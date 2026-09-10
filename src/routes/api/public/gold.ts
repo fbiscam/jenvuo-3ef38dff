@@ -81,6 +81,10 @@ async function handle({ request }: { request: Request }) {
     const market = await loadMarket(symbol, timeframe)
 
     if (body.action === 'chat') {
+      const requestId = request.headers.get('x-request-id') || crypto.randomUUID()
+      const { getExtensionEntitlement } = await import('@/lib/extension-billing.server')
+      const entitlement = await getExtensionEntitlement(auth.userId)
+      if (!entitlement.allowed) return extJson({ ok: false, error: entitlement.error, code: entitlement.status === 402 ? 'LOW_BALANCE' : 'PLAN_REQUIRED', balance: entitlement.balance }, entitlement.status)
       const question = String(body.question || '').slice(0, 2000)
       if (!question) return extJson({ ok: false, error: 'Question is empty.' }, 400)
 
@@ -121,11 +125,9 @@ async function handle({ request }: { request: Request }) {
         ],
       })
 
-      const needsDeskReview = Boolean(image) || /\b(analy[sz]e|chart|screen|trade|setup|signal|entry|stop|\bsl\b|\btp\b|bias|trend|smc|ict|liquidity|fvg|order block)\b/i.test(question)
       let content = primary.content
       let seniorReview: { included: boolean; model: string | null; status: string } = { included: false, model: null, status: 'not_required' }
-      if (needsDeskReview) {
-        const review = await callChatCompletion({
+      const review = await callChatCompletion({
           models: [...MODEL_CHAIN.seniorReview],
           stage: 'extension-senior-review',
           maxTokens: 900,
@@ -137,11 +139,21 @@ async function handle({ request }: { request: Request }) {
             { role: 'user', content: `Verified context:\n${context}\n\nTrader request:\n${question}\n\nJunior analysis:\n${primary.content}` },
           ],
         })
-        content = review.content
-        seniorReview = { included: true, model: review.model, status: 'completed' }
-      }
+      content = review.content
+      seniorReview = { included: true, model: review.model, status: 'completed' }
 
-      return extJson({ ok: true, text: content, ticker: market.ticker, seniorReview })
+      const { chargeExtensionUsage } = await import('@/lib/extension-billing.server')
+      const billing = await chargeExtensionUsage({
+        userId: auth.userId, keyId: auth.keyId, keyName: auth.name, requestId,
+        action: image ? 'screen_analysis' : 'chat',
+        calls: [
+          { model: primary.model, usage: primary.usage, stage: image ? 'extension-screen-analysis' : 'extension-chat' },
+          { model: review.model, usage: review.usage, stage: 'extension-senior-review' },
+        ],
+      })
+      if (!billing.ok) return extJson({ ok: false, error: billing.error, code: billing.error?.includes('balance') ? 'LOW_BALANCE' : 'BILLING_FAILED' }, billing.error?.includes('balance') ? 402 : 502)
+
+      return extJson({ ok: true, text: content, ticker: market.ticker, seniorReview, usage: { requestId, charged: billing.charged, balance: billing.balance } })
     }
 
     return extJson({

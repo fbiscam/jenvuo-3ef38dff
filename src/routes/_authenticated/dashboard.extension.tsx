@@ -8,6 +8,7 @@ import {
   createExtensionKey,
   revokeExtensionKey,
   type ExtensionKeyRow,
+  type ExtensionKeyAccess,
 } from "@/lib/extension-keys.functions";
 
 const MONO = "font-['JetBrains_Mono',ui-monospace,monospace]";
@@ -29,6 +30,7 @@ function ExtensionPage() {
   const revoke = useServerFn(revokeExtensionKey);
 
   const [keys, setKeys] = useState<ExtensionKeyRow[]>([]);
+  const [access, setAccess] = useState<ExtensionKeyAccess | null>(null);
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
   const [showCreate, setShowCreate] = useState(false);
@@ -48,7 +50,7 @@ function ExtensionPage() {
     setLoading(true);
     try {
       const res = await load();
-      if (res.ok) setKeys(res.keys);
+      if (res.ok) { setKeys(res.keys); setAccess(res.access); }
       else toast.error(res.error || "Could not load your keys");
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Could not load your keys");
@@ -118,6 +120,7 @@ function ExtensionPage() {
 
   const activeKeys = keys.filter((k) => !k.revoked_at);
   const displayedKeys = keys.slice(0, 4);
+  const canCreate = Boolean(access?.active && access.plan !== "free" && activeKeys.length < access.keyLimit);
 
   return (
     <div className="w-full px-1 py-2 sm:px-2 sm:py-4">
@@ -133,12 +136,21 @@ function ExtensionPage() {
           </button>
           <button
             onClick={() => { setShowCreate(true); setFreshKey(null); }}
-            className="inline-flex items-center gap-2 rounded-full border border-zinc-300 px-4 py-2 text-[13px] font-medium text-zinc-900 hover:bg-zinc-50"
+            disabled={!canCreate}
+            className="inline-flex items-center gap-2 rounded-full border border-zinc-300 px-4 py-2 text-[13px] font-medium text-zinc-900 hover:bg-zinc-50 disabled:cursor-not-allowed disabled:opacity-45"
           >
             <KeyRound className="h-4 w-4" /> Create API key
           </button>
         </div>
       </div>
+
+      {access && (
+        <div className="mt-5 grid gap-3 border-y border-zinc-200 py-4 sm:grid-cols-3">
+          <div><div className="text-[11px] text-zinc-500">Plan</div><div className="mt-1 text-sm font-medium text-zinc-900">{access.planName}</div></div>
+          <div><div className="text-[11px] text-zinc-500">Active API keys</div><div className="mt-1 text-sm font-medium tabular-nums text-zinc-900">{activeKeys.length} / {access.keyLimit}</div></div>
+          <div><div className="text-[11px] text-zinc-500">AI wallet</div><div className={`mt-1 text-sm font-medium tabular-nums ${access.balance < 0.02 ? "text-rose-600" : "text-zinc-900"}`}>${access.balance.toFixed(2)} / ${access.wallet.toFixed(2)}</div></div>
+        </div>
+      )}
 
       {/* Filter row */}
       <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
@@ -259,7 +271,8 @@ function ExtensionPage() {
             </p>
             <button
               onClick={() => setShowCreate(true)}
-              className="mt-6 rounded-full border border-zinc-300 px-4 py-2 text-[13px] text-zinc-900 hover:bg-zinc-50"
+              disabled={!canCreate}
+              className="mt-6 rounded-full border border-zinc-300 px-4 py-2 text-[13px] text-zinc-900 hover:bg-zinc-50 disabled:cursor-not-allowed disabled:opacity-45"
             >
               Create API key
             </button>
@@ -268,7 +281,7 @@ function ExtensionPage() {
 
         {!loading && keys.length > 0 && (
           <div className="mt-3 text-[12px] text-zinc-500">
-            Showing {displayedKeys.length} of {keys.length} key(s) · {activeKeys.length} active.
+            Showing {displayedKeys.length} of {keys.length} key(s) · {activeKeys.length} of {access?.keyLimit ?? 0} active.
           </div>
         )}
       </div>}
@@ -314,6 +327,7 @@ function ExtensionPage() {
               <X className="h-4 w-4" />
             </button>
           </div>
+          <p className="mt-3 text-[12px] leading-relaxed text-zinc-600">Live snapshots are free. AI chat and analysis cost $0.02 plus GPT/Gemini token usage with mandatory senior review.</p>
           <ol className="mt-3 space-y-2 text-[13px] leading-relaxed text-zinc-700">
             <li>1. Download the extension package above and unzip it.</li>
             <li>2. Open <span className={`${MONO} rounded bg-white px-1.5 py-0.5 text-[12px]`}>chrome://extensions</span>, turn on Developer mode.</li>

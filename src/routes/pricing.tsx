@@ -23,9 +23,9 @@ export const Route = createFileRoute("/pricing")({
   head: () => ({
     meta: [
       { title: "Pricing Plans — Jenvu" },
-      { name: "description", content: "Every plan includes the full platform — voice agent, A+ signals, ICT & SMC narration, trade journal, and realtime alerts. Invite-only." },
+      { name: "description", content: "Compare Jenvu plans, extension API key limits, monthly AI wallets, and senior-reviewed GPT/Gemini market analysis." },
       { property: "og:title", content: "Jenvu Pricing — Pro & Elite Plans" },
-      { property: "og:description", content: "Realtime A+ gold setups, voice intelligence, and trade journal — Pro $15/mo, Elite $50/mo." },
+      { property: "og:description", content: "Compare Jenvu plans with extension API keys, AI wallets, and senior-reviewed GPT/Gemini market analysis." },
       { property: "og:url", content: "https://jenvu.com/pricing" },
     ],
     links: [{ rel: "canonical", href: "https://jenvu.com/pricing" }],
@@ -58,7 +58,7 @@ const TIERS = [
     tagline: "For serious gold traders.",
     cta: "Notify me when live",
     ctaTo: "/contact",
-    credits: 35,
+    credits: 10,
     features: [
 
       "Voice queries free",
@@ -68,6 +68,8 @@ const TIERS = [
       "Full ICT / SMC narration",
       "Trade journal & analytics",
       "Multi-timeframe bias engine",
+      "1 extension API key · $10 AI wallet",
+      "GPT/Gemini analysis + senior review",
     ],
 
     highlight: true,
@@ -81,7 +83,7 @@ const TIERS = [
     tagline: "For prop desks & funds.",
     cta: "Talk to sales",
     ctaTo: "/contact",
-    credits: 85,
+    credits: 40,
     features: [
 
       "Voice queries free",
@@ -90,6 +92,7 @@ const TIERS = [
       "Priority A+ alerts (< 30s)",
       "Dedicated XAU/USD scanner with DXY overlay",
       "API access & webhooks",
+      "3 extension API keys · $40 AI wallet",
       "Custom alert rules",
       "Dedicated onboarding & SLA",
     ],
@@ -117,7 +120,7 @@ const MATRIX: Array<{ feature: string; free: Mark; pro: Mark; elite: Mark }> = [
   { feature: "Multi-timeframe bias", free: true, pro: true, elite: true },
   { feature: "Trade journal", free: true, pro: true, elite: true },
   { feature: "Multi-pair scanner", free: false, pro: false, elite: true },
-  { feature: "API & webhooks", free: false, pro: false, elite: true },
+  { feature: "Extension API keys", free: false, pro: "1", elite: "3" },
   { feature: "Custom alert rules", free: false, pro: false, elite: true },
   { feature: "Dedicated onboarding", free: false, pro: false, elite: true },
 ];
@@ -281,7 +284,9 @@ function PricingPage() {
 
             <tbody>
               {([
-                { f: "Monthly wallet (USD)", b: "$15", c: "$50", d: "$100" },
+                { f: "Monthly AI wallet", b: "$10", c: "$40", d: "$90" },
+                { f: "Active extension API keys", b: "1", c: "3", d: "5" },
+                { f: "Extension senior review", b: true, c: true, d: true },
 
                 { f: "Voice queries / day", b: "Unlimited", c: "Unlimited", d: "Unlimited" },
 
@@ -419,7 +424,7 @@ function PricingPage() {
           <div>
             
             <h2 className="mt-2 text-2xl sm:text-3xl font-semibold tracking-tight">Need more wallet balance?</h2>
-            <p className="mt-2 max-w-xl text-sm text-zinc-600 lg:max-w-none lg:whitespace-nowrap">One-time top-ups that never expire. $1 top-up = $1 wallet — same as plans. Each real signal costs $0.30.</p>
+            <p className="mt-2 max-w-xl text-sm text-zinc-600 lg:max-w-none lg:whitespace-nowrap">Live extension market data is free. AI analysis costs $0.02 plus model usage, including senior review.</p>
           </div>
         </div>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -516,7 +521,7 @@ function CustomTopUp({ signedOut }: { signedOut: boolean }) {
         <div>
           
           <h3 className="mt-2 text-lg font-semibold tracking-tight">Pick your own amount</h3>
-          <p className="mt-1 text-sm text-zinc-600">Minimum $5. $1 top-up = $1 wallet. Each real signal costs $0.30. Balance never expires.</p>
+          <p className="mt-1 text-sm text-zinc-600">Minimum $5. $1 top-up = $1 wallet. Extension AI uses hybrid per-request pricing.</p>
         </div>
         <div className="flex items-center gap-3">
           <div className="flex items-center overflow-hidden rounded-md border border-border bg-background focus-within:ring-2 focus-within:ring-home-accent/40">

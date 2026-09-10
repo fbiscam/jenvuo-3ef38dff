@@ -2084,7 +2084,7 @@ function buildFeedFallbackPlan(args: {
 export async function computeSignalPlan(
   data: { symbol: string },
   __userId: string | null = null,
-  billing?: { scanId?: string | null; systemScan?: boolean },
+  billing?: { scanId?: string | null; systemScan?: boolean; extensionBilling?: { keyId: string; keyName: string } },
 ): Promise<SignalPlan> {
     // AI key is validated inside callChatCompletion — no local read needed.
 
@@ -2324,10 +2324,12 @@ ${fmt(ltfPrompt)}
 Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
 
     let parsed: any = {};
-    let __usedNarrationModel: string | null = "rules-engine/ict-smc";
+    let __usedNarrationModel: string | null = null;
     let __usedSeniorModel: string | null = null;
     let __totalPromptTokens = 0;
     let __totalCompletionTokens = 0;
+    let __seniorPromptTokens = 0;
+    let __seniorCompletionTokens = 0;
     // The deterministic engine remains the authority for direction and levels,
     // while a real AI pass reads the current candles for narration and an
     // independent confidence input. Provider failure soft-fails to the engine.
@@ -2939,7 +2941,12 @@ ENGINE GRADE ${setupGrade} (${setupScore}/100) | breakers ${breakers.length} | i
     let __requiresSeniorReview = false;
     let __seniorReviewStatus: "not_required" | "completed" | "confirmed" | "downgraded" | "vetoed" | "failed" = "not_required";
     let __seniorReviewError: string | null = null;
-    if (billing?.systemScan) {
+    if (billing?.extensionBilling) {
+      // Every paid extension analysis includes the independent senior desk pass,
+      // including WAIT outcomes, so billing and review quality stay consistent.
+      __planAllowsSenior = true;
+      __planId = "extension";
+    } else if (billing?.systemScan) {
       // Auto-scan / broadcast worker runs with no user context, but a signal
       // that goes out to every subscriber MUST pass the senior review gate.
       __planAllowsSenior = true;
@@ -2953,18 +2960,18 @@ ENGINE GRADE ${setupGrade} (${setupScore}/100) | breakers ${breakers.length} | i
           .eq("user_id", __userId)
           .maybeSingle();
         const pid = (sub?.plan_id as string | undefined) ?? "free";
-        __planId = sub?.status === "active" ? pid : "free";
-        __planAllowsSenior = sub?.status === "active" && pid !== "free";
+        const subscriptionActive = sub?.status === "active" || sub?.status === "trialing";
+        __planId = subscriptionActive ? pid : "free";
+        __planAllowsSenior = subscriptionActive && pid !== "free";
       } catch { __planAllowsSenior = false; __planId = "free"; }
     }
     // Senior review re-enabled: acts as a 25-year veteran veto/downgrade layer.
     // Runs whenever the rules engine produces a live BUY/SELL and the score
     // is above SENIOR_REVIEW_MIN_RULE_SCORE (62). Failure soft-fails — the
     // rules result still stands so a throttled AI provider never drops a signal.
-    __requiresSeniorReview =
-      __planAllowsSenior &&
-      built.direction !== "WAIT" &&
-      setupScore >= SENIOR_REVIEW_MIN_RULE_SCORE;
+    __requiresSeniorReview = billing?.extensionBilling
+      ? __planAllowsSenior
+      : __planAllowsSenior && built.direction !== "WAIT" && setupScore >= SENIOR_REVIEW_MIN_RULE_SCORE;
 
     if (__requiresSeniorReview) {
       try {
@@ -3040,8 +3047,10 @@ Run the full 25-year desk-head review internally through the elite lens above, t
         } else {
           const mdl = reviewResult.model;
           __usedSeniorModel = mdl;
-          __totalPromptTokens += reviewResult.usage?.promptTokens ?? 0;
-          __totalCompletionTokens += reviewResult.usage?.completionTokens ?? 0;
+          __seniorPromptTokens = reviewResult.usage?.promptTokens ?? 0;
+          __seniorCompletionTokens = reviewResult.usage?.completionTokens ?? 0;
+          __totalPromptTokens += __seniorPromptTokens;
+          __totalCompletionTokens += __seniorCompletionTokens;
           const uCap = reviewResult.usage;
           import("@/lib/ai-cost-log.server")
             .then((m) => m.logAiCost({ userId: __userId, stage: "senior-review", model: mdl, usage: uCap }))
@@ -3783,7 +3792,16 @@ IMMINENT HIGH-IMPACT: ${imminentHigh ? `${imminentHigh.title} in ${Math.round(im
     // WAIT / no-trade returns are free. MUST be awaited — Cloudflare Workers
     // cancel post-response async work, so fire-and-forget charges get dropped.
     const __scanId = billing?.scanId ?? ((globalThis as any).crypto?.randomUUID?.() ?? `scan_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`);
-    if (enrichedPlan.trade.direction === "BUY" || enrichedPlan.trade.direction === "SELL") {
+    if (billing?.extensionBilling) {
+      const calls = [
+        ...(__usedNarrationModel ? [{ model: __usedNarrationModel, usage: { promptTokens: Math.max(0, __totalPromptTokens - __seniorPromptTokens), completionTokens: Math.max(0, __totalCompletionTokens - __seniorCompletionTokens) }, stage: "extension-full-analysis" }] : []),
+        ...(__usedSeniorModel ? [{ model: __usedSeniorModel, usage: { promptTokens: __seniorPromptTokens, completionTokens: __seniorCompletionTokens }, stage: "extension-senior-review" }] : []),
+      ];
+      if (calls.length < 2) throw new Error("Extension analysis requires a completed primary and senior AI review.");
+      const { chargeExtensionUsage } = await import("@/lib/extension-billing.server");
+      const charged = await chargeExtensionUsage({ userId: __userId as string, keyId: billing.extensionBilling.keyId, keyName: billing.extensionBilling.keyName, requestId: __scanId, action: "full_analysis", calls });
+      if (!charged.ok) throw new Error(charged.error ?? "Extension usage could not be charged.");
+    } else if (enrichedPlan.trade.direction === "BUY" || enrichedPlan.trade.direction === "SELL") {
       try {
         const { chargeSignalScan } = await import("@/lib/ai-cost-log.server");
         await chargeSignalScan({

@@ -1999,6 +1999,7 @@ export type Database = {
           annual_discount_pct: number | null
           annual_price_usd: number | null
           created_at: string
+          extension_key_limit: number
           feature_full_ict: boolean
           feature_journal: boolean
           feature_realtime_alerts: boolean
@@ -2016,6 +2017,7 @@ export type Database = {
           annual_discount_pct?: number | null
           annual_price_usd?: number | null
           created_at?: string
+          extension_key_limit?: number
           feature_full_ict?: boolean
           feature_journal?: boolean
           feature_realtime_alerts?: boolean
@@ -2033,6 +2035,7 @@ export type Database = {
           annual_discount_pct?: number | null
           annual_price_usd?: number | null
           created_at?: string
+          extension_key_limit?: number
           feature_full_ict?: boolean
           feature_journal?: boolean
           feature_realtime_alerts?: boolean
@@ -3357,6 +3360,15 @@ export type Database = {
       bug_notify_dispatch: {
         Args: { _fingerprint: string; _kind: string; _occurrences: number }
         Returns: undefined
+      }
+      charge_extension_usage: {
+        Args: {
+          _amount: number
+          _metadata?: Json
+          _request_id: string
+          _user_id: string
+        }
+        Returns: number
       }
       close_chat_session: { Args: { _session_id: string }; Returns: undefined }
       community_bump_counter: {
