@@ -71,7 +71,7 @@ function SavedSignals() {
         </div>
         <h3 className="mt-4 text-lg font-semibold tracking-tight">No saved setups yet</h3>
         <p className="mx-auto mt-1.5 max-w-md text-sm text-zinc-500 sm:max-w-none sm:whitespace-nowrap">
-          On the Live Signals, tap <span className="font-medium text-zinc-700">Save Signal</span> to keep an A+ setup here for later.
+          Saved setups will appear here when an alert is added to your account.
         </p>
         <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
           <Link to="/dashboard/alerts" className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-4 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-50">

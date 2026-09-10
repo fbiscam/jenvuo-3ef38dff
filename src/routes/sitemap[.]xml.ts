@@ -35,35 +35,8 @@ export const Route = createFileRoute("/sitemap.xml")({
           { path: "/refund", changefreq: "yearly", priority: "0.3" },
           { path: "/killzones", changefreq: "daily", priority: "0.7" },
           { path: "/help", changefreq: "weekly", priority: "0.6" },
-          { path: "/briefs", changefreq: "daily", priority: "0.8" },
           { path: "/broadcasts", changefreq: "daily", priority: "0.7" },
-          { path: "/signals-live", changefreq: "hourly", priority: "0.9" },
         ];
-
-        // Append every public brief
-        try {
-          const supaBriefs = createClient(
-            process.env.SUPABASE_URL!,
-            process.env.SUPABASE_PUBLISHABLE_KEY!,
-            { auth: { persistSession: false, autoRefreshToken: false } },
-          );
-          const { data: briefs } = await supaBriefs
-            .from("killzone_briefs")
-            .select("id, published_at, is_public")
-            .eq("is_public", true)
-            .order("published_at", { ascending: false })
-            .limit(500);
-          for (const b of briefs ?? []) {
-            entries.push({
-              path: `/brief/${b.id}`,
-              changefreq: "weekly",
-              priority: "0.6",
-              lastmod: b.published_at ? new Date(b.published_at).toISOString().slice(0, 10) : undefined,
-            });
-          }
-        } catch {
-          // ignore
-        }
 
         // Append Help Center pages
         try {

@@ -48,7 +48,7 @@ function formatSignal(a: TelegramSignal): string {
     '',
     a.rationale ? `<i>${escapeHtml(a.rationale.slice(0, 600))}</i>` : '',
     '',
-    `https://jenvu.com/signals-live${a.alertId ? `?alertId=${a.alertId}` : ''}`,
+    `https://jenvu.com/dashboard/notifications`,
   ]
     .filter(Boolean)
     .join('\n')

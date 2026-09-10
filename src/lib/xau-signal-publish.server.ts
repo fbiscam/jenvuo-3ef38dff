@@ -3,7 +3,7 @@
 //
 // The homepage/dashboard terminal engine runs every 45s. Only a real
 // ACTIVE signal is persisted, and only once per cooldown window, so the
-// Live Signals page and WhatsApp broadcast stay in sync with the terminal.
+// Signal records and alert broadcasts stay in sync with the terminal.
 
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { fetchLiveInstrumentTick, resolveInstrument } from "@/lib/gold-analysis.functions";

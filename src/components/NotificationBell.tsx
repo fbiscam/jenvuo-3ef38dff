@@ -74,7 +74,7 @@ function visualFor(n: NotificationRow): Visual {
     return {
       Icon: isBuy ? TrendingUp : TrendingDown,
       wrap: isBuy ? "bg-emerald-50 text-emerald-600" : "bg-red-50 text-red-600",
-      href: "/signals-live",
+      href: "/dashboard/notifications",
       search: alertId ? { alertId } : undefined,
     };
   }

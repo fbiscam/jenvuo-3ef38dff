@@ -62,7 +62,7 @@ const Email = ({
   htfBias = 'bullish',
   rationale = 'High-confluence institutional setup detected.',
   firedAt,
-  signalUrl = `${SITE}/signals-live`,
+  signalUrl = `${SITE}/dashboard/notifications`,
   sizeLots,
   sizeUnits,
   sizeRiskUsd,
@@ -198,7 +198,7 @@ const Email = ({
           <Section style={footer}>
             <Text style={footerBrand}>JENVU AI · SIGNAL ALERTS</Text>
             <Text style={footerMeta}>
-              You're receiving this because you subscribed to A+ setup alerts at jenvu.com/signals-live.
+              You're receiving this because you subscribed to A+ setup alerts in Jenvu.
             </Text>
             <Text style={footerMeta}>
               {' · '}
@@ -231,7 +231,7 @@ export const template = {
     rationale:
       'Price swept Asian session lows into a bullish 1H order block aligned with daily premium discount. FVG above unfilled, BSL resting at PDH.',
     firedAt: new Date().toISOString(),
-    signalUrl: 'https://jenvu.com/signals-live',
+    signalUrl: 'https://jenvu.com/dashboard/notifications',
   },
 } satisfies TemplateEntry
 
