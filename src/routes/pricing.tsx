@@ -281,7 +281,9 @@ function PricingPage() {
 
             <tbody>
               {([
-                { f: "Monthly wallet (USD)", b: "$15", c: "$50", d: "$100" },
+                { f: "Monthly AI wallet", b: "$10", c: "$40", d: "$90" },
+                { f: "Active extension API keys", b: "1", c: "3", d: "5" },
+                { f: "Extension senior review", b: true, c: true, d: true },
 
                 { f: "Voice queries / day", b: "Unlimited", c: "Unlimited", d: "Unlimited" },
 
@@ -419,7 +421,7 @@ function PricingPage() {
           <div>
             
             <h2 className="mt-2 text-2xl sm:text-3xl font-semibold tracking-tight">Need more wallet balance?</h2>
-            <p className="mt-2 max-w-xl text-sm text-zinc-600 lg:max-w-none lg:whitespace-nowrap">One-time top-ups that never expire. $1 top-up = $1 wallet — same as plans. Each real signal costs $0.30.</p>
+            <p className="mt-2 max-w-xl text-sm text-zinc-600 lg:max-w-none lg:whitespace-nowrap">Live extension market data is free. AI analysis costs $0.02 plus model usage, including senior review.</p>
           </div>
         </div>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -516,7 +518,7 @@ function CustomTopUp({ signedOut }: { signedOut: boolean }) {
         <div>
           
           <h3 className="mt-2 text-lg font-semibold tracking-tight">Pick your own amount</h3>
-          <p className="mt-1 text-sm text-zinc-600">Minimum $5. $1 top-up = $1 wallet. Each real signal costs $0.30. Balance never expires.</p>
+          <p className="mt-1 text-sm text-zinc-600">Minimum $5. $1 top-up = $1 wallet. Extension AI uses hybrid per-request pricing.</p>
         </div>
         <div className="flex items-center gap-3">
           <div className="flex items-center overflow-hidden rounded-md border border-border bg-background focus-within:ring-2 focus-within:ring-home-accent/40">

@@ -232,7 +232,7 @@ function Billing() {
           <Info className="h-3.5 w-3.5 text-zinc-400" />
           <span>API credit balance</span>
           <span className="text-zinc-300">·</span>
-          <span>Flat $0.30 per real BUY/SELL signal. WAIT scans are free.</span>
+          <span>Extension AI: $0.02 base + model usage; senior review included.</span>
         </div>
         {trial.active && (
           <p className="mt-1 text-xs text-amber-600">

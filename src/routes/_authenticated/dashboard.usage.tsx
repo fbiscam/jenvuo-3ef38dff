@@ -18,6 +18,7 @@ export const Route = createFileRoute("/_authenticated/dashboard/usage")({
 
 const REASON_LABEL: Record<string, string> = {
   ai_scan: "AI scan",
+  extension_api: "Extension API",
   signal: "Signal scan",
   ict_narration: "ICT narration",
   alert: "Alert broadcast",
@@ -284,7 +285,7 @@ function UsagePage() {
             {tab === "categories" ? (
               <div className="grid grid-cols-1 gap-4 p-5 sm:grid-cols-2">
                 <CategoryCard
-                  title="AI scans"
+                    title="AI and extension requests"
                   items={[
                     { color: "bg-indigo-500", label: `${fmtInt(derived.spendRows.length)} requests` },
                     { color: "bg-zinc-300", label: `${fmtInt(derived.inputTokens)} input tokens` },
@@ -366,7 +367,7 @@ function UsagePage() {
                           <div className="truncate font-medium text-zinc-800">{label(r.reason)}</div>
                           <div className="text-[10.5px] tabular-nums text-zinc-400">
                             {d.toLocaleDateString(undefined, { month: "short", day: "numeric" })} · {d.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" })}
-                            {r.model ? ` · ${r.model}` : ""}
+                            {r.model ? ` · ${r.model}` : ""}{r.reason === "extension_api" && r.metadata && typeof r.metadata === "object" && !Array.isArray(r.metadata) && typeof r.metadata.action === "string" ? ` · ${r.metadata.action.replace(/_/g, " ")}` : ""}
                           </div>
                         </div>
                         <span className={`shrink-0 font-semibold tabular-nums ${isSpend ? "text-rose-600" : "text-emerald-600"}`}>

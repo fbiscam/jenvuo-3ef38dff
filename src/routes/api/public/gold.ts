@@ -151,7 +151,7 @@ async function handle({ request }: { request: Request }) {
           { model: review.model, usage: review.usage, stage: 'extension-senior-review' },
         ],
       })
-      if (!billing.ok) return extJson({ ok: false, error: billing.error, code: 'LOW_BALANCE' }, 402)
+      if (!billing.ok) return extJson({ ok: false, error: billing.error, code: billing.error?.includes('balance') ? 'LOW_BALANCE' : 'BILLING_FAILED' }, billing.error?.includes('balance') ? 402 : 502)
 
       return extJson({ ok: true, text: content, ticker: market.ticker, seniorReview, usage: { requestId, charged: billing.charged, balance: billing.balance } })
     }

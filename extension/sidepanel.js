@@ -462,6 +462,7 @@ function addMsg(cls, text, shot) {
 }
 
 async function post(body, signal) {
+  const requestId = "ext_" + Date.now().toString(36) + "_" + Math.random().toString(36).slice(2, 10);
   let lastErr;
   for (const url of [API, ...ENDPOINTS.filter((u) => u !== API)]) {
     for (let attempt = 0; attempt < 2; attempt++) {
@@ -471,15 +472,19 @@ async function post(body, signal) {
           headers: {
             "content-type": "application/json",
             ...(apiKey ? { authorization: `Bearer ${apiKey}` } : {}),
+            "x-request-id": requestId,
           },
           body: JSON.stringify(body),
           cache: "no-store",
           signal,
         });
         const json = await res.json().catch(() => ({}));
-        if (res.status === 401) {
+        if (res.status === 401 || res.status === 403) {
           showKeyGate(true, json.error || "Your API key is invalid or revoked.");
           throw new Error(json.error || "Sign in with your Jenvu API key.");
+        }
+        if (res.status === 402 || json.code === "LOW_BALANCE") {
+          throw new Error(json.error || "Low balance. Top up your Jenvu wallet to continue.");
         }
         if (!res.ok) {
           const error = new Error(json.error || `Request failed (${res.status})`);
