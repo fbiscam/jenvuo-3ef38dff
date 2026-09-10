@@ -96,6 +96,7 @@
   --color-brand-claude: var(--brand-claude);
   --color-home-accent: var(--home-accent);
   --color-home-accent-soft: var(--home-accent-soft);
+  --color-home-accent-foreground: var(--home-accent-foreground);
   --color-auth-action: var(--auth-action);
   --color-auth-action-foreground: var(--auth-action-foreground);
 }
@@ -144,6 +145,7 @@
   --brand-deepseek: oklch(0.59 0.22 271);
   --brand-claude: oklch(0.7 0.12 55);
   --home-accent: #fd540f;
+  --home-accent-foreground: #ffffff;
   --home-accent-soft: oklch(0.95 0.04 60);
   --home-accent-canvas: rgb(255 244 237);
   --auth-action: oklch(0.72 0.14 255);
@@ -188,6 +190,7 @@
   --brand-deepseek: oklch(0.7 0.18 271);
   --brand-claude: oklch(0.75 0.11 55);
   --home-accent: #fd540f;
+  --home-accent-foreground: #ffffff;
   --home-accent-soft: oklch(0.32 0.10 55);
   --home-accent-canvas: rgb(45 24 12);
   --auth-action: oklch(0.72 0.14 255);
