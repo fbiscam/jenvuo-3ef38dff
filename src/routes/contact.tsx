@@ -114,7 +114,7 @@ function ContactPage() {
 
   return (
     <>
-      <div className={`jenvu-zoom min-h-dvh w-full bg-[#FAFAFA] text-zinc-900 ${SANS} antialiased selection:bg-zinc-900 selection:text-white`}>
+      <div className={`public-cloudflare jenvu-zoom min-h-dvh w-full bg-background text-foreground ${SANS} antialiased selection:bg-home-accent selection:text-home-accent-foreground`}>
         {/* NAV */}
         <header className="sticky top-0 z-50 border-b border-zinc-100 bg-white">
           <div className="relative mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-5 py-3 sm:px-6 sm:py-4 md:flex md:justify-between">
@@ -128,7 +128,7 @@ function ContactPage() {
         </header>
 
         {/* HERO */}
-        <section className="border-b border-zinc-100">
+        <section className="public-page-hero border-b border-border">
           <div className="mx-auto max-w-6xl px-5 sm:px-6 py-12 sm:py-16">
             <h1 className="mt-4 max-w-3xl text-3xl font-semibold tracking-tight sm:text-4xl md:text-5xl">
               Talk to the desk.
@@ -173,7 +173,7 @@ function ContactPage() {
                     "Press & media inquiries answered within 24h.",
                   ].map((t) => (
                     <li key={t} className="flex gap-2.5">
-                      <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-zinc-900" />
+                      <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-home-accent" />
                       <span>{t}</span>
                     </li>
                   ))}

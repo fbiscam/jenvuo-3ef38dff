@@ -105,7 +105,7 @@ function FoundingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white text-zinc-900 founding-zoom" style={{ fontFamily: "'Google Sans', 'Urbanist', system-ui, sans-serif" }}>
+    <div className="public-cloudflare min-h-screen bg-background text-foreground founding-zoom" style={{ fontFamily: "'Google Sans', 'Urbanist', system-ui, sans-serif" }}>
       <header className="sticky top-0 z-30 border-b border-zinc-100 bg-white backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-3.5">
           <Link to="/" className="inline-flex items-center gap-2 text-[15px] font-semibold tracking-tight">
@@ -131,9 +131,9 @@ function FoundingPage() {
             <span>Seats claimed this month</span>
             <span className="font-medium text-zinc-900">{seats.filled} / {seats.total}</span>
           </div>
-          <div className="mt-2 h-2 overflow-hidden rounded-full bg-zinc-100">
+          <div className="mt-2 h-2 overflow-hidden rounded-full bg-home-accent-soft">
             <div
-              className="relative h-full rounded-full transition-all duration-700 ease-out overflow-hidden bg-gradient-to-r from-[#60a5fa] via-[#2563eb] to-[#1d4ed8] bg-[length:200%_100%] animate-[flow_2.4s_linear_infinite] shadow-[0_0_10px_rgba(37,99,235,0.55)]"
+              className="relative h-full overflow-hidden rounded-full bg-home-accent transition-all duration-700 ease-out"
               style={{ width: `${pct}%` }}
             >
               <div className="absolute inset-y-0 -left-1/3 w-1/3 bg-gradient-to-r from-transparent via-white/70 to-transparent animate-[shimmer_1.8s_linear_infinite]" />
@@ -173,9 +173,9 @@ function FoundingPage() {
             ].map(([t, d], i, arr) => (
               <li key={t} className="flex gap-4">
                 <div className="flex flex-col items-center shrink-0">
-                  <div className="flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold bg-[#2563eb] text-white">{i + 1}</div>
+                  <div className="flex h-7 w-7 items-center justify-center rounded-full bg-home-accent text-xs font-semibold text-home-accent-foreground">{i + 1}</div>
                   {i < arr.length - 1 && (
-                    <div className="mt-1 w-px flex-1 bg-[#2563eb]/30" />
+                    <div className="mt-1 w-px flex-1 bg-home-accent/30" />
                   )}
                 </div>
                 <div className="pb-2">
@@ -264,7 +264,7 @@ function FoundingPage() {
                         key={p.id}
                         type="button"
                         onClick={() => setPlan(p.id)}
-                        className={`rounded-xl border px-3 py-2.5 text-left transition ${ active ? "border-zinc-900 bg-white text-zinc-900 shadow-sm" : "border-zinc-200 bg-white text-zinc-900 hover:border-zinc-400" }`}
+                        className={`rounded-xl border px-3 py-2.5 text-left transition ${ active ? "border-home-accent bg-home-accent-soft text-foreground shadow-sm" : "border-border bg-background text-foreground hover:border-home-accent/50" }`}
                       >
                         <div className="text-[13px] font-semibold">{p.label}</div>
                         <div className={`text-[11px] ${active ? "text-zinc-600" : "text-zinc-500"}`}>{p.desc}</div>
@@ -312,7 +312,7 @@ function FoundingPage() {
               <button
                 type="submit"
                 disabled={submitting || remaining === 0}
-                className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-black px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-zinc-800 disabled:opacity-60"
+                className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-home-accent px-4 py-3 text-sm font-semibold text-home-accent-foreground transition-opacity hover:opacity-90 disabled:opacity-60"
               >
                 {submitting ? "Submitting…" : remaining === 0 ? "This month is full — join waitlist" : "Submit application"}
                 <ArrowRight className="h-4 w-4" />

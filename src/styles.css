@@ -310,6 +310,64 @@
 .region-earth::before { left: 0; }
 .region-earth::after { right: 0; }
 
+.public-cloudflare {
+  --public-rail: color-mix(in oklab, var(--border) 72%, transparent);
+  background-color: var(--background);
+}
+
+.public-page-hero {
+  position: relative;
+  overflow: hidden;
+  background-color: var(--background);
+}
+
+.public-page-hero::before,
+.public-page-hero::after,
+.public-page-rail::before,
+.public-page-rail::after {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: min(10vw, 96px);
+  content: "";
+  opacity: 0.48;
+  background-image: radial-gradient(circle, var(--public-rail) 0.7px, transparent 0.9px);
+  background-size: 8px 8px;
+  pointer-events: none;
+}
+
+.public-page-hero::before,
+.public-page-rail::before { left: 0; }
+.public-page-hero::after,
+.public-page-rail::after { right: 0; }
+
+.public-page-rail {
+  position: relative;
+}
+
+.public-cloudflare header {
+  border-color: var(--border);
+  background-color: color-mix(in oklab, var(--background) 94%, transparent);
+  backdrop-filter: blur(12px);
+}
+
+.public-cloudflare main article,
+.public-cloudflare main aside > div,
+.public-cloudflare main section[class*="border"] {
+  box-shadow: none;
+}
+
+.public-orange-cta::before {
+  position: absolute;
+  inset: 0;
+  content: "";
+  opacity: 0.35;
+  background-image: radial-gradient(circle, color-mix(in oklab, var(--home-accent-foreground) 70%, transparent) 0.65px, transparent 0.85px);
+  background-size: 6px 6px;
+  mask-image: radial-gradient(ellipse at center, black, transparent 76%);
+  pointer-events: none;
+}
+
 @keyframes jenvu-marquee {
   from { transform: translateX(0); }
   to   { transform: translateX(-50%); }

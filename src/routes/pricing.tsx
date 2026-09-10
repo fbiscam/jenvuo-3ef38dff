@@ -141,7 +141,7 @@ function PricingPage() {
   };
   const suffix = billing === "annual" ? "/yr" : "/mo";
   return (
-    <div className={`min-h-dvh w-full bg-[#FAFAFA] text-zinc-900 ${SANS} antialiased md:[zoom:1.375]`}>
+    <div className={`public-cloudflare min-h-dvh w-full bg-background text-foreground ${SANS} antialiased md:[zoom:1.375]`}>
 
       {/* HEADER */}
       <header className="sticky top-0 z-50 border-b border-zinc-100 bg-white">
@@ -157,8 +157,8 @@ function PricingPage() {
       </header>
 
       {/* HERO */}
-      <section className="relative border-b border-zinc-100 overflow-hidden">
-        <div className="relative mx-auto max-w-6xl px-5 sm:px-6 py-16 sm:py-24 text-left sm:text-center">
+      <section className="public-page-hero relative overflow-hidden border-b border-border">
+        <div className="relative z-10 mx-auto max-w-4xl px-5 py-16 text-center sm:px-6 sm:py-24">
           
           <h1 className="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl md:text-6xl">
             Trade gold with an institutional edge.
@@ -166,9 +166,9 @@ function PricingPage() {
           <p className="mx-auto mt-5 max-w-2xl text-base text-zinc-600 sm:text-lg">
             One voice agent. A+ realtime setups. Built on ICT, SMC, and 25 years of professional desk methodology.
           </p>
-          <div className="mt-8 flex flex-wrap justify-start sm:justify-center gap-2">
+          <div className="mt-8 flex flex-wrap justify-center gap-2">
             {["A+ Setups", "ICT / SMC", "< 30s Alerts", "25Y Methodology"].map((s) => (
-              <span key={s} className={`${MONO} text-[10px] uppercase tracking-wider px-3 py-1.5 rounded-full border border-zinc-200 bg-white text-zinc-700`}>
+              <span key={s} className={`${MONO} rounded-full border border-home-accent/25 bg-background px-3 py-1.5 text-[10px] text-home-accent`}>
                 {s}
               </span>
             ))}
@@ -188,7 +188,7 @@ function PricingPage() {
 
 
 
-        <div className="overflow-x-auto rounded-xl border border-zinc-200 bg-white">
+        <div className="overflow-x-auto rounded-lg border border-border bg-background shadow-sm">
 
           <table className="w-full min-w-[760px] text-sm border-collapse">
             <colgroup>
@@ -376,7 +376,7 @@ function PricingPage() {
             {FEATURE_BLOCKS.map((b) => (
               <article
                 key={b.tag}
-                className="group relative overflow-hidden rounded-xl border border-zinc-200 bg-white hover:border-zinc-300 transition"
+                className="group relative overflow-hidden rounded-lg border border-border bg-background transition hover:border-home-accent/50"
               >
                 <div className="px-6 pt-6">
                   <span className={`${MONO} inline-block text-[9px] uppercase tracking-wider px-2 py-1 rounded-sm bg-white text-zinc-900 border border-zinc-200`}>
@@ -392,7 +392,7 @@ function PricingPage() {
                     <span className={`${MONO} text-[10px] uppercase tracking-wider text-zinc-500`}>
                       {b.tone}
                     </span>
-                    <span className={`${MONO} text-[10px] uppercase tracking-wider text-emerald-600`}>
+                    <span className={`${MONO} text-[10px] text-home-accent`}>
                       Included →
                     </span>
                   </div>
@@ -419,11 +419,11 @@ function PricingPage() {
             { price: 25, sub: "Trader", accent: true },
             { price: 50, sub: "Power" },
           ].map((p) => (
-            <div key={p.price} className={`rounded-xl border ${p.accent ? "border-amber-300 bg-amber-50/40" : "border-zinc-200 bg-white"} p-5`}>
+            <div key={p.price} className={`rounded-lg border ${p.accent ? "border-home-accent bg-home-accent-soft" : "border-border bg-background"} p-5`}>
               <div className="flex items-center justify-between">
                 <span className={`${MONO} text-[10px] uppercase tracking-wider text-zinc-500`}>{p.sub}</span>
                 {p.accent && (
-                  <span className={`${MONO} text-[9px] uppercase tracking-wider px-1.5 py-0.5 rounded-sm bg-amber-400 text-zinc-900 font-bold`}>Best value</span>
+                  <span className={`${MONO} rounded-sm bg-home-accent px-1.5 py-0.5 text-[9px] font-bold text-home-accent-foreground`}>Best value</span>
                 )}
               </div>
               <div className="mt-4 flex items-baseline gap-1">
@@ -432,11 +432,11 @@ function PricingPage() {
               </div>
               <div className="mt-1 text-sm text-zinc-700">${p.price} one-time · ~{Math.floor(p.price / 0.2)} signals</div>
               {signedOut ? (
-                <Link to="/founding" className="mt-5 inline-flex w-full items-center justify-center rounded-md bg-zinc-900 px-3 py-2 text-xs font-medium text-white hover:bg-black">
+                <Link to="/founding" className="mt-5 inline-flex w-full items-center justify-center rounded-md bg-home-accent px-3 py-2 text-xs font-medium text-home-accent-foreground hover:opacity-90">
                   Buy Now
                 </Link>
               ) : (
-                <Link to="/dashboard/pay" search={{ amount: p.price }} className="mt-5 inline-flex w-full items-center justify-center rounded-md bg-zinc-900 px-3 py-2 text-xs font-medium text-white hover:bg-black">
+                <Link to="/dashboard/pay" search={{ amount: p.price }} className="mt-5 inline-flex w-full items-center justify-center rounded-md bg-home-accent px-3 py-2 text-xs font-medium text-home-accent-foreground hover:opacity-90">
                   Buy Now
                 </Link>
               )}

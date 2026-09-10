@@ -60,7 +60,7 @@ function HelpCenterPage() {
 
   return (
     <>
-      <div className={`jenvu-zoom min-h-dvh bg-[#FAFAFA] text-zinc-900 ${SANS} antialiased`}>
+      <div className={`public-cloudflare jenvu-zoom min-h-dvh bg-background text-foreground ${SANS} antialiased`}>
         {/* NAV */}
         <header className="sticky top-0 z-50 border-b border-zinc-100 bg-white">
           <div className="relative mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-5 py-3 sm:px-6 sm:py-4 md:flex md:justify-between">
@@ -74,7 +74,7 @@ function HelpCenterPage() {
         </header>
 
         {/* HERO + SEARCH */}
-        <section className="border-b border-zinc-100 bg-gradient-to-b from-zinc-50 to-white">
+        <section className="public-page-hero border-b border-border">
           <div className="mx-auto max-w-3xl px-5 sm:px-6 py-16 sm:py-24 text-left sm:text-center">
             <h1 className="text-3xl sm:text-5xl font-semibold tracking-tight text-zinc-900">
               How can we help?
@@ -192,7 +192,7 @@ function HelpCenterPage() {
             </div>
             <Link
               to="/contact"
-              className="inline-flex items-center gap-2 rounded-full bg-zinc-900 text-white px-5 py-3 text-sm font-medium hover:bg-zinc-800 transition"
+                className="inline-flex items-center gap-2 rounded-full bg-home-accent px-5 py-3 text-sm font-medium text-home-accent-foreground transition hover:opacity-90"
             >
               <MessageCircle className="h-4 w-4" />
               Contact support

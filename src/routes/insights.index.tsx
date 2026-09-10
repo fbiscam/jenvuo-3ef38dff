@@ -146,7 +146,7 @@ function InsightsPage() {
 
   return (
     <>
-      <div className={`jenvu-zoom min-h-dvh w-full bg-[#FAFAFA] text-zinc-900 ${SANS} antialiased selection:bg-zinc-900 selection:text-white`}>
+      <div className={`public-cloudflare jenvu-zoom min-h-dvh w-full bg-background text-foreground ${SANS} antialiased selection:bg-home-accent selection:text-home-accent-foreground`}>
         {/* NAV */}
         <header className="sticky top-0 z-50 border-b border-zinc-100 bg-white">
           <div className="relative mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-5 py-3 sm:px-6 sm:py-4 md:flex md:justify-between">
@@ -160,7 +160,7 @@ function InsightsPage() {
           
           {/* CNN-STYLE BREAKING TICKER — clickable, links to articles */}
           {tickerItems.length > 0 && (
-            <div className="bg-red-600 text-white overflow-hidden py-1.5 px-4 sm:px-6">
+            <div className="overflow-hidden bg-home-accent px-4 py-1.5 text-home-accent-foreground sm:px-6">
               <div className="mx-auto max-w-6xl flex items-center gap-4">
                 <span className={`${MONO} text-[10px] font-bold uppercase bg-white text-red-600 px-1.5 py-0.5 rounded shrink-0 animate-pulse`}>
                   Live
@@ -186,7 +186,7 @@ function InsightsPage() {
 
         {/* HERO SECTION - FEATURED ARTICLE */}
         {featured ? (
-          <section className="border-b border-zinc-100 bg-zinc-50/50">
+          <section className="public-page-hero border-b border-border">
             <div className="mx-auto max-w-6xl px-5 sm:px-6 py-12 sm:py-16">
               <div className="grid lg:grid-cols-12 gap-8 lg:items-center">
                 <div className="lg:col-span-7">
@@ -256,7 +256,7 @@ function InsightsPage() {
                     onClick={() => onFilterChange(f.id)}
                     className={`px-4 py-1.5 rounded-full transition-colors ${
                       active
-                        ? "bg-zinc-900 text-white shadow-sm"
+                        ? "bg-home-accent text-home-accent-foreground shadow-sm"
                         : "text-zinc-500 hover:text-zinc-900"
                     }`}
                   >
@@ -352,7 +352,7 @@ function InsightsPage() {
 
 
           {/* LOAD MORE / NEWSLETTER */}
-          <div className="mt-20 rounded-xl bg-zinc-50 border border-zinc-200 p-8 sm:p-12 text-center text-zinc-900 relative overflow-hidden">
+          <div className="public-orange-cta relative mt-20 overflow-hidden rounded-lg border border-home-accent bg-home-accent p-8 text-center text-home-accent-foreground sm:p-12">
             <div className="absolute inset-0 opacity-[0.07]" style={{
               backgroundImage: "radial-gradient(#000 0.5px, transparent 0.5px)",
               backgroundSize: "20px 20px"
@@ -361,7 +361,7 @@ function InsightsPage() {
               <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight mb-4">
                 Institutional briefings, delivered live.
               </h2>
-              <p className="text-zinc-600 max-w-xl mx-auto mb-8 text-sm sm:text-base">
+              <p className="mx-auto mb-8 max-w-xl text-sm text-home-accent-foreground/85 sm:text-base">
                 Join 5,000+ traders receiving Jenvu terminal insights directly in their inbox before the New York open.
               </p>
               <SubscribeForm />

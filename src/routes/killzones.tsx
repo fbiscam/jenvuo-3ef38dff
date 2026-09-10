@@ -216,7 +216,7 @@ function KillzonesPage() {
 
 
   return (
-    <div className="killzones-root min-h-dvh w-full bg-[#FAFAFA] text-slate-900 font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif] antialiased">
+    <div className="public-cloudflare killzones-root min-h-dvh w-full bg-background text-foreground font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif] antialiased">
       <header className="sticky top-0 z-40 border-b border-zinc-100 bg-white">
         <div className="relative mx-auto flex max-w-[1600px] items-center justify-between gap-3 px-5 py-3 sm:px-6 sm:py-4">
           <button
@@ -243,7 +243,7 @@ function KillzonesPage() {
           </div>
           <Link
             to="/signals-live"
-            className="h-8 inline-flex items-center gap-1.5 px-3 rounded-lg bg-zinc-900 text-[12px] font-medium text-white hover:bg-zinc-800 transition"
+            className="h-8 inline-flex items-center gap-1.5 px-3 rounded-lg bg-home-accent text-[12px] font-medium text-home-accent-foreground hover:opacity-90 transition"
           >
             <Radar className="h-3.5 w-3.5" /> Live Signals
           </Link>
@@ -307,7 +307,7 @@ function KillzonesPage() {
               <button
                 key={c}
                 onClick={() => setCat(c)}
-                className={`h-8 px-3 rounded-lg border text-[12px] font-medium transition ${ cat === c ? "border-zinc-900 bg-zinc-900 text-white" : "border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-50" }`}
+                className={`h-8 px-3 rounded-lg border text-[12px] font-medium transition ${ cat === c ? "border-home-accent bg-home-accent text-home-accent-foreground" : "border-border bg-background text-muted-foreground hover:border-home-accent/50" }`}
               >
                 {c}
               </button>
