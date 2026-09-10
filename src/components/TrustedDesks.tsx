@@ -194,7 +194,7 @@ function PerformanceChart({ desk }: { desk: Desk }) {
   const lastPoint = points.at(-1);
 
   return (
-    <div className="relative min-h-[330px] overflow-hidden rounded-xl border border-zinc-200 bg-white p-5 text-zinc-900 sm:p-6">
+    <div className="relative min-h-[330px] overflow-hidden rounded-xl bg-white p-5 text-zinc-900 sm:p-6">
       <div className="flex items-start justify-between gap-4">
         <div>
           <p className="text-[11px] font-medium uppercase text-zinc-500">12-month performance</p>
