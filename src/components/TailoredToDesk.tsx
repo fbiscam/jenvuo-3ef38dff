@@ -98,14 +98,14 @@ export function TailoredToDesk() {
           </article>
 
           <article className="relative min-h-[290px] overflow-hidden rounded-md border border-border bg-card lg:col-span-2">
-            <div className="relative z-10 max-w-[52%] p-6 sm:p-7">
+            <div className="relative z-10 max-w-[46%] p-6 sm:p-7">
               <h3 className="text-[15px] font-semibold text-foreground">Fast path to AI adoption</h3>
               <p className="mt-2 text-sm leading-snug text-muted-foreground">
                 Build and launch experienced ICT/SMC agents on the same chart. Secure access and senior review make analysis production-ready in one click.
               </p>
             </div>
 
-            <div className="tailored-console absolute bottom-0 right-0 top-[56px] w-[64%] overflow-hidden rounded-tl-lg border-l border-t border-border bg-background shadow-sm">
+            <div className="tailored-console absolute bottom-0 right-0 top-[56px] w-[52%] overflow-hidden rounded-tl-lg border-l border-t border-border bg-background shadow-sm">
               <div className="p-4">
                 <p className="text-[11px] text-muted-foreground">Launching agents to analyze XAU/USD…</p>
                 <p className="mt-2 flex items-center gap-2 text-[11px] text-home-accent">
