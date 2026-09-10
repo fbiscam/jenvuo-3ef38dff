@@ -141,7 +141,7 @@ function PricingPage() {
   };
   const suffix = billing === "annual" ? "/yr" : "/mo";
   return (
-    <div className={`min-h-dvh w-full bg-[#FAFAFA] text-zinc-900 ${SANS} antialiased md:[zoom:1.375]`}>
+    <div className={`public-cloudflare min-h-dvh w-full bg-background text-foreground ${SANS} antialiased md:[zoom:1.375]`}>
 
       {/* HEADER */}
       <header className="sticky top-0 z-50 border-b border-zinc-100 bg-white">
@@ -157,8 +157,8 @@ function PricingPage() {
       </header>
 
       {/* HERO */}
-      <section className="relative border-b border-zinc-100 overflow-hidden">
-        <div className="relative mx-auto max-w-6xl px-5 sm:px-6 py-16 sm:py-24 text-left sm:text-center">
+      <section className="public-page-hero relative overflow-hidden border-b border-border">
+        <div className="relative z-10 mx-auto max-w-4xl px-5 py-16 text-center sm:px-6 sm:py-24">
           
           <h1 className="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl md:text-6xl">
             Trade gold with an institutional edge.
@@ -166,9 +166,9 @@ function PricingPage() {
           <p className="mx-auto mt-5 max-w-2xl text-base text-zinc-600 sm:text-lg">
             One voice agent. A+ realtime setups. Built on ICT, SMC, and 25 years of professional desk methodology.
           </p>
-          <div className="mt-8 flex flex-wrap justify-start sm:justify-center gap-2">
+          <div className="mt-8 flex flex-wrap justify-center gap-2">
             {["A+ Setups", "ICT / SMC", "< 30s Alerts", "25Y Methodology"].map((s) => (
-              <span key={s} className={`${MONO} text-[10px] uppercase tracking-wider px-3 py-1.5 rounded-full border border-zinc-200 bg-white text-zinc-700`}>
+              <span key={s} className={`${MONO} rounded-full border border-home-accent/25 bg-background px-3 py-1.5 text-[10px] text-home-accent`}>
                 {s}
               </span>
             ))}
@@ -188,12 +188,12 @@ function PricingPage() {
 
 
 
-        <div className="overflow-x-auto rounded-xl border border-zinc-200 bg-white">
+        <div className="overflow-x-auto rounded-lg border border-border bg-background shadow-sm">
 
           <table className="w-full min-w-[760px] text-sm border-collapse">
             <colgroup>
               <col className="w-[28%]" />
-              <col className={`w-[24%] ${currentPlan === "pro" ? "bg-emerald-50/50" : "bg-amber-50/40"}`} />
+              <col className={`w-[24%] ${currentPlan === "pro" ? "bg-home-accent-soft" : "bg-home-accent-soft/40"}`} />
               <col className={`w-[24%] ${currentPlan === "elite" ? "bg-emerald-50/50" : ""}`} />
               <col className={`w-[24%] ${currentPlan === "ultra" ? "bg-emerald-50/50" : ""}`} />
             </colgroup>
@@ -223,17 +223,17 @@ function PricingPage() {
                   return (
                   <th
                     key={p.name}
-                    className={`p-6 text-left align-top border-l border-zinc-200 ${isCurrent ? "bg-emerald-50/50" : p.accent ? "bg-amber-50/50" : ""}`}
+                    className={`p-6 text-left align-top border-l border-zinc-200 ${isCurrent || p.accent ? "bg-home-accent-soft/60" : ""}`}
                   >
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className={`text-base font-semibold ${isCurrent ? "text-emerald-700" : p.accent ? "text-amber-700" : "text-zinc-900"}`}>{p.name}</span>
+                      <span className={`text-base font-semibold ${isCurrent || p.accent ? "text-home-accent" : "text-zinc-900"}`}>{p.name}</span>
                       {isCurrent && (
                         <span className={`${MONO} text-[8px] uppercase tracking-wider px-1.5 py-0.5 rounded-sm bg-emerald-600 text-white font-bold`}>
                           Current
                         </span>
                       )}
                       {p.accent && !isCurrent && (
-                        <span className={`${MONO} text-[8px] uppercase tracking-wider px-1.5 py-0.5 rounded-sm bg-amber-400 text-zinc-900 font-bold`}>
+                        <span className={`${MONO} rounded-sm bg-home-accent px-1.5 py-0.5 text-[8px] font-bold text-home-accent-foreground`}>
                           Popular
                         </span>
                       )}
@@ -268,7 +268,7 @@ function PricingPage() {
                       <Link
                         to={to}
                         search={p.search}
-                        className={`mt-3 inline-flex w-full items-center justify-center rounded-md px-3 py-1.5 text-xs font-medium transition ${ p.accent || p.dark ? "bg-zinc-900 text-white hover:bg-black" : "border border-zinc-300 bg-white text-zinc-900 hover:bg-zinc-50" }`}
+                        className={`mt-3 inline-flex w-full items-center justify-center rounded-md px-3 py-1.5 text-xs font-medium transition ${ p.accent || p.dark ? "bg-home-accent text-home-accent-foreground hover:opacity-90" : "border border-zinc-300 bg-white text-zinc-900 hover:border-home-accent/50" }`}
                       >
                         {cta}
                       </Link>
@@ -320,7 +320,7 @@ function PricingPage() {
                     return (
                     <td
                       key={i}
-                      className={`px-2 py-3.5 text-center border-l border-zinc-200 min-w-[120px] ${isCurrentCol ? "bg-emerald-50/60" : i === 0 ? "bg-amber-50/40" : ""}`}
+                      className={`px-2 py-3.5 text-center border-l border-zinc-200 min-w-[120px] ${isCurrentCol ? "bg-home-accent-soft/60" : i === 0 ? "bg-home-accent-soft/40" : ""}`}
                     >
                       {v === true ? (
                         <span className={`inline-block h-1.5 w-1.5 rounded-full ${isCurrentCol ? "bg-emerald-600" : "bg-zinc-900"}`} />
@@ -346,7 +346,7 @@ function PricingPage() {
                           )}
                         </span>
                       ) : (
-                        <span className={`${MONO} text-[11px] tracking-wider ${row.isHeading ? "text-zinc-900 font-semibold" : isCurrentCol ? "text-emerald-700 font-semibold" : "text-zinc-700"}`}>
+                        <span className={`${MONO} text-[11px] tracking-wider ${row.isHeading ? "text-zinc-900 font-semibold" : isCurrentCol ? "text-home-accent font-semibold" : "text-zinc-700"}`}>
                           {v}
                         </span>
                       )}
@@ -376,7 +376,7 @@ function PricingPage() {
             {FEATURE_BLOCKS.map((b) => (
               <article
                 key={b.tag}
-                className="group relative overflow-hidden rounded-xl border border-zinc-200 bg-white hover:border-zinc-300 transition"
+                className="group relative overflow-hidden rounded-lg border border-border bg-background transition hover:border-home-accent/50"
               >
                 <div className="px-6 pt-6">
                   <span className={`${MONO} inline-block text-[9px] uppercase tracking-wider px-2 py-1 rounded-sm bg-white text-zinc-900 border border-zinc-200`}>
@@ -392,7 +392,7 @@ function PricingPage() {
                     <span className={`${MONO} text-[10px] uppercase tracking-wider text-zinc-500`}>
                       {b.tone}
                     </span>
-                    <span className={`${MONO} text-[10px] uppercase tracking-wider text-emerald-600`}>
+                    <span className={`${MONO} text-[10px] text-home-accent`}>
                       Included →
                     </span>
                   </div>
@@ -419,11 +419,11 @@ function PricingPage() {
             { price: 25, sub: "Trader", accent: true },
             { price: 50, sub: "Power" },
           ].map((p) => (
-            <div key={p.price} className={`rounded-xl border ${p.accent ? "border-amber-300 bg-amber-50/40" : "border-zinc-200 bg-white"} p-5`}>
+            <div key={p.price} className={`rounded-lg border ${p.accent ? "border-home-accent bg-home-accent-soft" : "border-border bg-background"} p-5`}>
               <div className="flex items-center justify-between">
                 <span className={`${MONO} text-[10px] uppercase tracking-wider text-zinc-500`}>{p.sub}</span>
                 {p.accent && (
-                  <span className={`${MONO} text-[9px] uppercase tracking-wider px-1.5 py-0.5 rounded-sm bg-amber-400 text-zinc-900 font-bold`}>Best value</span>
+                  <span className={`${MONO} rounded-sm bg-home-accent px-1.5 py-0.5 text-[9px] font-bold text-home-accent-foreground`}>Best value</span>
                 )}
               </div>
               <div className="mt-4 flex items-baseline gap-1">
@@ -432,11 +432,11 @@ function PricingPage() {
               </div>
               <div className="mt-1 text-sm text-zinc-700">${p.price} one-time · ~{Math.floor(p.price / 0.2)} signals</div>
               {signedOut ? (
-                <Link to="/founding" className="mt-5 inline-flex w-full items-center justify-center rounded-md bg-zinc-900 px-3 py-2 text-xs font-medium text-white hover:bg-black">
+                <Link to="/founding" className="mt-5 inline-flex w-full items-center justify-center rounded-md bg-home-accent px-3 py-2 text-xs font-medium text-home-accent-foreground hover:opacity-90">
                   Buy Now
                 </Link>
               ) : (
-                <Link to="/dashboard/pay" search={{ amount: p.price }} className="mt-5 inline-flex w-full items-center justify-center rounded-md bg-zinc-900 px-3 py-2 text-xs font-medium text-white hover:bg-black">
+                <Link to="/dashboard/pay" search={{ amount: p.price }} className="mt-5 inline-flex w-full items-center justify-center rounded-md bg-home-accent px-3 py-2 text-xs font-medium text-home-accent-foreground hover:opacity-90">
                   Buy Now
                 </Link>
               )}
@@ -501,7 +501,7 @@ function CustomTopUp({ signedOut }: { signedOut: boolean }) {
   const safe = Math.max(5, Math.min(1000, Number.isFinite(amount) ? amount : 5));
   const estSignals = Math.floor(safe / 0.2);
   return (
-    <div className="mt-8 rounded-xl border border-zinc-200 bg-white p-6 sm:p-7">
+    <div className="mt-8 rounded-lg border border-border bg-background p-6 sm:p-7">
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-5">
         <div>
           
@@ -509,7 +509,7 @@ function CustomTopUp({ signedOut }: { signedOut: boolean }) {
           <p className="mt-1 text-sm text-zinc-600">Minimum $5. $1 top-up = $1 wallet. Each real signal costs $0.30. Balance never expires.</p>
         </div>
         <div className="flex items-center gap-3">
-          <div className="flex items-center rounded-md border border-zinc-300 bg-white overflow-hidden focus-within:ring-2 focus-within:ring-amber-400">
+          <div className="flex items-center overflow-hidden rounded-md border border-border bg-background focus-within:ring-2 focus-within:ring-home-accent/40">
             <span className="px-3 text-sm text-zinc-500 border-r border-zinc-200 bg-white">$</span>
             <input
               type="number"
@@ -527,7 +527,7 @@ function CustomTopUp({ signedOut }: { signedOut: boolean }) {
           {signedOut ? (
             <Link
               to="/founding"
-              className="inline-flex items-center justify-center rounded-md bg-zinc-900 px-4 py-2 text-xs font-medium text-white hover:bg-black whitespace-nowrap"
+              className="inline-flex items-center justify-center whitespace-nowrap rounded-md bg-home-accent px-4 py-2 text-xs font-medium text-home-accent-foreground hover:opacity-90"
             >
               Buy Now
             </Link>
@@ -535,7 +535,7 @@ function CustomTopUp({ signedOut }: { signedOut: boolean }) {
             <Link
               to="/dashboard/pay"
               search={{ amount: safe }}
-              className="inline-flex items-center justify-center rounded-md bg-zinc-900 px-4 py-2 text-xs font-medium text-white hover:bg-black whitespace-nowrap"
+              className="inline-flex items-center justify-center whitespace-nowrap rounded-md bg-home-accent px-4 py-2 text-xs font-medium text-home-accent-foreground hover:opacity-90"
             >
               Buy Now
             </Link>

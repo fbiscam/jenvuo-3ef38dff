@@ -11,15 +11,15 @@ export const SITE_NAV_LINKS = [
 
 export default function SiteNavLinks({ active }: { active?: string }) {
   return (
-    <nav className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center gap-7 text-sm text-zinc-900">
+    <nav className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-7 text-sm text-foreground md:flex">
       {SITE_NAV_LINKS.map((l) => (
         <Link
           key={l.to}
           to={l.to}
           className={
             active === l.to
-              ? "font-medium text-zinc-900"
-              : "text-zinc-600 hover:text-zinc-900"
+              ? "font-medium text-home-accent"
+              : "text-muted-foreground transition-colors hover:text-home-accent"
           }
         >
           {l.label}

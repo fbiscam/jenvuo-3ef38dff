@@ -20,7 +20,7 @@ export function PageShell({
 }) {
   return (
     <>
-      <div className={`jenvu-zoom min-h-dvh w-full bg-[#FAFAFA] text-zinc-900 ${SANS} antialiased selection:bg-zinc-900 selection:text-white`}>
+      <div className={`public-cloudflare jenvu-zoom min-h-dvh w-full bg-background text-foreground ${SANS} antialiased selection:bg-home-accent selection:text-home-accent-foreground`}>
         {/* NAV — matches homepage */}
         <header className="hide-in-pwa sticky top-0 z-50 border-b border-zinc-100 bg-white">
           <div className="relative mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-5 py-3 sm:px-6 sm:py-4 md:flex md:justify-between">
@@ -42,13 +42,14 @@ export function PageShell({
         </header>
 
         {/* HERO */}
-        <section className="border-b border-zinc-100">
-          <div className="mx-auto max-w-6xl px-5 sm:px-6 py-14 sm:py-20">
-            <h1 className="max-w-3xl text-3xl font-semibold tracking-tight sm:text-4xl md:text-5xl whitespace-pre-line">
+        <section className="public-page-hero border-b border-border">
+          <div className="relative z-10 mx-auto max-w-4xl px-5 py-16 text-center sm:px-6 sm:py-24">
+            <span className="inline-flex rounded-full border border-home-accent/30 bg-home-accent-soft px-3 py-1 text-[11px] font-medium text-home-accent">{eyebrow}</span>
+            <h1 className="mx-auto mt-5 max-w-3xl whitespace-pre-line text-3xl font-semibold text-foreground sm:text-4xl md:text-5xl">
               {title}
             </h1>
             {intro && (
-              <p className="mt-5 max-w-2xl text-base text-zinc-600 leading-relaxed sm:text-lg">
+              <p className="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg">
                 {intro}
               </p>
             )}
@@ -56,8 +57,8 @@ export function PageShell({
         </section>
 
         {/* BODY */}
-        <main className="mx-auto max-w-6xl px-5 sm:px-6 py-14 sm:py-20">
-          <div className="rounded-xl border border-zinc-200 bg-white p-6 sm:p-10 md:p-14 space-y-10 leading-relaxed">
+        <main className="public-page-rail mx-auto max-w-[900px] px-5 py-14 sm:px-8 sm:py-20">
+          <div className="divide-y divide-border border-y border-border bg-background leading-relaxed [&>section]:py-8 first:[&>section]:pt-0 last:[&>section]:pb-0 sm:[&>section]:py-10">
             {children}
           </div>
           <p className={`mt-8 text-center ${MONO} text-[10px] uppercase tracking-[0.22em] text-zinc-500`}>
@@ -73,19 +74,19 @@ export function PageShell({
 
 export function H2({ children }: { children: ReactNode }) {
   return (
-    <h2 className="text-xl sm:text-2xl font-semibold tracking-tight text-zinc-900 pt-2 border-t border-zinc-100 first:border-t-0 first:pt-0">
+    <h2 className="text-xl font-semibold text-foreground sm:text-2xl">
       {children}
     </h2>
   );
 }
 
 export function P({ children }: { children: ReactNode }) {
-  return <p className="text-zinc-700 leading-relaxed">{children}</p>;
+  return <p className="leading-relaxed text-muted-foreground">{children}</p>;
 }
 
 export function UL({ children }: { children: ReactNode }) {
   return (
-    <ul className="space-y-2 text-zinc-700 list-disc pl-5 marker:text-zinc-400">
+    <ul className="space-y-2 pl-5 text-muted-foreground marker:text-home-accent list-disc">
       {children}
     </ul>
   );

@@ -109,7 +109,7 @@ const CHANGELOG = [
 function DownloadPage() {
   return (
     <>
-      <div className={`jenvu-zoom min-h-dvh w-full bg-[#FAFAFA] text-zinc-900 ${SANS} antialiased selection:bg-zinc-900 selection:text-white`}>
+      <div className={`public-cloudflare jenvu-zoom min-h-dvh w-full bg-background text-foreground ${SANS} antialiased selection:bg-home-accent selection:text-home-accent-foreground`}>
         {/* NAV — matches homepage */}
         <header className="sticky top-0 z-50 border-b border-zinc-100 bg-white">
           <div className="relative mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-5 py-3 sm:px-6 sm:py-4 md:flex md:justify-between">
@@ -123,7 +123,7 @@ function DownloadPage() {
         </header>
 
         {/* HERO */}
-        <section className="mx-auto max-w-6xl px-5 pt-12 pb-10 sm:px-6 sm:pt-16 sm:pb-14">
+        <section className="public-page-hero mx-auto max-w-6xl px-5 pb-10 pt-12 sm:px-6 sm:pb-14 sm:pt-16">
           <h1 className="mt-5 max-w-5xl text-[22px] font-semibold tracking-tight leading-[1.15] whitespace-nowrap sm:text-4xl md:text-5xl">
             Carry the desk in your pocket.
           </h1>
@@ -156,7 +156,7 @@ function DownloadPage() {
                     </div>
                     <span
                       className={`text-[10px] px-2 py-0.5 rounded ${MONO} uppercase tracking-wider ${
-                        available ? "bg-emerald-500 text-white" : "bg-zinc-900 text-white"
+                        available ? "bg-home-accent text-home-accent-foreground" : "bg-foreground text-background"
                       }`}
                     >
                       {p.status}
@@ -175,7 +175,7 @@ function DownloadPage() {
                         href={p.href}
                         target="_blank"
                         rel="noreferrer"
-                        className="inline-flex items-center justify-center gap-2 rounded-lg bg-zinc-900 px-5 py-3 text-sm font-medium text-white hover:bg-zinc-800"
+                        className="inline-flex items-center justify-center gap-2 rounded-lg bg-home-accent px-5 py-3 text-sm font-medium text-home-accent-foreground hover:opacity-90"
                       >
                         {p.cta}
                         <span className={`${MONO} text-xs opacity-80`}>→</span>
