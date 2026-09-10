@@ -239,7 +239,7 @@ export default function TrustedDesks() {
 
   React.useEffect(() => {
     if (!playing) return;
-    const t = setInterval(() => setActive((i) => (i + 1) % DESKS.length), 6000);
+    const t = window.setInterval(() => setActive((i) => (i + 1) % DESKS.length), 4000);
     return () => clearInterval(t);
   }, [playing]);
 
@@ -271,7 +271,7 @@ export default function TrustedDesks() {
         <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-12 bg-gradient-to-l from-white to-transparent" />
         <div
           ref={logoRailRef}
-          className="td-logo-rail flex snap-x snap-mandatory touch-pan-x gap-3 overflow-x-auto px-4 py-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          className="td-logo-rail flex snap-x snap-proximity touch-pan-x gap-3 overflow-x-auto px-4 py-4 [scrollbar-width:none] [-webkit-overflow-scrolling:touch] [scroll-padding-inline:1rem] [&::-webkit-scrollbar]:hidden"
         >
           {DESKS.map((d, i) => (
             <button
