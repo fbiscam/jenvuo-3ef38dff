@@ -1,178 +1,141 @@
 import * as React from "react";
-import orbVideo from "@/assets/welcome-orb.mp4.asset.json";
-import xauLogo from "@/assets/xau-logo.png.asset.json";
+import { Bot, CornerDownRight, Github, Globe2, Grid3X3, ShieldCheck } from "lucide-react";
 import jenvuLogo from "@/assets/favicon.png";
 
-const MONO = "font-mono";
-
 const BUILDS = [
-  { id: "v30862", time: "Updated 09.10.26, 01:08", status: "Queued" },
-  { id: "v30861", time: "Updated 09.10.26, 01:08", status: "Analyzing" },
-  { id: "v30860", time: "Updated 09.10.26, 01:07", status: "Delivered" },
-  { id: "v30859", time: "Updated 09.10.26, 01:06", status: "Delivered" },
+  { id: "v30499", time: "Updated 09.10.26, 09:50", status: "Queued" },
+  { id: "v30498", time: "Updated 09.10.26, 09:50", status: "Deployed" },
+  { id: "v30497", time: "Updated 09.10.26, 09:49", status: "Deployed" },
+  { id: "v30496", time: "Updated 09.10.26, 09:49", status: "Deployed" },
 ];
 
 const AGENTS = [
-  { name: "structure-agent", detail: "scanning H4 legs", meta: "179.6k ticks" },
-  { name: "liquidity-agent", detail: "sweep confirmation", meta: "27k levels" },
-  { name: "risk-agent", detail: "exposure clean", meta: "146 checks" },
+  { name: "structure-agent", detail: "BOS + CHoCH", meta: "4k candles" },
+  { name: "liquidity-agent", detail: "sweeps + FVG", meta: "146 zones" },
+  { name: "risk-agent", detail: "exposure clean", meta: "98 checks" },
 ];
 
 export function TailoredToDesk() {
   const [tick, setTick] = React.useState(0);
 
   React.useEffect(() => {
-    const id = window.setInterval(() => setTick((t) => t + 1), 1600);
-    return () => window.clearInterval(id);
+    const timer = window.setInterval(() => setTick((value) => value + 1), 1500);
+    return () => window.clearInterval(timer);
   }, []);
 
   return (
-    <section className="border-t border-zinc-100 bg-white">
-      <div className="mx-auto max-w-6xl px-5 py-16 sm:px-6 sm:py-24">
+    <section className="border-t border-border bg-background">
+      <div className="mx-auto max-w-[1200px] px-4 py-16 sm:px-6 sm:py-24">
         <div className="text-center">
-          <h2 className="text-3xl font-semibold tracking-tight text-zinc-900 sm:text-4xl md:text-[44px] md:leading-[1.1]">
+          <h2 className="text-3xl font-semibold text-foreground sm:text-4xl md:text-[44px] md:leading-[1.1]">
             Tailored to your desk
           </h2>
-          <p className="mx-auto mt-4 max-w-xl text-[15px] leading-relaxed text-zinc-500 sm:text-base">
+          <p className="mx-auto mt-4 max-w-xl text-[15px] leading-relaxed text-muted-foreground sm:text-base">
             Easy to use for both solo traders and the world&rsquo;s largest funds.
           </p>
         </div>
 
-
-        <div className="mt-10 grid gap-px overflow-hidden rounded-2xl border border-zinc-200 bg-zinc-200 md:grid-cols-5">
-          {/* TOP LEFT — animated build/scan list */}
-          <div className="bg-white p-5 sm:p-6 md:col-span-3">
-            <div className="flex items-start gap-4">
-              <div className="relative hidden h-12 w-12 shrink-0 items-center justify-center rounded-lg border border-zinc-200 bg-white sm:flex">
-                <img
-                  src={jenvuLogo}
-                  alt="Jenvu logo"
-                  loading="lazy"
-                  width={256}
-                  height={256}
-                  className="h-8 w-8 object-contain"
-                />
-                <img
-                  src={xauLogo.url}
-                  alt="XAU gold logo"
-                  loading="lazy"
-                  width={512}
-                  height={512}
-                  className="absolute -bottom-2 -right-2 h-6 w-6 rounded-full bg-white ring-2 ring-white"
-                />
+        <div className="mt-10 grid min-h-[610px] gap-2 lg:grid-cols-3 lg:grid-rows-2">
+          <article className="flex min-h-[290px] flex-col rounded-md border border-border bg-card p-5 sm:p-6 lg:col-span-2">
+            <div className="flex items-start gap-5">
+              <div className="relative hidden h-14 w-14 shrink-0 items-center justify-center rounded-md bg-home-accent sm:flex">
+                <img src={jenvuLogo} alt="Jenvu" width={256} height={256} className="h-9 w-9 object-contain" />
+                <span className="absolute -bottom-3 -right-3 flex h-7 w-7 items-center justify-center rounded-sm bg-foreground text-background shadow-sm">
+                  <Github className="h-4 w-4" aria-hidden="true" />
+                </span>
               </div>
-              <div className="min-w-0 flex-1 overflow-hidden">
-                {BUILDS.map((b, i) => {
-                  const active = i === tick % BUILDS.length;
+
+              <div className="min-w-0 flex-1 space-y-1">
+                {BUILDS.map((build, index) => {
+                  const active = index === tick % BUILDS.length;
+                  const complete = build.status === "Deployed";
                   return (
                     <div
-                      key={b.id}
-                      className={`flex items-center justify-between gap-3 rounded-md px-3 py-2.5 text-xs transition-all duration-500 ${
-                        active ? "bg-home-accent-soft" : "bg-white"
-                      }`}
-                      style={{ opacity: 1 - i * 0.18 }}
+                      key={build.id}
+                      className={`tailored-build-row flex h-11 items-center justify-between gap-3 rounded-sm px-3 text-xs transition-all duration-500 ${active ? "is-active" : ""}`}
                     >
-                      <span className={`${MONO} text-zinc-700`}>{b.id}</span>
-                      <span className="hidden text-zinc-500 sm:inline">{b.time}</span>
-                      <span className="flex items-center gap-1.5 text-zinc-700">
-                        {b.status}
-                        <span
-                          className={`inline-block h-2.5 w-2.5 rounded-full border-2 ${
-                            active
-                              ? "animate-spin border-home-accent border-t-transparent"
-                              : "border-emerald-500 bg-emerald-500/20"
-                          }`}
-                        />
+                      <span className="font-mono font-semibold text-home-accent">{build.id}</span>
+                      <span className="hidden text-home-accent sm:inline">{build.time}</span>
+                      <span className="flex items-center gap-2 text-home-accent">
+                        {active && !complete ? "Queued" : "Deployed"}
+                        <span className={`flex h-4 w-4 items-center justify-center rounded-full ${active && !complete ? "border border-dashed border-home-accent animate-spin" : "bg-home-accent text-background"}`}>
+                          {complete || !active ? <span className="text-[9px]">✓</span> : null}
+                        </span>
                       </span>
                     </div>
                   );
                 })}
               </div>
             </div>
-            <h3 className="mt-6 text-sm font-semibold text-zinc-900">
-              Fits into your existing workflow
-            </h3>
-            <p className="mt-2 text-sm leading-relaxed text-zinc-500">
-              TradingView, MT5, Chrome and any broker. No proprietary terminal or vendor lock-in.
-            </p>
-          </div>
 
-          {/* TOP RIGHT — accent panel */}
-          <div className="bg-home-accent p-6 text-white md:col-span-2">
-            <div className="flex h-6 w-6 items-center justify-center rounded-full border border-white/60">
-              <span className="text-[11px]">◎</span>
+            <div className="mt-auto pt-8">
+              <h3 className="text-[15px] font-semibold text-foreground">Fits into your existing workflows</h3>
+              <p className="mt-2 max-w-md text-sm leading-relaxed text-muted-foreground">
+                TradingView, MT5, Chrome and any broker. No proprietary tools or vendor lock-in.
+              </p>
             </div>
-            <h3 className="mt-4 text-base font-semibold">
-              One desk for charts, voice and risk
-            </h3>
-            <p className="mt-3 text-sm leading-relaxed text-white/90">
-              Whether you&rsquo;re scalping the London killzone, tracking red-folder news, or
-              reviewing a week of trades — it all runs on the same engine, managed from one
-              dashboard, billed as one platform.
-            </p>
-          </div>
+          </article>
 
-          {/* BOTTOM LEFT — secure by default */}
-          <div className="flex flex-col justify-end bg-white p-6 md:col-span-2">
-            <div className="tailored-accent-glow mb-4 h-24 rounded-lg" />
-            <div className="flex h-6 w-6 items-center justify-center rounded-full border border-zinc-300 text-zinc-700">
-              <span className="text-[11px]">⛨</span>
+          <article className="flex min-h-[290px] flex-col rounded-md bg-home-accent p-6 text-primary-foreground sm:p-7">
+            <Globe2 className="h-6 w-6" strokeWidth={1.8} aria-hidden="true" />
+            <h3 className="mt-3 text-base font-semibold">One network for charts, voice and risk</h3>
+            <p className="mt-3 max-w-sm text-sm leading-snug opacity-95">
+              Whether you&rsquo;re scalping the London killzone, tracking red-folder news, or reviewing a week of trades, it all runs on the same global engine.
+            </p>
+            <div className="tailored-orange-pulse mt-auto" aria-hidden="true" />
+          </article>
+
+          <article className="flex min-h-[290px] flex-col justify-end rounded-md border border-border bg-card p-6 sm:p-7">
+            <div className="tailored-security-visual mb-auto" aria-hidden="true">
+              <span className="tailored-security-ring" />
+              <ShieldCheck className="relative h-7 w-7 text-home-accent" />
             </div>
-            <h3 className="mt-3 text-sm font-semibold text-zinc-900">Secure by default</h3>
-            <p className="mt-2 text-sm leading-relaxed text-zinc-500">
+            <ShieldCheck className="h-5 w-5 text-foreground" strokeWidth={1.7} aria-hidden="true" />
+            <h3 className="mt-3 text-[15px] font-semibold text-foreground">Secure by default</h3>
+            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
               Encrypted keys, device trust and 2FA are built into every account from day one.
             </p>
-          </div>
+          </article>
 
-          {/* BOTTOM RIGHT — agents + live video */}
-          <div className="bg-white p-6 md:col-span-3">
-            <h3 className="text-sm font-semibold text-zinc-900">Fast path to AI analysis</h3>
-            <p className="mt-2 max-w-sm text-sm leading-relaxed text-zinc-500">
-              Launch voice agents that read structure, liquidity and risk on the same chart —
-              production-ready in one click.
-            </p>
+          <article className="relative min-h-[290px] overflow-hidden rounded-md border border-border bg-card lg:col-span-2">
+            <div className="relative z-10 max-w-[46%] p-6 sm:p-7">
+              <h3 className="text-[15px] font-semibold text-foreground">Fast path to AI adoption</h3>
+              <p className="mt-2 text-sm leading-snug text-muted-foreground">
+                Build and launch experienced ICT/SMC agents on the same chart. Secure access and senior review make analysis production-ready in one click.
+              </p>
+            </div>
 
-            <div className="mt-5 grid gap-4 sm:grid-cols-2">
-              <div className="rounded-lg border border-zinc-200 bg-white p-3">
-                <p className="text-[11px] text-zinc-500">Launching agents to analyze XAU/USD…</p>
+            <div className="tailored-console absolute bottom-0 right-0 top-[56px] w-[52%] overflow-hidden rounded-tl-lg border-l border-t border-border bg-background shadow-sm">
+              <div className="p-4">
+                <p className="text-[11px] text-muted-foreground">Launching agents to analyze XAU/USD…</p>
                 <p className="mt-2 flex items-center gap-2 text-[11px] text-home-accent">
                   <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-home-accent" />
                   3 background agents launched
                 </p>
                 <div className="mt-2 space-y-1.5">
-                  {AGENTS.map((a, i) => (
-                    <div
-                      key={a.name}
-                      className={`flex items-center gap-2 text-[10px] transition-opacity duration-500 ${
-                        tick % AGENTS.length >= i ? "opacity-100" : "opacity-30"
-                      }`}
-                    >
-                      <span className="text-zinc-400">↳</span>
-                      <span className={`${MONO} rounded bg-home-accent-soft px-1.5 py-0.5 text-home-accent`}>
-                        {a.name}
-                      </span>
-                      <span className={`${MONO} truncate text-zinc-500`}>{a.detail}</span>
-                      <span className={`${MONO} ml-auto hidden text-zinc-400 sm:inline`}>{a.meta}</span>
+                  {AGENTS.map((agent, index) => (
+                    <div key={agent.name} className={`flex items-center gap-2 text-[10px] transition-opacity duration-500 ${tick % 4 >= index ? "opacity-100" : "opacity-35"}`}>
+                      <CornerDownRight className="h-3 w-3 text-muted-foreground" aria-hidden="true" />
+                      <span className="rounded border border-border bg-muted px-1.5 py-0.5 font-mono text-foreground">{agent.name}</span>
+                      <span className="truncate font-mono text-muted-foreground">→ {agent.detail}</span>
+                      <span className="ml-auto hidden font-mono text-muted-foreground sm:inline">• {agent.meta}</span>
                     </div>
                   ))}
                 </div>
               </div>
 
-              <div className="relative overflow-hidden rounded-lg border border-zinc-200 bg-zinc-950">
-                <video
-                  src={orbVideo.url}
-                  autoPlay
-                  loop
-                  muted
-                  playsInline
-                  className="h-full min-h-[130px] w-full object-cover"
-                />
-                <span className={`absolute bottom-2 left-2 rounded bg-black/60 px-2 py-0.5 ${MONO} text-[9px] uppercase tracking-widest text-white`}>
-                  live voice desk
+              <div className="tailored-analysis-bar flex h-8 items-center gap-2 border-y border-border px-4 text-[11px] text-home-accent">
+                <Grid3X3 className="h-3.5 w-3.5 animate-pulse" aria-hidden="true" />
+                Agents live-chart analysis running…
+              </div>
+              <div className="flex h-16 items-end justify-between px-4 pb-3 font-mono text-xs text-muted-foreground">
+                <span>&gt; <span className="animate-terminal-blink">_</span></span>
+                <span className="flex items-center gap-1 rounded-md bg-home-accent px-3 py-1.5 font-sans text-xs font-medium text-primary-foreground">
+                  Enter <Bot className="h-3.5 w-3.5" aria-hidden="true" />
                 </span>
               </div>
             </div>
-          </div>
+          </article>
         </div>
       </div>
     </section>
