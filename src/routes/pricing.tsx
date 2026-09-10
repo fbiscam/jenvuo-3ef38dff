@@ -360,45 +360,55 @@ function PricingPage() {
         </div>
       </section>
 
-      {/* FEATURE CARDS — 6 modules */}
-      <section className="border-y border-zinc-100 bg-white">
-        <div className="mx-auto max-w-6xl px-5 sm:px-6 py-16 sm:py-20">
-          <div className="mb-12 max-w-2xl">
-            <h2 className="text-3xl sm:text-4xl font-semibold tracking-tight">
-              Everything in the platform.
-            </h2>
-            <p className="mt-3 text-zinc-600">
-              Six modules for serious gold traders voice, narration, alerts, journal, scanner, and API.
-            </p>
-          </div>
-
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {FEATURE_BLOCKS.map((b) => (
-              <article
-                key={b.tag}
-                className="group relative overflow-hidden rounded-lg border border-border bg-background transition hover:border-home-accent/50"
-              >
-                <div className="px-6 pt-6">
-                  <span className={`${MONO} inline-block text-[9px] uppercase tracking-wider px-2 py-1 rounded-sm bg-white text-zinc-900 border border-zinc-200`}>
-                    {b.tag}
-                  </span>
+      {/* FEATURE FILM — platform modules */}
+      <section className="border-y border-border bg-background">
+        <div className="mx-auto max-w-6xl px-5 py-16 sm:px-6 sm:py-20">
+          <div className="grid items-stretch gap-10 lg:grid-cols-[minmax(0,1.12fr)_minmax(320px,0.88fr)] lg:gap-14">
+            <div className="relative min-h-[360px] overflow-hidden rounded-lg border border-border bg-zinc-950 shadow-sm sm:min-h-[480px]">
+              <video
+                className="absolute inset-0 h-full w-full object-cover"
+                src="/pricing-features.mp4"
+                poster={pricingVoice}
+                autoPlay
+                muted
+                loop
+                playsInline
+                preload="metadata"
+                aria-label="Jenvu platform feature preview"
+              />
+              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-zinc-950 via-zinc-950/80 to-transparent px-6 pb-6 pt-24 text-white sm:px-8 sm:pb-8">
+                <div className="flex items-center gap-2 text-[11px] font-medium">
+                  <span className="h-2 w-2 animate-pulse rounded-full bg-home-accent" />
+                  LIVE PLATFORM PREVIEW
                 </div>
+                <p className="mt-3 max-w-md text-xl font-semibold leading-snug sm:text-2xl">
+                  One intelligent workflow from market context to execution.
+                </p>
+              </div>
+            </div>
 
+            <div className="flex flex-col justify-center">
+              <span className={`${MONO} text-[11px] font-medium text-home-accent`}>BUILT FOR THE GOLD DESK</span>
+              <h2 className="mt-4 text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
+                Everything in the platform.
+              </h2>
+              <p className="mt-4 max-w-xl text-sm leading-relaxed text-muted-foreground sm:text-base">
+                Six connected modules for serious gold traders—from spoken market context to live alerts and review.
+              </p>
 
-                <div className="p-6">
-                  <h3 className="text-base font-semibold tracking-tight text-zinc-900">{b.title}</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-zinc-600">{b.desc}</p>
-                  <div className="mt-5 flex items-center justify-between border-t border-zinc-100 pt-4">
-                    <span className={`${MONO} text-[10px] uppercase tracking-wider text-zinc-500`}>
-                      {b.tone}
-                    </span>
-                    <span className={`${MONO} text-[10px] text-home-accent`}>
-                      Included →
-                    </span>
-                  </div>
-                </div>
-              </article>
-            ))}
+              <div className="mt-8 divide-y divide-border border-y border-border">
+                {FEATURE_BLOCKS.map((feature, index) => (
+                  <article key={feature.tag} className="group grid grid-cols-[34px_1fr_auto] items-start gap-3 py-4">
+                    <span className={`${MONO} pt-0.5 text-[10px] text-home-accent`}>{String(index + 1).padStart(2, "0")}</span>
+                    <div>
+                      <h3 className="text-sm font-semibold text-foreground sm:text-[15px]">{feature.title}</h3>
+                      <p className="mt-1 text-xs leading-relaxed text-muted-foreground sm:text-sm">{feature.desc}</p>
+                    </div>
+                    <span className="mt-1 text-home-accent transition-transform group-hover:translate-x-1" aria-hidden="true">→</span>
+                  </article>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       </section>
