@@ -19,6 +19,15 @@ const MONO = "font-['JetBrains_Mono',ui-monospace,monospace]";
 
 const REASON_LABEL: Record<string, string> = {
   ai_scan: "AI scan",
+  terminal_scan: "Terminal scan",
+  topup_crypto: "Crypto top-up",
+  promo_bonus: "Promo bonus",
+  pro_trial_grant: "Pro trial credit",
+  trial_expired: "Trial expired",
+  trial_revoked: "Trial revoked",
+  expired: "Credits expired",
+  founding_referral_bonus: "Founding referral bonus",
+  founding_referral_reward: "Founding referral reward",
   signal: "Signal scan",
   ict_narration: "ICT narration",
   alert: "Alert broadcast",
