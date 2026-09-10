@@ -73,9 +73,9 @@ const WelcomeEmail = ({
               — check your credits & plan.
             </Text>
             <Text style={listItem}>
-              2. Visit the{' '}
-              <Link href={`${siteUrl}/signals-live`} style={linkStyle}>Signal page</Link>{' '}
-              — analyze XAU/USD, EUR, GBP in one click.
+              2. Open the{' '}
+              <Link href={`${siteUrl}/app`} style={linkStyle}>Jenvu desk</Link>{' '}
+              — analyze XAU/USD in one click.
             </Text>
             <Text style={listItem}>
               3. Enable{' '}

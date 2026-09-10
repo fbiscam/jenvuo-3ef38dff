@@ -242,10 +242,10 @@ function KillzonesPage() {
             <span className="truncate text-[22px] tracking-tight leading-none select-none" style={{ color: "#3c4043", fontFamily: "\"Google Sans\", \"Product Sans\", \"DM Sans\", system-ui, sans-serif", fontWeight: 500 }}>Jenvu</span>
           </div>
           <Link
-            to="/signals-live"
+            to="/app"
             className="h-8 inline-flex items-center gap-1.5 px-3 rounded-lg bg-home-accent text-[12px] font-medium text-home-accent-foreground hover:opacity-90 transition"
           >
-            <Radar className="h-3.5 w-3.5" /> Live Signals
+            <Radar className="h-3.5 w-3.5" /> Open Desk
           </Link>
         </div>
       </header>
@@ -341,7 +341,7 @@ function KillzonesPage() {
                       <button
                         key={profile.key}
                         onClick={() => {
-                          navigate({ to: "/signals-live", });
+                          navigate({ to: "/app" });
                         }}
                         className={`group text-left rounded-xl border p-4 ring-1 ring-white/60 transition-all duration-300 hover:-translate-y-1 ${ locked ? "border-zinc-200 bg-zinc-50/60 hover:border-zinc-300/70" : "border-zinc-200 bg-white hover:border-zinc-300/70 " }`}
                       >

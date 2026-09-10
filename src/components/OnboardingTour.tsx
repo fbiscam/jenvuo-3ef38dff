@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { X, ArrowRight, LayoutDashboard, Radar, Scale } from "lucide-react";
+import { X, ArrowRight, LayoutDashboard, Scale } from "lucide-react";
 
 const STORAGE_KEY = "jenvu.onboarding.v1.dismissed";
 
@@ -17,12 +17,6 @@ const STEPS: Step[] = [
     body: "Account Overview shows saved signals, alerts, trade journal stats and open positions — everything in one white surface.",
     icon: LayoutDashboard,
     cta: { to: "/dashboard", label: "Explore dashboard" },
-  },
-  {
-    title: "Institutional signal engine",
-    body: "Live Signals runs ICT/SMC scans across XAU/USD, EUR, GBP, JPY, AUD, CHF with 64% confidence gate and killzone timing.",
-    icon: Radar,
-    cta: { to: "/signals-live", label: "Open Live Signals" },
   },
   {
     title: "Risk sized to your balance",

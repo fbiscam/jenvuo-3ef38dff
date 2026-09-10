@@ -164,7 +164,7 @@ export const Route = createFileRoute('/api/public/hooks/news-alerts')({
               minutesUntil,
               forecast: ev.forecast ?? '',
               previous: ev.previous ?? '',
-              signalUrl: 'https://jenvu.com/signals-live',
+              signalUrl: 'https://jenvu.com/dashboard/notifications',
             }
             const element = React.createElement(template.component, templateData)
             const html = await render(element)

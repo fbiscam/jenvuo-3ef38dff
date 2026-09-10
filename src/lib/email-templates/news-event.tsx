@@ -33,7 +33,7 @@ const NewsEventEmail = ({
   minutesUntil = 60,
   forecast = '',
   previous = '',
-  signalUrl = `${SITE}/signals-live`,
+  signalUrl = `${SITE}/dashboard/notifications`,
 }: Props) => (
   <Html lang="en" dir="ltr">
     <EmailHead />
@@ -64,7 +64,7 @@ const NewsEventEmail = ({
           </Section>
 
           <Link href={signalUrl} style={s.button}>
-            Open Live Signals →
+            Open alerts →
           </Link>
 
           <Text style={{ ...s.footer, marginTop: '24px' }}>
@@ -116,6 +116,6 @@ export const template: TemplateEntry = {
     minutesUntil: 45,
     forecast: '0.3%',
     previous: '0.2%',
-    signalUrl: 'https://jenvu.com/signals-live',
+    signalUrl: 'https://jenvu.com/dashboard/notifications',
   },
 }
