@@ -60,8 +60,6 @@ const columns = [
     label: "Platform",
     links: [
       { to: "/", label: "Home" },
-      { to: "/app", label: "Voice Agent" },
-      { to: "/signals-live", label: "Live Signals" },
       { to: "/broadcasts", label: "Broadcast" },
       { to: "/pricing", label: "Pricing" },
       { to: "/download", label: "Download App" },
@@ -107,7 +105,7 @@ const columns = [
 export default function SiteFooter({ className }: { className?: string }) {
   const year = new Date().getFullYear();
   return (
-    <footer className={`hide-in-pwa relative bg-[#FAFAFA] ${className || ""}`}>
+    <footer className={`hide-in-pwa relative bg-white ${className || ""}`}>
 
       {/* Subtle divider */}
       <div className="h-px w-full bg-transparent" />
