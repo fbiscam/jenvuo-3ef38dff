@@ -654,69 +654,52 @@ function HomePage() {
 
 
 
-      <section className="border-t border-zinc-100 overflow-hidden">
-        <div className="mx-auto max-w-6xl px-5 sm:px-6 pt-6 pb-24">
-          <div
-            className="relative overflow-hidden rounded-[28px]"
-            style={{ background: "var(--home-accent)" }}
-          >
+      <section className="overflow-hidden border-t border-border bg-background">
+        <div className="mx-auto max-w-[1200px] px-3 pb-24 pt-10 sm:px-4">
+          <div className="build-boundaries-panel relative min-h-[396px] overflow-hidden rounded-[14px] bg-home-accent">
             {/* dot grid */}
-            <div
-              className="pointer-events-none absolute inset-0 opacity-30"
-              style={{
-                backgroundImage:
-                  "radial-gradient(circle, rgba(255,255,255,0.5) 1px, transparent 1px)",
-                backgroundSize: "22px 22px",
-              }}
-            />
+            <div className="build-boundaries-dots pointer-events-none absolute inset-0" />
             {/* warm bottom glow */}
-            <div
-              className="pointer-events-none absolute bottom-0 left-1/2 h-2/3 w-3/4 -translate-x-1/2 translate-y-1/3"
-              style={{
-                background:
-                  "radial-gradient(ellipse at center bottom, color-mix(in oklab, var(--home-accent-soft) 85%, transparent), transparent 70%)",
-                filter: "blur(12px)",
-              }}
-            />
+            <div className="build-boundaries-glow pointer-events-none absolute bottom-0 left-1/2 h-2/3 w-3/4 -translate-x-1/2 translate-y-1/3" />
 
             {/* floating dashed tiles */}
             {[
-              { Icon: Mic, cls: "left-[7%] top-[16%] -rotate-12", delay: "0s" },
-              { Icon: AudioWaveform, cls: "left-[17%] top-[52%] rotate-6", delay: "0.8s" },
-              { Icon: PhoneCall, cls: "left-[24%] top-[70%] rotate-12", delay: "1.6s" },
-              { Icon: Database, cls: "right-[24%] top-[68%] -rotate-6", delay: "0.4s" },
-              { Icon: Wifi, cls: "right-[16%] top-[48%] rotate-12", delay: "1.2s" },
-              { Icon: Box, cls: "right-[7%] top-[18%] -rotate-12", delay: "2s" },
+              { Icon: Mic, cls: "left-[14%] top-[8%] rotate-12", delay: "0s" },
+              { Icon: AudioWaveform, cls: "left-[8%] top-[27%] -rotate-6", delay: "0.8s" },
+              { Icon: PhoneCall, cls: "left-[21%] top-[32%] -rotate-12", delay: "1.6s" },
+              { Icon: Database, cls: "right-[22%] top-[28%] rotate-6", delay: "0.4s" },
+              { Icon: Wifi, cls: "right-[8%] top-[9%] rotate-12", delay: "1.2s" },
+              { Icon: Box, cls: "right-[5%] top-[35%] -rotate-12", delay: "2s" },
             ].map(({ Icon, cls, delay }, i) => (
               <div
                 key={i}
-                className={`pointer-events-none absolute hidden rounded-xl border border-dashed border-white/60 p-3 sm:block ${cls}`}
+                className={`pointer-events-none absolute hidden h-14 w-14 items-center justify-center rounded-sm border border-primary-foreground/60 sm:flex ${cls}`}
                 style={{ animation: `cfhero-float 7s ease-in-out ${delay} infinite` }}
               >
-                <Icon className="h-6 w-6 text-white" strokeWidth={1.75} />
+                <Icon className="h-5 w-5 text-primary-foreground" strokeWidth={1.75} />
               </div>
             ))}
 
             {/* content */}
-            <div className="relative z-10 mx-auto max-w-3xl px-6 py-16 text-center sm:px-10 sm:py-20">
-              <h2 className="text-3xl font-semibold leading-[1.08] tracking-tight text-white sm:text-4xl md:text-[44px]">
+            <div className="relative z-10 mx-auto max-w-3xl px-6 pb-24 pt-24 text-center sm:px-10 sm:pt-24">
+              <h2 className="text-3xl font-semibold leading-[1.08] text-primary-foreground sm:text-4xl md:text-[42px]">
                 Build without boundaries
               </h2>
-              <p className="mx-auto mt-5 max-w-xl text-sm leading-relaxed text-white/90 sm:text-base">
+              <p className="mx-auto mt-6 max-w-xl text-sm leading-snug text-primary-foreground/95">
                 Your voice agent is one tap away — listening, reasoning, research
                 <br className="hidden sm:block" />{" "}
                 &amp; narrating. Speak to the market now, no credit card required.
               </p>
-              <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
+              <div className="mt-8 flex flex-col items-center justify-center gap-2 sm:flex-row">
                 <Link
                   to="/dashboard"
-                  className="inline-flex items-center justify-center rounded-full bg-white px-7 py-3 text-sm font-semibold text-zinc-900 shadow-sm transition hover:bg-zinc-100"
+                  className="inline-flex h-10 items-center justify-center rounded-full bg-background px-6 text-sm font-semibold text-foreground shadow-sm transition hover:bg-muted"
                 >
                   Open Dashboard
                 </Link>
                 <Link
                   to="/pricing"
-                  className="inline-flex items-center justify-center rounded-full border border-white/40 bg-white/10 px-7 py-3 text-sm font-semibold text-white backdrop-blur transition hover:bg-white/20"
+                  className="inline-flex h-10 items-center justify-center rounded-full border border-primary-foreground/20 bg-primary-foreground/15 px-6 text-sm font-semibold text-primary-foreground backdrop-blur transition hover:bg-primary-foreground/25"
                 >
                   View Pricing
                 </Link>
@@ -724,14 +707,14 @@ function HomePage() {
             </div>
 
             {/* ticker bar */}
-            <div className="relative z-10 overflow-hidden border-t border-white/25 bg-black/10 py-2.5">
+            <div className="absolute inset-x-0 bottom-0 z-10 overflow-hidden border-t border-primary-foreground/25 bg-foreground/10 py-3">
               <div className="flex w-max items-center gap-10 whitespace-nowrap" style={{ animation: "jenvu-marquee 28s linear infinite" }}>
                 {Array.from({ length: 2 }).map((_, dup) => (
-                  <div key={dup} className="flex items-center gap-10 pr-10 text-xs font-medium text-white/90">
-                    <span>Voice agent listening &amp; narrating the market 24/7</span>
-                    <span>Real-time gold signals without surprises</span>
-                    <span>Research, reasoning &amp; risk context in one terminal</span>
-                    <span>Battle-tested feeds powering desks worldwide</span>
+                  <div key={dup} className="flex items-center gap-10 pr-10 text-xs font-medium text-primary-foreground">
+                    <span>◈ Voice agent listening &amp; narrating the market 24/7</span>
+                    <span>◉ Real-time gold signals without surprises</span>
+                    <span>⌁ Research, reasoning &amp; risk context in one terminal</span>
+                    <span>▣ Battle-tested feeds powering desks worldwide</span>
                   </div>
                 ))}
               </div>
