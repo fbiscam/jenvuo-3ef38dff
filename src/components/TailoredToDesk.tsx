@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Bot, CornerDownRight, Github, Globe2, Grid3X3, ShieldCheck } from "lucide-react";
-import jenvuLogo from "@/assets/favicon.png";
+import jenvuLogoAsset from "@/assets/tcc-orange-logo.png.asset.json";
 
 const BUILDS = [
   { id: "v30499", time: "Updated 09.10.26, 09:50", status: "Queued" },
@@ -39,7 +39,7 @@ export function TailoredToDesk() {
           <article className="flex min-h-[290px] flex-col rounded-md border border-border bg-card p-5 sm:p-6 lg:col-span-2">
             <div className="flex items-start gap-5">
               <div className="relative hidden h-14 w-14 shrink-0 items-center justify-center rounded-md bg-home-accent sm:flex">
-                <img src={jenvuLogo} alt="Jenvu" width={256} height={256} className="h-9 w-9 object-contain" />
+                <img src={jenvuLogoAsset.url} alt="Jenvu" width={256} height={256} className="h-9 w-9 object-contain" />
                 <span className="absolute -bottom-3 -right-3 flex h-7 w-7 items-center justify-center rounded-sm bg-foreground text-background shadow-sm">
                   <Github className="h-4 w-4" aria-hidden="true" />
                 </span>
