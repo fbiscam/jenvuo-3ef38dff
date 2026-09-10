@@ -21,7 +21,7 @@ export default function CloudflareHero() {
           </div>
 
           <h1 className="mx-auto mt-8 max-w-[740px] text-[36px] font-semibold leading-[0.98] tracking-normal text-home-accent-foreground sm:text-[44px] md:text-[48px]">
-            Everything we learned from powering gold trading—yours by default
+             Everything we learned from powering gold trading
           </h1>
 
           <p className="mx-auto mt-8 max-w-xl text-[13px] leading-[1.25] text-home-accent-foreground sm:text-sm">
