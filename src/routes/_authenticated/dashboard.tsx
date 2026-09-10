@@ -1051,7 +1051,7 @@ function DashboardLayout() {
 
 
         {/* Extension usage analytics — Cloudflare-style */}
-        <DashboardHero keysCount={extKeyCount} balance={usageStats ? usageStats.balance : null} />
+        <DashboardHero stats={usageStats} loading={usageLoading} />
 
         {/* Extension usage analytics — Cloudflare-style */}
         <UsageAnalytics
@@ -1248,96 +1248,76 @@ function UsageStatCard({ title, value, delta, series, tall = false, chartHeight,
 }
 
 
-function DashboardHero({ keysCount, balance }: { keysCount: number | null; balance: number | null }) {
-  const [q, setQ] = useState("");
-  const links: { to: string; label: string }[] = [
-    { to: "/dashboard/usage", label: "Wallet usage" },
-    { to: "/dashboard/extension", label: "Extension keys" },
-    { to: "/dashboard/analytics", label: "Analytics" },
-    { to: "/dashboard/security", label: "Security" },
-  ];
-  const filtered = q.trim()
-    ? links.filter((l) => l.label.toLowerCase().includes(q.trim().toLowerCase()))
-    : links;
+function DashboardHero({ stats, loading }: { stats: UsageStats | null; loading: boolean }) {
+  const keySpend = useMemo(() => {
+    const spend = new Map<string, number>();
+    for (const row of stats?.ledger ?? []) {
+      if (row.delta >= 0 || row.reason !== "extension_api" || !row.metadata || typeof row.metadata !== "object" || Array.isArray(row.metadata)) continue;
+      const keyId = typeof row.metadata.api_key_id === "string" ? row.metadata.api_key_id : null;
+      if (!keyId) continue;
+      spend.set(keyId, (spend.get(keyId) ?? 0) + Math.abs(row.delta));
+    }
+    return spend;
+  }, [stats]);
 
   return (
-    <section className="dashboard-hero -mx-5 mb-2 bg-white px-5 pb-8 pt-6 sm:-mx-8 sm:px-8">
-      <div className="mx-auto flex max-w-4xl flex-col items-center">
-        <Link
-          to="/dashboard/extension"
-          className="inline-flex items-center gap-2.5 rounded-full border border-zinc-200 bg-white px-3.5 py-2 text-sm text-zinc-950 shadow-sm transition hover:border-zinc-300 hover:shadow"
-        >
-          <span className="font-medium">Senior Review with Top Models</span>
-          <span className="flex items-center gap-1.5" aria-label="ChatGPT, Gemini, Claude, and DeepSeek">
-            <RiOpenaiFill className="h-[18px] w-[18px] text-brand-openai" aria-label="ChatGPT" />
-            <RiGeminiFill className="h-[18px] w-[18px] text-brand-gemini" aria-label="Gemini" />
-            <RiClaudeFill className="h-[18px] w-[18px] text-brand-claude" aria-label="Claude" />
-            <RiDeepseekFill className="h-[18px] w-[18px] text-brand-deepseek" aria-label="DeepSeek" />
-          </span>
-        </Link>
+    <section className="dashboard-hero -mx-5 mb-6 bg-white px-5 pb-5 pt-3 sm:-mx-8 sm:px-8">
+      <div className="grid gap-6 border-b border-zinc-200 pb-7 lg:grid-cols-[minmax(0,2fr)_minmax(240px,1fr)]">
+        <div className="min-w-0">
+          <div className="mb-3 flex items-center justify-between gap-4">
+            <div>
+              <h1 className="text-lg font-semibold text-zinc-950">Recent API keys</h1>
+              <p className="mt-0.5 text-sm text-zinc-500">Your latest extension keys and their spend.</p>
+            </div>
+            <Link to="/dashboard/extension" className="shrink-0 text-sm font-medium text-zinc-700 hover:text-zinc-950">
+              View all
+            </Link>
+          </div>
 
-        <h1 className="mt-7 text-center text-3xl font-bold tracking-tight text-zinc-900 sm:text-4xl">
-          What are we building today?
-        </h1>
-
-        <div className="mt-6 flex w-full items-center gap-2 rounded-xl border border-zinc-200 bg-white px-4 py-3 shadow-sm focus-within:border-zinc-300">
-          <Search className="h-4 w-4 shrink-0 text-zinc-400" />
-          <input
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
-            placeholder="Search"
-            className="min-w-0 flex-1 bg-transparent text-sm text-zinc-900 outline-none placeholder:text-zinc-400"
-          />
-          <span className="hidden items-center gap-1 sm:flex">
-            <kbd className="rounded border border-zinc-200 px-1.5 py-0.5 text-[10px] text-zinc-500">Ctrl</kbd>
-            <kbd className="rounded border border-zinc-200 px-1.5 py-0.5 text-[10px] text-zinc-500">K</kbd>
-          </span>
+          <div className="divide-y divide-zinc-200 border-y border-zinc-200">
+            {loading ? (
+              <div className="space-y-3 py-4" aria-label="Loading API keys">
+                {[0, 1].map((item) => <div key={item} className="h-9 animate-pulse rounded bg-zinc-100" />)}
+              </div>
+            ) : stats?.recentExtensionKeys.length ? (
+              stats.recentExtensionKeys.slice(0, 4).map((key, index) => (
+                <Link key={key.id} to="/dashboard/extension" className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-4 py-3.5">
+                  <span className="min-w-0">
+                    <span className="flex items-center gap-2">
+                      <code className="truncate rounded bg-zinc-100 px-2 py-1 text-xs font-medium text-zinc-800">{key.keyPrefix}••••••••</code>
+                      {index === 0 && <span className="rounded border border-zinc-200 px-1.5 py-0.5 text-[10px] font-medium uppercase text-zinc-500">Latest</span>}
+                    </span>
+                    <span className="mt-1 block truncate text-xs text-zinc-500">{key.name}{key.revokedAt ? " · Revoked" : ""}</span>
+                  </span>
+                  <span className="text-right">
+                    <span className="block text-sm font-semibold tabular-nums text-zinc-950">${(keySpend.get(key.id) ?? 0).toFixed(4)}</span>
+                    <span className="text-[11px] text-zinc-500">Spent</span>
+                  </span>
+                </Link>
+              ))
+            ) : (
+              <Link to="/dashboard/extension" className="flex items-center justify-between py-5 text-sm text-zinc-600 hover:text-zinc-950">
+                <span>No API keys yet</span>
+                <span className="font-medium">Create key</span>
+              </Link>
+            )}
+          </div>
         </div>
 
-        <div className="mt-6 grid w-full grid-cols-1 gap-x-8 gap-y-6 md:grid-cols-3">
-          <div>
-            <div className="flex items-center justify-between text-sm text-zinc-500">
-              <span className="inline-flex items-center gap-1">Wallet <ChevronRight className="h-3 w-3" /></span>
-              <MoreHorizontal className="h-4 w-4 text-zinc-300" />
+        <div className="border-t border-zinc-200 pt-5 lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0">
+          <p className="text-sm font-medium text-zinc-500">Credit used</p>
+          <p className="mt-2 text-4xl font-semibold tabular-nums text-zinc-950">
+            {loading || !stats ? "—" : `$${stats.spentThisPeriod.toFixed(2)}`}
+          </p>
+          <p className="mt-1 text-sm text-zinc-500">Current billing period</p>
+          <div className="mt-6 border-t border-zinc-200 pt-4">
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-zinc-500">Available credit</span>
+              <span className="font-semibold tabular-nums text-zinc-950">{stats ? `$${stats.balance.toFixed(2)}` : "—"}</span>
             </div>
-            <Link to="/dashboard/usage" className="mt-3 flex items-center justify-between rounded-md py-2 text-sm text-zinc-900 hover:bg-white">
-              <span className="inline-flex items-center gap-2">
-                <Globe className="h-4 w-4 text-zinc-400" />
-                {balance == null ? "Balance" : `$${balance.toFixed(2)} available`}
-              </span>
-              <ChevronRight className="h-4 w-4 text-zinc-400" />
+            <Link to="/dashboard/usage" className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-zinc-700 hover:text-zinc-950">
+              View usage <ChevronRight className="h-4 w-4" />
             </Link>
-          </div>
-
-          <div>
-            <div className="flex items-center justify-between text-sm text-zinc-500">
-              <span className="inline-flex items-center gap-1">Extension <ChevronRight className="h-3 w-3" /></span>
-              <MoreHorizontal className="h-4 w-4 text-zinc-300" />
-            </div>
-            <Link to="/dashboard/extension" className="mt-3 flex items-center justify-center gap-2 rounded-lg bg-zinc-100 px-4 py-4 text-sm text-zinc-700 transition hover:bg-zinc-200">
-              <Rocket className="h-4 w-4 text-zinc-500" />
-              {keysCount ? `${keysCount} active key${keysCount > 1 ? "s" : ""}` : "Create your first key"}
-            </Link>
-          </div>
-
-          <div>
-            <div className="flex items-center justify-between text-sm text-zinc-500">
-              <span>Recents</span>
-              <MoreHorizontal className="h-4 w-4 text-zinc-300" />
-            </div>
-            <div className="mt-1 divide-y divide-zinc-200">
-              {filtered.length === 0 ? (
-                <p className="py-3 text-sm text-zinc-400">No matches</p>
-              ) : filtered.map((l) => (
-                <Link key={l.to} to={l.to} className="flex items-center justify-between py-3 text-sm text-zinc-500 hover:text-zinc-900">
-                  <span className="inline-flex items-center gap-2">
-                    <History className="h-3.5 w-3.5 text-zinc-400" />
-                    <span className="font-medium text-zinc-900">{l.label}</span>
-                  </span>
-                  <ChevronRight className="h-4 w-4 text-zinc-400" />
-                </Link>
-              ))}
-            </div>
           </div>
         </div>
       </div>
