@@ -117,6 +117,7 @@ function ExtensionPage() {
   };
 
   const activeKeys = keys.filter((k) => !k.revoked_at);
+  const displayedKeys = keys.slice(0, 4);
 
   return (
     <div className="w-full px-1 py-2 sm:px-2 sm:py-4">
@@ -198,13 +199,13 @@ function ExtensionPage() {
         {loading ? (
           <div className="py-6 text-[13px] text-zinc-500">Loading…</div>
         ) : (
-          keys.map((k) => (
+          displayedKeys.map((k) => (
             <div
               key={k.id}
               className="grid grid-cols-[1.4fr_1.6fr_1fr_1fr_auto] items-center gap-4 border-b border-zinc-100 py-4"
             >
               <div className="min-w-0">
-                <div className={`${MONO} truncate text-[13px] text-blue-700`}>…{k.key_prefix}</div>
+                <div className={`${MONO} truncate text-[13px] text-blue-700`}>{k.key_prefix}…</div>
                 <div className="truncate text-[12px] text-zinc-500">{k.name}</div>
               </div>
               <div className="min-w-0">
@@ -266,7 +267,9 @@ function ExtensionPage() {
         )}
 
         {!loading && keys.length > 0 && (
-          <div className="mt-3 text-[12px] text-zinc-500">{activeKeys.length} active key(s) · maximum 5.</div>
+          <div className="mt-3 text-[12px] text-zinc-500">
+            Showing {displayedKeys.length} of {keys.length} key(s) · {activeKeys.length} active.
+          </div>
         )}
       </div>}
 
