@@ -367,7 +367,7 @@ function PricingPage() {
             <div className="relative min-h-[360px] overflow-hidden rounded-lg border border-border bg-zinc-950 shadow-sm sm:min-h-[480px]">
               <video
                 className="absolute inset-0 h-full w-full object-cover"
-                src="/pricing-features.mp4"
+                src="/pricing-features.webm"
                 poster={pricingVoice}
                 autoPlay
                 muted
