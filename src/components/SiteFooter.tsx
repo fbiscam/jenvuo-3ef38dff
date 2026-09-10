@@ -114,9 +114,6 @@ export default function SiteFooter({ className }: { className?: string }) {
               <img src="/favicon.png" alt="Jenvu" className="h-7 w-7 rounded object-contain" />
               <span className="text-[17px] font-semibold tracking-tight text-zinc-900">Jenvu AI</span>
             </Link>
-            <p className="max-w-xs text-[13px] leading-relaxed text-zinc-600">
-              Institutional grade voice intelligence for gold traders using ICT &amp; SMC.
-            </p>
           </div>
 
           {/* Link columns */}
