@@ -29,6 +29,7 @@ const MODEL_PRICING: Record<string, Price> = {
   "bmind/gpt-5-mini": { in: 0.25, out: 2.0 },
   "bmind/gpt-5.2-chat": { in: 1.1, out: 8.8 },
   "bmind/gpt-4o-mini": { in: 0.15, out: 0.6 },
+  "bmind/gpt-4o": { in: 2.5, out: 10.0 },
   "bmind/gpt-4.1-mini": { in: 0.4, out: 1.6 },
   "bmind/claude-3.7-sonnet": { in: 3.0, out: 15.0 },
   "bmind/claude-sonnet-4.5": { in: 3.0, out: 15.0 },

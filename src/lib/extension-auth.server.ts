@@ -39,13 +39,22 @@ export async function authenticateExtensionRequest(request: Request): Promise<Ex
 
   const { data, error } = await admin
     .from('extension_api_keys')
-    .select('id,user_id,name,revoked_at')
+    .select('id,user_id,name,revoked_at,created_at')
     .eq('key_hash', keyHash)
     .maybeSingle()
 
   if (error) return { ok: false, status: 500, error: 'Key lookup failed.' }
   if (!data) return { ok: false, status: 401, error: 'Invalid API key.' }
   if (data.revoked_at) return { ok: false, status: 401, error: 'This API key was revoked.' }
+
+  const { data: sub } = await admin.from('user_subscriptions').select('plan_id,status').eq('user_id', data.user_id).maybeSingle()
+  const active = Boolean(sub && (sub.status === 'active' || sub.status === 'trialing'))
+  const planId = active ? String(sub.plan_id || 'free') : 'free'
+  const { data: plan } = await admin.from('plans').select('extension_key_limit').eq('id', planId).maybeSingle()
+  const keyLimit = Number(plan?.extension_key_limit ?? 0)
+  if (!active || planId === 'free' || keyLimit < 1) return { ok: false, status: 403, error: 'A paid Pro, Elite, or Ultra plan is required for extension access.' }
+  const { data: allowedKeys } = await admin.from('extension_api_keys').select('id').eq('user_id', data.user_id).is('revoked_at', null).order('created_at', { ascending: false }).limit(keyLimit)
+  if (!(allowedKeys ?? []).some((key: any) => key.id === data.id)) return { ok: false, status: 403, error: `This key is outside your ${planId} plan's active-key allowance.` }
 
   try {
     await admin.from('extension_api_keys').update({ last_used_at: new Date().toISOString() }).eq('id', data.id)
