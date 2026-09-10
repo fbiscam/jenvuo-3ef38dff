@@ -11,7 +11,6 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
-import { Route as SignalsLiveRouteImport } from './routes/signals-live'
 import { Route as ScamToolRouteImport } from './routes/scam-tool'
 import { Route as ScamCheckRouteImport } from './routes/scam-check'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
@@ -35,7 +34,6 @@ import { Route as ContactRouteImport } from './routes/contact'
 import { Route as ConfirmEmailChangeRouteImport } from './routes/confirm-email-change'
 import { Route as CancellationRouteImport } from './routes/cancellation'
 import { Route as BroadcastsRouteImport } from './routes/broadcasts'
-import { Route as BriefsRouteImport } from './routes/briefs'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AppRouteImport } from './routes/app'
 import { Route as AiEngineRouteImport } from './routes/ai-engine'
@@ -59,7 +57,6 @@ import { Route as LeadsActivityRouteImport } from './routes/leads.activity'
 import { Route as LeadsAccountRouteImport } from './routes/leads.account'
 import { Route as JenvuOpsX9k2InboxRouteImport } from './routes/jenvu-ops-x9k2.inbox'
 import { Route as InsightsSlugRouteImport } from './routes/insights.$slug'
-import { Route as BriefIdRouteImport } from './routes/brief.$id'
 import { Route as AuthenticatedInboxRouteImport } from './routes/_authenticated/inbox'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as HelpCollectionIndexRouteImport } from './routes/help.$collection.index'
@@ -67,8 +64,6 @@ import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authe
 import { Route as LovableEmailEventsRouteImport } from './routes/lovable/email/events'
 import { Route as LeadsAdminUsersRouteImport } from './routes/leads.admin.users'
 import { Route as HelpCollectionSlugRouteImport } from './routes/help.$collection.$slug'
-import { Route as ApiPublicSignalsFeedRouteImport } from './routes/api/public/signals-feed'
-import { Route as ApiPublicPodcastDotxmlRouteImport } from './routes/api/public/podcast[.]xml'
 import { Route as ApiPublicGoldRouteImport } from './routes/api/public/gold'
 import { Route as AuthenticatedDashboardWorkspaceRouteImport } from './routes/_authenticated/dashboard.workspace'
 import { Route as AuthenticatedDashboardUsageRouteImport } from './routes/_authenticated/dashboard.usage'
@@ -96,12 +91,10 @@ import { Route as ApiPublicHooksNotifySubscribersRouteImport } from './routes/ap
 import { Route as ApiPublicHooksNewsAlertsRouteImport } from './routes/api/public/hooks/news-alerts'
 import { Route as ApiPublicHooksMonthlyRetuneRouteImport } from './routes/api/public/hooks/monthly-retune'
 import { Route as ApiPublicHooksGenerateInsightRouteImport } from './routes/api/public/hooks/generate-insight'
-import { Route as ApiPublicHooksGenerateBriefRouteImport } from './routes/api/public/hooks/generate-brief'
 import { Route as ApiPublicHooksBackfillInsightImagesRouteImport } from './routes/api/public/hooks/backfill-insight-images'
 import { Route as ApiPublicHooksAutoScanRouteImport } from './routes/api/public/hooks/auto-scan'
 import { Route as ApiPublicExtensionVerifyRouteImport } from './routes/api/public/extension/verify'
 import { Route as ApiPublicExtensionAnalyzeRouteImport } from './routes/api/public/extension/analyze'
-import { Route as ApiPublicBriefAudioIdRouteImport } from './routes/api/public/brief-audio.$id'
 import { Route as AuthenticatedDashboardAdminTvMismatchRouteImport } from './routes/_authenticated/dashboard.admin.tv-mismatch'
 import { Route as AuthenticatedDashboardAdminTuningRouteImport } from './routes/_authenticated/dashboard.admin.tuning'
 import { Route as AuthenticatedDashboardAdminSubscribersRouteImport } from './routes/_authenticated/dashboard.admin.subscribers'
@@ -122,11 +115,6 @@ const TermsRoute = TermsRouteImport.update({
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SignalsLiveRoute = SignalsLiveRouteImport.update({
-  id: '/signals-live',
-  path: '/signals-live',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ScamToolRoute = ScamToolRouteImport.update({
@@ -244,11 +232,6 @@ const BroadcastsRoute = BroadcastsRouteImport.update({
   path: '/broadcasts',
   getParentRoute: () => rootRouteImport,
 } as any)
-const BriefsRoute = BriefsRouteImport.update({
-  id: '/briefs',
-  path: '/briefs',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
@@ -363,11 +346,6 @@ const InsightsSlugRoute = InsightsSlugRouteImport.update({
   path: '/$slug',
   getParentRoute: () => InsightsRoute,
 } as any)
-const BriefIdRoute = BriefIdRouteImport.update({
-  id: '/brief/$id',
-  path: '/brief/$id',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const AuthenticatedInboxRoute = AuthenticatedInboxRouteImport.update({
   id: '/inbox',
   path: '/inbox',
@@ -402,16 +380,6 @@ const LeadsAdminUsersRoute = LeadsAdminUsersRouteImport.update({
 const HelpCollectionSlugRoute = HelpCollectionSlugRouteImport.update({
   id: '/help/$collection/$slug',
   path: '/help/$collection/$slug',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiPublicSignalsFeedRoute = ApiPublicSignalsFeedRouteImport.update({
-  id: '/api/public/signals-feed',
-  path: '/api/public/signals-feed',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiPublicPodcastDotxmlRoute = ApiPublicPodcastDotxmlRouteImport.update({
-  id: '/api/public/podcast.xml',
-  path: '/api/public/podcast.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPublicGoldRoute = ApiPublicGoldRouteImport.update({
@@ -573,12 +541,6 @@ const ApiPublicHooksGenerateInsightRoute =
     path: '/api/public/hooks/generate-insight',
     getParentRoute: () => rootRouteImport,
   } as any)
-const ApiPublicHooksGenerateBriefRoute =
-  ApiPublicHooksGenerateBriefRouteImport.update({
-    id: '/api/public/hooks/generate-brief',
-    path: '/api/public/hooks/generate-brief',
-    getParentRoute: () => rootRouteImport,
-  } as any)
 const ApiPublicHooksBackfillInsightImagesRoute =
   ApiPublicHooksBackfillInsightImagesRouteImport.update({
     id: '/api/public/hooks/backfill-insight-images',
@@ -602,11 +564,6 @@ const ApiPublicExtensionAnalyzeRoute =
     path: '/api/public/extension/analyze',
     getParentRoute: () => rootRouteImport,
   } as any)
-const ApiPublicBriefAudioIdRoute = ApiPublicBriefAudioIdRouteImport.update({
-  id: '/api/public/brief-audio/$id',
-  path: '/api/public/brief-audio/$id',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const AuthenticatedDashboardAdminTvMismatchRoute =
   AuthenticatedDashboardAdminTvMismatchRouteImport.update({
     id: '/admin/tv-mismatch',
@@ -680,7 +637,6 @@ export interface FileRoutesByFullPath {
   '/ai-engine': typeof AiEngineRoute
   '/app': typeof AppRoute
   '/auth': typeof AuthRoute
-  '/briefs': typeof BriefsRoute
   '/broadcasts': typeof BroadcastsRoute
   '/cancellation': typeof CancellationRoute
   '/confirm-email-change': typeof ConfirmEmailChangeRoute
@@ -704,12 +660,10 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/scam-check': typeof ScamCheckRoute
   '/scam-tool': typeof ScamToolRoute
-  '/signals-live': typeof SignalsLiveRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/dashboard': typeof AuthenticatedDashboardRouteWithChildren
   '/inbox': typeof AuthenticatedInboxRoute
-  '/brief/$id': typeof BriefIdRoute
   '/insights/$slug': typeof InsightsSlugRoute
   '/jenvu-ops-x9k2/inbox': typeof JenvuOpsX9k2InboxRoute
   '/leads/account': typeof LeadsAccountRoute
@@ -742,8 +696,6 @@ export interface FileRoutesByFullPath {
   '/dashboard/usage': typeof AuthenticatedDashboardUsageRoute
   '/dashboard/workspace': typeof AuthenticatedDashboardWorkspaceRoute
   '/api/public/gold': typeof ApiPublicGoldRoute
-  '/api/public/podcast.xml': typeof ApiPublicPodcastDotxmlRoute
-  '/api/public/signals-feed': typeof ApiPublicSignalsFeedRoute
   '/help/$collection/$slug': typeof HelpCollectionSlugRoute
   '/leads/admin/users': typeof LeadsAdminUsersRoute
   '/lovable/email/events': typeof LovableEmailEventsRoute
@@ -760,12 +712,10 @@ export interface FileRoutesByFullPath {
   '/dashboard/admin/subscribers': typeof AuthenticatedDashboardAdminSubscribersRoute
   '/dashboard/admin/tuning': typeof AuthenticatedDashboardAdminTuningRoute
   '/dashboard/admin/tv-mismatch': typeof AuthenticatedDashboardAdminTvMismatchRoute
-  '/api/public/brief-audio/$id': typeof ApiPublicBriefAudioIdRoute
   '/api/public/extension/analyze': typeof ApiPublicExtensionAnalyzeRoute
   '/api/public/extension/verify': typeof ApiPublicExtensionVerifyRoute
   '/api/public/hooks/auto-scan': typeof ApiPublicHooksAutoScanRoute
   '/api/public/hooks/backfill-insight-images': typeof ApiPublicHooksBackfillInsightImagesRoute
-  '/api/public/hooks/generate-brief': typeof ApiPublicHooksGenerateBriefRoute
   '/api/public/hooks/generate-insight': typeof ApiPublicHooksGenerateInsightRoute
   '/api/public/hooks/monthly-retune': typeof ApiPublicHooksMonthlyRetuneRoute
   '/api/public/hooks/news-alerts': typeof ApiPublicHooksNewsAlertsRoute
@@ -785,7 +735,6 @@ export interface FileRoutesByTo {
   '/ai-engine': typeof AiEngineRoute
   '/app': typeof AppRoute
   '/auth': typeof AuthRoute
-  '/briefs': typeof BriefsRoute
   '/broadcasts': typeof BroadcastsRoute
   '/cancellation': typeof CancellationRoute
   '/confirm-email-change': typeof ConfirmEmailChangeRoute
@@ -805,11 +754,9 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/scam-check': typeof ScamCheckRoute
   '/scam-tool': typeof ScamToolRoute
-  '/signals-live': typeof SignalsLiveRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/inbox': typeof AuthenticatedInboxRoute
-  '/brief/$id': typeof BriefIdRoute
   '/insights/$slug': typeof InsightsSlugRoute
   '/jenvu-ops-x9k2/inbox': typeof JenvuOpsX9k2InboxRoute
   '/leads/account': typeof LeadsAccountRoute
@@ -842,8 +789,6 @@ export interface FileRoutesByTo {
   '/dashboard/usage': typeof AuthenticatedDashboardUsageRoute
   '/dashboard/workspace': typeof AuthenticatedDashboardWorkspaceRoute
   '/api/public/gold': typeof ApiPublicGoldRoute
-  '/api/public/podcast.xml': typeof ApiPublicPodcastDotxmlRoute
-  '/api/public/signals-feed': typeof ApiPublicSignalsFeedRoute
   '/help/$collection/$slug': typeof HelpCollectionSlugRoute
   '/leads/admin/users': typeof LeadsAdminUsersRoute
   '/lovable/email/events': typeof LovableEmailEventsRoute
@@ -860,12 +805,10 @@ export interface FileRoutesByTo {
   '/dashboard/admin/subscribers': typeof AuthenticatedDashboardAdminSubscribersRoute
   '/dashboard/admin/tuning': typeof AuthenticatedDashboardAdminTuningRoute
   '/dashboard/admin/tv-mismatch': typeof AuthenticatedDashboardAdminTvMismatchRoute
-  '/api/public/brief-audio/$id': typeof ApiPublicBriefAudioIdRoute
   '/api/public/extension/analyze': typeof ApiPublicExtensionAnalyzeRoute
   '/api/public/extension/verify': typeof ApiPublicExtensionVerifyRoute
   '/api/public/hooks/auto-scan': typeof ApiPublicHooksAutoScanRoute
   '/api/public/hooks/backfill-insight-images': typeof ApiPublicHooksBackfillInsightImagesRoute
-  '/api/public/hooks/generate-brief': typeof ApiPublicHooksGenerateBriefRoute
   '/api/public/hooks/generate-insight': typeof ApiPublicHooksGenerateInsightRoute
   '/api/public/hooks/monthly-retune': typeof ApiPublicHooksMonthlyRetuneRoute
   '/api/public/hooks/news-alerts': typeof ApiPublicHooksNewsAlertsRoute
@@ -887,7 +830,6 @@ export interface FileRoutesById {
   '/ai-engine': typeof AiEngineRoute
   '/app': typeof AppRoute
   '/auth': typeof AuthRoute
-  '/briefs': typeof BriefsRoute
   '/broadcasts': typeof BroadcastsRoute
   '/cancellation': typeof CancellationRoute
   '/confirm-email-change': typeof ConfirmEmailChangeRoute
@@ -911,12 +853,10 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/scam-check': typeof ScamCheckRoute
   '/scam-tool': typeof ScamToolRoute
-  '/signals-live': typeof SignalsLiveRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRouteWithChildren
   '/_authenticated/inbox': typeof AuthenticatedInboxRoute
-  '/brief/$id': typeof BriefIdRoute
   '/insights/$slug': typeof InsightsSlugRoute
   '/jenvu-ops-x9k2/inbox': typeof JenvuOpsX9k2InboxRoute
   '/leads/account': typeof LeadsAccountRoute
@@ -949,8 +889,6 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/usage': typeof AuthenticatedDashboardUsageRoute
   '/_authenticated/dashboard/workspace': typeof AuthenticatedDashboardWorkspaceRoute
   '/api/public/gold': typeof ApiPublicGoldRoute
-  '/api/public/podcast.xml': typeof ApiPublicPodcastDotxmlRoute
-  '/api/public/signals-feed': typeof ApiPublicSignalsFeedRoute
   '/help/$collection/$slug': typeof HelpCollectionSlugRoute
   '/leads/admin/users': typeof LeadsAdminUsersRoute
   '/lovable/email/events': typeof LovableEmailEventsRoute
@@ -967,12 +905,10 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/admin/subscribers': typeof AuthenticatedDashboardAdminSubscribersRoute
   '/_authenticated/dashboard/admin/tuning': typeof AuthenticatedDashboardAdminTuningRoute
   '/_authenticated/dashboard/admin/tv-mismatch': typeof AuthenticatedDashboardAdminTvMismatchRoute
-  '/api/public/brief-audio/$id': typeof ApiPublicBriefAudioIdRoute
   '/api/public/extension/analyze': typeof ApiPublicExtensionAnalyzeRoute
   '/api/public/extension/verify': typeof ApiPublicExtensionVerifyRoute
   '/api/public/hooks/auto-scan': typeof ApiPublicHooksAutoScanRoute
   '/api/public/hooks/backfill-insight-images': typeof ApiPublicHooksBackfillInsightImagesRoute
-  '/api/public/hooks/generate-brief': typeof ApiPublicHooksGenerateBriefRoute
   '/api/public/hooks/generate-insight': typeof ApiPublicHooksGenerateInsightRoute
   '/api/public/hooks/monthly-retune': typeof ApiPublicHooksMonthlyRetuneRoute
   '/api/public/hooks/news-alerts': typeof ApiPublicHooksNewsAlertsRoute
@@ -994,7 +930,6 @@ export interface FileRouteTypes {
     | '/ai-engine'
     | '/app'
     | '/auth'
-    | '/briefs'
     | '/broadcasts'
     | '/cancellation'
     | '/confirm-email-change'
@@ -1018,12 +953,10 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/scam-check'
     | '/scam-tool'
-    | '/signals-live'
     | '/sitemap.xml'
     | '/terms'
     | '/dashboard'
     | '/inbox'
-    | '/brief/$id'
     | '/insights/$slug'
     | '/jenvu-ops-x9k2/inbox'
     | '/leads/account'
@@ -1056,8 +989,6 @@ export interface FileRouteTypes {
     | '/dashboard/usage'
     | '/dashboard/workspace'
     | '/api/public/gold'
-    | '/api/public/podcast.xml'
-    | '/api/public/signals-feed'
     | '/help/$collection/$slug'
     | '/leads/admin/users'
     | '/lovable/email/events'
@@ -1074,12 +1005,10 @@ export interface FileRouteTypes {
     | '/dashboard/admin/subscribers'
     | '/dashboard/admin/tuning'
     | '/dashboard/admin/tv-mismatch'
-    | '/api/public/brief-audio/$id'
     | '/api/public/extension/analyze'
     | '/api/public/extension/verify'
     | '/api/public/hooks/auto-scan'
     | '/api/public/hooks/backfill-insight-images'
-    | '/api/public/hooks/generate-brief'
     | '/api/public/hooks/generate-insight'
     | '/api/public/hooks/monthly-retune'
     | '/api/public/hooks/news-alerts'
@@ -1099,7 +1028,6 @@ export interface FileRouteTypes {
     | '/ai-engine'
     | '/app'
     | '/auth'
-    | '/briefs'
     | '/broadcasts'
     | '/cancellation'
     | '/confirm-email-change'
@@ -1119,11 +1047,9 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/scam-check'
     | '/scam-tool'
-    | '/signals-live'
     | '/sitemap.xml'
     | '/terms'
     | '/inbox'
-    | '/brief/$id'
     | '/insights/$slug'
     | '/jenvu-ops-x9k2/inbox'
     | '/leads/account'
@@ -1156,8 +1082,6 @@ export interface FileRouteTypes {
     | '/dashboard/usage'
     | '/dashboard/workspace'
     | '/api/public/gold'
-    | '/api/public/podcast.xml'
-    | '/api/public/signals-feed'
     | '/help/$collection/$slug'
     | '/leads/admin/users'
     | '/lovable/email/events'
@@ -1174,12 +1098,10 @@ export interface FileRouteTypes {
     | '/dashboard/admin/subscribers'
     | '/dashboard/admin/tuning'
     | '/dashboard/admin/tv-mismatch'
-    | '/api/public/brief-audio/$id'
     | '/api/public/extension/analyze'
     | '/api/public/extension/verify'
     | '/api/public/hooks/auto-scan'
     | '/api/public/hooks/backfill-insight-images'
-    | '/api/public/hooks/generate-brief'
     | '/api/public/hooks/generate-insight'
     | '/api/public/hooks/monthly-retune'
     | '/api/public/hooks/news-alerts'
@@ -1200,7 +1122,6 @@ export interface FileRouteTypes {
     | '/ai-engine'
     | '/app'
     | '/auth'
-    | '/briefs'
     | '/broadcasts'
     | '/cancellation'
     | '/confirm-email-change'
@@ -1224,12 +1145,10 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/scam-check'
     | '/scam-tool'
-    | '/signals-live'
     | '/sitemap.xml'
     | '/terms'
     | '/_authenticated/dashboard'
     | '/_authenticated/inbox'
-    | '/brief/$id'
     | '/insights/$slug'
     | '/jenvu-ops-x9k2/inbox'
     | '/leads/account'
@@ -1262,8 +1181,6 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/usage'
     | '/_authenticated/dashboard/workspace'
     | '/api/public/gold'
-    | '/api/public/podcast.xml'
-    | '/api/public/signals-feed'
     | '/help/$collection/$slug'
     | '/leads/admin/users'
     | '/lovable/email/events'
@@ -1280,12 +1197,10 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/admin/subscribers'
     | '/_authenticated/dashboard/admin/tuning'
     | '/_authenticated/dashboard/admin/tv-mismatch'
-    | '/api/public/brief-audio/$id'
     | '/api/public/extension/analyze'
     | '/api/public/extension/verify'
     | '/api/public/hooks/auto-scan'
     | '/api/public/hooks/backfill-insight-images'
-    | '/api/public/hooks/generate-brief'
     | '/api/public/hooks/generate-insight'
     | '/api/public/hooks/monthly-retune'
     | '/api/public/hooks/news-alerts'
@@ -1307,7 +1222,6 @@ export interface RootRouteChildren {
   AiEngineRoute: typeof AiEngineRoute
   AppRoute: typeof AppRoute
   AuthRoute: typeof AuthRoute
-  BriefsRoute: typeof BriefsRoute
   BroadcastsRoute: typeof BroadcastsRoute
   CancellationRoute: typeof CancellationRoute
   ConfirmEmailChangeRoute: typeof ConfirmEmailChangeRoute
@@ -1331,23 +1245,17 @@ export interface RootRouteChildren {
   ResetPasswordRoute: typeof ResetPasswordRoute
   ScamCheckRoute: typeof ScamCheckRoute
   ScamToolRoute: typeof ScamToolRoute
-  SignalsLiveRoute: typeof SignalsLiveRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
-  BriefIdRoute: typeof BriefIdRoute
   HelpIndexRoute: typeof HelpIndexRoute
   ApiPublicGoldRoute: typeof ApiPublicGoldRoute
-  ApiPublicPodcastDotxmlRoute: typeof ApiPublicPodcastDotxmlRoute
-  ApiPublicSignalsFeedRoute: typeof ApiPublicSignalsFeedRoute
   HelpCollectionSlugRoute: typeof HelpCollectionSlugRoute
   LovableEmailEventsRoute: typeof LovableEmailEventsRoute
   HelpCollectionIndexRoute: typeof HelpCollectionIndexRoute
-  ApiPublicBriefAudioIdRoute: typeof ApiPublicBriefAudioIdRoute
   ApiPublicExtensionAnalyzeRoute: typeof ApiPublicExtensionAnalyzeRoute
   ApiPublicExtensionVerifyRoute: typeof ApiPublicExtensionVerifyRoute
   ApiPublicHooksAutoScanRoute: typeof ApiPublicHooksAutoScanRoute
   ApiPublicHooksBackfillInsightImagesRoute: typeof ApiPublicHooksBackfillInsightImagesRoute
-  ApiPublicHooksGenerateBriefRoute: typeof ApiPublicHooksGenerateBriefRoute
   ApiPublicHooksGenerateInsightRoute: typeof ApiPublicHooksGenerateInsightRoute
   ApiPublicHooksMonthlyRetuneRoute: typeof ApiPublicHooksMonthlyRetuneRoute
   ApiPublicHooksNewsAlertsRoute: typeof ApiPublicHooksNewsAlertsRoute
@@ -1376,13 +1284,6 @@ declare module '@tanstack/react-router' {
       path: '/sitemap.xml'
       fullPath: '/sitemap.xml'
       preLoaderRoute: typeof SitemapDotxmlRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/signals-live': {
-      id: '/signals-live'
-      path: '/signals-live'
-      fullPath: '/signals-live'
-      preLoaderRoute: typeof SignalsLiveRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/scam-tool': {
@@ -1546,13 +1447,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BroadcastsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/briefs': {
-      id: '/briefs'
-      path: '/briefs'
-      fullPath: '/briefs'
-      preLoaderRoute: typeof BriefsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/auth': {
       id: '/auth'
       path: '/auth'
@@ -1714,13 +1608,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof InsightsSlugRouteImport
       parentRoute: typeof InsightsRoute
     }
-    '/brief/$id': {
-      id: '/brief/$id'
-      path: '/brief/$id'
-      fullPath: '/brief/$id'
-      preLoaderRoute: typeof BriefIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/_authenticated/inbox': {
       id: '/_authenticated/inbox'
       path: '/inbox'
@@ -1768,20 +1655,6 @@ declare module '@tanstack/react-router' {
       path: '/help/$collection/$slug'
       fullPath: '/help/$collection/$slug'
       preLoaderRoute: typeof HelpCollectionSlugRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/signals-feed': {
-      id: '/api/public/signals-feed'
-      path: '/api/public/signals-feed'
-      fullPath: '/api/public/signals-feed'
-      preLoaderRoute: typeof ApiPublicSignalsFeedRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/podcast.xml': {
-      id: '/api/public/podcast.xml'
-      path: '/api/public/podcast.xml'
-      fullPath: '/api/public/podcast.xml'
-      preLoaderRoute: typeof ApiPublicPodcastDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/gold': {
@@ -1973,13 +1846,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksGenerateInsightRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/public/hooks/generate-brief': {
-      id: '/api/public/hooks/generate-brief'
-      path: '/api/public/hooks/generate-brief'
-      fullPath: '/api/public/hooks/generate-brief'
-      preLoaderRoute: typeof ApiPublicHooksGenerateBriefRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/api/public/hooks/backfill-insight-images': {
       id: '/api/public/hooks/backfill-insight-images'
       path: '/api/public/hooks/backfill-insight-images'
@@ -2006,13 +1872,6 @@ declare module '@tanstack/react-router' {
       path: '/api/public/extension/analyze'
       fullPath: '/api/public/extension/analyze'
       preLoaderRoute: typeof ApiPublicExtensionAnalyzeRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/brief-audio/$id': {
-      id: '/api/public/brief-audio/$id'
-      path: '/api/public/brief-audio/$id'
-      fullPath: '/api/public/brief-audio/$id'
-      preLoaderRoute: typeof ApiPublicBriefAudioIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/dashboard/admin/tv-mismatch': {
@@ -2262,7 +2121,6 @@ const rootRouteChildren: RootRouteChildren = {
   AiEngineRoute: AiEngineRoute,
   AppRoute: AppRoute,
   AuthRoute: AuthRoute,
-  BriefsRoute: BriefsRoute,
   BroadcastsRoute: BroadcastsRoute,
   CancellationRoute: CancellationRoute,
   ConfirmEmailChangeRoute: ConfirmEmailChangeRoute,
@@ -2286,24 +2144,18 @@ const rootRouteChildren: RootRouteChildren = {
   ResetPasswordRoute: ResetPasswordRoute,
   ScamCheckRoute: ScamCheckRoute,
   ScamToolRoute: ScamToolRoute,
-  SignalsLiveRoute: SignalsLiveRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermsRoute: TermsRoute,
-  BriefIdRoute: BriefIdRoute,
   HelpIndexRoute: HelpIndexRoute,
   ApiPublicGoldRoute: ApiPublicGoldRoute,
-  ApiPublicPodcastDotxmlRoute: ApiPublicPodcastDotxmlRoute,
-  ApiPublicSignalsFeedRoute: ApiPublicSignalsFeedRoute,
   HelpCollectionSlugRoute: HelpCollectionSlugRoute,
   LovableEmailEventsRoute: LovableEmailEventsRoute,
   HelpCollectionIndexRoute: HelpCollectionIndexRoute,
-  ApiPublicBriefAudioIdRoute: ApiPublicBriefAudioIdRoute,
   ApiPublicExtensionAnalyzeRoute: ApiPublicExtensionAnalyzeRoute,
   ApiPublicExtensionVerifyRoute: ApiPublicExtensionVerifyRoute,
   ApiPublicHooksAutoScanRoute: ApiPublicHooksAutoScanRoute,
   ApiPublicHooksBackfillInsightImagesRoute:
     ApiPublicHooksBackfillInsightImagesRoute,
-  ApiPublicHooksGenerateBriefRoute: ApiPublicHooksGenerateBriefRoute,
   ApiPublicHooksGenerateInsightRoute: ApiPublicHooksGenerateInsightRoute,
   ApiPublicHooksMonthlyRetuneRoute: ApiPublicHooksMonthlyRetuneRoute,
   ApiPublicHooksNewsAlertsRoute: ApiPublicHooksNewsAlertsRoute,
