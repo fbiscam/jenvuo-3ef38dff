@@ -269,14 +269,17 @@ export default function TrustedDesks() {
       <div className="relative mt-8 overflow-hidden border-y border-zinc-200 bg-white">
         <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-12 bg-gradient-to-r from-white to-transparent" />
         <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-12 bg-gradient-to-l from-white to-transparent" />
-        <div ref={logoRailRef} className="flex gap-3 overflow-x-auto px-4 py-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <div
+          ref={logoRailRef}
+          className="td-logo-rail flex snap-x snap-mandatory touch-pan-x gap-3 overflow-x-auto px-4 py-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        >
           {DESKS.map((d, i) => (
             <button
               key={d.id}
               ref={(node) => { logoButtonRefs.current[i] = node; }}
               type="button"
               onClick={() => setActive(i)}
-              className={`flex shrink-0 items-center gap-3 rounded-lg border px-4 py-3 text-sm font-semibold transition-colors ${
+              className={`flex shrink-0 snap-center items-center gap-3 rounded-lg border px-4 py-3 text-sm font-semibold transition-colors ${
                 i === active
                   ? "border-zinc-300 bg-white text-zinc-900 shadow-[0_1px_4px_rgba(24,24,27,0.08)]"
                   : "border-transparent text-zinc-500 hover:text-zinc-800"
@@ -352,7 +355,7 @@ export default function TrustedDesks() {
       <div className="relative mt-5 overflow-hidden">
         <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-16 bg-gradient-to-r from-white to-transparent" />
         <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-16 bg-gradient-to-l from-white to-transparent" />
-        <div className="td-marquee flex w-max gap-14 py-3">
+        <div className="td-marquee flex w-max gap-14 py-3" aria-hidden="true">
           {[...DESKS, ...DESKS].map((company, i) => (
             <span
               key={`${company.id}-${i}`}

@@ -938,9 +938,17 @@ html:not(.ms-icons-ready) .material-symbols-rounded {
 }
 .td-marquee {
   animation: td-marquee 28s linear infinite;
+  will-change: transform;
+  transform: translate3d(0, 0, 0);
 }
-.td-marquee:hover {
-  animation-play-state: paused;
+.td-logo-rail {
+  overscroll-behavior-inline: contain;
+  -webkit-overflow-scrolling: touch;
+}
+@media (hover: hover) and (pointer: fine) {
+  .td-marquee:hover {
+    animation-play-state: paused;
+  }
 }
 .td-brand-tradingview { color: #2962ff; }
 .td-brand-binance { color: #f0b90b; }
@@ -953,5 +961,5 @@ html:not(.ms-icons-ready) .material-symbols-rounded {
 .td-brand-etoro { color: #6aa84f; }
 .td-brand-metatrader { color: #2784c8; }
 @media (prefers-reduced-motion: reduce) {
-  .td-marquee { animation: none; }
+  .td-marquee { animation: td-marquee 56s linear infinite !important; }
 }
