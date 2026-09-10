@@ -76,7 +76,7 @@ export function TailoredToDesk() {
             </div>
           </article>
 
-          <article className="flex min-h-[290px] flex-col rounded-md bg-home-accent p-6 text-primary-foreground sm:p-7">
+          <article className="flex min-h-[290px] flex-col rounded-md bg-home-accent p-6 text-home-accent-foreground sm:p-7">
             <Globe2 className="h-6 w-6" strokeWidth={1.8} aria-hidden="true" />
             <h3 className="mt-3 text-base font-semibold">One network for charts, voice and risk</h3>
             <p className="mt-3 max-w-sm text-sm leading-snug opacity-95">
