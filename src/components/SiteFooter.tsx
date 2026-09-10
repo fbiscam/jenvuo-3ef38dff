@@ -118,10 +118,7 @@ export default function SiteFooter({ className }: { className?: string }) {
 
           {/* Link columns */}
           {columns.map((col) => (
-            <div key={col.label} className="space-y-3">
-              <div className={`${MONO} text-[11px] font-semibold uppercase tracking-[0.18em] text-zinc-900`}>
-                {col.label}
-              </div>
+            <div key={col.label}>
               <ul className="space-y-2.5">
                 {col.links.map((l) => (
                   <li key={`${l.to}:${l.label}`}>
