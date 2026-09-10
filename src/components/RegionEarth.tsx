@@ -213,22 +213,27 @@ export default function RegionEarth() {
             icon: <Globe className="h-5 w-5" />,
             t: "Runs everywhere",
             d: "Voice, charts and news in one loop — on desktop, tablet and the extension.",
+            mobileExtra: "Wherever your workflow takes you.",
           },
           {
             icon: <MapPin className="h-5 w-5" />,
             t: "Close to the session",
             d: "Tuned to XAU/USD across every killzone so structure is read as it forms.",
+            mobileExtra: "While price action keeps evolving.",
           },
           {
             icon: <Scan className="h-5 w-5" />,
             t: "Scales with you",
             d: "A+ confluence grading only. No noise, no guessing, no capacity planning.",
+            mobileExtra: "As your trading needs grow.",
           },
         ].map((f) => (
           <div key={f.t} className="min-h-[145px] px-6 py-6 md:px-7">
             <div className="text-foreground">{f.icon}</div>
             <h3 className="mt-3 text-[14px] font-semibold text-foreground">{f.t}</h3>
-            <p className="mt-1 text-[12px] leading-[1.45] text-muted-foreground">{f.d}</p>
+            <p className="mt-1 text-[12px] leading-[1.45] text-muted-foreground">
+              {f.d} <span className="md:hidden">{f.mobileExtra}</span>
+            </p>
           </div>
         ))}
       </div>
