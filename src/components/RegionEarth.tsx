@@ -32,13 +32,13 @@ function DottedGlobe() {
     if (!ctx) return;
 
     const points = fibonacciSphere(DOT_COUNT);
+    const accent = getComputedStyle(document.documentElement)
+      .getPropertyValue("--home-accent-canvas")
+      .trim() || "rgb(37 99 235)";
     let raf = 0;
     let angle = 0;
     let running = true;
-
-    const reduce =
-      typeof window !== "undefined" &&
-      window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+    let lastFrame = performance.now();
 
     const resize = () => {
       const rect = canvas.getBoundingClientRect();
@@ -48,9 +48,11 @@ function DottedGlobe() {
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     };
     resize();
+    const resizeObserver = new ResizeObserver(resize);
+    resizeObserver.observe(canvas);
     window.addEventListener("resize", resize);
 
-    const draw = () => {
+    const draw = (now: number) => {
       const rect = canvas.getBoundingClientRect();
       const w = rect.width;
       const h = rect.height;
@@ -93,9 +95,6 @@ function DottedGlobe() {
         const depth = 0.25 + z * 0.75;
         const size = 0.7 + depth * 0.9;
         ctx.beginPath();
-        const accent = getComputedStyle(document.documentElement)
-          .getPropertyValue("--home-accent-canvas")
-          .trim() || "rgb(37 99 235)";
         ctx.globalAlpha = 0.12 + depth * 0.55;
         ctx.fillStyle = accent;
         ctx.arc(px, py, size, 0, Math.PI * 2);
@@ -103,7 +102,9 @@ function DottedGlobe() {
         ctx.globalAlpha = 1;
       }
 
-      if (!reduce) angle += 0.0022;
+      const elapsed = Math.min(now - lastFrame, 64);
+      angle += elapsed * 0.000132;
+      lastFrame = now;
       if (running) raf = requestAnimationFrame(draw);
     };
 
@@ -111,6 +112,7 @@ function DottedGlobe() {
     return () => {
       running = false;
       cancelAnimationFrame(raf);
+      resizeObserver.disconnect();
       window.removeEventListener("resize", resize);
     };
   }, []);
