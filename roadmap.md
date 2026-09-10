@@ -1,5 +1,6 @@
 # Roadmap
 
-- [ ] WhatsApp access token + phone number ID secrets (deferred by user — "filhal rehne do")
-- [x] Delete yesterday's (Sep 3) wrong XAUUSD signals from the database
-- [ ] Verify: ICT/SMC narration, live-price entry/SL/TP geometry, BluesMinds gpt-4o health
+- [ ] Verify and resolve the reported TypeScript error
+- [ ] Port Hello Hub homepage sections and required assets
+- [ ] Align dashboard and shared navigation with Hello Hub
+- [ ] Verify the updated pages and type safety
