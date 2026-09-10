@@ -3,7 +3,7 @@ import * as React from "react";
 
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { CloudOrb } from "@/components/CloudOrb";
+
 import SiteFooter from "@/components/SiteFooter";
 import HeaderAuthButtons from "@/components/HeaderAuthButtons";
 
@@ -13,8 +13,14 @@ import { useTrial } from "@/hooks/useTrial";
 import { useCurrentPlan } from "@/hooks/useCurrentPlan";
 import { useUpgradeLock } from "@/hooks/useUpgradeLock";
 import { getMarketSnapshotsBatch } from "@/lib/gold-analysis.functions";
-import { getXauProjection } from "@/lib/home-projection.functions";
-import { TerminalWorkstation } from "@/components/TerminalWorkstation";
+
+
+import RegionEarth from "@/components/RegionEarth";
+import TrustedDesks from "@/components/TrustedDesks";
+import { WhyJenvu } from "@/components/WhyJenvu";
+import CloudflareHero from "@/components/CloudflareHero";
+import TailoredToDesk from "@/components/TailoredToDesk";
+
 import {
   getCorrelatedMarkets,
   type CorrelatedBoard,
@@ -95,7 +101,7 @@ function HeroBanners() {
   );
 }
 
-import { Check, Sparkles, Zap, Crown, Minus, Menu, X } from "lucide-react";
+import { Check, Sparkles, Zap, Crown, Minus, Menu, X, Mic, AudioWaveform, PhoneCall, Database, Wifi, Box } from "lucide-react";
 
 import xaiLogo from "@/assets/xai-logo.png";
 
@@ -140,11 +146,8 @@ export const Route = createFileRoute("/")({
   // The XAU projection is primed server-side (5-min cache) so the very first
   // paint shows the real live price instead of a stale placeholder.
   loader: async () => {
-    const [projection, board] = await Promise.all([
-      getXauProjection().catch(() => null),
-      getCorrelatedMarkets().catch(() => null),
-    ]);
-    return { tickerRows: INITIAL_TICKER, projection, board };
+    const board = await getCorrelatedMarkets().catch(() => null);
+    return { tickerRows: INITIAL_TICKER, board };
   },
   errorComponent: ({ error }) => (
     <div role="alert" className="p-8 text-sm text-zinc-600">{(error as Error)?.message ?? "Something went wrong."}</div>
@@ -353,7 +356,7 @@ function Sparkline({ series, up }: { series: number[]; up: boolean }) {
 
 function HomePage() {
   const ticker = useLiveTicker();
-  const initialProjection = (Route.useLoaderData() as { projection?: import("@/lib/home-projection.functions").XauProjection | null } | undefined)?.projection ?? null;
+  
   const board = useCorrelatedMarkets(
     (Route.useLoaderData() as { board?: CorrelatedBoard | null } | undefined)?.board ?? null,
   );
@@ -372,7 +375,7 @@ function HomePage() {
   }, [mobileMenuOpen]);
   return (
     <>
-    <div className={`jenvu-zoom min-h-dvh w-full bg-[#FAFAFA] text-zinc-900 ${SANS} antialiased selection:bg-zinc-900 selection:text-white`}>
+    <div className={`jenvu-zoom min-h-dvh w-full bg-white text-zinc-900 ${SANS} antialiased selection:bg-zinc-900 selection:text-white`}>
       {/* NAV */}
       <header className="sticky top-0 z-50 border-b border-zinc-100 bg-white">
         <div className="relative mx-auto flex max-w-6xl items-center justify-between gap-3 px-5 py-3 sm:px-6 sm:py-4">
@@ -382,8 +385,6 @@ function HomePage() {
           </Link>
 
           <nav className={`hidden md:flex absolute left-1/2 -translate-x-1/2 items-center gap-7 text-sm text-zinc-900`}>
-            <Link to="/signals-live" className="hover:text-zinc-900">Live Signals</Link>
-            <Link to="/signals-live" className="hover:text-zinc-900">Signals Live</Link>
             <Link to="/pricing" className="hover:text-zinc-900">Pricing</Link>
             <Link to="/founding" className="hover:text-zinc-900">Founding</Link>
             <Link to="/insights" className="hover:text-zinc-900">Insights</Link>
@@ -406,19 +407,6 @@ function HomePage() {
           </div>
 
 
-        </div>
-        {/* ticker strip */}
-        <div className="border-t border-zinc-100 overflow-hidden">
-          <div className={`flex w-max gap-8 py-2 ${MONO} text-[11px] text-zinc-900 whitespace-nowrap animate-ticker`}>
-            {[...ticker, ...ticker].map(([s, p, d], i) => (
-              <span key={i} className="flex items-center gap-2">
-                <span className="text-zinc-900 font-medium">{s}</span>
-                <span>{p}</span>
-                <span className={d === "…" ? "text-zinc-500" : d.startsWith("-") ? "text-red-600" : "text-emerald-700"}>{d}</span>
-                <span className="text-zinc-200">•</span>
-              </span>
-            ))}
-          </div>
         </div>
 
       </header>
@@ -443,8 +431,6 @@ function HomePage() {
             </div>
             <nav className="flex flex-col px-3 pb-4 pt-1 text-[15px] text-zinc-900">
               {[
-                { to: "/signals-live", label: "Live Signals" },
-                { to: "/signals-live", label: "Signals Live" },
                 { to: "/pricing", label: "Pricing" },
                 { to: "/founding", label: "Founding" },
                 { to: "/insights", label: "Insights" },
@@ -462,11 +448,11 @@ function HomePage() {
               ))}
               {isAuthed ? (
                 <Link
-                  to="/app"
+                  to="/dashboard"
                   onClick={() => setMobileMenuOpen(false)}
                   className="mx-3 mt-3 inline-flex items-center justify-center rounded-lg bg-zinc-900 px-3 py-2.5 text-sm font-medium text-white hover:bg-zinc-800"
                 >
-                  Launch
+                  Dashboard
                   <span className={`${MONO} text-[10px] opacity-70 ml-1.5`}>↗</span>
                 </Link>
               ) : (
@@ -495,497 +481,150 @@ function HomePage() {
 
       <main>
       {/* HERO */}
-      <section className="relative mx-auto max-w-6xl px-5 pt-10 pb-20 sm:px-6 sm:pt-16 sm:pb-28">
-        <HeroBanners />
-
-        <div className="relative z-10 grid gap-8 sm:gap-10 lg:grid-cols-12 lg:items-end">
-
-          <div className="text-left lg:col-span-7 lg:text-left">
-
-            <h1 className="mt-5 max-w-3xl text-[28px] font-semibold tracking-tight leading-[1.1] sm:text-[42px] md:text-[56px] lg:mx-0 text-zinc-900">
-              <span className="block sm:whitespace-nowrap">Institutional intelligence</span>
-              <span className="block">vocalized in real time.</span>
-            </h1>
-            <p className="mt-5 max-w-3xl text-[13px] leading-relaxed text-zinc-700 sm:text-base md:text-lg lg:mx-0">
-              <span className="sm:hidden">Voice native gold desk narrating live A+ ICT/SMC setups every XAU pair with institutional precision.</span>
-              <span className="hidden sm:inline">Voice native gold terminal narrating live A+ ICT/SMC setups<br />across every XAU pair in real time with institutional precision.</span>
-            </p>
-            <div className="mt-7 flex flex-col items-stretch justify-start gap-3 sm:flex-row sm:items-start lg:justify-start">
-              <Link
-                to={isAuthed ? "/app" : "/founding"}
-                className="hover-lift inline-flex items-center justify-center gap-2 rounded-lg bg-zinc-900 px-5 py-3 text-sm font-medium text-white hover:bg-zinc-800"
-              >
-                {isAuthed ? "Launch Voice Agent" : "Apply for access"}
-                <br className="sm:hidden" />
-                <span className={`${MONO} text-xs opacity-80`}>→</span>
-              </Link>
-              <Link
-                to={isAuthed ? "/signals-live" : "/auth"}
-                className="hover-glow inline-flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-5 py-3 text-sm font-medium text-zinc-900 hover:bg-white"
-              >
-                See Signal Engine
-              </Link>
-            </div>
-          </div>
-          <div className="lg:col-span-5">
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-px bg-zinc-200 rounded-xl overflow-hidden border border-zinc-200 shadow-[0_4px_20px_-8px_rgba(24,24,27,0.08)]">
-              {[
-                ["Markets", "XAU"],
-                ["Frameworks", "ICT, SMC"],
-                ["Avg. R:R", "1 : 3.2"],
-              ].map(([k, v]) => (
-                <div key={k} className="bg-white p-5 text-left text-zinc-900 sm:text-left transition-colors hover:bg-zinc-50/60">
-                  <div className={`${MONO} text-[10px] uppercase tracking-widest text-zinc-500`}>{k}</div>
-                  <div className="mt-2 text-lg font-semibold tracking-tight text-zinc-900 sm:text-xl">{v}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
+      <CloudflareHero />
 
 
 
-      {/* TERMINAL WORKSTATION */}
-      <TerminalWorkstation
-        bordered={false}
-        initialProjection={initialProjection}
-        className="mx-auto max-w-6xl px-5 mt-8 pb-14 sm:px-6 sm:mt-10 sm:pb-20"
-      />
 
-      {/* CAPABILITIES */}
+
+
+      {/* REGION: EARTH */}
       <section className="border-t border-zinc-100">
-        <div className="mx-auto max-w-6xl px-5 py-10 text-left sm:px-6 sm:py-14 md:text-left">
-          
-          <h2 className="mt-4 max-w-3xl text-xl font-semibold tracking-tight sm:text-3xl md:mx-0 md:text-4xl md:whitespace-nowrap">
-            <span className="sm:hidden">Built like a trading desk<br />spoken just like a real partner</span>
-            <span className="hidden sm:inline">Built like a trading desk, spoken like a partner.</span>
-          </h2>
-          <div className="mt-12 grid gap-px bg-zinc-100 border border-zinc-100 rounded-2xl overflow-hidden md:grid-cols-3">
-            {[
-              {
-                k: "01",
-                t: "Voice-Native Workflow",
-                d: "Push-to-talk a real institutional analyst that reasons through ICT/SMC live.",
-              },
-              {
-                k: "02",
-                t: "ICT & SMC Signal Engine",
-                d: "Live FVG, Order Block, BOS, CHoCH and liquidity sweeps marked on charts.",
-              },
-              {
-                k: "03",
-                t: "Market Intelligence",
-                d: "London fix, DXY, gold-specific Forex Factory news merged into every plan.",
-              },
-              {
-                k: "04",
-                t: "A+ Setups Only",
-                d: "Confluence-graded entries with structured entry, SL, TP never guessed.",
-              },
-              {
-                k: "05",
-                t: "One Pair, Total Focus",
-                d: "XAU/USD only — the entire desk is tuned to a single instrument, news, market insights.",
-              },
-              {
-                k: "06",
-                t: "Narrated Chart Reviews",
-                d: "JENVU walks the structure aloud: highs, lows, mitigations and displacement.",
-              },
-
-            ].map((f) => (
-              <div key={f.k} className="bg-white p-6 text-left transition-colors hover:bg-white sm:p-7">
-                <div className={`flex items-center justify-between ${MONO} text-[10px] uppercase tracking-widest text-zinc-900`}>
-                  <span>{f.k}</span>
-                  <span>→</span>
-                </div>
-                <h3 className="mt-5 text-base font-semibold tracking-tight sm:text-lg">{f.t}</h3>
-                <p className="mt-2 text-sm text-zinc-900 leading-relaxed">{f.d}</p>
-              </div>
-            ))}
-          </div>
-        </div>
+        <RegionEarth />
       </section>
 
 
-      {/* CHANGELOG */}
+      {/* TRUSTED DESKS / REVIEWS */}
       <section className="border-t border-zinc-100 bg-white">
-        <div className="mx-auto max-w-6xl px-5 py-10 sm:px-6 sm:py-14">
-          <div className="mb-8 flex flex-col items-start justify-start gap-2 text-left sm:mb-10 sm:flex-row sm:items-end sm:justify-between sm:text-left">
-            <div>
-              <h2 className="text-xl font-semibold tracking-tight sm:text-3xl">Recent shipments</h2>
-            </div>
-            <span className={`${MONO} text-[11px] text-zinc-900`}>v2.04.1 · stable</span>
+        <TrustedDesks />
+      </section>
+
+      {/* WHY JENVU — Cloudflare-style split panel */}
+      <section className="border-t border-zinc-100 bg-white">
+        <WhyJenvu />
+      </section>
+
+
+      {/* PRICING — Free vs Paid panels */}
+      <section className="border-t border-zinc-100 bg-white">
+        <div className="mx-auto max-w-6xl px-5 py-16 sm:px-6 sm:py-24">
+          <div className="mx-auto mb-10 max-w-2xl text-center">
+            <h2 className="text-3xl font-semibold tracking-tight text-zinc-900 sm:text-4xl md:text-[44px] md:leading-[1.1]">
+              Compare Jenvu Plans
+            </h2>
+            <p className="mx-auto mt-4 max-w-xl text-[15px] leading-relaxed text-zinc-500 sm:text-base">
+              Choose the wallet and desk access that fits how you trade gold.
+            </p>
           </div>
-          <div className="rounded-xl border border-zinc-200 bg-white overflow-hidden">
-            {[
-              ["2026.06.28", "v2.04", "Killzone-aware narration for London & NY sessions.", "Killzone narration for London & NY."],
-              ["2026.06.14", "v2.03", "FVG + OB auto-markup on 1H and 15m charts.", "FVG + OB auto-markup on 1H/15m."],
-              ["2026.05.30", "v2.02", "Red-folder USD, EUR, GBP, JPY, AUD & CHF news injected per XAU cross.", "Red-folder news injected per XAU cross."],
-              ["2026.05.12", "v2.01", "Push-to-talk replaces always-on; cleaner mic control.", "Push-to-talk replaces always-on mic."],
-              ["2026.04.28", "v2.00", "Voice-native rewrite. New orb. New signal engine.", "Voice-native rewrite. New orb & engine."],
-            ].map(([d, v, n, nShort], i) => (
-              <div
-                key={v}
-                className={`grid grid-cols-[minmax(0,1fr)_auto] gap-x-3 gap-y-1 px-5 py-4 sm:grid-cols-12 sm:items-center sm:gap-y-0 sm:px-6 ${
-                  i !== 0 ? "border-t border-zinc-100" : ""
+
+          {/* Category tabs */}
+          <div className="flex flex-wrap items-center justify-center gap-2">
+            {["Wallet & Credits", "Signal Engine", "API & Extension"].map((t, i) => (
+              <span
+                key={t}
+                className={`rounded-full border px-4 py-1.5 text-[13px] font-medium ${
+                  i === 0
+                    ? "border-home-accent bg-home-accent-soft text-home-accent"
+                    : "border-zinc-200 bg-white text-zinc-600"
                 }`}
               >
-                <span className={`min-w-0 sm:col-span-3 ${MONO} text-[11px] text-zinc-900`}>{d}</span>
-                <span className={`shrink-0 sm:col-span-2 ${MONO} text-[11px] font-semibold text-zinc-900 text-right sm:text-left`}>{v}</span>
-                <span className="col-span-2 text-sm text-zinc-900 sm:col-span-7 truncate sm:whitespace-normal sm:overflow-visible">
-                  <span className="sm:hidden">{nShort}</span>
-                  <span className="hidden sm:inline">{n}</span>
+                {t}
+              </span>
+            ))}
+          </div>
+
+          {/* Trial vs Paid explainer */}
+          <div className="mx-auto mt-12 grid max-w-4xl items-center gap-8 md:grid-cols-2">
+            <div>
+              <h3 className="text-xl font-semibold tracking-tight text-zinc-900 sm:text-2xl">
+                Free Trial vs. Paid Plans
+              </h3>
+              <p className="mt-3 text-[15px] leading-relaxed text-zinc-500">
+                Paid plans unlock realtime A+ signals, unlimited voice queries,
+                and API keys for the browser extension.
+              </p>
+            </div>
+            <div className="flex items-center justify-center gap-4">
+              <div className="flex h-24 w-28 flex-col items-center justify-center rounded-xl border border-zinc-200 bg-white">
+                <span className={`${MONO} text-[10px] uppercase tracking-wider text-zinc-400`}>Trial</span>
+                <span className="mt-1 text-lg font-semibold text-zinc-900">$0</span>
+              </div>
+              <svg width="48" height="24" viewBox="0 0 48 24" fill="none" aria-hidden>
+                <line x1="2" y1="12" x2="40" y2="12" stroke="currentColor" strokeWidth="2" className="text-home-accent" strokeDasharray="4 4" />
+                <path d="M36 5l8 7-8 7" stroke="currentColor" strokeWidth="2" fill="none" className="text-home-accent" />
+              </svg>
+              <div className="flex h-24 w-28 flex-col items-center justify-center rounded-xl border-2 border-home-accent bg-home-accent-soft">
+                <span className={`${MONO} text-[10px] uppercase tracking-wider text-home-accent`}>Paid</span>
+                <span className="mt-1 text-lg font-semibold text-zinc-900">$15+</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Free / Paid panels */}
+          <div className="mx-auto mt-12 grid max-w-4xl gap-6 md:grid-cols-2">
+            {/* Free */}
+            <div className="rounded-2xl border border-zinc-200 bg-white p-7">
+              <h4 className="text-lg font-semibold text-zinc-900">Free</h4>
+              <p className="mt-1 text-[13px] text-zinc-500">30-day trial for every new desk</p>
+              <div className="mt-5 space-y-3">
+                {[
+                  ["Signals / day", "5"],
+                  ["Signal latency", "15 min"],
+                  ["Voice queries", "20 / day"],
+                ].map(([k, v]) => (
+                  <div key={k} className="flex items-center justify-between rounded-lg border border-dashed border-zinc-300 px-4 py-2.5">
+                    <span className="text-[13px] text-zinc-600">{k}</span>
+                    <span className={`${MONO} text-[13px] font-semibold text-zinc-900`}>{v}</span>
+                  </div>
+                ))}
+              </div>
+              <Link
+                to="/founding"
+                className="mt-6 inline-flex h-10 w-full items-center justify-center rounded-full border border-zinc-300 bg-white text-sm font-semibold text-zinc-900 transition hover:bg-zinc-50"
+              >
+                See more
+              </Link>
+            </div>
+
+            {/* Paid */}
+            <div className="rounded-2xl border-2 border-home-accent bg-home-accent-soft/40 p-7">
+              <div className="flex items-center gap-2">
+                <h4 className="text-lg font-semibold text-zinc-900">Paid</h4>
+                <span className={`${MONO} rounded-sm bg-home-accent px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wider text-white`}>
+                  Popular
                 </span>
               </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* HOW IT WORKS */}
-      <section className="border-t border-zinc-100">
-        <div className="mx-auto max-w-6xl px-5 py-10 sm:px-6 sm:py-14">
-          <div className="flex flex-col items-start gap-4 text-left md:flex-row md:items-end md:justify-between md:text-left">
-            <div>
-              <h2 className="text-xl font-semibold tracking-tight sm:text-3xl md:text-4xl">
-                Four steps. One voice.
-              </h2>
-            </div>
-            <p className="max-w-md text-zinc-900 leading-relaxed">
-              <span className="sm:hidden">Spoken intent to plan — one voice loop.</span>
-              <span className="hidden sm:inline">From spoken intent to executable plan — JENVU compresses a full trading desk into one voice loop.</span>
-            </p>
-
-          </div>
-
-          {/* CORRELATED MARKETS — live prices that move XAU/USD */}
-          <div className="mt-12 overflow-hidden rounded-xl border border-zinc-100 bg-white">
-            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-zinc-100 px-5 py-3.5">
-              <h3 className={`text-[10px] font-bold ${MONO} uppercase tracking-widest text-zinc-900`}>
-                Markets that move XAU/USD
-              </h3>
-              <span className={`flex items-center gap-2 text-[9px] ${MONO} uppercase tracking-widest text-zinc-400`}>
-                <span className={`h-1.5 w-1.5 rounded-full ${board ? "bg-emerald-500 animate-pulse" : "bg-zinc-300"}`} />
-                {board ? "live · 24h range" : "connecting feed"}
-              </span>
-            </div>
-
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[720px] border-collapse text-sm">
-                <thead>
-                  <tr className={`text-left text-[9px] ${MONO} uppercase tracking-widest text-zinc-400`}>
-                    <th className="px-5 py-2.5 font-medium">Market</th>
-                    <th className="px-3 py-2.5 text-right font-medium">Price</th>
-                    <th className="px-3 py-2.5 text-right font-medium">24h</th>
-                    <th className="px-3 py-2.5 font-medium">Low / High</th>
-                    <th className="px-3 py-2.5 font-medium">Trend</th>
-                    <th className="px-5 py-2.5 text-right font-medium">Gold impact</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {(board?.markets ?? CORR_PLACEHOLDER).map((m) => {
-                    const live = !!board;
-                    const up = m.changePct >= 0;
-                    return (
-                      <tr key={m.symbol} className="border-t border-zinc-100 align-middle">
-                        <td className="px-5 py-3.5">
-                          <div className="text-[13px] font-semibold tracking-tight text-zinc-900">{m.display}</div>
-                          <div className="mt-0.5 text-[11px] leading-tight text-zinc-500">{m.note}</div>
-                        </td>
-                        <td className={`px-3 py-3.5 text-right text-[13px] font-semibold ${MONO} text-zinc-900`}>
-                          {live
-                            ? m.price.toLocaleString("en-US", {
-                                minimumFractionDigits: Math.min(m.decimals, 3),
-                                maximumFractionDigits: Math.min(m.decimals, 3),
-                              })
-                            : "—"}
-                        </td>
-                        <td className={`px-3 py-3.5 text-right text-[13px] font-semibold ${MONO} ${live ? (up ? "text-emerald-600" : "text-red-500") : "text-zinc-300"}`}>
-                          {live ? `${up ? "+" : ""}${m.changePct.toFixed(2)}%` : "—"}
-                        </td>
-                        <td className="px-3 py-3.5">
-                          <div className="w-[132px]">
-                            <div className="relative h-1 w-full rounded-full bg-zinc-100">
-                              <span
-                                className={`absolute top-1/2 h-2.5 w-2.5 -translate-y-1/2 rounded-full border-2 border-white ${up ? "bg-emerald-500" : "bg-red-500"}`}
-                                style={{ left: `calc(${live ? Math.min(96, Math.max(2, m.rangePos)) : 50}% - 5px)` }}
-                              />
-                            </div>
-                            <div className={`mt-1.5 flex justify-between text-[9px] ${MONO} text-zinc-400`}>
-                              <span>{live ? m.low.toLocaleString("en-US") : "—"}</span>
-                              <span>{live ? m.high.toLocaleString("en-US") : "—"}</span>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="px-3 py-3.5">
-                          <Sparkline series={m.series} up={up} />
-                        </td>
-                        <td className="px-5 py-3.5 text-right">
-                          <span
-                            className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[9px] font-bold ${MONO} uppercase tracking-widest ${ !live ? "bg-zinc-50 text-zinc-400" : m.impact === "bullish" ? "bg-emerald-50 text-emerald-700" : m.impact === "bearish" ? "bg-red-50 text-red-600" : "bg-zinc-100 text-zinc-500" }`}
-                          >
-                            {live ? m.impact : "—"}
-                          </span>
-                          <div className={`mt-1 text-[9px] ${MONO} text-zinc-400`}>
-                            corr {live ? (m.correlation > 0 ? "+" : "") + m.correlation.toFixed(2) : "—"}
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-
-            <div className={`border-t border-zinc-100 px-5 py-3 text-[9px] ${MONO} uppercase tracking-widest text-zinc-400`}>
-              Correlation vs XAU/USD hourly returns · context feeds only — Jenvu trades XAU/USD exclusively
-            </div>
-          </div>
-
-        </div>
-      </section>
-
-
-      {/* PRICING — comparison matrix (old style) */}
-      <section className="border-t border-zinc-100 bg-white">
-        <div className="mx-auto max-w-7xl px-5 sm:px-8 py-16 sm:py-20">
-          <div className="mb-10">
-            <h2 className="mt-3 text-3xl sm:text-4xl font-semibold tracking-tight max-sm:whitespace-nowrap max-sm:text-[7vw]">
-              <span className="sm:hidden">Compare Plans</span>
-              <span className="hidden sm:inline">Compare Jenvu Pro and Elite Plans</span>
-            </h2>
-          </div>
-
-          <div className="overflow-x-auto rounded-xl border border-zinc-200 bg-white">
-            <table className="w-full min-w-[760px] text-sm border-collapse">
-              <colgroup>
-                <col className="w-[34%]" />
-                <col className="w-[22%] bg-amber-50/40" />
-                <col className="w-[22%]" />
-                <col className="w-[22%]" />
-              </colgroup>
-
-              <thead>
-                <tr className="border-b border-zinc-200">
-                  <th className="p-6 text-left align-bottom">
-                    <span className="text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl">Pricing Plans</span>
-                  </th>
-                  {[
-                    { name: "Pro", price: currentPlan === null ? "$5" : "$15", tag: "Active", accent: true, key: "pro", to: "/founding" as const, search: undefined },
-                    { name: "Elite", price: "$50", tag: "Desk", dark: true, key: "elite", to: "/founding" as const },
-                    { name: "Ultra", price: "$100", tag: "Fund / Desk+", key: "ultra", to: "/founding" as const },
-                  ].map((p) => {
-                    const trialPro = trial.active && p.key === "pro";
-                    const isCurrent = currentPlan === p.key && !trialPro;
-                    const isLoggedIn = currentPlan !== null;
-                    const disabled = !trialPro && isLoggedIn && !isCurrent && upgradeLock.locked;
-                    const cta = trialPro
-                      ? "Upgrade to Pro"
-                      : isCurrent
-                      ? "Active"
-                      : disabled
-                        ? "Locked in trial"
-                        : isLoggedIn
-                          ? "Upgrade"
-                          : "Apply Now";
-                    return (
-                    <th
-                      key={p.name}
-                      className={`p-6 text-left align-top border-l border-zinc-200 ${isCurrent ? "bg-emerald-50/50" : p.accent ? "bg-amber-50/50" : ""}`}
-                    >
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span className={`text-base font-semibold ${isCurrent ? "text-emerald-700" : p.accent ? "text-amber-700" : "text-zinc-900"}`}>{p.name}</span>
-                        {isCurrent && (
-                          <span className={`${MONO} text-[8px] uppercase tracking-wider px-1.5 py-0.5 rounded-sm bg-emerald-600 text-white font-bold`}>
-                            Current
-                          </span>
-                        )}
-                        {p.accent && !isCurrent && (
-                          <span className={`${MONO} text-[8px] uppercase tracking-wider px-1.5 py-0.5 rounded-sm bg-amber-400 text-zinc-900 font-bold`}>
-                            Popular
-                          </span>
-                        )}
-                      </div>
-                      <div className="mt-2 flex items-baseline gap-1">
-                        <span className="text-2xl tracking-tight text-zinc-900 price-font">{p.price}</span>
-                        {p.price !== "$0" && (
-                          <span className="text-[11px] text-zinc-500 price-font">/credits</span>
-                        )}
-                      </div>
-                      <p className={`mt-1 ${MONO} text-[9px] uppercase tracking-wider text-zinc-500`}>{p.tag}</p>
-
-                      {isCurrent ? (
-                        <div className="mt-3 inline-flex w-full items-center justify-center rounded-md border border-emerald-300 bg-emerald-50 px-3 py-1.5 text-xs font-medium text-emerald-700">
-                          Active
-                        </div>
-                      ) : disabled ? (
-                        <button
-                          type="button"
-                          disabled
-                          aria-disabled="true"
-                          title={
-                            upgradeLock.reason === "docs_pending"
-                              ? "Upgrades unlock after your ID and driving license are verified and your 30-day trial ends."
-                              : `Upgrades unlock in ${upgradeLock.daysLeft ?? 30} day${upgradeLock.daysLeft === 1 ? "" : "s"} once your ID and driving license are verified.`
-                          }
-                          className="mt-3 inline-flex w-full cursor-not-allowed items-center justify-center rounded-md border border-zinc-200 bg-zinc-100 px-3 py-1.5 text-xs font-medium text-zinc-500"
-                        >
-                          {cta}
-                        </button>
-                      ) : (
-                        <Link
-                          to={isLoggedIn ? "/dashboard/pay" : p.to}
-                          search={isLoggedIn ? undefined : p.search}
-                          className={`mt-3 inline-flex w-full items-center justify-center rounded-md px-3 py-1.5 text-xs font-medium transition ${ p.accent || p.dark ? "bg-zinc-900 text-white hover:bg-black" : "border border-zinc-300 bg-white text-zinc-900 hover:bg-zinc-50" }`}
-                        >
-                          {cta}
-                        </Link>
-                      )}
-                    </th>
-                    );
-                  })}
-                </tr>
-              </thead>
-
-              <tbody>
-                {([
-                  { f: "", b: "$15/mo", c: "$50/mo", d: "$100/mo", isHeading: true },
-                  { f: "Monthly wallet (USD)", b: "$15", c: "$50", d: "$100" },
-                  { f: "Voice queries / day", b: "Unlimited", c: "Unlimited", d: "Unlimited" },
-                  { f: "Signal latency", b: "Realtime", c: "Realtime", d: "Realtime" },
-                  { f: "A+ signal access", b: true, c: true, d: true },
-                  { f: "ICT / SMC narration", b: true, c: true, d: true, badge: "New" },
-                  { f: "Multi-timeframe bias", b: true, c: true, d: true },
-                  { f: "Trade journal", b: true, c: true, d: true },
-                  { f: "Email + push alerts", b: true, c: true, d: true },
-                  
-                  { f: "Custom alert rules", b: false, c: true, d: true },
-                  { f: "Priority desk support", b: false, c: false, d: true },
-                ] as ReadonlyArray<{ f: string; b: string | boolean; c: string | boolean; d: string | boolean; isHeading?: boolean; badge?: string }>).map((row, idx) => (
-                  <tr
-                    key={row.f}
-                    className={`border-t border-zinc-200 ${idx % 2 === 1 ? "bg-zinc-50/40" : ""} hover:bg-amber-50/20 transition`}
-                  >
-                    <td className="px-6 py-3.5 text-zinc-800">
-                      <div className="flex items-center gap-2">
-                        {row.badge && (
-                          <span className={`${MONO} text-[8px] uppercase tracking-wider px-1.5 py-0.5 rounded-sm bg-amber-400 text-zinc-900 font-bold`}>
-                            {row.badge}
-                          </span>
-                        )}
-                        <span className={row.isHeading ? "text-[11px] uppercase tracking-wider font-semibold text-zinc-500" : ""}>
-                          {row.f}
-                        </span>
-                      </div>
-                    </td>
-                    {[row.b, row.c, row.d].map((v, i) => (
-                      <td
-                        key={i}
-                        className={`px-2 py-3.5 text-center border-l border-zinc-200 min-w-[120px] ${i === 0 ? "bg-amber-50/40" : ""}`}
-                      >
-                        {v === true ? (
-                          <span className="inline-block h-1.5 w-1.5 rounded-full bg-zinc-900" />
-                        ) : v === false ? (
-                          <span className="inline-block h-px w-4 bg-zinc-200" />
-                        ) : (
-                          <span className={`${MONO} text-[11px] tracking-wider ${row.isHeading ? "text-zinc-900 font-semibold" : "text-zinc-700"}`}>
-                            {v}
-                          </span>
-                        )}
-                      </td>
-                    ))}
-                  </tr>
+              <p className="mt-1 text-[13px] text-zinc-500">Pro, Elite and Ultra wallet tiers</p>
+              <div className="mt-5 space-y-3">
+                {[
+                  ["Signals / day", "Unlimited"],
+                  ["Signal latency", "Realtime"],
+                  ["Voice queries", "Unlimited"],
+                  ["API & Extension", "Included"],
+                ].map(([k, v]) => (
+                  <div key={k} className="flex items-center justify-between rounded-lg border border-dashed border-home-accent/50 bg-white px-4 py-2.5">
+                    <span className="text-[13px] text-zinc-600">{k}</span>
+                    <span className={`${MONO} text-[13px] font-semibold text-home-accent`}>{v}</span>
+                  </div>
                 ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-
-
-      {/* TESTIMONIALS */}
-      <section className="border-t border-zinc-100 bg-white">
-        <div className="mx-auto max-w-6xl px-5 py-10 sm:px-6 sm:py-14">
-          <h2 className="mb-10 text-xl font-semibold tracking-tight sm:text-3xl md:text-4xl">Trusted by traders.</h2>
-          <div className="grid gap-6 md:grid-cols-3">
-            {[
-              ["Feels like sitting next to a 25-year desk trader. The narration alone changed how I read structure.", "A. Rahman", "Prop Desk · Dubai"],
-              ["ICT setups marked live on the chart, with voice — I stopped second-guessing my entries.", "M. Chen", "Independent · Singapore"],
-              ["Gold execution is on another level. The killzone + sweep logic is exactly how I trade.", "S. Patel", "Family Office · London"],
-            ].map(([q, n, r]) => (
-              <figure key={n} className="rounded-xl border border-zinc-200 bg-white p-6">
-                <blockquote className="text-sm leading-relaxed text-zinc-700">"{q}"</blockquote>
-                <figcaption className="mt-4 flex items-center justify-between text-xs">
-                  <div>
-                    <div className="font-medium text-zinc-900">{n}</div>
-                    <div className="text-zinc-500">{r}</div>
-                  </div>
-                  <span className="text-zinc-600" aria-hidden="true">↗</span>
-                </figcaption>
-              </figure>
-            ))}
-          </div>
-        </div>
-      </section>
-
-
-      {/* COMPARISON */}
-      <section className="border-t border-zinc-100 bg-white">
-        <div className="mx-auto max-w-6xl px-5 py-10 sm:px-6 sm:py-14">
-          <h2 className="text-left text-xl font-semibold tracking-tight sm:text-3xl md:text-left md:text-4xl">
-            Why traders move to JENVU.
-          </h2>
-          <div className="mt-10 rounded-xl border border-zinc-200 bg-white overflow-hidden">
-            <div className={`hidden md:grid grid-cols-4 px-6 py-4 border-b border-zinc-200 ${MONO} text-[10px] uppercase tracking-widest text-zinc-900`}>
-              <span>Capability</span>
-              <span className="text-center">Generic AI</span>
-              <span className="text-center">Signal Group</span>
-              <span className="text-center text-zinc-900 font-bold">Jenvu</span>
-            </div>
-            {[
-              ["Voice-native interface", false, false, true],
-              ["ICT / SMC framework", false, true, true],
-              ["Auto chart markup", false, false, true],
-              ["Killzone & session bias", false, false, true],
-              ["Gold macro & red-folder context", false, false, true],
-              ["Sub-20ms latency", false, false, true],
-            ].map(([cap, a, b, c], i) => (
-              <div
-                key={String(cap)}
-                className={`px-5 sm:px-6 py-4 text-sm ${i !== 0 ? "border-t border-zinc-100" : ""}`}
-              >
-                {/* desktop row */}
-                <div className="hidden md:grid grid-cols-4 items-center">
-                  <span className="text-zinc-900 font-medium">{cap}</span>
-                  <span className="text-center text-zinc-900">{a ? "●" : "—"}</span>
-                  <span className="text-center text-zinc-900">{b ? "●" : "—"}</span>
-                  <span className="text-center text-zinc-900 font-bold">{c ? "●" : "—"}</span>
-                </div>
-                {/* mobile stacked */}
-                <div className="md:hidden space-y-2">
-                  <div className="text-zinc-900 font-medium">{cap}</div>
-                  <div className={`grid grid-cols-3 gap-2 ${MONO} text-[10px] uppercase tracking-widest text-zinc-500`}>
-                    <div className="flex flex-col items-center gap-1">
-                      <span>Generic</span>
-                      <span className="text-zinc-900 text-sm">{a ? "●" : "—"}</span>
-                    </div>
-                    <div className="flex flex-col items-center gap-1">
-                      <span>Signals</span>
-                      <span className="text-zinc-900 text-sm">{b ? "●" : "—"}</span>
-                    </div>
-                    <div className="flex flex-col items-center gap-1">
-                      <span className="text-zinc-900">JENVU</span>
-                      <span className="text-zinc-900 text-sm font-bold">{c ? "●" : "—"}</span>
-                    </div>
-                  </div>
-                </div>
               </div>
-            ))}
+              <Link
+                to="/pricing"
+                className="mt-6 inline-flex h-10 w-full items-center justify-center rounded-full bg-home-accent text-sm font-semibold text-white transition hover:opacity-90"
+              >
+                See more
+              </Link>
+            </div>
           </div>
         </div>
       </section>
+
+
+
+
+      {/* TAILORED TO YOUR DESK */}
+      <TailoredToDesk />
+
 
 
       {/* INTEGRATIONS */}
@@ -1012,88 +651,90 @@ function HomePage() {
       </section>
 
 
-      {/* FAQ */}
-      <section className="border-t border-zinc-100">
 
-        <div className="mx-auto max-w-6xl px-5 py-10 sm:px-6 sm:py-14">
-          <div className="grid gap-8 sm:gap-10 lg:grid-cols-12">
-            <div className="text-left lg:col-span-4 lg:text-left">
-              <h2 className="text-xl font-semibold tracking-tight sm:text-3xl">Asked often.</h2>
-              <p className="mt-3 text-zinc-900">Everything else lives in the docs&nbsp;</p>
-            </div>
-            <div className="lg:col-span-8 divide-y divide-zinc-100 border-y border-zinc-100">
-              {[
-                {
-                  q: "Which pairs does JENVU cover?",
-                  a: "JENVU is a gold-only desk focused entirely on XAU/USD — nothing else.",
-                },
-                {
-                  q: "Does it execute trades automatically?",
-                  a: "No. JENVU narrates A+ setups with structured entries, stops and targets — execution stays in your hands.",
-                },
-                {
-                  q: "What model powers the voice agent?",
-                  a: "A low-latency Gemini-class model wired through Lovable AI, tuned for institutional trading reasoning.",
-                },
-                {
-                  q: "Does it work on mobile?",
-                  a: "Yes. The voice loop, signal engine and charts are fully responsive on phones and tablets.",
-                },
-                {
-                  q: "How accurate are the signals?",
-                  a: "Every setup is confluence-graded across ICT, SMC, liquidity and news context. JENVU only narrates A+ setups — when conditions don't align, it stays silent instead of forcing trades.",
-                },
-                {
-                  q: "Do I need trading experience to use it?",
-                  a: "No. JENVU explains its reasoning in plain English — bias, structure, entry, stop and target — so beginners learn the logic while pros get an institutional second opinion.",
-                },
 
-              ].map((f) => (
-                <details key={f.q} className="group py-5">
-                  <summary className="grid cursor-pointer list-none grid-cols-[minmax(0,1fr)_auto] items-center gap-4">
-                    <span className="min-w-0 text-base font-medium text-zinc-900">{f.q}</span>
-                    <span className={`${MONO} shrink-0 text-zinc-900 group-open:rotate-45 transition-transform`}>+</span>
-                  </summary>
-                  <p className="mt-3 text-sm text-zinc-900 leading-relaxed max-w-2xl">{f.a}</p>
-                </details>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
 
       <section className="border-t border-zinc-100 overflow-hidden">
-
         <div className="mx-auto max-w-6xl px-5 sm:px-6 pt-6 pb-24">
-          <div className="rounded-xl border border-zinc-200 bg-white p-6 sm:p-10 md:p-14 flex flex-col md:flex-row items-center md:items-start justify-between gap-8">
-            <div className="max-w-xl text-left md:text-left">
-              <h2 className="text-xl sm:text-3xl md:text-4xl font-semibold tracking-tight">
-                Boot the terminal.&nbsp;<br />
-                Speak to the market now.
+          <div
+            className="relative overflow-hidden rounded-[28px]"
+            style={{ background: "var(--home-accent)" }}
+          >
+            {/* dot grid */}
+            <div
+              className="pointer-events-none absolute inset-0 opacity-30"
+              style={{
+                backgroundImage:
+                  "radial-gradient(circle, rgba(255,255,255,0.5) 1px, transparent 1px)",
+                backgroundSize: "22px 22px",
+              }}
+            />
+            {/* warm bottom glow */}
+            <div
+              className="pointer-events-none absolute bottom-0 left-1/2 h-2/3 w-3/4 -translate-x-1/2 translate-y-1/3"
+              style={{
+                background:
+                  "radial-gradient(ellipse at center bottom, color-mix(in oklab, var(--home-accent-soft) 85%, transparent), transparent 70%)",
+                filter: "blur(12px)",
+              }}
+            />
+
+            {/* floating dashed tiles */}
+            {[
+              { Icon: Mic, cls: "left-[7%] top-[16%] -rotate-12", delay: "0s" },
+              { Icon: AudioWaveform, cls: "left-[17%] top-[52%] rotate-6", delay: "0.8s" },
+              { Icon: PhoneCall, cls: "left-[24%] top-[70%] rotate-12", delay: "1.6s" },
+              { Icon: Database, cls: "right-[24%] top-[68%] -rotate-6", delay: "0.4s" },
+              { Icon: Wifi, cls: "right-[16%] top-[48%] rotate-12", delay: "1.2s" },
+              { Icon: Box, cls: "right-[7%] top-[18%] -rotate-12", delay: "2s" },
+            ].map(({ Icon, cls, delay }, i) => (
+              <div
+                key={i}
+                className={`pointer-events-none absolute hidden rounded-xl border border-dashed border-white/60 p-3 sm:block ${cls}`}
+                style={{ animation: `cfhero-float 7s ease-in-out ${delay} infinite` }}
+              >
+                <Icon className="h-6 w-6 text-white" strokeWidth={1.75} />
+              </div>
+            ))}
+
+            {/* content */}
+            <div className="relative z-10 mx-auto max-w-3xl px-6 py-16 text-center sm:px-10 sm:py-20">
+              <h2 className="text-3xl font-semibold leading-[1.08] tracking-tight text-white sm:text-4xl md:text-[44px]">
+                Build without boundaries
               </h2>
-              <p className="mt-3 text-zinc-900 text-[15px] sm:text-base leading-snug">
-                Your voice agent is one tap away<br className="md:hidden" />
-                <span className="hidden md:inline"> listening<br className="hidden md:inline" /> </span>
-                <span className="md:hidden">listening, thinking &amp; narrating.</span>
-                <span className="hidden md:inline">reasoning, thinking, research &amp; narrating.</span>
+              <p className="mx-auto mt-5 max-w-xl text-sm leading-relaxed text-white/90 sm:text-base">
+                Your voice agent is one tap away — listening, reasoning, research
+                <br className="hidden sm:block" />{" "}
+                &amp; narrating. Speak to the market now, no credit card required.
               </p>
-              <div className="mt-7 flex flex-col items-stretch justify-start gap-3 sm:flex-row md:justify-start">
+              <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
                 <Link
-                  to="/app"
-                  className="inline-flex items-center justify-center gap-2 rounded-lg bg-zinc-900 px-5 py-3 text-sm font-medium text-white hover:bg-zinc-800"
+                  to="/dashboard"
+                  className="inline-flex items-center justify-center rounded-full bg-white px-7 py-3 text-sm font-semibold text-zinc-900 shadow-sm transition hover:bg-zinc-100"
                 >
-                  Launch Voice Agent
+                  Open Dashboard
                 </Link>
                 <Link
-                  to="/signals-live"
-                  className="inline-flex items-center justify-center gap-2 rounded-lg border border-zinc-200 px-5 py-3 text-sm font-medium text-zinc-900 hover:bg-white"
+                  to="/pricing"
+                  className="inline-flex items-center justify-center rounded-full border border-white/40 bg-white/10 px-7 py-3 text-sm font-semibold text-white backdrop-blur transition hover:bg-white/20"
                 >
-                  Open Signal Engine
+                  View Pricing
                 </Link>
               </div>
             </div>
-            <div className="relative mx-auto md:mx-0 h-24 w-24 sm:h-56 sm:w-56 shrink-0">
-              <CloudOrb status="speaking" pulse={1} />
+
+            {/* ticker bar */}
+            <div className="relative z-10 overflow-hidden border-t border-white/25 bg-black/10 py-2.5">
+              <div className="flex w-max items-center gap-10 whitespace-nowrap" style={{ animation: "jenvu-marquee 28s linear infinite" }}>
+                {Array.from({ length: 2 }).map((_, dup) => (
+                  <div key={dup} className="flex items-center gap-10 pr-10 text-xs font-medium text-white/90">
+                    <span>Voice agent listening &amp; narrating the market 24/7</span>
+                    <span>Real-time gold signals without surprises</span>
+                    <span>Research, reasoning &amp; risk context in one terminal</span>
+                    <span>Battle-tested feeds powering desks worldwide</span>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
