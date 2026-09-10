@@ -24,10 +24,10 @@ export default function CloudflareHero() {
              Everything we learned from powering gold trading
           </h1>
 
-          <p className="mx-auto mt-8 max-w-xl text-[13px] leading-[1.25] text-home-accent-foreground sm:text-sm">
+          <p className="mx-auto mt-8 max-w-[320px] text-center text-[13px] leading-[1.45] text-home-accent-foreground sm:max-w-xl sm:text-sm sm:leading-[1.25]">
             One platform for your signals, voice agent, and trading desk.
-            <br />
-            Deploy, analyze, and scale without managing infrastructure.
+            <br className="hidden sm:block" />{" "}
+            <span className="sm:hidden"> </span>Deploy, analyze, and scale without managing infrastructure.
           </p>
 
           <div className="mt-10 flex items-center justify-center">
