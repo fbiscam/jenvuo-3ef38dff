@@ -785,11 +785,59 @@ html:not(.ms-icons-ready) .material-symbols-rounded {
 .ge-ping {
   animation: ge-ping 2.6s cubic-bezier(0, 0, 0.2, 1) infinite;
 }
-.tailored-accent-glow {
-  background: radial-gradient(circle at 30% 20%, color-mix(in oklab, var(--home-accent) 16%, transparent), transparent 60%);
+.tailored-build-row {
+  background: color-mix(in oklab, var(--home-accent) 7%, transparent);
+  opacity: 0.48;
+}
+.tailored-build-row.is-active {
+  background: color-mix(in oklab, var(--home-accent) 11%, transparent);
+  opacity: 1;
+}
+.tailored-orange-pulse {
+  height: 70px;
+  background: radial-gradient(ellipse at 50% 100%, color-mix(in oklab, var(--primary-foreground) 24%, transparent), transparent 68%);
+  animation: tailored-breathe 3.4s ease-in-out infinite;
+}
+.tailored-security-visual {
+  position: relative;
+  display: grid;
+  min-height: 116px;
+  place-items: center;
+  overflow: hidden;
+  opacity: 0.8;
+}
+.tailored-security-visual::before {
+  position: absolute;
+  width: 150px;
+  height: 150px;
+  border-radius: 9999px;
+  background: radial-gradient(circle, color-mix(in oklab, var(--home-accent) 13%, transparent), transparent 66%);
+  content: "";
+}
+.tailored-security-ring {
+  position: absolute;
+  width: 76px;
+  height: 76px;
+  border: 1px dashed color-mix(in oklab, var(--home-accent) 36%, transparent);
+  border-radius: 9999px;
+  animation: tailored-spin 9s linear infinite;
+}
+.tailored-console {
+  background-image: linear-gradient(to bottom, var(--background), color-mix(in oklab, var(--home-accent) 3%, var(--background)));
+}
+.tailored-analysis-bar {
+  background-image: radial-gradient(circle, color-mix(in oklab, var(--home-accent) 42%, transparent) 0.8px, transparent 0.9px);
+  background-size: 8px 8px;
+}
+@keyframes tailored-spin {
+  to { transform: rotate(360deg); }
+}
+@keyframes tailored-breathe {
+  0%, 100% { opacity: 0.35; transform: scale(0.92); }
+  50% { opacity: 0.8; transform: scale(1); }
 }
 @media (prefers-reduced-motion: reduce) {
-  .ge-arc, .ge-ping { animation: none; }
+  .ge-arc, .ge-ping, .tailored-security-ring, .tailored-orange-pulse { animation: none; }
 }
 
 /* Trusted desks logo marquee */
