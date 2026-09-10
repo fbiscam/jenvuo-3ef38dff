@@ -20,7 +20,7 @@ export default function HeaderAuthButtons({ signInOnly = false }: { signInOnly?:
       <div className="flex shrink-0 items-center gap-2">
         <Link
           to="/dashboard"
-          className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-xs font-medium text-zinc-900 hover:bg-zinc-50 sm:gap-2 sm:px-3.5 sm:text-sm"
+          className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground hover:bg-muted sm:gap-2 sm:px-3.5 sm:text-sm"
         >
           Dashboard
           <span className={`${MONO} text-[10px] opacity-70`}>↗</span>
@@ -34,7 +34,7 @@ export default function HeaderAuthButtons({ signInOnly = false }: { signInOnly?:
       <div className="flex shrink-0 items-center gap-2">
         <Link
           to="/auth"
-          className="inline-flex items-center gap-1.5 rounded-lg bg-zinc-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-zinc-800 sm:gap-2 sm:px-3.5 sm:text-sm"
+          className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground hover:bg-muted sm:gap-2 sm:px-3.5 sm:text-sm"
         >
           Sign In
           <span className={`${MONO} text-[10px] opacity-70`}>→</span>
@@ -47,13 +47,13 @@ export default function HeaderAuthButtons({ signInOnly = false }: { signInOnly?:
     <div className="flex shrink-0 items-center gap-2">
       <Link
         to="/auth"
-        className="hidden sm:inline-flex px-3 py-1.5 text-sm text-zinc-900 hover:text-zinc-700"
+        className="hidden items-center rounded-lg border border-border bg-background px-3 py-1.5 text-sm font-medium text-foreground hover:bg-muted sm:inline-flex"
       >
         Sign In
       </Link>
       <Link
         to="/founding"
-        className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-xs font-medium text-zinc-900 hover:bg-zinc-50 sm:gap-2 sm:px-3.5 sm:text-sm"
+        className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground hover:bg-muted sm:gap-2 sm:px-3.5 sm:text-sm"
       >
         Apply
         <span className={`${MONO} text-[10px] opacity-70`}>→</span>
