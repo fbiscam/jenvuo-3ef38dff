@@ -105,32 +105,53 @@ const columns = [
 export default function SiteFooter({ className }: { className?: string }) {
   const year = new Date().getFullYear();
   return (
-    <footer className={`hide-in-pwa relative bg-white ${className || ""}`}>
-
-      {/* Subtle divider */}
-      <div className="h-px w-full bg-transparent" />
-
-
-      {/* Main grid */}
-      <div className="mx-auto max-w-6xl px-5 sm:px-6 py-8 sm:py-10">
-        <div className="grid grid-cols-2 md:grid-cols-6 gap-10">
+    <footer className={`hide-in-pwa relative border-t border-zinc-200 bg-white ${className || ""}`}>
+      <div className="mx-auto max-w-[1184px] px-5 py-12 sm:px-6 sm:py-14">
+        <div className="grid grid-cols-2 gap-x-8 gap-y-10 md:grid-cols-5">
           {/* Brand */}
-          <div className="col-span-2 md:col-span-2 space-y-4">
+          <div className="col-span-2 md:col-span-1 space-y-4">
             <Link to="/" className="flex items-center gap-2.5">
-              <img
-                src="/favicon.png"
-                alt="Jenvu"
-                className="h-7 w-7 rounded object-contain"
-              />
-              <span className="text-zinc-900 font-semibold tracking-tight text-lg">
-                Jenvu AI
-              </span>
+              <img src="/favicon.png" alt="Jenvu" className="h-7 w-7 rounded object-contain" />
+              <span className="text-[17px] font-semibold tracking-tight text-zinc-900">Jenvu AI</span>
             </Link>
-            <p className="text-sm text-zinc-600 leading-relaxed max-w-sm whitespace-pre-line">
-              Institutional grade voice intelligence for gold{"\n"}traders using ICT & SMC to make analysis.
+            <p className="max-w-xs text-[13px] leading-relaxed text-zinc-600">
+              Institutional grade voice intelligence for gold traders using ICT &amp; SMC.
             </p>
+          </div>
 
-            <div className="flex items-center gap-2.5 pt-1">
+          {/* Link columns */}
+          {columns.map((col) => (
+            <div key={col.label} className="space-y-3">
+              <div className={`${MONO} text-[11px] font-semibold uppercase tracking-[0.18em] text-zinc-900`}>
+                {col.label}
+              </div>
+              <ul className="space-y-2.5">
+                {col.links.map((l) => (
+                  <li key={`${l.to}:${l.label}`}>
+                    <Link
+                      to={l.to}
+                      className="text-[13px] text-zinc-600 transition-colors hover:text-zinc-900"
+                    >
+                      {l.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+
+        {/* Bottom bar */}
+        <div className="mt-12 flex flex-col gap-5 border-t border-zinc-200 pt-6 md:flex-row md:items-center md:justify-between">
+          <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-[12px] text-zinc-500">
+            <span>© {year} Jenvu AI, Inc.</span>
+            <Link to="/privacy" className="hover:text-zinc-900">Privacy Policy</Link>
+            <Link to="/terms" className="hover:text-zinc-900">Terms of Use</Link>
+            <Link to="/disclaimer" className="hover:text-zinc-900">Risk Disclaimer</Link>
+          </div>
+
+          <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center">
+            <div className="flex items-center gap-2">
               {[
                 {
                   href: "https://x.com/jenvu",
@@ -177,60 +198,15 @@ export default function SiteFooter({ className }: { className?: string }) {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={s.label}
-                  className="flex h-9 w-9 items-center justify-center rounded-full border border-zinc-200 bg-white text-zinc-900 transition-all hover:scale-110 hover:border-zinc-300 hover:shadow-sm"
+                  className="flex h-8 w-8 items-center justify-center rounded-full border border-zinc-200 bg-white text-zinc-700 transition-colors hover:border-zinc-300 hover:text-zinc-900"
                 >
                   {s.icon}
                 </a>
               ))}
             </div>
+
+            <NewsletterSubscribe />
           </div>
-
-
-
-
-
-          {/* Link columns */}
-          {columns.map((col) => (
-            <div key={col.label} className="space-y-3">
-              <div
-                className={`${MONO} text-sm font-black uppercase tracking-[0.25em] text-black`}
-              >
-
-
-              
-                {col.label}
-              </div>
-              <ul className="space-y-2">
-                {col.links.map((l) => (
-                  <li key={`${l.to}:${l.label}`}>
-                    <Link
-                      to={l.to}
-                      className="text-sm text-zinc-800 hover:text-black transition-colors whitespace-nowrap"
-                    >
-                      {l.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
-
-        {/* Divider + sub bar */}
-        <div className="mt-8 pt-4 pb-4 border-t border-zinc-100 flex flex-col md:flex-row items-start justify-between gap-3 md:translate-y-2">
-          <div
-            className="whitespace-nowrap text-[12px] sm:text-[14px] tracking-tight"
-            style={{ fontFamily: '"Urbanist", system-ui, sans-serif', fontWeight: 500, color: "#3c4043" }}
-          >
-            © {year} Jenvu AI. All rights reserved
-          </div>
-
-
-
-
-          <NewsletterSubscribe />
-
-
         </div>
       </div>
     </footer>
