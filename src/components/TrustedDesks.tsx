@@ -8,7 +8,6 @@ import {
   SiRobinhood,
   SiTradingview,
 } from "react-icons/si";
-import orbVideo from "@/assets/welcome-orb.mp4.asset.json";
 import face1 from "@/assets/review-user-1.jpg";
 import face2 from "@/assets/review-user-2.jpg";
 import face3 from "@/assets/review-user-3.jpg";
@@ -31,6 +30,7 @@ type Desk = {
   quote: string;
   author: string;
   role: string;
+  performance: number[];
 };
 
 const DESKS: Desk[] = [
@@ -44,6 +44,7 @@ const DESKS: Desk[] = [
       "JENVU reads structure out loud faster than our analysts can mark it. Liquidity sweeps, CHoCH, displacement — narrated before the candle closes.",
     author: "Daniel Reyes",
     role: "Head of Desk, TradingView",
+    performance: [18, 22, 21, 29, 34, 38, 45, 49, 57, 63, 72, 81],
   },
   {
     id: "binance",
@@ -55,6 +56,7 @@ const DESKS: Desk[] = [
       "We stopped chasing setups. The A+ confluence grading filters everything down to trades we'd actually take, with entry, stop and target already framed.",
     author: "Aisha Karim",
     role: "Markets Analyst, Binance",
+    performance: [16, 20, 26, 24, 31, 39, 43, 51, 58, 66, 70, 78],
   },
   {
     id: "webull",
@@ -66,6 +68,7 @@ const DESKS: Desk[] = [
       "London and New York killzones are covered without a single missed sweep. It's like having a senior gold analyst on the mic all session.",
     author: "Marcus Feld",
     role: "Senior Trader, Webull",
+    performance: [21, 25, 23, 30, 36, 41, 48, 55, 53, 64, 73, 84],
   },
   {
     id: "trading212",
@@ -77,6 +80,7 @@ const DESKS: Desk[] = [
       "Onboarding new traders used to take months. JENVU explains the reasoning behind every ICT call, so they learn while they trade.",
     author: "Ivy Chen",
     role: "Risk Lead, Trading 212",
+    performance: [15, 19, 27, 31, 29, 38, 44, 50, 59, 65, 76, 82],
   },
   {
     id: "trustwallet",
@@ -88,6 +92,7 @@ const DESKS: Desk[] = [
       "Red-folder news, DXY and the London fix all land in the same voice loop. Our XAU desk finally works from one narrative.",
     author: "Tomas Weber",
     role: "Market Strategist, Trust Wallet",
+    performance: [19, 23, 28, 26, 35, 42, 49, 54, 62, 68, 79, 87],
   },
   {
     id: "coinbase",
@@ -99,6 +104,7 @@ const DESKS: Desk[] = [
       "The narrated chart reviews are the killer feature. Highs, lows, mitigations — spoken through, not buried in a dashboard.",
     author: "Sofia Almeida",
     role: "Product Lead, Coinbase",
+    performance: [17, 21, 25, 32, 37, 35, 46, 52, 61, 69, 75, 85],
   },
   {
     id: "robinhood",
@@ -109,6 +115,7 @@ const DESKS: Desk[] = [
     quote: "The live narration gives our traders a clean second opinion without breaking focus or changing their chart setup.",
     author: "Liam Carter",
     role: "Trading Lead, Robinhood",
+    performance: [20, 24, 29, 27, 34, 40, 47, 56, 63, 71, 77, 88],
   },
   {
     id: "revolut",
@@ -119,6 +126,7 @@ const DESKS: Desk[] = [
     quote: "JENVU turns a crowded gold chart into a clear sequence of structure, liquidity and risk decisions.",
     author: "Maya Foster",
     role: "Markets Product, Revolut",
+    performance: [14, 18, 24, 30, 28, 37, 43, 51, 60, 67, 74, 83],
   },
   {
     id: "etoro",
@@ -129,6 +137,7 @@ const DESKS: Desk[] = [
     quote: "The consistent review format makes every setup easier to compare, explain and share across the desk.",
     author: "Noah Bennett",
     role: "Senior Analyst, eToro",
+    performance: [18, 25, 23, 31, 39, 46, 44, 55, 64, 70, 80, 89],
   },
   {
     id: "metatrader",
@@ -139,6 +148,7 @@ const DESKS: Desk[] = [
     quote: "Voice-first analysis keeps attention on execution while the engine tracks the market structure in real time.",
     author: "Elena Rossi",
     role: "Execution Specialist, MetaTrader 5",
+    performance: [22, 26, 24, 33, 38, 45, 52, 58, 66, 74, 81, 91],
   },
 ];
 
@@ -160,6 +170,67 @@ function Mark({ desk, large = false }: { desk: Desk; large?: boolean }) {
         />
       ) : null}
     </span>
+  );
+}
+
+function PerformanceChart({ desk }: { desk: Desk }) {
+  const width = 460;
+  const height = 250;
+  const paddingX = 22;
+  const paddingY = 24;
+  const min = Math.min(...desk.performance) - 6;
+  const max = Math.max(...desk.performance) + 5;
+  const range = Math.max(1, max - min);
+  const points = desk.performance.map((value, index) => {
+    const x = paddingX + (index / (desk.performance.length - 1)) * (width - paddingX * 2);
+    const y = height - paddingY - ((value - min) / range) * (height - paddingY * 2);
+    return { x, y };
+  });
+  const line = points.map(({ x, y }) => `${x},${y}`).join(" ");
+  const area = `${paddingX},${height - paddingY} ${line} ${width - paddingX},${height - paddingY}`;
+  const first = desk.performance[0] ?? 0;
+  const last = desk.performance.at(-1) ?? first;
+  const growth = first > 0 ? Math.round(((last - first) / first) * 100) : 0;
+  const lastPoint = points.at(-1);
+
+  return (
+    <div className="relative min-h-[330px] overflow-hidden rounded-xl border border-zinc-200 bg-zinc-950 p-5 text-white sm:p-6">
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <p className="text-[11px] font-medium uppercase text-zinc-400">12-month performance</p>
+          <div className="mt-1 flex items-baseline gap-2">
+            <span className="text-3xl font-semibold">+{growth}%</span>
+            <span className="text-xs text-emerald-400">Growing</span>
+          </div>
+        </div>
+        <Mark desk={desk} large />
+      </div>
+
+      <svg
+        viewBox={`0 0 ${width} ${height}`}
+        className="mt-3 h-[210px] w-full text-home-accent"
+        role="img"
+        aria-label={`${desk.name} illustrative 12-month growth chart, up ${growth} percent`}
+      >
+        {[0, 1, 2, 3].map((row) => {
+          const y = paddingY + row * ((height - paddingY * 2) / 3);
+          return <line key={row} x1={paddingX} x2={width - paddingX} y1={y} y2={y} className="stroke-zinc-800" strokeWidth="1" />;
+        })}
+        <polygon points={area} fill="currentColor" opacity="0.12" />
+        <polyline points={line} fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
+        {lastPoint ? (
+          <>
+            <circle cx={lastPoint.x} cy={lastPoint.y} r="9" fill="currentColor" opacity="0.2" />
+            <circle cx={lastPoint.x} cy={lastPoint.y} r="4" fill="currentColor" />
+          </>
+        ) : null}
+      </svg>
+
+      <div className="absolute inset-x-5 bottom-4 flex items-center justify-between text-[10px] font-medium uppercase text-zinc-500 sm:inset-x-6">
+        <span>Sep 2025</span>
+        <span>Sep 2026</span>
+      </div>
+    </div>
   );
 }
 
@@ -235,7 +306,7 @@ export default function TrustedDesks() {
         </div>
       </div>
 
-      {/* main review + video */}
+      {/* main review + company performance */}
       <div
         key={desk.id}
         className="animate-fade-in mt-5 grid gap-6 rounded-xl border border-zinc-200 bg-white p-6 sm:p-10 lg:grid-cols-12 lg:items-center"
@@ -265,23 +336,7 @@ export default function TrustedDesks() {
 
         </div>
         <div className="lg:col-span-5">
-          <div className="relative overflow-hidden rounded-xl border border-zinc-200 bg-zinc-50">
-            <video
-              className="h-full w-full object-cover"
-              src={orbVideo.url}
-              autoPlay
-              muted
-              loop
-              playsInline
-            />
-            <div className="absolute bottom-4 right-4 flex items-center gap-3 rounded-lg border border-zinc-200 bg-white/95 px-4 py-3 shadow-lg backdrop-blur-sm">
-              <Mark desk={desk} large />
-              <div>
-                <div className="text-xs font-medium text-zinc-500">Reviewed for</div>
-                <div className="text-base font-bold text-zinc-900">{desk.name}</div>
-              </div>
-            </div>
-          </div>
+          <PerformanceChart desk={desk} />
         </div>
       </div>
 
