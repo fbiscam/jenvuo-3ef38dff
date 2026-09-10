@@ -226,10 +226,6 @@ function PerformanceChart({ desk }: { desk: Desk }) {
         ) : null}
       </svg>
 
-      <div className="absolute inset-x-5 bottom-4 flex items-center justify-between text-[10px] font-medium uppercase text-zinc-400 sm:inset-x-6">
-        <span>Sep 2025</span>
-        <span>Sep 2026</span>
-      </div>
     </div>
   );
 }
