@@ -34,7 +34,7 @@ export const getUsageStats = createServerFn({ method: "GET" })
   .handler(async ({ context }): Promise<UsageStats> => {
     const { supabase, userId } = context;
 
-    const [{ data: bal }, { data: ledger }] = await Promise.all([
+    const [{ data: bal }, { data: ledger }, { data: sub }] = await Promise.all([
       supabase
         .from("credit_balances")
         .select("balance, monthly_allowance, period_resets_at")
@@ -46,10 +46,25 @@ export const getUsageStats = createServerFn({ method: "GET" })
         .eq("user_id", userId)
         .order("created_at", { ascending: false })
         .limit(200),
+      supabase
+        .from("user_subscriptions")
+        .select("plan_id")
+        .eq("user_id", userId)
+        .maybeSingle(),
     ]);
 
+    // Allowance mirrors the plan wallet when the balance row has none set,
+    // so the wallet bar matches the Billing/Credits view instead of showing $0.
+    const { data: planRow } = await supabase
+      .from("plans")
+      .select("wallet_usd")
+      .eq("id", (sub?.plan_id as string | null) ?? "free")
+      .maybeSingle();
+
     const balance = Number(bal?.balance ?? 0);
-    const allowance = Number(bal?.monthly_allowance ?? 0);
+    const planWallet = Number((planRow as any)?.wallet_usd ?? 0);
+    const rawAllowance = Number(bal?.monthly_allowance ?? 0);
+    const allowance = rawAllowance > 0 ? rawAllowance : Math.max(planWallet, balance);
     const periodResetsAt = bal?.period_resets_at ?? null;
     const periodStart: string | null = periodResetsAt
       ? new Date(new Date(periodResetsAt).getTime() - 30 * 24 * 60 * 60 * 1000).toISOString()
