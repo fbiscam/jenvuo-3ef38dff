@@ -119,7 +119,9 @@ function ExtensionPage() {
   };
 
   const activeKeys = keys.filter((k) => !k.revoked_at);
-  const displayedKeys = keys.slice(0, 4);
+  const displayedKeys = [...keys]
+    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+    .slice(0, 4);
   const canCreate = Boolean(access?.active && access.plan !== "free" && activeKeys.length < access.keyLimit);
 
   return (
@@ -200,8 +202,15 @@ function ExtensionPage() {
 
       {/* API key list */}
       {view === "keys" && <div className="mt-5">
-        <div className="grid grid-cols-[1.4fr_1.6fr_1fr_1fr_auto] items-center gap-4 border-b border-zinc-200 pb-3 text-[13px] text-zinc-700">
-          <div>Key</div>
+        <div className="mb-4 flex items-end justify-between gap-3">
+          <div>
+            <h2 className="text-[16px] font-medium text-zinc-900">Recent API keys</h2>
+            <p className="mt-1 text-[12px] text-zinc-500">Your four newest extension keys, newest first.</p>
+          </div>
+          <span className="shrink-0 text-[12px] tabular-nums text-zinc-500">{displayedKeys.length} shown</span>
+        </div>
+        <div className="hidden grid-cols-[1.5fr_1.4fr_0.8fr_0.9fr_auto] items-center gap-4 border-b border-zinc-200 pb-3 text-[13px] text-zinc-700 md:grid">
+          <div>API key</div>
           <div>Extension</div>
           <div>Created</div>
           <div>Status</div>
@@ -214,20 +223,40 @@ function ExtensionPage() {
           displayedKeys.map((k) => (
             <div
               key={k.id}
-              className="grid grid-cols-[1.4fr_1.6fr_1fr_1fr_auto] items-center gap-4 border-b border-zinc-100 py-4"
+              className="grid gap-3 border-b border-zinc-100 py-4 md:grid-cols-[1.5fr_1.4fr_0.8fr_0.9fr_auto] md:items-center md:gap-4"
             >
               <div className="min-w-0">
-                <div className={`${MONO} truncate text-[13px] text-blue-700`}>{k.key_prefix}…</div>
-                <div className="truncate text-[12px] text-zinc-500">{k.name}</div>
+                <div className="mb-1 flex items-center gap-2">
+                  <span className="text-[11px] text-zinc-500 md:hidden">API key</span>
+                  {k.id === displayedKeys[0]?.id && (
+                    <span className="rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-medium text-blue-700">Newest</span>
+                  )}
+                </div>
+                <div className="flex min-w-0 items-center gap-1 rounded-md border border-zinc-200 bg-zinc-50 px-2.5 py-2">
+                  <code className={`${MONO} min-w-0 flex-1 truncate text-[12px] text-zinc-900`}>{k.key_prefix}••••••••••</code>
+                  <button
+                    type="button"
+                    title="Copy visible key prefix"
+                    aria-label={`Copy visible prefix for ${k.name}`}
+                    onClick={() => copyValue(k.key_prefix, k.id)}
+                    className="shrink-0 rounded p-1 text-zinc-500 hover:bg-white hover:text-zinc-900"
+                  >
+                    {copied === k.id ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+                  </button>
+                </div>
+                <div className="mt-1.5 truncate text-[12px] text-zinc-500">{k.name}</div>
               </div>
               <div className="min-w-0">
+                <div className="mb-1 text-[11px] text-zinc-500 md:hidden">Extension</div>
                 <div className="truncate text-[13px] text-blue-700">Jenvu XAU/USD Extension</div>
                 <div className={`${MONO} truncate text-[12px] text-zinc-500`}>v1.8.1</div>
               </div>
               <div className="text-[13px] text-zinc-800">
+                <div className="mb-1 text-[11px] text-zinc-500 md:hidden">Created</div>
                 {new Date(k.created_at).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}
               </div>
               <div>
+                <div className="mb-1 text-[11px] text-zinc-500 md:hidden">Status</div>
                 {k.revoked_at ? (
                   <div className="text-[13px] text-zinc-500">Revoked</div>
                 ) : (
@@ -239,14 +268,7 @@ function ExtensionPage() {
                   </>
                 )}
               </div>
-              <div className="flex w-24 items-center justify-end gap-1">
-                <button
-                  title="Copy key prefix"
-                  onClick={() => copyValue(k.key_prefix, k.id)}
-                  className="rounded-full p-2 text-zinc-500 hover:bg-zinc-100 hover:text-zinc-800"
-                >
-                  {copied === k.id ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-                </button>
+              <div className="flex items-center justify-end gap-1 md:w-24">
                 {!k.revoked_at && (
                   <button
                     title="Revoke key"
@@ -289,13 +311,17 @@ function ExtensionPage() {
       {/* Extension releases */}
       {view === "extension" && (
         <div className="mt-5">
-          <div className="grid grid-cols-[minmax(0,1.8fr)_0.8fr_0.8fr_auto] items-center gap-4 border-b border-zinc-200 pb-3 text-[13px] text-zinc-700">
+          <div className="mb-4">
+            <h2 className="text-[16px] font-medium text-zinc-900">Latest extension</h2>
+            <p className="mt-1 text-[12px] text-zinc-500">The newest tested release available for your account.</p>
+          </div>
+          <div className="hidden grid-cols-[minmax(0,1.8fr)_0.8fr_0.8fr_auto] items-center gap-4 border-b border-zinc-200 pb-3 text-[13px] text-zinc-700 md:grid">
             <div>Extension</div>
             <div>Version</div>
             <div>Release</div>
             <div className="w-40" />
           </div>
-          <div className="grid grid-cols-[minmax(0,1.8fr)_0.8fr_0.8fr_auto] items-center gap-4 border-b border-zinc-100 py-5">
+          <div className="grid gap-4 border-b border-zinc-100 py-5 md:grid-cols-[minmax(0,1.8fr)_0.8fr_0.8fr_auto] md:items-center">
             <div className="min-w-0">
               <div className="truncate text-[14px] font-medium text-zinc-900">Jenvu — ICT/SMC Gold Analyst</div>
               <div className="mt-1 text-[12px] text-zinc-500">Chrome extension for live XAU/USD analysis</div>
@@ -304,12 +330,12 @@ function ExtensionPage() {
               <span className={MONO}>v1.8.1</span>
               <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-medium text-emerald-700">Latest</span>
             </div>
-            <div className="text-[13px] text-zinc-600">Current</div>
+            <div className="text-[13px] text-zinc-600">Updated Sep 10, 2026</div>
             <button
               type="button"
               onClick={onDownload}
               disabled={downloading}
-              className="inline-flex w-40 items-center justify-center gap-2 rounded-lg border border-zinc-300 px-3 py-2 text-[13px] font-medium text-zinc-900 hover:bg-zinc-50 disabled:opacity-60"
+              className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-zinc-300 px-3 py-2 text-[13px] font-medium text-zinc-900 hover:bg-zinc-50 disabled:opacity-60 md:w-40"
             >
               <Download className="h-4 w-4" /> {downloading ? "Preparing…" : "Download latest"}
             </button>
