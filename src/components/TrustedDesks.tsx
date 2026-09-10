@@ -194,13 +194,13 @@ function PerformanceChart({ desk }: { desk: Desk }) {
   const lastPoint = points.at(-1);
 
   return (
-    <div className="relative min-h-[330px] overflow-hidden rounded-xl border border-zinc-200 bg-zinc-950 p-5 text-white sm:p-6">
+    <div className="relative min-h-[330px] overflow-hidden rounded-xl border border-zinc-200 bg-white p-5 text-zinc-900 sm:p-6">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <p className="text-[11px] font-medium uppercase text-zinc-400">12-month performance</p>
+          <p className="text-[11px] font-medium uppercase text-zinc-500">12-month performance</p>
           <div className="mt-1 flex items-baseline gap-2">
             <span className="text-3xl font-semibold">+{growth}%</span>
-            <span className="text-xs text-emerald-400">Growing</span>
+            <span className="text-xs text-emerald-600">Growing</span>
           </div>
         </div>
         <Mark desk={desk} large />
@@ -214,7 +214,7 @@ function PerformanceChart({ desk }: { desk: Desk }) {
       >
         {[0, 1, 2, 3].map((row) => {
           const y = paddingY + row * ((height - paddingY * 2) / 3);
-          return <line key={row} x1={paddingX} x2={width - paddingX} y1={y} y2={y} className="stroke-zinc-800" strokeWidth="1" />;
+          return <line key={row} x1={paddingX} x2={width - paddingX} y1={y} y2={y} className="stroke-zinc-200" strokeWidth="1" />;
         })}
         <polygon points={area} fill="currentColor" opacity="0.12" />
         <polyline points={line} fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
@@ -226,7 +226,7 @@ function PerformanceChart({ desk }: { desk: Desk }) {
         ) : null}
       </svg>
 
-      <div className="absolute inset-x-5 bottom-4 flex items-center justify-between text-[10px] font-medium uppercase text-zinc-500 sm:inset-x-6">
+      <div className="absolute inset-x-5 bottom-4 flex items-center justify-between text-[10px] font-medium uppercase text-zinc-400 sm:inset-x-6">
         <span>Sep 2025</span>
         <span>Sep 2026</span>
       </div>
