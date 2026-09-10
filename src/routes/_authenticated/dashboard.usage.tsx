@@ -2,12 +2,13 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
+import { Calendar, ChartColumn, ChevronDown, ChevronRight, Download, RefreshCw } from "lucide-react";
 import { getUsageStats } from "@/lib/usage.functions";
 
 export const Route = createFileRoute("/_authenticated/dashboard/usage")({
   head: () => ({
     meta: [
-      { title: "Wallet Usage — Jenvu" },
+      { title: "Usage — Jenvu" },
       { name: "description", content: "Track your USD wallet usage, per-scan model + cost history." },
       { name: "robots", content: "noindex" },
     ],
@@ -15,19 +16,8 @@ export const Route = createFileRoute("/_authenticated/dashboard/usage")({
   component: UsagePage,
 });
 
-const MONO = "font-['JetBrains_Mono',ui-monospace,monospace]";
-
 const REASON_LABEL: Record<string, string> = {
   ai_scan: "AI scan",
-  terminal_scan: "Terminal scan",
-  topup_crypto: "Crypto top-up",
-  promo_bonus: "Promo bonus",
-  pro_trial_grant: "Pro trial credit",
-  trial_expired: "Trial expired",
-  trial_revoked: "Trial revoked",
-  expired: "Credits expired",
-  founding_referral_bonus: "Founding referral bonus",
-  founding_referral_reward: "Founding referral reward",
   signal: "Signal scan",
   ict_narration: "ICT narration",
   alert: "Alert broadcast",
@@ -52,30 +42,101 @@ function fmtUsd(n: number, decimals = 4) {
   return `$${n.toFixed(d)}`;
 }
 
+function fmtInt(n: number) {
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
+  if (n >= 1_000) return `${(n / 1_000).toFixed(1)}k`;
+  return `${Math.round(n)}`;
+}
+
+const RANGES = [
+  { days: 7, label: "Last 7 days" },
+  { days: 14, label: "Last 14 days" },
+  { days: 30, label: "Last 30 days" },
+] as const;
+
 function UsagePage() {
   const fetchStats = useServerFn(getUsageStats);
-  const { data, isLoading, isError, refetch } = useQuery({
+  const { data, isLoading, isError, isFetching, refetch, dataUpdatedAt } = useQuery({
     queryKey: ["usage-stats"],
     queryFn: () => fetchStats(),
-    staleTime: 15_000,
+    staleTime: 10_000,
+    refetchInterval: 30_000,
+    refetchOnWindowFocus: true,
   });
-  const [showAll, setShowAll] = useState(false);
+  const [tab, setTab] = useState<"categories" | "models">("categories");
+  const [rightTab, setRightTab] = useState<"types" | "activity">("types");
+  const [rangeDays, setRangeDays] = useState<number>(30);
+  const [model, setModel] = useState<string>("all");
+  const [openMenu, setOpenMenu] = useState<"model" | "range" | null>(null);
 
-  const maxDaily = useMemo(() => {
-    if (!data) return 1;
-    return Math.max(0.01, ...data.daily.map((d) => d.spent + d.earned));
+  const models = useMemo(() => {
+    if (!data) return [] as string[];
+    return [...new Set(data.ledger.map((r) => r.model).filter(Boolean) as string[])].sort();
   }, [data]);
+
+  const derived = useMemo(() => {
+    if (!data) return null;
+    const from = new Date();
+    from.setHours(0, 0, 0, 0);
+    from.setDate(from.getDate() - (rangeDays - 1));
+    const fromMs = from.getTime();
+
+    const rows = data.ledger.filter((r) => {
+      if (new Date(r.created_at).getTime() < fromMs) return false;
+      if (model !== "all" && (r.model ?? "unknown") !== model) return false;
+      return true;
+    });
+
+    const spendRows = rows.filter((r) => r.delta < 0);
+    const earnRows = rows.filter((r) => r.delta > 0);
+    const spent = spendRows.reduce((s, r) => s + Math.abs(r.delta), 0);
+    const earned = earnRows.reduce((s, r) => s + r.delta, 0);
+    const totalTokens = spendRows.reduce((s, r) => s + (r.prompt_tokens ?? 0) + (r.completion_tokens ?? 0), 0);
+    const inputTokens = spendRows.reduce((s, r) => s + (r.prompt_tokens ?? 0), 0);
+    const outputTokens = totalTokens - inputTokens;
+
+    const days: { date: string; spent: number; earned: number; tokens: number; requests: number }[] = [];
+    const idx = new Map<string, number>();
+    for (let i = rangeDays - 1; i >= 0; i--) {
+      const d = new Date();
+      d.setHours(0, 0, 0, 0);
+      d.setDate(d.getDate() - i);
+      const key = d.toISOString().slice(0, 10);
+      idx.set(key, days.length);
+      days.push({ date: key, spent: 0, earned: 0, tokens: 0, requests: 0 });
+    }
+    for (const r of rows) {
+      const i = idx.get(r.created_at.slice(0, 10));
+      if (i == null) continue;
+      const b = days[i]!;
+      if (r.delta < 0) {
+        b.spent += Math.abs(r.delta);
+        b.requests += 1;
+        b.tokens += (r.prompt_tokens ?? 0) + (r.completion_tokens ?? 0);
+      } else b.earned += r.delta;
+    }
+
+    const avgCost = spendRows.length ? spent / spendRows.length : 0;
+    const lastActivity = rows[0]?.created_at ?? null;
+    const hasSpend = spent > 0 || earned > 0;
+    return {
+      rows, spendRows, earnRows, spent, earned, totalTokens, inputTokens, outputTokens,
+      days, avgCost, lastActivity, hasSpend,
+      tokenSeries: days.map((d) => d.tokens),
+      requestSeries: days.map((d) => d.requests),
+    };
+  }, [data, rangeDays, model]);
 
   if (isLoading) {
     return (
-      <div className="space-y-6">
-        <div className="h-32 animate-pulse rounded-2xl bg-zinc-100" />
-        <div className="h-64 animate-pulse rounded-2xl bg-zinc-100" />
+      <div className="space-y-4">
+        <div className="h-9 w-full animate-pulse rounded-lg bg-zinc-100" />
+        <div className="h-72 animate-pulse rounded-lg bg-zinc-100" />
       </div>
     );
   }
 
-  if (isError || !data) {
+  if (isError || !data || !derived) {
     return (
       <div className="rounded-xl border border-zinc-200 bg-white p-8 text-center">
         <p className="text-sm text-zinc-600">Failed to load usage data.</p>
@@ -87,143 +148,408 @@ function UsagePage() {
   }
 
   const remaining = Math.max(0, Math.min(data.balance, data.allowance));
-  const pct = data.allowance > 0 ? Math.min(100, Math.round((remaining / data.allowance) * 100)) : 0;
-  const usedPct = 100 - pct;
-  const resetsAt = data.periodResetsAt ? new Date(data.periodResetsAt) : null;
-  const ledger = showAll ? data.ledger : data.ledger.slice(0, 20);
+  const pct = data.allowance > 0 ? Math.min(100, (remaining / data.allowance) * 100) : 0;
+  const maxDaily = Math.max(0.0001, ...derived.days.map((d) => d.spent + d.earned));
+  const daysLeft = data.periodResetsAt
+    ? Math.max(0, Math.ceil((new Date(data.periodResetsAt).getTime() - Date.now()) / 86_400_000))
+    : null;
+  const burnPerDay = derived.spent / rangeDays;
+  const runway = burnPerDay > 0 ? Math.floor(data.balance / burnPerDay) : null;
+
+  const exportCsv = () => {
+    const rows = [
+      ["date", "reason", "model", "prompt_tokens", "completion_tokens", "raw_cost_usd", "delta_usd", "balance_after"],
+      ...derived.rows.map((r) => [
+        r.created_at,
+        label(r.reason),
+        r.model ?? "",
+        String(r.prompt_tokens ?? ""),
+        String(r.completion_tokens ?? ""),
+        r.raw_cost_usd != null ? String(r.raw_cost_usd) : "",
+        String(r.delta),
+        String(r.balance_after),
+      ]),
+    ];
+    const csv = rows.map((r) => r.map((c) => `"${c.replace(/"/g, '""')}"`).join(",")).join("\n");
+    const url = URL.createObjectURL(new Blob([csv], { type: "text/csv" }));
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `jenvu-usage-${rangeDays}d.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const rangeLabel = RANGES.find((r) => r.days === rangeDays)?.label ?? `Last ${rangeDays} days`;
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="pl-1 text-2xl font-semibold text-zinc-900">Wallet usage</h1>
-        <p className="mt-1 text-sm text-zinc-500">Actual $ cost per scan · model used · tokens processed.</p>
+    <div className="space-y-4">
+      {/* ── Header bar ── */}
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-200 pb-3">
+        <h1 className="text-xl font-semibold text-zinc-900">  Usage</h1>
+        <div className="flex items-center gap-2">
+          <Dropdown
+            open={openMenu === "model"}
+            onToggle={() => setOpenMenu(openMenu === "model" ? null : "model")}
+            trigger={model === "all" ? "All models" : model}
+            options={[{ value: "all", label: "All models" }, ...models.map((m) => ({ value: m, label: m }))]}
+            value={model}
+            onSelect={(v) => { setModel(v); setOpenMenu(null); }}
+          />
+          <Dropdown
+            open={openMenu === "range"}
+            onToggle={() => setOpenMenu(openMenu === "range" ? null : "range")}
+            trigger={rangeLabel}
+            icon={<Calendar className="h-3.5 w-3.5 text-zinc-500" />}
+            options={RANGES.map((r) => ({ value: String(r.days), label: r.label }))}
+            value={String(rangeDays)}
+            onSelect={(v) => { setRangeDays(Number(v)); setOpenMenu(null); }}
+          />
+          <button
+            type="button"
+            onClick={() => refetch()}
+            aria-label="Refresh usage"
+            className="rounded-md p-1.5 text-zinc-600 transition hover:bg-zinc-100 hover:text-zinc-900"
+          >
+            <RefreshCw className={`h-4 w-4 ${isFetching ? "animate-spin" : ""}`} />
+          </button>
+          <button
+            type="button"
+            onClick={exportCsv}
+            aria-label="Download usage CSV"
+            className="rounded-md p-1.5 text-zinc-600 transition hover:bg-zinc-100 hover:text-zinc-900"
+          >
+            <Download className="h-4 w-4" />
+          </button>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard label="Balance" value={fmtUsd(remaining, 2)} sub={`of ${fmtUsd(data.allowance, 2)}`} accent="emerald" />
-        <StatCard label="Spent this period" value={fmtUsd(data.spentThisPeriod)} sub={`${usedPct}% of wallet`} accent="rose" />
-        <StatCard label="Added" value={fmtUsd(data.earnedThisPeriod, 2)} sub="top-ups, resets, bonuses" accent="blue" />
-        <StatCard
-          label="Resets"
-          value={resetsAt ? resetsAt.toLocaleDateString(undefined, { month: "short", day: "numeric" }) : "—"}
-          sub={resetsAt ? `in ${Math.max(0, Math.ceil((resetsAt.getTime() - Date.now()) / 86400000))} days` : ""}
-          accent="zinc"
-        />
-      </div>
 
-      <section className="rounded-xl border border-zinc-200 bg-white p-6">
-        <div className="flex items-baseline justify-between">
-          <div className={`${MONO} text-[10px] uppercase tracking-[0.25em] text-zinc-500`}>Balance</div>
-          <div className="text-sm text-zinc-600 tabular-nums">
-            <span className="font-semibold text-zinc-900">{fmtUsd(remaining, 2)}</span> / {fmtUsd(data.allowance, 2)}
-          </div>
-        </div>
-        <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-zinc-100">
-          <div className="h-full bg-zinc-900 transition-all" style={{ width: `${pct}%` }} />
-        </div>
-      </section>
-
-      <section className="rounded-xl border border-zinc-200 bg-white p-6">
-        <div className="flex items-center justify-between">
-          <div className={`${MONO} text-[10px] uppercase tracking-[0.25em] text-zinc-500`}>Last 30 days</div>
-          <div className="flex items-center gap-3 text-[11px] text-zinc-500">
-            <span className="flex items-center gap-1.5"><span className="inline-block h-2 w-2 rounded-sm bg-rose-500" /> Spent</span>
-            <span className="flex items-center gap-1.5"><span className="inline-block h-2 w-2 rounded-sm bg-emerald-500" /> Added</span>
-          </div>
-        </div>
-        <div className="mt-5 flex h-32 items-end gap-1">
-          {data.daily.map((d) => {
-            const totalH = ((d.spent + d.earned) / maxDaily) * 100;
-            const spentH = d.spent + d.earned > 0 ? (d.spent / (d.spent + d.earned)) * totalH : 0;
-            const earnedH = totalH - spentH;
-            return (
-              <div key={d.date} className="group relative flex flex-1 flex-col items-center justify-end">
-                <div className="pointer-events-none absolute -top-8 z-10 hidden whitespace-nowrap rounded bg-zinc-900 px-2 py-1 text-[10px] text-white group-hover:block">
-                  {new Date(d.date).toLocaleDateString(undefined, { month: "short", day: "numeric" })} · −{fmtUsd(d.spent)} / +{fmtUsd(d.earned)}
-                </div>
-                <div className="flex w-full flex-col justify-end" style={{ height: "100%" }}>
-                  {earnedH > 0 && <div className="w-full bg-emerald-500" style={{ height: `${earnedH}%` }} />}
-                  {spentH > 0 && <div className="w-full bg-rose-500" style={{ height: `${spentH}%` }} />}
-                  {totalH === 0 && <div className="w-full bg-zinc-100" style={{ height: "2px" }} />}
+      <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
+        {/* ── Left column ── */}
+        <div className="space-y-4 xl:col-span-2">
+          {/* Total Spend */}
+          <section>
+            <div className="flex items-center justify-between border-b border-zinc-100 px-5 py-3">
+              <div>
+                <div className="text-[13px] text-zinc-500">Total Spend</div>
+                <div className="mt-0.5 text-xl font-semibold tabular-nums text-zinc-900">
+                  {derived.hasSpend ? fmtUsd(derived.spent, 2) : "No data"}
                 </div>
               </div>
-            );
-          })}
-        </div>
-      </section>
-
-      <section className="rounded-xl border border-zinc-200 bg-white p-6">
-        <div className="flex items-center justify-between">
-          <div className={`${MONO} text-[10px] uppercase tracking-[0.25em] text-zinc-500`}>Activity log</div>
-          <div className="text-[11px] text-zinc-500">{data.ledger.length} entries · model + cost per row</div>
-        </div>
-        {data.ledger.length === 0 ? (
-          <p className="mt-6 text-center text-sm text-zinc-500">No activity yet.</p>
-        ) : (
-          <>
-            <div className="mt-4 max-h-[520px] overflow-y-auto divide-y divide-zinc-100 rounded-lg border border-zinc-200 [scrollbar-width:thin]">
-              {ledger.map((r) => {
-                const d = new Date(r.created_at);
-                const isSpend = r.delta < 0;
-                const model = r.model ?? null;
-                const stage = r.stage ?? null;
-                const toks = (r.prompt_tokens ?? 0) + (r.completion_tokens ?? 0);
-                return (
-                  <div key={r.id} className="flex flex-col gap-1 px-3 py-2.5 text-xs sm:flex-row sm:items-center sm:justify-between">
-                    <div className="flex min-w-0 flex-col gap-0.5">
-                      <div className="flex items-center gap-2">
-                        <span className={`${MONO} shrink-0 text-[10px] uppercase tracking-wider text-zinc-500 tabular-nums`}>
-                          {d.toLocaleDateString(undefined, { month: "short", day: "numeric" })} · {d.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" })}
-                        </span>
-                        <span className="text-zinc-800 font-medium">{label(r.reason)}</span>
-                        {stage && <span className="rounded bg-zinc-100 px-1.5 py-0.5 text-[9px] uppercase tracking-wider text-zinc-600">{stage}</span>}
-                      </div>
-                      {(model || toks > 0) && (
-                        <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 text-[10.5px] text-zinc-500">
-                          {model && <span className={`${MONO} truncate`}>{model}</span>}
-                          {toks > 0 && <span className="tabular-nums">{r.prompt_tokens ?? 0} in · {r.completion_tokens ?? 0} out</span>}
-                          {r.raw_cost_usd != null && <span className="tabular-nums">raw {fmtUsd(Number(r.raw_cost_usd))}</span>}
-                        </div>
-                      )}
-                    </div>
-                    <div className="flex items-center gap-3 tabular-nums">
-                      <span className={`font-semibold ${isSpend ? "text-rose-600" : "text-emerald-600"}`}>
-                        {isSpend ? "−" : "+"}{fmtUsd(Math.abs(r.delta))}
-                      </span>
-                      <span className="text-[10px] text-zinc-400">bal {fmtUsd(Number(r.balance_after), 2)}</span>
-                    </div>
-                  </div>
-                );
-              })}
+              <div className="flex items-center gap-3 text-[12px] text-zinc-500">
+                <span className="flex items-center gap-1.5"><span className="inline-block h-2 w-2 rounded-[2px] bg-zinc-800" /> Spent</span>
+                <span className="flex items-center gap-1.5"><span className="inline-block h-2 w-2 rounded-[2px] bg-emerald-400" /> Added</span>
+              </div>
             </div>
-            {data.ledger.length > 20 && (
-              <div className="mt-3 flex justify-center">
-                <button type="button" onClick={() => setShowAll((v) => !v)}
-                  className="text-xs font-medium text-zinc-700 hover:text-zinc-900">
-                  {showAll ? "Show less" : `Show more (${data.ledger.length - 20})`}
-                </button>
+            <div className="px-5 py-6">
+              {derived.hasSpend ? (
+                <div className="flex h-48 items-end gap-[3px]">
+                  {derived.days.map((d) => {
+                    const totalH = ((d.spent + d.earned) / maxDaily) * 100;
+                    const spentH = d.spent + d.earned > 0 ? (d.spent / (d.spent + d.earned)) * totalH : 0;
+                    const earnedH = totalH - spentH;
+                    return (
+                      <div key={d.date} className="group relative flex flex-1 flex-col items-center justify-end">
+                        <div className="pointer-events-none absolute -top-8 z-10 hidden whitespace-nowrap rounded bg-zinc-900 px-2 py-1 text-[10px] text-white group-hover:block">
+                          {new Date(d.date).toLocaleDateString(undefined, { month: "short", day: "numeric" })} · −{fmtUsd(d.spent)} / +{fmtUsd(d.earned)} · {d.requests} req
+                        </div>
+                        <div className="flex w-full flex-col justify-end" style={{ height: "100%" }}>
+                          {earnedH > 0 && <div className="w-full rounded-t-sm bg-emerald-400" style={{ height: `${earnedH}%` }} />}
+                          {spentH > 0 && <div className={`w-full bg-zinc-800 ${earnedH > 0 ? "" : "rounded-t-sm"}`} style={{ height: `${spentH}%` }} />}
+                          {totalH === 0 && <div className="w-full bg-zinc-100" style={{ height: "2px" }} />}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="flex h-48 flex-col items-center justify-center text-center">
+                  <span className="flex h-11 w-11 items-center justify-center rounded-lg bg-zinc-100 text-zinc-500">
+                    <ChartColumn className="h-5 w-5" />
+                  </span>
+                  <p className="mt-3 text-sm font-semibold text-zinc-900">No usage data</p>
+                  <p className="mt-1 max-w-xs text-[13px] text-zinc-500">
+                    Nothing recorded for {rangeLabel.toLowerCase()}{model !== "all" ? ` on ${model}` : ""}.
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* Tabs */}
+            <div className="flex items-center gap-5 border-b border-zinc-200 px-5 text-[13px]">
+              <TabButton active={tab === "categories"} onClick={() => setTab("categories")}>Spend categories</TabButton>
+              <TabButton active={tab === "models"} onClick={() => setTab("models")}>Models</TabButton>
+            </div>
+
+            {tab === "categories" ? (
+              <div className="grid grid-cols-1 gap-4 p-5 sm:grid-cols-2">
+                <CategoryCard
+                  title="AI scans"
+                  items={[
+                    { color: "bg-indigo-500", label: `${fmtInt(derived.spendRows.length)} requests` },
+                    { color: "bg-zinc-300", label: `${fmtInt(derived.inputTokens)} input tokens` },
+                    { color: "bg-zinc-300", label: `${fmtUsd(derived.spent, 2)} spent` },
+                  ]}
+                />
+                <CategoryCard
+                  title="Top-ups & bonuses"
+                  items={[
+                    { color: "bg-emerald-500", label: `${fmtInt(derived.earnRows.length)} credits` },
+                    { color: "bg-zinc-300", label: `${fmtUsd(derived.earned, 2)} added` },
+                  ]}
+                />
               </div>
+            ) : (
+              <ModelBreakdown rows={derived.spendRows} />
             )}
-          </>
-        )}
-      </section>
+          </section>
+        </div>
+
+        {/* ── Right column ── */}
+        <div className="space-y-4">
+          {/* Period spend */}
+          <section className="border-b border-zinc-200 px-1 pb-5">
+            <div className="text-[13px] text-zinc-500">
+              Monthly Wallet
+            </div>
+            <div className="mt-3 flex items-center justify-between text-[13px]">
+              <span className="text-zinc-600">Wallet</span>
+              <span className="tabular-nums text-zinc-800">{fmtUsd(remaining, 2)} / {fmtUsd(data.allowance, 2)}</span>
+            </div>
+            <div className="relative mt-2 h-2.5 w-full rounded-full bg-zinc-100">
+              <div className="h-full rounded-full bg-zinc-900 transition-all" style={{ width: `${pct}%` }} />
+            </div>
+            {daysLeft != null && (
+              <div className="mt-2 text-[11.5px] text-zinc-500">Resets in {daysLeft} day{daysLeft === 1 ? "" : "s"}</div>
+            )}
+          </section>
+
+          {/* Total tokens */}
+          <section className="border-b border-zinc-200 px-1 pb-5">
+            <div className="text-[13px] text-zinc-500">Total tokens</div>
+            <div className="mt-0.5 text-xl font-semibold tabular-nums text-zinc-900">{fmtInt(derived.totalTokens)}</div>
+            <div className="mt-4">
+              <MiniLine data={derived.tokenSeries} color="#e11d63" filled={derived.totalTokens > 0} />
+            </div>
+          </section>
+
+          {/* Total requests */}
+          <section className="border-b border-zinc-200 px-1 pb-5">
+            <div className="text-[13px] text-zinc-500">Total requests</div>
+            <div className="mt-0.5 text-xl font-semibold tabular-nums text-zinc-900">{fmtInt(derived.spendRows.length)}</div>
+            <div className="mt-4">
+              <MiniLine data={derived.requestSeries} color="#a1a1aa" filled={derived.spendRows.length > 0} dashed />
+            </div>
+          </section>
+
+          {/* Breakdown tabs */}
+          <section>
+            <div className="flex items-center gap-5 border-b border-zinc-200 px-5 text-[13px]">
+              <TabButton active={rightTab === "types"} onClick={() => setRightTab("types")}>Request types</TabButton>
+              <TabButton active={rightTab === "activity"} onClick={() => setRightTab("activity")}>Activity</TabButton>
+            </div>
+            <div className="p-5">
+              {rightTab === "types" ? (
+                <TypeBreakdown rows={derived.spendRows} />
+              ) : derived.rows.length === 0 ? (
+                <p className="py-8 text-center text-[13px] text-zinc-500">
+                  There is no activity for this range.
+                </p>
+              ) : (
+                <div className="max-h-64 space-y-2 overflow-y-auto [scrollbar-width:thin]">
+                  {derived.rows.slice(0, 30).map((r) => {
+                    const d = new Date(r.created_at);
+                    const isSpend = r.delta < 0;
+                    return (
+                      <div key={r.id} className="flex items-center justify-between gap-2 text-[12px]">
+                        <div className="min-w-0">
+                          <div className="truncate font-medium text-zinc-800">{label(r.reason)}</div>
+                          <div className="text-[10.5px] tabular-nums text-zinc-400">
+                            {d.toLocaleDateString(undefined, { month: "short", day: "numeric" })} · {d.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" })}
+                            {r.model ? ` · ${r.model}` : ""}
+                          </div>
+                        </div>
+                        <span className={`shrink-0 font-semibold tabular-nums ${isSpend ? "text-rose-600" : "text-emerald-600"}`}>
+                          {isSpend ? "−" : "+"}{fmtUsd(Math.abs(r.delta))}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </section>
+        </div>
+      </div>
     </div>
   );
 }
 
-function StatCard({ label, value, sub, accent }: {
-  label: string; value: React.ReactNode; sub?: string;
-  accent: "emerald" | "rose" | "blue" | "zinc";
+
+function Dropdown({
+  open, onToggle, trigger, icon, options, value, onSelect,
+}: {
+  open: boolean;
+  onToggle: () => void;
+  trigger: string;
+  icon?: React.ReactNode;
+  options: { value: string; label: string }[];
+  value: string;
+  onSelect: (v: string) => void;
 }) {
-  const dot = { emerald: "bg-emerald-500", rose: "bg-rose-500", blue: "bg-blue-500", zinc: "bg-zinc-400" }[accent];
   return (
-    <div className="rounded-xl border border-zinc-200 bg-white p-4">
-      <div className="flex items-center gap-2">
-        <span className={`inline-block h-1.5 w-1.5 rounded-full ${dot}`} />
-        <span className={`${MONO} text-[10px] uppercase tracking-[0.2em] text-zinc-500`}>{label}</span>
-      </div>
-      <div className="mt-2 text-2xl font-semibold tabular-nums text-zinc-900">{value}</div>
-      {sub && <div className="mt-0.5 text-[11px] text-zinc-500">{sub}</div>}
+    <div className="relative">
+      <button
+        type="button"
+        onClick={onToggle}
+        className="flex max-w-[190px] items-center gap-1.5 rounded-full border border-zinc-200 bg-white px-3 py-1.5 text-[13px] font-medium text-zinc-700 transition hover:bg-zinc-50"
+      >
+        {icon}
+        <span className="truncate">{trigger}</span>
+        <ChevronDown className="h-3.5 w-3.5 shrink-0 text-zinc-500" />
+      </button>
+      {open && (
+        <div className="absolute right-0 z-20 mt-1 max-h-64 w-56 overflow-y-auto rounded-lg border border-zinc-200 bg-white p-1 shadow-lg">
+          {options.map((o) => (
+            <button
+              key={o.value}
+              type="button"
+              onClick={() => onSelect(o.value)}
+              className={`block w-full truncate rounded-md px-2.5 py-1.5 text-left text-[13px] transition hover:bg-zinc-100 ${
+                o.value === value ? "font-semibold text-zinc-900" : "text-zinc-600"
+              }`}
+            >
+              {o.label}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
+  );
+}
+
+function TabButton({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`-mb-px border-b-2 border-transparent py-2.5 font-medium transition ${
+        active ? "text-zinc-900" : "text-zinc-500 hover:text-zinc-700"
+      }`}
+    >
+      {children}
+    </button>
+  );
+}
+
+function CategoryCard({ title, items }: { title: string; items: { color: string; label: string }[] }) {
+  return (
+    <div className="py-2">
+      <div className="flex items-center gap-1 text-[13px] font-medium text-zinc-800">
+        {title} <ChevronRight className="h-3.5 w-3.5 text-zinc-400" />
+      </div>
+      <div className="mt-3 space-y-1.5">
+        {items.map((it) => (
+          <div key={it.label} className="flex items-center gap-2 text-[12px] text-zinc-500">
+            <span className={`inline-block h-2 w-2 rounded-[2px] ${it.color}`} />
+            {it.label}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function ModelBreakdown({ rows }: { rows: { model?: string | null; prompt_tokens?: number | null; completion_tokens?: number | null; raw_cost_usd?: number | null; delta: number }[] }) {
+  const byModel = new Map<string, { requests: number; tokens: number; cost: number }>();
+  for (const r of rows) {
+    const key = r.model ?? "unknown";
+    const cur = byModel.get(key) ?? { requests: 0, tokens: 0, cost: 0 };
+    cur.requests += 1;
+    cur.tokens += (r.prompt_tokens ?? 0) + (r.completion_tokens ?? 0);
+    cur.cost += r.raw_cost_usd != null ? Number(r.raw_cost_usd) : Math.abs(r.delta);
+    byModel.set(key, cur);
+  }
+  const list = [...byModel.entries()].sort((a, b) => b[1].cost - a[1].cost);
+  if (list.length === 0) {
+    return <p className="p-5 text-center text-[13px] text-zinc-500">There is no usage data for this period and group.</p>;
+  }
+  return (
+    <div className="divide-y divide-zinc-100">
+      {list.map(([model, s]) => (
+        <div key={model} className="flex items-center justify-between gap-3 px-5 py-3 text-[13px]">
+          <span className="truncate font-mono text-[12px] text-zinc-700">{model}</span>
+          <div className="flex shrink-0 items-center gap-4 tabular-nums text-[12px] text-zinc-500">
+            <span>{fmtInt(s.requests)} requests</span>
+            <span>{fmtInt(s.tokens)} tokens</span>
+            <span className="font-semibold text-zinc-800">{fmtUsd(s.cost, 2)}</span>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function TypeBreakdown({ rows }: { rows: { reason: string; delta: number }[] }) {
+  const byType = new Map<string, { count: number; cost: number }>();
+  for (const r of rows) {
+    const key = label(r.reason);
+    const cur = byType.get(key) ?? { count: 0, cost: 0 };
+    cur.count += 1;
+    cur.cost += Math.abs(r.delta);
+    byType.set(key, cur);
+  }
+  const list = [...byType.entries()].sort((a, b) => b[1].cost - a[1].cost);
+  if (list.length === 0) {
+    return <p className="py-8 text-center text-[13px] text-zinc-500">There is no usage data for this period and group.</p>;
+  }
+  const max = Math.max(...list.map(([, s]) => s.cost), 0.0001);
+  return (
+    <div className="space-y-3">
+      {list.map(([name, s]) => (
+        <div key={name}>
+          <div className="flex items-center justify-between text-[12px]">
+            <span className="font-medium text-zinc-700">{name}</span>
+            <span className="tabular-nums text-zinc-500">{fmtInt(s.count)} · {fmtUsd(s.cost, 2)}</span>
+          </div>
+          <div className="mt-1 h-1.5 w-full rounded-full bg-zinc-100">
+            <div className="h-full rounded-full bg-zinc-800" style={{ width: `${(s.cost / max) * 100}%` }} />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function MiniLine({ data, color, filled, dashed }: { data: number[]; color: string; filled: boolean; dashed?: boolean }) {
+  const W = 260;
+  const H = 44;
+  const n = Math.max(data.length, 2);
+  const max = Math.max(...data, 1);
+  const pts = Array.from({ length: n }, (_, i) => {
+    const x = (i / (n - 1)) * W;
+    const y = H - 4 - ((data[i] ?? 0) / max) * (H - 10);
+    return [x, y] as const;
+  });
+  const dPath = pts.map(([x, y], i) => `${i === 0 ? "M" : "L"}${x.toFixed(1)} ${y.toFixed(1)}`).join(" ");
+  const last = pts[pts.length - 1];
+  if (!filled) {
+    // dashed empty baseline, like the reference
+    const segs = 7;
+    return (
+      <svg viewBox={`0 0 ${W} ${H}`} className="w-full" preserveAspectRatio="none" style={{ height: H }}>
+        {Array.from({ length: segs }, (_, i) => {
+          const x0 = (i / segs) * W + 2;
+          const x1 = ((i + 1) / segs) * W - 6;
+          return <line key={i} x1={x0} y1={H - 4} x2={x1} y2={H - 4} stroke={color} strokeWidth={1.5} />;
+        })}
+      </svg>
+    );
+  }
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} className="w-full" preserveAspectRatio="none" style={{ height: H }}>
+      <path d={dPath} fill="none" stroke={color} strokeWidth={1.5} strokeDasharray={dashed ? "5 4" : undefined} strokeLinecap="round" />
+      <circle cx={last[0]} cy={last[1]} r={3.5} fill="white" stroke={color} strokeWidth={1.5} />
+    </svg>
   );
 }
