@@ -676,16 +676,16 @@ function HomePage() {
                 className={`pointer-events-none absolute hidden h-14 w-14 items-center justify-center rounded-sm border border-primary-foreground/60 sm:flex ${cls}`}
                 style={{ animation: `cfhero-float 7s ease-in-out ${delay} infinite` }}
               >
-                <Icon className="h-5 w-5 text-primary-foreground" strokeWidth={1.75} />
+                <Icon className="h-5 w-5 text-home-accent-foreground" strokeWidth={1.75} />
               </div>
             ))}
 
             {/* content */}
             <div className="relative z-10 mx-auto max-w-3xl px-6 pb-24 pt-24 text-center sm:px-10 sm:pt-24">
-              <h2 className="text-3xl font-semibold leading-[1.08] text-primary-foreground sm:text-4xl md:text-[42px]">
+              <h2 className="text-3xl font-semibold leading-[1.08] text-home-accent-foreground sm:text-4xl md:text-[42px]">
                 Build without boundaries
               </h2>
-              <p className="mx-auto mt-6 max-w-xl text-sm leading-snug text-primary-foreground/95">
+              <p className="mx-auto mt-6 max-w-xl text-sm leading-snug text-home-accent-foreground">
                 Your voice agent is one tap away — listening, reasoning, research
                 <br className="hidden sm:block" />{" "}
                 &amp; narrating. Speak to the market now, no credit card required.
@@ -699,7 +699,7 @@ function HomePage() {
                 </Link>
                 <Link
                   to="/pricing"
-                  className="inline-flex h-10 items-center justify-center rounded-full border border-primary-foreground/20 bg-primary-foreground/15 px-6 text-sm font-semibold text-primary-foreground backdrop-blur transition hover:bg-primary-foreground/25"
+                  className="inline-flex h-10 items-center justify-center rounded-full border border-primary-foreground/20 bg-primary-foreground/15 px-6 text-sm font-semibold text-home-accent-foreground backdrop-blur transition hover:bg-primary-foreground/25"
                 >
                   View Pricing
                 </Link>
@@ -710,7 +710,7 @@ function HomePage() {
             <div className="absolute inset-x-0 bottom-0 z-10 overflow-hidden border-t border-primary-foreground/25 bg-foreground/10 py-3">
               <div className="flex w-max items-center gap-10 whitespace-nowrap" style={{ animation: "jenvu-marquee 28s linear infinite" }}>
                 {Array.from({ length: 2 }).map((_, dup) => (
-                  <div key={dup} className="flex items-center gap-10 pr-10 text-xs font-medium text-primary-foreground">
+                  <div key={dup} className="flex items-center gap-10 pr-10 text-xs font-medium text-home-accent-foreground">
                     <span>◈ Voice agent listening &amp; narrating the market 24/7</span>
                     <span>◉ Real-time gold signals without surprises</span>
                     <span>⌁ Research, reasoning &amp; risk context in one terminal</span>

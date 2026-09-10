@@ -7,24 +7,24 @@ export default function CloudflareHero() {
         <div className="hero-dot-field pointer-events-none absolute inset-0" />
         <div className="hero-bottom-glow pointer-events-none absolute inset-x-0 bottom-0 h-2/3" />
 
-        <div className="relative z-10 m-auto w-full max-w-[760px] text-center text-primary-foreground">
-          <div className="mx-auto inline-flex max-w-full flex-wrap items-center justify-center gap-1.5 rounded-md border border-primary-foreground/50 px-3 py-2 text-[10px] leading-none text-primary-foreground sm:text-[11px]">
+        <div className="relative z-10 m-auto w-full max-w-[760px] text-center text-home-accent-foreground">
+          <div className="mx-auto inline-flex max-w-full flex-wrap items-center justify-center gap-1.5 rounded-md border border-primary-foreground/50 px-3 py-2 text-[10px] leading-none text-home-accent-foreground sm:text-[11px]">
             <span className="font-medium">Jenvu 2026</span>
-            <span className="text-primary-foreground/60">·</span>
+            <span className="text-home-accent-foreground">·</span>
             <span>The Agentic Trading Network of the Year</span>
-            <span className="text-primary-foreground/60">·</span>
+            <span className="text-home-accent-foreground">·</span>
             <span>Live 24/7</span>
-            <span className="text-primary-foreground/60">·</span>
+            <span className="text-home-accent-foreground">·</span>
             <Link to="/founding" className="font-medium underline underline-offset-2">
               Register
             </Link>
           </div>
 
-          <h1 className="mx-auto mt-8 max-w-[740px] text-[36px] font-semibold leading-[0.98] tracking-normal text-primary-foreground sm:text-[44px] md:text-[48px]">
+          <h1 className="mx-auto mt-8 max-w-[740px] text-[36px] font-semibold leading-[0.98] tracking-normal text-home-accent-foreground sm:text-[44px] md:text-[48px]">
             Everything we learned from powering gold trading—yours by default
           </h1>
 
-          <p className="mx-auto mt-8 max-w-xl text-[13px] leading-[1.25] text-primary-foreground sm:text-sm">
+          <p className="mx-auto mt-8 max-w-xl text-[13px] leading-[1.25] text-home-accent-foreground sm:text-sm">
             One platform for your signals, voice agent, and trading desk.
             <br />
             Deploy, analyze, and scale without managing infrastructure.
