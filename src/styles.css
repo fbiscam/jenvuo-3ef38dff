@@ -96,6 +96,8 @@
   --color-brand-claude: var(--brand-claude);
   --color-home-accent: var(--home-accent);
   --color-home-accent-soft: var(--home-accent-soft);
+  --color-auth-action: var(--auth-action);
+  --color-auth-action-foreground: var(--auth-action-foreground);
 }
 
 :root {
@@ -144,6 +146,8 @@
   --home-accent: #fd540f;
   --home-accent-soft: oklch(0.95 0.04 60);
   --home-accent-canvas: rgb(255 244 237);
+  --auth-action: oklch(0.72 0.14 255);
+  --auth-action-foreground: oklch(1 0 0);
 }
 
 .dark {
@@ -186,6 +190,8 @@
   --home-accent: #fd540f;
   --home-accent-soft: oklch(0.32 0.10 55);
   --home-accent-canvas: rgb(45 24 12);
+  --auth-action: oklch(0.72 0.14 255);
+  --auth-action-foreground: oklch(1 0 0);
 }
 
 
