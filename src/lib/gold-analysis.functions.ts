@@ -2941,7 +2941,12 @@ ENGINE GRADE ${setupGrade} (${setupScore}/100) | breakers ${breakers.length} | i
     let __requiresSeniorReview = false;
     let __seniorReviewStatus: "not_required" | "completed" | "confirmed" | "downgraded" | "vetoed" | "failed" = "not_required";
     let __seniorReviewError: string | null = null;
-    if (billing?.systemScan) {
+    if (billing?.extensionBilling) {
+      // Every paid extension analysis includes the independent senior desk pass,
+      // including WAIT outcomes, so billing and review quality stay consistent.
+      __planAllowsSenior = true;
+      __planId = "extension";
+    } else if (billing?.systemScan) {
       // Auto-scan / broadcast worker runs with no user context, but a signal
       // that goes out to every subscriber MUST pass the senior review gate.
       __planAllowsSenior = true;
@@ -2955,18 +2960,18 @@ ENGINE GRADE ${setupGrade} (${setupScore}/100) | breakers ${breakers.length} | i
           .eq("user_id", __userId)
           .maybeSingle();
         const pid = (sub?.plan_id as string | undefined) ?? "free";
-        __planId = sub?.status === "active" ? pid : "free";
-        __planAllowsSenior = sub?.status === "active" && pid !== "free";
+        const subscriptionActive = sub?.status === "active" || sub?.status === "trialing";
+        __planId = subscriptionActive ? pid : "free";
+        __planAllowsSenior = subscriptionActive && pid !== "free";
       } catch { __planAllowsSenior = false; __planId = "free"; }
     }
     // Senior review re-enabled: acts as a 25-year veteran veto/downgrade layer.
     // Runs whenever the rules engine produces a live BUY/SELL and the score
     // is above SENIOR_REVIEW_MIN_RULE_SCORE (62). Failure soft-fails — the
     // rules result still stands so a throttled AI provider never drops a signal.
-    __requiresSeniorReview =
-      __planAllowsSenior &&
-      built.direction !== "WAIT" &&
-      setupScore >= SENIOR_REVIEW_MIN_RULE_SCORE;
+    __requiresSeniorReview = billing?.extensionBilling
+      ? __planAllowsSenior
+      : __planAllowsSenior && built.direction !== "WAIT" && setupScore >= SENIOR_REVIEW_MIN_RULE_SCORE;
 
     if (__requiresSeniorReview) {
       try {
