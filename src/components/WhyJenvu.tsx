@@ -115,9 +115,6 @@ export function WhyJenvu() {
             </span>
           </div>
 
-          <p className="text-[11px] uppercase tracking-[0.18em] text-white/75">
-            One voice loop — bias, levels, and plan for XAU/USD
-          </p>
         </div>
       </div>
     </div>
