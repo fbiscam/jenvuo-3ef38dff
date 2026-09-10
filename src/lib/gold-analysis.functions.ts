@@ -2328,6 +2328,8 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
     let __usedSeniorModel: string | null = null;
     let __totalPromptTokens = 0;
     let __totalCompletionTokens = 0;
+    let __seniorPromptTokens = 0;
+    let __seniorCompletionTokens = 0;
     // The deterministic engine remains the authority for direction and levels,
     // while a real AI pass reads the current candles for narration and an
     // independent confidence input. Provider failure soft-fails to the engine.
@@ -3040,8 +3042,10 @@ Run the full 25-year desk-head review internally through the elite lens above, t
         } else {
           const mdl = reviewResult.model;
           __usedSeniorModel = mdl;
-          __totalPromptTokens += reviewResult.usage?.promptTokens ?? 0;
-          __totalCompletionTokens += reviewResult.usage?.completionTokens ?? 0;
+          __seniorPromptTokens = reviewResult.usage?.promptTokens ?? 0;
+          __seniorCompletionTokens = reviewResult.usage?.completionTokens ?? 0;
+          __totalPromptTokens += __seniorPromptTokens;
+          __totalCompletionTokens += __seniorCompletionTokens;
           const uCap = reviewResult.usage;
           import("@/lib/ai-cost-log.server")
             .then((m) => m.logAiCost({ userId: __userId, stage: "senior-review", model: mdl, usage: uCap }))
@@ -3785,8 +3789,8 @@ IMMINENT HIGH-IMPACT: ${imminentHigh ? `${imminentHigh.title} in ${Math.round(im
     const __scanId = billing?.scanId ?? ((globalThis as any).crypto?.randomUUID?.() ?? `scan_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`);
     if (billing?.extensionBilling) {
       const calls = [
-        ...(__usedNarrationModel ? [{ model: __usedNarrationModel, usage: { promptTokens: __totalPromptTokens, completionTokens: __totalCompletionTokens }, stage: "extension-full-analysis" }] : []),
-        ...(__usedSeniorModel ? [{ model: __usedSeniorModel, usage: { promptTokens: 0, completionTokens: 0 }, stage: "extension-senior-review" }] : []),
+        ...(__usedNarrationModel ? [{ model: __usedNarrationModel, usage: { promptTokens: Math.max(0, __totalPromptTokens - __seniorPromptTokens), completionTokens: Math.max(0, __totalCompletionTokens - __seniorCompletionTokens) }, stage: "extension-full-analysis" }] : []),
+        ...(__usedSeniorModel ? [{ model: __usedSeniorModel, usage: { promptTokens: __seniorPromptTokens, completionTokens: __seniorCompletionTokens }, stage: "extension-senior-review" }] : []),
       ];
       if (calls.length < 2) throw new Error("Extension analysis requires a completed primary and senior AI review.");
       const { chargeExtensionUsage } = await import("@/lib/extension-billing.server");

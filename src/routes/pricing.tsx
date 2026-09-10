@@ -23,9 +23,9 @@ export const Route = createFileRoute("/pricing")({
   head: () => ({
     meta: [
       { title: "Pricing Plans — Jenvu" },
-      { name: "description", content: "Every plan includes the full platform — voice agent, A+ signals, ICT & SMC narration, trade journal, and realtime alerts. Invite-only." },
+      { name: "description", content: "Compare Jenvu plans, extension API key limits, monthly AI wallets, and senior-reviewed GPT/Gemini market analysis." },
       { property: "og:title", content: "Jenvu Pricing — Pro & Elite Plans" },
-      { property: "og:description", content: "Realtime A+ gold setups, voice intelligence, and trade journal — Pro $15/mo, Elite $50/mo." },
+      { property: "og:description", content: "Compare Jenvu plans with extension API keys, AI wallets, and senior-reviewed GPT/Gemini market analysis." },
       { property: "og:url", content: "https://jenvu.com/pricing" },
     ],
     links: [{ rel: "canonical", href: "https://jenvu.com/pricing" }],
