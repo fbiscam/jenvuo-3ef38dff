@@ -440,7 +440,7 @@ function SubscribeForm() {
       <button
         type="submit"
         disabled={busy}
-        className="bg-zinc-900 text-white px-6 py-3 rounded-xl text-sm font-bold hover:bg-zinc-800 transition-colors whitespace-nowrap disabled:opacity-60"
+        className="border border-zinc-200 bg-white px-6 py-3 text-sm font-bold text-zinc-950 hover:bg-zinc-100 transition-colors whitespace-nowrap disabled:opacity-60 rounded-xl"
       >
         {busy ? "…" : "SUBSCRIBE"}
       </button>
