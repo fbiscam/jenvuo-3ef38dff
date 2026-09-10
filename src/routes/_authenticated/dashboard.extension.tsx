@@ -38,6 +38,7 @@ function ExtensionPage() {
   const [copied, setCopied] = useState<string | null>(null);
   const [origin, setOrigin] = useState("https://jenvu.com");
   const [downloading, setDownloading] = useState(false);
+  const [view, setView] = useState<"keys" | "extension">("keys");
 
   useEffect(() => {
     if (typeof window !== "undefined") setOrigin(window.location.origin);
@@ -118,7 +119,7 @@ function ExtensionPage() {
   const activeKeys = keys.filter((k) => !k.revoked_at);
 
   return (
-    <div className="rounded-xl border border-zinc-200 bg-white px-6 py-6 sm:px-10 sm:py-8">
+    <div className="w-full px-1 py-2 sm:px-2 sm:py-4">
       {/* Header row */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-[26px] font-normal tracking-tight text-zinc-900">API Keys</h1>
@@ -143,10 +144,20 @@ function ExtensionPage() {
         <div className="flex items-center gap-2">
           <span className="text-[13px] text-zinc-500">Group by</span>
           <div className="flex items-center gap-1 rounded-full bg-zinc-100 p-0.5">
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1.5 text-[13px] text-zinc-900 shadow-sm">
-              <span className="h-1.5 w-1.5 rounded-full bg-zinc-900" /> API Key
-            </span>
-            <span className="rounded-full px-3 py-1.5 text-[13px] text-zinc-600">Extension</span>
+            <button
+              type="button"
+              onClick={() => setView("keys")}
+              className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[13px] ${view === "keys" ? "bg-white text-zinc-900 shadow-sm" : "text-zinc-600 hover:text-zinc-900"}`}
+            >
+              {view === "keys" && <span className="h-1.5 w-1.5 rounded-full bg-zinc-900" />} API Key
+            </button>
+            <button
+              type="button"
+              onClick={() => setView("extension")}
+              className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[13px] ${view === "extension" ? "bg-white text-zinc-900 shadow-sm" : "text-zinc-600 hover:text-zinc-900"}`}
+            >
+              {view === "extension" && <span className="h-1.5 w-1.5 rounded-full bg-zinc-900" />} Extension
+            </button>
           </div>
         </div>
         <button
@@ -174,8 +185,8 @@ function ExtensionPage() {
         </div>
       )}
 
-      {/* Table */}
-      <div className="mt-5">
+      {/* API key list */}
+      {view === "keys" && <div className="mt-5">
         <div className="grid grid-cols-[1.4fr_1.6fr_1fr_1fr_auto] items-center gap-4 border-b border-zinc-200 pb-3 text-[13px] text-zinc-700">
           <div>Key</div>
           <div>Extension</div>
@@ -257,7 +268,39 @@ function ExtensionPage() {
         {!loading && keys.length > 0 && (
           <div className="mt-3 text-[12px] text-zinc-500">{activeKeys.length} active key(s) · maximum 5.</div>
         )}
-      </div>
+      </div>}
+
+      {/* Extension releases */}
+      {view === "extension" && (
+        <div className="mt-5">
+          <div className="grid grid-cols-[minmax(0,1.8fr)_0.8fr_0.8fr_auto] items-center gap-4 border-b border-zinc-200 pb-3 text-[13px] text-zinc-700">
+            <div>Extension</div>
+            <div>Version</div>
+            <div>Release</div>
+            <div className="w-40" />
+          </div>
+          <div className="grid grid-cols-[minmax(0,1.8fr)_0.8fr_0.8fr_auto] items-center gap-4 border-b border-zinc-100 py-5">
+            <div className="min-w-0">
+              <div className="truncate text-[14px] font-medium text-zinc-900">Jenvu — ICT/SMC Gold Analyst</div>
+              <div className="mt-1 text-[12px] text-zinc-500">Chrome extension for live XAU/USD analysis</div>
+            </div>
+            <div className="flex items-center gap-2 text-[13px] text-zinc-800">
+              <span className={MONO}>v1.8.1</span>
+              <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-medium text-emerald-700">Latest</span>
+            </div>
+            <div className="text-[13px] text-zinc-600">Current</div>
+            <button
+              type="button"
+              onClick={onDownload}
+              disabled={downloading}
+              className="inline-flex w-40 items-center justify-center gap-2 rounded-lg border border-zinc-300 px-3 py-2 text-[13px] font-medium text-zinc-900 hover:bg-zinc-50 disabled:opacity-60"
+            >
+              <Download className="h-4 w-4" /> {downloading ? "Preparing…" : "Download latest"}
+            </button>
+          </div>
+          <p className="mt-4 text-[12px] text-zinc-500">ZIP package · Chrome developer mode · Version 1.8.1</p>
+        </div>
+      )}
 
       {/* Quickstart drawer */}
       {showGuide && (
