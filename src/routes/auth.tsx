@@ -18,8 +18,10 @@ import { applyReferralCode } from "@/lib/referrals.functions";
 import { registerTrustedDevice, verifyTrustedDevice } from "@/lib/trusted-devices.functions";
 import { sendWelcomeEmail } from "@/lib/email/welcome.functions";
 import { createUserNotification } from "@/lib/notifications.functions";
+import { Button } from "@/components/ui/button";
 
 const TRUSTED_DEVICE_KEY = (uid: string) => `mfa_trusted_device:${uid}`;
+const SAVED_LOGIN_EMAIL_KEY = "jenvu_saved_login_email";
 
 async function waitForMfaElevation(): Promise<boolean> {
   for (let i = 0; i < 10; i += 1) {
@@ -123,6 +125,7 @@ function AuthPage() {
   const [fullName, setFullName] = React.useState("");
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
+  const [rememberLogin, setRememberLogin] = React.useState(true);
   const [loading, setLoading] = React.useState(false);
   const [errorMsg, setErrorMsg] = React.useState<string | null>(null);
   const [emailChangedBanner, setEmailChangedBanner] = React.useState<string | null>(null);
@@ -150,6 +153,11 @@ function AuthPage() {
   const [newPassword, setNewPassword] = React.useState("");
   const [showPassword, setShowPassword] = React.useState(false);
   const [showNewPassword, setShowNewPassword] = React.useState(false);
+
+  React.useEffect(() => {
+    const savedEmail = window.localStorage.getItem(SAVED_LOGIN_EMAIL_KEY);
+    if (savedEmail) setEmail(savedEmail);
+  }, []);
 
   const recoveryModeRef = React.useRef(false);
   const lastSubmittedOtpRef = React.useRef<string>("");
@@ -436,6 +444,11 @@ function AuthPage() {
       }
       setErrorMsg(msg);
       return;
+    }
+    if (rememberLogin) {
+      window.localStorage.setItem(SAVED_LOGIN_EMAIL_KEY, parsed.data.email);
+    } else {
+      window.localStorage.removeItem(SAVED_LOGIN_EMAIL_KEY);
     }
     // Do NOT navigate here — the onAuthStateChange listener above will
     // check MFA level and either open the MFA challenge or navigate.
@@ -812,7 +825,7 @@ function AuthPage() {
         </div>
 
         <div className="flex flex-1 items-start justify-center px-6 pb-16 pt-10 sm:pt-14">
-          <div className="w-full max-w-[340px]">
+          <div className="w-full max-w-[354px]">
             <h1 className="text-center text-[26px] font-semibold tracking-tight text-zinc-900">
               {mfaChallenge
                 ? "Two-factor authentication"
@@ -1305,55 +1318,53 @@ function AuthPage() {
                     )
                   ) : (
                     <>
-                      <form onSubmit={signIn} className="mt-4 space-y-3">
+                      <form onSubmit={signIn} className="mt-4 space-y-4">
                         <div>
-                          <label className={`block text-[11px] font-bold uppercase tracking-widest text-zinc-500 mb-1 ${MONO}`}>
-                            User Identification
+                          <label htmlFor="signin-email" className="mb-2 block text-[14px] font-medium text-zinc-900">
+                            Email
                           </label>
-                          <div className="relative">
-                            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
-                            <input
-                              type="email"
-                              required
-                              value={email}
-                              onChange={(e) => setEmail(e.target.value)}
-                              className="w-full rounded-xl border border-zinc-200 bg-white pl-11 pr-4 py-2.5 text-sm text-zinc-900 outline-none focus:border-zinc-900 transition placeholder:text-zinc-300"
-                              placeholder="Institutional email..."
-                            />
-                          </div>
+                          <input
+                            type="email"
+                            id="signin-email"
+                            required
+                            autoComplete="username"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            className="h-[43px] w-full rounded-lg border border-zinc-200 bg-white px-3 text-sm text-zinc-900 outline-none transition focus:border-auth-action focus:ring-1 focus:ring-auth-action"
+                          />
                           {flashInline("email")}
                         </div>
 
                         <div>
-                          <label className={`block text-[11px] font-bold uppercase tracking-widest text-zinc-500 mb-1 ${MONO}`}>
-                            Access Key
+                          <label htmlFor="signin-password" className="mb-2 block text-[14px] font-medium text-zinc-900">
+                            Password
                           </label>
                           <div className="relative">
-                            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
                             <input
                               type={showPassword ? "text" : "password"}
+                              id="signin-password"
                               required
+                              autoComplete="current-password"
                               value={password}
                               onChange={(e) => setPassword(e.target.value)}
-                              className="w-full rounded-xl border border-zinc-200 bg-white pl-11 pr-11 py-2.5 text-sm text-zinc-900 outline-none focus:border-zinc-900 transition placeholder:text-zinc-300"
-                              placeholder="Enter password..."
+                              className="h-[43px] w-full rounded-lg border border-zinc-200 bg-white px-3 pr-12 text-sm text-zinc-900 outline-none transition focus:border-auth-action focus:ring-1 focus:ring-auth-action"
                             />
-                            <button type="button" onClick={() => setShowPassword((v) => !v)} aria-label={showPassword ? "Hide password" : "Show password"} className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-700">
-                              {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                            </button>
+                            <Button type="button" variant="ghost" size="icon" onClick={() => setShowPassword((v) => !v)} aria-label={showPassword ? "Hide password" : "Show password"} className="absolute right-1 top-1/2 -translate-y-1/2 text-zinc-700 hover:bg-transparent hover:text-zinc-900">
+                              {showPassword ? <EyeOff className="h-[18px] w-[18px]" /> : <Eye className="h-[18px] w-[18px]" />}
+                            </Button>
                           </div>
                           {flashInline("password")}
                         </div>
 
-                        <div className="flex justify-end -mt-1">
-                          <button
-                            type="button"
-                            onClick={() => { setMode("forgot"); setForgotStep("email"); setErrorMsg(null); setOtpCode(""); }}
-                            className={`text-[11px] uppercase tracking-widest text-zinc-500 hover:text-zinc-900 transition ${MONO}`}
-                          >
-                            Forgot password?
-                          </button>
-                        </div>
+                        <label className="flex cursor-pointer select-none items-center gap-2 pt-3 text-[14px] text-zinc-900">
+                          <input
+                            type="checkbox"
+                            checked={rememberLogin}
+                            onChange={(event) => setRememberLogin(event.target.checked)}
+                            className="h-[18px] w-[18px] rounded border-zinc-300 accent-zinc-900"
+                          />
+                          <span>Save email and login method on this device</span>
+                        </label>
 
 
                         {errorMsg && (
@@ -1363,15 +1374,15 @@ function AuthPage() {
                           </div>
                         )}
 
-                        <button
+                        <Button
                           type="submit"
                           disabled={loading}
-                          className="group w-full rounded-lg bg-zinc-900 px-5 py-3 text-sm font-medium text-white hover:bg-zinc-800 transition inline-flex items-center justify-center gap-2 disabled:opacity-60"
+                          className="group h-[43px] w-full rounded-lg bg-auth-action px-5 text-sm font-semibold text-auth-action-foreground shadow-none transition hover:bg-auth-action/90"
                         >
                           {loading
-                            ? btnLoading("Authenticating...")
-                            : (<>Authenticate <ArrowRight className={`w-4 h-4 group-hover:translate-x-0.5 transition ${MONO}`} /></>)}
-                        </button>
+                            ? btnLoading("Signing in...")
+                            : "Sign in"}
+                        </Button>
                       </form>
 
                     </>
