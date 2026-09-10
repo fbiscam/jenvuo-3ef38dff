@@ -681,16 +681,16 @@ function HomePage() {
             ))}
 
             {/* content */}
-            <div className="relative z-10 mx-auto max-w-3xl px-6 pb-24 pt-24 text-center sm:px-10 sm:pt-24">
-              <h2 className="text-3xl font-semibold leading-[1.08] text-home-accent-foreground sm:text-4xl md:text-[42px]">
+            <div className="relative z-10 mx-auto max-w-3xl px-5 pb-24 pt-16 text-center sm:px-10 sm:pt-24">
+              <h2 className="mx-auto max-w-[330px] text-[30px] font-semibold leading-[1.08] text-home-accent-foreground sm:max-w-none sm:text-4xl md:text-[42px]">
                 Build without boundaries
               </h2>
-              <p className="mx-auto mt-6 max-w-xl text-sm leading-snug text-home-accent-foreground">
+              <p className="mx-auto mt-6 max-w-[320px] text-[13px] leading-[1.45] text-home-accent-foreground sm:max-w-xl sm:text-sm sm:leading-snug">
                 Your voice agent is one tap away — listening, reasoning, research
                 <br className="hidden sm:block" />{" "}
                 &amp; narrating. Speak to the market now, no credit card required.
               </p>
-              <div className="mt-8 flex flex-col items-center justify-center gap-2 sm:flex-row">
+              <div className="mx-auto mt-8 flex w-full max-w-[300px] flex-col items-stretch justify-center gap-2 sm:max-w-none sm:flex-row sm:items-center">
                 <Link
                   to="/dashboard"
                   className="inline-flex h-10 items-center justify-center rounded-full bg-background px-6 text-sm font-semibold text-foreground shadow-sm transition hover:bg-muted"
@@ -705,6 +705,7 @@ function HomePage() {
                 </Link>
               </div>
             </div>
+
 
             {/* ticker bar */}
             <div className="absolute inset-x-0 bottom-0 z-10 overflow-hidden border-t border-primary-foreground/25 bg-foreground/10 py-3">
