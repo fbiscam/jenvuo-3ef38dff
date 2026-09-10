@@ -450,7 +450,7 @@ function HomePage() {
                 <Link
                   to="/dashboard"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="mx-3 mt-3 inline-flex items-center justify-center rounded-lg bg-zinc-900 px-3 py-2.5 text-sm font-medium text-white hover:bg-zinc-800"
+                  className="mx-3 mt-3 inline-flex items-center justify-center rounded-lg border border-zinc-200 bg-white px-3 py-2.5 text-sm font-medium text-zinc-950 hover:bg-zinc-50"
                 >
                   Dashboard
                   <span className={`${MONO} text-[10px] opacity-70 ml-1.5`}>↗</span>
@@ -467,9 +467,9 @@ function HomePage() {
                   <Link
                     to="/founding"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="inline-flex items-center justify-center rounded-lg bg-zinc-900 px-3 py-2 text-sm font-medium text-white hover:bg-zinc-800"
+                    className="inline-flex items-center justify-center rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm font-medium text-zinc-950 hover:bg-zinc-50"
                   >
-                    Apply
+                    Apply Now
                   </Link>
                 </div>
               )}
