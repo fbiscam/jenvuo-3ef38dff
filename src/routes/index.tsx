@@ -659,8 +659,6 @@ function HomePage() {
           <div className="build-boundaries-panel relative min-h-[396px] overflow-hidden rounded-[14px] bg-home-accent">
             {/* dot grid */}
             <div className="build-boundaries-dots pointer-events-none absolute inset-0" />
-            {/* warm bottom glow */}
-            <div className="build-boundaries-glow pointer-events-none absolute bottom-0 left-1/2 h-2/3 w-3/4 -translate-x-1/2 translate-y-1/3" />
 
             {/* floating dashed tiles */}
             {[
