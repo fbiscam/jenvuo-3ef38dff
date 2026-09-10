@@ -159,40 +159,40 @@ export default function RegionEarth() {
       <div className="relative z-10 mx-auto mt-4 h-[330px] w-full max-w-[620px] sm:mt-5 sm:h-[370px]">
         <div className="absolute left-1/2 top-0 h-[330px] w-[330px] -translate-x-1/2 sm:h-[370px] sm:w-[370px]">
           <DottedGlobe />
+
+          {/* connection arcs — sized to the globe so they stay aligned on mobile */}
+          <svg
+            className="pointer-events-none absolute inset-0 h-full w-full"
+            viewBox="0 0 370 370"
+            preserveAspectRatio="xMidYMid meet"
+            aria-hidden="true"
+          >
+            <path
+              d="M135 118 C 205 80, 270 103, 290 145"
+              fill="none"
+              stroke="var(--home-accent)"
+              strokeWidth="1.6"
+              strokeDasharray="240"
+              className="ge-arc"
+            />
+            <path
+              d="M290 145 C 313 195, 273 230, 240 236"
+              fill="none"
+              stroke="var(--home-accent)"
+              strokeWidth="1.6"
+              strokeDasharray="200"
+              className="ge-arc ge-arc-2"
+            />
+          </svg>
+
+          <Node className="left-[36.5%] top-[29%]" icon={<MapPin className="h-4 w-4" />} />
+          <Node
+            className="left-[78.4%] top-[39%]"
+            icon={<Globe className="h-4 w-4" />}
+            solid
+          />
+          <Node className="left-[64.9%] top-[61%]" icon={<MapPin className="h-4 w-4" />} />
         </div>
-
-        {/* connection nodes + arcs */}
-        <svg
-          className="pointer-events-none absolute inset-0 h-full w-full"
-          viewBox="0 0 620 370"
-          preserveAspectRatio="xMidYMid meet"
-          aria-hidden="true"
-        >
-          <path
-            d="M260 118 C 330 80, 395 103, 415 145"
-            fill="none"
-            stroke="var(--home-accent)"
-            strokeWidth="1.2"
-            strokeDasharray="240"
-            className="ge-arc"
-          />
-          <path
-            d="M415 145 C 438 195, 398 230, 365 236"
-            fill="none"
-            stroke="var(--home-accent)"
-            strokeWidth="1.2"
-            strokeDasharray="200"
-            className="ge-arc ge-arc-2"
-          />
-        </svg>
-
-        <Node className="left-[42%] top-[29%]" icon={<MapPin className="h-4 w-4" />} />
-        <Node
-          className="left-[67%] top-[39%]"
-          icon={<Globe className="h-4 w-4" />}
-          solid
-        />
-        <Node className="left-[59%] top-[61%]" icon={<MapPin className="h-4 w-4" />} />
 
         <Callout
           className="left-0 top-[44%]"
@@ -204,6 +204,7 @@ export default function RegionEarth() {
           body="Every London, New York and Asia killzone is covered without a single missed sweep."
         />
       </div>
+
 
       {/* bottom feature strip */}
       <div className="relative z-10 grid divide-y divide-border border-y border-border bg-background md:grid-cols-3 md:divide-x md:divide-y-0">
