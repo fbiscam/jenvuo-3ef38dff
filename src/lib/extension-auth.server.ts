@@ -68,7 +68,7 @@ export async function authenticateExtensionRequest(request: Request): Promise<Ex
 export const EXT_CORS_HEADERS: Record<string, string> = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
-  'Access-Control-Allow-Headers': 'authorization, x-jenvu-key, content-type',
+  'Access-Control-Allow-Headers': 'authorization, x-jenvu-key, x-request-id, content-type',
   'Access-Control-Max-Age': '86400',
 }
 

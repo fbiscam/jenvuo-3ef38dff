@@ -58,7 +58,7 @@ const TIERS = [
     tagline: "For serious gold traders.",
     cta: "Notify me when live",
     ctaTo: "/contact",
-    credits: 35,
+    credits: 10,
     features: [
 
       "Voice queries free",
@@ -68,6 +68,8 @@ const TIERS = [
       "Full ICT / SMC narration",
       "Trade journal & analytics",
       "Multi-timeframe bias engine",
+      "1 extension API key · $10 AI wallet",
+      "GPT/Gemini analysis + senior review",
     ],
 
     highlight: true,
@@ -81,7 +83,7 @@ const TIERS = [
     tagline: "For prop desks & funds.",
     cta: "Talk to sales",
     ctaTo: "/contact",
-    credits: 85,
+    credits: 40,
     features: [
 
       "Voice queries free",
@@ -90,6 +92,7 @@ const TIERS = [
       "Priority A+ alerts (< 30s)",
       "Dedicated XAU/USD scanner with DXY overlay",
       "API access & webhooks",
+      "3 extension API keys · $40 AI wallet",
       "Custom alert rules",
       "Dedicated onboarding & SLA",
     ],
@@ -117,7 +120,7 @@ const MATRIX: Array<{ feature: string; free: Mark; pro: Mark; elite: Mark }> = [
   { feature: "Multi-timeframe bias", free: true, pro: true, elite: true },
   { feature: "Trade journal", free: true, pro: true, elite: true },
   { feature: "Multi-pair scanner", free: false, pro: false, elite: true },
-  { feature: "API & webhooks", free: false, pro: false, elite: true },
+  { feature: "Extension API keys", free: false, pro: "1", elite: "3" },
   { feature: "Custom alert rules", free: false, pro: false, elite: true },
   { feature: "Dedicated onboarding", free: false, pro: false, elite: true },
 ];
