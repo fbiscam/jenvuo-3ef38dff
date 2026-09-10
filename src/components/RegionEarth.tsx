@@ -129,43 +129,45 @@ function Callout({
 }) {
   return (
     <div
-      className={`absolute hidden w-[210px] rounded-sm border border-dashed border-home-accent/70 bg-white/90 px-3 py-2 backdrop-blur-sm md:block ${className}`}
+      className={`absolute hidden w-[190px] border border-dashed border-home-accent bg-background/95 px-3 py-2 shadow-sm backdrop-blur-sm md:block ${className}`}
     >
       {title ? (
-        <div className="text-[13px] font-semibold text-zinc-900">{title}</div>
+        <div className="text-[13px] font-semibold text-foreground">{title}</div>
       ) : null}
-      <p className="mt-0.5 text-[11px] leading-snug text-zinc-600">{body}</p>
+      <p className="mt-0.5 text-[11px] leading-snug text-muted-foreground">{body}</p>
     </div>
   );
 }
 
 export default function RegionEarth() {
   return (
-    <div className="mx-auto max-w-6xl px-5 py-16 sm:px-6 sm:py-24">
-      <h2 className="text-center text-3xl font-semibold tracking-tight text-zinc-900 sm:text-4xl md:text-[44px] md:leading-[1.1]">
-        Region: Earth
-      </h2>
-      <p className="mx-auto mt-4 max-w-2xl text-center text-[15px] leading-relaxed text-zinc-500 sm:text-base">
-        One voice-native gold desk — running close to every session, close to
-        the tape.
-      </p>
+    <div className="region-earth relative mx-auto max-w-[900px] overflow-hidden border-x border-border bg-background px-0 pt-14 sm:pt-16">
+      <div className="relative z-10 px-5 sm:px-8">
+        <h2 className="text-center text-3xl font-semibold text-foreground sm:text-[38px] sm:leading-[1.15]">
+          Region: Earth
+        </h2>
+        <p className="mx-auto mt-3 max-w-2xl text-center text-[14px] leading-relaxed text-muted-foreground">
+          One voice-native gold desk — running close to every session, close to
+          the tape.
+        </p>
+      </div>
 
 
       {/* Globe stage */}
-      <div className="relative mx-auto mt-6 aspect-[16/10] w-full max-w-3xl sm:mt-8">
-        <div className="absolute inset-0">
+      <div className="relative z-10 mx-auto mt-4 h-[330px] w-full max-w-[620px] sm:mt-5 sm:h-[370px]">
+        <div className="absolute left-1/2 top-0 h-[330px] w-[330px] -translate-x-1/2 sm:h-[370px] sm:w-[370px]">
           <DottedGlobe />
         </div>
 
         {/* connection nodes + arcs */}
         <svg
           className="pointer-events-none absolute inset-0 h-full w-full"
-          viewBox="0 0 800 500"
+          viewBox="0 0 620 370"
           preserveAspectRatio="xMidYMid meet"
           aria-hidden="true"
         >
           <path
-            d="M330 175 C 420 130, 500 150, 520 205"
+            d="M260 118 C 330 80, 395 103, 415 145"
             fill="none"
             stroke="var(--home-accent)"
             strokeWidth="1.2"
@@ -173,7 +175,7 @@ export default function RegionEarth() {
             className="ge-arc"
           />
           <path
-            d="M520 205 C 540 260, 500 295, 460 305"
+            d="M415 145 C 438 195, 398 230, 365 236"
             fill="none"
             stroke="var(--home-accent)"
             strokeWidth="1.2"
@@ -182,27 +184,27 @@ export default function RegionEarth() {
           />
         </svg>
 
-        <Node className="left-[38%] top-[31%]" icon={<MapPin className="h-4 w-4" />} />
+        <Node className="left-[42%] top-[29%]" icon={<MapPin className="h-4 w-4" />} />
         <Node
-          className="left-[63%] top-[38%]"
+          className="left-[67%] top-[39%]"
           icon={<Globe className="h-4 w-4" />}
           solid
         />
-        <Node className="left-[56%] top-[58%]" icon={<MapPin className="h-4 w-4" />} />
+        <Node className="left-[59%] top-[61%]" icon={<MapPin className="h-4 w-4" />} />
 
         <Callout
-          className="left-0 top-[52%]"
+          className="left-0 top-[44%]"
           title="4.5x faster"
           body="Setups narrated in seconds — the desk reasons next to the tape, not after it."
         />
         <Callout
-          className="right-0 top-[48%]"
+          className="right-0 top-[39%]"
           body="Every London, New York and Asia killzone is covered without a single missed sweep."
         />
       </div>
 
       {/* bottom feature strip */}
-      <div className="mt-8 grid divide-y divide-zinc-200 border-y border-zinc-200 md:grid-cols-3 md:divide-x md:divide-y-0">
+      <div className="relative z-10 grid divide-y divide-border border-y border-border bg-background md:grid-cols-3 md:divide-x md:divide-y-0">
         {[
           {
             icon: <Globe className="h-5 w-5" />,
@@ -220,10 +222,10 @@ export default function RegionEarth() {
             d: "A+ confluence grading only. No noise, no guessing, no capacity planning.",
           },
         ].map((f) => (
-          <div key={f.t} className="px-0 py-6 md:px-6">
-            <div className="text-zinc-800">{f.icon}</div>
-            <h3 className="mt-4 text-[15px] font-semibold text-zinc-900">{f.t}</h3>
-            <p className="mt-1.5 text-[13px] leading-relaxed text-zinc-600">{f.d}</p>
+          <div key={f.t} className="min-h-[145px] px-6 py-6 md:px-7">
+            <div className="text-foreground">{f.icon}</div>
+            <h3 className="mt-3 text-[14px] font-semibold text-foreground">{f.t}</h3>
+            <p className="mt-1 text-[12px] leading-[1.45] text-muted-foreground">{f.d}</p>
           </div>
         ))}
       </div>
@@ -246,8 +248,8 @@ function Node({
       <span
         className={`relative flex h-9 w-9 items-center justify-center rounded-full border ${
           solid
-            ? "border-home-accent bg-home-accent text-white"
-            : "border-home-accent/70 bg-white text-home-accent"
+            ? "border-home-accent bg-home-accent text-home-accent-foreground"
+            : "border-home-accent/70 bg-background text-home-accent"
         }`}
       >
         {icon}
