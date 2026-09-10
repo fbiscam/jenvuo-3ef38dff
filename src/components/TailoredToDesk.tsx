@@ -38,7 +38,7 @@ export function TailoredToDesk() {
         <div className="mt-10 grid min-h-[610px] gap-2 lg:grid-cols-3 lg:grid-rows-2">
           <article className="flex min-h-[290px] flex-col rounded-md border border-border bg-card p-5 sm:p-6 lg:col-span-2">
             <div className="flex items-start gap-5">
-              <div className="relative hidden h-14 w-14 shrink-0 items-center justify-center rounded-md bg-home-accent sm:flex">
+              <div className="relative hidden h-14 w-14 shrink-0 items-center justify-center rounded-md border border-border bg-background shadow-sm sm:flex">
                 <img src={jenvuLogoAsset.url} alt="Jenvu" width={256} height={256} className="h-9 w-9 object-contain" />
                 <span className="absolute -bottom-3 -right-3 flex h-7 w-7 items-center justify-center rounded-sm bg-foreground text-background shadow-sm">
                   <Github className="h-4 w-4" aria-hidden="true" />
