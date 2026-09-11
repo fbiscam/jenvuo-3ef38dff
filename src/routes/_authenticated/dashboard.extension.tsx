@@ -7,6 +7,7 @@ import {
   listExtensionKeys,
   createExtensionKey,
   revokeExtensionKey,
+  deleteExtensionKey,
   type ExtensionKeyRow,
   type ExtensionKeyAccess,
 } from "@/lib/extension-keys.functions";
@@ -28,6 +29,7 @@ function ExtensionPage() {
   const load = useServerFn(listExtensionKeys);
   const create = useServerFn(createExtensionKey);
   const revoke = useServerFn(revokeExtensionKey);
+  const remove = useServerFn(deleteExtensionKey);
 
   const [keys, setKeys] = useState<ExtensionKeyRow[]>([]);
   const [access, setAccess] = useState<ExtensionKeyAccess | null>(null);
@@ -41,6 +43,8 @@ function ExtensionPage() {
   const [origin, setOrigin] = useState("https://jenvu.com");
   const [downloading, setDownloading] = useState(false);
   const [view, setView] = useState<"keys" | "extension">("keys");
+  const [deleteTarget, setDeleteTarget] = useState<ExtensionKeyRow | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     if (typeof window !== "undefined") setOrigin(window.location.origin);
@@ -86,6 +90,22 @@ function ExtensionPage() {
       await refresh();
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Could not revoke the key");
+    }
+  };
+
+  const onDelete = async () => {
+    if (!deleteTarget) return;
+    setDeleting(true);
+    try {
+      const res = await remove({ data: { id: deleteTarget.id } });
+      if (!res.ok) { toast.error(res.error); return; }
+      setDeleteTarget(null);
+      toast.success("API key permanently deleted");
+      await refresh();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Could not delete the key");
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -264,9 +284,22 @@ function ExtensionPage() {
               <div className="flex items-center justify-end gap-1 md:w-24">
                 {!k.revoked_at && (
                   <button
+                    type="button"
                     title="Revoke key"
+                    aria-label={`Revoke ${k.name}`}
                     onClick={() => onRevoke(k.id)}
                     className="rounded-full p-2 text-zinc-500 hover:bg-rose-50 hover:text-rose-600"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                )}
+                {k.revoked_at && (
+                  <button
+                    type="button"
+                    title="Delete permanently"
+                    aria-label={`Permanently delete ${k.name}`}
+                    onClick={() => setDeleteTarget(k)}
+                    className="rounded-full p-2 text-rose-600 hover:bg-rose-50 hover:text-rose-700"
                   >
                     <Trash2 className="h-4 w-4" />
                   </button>
@@ -392,6 +425,30 @@ function ExtensionPage() {
                 className="rounded-full bg-zinc-900 px-4 py-2 text-[13px] font-medium text-white hover:bg-zinc-800 disabled:opacity-60"
               >
                 {creating ? "Creating…" : "Create key"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {deleteTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-900/30 p-4">
+          <div role="dialog" aria-modal="true" aria-labelledby="delete-key-title" className="w-full max-w-md rounded-xl border border-zinc-200 bg-white p-5 shadow-xl">
+            <div className="flex items-start justify-between gap-3">
+              <div id="delete-key-title" className="text-[15px] font-medium text-zinc-900">Delete API key permanently?</div>
+              <button type="button" aria-label="Close delete confirmation" onClick={() => setDeleteTarget(null)} className="rounded-full p-1 text-zinc-500 hover:bg-zinc-100">
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+            <p className="mt-2 text-[13px] leading-relaxed text-zinc-500">
+              <span className="font-medium text-zinc-800">{deleteTarget.name}</span> will be removed from your account and database. This cannot be undone.
+            </p>
+            <div className="mt-5 flex justify-end gap-2">
+              <button type="button" onClick={() => setDeleteTarget(null)} disabled={deleting} className="rounded-full px-4 py-2 text-[13px] text-zinc-700 hover:bg-zinc-100 disabled:opacity-60">
+                Cancel
+              </button>
+              <button type="button" onClick={onDelete} disabled={deleting} className="rounded-full bg-rose-600 px-4 py-2 text-[13px] font-medium text-white hover:bg-rose-700 disabled:opacity-60">
+                {deleting ? "Deleting…" : "Delete permanently"}
               </button>
             </div>
           </div>
