@@ -115,11 +115,11 @@ async function singleAttempt(
   const isOai = model.startsWith("oai/");
   const blackboxKey = process.env.BLACKBOX_API_KEY;
   const nvidiaKey = process.env.NVIDIA_API_KEY;
-  // Bluesmind key: prefer the dedicated BLUESMIND_API_KEY, then the older
-  // slots it was previously saved under.
+  // Prefer the newer second BluesMinds credential. The singular slot is kept
+  // only as a legacy fallback because that account can be out of quota.
   const bmindKey =
-    process.env.BLUESMIND_API_KEY ||
     process.env.BLUESMINDS_API_KEY ||
+    process.env.BLUESMIND_API_KEY ||
     process.env.OPENAI_API_KEY;
   const deepseekKey = process.env.DEEPSEEK_API_KEY;
   const openaiKey = process.env.OPENAI_API_KEY;
