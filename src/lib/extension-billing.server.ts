@@ -1,6 +1,7 @@
 import { estimateCostUsd, logAiCost } from '@/lib/ai-cost-log.server'
 
-export const EXTENSION_BASE_FEE_USD = 0.02
+export const EXTENSION_BASE_FEE_USD = 0
+export const EXTENSION_TOKEN_PRICE_MULTIPLIER = 0.5
 
 type Usage = { promptTokens: number; completionTokens: number; totalTokens?: number }
 type ModelCall = { model: string; usage: Usage; stage: string }
@@ -14,17 +15,17 @@ export async function getExtensionEntitlement(userId: string) {
   ])
   const active = Boolean(sub && (sub.status === 'active' || sub.status === 'trialing'))
   const planId = active ? String(sub.plan_id || 'free') : 'free'
-  const { data: plan } = await admin.from('plans').select('wallet_usd,markup_multiplier,extension_key_limit').eq('id', planId).maybeSingle()
+  const { data: plan } = await admin.from('plans').select('wallet_usd,extension_key_limit').eq('id', planId).maybeSingle()
   const keyLimit = Number(plan?.extension_key_limit ?? 0)
   const balance = Number(bal?.balance ?? 0)
   const result = {
-    allowed: active && planId !== 'free' && keyLimit > 0 && balance >= EXTENSION_BASE_FEE_USD,
-    status: !active || planId === 'free' || keyLimit < 1 ? 403 : balance < EXTENSION_BASE_FEE_USD ? 402 : 200,
+    allowed: active && planId !== 'free' && keyLimit > 0 && balance > 0,
+    status: !active || planId === 'free' || keyLimit < 1 ? 403 : balance <= 0 ? 402 : 200,
     plan: planId,
     keyLimit,
     balance,
     wallet: Number(plan?.wallet_usd ?? 0),
-    markup: Math.max(1, Number(plan?.markup_multiplier ?? 2)),
+    markup: EXTENSION_TOKEN_PRICE_MULTIPLIER,
   }
   return {
     ...result,
@@ -45,7 +46,7 @@ export async function chargeExtensionUsage(params: {
   const entitlement = await getExtensionEntitlement(params.userId)
   if (!entitlement.allowed) return { ok: false, charged: 0, error: entitlement.error }
   const rawCost = params.calls.reduce((sum, call) => sum + estimateCostUsd(call.model, call.usage.promptTokens, call.usage.completionTokens), 0)
-  const charged = Number((EXTENSION_BASE_FEE_USD + rawCost * entitlement.markup).toFixed(6))
+  const charged = Number((rawCost * EXTENSION_TOKEN_PRICE_MULTIPLIER).toFixed(6))
   if (entitlement.balance < charged) return { ok: false, charged: 0, error: 'Low balance. Add funds to continue using extension AI.' }
 
   const primary = params.calls[0]
@@ -63,7 +64,8 @@ export async function chargeExtensionUsage(params: {
       action: params.action, model: models, primary_model: primary?.model ?? null,
       senior_model: senior?.model ?? null, stage: 'extension_api', prompt_tokens: promptTokens,
       completion_tokens: completionTokens, raw_cost_usd: rawCost, base_fee_usd: EXTENSION_BASE_FEE_USD,
-      markup_multiplier: entitlement.markup, charge_usd: charged, senior_review: Boolean(senior),
+       pricing_multiplier: EXTENSION_TOKEN_PRICE_MULTIPLIER, pricing_basis: '50_percent_of_tukenku_published_token_rates',
+       charge_usd: charged, senior_review: Boolean(senior),
     },
   })
   if (error) {

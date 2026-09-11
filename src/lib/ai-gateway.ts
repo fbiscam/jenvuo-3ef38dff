@@ -519,15 +519,11 @@ export const EXTENSION_MODEL_CHAIN = {
     "tukenku/myt/qwen3-vl-plus",
   ],
   seniorReview: [
-    "tukenku/myt/gpt-5.6-sol-free",
     "tukenku/myt/claude-opus-4-8-free",
-    "tukenku/myt/qwen3.8-max-free",
   ],
   // Independent second reviewer — must not reuse the senior primary model.
   secondReview: [
-    "tukenku/myt/qwen3.8-max-free",
     "tukenku/myt/claude-opus-4-8-free",
-    "tukenku/myt/gpt-5.6-sol-free",
   ],
 } as const;
 

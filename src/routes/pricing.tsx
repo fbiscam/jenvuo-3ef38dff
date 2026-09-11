@@ -69,7 +69,7 @@ const TIERS = [
       "Trade journal & analytics",
       "Multi-timeframe bias engine",
       "1 extension API key · $10 AI wallet",
-      "GPT/Gemini analysis + senior review",
+      "GPT-5.6 Sol + Claude Opus 4.8 review",
     ],
 
     highlight: true,
@@ -286,7 +286,9 @@ function PricingPage() {
               {([
                 { f: "Monthly AI wallet", b: "$10", c: "$40", d: "$90" },
                 { f: "Active extension API keys", b: "1", c: "3", d: "5" },
-                { f: "Extension senior review", b: true, c: true, d: true },
+                { f: "GPT-5.6 Sol primary analysis", b: true, c: true, d: true },
+                { f: "Claude Opus 4.8 senior review", b: true, c: true, d: true },
+                { f: "Token price", b: "50% of published rate", c: "50% of published rate", d: "50% of published rate" },
 
                 { f: "Voice queries / day", b: "Unlimited", c: "Unlimited", d: "Unlimited" },
 
@@ -424,7 +426,7 @@ function PricingPage() {
           <div>
             
             <h2 className="mt-2 text-2xl sm:text-3xl font-semibold tracking-tight">Need more wallet balance?</h2>
-            <p className="mt-2 max-w-xl text-sm text-zinc-600 lg:max-w-none lg:whitespace-nowrap">Live extension market data is free. AI analysis costs $0.02 plus model usage, including senior review.</p>
+            <p className="mt-2 max-w-xl text-sm text-zinc-600 lg:max-w-none lg:whitespace-nowrap">Live extension market data is free. GPT-5.6 Sol and Claude Opus 4.8 are billed per token at 50% of Tukenku's published rates.</p>
           </div>
         </div>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -521,7 +523,7 @@ function CustomTopUp({ signedOut }: { signedOut: boolean }) {
         <div>
           
           <h3 className="mt-2 text-lg font-semibold tracking-tight">Pick your own amount</h3>
-          <p className="mt-1 text-sm text-zinc-600">Minimum $5. $1 top-up = $1 wallet. Extension AI uses hybrid per-request pricing.</p>
+          <p className="mt-1 text-sm text-zinc-600">Minimum $5. $1 top-up = $1 wallet. Extension AI is billed per token at 50% of the published rate.</p>
         </div>
         <div className="flex items-center gap-3">
           <div className="flex items-center overflow-hidden rounded-md border border-border bg-background focus-within:ring-2 focus-within:ring-home-accent/40">
