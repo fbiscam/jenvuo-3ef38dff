@@ -37,6 +37,22 @@ export type LedgerEntry = {
 
 export type TrialInfo = { active: boolean; endsAt: string | null; daysLeft: number };
 
+export type CreditGrant = {
+  id: string;
+  amount: number;
+  reason: string;
+  createdAt: string;
+  metadata: Record<string, unknown> | null;
+};
+
+export type PromotionRedemption = {
+  id: string;
+  code: string;
+  bonusUsd: number;
+  payAmountUsd: number;
+  createdAt: string;
+};
+
 export type CreditState = {
   plan: { id: string; name: string; price_usd: number; wallet_usd: number };
   features: PlanFeatures;
@@ -45,6 +61,8 @@ export type CreditState = {
   periodResetsAt: string | null;
   trial: TrialInfo;
   recent: LedgerEntry[];
+  grants: CreditGrant[];
+  promotions: PromotionRedemption[];
 };
 
 export const getCreditState = createServerFn({ method: "GET" })
@@ -52,7 +70,7 @@ export const getCreditState = createServerFn({ method: "GET" })
   .handler(async ({ context }): Promise<CreditState> => {
     const { supabase, userId } = context;
 
-    const [{ data: sub }, { data: bal }, { data: ledger }] = await Promise.all([
+    const [{ data: sub }, { data: bal }, { data: ledger }, { data: positiveLedger }, { data: promoRedemptions }] = await Promise.all([
       supabase
         .from("user_subscriptions")
         .select("plan_id, status, is_trial, trial_ends_at")
@@ -63,6 +81,12 @@ export const getCreditState = createServerFn({ method: "GET" })
       supabase.from("credit_ledger")
         .select("id, delta, reason, balance_after, created_at, model, stage, prompt_tokens, completion_tokens, raw_cost_usd, metadata")
         .eq("user_id", userId).order("created_at", { ascending: false }).limit(60),
+      supabase.from("credit_ledger")
+        .select("id, delta, reason, created_at, metadata")
+        .eq("user_id", userId).gt("delta", 0).order("created_at", { ascending: false }).limit(100),
+      supabase.from("promo_redemptions")
+        .select("id, code, bonus_usd, pay_amount_usd, created_at")
+        .eq("user_id", userId).order("created_at", { ascending: false }).limit(100),
     ]);
 
     // Fetch plan row separately to avoid PostgREST embed edge-cases
@@ -118,6 +142,22 @@ export const getCreditState = createServerFn({ method: "GET" })
       balance: Number(bal?.balance ?? 0),
       allowance: Number(bal?.monthly_allowance ?? walletUsd),
       periodResetsAt: bal?.period_resets_at ?? null,
+      grants: (positiveLedger ?? [])
+        .filter((r: any) => !["promo_bonus", "topup_crypto", "refund"].includes(String(r.reason)))
+        .map((r: any) => ({
+          id: r.id,
+          amount: Number(r.delta),
+          reason: String(r.reason),
+          createdAt: r.created_at,
+          metadata: (r.metadata as Record<string, unknown> | null) ?? null,
+        })),
+      promotions: (promoRedemptions ?? []).map((r: any) => ({
+        id: r.id,
+        code: r.code,
+        bonusUsd: Number(r.bonus_usd ?? 0),
+        payAmountUsd: Number(r.pay_amount_usd ?? 0),
+        createdAt: r.created_at,
+      })),
       recent: ledgerRows.map((r: any) => {
         const meta = (r.metadata ?? {}) as Record<string, any>;
         const actual = actualModelMatches.get(r.id);

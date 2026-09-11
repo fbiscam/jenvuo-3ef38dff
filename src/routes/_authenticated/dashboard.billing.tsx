@@ -6,6 +6,7 @@ import { useCredits } from "@/hooks/useCredits";
 import { useCurrentPlan } from "@/hooks/useCurrentPlan";
 import { useTrial } from "@/hooks/useTrial";
 import { cancelMyPlan } from "@/lib/subscription.functions";
+import { redeemFreeCode } from "@/lib/payments.functions";
 import InvoiceHistory from "@/components/billing/InvoiceHistory";
 import {
   AlertDialog,
@@ -121,12 +122,14 @@ function Billing() {
   const credits = useCredits();
   const trial = useTrial();
   const cancelPlan = useServerFn(cancelMyPlan);
+  const redeemPromotion = useServerFn(redeemFreeCode);
 
   const [showAllActivity, setShowAllActivity] = useState(false);
   const [activeTab, setActiveTab] = useState<(typeof TABS)[number]>("Overview");
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
   const [cancellingPlan, setCancellingPlan] = useState(false);
   const [promoCode, setPromoCode] = useState("");
+  const [redeemingPromo, setRedeemingPromo] = useState(false);
   const [prefs, setPrefs] = useState(() => {
     try { return JSON.parse(localStorage.getItem("jenvu-billing-prefs") ?? "{}"); } catch { return {}; }
   });
@@ -188,6 +191,26 @@ function Billing() {
       });
     } finally {
       setCancellingPlan(false);
+    }
+  };
+
+  const handleRedeemPromotion = async () => {
+    const code = promoCode.trim();
+    if (!code || redeemingPromo) return;
+    setRedeemingPromo(true);
+    try {
+      const result = await redeemPromotion({ data: { code } });
+      if (!result.ok) {
+        toast.error(result.error);
+        return;
+      }
+      setPromoCode("");
+      await credits.refresh();
+      toast.success(`$${Number(result.credited).toFixed(2)} promotional credit added.`);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Could not apply this promotion.");
+    } finally {
+      setRedeemingPromo(false);
     }
   };
 
@@ -489,7 +512,25 @@ function Billing() {
             <h2 className="text-sm font-semibold text-zinc-900">  Credit grants</h2>
             <span className="text-sm text-zinc-500">USD</span>
           </div>
-          <p className="text-sm text-zinc-900">No credit grants found.</p>
+          {(credits.state?.grants ?? []).length === 0 ? (
+            <p className="text-sm text-zinc-900">No credit grants found.</p>
+          ) : (
+            <div className="divide-y divide-zinc-200 border-y border-zinc-200">
+              {(credits.state?.grants ?? []).map((grant) => (
+                <div key={grant.id} className="flex items-center justify-between gap-4 py-3">
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-medium text-zinc-900">
+                      {grant.reason.split("_").map((part) => part.charAt(0).toUpperCase() + part.slice(1)).join(" ")}
+                    </p>
+                    <p className="text-xs text-zinc-500">
+                      {new Date(grant.createdAt).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" })}
+                    </p>
+                  </div>
+                  <span className="shrink-0 text-sm font-medium tabular-nums text-emerald-700">+${grant.amount.toFixed(2)}</span>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
 
@@ -597,22 +638,39 @@ function Billing() {
               />
               <button
                 type="button"
-                disabled={!promoCode.trim()}
+                disabled={!promoCode.trim() || redeemingPromo}
+                onClick={() => void handleRedeemPromotion()}
                 className="shrink-0 rounded-lg bg-zinc-100 px-4 py-2 text-sm font-medium text-zinc-900 hover:bg-zinc-200 transition-colors disabled:cursor-not-allowed disabled:text-zinc-400"
               >
-                Apply
+                {redeemingPromo ? "Applying…" : "Apply"}
               </button>
             </div>
           </div>
           <div className="space-y-2">
             <h2 className="text-base font-semibold text-zinc-900">Applied promotions</h2>
-            <div className="flex flex-col items-center gap-2 py-10 text-center">
-              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-zinc-100 text-zinc-500">
-                <Tag className="h-4 w-4" />
-              </span>
-              <p className="text-sm font-medium text-zinc-900">You haven't applied any promotions yet</p>
-              <p className="text-xs text-zinc-500">Applied promotions will appear here</p>
-            </div>
+            {(credits.state?.promotions ?? []).length === 0 ? (
+              <div className="flex flex-col items-center gap-2 py-10 text-center">
+                <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-zinc-100 text-zinc-500">
+                  <Tag className="h-4 w-4" />
+                </span>
+                <p className="text-sm font-medium text-zinc-900">You haven't applied any promotions yet</p>
+                <p className="text-xs text-zinc-500">Applied promotions will appear here</p>
+              </div>
+            ) : (
+              <div className="divide-y divide-zinc-200 border-y border-zinc-200">
+                {(credits.state?.promotions ?? []).map((promotion) => (
+                  <div key={promotion.id} className="flex items-center justify-between gap-4 py-3">
+                    <div className="min-w-0">
+                      <p className={`${MONO} truncate text-sm font-medium text-zinc-900`}>{promotion.code}</p>
+                      <p className="text-xs text-zinc-500">
+                        Redeemed {new Date(promotion.createdAt).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" })}
+                      </p>
+                    </div>
+                    <span className="shrink-0 text-sm font-medium tabular-nums text-emerald-700">+${promotion.bonusUsd.toFixed(2)}</span>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       )}
