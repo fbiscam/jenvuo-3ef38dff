@@ -50,6 +50,9 @@ export type CallChatOptions = {
   retriesPerModel?: number;
   // For telemetry / debugging.
   stage?: string;
+  // Optional semantic guard. Returning a message rejects this model's output
+  // and continues to the next configured model instead of exposing bad text.
+  validateContent?: (content: string, model: string) => true | string;
 };
 
 export class AiGatewayError extends Error {
@@ -338,6 +341,11 @@ export async function callChatCompletion(opts: CallChatOptions): Promise<{ conte
       }
       try {
         const { content, usage } = await singleAttempt(model, opts, apiKey);
+        const validation = opts.validateContent?.(content, model) ?? true;
+        if (validation !== true) {
+          lastErr = new AiGatewayError(validation, 422, true);
+          break;
+        }
 
         return { content, model, usage };
       } catch (err) {
@@ -521,14 +529,12 @@ export const EXTENSION_MODEL_CHAIN = {
   ],
   seniorReview: [
     "unikey/claude-opus-4-8",
-    "unikey/gemini-3.1-pro",
-    "unikey/deepseek-v4-pro",
+    "tukenku/myt/grok-4.6-free",
   ],
   // Alias retained for callers that identify the senior pass as review #2.
   secondReview: [
     "unikey/claude-opus-4-8",
-    "unikey/gemini-3.1-pro",
-    "unikey/deepseek-v4-pro",
+    "tukenku/myt/grok-4.6-free",
   ],
 } as const;
 
