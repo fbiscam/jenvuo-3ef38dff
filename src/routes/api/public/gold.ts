@@ -216,6 +216,7 @@ async function handle({ request }: { request: Request }) {
         calls: [
           { model: primary.model, usage: primary.usage, stage: image ? 'extension-screen-analysis' : 'extension-chat' },
           { model: review.model, usage: review.usage, stage: 'extension-senior-review' },
+          ...(secondCall ? [{ model: secondCall.model, usage: secondCall.usage, stage: 'extension-second-review' }] : []),
         ],
       })
       if (!billing.ok) return extJson({ ok: false, error: billing.error, code: billing.error?.includes('balance') ? 'LOW_BALANCE' : 'BILLING_FAILED' }, billing.error?.includes('balance') ? 402 : 502)
