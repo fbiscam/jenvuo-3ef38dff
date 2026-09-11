@@ -42,7 +42,6 @@ export type CreditGrant = {
   amount: number;
   reason: string;
   createdAt: string;
-  metadata: Record<string, unknown> | null;
 };
 
 export type PromotionRedemption = {
@@ -149,7 +148,6 @@ export const getCreditState = createServerFn({ method: "GET" })
           amount: Number(r.delta),
           reason: String(r.reason),
           createdAt: r.created_at,
-          metadata: (r.metadata as Record<string, unknown> | null) ?? null,
         })),
       promotions: (promoRedemptions ?? []).map((r: any) => ({
         id: r.id,
