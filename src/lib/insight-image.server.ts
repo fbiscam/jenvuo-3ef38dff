@@ -76,12 +76,48 @@ async function generateWithGoogle(prompt: string): Promise<{ b64: string; model:
   return null;
 }
 
-async function generateBase64(prompt: string): Promise<{ b64: string; model: string } | null> {
+// Free, keyless image provider (no Lovable credits are consumed).
+async function generateWithPollinations(
+  prompt: string,
+): Promise<{ b64: string; model: string; mime: string } | null> {
+  const models = ["flux", "turbo"];
+  for (const model of models) {
+    try {
+      const url =
+        `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}` +
+        `?width=1280&height=720&nologo=true&safe=false&model=${model}&seed=${Date.now() % 100000}`;
+      const res = await fetch(url);
+      if (!res.ok) {
+        console.warn("[insight-image] pollinations failed", model, res.status);
+        continue;
+      }
+      const mime = res.headers.get("content-type") || "image/jpeg";
+      if (!mime.startsWith("image/")) continue;
+      const buf = new Uint8Array(await res.arrayBuffer());
+      if (buf.byteLength < 5000) continue;
+      let bin = "";
+      for (let i = 0; i < buf.length; i++) bin += String.fromCharCode(buf[i]!);
+      return { b64: btoa(bin), model: `pollinations:${model}`, mime };
+    } catch (e) {
+      console.warn("[insight-image] pollinations threw", model, String(e));
+    }
+  }
+  return null;
+}
+
+async function generateBase64(
+  prompt: string,
+): Promise<{ b64: string; model: string; mime?: string } | null> {
   const viaGoogle = await generateWithGoogle(prompt);
   if (viaGoogle) return viaGoogle;
 
+  const viaFree = await generateWithPollinations(prompt);
+  if (viaFree) return viaFree;
+
   const key = process.env.LOVABLE_API_KEY;
   if (!key) return null;
+
+
 
 
   for (const model of IMAGE_MODELS) {
