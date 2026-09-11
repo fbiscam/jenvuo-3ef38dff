@@ -53,6 +53,14 @@ const MODEL_PRICING: Record<string, Price> = {
   "nvapi/deepseek-ai/deepseek-v4-flash-0731": { in: 0, out: 0 },
   "nvapi/openai/gpt-oss-120b": { in: 0, out: 0 },
 
+  // Tukenku published PAYG rates per 1M tokens. The extension billing layer
+  // charges users 50% of these rates, including when the matching free route
+  // is used upstream.
+  "tukenku/myt/gpt-5.6-sol": { in: 0.7714, out: 4.63 },
+  "tukenku/myt/gpt-5.6-sol-free": { in: 0.7714, out: 4.63 },
+  "tukenku/myt/claude-opus-4-8": { in: 0.7714, out: 3.86 },
+  "tukenku/myt/claude-opus-4-8-free": { in: 0.7714, out: 3.86 },
+
   // Google
   "google/gemini-2.5-pro": { in: 1.25, out: 10.0 },
   "google/gemini-2.5-flash": { in: 0.075, out: 0.3 },
@@ -85,11 +93,13 @@ export function formatModelLabel(rawModel: string | null | undefined): string {
   const m = raw.toLowerCase();
   if (m.startsWith("rules-engine/ict-smc")) return "ICT/SMC Rules Engine";
   // Strip provider prefix (bmind/, openai/, nvapi/, google/, etc.)
-  const bare = m.replace(/^(dsofficial|bmind|openai|nvapi|google|anthropic)\//g, "").replace(/^orion\//, "").replace(/^deepseek-ai\//, "");
+  const bare = m.replace(/^(dsofficial|bmind|tukenku|openai|nvapi|google|anthropic)\//g, "").replace(/^myt\//, "").replace(/^orion\//, "").replace(/^deepseek-ai\//, "");
+  if (bare.startsWith("claude-opus-4-8")) return "Claude Opus 4.8";
   if (bare.startsWith("claude-sonnet-4.5") || bare.startsWith("claude-4.5-sonnet")) return "Claude Sonnet 4.5";
   if (bare.startsWith("claude-3.7-sonnet") || bare.startsWith("claude-3-7-sonnet")) return "Claude 3.7 Sonnet";
   if (bare.startsWith("claude-opus")) return "Claude Opus";
   if (bare.startsWith("claude")) return "Claude";
+  if (bare.startsWith("gpt-5.6-sol")) return "ChatGPT 5.6 Sol";
   if (bare.startsWith("gpt-5.6-luna")) return "ChatGPT 5.6 Luna";
   if (bare.startsWith("gpt-5.6")) return "ChatGPT 5.6";
   if (bare.startsWith("gpt-5.5-pro")) return "ChatGPT 5.5 Pro";

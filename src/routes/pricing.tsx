@@ -69,7 +69,7 @@ const TIERS = [
       "Trade journal & analytics",
       "Multi-timeframe bias engine",
       "1 extension API key · $10 AI wallet",
-      "GPT/Gemini analysis + senior review",
+      "GPT-5.6 Sol + Claude Opus 4.8 review",
     ],
 
     highlight: true,
@@ -286,7 +286,9 @@ function PricingPage() {
               {([
                 { f: "Monthly AI wallet", b: "$10", c: "$40", d: "$90" },
                 { f: "Active extension API keys", b: "1", c: "3", d: "5" },
-                { f: "Extension senior review", b: true, c: true, d: true },
+                { f: "GPT-5.6 Sol primary analysis", b: true, c: true, d: true },
+                { f: "Claude Opus 4.8 senior review", b: true, c: true, d: true },
+                { f: "Token price", b: "50% of published rate", c: "50% of published rate", d: "50% of published rate" },
 
                 { f: "Voice queries / day", b: "Unlimited", c: "Unlimited", d: "Unlimited" },
 
@@ -333,19 +335,15 @@ function PricingPage() {
                         <span className="inline-block h-px w-4 bg-zinc-200" />
                       ) : v === "__MODELS__" || v === "__GPT_ONLY__" || v === "__MODELS_PLUS__" ? (
                         <span className="inline-flex flex-col items-center justify-center gap-1">
-                          <span className="inline-flex flex-col sm:flex-row flex-nowrap items-center justify-center gap-1 whitespace-nowrap">
+                          <span className="inline-flex flex-col items-center justify-center gap-1 whitespace-nowrap">
                             <span className="inline-flex items-center gap-1 rounded-md border border-zinc-200 bg-white px-1.5 py-0.5">
                               <svg viewBox="0 0 24 24" width="10" height="10" fill="#000" aria-hidden="true"><path d="M22.28 9.82a5.98 5.98 0 0 0-.51-4.91 6.05 6.05 0 0 0-6.52-2.9A6 6 0 0 0 4.98 4.18a5.98 5.98 0 0 0-4 2.9 6.05 6.05 0 0 0 .74 7.1 5.98 5.98 0 0 0 .51 4.91 6.05 6.05 0 0 0 6.52 2.9A6 6 0 0 0 19.02 19.8a5.98 5.98 0 0 0 4-2.9 6.05 6.05 0 0 0-.74-7.1zm-9.06 12.67a4.5 4.5 0 0 1-2.88-1.04l.14-.08 4.79-2.77a.78.78 0 0 0 .39-.68v-6.76l2.03 1.17.02.05v5.6a4.5 4.5 0 0 1-4.49 4.51zM3.5 18.55a4.47 4.47 0 0 1-.54-3.03l.14.08 4.79 2.77a.78.78 0 0 0 .79 0l5.85-3.38v2.35l.02.05-4.85 2.8a4.5 4.5 0 0 1-6.2-1.64zM2.24 8.03a4.5 4.5 0 0 1 2.35-1.98v5.7a.77.77 0 0 0 .39.68l5.83 3.36-2.03 1.17a.07.07 0 0 1-.07 0l-4.84-2.8a4.5 4.5 0 0 1-1.63-6.13zm16.63 3.87-5.85-3.4L15.05 7.34a.07.07 0 0 1 .07 0l4.84 2.8a4.5 4.5 0 0 1-.68 8.11v-5.7a.79.79 0 0 0-.4-.65zm2.02-3.04-.14-.09-4.78-2.79a.78.78 0 0 0-.79 0L9.33 9.36V7.01l-.02-.05 4.85-2.8a4.5 4.5 0 0 1 6.68 4.66zM8.22 12.99l-2.03-1.17-.02-.05v-5.6a4.5 4.5 0 0 1 7.38-3.45l-.14.08L8.62 5.57a.78.78 0 0 0-.4.68zm1.1-2.38 2.61-1.5 2.6 1.5v3l-2.6 1.5-2.6-1.5z"/></svg>
-                              <span className="text-[10px] font-medium text-zinc-800 whitespace-nowrap">OpenAI</span>
+                              <span className="text-[10px] font-medium text-zinc-800 whitespace-nowrap">GPT-5.6 Sol</span>
                             </span>
                           </span>
                           {(v === "__MODELS__" || v === "__MODELS_PLUS__") && (
                             <span className="inline-flex items-center gap-1 rounded-md border border-zinc-200 bg-white px-1.5 py-0.5">
-                              <img src="https://www.google.com/s2/favicons?domain=deepseek.com&sz=32" alt="" width={10} height={10} className="h-2.5 w-2.5 rounded-sm object-contain" loading="lazy" />
-                              <span className="text-[10px] font-medium text-zinc-800 whitespace-nowrap">DeepSeek</span>
-                              <span className="text-zinc-300">·</span>
-                              <img src="https://www.google.com/s2/favicons?domain=google.com&sz=32" alt="" width={10} height={10} className="h-2.5 w-2.5 rounded-sm object-contain" loading="lazy" />
-                              <span className="text-[10px] font-medium text-zinc-800 whitespace-nowrap">Google</span>
+                               <span className="text-[10px] font-medium text-zinc-800 whitespace-nowrap">Claude Opus 4.8</span>
                               
                             </span>
                           )}
@@ -424,7 +422,7 @@ function PricingPage() {
           <div>
             
             <h2 className="mt-2 text-2xl sm:text-3xl font-semibold tracking-tight">Need more wallet balance?</h2>
-            <p className="mt-2 max-w-xl text-sm text-zinc-600 lg:max-w-none lg:whitespace-nowrap">Live extension market data is free. AI analysis costs $0.02 plus model usage, including senior review.</p>
+            <p className="mt-2 max-w-xl text-sm text-zinc-600 lg:max-w-none lg:whitespace-nowrap">Live extension market data is free. GPT-5.6 Sol and Claude Opus 4.8 are billed per token at 50% of Tukenku's published rates.</p>
           </div>
         </div>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -521,7 +519,7 @@ function CustomTopUp({ signedOut }: { signedOut: boolean }) {
         <div>
           
           <h3 className="mt-2 text-lg font-semibold tracking-tight">Pick your own amount</h3>
-          <p className="mt-1 text-sm text-zinc-600">Minimum $5. $1 top-up = $1 wallet. Extension AI uses hybrid per-request pricing.</p>
+          <p className="mt-1 text-sm text-zinc-600">Minimum $5. $1 top-up = $1 wallet. Extension AI is billed per token at 50% of the published rate.</p>
         </div>
         <div className="flex items-center gap-3">
           <div className="flex items-center overflow-hidden rounded-md border border-border bg-background focus-within:ring-2 focus-within:ring-home-accent/40">
