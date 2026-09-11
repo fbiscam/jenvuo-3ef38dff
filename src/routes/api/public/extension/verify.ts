@@ -25,7 +25,7 @@ async function handle({ request }: { request: Request }) {
 
   const { getExtensionEntitlement } = await import('@/lib/extension-billing.server')
   const access = await getExtensionEntitlement(auth.userId)
-  return extJson({ ok: true, user: { id: auth.userId, email, plan }, key: { id: auth.keyId, name: auth.name }, access: { keyLimit: access.keyLimit, wallet: access.wallet, balance: access.balance, aiEnabled: access.allowed } })
+  return extJson({ ok: true, user: { id: auth.userId, email, plan }, key: { id: auth.keyId, name: auth.name }, access: { keyLimit: access.keyLimit, wallet: access.wallet, balance: access.balance, aiEnabled: access.allowed, seniorReview: access.seniorReview } })
 }
 
 export const Route = createFileRoute('/api/public/extension/verify')({
