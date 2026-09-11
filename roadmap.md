@@ -11,3 +11,4 @@
 - [x] Show dashboard total spend and the three most recent payment rows
 - [x] Enlarge recent scan rows, show senior-review model logos, and link available balance to Usage
 - [x] Show API key names and align dashboard Spend, Extension, and Recents rows
+- [x] Match exact row heights and dividers across all three dashboard columns

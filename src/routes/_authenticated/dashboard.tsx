@@ -1319,7 +1319,7 @@ function DashboardHero({ keysCount, stats }: { keysCount: number | null; stats: 
               <span className="inline-flex items-center gap-1">Spend <ChevronRight className="h-3 w-3" /></span>
               <MoreHorizontal className="h-4 w-4 text-zinc-300" />
             </div>
-            <Link to="/dashboard/usage" className="mt-1 flex items-center justify-between border-b border-zinc-200 py-3 text-sm text-zinc-900 hover:text-zinc-600">
+            <Link to="/dashboard/usage" className="mt-1 flex h-12 items-center justify-between border-b border-zinc-200 text-sm text-zinc-900 hover:text-zinc-600">
               <span className="inline-flex items-center gap-2">
                 <BadgeDollarSign className="h-4 w-4 text-zinc-500" />
                 <span className="font-medium">$60. 60 Total Available</span>
@@ -1333,7 +1333,7 @@ function DashboardHero({ keysCount, stats }: { keysCount: number | null; stats: 
                 const seed = Array.from(entry.id).reduce((sum, char) => sum + char.charCodeAt(0), 0);
                 const models = Array.from({ length: 2 }, (_, offset) => reviewModels[(seed + offset) % reviewModels.length]);
                 return (
-                  <Link key={entry.id} to="/dashboard/usage" className="flex min-h-12 items-center justify-between gap-3 py-3 text-sm text-zinc-500 hover:text-zinc-900">
+                  <Link key={entry.id} to="/dashboard/usage" className="flex h-12 items-center justify-between gap-3 text-sm text-zinc-500 hover:text-zinc-900">
                     <span className="min-w-0 truncate capitalize">{entry.reason.replace(/_/g, " ")}</span>
                     <span className="flex shrink-0 items-center gap-3">
                       <span className="flex items-center -space-x-0.5" aria-label={models.map((model) => model.label).join(", ")}>
@@ -1354,7 +1354,7 @@ function DashboardHero({ keysCount, stats }: { keysCount: number | null; stats: 
               <span className="inline-flex items-center gap-1">Extension <ChevronRight className="h-3 w-3" /></span>
               <MoreHorizontal className="h-4 w-4 text-zinc-300" />
             </div>
-            <Link to="/dashboard/extension" className="mt-1 flex items-center justify-between border-b border-zinc-200 py-3 text-sm text-zinc-900 hover:text-zinc-600">
+            <Link to="/dashboard/extension" className="mt-1 flex h-12 items-center justify-between border-b border-zinc-200 text-sm text-zinc-900 hover:text-zinc-600">
               <span className="inline-flex min-w-0 items-center gap-2">
                 <Rocket className="h-4 w-4 shrink-0 text-zinc-500" />
                 <span className="truncate font-medium">Jenvu Extension v1.8.1</span>
@@ -1363,11 +1363,11 @@ function DashboardHero({ keysCount, stats }: { keysCount: number | null; stats: 
             </Link>
             <div className="divide-y divide-zinc-200">
               {recentKeys.length === 0 ? (
-                <Link to="/dashboard/extension" className="flex py-3 text-sm text-zinc-400 hover:text-zinc-600">
+                <Link to="/dashboard/extension" className="flex h-12 items-center text-sm text-zinc-400 hover:text-zinc-600">
                   {keysCount ? `${keysCount} active key${keysCount > 1 ? "s" : ""}` : "Create your first key"}
                 </Link>
               ) : recentKeys.map((key) => (
-                <Link key={key.id} to="/dashboard/extension" className="flex min-h-12 items-center justify-between gap-3 py-3 text-sm text-zinc-500 hover:text-zinc-900">
+                <Link key={key.id} to="/dashboard/extension" className="flex h-12 items-center justify-between gap-3 text-sm text-zinc-500 hover:text-zinc-900">
                   <span className="min-w-0 truncate font-medium text-zinc-900">{key.name}</span>
                   <span className="shrink-0 tabular-nums text-[12px] text-zinc-500">
                     {keyTokens.get(key.id)
@@ -1386,9 +1386,9 @@ function DashboardHero({ keysCount, stats }: { keysCount: number | null; stats: 
             </div>
             <div className="mt-1 divide-y divide-zinc-200">
               {filtered.length === 0 ? (
-                <p className="flex min-h-12 items-center py-3 text-sm text-zinc-400">No matches</p>
+                <p className="flex h-12 items-center text-sm text-zinc-400">No matches</p>
               ) : filtered.map((l) => (
-                <Link key={l.to} to={l.to} className="flex min-h-12 items-center justify-between py-3 text-sm text-zinc-500 hover:text-zinc-900">
+                <Link key={l.to} to={l.to} className="flex h-12 items-center justify-between text-sm text-zinc-500 hover:text-zinc-900">
                   <span className="inline-flex items-center gap-2">
                     <History className="h-3.5 w-3.5 text-zinc-400" />
                     <span className="font-medium text-zinc-900">{l.label}</span>
