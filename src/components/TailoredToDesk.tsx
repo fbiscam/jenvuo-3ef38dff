@@ -78,7 +78,7 @@ export function TailoredToDesk() {
 
           <article className="flex min-h-[290px] flex-col rounded-md bg-home-accent p-6 text-home-accent-foreground sm:p-7">
             <Globe2 className="h-6 w-6" strokeWidth={1.8} aria-hidden="true" />
-            <h3 className="mt-3 text-base font-semibold">One network for charts and risk</h3>
+            <h3 className="mt-3 text-center text-base font-semibold sm:text-left">One network for charts and risk</h3>
             <p className="mt-3 max-w-sm text-sm leading-snug opacity-95">
                Whether you&rsquo;re scalping the London killzone, tracking red-folder news, or reviewing a week of trades, it runs on the global engine.
             </p>
