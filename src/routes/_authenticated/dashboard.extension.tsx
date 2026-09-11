@@ -197,7 +197,7 @@ function ExtensionPage() {
       {view === "keys" && <div className="mt-5">
         <div className="mb-4 flex items-end justify-between gap-3">
           <div>
-            <h2 className="text-[16px] font-medium text-zinc-900">Recent API Keys</h2>
+            <h2 className="text-[16px] font-medium text-zinc-900">&nbsp; Recent api keys</h2>
             <p className="mt-1 text-[12px] text-zinc-500">Your four newest extension keys, newest first.</p>
           </div>
           <span className="shrink-0 text-[12px] tabular-nums text-zinc-500">{displayedKeys.length} shown</span>
