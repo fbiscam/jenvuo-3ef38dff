@@ -1319,8 +1319,7 @@ function DashboardHero({ keysCount, stats }: { keysCount: number | null; stats: 
                 <p className="py-3 text-sm text-zinc-400">No recent payments</p>
               ) : recentSpend.map((entry) => {
                 const seed = Array.from(entry.id).reduce((sum, char) => sum + char.charCodeAt(0), 0);
-                const modelCount = 2 + (seed % 2);
-                const models = Array.from({ length: modelCount }, (_, offset) => reviewModels[(seed + offset) % reviewModels.length]);
+                const models = Array.from({ length: 2 }, (_, offset) => reviewModels[(seed + offset) % reviewModels.length]);
                 return (
                   <Link key={entry.id} to="/dashboard/usage" className="flex min-h-12 items-center justify-between gap-3 py-3 text-sm text-zinc-500 hover:text-zinc-900">
                     <span className="min-w-0 truncate capitalize">{entry.reason.replace(/_/g, " ")}</span>
@@ -1330,7 +1329,7 @@ function DashboardHero({ keysCount, stats }: { keysCount: number | null; stats: 
                           <Icon key={key} className={`h-4 w-4 ${className}`} aria-label={label} />
                         ))}
                       </span>
-                      <span className="font-medium tabular-nums text-zinc-900">-${Math.abs(entry.delta).toFixed(2)}</span>
+                      <span className="font-medium tabular-nums text-destructive">-${Math.abs(entry.delta).toFixed(2)}</span>
                     </span>
                   </Link>
                 );
