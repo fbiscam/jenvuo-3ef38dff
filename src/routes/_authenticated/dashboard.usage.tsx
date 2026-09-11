@@ -2,14 +2,19 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import { Calendar, ChartColumn, ChevronDown, ChevronRight, Download, RefreshCw } from "lucide-react";
+import { Calendar, ChartColumn, Check, ChevronDown, ChevronRight, Copy, Download, RefreshCw } from "lucide-react";
 import { getUsageStats } from "@/lib/usage.functions";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/_authenticated/dashboard/usage")({
   head: () => ({
     meta: [
       { title: "Usage — Jenvu" },
       { name: "description", content: "Track your USD wallet usage, per-scan model + cost history." },
+      { property: "og:title", content: "Usage — Jenvu" },
+      { property: "og:description", content: "Track your USD wallet usage, per-scan model + cost history." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -69,6 +74,17 @@ function UsagePage() {
   const [rangeDays, setRangeDays] = useState<number>(30);
   const [model, setModel] = useState<string>("all");
   const [openMenu, setOpenMenu] = useState<"model" | "range" | null>(null);
+  const [copiedKeyId, setCopiedKeyId] = useState<string | null>(null);
+
+  const copyKeyPrefix = async (keyId: string, keyPrefix: string) => {
+    try {
+      await navigator.clipboard.writeText(keyPrefix);
+      setCopiedKeyId(keyId);
+      window.setTimeout(() => setCopiedKeyId(null), 1800);
+    } catch {
+      setCopiedKeyId(null);
+    }
+  };
 
   const models = useMemo(() => {
     if (!data) return [] as string[];
@@ -362,9 +378,22 @@ function UsagePage() {
                           {key.name} · {usage.requests} request{usage.requests === 1 ? "" : "s"} · {key.revokedAt ? "Revoked" : "Active"}
                         </div>
                       </div>
-                      <div className="shrink-0 text-right">
-                        <div className="text-[12px] font-semibold tabular-nums text-zinc-900">{fmtUsd(usage.spend, 2)}</div>
-                        <div className="mt-0.5 text-[10px] text-zinc-400">Spend</div>
+                      <div className="flex shrink-0 items-center gap-2">
+                        <div className="text-right">
+                          <div className="text-[12px] font-semibold tabular-nums text-zinc-900">{fmtUsd(usage.spend, 2)}</div>
+                          <div className="mt-0.5 text-[10px] text-zinc-400">Spend</div>
+                        </div>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          title="Copy visible key prefix"
+                          aria-label={`Copy visible prefix for ${key.name}`}
+                          onClick={() => void copyKeyPrefix(key.id, key.keyPrefix)}
+                          className="h-8 w-8 text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900"
+                        >
+                          {copiedKeyId === key.id ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+                        </Button>
                       </div>
                     </div>
                   );
