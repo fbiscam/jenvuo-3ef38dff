@@ -16,3 +16,4 @@
 - [x] Promote tested Unikey GPT-6 Astra to primary extension analysis
 - [x] Promote tested Unikey Claude Opus 4.8 to senior second review
 - [x] Align extension token billing and pricing copy with Unikey rates
+- [x] Add Grok 4.6 fallback and block every unreviewed extension result

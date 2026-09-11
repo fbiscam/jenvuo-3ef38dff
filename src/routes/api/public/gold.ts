@@ -97,6 +97,18 @@ function validImage(value: unknown): string | null {
   return value.length <= 4_500_000 ? value : null
 }
 
+function validateSeniorReview(content: string): true | string {
+  const normalized = content.trim()
+  if (normalized.length < 80) return 'Senior reviewer returned an incomplete answer.'
+  if (/^here are the search results\b/i.test(normalized) || /search results for ["“]/i.test(normalized)) {
+    return 'Senior reviewer returned search results instead of an ICT/SMC audit.'
+  }
+  if (!/\b(?:verdict|wait|buy|sell|bias)\b/i.test(normalized)) {
+    return 'Senior reviewer did not provide a valid trading verdict.'
+  }
+  return true
+}
+
 async function handle({ request }: { request: Request }) {
   const auth = await authenticateExtensionRequest(request)
   if (!auth.ok) return extJson({ ok: false, error: auth.error }, auth.status)
@@ -180,6 +192,7 @@ async function handle({ request }: { request: Request }) {
           timeoutMs: 45_000,
           deadlineMs: 50_000,
           retriesPerModel: 1,
+          validateContent: validateSeniorReview,
           messages: [
             {
               role: 'system',
@@ -188,11 +201,13 @@ async function handle({ request }: { request: Request }) {
             { role: 'user', content: `Live:\n${reviewContext}\nAsk: ${question.slice(0, 300)}\nGPT-6 Astra primary analysis:\n${primary.content.slice(0, 900)}` },
           ],
         })
+      // Hard approval gate: only the validated senior response is ever exposed.
       content = review.content
       seniorReview = { included: true, model: review.model, status: 'completed' }
 
       // The senior review is the second pass: GPT-6 Astra analyzes first,
-      // then Claude Opus 4.8 independently audits and finalizes the answer.
+       // then Claude Opus 4.8 (or Grok 4.6 fallback) independently audits and
+       // finalizes the answer. A failed review aborts the request above.
       const secondReview = { included: true, model: review.model, status: 'completed' }
 
       const { chargeExtensionUsage } = await import('@/lib/extension-billing.server')
