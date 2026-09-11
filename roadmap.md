@@ -9,7 +9,7 @@
 - [x] Strengthen live ICT/SMC context, chart markings, and senior-review reasoning
 - [x] Repackage and test the extension, API, billing, and TypeScript checks
 
-- [ ] Add and test Unikey models for extension senior review
-- [ ] Replace extension logo with current Jenvu logo
-- [ ] Remove chart markings from extension home graph
+- [x] Add and test Unikey models for extension senior review
+- [x] Replace extension logo with current Jenvu logo
+- [x] Remove chart markings from extension home graph
 - [ ] Verify TypeScript and live extension flow

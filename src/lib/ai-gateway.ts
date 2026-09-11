@@ -71,6 +71,7 @@ function providerConfigured(model: string): boolean {
   if (model.startsWith("nvapi/")) return Boolean(process.env.NVIDIA_API_KEY);
   if (model.startsWith("bmind/")) return Boolean(process.env.BLUESMIND_API_KEY || process.env.BLUESMINDS_API_KEY || process.env.OPENAI_API_KEY);
   if (model.startsWith("tukenku/")) return Boolean(process.env.TUKENKU_API_KEY);
+  if (model.startsWith("unikey/")) return Boolean(process.env.UNIKEY_API_KEY);
   if (model.startsWith("dsofficial/")) return Boolean(process.env.DEEPSEEK_API_KEY);
   if (model.startsWith("oai/")) return Boolean(process.env.OPENAI_API_KEY);
   return Boolean(process.env.LOVABLE_API_KEY);
@@ -107,13 +108,15 @@ async function singleAttempt(
   //   `blackboxai/*` → Blackbox API
   //   `nvapi/*`      → NVIDIA Integrate API (strip prefix to get real model id)
   //   `bmind/*`      → Bluesminds unified gateway (OpenAI-compatible)
-  //   `tukenku/*`   → Tukenku / Monyet AI (OpenAI-compatible)
+  //   `tukenku/*`    → Tukenku / Monyet AI (OpenAI-compatible)
+  //   `unikey/*`     → GetUniKey (OpenAI-compatible)
   //   `dsofficial/*` → DeepSeek official API (OpenAI-compatible)
   //   else           → Lovable AI Gateway
   const isBlackbox = model.startsWith("blackboxai/");
   const isNvidia = model.startsWith("nvapi/");
   const isBmind = model.startsWith("bmind/");
   const isTukenku = model.startsWith("tukenku/");
+  const isUnikey = model.startsWith("unikey/");
   const isDsOfficial = model.startsWith("dsofficial/");
   const isOai = model.startsWith("oai/");
   const blackboxKey = process.env.BLACKBOX_API_KEY;
@@ -125,6 +128,7 @@ async function singleAttempt(
     process.env.BLUESMIND_API_KEY ||
     process.env.OPENAI_API_KEY;
   const tukenkuKey = process.env.TUKENKU_API_KEY;
+  const unikeyKey = process.env.UNIKEY_API_KEY;
   const deepseekKey = process.env.DEEPSEEK_API_KEY;
   const openaiKey = process.env.OPENAI_API_KEY;
 
@@ -146,6 +150,8 @@ async function singleAttempt(
     ? bmindEndpoint
     : isTukenku
     ? "https://tukenku.com/v1/chat/completions"
+    : isUnikey
+    ? "https://www.getunikey.ai/v1/chat/completions"
     : isDsOfficial
     ? "https://api.deepseek.com/chat/completions"
     : "https://ai.gateway.lovable.dev/v1/chat/completions";
@@ -163,6 +169,9 @@ async function singleAttempt(
   } else if (isTukenku) {
     if (!tukenkuKey) throw new AiGatewayError("TUKENKU_API_KEY missing on server", 0, true);
     headers["Authorization"] = `Bearer ${tukenkuKey}`;
+  } else if (isUnikey) {
+    if (!unikeyKey) throw new AiGatewayError("UNIKEY_API_KEY missing on server", 0, true);
+    headers["Authorization"] = `Bearer ${unikeyKey}`;
   } else if (isDsOfficial) {
     if (!deepseekKey) throw new AiGatewayError("DEEPSEEK_API_KEY missing on server", 0, true);
     headers["Authorization"] = `Bearer ${deepseekKey}`;
@@ -184,6 +193,8 @@ async function singleAttempt(
     ? model.slice("bmind/".length)
     : isTukenku
     ? model.slice("tukenku/".length)
+    : isUnikey
+    ? model.slice("unikey/".length)
     : isDsOfficial
     ? model.slice("dsofficial/".length)
     : model;
@@ -209,15 +220,15 @@ async function singleAttempt(
   };
   // Blackbox/NVIDIA/Bluesminds/DeepSeek-official: don't force response_format — rely on system prompt.
   if (opts.jsonMode && isOai) body.response_format = { type: "json_object" };
-  else if (opts.jsonMode && !isBlackbox && !isNvidia && !isBmind && !isTukenku && !isDsOfficial && !isOai) body.response_format = { type: "json_object" };
+  else if (opts.jsonMode && !isBlackbox && !isNvidia && !isBmind && !isTukenku && !isUnikey && !isDsOfficial && !isOai) body.response_format = { type: "json_object" };
   if (opts.maxTokens) {
-    if ((isOai && /^gpt-5/i.test(wireModel)) || (!isBlackbox && !isNvidia && !isBmind && !isTukenku && !isDsOfficial && !isOai && model.startsWith("openai/gpt-5"))) {
+    if ((isOai && /^gpt-5/i.test(wireModel)) || (!isBlackbox && !isNvidia && !isBmind && !isTukenku && !isUnikey && !isDsOfficial && !isOai && model.startsWith("openai/gpt-5"))) {
       body.max_completion_tokens = opts.maxTokens;
     } else {
       body.max_tokens = opts.maxTokens;
     }
   }
-  if (!isBlackbox && !isNvidia && !isBmind && !isTukenku && !isDsOfficial && !isOai && opts.priority && PRIORITY_TIER_MODELS.has(model)) {
+  if (!isBlackbox && !isNvidia && !isBmind && !isTukenku && !isUnikey && !isDsOfficial && !isOai && opts.priority && PRIORITY_TIER_MODELS.has(model)) {
     body.service_tier = "priority";
   }
 
@@ -242,7 +253,7 @@ async function singleAttempt(
 
   if (!res.ok) {
     const txt = await res.text().catch(() => "");
-    const terminal = (isBlackbox || isNvidia || isBmind || isTukenku || isDsOfficial || isOai)
+    const terminal = (isBlackbox || isNvidia || isBmind || isTukenku || isUnikey || isDsOfficial || isOai)
       ? !(res.status === 429 || res.status >= 500 || res.status === 403 || res.status === 400 || res.status === 401 || res.status === 404)
       : !(res.status === 429 || res.status >= 500);
 
@@ -519,11 +530,14 @@ export const EXTENSION_MODEL_CHAIN = {
     "tukenku/myt/qwen3-vl-plus",
   ],
   seniorReview: [
-    "tukenku/myt/claude-opus-4-8-free",
+    "unikey/gpt-6-astra",
+    "unikey/gemini-3.1-pro",
+    "unikey/x-ai/grok-4.3",
   ],
   // Independent second reviewer — must not reuse the senior primary model.
   secondReview: [
-    "tukenku/myt/claude-opus-4-8-free",
+    "unikey/gemini-3.1-pro",
+    "unikey/deepseek-v4-pro",
   ],
 } as const;
 
