@@ -152,6 +152,53 @@ async function handle({ request }: { request: Request }) {
       }))
 
       const image = validImage(body.screenImage) || validImage(body.chartImage)
+
+      // Conversational mode: plain questions/greetings get a normal assistant
+      // reply. Only explicit trading/analysis intent (or an attached chart)
+      // triggers the ICT/SMC desk pipeline with senior review.
+      const analysisIntent =
+        /\b(analy[sz]|signal|setup|trade|entry|exit|buy|sell|long|short|bias|tp\d?|sl|stop\s*loss|target|rr|risk|chart|candle|structure|bos|choch|fvg|order\s*block|liquidity|premium|discount|support|resistance|trend|price|market|xau|gold|forex|pair|timeframe|scalp|swing|position)\b/i.test(question) ||
+        /(tajzia|tajziya|signal|kharid|bech|entry|nishan|marking)/i.test(question)
+      const conversational = !image && !analysisIntent
+
+      if (conversational) {
+        const casual = await callChatCompletion({
+          models: [...EXTENSION_MODEL_CHAIN.reasoning],
+          stage: 'extension-chat',
+          maxTokens: 400,
+          timeoutMs: 45_000,
+          deadlineMs: 50_000,
+          retriesPerModel: 1,
+          messages: [
+            {
+              role: 'system',
+              content:
+                "You are Jenvu, a friendly general-purpose AI assistant that also happens to be an expert gold/forex ICT-SMC analyst. Right now the user is just chatting or asking a general question. Reply naturally and helpfully like ChatGPT would - conversational, concise, in the user's language (Urdu/English/Roman Urdu). Do NOT output a trade plan, verdict, bias, entry, stop or targets unless the user explicitly asks for market analysis. If they ask what you can do, briefly mention you can analyze charts, mark levels and give ICT/SMC signals on request.",
+            },
+            ...history,
+            { role: 'user', content: question },
+          ],
+        })
+
+        const { chargeExtensionUsage: chargeCasual } = await import('@/lib/extension-billing.server')
+        const casualBilling = await chargeCasual({
+          userId: auth.userId, keyId: auth.keyId, keyName: auth.name, requestId,
+          action: 'chat',
+          calls: [{ model: casual.model, usage: casual.usage, stage: 'extension-chat' }],
+        })
+        if (!casualBilling.ok) return extJson({ ok: false, error: casualBilling.error, code: casualBilling.error?.includes('balance') ? 'LOW_BALANCE' : 'BILLING_FAILED' }, casualBilling.error?.includes('balance') ? 402 : 502)
+
+        return extJson({
+          ok: true,
+          text: casual.content,
+          mode: 'conversation',
+          ticker: market.ticker,
+          seniorReview: { included: false, model: null, status: 'not_required' },
+          secondReview: { included: false, model: null, status: 'not_required' },
+          usage: { requestId, charged: casualBilling.charged, balance: casualBilling.balance },
+        })
+      }
+
       const userContent: string | ChatContentPart[] = image
         ? [
             { type: 'text', text: `Live market context:\n${context}\n\nTrader request: ${question}\nInspect the attached chart itself as well as the verified live feed. If they conflict, trust the verified live price and clearly mention the mismatch.` },
