@@ -93,7 +93,7 @@ export function formatModelLabel(rawModel: string | null | undefined): string {
   const m = raw.toLowerCase();
   if (m.startsWith("rules-engine/ict-smc")) return "ICT/SMC Rules Engine";
   // Strip provider prefix (bmind/, openai/, nvapi/, google/, etc.)
-  const bare = m.replace(/^(dsofficial|bmind|tukenku|openai|nvapi|google|anthropic)\//g, "").replace(/^myt\//, "").replace(/^orion\//, "").replace(/^deepseek-ai\//, "");
+  const bare = m.replace(/^(dsofficial|bmind|tukenku|unikey|openai|nvapi|google|anthropic)\//g, "").replace(/^myt\//, "").replace(/^orion\//, "").replace(/^deepseek-ai\//, "");
   if (bare.startsWith("claude-opus-4-8")) return "Claude Opus 4.8";
   if (bare.startsWith("claude-sonnet-4.5") || bare.startsWith("claude-4.5-sonnet")) return "Claude Sonnet 4.5";
   if (bare.startsWith("claude-3.7-sonnet") || bare.startsWith("claude-3-7-sonnet")) return "Claude 3.7 Sonnet";
@@ -113,6 +113,7 @@ export function formatModelLabel(rawModel: string | null | undefined): string {
   if (bare.startsWith("gpt-5-mini")) return "ChatGPT 5 Mini";
   if (bare.startsWith("gpt-5-nano")) return "ChatGPT 5 Nano";
   if (bare.startsWith("gpt-5")) return "ChatGPT 5";
+  if (bare.startsWith("gpt-6-astra")) return "GPT-6 Astra";
   if (bare.startsWith("gpt-4.1-mini")) return "ChatGPT 4.1 Mini";
   if (bare.startsWith("gpt-4.1")) return "ChatGPT 4.1";
   if (bare.startsWith("gpt-4o-mini")) return "ChatGPT 4o Mini";
@@ -121,6 +122,7 @@ export function formatModelLabel(rawModel: string | null | undefined): string {
   if (bare.startsWith("deepseek-v4-flash")) return "DeepSeek V4 Flash";
   if (bare.startsWith("deepseek-v4-pro") || bare.startsWith("deepseek-reasoner")) return "DeepSeek V4 Pro";
   if (bare.startsWith("deepseek-chat")) return "DeepSeek V3";
+  if (bare.startsWith("grok-4.3")) return "Grok 4.3";
   if (bare.startsWith("grok")) return "Grok 4.5";
 
   if (bare.startsWith("gemini-3.1-pro")) return "Gemini 3.1 Pro";
