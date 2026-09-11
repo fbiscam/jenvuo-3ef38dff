@@ -911,7 +911,7 @@ function DashboardLayout() {
   }, [authUser?.id, authLoading, refreshTick]);
 
   return (
-    <div className={`flex min-h-screen bg-white text-zinc-900 font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif] antialiased jenvu-zoom-dashboard`}>
+    <div className={`flex min-h-screen text-zinc-900 font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif] antialiased jenvu-zoom-dashboard ${pathname === "/dashboard" ? "bg-[#FAFAFA]" : "bg-white"}`}>
 
       {/* Mobile overlay */}
       {mobileNavOpen && !embedMode && (
@@ -1043,7 +1043,7 @@ function DashboardLayout() {
 
 
       {/* Right column */}
-      <div className={`dashboard-right-col flex min-w-0 flex-1 flex-col bg-white ${embedMode ? "" : sidebarCollapsed ? "collapsed lg:pl-[60px]" : "lg:pl-[200px]"}`}>
+      <div className={`dashboard-right-col flex min-w-0 flex-1 flex-col ${pathname === "/dashboard" ? "bg-[#FAFAFA]" : "bg-white"} ${embedMode ? "" : sidebarCollapsed ? "collapsed lg:pl-[60px]" : "lg:pl-[200px]"}`}>
 
       {/* Mobile menu toggle (floating) */}
       {!embedMode && (
