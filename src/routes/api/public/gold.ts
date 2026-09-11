@@ -184,6 +184,31 @@ async function handle({ request }: { request: Request }) {
       content = review.content
       seniorReview = { included: true, model: review.model, status: 'completed' }
 
+      // Independent second reviewer (enrichment only, never vetoes, never blocks the answer).
+      let secondReview: { included: boolean; model: string | null; status: string } = { included: false, model: null, status: 'unavailable' }
+      let secondCall: Awaited<ReturnType<typeof callChatCompletion>> | null = null
+      try {
+        secondCall = await callChatCompletion({
+          models: [...EXTENSION_MODEL_CHAIN.secondReview].filter((m) => m !== review.model),
+          stage: 'extension-second-review',
+          maxTokens: 400,
+          timeoutMs: 30_000,
+          deadlineMs: 35_000,
+          retriesPerModel: 0,
+          messages: [
+            {
+              role: 'system',
+              content: 'You are a second, independent ICT/SMC risk reviewer. Do NOT rewrite the plan. In at most 5 short bullets, flag disagreements, stale or invented levels, missing confirmations and risk-geometry problems against the verified live context. If you fully agree, say "Second review: aligned" plus the single biggest risk. Never promise accuracy or profit.',
+            },
+            { role: 'user', content: `Verified context:\n${context}\n\nSenior desk answer:\n${review.content}` },
+          ],
+        })
+        content = `${content}\n\n---\nSecond review (${secondCall.model}):\n${secondCall.content}`
+        secondReview = { included: true, model: secondCall.model, status: 'completed' }
+      } catch {
+        secondReview = { included: false, model: null, status: 'unavailable' }
+      }
+
       const { chargeExtensionUsage } = await import('@/lib/extension-billing.server')
       const billing = await chargeExtensionUsage({
         userId: auth.userId, keyId: auth.keyId, keyName: auth.name, requestId,
@@ -191,11 +216,12 @@ async function handle({ request }: { request: Request }) {
         calls: [
           { model: primary.model, usage: primary.usage, stage: image ? 'extension-screen-analysis' : 'extension-chat' },
           { model: review.model, usage: review.usage, stage: 'extension-senior-review' },
+          ...(secondCall ? [{ model: secondCall.model, usage: secondCall.usage, stage: 'extension-second-review' }] : []),
         ],
       })
       if (!billing.ok) return extJson({ ok: false, error: billing.error, code: billing.error?.includes('balance') ? 'LOW_BALANCE' : 'BILLING_FAILED' }, billing.error?.includes('balance') ? 402 : 502)
 
-      return extJson({ ok: true, text: content, ticker: market.ticker, chart: market.chart, technicals: market.technicals, freshness: market.freshness, overlayMarks: market.marks, marksBias: market.technicals.trend.toLowerCase(), seniorReview, usage: { requestId, charged: billing.charged, balance: billing.balance } })
+      return extJson({ ok: true, text: content, ticker: market.ticker, chart: market.chart, technicals: market.technicals, freshness: market.freshness, overlayMarks: market.marks, marksBias: market.technicals.trend.toLowerCase(), seniorReview, secondReview, usage: { requestId, charged: billing.charged, balance: billing.balance } })
     }
 
     return extJson({
