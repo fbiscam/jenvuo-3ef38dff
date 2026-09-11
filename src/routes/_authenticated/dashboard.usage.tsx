@@ -294,7 +294,7 @@ function UsagePage() {
                         tickLine={false}
                         axisLine={false}
                         width={48}
-                        tick={{ fill: "#a1a1aa", fontSize: 11 }}
+                        tick={{ fill: "#a1a1aa", fontSize: 11, textAnchor: "start", dx: -46 }}
                         tickFormatter={(v: number) => `$${v >= 1 ? v.toFixed(0) : v.toFixed(2)}`}
                       />
                       <RTooltip
