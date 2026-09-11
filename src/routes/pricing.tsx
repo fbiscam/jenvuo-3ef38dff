@@ -25,6 +25,8 @@ export const Route = createFileRoute("/pricing")({
       { name: "description", content: "Compare Jenvu plans, extension API key limits, monthly AI wallets, and senior-reviewed GPT/Gemini market analysis." },
       { property: "og:title", content: "Jenvu Pricing — Pro & Elite Plans" },
       { property: "og:description", content: "Compare Jenvu plans with extension API keys, AI wallets, and senior-reviewed GPT/Gemini market analysis." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { property: "og:url", content: "https://jenvu.com/pricing" },
     ],
     links: [{ rel: "canonical", href: "https://jenvu.com/pricing" }],
@@ -491,25 +493,6 @@ function PricingPage() {
       <SiteFooter />
     </div>
   );
-}
-
-function Cell({ value, highlight }: { value: Mark; highlight?: boolean }) {
-  const base = `px-5 py-3.5 text-center ${highlight ? "bg-amber-50/40" : ""}`;
-  if (value === true) {
-    return (
-      <td className={base}>
-        <Check className="inline h-4 w-4 text-emerald-600" />
-      </td>
-    );
-  }
-  if (value === false) {
-    return (
-      <td className={base}>
-        <Minus className="inline h-4 w-4 text-zinc-300" />
-      </td>
-    );
-  }
-  return <td className={`${base} ${MONO} text-[11px] uppercase tracking-wider text-zinc-700`}>{value}</td>;
 }
 
 function CustomTopUp({ signedOut }: { signedOut: boolean }) {
