@@ -1,3 +1,4 @@
 - [x] Connect Buy credits to the payment page
 - [x] Add confirmed plan cancellation with credit-loss warning
 - [x] Verify TypeScript and billing interactions
+- [x] Balance footer navigation to four pages per column and remove Killzone Times

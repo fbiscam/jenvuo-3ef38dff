@@ -69,7 +69,6 @@ const columns = [
     label: "Intelligence",
     links: [
       { to: "/insights", label: "Market Insights" },
-      { to: "/killzones", label: "Killzone Times" },
       { to: "/insights", label: "Our Insights" },
       { to: "/llm", label: "Language Model" },
       { to: "/development", label: "Development" },
@@ -82,9 +81,6 @@ const columns = [
       { to: "/auth", label: "Sign In" },
       { to: "/help", label: "Help Center" },
       { to: "/leads", label: "Leads Tool" },
-      { to: "/about", label: "About" },
-      { to: "/contact", label: "Contact" },
-
     ],
   },
   {
@@ -93,9 +89,7 @@ const columns = [
       { to: "/terms", label: "Terms of Service" },
       { to: "/privacy", label: "Privacy Policy" },
       { to: "/refund", label: "Refund Policy" },
-      { to: "/cancellation", label: "Cancellation" },
       { to: "/disclaimer", label: "Risk Disclaimer" },
-      { to: "/scam-tool", label: "Scam Tool" },
     ],
   },
 
