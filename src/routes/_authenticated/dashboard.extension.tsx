@@ -175,13 +175,6 @@ function ExtensionPage() {
             </button>
           </div>
         </div>
-        <button
-          onClick={onDownload}
-          disabled={downloading}
-          className="inline-flex items-center gap-2 rounded-lg border border-zinc-300 px-3 py-2 text-[13px] text-zinc-800 hover:bg-zinc-50 disabled:opacity-60"
-        >
-          <Download className="h-4 w-4" /> {downloading ? "Preparing…" : "Download extension (v1.8.1)"}
-        </button>
       </div>
 
       {/* Fresh key banner */}
@@ -204,7 +197,7 @@ function ExtensionPage() {
       {view === "keys" && <div className="mt-5">
         <div className="mb-4 flex items-end justify-between gap-3">
           <div>
-            <h2 className="text-[16px] font-medium text-zinc-900">Recent API keys</h2>
+            <h2 aria-hidden="true" className="text-[16px] font-medium text-zinc-900">&nbsp;</h2>
             <p className="mt-1 text-[12px] text-zinc-500">Your four newest extension keys, newest first.</p>
           </div>
           <span className="shrink-0 text-[12px] tabular-nums text-zinc-500">{displayedKeys.length} shown</span>
