@@ -266,26 +266,41 @@ function UsagePage() {
             </div>
             <div className="px-2 py-6 sm:px-5">
               {derived.hasSpend ? (
-                <div className="h-64 w-full">
+                <div className="h-72 w-full">
                   <ResponsiveContainer width="100%" height="100%">
-                    <ComposedChart data={derived.days} margin={{ top: 8, right: 8, bottom: 4, left: 0 }}>
-                      <CartesianGrid stroke="#f4f4f5" vertical={false} />
+                    <ComposedChart data={derived.days} margin={{ top: 12, right: 8, bottom: 4, left: 0 }}>
+                      <defs>
+                        <linearGradient id="usageSpent" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor="#3f3f46" />
+                          <stop offset="100%" stopColor="#18181b" />
+                        </linearGradient>
+                        <linearGradient id="usageAdded" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor="#6ee7b7" />
+                          <stop offset="100%" stopColor="#10b981" />
+                        </linearGradient>
+                        <linearGradient id="usageReq" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor="#6366f1" stopOpacity={0.28} />
+                          <stop offset="100%" stopColor="#6366f1" stopOpacity={0} />
+                        </linearGradient>
+                      </defs>
+                      <CartesianGrid stroke="#f1f1f3" strokeDasharray="4 6" vertical={false} />
                       <XAxis
                         dataKey="date"
                         tickLine={false}
-                        axisLine={{ stroke: "#e4e4e7" }}
-                        tick={{ fill: "#71717a", fontSize: 11 }}
+                        axisLine={false}
+                        tickMargin={10}
+                        tick={{ fill: "#a1a1aa", fontSize: 11 }}
                         tickFormatter={(v: string) =>
                           new Date(v).toLocaleDateString(undefined, { month: "short", day: "numeric" })
                         }
-                        minTickGap={18}
+                        minTickGap={24}
                       />
                       <YAxis
                         yAxisId="usd"
                         tickLine={false}
                         axisLine={false}
                         width={54}
-                        tick={{ fill: "#71717a", fontSize: 11 }}
+                        tick={{ fill: "#a1a1aa", fontSize: 11 }}
                         tickFormatter={(v: number) => `$${v >= 1 ? v.toFixed(0) : v.toFixed(2)}`}
                       />
                       <YAxis
@@ -295,10 +310,10 @@ function UsagePage() {
                         axisLine={false}
                         width={40}
                         allowDecimals={false}
-                        tick={{ fill: "#71717a", fontSize: 11 }}
+                        tick={{ fill: "#a1a1aa", fontSize: 11 }}
                       />
                       <RTooltip
-                        cursor={{ fill: "rgba(24,24,27,0.04)" }}
+                        cursor={{ fill: "rgba(99,102,241,0.06)", radius: 6 }}
                         labelFormatter={(v) =>
                           new Date(String(v)).toLocaleDateString(undefined, {
                             weekday: "short",
@@ -307,34 +322,56 @@ function UsagePage() {
                           })
                         }
                         formatter={(value: number, name: string) =>
-                          name === "Requests"
-                            ? [fmtInt(value), name]
-                            : [fmtUsd(value, 2), name]
+                          name === "Requests" ? [fmtInt(value), name] : [fmtUsd(value, 2), name]
                         }
                         contentStyle={{
-                          borderRadius: 8,
-                          border: "1px solid #e4e4e7",
+                          borderRadius: 12,
+                          border: "1px solid #ececef",
+                          padding: "10px 12px",
                           fontSize: 12,
-                          boxShadow: "0 4px 16px rgba(0,0,0,0.06)",
+                          boxShadow: "0 10px 30px rgba(24,24,27,0.10)",
                         }}
+                        labelStyle={{ color: "#18181b", fontWeight: 600, marginBottom: 4 }}
+                        itemStyle={{ padding: 0 }}
                       />
                       <Legend
                         verticalAlign="bottom"
-                        height={28}
-                        iconType="square"
+                        height={30}
+                        iconType="circle"
+                        iconSize={8}
                         wrapperStyle={{ fontSize: 12, color: "#71717a" }}
                       />
-                      <Bar yAxisId="usd" dataKey="spent" name="Spent" stackId="usd" fill="#27272a" radius={[0, 0, 0, 0]} maxBarSize={26} />
-                      <Bar yAxisId="usd" dataKey="earned" name="Added" stackId="usd" fill="#34d399" radius={[3, 3, 0, 0]} maxBarSize={26} />
-                      <Line
+                      <Area
                         yAxisId="req"
                         type="monotone"
                         dataKey="requests"
                         name="Requests"
                         stroke="#6366f1"
-                        strokeWidth={2}
-                        dot={{ r: 2.5 }}
-                        activeDot={{ r: 4 }}
+                        strokeWidth={2.25}
+                        fill="url(#usageReq)"
+                        dot={false}
+                        activeDot={{ r: 4, strokeWidth: 2, stroke: "#fff" }}
+                        animationDuration={900}
+                      />
+                      <Bar
+                        yAxisId="usd"
+                        dataKey="spent"
+                        name="Spent"
+                        stackId="usd"
+                        fill="url(#usageSpent)"
+                        maxBarSize={22}
+                        radius={[4, 4, 4, 4]}
+                        animationDuration={800}
+                      />
+                      <Bar
+                        yAxisId="usd"
+                        dataKey="earned"
+                        name="Added"
+                        stackId="usd"
+                        fill="url(#usageAdded)"
+                        maxBarSize={22}
+                        radius={[4, 4, 4, 4]}
+                        animationDuration={800}
                       />
                     </ComposedChart>
                   </ResponsiveContainer>
