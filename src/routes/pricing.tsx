@@ -131,7 +131,7 @@ function PricingPage() {
   };
   const suffix = billing === "annual" ? "/yr" : "/mo";
   return (
-    <div className={`public-cloudflare min-h-dvh w-full bg-background text-foreground ${SANS} antialiased md:[zoom:1.375]`}>
+    <div className={`public-cloudflare min-h-dvh w-full bg-background text-foreground ${SANS} antialiased`}>
 
       {/* HEADER */}
       <header className="sticky top-0 z-50 border-b border-zinc-100 bg-white">
@@ -147,41 +147,66 @@ function PricingPage() {
       </header>
 
       {/* HERO */}
-      <section className="border-b border-border bg-zinc-50">
-        <div className="mx-auto max-w-5xl px-5 pb-12 pt-16 text-center sm:px-6 sm:pb-16 sm:pt-24">
-          <h1 className="text-4xl font-semibold sm:text-5xl md:text-6xl">
+      <section className="border-b border-border bg-background">
+        <div className="mx-auto max-w-5xl px-5 pb-20 pt-20 text-center sm:px-6 sm:pb-24 sm:pt-28">
+          <h1 className="text-4xl font-semibold leading-tight sm:text-5xl">
             Scale predictably.
           </h1>
-          <p className="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-zinc-600 sm:text-lg">
+          <p className="mx-auto mt-3 max-w-2xl text-sm leading-relaxed text-muted-foreground sm:text-base">
             Start with the plan that fits your trading desk. Every paid plan includes a monthly AI wallet billed by actual token use.
           </p>
-          <nav aria-label="Pricing categories" className="mt-9 flex flex-wrap justify-center gap-2">
-            {["Plans", "AI wallet", "Extension API", "Desk access"].map((item, index) => (
-              <span
-                key={item}
-                className={`rounded-full border px-4 py-2 text-sm font-medium ${index === 0 ? "border-home-accent bg-home-accent text-home-accent-foreground" : "border-zinc-300 bg-background text-zinc-700"}`}
-              >
-                {item}
-              </span>
-            ))}
-          </nav>
+          <div className="mx-auto mt-8 inline-flex items-center rounded-full border border-border bg-background p-1 shadow-sm" aria-label="Billing cycle">
+            <button type="button" onClick={() => setBilling("monthly")} className={`rounded-full px-5 py-2 text-sm font-medium transition ${billing === "monthly" ? "bg-home-accent text-home-accent-foreground" : "text-muted-foreground hover:text-foreground"}`}>Monthly</button>
+            <button type="button" onClick={() => setBilling("annual")} className={`rounded-full px-5 py-2 text-sm font-medium transition ${billing === "annual" ? "bg-home-accent text-home-accent-foreground" : "text-muted-foreground hover:text-foreground"}`}>Annual · save 17%</button>
+          </div>
         </div>
       </section>
 
 
-      {/* COMPARISON MATRIX — homepage Beanstalk style */}
+      {/* PLAN CARDS + COMPARISON MATRIX */}
       <section className="bg-background">
-        <div className="mx-auto max-w-7xl px-5 py-16 sm:px-8 sm:py-20">
-        <div className="mb-10 max-w-2xl">
-          <h2 className="text-3xl font-semibold sm:text-4xl">Choose your plan</h2>
-          <p className="mt-3 text-sm leading-relaxed text-zinc-600 sm:text-base">Clear monthly wallet limits, extension access, and review coverage with no hidden base analysis fee.</p>
+        <div className="mx-auto max-w-7xl px-5 py-10 sm:px-8 sm:py-14">
+        <div className="grid overflow-hidden border border-border bg-background sm:grid-cols-3">
+          {[
+            { name: "Pro", price: signedOut ? priceOf({ id: "pro", price: 15 }) : priceOf({ id: "pro", price: 15 }), description: "For active traders who need precise primary analysis.", wallet: "$10 AI wallet", key: "pro" as const },
+            { name: "Elite", price: priceOf({ id: "elite", price: 50 }), description: "For trading desks that require a senior-reviewed signal.", wallet: "$40 AI wallet", key: "elite" as const },
+            { name: "Ultra", price: priceOf({ id: "ultra", price: 100 }), description: "For high-volume desks needing maximum review capacity.", wallet: "$90 AI wallet", key: "ultra" as const },
+          ].map((plan) => {
+            const trialPro = trial.active && plan.key === "pro";
+            const isCurrent = currentPlan === plan.key && !trialPro;
+            const disabled = currentPlan !== null && !isCurrent && !trialPro && upgradeLock.locked;
+            const destination = currentPlan !== null ? "/dashboard/pay" : "/founding";
+            return (
+              <article key={plan.name} className="flex min-h-64 flex-col border-b border-border p-6 last:border-b-0 sm:border-b-0 sm:border-r sm:last:border-r-0">
+                <div className="flex items-center justify-between gap-3">
+                  <h2 className="text-base font-medium">{plan.name}</h2>
+                  {plan.key === "pro" && <span className="rounded-sm bg-home-accent px-2 py-1 text-[10px] font-semibold text-home-accent-foreground">Popular</span>}
+                </div>
+                <p className="mt-2 min-h-10 text-sm leading-5 text-muted-foreground">{plan.description}</p>
+                <div className="mt-5 flex items-baseline gap-1">
+                  <span className="price-font text-3xl tracking-normal">${plan.price}</span>
+                  <span className="text-xs text-muted-foreground">{suffix}</span>
+                </div>
+                <p className="mt-1 text-xs text-muted-foreground">{plan.wallet} included</p>
+                {isCurrent ? (
+                  <div className="mt-auto flex h-10 items-center justify-center rounded-full border border-border bg-muted text-sm font-medium">Current plan</div>
+                ) : disabled ? (
+                  <button type="button" disabled className="mt-auto h-10 cursor-not-allowed rounded-full border border-border bg-muted text-sm text-muted-foreground">Locked in trial</button>
+                ) : (
+                  <Link to={destination} className={`mt-auto flex h-10 items-center justify-center rounded-full border text-sm font-medium transition ${plan.key === "pro" ? "border-home-accent bg-home-accent text-home-accent-foreground hover:opacity-90" : "border-border bg-background hover:border-home-accent"}`}>
+                    {trialPro ? "Upgrade to Pro" : currentPlan !== null ? "Upgrade" : "Get started"}
+                  </Link>
+                )}
+              </article>
+            );
+          })}
         </div>
 
-
-
-
-
-        <div className="overflow-x-auto border border-border bg-background shadow-sm">
+        <div className="mt-8 overflow-hidden border border-border bg-background">
+          <div className="flex items-center justify-between border-b border-border px-5 py-4">
+            <h2 className="text-sm font-medium">Compare all features</h2>
+            <span className="text-xs text-muted-foreground">All plans include live market data</span>
+          </div>
 
           <table className="w-full min-w-[760px] text-sm border-collapse">
             <colgroup>
@@ -192,83 +217,11 @@ function PricingPage() {
             </colgroup>
 
             <thead>
-              <tr className="border-b border-zinc-200">
-                <th className="p-6 text-left align-bottom">
-                  <span className="text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl">Pricing Plan</span>
-                </th>
-                {[
-                  { name: "Pro", price: signedOut ? (billing === "annual" ? "$50" : "$5") : (billing === "annual" ? "$150" : "$15"), tag: "Active", anonTo: "/founding" as const, search: undefined, dark: false, accent: true, key: "pro" },
-                  { name: "Elite", price: billing === "annual" ? "$500" : "$50", tag: "Desk", anonTo: "/founding" as const, dark: true, key: "elite" },
-                  { name: "Ultra", price: billing === "annual" ? "$1,000" : "$100", tag: "Fund / Desk+", anonTo: "/founding" as const, dark: false, key: "ultra" },
-                ].map((p) => {
-                  const trialPro = trial.active && p.key === "pro";
-                  const isCurrent = currentPlan === p.key && !trialPro;
-                  const isLoggedIn = currentPlan !== null;
-                  const disabled = !trialPro && isLoggedIn && !isCurrent && upgradeLock.locked;
-                  const cta = trialPro
-                    ? "Upgrade to Pro"
-                    : disabled
-                    ? "Locked in trial"
-                    : isLoggedIn
-                      ? "Upgrade"
-                      : "Apply Now";
-                  const to = isLoggedIn ? "/dashboard/pay" : p.anonTo;
-                  return (
-                  <th
-                    key={p.name}
-                    className={`p-6 text-left align-top border-l border-zinc-200 ${isCurrent || p.accent ? "bg-home-accent-soft/60" : ""}`}
-                  >
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span className={`text-base font-semibold ${isCurrent || p.accent ? "text-home-accent" : "text-zinc-900"}`}>{p.name}</span>
-                      {isCurrent && (
-                        <span className={`${MONO} text-[8px] uppercase tracking-wider px-1.5 py-0.5 rounded-sm bg-emerald-600 text-white font-bold`}>
-                          Current
-                        </span>
-                      )}
-                      {p.accent && !isCurrent && (
-                        <span className={`${MONO} rounded-sm bg-home-accent px-1.5 py-0.5 text-[8px] font-bold text-home-accent-foreground`}>
-                          Popular
-                        </span>
-                      )}
-                    </div>
-                    <div className="mt-2 flex items-baseline gap-1">
-                      <span className="text-2xl tracking-tight text-zinc-900 price-font">{p.price}</span>
-                      {p.price.startsWith("$") && p.price !== "$0" && (
-                        <span className="text-[11px] text-zinc-500 price-font">/credits</span>
-                      )}
-                    </div>
-                    <p className={`mt-1 ${MONO} text-[9px] uppercase tracking-wider text-zinc-500`}>{p.tag}</p>
-                    
-                    {isCurrent ? (
-                      <div className="mt-3 inline-flex w-full items-center justify-center rounded-md border border-emerald-300 bg-emerald-50 px-3 py-1.5 text-xs font-medium text-emerald-700">
-                        Active
-                      </div>
-                    ) : disabled ? (
-                      <button
-                        type="button"
-                        disabled
-                        aria-disabled="true"
-                        title={
-                          upgradeLock.reason === "docs_pending"
-                            ? "Upgrades unlock after your ID and driving license are verified and your 30-day trial ends."
-                            : `Upgrades unlock in ${upgradeLock.daysLeft ?? 30} day${upgradeLock.daysLeft === 1 ? "" : "s"} once your ID and driving license are verified.`
-                        }
-                        className="mt-3 inline-flex w-full cursor-not-allowed items-center justify-center rounded-md border border-zinc-200 bg-zinc-100 px-3 py-1.5 text-xs font-medium text-zinc-500"
-                      >
-                        {cta}
-                      </button>
-                    ) : (
-                      <Link
-                        to={to}
-                        search={p.search}
-                        className={`mt-3 inline-flex w-full items-center justify-center rounded-md px-3 py-1.5 text-xs font-medium transition ${ p.accent || p.dark ? "bg-home-accent text-home-accent-foreground hover:opacity-90" : "border border-zinc-300 bg-white text-zinc-900 hover:border-home-accent/50" }`}
-                      >
-                        {cta}
-                      </Link>
-                    )}
-                  </th>
-                  );
-                })}
+              <tr className="border-b border-border bg-muted/30">
+                <th className="px-5 py-4 text-left text-xs font-medium text-muted-foreground">Core features</th>
+                {(["Pro", "Elite", "Ultra"] as const).map((name) => (
+                  <th key={name} className="border-l border-border px-5 py-4 text-center text-xs font-medium">{name}</th>
+                ))}
               </tr>
             </thead>
 
