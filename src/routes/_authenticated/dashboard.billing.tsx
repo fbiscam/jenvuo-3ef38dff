@@ -307,14 +307,14 @@ function Billing() {
         <Link
           to="/dashboard/pay"
           search={{ purchase: "credits" }}
-          className="rounded-lg bg-zinc-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-zinc-800 transition-colors"
+          className="rounded-lg border border-zinc-200 bg-white px-5 py-2.5 text-sm font-medium text-black hover:bg-zinc-50 transition-colors"
         >
           Buy credits
         </Link>
         <button
           type="button"
           onClick={() => setCancelDialogOpen(true)}
-          className="rounded-lg bg-zinc-100 px-5 py-2.5 text-sm font-medium text-zinc-900 hover:bg-zinc-200 transition-colors"
+          className="rounded-lg border border-zinc-200 bg-white px-5 py-2.5 text-sm font-medium text-black hover:bg-zinc-50 transition-colors"
         >
           Cancel plan
         </button>
