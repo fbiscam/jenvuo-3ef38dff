@@ -7,4 +7,4 @@
 - [x] Add the Jenvu logo and senior-review status to the extension header
 - [x] Move extension chat and screen analysis to tested BluesMinds-only model chains
 - [x] Strengthen live ICT/SMC context, chart markings, and senior-review reasoning
-- [ ] Repackage and test the extension, API, billing, and TypeScript checks
+- [x] Repackage and test the extension, API, billing, and TypeScript checks
