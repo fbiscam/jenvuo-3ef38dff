@@ -31,7 +31,7 @@ import {
   Wallet, TrendingUp, LineChart, Activity, ShieldCheck, Gauge, BarChart3,
   MoreHorizontal, Tag, ArrowUpRight, ArrowRight, CheckCircle2, Calendar, RefreshCw, Gift, PieChart,
   ChevronsLeft, ChevronsRight, Menu, X, Sparkles, LayoutGrid, LifeBuoy, Lightbulb,
-  Search, ChevronRight, ChevronDown, Rocket, History, Globe,
+  Search, ChevronRight, ChevronDown, Rocket, History,
   LayoutDashboard, ChartNoAxesCombined, Puzzle, BadgeDollarSign, FileCheck2,
   LockKeyhole, CircleHelp, type LucideIcon,
 } from "lucide-react";
