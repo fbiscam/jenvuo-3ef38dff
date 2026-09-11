@@ -1380,7 +1380,7 @@ function DashboardHero({ keysCount, stats }: { keysCount: number | null; stats: 
             <Link to="/dashboard/extension" className="mt-1 flex h-12 items-center justify-between border-b border-zinc-200 text-sm text-zinc-900 hover:text-zinc-600">
               <span className="inline-flex min-w-0 items-center gap-2">
                 <Rocket className="h-4 w-4 shrink-0 text-zinc-500" />
-                <span className="truncate font-medium">Jenvu Extension v1.8.1</span>
+                <span className="truncate font-medium">Jenvu Extension v1.9.0</span>
               </span>
               <ChevronRight className="h-4 w-4 shrink-0 text-zinc-400" />
             </Link>

@@ -1,7 +1,8 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { authenticateExtensionRequest, extJson, EXT_CORS_HEADERS } from '@/lib/extension-auth.server'
 import { resolveInstrument, fetchInstrumentCandles, fetchLiveInstrumentTick } from '@/lib/gold-analysis.functions'
-import { callChatCompletion, MODEL_CHAIN, type ChatContentPart } from '@/lib/ai-gateway'
+import { analyzeTF, buildLiquidityPools } from '@/lib/analysis/engine'
+import { callChatCompletion, EXTENSION_MODEL_CHAIN, type ChatContentPart } from '@/lib/ai-gateway'
 
 type Body = {
   action?: 'snapshot' | 'chat'
@@ -24,7 +25,11 @@ function ema(values: number[], period: number): number {
 
 async function loadMarket(symbol: string, timeframe: string) {
   const inst = resolveInstrument(symbol)
-  const candles = await fetchInstrumentCandles(inst, timeframe)
+  const [candles, hourly, fourHourly] = await Promise.all([
+    fetchInstrumentCandles(inst, timeframe),
+    timeframe === '1h' ? Promise.resolve(null) : fetchInstrumentCandles(inst, '1h').catch(() => null),
+    timeframe === '4h' ? Promise.resolve(null) : fetchInstrumentCandles(inst, '4h').catch(() => null),
+  ])
   if (!candles || candles.length < 5) throw new Error('Live candles unavailable right now.')
   const tick = await fetchLiveInstrumentTick(inst).catch(() => null)
   const closes = candles.map((c: any) => Number(c.close ?? c.c)).filter((n) => Number.isFinite(n))
@@ -40,12 +45,27 @@ async function loadMarket(symbol: string, timeframe: string) {
   const swingWindow = recent.slice(-24)
   const swingHigh = Math.max(...swingWindow.map((c: any) => Number(c.high ?? c.h)))
   const swingLow = Math.min(...swingWindow.map((c: any) => Number(c.low ?? c.l)))
+  const selected = analyzeTF(candles)
+  const h1 = analyzeTF((hourly?.length ? hourly : candles))
+  const h4 = analyzeTF((fourHourly?.length ? fourHourly : hourly?.length ? hourly : candles))
+  const liquidity = buildLiquidityPools(hourly?.length ? hourly : candles, candles)
+  const freshFvgs = selected.fvgs.slice(0, 3)
+  const freshObs = selected.obs.slice(0, 3)
   const marks = [
     { kind: 'line', level: recentHigh, label: 'BSL', tone: 'sell' },
     { kind: 'line', level: recentLow, label: 'SSL', tone: 'buy' },
     { kind: 'line', level: swingHigh, label: 'SWING HIGH', tone: 'sell' },
     { kind: 'line', level: swingLow, label: 'SWING LOW', tone: 'buy' },
-  ].filter((mark, index, all) => Number.isFinite(mark.level) && all.findIndex((other) => Math.abs(other.level - mark.level) < 0.01) === index)
+    ...liquidity.map((pool) => ({ kind: pool.swept ? 'sweep' : 'line', level: pool.price, label: pool.swept ? `${pool.label} SWEEP` : pool.label, tone: pool.side === 'buy' ? 'sell' : 'buy' })),
+    ...freshFvgs.map((fvg) => ({ kind: 'zone', from: fvg.priceLow, to: fvg.priceHigh, label: `${fvg.kind.toUpperCase()} FVG`, tone: fvg.kind === 'bullish' ? 'buy' : 'sell' })),
+    ...freshObs.map((ob) => ({ kind: 'zone', from: ob.priceLow, to: ob.priceHigh, label: `${ob.kind.toUpperCase()} OB`, tone: ob.kind === 'demand' ? 'buy' : 'sell' })),
+    ...(selected.lastStructure ? [{ kind: 'event', level: selected.lastStructure.price, label: selected.lastStructure.kind, dir: selected.lastStructure.dir === 'bullish' ? 'up' : 'down', tone: selected.lastStructure.dir === 'bullish' ? 'buy' : 'sell' }] : []),
+  ].filter((mark) => Number.isFinite('level' in mark ? mark.level : mark.from) && Number.isFinite('level' in mark ? mark.level : mark.to))
+
+  const generatedAt = new Date().toISOString()
+  const ageMs = tick?.t ? Math.max(0, Date.now() - tick.t) : 0
+  const sessionHour = new Date().getUTCHours()
+  const session = sessionHour < 7 ? 'Asia' : sessionHour < 12 ? 'London' : sessionHour < 17 ? 'New York' : 'After-hours'
 
   return {
     inst,
@@ -57,7 +77,17 @@ async function loadMarket(symbol: string, timeframe: string) {
       l: Number(c.low ?? c.l),
       c: Number(c.close ?? c.c),
     })),
-    technicals: { trend, ema9: fast, ema21: slow, high: Math.max(...closes.slice(-120)), low: Math.min(...closes.slice(-120)) },
+    technicals: {
+      trend, ema9: fast, ema21: slow, high: Math.max(...closes.slice(-120)), low: Math.min(...closes.slice(-120)),
+      structure: { selected: selected.trend, h1: h1.trend, h4: h4.trend },
+      equilibrium: selected.equilibrium,
+      lastStructure: selected.lastStructure,
+      freshFvgs: freshFvgs.map((fvg) => ({ side: fvg.kind, low: fvg.priceLow, high: fvg.priceHigh })),
+      freshOrderBlocks: freshObs.map((ob) => ({ side: ob.kind, low: ob.priceLow, high: ob.priceHigh })),
+      liquidity: liquidity.map((pool) => ({ label: pool.label, price: pool.price, swept: pool.swept })),
+      session,
+    },
+    freshness: { generatedAt, quoteAgeMs: ageMs, source: tick ? 'live-tick' : 'live-candle' },
     marks,
   }
 }
@@ -95,6 +125,12 @@ async function handle({ request }: { request: Request }) {
         `Session change: ${market.ticker.changePercent.toFixed(2)}%`,
         `EMA9: ${market.technicals.ema9.toFixed(2)} | EMA21: ${market.technicals.ema21.toFixed(2)} | Trend: ${market.technicals.trend}`,
         `Recent range: ${market.technicals.low.toFixed(2)} - ${market.technicals.high.toFixed(2)}`,
+        `Structure: selected ${market.technicals.structure.selected}; H1 ${market.technicals.structure.h1}; H4 ${market.technicals.structure.h4}`,
+        `Session: ${market.technicals.session}; equilibrium: ${market.technicals.equilibrium.toFixed(2)}`,
+        `Fresh FVGs: ${JSON.stringify(market.technicals.freshFvgs)}`,
+        `Fresh order blocks: ${JSON.stringify(market.technicals.freshOrderBlocks)}`,
+        `Liquidity: ${JSON.stringify(market.technicals.liquidity)}`,
+        `Quote generated: ${market.freshness.generatedAt}; age: ${market.freshness.quoteAgeMs}ms; source: ${market.freshness.source}`,
       ].join('\n')
 
       const history = (body.history || []).slice(-8).map((h) => ({
@@ -111,14 +147,17 @@ async function handle({ request }: { request: Request }) {
         : `${question}\n\nVerified live market context:\n${context}`
 
       const primary = await callChatCompletion({
-        models: [...MODEL_CHAIN.chat],
+        models: [...(image ? EXTENSION_MODEL_CHAIN.vision : EXTENSION_MODEL_CHAIN.reasoning)],
         stage: image ? 'extension-screen-analysis' : 'extension-chat',
         maxTokens: 900,
+        timeoutMs: 45_000,
+        deadlineMs: 50_000,
+        retriesPerModel: 1,
         messages: [
           {
             role: 'system',
             content:
-              'You are Jenvu, an institutional ICT/SMC gold analyst. Apply multi-timeframe structure, BOS/CHOCH, displacement, FVG/order blocks, premium/discount, liquidity sweeps and killzone context. Answer in the trader\'s language (Urdu/English mix is fine). Ground every level in the verified live data. Never invent a price away from live price. If confluence is incomplete, say WAIT instead of forcing a trade.',
+              'You are Jenvu, an institutional ICT/SMC gold analyst operating with a disciplined 25+ year desk mindset. Apply multi-timeframe structure, BOS/CHOCH, displacement, fresh FVG/order blocks, premium/discount, liquidity sweeps, session timing and risk geometry. Answer in the trader\'s language (Urdu/English mix is fine). Ground every numerical level in the verified live context. Never invent a price away from live price. For a trade plan, state VERDICT, BIAS, ENTRY/POI, STOP, TP1, TP2, RR, INVALIDATION, EVIDENCE and RISKS. If HTF/LTF alignment, liquidity event, displacement and a fresh POI are incomplete, say WAIT instead of forcing a trade. Never promise accuracy or profit.',
           },
           ...history,
           { role: 'user', content: userContent },
@@ -128,13 +167,16 @@ async function handle({ request }: { request: Request }) {
       let content = primary.content
       let seniorReview: { included: boolean; model: string | null; status: string } = { included: false, model: null, status: 'not_required' }
       const review = await callChatCompletion({
-          models: [...MODEL_CHAIN.seniorReview],
+          models: [...EXTENSION_MODEL_CHAIN.seniorReview],
           stage: 'extension-senior-review',
           maxTokens: 900,
+          timeoutMs: 45_000,
+          deadlineMs: 50_000,
+          retriesPerModel: 1,
           messages: [
             {
               role: 'system',
-              content: 'You are the independent 25+ year senior ICT/SMC desk reviewer. Audit the junior analysis against the verified live context. Reject stale or invented levels, require HTF/LTF alignment, a liquidity event, displacement, a fresh POI and sane risk geometry. Return the corrected final answer only. If evidence is insufficient, return a clear WAIT verdict and explain what confirmation is missing. Never rubber-stamp.',
+               content: 'You are the independent 25+ year senior ICT/SMC desk reviewer. Audit the junior analysis against every verified live-context value. Reject stale or invented levels; require HTF/LTF alignment, a liquidity event, displacement, a fresh POI, stop invalidation and at least 1:2 projected risk/reward for an actionable setup. Return the corrected final answer only, with concise reasoning. If evidence is insufficient or geometry is incoherent, return a clear WAIT verdict and list the missing confirmation. Never rubber-stamp and never promise profit.',
             },
             { role: 'user', content: `Verified context:\n${context}\n\nTrader request:\n${question}\n\nJunior analysis:\n${primary.content}` },
           ],
@@ -153,7 +195,7 @@ async function handle({ request }: { request: Request }) {
       })
       if (!billing.ok) return extJson({ ok: false, error: billing.error, code: billing.error?.includes('balance') ? 'LOW_BALANCE' : 'BILLING_FAILED' }, billing.error?.includes('balance') ? 402 : 502)
 
-      return extJson({ ok: true, text: content, ticker: market.ticker, seniorReview, usage: { requestId, charged: billing.charged, balance: billing.balance } })
+      return extJson({ ok: true, text: content, ticker: market.ticker, chart: market.chart, technicals: market.technicals, freshness: market.freshness, overlayMarks: market.marks, marksBias: market.technicals.trend.toLowerCase(), seniorReview, usage: { requestId, charged: billing.charged, balance: billing.balance } })
     }
 
     return extJson({
@@ -164,6 +206,7 @@ async function handle({ request }: { request: Request }) {
       marks: market.marks,
       overlayMarks: market.marks,
       marksBias: market.technicals.trend.toLowerCase(),
+      freshness: market.freshness,
     })
   } catch (e) {
     const message = e instanceof Error ? e.message : 'Request failed.'

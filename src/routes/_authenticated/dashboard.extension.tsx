@@ -123,12 +123,12 @@ function ExtensionPage() {
   const onDownload = async () => {
     setDownloading(true);
     try {
-      const res = await fetch("/jenvu-extension-v1.8.1.zip");
+      const res = await fetch("/jenvu-extension-v1.9.0.zip");
       if (!res.ok) throw new Error(`Download failed: ${res.status}`);
       const blob = await res.blob();
       const a = document.createElement("a");
       a.href = URL.createObjectURL(blob);
-      a.download = "jenvu-extension-v1.8.1.zip";
+      a.download = "jenvu-extension-v1.9.0.zip";
       a.click();
       URL.revokeObjectURL(a.href);
     } catch (e) {
@@ -262,7 +262,7 @@ function ExtensionPage() {
               <div className="min-w-0">
                 <div className="mb-1 text-[11px] text-zinc-500 md:hidden">Extension</div>
                 <div className="truncate text-[13px] text-blue-700">Jenvu XAU/USD Extension</div>
-                <div className={`${MONO} truncate text-[12px] text-zinc-500`}>v1.8.1</div>
+                <div className={`${MONO} truncate text-[12px] text-zinc-500`}>v1.9.0</div>
               </div>
               <div className="text-[13px] text-zinc-800">
                 <div className="mb-1 text-[11px] text-zinc-500 md:hidden">Created</div>
@@ -353,10 +353,10 @@ function ExtensionPage() {
               <div className="mt-1 text-[12px] text-zinc-500">Chrome extension for live XAU/USD analysis</div>
             </div>
             <div className="flex items-center gap-2 text-[13px] text-zinc-800">
-              <span className={MONO}>v1.8.1</span>
+              <span className={MONO}>v1.9.0</span>
               <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-medium text-emerald-700">Latest</span>
             </div>
-            <div className="text-[13px] text-zinc-600">Updated Sep 10, 2026</div>
+            <div className="text-[13px] text-zinc-600">Updated Sep 11, 2026</div>
             <button
               type="button"
               onClick={onDownload}
@@ -366,7 +366,7 @@ function ExtensionPage() {
               <Download className="h-4 w-4" /> {downloading ? "Preparing…" : "Download latest"}
             </button>
           </div>
-          <p className="mt-4 text-[12px] text-zinc-500">ZIP package · Chrome developer mode · Version 1.8.1</p>
+          <p className="mt-4 text-[12px] text-zinc-500">ZIP package · Chrome developer mode · Version 1.9.0</p>
         </div>
       )}
 
@@ -379,7 +379,7 @@ function ExtensionPage() {
               <X className="h-4 w-4" />
             </button>
           </div>
-          <p className="mt-3 text-[12px] leading-relaxed text-zinc-600">Live snapshots are free. AI chat and analysis cost $0.02 plus GPT/Gemini token usage with mandatory senior review.</p>
+          <p className="mt-3 text-[12px] leading-relaxed text-zinc-600">Live snapshots are free. AI chat and analysis cost $0.02 plus model token usage with mandatory senior review.</p>
           <ol className="mt-3 space-y-2 text-[13px] leading-relaxed text-zinc-700">
             <li>1. Download the extension package above and unzip it.</li>
             <li>2. Open <span className={`${MONO} rounded bg-white px-1.5 py-0.5 text-[12px]`}>chrome://extensions</span>, turn on Developer mode.</li>
