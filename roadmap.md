@@ -14,5 +14,5 @@
 - [x] Match exact row heights and dividers across all three dashboard columns
 - [x] Show live wallet, API token usage, and payment/usage ledger activity on dashboard
 
-- [ ] Add owner-only permanent deletion for extension API keys
-- [ ] Verify permanent deletion and TypeScript state
+- [x] Add owner-only permanent deletion for extension API keys
+- [x] Verify permanent deletion and TypeScript state
