@@ -1,9 +1,22 @@
 import { useState, useMemo } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
+import { toast } from "sonner";
 import { useCredits } from "@/hooks/useCredits";
 import { useCurrentPlan } from "@/hooks/useCurrentPlan";
 import { useTrial } from "@/hooks/useTrial";
+import { cancelMyPlan } from "@/lib/subscription.functions";
 import InvoiceHistory from "@/components/billing/InvoiceHistory";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Download, Info, CreditCard, Settings, BarChart3, FileText, SlidersHorizontal, ArrowRight, Tag } from "lucide-react";
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
@@ -107,9 +120,12 @@ function Billing() {
   const currentPlan = useCurrentPlan();
   const credits = useCredits();
   const trial = useTrial();
+  const cancelPlan = useServerFn(cancelMyPlan);
 
   const [showAllActivity, setShowAllActivity] = useState(false);
   const [activeTab, setActiveTab] = useState<(typeof TABS)[number]>("Overview");
+  const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
+  const [cancellingPlan, setCancellingPlan] = useState(false);
   const [promoCode, setPromoCode] = useState("");
   const [prefs, setPrefs] = useState(() => {
     try { return JSON.parse(localStorage.getItem("jenvu-billing-prefs") ?? "{}"); } catch { return {}; }
@@ -152,6 +168,28 @@ function Billing() {
     allRows.filter(r => new Date(r.created_at) < thirtyDaysAgo),
     [allRows, thirtyDaysAgo]
   );
+
+  const handleCancelPlan = async () => {
+    setCancellingPlan(true);
+    try {
+      const result = await cancelPlan();
+      if (!result.ok) {
+        toast.error(result.error === "NO_ACTIVE_PLAN" ? "No active plan was found." : "Could not cancel your plan.");
+        return;
+      }
+      setCancelDialogOpen(false);
+      await credits.refresh();
+      toast.success("Plan cancelled", {
+        description: `Your paid features were removed${Number(result.credits_removed ?? 0) > 0 ? ` and $${Number(result.credits_removed).toFixed(2)} in credits were forfeited` : ""}.`,
+      });
+    } catch (error) {
+      toast.error("Could not cancel your plan", {
+        description: error instanceof Error ? error.message : "Please try again.",
+      });
+    } finally {
+      setCancellingPlan(false);
+    }
+  };
 
   const handleDownloadOlder = () => {
     const doc = new jsPDF();
@@ -245,17 +283,45 @@ function Billing() {
       <section className="flex flex-wrap items-center gap-3">
         <Link
           to="/dashboard/pay"
+          search={{ purchase: "credits" }}
           className="rounded-lg bg-zinc-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-zinc-800 transition-colors"
         >
           Buy credits
         </Link>
-        <Link
-          to="/dashboard/pay"
+        <button
+          type="button"
+          onClick={() => setCancelDialogOpen(true)}
           className="rounded-lg bg-zinc-100 px-5 py-2.5 text-sm font-medium text-zinc-900 hover:bg-zinc-200 transition-colors"
         >
           Cancel plan
-        </Link>
+        </button>
       </section>
+
+      <AlertDialog open={cancelDialogOpen} onOpenChange={(open) => !cancellingPlan && setCancelDialogOpen(open)}>
+        <AlertDialogContent className="max-w-md rounded-xl border-zinc-200 bg-white">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-zinc-900">Cancel your plan?</AlertDialogTitle>
+            <AlertDialogDescription className="space-y-3 text-zinc-600">
+              <span className="block">This action takes effect immediately. You will lose your remaining credits and all paid plan features.</span>
+              <span className="block font-medium text-rose-600">Your current ${Number(remaining).toFixed(2)} credit balance will become $0.00.</span>
+              <span className="block">Are you sure you want to continue?</span>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={cancellingPlan}>Keep plan</AlertDialogCancel>
+            <AlertDialogAction
+              disabled={cancellingPlan}
+              onClick={(event) => {
+                event.preventDefault();
+                void handleCancelPlan();
+              }}
+              className="bg-rose-600 text-white hover:bg-rose-700"
+            >
+              {cancellingPlan ? "Cancelling…" : "Cancel plan permanently"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* Shortcut grid */}
       <section className="grid grid-cols-1 gap-x-8 gap-y-5 sm:grid-cols-2">

@@ -3361,6 +3361,7 @@ export type Database = {
         Args: { _fingerprint: string; _kind: string; _occurrences: number }
         Returns: undefined
       }
+      cancel_user_plan: { Args: { _user_id: string }; Returns: Json }
       charge_extension_usage: {
         Args: {
           _amount: number
