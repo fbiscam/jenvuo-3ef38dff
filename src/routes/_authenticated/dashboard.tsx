@@ -1342,10 +1342,29 @@ function DashboardHero({ keysCount, stats }: { keysCount: number | null; stats: 
               <span className="inline-flex items-center gap-1">Extension <ChevronRight className="h-3 w-3" /></span>
               <MoreHorizontal className="h-4 w-4 text-zinc-300" />
             </div>
-            <Link to="/dashboard/extension" className="mt-3 flex items-center justify-center gap-2 rounded-lg bg-zinc-100 px-4 py-4 text-sm text-zinc-700 transition hover:bg-zinc-200">
-              <Rocket className="h-4 w-4 text-zinc-500" />
-              {keysCount ? `${keysCount} active key${keysCount > 1 ? "s" : ""}` : "Create your first key"}
+            <Link to="/dashboard/extension" className="mt-1 flex items-center justify-between border-b border-zinc-200 py-3 text-sm text-zinc-900 hover:text-zinc-600">
+              <span className="inline-flex min-w-0 items-center gap-2">
+                <Rocket className="h-4 w-4 shrink-0 text-zinc-500" />
+                <span className="truncate font-medium">Jenvu Extension v1.8.1</span>
+              </span>
+              <ChevronRight className="h-4 w-4 shrink-0 text-zinc-400" />
             </Link>
+            <div className="divide-y divide-zinc-200">
+              {recentKeys.length === 0 ? (
+                <Link to="/dashboard/extension" className="flex py-3 text-sm text-zinc-400 hover:text-zinc-600">
+                  {keysCount ? `${keysCount} active key${keysCount > 1 ? "s" : ""}` : "Create your first key"}
+                </Link>
+              ) : recentKeys.map((key) => (
+                <Link key={key.id} to="/dashboard/extension" className="flex min-h-12 items-center justify-between gap-3 py-3 text-sm text-zinc-500 hover:text-zinc-900">
+                  <span className="min-w-0 truncate font-mono text-[12px] text-zinc-700">{key.keyPrefix}…</span>
+                  <span className="shrink-0 tabular-nums text-[12px] text-zinc-500">
+                    {keyTokens.get(key.id)
+                      ? `${((keyTokens.get(key.id) ?? 0) / 1000).toFixed(1)}k tokens`
+                      : "0 tokens"}
+                  </span>
+                </Link>
+              ))}
+            </div>
           </div>
 
           <div>
