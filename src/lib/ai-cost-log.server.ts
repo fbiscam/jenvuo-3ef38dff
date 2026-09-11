@@ -61,6 +61,11 @@ const MODEL_PRICING: Record<string, Price> = {
   "tukenku/myt/claude-opus-4-8": { in: 0.7714, out: 3.86 },
   "tukenku/myt/claude-opus-4-8-free": { in: 0.7714, out: 3.86 },
 
+  // Unikey published rates derived from its live pricing ratios (USD per 1M
+  // tokens). Extension users are charged 50% by extension-billing.server.ts.
+  "unikey/gpt-6-astra": { in: 2.0, out: 10.0 },
+  "unikey/claude-opus-4-8": { in: 1.0, out: 5.0 },
+
   // Google
   "google/gemini-2.5-pro": { in: 1.25, out: 10.0 },
   "google/gemini-2.5-flash": { in: 0.075, out: 0.3 },
@@ -219,7 +224,7 @@ export async function chargeSignalScan(params: {
     // Guarantee history always shows the model that ran — if the caller
     // didn't pass one (deterministic engine fallback path), default to the
     // current primary so no user's billing row is ever blank.
-    const primaryModel = params.model ?? "bmind/gpt-5-mini";
+    const primaryModel = params.model ?? "unikey/gpt-6-astra";
     const meta: Record<string, unknown> = {
       model: primaryModel,
       model_label: formatModelLabel(primaryModel),
