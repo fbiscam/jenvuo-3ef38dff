@@ -12,4 +12,4 @@
 - [x] Add and test Unikey models for extension senior review
 - [x] Replace extension logo with current Jenvu logo
 - [x] Remove chart markings from extension home graph
-- [ ] Verify TypeScript and live extension flow
+- [x] Verify TypeScript and live extension flow
