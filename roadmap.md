@@ -1,3 +1,3 @@
-- [ ] Connect Buy credits to the payment page
-- [ ] Add confirmed plan cancellation with credit-loss warning
-- [ ] Verify TypeScript and billing interactions
+- [x] Connect Buy credits to the payment page
+- [x] Add confirmed plan cancellation with credit-loss warning
+- [x] Verify TypeScript and billing interactions
