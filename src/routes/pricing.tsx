@@ -422,7 +422,7 @@ function PricingPage() {
           <div>
             
             <h2 className="mt-2 text-2xl sm:text-3xl font-semibold tracking-tight">Need more wallet balance?</h2>
-            <p className="mt-2 max-w-xl text-sm text-zinc-600 lg:max-w-none lg:whitespace-nowrap">Live extension market data is free. GPT-6 Astra and Claude Opus 4.8 are billed at 50% of Unikey's published token rates.</p>
+            <p className="mt-2 max-w-xl text-sm text-zinc-600 lg:max-w-none lg:whitespace-nowrap">Live extension market data is free. GPT-6 Astra and Claude Opus 4.8 are billed at 50% of their official token rates.</p>
           </div>
         </div>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">

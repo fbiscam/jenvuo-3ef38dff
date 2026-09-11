@@ -61,10 +61,13 @@ const MODEL_PRICING: Record<string, Price> = {
   "tukenku/myt/claude-opus-4-8": { in: 0.7714, out: 3.86 },
   "tukenku/myt/claude-opus-4-8-free": { in: 0.7714, out: 3.86 },
 
-  // Unikey published rates derived from its live pricing ratios (USD per 1M
-  // tokens). Extension users are charged 50% by extension-billing.server.ts.
-  "unikey/gpt-6-astra": { in: 2.0, out: 10.0 },
-  "unikey/claude-opus-4-8": { in: 1.0, out: 5.0 },
+  // Official provider list rates in USD per 1M tokens. Extension users are
+  // charged 50% of these rates by extension-billing.server.ts.
+  "unikey/gpt-6-astra": { in: 10.0, out: 50.0 },
+  "unikey/claude-opus-4-8": { in: 5.0, out: 25.0 },
+  "unikey/gemini-3.1-pro": { in: 1.5, out: 12.0 },
+  "unikey/x-ai/grok-4.3": { in: 1.25, out: 2.5 },
+  "unikey/deepseek-v4-pro": { in: 0.55, out: 2.19 },
 
   // Google
   "google/gemini-2.5-pro": { in: 1.25, out: 10.0 },
