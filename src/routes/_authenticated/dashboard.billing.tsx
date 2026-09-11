@@ -420,7 +420,7 @@ function Billing() {
       {activeTab === "Credit grants" && (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-sm font-semibold text-zinc-900"> Credit grants</h2>
+            <h2 className="text-sm font-semibold text-zinc-900">  Credit grants</h2>
             <span className="text-sm text-zinc-500">USD</span>
           </div>
           <p className="text-sm text-zinc-900">No credit grants found.</p>
