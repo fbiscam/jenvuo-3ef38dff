@@ -89,3 +89,34 @@ export const revokeExtensionKey = createServerFn({ method: 'POST' })
     if (error) return { ok: false as const, error: error.message }
     return { ok: true as const }
   })
+
+export const deleteExtensionKey = createServerFn({ method: 'POST' })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => {
+    const obj = (d ?? {}) as { id?: string }
+    if (!obj.id || typeof obj.id !== 'string') throw new Error('Key id is required.')
+    return { id: obj.id }
+  })
+  .handler(async ({ data, context }) => {
+    const client = context.supabase as any
+    const { data: key, error: lookupError } = await client
+      .from('extension_api_keys')
+      .select('id,revoked_at')
+      .eq('id', data.id)
+      .eq('user_id', context.userId)
+      .maybeSingle()
+
+    if (lookupError) return { ok: false as const, error: lookupError.message }
+    if (!key) return { ok: false as const, error: 'API key not found.' }
+    if (!key.revoked_at) return { ok: false as const, error: 'Revoke this API key before deleting it permanently.' }
+
+    const { error } = await client
+      .from('extension_api_keys')
+      .delete()
+      .eq('id', data.id)
+      .eq('user_id', context.userId)
+      .not('revoked_at', 'is', null)
+
+    if (error) return { ok: false as const, error: error.message }
+    return { ok: true as const }
+  })

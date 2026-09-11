@@ -13,3 +13,6 @@
 - [x] Show API key names and align dashboard Spend, Extension, and Recents rows
 - [x] Match exact row heights and dividers across all three dashboard columns
 - [x] Show live wallet, API token usage, and payment/usage ledger activity on dashboard
+
+- [x] Add owner-only permanent deletion for extension API keys
+- [x] Verify permanent deletion and TypeScript state
