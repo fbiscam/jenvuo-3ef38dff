@@ -63,7 +63,7 @@ async function loadMarket(symbol: string, timeframe: string) {
   ].filter((mark) => Number.isFinite('level' in mark ? mark.level : mark.from) && Number.isFinite('level' in mark ? mark.level : mark.to))
 
   const generatedAt = new Date().toISOString()
-  const ageMs = tick?.timestamp ? Math.max(0, Date.now() - tick.timestamp) : 0
+  const ageMs = tick?.t ? Math.max(0, Date.now() - tick.t) : 0
   const sessionHour = new Date().getUTCHours()
   const session = sessionHour < 7 ? 'Asia' : sessionHour < 12 ? 'London' : sessionHour < 17 ? 'New York' : 'After-hours'
 
@@ -87,7 +87,7 @@ async function loadMarket(symbol: string, timeframe: string) {
       liquidity: liquidity.map((pool) => ({ label: pool.label, price: pool.price, swept: pool.swept })),
       session,
     },
-    freshness: { generatedAt, quoteAgeMs: ageMs, source: tick?.source ?? 'live-candle' },
+    freshness: { generatedAt, quoteAgeMs: ageMs, source: tick ? 'live-tick' : 'live-candle' },
     marks,
   }
 }
