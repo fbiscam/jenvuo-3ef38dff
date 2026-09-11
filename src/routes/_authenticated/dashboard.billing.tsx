@@ -647,7 +647,7 @@ function Billing() {
             </div>
           </div>
           <div className="space-y-2">
-            <h2 className="text-base font-semibold text-zinc-900">Applied promotions</h2>
+            <h2 className="text-base font-semibold text-zinc-900">  Applied promotions</h2>
             {(credits.state?.promotions ?? []).length === 0 ? (
               <div className="flex flex-col items-center gap-2 py-10 text-center">
                 <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-zinc-100 text-zinc-500">
