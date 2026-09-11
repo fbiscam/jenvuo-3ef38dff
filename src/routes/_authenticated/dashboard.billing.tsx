@@ -241,33 +241,6 @@ function Billing() {
         )}
       </section>
 
-      {/* Auto-reload banner */}
-      <section className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-zinc-200 bg-white px-5 py-4">
-        <div className="flex items-start gap-3">
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-zinc-100">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4 text-zinc-700">
-              <path d="M21 12a9 9 0 1 1-2.64-6.36" />
-              <path d="M21 3v6h-6" />
-            </svg>
-          </div>
-          <div className="min-w-0">
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-medium text-zinc-900">Auto-reload credits</span>
-              <span className="rounded-full bg-emerald-100 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wider text-emerald-700">ON</span>
-            </div>
-            <p className="mt-0.5 text-xs text-zinc-500">
-              When my balance reaches $5, reload it to $50, up to my tier's monthly limit of $100.
-            </p>
-          </div>
-        </div>
-        <Link
-          to="/dashboard/pay"
-          className="rounded-lg bg-zinc-100 px-3.5 py-2 text-xs font-medium text-zinc-900 hover:bg-zinc-200 transition-colors"
-        >
-          Manage auto-reload
-        </Link>
-      </section>
-
       {/* Action buttons */}
       <section className="flex flex-wrap items-center gap-3">
         <Link
