@@ -90,7 +90,7 @@ function SecurityPage() {
         </p>
       </div>
 
-      <section className="border-t border-zinc-100 pt-6">
+      <section className="pt-6">
         <h2 className="pl-1 text-base font-semibold">&nbsp;Password</h2>
         <p className="mt-1 text-sm text-zinc-500">
           We'll email a secure single-use link to {email || "your account email"} so you can set a new password.
@@ -104,7 +104,7 @@ function SecurityPage() {
         </button>
       </section>
 
-      <section id="change-email" className="scroll-mt-24 border-t border-zinc-100 pt-6">
+      <section id="change-email" className="scroll-mt-24 pt-6">
         <h2 className="pl-1 text-base font-semibold">&nbsp;Change email</h2>
         <p className="mt-1 text-sm text-zinc-500">
           Enter a new email and we'll send a confirmation link to your current email address. Your email changes only after you click that link.
@@ -138,7 +138,7 @@ function SecurityPage() {
         </div>
       </section>
 
-      <section className="border-t border-zinc-100 pt-6">
+      <section className="pt-6">
         <h2 className="pl-1 text-base font-semibold">&nbsp;Two-factor authentication</h2>
         <p className="mt-1 text-sm text-zinc-500">
           Require a six-digit code from your authenticator app every time you sign in.
@@ -148,7 +148,7 @@ function SecurityPage() {
         </div>
       </section>
 
-      <section className="border-t border-zinc-100 pt-6">
+      <section className="pt-6">
         <h2 className="pl-1 text-base font-semibold">&nbsp;Trusted devices</h2>
         <p className="mt-1 text-sm text-zinc-500">
           Browsers you've marked as trusted skip the 2FA step on sign-in.&nbsp;
@@ -158,7 +158,7 @@ function SecurityPage() {
         </div>
       </section>
 
-      <section className="border-t border-zinc-100 pt-6">
+      <section className="pt-6">
         <h2 className="pl-1 text-base font-semibold">&nbsp;Session</h2>
         <p className="mt-1 text-sm text-zinc-500">
           Signing out clears your local session on this browser.&nbsp;
@@ -177,7 +177,7 @@ function SecurityPage() {
         </button>
       </section>
 
-      <section className="border-t border-zinc-100 pt-6">
+      <section className="pt-6">
         <h2 className="pl-1 text-base font-semibold text-rose-700">&nbsp;Danger zone</h2>
         <p className="mt-1 text-sm text-rose-600/80">Deleting your account is permanent and cannot be undone.</p>
         {!confirmDelete ? (

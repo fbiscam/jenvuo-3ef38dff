@@ -489,24 +489,24 @@ function HomePage() {
 
 
       {/* REGION: EARTH */}
-      <section className="border-t border-zinc-100">
+      <section>
         <RegionEarth />
       </section>
 
 
       {/* TRUSTED DESKS / REVIEWS */}
-      <section className="border-t border-zinc-100 bg-white">
+      <section className="bg-white">
         <TrustedDesks />
       </section>
 
       {/* WHY JENVU — Cloudflare-style split panel */}
-      <section className="border-t border-zinc-100 bg-white">
+      <section className="bg-white">
         <WhyJenvu />
       </section>
 
 
       {/* PRICING — Free vs Paid panels */}
-      <section className="border-t border-zinc-100 bg-white">
+      <section className="bg-white">
         <div className="mx-auto max-w-6xl px-5 py-16 sm:px-6 sm:py-24">
           <div className="mx-auto mb-10 max-w-2xl text-center">
             <h2 className="text-3xl font-semibold tracking-tight text-zinc-900 sm:text-4xl md:text-[44px] md:leading-[1.1]">

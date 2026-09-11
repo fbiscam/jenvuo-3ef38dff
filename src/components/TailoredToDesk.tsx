@@ -24,7 +24,7 @@ export function TailoredToDesk() {
   }, []);
 
   return (
-    <section className="border-t border-border bg-background">
+    <section className="bg-background">
       <div className="mx-auto max-w-[1200px] px-4 py-16 sm:px-6 sm:py-24">
         <div className="text-center">
           <h2 className="text-3xl font-semibold text-foreground sm:text-4xl md:text-[44px] md:leading-[1.1]">
