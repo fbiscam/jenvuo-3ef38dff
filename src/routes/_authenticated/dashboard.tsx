@@ -874,8 +874,8 @@ function DashboardLayout() {
   useEffect(() => {
     if (authLoading || !authUser) return;
     let cancelled = false;
-    setUsageLoading(true);
-    (async () => {
+    const loadUsage = async (showLoading = false) => {
+      if (showLoading) setUsageLoading(true);
       try {
         const [u, k] = await Promise.all([fetchUsageStats(), fetchExtensionKeys()]);
         if (cancelled) return;
@@ -884,10 +884,29 @@ function DashboardLayout() {
       } catch {
         // best-effort — cards render empty state
       } finally {
-        if (!cancelled) setUsageLoading(false);
+        if (!cancelled && showLoading) setUsageLoading(false);
       }
-    })();
-    return () => { cancelled = true; };
+    };
+    void loadUsage(true);
+
+    const channel = supabase
+      .channel(`dashboard-usage-${authUser.id}-${Math.random().toString(36).slice(2)}`)
+      .on("postgres_changes", { event: "*", schema: "public", table: "credit_ledger", filter: `user_id=eq.${authUser.id}` }, () => void loadUsage())
+      .on("postgres_changes", { event: "*", schema: "public", table: "credit_balances", filter: `user_id=eq.${authUser.id}` }, () => void loadUsage())
+      .on("postgres_changes", { event: "*", schema: "public", table: "extension_api_keys", filter: `user_id=eq.${authUser.id}` }, () => void loadUsage())
+      .subscribe();
+    const pollId = window.setInterval(() => void loadUsage(), 15_000);
+    const refreshWhenVisible = () => {
+      if (document.visibilityState === "visible") void loadUsage();
+    };
+    document.addEventListener("visibilitychange", refreshWhenVisible);
+
+    return () => {
+      cancelled = true;
+      window.clearInterval(pollId);
+      document.removeEventListener("visibilitychange", refreshWhenVisible);
+      void supabase.removeChannel(channel);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authUser?.id, authLoading, refreshTick]);
 
@@ -1250,7 +1269,7 @@ function UsageStatCard({ title, value, delta, series, tall = false, chartHeight,
 
 function DashboardHero({ keysCount, stats }: { keysCount: number | null; stats: UsageStats | null }) {
   const [q, setQ] = useState("");
-  const recentSpend = (stats?.ledger ?? []).filter((entry) => entry.delta < 0).slice(0, 3);
+  const recentActivity = (stats?.ledger ?? []).filter((entry) => entry.delta !== 0).slice(0, 3);
   const recentKeys = (stats?.recentExtensionKeys ?? []).slice(0, 3);
   const keyTokens = useMemo(() => {
     const map = new Map<string, number>();
@@ -1322,26 +1341,30 @@ function DashboardHero({ keysCount, stats }: { keysCount: number | null; stats: 
             <Link to="/dashboard/usage" className="mt-1 flex h-12 items-center justify-between border-b border-zinc-200 text-sm text-zinc-900 hover:text-zinc-600">
               <span className="inline-flex items-center gap-2">
                 <BadgeDollarSign className="h-4 w-4 text-zinc-500" />
-                <span className="font-medium">$60. 60 Total Available</span>
+                <span className="font-medium">{stats ? `$${stats.balance.toFixed(2)} Total Available` : "Loading balance…"}</span>
               </span>
               <ChevronRight className="h-4 w-4 text-zinc-400" />
             </Link>
             <div className="divide-y divide-zinc-200">
-              {recentSpend.length === 0 ? (
-                <p className="py-3 text-sm text-zinc-400">No recent payments</p>
-              ) : recentSpend.map((entry) => {
+              {recentActivity.length === 0 ? (
+                <p className="flex h-12 items-center text-sm text-zinc-400">No recent activity</p>
+              ) : recentActivity.map((entry) => {
                 const seed = Array.from(entry.id).reduce((sum, char) => sum + char.charCodeAt(0), 0);
                 const models = Array.from({ length: 2 }, (_, offset) => reviewModels[(seed + offset) % reviewModels.length]);
                 return (
                   <Link key={entry.id} to="/dashboard/usage" className="flex h-12 items-center justify-between gap-3 text-sm text-zinc-500 hover:text-zinc-900">
                     <span className="min-w-0 truncate capitalize">{entry.reason.replace(/_/g, " ")}</span>
                     <span className="flex shrink-0 items-center gap-3">
-                      <span className="flex items-center -space-x-0.5" aria-label={models.map((model) => model.label).join(", ")}>
-                        {models.map(({ key, label, Icon, className }) => (
-                          <Icon key={key} className={`h-4 w-4 ${className}`} aria-label={label} />
-                        ))}
+                      {entry.delta < 0 && (
+                        <span className="flex items-center -space-x-0.5" aria-label={models.map((model) => model.label).join(", ")}>
+                          {models.map(({ key, label, Icon, className }) => (
+                            <Icon key={key} className={`h-4 w-4 ${className}`} aria-label={label} />
+                          ))}
+                        </span>
+                      )}
+                      <span className={`font-medium tabular-nums ${entry.delta < 0 ? "text-destructive" : "text-emerald-600"}`}>
+                        {entry.delta < 0 ? "-" : "+"}${Math.abs(entry.delta).toFixed(2)}
                       </span>
-                      <span className="font-medium tabular-nums text-destructive">-${Math.abs(entry.delta).toFixed(2)}</span>
                     </span>
                   </Link>
                 );
