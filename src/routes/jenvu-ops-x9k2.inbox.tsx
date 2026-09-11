@@ -321,7 +321,7 @@ function AdminInbox() {
         </div>
       </header>
 
-      <div className="relative z-10 border-b border-neutral-200 bg-white px-5 py-5 sm:px-6">
+      <div className="relative z-10 bg-white px-5 py-5 sm:px-6">
         <div className="mx-auto max-w-7xl">
           <h1 className="text-2xl font-semibold tracking-tight text-zinc-900">Support inbox</h1>
           <p className="mt-1 text-sm text-zinc-500">Review conversations and reply to customer support requests.</p>
