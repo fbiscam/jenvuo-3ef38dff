@@ -203,7 +203,7 @@ function Billing() {
         <button
           type="button"
           onClick={() => setCancelDialogOpen(true)}
-          className="rounded-lg border border-zinc-200 bg-white px-5 py-2.5 text-sm font-medium text-black hover:bg-zinc-50 transition-colors"
+          className="rounded-lg border border-zinc-200 bg-zinc-100 px-5 py-2.5 text-sm font-medium text-zinc-900 hover:bg-zinc-200 transition-colors"
         >
           Cancel plan
         </button>
