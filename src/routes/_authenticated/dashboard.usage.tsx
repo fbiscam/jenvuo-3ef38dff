@@ -77,7 +77,6 @@ function UsagePage() {
     refetchOnWindowFocus: true,
   });
   const [tab, setTab] = useState<"categories" | "models">("categories");
-  const [rightTab, setRightTab] = useState<"types" | "activity">("types");
   const [rangeDays, setRangeDays] = useState<number>(30);
   const [model, setModel] = useState<string>("all");
   const [openMenu, setOpenMenu] = useState<"model" | "range" | null>(null);
@@ -494,43 +493,6 @@ function UsagePage() {
             </div>
           </section>
 
-          {/* Breakdown tabs */}
-          <section>
-            <div className="flex items-center gap-5 border-b border-zinc-200 px-5 text-[13px]">
-              <TabButton active={rightTab === "types"} onClick={() => setRightTab("types")}>Request types</TabButton>
-              <TabButton active={rightTab === "activity"} onClick={() => setRightTab("activity")}>Activity</TabButton>
-            </div>
-            <div className="p-5">
-              {rightTab === "types" ? (
-                <TypeBreakdown rows={derived.spendRows} />
-              ) : derived.rows.length === 0 ? (
-                <p className="py-8 text-center text-[13px] text-zinc-500">
-                  There is no activity for this range.
-                </p>
-              ) : (
-                <div className="max-h-64 space-y-2 overflow-y-auto [scrollbar-width:thin]">
-                  {derived.rows.slice(0, 30).map((r) => {
-                    const d = new Date(r.created_at);
-                    const isSpend = r.delta < 0;
-                    return (
-                      <div key={r.id} className="flex items-center justify-between gap-2 text-[12px]">
-                        <div className="min-w-0">
-                          <div className="truncate font-medium text-zinc-800">{label(r.reason)}</div>
-                          <div className="text-[10.5px] tabular-nums text-zinc-400">
-                            {d.toLocaleDateString(undefined, { month: "short", day: "numeric" })} · {d.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" })}
-                            {r.model ? ` · ${r.model}` : ""}{r.reason === "extension_api" && r.metadata && typeof r.metadata === "object" && !Array.isArray(r.metadata) && typeof r.metadata.action === "string" ? ` · ${r.metadata.action.replace(/_/g, " ")}` : ""}
-                          </div>
-                        </div>
-                        <span className={`shrink-0 font-semibold tabular-nums ${isSpend ? "text-rose-600" : "text-emerald-600"}`}>
-                          {isSpend ? "−" : "+"}{fmtUsd(Math.abs(r.delta))}
-                        </span>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-          </section>
         </div>
       </div>
     </div>
