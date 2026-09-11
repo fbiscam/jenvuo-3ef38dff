@@ -20,6 +20,10 @@ export const Route = createFileRoute("/_authenticated/dashboard/usage")({
     meta: [
       { title: "Usage — Jenvu" },
       { name: "description", content: "Track your USD wallet usage, per-scan model + cost history." },
+      { property: "og:title", content: "Usage — Jenvu" },
+      { property: "og:description", content: "Track your USD wallet usage, per-scan model + cost history." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -205,9 +209,9 @@ function UsagePage() {
   return (
     <div className="space-y-4">
       {/* ── Header bar ── */}
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-200 pb-3">
-        <h1 className="text-xl font-semibold text-zinc-900">  Usage</h1>
-        <div className="flex items-center gap-2">
+      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 border-b border-zinc-200 pb-3 sm:flex sm:flex-wrap sm:justify-between">
+        <h1 className="min-w-0 truncate text-xl font-semibold text-zinc-900">  Usage</h1>
+        <div className="col-span-2 grid min-w-0 grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto_auto] items-center gap-1.5 sm:col-span-1 sm:flex sm:gap-2">
           <Dropdown
             open={openMenu === "model"}
             onToggle={() => setOpenMenu(openMenu === "model" ? null : "model")}
@@ -229,7 +233,7 @@ function UsagePage() {
             type="button"
             onClick={() => refetch()}
             aria-label="Refresh usage"
-            className="rounded-md p-1.5 text-zinc-600 transition hover:bg-zinc-100 hover:text-zinc-900"
+            className="grid h-9 w-9 shrink-0 place-items-center rounded-md text-zinc-600 transition hover:bg-zinc-100 hover:text-zinc-900"
           >
             <RefreshCw className={`h-4 w-4 ${isFetching ? "animate-spin" : ""}`} />
           </button>
@@ -237,7 +241,7 @@ function UsagePage() {
             type="button"
             onClick={exportCsv}
             aria-label="Download usage CSV"
-            className="rounded-md p-1.5 text-zinc-600 transition hover:bg-zinc-100 hover:text-zinc-900"
+            className="grid h-9 w-9 shrink-0 place-items-center rounded-md text-zinc-600 transition hover:bg-zinc-100 hover:text-zinc-900"
           >
             <Download className="h-4 w-4" />
           </button>
@@ -250,23 +254,23 @@ function UsagePage() {
         <div className="space-y-4 xl:col-span-2">
           {/* Total Spend */}
           <section>
-            <div className="flex items-center justify-between border-b border-zinc-100 px-5 py-3">
-              <div>
+            <div className="grid grid-cols-[minmax(0,1fr)_auto] items-end gap-3 border-b border-zinc-100 px-4 py-3 sm:px-5">
+              <div className="min-w-0">
                 <div className="text-[13px] text-zinc-500">Total Spend</div>
                 <div className="mt-0.5 text-xl font-semibold tabular-nums text-zinc-900">
                   {derived.hasSpend ? fmtUsd(derived.spent, 2) : "No data"}
                 </div>
               </div>
-              <div className="flex items-center gap-3 text-[12px] text-zinc-500">
+              <div className="flex shrink-0 flex-wrap items-center justify-end gap-x-3 gap-y-1 text-[12px] text-zinc-500">
                 <span className="flex items-center gap-1.5"><span className="inline-block h-2.5 w-2.5 rounded-full bg-sky-400" /> Spent</span>
                 <span className="flex items-center gap-1.5"><span className="inline-block h-2.5 w-2.5 rounded-full bg-zinc-300" /> Added</span>
               </div>
             </div>
-            <div className="px-2 py-6 sm:px-5">
+            <div className="px-4 pb-5 pt-4 sm:px-5 sm:pb-6 sm:pt-5">
               {derived.hasSpend ? (
-                <div className="h-72 w-full">
+                <div className="h-64 min-w-0 w-full sm:h-72">
                   <ResponsiveContainer width="100%" height="100%">
-                    <ComposedChart data={derived.days} margin={{ top: 12, right: 8, bottom: 4, left: 0 }}>
+                    <ComposedChart data={derived.days} margin={{ top: 8, right: 4, bottom: 4, left: 0 }}>
                       <defs>
                         <linearGradient id="usageSpent" x1="0" y1="0" x2="0" y2="1">
                           <stop offset="0%" stopColor="#93c5fd" stopOpacity={0.82} />
@@ -289,7 +293,7 @@ function UsagePage() {
                       <YAxis
                         tickLine={false}
                         axisLine={false}
-                        width={54}
+                        width={48}
                         tick={{ fill: "#a1a1aa", fontSize: 11 }}
                         tickFormatter={(v: number) => `$${v >= 1 ? v.toFixed(0) : v.toFixed(2)}`}
                       />
@@ -352,13 +356,13 @@ function UsagePage() {
             </div>
 
             {/* Tabs */}
-            <div className="flex items-center gap-5 border-b border-zinc-200 px-5 text-[13px]">
+            <div className="flex max-w-full items-center gap-5 overflow-x-auto border-b border-zinc-200 px-4 text-[13px] sm:px-5">
               <TabButton active={tab === "categories"} onClick={() => setTab("categories")}>Spend categories</TabButton>
               <TabButton active={tab === "models"} onClick={() => setTab("models")}>Models</TabButton>
             </div>
 
             {tab === "categories" ? (
-              <div className="grid grid-cols-1 gap-4 p-5 sm:grid-cols-2">
+              <div className="grid grid-cols-1 gap-4 p-4 sm:grid-cols-2 sm:p-5">
                 <CategoryCard
                     title="AI and extension requests"
                   items={[
@@ -434,7 +438,7 @@ function UsagePage() {
                 {data.recentExtensionKeys.map((key, index) => {
                   const usage = derived.keySpend.get(key.id) ?? { spend: 0, requests: 0 };
                   return (
-                    <div key={key.id} className="flex items-center justify-between gap-3 py-3">
+                    <div key={key.id} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 py-3">
                       <div className="min-w-0">
                         <div className="flex items-center gap-2">
                           <code className="truncate font-mono text-[11.5px] text-zinc-800">{key.keyPrefix}••••••••••</code>
@@ -474,18 +478,18 @@ function Dropdown({
   onSelect: (v: string) => void;
 }) {
   return (
-    <div className="relative">
+    <div className="relative min-w-0">
       <button
         type="button"
         onClick={onToggle}
-        className="flex max-w-[190px] items-center gap-1.5 rounded-full border border-zinc-200 bg-white px-3 py-1.5 text-[13px] font-medium text-zinc-700 transition hover:bg-zinc-50"
+        className="flex h-9 w-full min-w-0 items-center gap-1.5 rounded-full border border-zinc-200 bg-white px-2.5 text-[12px] font-medium text-zinc-700 transition hover:bg-zinc-50 sm:w-auto sm:max-w-[190px] sm:px-3 sm:text-[13px]"
       >
         {icon}
         <span className="truncate">{trigger}</span>
         <ChevronDown className="h-3.5 w-3.5 shrink-0 text-zinc-500" />
       </button>
       {open && (
-        <div className="absolute right-0 z-20 mt-1 max-h-64 w-56 overflow-y-auto rounded-lg border border-zinc-200 bg-white p-1 shadow-lg">
+        <div className="absolute left-0 z-20 mt-1 max-h-64 w-[min(14rem,calc(100vw-2rem))] overflow-y-auto rounded-lg border border-zinc-200 bg-white p-1 shadow-lg sm:left-auto sm:right-0">
           {options.map((o) => (
             <button
               key={o.value}
@@ -553,9 +557,9 @@ function ModelBreakdown({ rows }: { rows: { model?: string | null; prompt_tokens
   return (
     <div className="divide-y divide-zinc-100">
       {list.map(([model, s]) => (
-        <div key={model} className="flex items-center justify-between gap-3 px-5 py-3 text-[13px]">
-          <span className="truncate font-mono text-[12px] text-zinc-700">{model}</span>
-          <div className="flex shrink-0 items-center gap-4 tabular-nums text-[12px] text-zinc-500">
+        <div key={model} className="grid grid-cols-1 gap-2 px-4 py-3 text-[13px] sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center sm:px-5">
+          <span className="min-w-0 truncate font-mono text-[12px] text-zinc-700">{model}</span>
+          <div className="grid grid-cols-3 items-center gap-2 tabular-nums text-[11px] text-zinc-500 sm:flex sm:shrink-0 sm:gap-4 sm:text-[12px]">
             <span>{fmtInt(s.requests)} requests</span>
             <span>{fmtInt(s.tokens)} tokens</span>
             <span className="font-semibold text-zinc-800">{fmtUsd(s.cost, 2)}</span>
