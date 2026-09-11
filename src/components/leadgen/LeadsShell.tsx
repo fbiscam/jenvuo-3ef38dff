@@ -154,7 +154,7 @@ export function LeadsShell({ me, children }: { me: Me | null; children: ReactNod
           ))}
         </nav>
 
-        <main className="min-w-0 flex-1 overflow-x-hidden p-4 md:p-6">{children}</main>
+        <main className="mx-auto w-full max-w-7xl min-w-0 flex-1 overflow-x-hidden px-4 py-6 md:px-6 md:py-8">{children}</main>
       </div>
     </div>
   );
@@ -170,9 +170,9 @@ export function PageHeader({
   actions?: ReactNode;
 }) {
   return (
-    <div className="mb-5 flex flex-wrap items-start justify-between gap-3">
+    <div className="mb-6 flex flex-wrap items-start justify-between gap-3 border-b border-zinc-200 pb-5">
       <div>
-        <h1 className="text-[22px] font-semibold tracking-tight text-zinc-900">{title}</h1>
+        <h1 className="text-2xl font-semibold tracking-tight text-zinc-900">{title}</h1>
         {description && <p className="mt-1 text-[13px] text-zinc-600">{description}</p>}
       </div>
       {actions && <div className="flex items-center gap-2">{actions}</div>}
@@ -183,7 +183,7 @@ export function PageHeader({
 export function Card({ children, className = "" }: { children: ReactNode; className?: string }) {
   return (
     <div
-      className={`rounded-2xl border border-zinc-200 bg-white shadow-[0_8px_24px_-12px_rgba(0,0,0,0.06)] ${className}`}
+      className={`rounded-lg border border-zinc-200 bg-white ${className}`}
     >
       {children}
     </div>

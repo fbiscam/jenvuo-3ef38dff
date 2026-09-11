@@ -321,7 +321,14 @@ function AdminInbox() {
         </div>
       </header>
 
-      <div className="relative z-10 flex flex-1 overflow-hidden">
+      <div className="relative z-10 border-b border-neutral-200 bg-white px-5 py-5 sm:px-6">
+        <div className="mx-auto max-w-7xl">
+          <h1 className="text-2xl font-semibold tracking-tight text-zinc-900">Support inbox</h1>
+          <p className="mt-1 text-sm text-zinc-500">Review conversations and reply to customer support requests.</p>
+        </div>
+      </div>
+
+      <div className="relative z-10 flex min-h-0 flex-1 overflow-hidden">
         {/* Left rail — filters/nav */}
         <nav className="hidden w-60 shrink-0 flex-col border-r border-neutral-200 bg-[#FDFDFB] p-4 md:flex">
           <div className="mb-3 px-2 font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-900 font-semibold">
