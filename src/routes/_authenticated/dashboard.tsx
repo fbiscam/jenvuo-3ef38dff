@@ -1455,7 +1455,7 @@ function UsageAnalytics({ stats, keysCount, loading, range, onRangeChange, onRef
     <section className="analytics-section mt-6 bg-white">
       <div className="mx-auto w-full max-w-4xl px-1">
       <div className="mb-5 flex items-center justify-between">
-        <h2 className="text-[17px] font-semibold tracking-tight text-zinc-900">   Analytics</h2>
+        <h2 className="text-[17px] font-semibold tracking-tight text-zinc-900">  Analytics</h2>
         <div className="flex items-center gap-2">
           <div className="relative">
             <select
