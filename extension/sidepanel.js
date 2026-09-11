@@ -889,6 +889,8 @@ async function send(preset, silentUser) {
     if (d.seniorReview?.included && d.seniorReview?.status === "completed") {
       const label = String(d.seniorReview.model || "BluesMinds").split("/").pop();
       setReviewStatus(`Senior reviewed · ${label}`, "verified");
+    } else if (d.mode === "conversation" || d.seniorReview?.status === "not_required") {
+      setReviewStatus("Chat mode", "");
     } else {
       setReviewStatus("Senior review required", "failed");
     }
