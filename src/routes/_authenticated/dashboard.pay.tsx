@@ -35,10 +35,13 @@ export const Route = createFileRoute("/_authenticated/dashboard/pay")({
       { name: "robots", content: "noindex,nofollow" },
     ],
   }),
-  validateSearch: (search: Record<string, unknown>): { amount?: number } => {
+  validateSearch: (search: Record<string, unknown>): { amount?: number; mode?: "topup" | "upgrade" } => {
     const raw = Number(search['amount']);
-    if (!Number.isFinite(raw) || raw <= 0) return {};
-    return { amount: Math.min(1000, Math.round(raw * 100) / 100) };
+    const mode = search['mode'] === "topup" ? "topup" : search['mode'] === "upgrade" ? "upgrade" : undefined;
+    const amount = Number.isFinite(raw) && raw > 0
+      ? Math.min(1000, Math.round(raw * 100) / 100)
+      : undefined;
+    return { amount, mode };
   },
   component: PayPage,
 });
@@ -65,11 +68,11 @@ function PayPage() {
   const cancelFn = useServerFn(cancelOrder);
   const redeemFn = useServerFn(redeemFreeCode);
 
-  const { amount: presetFromUrl } = Route.useSearch();
+  const { amount: presetFromUrl, mode: modeFromUrl } = Route.useSearch();
   const credits = useCredits();
   const currentPlan = credits.plan && typeof credits.plan === 'object' ? (credits.plan as any).id : credits.plan;
   const trial = useTrial();
-  const [mode, setMode] = useState<"topup" | "upgrade">("upgrade");
+  const [mode, setMode] = useState<"topup" | "upgrade">(modeFromUrl ?? "upgrade");
   const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null);
 
 
