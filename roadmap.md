@@ -12,3 +12,4 @@
 - [x] Enlarge recent scan rows, show senior-review model logos, and link available balance to Usage
 - [x] Show API key names and align dashboard Spend, Extension, and Recents rows
 - [x] Match exact row heights and dividers across all three dashboard columns
+- [x] Show live wallet, API token usage, and payment/usage ledger activity on dashboard
