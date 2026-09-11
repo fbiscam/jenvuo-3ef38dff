@@ -3,6 +3,17 @@ import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { Calendar, ChartColumn, ChevronDown, ChevronRight, Download, RefreshCw } from "lucide-react";
+import {
+  Bar,
+  CartesianGrid,
+  ComposedChart,
+  Legend,
+  Line,
+  ResponsiveContainer,
+  Tooltip as RTooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
 import { getUsageStats } from "@/lib/usage.functions";
 
 export const Route = createFileRoute("/_authenticated/dashboard/usage")({
@@ -253,29 +264,83 @@ function UsagePage() {
                 <span className="flex items-center gap-1.5"><span className="inline-block h-2 w-2 rounded-[2px] bg-emerald-400" /> Added</span>
               </div>
             </div>
-            <div className="px-5 py-6">
+            <div className="px-2 py-6 sm:px-5">
               {derived.hasSpend ? (
-                <div className="flex h-48 items-end gap-[3px]">
-                  {derived.days.map((d) => {
-                    const totalH = ((d.spent + d.earned) / maxDaily) * 100;
-                    const spentH = d.spent + d.earned > 0 ? (d.spent / (d.spent + d.earned)) * totalH : 0;
-                    const earnedH = totalH - spentH;
-                    return (
-                      <div key={d.date} className="group relative flex flex-1 flex-col items-center justify-end">
-                        <div className="pointer-events-none absolute -top-8 z-10 hidden whitespace-nowrap rounded bg-zinc-900 px-2 py-1 text-[10px] text-white group-hover:block">
-                          {new Date(d.date).toLocaleDateString(undefined, { month: "short", day: "numeric" })} · −{fmtUsd(d.spent)} / +{fmtUsd(d.earned)} · {d.requests} req
-                        </div>
-                        <div className="flex w-full flex-col justify-end" style={{ height: "100%" }}>
-                          {earnedH > 0 && <div className="w-full rounded-t-sm bg-emerald-400" style={{ height: `${earnedH}%` }} />}
-                          {spentH > 0 && <div className={`w-full bg-zinc-800 ${earnedH > 0 ? "" : "rounded-t-sm"}`} style={{ height: `${spentH}%` }} />}
-                          {totalH === 0 && <div className="w-full bg-zinc-100" style={{ height: "2px" }} />}
-                        </div>
-                      </div>
-                    );
-                  })}
+                <div className="h-64 w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <ComposedChart data={derived.days} margin={{ top: 8, right: 8, bottom: 4, left: 0 }}>
+                      <CartesianGrid stroke="#f4f4f5" vertical={false} />
+                      <XAxis
+                        dataKey="date"
+                        tickLine={false}
+                        axisLine={{ stroke: "#e4e4e7" }}
+                        tick={{ fill: "#71717a", fontSize: 11 }}
+                        tickFormatter={(v: string) =>
+                          new Date(v).toLocaleDateString(undefined, { month: "short", day: "numeric" })
+                        }
+                        minTickGap={18}
+                      />
+                      <YAxis
+                        yAxisId="usd"
+                        tickLine={false}
+                        axisLine={false}
+                        width={54}
+                        tick={{ fill: "#71717a", fontSize: 11 }}
+                        tickFormatter={(v: number) => `$${v >= 1 ? v.toFixed(0) : v.toFixed(2)}`}
+                      />
+                      <YAxis
+                        yAxisId="req"
+                        orientation="right"
+                        tickLine={false}
+                        axisLine={false}
+                        width={40}
+                        allowDecimals={false}
+                        tick={{ fill: "#71717a", fontSize: 11 }}
+                      />
+                      <RTooltip
+                        cursor={{ fill: "rgba(24,24,27,0.04)" }}
+                        labelFormatter={(v) =>
+                          new Date(String(v)).toLocaleDateString(undefined, {
+                            weekday: "short",
+                            month: "short",
+                            day: "numeric",
+                          })
+                        }
+                        formatter={(value: number, name: string) =>
+                          name === "Requests"
+                            ? [fmtInt(value), name]
+                            : [fmtUsd(value, 2), name]
+                        }
+                        contentStyle={{
+                          borderRadius: 8,
+                          border: "1px solid #e4e4e7",
+                          fontSize: 12,
+                          boxShadow: "0 4px 16px rgba(0,0,0,0.06)",
+                        }}
+                      />
+                      <Legend
+                        verticalAlign="bottom"
+                        height={28}
+                        iconType="square"
+                        wrapperStyle={{ fontSize: 12, color: "#71717a" }}
+                      />
+                      <Bar yAxisId="usd" dataKey="spent" name="Spent" stackId="usd" fill="#27272a" radius={[0, 0, 0, 0]} maxBarSize={26} />
+                      <Bar yAxisId="usd" dataKey="earned" name="Added" stackId="usd" fill="#34d399" radius={[3, 3, 0, 0]} maxBarSize={26} />
+                      <Line
+                        yAxisId="req"
+                        type="monotone"
+                        dataKey="requests"
+                        name="Requests"
+                        stroke="#6366f1"
+                        strokeWidth={2}
+                        dot={{ r: 2.5 }}
+                        activeDot={{ r: 4 }}
+                      />
+                    </ComposedChart>
+                  </ResponsiveContainer>
                 </div>
               ) : (
-                <div className="flex h-48 flex-col items-center justify-center text-center">
+                <div className="flex h-64 flex-col items-center justify-center text-center">
                   <span className="flex h-11 w-11 items-center justify-center rounded-lg bg-zinc-100 text-zinc-500">
                     <ChartColumn className="h-5 w-5" />
                   </span>
