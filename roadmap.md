@@ -4,3 +4,7 @@
 - [x] Balance footer navigation to four pages per column and remove Killzone Times
 - [ ] Complete daily BluesMinds article publishing after cover-image credits are added (blocked: image provider returned 402)
 - [x] Verify persisted article-job security and the single daily schedule
+- [ ] Add the Jenvu logo and senior-review status to the extension header
+- [ ] Move extension chat and screen analysis to tested BluesMinds-only model chains
+- [ ] Strengthen live ICT/SMC context, chart markings, and senior-review reasoning
+- [ ] Repackage and test the extension, API, billing, and TypeScript checks
