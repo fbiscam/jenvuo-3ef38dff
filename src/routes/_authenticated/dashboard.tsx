@@ -1368,7 +1368,7 @@ function DashboardHero({ keysCount, stats }: { keysCount: number | null; stats: 
                 </Link>
               ) : recentKeys.map((key) => (
                 <Link key={key.id} to="/dashboard/extension" className="flex min-h-12 items-center justify-between gap-3 py-3 text-sm text-zinc-500 hover:text-zinc-900">
-                  <span className="min-w-0 truncate font-mono text-[12px] text-zinc-700">{key.keyPrefix}…</span>
+                  <span className="min-w-0 truncate font-medium text-zinc-900">{key.name}</span>
                   <span className="shrink-0 tabular-nums text-[12px] text-zinc-500">
                     {keyTokens.get(key.id)
                       ? `${((keyTokens.get(key.id) ?? 0) / 1000).toFixed(1)}k tokens`
@@ -1386,9 +1386,9 @@ function DashboardHero({ keysCount, stats }: { keysCount: number | null; stats: 
             </div>
             <div className="mt-1 divide-y divide-zinc-200">
               {filtered.length === 0 ? (
-                <p className="py-3 text-sm text-zinc-400">No matches</p>
+                <p className="flex min-h-12 items-center py-3 text-sm text-zinc-400">No matches</p>
               ) : filtered.map((l) => (
-                <Link key={l.to} to={l.to} className="flex items-center justify-between py-3 text-sm text-zinc-500 hover:text-zinc-900">
+                <Link key={l.to} to={l.to} className="flex min-h-12 items-center justify-between py-3 text-sm text-zinc-500 hover:text-zinc-900">
                   <span className="inline-flex items-center gap-2">
                     <History className="h-3.5 w-3.5 text-zinc-400" />
                     <span className="font-medium text-zinc-900">{l.label}</span>
