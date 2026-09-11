@@ -19,4 +19,4 @@
 - [x] Add Grok 4.6 fallback and block every unreviewed extension result
 - [x] Rework pricing around token wallets and plan-specific API limits
 - [x] Limit Pro to primary AI; reserve mandatory senior review for Elite and Ultra
-- [ ] Verify pricing, extension billing, and TypeScript
+- [x] Verify pricing, extension billing, and TypeScript
