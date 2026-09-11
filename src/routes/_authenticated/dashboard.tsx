@@ -1251,6 +1251,18 @@ function UsageStatCard({ title, value, delta, series, tall = false, chartHeight,
 function DashboardHero({ keysCount, stats }: { keysCount: number | null; stats: UsageStats | null }) {
   const [q, setQ] = useState("");
   const recentSpend = (stats?.ledger ?? []).filter((entry) => entry.delta < 0).slice(0, 3);
+  const recentKeys = (stats?.recentExtensionKeys ?? []).slice(0, 3);
+  const keyTokens = useMemo(() => {
+    const map = new Map<string, number>();
+    for (const row of stats?.ledger ?? []) {
+      const meta = (row.metadata ?? null) as { api_key_id?: string } | null;
+      const id = meta && typeof meta === "object" ? meta.api_key_id : undefined;
+      if (!id) continue;
+      const tokens = (row.prompt_tokens ?? 0) + (row.completion_tokens ?? 0);
+      map.set(id, (map.get(id) ?? 0) + tokens);
+    }
+    return map;
+  }, [stats]);
   const reviewModels = [
     { key: "openai", label: "ChatGPT", Icon: RiOpenaiFill, className: "text-brand-openai" },
     { key: "gemini", label: "Gemini", Icon: RiGeminiFill, className: "text-brand-gemini" },
