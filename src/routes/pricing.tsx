@@ -8,12 +8,6 @@ import { useUpgradeLock } from "@/hooks/useUpgradeLock";
 import { useTrial } from "@/hooks/useTrial";
 
 import { Zap, Crown } from "lucide-react";
-import pricingVoice from "@/assets/pricing-voice.jpg";
-import pricingIct from "@/assets/pricing-ict.jpg";
-import pricingAlerts from "@/assets/pricing-alerts.jpg";
-import pricingJournal from "@/assets/pricing-journal.jpg";
-import pricingScanner from "@/assets/pricing-scanner.jpg";
-import pricingApi from "@/assets/pricing-api.jpg";
 
 const MONO = "font-['Google_Sans','Product_Sans','Roboto',system-ui,sans-serif] font-normal normal-case tracking-normal";
 const SANS = "font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif]";
@@ -103,15 +97,6 @@ const TIERS = [
   },
 ] as const;
 
-const FEATURE_BLOCKS = [
-  { img: pricingVoice, tag: "01 / VOICE", title: "Voice-first analysis", desc: "Speak your query. Get an institutional narration in seconds — no typing.", tone: "Pro · Elite · Ultra" },
-  { img: pricingIct, tag: "02 / ICT · SMC", title: "ICT & SMC narration", desc: "Fair value gaps, order blocks, liquidity sweeps and BOS — all called live on chart.", tone: "Pro · Elite · Ultra" },
-  { img: pricingAlerts, tag: "03 / ALERTS", title: "Realtime A+ alerts", desc: "Email + push the instant a 4★ confluence setup forms. No noise. Only A+.", tone: "Pro · Elite" },
-  { img: pricingJournal, tag: "04 / JOURNAL", title: "Trade journal & analytics", desc: "Auto-log every trade. Track equity curve, win rate, RR and emotional state.", tone: "Pro · Elite · Ultra" },
-  { img: pricingScanner, tag: "05 / SCANNER", title: "XAU/USD scanner", desc: "Bias engine on XAU/USD plus DXY overlay — synced timeframes.", tone: "Elite" },
-  { img: pricingApi, tag: "06 / API", title: "API access & webhooks", desc: "Pipe signals into your stack. JSON webhooks, REST endpoints, custom rules.", tone: "Elite" },
-];
-
 type Mark = boolean | string;
 const MATRIX: Array<{ feature: string; free: Mark; pro: Mark; elite: Mark }> = [
   { feature: "Voice queries / day", free: "Unlimited", pro: "Unlimited", elite: "Unlimited" },
@@ -162,38 +147,41 @@ function PricingPage() {
       </header>
 
       {/* HERO */}
-      <section className="public-page-hero relative overflow-hidden border-b border-border">
-        <div className="relative z-10 mx-auto max-w-4xl px-5 py-16 text-center sm:px-6 sm:py-24">
-          
-          <h1 className="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl md:text-6xl">
-            Trade gold with an institutional edge.
+      <section className="border-b border-border bg-zinc-50">
+        <div className="mx-auto max-w-5xl px-5 pb-12 pt-16 text-center sm:px-6 sm:pb-16 sm:pt-24">
+          <h1 className="text-4xl font-semibold sm:text-5xl md:text-6xl">
+            Scale predictably.
           </h1>
-          <p className="mx-auto mt-5 max-w-2xl text-base text-zinc-600 sm:text-lg">
-            One voice agent. A+ realtime setups. Built on ICT, SMC, and 25 years of professional desk methodology.
+          <p className="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-zinc-600 sm:text-lg">
+            Start with the plan that fits your trading desk. Every paid plan includes a monthly AI wallet billed by actual token use.
           </p>
-          <div className="mt-8 flex flex-wrap justify-center gap-2">
-            {["A+ Setups", "ICT / SMC", "< 30s Alerts", "25Y Methodology"].map((s) => (
-              <span key={s} className={`${MONO} rounded-full border border-home-accent/25 bg-background px-3 py-1.5 text-[10px] text-home-accent`}>
-                {s}
+          <nav aria-label="Pricing categories" className="mt-9 flex flex-wrap justify-center gap-2">
+            {["Plans", "AI wallet", "Extension API", "Desk access"].map((item, index) => (
+              <span
+                key={item}
+                className={`rounded-full border px-4 py-2 text-sm font-medium ${index === 0 ? "border-home-accent bg-home-accent text-home-accent-foreground" : "border-zinc-300 bg-background text-zinc-700"}`}
+              >
+                {item}
               </span>
             ))}
-          </div>
+          </nav>
         </div>
       </section>
 
 
       {/* COMPARISON MATRIX — homepage Beanstalk style */}
-      <section className="mx-auto max-w-7xl px-5 sm:px-8 py-16 sm:py-20">
-        <div className="mb-10">
-          
-          <h2 className="mt-3 text-3xl sm:text-4xl font-semibold tracking-tight max-sm:whitespace-nowrap max-sm:text-[7vw]">Compare Jenvu Plans</h2>
+      <section className="bg-background">
+        <div className="mx-auto max-w-7xl px-5 py-16 sm:px-8 sm:py-20">
+        <div className="mb-10 max-w-2xl">
+          <h2 className="text-3xl font-semibold sm:text-4xl">Choose your plan</h2>
+          <p className="mt-3 text-sm leading-relaxed text-zinc-600 sm:text-base">Clear monthly wallet limits, extension access, and review coverage with no hidden base analysis fee.</p>
         </div>
 
 
 
 
 
-        <div className="overflow-x-auto rounded-lg border border-border bg-background shadow-sm">
+        <div className="overflow-x-auto border border-border bg-background shadow-sm">
 
           <table className="w-full min-w-[760px] text-sm border-collapse">
             <colgroup>
@@ -366,59 +354,6 @@ function PricingPage() {
               ))}
             </tbody>
           </table>
-        </div>
-      </section>
-
-      {/* FEATURE FILM — platform modules */}
-      <section className="border-y border-border bg-background">
-        <div className="mx-auto max-w-6xl px-5 py-16 sm:px-6 sm:py-20">
-          <div className="grid items-stretch gap-10 lg:grid-cols-[minmax(0,1.12fr)_minmax(320px,0.88fr)] lg:gap-14">
-            <div className="relative min-h-[360px] overflow-hidden rounded-lg border border-border bg-zinc-950 shadow-sm sm:min-h-[480px]">
-              <video
-                className="absolute inset-0 h-full w-full object-cover"
-                src="/pricing-features.webm"
-                poster={pricingVoice}
-                autoPlay
-                muted
-                loop
-                playsInline
-                preload="metadata"
-                aria-label="Jenvu platform feature preview"
-              />
-              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-zinc-950 via-zinc-950/80 to-transparent px-6 pb-6 pt-24 text-white sm:px-8 sm:pb-8">
-                <div className="flex items-center gap-2 text-[11px] font-medium">
-                  <span className="h-2 w-2 animate-pulse rounded-full bg-home-accent" />
-                  LIVE PLATFORM PREVIEW
-                </div>
-                <p className="mt-3 max-w-md text-xl font-semibold leading-snug sm:text-2xl">
-                  One intelligent workflow from market context to execution.
-                </p>
-              </div>
-            </div>
-
-            <div className="flex flex-col justify-center">
-              <span className={`${MONO} text-[11px] font-medium text-home-accent`}>BUILT FOR THE GOLD DESK</span>
-              <h2 className="mt-4 text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
-                Everything in the platform.
-              </h2>
-              <p className="mt-4 max-w-xl text-sm leading-relaxed text-muted-foreground sm:text-base">
-                Six connected modules for serious gold traders—from spoken market context to live alerts and review.
-              </p>
-
-              <div className="mt-8 divide-y divide-border border-y border-border">
-                {FEATURE_BLOCKS.map((feature, index) => (
-                  <article key={feature.tag} className="group grid grid-cols-[34px_1fr_auto] items-start gap-3 py-4">
-                    <span className={`${MONO} pt-0.5 text-[10px] text-home-accent`}>{String(index + 1).padStart(2, "0")}</span>
-                    <div>
-                      <h3 className="text-sm font-semibold text-foreground sm:text-[15px]">{feature.title}</h3>
-                      <p className="mt-1 text-xs leading-relaxed text-muted-foreground sm:text-sm">{feature.desc}</p>
-                    </div>
-                    <span className="mt-1 text-home-accent transition-transform group-hover:translate-x-1" aria-hidden="true">→</span>
-                  </article>
-                ))}
-              </div>
-            </div>
-          </div>
         </div>
       </section>
 
