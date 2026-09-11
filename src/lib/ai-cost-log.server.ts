@@ -41,6 +41,10 @@ const MODEL_PRICING: Record<string, Price> = {
   "bmind/grok-4.5": { in: 3.0, out: 15.0 },
   "bmind/nvidia/nemotron-3-nano-omni-30b-a3b-reasoning": { in: 0, out: 0 },
   "bmind/meta/llama-3.2-11b-vision-instruct": { in: 0, out: 0 },
+  "bmind/nvidia/llama-3.3-nemotron-super-49b-v1.5": { in: 0, out: 0 },
+  "bmind/kimi-k2.5": { in: 0, out: 0 },
+  "bmind/nvidia/nvidia-nemotron-nano-9b-v2": { in: 0, out: 0 },
+  "bmind/meta/llama-3.3-70b-instruct": { in: 0, out: 0 },
   // DeepSeek official API
   "dsofficial/deepseek-reasoner": { in: 0.55, out: 2.19 },
   "dsofficial/deepseek-chat": { in: 0.27, out: 1.10 },
