@@ -185,12 +185,14 @@ export async function generateInsightCover(opts: {
   if (!generated) return null;
 
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  const path = `${opts.slug}-${Date.now()}.png`;
+  const mime = generated.mime || "image/png";
+  const ext = mime.includes("jpeg") || mime.includes("jpg") ? "jpg" : mime.includes("webp") ? "webp" : "png";
+  const path = `${opts.slug}-${Date.now()}.${ext}`;
 
   const { error } = await supabaseAdmin.storage
     .from(INSIGHT_IMAGE_BUCKET)
     .upload(path, base64ToBytes(generated.b64), {
-      contentType: "image/png",
+      contentType: mime,
       upsert: true,
     });
 
