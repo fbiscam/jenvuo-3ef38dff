@@ -508,6 +508,13 @@ export const EXTENSION_MODEL_CHAIN = {
     "bmind/nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
     "bmind/meta/llama-3.2-11b-vision-instruct",
   ],
+  // Independent second reviewer — must not reuse the senior primary model.
+  secondReview: [
+    "bmind/nvidia/llama-3.3-nemotron-super-49b-v1.5",
+    "bmind/kimi-k2.5",
+    "bmind/nvidia/nvidia-nemotron-nano-9b-v2",
+    "bmind/meta/llama-3.3-70b-instruct",
+  ],
 } as const;
 
 export const MACRO_CONTEXT_CHAIN = WORKING_BMIND;
