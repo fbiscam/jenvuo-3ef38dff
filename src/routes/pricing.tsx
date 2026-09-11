@@ -7,14 +7,13 @@ import { useCurrentPlan } from "@/hooks/useCurrentPlan";
 import { useUpgradeLock } from "@/hooks/useUpgradeLock";
 import { useTrial } from "@/hooks/useTrial";
 
-import { Check, Sparkles, Zap, Crown, Minus } from "lucide-react";
+import { Zap, Crown } from "lucide-react";
 import pricingVoice from "@/assets/pricing-voice.jpg";
 import pricingIct from "@/assets/pricing-ict.jpg";
 import pricingAlerts from "@/assets/pricing-alerts.jpg";
 import pricingJournal from "@/assets/pricing-journal.jpg";
 import pricingScanner from "@/assets/pricing-scanner.jpg";
 import pricingApi from "@/assets/pricing-api.jpg";
-import xaiLogo from "@/assets/xai-logo.png";
 
 const MONO = "font-['Google_Sans','Product_Sans','Roboto',system-ui,sans-serif] font-normal normal-case tracking-normal";
 const SANS = "font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif]";
@@ -69,7 +68,7 @@ const TIERS = [
       "Trade journal & analytics",
       "Multi-timeframe bias engine",
       "1 extension API key · $10 AI wallet",
-      "GPT-6 Astra + Claude Opus 4.8 review",
+      "GPT-6 Astra primary analysis",
     ],
 
     highlight: true,
@@ -93,6 +92,7 @@ const TIERS = [
       "Dedicated XAU/USD scanner with DXY overlay",
       "API access & webhooks",
       "3 extension API keys · $40 AI wallet",
+      "Claude Opus 4.8 mandatory senior review",
       "Custom alert rules",
       "Dedicated onboarding & SLA",
     ],
@@ -287,7 +287,10 @@ function PricingPage() {
                 { f: "Monthly AI wallet", b: "$10", c: "$40", d: "$90" },
                 { f: "Active extension API keys", b: "1", c: "3", d: "5" },
                 { f: "GPT-6 Astra primary analysis", b: true, c: true, d: true },
-                { f: "Claude Opus 4.8 senior review", b: true, c: true, d: true },
+                { f: "Claude Opus 4.8 senior review", b: false, c: true, d: true },
+                { f: "Approx. monthly analyses", b: "~500 primary", c: "~1,400 reviewed", d: "~3,200 reviewed" },
+                { f: "Primary input tokens", b: "Up to 2M", c: "Up to 8M", d: "Up to 18M" },
+                { f: "Primary output tokens", b: "Up to 400K", c: "Up to 1.6M", d: "Up to 3.6M" },
                 { f: "Token price", b: "50% of published rate", c: "50% of published rate", d: "50% of published rate" },
 
                 { f: "Voice queries / day", b: "Unlimited", c: "Unlimited", d: "Unlimited" },
@@ -422,7 +425,7 @@ function PricingPage() {
           <div>
             
             <h2 className="mt-2 text-2xl sm:text-3xl font-semibold tracking-tight">Need more wallet balance?</h2>
-            <p className="mt-2 max-w-xl text-sm text-zinc-600 lg:max-w-none lg:whitespace-nowrap">Live extension market data is free. GPT-6 Astra and Claude Opus 4.8 are billed at 50% of their official token rates.</p>
+            <p className="mt-2 max-w-xl text-sm text-zinc-600 lg:max-w-none lg:whitespace-nowrap">Live market data is free. Pro uses GPT-6 Astra; Elite and Ultra add a mandatory Claude Opus 4.8 review. AI is billed at 50% of published token rates.</p>
           </div>
         </div>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -443,7 +446,7 @@ function PricingPage() {
                 <span className="text-3xl tabular-nums price-font">${p.price}</span>
                 <span className="text-xs text-zinc-500">wallet</span>
               </div>
-              <div className="mt-1 text-sm text-zinc-700">${p.price} one-time · ~{Math.floor(p.price / 0.2)} signals</div>
+              <div className="mt-1 text-sm text-zinc-700">${p.price} one-time · up to {(p.price / 5).toFixed(1)}M GPT-6 input tokens</div>
               {signedOut ? (
                 <Link to="/founding" className="mt-5 inline-flex w-full items-center justify-center rounded-md bg-home-accent px-3 py-2 text-xs font-medium text-home-accent-foreground hover:opacity-90">
                   Buy Now
@@ -512,7 +515,7 @@ function Cell({ value, highlight }: { value: Mark; highlight?: boolean }) {
 function CustomTopUp({ signedOut }: { signedOut: boolean }) {
   const [amount, setAmount] = React.useState<number>(15);
   const safe = Math.max(5, Math.min(1000, Number.isFinite(amount) ? amount : 5));
-  const estSignals = Math.floor(safe / 0.2);
+  const inputTokens = (safe / 5).toFixed(1);
   return (
     <div className="mt-8 rounded-lg border border-border bg-background p-6 sm:p-7">
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-5">
@@ -535,7 +538,7 @@ function CustomTopUp({ signedOut }: { signedOut: boolean }) {
           </div>
           <div className="text-right">
             <div className={`text-2xl font-bold tabular-nums ${MONO}`}>${safe}</div>
-            <div className="text-[11px] text-zinc-500">wallet · ~{estSignals} signals</div>
+            <div className="text-[11px] text-zinc-500">wallet · up to {inputTokens}M input tokens</div>
           </div>
           {signedOut ? (
             <Link

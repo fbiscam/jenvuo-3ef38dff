@@ -2084,7 +2084,7 @@ function buildFeedFallbackPlan(args: {
 export async function computeSignalPlan(
   data: { symbol: string },
   __userId: string | null = null,
-  billing?: { scanId?: string | null; systemScan?: boolean; extensionBilling?: { keyId: string; keyName: string } },
+  billing?: { scanId?: string | null; systemScan?: boolean; extensionBilling?: { keyId: string; keyName: string; planId: string } },
 ): Promise<SignalPlan> {
     // AI key is validated inside callChatCompletion — no local read needed.
 
@@ -2942,10 +2942,10 @@ ENGINE GRADE ${setupGrade} (${setupScore}/100) | breakers ${breakers.length} | i
     let __seniorReviewStatus: "not_required" | "completed" | "confirmed" | "downgraded" | "vetoed" | "failed" = "not_required";
     let __seniorReviewError: string | null = null;
     if (billing?.extensionBilling) {
-      // Every paid extension analysis includes the independent senior desk pass,
-      // including WAIT outcomes, so billing and review quality stay consistent.
-      __planAllowsSenior = true;
-      __planId = "extension";
+      // Pro receives the primary model only. Elite and Ultra add the mandatory
+      // senior desk pass, including WAIT outcomes.
+      __planId = billing.extensionBilling.planId;
+      __planAllowsSenior = __planId === "elite" || __planId === "ultra";
     } else if (billing?.systemScan) {
       // Auto-scan / broadcast worker runs with no user context, but a signal
       // that goes out to every subscriber MUST pass the senior review gate.
@@ -3797,7 +3797,12 @@ IMMINENT HIGH-IMPACT: ${imminentHigh ? `${imminentHigh.title} in ${Math.round(im
         ...(__usedNarrationModel ? [{ model: __usedNarrationModel, usage: { promptTokens: Math.max(0, __totalPromptTokens - __seniorPromptTokens), completionTokens: Math.max(0, __totalCompletionTokens - __seniorCompletionTokens) }, stage: "extension-full-analysis" }] : []),
         ...(__usedSeniorModel ? [{ model: __usedSeniorModel, usage: { promptTokens: __seniorPromptTokens, completionTokens: __seniorCompletionTokens }, stage: "extension-senior-review" }] : []),
       ];
-      if (calls.length < 2) throw new Error("Extension analysis requires a completed primary and senior AI review.");
+      const requiredCalls = billing.extensionBilling.planId === "elite" || billing.extensionBilling.planId === "ultra" ? 2 : 1;
+      if (calls.length < requiredCalls) {
+        throw new Error(requiredCalls === 2
+          ? "This plan requires a completed primary and senior AI review."
+          : "Extension analysis requires a completed primary AI review.");
+      }
       const { chargeExtensionUsage } = await import("@/lib/extension-billing.server");
       const charged = await chargeExtensionUsage({ userId: __userId as string, keyId: billing.extensionBilling.keyId, keyName: billing.extensionBilling.keyName, requestId: __scanId, action: "full_analysis", calls });
       if (!charged.ok) throw new Error(charged.error ?? "Extension usage could not be charged.");
