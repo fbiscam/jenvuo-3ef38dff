@@ -305,7 +305,7 @@ function ExtensionPage() {
       {view === "extension" && (
         <div className="mt-5">
           <div className="mb-4">
-            <h2 className="text-[16px] font-medium text-zinc-900">Latest extension</h2>
+            <h2 className="text-[16px] font-medium text-zinc-900">  Latest extension</h2>
             <p className="mt-1 text-[12px] text-zinc-500">The newest tested release available for your account.</p>
           </div>
           <div className="hidden grid-cols-[minmax(0,1.8fr)_0.8fr_0.8fr_auto] items-center gap-4 border-b border-zinc-200 pb-3 text-[13px] text-zinc-700 md:grid">
