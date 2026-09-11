@@ -152,7 +152,7 @@ function ExtensionPage() {
         <div className="flex min-w-0 items-center gap-3">
           <button
             onClick={() => setShowGuide((v) => !v)}
-            className="inline-flex items-center gap-2 rounded-full px-3 py-2 text-[13px] text-zinc-700 hover:bg-zinc-100"
+            className="hidden items-center gap-2 rounded-full px-3 py-2 text-[13px] text-zinc-700 hover:bg-zinc-100 sm:inline-flex"
           >
             <FileText className="h-4 w-4" /> API quickstart
           </button>
