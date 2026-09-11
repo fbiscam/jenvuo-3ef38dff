@@ -283,7 +283,7 @@ function Billing() {
       <section className="flex flex-wrap items-center gap-3">
         <Link
           to="/dashboard/pay"
-          search={{ mode: "topup" }}
+          search={{ purchase: "credits" }}
           className="rounded-lg bg-zinc-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-zinc-800 transition-colors"
         >
           Buy credits
