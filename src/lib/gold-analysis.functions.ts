@@ -14,7 +14,7 @@ import {
 } from "@/lib/analysis/engine";
 import {
   callChatCompletion, tryParseJsonLoose, AiGatewayError,
-  MODEL_CHAIN, SENIOR_REVIEW_CHAIN, MACRO_CONTEXT_CHAIN, DEEPSEEK_REVIEW_CHAIN,
+  MODEL_CHAIN, EXTENSION_MODEL_CHAIN, SENIOR_REVIEW_CHAIN, MACRO_CONTEXT_CHAIN, DEEPSEEK_REVIEW_CHAIN,
   getCachedPlan, setCachedPlan, checkAnalyzeRateLimit,
 } from "@/lib/ai-gateway";
 import { MIN_CONFIDENCE } from "@/lib/signals/qualification";
@@ -2084,7 +2084,7 @@ function buildFeedFallbackPlan(args: {
 export async function computeSignalPlan(
   data: { symbol: string },
   __userId: string | null = null,
-  billing?: { scanId?: string | null; systemScan?: boolean; extensionBilling?: { keyId: string; keyName: string } },
+  billing?: { scanId?: string | null; systemScan?: boolean; extensionBilling?: { keyId: string; keyName: string; planId: string } },
 ): Promise<SignalPlan> {
     // AI key is validated inside callChatCompletion — no local read needed.
 
@@ -2340,7 +2340,7 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
     // exceed the request timeout with no result at all.
     try {
       const narration = await callChatCompletion({
-        models: [...MODEL_CHAIN.narration],
+        models: [...(billing?.extensionBilling ? EXTENSION_MODEL_CHAIN.reasoning : MODEL_CHAIN.narration)],
         messages: [
           { role: "system", content: system },
           { role: "user", content: user },
@@ -2859,7 +2859,7 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
     let __crossCheckModel: string | null = null;
     let __dsAgrees: boolean | null = null;
     let __consensus: "full" | "split" | null = null;
-    if (built.direction !== "WAIT" && setupScore >= SENIOR_REVIEW_MIN_RULE_SCORE && __aiLeft() > 16000) {
+    if (!billing?.extensionBilling && built.direction !== "WAIT" && setupScore >= SENIOR_REVIEW_MIN_RULE_SCORE && __aiLeft() > 16000) {
       try {
         const xSystem = `You are an independent ICT/SMC audit desk (second opinion, different house than the primary analyst). Audit the setup ONLY against core Smart Money rules: liquidity sweep before entry, displacement creating the FVG/OB, premium/discount side correctness, HTF↔LTF alignment, zone freshness, killzone timing, and R:R sanity.
 Reply ONLY as JSON: {"agrees":true|false,"smc_score":<0-100>,"note":"<one short sentence, most important rule that passes or fails>"}`;
@@ -2942,10 +2942,10 @@ ENGINE GRADE ${setupGrade} (${setupScore}/100) | breakers ${breakers.length} | i
     let __seniorReviewStatus: "not_required" | "completed" | "confirmed" | "downgraded" | "vetoed" | "failed" = "not_required";
     let __seniorReviewError: string | null = null;
     if (billing?.extensionBilling) {
-      // Every paid extension analysis includes the independent senior desk pass,
-      // including WAIT outcomes, so billing and review quality stay consistent.
-      __planAllowsSenior = true;
-      __planId = "extension";
+      // Pro receives the primary model only. Elite and Ultra add the mandatory
+      // senior desk pass, including WAIT outcomes.
+      __planId = billing.extensionBilling.planId;
+      __planAllowsSenior = __planId === "elite" || __planId === "ultra";
     } else if (billing?.systemScan) {
       // Auto-scan / broadcast worker runs with no user context, but a signal
       // that goes out to every subscriber MUST pass the senior review gate.
@@ -3012,7 +3012,7 @@ Run the full 25-year desk-head review internally through the elite lens above, t
         // Senior review — best-available mode.
         // Uses SENIOR_REVIEW_CHAIN (best → most reliable) from ai-gateway.
         // Sequential fallback: strongest live model wins; if all throttled, review skips.
-        const seniorChain = [...SENIOR_REVIEW_CHAIN];
+        const seniorChain = [...(billing?.extensionBilling ? EXTENSION_MODEL_CHAIN.seniorReview : SENIOR_REVIEW_CHAIN)];
 
         let reviewResult: { content: string; model: string; usage: any } | null = null;
         let reviewError: any = null;
@@ -3797,7 +3797,12 @@ IMMINENT HIGH-IMPACT: ${imminentHigh ? `${imminentHigh.title} in ${Math.round(im
         ...(__usedNarrationModel ? [{ model: __usedNarrationModel, usage: { promptTokens: Math.max(0, __totalPromptTokens - __seniorPromptTokens), completionTokens: Math.max(0, __totalCompletionTokens - __seniorCompletionTokens) }, stage: "extension-full-analysis" }] : []),
         ...(__usedSeniorModel ? [{ model: __usedSeniorModel, usage: { promptTokens: __seniorPromptTokens, completionTokens: __seniorCompletionTokens }, stage: "extension-senior-review" }] : []),
       ];
-      if (calls.length < 2) throw new Error("Extension analysis requires a completed primary and senior AI review.");
+      const requiredCalls = billing.extensionBilling.planId === "elite" || billing.extensionBilling.planId === "ultra" ? 2 : 1;
+      if (calls.length < requiredCalls) {
+        throw new Error(requiredCalls === 2
+          ? "This plan requires a completed primary and senior AI review."
+          : "Extension analysis requires a completed primary AI review.");
+      }
       const { chargeExtensionUsage } = await import("@/lib/extension-billing.server");
       const charged = await chargeExtensionUsage({ userId: __userId as string, keyId: billing.extensionBilling.keyId, keyName: billing.extensionBilling.keyName, requestId: __scanId, action: "full_analysis", calls });
       if (!charged.ok) throw new Error(charged.error ?? "Extension usage could not be charged.");

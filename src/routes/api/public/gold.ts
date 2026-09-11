@@ -127,6 +127,7 @@ async function handle({ request }: { request: Request }) {
       const { getExtensionEntitlement } = await import('@/lib/extension-billing.server')
       const entitlement = await getExtensionEntitlement(auth.userId)
       if (!entitlement.allowed) return extJson({ ok: false, error: entitlement.error, code: entitlement.status === 402 ? 'LOW_BALANCE' : 'PLAN_REQUIRED', balance: entitlement.balance }, entitlement.status)
+      const requiresSeniorReview = entitlement.seniorReview
       const question = String(body.question || '').slice(0, 2000)
       if (!question) return extJson({ ok: false, error: 'Question is empty.' }, 400)
 
@@ -185,7 +186,7 @@ async function handle({ request }: { request: Request }) {
         `FVG ${JSON.stringify(market.technicals.freshFvgs).slice(0, 220)}`,
         `OB ${JSON.stringify(market.technicals.freshOrderBlocks).slice(0, 220)}`,
       ].join('\n')
-      const review = await callChatCompletion({
+      const review = requiresSeniorReview ? await callChatCompletion({
           models: [...EXTENSION_MODEL_CHAIN.seniorReview],
           stage: 'extension-senior-review',
           maxTokens: 450,
@@ -200,15 +201,20 @@ async function handle({ request }: { request: Request }) {
             },
             { role: 'user', content: `Live:\n${reviewContext}\nAsk: ${question.slice(0, 300)}\nGPT-6 Astra primary analysis:\n${primary.content.slice(0, 900)}` },
           ],
-        })
-      // Hard approval gate: only the validated senior response is ever exposed.
-      content = review.content
-      seniorReview = { included: true, model: review.model, status: 'completed' }
+        }) : null
+      // Elite and Ultra only expose the validated senior response. Pro returns
+      // its completed GPT-6 Astra primary analysis without a second pass.
+      if (review) {
+        content = review.content
+        seniorReview = { included: true, model: review.model, status: 'completed' }
+      }
 
       // The senior review is the second pass: GPT-6 Astra analyzes first,
        // then Claude Opus 4.8 (or Grok 4.6 fallback) independently audits and
        // finalizes the answer. A failed review aborts the request above.
-      const secondReview = { included: true, model: review.model, status: 'completed' }
+      const secondReview = review
+        ? { included: true, model: review.model, status: 'completed' }
+        : { included: false, model: null, status: 'not_in_plan' }
 
       const { chargeExtensionUsage } = await import('@/lib/extension-billing.server')
       const billing = await chargeExtensionUsage({
@@ -216,7 +222,7 @@ async function handle({ request }: { request: Request }) {
         action: image ? 'screen_analysis' : 'chat',
         calls: [
           { model: primary.model, usage: primary.usage, stage: image ? 'extension-screen-analysis' : 'extension-chat' },
-          { model: review.model, usage: review.usage, stage: 'extension-senior-review' },
+          ...(review ? [{ model: review.model, usage: review.usage, stage: 'extension-senior-review' }] : []),
         ],
       })
       if (!billing.ok) return extJson({ ok: false, error: billing.error, code: billing.error?.includes('balance') ? 'LOW_BALANCE' : 'BILLING_FAILED' }, billing.error?.includes('balance') ? 402 : 502)

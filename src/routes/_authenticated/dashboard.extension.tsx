@@ -379,7 +379,7 @@ function ExtensionPage() {
               <X className="h-4 w-4" />
             </button>
           </div>
-          <p className="mt-3 text-[12px] leading-relaxed text-zinc-600">Live snapshots are free. AI chat and analysis cost $0.02 plus model token usage with mandatory senior review.</p>
+          <p className="mt-3 text-[12px] leading-relaxed text-zinc-600">Live snapshots are free. AI chat and analysis are billed per token at 50% of published rates. Senior review is included on Elite and Ultra.</p>
           <ol className="mt-3 space-y-2 text-[13px] leading-relaxed text-zinc-700">
             <li>1. Download the extension package above and unzip it.</li>
             <li>2. Open <span className={`${MONO} rounded bg-white px-1.5 py-0.5 text-[12px]`}>chrome://extensions</span>, turn on Developer mode.</li>

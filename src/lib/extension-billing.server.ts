@@ -26,6 +26,7 @@ export async function getExtensionEntitlement(userId: string) {
     balance,
     wallet: Number(plan?.wallet_usd ?? 0),
     markup: EXTENSION_TOKEN_PRICE_MULTIPLIER,
+    seniorReview: planId === 'elite' || planId === 'ultra',
   }
   return {
     ...result,
