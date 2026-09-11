@@ -60,6 +60,8 @@ const MODEL_PRICING: Record<string, Price> = {
   "tukenku/myt/gpt-5.6-sol-free": { in: 0.7714, out: 4.63 },
   "tukenku/myt/claude-opus-4-8": { in: 0.7714, out: 3.86 },
   "tukenku/myt/claude-opus-4-8-free": { in: 0.7714, out: 3.86 },
+  // Tukenku publishes this fallback as a free route without token prices.
+  "tukenku/myt/grok-4.6-free": { in: 0, out: 0 },
 
   // Official provider list rates in USD per 1M tokens. Extension users are
   // charged 50% of these rates by extension-billing.server.ts.
@@ -131,6 +133,7 @@ export function formatModelLabel(rawModel: string | null | undefined): string {
   if (bare.startsWith("deepseek-v4-pro") || bare.startsWith("deepseek-reasoner")) return "DeepSeek V4 Pro";
   if (bare.startsWith("deepseek-chat")) return "DeepSeek V3";
   if (bare.startsWith("grok-4.3")) return "Grok 4.3";
+  if (bare.startsWith("grok-4.6")) return "Grok 4.6";
   if (bare.startsWith("grok")) return "Grok 4.5";
 
   if (bare.startsWith("gemini-3.1-pro")) return "Gemini 3.1 Pro";
