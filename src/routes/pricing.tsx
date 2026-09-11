@@ -131,7 +131,7 @@ function PricingPage() {
   };
   const suffix = billing === "annual" ? "/yr" : "/mo";
   return (
-    <div className={`public-cloudflare min-h-dvh w-full bg-background text-foreground ${SANS} antialiased`}>
+    <div className={`public-cloudflare min-h-dvh w-full bg-background text-foreground ${SANS} antialiased md:[zoom:1.375] origin-top`}>
 
       {/* HEADER */}
       <header className="sticky top-0 z-50 border-b border-zinc-100 bg-white">
