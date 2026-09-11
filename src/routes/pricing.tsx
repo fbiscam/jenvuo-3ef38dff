@@ -355,6 +355,7 @@ function PricingPage() {
             </tbody>
           </table>
         </div>
+        </div>
       </section>
 
       {/* TOP-UP PACKS */}
