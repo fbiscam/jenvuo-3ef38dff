@@ -14,7 +14,7 @@ import {
 } from "@/lib/analysis/engine";
 import {
   callChatCompletion, tryParseJsonLoose, AiGatewayError,
-  MODEL_CHAIN, SENIOR_REVIEW_CHAIN, MACRO_CONTEXT_CHAIN, DEEPSEEK_REVIEW_CHAIN,
+  MODEL_CHAIN, EXTENSION_MODEL_CHAIN, SENIOR_REVIEW_CHAIN, MACRO_CONTEXT_CHAIN, DEEPSEEK_REVIEW_CHAIN,
   getCachedPlan, setCachedPlan, checkAnalyzeRateLimit,
 } from "@/lib/ai-gateway";
 import { MIN_CONFIDENCE } from "@/lib/signals/qualification";
@@ -2340,7 +2340,7 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
     // exceed the request timeout with no result at all.
     try {
       const narration = await callChatCompletion({
-        models: [...MODEL_CHAIN.narration],
+        models: [...(billing?.extensionBilling ? EXTENSION_MODEL_CHAIN.reasoning : MODEL_CHAIN.narration)],
         messages: [
           { role: "system", content: system },
           { role: "user", content: user },
@@ -2859,7 +2859,7 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
     let __crossCheckModel: string | null = null;
     let __dsAgrees: boolean | null = null;
     let __consensus: "full" | "split" | null = null;
-    if (built.direction !== "WAIT" && setupScore >= SENIOR_REVIEW_MIN_RULE_SCORE && __aiLeft() > 16000) {
+    if (!billing?.extensionBilling && built.direction !== "WAIT" && setupScore >= SENIOR_REVIEW_MIN_RULE_SCORE && __aiLeft() > 16000) {
       try {
         const xSystem = `You are an independent ICT/SMC audit desk (second opinion, different house than the primary analyst). Audit the setup ONLY against core Smart Money rules: liquidity sweep before entry, displacement creating the FVG/OB, premium/discount side correctness, HTF↔LTF alignment, zone freshness, killzone timing, and R:R sanity.
 Reply ONLY as JSON: {"agrees":true|false,"smc_score":<0-100>,"note":"<one short sentence, most important rule that passes or fails>"}`;
@@ -3012,7 +3012,7 @@ Run the full 25-year desk-head review internally through the elite lens above, t
         // Senior review — best-available mode.
         // Uses SENIOR_REVIEW_CHAIN (best → most reliable) from ai-gateway.
         // Sequential fallback: strongest live model wins; if all throttled, review skips.
-        const seniorChain = [...SENIOR_REVIEW_CHAIN];
+        const seniorChain = [...(billing?.extensionBilling ? EXTENSION_MODEL_CHAIN.seniorReview : SENIOR_REVIEW_CHAIN)];
 
         let reviewResult: { content: string; model: string; usage: any } | null = null;
         let reviewError: any = null;

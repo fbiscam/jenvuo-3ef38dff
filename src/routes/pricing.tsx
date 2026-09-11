@@ -290,9 +290,10 @@ function PricingPage() {
                 { f: "Active extension API keys", b: "1", c: "3", d: "5" },
                 { f: "GPT-6 Astra primary analysis", b: true, c: true, d: true },
                 { f: "Claude Opus 4.8 senior review", b: false, c: true, d: true },
-                { f: "Approx. monthly analyses", b: "~500 primary", c: "~1,400 reviewed", d: "~3,200 reviewed" },
-                { f: "Primary input tokens", b: "Up to 2M", c: "Up to 8M", d: "Up to 18M" },
-                { f: "Primary output tokens", b: "Up to 400K", c: "Up to 1.6M", d: "Up to 3.6M" },
+                { f: "GPT-6 input capacity", b: "Up to 2M tokens", c: "Up to 8M tokens", d: "Up to 18M tokens" },
+                { f: "GPT-6 output capacity", b: "Up to 400K tokens", c: "Up to 1.6M tokens", d: "Up to 3.6M tokens" },
+                { f: "Claude review input capacity", b: false, c: "Up to 16M tokens", d: "Up to 36M tokens" },
+                { f: "Claude review output capacity", b: false, c: "Up to 3.2M tokens", d: "Up to 7.2M tokens" },
                 { f: "Token price", b: "50% of published rate", c: "50% of published rate", d: "50% of published rate" },
 
                 { f: "Voice queries / day", b: "Unlimited", c: "Unlimited", d: "Unlimited" },
