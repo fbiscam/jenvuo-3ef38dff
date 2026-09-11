@@ -147,9 +147,9 @@ function ExtensionPage() {
   return (
     <div className="w-full px-1 py-2 sm:px-2 sm:py-4">
       {/* Header row */}
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-[26px] font-normal tracking-tight text-zinc-900">API Keys</h1>
-        <div className="flex items-center gap-3">
+      <div className="grid grid-cols-1 items-center gap-2 sm:flex sm:flex-wrap sm:justify-between sm:gap-3">
+        <h1 className="min-w-0 text-[26px] font-normal tracking-tight text-zinc-900">API Keys</h1>
+        <div className="flex min-w-0 items-center gap-3">
           <button
             onClick={() => setShowGuide((v) => !v)}
             className="inline-flex items-center gap-2 rounded-full px-3 py-2 text-[13px] text-zinc-700 hover:bg-zinc-100"
