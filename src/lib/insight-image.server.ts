@@ -14,6 +14,15 @@ const IMAGE_MODELS = [
 
 export const INSIGHT_IMAGE_BUCKET = "insight-images";
 
+export class InsightImageGenerationError extends Error {
+  constructor(
+    message: string,
+    readonly status: number,
+  ) {
+    super(message);
+  }
+}
+
 function coverPrompt(title: string, category: string): string {
   return [
     "Create a premium, editorial cover image for a professional gold-trading research article.",
@@ -94,7 +103,11 @@ async function generateBase64(prompt: string): Promise<{ b64: string; model: str
       });
 
       if (!res.ok) {
-        console.warn("[insight-image] model failed", model, res.status, (await res.text()).slice(0, 200));
+        const detail = (await res.text()).slice(0, 500);
+        console.warn("[insight-image] model failed", model, res.status, detail.slice(0, 200));
+        if (res.status === 402 || res.status === 403) {
+          throw new InsightImageGenerationError(`Cover image provider failed [${res.status}]: ${detail}`, res.status);
+        }
         continue;
       }
 
@@ -109,6 +122,7 @@ async function generateBase64(prompt: string): Promise<{ b64: string; model: str
       }
       console.warn("[insight-image] no image payload from", model);
     } catch (e) {
+      if (e instanceof InsightImageGenerationError) throw e;
       console.warn("[insight-image] threw", model, String(e));
     }
   }

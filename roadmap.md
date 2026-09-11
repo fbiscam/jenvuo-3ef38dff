@@ -2,3 +2,5 @@
 - [x] Add confirmed plan cancellation with credit-loss warning
 - [x] Verify TypeScript and billing interactions
 - [x] Balance footer navigation to four pages per column and remove Killzone Times
+- [ ] Complete and verify daily BluesMinds article publishing with a required cover image
+- [ ] Verify persisted article-job security and the single daily schedule

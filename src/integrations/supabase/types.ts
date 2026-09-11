@@ -1355,6 +1355,75 @@ export type Database = {
           },
         ]
       }
+      insight_generation_jobs: {
+        Row: {
+          consecutive_rate_limits: number
+          created_at: string
+          id: string
+          job_key: string
+          last_completed_at: string | null
+          last_error: string | null
+          last_index_status: Json | null
+          last_insight_id: string | null
+          last_model: string | null
+          last_started_at: string | null
+          last_topic_id: string | null
+          locked_until: string | null
+          pause_reason: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          consecutive_rate_limits?: number
+          created_at?: string
+          id?: string
+          job_key: string
+          last_completed_at?: string | null
+          last_error?: string | null
+          last_index_status?: Json | null
+          last_insight_id?: string | null
+          last_model?: string | null
+          last_started_at?: string | null
+          last_topic_id?: string | null
+          locked_until?: string | null
+          pause_reason?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          consecutive_rate_limits?: number
+          created_at?: string
+          id?: string
+          job_key?: string
+          last_completed_at?: string | null
+          last_error?: string | null
+          last_index_status?: Json | null
+          last_insight_id?: string | null
+          last_model?: string | null
+          last_started_at?: string | null
+          last_topic_id?: string | null
+          locked_until?: string | null
+          pause_reason?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "insight_generation_jobs_last_insight_id_fkey"
+            columns: ["last_insight_id"]
+            isOneToOne: false
+            referencedRelation: "insights"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "insight_generation_jobs_last_topic_id_fkey"
+            columns: ["last_topic_id"]
+            isOneToOne: false
+            referencedRelation: "insight_topics"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       insight_topics: {
         Row: {
           angle: string | null
@@ -3336,6 +3405,32 @@ export type Database = {
       }
     }
     Functions: {
+      acquire_insight_generation_job: {
+        Args: { _job_key: string; _lease_seconds?: number }
+        Returns: {
+          consecutive_rate_limits: number
+          created_at: string
+          id: string
+          job_key: string
+          last_completed_at: string | null
+          last_error: string | null
+          last_index_status: Json | null
+          last_insight_id: string | null
+          last_model: string | null
+          last_started_at: string | null
+          last_topic_id: string | null
+          locked_until: string | null
+          pause_reason: string | null
+          status: string
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "insight_generation_jobs"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       admin_auto_scan_cron_history: {
         Args: never
         Returns: {
