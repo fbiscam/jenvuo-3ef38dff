@@ -155,7 +155,7 @@ export function LeadsLanding() {
         </section>
 
         {/* FEATURES */}
-        <section className="border-y border-zinc-100 bg-white">
+        <section className="border-b border-zinc-100 bg-white">
           <div className="mx-auto max-w-6xl px-5 py-16 sm:px-6 sm:py-20">
             <h2 className="text-[24px] font-semibold tracking-tight text-zinc-900 sm:text-[32px]">
               Everything the desk does
