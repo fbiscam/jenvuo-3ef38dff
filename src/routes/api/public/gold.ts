@@ -149,7 +149,7 @@ async function handle({ request }: { request: Request }) {
       const primary = await callChatCompletion({
         models: [...(image ? EXTENSION_MODEL_CHAIN.vision : EXTENSION_MODEL_CHAIN.reasoning)],
         stage: image ? 'extension-screen-analysis' : 'extension-chat',
-        maxTokens: 900,
+        maxTokens: 320,
         timeoutMs: 45_000,
         deadlineMs: 50_000,
         retriesPerModel: 1,
@@ -166,19 +166,26 @@ async function handle({ request }: { request: Request }) {
 
       let content = primary.content
       let seniorReview: { included: boolean; model: string | null; status: string } = { included: false, model: null, status: 'not_required' }
+      const reviewContext = [
+        `${market.ticker.symbol} ${timeframe} @ ${market.ticker.price.toFixed(2)}`,
+        `Trend ${market.technicals.trend}; structure ${market.technicals.structure.selected}/${market.technicals.structure.h1}/${market.technicals.structure.h4}`,
+        `Range ${market.technicals.low.toFixed(2)}-${market.technicals.high.toFixed(2)}; session ${market.technicals.session}`,
+        `FVG ${JSON.stringify(market.technicals.freshFvgs).slice(0, 220)}`,
+        `OB ${JSON.stringify(market.technicals.freshOrderBlocks).slice(0, 220)}`,
+      ].join('\n')
       const review = await callChatCompletion({
           models: [...EXTENSION_MODEL_CHAIN.seniorReview],
           stage: 'extension-senior-review',
-          maxTokens: 900,
+          maxTokens: 450,
           timeoutMs: 45_000,
           deadlineMs: 50_000,
           retriesPerModel: 1,
           messages: [
             {
               role: 'system',
-               content: 'You are the independent 25+ year senior ICT/SMC desk reviewer. Audit the junior analysis against every verified live-context value. Reject stale or invented levels; require HTF/LTF alignment, a liquidity event, displacement, a fresh POI, stop invalidation and at least 1:2 projected risk/reward for an actionable setup. Return the corrected final answer only, with concise reasoning. If evidence is insufficient or geometry is incoherent, return a clear WAIT verdict and list the missing confirmation. Never rubber-stamp and never promise profit.',
+               content: 'Senior ICT/SMC reviewer. Audit live levels, HTF/LTF alignment, sweep, displacement, fresh POI and minimum 1:2 RR. Return a corrected concise answer. If incomplete, return WAIT. Never promise profit.',
             },
-            { role: 'user', content: `Verified context:\n${context}\n\nTrader request:\n${question}\n\nJunior analysis:\n${primary.content}` },
+            { role: 'user', content: `Live:\n${reviewContext}\nAsk: ${question.slice(0, 300)}\nGPT-5.6 Sol:\n${primary.content.slice(0, 900)}` },
           ],
         })
       content = review.content
