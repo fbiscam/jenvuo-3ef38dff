@@ -116,7 +116,7 @@ function AdminMessagesPage() {
 
   return (
     <div className="mx-auto max-w-7xl space-y-6 px-4 py-6 sm:px-6 sm:py-8">
-      <div className="border-b border-zinc-200 pb-5">
+      <div className="pb-5">
         <h1 className="text-2xl font-semibold tracking-tight text-zinc-900">Contact messages</h1>
         <p className="mt-1 text-sm text-zinc-500">Messages submitted from your website contact form.</p>
       </div>

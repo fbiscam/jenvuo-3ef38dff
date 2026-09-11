@@ -129,7 +129,7 @@ function AdminDocumentsPage() {
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-6 font-['Google_Sans',_'Inter',_system-ui,_sans-serif] sm:px-6 sm:py-8">
-      <div className="mb-6 flex flex-wrap items-start justify-between gap-4 border-b border-zinc-200 pb-5">
+      <div className="mb-6 flex flex-wrap items-start justify-between gap-4 pb-5">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight text-zinc-900">Documents</h1>
           <p className="text-sm text-zinc-600 mt-1">Review ID and driving license uploads and approve or reject users.</p>
