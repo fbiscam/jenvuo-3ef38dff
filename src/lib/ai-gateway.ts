@@ -262,6 +262,7 @@ async function singleAttempt(
     else if (res.status === 503 || res.status === 502 || res.status === 504) msg = "Server busy — please try again in a moment.";
     else if (res.status >= 500) msg = "Server busy — please try again in a moment.";
     else if (res.status === 402 && isTukenku) msg = "Tukenku balance is too low. Please top up Tukenku to use this model.";
+    else if (res.status === 402 && isUnikey) msg = "Unikey balance is too low. Please top up Unikey to use this model.";
     else if (res.status === 402) msg = "AI credits exhausted. Please top up your workspace.";
     else if (res.status === 401) msg = "AI key rejected. Please contact support.";
     else if (res.status === 400) msg = "Server busy — please try again in a moment.";
