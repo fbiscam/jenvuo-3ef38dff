@@ -1251,6 +1251,18 @@ function UsageStatCard({ title, value, delta, series, tall = false, chartHeight,
 function DashboardHero({ keysCount, stats }: { keysCount: number | null; stats: UsageStats | null }) {
   const [q, setQ] = useState("");
   const recentSpend = (stats?.ledger ?? []).filter((entry) => entry.delta < 0).slice(0, 3);
+  const recentKeys = (stats?.recentExtensionKeys ?? []).slice(0, 3);
+  const keyTokens = useMemo(() => {
+    const map = new Map<string, number>();
+    for (const row of stats?.ledger ?? []) {
+      const meta = (row.metadata ?? null) as { api_key_id?: string } | null;
+      const id = meta && typeof meta === "object" ? meta.api_key_id : undefined;
+      if (!id) continue;
+      const tokens = (row.prompt_tokens ?? 0) + (row.completion_tokens ?? 0);
+      map.set(id, (map.get(id) ?? 0) + tokens);
+    }
+    return map;
+  }, [stats]);
   const reviewModels = [
     { key: "openai", label: "ChatGPT", Icon: RiOpenaiFill, className: "text-brand-openai" },
     { key: "gemini", label: "Gemini", Icon: RiGeminiFill, className: "text-brand-gemini" },
@@ -1342,10 +1354,29 @@ function DashboardHero({ keysCount, stats }: { keysCount: number | null; stats: 
               <span className="inline-flex items-center gap-1">Extension <ChevronRight className="h-3 w-3" /></span>
               <MoreHorizontal className="h-4 w-4 text-zinc-300" />
             </div>
-            <Link to="/dashboard/extension" className="mt-3 flex items-center justify-center gap-2 rounded-lg bg-zinc-100 px-4 py-4 text-sm text-zinc-700 transition hover:bg-zinc-200">
-              <Rocket className="h-4 w-4 text-zinc-500" />
-              {keysCount ? `${keysCount} active key${keysCount > 1 ? "s" : ""}` : "Create your first key"}
+            <Link to="/dashboard/extension" className="mt-1 flex items-center justify-between border-b border-zinc-200 py-3 text-sm text-zinc-900 hover:text-zinc-600">
+              <span className="inline-flex min-w-0 items-center gap-2">
+                <Rocket className="h-4 w-4 shrink-0 text-zinc-500" />
+                <span className="truncate font-medium">Jenvu Extension v1.8.1</span>
+              </span>
+              <ChevronRight className="h-4 w-4 shrink-0 text-zinc-400" />
             </Link>
+            <div className="divide-y divide-zinc-200">
+              {recentKeys.length === 0 ? (
+                <Link to="/dashboard/extension" className="flex py-3 text-sm text-zinc-400 hover:text-zinc-600">
+                  {keysCount ? `${keysCount} active key${keysCount > 1 ? "s" : ""}` : "Create your first key"}
+                </Link>
+              ) : recentKeys.map((key) => (
+                <Link key={key.id} to="/dashboard/extension" className="flex min-h-12 items-center justify-between gap-3 py-3 text-sm text-zinc-500 hover:text-zinc-900">
+                  <span className="min-w-0 truncate font-mono text-[12px] text-zinc-700">{key.keyPrefix}…</span>
+                  <span className="shrink-0 tabular-nums text-[12px] text-zinc-500">
+                    {keyTokens.get(key.id)
+                      ? `${((keyTokens.get(key.id) ?? 0) / 1000).toFixed(1)}k tokens`
+                      : "0 tokens"}
+                  </span>
+                </Link>
+              ))}
+            </div>
           </div>
 
           <div>
