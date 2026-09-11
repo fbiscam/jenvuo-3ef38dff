@@ -63,7 +63,7 @@ const TIERS = [
       "Full ICT / SMC narration",
       "Trade journal & analytics",
       "Multi-timeframe bias engine",
-      "1 extension API key · $10 AI wallet",
+      "2 extension API keys · $10 AI wallet",
       "GPT-6 Astra primary analysis",
     ],
 
@@ -107,7 +107,7 @@ const MATRIX: Array<{ feature: string; free: Mark; pro: Mark; elite: Mark }> = [
   { feature: "Multi-timeframe bias", free: true, pro: true, elite: true },
   { feature: "Trade journal", free: true, pro: true, elite: true },
   { feature: "Multi-pair scanner", free: false, pro: false, elite: true },
-  { feature: "Extension API keys", free: false, pro: "1", elite: "3" },
+  { feature: "Extension API keys", free: false, pro: "2", elite: "3" },
   { feature: "Custom alert rules", free: false, pro: false, elite: true },
   { feature: "Dedicated onboarding", free: false, pro: false, elite: true },
 ];
@@ -228,7 +228,7 @@ function PricingPage() {
             <tbody>
               {([
                 { f: "Monthly AI wallet", b: "$10", c: "$40", d: "$90" },
-                { f: "Active extension API keys", b: "1", c: "3", d: "5" },
+                { f: "Active extension API keys", b: "2", c: "3", d: "5" },
                 { f: "GPT-6 Astra primary analysis", b: true, c: true, d: true },
                 { f: "Claude Opus 4.8 senior review", b: false, c: true, d: true },
                 { f: "GPT-6 input capacity", b: "Up to 2M tokens", c: "Up to 8M tokens", d: "Up to 18M tokens" },
