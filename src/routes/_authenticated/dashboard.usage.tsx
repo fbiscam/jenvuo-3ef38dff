@@ -438,6 +438,24 @@ function UsagePage() {
             )}
           </section>
 
+          {/* Total tokens */}
+          <section className="border-b border-zinc-200 px-1 pb-5">
+            <div className="text-[13px] text-zinc-500">Total tokens</div>
+            <div className="mt-0.5 text-xl font-semibold tabular-nums text-zinc-900">{fmtInt(derived.totalTokens)}</div>
+            <div className="mt-4">
+              <MiniLine data={derived.tokenSeries} color="#e11d63" filled={derived.totalTokens > 0} />
+            </div>
+          </section>
+
+          {/* Total requests */}
+          <section className="border-b border-zinc-200 px-1 pb-5">
+            <div className="text-[13px] text-zinc-500">Total requests</div>
+            <div className="mt-0.5 text-xl font-semibold tabular-nums text-zinc-900">{fmtInt(derived.spendRows.length)}</div>
+            <div className="mt-4">
+              <MiniLine data={derived.requestSeries} color="#a1a1aa" filled={derived.spendRows.length > 0} dashed />
+            </div>
+          </section>
+
           {/* Recent extension keys */}
           <section className="border-b border-zinc-200 px-1 pb-5">
             <div className="flex items-center justify-between gap-3">
@@ -473,24 +491,6 @@ function UsagePage() {
                 })}
               </div>
             )}
-          </section>
-
-          {/* Total tokens */}
-          <section className="border-b border-zinc-200 px-1 pb-5">
-            <div className="text-[13px] text-zinc-500">Total tokens</div>
-            <div className="mt-0.5 text-xl font-semibold tabular-nums text-zinc-900">{fmtInt(derived.totalTokens)}</div>
-            <div className="mt-4">
-              <MiniLine data={derived.tokenSeries} color="#e11d63" filled={derived.totalTokens > 0} />
-            </div>
-          </section>
-
-          {/* Total requests */}
-          <section className="border-b border-zinc-200 px-1 pb-5">
-            <div className="text-[13px] text-zinc-500">Total requests</div>
-            <div className="mt-0.5 text-xl font-semibold tabular-nums text-zinc-900">{fmtInt(derived.spendRows.length)}</div>
-            <div className="mt-4">
-              <MiniLine data={derived.requestSeries} color="#a1a1aa" filled={derived.spendRows.length > 0} dashed />
-            </div>
           </section>
 
         </div>
