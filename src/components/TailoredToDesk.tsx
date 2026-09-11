@@ -80,7 +80,7 @@ export function TailoredToDesk() {
             <Globe2 className="h-6 w-6" strokeWidth={1.8} aria-hidden="true" />
             <h3 className="mt-3 text-base font-semibold">One network for charts and risk</h3>
             <p className="mt-3 max-w-sm text-sm leading-snug opacity-95">
-              Whether you&rsquo;re scalping the London killzone, tracking red-folder news, or reviewing a week of trades, it all runs on the same global engine.
+               Whether you&rsquo;re scalping the London killzone, tracking red-folder news, or reviewing a week of trades, it all runs on the global engine.
             </p>
             <div className="tailored-orange-pulse mt-auto" aria-hidden="true" />
           </article>
