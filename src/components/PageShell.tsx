@@ -52,7 +52,7 @@ export function PageShell({
 
         {/* BODY */}
         <main className="public-page-rail mx-auto max-w-[900px] px-5 py-14 sm:px-8 sm:py-20">
-          <div className="divide-y divide-border border-y border-border bg-background leading-relaxed [&>section]:py-8 first:[&>section]:pt-0 last:[&>section]:pb-0 sm:[&>section]:py-10">
+          <div className="space-y-8 bg-background leading-relaxed sm:space-y-10">
             {children}
           </div>
           <p className={`mt-8 text-center ${MONO} text-[10px] uppercase tracking-[0.22em] text-zinc-500`}>
