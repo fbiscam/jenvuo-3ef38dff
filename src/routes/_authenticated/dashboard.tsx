@@ -1051,7 +1051,7 @@ function DashboardLayout() {
 
 
         {/* Extension usage analytics — Cloudflare-style */}
-        <DashboardHero keysCount={extKeyCount} balance={usageStats ? usageStats.balance : null} />
+        <DashboardHero keysCount={extKeyCount} stats={usageStats} />
 
         {/* Extension usage analytics — Cloudflare-style */}
         <UsageAnalytics
@@ -1248,8 +1248,9 @@ function UsageStatCard({ title, value, delta, series, tall = false, chartHeight,
 }
 
 
-function DashboardHero({ keysCount, balance }: { keysCount: number | null; balance: number | null }) {
+function DashboardHero({ keysCount, stats }: { keysCount: number | null; stats: UsageStats | null }) {
   const [q, setQ] = useState("");
+  const recentSpend = (stats?.ledger ?? []).filter((entry) => entry.delta < 0).slice(0, 3);
   const links: { to: string; label: string }[] = [
     { to: "/dashboard/usage", label: "Wallet usage" },
     { to: "/dashboard/extension", label: "Extension keys" },
@@ -1297,16 +1298,26 @@ function DashboardHero({ keysCount, balance }: { keysCount: number | null; balan
         <div className="mt-6 grid w-full grid-cols-1 gap-x-8 gap-y-6 md:grid-cols-3">
           <div>
             <div className="flex items-center justify-between text-sm text-zinc-500">
-              <span className="inline-flex items-center gap-1">Wallet <ChevronRight className="h-3 w-3" /></span>
+              <span className="inline-flex items-center gap-1">Spend <ChevronRight className="h-3 w-3" /></span>
               <MoreHorizontal className="h-4 w-4 text-zinc-300" />
             </div>
-            <Link to="/dashboard/usage" className="mt-3 flex items-center justify-between rounded-md py-2 text-sm text-zinc-900 hover:bg-white">
+            <Link to="/dashboard/usage" className="mt-1 flex items-center justify-between border-b border-zinc-200 py-3 text-sm text-zinc-900 hover:text-zinc-600">
               <span className="inline-flex items-center gap-2">
-                <Globe className="h-4 w-4 text-zinc-400" />
-                {balance == null ? "Balance" : `$${balance.toFixed(2)} available`}
+                <BadgeDollarSign className="h-4 w-4 text-zinc-500" />
+                <span className="font-medium">Total spend</span>
               </span>
-              <ChevronRight className="h-4 w-4 text-zinc-400" />
+              <span className="font-semibold tabular-nums">{stats ? `$${stats.spentThisPeriod.toFixed(2)}` : "…"}</span>
             </Link>
+            <div className="divide-y divide-zinc-200">
+              {recentSpend.length === 0 ? (
+                <p className="py-3 text-sm text-zinc-400">No recent payments</p>
+              ) : recentSpend.map((entry) => (
+                <Link key={entry.id} to="/dashboard/usage" className="flex items-center justify-between gap-3 py-2.5 text-xs text-zinc-500 hover:text-zinc-900">
+                  <span className="min-w-0 truncate">{entry.reason.replace(/_/g, " ")}</span>
+                  <span className="shrink-0 font-medium tabular-nums text-zinc-900">-${Math.abs(entry.delta).toFixed(2)}</span>
+                </Link>
+              ))}
+            </div>
           </div>
 
           <div>
