@@ -500,20 +500,23 @@ export const EXTENSION_MODEL_CHAIN = {
   reasoning: [
     "bmind/nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
     "bmind/meta/llama-3.2-11b-vision-instruct",
+    "bmind/gpt-oss-20b",
   ],
   vision: [
     "bmind/meta/llama-3.2-11b-vision-instruct",
+    "bmind/nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
   ],
   seniorReview: [
     "bmind/nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
     "bmind/meta/llama-3.2-11b-vision-instruct",
+    "bmind/gpt-5.5",
   ],
   // Independent second reviewer — must not reuse the senior primary model.
   secondReview: [
-    "bmind/nvidia/llama-3.3-nemotron-super-49b-v1.5",
+    "bmind/gpt-5.5",
     "bmind/kimi-k2.5",
-    "bmind/nvidia/nvidia-nemotron-nano-9b-v2",
-    "bmind/meta/llama-3.3-70b-instruct",
+    "bmind/openai/gpt-oss-20b",
+    "bmind/gemma-4-26b",
   ],
 } as const;
 
