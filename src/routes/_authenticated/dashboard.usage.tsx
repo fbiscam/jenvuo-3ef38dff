@@ -210,7 +210,7 @@ function UsagePage() {
     <div className="space-y-4">
       {/* ── Header bar ── */}
       <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 border-b border-zinc-200 pb-3 sm:flex sm:flex-wrap sm:justify-between">
-        <h1 className="min-w-0 truncate text-xl font-semibold text-zinc-900">   	Usage</h1>
+        <h1 className="min-w-0 truncate text-xl font-semibold text-zinc-900">   Usage</h1>
         <div className="col-span-2 grid min-w-0 grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto_auto] items-center gap-1.5 sm:col-span-1 sm:flex sm:gap-2">
           <Dropdown
             open={openMenu === "model"}
