@@ -1304,7 +1304,7 @@ function DashboardHero({ keysCount, stats }: { keysCount: number | null; stats: 
             <Link to="/dashboard/usage" className="mt-1 flex items-center justify-between border-b border-zinc-200 py-3 text-sm text-zinc-900 hover:text-zinc-600">
               <span className="inline-flex items-center gap-2">
                 <BadgeDollarSign className="h-4 w-4 text-zinc-500" />
-                <span className="font-medium">Total spend</span>
+                <span className="font-medium">$60. 60 Total Available</span>
               </span>
               <span className="font-semibold tabular-nums">{stats ? `$${stats.spentThisPeriod.toFixed(2)}` : "…"}</span>
             </Link>
