@@ -23,7 +23,7 @@ export function PageShell({
     <>
       <div className={`public-cloudflare jenvu-zoom min-h-dvh w-full bg-background text-foreground ${SANS} antialiased selection:bg-home-accent selection:text-home-accent-foreground`}>
         {/* NAV — matches homepage */}
-        <header className="hide-in-pwa sticky top-0 z-50 border-b border-zinc-100 bg-white">
+        <header className="hide-in-pwa sticky top-0 z-50 bg-white">
           <div className="relative mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-3 px-5 py-3 sm:px-6 sm:py-4 md:flex md:justify-between">
             <Link to="/" className="flex min-w-0 items-center gap-2.5">
               <img src="/favicon.png" alt="Jenvu Logo" className="h-7 w-7 shrink-0 rounded-md object-contain" />
@@ -36,7 +36,7 @@ export function PageShell({
         </header>
 
         {/* HERO */}
-        <section className="public-page-hero border-b border-border">
+        <section className="public-page-hero">
           <div className="relative z-10 mx-auto max-w-4xl px-5 py-16 text-center sm:px-6 sm:py-24">
             <span className="inline-flex rounded-full border border-home-accent/30 bg-home-accent-soft px-3 py-1 text-[11px] font-medium text-home-accent">{eyebrow}</span>
             <h1 className="mx-auto mt-5 max-w-3xl whitespace-pre-line text-3xl font-semibold text-foreground sm:text-4xl md:text-5xl">

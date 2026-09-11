@@ -116,7 +116,7 @@ function ContactPage() {
     <>
       <div className={`public-cloudflare jenvu-zoom min-h-dvh w-full bg-background text-foreground ${SANS} antialiased selection:bg-home-accent selection:text-home-accent-foreground`}>
         {/* NAV */}
-        <header className="sticky top-0 z-50 border-b border-zinc-100 bg-white">
+        <header className="sticky top-0 z-50 bg-white">
           <div className="relative mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-3 px-5 py-3 sm:px-6 sm:py-4 md:flex md:justify-between">
             <Link to="/" className="flex min-w-0 items-center gap-2.5">
               <img src="/favicon.png" alt="Jenvu" className="h-7 w-7 shrink-0 rounded-md object-contain" />
@@ -128,7 +128,7 @@ function ContactPage() {
         </header>
 
         {/* HERO */}
-        <section className="public-page-hero border-b border-border">
+        <section className="public-page-hero">
           <div className="mx-auto max-w-6xl px-5 sm:px-6 py-12 sm:py-16">
             <h1 className="mt-4 max-w-3xl text-3xl font-semibold tracking-tight sm:text-4xl md:text-5xl">
               Talk to the desk.
