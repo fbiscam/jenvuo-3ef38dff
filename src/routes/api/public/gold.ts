@@ -195,7 +195,7 @@ async function handle({ request }: { request: Request }) {
       })
       if (!billing.ok) return extJson({ ok: false, error: billing.error, code: billing.error?.includes('balance') ? 'LOW_BALANCE' : 'BILLING_FAILED' }, billing.error?.includes('balance') ? 402 : 502)
 
-      return extJson({ ok: true, text: content, ticker: market.ticker, technicals: market.technicals, freshness: market.freshness, overlayMarks: market.marks, marksBias: market.technicals.trend.toLowerCase(), seniorReview, usage: { requestId, charged: billing.charged, balance: billing.balance } })
+      return extJson({ ok: true, text: content, ticker: market.ticker, chart: market.chart, technicals: market.technicals, freshness: market.freshness, overlayMarks: market.marks, marksBias: market.technicals.trend.toLowerCase(), seniorReview, usage: { requestId, charged: billing.charged, balance: billing.balance } })
     }
 
     return extJson({

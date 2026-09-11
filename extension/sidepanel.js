@@ -915,6 +915,28 @@ async function markOnPage(text, signal) {
   return { count: marks.length, names: [...topics].filter((topic) => topic !== "all") };
 }
 
+async function applyLiveMarksToPage(d) {
+  const marks = Array.isArray(d?.overlayMarks) ? d.overlayMarks : [];
+  const pts = (d?.chart || []).map((c) => Number(c?.close ?? c?.c)).filter(Number.isFinite);
+  const levels = marks.flatMap((m) => m.kind === "zone" ? [Number(m.from), Number(m.to)] : [Number(m.level)]).filter(Number.isFinite);
+  if (!marks.length || !pts.length || !levels.length || typeof chrome === "undefined") return;
+  const all = pts.concat(levels);
+  const lo = Math.min(...all);
+  const hi = Math.max(...all);
+  const pad = (hi - lo) * 0.08 || 1;
+  const [tab] = await chrome.tabs.query({ active: true, lastFocusedWindow: true });
+  if (!tab?.id || !/tradingview\.com/i.test(tab.url || "")) return;
+  await chrome.scripting.executeScript({ target: { tabId: tab.id }, files: ["content.js"] });
+  await chrome.tabs.sendMessage(tab.id, {
+    type: "JENVU_MARK",
+    marks,
+    lo: lo - pad,
+    hi: hi + pad,
+    bias: d.marksBias || null,
+    showSession: true,
+  });
+}
+
 async function send(preset, silentUser) {
   if (busy) return;
   const text = (preset ?? box.value).trim();
@@ -988,11 +1010,8 @@ async function send(preset, silentUser) {
     } else {
       setReviewStatus("Senior review required", "failed");
     }
-    if (Array.isArray(d.overlayMarks) && d.overlayMarks.length) {
-      lastMarks = d.overlayMarks;
-      lastBias = d.marksBias || null;
-      drawChart([], lastMarks, lastBias);
-    }
+    if (Array.isArray(d.chart) && d.chart.length) renderSnapshot({ ...d, marks: d.overlayMarks });
+    applyLiveMarksToPage(d).catch(() => {});
   } catch (e) {
     pend.remove();
     if (e && e.name === "AbortError") addMsg("ai err", "Request stop kar di gayi.");
