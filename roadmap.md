@@ -8,3 +8,4 @@
 - [x] Redesign the Pricing feature section with a left-side feature video
 - [x] Remove the Live Signals and Briefs pages, links, feeds, and cached records
 - [x] Show the four most recent extension API keys with per-key spend on Usage
+- [x] Add payment totals, deducted usage, and the four latest payments

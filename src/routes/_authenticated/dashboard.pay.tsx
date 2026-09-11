@@ -212,6 +212,19 @@ function PayPage() {
   const net = networkMeta(order?.network ?? network);
   const mm = String(Math.floor(secondsLeft / 60)).padStart(2, "0");
   const ss = String(secondsLeft % 60).padStart(2, "0");
+  const approvedTotal = useMemo(
+    () => orders
+      .filter((item) => item.status === "approved")
+      .reduce((sum, item) => sum + Number(item.credit_usd || 0), 0),
+    [orders],
+  );
+  const deductedTotal = useMemo(
+    () => (credits.state?.recent ?? [])
+      .filter((item) => Number(item.delta) < 0)
+      .reduce((sum, item) => sum + Math.abs(Number(item.delta)), 0),
+    [credits.state?.recent],
+  );
+  const recentOrders = useMemo(() => orders.slice(0, 4), [orders]);
 
   return (
     <div className="mx-auto w-full max-w-4xl space-y-6 px-1 pb-16" style={SANS}>
@@ -507,8 +520,24 @@ function PayPage() {
       )}
 
       <section className="rounded-xl border border-zinc-200 bg-white p-6">
-        <h2 className="text-[15px] font-semibold text-zinc-900">&nbsp; Payment history</h2>
-        {orders.length === 0 ? (
+        <div className="grid grid-cols-1 gap-4 border-b border-zinc-100 pb-5 sm:grid-cols-2">
+          <div>
+            <p className="text-[12px] text-zinc-500">Total amount</p>
+            <p className="mt-1 text-2xl font-semibold tabular-nums text-zinc-900">${approvedTotal.toFixed(2)}</p>
+            <p className="mt-1 text-[11px] text-zinc-400">Approved payments</p>
+          </div>
+          <div>
+            <p className="text-[12px] text-zinc-500">Deducted amount</p>
+            <p className="mt-1 text-2xl font-semibold tabular-nums text-zinc-900">${deductedTotal.toFixed(2)}</p>
+            <p className="mt-1 text-[11px] text-zinc-400">Recorded usage</p>
+          </div>
+        </div>
+
+        <div className="mt-5 flex items-center justify-between gap-3">
+          <h2 className="text-[15px] font-semibold text-zinc-900">Recent payments</h2>
+          <span className="text-[11px] text-zinc-400">Latest 4</span>
+        </div>
+        {recentOrders.length === 0 ? (
           <p className="mt-2 text-[13px] text-zinc-500">No payments yet.</p>
         ) : (
           <div className="mt-3 overflow-x-auto">
@@ -523,7 +552,7 @@ function PayPage() {
                 </tr>
               </thead>
               <tbody className="text-zinc-700">
-                {orders.map((o) => (
+                {recentOrders.map((o) => (
                   <tr key={o.id} className="border-t border-zinc-100">
                     <td className="py-2 pr-3">{new Date(o.created_at).toLocaleDateString()}</td>
                     <td className="py-2 pr-3">${Number(o.pay_amount_usd).toFixed(2)}</td>
