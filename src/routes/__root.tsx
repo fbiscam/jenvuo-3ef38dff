@@ -17,6 +17,8 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { installIntlGuard } from "../lib/intl-guard";
 
+const googleAnalyticsId = import.meta.env.VITE_LOVABLE_CONNECTOR_GOOGLE_ANALYTICS_API_KEY;
+
 // Machines with a malformed system locale (e.g. `en-US@posix`) make every
 // default-locale date/number format throw and crash the page. Neutralise it
 // before any component renders.
@@ -153,13 +155,17 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
     ],
     scripts: [
-      {
-        src: "https://www.googletagmanager.com/gtag/js?id=G-GCBC1RBN4Y",
-        async: true,
-      },
-      {
-        children: `window.dataLayer = window.dataLayer || [];function gtag(){dataLayer.push(arguments);}gtag('js', new Date());gtag('config', 'G-GCBC1RBN4Y');`,
-      },
+      ...(googleAnalyticsId
+        ? [
+            {
+              src: `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(googleAnalyticsId)}`,
+              async: true,
+            },
+            {
+              children: `window.dataLayer = window.dataLayer || [];function gtag(){dataLayer.push(arguments);}gtag('js', new Date());gtag('config', ${JSON.stringify(googleAnalyticsId)});`,
+            },
+          ]
+        : []),
       {
         type: "application/ld+json",
         children: JSON.stringify({
