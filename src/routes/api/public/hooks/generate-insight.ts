@@ -2,6 +2,53 @@ import { createFileRoute } from "@tanstack/react-router";
 
 const BASE_URL = "https://jenvu.com";
 const INDEXNOW_KEY = "31f95befb924351f7ab6c1f5ce4bc15b";
+const JOB_KEY = "daily-insight";
+const BLUESMINDS_MODEL = "meta/llama-3.2-11b-vision-instruct";
+
+class BluesMindsError extends Error {
+  constructor(
+    message: string,
+    readonly status: number,
+  ) {
+    super(message);
+  }
+}
+
+function wait(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function callBluesMinds(
+  messages: Array<{ role: "system" | "user"; content: string }>,
+  maxTokens: number,
+) {
+  const key = process.env.BLUESMIND_API_KEY || process.env.BLUESMINDS_API_KEY;
+  if (!key) throw new BluesMindsError("BLUESMIND_API_KEY missing", 401);
+  const base = (process.env.BLUESMIND_BASE_URL || "https://api.bluesminds.com/v1").replace(/\/+$/, "");
+
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    const response = await fetch(`${base}/chat/completions`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ model: BLUESMINDS_MODEL, messages, max_tokens: maxTokens }),
+    });
+    if (response.ok) {
+      const payload = (await response.json()) as { choices?: Array<{ message?: { content?: string } }> };
+      const content = payload.choices?.[0]?.message?.content;
+      if (!content) throw new BluesMindsError("BluesMinds returned an empty response", 502);
+      return content;
+    }
+
+    const detail = (await response.text()).slice(0, 500);
+    const retryable = response.status === 429 || response.status >= 500;
+    if (!retryable || attempt === 1) {
+      throw new BluesMindsError(`BluesMinds failed [${response.status}]: ${detail}`, response.status);
+    }
+    const retryAfter = Number(response.headers.get("retry-after"));
+    await wait(Number.isFinite(retryAfter) && retryAfter > 0 ? retryAfter * 1000 : 1500 * (attempt + 1));
+  }
+  throw new BluesMindsError("BluesMinds request failed", 502);
+}
 
 function slugify(s: string) {
   return s
@@ -69,6 +116,39 @@ export const Route = createFileRoute("/api/public/hooks/generate-insight")({
 
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
+        const { data: currentJob } = await supabaseAdmin
+          .from("insight_generation_jobs")
+          .select("status, pause_reason")
+          .eq("job_key", JOB_KEY)
+          .maybeSingle();
+
+        if (currentJob?.status === "paused") {
+          try {
+            await callBluesMinds([{ role: "user", content: "Reply exactly READY" }], 16);
+            await supabaseAdmin
+              .from("insight_generation_jobs")
+              .update({ status: "idle", pause_reason: null, last_error: null, updated_at: new Date().toISOString() })
+              .eq("job_key", JOB_KEY);
+            return Response.json({ recovered: true, note: "Generation will resume on the next daily run." });
+          } catch (error) {
+            return Response.json({ paused: true, reason: currentJob.pause_reason, probe: String(error) });
+          }
+        }
+
+        const { data: lockedJob, error: lockError } = await supabaseAdmin.rpc("acquire_insight_generation_job", {
+          _job_key: JOB_KEY,
+          _lease_seconds: 1800,
+        });
+        if (lockError) return Response.json({ error: lockError.message }, { status: 500 });
+        if (!lockedJob) return Response.json({ skipped: "already-running" });
+
+        const updateJob = async (values: Record<string, unknown>) => {
+          await supabaseAdmin
+            .from("insight_generation_jobs")
+            .update({ ...values, locked_until: null, updated_at: new Date().toISOString() })
+            .eq("job_key", JOB_KEY);
+        };
+
         // Daily cap: 1 article per 24h (bypass with ?force=1 for manual publishing)
         const force = new URL(request.url).searchParams.get("force") === "1";
         const since = new Date(Date.now() - 24 * 3600 * 1000).toISOString();
@@ -77,6 +157,7 @@ export const Route = createFileRoute("/api/public/hooks/generate-insight")({
           .select("id", { count: "exact", head: true })
           .gte("created_at", since);
         if (!force && (recentCount ?? 0) >= 1) {
+          await updateJob({ status: "completed", last_completed_at: new Date().toISOString() });
           return Response.json({ skipped: "daily-cap-reached", recentCount });
         }
 
@@ -93,6 +174,7 @@ export const Route = createFileRoute("/api/public/hooks/generate-insight")({
 
         if (topicErr) return new Response(JSON.stringify({ error: topicErr.message }), { status: 500 });
         if (!topics || topics.length === 0) {
+          await updateJob({ status: "completed", last_completed_at: new Date().toISOString() });
           return Response.json({ skipped: "no-topic-available" });
         }
         const topic = topics[0];
@@ -120,46 +202,43 @@ Category: ${topic.category}
 Language: ${langName}
 Primary keyword must appear in the title, the first 100 words, and at least one H2.
 
-Return STRICT JSON only, no prose, with this exact shape:
-{
-  "title": "<60-char SEO title with the primary keyword, optimized for Google Europe SERPs>",
-  "slug": "<url-safe-slug, always lowercase ascii>",
-  "excerpt": "<150-160 char meta description with primary keyword and a European trading hook>",
-  "content": "<full markdown article 900-1300 words with ## H2 sections, lists, and a final ## FAQ section. Use internal links to /signal, /app, /insights, /download where natural>"
-}`;
+Return Markdown only. Start with one '# ' title of no more than 60 characters, then the complete 900-1300 word article. Use ## H2 sections, lists, a final ## FAQ section, and natural internal links to /signal, /app, /insights, or /download. Do not wrap the Markdown in a code fence.`;
 
-
-        // Try Bluesminds first (when configured), then fall back to Lovable AI
-        // models so a provider outage never leaves the Insights section stale.
-        const { callChatCompletion } = await import("@/lib/ai-gateway");
-        const chain = [
-          "bmind/gpt-4o",
-          "bmind/gpt-5.5",
-          "bmind/gpt-oss-20b",
-          "google/gemini-3.8-flash",
-          "openai/gpt-5.4-mini",
-          "google/gemini-3.1-flash-lite",
-        ];
 
         let raw = "";
         let lastErr = "";
         try {
-          const out = await callChatCompletion({
-            models: chain,
-            messages: [
-              { role: "system", content: sys },
-              { role: "user", content: userPrompt },
-            ],
-            jsonMode: true,
-            timeoutMs: 90_000,
-            deadlineMs: 240_000,
-            retriesPerModel: 2,
-            stage: "generate-insight",
-          });
-          raw = out.content ?? "";
+          const sectionPrompts = [
+            `${userPrompt}\n\nWrite part 1 of 3 only: the title, introduction, and first two substantive H2 sections. Aim for 350-450 words.`,
+            `Continue the same article on "${topic.keyword}" in ${langName}. Write part 2 of 3 only: three new substantive H2 sections covering practical method, European sessions, and risk. Do not repeat the title or introduction. Aim for 350-450 words.`,
+            `Finish the same article on "${topic.keyword}" in ${langName}. Write part 3 of 3 only: key takeaways, a concise conclusion, and a final ## FAQ with exactly 3 useful Q&A pairs. Do not repeat earlier sections. Aim for 300-400 words.`,
+          ];
+          const parts: string[] = [];
+          for (const prompt of sectionPrompts) {
+            parts.push(
+              await callBluesMinds(
+                [
+                  { role: "system", content: sys },
+                  { role: "user", content: prompt },
+                ],
+                1800,
+              ),
+            );
+          }
+          raw = parts.join("\n\n");
         } catch (e) {
           lastErr = String((e as Error)?.message ?? e);
           console.error("[generate-insight] all providers failed", lastErr);
+          const status = e instanceof BluesMindsError ? e.status : 0;
+          const shouldPause = status === 401 || status === 402 || status === 403;
+          await updateJob({
+            status: shouldPause ? "paused" : "failed",
+            pause_reason: shouldPause ? `provider-${status}` : null,
+            last_error: lastErr,
+            last_model: BLUESMINDS_MODEL,
+            last_topic_id: topic.id,
+            consecutive_rate_limits: status === 429 ? 1 : 0,
+          });
         }
 
         if (!raw.trim()) {
@@ -167,30 +246,26 @@ Return STRICT JSON only, no prose, with this exact shape:
           return Response.json({ skipped: "ai-unavailable", detail: lastErr, willRetry: true });
         }
 
-        // Some providers wrap JSON in ```json fences — strip them.
-        raw = raw.trim().replace(/^```(?:json)?\s*/i, "").replace(/```\s*$/i, "").trim();
-        let parsed: { title?: string; slug?: string; excerpt?: string; content?: string };
-        try {
-          parsed = JSON.parse(raw);
-        } catch {
-          // Try to extract the first {...} block
-          const m = raw.match(/\{[\s\S]*\}/);
-          if (!m) {
-            return new Response(JSON.stringify({ error: "ai-bad-json", raw: raw.slice(0, 400) }), { status: 502 });
-          }
-          try { parsed = JSON.parse(m[0]); } catch {
-            return new Response(JSON.stringify({ error: "ai-bad-json", raw: raw.slice(0, 400) }), { status: 502 });
-          }
-        }
-
-
-
-        const title = (parsed.title || topic.keyword).slice(0, 120);
-        const slug = slugify(parsed.slug || title);
-        const excerpt = (parsed.excerpt || "").slice(0, 250) || `${topic.keyword} — institutional analysis from Jenvu.`;
-        const content = parsed.content || "";
+        const markdown = raw.trim().replace(/^```(?:markdown|md)?\s*/i, "").replace(/```\s*$/i, "").trim();
+        const titleMatch = markdown.match(/^#\s+(.+)$/m);
+        const title = (titleMatch?.[1]?.trim() || topic.keyword).slice(0, 120);
+        const slug = slugify(title);
+        const content = markdown.replace(/^#\s+.+\n?/, "").trim();
+        const firstParagraph = content
+          .split(/\n\s*\n/)
+          .find((part) => part.trim() && !part.trim().startsWith("#") && !part.trim().startsWith("-") && !part.trim().startsWith("|"));
+        const cleanParagraph = (firstParagraph || "").replace(/\[([^\]]+)\]\([^)]+\)/g, "$1").replace(/[*_`]/g, "").trim();
+        const excerpt = cleanParagraph
+          ? `${cleanParagraph.slice(0, 157).trimEnd()}${cleanParagraph.length > 157 ? "…" : ""}`
+          : `${topic.keyword} — institutional analysis from Jenvu.`;
 
         if (!content || content.length < 800) {
+          await updateJob({
+            status: "failed",
+            last_error: `Article content was too short (${content.length} characters).`,
+            last_model: BLUESMINDS_MODEL,
+            last_topic_id: topic.id,
+          });
           return new Response(JSON.stringify({ error: "content-too-short", len: content.length }), { status: 502 });
         }
 
@@ -208,10 +283,34 @@ Return STRICT JSON only, no prose, with this exact shape:
 
         // AI-generated cover image (Bluesminds writes the text; the image comes
         // from Lovable AI's image model since Bluesminds has no image model).
-        const { generateInsightCover } = await import("@/lib/insight-image.server");
-        const image_url =
-          (await generateInsightCover({ title, category: topic.category, slug })) ??
-          "https://images.unsplash.com/photo-1610375461246-83df859d849d?w=1600&q=80";
+        const { generateInsightCover, InsightImageGenerationError } = await import("@/lib/insight-image.server");
+        let image_url: string | null = null;
+        try {
+          image_url = await generateInsightCover({ title, category: topic.category, slug });
+        } catch (error) {
+          const status = error instanceof InsightImageGenerationError ? error.status : 0;
+          const shouldPause = status === 402 || status === 403;
+          await updateJob({
+            status: shouldPause ? "paused" : "failed",
+            pause_reason: shouldPause ? `image-provider-${status}` : null,
+            last_error: String(error),
+            last_model: BLUESMINDS_MODEL,
+            last_topic_id: topic.id,
+          });
+          return Response.json(
+            { error: "image-generation-failed", published: false, paused: shouldPause },
+            { status: shouldPause ? status : 502 },
+          );
+        }
+        if (!image_url) {
+          await updateJob({
+            status: "failed",
+            last_error: "Cover image generation failed; article was not published.",
+            last_model: BLUESMINDS_MODEL,
+            last_topic_id: topic.id,
+          });
+          return Response.json({ error: "image-generation-failed", published: false }, { status: 502 });
+        }
 
         const { data: inserted, error: insErr } = await supabaseAdmin
           .from("insights")
@@ -227,7 +326,10 @@ Return STRICT JSON only, no prose, with this exact shape:
           .select("id, slug")
           .single();
 
-        if (insErr) return new Response(JSON.stringify({ error: insErr.message }), { status: 500 });
+        if (insErr) {
+          await updateJob({ status: "failed", last_error: insErr.message, last_model: BLUESMINDS_MODEL, last_topic_id: topic.id });
+          return new Response(JSON.stringify({ error: insErr.message }), { status: 500 });
+        }
 
         await supabaseAdmin.from("insight_topics").update({ last_used_at: new Date().toISOString() }).eq("id", topic.id);
 
@@ -238,12 +340,30 @@ Return STRICT JSON only, no prose, with this exact shape:
           submitToIndexNow([url, `${BASE_URL}/insights`, `${BASE_URL}/sitemap.xml`]),
         ]);
 
+        if (!inserted) {
+          await updateJob({ status: "failed", last_error: "Article insert returned no row." });
+          return Response.json({ error: "missing-insert-result" }, { status: 500 });
+        }
+
+        const indexStatus = { google, indexnow };
         await supabaseAdmin
           .from("insights")
-          .update({ indexed_at: new Date().toISOString(), index_status: { google, indexnow } })
-          .eq("id", inserted!.id);
+          .update({ indexed_at: new Date().toISOString(), index_status: indexStatus })
+          .eq("id", inserted.id);
 
-        return Response.json({ ok: true, slug, url, google, indexnow });
+        await updateJob({
+          status: "completed",
+          last_completed_at: new Date().toISOString(),
+          last_model: BLUESMINDS_MODEL,
+          last_topic_id: topic.id,
+          last_insight_id: inserted.id,
+          last_index_status: indexStatus,
+          last_error: null,
+          pause_reason: null,
+          consecutive_rate_limits: 0,
+        });
+
+        return Response.json({ ok: true, slug, url, model: BLUESMINDS_MODEL, google, indexnow });
       },
     },
   },
