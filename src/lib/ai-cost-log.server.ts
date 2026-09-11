@@ -39,6 +39,8 @@ const MODEL_PRICING: Record<string, Price> = {
   "bmind/deepseek-v4-pro": { in: 0.55, out: 2.19 },
   "bmind/deepseek-v4-flash": { in: 0.27, out: 1.10 },
   "bmind/grok-4.5": { in: 3.0, out: 15.0 },
+  "bmind/nvidia/nemotron-3-nano-omni-30b-a3b-reasoning": { in: 0, out: 0 },
+  "bmind/meta/llama-3.2-11b-vision-instruct": { in: 0, out: 0 },
   // DeepSeek official API
   "dsofficial/deepseek-reasoner": { in: 0.55, out: 2.19 },
   "dsofficial/deepseek-chat": { in: 0.27, out: 1.10 },

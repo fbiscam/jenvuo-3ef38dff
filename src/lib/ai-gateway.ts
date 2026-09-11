@@ -493,6 +493,23 @@ export const MODEL_CHAIN = {
   chat: WORKING_BMIND,
 } as const;
 
+// Extension calls are intentionally isolated from the shared model chains.
+// Every entry carries the BluesMinds prefix, so this path can never fall
+// through to the Lovable AI Gateway. These ids were live-probed Sep 11 2026.
+export const EXTENSION_MODEL_CHAIN = {
+  reasoning: [
+    "bmind/nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
+    "bmind/meta/llama-3.2-11b-vision-instruct",
+  ],
+  vision: [
+    "bmind/meta/llama-3.2-11b-vision-instruct",
+  ],
+  seniorReview: [
+    "bmind/nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
+    "bmind/meta/llama-3.2-11b-vision-instruct",
+  ],
+} as const;
+
 export const MACRO_CONTEXT_CHAIN = WORKING_BMIND;
 
 export const SENIOR_REVIEW_CHAIN = SENIOR_REVIEW_BMIND_4O;

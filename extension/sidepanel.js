@@ -59,6 +59,13 @@ const SEND_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 7-
 const STOP_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="7" width="10" height="10" rx="2" fill="currentColor" stroke="none"/></svg>';
 let history = [];
 
+function setReviewStatus(text, state) {
+  const el = $("reviewStatus");
+  if (!el) return;
+  el.textContent = text;
+  el.className = "review-status" + (state ? " " + state : "");
+}
+
 /* ---------- chat threads (new chat + history) ---------- */
 
 const STORE_KEY = "jenvu_threads_v1";
@@ -913,6 +920,7 @@ async function send(preset, silentUser) {
   const text = (preset ?? box.value).trim();
   if (!text && !chartImage && !stream) return;
   busy = true;
+  setReviewStatus("Senior review checking…", "checking");
   controller = new AbortController();
   $("send").disabled = false;
   updateSendState();
@@ -974,10 +982,22 @@ async function send(preset, silentUser) {
     if (d.ticker) {
       $("price").textContent = d.ticker.price.toFixed(2);
     }
+    if (d.seniorReview?.included && d.seniorReview?.status === "completed") {
+      const label = String(d.seniorReview.model || "BluesMinds").split("/").pop();
+      setReviewStatus(`Senior reviewed · ${label}`, "verified");
+    } else {
+      setReviewStatus("Senior review required", "failed");
+    }
+    if (Array.isArray(d.overlayMarks) && d.overlayMarks.length) {
+      lastMarks = d.overlayMarks;
+      lastBias = d.marksBias || null;
+      drawChart([], lastMarks, lastBias);
+    }
   } catch (e) {
     pend.remove();
     if (e && e.name === "AbortError") addMsg("ai err", "Request stop kar di gayi.");
     else addMsg("ai err", e.message);
+    setReviewStatus("Senior review unavailable", "failed");
   } finally {
     busy = false;
     controller = null; $("send").disabled = false; updateSendState();
