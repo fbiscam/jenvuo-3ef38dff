@@ -5,10 +5,8 @@ import { useMemo, useState } from "react";
 import { Calendar, ChartColumn, ChevronDown, ChevronRight, Download, RefreshCw } from "lucide-react";
 import {
   Area,
-  Bar,
   CartesianGrid,
   ComposedChart,
-  Legend,
   Line,
   ResponsiveContainer,
   Tooltip as RTooltip,
@@ -260,8 +258,8 @@ function UsagePage() {
                 </div>
               </div>
               <div className="flex items-center gap-3 text-[12px] text-zinc-500">
-                <span className="flex items-center gap-1.5"><span className="inline-block h-2 w-2 rounded-[2px] bg-zinc-800" /> Spent</span>
-                <span className="flex items-center gap-1.5"><span className="inline-block h-2 w-2 rounded-[2px] bg-emerald-400" /> Added</span>
+                <span className="flex items-center gap-1.5"><span className="inline-block h-2.5 w-2.5 rounded-full bg-sky-400" /> Spent</span>
+                <span className="flex items-center gap-1.5"><span className="inline-block h-2.5 w-2.5 rounded-full bg-zinc-300" /> Added</span>
               </div>
             </div>
             <div className="px-2 py-6 sm:px-5">
@@ -271,16 +269,9 @@ function UsagePage() {
                     <ComposedChart data={derived.days} margin={{ top: 12, right: 8, bottom: 4, left: 0 }}>
                       <defs>
                         <linearGradient id="usageSpent" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="0%" stopColor="#3f3f46" />
-                          <stop offset="100%" stopColor="#18181b" />
-                        </linearGradient>
-                        <linearGradient id="usageAdded" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="0%" stopColor="#6ee7b7" />
-                          <stop offset="100%" stopColor="#10b981" />
-                        </linearGradient>
-                        <linearGradient id="usageReq" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="0%" stopColor="#6366f1" stopOpacity={0.28} />
-                          <stop offset="100%" stopColor="#6366f1" stopOpacity={0} />
+                          <stop offset="0%" stopColor="#93c5fd" stopOpacity={0.82} />
+                          <stop offset="72%" stopColor="#dbeafe" stopOpacity={0.42} />
+                          <stop offset="100%" stopColor="#ffffff" stopOpacity={0.06} />
                         </linearGradient>
                       </defs>
                       <CartesianGrid stroke="#f1f1f3" strokeDasharray="4 6" vertical={false} />
@@ -296,24 +287,14 @@ function UsagePage() {
                         minTickGap={24}
                       />
                       <YAxis
-                        yAxisId="usd"
                         tickLine={false}
                         axisLine={false}
                         width={54}
                         tick={{ fill: "#a1a1aa", fontSize: 11 }}
                         tickFormatter={(v: number) => `$${v >= 1 ? v.toFixed(0) : v.toFixed(2)}`}
                       />
-                      <YAxis
-                        yAxisId="req"
-                        orientation="right"
-                        tickLine={false}
-                        axisLine={false}
-                        width={40}
-                        allowDecimals={false}
-                        tick={{ fill: "#a1a1aa", fontSize: 11 }}
-                      />
                       <RTooltip
-                        cursor={{ fill: "rgba(99,102,241,0.06)", radius: 6 }}
+                        cursor={{ stroke: "#d4d4d8", strokeDasharray: "4 4" }}
                         labelFormatter={(v) =>
                           new Date(String(v)).toLocaleDateString(undefined, {
                             weekday: "short",
@@ -321,9 +302,7 @@ function UsagePage() {
                             day: "numeric",
                           })
                         }
-                        formatter={(value: number, name: string) =>
-                          name === "Requests" ? [fmtInt(value), name] : [fmtUsd(value, 2), name]
-                        }
+                         formatter={(value: number, name: string) => [fmtUsd(value, 2), name]}
                         contentStyle={{
                           borderRadius: 12,
                           border: "1px solid #ececef",
@@ -334,44 +313,27 @@ function UsagePage() {
                         labelStyle={{ color: "#18181b", fontWeight: 600, marginBottom: 4 }}
                         itemStyle={{ padding: 0 }}
                       />
-                      <Legend
-                        verticalAlign="bottom"
-                        height={30}
-                        iconType="circle"
-                        iconSize={8}
-                        wrapperStyle={{ fontSize: 12, color: "#71717a" }}
-                      />
                       <Area
-                        yAxisId="req"
                         type="monotone"
-                        dataKey="requests"
-                        name="Requests"
-                        stroke="#6366f1"
-                        strokeWidth={2.25}
-                        fill="url(#usageReq)"
+                        dataKey="spent"
+                        name="Spent"
+                        stroke="#18181b"
+                        strokeWidth={2}
+                        fill="url(#usageSpent)"
                         dot={false}
                         activeDot={{ r: 4, strokeWidth: 2, stroke: "#fff" }}
                         animationDuration={900}
                       />
-                      <Bar
-                        yAxisId="usd"
-                        dataKey="spent"
-                        name="Spent"
-                        stackId="usd"
-                        fill="url(#usageSpent)"
-                        maxBarSize={22}
-                        radius={[4, 4, 4, 4]}
-                        animationDuration={800}
-                      />
-                      <Bar
-                        yAxisId="usd"
+                      <Line
+                        type="monotone"
                         dataKey="earned"
                         name="Added"
-                        stackId="usd"
-                        fill="url(#usageAdded)"
-                        maxBarSize={22}
-                        radius={[4, 4, 4, 4]}
-                        animationDuration={800}
+                        stroke="#a1a1aa"
+                        strokeWidth={1.75}
+                        strokeDasharray="5 6"
+                        dot={false}
+                        activeDot={{ r: 4, strokeWidth: 2, stroke: "#fff" }}
+                        animationDuration={900}
                       />
                     </ComposedChart>
                   </ResponsiveContainer>
