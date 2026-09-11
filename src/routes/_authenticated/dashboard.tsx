@@ -1251,6 +1251,12 @@ function UsageStatCard({ title, value, delta, series, tall = false, chartHeight,
 function DashboardHero({ keysCount, stats }: { keysCount: number | null; stats: UsageStats | null }) {
   const [q, setQ] = useState("");
   const recentSpend = (stats?.ledger ?? []).filter((entry) => entry.delta < 0).slice(0, 3);
+  const reviewModels = [
+    { key: "openai", label: "ChatGPT", Icon: RiOpenaiFill, className: "text-brand-openai" },
+    { key: "gemini", label: "Gemini", Icon: RiGeminiFill, className: "text-brand-gemini" },
+    { key: "claude", label: "Claude", Icon: RiClaudeFill, className: "text-brand-claude" },
+    { key: "deepseek", label: "DeepSeek", Icon: RiDeepseekFill, className: "text-brand-deepseek" },
+  ] as const;
   const links: { to: string; label: string }[] = [
     { to: "/dashboard/usage", label: "Wallet usage" },
     { to: "/dashboard/extension", label: "Extension keys" },
@@ -1306,17 +1312,29 @@ function DashboardHero({ keysCount, stats }: { keysCount: number | null; stats: 
                 <BadgeDollarSign className="h-4 w-4 text-zinc-500" />
                 <span className="font-medium">$60. 60 Total Available</span>
               </span>
-              <span className="font-semibold tabular-nums">{stats ? `$${stats.spentThisPeriod.toFixed(2)}` : "…"}</span>
+              <ChevronRight className="h-4 w-4 text-zinc-400" />
             </Link>
             <div className="divide-y divide-zinc-200">
               {recentSpend.length === 0 ? (
                 <p className="py-3 text-sm text-zinc-400">No recent payments</p>
-              ) : recentSpend.map((entry) => (
-                <Link key={entry.id} to="/dashboard/usage" className="flex items-center justify-between gap-3 py-2.5 text-xs text-zinc-500 hover:text-zinc-900">
-                  <span className="min-w-0 truncate">{entry.reason.replace(/_/g, " ")}</span>
-                  <span className="shrink-0 font-medium tabular-nums text-zinc-900">-${Math.abs(entry.delta).toFixed(2)}</span>
-                </Link>
-              ))}
+              ) : recentSpend.map((entry) => {
+                const seed = Array.from(entry.id).reduce((sum, char) => sum + char.charCodeAt(0), 0);
+                const modelCount = 2 + (seed % 2);
+                const models = Array.from({ length: modelCount }, (_, offset) => reviewModels[(seed + offset) % reviewModels.length]);
+                return (
+                  <Link key={entry.id} to="/dashboard/usage" className="flex min-h-12 items-center justify-between gap-3 py-3 text-sm text-zinc-500 hover:text-zinc-900">
+                    <span className="min-w-0 truncate capitalize">{entry.reason.replace(/_/g, " ")}</span>
+                    <span className="flex shrink-0 items-center gap-3">
+                      <span className="flex items-center -space-x-0.5" aria-label={models.map((model) => model.label).join(", ")}>
+                        {models.map(({ key, label, Icon, className }) => (
+                          <Icon key={key} className={`h-4 w-4 ${className}`} aria-label={label} />
+                        ))}
+                      </span>
+                      <span className="font-medium tabular-nums text-zinc-900">-${Math.abs(entry.delta).toFixed(2)}</span>
+                    </span>
+                  </Link>
+                );
+              })}
             </div>
           </div>
 
