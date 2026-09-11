@@ -17,6 +17,6 @@
 - [x] Promote tested Unikey Claude Opus 4.8 to senior second review
 - [x] Align extension token billing and pricing copy with Unikey rates
 - [x] Add Grok 4.6 fallback and block every unreviewed extension result
-- [ ] Rework pricing around token wallets and plan-specific API limits
-- [ ] Limit Pro to primary AI; reserve mandatory senior review for Elite and Ultra
+- [x] Rework pricing around token wallets and plan-specific API limits
+- [x] Limit Pro to primary AI; reserve mandatory senior review for Elite and Ultra
 - [ ] Verify pricing, extension billing, and TypeScript
