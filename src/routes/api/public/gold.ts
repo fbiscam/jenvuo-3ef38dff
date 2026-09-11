@@ -185,13 +185,13 @@ async function handle({ request }: { request: Request }) {
               role: 'system',
                content: 'Senior ICT/SMC reviewer. Audit live levels, HTF/LTF alignment, sweep, displacement, fresh POI and minimum 1:2 RR. Return a corrected concise answer. If incomplete, return WAIT. Never promise profit.',
             },
-            { role: 'user', content: `Live:\n${reviewContext}\nAsk: ${question.slice(0, 300)}\nGPT-5.6 Sol:\n${primary.content.slice(0, 900)}` },
+            { role: 'user', content: `Live:\n${reviewContext}\nAsk: ${question.slice(0, 300)}\nGPT-6 Astra primary analysis:\n${primary.content.slice(0, 900)}` },
           ],
         })
       content = review.content
       seniorReview = { included: true, model: review.model, status: 'completed' }
 
-      // The senior review is the second pass: GPT-5.6 Sol analyzes first,
+      // The senior review is the second pass: GPT-6 Astra analyzes first,
       // then Claude Opus 4.8 independently audits and finalizes the answer.
       const secondReview = { included: true, model: review.model, status: 'completed' }
 

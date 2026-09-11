@@ -507,25 +507,26 @@ export const MODEL_CHAIN = {
 } as const;
 
 // Extension calls are intentionally isolated from the shared model chains.
-// Every entry carries the Tukenku prefix, so this path never uses Lovable AI
-// credits. These free routes were live-probed Sep 11 2026 with the project key.
+// GPT-6 Astra is the strongest tested Unikey primary, while Claude Opus 4.8
+// independently audits and finalizes its answer as the senior second pass.
 export const EXTENSION_MODEL_CHAIN = {
   reasoning: [
-    "tukenku/myt/gpt-5.6-sol-free",
-    "tukenku/myt/qwen3.8-max-free",
-    "tukenku/myt/claude-opus-4-8-free",
+    "unikey/gpt-6-astra",
+    "unikey/gemini-3.1-pro",
+    "unikey/x-ai/grok-4.3",
   ],
   vision: [
     "tukenku/myt/deepseek-v4-flash-vision-exp",
     "tukenku/myt/qwen3-vl-plus",
   ],
   seniorReview: [
-    "unikey/gpt-6-astra",
+    "unikey/claude-opus-4-8",
     "unikey/gemini-3.1-pro",
-    "unikey/x-ai/grok-4.3",
+    "unikey/deepseek-v4-pro",
   ],
-  // Independent second reviewer — must not reuse the senior primary model.
+  // Alias retained for callers that identify the senior pass as review #2.
   secondReview: [
+    "unikey/claude-opus-4-8",
     "unikey/gemini-3.1-pro",
     "unikey/deepseek-v4-pro",
   ],

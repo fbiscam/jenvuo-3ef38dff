@@ -13,3 +13,6 @@
 - [x] Replace extension logo with current Jenvu logo
 - [x] Remove chart markings from extension home graph
 - [x] Verify TypeScript and live extension flow
+- [x] Promote tested Unikey GPT-6 Astra to primary extension analysis
+- [x] Promote tested Unikey Claude Opus 4.8 to senior second review
+- [x] Align extension token billing and pricing copy with Unikey rates

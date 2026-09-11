@@ -64,7 +64,7 @@ export async function chargeExtensionUsage(params: {
       action: params.action, model: models, primary_model: primary?.model ?? null,
       senior_model: senior?.model ?? null, stage: 'extension_api', prompt_tokens: promptTokens,
       completion_tokens: completionTokens, raw_cost_usd: rawCost, base_fee_usd: EXTENSION_BASE_FEE_USD,
-       pricing_multiplier: EXTENSION_TOKEN_PRICE_MULTIPLIER, pricing_basis: '50_percent_of_tukenku_published_token_rates',
+       pricing_multiplier: EXTENSION_TOKEN_PRICE_MULTIPLIER, pricing_basis: '50_percent_of_official_provider_token_rates',
        charge_usd: charged, senior_review: Boolean(senior),
     },
   })
