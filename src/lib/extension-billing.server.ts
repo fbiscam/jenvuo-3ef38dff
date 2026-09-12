@@ -3,6 +3,7 @@ import { getPlanCapabilities } from '@/lib/plan-entitlements'
 
 export const EXTENSION_BASE_FEE_USD = 0
 export const EXTENSION_TOKEN_PRICE_MULTIPLIER = 0.5
+export const EXTENSION_SENIOR_REVIEW_FEE_USD = 0.2
 
 type Usage = { promptTokens: number; completionTokens: number; totalTokens?: number }
 type ModelCall = { model: string; usage: Usage; stage: string }
@@ -50,7 +51,10 @@ export async function chargeExtensionUsage(params: {
   const entitlement = await getExtensionEntitlement(params.userId)
   if (!entitlement.allowed) return { ok: false, charged: 0, error: entitlement.error }
   const rawCost = params.calls.reduce((sum, call) => sum + estimateCostUsd(call.model, call.usage.promptTokens, call.usage.completionTokens), 0)
-  const charged = Number((rawCost * EXTENSION_TOKEN_PRICE_MULTIPLIER).toFixed(6))
+  const hasSeniorReview = params.calls.some((call) => call.stage === 'extension-senior-review' || call.stage === 'senior-review')
+  const charged = hasSeniorReview
+    ? EXTENSION_SENIOR_REVIEW_FEE_USD
+    : Number((rawCost * EXTENSION_TOKEN_PRICE_MULTIPLIER).toFixed(6))
   if (entitlement.balance < charged) return { ok: false, charged: 0, error: 'Low balance. Add funds to continue using extension AI.' }
 
   const primary = params.calls[0]
@@ -69,7 +73,8 @@ export async function chargeExtensionUsage(params: {
       senior_model: senior?.model ?? null, stage: 'extension_api', prompt_tokens: promptTokens,
       completion_tokens: completionTokens, raw_cost_usd: rawCost, base_fee_usd: EXTENSION_BASE_FEE_USD,
        pricing_multiplier: EXTENSION_TOKEN_PRICE_MULTIPLIER, pricing_basis: '50_percent_of_official_provider_token_rates',
-       charge_usd: charged, senior_review: Boolean(senior),
+       charge_usd: charged, senior_review: hasSeniorReview,
+       senior_review_fee_usd: hasSeniorReview ? EXTENSION_SENIOR_REVIEW_FEE_USD : 0,
     },
   })
   if (error) {
