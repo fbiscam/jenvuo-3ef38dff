@@ -145,7 +145,7 @@ const DESKS: Desk[] = [
     logo: metaTraderLogo.url,
     brandClass: "td-brand-metatrader",
     avatar: face4,
-    quote: "Voice-first analysis keeps attention on execution while the engine tracks the market structure in real time.",
+    quote: "Chart-aware analysis keeps attention on execution while the engine tracks market structure in real time.",
     author: "Elena Rossi",
     role: "Execution Specialist, MetaTrader 5",
     performance: [22, 26, 24, 33, 38, 45, 52, 58, 66, 74, 81, 91],

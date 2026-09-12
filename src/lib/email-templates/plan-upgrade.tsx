@@ -31,7 +31,7 @@ const PlanUpgradeEmail = ({
   effectiveDate = new Date().toUTCString(),
   amount = '$79 / month',
   features = [
-    'Unlimited voice-native briefings',
+    'AI extension chat and chart analysis',
     'Real-time ICT session alerts',
     'Priority signal delivery',
     'Extended market replay & journal',
@@ -145,7 +145,7 @@ export const template: TemplateEntry = {
     effectiveDate: new Date().toUTCString(),
     amount: '$79 / month',
     features: [
-      'Unlimited voice-native briefings',
+      'AI extension chat and chart analysis',
       'Real-time ICT session alerts',
       'Priority signal delivery',
       'Extended market replay & journal',
