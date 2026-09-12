@@ -22,7 +22,7 @@ import {
   Download,
 } from "lucide-react";
 
-const PLAN_AMOUNT: Record<string, string> = { pro: "$15", elite: "$50", ultra: "$100", free: "$1" };
+const PLAN_AMOUNT: Record<string, string> = { pro: "$15", elite: "$50", ultra: "$100", free: "$2" };
 
 import { isAdmin } from "@/lib/admin-messages.functions";
 import {

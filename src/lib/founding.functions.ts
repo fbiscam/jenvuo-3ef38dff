@@ -68,7 +68,7 @@ function htmlToText(html: string) {
 }
 
 const PLAN_META: Record<string, { label: string; wallet: string; amount: string; blurb: string }> = {
-  free: { label: "Free", wallet: "$1 starting credit", amount: "$1", blurb: "Try the platform on XAU/USD. Upgrade any time." },
+  free: { label: "Free", wallet: "$2 starting credit", amount: "$2", blurb: "Try the platform on XAU/USD. Upgrade any time." },
   pro: { label: "Pro", wallet: "$15 wallet credit", amount: "$15", blurb: "Multi-pair scans, realtime alerts, full trade management." },
   elite: { label: "Elite", wallet: "$50 wallet credit", amount: "$50", blurb: "Everything in Pro plus priority AI models & higher scan budget." },
   ultra: { label: "Ultra", wallet: "$100 wallet credit", amount: "$100", blurb: "Top-tier access. Every model, every pair, no throttling." },
