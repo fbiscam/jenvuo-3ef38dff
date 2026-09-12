@@ -71,6 +71,13 @@ const MODEL_PRICING: Record<string, Price> = {
   "unikey/x-ai/grok-4.3": { in: 1.25, out: 2.5 },
   "unikey/deepseek-v4-pro": { in: 0.55, out: 2.19 },
 
+  // Evolink official rates in USD per 1M tokens. The catalog publishes these
+  // as per-1K-token SKUs; these values are their per-million equivalents.
+  "evolink/gpt-6-astra": { in: 10.0, out: 50.0 },
+  "evolink/claude-opus-5": { in: 5.0, out: 25.0 },
+  "evolink/claude-opus-4-8": { in: 5.0, out: 25.0 },
+  "evolink/grok-4.6": { in: 2.0, out: 6.0 },
+
   // Google
   "google/gemini-2.5-pro": { in: 1.25, out: 10.0 },
   "google/gemini-2.5-flash": { in: 0.075, out: 0.3 },
@@ -103,7 +110,8 @@ export function formatModelLabel(rawModel: string | null | undefined): string {
   const m = raw.toLowerCase();
   if (m.startsWith("rules-engine/ict-smc")) return "ICT/SMC Rules Engine";
   // Strip provider prefix (bmind/, openai/, nvapi/, google/, etc.)
-  const bare = m.replace(/^(dsofficial|bmind|tukenku|unikey|openai|nvapi|google|anthropic)\//g, "").replace(/^myt\//, "").replace(/^orion\//, "").replace(/^deepseek-ai\//, "");
+  const bare = m.replace(/^(dsofficial|bmind|tukenku|unikey|evolink|openai|nvapi|google|anthropic)\//g, "").replace(/^myt\//, "").replace(/^orion\//, "").replace(/^deepseek-ai\//, "");
+  if (bare.startsWith("claude-opus-5")) return "Claude Opus 5";
   if (bare.startsWith("claude-opus-4-8")) return "Claude Opus 4.8";
   if (bare.startsWith("claude-sonnet-4.5") || bare.startsWith("claude-4.5-sonnet")) return "Claude Sonnet 4.5";
   if (bare.startsWith("claude-3.7-sonnet") || bare.startsWith("claude-3-7-sonnet")) return "Claude 3.7 Sonnet";
@@ -230,7 +238,7 @@ export async function chargeSignalScan(params: {
     // Guarantee history always shows the model that ran — if the caller
     // didn't pass one (deterministic engine fallback path), default to the
     // current primary so no user's billing row is ever blank.
-    const primaryModel = params.model ?? "unikey/gpt-6-astra";
+    const primaryModel = params.model ?? "evolink/gpt-6-astra";
     const meta: Record<string, unknown> = {
       model: primaryModel,
       model_label: formatModelLabel(primaryModel),

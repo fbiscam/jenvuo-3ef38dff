@@ -75,6 +75,7 @@ function providerConfigured(model: string): boolean {
   if (model.startsWith("bmind/")) return Boolean(process.env.BLUESMIND_API_KEY || process.env.BLUESMINDS_API_KEY || process.env.OPENAI_API_KEY);
   if (model.startsWith("tukenku/")) return Boolean(process.env.TUKENKU_API_KEY);
   if (model.startsWith("unikey/")) return Boolean(process.env.UNIKEY_API_KEY);
+  if (model.startsWith("evolink/")) return Boolean(process.env.EVOLINK_API_KEY);
   if (model.startsWith("dsofficial/")) return Boolean(process.env.DEEPSEEK_API_KEY);
   if (model.startsWith("oai/")) return Boolean(process.env.OPENAI_API_KEY);
   return Boolean(process.env.LOVABLE_API_KEY);
@@ -109,6 +110,7 @@ async function singleAttempt(
   //   `bmind/*`      → Bluesminds unified gateway (OpenAI-compatible)
   //   `tukenku/*`    → Tukenku / Monyet AI (OpenAI-compatible)
   //   `unikey/*`     → GetUniKey (OpenAI-compatible)
+  //   `evolink/*`    → Evolink direct API (OpenAI-compatible)
   //   `dsofficial/*` → DeepSeek official API (OpenAI-compatible)
   //   else           → Lovable AI Gateway
   const isBlackbox = model.startsWith("blackboxai/");
@@ -116,6 +118,7 @@ async function singleAttempt(
   const isBmind = model.startsWith("bmind/");
   const isTukenku = model.startsWith("tukenku/");
   const isUnikey = model.startsWith("unikey/");
+  const isEvolink = model.startsWith("evolink/");
   const isDsOfficial = model.startsWith("dsofficial/");
   const isOai = model.startsWith("oai/");
   const blackboxKey = process.env.BLACKBOX_API_KEY;
@@ -128,6 +131,7 @@ async function singleAttempt(
     process.env.OPENAI_API_KEY;
   const tukenkuKey = process.env.TUKENKU_API_KEY;
   const unikeyKey = process.env.UNIKEY_API_KEY;
+  const evolinkKey = process.env.EVOLINK_API_KEY;
   const deepseekKey = process.env.DEEPSEEK_API_KEY;
   const openaiKey = process.env.OPENAI_API_KEY;
 
@@ -151,6 +155,8 @@ async function singleAttempt(
     ? "https://tukenku.com/v1/chat/completions"
     : isUnikey
     ? "https://www.getunikey.ai/v1/chat/completions"
+    : isEvolink
+    ? "https://direct.evolink.ai/v1/chat/completions"
     : isDsOfficial
     ? "https://api.deepseek.com/chat/completions"
     : "https://ai.gateway.lovable.dev/v1/chat/completions";
@@ -171,6 +177,9 @@ async function singleAttempt(
   } else if (isUnikey) {
     if (!unikeyKey) throw new AiGatewayError("UNIKEY_API_KEY missing on server", 0, true);
     headers["Authorization"] = `Bearer ${unikeyKey}`;
+  } else if (isEvolink) {
+    if (!evolinkKey) throw new AiGatewayError("EVOLINK_API_KEY missing on server", 0, true);
+    headers["Authorization"] = `Bearer ${evolinkKey}`;
   } else if (isDsOfficial) {
     if (!deepseekKey) throw new AiGatewayError("DEEPSEEK_API_KEY missing on server", 0, true);
     headers["Authorization"] = `Bearer ${deepseekKey}`;
@@ -194,6 +203,8 @@ async function singleAttempt(
     ? model.slice("tukenku/".length)
     : isUnikey
     ? model.slice("unikey/".length)
+    : isEvolink
+    ? model.slice("evolink/".length)
     : isDsOfficial
     ? model.slice("dsofficial/".length)
     : model;
@@ -209,25 +220,25 @@ async function singleAttempt(
 
   // GPT-5 family only accepts default temperature (1); skip temp/top_p there,
   // keep seed for determinism.
-  const isGpt5Family = /(^|\/)gpt-5/i.test(wireModel);
+  const usesDefaultTemperature = /(^|\/)gpt-(?:5|6)/i.test(wireModel);
 
   const body: Record<string, unknown> = {
     model: wireModel,
     messages: opts.messages,
     seed,
-    ...(isGpt5Family ? {} : { temperature: 0, top_p: 1 }),
+    ...(usesDefaultTemperature ? {} : { temperature: 0, top_p: 1 }),
   };
   // Blackbox/NVIDIA/Bluesminds/DeepSeek-official: don't force response_format — rely on system prompt.
   if (opts.jsonMode && isOai) body.response_format = { type: "json_object" };
-  else if (opts.jsonMode && !isBlackbox && !isNvidia && !isBmind && !isTukenku && !isUnikey && !isDsOfficial && !isOai) body.response_format = { type: "json_object" };
+  else if (opts.jsonMode && !isBlackbox && !isNvidia && !isBmind && !isTukenku && !isUnikey && !isEvolink && !isDsOfficial && !isOai) body.response_format = { type: "json_object" };
   if (opts.maxTokens) {
-    if ((isOai && /^gpt-5/i.test(wireModel)) || (!isBlackbox && !isNvidia && !isBmind && !isTukenku && !isUnikey && !isDsOfficial && !isOai && model.startsWith("openai/gpt-5"))) {
+    if (((isOai || isEvolink) && /^gpt-(?:5|6)/i.test(wireModel)) || (!isBlackbox && !isNvidia && !isBmind && !isTukenku && !isUnikey && !isEvolink && !isDsOfficial && !isOai && /^openai\/gpt-(?:5|6)/i.test(model))) {
       body.max_completion_tokens = opts.maxTokens;
     } else {
       body.max_tokens = opts.maxTokens;
     }
   }
-  if (!isBlackbox && !isNvidia && !isBmind && !isTukenku && !isUnikey && !isDsOfficial && !isOai && opts.priority && PRIORITY_TIER_MODELS.has(model)) {
+  if (!isBlackbox && !isNvidia && !isBmind && !isTukenku && !isUnikey && !isEvolink && !isDsOfficial && !isOai && opts.priority && PRIORITY_TIER_MODELS.has(model)) {
     body.service_tier = "priority";
   }
 
@@ -246,7 +257,7 @@ async function singleAttempt(
 
   if (!res.ok) {
     const txt = await res.text().catch(() => "");
-    const terminal = (isBlackbox || isNvidia || isBmind || isTukenku || isUnikey || isDsOfficial || isOai)
+    const terminal = (isBlackbox || isNvidia || isBmind || isTukenku || isUnikey || isEvolink || isDsOfficial || isOai)
       ? !(res.status === 429 || res.status >= 500 || res.status === 403 || res.status === 400 || res.status === 401 || res.status === 404)
       : !(res.status === 429 || res.status >= 500);
 
@@ -256,6 +267,7 @@ async function singleAttempt(
     else if (res.status >= 500) msg = "Server busy — please try again in a moment.";
     else if (res.status === 402 && isTukenku) msg = "Tukenku balance is too low. Please top up Tukenku to use this model.";
     else if (res.status === 402 && isUnikey) msg = "Unikey balance is too low. Please top up Unikey to use this model.";
+    else if (res.status === 402 && isEvolink) msg = "Evolink balance is too low. Please top up Evolink to use this model.";
     else if (res.status === 402) msg = "AI credits exhausted. Please top up your workspace.";
     else if (res.status === 401) msg = "AI key rejected. Please contact support.";
     else if (res.status === 400) msg = "Server busy — please try again in a moment.";
@@ -515,11 +527,13 @@ export const MODEL_CHAIN = {
 } as const;
 
 // Extension calls are intentionally isolated from the shared model chains.
-// GPT-6 Astra is the strongest tested Unikey primary, while Claude Opus 4.8
-// independently audits and finalizes its answer as the senior second pass.
+// Evolink GPT-6 Astra is the strongest tested primary. Claude Opus 5 performs
+// the independent senior pass, with tested Evolink and legacy provider fallbacks.
 export const EXTENSION_MODEL_CHAIN = {
   reasoning: [
+    "evolink/gpt-6-astra",
     "unikey/gpt-6-astra",
+    "evolink/grok-4.6",
     "unikey/gemini-3.1-pro",
     "unikey/x-ai/grok-4.3",
   ],
@@ -528,11 +542,17 @@ export const EXTENSION_MODEL_CHAIN = {
     "tukenku/myt/qwen3-vl-plus",
   ],
   seniorReview: [
+    "evolink/claude-opus-5",
+    "evolink/claude-opus-4-8",
+    "evolink/grok-4.6",
     "unikey/claude-opus-4-8",
     "tukenku/myt/grok-4.6-free",
   ],
   // Alias retained for callers that identify the senior pass as review #2.
   secondReview: [
+    "evolink/claude-opus-5",
+    "evolink/claude-opus-4-8",
+    "evolink/grok-4.6",
     "unikey/claude-opus-4-8",
     "tukenku/myt/grok-4.6-free",
   ],
