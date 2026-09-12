@@ -78,6 +78,7 @@ function providerConfigured(model: string): boolean {
   if (model.startsWith("evolink/")) return Boolean(process.env.EVOLINK_API_KEY);
   if (model.startsWith("dsofficial/")) return Boolean(process.env.DEEPSEEK_API_KEY);
   if (model.startsWith("oai/")) return Boolean(process.env.OPENAI_API_KEY);
+  if (model.startsWith("jw/")) return Boolean(process.env.JUSTWOKER_API_KEY);
   return Boolean(process.env.LOVABLE_API_KEY);
 }
 
@@ -97,6 +98,89 @@ export function isModelUnhealthy(model: string): boolean {
 }
 
 export type UsageInfo = { promptTokens: number; completionTokens: number; totalTokens: number };
+
+// -------- JustWoker (api.justwoker.icu) ------------------------------------
+// This upstream fronts GPT-5.6 (sol / terra / luna). Its OpenAI-compatible
+// /v1/chat/completions path is blocked by the provider's WAF for server-side
+// calls, but the Anthropic-style /v1/messages path answers reliably, so we
+// speak that dialect and translate messages both ways.
+async function callJustwoker(
+  model: string,
+  opts: CallChatOptions,
+): Promise<{ content: string; usage: UsageInfo }> {
+  const key = process.env.JUSTWOKER_API_KEY;
+  if (!key) throw new AiGatewayError("JUSTWOKER_API_KEY missing on server", 0, true);
+  const wireModel = model.slice("jw/".length);
+
+  const systemParts: string[] = [];
+  const messages: Array<{ role: "user" | "assistant"; content: unknown }> = [];
+  for (const m of opts.messages) {
+    if (m.role === "system") {
+      systemParts.push(typeof m.content === "string" ? m.content : JSON.stringify(m.content));
+      continue;
+    }
+    if (typeof m.content === "string") {
+      messages.push({ role: m.role, content: m.content });
+      continue;
+    }
+    const blocks = m.content
+      .map((part) => {
+        if (part.type === "text") return { type: "text", text: part.text };
+        const url = part.image_url?.url ?? "";
+        const match = /^data:(image\/[a-z]+);base64,(.+)$/i.exec(url);
+        if (!match) return null;
+        return { type: "image", source: { type: "base64", media_type: match[1], data: match[2] } };
+      })
+      .filter(Boolean);
+    messages.push({ role: m.role, content: blocks });
+  }
+  if (!messages.length) messages.push({ role: "user", content: "." });
+
+  const res = await fetch("https://api.justwoker.icu/v1/messages", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-api-key": key,
+      "anthropic-version": "2023-06-01",
+    },
+    body: JSON.stringify({
+      model: wireModel,
+      max_tokens: opts.maxTokens ?? 1500,
+      ...(systemParts.length ? { system: systemParts.join("\n\n") } : {}),
+      messages,
+    }),
+  }).catch(() => {
+    throw new AiGatewayError("Server busy — please try again in a moment.", 0, false);
+  });
+
+  if (!res.ok) {
+    const txt = await res.text().catch(() => "");
+    const status = res.status;
+    const msg =
+      status === 402 || /insufficient|balance|credit/i.test(txt)
+        ? "JustWoker balance is too low. Please top up to use this model."
+        : status === 401 || status === 403
+        ? "AI key rejected. Please contact support."
+        : "Server busy — please try again in a moment.";
+    const terminal = !(status === 429 || status >= 500);
+    if (status === 404 || /model_not_found|not found/i.test(txt)) markModelUnhealthy(model, 15 * 60 * 1000);
+    throw new AiGatewayError(msg, status, terminal);
+  }
+
+  const json: any = await res.json();
+  const content = Array.isArray(json?.content)
+    ? json.content.filter((b: any) => b?.type === "text").map((b: any) => String(b.text ?? "")).join("\n").trim()
+    : "";
+  if (!content) throw new AiGatewayError("AI returned empty response.", 0, false);
+  const promptTokens = Number(json?.usage?.input_tokens ?? 0) || 0;
+  const completionTokens = Number(json?.usage?.output_tokens ?? 0) || 0;
+  return {
+    content,
+    usage: { promptTokens, completionTokens, totalTokens: promptTokens + completionTokens },
+  };
+}
+
+
 
 
 async function singleAttempt(
