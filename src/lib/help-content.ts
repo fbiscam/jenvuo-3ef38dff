@@ -76,7 +76,7 @@ export const collections: Collection[] = [
       {
         slug: "create-account",
         title: "How do I create an account?",
-        summary: "Sign up takes under a minute — email + password or Google.",
+        summary: "Sign up takes under a minute with email and password.",
         updatedAt: "2026-06-30",
         body: [
           { type: "p", content: "Creating a Jenvu account takes less than 60 seconds. New accounts start on the Free plan and include starter credits so you can try the extension and signal engine immediately." },
@@ -88,9 +88,6 @@ export const collections: Collection[] = [
             "Enter your full name, email and a password of 8+ characters.",
             "Click 'Create account' — you'll be signed in straight away.",
           ]},
-
-          { type: "h2", content: "Sign up with Google" },
-          { type: "p", content: "Prefer one-click? Click 'Continue with Google' on the Sign In page and pick the Google account you want to use. We only request your name, email and profile picture — nothing else." },
 
           { type: "h2", content: "What happens next" },
           { type: "ul", items: [
