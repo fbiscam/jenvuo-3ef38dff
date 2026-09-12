@@ -597,7 +597,11 @@ const FAST_NARRATION_BMIND = [
 // Senior review: Bluesminds GPT-4o remains the desk's preferred reviewer, but
 // while that route is unavailable the Gemini routes sign off so a provider
 // outage cannot zero out the whole trading day via the hard review gate.
+// JustWoker GPT-5.6 is now the desk's lead reviewer (live-probed Sep 12 2026:
+// sol / terra / luna all answer, and sol reads chart images correctly).
 const SENIOR_REVIEW_BMIND_4O = [
+  "jw/gpt-5.6-sol",
+  "jw/gpt-5.6-terra",
   "google/gemini-3.1-pro-preview",
   "google/gemini-3.7-flash",
   "bmind/gpt-4o",
@@ -609,38 +613,41 @@ export const MODEL_CHAIN = {
   narration: FAST_NARRATION_BMIND,
   seniorReview: SENIOR_REVIEW_BMIND_4O,
   macroContext: WORKING_BMIND,
-  chat: WORKING_BMIND,
+  chat: ["jw/gpt-5.6-sol", ...WORKING_BMIND] as const,
 } as const;
 
 // Extension calls are intentionally isolated from the shared model chains.
-// Evolink GPT-6 Astra is the strongest tested primary. Claude Opus 5 performs
-// the independent senior pass, with tested Evolink and legacy provider fallbacks.
+// JustWoker GPT-5.6 Sol is the primary analyst and also reads chart images;
+// GPT-5.6 Terra runs the independent senior pass, with the previously tested
+// Evolink / Unikey routes kept as fallbacks.
 export const EXTENSION_MODEL_CHAIN = {
   reasoning: [
+    "jw/gpt-5.6-sol",
+    "jw/gpt-5.6-terra",
     "evolink/gpt-6-astra",
     "unikey/gpt-6-astra",
     "evolink/grok-4.6",
-    "unikey/gemini-3.1-pro",
-    "unikey/x-ai/grok-4.3",
   ],
   vision: [
+    "jw/gpt-5.6-sol",
+    "jw/gpt-5.6-terra",
     "tukenku/myt/deepseek-v4-flash-vision-exp",
     "tukenku/myt/qwen3-vl-plus",
   ],
   seniorReview: [
+    "jw/gpt-5.6-terra",
+    "jw/gpt-5.6-sol",
     "evolink/claude-opus-5",
     "evolink/claude-opus-4-8",
-    "evolink/grok-4.6",
     "unikey/claude-opus-4-8",
-    "tukenku/myt/grok-4.6-free",
   ],
   // Alias retained for callers that identify the senior pass as review #2.
   secondReview: [
+    "jw/gpt-5.6-terra",
+    "jw/gpt-5.6-sol",
     "evolink/claude-opus-5",
     "evolink/claude-opus-4-8",
-    "evolink/grok-4.6",
     "unikey/claude-opus-4-8",
-    "tukenku/myt/grok-4.6-free",
   ],
 } as const;
 
