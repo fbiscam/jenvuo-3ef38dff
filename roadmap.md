@@ -23,4 +23,4 @@
 - [x] Securely connect Evolink and verify its live model catalog
 - [x] Add tested Evolink GPT-6 Astra primary and Claude Opus 5 senior-review routing
 - [x] Add Evolink token pricing, labels, fallbacks, and provider error handling
-- [ ] Verify the integrated Evolink path and extension checks
+- [x] Verify the integrated Evolink path and extension checks
