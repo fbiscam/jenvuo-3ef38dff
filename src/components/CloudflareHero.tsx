@@ -32,7 +32,8 @@ export default function CloudflareHero() {
 
           <div className="mt-10 flex items-center justify-center">
             <Link
-              to="/founding"
+              to="/auth"
+              search={{ mode: "signup" }}
               className="inline-flex min-h-9 items-center justify-center rounded-full bg-background px-6 text-xs font-semibold text-foreground shadow-sm transition hover:bg-secondary"
             >
               Start trading for free
