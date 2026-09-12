@@ -10,13 +10,13 @@ export const Route = createFileRoute("/download")({
       {
         name: "description",
         content:
-          "Get Jenvu on your device. Native iOS, Android APK and desktop PWA — the institutional voice-native gold trading agent covering every XAU cross-pair in your pocket.",
+          "Get Jenvu on your device. Use the AI-powered gold analysis extension with ICT/SMC chart context, reviewed signals and live alerts.",
       },
       { property: "og:title", content: "Download our app" },
       {
         property: "og:description",
         content:
-          "Native iOS, Android APK and desktop PWA. Carry the voice-powered ICT/SMC trading desk with you.",
+          "Access Jenvu across desktop and mobile, with the TradingView extension at the center of your ICT/SMC workflow.",
       },
       { property: "og:url", content: "https://jenvu.com/download" },
       { property: "og:type", content: "website" },
@@ -32,7 +32,7 @@ export const Route = createFileRoute("/download")({
           applicationCategory: "FinanceApplication",
           operatingSystem: "iOS, Android, Web",
           description:
-            "Voice-native institutional AI gold trading terminal covering every XAU cross-pair — available on iOS, Android and as an installable PWA.",
+            "AI-powered gold chart analysis extension with institutional ICT/SMC logic, reviewed signals and live alerts.",
           offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
         }),
       },
@@ -67,7 +67,7 @@ const PLATFORMS: Platform[] = [
     key: "ios",
     label: "iOS",
     channel: "App Store",
-    blurb: "Native iPhone & iPad build. Background voice, push alerts and haptics — wrapped in a signed Apple bundle.",
+    blurb: "Native iPhone & iPad companion. Push alerts and haptics keep extension signals close when you leave your desk.",
     status: "COMING SOON",
     cta: "Notify on release",
     href: DOWNLOADS.ios,
@@ -77,7 +77,7 @@ const PLATFORMS: Platform[] = [
     key: "android",
     label: "Android",
     channel: "APK · Play Store",
-    blurb: "Signed APK and Play Store release. Native microphone, push notifications and full background streaming.",
+    blurb: "Signed APK and Play Store companion with push notifications and full background signal streaming.",
     status: "COMING SOON",
     cta: "Notify on release",
     href: DOWNLOADS.android,
@@ -102,7 +102,7 @@ const REQS = [
 ];
 
 const CHANGELOG = [
-  { v: "v1.0.0", t: "Initial release", body: "Voice agent, signal engine, ICT/SMC analyzer and live A+ setup grading." },
+  { v: "v1.0.0", t: "Initial release", body: "TradingView extension, signal engine, ICT/SMC analyzer and live A+ setup grading." },
   { v: "v0.9.0", t: "Public preview", body: "Web terminal with multi-timeframe alignment and live tick streaming." },
 ];
 
@@ -128,8 +128,8 @@ function DownloadPage() {
             Carry the desk in your pocket.
           </h1>
           <p className="mt-5 max-w-2xl text-base leading-relaxed text-zinc-900 md:text-lg">
-            <span className="sm:hidden">Jenvu on iOS, Android and desktop — same voice agent, same institutional engine, same A+ setups. Links coming soon.</span>
-            <span className="hidden sm:inline">Jenvu on iOS, Android and desktop same voice agent, same institutional engine, same A+ setups. Download links are being prepared shortly</span>
+            <span className="sm:hidden">Jenvu on iOS, Android and desktop — same extension signals, same institutional engine, same A+ setups. Links coming soon.</span>
+            <span className="hidden sm:inline">Jenvu on iOS, Android and desktop with the same extension signals, institutional engine and A+ setups. Download links are being prepared shortly.</span>
           </p>
         </section>
 

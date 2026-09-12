@@ -149,7 +149,7 @@ export default function RegionEarth() {
           Region: Earth
         </h2>
         <p className="mx-auto mt-3 max-w-2xl text-center text-[14px] leading-relaxed text-muted-foreground">
-          One voice-native gold desk — running close to every session, close to
+          One extension-based gold desk — running close to every session, close to
           the tape.
         </p>
       </div>
@@ -212,7 +212,7 @@ export default function RegionEarth() {
           {
             icon: <Globe className="h-5 w-5" />,
             t: "Runs everywhere",
-            d: "Voice, charts and news in one loop — on desktop, tablet and the extension.",
+            d: "Charts, AI analysis and news in one loop — directly inside TradingView.",
             mobileExtra: "Wherever your workflow takes you.",
           },
           {

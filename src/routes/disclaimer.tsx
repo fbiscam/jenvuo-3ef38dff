@@ -5,7 +5,7 @@ export const Route = createFileRoute("/disclaimer")({
   head: () => ({
     meta: [
       { title: "Risk Disclaimer — Jenvu" },
-      { name: "description", content: "Important risk disclosure for users of Jenvu AI trading analysis, signals and the voice agent. Read before trading." },
+      { name: "description", content: "Important risk disclosure for users of Jenvu AI chart analysis, extension signals and alerts. Read before trading." },
       { property: "og:title", content: "Risk Disclaimer — Jenvu" },
       { property: "og:url", content: "https://jenvu.com/disclaimer" },
     ],
@@ -23,7 +23,7 @@ function DisclaimerPage() {
     >
       <section className="space-y-3">
         <H2>1. Not financial advice</H2>
-        <P>Jenvu is an educational and analytical research tool. Nothing on jenvu.com, the voice agent, the signal desk, articles, or any alert constitutes investment advice, a recommendation to buy or sell, or a solicitation. We are not a registered investment adviser, broker-dealer, or financial planner in any jurisdiction.</P>
+        <P>Jenvu is an educational and analytical research tool. Nothing on jenvu.com, the TradingView extension, the signal desk, articles, or any alert constitutes investment advice, a recommendation to buy or sell, or a solicitation. We are not a registered investment adviser, broker-dealer, or financial planner in any jurisdiction.</P>
       </section>
 
       <section className="space-y-3">

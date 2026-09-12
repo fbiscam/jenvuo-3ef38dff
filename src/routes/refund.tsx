@@ -24,7 +24,7 @@ function RefundPage() {
     >
       <section className="space-y-3">
         <H2>1. Overview</H2>
-        <P>Because Jenvu delivers digital value the moment you use it (voice minutes, signals, AI queries, analysis), refunds are limited by the nature of the service. Please read this policy carefully before purchasing a plan or topping up credits.</P>
+        <P>Because Jenvu delivers digital value the moment you use it (extension queries, signals and AI analysis), refunds are limited by the nature of the service. Please read this policy carefully before purchasing a plan or topping up credits.</P>
       </section>
 
       <section className="space-y-3">
@@ -32,7 +32,7 @@ function RefundPage() {
         <P>This is the core rule of our billing:</P>
         <UL>
           <li>Once <strong>any</strong> credits from a top-up or plan upgrade have been consumed — even a single credit — that payment becomes <strong>non-refundable</strong>.</li>
-          <li>This applies whether credits were spent on the voice agent, A+ signals, AI Engine queries, journal analysis, or any other feature.</li>
+          <li>This applies whether credits were spent on extension queries, A+ signals, AI Engine queries, journal analysis, or any other feature.</li>
           <li>Partial usage does not entitle you to a partial refund. Using the service is considered acceptance of the charge in full.</li>
           <li>Unused credits carry no cash value and are not exchangeable for money.</li>
         </UL>

@@ -101,7 +101,7 @@ function HeroBanners() {
   );
 }
 
-import { Check, Sparkles, Zap, Crown, Minus, Menu, X, Mic, AudioWaveform, PhoneCall, Database, Wifi, Box } from "lucide-react";
+import { Check, Sparkles, Zap, Crown, Minus, Menu, X, Chrome, MessageSquare, ScanLine, Database, Wifi, Box } from "lucide-react";
 
 import xaiLogo from "@/assets/xai-logo.png";
 
@@ -109,16 +109,16 @@ import xaiLogo from "@/assets/xai-logo.png";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Voice Powered Gold Trading Intelligence" },
+      { title: "AI Gold Trading Extension — Jenvu" },
       {
         name: "description",
         content:
-          "Jenvu AI — voice-native gold trading desk narrating live ICT/SMC A+ setups with precision entries, stops and targets across every XAU cross-pair.",
+          "Jenvu is an AI TradingView extension for live ICT/SMC gold analysis with precise entries, stops, targets and mandatory senior review on eligible plans.",
       },
-      { property: "og:title", content: "Voice-Native Gold Trading Intelligence — Jenvu" },
+      { property: "og:title", content: "AI Gold Trading Extension — Jenvu" },
       {
         property: "og:description",
-        content: "Speak. Analyze. Execute. The voice terminal that narrates institutional-grade XAU signals across every major gold cross-pair.",
+        content: "Analyze XAU/USD charts in TradingView with institutional ICT/SMC logic, chart-aware AI and reviewed trade signals.",
       },
       { property: "og:url", content: "https://jenvu.com/" },
       { property: "og:type", content: "website" },
@@ -134,7 +134,7 @@ export const Route = createFileRoute("/")({
           applicationCategory: "FinanceApplication",
           operatingSystem: "Web",
           description:
-            "Voice-native AI gold trading terminal with institutional ICT/SMC analysis for every XAU cross-pair.",
+            "AI TradingView extension with institutional ICT/SMC analysis and reviewed signals for XAU/USD.",
           offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
         }),
       },
@@ -540,7 +540,7 @@ function HomePage() {
                 Free Trial vs. Paid Plans
               </h3>
               <p className="mt-3 text-[15px] leading-relaxed text-zinc-500">
-                Paid plans unlock realtime A+ signals, unlimited voice queries,
+                Paid plans unlock realtime A+ signals, AI chart analysis,
                 and API keys for the browser extension.
               </p>
             </div>
@@ -570,7 +570,7 @@ function HomePage() {
                 {[
                   ["Signals / day", "5"],
                   ["Signal latency", "15 min"],
-                  ["Voice queries", "20 / day"],
+                  ["AI chart queries", "20 / day"],
                 ].map(([k, v]) => (
                   <div key={k} className="flex items-center justify-between rounded-lg border border-dashed border-zinc-300 px-4 py-2.5">
                     <span className="text-[13px] text-zinc-600">{k}</span>
@@ -599,7 +599,7 @@ function HomePage() {
                 {[
                   ["Signals / day", "Unlimited"],
                   ["Signal latency", "Realtime"],
-                  ["Voice queries", "Unlimited"],
+                  ["AI chart queries", "Wallet based"],
                   ["API & Extension", "Included"],
                 ].map(([k, v]) => (
                   <div key={k} className="flex items-center justify-between rounded-lg border border-dashed border-home-accent/50 bg-white px-4 py-2.5">
@@ -662,9 +662,9 @@ function HomePage() {
 
             {/* floating dashed tiles */}
             {[
-              { Icon: Mic, cls: "left-[14%] top-[8%] rotate-12", delay: "0s" },
-              { Icon: AudioWaveform, cls: "left-[8%] top-[27%] -rotate-6", delay: "0.8s" },
-              { Icon: PhoneCall, cls: "left-[21%] top-[32%] -rotate-12", delay: "1.6s" },
+              { Icon: Chrome, cls: "left-[14%] top-[8%] rotate-12", delay: "0s" },
+              { Icon: MessageSquare, cls: "left-[8%] top-[27%] -rotate-6", delay: "0.8s" },
+              { Icon: ScanLine, cls: "left-[21%] top-[32%] -rotate-12", delay: "1.6s" },
               { Icon: Database, cls: "right-[22%] top-[28%] rotate-6", delay: "0.4s" },
               { Icon: Wifi, cls: "right-[8%] top-[9%] rotate-12", delay: "1.2s" },
               { Icon: Box, cls: "right-[5%] top-[35%] -rotate-12", delay: "2s" },
@@ -684,9 +684,9 @@ function HomePage() {
                 Build without boundaries
               </h2>
               <p className="mx-auto mt-6 max-w-[320px] text-[13px] leading-[1.45] text-home-accent-foreground sm:max-w-xl sm:text-sm sm:leading-snug">
-                Your voice agent is one tap away — listening, reasoning, research
+                Your TradingView copilot is one click away — reading, reasoning, research
                 <br className="hidden sm:block" />{" "}
-                &amp; narrating. Speak to the market now, no credit card required.
+                &amp; reviewing. Analyze the market now, no credit card required.
               </p>
               <div className="mx-auto mt-8 flex w-full max-w-[300px] flex-col items-stretch justify-center gap-2 sm:max-w-none sm:flex-row sm:items-center">
                 <Link
@@ -710,7 +710,7 @@ function HomePage() {
               <div className="flex w-max items-center gap-10 whitespace-nowrap" style={{ animation: "jenvu-marquee 28s linear infinite" }}>
                 {Array.from({ length: 2 }).map((_, dup) => (
                   <div key={dup} className="flex items-center gap-10 pr-10 text-xs font-medium text-home-accent-foreground">
-                    <span>◈ Voice agent listening &amp; narrating the market 24/7</span>
+                    <span>◈ TradingView extension analyzing gold charts 24/7</span>
                     <span>◉ Real-time gold signals without surprises</span>
                     <span>⌁ Research, reasoning &amp; risk context in one terminal</span>
                     <span>▣ Battle-tested feeds powering desks worldwide</span>

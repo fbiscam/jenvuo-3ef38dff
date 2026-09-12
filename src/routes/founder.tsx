@@ -10,9 +10,9 @@ export const Route = createFileRoute("/founder")({
   head: () => ({
     meta: [
       { title: "Haseeb Ijaz — Founder of Jenvu" },
-      { name: "description", content: "Meet Haseeb Ijaz, founder of Jenvu. At 21, he built a voice-native gold trading intelligence desk powered by ICT, SMC and AI." },
+      { name: "description", content: "Meet Haseeb Ijaz, founder of Jenvu. At 21, he built an AI gold trading extension powered by ICT, SMC and reviewed chart analysis." },
       { property: "og:title", content: "Haseeb Ijaz — Founder of Jenvu" },
-      { property: "og:description", content: "At 21, Haseeb Ijaz founded Jenvu to turn institutional gold trading logic into a voice-first AI any serious trader can use." },
+      { property: "og:description", content: "At 21, Haseeb Ijaz founded Jenvu to bring institutional gold trading logic directly into every serious trader's chart workflow." },
       { property: "og:url", content: "https://jenvu.com/founder" },
       { property: "og:type", content: "profile" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -29,9 +29,9 @@ const FOUNDING_STORY = {
   tagline: "Built for traders who refuse to guess.",
   bio: [
     "Haseeb Ijaz started Jenvu at age 21 with a single conviction: institutional-grade gold analysis should not be locked behind a Bloomberg terminal or a Wall Street desk.",
-    "He spent years dissecting ICT, SMC, liquidity engineering and market structure across XAU/USD and every major gold cross-pair. The patterns were repeatable, but the execution tools were fragmented. So he built the desk he wished he had at 18 — voice-native, AI-augmented, and ruthlessly honest about risk.",
+    "He spent years dissecting ICT, SMC, liquidity engineering and market structure across XAU/USD and every major gold cross-pair. The patterns were repeatable, but the execution tools were fragmented. So he built the chart extension he wished he had at 18 — AI-augmented and ruthlessly honest about risk.",
     "Beyond the terminal, Haseeb has sharpened 25 proprietary skills and techniques spanning market research, product marketing, community building and AI-driven growth. That same research discipline is why Jenvu learns faster with every scan.",
-    "Today, Jenvu combines those 25 disciplines into a single terminal that speaks in real time, draws institutional logic on the chart, and tells traders exactly when to step aside.",
+    "Today, Jenvu combines those 25 disciplines into a single extension that reads charts in real time, draws institutional logic, and tells traders exactly when to step aside.",
   ],
 };
 
@@ -40,7 +40,7 @@ function FounderPage() {
   return (
     <PageShell
       eyebrow="Founder"
-      title={"The founder behind\nthe voice terminal."}
+      title={"The founder behind\nthe trading extension."}
       intro="Haseeb Ijaz started Jenvu at 21 to give independent traders the same structural edge that institutional desks have used for decades."
     >
       {/* Profile Card */}
@@ -62,7 +62,7 @@ function FounderPage() {
               </div>
               <div>
                 <p className="text-sm font-semibold text-zinc-900">Founded at age {FOUNDING_STORY.foundedAge}</p>
-                <p className={`text-xs text-zinc-500 ${MONO} uppercase tracking-wider`}>Jenvu · Voice Trading Desk</p>
+                <p className={`text-xs text-zinc-500 ${MONO} uppercase tracking-wider`}>Jenvu · AI Trading Extension</p>
               </div>
             </div>
             <div className="flex items-center gap-3 rounded-xl border border-amber-100 bg-amber-50 px-4 py-3">
