@@ -196,7 +196,9 @@ async function singleAttempt(
   //   `unikey/*`     → GetUniKey (OpenAI-compatible)
   //   `evolink/*`    → Evolink direct API (OpenAI-compatible)
   //   `dsofficial/*` → DeepSeek official API (OpenAI-compatible)
+  //   `jw/*`         → JustWoker (Anthropic-style /v1/messages)
   //   else           → Lovable AI Gateway
+  if (model.startsWith("jw/")) return callJustwoker(model, opts);
   const isBlackbox = model.startsWith("blackboxai/");
   const isNvidia = model.startsWith("nvapi/");
   const isBmind = model.startsWith("bmind/");
