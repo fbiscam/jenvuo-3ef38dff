@@ -1,7 +1,8 @@
 import { createStart, createMiddleware } from "@tanstack/react-start";
 
 import { renderErrorPage } from "./lib/error-page";
-import { attachSupabaseAuth } from "@/integrations/supabase/auth-attacher";
+// Project-specific attacher (refreshes expiring sessions) replaces the generated one.
+import { attachFreshSupabaseAuth } from "@/lib/supabase-bearer";
 
 const errorMiddleware = createMiddleware().server(async ({ request, next }) => {
   // /lovable/* routes (webhooks, cron callbacks, email queue) authenticate themselves
@@ -25,6 +26,6 @@ const errorMiddleware = createMiddleware().server(async ({ request, next }) => {
 });
 
 export const startInstance = createStart(() => ({
-  functionMiddleware: [attachSupabaseAuth],
+  functionMiddleware: [attachFreshSupabaseAuth],
   requestMiddleware: [errorMiddleware],
 }));
