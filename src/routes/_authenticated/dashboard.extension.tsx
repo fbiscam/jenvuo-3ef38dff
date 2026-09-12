@@ -184,7 +184,7 @@ function ExtensionPage() {
 
       {!loading && access && capabilities.extensionAi && !capabilities.seniorReview && (
         <div className="mt-5 rounded-lg border border-blue-200 bg-blue-50 p-4 text-[13px] text-blue-900">
-          Your Pro plan includes GPT-6 Astra primary analysis for XAU/USD. Elite or Ultra unlocks multi-pair scanning and mandatory senior review.
+          Your Pro plan includes GPT-5.6 Sol primary analysis for XAU/USD. Elite or Ultra unlocks multi-pair scanning and mandatory senior review.
         </div>
       )}
 

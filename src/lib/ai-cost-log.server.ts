@@ -128,6 +128,7 @@ export function formatModelLabel(rawModel: string | null | undefined): string {
   if (bare.startsWith("claude")) return "Claude";
   if (bare.startsWith("gpt-5.6-sol")) return "ChatGPT 5.6 Sol";
   if (bare.startsWith("gpt-5.6-luna")) return "ChatGPT 5.6 Luna";
+  if (bare.startsWith("gpt-5.6-terra")) return "ChatGPT 5.6 Terra";
   if (bare.startsWith("gpt-5.6")) return "ChatGPT 5.6";
   if (bare.startsWith("gpt-5.5-pro")) return "ChatGPT 5.5 Pro";
   if (bare.startsWith("gpt-5.5")) return "ChatGPT 5.5";

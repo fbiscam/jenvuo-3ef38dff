@@ -256,17 +256,17 @@ async function handle({ request }: { request: Request }) {
               role: 'system',
                content: 'Senior ICT/SMC reviewer. Audit live levels, HTF/LTF alignment, sweep, displacement, fresh POI and minimum 1:2 RR. Return a corrected concise answer. If incomplete, return WAIT. Never promise profit.',
             },
-            { role: 'user', content: `Live:\n${reviewContext}\nAsk: ${question.slice(0, 300)}\nGPT-6 Astra primary analysis:\n${primary.content.slice(0, 900)}` },
+            { role: 'user', content: `Live:\n${reviewContext}\nAsk: ${question.slice(0, 300)}\nGPT-5.6 Sol primary analysis:\n${primary.content.slice(0, 900)}` },
           ],
         }) : null
       // Elite and Ultra only expose the validated senior response. Pro returns
-      // its completed GPT-6 Astra primary analysis without a second pass.
+      // its completed GPT-5.6 Sol primary analysis without a second pass.
       if (review) {
         content = review.content
         seniorReview = { included: true, model: review.model, status: 'completed' }
       }
 
-      // The senior review is the second pass: GPT-6 Astra analyzes first,
+      // The senior review is the second pass: GPT-5.6 Sol analyzes first,
        // then Claude Opus 4.8 (or Grok 4.6 fallback) independently audits and
        // finalizes the answer. A failed review aborts the request above.
       const secondReview = review
