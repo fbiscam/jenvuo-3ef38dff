@@ -20,3 +20,7 @@
 - [x] Rework pricing around token wallets and plan-specific API limits
 - [x] Limit Pro to primary AI; reserve mandatory senior review for Elite and Ultra
 - [x] Verify pricing, extension billing, and TypeScript
+- [x] Securely connect Evolink and verify its live model catalog
+- [x] Add tested Evolink GPT-6 Astra primary and Claude Opus 5 senior-review routing
+- [x] Add Evolink token pricing, labels, fallbacks, and provider error handling
+- [x] Verify the integrated Evolink path and extension checks
