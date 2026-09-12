@@ -1087,7 +1087,7 @@ function AuthPage() {
                       <form onSubmit={sendResetLink} className="mt-4 space-y-3">
                         <div className={`rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-[13px] text-zinc-700 ${MONO}`}>
                           <p className="leading-relaxed">
-                            Enter your email. We'll send a 6-digit reset code.
+                            &nbsp; &nbsp; We'll send a 6-digit reset code.
                           </p>
                         </div>
                         <div>
