@@ -107,6 +107,7 @@ export type UsageInfo = { promptTokens: number; completionTokens: number; totalT
 async function callJustwoker(
   model: string,
   opts: CallChatOptions,
+  signal?: AbortSignal,
 ): Promise<{ content: string; usage: UsageInfo }> {
   const key = process.env.JUSTWOKER_API_KEY;
   if (!key) throw new AiGatewayError("JUSTWOKER_API_KEY missing on server", 0, true);
@@ -138,6 +139,7 @@ async function callJustwoker(
 
   const res = await fetch("https://api.justwoker.icu/v1/messages", {
     method: "POST",
+    ...(signal ? { signal } : {}),
     headers: {
       "Content-Type": "application/json",
       "x-api-key": key,
@@ -187,6 +189,30 @@ async function singleAttempt(
   model: string,
   opts: CallChatOptions,
   apiKey: string | undefined,
+  timeoutMs?: number,
+): Promise<{ content: string; usage: UsageInfo }> {
+  // Per-request wall clock. Without it a provider that accepts the connection
+  // and never answers blocks the await forever, so the retry/fallback chain
+  // never runs and the scan "hangs" with no result.
+  const ac = timeoutMs && timeoutMs > 0 ? new AbortController() : null;
+  const timer = ac ? setTimeout(() => ac.abort(), timeoutMs) : null;
+  try {
+    return await singleAttemptInner(model, opts, apiKey, ac?.signal);
+  } catch (err: any) {
+    if (ac?.signal.aborted) {
+      throw new AiGatewayError("Server busy — please try again in a moment.", 0, false);
+    }
+    throw err;
+  } finally {
+    if (timer) clearTimeout(timer);
+  }
+}
+
+async function singleAttemptInner(
+  model: string,
+  opts: CallChatOptions,
+  apiKey: string | undefined,
+  signal?: AbortSignal,
 ): Promise<{ content: string; usage: UsageInfo }> {
   // Route by prefix:
   //   `blackboxai/*` → Blackbox API
@@ -198,7 +224,7 @@ async function singleAttempt(
   //   `dsofficial/*` → DeepSeek official API (OpenAI-compatible)
   //   `jw/*`         → JustWoker (Anthropic-style /v1/messages)
   //   else           → Lovable AI Gateway
-  if (model.startsWith("jw/")) return callJustwoker(model, opts);
+  if (model.startsWith("jw/")) return callJustwoker(model, opts, signal);
   const isBlackbox = model.startsWith("blackboxai/");
   const isNvidia = model.startsWith("nvapi/");
   const isBmind = model.startsWith("bmind/");
@@ -333,6 +359,7 @@ async function singleAttempt(
   let res: Response;
   try {
     res = await fetch(endpoint, {
+      ...(signal ? { signal } : {}),
       method: "POST",
       headers,
       body: JSON.stringify(body),
@@ -438,7 +465,12 @@ export async function callChatCompletion(opts: CallChatOptions): Promise<{ conte
         throw lastErr ?? new AiGatewayError("Server busy — please try again in a moment.", 0, false);
       }
       try {
-        const { content, usage } = await singleAttempt(model, opts, apiKey);
+        const { content, usage } = await singleAttempt(
+          model,
+          opts,
+          apiKey,
+          Math.max(5000, Math.min(timeoutMs, remaining())),
+        );
         const validation = opts.validateContent?.(content, model) ?? true;
         if (validation !== true) {
           lastErr = new AiGatewayError(validation, 422, true);

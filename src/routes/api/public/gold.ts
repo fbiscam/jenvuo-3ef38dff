@@ -219,7 +219,7 @@ async function handle({ request }: { request: Request }) {
       const primary = await callChatCompletion({
         models: [...(image ? EXTENSION_MODEL_CHAIN.vision : EXTENSION_MODEL_CHAIN.reasoning)],
         stage: image ? 'extension-screen-analysis' : 'extension-chat',
-        maxTokens: 320,
+        maxTokens: 900,
         timeoutMs: 45_000,
         deadlineMs: 50_000,
         retriesPerModel: 1,
@@ -246,7 +246,7 @@ async function handle({ request }: { request: Request }) {
       const review = requiresSeniorReview ? await callChatCompletion({
           models: [...EXTENSION_MODEL_CHAIN.seniorReview],
           stage: 'extension-senior-review',
-          maxTokens: 450,
+          maxTokens: 800,
           timeoutMs: 45_000,
           deadlineMs: 50_000,
           retriesPerModel: 1,
@@ -256,7 +256,7 @@ async function handle({ request }: { request: Request }) {
               role: 'system',
                content: 'Senior ICT/SMC reviewer. Audit live levels, HTF/LTF alignment, sweep, displacement, fresh POI and minimum 1:2 RR. Return a corrected concise answer. If incomplete, return WAIT. Never promise profit.',
             },
-            { role: 'user', content: `Live:\n${reviewContext}\nAsk: ${question.slice(0, 300)}\nGPT-5.6 Sol primary analysis:\n${primary.content.slice(0, 900)}` },
+            { role: 'user', content: `Live:\n${reviewContext}\nAsk: ${question.slice(0, 300)}\nGPT-5.6 Sol primary analysis:\n${primary.content.slice(0, 2400)}` },
           ],
         }) : null
       // Elite and Ultra only expose the validated senior response. Pro returns
