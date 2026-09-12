@@ -139,6 +139,7 @@ async function callJustwoker(
 
   const res = await fetch("https://api.justwoker.icu/v1/messages", {
     method: "POST",
+    ...(signal ? { signal } : {}),
     headers: {
       "Content-Type": "application/json",
       "x-api-key": key,
@@ -188,6 +189,30 @@ async function singleAttempt(
   model: string,
   opts: CallChatOptions,
   apiKey: string | undefined,
+  timeoutMs?: number,
+): Promise<{ content: string; usage: UsageInfo }> {
+  // Per-request wall clock. Without it a provider that accepts the connection
+  // and never answers blocks the await forever, so the retry/fallback chain
+  // never runs and the scan "hangs" with no result.
+  const ac = timeoutMs && timeoutMs > 0 ? new AbortController() : null;
+  const timer = ac ? setTimeout(() => ac.abort(), timeoutMs) : null;
+  try {
+    return await singleAttemptInner(model, opts, apiKey, ac?.signal);
+  } catch (err: any) {
+    if (ac?.signal.aborted) {
+      throw new AiGatewayError("Server busy — please try again in a moment.", 0, false);
+    }
+    throw err;
+  } finally {
+    if (timer) clearTimeout(timer);
+  }
+}
+
+async function singleAttemptInner(
+  model: string,
+  opts: CallChatOptions,
+  apiKey: string | undefined,
+  signal?: AbortSignal,
 ): Promise<{ content: string; usage: UsageInfo }> {
   // Route by prefix:
   //   `blackboxai/*` → Blackbox API
