@@ -132,7 +132,7 @@
   --chart-3: oklch(0.72 0.17 60);                /* orange */
   --chart-4: oklch(0.78 0.16 95);                /* yellow */
   --chart-5: oklch(0.55 0.18 330);               /* reddish purple */
-  --sidebar: oklch(0.984 0.003 247.858);
+  --sidebar: #f0f5fe;
   --sidebar-foreground: oklch(0.145 0.02 264);
   --sidebar-primary: oklch(0.208 0.042 265.755);
   --sidebar-primary-foreground: oklch(0.984 0.003 247.858);
