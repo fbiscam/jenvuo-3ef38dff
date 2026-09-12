@@ -848,7 +848,7 @@ function AuthPage() {
                         </p>
                       </div>
                       <div>
-                        <label className={`block text-[11px] font-bold uppercase tracking-widest text-zinc-500 mb-1 ${MONO}`}>
+                        <label className="mb-2 block text-[14px] font-medium text-zinc-900">
                           Authenticator Code
                         </label>
                         <input
@@ -927,7 +927,7 @@ function AuthPage() {
                           </p>
                         </div>
                         <div>
-                          <label className={`block text-[11px] font-bold uppercase tracking-widest text-zinc-500 mb-1 ${MONO}`}>
+                          <label className="mb-2 block text-[14px] font-medium text-zinc-900">
                             Verification Code
                           </label>
                           <input
@@ -995,7 +995,7 @@ function AuthPage() {
 
 
                         <div>
-                          <label className={`block text-[11px] font-bold uppercase tracking-widest text-zinc-500 mb-1 ${MONO}`}>
+                          <label className="mb-2 block text-[14px] font-medium text-zinc-900">
                             Full Name
                           </label>
                           <div className="relative">
@@ -1014,7 +1014,7 @@ function AuthPage() {
                         </div>
 
                         <div>
-                          <label className={`block text-[11px] font-bold uppercase tracking-widest text-zinc-500 mb-1 ${MONO}`}>
+                          <label className="mb-2 block text-[14px] font-medium text-zinc-900">
                             Email
                           </label>
                           <div className="relative">
@@ -1034,7 +1034,7 @@ function AuthPage() {
                         </div>
 
                         <div>
-                          <label className={`block text-[11px] font-bold uppercase tracking-widest text-zinc-500 mb-1 ${MONO}`}>
+                          <label className="mb-2 block text-[14px] font-medium text-zinc-900">
                             Password
                           </label>
                           <div className="relative">
@@ -1091,7 +1091,7 @@ function AuthPage() {
                           </p>
                         </div>
                         <div>
-                          <label className={`block text-[11px] font-bold uppercase tracking-widest text-zinc-500 mb-1 ${MONO}`}>
+                          <label className="mb-2 block text-[14px] font-medium text-zinc-900">
                             Email
                           </label>
                           <div className="relative">
@@ -1141,7 +1141,7 @@ function AuthPage() {
                           </p>
                         </div>
                         <div>
-                          <label className={`block text-[11px] font-bold uppercase tracking-widest text-zinc-500 mb-1 ${MONO}`}>
+                          <label className="mb-2 block text-[14px] font-medium text-zinc-900">
                             Verification Code
                           </label>
                           <input
@@ -1212,7 +1212,7 @@ function AuthPage() {
                           </p>
                         </div>
                         <div>
-                          <label className={`block text-[11px] font-bold uppercase tracking-widest text-zinc-500 mb-1 ${MONO}`}>
+                          <label className="mb-2 block text-[14px] font-medium text-zinc-900">
                             New Password
                           </label>
                           <div className="relative">
