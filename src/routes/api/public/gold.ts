@@ -3,6 +3,7 @@ import { authenticateExtensionRequest, extJson, EXT_CORS_HEADERS } from '@/lib/e
 import { resolveInstrument, fetchInstrumentCandles, fetchLiveInstrumentTick } from '@/lib/gold-analysis.functions'
 import { analyzeTF, buildLiquidityPools } from '@/lib/analysis/engine'
 import { callChatCompletion, EXTENSION_MODEL_CHAIN, type ChatContentPart } from '@/lib/ai-gateway'
+import { isGoldSymbol } from '@/lib/plan-entitlements'
 
 type Body = {
   action?: 'snapshot' | 'chat'
@@ -197,6 +198,15 @@ async function handle({ request }: { request: Request }) {
           secondReview: { included: false, model: null, status: 'not_required' },
           usage: { requestId, charged: casualBilling.charged, balance: casualBilling.balance },
         })
+      }
+
+      if (!entitlement.capabilities.multiPairScanner && !isGoldSymbol(symbol)) {
+        return extJson({
+          ok: false,
+          code: 'FEATURE_LOCKED',
+          feature: 'multi_pair_scanner',
+          error: `Your ${entitlement.plan === 'pro' ? 'Pro' : 'current'} plan includes XAU/USD analysis. Upgrade to Elite or Ultra to analyze other pairs.`,
+        }, 403)
       }
 
       const userContent: string | ChatContentPart[] = image

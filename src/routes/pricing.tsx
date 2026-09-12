@@ -16,9 +16,9 @@ export const Route = createFileRoute("/pricing")({
   head: () => ({
     meta: [
       { title: "Pricing Plans — Jenvu" },
-      { name: "description", content: "Compare Jenvu plans, extension API key limits, monthly AI wallets, and senior-reviewed GPT/Gemini market analysis." },
+      { name: "description", content: "Compare Jenvu plans, extension API key limits, monthly AI wallets, and senior-reviewed GPT/Claude market analysis." },
       { property: "og:title", content: "Jenvu Pricing — Pro & Elite Plans" },
-      { property: "og:description", content: "Compare Jenvu plans with extension API keys, AI wallets, and senior-reviewed GPT/Gemini market analysis." },
+      { property: "og:description", content: "Compare Jenvu plans with extension API keys, AI wallets, and senior-reviewed GPT/Claude market analysis." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { property: "og:url", content: "https://jenvu.com/pricing" },
@@ -88,7 +88,7 @@ const TIERS = [
       "Dedicated XAU/USD scanner with DXY overlay",
       "API access & webhooks",
       "3 extension API keys · $40 AI wallet",
-      "Claude Opus 4.8 mandatory senior review",
+      "Claude Opus 5 mandatory senior review",
       "Custom alert rules",
       "Dedicated onboarding & SLA",
     ],
@@ -230,7 +230,7 @@ function PricingPage() {
                 { f: "Monthly AI wallet", b: "$10", c: "$40", d: "$90" },
                 { f: "Active extension API keys", b: "2", c: "3", d: "5" },
                 { f: "GPT-6 Astra primary analysis", b: true, c: true, d: true },
-                { f: "Claude Opus 4.8 senior review", b: false, c: true, d: true },
+                { f: "Claude Opus 5 senior review", b: false, c: true, d: true },
                 { f: "GPT-6 input capacity", b: "Up to 2M tokens", c: "Up to 8M tokens", d: "Up to 18M tokens" },
                 { f: "GPT-6 output capacity", b: "Up to 400K tokens", c: "Up to 1.6M tokens", d: "Up to 3.6M tokens" },
                 { f: "Claude review input capacity", b: false, c: "Up to 16M tokens", d: "Up to 36M tokens" },
@@ -290,7 +290,7 @@ function PricingPage() {
                           </span>
                           {(v === "__MODELS__" || v === "__MODELS_PLUS__") && (
                             <span className="inline-flex items-center gap-1 rounded-md border border-zinc-200 bg-white px-1.5 py-0.5">
-                               <span className="text-[10px] font-medium text-zinc-800 whitespace-nowrap">Claude Opus 4.8</span>
+                             <span className="text-[10px] font-medium text-zinc-800 whitespace-nowrap">Claude Opus 5</span>
                               
                             </span>
                           )}
@@ -317,7 +317,7 @@ function PricingPage() {
           <div>
             
             <h2 className="mt-2 text-2xl sm:text-3xl font-semibold tracking-tight">Need more wallet balance?</h2>
-            <p className="mt-2 max-w-xl text-sm text-zinc-600 lg:max-w-none lg:whitespace-nowrap">Live market data is free. Pro uses GPT-6 Astra; Elite and Ultra add a mandatory Claude Opus 4.8 review. AI is billed at 50% of published token rates.</p>
+             <p className="mt-2 max-w-xl text-sm text-zinc-600 lg:max-w-none lg:whitespace-nowrap">Live market data is free. Pro uses GPT-6 Astra; Elite and Ultra add a mandatory Claude Opus 5 review. AI is billed at 50% of published token rates.</p>
           </div>
         </div>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">

@@ -11,6 +11,7 @@ import {
   type ExtensionKeyRow,
   type ExtensionKeyAccess,
 } from "@/lib/extension-keys.functions";
+import { getPlanCapabilities } from "@/lib/plan-entitlements";
 
 const MONO = "font-['JetBrains_Mono',ui-monospace,monospace]";
 
@@ -143,6 +144,7 @@ function ExtensionPage() {
     .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
     .slice(0, 4);
   const canCreate = Boolean(access?.active && access.plan !== "free" && activeKeys.length < access.keyLimit);
+  const capabilities = getPlanCapabilities(access?.active ? access.plan : "free");
 
   return (
     <div className="w-full px-1 py-2 sm:px-2 sm:py-4">
@@ -171,6 +173,18 @@ function ExtensionPage() {
           <div><div className="text-[11px] text-zinc-500">Plan</div><div className="mt-1 text-sm font-medium text-zinc-900">{access.planName}</div></div>
           <div><div className="text-[11px] text-zinc-500">Active API keys</div><div className="mt-1 text-sm font-medium tabular-nums text-zinc-900">{activeKeys.length} / {access.keyLimit}</div></div>
           <div><div className="text-[11px] text-zinc-500">AI wallet</div><div className={`mt-1 text-sm font-medium tabular-nums ${access.balance < 0.02 ? "text-rose-600" : "text-zinc-900"}`}>${access.balance.toFixed(2)} / ${access.wallet.toFixed(2)}</div></div>
+        </div>
+      )}
+
+      {!loading && access && !capabilities.extensionAi && (
+        <div className="mt-5 rounded-lg border border-amber-200 bg-amber-50 p-4 text-[13px] text-amber-900">
+          Extension AI is not included in your current plan. Upgrade to Pro, Elite, or Ultra to create keys and use AI analysis.
+        </div>
+      )}
+
+      {!loading && access && capabilities.extensionAi && !capabilities.seniorReview && (
+        <div className="mt-5 rounded-lg border border-blue-200 bg-blue-50 p-4 text-[13px] text-blue-900">
+          Your Pro plan includes GPT-6 Astra primary analysis for XAU/USD. Elite or Ultra unlocks multi-pair scanning and mandatory senior review.
         </div>
       )}
 
@@ -379,13 +393,13 @@ function ExtensionPage() {
               <X className="h-4 w-4" />
             </button>
           </div>
-          <p className="mt-3 text-[12px] leading-relaxed text-zinc-600">Live snapshots are free. AI chat and analysis are billed per token at 50% of published rates. Senior review is included on Elite and Ultra.</p>
+          <p className="mt-3 text-[12px] leading-relaxed text-zinc-600">AI chat and analysis are billed per token at 50% of published rates. Pro includes primary XAU/USD analysis; Elite and Ultra add multi-pair scanning and mandatory senior review.</p>
           <ol className="mt-3 space-y-2 text-[13px] leading-relaxed text-zinc-700">
             <li>1. Download the extension package above and unzip it.</li>
             <li>2. Open <span className={`${MONO} rounded bg-white px-1.5 py-0.5 text-[12px]`}>chrome://extensions</span>, turn on Developer mode.</li>
             <li>3. Click <span className="font-medium">Load unpacked</span> and select the unzipped folder.</li>
             <li>4. Open the Jenvu icon, paste your API key and press <span className="font-medium">Connect</span>.</li>
-            <li>5. Press <span className="font-medium">Analyze XAU/USD</span> for a live ICT/SMC read with AI second review.</li>
+            <li>5. Press <span className="font-medium">Analyze XAU/USD</span> for a live ICT/SMC read. Senior review appears automatically when your plan includes it.</li>
           </ol>
           <div className={`${MONO} mt-4 space-y-1 rounded-lg border border-zinc-200 bg-white p-3 text-[12px] text-zinc-700`}>
             <div>POST {origin}/api/public/extension/verify</div>

@@ -17,7 +17,7 @@ export function useCurrentPlan() {
         .eq("user_id", u.user.id)
         .maybeSingle();
       if (!mounted) return;
-      if (data && data.status === "active") setPlan(data.plan_id);
+      if (data && (data.status === "active" || data.status === "trialing")) setPlan(data.plan_id);
       else setPlan(null);
     };
     load();

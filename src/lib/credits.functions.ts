@@ -90,7 +90,8 @@ export const getCreditState = createServerFn({ method: "GET" })
 
     // Fetch plan row separately to avoid PostgREST embed edge-cases
     // (array vs object, null on join). Falls back to Free defaults.
-    const planId = (sub?.plan_id as string | null) ?? "free";
+    const subscriptionActive = sub?.status === "active" || sub?.status === "trialing";
+    const planId = subscriptionActive ? ((sub?.plan_id as string | null) ?? "free") : "free";
     const { data: planRow } = await supabase
       .from("plans")
       .select("id, name, price_usd, wallet_usd, monthly_credits, feature_journal, feature_realtime_alerts, feature_full_ict, feature_scanner")
@@ -116,6 +117,8 @@ export const getCreditState = createServerFn({ method: "GET" })
     }
 
     const plan = (planRow as any) ?? { id: "free", name: "Free", price_usd: 0, wallet_usd: 1.00, feature_journal: false, feature_realtime_alerts: false, feature_full_ict: false, feature_scanner: false };
+    const { getPlanCapabilities } = await import("@/lib/plan-entitlements");
+    const capabilities = getPlanCapabilities(planId);
     const walletUsd = Number(plan.wallet_usd ?? 0);
 
     const trialEndsAt = (sub as any)?.trial_ends_at as string | null | undefined;
@@ -136,7 +139,7 @@ export const getCreditState = createServerFn({ method: "GET" })
         journal: !!plan.feature_journal,
         realtime_alerts: !!plan.feature_realtime_alerts,
         full_ict: !!plan.feature_full_ict,
-        scanner: !!plan.feature_scanner,
+        scanner: capabilities.multiPairScanner,
       },
       balance: Number(bal?.balance ?? 0),
       allowance: Number(bal?.monthly_allowance ?? walletUsd),
