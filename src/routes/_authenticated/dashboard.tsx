@@ -1654,7 +1654,7 @@ function VoiceAgentHistory() {
         </span>
         <button
           onClick={async () => {
-            if (!confirm("Clear all voice history?")) return;
+            if (!confirm("Clear all AI chat history?")) return;
             clearVoiceHistory();
             try {
               const { clearVoiceTurns } = await import("@/lib/voice-history.functions");

@@ -613,7 +613,7 @@ function StatusPill({ status, supported, dark }: { status: "idle" | "listening" 
         {s.pulse && <span className={cn("absolute inline-flex h-full w-full rounded-full opacity-70 animate-ping", s.dot)} />}
         <span className={cn("relative inline-flex h-2 w-2 rounded-full", s.dot)} />
       </span>
-      <span>Voice</span>
+      <span>Audio</span>
       <span className="opacity-50">·</span>
       <span>{s.label}</span>
     </div>
@@ -744,7 +744,7 @@ function VoicePicker({ value, onChange }: { value: VoicePresetKey; onChange: (k:
           "h-9 w-9 rounded-full flex items-center justify-center transition",
           open ? "bg-black text-white" : "hover:bg-black/5 text-neutral-600",
         )}
-        aria-label="Voice settings"
+        aria-label="Audio settings"
       >
         <Sliders className="h-4 w-4" />
       </button>

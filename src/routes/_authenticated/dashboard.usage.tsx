@@ -36,7 +36,7 @@ const REASON_LABEL: Record<string, string> = {
   signal: "Signal scan",
   ict_narration: "ICT narration",
   alert: "Alert broadcast",
-  voice_query: "Voice query",
+  voice_query: "AI chat query",
   monthly_reset: "Monthly reset",
   monthly_grant: "Monthly wallet",
   plan_change: "Plan change",

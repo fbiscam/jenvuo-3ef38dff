@@ -89,7 +89,7 @@ const DESKS: Desk[] = [
     brandClass: "td-brand-trustwallet",
     avatar: face5,
     quote:
-      "Red-folder news, DXY and the London fix all land in the same voice loop. Our XAU desk finally works from one narrative.",
+      "Red-folder news, DXY and the London fix all land in the same analysis loop. Our XAU desk finally works from one view.",
     author: "Tomas Weber",
     role: "Market Strategist, Trust Wallet",
     performance: [19, 23, 28, 26, 35, 42, 49, 54, 62, 68, 79, 87],

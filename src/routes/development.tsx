@@ -5,7 +5,7 @@ export const Route = createFileRoute("/development")({
   head: () => ({
     meta: [
       { title: "Engineering — Jenvu" },
-      { name: "description", content: "The stack, architecture and engineering principles powering the Jenvu voice trading agent and A+ signal engine." },
+      { name: "description", content: "The stack, architecture and engineering principles powering the Jenvu TradingView extension and A+ signal engine." },
       { property: "og:title", content: "Development & Engineering — Jenvu" },
       { property: "og:url", content: "https://jenvu.com/development" },
     ],
@@ -19,7 +19,7 @@ function DevPage() {
     <PageShell
       eyebrow="Engineering"
       title="How JENVU Is Built"
-      intro="A modern, edge-rendered, type-safe stack tuned for sub-second voice latency and reliable signal generation."
+      intro="A modern, edge-rendered, type-safe stack tuned for fast extension analysis and reliable signal generation."
     >
       <section className="space-y-3">
         <H2>Frontend</H2>
@@ -31,11 +31,11 @@ function DevPage() {
         </UL>
       </section>
       <section className="space-y-3">
-        <H2>Voice Layer</H2>
+        <H2>Extension Layer</H2>
         <P>
-          The Web Speech API powers low-latency speech-to-text and text-to-speech directly
-          in the browser. Word-boundary events drive the orb's pulsing animation so the
-          agent feels alive while it speaks.
+          The browser extension reads the active TradingView chart and packages the
+          visible market context for analysis. The side panel keeps chat, chart review
+          and signal results together without interrupting the trader's workflow.
         </P>
       </section>
       <section className="space-y-3">
@@ -59,8 +59,8 @@ function DevPage() {
         <UL>
           <li>Type safety from route params to server-function payloads.</li>
           <li>Schema-bound LLM outputs — the UI never trusts free-form text.</li>
-          <li>Honest defaults — when uncertainty is high, the agent stands aside.</li>
-          <li>Performance budget: speak in under one second.</li>
+          <li>Honest defaults — when uncertainty is high, the engine stands aside.</li>
+          <li>Performance budget: acknowledge requests in under one second.</li>
         </UL>
       </section>
     </PageShell>

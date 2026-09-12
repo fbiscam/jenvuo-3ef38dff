@@ -25,7 +25,7 @@ export type Collection = {
   // Lucide icon name kept as string label so we map on render
   icon:
     | "Compass"
-    | "Mic"
+    | "Puzzle"
     | "LineChart"
     | "CreditCard"
     | "Shield"
