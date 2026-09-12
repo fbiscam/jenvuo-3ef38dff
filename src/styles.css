@@ -823,7 +823,7 @@ html[data-pwa="1"] .pwa-tabbar {
 
 /* ====== Dashboard Sidebar: plain full-height ====== */
 .dashboard-sidebar-root {
-  background-color: #ffffff !important;
+  background-color: var(--sidebar) !important;
 }
 .dashboard-sidebar-root .sidebar-group-label,
 .dashboard-sidebar-root nav > div > div:first-child {
