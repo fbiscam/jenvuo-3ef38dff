@@ -224,7 +224,7 @@ async function singleAttemptInner(
   //   `dsofficial/*` → DeepSeek official API (OpenAI-compatible)
   //   `jw/*`         → JustWoker (Anthropic-style /v1/messages)
   //   else           → Lovable AI Gateway
-  if (model.startsWith("jw/")) return callJustwoker(model, opts);
+  if (model.startsWith("jw/")) return callJustwoker(model, opts, signal);
   const isBlackbox = model.startsWith("blackboxai/");
   const isNvidia = model.startsWith("nvapi/");
   const isBmind = model.startsWith("bmind/");
@@ -359,6 +359,7 @@ async function singleAttemptInner(
   let res: Response;
   try {
     res = await fetch(endpoint, {
+      ...(signal ? { signal } : {}),
       method: "POST",
       headers,
       body: JSON.stringify(body),
@@ -464,7 +465,12 @@ export async function callChatCompletion(opts: CallChatOptions): Promise<{ conte
         throw lastErr ?? new AiGatewayError("Server busy — please try again in a moment.", 0, false);
       }
       try {
-        const { content, usage } = await singleAttempt(model, opts, apiKey);
+        const { content, usage } = await singleAttempt(
+          model,
+          opts,
+          apiKey,
+          Math.max(5000, Math.min(timeoutMs, remaining())),
+        );
         const validation = opts.validateContent?.(content, model) ?? true;
         if (validation !== true) {
           lastErr = new AiGatewayError(validation, 422, true);
