@@ -30,4 +30,4 @@
 - [x] Verify plan enforcement, extension package, and TypeScript
 - [x] Restrict dashboard senior review to Elite and Ultra
 - [x] Prevent inactive subscriptions from inheriting paid feature flags
-- [ ] Run final TypeScript and entitlement consistency checks
+- [x] Run final TypeScript and entitlement consistency checks
