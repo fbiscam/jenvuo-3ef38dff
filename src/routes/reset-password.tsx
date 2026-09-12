@@ -90,107 +90,136 @@ function ResetPasswordPage() {
     setTimeout(() => navigate({ to: "/auth" }), 1200);
   };
 
+  const MONO = "font-mono";
+
   return (
-    <main className="min-h-screen bg-zinc-50 flex items-center justify-center px-4 py-12" style={{ fontFamily: '"Google Sans", "Google Sans Text", system-ui, -apple-system, sans-serif' }}>
-      <div className="w-full max-w-md rounded-xl border border-zinc-200 bg-white p-6 sm:p-8 shadow-sm">
-        <h1 className="text-xl font-semibold text-zinc-900">Reset your password</h1>
-        <p className="mt-1 text-sm text-zinc-500">
-          Choose a new password for your Jenvu account.
-        </p>
+    <main
+      className="min-h-dvh w-full bg-white text-zinc-900 antialiased selection:bg-zinc-900 selection:text-white"
+      style={{ fontFamily: '"Google Sans", "Google Sans Text", system-ui, -apple-system, sans-serif' }}
+    >
+      <div className="flex min-h-dvh w-full flex-col">
+        <div className="px-6 pt-6 sm:px-10 sm:pt-8">
+          <Link to="/" aria-label="Jenvu home" className="inline-flex">
+            <img src="/favicon.png" alt="Jenvu" className="h-9 w-9 rounded-md object-contain" />
+          </Link>
+        </div>
 
-        {!ready ? (
-          <div className="mt-8 flex items-center justify-center py-8 text-zinc-500">
-            <Loader2 className="h-5 w-5 animate-spin" />
-          </div>
-        ) : done ? (
-          <div className="mt-6 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-800">
-            <div className="flex items-start gap-2">
-              <CheckCircle2 className="mt-0.5 h-4 w-4" />
-              <div>
-                <p className="font-medium">Password updated.</p>
-                <p className="mt-1 text-[10px] sm:text-xs text-emerald-700 whitespace-nowrap">
-                  You've been signed out of all devices. Redirecting to sign-in…
-                </p>
+        <div className="flex flex-1 items-start justify-center px-6 pb-16 pt-10 sm:pt-14">
+          <div className="w-full max-w-[354px]">
+            <h1 className="text-center text-[26px] font-semibold tracking-tight text-zinc-900">
+              Reset your password
+            </h1>
+
+            {!ready ? (
+              <div className="mt-8 flex items-center justify-center py-8 text-zinc-500">
+                <Loader2 className="h-5 w-5 animate-spin" />
               </div>
-            </div>
-          </div>
-        ) : !hasSession ? (
-          <div className="mt-6 space-y-4">
-            <div className="rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700">
-              This reset link is invalid or has expired. Please request a new one from the
-              sign-in screen.
-            </div>
-            <Link
-              to="/auth"
-              className="inline-flex w-full items-center justify-center rounded-lg bg-zinc-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-zinc-800"
-            >
-              Back to sign in
-            </Link>
-          </div>
-        ) : (
-          <form onSubmit={submit} className="mt-6 space-y-4">
-            <label className="block text-xs font-medium text-zinc-600">
-              New password
-              <div className="mt-1 flex items-center gap-2 rounded-lg border border-zinc-200 px-3 py-2">
-                <Lock className="h-4 w-4 text-zinc-400" />
-                <input
-                  type={showPassword ? "text" : "password"}
-                  autoComplete="new-password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full bg-transparent text-sm outline-none"
-                  placeholder="At least 8 characters"
-                  required
-                />
-                <button type="button" onClick={() => setShowPassword((v) => !v)} aria-label={showPassword ? "Hide password" : "Show password"} className="text-zinc-400 hover:text-zinc-700">
-                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+            ) : done ? (
+              <div className="mt-4 flex items-start gap-3 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-900">
+                <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" />
+                <div className="leading-snug">
+                  <div className="font-medium">Password updated</div>
+                  <div className="text-emerald-800">
+                    You've been signed out of all devices. Redirecting to sign-in…
+                  </div>
+                </div>
+              </div>
+            ) : !hasSession ? (
+              <div className="mt-4 space-y-3">
+                <div className={`flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[12px] text-red-700 ${MONO}`}>
+                  <span className="mt-[2px] inline-block h-1.5 w-1.5 rounded-full bg-red-500 shrink-0" />
+                  <span className="leading-snug">
+                    This reset link is invalid or has expired. Please request a new one from the sign-in screen.
+                  </span>
+                </div>
+                <Link
+                  to="/auth"
+                  className="group inline-flex w-full items-center justify-center gap-2 rounded-lg bg-zinc-900 px-5 py-3 text-sm font-medium text-white transition hover:bg-zinc-800"
+                >
+                  Back to sign in
+                </Link>
+              </div>
+            ) : (
+              <form onSubmit={submit} className="mt-4 space-y-3">
+                <div className={`rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-[13px] text-zinc-700 ${MONO}`}>
+                  <p className="leading-relaxed">Choose a new password for your Jenvu account.</p>
+                </div>
+
+                <div>
+                  <label className={`block text-[11px] font-bold uppercase tracking-widest text-zinc-500 mb-1 ${MONO}`}>
+                    New Password
+                  </label>
+                  <div className="relative">
+                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      autoComplete="new-password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="w-full rounded-xl border border-zinc-200 bg-white pl-11 pr-11 py-2.5 text-sm text-zinc-900 outline-none focus:border-zinc-900 transition placeholder:text-zinc-300"
+                      placeholder="Min 8 characters..."
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword((v) => !v)}
+                      aria-label={showPassword ? "Hide password" : "Show password"}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-700"
+                    >
+                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                </div>
+
+                <div>
+                  <label className={`block text-[11px] font-bold uppercase tracking-widest text-zinc-500 mb-1 ${MONO}`}>
+                    Confirm Password
+                  </label>
+                  <div className="relative">
+                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
+                    <input
+                      type={showConfirm ? "text" : "password"}
+                      autoComplete="new-password"
+                      value={confirm}
+                      onChange={(e) => setConfirm(e.target.value)}
+                      className="w-full rounded-xl border border-zinc-200 bg-white pl-11 pr-11 py-2.5 text-sm text-zinc-900 outline-none focus:border-zinc-900 transition placeholder:text-zinc-300"
+                      placeholder="Retype the new password..."
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirm((v) => !v)}
+                      aria-label={showConfirm ? "Hide password" : "Show password"}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-700"
+                    >
+                      {showConfirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                </div>
+
+                {error && (
+                  <div className={`flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[12px] text-red-700 ${MONO}`}>
+                    <span className="mt-[2px] inline-block h-1.5 w-1.5 rounded-full bg-red-500 shrink-0" />
+                    <span className="leading-snug">{error}</span>
+                  </div>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={saving}
+                  className="group w-full rounded-lg bg-zinc-900 px-5 py-3 text-sm font-medium text-white hover:bg-zinc-800 transition inline-flex items-center justify-center gap-2 disabled:opacity-60"
+                >
+                  {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+                  {saving ? "Updating..." : "Update password"}
                 </button>
-              </div>
 
-            </label>
-            <label className="block text-xs font-medium text-zinc-600">
-              Confirm new password
-              <div className="mt-1 flex items-center gap-2 rounded-lg border border-zinc-200 px-3 py-2">
-                <Lock className="h-4 w-4 text-zinc-400" />
-                <input
-                  type={showConfirm ? "text" : "password"}
-                  autoComplete="new-password"
-                  value={confirm}
-                  onChange={(e) => setConfirm(e.target.value)}
-                  className="w-full bg-transparent text-sm outline-none"
-                  placeholder="Retype the new password"
-                  required
-                />
-                <button type="button" onClick={() => setShowConfirm((v) => !v)} aria-label={showConfirm ? "Hide password" : "Show password"} className="text-zinc-400 hover:text-zinc-700">
-                  {showConfirm ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                </button>
-              </div>
-
-            </label>
-            {error && (() => {
-              const idx = error.toLowerCase().indexOf("please");
-              const first = idx > 0 ? error.slice(0, idx).trim() : error;
-              const second = idx > 0 ? error.slice(idx).trim() : "";
-              return (
-                <p className="rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-[10px] sm:text-xs text-rose-700 text-center leading-snug">
-                  <span className="block">{first}</span>
-                  {second && <span className="block">{second}</span>}
+                <p className="pt-1 text-center text-[11.5px] text-zinc-500">
+                  After updating, you'll be signed out everywhere and asked to sign in again.
                 </p>
-              );
-            })()}
-            <button
-              type="submit"
-              disabled={saving}
-              className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-zinc-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-zinc-800 disabled:opacity-50"
-            >
-              {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-              {saving ? "Updating…" : "Update password"}
-            </button>
-            <p className="text-center text-[10px] sm:text-xs text-zinc-500 whitespace-nowrap">
-              After updating, you'll be signed out everywhere and asked to sign in again.
-            </p>
-          </form>
-        )}
+              </form>
+            )}
+          </div>
+        </div>
       </div>
     </main>
   );
