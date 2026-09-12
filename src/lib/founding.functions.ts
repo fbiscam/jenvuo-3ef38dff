@@ -132,7 +132,7 @@ function renderApplicantEmail(kind: ApplicantEmailKind, name: string, plan: stri
            <ul style="margin:0 0 12px;padding-left:20px">
              <li style="margin:4px 0"><strong>${escapeHtml(meta.label)}</strong> plan free for 30 days</li>
              <li style="margin:4px 0">${escapeHtml(meta.wallet)} on your account</li>
-             <li style="margin:4px 0">Full access — signals, alerts, killzones, voice briefs</li>
+             <li style="margin:4px 0">Full access — extension analysis, signals, alerts and killzones</li>
            </ul>
            <p style="margin:0">You only start paying once you cross <strong>$100 in verified profit</strong>. If you don't profit, you don't pay.</p>`,
           { label: "Explore the platform", href: `${APP_URL}/` },
@@ -152,7 +152,7 @@ function renderApplicantEmail(kind: ApplicantEmailKind, name: string, plan: stri
              <li style="margin:6px 0">Institutional XAU/USD signal engine</li>
              <li style="margin:6px 0">Live killzones & session alerts</li>
              <li style="margin:6px 0">Trade journal with auto win/lose tracking</li>
-             <li style="margin:6px 0">Voice briefs & macro context on every scan</li>
+             <li style="margin:6px 0">AI chart reviews & macro context on every scan</li>
            </ul>
            <p style="margin:0 0 8px;font-weight:600">Next step — set your password</p>
            <p style="margin:0 0 4px;line-height:1.6">Use the secure link below. It's a one-time link tied to your email.</p>`,

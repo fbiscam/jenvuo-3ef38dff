@@ -5,9 +5,9 @@ export const Route = createFileRoute("/ai-engine")({
   head: () => ({
     meta: [
       { title: "AI Engine — Jenvu" },
-      { name: "description", content: "Inside the Jenvu AI engine: how it listens, reasons and narrates institutional ICT and SMC trade setups in real time." },
+      { name: "description", content: "Inside the Jenvu AI engine: how it reads charts, reasons and reviews institutional ICT and SMC trade setups in real time." },
       { property: "og:title", content: "Artificial Intelligence Engine — Jenvu" },
-      { property: "og:description", content: "How the Jenvu AI engine listens, reasons and narrates institutional ICT and SMC gold trade setups in real time." },
+      { property: "og:description", content: "How the Jenvu AI engine reads charts, reasons and reviews institutional ICT and SMC gold trade setups in real time." },
       { property: "og:url", content: "https://jenvu.com/ai-engine" },
     ],
     links: [{ rel: "canonical", href: "https://jenvu.com/ai-engine" }],
@@ -25,10 +25,9 @@ function AIPage() {
       <section className="space-y-3">
         <H2>Perception Layer</H2>
         <P>
-          The Web Speech API captures your voice and converts it to text in real time.
-          A lightweight intent resolver routes commands like "Analyze XAU/JPY" or
-          "Show me gold in euros" to the correct XAU cross-pair adapter (OANDA and
-          Yahoo Finance bullion feeds).
+          The extension captures the active TradingView chart and the user's request in
+          real time. A lightweight intent resolver separates normal chat from analysis
+          requests before sending supported XAU/USD context into the signal pipeline.
         </P>
       </section>
       <section className="space-y-3">
@@ -52,9 +51,9 @@ function AIPage() {
       <section className="space-y-3">
         <H2>Output Layer</H2>
         <P>
-          The plan is rendered on dual lightweight-charts (1H + 15M) with zones drawn for
-          FVGs, OBs, and liquidity, while text-to-speech narrates each step in sync with
-          word-level orb pulses for a Jarvis-class voice experience.
+          The plan appears in the extension chat with clear entry, invalidation and target
+          levels. Relevant FVGs, order blocks and liquidity zones can also be marked on the
+          TradingView chart when the user explicitly requests analysis.
         </P>
       </section>
     </PageShell>

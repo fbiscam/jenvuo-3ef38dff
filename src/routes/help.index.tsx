@@ -2,7 +2,7 @@ import * as React from "react";
 import SiteNavLinks from "@/components/SiteNavLinks";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import {
-  Compass, Mic, LineChart, CreditCard, Shield, Smartphone,
+  Compass, Puzzle, LineChart, CreditCard, Shield, Smartphone,
   Search, ArrowRight, HelpCircle, MessageCircle,
 } from "lucide-react";
 import SiteFooter from "@/components/SiteFooter";
@@ -13,15 +13,15 @@ export const Route = createFileRoute("/help/")({
   head: () => ({
     meta: [
       { title: "Help Center — Guides, FAQs & Support | Jenvu AI" },
-      { name: "description", content: "Jenvu AI Help Center — step-by-step guides, FAQs and troubleshooting for the voice trading agent, ICT/SMC signal engine, credits & billing, account security and the mobile app." },
-      { name: "keywords", content: "Jenvu help, Jenvu AI support, voice trading agent help, ICT SMC signals help, gold trading AI FAQ, Jenvu billing, Jenvu mobile app" },
+      { name: "description", content: "Jenvu AI Help Center — guides and troubleshooting for the TradingView extension, ICT/SMC signal engine, billing and account security." },
+      { name: "keywords", content: "Jenvu help, Jenvu extension support, ICT SMC signals help, gold trading AI FAQ, Jenvu billing" },
       { property: "og:title", content: "Help Center — Jenvu AI" },
-      { property: "og:description", content: "Guides, FAQs and troubleshooting for Jenvu's voice trading agent, signal engine, billing and mobile app." },
+      { property: "og:description", content: "Guides, FAQs and troubleshooting for Jenvu's TradingView extension, signal engine and billing." },
       { property: "og:url", content: "https://jenvu.com/help" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "Help Center — Jenvu AI" },
-      { name: "twitter:description", content: "Guides, FAQs and troubleshooting for the Jenvu voice trading agent." },
+      { name: "twitter:description", content: "Guides, FAQs and troubleshooting for the Jenvu TradingView extension." },
     ],
     links: [{ rel: "canonical", href: "https://jenvu.com/help" }],
   }),
@@ -31,7 +31,7 @@ export const Route = createFileRoute("/help/")({
 const MONO = "font-['JetBrains_Mono',ui-monospace,monospace]";
 const SANS = "font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif]";
 
-const ICONS = { Compass, Mic, LineChart, CreditCard, Shield, Smartphone } as const;
+const ICONS = { Compass, Puzzle, LineChart, CreditCard, Shield, Smartphone } as const;
 
 function HelpCenterPage() {
   const [q, setQ] = React.useState("");

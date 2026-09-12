@@ -56,11 +56,11 @@ const TIERS = [
     credits: 10,
     features: [
 
-      "Voice queries free",
+      "AI extension chat",
       "A+ / A institutional signals",
       "Institutional-grade signal engine",
       "Realtime email & push alerts",
-      "Full ICT / SMC narration",
+      "Full ICT / SMC breakdown",
       "Trade journal & analytics",
       "Multi-timeframe bias engine",
       "2 extension API keys · $10 AI wallet",
@@ -81,7 +81,7 @@ const TIERS = [
     credits: 40,
     features: [
 
-      "Voice queries free",
+      "AI extension chat",
       "Everything in Pro",
       "Institutional-grade signal engine",
       "Priority A+ alerts (< 30s)",
@@ -99,11 +99,11 @@ const TIERS = [
 
 type Mark = boolean | string;
 const MATRIX: Array<{ feature: string; free: Mark; pro: Mark; elite: Mark }> = [
-  { feature: "Voice queries / day", free: "Unlimited", pro: "Unlimited", elite: "Unlimited" },
+  { feature: "AI extension chat", free: "Limited", pro: "$10 wallet", elite: "$40 wallet" },
   { feature: "A+ signal access", free: true, pro: true, elite: true },
   { feature: "AI models", free: "OpenAI", pro: "OpenAI + DeepSeek + Google", elite: "OpenAI + DeepSeek + Google" },
   { feature: "Alert latency", free: "No alerts", pro: "Realtime", elite: "Realtime" },
-  { feature: "ICT / SMC narration", free: true, pro: true, elite: true },
+  { feature: "ICT / SMC breakdown", free: true, pro: true, elite: true },
   { feature: "Multi-timeframe bias", free: true, pro: true, elite: true },
   { feature: "Trade journal", free: true, pro: true, elite: true },
   { feature: "Multi-pair scanner", free: false, pro: false, elite: true },
@@ -237,12 +237,12 @@ function PricingPage() {
                 { f: "Claude review output capacity", b: false, c: "Up to 3.2M tokens", d: "Up to 7.2M tokens" },
                 { f: "Token price", b: "50% of published rate", c: "50% of published rate", d: "50% of published rate" },
 
-                { f: "Voice queries / day", b: "Unlimited", c: "Unlimited", d: "Unlimited" },
+                { f: "AI extension chat", b: "$10 wallet", c: "$40 wallet", d: "$90 wallet" },
 
                 { f: "Signal latency", b: "Realtime", c: "Realtime", d: "Realtime" },
                 { f: "AI models", b: "__MODELS_PLUS__", c: "__MODELS_PLUS__", d: "__MODELS_PLUS__" },
                 { f: "A+ signal access", b: true, c: true, d: true },
-                { f: "ICT / SMC narration", b: true, c: true, d: true },
+                { f: "ICT / SMC breakdown", b: true, c: true, d: true },
                 { f: "Multi-timeframe bias", b: true, c: true, d: true },
                 { f: "Trade journal", b: true, c: true, d: true },
                 { f: "Email + push alerts", b: true, c: true, d: true },

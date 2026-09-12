@@ -1,7 +1,7 @@
 {
-  "name": "Jenvu AI — Gold Trading Desk",
+  "name": "Jenvu AI — Gold Trading Extension",
   "short_name": "Jenvu",
-  "description": "Voice-native AI gold desk for XAU/USD and every major XAU cross.",
+  "description": "AI-powered TradingView extension for XAU/USD chart analysis and reviewed signals.",
   "start_url": "/dashboard",
   "id": "/",
   "scope": "/",

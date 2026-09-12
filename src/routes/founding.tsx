@@ -166,7 +166,7 @@ function FoundingPage() {
           <ol className="mt-5 space-y-4 text-[14px]">
             {[
               ["Apply", "Fill the short form below. We review every application manually."],
-              ["Get approved", "If accepted, we activate your Elite plan free for 30 days — full access to signals, alerts, killzones and voice analysis."],
+              ["Get approved", "If accepted, we activate your Elite plan free for 30 days — full access to extension analysis, signals, alerts and killzones."],
               ["Reach $100 in 30 days", "You have 30 days to hit $100 in verified profit. After that, billing activates on your account and you pay per scan."],
               ["Verify & pay to continue scanning", "Once 30 days end, a 'Submit documents' notification appears on your account. Click it, upload your broker statement / MyFxBook, and we verify. After verification, billing goes live — pay, and credits are added to your account so you can keep scanning."],
 

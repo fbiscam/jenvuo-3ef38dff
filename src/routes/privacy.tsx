@@ -5,9 +5,9 @@ export const Route = createFileRoute("/privacy")({
   head: () => ({
     meta: [
       { title: "Privacy Policy — Jenvu" },
-      { name: "description", content: "How Jenvu collects, processes, retains and protects your personal data across the voice agent, signals and account dashboard." },
+      { name: "description", content: "How Jenvu collects, processes, retains and protects your personal data across the TradingView extension, signals and account dashboard." },
       { property: "og:title", content: "Privacy Policy — Jenvu" },
-      { property: "og:description", content: "How Jenvu collects, processes, retains and protects your personal data across the voice agent, signals and account dashboard." },
+      { property: "og:description", content: "How Jenvu collects, processes, retains and protects your personal data across the TradingView extension, signals and account dashboard." },
       { property: "og:url", content: "https://jenvu.com/privacy" },
     ],
     links: [{ rel: "canonical", href: "https://jenvu.com/privacy" }],
@@ -20,14 +20,14 @@ function PrivacyPage() {
     <PageShell
       eyebrow="Legal"
       title="Privacy Policy"
-      intro="Jenvu ('we', 'us', 'our') respects your privacy. This policy explains what we collect when you use jenvu.com or our voice agent, how we use it, and the rights you have over that data."
+      intro="Jenvu ('we', 'us', 'our') respects your privacy. This policy explains what we collect when you use jenvu.com or our TradingView extension, how we use it, and the rights you have over that data."
     >
       <section className="space-y-3">
         <H2>1. Information we collect</H2>
         <P>We collect the minimum data needed to operate Jenvu:</P>
         <UL>
           <li><strong>Account data</strong> — email, display name, hashed password, and authentication provider identifiers when you sign in.</li>
-          <li><strong>Voice & text inputs</strong> — transcripts captured only while you have explicitly activated the microphone, plus text prompts you submit. We do not run background audio capture.</li>
+          <li><strong>Extension inputs</strong> — text prompts, chart images and market context you explicitly submit for analysis.</li>
           <li><strong>Trading interactions</strong> — saved signals, alert preferences, and journal entries you create.</li>
           <li><strong>Usage telemetry</strong> — routes visited, feature events, device type, browser, IP address (truncated where feasible), and crash diagnostics.</li>
           <li><strong>Email engagement</strong> — opens, clicks and unsubscribe events for newsletters and alerts you opted into.</li>
@@ -55,7 +55,7 @@ function PrivacyPage() {
         <P>We use carefully vetted processors to deliver Jenvu, including:</P>
         <UL>
           <li><strong>Cloud infrastructure & database</strong> — to host the app and store your account data.</li>
-          <li><strong>AI inference</strong> — to generate analysis, voice responses, and content.</li>
+          <li><strong>AI inference</strong> — to generate chart analysis, reviewed signals and content.</li>
           <li><strong>Email delivery</strong> — to send transactional and alert emails.</li>
           <li><strong>Market data feeds</strong> — public price feeds (e.g. Binance, exchange APIs) for live quotes.</li>
         </UL>
@@ -71,7 +71,7 @@ function PrivacyPage() {
         <H2>6. Data retention</H2>
         <UL>
           <li>Account data — retained while your account is active and for up to 30 days after deletion to handle disputes or legal claims.</li>
-          <li>Voice transcripts & prompts — retained up to 90 days for quality and abuse review, then deleted or fully anonymised.</li>
+          <li>Extension prompts and chart context — retained up to 90 days for quality and abuse review, then deleted or fully anonymised.</li>
           <li>Aggregated analytics — retained indefinitely; never tied to your identity.</li>
         </UL>
       </section>

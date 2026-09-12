@@ -45,21 +45,21 @@ import { useLiveTicker, type TickerRow } from "@/hooks/useLiveTicker";
 export const Route = createFileRoute("/app")({
   head: () => ({
     meta: [
-      { title: "Voice Terminal — Jenvu" },
+      { title: "AI Gold Analysis — Jenvu" },
       { name: "robots", content: "noindex, follow" },
       {
         name: "description",
         content:
-          "Speak to Jenvu and get live institutional ICT/SMC analysis for XAU/USD gold — A+ setups, structured entries, stops and targets narrated in real time.",
+          "Ask Jenvu for live institutional ICT/SMC analysis on XAU/USD — A+ setups, structured entries, stops and targets with clear chart context.",
       },
-      { name: "keywords", content: "voice gold trading agent, XAU/USD voice analysis, ICT gold agent, SMC bullion AI, XAUUSD voice signals" },
-      { property: "og:title", content: "Voice Gold Trading Terminal — Jenvu" },
-      { property: "og:description", content: "Voice-native institutional bullion desk focused on XAU/USD." },
+      { name: "keywords", content: "gold trading extension, XAU/USD AI analysis, ICT gold analysis, SMC bullion AI, XAUUSD signals" },
+      { property: "og:title", content: "AI Gold Analysis — Jenvu" },
+      { property: "og:description", content: "Institutional AI chart analysis focused on XAU/USD." },
       { property: "og:url", content: "https://jenvu.com/app" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "Voice Trading Terminal — Jenvu" },
-      { name: "twitter:description", content: "Speak. Analyze. Execute. Institutional ICT/SMC narrated live." },
+      { name: "twitter:title", content: "AI Gold Analysis — Jenvu" },
+      { name: "twitter:description", content: "Analyze XAU/USD with institutional ICT/SMC logic and clear chart context." },
     ],
     links: [{ rel: "canonical", href: "https://jenvu.com/app" }],
     scripts: [
@@ -68,12 +68,12 @@ export const Route = createFileRoute("/app")({
         children: JSON.stringify({
           "@context": "https://schema.org",
           "@type": "WebApplication",
-          name: "Jenvu Voice Terminal",
+          name: "Jenvu AI Gold Analysis",
           url: "https://jenvu.com/app",
           applicationCategory: "FinanceApplication",
           operatingSystem: "Web",
           description:
-            "Voice-native AI gold trading terminal that narrates institutional ICT/SMC analysis for XAU/USD in real time.",
+            "AI gold analysis workspace delivering institutional ICT/SMC analysis for XAU/USD in real time.",
           offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
         }),
       },
@@ -433,7 +433,7 @@ function Home() {
   const ticker = useLiveTicker();
 
   if (authLoading || !authUser) {
-    return <PageLoading label="Opening voice terminal" />;
+    return <PageLoading label="Opening AI analysis" />;
   }
 
   return (
@@ -482,7 +482,7 @@ function Home() {
         </div>
       </header>
 
-      {/* MAIN: voice agent surface */}
+      {/* Main analysis surface */}
       <main className={cn(
         "relative flex-1 min-h-0 flex flex-col lg:flex-row items-center justify-center px-6 gap-6 lg:gap-10 overflow-hidden transition-colors duration-300",
         dark ? "bg-neutral-950 text-neutral-100" : "bg-white text-neutral-900",
@@ -613,7 +613,7 @@ function StatusPill({ status, supported, dark }: { status: "idle" | "listening" 
         {s.pulse && <span className={cn("absolute inline-flex h-full w-full rounded-full opacity-70 animate-ping", s.dot)} />}
         <span className={cn("relative inline-flex h-2 w-2 rounded-full", s.dot)} />
       </span>
-      <span>Voice</span>
+      <span>Audio</span>
       <span className="opacity-50">·</span>
       <span>{s.label}</span>
     </div>
@@ -744,7 +744,7 @@ function VoicePicker({ value, onChange }: { value: VoicePresetKey; onChange: (k:
           "h-9 w-9 rounded-full flex items-center justify-center transition",
           open ? "bg-black text-white" : "hover:bg-black/5 text-neutral-600",
         )}
-        aria-label="Voice settings"
+        aria-label="Audio settings"
       >
         <Sliders className="h-4 w-4" />
       </button>

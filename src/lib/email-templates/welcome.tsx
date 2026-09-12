@@ -49,7 +49,7 @@ const WelcomeEmail = ({
   return (
     <Html lang="en" dir="ltr">
       <EmailHead />
-      <Preview>Welcome to Jenvu — your voice-native trading desk is ready</Preview>
+      <Preview>Welcome to Jenvu — your AI trading extension is ready</Preview>
       <Body style={s.main}>
         <Container style={s.container}>
           <LogoHeader />
@@ -60,7 +60,7 @@ const WelcomeEmail = ({
             </Heading>
             <Text style={s.text}>
               You&apos;re in. Jenvu turns real-time ICT & SMC market structure into
-              voice briefings, precision signals, and a journal that shows
+              chart-aware analysis, precision signals, and a journal that shows
               exactly where your edge lives.
             </Text>
 

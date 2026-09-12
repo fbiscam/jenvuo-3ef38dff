@@ -25,7 +25,7 @@ export type Collection = {
   // Lucide icon name kept as string label so we map on render
   icon:
     | "Compass"
-    | "Mic"
+    | "Puzzle"
     | "LineChart"
     | "CreditCard"
     | "Shield"
@@ -45,15 +45,15 @@ export const collections: Collection[] = [
         slug: "what-is-jenvu",
         title: "What is Jenvu AI?",
         summary:
-          "Jenvu is a voice-native gold trading agent focused on XAU/USD — built on ICT and SMC playbooks.",
+          "Jenvu is an AI-powered TradingView extension focused on XAU/USD and built on ICT and SMC playbooks.",
         updatedAt: "2026-06-30",
         body: [
-          { type: "p", content: "Jenvu AI is a voice-first market intelligence terminal. You speak — it listens, analyses market structure, liquidity and bias using institutional ICT (Inner Circle Trader) and SMC (Smart Money Concepts) frameworks, narrates its read in real time, and renders the chart with marked zones so you can see exactly what it sees." },
+          { type: "p", content: "Jenvu AI is a chart-aware TradingView extension. It analyses market structure, liquidity and bias using institutional ICT (Inner Circle Trader) and SMC (Smart Money Concepts) frameworks, then returns a clear answer with marked zones so you can see exactly what it sees." },
           { type: "p", content: "Think of it as having a senior bullion-desk analyst on call 24/7: ask for a setup on XAU/USD, XAU/JPY or any other gold cross and Jenvu walks the chart aloud, points out the structure shifts, marks the liquidity it's hunting, and only delivers an entry when the confluence meets its A+ bar." },
 
           { type: "h2", content: "What you can do with Jenvu" },
           { type: "ul", items: [
-            "Talk to the agent like a desk analyst — push-to-talk, no typing required.",
+            "Chat with the extension like a desk analyst directly from your TradingView chart.",
             "Generate A+ setups on demand for XAU/USD.",
             "Watch the AI mark structure, FVGs, order blocks and liquidity directly on the chart.",
             "Save signals to your dashboard and receive alerts when new A+ setups are detected.",
@@ -61,9 +61,9 @@ export const collections: Collection[] = [
           ]},
 
           { type: "h2", content: "Who Jenvu is built for" },
-          { type: "p", content: "Jenvu is designed for traders who already understand ICT/SMC fundamentals and want an institutional-grade analyst that never sleeps. It's equally useful for beginners learning the playbook — the narration explains every step in plain English." },
+          { type: "p", content: "Jenvu is designed for traders who already understand ICT/SMC fundamentals and want institutional-grade analysis inside TradingView. It's equally useful for beginners learning the playbook because each step is explained in plain English." },
 
-          { type: "note", tone: "info", content: "Jenvu is an analysis tool, not financial advice. You stay in control of every trade — the agent only suggests when its confluence model is satisfied." },
+          { type: "note", tone: "info", content: "Jenvu is an analysis tool, not financial advice. You stay in control of every trade — it only suggests a setup when its confluence model is satisfied." },
 
           { type: "h2", content: "Where to go next" },
           { type: "ul", items: [
@@ -79,7 +79,7 @@ export const collections: Collection[] = [
         summary: "Sign up takes under a minute — email + password or Google.",
         updatedAt: "2026-06-30",
         body: [
-          { type: "p", content: "Creating a Jenvu account takes less than 60 seconds. New accounts start on the Free plan and include starter credits so you can try the voice agent and the signal engine immediately." },
+          { type: "p", content: "Creating a Jenvu account takes less than 60 seconds. New accounts start on the Free plan and include starter credits so you can try the extension and signal engine immediately." },
 
           { type: "h2", content: "Sign up with email" },
           { type: "ol", items: [
@@ -95,7 +95,7 @@ export const collections: Collection[] = [
           { type: "h2", content: "What happens next" },
           { type: "ul", items: [
             "Your dashboard loads with starter credits already topped up.",
-            "You can launch the voice agent from the home page or the dashboard.",
+            "You can install and manage the TradingView extension from your dashboard.",
             "Upgrade to Pro or Elite any time from Dashboard → Billing.",
           ]},
 
@@ -108,13 +108,13 @@ export const collections: Collection[] = [
         summary: "From homepage to A+ setup in three clicks.",
         updatedAt: "2026-06-30",
         body: [
-          { type: "p", content: "Getting your first signal out of Jenvu is intentionally simple. The 7-stage pipeline does the heavy lifting — you just pick the instrument and watch the agent work." },
+          { type: "p", content: "Getting your first signal out of Jenvu is intentionally simple. The 7-stage pipeline does the heavy lifting — open your chart and ask the extension to analyze it." },
 
           { type: "h2", content: "Step by step" },
           { type: "ol", items: [
             "Open the Jenvu desk from your dashboard.",
             "Confirm the instrument — XAU/USD (the only pair Jenvu trades).",
-            "Hit 'Analyze'. The 1H and 15M charts load and the agent starts narrating.",
+            "Hit 'Analyze'. The extension reads the active chart and starts building the setup.",
             "Wait while the 7-stage pipeline runs — usually 10–25 seconds.",
             "If the final score is 85+, the setup is graded A+ and entry, stop and targets appear.",
           ]},
@@ -128,8 +128,8 @@ export const collections: Collection[] = [
             "Liquidity pools tagged (PDH, PDL, equal highs / lows).",
           ]},
 
-          { type: "h2", content: "Listening to the narration" },
-          { type: "p", content: "While the agent works, it narrates each step. If your browser blocks autoplay audio, tap the '🔇 Enable voice' pill once and Jenvu will speak from then on. You can replay any step from the timeline." },
+          { type: "h2", content: "Reviewing the analysis" },
+          { type: "p", content: "The extension explains each step in the chat and marks relevant structure on the chart. Eligible plans also require a second-model senior review before the final result appears." },
 
           { type: "note", tone: "warn", content: "If the setup scores below 85, Jenvu shows the read but does not issue an entry. Standing aside is a feature — it protects your win rate." },
         ],
@@ -154,66 +154,65 @@ export const collections: Collection[] = [
     ],
   },
   {
-    slug: "voice-agent",
-    title: "Voice Agent",
-    description: "Talk to Jenvu like Jarvis, commands, mic.",
-    icon: "Mic",
+    slug: "tradingview-extension",
+    title: "TradingView Extension",
+    description: "Install Jenvu, chat with AI and analyze active charts.",
+    icon: "Puzzle",
     articles: [
       {
-        slug: "how-to-talk",
-        title: "How do I talk to the agent?",
-        summary: "Push-to-talk on desktop, tap-to-talk on mobile.",
+        slug: "how-to-chat",
+        title: "How do I use AI chat?",
+        summary: "Ask general questions or request a chart analysis.",
         updatedAt: "2026-06-30",
         body: [
-          { type: "p", content: "Jenvu uses a push-to-talk model so it only listens when you want it to. No always-on mic, no accidental wake-ups — you stay in control." },
+          { type: "p", content: "Jenvu works like a familiar AI chat inside TradingView. It answers normal questions conversationally and only runs the signal engine when you ask it to analyze a chart or trading setup." },
 
-          { type: "h2", content: "Desktop" },
+          { type: "h2", content: "Open the extension" },
           { type: "ol", items: [
-            "Open the Voice Agent page.",
-            "Click the mic button in the centre composer to start speaking.",
-            "Click it again when you're done. The orb pulses while it's listening.",
-            "The agent replies aloud the moment you release the mic.",
+            "Open a supported XAU/USD chart in TradingView.",
+            "Open Jenvu from your browser toolbar.",
+            "Enter your extension API key when prompted.",
+            "Type a question or ask Jenvu to analyze the active chart.",
           ]},
 
-          { type: "h2", content: "Mobile" },
-          { type: "p", content: "Same flow — tap the mic to start, tap again to stop. On iOS and Android the native mic permission prompt appears the first time. Accept it to enable voice mode." },
+          { type: "h2", content: "Chat mode and analysis mode" },
+          { type: "p", content: "Greetings and general questions stay in chat mode. Requests for a setup, signal or chart review trigger the ICT/SMC engine and use the live TradingView chart as context." },
 
-          { type: "h2", content: "Typing instead" },
-          { type: "p", content: "Don't want to talk? Type into the composer pill and hit the arrow button. Jenvu still replies aloud unless you've muted the speaker." },
+          { type: "h2", content: "Ask naturally" },
+          { type: "p", content: "Type into the composer and send your message. You can ask follow-up questions in the same conversation without repeating the full context." },
 
-          { type: "note", tone: "tip", content: "Keep questions short and specific — 'Bias on Gold?' beats 'Tell me about Gold today'. The agent responds faster and more accurately." },
+          { type: "note", tone: "tip", content: "Keep analysis requests specific — 'Analyze this XAU/USD chart' or 'What is the 15-minute bias?' produces the clearest result." },
         ],
       },
       {
-        slug: "mic-permissions",
-        title: "Mic isn't working — what to check",
-        summary: "Browser permissions, OS settings, and the right input device.",
+        slug: "extension-troubleshooting",
+        title: "Extension isn't responding — what to check",
+        summary: "TradingView tab access, API key status and supported charts.",
         updatedAt: "2026-06-30",
         body: [
-          { type: "p", content: "If the mic button does nothing or the orb won't react to your voice, the problem is almost always a permission or device issue. Run through this checklist top to bottom." },
+          { type: "p", content: "If Jenvu does not respond or cannot read the chart, run through this checklist from top to bottom." },
 
-          { type: "h2", content: "1. Browser permission" },
+          { type: "h2", content: "1. TradingView access" },
           { type: "ul", items: [
-            "Click the padlock icon in your browser's address bar.",
-            "Make sure 'Microphone' is set to Allow for jenvu.com.",
-            "Reload the page after changing it.",
+            "Make sure the active tab is a TradingView chart.",
+            "Allow the extension to access tradingview.com when prompted.",
+            "Reload the chart after changing extension permissions.",
           ]},
 
-          { type: "h2", content: "2. Operating system permission" },
+          { type: "h2", content: "2. Extension API key" },
           { type: "ul", items: [
-            "macOS: System Settings → Privacy & Security → Microphone → enable your browser.",
-            "Windows: Settings → Privacy → Microphone → enable for your browser.",
-            "iOS: Settings → Safari / Chrome → Microphone → Allow.",
-            "Android: Settings → Apps → your browser → Permissions → Microphone → Allow.",
+            "Open Dashboard → Extension and copy an active key.",
+            "Paste the key into the extension settings exactly as shown.",
+            "Confirm your plan is active and has available AI wallet balance.",
           ]},
 
-          { type: "h2", content: "3. Other apps holding the mic" },
-          { type: "p", content: "Zoom, Google Meet, Discord and Teams sometimes grab exclusive access to the microphone. Close them fully (not just the call) and reload Jenvu." },
+          { type: "h2", content: "3. Supported market" },
+          { type: "p", content: "Jenvu is tuned for XAU/USD. Open a Gold versus U.S. Dollar chart before requesting a full setup analysis." },
 
-          { type: "h2", content: "4. Right input device" },
-          { type: "p", content: "On laptops with a headset plugged in, the mic input may default to a device that's muted or unplugged. Switch input in your OS sound settings and reload." },
+          { type: "h2", content: "4. Reload the extension" },
+          { type: "p", content: "Close and reopen the side panel, then refresh the TradingView tab. If the issue continues, generate a new API key from the dashboard." },
 
-          { type: "note", tone: "warn", content: "Voice input requires HTTPS. Local file previews (file:// URLs) cannot use the microphone — always test on jenvu.com." },
+          { type: "note", tone: "warn", content: "Never share your extension API key. Revoke it immediately from the dashboard if it is exposed." },
         ],
       },
       {
@@ -342,7 +341,7 @@ export const collections: Collection[] = [
           { type: "h2", content: "Free" },
           { type: "ul", items: [
             "$2 wallet per month (~5 scans).",
-            "Unlimited voice queries (free).",
+            "AI extension chat with starter wallet access.",
             "Full signal engine — A+ / A institutional signals.",
             "Full ICT / SMC narration.",
             "Trade journal & analytics.",
@@ -353,7 +352,7 @@ export const collections: Collection[] = [
           { type: "h2", content: "Pro — $15 / month" },
           { type: "ul", items: [
             "$15 wallet per month (~35 scans).",
-            "Unlimited voice queries.",
+            "AI extension chat billed from the included wallet.",
             "Full XAU/USD signal engine.",
             "Realtime A+ email & push alerts (no delay).",
             "Full ICT / SMC narration, trade journal & analytics.",
@@ -393,7 +392,7 @@ export const collections: Collection[] = [
           { type: "ul", items: [
             "Signal analysis returning BUY or SELL — deducted from wallet at real cost.",
             "Signal returning WAIT (dead market) — free.",
-            "Voice agent reply (per turn) — free.",
+            "AI extension chat — billed by measured token use.",
             "A+ broadcast alert delivered to you — free.",
           ]},
 
@@ -533,7 +532,7 @@ export const collections: Collection[] = [
 
           { type: "h2", content: "What we don't store" },
           { type: "ul", items: [
-            "Raw audio from voice sessions — we transcribe and discard.",
+            "Background browsing activity outside the active TradingView analysis request.",
             "Payment card numbers — handled by our PCI-compliant processor.",
             "Cross-site tracking identifiers.",
           ]},
@@ -555,7 +554,7 @@ export const collections: Collection[] = [
         summary: "Download links are on the Download page.",
         updatedAt: "2026-06-30",
         body: [
-          { type: "p", content: "Jenvu ships as a native app on both iOS and Android. It uses the device microphone, push notifications and haptics for a true desk-grade experience on the go." },
+          { type: "p", content: "Jenvu's mobile companions keep your alerts, saved signals and account status available away from your TradingView workstation." },
 
           { type: "h2", content: "Download" },
           { type: "ol", items: [
@@ -566,8 +565,8 @@ export const collections: Collection[] = [
 
           { type: "h2", content: "First-launch permissions" },
           { type: "ul", items: [
-            "Microphone — required for the voice agent.",
             "Notifications — required for A+ signal alerts.",
+            "Network access — required to sync signals and account status.",
             "Haptics — automatic, no prompt.",
           ]},
 
