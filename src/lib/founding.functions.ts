@@ -723,17 +723,26 @@ export const getMyDocumentStatus = createServerFn({ method: "GET" })
   .handler(async ({ context }): Promise<DocumentStatusRow | null> => {
     const email = (context.claims as any)?.email as string | undefined;
     if (!email) return null;
-    const { data, error } = await context.supabase
-      .from("founding_applications" as any)
-      .select(
-        "id, full_name, email, status, requested_plan, document_status, documents_submitted_at, documents_verified_at, documents_rejected_at, documents_rejected_reason, documents_note, documents_info_request, documents_info_requested_at, created_at",
-      )
-      .ilike("email", email)
-      .order("created_at", { ascending: false })
-      .limit(1)
-      .maybeSingle();
-    if (error) throw new Error(error.message);
-    return (data as unknown as DocumentStatusRow) ?? null;
+    try {
+      const { data, error } = await context.supabase
+        .from("founding_applications" as any)
+        .select(
+          "id, full_name, email, status, requested_plan, document_status, documents_submitted_at, documents_verified_at, documents_rejected_at, documents_rejected_reason, documents_note, documents_info_request, documents_info_requested_at, created_at",
+        )
+        .ilike("email", email)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (error) {
+        // Transient network/permission hiccups must not blank the dashboard.
+        console.error("getMyDocumentStatus failed", error.message);
+        return null;
+      }
+      return (data as unknown as DocumentStatusRow) ?? null;
+    } catch (e) {
+      console.error("getMyDocumentStatus threw", e);
+      return null;
+    }
   });
 
 export const markMyDocumentsSubmitted = createServerFn({ method: "POST" })
