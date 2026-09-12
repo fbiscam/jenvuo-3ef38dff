@@ -146,7 +146,7 @@ function ResetPasswordPage() {
                 </div>
 
                 <div>
-                  <label className={`block text-[11px] font-bold uppercase tracking-widest text-zinc-500 mb-1 ${MONO}`}>
+                  <label className="mb-2 block text-[14px] font-medium text-zinc-900">
                     New Password
                   </label>
                   <div className="relative">
@@ -172,7 +172,7 @@ function ResetPasswordPage() {
                 </div>
 
                 <div>
-                  <label className={`block text-[11px] font-bold uppercase tracking-widest text-zinc-500 mb-1 ${MONO}`}>
+                  <label className="mb-2 block text-[14px] font-medium text-zinc-900">
                     Confirm Password
                   </label>
                   <div className="relative">
