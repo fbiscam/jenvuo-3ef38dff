@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { authenticateExtensionRequest, extJson, EXT_CORS_HEADERS } from '@/lib/extension-auth.server'
 import { computeSignalPlan } from '@/lib/gold-analysis.functions'
+import { isGoldSymbol } from '@/lib/plan-entitlements'
 
 async function handle({ request }: { request: Request }) {
   const auth = await authenticateExtensionRequest(request)
@@ -22,6 +23,14 @@ async function handle({ request }: { request: Request }) {
     const { getExtensionEntitlement } = await import('@/lib/extension-billing.server')
     const entitlement = await getExtensionEntitlement(auth.userId)
     if (!entitlement.allowed) return extJson({ ok: false, error: entitlement.error, code: entitlement.status === 402 ? 'LOW_BALANCE' : 'PLAN_REQUIRED', balance: entitlement.balance }, entitlement.status)
+    if (!entitlement.capabilities.multiPairScanner && !isGoldSymbol(symbol)) {
+      return extJson({
+        ok: false,
+        code: 'FEATURE_LOCKED',
+        feature: 'multi_pair_scanner',
+        error: `Your ${entitlement.plan === 'pro' ? 'Pro' : 'current'} plan includes XAU/USD analysis. Upgrade to Elite or Ultra to analyze other pairs.`,
+      }, 403)
+    }
     const plan = await computeSignalPlan({ symbol }, auth.userId, {
       scanId: requestId,
       extensionBilling: { keyId: auth.keyId, keyName: auth.name, planId: entitlement.plan },

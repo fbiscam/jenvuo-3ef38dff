@@ -24,3 +24,7 @@
 - [x] Add tested Evolink GPT-6 Astra primary and Claude Opus 5 senior-review routing
 - [x] Add Evolink token pricing, labels, fallbacks, and provider error handling
 - [x] Verify the integrated Evolink path and extension checks
+- [x] Centralize plan capabilities for extension AI features
+- [x] Enforce Pro XAU/USD-only access and Elite/Ultra multi-pair access
+- [x] Show friendly plan-lock and senior-review messages
+- [ ] Verify plan enforcement, extension package, and TypeScript

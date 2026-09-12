@@ -1,4 +1,5 @@
 import { estimateCostUsd, logAiCost } from '@/lib/ai-cost-log.server'
+import { getPlanCapabilities } from '@/lib/plan-entitlements'
 
 export const EXTENSION_BASE_FEE_USD = 0
 export const EXTENSION_TOKEN_PRICE_MULTIPLIER = 0.5
@@ -18,21 +19,23 @@ export async function getExtensionEntitlement(userId: string) {
   const { data: plan } = await admin.from('plans').select('wallet_usd,extension_key_limit').eq('id', planId).maybeSingle()
   const keyLimit = Number(plan?.extension_key_limit ?? 0)
   const balance = Number(bal?.balance ?? 0)
+  const capabilities = getPlanCapabilities(planId)
   const result = {
-    allowed: active && planId !== 'free' && keyLimit > 0 && balance > 0,
-    status: !active || planId === 'free' || keyLimit < 1 ? 403 : balance <= 0 ? 402 : 200,
+    allowed: active && capabilities.extensionAi && keyLimit > 0 && balance > 0,
+    status: !active || !capabilities.extensionAi || keyLimit < 1 ? 403 : balance <= 0 ? 402 : 200,
     plan: planId,
     keyLimit,
     balance,
     wallet: Number(plan?.wallet_usd ?? 0),
     markup: EXTENSION_TOKEN_PRICE_MULTIPLIER,
-    seniorReview: planId === 'elite' || planId === 'ultra',
+    seniorReview: capabilities.seniorReview,
+    capabilities,
   }
   return {
     ...result,
     error: result.allowed ? undefined : result.status === 402
       ? 'Low balance. Add funds to continue using extension AI.'
-      : 'A paid Pro, Elite, or Ultra plan is required for extension AI.',
+       : 'Extension AI is not included in your current plan. Upgrade to Pro, Elite, or Ultra to continue.',
   }
 }
 

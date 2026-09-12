@@ -486,9 +486,12 @@ async function post(body, signal) {
           signal,
         });
         const json = await res.json().catch(() => ({}));
-        if (res.status === 401 || res.status === 403) {
+        if (res.status === 401 || (res.status === 403 && json.code !== "FEATURE_LOCKED")) {
           showKeyGate(true, json.error || "Your API key is invalid or revoked.");
           throw new Error(json.error || "Sign in with your Jenvu API key.");
+        }
+        if (res.status === 403 && json.code === "FEATURE_LOCKED") {
+          throw new Error(json.error || "This feature is not included in your current plan. Upgrade to unlock it.");
         }
         if (res.status === 402 || json.code === "LOW_BALANCE") {
           throw new Error(json.error || "Low balance. Top up your Jenvu wallet to continue.");
@@ -891,8 +894,10 @@ async function send(preset, silentUser) {
       setReviewStatus(`Senior reviewed · ${label}`, "verified");
     } else if (d.mode === "conversation" || d.seniorReview?.status === "not_required") {
       setReviewStatus("Chat mode", "");
+    } else if (d.seniorReview?.status === "not_in_plan") {
+      setReviewStatus("Primary AI · Elite unlocks senior review", "");
     } else {
-      setReviewStatus("Senior review required", "failed");
+      setReviewStatus("Senior review unavailable", "failed");
     }
     if (Array.isArray(d.chart) && d.chart.length) renderSnapshot(d);
   } catch (e) {
