@@ -911,7 +911,7 @@ function DashboardLayout() {
   }, [authUser?.id, authLoading, refreshTick]);
 
   return (
-    <div className={`flex min-h-screen bg-white text-zinc-900 font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif] antialiased jenvu-zoom-dashboard`}>
+    <div className={`flex min-h-screen bg-zinc-50 text-zinc-900 font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif] antialiased jenvu-zoom-dashboard`}>
 
       {/* Mobile overlay */}
       {mobileNavOpen && !embedMode && (
@@ -1043,7 +1043,7 @@ function DashboardLayout() {
 
 
       {/* Right column */}
-      <div className={`dashboard-right-col flex min-w-0 flex-1 flex-col bg-white ${embedMode ? "" : sidebarCollapsed ? "collapsed lg:pl-[60px]" : "lg:pl-[200px]"}`}>
+      <div className={`dashboard-right-col flex min-w-0 flex-1 flex-col bg-zinc-50 ${embedMode ? "" : sidebarCollapsed ? "collapsed lg:pl-[60px]" : "lg:pl-[200px]"}`}>
 
       {/* Mobile menu toggle (floating) */}
       {!embedMode && (
@@ -1059,7 +1059,7 @@ function DashboardLayout() {
 
 
 
-      <main className="mx-auto w-full max-w-7xl flex-1 bg-white px-5 pt-14 pb-7 sm:px-8 sm:pt-7" style={{ zoom: 0.9 }}>
+      <main className="mx-auto w-full max-w-7xl flex-1 bg-zinc-50 px-5 pt-14 pb-7 sm:px-8 sm:pt-7" style={{ zoom: 0.9 }}>
 
         <VerificationBanner isAdmin={isAdminUser} />
 
@@ -1299,7 +1299,7 @@ function DashboardHero({ keysCount, stats }: { keysCount: number | null; stats: 
     : links;
 
   return (
-    <section className="dashboard-hero -mx-5 mb-2 bg-white px-5 pb-8 pt-6 sm:-mx-8 sm:px-8">
+    <section className="dashboard-hero -mx-5 mb-2 bg-zinc-50 px-5 pb-8 pt-6 sm:-mx-8 sm:px-8">
       <div className="mx-auto flex max-w-4xl flex-col items-center">
         <Link
           to="/dashboard/extension"
@@ -1452,7 +1452,7 @@ function UsageAnalytics({ stats, keysCount, loading, range, onRangeChange, onRef
   const tokenSeries = points.length ? points.map((p) => p.tokens) : empty;
 
   return (
-    <section className="analytics-section mt-6 bg-white">
+    <section className="analytics-section mt-6 bg-zinc-50">
       <div className="mx-auto w-full max-w-4xl px-1">
       <div className="mb-5 flex items-center justify-between">
         <h2 className="text-[17px] font-semibold tracking-tight text-zinc-900">  Analytics</h2>
