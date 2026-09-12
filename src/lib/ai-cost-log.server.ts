@@ -78,6 +78,15 @@ const MODEL_PRICING: Record<string, Price> = {
   "evolink/claude-opus-4-8": { in: 5.0, out: 25.0 },
   "evolink/grok-4.6": { in: 2.0, out: 6.0 },
 
+  // JustWoker GPT-5.6 family. The upstream reports a per-request cost rather
+  // than a published token table, so these are the GPT-5.6 list rates in USD
+  // per 1M tokens; extension users are charged 50% of them.
+  "jw/gpt-5.6-sol": { in: 1.25, out: 10.0 },
+  "jw/gpt-5.6-terra": { in: 1.25, out: 10.0 },
+  "jw/gpt-5.6-luna": { in: 0.25, out: 2.0 },
+
+
+
   // Google
   "google/gemini-2.5-pro": { in: 1.25, out: 10.0 },
   "google/gemini-2.5-flash": { in: 0.075, out: 0.3 },
@@ -110,7 +119,7 @@ export function formatModelLabel(rawModel: string | null | undefined): string {
   const m = raw.toLowerCase();
   if (m.startsWith("rules-engine/ict-smc")) return "ICT/SMC Rules Engine";
   // Strip provider prefix (bmind/, openai/, nvapi/, google/, etc.)
-  const bare = m.replace(/^(dsofficial|bmind|tukenku|unikey|evolink|openai|nvapi|google|anthropic)\//g, "").replace(/^myt\//, "").replace(/^orion\//, "").replace(/^deepseek-ai\//, "");
+  const bare = m.replace(/^(dsofficial|bmind|tukenku|unikey|evolink|jw|openai|nvapi|google|anthropic)\//g, "").replace(/^myt\//, "").replace(/^orion\//, "").replace(/^deepseek-ai\//, "");
   if (bare.startsWith("claude-opus-5")) return "Claude Opus 5";
   if (bare.startsWith("claude-opus-4-8")) return "Claude Opus 4.8";
   if (bare.startsWith("claude-sonnet-4.5") || bare.startsWith("claude-4.5-sonnet")) return "Claude Sonnet 4.5";
@@ -119,6 +128,7 @@ export function formatModelLabel(rawModel: string | null | undefined): string {
   if (bare.startsWith("claude")) return "Claude";
   if (bare.startsWith("gpt-5.6-sol")) return "ChatGPT 5.6 Sol";
   if (bare.startsWith("gpt-5.6-luna")) return "ChatGPT 5.6 Luna";
+  if (bare.startsWith("gpt-5.6-terra")) return "ChatGPT 5.6 Terra";
   if (bare.startsWith("gpt-5.6")) return "ChatGPT 5.6";
   if (bare.startsWith("gpt-5.5-pro")) return "ChatGPT 5.5 Pro";
   if (bare.startsWith("gpt-5.5")) return "ChatGPT 5.5";

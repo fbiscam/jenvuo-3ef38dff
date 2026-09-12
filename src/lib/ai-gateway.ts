@@ -78,6 +78,7 @@ function providerConfigured(model: string): boolean {
   if (model.startsWith("evolink/")) return Boolean(process.env.EVOLINK_API_KEY);
   if (model.startsWith("dsofficial/")) return Boolean(process.env.DEEPSEEK_API_KEY);
   if (model.startsWith("oai/")) return Boolean(process.env.OPENAI_API_KEY);
+  if (model.startsWith("jw/")) return Boolean(process.env.JUSTWOKER_API_KEY);
   return Boolean(process.env.LOVABLE_API_KEY);
 }
 
@@ -98,6 +99,89 @@ export function isModelUnhealthy(model: string): boolean {
 
 export type UsageInfo = { promptTokens: number; completionTokens: number; totalTokens: number };
 
+// -------- JustWoker (api.justwoker.icu) ------------------------------------
+// This upstream fronts GPT-5.6 (sol / terra / luna). Its OpenAI-compatible
+// /v1/chat/completions path is blocked by the provider's WAF for server-side
+// calls, but the Anthropic-style /v1/messages path answers reliably, so we
+// speak that dialect and translate messages both ways.
+async function callJustwoker(
+  model: string,
+  opts: CallChatOptions,
+): Promise<{ content: string; usage: UsageInfo }> {
+  const key = process.env.JUSTWOKER_API_KEY;
+  if (!key) throw new AiGatewayError("JUSTWOKER_API_KEY missing on server", 0, true);
+  const wireModel = model.slice("jw/".length);
+
+  const systemParts: string[] = [];
+  const messages: Array<{ role: "user" | "assistant"; content: unknown }> = [];
+  for (const m of opts.messages) {
+    if (m.role === "system") {
+      systemParts.push(typeof m.content === "string" ? m.content : JSON.stringify(m.content));
+      continue;
+    }
+    if (typeof m.content === "string") {
+      messages.push({ role: m.role, content: m.content });
+      continue;
+    }
+    const blocks = m.content
+      .map((part) => {
+        if (part.type === "text") return { type: "text", text: part.text };
+        const url = part.image_url?.url ?? "";
+        const match = /^data:(image\/[a-z]+);base64,(.+)$/i.exec(url);
+        if (!match) return null;
+        return { type: "image", source: { type: "base64", media_type: match[1], data: match[2] } };
+      })
+      .filter(Boolean);
+    messages.push({ role: m.role, content: blocks });
+  }
+  if (!messages.length) messages.push({ role: "user", content: "." });
+
+  const res = await fetch("https://api.justwoker.icu/v1/messages", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-api-key": key,
+      "anthropic-version": "2023-06-01",
+    },
+    body: JSON.stringify({
+      model: wireModel,
+      max_tokens: opts.maxTokens ?? 1500,
+      ...(systemParts.length ? { system: systemParts.join("\n\n") } : {}),
+      messages,
+    }),
+  }).catch(() => {
+    throw new AiGatewayError("Server busy — please try again in a moment.", 0, false);
+  });
+
+  if (!res.ok) {
+    const txt = await res.text().catch(() => "");
+    const status = res.status;
+    const msg =
+      status === 402 || /insufficient|balance|credit/i.test(txt)
+        ? "JustWoker balance is too low. Please top up to use this model."
+        : status === 401 || status === 403
+        ? "AI key rejected. Please contact support."
+        : "Server busy — please try again in a moment.";
+    const terminal = !(status === 429 || status >= 500);
+    if (status === 404 || /model_not_found|not found/i.test(txt)) markModelUnhealthy(model, 15 * 60 * 1000);
+    throw new AiGatewayError(msg, status, terminal);
+  }
+
+  const json: any = await res.json();
+  const content = Array.isArray(json?.content)
+    ? json.content.filter((b: any) => b?.type === "text").map((b: any) => String(b.text ?? "")).join("\n").trim()
+    : "";
+  if (!content) throw new AiGatewayError("AI returned empty response.", 0, false);
+  const promptTokens = Number(json?.usage?.input_tokens ?? 0) || 0;
+  const completionTokens = Number(json?.usage?.output_tokens ?? 0) || 0;
+  return {
+    content,
+    usage: { promptTokens, completionTokens, totalTokens: promptTokens + completionTokens },
+  };
+}
+
+
+
 
 async function singleAttempt(
   model: string,
@@ -112,7 +196,9 @@ async function singleAttempt(
   //   `unikey/*`     → GetUniKey (OpenAI-compatible)
   //   `evolink/*`    → Evolink direct API (OpenAI-compatible)
   //   `dsofficial/*` → DeepSeek official API (OpenAI-compatible)
+  //   `jw/*`         → JustWoker (Anthropic-style /v1/messages)
   //   else           → Lovable AI Gateway
+  if (model.startsWith("jw/")) return callJustwoker(model, opts);
   const isBlackbox = model.startsWith("blackboxai/");
   const isNvidia = model.startsWith("nvapi/");
   const isBmind = model.startsWith("bmind/");
@@ -511,7 +597,11 @@ const FAST_NARRATION_BMIND = [
 // Senior review: Bluesminds GPT-4o remains the desk's preferred reviewer, but
 // while that route is unavailable the Gemini routes sign off so a provider
 // outage cannot zero out the whole trading day via the hard review gate.
+// JustWoker GPT-5.6 is now the desk's lead reviewer (live-probed Sep 12 2026:
+// sol / terra / luna all answer, and sol reads chart images correctly).
 const SENIOR_REVIEW_BMIND_4O = [
+  "jw/gpt-5.6-sol",
+  "jw/gpt-5.6-terra",
   "google/gemini-3.1-pro-preview",
   "google/gemini-3.7-flash",
   "bmind/gpt-4o",
@@ -523,38 +613,41 @@ export const MODEL_CHAIN = {
   narration: FAST_NARRATION_BMIND,
   seniorReview: SENIOR_REVIEW_BMIND_4O,
   macroContext: WORKING_BMIND,
-  chat: WORKING_BMIND,
+  chat: ["jw/gpt-5.6-sol", ...WORKING_BMIND] as const,
 } as const;
 
 // Extension calls are intentionally isolated from the shared model chains.
-// Evolink GPT-6 Astra is the strongest tested primary. Claude Opus 5 performs
-// the independent senior pass, with tested Evolink and legacy provider fallbacks.
+// JustWoker GPT-5.6 Sol is the primary analyst and also reads chart images;
+// GPT-5.6 Terra runs the independent senior pass, with the previously tested
+// Evolink / Unikey routes kept as fallbacks.
 export const EXTENSION_MODEL_CHAIN = {
   reasoning: [
+    "jw/gpt-5.6-sol",
+    "jw/gpt-5.6-terra",
     "evolink/gpt-6-astra",
     "unikey/gpt-6-astra",
     "evolink/grok-4.6",
-    "unikey/gemini-3.1-pro",
-    "unikey/x-ai/grok-4.3",
   ],
   vision: [
+    "jw/gpt-5.6-sol",
+    "jw/gpt-5.6-terra",
     "tukenku/myt/deepseek-v4-flash-vision-exp",
     "tukenku/myt/qwen3-vl-plus",
   ],
   seniorReview: [
+    "jw/gpt-5.6-terra",
+    "jw/gpt-5.6-sol",
     "evolink/claude-opus-5",
     "evolink/claude-opus-4-8",
-    "evolink/grok-4.6",
     "unikey/claude-opus-4-8",
-    "tukenku/myt/grok-4.6-free",
   ],
   // Alias retained for callers that identify the senior pass as review #2.
   secondReview: [
+    "jw/gpt-5.6-terra",
+    "jw/gpt-5.6-sol",
     "evolink/claude-opus-5",
     "evolink/claude-opus-4-8",
-    "evolink/grok-4.6",
     "unikey/claude-opus-4-8",
-    "tukenku/myt/grok-4.6-free",
   ],
 } as const;
 
