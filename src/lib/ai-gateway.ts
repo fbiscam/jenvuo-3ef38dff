@@ -107,6 +107,7 @@ export type UsageInfo = { promptTokens: number; completionTokens: number; totalT
 async function callJustwoker(
   model: string,
   opts: CallChatOptions,
+  signal?: AbortSignal,
 ): Promise<{ content: string; usage: UsageInfo }> {
   const key = process.env.JUSTWOKER_API_KEY;
   if (!key) throw new AiGatewayError("JUSTWOKER_API_KEY missing on server", 0, true);
