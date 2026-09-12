@@ -848,7 +848,7 @@ async function send(preset, silentUser) {
       saveMessage("ai", msg);
     } catch (e) {
       p.remove();
-      addMsg("ai err", e && e.name === "AbortError" ? "Request stop kar di gayi." : (e.message || "Markings nahi lag sakin."));
+      addMsg("ai err", e && e.name === "AbortError" ? "Request stopped." : (e.message || "Markings nahi lag sakin."));
     }
     busy = false;
     controller = null; $("send").disabled = false; updateSendState();
@@ -902,7 +902,7 @@ async function send(preset, silentUser) {
     if (Array.isArray(d.chart) && d.chart.length) renderSnapshot(d);
   } catch (e) {
     pend.remove();
-    if (e && e.name === "AbortError") addMsg("ai err", "Request stop kar di gayi.");
+    if (e && e.name === "AbortError") addMsg("ai err", "Request stopped.");
     else addMsg("ai err", e.message);
     setReviewStatus("Senior review unavailable", "failed");
   } finally {
