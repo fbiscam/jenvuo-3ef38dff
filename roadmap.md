@@ -27,4 +27,4 @@
 - [x] Centralize plan capabilities for extension AI features
 - [x] Enforce Pro XAU/USD-only access and Elite/Ultra multi-pair access
 - [x] Show friendly plan-lock and senior-review messages
-- [ ] Verify plan enforcement, extension package, and TypeScript
+- [x] Verify plan enforcement, extension package, and TypeScript
