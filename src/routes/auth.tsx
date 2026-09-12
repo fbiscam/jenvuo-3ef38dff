@@ -854,13 +854,6 @@ function AuthPage() {
                     <FaApple className="h-4 w-4" /> Apple
                   </button>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => toast.info("Enterprise SSO is available on desk plans — contact us to enable it.")}
-                  className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-md border border-zinc-200 bg-white px-3 py-2.5 text-[13px] font-medium text-zinc-700 transition hover:bg-zinc-50"
-                >
-                  <Lock className="h-3.5 w-3.5" /> Continue with SSO
-                </button>
                 <div className="my-5 flex items-center gap-3">
                   <div className="h-px flex-1 bg-zinc-200" />
                   <span className="text-[11px] uppercase tracking-wider text-zinc-400">OR</span>
