@@ -631,7 +631,7 @@ function HomePage() {
       <section className="border-t border-zinc-100 bg-white">
         <div className="mx-auto max-w-6xl px-5 py-10 sm:px-6 sm:py-12">
           <div className="flex flex-col md:flex-row items-start justify-between gap-6">
-            <div className="text-left md:text-left">
+            <div className="w-full text-center md:w-auto md:text-left">
               <h3 className="text-lg font-semibold tracking-tight text-zinc-900 sm:text-xl">
                 Wired into the venues&nbsp;
               </h3>
