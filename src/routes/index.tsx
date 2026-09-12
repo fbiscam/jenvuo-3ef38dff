@@ -147,7 +147,7 @@ export const Route = createFileRoute("/")({
   // paint shows the real live price instead of a stale placeholder.
   loader: async () => {
     const board = await getCorrelatedMarkets().catch(() => null);
-    return { tickerRows: INITIAL_TICKER, board };
+    return { tickerRows: null as TickerRow[] | null, board };
   },
   errorComponent: ({ error }) => (
     <div role="alert" className="p-8 text-sm text-zinc-600">{(error as Error)?.message ?? "Something went wrong."}</div>
