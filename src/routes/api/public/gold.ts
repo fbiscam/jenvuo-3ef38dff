@@ -128,14 +128,6 @@ async function handle({ request }: { request: Request }) {
       const { getExtensionEntitlement } = await import('@/lib/extension-billing.server')
       const entitlement = await getExtensionEntitlement(auth.userId)
       if (!entitlement.allowed) return extJson({ ok: false, error: entitlement.error, code: entitlement.status === 402 ? 'LOW_BALANCE' : 'PLAN_REQUIRED', balance: entitlement.balance }, entitlement.status)
-      if (!entitlement.capabilities.multiPairScanner && !isGoldSymbol(symbol)) {
-        return extJson({
-          ok: false,
-          code: 'FEATURE_LOCKED',
-          feature: 'multi_pair_scanner',
-          error: `Your ${entitlement.plan === 'pro' ? 'Pro' : 'current'} plan includes XAU/USD analysis. Upgrade to Elite or Ultra to analyze other pairs.`,
-        }, 403)
-      }
       const requiresSeniorReview = entitlement.seniorReview
       const question = String(body.question || '').slice(0, 2000)
       if (!question) return extJson({ ok: false, error: 'Question is empty.' }, 400)
@@ -206,6 +198,15 @@ async function handle({ request }: { request: Request }) {
           secondReview: { included: false, model: null, status: 'not_required' },
           usage: { requestId, charged: casualBilling.charged, balance: casualBilling.balance },
         })
+      }
+
+      if (!entitlement.capabilities.multiPairScanner && !isGoldSymbol(symbol)) {
+        return extJson({
+          ok: false,
+          code: 'FEATURE_LOCKED',
+          feature: 'multi_pair_scanner',
+          error: `Your ${entitlement.plan === 'pro' ? 'Pro' : 'current'} plan includes XAU/USD analysis. Upgrade to Elite or Ultra to analyze other pairs.`,
+        }, 403)
       }
 
       const userContent: string | ChatContentPart[] = image
