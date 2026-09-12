@@ -31,3 +31,6 @@
 - [x] Restrict dashboard senior review to Elite and Ultra
 - [x] Prevent inactive subscriptions from inheriting paid feature flags
 - [x] Run final TypeScript and entitlement consistency checks
+- [x] Charge a fixed $0.20 for every completed senior-reviewed scan
+- [x] Link Google Search Console, Google Maps, Apollo, Firecrawl, and Google Analytics
+- [ ] Replace the managed Google Maps connection for custom-domain support (blocked until a user-owned Maps key is ready)
