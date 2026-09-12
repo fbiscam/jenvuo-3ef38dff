@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { Mail, Lock, ArrowRight, User, Loader2, Eye, EyeOff, Globe } from "lucide-react";
 import { FcGoogle } from "react-icons/fc";
-import { FaApple, FaGithub } from "react-icons/fa";
+import { FaApple } from "react-icons/fa";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import authPanel from "@/assets/auth-panel.jpg.asset.json";
@@ -400,14 +400,14 @@ function AuthPage() {
     </>
   );
 
-  const signInWithProvider = async (provider: "google" | "apple" | "github") => {
+  const signInWithProvider = async (provider: "google" | "apple") => {
     setErrorMsg(null);
     try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider,
-        options: { redirectTo: `${window.location.origin}/auth` },
+      const { lovable } = await import("@/integrations/lovable/index");
+      const result = await lovable.auth.signInWithOAuth(provider, {
+        redirect_uri: window.location.origin,
       });
-      if (error) throw error;
+      if (result.error) throw new Error(String(result.error));
     } catch (err) {
       const msg = err instanceof Error ? err.message : "This sign-in method is not enabled yet.";
       toast.error(`${provider} sign-in unavailable`, { description: msg });
@@ -838,7 +838,7 @@ function AuthPage() {
 
             {(mode === "signin" || mode === "signup") && !mfaChallenge && !otpStep && (
               <>
-                <div className="mt-6 grid grid-cols-3 gap-2">
+                <div className="mt-6 grid grid-cols-2 gap-2">
                   <button
                     type="button"
                     onClick={() => void signInWithProvider("google")}
@@ -852,13 +852,6 @@ function AuthPage() {
                     className="inline-flex items-center justify-center gap-2 rounded-md border border-zinc-200 bg-white px-3 py-2.5 text-[13px] font-medium text-zinc-700 transition hover:bg-zinc-50"
                   >
                     <FaApple className="h-4 w-4" /> Apple
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => void signInWithProvider("github")}
-                    className="inline-flex items-center justify-center gap-2 rounded-md border border-zinc-200 bg-white px-3 py-2.5 text-[13px] font-medium text-zinc-700 transition hover:bg-zinc-50"
-                  >
-                    <FaGithub className="h-4 w-4" /> GitHub
                   </button>
                 </div>
                 <button
