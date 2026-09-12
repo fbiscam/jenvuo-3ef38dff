@@ -2934,7 +2934,7 @@ ENGINE GRADE ${setupGrade} (${setupScore}/100) | breakers ${breakers.length} | i
     // Runs GPT (5.5 → 5.2 chat) as a "25-year veteran" third opinion on any
     // live A / A+ setup, after the ICT/SMC engine and the DeepSeek V4 review —
     // it can veto, downgrade, or confirm.
-    // Gated by plan: only paid plans (pro/elite/ultra) get the senior review.
+    // Gated by plan: only Elite and Ultra get the senior review.
     // Failure here should NEVER block the plan — Stage-1 result stands.
     let __planAllowsSenior = false;
     let __planId: string = "free";
@@ -2962,7 +2962,7 @@ ENGINE GRADE ${setupGrade} (${setupScore}/100) | breakers ${breakers.length} | i
         const pid = (sub?.plan_id as string | undefined) ?? "free";
         const subscriptionActive = sub?.status === "active" || sub?.status === "trialing";
         __planId = subscriptionActive ? pid : "free";
-        __planAllowsSenior = subscriptionActive && pid !== "free";
+        __planAllowsSenior = subscriptionActive && (pid === "elite" || pid === "ultra");
       } catch { __planAllowsSenior = false; __planId = "free"; }
     }
     // Senior review re-enabled: acts as a 25-year veteran veto/downgrade layer.

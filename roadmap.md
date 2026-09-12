@@ -28,3 +28,6 @@
 - [x] Enforce Pro XAU/USD-only access and Elite/Ultra multi-pair access
 - [x] Show friendly plan-lock and senior-review messages
 - [x] Verify plan enforcement, extension package, and TypeScript
+- [x] Restrict dashboard senior review to Elite and Ultra
+- [x] Prevent inactive subscriptions from inheriting paid feature flags
+- [ ] Run final TypeScript and entitlement consistency checks

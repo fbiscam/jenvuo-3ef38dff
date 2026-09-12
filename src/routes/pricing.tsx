@@ -16,9 +16,9 @@ export const Route = createFileRoute("/pricing")({
   head: () => ({
     meta: [
       { title: "Pricing Plans — Jenvu" },
-      { name: "description", content: "Compare Jenvu plans, extension API key limits, monthly AI wallets, and senior-reviewed GPT/Gemini market analysis." },
+      { name: "description", content: "Compare Jenvu plans, extension API key limits, monthly AI wallets, and senior-reviewed GPT/Claude market analysis." },
       { property: "og:title", content: "Jenvu Pricing — Pro & Elite Plans" },
-      { property: "og:description", content: "Compare Jenvu plans with extension API keys, AI wallets, and senior-reviewed GPT/Gemini market analysis." },
+      { property: "og:description", content: "Compare Jenvu plans with extension API keys, AI wallets, and senior-reviewed GPT/Claude market analysis." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { property: "og:url", content: "https://jenvu.com/pricing" },
