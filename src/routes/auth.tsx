@@ -3,8 +3,6 @@ import { createFileRoute, useNavigate, Link, redirect } from "@tanstack/react-ro
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { Mail, Lock, ArrowRight, User, Loader2, Eye, EyeOff, Globe } from "lucide-react";
-import { FcGoogle } from "react-icons/fc";
-import { FaApple } from "react-icons/fa";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import authPanel from "@/assets/auth-panel.jpg.asset.json";
@@ -108,9 +106,9 @@ function AuthPage() {
   const verifyRecoveryCode = useServerFn(confirmRecoveryOtp);
   const search = Route.useSearch();
   const redirectTo = sanitizeRedirect(search.redirect);
-  // Public sign-up is closed — access is granted through the Founding Trader
-  // Program only. `?mode=signup` no longer opens a sign-up form.
-  const [mode, setMode] = React.useState<"signin" | "signup" | "forgot">("signin");
+  const [mode, setMode] = React.useState<"signin" | "signup" | "forgot">(
+    search.mode === "signup" ? "signup" : "signin",
+  );
 
   // Exact date the 14-day Pro trial would end for someone signing up now.
   // Computed after mount so SSR and client markup match.
@@ -399,20 +397,6 @@ function AuthPage() {
       <span>{label}</span>
     </>
   );
-
-  const signInWithProvider = async (provider: "google" | "apple") => {
-    setErrorMsg(null);
-    try {
-      const { lovable } = await import("@/integrations/lovable/index");
-      const result = await lovable.auth.signInWithOAuth(provider, {
-        redirect_uri: window.location.origin,
-      });
-      if (result.error) throw new Error(String(result.error));
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : "This sign-in method is not enabled yet.";
-      toast.error(`${provider} sign-in unavailable`, { description: msg });
-    }
-  };
 
   const signIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -836,32 +820,6 @@ function AuthPage() {
                     : "Sign in to Jenvu"}
             </h1>
 
-            {(mode === "signin" || mode === "signup") && !mfaChallenge && !otpStep && (
-              <>
-                <div className="mt-6 grid grid-cols-2 gap-2">
-                  <button
-                    type="button"
-                    onClick={() => void signInWithProvider("google")}
-                    className="inline-flex items-center justify-center gap-2 rounded-md border border-zinc-200 bg-white px-3 py-2.5 text-[13px] font-medium text-zinc-700 transition hover:bg-zinc-50"
-                  >
-                    <FcGoogle className="h-4 w-4" /> Google
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => void signInWithProvider("apple")}
-                    className="inline-flex items-center justify-center gap-2 rounded-md border border-zinc-200 bg-white px-3 py-2.5 text-[13px] font-medium text-zinc-700 transition hover:bg-zinc-50"
-                  >
-                    <FaApple className="h-4 w-4" /> Apple
-                  </button>
-                </div>
-                <div className="my-5 flex items-center gap-3">
-                  <div className="h-px flex-1 bg-zinc-200" />
-                  <span className="text-[11px] uppercase tracking-wider text-zinc-400">OR</span>
-                  <div className="h-px flex-1 bg-zinc-200" />
-                </div>
-              </>
-            )}
-
                   {emailChangedBanner && (
                     <div
                       role="status"
@@ -880,17 +838,6 @@ function AuthPage() {
 
 
 
-
-                  {/* Sign-up is closed — access via Founding Trader Program */}
-                  {mode === "signup" && !otpStep && (
-                    <div className="mt-4 rounded-lg border border-yellow-300 bg-white px-4 py-3 text-[13px] text-yellow-900">
-                      Public sign-up is closed. Access is granted through the{" "}
-                      <Link to="/founding" className="font-medium text-zinc-900 underline-offset-2 hover:underline">
-                        {"\n"}Founding Trader Program
-                      </Link>
-                      {" "}— apply and we'll email you once your seat is approved.
-                    </div>
-                  )}
 
 
                   {mfaChallenge ? (
@@ -1378,9 +1325,13 @@ function AuthPage() {
                     <div className="mt-6 space-y-1.5 text-center text-[13px] text-zinc-500">
                       <p>
                         Don't have an account?{" "}
-                        <Link to="/founding" className="font-medium text-zinc-900 underline underline-offset-2">
-                          Sign up
-                        </Link>
+                         <button
+                           type="button"
+                           onClick={() => { setMode("signup"); setErrorMsg(null); }}
+                           className="font-medium text-zinc-900 underline underline-offset-2"
+                         >
+                           Sign up with email
+                         </button>
                       </p>
                       <p>
                         Forgot your password?{" "}
@@ -1393,6 +1344,19 @@ function AuthPage() {
                         </button>
                       </p>
                     </div>
+                  )}
+
+                  {mode === "signup" && !otpStep && !mfaChallenge && (
+                    <p className="mt-6 text-center text-[13px] text-zinc-500">
+                      Already have an account?{" "}
+                      <button
+                        type="button"
+                        onClick={() => { setMode("signin"); setErrorMsg(null); }}
+                        className="font-medium text-zinc-900 underline underline-offset-2"
+                      >
+                        Sign in
+                      </button>
+                    </p>
                   )}
 
                   <p className="mt-8 text-center text-[12px] leading-relaxed text-zinc-400">
