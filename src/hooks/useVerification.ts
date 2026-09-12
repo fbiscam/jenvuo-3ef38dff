@@ -11,7 +11,14 @@ export function useVerification() {
   const fetchStatus = useServerFn(getMyDocumentStatus);
   const { data, isLoading } = useQuery<DocumentStatusRow | null>({
     queryKey: ["my-document-status"],
-    queryFn: () => fetchStatus({ data: undefined as any } as any),
+    queryFn: async () => {
+      try {
+        return await fetchStatus({ data: undefined as any } as any);
+      } catch {
+        // Expired token or network blip — treat as "unknown" instead of crashing.
+        return null;
+      }
+    },
     staleTime: 60_000,
     retry: false,
   });
