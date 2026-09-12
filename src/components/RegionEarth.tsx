@@ -58,9 +58,15 @@ function DottedGlobe() {
       const h = rect.height;
       const cx = w / 2;
       const cy = h / 2;
-      const radius = Math.min(w, h) / 2 - 6;
+      // ResizeObserver can briefly report a near-zero box during layout.
+      // Canvas arc/ellipse radii must never be negative.
+      const radius = Math.max(0, Math.min(w, h) / 2 - 6);
 
       ctx.clearRect(0, 0, w, h);
+      if (radius === 0) {
+        if (running) raf = requestAnimationFrame(draw);
+        return;
+      }
 
       // graticule (latitude / longitude grid)
       ctx.strokeStyle = "rgba(161,161,170,0.22)";
