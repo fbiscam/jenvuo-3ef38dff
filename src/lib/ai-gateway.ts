@@ -1,4 +1,4 @@
-// Shared Lovable AI Gateway helper used by every server-side analyzer call.
+// Shared multi-provider AI helper used by every server-side analyzer call.
 //
 // Purpose:
 //   1. One place to switch models (25-year-veteran quality tier).
@@ -764,8 +764,9 @@ export const MODEL_CHAIN = {
 } as const;
 
 // Extension calls are intentionally isolated from the shared model chains.
-// AgentRouter GPT-6 Astra is the primary analyst/chat model and reads attached
-// chart images. Claude Opus 5 runs the mandatory independent senior pass.
+// GPT-6 Astra is the primary analyst/chat model and reads attached chart
+// images. Claude Opus 5 runs the mandatory independent senior pass. Keep only
+// live-tested providers in front of the fallback chain.
 export const EXTENSION_MODEL_CHAIN = {
   reasoning: [
     "browseruse/gpt-6-astra",
