@@ -22,6 +22,7 @@ export type ChatMessage = {
 // Models that support the OpenAI priority serving tier (fast mode).
 // Anything else must not send service_tier: "priority".
 const PRIORITY_TIER_MODELS = new Set([
+  "openai/gpt-6-astra",
   "openai/gpt-5",
   "openai/gpt-5-mini",
   "openai/gpt-5.2",
@@ -330,9 +331,6 @@ async function callJustwoker(
   };
 }
 
-
-
-
 async function singleAttempt(
   model: string,
   opts: CallChatOptions,
@@ -453,7 +451,6 @@ async function singleAttemptInner(
     headers["Lovable-API-Key"] = apiKey;
   }
 
-
   // Strip provider prefixes to expose the real upstream model id.
   const wireModel = isOai
     ? model.slice("oai/".length)
@@ -504,8 +501,6 @@ async function singleAttemptInner(
     body.service_tier = "priority";
   }
 
-
-
   let res: Response;
   try {
     res = await fetch(endpoint, {
@@ -554,8 +549,6 @@ async function singleAttemptInner(
     throw e;
   }
 
-
-
   const json: any = await res.json();
   const content = json?.choices?.[0]?.message?.content;
   if (typeof content !== "string" || !content.length) {
@@ -583,7 +576,6 @@ async function singleAttemptInner(
   return { content, usage };
 }
 
-
 // Main entrypoint. Returns raw assistant content string plus model/usage.
 // Throws AiGatewayError with `terminal` flag on final failure.
 export async function callChatCompletion(opts: CallChatOptions): Promise<{ content: string; model: string; usage: UsageInfo }> {
@@ -603,7 +595,6 @@ export async function callChatCompletion(opts: CallChatOptions): Promise<{ conte
   // attempt (in case the outage cleared).
   const healthy = configured.filter((m) => !isModelUnhealthy(m));
   const models = healthy.length ? healthy : configured;
-
 
   let lastErr: AiGatewayError | null = null;
 
@@ -741,47 +732,21 @@ export function setCachedPlan<T>(key: string, value: T, ttlMs: number = PLAN_CAC
 // chain-walk skips a known-dead endpoint instead of paying its timeout.
 // TTLs: 15 min for "model_not_found" (not provisioned), 5 min for flaky
 // upstream. If every candidate is cooling, we still try the whole chain.
-// NOTE (Aug 29 2026 live audit against the Bluesminds key): routable + fast =
-// `gpt-5.6-sol` (best), `gpt-5.6-luna` (fastest), `gpt-5.2-chat`, `gpt-5-mini`,
-// `gpt-4o`. `gpt-5.5` / `gpt-5.6-terra` / `kimi-k2.5` time out (>60s) and
-// `deepseek-v4-pro` returns a bad upstream body, so they are out of the chains.
 
-// Live-probed Aug 30 2026: only `gpt-5.6-sol`, `gpt-5.2-chat` and `gpt-4o`
-// answer on Bluesminds. `gpt-5.6-luna`, `gpt-5.6-terra`, `gpt-5.5`,
-// `gpt-5-mini`, `kimi-k2.5`, `gemma-4-26b`, `gpt-oss-20b` hang until timeout,
-// `deepseek-v4-pro` 500s, the nemotron/llama ids are 410 Gone, and the NVIDIA
-// deepseek endpoint never responds. Dead ids are removed from every chain so a
-// scan no longer burns 30–60s per dead hop before falling back.
-// Re-probed Sep 1 2026: `bmind/gpt-4o` (1.7s) and `bmind/gpt-5.2-chat` (3.1s)
-// answer; `bmind/gpt-5.6-sol` still hangs until timeout, so it is removed from
-// every chain — it only burned 45s+ per hop and pushed the senior review past
-// its deadline, which flipped good setups to WAIT via the hard review gate.
-// Re-probed Sep 7 2026 with the NEW Bluesminds key: /v1/models lists 19 ids and
-// contains NO gpt-4o / gpt-5.2-chat (both return 503 model_not_found), while
-// `gpt-5.5` and `kimi-k2.5` hang for 60s into a 504 and the llama ids are 410
-// Gone. So Bluesminds currently has no usable route: it is demoted to LAST hop
-// everywhere and the workspace Gemini routes lead, otherwise every scan burned
-// 60s+ per dead hop and pushed the senior review past its deadline (-> WAIT).
 const WORKING_BMIND = [
   "google/gemini-3.1-pro-preview",
   "google/gemini-3.7-flash",
-  // Kept last so the desk auto-recovers if the Bluesminds account regains
-  // GPT-4o access, without slowing scans while it is unavailable.
   "bmind/gpt-4o",
 ] as const;
-// Narration must return before the deterministic plan is presented.
+
 const FAST_NARRATION_BMIND = [
   "google/gemini-3.7-flash",
   "google/gemini-3.1-pro-preview",
   "bmind/gpt-4o",
 ] as const;
 
-// Senior review: Bluesminds GPT-4o remains the desk's preferred reviewer, but
-// while that route is unavailable the Gemini routes sign off so a provider
-// outage cannot zero out the whole trading day via the hard review gate.
-// Browser Use Claude Fable 5 is the desk's lead reviewer (live-probed Sep 13
-// 2026). Previous working routes remain as outage fallbacks.
 const SENIOR_REVIEW_BMIND_4O = [
+  "evolink/claude-opus-5",
   "browseruse/claude-fable-5",
   "jw/gpt-5.6-sol",
   "jw/gpt-5.6-terra",
@@ -789,7 +754,6 @@ const SENIOR_REVIEW_BMIND_4O = [
   "google/gemini-3.7-flash",
   "bmind/gpt-4o",
 ] as const;
-
 
 export const MODEL_CHAIN = {
   intent: WORKING_BMIND,
@@ -800,51 +764,47 @@ export const MODEL_CHAIN = {
 } as const;
 
 // Extension calls are intentionally isolated from the shared model chains.
-// Browser Use GPT-6 Astra is the primary analyst/chat model and reads attached
-// chart images. Claude Fable 5 runs the mandatory independent senior pass.
+// AgentRouter GPT-6 Astra is the primary analyst/chat model and reads attached
+// chart images. Claude Opus 5 runs the mandatory independent senior pass.
 export const EXTENSION_MODEL_CHAIN = {
   reasoning: [
     "browseruse/gpt-6-astra",
-    "jw/gpt-5.6-sol",
-    "jw/gpt-5.6-terra",
     "evolink/gpt-6-astra",
     "unikey/gpt-6-astra",
+    "jw/gpt-5.6-sol",
+    "jw/gpt-5.6-terra",
     "evolink/grok-4.6",
   ],
   vision: [
     "browseruse/gpt-6-astra",
+    "evolink/gpt-6-astra",
+    "unikey/gpt-6-astra",
     "jw/gpt-5.6-sol",
     "jw/gpt-5.6-terra",
     "tukenku/myt/deepseek-v4-flash-vision-exp",
-    "tukenku/myt/qwen3-vl-plus",
   ],
   seniorReview: [
+    "evolink/claude-opus-5",
     "browseruse/claude-fable-5",
     "jw/gpt-5.6-terra",
     "jw/gpt-5.6-sol",
-    "evolink/claude-opus-5",
     "evolink/claude-opus-4-8",
     "unikey/claude-opus-4-8",
   ],
   // Alias retained for callers that identify the senior pass as review #2.
   secondReview: [
+    "evolink/claude-opus-5",
     "browseruse/claude-fable-5",
     "jw/gpt-5.6-terra",
     "jw/gpt-5.6-sol",
-    "evolink/claude-opus-5",
     "evolink/claude-opus-4-8",
     "unikey/claude-opus-4-8",
   ],
 } as const;
 
 export const MACRO_CONTEXT_CHAIN = WORKING_BMIND;
-
 export const SENIOR_REVIEW_CHAIN = SENIOR_REVIEW_BMIND_4O;
 
-// -------- Stage 2: independent SMC second-opinion chain --------------------
-// A SECOND pass that must not reuse the senior-review primary, so the desk
-// never rubber-stamps its own answer. This stage is ENRICHMENT ONLY — it can
-// agree (small confidence lift) or flag a risk note, but never vetoes.
 export const DEEPSEEK_REVIEW_CHAIN = [
   "google/gemini-3.7-flash",
   "google/gemini-3.1-pro-preview",
@@ -854,4 +814,3 @@ export const DEEPSEEK_REVIEW_CHAIN = [
 
 /** @deprecated legacy alias — use DEEPSEEK_REVIEW_CHAIN */
 export const CROSS_CHECK_CHAIN = DEEPSEEK_REVIEW_CHAIN;
-
