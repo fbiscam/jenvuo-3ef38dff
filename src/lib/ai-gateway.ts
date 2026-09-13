@@ -79,6 +79,7 @@ function providerConfigured(model: string): boolean {
   if (model.startsWith("dsofficial/")) return Boolean(process.env.DEEPSEEK_API_KEY);
   if (model.startsWith("oai/")) return Boolean(process.env.OPENAI_API_KEY);
   if (model.startsWith("jw/")) return Boolean(process.env.JUSTWOKER_API_KEY);
+  if (model.startsWith("browseruse/")) return Boolean(process.env.BROWSER_USE_API_KEY);
   return Boolean(process.env.LOVABLE_API_KEY);
 }
 
@@ -98,6 +99,153 @@ export function isModelUnhealthy(model: string): boolean {
 }
 
 export type UsageInfo = { promptTokens: number; completionTokens: number; totalTokens: number };
+
+// -------- Browser Use Cloud Agent v4 ---------------------------------------
+// Browser Use exposes these hosted models through asynchronous agent runs,
+// rather than an OpenAI-compatible chat-completions endpoint. Translate the
+// conversation into a self-contained task, upload any chart images, and poll
+// the bounded run until it reaches a terminal state.
+async function callBrowserUse(
+  model: string,
+  opts: CallChatOptions,
+  signal?: AbortSignal,
+): Promise<{ content: string; usage: UsageInfo }> {
+  const key = process.env.BROWSER_USE_API_KEY;
+  if (!key) throw new AiGatewayError("BROWSER_USE_API_KEY missing on server", 0, true);
+  const wireModel = model.slice("browseruse/".length);
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+    "X-Browser-Use-API-Key": key,
+  };
+
+  const textParts: string[] = [];
+  const images: Array<{ bytes: Uint8Array; contentType: string; name: string }> = [];
+  for (const [messageIndex, message] of opts.messages.entries()) {
+    const role = message.role.toUpperCase();
+    if (typeof message.content === "string") {
+      textParts.push(`${role}:\n${message.content}`);
+      continue;
+    }
+    const messageText: string[] = [];
+    for (const part of message.content) {
+      if (part.type === "text") {
+        messageText.push(part.text);
+        continue;
+      }
+      const match = /^data:(image\/[a-z0-9.+-]+);base64,(.+)$/i.exec(part.image_url.url);
+      if (!match) continue;
+      const contentType = match[1];
+      const extension = contentType.split("/")[1]?.replace("jpeg", "jpg") ?? "png";
+      images.push({
+        bytes: Uint8Array.from(atob(match[2]), (char) => char.charCodeAt(0)),
+        contentType,
+        name: `chart-${messageIndex + 1}-${images.length + 1}.${extension}`,
+      });
+    }
+    textParts.push(`${role}:\n${messageText.join("\n")}`);
+  }
+
+  let workspaceId: string | undefined;
+  const attachedFileIds: string[] = [];
+  try {
+    if (images.length) {
+      const workspaceResponse = await fetch("https://api.browser-use.com/api/v4/workspaces", {
+        method: "POST",
+        headers,
+        body: JSON.stringify({ name: "Jenvu chart analysis" }),
+        ...(signal ? { signal } : {}),
+      });
+      if (!workspaceResponse.ok) throw new AiGatewayError("Unable to prepare chart analysis.", workspaceResponse.status, false);
+      const workspace = await workspaceResponse.json() as { id?: string };
+      workspaceId = workspace.id;
+      if (!workspaceId) throw new AiGatewayError("Unable to prepare chart analysis.", 0, false);
+
+      const uploadResponse = await fetch(`https://api.browser-use.com/api/v4/workspaces/${workspaceId}/files/upload`, {
+        method: "POST",
+        headers,
+        body: JSON.stringify({ files: images.map((image) => ({ name: image.name, contentType: image.contentType, size: image.bytes.byteLength })) }),
+        ...(signal ? { signal } : {}),
+      });
+      if (!uploadResponse.ok) throw new AiGatewayError("Unable to upload chart image.", uploadResponse.status, false);
+      const upload = await uploadResponse.json() as { files?: Array<{ id?: string; uploadUrl?: string }> };
+      const slots = upload.files ?? [];
+      if (slots.length !== images.length) throw new AiGatewayError("Unable to upload chart image.", 0, false);
+      for (let index = 0; index < slots.length; index++) {
+        const slot = slots[index];
+        const image = images[index];
+        if (!slot?.id || !slot.uploadUrl || !image) throw new AiGatewayError("Unable to upload chart image.", 0, false);
+        const uploadBody = new ArrayBuffer(image.bytes.byteLength);
+        new Uint8Array(uploadBody).set(image.bytes);
+        const putResponse = await fetch(slot.uploadUrl, {
+          method: "PUT",
+          headers: { "Content-Type": image.contentType, "Content-Length": String(image.bytes.byteLength) },
+          body: uploadBody,
+          ...(signal ? { signal } : {}),
+        });
+        if (!putResponse.ok) throw new AiGatewayError("Unable to upload chart image.", putResponse.status, false);
+        attachedFileIds.push(slot.id);
+      }
+    }
+
+    const task = [
+      "Answer the conversation below directly. Do not browse the web or use browser tools. Treat attached images as chart inputs. Return only the requested answer, preserving any required JSON format.",
+      textParts.join("\n\n"),
+    ].join("\n\n");
+    const runResponse = await fetch("https://api.browser-use.com/api/v4/runs", {
+      method: "POST",
+      headers,
+      body: JSON.stringify({
+        task,
+        model: wireModel,
+        ...(wireModel === "gpt-6-astra" ? { modelParams: { reasoning: { effort: "high" } } } : {}),
+        ...(workspaceId ? { workspaceId } : {}),
+        ...(attachedFileIds.length ? { attachedFileIds } : {}),
+      }),
+      ...(signal ? { signal } : {}),
+    });
+    if (!runResponse.ok) {
+      const detail = await runResponse.text().catch(() => "");
+      const terminal = !(runResponse.status === 429 || runResponse.status >= 500 || runResponse.status === 409);
+      if (runResponse.status === 402) throw new AiGatewayError("Browser Use balance is too low. Please top up to use this model.", 402, true);
+      if (runResponse.status === 401 || runResponse.status === 403) throw new AiGatewayError("AI key rejected. Please contact support.", runResponse.status, true);
+      if (runResponse.status === 404 || /model/i.test(detail)) markModelUnhealthy(model, 15 * 60 * 1000);
+      throw new AiGatewayError("Server busy — please try again in a moment.", runResponse.status, terminal);
+    }
+    const run = await runResponse.json() as { id?: string };
+    if (!run.id) throw new AiGatewayError("AI run could not be started.", 0, false);
+
+    while (!signal?.aborted) {
+      await sleep(750);
+      const statusResponse = await fetch(`https://api.browser-use.com/api/v4/runs/${run.id}`, {
+        headers: { "X-Browser-Use-API-Key": key },
+        ...(signal ? { signal } : {}),
+      });
+      if (!statusResponse.ok) throw new AiGatewayError("Server busy — please try again in a moment.", statusResponse.status, false);
+      const status = await statusResponse.json() as {
+        status?: string; result?: string | null; error?: string | null;
+        totalInputTokens?: number; totalOutputTokens?: number;
+      };
+      if (status.status === "completed") {
+        const content = status.result?.trim();
+        if (!content) throw new AiGatewayError("AI returned empty response.", 0, false);
+        const promptTokens = Number(status.totalInputTokens ?? 0) || 0;
+        const completionTokens = Number(status.totalOutputTokens ?? 0) || 0;
+        return { content, usage: { promptTokens, completionTokens, totalTokens: promptTokens + completionTokens } };
+      }
+      if (status.status === "failed" || status.status === "cancelled") {
+        throw new AiGatewayError(status.error || "Server busy — please try again in a moment.", 0, false);
+      }
+    }
+    throw new AiGatewayError("Server busy — please try again in a moment.", 0, false);
+  } finally {
+    if (workspaceId) {
+      void fetch(`https://api.browser-use.com/api/v4/workspaces/${workspaceId}`, {
+        method: "DELETE",
+        headers: { "X-Browser-Use-API-Key": key },
+      }).catch(() => undefined);
+    }
+  }
+}
 
 // -------- JustWoker (api.justwoker.icu) ------------------------------------
 // This upstream fronts GPT-5.6 (sol / terra / luna). Its OpenAI-compatible
@@ -223,8 +371,10 @@ async function singleAttemptInner(
   //   `evolink/*`    → Evolink direct API (OpenAI-compatible)
   //   `dsofficial/*` → DeepSeek official API (OpenAI-compatible)
   //   `jw/*`         → JustWoker (Anthropic-style /v1/messages)
+  //   `browseruse/*` → Browser Use Cloud Agent v4
   //   else           → Lovable AI Gateway
   if (model.startsWith("jw/")) return callJustwoker(model, opts, signal);
+  if (model.startsWith("browseruse/")) return callBrowserUse(model, opts, signal);
   const isBlackbox = model.startsWith("blackboxai/");
   const isNvidia = model.startsWith("nvapi/");
   const isBmind = model.startsWith("bmind/");
@@ -629,9 +779,10 @@ const FAST_NARRATION_BMIND = [
 // Senior review: Bluesminds GPT-4o remains the desk's preferred reviewer, but
 // while that route is unavailable the Gemini routes sign off so a provider
 // outage cannot zero out the whole trading day via the hard review gate.
-// JustWoker GPT-5.6 is now the desk's lead reviewer (live-probed Sep 12 2026:
-// sol / terra / luna all answer, and sol reads chart images correctly).
+// Browser Use Claude Fable 5 is the desk's lead reviewer (live-probed Sep 13
+// 2026). Previous working routes remain as outage fallbacks.
 const SENIOR_REVIEW_BMIND_4O = [
+  "browseruse/claude-fable-5",
   "jw/gpt-5.6-sol",
   "jw/gpt-5.6-terra",
   "google/gemini-3.1-pro-preview",
@@ -645,15 +796,15 @@ export const MODEL_CHAIN = {
   narration: FAST_NARRATION_BMIND,
   seniorReview: SENIOR_REVIEW_BMIND_4O,
   macroContext: WORKING_BMIND,
-  chat: ["jw/gpt-5.6-sol", ...WORKING_BMIND] as const,
+  chat: ["browseruse/gpt-6-astra", "jw/gpt-5.6-sol", ...WORKING_BMIND] as const,
 } as const;
 
 // Extension calls are intentionally isolated from the shared model chains.
-// JustWoker GPT-5.6 Sol is the primary analyst and also reads chart images;
-// GPT-5.6 Terra runs the independent senior pass, with the previously tested
-// Evolink / Unikey routes kept as fallbacks.
+// Browser Use GPT-6 Astra is the primary analyst/chat model and reads attached
+// chart images. Claude Fable 5 runs the mandatory independent senior pass.
 export const EXTENSION_MODEL_CHAIN = {
   reasoning: [
+    "browseruse/gpt-6-astra",
     "jw/gpt-5.6-sol",
     "jw/gpt-5.6-terra",
     "evolink/gpt-6-astra",
@@ -661,12 +812,14 @@ export const EXTENSION_MODEL_CHAIN = {
     "evolink/grok-4.6",
   ],
   vision: [
+    "browseruse/gpt-6-astra",
     "jw/gpt-5.6-sol",
     "jw/gpt-5.6-terra",
     "tukenku/myt/deepseek-v4-flash-vision-exp",
     "tukenku/myt/qwen3-vl-plus",
   ],
   seniorReview: [
+    "browseruse/claude-fable-5",
     "jw/gpt-5.6-terra",
     "jw/gpt-5.6-sol",
     "evolink/claude-opus-5",
@@ -675,6 +828,7 @@ export const EXTENSION_MODEL_CHAIN = {
   ],
   // Alias retained for callers that identify the senior pass as review #2.
   secondReview: [
+    "browseruse/claude-fable-5",
     "jw/gpt-5.6-terra",
     "jw/gpt-5.6-sol",
     "evolink/claude-opus-5",
