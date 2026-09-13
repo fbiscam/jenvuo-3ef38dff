@@ -174,10 +174,12 @@ async function callBrowserUse(
         const slot = slots[index];
         const image = images[index];
         if (!slot?.id || !slot.uploadUrl || !image) throw new AiGatewayError("Unable to upload chart image.", 0, false);
+        const uploadBody = new ArrayBuffer(image.bytes.byteLength);
+        new Uint8Array(uploadBody).set(image.bytes);
         const putResponse = await fetch(slot.uploadUrl, {
           method: "PUT",
           headers: { "Content-Type": image.contentType, "Content-Length": String(image.bytes.byteLength) },
-          body: image.bytes,
+          body: uploadBody,
           ...(signal ? { signal } : {}),
         });
         if (!putResponse.ok) throw new AiGatewayError("Unable to upload chart image.", putResponse.status, false);
