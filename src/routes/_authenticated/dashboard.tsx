@@ -39,6 +39,7 @@ import { RiClaudeFill, RiDeepseekFill, RiGeminiFill, RiOpenaiFill } from "react-
 import {
   DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuCheckboxItem, DropdownMenuSeparator, DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
 
 type RangeKey = "24h" | "7d" | "30d" | "90d" | "all";
 function clearStoredAuthSession() {
@@ -1164,7 +1165,7 @@ function fmtUsd2(n: number) {
   return `$${n.toFixed(abs >= 1 ? 2 : 4)}`;
 }
 
-function UsageLineChart({ values, height = 110, color = "#e01563" }: { values: number[]; height?: number; color?: string }) {
+function UsageLineChart({ values, height = 110, color = "currentColor" }: { values: number[]; height?: number; color?: string }) {
   const w = 320;
   const h = height;
   const max = Math.max(1, ...values);
@@ -1175,26 +1176,20 @@ function UsageLineChart({ values, height = 110, color = "#e01563" }: { values: n
   const pts = values.map((v, i) => [i * stepX, bottom - (v / max) * (bottom - top)] as const);
 
   if (!hasData) {
-    // dashed placeholder segments, like the reference
-    const segs = 8;
-    const segW = w / (segs * 1.6);
     return (
-      <div className="relative w-full" style={{ height: h }}>
+      <div className="relative w-full text-zinc-200" style={{ height: h }}>
         <svg viewBox={`0 0 ${w} ${h}`} className="h-full w-full" preserveAspectRatio="none" aria-hidden="true">
-          {Array.from({ length: segs }).map((_, i) => (
-            <line
-              key={i}
-              x1={i * segW * 1.6}
-              x2={i * segW * 1.6 + segW}
-              y1={bottom}
-              y2={bottom}
-              stroke="#d4d4d8"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              vectorEffect="non-scaling-stroke"
-            />
-          ))}
+          <path
+            d={`M 0 ${bottom - 8} C 28 ${bottom - 20}, 40 ${bottom + 7}, 72 ${bottom - 3} S 112 ${bottom + 11}, 138 ${bottom - 15} S 172 ${bottom + 9}, 206 ${bottom - 5} S 252 ${bottom - 18}, 278 ${bottom + 6} S 306 ${bottom - 8}, 320 ${bottom - 11}`}
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.4"
+            vectorEffect="non-scaling-stroke"
+          />
         </svg>
+        <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border border-zinc-200 bg-white px-2 py-1 text-[11px] text-zinc-500">
+          No data
+        </span>
       </div>
     );
   }
@@ -1230,30 +1225,33 @@ function UsageLineChart({ values, height = 110, color = "#e01563" }: { values: n
 
 
 
-function UsageStatCard({ title, value, delta, series, tall = false, chartHeight, xLabels, color }: {
+function UsageStatCard({ title, value, delta, series, featured = false, chartHeight, xLabels, color }: {
   title: string;
   value: string;
   delta?: number | null;
   series: number[];
-  tall?: boolean;
+  featured?: boolean;
   chartHeight?: number;
   xLabels?: string[];
   color?: string;
 }) {
   return (
-    <div className="flex min-h-[118px] flex-col bg-white px-5 py-4">
+    <div className={`flex flex-col bg-white p-4 ${featured ? "min-h-[242px] lg:col-span-2" : "min-h-[242px]"}`}>
       <div className="flex items-start justify-between">
         <span className="text-[13px] text-zinc-600">{title}</span>
-        {delta != null && (
-          <span className={`inline-flex items-center gap-0.5 text-xs font-medium ${delta >= 0 ? "text-emerald-600" : "text-rose-600"}`}>
-            {delta >= 0 ? <TrendingUp className="h-3 w-3" /> : <TrendingUp className="h-3 w-3 rotate-180" />}
-            {Math.abs(delta).toFixed(1)}%
-          </span>
-        )}
+        <div className="flex items-center gap-2">
+          {delta != null && (
+            <span className={`inline-flex items-center gap-0.5 text-xs font-medium ${delta >= 0 ? "text-emerald-600" : "text-rose-600"}`}>
+              {delta >= 0 ? <TrendingUp className="h-3 w-3" /> : <TrendingUp className="h-3 w-3 rotate-180" />}
+              {Math.abs(delta).toFixed(1)}%
+            </span>
+          )}
+          <MoreHorizontal className="h-4 w-4 text-zinc-500" aria-hidden="true" />
+        </div>
       </div>
-      <div className="mt-1.5 text-[22px] font-semibold leading-none tracking-tight text-zinc-900 tabular-nums">{value}</div>
-      <div className="mt-auto pt-3">
-        <UsageLineChart values={series} height={chartHeight ?? (tall ? 40 : 32)} color={color} />
+      <div className="mt-1.5 text-[26px] font-medium leading-none text-zinc-900 tabular-nums">{value}</div>
+      <div className="mt-auto pt-8">
+        <UsageLineChart values={series} height={chartHeight ?? (featured ? 92 : 80)} color={color} />
       </div>
 
       {xLabels && xLabels.length > 1 && (
@@ -1452,17 +1450,18 @@ function UsageAnalytics({ stats, keysCount, loading, range, onRangeChange, onRef
   const tokenSeries = points.length ? points.map((p) => p.tokens) : empty;
 
   return (
-    <section className="analytics-section mt-6 bg-white">
-      <div className="mx-auto w-full max-w-4xl px-1">
-      <div className="mb-5 flex items-center justify-between">
-        <h2 className="text-[17px] font-semibold tracking-tight text-zinc-900">  Analytics</h2>
+    <section className="analytics-section -mx-5 mt-6 bg-zinc-50 px-5 py-7 sm:-mx-8 sm:px-8">
+      <div className="mx-auto w-full max-w-5xl">
+      <div className="mb-3 flex items-center justify-between gap-3">
+        <h2 className="text-[17px] font-semibold text-zinc-900">Analytics</h2>
         <div className="flex items-center gap-2">
           <div className="relative">
+            <Calendar className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-zinc-700" />
             <select
               value={range}
               onChange={(e) => onRangeChange(e.target.value as UsageRangeKey)}
               aria-label="Time range"
-              className="appearance-none rounded-md border border-zinc-200 bg-white py-1.5 pl-3 pr-8 text-xs font-medium text-zinc-700 shadow-sm outline-none transition hover:border-zinc-300 focus:border-zinc-400"
+              className="h-10 appearance-none rounded-lg border border-zinc-200 bg-white pl-9 pr-9 text-sm font-medium text-zinc-800 shadow-sm outline-none transition hover:border-zinc-300 focus:border-zinc-400"
             >
               {(Object.keys(USAGE_RANGE_LABELS) as UsageRangeKey[]).map((k) => (
                 <option key={k} value={k}>{USAGE_RANGE_LABELS[k]}</option>
@@ -1470,30 +1469,34 @@ function UsageAnalytics({ stats, keysCount, loading, range, onRangeChange, onRef
             </select>
             <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-zinc-400" />
           </div>
-          <Link
-            to="/dashboard/extension"
-            aria-label="Add extension key"
-            className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-zinc-200 bg-white text-zinc-500 shadow-sm transition hover:border-zinc-300 hover:text-zinc-900"
-          >
-            <Plus className="h-3.5 w-3.5" />
-          </Link>
-          <button
+          <Button asChild variant="ghost" size="icon" className="h-10 w-10 text-zinc-600 shadow-none">
+            <Link to="/dashboard/extension" aria-label="Add extension key">
+              <Plus className="h-4 w-4" />
+            </Link>
+          </Button>
+          <Button
             type="button"
             onClick={onRefresh}
             aria-label="Refresh usage"
-            className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-zinc-200 bg-white text-zinc-500 shadow-sm transition hover:border-zinc-300 hover:text-zinc-900"
+            variant="ghost"
+            size="icon"
+            className="h-10 w-10 text-zinc-600 shadow-none"
           >
-            <RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`} />
-          </button>
+            <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
+          </Button>
         </div>
       </div>
-      <div className="grid grid-cols-1 overflow-hidden rounded-xl border border-white sm:grid-cols-2 lg:grid-cols-3 [&>*]:border-b [&>*]:border-r [&>*]:border-white">
-        <UsageStatCard title="Extension scans" value={String(totalScans)} delta={deltaPct(totalScans, prevScans)} series={scanSeries} chartHeight={36} color="#e01563" />
-        <UsageStatCard title="Credits spent" value={fmtUsd2(totalSpent)} delta={deltaPct(totalSpent, prevSpent)} series={spentSeries} chartHeight={36} color="#0f9d8f" />
-        <UsageStatCard title="Tokens processed" value={totalTokens >= 1000 ? `${(totalTokens / 1000).toFixed(1)}k` : String(totalTokens)} series={tokenSeries} chartHeight={36} color="#a16207" />
-        <UsageStatCard title="Wallet balance" value={stats ? fmtUsd2(balance) : "…"} series={spentSeries} chartHeight={36} color="#0f9d8f" />
-        <UsageStatCard title="Credits remaining" value={stats ? `${remainingPct.toFixed(1)}%` : "…"} series={[remainingPct]} chartHeight={36} color="#e01563" />
-        <UsageStatCard title="Extension keys" value={keysCount == null ? "…" : String(keysCount)} series={[keysCount ?? 0]} chartHeight={36} color="#0f9d8f" />
+      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="overflow-hidden rounded-lg border border-zinc-200 lg:col-span-2">
+          <UsageStatCard featured title="Total requests" value={String(totalScans)} delta={deltaPct(totalScans, prevScans)} series={scanSeries} />
+        </div>
+        <div className="overflow-hidden rounded-lg border border-zinc-200 lg:col-span-2">
+          <UsageStatCard featured title="Tokens processed" value={totalTokens >= 1000 ? `${(totalTokens / 1000).toFixed(1)}k` : String(totalTokens)} series={tokenSeries} />
+        </div>
+        <div className="overflow-hidden rounded-lg border border-zinc-200"><UsageStatCard title="Credits spent" value={fmtUsd2(totalSpent)} delta={deltaPct(totalSpent, prevSpent)} series={spentSeries} /></div>
+        <div className="overflow-hidden rounded-lg border border-zinc-200"><UsageStatCard title="Wallet balance" value={stats ? fmtUsd2(balance) : "…"} series={spentSeries} /></div>
+        <div className="overflow-hidden rounded-lg border border-zinc-200"><UsageStatCard title="Credits remaining" value={stats ? `${remainingPct.toFixed(1)}%` : "…"} series={[remainingPct]} /></div>
+        <div className="overflow-hidden rounded-lg border border-zinc-200"><UsageStatCard title="Extension keys" value={keysCount == null ? "…" : String(keysCount)} series={[keysCount ?? 0]} /></div>
       </div>
 
 
