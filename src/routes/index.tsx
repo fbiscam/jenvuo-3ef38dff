@@ -109,13 +109,13 @@ import xaiLogo from "@/assets/xai-logo.png";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "AI Gold Trading Extension — Jenvu" },
+      { title: "AI Gold Trading — Jenvu" },
       {
         name: "description",
         content:
           "Jenvu is an AI TradingView extension for live ICT/SMC gold analysis with precise entries, stops, targets and mandatory senior review on eligible plans.",
       },
-      { property: "og:title", content: "AI Gold Trading Extension — Jenvu" },
+      { property: "og:title", content: "AI Gold Trading — Jenvu" },
       {
         property: "og:description",
         content: "Analyze XAU/USD charts in TradingView with institutional ICT/SMC logic, chart-aware AI and reviewed trade signals.",
