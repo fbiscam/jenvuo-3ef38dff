@@ -1194,7 +1194,8 @@ function UsageLineChart({ values, height = 110, color = "currentColor" }: { valu
     );
   }
 
-  const last = pts[pts.length - 1]!;
+  const last = pts.at(-1);
+  if (!last) return null;
   return (
     <div className="relative w-full" style={{ height: h }}>
       <svg viewBox={`0 0 ${w} ${h}`} className="h-full w-full" preserveAspectRatio="none" aria-hidden="true">
