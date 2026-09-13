@@ -85,6 +85,12 @@ const MODEL_PRICING: Record<string, Price> = {
   "jw/gpt-5.6-terra": { in: 1.25, out: 10.0 },
   "jw/gpt-5.6-luna": { in: 0.25, out: 2.0 },
 
+  // Browser Use hosted rates. GPT-6 Astra and Claude Fable 5 are currently
+  // available on this account; cost logs use conservative published-tier
+  // equivalents until model-specific public token prices are posted.
+  "browseruse/gpt-6-astra": { in: 6.0, out: 36.0 },
+  "browseruse/claude-fable-5": { in: 6.0, out: 30.0 },
+
 
 
   // Google
@@ -119,12 +125,13 @@ export function formatModelLabel(rawModel: string | null | undefined): string {
   const m = raw.toLowerCase();
   if (m.startsWith("rules-engine/ict-smc")) return "ICT/SMC Rules Engine";
   // Strip provider prefix (bmind/, openai/, nvapi/, google/, etc.)
-  const bare = m.replace(/^(dsofficial|bmind|tukenku|unikey|evolink|jw|openai|nvapi|google|anthropic)\//g, "").replace(/^myt\//, "").replace(/^orion\//, "").replace(/^deepseek-ai\//, "");
+  const bare = m.replace(/^(dsofficial|bmind|tukenku|unikey|evolink|jw|browseruse|openai|nvapi|google|anthropic)\//g, "").replace(/^myt\//, "").replace(/^orion\//, "").replace(/^deepseek-ai\//, "");
   if (bare.startsWith("claude-opus-5")) return "Claude Opus 5";
   if (bare.startsWith("claude-opus-4-8")) return "Claude Opus 4.8";
   if (bare.startsWith("claude-sonnet-4.5") || bare.startsWith("claude-4.5-sonnet")) return "Claude Sonnet 4.5";
   if (bare.startsWith("claude-3.7-sonnet") || bare.startsWith("claude-3-7-sonnet")) return "Claude 3.7 Sonnet";
   if (bare.startsWith("claude-opus")) return "Claude Opus";
+  if (bare.startsWith("claude-fable-5")) return "Claude Fable 5";
   if (bare.startsWith("claude")) return "Claude";
   if (bare.startsWith("gpt-5.6-sol")) return "ChatGPT 5.6 Sol";
   if (bare.startsWith("gpt-5.6-luna")) return "ChatGPT 5.6 Luna";
