@@ -80,7 +80,11 @@ function providerConfigured(model: string): boolean {
   if (model.startsWith("dsofficial/")) return Boolean(process.env.DEEPSEEK_API_KEY);
   if (model.startsWith("oai/")) return Boolean(process.env.OPENAI_API_KEY);
   if (model.startsWith("jw/")) return Boolean(process.env.JUSTWOKER_API_KEY);
-  if (model.startsWith("browseruse/")) return Boolean(process.env.BROWSER_USE_API_KEY);
+  if (model.startsWith("browseruse/")) return Boolean(
+    process.env.BROWSER_USE_API_KEY ||
+    process.env.BROWSER_USE_API_KEY_2 ||
+    process.env.BROWSER_USE_API_KEY_3,
+  );
   return Boolean(process.env.LOVABLE_API_KEY);
 }
 
@@ -106,13 +110,20 @@ export type UsageInfo = { promptTokens: number; completionTokens: number; totalT
 // rather than an OpenAI-compatible chat-completions endpoint. Translate the
 // conversation into a self-contained task, upload any chart images, and poll
 // the bounded run until it reaches a terminal state.
-async function callBrowserUse(
+function getBrowserUseApiKeys(): string[] {
+  return [
+    process.env.BROWSER_USE_API_KEY,
+    process.env.BROWSER_USE_API_KEY_2,
+    process.env.BROWSER_USE_API_KEY_3,
+  ].filter((key): key is string => Boolean(key));
+}
+
+async function callBrowserUseWithKey(
   model: string,
   opts: CallChatOptions,
+  key: string,
   signal?: AbortSignal,
 ): Promise<{ content: string; usage: UsageInfo }> {
-  const key = process.env.BROWSER_USE_API_KEY;
-  if (!key) throw new AiGatewayError("BROWSER_USE_API_KEY missing on server", 0, true);
   const wireModel = model.slice("browseruse/".length);
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
@@ -246,6 +257,34 @@ async function callBrowserUse(
       }).catch(() => undefined);
     }
   }
+}
+
+async function callBrowserUse(
+  model: string,
+  opts: CallChatOptions,
+  signal?: AbortSignal,
+): Promise<{ content: string; usage: UsageInfo }> {
+  const keys = getBrowserUseApiKeys();
+  if (!keys.length) throw new AiGatewayError("Browser Use API keys are missing on the server.", 0, true);
+
+  let lastError: unknown;
+  for (const key of keys) {
+    try {
+      return await callBrowserUseWithKey(model, opts, key, signal);
+    } catch (error) {
+      lastError = error;
+      if (signal?.aborted) throw error;
+      const status = error instanceof AiGatewayError ? error.status : 0;
+      // A depleted, revoked, or account-limited key should not block the next
+      // funded Browser Use account in the ordered fallback pool.
+      if (status !== 401 && status !== 402 && status !== 403) throw error;
+    }
+  }
+
+  if (lastError instanceof AiGatewayError) {
+    throw new AiGatewayError(lastError.message, lastError.status, true);
+  }
+  throw new AiGatewayError("All Browser Use accounts are unavailable.", 0, true);
 }
 
 // -------- JustWoker (api.justwoker.icu) ------------------------------------
