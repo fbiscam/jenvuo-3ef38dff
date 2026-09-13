@@ -333,7 +333,7 @@ export const collections: Collection[] = [
         summary: "Free, Pro, Elite and Ultra — wallets, scan estimates and features.",
         updatedAt: "2026-07-10",
         body: [
-          { type: "p", content: "Jenvu uses a USD-wallet subscription model. Every plan comes with a monthly USD wallet — each signal scan deducts a flat $0.20 per scan. Only successful BUY / SELL scans are billed; WAIT results and errors are free." },
+          { type: "p", content: "Jenvu uses a USD-wallet subscription model. AI chat and primary-only analysis cost $0.03 per request. A completed senior-reviewed analysis costs $0.20. Failed requests are free." },
 
           { type: "h2", content: "Free" },
           { type: "ul", items: [
@@ -383,13 +383,14 @@ export const collections: Collection[] = [
         summary: "Only BUY / SELL signals draw from your USD wallet.",
         updatedAt: "2026-07-10",
         body: [
-          { type: "p", content: "Scans deduct a flat $0.20 per successful BUY / SELL signal from your USD wallet. WAIT signals and errors are free." },
+          { type: "p", content: "AI chat and primary-only analysis cost $0.03 per request. A completed senior-reviewed analysis costs $0.20. Failed requests are free." },
 
           { type: "h2", content: "What counts as a scan" },
           { type: "ul", items: [
             "Signal analysis returning BUY or SELL — deducted from wallet at real cost.",
             "Signal returning WAIT (dead market) — free.",
-            "AI extension chat — billed by measured token use.",
+            "AI extension chat or primary-only analysis — $0.03 per completed request.",
+            "Analysis with a completed senior review — $0.20 per request.",
             "A+ broadcast alert delivered to you — free.",
           ]},
 

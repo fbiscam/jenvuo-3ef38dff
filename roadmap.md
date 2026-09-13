@@ -35,3 +35,6 @@
 - [x] Link Google Search Console, Google Maps, Apollo, Firecrawl, and Google Analytics
 - [ ] Replace the managed Google Maps connection for custom-domain support (blocked until a user-owned Maps key is ready)
 - [ ] Mark imgakhar@gmail.com identity documents as verified (blocked while the hosted database is paused)
+- [x] Set extension request billing to $0.03 primary and $0.20 senior-reviewed
+- [x] Update current GPT-6 Astra and Claude Opus 5 model copy across pricing and dashboards
+- [ ] Activate AgentRouter GPT-6 Astra and Claude Opus 5 (blocked by AgentRouter rejecting the saved API key)

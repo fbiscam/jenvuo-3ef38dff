@@ -64,7 +64,7 @@ const TIERS = [
       "Trade journal & analytics",
       "Multi-timeframe bias engine",
       "2 extension API keys · $10 AI wallet",
-      "GPT-5.6 Sol primary analysis",
+      "GPT-6 Astra primary analysis",
     ],
 
     highlight: true,
@@ -88,7 +88,7 @@ const TIERS = [
       "Dedicated XAU/USD scanner with DXY overlay",
       "API access & webhooks",
       "3 extension API keys · $40 AI wallet",
-      "GPT-5.6 Terra mandatory senior review",
+      "Claude Opus 5 mandatory senior review",
       "Custom alert rules",
       "Dedicated onboarding & SLA",
     ],
@@ -229,13 +229,10 @@ function PricingPage() {
               {([
                 { f: "Monthly AI wallet", b: "$10", c: "$40", d: "$90" },
                 { f: "Active extension API keys", b: "2", c: "3", d: "5" },
-                { f: "GPT-5.6 Sol primary analysis", b: true, c: true, d: true },
-                { f: "GPT-5.6 Terra senior review", b: false, c: true, d: true },
-                { f: "GPT-6 input capacity", b: "Up to 2M tokens", c: "Up to 8M tokens", d: "Up to 18M tokens" },
-                { f: "GPT-6 output capacity", b: "Up to 400K tokens", c: "Up to 1.6M tokens", d: "Up to 3.6M tokens" },
-                { f: "Claude review input capacity", b: false, c: "Up to 16M tokens", d: "Up to 36M tokens" },
-                { f: "Claude review output capacity", b: false, c: "Up to 3.2M tokens", d: "Up to 7.2M tokens" },
-                { f: "Token price", b: "50% of published rate", c: "50% of published rate", d: "50% of published rate" },
+                { f: "GPT-6 Astra primary analysis", b: true, c: true, d: true },
+                { f: "Claude Opus 5 senior review", b: false, c: true, d: true },
+                { f: "Chat / primary request", b: "$0.03", c: "$0.03", d: "$0.03" },
+                { f: "Senior-reviewed analysis", b: false, c: "$0.20", d: "$0.20" },
 
                 { f: "AI extension chat", b: "$10 wallet", c: "$40 wallet", d: "$90 wallet" },
 
@@ -285,12 +282,12 @@ function PricingPage() {
                           <span className="inline-flex flex-col items-center justify-center gap-1 whitespace-nowrap">
                             <span className="inline-flex items-center gap-1 rounded-md border border-zinc-200 bg-white px-1.5 py-0.5">
                               <svg viewBox="0 0 24 24" width="10" height="10" fill="#000" aria-hidden="true"><path d="M22.28 9.82a5.98 5.98 0 0 0-.51-4.91 6.05 6.05 0 0 0-6.52-2.9A6 6 0 0 0 4.98 4.18a5.98 5.98 0 0 0-4 2.9 6.05 6.05 0 0 0 .74 7.1 5.98 5.98 0 0 0 .51 4.91 6.05 6.05 0 0 0 6.52 2.9A6 6 0 0 0 19.02 19.8a5.98 5.98 0 0 0 4-2.9 6.05 6.05 0 0 0-.74-7.1zm-9.06 12.67a4.5 4.5 0 0 1-2.88-1.04l.14-.08 4.79-2.77a.78.78 0 0 0 .39-.68v-6.76l2.03 1.17.02.05v5.6a4.5 4.5 0 0 1-4.49 4.51zM3.5 18.55a4.47 4.47 0 0 1-.54-3.03l.14.08 4.79 2.77a.78.78 0 0 0 .79 0l5.85-3.38v2.35l.02.05-4.85 2.8a4.5 4.5 0 0 1-6.2-1.64zM2.24 8.03a4.5 4.5 0 0 1 2.35-1.98v5.7a.77.77 0 0 0 .39.68l5.83 3.36-2.03 1.17a.07.07 0 0 1-.07 0l-4.84-2.8a4.5 4.5 0 0 1-1.63-6.13zm16.63 3.87-5.85-3.4L15.05 7.34a.07.07 0 0 1 .07 0l4.84 2.8a4.5 4.5 0 0 1-.68 8.11v-5.7a.79.79 0 0 0-.4-.65zm2.02-3.04-.14-.09-4.78-2.79a.78.78 0 0 0-.79 0L9.33 9.36V7.01l-.02-.05 4.85-2.8a4.5 4.5 0 0 1 6.68 4.66zM8.22 12.99l-2.03-1.17-.02-.05v-5.6a4.5 4.5 0 0 1 7.38-3.45l-.14.08L8.62 5.57a.78.78 0 0 0-.4.68zm1.1-2.38 2.61-1.5 2.6 1.5v3l-2.6 1.5-2.6-1.5z"/></svg>
-                               <span className="text-[10px] font-medium text-zinc-800 whitespace-nowrap">GPT-5.6 Sol</span>
+                               <span className="text-[10px] font-medium text-zinc-800 whitespace-nowrap">GPT-6 Astra</span>
                             </span>
                           </span>
                           {(v === "__MODELS__" || v === "__MODELS_PLUS__") && (
                             <span className="inline-flex items-center gap-1 rounded-md border border-zinc-200 bg-white px-1.5 py-0.5">
-                             <span className="text-[10px] font-medium text-zinc-800 whitespace-nowrap">GPT-5.6 Terra</span>
+                              <span className="text-[10px] font-medium text-zinc-800 whitespace-nowrap">Claude Opus 5</span>
                               
                             </span>
                           )}
@@ -317,7 +314,7 @@ function PricingPage() {
           <div>
             
             <h2 className="mt-2 text-2xl sm:text-3xl font-semibold tracking-tight">Need more wallet balance?</h2>
-             <p className="mt-2 max-w-xl text-sm text-zinc-600 lg:max-w-none lg:whitespace-nowrap">Live market data is free. Pro uses GPT-5.6 Sol; Elite and Ultra add a mandatory GPT-5.6 Terra review. AI is billed at 50% of published token rates.</p>
+             <p className="mt-2 max-w-xl text-sm text-zinc-600 lg:max-w-none lg:whitespace-nowrap">Live market data is free. Pro uses GPT-6 Astra; Elite and Ultra add mandatory Claude Opus 5 review. Requests cost $0.03 or $0.20 with senior review.</p>
           </div>
         </div>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -338,7 +335,7 @@ function PricingPage() {
                 <span className="text-3xl tabular-nums price-font">${p.price}</span>
                 <span className="text-xs text-zinc-500">wallet</span>
               </div>
-              <div className="mt-1 text-sm text-zinc-700">${p.price} one-time · up to {(p.price / 5).toFixed(1)}M GPT-6 input tokens</div>
+               <div className="mt-1 text-sm text-zinc-700">${p.price} one-time · about {Math.floor(p.price / 0.03)} primary AI requests</div>
               {signedOut ? (
                 <Link to="/founding" className="mt-5 inline-flex w-full items-center justify-center rounded-md bg-home-accent px-3 py-2 text-xs font-medium text-home-accent-foreground hover:opacity-90">
                   Buy Now
@@ -388,14 +385,14 @@ function PricingPage() {
 function CustomTopUp({ signedOut }: { signedOut: boolean }) {
   const [amount, setAmount] = React.useState<number>(15);
   const safe = Math.max(5, Math.min(1000, Number.isFinite(amount) ? amount : 5));
-  const inputTokens = (safe / 5).toFixed(1);
+  const primaryRequests = Math.floor(safe / 0.03);
   return (
     <div className="mt-8 rounded-lg border border-border bg-background p-6 sm:p-7">
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-5">
         <div>
           
           <h3 className="mt-2 text-lg font-semibold tracking-tight">Pick your own amount</h3>
-          <p className="mt-1 text-sm text-zinc-600">Minimum $5. $1 top-up = $1 wallet. Extension AI is billed per token at 50% of the published rate.</p>
+          <p className="mt-1 text-sm text-zinc-600">Minimum $5. $1 top-up = $1 wallet. Primary requests cost $0.03; completed senior-reviewed analysis costs $0.20.</p>
         </div>
         <div className="flex items-center gap-3">
           <div className="flex items-center overflow-hidden rounded-md border border-border bg-background focus-within:ring-2 focus-within:ring-home-accent/40">
@@ -411,7 +408,7 @@ function CustomTopUp({ signedOut }: { signedOut: boolean }) {
           </div>
           <div className="text-right">
             <div className={`text-2xl font-bold tabular-nums ${MONO}`}>${safe}</div>
-            <div className="text-[11px] text-zinc-500">wallet · up to {inputTokens}M input tokens</div>
+            <div className="text-[11px] text-zinc-500">wallet · about {primaryRequests} primary requests</div>
           </div>
           {signedOut ? (
             <Link
