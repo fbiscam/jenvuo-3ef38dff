@@ -138,7 +138,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "robots", content: "index, follow, max-image-preview:large, max-snippet:-1" },
       { name: "google-site-verification", content: "tbza8oQV5Q94J94ETfj9TDnV7gI8eoXIAF6q9nctPnQ" },
       { name: "google-adsense-account", content: "ca-pub-7687697849515472" },
-      { title: "Jenvu — AI Gold Trading Extension" },
+      { title: "Jenvu — AI Gold Trading" },
       { name: "description", content: "AI-powered TradingView extension for XAU/USD with live ICT/SMC analysis, chart context, A+ setups and reviewed trade signals." },
       { name: "author", content: "Jenvu AI" },
       { name: "theme-color", content: "#000000" },
