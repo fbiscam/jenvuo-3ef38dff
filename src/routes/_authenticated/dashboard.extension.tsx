@@ -184,7 +184,7 @@ function ExtensionPage() {
 
       {!loading && access && capabilities.extensionAi && !capabilities.seniorReview && (
         <div className="mt-5 rounded-lg border border-blue-200 bg-blue-50 p-4 text-[13px] text-blue-900">
-          Your Pro plan includes GPT-5.6 Sol primary analysis for XAU/USD. Elite or Ultra unlocks multi-pair scanning and mandatory senior review.
+          Your Pro plan includes GPT-6 Astra primary analysis for XAU/USD. Elite or Ultra unlocks multi-pair scanning and mandatory Claude senior review.
         </div>
       )}
 
@@ -393,7 +393,7 @@ function ExtensionPage() {
               <X className="h-4 w-4" />
             </button>
           </div>
-          <p className="mt-3 text-[12px] leading-relaxed text-zinc-600">AI chat and primary analysis are billed per token at 50% of published rates. Each completed senior-reviewed scan costs $0.20. Pro includes primary XAU/USD analysis; Elite and Ultra add multi-pair scanning and mandatory senior review.</p>
+          <p className="mt-3 text-[12px] leading-relaxed text-zinc-600">AI chat and primary-only analysis cost $0.03 per request. Each completed senior-reviewed analysis costs $0.20. Pro includes GPT-6 Astra for XAU/USD; Elite and Ultra add multi-pair scanning and mandatory Claude review.</p>
           <ol className="mt-3 space-y-2 text-[13px] leading-relaxed text-zinc-700">
             <li>1. Download the extension package above and unzip it.</li>
             <li>2. Open <span className={`${MONO} rounded bg-white px-1.5 py-0.5 text-[12px]`}>chrome://extensions</span>, turn on Developer mode.</li>

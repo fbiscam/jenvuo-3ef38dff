@@ -3,6 +3,7 @@ import { getPlanCapabilities } from '@/lib/plan-entitlements'
 
 export const EXTENSION_BASE_FEE_USD = 0
 export const EXTENSION_TOKEN_PRICE_MULTIPLIER = 0.5
+export const EXTENSION_PRIMARY_REQUEST_FEE_USD = 0.03
 export const EXTENSION_SENIOR_REVIEW_FEE_USD = 0.2
 
 type Usage = { promptTokens: number; completionTokens: number; totalTokens?: number }
@@ -54,7 +55,7 @@ export async function chargeExtensionUsage(params: {
   const hasSeniorReview = params.calls.some((call) => call.stage === 'extension-senior-review' || call.stage === 'senior-review')
   const charged = hasSeniorReview
     ? EXTENSION_SENIOR_REVIEW_FEE_USD
-    : Number((rawCost * EXTENSION_TOKEN_PRICE_MULTIPLIER).toFixed(6))
+    : EXTENSION_PRIMARY_REQUEST_FEE_USD
   if (entitlement.balance < charged) return { ok: false, charged: 0, error: 'Low balance. Add funds to continue using extension AI.' }
 
   const primary = params.calls[0]
@@ -72,8 +73,9 @@ export async function chargeExtensionUsage(params: {
       action: params.action, model: models, primary_model: primary?.model ?? null,
       senior_model: senior?.model ?? null, stage: 'extension_api', prompt_tokens: promptTokens,
       completion_tokens: completionTokens, raw_cost_usd: rawCost, base_fee_usd: EXTENSION_BASE_FEE_USD,
-       pricing_multiplier: EXTENSION_TOKEN_PRICE_MULTIPLIER, pricing_basis: '50_percent_of_official_provider_token_rates',
+       pricing_multiplier: EXTENSION_TOKEN_PRICE_MULTIPLIER, pricing_basis: hasSeniorReview ? 'fixed_senior_review_request' : 'fixed_primary_request',
        charge_usd: charged, senior_review: hasSeniorReview,
+       primary_request_fee_usd: hasSeniorReview ? 0 : EXTENSION_PRIMARY_REQUEST_FEE_USD,
        senior_review_fee_usd: hasSeniorReview ? EXTENSION_SENIOR_REVIEW_FEE_USD : 0,
     },
   })

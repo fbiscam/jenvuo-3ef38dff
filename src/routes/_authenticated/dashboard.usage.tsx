@@ -63,6 +63,17 @@ function fmtInt(n: number) {
   return `${Math.round(n)}`;
 }
 
+function modelDisplay(raw: string) {
+  const [providerId = "unknown", ...modelParts] = raw.split("/");
+  const provider = providerId === "browseruse" ? "Browser Use" : providerId === "evolink" ? "Evolink" : providerId === "agentrouter" ? "AgentRouter" : providerId;
+  const modelId = modelParts.join("/") || raw;
+  const model = modelId
+    .replace(/^gpt-6-astra$/i, "GPT-6 Astra")
+    .replace(/^claude-opus-5$/i, "Claude Opus 5")
+    .replace(/^claude-fable-5$/i, "Claude Fable 5");
+  return { provider, model };
+}
+
 const RANGES = [
   { days: 7, label: "Last 7 days" },
   { days: 14, label: "Last 14 days" },
@@ -558,7 +569,13 @@ function ModelBreakdown({ rows }: { rows: { model?: string | null; prompt_tokens
     <div className="divide-y divide-zinc-100">
       {list.map(([model, s]) => (
         <div key={model} className="grid grid-cols-1 gap-2 px-4 py-3 text-[13px] sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center sm:px-5">
-          <span className="min-w-0 truncate font-mono text-[12px] text-zinc-700">{model}</span>
+          <div className="flex min-w-0 items-center gap-2">
+            <span className="grid h-6 w-6 shrink-0 place-items-center rounded-md border border-zinc-200 bg-white text-[10px] font-semibold text-zinc-700" aria-hidden="true">
+              {modelDisplay(model).provider.slice(0, 1).toUpperCase()}
+            </span>
+            <span className="min-w-0 truncate text-[12px] font-medium text-zinc-800">{modelDisplay(model).model}</span>
+            <span className="shrink-0 rounded-full bg-zinc-100 px-2 py-0.5 text-[10px] text-zinc-500">{modelDisplay(model).provider}</span>
+          </div>
           <div className="grid grid-cols-3 items-center gap-2 tabular-nums text-[11px] text-zinc-500 sm:flex sm:shrink-0 sm:gap-4 sm:text-[12px]">
             <span>{fmtInt(s.requests)} requests</span>
             <span>{fmtInt(s.tokens)} tokens</span>

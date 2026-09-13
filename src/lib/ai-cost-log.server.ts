@@ -125,7 +125,7 @@ export function formatModelLabel(rawModel: string | null | undefined): string {
   const m = raw.toLowerCase();
   if (m.startsWith("rules-engine/ict-smc")) return "ICT/SMC Rules Engine";
   // Strip provider prefix (bmind/, openai/, nvapi/, google/, etc.)
-  const bare = m.replace(/^(dsofficial|bmind|tukenku|unikey|evolink|jw|browseruse|openai|nvapi|google|anthropic)\//g, "").replace(/^myt\//, "").replace(/^orion\//, "").replace(/^deepseek-ai\//, "");
+  const bare = m.replace(/^(dsofficial|bmind|tukenku|unikey|evolink|jw|browseruse|agentrouter|openai|nvapi|google|anthropic)\//g, "").replace(/^myt\//, "").replace(/^orion\//, "").replace(/^deepseek-ai\//, "");
   if (bare.startsWith("claude-opus-5")) return "Claude Opus 5";
   if (bare.startsWith("claude-opus-4-8")) return "Claude Opus 4.8";
   if (bare.startsWith("claude-sonnet-4.5") || bare.startsWith("claude-4.5-sonnet")) return "Claude Sonnet 4.5";
