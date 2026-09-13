@@ -631,17 +631,17 @@ function HomePage() {
       {/* INTEGRATIONS */}
       <section className="border-t border-zinc-100 bg-white">
         <div className="mx-auto max-w-6xl px-5 py-10 sm:px-6 sm:py-12">
-          <div className="flex flex-col md:flex-row items-start justify-between gap-6">
+          <div className="flex min-w-0 flex-col items-start justify-between gap-6 md:flex-row">
             <div className="w-full text-center md:w-auto md:text-left">
               <h3 className="text-lg font-semibold tracking-tight text-zinc-900 sm:text-xl">
                 Wired into the venues&nbsp;
               </h3>
             </div>
-            <div className="flex flex-wrap items-center justify-center gap-3">
+            <div className="flex w-full min-w-0 snap-x snap-mandatory flex-nowrap items-center justify-start gap-3 overflow-x-auto overscroll-x-contain pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:w-auto md:flex-wrap md:justify-end md:overflow-visible md:pb-0">
               {["OANDA XAU feeds", "Yahoo Finance", "LBMA fix", "TradingView", "COMEX / COT", "DXY"].map((n) => (
                 <span
                   key={n}
-                  className={`rounded-full border border-zinc-200 bg-white px-3.5 py-1.5 ${MONO} text-[11px] tracking-wider text-zinc-900`}
+                  className={`shrink-0 snap-start rounded-full border border-zinc-200 bg-white px-3.5 py-1.5 ${MONO} text-[11px] tracking-wider text-zinc-900`}
                 >
                   {n}
                 </span>
