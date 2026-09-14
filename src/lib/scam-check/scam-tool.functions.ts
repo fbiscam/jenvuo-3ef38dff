@@ -200,7 +200,7 @@ export const scamToolCheck = createServerFn({ method: "POST" })
 
     try {
       const res = await callChatCompletion({
-        models: ["bmind/gpt-4o", "bmind/gpt-5.2-chat", "google/gemini-2.5-flash"],
+        models: ["unorouter/nemotron-3-ultra-550b-a55b:free", "unorouter/glm-5.3:free", "bmind/gpt-4o"],
         messages: [
           { role: "system", content: SYSTEM },
           { role: "user", content: userMsg },

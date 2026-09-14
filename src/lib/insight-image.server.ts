@@ -2,14 +2,8 @@
 // stores it in the private `insight-images` bucket. The public site reads it
 // back through /api/public/insight-image/$path (see that route).
 //
-// UnoRouter's free image routes are attempted first. They are aggressively
-// rate-limited, so the established providers remain as reliable fallbacks.
-
-const IMAGE_MODELS = [
-  "google/gemini-3.1-flash-image",
-  "google/gemini-2.5-flash-image",
-  "openai/gpt-image-1-mini",
-] as const;
+// UnoRouter's free image routes are attempted first. Google AI and the free
+// image provider are independent fallbacks; Lovable AI is never called.
 
 export const INSIGHT_IMAGE_BUCKET = "insight-images";
 
@@ -158,55 +152,6 @@ async function generateBase64(
 
   const viaFree = await generateWithPollinations(prompt);
   if (viaFree) return viaFree;
-
-  const key = process.env.LOVABLE_API_KEY;
-  if (!key) return null;
-
-
-
-
-  for (const model of IMAGE_MODELS) {
-    try {
-      const isOpenAi = model.startsWith("openai/");
-      const body = isOpenAi
-        ? { model, prompt, quality: "low", stream: false }
-        : {
-            model,
-            messages: [{ role: "user", content: prompt }],
-            modalities: ["image", "text"],
-            stream: false,
-          };
-
-      const res = await fetch("https://ai.gateway.lovable.dev/v1/images/generations", {
-        method: "POST",
-        headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      });
-
-      if (!res.ok) {
-        const detail = (await res.text()).slice(0, 500);
-        console.warn("[insight-image] model failed", model, res.status, detail.slice(0, 200));
-        if (res.status === 402 || res.status === 403) {
-          throw new InsightImageGenerationError(`Cover image provider failed [${res.status}]: ${detail}`, res.status);
-        }
-        continue;
-      }
-
-      const json = (await res.json()) as any;
-      const b64: string | undefined =
-        json?.data?.[0]?.b64_json ??
-        json?.choices?.[0]?.message?.images?.[0]?.image_url?.url ??
-        json?.choices?.[0]?.message?.content?.find?.((p: any) => p?.type === "image_url")?.image_url?.url;
-
-      if (typeof b64 === "string" && b64.length > 100) {
-        return { b64: b64.replace(/^data:image\/\w+;base64,/, ""), model };
-      }
-      console.warn("[insight-image] no image payload from", model);
-    } catch (e) {
-      if (e instanceof InsightImageGenerationError) throw e;
-      console.warn("[insight-image] threw", model, String(e));
-    }
-  }
   return null;
 }
 
