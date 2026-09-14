@@ -721,14 +721,16 @@ function CapabilityChart({ title, series }: { title: string; series: { data: num
   );
 }
 
-function ModelBreakdown({ rows }: { rows: { model?: string | null; prompt_tokens?: number | null; completion_tokens?: number | null; raw_cost_usd?: number | null; delta: number }[] }) {
-  const byModel = new Map<string, { requests: number; tokens: number; cost: number }>();
+function ModelBreakdown({ rows }: { rows: { model?: string | null; prompt_tokens?: number | null; completion_tokens?: number | null; raw_cost_usd?: number | null; delta: number; created_at?: string }[] }) {
+  const byModel = new Map<string, { requests: number; tokens: number; cost: number; trend: { date: string; cost: number }[] }>();
   for (const r of rows) {
     const key = r.model ?? "unknown";
-    const cur = byModel.get(key) ?? { requests: 0, tokens: 0, cost: 0 };
+    const cur = byModel.get(key) ?? { requests: 0, tokens: 0, cost: 0, trend: [] };
     cur.requests += 1;
     cur.tokens += (r.prompt_tokens ?? 0) + (r.completion_tokens ?? 0);
-    cur.cost += r.raw_cost_usd != null ? Number(r.raw_cost_usd) : Math.abs(r.delta);
+    const cost = r.raw_cost_usd != null ? Number(r.raw_cost_usd) : Math.abs(r.delta);
+    cur.cost += cost;
+    cur.trend.push({ date: r.created_at ?? "", cost });
     byModel.set(key, cur);
   }
   const list = [...byModel.entries()].sort((a, b) => b[1].cost - a[1].cost);
@@ -737,20 +739,34 @@ function ModelBreakdown({ rows }: { rows: { model?: string | null; prompt_tokens
   }
   return (
     <div className="divide-y divide-zinc-100">
-      {list.map(([model, s]) => (
-        <div key={model} className="grid grid-cols-1 gap-2 px-4 py-3 text-[13px] sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center sm:px-5">
-          <div className="flex min-w-0 items-center gap-2">
-            <ModelLogo model={model} />
-            <span className="min-w-0 truncate text-[12px] font-medium text-zinc-800">{modelDisplay(model).model}</span>
-            <span className="shrink-0 rounded-full bg-zinc-100 px-2 py-0.5 text-[10px] text-zinc-500">{modelDisplay(model).provider}</span>
+      {list.map(([model, s]) => {
+        const isIctSmc = /ict|smc/i.test(model);
+        return (
+        <div key={model} className="px-4 py-3 text-[13px] sm:px-5">
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
+            <div className="flex min-w-0 items-center gap-2">
+              <ModelLogo model={model} />
+              <span className="min-w-0 truncate text-[12px] font-medium text-zinc-800">{modelDisplay(model).model}</span>
+              <span className="shrink-0 rounded-full bg-zinc-100 px-2 py-0.5 text-[10px] text-zinc-500">{modelDisplay(model).provider}</span>
+            </div>
+            <div className="grid grid-cols-3 items-center gap-2 tabular-nums text-[11px] text-zinc-500 sm:flex sm:shrink-0 sm:gap-4 sm:text-[12px]">
+              <span>{fmtInt(s.requests)} requests</span>
+              <span>{fmtInt(s.tokens)} tokens</span>
+              <span className="font-semibold text-zinc-800">{fmtUsd(s.cost, 2)}</span>
+            </div>
           </div>
-          <div className="grid grid-cols-3 items-center gap-2 tabular-nums text-[11px] text-zinc-500 sm:flex sm:shrink-0 sm:gap-4 sm:text-[12px]">
-            <span>{fmtInt(s.requests)} requests</span>
-            <span>{fmtInt(s.tokens)} tokens</span>
-            <span className="font-semibold text-zinc-800">{fmtUsd(s.cost, 2)}</span>
+          {isIctSmc && (
+            <div className="mt-2 pl-9" aria-label={`${modelDisplay(model).model} usage graph`}>
+              <MiniLine
+                data={s.trend.sort((a, b) => a.date.localeCompare(b.date)).map((point) => point.cost)}
+                color="var(--chart-1)"
+                filled
+              />
+            </div>
+          )}
           </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 }
