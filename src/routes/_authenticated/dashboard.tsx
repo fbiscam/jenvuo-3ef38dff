@@ -1469,7 +1469,7 @@ const RECOMMENDED_MODELS = [
     featured: true,
   },
   {
-    name: " Claude opus 5",
+    name: "  Claude opus 5",
     badge: "Senior review",
     description: "Independent validation for structure, risk",
     logo: ClaudeLogo,
