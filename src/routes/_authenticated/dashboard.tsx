@@ -1502,7 +1502,7 @@ const PRODUCT_UPDATES = [
   },
   {
     age: "Updated",
-    title: "Provider fallback",
+    title: " Provider fallback",
     copy: "Analysis continues through another provider when an AI account is unavailable.",
     icon: RefreshCw,
   },
