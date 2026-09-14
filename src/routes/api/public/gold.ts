@@ -179,7 +179,7 @@ async function handle({ request }: { request: Request }) {
 
       if (conversational) {
         const casual = await callChatCompletion({
-          models: [...EXTENSION_MODEL_CHAIN.reasoning],
+          models: [...EXTENSION_MODEL_CHAIN.conversation],
           stage: 'extension-chat',
           maxTokens: 400,
           timeoutMs: 45_000,
