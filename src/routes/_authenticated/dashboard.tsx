@@ -1577,7 +1577,7 @@ function ModelWorkspace() {
           </Link>
           <Link to="/pricing" className="group flex min-h-[132px] items-start gap-4 p-5 transition-colors hover:bg-muted/60">
             <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-border bg-background text-foreground"><ShieldCheckIcon className="h-5 w-5" /></div>
-            <div><h3 className="font-semibold text-foreground">Senior Reviewer</h3><p className="mt-1 text-sm leading-5 text-muted-foreground">Validate the setup before the final signal is shown.</p></div>
+             <div><h3 className="font-semibold text-foreground">&nbsp;Senior reviewer</h3><p className="mt-1 text-sm leading-5 text-muted-foreground">Validate the setup before the final signal is shown.</p></div>
           </Link>
           <Link to="/dashboard/extension" className="group flex min-h-[132px] items-start gap-4 p-5 transition-colors hover:bg-muted/60">
             <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-border bg-background text-foreground"><Boxes className="h-5 w-5" /></div>
