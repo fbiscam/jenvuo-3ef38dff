@@ -649,8 +649,10 @@ function TabButton({ active, onClick, children }: { active: boolean; onClick: ()
       type="button"
       variant="ghost"
       onClick={onClick}
-      className={`relative -mb-px h-auto shrink-0 rounded-none border-b-2 px-0 py-3 text-[13px] shadow-none ${
-        active ? "border-foreground text-foreground" : "border-transparent text-muted-foreground hover:bg-transparent hover:text-foreground"
+      className={`relative h-auto shrink-0 rounded-none border-0 px-0 py-3 text-[13px] shadow-none hover:bg-transparent ${
+        active
+          ? "text-foreground after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 after:bg-foreground"
+          : "text-muted-foreground hover:text-foreground"
       }`}
     >
       {children}
