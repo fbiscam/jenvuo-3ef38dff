@@ -1492,7 +1492,7 @@ const RECOMMENDED_MODELS = [
   {
     name: "  Ict / smc engine",
     badge: "Built in",
-    description: "Maps structure, liquidity, order blocks",
+    description: " Maps structure, liquidity, order blocks",
     logo: ChartNoAxesCombined,
     logoImage: null,
     logoLabel: "SMC",
