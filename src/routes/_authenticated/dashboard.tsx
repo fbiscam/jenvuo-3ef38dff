@@ -1581,7 +1581,7 @@ function ModelWorkspace() {
           </Link>
           <Link to="/dashboard/extension" className="group flex min-h-[132px] items-start gap-4 p-5 transition-colors hover:bg-muted/60">
             <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-border bg-background text-foreground"><Boxes className="h-5 w-5" /></div>
-            <div><h3 className="font-semibold text-foreground">Extension API</h3><p className="mt-1 text-sm leading-5 text-muted-foreground">Connect your browser workflow with secure API keys.</p></div>
+             <div><h3 className="font-semibold text-foreground">&nbsp;Extension api</h3><p className="mt-1 text-sm leading-5 text-muted-foreground">Connect your browser workflow with secure API keys.</p></div>
           </Link>
         </div>
       </div>
