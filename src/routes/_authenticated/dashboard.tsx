@@ -1566,7 +1566,7 @@ function ModelWorkspace() {
 
         <aside className="min-w-0">
           <h2 className="mb-4 text-xl font-normal text-foreground">Updates</h2>
-          <div className="divide-y divide-border border-y border-border">
+          <div className="divide-y divide-border">
             {PRODUCT_UPDATES.map((update) => {
               const UpdateIcon = update.icon;
               return (
