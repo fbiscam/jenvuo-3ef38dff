@@ -1276,20 +1276,20 @@ function DashboardHero({ keysCount, stats }: { keysCount: number | null; stats: 
   const [slide, setSlide] = useState(0);
   const banners = [
     {
-      variant: "features" as const,
-      eyebrow: "  Ai analysis, built into your workflow",
-      copy: "Capture any chart, get GPT-6 Astra analysis, and unlock a mandatory \nClaude Opus 5 senior review on eligible plans.",
-      action: "Compare plans",
-      to: "/pricing" as const,
-      note: "Plans from $15 · $2 free testing credit",
-    },
-    {
       variant: "model" as const,
       eyebrow: "Introducing GPT-6 Astra",
       copy: "Our most capable model, built for precise market analysis. Astra combines reasoning, chart vision, and strong context awareness from capture to completion.",
       action: "Analyze with Astra",
       to: "/dashboard/extension" as const,
       note: "",
+    },
+    {
+      variant: "features" as const,
+      eyebrow: "  Ai analysis, built into your workflow",
+      copy: "Capture any chart, get GPT-6 Astra analysis, and unlock a mandatory \nClaude Opus 5 senior review on eligible plans.",
+      action: "Compare plans",
+      to: "/pricing" as const,
+      note: "Plans from $15 · $2 free testing credit",
     },
     {
       variant: "model" as const,
