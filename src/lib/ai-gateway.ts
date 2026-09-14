@@ -19,20 +19,6 @@ export type ChatMessage = {
   content: string | ChatContentPart[];
 };
 
-// Models that support the OpenAI priority serving tier (fast mode).
-// Anything else must not send service_tier: "priority".
-const PRIORITY_TIER_MODELS = new Set([
-  "openai/gpt-6-astra",
-  "openai/gpt-5",
-  "openai/gpt-5-mini",
-  "openai/gpt-5.2",
-  "openai/gpt-5.4",
-  "openai/gpt-5.4-mini",
-  "openai/gpt-5.5",
-  "google/gemini-3.7-flash",
-  "google/gemini-3.1-pro-preview",
-]);
-
 export type CallChatOptions = {
   // Ordered list: try [0] first; if it exhausts retries, try [1]; etc.
   models: string[];
@@ -376,7 +362,6 @@ async function callJustwoker(
 async function singleAttempt(
   model: string,
   opts: CallChatOptions,
-  apiKey: string | undefined,
   timeoutMs?: number,
 ): Promise<{ content: string; usage: UsageInfo }> {
   // Per-request wall clock. Without it a provider that accepts the connection
@@ -385,7 +370,7 @@ async function singleAttempt(
   const ac = timeoutMs && timeoutMs > 0 ? new AbortController() : null;
   const timer = ac ? setTimeout(() => ac.abort(), timeoutMs) : null;
   try {
-    return await singleAttemptInner(model, opts, apiKey, ac?.signal);
+    return await singleAttemptInner(model, opts, ac?.signal);
   } catch (err: any) {
     if (ac?.signal.aborted) {
       throw new AiGatewayError("Server busy — please try again in a moment.", 0, false);
@@ -399,7 +384,6 @@ async function singleAttempt(
 async function singleAttemptInner(
   model: string,
   opts: CallChatOptions,
-  apiKey: string | undefined,
   signal?: AbortSignal,
 ): Promise<{ content: string; usage: UsageInfo }> {
   // Route by prefix:
@@ -549,10 +533,6 @@ async function singleAttemptInner(
       body.max_tokens = opts.maxTokens;
     }
   }
-  if (!isBlackbox && !isNvidia && !isBmind && !isTukenku && !isUnikey && !isEvolink && !isUnoRouter && !isDsOfficial && !isOai && opts.priority && PRIORITY_TIER_MODELS.has(model)) {
-    body.service_tier = "priority";
-  }
-
   let res: Response;
   try {
     res = await fetch(endpoint, {
@@ -632,7 +612,6 @@ async function singleAttemptInner(
 // Main entrypoint. Returns raw assistant content string plus model/usage.
 // Throws AiGatewayError with `terminal` flag on final failure.
 export async function callChatCompletion(opts: CallChatOptions): Promise<{ content: string; model: string; usage: UsageInfo }> {
-  const apiKey = process.env.LOVABLE_API_KEY;
   const timeoutMs = opts.timeoutMs ?? 25000;
   const retriesPerModel = Math.max(1, opts.retriesPerModel ?? 3);
   // Hard wall-clock budget for the whole chain-walk (all models + retries).
@@ -662,7 +641,6 @@ export async function callChatCompletion(opts: CallChatOptions): Promise<{ conte
         const { content, usage } = await singleAttempt(
           model,
           opts,
-          apiKey,
           Math.max(5000, Math.min(timeoutMs, remaining())),
         );
         const validation = opts.validateContent?.(content, model) ?? true;
