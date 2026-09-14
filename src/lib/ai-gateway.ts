@@ -801,9 +801,9 @@ export const MODEL_CHAIN = {
 // uses GPT-6 Astra first and Claude Fable 5 as its only fallback/reviewer.
 export const EXTENSION_MODEL_CHAIN = {
   conversation: [
-    "unorouter/nemotron-3-ultra-550b-a55b:free",
     "unorouter/glm-5.3:free",
     "browseruse/gpt-6-astra",
+    "unorouter/nemotron-3-ultra-550b-a55b:free",
   ],
   reasoning: [
     "browseruse/gpt-6-astra",

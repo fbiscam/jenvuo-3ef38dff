@@ -470,18 +470,20 @@ function addMsg(cls, text, shot) {
 
 async function post(body, signal) {
   const requestId = "ext_" + Date.now().toString(36) + "_" + Math.random().toString(36).slice(2, 10);
-  const deadlineAt = Date.now() + 40000;
+  // Chart analysis can include a sequential senior review. Keep one request
+  // alive long enough for the server to finish instead of aborting it after
+  // 15 seconds and launching duplicate work against backup domains.
+  const deadlineAt = Date.now() + 75000;
   let lastErr;
   for (const url of [API, ...ENDPOINTS.filter((u) => u !== API)]) {
-    for (let attempt = 0; attempt < 1; attempt++) {
-      const remainingMs = deadlineAt - Date.now();
-      if (remainingMs <= 0) throw lastErr || new Error("AI response took too long. Please try again.");
-      const requestController = new AbortController();
-      const abortFromUser = () => requestController.abort();
-      signal?.addEventListener("abort", abortFromUser, { once: true });
-      const timeout = setTimeout(() => requestController.abort(), Math.min(15000, remainingMs));
-      try {
-        const res = await fetch(url, {
+    const remainingMs = deadlineAt - Date.now();
+    if (remainingMs <= 0) throw lastErr || new Error("AI response took too long. Please try again.");
+    const requestController = new AbortController();
+    const abortFromUser = () => requestController.abort();
+    signal?.addEventListener("abort", abortFromUser, { once: true });
+    const timeout = setTimeout(() => requestController.abort(), remainingMs);
+    try {
+      const res = await fetch(url, {
           method: "POST",
           headers: {
             "content-type": "application/json",
@@ -491,8 +493,8 @@ async function post(body, signal) {
           body: JSON.stringify(body),
           cache: "no-store",
           signal: requestController.signal,
-        });
-        const json = await res.json().catch(() => ({}));
+      });
+      const json = await res.json().catch(() => ({}));
         if (res.status === 401 || (res.status === 403 && json.code !== "FEATURE_LOCKED")) {
           showKeyGate(true, json.error || "Your API key is invalid or revoked.");
           throw new Error(json.error || "Sign in with your Jenvu API key.");
@@ -508,24 +510,18 @@ async function post(body, signal) {
           error.retryable = res.status === 429 || res.status >= 500;
           throw error;
         }
-        API = url;
-        return json;
-      } catch (e) {
-        if (e && e.name === "AbortError") {
-          if (signal?.aborted) throw e;
-          const timeoutError = new Error("AI response took too long. Please try again.");
-          timeoutError.retryable = true;
-          lastErr = timeoutError;
-          if (attempt === 0) break;
-          continue;
-        }
-        lastErr = e;
-        if (!e.retryable || attempt === 0) break;
-        await new Promise((resolve) => setTimeout(resolve, 1500));
-      } finally {
-        clearTimeout(timeout);
-        signal?.removeEventListener("abort", abortFromUser);
+      API = url;
+      return json;
+    } catch (e) {
+      if (e && e.name === "AbortError") {
+        if (signal?.aborted) throw e;
+        throw new Error("AI response took too long. Please try again.");
       }
+      lastErr = e;
+      if (!e.retryable) break;
+    } finally {
+      clearTimeout(timeout);
+      signal?.removeEventListener("abort", abortFromUser);
     }
   }
   throw lastErr || new Error("Network error");
