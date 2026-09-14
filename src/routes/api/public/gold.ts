@@ -179,7 +179,7 @@ async function handle({ request }: { request: Request }) {
 
       if (conversational) {
         const casual = await callChatCompletion({
-          models: [...EXTENSION_MODEL_CHAIN.reasoning],
+          models: [...EXTENSION_MODEL_CHAIN.conversation],
           stage: 'extension-chat',
           maxTokens: 400,
           timeoutMs: 45_000,
@@ -282,8 +282,8 @@ async function handle({ request }: { request: Request }) {
       }
 
       // The senior review is the second pass: GPT-6 Astra analyzes first,
-       // then Claude Opus 5 (or the next tested fallback) independently audits and
-       // finalizes the answer. A failed review aborts the request above.
+      // then Claude Fable 5 independently audits and finalizes the answer.
+      // A failed review aborts the request above.
       const secondReview = review
         ? { included: true, model: review.model, status: 'completed' }
         : { included: false, model: null, status: 'not_in_plan' }

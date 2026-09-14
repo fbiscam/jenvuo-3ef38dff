@@ -817,42 +817,27 @@ export const MODEL_CHAIN = {
 } as const;
 
 // Extension calls are intentionally isolated from the shared model chains.
-// GPT-6 Astra is the primary analyst/chat model and reads attached chart
-// images. Claude Opus 5 runs the mandatory independent senior pass. Keep only
-// live-tested providers in front of the fallback chain.
+// Free UnoRouter models handle ordinary conversation. Trading/chart analysis
+// uses GPT-6 Astra first and Claude Fable 5 as its only fallback/reviewer.
 export const EXTENSION_MODEL_CHAIN = {
+  conversation: [
+    "unorouter/nemotron-3-ultra-550b-a55b:free",
+    "unorouter/glm-5.3:free",
+  ],
   reasoning: [
     "browseruse/gpt-6-astra",
-    "evolink/gpt-6-astra",
-    "unikey/gpt-6-astra",
-    "jw/gpt-5.6-sol",
-    "jw/gpt-5.6-terra",
-    "evolink/grok-4.6",
+    "browseruse/claude-fable-5",
   ],
   vision: [
     "browseruse/gpt-6-astra",
-    "evolink/gpt-6-astra",
-    "unikey/gpt-6-astra",
-    "jw/gpt-5.6-sol",
-    "jw/gpt-5.6-terra",
-    "tukenku/myt/deepseek-v4-flash-vision-exp",
+    "browseruse/claude-fable-5",
   ],
   seniorReview: [
-    "evolink/claude-opus-5",
     "browseruse/claude-fable-5",
-    "jw/gpt-5.6-terra",
-    "jw/gpt-5.6-sol",
-    "evolink/claude-opus-4-8",
-    "unikey/claude-opus-4-8",
   ],
   // Alias retained for callers that identify the senior pass as review #2.
   secondReview: [
-    "evolink/claude-opus-5",
     "browseruse/claude-fable-5",
-    "jw/gpt-5.6-terra",
-    "jw/gpt-5.6-sol",
-    "evolink/claude-opus-4-8",
-    "unikey/claude-opus-4-8",
   ],
 } as const;
 
