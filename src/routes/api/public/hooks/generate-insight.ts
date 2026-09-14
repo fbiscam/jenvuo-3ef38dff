@@ -10,51 +10,6 @@ const ARTICLE_MODELS = [
 ];
 const ARTICLE_MODEL_LABEL = "UnoRouter Nemotron Ultra (free)";
 
-class BluesMindsError extends Error {
-  constructor(
-    message: string,
-    readonly status: number,
-  ) {
-    super(message);
-  }
-}
-
-function wait(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-async function callBluesMinds(
-  messages: Array<{ role: "system" | "user"; content: string }>,
-  maxTokens: number,
-) {
-  const key = process.env.BLUESMIND_API_KEY || process.env.BLUESMINDS_API_KEY;
-  if (!key) throw new BluesMindsError("BLUESMIND_API_KEY missing", 401);
-  const base = (process.env.BLUESMIND_BASE_URL || "https://api.bluesminds.com/v1").replace(/\/+$/, "");
-
-  for (let attempt = 0; attempt < 2; attempt += 1) {
-    const response = await fetch(`${base}/chat/completions`, {
-      method: "POST",
-      headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
-      body: JSON.stringify({ model: BLUESMINDS_MODEL, messages, max_tokens: maxTokens }),
-    });
-    if (response.ok) {
-      const payload = (await response.json()) as { choices?: Array<{ message?: { content?: string } }> };
-      const content = payload.choices?.[0]?.message?.content;
-      if (!content) throw new BluesMindsError("BluesMinds returned an empty response", 502);
-      return content;
-    }
-
-    const detail = (await response.text()).slice(0, 500);
-    const retryable = response.status === 429 || response.status >= 500;
-    if (!retryable || attempt === 1) {
-      throw new BluesMindsError(`BluesMinds failed [${response.status}]: ${detail}`, response.status);
-    }
-    const retryAfter = Number(response.headers.get("retry-after"));
-    await wait(Number.isFinite(retryAfter) && retryAfter > 0 ? retryAfter * 1000 : 1500 * (attempt + 1));
-  }
-  throw new BluesMindsError("BluesMinds request failed", 502);
-}
-
 function slugify(s: string) {
   return s
     .toLowerCase()
@@ -240,7 +195,7 @@ Return Markdown only. Start with one '# ' title of no more than 60 characters, t
         } catch (e) {
           lastErr = String((e as Error)?.message ?? e);
           console.error("[generate-insight] all providers failed", lastErr);
-          const status = e instanceof BluesMindsError ? e.status : 0;
+          const status = typeof e === "object" && e !== null && "status" in e ? Number(e.status) : 0;
           const shouldPause = status === 401 || status === 402 || status === 403;
           await updateJob({
             status: shouldPause ? "paused" : "failed",
@@ -274,7 +229,7 @@ Return Markdown only. Start with one '# ' title of no more than 60 characters, t
           await updateJob({
             status: "failed",
             last_error: `Article content was too short (${content.length} characters).`,
-            last_model: BLUESMINDS_MODEL,
+            last_model: ARTICLE_MODEL_LABEL,
             last_topic_id: topic.id,
           });
           return new Response(JSON.stringify({ error: "content-too-short", len: content.length }), { status: 502 });
