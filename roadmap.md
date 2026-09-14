@@ -46,3 +46,4 @@
 - [x] Verify GPT-6 Astra chart vision with a live image request
 - [x] Reject unreadable chart uploads instead of silently analyzing without the image
 - [x] Strengthen senior-review validation and extension review-status accuracy
+- [x] Replace the dashboard search/activity section with two banners and analytics blocks
