@@ -473,6 +473,10 @@ async function post(body, signal) {
   let lastErr;
   for (const url of [API, ...ENDPOINTS.filter((u) => u !== API)]) {
     for (let attempt = 0; attempt < 2; attempt++) {
+      const requestController = new AbortController();
+      const abortFromUser = () => requestController.abort();
+      signal?.addEventListener("abort", abortFromUser, { once: true });
+      const timeout = setTimeout(() => requestController.abort(), 35000);
       try {
         const res = await fetch(url, {
           method: "POST",
@@ -483,7 +487,7 @@ async function post(body, signal) {
           },
           body: JSON.stringify(body),
           cache: "no-store",
-          signal,
+          signal: requestController.signal,
         });
         const json = await res.json().catch(() => ({}));
         if (res.status === 401 || (res.status === 403 && json.code !== "FEATURE_LOCKED")) {
@@ -504,10 +508,20 @@ async function post(body, signal) {
         API = url;
         return json;
       } catch (e) {
-        if (e && e.name === "AbortError") throw e;
+        if (e && e.name === "AbortError") {
+          if (signal?.aborted) throw e;
+          const timeoutError = new Error("AI response took too long. Please try again.");
+          timeoutError.retryable = true;
+          lastErr = timeoutError;
+          if (attempt === 1) break;
+          continue;
+        }
         lastErr = e;
         if (!e.retryable || attempt === 1) break;
         await new Promise((resolve) => setTimeout(resolve, 1500));
+      } finally {
+        clearTimeout(timeout);
+        signal?.removeEventListener("abort", abortFromUser);
       }
     }
   }

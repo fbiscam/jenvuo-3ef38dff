@@ -803,6 +803,7 @@ export const EXTENSION_MODEL_CHAIN = {
   conversation: [
     "unorouter/nemotron-3-ultra-550b-a55b:free",
     "unorouter/glm-5.3:free",
+    "browseruse/gpt-6-astra",
   ],
   reasoning: [
     "browseruse/gpt-6-astra",
