@@ -756,7 +756,6 @@ function ModelBreakdown({ rows }: { rows: { model?: string | null; prompt_tokens
             <div className="flex min-w-0 items-center gap-2">
               <ModelLogo model={model} />
               <span className="min-w-0 truncate text-[12px] font-medium text-zinc-800">{modelDisplay(model).model}</span>
-              <span className="shrink-0 rounded-full bg-zinc-100 px-2 py-0.5 text-[10px] text-zinc-500">{modelDisplay(model).provider}</span>
             </div>
             <div className="grid grid-cols-3 items-center gap-2 tabular-nums text-[11px] text-zinc-500 sm:flex sm:shrink-0 sm:gap-4 sm:text-[12px]">
               <span>{fmtInt(s.requests)} requests</span>
