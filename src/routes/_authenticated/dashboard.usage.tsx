@@ -180,9 +180,9 @@ function UsagePage() {
     return (
       <div className="rounded-xl border border-zinc-200 bg-white p-8 text-center">
         <p className="text-sm text-zinc-600">Failed to load usage data.</p>
-        <button onClick={() => refetch()} className="mt-3 rounded-lg bg-zinc-900 px-4 py-2 text-sm text-white">
+        <Button type="button" onClick={() => refetch()} className="mt-3">
           Retry
-        </button>
+        </Button>
       </div>
     );
   }
@@ -560,6 +560,7 @@ function Dropdown({
         type="button"
         variant="outline"
         onClick={onToggle}
+        aria-expanded={open}
         className="flex h-9 w-full min-w-0 items-center gap-1.5 rounded-full bg-background px-2.5 text-[12px] font-medium text-foreground shadow-none sm:w-auto sm:max-w-[190px] sm:px-3 sm:text-[13px]"
       >
         {icon}
