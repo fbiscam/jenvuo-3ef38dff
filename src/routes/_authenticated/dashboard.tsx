@@ -1569,7 +1569,7 @@ function ModelWorkspace() {
       </div>
 
       <div className="mx-auto mt-10 w-full max-w-6xl">
-        <h2 className="mb-4 text-xl font-semibold text-foreground">Build Agents</h2>
+        <h2 className="mb-4 text-xl font-semibold text-foreground">&nbsp; &nbsp; &nbsp; Build agents</h2>
         <div className="grid overflow-hidden rounded-lg border border-border bg-card sm:grid-cols-2 lg:grid-cols-3 [&>*:not(:last-child)]:border-border max-sm:[&>*:not(:last-child)]:border-b sm:[&>*:not(:last-child)]:border-r">
           <Link to="/dashboard/extension" className="group flex min-h-[132px] items-start gap-4 p-5 transition-colors hover:bg-muted/60">
             <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-border bg-background text-foreground"><ScanSearch className="h-5 w-5" /></div>
