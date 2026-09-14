@@ -25,6 +25,7 @@ import { getUsageStats, type UsageStats } from "@/lib/usage.functions";
 import { listExtensionKeys } from "@/lib/extension-keys.functions";
 import { Button } from "@/components/ui/button";
 import astraGalaxyBanner from "@/assets/astra-galaxy-banner.jpg";
+import astraParticleCardBackground from "@/assets/astra-particle-card-bg.jpg";
 import astraModelLogoAsset from "@/assets/astra-model-logo.png.asset.json";
 import solLogoAsset from "@/assets/sol-logo.png.asset.json";
 
@@ -1537,7 +1538,7 @@ function ModelWorkspace() {
                   className={`relative min-h-[154px] overflow-hidden rounded-lg border p-5 ${model.featured ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card text-card-foreground"}`}
                 >
                   {model.featured && (
-                    <img src={astraGalaxyBanner} alt="" className="absolute inset-0 h-full w-full object-cover object-right opacity-70" />
+                    <img src={astraParticleCardBackground} alt="" loading="lazy" width={1200} height={600} className="absolute inset-0 h-full w-full object-cover object-right" />
                   )}
                   <div className="relative z-10 flex h-full flex-col">
                     <div className="flex items-start justify-between gap-3">
