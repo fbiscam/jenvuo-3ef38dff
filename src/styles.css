@@ -280,6 +280,22 @@
   filter: blur(8px);
 }
 
+.dashboard-feature-banner {
+  background-image: linear-gradient(
+    90deg,
+    var(--card) 0%,
+    var(--card) 45%,
+    color-mix(in oklab, var(--brand-gemini) 10%, var(--card)) 70%,
+    color-mix(in oklab, var(--chart-4) 30%, var(--card)) 100%
+  );
+}
+
+.dashboard-feature-code {
+  padding: 2rem 2.25rem;
+  white-space: pre;
+  mask-image: linear-gradient(90deg, transparent, black 30%, black);
+}
+
 .build-boundaries-panel {
   box-shadow: inset 0 1px color-mix(in oklab, var(--primary-foreground) 16%, transparent);
 }
