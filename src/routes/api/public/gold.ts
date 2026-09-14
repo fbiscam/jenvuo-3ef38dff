@@ -104,7 +104,7 @@ function validateSeniorReview(content: string): true | string {
   if (/^here are the search results\b/i.test(normalized) || /search results for ["“]/i.test(normalized)) {
     return 'Senior reviewer returned search results instead of an ICT/SMC audit.'
   }
-  if (/\b(?:no|without) (?:primary )?(?:answer|analysis|response) (?:was |is )?(?:provided|included|available)\b/i.test(normalized)) {
+  if (/\b(?:no|without) (?:primary )?(?:answer|analysis|response) (?:was |is )?(?:provided|included|available|present)\b/i.test(normalized)) {
     return 'Senior reviewer did not receive or audit the primary analysis.'
   }
   if (!/\b(?:verdict|wait|buy|sell|bias)\b/i.test(normalized)) {
