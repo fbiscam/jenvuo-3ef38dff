@@ -124,7 +124,7 @@ function UsagePage() {
     const inputTokens = spendRows.reduce((s, r) => s + (r.prompt_tokens ?? 0), 0);
     const outputTokens = totalTokens - inputTokens;
 
-    const days: { date: string; spent: number; earned: number; tokens: number; requests: number }[] = [];
+    const days: { date: string; spent: number; earned: number; tokens: number; requests: number; responses: number; inputTokens: number; seniorReviews: number; seniorTokens: number; extensionRequests: number; additions: number; addedUsd: number }[] = [];
     const idx = new Map<string, number>();
     for (let i = rangeDays - 1; i >= 0; i--) {
       const d = new Date();
@@ -132,7 +132,7 @@ function UsagePage() {
       d.setDate(d.getDate() - i);
       const key = d.toISOString().slice(0, 10);
       idx.set(key, days.length);
-      days.push({ date: key, spent: 0, earned: 0, tokens: 0, requests: 0 });
+      days.push({ date: key, spent: 0, earned: 0, tokens: 0, requests: 0, responses: 0, inputTokens: 0, seniorReviews: 0, seniorTokens: 0, extensionRequests: 0, additions: 0, addedUsd: 0 });
     }
     for (const r of rows) {
       const i = idx.get(r.created_at.slice(0, 10));
@@ -142,7 +142,18 @@ function UsagePage() {
         b.spent += Math.abs(r.delta);
         b.requests += 1;
         b.tokens += (r.prompt_tokens ?? 0) + (r.completion_tokens ?? 0);
-      } else b.earned += r.delta;
+        b.responses += 1;
+        b.inputTokens += r.prompt_tokens ?? 0;
+        if (r.stage === "senior_review") {
+          b.seniorReviews += 1;
+          b.seniorTokens += r.completion_tokens ?? 0;
+        }
+        if (r.reason === "extension_api") b.extensionRequests += 1;
+      } else {
+        b.earned += r.delta;
+        b.additions += 1;
+        b.addedUsd += r.delta;
+      }
     }
 
     const avgCost = spendRows.length ? spent / spendRows.length : 0;
@@ -416,21 +427,21 @@ function UsagePage() {
 
           {tab === "capabilities" ? (
             <div className="grid grid-cols-1 gap-4 p-4 sm:grid-cols-2 sm:p-4">
-              <CapabilityCard title="Responses and Chat Completions" start={rangeStartLabel(rangeDays)} end={rangeEndLabel()} items={[
-                { color: "bg-violet-600", label: `${fmtInt(derived.spendRows.length)} requests` },
-                { color: "bg-zinc-300", label: `${fmtInt(derived.inputTokens)} input tokens` },
-              ]} />
-              <CapabilityCard title="Senior reviews" start={rangeStartLabel(rangeDays)} end={rangeEndLabel()} items={[
-                { color: "bg-violet-600", label: `${fmtInt(derived.spendRows.filter((r) => r.stage === "senior_review").length)} requests` },
-                { color: "bg-zinc-300", label: `${fmtInt(derived.outputTokens)} output tokens` },
-              ]} />
-              <CapabilityCard title="Extension API" start={rangeStartLabel(rangeDays)} end={rangeEndLabel()} items={[
-                { color: "bg-violet-600", label: `${fmtInt(derived.spendRows.filter((r) => r.reason === "extension_api").length)} requests` },
-              ]} />
-              <CapabilityCard title="Credits and top-ups" start={rangeStartLabel(rangeDays)} end={rangeEndLabel()} items={[
-                { color: "bg-violet-600", label: `${fmtInt(derived.earnRows.length)} additions` },
-                { color: "bg-zinc-300", label: `${fmtUsd(derived.earned, 2)} added` },
-              ]} />
+               <CapabilityCard title="Responses and Chat Completions" start={rangeStartLabel(rangeDays)} end={rangeEndLabel()} items={[
+                 { color: "bg-chart-1", label: `${fmtInt(derived.spendRows.length)} requests`, data: derived.days.map((d) => d.responses) },
+                 { color: "bg-chart-2", label: `${fmtInt(derived.inputTokens)} input tokens`, data: derived.days.map((d) => d.inputTokens) },
+               ]} />
+               <CapabilityCard title="Senior reviews" start={rangeStartLabel(rangeDays)} end={rangeEndLabel()} items={[
+                 { color: "bg-chart-1", label: `${fmtInt(derived.spendRows.filter((r) => r.stage === "senior_review").length)} requests`, data: derived.days.map((d) => d.seniorReviews) },
+                 { color: "bg-chart-2", label: `${fmtInt(derived.spendRows.filter((r) => r.stage === "senior_review").reduce((sum, r) => sum + (r.completion_tokens ?? 0), 0))} output tokens`, data: derived.days.map((d) => d.seniorTokens) },
+               ]} />
+               <CapabilityCard title="Extension API" start={rangeStartLabel(rangeDays)} end={rangeEndLabel()} items={[
+                 { color: "bg-chart-1", label: `${fmtInt(derived.spendRows.filter((r) => r.reason === "extension_api").length)} requests`, data: derived.days.map((d) => d.extensionRequests) },
+               ]} />
+               <CapabilityCard title="Credits and top-ups" start={rangeStartLabel(rangeDays)} end={rangeEndLabel()} items={[
+                 { color: "bg-chart-1", label: `${fmtInt(derived.earnRows.length)} additions`, data: derived.days.map((d) => d.additions) },
+                 { color: "bg-chart-2", label: `${fmtUsd(derived.earned, 2)} added`, data: derived.days.map((d) => d.addedUsd) },
+               ]} />
             </div>
           ) : tab === "categories" ? (
             <div className="grid gap-8 p-5 md:grid-cols-2">
@@ -603,7 +614,7 @@ function TabButton({ active, onClick, children }: { active: boolean; onClick: ()
   );
 }
 
-function CapabilityCard({ title, items, start, end }: { title: string; items: { color: string; label: string }[]; start: string; end: string }) {
+function CapabilityCard({ title, items, start, end }: { title: string; items: { color: string; label: string; data: number[] }[]; start: string; end: string }) {
   return (
     <div className="flex min-h-64 flex-col rounded-lg border border-border bg-card p-4 sm:min-h-[250px]">
       <div className="flex items-center gap-1 text-[13px] text-card-foreground">
@@ -617,10 +628,49 @@ function CapabilityCard({ title, items, start, end }: { title: string; items: { 
           </div>
         ))}
       </div>
+      <CapabilityChart title={title} series={items.map((item, index) => ({ data: item.data, tone: index }))} />
       <div className="mt-auto flex items-center justify-between px-7 text-[12px] text-muted-foreground">
         <span>{start}</span>
         <span>{end}</span>
       </div>
+    </div>
+  );
+}
+
+function CapabilityChart({ title, series }: { title: string; series: { data: number[]; tone: number }[] }) {
+  const width = 480;
+  const height = 116;
+  const top = 10;
+  const bottom = 104;
+  const palette = ["var(--chart-1)", "var(--chart-2)"];
+  const paths = series.map(({ data, tone }) => {
+    const count = Math.max(data.length, 2);
+    const maximum = Math.max(...data, 1);
+    const points = Array.from({ length: count }, (_, index) => {
+      const x = (index / (count - 1)) * width;
+      const y = bottom - ((data[index] ?? 0) / maximum) * (bottom - top);
+      return [x, y] as const;
+    });
+    return {
+      tone,
+      line: points.map(([x, y], index) => `${index === 0 ? "M" : "L"}${x.toFixed(1)} ${y.toFixed(1)}`).join(" "),
+      area: `M0 ${bottom} ${points.map(([x, y]) => `L${x.toFixed(1)} ${y.toFixed(1)}`).join(" ")} L${width} ${bottom} Z`,
+    };
+  });
+  const gradientId = `capability-${title.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
+  return (
+    <div className="mt-5 min-h-0 flex-1" role="img" aria-label={`${title} usage trend from ${series[0]?.data.length ?? 0} daily data points`}>
+      <svg viewBox={`0 0 ${width} ${height}`} className="h-[116px] w-full" preserveAspectRatio="none">
+        <defs>
+          <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="var(--chart-1)" stopOpacity="0.2" />
+            <stop offset="100%" stopColor="var(--chart-1)" stopOpacity="0" />
+          </linearGradient>
+        </defs>
+        {[top, (top + bottom) / 2, bottom].map((y) => <line key={y} x1="0" y1={y} x2={width} y2={y} stroke="var(--border)" strokeWidth="1" strokeDasharray="4 5" />)}
+        {paths[0] && <path d={paths[0].area} fill={`url(#${gradientId})`} />}
+        {paths.map((path) => <path key={path.tone} d={path.line} fill="none" stroke={palette[path.tone] ?? "var(--chart-3)"} strokeWidth="2" vectorEffect="non-scaling-stroke" strokeLinecap="round" strokeLinejoin="round" />)}
+      </svg>
     </div>
   );
 }
