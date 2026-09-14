@@ -104,6 +104,12 @@ function validateSeniorReview(content: string): true | string {
   if (/^here are the search results\b/i.test(normalized) || /search results for ["“]/i.test(normalized)) {
     return 'Senior reviewer returned search results instead of an ICT/SMC audit.'
   }
+  if (/\b(?:no|without) (?:primary )?(?:answer|analysis|response) (?:was |is )?(?:provided|included|available|present)\b/i.test(normalized)) {
+    return 'Senior reviewer did not receive or audit the primary analysis.'
+  }
+  if (/\bno (?:chart )?image (?:was |is )?(?:attached|provided|available|present)\b/i.test(normalized)) {
+    return 'Senior reviewer refused the live-context audit because the chart image was not repeated.'
+  }
   if (!/\b(?:verdict|wait|buy|sell|bias)\b/i.test(normalized)) {
     return 'Senior reviewer did not provide a valid trading verdict.'
   }
@@ -152,7 +158,16 @@ async function handle({ request }: { request: Request }) {
         content: String(h.text || '').slice(0, 1500),
       }))
 
-      const image = validImage(body.screenImage) || validImage(body.chartImage)
+      const suppliedChartImage = typeof body.chartImage === 'string' && body.chartImage.length > 0
+      const suppliedScreenImage = typeof body.screenImage === 'string' && body.screenImage.length > 0
+      const chartImage = validImage(body.chartImage)
+      const screenImage = validImage(body.screenImage)
+      if ((suppliedChartImage && !chartImage) || (suppliedScreenImage && !screenImage)) {
+        return extJson({ ok: false, error: 'The chart image could not be read. Attach a PNG, JPEG, or WebP image under 3 MB and try again.', code: 'INVALID_IMAGE' }, 400)
+      }
+      // A deliberately attached chart takes precedence over a potentially stale
+      // frame from an active screen-share session.
+      const image = chartImage || screenImage
 
       // Conversational mode: plain questions/greetings get a normal assistant
       // reply. Only explicit trading/analysis intent (or an attached chart)
@@ -254,9 +269,9 @@ async function handle({ request }: { request: Request }) {
           messages: [
             {
               role: 'system',
-               content: 'Senior ICT/SMC reviewer. Audit live levels, HTF/LTF alignment, sweep, displacement, fresh POI and minimum 1:2 RR. Return a corrected concise answer. If incomplete, return WAIT. Never promise profit.',
+                content: 'Senior ICT/SMC reviewer. The PRIMARY_ANALYSIS block below is the answer you must audit; never claim it is missing when that block contains text. The verified LIVE_CONTEXT is sufficient for this independent audit, so do not request or claim you need the original chart image. Audit live levels, HTF/LTF alignment, sweep, displacement, fresh POI and minimum 1:2 RR. Return a corrected concise answer. If incomplete, return WAIT. Never promise profit.',
             },
-            { role: 'user', content: `Live:\n${reviewContext}\nAsk: ${question.slice(0, 300)}\nGPT-6 Astra primary analysis:\n${primary.content.slice(0, 2400)}` },
+            { role: 'user', content: `LIVE_CONTEXT_START\n${reviewContext}\nLIVE_CONTEXT_END\n\nTRADER_REQUEST_START\n${question.slice(0, 300)}\nTRADER_REQUEST_END\n\nPRIMARY_ANALYSIS_START\n${primary.content.slice(0, 2400)}\nPRIMARY_ANALYSIS_END` },
           ],
         }) : null
       // Elite and Ultra only expose the validated senior response. Pro returns

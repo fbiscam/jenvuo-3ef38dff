@@ -43,3 +43,6 @@
 - [x] Continue extension analysis through backup providers when Browser Use accounts are unavailable
 - [x] Connect UnoRouter and verify its live text and image model catalogue
 - [x] Use free UnoRouter models first for Insight writing and cover generation, with reliable fallbacks
+- [x] Verify GPT-6 Astra chart vision with a live image request
+- [x] Reject unreadable chart uploads instead of silently analyzing without the image
+- [x] Strengthen senior-review validation and extension review-status accuracy
