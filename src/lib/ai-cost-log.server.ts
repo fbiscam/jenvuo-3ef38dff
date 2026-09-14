@@ -43,6 +43,7 @@ const MODEL_PRICING: Record<string, Price> = {
   "bmind/meta/llama-3.2-11b-vision-instruct": { in: 0, out: 0 },
   "bmind/nvidia/llama-3.3-nemotron-super-49b-v1.5": { in: 0, out: 0 },
   "bmind/kimi-k2.5": { in: 0, out: 0 },
+  "bmind/openai/gpt-oss-20b": { in: 0.05, out: 0.2 },
   "bmind/nvidia/nvidia-nemotron-nano-9b-v2": { in: 0, out: 0 },
   "bmind/meta/llama-3.3-70b-instruct": { in: 0, out: 0 },
   // DeepSeek official API
