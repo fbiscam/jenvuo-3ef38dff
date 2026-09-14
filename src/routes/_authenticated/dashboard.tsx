@@ -1496,7 +1496,7 @@ const PRODUCT_UPDATES = [
   },
   {
     age: "Latest",
-    title: "Reliable senior review",
+    title: " Reliable senior review",
     copy: "Claude Opus 5 must complete its review before eligible signals are shown.",
     icon: ShieldCheckIcon,
   },
