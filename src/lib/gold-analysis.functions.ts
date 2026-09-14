@@ -2737,16 +2737,9 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
         tradeFromAi.rr = 0;
         tradeFromAi.invalidation = executionVetoReason;
       }
-      // Strict 77% Veto: Even if directional bias exists, if we are exactly in the 
-      // 70-78 range (like yesterday's 77% losers), REQUIRE a displacement passed check.
-      // This prevents "naked" retracements from alerts unless momentum is already impulsive.
-      if (confirmations < 1 && displacement?.passed !== true) {
-         // Force a WAIT state for mid-range signals lacking impulsive momentum
-         built.direction = "WAIT" as typeof built.direction;
-         built.reason = "Blocked: No impulsive displacement/LTF confirmation found for mid-range setup.";
-         tradeFromAi.direction = "WAIT";
-         tradeFromAi.invalidation = built.reason;
-      }
+      // Confirmation quality remains part of the weighted score and downstream
+      // broadcast gates. Do not apply a second hard veto here: it contradicted
+      // the relaxed gate above and converted every early directional setup to WAIT.
     }
 
 

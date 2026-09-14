@@ -116,6 +116,28 @@ function validateSeniorReview(content: string): true | string {
   return true
 }
 
+function tradingVerdict(content: string): 'BUY' | 'SELL' | 'WAIT' | null {
+  const explicit = content.match(/\b(?:verdict|bias)\s*[:\-]\s*(BUY|SELL|WAIT)\b/i)?.[1]
+  if (explicit) return explicit.toUpperCase() as 'BUY' | 'SELL' | 'WAIT'
+  if (/\bWAIT\b/i.test(content)) return 'WAIT'
+  if (/\bBUY\b/i.test(content)) return 'BUY'
+  if (/\bSELL\b/i.test(content)) return 'SELL'
+  return null
+}
+
+function hasSupportedWait(content: string): boolean {
+  const evidenceTerms = [
+    /\bHTF|higher[ -]timeframe\b/i,
+    /\bLTF|lower[ -]timeframe\b/i,
+    /\b(?:liquidity )?sweep\b/i,
+    /\bdisplacement\b/i,
+    /\b(?:fresh )?(?:POI|FVG|order block)\b/i,
+    /\b(?:RR|risk.?reward)\b/i,
+    /\b(?:conflict|misalign|invalid|missing|absent|not confirmed)\b/i,
+  ]
+  return evidenceTerms.filter((term) => term.test(content)).length >= 2
+}
+
 async function handle({ request }: { request: Request }) {
   const auth = await authenticateExtensionRequest(request)
   if (!auth.ok) return extJson({ ok: false, error: auth.error }, auth.status)
@@ -127,8 +149,6 @@ async function handle({ request }: { request: Request }) {
   const symbol = (body.symbol || 'XAUUSD').trim()
 
   try {
-    const market = await loadMarket(symbol, timeframe)
-
     if (body.action === 'chat') {
       const requestId = request.headers.get('x-request-id') || crypto.randomUUID()
       const { getExtensionEntitlement } = await import('@/lib/extension-billing.server')
@@ -137,21 +157,6 @@ async function handle({ request }: { request: Request }) {
       const requiresSeniorReview = entitlement.seniorReview
       const question = String(body.question || '').slice(0, 2000)
       if (!question) return extJson({ ok: false, error: 'Question is empty.' }, 400)
-
-      const context = [
-        `Instrument: ${market.ticker.symbol}`,
-        `Timeframe: ${timeframe}`,
-        `Live price: ${market.ticker.price.toFixed(2)}`,
-        `Session change: ${market.ticker.changePercent.toFixed(2)}%`,
-        `EMA9: ${market.technicals.ema9.toFixed(2)} | EMA21: ${market.technicals.ema21.toFixed(2)} | Trend: ${market.technicals.trend}`,
-        `Recent range: ${market.technicals.low.toFixed(2)} - ${market.technicals.high.toFixed(2)}`,
-        `Structure: selected ${market.technicals.structure.selected}; H1 ${market.technicals.structure.h1}; H4 ${market.technicals.structure.h4}`,
-        `Session: ${market.technicals.session}; equilibrium: ${market.technicals.equilibrium.toFixed(2)}`,
-        `Fresh FVGs: ${JSON.stringify(market.technicals.freshFvgs)}`,
-        `Fresh order blocks: ${JSON.stringify(market.technicals.freshOrderBlocks)}`,
-        `Liquidity: ${JSON.stringify(market.technicals.liquidity)}`,
-        `Quote generated: ${market.freshness.generatedAt}; age: ${market.freshness.quoteAgeMs}ms; source: ${market.freshness.source}`,
-      ].join('\n')
 
       const history = (body.history || []).slice(-8).map((h) => ({
         role: h.role === 'assistant' ? ('assistant' as const) : ('user' as const),
@@ -182,8 +187,8 @@ async function handle({ request }: { request: Request }) {
           models: [...EXTENSION_MODEL_CHAIN.conversation],
           stage: 'extension-chat',
           maxTokens: 400,
-          timeoutMs: 45_000,
-          deadlineMs: 50_000,
+          timeoutMs: 8_000,
+          deadlineMs: 24_000,
           retriesPerModel: 1,
           messages: [
             {
@@ -208,12 +213,28 @@ async function handle({ request }: { request: Request }) {
           ok: true,
           text: casual.content,
           mode: 'conversation',
-          ticker: market.ticker,
           seniorReview: { included: false, model: null, status: 'not_required' },
           secondReview: { included: false, model: null, status: 'not_required' },
           usage: { requestId, charged: casualBilling.charged, balance: casualBilling.balance },
         })
       }
+
+      const market = await loadMarket(symbol, timeframe)
+      const context = [
+        `Instrument: ${market.ticker.symbol}`,
+        `Timeframe: ${timeframe}`,
+        `Live price: ${market.ticker.price.toFixed(2)}`,
+        `Session change: ${market.ticker.changePercent.toFixed(2)}%`,
+        `EMA9: ${market.technicals.ema9.toFixed(2)} | EMA21: ${market.technicals.ema21.toFixed(2)} | Trend: ${market.technicals.trend}`,
+        `Recent range: ${market.technicals.low.toFixed(2)} - ${market.technicals.high.toFixed(2)}`,
+        `Structure: selected ${market.technicals.structure.selected}; H1 ${market.technicals.structure.h1}; H4 ${market.technicals.structure.h4}`,
+        `Session: ${market.technicals.session}; equilibrium: ${market.technicals.equilibrium.toFixed(2)}`,
+        `Last structure event: ${JSON.stringify(market.technicals.lastStructure)}`,
+        `Fresh FVGs: ${JSON.stringify(market.technicals.freshFvgs)}`,
+        `Fresh order blocks: ${JSON.stringify(market.technicals.freshOrderBlocks)}`,
+        `Liquidity: ${JSON.stringify(market.technicals.liquidity)}`,
+        `Quote generated: ${market.freshness.generatedAt}; age: ${market.freshness.quoteAgeMs}ms; source: ${market.freshness.source}`,
+      ].join('\n')
 
       if (!entitlement.capabilities.multiPairScanner && !isGoldSymbol(symbol)) {
         return extJson({
@@ -251,13 +272,13 @@ async function handle({ request }: { request: Request }) {
 
       let content = primary.content
       let seniorReview: { included: boolean; model: string | null; status: string } = { included: false, model: null, status: 'not_required' }
-      const reviewContext = [
-        `${market.ticker.symbol} ${timeframe} @ ${market.ticker.price.toFixed(2)}`,
-        `Trend ${market.technicals.trend}; structure ${market.technicals.structure.selected}/${market.technicals.structure.h1}/${market.technicals.structure.h4}`,
-        `Range ${market.technicals.low.toFixed(2)}-${market.technicals.high.toFixed(2)}; session ${market.technicals.session}`,
-        `FVG ${JSON.stringify(market.technicals.freshFvgs).slice(0, 220)}`,
-        `OB ${JSON.stringify(market.technicals.freshOrderBlocks).slice(0, 220)}`,
-      ].join('\n')
+      const reviewPrompt = `LIVE_CONTEXT_START\n${context}\nLIVE_CONTEXT_END\n\nTRADER_REQUEST_START\n${question.slice(0, 300)}\nTRADER_REQUEST_END\n\nPRIMARY_ANALYSIS_START\n${primary.content.slice(0, 3000)}\nPRIMARY_ANALYSIS_END`
+      const reviewUserContent: string | ChatContentPart[] = image
+        ? [
+            { type: 'text', text: reviewPrompt },
+            { type: 'image_url', image_url: { url: image, detail: 'high' } },
+          ]
+        : reviewPrompt
       const review = requiresSeniorReview ? await callChatCompletion({
           models: [...EXTENSION_MODEL_CHAIN.seniorReview],
           stage: 'extension-senior-review',
@@ -269,15 +290,22 @@ async function handle({ request }: { request: Request }) {
           messages: [
             {
               role: 'system',
-                content: 'Senior ICT/SMC reviewer. The PRIMARY_ANALYSIS block below is the answer you must audit; never claim it is missing when that block contains text. The verified LIVE_CONTEXT is sufficient for this independent audit, so do not request or claim you need the original chart image. Audit live levels, HTF/LTF alignment, sweep, displacement, fresh POI and minimum 1:2 RR. Return a corrected concise answer. If incomplete, return WAIT. Never promise profit.',
+                content: 'Senior ICT/SMC reviewer. Audit the PRIMARY_ANALYSIS against the complete verified LIVE_CONTEXT and attached chart when present. Check live levels, HTF/LTF alignment, liquidity sweep, displacement, fresh POI and minimum 1:2 RR. Start with VERDICT: BUY, SELL, or WAIT, then give specific evidence. Return WAIT only when concrete missing or conflicting evidence makes a directional plan unsafe; never use WAIT merely because confidence is imperfect. Never promise profit.',
             },
-            { role: 'user', content: `LIVE_CONTEXT_START\n${reviewContext}\nLIVE_CONTEXT_END\n\nTRADER_REQUEST_START\n${question.slice(0, 300)}\nTRADER_REQUEST_END\n\nPRIMARY_ANALYSIS_START\n${primary.content.slice(0, 2400)}\nPRIMARY_ANALYSIS_END` },
+            { role: 'user', content: reviewUserContent },
           ],
         }) : null
       // Elite and Ultra only expose the validated senior response. Pro returns
       // its completed GPT-6 Astra primary analysis without a second pass.
       if (review) {
-        content = review.content
+        const primaryVerdict = tradingVerdict(primary.content)
+        const reviewVerdict = tradingVerdict(review.content)
+        // A text-only conservative WAIT used to erase valid directional plans.
+        // Keep the completed primary when the reviewer has no contradictory
+        // direction; expose the review's caution without inventing a signal.
+        content = reviewVerdict === 'WAIT' && !hasSupportedWait(review.content) && (primaryVerdict === 'BUY' || primaryVerdict === 'SELL')
+          ? `${primary.content}\n\nSENIOR REVIEW\n${review.content}`
+          : review.content
         seniorReview = { included: true, model: review.model, status: 'completed' }
       }
 
@@ -301,6 +329,9 @@ async function handle({ request }: { request: Request }) {
 
       return extJson({ ok: true, text: content, ticker: market.ticker, chart: market.chart, technicals: market.technicals, freshness: market.freshness, overlayMarks: market.marks, marksBias: market.technicals.trend.toLowerCase(), seniorReview, secondReview, usage: { requestId, charged: billing.charged, balance: billing.balance } })
     }
+
+
+    const market = await loadMarket(symbol, timeframe)
 
     return extJson({
       ok: true,
