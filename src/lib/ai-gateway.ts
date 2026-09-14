@@ -663,12 +663,14 @@ export async function callChatCompletion(opts: CallChatOptions): Promise<{ conte
           ? err
           : new AiGatewayError(String((err as any)?.message ?? err), 0, false);
 
-        // Terminal errors (auth, 402 credits, bad key, etc.) — do not retry
-        // or fall back; caller must surface as-is.
+        // Terminal errors must not be retried against the same provider.
+        // A provider-scoped auth/billing failure may still fall through to a
+        // separately configured provider later in the chain.
         if (lastErr.terminal) {
           const isAuthOrBilling = lastErr.status === 401 || lastErr.status === 402 || lastErr.status === 403;
+          if (isAuthOrBilling && !isLastModel) break;
           if (isAuthOrBilling) throw lastErr;
-          // Other terminals: still try next provider in the chain.
+          // Other terminal model failures also continue with the next model.
           break;
         }
 
