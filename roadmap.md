@@ -47,3 +47,4 @@
 - [x] Reject unreadable chart uploads instead of silently analyzing without the image
 - [x] Strengthen senior-review validation and extension review-status accuracy
 - [x] Replace the dashboard search/activity section with two banners and analytics blocks
+- [x] Add a reference-style feature and pricing banner as the default dashboard slide
