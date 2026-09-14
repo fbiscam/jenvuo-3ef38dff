@@ -23,6 +23,8 @@ import { readCachedAvatar, writeCachedAvatar, AVATAR_TTL_SECONDS } from "@/lib/a
 
 import { getUsageStats, type UsageStats } from "@/lib/usage.functions";
 import { listExtensionKeys } from "@/lib/extension-keys.functions";
+import { Button } from "@/components/ui/button";
+import astraGalaxyBanner from "@/assets/astra-galaxy-banner.jpg";
 
 
 
@@ -31,7 +33,7 @@ import {
   Wallet, TrendingUp, LineChart, Activity, ShieldCheck, Gauge, BarChart3,
   Tag, ArrowUpRight, ArrowRight, CheckCircle2, Calendar, RefreshCw, Gift, PieChart,
   ChevronsLeft, ChevronsRight, Menu, X, Sparkles, LayoutGrid, LifeBuoy, Lightbulb,
-  ChevronRight, ChevronDown, Bot, KeyRound,
+  ChevronLeft, ChevronRight, Bot, Info, Settings2,
   LayoutDashboard, ChartNoAxesCombined, Puzzle, BadgeDollarSign, FileCheck2,
   LockKeyhole, CircleHelp, type LucideIcon,
 } from "lucide-react";
@@ -1268,59 +1270,49 @@ function UsageStatCard({ title, value, delta, series, tall = false, chartHeight,
 
 
 function DashboardHero({ keysCount, stats }: { keysCount: number | null; stats: UsageStats | null }) {
-  return (
-    <section className="dashboard-hero pb-1 pt-3">
-      <div className="mx-auto grid w-full max-w-4xl gap-4 lg:grid-cols-2">
-        <Link
-          to="/dashboard/extension"
-          className="group relative flex min-h-[188px] overflow-hidden rounded-lg border border-zinc-200 bg-zinc-950 p-6 text-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
-        >
-          <div className="relative z-10 flex min-w-0 flex-1 flex-col">
-            <div className="flex items-center gap-2 text-xs font-semibold uppercase text-zinc-300">
-              <Bot className="h-4 w-4" />
-              AI analysis
-            </div>
-            <h1 className="mt-5 max-w-[280px] text-2xl font-semibold leading-tight">
-              Analyze markets with GPT-6 Astra
-            </h1>
-            <p className="mt-2 max-w-[290px] text-sm leading-5 text-zinc-400">
-              Capture a chart and receive a structured ICT/SMC market read.
-            </p>
-            <span className="mt-auto inline-flex items-center gap-1 pt-5 text-sm font-semibold">
-              Open extension <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-            </span>
-          </div>
-          <div className="absolute -bottom-9 -right-7 grid h-36 w-36 place-items-center rounded-full border border-zinc-700 bg-zinc-900">
-            <RiOpenaiFill className="h-16 w-16 text-white" aria-label="GPT-6 Astra" />
-          </div>
-        </Link>
+  const [slide, setSlide] = useState(0);
+  const banners = [
+    {
+      eyebrow: "Introducing GPT-6 Astra",
+      copy: "Our most capable model, built for precise market analysis. Astra combines reasoning, chart vision, and strong context awareness from capture to completion.",
+      action: "Analyze with Astra",
+      to: "/dashboard/extension" as const,
+    },
+    {
+      eyebrow: "Senior review with Claude Opus 5",
+      copy: "A mandatory second opinion checks every eligible analysis for structure, invalidation, risk, and consistency before a signal is returned.",
+      action: "View model access",
+      to: "/pricing" as const,
+    },
+  ];
+  const banner = banners[slide];
 
-        <Link
-          to="/dashboard/usage"
-          className="group relative flex min-h-[188px] overflow-hidden rounded-lg border border-zinc-200 bg-zinc-50 p-6 shadow-sm transition hover:-translate-y-0.5 hover:border-zinc-300 hover:shadow-md"
-        >
-          <div className="relative z-10 flex min-w-0 flex-1 flex-col">
-            <div className="flex items-center gap-2 text-xs font-semibold uppercase text-zinc-500">
-              <KeyRound className="h-4 w-4" />
-              Account overview
-            </div>
-            <div className="mt-5 flex items-end gap-2">
-              <span className="text-3xl font-semibold leading-none text-zinc-950 tabular-nums">
-                {stats ? `$${stats.balance.toFixed(2)}` : "—"}
-              </span>
-              <span className="pb-0.5 text-sm text-zinc-500">available</span>
-            </div>
-            <p className="mt-3 text-sm text-zinc-600">
-              {keysCount == null ? "Loading extension keys…" : `${keysCount} active extension key${keysCount === 1 ? "" : "s"}`}
-            </p>
-            <span className="mt-auto inline-flex items-center gap-1 pt-5 text-sm font-semibold text-zinc-950">
-              View usage <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-            </span>
+  return (
+    <section className="dashboard-hero pb-1 pt-1">
+      <div className="mx-auto w-full max-w-6xl">
+        <div className="mb-7 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4">
+          <h1 className="truncate text-3xl font-medium text-foreground sm:text-4xl">Home</h1>
+          <div className="flex shrink-0 items-center gap-1 text-xs text-muted-foreground">
+            <span className="mr-2 tabular-nums">{slide + 1} of {banners.length}</span>
+            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setSlide((slide - 1 + banners.length) % banners.length)} aria-label="Previous banner">
+              <ChevronLeft />
+            </Button>
+            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setSlide((slide + 1) % banners.length)} aria-label="Next banner">
+              <ChevronRight />
+            </Button>
           </div>
-          <div className="absolute bottom-5 right-5 flex h-14 w-14 items-center justify-center rounded-lg border border-zinc-200 bg-white shadow-sm">
-            <RiClaudeFill className="h-7 w-7 text-brand-claude" aria-label="Claude Opus 5" />
+        </div>
+
+        <div className="relative min-h-[200px] overflow-hidden rounded-lg border border-border bg-primary text-primary-foreground sm:min-h-[214px]">
+          <img src={astraGalaxyBanner} alt="Spiral galaxy representing GPT-6 Astra" width={1536} height={512} className="absolute inset-0 h-full w-full object-cover object-right" />
+          <div className="relative z-10 flex min-h-[200px] max-w-3xl flex-col justify-center px-7 py-7 sm:min-h-[214px] sm:px-9">
+            <h2 className="text-xl font-semibold sm:text-2xl">{banner.eyebrow}</h2>
+            <p className="mt-1.5 max-w-2xl text-sm leading-6 text-primary-foreground/80">{banner.copy}</p>
+            <Button asChild variant="secondary" size="sm" className="mt-4 w-fit bg-background text-foreground hover:bg-muted">
+              <Link to={banner.to}>{banner.action}</Link>
+            </Button>
           </div>
-        </Link>
+        </div>
       </div>
     </section>
   );
