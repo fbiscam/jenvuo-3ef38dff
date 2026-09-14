@@ -694,6 +694,11 @@ $("attach").onclick = () => $("file").click();
 $("file").onchange = (e) => {
   const f = e.target.files && e.target.files[0];
   if (!f) return;
+  if (!/^(image\/png|image\/jpeg|image\/webp)$/i.test(f.type) || f.size > 3_300_000) {
+    e.target.value = "";
+    addMsg("ai err", "Please attach a PNG, JPEG, or WebP image under 3 MB.");
+    return;
+  }
   const r = new FileReader();
   r.onload = () => {
     chartImage = String(r.result);
@@ -892,9 +897,9 @@ async function send(preset, silentUser) {
     if (d.seniorReview?.included && d.seniorReview?.status === "completed") {
       const label = String(d.seniorReview.model || "BluesMinds").split("/").pop();
       setReviewStatus(`Senior reviewed · ${label}`, "verified");
-    } else if (d.mode === "conversation" || d.seniorReview?.status === "not_required") {
+    } else if (d.mode === "conversation") {
       setReviewStatus("Chat mode", "");
-    } else if (d.seniorReview?.status === "not_in_plan") {
+    } else if (d.secondReview?.status === "not_in_plan" || d.seniorReview?.status === "not_in_plan" || d.seniorReview?.status === "not_required") {
       setReviewStatus("Primary AI · Elite unlocks senior review", "");
     } else {
       setReviewStatus("Senior review unavailable", "failed");
