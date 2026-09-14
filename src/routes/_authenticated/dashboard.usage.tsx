@@ -289,7 +289,7 @@ function UsagePage() {
     <div className="-mx-5 -mb-7 min-h-[calc(100dvh-4rem)] overflow-hidden bg-background text-foreground sm:-mx-8">
       {/* Header */}
       <div className="flex min-h-14 flex-col gap-3 border-b border-border px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-6">
-        <h1 className="text-lg font-medium text-foreground">Usage</h1>
+         <h1 className="text-lg font-medium text-foreground">  Usage</h1>
         <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto_auto] items-center gap-2 sm:flex">
           <Dropdown
             open={openMenu === "model"}
