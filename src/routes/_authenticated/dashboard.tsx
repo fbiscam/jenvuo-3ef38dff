@@ -1341,53 +1341,72 @@ function UsageAnalytics({ stats, keysCount, loading, range, onRangeChange, onRef
   const scanSeries = points.length ? points.map((p) => p.scans) : empty;
   const spentSeries = points.length ? points.map((p) => p.spent) : empty;
   const tokenSeries = points.length ? points.map((p) => p.tokens) : empty;
+  const periodSpendLabel = range === "24h" ? "Today spend" : range === "7d" ? "7 day spend" : "30 day spend";
+  const metricClass = "flex min-h-[126px] flex-col bg-card px-4 py-4 sm:px-5";
 
   return (
-    <section className="analytics-section mt-5 bg-white">
-      <div className="mx-auto w-full max-w-4xl px-1">
-      <div className="mb-5 flex items-center justify-between">
-        <h2 className="text-[17px] font-semibold tracking-tight text-zinc-900">  Analytics</h2>
-        <div className="flex items-center gap-2">
-          <div className="relative">
-            <select
-              value={range}
-              onChange={(e) => onRangeChange(e.target.value as UsageRangeKey)}
-              aria-label="Time range"
-              className="appearance-none rounded-md border border-zinc-200 bg-white py-1.5 pl-3 pr-8 text-xs font-medium text-zinc-700 shadow-sm outline-none transition hover:border-zinc-300 focus:border-zinc-400"
+    <section className="analytics-section mt-8 bg-background">
+      <div className="mx-auto w-full max-w-6xl">
+      <div className="mb-3 flex items-center justify-end gap-2">
+        <div className="inline-flex rounded-full bg-muted p-0.5" aria-label="Analytics range">
+          {(Object.keys(USAGE_RANGE_LABELS) as UsageRangeKey[]).map((key) => (
+            <Button
+              key={key}
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => onRangeChange(key)}
+              className={`h-7 rounded-full px-3 text-xs shadow-none ${range === key ? "bg-background text-foreground shadow-sm hover:bg-background" : "text-muted-foreground hover:bg-background/60"}`}
             >
-              {(Object.keys(USAGE_RANGE_LABELS) as UsageRangeKey[]).map((k) => (
-                <option key={k} value={k}>{USAGE_RANGE_LABELS[k]}</option>
-              ))}
-            </select>
-            <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-zinc-400" />
+              {key}
+            </Button>
+          ))}
+        </div>
+        <Button variant="ghost" size="icon" className="h-7 w-7 rounded-full" onClick={onRefresh} aria-label="Refresh usage">
+          <RefreshCw className={loading ? "animate-spin" : ""} />
+        </Button>
+      </div>
+
+      <div className="grid grid-cols-1 overflow-hidden rounded-lg border border-border sm:grid-cols-2 lg:grid-cols-3 [&>*]:border-border lg:[&>*:not(:nth-child(3n))]:border-r lg:[&>*:nth-child(-n+3)]:border-b sm:max-lg:[&>*:nth-child(odd)]:border-r sm:max-lg:[&>*:nth-child(-n+4)]:border-b max-sm:[&>*:not(:last-child)]:border-b">
+        <div className={metricClass}>
+          <Link to="/dashboard/usage" className="inline-flex items-center gap-1 text-sm text-foreground hover:text-muted-foreground">Total tokens <ChevronRight className="h-3.5 w-3.5" /></Link>
+          <strong className="mt-1 text-base font-semibold tabular-nums text-foreground">{totalTokens >= 1000 ? `${(totalTokens / 1000).toFixed(1)}k` : totalTokens}</strong>
+          <div className="mt-auto pt-5"><UsageLineChart values={tokenSeries} height={28} color="var(--chart-5)" /></div>
+        </div>
+        <div className={metricClass}>
+          <Link to="/dashboard/usage" className="inline-flex items-center gap-1 text-sm text-foreground hover:text-muted-foreground">Responses and Chat Completions <ChevronRight className="h-3.5 w-3.5" /></Link>
+          <strong className="mt-1 text-base font-semibold tabular-nums text-foreground">{totalScans}</strong>
+          <div className="mt-auto pt-5"><UsageLineChart values={scanSeries} height={28} color="var(--muted-foreground)" /></div>
+        </div>
+        <div className={metricClass}>
+          <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 text-sm text-foreground">
+            <span className="truncate">Prompt caching: Hit rate</span><Info className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
           </div>
-          <Link
-            to="/dashboard/extension"
-            aria-label="Add extension key"
-            className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-zinc-200 bg-white text-zinc-500 shadow-sm transition hover:border-zinc-300 hover:text-zinc-900"
-          >
-            <Plus className="h-3.5 w-3.5" />
-          </Link>
-          <button
-            type="button"
-            onClick={onRefresh}
-            aria-label="Refresh usage"
-            className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-zinc-200 bg-white text-zinc-500 shadow-sm transition hover:border-zinc-300 hover:text-zinc-900"
-          >
-            <RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`} />
-          </button>
+          <strong className="mt-1 text-base font-semibold text-foreground">—</strong>
+          <div className="mt-auto border-b border-border pt-5" />
+        </div>
+        <div className={metricClass}>
+          <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 text-sm text-foreground">
+            <span className="truncate">{periodSpendLabel}</span><Settings2 className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+          </div>
+          <div className="mt-4 flex items-center justify-between gap-3 text-sm text-foreground">
+            <span>Personal</span><span className="tabular-nums">{fmtUsd2(totalSpent)} / {stats ? fmtUsd2(stats.allowance) : "$0.00"}</span>
+          </div>
+          <div className="mt-2 h-4 overflow-hidden rounded bg-muted"><div className="h-full bg-foreground" style={{ width: `${Math.min(100, Math.max(0, stats?.allowance ? (totalSpent / stats.allowance) * 100 : 0))}%` }} /></div>
+        </div>
+        <div className={`${metricClass} bg-secondary`}>
+          <span className="text-sm text-foreground">Credit balance</span>
+          <strong className="mt-1 text-xl font-semibold tabular-nums text-foreground">{stats ? fmtUsd2(balance) : "—"}</strong>
+          <Button asChild size="sm" className="mt-3 w-fit">
+            <Link to="/dashboard/pay"><CreditCard className="h-3.5 w-3.5" /> Add credits</Link>
+          </Button>
+        </div>
+        <div className={metricClass}>
+          <Link to="/dashboard/usage" className="inline-flex items-center gap-1 text-sm text-foreground hover:text-muted-foreground">Total requests <ChevronRight className="h-3.5 w-3.5" /></Link>
+          <strong className="mt-1 text-base font-semibold tabular-nums text-foreground">{totalScans}</strong>
+          <div className="mt-auto pt-5"><UsageLineChart values={scanSeries} height={28} color="var(--chart-2)" /></div>
         </div>
       </div>
-      <div className="grid grid-cols-1 overflow-hidden rounded-lg border border-zinc-200 sm:grid-cols-2 lg:grid-cols-3 [&>*]:border-b [&>*]:border-r [&>*]:border-zinc-200">
-        <UsageStatCard title="Extension scans" value={String(totalScans)} delta={deltaPct(totalScans, prevScans)} series={scanSeries} chartHeight={36} color="#e01563" />
-        <UsageStatCard title="Credits spent" value={fmtUsd2(totalSpent)} delta={deltaPct(totalSpent, prevSpent)} series={spentSeries} chartHeight={36} color="#0f9d8f" />
-        <UsageStatCard title="Tokens processed" value={totalTokens >= 1000 ? `${(totalTokens / 1000).toFixed(1)}k` : String(totalTokens)} series={tokenSeries} chartHeight={36} color="#a16207" />
-        <UsageStatCard title="Wallet balance" value={stats ? fmtUsd2(balance) : "…"} series={spentSeries} chartHeight={36} color="#0f9d8f" />
-        <UsageStatCard title="Credits remaining" value={stats ? `${remainingPct.toFixed(1)}%` : "…"} series={[remainingPct]} chartHeight={36} color="#e01563" />
-        <UsageStatCard title="Extension keys" value={keysCount == null ? "…" : String(keysCount)} series={[keysCount ?? 0]} chartHeight={36} color="#0f9d8f" />
-      </div>
-
-
       </div>
     </section>
   );
