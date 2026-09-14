@@ -925,7 +925,8 @@ async function send(preset, silentUser) {
     pend.remove();
     if (e && e.name === "AbortError") addMsg("ai err", "Request stopped.");
     else addMsg("ai err", e.message);
-    setReviewStatus("Senior review unavailable", "failed");
+    if (analysisRequest) setReviewStatus("Senior review unavailable", "failed");
+    else setReviewStatus("Chat mode", "");
   } finally {
     busy = false;
     controller = null; $("send").disabled = false; updateSendState();
