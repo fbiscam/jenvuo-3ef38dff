@@ -470,7 +470,7 @@ function UsagePage() {
             </div>
           ) : tab === "categories" ? (
             <div className="grid gap-8 p-5 md:grid-cols-2">
-              <div><h2 className="mb-4 text-[13px] text-foreground">By service</h2><TypeBreakdown rows={derived.spendRows} /></div>
+               <div><h2 className="mb-4 text-[13px] text-foreground">  By service</h2><TypeBreakdown rows={derived.spendRows} /></div>
               <div><h2 className="mb-4 text-[13px] text-foreground">By model</h2><ModelBreakdown rows={derived.spendRows} /></div>
             </div>
           ) : tab === "caching" ? (
