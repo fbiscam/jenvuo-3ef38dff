@@ -33,11 +33,10 @@ import {
   Wallet, TrendingUp, LineChart, Activity, ShieldCheck, Gauge, BarChart3,
   Tag, ArrowUpRight, ArrowRight, CheckCircle2, Calendar, RefreshCw, Gift, PieChart,
   ChevronsLeft, ChevronsRight, Menu, X, Sparkles, LayoutGrid, LifeBuoy, Lightbulb,
-  ChevronLeft, ChevronRight, Bot, Info, Settings2,
+  ChevronLeft, ChevronRight, Info, Settings2,
   LayoutDashboard, ChartNoAxesCombined, Puzzle, BadgeDollarSign, FileCheck2,
   LockKeyhole, CircleHelp, type LucideIcon,
 } from "lucide-react";
-import { RiClaudeFill, RiOpenaiFill } from "react-icons/ri";
 import {
   DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuCheckboxItem, DropdownMenuSeparator, DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
