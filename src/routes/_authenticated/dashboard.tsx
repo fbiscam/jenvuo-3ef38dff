@@ -1554,7 +1554,7 @@ function ModelWorkspace() {
                       </span>
                     </div>
                     <div className="mt-4 text-left">
-                      <h3 className={`text-base font-normal ${model.featured ? "text-primary-foreground" : "text-card-foreground"}`}>{model.name}</h3>
+                      <h3 className={`text-base font-normal ${model.featured ? "!text-white" : "text-card-foreground"}`}>{model.name}</h3>
                       <p className={`mt-1 text-sm leading-5 ${model.featured ? "text-primary-foreground" : "text-muted-foreground"}`}>{model.description}</p>
                     </div>
                   </div>
