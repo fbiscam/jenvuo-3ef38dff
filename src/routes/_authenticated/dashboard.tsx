@@ -1273,7 +1273,7 @@ function DashboardHero({ keysCount, stats }: { keysCount: number | null; stats: 
   const banners = [
     {
       variant: "features" as const,
-      eyebrow: "AI analysis, built into your workflow",
+      eyebrow: "  Ai analysis, built into your workflow",
       copy: "Capture any chart, get GPT-6 Astra analysis, and unlock a mandatory Claude Opus 5 senior review on eligible plans.",
       action: "Compare plans",
       to: "/pricing" as const,
