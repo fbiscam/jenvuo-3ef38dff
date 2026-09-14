@@ -1453,50 +1453,58 @@ const RECOMMENDED_MODELS = [
     name: "GPT-6 Astra",
     badge: "New",
     description: "Our most capable model, built for demanding chart analysis.",
-    mark: "6",
+    logo: Sparkles,
+    logoLabel: "Astra",
+    badgeTone: "bg-primary text-primary-foreground",
     featured: true,
   },
   {
     name: "Claude Opus 5",
     badge: "Senior review",
     description: "Independent validation for structure, risk, and consistency.",
-    mark: "C5",
+    logo: ShieldCheckIcon,
+    logoLabel: "Claude",
+    badgeTone: "bg-success/15 text-success",
     featured: false,
   },
   {
     name: "GPT-5.6 Sol",
     badge: "Efficient",
     description: "Fast reasoning for everyday market questions and workflows.",
-    mark: "Sol",
+    logo: Gauge,
+    logoLabel: "Sol",
+    badgeTone: "bg-info/15 text-info",
     featured: false,
   },
   {
     name: "ICT / SMC Engine",
     badge: "Built in",
     description: "Maps structure, liquidity, order blocks, and fair value gaps.",
-    mark: "SMC",
+    logo: ChartNoAxesCombined,
+    logoLabel: "SMC",
+    badgeTone: "bg-accent text-accent-foreground",
     featured: false,
   },
 ] as const;
 
 const PRODUCT_UPDATES = [
   {
-    age: "Now",
-    title: "GPT-6 Astra",
-    copy: "Primary chart analysis and natural AI chat are available in the extension.",
-    icon: Bot,
+    age: "Latest",
+    title: "Smarter chart validation",
+    copy: "Chart images are now checked before GPT-6 Astra starts its analysis.",
+    icon: ScanSearch,
   },
   {
-    age: "New",
-    title: "Claude Opus 5 review",
-    copy: "Eligible plans receive a mandatory second review before a signal is returned.",
+    age: "Latest",
+    title: "Reliable senior review",
+    copy: "Claude Opus 5 must complete its review before eligible signals are shown.",
     icon: ShieldCheckIcon,
   },
   {
     age: "Updated",
-    title: "Screen capture",
-    copy: "Capture the visible TradingView chart and send it directly for analysis.",
-    icon: ScanSearch,
+    title: "Provider fallback",
+    copy: "Analysis continues through another provider when an AI account is unavailable.",
+    icon: RefreshCw,
   },
 ] as const;
 
@@ -1505,40 +1513,46 @@ function ModelWorkspace() {
     <section className="mt-10 bg-background" aria-label="Models and product updates">
       <div className="mx-auto grid w-full max-w-6xl gap-9 lg:grid-cols-[minmax(0,1.7fr)_minmax(260px,0.9fr)] lg:gap-10">
         <div className="min-w-0">
-          <h2 className="mb-4 text-xl font-semibold text-foreground">&nbsp; &nbsp; &nbsp; &nbsp; Recommended models</h2>
+          <h2 className="mb-4 text-xl font-semibold text-foreground">Recommended models</h2>
           <div className="grid gap-4 sm:grid-cols-2">
-            {RECOMMENDED_MODELS.map((model) => (
-              <article
-                key={model.name}
-                className={`relative min-h-[148px] overflow-hidden rounded-lg border p-5 ${model.featured ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card text-card-foreground"}`}
-              >
-                {model.featured && (
-                  <img src={astraGalaxyBanner} alt="" className="absolute inset-0 h-full w-full object-cover object-right opacity-70" />
-                )}
-                <div className="relative z-10 flex h-full flex-col">
-                  <div className="flex items-start justify-between gap-3">
-                    <div className={`flex h-12 min-w-12 items-center justify-center rounded-xl border px-2 text-sm font-semibold ${model.featured ? "border-primary-foreground/25 bg-primary/70" : "border-border bg-muted"}`}>
-                      {model.mark}
+            {RECOMMENDED_MODELS.map((model) => {
+              const ModelLogo = model.logo;
+              return (
+                <article
+                  key={model.name}
+                  className={`relative min-h-[154px] overflow-hidden rounded-lg border p-5 ${model.featured ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card text-card-foreground"}`}
+                >
+                  {model.featured && (
+                    <img src={astraGalaxyBanner} alt="" className="absolute inset-0 h-full w-full object-cover object-right opacity-70" />
+                  )}
+                  <div className="relative z-10 flex h-full flex-col">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className={`flex h-11 items-center gap-2 rounded-md border px-2.5 ${model.featured ? "border-primary-foreground/30 bg-primary/75" : "border-border bg-background"}`} aria-label={`${model.logoLabel} model`}>
+                        <ModelLogo className="h-5 w-5" strokeWidth={1.8} />
+                        <span className="text-xs font-semibold">{model.logoLabel}</span>
+                      </div>
+                      <span className={`rounded px-2 py-1 text-xs font-semibold ${model.featured ? "bg-primary-foreground text-primary" : model.badgeTone}`}>
+                        {model.badge}
+                      </span>
                     </div>
-                    <span className={`rounded px-2 py-1 text-xs font-medium ${model.featured ? "bg-primary-foreground text-primary" : "bg-accent text-accent-foreground"}`}>
-                      {model.badge}
-                    </span>
+                    <div className="mt-4 text-left">
+                      <h3 className="text-base font-semibold">{model.name}</h3>
+                      <p className={`mt-1 text-sm leading-5 ${model.featured ? "text-primary-foreground" : "text-muted-foreground"}`}>{model.description}</p>
+                    </div>
                   </div>
-                  <h3 className="mt-4 text-base font-semibold">{model.name}</h3>
-                  <p className={`mt-1 text-sm leading-5 ${model.featured ? "text-primary-foreground" : "text-muted-foreground"}`}>{model.description}</p>
-                </div>
-              </article>
-            ))}
+                </article>
+              );
+            })}
           </div>
         </div>
 
         <aside className="min-w-0">
           <h2 className="mb-4 text-xl font-semibold text-foreground">Updates</h2>
-          <div className="space-y-6">
+          <div className="divide-y divide-border border-y border-border">
             {PRODUCT_UPDATES.map((update) => {
               const UpdateIcon = update.icon;
               return (
-                <article key={update.title} className="grid grid-cols-[42px_minmax(0,1fr)] gap-4">
+                <article key={update.title} className="grid grid-cols-[42px_minmax(0,1fr)] gap-4 py-5 first:pt-4">
                   <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted text-primary">
                     <UpdateIcon className="h-5 w-5" strokeWidth={1.8} />
                   </div>
