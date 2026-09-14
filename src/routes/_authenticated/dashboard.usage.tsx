@@ -748,9 +748,7 @@ function ModelBreakdown({ rows }: { rows: { model?: string | null; prompt_tokens
   }
   return (
     <div className="divide-y divide-zinc-100">
-      {list.map(([model, s]) => {
-        const isIctSmc = /ict|smc/i.test(model);
-        return (
+      {list.map(([model, s]) => (
         <div key={model} className="px-4 py-3 text-[13px] sm:px-5">
           <div className="grid grid-cols-1 gap-2 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
             <div className="flex min-w-0 items-center gap-2">
@@ -763,18 +761,8 @@ function ModelBreakdown({ rows }: { rows: { model?: string | null; prompt_tokens
               <span className="font-semibold text-zinc-800">{fmtUsd(s.cost, 2)}</span>
             </div>
           </div>
-          {isIctSmc && (
-            <div className="mt-2 pl-9" aria-label={`${modelDisplay(model).model} usage graph`}>
-              <MiniLine
-                data={s.trend.sort((a, b) => a.date.localeCompare(b.date)).map((point) => point.cost)}
-                color="var(--chart-1)"
-                filled
-              />
-            </div>
-          )}
-          </div>
-        );
-      })}
+        </div>
+      ))}
     </div>
   );
 }
