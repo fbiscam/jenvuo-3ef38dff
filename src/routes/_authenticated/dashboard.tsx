@@ -35,7 +35,7 @@ import {
   ChevronsLeft, ChevronsRight, Menu, X, Sparkles, LayoutGrid, LifeBuoy, Lightbulb,
   ChevronLeft, ChevronRight, Info, Settings2,
   LayoutDashboard, ChartNoAxesCombined, Puzzle, BadgeDollarSign, FileCheck2,
-  LockKeyhole, CircleHelp, type LucideIcon,
+  LockKeyhole, CircleHelp, Bot, Boxes, ScanSearch, ShieldCheckIcon, type LucideIcon,
 } from "lucide-react";
 import {
   DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuCheckboxItem, DropdownMenuSeparator, DropdownMenuLabel,
@@ -1083,6 +1083,8 @@ function DashboardLayout() {
           onRefresh={handleRefresh}
         />
 
+        <ModelWorkspace />
+
 
 
 
@@ -1441,6 +1443,133 @@ function UsageAnalytics({ stats, keysCount, loading, range, onRangeChange, onRef
           <div className="mt-auto pt-5"><UsageLineChart values={scanSeries} height={28} color="var(--chart-2)" /></div>
         </div>
       </div>
+      </div>
+    </section>
+  );
+}
+
+const RECOMMENDED_MODELS = [
+  {
+    name: "GPT-6 Astra",
+    badge: "New",
+    description: "Our most capable model, built for demanding chart analysis.",
+    mark: "6",
+    featured: true,
+  },
+  {
+    name: "Claude Opus 5",
+    badge: "Senior review",
+    description: "Independent validation for structure, risk, and consistency.",
+    mark: "C5",
+    featured: false,
+  },
+  {
+    name: "GPT-5.6 Sol",
+    badge: "Efficient",
+    description: "Fast reasoning for everyday market questions and workflows.",
+    mark: "Sol",
+    featured: false,
+  },
+  {
+    name: "ICT / SMC Engine",
+    badge: "Built in",
+    description: "Maps structure, liquidity, order blocks, and fair value gaps.",
+    mark: "SMC",
+    featured: false,
+  },
+] as const;
+
+const PRODUCT_UPDATES = [
+  {
+    age: "Now",
+    title: "GPT-6 Astra",
+    copy: "Primary chart analysis and natural AI chat are available in the extension.",
+    icon: Bot,
+  },
+  {
+    age: "New",
+    title: "Claude Opus 5 review",
+    copy: "Eligible plans receive a mandatory second review before a signal is returned.",
+    icon: ShieldCheckIcon,
+  },
+  {
+    age: "Updated",
+    title: "Screen capture",
+    copy: "Capture the visible TradingView chart and send it directly for analysis.",
+    icon: ScanSearch,
+  },
+] as const;
+
+function ModelWorkspace() {
+  return (
+    <section className="mt-10 bg-background" aria-label="Models and product updates">
+      <div className="mx-auto grid w-full max-w-6xl gap-9 lg:grid-cols-[minmax(0,1.7fr)_minmax(260px,0.9fr)] lg:gap-10">
+        <div className="min-w-0">
+          <h2 className="mb-4 text-xl font-semibold text-foreground">Recommended models</h2>
+          <div className="grid gap-4 sm:grid-cols-2">
+            {RECOMMENDED_MODELS.map((model) => (
+              <article
+                key={model.name}
+                className={`relative min-h-[148px] overflow-hidden rounded-lg border p-5 ${model.featured ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card text-card-foreground"}`}
+              >
+                {model.featured && (
+                  <img src={astraGalaxyBanner} alt="" className="absolute inset-0 h-full w-full object-cover object-right opacity-70" />
+                )}
+                <div className="relative z-10 flex h-full flex-col">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className={`flex h-12 min-w-12 items-center justify-center rounded-xl border px-2 text-sm font-semibold ${model.featured ? "border-primary-foreground/25 bg-primary/70" : "border-border bg-muted"}`}>
+                      {model.mark}
+                    </div>
+                    <span className={`rounded px-2 py-1 text-xs font-medium ${model.featured ? "bg-primary-foreground text-primary" : "bg-accent text-accent-foreground"}`}>
+                      {model.badge}
+                    </span>
+                  </div>
+                  <h3 className="mt-4 text-base font-semibold">{model.name}</h3>
+                  <p className={`mt-1 text-sm leading-5 ${model.featured ? "text-primary-foreground" : "text-muted-foreground"}`}>{model.description}</p>
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+
+        <aside className="min-w-0">
+          <h2 className="mb-4 text-xl font-semibold text-foreground">Updates</h2>
+          <div className="space-y-6">
+            {PRODUCT_UPDATES.map((update) => {
+              const UpdateIcon = update.icon;
+              return (
+                <article key={update.title} className="grid grid-cols-[42px_minmax(0,1fr)] gap-4">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted text-primary">
+                    <UpdateIcon className="h-5 w-5" strokeWidth={1.8} />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-xs text-muted-foreground">{update.age}</p>
+                    <h3 className="mt-0.5 text-sm font-semibold text-foreground">{update.title}</h3>
+                    <p className="mt-1 text-sm leading-5 text-muted-foreground">{update.copy}</p>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        </aside>
+      </div>
+
+      <div className="mx-auto mt-10 w-full max-w-6xl">
+        <h2 className="mb-4 text-xl font-semibold text-foreground">Build Agents</h2>
+        <div className="grid overflow-hidden rounded-lg border border-border bg-card sm:grid-cols-2 lg:grid-cols-3 [&>*:not(:last-child)]:border-border max-sm:[&>*:not(:last-child)]:border-b sm:[&>*:not(:last-child)]:border-r">
+          <Link to="/dashboard/extension" className="group flex min-h-[132px] items-start gap-4 p-5 transition-colors hover:bg-muted/60">
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-border bg-background text-foreground"><ScanSearch className="h-5 w-5" /></div>
+            <div><h3 className="font-semibold text-foreground">Chart Analyzer</h3><p className="mt-1 text-sm leading-5 text-muted-foreground">Capture a chart and run structured ICT/SMC analysis.</p></div>
+          </Link>
+          <Link to="/pricing" className="group flex min-h-[132px] items-start gap-4 p-5 transition-colors hover:bg-muted/60">
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-border bg-background text-foreground"><ShieldCheckIcon className="h-5 w-5" /></div>
+            <div><h3 className="font-semibold text-foreground">Senior Reviewer</h3><p className="mt-1 text-sm leading-5 text-muted-foreground">Validate the setup before the final signal is shown.</p></div>
+          </Link>
+          <Link to="/dashboard/extension" className="group flex min-h-[132px] items-start gap-4 p-5 transition-colors hover:bg-muted/60">
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-border bg-background text-foreground"><Boxes className="h-5 w-5" /></div>
+            <div><h3 className="font-semibold text-foreground">Extension API</h3><p className="mt-1 text-sm leading-5 text-muted-foreground">Connect your browser workflow with secure API keys.</p></div>
+          </Link>
+        </div>
       </div>
     </section>
   );
