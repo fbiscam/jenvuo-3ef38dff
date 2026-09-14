@@ -501,7 +501,7 @@ function UsagePage() {
         </div>
 
         <aside className="border-t border-border xl:border-l xl:border-t-0">
-          <section className="border-b border-border px-4 py-5">
+          <section className="border-b border-border bg-usage-balance px-4 py-5 text-zinc-950">
             <div className="flex items-center justify-between text-[13px] text-foreground">
               <span>Monthly spend</span>
               <Button asChild type="button" variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground">
