@@ -25,6 +25,7 @@ import { getUsageStats, type UsageStats } from "@/lib/usage.functions";
 import { listExtensionKeys } from "@/lib/extension-keys.functions";
 import { Button } from "@/components/ui/button";
 import astraGalaxyBanner from "@/assets/astra-galaxy-banner.jpg";
+import solLogoAsset from "@/assets/sol-logo.png.asset.json";
 
 
 
@@ -1462,6 +1463,7 @@ const RECOMMENDED_MODELS = [
     badge: "New",
     description: "Our most capable model, built for demanding chart analysis.",
     logo: Sparkles,
+    logoImage: null,
     logoLabel: "Astra",
     badgeTone: "bg-primary text-primary-foreground",
     featured: true,
@@ -1471,6 +1473,7 @@ const RECOMMENDED_MODELS = [
     badge: "Senior review",
     description: "Independent validation for structure, risk",
     logo: ClaudeLogo,
+    logoImage: null,
     logoLabel: "Claude",
     badgeTone: "bg-chart-2/15 text-chart-2",
     featured: false,
@@ -1479,7 +1482,8 @@ const RECOMMENDED_MODELS = [
     name: " Gpt-5.6 sol",
     badge: "Efficient",
     description: "Fast reasoning for everyday market questions ",
-    logo: Gauge,
+    logo: null,
+    logoImage: solLogoAsset.url,
     logoLabel: "Sol",
     badgeTone: "bg-chart-1/15 text-chart-1",
     featured: false,
@@ -1489,6 +1493,7 @@ const RECOMMENDED_MODELS = [
     badge: "Built in",
     description: "Maps structure, liquidity, order blocks",
     logo: ChartNoAxesCombined,
+    logoImage: null,
     logoLabel: "SMC",
     badgeTone: "bg-accent text-accent-foreground",
     featured: false,
@@ -1536,7 +1541,11 @@ function ModelWorkspace() {
                   <div className="relative z-10 flex h-full flex-col">
                     <div className="flex items-start justify-between gap-3">
                       <div className={`flex h-11 items-center gap-2 rounded-md border px-2.5 ${model.featured ? "border-primary-foreground/30 bg-primary/75" : "border-border bg-background"}`} aria-label={`${model.logoLabel} model`}>
-                        <ModelLogo className="h-5 w-5" strokeWidth={1.8} />
+                        {model.logoImage ? (
+                          <img src={model.logoImage} alt="Sol" className="h-7 w-7 rounded-md object-cover" />
+                        ) : ModelLogo ? (
+                          <ModelLogo className="h-5 w-5" strokeWidth={1.8} />
+                        ) : null}
                         <span className="text-xs font-semibold">{model.logoLabel}</span>
                       </div>
                       <span className={`rounded px-2 py-1 text-xs font-semibold ${model.featured ? "bg-primary-foreground text-primary" : model.badgeTone}`}>
