@@ -1575,8 +1575,7 @@ function ModelWorkspace() {
                     <UpdateIcon className="h-5 w-5" strokeWidth={1.8} />
                   </div>
                   <div className="min-w-0">
-                    <p className="text-xs text-muted-foreground">{update.age}</p>
-                    <h3 className="mt-0.5 text-sm font-normal text-foreground">{update.title}</h3>
+                    <h3 className="text-sm font-normal text-foreground">{update.title}</h3>
                     <p className="mt-1 text-sm leading-5 text-muted-foreground">{update.copy}</p>
                   </div>
                 </article>
