@@ -16,7 +16,7 @@ import {
 } from "recharts";
 import { getUsageStats } from "@/lib/usage.functions";
 import { Button } from "@/components/ui/button";
-import astraModelLogoAsset from "@/assets/astra-model-logo.png.asset.json";
+import chatGptLogoAsset from "@/assets/chatgpt-logo.png.asset.json";
 import solLogoAsset from "@/assets/sol-logo.png.asset.json";
 
 export const Route = createFileRoute("/_authenticated/dashboard/usage")({
@@ -790,7 +790,7 @@ function ClaudeLogo({ className }: { className?: string }) {
 
 function ModelLogo({ model }: { model: string }) {
   const normalized = model.toLowerCase();
-  if (normalized.includes("astra")) return <img src={astraModelLogoAsset.url} alt="Astra logo" className="h-7 w-7 shrink-0 object-contain" />;
+  if (normalized.includes("astra")) return <img src={chatGptLogoAsset.url} alt="ChatGPT logo" className="h-7 w-7 shrink-0 object-contain" />;
   if (normalized.includes("claude") || normalized.includes("fable")) return <span className="grid h-7 w-7 shrink-0 place-items-center text-[#D97757]"><ClaudeLogo className="h-6 w-6" /></span>;
   if (normalized.includes("sol")) return <img src={solLogoAsset.url} alt="Sol logo" className="h-7 w-7 shrink-0 object-contain" />;
   if (normalized.includes("gemini") || normalized.includes("google")) return <CompanyMark company="Google" />;
