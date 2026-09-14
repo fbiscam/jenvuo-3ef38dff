@@ -1513,7 +1513,7 @@ function ModelWorkspace() {
     <section className="mt-10 bg-background" aria-label="Models and product updates">
       <div className="mx-auto grid w-full max-w-6xl gap-9 lg:grid-cols-[minmax(0,1.7fr)_minmax(260px,0.9fr)] lg:gap-10">
         <div className="min-w-0">
-          <h2 className="mb-4 text-xl font-semibold text-foreground">&nbsp; &nbsp; Recommended models</h2>
+          <h2 className="mb-4 text-xl font-normal text-foreground">&nbsp; &nbsp; Recommended models</h2>
           <div className="grid gap-4 sm:grid-cols-2">
             {RECOMMENDED_MODELS.map((model) => {
               const ModelLogo = model.logo;
@@ -1536,7 +1536,7 @@ function ModelWorkspace() {
                       </span>
                     </div>
                     <div className="mt-4 text-left">
-                      <h3 className="text-base font-semibold">{model.name}</h3>
+                      <h3 className="text-base font-normal">{model.name}</h3>
                       <p className={`mt-1 text-sm leading-5 ${model.featured ? "text-primary-foreground" : "text-muted-foreground"}`}>{model.description}</p>
                     </div>
                   </div>
@@ -1547,7 +1547,7 @@ function ModelWorkspace() {
         </div>
 
         <aside className="min-w-0">
-          <h2 className="mb-4 text-xl font-semibold text-foreground">Updates</h2>
+          <h2 className="mb-4 text-xl font-normal text-foreground">Updates</h2>
           <div className="divide-y divide-border border-y border-border">
             {PRODUCT_UPDATES.map((update) => {
               const UpdateIcon = update.icon;
@@ -1558,7 +1558,7 @@ function ModelWorkspace() {
                   </div>
                   <div className="min-w-0">
                     <p className="text-xs text-muted-foreground">{update.age}</p>
-                    <h3 className="mt-0.5 text-sm font-semibold text-foreground">{update.title}</h3>
+                    <h3 className="mt-0.5 text-sm font-normal text-foreground">{update.title}</h3>
                     <p className="mt-1 text-sm leading-5 text-muted-foreground">{update.copy}</p>
                   </div>
                 </article>
