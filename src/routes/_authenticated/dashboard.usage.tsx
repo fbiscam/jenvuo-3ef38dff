@@ -1,8 +1,9 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { Calendar, ChartColumn, ChevronDown, ChevronRight, Download, RefreshCw, Settings2, X } from "lucide-react";
+import { toast } from "sonner";
 import {
   Area,
   CartesianGrid,
@@ -90,10 +91,12 @@ function UsagePage() {
     refetchInterval: 30_000,
     refetchOnWindowFocus: true,
   });
-  const [tab, setTab] = useState<"categories" | "models">("categories");
+  const [tab, setTab] = useState<"capabilities" | "categories" | "caching" | "safety">("capabilities");
+  const [sideTab, setSideTab] = useState<"users" | "services" | "keys">("keys");
   const [rangeDays, setRangeDays] = useState<number>(30);
   const [model, setModel] = useState<string>("all");
-  const [openMenu, setOpenMenu] = useState<"model" | "range" | null>(null);
+  const [groupDays, setGroupDays] = useState<number>(1);
+  const [openMenu, setOpenMenu] = useState<"model" | "range" | "group" | null>(null);
 
   const models = useMemo(() => {
     if (!data) return [] as string[];
@@ -214,20 +217,44 @@ function UsagePage() {
     a.download = `jenvu-usage-${rangeDays}d.csv`;
     a.click();
     URL.revokeObjectURL(url);
+    toast.success("Usage CSV downloaded");
   };
 
   const rangeLabel = RANGES.find((r) => r.days === rangeDays)?.label ?? `Last ${rangeDays} days`;
+  const chartDays = groupDays === 1
+    ? derived.days
+    : derived.days.reduce<typeof derived.days>((groups, day, index) => {
+        const groupIndex = Math.floor(index / groupDays);
+        const current = groups[groupIndex];
+        if (current) {
+          current.spent += day.spent;
+          current.earned += day.earned;
+          current.tokens += day.tokens;
+          current.requests += day.requests;
+        } else {
+          groups.push({ ...day });
+        }
+        return groups;
+      }, []);
+  const cachingRows = derived.spendRows.filter((row) => {
+    if (!row.metadata || typeof row.metadata !== "object" || Array.isArray(row.metadata)) return false;
+    return Object.keys(row.metadata).some((key) => key.toLowerCase().includes("cache"));
+  });
+  const safetyRows = derived.spendRows.filter((row) => {
+    if (!row.metadata || typeof row.metadata !== "object" || Array.isArray(row.metadata)) return false;
+    return Object.keys(row.metadata).some((key) => /safety|moderation|blocked/i.test(key));
+  });
 
   return (
-    <div className="min-h-[calc(100dvh-4rem)] overflow-hidden border border-border bg-background text-foreground">
+    <div className="-mx-5 -mb-7 min-h-[calc(100dvh-4rem)] overflow-hidden bg-background text-foreground sm:-mx-8">
       {/* Header */}
       <div className="flex min-h-14 flex-col gap-3 border-b border-border px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-6">
         <h1 className="text-lg font-medium text-foreground">Usage</h1>
         <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto_auto] items-center gap-2 sm:flex">
-          <div className="hidden h-9 items-center gap-2 rounded-full border border-border bg-background px-3 text-[13px] text-foreground sm:flex">
+          <Link to="/dashboard/workspace" className="hidden h-9 items-center gap-2 rounded-full border border-border bg-background px-3 text-[13px] text-foreground transition hover:bg-muted sm:flex">
             <span>Default project</span>
             <span className="grid h-5 w-5 place-items-center rounded-full bg-muted text-muted-foreground"><X className="h-3 w-3" /></span>
-          </div>
+          </Link>
           <Dropdown
             open={openMenu === "model"}
             onToggle={() => setOpenMenu(openMenu === "model" ? null : "model")}
@@ -247,7 +274,11 @@ function UsagePage() {
           />
           <Button
             type="button" variant="ghost" size="icon"
-            onClick={() => refetch()}
+            onClick={async () => {
+              const result = await refetch();
+              if (result.isError) toast.error("Usage could not be refreshed");
+              else toast.success("Usage refreshed");
+            }}
             aria-label="Refresh usage"
             className="shrink-0 text-muted-foreground"
           >
@@ -274,18 +305,23 @@ function UsagePage() {
                   {derived.hasSpend ? fmtUsd(derived.spent, 2) : "No data"}
                 </div>
               </div>
-              <div className="flex items-center gap-3 text-[13px] text-muted-foreground">
+               <div className="flex items-center gap-2 text-[13px] text-muted-foreground">
                 <span className="hidden sm:inline">Group by</span>
-                <ChevronDown className="hidden h-4 w-4 sm:block" />
-                <span className="h-7 border-l border-border" />
-                <span className="bg-muted px-3 py-1.5 font-medium text-foreground">1d</span>
+                 <Dropdown
+                   open={openMenu === "group"}
+                   onToggle={() => setOpenMenu(openMenu === "group" ? null : "group")}
+                   trigger={`${groupDays}d`}
+                   options={[1, 7, 14].filter((days) => days <= rangeDays).map((days) => ({ value: String(days), label: `${days} day${days === 1 ? "" : "s"}` }))}
+                   value={String(groupDays)}
+                   onSelect={(value) => { setGroupDays(Number(value)); setOpenMenu(null); }}
+                 />
               </div>
             </div>
             <div className="px-4 pb-5 sm:px-7">
               {derived.hasSpend ? (
                 <div className="h-72 min-w-0 w-full sm:h-[310px]">
                   <ResponsiveContainer width="100%" height="100%">
-                    <ComposedChart data={derived.days} margin={{ top: 18, right: 6, bottom: 4, left: 0 }}>
+                    <ComposedChart data={chartDays} margin={{ top: 18, right: 6, bottom: 4, left: 0 }}>
                       <defs>
                         <linearGradient id="usageSpent" x1="0" y1="0" x2="0" y2="1">
                           <stop offset="0%" stopColor="#93c5fd" stopOpacity={0.82} />
@@ -372,13 +408,13 @@ function UsagePage() {
           </section>
 
           <div className="flex max-w-full items-center gap-7 overflow-x-auto border-b border-border px-4 text-[13px] sm:px-6">
-            <TabButton active={tab === "categories"} onClick={() => setTab("categories")}>API capabilities</TabButton>
-            <TabButton active={tab === "models"} onClick={() => setTab("models")}>Spend categories</TabButton>
-            <span className="shrink-0 py-3 text-muted-foreground">Prompt caching</span>
-            <span className="shrink-0 py-3 text-muted-foreground">Safety usage</span>
+            <TabButton active={tab === "capabilities"} onClick={() => setTab("capabilities")}>API capabilities</TabButton>
+            <TabButton active={tab === "categories"} onClick={() => setTab("categories")}>Spend categories</TabButton>
+            <TabButton active={tab === "caching"} onClick={() => setTab("caching")}>Prompt caching</TabButton>
+            <TabButton active={tab === "safety"} onClick={() => setTab("safety")}>Safety usage</TabButton>
           </div>
 
-          {tab === "categories" ? (
+          {tab === "capabilities" ? (
             <div className="grid grid-cols-1 gap-4 p-4 sm:grid-cols-2 sm:p-4">
               <CapabilityCard title="Responses and Chat Completions" start={rangeStartLabel(rangeDays)} end={rangeEndLabel()} items={[
                 { color: "bg-violet-600", label: `${fmtInt(derived.spendRows.length)} requests` },
@@ -396,8 +432,15 @@ function UsagePage() {
                 { color: "bg-zinc-300", label: `${fmtUsd(derived.earned, 2)} added` },
               ]} />
             </div>
+          ) : tab === "categories" ? (
+            <div className="grid gap-8 p-5 md:grid-cols-2">
+              <div><h2 className="mb-4 text-[13px] text-foreground">By service</h2><TypeBreakdown rows={derived.spendRows} /></div>
+              <div><h2 className="mb-4 text-[13px] text-foreground">By model</h2><ModelBreakdown rows={derived.spendRows} /></div>
+            </div>
+          ) : tab === "caching" ? (
+            <UsageSubset title="Prompt caching" rows={cachingRows} empty="No prompt-cache usage was recorded for this selection." />
           ) : (
-            <ModelBreakdown rows={derived.spendRows} />
+            <UsageSubset title="Safety usage" rows={safetyRows} empty="No safety or moderation events were recorded for this selection." />
           )}
         </div>
 
@@ -405,7 +448,9 @@ function UsagePage() {
           <section className="border-b border-border px-4 py-5">
             <div className="flex items-center justify-between text-[13px] text-foreground">
               <span>Monthly spend</span>
-              <Settings2 className="h-4 w-4 text-muted-foreground" />
+              <Button asChild type="button" variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground">
+                <Link to="/dashboard/billing" aria-label="Manage monthly spend"><Settings2 className="h-4 w-4" /></Link>
+              </Button>
             </div>
             <div className="mt-5 flex items-center justify-between text-[13px]">
               <span className="text-foreground">Personal</span>
@@ -436,12 +481,21 @@ function UsagePage() {
           </section>
 
           <div className="flex items-center gap-7 border-b border-border px-4 text-[13px]">
-            <span className="border-b border-foreground py-3 font-medium text-foreground">Users</span>
-            <span className="py-3 text-muted-foreground">Services</span>
-            <span className="py-3 text-muted-foreground">API Keys</span>
+            <TabButton active={sideTab === "users"} onClick={() => setSideTab("users")}>Users</TabButton>
+            <TabButton active={sideTab === "services"} onClick={() => setSideTab("services")}>Services</TabButton>
+            <TabButton active={sideTab === "keys"} onClick={() => setSideTab("keys")}>API Keys</TabButton>
           </div>
           <section className="px-4 py-5">
-            {data.recentExtensionKeys.length === 0 ? (
+            {sideTab === "users" ? (
+              <div className="space-y-4 text-[12px]">
+                <MetricRow label="Personal requests" value={fmtInt(derived.spendRows.length)} />
+                <MetricRow label="Personal spend" value={fmtUsd(derived.spent, 2)} />
+                <MetricRow label="Average per request" value={fmtUsd(derived.avgCost, 4)} />
+                <MetricRow label="Last activity" value={derived.lastActivity ? new Date(derived.lastActivity).toLocaleDateString() : "No activity"} />
+              </div>
+            ) : sideTab === "services" ? (
+              <TypeBreakdown rows={derived.spendRows} />
+            ) : data.recentExtensionKeys.length === 0 ? (
               <p className="py-20 text-center text-[13px] text-muted-foreground">There is no usage data for this period and group.</p>
             ) : (
               <div className="divide-y divide-border">
@@ -502,28 +556,30 @@ function Dropdown({
 }) {
   return (
     <div className="relative min-w-0">
-      <button
+      <Button
         type="button"
+        variant="outline"
         onClick={onToggle}
-        className="flex h-9 w-full min-w-0 items-center gap-1.5 rounded-full border border-zinc-200 bg-white px-2.5 text-[12px] font-medium text-zinc-700 transition hover:bg-zinc-50 sm:w-auto sm:max-w-[190px] sm:px-3 sm:text-[13px]"
+        className="flex h-9 w-full min-w-0 items-center gap-1.5 rounded-full bg-background px-2.5 text-[12px] font-medium text-foreground shadow-none sm:w-auto sm:max-w-[190px] sm:px-3 sm:text-[13px]"
       >
         {icon}
         <span className="truncate">{trigger}</span>
         <ChevronDown className="h-3.5 w-3.5 shrink-0 text-zinc-500" />
-      </button>
+      </Button>
       {open && (
         <div className="absolute left-0 z-20 mt-1 max-h-64 w-[min(14rem,calc(100vw-2rem))] overflow-y-auto rounded-lg border border-zinc-200 bg-white p-1 shadow-lg sm:left-auto sm:right-0">
           {options.map((o) => (
-            <button
+            <Button
               key={o.value}
               type="button"
+              variant="ghost"
               onClick={() => onSelect(o.value)}
-              className={`block w-full truncate rounded-md px-2.5 py-1.5 text-left text-[13px] transition hover:bg-zinc-100 ${
+              className={`block h-auto w-full truncate rounded-md px-2.5 py-1.5 text-left text-[13px] transition ${
                 o.value === value ? "font-semibold text-zinc-900" : "text-zinc-600"
               }`}
             >
               {o.label}
-            </button>
+            </Button>
           ))}
         </div>
       )}
@@ -633,6 +689,24 @@ function TypeBreakdown({ rows }: { rows: { reason: string; delta: number }[] }) 
       ))}
     </div>
   );
+}
+
+function UsageSubset({ title, rows, empty }: { title: string; rows: { reason: string; delta: number }[]; empty: string }) {
+  return (
+    <div className="p-5">
+      <h2 className="text-[13px] text-foreground">{title}</h2>
+      {rows.length > 0 ? <div className="mt-4"><TypeBreakdown rows={rows} /></div> : (
+        <div className="flex min-h-48 flex-col items-center justify-center text-center">
+          <ChartColumn className="h-5 w-5 text-muted-foreground" />
+          <p className="mt-3 text-[13px] text-muted-foreground">{empty}</p>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function MetricRow({ label, value }: { label: string; value: string }) {
+  return <div className="flex items-center justify-between gap-3"><span className="text-muted-foreground">{label}</span><span className="text-right tabular-nums text-foreground">{value}</span></div>;
 }
 
 function MiniLine({ data, color, filled, dashed }: { data: number[]; color: string; filled: boolean; dashed?: boolean }) {
