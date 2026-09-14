@@ -800,7 +800,10 @@ export const MODEL_CHAIN = {
 // Free UnoRouter models handle ordinary conversation. Trading/chart analysis
 // uses GPT-6 Astra first and Claude Fable 5 as its only fallback/reviewer.
 export const EXTENSION_MODEL_CHAIN = {
+  // Normal conversation runs on Bluesminds (verified live, fast) with the
+  // previous free/Astra routes kept only as fallbacks.
   conversation: [
+    "bmind/openai/gpt-oss-20b",
     "unorouter/glm-5.3:free",
     "browseruse/gpt-6-astra",
     "unorouter/nemotron-3-ultra-550b-a55b:free",
