@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import { Calendar, ChartColumn, ChevronDown, ChevronRight, Download, RefreshCw, Settings2, X } from "lucide-react";
+import { Calendar, ChartColumn, ChevronDown, ChevronRight, Download, RefreshCw, Settings2 } from "lucide-react";
 import { toast } from "sonner";
 import {
   Area,
@@ -16,6 +16,8 @@ import {
 } from "recharts";
 import { getUsageStats } from "@/lib/usage.functions";
 import { Button } from "@/components/ui/button";
+import astraModelLogoAsset from "@/assets/astra-model-logo.png.asset.json";
+import solLogoAsset from "@/assets/sol-logo.png.asset.json";
 
 export const Route = createFileRoute("/_authenticated/dashboard/usage")({
   head: () => ({
@@ -76,6 +78,23 @@ function modelDisplay(raw: string) {
   return { provider, model };
 }
 
+function metadataEntries(metadata: unknown) {
+  if (!metadata || typeof metadata !== "object" || Array.isArray(metadata)) return [] as [string, unknown][];
+  return Object.entries(metadata as Record<string, unknown>);
+}
+
+function metadataNumber(metadata: unknown, pattern: RegExp) {
+  return metadataEntries(metadata).reduce((sum, [key, value]) => {
+    if (!pattern.test(key)) return sum;
+    const amount = typeof value === "number" ? value : Number(value);
+    return sum + (Number.isFinite(amount) ? amount : 0);
+  }, 0);
+}
+
+function metadataFlag(metadata: unknown, pattern: RegExp) {
+  return metadataEntries(metadata).some(([key, value]) => pattern.test(key) && value !== false && value !== 0 && value !== "false");
+}
+
 const RANGES = [
   { days: 7, label: "Last 7 days" },
   { days: 14, label: "Last 14 days" },
@@ -124,7 +143,7 @@ function UsagePage() {
     const inputTokens = spendRows.reduce((s, r) => s + (r.prompt_tokens ?? 0), 0);
     const outputTokens = totalTokens - inputTokens;
 
-    const days: { date: string; spent: number; earned: number; tokens: number; requests: number; responses: number; inputTokens: number; seniorReviews: number; seniorTokens: number; extensionRequests: number; additions: number; addedUsd: number }[] = [];
+    const days: { date: string; spent: number; earned: number; tokens: number; requests: number; responses: number; inputTokens: number; seniorReviews: number; seniorTokens: number; extensionRequests: number; additions: number; addedUsd: number; cacheReads: number; cacheWrites: number; cacheHits: number; safetyChecks: number; blockedRequests: number }[] = [];
     const idx = new Map<string, number>();
     for (let i = rangeDays - 1; i >= 0; i--) {
       const d = new Date();
@@ -132,7 +151,7 @@ function UsagePage() {
       d.setDate(d.getDate() - i);
       const key = d.toISOString().slice(0, 10);
       idx.set(key, days.length);
-      days.push({ date: key, spent: 0, earned: 0, tokens: 0, requests: 0, responses: 0, inputTokens: 0, seniorReviews: 0, seniorTokens: 0, extensionRequests: 0, additions: 0, addedUsd: 0 });
+      days.push({ date: key, spent: 0, earned: 0, tokens: 0, requests: 0, responses: 0, inputTokens: 0, seniorReviews: 0, seniorTokens: 0, extensionRequests: 0, additions: 0, addedUsd: 0, cacheReads: 0, cacheWrites: 0, cacheHits: 0, safetyChecks: 0, blockedRequests: 0 });
     }
     for (const r of rows) {
       const i = idx.get(r.created_at.slice(0, 10));
@@ -149,6 +168,11 @@ function UsagePage() {
           b.seniorTokens += r.completion_tokens ?? 0;
         }
         if (r.reason === "extension_api") b.extensionRequests += 1;
+        b.cacheReads += metadataNumber(r.metadata, /cache.*(?:read|input).*token|cached.*token/i);
+        b.cacheWrites += metadataNumber(r.metadata, /cache.*(?:write|creation).*token/i);
+        if (metadataFlag(r.metadata, /cache.*hit/i)) b.cacheHits += 1;
+        if (metadataFlag(r.metadata, /safety|moderation|screened/i)) b.safetyChecks += 1;
+        if (metadataFlag(r.metadata, /blocked|flagged|rejected/i)) b.blockedRequests += 1;
       } else {
         b.earned += r.delta;
         b.additions += 1;
@@ -175,6 +199,11 @@ function UsagePage() {
       tokenSeries: days.map((d) => d.tokens),
       requestSeries: days.map((d) => d.requests),
       keySpend,
+      cacheReads: days.reduce((sum, day) => sum + day.cacheReads, 0),
+      cacheWrites: days.reduce((sum, day) => sum + day.cacheWrites, 0),
+      cacheHits: days.reduce((sum, day) => sum + day.cacheHits, 0),
+      safetyChecks: days.reduce((sum, day) => sum + day.safetyChecks, 0),
+      blockedRequests: days.reduce((sum, day) => sum + day.blockedRequests, 0),
     };
   }, [data, rangeDays, model]);
 
@@ -262,10 +291,6 @@ function UsagePage() {
       <div className="flex min-h-14 flex-col gap-3 border-b border-border px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-6">
         <h1 className="text-lg font-medium text-foreground">Usage</h1>
         <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto_auto] items-center gap-2 sm:flex">
-          <Link to="/dashboard/workspace" className="hidden h-9 items-center gap-2 rounded-full border border-border bg-background px-3 text-[13px] text-foreground transition hover:bg-muted sm:flex">
-            <span>Default project</span>
-            <span className="grid h-5 w-5 place-items-center rounded-full bg-muted text-muted-foreground"><X className="h-3 w-3" /></span>
-          </Link>
           <Dropdown
             open={openMenu === "model"}
             onToggle={() => setOpenMenu(openMenu === "model" ? null : "model")}
@@ -449,9 +474,28 @@ function UsagePage() {
               <div><h2 className="mb-4 text-[13px] text-foreground">By model</h2><ModelBreakdown rows={derived.spendRows} /></div>
             </div>
           ) : tab === "caching" ? (
-            <UsageSubset title="Prompt caching" rows={cachingRows} empty="No prompt-cache usage was recorded for this selection." />
+            <div className="grid grid-cols-1 gap-4 p-4 sm:grid-cols-2">
+              <CapabilityCard title="Cached input tokens" start={rangeStartLabel(rangeDays)} end={rangeEndLabel()} items={[
+                { color: "bg-chart-1", label: `${fmtInt(derived.cacheReads)} tokens reused`, data: derived.days.map((day) => day.cacheReads) },
+                { color: "bg-chart-2", label: `${fmtInt(derived.cacheHits)} cache hits`, data: derived.days.map((day) => day.cacheHits) },
+              ]} />
+              <CapabilityCard title="Cache writes" start={rangeStartLabel(rangeDays)} end={rangeEndLabel()} items={[
+                { color: "bg-chart-1", label: `${fmtInt(derived.cacheWrites)} tokens stored`, data: derived.days.map((day) => day.cacheWrites) },
+              ]} />
+              <UsageFeature title="Prompt caching activity" description="Requests with reusable prompt context are tracked here when the model provider reports cache usage." value={`${cachingRows.length} tracked requests`} />
+              <UsageFeature title="Estimated efficiency" description="Token reuse lowers repeated input processing while keeping the complete conversation context available." value={derived.cacheReads > 0 ? `${fmtInt(derived.cacheReads)} tokens reused` : "Ready to track"} />
+            </div>
           ) : (
-            <UsageSubset title="Safety usage" rows={safetyRows} empty="No safety or moderation events were recorded for this selection." />
+            <div className="grid grid-cols-1 gap-4 p-4 sm:grid-cols-2">
+              <CapabilityCard title="Safety checks" start={rangeStartLabel(rangeDays)} end={rangeEndLabel()} items={[
+                { color: "bg-chart-1", label: `${fmtInt(derived.safetyChecks)} checks`, data: derived.days.map((day) => day.safetyChecks) },
+              ]} />
+              <CapabilityCard title="Blocked requests" start={rangeStartLabel(rangeDays)} end={rangeEndLabel()} items={[
+                { color: "bg-chart-2", label: `${fmtInt(derived.blockedRequests)} blocked`, data: derived.days.map((day) => day.blockedRequests) },
+              ]} />
+              <UsageFeature title="Moderation events" description="Safety and moderation results reported by the analysis pipeline appear in this view." value={`${safetyRows.length} recorded events`} />
+              <UsageFeature title="Protection status" description="Chart uploads and prompts continue through the configured validation and review safeguards." value="Active" />
+            </div>
           )}
         </div>
 
@@ -605,8 +649,8 @@ function TabButton({ active, onClick, children }: { active: boolean; onClick: ()
       type="button"
       variant="ghost"
       onClick={onClick}
-      className={`h-auto shrink-0 rounded-none border-b border-transparent px-0 py-3 text-[13px] shadow-none ${
-        active ? "border-foreground text-foreground" : "text-muted-foreground hover:bg-transparent hover:text-foreground"
+      className={`relative -mb-px h-auto shrink-0 rounded-none border-b-2 px-0 py-3 text-[13px] shadow-none ${
+        active ? "border-foreground text-foreground" : "border-transparent text-muted-foreground hover:bg-transparent hover:text-foreground"
       }`}
     >
       {children}
@@ -694,9 +738,7 @@ function ModelBreakdown({ rows }: { rows: { model?: string | null; prompt_tokens
       {list.map(([model, s]) => (
         <div key={model} className="grid grid-cols-1 gap-2 px-4 py-3 text-[13px] sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center sm:px-5">
           <div className="flex min-w-0 items-center gap-2">
-            <span className="grid h-6 w-6 shrink-0 place-items-center rounded-md border border-zinc-200 bg-white text-[10px] font-semibold text-zinc-700" aria-hidden="true">
-              {modelDisplay(model).provider.slice(0, 1).toUpperCase()}
-            </span>
+            <ModelLogo model={model} />
             <span className="min-w-0 truncate text-[12px] font-medium text-zinc-800">{modelDisplay(model).model}</span>
             <span className="shrink-0 rounded-full bg-zinc-100 px-2 py-0.5 text-[10px] text-zinc-500">{modelDisplay(model).provider}</span>
           </div>
@@ -709,6 +751,23 @@ function ModelBreakdown({ rows }: { rows: { model?: string | null; prompt_tokens
       ))}
     </div>
   );
+}
+
+function ClaudeLogo({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" className={className} fill="currentColor">
+      <path d="M4.709 15.955l4.72-2.647.079-.23-.08-.128H9.2l-.79-.048-2.698-.073-2.339-.097-2.266-.122-.571-.121L0 11.784l.055-.352.48-.321.686.06 1.52.103 2.278.158 1.652.097 2.449.255h.389l.055-.157-.134-.098-.103-.097-2.358-1.596-2.552-1.688-1.336-.972-.724-.491-.364-.462-.158-1.008.656-.722.881.06.225.061.893.686 1.908 1.476 2.491 1.833.365.304.145-.103.019-.073-.164-.274-1.355-2.446-1.446-2.49-.644-1.032-.17-.619a2.97 2.97 0 01-.104-.729L6.283.134 6.696 0l.996.134.42.364.62 1.414 1.002 2.229 1.555 3.03.456.898.243.832.091.255h.158V9.01l.128-1.706.237-2.095.23-2.695.08-.76.376-.91.747-.492.584.28.48.685-.067.444-.286 1.851-.559 2.903-.364 1.942h.212l.243-.242.985-1.306 1.652-2.064.73-.82.85-.904.547-.431h1.033l.76 1.129-.34 1.166-1.064 1.347-.881 1.142-1.264 1.7-.79 1.36.073.11.188-.02 2.856-.606 1.543-.28 1.841-.315.833.388.091.395-.328.807-1.969.486-2.309.462-3.439.813-.042.03.049.061 1.549.146.662.036h1.622l3.02.225.79.522.474.638-.079.485-1.215.62-1.64-.389-3.829-.91-1.312-.329h-.182v.11l1.093 1.068 2.006 1.81 2.509 2.33.127.578-.322.455-.34-.049-2.205-1.657-.851-.747-1.926-1.62h-.128v.17l.444.649 2.345 3.521.122 1.08-.17.353-.607.213-.667-.122-1.373-1.925-1.415-2.167-1.143-1.943-.14.08-.674 7.254-.316.37-.729.28-.607-.461-.322-.747.322-1.476.389-1.924.315-1.53.286-1.9.17-.632-.012-.042-.14.018-1.434 1.967-2.18 2.945-1.726 1.845-.414.164-.717-.37.067-.662.401-.589 2.388-3.036 1.44-1.882.93-1.086-.006-.158h-.055L4.132 18.56l-1.13.146-.487-.456.061-.746.231-.243 1.913-1.315-.012.008z" />
+    </svg>
+  );
+}
+
+function ModelLogo({ model }: { model: string }) {
+  const normalized = model.toLowerCase();
+  if (normalized.includes("astra")) return <img src={astraModelLogoAsset.url} alt="GPT-6 Astra logo" className="h-7 w-7 shrink-0 rounded-md object-cover" />;
+  if (normalized.includes("claude") || normalized.includes("fable")) return <span className="grid h-7 w-7 shrink-0 place-items-center text-[#D97757]"><ClaudeLogo className="h-6 w-6" /></span>;
+  if (normalized.includes("sol")) return <img src={solLogoAsset.url} alt="GPT-5.6 Sol logo" className="h-7 w-7 shrink-0 rounded-md object-cover" />;
+  const display = modelDisplay(model);
+  return <span className="grid h-7 w-7 shrink-0 place-items-center rounded-md border border-border bg-background text-[10px] font-medium text-foreground" aria-hidden="true">{display.provider.slice(0, 1).toUpperCase()}</span>;
 }
 
 function TypeBreakdown({ rows }: { rows: { reason: string; delta: number }[] }) {
@@ -752,6 +811,16 @@ function UsageSubset({ title, rows, empty }: { title: string; rows: { reason: st
           <p className="mt-3 text-[13px] text-muted-foreground">{empty}</p>
         </div>
       )}
+    </div>
+  );
+}
+
+function UsageFeature({ title, description, value }: { title: string; description: string; value: string }) {
+  return (
+    <div className="min-h-40 rounded-lg border border-border bg-card p-4">
+      <div className="text-[13px] text-card-foreground">{title}</div>
+      <div className="mt-3 text-xl font-medium tabular-nums text-card-foreground">{value}</div>
+      <p className="mt-3 max-w-md text-[12px] leading-5 text-muted-foreground">{description}</p>
     </div>
   );
 }
