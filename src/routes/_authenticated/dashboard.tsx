@@ -1468,7 +1468,7 @@ const RECOMMENDED_MODELS = [
     featured: false,
   },
   {
-    name: "GPT-5.6 Sol",
+    name: " Gpt-5.6 sol",
     badge: "Efficient",
     description: "Fast reasoning for everyday market questions and workflows.",
     logo: Gauge,
