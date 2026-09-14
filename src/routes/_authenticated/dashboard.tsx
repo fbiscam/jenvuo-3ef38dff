@@ -1470,7 +1470,7 @@ const RECOMMENDED_MODELS = [
   {
     name: " Gpt-5.6 sol",
     badge: "Efficient",
-    description: "Fast reasoning for everyday market questions and workflows.",
+    description: "Fast reasoning for everyday market questions ",
     logo: Gauge,
     logoLabel: "Sol",
     badgeTone: "bg-chart-1/15 text-chart-1",
