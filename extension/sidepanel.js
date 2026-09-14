@@ -845,7 +845,10 @@ async function send(preset, silentUser) {
   const text = (preset ?? box.value).trim();
   if (!text && !chartImage && !stream) return;
   busy = true;
-  setReviewStatus("Senior review checking…", "checking");
+  // Senior review only applies to chart/screen analysis. Plain chat stays in
+  // conversation mode, so never show the review banner for it.
+  const analysisRequest = Boolean(chartImage || stream);
+  setReviewStatus(analysisRequest ? "Senior review checking…" : "Chat mode", analysisRequest ? "checking" : "");
   controller = new AbortController();
   $("send").disabled = false;
   updateSendState();
