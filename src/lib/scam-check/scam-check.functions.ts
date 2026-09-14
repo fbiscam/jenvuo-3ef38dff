@@ -85,7 +85,7 @@ export const scamCheck = createServerFn({ method: "POST" })
 
     try {
       const res = await callChatCompletion({
-        models: ["openai/gpt-5.4-mini", "google/gemini-2.5-flash", "openai/gpt-5.5"],
+        models: ["unorouter/nemotron-3-ultra-550b-a55b:free", "unorouter/glm-5.3:free", "bmind/gpt-4o"],
         messages: [
           { role: "system", content: SYSTEM },
           { role: "user", content: userMsg },

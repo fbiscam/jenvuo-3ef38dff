@@ -86,7 +86,9 @@ function providerConfigured(model: string): boolean {
     process.env.BROWSER_USE_API_KEY_2 ||
     process.env.BROWSER_USE_API_KEY_3,
   );
-  return Boolean(process.env.LOVABLE_API_KEY);
+  // Fail closed: an unknown/unprefixed model must never silently consume
+  // Lovable AI workspace credits.
+  return false;
 }
 
 // -------- Per-worker model health cache -----------------------------------
@@ -411,7 +413,8 @@ async function singleAttemptInner(
   //   `dsofficial/*` → DeepSeek official API (OpenAI-compatible)
   //   `jw/*`         → JustWoker (Anthropic-style /v1/messages)
   //   `browseruse/*` → Browser Use Cloud Agent v4
-  //   else           → Lovable AI Gateway
+  // Unknown/unprefixed models are rejected so this helper can never consume
+  // Lovable AI workspace credits.
   if (model.startsWith("jw/")) return callJustwoker(model, opts, signal);
   if (model.startsWith("browseruse/")) return callBrowserUse(model, opts, signal);
   const isBlackbox = model.startsWith("blackboxai/");
@@ -423,6 +426,10 @@ async function singleAttemptInner(
   const isUnoRouter = model.startsWith("unorouter/");
   const isDsOfficial = model.startsWith("dsofficial/");
   const isOai = model.startsWith("oai/");
+  const isExternalProvider = isBlackbox || isNvidia || isBmind || isTukenku || isUnikey || isEvolink || isUnoRouter || isDsOfficial || isOai;
+  if (!isExternalProvider) {
+    throw new AiGatewayError(`Unsupported external AI provider for model: ${model}`, 400, true);
+  }
   const blackboxKey = process.env.BLACKBOX_API_KEY;
   const nvidiaKey = process.env.NVIDIA_API_KEY;
   // Prefer the newer second BluesMinds credential. The singular slot is kept
@@ -462,9 +469,7 @@ async function singleAttemptInner(
     ? "https://direct.evolink.ai/v1/chat/completions"
     : isUnoRouter
     ? "https://api.unorouter.com/v1/chat/completions"
-    : isDsOfficial
-    ? "https://api.deepseek.com/chat/completions"
-    : "https://ai.gateway.lovable.dev/v1/chat/completions";
+    : "https://api.deepseek.com/chat/completions";
 
   const headers: Record<string, string> = { "Content-Type": "application/json" };
   if (isBlackbox) {
@@ -494,9 +499,6 @@ async function singleAttemptInner(
   } else if (isOai) {
     if (!openaiKey) throw new AiGatewayError("OPENAI_API_KEY missing on server", 0, true);
     headers["Authorization"] = `Bearer ${openaiKey}`;
-  } else {
-    if (!apiKey) throw new AiGatewayError("LOVABLE_API_KEY missing on server", 0, true);
-    headers["Lovable-API-Key"] = apiKey;
   }
 
   // Strip provider prefixes to expose the real upstream model id.
@@ -787,14 +789,14 @@ export function setCachedPlan<T>(key: string, value: T, ttlMs: number = PLAN_CAC
 // upstream. If every candidate is cooling, we still try the whole chain.
 
 const WORKING_BMIND = [
-  "google/gemini-3.1-pro-preview",
-  "google/gemini-3.7-flash",
+  "unorouter/nemotron-3-ultra-550b-a55b:free",
+  "unorouter/glm-5.3:free",
   "bmind/gpt-4o",
 ] as const;
 
 const FAST_NARRATION_BMIND = [
-  "google/gemini-3.7-flash",
-  "google/gemini-3.1-pro-preview",
+  "unorouter/glm-5.3:free",
+  "unorouter/nemotron-3-ultra-550b-a55b:free",
   "bmind/gpt-4o",
 ] as const;
 
@@ -803,8 +805,8 @@ const SENIOR_REVIEW_BMIND_4O = [
   "browseruse/claude-fable-5",
   "jw/gpt-5.6-sol",
   "jw/gpt-5.6-terra",
-  "google/gemini-3.1-pro-preview",
-  "google/gemini-3.7-flash",
+  "unorouter/nemotron-3-ultra-550b-a55b:free",
+  "unorouter/glm-5.3:free",
   "bmind/gpt-4o",
 ] as const;
 
@@ -845,8 +847,8 @@ export const MACRO_CONTEXT_CHAIN = WORKING_BMIND;
 export const SENIOR_REVIEW_CHAIN = SENIOR_REVIEW_BMIND_4O;
 
 export const DEEPSEEK_REVIEW_CHAIN = [
-  "google/gemini-3.7-flash",
-  "google/gemini-3.1-pro-preview",
+  "unorouter/glm-5.3:free",
+  "unorouter/nemotron-3-ultra-550b-a55b:free",
   "bmind/gpt-5.2-chat",
   "bmind/gpt-4o",
 ] as const;
