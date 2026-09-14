@@ -25,6 +25,7 @@ import { getUsageStats, type UsageStats } from "@/lib/usage.functions";
 import { listExtensionKeys } from "@/lib/extension-keys.functions";
 import { Button } from "@/components/ui/button";
 import astraGalaxyBanner from "@/assets/astra-galaxy-banner.jpg";
+import astraModelLogoAsset from "@/assets/astra-model-logo.png.asset.json";
 import solLogoAsset from "@/assets/sol-logo.png.asset.json";
 
 
@@ -1462,9 +1463,9 @@ const RECOMMENDED_MODELS = [
     name: "GPT-6 Astra",
     badge: "New",
     description: "Our most capable model, built for demanding chart analysis.",
-    logo: Sparkles,
-    logoImage: null,
-    logoLabel: "Astra",
+    logo: null,
+    logoImage: astraModelLogoAsset.url,
+    logoLabel: "",
     badgeTone: "bg-primary text-primary-foreground",
     featured: true,
   },
@@ -1540,13 +1541,13 @@ function ModelWorkspace() {
                   )}
                   <div className="relative z-10 flex h-full flex-col">
                     <div className="flex items-start justify-between gap-3">
-                      <div className={`flex h-11 items-center gap-2 rounded-md border px-2.5 ${model.featured ? "border-primary-foreground/30 bg-primary/75" : "border-border bg-background"}`} aria-label={`${model.logoLabel} model`}>
+                      <div className={`flex h-11 items-center gap-2 rounded-md border px-2.5 ${model.featured ? "border-primary-foreground/30 bg-primary/75" : "border-border bg-background"}`} aria-label={`${model.logoLabel || model.name} model`}>
                         {model.logoImage ? (
-                          <img src={model.logoImage} alt="Sol" className="h-7 w-7 rounded-md object-cover" />
+                          <img src={model.logoImage} alt={model.logoLabel || model.name} className="h-7 w-7 rounded-md object-cover" />
                         ) : ModelLogo ? (
                           <ModelLogo className="h-5 w-5" strokeWidth={1.8} />
                         ) : null}
-                        <span className="text-xs font-semibold">{model.logoLabel}</span>
+                        {model.logoLabel ? <span className="text-xs font-semibold">{model.logoLabel}</span> : null}
                       </div>
                       <span className={`rounded px-2 py-1 text-xs font-semibold ${model.featured ? "bg-primary-foreground text-primary" : model.badgeTone}`}>
                         {model.badge}
