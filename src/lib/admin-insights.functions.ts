@@ -3,8 +3,14 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
 import { callChatCompletion } from "@/lib/ai-gateway";
 
-// Bluesminds-only writing assistant for the Insights desk.
-const WRITER_CHAIN = ["bmind/gpt-4o", "bmind/gpt-5.2-chat"];
+// Use the strongest live-tested free UnoRouter writer first, with independent
+// providers retained so editorial work continues through free-tier congestion.
+const WRITER_CHAIN = [
+  "unorouter/nemotron-3-ultra-550b-a55b:free",
+  "unorouter/glm-5.3:free",
+  "bmind/gpt-4o",
+  "bmind/gpt-5.2-chat",
+];
 
 async function assertAdmin(supabase: any, userId: string) {
   const { isAdminOrOpsUnlocked } = await import("@/lib/admin-guard.server");

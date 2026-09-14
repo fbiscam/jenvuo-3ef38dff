@@ -91,6 +91,10 @@ const MODEL_PRICING: Record<string, Price> = {
   "browseruse/gpt-6-astra": { in: 6.0, out: 36.0 },
   "browseruse/claude-fable-5": { in: 6.0, out: 30.0 },
 
+  // UnoRouter free-tier editorial models.
+  "unorouter/nemotron-3-ultra-550b-a55b:free": { in: 0, out: 0 },
+  "unorouter/glm-5.3:free": { in: 0, out: 0 },
+
 
 
   // Google
@@ -125,7 +129,7 @@ export function formatModelLabel(rawModel: string | null | undefined): string {
   const m = raw.toLowerCase();
   if (m.startsWith("rules-engine/ict-smc")) return "ICT/SMC Rules Engine";
   // Strip provider prefix (bmind/, openai/, nvapi/, google/, etc.)
-  const bare = m.replace(/^(dsofficial|bmind|tukenku|unikey|evolink|jw|browseruse|agentrouter|openai|nvapi|google|anthropic)\//g, "").replace(/^myt\//, "").replace(/^orion\//, "").replace(/^deepseek-ai\//, "");
+  const bare = m.replace(/^(dsofficial|bmind|tukenku|unikey|evolink|jw|browseruse|agentrouter|unorouter|openai|nvapi|google|anthropic)\//g, "").replace(/^myt\//, "").replace(/^orion\//, "").replace(/^deepseek-ai\//, "");
   if (bare.startsWith("claude-opus-5")) return "Claude Opus 5";
   if (bare.startsWith("claude-opus-4-8")) return "Claude Opus 4.8";
   if (bare.startsWith("claude-sonnet-4.5") || bare.startsWith("claude-4.5-sonnet")) return "Claude Sonnet 4.5";

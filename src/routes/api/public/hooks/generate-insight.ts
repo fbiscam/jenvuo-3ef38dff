@@ -3,52 +3,12 @@ import { createFileRoute } from "@tanstack/react-router";
 const BASE_URL = "https://jenvu.com";
 const INDEXNOW_KEY = "31f95befb924351f7ab6c1f5ce4bc15b";
 const JOB_KEY = "daily-insight";
-const BLUESMINDS_MODEL = "meta/llama-3.2-11b-vision-instruct";
-
-class BluesMindsError extends Error {
-  constructor(
-    message: string,
-    readonly status: number,
-  ) {
-    super(message);
-  }
-}
-
-function wait(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-async function callBluesMinds(
-  messages: Array<{ role: "system" | "user"; content: string }>,
-  maxTokens: number,
-) {
-  const key = process.env.BLUESMIND_API_KEY || process.env.BLUESMINDS_API_KEY;
-  if (!key) throw new BluesMindsError("BLUESMIND_API_KEY missing", 401);
-  const base = (process.env.BLUESMIND_BASE_URL || "https://api.bluesminds.com/v1").replace(/\/+$/, "");
-
-  for (let attempt = 0; attempt < 2; attempt += 1) {
-    const response = await fetch(`${base}/chat/completions`, {
-      method: "POST",
-      headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
-      body: JSON.stringify({ model: BLUESMINDS_MODEL, messages, max_tokens: maxTokens }),
-    });
-    if (response.ok) {
-      const payload = (await response.json()) as { choices?: Array<{ message?: { content?: string } }> };
-      const content = payload.choices?.[0]?.message?.content;
-      if (!content) throw new BluesMindsError("BluesMinds returned an empty response", 502);
-      return content;
-    }
-
-    const detail = (await response.text()).slice(0, 500);
-    const retryable = response.status === 429 || response.status >= 500;
-    if (!retryable || attempt === 1) {
-      throw new BluesMindsError(`BluesMinds failed [${response.status}]: ${detail}`, response.status);
-    }
-    const retryAfter = Number(response.headers.get("retry-after"));
-    await wait(Number.isFinite(retryAfter) && retryAfter > 0 ? retryAfter * 1000 : 1500 * (attempt + 1));
-  }
-  throw new BluesMindsError("BluesMinds request failed", 502);
-}
+const ARTICLE_MODELS = [
+  "unorouter/nemotron-3-ultra-550b-a55b:free",
+  "unorouter/glm-5.3:free",
+  "bmind/meta/llama-3.2-11b-vision-instruct",
+];
+const ARTICLE_MODEL_LABEL = "UnoRouter Nemotron Ultra (free)";
 
 function slugify(s: string) {
   return s
@@ -124,7 +84,8 @@ export const Route = createFileRoute("/api/public/hooks/generate-insight")({
 
         if (currentJob?.status === "paused") {
           try {
-            await callBluesMinds([{ role: "user", content: "Reply exactly READY" }], 16);
+            const { callChatCompletion } = await import("@/lib/ai-gateway");
+            await callChatCompletion({ models: ARTICLE_MODELS, messages: [{ role: "user", content: "Reply exactly READY" }], maxTokens: 16, retriesPerModel: 1, stage: "insight-health-probe" });
             await supabaseAdmin
               .from("insight_generation_jobs")
               .update({ status: "idle", pause_reason: null, last_error: null, updated_at: new Date().toISOString() })
@@ -216,26 +177,31 @@ Return Markdown only. Start with one '# ' title of no more than 60 characters, t
           const parts: string[] = [];
           for (const prompt of sectionPrompts) {
             parts.push(
-              await callBluesMinds(
-                [
+              (await (await import("@/lib/ai-gateway")).callChatCompletion({
+                models: ARTICLE_MODELS,
+                messages: [
                   { role: "system", content: sys },
                   { role: "user", content: prompt },
                 ],
-                1800,
-              ),
+                maxTokens: 1800,
+                retriesPerModel: 1,
+                timeoutMs: 120_000,
+                deadlineMs: 300_000,
+                stage: "daily-insight",
+              })).content,
             );
           }
           raw = parts.join("\n\n");
         } catch (e) {
           lastErr = String((e as Error)?.message ?? e);
           console.error("[generate-insight] all providers failed", lastErr);
-          const status = e instanceof BluesMindsError ? e.status : 0;
+          const status = typeof e === "object" && e !== null && "status" in e ? Number(e.status) : 0;
           const shouldPause = status === 401 || status === 402 || status === 403;
           await updateJob({
             status: shouldPause ? "paused" : "failed",
             pause_reason: shouldPause ? `provider-${status}` : null,
             last_error: lastErr,
-            last_model: BLUESMINDS_MODEL,
+            last_model: ARTICLE_MODEL_LABEL,
             last_topic_id: topic.id,
             consecutive_rate_limits: status === 429 ? 1 : 0,
           });
@@ -263,7 +229,7 @@ Return Markdown only. Start with one '# ' title of no more than 60 characters, t
           await updateJob({
             status: "failed",
             last_error: `Article content was too short (${content.length} characters).`,
-            last_model: BLUESMINDS_MODEL,
+            last_model: ARTICLE_MODEL_LABEL,
             last_topic_id: topic.id,
           });
           return new Response(JSON.stringify({ error: "content-too-short", len: content.length }), { status: 502 });
@@ -281,8 +247,8 @@ Return Markdown only. Start with one '# ' title of no more than 60 characters, t
           return Response.json({ skipped: "duplicate-slug", slug });
         }
 
-        // AI-generated cover image (Bluesminds writes the text; the image comes
-        // from Lovable AI's image model since Bluesminds has no image model).
+        // Generate the cover through UnoRouter's free image tier first, then
+        // continue through the existing reliable image fallbacks.
         const { generateInsightCover, InsightImageGenerationError } = await import("@/lib/insight-image.server");
         let image_url: string | null = null;
         try {
@@ -294,7 +260,7 @@ Return Markdown only. Start with one '# ' title of no more than 60 characters, t
             status: shouldPause ? "paused" : "failed",
             pause_reason: shouldPause ? `image-provider-${status}` : null,
             last_error: String(error),
-            last_model: BLUESMINDS_MODEL,
+            last_model: ARTICLE_MODEL_LABEL,
             last_topic_id: topic.id,
           });
           return Response.json(
@@ -306,7 +272,7 @@ Return Markdown only. Start with one '# ' title of no more than 60 characters, t
           await updateJob({
             status: "failed",
             last_error: "Cover image generation failed; article was not published.",
-            last_model: BLUESMINDS_MODEL,
+            last_model: ARTICLE_MODEL_LABEL,
             last_topic_id: topic.id,
           });
           return Response.json({ error: "image-generation-failed", published: false }, { status: 502 });
@@ -327,7 +293,7 @@ Return Markdown only. Start with one '# ' title of no more than 60 characters, t
           .single();
 
         if (insErr) {
-          await updateJob({ status: "failed", last_error: insErr.message, last_model: BLUESMINDS_MODEL, last_topic_id: topic.id });
+          await updateJob({ status: "failed", last_error: insErr.message, last_model: ARTICLE_MODEL_LABEL, last_topic_id: topic.id });
           return new Response(JSON.stringify({ error: insErr.message }), { status: 500 });
         }
 
@@ -354,7 +320,7 @@ Return Markdown only. Start with one '# ' title of no more than 60 characters, t
         await updateJob({
           status: "completed",
           last_completed_at: new Date().toISOString(),
-          last_model: BLUESMINDS_MODEL,
+          last_model: ARTICLE_MODEL_LABEL,
           last_topic_id: topic.id,
           last_insight_id: inserted.id,
           last_index_status: indexStatus,
@@ -363,7 +329,7 @@ Return Markdown only. Start with one '# ' title of no more than 60 characters, t
           consecutive_rate_limits: 0,
         });
 
-        return Response.json({ ok: true, slug, url, model: BLUESMINDS_MODEL, google, indexnow });
+        return Response.json({ ok: true, slug, url, model: ARTICLE_MODEL_LABEL, google, indexnow });
       },
     },
   },

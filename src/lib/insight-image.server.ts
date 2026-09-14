@@ -2,9 +2,8 @@
 // stores it in the private `insight-images` bucket. The public site reads it
 // back through /api/public/insight-image/$path (see that route).
 //
-// Note: the Bluesminds gateway has no image-capable model (its catalogue is
-// text-only), so article TEXT is written with Bluesminds while the COVER IMAGE
-// is generated with Lovable AI's Gemini image model.
+// UnoRouter's free image routes are attempted first. They are aggressively
+// rate-limited, so the established providers remain as reliable fallbacks.
 
 const IMAGE_MODELS = [
   "google/gemini-3.1-flash-image",
@@ -23,6 +22,12 @@ export class InsightImageGenerationError extends Error {
   }
 }
 
+const UNOROUTER_IMAGE_MODELS = [
+  "gpt-image-2:free",
+  "juggernaut-xl:free",
+  "dreamshaper:free",
+] as const;
+
 function coverPrompt(title: string, category: string): string {
   return [
     "Create a premium, editorial cover image for a professional gold-trading research article.",
@@ -31,6 +36,43 @@ function coverPrompt(title: string, category: string): string {
     "subtle candlestick chart geometry, soft volumetric light, high detail, 16:9 composition, no text,",
     "no words, no letters, no logos, no watermarks, no human faces.",
   ].join(" ");
+}
+
+async function generateWithUnoRouter(
+  prompt: string,
+): Promise<{ b64: string; model: string; mime?: string } | null> {
+  const key = process.env.UNOROUTER_API_KEY;
+  if (!key) return null;
+
+  for (const model of UNOROUTER_IMAGE_MODELS) {
+    try {
+      const res = await fetch("https://api.unorouter.com/v1/images/generations", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
+        body: JSON.stringify({ model, prompt, size: "1280x720", n: 1 }),
+      });
+      if (!res.ok) {
+        console.warn("[insight-image] UnoRouter failed", model, res.status, (await res.text()).slice(0, 200));
+        continue;
+      }
+
+      const json = (await res.json()) as { data?: Array<{ b64_json?: string; url?: string }> };
+      const image = json.data?.[0];
+      if (image?.b64_json) return { b64: image.b64_json, model: `unorouter:${model}` };
+      if (image?.url) {
+        const imageResponse = await fetch(image.url);
+        if (!imageResponse.ok) continue;
+        const mime = imageResponse.headers.get("content-type") || "image/png";
+        const bytes = new Uint8Array(await imageResponse.arrayBuffer());
+        let binary = "";
+        for (const byte of bytes) binary += String.fromCharCode(byte);
+        return { b64: btoa(binary), model: `unorouter:${model}`, mime };
+      }
+    } catch (error) {
+      console.warn("[insight-image] UnoRouter threw", model, String(error));
+    }
+  }
+  return null;
 }
 
 // Direct Google AI Studio (Gemini) image generation using the user's own key.
@@ -108,6 +150,9 @@ async function generateWithPollinations(
 async function generateBase64(
   prompt: string,
 ): Promise<{ b64: string; model: string; mime?: string } | null> {
+  const viaUnoRouter = await generateWithUnoRouter(prompt);
+  if (viaUnoRouter) return viaUnoRouter;
+
   const viaGoogle = await generateWithGoogle(prompt);
   if (viaGoogle) return viaGoogle;
 
