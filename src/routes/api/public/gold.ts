@@ -107,6 +107,9 @@ function validateSeniorReview(content: string): true | string {
   if (/\b(?:no|without) (?:primary )?(?:answer|analysis|response) (?:was |is )?(?:provided|included|available|present)\b/i.test(normalized)) {
     return 'Senior reviewer did not receive or audit the primary analysis.'
   }
+  if (/\bno (?:chart )?image (?:was |is )?(?:attached|provided|available|present)\b/i.test(normalized)) {
+    return 'Senior reviewer refused the live-context audit because the chart image was not repeated.'
+  }
   if (!/\b(?:verdict|wait|buy|sell|bias)\b/i.test(normalized)) {
     return 'Senior reviewer did not provide a valid trading verdict.'
   }
@@ -266,7 +269,7 @@ async function handle({ request }: { request: Request }) {
           messages: [
             {
               role: 'system',
-                content: 'Senior ICT/SMC reviewer. The PRIMARY_ANALYSIS block below is the answer you must audit; never claim it is missing when that block contains text. Audit live levels, HTF/LTF alignment, sweep, displacement, fresh POI and minimum 1:2 RR. Return a corrected concise answer. If incomplete, return WAIT. Never promise profit.',
+                content: 'Senior ICT/SMC reviewer. The PRIMARY_ANALYSIS block below is the answer you must audit; never claim it is missing when that block contains text. The verified LIVE_CONTEXT is sufficient for this independent audit, so do not request or claim you need the original chart image. Audit live levels, HTF/LTF alignment, sweep, displacement, fresh POI and minimum 1:2 RR. Return a corrected concise answer. If incomplete, return WAIT. Never promise profit.',
             },
             { role: 'user', content: `LIVE_CONTEXT_START\n${reviewContext}\nLIVE_CONTEXT_END\n\nTRADER_REQUEST_START\n${question.slice(0, 300)}\nTRADER_REQUEST_END\n\nPRIMARY_ANALYSIS_START\n${primary.content.slice(0, 2400)}\nPRIMARY_ANALYSIS_END` },
           ],
