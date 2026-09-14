@@ -1340,7 +1340,7 @@ function DashboardHero({ keysCount, stats }: { keysCount: number | null; stats: 
             <img src={astraGalaxyBanner} alt="Spiral galaxy representing GPT-6 Astra" width={1536} height={512} className="absolute inset-0 h-full w-full object-cover object-right" />
             <div className="relative z-10 flex min-h-[200px] max-w-3xl flex-col justify-center px-7 py-7 sm:min-h-[214px] sm:px-9">
               <h2 className="text-xl font-semibold sm:text-2xl">{banner.eyebrow}</h2>
-              <p className="mt-1.5 max-w-2xl text-sm leading-6 text-primary-foreground/80">{banner.copy}</p>
+              <p className="mt-1.5 max-w-2xl text-sm leading-6 text-white">{banner.copy}</p>
               <Button asChild variant="secondary" size="sm" className="mt-4 w-fit bg-background text-foreground hover:bg-muted">
                 <Link to={banner.to}>{banner.action}</Link>
               </Button>
