@@ -1274,22 +1274,6 @@ function UsageStatCard({ title, value, delta, series, tall = false, chartHeight,
 
 function DashboardHero({ keysCount, stats }: { keysCount: number | null; stats: UsageStats | null }) {
   const [slide, setSlide] = useState(0);
-  const [modelLogoIndex, setModelLogoIndex] = useState(0);
-  const rotatingModelLogos = [
-    { name: "Sol", image: solLogoAsset.url },
-    { name: "Astra", image: astraModelLogoAsset.url },
-    { name: "Claude", image: null },
-  ] as const;
-  const activeModelLogo = rotatingModelLogos[modelLogoIndex];
-
-  useEffect(() => {
-    const timer = window.setInterval(() => {
-      setModelLogoIndex((current) => (current + 1) % rotatingModelLogos.length);
-    }, 4500);
-
-    return () => window.clearInterval(timer);
-  }, [rotatingModelLogos.length]);
-
   const banners = [
     {
       variant: "features" as const,
@@ -1340,12 +1324,8 @@ function DashboardHero({ keysCount, stats }: { keysCount: number | null; stats: 
               <div className="dashboard-feature-code absolute inset-0 overflow-hidden font-mono text-[14px] leading-[15px] text-primary/10">
                 {"const analyze = (chart) => {\n  detectStructure(chart);\n  mapLiquidity(chart);\n  validateRisk(chart);\n  return seniorReview();\n};"}
               </div>
-              <div className="absolute right-10 top-1/2 flex h-20 w-20 -translate-y-1/2 items-center justify-center overflow-hidden bg-transparent" aria-label={`${activeModelLogo.name} model`}>
-                {activeModelLogo.image ? (
-                  <img key={activeModelLogo.name} src={activeModelLogo.image} alt={`${activeModelLogo.name} logo`} className="h-14 w-14 animate-in fade-in zoom-in-95 rounded-lg object-cover duration-1000" />
-                ) : (
-                  <ClaudeLogo key={activeModelLogo.name} className="h-12 w-12 animate-in fade-in zoom-in-95 duration-1000" />
-                )}
+              <div className="absolute right-10 top-1/2 flex h-16 w-16 -translate-y-1/2 items-center justify-center rounded-full border border-border bg-background shadow-sm">
+                <Sparkles className="h-7 w-7 text-foreground" strokeWidth={1.8} />
               </div>
             </div>
             <div className="relative z-10 flex min-h-[180px] max-w-[720px] flex-col justify-center px-7 py-5 sm:min-h-[190px] sm:px-9">
