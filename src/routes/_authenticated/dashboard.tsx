@@ -1304,7 +1304,7 @@ function DashboardHero({ keysCount, stats }: { keysCount: number | null; stats: 
     <section className="dashboard-hero pb-1 pt-1">
       <div className="mx-auto w-full max-w-6xl">
         <div className="mb-7 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4">
-          <h1 className="truncate text-3xl font-medium text-foreground sm:text-4xl">&nbsp; &nbsp;Overview</h1>
+          <h1 className="truncate text-3xl font-medium text-foreground sm:text-4xl">&nbsp; Overview</h1>
           <div className="flex shrink-0 items-center gap-1 text-xs text-muted-foreground">
             <span className="mr-2 tabular-nums">{slide + 1} of {banners.length}</span>
             <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setSlide((slide - 1 + banners.length) % banners.length)} aria-label="Previous banner">
