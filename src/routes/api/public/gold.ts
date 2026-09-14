@@ -125,6 +125,19 @@ function tradingVerdict(content: string): 'BUY' | 'SELL' | 'WAIT' | null {
   return null
 }
 
+function hasSupportedWait(content: string): boolean {
+  const evidenceTerms = [
+    /\bHTF|higher[ -]timeframe\b/i,
+    /\bLTF|lower[ -]timeframe\b/i,
+    /\b(?:liquidity )?sweep\b/i,
+    /\bdisplacement\b/i,
+    /\b(?:fresh )?(?:POI|FVG|order block)\b/i,
+    /\b(?:RR|risk.?reward)\b/i,
+    /\b(?:conflict|misalign|invalid|missing|absent|not confirmed)\b/i,
+  ]
+  return evidenceTerms.filter((term) => term.test(content)).length >= 2
+}
+
 async function handle({ request }: { request: Request }) {
   const auth = await authenticateExtensionRequest(request)
   if (!auth.ok) return extJson({ ok: false, error: auth.error }, auth.status)
@@ -290,7 +303,7 @@ async function handle({ request }: { request: Request }) {
         // A text-only conservative WAIT used to erase valid directional plans.
         // Keep the completed primary when the reviewer has no contradictory
         // direction; expose the review's caution without inventing a signal.
-        content = reviewVerdict === 'WAIT' && (primaryVerdict === 'BUY' || primaryVerdict === 'SELL')
+        content = reviewVerdict === 'WAIT' && !hasSupportedWait(review.content) && (primaryVerdict === 'BUY' || primaryVerdict === 'SELL')
           ? `${primary.content}\n\nSENIOR REVIEW\n${review.content}`
           : review.content
         seniorReview = { included: true, model: review.model, status: 'completed' }

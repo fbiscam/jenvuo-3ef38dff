@@ -52,3 +52,4 @@
 - [x] Make Usage filters, tabs, grouping, export, refresh, settings, and breakdown views functional
 - [x] Add clear active-tab underlines, model logos, and useful prompt-caching and safety panels
 - [x] Prevent all AI inference paths from consuming Lovable AI workspace credits
+- [x] Restore fast extension chat replies and prevent unsupported senior-review WAIT overrides

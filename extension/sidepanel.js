@@ -470,13 +470,16 @@ function addMsg(cls, text, shot) {
 
 async function post(body, signal) {
   const requestId = "ext_" + Date.now().toString(36) + "_" + Math.random().toString(36).slice(2, 10);
+  const deadlineAt = Date.now() + 40000;
   let lastErr;
   for (const url of [API, ...ENDPOINTS.filter((u) => u !== API)]) {
-    for (let attempt = 0; attempt < 2; attempt++) {
+    for (let attempt = 0; attempt < 1; attempt++) {
+      const remainingMs = deadlineAt - Date.now();
+      if (remainingMs <= 0) throw lastErr || new Error("AI response took too long. Please try again.");
       const requestController = new AbortController();
       const abortFromUser = () => requestController.abort();
       signal?.addEventListener("abort", abortFromUser, { once: true });
-      const timeout = setTimeout(() => requestController.abort(), 35000);
+      const timeout = setTimeout(() => requestController.abort(), Math.min(15000, remainingMs));
       try {
         const res = await fetch(url, {
           method: "POST",
@@ -513,11 +516,11 @@ async function post(body, signal) {
           const timeoutError = new Error("AI response took too long. Please try again.");
           timeoutError.retryable = true;
           lastErr = timeoutError;
-          if (attempt === 1) break;
+          if (attempt === 0) break;
           continue;
         }
         lastErr = e;
-        if (!e.retryable || attempt === 1) break;
+        if (!e.retryable || attempt === 0) break;
         await new Promise((resolve) => setTimeout(resolve, 1500));
       } finally {
         clearTimeout(timeout);
