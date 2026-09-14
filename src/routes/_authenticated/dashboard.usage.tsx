@@ -533,31 +533,36 @@ function Dropdown({
 
 function TabButton({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
   return (
-    <button
+    <Button
       type="button"
+      variant="ghost"
       onClick={onClick}
-      className={`-mb-px border-b-2 border-transparent py-2.5 font-medium transition ${
-        active ? "text-zinc-900" : "text-zinc-500 hover:text-zinc-700"
+      className={`h-auto shrink-0 rounded-none border-b border-transparent px-0 py-3 text-[13px] shadow-none ${
+        active ? "border-foreground text-foreground" : "text-muted-foreground hover:bg-transparent hover:text-foreground"
       }`}
     >
       {children}
-    </button>
+    </Button>
   );
 }
 
-function CategoryCard({ title, items }: { title: string; items: { color: string; label: string }[] }) {
+function CapabilityCard({ title, items, start, end }: { title: string; items: { color: string; label: string }[]; start: string; end: string }) {
   return (
-    <div className="py-2">
-      <div className="flex items-center gap-1 text-[13px] font-medium text-zinc-800">
-        {title} <ChevronRight className="h-3.5 w-3.5 text-zinc-400" />
+    <div className="flex min-h-64 flex-col rounded-lg border border-border bg-card p-4 sm:min-h-[250px]">
+      <div className="flex items-center gap-1 text-[13px] text-card-foreground">
+        {title} <ChevronRight className="h-3.5 w-3.5 text-muted-foreground" />
       </div>
-      <div className="mt-3 space-y-1.5">
+      <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1">
         {items.map((it) => (
-          <div key={it.label} className="flex items-center gap-2 text-[12px] text-zinc-500">
+          <div key={it.label} className="flex items-center gap-2 text-[12px] text-muted-foreground">
             <span className={`inline-block h-2 w-2 rounded-[2px] ${it.color}`} />
             {it.label}
           </div>
         ))}
+      </div>
+      <div className="mt-auto flex items-center justify-between px-7 text-[12px] text-muted-foreground">
+        <span>{start}</span>
+        <span>{end}</span>
       </div>
     </div>
   );
