@@ -1461,18 +1461,21 @@ const RECOMMENDED_MODELS = [
     badge: "Senior review",
     description: "Independent validation for structure, risk, and consistency.",
     mark: "C5",
+    featured: false,
   },
   {
     name: "GPT-5.6 Sol",
     badge: "Efficient",
     description: "Fast reasoning for everyday market questions and workflows.",
     mark: "Sol",
+    featured: false,
   },
   {
     name: "ICT / SMC Engine",
     badge: "Built in",
     description: "Maps structure, liquidity, order blocks, and fair value gaps.",
     mark: "SMC",
+    featured: false,
   },
 ] as const;
 
