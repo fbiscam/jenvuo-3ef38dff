@@ -138,6 +138,19 @@ function hasSupportedWait(content: string): boolean {
   return evidenceTerms.filter((term) => term.test(content)).length >= 2
 }
 
+function quickConversationReply(question: string): string | null {
+  const normalized = question.trim().toLowerCase().replace(/[!?.،]+$/g, '')
+  if (/^(hi|hello|hey|hii+|helo|salam|salaam|assalam(?:u alaikum)?|aoa)$/.test(normalized)) {
+    return /salam|assalam|aoa/.test(normalized)
+      ? 'Wa Alaikum Assalam! Main Jenvu AI hoon. Aaj main aapki kis cheez mein help karun?'
+      : 'Hello! I’m Jenvu AI. How can I help you today?'
+  }
+  if (/^(thanks|thank you|thx|shukriya|jazakallah)$/.test(normalized)) {
+    return /shukriya|jazakallah/.test(normalized) ? 'Khushi hui! Aur kisi cheez mein help chahiye ho to batayein.' : 'You’re welcome! Let me know what else you need.'
+  }
+  return null
+}
+
 async function handle({ request }: { request: Request }) {
   const auth = await authenticateExtensionRequest(request)
   if (!auth.ok) return extJson({ ok: false, error: auth.error }, auth.status)
@@ -183,12 +196,23 @@ async function handle({ request }: { request: Request }) {
       const conversational = !image && !analysisIntent
 
       if (conversational) {
+        const quickReply = quickConversationReply(question)
+        if (quickReply) {
+          return extJson({
+            ok: true,
+            text: quickReply,
+            mode: 'conversation',
+            seniorReview: { included: false, model: null, status: 'not_required' },
+            secondReview: { included: false, model: null, status: 'not_required' },
+            usage: { requestId, charged: 0, balance: entitlement.balance },
+          })
+        }
         const casual = await callChatCompletion({
           models: [...EXTENSION_MODEL_CHAIN.conversation],
           stage: 'extension-chat',
           maxTokens: 400,
-          timeoutMs: 8_000,
-          deadlineMs: 24_000,
+          timeoutMs: 6_000,
+          deadlineMs: 18_000,
           retriesPerModel: 1,
           messages: [
             {
@@ -256,8 +280,8 @@ async function handle({ request }: { request: Request }) {
         models: [...(image ? EXTENSION_MODEL_CHAIN.vision : EXTENSION_MODEL_CHAIN.reasoning)],
         stage: image ? 'extension-screen-analysis' : 'extension-chat',
         maxTokens: 900,
-        timeoutMs: 45_000,
-        deadlineMs: 50_000,
+        timeoutMs: 28_000,
+        deadlineMs: 32_000,
         retriesPerModel: 1,
         messages: [
           {
@@ -283,8 +307,8 @@ async function handle({ request }: { request: Request }) {
           models: [...EXTENSION_MODEL_CHAIN.seniorReview],
           stage: 'extension-senior-review',
           maxTokens: 800,
-          timeoutMs: 45_000,
-          deadlineMs: 50_000,
+          timeoutMs: 28_000,
+          deadlineMs: 32_000,
           retriesPerModel: 1,
           validateContent: validateSeniorReview,
           messages: [
