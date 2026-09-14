@@ -29,13 +29,13 @@ import { listExtensionKeys } from "@/lib/extension-keys.functions";
 import {
   Bookmark, Bell, BellRing, CreditCard, BookOpen, User, LogOut, Power, Mic, Plus,
   Wallet, TrendingUp, LineChart, Activity, ShieldCheck, Gauge, BarChart3,
-  MoreHorizontal, Tag, ArrowUpRight, ArrowRight, CheckCircle2, Calendar, RefreshCw, Gift, PieChart,
+  Tag, ArrowUpRight, ArrowRight, CheckCircle2, Calendar, RefreshCw, Gift, PieChart,
   ChevronsLeft, ChevronsRight, Menu, X, Sparkles, LayoutGrid, LifeBuoy, Lightbulb,
-  Search, ChevronRight, ChevronDown, Rocket, History,
+  ChevronRight, ChevronDown, Bot, KeyRound,
   LayoutDashboard, ChartNoAxesCombined, Puzzle, BadgeDollarSign, FileCheck2,
   LockKeyhole, CircleHelp, type LucideIcon,
 } from "lucide-react";
-import { RiClaudeFill, RiDeepseekFill, RiGeminiFill, RiOpenaiFill } from "react-icons/ri";
+import { RiClaudeFill, RiOpenaiFill } from "react-icons/ri";
 import {
   DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuCheckboxItem, DropdownMenuSeparator, DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
@@ -1268,158 +1268,57 @@ function UsageStatCard({ title, value, delta, series, tall = false, chartHeight,
 
 
 function DashboardHero({ keysCount, stats }: { keysCount: number | null; stats: UsageStats | null }) {
-  const [q, setQ] = useState("");
-  const recentActivity = (stats?.ledger ?? []).filter((entry) => entry.delta !== 0).slice(0, 3);
-  const recentKeys = (stats?.recentExtensionKeys ?? []).slice(0, 3);
-  const keyTokens = useMemo(() => {
-    const map = new Map<string, number>();
-    for (const row of stats?.ledger ?? []) {
-      const meta = (row.metadata ?? null) as { api_key_id?: string } | null;
-      const id = meta && typeof meta === "object" ? meta.api_key_id : undefined;
-      if (!id) continue;
-      const tokens = (row.prompt_tokens ?? 0) + (row.completion_tokens ?? 0);
-      map.set(id, (map.get(id) ?? 0) + tokens);
-    }
-    return map;
-  }, [stats]);
-  const reviewModels = [
-    { key: "openai", label: "ChatGPT", Icon: RiOpenaiFill, className: "text-brand-openai" },
-    { key: "gemini", label: "Gemini", Icon: RiGeminiFill, className: "text-brand-gemini" },
-    { key: "claude", label: "Claude", Icon: RiClaudeFill, className: "text-brand-claude" },
-    { key: "deepseek", label: "DeepSeek", Icon: RiDeepseekFill, className: "text-brand-deepseek" },
-  ] as const;
-  const links: { to: string; label: string }[] = [
-    { to: "/dashboard/usage", label: "Wallet usage" },
-    { to: "/dashboard/extension", label: "Extension keys" },
-    { to: "/dashboard/analytics", label: "Analytics" },
-    { to: "/dashboard/security", label: "Security" },
-  ];
-  const filtered = q.trim()
-    ? links.filter((l) => l.label.toLowerCase().includes(q.trim().toLowerCase()))
-    : links;
-
   return (
-    <section className="dashboard-hero -mx-5 mb-2 bg-white px-5 pb-8 pt-6 sm:-mx-8 sm:px-8">
-      <div className="mx-auto flex max-w-4xl flex-col items-center">
+    <section className="dashboard-hero pb-1 pt-3">
+      <div className="mx-auto grid w-full max-w-4xl gap-4 lg:grid-cols-2">
         <Link
           to="/dashboard/extension"
-          className="inline-flex items-center gap-2.5 rounded-full border border-zinc-200 bg-white px-3.5 py-2 text-sm text-zinc-950 shadow-sm transition hover:border-zinc-300 hover:shadow"
+          className="group relative flex min-h-[188px] overflow-hidden rounded-lg border border-zinc-200 bg-zinc-950 p-6 text-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
         >
-          <span className="font-medium">Senior Review with Top Models</span>
-          <span className="flex items-center gap-1.5" aria-label="ChatGPT, Gemini, Claude, and DeepSeek">
-            <RiOpenaiFill className="h-[18px] w-[18px] text-brand-openai" aria-label="ChatGPT" />
-            <RiGeminiFill className="h-[18px] w-[18px] text-brand-gemini" aria-label="Gemini" />
-            <RiClaudeFill className="h-[18px] w-[18px] text-brand-claude" aria-label="Claude" />
-            <RiDeepseekFill className="h-[18px] w-[18px] text-brand-deepseek" aria-label="DeepSeek" />
-          </span>
+          <div className="relative z-10 flex min-w-0 flex-1 flex-col">
+            <div className="flex items-center gap-2 text-xs font-semibold uppercase text-zinc-300">
+              <Bot className="h-4 w-4" />
+              AI analysis
+            </div>
+            <h1 className="mt-5 max-w-[280px] text-2xl font-semibold leading-tight">
+              Analyze markets with GPT-6 Astra
+            </h1>
+            <p className="mt-2 max-w-[290px] text-sm leading-5 text-zinc-400">
+              Capture a chart and receive a structured ICT/SMC market read.
+            </p>
+            <span className="mt-auto inline-flex items-center gap-1 pt-5 text-sm font-semibold">
+              Open extension <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+            </span>
+          </div>
+          <div className="absolute -bottom-9 -right-7 grid h-36 w-36 place-items-center rounded-full border border-zinc-700 bg-zinc-900">
+            <RiOpenaiFill className="h-16 w-16 text-white" aria-label="GPT-6 Astra" />
+          </div>
         </Link>
 
-        <h1 className="mt-7 text-center text-3xl font-bold tracking-tight text-zinc-900 sm:text-4xl">
-          What are we building today?
-        </h1>
-
-        <div className="mt-6 flex w-full items-center gap-2 rounded-xl border border-zinc-200 bg-white px-4 py-3 shadow-sm focus-within:border-zinc-300">
-          <Search className="h-4 w-4 shrink-0 text-zinc-400" />
-          <input
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
-            placeholder="Search"
-            className="min-w-0 flex-1 bg-transparent text-sm text-zinc-900 outline-none placeholder:text-zinc-400"
-          />
-          <span className="hidden items-center gap-1 sm:flex">
-            <kbd className="rounded border border-zinc-200 px-1.5 py-0.5 text-[10px] text-zinc-500">Ctrl</kbd>
-            <kbd className="rounded border border-zinc-200 px-1.5 py-0.5 text-[10px] text-zinc-500">K</kbd>
-          </span>
-        </div>
-
-        <div className="mt-6 grid w-full grid-cols-1 gap-x-8 gap-y-6 md:grid-cols-3">
-          <div>
-            <div className="flex items-center justify-between text-sm text-zinc-500">
-              <span className="inline-flex items-center gap-1">Spend <ChevronRight className="h-3 w-3" /></span>
-              <MoreHorizontal className="h-4 w-4 text-zinc-300" />
+        <Link
+          to="/dashboard/usage"
+          className="group relative flex min-h-[188px] overflow-hidden rounded-lg border border-zinc-200 bg-zinc-50 p-6 shadow-sm transition hover:-translate-y-0.5 hover:border-zinc-300 hover:shadow-md"
+        >
+          <div className="relative z-10 flex min-w-0 flex-1 flex-col">
+            <div className="flex items-center gap-2 text-xs font-semibold uppercase text-zinc-500">
+              <KeyRound className="h-4 w-4" />
+              Account overview
             </div>
-            <Link to="/dashboard/usage" className="mt-1 flex h-12 items-center justify-between border-b border-zinc-200 text-sm text-zinc-900 hover:text-zinc-600">
-              <span className="inline-flex items-center gap-2">
-                <BadgeDollarSign className="h-4 w-4 text-zinc-500" />
-                <span className="font-medium">{stats ? `$${stats.balance.toFixed(2)} Total Available` : "Loading balance…"}</span>
+            <div className="mt-5 flex items-end gap-2">
+              <span className="text-3xl font-semibold leading-none text-zinc-950 tabular-nums">
+                {stats ? `$${stats.balance.toFixed(2)}` : "—"}
               </span>
-              <ChevronRight className="h-4 w-4 text-zinc-400" />
-            </Link>
-            <div className="divide-y divide-zinc-200">
-              {recentActivity.length === 0 ? (
-                <p className="flex h-12 items-center text-sm text-zinc-400">No recent activity</p>
-              ) : recentActivity.map((entry) => {
-                const seed = Array.from(entry.id).reduce((sum, char) => sum + char.charCodeAt(0), 0);
-                const models = Array.from({ length: 2 }, (_, offset) => reviewModels[(seed + offset) % reviewModels.length]);
-                return (
-                  <Link key={entry.id} to="/dashboard/usage" className="flex h-12 items-center justify-between gap-3 text-sm text-zinc-500 hover:text-zinc-900">
-                    <span className="min-w-0 truncate capitalize">{entry.reason.replace(/_/g, " ")}</span>
-                    <span className="flex shrink-0 items-center gap-3">
-                      {entry.delta < 0 && (
-                        <span className="flex items-center -space-x-0.5" aria-label={models.map((model) => model.label).join(", ")}>
-                          {models.map(({ key, label, Icon, className }) => (
-                            <Icon key={key} className={`h-4 w-4 ${className}`} aria-label={label} />
-                          ))}
-                        </span>
-                      )}
-                      <span className={`font-medium tabular-nums ${entry.delta < 0 ? "text-destructive" : "text-emerald-600"}`}>
-                        {entry.delta < 0 ? "-" : "+"}${Math.abs(entry.delta).toFixed(2)}
-                      </span>
-                    </span>
-                  </Link>
-                );
-              })}
+              <span className="pb-0.5 text-sm text-zinc-500">available</span>
             </div>
+            <p className="mt-3 text-sm text-zinc-600">
+              {keysCount == null ? "Loading extension keys…" : `${keysCount} active extension key${keysCount === 1 ? "" : "s"}`}
+            </p>
+            <span className="mt-auto inline-flex items-center gap-1 pt-5 text-sm font-semibold text-zinc-950">
+              View usage <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+            </span>
           </div>
-
-          <div>
-            <div className="flex items-center justify-between text-sm text-zinc-500">
-              <span className="inline-flex items-center gap-1">Extension <ChevronRight className="h-3 w-3" /></span>
-              <MoreHorizontal className="h-4 w-4 text-zinc-300" />
-            </div>
-            <Link to="/dashboard/extension" className="mt-1 flex h-12 items-center justify-between border-b border-zinc-200 text-sm text-zinc-900 hover:text-zinc-600">
-              <span className="inline-flex min-w-0 items-center gap-2">
-                <Rocket className="h-4 w-4 shrink-0 text-zinc-500" />
-                <span className="truncate font-medium">Jenvu Extension v1.9.0</span>
-              </span>
-              <ChevronRight className="h-4 w-4 shrink-0 text-zinc-400" />
-            </Link>
-            <div className="divide-y divide-zinc-200">
-              {recentKeys.length === 0 ? (
-                <Link to="/dashboard/extension" className="flex h-12 items-center text-sm text-zinc-400 hover:text-zinc-600">
-                  {keysCount ? `${keysCount} active key${keysCount > 1 ? "s" : ""}` : "Create your first key"}
-                </Link>
-              ) : recentKeys.map((key) => (
-                <Link key={key.id} to="/dashboard/extension" className="flex h-12 items-center justify-between gap-3 text-sm text-zinc-500 hover:text-zinc-900">
-                  <span className="min-w-0 truncate font-medium text-zinc-900">{key.name}</span>
-                  <span className="shrink-0 tabular-nums text-[12px] text-zinc-500">
-                    {keyTokens.get(key.id)
-                      ? `${((keyTokens.get(key.id) ?? 0) / 1000).toFixed(1)}k tokens`
-                      : "0 tokens"}
-                  </span>
-                </Link>
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <div className="flex items-center justify-between text-sm text-zinc-500">
-              <span>Recents</span>
-              <MoreHorizontal className="h-4 w-4 text-zinc-300" />
-            </div>
-            <div className="mt-1 divide-y divide-zinc-200">
-              {filtered.length === 0 ? (
-                <p className="flex h-12 items-center text-sm text-zinc-400">No matches</p>
-              ) : filtered.map((l) => (
-                <Link key={l.to} to={l.to} className="flex h-12 items-center justify-between text-sm text-zinc-500 hover:text-zinc-900">
-                  <span className="inline-flex items-center gap-2">
-                    <History className="h-3.5 w-3.5 text-zinc-400" />
-                    <span className="font-medium text-zinc-900">{l.label}</span>
-                  </span>
-                  <ChevronRight className="h-4 w-4 text-zinc-400" />
-                </Link>
-              ))}
-            </div>
+          <div className="absolute bottom-5 right-5 flex h-14 w-14 items-center justify-center rounded-lg border border-zinc-200 bg-white shadow-sm">
+            <RiClaudeFill className="h-7 w-7 text-brand-claude" aria-label="Claude Opus 5" />
           </div>
         </div>
       </div>
@@ -1452,7 +1351,7 @@ function UsageAnalytics({ stats, keysCount, loading, range, onRangeChange, onRef
   const tokenSeries = points.length ? points.map((p) => p.tokens) : empty;
 
   return (
-    <section className="analytics-section mt-6 bg-white">
+    <section className="analytics-section mt-5 bg-white">
       <div className="mx-auto w-full max-w-4xl px-1">
       <div className="mb-5 flex items-center justify-between">
         <h2 className="text-[17px] font-semibold tracking-tight text-zinc-900">  Analytics</h2>
@@ -1487,7 +1386,7 @@ function UsageAnalytics({ stats, keysCount, loading, range, onRangeChange, onRef
           </button>
         </div>
       </div>
-      <div className="grid grid-cols-1 overflow-hidden rounded-xl border border-white sm:grid-cols-2 lg:grid-cols-3 [&>*]:border-b [&>*]:border-r [&>*]:border-white">
+      <div className="grid grid-cols-1 overflow-hidden rounded-lg border border-zinc-200 sm:grid-cols-2 lg:grid-cols-3 [&>*]:border-b [&>*]:border-r [&>*]:border-zinc-200">
         <UsageStatCard title="Extension scans" value={String(totalScans)} delta={deltaPct(totalScans, prevScans)} series={scanSeries} chartHeight={36} color="#e01563" />
         <UsageStatCard title="Credits spent" value={fmtUsd2(totalSpent)} delta={deltaPct(totalSpent, prevSpent)} series={spentSeries} chartHeight={36} color="#0f9d8f" />
         <UsageStatCard title="Tokens processed" value={totalTokens >= 1000 ? `${(totalTokens / 1000).toFixed(1)}k` : String(totalTokens)} series={tokenSeries} chartHeight={36} color="#a16207" />
