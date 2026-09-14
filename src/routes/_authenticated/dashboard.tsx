@@ -1490,7 +1490,7 @@ const RECOMMENDED_MODELS = [
 const PRODUCT_UPDATES = [
   {
     age: "Latest",
-    title: "  Smarter chart validation",
+    title: " Smarter chart validation",
     copy: "Chart images are now checked before GPT-6 Astra starts its analysis.",
     icon: ScanSearch,
   },
