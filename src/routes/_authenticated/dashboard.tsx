@@ -1315,7 +1315,7 @@ function DashboardHero({ keysCount, stats }: { keysCount: number | null; stats: 
         </div>
 
         {banner.variant === "features" ? (
-          <div className="dashboard-feature-banner relative min-h-[200px] overflow-hidden rounded-lg border border-border bg-card text-card-foreground sm:min-h-[214px]">
+          <div className="dashboard-feature-banner relative min-h-[180px] overflow-hidden rounded-lg border border-border bg-card text-card-foreground sm:min-h-[190px]">
             <div className="absolute inset-y-0 right-0 hidden w-[42%] sm:block" aria-hidden="true">
               <div className="dashboard-feature-code absolute inset-0 overflow-hidden font-mono text-[14px] leading-[15px] text-primary/10">
                 {"const analyze = (chart) => {\n  detectStructure(chart);\n  mapLiquidity(chart);\n  validateRisk(chart);\n  return seniorReview();\n};"}
@@ -1324,7 +1324,7 @@ function DashboardHero({ keysCount, stats }: { keysCount: number | null; stats: 
                 <Sparkles className="h-7 w-7 text-foreground" strokeWidth={1.8} />
               </div>
             </div>
-            <div className="relative z-10 flex min-h-[200px] max-w-[720px] flex-col justify-center px-7 py-7 sm:min-h-[214px] sm:px-9">
+            <div className="relative z-10 flex min-h-[180px] max-w-[720px] flex-col justify-center px-7 py-5 sm:min-h-[190px] sm:px-9">
               <h2 className="text-xl font-semibold sm:text-2xl">{banner.eyebrow}</h2>
               <p className="mt-1.5 max-w-2xl text-sm leading-6 text-muted-foreground">{banner.copy}</p>
               <div className="mt-4 flex flex-wrap items-center gap-3">
@@ -1336,9 +1336,9 @@ function DashboardHero({ keysCount, stats }: { keysCount: number | null; stats: 
             </div>
           </div>
         ) : (
-          <div className="relative min-h-[200px] overflow-hidden rounded-lg border border-border bg-primary text-primary-foreground sm:min-h-[214px]">
+          <div className="relative min-h-[180px] overflow-hidden rounded-lg border border-border bg-primary text-primary-foreground sm:min-h-[190px]">
             <img src={astraGalaxyBanner} alt="Spiral galaxy representing GPT-6 Astra" width={1536} height={512} className="absolute inset-0 h-full w-full object-cover object-right" />
-            <div className="relative z-10 flex min-h-[200px] max-w-3xl flex-col justify-center px-7 py-7 sm:min-h-[214px] sm:px-9">
+            <div className="relative z-10 flex min-h-[180px] max-w-3xl flex-col justify-center px-7 py-5 sm:min-h-[190px] sm:px-9">
               <h2 className="text-xl font-semibold sm:text-2xl">{banner.eyebrow}</h2>
               <p className="mt-1.5 max-w-2xl text-sm leading-6 text-white">{banner.copy}</p>
               <Button asChild variant="secondary" size="sm" className="mt-4 w-fit bg-background text-foreground hover:bg-muted">
