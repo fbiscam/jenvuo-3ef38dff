@@ -1471,7 +1471,7 @@ const RECOMMENDED_MODELS = [
   {
     name: "  Claude opus 5",
     badge: "Senior review",
-    description: "Independent validation for structure, risk",
+    description: " Independent validation for structure, risk",
     logo: ClaudeLogo,
     logoImage: null,
     logoLabel: "Claude",
