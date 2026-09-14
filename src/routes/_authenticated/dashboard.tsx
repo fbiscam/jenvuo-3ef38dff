@@ -1460,7 +1460,7 @@ function ClaudeLogo({ className }: { className?: string; strokeWidth?: number })
 
 const RECOMMENDED_MODELS = [
   {
-    name: "GPT-6 Astra",
+    name: " Gpt-6 astra",
     badge: "New",
     description: "Our most capable model, built for demanding chart analysis.",
     logo: null,
