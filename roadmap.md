@@ -48,3 +48,5 @@
 - [x] Strengthen senior-review validation and extension review-status accuracy
 - [x] Replace the dashboard search/activity section with two banners and analytics blocks
 - [x] Add a reference-style feature and pricing banner as the default dashboard slide
+- [x] Attach Usage sections to the dashboard page and remove the outer frame
+- [x] Make Usage filters, tabs, grouping, export, refresh, settings, and breakdown views functional
