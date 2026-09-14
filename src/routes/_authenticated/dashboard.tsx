@@ -23,6 +23,8 @@ import { readCachedAvatar, writeCachedAvatar, AVATAR_TTL_SECONDS } from "@/lib/a
 
 import { getUsageStats, type UsageStats } from "@/lib/usage.functions";
 import { listExtensionKeys } from "@/lib/extension-keys.functions";
+import { Button } from "@/components/ui/button";
+import astraGalaxyBanner from "@/assets/astra-galaxy-banner.jpg";
 
 
 
@@ -31,11 +33,10 @@ import {
   Wallet, TrendingUp, LineChart, Activity, ShieldCheck, Gauge, BarChart3,
   Tag, ArrowUpRight, ArrowRight, CheckCircle2, Calendar, RefreshCw, Gift, PieChart,
   ChevronsLeft, ChevronsRight, Menu, X, Sparkles, LayoutGrid, LifeBuoy, Lightbulb,
-  ChevronRight, ChevronDown, Bot, KeyRound,
+  ChevronLeft, ChevronRight, Info, Settings2,
   LayoutDashboard, ChartNoAxesCombined, Puzzle, BadgeDollarSign, FileCheck2,
   LockKeyhole, CircleHelp, type LucideIcon,
 } from "lucide-react";
-import { RiClaudeFill, RiOpenaiFill } from "react-icons/ri";
 import {
   DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuCheckboxItem, DropdownMenuSeparator, DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
@@ -1268,59 +1269,49 @@ function UsageStatCard({ title, value, delta, series, tall = false, chartHeight,
 
 
 function DashboardHero({ keysCount, stats }: { keysCount: number | null; stats: UsageStats | null }) {
-  return (
-    <section className="dashboard-hero pb-1 pt-3">
-      <div className="mx-auto grid w-full max-w-4xl gap-4 lg:grid-cols-2">
-        <Link
-          to="/dashboard/extension"
-          className="group relative flex min-h-[188px] overflow-hidden rounded-lg border border-zinc-200 bg-zinc-950 p-6 text-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
-        >
-          <div className="relative z-10 flex min-w-0 flex-1 flex-col">
-            <div className="flex items-center gap-2 text-xs font-semibold uppercase text-zinc-300">
-              <Bot className="h-4 w-4" />
-              AI analysis
-            </div>
-            <h1 className="mt-5 max-w-[280px] text-2xl font-semibold leading-tight">
-              Analyze markets with GPT-6 Astra
-            </h1>
-            <p className="mt-2 max-w-[290px] text-sm leading-5 text-zinc-400">
-              Capture a chart and receive a structured ICT/SMC market read.
-            </p>
-            <span className="mt-auto inline-flex items-center gap-1 pt-5 text-sm font-semibold">
-              Open extension <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-            </span>
-          </div>
-          <div className="absolute -bottom-9 -right-7 grid h-36 w-36 place-items-center rounded-full border border-zinc-700 bg-zinc-900">
-            <RiOpenaiFill className="h-16 w-16 text-white" aria-label="GPT-6 Astra" />
-          </div>
-        </Link>
+  const [slide, setSlide] = useState(0);
+  const banners = [
+    {
+      eyebrow: "Introducing GPT-6 Astra",
+      copy: "Our most capable model, built for precise market analysis. Astra combines reasoning, chart vision, and strong context awareness from capture to completion.",
+      action: "Analyze with Astra",
+      to: "/dashboard/extension" as const,
+    },
+    {
+      eyebrow: "Senior review with Claude Opus 5",
+      copy: "A mandatory second opinion checks every eligible analysis for structure, invalidation, risk, and consistency before a signal is returned.",
+      action: "View model access",
+      to: "/pricing" as const,
+    },
+  ];
+  const banner = banners[slide];
 
-        <Link
-          to="/dashboard/usage"
-          className="group relative flex min-h-[188px] overflow-hidden rounded-lg border border-zinc-200 bg-zinc-50 p-6 shadow-sm transition hover:-translate-y-0.5 hover:border-zinc-300 hover:shadow-md"
-        >
-          <div className="relative z-10 flex min-w-0 flex-1 flex-col">
-            <div className="flex items-center gap-2 text-xs font-semibold uppercase text-zinc-500">
-              <KeyRound className="h-4 w-4" />
-              Account overview
-            </div>
-            <div className="mt-5 flex items-end gap-2">
-              <span className="text-3xl font-semibold leading-none text-zinc-950 tabular-nums">
-                {stats ? `$${stats.balance.toFixed(2)}` : "—"}
-              </span>
-              <span className="pb-0.5 text-sm text-zinc-500">available</span>
-            </div>
-            <p className="mt-3 text-sm text-zinc-600">
-              {keysCount == null ? "Loading extension keys…" : `${keysCount} active extension key${keysCount === 1 ? "" : "s"}`}
-            </p>
-            <span className="mt-auto inline-flex items-center gap-1 pt-5 text-sm font-semibold text-zinc-950">
-              View usage <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-            </span>
+  return (
+    <section className="dashboard-hero pb-1 pt-1">
+      <div className="mx-auto w-full max-w-6xl">
+        <div className="mb-7 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4">
+          <h1 className="truncate text-3xl font-medium text-foreground sm:text-4xl">Home</h1>
+          <div className="flex shrink-0 items-center gap-1 text-xs text-muted-foreground">
+            <span className="mr-2 tabular-nums">{slide + 1} of {banners.length}</span>
+            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setSlide((slide - 1 + banners.length) % banners.length)} aria-label="Previous banner">
+              <ChevronLeft />
+            </Button>
+            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setSlide((slide + 1) % banners.length)} aria-label="Next banner">
+              <ChevronRight />
+            </Button>
           </div>
-          <div className="absolute bottom-5 right-5 flex h-14 w-14 items-center justify-center rounded-lg border border-zinc-200 bg-white shadow-sm">
-            <RiClaudeFill className="h-7 w-7 text-brand-claude" aria-label="Claude Opus 5" />
+        </div>
+
+        <div className="relative min-h-[200px] overflow-hidden rounded-lg border border-border bg-primary text-primary-foreground sm:min-h-[214px]">
+          <img src={astraGalaxyBanner} alt="Spiral galaxy representing GPT-6 Astra" width={1536} height={512} className="absolute inset-0 h-full w-full object-cover object-right" />
+          <div className="relative z-10 flex min-h-[200px] max-w-3xl flex-col justify-center px-7 py-7 sm:min-h-[214px] sm:px-9">
+            <h2 className="text-xl font-semibold sm:text-2xl">{banner.eyebrow}</h2>
+            <p className="mt-1.5 max-w-2xl text-sm leading-6 text-primary-foreground/80">{banner.copy}</p>
+            <Button asChild variant="secondary" size="sm" className="mt-4 w-fit bg-background text-foreground hover:bg-muted">
+              <Link to={banner.to}>{banner.action}</Link>
+            </Button>
           </div>
-        </Link>
+        </div>
       </div>
     </section>
   );
@@ -1349,53 +1340,72 @@ function UsageAnalytics({ stats, keysCount, loading, range, onRangeChange, onRef
   const scanSeries = points.length ? points.map((p) => p.scans) : empty;
   const spentSeries = points.length ? points.map((p) => p.spent) : empty;
   const tokenSeries = points.length ? points.map((p) => p.tokens) : empty;
+  const periodSpendLabel = range === "24h" ? "Today spend" : range === "7d" ? "7 day spend" : "30 day spend";
+  const metricClass = "flex min-h-[126px] flex-col bg-card px-4 py-4 sm:px-5";
 
   return (
-    <section className="analytics-section mt-5 bg-white">
-      <div className="mx-auto w-full max-w-4xl px-1">
-      <div className="mb-5 flex items-center justify-between">
-        <h2 className="text-[17px] font-semibold tracking-tight text-zinc-900">  Analytics</h2>
-        <div className="flex items-center gap-2">
-          <div className="relative">
-            <select
-              value={range}
-              onChange={(e) => onRangeChange(e.target.value as UsageRangeKey)}
-              aria-label="Time range"
-              className="appearance-none rounded-md border border-zinc-200 bg-white py-1.5 pl-3 pr-8 text-xs font-medium text-zinc-700 shadow-sm outline-none transition hover:border-zinc-300 focus:border-zinc-400"
+    <section className="analytics-section mt-8 bg-background">
+      <div className="mx-auto w-full max-w-6xl">
+      <div className="mb-3 flex items-center justify-end gap-2">
+        <div className="inline-flex rounded-full bg-muted p-0.5" aria-label="Analytics range">
+          {(Object.keys(USAGE_RANGE_LABELS) as UsageRangeKey[]).map((key) => (
+            <Button
+              key={key}
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => onRangeChange(key)}
+              className={`h-7 rounded-full px-3 text-xs shadow-none ${range === key ? "bg-background text-foreground shadow-sm hover:bg-background" : "text-muted-foreground hover:bg-background/60"}`}
             >
-              {(Object.keys(USAGE_RANGE_LABELS) as UsageRangeKey[]).map((k) => (
-                <option key={k} value={k}>{USAGE_RANGE_LABELS[k]}</option>
-              ))}
-            </select>
-            <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-zinc-400" />
+              {key}
+            </Button>
+          ))}
+        </div>
+        <Button variant="ghost" size="icon" className="h-7 w-7 rounded-full" onClick={onRefresh} aria-label="Refresh usage">
+          <RefreshCw className={loading ? "animate-spin" : ""} />
+        </Button>
+      </div>
+
+      <div className="grid grid-cols-1 overflow-hidden rounded-lg border border-border sm:grid-cols-2 lg:grid-cols-3 [&>*]:border-border lg:[&>*:not(:nth-child(3n))]:border-r lg:[&>*:nth-child(-n+3)]:border-b sm:max-lg:[&>*:nth-child(odd)]:border-r sm:max-lg:[&>*:nth-child(-n+4)]:border-b max-sm:[&>*:not(:last-child)]:border-b">
+        <div className={metricClass}>
+          <Link to="/dashboard/usage" className="inline-flex items-center gap-1 text-sm text-foreground hover:text-muted-foreground">Total tokens <ChevronRight className="h-3.5 w-3.5" /></Link>
+          <strong className="mt-1 text-base font-semibold tabular-nums text-foreground">{totalTokens >= 1000 ? `${(totalTokens / 1000).toFixed(1)}k` : totalTokens}</strong>
+          <div className="mt-auto pt-5"><UsageLineChart values={tokenSeries} height={28} color="var(--chart-5)" /></div>
+        </div>
+        <div className={metricClass}>
+          <Link to="/dashboard/usage" className="inline-flex items-center gap-1 text-sm text-foreground hover:text-muted-foreground">Responses and Chat Completions <ChevronRight className="h-3.5 w-3.5" /></Link>
+          <strong className="mt-1 text-base font-semibold tabular-nums text-foreground">{totalScans}</strong>
+          <div className="mt-auto pt-5"><UsageLineChart values={scanSeries} height={28} color="var(--muted-foreground)" /></div>
+        </div>
+        <div className={metricClass}>
+          <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 text-sm text-foreground">
+            <span className="truncate">Prompt caching: Hit rate</span><Info className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
           </div>
-          <Link
-            to="/dashboard/extension"
-            aria-label="Add extension key"
-            className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-zinc-200 bg-white text-zinc-500 shadow-sm transition hover:border-zinc-300 hover:text-zinc-900"
-          >
-            <Plus className="h-3.5 w-3.5" />
-          </Link>
-          <button
-            type="button"
-            onClick={onRefresh}
-            aria-label="Refresh usage"
-            className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-zinc-200 bg-white text-zinc-500 shadow-sm transition hover:border-zinc-300 hover:text-zinc-900"
-          >
-            <RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`} />
-          </button>
+          <strong className="mt-1 text-base font-semibold text-foreground">—</strong>
+          <div className="mt-auto border-b border-border pt-5" />
+        </div>
+        <div className={metricClass}>
+          <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 text-sm text-foreground">
+            <span className="truncate">{periodSpendLabel}</span><Settings2 className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+          </div>
+          <div className="mt-4 flex items-center justify-between gap-3 text-sm text-foreground">
+            <span>Personal</span><span className="tabular-nums">{fmtUsd2(totalSpent)} / {stats ? fmtUsd2(stats.allowance) : "$0.00"}</span>
+          </div>
+          <div className="mt-2 h-4 overflow-hidden rounded bg-muted"><div className="h-full bg-foreground" style={{ width: `${Math.min(100, Math.max(0, stats?.allowance ? (totalSpent / stats.allowance) * 100 : 0))}%` }} /></div>
+        </div>
+        <div className={`${metricClass} bg-secondary`}>
+          <span className="text-sm text-foreground">Credit balance</span>
+          <strong className="mt-1 text-xl font-semibold tabular-nums text-foreground">{stats ? fmtUsd2(balance) : "—"}</strong>
+          <Button asChild size="sm" className="mt-3 w-fit">
+            <Link to="/dashboard/pay"><CreditCard className="h-3.5 w-3.5" /> Add credits</Link>
+          </Button>
+        </div>
+        <div className={metricClass}>
+          <Link to="/dashboard/usage" className="inline-flex items-center gap-1 text-sm text-foreground hover:text-muted-foreground">Total requests <ChevronRight className="h-3.5 w-3.5" /></Link>
+          <strong className="mt-1 text-base font-semibold tabular-nums text-foreground">{totalScans}</strong>
+          <div className="mt-auto pt-5"><UsageLineChart values={scanSeries} height={28} color="var(--chart-2)" /></div>
         </div>
       </div>
-      <div className="grid grid-cols-1 overflow-hidden rounded-lg border border-zinc-200 sm:grid-cols-2 lg:grid-cols-3 [&>*]:border-b [&>*]:border-r [&>*]:border-zinc-200">
-        <UsageStatCard title="Extension scans" value={String(totalScans)} delta={deltaPct(totalScans, prevScans)} series={scanSeries} chartHeight={36} color="#e01563" />
-        <UsageStatCard title="Credits spent" value={fmtUsd2(totalSpent)} delta={deltaPct(totalSpent, prevSpent)} series={spentSeries} chartHeight={36} color="#0f9d8f" />
-        <UsageStatCard title="Tokens processed" value={totalTokens >= 1000 ? `${(totalTokens / 1000).toFixed(1)}k` : String(totalTokens)} series={tokenSeries} chartHeight={36} color="#a16207" />
-        <UsageStatCard title="Wallet balance" value={stats ? fmtUsd2(balance) : "…"} series={spentSeries} chartHeight={36} color="#0f9d8f" />
-        <UsageStatCard title="Credits remaining" value={stats ? `${remainingPct.toFixed(1)}%` : "…"} series={[remainingPct]} chartHeight={36} color="#e01563" />
-        <UsageStatCard title="Extension keys" value={keysCount == null ? "…" : String(keysCount)} series={[keysCount ?? 0]} chartHeight={36} color="#0f9d8f" />
-      </div>
-
-
       </div>
     </section>
   );
