@@ -77,6 +77,7 @@ function providerConfigured(model: string): boolean {
   if (model.startsWith("tukenku/")) return Boolean(process.env.TUKENKU_API_KEY);
   if (model.startsWith("unikey/")) return Boolean(process.env.UNIKEY_API_KEY);
   if (model.startsWith("evolink/")) return Boolean(process.env.EVOLINK_API_KEY);
+  if (model.startsWith("unorouter/")) return Boolean(process.env.UNOROUTER_API_KEY);
   if (model.startsWith("dsofficial/")) return Boolean(process.env.DEEPSEEK_API_KEY);
   if (model.startsWith("oai/")) return Boolean(process.env.OPENAI_API_KEY);
   if (model.startsWith("jw/")) return Boolean(process.env.JUSTWOKER_API_KEY);
@@ -406,6 +407,7 @@ async function singleAttemptInner(
   //   `tukenku/*`    → Tukenku / Monyet AI (OpenAI-compatible)
   //   `unikey/*`     → GetUniKey (OpenAI-compatible)
   //   `evolink/*`    → Evolink direct API (OpenAI-compatible)
+  //   `unorouter/*`  → UnoRouter (OpenAI-compatible)
   //   `dsofficial/*` → DeepSeek official API (OpenAI-compatible)
   //   `jw/*`         → JustWoker (Anthropic-style /v1/messages)
   //   `browseruse/*` → Browser Use Cloud Agent v4
@@ -418,6 +420,7 @@ async function singleAttemptInner(
   const isTukenku = model.startsWith("tukenku/");
   const isUnikey = model.startsWith("unikey/");
   const isEvolink = model.startsWith("evolink/");
+  const isUnoRouter = model.startsWith("unorouter/");
   const isDsOfficial = model.startsWith("dsofficial/");
   const isOai = model.startsWith("oai/");
   const blackboxKey = process.env.BLACKBOX_API_KEY;
@@ -431,6 +434,7 @@ async function singleAttemptInner(
   const tukenkuKey = process.env.TUKENKU_API_KEY;
   const unikeyKey = process.env.UNIKEY_API_KEY;
   const evolinkKey = process.env.EVOLINK_API_KEY;
+  const unoRouterKey = process.env.UNOROUTER_API_KEY;
   const deepseekKey = process.env.DEEPSEEK_API_KEY;
   const openaiKey = process.env.OPENAI_API_KEY;
 
@@ -456,6 +460,8 @@ async function singleAttemptInner(
     ? "https://www.getunikey.ai/v1/chat/completions"
     : isEvolink
     ? "https://direct.evolink.ai/v1/chat/completions"
+    : isUnoRouter
+    ? "https://api.unorouter.com/v1/chat/completions"
     : isDsOfficial
     ? "https://api.deepseek.com/chat/completions"
     : "https://ai.gateway.lovable.dev/v1/chat/completions";
@@ -479,6 +485,9 @@ async function singleAttemptInner(
   } else if (isEvolink) {
     if (!evolinkKey) throw new AiGatewayError("EVOLINK_API_KEY missing on server", 0, true);
     headers["Authorization"] = `Bearer ${evolinkKey}`;
+  } else if (isUnoRouter) {
+    if (!unoRouterKey) throw new AiGatewayError("UNOROUTER_API_KEY missing on server", 0, true);
+    headers["Authorization"] = `Bearer ${unoRouterKey}`;
   } else if (isDsOfficial) {
     if (!deepseekKey) throw new AiGatewayError("DEEPSEEK_API_KEY missing on server", 0, true);
     headers["Authorization"] = `Bearer ${deepseekKey}`;
@@ -503,6 +512,8 @@ async function singleAttemptInner(
     ? model.slice("unikey/".length)
     : isEvolink
     ? model.slice("evolink/".length)
+    : isUnoRouter
+    ? model.slice("unorouter/".length)
     : isDsOfficial
     ? model.slice("dsofficial/".length)
     : model;
@@ -528,15 +539,15 @@ async function singleAttemptInner(
   };
   // Blackbox/NVIDIA/Bluesminds/DeepSeek-official: don't force response_format — rely on system prompt.
   if (opts.jsonMode && isOai) body.response_format = { type: "json_object" };
-  else if (opts.jsonMode && !isBlackbox && !isNvidia && !isBmind && !isTukenku && !isUnikey && !isEvolink && !isDsOfficial && !isOai) body.response_format = { type: "json_object" };
+  else if (opts.jsonMode && !isBlackbox && !isNvidia && !isBmind && !isTukenku && !isUnikey && !isEvolink && !isUnoRouter && !isDsOfficial && !isOai) body.response_format = { type: "json_object" };
   if (opts.maxTokens) {
-    if (((isOai || isEvolink) && /^gpt-(?:5|6)/i.test(wireModel)) || (!isBlackbox && !isNvidia && !isBmind && !isTukenku && !isUnikey && !isEvolink && !isDsOfficial && !isOai && /^openai\/gpt-(?:5|6)/i.test(model))) {
+    if (((isOai || isEvolink || isUnoRouter) && /^gpt-(?:5|6)/i.test(wireModel)) || (!isBlackbox && !isNvidia && !isBmind && !isTukenku && !isUnikey && !isEvolink && !isUnoRouter && !isDsOfficial && !isOai && /^openai\/gpt-(?:5|6)/i.test(model))) {
       body.max_completion_tokens = opts.maxTokens;
     } else {
       body.max_tokens = opts.maxTokens;
     }
   }
-  if (!isBlackbox && !isNvidia && !isBmind && !isTukenku && !isUnikey && !isEvolink && !isDsOfficial && !isOai && opts.priority && PRIORITY_TIER_MODELS.has(model)) {
+  if (!isBlackbox && !isNvidia && !isBmind && !isTukenku && !isUnikey && !isEvolink && !isUnoRouter && !isDsOfficial && !isOai && opts.priority && PRIORITY_TIER_MODELS.has(model)) {
     body.service_tier = "priority";
   }
 
@@ -554,7 +565,7 @@ async function singleAttemptInner(
 
   if (!res.ok) {
     const txt = await res.text().catch(() => "");
-    const terminal = (isBlackbox || isNvidia || isBmind || isTukenku || isUnikey || isEvolink || isDsOfficial || isOai)
+    const terminal = (isBlackbox || isNvidia || isBmind || isTukenku || isUnikey || isEvolink || isUnoRouter || isDsOfficial || isOai)
       ? !(res.status === 429 || res.status >= 500 || res.status === 403 || res.status === 400 || res.status === 401 || res.status === 404)
       : !(res.status === 429 || res.status >= 500);
 
@@ -565,6 +576,7 @@ async function singleAttemptInner(
     else if (res.status === 402 && isTukenku) msg = "Tukenku balance is too low. Please top up Tukenku to use this model.";
     else if (res.status === 402 && isUnikey) msg = "Unikey balance is too low. Please top up Unikey to use this model.";
     else if (res.status === 402 && isEvolink) msg = "Evolink balance is too low. Please top up Evolink to use this model.";
+    else if (res.status === 402 && isUnoRouter) msg = "UnoRouter balance is too low. Please top up UnoRouter to use this model.";
     else if (res.status === 402) msg = "AI credits exhausted. Please top up your workspace.";
     else if (res.status === 401) msg = "AI key rejected. Please contact support.";
     else if (res.status === 400) msg = "Server busy — please try again in a moment.";

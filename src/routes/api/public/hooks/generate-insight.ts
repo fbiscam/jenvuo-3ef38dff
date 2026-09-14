@@ -3,7 +3,12 @@ import { createFileRoute } from "@tanstack/react-router";
 const BASE_URL = "https://jenvu.com";
 const INDEXNOW_KEY = "31f95befb924351f7ab6c1f5ce4bc15b";
 const JOB_KEY = "daily-insight";
-const BLUESMINDS_MODEL = "meta/llama-3.2-11b-vision-instruct";
+const ARTICLE_MODELS = [
+  "unorouter/nemotron-3-ultra-550b-a55b:free",
+  "unorouter/glm-5.3:free",
+  "bmind/meta/llama-3.2-11b-vision-instruct",
+];
+const ARTICLE_MODEL_LABEL = "UnoRouter Nemotron Ultra (free)";
 
 class BluesMindsError extends Error {
   constructor(
@@ -124,7 +129,8 @@ export const Route = createFileRoute("/api/public/hooks/generate-insight")({
 
         if (currentJob?.status === "paused") {
           try {
-            await callBluesMinds([{ role: "user", content: "Reply exactly READY" }], 16);
+            const { callChatCompletion } = await import("@/lib/ai-gateway");
+            await callChatCompletion({ models: ARTICLE_MODELS, messages: [{ role: "user", content: "Reply exactly READY" }], maxTokens: 16, retriesPerModel: 1, stage: "insight-health-probe" });
             await supabaseAdmin
               .from("insight_generation_jobs")
               .update({ status: "idle", pause_reason: null, last_error: null, updated_at: new Date().toISOString() })
@@ -216,13 +222,18 @@ Return Markdown only. Start with one '# ' title of no more than 60 characters, t
           const parts: string[] = [];
           for (const prompt of sectionPrompts) {
             parts.push(
-              await callBluesMinds(
-                [
+              (await (await import("@/lib/ai-gateway")).callChatCompletion({
+                models: ARTICLE_MODELS,
+                messages: [
                   { role: "system", content: sys },
                   { role: "user", content: prompt },
                 ],
-                1800,
-              ),
+                maxTokens: 1800,
+                retriesPerModel: 1,
+                timeoutMs: 120_000,
+                deadlineMs: 300_000,
+                stage: "daily-insight",
+              })).content,
             );
           }
           raw = parts.join("\n\n");
@@ -235,7 +246,7 @@ Return Markdown only. Start with one '# ' title of no more than 60 characters, t
             status: shouldPause ? "paused" : "failed",
             pause_reason: shouldPause ? `provider-${status}` : null,
             last_error: lastErr,
-            last_model: BLUESMINDS_MODEL,
+            last_model: ARTICLE_MODEL_LABEL,
             last_topic_id: topic.id,
             consecutive_rate_limits: status === 429 ? 1 : 0,
           });
@@ -281,8 +292,8 @@ Return Markdown only. Start with one '# ' title of no more than 60 characters, t
           return Response.json({ skipped: "duplicate-slug", slug });
         }
 
-        // AI-generated cover image (Bluesminds writes the text; the image comes
-        // from Lovable AI's image model since Bluesminds has no image model).
+        // Generate the cover through UnoRouter's free image tier first, then
+        // continue through the existing reliable image fallbacks.
         const { generateInsightCover, InsightImageGenerationError } = await import("@/lib/insight-image.server");
         let image_url: string | null = null;
         try {
@@ -294,7 +305,7 @@ Return Markdown only. Start with one '# ' title of no more than 60 characters, t
             status: shouldPause ? "paused" : "failed",
             pause_reason: shouldPause ? `image-provider-${status}` : null,
             last_error: String(error),
-            last_model: BLUESMINDS_MODEL,
+            last_model: ARTICLE_MODEL_LABEL,
             last_topic_id: topic.id,
           });
           return Response.json(
@@ -306,7 +317,7 @@ Return Markdown only. Start with one '# ' title of no more than 60 characters, t
           await updateJob({
             status: "failed",
             last_error: "Cover image generation failed; article was not published.",
-            last_model: BLUESMINDS_MODEL,
+            last_model: ARTICLE_MODEL_LABEL,
             last_topic_id: topic.id,
           });
           return Response.json({ error: "image-generation-failed", published: false }, { status: 502 });
@@ -327,7 +338,7 @@ Return Markdown only. Start with one '# ' title of no more than 60 characters, t
           .single();
 
         if (insErr) {
-          await updateJob({ status: "failed", last_error: insErr.message, last_model: BLUESMINDS_MODEL, last_topic_id: topic.id });
+          await updateJob({ status: "failed", last_error: insErr.message, last_model: ARTICLE_MODEL_LABEL, last_topic_id: topic.id });
           return new Response(JSON.stringify({ error: insErr.message }), { status: 500 });
         }
 
@@ -354,7 +365,7 @@ Return Markdown only. Start with one '# ' title of no more than 60 characters, t
         await updateJob({
           status: "completed",
           last_completed_at: new Date().toISOString(),
-          last_model: BLUESMINDS_MODEL,
+          last_model: ARTICLE_MODEL_LABEL,
           last_topic_id: topic.id,
           last_insight_id: inserted.id,
           last_index_status: indexStatus,
@@ -363,7 +374,7 @@ Return Markdown only. Start with one '# ' title of no more than 60 characters, t
           consecutive_rate_limits: 0,
         });
 
-        return Response.json({ ok: true, slug, url, model: BLUESMINDS_MODEL, google, indexnow });
+        return Response.json({ ok: true, slug, url, model: ARTICLE_MODEL_LABEL, google, indexnow });
       },
     },
   },
