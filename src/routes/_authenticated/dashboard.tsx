@@ -1274,7 +1274,7 @@ function DashboardHero({ keysCount, stats }: { keysCount: number | null; stats: 
     {
       variant: "features" as const,
       eyebrow: "  Ai analysis, built into your workflow",
-      copy: "Capture any chart, get GPT-6 Astra analysis, and unlock a mandatory Claude Opus 5 senior review on eligible plans.",
+      copy: "Capture any chart, get GPT-6 Astra analysis, and unlock a mandatory \nClaude Opus 5 senior review on eligible plans.",
       action: "Compare plans",
       to: "/pricing" as const,
       note: "Plans from $15 · $2 free testing credit",
