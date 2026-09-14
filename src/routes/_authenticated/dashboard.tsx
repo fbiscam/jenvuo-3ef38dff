@@ -977,7 +977,7 @@ function DashboardLayout() {
                       resetScroll={false}
                       onClick={() => { markTabSeen(t.countKey); setMobileNavOpen(false); }}
                       title={sidebarCollapsed ? t.label : undefined}
-                      className={`group relative flex items-center rounded-full text-[12.5px] font-normal transition ${sidebarCollapsed ? "justify-center px-2 py-1.5" : "gap-3 px-2.5 py-1.5"} ${active ? "bg-[#EBEBEB] text-zinc-900" : "text-[#3C4043] hover:bg-zinc-50 hover:text-zinc-900"}`}
+                      className={`group relative flex items-center rounded-full text-[12.5px] font-normal transition ${sidebarCollapsed ? "justify-center px-2 py-1.5" : "gap-3 px-2.5 py-1.5"} ${active ? "bg-[#EBEBEB] text-zinc-900" : "text-[#35393B] hover:bg-zinc-50 hover:text-zinc-900"}`}
                     >
                       <Icon
                         className="h-[19px] w-[19px] shrink-0 text-current"
