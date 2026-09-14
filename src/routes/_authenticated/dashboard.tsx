@@ -1285,7 +1285,7 @@ function DashboardHero({ keysCount, stats }: { keysCount: number | null; stats: 
   useEffect(() => {
     const timer = window.setInterval(() => {
       setModelLogoIndex((current) => (current + 1) % rotatingModelLogos.length);
-    }, 1800);
+    }, 4500);
 
     return () => window.clearInterval(timer);
   }, [rotatingModelLogos.length]);
@@ -1340,11 +1340,11 @@ function DashboardHero({ keysCount, stats }: { keysCount: number | null; stats: 
               <div className="dashboard-feature-code absolute inset-0 overflow-hidden font-mono text-[14px] leading-[15px] text-primary/10">
                 {"const analyze = (chart) => {\n  detectStructure(chart);\n  mapLiquidity(chart);\n  validateRisk(chart);\n  return seniorReview();\n};"}
               </div>
-              <div className="absolute right-10 top-1/2 flex h-20 w-20 -translate-y-1/2 items-center justify-center overflow-hidden rounded-xl border border-border bg-background shadow-sm" aria-label={`${activeModelLogo.name} model`}>
+              <div className="absolute right-10 top-1/2 flex h-20 w-20 -translate-y-1/2 items-center justify-center overflow-hidden bg-transparent" aria-label={`${activeModelLogo.name} model`}>
                 {activeModelLogo.image ? (
-                  <img key={activeModelLogo.name} src={activeModelLogo.image} alt={`${activeModelLogo.name} logo`} className="h-14 w-14 animate-in fade-in zoom-in-95 rounded-lg object-cover duration-300" />
+                  <img key={activeModelLogo.name} src={activeModelLogo.image} alt={`${activeModelLogo.name} logo`} className="h-14 w-14 animate-in fade-in zoom-in-95 rounded-lg object-cover duration-1000" />
                 ) : (
-                  <ClaudeLogo key={activeModelLogo.name} className="h-12 w-12 animate-in fade-in zoom-in-95 duration-300" />
+                  <ClaudeLogo key={activeModelLogo.name} className="h-12 w-12 animate-in fade-in zoom-in-95 duration-1000" />
                 )}
               </div>
             </div>
