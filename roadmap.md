@@ -25,6 +25,7 @@
 - [x] Add Evolink token pricing, labels, fallbacks, and provider error handling
 - [x] Verify the integrated Evolink path and extension checks
 - [x] Add ordered fallback across three Browser Use API accounts
+- [x] Match authentication emails to the Jenvu typography and visual theme
 - [x] Centralize plan capabilities for extension AI features
 - [x] Enforce Pro XAU/USD-only access and Elite/Ultra multi-pair access
 - [x] Show friendly plan-lock and senior-review messages

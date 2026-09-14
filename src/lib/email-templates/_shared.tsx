@@ -6,7 +6,8 @@ export const LOGO_URL = `${SITE_URL}/favicon.png`
 
 /**
  * Shared design tokens for Jenvu emails — clean, minimal, professional.
- * Inter for everything (headings, body, labels, code digits).
+ * Google Sans for everything (headings, body, labels, and code digits),
+ * matching the Jenvu product UI.
  */
 export const INTER =
   "'Google Sans Normal', 'Google Sans', 'Product Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"
@@ -27,7 +28,7 @@ export const COLORS = {
   accent: '#111827',
 }
 
-/** Load Urbanist from Google Fonts inside <Head>. Falls back to system sans-serif in clients that block web fonts. */
+/** Load Google Sans inside <Head>. Falls back to system sans-serif when web fonts are blocked. */
 export const EmailFonts = () => (
   <>
     <link
@@ -143,9 +144,9 @@ export const shellStyles = {
   },
   button: {
     display: 'inline-block',
-    backgroundColor: '#ffffff',
-    color: '#000000',
-    border: `1px solid ${COLORS.border}`,
+    backgroundColor: COLORS.accent,
+    color: '#ffffff',
+    border: `1px solid ${COLORS.accent}`,
     fontFamily: INTER,
     fontSize: '14px',
     fontWeight: 500 as const,
@@ -153,6 +154,11 @@ export const shellStyles = {
     padding: '11px 20px',
     textDecoration: 'none',
     margin: '4px 0 0',
+  },
+
+  actionWrap: {
+    textAlign: 'center' as const,
+    margin: '24px 0 4px',
   },
 
   footer: {

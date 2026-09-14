@@ -4,13 +4,14 @@ import {
   Body,
   Button,
   Container,
-  Head,
   Heading,
   Html,
   Link,
   Preview,
+  Section,
   Text,
 } from '@react-email/components'
+import { COLORS, EmailHead, LogoHeader, shellStyles as s } from './_shared'
 
 interface SignupEmailProps {
   siteName: string
@@ -30,36 +31,38 @@ export const SignupEmail = ({
   showLink = true,
 }: SignupEmailProps) => (
   <Html lang="en" dir="ltr">
-    <Head>
-      <style>{darkModeCss}</style>
-    </Head>
+    <EmailHead />
     <Preview>Confirm your email for {siteName}</Preview>
-    <Body style={main}>
-      <Container style={container}>
-        <Heading style={h1}>Confirm your email</Heading>
-        <Text style={text}>
+    <Body style={s.main}>
+      <Container style={s.container}>
+        <LogoHeader />
+        <Section style={s.card}>
+        <Heading style={s.h1}>Confirm your email</Heading>
+        <Text style={s.text}>
           Thanks for signing up for{' '}
-          <Link href={siteUrl} style={link}>
+          <Link href={siteUrl} style={linkStyle}>
             <strong>{siteName}</strong>
           </Link>
           !
         </Text>
-        <Text style={text}>
+        <Text style={s.text}>
           Please confirm your email address (
-          <Link href={`mailto:${recipient}`} style={link}>
+          <Link href={`mailto:${recipient}`} style={linkStyle}>
             {recipient}
           </Link>
           ){token ? ' using the code below:' : ' by clicking the button below:'}
         </Text>
-        {token ? <Text style={codeStyle}>{token}</Text> : null}
+        {token ? <Section style={s.codeBox}><Text style={s.codeLabel}>VERIFICATION CODE</Text><Text style={s.codeValue}>{token}</Text><Text style={s.codeExpiry}>This code expires shortly.</Text></Section> : null}
         {showLink ? (
-          <Button className="dm-btn" style={button} href={confirmationUrl}>
+          <Section style={s.actionWrap}><Button style={s.button} href={confirmationUrl}>
             Verify Email
-          </Button>
+          </Button></Section>
         ) : null}
-        <Text style={footer}>
+        <Text style={s.footer}>
           If you didn't create an account, you can safely ignore this email.
         </Text>
+        <Text style={s.legal}>© Jenvu · AI Gold Trading</Text>
+        </Section>
       </Container>
     </Body>
   </Html>
@@ -67,43 +70,4 @@ export const SignupEmail = ({
 
 export default SignupEmail
 
-const main = { backgroundColor: '#ffffff', fontFamily: 'Arial, sans-serif' }
-const container = { padding: '20px 25px' }
-const h1 = {
-  fontSize: '22px',
-  fontWeight: 'bold' as const,
-  color: '#000000',
-  margin: '0 0 20px',
-}
-const text = {
-  fontSize: '14px',
-  color: '#55575d',
-  lineHeight: '1.5',
-  margin: '0 0 25px',
-}
-const link = { color: 'inherit', textDecoration: 'underline' }
-const button = {
-  backgroundColor: '#000000',
-  color: '#ffffff',
-  fontSize: '14px',
-  border: '1px solid #000000',
-  borderRadius: '8px',
-  padding: '12px 20px',
-  textDecoration: 'none',
-}
-const footer = { fontSize: '12px', color: '#999999', margin: '30px 0 0' }
-// Rendered as a text child, which React may HTML-escape: keep this CSS free of >, &, and quotes.
-const darkModeCss = `
-  @media (prefers-color-scheme: dark) {
-    .dm-btn { background-color: #ffffff !important; color: #000000 !important; }
-  }
-  [data-ogsc] .dm-btn { background-color: #ffffff !important; color: #000000 !important; }
-  [data-ogsb] .dm-btn { background-color: #ffffff !important; color: #000000 !important; }
-`
-const codeStyle = {
-  fontSize: '28px',
-  fontWeight: 'bold' as const,
-  letterSpacing: '6px',
-  color: '#000000',
-  margin: '0 0 25px',
-}
+const linkStyle = { color: COLORS.ink, textDecoration: 'underline' }
