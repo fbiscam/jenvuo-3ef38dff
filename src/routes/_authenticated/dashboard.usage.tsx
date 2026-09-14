@@ -765,14 +765,48 @@ function ClaudeLogo({ className }: { className?: string }) {
 
 function ModelLogo({ model }: { model: string }) {
   const normalized = model.toLowerCase();
-  if (normalized.includes("astra")) return <img src={astraModelLogoAsset.url} alt="GPT-6 Astra logo" className="h-7 w-7 shrink-0 rounded-md object-cover" />;
+  if (normalized.includes("astra")) return <img src={astraModelLogoAsset.url} alt="Astra logo" className="h-7 w-7 shrink-0 object-contain" />;
   if (normalized.includes("claude") || normalized.includes("fable")) return <span className="grid h-7 w-7 shrink-0 place-items-center text-[#D97757]"><ClaudeLogo className="h-6 w-6" /></span>;
-  if (normalized.includes("sol")) return <img src={solLogoAsset.url} alt="GPT-5.6 Sol logo" className="h-7 w-7 shrink-0 rounded-md object-cover" />;
+  if (normalized.includes("sol")) return <img src={solLogoAsset.url} alt="Sol logo" className="h-7 w-7 shrink-0 object-contain" />;
+  if (normalized.includes("gemini") || normalized.includes("google")) return <CompanyMark company="Google" />;
+  if (normalized.includes("grok") || normalized.includes("xai")) return <CompanyMark company="xAI" />;
+  if (normalized.includes("deepseek")) return <CompanyMark company="DeepSeek" />;
+  if (normalized.includes("llama") || normalized.includes("meta")) return <CompanyMark company="Meta" />;
+  if (normalized.includes("mistral")) return <CompanyMark company="Mistral" />;
+  if (normalized.includes("nemotron") || normalized.includes("nvidia")) return <CompanyMark company="NVIDIA" />;
+  if (normalized.includes("gpt") || normalized.includes("openai")) return <CompanyMark company="OpenAI" />;
   const display = modelDisplay(model);
-  return <span className="grid h-7 w-7 shrink-0 place-items-center rounded-md border border-border bg-background text-[10px] font-medium text-foreground" aria-hidden="true">{display.provider.slice(0, 1).toUpperCase()}</span>;
+  return <span className="grid h-7 w-7 shrink-0 place-items-center text-[10px] font-medium text-foreground" aria-hidden="true">{display.provider.slice(0, 1).toUpperCase()}</span>;
 }
 
-function TypeBreakdown({ rows }: { rows: { reason: string; delta: number }[] }) {
+function CompanyMark({ company }: { company: "Google" | "xAI" | "DeepSeek" | "Meta" | "Mistral" | "NVIDIA" | "OpenAI" }) {
+  if (company === "Google") {
+    return <span className="grid h-7 w-7 shrink-0 place-items-center text-lg font-medium text-foreground" aria-label="Google logo">G</span>;
+  }
+  if (company === "xAI") {
+    return <span className="grid h-7 w-7 shrink-0 place-items-center text-base font-medium text-foreground" aria-label="xAI logo">𝕏</span>;
+  }
+  if (company === "Meta") {
+    return <span className="grid h-7 w-7 shrink-0 place-items-center text-xl text-foreground" aria-label="Meta logo">∞</span>;
+  }
+  if (company === "NVIDIA") {
+    return <span className="grid h-7 w-7 shrink-0 place-items-center text-[9px] font-medium text-foreground" aria-label="NVIDIA logo">NVIDIA</span>;
+  }
+  if (company === "Mistral") {
+    return <span className="grid h-7 w-7 shrink-0 place-items-center text-base font-medium text-foreground" aria-label="Mistral AI logo">M</span>;
+  }
+  if (company === "DeepSeek") {
+    return <span className="grid h-7 w-7 shrink-0 place-items-center text-base font-medium text-foreground" aria-label="DeepSeek logo">DS</span>;
+  }
+  return (
+    <svg viewBox="0 0 24 24" role="img" aria-label="OpenAI logo" className="h-6 w-6 shrink-0 text-foreground" fill="none" stroke="currentColor" strokeWidth="1.6">
+      <path d="M12 3.1a4.45 4.45 0 0 1 7.65 3.08 4.46 4.46 0 0 1 1.04 7.96 4.45 4.45 0 0 1-4.87 6.65A4.46 4.46 0 0 1 8.1 19.8a4.45 4.45 0 0 1-4.76-6.72A4.46 4.46 0 0 1 4.4 5.14 4.45 4.45 0 0 1 12 3.1Z" />
+      <path d="m8.15 7.8 3.86-2.22 3.85 2.22v4.45L12 14.48 8.15 12.25V7.8Zm0 4.45v4.45L12 18.92l3.86-2.22v-4.45M12 14.48v4.44" />
+    </svg>
+  );
+}
+
+function TypeBreakdown({ rows }: { rows: { reason: string; delta: number; created_at?: string }[] }) {
   const byType = new Map<string, { count: number; cost: number }>();
   for (const r of rows) {
     const key = label(r.reason);
@@ -797,6 +831,18 @@ function TypeBreakdown({ rows }: { rows: { reason: string; delta: number }[] }) 
           <div className="mt-1 h-1.5 w-full rounded-full bg-zinc-100">
             <div className="h-full rounded-full bg-zinc-800" style={{ width: `${(s.cost / max) * 100}%` }} />
           </div>
+          {name.toLowerCase().includes("ict") && (
+            <div className="mt-2" aria-label={`${name} usage graph`}>
+              <MiniLine
+                data={rows
+                  .filter((row) => label(row.reason) === name)
+                  .sort((a, b) => (a.created_at ?? "").localeCompare(b.created_at ?? ""))
+                  .map((row) => Math.abs(row.delta))}
+                color="var(--chart-1)"
+                filled
+              />
+            </div>
+          )}
         </div>
       ))}
     </div>
