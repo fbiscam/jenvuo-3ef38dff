@@ -1429,8 +1429,8 @@ function UsageAnalytics({ stats, keysCount, loading, range, onRangeChange, onRef
           <div className="mt-2 h-4 overflow-hidden rounded bg-muted"><div className="h-full bg-foreground" style={{ width: `${Math.min(100, Math.max(0, stats?.allowance ? (totalSpent / stats.allowance) * 100 : 0))}%` }} /></div>
         </div>
         <div className={`${metricClass} bg-[#FFFBED]`}>
-          <span className="text-sm text-[#6B5200]">Credit balance</span>
-          <strong className="mt-1 text-xl font-semibold tabular-nums text-[#4A3800]">{stats ? fmtUsd2(balance) : "—"}</strong>
+          <span className="text-sm text-black">Credit balance</span>
+          <strong className="mt-1 text-xl font-semibold tabular-nums text-black">{stats ? fmtUsd2(balance) : "—"}</strong>
           <Button asChild size="sm" className="mt-3 w-fit bg-[#A8830B] text-white hover:bg-[#8E6E09]">
             <Link to="/dashboard/pay"><CreditCard className="h-3.5 w-3.5" /> Add credits</Link>
           </Button>
