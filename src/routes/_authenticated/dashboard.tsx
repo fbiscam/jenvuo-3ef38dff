@@ -1464,7 +1464,7 @@ const RECOMMENDED_MODELS = [
     description: "Independent validation for structure, risk, and consistency.",
     logo: ShieldCheckIcon,
     logoLabel: "Claude",
-    badgeTone: "bg-success/15 text-success",
+    badgeTone: "bg-chart-2/15 text-chart-2",
     featured: false,
   },
   {
@@ -1473,7 +1473,7 @@ const RECOMMENDED_MODELS = [
     description: "Fast reasoning for everyday market questions and workflows.",
     logo: Gauge,
     logoLabel: "Sol",
-    badgeTone: "bg-info/15 text-info",
+    badgeTone: "bg-chart-1/15 text-chart-1",
     featured: false,
   },
   {
