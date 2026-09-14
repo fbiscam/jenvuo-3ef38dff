@@ -99,7 +99,6 @@
   --color-home-accent-foreground: var(--home-accent-foreground);
   --color-auth-action: var(--auth-action);
   --color-auth-action-foreground: var(--auth-action-foreground);
-  --color-usage-balance: var(--usage-balance);
 }
 
 :root {
@@ -151,7 +150,6 @@
   --home-accent-canvas: rgb(255 244 237);
   --auth-action: oklch(0.72 0.14 255);
   --auth-action-foreground: oklch(1 0 0);
-  --usage-balance: #FFFBED;
 }
 
 .dark {
@@ -197,7 +195,6 @@
   --home-accent-canvas: rgb(45 24 12);
   --auth-action: oklch(0.72 0.14 255);
   --auth-action-foreground: oklch(1 0 0);
-  --usage-balance: #FFFBED;
 }
 
 
