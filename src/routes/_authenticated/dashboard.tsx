@@ -1320,7 +1320,7 @@ function DashboardHero({ keysCount, stats }: { keysCount: number | null; stats: 
           <div className="absolute bottom-5 right-5 flex h-14 w-14 items-center justify-center rounded-lg border border-zinc-200 bg-white shadow-sm">
             <RiClaudeFill className="h-7 w-7 text-brand-claude" aria-label="Claude Opus 5" />
           </div>
-        </div>
+        </Link>
       </div>
     </section>
   );
