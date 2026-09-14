@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import { Calendar, ChartColumn, ChevronDown, ChevronRight, Download, RefreshCw } from "lucide-react";
+import { Calendar, ChartColumn, ChevronDown, ChevronRight, Download, RefreshCw, Settings2, X } from "lucide-react";
 import {
   Area,
   CartesianGrid,
@@ -14,6 +14,7 @@ import {
   YAxis,
 } from "recharts";
 import { getUsageStats } from "@/lib/usage.functions";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/_authenticated/dashboard/usage")({
   head: () => ({
@@ -218,16 +219,20 @@ function UsagePage() {
   const rangeLabel = RANGES.find((r) => r.days === rangeDays)?.label ?? `Last ${rangeDays} days`;
 
   return (
-    <div className="space-y-4">
-      {/* ── Header bar ── */}
-      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 border-b border-zinc-200 pb-3 sm:flex sm:flex-wrap sm:justify-between">
-        <h1 className="min-w-0 truncate text-xl font-semibold text-zinc-900">      Usage</h1>
-        <div className="col-span-2 grid min-w-0 grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto_auto] items-center gap-1.5 sm:col-span-1 sm:flex sm:gap-2">
+    <div className="min-h-[calc(100dvh-4rem)] overflow-hidden border border-border bg-background text-foreground">
+      {/* Header */}
+      <div className="flex min-h-14 flex-col gap-3 border-b border-border px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+        <h1 className="text-lg font-medium text-foreground">Usage</h1>
+        <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto_auto] items-center gap-2 sm:flex">
+          <div className="hidden h-9 items-center gap-2 rounded-full border border-border bg-background px-3 text-[13px] text-foreground sm:flex">
+            <span>Default project</span>
+            <span className="grid h-5 w-5 place-items-center rounded-full bg-muted text-muted-foreground"><X className="h-3 w-3" /></span>
+          </div>
           <Dropdown
             open={openMenu === "model"}
             onToggle={() => setOpenMenu(openMenu === "model" ? null : "model")}
-            trigger={model === "all" ? "All models" : model}
-            options={[{ value: "all", label: "All models" }, ...models.map((m) => ({ value: m, label: m }))]}
+            trigger={model === "all" ? "All API keys" : model}
+            options={[{ value: "all", label: "All API keys" }, ...models.map((m) => ({ value: m, label: m }))]}
             value={model}
             onSelect={(v) => { setModel(v); setOpenMenu(null); }}
           />
@@ -240,48 +245,47 @@ function UsagePage() {
             value={String(rangeDays)}
             onSelect={(v) => { setRangeDays(Number(v)); setOpenMenu(null); }}
           />
-          <button
-            type="button"
+          <Button
+            type="button" variant="ghost" size="icon"
             onClick={() => refetch()}
             aria-label="Refresh usage"
-            className="grid h-9 w-9 shrink-0 place-items-center rounded-md text-zinc-600 transition hover:bg-zinc-100 hover:text-zinc-900"
+            className="shrink-0 text-muted-foreground"
           >
             <RefreshCw className={`h-4 w-4 ${isFetching ? "animate-spin" : ""}`} />
-          </button>
-          <button
-            type="button"
+          </Button>
+          <Button
+            type="button" variant="ghost" size="icon"
             onClick={exportCsv}
             aria-label="Download usage CSV"
-            className="grid h-9 w-9 shrink-0 place-items-center rounded-md text-zinc-600 transition hover:bg-zinc-100 hover:text-zinc-900"
+            className="shrink-0 text-muted-foreground"
           >
             <Download className="h-4 w-4" />
-          </button>
+          </Button>
         </div>
       </div>
 
-
-      <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
-        {/* ── Left column ── */}
-        <div className="space-y-4 xl:col-span-2">
-          {/* Total Spend */}
-          <section>
-            <div className="grid grid-cols-[minmax(0,1fr)_auto] items-end gap-3 border-b border-zinc-100 px-4 py-3 sm:px-5">
+      <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_320px]">
+        <div className="min-w-0">
+          <section className="border-b border-border">
+            <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3 px-4 pb-2 pt-5 sm:px-7">
               <div className="min-w-0">
-                <div className="text-[13px] text-zinc-500">Total Spend</div>
-                <div className="mt-0.5 text-xl font-semibold tabular-nums text-zinc-900">
+                <div className="text-[13px] text-foreground">Total Spend</div>
+                <div className="mt-2 text-xl font-medium tabular-nums text-foreground">
                   {derived.hasSpend ? fmtUsd(derived.spent, 2) : "No data"}
                 </div>
               </div>
-              <div className="flex shrink-0 flex-wrap items-center justify-end gap-x-3 gap-y-1 text-[12px] text-zinc-500">
-                <span className="flex items-center gap-1.5"><span className="inline-block h-2.5 w-2.5 rounded-full bg-sky-400" /> Spent</span>
-                <span className="flex items-center gap-1.5"><span className="inline-block h-2.5 w-2.5 rounded-full bg-zinc-300" /> Added</span>
+              <div className="flex items-center gap-3 text-[13px] text-muted-foreground">
+                <span className="hidden sm:inline">Group by</span>
+                <ChevronDown className="hidden h-4 w-4 sm:block" />
+                <span className="h-7 border-l border-border" />
+                <span className="bg-muted px-3 py-1.5 font-medium text-foreground">1d</span>
               </div>
             </div>
-            <div className="px-4 pb-5 pt-4 sm:px-5 sm:pb-6 sm:pt-5">
+            <div className="px-4 pb-5 sm:px-7">
               {derived.hasSpend ? (
-                <div className="h-64 min-w-0 w-full sm:h-72">
+                <div className="h-72 min-w-0 w-full sm:h-[310px]">
                   <ResponsiveContainer width="100%" height="100%">
-                    <ComposedChart data={derived.days} margin={{ top: 8, right: 4, bottom: 4, left: 0 }}>
+                    <ComposedChart data={derived.days} margin={{ top: 18, right: 6, bottom: 4, left: 0 }}>
                       <defs>
                         <linearGradient id="usageSpent" x1="0" y1="0" x2="0" y2="1">
                           <stop offset="0%" stopColor="#93c5fd" stopOpacity={0.82} />
@@ -295,7 +299,7 @@ function UsagePage() {
                         tickLine={false}
                         axisLine={false}
                         tickMargin={10}
-                        tick={{ fill: "#a1a1aa", fontSize: 11 }}
+                        tick={{ fill: "currentColor", fontSize: 11 }}
                         tickFormatter={(v: string) =>
                           new Date(v).toLocaleDateString(undefined, { month: "short", day: "numeric" })
                         }
@@ -305,7 +309,7 @@ function UsagePage() {
                         tickLine={false}
                         axisLine={false}
                         width={48}
-                        tick={{ fill: "#a1a1aa", fontSize: 11, textAnchor: "start", dx: -46 }}
+                        tick={{ fill: "currentColor", fontSize: 11, textAnchor: "start", dx: -46 }}
                         tickFormatter={(v: number) => `$${v >= 1 ? v.toFixed(0) : v.toFixed(2)}`}
                       />
                       <RTooltip
@@ -354,114 +358,109 @@ function UsagePage() {
                   </ResponsiveContainer>
                 </div>
               ) : (
-                <div className="flex h-64 flex-col items-center justify-center text-center">
-                  <span className="flex h-11 w-11 items-center justify-center rounded-lg bg-zinc-100 text-zinc-500">
+                <div className="flex h-72 flex-col items-center justify-center text-center sm:h-[310px]">
+                  <span className="flex h-11 w-11 items-center justify-center rounded-lg bg-muted text-muted-foreground">
                     <ChartColumn className="h-5 w-5" />
                   </span>
-                  <p className="mt-3 text-sm font-semibold text-zinc-900">No usage data</p>
-                  <p className="mt-1 max-w-xs text-[13px] text-zinc-500">
-                    Nothing recorded for {rangeLabel.toLowerCase()}{model !== "all" ? ` on ${model}` : ""}.
+                  <p className="mt-3 text-sm font-medium text-foreground">No usage data</p>
+                  <p className="mt-2 max-w-sm text-[13px] text-muted-foreground">
+                    The selected date range and group doesn’t have any usage data.
                   </p>
                 </div>
               )}
             </div>
-
-            {/* Tabs */}
-            <div className="flex max-w-full items-center gap-5 overflow-x-auto border-b border-zinc-200 px-4 text-[13px] sm:px-5">
-              <TabButton active={tab === "categories"} onClick={() => setTab("categories")}>Spend categories</TabButton>
-              <TabButton active={tab === "models"} onClick={() => setTab("models")}>Models</TabButton>
-            </div>
-
-            {tab === "categories" ? (
-              <div className="grid grid-cols-1 gap-4 p-4 sm:grid-cols-2 sm:p-5">
-                <CategoryCard
-                    title="AI and extension requests"
-                  items={[
-                    { color: "bg-indigo-500", label: `${fmtInt(derived.spendRows.length)} requests` },
-                    { color: "bg-zinc-300", label: `${fmtInt(derived.inputTokens)} input tokens` },
-                    { color: "bg-zinc-300", label: `${fmtUsd(derived.spent, 2)} spent` },
-                  ]}
-                />
-                <CategoryCard
-                  title="Top-ups & bonuses"
-                  items={[
-                    { color: "bg-emerald-500", label: `${fmtInt(derived.earnRows.length)} credits` },
-                    { color: "bg-zinc-300", label: `${fmtUsd(derived.earned, 2)} added` },
-                  ]}
-                />
-              </div>
-            ) : (
-              <ModelBreakdown rows={derived.spendRows} />
-            )}
           </section>
+
+          <div className="flex max-w-full items-center gap-7 overflow-x-auto border-b border-border px-4 text-[13px] sm:px-6">
+            <TabButton active={tab === "categories"} onClick={() => setTab("categories")}>API capabilities</TabButton>
+            <TabButton active={tab === "models"} onClick={() => setTab("models")}>Spend categories</TabButton>
+            <span className="shrink-0 py-3 text-muted-foreground">Prompt caching</span>
+            <span className="shrink-0 py-3 text-muted-foreground">Safety usage</span>
+          </div>
+
+          {tab === "categories" ? (
+            <div className="grid grid-cols-1 gap-4 p-4 sm:grid-cols-2 sm:p-4">
+              <CapabilityCard title="Responses and Chat Completions" start={rangeStartLabel(rangeDays)} end={rangeEndLabel()} items={[
+                { color: "bg-violet-600", label: `${fmtInt(derived.spendRows.length)} requests` },
+                { color: "bg-zinc-300", label: `${fmtInt(derived.inputTokens)} input tokens` },
+              ]} />
+              <CapabilityCard title="Senior reviews" start={rangeStartLabel(rangeDays)} end={rangeEndLabel()} items={[
+                { color: "bg-violet-600", label: `${fmtInt(derived.spendRows.filter((r) => r.stage === "senior_review").length)} requests` },
+                { color: "bg-zinc-300", label: `${fmtInt(derived.outputTokens)} output tokens` },
+              ]} />
+              <CapabilityCard title="Extension API" start={rangeStartLabel(rangeDays)} end={rangeEndLabel()} items={[
+                { color: "bg-violet-600", label: `${fmtInt(derived.spendRows.filter((r) => r.reason === "extension_api").length)} requests` },
+              ]} />
+              <CapabilityCard title="Credits and top-ups" start={rangeStartLabel(rangeDays)} end={rangeEndLabel()} items={[
+                { color: "bg-violet-600", label: `${fmtInt(derived.earnRows.length)} additions` },
+                { color: "bg-zinc-300", label: `${fmtUsd(derived.earned, 2)} added` },
+              ]} />
+            </div>
+          ) : (
+            <ModelBreakdown rows={derived.spendRows} />
+          )}
         </div>
 
-        {/* ── Right column ── */}
-        <div className="space-y-4">
-          {/* Period spend */}
-          <section className="border-b border-zinc-200 px-1 pb-5">
-            <div className="text-[13px] text-zinc-500">
-              Monthly Wallet
+        <aside className="border-t border-border xl:border-l xl:border-t-0">
+          <section className="border-b border-border px-4 py-5">
+            <div className="flex items-center justify-between text-[13px] text-foreground">
+              <span>Monthly spend</span>
+              <Settings2 className="h-4 w-4 text-muted-foreground" />
             </div>
-            <div className="mt-3 flex items-center justify-between text-[13px]">
-              <span className="text-zinc-600">Wallet</span>
-              <span className="tabular-nums text-zinc-800">{fmtUsd(remaining, 2)} / {fmtUsd(data.allowance, 2)}</span>
+            <div className="mt-5 flex items-center justify-between text-[13px]">
+              <span className="text-foreground">Personal</span>
+              <span className="tabular-nums text-foreground">{fmtUsd(data.allowance - remaining, 2)} / {fmtUsd(data.allowance, 2)}</span>
             </div>
-            <div className="relative mt-2 h-2.5 w-full rounded-full bg-zinc-100">
-              <div className="h-full rounded-full bg-zinc-900 transition-all" style={{ width: `${pct}%` }} />
+            <div className="relative mt-3 h-4 w-full rounded-md bg-muted">
+              <div className="h-full rounded-md bg-foreground transition-all" style={{ width: `${100 - pct}%` }} />
             </div>
             {daysLeft != null && (
-              <div className="mt-2 text-[11.5px] text-zinc-500">Resets in {daysLeft} day{daysLeft === 1 ? "" : "s"}</div>
+              <div className="mt-2 text-[11.5px] text-muted-foreground">Resets in {daysLeft} day{daysLeft === 1 ? "" : "s"}</div>
             )}
           </section>
 
-          {/* Total tokens */}
-          <section className="border-b border-zinc-200 px-1 pb-5">
-            <div className="text-[13px] text-zinc-500">Total tokens</div>
-            <div className="mt-0.5 text-xl font-semibold tabular-nums text-zinc-900">{fmtInt(derived.totalTokens)}</div>
-            <div className="mt-4">
+          <section className="border-b border-border px-4 py-5">
+            <div className="text-[13px] text-foreground">Total tokens</div>
+            <div className="mt-1 text-xl font-medium tabular-nums text-foreground">{fmtInt(derived.totalTokens)}</div>
+            <div className="mt-5">
               <MiniLine data={derived.tokenSeries} color="#e11d63" filled={derived.totalTokens > 0} />
             </div>
           </section>
 
-          {/* Total requests */}
-          <section className="border-b border-zinc-200 px-1 pb-5">
-            <div className="text-[13px] text-zinc-500">Total requests</div>
-            <div className="mt-0.5 text-xl font-semibold tabular-nums text-zinc-900">{fmtInt(derived.spendRows.length)}</div>
-            <div className="mt-4">
+          <section className="border-b border-border px-4 py-5">
+            <div className="text-[13px] text-foreground">Total requests</div>
+            <div className="mt-1 text-xl font-medium tabular-nums text-foreground">{fmtInt(derived.spendRows.length)}</div>
+            <div className="mt-5">
               <MiniLine data={derived.requestSeries} color="#a1a1aa" filled={derived.spendRows.length > 0} dashed />
             </div>
           </section>
 
-          {/* Recent extension keys */}
-          <section className="border-b border-zinc-200 px-1 pb-5">
-            <div className="flex items-center justify-between gap-3">
-              <div>
-                <div className="text-[13px] font-medium text-zinc-900">Recent API keys</div>
-                <div className="mt-0.5 text-[11.5px] text-zinc-500">Latest four · spend for {rangeLabel.toLowerCase()}</div>
-              </div>
-              <span className="text-[11px] tabular-nums text-zinc-400">{data.recentExtensionKeys.length} shown</span>
-            </div>
+          <div className="flex items-center gap-7 border-b border-border px-4 text-[13px]">
+            <span className="border-b border-foreground py-3 font-medium text-foreground">Users</span>
+            <span className="py-3 text-muted-foreground">Services</span>
+            <span className="py-3 text-muted-foreground">API Keys</span>
+          </div>
+          <section className="px-4 py-5">
             {data.recentExtensionKeys.length === 0 ? (
-              <p className="py-6 text-center text-[13px] text-zinc-500">No extension API keys yet.</p>
+              <p className="py-20 text-center text-[13px] text-muted-foreground">There is no usage data for this period and group.</p>
             ) : (
-              <div className="mt-3 divide-y divide-zinc-100">
+              <div className="divide-y divide-border">
                 {data.recentExtensionKeys.map((key, index) => {
                   const usage = derived.keySpend.get(key.id) ?? { spend: 0, requests: 0 };
                   return (
                     <div key={key.id} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 py-3">
                       <div className="min-w-0">
                         <div className="flex items-center gap-2">
-                          <code className="truncate font-mono text-[11.5px] text-zinc-800">{key.keyPrefix}••••••••••</code>
-                          {index === 0 && <span className="rounded-full bg-blue-50 px-1.5 py-0.5 text-[9px] font-medium text-blue-700">Newest</span>}
+                           <code className="truncate font-mono text-[11.5px] text-foreground">{key.keyPrefix}••••••••••</code>
+                           {index === 0 && <span className="rounded-full bg-muted px-1.5 py-0.5 text-[9px] font-medium text-foreground">Newest</span>}
                         </div>
-                        <div className="mt-1 truncate text-[10.5px] text-zinc-400">
+                         <div className="mt-1 truncate text-[10.5px] text-muted-foreground">
                           {key.name} · {usage.requests} request{usage.requests === 1 ? "" : "s"} · {key.revokedAt ? "Revoked" : "Active"}
                         </div>
                       </div>
                       <div className="shrink-0 text-right">
-                        <div className="text-[12px] font-semibold tabular-nums text-zinc-900">{fmtUsd(usage.spend, 2)}</div>
-                        <div className="mt-0.5 text-[10px] text-zinc-400">Spend</div>
+                         <div className="text-[12px] font-medium tabular-nums text-foreground">{fmtUsd(usage.spend, 2)}</div>
+                         <div className="mt-0.5 text-[10px] text-muted-foreground">Spend</div>
                       </div>
                     </div>
                   );
@@ -469,11 +468,24 @@ function UsagePage() {
               </div>
             )}
           </section>
-
-        </div>
+        </aside>
       </div>
     </div>
   );
+}
+
+function dateLabel(date: Date) {
+  return date.toLocaleDateString(undefined, { month: "short", day: "2-digit" });
+}
+
+function rangeStartLabel(days: number) {
+  const start = new Date();
+  start.setDate(start.getDate() - (days - 1));
+  return dateLabel(start);
+}
+
+function rangeEndLabel() {
+  return dateLabel(new Date());
 }
 
 
@@ -521,31 +533,36 @@ function Dropdown({
 
 function TabButton({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
   return (
-    <button
+    <Button
       type="button"
+      variant="ghost"
       onClick={onClick}
-      className={`-mb-px border-b-2 border-transparent py-2.5 font-medium transition ${
-        active ? "text-zinc-900" : "text-zinc-500 hover:text-zinc-700"
+      className={`h-auto shrink-0 rounded-none border-b border-transparent px-0 py-3 text-[13px] shadow-none ${
+        active ? "border-foreground text-foreground" : "text-muted-foreground hover:bg-transparent hover:text-foreground"
       }`}
     >
       {children}
-    </button>
+    </Button>
   );
 }
 
-function CategoryCard({ title, items }: { title: string; items: { color: string; label: string }[] }) {
+function CapabilityCard({ title, items, start, end }: { title: string; items: { color: string; label: string }[]; start: string; end: string }) {
   return (
-    <div className="py-2">
-      <div className="flex items-center gap-1 text-[13px] font-medium text-zinc-800">
-        {title} <ChevronRight className="h-3.5 w-3.5 text-zinc-400" />
+    <div className="flex min-h-64 flex-col rounded-lg border border-border bg-card p-4 sm:min-h-[250px]">
+      <div className="flex items-center gap-1 text-[13px] text-card-foreground">
+        {title} <ChevronRight className="h-3.5 w-3.5 text-muted-foreground" />
       </div>
-      <div className="mt-3 space-y-1.5">
+      <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1">
         {items.map((it) => (
-          <div key={it.label} className="flex items-center gap-2 text-[12px] text-zinc-500">
+          <div key={it.label} className="flex items-center gap-2 text-[12px] text-muted-foreground">
             <span className={`inline-block h-2 w-2 rounded-[2px] ${it.color}`} />
             {it.label}
           </div>
         ))}
+      </div>
+      <div className="mt-auto flex items-center justify-between px-7 text-[12px] text-muted-foreground">
+        <span>{start}</span>
+        <span>{end}</span>
       </div>
     </div>
   );
