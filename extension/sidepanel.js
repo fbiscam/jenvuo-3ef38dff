@@ -851,7 +851,7 @@ async function send(preset, silentUser) {
   // Senior review only applies to chart/screen analysis. Plain chat stays in
   // conversation mode, so never show the review banner for it.
   const analysisRequest = Boolean(chartImage || stream || ANALYSIS_INTENT.test(text));
-  setReviewStatus(analysisRequest ? "Senior review checking…" : "Chat mode", analysisRequest ? "checking" : "");
+  setReviewStatus(analysisRequest ? "ICT rules engine analyzing…" : "Chat mode", analysisRequest ? "checking" : "");
   controller = new AbortController();
   $("send").disabled = false;
   updateSendState();
@@ -914,16 +914,15 @@ async function send(preset, silentUser) {
       $("price").textContent = d.ticker.price.toFixed(2);
     }
     if (d.seniorReview?.included && d.seniorReview?.status === "completed") {
-      const label = String(d.seniorReview.model || "BluesMinds").split("/").pop();
-      setReviewStatus(`Senior reviewed · ${label}`, "verified");
+      setReviewStatus("Senior rules review · verified", "verified");
     } else if (d.mode === "conversation") {
       setReviewStatus("Chat mode", "");
     } else if (d.seniorReview?.status === "unavailable") {
-      setReviewStatus("Primary complete · senior review retry needed", "failed");
+      setReviewStatus("Rules analysis complete · review unavailable", "failed");
     } else if (d.secondReview?.status === "not_in_plan" || d.seniorReview?.status === "not_in_plan" || d.seniorReview?.status === "not_required") {
-      setReviewStatus("Primary AI · Elite unlocks senior review", "");
+      setReviewStatus("ICT rules analysis · Elite unlocks senior review", "");
     } else {
-      setReviewStatus("Senior review unavailable", "failed");
+      setReviewStatus("ICT rules analysis complete", "verified");
     }
     if (Array.isArray(d.chart) && d.chart.length) renderSnapshot(d);
   } catch (e) {

@@ -145,12 +145,12 @@ function ExtensionPage() {
   const onDownload = async () => {
     setDownloading(true);
     try {
-      const res = await fetch("/jenvu-extension-v1.9.2.zip", { cache: "no-store" });
+      const res = await fetch("/jenvu-extension-v1.9.3.zip", { cache: "no-store" });
       if (!res.ok) throw new Error(`Download failed: ${res.status}`);
       const blob = await res.blob();
       const a = document.createElement("a");
       a.href = URL.createObjectURL(blob);
-      a.download = "jenvu-extension-v1.9.2.zip";
+      a.download = "jenvu-extension-v1.9.3.zip";
       a.click();
       URL.revokeObjectURL(a.href);
     } catch (e) {
@@ -297,7 +297,7 @@ function ExtensionPage() {
               <div className="min-w-0">
                 <div className="mb-1 text-[11px] text-zinc-500 md:hidden">Extension</div>
                 <div className="truncate text-[13px] text-blue-700">Jenvu XAU/USD Extension</div>
-                <div className={`${MONO} truncate text-[12px] text-zinc-500`}>v1.9.2</div>
+                <div className={`${MONO} truncate text-[12px] text-zinc-500`}>v1.9.3</div>
               </div>
               <div className="text-[13px] text-zinc-800">
                 <div className="mb-1 text-[11px] text-zinc-500 md:hidden">Created</div>
@@ -388,7 +388,7 @@ function ExtensionPage() {
               <div className="mt-1 text-[12px] text-zinc-500">Chrome extension for live XAU/USD analysis</div>
             </div>
             <div className="flex items-center gap-2 text-[13px] text-zinc-800">
-              <span className={MONO}>v1.9.2</span>
+              <span className={MONO}>v1.9.3</span>
               <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-medium text-emerald-700">Latest</span>
             </div>
             <div className="text-[13px] text-zinc-600">Updated Sep 11, 2026</div>
@@ -401,7 +401,7 @@ function ExtensionPage() {
               <Download className="h-4 w-4" /> {downloading ? "Preparing…" : "Download latest"}
             </button>
           </div>
-          <p className="mt-4 text-[12px] text-zinc-500">ZIP package · Chrome developer mode · Version 1.9.2</p>
+          <p className="mt-4 text-[12px] text-zinc-500">ZIP package · Chrome developer mode · Version 1.9.3</p>
         </div>
       )}
 

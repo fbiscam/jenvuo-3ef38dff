@@ -71,3 +71,5 @@
 - [x] Stabilize ordinary extension chat with tested fast OmniRoute fallbacks
 - [x] Reorder extension chat around currently healthy automatic routes and prevent a slow Claude route from consuming the response window
 - [x] Move extension chat, chart analysis, and senior review to load-tested Gemini-only routes
+- [x] Make extension XAU/USD analysis and senior validation fully deterministic and model-independent
+- [x] Rebuild and verify the model-independent extension package
