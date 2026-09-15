@@ -982,14 +982,15 @@ const WORKING_BMIND = [
   "omniroute/auto/best-chat",
 ] as const;
 
-// Load-tested (4 concurrent requests each): claude-sonnet-4-6 12s / opus 13s /
-// gemini-3.7-flash-medium 20s / best-chat 29s all 4x HTTP 200, while
-// auto/best-fast dropped one request ("server busy") — so best-fast is last.
+// Keep the automatic routes first for chat. Concrete Claude routes can become
+// saturated for long stretches; putting one first used the entire first
+// timeout before a healthy route was tried. The automatic routes spread work
+// across available upstreams, while Gemini remains a concrete fallback.
 const FAST_NARRATION_BMIND = [
-  "omniroute/agy/claude-sonnet-4-6",
+  "omniroute/auto/best-fast",
   "omniroute/agy/gemini-3.7-flash-medium",
   "omniroute/auto/best-chat",
-  "omniroute/auto/best-fast",
+  "omniroute/agy/claude-sonnet-4-6",
 ] as const;
 
 
@@ -1008,11 +1009,11 @@ export const MODEL_CHAIN = {
   seniorReview: SENIOR_REVIEW_BMIND_4O,
   macroContext: WORKING_BMIND,
   chat: [
-    "omniroute/agy/claude-sonnet-4-6",
+    "omniroute/auto/best-fast",
     "omniroute/agy/gemini-3.7-flash-medium",
     "omniroute/auto/best-chat",
+    "omniroute/agy/claude-sonnet-4-6",
     "omniroute/auto/claude-sonnet",
-    "omniroute/auto/best-fast",
   ] as const,
 
 } as const;
@@ -1022,11 +1023,11 @@ export const MODEL_CHAIN = {
 // answering model instead of failing the whole request.
 export const EXTENSION_MODEL_CHAIN = {
   conversation: [
-    "omniroute/agy/claude-sonnet-4-6",
+    "omniroute/auto/best-fast",
     "omniroute/agy/gemini-3.7-flash-medium",
     "omniroute/auto/best-chat",
+    "omniroute/agy/claude-sonnet-4-6",
     "omniroute/auto/claude-sonnet",
-    "omniroute/auto/best-fast",
   ],
 
   reasoning: [
