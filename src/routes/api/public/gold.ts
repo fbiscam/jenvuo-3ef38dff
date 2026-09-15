@@ -303,22 +303,31 @@ async function handle({ request }: { request: Request }) {
             { type: 'image_url', image_url: { url: image, detail: 'high' } },
           ]
         : reviewPrompt
-      const review = requiresSeniorReview ? await callChatCompletion({
-          models: [...EXTENSION_MODEL_CHAIN.seniorReview],
-          stage: 'extension-senior-review',
-          maxTokens: 800,
-          timeoutMs: 28_000,
-          deadlineMs: 32_000,
-          retriesPerModel: 1,
-          validateContent: validateSeniorReview,
-          messages: [
-            {
-              role: 'system',
+      let review: Awaited<ReturnType<typeof callChatCompletion>> | null = null
+      let reviewFailed = false
+      if (requiresSeniorReview) {
+        try {
+          review = await callChatCompletion({
+            models: [...EXTENSION_MODEL_CHAIN.seniorReview],
+            stage: 'extension-senior-review',
+            maxTokens: 550,
+            timeoutMs: 20_000,
+            deadlineMs: 22_000,
+            retriesPerModel: 1,
+            validateContent: validateSeniorReview,
+            messages: [
+              {
+                role: 'system',
                 content: 'Senior ICT/SMC reviewer. Audit the PRIMARY_ANALYSIS against the complete verified LIVE_CONTEXT and attached chart when present. Check live levels, HTF/LTF alignment, liquidity sweep, displacement, fresh POI and minimum 1:2 RR. Start with VERDICT: BUY, SELL, or WAIT, then give specific evidence. Return WAIT only when concrete missing or conflicting evidence makes a directional plan unsafe; never use WAIT merely because confidence is imperfect. Never promise profit.',
-            },
-            { role: 'user', content: reviewUserContent },
-          ],
-        }) : null
+              },
+              { role: 'user', content: reviewUserContent },
+            ],
+          })
+        } catch (error) {
+          reviewFailed = true
+          console.warn('extension-senior-review unavailable:', error instanceof Error ? error.message : error)
+        }
+      }
       // Elite and Ultra only expose the validated senior response. Pro returns
       // its completed GPT-6 Astra primary analysis without a second pass.
       if (review) {
@@ -331,14 +340,16 @@ async function handle({ request }: { request: Request }) {
           ? `${primary.content}\n\nSENIOR REVIEW\n${review.content}`
           : review.content
         seniorReview = { included: true, model: review.model, status: 'completed' }
+      } else if (reviewFailed) {
+        content = `${primary.content}\n\nREVIEW STATUS\nPrimary analysis completed. Senior review is temporarily unavailable, so treat this as an unconfirmed analysis and do not enter a trade until the review completes on a retry.`
+        seniorReview = { included: false, model: null, status: 'unavailable' }
       }
 
       // The senior review is the second pass: GPT-6 Astra analyzes first,
       // then Claude Fable 5 independently audits and finalizes the answer.
-      // A failed review aborts the request above.
       const secondReview = review
         ? { included: true, model: review.model, status: 'completed' }
-        : { included: false, model: null, status: 'not_in_plan' }
+        : { included: false, model: null, status: reviewFailed ? 'unavailable' : 'not_in_plan' }
 
       const { chargeExtensionUsage } = await import('@/lib/extension-billing.server')
       const billing = await chargeExtensionUsage({
