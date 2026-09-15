@@ -106,7 +106,7 @@ const MATRIX: Array<{ feature: string; free: Mark; pro: Mark; elite: Mark }> = [
   { feature: "ICT / SMC breakdown", free: true, pro: true, elite: true },
   { feature: "Multi-timeframe bias", free: true, pro: true, elite: true },
   { feature: "Trade journal", free: true, pro: true, elite: true },
-  { feature: "Multi-pair scanner", free: false, pro: false, elite: true },
+  { feature: "Dedicated XAU/USD scanner", free: false, pro: true, elite: true },
   { feature: "Extension API keys", free: false, pro: "2", elite: "3" },
   { feature: "Custom alert rules", free: false, pro: false, elite: true },
   { feature: "Dedicated onboarding", free: false, pro: false, elite: true },
@@ -243,7 +243,7 @@ function PricingPage() {
                 { f: "Multi-timeframe bias", b: true, c: true, d: true },
                 { f: "Trade journal", b: true, c: true, d: true },
                 { f: "Email + push alerts", b: true, c: true, d: true },
-                { f: "Multi-pair scanner", b: false, c: true, d: true, badge: "new" },
+                { f: "Dedicated XAU/USD scanner", b: true, c: true, d: true, badge: "new" },
 
                 { f: "Custom alert rules", b: false, c: true, d: true },
 

@@ -49,7 +49,7 @@ export const collections: Collection[] = [
         updatedAt: "2026-06-30",
         body: [
           { type: "p", content: "Jenvu AI is a chart-aware TradingView extension. It analyses market structure, liquidity and bias using institutional ICT (Inner Circle Trader) and SMC (Smart Money Concepts) frameworks, then returns a clear answer with marked zones so you can see exactly what it sees." },
-          { type: "p", content: "Think of it as having a senior bullion-desk analyst on call 24/7: ask for a setup on XAU/USD, XAU/JPY or any other gold cross and Jenvu walks the chart aloud, points out the structure shifts, marks the liquidity it's hunting, and only delivers an entry when the confluence meets its A+ bar." },
+          { type: "p", content: "Think of it as having a senior bullion-desk analyst on call 24/7: ask for a setup on XAU/USD and Jenvu walks the chart aloud, points out the structure shifts, marks the liquidity it's hunting, and only delivers an entry when the confluence meets its A+ bar." },
 
           { type: "h2", content: "What you can do with Jenvu" },
           { type: "ul", items: [
@@ -69,7 +69,7 @@ export const collections: Collection[] = [
           { type: "ul", items: [
             "Read 'How do I create an account?' to set up your profile.",
             "Open 'Generate your first signal' for a 3-click walkthrough.",
-            "Browse 'Which assets does Jenvu support?' for the full instrument list.",
+            "Read 'Which asset does Jenvu support?' for details about its XAU/USD-only focus.",
           ]},
         ],
       },
@@ -133,11 +133,11 @@ export const collections: Collection[] = [
       },
       {
         slug: "supported-assets",
-        title: "Which assets does Jenvu support?",
+        title: "Which asset does Jenvu support?",
         summary: "Gold only — XAU/USD, nothing else.",
         updatedAt: "2026-06-30",
         body: [
-          { type: "p", content: "Jenvu is a dedicated gold desk. The analysis engine is tuned for bullion — London fix mechanics, DXY correlation, COMEX/COT positioning and central-bank buying flows — and it refuses to trade anything that isn't gold." },
+          { type: "p", content: "Jenvu is a dedicated XAU/USD desk. The analysis engine is tuned specifically for Gold versus U.S. Dollar — including London fix mechanics, DXY correlation, COMEX/COT positioning and central-bank buying flows — and it refuses to analyze any other pair." },
 
           { type: "h2", content: "Supported instruments" },
           { type: "h3", content: "Gold" },
@@ -221,7 +221,7 @@ export const collections: Collection[] = [
           { type: "p", content: "Jenvu understands natural language — you don't need fixed phrases. These examples are a good starting point and cover the most common workflows." },
 
           { type: "h2", content: "Analysis & setups" },
-          { type: "code", content: "“Analyze XAU/USD.”\n“Give me an A+ setup on gold in euros.”\n“What's the bias on XAU/JPY right now?”\n“Walk me through the 15-minute structure on XAU/GBP.”" },
+          { type: "code", content: "“Analyze XAU/USD.”\n“Give me an A+ setup on gold.”\n“What's the XAU/USD bias right now?”\n“Walk me through the 15-minute XAU/USD structure.”" },
 
           { type: "h2", content: "Risk & news" },
           { type: "code", content: "“Is it safe to trade NFP today?”\n“Any high-impact news in the next hour?”\n“What killzone are we in?”" },
@@ -298,7 +298,7 @@ export const collections: Collection[] = [
         summary: "You'll see a MARKET CLOSED badge — no live entries are issued.",
         updatedAt: "2026-06-30",
         body: [
-          { type: "p", content: "Spot gold follows the OTC bullion week — Sunday open in Sydney through Friday New York close, with a daily 60-minute settlement break. When you ask for a gold cross outside its trading window, Jenvu detects it and adapts." },
+          { type: "p", content: "XAU/USD follows the OTC bullion week — Sunday open in Sydney through Friday New York close, with a daily 60-minute settlement break. When you request analysis outside its trading window, Jenvu detects it and adapts." },
 
           { type: "h2", content: "What you'll see" },
           { type: "ul", items: [

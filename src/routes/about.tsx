@@ -35,7 +35,7 @@ function AboutPage() {
         <UL>
           <li><b>Chart-first</b> — analyze the active TradingView chart without changing workflows.</li>
           <li><b>Institutional playbook</b> — ICT, SMC, killzones, liquidity, OTE.</li>
-          <li><b>Gold specialist</b> — every XAU cross (USD, EUR, GBP, JPY, AUD, CHF) from one bullion engine.</li>
+          <li><b>XAU/USD specialist</b> — one dedicated bullion market, tuned deeply instead of spread across unrelated pairs.</li>
           <li><b>Honest output</b> — when conditions are bad, the analysis says "wait".</li>
         </UL>
       </section>

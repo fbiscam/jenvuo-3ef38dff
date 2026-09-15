@@ -581,7 +581,7 @@ function AlertPrefs() {
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h2 className="text-base font-semibold text-black normal-case pl-3">&nbsp;Recent alerts</h2>
-            <p className="mt-1 text-sm text-zinc-500">Live A+ setups across all pairs & coins. Updates in realtime.</p>
+            <p className="mt-1 text-sm text-zinc-500">Live A+ setups for XAU/USD. Updates in realtime.</p>
           </div>
           <div className="flex items-center gap-2 self-start sm:self-auto">
             {alertsOn !== null && (
@@ -613,7 +613,7 @@ function AlertPrefs() {
               onChange={(e) => setPairFilter(e.target.value)}
               className="rounded-md border border-zinc-200 bg-white px-2 py-1 text-xs text-zinc-700"
             >
-              <option value="ALL">All pairs</option>
+              <option value="ALL">XAU/USD only</option>
               {Array.from(new Set(alerts.map((a) => a.pair))).map((p) => (
                 <option key={p} value={p}>{p}</option>
               ))}

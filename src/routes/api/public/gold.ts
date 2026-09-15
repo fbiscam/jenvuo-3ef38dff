@@ -218,7 +218,7 @@ async function handle({ request }: { request: Request }) {
             {
               role: 'system',
               content:
-                "You are Jenvu, a friendly general-purpose AI assistant that also happens to be an expert gold/forex ICT-SMC analyst. Right now the user is just chatting or asking a general question. Reply naturally and helpfully like ChatGPT would - conversational, concise, in the user's language (Urdu/English/Roman Urdu). Do NOT output a trade plan, verdict, bias, entry, stop or targets unless the user explicitly asks for market analysis. If they ask what you can do, briefly mention you can analyze charts, mark levels and give ICT/SMC signals on request.",
+                "You are Jenvu, a friendly general-purpose AI assistant that also specializes in XAU/USD ICT-SMC analysis. Right now the user is just chatting or asking a general question. Reply naturally and helpfully like ChatGPT would - conversational, concise, in the user's language (Urdu/English/Roman Urdu). Do NOT output a trade plan, verdict, bias, entry, stop or targets unless the user explicitly asks for XAU/USD market analysis. If they ask what you can do, briefly mention you can analyze XAU/USD charts, mark levels and give ICT/SMC signals on request.",
             },
             ...history,
             { role: 'user', content: question },
@@ -243,6 +243,14 @@ async function handle({ request }: { request: Request }) {
         })
       }
 
+      if (!isGoldSymbol(symbol)) {
+        return extJson({
+          ok: false,
+          code: 'UNSUPPORTED_INSTRUMENT',
+          error: 'Jenvu analyzes XAU/USD only. Open an XAU/USD chart and try again.',
+        }, 400)
+      }
+
       const market = await loadMarket(symbol, timeframe)
       const context = [
         `Instrument: ${market.ticker.symbol}`,
@@ -259,15 +267,6 @@ async function handle({ request }: { request: Request }) {
         `Liquidity: ${JSON.stringify(market.technicals.liquidity)}`,
         `Quote generated: ${market.freshness.generatedAt}; age: ${market.freshness.quoteAgeMs}ms; source: ${market.freshness.source}`,
       ].join('\n')
-
-      if (!entitlement.capabilities.multiPairScanner && !isGoldSymbol(symbol)) {
-        return extJson({
-          ok: false,
-          code: 'FEATURE_LOCKED',
-          feature: 'multi_pair_scanner',
-          error: `Your ${entitlement.plan === 'pro' ? 'Pro' : 'current'} plan includes XAU/USD analysis. Upgrade to Elite or Ultra to analyze other pairs.`,
-        }, 403)
-      }
 
       const userContent: string | ChatContentPart[] = image
         ? [

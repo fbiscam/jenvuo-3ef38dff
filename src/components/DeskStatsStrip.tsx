@@ -25,7 +25,6 @@ export function DeskStatsStrip() {
 
   const dayAgo = Date.now() - 24 * 3600 * 1000;
   const last24 = rows.filter((r) => new Date(r.fired_at).getTime() >= dayAgo);
-  const uniquePairs = new Set(rows.map((r) => r.pair)).size;
   const avgConf =
     rows.length > 0
       ? Math.round(
@@ -45,7 +44,7 @@ export function DeskStatsStrip() {
 
   const items = [
     { icon: Activity, label: "Signals · 24h", value: String(last24.length) },
-    { icon: Layers, label: "Pairs active", value: uniquePairs ? `${uniquePairs} / 6` : "—" },
+    { icon: Layers, label: "Market focus", value: "XAU/USD" },
     {
       icon: Target,
       label: "Avg confidence",
