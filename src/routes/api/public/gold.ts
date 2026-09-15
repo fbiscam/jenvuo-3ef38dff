@@ -333,7 +333,7 @@ async function handle({ request }: { request: Request }) {
         freshness: market.freshness,
         overlayMarks: [...market.marks, ...desk.marks],
         marksBias: desk.bias.toLowerCase(),
-        analysisModels: { primary: primaryModel, engine: RULES_PRIMARY_MODEL, senior: null },
+        analysisModels: { primary: primaryModel, engine: RULES_PRIMARY_MODEL, senior: seniorModel || null },
         seniorReview,
         secondReview,
         usage: { requestId, charged: billing.charged, balance: billing.balance },
