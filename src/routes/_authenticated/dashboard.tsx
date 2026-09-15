@@ -37,7 +37,7 @@ import {
   Tag, ArrowUpRight, ArrowRight, CheckCircle2, Calendar, RefreshCw, Gift, PieChart,
   ChevronsLeft, ChevronsRight, Menu, X, Sparkles, LayoutGrid, LifeBuoy, Lightbulb,
   ChevronLeft, ChevronRight, Info, Settings2,
-  LayoutDashboard, ChartNoAxesCombined, Puzzle, BadgeDollarSign, FileCheck2,
+  LayoutDashboard, ChartNoAxesCombined, MessageSquare, Puzzle, BadgeDollarSign, FileCheck2,
   LockKeyhole, CircleHelp, Bot, Boxes, ScanSearch, ShieldCheckIcon, type LucideIcon,
 } from "lucide-react";
 import {
@@ -95,6 +95,7 @@ const NAV_GROUPS: Array<{ label: string; items: TabItem[] }> = [
   {
     label: "",
     items: [
+      { to: "/dashboard/chat", label: "Chat", icon: MessageSquare },
       { to: "/dashboard/usage", label: "Usage", icon: ChartNoAxesCombined },
     ],
   },
