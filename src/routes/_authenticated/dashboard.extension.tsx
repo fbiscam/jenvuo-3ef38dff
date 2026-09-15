@@ -112,13 +112,34 @@ function ExtensionPage() {
 
   const copyValue = async (value: string, id: string) => {
     try {
-      await navigator.clipboard.writeText(value);
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(value);
+      } else {
+        const textarea = document.createElement("textarea");
+        textarea.value = value;
+        textarea.style.position = "fixed";
+        textarea.style.opacity = "0";
+        document.body.appendChild(textarea);
+        textarea.select();
+        const copiedSuccessfully = document.execCommand("copy");
+        textarea.remove();
+        if (!copiedSuccessfully) throw new Error("Clipboard unavailable");
+      }
       setCopied(id);
-      toast.success("Copied");
+      toast.success("Full API key copied");
       setTimeout(() => setCopied(null), 1800);
     } catch {
       toast.error("Copy failed");
     }
+  };
+
+  const copyListedKey = async (key: ExtensionKeyRow) => {
+    if (freshKey?.startsWith(key.key_prefix)) {
+      await copyValue(freshKey, key.id);
+      return;
+    }
+
+    toast.error("For security, older full keys cannot be shown again. Create a new key to copy it.");
   };
 
   const onDownload = async () => {
@@ -263,9 +284,9 @@ function ExtensionPage() {
                   <code className={`${MONO} min-w-0 flex-1 truncate text-[12px] text-zinc-900`}>{k.key_prefix}••••••••••</code>
                   <button
                     type="button"
-                    title="Copy visible key prefix"
-                    aria-label={`Copy visible prefix for ${k.name}`}
-                    onClick={() => copyValue(k.key_prefix, k.id)}
+                     title={freshKey?.startsWith(k.key_prefix) ? "Copy full API key" : "Full key is no longer available"}
+                     aria-label={`Copy full API key for ${k.name}`}
+                     onClick={() => void copyListedKey(k)}
                     className="shrink-0 rounded p-1 text-zinc-500 hover:bg-white hover:text-zinc-900"
                   >
                     {copied === k.id ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
