@@ -74,4 +74,5 @@
 - [x] Make extension XAU/USD analysis and senior validation fully deterministic and model-independent
 - [x] Rebuild and verify the model-independent extension package
 - [x] Require a completed Claude primary review with multiple OmniRoute Claude fallbacks
-- [x] Switch primary ICT analysis to Browser Use GPT-6 Astra with Claude Fable 5 fallback and keep chat on fast OmniRoute
+- [ ] Activate Browser Use GPT-6 Astra with Claude Fable 5 fallback (routing is ready; blocked because all three Browser Use accounts are on free plans)
+- [x] Keep ordinary extension chat on fast OmniRoute routes

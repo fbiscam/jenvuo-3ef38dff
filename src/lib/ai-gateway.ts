@@ -249,6 +249,12 @@ async function callBrowserUseWithKey(
           402,
           true,
         );
+      if (runResponse.status === 403 && /not available on the free plan|buy credits/i.test(detail))
+        throw new AiGatewayError(
+          "Browser Use credits are required for GPT-6 Astra and Claude Fable 5.",
+          403,
+          true,
+        );
       if (runResponse.status === 401 || runResponse.status === 403)
         throw new AiGatewayError(
           "AI key rejected. Please contact support.",
