@@ -222,8 +222,7 @@ async function handle({ request }: { request: Request }) {
         h1: market.hourly,
         h4: market.fourHourly,
         livePrice: market.ticker.price,
-        // Primary review only — no senior pass in this pipeline.
-        seniorReview: false,
+        seniorReview: entitlement.seniorReview,
       })
 
       // Primary market-structure review is mandatory. OmniRoute tries each
