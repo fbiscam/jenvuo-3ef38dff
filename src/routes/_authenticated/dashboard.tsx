@@ -1521,6 +1521,7 @@ const PRODUCT_UPDATES = [
     age: "Updated",
     title: "  Provider fallback",
     copy: "Analysis continues through another provider when an AI account is unavailable.",
+    time: "12 Sep 2026 · 11:20",
     icon: RefreshCw,
   },
 ] as const;
