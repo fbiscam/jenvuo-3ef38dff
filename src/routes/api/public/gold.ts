@@ -130,7 +130,7 @@ async function handle({ request }: { request: Request }) {
       const { getExtensionEntitlement } = await import('@/lib/extension-billing.server')
       const entitlement = await getExtensionEntitlement(auth.userId)
       if (!entitlement.allowed) return extJson({ ok: false, error: entitlement.error, code: entitlement.status === 402 ? 'LOW_BALANCE' : 'PLAN_REQUIRED', balance: entitlement.balance }, entitlement.status)
-      const requiresSeniorReview = entitlement.seniorReview
+      // Senior review is intentionally disabled: primary Claude review only.
       const question = String(body.question || '').slice(0, 2000)
       if (!question) return extJson({ ok: false, error: 'Question is empty.' }, 400)
 
