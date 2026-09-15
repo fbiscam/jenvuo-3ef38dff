@@ -1018,39 +1018,29 @@ export const MODEL_CHAIN = {
 
 } as const;
 
-// Extension chains — Gemini only. Gemini 3.7 Flash High and Medium were the
-// only candidates to pass every concurrent live probe; the Pro and 3.8 routes
-// remain excluded because they intermittently exhausted the response window.
-const EXTENSION_GEMINI_RELIABLE = [
-  "omniroute/agy/gemini-3.7-flash-high",
+// Ordinary extension conversation stays on OmniRoute's low-latency routes.
+// Analysis is intentionally kept off this chain and uses Browser Use below.
+const EXTENSION_FAST_CHAT = [
+  "omniroute/auto/best-fast",
   "omniroute/agy/gemini-3.7-flash-medium",
-  "omniroute/auto/gemini",
+  "omniroute/auto/best-chat",
 ] as const;
 
-// Mandatory primary market-structure review runs on OmniRoute Claude.
-// Each verified route is attempted in order; callers must not return an
-// unreviewed analysis when the whole chain is unavailable.
-const EXTENSION_CLAUDE_PRIMARY = [
-  "omniroute/auto/claude-opus",
-  "omniroute/auto/claude-sonnet",
-  "omniroute/agy/claude-sonnet-4-6",
+// Browser Use performs the mandatory primary market-structure review.
+// GPT-6 Astra is primary and Claude Fable 5 is the sole model fallback;
+// account-key fallback is handled independently by callBrowserUse().
+const EXTENSION_BROWSER_PRIMARY = [
+  "browseruse/gpt-6-astra",
+  "browseruse/claude-fable-5",
 ] as const;
 
 export const EXTENSION_MODEL_CHAIN = {
-  conversation: [...EXTENSION_GEMINI_RELIABLE],
-  reasoning: [...EXTENSION_CLAUDE_PRIMARY],
-  vision: [...EXTENSION_CLAUDE_PRIMARY],
-  seniorReview: [
-    "omniroute/agy/gemini-3.7-flash-medium",
-    "omniroute/agy/gemini-3.7-flash-high",
-    "omniroute/auto/gemini",
-  ],
+  conversation: [...EXTENSION_FAST_CHAT],
+  reasoning: [...EXTENSION_BROWSER_PRIMARY],
+  vision: [...EXTENSION_BROWSER_PRIMARY],
+  seniorReview: [],
   // Alias retained for callers that identify the senior pass as review #2.
-  secondReview: [
-    "omniroute/agy/gemini-3.7-flash-medium",
-    "omniroute/agy/gemini-3.7-flash-high",
-    "omniroute/auto/gemini",
-  ],
+  secondReview: [],
 } as const;
 
 export const MACRO_CONTEXT_CHAIN = WORKING_BMIND;

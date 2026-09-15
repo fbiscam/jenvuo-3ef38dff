@@ -130,7 +130,7 @@ async function handle({ request }: { request: Request }) {
       const { getExtensionEntitlement } = await import('@/lib/extension-billing.server')
       const entitlement = await getExtensionEntitlement(auth.userId)
       if (!entitlement.allowed) return extJson({ ok: false, error: entitlement.error, code: entitlement.status === 402 ? 'LOW_BALANCE' : 'PLAN_REQUIRED', balance: entitlement.balance }, entitlement.status)
-      // Senior review is intentionally disabled: primary Claude review only.
+      // Senior review is intentionally disabled: one mandatory primary review only.
       const question = String(body.question || '').slice(0, 2000)
       if (!question) return extJson({ ok: false, error: 'Question is empty.' }, 400)
 
@@ -152,7 +152,7 @@ async function handle({ request }: { request: Request }) {
 
       // Conversational mode: plain questions/greetings get a normal assistant
       // reply. Only explicit trading/analysis intent (or an attached chart)
-      // triggers the ICT/SMC desk pipeline with mandatory Claude primary review.
+      // triggers the ICT/SMC desk pipeline with mandatory Browser Use primary review.
       const analysisIntent =
         /\b(analy[sz]|signal|setup|trade|entry|exit|buy|sell|long|short|bias|tp\d?|sl|stop\s*loss|target|rr|risk|chart|candle|structure|bos|choch|fvg|order\s*block|liquidity|premium|discount|support|resistance|trend|price|market|xau|gold|forex|pair|timeframe|scalp|swing|position)\b/i.test(question) ||
         /(tajzia|tajziya|signal|kharid|bech|entry|nishan|marking)/i.test(question)
@@ -226,29 +226,35 @@ async function handle({ request }: { request: Request }) {
         seniorReview: false,
       })
 
-      // Primary market-structure review is mandatory. OmniRoute tries each
-      // verified Claude route in order; an unreviewed result is never returned.
+      // Primary market-structure review is mandatory. Browser Use tries GPT-6
+      // Astra first, then Claude Fable 5; an unreviewed result is never returned.
       let analysisText = ''
       let primaryModel = ''
       let primaryUsage = { promptTokens: 0, completionTokens: 0 }
       try {
+        const primaryPrompt = `User request: ${question}\n\nLive price: ${market.ticker.price}\nTimeframe: ${timeframe}\n\nICT/SMC engine report:\n${desk.text}`
         const primary = await callChatCompletion({
-          models: [...EXTENSION_MODEL_CHAIN.reasoning],
+          models: [...(image ? EXTENSION_MODEL_CHAIN.vision : EXTENSION_MODEL_CHAIN.reasoning)],
           stage: 'extension-primary-review',
           maxTokens: 900,
-          timeoutMs: 20_000,
-          deadlineMs: 55_000,
+          timeoutMs: 65_000,
+          deadlineMs: 135_000,
           retriesPerModel: 1,
           messages: [
             {
               role: 'system',
               content:
-                'You are Jenvu, a 25+ year ICT/SMC XAU/USD desk analyst. You receive a deterministic ICT/SMC engine report computed from live OHLCV. Review the market structure it describes (BOS/CHoCH, liquidity, premium/discount, OB/FVG, killzone) and write the final primary analysis. Never invent price levels: use only the numbers given. Keep the verdict, entry, stop and targets consistent with the report unless the structure clearly contradicts it — then say so and downgrade to WAIT. Answer in the user\'s language, concise and desk-style.',
+                'You are Jenvu, a 25+ year ICT/SMC XAU/USD desk analyst. You receive a deterministic ICT/SMC engine report computed from live OHLCV and may receive the user\'s chart image. Review BOS/CHoCH, liquidity, premium/discount, OB/FVG and killzone context, then write the final primary analysis. Never invent price levels: use only numbers in the engine report. Keep the verdict, entry, stop and targets consistent with the report unless structure clearly contradicts it — then downgrade to WAIT. Answer in the user\'s language, concise and desk-style.',
             },
             ...history,
             {
               role: 'user',
-              content: `User request: ${question}\n\nLive price: ${market.ticker.price}\nTimeframe: ${timeframe}\n\nICT/SMC engine report:\n${desk.text}`,
+              content: image
+                ? [
+                    { type: 'text', text: primaryPrompt },
+                    { type: 'image_url', image_url: { url: image, detail: 'high' } },
+                  ]
+                : primaryPrompt,
             },
           ],
         })
@@ -256,7 +262,7 @@ async function handle({ request }: { request: Request }) {
           return extJson({
             ok: false,
             code: 'PRIMARY_REVIEW_UNAVAILABLE',
-            error: 'Claude primary review could not complete. Please retry in a moment.',
+            error: 'Primary market review could not complete. Please retry in a moment.',
           }, 503)
         }
         analysisText = primary.content.trim()
@@ -266,7 +272,7 @@ async function handle({ request }: { request: Request }) {
         return extJson({
           ok: false,
           code: 'PRIMARY_REVIEW_UNAVAILABLE',
-          error: 'Claude primary review is temporarily unavailable after trying all fallback models. Please retry in a moment.',
+          error: 'Primary market review is temporarily unavailable after trying Astra and Claude Fable. Please retry in a moment.',
         }, 503)
       }
 
