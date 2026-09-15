@@ -982,12 +982,16 @@ const WORKING_BMIND = [
   "omniroute/auto/best-chat",
 ] as const;
 
+// Load-tested (4 concurrent requests each): claude-sonnet-4-6 12s / opus 13s /
+// gemini-3.7-flash-medium 20s / best-chat 29s all 4x HTTP 200, while
+// auto/best-fast dropped one request ("server busy") — so best-fast is last.
 const FAST_NARRATION_BMIND = [
-  "omniroute/auto/best-fast",
-  "omniroute/auto/best-chat",
+  "omniroute/agy/claude-sonnet-4-6",
   "omniroute/agy/gemini-3.7-flash-medium",
-  "omniroute/auto/best-reasoning",
+  "omniroute/auto/best-chat",
+  "omniroute/auto/best-fast",
 ] as const;
+
 
 const SENIOR_REVIEW_BMIND_4O = [
   "omniroute/auto/claude-opus",
@@ -1004,12 +1008,13 @@ export const MODEL_CHAIN = {
   seniorReview: SENIOR_REVIEW_BMIND_4O,
   macroContext: WORKING_BMIND,
   chat: [
-    "omniroute/auto/best-fast",
+    "omniroute/agy/claude-sonnet-4-6",
     "omniroute/agy/gemini-3.7-flash-medium",
-    "omniroute/auto/claude-sonnet",
     "omniroute/auto/best-chat",
-    "omniroute/auto/best-reasoning",
+    "omniroute/auto/claude-sonnet",
+    "omniroute/auto/best-fast",
   ] as const,
+
 } as const;
 
 // Extension chains — OmniRoute only, top models first, then verified
@@ -1017,11 +1022,13 @@ export const MODEL_CHAIN = {
 // answering model instead of failing the whole request.
 export const EXTENSION_MODEL_CHAIN = {
   conversation: [
-    "omniroute/auto/best-fast",
+    "omniroute/agy/claude-sonnet-4-6",
     "omniroute/agy/gemini-3.7-flash-medium",
-    "omniroute/auto/claude-sonnet",
     "omniroute/auto/best-chat",
+    "omniroute/auto/claude-sonnet",
+    "omniroute/auto/best-fast",
   ],
+
   reasoning: [
     "omniroute/auto/best-reasoning",
     "omniroute/auto/claude-opus",
