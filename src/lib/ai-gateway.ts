@@ -971,29 +971,24 @@ export function setCachedPlan<T>(key: string, value: T, ttlMs: number = PLAN_CAC
 // TTLs: 15 min for "model_not_found" (not provisioned), 5 min for flaky
 // upstream. If every candidate is cooling, we still try the whole chain.
 
+// OmniRoute is the ONLY provider in use. Every chain below resolves through
+// CUSTOM_AI_BASE_URL and uses OmniRoute's strongest automatic routes.
 const WORKING_BMIND = [
   "omniroute/auto/best-reasoning",
-  "unorouter/nemotron-3-ultra-550b-a55b:free",
-  "unorouter/glm-5.3:free",
-  "bmind/gpt-4o",
+  "omniroute/auto/claude-opus",
+  "omniroute/auto/best-chat",
 ] as const;
 
 const FAST_NARRATION_BMIND = [
   "omniroute/auto/best-fast",
-  "unorouter/glm-5.3:free",
-  "unorouter/nemotron-3-ultra-550b-a55b:free",
-  "bmind/gpt-4o",
+  "omniroute/auto/best-chat",
+  "omniroute/auto/best-reasoning",
 ] as const;
 
 const SENIOR_REVIEW_BMIND_4O = [
   "omniroute/auto/claude-opus",
-  "evolink/claude-opus-5",
-  "browseruse/claude-fable-5",
-  "jw/gpt-5.6-sol",
-  "jw/gpt-5.6-terra",
-  "unorouter/nemotron-3-ultra-550b-a55b:free",
-  "unorouter/glm-5.3:free",
-  "bmind/gpt-4o",
+  "omniroute/auto/best-reasoning",
+  "omniroute/auto/best-chat",
 ] as const;
 
 export const MODEL_CHAIN = {
@@ -1001,36 +996,27 @@ export const MODEL_CHAIN = {
   narration: FAST_NARRATION_BMIND,
   seniorReview: SENIOR_REVIEW_BMIND_4O,
   macroContext: WORKING_BMIND,
-  chat: ["omniroute/auto/best-chat", "browseruse/gpt-6-astra", "jw/gpt-5.6-sol", ...WORKING_BMIND] as const,
+  chat: ["omniroute/auto/best-chat", "omniroute/auto/best-fast", "omniroute/auto/best-reasoning"] as const,
 } as const;
 
-// Extension calls are intentionally isolated from the shared model chains.
-// Free UnoRouter models handle ordinary conversation. Trading/chart analysis
-// uses GPT-6 Astra first and Claude Fable 5 as its only fallback/reviewer.
+// Extension chains — OmniRoute only, top models for analysis and review.
 export const EXTENSION_MODEL_CHAIN = {
-  // OmniRoute's tested automatic routes lead each workload, with the
-  // previous providers retained as fallbacks.
   conversation: [
-    "unorouter/glm-5.3:free",
-    "bmind/openai/gpt-oss-20b",
+    "omniroute/auto/best-chat",
     "omniroute/auto/best-fast",
   ],
   reasoning: [
-    "bmind/openai/gpt-oss-20b",
     "omniroute/auto/best-reasoning",
     "omniroute/auto/claude-opus",
-    "unikey/claude-opus-4-8",
-    "browseruse/gpt-6-astra",
   ],
   vision: [
     "omniroute/auto/best-vision",
-    "browseruse/gpt-6-astra",
-    "bmind/openai/gpt-oss-20b",
-    "unikey/claude-opus-4-8",
+    "omniroute/auto/best-reasoning",
+    "omniroute/auto/claude-opus",
   ],
-  seniorReview: ["bmind/openai/gpt-oss-20b", "unorouter/glm-5.3:free", "omniroute/auto/claude-opus", "unikey/claude-opus-4-8", "browseruse/claude-fable-5"],
+  seniorReview: ["omniroute/auto/claude-opus", "omniroute/auto/best-reasoning"],
   // Alias retained for callers that identify the senior pass as review #2.
-  secondReview: ["bmind/openai/gpt-oss-20b", "unorouter/glm-5.3:free", "omniroute/auto/claude-opus", "unikey/claude-opus-4-8", "browseruse/claude-fable-5"],
+  secondReview: ["omniroute/auto/claude-opus", "omniroute/auto/best-reasoning"],
 } as const;
 
 export const MACRO_CONTEXT_CHAIN = WORKING_BMIND;
