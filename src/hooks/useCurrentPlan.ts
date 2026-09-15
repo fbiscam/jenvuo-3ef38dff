@@ -13,11 +13,13 @@ export function useCurrentPlan() {
       }
       const { data } = await supabase
         .from("user_subscriptions")
-        .select("plan_id, status")
+        .select("plan_id, status, is_trial, trial_ends_at, current_period_end")
         .eq("user_id", u.user.id)
         .maybeSingle();
       if (!mounted) return;
-      if (data && (data.status === "active" || data.status === "trialing")) setPlan(data.plan_id);
+      const expiry = data?.trial_ends_at || data?.current_period_end;
+      const trialValid = !data?.is_trial || (Boolean(expiry) && new Date(expiry as string).getTime() > Date.now());
+      if (data && (data.status === "active" || data.status === "trialing") && trialValid) setPlan(data.plan_id);
       else setPlan(null);
     };
     load();

@@ -47,8 +47,10 @@ export async function authenticateExtensionRequest(request: Request): Promise<Ex
   if (!data) return { ok: false, status: 401, error: 'Invalid API key.' }
   if (data.revoked_at) return { ok: false, status: 401, error: 'This API key was revoked.' }
 
-  const { data: sub } = await admin.from('user_subscriptions').select('plan_id,status').eq('user_id', data.user_id).maybeSingle()
-  const active = Boolean(sub && (sub.status === 'active' || sub.status === 'trialing'))
+  const { data: sub } = await admin.from('user_subscriptions').select('plan_id,status,is_trial,trial_ends_at,current_period_end').eq('user_id', data.user_id).maybeSingle()
+  const expiry = sub?.trial_ends_at || sub?.current_period_end
+  const trialValid = !sub?.is_trial || (Boolean(expiry) && new Date(expiry).getTime() > Date.now())
+  const active = Boolean(sub && (sub.status === 'active' || sub.status === 'trialing') && trialValid)
   const planId = active ? String(sub.plan_id || 'free') : 'free'
   const { data: plan } = await admin.from('plans').select('extension_key_limit').eq('id', planId).maybeSingle()
   const keyLimit = Number(plan?.extension_key_limit ?? 0)

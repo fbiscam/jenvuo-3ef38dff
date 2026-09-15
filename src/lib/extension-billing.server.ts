@@ -13,10 +13,12 @@ export async function getExtensionEntitlement(userId: string) {
   const { supabaseAdmin } = await import('@/integrations/supabase/client.server')
   const admin = supabaseAdmin as any
   const [{ data: sub }, { data: bal }] = await Promise.all([
-    admin.from('user_subscriptions').select('plan_id,status').eq('user_id', userId).maybeSingle(),
+    admin.from('user_subscriptions').select('plan_id,status,is_trial,trial_ends_at,current_period_end').eq('user_id', userId).maybeSingle(),
     admin.from('credit_balances').select('balance').eq('user_id', userId).maybeSingle(),
   ])
-  const active = Boolean(sub && (sub.status === 'active' || sub.status === 'trialing'))
+  const expiry = sub?.trial_ends_at || sub?.current_period_end
+  const trialValid = !sub?.is_trial || (Boolean(expiry) && new Date(expiry).getTime() > Date.now())
+  const active = Boolean(sub && (sub.status === 'active' || sub.status === 'trialing') && trialValid)
   const planId = active ? String(sub.plan_id || 'free') : 'free'
   const { data: plan } = await admin.from('plans').select('wallet_usd,extension_key_limit').eq('id', planId).maybeSingle()
   const keyLimit = Number(plan?.extension_key_limit ?? 0)

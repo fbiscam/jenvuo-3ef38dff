@@ -103,6 +103,9 @@ export const DISPOSABLE_EMAIL_DOMAINS: ReadonlySet<string> = new Set([
   'getnada.com','nada.email','mohmal.com','tmailor.com','burnermail.io',
   'trashinbox.com','tempinbox.xyz','dropmail.me','spam4.me','disbox.net',
   'anonaddy.me','tempmail.ninja','emailfake.com','tempmailo.com','edu.sg',
+  '1secmail.com','1secmail.net','1secmail.org','dropmail.com','emailnator.com',
+  'generator.email','inboxes.com','mail.tm','mail.gw','minuteinbox.com',
+  'temp-mail.org','tempmail.plus','tempmail.dev','throwawaymail.com','yopmail.guru',
 ]);
 
 /** Returns true when the email's domain looks like a throwaway provider. */

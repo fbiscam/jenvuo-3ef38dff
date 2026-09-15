@@ -133,6 +133,7 @@ async function findUserByEmail(email: string): Promise<User | null> {
 const SIGNUP_IP_LIMIT_PER_HOUR = 5
 const SIGNUP_DOMAIN_LIMIT_PER_HOUR = 20
 const MAX_ACCOUNTS_PER_DEVICE = 2
+const MAX_ACCOUNTS_PER_IP = 3
 
 // Public email providers — skip domain-level rate limit (millions of legit users share these).
 // Abuse from these is caught by device fingerprint + IP caps instead.
@@ -146,24 +147,35 @@ const PUBLIC_EMAIL_PROVIDERS = new Set([
   'fastmail.com', 'tutanota.com', 'hey.com',
 ])
 
-async function assertDeviceUnderCap(_ip: string | undefined, fingerprint: string | undefined) {
-  // Only enforce the hard cap by browser fingerprint. IP addresses are shared by
-  // families, offices, co-working spaces, and mobile carrier CGNAT — capping on
-  // IP would lock out legitimate users. Abuse from a single IP is still throttled
-  // by SIGNUP_IP_LIMIT_PER_HOUR above.
-  if (!fingerprint) return
-  const { supabaseAdmin } = await import('@/integrations/supabase/client.server')
-  const admin = supabaseAdmin as any
-  const { count } = await admin
-    .from('account_devices')
-    .select('user_id', { count: 'exact', head: true })
-    .eq('fingerprint', fingerprint)
-  if (typeof count === 'number' && count >= MAX_ACCOUNTS_PER_DEVICE) {
-    throw new Error('This device already has the maximum number of accounts. Please sign in to your existing account.')
+function assertSignupSignals(input: { country?: string; fingerprint?: string; userAgent?: string }) {
+  if (input.country === 'PK') throw new Error('New account creation is not available in your region.')
+  if (!input.fingerprint || input.fingerprint.length < 32) throw new Error('Device verification failed. Refresh the page and try again.')
+  const userAgent = (input.userAgent || '').trim()
+  if (userAgent.length < 10 || /^(curl|wget|python-requests|postmanruntime|insomnia)\b/i.test(userAgent)) {
+    throw new Error('This browser could not be verified. Please use a current web browser.')
   }
 }
 
-export async function createSignupOtp(input: { email: string; password: string; fullName: string; siteUrl?: string; ip?: string; fingerprint?: string; userAgent?: string }) {
+async function assertDeviceUnderCap(ip: string | undefined, fingerprint: string) {
+  const { supabaseAdmin } = await import('@/integrations/supabase/client.server')
+  const admin = supabaseAdmin as any
+  const { data: deviceRows } = await admin
+    .from('account_devices')
+    .select('user_id')
+    .eq('fingerprint', fingerprint)
+  const deviceAccounts = new Set((deviceRows ?? []).map((row: { user_id: string }) => row.user_id)).size
+  if (deviceAccounts >= MAX_ACCOUNTS_PER_DEVICE) {
+    throw new Error('This device already has the maximum number of accounts. Please sign in to your existing account.')
+  }
+  const normalizedIp = (ip || '').trim().slice(0, 100)
+  if (normalizedIp) {
+    const { data: ipRows } = await admin.from('account_devices').select('user_id').eq('ip', normalizedIp)
+    const ipAccounts = new Set((ipRows ?? []).map((row: { user_id: string }) => row.user_id)).size
+    if (ipAccounts >= MAX_ACCOUNTS_PER_IP) throw new Error('This network already has the maximum number of accounts. Please sign in to an existing account.')
+  }
+}
+
+export async function createSignupOtp(input: { email: string; password: string; fullName: string; siteUrl?: string; ip?: string; country?: string; fingerprint: string; userAgent?: string }) {
   const { supabaseAdmin } = await import('@/integrations/supabase/client.server')
   const email = normalizeEmail(input.email)
 
@@ -173,7 +185,7 @@ export async function createSignupOtp(input: { email: string; password: string; 
     throw new Error('Disposable email addresses are not allowed. Please use a permanent email.')
   }
 
-  // 2. Hard cap: max N confirmed accounts per IP or device fingerprint.
+  assertSignupSignals(input)
   await assertDeviceUnderCap(input.ip, input.fingerprint)
 
   // 3. Per-email-domain rate limit: skipped for public providers (gmail/yahoo/etc.);
@@ -203,7 +215,7 @@ export async function createSignupOtp(input: { email: string; password: string; 
       throw new Error('Too many signup attempts from your network. Please try again in an hour.')
     }
     try {
-      await (supabaseAdmin as any).from('signup_attempts').insert({ ip, email })
+      await (supabaseAdmin as any).from('signup_attempts').insert({ ip, email, country: input.country || null })
     } catch { /* logging failure must not block signup */ }
   }
 
@@ -266,7 +278,7 @@ export async function createRecoveryOtp(input: { email: string; siteUrl?: string
 
 
 
-export async function verifySignupOtp(input: { email: string; code: string; password: string; ip?: string; fingerprint?: string; userAgent?: string }): Promise<CustomAuthResult> {
+export async function verifySignupOtp(input: { email: string; code: string; password: string; ip?: string; country?: string; fingerprint: string; userAgent?: string }): Promise<CustomAuthResult> {
   const email = normalizeEmail(input.email)
   const verified = await verifyCustomOtp(email, 'signup', input.code)
   if (!verified.ok) return { ok: false, error: verified.error }
@@ -282,6 +294,7 @@ export async function verifySignupOtp(input: { email: string; code: string; pass
 
   // Re-check device cap at the confirm step, in case someone tried to bypass the request step.
   try {
+    assertSignupSignals(input)
     await assertDeviceUnderCap(input.ip, input.fingerprint)
   } catch (e) {
     return { ok: false, error: e instanceof Error ? e.message : 'Signup not allowed on this device.' }

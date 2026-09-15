@@ -2741,18 +2741,21 @@ export type Database = {
       }
       signup_attempts: {
         Row: {
+          country: string | null
           created_at: string
           email: string | null
           id: string
           ip: string
         }
         Insert: {
+          country?: string | null
           created_at?: string
           email?: string | null
           id?: string
           ip: string
         }
         Update: {
+          country?: string | null
           created_at?: string
           email?: string | null
           id?: string
