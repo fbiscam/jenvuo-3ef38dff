@@ -3,13 +3,10 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
 import { callChatCompletion } from "@/lib/ai-gateway";
 
-// Use the strongest live-tested free UnoRouter writer first, with independent
-// providers retained so editorial work continues through free-tier congestion.
+// OmniRoute only: strongest writing/reasoning routes.
 const WRITER_CHAIN = [
-  "unorouter/nemotron-3-ultra-550b-a55b:free",
-  "unorouter/glm-5.3:free",
-  "bmind/gpt-4o",
-  "bmind/gpt-5.2-chat",
+  "omniroute/auto/best-chat",
+  "omniroute/auto/best-reasoning",
 ];
 
 async function assertAdmin(supabase: any, userId: string) {
