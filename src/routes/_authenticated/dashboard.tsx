@@ -1286,10 +1286,6 @@ function DashboardLayout() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authUser?.id, authLoading, refreshTick]);
 
-  if (pathname.startsWith("/chat")) {
-    return <Outlet />;
-  }
-
   return (
     <div
       className={`flex min-h-screen bg-white text-zinc-900 font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif] antialiased jenvu-zoom-dashboard`}
