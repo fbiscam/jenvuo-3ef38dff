@@ -105,7 +105,7 @@ function FounderPage() {
         </p>
         <ul className="grid gap-3 sm:grid-cols-2">
           {[
-            "Analyze every XAU cross-pair through one consistent engine",
+            "Analyze XAU/USD through one deeply specialized engine",
             "Narrate the setup in plain language so traders can trust it",
             "Only fire when bias, structure, liquidity and timing align",
             "Tell the truth when the market offers no clear edge",
