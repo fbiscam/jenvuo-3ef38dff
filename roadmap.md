@@ -73,3 +73,4 @@
 - [x] Move extension chat, chart analysis, and senior review to load-tested Gemini-only routes
 - [x] Make extension XAU/USD analysis and senior validation fully deterministic and model-independent
 - [x] Rebuild and verify the model-independent extension package
+- [x] Require a completed Claude primary review with multiple OmniRoute Claude fallbacks

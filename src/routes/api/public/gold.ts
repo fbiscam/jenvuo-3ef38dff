@@ -152,7 +152,7 @@ async function handle({ request }: { request: Request }) {
 
       // Conversational mode: plain questions/greetings get a normal assistant
       // reply. Only explicit trading/analysis intent (or an attached chart)
-      // triggers the ICT/SMC desk pipeline with senior review.
+      // triggers the ICT/SMC desk pipeline with mandatory Claude primary review.
       const analysisIntent =
         /\b(analy[sz]|signal|setup|trade|entry|exit|buy|sell|long|short|bias|tp\d?|sl|stop\s*loss|target|rr|risk|chart|candle|structure|bos|choch|fvg|order\s*block|liquidity|premium|discount|support|resistance|trend|price|market|xau|gold|forex|pair|timeframe|scalp|swing|position)\b/i.test(question) ||
         /(tajzia|tajziya|signal|kharid|bech|entry|nishan|marking)/i.test(question)
@@ -226,10 +226,10 @@ async function handle({ request }: { request: Request }) {
         seniorReview: false,
       })
 
-      // Primary market-structure review: OmniRoute Claude reads the
-      // deterministic ICT/SMC desk output and writes the final answer.
-      let analysisText = desk.text
-      let primaryModel = RULES_PRIMARY_MODEL
+      // Primary market-structure review is mandatory. OmniRoute tries each
+      // verified Claude route in order; an unreviewed result is never returned.
+      let analysisText = ''
+      let primaryModel = ''
       let primaryUsage = { promptTokens: 0, completionTokens: 0 }
       try {
         const primary = await callChatCompletion({
@@ -252,13 +252,22 @@ async function handle({ request }: { request: Request }) {
             },
           ],
         })
-        if (primary.content && primary.content.trim().length > 40) {
-          analysisText = primary.content.trim()
-          primaryModel = primary.model
-          primaryUsage = primary.usage
+        if (!primary.content || primary.content.trim().length <= 40) {
+          return extJson({
+            ok: false,
+            code: 'PRIMARY_REVIEW_UNAVAILABLE',
+            error: 'Claude primary review could not complete. Please retry in a moment.',
+          }, 503)
         }
+        analysisText = primary.content.trim()
+        primaryModel = primary.model
+        primaryUsage = primary.usage
       } catch {
-        // Claude unavailable — deterministic ICT desk output still stands.
+        return extJson({
+          ok: false,
+          code: 'PRIMARY_REVIEW_UNAVAILABLE',
+          error: 'Claude primary review is temporarily unavailable after trying all fallback models. Please retry in a moment.',
+        }, 503)
       }
 
       const seniorReview = { included: false, model: null, status: 'not_required' }
