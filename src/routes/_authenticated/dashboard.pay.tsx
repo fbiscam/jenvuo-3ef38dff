@@ -93,7 +93,7 @@ function PayPage() {
 
   const PLANS = [
     { id: "pro", name: "Pro", price: 15, features: ["Realtime Alerts", "Journal Access", "Multi-Timeframe Bias"] },
-    { id: "elite", name: "Elite", price: 50, features: ["Multi-pair Scanner", "Custom Alert Rules", "AI Model Analysis"] },
+    { id: "elite", name: "Elite", price: 50, features: ["XAU/USD Senior Review", "Custom Alert Rules", "AI Model Analysis"] },
     { id: "ultra", name: "Ultra", price: 100, features: ["Priority Support", "Advanced Signals", "Full ICT Narration"] },
   ];
 
