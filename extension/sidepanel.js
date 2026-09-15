@@ -1,9 +1,9 @@
 const ENDPOINTS =
   location.protocol === "chrome-extension:"
     ? [
+        "https://project--06cd4260-299b-4286-8096-c43f2f596dee-dev.lovable.app/api/public/gold",
         "https://jenvu.com/api/public/gold",
         "https://project--06cd4260-299b-4286-8096-c43f2f596dee.lovable.app/api/public/gold",
-        "https://project--06cd4260-299b-4286-8096-c43f2f596dee-dev.lovable.app/api/public/gold",
       ]
     : ["/api/public/gold"];
 let API = ENDPOINTS[0];
@@ -46,6 +46,7 @@ const QUICKS = [
   { label: "Trade plan", text: "Give me a trade plan now: bias, entry (POI), stop, TP1/TP2, RR." },
   { label: "Liquidity", text: "Where is liquidity resting and where should I expect the next sweep?" },
 ];
+const ANALYSIS_INTENT = /\b(analy[sz]|signal|setup|trade|entry|exit|buy|sell|long|short|bias|tp\d?|sl|stop\s*loss|target|rr|risk|chart|candle|structure|bos|choch|fvg|order\s*block|liquidity|premium|discount|support|resistance|trend|price|market|xau|gold|forex|pair|timeframe|scalp|swing|position)\b|(?:tajzia|tajziya|signal|kharid|bech|entry|nishan|marking)/i;
 
 const $ = (id) => document.getElementById(id);
 
@@ -471,6 +472,7 @@ function addMsg(cls, text, shot) {
 async function post(body, signal) {
   const requestId = "ext_" + Date.now().toString(36) + "_" + Math.random().toString(36).slice(2, 10);
   let lastErr;
+  let authErr;
   for (const url of [API, ...ENDPOINTS.filter((u) => u !== API)]) {
     const requestController = new AbortController();
     const abortFromUser = () => requestController.abort();
@@ -489,8 +491,10 @@ async function post(body, signal) {
       });
       const json = await res.json().catch(() => ({}));
         if (res.status === 401 || (res.status === 403 && json.code !== "FEATURE_LOCKED")) {
-          showKeyGate(true, json.error || "Your API key is invalid or revoked.");
-          throw new Error(json.error || "Sign in with your Jenvu API key.");
+          const error = new Error(json.error || "Sign in with your Jenvu API key.");
+          error.tryNextEndpoint = true;
+          authErr = error;
+          throw error;
         }
         if (res.status === 403 && json.code === "FEATURE_LOCKED") {
           throw new Error(json.error || "This feature is not included in your current plan. Upgrade to unlock it.");
@@ -510,10 +514,14 @@ async function post(body, signal) {
         if (signal?.aborted) throw e;
       }
       lastErr = e;
-      if (!e.retryable) break;
+      if (!e.retryable && !e.tryNextEndpoint) break;
     } finally {
       signal?.removeEventListener("abort", abortFromUser);
     }
+  }
+  if (authErr) {
+    showKeyGate(true, authErr.message || "Your API key is invalid or revoked.");
+    throw authErr;
   }
   throw lastErr || new Error("Network error");
 }
@@ -838,7 +846,7 @@ async function send(preset, silentUser) {
   busy = true;
   // Senior review only applies to chart/screen analysis. Plain chat stays in
   // conversation mode, so never show the review banner for it.
-  const analysisRequest = Boolean(chartImage || stream);
+  const analysisRequest = Boolean(chartImage || stream || ANALYSIS_INTENT.test(text));
   setReviewStatus(analysisRequest ? "Senior review checking…" : "Chat mode", analysisRequest ? "checking" : "");
   controller = new AbortController();
   $("send").disabled = false;
