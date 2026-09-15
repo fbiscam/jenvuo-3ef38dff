@@ -2,7 +2,8 @@ import { createFileRoute } from '@tanstack/react-router'
 import { authenticateExtensionRequest, extJson, EXT_CORS_HEADERS } from '@/lib/extension-auth.server'
 import { resolveInstrument, fetchInstrumentCandles, fetchLiveInstrumentTick } from '@/lib/gold-analysis.functions'
 import { analyzeTF, buildLiquidityPools } from '@/lib/analysis/engine'
-import { callChatCompletion, EXTENSION_MODEL_CHAIN, type ChatContentPart } from '@/lib/ai-gateway'
+import { callChatCompletion, EXTENSION_MODEL_CHAIN } from '@/lib/ai-gateway'
+import { runExtensionDesk, RULES_PRIMARY_MODEL, RULES_SENIOR_MODEL } from '@/lib/analysis/extension-desk'
 import { isGoldSymbol } from '@/lib/plan-entitlements'
 
 type Body = {
@@ -71,6 +72,8 @@ async function loadMarket(symbol: string, timeframe: string) {
   return {
     inst,
     candles,
+    hourly: hourly?.length ? hourly : candles,
+    fourHourly: fourHourly?.length ? fourHourly : hourly?.length ? hourly : candles,
     ticker: { symbol: inst.display, price: last, changePercent },
     chart: recent.map((c: any) => ({
       o: Number(c.open ?? c.o),
@@ -96,46 +99,6 @@ async function loadMarket(symbol: string, timeframe: string) {
 function validImage(value: unknown): string | null {
   if (typeof value !== 'string' || !/^data:image\/(?:png|jpeg|webp);base64,/i.test(value)) return null
   return value.length <= 4_500_000 ? value : null
-}
-
-function validateSeniorReview(content: string): true | string {
-  const normalized = content.trim()
-  if (normalized.length < 80) return 'Senior reviewer returned an incomplete answer.'
-  if (/^here are the search results\b/i.test(normalized) || /search results for ["“]/i.test(normalized)) {
-    return 'Senior reviewer returned search results instead of an ICT/SMC audit.'
-  }
-  if (/\b(?:no|without) (?:primary )?(?:answer|analysis|response) (?:was |is )?(?:provided|included|available|present)\b/i.test(normalized)) {
-    return 'Senior reviewer did not receive or audit the primary analysis.'
-  }
-  if (/\bno (?:chart )?image (?:was |is )?(?:attached|provided|available|present)\b/i.test(normalized)) {
-    return 'Senior reviewer refused the live-context audit because the chart image was not repeated.'
-  }
-  if (!/\b(?:verdict|wait|buy|sell|bias)\b/i.test(normalized)) {
-    return 'Senior reviewer did not provide a valid trading verdict.'
-  }
-  return true
-}
-
-function tradingVerdict(content: string): 'BUY' | 'SELL' | 'WAIT' | null {
-  const explicit = content.match(/\b(?:verdict|bias)\s*[:\-]\s*(BUY|SELL|WAIT)\b/i)?.[1]
-  if (explicit) return explicit.toUpperCase() as 'BUY' | 'SELL' | 'WAIT'
-  if (/\bWAIT\b/i.test(content)) return 'WAIT'
-  if (/\bBUY\b/i.test(content)) return 'BUY'
-  if (/\bSELL\b/i.test(content)) return 'SELL'
-  return null
-}
-
-function hasSupportedWait(content: string): boolean {
-  const evidenceTerms = [
-    /\bHTF|higher[ -]timeframe\b/i,
-    /\bLTF|lower[ -]timeframe\b/i,
-    /\b(?:liquidity )?sweep\b/i,
-    /\bdisplacement\b/i,
-    /\b(?:fresh )?(?:POI|FVG|order block)\b/i,
-    /\b(?:RR|risk.?reward)\b/i,
-    /\b(?:conflict|misalign|invalid|missing|absent|not confirmed)\b/i,
-  ]
-  return evidenceTerms.filter((term) => term.test(content)).length >= 2
 }
 
 function quickConversationReply(question: string): string | null {
@@ -252,127 +215,41 @@ async function handle({ request }: { request: Request }) {
       }
 
       const market = await loadMarket(symbol, timeframe)
-      const context = [
-        `Instrument: ${market.ticker.symbol}`,
-        `Timeframe: ${timeframe}`,
-        `Live price: ${market.ticker.price.toFixed(2)}`,
-        `Session change: ${market.ticker.changePercent.toFixed(2)}%`,
-        `EMA9: ${market.technicals.ema9.toFixed(2)} | EMA21: ${market.technicals.ema21.toFixed(2)} | Trend: ${market.technicals.trend}`,
-        `Recent range: ${market.technicals.low.toFixed(2)} - ${market.technicals.high.toFixed(2)}`,
-        `Structure: selected ${market.technicals.structure.selected}; H1 ${market.technicals.structure.h1}; H4 ${market.technicals.structure.h4}`,
-        `Session: ${market.technicals.session}; equilibrium: ${market.technicals.equilibrium.toFixed(2)}`,
-        `Last structure event: ${JSON.stringify(market.technicals.lastStructure)}`,
-        `Fresh FVGs: ${JSON.stringify(market.technicals.freshFvgs)}`,
-        `Fresh order blocks: ${JSON.stringify(market.technicals.freshOrderBlocks)}`,
-        `Liquidity: ${JSON.stringify(market.technicals.liquidity)}`,
-        `Quote generated: ${market.freshness.generatedAt}; age: ${market.freshness.quoteAgeMs}ms; source: ${market.freshness.source}`,
-      ].join('\n')
-
-      const userContent: string | ChatContentPart[] = image
-        ? [
-            { type: 'text', text: `Live market context:\n${context}\n\nTrader request: ${question}\nInspect the attached chart itself as well as the verified live feed. If they conflict, trust the verified live price and clearly mention the mismatch.` },
-            { type: 'image_url', image_url: { url: image, detail: 'high' } },
-          ]
-        : `${question}\n\nVerified live market context:\n${context}`
-
-      const primary = await callChatCompletion({
-        models: [...(image ? EXTENSION_MODEL_CHAIN.vision : EXTENSION_MODEL_CHAIN.reasoning)],
-        stage: image ? 'extension-screen-analysis' : 'extension-chat',
-        maxTokens: 900,
-        // Keep enough time for the verified Claude fallback while preventing a
-        // dead model from holding the extension open for several minutes.
-        timeoutMs: 18_000,
-        deadlineMs: 52_000,
-        retriesPerModel: 1,
-        messages: [
-          {
-            role: 'system',
-            content:
-              'You are Jenvu, an institutional ICT/SMC gold analyst operating with a disciplined 25+ year desk mindset. Apply multi-timeframe structure, BOS/CHOCH, displacement, fresh FVG/order blocks, premium/discount, liquidity sweeps, session timing and risk geometry. Answer in the trader\'s language (Urdu/English mix is fine). Ground every numerical level in the verified live context. Never invent a price away from live price. For a trade plan, state VERDICT, BIAS, ENTRY/POI, STOP, TP1, TP2, RR, INVALIDATION, EVIDENCE and RISKS. If HTF/LTF alignment, liquidity event, displacement and a fresh POI are incomplete, say WAIT instead of forcing a trade. Never promise accuracy or profit.',
-          },
-          ...history,
-          { role: 'user', content: userContent },
-        ],
+      const desk = runExtensionDesk({
+        symbol: market.ticker.symbol,
+        timeframe,
+        selected: market.candles,
+        h1: market.hourly,
+        h4: market.fourHourly,
+        livePrice: market.ticker.price,
+        seniorReview: requiresSeniorReview,
       })
-
-      let content = primary.content
-      let seniorReview: { included: boolean; model: string | null; status: string } = { included: false, model: null, status: 'not_required' }
-      const reviewPrompt = `LIVE_CONTEXT_START\n${context}\nLIVE_CONTEXT_END\n\nTRADER_REQUEST_START\n${question.slice(0, 300)}\nTRADER_REQUEST_END\n\nPRIMARY_ANALYSIS_START\n${primary.content.slice(0, 3000)}\nPRIMARY_ANALYSIS_END`
-      const reviewUserContent: string | ChatContentPart[] = image
-        ? [
-            { type: 'text', text: reviewPrompt },
-            { type: 'image_url', image_url: { url: image, detail: 'high' } },
-          ]
-        : reviewPrompt
-      let review: Awaited<ReturnType<typeof callChatCompletion>> | null = null
-      let reviewFailed = false
-      if (requiresSeniorReview) {
-        try {
-          review = await callChatCompletion({
-            models: [...EXTENSION_MODEL_CHAIN.seniorReview],
-            stage: 'extension-senior-review',
-            maxTokens: 700,
-            timeoutMs: 16_000,
-            deadlineMs: 42_000,
-            retriesPerModel: 1,
-            validateContent: validateSeniorReview,
-            messages: [
-              {
-                role: 'system',
-                content: 'Senior ICT/SMC reviewer. Audit the PRIMARY_ANALYSIS against the complete verified LIVE_CONTEXT and attached chart when present. Check live levels, HTF/LTF alignment, liquidity sweep, displacement, fresh POI and minimum 1:2 RR. Start with VERDICT: BUY, SELL, or WAIT, then give specific evidence. Return WAIT only when concrete missing or conflicting evidence makes a directional plan unsafe; never use WAIT merely because confidence is imperfect. Never promise profit.',
-              },
-              { role: 'user', content: reviewUserContent },
-            ],
-          })
-        } catch (error) {
-          reviewFailed = true
-          console.warn('extension-senior-review unavailable:', error instanceof Error ? error.message : error)
-        }
-      }
-      // Elite and Ultra only expose the validated senior response. Pro returns
-      // its completed GPT-6 Astra primary analysis without a second pass.
-      if (review) {
-        const primaryVerdict = tradingVerdict(primary.content)
-        const reviewVerdict = tradingVerdict(review.content)
-        // A text-only conservative WAIT used to erase valid directional plans.
-        // Keep the completed primary when the reviewer has no contradictory
-        // direction; expose the review's caution without inventing a signal.
-        content = reviewVerdict === 'WAIT' && !hasSupportedWait(review.content) && (primaryVerdict === 'BUY' || primaryVerdict === 'SELL')
-          ? `${primary.content}\n\nSENIOR REVIEW\n${review.content}`
-          : review.content
-        seniorReview = { included: true, model: review.model, status: 'completed' }
-      } else if (reviewFailed) {
-        content = `${primary.content}\n\nREVIEW STATUS\nPrimary analysis completed. Senior review is temporarily unavailable, so treat this as an unconfirmed analysis and do not enter a trade until the review completes on a retry.`
-        seniorReview = { included: false, model: null, status: 'unavailable' }
-      }
-
-      // The senior review is the second pass: GPT-6 Astra analyzes first,
-      // then Claude Fable 5 independently audits and finalizes the answer.
-      const secondReview = review
-        ? { included: true, model: review.model, status: 'completed' }
-        : { included: false, model: null, status: reviewFailed ? 'unavailable' : 'not_in_plan' }
+      const seniorReview = desk.senior.included
+        ? { included: true, model: RULES_SENIOR_MODEL, status: 'completed' }
+        : { included: false, model: null, status: 'not_in_plan' }
+      const secondReview = seniorReview
 
       const { chargeExtensionUsage } = await import('@/lib/extension-billing.server')
       const billing = await chargeExtensionUsage({
         userId: auth.userId, keyId: auth.keyId, keyName: auth.name, requestId,
         action: image ? 'screen_analysis' : 'chat',
         calls: [
-          { model: primary.model, usage: primary.usage, stage: image ? 'extension-screen-analysis' : 'extension-chat' },
-          ...(review ? [{ model: review.model, usage: review.usage, stage: 'extension-senior-review' }] : []),
+          { model: RULES_PRIMARY_MODEL, usage: { promptTokens: 0, completionTokens: 0 }, stage: 'extension-rules-analysis' },
+          ...(requiresSeniorReview ? [{ model: RULES_SENIOR_MODEL, usage: { promptTokens: 0, completionTokens: 0 }, stage: 'extension-senior-review' }] : []),
         ],
       })
       if (!billing.ok) return extJson({ ok: false, error: billing.error, code: billing.error?.includes('balance') ? 'LOW_BALANCE' : 'BILLING_FAILED' }, billing.error?.includes('balance') ? 402 : 502)
 
       return extJson({
         ok: true,
-        text: content,
+        text: desk.text,
         ticker: market.ticker,
         chart: market.chart,
         technicals: market.technicals,
         freshness: market.freshness,
-        overlayMarks: market.marks,
-        marksBias: market.technicals.trend.toLowerCase(),
-        analysisModels: { primary: primary.model, senior: review?.model ?? null },
+        overlayMarks: [...market.marks, ...desk.marks],
+        marksBias: desk.bias.toLowerCase(),
+        analysisModels: { primary: RULES_PRIMARY_MODEL, senior: requiresSeniorReview ? RULES_SENIOR_MODEL : null },
         seniorReview,
         secondReview,
         usage: { requestId, charged: billing.charged, balance: billing.balance },
