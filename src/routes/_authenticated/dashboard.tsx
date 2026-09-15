@@ -1514,6 +1514,7 @@ const PRODUCT_UPDATES = [
     age: "Latest",
     title: " Reliable senior review",
     copy: "Claude Opus 5 must complete its review before eligible signals are shown.",
+    time: "14 Sep 2026 · 17:05",
     icon: ShieldCheckIcon,
   },
   {
