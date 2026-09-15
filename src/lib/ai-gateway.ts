@@ -976,17 +976,24 @@ export function setCachedPlan<T>(key: string, value: T, ttlMs: number = PLAN_CAC
 const WORKING_BMIND = [
   "omniroute/auto/best-reasoning",
   "omniroute/auto/claude-opus",
+  "omniroute/auto/pro-reasoning",
+  "omniroute/auto/claude-sonnet",
+  "omniroute/agy/claude-sonnet-4-6",
   "omniroute/auto/best-chat",
 ] as const;
 
 const FAST_NARRATION_BMIND = [
   "omniroute/auto/best-fast",
   "omniroute/auto/best-chat",
+  "omniroute/agy/gemini-3.7-flash-medium",
   "omniroute/auto/best-reasoning",
 ] as const;
 
 const SENIOR_REVIEW_BMIND_4O = [
   "omniroute/auto/claude-opus",
+  "omniroute/auto/claude-sonnet",
+  "omniroute/agy/claude-sonnet-4-6",
+  "omniroute/auto/pro-reasoning",
   "omniroute/auto/best-reasoning",
   "omniroute/auto/best-chat",
 ] as const;
@@ -996,27 +1003,51 @@ export const MODEL_CHAIN = {
   narration: FAST_NARRATION_BMIND,
   seniorReview: SENIOR_REVIEW_BMIND_4O,
   macroContext: WORKING_BMIND,
-  chat: ["omniroute/auto/best-chat", "omniroute/auto/best-fast", "omniroute/auto/best-reasoning"] as const,
+  chat: [
+    "omniroute/auto/best-chat",
+    "omniroute/auto/best-fast",
+    "omniroute/agy/gemini-3.7-flash-medium",
+    "omniroute/auto/best-reasoning",
+  ] as const,
 } as const;
 
-// Extension chains — OmniRoute only, top models for analysis and review.
+// Extension chains — OmniRoute only, top models first, then verified
+// concrete models so primary analysis and senior review always get an
+// answering model instead of failing the whole request.
 export const EXTENSION_MODEL_CHAIN = {
   conversation: [
     "omniroute/auto/best-chat",
     "omniroute/auto/best-fast",
+    "omniroute/agy/gemini-3.7-flash-medium",
   ],
   reasoning: [
     "omniroute/auto/best-reasoning",
     "omniroute/auto/claude-opus",
+    "omniroute/auto/pro-reasoning",
+    "omniroute/auto/claude-sonnet",
+    "omniroute/agy/claude-sonnet-4-6",
   ],
   vision: [
     "omniroute/auto/best-vision",
-    "omniroute/auto/best-reasoning",
     "omniroute/auto/claude-opus",
+    "omniroute/auto/claude-sonnet",
+    "omniroute/agy/claude-sonnet-4-6",
+    "omniroute/auto/best-reasoning",
   ],
-  seniorReview: ["omniroute/auto/claude-opus", "omniroute/auto/best-reasoning"],
+  seniorReview: [
+    "omniroute/auto/claude-opus",
+    "omniroute/auto/claude-sonnet",
+    "omniroute/agy/claude-sonnet-4-6",
+    "omniroute/auto/pro-reasoning",
+    "omniroute/auto/best-reasoning",
+  ],
   // Alias retained for callers that identify the senior pass as review #2.
-  secondReview: ["omniroute/auto/claude-opus", "omniroute/auto/best-reasoning"],
+  secondReview: [
+    "omniroute/auto/claude-opus",
+    "omniroute/auto/claude-sonnet",
+    "omniroute/agy/claude-sonnet-4-6",
+    "omniroute/auto/best-reasoning",
+  ],
 } as const;
 
 export const MACRO_CONTEXT_CHAIN = WORKING_BMIND;
@@ -1024,6 +1055,7 @@ export const SENIOR_REVIEW_CHAIN = SENIOR_REVIEW_BMIND_4O;
 
 export const DEEPSEEK_REVIEW_CHAIN = [
   "omniroute/auto/claude-opus",
+  "omniroute/auto/claude-sonnet",
   "omniroute/auto/best-reasoning",
 ] as const;
 
