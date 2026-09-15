@@ -270,7 +270,47 @@ async function handle({ request }: { request: Request }) {
         }, 503)
       }
 
-      const seniorReview = { included: false, model: null, status: 'not_required' }
+      // Senior review: a second, stronger pass that vets the primary analysis.
+      // It runs only for plans that include it; a failure never blocks the
+      // primary result — it is reported as unconfirmed instead.
+      let seniorReview: { included: boolean; model: string | null; status: string } = {
+        included: false,
+        model: null,
+        status: entitlement.seniorReview ? 'unavailable' : 'not_required',
+      }
+      let seniorModel = ''
+      let seniorUsage = { promptTokens: 0, completionTokens: 0 }
+      if (entitlement.seniorReview) {
+        try {
+          const senior = await callChatCompletion({
+            models: [...EXTENSION_MODEL_CHAIN.seniorReview],
+            stage: 'extension-senior-review',
+            maxTokens: 700,
+            timeoutMs: 18_000,
+            deadlineMs: 40_000,
+            retriesPerModel: 1,
+            messages: [
+              {
+                role: 'system',
+                content:
+                  'You are the senior XAU/USD desk head (30+ years, ICT/SMC). You receive a deterministic ICT/SMC engine report and a junior analyst\'s primary analysis of it. Vet the logic: is the bias, entry zone, stop and targets consistent with the structure, liquidity and premium/discount state? Never invent price levels — use only the numbers given. Reply with the final desk answer for the trader: confirm, adjust, or downgrade to WAIT with a one-line reason. Answer in the user\'s language, concise and desk-style.',
+              },
+              {
+                role: 'user',
+                content: `User request: ${question}\n\nLive price: ${market.ticker.price}\nTimeframe: ${timeframe}\n\nICT/SMC engine report:\n${desk.text}\n\nPrimary analysis:\n${analysisText}`,
+              },
+            ],
+          })
+          if (senior.content && senior.content.trim().length > 40) {
+            analysisText = senior.content.trim()
+            seniorModel = senior.model
+            seniorUsage = senior.usage
+            seniorReview = { included: true, model: senior.model, status: 'confirmed' }
+          }
+        } catch {
+          seniorReview = { included: false, model: null, status: 'unavailable' }
+        }
+      }
       const secondReview = seniorReview
 
       const { chargeExtensionUsage } = await import('@/lib/extension-billing.server')
@@ -279,6 +319,7 @@ async function handle({ request }: { request: Request }) {
         action: image ? 'screen_analysis' : 'chat',
         calls: [
           { model: primaryModel, usage: primaryUsage, stage: 'extension-primary-review' },
+          ...(seniorModel ? [{ model: seniorModel, usage: seniorUsage, stage: 'extension-senior-review' }] : []),
         ],
       })
       if (!billing.ok) return extJson({ ok: false, error: billing.error, code: billing.error?.includes('balance') ? 'LOW_BALANCE' : 'BILLING_FAILED' }, billing.error?.includes('balance') ? 402 : 502)
