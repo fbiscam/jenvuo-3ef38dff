@@ -990,7 +990,7 @@ const FAST_NARRATION_BMIND = [
   "omniroute/auto/best-fast",
   "omniroute/agy/gemini-3.7-flash-medium",
   "omniroute/auto/best-chat",
-  "omniroute/auto/best-fast",
+  "omniroute/agy/claude-sonnet-4-6",
 ] as const;
 
 
