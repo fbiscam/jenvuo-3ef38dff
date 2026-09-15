@@ -1004,9 +1004,10 @@ export const MODEL_CHAIN = {
   seniorReview: SENIOR_REVIEW_BMIND_4O,
   macroContext: WORKING_BMIND,
   chat: [
-    "omniroute/auto/best-chat",
     "omniroute/auto/best-fast",
     "omniroute/agy/gemini-3.7-flash-medium",
+    "omniroute/auto/claude-sonnet",
+    "omniroute/auto/best-chat",
     "omniroute/auto/best-reasoning",
   ] as const,
 } as const;
@@ -1016,9 +1017,10 @@ export const MODEL_CHAIN = {
 // answering model instead of failing the whole request.
 export const EXTENSION_MODEL_CHAIN = {
   conversation: [
-    "omniroute/auto/best-chat",
     "omniroute/auto/best-fast",
     "omniroute/agy/gemini-3.7-flash-medium",
+    "omniroute/auto/claude-sonnet",
+    "omniroute/auto/best-chat",
   ],
   reasoning: [
     "omniroute/auto/best-reasoning",
