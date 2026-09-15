@@ -15,7 +15,6 @@ import { Route as ScamToolRouteImport } from './routes/scam-tool'
 import { Route as ScamCheckRouteImport } from './routes/scam-check'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as RefundRouteImport } from './routes/refund'
-import { Route as ProbabilityRouteImport } from './routes/probability'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as OpsX9k27m4nRouteImport } from './routes/ops-x9k2-7m4n'
@@ -136,11 +135,6 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
 const RefundRoute = RefundRouteImport.update({
   id: '/refund',
   path: '/refund',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProbabilityRoute = ProbabilityRouteImport.update({
-  id: '/probability',
-  path: '/probability',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PrivacyRoute = PrivacyRouteImport.update({
@@ -662,7 +656,6 @@ export interface FileRoutesByFullPath {
   '/ops-x9k2-7m4n': typeof OpsX9k27m4nRouteWithChildren
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
-  '/probability': typeof ProbabilityRoute
   '/refund': typeof RefundRoute
   '/reset-password': typeof ResetPasswordRoute
   '/scam-check': typeof ScamCheckRoute
@@ -757,7 +750,6 @@ export interface FileRoutesByTo {
   '/llm': typeof LlmRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
-  '/probability': typeof ProbabilityRoute
   '/refund': typeof RefundRoute
   '/reset-password': typeof ResetPasswordRoute
   '/scam-check': typeof ScamCheckRoute
@@ -857,7 +849,6 @@ export interface FileRoutesById {
   '/ops-x9k2-7m4n': typeof OpsX9k27m4nRouteWithChildren
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
-  '/probability': typeof ProbabilityRoute
   '/refund': typeof RefundRoute
   '/reset-password': typeof ResetPasswordRoute
   '/scam-check': typeof ScamCheckRoute
@@ -958,7 +949,6 @@ export interface FileRouteTypes {
     | '/ops-x9k2-7m4n'
     | '/pricing'
     | '/privacy'
-    | '/probability'
     | '/refund'
     | '/reset-password'
     | '/scam-check'
@@ -1053,7 +1043,6 @@ export interface FileRouteTypes {
     | '/llm'
     | '/pricing'
     | '/privacy'
-    | '/probability'
     | '/refund'
     | '/reset-password'
     | '/scam-check'
@@ -1152,7 +1141,6 @@ export interface FileRouteTypes {
     | '/ops-x9k2-7m4n'
     | '/pricing'
     | '/privacy'
-    | '/probability'
     | '/refund'
     | '/reset-password'
     | '/scam-check'
@@ -1253,7 +1241,6 @@ export interface RootRouteChildren {
   OpsX9k27m4nRoute: typeof OpsX9k27m4nRouteWithChildren
   PricingRoute: typeof PricingRoute
   PrivacyRoute: typeof PrivacyRoute
-  ProbabilityRoute: typeof ProbabilityRoute
   RefundRoute: typeof RefundRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   ScamCheckRoute: typeof ScamCheckRoute
@@ -1325,13 +1312,6 @@ declare module '@tanstack/react-router' {
       path: '/refund'
       fullPath: '/refund'
       preLoaderRoute: typeof RefundRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/probability': {
-      id: '/probability'
-      path: '/probability'
-      fullPath: '/probability'
-      preLoaderRoute: typeof ProbabilityRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/privacy': {
@@ -2160,7 +2140,6 @@ const rootRouteChildren: RootRouteChildren = {
   OpsX9k27m4nRoute: OpsX9k27m4nRouteWithChildren,
   PricingRoute: PricingRoute,
   PrivacyRoute: PrivacyRoute,
-  ProbabilityRoute: ProbabilityRoute,
   RefundRoute: RefundRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   ScamCheckRoute: ScamCheckRoute,
