@@ -16,7 +16,14 @@ export const Route = createFileRoute('/api/public/provider-probe')({
         }
         const endpoint = providerUrl('models')
         const key = process.env.CUSTOM_AI_API_KEY
-        if (!endpoint || !key) return Response.json({ ok: false, error: 'Provider details are unavailable.' }, { status: 503 })
+        if (!endpoint || !key) {
+          return Response.json({
+            ok: false,
+            error: 'Provider details are unavailable.',
+            validHttpsBaseUrl: Boolean(endpoint),
+            apiKeyAvailable: Boolean(key),
+          }, { status: 503 })
+        }
 
         try {
           const response = await fetch(endpoint, {
