@@ -629,6 +629,10 @@ async function singleAttemptInner(
     messages: opts.messages,
     seed,
     ...(usesDefaultTemperature ? {} : { temperature: 0, top_p: 1 }),
+    // GPT-OSS otherwise spends most of the token/time budget on hidden chain
+    // of thought before emitting the visible answer. Low effort keeps the
+    // extension responsive while preserving the full ICT/SMC output schema.
+    ...(isBmind && /gpt-oss/i.test(wireModel) ? { reasoning_effort: "low" } : {}),
   };
   // Blackbox/NVIDIA/Bluesminds/DeepSeek-official: don't force response_format — rely on system prompt.
   if (opts.jsonMode && (isOai || isOmniRoute)) body.response_format = { type: "json_object" };
