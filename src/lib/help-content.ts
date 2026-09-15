@@ -298,7 +298,7 @@ export const collections: Collection[] = [
         summary: "You'll see a MARKET CLOSED badge — no live entries are issued.",
         updatedAt: "2026-06-30",
         body: [
-          { type: "p", content: "Spot gold follows the OTC bullion week — Sunday open in Sydney through Friday New York close, with a daily 60-minute settlement break. When you ask for a gold cross outside its trading window, Jenvu detects it and adapts." },
+          { type: "p", content: "XAU/USD follows the OTC bullion week — Sunday open in Sydney through Friday New York close, with a daily 60-minute settlement break. When you request analysis outside its trading window, Jenvu detects it and adapts." },
 
           { type: "h2", content: "What you'll see" },
           { type: "ul", items: [
