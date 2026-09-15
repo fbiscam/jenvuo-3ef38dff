@@ -276,7 +276,7 @@ async function handle({ request }: { request: Request }) {
 
       return extJson({
         ok: true,
-        text: desk.text,
+        text: analysisText,
         ticker: market.ticker,
         chart: market.chart,
         technicals: market.technicals,
