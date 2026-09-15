@@ -470,18 +470,11 @@ function addMsg(cls, text, shot) {
 
 async function post(body, signal) {
   const requestId = "ext_" + Date.now().toString(36) + "_" + Math.random().toString(36).slice(2, 10);
-  // Chart analysis can include a sequential senior review. Keep one request
-  // alive long enough for the server to finish instead of aborting it after
-  // 15 seconds and launching duplicate work against backup domains.
-  const deadlineAt = Date.now() + 75000;
   let lastErr;
   for (const url of [API, ...ENDPOINTS.filter((u) => u !== API)]) {
-    const remainingMs = deadlineAt - Date.now();
-    if (remainingMs <= 0) throw lastErr || new Error("AI response took too long. Please try again.");
     const requestController = new AbortController();
     const abortFromUser = () => requestController.abort();
     signal?.addEventListener("abort", abortFromUser, { once: true });
-    const timeout = setTimeout(() => requestController.abort(), remainingMs);
     try {
       const res = await fetch(url, {
           method: "POST",
@@ -515,12 +508,10 @@ async function post(body, signal) {
     } catch (e) {
       if (e && e.name === "AbortError") {
         if (signal?.aborted) throw e;
-        throw new Error("AI response took too long. Please try again.");
       }
       lastErr = e;
       if (!e.retryable) break;
     } finally {
-      clearTimeout(timeout);
       signal?.removeEventListener("abort", abortFromUser);
     }
   }
@@ -915,6 +906,8 @@ async function send(preset, silentUser) {
       setReviewStatus(`Senior reviewed · ${label}`, "verified");
     } else if (d.mode === "conversation") {
       setReviewStatus("Chat mode", "");
+    } else if (d.seniorReview?.status === "unavailable") {
+      setReviewStatus("Primary complete · senior review retry needed", "failed");
     } else if (d.secondReview?.status === "not_in_plan" || d.seniorReview?.status === "not_in_plan" || d.seniorReview?.status === "not_required") {
       setReviewStatus("Primary AI · Elite unlocks senior review", "");
     } else {
@@ -925,7 +918,7 @@ async function send(preset, silentUser) {
     pend.remove();
     if (e && e.name === "AbortError") addMsg("ai err", "Request stopped.");
     else addMsg("ai err", e.message);
-    if (analysisRequest) setReviewStatus("Senior review unavailable", "failed");
+    if (analysisRequest) setReviewStatus("Analysis could not complete · retry", "failed");
     else setReviewStatus("Chat mode", "");
   } finally {
     busy = false;

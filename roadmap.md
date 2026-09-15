@@ -54,3 +54,4 @@
 - [x] Prevent all AI inference paths from consuming Lovable AI workspace credits
 - [x] Restore fast extension chat replies and prevent unsupported senior-review WAIT overrides
 - [x] Prevent premature extension timeouts and return greetings instantly
+- [x] Preserve completed screen analysis when senior review is temporarily unavailable
