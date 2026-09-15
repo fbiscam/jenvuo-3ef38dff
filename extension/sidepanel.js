@@ -848,10 +848,9 @@ async function send(preset, silentUser) {
   const text = (preset ?? box.value).trim();
   if (!text && !chartImage && !stream) return;
   busy = true;
-  // Senior review only applies to chart/screen analysis. Plain chat stays in
-  // conversation mode, so never show the review banner for it.
+  // Mandatory Claude primary review applies only to chart/screen analysis.
   const analysisRequest = Boolean(chartImage || stream || ANALYSIS_INTENT.test(text));
-  setReviewStatus(analysisRequest ? "ICT rules engine analyzing…" : "Chat mode", analysisRequest ? "checking" : "");
+  setReviewStatus(analysisRequest ? "ICT analysis · Claude primary review…" : "Chat mode", analysisRequest ? "checking" : "");
   controller = new AbortController();
   $("send").disabled = false;
   updateSendState();
