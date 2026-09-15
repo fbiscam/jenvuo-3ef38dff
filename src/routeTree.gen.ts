@@ -79,6 +79,7 @@ import { Route as AuthenticatedDashboardDocumentsRouteImport } from './routes/_a
 import { Route as AuthenticatedDashboardBillingRouteImport } from './routes/_authenticated/dashboard.billing'
 import { Route as AuthenticatedDashboardAnalyticsRouteImport } from './routes/_authenticated/dashboard.analytics'
 import { Route as AuthenticatedDashboardAlertsRouteImport } from './routes/_authenticated/dashboard.alerts'
+import { Route as AuthenticatedDashboardChatIndexRouteImport } from './routes/_authenticated/dashboard.chat.index'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
 import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
@@ -472,6 +473,12 @@ const AuthenticatedDashboardAlertsRoute =
     path: '/alerts',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
+const AuthenticatedDashboardChatIndexRoute =
+  AuthenticatedDashboardChatIndexRouteImport.update({
+    id: '/chat/',
+    path: '/chat/',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
 const LovableEmailTransactionalPreviewRoute =
   LovableEmailTransactionalPreviewRouteImport.update({
     id: '/lovable/email/transactional/preview',
@@ -736,6 +743,7 @@ export interface FileRoutesByFullPath {
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
+  '/dashboard/chat/': typeof AuthenticatedDashboardChatIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -830,6 +838,7 @@ export interface FileRoutesByTo {
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
+  '/dashboard/chat': typeof AuthenticatedDashboardChatIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -931,6 +940,7 @@ export interface FileRoutesById {
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
+  '/_authenticated/dashboard/chat/': typeof AuthenticatedDashboardChatIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -1032,6 +1042,7 @@ export interface FileRouteTypes {
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/transactional/preview'
+    | '/dashboard/chat/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -1126,6 +1137,7 @@ export interface FileRouteTypes {
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/transactional/preview'
+    | '/dashboard/chat'
   id:
     | '__root__'
     | '/'
@@ -1226,6 +1238,7 @@ export interface FileRouteTypes {
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/transactional/preview'
+    | '/_authenticated/dashboard/chat/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -1775,6 +1788,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardAlertsRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
+    '/_authenticated/dashboard/chat/': {
+      id: '/_authenticated/dashboard/chat/'
+      path: '/chat'
+      fullPath: '/dashboard/chat/'
+      preLoaderRoute: typeof AuthenticatedDashboardChatIndexRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
     '/lovable/email/transactional/preview': {
       id: '/lovable/email/transactional/preview'
       path: '/lovable/email/transactional/preview'
@@ -2002,6 +2022,7 @@ interface AuthenticatedDashboardRouteChildren {
   AuthenticatedDashboardAdminTuningRoute: typeof AuthenticatedDashboardAdminTuningRoute
   AuthenticatedDashboardAdminTvMismatchRoute: typeof AuthenticatedDashboardAdminTvMismatchRoute
   AuthenticatedDashboardChatThreadIdRoute: typeof AuthenticatedDashboardChatThreadIdRoute
+  AuthenticatedDashboardChatIndexRoute: typeof AuthenticatedDashboardChatIndexRoute
 }
 
 const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
@@ -2045,6 +2066,7 @@ const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
       AuthenticatedDashboardAdminTvMismatchRoute,
     AuthenticatedDashboardChatThreadIdRoute:
       AuthenticatedDashboardChatThreadIdRoute,
+    AuthenticatedDashboardChatIndexRoute: AuthenticatedDashboardChatIndexRoute,
   }
 
 const AuthenticatedDashboardRouteWithChildren =
