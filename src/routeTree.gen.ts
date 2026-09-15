@@ -64,6 +64,7 @@ import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authe
 import { Route as LovableEmailEventsRouteImport } from './routes/lovable/email/events'
 import { Route as LeadsAdminUsersRouteImport } from './routes/leads.admin.users'
 import { Route as HelpCollectionSlugRouteImport } from './routes/help.$collection.$slug'
+import { Route as ApiPublicProviderProbeRouteImport } from './routes/api/public/provider-probe'
 import { Route as ApiPublicGoldRouteImport } from './routes/api/public/gold'
 import { Route as AuthenticatedDashboardWorkspaceRouteImport } from './routes/_authenticated/dashboard.workspace'
 import { Route as AuthenticatedDashboardUsageRouteImport } from './routes/_authenticated/dashboard.usage'
@@ -382,6 +383,11 @@ const HelpCollectionSlugRoute = HelpCollectionSlugRouteImport.update({
   path: '/help/$collection/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicProviderProbeRoute = ApiPublicProviderProbeRouteImport.update({
+  id: '/api/public/provider-probe',
+  path: '/api/public/provider-probe',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicGoldRoute = ApiPublicGoldRouteImport.update({
   id: '/api/public/gold',
   path: '/api/public/gold',
@@ -696,6 +702,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/usage': typeof AuthenticatedDashboardUsageRoute
   '/dashboard/workspace': typeof AuthenticatedDashboardWorkspaceRoute
   '/api/public/gold': typeof ApiPublicGoldRoute
+  '/api/public/provider-probe': typeof ApiPublicProviderProbeRoute
   '/help/$collection/$slug': typeof HelpCollectionSlugRoute
   '/leads/admin/users': typeof LeadsAdminUsersRoute
   '/lovable/email/events': typeof LovableEmailEventsRoute
@@ -789,6 +796,7 @@ export interface FileRoutesByTo {
   '/dashboard/usage': typeof AuthenticatedDashboardUsageRoute
   '/dashboard/workspace': typeof AuthenticatedDashboardWorkspaceRoute
   '/api/public/gold': typeof ApiPublicGoldRoute
+  '/api/public/provider-probe': typeof ApiPublicProviderProbeRoute
   '/help/$collection/$slug': typeof HelpCollectionSlugRoute
   '/leads/admin/users': typeof LeadsAdminUsersRoute
   '/lovable/email/events': typeof LovableEmailEventsRoute
@@ -889,6 +897,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/usage': typeof AuthenticatedDashboardUsageRoute
   '/_authenticated/dashboard/workspace': typeof AuthenticatedDashboardWorkspaceRoute
   '/api/public/gold': typeof ApiPublicGoldRoute
+  '/api/public/provider-probe': typeof ApiPublicProviderProbeRoute
   '/help/$collection/$slug': typeof HelpCollectionSlugRoute
   '/leads/admin/users': typeof LeadsAdminUsersRoute
   '/lovable/email/events': typeof LovableEmailEventsRoute
@@ -989,6 +998,7 @@ export interface FileRouteTypes {
     | '/dashboard/usage'
     | '/dashboard/workspace'
     | '/api/public/gold'
+    | '/api/public/provider-probe'
     | '/help/$collection/$slug'
     | '/leads/admin/users'
     | '/lovable/email/events'
@@ -1082,6 +1092,7 @@ export interface FileRouteTypes {
     | '/dashboard/usage'
     | '/dashboard/workspace'
     | '/api/public/gold'
+    | '/api/public/provider-probe'
     | '/help/$collection/$slug'
     | '/leads/admin/users'
     | '/lovable/email/events'
@@ -1181,6 +1192,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/usage'
     | '/_authenticated/dashboard/workspace'
     | '/api/public/gold'
+    | '/api/public/provider-probe'
     | '/help/$collection/$slug'
     | '/leads/admin/users'
     | '/lovable/email/events'
@@ -1249,6 +1261,7 @@ export interface RootRouteChildren {
   TermsRoute: typeof TermsRoute
   HelpIndexRoute: typeof HelpIndexRoute
   ApiPublicGoldRoute: typeof ApiPublicGoldRoute
+  ApiPublicProviderProbeRoute: typeof ApiPublicProviderProbeRoute
   HelpCollectionSlugRoute: typeof HelpCollectionSlugRoute
   LovableEmailEventsRoute: typeof LovableEmailEventsRoute
   HelpCollectionIndexRoute: typeof HelpCollectionIndexRoute
@@ -1655,6 +1668,13 @@ declare module '@tanstack/react-router' {
       path: '/help/$collection/$slug'
       fullPath: '/help/$collection/$slug'
       preLoaderRoute: typeof HelpCollectionSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/provider-probe': {
+      id: '/api/public/provider-probe'
+      path: '/api/public/provider-probe'
+      fullPath: '/api/public/provider-probe'
+      preLoaderRoute: typeof ApiPublicProviderProbeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/gold': {
@@ -2148,6 +2168,7 @@ const rootRouteChildren: RootRouteChildren = {
   TermsRoute: TermsRoute,
   HelpIndexRoute: HelpIndexRoute,
   ApiPublicGoldRoute: ApiPublicGoldRoute,
+  ApiPublicProviderProbeRoute: ApiPublicProviderProbeRoute,
   HelpCollectionSlugRoute: HelpCollectionSlugRoute,
   LovableEmailEventsRoute: LovableEmailEventsRoute,
   HelpCollectionIndexRoute: HelpCollectionIndexRoute,
