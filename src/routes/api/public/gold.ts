@@ -3,7 +3,7 @@ import { authenticateExtensionRequest, extJson, EXT_CORS_HEADERS } from '@/lib/e
 import { resolveInstrument, fetchInstrumentCandles, fetchLiveInstrumentTick } from '@/lib/gold-analysis.functions'
 import { analyzeTF, buildLiquidityPools } from '@/lib/analysis/engine'
 import { callChatCompletion, EXTENSION_MODEL_CHAIN } from '@/lib/ai-gateway'
-import { runExtensionDesk, RULES_PRIMARY_MODEL, RULES_SENIOR_MODEL } from '@/lib/analysis/extension-desk'
+import { runExtensionDesk, RULES_PRIMARY_MODEL } from '@/lib/analysis/extension-desk'
 import { isGoldSymbol } from '@/lib/plan-entitlements'
 
 type Body = {
