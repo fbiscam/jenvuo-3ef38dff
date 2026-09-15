@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { ChatWorkspace } from "@/components/ChatWorkspace";
 
-export const Route = createFileRoute("/_authenticated/dashboard/chat/$threadId")({
+export const Route = createFileRoute("/_authenticated/chat/$threadId")({
   head: () => ({
     meta: [
       { title: "Jenvu Chat — AI assistant" },

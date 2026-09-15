@@ -220,7 +220,7 @@ export function ChatWorkspace({ threadId }: { threadId: string }) {
   }
 
   function startNewChat() {
-    void navigate({ to: "/dashboard/chat/$threadId", params: { threadId: newThreadId() } });
+    void navigate({ to: "/chat/$threadId", params: { threadId: newThreadId() } });
   }
 
   function removeThread(id: string) {
@@ -411,7 +411,7 @@ export function ChatWorkspace({ threadId }: { threadId: string }) {
                       )}
                     >
                       <Link
-                        to="/dashboard/chat/$threadId"
+                        to="/chat/$threadId"
                         params={{ threadId: item.id }}
                         className="min-w-0 truncate px-2.5 py-2 text-sm"
                       >

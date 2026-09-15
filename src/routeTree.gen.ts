@@ -61,6 +61,7 @@ import { Route as AuthenticatedInboxRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as HelpCollectionIndexRouteImport } from './routes/help.$collection.index'
 import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated/dashboard.index'
+import { Route as AuthenticatedChatIndexRouteImport } from './routes/_authenticated/chat.index'
 import { Route as LovableEmailEventsRouteImport } from './routes/lovable/email/events'
 import { Route as LeadsAdminUsersRouteImport } from './routes/leads.admin.users'
 import { Route as HelpCollectionSlugRouteImport } from './routes/help.$collection.$slug'
@@ -79,7 +80,7 @@ import { Route as AuthenticatedDashboardDocumentsRouteImport } from './routes/_a
 import { Route as AuthenticatedDashboardBillingRouteImport } from './routes/_authenticated/dashboard.billing'
 import { Route as AuthenticatedDashboardAnalyticsRouteImport } from './routes/_authenticated/dashboard.analytics'
 import { Route as AuthenticatedDashboardAlertsRouteImport } from './routes/_authenticated/dashboard.alerts'
-import { Route as AuthenticatedDashboardChatIndexRouteImport } from './routes/_authenticated/dashboard.chat.index'
+import { Route as AuthenticatedChatThreadIdRouteImport } from './routes/_authenticated/chat.$threadId'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
 import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
@@ -96,7 +97,6 @@ import { Route as ApiPublicHooksBackfillInsightImagesRouteImport } from './route
 import { Route as ApiPublicHooksAutoScanRouteImport } from './routes/api/public/hooks/auto-scan'
 import { Route as ApiPublicExtensionVerifyRouteImport } from './routes/api/public/extension/verify'
 import { Route as ApiPublicExtensionAnalyzeRouteImport } from './routes/api/public/extension/analyze'
-import { Route as AuthenticatedDashboardChatThreadIdRouteImport } from './routes/_authenticated/dashboard.chat.$threadId'
 import { Route as AuthenticatedDashboardAdminTvMismatchRouteImport } from './routes/_authenticated/dashboard.admin.tv-mismatch'
 import { Route as AuthenticatedDashboardAdminTuningRouteImport } from './routes/_authenticated/dashboard.admin.tuning'
 import { Route as AuthenticatedDashboardAdminSubscribersRouteImport } from './routes/_authenticated/dashboard.admin.subscribers'
@@ -369,6 +369,11 @@ const AuthenticatedDashboardIndexRoute =
     path: '/',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
+const AuthenticatedChatIndexRoute = AuthenticatedChatIndexRouteImport.update({
+  id: '/chat/',
+  path: '/chat/',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const LovableEmailEventsRoute = LovableEmailEventsRouteImport.update({
   id: '/lovable/email/events',
   path: '/lovable/email/events',
@@ -473,11 +478,11 @@ const AuthenticatedDashboardAlertsRoute =
     path: '/alerts',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
-const AuthenticatedDashboardChatIndexRoute =
-  AuthenticatedDashboardChatIndexRouteImport.update({
-    id: '/chat/',
-    path: '/chat/',
-    getParentRoute: () => AuthenticatedDashboardRoute,
+const AuthenticatedChatThreadIdRoute =
+  AuthenticatedChatThreadIdRouteImport.update({
+    id: '/chat/$threadId',
+    path: '/chat/$threadId',
+    getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const LovableEmailTransactionalPreviewRoute =
   LovableEmailTransactionalPreviewRouteImport.update({
@@ -571,12 +576,6 @@ const ApiPublicExtensionAnalyzeRoute =
     id: '/api/public/extension/analyze',
     path: '/api/public/extension/analyze',
     getParentRoute: () => rootRouteImport,
-  } as any)
-const AuthenticatedDashboardChatThreadIdRoute =
-  AuthenticatedDashboardChatThreadIdRouteImport.update({
-    id: '/chat/$threadId',
-    path: '/chat/$threadId',
-    getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
 const AuthenticatedDashboardAdminTvMismatchRoute =
   AuthenticatedDashboardAdminTvMismatchRouteImport.update({
@@ -695,6 +694,7 @@ export interface FileRoutesByFullPath {
   '/jenvu-ops-x9k2/': typeof JenvuOpsX9k2IndexRoute
   '/leads/': typeof LeadsIndexRoute
   '/ops-x9k2-7m4n/': typeof OpsX9k27m4nIndexRoute
+  '/chat/$threadId': typeof AuthenticatedChatThreadIdRoute
   '/dashboard/alerts': typeof AuthenticatedDashboardAlertsRoute
   '/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
   '/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
@@ -713,6 +713,7 @@ export interface FileRoutesByFullPath {
   '/help/$collection/$slug': typeof HelpCollectionSlugRoute
   '/leads/admin/users': typeof LeadsAdminUsersRoute
   '/lovable/email/events': typeof LovableEmailEventsRoute
+  '/chat/': typeof AuthenticatedChatIndexRoute
   '/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/help/$collection/': typeof HelpCollectionIndexRoute
   '/dashboard/admin/accuracy': typeof AuthenticatedDashboardAdminAccuracyRoute
@@ -726,7 +727,6 @@ export interface FileRoutesByFullPath {
   '/dashboard/admin/subscribers': typeof AuthenticatedDashboardAdminSubscribersRoute
   '/dashboard/admin/tuning': typeof AuthenticatedDashboardAdminTuningRoute
   '/dashboard/admin/tv-mismatch': typeof AuthenticatedDashboardAdminTvMismatchRoute
-  '/dashboard/chat/$threadId': typeof AuthenticatedDashboardChatThreadIdRoute
   '/api/public/extension/analyze': typeof ApiPublicExtensionAnalyzeRoute
   '/api/public/extension/verify': typeof ApiPublicExtensionVerifyRoute
   '/api/public/hooks/auto-scan': typeof ApiPublicHooksAutoScanRoute
@@ -743,7 +743,6 @@ export interface FileRoutesByFullPath {
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
-  '/dashboard/chat/': typeof AuthenticatedDashboardChatIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -790,6 +789,7 @@ export interface FileRoutesByTo {
   '/jenvu-ops-x9k2': typeof JenvuOpsX9k2IndexRoute
   '/leads': typeof LeadsIndexRoute
   '/ops-x9k2-7m4n': typeof OpsX9k27m4nIndexRoute
+  '/chat/$threadId': typeof AuthenticatedChatThreadIdRoute
   '/dashboard/alerts': typeof AuthenticatedDashboardAlertsRoute
   '/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
   '/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
@@ -808,6 +808,7 @@ export interface FileRoutesByTo {
   '/help/$collection/$slug': typeof HelpCollectionSlugRoute
   '/leads/admin/users': typeof LeadsAdminUsersRoute
   '/lovable/email/events': typeof LovableEmailEventsRoute
+  '/chat': typeof AuthenticatedChatIndexRoute
   '/dashboard': typeof AuthenticatedDashboardIndexRoute
   '/help/$collection': typeof HelpCollectionIndexRoute
   '/dashboard/admin/accuracy': typeof AuthenticatedDashboardAdminAccuracyRoute
@@ -821,7 +822,6 @@ export interface FileRoutesByTo {
   '/dashboard/admin/subscribers': typeof AuthenticatedDashboardAdminSubscribersRoute
   '/dashboard/admin/tuning': typeof AuthenticatedDashboardAdminTuningRoute
   '/dashboard/admin/tv-mismatch': typeof AuthenticatedDashboardAdminTvMismatchRoute
-  '/dashboard/chat/$threadId': typeof AuthenticatedDashboardChatThreadIdRoute
   '/api/public/extension/analyze': typeof ApiPublicExtensionAnalyzeRoute
   '/api/public/extension/verify': typeof ApiPublicExtensionVerifyRoute
   '/api/public/hooks/auto-scan': typeof ApiPublicHooksAutoScanRoute
@@ -838,7 +838,6 @@ export interface FileRoutesByTo {
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
-  '/dashboard/chat': typeof AuthenticatedDashboardChatIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -892,6 +891,7 @@ export interface FileRoutesById {
   '/jenvu-ops-x9k2/': typeof JenvuOpsX9k2IndexRoute
   '/leads/': typeof LeadsIndexRoute
   '/ops-x9k2-7m4n/': typeof OpsX9k27m4nIndexRoute
+  '/_authenticated/chat/$threadId': typeof AuthenticatedChatThreadIdRoute
   '/_authenticated/dashboard/alerts': typeof AuthenticatedDashboardAlertsRoute
   '/_authenticated/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
   '/_authenticated/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
@@ -910,6 +910,7 @@ export interface FileRoutesById {
   '/help/$collection/$slug': typeof HelpCollectionSlugRoute
   '/leads/admin/users': typeof LeadsAdminUsersRoute
   '/lovable/email/events': typeof LovableEmailEventsRoute
+  '/_authenticated/chat/': typeof AuthenticatedChatIndexRoute
   '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/help/$collection/': typeof HelpCollectionIndexRoute
   '/_authenticated/dashboard/admin/accuracy': typeof AuthenticatedDashboardAdminAccuracyRoute
@@ -923,7 +924,6 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/admin/subscribers': typeof AuthenticatedDashboardAdminSubscribersRoute
   '/_authenticated/dashboard/admin/tuning': typeof AuthenticatedDashboardAdminTuningRoute
   '/_authenticated/dashboard/admin/tv-mismatch': typeof AuthenticatedDashboardAdminTvMismatchRoute
-  '/_authenticated/dashboard/chat/$threadId': typeof AuthenticatedDashboardChatThreadIdRoute
   '/api/public/extension/analyze': typeof ApiPublicExtensionAnalyzeRoute
   '/api/public/extension/verify': typeof ApiPublicExtensionVerifyRoute
   '/api/public/hooks/auto-scan': typeof ApiPublicHooksAutoScanRoute
@@ -940,7 +940,6 @@ export interface FileRoutesById {
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
-  '/_authenticated/dashboard/chat/': typeof AuthenticatedDashboardChatIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -994,6 +993,7 @@ export interface FileRouteTypes {
     | '/jenvu-ops-x9k2/'
     | '/leads/'
     | '/ops-x9k2-7m4n/'
+    | '/chat/$threadId'
     | '/dashboard/alerts'
     | '/dashboard/analytics'
     | '/dashboard/billing'
@@ -1012,6 +1012,7 @@ export interface FileRouteTypes {
     | '/help/$collection/$slug'
     | '/leads/admin/users'
     | '/lovable/email/events'
+    | '/chat/'
     | '/dashboard/'
     | '/help/$collection/'
     | '/dashboard/admin/accuracy'
@@ -1025,7 +1026,6 @@ export interface FileRouteTypes {
     | '/dashboard/admin/subscribers'
     | '/dashboard/admin/tuning'
     | '/dashboard/admin/tv-mismatch'
-    | '/dashboard/chat/$threadId'
     | '/api/public/extension/analyze'
     | '/api/public/extension/verify'
     | '/api/public/hooks/auto-scan'
@@ -1042,7 +1042,6 @@ export interface FileRouteTypes {
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/transactional/preview'
-    | '/dashboard/chat/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -1089,6 +1088,7 @@ export interface FileRouteTypes {
     | '/jenvu-ops-x9k2'
     | '/leads'
     | '/ops-x9k2-7m4n'
+    | '/chat/$threadId'
     | '/dashboard/alerts'
     | '/dashboard/analytics'
     | '/dashboard/billing'
@@ -1107,6 +1107,7 @@ export interface FileRouteTypes {
     | '/help/$collection/$slug'
     | '/leads/admin/users'
     | '/lovable/email/events'
+    | '/chat'
     | '/dashboard'
     | '/help/$collection'
     | '/dashboard/admin/accuracy'
@@ -1120,7 +1121,6 @@ export interface FileRouteTypes {
     | '/dashboard/admin/subscribers'
     | '/dashboard/admin/tuning'
     | '/dashboard/admin/tv-mismatch'
-    | '/dashboard/chat/$threadId'
     | '/api/public/extension/analyze'
     | '/api/public/extension/verify'
     | '/api/public/hooks/auto-scan'
@@ -1137,7 +1137,6 @@ export interface FileRouteTypes {
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/transactional/preview'
-    | '/dashboard/chat'
   id:
     | '__root__'
     | '/'
@@ -1190,6 +1189,7 @@ export interface FileRouteTypes {
     | '/jenvu-ops-x9k2/'
     | '/leads/'
     | '/ops-x9k2-7m4n/'
+    | '/_authenticated/chat/$threadId'
     | '/_authenticated/dashboard/alerts'
     | '/_authenticated/dashboard/analytics'
     | '/_authenticated/dashboard/billing'
@@ -1208,6 +1208,7 @@ export interface FileRouteTypes {
     | '/help/$collection/$slug'
     | '/leads/admin/users'
     | '/lovable/email/events'
+    | '/_authenticated/chat/'
     | '/_authenticated/dashboard/'
     | '/help/$collection/'
     | '/_authenticated/dashboard/admin/accuracy'
@@ -1221,7 +1222,6 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/admin/subscribers'
     | '/_authenticated/dashboard/admin/tuning'
     | '/_authenticated/dashboard/admin/tv-mismatch'
-    | '/_authenticated/dashboard/chat/$threadId'
     | '/api/public/extension/analyze'
     | '/api/public/extension/verify'
     | '/api/public/hooks/auto-scan'
@@ -1238,7 +1238,6 @@ export interface FileRouteTypes {
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/transactional/preview'
-    | '/_authenticated/dashboard/chat/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -1662,6 +1661,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardIndexRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
+    '/_authenticated/chat/': {
+      id: '/_authenticated/chat/'
+      path: '/chat'
+      fullPath: '/chat/'
+      preLoaderRoute: typeof AuthenticatedChatIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/lovable/email/events': {
       id: '/lovable/email/events'
       path: '/lovable/email/events'
@@ -1788,12 +1794,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardAlertsRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
-    '/_authenticated/dashboard/chat/': {
-      id: '/_authenticated/dashboard/chat/'
-      path: '/chat'
-      fullPath: '/dashboard/chat/'
-      preLoaderRoute: typeof AuthenticatedDashboardChatIndexRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
+    '/_authenticated/chat/$threadId': {
+      id: '/_authenticated/chat/$threadId'
+      path: '/chat/$threadId'
+      fullPath: '/chat/$threadId'
+      preLoaderRoute: typeof AuthenticatedChatThreadIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/lovable/email/transactional/preview': {
       id: '/lovable/email/transactional/preview'
@@ -1907,13 +1913,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicExtensionAnalyzeRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/dashboard/chat/$threadId': {
-      id: '/_authenticated/dashboard/chat/$threadId'
-      path: '/chat/$threadId'
-      fullPath: '/dashboard/chat/$threadId'
-      preLoaderRoute: typeof AuthenticatedDashboardChatThreadIdRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
-    }
     '/_authenticated/dashboard/admin/tv-mismatch': {
       id: '/_authenticated/dashboard/admin/tv-mismatch'
       path: '/admin/tv-mismatch'
@@ -2021,8 +2020,6 @@ interface AuthenticatedDashboardRouteChildren {
   AuthenticatedDashboardAdminSubscribersRoute: typeof AuthenticatedDashboardAdminSubscribersRoute
   AuthenticatedDashboardAdminTuningRoute: typeof AuthenticatedDashboardAdminTuningRoute
   AuthenticatedDashboardAdminTvMismatchRoute: typeof AuthenticatedDashboardAdminTvMismatchRoute
-  AuthenticatedDashboardChatThreadIdRoute: typeof AuthenticatedDashboardChatThreadIdRoute
-  AuthenticatedDashboardChatIndexRoute: typeof AuthenticatedDashboardChatIndexRoute
 }
 
 const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
@@ -2064,9 +2061,6 @@ const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
       AuthenticatedDashboardAdminTuningRoute,
     AuthenticatedDashboardAdminTvMismatchRoute:
       AuthenticatedDashboardAdminTvMismatchRoute,
-    AuthenticatedDashboardChatThreadIdRoute:
-      AuthenticatedDashboardChatThreadIdRoute,
-    AuthenticatedDashboardChatIndexRoute: AuthenticatedDashboardChatIndexRoute,
   }
 
 const AuthenticatedDashboardRouteWithChildren =
@@ -2077,11 +2071,15 @@ const AuthenticatedDashboardRouteWithChildren =
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRouteWithChildren
   AuthenticatedInboxRoute: typeof AuthenticatedInboxRoute
+  AuthenticatedChatThreadIdRoute: typeof AuthenticatedChatThreadIdRoute
+  AuthenticatedChatIndexRoute: typeof AuthenticatedChatIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRouteWithChildren,
   AuthenticatedInboxRoute: AuthenticatedInboxRoute,
+  AuthenticatedChatThreadIdRoute: AuthenticatedChatThreadIdRoute,
+  AuthenticatedChatIndexRoute: AuthenticatedChatIndexRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
