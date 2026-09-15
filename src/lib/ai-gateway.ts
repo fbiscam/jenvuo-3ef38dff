@@ -57,6 +57,7 @@ function sleep(ms: number) {
 }
 
 function providerConfigured(model: string): boolean {
+  if (model.startsWith("omniroute/")) return Boolean(process.env.CUSTOM_AI_API_KEY && process.env.CUSTOM_AI_BASE_URL);
   if (model.startsWith("blackboxai/")) return Boolean(process.env.BLACKBOX_API_KEY);
   if (model.startsWith("nvapi/")) return Boolean(process.env.NVIDIA_API_KEY);
   if (model.startsWith("bmind/")) return Boolean(process.env.BLUESMIND_API_KEY || process.env.BLUESMINDS_API_KEY || process.env.OPENAI_API_KEY);
@@ -387,6 +388,7 @@ async function singleAttemptInner(
   signal?: AbortSignal,
 ): Promise<{ content: string; usage: UsageInfo }> {
   // Route by prefix:
+  //   `omniroute/*`   → Self-hosted OmniRoute (OpenAI-compatible)
   //   `blackboxai/*` → Blackbox API
   //   `nvapi/*`      → NVIDIA Integrate API (strip prefix to get real model id)
   //   `bmind/*`      → Bluesminds unified gateway (OpenAI-compatible)
@@ -401,6 +403,7 @@ async function singleAttemptInner(
   // Lovable AI workspace credits.
   if (model.startsWith("jw/")) return callJustwoker(model, opts, signal);
   if (model.startsWith("browseruse/")) return callBrowserUse(model, opts, signal);
+  const isOmniRoute = model.startsWith("omniroute/");
   const isBlackbox = model.startsWith("blackboxai/");
   const isNvidia = model.startsWith("nvapi/");
   const isBmind = model.startsWith("bmind/");
@@ -410,11 +413,12 @@ async function singleAttemptInner(
   const isUnoRouter = model.startsWith("unorouter/");
   const isDsOfficial = model.startsWith("dsofficial/");
   const isOai = model.startsWith("oai/");
-  const isExternalProvider = isBlackbox || isNvidia || isBmind || isTukenku || isUnikey || isEvolink || isUnoRouter || isDsOfficial || isOai;
+  const isExternalProvider = isOmniRoute || isBlackbox || isNvidia || isBmind || isTukenku || isUnikey || isEvolink || isUnoRouter || isDsOfficial || isOai;
   if (!isExternalProvider) {
     throw new AiGatewayError(`Unsupported external AI provider for model: ${model}`, 400, true);
   }
   const blackboxKey = process.env.BLACKBOX_API_KEY;
+  const omniRouteKey = process.env.CUSTOM_AI_API_KEY;
   const nvidiaKey = process.env.NVIDIA_API_KEY;
   // Prefer the newer second BluesMinds credential. The singular slot is kept
   // only as a legacy fallback because that account can be out of quota.
@@ -428,6 +432,10 @@ async function singleAttemptInner(
   const unoRouterKey = process.env.UNOROUTER_API_KEY;
   const deepseekKey = process.env.DEEPSEEK_API_KEY;
   const openaiKey = process.env.OPENAI_API_KEY;
+  const omniRouteBase = (process.env.CUSTOM_AI_BASE_URL || "").replace(/\/+$/, "");
+  if (isOmniRoute && !/^https:\/\//i.test(omniRouteBase)) {
+    throw new AiGatewayError("OmniRoute requires a public HTTPS server address.", 0, true);
+  }
 
   // Bluesmind base URL is configurable (BLUESMIND_BASE_URL), e.g.
   // "https://api.bluesminds.com/v1" — with or without a trailing
@@ -437,7 +445,11 @@ async function singleAttemptInner(
     ? bmindBase
     : `${bmindBase}/chat/completions`;
 
-  const endpoint = isOai
+  const endpoint = isOmniRoute
+    ? /\/chat\/completions$/i.test(omniRouteBase)
+      ? omniRouteBase
+      : `${omniRouteBase.replace(/\/v1$/i, "")}/v1/chat/completions`
+    : isOai
     ? "https://api.openai.com/v1/chat/completions"
     : isBlackbox
     ? "https://api.blackbox.ai/v1/chat/completions"
@@ -456,7 +468,10 @@ async function singleAttemptInner(
     : "https://api.deepseek.com/chat/completions";
 
   const headers: Record<string, string> = { "Content-Type": "application/json" };
-  if (isBlackbox) {
+  if (isOmniRoute) {
+    if (!omniRouteKey) throw new AiGatewayError("CUSTOM_AI_API_KEY missing on server", 0, true);
+    headers["Authorization"] = `Bearer ${omniRouteKey}`;
+  } else if (isBlackbox) {
     if (!blackboxKey) throw new AiGatewayError("BLACKBOX_API_KEY missing on server", 0, true);
     headers["Authorization"] = `Bearer ${blackboxKey}`;
   } else if (isNvidia) {
@@ -502,6 +517,8 @@ async function singleAttemptInner(
     ? model.slice("unorouter/".length)
     : isDsOfficial
     ? model.slice("dsofficial/".length)
+    : isOmniRoute
+    ? model.slice("omniroute/".length)
     : model;
 
   // Determinism: temperature 0 + top_p 1 + stable seed so the same input
@@ -524,8 +541,8 @@ async function singleAttemptInner(
     ...(usesDefaultTemperature ? {} : { temperature: 0, top_p: 1 }),
   };
   // Blackbox/NVIDIA/Bluesminds/DeepSeek-official: don't force response_format — rely on system prompt.
-  if (opts.jsonMode && isOai) body.response_format = { type: "json_object" };
-  else if (opts.jsonMode && !isBlackbox && !isNvidia && !isBmind && !isTukenku && !isUnikey && !isEvolink && !isUnoRouter && !isDsOfficial && !isOai) body.response_format = { type: "json_object" };
+  if (opts.jsonMode && (isOai || isOmniRoute)) body.response_format = { type: "json_object" };
+  else if (opts.jsonMode && !isOmniRoute && !isBlackbox && !isNvidia && !isBmind && !isTukenku && !isUnikey && !isEvolink && !isUnoRouter && !isDsOfficial && !isOai) body.response_format = { type: "json_object" };
   if (opts.maxTokens) {
     if (((isOai || isEvolink || isUnoRouter) && /^gpt-(?:5|6)/i.test(wireModel)) || (!isBlackbox && !isNvidia && !isBmind && !isTukenku && !isUnikey && !isEvolink && !isUnoRouter && !isDsOfficial && !isOai && /^openai\/gpt-(?:5|6)/i.test(model))) {
       body.max_completion_tokens = opts.maxTokens;
@@ -547,7 +564,7 @@ async function singleAttemptInner(
 
   if (!res.ok) {
     const txt = await res.text().catch(() => "");
-    const terminal = (isBlackbox || isNvidia || isBmind || isTukenku || isUnikey || isEvolink || isUnoRouter || isDsOfficial || isOai)
+    const terminal = (isOmniRoute || isBlackbox || isNvidia || isBmind || isTukenku || isUnikey || isEvolink || isUnoRouter || isDsOfficial || isOai)
       ? !(res.status === 429 || res.status >= 500 || res.status === 403 || res.status === 400 || res.status === 401 || res.status === 404)
       : !(res.status === 429 || res.status >= 500);
 
