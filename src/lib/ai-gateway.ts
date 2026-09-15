@@ -1027,10 +1027,18 @@ const EXTENSION_GEMINI_RELIABLE = [
   "omniroute/auto/gemini",
 ] as const;
 
+// Primary market-structure review runs on OmniRoute Claude (live-verified:
+// all three routes returned 200 in 5-9s). No senior pass — primary only.
+const EXTENSION_CLAUDE_PRIMARY = [
+  "omniroute/auto/claude-opus",
+  "omniroute/auto/claude-sonnet",
+  "omniroute/agy/claude-sonnet-4-6",
+] as const;
+
 export const EXTENSION_MODEL_CHAIN = {
   conversation: [...EXTENSION_GEMINI_RELIABLE],
-  reasoning: [...EXTENSION_GEMINI_RELIABLE],
-  vision: [...EXTENSION_GEMINI_RELIABLE],
+  reasoning: [...EXTENSION_CLAUDE_PRIMARY],
+  vision: [...EXTENSION_CLAUDE_PRIMARY],
   seniorReview: [
     "omniroute/agy/gemini-3.7-flash-medium",
     "omniroute/agy/gemini-3.7-flash-high",
