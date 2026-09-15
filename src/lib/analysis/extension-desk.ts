@@ -165,10 +165,10 @@ export function runExtensionDesk(input: DeskInput): DeskResult {
   const bias = directionBias(trade, h4.trend, h1.trend)
   const passed = scored.factors.filter((factor) => factor.pass).sort((a, b) => b.weight - a.weight).slice(0, 7)
   const failed = scored.factors.filter((factor) => !factor.pass).sort((a, b) => b.weight - a.weight).slice(0, 5)
-  const entryLine = trade.direction === 'WAIT'
+  const entryLine = direction === 'WAIT'
     ? 'ENTRY/POI: No executable entry.'
     : `ENTRY/POI: ${trade.entryType} ${price(trade.entry)}${zone ? ` · ${zone.kind} ${price(zone.priceLow)}–${price(zone.priceHigh)}` : ''}`
-  const riskLines = trade.direction === 'WAIT'
+  const riskLines = direction === 'WAIT'
     ? ['STOP: —', 'TP1 / TP2: —', 'RR: —']
     : [
         `STOP: ${price(trade.sl)}`,
@@ -198,7 +198,7 @@ export function runExtensionDesk(input: DeskInput): DeskResult {
   ].join('\n\n')
 
   const marks: Array<Record<string, string | number>> = []
-  if (trade.direction !== 'WAIT') {
+  if (direction !== 'WAIT') {
     marks.push(
       { kind: 'line', level: trade.entry, label: `${trade.entryType} ENTRY`, tone: trade.direction === 'BUY' ? 'buy' : 'sell' },
       { kind: 'line', level: trade.sl, label: 'STOP', tone: 'sell' },
