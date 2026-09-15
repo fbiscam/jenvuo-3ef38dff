@@ -74,3 +74,7 @@
 - [x] Make extension XAU/USD analysis and senior validation fully deterministic and model-independent
 - [x] Rebuild and verify the model-independent extension package
 - [x] Require a completed Claude primary review with multiple OmniRoute Claude fallbacks
+- [x] Upgrade the user-uploaded popup/TradingView extension with a deterministic XAU/USD Probability Engine
+- [x] Add multi-timeframe trend/regime, BUY/SELL/WAIT probabilities, and next-three-candle projections
+- [x] Add strict WAIT filters, ICT/SMC evidence, trade levels, and rolling walk-forward validation
+- [ ] Verify and package the uploaded-extension upgrade

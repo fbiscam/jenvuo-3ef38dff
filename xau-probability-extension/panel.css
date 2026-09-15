@@ -562,3 +562,22 @@ body.nc-light {
   border-color: #e0e4e8;
   color: #5c6572;
 }
+
+/* Probability Engine 2.0 */
+.pe-head { display:flex; align-items:center; justify-content:space-between; gap:12px; }
+.pe-section { margin-top:14px; padding-top:13px; border-top:1px solid #1a1a1a; }
+.pe-section h3 { margin:0 0 10px; color:#e7eaf0; font-size:12px; font-weight:500; text-transform:uppercase; letter-spacing:.5px; }
+.pe-prob { display:grid; grid-template-columns:72px 38px 1fr; align-items:center; gap:8px; margin:8px 0; font-size:11px; color:#9aa4b5; }
+.pe-prob b { color:#e7eaf0; font-size:12px; font-weight:500; text-align:right; }
+.pe-prob i { display:block; height:6px; overflow:hidden; border-radius:6px; background:#171717; }
+.pe-prob em { display:block; height:100%; border-radius:inherit; }
+.pe-prob em.buy { background:#3ddc84; }.pe-prob em.sell { background:#ff6b6b; }.pe-prob em.wait { background:#9aa4b5; }
+.pe-plan,.pe-metrics { display:grid; grid-template-columns:1fr 1fr; gap:7px; }
+.pe-plan span,.pe-metrics span { display:flex; flex-direction:column; gap:3px; padding:8px; border:1px solid #1a1a1a; border-radius:8px; color:#8b95a6; font-size:10px; }
+.pe-plan b,.pe-metrics b { color:#e7eaf0; font-size:11px; font-weight:500; overflow-wrap:anywhere; }
+.pe-wait,.pe-risk { margin-top:12px; padding:10px; border:1px solid rgba(150,158,172,.35); border-radius:10px; color:#b6bfcc; background:rgba(150,158,172,.1); font-size:11px; line-height:1.45; }
+.pe-risk { color:#8b95a6; background:transparent; border-color:#171717; }
+.nc-light .pe-section { border-top-color:#eceff1; }.nc-light .pe-section h3,.nc-light .pe-prob b,.nc-light .pe-plan b,.nc-light .pe-metrics b { color:#202124; }
+.nc-light .pe-prob i { background:#eceff1; }.nc-light .pe-plan span,.nc-light .pe-metrics span { border-color:#eceff1; color:#5f6368; }
+.nc-light .pe-wait,.nc-light .pe-risk { color:#5f6368; border-color:#e0e4e8; }
+#nc-panel .nc-root { max-height:calc(100vh - 145px); overflow:auto; scrollbar-width:thin; }
