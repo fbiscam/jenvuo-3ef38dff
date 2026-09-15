@@ -66,4 +66,4 @@
 - [x] Run security and TypeScript verification
 - [x] Restore extension AI routing after the primary provider tunnel went offline
 - [x] Prevent provider credential failures from being shown as an invalid extension key
-- [ ] Verify a live two-stage XAU/USD extension analysis and rebuild the install package
+- [x] Verify a live two-stage XAU/USD extension analysis and rebuild the install package
