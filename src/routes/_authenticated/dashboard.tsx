@@ -1507,6 +1507,7 @@ const PRODUCT_UPDATES = [
     age: "Latest",
     title: " Smarter chart validation",
     copy: "Chart images are now checked before GPT-6 Astra starts its analysis.",
+    time: "15 Sep 2026 · 09:40",
     icon: ScanSearch,
   },
   {
