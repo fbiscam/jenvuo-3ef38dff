@@ -1507,18 +1507,21 @@ const PRODUCT_UPDATES = [
     age: "Latest",
     title: " Smarter chart validation",
     copy: "Chart images are now checked before GPT-6 Astra starts its analysis.",
+    time: "15 Sep 2026 · 09:40",
     icon: ScanSearch,
   },
   {
     age: "Latest",
     title: " Reliable senior review",
     copy: "Claude Opus 5 must complete its review before eligible signals are shown.",
+    time: "14 Sep 2026 · 17:05",
     icon: ShieldCheckIcon,
   },
   {
     age: "Updated",
     title: "  Provider fallback",
     copy: "Analysis continues through another provider when an AI account is unavailable.",
+    time: "12 Sep 2026 · 11:20",
     icon: RefreshCw,
   },
 ] as const;
@@ -1578,6 +1581,7 @@ function ModelWorkspace() {
                   <div className="min-w-0">
                     <h3 className="text-sm font-normal text-foreground">{update.title}</h3>
                     <p className="mt-1 text-sm leading-5 text-muted-foreground">{update.copy}</p>
+                    <p className="mt-2 text-xs text-muted-foreground/80">{update.time}</p>
                   </div>
                 </article>
               );
