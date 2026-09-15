@@ -1027,9 +1027,19 @@ const EXTENSION_GEMINI_RELIABLE = [
   "omniroute/auto/gemini",
 ] as const;
 
-// Mandatory primary market-structure review runs on OmniRoute Claude.
-// Each verified route is attempted in order; callers must not return an
-// unreviewed analysis when the whole chain is unavailable.
+// UnoRouter routes verified live on the current key: gemini-3.6-flash (~4s),
+// glm-5.3-flash (~3.6s), qwen3.5-122b (~5s) and glm-5.3-thinking (~22s, the
+// strongest reasoning route). Paid Claude/GPT ids on that key return 403.
+const EXTENSION_UNOROUTER_PRIMARY = [
+  "unorouter/gemini-3.6-flash:free",
+  "unorouter/glm-5.3-thinking:free",
+  "unorouter/qwen3.5-122b-a10b:free",
+  "unorouter/glm-5.3-flash:free",
+] as const;
+
+// Mandatory primary market-structure review. UnoRouter leads; the verified
+// OmniRoute Claude routes stay as fallback so an unreviewed analysis is
+// never returned.
 const EXTENSION_CLAUDE_PRIMARY = [
   "omniroute/auto/claude-opus",
   "omniroute/auto/claude-sonnet",
@@ -1037,9 +1047,9 @@ const EXTENSION_CLAUDE_PRIMARY = [
 ] as const;
 
 export const EXTENSION_MODEL_CHAIN = {
-  conversation: [...EXTENSION_GEMINI_RELIABLE],
-  reasoning: [...EXTENSION_CLAUDE_PRIMARY],
-  vision: [...EXTENSION_CLAUDE_PRIMARY],
+  conversation: [...EXTENSION_UNOROUTER_PRIMARY, ...EXTENSION_GEMINI_RELIABLE],
+  reasoning: [...EXTENSION_UNOROUTER_PRIMARY, ...EXTENSION_CLAUDE_PRIMARY],
+  vision: [...EXTENSION_CLAUDE_PRIMARY, ...EXTENSION_UNOROUTER_PRIMARY],
   seniorReview: [
     "omniroute/agy/gemini-3.7-flash-medium",
     "omniroute/agy/gemini-3.7-flash-high",
