@@ -978,11 +978,11 @@ function DashboardLayout() {
                       resetScroll={false}
                       onClick={() => { markTabSeen(t.countKey); setMobileNavOpen(false); }}
                       title={sidebarCollapsed ? t.label : undefined}
-                      className={`group relative flex items-center rounded-full text-[12.5px] font-semibold transition ${sidebarCollapsed ? "justify-center px-2 py-1.5" : "gap-3 px-2.5 py-1.5"} ${active ? "bg-[#EBEBEB] text-[#5A5F62]" : "text-[#6A6F72] hover:bg-zinc-50 hover:text-[#5A5F62]"}`}
+                      className={`group relative flex items-center rounded-full text-[12.5px] font-normal text-foreground transition ${sidebarCollapsed ? "justify-center px-2 py-1.5" : "gap-3 px-2.5 py-1.5"} ${active ? "bg-[#EBEBEB]" : "hover:bg-zinc-50"}`}
                     >
                       <Icon
                         className="h-[19px] w-[19px] shrink-0 text-current"
-                        strokeWidth={active ? 2 : 1.75}
+                        strokeWidth={1.75}
                         aria-hidden="true"
                       />
                       {!sidebarCollapsed && <span className="truncate">{t.label}</span>}
