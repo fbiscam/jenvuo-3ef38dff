@@ -69,3 +69,4 @@
 - [x] Verify a live two-stage XAU/USD extension analysis and rebuild the install package
 - [x] Prevent repeated multi-endpoint analysis runs and verify the faster primary/senior fallback package
 - [x] Stabilize ordinary extension chat with tested fast OmniRoute fallbacks
+- [x] Reorder extension chat around currently healthy automatic routes and prevent a slow Claude route from consuming the response window

@@ -211,8 +211,8 @@ async function handle({ request }: { request: Request }) {
           models: [...EXTENSION_MODEL_CHAIN.conversation],
           stage: 'extension-chat',
           maxTokens: 400,
-          timeoutMs: 10_000,
-          deadlineMs: 30_000,
+          timeoutMs: 8_000,
+          deadlineMs: 34_000,
           retriesPerModel: 1,
           messages: [
             {
