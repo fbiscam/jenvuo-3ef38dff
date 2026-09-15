@@ -913,16 +913,10 @@ async function send(preset, silentUser) {
     if (d.ticker) {
       $("price").textContent = d.ticker.price.toFixed(2);
     }
-    if (d.seniorReview?.included && d.seniorReview?.status === "completed") {
-      setReviewStatus("Senior rules review · verified", "verified");
-    } else if (d.mode === "conversation") {
+    if (d.mode === "conversation") {
       setReviewStatus("Chat mode", "");
-    } else if (d.seniorReview?.status === "unavailable") {
-      setReviewStatus("Rules analysis complete · review unavailable", "failed");
-    } else if (d.secondReview?.status === "not_in_plan" || d.seniorReview?.status === "not_in_plan" || d.seniorReview?.status === "not_required") {
-      setReviewStatus("ICT rules analysis · Elite unlocks senior review", "");
     } else {
-      setReviewStatus("ICT rules analysis complete", "verified");
+      setReviewStatus("ICT primary review complete", "verified");
     }
     if (Array.isArray(d.chart) && d.chart.length) renderSnapshot(d);
   } catch (e) {
