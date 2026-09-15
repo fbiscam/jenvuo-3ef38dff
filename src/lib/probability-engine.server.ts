@@ -359,6 +359,6 @@ export async function analyzeGoldProbability(timeframe = "5m") {
       currentRegimeSamples: recentReg?.tested ?? 0,
     },
     news: { verified: false, label: "High-impact news risk not connected" },
-    nextCloseAt: execution.at(-1)!.t + TF_MS[tf] * 2,
+    nextCloseAt: Math.ceil(Date.now() / TF_MS[tf]) * TF_MS[tf],
   };
 }

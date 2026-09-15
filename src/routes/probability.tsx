@@ -244,8 +244,8 @@ function ProbabilityPage() {
                 <ProbBar label="NO TRADE" value={data.probabilities.noTrade} tone="bg-amber-500" />
                 {data.waitReasons.length > 0 && (
                   <ul className="mt-4 space-y-1 text-sm text-muted-foreground">
-                    {data.waitReasons.map((r) => (
-                      <li key={r}>• {r}</li>
+                    {data.waitReasons.map((r, i) => (
+                      <li key={i}>• {r}</li>
                     ))}
                   </ul>
                 )}
@@ -310,8 +310,8 @@ function ProbabilityPage() {
 
               <Block id="evidence" title="ICT / SMC evidence">
                 <ul className="space-y-2 text-sm text-muted-foreground">
-                  {data.evidence.map((e) => (
-                    <li key={e}>• {e}</li>
+                  {data.evidence.map((e, i) => (
+                    <li key={i}>• {e}</li>
                   ))}
                 </ul>
               </Block>
