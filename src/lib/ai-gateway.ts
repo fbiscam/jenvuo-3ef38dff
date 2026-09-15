@@ -949,18 +949,21 @@ export function setCachedPlan<T>(key: string, value: T, ttlMs: number = PLAN_CAC
 // upstream. If every candidate is cooling, we still try the whole chain.
 
 const WORKING_BMIND = [
+  "omniroute/auto/best-reasoning",
   "unorouter/nemotron-3-ultra-550b-a55b:free",
   "unorouter/glm-5.3:free",
   "bmind/gpt-4o",
 ] as const;
 
 const FAST_NARRATION_BMIND = [
+  "omniroute/auto/best-fast",
   "unorouter/glm-5.3:free",
   "unorouter/nemotron-3-ultra-550b-a55b:free",
   "bmind/gpt-4o",
 ] as const;
 
 const SENIOR_REVIEW_BMIND_4O = [
+  "omniroute/auto/claude-opus",
   "evolink/claude-opus-5",
   "browseruse/claude-fable-5",
   "jw/gpt-5.6-sol",
@@ -975,26 +978,28 @@ export const MODEL_CHAIN = {
   narration: FAST_NARRATION_BMIND,
   seniorReview: SENIOR_REVIEW_BMIND_4O,
   macroContext: WORKING_BMIND,
-  chat: ["browseruse/gpt-6-astra", "jw/gpt-5.6-sol", ...WORKING_BMIND] as const,
+  chat: ["omniroute/auto/best-chat", "browseruse/gpt-6-astra", "jw/gpt-5.6-sol", ...WORKING_BMIND] as const,
 } as const;
 
 // Extension calls are intentionally isolated from the shared model chains.
 // Free UnoRouter models handle ordinary conversation. Trading/chart analysis
 // uses GPT-6 Astra first and Claude Fable 5 as its only fallback/reviewer.
 export const EXTENSION_MODEL_CHAIN = {
-  // Normal conversation runs on Bluesminds (verified live, fast) with the
-  // previous free/Astra routes kept only as fallbacks.
+  // OmniRoute's tested automatic routes lead each workload, with the
+  // previous providers retained as fallbacks.
   conversation: [
+    "omniroute/auto/best-fast",
+    "omniroute/auto/best-chat",
     "bmind/openai/gpt-oss-20b",
     "unorouter/glm-5.3:free",
     "browseruse/gpt-6-astra",
     "unorouter/nemotron-3-ultra-550b-a55b:free",
   ],
-  reasoning: ["browseruse/gpt-6-astra", "browseruse/claude-fable-5"],
-  vision: ["browseruse/gpt-6-astra", "browseruse/claude-fable-5"],
-  seniorReview: ["browseruse/claude-fable-5"],
+  reasoning: ["omniroute/auto/best-reasoning", "browseruse/gpt-6-astra", "browseruse/claude-fable-5"],
+  vision: ["omniroute/auto/best-vision", "omniroute/auto/best-reasoning", "browseruse/gpt-6-astra", "browseruse/claude-fable-5"],
+  seniorReview: ["omniroute/auto/claude-opus", "browseruse/claude-fable-5"],
   // Alias retained for callers that identify the senior pass as review #2.
-  secondReview: ["browseruse/claude-fable-5"],
+  secondReview: ["omniroute/auto/claude-opus", "browseruse/claude-fable-5"],
 } as const;
 
 export const MACRO_CONTEXT_CHAIN = WORKING_BMIND;
