@@ -619,8 +619,10 @@ async function singleAttemptInner(
   seed = Math.abs(seed) || 1;
 
   // GPT-5 family only accepts default temperature (1); skip temp/top_p there,
-  // keep seed for determinism.
-  const usesDefaultTemperature = /(^|\/)gpt-(?:5|6)/i.test(wireModel);
+  // keep seed for determinism. OmniRoute's `auto/*` routes pick a different,
+  // far slower upstream when temperature/top_p are pinned (25s+ for a trivial
+  // prompt vs ~3s without), so they are treated the same way.
+  const usesDefaultTemperature = /(^|\/)gpt-(?:5|6)/i.test(wireModel) || isOmniRoute;
 
   const body: Record<string, unknown> = {
     model: wireModel,
