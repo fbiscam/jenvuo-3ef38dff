@@ -3,7 +3,7 @@ import { authenticateExtensionRequest, extJson, EXT_CORS_HEADERS } from '@/lib/e
 import { resolveInstrument, fetchInstrumentCandles, fetchLiveInstrumentTick } from '@/lib/gold-analysis.functions'
 import { analyzeTF, buildLiquidityPools } from '@/lib/analysis/engine'
 import { callChatCompletion, EXTENSION_MODEL_CHAIN } from '@/lib/ai-gateway'
-import { runExtensionDesk, RULES_PRIMARY_MODEL, RULES_SENIOR_MODEL } from '@/lib/analysis/extension-desk'
+import { runExtensionDesk, RULES_PRIMARY_MODEL } from '@/lib/analysis/extension-desk'
 import { isGoldSymbol } from '@/lib/plan-entitlements'
 
 type Body = {
@@ -130,7 +130,7 @@ async function handle({ request }: { request: Request }) {
       const { getExtensionEntitlement } = await import('@/lib/extension-billing.server')
       const entitlement = await getExtensionEntitlement(auth.userId)
       if (!entitlement.allowed) return extJson({ ok: false, error: entitlement.error, code: entitlement.status === 402 ? 'LOW_BALANCE' : 'PLAN_REQUIRED', balance: entitlement.balance }, entitlement.status)
-      const requiresSeniorReview = entitlement.seniorReview
+      // Senior review is intentionally disabled: primary Claude review only.
       const question = String(body.question || '').slice(0, 2000)
       if (!question) return extJson({ ok: false, error: 'Question is empty.' }, 400)
 
@@ -222,11 +222,46 @@ async function handle({ request }: { request: Request }) {
         h1: market.hourly,
         h4: market.fourHourly,
         livePrice: market.ticker.price,
-        seniorReview: requiresSeniorReview,
+        // Primary review only — no senior pass in this pipeline.
+        seniorReview: false,
       })
-      const seniorReview = desk.senior.included
-        ? { included: true, model: RULES_SENIOR_MODEL, status: 'completed' }
-        : { included: false, model: null, status: 'not_in_plan' }
+
+      // Primary market-structure review: OmniRoute Claude reads the
+      // deterministic ICT/SMC desk output and writes the final answer.
+      let analysisText = desk.text
+      let primaryModel = RULES_PRIMARY_MODEL
+      let primaryUsage = { promptTokens: 0, completionTokens: 0 }
+      try {
+        const primary = await callChatCompletion({
+          models: [...EXTENSION_MODEL_CHAIN.reasoning],
+          stage: 'extension-primary-review',
+          maxTokens: 900,
+          timeoutMs: 20_000,
+          deadlineMs: 55_000,
+          retriesPerModel: 1,
+          messages: [
+            {
+              role: 'system',
+              content:
+                'You are Jenvu, a 25+ year ICT/SMC XAU/USD desk analyst. You receive a deterministic ICT/SMC engine report computed from live OHLCV. Review the market structure it describes (BOS/CHoCH, liquidity, premium/discount, OB/FVG, killzone) and write the final primary analysis. Never invent price levels: use only the numbers given. Keep the verdict, entry, stop and targets consistent with the report unless the structure clearly contradicts it — then say so and downgrade to WAIT. Answer in the user\'s language, concise and desk-style.',
+            },
+            ...history,
+            {
+              role: 'user',
+              content: `User request: ${question}\n\nLive price: ${market.ticker.price}\nTimeframe: ${timeframe}\n\nICT/SMC engine report:\n${desk.text}`,
+            },
+          ],
+        })
+        if (primary.content && primary.content.trim().length > 40) {
+          analysisText = primary.content.trim()
+          primaryModel = primary.model
+          primaryUsage = primary.usage
+        }
+      } catch {
+        // Claude unavailable — deterministic ICT desk output still stands.
+      }
+
+      const seniorReview = { included: false, model: null, status: 'not_required' }
       const secondReview = seniorReview
 
       const { chargeExtensionUsage } = await import('@/lib/extension-billing.server')
@@ -234,22 +269,21 @@ async function handle({ request }: { request: Request }) {
         userId: auth.userId, keyId: auth.keyId, keyName: auth.name, requestId,
         action: image ? 'screen_analysis' : 'chat',
         calls: [
-          { model: RULES_PRIMARY_MODEL, usage: { promptTokens: 0, completionTokens: 0 }, stage: 'extension-rules-analysis' },
-          ...(requiresSeniorReview ? [{ model: RULES_SENIOR_MODEL, usage: { promptTokens: 0, completionTokens: 0 }, stage: 'extension-senior-review' }] : []),
+          { model: primaryModel, usage: primaryUsage, stage: 'extension-primary-review' },
         ],
       })
       if (!billing.ok) return extJson({ ok: false, error: billing.error, code: billing.error?.includes('balance') ? 'LOW_BALANCE' : 'BILLING_FAILED' }, billing.error?.includes('balance') ? 402 : 502)
 
       return extJson({
         ok: true,
-        text: desk.text,
+        text: analysisText,
         ticker: market.ticker,
         chart: market.chart,
         technicals: market.technicals,
         freshness: market.freshness,
         overlayMarks: [...market.marks, ...desk.marks],
         marksBias: desk.bias.toLowerCase(),
-        analysisModels: { primary: RULES_PRIMARY_MODEL, senior: requiresSeniorReview ? RULES_SENIOR_MODEL : null },
+        analysisModels: { primary: primaryModel, engine: RULES_PRIMARY_MODEL, senior: null },
         seniorReview,
         secondReview,
         usage: { requestId, charged: billing.charged, balance: billing.balance },
