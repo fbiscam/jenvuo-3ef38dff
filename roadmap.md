@@ -63,4 +63,4 @@
 - [x] Set new-account trial credit to $1 with automatic 14-day expiry
 - [x] Strengthen disposable-email and device-fingerprint signup protections
 - [x] Ensure expired or depleted trials show low balance and block extension AI
-- [ ] Run security and TypeScript verification
+- [x] Run security and TypeScript verification
