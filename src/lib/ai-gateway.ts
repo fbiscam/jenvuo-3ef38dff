@@ -629,6 +629,10 @@ async function singleAttemptInner(
     messages: opts.messages,
     seed,
     ...(usesDefaultTemperature ? {} : { temperature: 0, top_p: 1 }),
+    // GPT-OSS otherwise spends most of the token/time budget on hidden chain
+    // of thought before emitting the visible answer. Low effort keeps the
+    // extension responsive while preserving the full ICT/SMC output schema.
+    ...(isBmind && /gpt-oss/i.test(wireModel) ? { reasoning_effort: "low" } : {}),
   };
   // Blackbox/NVIDIA/Bluesminds/DeepSeek-official: don't force response_format — rely on system prompt.
   if (opts.jsonMode && (isOai || isOmniRoute)) body.response_format = { type: "json_object" };
@@ -795,10 +799,12 @@ export async function callChatCompletion(
   const models = healthy.length ? healthy : configured;
 
   let lastErr: AiGatewayError | null = null;
+  let attemptedModels = 0;
 
   for (let mi = 0; mi < models.length; mi++) {
     const model = models[mi];
     const isLastModel = mi === models.length - 1;
+    attemptedModels++;
     for (let attempt = 1; attempt <= retriesPerModel; attempt++) {
       if (remaining() < 3000) {
         throw (
@@ -855,6 +861,21 @@ export async function callChatCompletion(
         await sleep(Math.min(6000, base + jitter));
       }
     }
+  }
+
+  // Never expose the final provider's credential error as though the user's
+  // Jenvu extension key were invalid. In a multi-provider chain it only means
+  // every upstream route was unavailable, depleted, or rejected.
+  if (
+    attemptedModels > 1 &&
+    lastErr &&
+    (lastErr.status === 401 || lastErr.status === 402 || lastErr.status === 403)
+  ) {
+    throw new AiGatewayError(
+      "AI analysis is temporarily unavailable. Please retry in a moment.",
+      503,
+      false,
+    );
   }
 
   throw lastErr ?? new AiGatewayError("AI call failed with no error captured", 0, false);
@@ -990,28 +1011,26 @@ export const EXTENSION_MODEL_CHAIN = {
   // OmniRoute's tested automatic routes lead each workload, with the
   // previous providers retained as fallbacks.
   conversation: [
-    "omniroute/auto/best-fast",
-    "omniroute/auto/best-chat",
-    "bmind/openai/gpt-oss-20b",
     "unorouter/glm-5.3:free",
-    "browseruse/gpt-6-astra",
-    "unorouter/nemotron-3-ultra-550b-a55b:free",
+    "bmind/openai/gpt-oss-20b",
+    "omniroute/auto/best-fast",
   ],
   reasoning: [
+    "bmind/openai/gpt-oss-20b",
     "omniroute/auto/best-reasoning",
     "omniroute/auto/claude-opus",
-    "omniroute/auto/best-chat",
+    "unikey/claude-opus-4-8",
     "browseruse/gpt-6-astra",
   ],
   vision: [
     "omniroute/auto/best-vision",
-    "omniroute/auto/best-reasoning",
-    "omniroute/auto/claude-opus",
     "browseruse/gpt-6-astra",
+    "bmind/openai/gpt-oss-20b",
+    "unikey/claude-opus-4-8",
   ],
-  seniorReview: ["omniroute/auto/claude-opus", "omniroute/auto/best-reasoning", "browseruse/claude-fable-5"],
+  seniorReview: ["bmind/openai/gpt-oss-20b", "unorouter/glm-5.3:free", "omniroute/auto/claude-opus", "unikey/claude-opus-4-8", "browseruse/claude-fable-5"],
   // Alias retained for callers that identify the senior pass as review #2.
-  secondReview: ["omniroute/auto/claude-opus", "omniroute/auto/best-reasoning", "browseruse/claude-fable-5"],
+  secondReview: ["bmind/openai/gpt-oss-20b", "unorouter/glm-5.3:free", "omniroute/auto/claude-opus", "unikey/claude-opus-4-8", "browseruse/claude-fable-5"],
 } as const;
 
 export const MACRO_CONTEXT_CHAIN = WORKING_BMIND;

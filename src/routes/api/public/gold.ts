@@ -279,8 +279,8 @@ async function handle({ request }: { request: Request }) {
         models: [...(image ? EXTENSION_MODEL_CHAIN.vision : EXTENSION_MODEL_CHAIN.reasoning)],
         stage: image ? 'extension-screen-analysis' : 'extension-chat',
         maxTokens: 900,
-        timeoutMs: 45_000,
-        deadlineMs: 70_000,
+        timeoutMs: 55_000,
+        deadlineMs: 75_000,
         retriesPerModel: 1,
         messages: [
           {
@@ -309,9 +309,9 @@ async function handle({ request }: { request: Request }) {
           review = await callChatCompletion({
             models: [...EXTENSION_MODEL_CHAIN.seniorReview],
             stage: 'extension-senior-review',
-            maxTokens: 550,
-            timeoutMs: 40_000,
-            deadlineMs: 55_000,
+            maxTokens: 700,
+            timeoutMs: 50_000,
+            deadlineMs: 65_000,
             retriesPerModel: 1,
             validateContent: validateSeniorReview,
             messages: [
@@ -361,7 +361,20 @@ async function handle({ request }: { request: Request }) {
       })
       if (!billing.ok) return extJson({ ok: false, error: billing.error, code: billing.error?.includes('balance') ? 'LOW_BALANCE' : 'BILLING_FAILED' }, billing.error?.includes('balance') ? 402 : 502)
 
-      return extJson({ ok: true, text: content, ticker: market.ticker, chart: market.chart, technicals: market.technicals, freshness: market.freshness, overlayMarks: market.marks, marksBias: market.technicals.trend.toLowerCase(), seniorReview, secondReview, usage: { requestId, charged: billing.charged, balance: billing.balance } })
+      return extJson({
+        ok: true,
+        text: content,
+        ticker: market.ticker,
+        chart: market.chart,
+        technicals: market.technicals,
+        freshness: market.freshness,
+        overlayMarks: market.marks,
+        marksBias: market.technicals.trend.toLowerCase(),
+        analysisModels: { primary: primary.model, senior: review?.model ?? null },
+        seniorReview,
+        secondReview,
+        usage: { requestId, charged: billing.charged, balance: billing.balance },
+      })
     }
 
 
@@ -378,7 +391,11 @@ async function handle({ request }: { request: Request }) {
       freshness: market.freshness,
     })
   } catch (e) {
-    const message = e instanceof Error ? e.message : 'Request failed.'
+    const rawMessage = e instanceof Error ? e.message : 'Request failed.'
+    const providerCredentialFailure = /AI key rejected|API key rejected|missing on server/i.test(rawMessage)
+    const message = providerCredentialFailure
+      ? 'AI analysis is temporarily unavailable. Please retry in a moment.'
+      : rawMessage
     return extJson({ ok: false, error: message }, 502)
   }
 }
