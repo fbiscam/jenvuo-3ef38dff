@@ -59,8 +59,8 @@
 - [x] Preserve completed screen analysis when senior review is temporarily unavailable
 - [x] Make public website messaging consistently XAU/USD-only
 
-- [ ] Block Pakistan signups and enforce a maximum of 3 accounts per IP
-- [ ] Set new-account trial credit to $1 with automatic 14-day expiry
-- [ ] Strengthen disposable-email and device-fingerprint signup protections
-- [ ] Ensure expired or depleted trials show low balance and block extension AI
+- [x] Block Pakistan signups and enforce a maximum of 3 accounts per IP
+- [x] Set new-account trial credit to $1 with automatic 14-day expiry
+- [x] Strengthen disposable-email and device-fingerprint signup protections
+- [x] Ensure expired or depleted trials show low balance and block extension AI
 - [ ] Run security and TypeScript verification

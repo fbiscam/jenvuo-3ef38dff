@@ -17,6 +17,21 @@ function readClientIp(): string {
   }
 }
 
+function readTrustedCountry(): string {
+  try {
+    const headers = getRequest().headers
+    const cloudflareCountry = headers.get('cf-ipcountry')?.trim().toUpperCase() || ''
+    if (/^[A-Z]{2}$/.test(cloudflareCountry)) return cloudflareCountry
+    if (process.env['VERCEL'] === '1') {
+      const vercelCountry = headers.get('x-vercel-ip-country')?.trim().toUpperCase() || ''
+      if (/^[A-Z]{2}$/.test(vercelCountry)) return vercelCountry
+    }
+  } catch {
+    return ''
+  }
+  return ''
+}
+
 import {
   createRecoveryOtp,
   createSignupOtp,
@@ -39,14 +54,14 @@ export const requestSignupOtp = createServerFn({ method: 'POST' })
         email: z.string().trim().email('Enter a valid email').max(255),
         password: z.string().min(8, 'Password must be at least 8 characters').max(72),
         siteUrl: siteUrlSchema,
-        fingerprint: z.string().trim().max(128).optional(),
+        fingerprint: z.string().trim().min(32, 'Device verification failed. Refresh the page and try again.').max(128),
       })
       .parse(data),
   )
   .handler(async ({ data }) => {
     try {
       const ua = (() => { try { return getRequest().headers.get('user-agent') || '' } catch { return '' } })()
-      await createSignupOtp({ ...data, ip: readClientIp(), fingerprint: data.fingerprint, userAgent: ua })
+      await createSignupOtp({ ...data, ip: readClientIp(), country: readTrustedCountry(), fingerprint: data.fingerprint, userAgent: ua })
       return { ok: true as const }
     } catch (error) {
       return { ok: false as const, error: error instanceof Error ? error.message : 'Could not send code.' }
@@ -60,13 +75,13 @@ export const confirmSignupOtp = createServerFn({ method: 'POST' })
         email: z.string().trim().email('Enter a valid email').max(255),
         code: z.string().regex(/^\d{6}$/, 'Enter the 6-digit code from your email'),
         password: z.string().min(8, 'Password must be at least 8 characters').max(72),
-        fingerprint: z.string().trim().max(128).optional(),
+        fingerprint: z.string().trim().min(32, 'Device verification failed. Refresh the page and try again.').max(128),
       })
       .parse(data),
   )
   .handler(async ({ data }) => {
     const ua = (() => { try { return getRequest().headers.get('user-agent') || '' } catch { return '' } })()
-    return verifySignupOtp({ ...data, ip: readClientIp(), fingerprint: data.fingerprint, userAgent: ua })
+    return verifySignupOtp({ ...data, ip: readClientIp(), country: readTrustedCountry(), fingerprint: data.fingerprint, userAgent: ua })
   })
 
 export const requestRecoveryOtp = createServerFn({ method: 'POST' })

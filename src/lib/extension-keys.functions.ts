@@ -14,10 +14,12 @@ export type ExtensionKeyAccess = { plan: string; planName: string; keyLimit: num
 
 async function readAccess(client: any, userId: string): Promise<ExtensionKeyAccess> {
   const [{ data: sub }, { data: balance }] = await Promise.all([
-    client.from('user_subscriptions').select('plan_id,status').eq('user_id', userId).maybeSingle(),
+    client.from('user_subscriptions').select('plan_id,status,is_trial,trial_ends_at,current_period_end').eq('user_id', userId).maybeSingle(),
     client.from('credit_balances').select('balance').eq('user_id', userId).maybeSingle(),
   ])
-  const active = Boolean(sub && (sub.status === 'active' || sub.status === 'trialing'))
+  const expiry = sub?.trial_ends_at || sub?.current_period_end
+  const trialValid = !sub?.is_trial || (Boolean(expiry) && new Date(expiry).getTime() > Date.now())
+  const active = Boolean(sub && (sub.status === 'active' || sub.status === 'trialing') && trialValid)
   const planId = active ? String(sub.plan_id || 'free') : 'free'
   const { data: plan } = await client.from('plans').select('name,wallet_usd,extension_key_limit').eq('id', planId).maybeSingle()
   return { plan: planId, planName: String(plan?.name ?? 'Free'), keyLimit: Number(plan?.extension_key_limit ?? 0), balance: Number(balance?.balance ?? 0), wallet: Number(plan?.wallet_usd ?? 0), active }
