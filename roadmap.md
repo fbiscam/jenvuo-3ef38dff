@@ -70,3 +70,4 @@
 - [x] Prevent repeated multi-endpoint analysis runs and verify the faster primary/senior fallback package
 - [x] Stabilize ordinary extension chat with tested fast OmniRoute fallbacks
 - [x] Reorder extension chat around currently healthy automatic routes and prevent a slow Claude route from consuming the response window
+- [x] Move extension chat, chart analysis, and senior review to load-tested Gemini-only routes

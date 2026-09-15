@@ -1018,45 +1018,29 @@ export const MODEL_CHAIN = {
 
 } as const;
 
-// Extension chains — OmniRoute only, top models first, then verified
-// concrete models so primary analysis and senior review always get an
-// answering model instead of failing the whole request.
-export const EXTENSION_MODEL_CHAIN = {
-  conversation: [
-    "omniroute/auto/best-fast",
-    "omniroute/agy/gemini-3.7-flash-medium",
-    "omniroute/auto/best-chat",
-    "omniroute/agy/claude-sonnet-4-6",
-    "omniroute/auto/claude-sonnet",
-  ],
+// Extension chains — Gemini only. Gemini 3.7 Flash High and Medium were the
+// only candidates to pass every concurrent live probe; the Pro and 3.8 routes
+// remain excluded because they intermittently exhausted the response window.
+const EXTENSION_GEMINI_RELIABLE = [
+  "omniroute/agy/gemini-3.7-flash-high",
+  "omniroute/agy/gemini-3.7-flash-medium",
+  "omniroute/auto/gemini",
+] as const;
 
-  reasoning: [
-    "omniroute/auto/best-reasoning",
-    "omniroute/auto/claude-opus",
-    "omniroute/auto/pro-reasoning",
-    "omniroute/auto/claude-sonnet",
-    "omniroute/agy/claude-sonnet-4-6",
-  ],
-  vision: [
-    "omniroute/auto/best-vision",
-    "omniroute/auto/claude-opus",
-    "omniroute/auto/claude-sonnet",
-    "omniroute/agy/claude-sonnet-4-6",
-    "omniroute/auto/best-reasoning",
-  ],
+export const EXTENSION_MODEL_CHAIN = {
+  conversation: [...EXTENSION_GEMINI_RELIABLE],
+  reasoning: [...EXTENSION_GEMINI_RELIABLE],
+  vision: [...EXTENSION_GEMINI_RELIABLE],
   seniorReview: [
-    "omniroute/auto/claude-opus",
-    "omniroute/auto/claude-sonnet",
-    "omniroute/agy/claude-sonnet-4-6",
-    "omniroute/auto/pro-reasoning",
-    "omniroute/auto/best-reasoning",
+    "omniroute/agy/gemini-3.7-flash-medium",
+    "omniroute/agy/gemini-3.7-flash-high",
+    "omniroute/auto/gemini",
   ],
   // Alias retained for callers that identify the senior pass as review #2.
   secondReview: [
-    "omniroute/auto/claude-opus",
-    "omniroute/auto/claude-sonnet",
-    "omniroute/agy/claude-sonnet-4-6",
-    "omniroute/auto/best-reasoning",
+    "omniroute/agy/gemini-3.7-flash-medium",
+    "omniroute/agy/gemini-3.7-flash-high",
+    "omniroute/auto/gemini",
   ],
 } as const;
 
