@@ -310,8 +310,8 @@ async function handle({ request }: { request: Request }) {
             models: [...EXTENSION_MODEL_CHAIN.seniorReview],
             stage: 'extension-senior-review',
             maxTokens: 700,
-            timeoutMs: 50_000,
-            deadlineMs: 65_000,
+            timeoutMs: 28_000,
+            deadlineMs: 85_000,
             retriesPerModel: 1,
             validateContent: validateSeniorReview,
             messages: [
