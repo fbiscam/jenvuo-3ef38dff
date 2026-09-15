@@ -1008,12 +1008,13 @@ export const MODEL_CHAIN = {
   seniorReview: SENIOR_REVIEW_BMIND_4O,
   macroContext: WORKING_BMIND,
   chat: [
-    "omniroute/auto/best-fast",
+    "omniroute/agy/claude-sonnet-4-6",
     "omniroute/agy/gemini-3.7-flash-medium",
-    "omniroute/auto/claude-sonnet",
     "omniroute/auto/best-chat",
-    "omniroute/auto/best-reasoning",
+    "omniroute/auto/claude-sonnet",
+    "omniroute/auto/best-fast",
   ] as const,
+
 } as const;
 
 // Extension chains — OmniRoute only, top models first, then verified
