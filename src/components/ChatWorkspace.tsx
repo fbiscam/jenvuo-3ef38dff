@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import {
   ArrowUp,
   Check,
@@ -220,7 +221,7 @@ export function ChatWorkspace({ threadId }: { threadId: string }) {
   }
 
   function startNewChat() {
-    void navigate({ to: "/dashboard/chat/$threadId", params: { threadId: newThreadId() } });
+    void navigate({ to: "/chat/$threadId", params: { threadId: newThreadId() } });
   }
 
   function removeThread(id: string) {
@@ -331,297 +332,186 @@ export function ChatWorkspace({ threadId }: { threadId: string }) {
   );
 
   return (
-    <div className="flex h-dvh overflow-hidden bg-background text-foreground">
-      {sidebarOpen && (
-        <Button
-          variant="ghost"
-          aria-label="Close chat menu"
-          className="fixed inset-0 z-30 h-auto w-auto rounded-none bg-foreground/20 lg:hidden"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
-
-      <aside
-        className={cn(
-          "fixed inset-y-0 left-0 z-40 flex shrink-0 flex-col border-r border-border bg-sidebar transition-[width,transform] duration-200 lg:relative lg:translate-x-0",
-          sidebarCollapsed ? "w-[68px]" : "w-[258px]",
-          sidebarOpen ? "translate-x-0" : "-translate-x-full",
+    <TooltipProvider delayDuration={200}>
+      <div className="flex h-dvh overflow-hidden bg-background text-foreground">
+        {sidebarOpen && (
+          <Button
+            variant="ghost"
+            aria-label="Close chat menu"
+            className="fixed inset-0 z-30 h-auto w-auto rounded-none bg-foreground/20 lg:hidden"
+            onClick={() => setSidebarOpen(false)}
+          />
         )}
-      >
-        <div
+
+        <aside
           className={cn(
-            "grid h-16 grid-cols-[minmax(0,1fr)_auto] items-center gap-2 px-3",
-            sidebarCollapsed && "grid-cols-1 justify-items-center",
+            "fixed inset-y-0 left-0 z-40 flex shrink-0 flex-col border-r border-border bg-sidebar transition-[width,transform] duration-200 lg:relative lg:translate-x-0",
+            sidebarCollapsed ? "w-[68px]" : "w-[258px]",
+            sidebarOpen ? "translate-x-0" : "-translate-x-full",
           )}
         >
-          <Link
-            to="/dashboard"
+          <div
             className={cn(
-              "flex min-w-0 items-center gap-2.5",
-              sidebarCollapsed && "justify-center",
+              "grid h-16 grid-cols-[minmax(0,1fr)_auto] items-center gap-2 px-3",
+              sidebarCollapsed && "grid-cols-1 justify-items-center",
             )}
           >
-            <img
-              src="/favicon.png"
-              alt="Jenvu"
-              className="size-8 shrink-0 rounded-lg object-contain"
-            />
-            {!sidebarCollapsed && <span className="truncate text-lg font-medium">Jenvu</span>}
-          </Link>
-          <Button
-            variant="ghost"
-            size="icon-sm"
-            className="hidden lg:inline-flex"
-            onClick={() => setSidebarCollapsed((value) => !value)}
-            aria-label={sidebarCollapsed ? "Expand chat sidebar" : "Collapse chat sidebar"}
-          >
-            {sidebarCollapsed ? <PanelLeftOpen /> : <PanelLeftClose />}
-          </Button>
-        </div>
-
-        <nav className="flex min-h-0 flex-1 flex-col px-2" aria-label="Chat conversations">
-          <Button
-            variant="ghost"
-            onClick={startNewChat}
-            className={cn(
-              "mb-3 justify-start rounded-lg font-normal",
-              sidebarCollapsed ? "px-2" : "gap-3 px-3",
-            )}
-            title="New chat"
-          >
-            <Pencil className="size-4 shrink-0" />
-            {!sidebarCollapsed && <span>New chat</span>}
-          </Button>
-          {!sidebarCollapsed && (
-            <div className="sidebar-hover-scroll min-h-0 flex-1 overflow-y-auto px-1 pb-3">
-              {threads.length === 0 && (
-                <p className="px-2 py-4 text-xs text-muted-foreground">
-                  Your conversations will appear here.
-                </p>
+            <Link
+              to="/dashboard"
+              className={cn(
+                "flex min-w-0 items-center gap-2.5",
+                sidebarCollapsed && "justify-center",
               )}
-              {Object.entries(groupedThreads).map(([label, items]) => (
-                <div key={label} className="mb-5">
-                  <p className="mb-1 px-2 text-xs font-medium text-muted-foreground">{label}</p>
-                  {items.map((item) => (
-                    <div
-                      key={item.id}
-                      className={cn(
-                        "group grid grid-cols-[minmax(0,1fr)_auto] items-center rounded-lg",
-                        item.id === threadId ? "bg-accent" : "hover:bg-accent/70",
-                      )}
-                    >
-                      <Link
-                        to="/dashboard/chat/$threadId"
-                        params={{ threadId: item.id }}
-                        className="min-w-0 truncate px-2.5 py-2 text-sm"
-                      >
-                        {item.title || "New chat"}
-                      </Link>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="icon-sm"
-                            className="mr-1 opacity-0 group-hover:opacity-100"
-                            aria-label={`Options for ${item.title}`}
-                          >
-                            <ChevronDown className="size-3.5" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem
-                            className="text-destructive"
-                            onClick={() => removeThread(item.id)}
-                          >
-                            <Trash2 /> Delete
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </div>
-                  ))}
-                </div>
-              ))}
-            </div>
-          )}
-        </nav>
+            >
+              <img
+                src="/favicon.png"
+                alt="Jenvu"
+                className="size-8 shrink-0 rounded-lg object-contain"
+              />
+              {!sidebarCollapsed && <span className="truncate text-lg font-medium">Jenvu</span>}
+            </Link>
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              className="hidden lg:inline-flex"
+              onClick={() => setSidebarCollapsed((value) => !value)}
+              aria-label={sidebarCollapsed ? "Expand chat sidebar" : "Collapse chat sidebar"}
+            >
+              {sidebarCollapsed ? <PanelLeftOpen /> : <PanelLeftClose />}
+            </Button>
+          </div>
 
-        <div className="border-t border-sidebar-border p-2">
-          <Link
-            to="/dashboard/profile"
-            className={cn(
-              "flex items-center rounded-lg p-2 hover:bg-accent",
-              sidebarCollapsed ? "justify-center" : "gap-3",
-            )}
-          >
-            <span className="grid size-8 shrink-0 place-items-center rounded-full bg-primary text-xs font-medium text-primary-foreground">
-              {initial}
-            </span>
+          <nav className="flex min-h-0 flex-1 flex-col px-2" aria-label="Chat conversations">
+            <Button
+              variant="ghost"
+              onClick={startNewChat}
+              className={cn(
+                "mb-3 justify-start rounded-lg font-normal",
+                sidebarCollapsed ? "px-2" : "gap-3 px-3",
+              )}
+              title="New chat"
+            >
+              <Pencil className="size-4 shrink-0" />
+              {!sidebarCollapsed && <span>New chat</span>}
+            </Button>
             {!sidebarCollapsed && (
-              <span className="min-w-0">
-                <span className="block truncate text-sm">{userName}</span>
-                <span className="block text-xs text-muted-foreground">Jenvu account</span>
-              </span>
-            )}
-          </Link>
-        </div>
-      </aside>
-
-      <main className="relative flex min-w-0 flex-1 flex-col bg-background">
-        <header className="grid h-16 shrink-0 grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 px-3 sm:px-5">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="lg:hidden"
-            onClick={() => setSidebarOpen(true)}
-            aria-label="Open chat menu"
-          >
-            <Menu />
-          </Button>
-          <div className="min-w-0">
-            {thread.messages.length > 0 && (
-              <h1 className="truncate text-sm font-medium">{thread.title}</h1>
-            )}
-          </div>
-          <Button asChild variant="ghost" size="sm" className="text-xs">
-            <Link to="/dashboard">Dashboard</Link>
-          </Button>
-        </header>
-
-        {thread.messages.length === 0 ? (
-          <div className="flex flex-1 flex-col items-center justify-center px-4 pb-[16vh]">
-            <div className="w-full max-w-3xl">
-              <div className="mb-8 text-center">
-                <img
-                  src="/favicon.png"
-                  alt=""
-                  className="mx-auto mb-4 size-11 rounded-xl object-contain"
-                />
-                <h1 className="text-2xl font-normal sm:text-3xl">What can I help with?</h1>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  Chat naturally or share an XAU/USD chart for ICT/SMC analysis.
-                </p>
-              </div>
-              {image && (
-                <div className="mb-3 flex items-center gap-3 rounded-lg border bg-card p-2">
-                  <img
-                    src={image}
-                    alt="Chart attachment preview"
-                    className="h-16 w-24 rounded-md object-cover"
-                  />
-                  <span className="min-w-0 flex-1 text-sm text-muted-foreground">
-                    Chart ready to analyze
-                  </span>
-                  <Button
-                    variant="ghost"
-                    size="icon-sm"
-                    onClick={() => setImage(null)}
-                    aria-label="Remove attachment"
-                  >
-                    <X />
-                  </Button>
-                </div>
-              )}
-              {composer}
-              <div className="mx-auto mt-7 grid max-w-xl gap-1 text-sm text-muted-foreground">
-                <Button
-                  variant="ghost"
-                  className="justify-start font-normal"
-                  onClick={() => setInput("Analyze this XAU/USD chart using ICT and SMC concepts")}
-                >
-                  <ImageIcon /> Analyze a chart
-                </Button>
-                <Button
-                  variant="ghost"
-                  className="justify-start font-normal"
-                  onClick={() => setInput("Help me write or improve this:")}
-                >
-                  <Pencil /> Write or edit
-                </Button>
-                <Button
-                  variant="ghost"
-                  className="justify-start font-normal"
-                  onClick={() => setInput("Explain today’s XAU/USD market structure")}
-                >
-                  {" "}
-                  <MonitorUp /> Explore gold
-                </Button>
-              </div>
-            </div>
-          </div>
-        ) : (
-          <>
-            <Conversation className="min-h-0">
-              <ConversationContent className="mx-auto w-full max-w-3xl gap-7 px-4 pb-44 pt-8 sm:px-6">
-                {thread.messages.map((message) => (
-                  <Message key={message.id} from={message.role} className="max-w-full">
-                    <MessageContent
-                      className={cn(
-                        message.role === "user" && "rounded-3xl bg-secondary px-4 py-2.5",
-                      )}
-                    >
-                      {message.image && (
-                        <img
-                          src={message.image}
-                          alt="Attached XAU/USD chart"
-                          className="mb-2 max-h-72 rounded-lg object-contain"
-                        />
-                      )}
-                      {message.role === "assistant" ? (
-                        <MessageResponse>{message.text}</MessageResponse>
-                      ) : (
-                        <p className="whitespace-pre-wrap">{message.text}</p>
-                      )}
-                    </MessageContent>
-                    {message.role === "assistant" && (
-                      <MessageActions>
-                        <MessageAction
-                          tooltip="Copy"
-                          onClick={() => {
-                            void navigator.clipboard.writeText(message.text);
-                            toast.success("Copied");
-                          }}
-                        >
-                          <Copy />
-                        </MessageAction>
-                        <MessageAction
-                          tooltip="Use again"
-                          onClick={() =>
-                            setInput(
-                              thread.messages.find((item) => item.role === "user")?.text ?? "",
-                            )
-                          }
-                        >
-                          <RotateCcw />
-                        </MessageAction>
-                        {message.model && (
-                          <span className="ml-1 text-[11px] text-muted-foreground">
-                            {message.model}
-                          </span>
-                        )}
-                      </MessageActions>
-                    )}
-                  </Message>
-                ))}
-                {busy && (
-                  <div className="flex items-center gap-2 text-sm">
-                    <img src="/favicon.png" alt="" className="size-6 rounded-md" />
-                    <Shimmer>Jenvu is thinking…</Shimmer>
-                  </div>
+              <div className="sidebar-hover-scroll min-h-0 flex-1 overflow-y-auto px-1 pb-3">
+                {threads.length === 0 && (
+                  <p className="px-2 py-4 text-xs text-muted-foreground">
+                    Your conversations will appear here.
+                  </p>
                 )}
-              </ConversationContent>
-              <ConversationScrollButton />
-            </Conversation>
-            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-background via-background to-transparent px-4 pb-3 pt-12">
-              <div className="mx-auto max-w-3xl">
+                {Object.entries(groupedThreads).map(([label, items]) => (
+                  <div key={label} className="mb-5">
+                    <p className="mb-1 px-2 text-xs font-medium text-muted-foreground">{label}</p>
+                    {items.map((item) => (
+                      <div
+                        key={item.id}
+                        className={cn(
+                          "group grid grid-cols-[minmax(0,1fr)_auto] items-center rounded-lg",
+                          item.id === threadId ? "bg-accent" : "hover:bg-accent/70",
+                        )}
+                      >
+                        <Link
+                          to="/chat/$threadId"
+                          params={{ threadId: item.id }}
+                          className="min-w-0 truncate px-2.5 py-2 text-sm"
+                        >
+                          {item.title || "New chat"}
+                        </Link>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon-sm"
+                              className="mr-1 opacity-0 group-hover:opacity-100"
+                              aria-label={`Options for ${item.title}`}
+                            >
+                              <ChevronDown className="size-3.5" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem
+                              className="text-destructive"
+                              onClick={() => removeThread(item.id)}
+                            >
+                              <Trash2 /> Delete
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
+                    ))}
+                  </div>
+                ))}
+              </div>
+            )}
+          </nav>
+
+          <div className="border-t border-sidebar-border p-2">
+            <Link
+              to="/dashboard/profile"
+              className={cn(
+                "flex items-center rounded-lg p-2 hover:bg-accent",
+                sidebarCollapsed ? "justify-center" : "gap-3",
+              )}
+            >
+              <span className="grid size-8 shrink-0 place-items-center rounded-full bg-primary text-xs font-medium text-primary-foreground">
+                {initial}
+              </span>
+              {!sidebarCollapsed && (
+                <span className="min-w-0">
+                  <span className="block truncate text-sm">{userName}</span>
+                  <span className="block text-xs text-muted-foreground">Jenvu account</span>
+                </span>
+              )}
+            </Link>
+          </div>
+        </aside>
+
+        <main className="relative flex min-w-0 flex-1 flex-col bg-background">
+          <header className="grid h-16 shrink-0 grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 px-3 sm:px-5">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="lg:hidden"
+              onClick={() => setSidebarOpen(true)}
+              aria-label="Open chat menu"
+            >
+              <Menu />
+            </Button>
+            <div className="min-w-0">
+              {thread.messages.length > 0 && (
+                <h1 className="truncate text-sm font-medium">{thread.title}</h1>
+              )}
+            </div>
+            <Button asChild variant="ghost" size="sm" className="text-xs">
+              <Link to="/dashboard">Dashboard</Link>
+            </Button>
+          </header>
+
+          {thread.messages.length === 0 ? (
+            <div className="flex flex-1 flex-col items-center justify-center px-4 pb-[16vh]">
+              <div className="w-full max-w-3xl">
+                <div className="mb-8 text-center">
+                  <img
+                    src="/favicon.png"
+                    alt=""
+                    className="mx-auto mb-4 size-11 rounded-xl object-contain"
+                  />
+                  <h1 className="text-2xl font-normal sm:text-3xl">What can I help with?</h1>
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    Chat naturally or share an XAU/USD chart for ICT/SMC analysis.
+                  </p>
+                </div>
                 {image && (
-                  <div className="mb-2 flex items-center gap-3 rounded-lg border bg-card p-2">
+                  <div className="mb-3 flex items-center gap-3 rounded-lg border bg-card p-2">
                     <img
                       src={image}
                       alt="Chart attachment preview"
-                      className="h-14 w-20 rounded-md object-cover"
+                      className="h-16 w-24 rounded-md object-cover"
                     />
                     <span className="min-w-0 flex-1 text-sm text-muted-foreground">
-                      Chart ready
+                      Chart ready to analyze
                     </span>
                     <Button
                       variant="ghost"
@@ -634,14 +524,129 @@ export function ChatWorkspace({ threadId }: { threadId: string }) {
                   </div>
                 )}
                 {composer}
-                <p className="mt-2 text-center text-[11px] text-muted-foreground">
-                  Jenvu can make mistakes. Verify important market information.
-                </p>
+                <div className="mx-auto mt-7 grid max-w-xl gap-1 text-sm text-muted-foreground">
+                  <Button
+                    variant="ghost"
+                    className="justify-start font-normal"
+                    onClick={() =>
+                      setInput("Analyze this XAU/USD chart using ICT and SMC concepts")
+                    }
+                  >
+                    <ImageIcon /> Analyze a chart
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    className="justify-start font-normal"
+                    onClick={() => setInput("Help me write or improve this:")}
+                  >
+                    <Pencil /> Write or edit
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    className="justify-start font-normal"
+                    onClick={() => setInput("Explain today’s XAU/USD market structure")}
+                  >
+                    {" "}
+                    <MonitorUp /> Explore gold
+                  </Button>
+                </div>
               </div>
             </div>
-          </>
-        )}
-      </main>
-    </div>
+          ) : (
+            <>
+              <Conversation className="min-h-0">
+                <ConversationContent className="mx-auto w-full max-w-3xl gap-7 px-4 pb-44 pt-8 sm:px-6">
+                  {thread.messages.map((message) => (
+                    <Message key={message.id} from={message.role} className="max-w-full">
+                      <MessageContent
+                        className={cn(
+                          message.role === "user" && "rounded-3xl bg-secondary px-4 py-2.5",
+                        )}
+                      >
+                        {message.image && (
+                          <img
+                            src={message.image}
+                            alt="Attached XAU/USD chart"
+                            className="mb-2 max-h-72 rounded-lg object-contain"
+                          />
+                        )}
+                        {message.role === "assistant" ? (
+                          <MessageResponse>{message.text}</MessageResponse>
+                        ) : (
+                          <p className="whitespace-pre-wrap">{message.text}</p>
+                        )}
+                      </MessageContent>
+                      {message.role === "assistant" && (
+                        <MessageActions>
+                          <MessageAction
+                            tooltip="Copy"
+                            onClick={() => {
+                              void navigator.clipboard.writeText(message.text);
+                              toast.success("Copied");
+                            }}
+                          >
+                            <Copy />
+                          </MessageAction>
+                          <MessageAction
+                            tooltip="Use again"
+                            onClick={() =>
+                              setInput(
+                                thread.messages.find((item) => item.role === "user")?.text ?? "",
+                              )
+                            }
+                          >
+                            <RotateCcw />
+                          </MessageAction>
+                          {message.model && (
+                            <span className="ml-1 text-[11px] text-muted-foreground">
+                              {message.model}
+                            </span>
+                          )}
+                        </MessageActions>
+                      )}
+                    </Message>
+                  ))}
+                  {busy && (
+                    <div className="flex items-center gap-2 text-sm">
+                      <img src="/favicon.png" alt="" className="size-6 rounded-md" />
+                      <Shimmer>Jenvu is thinking…</Shimmer>
+                    </div>
+                  )}
+                </ConversationContent>
+                <ConversationScrollButton />
+              </Conversation>
+              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-background via-background to-transparent px-4 pb-3 pt-12">
+                <div className="mx-auto max-w-3xl">
+                  {image && (
+                    <div className="mb-2 flex items-center gap-3 rounded-lg border bg-card p-2">
+                      <img
+                        src={image}
+                        alt="Chart attachment preview"
+                        className="h-14 w-20 rounded-md object-cover"
+                      />
+                      <span className="min-w-0 flex-1 text-sm text-muted-foreground">
+                        Chart ready
+                      </span>
+                      <Button
+                        variant="ghost"
+                        size="icon-sm"
+                        onClick={() => setImage(null)}
+                        aria-label="Remove attachment"
+                      >
+                        <X />
+                      </Button>
+                    </div>
+                  )}
+                  {composer}
+                  <p className="mt-2 text-center text-[11px] text-muted-foreground">
+                    Jenvu can make mistakes. Verify important market information.
+                  </p>
+                </div>
+              </div>
+            </>
+          )}
+        </main>
+      </div>
+    </TooltipProvider>
   );
 }

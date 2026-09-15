@@ -181,7 +181,7 @@ const NAV_GROUPS: Array<{ label: string; items: TabItem[] }> = [
   {
     label: "",
     items: [
-      { to: "/dashboard/chat", label: "Chat", icon: MessageSquare },
+      { to: "/chat", label: "Chat", icon: MessageSquare },
       { to: "/dashboard/usage", label: "Usage", icon: ChartNoAxesCombined },
     ],
   },
@@ -1285,10 +1285,6 @@ function DashboardLayout() {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authUser?.id, authLoading, refreshTick]);
-
-  if (pathname.startsWith("/dashboard/chat")) {
-    return <Outlet />;
-  }
 
   return (
     <div
