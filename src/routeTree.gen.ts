@@ -61,7 +61,6 @@ import { Route as AuthenticatedInboxRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as HelpCollectionIndexRouteImport } from './routes/help.$collection.index'
 import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated/dashboard.index'
-import { Route as AuthenticatedChatIndexRouteImport } from './routes/_authenticated/chat.index'
 import { Route as LovableEmailEventsRouteImport } from './routes/lovable/email/events'
 import { Route as LeadsAdminUsersRouteImport } from './routes/leads.admin.users'
 import { Route as HelpCollectionSlugRouteImport } from './routes/help.$collection.$slug'
@@ -80,7 +79,6 @@ import { Route as AuthenticatedDashboardDocumentsRouteImport } from './routes/_a
 import { Route as AuthenticatedDashboardBillingRouteImport } from './routes/_authenticated/dashboard.billing'
 import { Route as AuthenticatedDashboardAnalyticsRouteImport } from './routes/_authenticated/dashboard.analytics'
 import { Route as AuthenticatedDashboardAlertsRouteImport } from './routes/_authenticated/dashboard.alerts'
-import { Route as AuthenticatedChatThreadIdRouteImport } from './routes/_authenticated/chat.$threadId'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
 import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
@@ -369,11 +367,6 @@ const AuthenticatedDashboardIndexRoute =
     path: '/',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
-const AuthenticatedChatIndexRoute = AuthenticatedChatIndexRouteImport.update({
-  id: '/chat/',
-  path: '/chat/',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
 const LovableEmailEventsRoute = LovableEmailEventsRouteImport.update({
   id: '/lovable/email/events',
   path: '/lovable/email/events',
@@ -477,12 +470,6 @@ const AuthenticatedDashboardAlertsRoute =
     id: '/alerts',
     path: '/alerts',
     getParentRoute: () => AuthenticatedDashboardRoute,
-  } as any)
-const AuthenticatedChatThreadIdRoute =
-  AuthenticatedChatThreadIdRouteImport.update({
-    id: '/chat/$threadId',
-    path: '/chat/$threadId',
-    getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const LovableEmailTransactionalPreviewRoute =
   LovableEmailTransactionalPreviewRouteImport.update({
@@ -694,7 +681,6 @@ export interface FileRoutesByFullPath {
   '/jenvu-ops-x9k2/': typeof JenvuOpsX9k2IndexRoute
   '/leads/': typeof LeadsIndexRoute
   '/ops-x9k2-7m4n/': typeof OpsX9k27m4nIndexRoute
-  '/chat/$threadId': typeof AuthenticatedChatThreadIdRoute
   '/dashboard/alerts': typeof AuthenticatedDashboardAlertsRoute
   '/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
   '/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
@@ -713,7 +699,6 @@ export interface FileRoutesByFullPath {
   '/help/$collection/$slug': typeof HelpCollectionSlugRoute
   '/leads/admin/users': typeof LeadsAdminUsersRoute
   '/lovable/email/events': typeof LovableEmailEventsRoute
-  '/chat/': typeof AuthenticatedChatIndexRoute
   '/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/help/$collection/': typeof HelpCollectionIndexRoute
   '/dashboard/admin/accuracy': typeof AuthenticatedDashboardAdminAccuracyRoute
@@ -789,7 +774,6 @@ export interface FileRoutesByTo {
   '/jenvu-ops-x9k2': typeof JenvuOpsX9k2IndexRoute
   '/leads': typeof LeadsIndexRoute
   '/ops-x9k2-7m4n': typeof OpsX9k27m4nIndexRoute
-  '/chat/$threadId': typeof AuthenticatedChatThreadIdRoute
   '/dashboard/alerts': typeof AuthenticatedDashboardAlertsRoute
   '/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
   '/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
@@ -808,7 +792,6 @@ export interface FileRoutesByTo {
   '/help/$collection/$slug': typeof HelpCollectionSlugRoute
   '/leads/admin/users': typeof LeadsAdminUsersRoute
   '/lovable/email/events': typeof LovableEmailEventsRoute
-  '/chat': typeof AuthenticatedChatIndexRoute
   '/dashboard': typeof AuthenticatedDashboardIndexRoute
   '/help/$collection': typeof HelpCollectionIndexRoute
   '/dashboard/admin/accuracy': typeof AuthenticatedDashboardAdminAccuracyRoute
@@ -891,7 +874,6 @@ export interface FileRoutesById {
   '/jenvu-ops-x9k2/': typeof JenvuOpsX9k2IndexRoute
   '/leads/': typeof LeadsIndexRoute
   '/ops-x9k2-7m4n/': typeof OpsX9k27m4nIndexRoute
-  '/_authenticated/chat/$threadId': typeof AuthenticatedChatThreadIdRoute
   '/_authenticated/dashboard/alerts': typeof AuthenticatedDashboardAlertsRoute
   '/_authenticated/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
   '/_authenticated/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
@@ -910,7 +892,6 @@ export interface FileRoutesById {
   '/help/$collection/$slug': typeof HelpCollectionSlugRoute
   '/leads/admin/users': typeof LeadsAdminUsersRoute
   '/lovable/email/events': typeof LovableEmailEventsRoute
-  '/_authenticated/chat/': typeof AuthenticatedChatIndexRoute
   '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/help/$collection/': typeof HelpCollectionIndexRoute
   '/_authenticated/dashboard/admin/accuracy': typeof AuthenticatedDashboardAdminAccuracyRoute
@@ -993,7 +974,6 @@ export interface FileRouteTypes {
     | '/jenvu-ops-x9k2/'
     | '/leads/'
     | '/ops-x9k2-7m4n/'
-    | '/chat/$threadId'
     | '/dashboard/alerts'
     | '/dashboard/analytics'
     | '/dashboard/billing'
@@ -1012,7 +992,6 @@ export interface FileRouteTypes {
     | '/help/$collection/$slug'
     | '/leads/admin/users'
     | '/lovable/email/events'
-    | '/chat/'
     | '/dashboard/'
     | '/help/$collection/'
     | '/dashboard/admin/accuracy'
@@ -1088,7 +1067,6 @@ export interface FileRouteTypes {
     | '/jenvu-ops-x9k2'
     | '/leads'
     | '/ops-x9k2-7m4n'
-    | '/chat/$threadId'
     | '/dashboard/alerts'
     | '/dashboard/analytics'
     | '/dashboard/billing'
@@ -1107,7 +1085,6 @@ export interface FileRouteTypes {
     | '/help/$collection/$slug'
     | '/leads/admin/users'
     | '/lovable/email/events'
-    | '/chat'
     | '/dashboard'
     | '/help/$collection'
     | '/dashboard/admin/accuracy'
@@ -1189,7 +1166,6 @@ export interface FileRouteTypes {
     | '/jenvu-ops-x9k2/'
     | '/leads/'
     | '/ops-x9k2-7m4n/'
-    | '/_authenticated/chat/$threadId'
     | '/_authenticated/dashboard/alerts'
     | '/_authenticated/dashboard/analytics'
     | '/_authenticated/dashboard/billing'
@@ -1208,7 +1184,6 @@ export interface FileRouteTypes {
     | '/help/$collection/$slug'
     | '/leads/admin/users'
     | '/lovable/email/events'
-    | '/_authenticated/chat/'
     | '/_authenticated/dashboard/'
     | '/help/$collection/'
     | '/_authenticated/dashboard/admin/accuracy'
@@ -1661,13 +1636,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardIndexRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
-    '/_authenticated/chat/': {
-      id: '/_authenticated/chat/'
-      path: '/chat'
-      fullPath: '/chat/'
-      preLoaderRoute: typeof AuthenticatedChatIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
     '/lovable/email/events': {
       id: '/lovable/email/events'
       path: '/lovable/email/events'
@@ -1793,13 +1761,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/dashboard/alerts'
       preLoaderRoute: typeof AuthenticatedDashboardAlertsRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
-    }
-    '/_authenticated/chat/$threadId': {
-      id: '/_authenticated/chat/$threadId'
-      path: '/chat/$threadId'
-      fullPath: '/chat/$threadId'
-      preLoaderRoute: typeof AuthenticatedChatThreadIdRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/lovable/email/transactional/preview': {
       id: '/lovable/email/transactional/preview'
@@ -2071,15 +2032,11 @@ const AuthenticatedDashboardRouteWithChildren =
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRouteWithChildren
   AuthenticatedInboxRoute: typeof AuthenticatedInboxRoute
-  AuthenticatedChatThreadIdRoute: typeof AuthenticatedChatThreadIdRoute
-  AuthenticatedChatIndexRoute: typeof AuthenticatedChatIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRouteWithChildren,
   AuthenticatedInboxRoute: AuthenticatedInboxRoute,
-  AuthenticatedChatThreadIdRoute: AuthenticatedChatThreadIdRoute,
-  AuthenticatedChatIndexRoute: AuthenticatedChatIndexRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =

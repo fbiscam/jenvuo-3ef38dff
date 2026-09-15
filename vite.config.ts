@@ -120,15 +120,9 @@ export default defineConfig({
     },
     resolve: {
       alias: {
-        // parse5 v7 imports "entities/escape" and "entities/decode" (entities v6 subpaths).
-        // These must come before the bare "entities" alias below, which would otherwise
-        // rewrite them onto entities v4 (no such subpaths) and break the build.
-        "entities/escape": path.resolve(__dirname, "node_modules/parse5/node_modules/entities/dist/esm/escape.js"),
-        "entities/decode": path.resolve(__dirname, "node_modules/parse5/node_modules/entities/dist/esm/decode.js"),
         "entities/lib/decode.js": path.resolve(__dirname, "node_modules/entities/lib/decode.js"),
         "entities/lib/encode.js": path.resolve(__dirname, "node_modules/entities/lib/encode.js"),
         "entities": path.resolve(__dirname, "node_modules/entities"),
-
       },
     },
   },
