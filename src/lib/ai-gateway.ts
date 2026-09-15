@@ -1028,9 +1028,9 @@ export const EXTENSION_MODEL_CHAIN = {
     "bmind/openai/gpt-oss-20b",
     "unikey/claude-opus-4-8",
   ],
-  seniorReview: ["unorouter/glm-5.3:free", "bmind/openai/gpt-oss-20b", "omniroute/auto/claude-opus", "unikey/claude-opus-4-8", "browseruse/claude-fable-5"],
+  seniorReview: ["bmind/openai/gpt-oss-20b", "unorouter/glm-5.3:free", "omniroute/auto/claude-opus", "unikey/claude-opus-4-8", "browseruse/claude-fable-5"],
   // Alias retained for callers that identify the senior pass as review #2.
-  secondReview: ["unorouter/glm-5.3:free", "bmind/openai/gpt-oss-20b", "omniroute/auto/claude-opus", "unikey/claude-opus-4-8", "browseruse/claude-fable-5"],
+  secondReview: ["bmind/openai/gpt-oss-20b", "unorouter/glm-5.3:free", "omniroute/auto/claude-opus", "unikey/claude-opus-4-8", "browseruse/claude-fable-5"],
 } as const;
 
 export const MACRO_CONTEXT_CHAIN = WORKING_BMIND;
