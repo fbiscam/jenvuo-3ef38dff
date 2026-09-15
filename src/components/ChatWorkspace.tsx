@@ -9,6 +9,7 @@ import {
   Check,
   ChevronDown,
   Copy,
+  History,
   Image as ImageIcon,
   Menu,
   MonitorUp,
@@ -367,9 +368,58 @@ export function ChatWorkspace({ threadId }: { threadId: string }) {
                 <h1 className="truncate text-sm font-medium">{thread.title}</h1>
               )}
             </div>
-            <Button asChild variant="ghost" size="sm" className="text-xs">
-              <Link to="/dashboard">Dashboard</Link>
-            </Button>
+            <div className="flex shrink-0 items-center gap-1.5">
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-1.5 rounded-full text-xs"
+                onClick={startNewChat}
+              >
+                <Plus className="size-3.5" />
+                <span className="hidden sm:inline">New chat</span>
+              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm" className="gap-1.5 rounded-full text-xs">
+                    <History className="size-3.5" />
+                    <span className="hidden sm:inline">History</span>
+                    <ChevronDown className="hidden size-3 sm:block" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="max-h-80 w-72 overflow-y-auto">
+                  {threads.length === 0 ? (
+                    <DropdownMenuItem disabled>No previous chats</DropdownMenuItem>
+                  ) : (
+                    Object.entries(groupedThreads).flatMap(([label, items]) => [
+                      <div
+                        key={`${label}-label`}
+                        className="px-2 pb-1 pt-2 text-[11px] font-medium text-muted-foreground"
+                      >
+                        {label}
+                      </div>,
+                      ...items.map((item) => (
+                        <DropdownMenuItem
+                          key={item.id}
+                          className="grid grid-cols-[minmax(0,1fr)_auto] gap-2"
+                          onSelect={() =>
+                            void navigate({
+                              to: "/chat/$threadId",
+                              params: { threadId: item.id },
+                            })
+                          }
+                        >
+                          <span className="truncate">{item.title}</span>
+                          {item.id === threadId && <Check className="size-3.5" />}
+                        </DropdownMenuItem>
+                      )),
+                    ])
+                  )}
+                </DropdownMenuContent>
+              </DropdownMenu>
+              <Button asChild variant="ghost" size="sm" className="hidden text-xs md:inline-flex">
+                <Link to="/dashboard">Dashboard</Link>
+              </Button>
+            </div>
           </header>
 
           {thread.messages.length === 0 ? (
