@@ -1528,7 +1528,7 @@ function ModelWorkspace() {
     <section className="mt-10 bg-background" aria-label="Models and product updates">
       <div className="mx-auto grid w-full max-w-6xl gap-9 lg:grid-cols-[minmax(0,1.7fr)_minmax(260px,0.9fr)] lg:gap-10">
         <div className="min-w-0">
-          <h2 className="mb-4 text-2xl font-normal text-foreground">&nbsp; &nbsp; Recommended models</h2>
+          <h2 className="mb-4 text-2xl font-normal text-foreground">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Recommended models</h2>
           <div className="grid gap-4 sm:grid-cols-2">
             {RECOMMENDED_MODELS.map((model) => {
               const ModelLogo = model.logo;
