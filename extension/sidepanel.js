@@ -504,7 +504,6 @@ async function post(body, signal) {
         }
         if (!res.ok) {
           const error = new Error(json.error || `Request failed (${res.status})`);
-          error.retryable = res.status === 429 || res.status >= 500;
           throw error;
         }
       API = url;
@@ -513,6 +512,11 @@ async function post(body, signal) {
       if (e && e.name === "AbortError") {
         if (signal?.aborted) throw e;
       }
+      // Only move to another site address when the current address cannot be
+      // reached. Replaying a completed 5xx analysis request against every
+      // address duplicated the same primary + senior work and caused 5-minute
+      // waits even though all addresses serve the same backend.
+      if (e instanceof TypeError) e.tryNextEndpoint = true;
       lastErr = e;
       if (!e.retryable && !e.tryNextEndpoint) break;
     } finally {

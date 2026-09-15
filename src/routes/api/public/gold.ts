@@ -279,8 +279,10 @@ async function handle({ request }: { request: Request }) {
         models: [...(image ? EXTENSION_MODEL_CHAIN.vision : EXTENSION_MODEL_CHAIN.reasoning)],
         stage: image ? 'extension-screen-analysis' : 'extension-chat',
         maxTokens: 900,
-        timeoutMs: 32_000,
-        deadlineMs: 95_000,
+        // Keep enough time for the verified Claude fallback while preventing a
+        // dead model from holding the extension open for several minutes.
+        timeoutMs: 18_000,
+        deadlineMs: 52_000,
         retriesPerModel: 1,
         messages: [
           {
@@ -310,8 +312,8 @@ async function handle({ request }: { request: Request }) {
             models: [...EXTENSION_MODEL_CHAIN.seniorReview],
             stage: 'extension-senior-review',
             maxTokens: 700,
-            timeoutMs: 28_000,
-            deadlineMs: 85_000,
+            timeoutMs: 16_000,
+            deadlineMs: 42_000,
             retriesPerModel: 1,
             validateContent: validateSeniorReview,
             messages: [

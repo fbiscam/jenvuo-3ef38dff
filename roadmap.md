@@ -67,3 +67,4 @@
 - [x] Restore extension AI routing after the primary provider tunnel went offline
 - [x] Prevent provider credential failures from being shown as an invalid extension key
 - [x] Verify a live two-stage XAU/USD extension analysis and rebuild the install package
+- [ ] Prevent repeated multi-endpoint analysis runs and verify the faster primary/senior fallback package
