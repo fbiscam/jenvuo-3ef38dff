@@ -1581,6 +1581,7 @@ function ModelWorkspace() {
                   <div className="min-w-0">
                     <h3 className="text-sm font-normal text-foreground">{update.title}</h3>
                     <p className="mt-1 text-sm leading-5 text-muted-foreground">{update.copy}</p>
+                    <p className="mt-2 text-xs text-muted-foreground/80">{update.time}</p>
                   </div>
                 </article>
               );
