@@ -1022,11 +1022,13 @@ export const MODEL_CHAIN = {
 // answering model instead of failing the whole request.
 export const EXTENSION_MODEL_CHAIN = {
   conversation: [
-    "omniroute/auto/best-fast",
+    "omniroute/agy/claude-sonnet-4-6",
     "omniroute/agy/gemini-3.7-flash-medium",
-    "omniroute/auto/claude-sonnet",
     "omniroute/auto/best-chat",
+    "omniroute/auto/claude-sonnet",
+    "omniroute/auto/best-fast",
   ],
+
   reasoning: [
     "omniroute/auto/best-reasoning",
     "omniroute/auto/claude-opus",
