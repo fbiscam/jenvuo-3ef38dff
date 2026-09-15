@@ -848,9 +848,9 @@ async function send(preset, silentUser) {
   const text = (preset ?? box.value).trim();
   if (!text && !chartImage && !stream) return;
   busy = true;
-  // Mandatory Browser Use primary review applies only to chart/screen analysis.
+  // Mandatory Claude primary review applies only to chart/screen analysis.
   const analysisRequest = Boolean(chartImage || stream || ANALYSIS_INTENT.test(text));
-  setReviewStatus(analysisRequest ? "ICT analysis · Astra primary review…" : "Chat mode", analysisRequest ? "checking" : "");
+  setReviewStatus(analysisRequest ? "ICT analysis · Claude primary review…" : "Chat mode", analysisRequest ? "checking" : "");
   controller = new AbortController();
   $("send").disabled = false;
   updateSendState();
