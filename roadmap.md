@@ -41,7 +41,7 @@
 - [ ] Mark imgakhar@gmail.com identity documents as verified (blocked while the hosted database is paused)
 - [x] Set extension request billing to $0.03 primary and $0.20 senior-reviewed
 - [x] Update current GPT-6 Astra and Claude Opus 5 model copy across pricing and dashboards
-- [ ] Activate AgentRouter GPT-6 Astra and Claude Opus 5 (blocked by AgentRouter rejecting the saved API key)
+- [ ] Activate AgentRouter models (blocked because the supplied base URL returns a website-protection page instead of its JSON API)
 - [x] Continue extension analysis through backup providers when Browser Use accounts are unavailable
 - [x] Connect UnoRouter and verify its live text and image model catalogue
 - [x] Use free UnoRouter models first for Insight writing and cover generation, with reliable fallbacks
@@ -74,3 +74,7 @@
 - [x] Make extension XAU/USD analysis and senior validation fully deterministic and model-independent
 - [x] Rebuild and verify the model-independent extension package
 - [x] Require a completed Claude primary review with multiple OmniRoute Claude fallbacks
+- [x] Upgrade the user-uploaded popup/TradingView extension with a deterministic XAU/USD Probability Engine
+- [x] Add multi-timeframe trend/regime, BUY/SELL/WAIT probabilities, and next-three-candle projections
+- [x] Add strict WAIT filters, ICT/SMC evidence, trade levels, and rolling walk-forward validation
+- [x] Verify and package the uploaded-extension upgrade
