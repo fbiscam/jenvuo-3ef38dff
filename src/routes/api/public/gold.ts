@@ -279,8 +279,8 @@ async function handle({ request }: { request: Request }) {
         models: [...(image ? EXTENSION_MODEL_CHAIN.vision : EXTENSION_MODEL_CHAIN.reasoning)],
         stage: image ? 'extension-screen-analysis' : 'extension-chat',
         maxTokens: 900,
-        timeoutMs: 55_000,
-        deadlineMs: 75_000,
+        timeoutMs: 32_000,
+        deadlineMs: 95_000,
         retriesPerModel: 1,
         messages: [
           {
