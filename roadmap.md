@@ -4,6 +4,8 @@
 - [x] Balance footer navigation to four pages per column and remove Killzone Times
 - [x] Complete daily BluesMinds article publishing with a non-Lovable cover-image fallback
 - [x] Verify persisted article-job security and the single daily schedule
+- [x] Add secure OpenAI-compatible routing support for a self-hosted OmniRoute server
+- [ ] Activate and test OmniRoute model routing (blocked until the selected 24/7 host provides a public HTTPS address)
 - [x] Add the Jenvu logo and senior-review status to the extension header
 - [x] Move extension chat and screen analysis to tested BluesMinds-only model chains
 - [x] Strengthen live ICT/SMC context, chart markings, and senior-review reasoning
