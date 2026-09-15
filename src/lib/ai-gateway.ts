@@ -1023,10 +1023,8 @@ export const MACRO_CONTEXT_CHAIN = WORKING_BMIND;
 export const SENIOR_REVIEW_CHAIN = SENIOR_REVIEW_BMIND_4O;
 
 export const DEEPSEEK_REVIEW_CHAIN = [
-  "unorouter/glm-5.3:free",
-  "unorouter/nemotron-3-ultra-550b-a55b:free",
-  "bmind/gpt-5.2-chat",
-  "bmind/gpt-4o",
+  "omniroute/auto/claude-opus",
+  "omniroute/auto/best-reasoning",
 ] as const;
 
 /** @deprecated legacy alias — use DEEPSEEK_REVIEW_CHAIN */
