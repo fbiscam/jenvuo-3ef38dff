@@ -95,6 +95,7 @@ import { Route as ApiPublicHooksBackfillInsightImagesRouteImport } from './route
 import { Route as ApiPublicHooksAutoScanRouteImport } from './routes/api/public/hooks/auto-scan'
 import { Route as ApiPublicExtensionVerifyRouteImport } from './routes/api/public/extension/verify'
 import { Route as ApiPublicExtensionAnalyzeRouteImport } from './routes/api/public/extension/analyze'
+import { Route as AuthenticatedDashboardChatThreadIdRouteImport } from './routes/_authenticated/dashboard.chat.$threadId'
 import { Route as AuthenticatedDashboardAdminTvMismatchRouteImport } from './routes/_authenticated/dashboard.admin.tv-mismatch'
 import { Route as AuthenticatedDashboardAdminTuningRouteImport } from './routes/_authenticated/dashboard.admin.tuning'
 import { Route as AuthenticatedDashboardAdminSubscribersRouteImport } from './routes/_authenticated/dashboard.admin.subscribers'
@@ -564,6 +565,12 @@ const ApiPublicExtensionAnalyzeRoute =
     path: '/api/public/extension/analyze',
     getParentRoute: () => rootRouteImport,
   } as any)
+const AuthenticatedDashboardChatThreadIdRoute =
+  AuthenticatedDashboardChatThreadIdRouteImport.update({
+    id: '/chat/$threadId',
+    path: '/chat/$threadId',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
 const AuthenticatedDashboardAdminTvMismatchRoute =
   AuthenticatedDashboardAdminTvMismatchRouteImport.update({
     id: '/admin/tv-mismatch',
@@ -712,6 +719,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/admin/subscribers': typeof AuthenticatedDashboardAdminSubscribersRoute
   '/dashboard/admin/tuning': typeof AuthenticatedDashboardAdminTuningRoute
   '/dashboard/admin/tv-mismatch': typeof AuthenticatedDashboardAdminTvMismatchRoute
+  '/dashboard/chat/$threadId': typeof AuthenticatedDashboardChatThreadIdRoute
   '/api/public/extension/analyze': typeof ApiPublicExtensionAnalyzeRoute
   '/api/public/extension/verify': typeof ApiPublicExtensionVerifyRoute
   '/api/public/hooks/auto-scan': typeof ApiPublicHooksAutoScanRoute
@@ -805,6 +813,7 @@ export interface FileRoutesByTo {
   '/dashboard/admin/subscribers': typeof AuthenticatedDashboardAdminSubscribersRoute
   '/dashboard/admin/tuning': typeof AuthenticatedDashboardAdminTuningRoute
   '/dashboard/admin/tv-mismatch': typeof AuthenticatedDashboardAdminTvMismatchRoute
+  '/dashboard/chat/$threadId': typeof AuthenticatedDashboardChatThreadIdRoute
   '/api/public/extension/analyze': typeof ApiPublicExtensionAnalyzeRoute
   '/api/public/extension/verify': typeof ApiPublicExtensionVerifyRoute
   '/api/public/hooks/auto-scan': typeof ApiPublicHooksAutoScanRoute
@@ -905,6 +914,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/admin/subscribers': typeof AuthenticatedDashboardAdminSubscribersRoute
   '/_authenticated/dashboard/admin/tuning': typeof AuthenticatedDashboardAdminTuningRoute
   '/_authenticated/dashboard/admin/tv-mismatch': typeof AuthenticatedDashboardAdminTvMismatchRoute
+  '/_authenticated/dashboard/chat/$threadId': typeof AuthenticatedDashboardChatThreadIdRoute
   '/api/public/extension/analyze': typeof ApiPublicExtensionAnalyzeRoute
   '/api/public/extension/verify': typeof ApiPublicExtensionVerifyRoute
   '/api/public/hooks/auto-scan': typeof ApiPublicHooksAutoScanRoute
@@ -1005,6 +1015,7 @@ export interface FileRouteTypes {
     | '/dashboard/admin/subscribers'
     | '/dashboard/admin/tuning'
     | '/dashboard/admin/tv-mismatch'
+    | '/dashboard/chat/$threadId'
     | '/api/public/extension/analyze'
     | '/api/public/extension/verify'
     | '/api/public/hooks/auto-scan'
@@ -1098,6 +1109,7 @@ export interface FileRouteTypes {
     | '/dashboard/admin/subscribers'
     | '/dashboard/admin/tuning'
     | '/dashboard/admin/tv-mismatch'
+    | '/dashboard/chat/$threadId'
     | '/api/public/extension/analyze'
     | '/api/public/extension/verify'
     | '/api/public/hooks/auto-scan'
@@ -1197,6 +1209,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/admin/subscribers'
     | '/_authenticated/dashboard/admin/tuning'
     | '/_authenticated/dashboard/admin/tv-mismatch'
+    | '/_authenticated/dashboard/chat/$threadId'
     | '/api/public/extension/analyze'
     | '/api/public/extension/verify'
     | '/api/public/hooks/auto-scan'
@@ -1874,6 +1887,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicExtensionAnalyzeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/dashboard/chat/$threadId': {
+      id: '/_authenticated/dashboard/chat/$threadId'
+      path: '/chat/$threadId'
+      fullPath: '/dashboard/chat/$threadId'
+      preLoaderRoute: typeof AuthenticatedDashboardChatThreadIdRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
     '/_authenticated/dashboard/admin/tv-mismatch': {
       id: '/_authenticated/dashboard/admin/tv-mismatch'
       path: '/admin/tv-mismatch'
@@ -1981,6 +2001,7 @@ interface AuthenticatedDashboardRouteChildren {
   AuthenticatedDashboardAdminSubscribersRoute: typeof AuthenticatedDashboardAdminSubscribersRoute
   AuthenticatedDashboardAdminTuningRoute: typeof AuthenticatedDashboardAdminTuningRoute
   AuthenticatedDashboardAdminTvMismatchRoute: typeof AuthenticatedDashboardAdminTvMismatchRoute
+  AuthenticatedDashboardChatThreadIdRoute: typeof AuthenticatedDashboardChatThreadIdRoute
 }
 
 const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
@@ -2022,6 +2043,8 @@ const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
       AuthenticatedDashboardAdminTuningRoute,
     AuthenticatedDashboardAdminTvMismatchRoute:
       AuthenticatedDashboardAdminTvMismatchRoute,
+    AuthenticatedDashboardChatThreadIdRoute:
+      AuthenticatedDashboardChatThreadIdRoute,
   }
 
 const AuthenticatedDashboardRouteWithChildren =
