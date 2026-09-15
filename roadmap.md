@@ -67,3 +67,4 @@
 - [x] Restore extension AI routing after the primary provider tunnel went offline
 - [x] Prevent provider credential failures from being shown as an invalid extension key
 - [x] Verify a live two-stage XAU/USD extension analysis and rebuild the install package
+- [ ] Complete and verify the dedicated ChatGPT-style chat workspace
