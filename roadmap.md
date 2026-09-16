@@ -83,3 +83,4 @@
 - [x] Strengthen primary and senior XAU/USD agent instructions for evidence-based ICT/SMC analysis and query relevance
 - [x] Verify the stale utils diagnostic and analysis prompt changes
 - [x] Pass shared chart images into extension vision analysis and stop warning-only conditions from forcing WAIT
+- [x] Reject black screen-share frames, wait for capture readiness, and rebuild extension v1.9.7

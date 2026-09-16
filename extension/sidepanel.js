@@ -680,16 +680,76 @@ async function loadSnapshot() {
 
 /* ---------- screen sharing ---------- */
 
+function canvasLooksBlank(ctx, width, height) {
+  try {
+    const cols = 8;
+    const rows = 6;
+    let visibleSamples = 0;
+    for (let y = 0; y < rows; y++) {
+      for (let x = 0; x < cols; x++) {
+        const px = ctx.getImageData(
+          Math.min(width - 1, Math.round(((x + 0.5) / cols) * width)),
+          Math.min(height - 1, Math.round(((y + 0.5) / rows) * height)),
+          1,
+          1,
+        ).data;
+        if (px[3] > 0 && px[0] + px[1] + px[2] > 24) visibleSamples++;
+      }
+    }
+    return visibleSamples < 3;
+  } catch {
+    return true;
+  }
+}
+
 function grabFrame() {
   if (!stream) return null;
   const v = $("vid");
-  if (!v.videoWidth) return null;
+  if (v.readyState < HTMLMediaElement.HAVE_CURRENT_DATA || !v.videoWidth || !v.videoHeight) return null;
   const cv = $("cv");
   const w = Math.min(1280, v.videoWidth);
   cv.width = w;
   cv.height = Math.round((v.videoHeight / v.videoWidth) * w);
-  cv.getContext("2d").drawImage(v, 0, 0, cv.width, cv.height);
+  const ctx = cv.getContext("2d", { willReadFrequently: true });
+  if (!ctx) return null;
+  ctx.drawImage(v, 0, 0, cv.width, cv.height);
+  if (canvasLooksBlank(ctx, cv.width, cv.height)) return null;
   return cv.toDataURL("image/jpeg", 0.7);
+}
+
+function waitForVideoFrame(video, timeoutMs = 8000) {
+  return new Promise((resolve, reject) => {
+    if (video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA && video.videoWidth > 0) {
+      resolve();
+      return;
+    }
+    const timeout = setTimeout(() => {
+      cleanup();
+      reject(new Error("The shared screen did not produce a visible frame."));
+    }, timeoutMs);
+    const cleanup = () => {
+      clearTimeout(timeout);
+      video.removeEventListener("loadeddata", ready);
+      video.removeEventListener("playing", ready);
+      video.removeEventListener("error", failed);
+    };
+    const ready = () => {
+      if (!video.videoWidth) return;
+      cleanup();
+      if (typeof video.requestVideoFrameCallback === "function") {
+        video.requestVideoFrameCallback(() => resolve());
+      } else {
+        requestAnimationFrame(() => resolve());
+      }
+    };
+    const failed = () => {
+      cleanup();
+      reject(new Error("Chrome could not read the shared screen."));
+    };
+    video.addEventListener("loadeddata", ready);
+    video.addEventListener("playing", ready);
+    video.addEventListener("error", failed);
+  });
 }
 
 
@@ -705,15 +765,20 @@ $("share").onclick = async () => {
   if (stream) return stopShare();
   try {
     stream = await navigator.mediaDevices.getDisplayMedia({
-      video: { frameRate: 1 },
+      video: { frameRate: { ideal: 2, max: 5 } },
       audio: false,
     });
-    $("vid").srcObject = stream;
+    const video = $("vid");
+    video.srcObject = stream;
     stream.getVideoTracks()[0].addEventListener("ended", stopShare);
+    await video.play();
+    await waitForVideoFrame(video);
     $("share").classList.add("on");
     $("share").title = "Stop sharing";
   } catch (e) {
+    if (stream) stream.getTracks().forEach((track) => track.stop());
     stream = null;
+    addMsg("ai err", e?.message || "Screen sharing start nahi ho saki. Chrome prompt mein chart tab ya window select karein.");
   }
   updateQuickVisibility();
 };
@@ -894,18 +959,18 @@ async function send(preset, silentUser) {
 
   let shot = grabFrame();
   if (!shot && stream) {
-    for (let i = 0; i < 12 && !shot; i++) {
-      await new Promise((r) => setTimeout(r, 250));
+    for (let i = 0; i < 16 && !shot; i++) {
+      await new Promise((r) => setTimeout(r, 300));
       shot = grabFrame();
     }
   }
   if (!shot && stream) {
     busy = false;
     controller = null; $("send").disabled = false; updateSendState();
-    addMsg("ai err", "Screen frame nahi mil paaya. Share dobara start karein (stop ✕ dabayein, phir Share screen).");
+    addMsg("ai err", "Shared frame black ya unreadable hai. Share dobara start karke Chrome prompt mein chart tab/window select karein; minimized ya protected window select na karein.");
     return;
   }
-  if (!silentUser) { addMsg("user", text, chartImage || undefined); saveMessage("user", text); }
+  if (!silentUser) { addMsg("user", text, chartImage || shot || undefined); saveMessage("user", text); }
 
   const pend = addMsg("ai", "");
   pend.textContent = "Thinking...";
