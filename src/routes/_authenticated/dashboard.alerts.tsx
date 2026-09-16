@@ -1191,7 +1191,7 @@ function AlertPrefs() {
 
 
       <section className="rounded-lg border border-border bg-card p-6">
-        <h2 className="text-base font-medium text-card-foreground normal-case">Quiet hours</h2>
+        <h2 className="text-base font-medium text-card-foreground normal-case"> Quiet hours</h2>
         <p className="mt-1 text-sm text-muted-foreground">No alerts will be sent during this window (your local time).</p>
         <div className="mt-4 grid grid-cols-2 gap-3">
           <label className="text-xs font-medium text-zinc-600">
