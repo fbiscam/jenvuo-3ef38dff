@@ -9,7 +9,6 @@ const ENDPOINTS =
 let API = ENDPOINTS[0];
 const REQUEST_DEADLINE_MS = 180000;
 
-
 /* ---------- Jenvu API key ---------- */
 const KEY_STORE = "jenvu_api_key_v1";
 let apiKey = null;
@@ -22,15 +21,20 @@ function readKey() {
       } else {
         resolve(localStorage.getItem(KEY_STORE));
       }
-    } catch { resolve(null); }
+    } catch {
+      resolve(null);
+    }
   });
 }
 
 function writeKey(value) {
   try {
-    if (typeof chrome !== "undefined" && chrome.storage?.local) chrome.storage.local.set({ [KEY_STORE]: value });
+    if (typeof chrome !== "undefined" && chrome.storage?.local)
+      chrome.storage.local.set({ [KEY_STORE]: value });
     else localStorage.setItem(KEY_STORE, value);
-  } catch { /* ignore */ }
+  } catch {
+    /* ignore */
+  }
 }
 
 function showKeyGate(show, message) {
@@ -41,14 +45,17 @@ function showKeyGate(show, message) {
   if (err) err.textContent = message || "";
 }
 
-
 const TIMEFRAMES = ["15m", "1h", "4h", "1d"];
 const QUICKS = [
   { label: "Read screen", text: "Read the chart on my screen using ICT/SMC concepts." },
   { label: "Trade plan", text: "Give me a trade plan now: bias, entry (POI), stop, TP1/TP2, RR." },
-  { label: "Liquidity", text: "Where is liquidity resting and where should I expect the next sweep?" },
+  {
+    label: "Liquidity",
+    text: "Where is liquidity resting and where should I expect the next sweep?",
+  },
 ];
-const ANALYSIS_INTENT = /\b(analy[sz]|signal|setup|trade|entry|exit|buy|sell|long|short|bias|tp\d?|sl|stop\s*loss|target|rr|risk|chart|candle|structure|bos|choch|fvg|order\s*block|liquidity|premium|discount|support|resistance|trend|price|market|xau|gold|forex|pair|timeframe|scalp|swing|position)\b|(?:tajzia|tajziya|signal|kharid|bech|entry|nishan|marking)/i;
+const ANALYSIS_INTENT =
+  /\b(analy[sz]|signal|setup|trade|entry|exit|buy|sell|long|short|bias|tp\d?|sl|stop\s*loss|target|rr|risk|chart|candle|structure|bos|choch|fvg|order\s*block|liquidity|premium|discount|support|resistance|trend|price|market|xau|gold|forex|pair|timeframe|scalp|swing|position)\b|(?:tajzia|tajziya|signal|kharid|bech|entry|nishan|marking)/i;
 
 const $ = (id) => document.getElementById(id);
 
@@ -58,8 +65,10 @@ let stream = null;
 let watchTimer = null;
 let busy = false;
 let controller = null;
-const SEND_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 7-7 7 7M12 19V5"/></svg>';
-const STOP_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="7" width="10" height="10" rx="2" fill="currentColor" stroke="none"/></svg>';
+const SEND_ICON =
+  '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 7-7 7 7M12 19V5"/></svg>';
+const STOP_ICON =
+  '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="7" width="10" height="10" rx="2" fill="currentColor" stroke="none"/></svg>';
 let history = [];
 
 function setReviewStatus(text, state) {
@@ -79,11 +88,20 @@ const store = {
     return new Promise((resolve) => {
       try {
         if (typeof chrome !== "undefined" && chrome.storage?.local) {
-          chrome.storage.local.get(STORE_KEY, (r) => resolve(r[STORE_KEY] || { threads: [], activeId: null }));
+          chrome.storage.local.get(STORE_KEY, (r) =>
+            resolve(r[STORE_KEY] || { threads: [], activeId: null }),
+          );
         } else {
-          resolve(JSON.parse(localStorage.getItem(STORE_KEY) || "null") || { threads: [], activeId: null });
+          resolve(
+            JSON.parse(localStorage.getItem(STORE_KEY) || "null") || {
+              threads: [],
+              activeId: null,
+            },
+          );
         }
-      } catch { resolve({ threads: [], activeId: null }); }
+      } catch {
+        resolve({ threads: [], activeId: null });
+      }
     });
   },
   set(data) {
@@ -93,11 +111,13 @@ const store = {
       } else {
         localStorage.setItem(STORE_KEY, JSON.stringify(data));
       }
-    } catch { /* quota — ignore */ }
+    } catch {
+      /* quota — ignore */
+    }
   },
 };
 
-let threads = [];       // [{ id, title, updatedAt, messages: [{cls, text}] }]
+let threads = []; // [{ id, title, updatedAt, messages: [{cls, text}] }]
 let activeId = null;
 
 function persist() {
@@ -124,7 +144,10 @@ function loadThread(id) {
   const t = threads.find((x) => x.id === id);
   if (!t) return;
   activeId = id;
-  history = t.messages.map((m) => ({ role: m.cls === "user" ? "user" : "assistant", text: m.text }));
+  history = t.messages.map((m) => ({
+    role: m.cls === "user" ? "user" : "assistant",
+    text: m.text,
+  }));
   const el = $("thread");
   el.innerHTML = "";
   if (!t.messages.length) emptyState();
@@ -138,7 +161,12 @@ function saveMessage(cls, text) {
   if (cls === "err") return;
   let t = activeThread();
   if (!t) {
-    t = { id: "t" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), title: "", updatedAt: Date.now(), messages: [] };
+    t = {
+      id: "t" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+      title: "",
+      updatedAt: Date.now(),
+      messages: [],
+    };
     threads.unshift(t);
     activeId = t.id;
   }
@@ -151,7 +179,9 @@ function saveMessage(cls, text) {
 
 function deleteThread(id) {
   threads = threads.filter((t) => t.id !== id);
-  if (activeId === id) { newChat(); }
+  if (activeId === id) {
+    newChat();
+  }
   persist();
   renderHistoryList();
 }
@@ -160,7 +190,8 @@ function renderHistoryList() {
   const c = $("historyList");
   c.innerHTML = "";
   if (!threads.length) {
-    c.innerHTML = '<div class="history-empty">No past chats yet.<br>Start a new chat — it will be saved here.</div>';
+    c.innerHTML =
+      '<div class="history-empty">No past chats yet.<br>Start a new chat — it will be saved here.</div>';
     return;
   }
   threads.forEach((t) => {
@@ -171,12 +202,18 @@ function renderHistoryList() {
     title.textContent = t.title || "Chat";
     const date = document.createElement("span");
     date.className = "hdate";
-    date.textContent = new Date(t.updatedAt).toLocaleDateString("en-US", { day: "numeric", month: "short" });
+    date.textContent = new Date(t.updatedAt).toLocaleDateString("en-US", {
+      day: "numeric",
+      month: "short",
+    });
     const del = document.createElement("button");
     del.className = "hdel";
     del.textContent = "✕";
     del.title = "Delete chat";
-    del.onclick = (e) => { e.stopPropagation(); deleteThread(t.id); };
+    del.onclick = (e) => {
+      e.stopPropagation();
+      deleteThread(t.id);
+    };
     row.append(title, date, del);
     row.onclick = () => loadThread(t.id);
     c.appendChild(row);
@@ -187,12 +224,12 @@ $("newchat").onclick = () => newChat();
 if ($("newchat2")) $("newchat2").onclick = () => newChat();
 $("historybtn").onclick = () => {
   const p = $("historyPanel");
-  if (p.classList.contains("hidden")) { renderHistoryList(); p.classList.remove("hidden"); }
-  else p.classList.add("hidden");
+  if (p.classList.contains("hidden")) {
+    renderHistoryList();
+    p.classList.remove("hidden");
+  } else p.classList.add("hidden");
 };
 $("historyClose").onclick = () => $("historyPanel").classList.add("hidden");
-
-
 
 function renderQuick() {
   const c = $("quick");
@@ -210,7 +247,7 @@ function emptyState() {
   t.classList.add("has-empty");
   t.innerHTML =
     '<div class="empty">Your ICT/SMC gold analyst is ready.<br>' +
-    'Share your chart and I’ll read structure, liquidity, FVGs and entries in real time.</div>';
+    "Share your chart and I’ll read structure, liquidity, FVGs and entries in real time.</div>";
   updateQuickVisibility();
 }
 
@@ -230,8 +267,14 @@ function scrollThread(force = false) {
   // they scrolled up to read older messages (unless it's their own message).
   const nearBottom = t.scrollHeight - t.scrollTop - t.clientHeight < 160;
   if (!force && !nearBottom) return;
-  const go = () => { t.scrollTop = t.scrollHeight; };
-  requestAnimationFrame(() => { go(); setTimeout(go, 60); setTimeout(go, 250); });
+  const go = () => {
+    t.scrollTop = t.scrollHeight;
+  };
+  requestAnimationFrame(() => {
+    go();
+    setTimeout(go, 60);
+    setTimeout(go, 250);
+  });
 }
 
 const ICONS = {
@@ -316,11 +359,18 @@ function addMsg(cls, text, shot) {
         .replace(/\*\*([^*]+)\*\*/g, "$1")
         .replace(/(^|[^*])\*([^*\n]+)\*(?!\*)/g, "$1<em>$2</em>")
         .replace(/(^|[^_])_([^_\n]+)_(?!_)/g, "$1<em>$2</em>");
-    const tableCells = (line) => line.trim().replace(/^\||\|$/g, "").split("|").map((cell) => cell.trim());
+    const tableCells = (line) =>
+      line
+        .trim()
+        .replace(/^\||\|$/g, "")
+        .split("|")
+        .map((cell) => cell.trim());
     const lines = text.split("\n");
     let list = null;
     let codeBlock = null;
-    const closeList = () => { list = null; };
+    const closeList = () => {
+      list = null;
+    };
     for (let index = 0; index < lines.length; index += 1) {
       const line = lines[index];
       const l = line.trim();
@@ -341,9 +391,13 @@ function addMsg(cls, text, shot) {
         codeBlock.textContent += (codeBlock.textContent ? "\n" : "") + line;
         continue;
       }
-      if (!l) { closeList(); continue; }
+      if (!l) {
+        closeList();
+        continue;
+      }
       const next = (lines[index + 1] || "").trim();
-      const isTableHeader = l.includes("|") && /^\|?\s*:?-{3,}:?\s*(\|\s*:?-{3,}:?\s*)+\|?$/.test(next);
+      const isTableHeader =
+        l.includes("|") && /^\|?\s*:?-{3,}:?\s*(\|\s*:?-{3,}:?\s*)+\|?$/.test(next);
       if (isTableHeader) {
         closeList();
         const wrapper = document.createElement("div");
@@ -377,7 +431,8 @@ function addMsg(cls, text, shot) {
         body.appendChild(wrapper);
         continue;
       }
-      const tradeRe = /^(?:[-*•]\s*)?(?:\*\*)?\s*(pair|symbol|asset|direction|bias|side|type|order|entry(?:\s*(?:price|zone))?|buy(?:\s*limit|\s*stop)?|sell(?:\s*limit|\s*stop)?|sl|stop\s*loss|stoploss|tp\s*\d*|take\s*profit\s*\d*|target\s*\d*|r\s*[:/]\s*r|risk\s*[:/-]?\s*reward|rr|lot(?:\s*size)?|risk|timeframe|time\s*frame|tf|confidence|validity)\s*(?:\*\*)?\s*[:\-–]\s*(.+)$/i;
+      const tradeRe =
+        /^(?:[-*•]\s*)?(?:\*\*)?\s*(pair|symbol|asset|direction|bias|side|type|order|entry(?:\s*(?:price|zone))?|buy(?:\s*limit|\s*stop)?|sell(?:\s*limit|\s*stop)?|sl|stop\s*loss|stoploss|tp\s*\d*|take\s*profit\s*\d*|target\s*\d*|r\s*[:/]\s*r|risk\s*[:/-]?\s*reward|rr|lot(?:\s*size)?|risk|timeframe|time\s*frame|tf|confidence|validity)\s*(?:\*\*)?\s*[:\-–]\s*(.+)$/i;
       const tradeMatch = l.match(tradeRe);
       if (tradeMatch) {
         closeList();
@@ -397,7 +452,10 @@ function addMsg(cls, text, shot) {
           row.className = "trade-row";
           if (/^(sl|stoploss)$/.test(key)) row.classList.add("is-sl");
           else if (/^(tp\d*|takeprofit\d*|target\d*)$/.test(key)) row.classList.add("is-tp");
-          else if (/^(entry|entryprice|entryzone|buy|buylimit|buystop|sell|selllimit|sellstop)$/.test(key)) row.classList.add("is-entry");
+          else if (
+            /^(entry|entryprice|entryzone|buy|buylimit|buystop|sell|selllimit|sellstop)$/.test(key)
+          )
+            row.classList.add("is-entry");
           const k = document.createElement("span");
           k.className = "trade-key";
           k.textContent = label.toUpperCase();
@@ -410,7 +468,10 @@ function addMsg(cls, text, shot) {
           index += 1;
           const nextLine = (lines[index] || "").trim();
           m = nextLine ? nextLine.match(tradeRe) : null;
-          if (!m) { index -= 1; break; }
+          if (!m) {
+            index -= 1;
+            break;
+          }
         }
         card.appendChild(grid);
         body.appendChild(card);
@@ -472,7 +533,8 @@ function addMsg(cls, text, shot) {
 }
 
 async function post(body, signal) {
-  const requestId = "ext_" + Date.now().toString(36) + "_" + Math.random().toString(36).slice(2, 10);
+  const requestId =
+    "ext_" + Date.now().toString(36) + "_" + Math.random().toString(36).slice(2, 10);
   let lastErr;
   let authErr;
   const deadlineAt = Date.now() + REQUEST_DEADLINE_MS;
@@ -489,33 +551,35 @@ async function post(body, signal) {
     signal?.addEventListener("abort", abortFromUser, { once: true });
     try {
       const res = await fetch(url, {
-          method: "POST",
-          headers: {
-            "content-type": "application/json",
-            ...(apiKey ? { authorization: `Bearer ${apiKey}` } : {}),
-            "x-request-id": requestId,
-          },
-          body: JSON.stringify(body),
-          cache: "no-store",
-          signal: requestController.signal,
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          ...(apiKey ? { authorization: `Bearer ${apiKey}` } : {}),
+          "x-request-id": requestId,
+        },
+        body: JSON.stringify(body),
+        cache: "no-store",
+        signal: requestController.signal,
       });
       const json = await res.json().catch(() => ({}));
-        if (res.status === 401 || (res.status === 403 && json.code !== "FEATURE_LOCKED")) {
-          const error = new Error(json.error || "Sign in with your Jenvu API key.");
-          error.tryNextEndpoint = true;
-          authErr = error;
-          throw error;
-        }
-        if (res.status === 403 && json.code === "FEATURE_LOCKED") {
-          throw new Error(json.error || "This feature is not included in your current plan. Upgrade to unlock it.");
-        }
-        if (res.status === 402 || json.code === "LOW_BALANCE") {
-          throw new Error(json.error || "Low balance. Top up your Jenvu wallet to continue.");
-        }
-        if (!res.ok) {
-          const error = new Error(json.error || `Request failed (${res.status})`);
-          throw error;
-        }
+      if (res.status === 401 || (res.status === 403 && json.code !== "FEATURE_LOCKED")) {
+        const error = new Error(json.error || "Sign in with your Jenvu API key.");
+        error.tryNextEndpoint = true;
+        authErr = error;
+        throw error;
+      }
+      if (res.status === 403 && json.code === "FEATURE_LOCKED") {
+        throw new Error(
+          json.error || "This feature is not included in your current plan. Upgrade to unlock it.",
+        );
+      }
+      if (res.status === 402 || json.code === "LOW_BALANCE") {
+        throw new Error(json.error || "Low balance. Top up your Jenvu wallet to continue.");
+      }
+      if (!res.ok) {
+        const error = new Error(json.error || `Request failed (${res.status})`);
+        throw error;
+      }
       API = url;
       return json;
     } catch (e) {
@@ -626,9 +690,7 @@ function drawChart(points) {
   ctx.beginPath();
   ctx.arc(plotW - 2.6, lastY, 2.6, 0, Math.PI * 2);
   ctx.fill();
-
 }
-
 
 let lastPrice = null;
 
@@ -655,7 +717,8 @@ function renderSnapshot(d) {
   if (trend) {
     const bias = String(d.technicals?.trend || d.indicators?.trend || (up ? "Bullish" : "Bearish"));
     trend.textContent = bias.toUpperCase();
-    trend.className = "trend " + (/bull|up/i.test(bias) ? "bull" : /bear|down/i.test(bias) ? "bear" : "");
+    trend.className =
+      "trend " + (/bull|up/i.test(bias) ? "bull" : /bear|down/i.test(bias) ? "bear" : "");
   }
   drawChart(d.chart);
 }
@@ -664,7 +727,11 @@ async function loadSnapshot() {
   try {
     const d = await post({ action: "snapshot", timeframe });
     renderSnapshot(d);
-    try { chrome.storage?.local?.set({ [SNAPSHOT_KEY]: { ...d, timeframe } }); } catch { /* cache is optional */ }
+    try {
+      chrome.storage?.local?.set({ [SNAPSHOT_KEY]: { ...d, timeframe } });
+    } catch {
+      /* cache is optional */
+    }
   } catch (e) {
     console.warn("market pulse failed", e);
     const trend = $("trend");
@@ -705,7 +772,8 @@ function canvasLooksBlank(ctx, width, height) {
 function grabFrame() {
   if (!stream) return null;
   const v = $("vid");
-  if (v.readyState < HTMLMediaElement.HAVE_CURRENT_DATA || !v.videoWidth || !v.videoHeight) return null;
+  if (v.readyState < HTMLMediaElement.HAVE_CURRENT_DATA || !v.videoWidth || !v.videoHeight)
+    return null;
   const cv = $("cv");
   const w = Math.min(1280, v.videoWidth);
   cv.width = w;
@@ -752,7 +820,6 @@ function waitForVideoFrame(video, timeoutMs = 8000) {
   });
 }
 
-
 function stopShare() {
   if (stream) stream.getTracks().forEach((t) => t.stop());
   stream = null;
@@ -778,7 +845,11 @@ $("share").onclick = async () => {
   } catch (e) {
     if (stream) stream.getTracks().forEach((track) => track.stop());
     stream = null;
-    addMsg("ai err", e?.message || "Screen sharing start nahi ho saki. Chrome prompt mein chart tab ya window select karein.");
+    addMsg(
+      "ai err",
+      e?.message ||
+        "Screen sharing start nahi ho saki. Chrome prompt mein chart tab ya window select karein.",
+    );
   }
   updateQuickVisibility();
 };
@@ -829,33 +900,51 @@ function updateSendState() {
     s.classList.add("active", "stop");
     s.title = "Stop";
     s.setAttribute("aria-label", "Stop generating");
-    if (s.dataset.mode !== "stop") { s.innerHTML = STOP_ICON; s.dataset.mode = "stop"; }
+    if (s.dataset.mode !== "stop") {
+      s.innerHTML = STOP_ICON;
+      s.dataset.mode = "stop";
+    }
     return;
   }
   s.classList.remove("stop");
   s.title = "Send";
   s.setAttribute("aria-label", "Send message");
-  if (s.dataset.mode !== "send") { s.innerHTML = SEND_ICON; s.dataset.mode = "send"; }
+  if (s.dataset.mode !== "send") {
+    s.innerHTML = SEND_ICON;
+    s.dataset.mode = "send";
+  }
   const hasText = box.value.trim().length > 0;
   s.classList.toggle("active", hasText && !s.disabled);
 }
 
 function stopRequest() {
-  if (controller) { try { controller.abort(); } catch { /* already aborted */ } }
+  if (controller) {
+    try {
+      controller.abort();
+    } catch {
+      /* already aborted */
+    }
+  }
 }
 updateSendState();
-$("send").onclick = () => { if (busy) stopRequest(); else send(); };
+$("send").onclick = () => {
+  if (busy) stopRequest();
+  else send();
+};
 
 /* ---------- TradingView chart markings overlay ---------- */
 
-const MARK_INTENT = /\b(mark|draw|show|highlight|overlay|nishan)\b|mark\s*kro|draw\s*kro|dikha\s*do/i;
-const MARK_TOPIC = /\b(fvg|ob|order block|bos|choch|liquidity|liq|bsl|ssl|sweep|killzone|kill zone|price action|smc|imbalance|structure)\b/i;
+const MARK_INTENT =
+  /\b(mark|draw|show|highlight|overlay|nishan)\b|mark\s*kro|draw\s*kro|dikha\s*do/i;
+const MARK_TOPIC =
+  /\b(fvg|ob|order block|bos|choch|liquidity|liq|bsl|ssl|sweep|killzone|kill zone|price action|smc|imbalance|structure)\b/i;
 
 function requestedMarkTopics(text) {
   const topics = new Set();
   if (/\b(fvg|fair value gap|imbalance)\b/i.test(text)) topics.add("fvg");
   if (/\b(ob|order block)\b/i.test(text)) topics.add("ob");
-  if (/\b(bos|choch|ch\.o\.ch|break of structure|change of character|structure)\b/i.test(text)) topics.add("structure");
+  if (/\b(bos|choch|ch\.o\.ch|break of structure|change of character|structure)\b/i.test(text))
+    topics.add("structure");
   if (/\b(liquidity|liq|bsl|ssl)\b/i.test(text)) topics.add("liquidity");
   if (/\b(sweep|stop raid)\b/i.test(text)) topics.add("sweep");
   if (/\b(smc|ict|everything|all|sab|sari|saari)\b/i.test(text)) topics.add("all");
@@ -875,11 +964,14 @@ function markMatchesTopic(mark, topics) {
 
 async function markOnPage(text, signal) {
   const d = await post({ action: "snapshot", timeframe }, signal);
-  const availableMarks = Array.isArray(d.overlayMarks) && d.overlayMarks.length ? d.overlayMarks : (d.marks || []);
+  const availableMarks =
+    Array.isArray(d.overlayMarks) && d.overlayMarks.length ? d.overlayMarks : d.marks || [];
   const topics = requestedMarkTopics(text);
   const marks = availableMarks.filter((mark) => markMatchesTopic(mark, topics));
   if (!marks.length) throw new Error("Requested marking ka koi valid live level abhi nahi mila.");
-  const pts = (d.chart || []).map((c) => (typeof c === "number" ? c : c.close ?? c.c ?? 0)).filter(Boolean);
+  const pts = (d.chart || [])
+    .map((c) => (typeof c === "number" ? c : (c.close ?? c.c ?? 0)))
+    .filter(Boolean);
   const levels = marks.flatMap((m) => (m.kind === "zone" ? [m.from, m.to] : [m.level]));
   const all = pts.concat(levels).filter((n) => Number.isFinite(n));
   const lo = Math.min(...all);
@@ -894,7 +986,10 @@ async function markOnPage(text, signal) {
     marks,
     lo: lo - pad,
     hi: hi + pad,
-    bias: topics.has("all") || topics.has("structure") ? d.marksBias ?? d.technicals?.smc?.structure?.bias ?? null : null,
+    bias:
+      topics.has("all") || topics.has("structure")
+        ? (d.marksBias ?? d.technicals?.smc?.structure?.bias ?? null)
+        : null,
     showSession: topics.has("all"),
   });
   return { count: marks.length, names: [...topics].filter((topic) => topic !== "all") };
@@ -903,7 +998,9 @@ async function markOnPage(text, signal) {
 async function applyLiveMarksToPage(d) {
   const marks = Array.isArray(d?.overlayMarks) ? d.overlayMarks : [];
   const pts = (d?.chart || []).map((c) => Number(c?.close ?? c?.c)).filter(Number.isFinite);
-  const levels = marks.flatMap((m) => m.kind === "zone" ? [Number(m.from), Number(m.to)] : [Number(m.level)]).filter(Number.isFinite);
+  const levels = marks
+    .flatMap((m) => (m.kind === "zone" ? [Number(m.from), Number(m.to)] : [Number(m.level)]))
+    .filter(Number.isFinite);
   if (!marks.length || !pts.length || !levels.length || typeof chrome === "undefined") return;
   const all = pts.concat(levels);
   const lo = Math.min(...all);
@@ -929,7 +1026,10 @@ async function send(preset, silentUser) {
   busy = true;
   // Mandatory Claude primary review applies only to chart/screen analysis.
   const analysisRequest = Boolean(chartImage || stream || ANALYSIS_INTENT.test(text));
-  setReviewStatus(analysisRequest ? "ICT analysis · Claude primary review…" : "Chat mode", analysisRequest ? "checking" : "");
+  setReviewStatus(
+    analysisRequest ? "ICT analysis · Claude primary review…" : "Chat mode",
+    analysisRequest ? "checking" : "",
+  );
   controller = new AbortController();
   $("send").disabled = false;
   updateSendState();
@@ -939,21 +1039,31 @@ async function send(preset, silentUser) {
   }
 
   if (text && MARK_INTENT.test(text) && MARK_TOPIC.test(text)) {
-    if (!silentUser) { addMsg("user", text); saveMessage("user", text); }
+    if (!silentUser) {
+      addMsg("user", text);
+      saveMessage("user", text);
+    }
     const p = addMsg("ai", "Chart par markings laga raha hoon…");
     try {
       const result = await markOnPage(text, controller.signal);
       p.remove();
-      const names = result.names.length ? result.names.map((name) => name.toUpperCase()).join(", ") : "requested ICT/SMC";
+      const names = result.names.length
+        ? result.names.map((name) => name.toUpperCase()).join(", ")
+        : "requested ICT/SMC";
       const msg = `Aapke chart par sirf ${names} ki ${result.count} marking${result.count === 1 ? "" : "s"} laga di hain. Levels approximate hain \u2014 overlay ke toolbar se \u25b2\u25bc aur \uff0b\uff0d se align kar sakte hain, \u2715 se hata dein.`;
       addMsg("ai", msg);
       saveMessage("ai", msg);
     } catch (e) {
       p.remove();
-      addMsg("ai err", e && e.name === "AbortError" ? "Request stopped." : (e.message || "Markings nahi lag sakin."));
+      addMsg(
+        "ai err",
+        e && e.name === "AbortError" ? "Request stopped." : e.message || "Markings nahi lag sakin.",
+      );
     }
     busy = false;
-    controller = null; $("send").disabled = false; updateSendState();
+    controller = null;
+    $("send").disabled = false;
+    updateSendState();
     return;
   }
 
@@ -966,24 +1076,35 @@ async function send(preset, silentUser) {
   }
   if (!shot && stream) {
     busy = false;
-    controller = null; $("send").disabled = false; updateSendState();
-    addMsg("ai err", "Shared frame black ya unreadable hai. Share dobara start karke Chrome prompt mein chart tab/window select karein; minimized ya protected window select na karein.");
+    controller = null;
+    $("send").disabled = false;
+    updateSendState();
+    addMsg(
+      "ai err",
+      "Shared frame black ya unreadable hai. Share dobara start karke Chrome prompt mein chart tab/window select karein; minimized ya protected window select na karein.",
+    );
     return;
   }
-  if (!silentUser) { addMsg("user", text, chartImage || shot || undefined); saveMessage("user", text); }
+  if (!silentUser) {
+    addMsg("user", text, chartImage || shot || undefined);
+    saveMessage("user", text);
+  }
 
   const pend = addMsg("ai", "");
   pend.textContent = "Thinking...";
 
   try {
-    const d = await post({
-      action: "chat",
-      timeframe,
-      question: text,
-      history: history.slice(-8),
-      screenImage: shot || undefined,
-      chartImage: chartImage || undefined,
-    }, controller.signal);
+    const d = await post(
+      {
+        action: "chat",
+        timeframe,
+        question: text,
+        history: history.slice(-8),
+        screenImage: shot || undefined,
+        chartImage: chartImage || undefined,
+      },
+      controller.signal,
+    );
     pend.remove();
     addMsg("ai", d.text);
     saveMessage("ai", d.text);
@@ -1005,7 +1126,9 @@ async function send(preset, silentUser) {
     else setReviewStatus("Chat mode", "");
   } finally {
     busy = false;
-    controller = null; $("send").disabled = false; updateSendState();
+    controller = null;
+    $("send").disabled = false;
+    updateSendState();
   }
 }
 
@@ -1015,10 +1138,16 @@ try {
   chrome.storage?.local?.get(SNAPSHOT_KEY, (saved) => {
     const snapshot = saved?.[SNAPSHOT_KEY];
     if (snapshot?.timeframe === timeframe) {
-      try { renderSnapshot(snapshot); } catch { /* wait for live data */ }
+      try {
+        renderSnapshot(snapshot);
+      } catch {
+        /* wait for live data */
+      }
     }
   });
-} catch { /* extension storage is unavailable in web preview */ }
+} catch {
+  /* extension storage is unavailable in web preview */
+}
 (async () => {
   apiKey = await readKey();
   showKeyGate(!apiKey, "");
@@ -1027,7 +1156,10 @@ try {
   if (save && input) {
     save.onclick = async () => {
       const value = (input.value || "").trim();
-      if (!value.startsWith("jenvu_ext_")) { showKeyGate(true, "Key must start with jenvu_ext_"); return; }
+      if (!value.startsWith("jenvu_ext_")) {
+        showKeyGate(true, "Key must start with jenvu_ext_");
+        return;
+      }
       save.disabled = true;
       apiKey = value;
       try {
@@ -1046,8 +1178,12 @@ try {
   }
   if (apiKey) loadSnapshot();
 })();
-setInterval(() => { if (apiKey) loadSnapshot(); }, 5000);
-document.addEventListener("visibilitychange", () => { if (!document.hidden && apiKey) loadSnapshot(); });
+setInterval(() => {
+  if (apiKey) loadSnapshot();
+}, 5000);
+document.addEventListener("visibilitychange", () => {
+  if (!document.hidden && apiKey) loadSnapshot();
+});
 
 // Restore last active chat (or start fresh)
 store.get().then((data) => {
@@ -1058,7 +1194,10 @@ store.get().then((data) => {
     const el = $("thread");
     el.innerHTML = "";
     t.messages.forEach((m) => addMsg(m.cls, m.text));
-    history = t.messages.map((m) => ({ role: m.cls === "user" ? "user" : "assistant", text: m.text }));
+    history = t.messages.map((m) => ({
+      role: m.cls === "user" ? "user" : "assistant",
+      text: m.text,
+    }));
   }
   box.focus();
 });
