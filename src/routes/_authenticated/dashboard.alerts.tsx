@@ -615,7 +615,7 @@ function AlertPrefs() {
     >
     <div className="-mx-5 -mb-7 min-h-[calc(100dvh-4rem)] overflow-hidden bg-background text-foreground sm:-mx-8">
       <header className="flex min-h-14 items-center border-b border-border px-4 py-3 sm:px-6">
-        <h1 className="text-lg font-medium text-foreground">Signal Alert</h1>
+        <h1 className="text-lg font-medium text-foreground">   Signal alert</h1>
       </header>
 
       <div className="space-y-6 px-4 py-5 sm:px-6">
