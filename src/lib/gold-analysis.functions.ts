@@ -2325,6 +2325,7 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
 
     let parsed: any = {};
     let __usedNarrationModel: string | null = null;
+    let __aiPassFailed = false;
     let __usedSeniorModel: string | null = null;
     let __totalPromptTokens = 0;
     let __totalCompletionTokens = 0;
