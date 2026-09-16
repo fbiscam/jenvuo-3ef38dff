@@ -2796,6 +2796,14 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
     const setupChecks: SetupCheck[] = scored.factors.map(f => ({
       key: f.key, label: `${f.label} (${f.weight})`, pass: f.pass, reason: f.detail,
     }));
+    if (__aiPassFailed) {
+      setupChecks.unshift({
+        key: "ai_unavailable",
+        label: "⚠ AI analysis unavailable — rules-only result",
+        pass: false,
+        reason: "The AI model provider was busy, so this setup was scored by the rules engine alone without AI confirmation.",
+      });
+    }
     // Add veto reasons as failed checks so the UI shows why an A+ was rejected
     for (const v of scored.vetos) {
       setupChecks.unshift({ key: `veto_${v.key}`, label: `⛔ ${v.label}`, pass: false, reason: v.reason });
