@@ -97,7 +97,6 @@ function AlertPrefs() {
   const [saving, setSaving] = useState(false);
   const [alerts, setAlerts] = useState<FiredAlert[]>([]);
   const [alertsLoading, setAlertsLoading] = useState(true);
-  const [pairFilter, setPairFilter] = useState<string>("ALL");
   const [visibleCount, setVisibleCount] = useState<number>(10);
   const [scanner, setScanner] = useState<LiveScannerStatus | null>(null);
   const [clock, setClock] = useState(() => Date.now());
@@ -664,16 +663,6 @@ function AlertPrefs() {
             </span>
 
 
-            <select
-              value={pairFilter}
-              onChange={(e) => setPairFilter(e.target.value)}
-              className="rounded-md border border-zinc-200 bg-white px-2 py-1 text-xs text-zinc-700"
-            >
-              <option value="ALL">XAU/USD only</option>
-              {Array.from(new Set(alerts.map((a) => a.pair))).map((p) => (
-                <option key={p} value={p}>{p}</option>
-              ))}
-            </select>
           </div>
         </div>
 
@@ -686,7 +675,7 @@ function AlertPrefs() {
             <>
             {/* Mobile card list */}
             <ul className="divide-y divide-zinc-100 sm:hidden">
-              {alerts.filter((a) => pairFilter === "ALL" || a.pair === pairFilter).slice(0, visibleCount).map((a) => {
+              {alerts.slice(0, visibleCount).map((a) => {
                 const isBuy = a.direction === "BUY";
                 const firedAt = new Date(a.fired_at);
                 const ago = relativeTime(firedAt);
@@ -764,7 +753,7 @@ function AlertPrefs() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-zinc-100">
-                {alerts.filter((a) => pairFilter === "ALL" || a.pair === pairFilter).slice(0, visibleCount).map((a) => {
+                {alerts.slice(0, visibleCount).map((a) => {
                   const isBuy = a.direction === "BUY";
                   const firedAt = new Date(a.fired_at);
                   const ago = relativeTime(firedAt);
@@ -837,8 +826,7 @@ function AlertPrefs() {
         </div>
 
         {(() => {
-          const filtered = alerts.filter((a) => pairFilter === "ALL" || a.pair === pairFilter);
-          if (filtered.length <= visibleCount) return null;
+          if (alerts.length <= visibleCount) return null;
           return (
             <div className="mt-3 flex justify-center">
               <Button
@@ -846,7 +834,7 @@ function AlertPrefs() {
                 size="sm"
                 onClick={() => setVisibleCount((c) => c + 10)}
               >
-                Show more ({filtered.length - visibleCount} remaining)
+                Show more ({alerts.length - visibleCount} remaining)
               </Button>
             </div>
           );
