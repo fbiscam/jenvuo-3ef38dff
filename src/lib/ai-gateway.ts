@@ -603,32 +603,41 @@ async function singleAttemptInner(
                     ? model.slice("omniroute/".length)
                     : model;
 
-  // Determinism: temperature 0 + top_p 1 + stable seed so the same input
-  // produces the same confidence within a short window. Seed derives from the
-  // conversation content bucketed to the current minute — prevents 61% → 55%
-  // flip-flop on back-to-back scans of the same setup.
-  const seedBase =
-    opts.messages
-      .map((m) => (typeof m.content === "string" ? m.content : JSON.stringify(m.content)))
-      .join("|") +
-    "|" +
-    Math.floor(Date.now() / 60000);
+  // Determinism: temperature 0 + top_p 1 + stable seed so the same chart and
+  // the same market data always produce the same read. The seed derives ONLY
+  // from the conversation content (no clock component) — a time-bucketed seed
+  // made back-to-back scans of an identical setup disagree.
+  const seedBase = opts.messages
+    .map((m) => (typeof m.content === "string" ? m.content : JSON.stringify(m.content)))
+    .join("|");
   let seed = 0;
   for (let i = 0; i < seedBase.length; i++)
     seed = ((seed << 5) - seed + seedBase.charCodeAt(i)) | 0;
   seed = Math.abs(seed) || 1;
 
-  // GPT-5 family only accepts default temperature (1); skip temp/top_p there,
-  // keep seed for determinism. OmniRoute's `auto/*` routes pick a different,
-  // far slower upstream when temperature/top_p are pinned (25s+ for a trivial
-  // prompt vs ~3s without), so they are treated the same way.
-  const usesDefaultTemperature = /(^|\/)gpt-(?:5|6)/i.test(wireModel) || isOmniRoute;
+  // GPT-5/6 family only accepts default temperature (1); skip temp/top_p there
+  // and keep the seed. OmniRoute's `auto/*` meta-routes pick a different, far
+  // slower upstream when sampling is pinned, so they are treated the same way;
+  // explicit OmniRoute model ids (kr/claude-*, kr/glm-*) DO get pinned sampling
+  // — without it Claude runs at temperature 1 and the same chart reads
+  // differently on every scan.
+  const usesDefaultTemperature =
+    /(^|\/)gpt-(?:5|6)/i.test(wireModel) || (isOmniRoute && /(^|\/)auto\//i.test(wireModel));
+
+  // Anthropic-backed routes dislike temperature and top_p together — pin only
+  // temperature there.
+  const pinnedSampling = usesDefaultTemperature
+    ? {}
+    : isOmniRoute
+      ? { temperature: 0 }
+      : { temperature: 0, top_p: 1 };
 
   const body: Record<string, unknown> = {
     model: wireModel,
     messages: opts.messages,
     seed,
-    ...(usesDefaultTemperature ? {} : { temperature: 0, top_p: 1 }),
+    ...pinnedSampling,
+
     // GPT-OSS otherwise spends most of the token/time budget on hidden chain
     // of thought before emitting the visible answer. Low effort keeps the
     // extension responsive while preserving the full ICT/SMC output schema.
