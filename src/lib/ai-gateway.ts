@@ -624,12 +624,20 @@ async function singleAttemptInner(
   const usesDefaultTemperature =
     /(^|\/)gpt-(?:5|6)/i.test(wireModel) || (isOmniRoute && /(^|\/)auto\//i.test(wireModel));
 
+  // Anthropic-backed routes dislike temperature and top_p together — pin only
+  // temperature there.
+  const pinnedSampling = usesDefaultTemperature
+    ? {}
+    : isOmniRoute
+      ? { temperature: 0 }
+      : { temperature: 0, top_p: 1 };
 
   const body: Record<string, unknown> = {
     model: wireModel,
     messages: opts.messages,
     seed,
-    ...(usesDefaultTemperature ? {} : { temperature: 0, top_p: 1 }),
+    ...pinnedSampling,
+
     // GPT-OSS otherwise spends most of the token/time budget on hidden chain
     // of thought before emitting the visible answer. Low effort keeps the
     // extension responsive while preserving the full ICT/SMC output schema.
