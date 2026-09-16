@@ -1,12 +1,14 @@
 const ENDPOINTS =
   location.protocol === "chrome-extension:"
     ? [
-        "https://project--06cd4260-299b-4286-8096-c43f2f596dee-dev.lovable.app/api/public/gold",
         "https://jenvu.com/api/public/gold",
         "https://project--06cd4260-299b-4286-8096-c43f2f596dee.lovable.app/api/public/gold",
+        "https://project--06cd4260-299b-4286-8096-c43f2f596dee-dev.lovable.app/api/public/gold",
       ]
     : ["/api/public/gold"];
 let API = ENDPOINTS[0];
+const REQUEST_DEADLINE_MS = 180000;
+
 
 /* ---------- Jenvu API key ---------- */
 const KEY_STORE = "jenvu_api_key_v1";
