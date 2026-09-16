@@ -583,6 +583,28 @@ function AlertPrefs() {
   }, [prefs, loading]);
 
 
+  const requestBrowser = async () => {
+    if (typeof Notification === "undefined") return toast.error("Notifications not supported in this browser");
+    // Iframes (like the Lovable preview) block Notification.requestPermission by default.
+    const inIframe = typeof window !== "undefined" && window.self !== window.top;
+    if (inIframe) {
+      return toast.error("Open the site in a new tab to enable notifications (blocked inside preview).");
+    }
+    try {
+      const result = await Notification.requestPermission();
+      if (result === "granted") {
+        setPrefs((p) => ({ ...p, browser_enabled: true }));
+        toast.success("Browser alerts enabled");
+      } else if (result === "denied") {
+        toast.error("Notifications blocked. Click the 🔒 in the address bar → Notifications → Allow.");
+      } else {
+        toast.message("Permission dismissed. Try again to enable alerts.");
+      }
+    } catch {
+      toast.error("Could not request permission in this context.");
+    }
+  };
+
   if (loading || isLoading) return <div className="text-sm text-zinc-500">Loading…</div>;
 
   return (
@@ -1106,6 +1128,10 @@ function AlertPrefs() {
             </AlertDialogContent>
           </AlertDialog>
 
+          <button onClick={requestBrowser} className="text-xs font-medium text-zinc-700 underline-offset-2 hover:underline">
+            {"\u00a0 \u00a0 \u00a0"}Request browser permission →
+          </button>
+          
           <AlertDialog open={whatsappDisconnectConfirmOpen} onOpenChange={setWhatsappDisconnectConfirmOpen}>
             <AlertDialogContent>
               <AlertDialogHeader>
