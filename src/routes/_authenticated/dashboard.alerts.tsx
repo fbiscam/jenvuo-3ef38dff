@@ -10,7 +10,7 @@ import { getLiveScannerStatus, type LiveScannerStatus } from "@/lib/live-signals
 import { getAlertsEnabled, setAlertsEnabled } from "@/lib/alert-toggle.functions";
 import { getRiskSettings } from "@/lib/risk-settings.functions";
 import { computePositionSize } from "@/lib/risk-manager";
-import { Activity, Bell, BellOff, CheckCircle2, Clock3, Loader2, ScanLine, Send, ShieldCheck } from "lucide-react";
+import { Activity, Bell, BellOff, Loader2, ScanLine, Send, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { connectWhatsappAlertLink, disconnectWhatsappAlertLink, getWhatsappAlertLink, setWhatsappAlertEnabled, verifyWhatsappAlertCode } from "@/lib/whatsapp-alert.functions";
 import { connectTelegramAlertLink, disconnectTelegramAlertLink, getTelegramAlertLink, getTelegramBotInfo, setTelegramAlertEnabled, verifyTelegramAlertCode } from "@/lib/telegram-alert.functions";
@@ -627,7 +627,6 @@ function AlertPrefs() {
         <StatusTile icon={ScanLine} label="Market scope" value="XAU/USD only" detail={`${currentGoldSession(new Date(clock))} · ${goldMarketLabel(new Date(clock))}`} tone="gold" />
       </section>
 
-      {alerts[0] ? <LatestSignal alert={alerts[0]} /> : null}
 
       <section className="rounded-xl border border-zinc-200 bg-white p-4 sm:p-6">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -1279,50 +1278,6 @@ function StatusTile({
         <div className="mt-1 text-xs leading-5 text-muted-foreground">{detail}</div>
       </div>
     </div>
-  );
-}
-
-function LatestSignal({ alert }: { alert: FiredAlert }) {
-  const isBuy = alert.direction === "BUY";
-  const levels = [
-    ["Entry", alert.entry],
-    ["Stop loss", alert.sl],
-    ["Take profit", alert.tp],
-    ["Risk / reward", `1:${Number(alert.rr).toFixed(2)}`],
-  ] as const;
-  return (
-    <section className="overflow-hidden rounded-xl border border-border bg-card">
-      <div className="flex flex-col gap-4 border-b border-border p-5 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-center gap-3">
-          <div className={cn("grid h-10 w-10 place-items-center rounded-md", isBuy ? "bg-chart-2/10 text-chart-2" : "bg-destructive/10 text-destructive")}>
-            <CheckCircle2 className="h-5 w-5" />
-          </div>
-          <div>
-            <div className="text-xs text-muted-foreground">Latest qualified setup</div>
-            <div className="mt-0.5 flex items-center gap-2">
-              <span className="text-lg font-medium text-card-foreground">{alert.direction} XAU/USD</span>
-              <span className="rounded bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground">Grade {alert.grade}</span>
-            </div>
-          </div>
-        </div>
-        <div className="flex items-center gap-2 text-xs text-muted-foreground">
-          <Clock3 className="h-3.5 w-3.5" />
-          {new Date(alert.fired_at).toLocaleString()}
-        </div>
-      </div>
-      <div className="grid grid-cols-2 divide-x divide-y divide-border sm:grid-cols-4 sm:divide-y-0">
-        {levels.map(([label, value]) => (
-          <div key={label} className="min-w-0 p-4">
-            <dt className="text-[10px] text-muted-foreground">{label}</dt>
-            <dd className="mt-1 truncate font-mono text-base text-card-foreground">{value}</dd>
-          </div>
-        ))}
-      </div>
-      <div className="flex flex-wrap items-center justify-between gap-2 border-t border-border bg-muted/40 px-5 py-3 text-xs">
-        <span className="text-muted-foreground">{alert.session ?? "Live market"} · {alert.confidence}% final confidence</span>
-        <span className="inline-flex items-center gap-1.5 text-card-foreground"><ShieldCheck className="h-3.5 w-3.5 text-chart-2" /> Senior AI confirmed</span>
-      </div>
-    </section>
   );
 }
 
