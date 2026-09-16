@@ -858,7 +858,7 @@ function AlertPrefs() {
 
 
       <section className="rounded-lg border border-border bg-card p-6">
-        <h2 className="text-base font-medium text-card-foreground normal-case">Delivery channels</h2>
+        <h2 className="text-base font-medium text-card-foreground normal-case"> Delivery channels</h2>
         <p className="mt-1 text-sm text-muted-foreground">Choose how new A+ setups reach you.</p>
         <div className="mt-5 space-y-3">
           <Toggle
