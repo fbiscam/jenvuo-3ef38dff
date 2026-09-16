@@ -145,12 +145,12 @@ function ExtensionPage() {
   const onDownload = async () => {
     setDownloading(true);
     try {
-      const res = await fetch("/jenvu-extension-v1.9.5.zip", { cache: "no-store" });
+      const res = await fetch("/jenvu-extension-v1.9.6.zip", { cache: "no-store" });
       if (!res.ok) throw new Error(`Download failed: ${res.status}`);
       const blob = await res.blob();
       const a = document.createElement("a");
       a.href = URL.createObjectURL(blob);
-      a.download = "jenvu-extension-v1.9.5.zip";
+      a.download = "jenvu-extension-v1.9.6.zip";
       a.click();
       URL.revokeObjectURL(a.href);
     } catch (e) {
@@ -297,7 +297,7 @@ function ExtensionPage() {
               <div className="min-w-0">
                 <div className="mb-1 text-[11px] text-zinc-500 md:hidden">Extension</div>
                 <div className="truncate text-[13px] text-blue-700">Jenvu XAU/USD Extension</div>
-                <div className={`${MONO} truncate text-[12px] text-zinc-500`}>v1.9.5</div>
+                <div className={`${MONO} truncate text-[12px] text-zinc-500`}>v1.9.6</div>
               </div>
               <div className="text-[13px] text-zinc-800">
                 <div className="mb-1 text-[11px] text-zinc-500 md:hidden">Created</div>
@@ -384,11 +384,11 @@ function ExtensionPage() {
           </div>
           <div className="grid gap-4 border-b border-zinc-100 py-5 md:grid-cols-[minmax(0,1.8fr)_0.8fr_0.8fr_auto] md:items-center">
             <div className="min-w-0">
-              <div className="truncate text-[14px] font-medium text-zinc-900">Jenvu — ICT/SMC Gold Analyst</div>
+              <div className="truncate text-[14px] font-medium text-zinc-900">Jenvu Thunder — ICT/SMC Gold Analyst</div>
               <div className="mt-1 text-[12px] text-zinc-500">Chrome extension for live XAU/USD analysis</div>
             </div>
             <div className="flex items-center gap-2 text-[13px] text-zinc-800">
-              <span className={MONO}>v1.9.5</span>
+              <span className={MONO}>v1.9.6</span>
               <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-medium text-emerald-700">Latest</span>
             </div>
             <div className="text-[13px] text-zinc-600">Updated Sep 16, 2026</div>
@@ -401,7 +401,7 @@ function ExtensionPage() {
               <Download className="h-4 w-4" /> {downloading ? "Preparing…" : "Download latest"}
             </button>
           </div>
-          <p className="mt-4 text-[12px] text-zinc-500">ZIP package · Chrome developer mode · Version 1.9.5</p>
+          <p className="mt-4 text-[12px] text-zinc-500">ZIP package · Chrome developer mode · Version 1.9.6</p>
         </div>
       )}
 
