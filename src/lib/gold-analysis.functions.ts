@@ -2325,6 +2325,7 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
 
     let parsed: any = {};
     let __usedNarrationModel: string | null = null;
+    let __aiPassFailed = false;
     let __usedSeniorModel: string | null = null;
     let __totalPromptTokens = 0;
     let __totalCompletionTokens = 0;
@@ -2348,9 +2349,9 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
         jsonMode: true,
         maxTokens: 1100,
         timeoutMs: 30000,
-        deadlineMs: 40000,
+        deadlineMs: 55000,
         priority: true,
-        retriesPerModel: 1,
+        retriesPerModel: 2,
         stage: "signal-analysis",
       });
       parsed = tryParseJsonLoose(narration.content) || {};
@@ -2361,6 +2362,7 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
         .then((m) => m.logAiCost({ userId: __userId, stage: "signal-analysis", model: narration.model, usage: narration.usage }))
         .catch(() => {});
     } catch (e) {
+      __aiPassFailed = true;
       console.warn(
         "signal-analysis AI pass failed; using deterministic engine:",
         (e as Error)?.message ?? e,
@@ -2794,6 +2796,14 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
     const setupChecks: SetupCheck[] = scored.factors.map(f => ({
       key: f.key, label: `${f.label} (${f.weight})`, pass: f.pass, reason: f.detail,
     }));
+    if (__aiPassFailed) {
+      setupChecks.unshift({
+        key: "ai_unavailable",
+        label: "⚠ AI analysis unavailable — rules-only result",
+        pass: false,
+        reason: "The AI model provider was busy, so this setup was scored by the rules engine alone without AI confirmation.",
+      });
+    }
     // Add veto reasons as failed checks so the UI shows why an A+ was rejected
     for (const v of scored.vetos) {
       setupChecks.unshift({ key: `veto_${v.key}`, label: `⛔ ${v.label}`, pass: false, reason: v.reason });
@@ -3179,17 +3189,17 @@ ${newsLines}
 IMMINENT HIGH-IMPACT: ${imminentHigh ? `${imminentHigh.title} in ${Math.round(imminentHigh.minutesUntil)}m` : "none"}`;
 
         const macroRes = await callChatCompletion({
-          models: ["bmind/gpt-5.2-chat"],
+          models: [...MACRO_CONTEXT_CHAIN],
           messages: [
             { role: "system", content: macroSystem },
             { role: "user", content: macroUser },
           ],
           jsonMode: true,
           maxTokens: 160,
-          timeoutMs: 12000,
-          deadlineMs: 14000,
+          timeoutMs: 15000,
+          deadlineMs: 32000,
           priority: false,
-          retriesPerModel: 1,
+          retriesPerModel: 2,
           stage: "macro-context",
         });
 
