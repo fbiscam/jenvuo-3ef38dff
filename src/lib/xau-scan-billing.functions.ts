@@ -7,7 +7,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-export const TERMINAL_SCAN_FEE_USD = 0.3;
+export const TERMINAL_SCAN_FEE_USD = 0.2;
 
 export type ScanBillingState = {
   balance: number;

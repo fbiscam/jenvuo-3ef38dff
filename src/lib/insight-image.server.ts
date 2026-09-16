@@ -22,13 +22,61 @@ const UNOROUTER_IMAGE_MODELS = [
   "dreamshaper:free",
 ] as const;
 
-function coverPrompt(title: string, category: string): string {
+// Each article must get a visually distinct cover. A stable hash of the slug
+// picks a scene/palette/angle combination, and a random seed suffix keeps two
+// articles on the same topic family from rendering near-identical images.
+const COVER_SCENES = [
+  "macro shot of a molten gold ingot surface with rippling liquid metal",
+  "abstract 3D candlestick canyon rendered as polished metal blocks",
+  "an institutional trading floor abstracted into glowing glass planes",
+  "a slow-motion burst of gold dust particles over a dark grid",
+  "layered depth-of-market ribbons flowing like silk through darkness",
+  "a precision mechanical vault mechanism with gold gearing",
+  "topographic liquidity map carved into brushed metal",
+  "orbiting concentric rings of light around a single gold sphere",
+  "cracked obsidian slab revealing veins of glowing gold",
+  "long-exposure light trails forming an upward market structure",
+] as const;
+
+const COVER_PALETTES = [
+  "deep charcoal with champagne gold highlights",
+  "near-black navy with amber and bronze accents",
+  "graphite grey with warm honey gold rim light",
+  "midnight teal with pale gold and ivory highlights",
+  "espresso brown with burnished copper-gold glow",
+] as const;
+
+const COVER_TREATMENTS = [
+  "cinematic wide shot, shallow depth of field",
+  "top-down flat-lay composition, hard directional light",
+  "extreme macro detail, soft volumetric haze",
+  "isometric 3D render, clean studio lighting",
+  "long-exposure motion blur, dramatic side light",
+] as const;
+
+function hashString(value: string): number {
+  let h = 2166136261;
+  for (let i = 0; i < value.length; i++) {
+    h ^= value.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return Math.abs(h);
+}
+
+function coverPrompt(title: string, category: string, slug = ""): string {
+  const h = hashString(slug || title);
+  const scene = COVER_SCENES[h % COVER_SCENES.length];
+  const palette = COVER_PALETTES[Math.floor(h / 7) % COVER_PALETTES.length];
+  const treatment = COVER_TREATMENTS[Math.floor(h / 53) % COVER_TREATMENTS.length];
   return [
     "Create a premium, editorial cover image for a professional gold-trading research article.",
     `Article title: "${title}". Category: ${category}.`,
-    "Style: dark cinematic fintech aesthetic, deep charcoal/near-black background, warm gold accents,",
-    "subtle candlestick chart geometry, soft volumetric light, high detail, 16:9 composition, no text,",
-    "no words, no letters, no logos, no watermarks, no human faces.",
+    `Visual concept: ${scene}.`,
+    `Colour palette: ${palette}.`,
+    `Photography/render treatment: ${treatment}.`,
+    "Premium fintech aesthetic, high detail, 16:9 composition, no text, no words, no letters,",
+    "no logos, no watermarks, no charts with labels, no human faces.",
+    `Unique variation id: ${h % 99991}.`,
   ].join(" ");
 }
 
