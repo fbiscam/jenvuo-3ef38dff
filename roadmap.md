@@ -78,3 +78,5 @@
 - [x] Require a confirmed senior AI verdict before any automated signal is published
 - [x] Align the Gold scanner and dashboard status with the 15-minute schedule
 - [x] Align Signal Alert and Security page styling with the Usage dashboard
+- [x] Reverify all active OmniRoute models under concurrent load
+- [x] Rebuild extension v1.9.5 and update the extension download page
