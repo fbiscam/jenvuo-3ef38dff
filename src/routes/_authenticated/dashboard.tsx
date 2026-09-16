@@ -1420,10 +1420,10 @@ function UsageAnalytics({ stats, keysCount, loading, range, onRangeChange, onRef
         </div>
         <div className={metricClass}>
           <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 text-sm text-foreground">
-            <span className="truncate">Prompt caching: Hit rate</span><Info className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+            <span className="truncate">Avg cost per request</span><Info className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
           </div>
-          <strong className="mt-1 text-base font-semibold text-foreground">—</strong>
-          <div className="mt-auto border-b border-border pt-5" />
+          <strong className="mt-1 text-base font-semibold tabular-nums text-foreground">{totalScans > 0 ? `$${(totalSpent / totalScans).toFixed(3)}` : "—"}</strong>
+          <div className="mt-auto pt-5"><UsageLineChart values={avgCostSeries} height={28} color="var(--chart-3)" /></div>
         </div>
         <div className={metricClass}>
           <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 text-sm text-foreground">
