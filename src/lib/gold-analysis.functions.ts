@@ -3179,17 +3179,17 @@ ${newsLines}
 IMMINENT HIGH-IMPACT: ${imminentHigh ? `${imminentHigh.title} in ${Math.round(imminentHigh.minutesUntil)}m` : "none"}`;
 
         const macroRes = await callChatCompletion({
-          models: ["bmind/gpt-5.2-chat"],
+          models: [...MACRO_CONTEXT_CHAIN],
           messages: [
             { role: "system", content: macroSystem },
             { role: "user", content: macroUser },
           ],
           jsonMode: true,
           maxTokens: 160,
-          timeoutMs: 12000,
-          deadlineMs: 14000,
+          timeoutMs: 15000,
+          deadlineMs: 32000,
           priority: false,
-          retriesPerModel: 1,
+          retriesPerModel: 2,
           stage: "macro-context",
         });
 
