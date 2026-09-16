@@ -2,7 +2,10 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
 import { callChatCompletion, MODEL_CHAIN } from "@/lib/ai-gateway";
-import { XAU_DESK_CORE_INSTRUCTIONS, XAU_SENIOR_REVIEW_INSTRUCTIONS } from "@/lib/analysis/agent-instructions";
+import {
+  XAU_DESK_CORE_INSTRUCTIONS,
+  XAU_SENIOR_REVIEW_INSTRUCTIONS,
+} from "@/lib/analysis/agent-instructions";
 
 const schema = z.object({
   interval: z.string(),

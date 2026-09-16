@@ -2,7 +2,10 @@ import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { computeSignalPlan, resolveInstrument, type SignalPlan } from "@/lib/gold-analysis.functions";
 import { callChatCompletion, AiGatewayError, MODEL_CHAIN } from "@/lib/ai-gateway";
-import { QUERY_RELEVANCE_INSTRUCTIONS, XAU_DESK_CORE_INSTRUCTIONS } from "@/lib/analysis/agent-instructions";
+import {
+  QUERY_RELEVANCE_INSTRUCTIONS,
+  XAU_DESK_CORE_INSTRUCTIONS,
+} from "@/lib/analysis/agent-instructions";
 
 export type AgentContext = {
   symbol?: string;

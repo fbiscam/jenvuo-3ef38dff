@@ -18,7 +18,11 @@ import {
   getCachedPlan, setCachedPlan, checkAnalyzeRateLimit,
 } from "@/lib/ai-gateway";
 import { MIN_CONFIDENCE } from "@/lib/signals/qualification";
-import { QUERY_RELEVANCE_INSTRUCTIONS, XAU_DESK_CORE_INSTRUCTIONS, XAU_SENIOR_REVIEW_INSTRUCTIONS } from "@/lib/analysis/agent-instructions";
+import {
+  QUERY_RELEVANCE_INSTRUCTIONS,
+  XAU_DESK_CORE_INSTRUCTIONS,
+  XAU_SENIOR_REVIEW_INSTRUCTIONS,
+} from "@/lib/analysis/agent-instructions";
 
 async function _spendUserCredits(
   userId: string,
@@ -3002,7 +3006,7 @@ Elite lens — walk ALL before verdict:
 • DXY / SMT for gold — DXY should confirm (DXY down → gold up). SMT divergence is bonus, not required.
 
 Verdict discipline:
-• CONFIRM — you would personally risk 1% of the desk today. Every box ticked. Rare — expect <25% of setups.
+• CONFIRM — every material box is supported by the supplied evidence. Reserve this for genuinely elite setups.
 • DOWNGRADE — valid thesis, one weak confluence (session, marginal RR, zone slightly used, HTF not textbook). Take smaller.
 • VETO — kills capital. Wrong side of EQ, chasing, SL inside zone, no sweep, HTF conflict, news minefield, or "I've seen this fail 500 times."
 
