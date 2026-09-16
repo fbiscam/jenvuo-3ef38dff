@@ -636,7 +636,7 @@ function AlertPrefs() {
       <section className="rounded-lg border border-border bg-card p-4 sm:p-6">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h2 className="text-base font-medium text-foreground normal-case">Signal history</h2>
+            <h2 className="text-base font-medium text-foreground normal-case"> Signal history</h2>
             <p className="mt-1 text-sm text-muted-foreground">Senior-confirmed XAU/USD setups, newest first.</p>
           </div>
           <div className="flex items-center gap-2 self-start sm:self-auto">
