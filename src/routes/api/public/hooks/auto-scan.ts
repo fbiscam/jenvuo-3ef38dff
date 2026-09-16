@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { computeSignalPlan, getLiveTick } from "@/lib/gold-analysis.functions";
 import { isActiveKillzone, MIN_CONFIDENCE, qualifySignal } from "@/lib/signals/qualification";
 
-// Auto-scan broadcast worker. Called every 5 min by pg_cron.
+// Auto-scan broadcast worker. Called every 15 min by pg_cron.
 // Auth: x-cron-secret (private CRON_SECRET) for cron + app-internal callers,
 // or a service-role signed manual-mode body for user-triggered manual scans.
 // The public anon apikey is NOT accepted — it ships in every browser bundle.
@@ -150,7 +150,7 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
         );
         // Keep cron executions comfortably under the platform timeout. A full
         // six-pair AI sweep can take 40–60s, so the scheduled worker rotates
-        // through small batches every 5 minutes. Manual scans still process the
+        // through small batches every 15 minutes. Manual scans still process the
         // selected pair immediately.
         const configuredBatchSize = Number(cfg.scan_batch_size ?? 2);
         const scanBatchSize = manualMode
@@ -163,16 +163,16 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
               ),
             );
         const batchCount = Math.max(1, Math.ceil(pairs.length / scanBatchSize));
-        const batchSlot = Math.floor(Date.now() / (5 * 60 * 1000)) % batchCount;
+        const batchSlot = Math.floor(Date.now() / (15 * 60 * 1000)) % batchCount;
         const scheduledPairs = manualMode
           ? pairs
           : pairs.slice(batchSlot * scanBatchSize, batchSlot * scanBatchSize + scanBatchSize);
         // Runtime config can lag behind code deploys. Keep a quality floor so
         // stale permissive settings cannot send B/C retracement calls again.
-        const configuredMinConf = Number(cfg.min_conf ?? MIN_CONFIDENCE);
+        const configuredMinConf = Number(cfg.min_conf ?? 75);
         let minConf = Math.max(
-          MIN_CONFIDENCE,
-          Number.isFinite(configuredMinConf) ? configuredMinConf : MIN_CONFIDENCE,
+          75,
+          Number.isFinite(configuredMinConf) ? configuredMinConf : 75,
         );
         const confirmWindowMin = Math.min(
           Number(cfg.confirm_window_min ?? 45) || 45,
@@ -365,6 +365,28 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
             const dir = plan.trade?.direction;
             let conf = Number(plan.trade?.confidence ?? 0);
             const now = new Date();
+
+            // Publishing is fail-closed: every automated XAU/USD setup must be
+            // explicitly confirmed by the senior AI desk. A timeout, veto,
+            // downgrade, malformed answer, or missing model remains visible in
+            // scan diagnostics but can never reach subscribers.
+            const seniorReview = plan.seniorReview;
+            const seniorConfirmed =
+              seniorReview?.included === true &&
+              seniorReview.status === "confirmed" &&
+              typeof seniorReview.model === "string" &&
+              seniorReview.model.length > 0;
+            if (!seniorConfirmed) {
+              await supabaseAdmin.from("auto_scan_state").delete().eq("pair", pair);
+              results.push({
+                pair,
+                action: "senior_review_not_confirmed",
+                conf,
+                senior_status: seniorReview?.status ?? "missing",
+                senior_model: seniorReview?.model ?? null,
+              });
+              continue;
+            }
 
             if (dir !== "BUY" && dir !== "SELL") {
               await supabaseAdmin
@@ -635,6 +657,25 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
               // Requote failed (transient upstream) — fall back to original plan.
             }
 
+            const finalSeniorReview = broadcastPlan.seniorReview;
+            const finalSeniorConfirmed =
+              finalSeniorReview?.included === true &&
+              finalSeniorReview.status === "confirmed" &&
+              typeof finalSeniorReview.model === "string" &&
+              finalSeniorReview.model.length > 0;
+            if (!finalSeniorConfirmed) {
+              await supabaseAdmin.from("auto_scan_state").delete().eq("pair", pair);
+              results.push({
+                pair,
+                action: "senior_review_not_confirmed",
+                conf,
+                senior_status: finalSeniorReview?.status ?? "missing",
+                senior_model: finalSeniorReview?.model ?? null,
+                stage: "broadcast_requote",
+              });
+              continue;
+            }
+
             // Broadcast on first qualifying hit
             const dec = broadcastPlan.instrument?.decimals ?? 2;
             const entry = Number(broadcastPlan.trade?.entry);
@@ -777,7 +818,7 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
                 htf_bias: plan.htfBias ?? null,
                 session,
                 killzone: plan.killzone ?? null,
-                rationale: `${manualMode ? "Manual scan" : "Auto-scan · single-hit"}${newsContext ? ` · Post-news reaction (${newsContext.title}, ${newsContext.minutesAgo}m ago)` : ""} · ${plan.alignmentLabel ?? ""}`.slice(
+                rationale: `${manualMode ? "Manual scan" : "15-minute auto-scan"} · Senior confirmed${newsContext ? ` · Post-news reaction (${newsContext.title}, ${newsContext.minutesAgo}m ago)` : ""} · ${plan.alignmentLabel ?? ""}`.slice(
                   0,
                   1000,
                 ),
@@ -1145,6 +1186,7 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
             "skipped_stale_entry",
             "insert_failed",
             "invalid_levels",
+            "senior_review_not_confirmed",
             "error",
           ].includes(String(r.action)),
         );

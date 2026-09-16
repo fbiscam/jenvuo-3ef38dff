@@ -74,3 +74,6 @@
 - [x] Make extension XAU/USD analysis and senior validation fully deterministic and model-independent
 - [x] Rebuild and verify the model-independent extension package
 - [x] Require a completed Claude primary review with multiple OmniRoute Claude fallbacks
+- [x] Build the XAU/USD Live Signals page with scanner health and qualified-signal history
+- [x] Require a confirmed senior AI verdict before any automated signal is published
+- [x] Align the Gold scanner and dashboard status with the 15-minute schedule

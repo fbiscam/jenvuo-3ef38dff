@@ -1,0 +1,1 @@
+REVOKE EXECUTE ON FUNCTION public.get_live_scanner_status() FROM anon;

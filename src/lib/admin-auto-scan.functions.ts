@@ -107,10 +107,10 @@ export const getAutoScanOverview = createServerFn({ method: "GET" })
     const s24 = sum(broadcasts24);
     const s7 = sum(broadcasts7);
 
-    // Next cron ETA — cron is */5, so compute mins to next five-minute mark
+    // Next cron ETA — cron is */15, so compute seconds to the next quarter hour.
     const d = new Date();
     const minutes = d.getUTCMinutes();
-    const nextQuarter = Math.ceil((minutes + 0.001) / 5) * 5;
+    const nextQuarter = Math.ceil((minutes + 0.001) / 15) * 15;
     const nextEta =
       (nextQuarter - minutes) * 60 - d.getUTCSeconds();
 

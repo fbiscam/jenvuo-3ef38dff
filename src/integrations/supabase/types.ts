@@ -3500,6 +3500,7 @@ export type Database = {
           session_status: string
         }[]
       }
+      get_live_scanner_status: { Args: never; Returns: Json }
       get_or_create_referral_code: {
         Args: { _user_id: string }
         Returns: string

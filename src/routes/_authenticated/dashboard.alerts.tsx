@@ -6,10 +6,12 @@ import { toast } from "sonner";
 import { useCredits } from "@/hooks/useCredits";
 import UpgradeOverlay from "@/components/UpgradeOverlay";
 import { useServerFn } from "@tanstack/react-start";
+import { getLiveScannerStatus, type LiveScannerStatus } from "@/lib/live-signals.functions";
 import { getAlertsEnabled, setAlertsEnabled } from "@/lib/alert-toggle.functions";
 import { getRiskSettings } from "@/lib/risk-settings.functions";
 import { computePositionSize } from "@/lib/risk-manager";
-import { Bell, BellOff, Loader2, Send } from "lucide-react";
+import { Activity, Bell, BellOff, CheckCircle2, Clock3, Loader2, ScanLine, Send, ShieldCheck } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { connectWhatsappAlertLink, disconnectWhatsappAlertLink, getWhatsappAlertLink, setWhatsappAlertEnabled, verifyWhatsappAlertCode } from "@/lib/whatsapp-alert.functions";
 import { connectTelegramAlertLink, disconnectTelegramAlertLink, getTelegramAlertLink, getTelegramBotInfo, setTelegramAlertEnabled, verifyTelegramAlertCode } from "@/lib/telegram-alert.functions";
 import { cn } from "@/lib/utils";
@@ -29,6 +31,17 @@ import {
 
 
 export const Route = createFileRoute("/_authenticated/dashboard/alerts")({
+  head: () => ({
+    meta: [
+      { title: "Live XAU/USD Signals — Jenvu" },
+      { name: "description", content: "Live Gold signals from Jenvu's 15-minute ICT and SMC scanner with senior AI review." },
+      { property: "og:title", content: "Live XAU/USD Signals — Jenvu" },
+      { property: "og:description", content: "Live Gold signals from a 15-minute ICT and SMC scanner with senior AI review." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+      { name: "robots", content: "noindex" },
+    ],
+  }),
   component: AlertPrefs,
 });
 
@@ -86,6 +99,8 @@ function AlertPrefs() {
   const [alertsLoading, setAlertsLoading] = useState(true);
   const [pairFilter, setPairFilter] = useState<string>("ALL");
   const [visibleCount, setVisibleCount] = useState<number>(10);
+  const [scanner, setScanner] = useState<LiveScannerStatus | null>(null);
+  const [clock, setClock] = useState(() => Date.now());
   const LOGGED_KEY = "jenvu:alerts:logged_ids";
   const [loggedIds, setLoggedIds] = useState<Set<string>>(() => {
     if (typeof window === "undefined") return new Set();
@@ -100,6 +115,7 @@ function AlertPrefs() {
   }, []);
   const [loggingId, setLoggingId] = useState<string | null>(null);
   const getAlertsEnabledFn = useServerFn(getAlertsEnabled);
+  const getScannerStatus = useServerFn(getLiveScannerStatus);
   const setAlertsEnabledFn = useServerFn(setAlertsEnabled);
   const getRisk = useServerFn(getRiskSettings);
   const getWhatsappLinkFn = useServerFn(getWhatsappAlertLink);
@@ -110,6 +126,26 @@ function AlertPrefs() {
 
   const [alertsOn, setAlertsOn] = useState<boolean | null>(null);
   const [alertsSaving, setAlertsSaving] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    const loadScanner = async () => {
+      try {
+        const status = await getScannerStatus();
+        if (!cancelled) setScanner(status);
+      } catch {
+        if (!cancelled) setScanner(null);
+      }
+    };
+    void loadScanner();
+    const refresh = window.setInterval(loadScanner, 60_000);
+    const tick = window.setInterval(() => setClock(Date.now()), 1_000);
+    return () => {
+      cancelled = true;
+      window.clearInterval(refresh);
+      window.clearInterval(tick);
+    };
+  }, [getScannerStatus]);
 
   const [whatsappPhone, setWhatsappPhone] = useState("");
   const [whatsappLinked, setWhatsappLinked] = useState(false);
@@ -470,6 +506,8 @@ function AlertPrefs() {
       let q = supabase
         .from("signal_alerts")
         .select("id, pair, grade, direction, entry, sl, tp, rr, confidence, session, fired_at, models_used")
+        .eq("pair", "XAUUSD")
+        .gte("confidence", 75)
         .order("fired_at", { ascending: false })
         .limit(50);
       if (cutoff) q = q.gte("fired_at", cutoff);
@@ -577,11 +615,55 @@ function AlertPrefs() {
     >
     <div className="max-w-6xl space-y-6">
 
+      <header className="live-signals-hero overflow-hidden rounded-xl border border-border bg-primary text-primary-foreground">
+        <div className="grid gap-6 p-5 sm:p-7 lg:grid-cols-[1.35fr_.65fr] lg:items-end">
+          <div>
+            <div className="flex items-center gap-2 text-xs text-primary-foreground/70">
+              <span className="relative flex h-2 w-2">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-chart-2 opacity-60" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-chart-2" />
+              </span>
+              Automated Gold desk
+            </div>
+            <div className="mt-5 flex items-center gap-3">
+              <img src={xauLogo.url} alt="XAU/USD Gold" className="h-11 w-11 rounded-md bg-background/10 object-contain p-1.5" />
+              <div>
+                <h1 className="text-2xl font-medium text-primary-foreground sm:text-3xl">Live Signals</h1>
+                <p className="mt-1 text-sm text-primary-foreground/65">XAU/USD · ICT / Smart Money Concepts</p>
+              </div>
+            </div>
+            <p className="mt-5 max-w-2xl text-sm leading-6 text-primary-foreground/70">
+              Multi-timeframe structure, liquidity, displacement and execution levels are scanned every 15 minutes. Only senior-confirmed setups at 75% or higher are published.
+            </p>
+          </div>
+          <div className="grid grid-cols-2 gap-px overflow-hidden rounded-lg bg-primary-foreground/15 ring-1 ring-primary-foreground/15">
+            <HeroMetric label="Scan cycle" value="15 min" />
+            <HeroMetric label="Publish gate" value="75%+" />
+            <HeroMetric label="Last scan" value={scanner?.lastScanAt ? relativeTime(new Date(scanner.lastScanAt)) : "Waiting"} />
+            <HeroMetric label="Next scan" value={nextScanLabel(clock)} />
+          </div>
+        </div>
+      </header>
+
+      <section className="grid gap-3 md:grid-cols-3">
+        <StatusTile
+          icon={Activity}
+          label="Scanner status"
+          value={scanner?.enabled === false ? "Paused" : scanner?.lastScanState === "attention" ? "Needs attention" : "Online"}
+          detail={scanner?.lastScanMessage ?? "Checking scanner health"}
+          tone={scanner?.enabled === false || scanner?.lastScanState === "attention" ? "warning" : "positive"}
+        />
+        <StatusTile icon={ShieldCheck} label="Review policy" value="Senior confirmed" detail="Unreviewed and downgraded setups stay private" tone="neutral" />
+        <StatusTile icon={ScanLine} label="Market scope" value="XAU/USD only" detail={`${currentGoldSession(new Date(clock))} · ${goldMarketLabel(new Date(clock))}`} tone="gold" />
+      </section>
+
+      {alerts[0] ? <LatestSignal alert={alerts[0]} /> : null}
+
       <section className="rounded-xl border border-zinc-200 bg-white p-4 sm:p-6">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h2 className="text-base font-semibold text-black normal-case pl-3">&nbsp;Recent alerts</h2>
-            <p className="mt-1 text-sm text-zinc-500">Live A+ setups for XAU/USD. Updates in realtime.</p>
+            <h2 className="text-base font-medium text-foreground normal-case">Signal history</h2>
+            <p className="mt-1 text-sm text-muted-foreground">Senior-confirmed XAU/USD setups, newest first.</p>
           </div>
           <div className="flex items-center gap-2 self-start sm:self-auto">
             {alertsOn !== null && (
@@ -625,7 +707,7 @@ function AlertPrefs() {
           {alertsLoading ? (
             <div className="px-2 py-8 text-center text-xs text-zinc-500">Loading alerts…</div>
           ) : alerts.length === 0 ? (
-            <div className="px-2 py-8 text-center text-xs text-zinc-500">No alerts have fired yet. Sit tight — the scanner runs every 5 minutes.</div>
+            <div className="px-2 py-8 text-center text-xs text-zinc-500">No qualified signals yet. The scanner checks XAU/USD every 15 minutes.</div>
           ) : (
             <>
             {/* Mobile card list */}
@@ -785,12 +867,13 @@ function AlertPrefs() {
           if (filtered.length <= visibleCount) return null;
           return (
             <div className="mt-3 flex justify-center">
-              <button
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={() => setVisibleCount((c) => c + 10)}
-                className="rounded-lg border border-zinc-200 bg-white px-4 py-2 text-xs font-medium text-zinc-700 hover:bg-zinc-50"
               >
                 Show more ({filtered.length - visibleCount} remaining)
-              </button>
+              </Button>
             </div>
           );
         })()}
@@ -1183,6 +1266,118 @@ function Toggle({ label, description, checked, onChange }: { label: string; desc
       </button>
     </label>
   );
+}
+
+function HeroMetric({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="min-w-0 bg-primary px-3 py-3">
+      <div className="text-[10px] text-primary-foreground/55">{label}</div>
+      <div className="mt-1 truncate font-mono text-sm text-primary-foreground">{value}</div>
+    </div>
+  );
+}
+
+function StatusTile({
+  icon: Icon,
+  label,
+  value,
+  detail,
+  tone,
+}: {
+  icon: typeof Activity;
+  label: string;
+  value: string;
+  detail: string;
+  tone: "positive" | "warning" | "neutral" | "gold";
+}) {
+  const toneClass =
+    tone === "positive"
+      ? "bg-chart-2/10 text-chart-2"
+      : tone === "warning"
+        ? "bg-destructive/10 text-destructive"
+        : tone === "gold"
+          ? "bg-chart-4/20 text-foreground"
+          : "bg-muted text-foreground";
+  return (
+    <div className="flex min-h-28 items-start gap-3 rounded-lg border border-border bg-card p-4">
+      <div className={cn("grid h-9 w-9 shrink-0 place-items-center rounded-md", toneClass)}>
+        <Icon className="h-4 w-4" />
+      </div>
+      <div className="min-w-0">
+        <div className="text-xs text-muted-foreground">{label}</div>
+        <div className="mt-1 text-sm font-medium text-card-foreground">{value}</div>
+        <div className="mt-1 text-xs leading-5 text-muted-foreground">{detail}</div>
+      </div>
+    </div>
+  );
+}
+
+function LatestSignal({ alert }: { alert: FiredAlert }) {
+  const isBuy = alert.direction === "BUY";
+  const levels = [
+    ["Entry", alert.entry],
+    ["Stop loss", alert.sl],
+    ["Take profit", alert.tp],
+    ["Risk / reward", `1:${Number(alert.rr).toFixed(2)}`],
+  ] as const;
+  return (
+    <section className="overflow-hidden rounded-xl border border-border bg-card">
+      <div className="flex flex-col gap-4 border-b border-border p-5 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-center gap-3">
+          <div className={cn("grid h-10 w-10 place-items-center rounded-md", isBuy ? "bg-chart-2/10 text-chart-2" : "bg-destructive/10 text-destructive")}>
+            <CheckCircle2 className="h-5 w-5" />
+          </div>
+          <div>
+            <div className="text-xs text-muted-foreground">Latest qualified setup</div>
+            <div className="mt-0.5 flex items-center gap-2">
+              <span className="text-lg font-medium text-card-foreground">{alert.direction} XAU/USD</span>
+              <span className="rounded bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground">Grade {alert.grade}</span>
+            </div>
+          </div>
+        </div>
+        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+          <Clock3 className="h-3.5 w-3.5" />
+          {new Date(alert.fired_at).toLocaleString()}
+        </div>
+      </div>
+      <div className="grid grid-cols-2 divide-x divide-y divide-border sm:grid-cols-4 sm:divide-y-0">
+        {levels.map(([label, value]) => (
+          <div key={label} className="min-w-0 p-4">
+            <dt className="text-[10px] text-muted-foreground">{label}</dt>
+            <dd className="mt-1 truncate font-mono text-base text-card-foreground">{value}</dd>
+          </div>
+        ))}
+      </div>
+      <div className="flex flex-wrap items-center justify-between gap-2 border-t border-border bg-muted/40 px-5 py-3 text-xs">
+        <span className="text-muted-foreground">{alert.session ?? "Live market"} · {alert.confidence}% final confidence</span>
+        <span className="inline-flex items-center gap-1.5 text-card-foreground"><ShieldCheck className="h-3.5 w-3.5 text-chart-2" /> Senior AI confirmed</span>
+      </div>
+    </section>
+  );
+}
+
+function nextScanLabel(nowMs: number): string {
+  const interval = 15 * 60 * 1000;
+  const remaining = interval - (nowMs % interval);
+  const minutes = Math.floor(remaining / 60_000);
+  const seconds = Math.floor((remaining % 60_000) / 1000);
+  return `${minutes}:${String(seconds).padStart(2, "0")}`;
+}
+
+function goldMarketLabel(now: Date): string {
+  const day = now.getUTCDay();
+  const hour = now.getUTCHours();
+  const closed = day === 6 || (day === 5 && hour >= 21) || (day === 0 && hour < 22);
+  return closed ? "Market closed" : "Market open";
+}
+
+function currentGoldSession(now: Date): string {
+  const hour = now.getUTCHours();
+  if (hour < 7) return "Asia";
+  if (hour < 12) return "London";
+  if (hour < 16) return "London / New York";
+  if (hour < 21) return "New York";
+  return "After hours";
 }
 
 function relativeTime(d: Date): string {
