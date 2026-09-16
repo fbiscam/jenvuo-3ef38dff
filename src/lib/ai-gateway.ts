@@ -972,40 +972,40 @@ export function setCachedPlan<T>(key: string, value: T, ttlMs: number = PLAN_CAC
 // upstream. If every candidate is cooling, we still try the whole chain.
 
 // OmniRoute is the ONLY provider in use. Every chain below resolves through
-// CUSTOM_AI_BASE_URL and uses OmniRoute's strongest automatic routes.
-// Re-verified live on the NEW OmniRoute endpoint with 3 concurrent requests
-// per model (all 3/3 OK): auto/claude-opus (~5-7s), auto/pro-reasoning (~5s),
-// auto/best-reasoning (~6-16s), auto/claude-sonnet (~6-10s), auto/best-vision
-// (~5s), auto/best-chat (~5.5s), auto/best-fast (~5s), kr/claude-sonnet-4.5
-// (~7s). Excluded: agy/* (422 — provider account not connected),
-// kr/claude-sonnet-5 (400 not in catalog), oc/gpt-6-astra (402).
+// CUSTOM_AI_BASE_URL and uses only models re-verified live under load
+// (5 concurrent requests each, all 5/5 OK):
+//   kr/claude-sonnet-4.5 (~4.0s) — strongest, vision OK
+//   kr/claude-sonnet-4   (~3.1s) — fast + strong, vision OK
+//   kr/claude-haiku-4.5  (~3.3s) — fastest Claude, vision OK
+//   kr/glm-5             (~6.8s) — text only (no image support)
+// Excluded (0/5 under load): every Claude Opus route and kr/claude-sonnet-5
+// (not in catalog), all Gemini routes (dva/* 500 sandbox error, tllm/* 403
+// egress blocked, aug/* invalid JSON), auto/* aliases that resolve to them.
 const PRIMARY_ANALYSIS_CHAIN = [
-  "omniroute/auto/claude-opus",
-  "omniroute/auto/pro-reasoning",
-  "omniroute/auto/best-reasoning",
-  "omniroute/auto/claude-sonnet",
   "omniroute/kr/claude-sonnet-4.5",
+  "omniroute/kr/claude-sonnet-4",
+  "omniroute/kr/claude-haiku-4.5",
+  "omniroute/kr/glm-5",
 ] as const;
 
 const SENIOR_REVIEW_MODELS = [
-  "omniroute/auto/claude-opus",
   "omniroute/kr/claude-sonnet-4.5",
-  "omniroute/auto/pro-reasoning",
-  "omniroute/auto/claude-sonnet",
-  "omniroute/auto/best-reasoning",
+  "omniroute/kr/claude-sonnet-4",
+  "omniroute/kr/glm-5",
+  "omniroute/kr/claude-haiku-4.5",
 ] as const;
 
 const FAST_CHAT_CHAIN = [
-  "omniroute/auto/best-chat",
-  "omniroute/auto/best-fast",
-  "omniroute/auto/claude-sonnet",
+  "omniroute/kr/claude-haiku-4.5",
+  "omniroute/kr/claude-sonnet-4",
+  "omniroute/kr/claude-sonnet-4.5",
 ] as const;
 
+// Vision: GLM-5 is excluded — it does not accept image content.
 const VISION_CHAIN = [
-  "omniroute/auto/best-vision",
-  "omniroute/auto/pro-vision",
-  "omniroute/auto/claude-opus",
-  "omniroute/auto/claude-sonnet",
+  "omniroute/kr/claude-sonnet-4.5",
+  "omniroute/kr/claude-sonnet-4",
+  "omniroute/kr/claude-haiku-4.5",
 ] as const;
 
 export const MODEL_CHAIN = {
