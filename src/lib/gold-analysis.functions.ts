@@ -2992,7 +2992,7 @@ ENGINE GRADE ${setupGrade} (${setupScore}/100) | breakers ${breakers.length} | i
 
 ${XAU_SENIOR_REVIEW_INSTRUCTIONS}
 
-Right now you are reviewing a junior analyst's ICT/SMC setup for REAL SIZE. Protect capital. Be brutally honest — 80% of "A+ setups" are NOT A+ under 25 years of scar tissue.
+Right now you are reviewing a junior analyst's ICT/SMC setup for REAL SIZE. Protect capital. Be brutally honest: most setups labelled A+ do not survive professional scrutiny.
 
 Elite lens — walk ALL before verdict:
 • LIQUIDITY LOGIC — where is the obvious pool (equal highs/lows, session H/L, PDH/PDL, Asian range, trendline liquidity)? Has price SWEPT it before entry? No sweep = no institutional interest.
