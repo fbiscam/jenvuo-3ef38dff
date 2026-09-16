@@ -148,7 +148,7 @@ button.link { border: none; background: none; padding: 0; color: var(--blue); fo
 
 #attached { padding: 0 8px 6px; }
 .hidden { display: none !important; }
-.capture-source { position: fixed; width: 2px; height: 2px; right: 0; bottom: 0; opacity: .01; pointer-events: none; }
+.capture-source { position: fixed; width: 480px; height: 270px; left: -2000px; top: -2000px; pointer-events: none; }
 canvas { display: none; }
 
 @media (max-width: 330px) {
