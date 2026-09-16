@@ -615,36 +615,6 @@ function AlertPrefs() {
     >
     <div className="max-w-6xl space-y-6">
 
-      <header className="live-signals-hero overflow-hidden rounded-xl border border-border bg-primary text-primary-foreground">
-        <div className="grid gap-6 p-5 sm:p-7 lg:grid-cols-[1.35fr_.65fr] lg:items-end">
-          <div>
-            <div className="flex items-center gap-2 text-xs text-primary-foreground/70">
-              <span className="relative flex h-2 w-2">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-chart-2 opacity-60" />
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-chart-2" />
-              </span>
-              Automated Gold desk
-            </div>
-            <div className="mt-5 flex items-center gap-3">
-              <img src={xauLogo.url} alt="XAU/USD Gold" className="h-11 w-11 rounded-md bg-background/10 object-contain p-1.5" />
-              <div>
-                <h1 className="text-2xl font-medium text-primary-foreground sm:text-3xl">Live Signals</h1>
-                <p className="mt-1 text-sm text-primary-foreground/65">XAU/USD · ICT / Smart Money Concepts</p>
-              </div>
-            </div>
-            <p className="mt-5 max-w-2xl text-sm leading-6 text-primary-foreground/70">
-              Multi-timeframe structure, liquidity, displacement and execution levels are scanned every 15 minutes. Only senior-confirmed setups at 75% or higher are published.
-            </p>
-          </div>
-          <div className="grid grid-cols-2 gap-px overflow-hidden rounded-lg bg-primary-foreground/15 ring-1 ring-primary-foreground/15">
-            <HeroMetric label="Scan cycle" value="15 min" />
-            <HeroMetric label="Publish gate" value="75%+" />
-            <HeroMetric label="Last scan" value={scanner?.lastScanAt ? relativeTime(new Date(scanner.lastScanAt)) : "Waiting"} />
-            <HeroMetric label="Next scan" value={nextScanLabel(clock)} />
-          </div>
-        </div>
-      </header>
-
       <section className="grid gap-3 md:grid-cols-3">
         <StatusTile
           icon={Activity}
