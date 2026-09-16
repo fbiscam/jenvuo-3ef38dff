@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
 import { callChatCompletion, MODEL_CHAIN } from "@/lib/ai-gateway";
+import { XAU_DESK_CORE_INSTRUCTIONS, XAU_SENIOR_REVIEW_INSTRUCTIONS } from "@/lib/analysis/agent-instructions";
 
 const schema = z.object({
   interval: z.string(),
@@ -63,8 +64,7 @@ Independent second opinion do: agli candle UP, DOWN ya NEUTRAL? Sirf JSON return
         messages: [
           {
             role: "system",
-            content:
-              "Tum disciplined gold trading analyst ho. Sirf valid JSON output do, koi markdown ya extra text nahi. Overconfident na bano.",
+            content: `Tum independent senior XAU/USD reviewer ho. Evidence ko dobara verify karo; primary prediction ko blindly agree mat karo. Sirf valid JSON output do, koi markdown ya extra text nahi.\n\n${XAU_DESK_CORE_INSTRUCTIONS}\n\n${XAU_SENIOR_REVIEW_INSTRUCTIONS}`,
           },
           { role: "user", content: prompt },
         ],

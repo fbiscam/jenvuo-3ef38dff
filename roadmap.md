@@ -80,3 +80,5 @@
 - [x] Align Signal Alert and Security page styling with the Usage dashboard
 - [x] Reverify all active OmniRoute models under concurrent load
 - [x] Rebuild extension v1.9.5 and update the extension download page
+- [x] Strengthen primary and senior XAU/USD agent instructions for evidence-based ICT/SMC analysis and query relevance
+- [x] Verify the stale utils diagnostic and analysis prompt changes
