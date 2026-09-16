@@ -3,10 +3,11 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
 import { callChatCompletion } from "@/lib/ai-gateway";
 
-// OmniRoute only: strongest writing/reasoning routes.
+// OmniRoute only: load-verified working routes.
 const WRITER_CHAIN = [
-  "omniroute/auto/best-chat",
-  "omniroute/auto/best-reasoning",
+  "omniroute/kr/claude-sonnet-4.5",
+  "omniroute/kr/claude-sonnet-4",
+  "omniroute/kr/glm-5",
 ];
 
 async function assertAdmin(supabase: any, userId: string) {
