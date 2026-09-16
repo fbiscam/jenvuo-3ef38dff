@@ -90,6 +90,7 @@ const NAV_GROUPS: Array<{ label: string; items: TabItem[] }> = [
     label: "",
     items: [
       { to: "/dashboard", label: "Overview", icon: LayoutDashboard, exact: true, countKey: "saved" },
+      { to: "/dashboard/alerts", label: "Live Signals", icon: BellRing, countKey: "alerts7d" },
     ],
   },
   {
@@ -282,7 +283,7 @@ function SignalDeskHistory() {
           <Activity className="h-5 w-5 text-zinc-700" />
         </div>
         <h3 className="mt-3 text-[14px] font-semibold text-zinc-900">No A+ scans yet</h3>
-        <p className="mt-1 max-w-[260px] text-[12px] text-zinc-500">The engine runs every 5 minutes. New A+ setups will land here automatically.</p>
+        <p className="mt-1 max-w-[260px] text-[12px] text-zinc-500">The engine runs every 15 minutes. Senior-confirmed setups will land here automatically.</p>
       </div>
     );
   }
