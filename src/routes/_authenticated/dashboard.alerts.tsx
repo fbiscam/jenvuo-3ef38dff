@@ -506,6 +506,8 @@ function AlertPrefs() {
       let q = supabase
         .from("signal_alerts")
         .select("id, pair, grade, direction, entry, sl, tp, rr, confidence, session, fired_at, models_used")
+        .eq("pair", "XAUUSD")
+        .gte("confidence", 75)
         .order("fired_at", { ascending: false })
         .limit(50);
       if (cutoff) q = q.gte("fired_at", cutoff);

@@ -169,10 +169,10 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
           : pairs.slice(batchSlot * scanBatchSize, batchSlot * scanBatchSize + scanBatchSize);
         // Runtime config can lag behind code deploys. Keep a quality floor so
         // stale permissive settings cannot send B/C retracement calls again.
-        const configuredMinConf = Number(cfg.min_conf ?? MIN_CONFIDENCE);
+        const configuredMinConf = Number(cfg.min_conf ?? 75);
         let minConf = Math.max(
-          MIN_CONFIDENCE,
-          Number.isFinite(configuredMinConf) ? configuredMinConf : MIN_CONFIDENCE,
+          75,
+          Number.isFinite(configuredMinConf) ? configuredMinConf : 75,
         );
         const confirmWindowMin = Math.min(
           Number(cfg.confirm_window_min ?? 45) || 45,
@@ -655,6 +655,25 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
               }
             } catch {
               // Requote failed (transient upstream) — fall back to original plan.
+            }
+
+            const finalSeniorReview = broadcastPlan.seniorReview;
+            const finalSeniorConfirmed =
+              finalSeniorReview?.included === true &&
+              finalSeniorReview.status === "confirmed" &&
+              typeof finalSeniorReview.model === "string" &&
+              finalSeniorReview.model.length > 0;
+            if (!finalSeniorConfirmed) {
+              await supabaseAdmin.from("auto_scan_state").delete().eq("pair", pair);
+              results.push({
+                pair,
+                action: "senior_review_not_confirmed",
+                conf,
+                senior_status: finalSeniorReview?.status ?? "missing",
+                senior_model: finalSeniorReview?.model ?? null,
+                stage: "broadcast_requote",
+              });
+              continue;
             }
 
             // Broadcast on first qualifying hit
