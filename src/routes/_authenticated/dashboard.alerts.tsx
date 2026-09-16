@@ -613,7 +613,12 @@ function AlertPrefs() {
       title="Realtime Alerts are Pro"
       description="Get A+ setups delivered the moment they form. Upgrade to Pro or Elite to enable realtime alerts."
     >
-    <div className="max-w-6xl space-y-6">
+    <div className="-mx-5 -mb-7 min-h-[calc(100dvh-4rem)] overflow-hidden bg-background text-foreground sm:-mx-8">
+      <header className="flex min-h-14 items-center border-b border-border px-4 py-3 sm:px-6">
+        <h1 className="text-lg font-medium text-foreground">Signal Alert</h1>
+      </header>
+
+      <div className="space-y-6 px-4 py-5 sm:px-6">
 
       <section className="grid gap-3 md:grid-cols-3">
         <StatusTile
@@ -628,7 +633,7 @@ function AlertPrefs() {
       </section>
 
 
-      <section className="rounded-xl border border-zinc-200 bg-white p-4 sm:p-6">
+      <section className="rounded-lg border border-border bg-card p-4 sm:p-6">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h2 className="text-base font-medium text-foreground normal-case">Signal history</h2>
@@ -672,7 +677,7 @@ function AlertPrefs() {
           </div>
         </div>
 
-        <div className="mt-4 rounded-xl border border-zinc-100 overflow-hidden">
+        <div className="mt-4 overflow-hidden rounded-lg border border-border">
           {alertsLoading ? (
             <div className="px-2 py-8 text-center text-xs text-zinc-500">Loading alerts…</div>
           ) : alerts.length === 0 ? (
@@ -852,9 +857,9 @@ function AlertPrefs() {
 
 
 
-      <section className="rounded-xl border border-zinc-200 bg-white p-6">
-        <h2 className="pl-3 text-base font-semibold text-black normal-case">&nbsp;Delivery channels</h2>
-        <p className="mt-1 text-sm text-zinc-500">Choose how new A+ setups reach you.</p>
+      <section className="rounded-lg border border-border bg-card p-6">
+        <h2 className="text-base font-medium text-card-foreground normal-case">Delivery channels</h2>
+        <p className="mt-1 text-sm text-muted-foreground">Choose how new A+ setups reach you.</p>
         <div className="mt-5 space-y-3">
           <Toggle
             label="Email alerts"
@@ -1146,9 +1151,9 @@ function AlertPrefs() {
         </div>
       </section>
 
-      <section className="rounded-xl border border-zinc-200 bg-white p-6">
-        <h2 className="pl-3 text-base font-semibold text-black normal-case">&nbsp;Conviction filter</h2>
-        <p className="mt-1 text-sm text-zinc-500">Only fire when confidence meets this threshold.</p>
+      <section className="rounded-lg border border-border bg-card p-6">
+        <h2 className="text-base font-medium text-card-foreground normal-case">Conviction filter</h2>
+        <p className="mt-1 text-sm text-muted-foreground">Only fire when confidence meets this threshold.</p>
         <div className="mt-4 inline-flex flex-wrap gap-1 rounded-lg border border-zinc-200 p-1">
           {([
             { key: 0, label: "All" },
@@ -1185,9 +1190,9 @@ function AlertPrefs() {
 
 
 
-      <section className="rounded-xl border border-zinc-200 bg-white p-6">
-        <h2 className="pl-3 text-base font-semibold text-black normal-case">&nbsp;Quiet hours</h2>
-        <p className="mt-1 text-sm text-zinc-500">No alerts will be sent during this window (your local time).</p>
+      <section className="rounded-lg border border-border bg-card p-6">
+        <h2 className="text-base font-medium text-card-foreground normal-case">Quiet hours</h2>
+        <p className="mt-1 text-sm text-muted-foreground">No alerts will be sent during this window (your local time).</p>
         <div className="mt-4 grid grid-cols-2 gap-3">
           <label className="text-xs font-medium text-zinc-600">
             From
@@ -1212,6 +1217,7 @@ function AlertPrefs() {
 
       <div className="flex justify-end text-xs text-zinc-400">
         {saving ? "Saving…" : "Changes are saved automatically"}
+      </div>
       </div>
     </div>
     </UpgradeOverlay>

@@ -6,8 +6,20 @@ import { TwoFactorSettings } from "@/components/TwoFactorSettings";
 import { TrustedDevicesSettings } from "@/components/TrustedDevicesSettings";
 import { requestEmailChange } from "@/lib/email-change.functions";
 import { deleteMyAccount } from "@/lib/delete-account.functions";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/_authenticated/dashboard/security")({
+  head: () => ({
+    meta: [
+      { title: "Security — Jenvu" },
+      { name: "description", content: "Manage Jenvu account security, sign-in protection, trusted devices, and account access." },
+      { property: "og:title", content: "Security — Jenvu" },
+      { property: "og:description", content: "Manage Jenvu account security, sign-in protection, trusted devices, and account access." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+      { name: "robots", content: "noindex" },
+    ],
+  }),
   component: SecurityPage,
 });
 
@@ -82,31 +94,34 @@ function SecurityPage() {
   };
 
   return (
-    <div className="max-w-2xl space-y-8">
-      <div>
-        <h1 className="pl-1 text-lg font-semibold">Security</h1>
-        <p className="mt-1 text-sm text-zinc-500">
-          Manage how you sign in to Jenvu — password, two-factor authentication and trusted devices.
+    <div className="-mx-5 -mb-7 min-h-[calc(100dvh-4rem)] overflow-hidden bg-background text-foreground sm:-mx-8">
+      <header className="border-b border-border px-4 py-3 sm:px-6">
+        <h1 className="text-lg font-medium text-foreground">Security</h1>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Manage your password, two-factor authentication, and trusted devices.
         </p>
-      </div>
+      </header>
 
-      <section className="pt-6">
-        <h2 className="pl-1 text-base font-semibold">&nbsp;Password</h2>
-        <p className="mt-1 text-sm text-zinc-500">
+      <div className="max-w-4xl divide-y divide-border px-4 sm:px-6">
+
+      <section className="py-6">
+        <h2 className="text-base font-medium text-foreground">Password</h2>
+        <p className="mt-1 text-sm text-muted-foreground">
           We'll email a secure single-use link to {email || "your account email"} so you can set a new password.
         </p>
-        <button
+        <Button
+          variant="outline"
           onClick={sendPasswordReset}
           disabled={sending || !email}
-          className="mt-4 rounded-lg border border-zinc-200 px-4 py-2 text-sm font-medium hover:bg-zinc-50 disabled:opacity-50"
+          className="mt-4"
         >
           {sending ? "Sending…" : "Send password reset"}
-        </button>
+        </Button>
       </section>
 
-      <section id="change-email" className="scroll-mt-24 pt-6">
-        <h2 className="pl-1 text-base font-semibold">&nbsp;Change email</h2>
-        <p className="mt-1 text-sm text-zinc-500">
+      <section id="change-email" className="scroll-mt-24 py-6">
+        <h2 className="text-base font-medium text-foreground">Change email</h2>
+        <p className="mt-1 text-sm text-muted-foreground">
           Enter a new email and we'll send a confirmation link to your current email address. Your email changes only after you click that link.
         </p>
         <div className="mt-4 space-y-3">
@@ -121,13 +136,12 @@ function SecurityPage() {
             />
           </label>
           <div className="flex flex-wrap items-center gap-3">
-            <button
+            <Button
               onClick={changeEmail}
               disabled={changingEmail || !newEmail}
-              className="rounded-lg bg-zinc-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-zinc-800 disabled:opacity-50"
             >
               {changingEmail ? "Sending…" : "Change email"}
-            </button>
+            </Button>
             {emailPending && (
               <span className="text-xs font-medium text-amber-600">
                 Verification pending — check {email} for a confirmation link.
@@ -138,9 +152,9 @@ function SecurityPage() {
         </div>
       </section>
 
-      <section className="pt-6">
-        <h2 className="pl-1 text-base font-semibold">&nbsp;Two-factor authentication</h2>
-        <p className="mt-1 text-sm text-zinc-500">
+      <section className="py-6">
+        <h2 className="text-base font-medium text-foreground">Two-factor authentication</h2>
+        <p className="mt-1 text-sm text-muted-foreground">
           Require a six-digit code from your authenticator app every time you sign in.
         </p>
         <div className="mt-4">
@@ -148,9 +162,9 @@ function SecurityPage() {
         </div>
       </section>
 
-      <section className="pt-6">
-        <h2 className="pl-1 text-base font-semibold">&nbsp;Trusted devices</h2>
-        <p className="mt-1 text-sm text-zinc-500">
+      <section className="py-6">
+        <h2 className="text-base font-medium text-foreground">Trusted devices</h2>
+        <p className="mt-1 text-sm text-muted-foreground">
           Browsers you've marked as trusted skip the 2FA step on sign-in.&nbsp;
         </p>
         <div className="mt-4">
@@ -158,50 +172,53 @@ function SecurityPage() {
         </div>
       </section>
 
-      <section className="pt-6">
-        <h2 className="pl-1 text-base font-semibold">&nbsp;Session</h2>
-        <p className="mt-1 text-sm text-zinc-500">
+      <section className="py-6">
+        <h2 className="text-base font-medium text-foreground">Session</h2>
+        <p className="mt-1 text-sm text-muted-foreground">
           Signing out clears your local session on this browser.&nbsp;
           <br />
           Trusted-device status stays until you revoke it above.
         </p>
 
-        <button
+        <Button
+          variant="outline"
           onClick={async () => {
             await supabase.auth.signOut();
             window.location.href = "/auth";
           }}
-          className="mt-4 rounded-lg border border-zinc-200 px-4 py-2 text-sm font-medium hover:bg-zinc-50"
+          className="mt-4"
         >
           Sign out of this browser
-        </button>
+        </Button>
       </section>
 
-      <section className="pt-6">
-        <h2 className="pl-1 text-base font-semibold text-rose-700">&nbsp;Danger zone</h2>
+      <section className="py-6">
+        <h2 className="text-base font-medium text-destructive">Danger zone</h2>
         <p className="mt-1 text-sm text-rose-600/80">Deleting your account is permanent and cannot be undone.</p>
         {!confirmDelete ? (
-          <button
+          <Button
+            variant="outline"
             onClick={() => setConfirmDelete(true)}
-            className="mt-4 rounded-lg border border-rose-300 bg-white px-4 py-2 text-sm font-medium text-rose-700 hover:bg-rose-50"
+            className="mt-4 border-destructive/30 text-destructive hover:bg-destructive/5 hover:text-destructive"
           >
             Delete account
-          </button>
+          </Button>
         ) : (
           <div className="mt-4 flex gap-2">
-            <button
+            <Button
+              variant="destructive"
               onClick={deleteAccount}
               disabled={deleting}
-              className="rounded-lg bg-rose-600 px-4 py-2 text-sm font-medium text-white hover:bg-rose-700 disabled:opacity-50"
             >
               {deleting ? "Deleting…" : "Confirm delete"}
-            </button>
-            <button onClick={() => setConfirmDelete(false)} disabled={deleting} className="rounded-lg px-4 py-2 text-sm">
+            </Button>
+            <Button variant="ghost" onClick={() => setConfirmDelete(false)} disabled={deleting}>
               Cancel
-            </button>
+            </Button>
           </div>
         )}
       </section>
+      </div>
     </div>
   );
 }
