@@ -152,15 +152,18 @@ export function runExtensionDesk(input: DeskInput): DeskResult {
     candidateDirection === 'WAIT' ? false : candidateDirection === 'BUY' ? input.livePrice <= h4.equilibrium : input.livePrice >= h4.equilibrium,
   ].filter(Boolean).length
 
-  const reviewReasons: string[] = []
-  if (candidateDirection === 'WAIT') reviewReasons.push(trade.reason)
-  if (scored.vetos.length) reviewReasons.push(...scored.vetos.map((veto) => veto.reason))
-  if (!regime.favorable) reviewReasons.push(regime.warning ?? `${regime.regime} conditions reduce execution quality`)
-  if (scored.score < 65) reviewReasons.push(`Weighted confluence is only ${scored.score}% (minimum 65%).`)
-  if (confirmations < 3) reviewReasons.push(`Only ${confirmations}/8 independent execution confirmations passed.`)
-  if (candidateDirection !== 'WAIT' && trade.rr < 1.5) reviewReasons.push(`Risk/reward 1:${trade.rr.toFixed(2)} is below the 1:1.5 floor.`)
+  const hardVetoReasons: string[] = []
+  const reviewWarnings: string[] = []
+  if (candidateDirection === 'WAIT') hardVetoReasons.push(trade.reason)
+  if (scored.vetos.length) hardVetoReasons.push(...scored.vetos.map((veto) => veto.reason))
+  if (candidateDirection !== 'WAIT' && trade.rr < 1.5) hardVetoReasons.push(`Risk/reward 1:${trade.rr.toFixed(2)} is below the 1:1.5 floor.`)
+  if (confirmations < 2) hardVetoReasons.push(`Only ${confirmations}/8 independent execution confirmations passed.`)
+  else if (confirmations < 4) reviewWarnings.push(`Only ${confirmations}/8 independent execution confirmations passed; treat this as a pending setup.`)
+  if (!regime.favorable) reviewWarnings.push(regime.warning ?? `${regime.regime} conditions reduce execution quality`)
+  if (scored.score < 65) reviewWarnings.push(`Weighted confluence is ${scored.score}%; reduced size or trigger confirmation is required.`)
 
-  const seniorVeto = input.seniorReview && reviewReasons.length > 0
+  const reviewReasons = [...hardVetoReasons, ...reviewWarnings]
+  const seniorVeto = input.seniorReview && hardVetoReasons.length > 0
   const direction: DeskResult['direction'] = seniorVeto ? 'WAIT' : candidateDirection
   const bias = directionBias(trade, h4.trend, h1.trend)
   const passed = scored.factors.filter((factor) => factor.pass).sort((a, b) => b.weight - a.weight).slice(0, 7)
@@ -177,8 +180,10 @@ export function runExtensionDesk(input: DeskInput): DeskResult {
       ]
   const reviewLabel = input.seniorReview
     ? seniorVeto
-      ? `WAIT — independent rules review blocked execution: ${reviewReasons.slice(0, 3).join(' ')}`
-      : `CONFIRMED — ${confirmations}/8 independent checks passed with no hard veto.`
+      ? `WAIT — independent rules review blocked execution: ${hardVetoReasons.slice(0, 3).join(' ')}`
+      : reviewWarnings.length
+        ? `CONDITIONAL — ${confirmations}/8 checks passed with no hard veto. ${reviewWarnings.slice(0, 2).join(' ')}`
+        : `CONFIRMED — ${confirmations}/8 independent checks passed with no hard veto.`
     : 'Not included in this plan.'
 
   const text = [
@@ -193,7 +198,7 @@ export function runExtensionDesk(input: DeskInput): DeskResult {
     `EVIDENCE: ${passed.map((factor) => factor.detail).join(' | ') || 'No complete directional confluence.'}`,
     `RISKS: ${failed.map((factor) => factor.detail).join(' | ') || 'No scored warning beyond normal market risk.'}`,
     `SENIOR RULES REVIEW: ${reviewLabel}`,
-    `INVALIDATION: ${direction === 'WAIT' ? reviewReasons[0] ?? trade.reason : trade.reason}`,
+    `INVALIDATION: ${direction === 'WAIT' ? hardVetoReasons[0] ?? trade.reason : trade.reason}`,
     'This is rules-based market analysis, not a profit guarantee. Risk only what you can afford to lose.',
   ].join('\n\n')
 

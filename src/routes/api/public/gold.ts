@@ -225,6 +225,13 @@ async function handle({ request }: { request: Request }) {
         livePrice: market.ticker.price,
         seniorReview: entitlement.seniorReview,
       })
+      const analysisRequestText = `User request: ${question}\n\nLive price: ${market.ticker.price}\nTimeframe: ${timeframe}\n\nICT/SMC engine report:\n${desk.text}`
+      const analysisUserContent = image
+        ? [
+            { type: 'text' as const, text: `${analysisRequestText}\n\nInspect the attached chart directly. Use it to validate structure, visible timeframe, liquidity, displacement and the proposed levels. The live OHLCV report controls exact prices if the screenshot labels are unclear.` },
+            { type: 'image_url' as const, image_url: { url: image, detail: 'high' as const } },
+          ]
+        : analysisRequestText
 
       // Primary market-structure review is mandatory. OmniRoute tries each
       // verified Claude route in order; an unreviewed result is never returned.
@@ -233,7 +240,7 @@ async function handle({ request }: { request: Request }) {
       let primaryUsage = { promptTokens: 0, completionTokens: 0 }
       try {
         const primary = await callChatCompletion({
-          models: [...EXTENSION_MODEL_CHAIN.reasoning],
+          models: [...(image ? EXTENSION_MODEL_CHAIN.vision : EXTENSION_MODEL_CHAIN.reasoning)],
           stage: 'extension-primary-review',
           maxTokens: 900,
           timeoutMs: 20_000,
@@ -243,12 +250,12 @@ async function handle({ request }: { request: Request }) {
             {
               role: 'system',
               content:
-                `You are Jenvu, the primary XAU/USD desk analyst. Review the deterministic ICT/SMC engine report computed from live OHLCV and produce the final primary analysis. Preserve its levels only when the evidence supports them; otherwise downgrade to WAIT and name the failed condition. Be concise and desk-style.\n\n${XAU_DESK_CORE_INSTRUCTIONS}\n\n${QUERY_RELEVANCE_INSTRUCTIONS}`,
+                `You are Jenvu, the primary XAU/USD desk analyst. Review the deterministic ICT/SMC engine report computed from live OHLCV and produce the final primary analysis. Preserve the engine's exact entry, stop and targets unless a hard veto invalidates them. A missing ideal confluence is a warning, not automatically a veto. If direction is valid but entry has not triggered, return a CONDITIONAL BUY/SELL limit setup and name the trigger. Use WAIT only for an explicit hard failure: no directional edge, structurally invalid levels, RR below the floor, contradictory data, or fewer than two independent confirmations. Start with VERDICT: BUY, VERDICT: SELL, or VERDICT: WAIT. Be concise and desk-style.\n\n${XAU_DESK_CORE_INSTRUCTIONS}\n\n${QUERY_RELEVANCE_INSTRUCTIONS}`,
             },
             ...history,
             {
               role: 'user',
-              content: `User request: ${question}\n\nLive price: ${market.ticker.price}\nTimeframe: ${timeframe}\n\nICT/SMC engine report:\n${desk.text}`,
+              content: analysisUserContent,
             },
           ],
         })
@@ -293,11 +300,16 @@ async function handle({ request }: { request: Request }) {
               {
                 role: 'system',
                 content:
-                  `You are the independent senior XAU/USD desk head. Return the final trader-facing answer: confirm the setup, adjust it using only supplied levels, or downgrade it to WAIT with the decisive reason. Answer in the user's language, concisely.\n\n${XAU_DESK_CORE_INSTRUCTIONS}\n\n${XAU_SENIOR_REVIEW_INSTRUCTIONS}\n\n${QUERY_RELEVANCE_INSTRUCTIONS}`,
+                  `You are the independent senior XAU/USD desk head. Return the final trader-facing answer. Preserve all exact engine prices: never invent replacement levels. CONFIRM a supported BUY/SELL, label an untriggered but valid idea as CONDITIONAL BUY/SELL, and use WAIT only for a decisive hard veto. A missing ideal confluence by itself is not a veto. Start with VERDICT: BUY, VERDICT: SELL, or VERDICT: WAIT, then state status CONFIRMED or CONDITIONAL. Answer in the user's language, concisely.\n\n${XAU_DESK_CORE_INSTRUCTIONS}\n\n${XAU_SENIOR_REVIEW_INSTRUCTIONS}\n\n${QUERY_RELEVANCE_INSTRUCTIONS}`,
               },
               {
                 role: 'user',
-                content: `User request: ${question}\n\nLive price: ${market.ticker.price}\nTimeframe: ${timeframe}\n\nICT/SMC engine report:\n${desk.text}\n\nPrimary analysis:\n${analysisText}`,
+                content: image
+                  ? [
+                      { type: 'text', text: `${analysisRequestText}\n\nPrimary analysis:\n${analysisText}\n\nIndependently verify the attached chart before ruling.` },
+                      { type: 'image_url', image_url: { url: image, detail: 'high' } },
+                    ]
+                  : `${analysisRequestText}\n\nPrimary analysis:\n${analysisText}`,
               },
             ],
           })
@@ -305,7 +317,12 @@ async function handle({ request }: { request: Request }) {
             analysisText = senior.content.trim()
             seniorModel = senior.model
             seniorUsage = senior.usage
-            seniorReview = { included: true, model: senior.model, status: 'confirmed' }
+            const seniorVerdict = /^\s*VERDICT:\s*(BUY|SELL|WAIT)\b/im.exec(analysisText)?.[1]
+            seniorReview = {
+              included: true,
+              model: senior.model,
+              status: seniorVerdict === 'WAIT' ? 'vetoed' : seniorVerdict ? 'confirmed' : 'completed',
+            }
           }
         } catch {
           seniorReview = { included: false, model: null, status: 'unavailable' }
