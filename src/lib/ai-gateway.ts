@@ -973,84 +973,64 @@ export function setCachedPlan<T>(key: string, value: T, ttlMs: number = PLAN_CAC
 
 // OmniRoute is the ONLY provider in use. Every chain below resolves through
 // CUSTOM_AI_BASE_URL and uses OmniRoute's strongest automatic routes.
-// Verified live on the current OmniRoute endpoint with 3 concurrent requests
-// per model: auto/claude-sonnet (3/3, ~5-10s), agy/claude-sonnet-4-6 (3/3,
-// ~8-11s), auto/best-reasoning (3/3, ~6s), auto/claude-opus (3/3, ~15-37s),
-// agy/gemini-3.7-flash-medium (3/3, ~4-7s), auto/best-fast (3/3, ~6-10s),
-// auto/best-chat (3/3, ~7s). Excluded because they failed under load:
-// auto/best-vision (0/3 timeouts), agy/claude-opus-4-6-thinking (1/3),
-// kr/gpt-5.6-sol (400), dva/gpt-5-6-sol-* (500).
-const WORKING_BMIND = [
-  "omniroute/auto/claude-sonnet",
-  "omniroute/agy/claude-sonnet-4-6",
-  "omniroute/auto/best-reasoning",
+// Re-verified live on the NEW OmniRoute endpoint with 3 concurrent requests
+// per model (all 3/3 OK): auto/claude-opus (~5-7s), auto/pro-reasoning (~5s),
+// auto/best-reasoning (~6-16s), auto/claude-sonnet (~6-10s), auto/best-vision
+// (~5s), auto/best-chat (~5.5s), auto/best-fast (~5s), kr/claude-sonnet-4.5
+// (~7s). Excluded: agy/* (422 — provider account not connected),
+// kr/claude-sonnet-5 (400 not in catalog), oc/gpt-6-astra (402).
+const PRIMARY_ANALYSIS_CHAIN = [
   "omniroute/auto/claude-opus",
-  "omniroute/auto/best-chat",
+  "omniroute/auto/pro-reasoning",
+  "omniroute/auto/best-reasoning",
+  "omniroute/auto/claude-sonnet",
+  "omniroute/kr/claude-sonnet-4.5",
 ] as const;
 
-const FAST_NARRATION_BMIND = [
-  "omniroute/agy/gemini-3.7-flash-medium",
+const SENIOR_REVIEW_MODELS = [
+  "omniroute/auto/claude-opus",
+  "omniroute/kr/claude-sonnet-4.5",
+  "omniroute/auto/pro-reasoning",
+  "omniroute/auto/claude-sonnet",
+  "omniroute/auto/best-reasoning",
+] as const;
+
+const FAST_CHAT_CHAIN = [
+  "omniroute/auto/best-chat",
   "omniroute/auto/best-fast",
-  "omniroute/auto/best-chat",
   "omniroute/auto/claude-sonnet",
 ] as const;
 
-const SENIOR_REVIEW_BMIND_4O = [
+const VISION_CHAIN = [
+  "omniroute/auto/best-vision",
+  "omniroute/auto/pro-vision",
   "omniroute/auto/claude-opus",
-  "omniroute/agy/claude-sonnet-4-6",
   "omniroute/auto/claude-sonnet",
-  "omniroute/auto/best-reasoning",
 ] as const;
 
 export const MODEL_CHAIN = {
-  intent: WORKING_BMIND,
-  narration: FAST_NARRATION_BMIND,
-  seniorReview: SENIOR_REVIEW_BMIND_4O,
-  macroContext: WORKING_BMIND,
-  chat: FAST_NARRATION_BMIND,
+  intent: FAST_CHAT_CHAIN,
+  // Auto-scan narration now runs the same primary-analysis chain as the
+  // extension, followed by the same senior review.
+  narration: PRIMARY_ANALYSIS_CHAIN,
+  seniorReview: SENIOR_REVIEW_MODELS,
+  macroContext: FAST_CHAT_CHAIN,
+  chat: FAST_CHAT_CHAIN,
 } as const;
-
-// Extension chains — OmniRoute only, ordered by the load test above.
-const EXTENSION_CLAUDE_PRIMARY = [
-  "omniroute/auto/claude-sonnet",
-  "omniroute/agy/claude-sonnet-4-6",
-  "omniroute/auto/claude-opus",
-  "omniroute/auto/best-reasoning",
-] as const;
-
-const EXTENSION_SENIOR_REVIEW = [
-  "omniroute/auto/claude-opus",
-  "omniroute/agy/claude-sonnet-4-6",
-  "omniroute/auto/claude-sonnet",
-  "omniroute/auto/best-reasoning",
-] as const;
-
-const EXTENSION_FAST_CHAT = [
-  "omniroute/agy/gemini-3.7-flash-medium",
-  "omniroute/auto/best-fast",
-  "omniroute/auto/best-chat",
-  "omniroute/auto/claude-sonnet",
-] as const;
 
 export const EXTENSION_MODEL_CHAIN = {
-  conversation: EXTENSION_FAST_CHAT,
-  reasoning: EXTENSION_CLAUDE_PRIMARY,
-  // auto/best-vision timed out on every probe; the Claude routes handle image
-  // input reliably, with Gemini Flash as the fallback.
-  vision: [...EXTENSION_CLAUDE_PRIMARY, "omniroute/agy/gemini-3.7-flash-medium"],
-  seniorReview: EXTENSION_SENIOR_REVIEW,
+  conversation: FAST_CHAT_CHAIN,
+  reasoning: PRIMARY_ANALYSIS_CHAIN,
+  vision: VISION_CHAIN,
+  seniorReview: SENIOR_REVIEW_MODELS,
   // Alias retained for callers that identify the senior pass as review #2.
-  secondReview: EXTENSION_SENIOR_REVIEW,
+  secondReview: SENIOR_REVIEW_MODELS,
 } as const;
 
-export const MACRO_CONTEXT_CHAIN = WORKING_BMIND;
-export const SENIOR_REVIEW_CHAIN = SENIOR_REVIEW_BMIND_4O;
+export const MACRO_CONTEXT_CHAIN = FAST_CHAT_CHAIN;
+export const SENIOR_REVIEW_CHAIN = SENIOR_REVIEW_MODELS;
 
-export const DEEPSEEK_REVIEW_CHAIN = [
-  "omniroute/auto/claude-opus",
-  "omniroute/auto/claude-sonnet",
-  "omniroute/auto/best-reasoning",
-] as const;
+export const DEEPSEEK_REVIEW_CHAIN = SENIOR_REVIEW_MODELS;
 
 /** @deprecated legacy alias — use DEEPSEEK_REVIEW_CHAIN */
 export const CROSS_CHECK_CHAIN = DEEPSEEK_REVIEW_CHAIN;
