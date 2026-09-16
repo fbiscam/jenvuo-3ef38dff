@@ -223,8 +223,10 @@
 
 }
 
-.live-signals-hero h1 {
+.jenvu-zoom-dashboard main .live-signals-hero h1 {
   color: var(--primary-foreground) !important;
+  margin-left: 0 !important;
+  text-transform: none !important;
 }
 
 /* Orb flowing color animations */
