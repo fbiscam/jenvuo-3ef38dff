@@ -615,7 +615,7 @@ function AlertPrefs() {
     >
     <div className="max-w-6xl space-y-6">
 
-      <header className="overflow-hidden rounded-xl border border-border bg-primary text-primary-foreground">
+      <header className="live-signals-hero overflow-hidden rounded-xl border border-border bg-primary text-primary-foreground">
         <div className="grid gap-6 p-5 sm:p-7 lg:grid-cols-[1.35fr_.65fr] lg:items-end">
           <div>
             <div className="flex items-center gap-2 text-xs text-primary-foreground/70">

@@ -223,6 +223,10 @@
 
 }
 
+.live-signals-hero h1 {
+  color: var(--primary-foreground) !important;
+}
+
 /* Orb flowing color animations */
 @keyframes orb-drift-a {
   0%   { transform: translate(-8%, -6%) rotate(0deg) scale(1); }
