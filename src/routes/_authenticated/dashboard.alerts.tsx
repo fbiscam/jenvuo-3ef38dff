@@ -1152,7 +1152,7 @@ function AlertPrefs() {
       </section>
 
       <section className="rounded-lg border border-border bg-card p-6">
-        <h2 className="text-base font-medium text-card-foreground normal-case">Conviction filter</h2>
+        <h2 className="text-base font-medium text-card-foreground normal-case"> Conviction filter</h2>
         <p className="mt-1 text-sm text-muted-foreground">Only fire when confidence meets this threshold.</p>
         <div className="mt-4 inline-flex flex-wrap gap-1 rounded-lg border border-zinc-200 p-1">
           {([
