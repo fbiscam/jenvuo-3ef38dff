@@ -2348,9 +2348,9 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
         jsonMode: true,
         maxTokens: 1100,
         timeoutMs: 30000,
-        deadlineMs: 40000,
+        deadlineMs: 55000,
         priority: true,
-        retriesPerModel: 1,
+        retriesPerModel: 2,
         stage: "signal-analysis",
       });
       parsed = tryParseJsonLoose(narration.content) || {};
@@ -2361,6 +2361,7 @@ Produce the A+ ICT/SMC trade plan for ${inst.display} now.`;
         .then((m) => m.logAiCost({ userId: __userId, stage: "signal-analysis", model: narration.model, usage: narration.usage }))
         .catch(() => {});
     } catch (e) {
+      __aiPassFailed = true;
       console.warn(
         "signal-analysis AI pass failed; using deterministic engine:",
         (e as Error)?.message ?? e,
