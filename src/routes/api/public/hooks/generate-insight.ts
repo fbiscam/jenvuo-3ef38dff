@@ -4,11 +4,12 @@ const BASE_URL = "https://jenvu.com";
 const INDEXNOW_KEY = "31f95befb924351f7ab6c1f5ce4bc15b";
 const JOB_KEY = "daily-insight";
 const ARTICLE_MODELS = [
-  "unorouter/nemotron-3-ultra-550b-a55b:free",
-  "unorouter/glm-5.3:free",
-  "bmind/meta/llama-3.2-11b-vision-instruct",
+  "omniroute/kr/claude-sonnet-4.5",
+  "omniroute/kr/claude-sonnet-4",
+  "omniroute/kr/glm-5",
+  "omniroute/kr/claude-haiku-4.5",
 ];
-const ARTICLE_MODEL_LABEL = "UnoRouter Nemotron Ultra (free)";
+const ARTICLE_MODEL_LABEL = "Claude Sonnet 4.5 (OmniRoute)";
 
 function slugify(s: string) {
   return s

@@ -219,7 +219,7 @@ export async function generateInsightCover(opts: {
   category: string;
   slug: string;
 }): Promise<string | null> {
-  const generated = await generateBase64(coverPrompt(opts.title, opts.category));
+  const generated = await generateBase64(coverPrompt(opts.title, opts.category, opts.slug));
   if (!generated) return null;
 
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
