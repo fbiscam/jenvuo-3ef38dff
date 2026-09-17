@@ -31,6 +31,65 @@ type Body = {
 
 const TF = new Set(["15m", "1h", "4h", "1d"]);
 
+const EXTENSION_SIGNAL_OUTPUT_CONTRACT = `Analyze every supplied ICT/SMC factor internally, but expose only this compact trader-facing format. Do not add headings, education, market commentary, disclaimers, confidence, grade, RR, model names, or extra paragraphs.
+
+VERDICT: BUY | SELL | WAIT
+STATUS: CONFIRMED | CONDITIONAL | NO TRADE
+ENTRY: exact supplied entry/zone, or —
+SL: exact supplied stop, or —
+TP1: exact supplied TP1, or —
+TP2: exact supplied TP2, or —
+WHY: one sentence, maximum 22 words, naming the two strongest verified ICT/SMC reasons or the decisive veto.
+
+CONFIRMED means take the listed setup. CONDITIONAL means do not enter yet; wait for the named trigger. WAIT always means NO TRADE. Never invent or adjust a price.`;
+
+function compactSignalAnswer(raw: string, desk: ReturnType<typeof runExtensionDesk>): string {
+  const verdictMatch = /^\s*VERDICT:\s*(BUY|SELL|WAIT)\b/im.exec(raw);
+  const statusMatch = /^\s*STATUS:\s*(CONFIRMED|CONDITIONAL|NO TRADE)\b/im.exec(raw);
+  const whyMatch = /^\s*WHY:\s*(.+)$/im.exec(raw);
+  const reviewedVerdict = verdictMatch?.[1];
+  const verdict =
+    reviewedVerdict === "WAIT" || reviewedVerdict === desk.direction ? reviewedVerdict : "WAIT";
+  const status =
+    verdict === "WAIT"
+      ? "NO TRADE"
+      : statusMatch?.[1] === "CONFIRMED"
+        ? "CONFIRMED"
+        : "CONDITIONAL";
+  const takeTrade =
+    status === "CONFIRMED"
+      ? "TAKE TRADE"
+      : status === "CONDITIONAL"
+        ? "WAIT FOR TRIGGER"
+        : "NO TRADE";
+  const fallbackWhy =
+    verdict === "WAIT"
+      ? (desk.senior.reasons[0] ?? "No valid setup has enough verified ICT/SMC confluence.")
+      : `${desk.bias} structure and verified liquidity evidence support the setup at the listed entry.`;
+  const why = (whyMatch?.[1] ?? fallbackWhy)
+    .replace(/\s+/g, " ")
+    .trim()
+    .split(/\s+/)
+    .slice(0, 22)
+    .join(" ");
+
+  if (verdict === "WAIT") {
+    return [`DECISION: ${takeTrade}`, "ENTRY: —", "SL: —", "TP1: —", "TP2: —", `WHY: ${why}`].join(
+      "\n",
+    );
+  }
+
+  return [
+    `DECISION: ${takeTrade}`,
+    `DIRECTION: ${verdict}`,
+    `ENTRY: ${desk.trade.entryType} ${desk.trade.entry.toFixed(2)}${desk.trade.zone ? ` · ${desk.trade.zone.priceLow.toFixed(2)}–${desk.trade.zone.priceHigh.toFixed(2)}` : ""}`,
+    `SL: ${desk.trade.sl.toFixed(2)}`,
+    `TP1: ${(desk.trade.tp1 ?? desk.trade.tp).toFixed(2)}`,
+    `TP2: ${(desk.trade.tp2 ?? desk.trade.tp).toFixed(2)}`,
+    `WHY: ${why}`,
+  ].join("\n");
+}
+
 function ema(values: number[], period: number): number {
   const k = 2 / (period + 1);
   let e = values[0] ?? 0;
@@ -358,14 +417,14 @@ async function handle({ request }: { request: Request }) {
         const primary = await callChatCompletion({
           models: [...(image ? EXTENSION_MODEL_CHAIN.vision : EXTENSION_MODEL_CHAIN.reasoning)],
           stage: "extension-primary-review",
-          maxTokens: 900,
+          maxTokens: 350,
           timeoutMs: 55_000,
           deadlineMs: 120_000,
           retriesPerModel: 1,
           messages: [
             {
               role: "system",
-              content: `You are Jenvu, the primary XAU/USD desk analyst. Review the deterministic ICT/SMC engine report computed from live OHLCV and produce the final primary analysis. Preserve the engine's exact entry, stop and targets unless a hard veto invalidates them. A missing ideal confluence is a warning, not automatically a veto. If direction is valid but entry has not triggered, return a CONDITIONAL BUY/SELL limit setup and name the trigger. Use WAIT only for an explicit hard failure: no directional edge, structurally invalid levels, RR below the floor, contradictory data, or fewer than two independent confirmations. Start with VERDICT: BUY, VERDICT: SELL, or VERDICT: WAIT. Be concise and desk-style.\n\n${XAU_DESK_CORE_INSTRUCTIONS}\n\n${QUERY_RELEVANCE_INSTRUCTIONS}`,
+              content: `You are Jenvu, the primary XAU/USD desk analyst. Perform a deep independent review of the deterministic ICT/SMC engine report computed from live OHLCV. Preserve the engine's exact entry, stop and targets unless a hard veto invalidates them. A missing ideal confluence is a warning, not automatically a veto. If direction is valid but entry has not triggered, return a CONDITIONAL setup. Use WAIT only for an explicit hard failure: no directional edge, structurally invalid levels, RR below the floor, contradictory data, or fewer than two independent confirmations.\n\n${XAU_DESK_CORE_INSTRUCTIONS}\n\n${QUERY_RELEVANCE_INSTRUCTIONS}\n\n${EXTENSION_SIGNAL_OUTPUT_CONTRACT}`,
             },
             ...history,
             {
@@ -417,14 +476,14 @@ async function handle({ request }: { request: Request }) {
           const senior = await callChatCompletion({
             models: [...EXTENSION_MODEL_CHAIN.seniorReview],
             stage: "extension-senior-review",
-            maxTokens: 700,
+            maxTokens: 300,
             timeoutMs: 45_000,
             deadlineMs: 90_000,
             retriesPerModel: 1,
             messages: [
               {
                 role: "system",
-                content: `You are the independent senior XAU/USD desk head. Return the final trader-facing answer. Preserve all exact engine prices: never invent replacement levels. CONFIRM a supported BUY/SELL, label an untriggered but valid idea as CONDITIONAL BUY/SELL, and use WAIT only for a decisive hard veto. A missing ideal confluence by itself is not a veto. Start with VERDICT: BUY, VERDICT: SELL, or VERDICT: WAIT, then state status CONFIRMED or CONDITIONAL. Answer in the user's language, concisely.\n\n${XAU_DESK_CORE_INSTRUCTIONS}\n\n${XAU_SENIOR_REVIEW_INSTRUCTIONS}\n\n${QUERY_RELEVANCE_INSTRUCTIONS}`,
+                content: `You are the independent senior XAU/USD desk head. Rebuild and verify the setup before ruling; do not merely summarize the primary response. Preserve all exact engine prices and never invent replacements. CONFIRM a supported triggered setup, mark an untriggered valid idea CONDITIONAL, and use WAIT only for a decisive hard veto. A missing ideal confluence by itself is not a veto.\n\n${XAU_DESK_CORE_INSTRUCTIONS}\n\n${XAU_SENIOR_REVIEW_INSTRUCTIONS}\n\n${QUERY_RELEVANCE_INSTRUCTIONS}\n\n${EXTENSION_SIGNAL_OUTPUT_CONTRACT}`,
               },
               {
                 role: "user",
@@ -461,6 +520,7 @@ async function handle({ request }: { request: Request }) {
         }
       }
       const secondReview = seniorReview;
+      analysisText = compactSignalAnswer(analysisText, desk);
 
       const { chargeExtensionUsage } = await import("@/lib/extension-billing.server");
       const billing = await chargeExtensionUsage({

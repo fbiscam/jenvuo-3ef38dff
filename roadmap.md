@@ -85,3 +85,5 @@
 - [x] Pass shared chart images into extension vision analysis and stop warning-only conditions from forcing WAIT
 - [x] Reject black screen-share frames, wait for capture readiness, and rebuild extension v1.9.7
 - [x] Fix misleading server-busy failures, remove artificial AI cutoffs, and rebuild extension v1.9.8
+- [x] Keep deep ICT/SMC analysis internal and return only decision, direction, entry, SL, TP1/TP2, and one concise reason
+- [x] Rebuild and verify extension v1.9.9 with the compact signal contract

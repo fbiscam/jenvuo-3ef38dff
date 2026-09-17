@@ -431,7 +431,7 @@ function addMsg(cls, text, shot) {
         continue;
       }
       const tradeRe =
-        /^(?:[-*•]\s*)?(?:\*\*)?\s*(pair|symbol|asset|direction|bias|side|type|order|entry(?:\s*(?:price|zone))?|buy(?:\s*limit|\s*stop)?|sell(?:\s*limit|\s*stop)?|sl|stop\s*loss|stoploss|tp\s*\d*|take\s*profit\s*\d*|target\s*\d*|r\s*[:/]\s*r|risk\s*[:/-]?\s*reward|rr|lot(?:\s*size)?|risk|timeframe|time\s*frame|tf|confidence|validity)\s*(?:\*\*)?\s*[:\-–]\s*(.+)$/i;
+        /^(?:[-*•]\s*)?(?:\*\*)?\s*(decision|verdict|pair|symbol|asset|direction|bias|side|type|order|entry(?:\s*(?:price|zone))?|buy(?:\s*limit|\s*stop)?|sell(?:\s*limit|\s*stop)?|sl|stop\s*loss|stoploss|tp\s*\d*|take\s*profit\s*\d*|target\s*\d*|r\s*[:/]\s*r|risk\s*[:/-]?\s*reward|rr|lot(?:\s*size)?|risk|timeframe|time\s*frame|tf|confidence|validity|why|reasons?)\s*(?:\*\*)?\s*[:\-–]\s*(.+)$/i;
       const tradeMatch = l.match(tradeRe);
       if (tradeMatch) {
         closeList();
