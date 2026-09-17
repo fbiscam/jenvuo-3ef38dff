@@ -54,15 +54,27 @@ function compactSignalAnswer(raw: string, desk: ReturnType<typeof runExtensionDe
       : statusMatch?.[1] === "CONFIRMED"
         ? "CONFIRMED"
         : "CONDITIONAL";
-  const takeTrade = status === "CONFIRMED" ? "TAKE TRADE" : status === "CONDITIONAL" ? "WAIT FOR TRIGGER" : "NO TRADE";
+  const takeTrade =
+    status === "CONFIRMED"
+      ? "TAKE TRADE"
+      : status === "CONDITIONAL"
+        ? "WAIT FOR TRIGGER"
+        : "NO TRADE";
   const fallbackWhy =
     verdict === "WAIT"
       ? (desk.senior.reasons[0] ?? "No valid setup has enough verified ICT/SMC confluence.")
       : `${desk.bias} structure and ${desk.score}% verified confluence support the setup at the listed entry.`;
-  const why = (whyMatch?.[1] ?? fallbackWhy).replace(/\s+/g, " ").trim().split(/\s+/).slice(0, 22).join(" ");
+  const why = (whyMatch?.[1] ?? fallbackWhy)
+    .replace(/\s+/g, " ")
+    .trim()
+    .split(/\s+/)
+    .slice(0, 22)
+    .join(" ");
 
   if (verdict === "WAIT") {
-    return [`DECISION: ${takeTrade}`, "ENTRY: —", "SL: —", "TP1: —", "TP2: —", `WHY: ${why}`].join("\n");
+    return [`DECISION: ${takeTrade}`, "ENTRY: —", "SL: —", "TP1: —", "TP2: —", `WHY: ${why}`].join(
+      "\n",
+    );
   }
 
   return [
