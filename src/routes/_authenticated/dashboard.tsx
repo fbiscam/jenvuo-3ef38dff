@@ -26,7 +26,6 @@ import { listExtensionKeys } from "@/lib/extension-keys.functions";
 import { Button } from "@/components/ui/button";
 import astraGalaxyBanner from "@/assets/astra-galaxy-banner.jpg";
 import astraParticleCardBackground from "@/assets/astra-particle-card-bg.jpg";
-import astraModelLogoAsset from "@/assets/astra-model-logo.png.asset.json";
 import solLogoAsset from "@/assets/sol-logo.png.asset.json";
 
 
@@ -1461,14 +1460,22 @@ function ClaudeLogo({ className }: { className?: string; strokeWidth?: number })
   );
 }
 
+function OpenAILogo({ className }: { className?: string; strokeWidth?: number }) {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" className={className} fill="currentColor">
+      <path d="M22.28 9.82a5.98 5.98 0 0 0-.51-4.91 6.05 6.05 0 0 0-6.52-2.9A6 6 0 0 0 4.98 4.18a5.98 5.98 0 0 0-4 2.9 6.05 6.05 0 0 0 .74 7.1 5.98 5.98 0 0 0 .51 4.91 6.05 6.05 0 0 0 6.52 2.9A6 6 0 0 0 19.02 19.8a5.98 5.98 0 0 0 4-2.9 6.05 6.05 0 0 0-.74-7.1zm-9.06 12.67a4.5 4.5 0 0 1-2.88-1.04l.14-.08 4.79-2.77a.78.78 0 0 0 .39-.68v-6.76l2.03 1.17.02.05v5.6a4.5 4.5 0 0 1-4.49 4.51zM3.5 18.55a4.47 4.47 0 0 1-.54-3.03l.14.08 4.79 2.77a.78.78 0 0 0 .79 0l5.85-3.38v2.35l.02.05-4.85 2.8a4.5 4.5 0 0 1-6.2-1.64zM2.24 8.03a4.5 4.5 0 0 1 2.35-1.98v5.7a.77.77 0 0 0 .39.68l5.83 3.36-2.03 1.17a.07.07 0 0 1-.07 0l-4.84-2.8a4.5 4.5 0 0 1-1.63-6.13zm16.63 3.87-5.85-3.4 2.03-1.16a.07.07 0 0 1 .07 0l4.84 2.8a4.5 4.5 0 0 1-.68 8.11v-5.7a.79.79 0 0 0-.4-.65zm2.02-3.04-.14-.09-4.78-2.79a.78.78 0 0 0-.79 0L9.33 9.36V7.01l-.02-.05 4.85-2.8a4.5 4.5 0 0 1 6.68 4.66zM8.22 12.99l-2.03-1.17-.02-.05v-5.6a4.5 4.5 0 0 1 7.38-3.45l-.14.08-4.79 2.77a.78.78 0 0 0-.4.68zm1.1-2.38 2.61-1.5 2.6 1.5v3l-2.6 1.5-2.6-1.5z" />
+    </svg>
+  );
+}
+
 const RECOMMENDED_MODELS = [
   {
     name: " Gpt-6 astra",
     badge: "New",
     description: "Our most capable model, built for demanding chart analysis.",
-    logo: null,
-    logoImage: astraModelLogoAsset.url,
-    logoLabel: "",
+    logo: OpenAILogo,
+    logoImage: null,
+    logoLabel: "OpenAI",
     badgeTone: "bg-primary text-primary-foreground",
     featured: true,
   },
@@ -1551,7 +1558,7 @@ function ModelWorkspace() {
                         {model.logoImage ? (
                           <img src={model.logoImage} alt={model.logoLabel || model.name} className="h-7 w-7 rounded-md object-cover" />
                         ) : ModelLogo ? (
-                          <ModelLogo className="h-5 w-5" strokeWidth={1.8} />
+                          <ModelLogo className={`h-5 w-5 ${model.featured ? "text-primary-foreground" : ""}`} strokeWidth={1.8} />
                         ) : null}
                         {model.logoLabel ? <span className="text-xs font-semibold">{model.logoLabel}</span> : null}
                       </div>
