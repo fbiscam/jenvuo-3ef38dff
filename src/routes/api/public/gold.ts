@@ -359,8 +359,8 @@ async function handle({ request }: { request: Request }) {
           models: [...(image ? EXTENSION_MODEL_CHAIN.vision : EXTENSION_MODEL_CHAIN.reasoning)],
           stage: "extension-primary-review",
           maxTokens: 900,
-          timeoutMs: 20_000,
-          deadlineMs: 55_000,
+          timeoutMs: 55_000,
+          deadlineMs: 120_000,
           retriesPerModel: 1,
           messages: [
             {
@@ -415,8 +415,8 @@ async function handle({ request }: { request: Request }) {
             models: [...EXTENSION_MODEL_CHAIN.seniorReview],
             stage: "extension-senior-review",
             maxTokens: 700,
-            timeoutMs: 18_000,
-            deadlineMs: 40_000,
+            timeoutMs: 45_000,
+            deadlineMs: 90_000,
             retriesPerModel: 1,
             messages: [
               {
