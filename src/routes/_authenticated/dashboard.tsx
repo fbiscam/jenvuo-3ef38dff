@@ -1554,9 +1554,9 @@ function ModelWorkspace() {
                   )}
                   <div className="relative z-10 flex h-full flex-col">
                     <div className="flex items-start justify-between gap-3">
-                      <div className={`flex h-11 items-center gap-2 rounded-md border px-2.5 ${model.featured ? "border-primary-foreground/30 bg-primary/75" : "border-border bg-background"}`} aria-label={`${model.logoLabel || model.name} model`}>
+                      <div className={`flex h-11 items-center gap-2 rounded-md border px-2.5 ${model.featured ? "border-primary-foreground/30 bg-primary/75" : "border-border bg-background"}`} aria-label={`${model.logoLabel} model`}>
                         {model.logoImage ? (
-                          <img src={model.logoImage} alt={model.logoLabel || model.name} className="h-7 w-7 rounded-md object-cover" />
+                          <img src={model.logoImage} alt={model.logoLabel} className="h-7 w-7 rounded-md object-cover" />
                         ) : ModelLogo ? (
                           <ModelLogo className={`h-5 w-5 ${model.featured ? "text-primary-foreground" : ""}`} strokeWidth={1.8} />
                         ) : null}
