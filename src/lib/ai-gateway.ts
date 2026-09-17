@@ -26,9 +26,10 @@ export type CallChatOptions = {
   // Force JSON response mode (uses response_format: json_object).
   jsonMode?: boolean;
   maxTokens?: number;
-  // Milliseconds per attempt. Defaults to 25000.
+  // Retained for caller compatibility. Provider generations are not aborted
+  // by an artificial timer; only an explicit caller cancellation may abort.
   timeoutMs?: number;
-  // Hard wall-clock budget for the whole chain-walk (all models + retries).
+  // Retained for caller compatibility. No artificial chain deadline is used.
   deadlineMs?: number;
 
   // If true and the model supports priority tier, request fast mode.
@@ -434,23 +435,9 @@ async function callJustwoker(
 async function singleAttempt(
   model: string,
   opts: CallChatOptions,
-  timeoutMs?: number,
+  _timeoutMs?: number,
 ): Promise<{ content: string; usage: UsageInfo }> {
-  // Per-request wall clock. Without it a provider that accepts the connection
-  // and never answers blocks the await forever, so the retry/fallback chain
-  // never runs and the scan "hangs" with no result.
-  const ac = timeoutMs && timeoutMs > 0 ? new AbortController() : null;
-  const timer = ac ? setTimeout(() => ac.abort(), timeoutMs) : null;
-  try {
-    return await singleAttemptInner(model, opts, ac?.signal);
-  } catch (err: any) {
-    if (ac?.signal.aborted) {
-      throw new AiGatewayError("Server busy — please try again in a moment.", 0, false);
-    }
-    throw err;
-  } finally {
-    if (timer) clearTimeout(timer);
-  }
+  return singleAttemptInner(model, opts);
 }
 
 async function singleAttemptInner(
@@ -603,10 +590,9 @@ async function singleAttemptInner(
                     ? model.slice("omniroute/".length)
                     : model;
 
-  // Determinism: temperature 0 + top_p 1 + stable seed so the same chart and
-  // the same market data always produce the same read. The seed derives ONLY
-  // from the conversation content (no clock component) — a time-bucketed seed
-  // made back-to-back scans of an identical setup disagree.
+  // Derive a stable seed for providers that explicitly support it. OmniRoute's
+  // Claude-compatible routes reject OpenAI's `seed` field on some upstream
+  // connections, so never send it there.
   const seedBase = opts.messages
     .map((m) => (typeof m.content === "string" ? m.content : JSON.stringify(m.content)))
     .join("|");
@@ -635,7 +621,7 @@ async function singleAttemptInner(
   const body: Record<string, unknown> = {
     model: wireModel,
     messages: opts.messages,
-    seed,
+    ...(!isOmniRoute ? { seed } : {}),
     ...pinnedSampling,
 
     // GPT-OSS otherwise spends most of the token/time budget on hidden chain
@@ -692,26 +678,10 @@ async function singleAttemptInner(
 
   if (!res.ok) {
     const txt = await res.text().catch(() => "");
-    const terminal =
-      isOmniRoute ||
-      isBlackbox ||
-      isNvidia ||
-      isBmind ||
-      isTukenku ||
-      isUnikey ||
-      isEvolink ||
-      isUnoRouter ||
-      isDsOfficial ||
-      isOai
-        ? !(
-            res.status === 429 ||
-            res.status >= 500 ||
-            res.status === 403 ||
-            res.status === 400 ||
-            res.status === 401 ||
-            res.status === 404
-          )
-        : !(res.status === 429 || res.status >= 500);
+    // Only rate limits and upstream 5xx failures are retryable. Replaying a
+    // malformed request or rejected credential against the same route cannot
+    // recover and previously produced repeated, misleading "server busy" UI.
+    const terminal = !(res.status === 429 || res.status >= 500);
 
     let msg: string;
     if (res.status === 429) msg = "Server busy — please try again in a moment.";
@@ -728,7 +698,10 @@ async function singleAttemptInner(
       msg = "UnoRouter balance is too low. Please top up UnoRouter to use this model.";
     else if (res.status === 402) msg = "AI credits exhausted. Please top up your workspace.";
     else if (res.status === 401) msg = "AI key rejected. Please contact support.";
-    else if (res.status === 400) msg = "Server busy — please try again in a moment.";
+    else if (res.status === 403) msg = "AI provider access is blocked. Please contact support.";
+    else if (res.status === 400)
+      msg = "AI provider rejected the analysis request. Please contact support.";
+    else if (res.status === 404) msg = "The selected AI model is unavailable.";
     else msg = "Server busy — please try again in a moment.";
     // Attach Retry-After (seconds) as ms, if provided by the upstream.
     const ra = res.headers.get("retry-after");
@@ -790,14 +763,7 @@ async function singleAttemptInner(
 export async function callChatCompletion(
   opts: CallChatOptions,
 ): Promise<{ content: string; model: string; usage: UsageInfo }> {
-  const timeoutMs = opts.timeoutMs ?? 25000;
   const retriesPerModel = Math.max(1, opts.retriesPerModel ?? 3);
-  // Hard wall-clock budget for the whole chain-walk (all models + retries).
-  // Without it a busy provider chain can keep a scan open until the platform
-  // request timeout kills it, which is what made scans "hang" with no result.
-  const deadlineMs = opts.deadlineMs ?? Math.max(timeoutMs + 5000, 45000);
-  const startedAt = Date.now();
-  const remaining = () => deadlineMs - (Date.now() - startedAt);
   const configured = opts.models.filter(Boolean).filter(providerConfigured);
   if (!configured.length)
     throw new AiGatewayError(`No configured AI provider for ${opts.stage ?? "AI call"}`, 0, true);
@@ -815,17 +781,8 @@ export async function callChatCompletion(
     const isLastModel = mi === models.length - 1;
     attemptedModels++;
     for (let attempt = 1; attempt <= retriesPerModel; attempt++) {
-      if (remaining() < 3000) {
-        throw (
-          lastErr ?? new AiGatewayError("Server busy — please try again in a moment.", 0, false)
-        );
-      }
       try {
-        const { content, usage } = await singleAttempt(
-          model,
-          opts,
-          Math.max(5000, Math.min(timeoutMs, remaining())),
-        );
+        const { content, usage } = await singleAttempt(model, opts);
         const validation = opts.validateContent?.(content, model) ?? true;
         if (validation !== true) {
           lastErr = new AiGatewayError(validation, 422, true);
