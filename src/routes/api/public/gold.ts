@@ -47,7 +47,9 @@ function compactSignalAnswer(raw: string, desk: ReturnType<typeof runExtensionDe
   const verdictMatch = /^\s*VERDICT:\s*(BUY|SELL|WAIT)\b/im.exec(raw);
   const statusMatch = /^\s*STATUS:\s*(CONFIRMED|CONDITIONAL|NO TRADE)\b/im.exec(raw);
   const whyMatch = /^\s*WHY:\s*(.+)$/im.exec(raw);
-  const verdict = verdictMatch?.[1] ?? desk.direction;
+  const reviewedVerdict = verdictMatch?.[1];
+  const verdict =
+    reviewedVerdict === "WAIT" || reviewedVerdict === desk.direction ? reviewedVerdict : "WAIT";
   const status =
     verdict === "WAIT"
       ? "NO TRADE"
@@ -63,7 +65,7 @@ function compactSignalAnswer(raw: string, desk: ReturnType<typeof runExtensionDe
   const fallbackWhy =
     verdict === "WAIT"
       ? (desk.senior.reasons[0] ?? "No valid setup has enough verified ICT/SMC confluence.")
-      : `${desk.bias} structure and ${desk.score}% verified confluence support the setup at the listed entry.`;
+      : `${desk.bias} structure and verified liquidity evidence support the setup at the listed entry.`;
   const why = (whyMatch?.[1] ?? fallbackWhy)
     .replace(/\s+/g, " ")
     .trim()
