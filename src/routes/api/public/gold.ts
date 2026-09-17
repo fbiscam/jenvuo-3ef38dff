@@ -387,13 +387,16 @@ async function handle({ request }: { request: Request }) {
         analysisText = primary.content.trim();
         primaryModel = primary.model;
         primaryUsage = primary.usage;
-      } catch {
+      } catch (error) {
+        const message = error instanceof Error ? error.message : "AI review failed.";
+        console.error("extension-primary-review failed", { requestId, message });
         return extJson(
           {
             ok: false,
             code: "PRIMARY_REVIEW_UNAVAILABLE",
-            error:
-              "Claude primary review is temporarily unavailable after trying all fallback models. Please retry in a moment.",
+            error: /rejected|blocked|key|model is unavailable/i.test(message)
+              ? message
+              : "Claude primary review is temporarily unavailable after trying all fallback models. Please retry in a moment.",
           },
           503,
         );
@@ -449,7 +452,11 @@ async function handle({ request }: { request: Request }) {
                 seniorVerdict === "WAIT" ? "vetoed" : seniorVerdict ? "confirmed" : "completed",
             };
           }
-        } catch {
+        } catch (error) {
+          console.warn("extension-senior-review failed", {
+            requestId,
+            message: error instanceof Error ? error.message : "AI review failed.",
+          });
           seniorReview = { included: false, model: null, status: "unavailable" };
         }
       }
