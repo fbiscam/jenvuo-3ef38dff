@@ -366,14 +366,17 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
             let conf = Number(plan.trade?.confidence ?? 0);
             const now = new Date();
 
-            // Publishing is fail-closed: every automated XAU/USD setup must be
-            // explicitly confirmed by the senior AI desk. A timeout, veto,
-            // downgrade, malformed answer, or missing model remains visible in
-            // scan diagnostics but can never reach subscribers.
+            // Publishing requires a senior review that actually ran. CONFIRM,
+            // plain completion and a soft DOWNGRADE all stay publishable — the
+            // downgrade already shaves the score, so the 75% confidence gate
+            // decides. Only a veto, a failed/missing review or a missing model
+            // blocks the alert outright.
             const seniorReview = plan.seniorReview;
             const seniorConfirmed =
               seniorReview?.included === true &&
-              seniorReview.status === "confirmed" &&
+              (seniorReview.status === "confirmed" ||
+                seniorReview.status === "completed" ||
+                seniorReview.status === "downgraded") &&
               typeof seniorReview.model === "string" &&
               seniorReview.model.length > 0;
             if (!seniorConfirmed) {
@@ -660,7 +663,9 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
             const finalSeniorReview = broadcastPlan.seniorReview;
             const finalSeniorConfirmed =
               finalSeniorReview?.included === true &&
-              finalSeniorReview.status === "confirmed" &&
+              (finalSeniorReview.status === "confirmed" ||
+                finalSeniorReview.status === "completed" ||
+                finalSeniorReview.status === "downgraded") &&
               typeof finalSeniorReview.model === "string" &&
               finalSeniorReview.model.length > 0;
             if (!finalSeniorConfirmed) {
