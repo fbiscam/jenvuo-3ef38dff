@@ -1,5 +1,5 @@
 import { estimateCostUsd, logAiCost } from '@/lib/ai-cost-log.server'
-import { getPlanCapabilities, getPlanDailyTokenLimit } from '@/lib/plan-entitlements'
+import { getEffectiveDailyTokenLimit, getPlanCapabilities } from '@/lib/plan-entitlements'
 
 export const EXTENSION_BASE_FEE_USD = 0
 export const EXTENSION_TOKEN_PRICE_MULTIPLIER = 0.5
@@ -53,7 +53,7 @@ export async function getExtensionEntitlement(userId: string) {
   const keyLimit = Number(plan?.extension_key_limit ?? 0)
   const balance = Number(bal?.balance ?? 0)
   const capabilities = getPlanCapabilities(planId)
-  const dailyTokenLimit = getPlanDailyTokenLimit(planId)
+  const dailyTokenLimit = getEffectiveDailyTokenLimit(planId, balance)
   const { total: tokensUsedToday } = await readDailyTokenUsage(admin, userId)
   const tokensRemainingToday = Math.max(0, dailyTokenLimit - tokensUsedToday)
   const overDailyTokens = dailyTokenLimit > 0 && tokensUsedToday >= dailyTokenLimit
@@ -76,7 +76,7 @@ export async function getExtensionEntitlement(userId: string) {
     ...result,
     error: result.allowed ? undefined
       : result.status === 429
-        ? `Daily token limit reached (${dailyTokenLimit.toLocaleString()} tokens). It resets at 00:00 UTC.`
+        ? `Daily token limit reached (${dailyTokenLimit.toLocaleString()} tokens). Add credits to increase the balance-based allowance, or wait until 00:00 UTC.`
         : result.status === 402
           ? 'Low balance. Add funds to continue using extension AI.'
           : 'Extension AI is not included in your current plan. Upgrade to Pro, Elite, or Ultra to continue.',

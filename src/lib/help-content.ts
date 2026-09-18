@@ -333,7 +333,7 @@ export const collections: Collection[] = [
         summary: "Free, Pro, Elite and Ultra — daily token limits, wallets, scan estimates and features.",
         updatedAt: "2026-09-18",
         body: [
-          { type: "p", content: "Jenvu uses a USD-wallet subscription model plus a daily token allowance. AI chat and primary-only analysis cost $0.03 per request. A completed senior-reviewed analysis costs $0.20. Failed requests are free. Tokens are priced at $3 per 1,000,000 tokens and every plan's daily allowance resets at 00:00 UTC." },
+          { type: "p", content: "Jenvu uses a USD wallet plus a plan-based daily token ceiling. Your available daily quota also follows your current balance at $3 per 1,000,000 tokens, so adding credits can raise it up to the plan ceiling and spending credits can lower it. Every daily allowance resets at 00:00 UTC." },
 
           { type: "h2", content: "Daily token limits" },
           { type: "ul", items: [
@@ -342,6 +342,7 @@ export const collections: Collection[] = [
             "Elite — 5,000,000 tokens per day.",
             "Ultra — 10,000,000 tokens per day.",
             "Rate: $3 per 1M tokens. Resets daily at 00:00 UTC.",
+            "The amount available today is the lower of your plan ceiling and your balance-based quota.",
           ]},
 
           { type: "h2", content: "Free" },
@@ -419,8 +420,10 @@ export const collections: Collection[] = [
           ]},
           { type: "h2", content: "Daily token usage" },
           { type: "ul", items: [
-            "Every request also consumes tokens from your plan's daily allowance (Free 100K, Pro 1.5M, Elite 5M, Ultra 10M).",
-            "Tokens are priced at $3 per 1,000,000 tokens.",
+            "Every request consumes tokens from a shared daily allowance capped by your plan (Free 100K, Pro 1.5M, Elite 5M, Ultra 10M).",
+            "Your current wallet balance sets the available amount at $3 per 1,000,000 tokens, up to the plan ceiling.",
+            "For example, a $5 balance provides one complete 1M-token block; below $3, the allowance scales down proportionally, so $1 provides about 333K tokens.",
+            "Top-ups update the available limit automatically, while spending that reduces your balance can also reduce it.",
             "The allowance resets at 00:00 UTC every day.",
             "Once the daily allowance is used up, requests are refused until the reset.",
           ]},
@@ -452,8 +455,10 @@ export const collections: Collection[] = [
 
           { type: "h2", content: "Quota and limits" },
           { type: "ul", items: [
-            "All keys on your account share one daily token allowance (Free 100K, Pro 1.5M, Elite 5M, Ultra 10M).",
-            "Tokens cost $3 per 1,000,000 tokens and the allowance resets at 00:00 UTC.",
+            "All keys on your account share one daily token allowance capped by the plan (Free 100K, Pro 1.5M, Elite 5M, Ultra 10M).",
+            "The available limit is calculated from the current wallet at $3 per 1,000,000 tokens, without exceeding the plan ceiling.",
+            "A $5 balance provides one complete 1M-token block. If the balance falls below $3, the quota scales proportionally; $1 provides about 333K tokens.",
+            "Top-ups and usage automatically update this number across the dashboard and Usage page.",
             "Requests over the daily limit are rejected with a rate-limit error explaining when it resets.",
             "If your wallet balance reaches zero, requests are rejected until you top up or renew.",
           ]},

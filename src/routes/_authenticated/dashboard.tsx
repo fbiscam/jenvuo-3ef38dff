@@ -1436,7 +1436,7 @@ function UsageAnalytics({ stats, keysCount, loading, range, onRangeChange, onRef
             <span className="truncate">Daily limit</span><Settings2 className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
           </div>
           <div className="mt-4 flex items-center justify-between gap-3 text-sm text-foreground">
-            <span className="capitalize">{stats?.plan ? `${stats.plan} tokens` : "Tokens"}</span>
+            <span className="capitalize">{stats?.plan ? `${stats.plan} · balance based` : "Tokens"}</span>
             <span className="tabular-nums">{fmtTokens(stats?.tokensUsedToday ?? 0)} / {stats?.dailyTokenLimit ? fmtTokens(stats.dailyTokenLimit) : "—"}</span>
           </div>
           <div className="mt-2 h-4 overflow-hidden rounded bg-muted">
@@ -1445,7 +1445,7 @@ function UsageAnalytics({ stats, keysCount, loading, range, onRangeChange, onRef
               style={{ width: `${Math.min(100, Math.max(0, stats?.dailyTokenLimit ? ((stats.tokensUsedToday ?? 0) / stats.dailyTokenLimit) * 100 : 0))}%` }}
             />
           </div>
-          <div className="mt-3 text-xs text-muted-foreground">Resets 00:00 UTC</div>
+          <div className="mt-3 text-xs text-muted-foreground">$3 = 1M tokens · resets 00:00 UTC</div>
 
         </div>
         <div className={metricClass} style={{ backgroundColor: "#FFFBED" }}>

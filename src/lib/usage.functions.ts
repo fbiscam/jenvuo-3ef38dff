@@ -3,7 +3,7 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import type { Json } from "@/integrations/supabase/types";
 import {
   TOKEN_RATE_USD_PER_MILLION,
-  getPlanDailyTokenLimit,
+  getEffectiveDailyTokenLimit,
   tokensToUsd,
 } from "@/lib/plan-entitlements";
 
@@ -181,7 +181,7 @@ export const getUsageStats = createServerFn({ method: "GET" })
       byReason,
       ledger: rows,
       plan: planId,
-      dailyTokenLimit: getPlanDailyTokenLimit(planId),
+      dailyTokenLimit: getEffectiveDailyTokenLimit(planId, balance),
       tokensUsedToday,
       tokenRateUsdPerMillion: TOKEN_RATE_USD_PER_MILLION,
       recentExtensionKeys: (extensionKeys ?? []).map((key) => {
