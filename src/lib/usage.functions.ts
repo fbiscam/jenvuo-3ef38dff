@@ -1,6 +1,11 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import type { Json } from "@/integrations/supabase/types";
+import {
+  TOKEN_RATE_USD_PER_MILLION,
+  getPlanDailyTokenLimit,
+  tokensToUsd,
+} from "@/lib/plan-entitlements";
 
 export type LedgerRow = {
   id: string;
