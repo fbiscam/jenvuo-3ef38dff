@@ -564,6 +564,7 @@ async function handle({ request }: { request: Request }) {
         let primaryUsage = { promptTokens: 0, completionTokens: 0 };
         let seniorModel = "";
         let seniorUsage = { promptTokens: 0, completionTokens: 0 };
+        let primaryReviewed = false;
         let seniorReview: { included: boolean; model: string | null; status: string } = {
           included: false,
           model: null,
@@ -588,6 +589,7 @@ async function handle({ request }: { request: Request }) {
             text = normalizeForecastReview(primary.content, forecast);
             primaryModel = primary.model;
             primaryUsage = primary.usage;
+            primaryReviewed = true;
             if (entitlement.seniorReview) {
               const senior = await callChatCompletion({
                 models: EXTENSION_MODEL_CHAIN.seniorReview.filter((model) => model !== primary.model),
@@ -624,6 +626,14 @@ async function handle({ request }: { request: Request }) {
               : "The live XAU/USD quote is stale; wait for a fresh quote before using this forecast.";
           text = formatForecast(forecast);
           seniorReview = { included: false, model: null, status: "expired" };
+        }
+        if (!forecast.stale && (!primaryReviewed || (entitlement.seniorReview && seniorReview.status !== "confirmed"))) {
+          forecast.direction = "INDECISIVE";
+          forecast.confidence = 0;
+          forecast.invalidation = !primaryReviewed
+            ? "The required AI review was unavailable; request a fresh forecast."
+            : "The required independent senior review was unavailable; request a fresh forecast.";
+          text = formatForecast(forecast);
         }
         const { chargeExtensionUsage } = await import("@/lib/extension-billing.server");
         const billing = await chargeExtensionUsage({
