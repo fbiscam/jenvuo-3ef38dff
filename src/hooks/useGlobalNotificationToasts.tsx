@@ -56,7 +56,7 @@ export function useGlobalNotificationToasts() {
             const title = n.title || "New notification";
             const body = n.body || "";
             const isSignal = n.type === "signal_alert";
-            const href = isSignal ? "/dashboard/alerts" : "/dashboard/notifications";
+            const href = "/dashboard/notifications";
             const Icon = isSignal ? TrendingUp : Bell;
             const accent = isSignal ? "text-emerald-600" : "text-zinc-900";
             const dot = isSignal ? "bg-emerald-500" : "bg-zinc-900";
