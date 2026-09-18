@@ -977,7 +977,7 @@ button.hicon:hover {
   body:has(.thread.has-empty) .content {
     display: flex;
     flex-direction: column;
-    justify-content: flex-end;
+    justify-content: center;
   }
   .thread.has-empty {
     padding: 0;
