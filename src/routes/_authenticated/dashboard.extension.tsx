@@ -213,6 +213,12 @@ function ExtensionPage() {
             <FileText className="h-4 w-4" /> API quickstart
           </button>
           <button
+            onClick={() => setShowEndpoint((v) => !v)}
+            className="hidden items-center gap-2 rounded-full px-3 py-2 text-[13px] text-zinc-700 hover:bg-zinc-100 sm:inline-flex"
+          >
+            <Terminal className="h-4 w-4" /> API endpoint
+          </button>
+          <button
             onClick={() => {
               setShowCreate(true);
               setFreshKey(null);
