@@ -91,3 +91,4 @@
 - [x] Resolve and verify the stale `src/lib/utils.ts` string return diagnostic
 - [x] Make repeated extension screen sharing use direct track capture and release v1.9.11
 - [x] Enforce universal hard vetoes, validated AI reviews, and fail-safe senior-review handling in extension v1.9.13
+- [x] Keep greetings and ordinary questions in chat mode while reserving screen trade analysis for explicit requests in extension v1.9.14

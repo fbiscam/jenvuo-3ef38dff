@@ -267,6 +267,9 @@ function quickConversationReply(question: string): string | null {
       ? "Khushi hui! Aur kisi cheez mein help chahiye ho to batayein."
       : "You’re welcome! Let me know what else you need.";
   }
+  if (/^(ok|okay|alright|theek|thik|acha|accha|got it)$/.test(normalized)) {
+    return "Got it. What would you like help with?";
+  }
   return null;
 }
 
@@ -358,7 +361,7 @@ async function handle({ request }: { request: Request }) {
       // follow-up questions stay conversational unless actionable levels or a
       // chart review are explicitly requested.
       const analysisIntent = requestsActionableAnalysis(question);
-      const conversational = !chartImage && !analysisIntent;
+      const conversational = !analysisIntent;
 
       if (conversational) {
         const quickReply = image ? null : quickConversationReply(question);
@@ -390,7 +393,6 @@ async function handle({ request }: { request: Request }) {
           timeoutMs: image ? 40_000 : 8_000,
           deadlineMs: image ? 90_000 : 34_000,
           retriesPerModel: 1,
-          validateContent: validateSignalReview,
           messages: [
             {
               role: "system",
