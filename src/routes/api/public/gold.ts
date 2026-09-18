@@ -643,7 +643,10 @@ async function handle({ request }: { request: Request }) {
               "WHY: Senior review was unavailable, so this setup remains unconfirmed.",
               "THEORY: The primary ICT/SMC review completed, but the required independent risk check did not. Do not take this trade until review succeeds.",
             ].join("\n")
-          : compactSignalAnswer(analysisText, desk);
+          : compactSignalAnswer(analysisText, desk, {
+              livePrice: market.ticker.price,
+              quoteAgeMs: market.freshness.quoteAgeMs,
+            });
 
       const { chargeExtensionUsage } = await import("@/lib/extension-billing.server");
       const billing = await chargeExtensionUsage({
