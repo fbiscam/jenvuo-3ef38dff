@@ -562,27 +562,56 @@ function UsagePage() {
             ) : data.recentExtensionKeys.length === 0 ? (
               <p className="py-20 text-center text-[13px] text-muted-foreground">There is no usage data for this period and group.</p>
             ) : (
-              <div className="divide-y divide-border">
-                {data.recentExtensionKeys.map((key, index) => {
-                  const usage = derived.keySpend.get(key.id) ?? { spend: 0, requests: 0 };
-                  return (
-                    <div key={key.id} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 py-3">
-                      <div className="min-w-0">
-                        <div className="flex items-center gap-2">
-                           <code className="truncate font-mono text-[11.5px] text-foreground">{key.keyPrefix}••••••••••</code>
-                           {index === 0 && <span className="rounded-full bg-muted px-1.5 py-0.5 text-[9px] font-medium text-foreground">Newest</span>}
+              <div className="space-y-4">
+                <div className="rounded-lg border border-border p-3">
+                  <div className="flex items-center justify-between text-[11.5px]">
+                    <span className="text-muted-foreground">Daily token limit</span>
+                    <span className="tabular-nums text-foreground">
+                      {fmtInt(data.tokensUsedToday)} / {data.dailyTokenLimit > 0 ? fmtInt(data.dailyTokenLimit) : "—"}
+                    </span>
+                  </div>
+                  <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-muted">
+                    <div
+                      className="h-full rounded-full bg-primary"
+                      style={{ width: `${data.dailyTokenLimit > 0 ? Math.min(100, (data.tokensUsedToday / data.dailyTokenLimit) * 100) : 0}%` }}
+                    />
+                  </div>
+                  <div className="mt-2 text-[10px] text-muted-foreground">
+                    ${data.tokenRateUsdPerMillion} per 1M tokens · resets 00:00 UTC
+                  </div>
+                </div>
+                <div className="divide-y divide-border">
+                  {data.recentExtensionKeys.map((key, index) => {
+                    const usage = derived.keySpend.get(key.id) ?? { spend: 0, requests: 0 };
+                    const pctToday = data.dailyTokenLimit > 0 ? Math.min(100, (key.tokensToday / data.dailyTokenLimit) * 100) : 0;
+                    return (
+                      <div key={key.id} className="py-3">
+                        <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-2">
+                              <code className="truncate font-mono text-[11.5px] text-foreground">{key.keyPrefix}••••••••••</code>
+                              {index === 0 && <span className="rounded-full bg-muted px-1.5 py-0.5 text-[9px] font-medium text-foreground">Newest</span>}
+                            </div>
+                            <div className="mt-1 truncate text-[10.5px] text-muted-foreground">
+                              {key.name} · {usage.requests} request{usage.requests === 1 ? "" : "s"} · {key.revokedAt ? "Revoked" : "Active"}
+                            </div>
+                          </div>
+                          <div className="shrink-0 text-right">
+                            <div className="text-[12px] font-medium tabular-nums text-foreground">{fmtUsd(usage.spend, 2)}</div>
+                            <div className="mt-0.5 text-[10px] text-muted-foreground">Spend</div>
+                          </div>
                         </div>
-                         <div className="mt-1 truncate text-[10.5px] text-muted-foreground">
-                          {key.name} · {usage.requests} request{usage.requests === 1 ? "" : "s"} · {key.revokedAt ? "Revoked" : "Active"}
+                        <div className="mt-2 h-1 w-full overflow-hidden rounded-full bg-muted">
+                          <div className="h-full rounded-full bg-primary/70" style={{ width: `${pctToday}%` }} />
+                        </div>
+                        <div className="mt-1 flex items-center justify-between text-[10px] text-muted-foreground">
+                          <span className="tabular-nums">{fmtInt(key.tokensToday)} tokens today</span>
+                          <span className="tabular-nums">{fmtUsd(key.costTodayUsd, 4)}</span>
                         </div>
                       </div>
-                      <div className="shrink-0 text-right">
-                         <div className="text-[12px] font-medium tabular-nums text-foreground">{fmtUsd(usage.spend, 2)}</div>
-                         <div className="mt-0.5 text-[10px] text-muted-foreground">Spend</div>
-                      </div>
-                    </div>
-                  );
-                })}
+                    );
+                  })}
+                </div>
               </div>
             )}
           </section>
