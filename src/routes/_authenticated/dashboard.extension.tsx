@@ -313,16 +313,24 @@ function ExtensionPage() {
         </div>
       )}
 
-      {/* Public API endpoint */}
-      {view === "keys" && (
-        <div className="mt-5 rounded-xl border border-zinc-200 bg-white p-4">
+      {/* Public API endpoint drawer */}
+      {view === "keys" && showEndpoint && (
+        <div className="mt-6 rounded-xl border border-zinc-200 bg-zinc-50 p-5">
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <h2 className="text-[16px] font-medium text-zinc-900"> Api endpoint</h2>
-            <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-medium text-emerald-700">
-              OpenAI-compatible
-            </span>
+            <div className="flex items-center gap-2">
+              <div className="text-[13px] font-medium text-zinc-900">Api endpoint</div>
+              <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-medium text-emerald-700">
+                OpenAI-compatible
+              </span>
+            </div>
+            <button
+              onClick={() => setShowEndpoint(false)}
+              className="rounded-full p-1 text-zinc-500 hover:bg-zinc-200"
+            >
+              <X className="h-4 w-4" />
+            </button>
           </div>
-          <p className="mt-1 text-[12px] text-zinc-500">
+          <p className="mt-3 text-[12px] leading-relaxed text-zinc-600">
             Use your key anywhere — Claude Desktop, scripts, or any OpenAI-compatible client. Usage
             counts against your plan&apos;s daily token limit and appears on the Usage page.
           </p>
