@@ -426,7 +426,7 @@ async function handle({ request }: { request: Request }) {
         const primary = await callChatCompletion({
           models: [...(image ? EXTENSION_MODEL_CHAIN.vision : EXTENSION_MODEL_CHAIN.reasoning)],
           stage: "extension-primary-review",
-          maxTokens: 350,
+          maxTokens: 550,
           timeoutMs: 55_000,
           deadlineMs: 120_000,
           retriesPerModel: 1,
@@ -485,7 +485,7 @@ async function handle({ request }: { request: Request }) {
           const senior = await callChatCompletion({
             models: [...EXTENSION_MODEL_CHAIN.seniorReview],
             stage: "extension-senior-review",
-            maxTokens: 300,
+            maxTokens: 500,
             timeoutMs: 45_000,
             deadlineMs: 90_000,
             retriesPerModel: 1,
