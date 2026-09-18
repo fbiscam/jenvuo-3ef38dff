@@ -23,11 +23,8 @@ export const Route = createFileRoute("/_authenticated/dashboard/analyst")({
 });
 
 function AnalystPage() {
-  const [nonce, setNonce] = useState(0);
-
   return (
     <iframe
-      key={nonce}
       title="Jenvu AI Analyst"
       src="/analyst/sidepanel.html"
       allow="display-capture; clipboard-write"
