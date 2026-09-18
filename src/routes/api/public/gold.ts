@@ -283,7 +283,12 @@ async function handle({ request }: { request: Request }) {
           {
             ok: false,
             error: entitlement.error,
-            code: entitlement.status === 402 ? "LOW_BALANCE" : "PLAN_REQUIRED",
+            code:
+              entitlement.status === 402
+                ? "LOW_BALANCE"
+                : entitlement.status === 429
+                  ? "DAILY_TOKEN_LIMIT"
+                  : "PLAN_REQUIRED",
             balance: entitlement.balance,
           },
           entitlement.status,

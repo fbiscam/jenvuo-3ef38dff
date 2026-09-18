@@ -1,5 +1,5 @@
 import { estimateCostUsd, logAiCost } from '@/lib/ai-cost-log.server'
-import { getPlanCapabilities } from '@/lib/plan-entitlements'
+import { getPlanCapabilities, getPlanDailyTokenLimit } from '@/lib/plan-entitlements'
 
 export const EXTENSION_BASE_FEE_USD = 0
 export const EXTENSION_TOKEN_PRICE_MULTIPLIER = 0.5
@@ -8,6 +8,35 @@ export const EXTENSION_SENIOR_REVIEW_FEE_USD = 0.2
 
 type Usage = { promptTokens: number; completionTokens: number; totalTokens?: number }
 type ModelCall = { model: string; usage: Usage; stage: string }
+
+export function startOfUtcDay(now = new Date()): string {
+  const d = new Date(now)
+  d.setUTCHours(0, 0, 0, 0)
+  return d.toISOString()
+}
+
+/** Tokens (prompt + completion) charged to this user since 00:00 UTC today. */
+export async function readDailyTokenUsage(client: any, userId: string) {
+  const { data } = await client
+    .from('credit_ledger')
+    .select('prompt_tokens, completion_tokens, metadata, created_at')
+    .eq('user_id', userId)
+    .eq('reason', 'extension_api')
+    .gte('created_at', startOfUtcDay())
+    .limit(2000)
+  const byKey = new Map<string, { tokens: number; requests: number }>()
+  let total = 0
+  for (const row of (data ?? []) as any[]) {
+    const tokens = Number(row.prompt_tokens ?? 0) + Number(row.completion_tokens ?? 0)
+    total += tokens
+    const keyId = String(row.metadata?.api_key_id ?? 'unknown')
+    const entry = byKey.get(keyId) ?? { tokens: 0, requests: 0 }
+    entry.tokens += tokens
+    entry.requests += 1
+    byKey.set(keyId, entry)
+  }
+  return { total, byKey }
+}
 
 export async function getExtensionEntitlement(userId: string) {
   const { supabaseAdmin } = await import('@/integrations/supabase/client.server')
@@ -24,9 +53,14 @@ export async function getExtensionEntitlement(userId: string) {
   const keyLimit = Number(plan?.extension_key_limit ?? 0)
   const balance = Number(bal?.balance ?? 0)
   const capabilities = getPlanCapabilities(planId)
+  const dailyTokenLimit = getPlanDailyTokenLimit(planId)
+  const { total: tokensUsedToday } = await readDailyTokenUsage(admin, userId)
+  const tokensRemainingToday = Math.max(0, dailyTokenLimit - tokensUsedToday)
+  const overDailyTokens = dailyTokenLimit > 0 && tokensUsedToday >= dailyTokenLimit
+  const planOk = active && capabilities.extensionAi && keyLimit > 0
   const result = {
-    allowed: active && capabilities.extensionAi && keyLimit > 0 && balance > 0,
-    status: !active || !capabilities.extensionAi || keyLimit < 1 ? 403 : balance <= 0 ? 402 : 200,
+    allowed: planOk && balance > 0 && !overDailyTokens,
+    status: !planOk ? 403 : balance <= 0 ? 402 : overDailyTokens ? 429 : 200,
     plan: planId,
     keyLimit,
     balance,
@@ -34,12 +68,18 @@ export async function getExtensionEntitlement(userId: string) {
     markup: EXTENSION_TOKEN_PRICE_MULTIPLIER,
     seniorReview: capabilities.seniorReview,
     capabilities,
+    dailyTokenLimit,
+    tokensUsedToday,
+    tokensRemainingToday,
   }
   return {
     ...result,
-    error: result.allowed ? undefined : result.status === 402
-      ? 'Low balance. Add funds to continue using extension AI.'
-       : 'Extension AI is not included in your current plan. Upgrade to Pro, Elite, or Ultra to continue.',
+    error: result.allowed ? undefined
+      : result.status === 429
+        ? `Daily token limit reached (${dailyTokenLimit.toLocaleString()} tokens). It resets at 00:00 UTC.`
+        : result.status === 402
+          ? 'Low balance. Add funds to continue using extension AI.'
+          : 'Extension AI is not included in your current plan. Upgrade to Pro, Elite, or Ultra to continue.',
   }
 }
 

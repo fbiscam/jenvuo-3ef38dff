@@ -1,6 +1,11 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import type { Json } from "@/integrations/supabase/types";
+import {
+  TOKEN_RATE_USD_PER_MILLION,
+  getPlanDailyTokenLimit,
+  tokensToUsd,
+} from "@/lib/plan-entitlements";
 
 export type LedgerRow = {
   id: string;
@@ -24,6 +29,9 @@ export type RecentExtensionKey = {
   keyPrefix: string;
   createdAt: string;
   revokedAt: string | null;
+  tokensToday: number;
+  requestsToday: number;
+  costTodayUsd: number;
 };
 
 export type UsageStats = {
@@ -37,6 +45,10 @@ export type UsageStats = {
   byReason: ReasonBucket[];
   ledger: LedgerRow[];
   recentExtensionKeys: RecentExtensionKey[];
+  plan: string;
+  dailyTokenLimit: number;
+  tokensUsedToday: number;
+  tokenRateUsdPerMillion: number;
 };
 
 export const getUsageStats = createServerFn({ method: "GET" })
@@ -66,7 +78,7 @@ export const getUsageStats = createServerFn({ method: "GET" })
         .select("id, name, key_prefix, created_at, revoked_at")
         .eq("user_id", userId)
         .order("created_at", { ascending: false })
-        .limit(4),
+        .limit(12),
     ]);
 
     // Allowance mirrors the plan wallet when the balance row has none set,
@@ -137,6 +149,27 @@ export const getUsageStats = createServerFn({ method: "GET" })
       .map(([reason, scans]) => ({ reason, scans }))
       .sort((a, b) => b.scans - a.scans);
 
+    // Daily token usage (UTC day) per API key, mirroring the enforcement
+    // window used by the extension billing layer.
+    const startOfDay = new Date();
+    startOfDay.setUTCHours(0, 0, 0, 0);
+    const todayRows = rows.filter(
+      (r) => r.reason === "extension_api" && new Date(r.created_at).getTime() >= startOfDay.getTime(),
+    );
+    const tokensByKey = new Map<string, { tokens: number; requests: number }>();
+    let tokensUsedToday = 0;
+    for (const r of todayRows) {
+      const tokens = Number(r.prompt_tokens ?? 0) + Number(r.completion_tokens ?? 0);
+      tokensUsedToday += tokens;
+      const keyId = String((r.metadata as any)?.api_key_id ?? "unknown");
+      const entry = tokensByKey.get(keyId) ?? { tokens: 0, requests: 0 };
+      entry.tokens += tokens;
+      entry.requests += 1;
+      tokensByKey.set(keyId, entry);
+    }
+
+    const planId = ((sub?.plan_id as string | null) ?? "free").toLowerCase();
+
     return {
       balance,
       allowance,
@@ -147,12 +180,22 @@ export const getUsageStats = createServerFn({ method: "GET" })
       daily: Array.from(dayMap.values()),
       byReason,
       ledger: rows,
-      recentExtensionKeys: (extensionKeys ?? []).map((key) => ({
-        id: key.id,
-        name: key.name,
-        keyPrefix: key.key_prefix,
-        createdAt: key.created_at,
-        revokedAt: key.revoked_at,
-      })),
+      plan: planId,
+      dailyTokenLimit: getPlanDailyTokenLimit(planId),
+      tokensUsedToday,
+      tokenRateUsdPerMillion: TOKEN_RATE_USD_PER_MILLION,
+      recentExtensionKeys: (extensionKeys ?? []).map((key) => {
+        const usage = tokensByKey.get(key.id) ?? { tokens: 0, requests: 0 };
+        return {
+          id: key.id,
+          name: key.name,
+          keyPrefix: key.key_prefix,
+          createdAt: key.created_at,
+          revokedAt: key.revoked_at,
+          tokensToday: usage.tokens,
+          requestsToday: usage.requests,
+          costTodayUsd: tokensToUsd(usage.tokens),
+        };
+      }),
     };
   });
