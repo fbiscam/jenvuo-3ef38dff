@@ -409,14 +409,14 @@ export const collections: Collection[] = [
         summary: "Only BUY / SELL signals draw from your USD wallet.",
         updatedAt: "2026-07-10",
         body: [
-          { type: "p", content: "AI chat and primary-only analysis cost $0.03 per request. A completed senior-reviewed analysis costs $0.20. Failed requests are free." },
+          { type: "p", content: "AI chat and analysis are charged only for the tokens actually processed at $3 per 1,000,000 tokens. There is no fixed per-request fee, and failed requests are free." },
 
           { type: "h2", content: "What counts as a scan" },
           { type: "ul", items: [
             "Signal analysis returning BUY or SELL — deducted from wallet at real cost.",
             "Signal returning WAIT (dead market) — free.",
-            "AI extension chat or primary-only analysis — $0.03 per completed request.",
-            "Analysis with a completed senior review — $0.20 per request.",
+            "AI extension chat or analysis — actual prompt and reply tokens at $3 per 1,000,000 tokens.",
+            "Senior review — its actual tokens are added at the same token rate, with no fixed fee.",
             "A+ broadcast alert delivered to you — free.",
           ]},
 
