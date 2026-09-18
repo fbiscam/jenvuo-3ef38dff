@@ -176,12 +176,12 @@ function ExtensionPage() {
   const onDownload = async () => {
     setDownloading(true);
     try {
-      const res = await fetch("/jenvu-extension-v1.9.12.zip", { cache: "no-store" });
+      const res = await fetch("/jenvu-extension-v1.9.13.zip", { cache: "no-store" });
       if (!res.ok) throw new Error(`Download failed: ${res.status}`);
       const blob = await res.blob();
       const a = document.createElement("a");
       a.href = URL.createObjectURL(blob);
-      a.download = "jenvu-extension-v1.9.12.zip";
+      a.download = "jenvu-extension-v1.9.13.zip";
       a.click();
       URL.revokeObjectURL(a.href);
     } catch (e) {
