@@ -259,6 +259,28 @@ function quickConversationReply(question: string): string | null {
   return null;
 }
 
+function requestsActionableAnalysis(question: string): boolean {
+  const educationalQuestion =
+    /^\s*(?:what\s+(?:is|are|does)|why\s+(?:is|does)|how\s+(?:does|do|to)|explain|define|meaning\s+of|tell\s+me\s+about)\b/i;
+  if (educationalQuestion.test(question)) return false;
+
+  const directRequest =
+    /\b(signal|setup|trade\s*plan|entry\s*(?:level|price|zone)?|stop\s*loss|take\s*profit|tp\d?|sl|buy\s*(?:or|\/)?\s*sell|long\s*(?:or|\/)?\s*short|should\s+i\s+(?:buy|sell|take\s+(?:the\s+)?trade)|where\s+is\s+liquidity|next\s+sweep)\b/i;
+  const analysisCommand =
+    /\b(analy[sz]e?|review|read|check|scan|inspect|mark)\b[\s\S]{0,60}\b(chart|screen|market|price|xau(?:\/usd)?|gold|setup|structure|liquidity|bias)\b/i;
+  const reversedAnalysisCommand =
+    /\b(chart|screen|market|price|xau(?:\/usd)?|gold|setup|structure|liquidity|bias)\b[\s\S]{0,60}\b(analy[sz]e?|review|read|check|scan|inspect|mark)\b/i;
+  const romanUrduRequest =
+    /(?:tajzia|tajziya|signal|setup|trade\s*plan|entry|sl|tp|kharid|bech|chart\s*(?:dekho|check)|market\s*(?:dekho|check))/i;
+
+  return (
+    directRequest.test(question) ||
+    analysisCommand.test(question) ||
+    reversedAnalysisCommand.test(question) ||
+    romanUrduRequest.test(question)
+  );
+}
+
 async function handle({ request }: { request: Request }) {
   const auth = await authenticateExtensionRequest(request);
   if (!auth.ok) return extJson({ ok: false, error: auth.error }, auth.status);
@@ -322,14 +344,11 @@ async function handle({ request }: { request: Request }) {
       // frame from an active screen-share session.
       const image = chartImage || screenImage;
 
-      // Conversational mode: plain questions/greetings get a normal assistant
-      // reply. Only explicit trading/analysis intent (or an attached chart)
-      // triggers the ICT/SMC desk pipeline with mandatory Claude primary review.
-      const analysisIntent =
-        /\b(analy[sz]|signal|setup|trade|entry|exit|buy|sell|long|short|bias|tp\d?|sl|stop\s*loss|target|rr|risk|chart|candle|structure|bos|choch|fvg|order\s*block|liquidity|premium|discount|support|resistance|trend|price|market|xau|gold|forex|pair|timeframe|scalp|swing|position)\b/i.test(
-          question,
-        ) || /(tajzia|tajziya|signal|kharid|bech|entry|nishan|marking)/i.test(question);
-      const conversational = !image && !analysisIntent;
+      // Trading vocabulary alone does not request a live plan. Educational and
+      // follow-up questions stay conversational unless actionable levels or a
+      // chart review are explicitly requested.
+      const analysisIntent = requestsActionableAnalysis(question);
+      const conversational = !chartImage && !analysisIntent;
 
       if (conversational) {
         const quickReply = quickConversationReply(question);

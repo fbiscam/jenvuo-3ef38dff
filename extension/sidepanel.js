@@ -53,8 +53,22 @@ const QUICKS = [
     text: "Where is liquidity resting and where should I expect the next sweep?",
   },
 ];
-const ANALYSIS_INTENT =
-  /\b(analy[sz]|signal|setup|trade|entry|exit|buy|sell|long|short|bias|tp\d?|sl|stop\s*loss|target|rr|risk|chart|candle|structure|bos|choch|fvg|order\s*block|liquidity|premium|discount|support|resistance|trend|price|market|xau|gold|forex|pair|timeframe|scalp|swing|position)\b|(?:tajzia|tajziya|signal|kharid|bech|entry|nishan|marking)/i;
+const ACTIONABLE_ANALYSIS_INTENT = [
+  /\b(signal|setup|trade\s*plan|entry\s*(?:level|price|zone)?|stop\s*loss|take\s*profit|tp\d?|sl|buy\s*(?:or|\/)?\s*sell|long\s*(?:or|\/)?\s*short|should\s+i\s+(?:buy|sell|take\s+(?:the\s+)?trade)|where\s+is\s+liquidity|next\s+sweep)\b/i,
+  /\b(analy[sz]e?|review|read|check|scan|inspect|mark)\b[\s\S]{0,60}\b(chart|screen|market|price|xau(?:\/usd)?|gold|setup|structure|liquidity|bias)\b/i,
+  /\b(chart|screen|market|price|xau(?:\/usd)?|gold|setup|structure|liquidity|bias)\b[\s\S]{0,60}\b(analy[sz]e?|review|read|check|scan|inspect|mark)\b/i,
+  /(?:tajzia|tajziya|signal|setup|trade\s*plan|entry|sl|tp|kharid|bech|chart\s*(?:dekho|check)|market\s*(?:dekho|check))/i,
+];
+
+function requestsActionableAnalysis(text) {
+  if (
+    /^\s*(?:what\s+(?:is|are|does)|why\s+(?:is|does)|how\s+(?:does|do|to)|explain|define|meaning\s+of|tell\s+me\s+about)\b/i.test(
+      text,
+    )
+  )
+    return false;
+  return ACTIONABLE_ANALYSIS_INTENT.some((pattern) => pattern.test(text));
+}
 
 const $ = (id) => document.getElementById(id);
 
@@ -1024,8 +1038,9 @@ async function send(preset, silentUser) {
   const text = (preset ?? box.value).trim();
   if (!text && !chartImage && !stream) return;
   busy = true;
-  // Mandatory Claude primary review applies only to chart/screen analysis.
-  const analysisRequest = Boolean(chartImage || stream || ANALYSIS_INTENT.test(text));
+  // A running screen share supplies context only when the user asks for live
+  // analysis. It must not turn every ordinary message into a trade plan.
+  const analysisRequest = Boolean(chartImage || requestsActionableAnalysis(text));
   setReviewStatus(
     analysisRequest ? "ICT analysis · Claude primary review…" : "Chat mode",
     analysisRequest ? "checking" : "",
@@ -1067,14 +1082,14 @@ async function send(preset, silentUser) {
     return;
   }
 
-  let shot = grabFrame();
-  if (!shot && stream) {
+  let shot = analysisRequest ? grabFrame() : null;
+  if (!shot && stream && analysisRequest) {
     for (let i = 0; i < 16 && !shot; i++) {
       await new Promise((r) => setTimeout(r, 300));
       shot = grabFrame();
     }
   }
-  if (!shot && stream) {
+  if (!shot && stream && analysisRequest) {
     busy = false;
     controller = null;
     $("send").disabled = false;
