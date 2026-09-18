@@ -20,7 +20,7 @@ export type ProductUpdate = {
 
 export const PRODUCT_UPDATES: ProductUpdate[] = [
   {
-    title: " Grok 4.6 added",
+    title: " Grok 4.6 added",
     copy: "Grok 4.6 now powers fast, high context gold chart analysis and replaces GPT Astra.",
     at: "2026-09-18T10:55:00Z",
     tag: "Model",
