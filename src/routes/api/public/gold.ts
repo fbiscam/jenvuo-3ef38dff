@@ -351,7 +351,7 @@ async function handle({ request }: { request: Request }) {
       const conversational = !chartImage && !analysisIntent;
 
       if (conversational) {
-        const quickReply = quickConversationReply(question);
+        const quickReply = image ? null : quickConversationReply(question);
         if (quickReply) {
           return extJson({
             ok: true,
@@ -362,20 +362,31 @@ async function handle({ request }: { request: Request }) {
             usage: { requestId, charged: 0, balance: entitlement.balance },
           });
         }
+        const casualUserContent = image
+          ? [
+              {
+                type: "text" as const,
+                text: `${question}\n\n(The user is sharing their screen right now. The attached screenshot is their current live screen — look at it and answer from what you actually see.)`,
+              },
+              { type: "image_url" as const, image_url: { url: image, detail: "high" as const } },
+            ]
+          : question;
         const casual = await callChatCompletion({
-          models: [...EXTENSION_MODEL_CHAIN.conversation],
+          models: [
+            ...(image ? EXTENSION_MODEL_CHAIN.vision : EXTENSION_MODEL_CHAIN.conversation),
+          ],
           stage: "extension-chat",
           maxTokens: 400,
-          timeoutMs: 8_000,
-          deadlineMs: 34_000,
+          timeoutMs: image ? 40_000 : 8_000,
+          deadlineMs: image ? 90_000 : 34_000,
           retriesPerModel: 1,
           messages: [
             {
               role: "system",
-              content: `You are Jenvu, a friendly general-purpose AI assistant that also specializes in XAU/USD ICT-SMC analysis. IDENTITY RULE (absolute): your name is Jenvu and you were built by the Jenvu team. Never call yourself any other product or assistant name, never name the underlying model, lab, vendor or provider, and never mention being a coding/IDE assistant. Reply naturally, concisely, and in the user's language (Urdu/English/Roman Urdu). Do NOT output a trade plan, verdict, bias, entry, stop or targets unless the user explicitly asks for XAU/USD market analysis. If asked what you can do, briefly mention XAU/USD chart analysis, marked levels, and ICT/SMC signals on request.\n\n${QUERY_RELEVANCE_INSTRUCTIONS}`,
+              content: `You are Jenvu, a friendly general-purpose AI assistant that also specializes in XAU/USD ICT-SMC analysis. IDENTITY RULE (absolute): your name is Jenvu and you were built by the Jenvu team. Never call yourself any other product or assistant name, never name the underlying model, lab, vendor or provider, and never mention being a coding/IDE assistant. Reply naturally, concisely, and in the user's language (Urdu/English/Roman Urdu). When a screenshot is attached, you CAN see the user's shared screen: describe or use what is visible and never claim you are unable to see their screen. Do NOT output a trade plan, verdict, bias, entry, stop or targets unless the user explicitly asks for XAU/USD market analysis. If asked what you can do, briefly mention XAU/USD chart analysis, marked levels, and ICT/SMC signals on request.\n\n${QUERY_RELEVANCE_INSTRUCTIONS}`,
             },
             ...history,
-            { role: "user", content: question },
+            { role: "user", content: casualUserContent },
           ],
         });
 
