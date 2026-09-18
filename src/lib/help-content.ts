@@ -330,13 +330,23 @@ export const collections: Collection[] = [
       {
         slug: "plans-overview",
         title: "Plan comparison",
-        summary: "Free, Pro, Elite and Ultra — wallets, scan estimates and features.",
-        updatedAt: "2026-07-10",
+        summary: "Free, Pro, Elite and Ultra — daily token limits, wallets, scan estimates and features.",
+        updatedAt: "2026-09-18",
         body: [
-          { type: "p", content: "Jenvu uses a USD-wallet subscription model. AI chat and primary-only analysis cost $0.03 per request. A completed senior-reviewed analysis costs $0.20. Failed requests are free." },
+          { type: "p", content: "Jenvu uses a USD-wallet subscription model plus a daily token allowance. AI chat and primary-only analysis cost $0.03 per request. A completed senior-reviewed analysis costs $0.20. Failed requests are free. Tokens are priced at $3 per 1,000,000 tokens and every plan's daily allowance resets at 00:00 UTC." },
+
+          { type: "h2", content: "Daily token limits" },
+          { type: "ul", items: [
+            "Free — 100,000 tokens per day.",
+            "Pro — 1,500,000 tokens per day.",
+            "Elite — 5,000,000 tokens per day.",
+            "Ultra — 10,000,000 tokens per day.",
+            "Rate: $3 per 1M tokens. Resets daily at 00:00 UTC.",
+          ]},
 
           { type: "h2", content: "Free" },
           { type: "ul", items: [
+            "100,000 tokens per day.",
             "$2 wallet per month (~5 scans).",
             "AI extension chat with starter wallet access.",
             "Full signal engine — A+ / A institutional signals.",
@@ -348,8 +358,10 @@ export const collections: Collection[] = [
 
           { type: "h2", content: "Pro — $15 / month" },
           { type: "ul", items: [
+            "1,500,000 tokens per day.",
             "$15 wallet per month (~35 scans).",
             "AI extension chat billed from the included wallet.",
+            "Personal API keys for the Jenvu API endpoint.",
             "Full XAU/USD signal engine.",
             "Realtime A+ email & push alerts (no delay).",
             "Full ICT / SMC narration, trade journal & analytics.",
@@ -358,8 +370,9 @@ export const collections: Collection[] = [
 
           { type: "h2", content: "Elite — $50 / month" },
           { type: "ul", items: [
+            "5,000,000 tokens per day.",
             "$50 wallet per month (~85 scans).",
-            "Everything in Pro.",
+            "Everything in Pro, plus senior review on analysis.",
             "Priority A+ alerts (< 30 seconds).",
             "Dedicated XAU/USD scanner with DXY overlay.",
             "API access, webhooks and custom alert rules.",
@@ -368,6 +381,7 @@ export const collections: Collection[] = [
 
           { type: "h2", content: "Ultra — $100 / month" },
           { type: "ul", items: [
+            "10,000,000 tokens per day.",
             "$100 wallet per month (~165 scans).",
             "Everything in Elite.",
             "< 10s SLA priority alerts.",
@@ -377,6 +391,7 @@ export const collections: Collection[] = [
           { type: "note", tone: "info", content: "See the Pricing page for the full feature matrix and one-time top-up packs ($1 = 3 scans, never expire)." },
         ],
       },
+
       {
         slug: "credit-costs",
         title: "How scans are counted",
