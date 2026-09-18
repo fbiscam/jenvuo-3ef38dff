@@ -301,6 +301,52 @@ function ExtensionPage() {
         </div>
       )}
 
+      {/* Public API endpoint */}
+      {view === "keys" && (
+        <div className="mt-5 rounded-xl border border-zinc-200 bg-white p-4">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <h2 className="text-[16px] font-medium text-zinc-900">API endpoint</h2>
+            <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-medium text-emerald-700">
+              OpenAI-compatible
+            </span>
+          </div>
+          <p className="mt-1 text-[12px] text-zinc-500">
+            Use your key anywhere — Claude Desktop, scripts, or any OpenAI-compatible client. Usage
+            counts against your plan&apos;s daily token limit and appears on the Usage page.
+          </p>
+          <div className="mt-3 flex items-center gap-2">
+            <code
+              className={`${MONO} min-w-0 flex-1 truncate rounded-md border border-zinc-200 bg-zinc-50 px-2.5 py-2 text-[12px] text-zinc-900`}
+            >
+              {API_BASE}/chat/completions
+            </code>
+            <button
+              type="button"
+              onClick={() => copyValue(`${API_BASE}/chat/completions`, "endpoint")}
+              className="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-2.5 py-2 text-[12px] text-zinc-700 hover:bg-zinc-50"
+            >
+              {copied === "endpoint" ? (
+                <Check className="h-3.5 w-3.5" />
+              ) : (
+                <Copy className="h-3.5 w-3.5" />
+              )}
+              Copy
+            </button>
+          </div>
+          <pre
+            className={`${MONO} mt-3 overflow-x-auto rounded-md border border-zinc-200 bg-zinc-50 p-3 text-[11.5px] leading-relaxed text-zinc-700`}
+          >{`curl ${API_BASE}/chat/completions \\
+  -H "Authorization: Bearer YOUR_JENVU_KEY" \\
+  -H "Content-Type: application/json" \\
+  -d '{"model":"jenvu-pro","messages":[{"role":"user","content":"XAU/USD bias today?"}]}'`}</pre>
+          <p className="mt-2 text-[12px] text-zinc-500">
+            Models: <span className={MONO}>jenvu-fast</span>, <span className={MONO}>jenvu-pro</span>
+            , <span className={MONO}>jenvu-vision</span>. List them at{" "}
+            <span className={MONO}>{API_BASE}/models</span>.
+          </p>
+        </div>
+      )}
+
       {/* API key list */}
       {view === "keys" && (
         <div className="mt-5">

@@ -82,6 +82,7 @@ import { Route as AuthenticatedDashboardAlertsRouteImport } from './routes/_auth
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
 import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
+import { Route as ApiPublicV1ModelsRouteImport } from './routes/api/public/v1/models'
 import { Route as ApiPublicInsightImageSplatRouteImport } from './routes/api/public/insight-image.$'
 import { Route as ApiPublicHooksSignalReversalMonitorRouteImport } from './routes/api/public/hooks/signal-reversal-monitor'
 import { Route as ApiPublicHooksScanSignalsRouteImport } from './routes/api/public/hooks/scan-signals'
@@ -106,6 +107,7 @@ import { Route as AuthenticatedDashboardAdminDocumentsRouteImport } from './rout
 import { Route as AuthenticatedDashboardAdminBugsRouteImport } from './routes/_authenticated/dashboard.admin.bugs'
 import { Route as AuthenticatedDashboardAdminAutoScanRouteImport } from './routes/_authenticated/dashboard.admin.auto-scan'
 import { Route as AuthenticatedDashboardAdminAccuracyRouteImport } from './routes/_authenticated/dashboard.admin.accuracy'
+import { Route as ApiPublicV1ChatCompletionsRouteImport } from './routes/api/public/v1/chat/completions'
 
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
@@ -487,6 +489,11 @@ const LovableEmailAuthPreviewRoute = LovableEmailAuthPreviewRouteImport.update({
   path: '/lovable/email/auth/preview',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicV1ModelsRoute = ApiPublicV1ModelsRouteImport.update({
+  id: '/api/public/v1/models',
+  path: '/api/public/v1/models',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicInsightImageSplatRoute =
   ApiPublicInsightImageSplatRouteImport.update({
     id: '/api/public/insight-image/$',
@@ -630,6 +637,12 @@ const AuthenticatedDashboardAdminAccuracyRoute =
     path: '/admin/accuracy',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
+const ApiPublicV1ChatCompletionsRoute =
+  ApiPublicV1ChatCompletionsRouteImport.update({
+    id: '/api/public/v1/chat/completions',
+    path: '/api/public/v1/chat/completions',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -725,9 +738,11 @@ export interface FileRoutesByFullPath {
   '/api/public/hooks/scan-signals': typeof ApiPublicHooksScanSignalsRoute
   '/api/public/hooks/signal-reversal-monitor': typeof ApiPublicHooksSignalReversalMonitorRoute
   '/api/public/insight-image/$': typeof ApiPublicInsightImageSplatRoute
+  '/api/public/v1/models': typeof ApiPublicV1ModelsRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
+  '/api/public/v1/chat/completions': typeof ApiPublicV1ChatCompletionsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -818,9 +833,11 @@ export interface FileRoutesByTo {
   '/api/public/hooks/scan-signals': typeof ApiPublicHooksScanSignalsRoute
   '/api/public/hooks/signal-reversal-monitor': typeof ApiPublicHooksSignalReversalMonitorRoute
   '/api/public/insight-image/$': typeof ApiPublicInsightImageSplatRoute
+  '/api/public/v1/models': typeof ApiPublicV1ModelsRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
+  '/api/public/v1/chat/completions': typeof ApiPublicV1ChatCompletionsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -918,9 +935,11 @@ export interface FileRoutesById {
   '/api/public/hooks/scan-signals': typeof ApiPublicHooksScanSignalsRoute
   '/api/public/hooks/signal-reversal-monitor': typeof ApiPublicHooksSignalReversalMonitorRoute
   '/api/public/insight-image/$': typeof ApiPublicInsightImageSplatRoute
+  '/api/public/v1/models': typeof ApiPublicV1ModelsRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
+  '/api/public/v1/chat/completions': typeof ApiPublicV1ChatCompletionsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -1018,9 +1037,11 @@ export interface FileRouteTypes {
     | '/api/public/hooks/scan-signals'
     | '/api/public/hooks/signal-reversal-monitor'
     | '/api/public/insight-image/$'
+    | '/api/public/v1/models'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/transactional/preview'
+    | '/api/public/v1/chat/completions'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -1111,9 +1132,11 @@ export interface FileRouteTypes {
     | '/api/public/hooks/scan-signals'
     | '/api/public/hooks/signal-reversal-monitor'
     | '/api/public/insight-image/$'
+    | '/api/public/v1/models'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/transactional/preview'
+    | '/api/public/v1/chat/completions'
   id:
     | '__root__'
     | '/'
@@ -1210,9 +1233,11 @@ export interface FileRouteTypes {
     | '/api/public/hooks/scan-signals'
     | '/api/public/hooks/signal-reversal-monitor'
     | '/api/public/insight-image/$'
+    | '/api/public/v1/models'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/transactional/preview'
+    | '/api/public/v1/chat/completions'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -1265,9 +1290,11 @@ export interface RootRouteChildren {
   ApiPublicHooksScanSignalsRoute: typeof ApiPublicHooksScanSignalsRoute
   ApiPublicHooksSignalReversalMonitorRoute: typeof ApiPublicHooksSignalReversalMonitorRoute
   ApiPublicInsightImageSplatRoute: typeof ApiPublicInsightImageSplatRoute
+  ApiPublicV1ModelsRoute: typeof ApiPublicV1ModelsRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
   LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
   LovableEmailTransactionalPreviewRoute: typeof LovableEmailTransactionalPreviewRoute
+  ApiPublicV1ChatCompletionsRoute: typeof ApiPublicV1ChatCompletionsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -1783,6 +1810,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LovableEmailAuthPreviewRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/v1/models': {
+      id: '/api/public/v1/models'
+      path: '/api/public/v1/models'
+      fullPath: '/api/public/v1/models'
+      preLoaderRoute: typeof ApiPublicV1ModelsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/insight-image/$': {
       id: '/api/public/insight-image/$'
       path: '/api/public/insight-image/$'
@@ -1950,6 +1984,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/dashboard/admin/accuracy'
       preLoaderRoute: typeof AuthenticatedDashboardAdminAccuracyRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
+    }
+    '/api/public/v1/chat/completions': {
+      id: '/api/public/v1/chat/completions'
+      path: '/api/public/v1/chat/completions'
+      fullPath: '/api/public/v1/chat/completions'
+      preLoaderRoute: typeof ApiPublicV1ChatCompletionsRouteImport
+      parentRoute: typeof rootRouteImport
     }
   }
 }
@@ -2166,9 +2207,11 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicHooksSignalReversalMonitorRoute:
     ApiPublicHooksSignalReversalMonitorRoute,
   ApiPublicInsightImageSplatRoute: ApiPublicInsightImageSplatRoute,
+  ApiPublicV1ModelsRoute: ApiPublicV1ModelsRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
   LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,
   LovableEmailTransactionalPreviewRoute: LovableEmailTransactionalPreviewRoute,
+  ApiPublicV1ChatCompletionsRoute: ApiPublicV1ChatCompletionsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
