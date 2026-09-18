@@ -277,27 +277,9 @@ $("historyClose").onclick = () => $("historyPanel").classList.add("hidden");
 
 function renderQuick() {
   const c = $("quick");
+  if (!c) return;
   c.innerHTML = "";
-  const head = document.createElement("div");
-  head.className = "quick-head";
-  head.textContent = "Get started";
-  c.appendChild(head);
-  const grid = document.createElement("div");
-  grid.className = "quick-grid";
-  QUICKS.forEach((q) => {
-    const b = document.createElement("button");
-    b.className = "quick-card";
-    const title = document.createElement("span");
-    title.className = "qc-title";
-    title.textContent = q.label;
-    const desc = document.createElement("span");
-    desc.className = "qc-desc";
-    desc.textContent = q.desc || "";
-    b.append(title, desc);
-    b.onclick = () => send(q.text);
-    grid.appendChild(b);
-  });
-  c.appendChild(grid);
+  c.classList.add("hidden");
 }
 
 function emptyState() {
