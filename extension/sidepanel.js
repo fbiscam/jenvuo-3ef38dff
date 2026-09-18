@@ -1121,7 +1121,7 @@ async function send(preset, silentUser) {
   busy = true;
   // A running screen share supplies context only when the user asks for live
   // analysis. It must not turn every ordinary message into a trade plan.
-  const analysisRequest = Boolean(chartImage || requestsActionableAnalysis(text));
+  const analysisRequest = requestsActionableAnalysis(text);
   setReviewStatus(
     analysisRequest ? "ICT analysis · Claude primary review…" : "Chat mode",
     analysisRequest ? "checking" : "",
