@@ -335,7 +335,7 @@ function requestsActionableAnalysis(question: string): boolean {
   const reversedAnalysisCommand =
     /\b(chart|screen|market|price|xau(?:\/usd)?|gold|setup|structure|liquidity|bias)\b[\s\S]{0,60}\b(analy[sz]e?|review|read|check|scan|inspect|mark)\b/i;
   const romanUrduRequest =
-    /(?:tajzia|tajziya|signal|setup|trade\s*plan|entry|sl|tp|kharid|bech|chart\s*(?:dekho|check)|market\s*(?:dekho|check))/i;
+    /\b(?:tajzia|tajziya|signal|setup|trade\s*plan|entry|sl|tp\d?|kharid|bech|chart\s*(?:dekho|check|dikhao)|market\s*(?:dekho|check))\b/i;
 
   return (
     directRequest.test(question) ||
