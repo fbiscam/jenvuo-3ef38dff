@@ -24,6 +24,9 @@ export type RecentExtensionKey = {
   keyPrefix: string;
   createdAt: string;
   revokedAt: string | null;
+  tokensToday: number;
+  requestsToday: number;
+  costTodayUsd: number;
 };
 
 export type UsageStats = {
