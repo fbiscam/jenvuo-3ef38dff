@@ -96,3 +96,4 @@
 - [x] Tighten normal-chat intent routing and block trade-plan leakage from conversational replies
 - [x] Require fresh live quotes, validated reviews, 75% confluence, and four confirmations for executable signals
 - [x] Replace stale fixed-request pricing copy and release extension v1.9.16
+- [x] Add calibrated next-15m-candle forecasting, live candle countdown, and release extension v1.9.17

@@ -206,6 +206,12 @@ h1 {
 .hchange.bear {
   color: var(--bear);
 }
+.candle-clock {
+  margin-top: 7px;
+  color: var(--muted);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
 
 button {
   cursor: pointer;
