@@ -61,6 +61,15 @@ function fmtUsd(n: number, decimals = 4) {
   return `$${n.toFixed(d)}`;
 }
 
+function fmtSpend(n: number) {
+  if (!Number.isFinite(n) || n === 0) return "$0.00";
+  const abs = Math.abs(n);
+  if (abs >= 1) return `$${n.toFixed(2)}`;
+  if (abs >= 0.01) return `$${n.toFixed(3)}`;
+  if (abs >= 0.0001) return `$${n.toFixed(5)}`;
+  return `<$0.0001`;
+}
+
 function fmtInt(n: number) {
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
   if (n >= 1_000) return `${(n / 1_000).toFixed(1)}k`;
@@ -766,7 +775,9 @@ function ModelBreakdown({ rows }: { rows: { model?: string | null; prompt_tokens
     const cur = byModel.get(key) ?? { requests: 0, tokens: 0, cost: 0, trend: [] };
     cur.requests += 1;
     cur.tokens += (r.prompt_tokens ?? 0) + (r.completion_tokens ?? 0);
-    const cost = r.raw_cost_usd != null ? Number(r.raw_cost_usd) : Math.abs(r.delta);
+    const charged = Math.abs(Number(r.delta) || 0);
+    const raw = r.raw_cost_usd != null ? Math.abs(Number(r.raw_cost_usd)) : 0;
+    const cost = charged > 0 ? charged : raw;
     cur.cost += cost;
     cur.trend.push({ date: r.created_at ?? "", cost });
     byModel.set(key, cur);
@@ -787,7 +798,7 @@ function ModelBreakdown({ rows }: { rows: { model?: string | null; prompt_tokens
             <div className="grid grid-cols-3 items-center gap-2 tabular-nums text-[11px] text-zinc-500 sm:flex sm:shrink-0 sm:gap-4 sm:text-[12px]">
               <span>{fmtInt(s.requests)} requests</span>
               <span>{fmtInt(s.tokens)} tokens</span>
-              <span className="font-semibold text-zinc-800">{fmtUsd(s.cost, 2)}</span>
+              <span className="font-semibold text-zinc-800">{fmtSpend(s.cost)}</span>
             </div>
           </div>
         </div>
@@ -867,7 +878,7 @@ function TypeBreakdown({ rows }: { rows: { reason: string; delta: number; create
         <div key={name}>
           <div className="flex items-center justify-between text-[12px]">
             <span className="font-medium text-zinc-700">{name}</span>
-            <span className="tabular-nums text-zinc-500">{fmtInt(s.count)} · {fmtUsd(s.cost, 2)}</span>
+            <span className="tabular-nums text-zinc-500">{fmtInt(s.count)} · {fmtSpend(s.cost)}</span>
           </div>
           <div className="mt-1 h-1.5 w-full rounded-full bg-zinc-100">
             <div className="h-full rounded-full bg-zinc-800" style={{ width: `${(s.cost / max) * 100}%` }} />
