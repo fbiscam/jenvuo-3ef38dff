@@ -60,8 +60,49 @@ function validateSignalReview(content: string): true | string {
   return true;
 }
 
-function compactSignalAnswer(raw: string, desk: ReturnType<typeof runExtensionDesk>): string {
-  const verdictMatch = /^\s*VERDICT:\s*(BUY|SELL|WAIT)\b/im.exec(raw);
+// Hard safety gate applied after the AI review: a structurally "valid" idea is
+// still wrong if the quote is stale or price has already run past the plan.
+function invalidateStalePlan(
+  desk: ReturnType<typeof runExtensionDesk>,
+  guard: { livePrice: number; quoteAgeMs: number },
+): string | null {
+  if (!Number.isFinite(guard.livePrice) || guard.livePrice <= 0) {
+    return "Live XAU/USD price could not be verified, so no trade is issued.";
+  }
+  if (guard.quoteAgeMs > 180_000) {
+    return "Live price feed is stale, so this setup cannot be validated right now.";
+  }
+  const { entry, sl, tp1, tp } = desk.trade as {
+    entry: number;
+    sl: number;
+    tp1?: number;
+    tp: number;
+  };
+  const target = tp1 ?? tp;
+  if (![entry, sl, target].every((n) => Number.isFinite(n) && n > 0)) {
+    return "Engine levels are incomplete, so no trade is issued.";
+  }
+  const drift = Math.abs(guard.livePrice - entry) / guard.livePrice;
+  if (drift > 0.006) {
+    return "Price has moved too far from the planned entry, so the setup is no longer valid.";
+  }
+  const isBuy = desk.direction === "BUY";
+  const stopHit = isBuy ? guard.livePrice <= sl : guard.livePrice >= sl;
+  const targetHit = isBuy ? guard.livePrice >= target : guard.livePrice <= target;
+  if (stopHit) return "Price already trades beyond the stop level, so the setup is invalidated.";
+  if (targetHit) return "Price already reached the first target, so the entry is no longer valid.";
+  return null;
+}
+
+function compactSignalAnswer(
+  raw: string,
+  desk: ReturnType<typeof runExtensionDesk>,
+  guard?: { livePrice: number; quoteAgeMs: number },
+): string {
+  const staleReason = guard ? invalidateStalePlan(desk, guard) : null;
+  const verdictMatch = staleReason
+    ? null
+    : /^\s*VERDICT:\s*(BUY|SELL|WAIT)\b/im.exec(raw);
   const statusMatch = /^\s*STATUS:\s*(CONFIRMED|CONDITIONAL|NO TRADE)\b/im.exec(raw);
   const whyMatch = /^\s*WHY:\s*(.+)$/im.exec(raw);
   const theoryMatch = /^\s*THEORY:\s*([\s\S]+?)(?=\n\s*[A-Z]{3,}:|\s*$)/im.exec(raw);
