@@ -78,7 +78,7 @@ export const getUsageStats = createServerFn({ method: "GET" })
         .select("id, name, key_prefix, created_at, revoked_at")
         .eq("user_id", userId)
         .order("created_at", { ascending: false })
-        .limit(4),
+        .limit(12),
     ]);
 
     // Allowance mirrors the plan wallet when the balance row has none set,
