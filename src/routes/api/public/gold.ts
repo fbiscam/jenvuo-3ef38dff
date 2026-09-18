@@ -31,7 +31,7 @@ type Body = {
 
 const TF = new Set(["15m", "1h", "4h", "1d"]);
 
-const EXTENSION_SIGNAL_OUTPUT_CONTRACT = `Analyze every supplied ICT/SMC factor internally, but expose only this compact trader-facing format. Do not add headings, education, market commentary, disclaimers, confidence, grade, RR, model names, or extra paragraphs.
+const EXTENSION_SIGNAL_OUTPUT_CONTRACT = `Analyze every supplied ICT/SMC factor internally, but expose only this compact trader-facing format. Do not add headings, disclaimers, confidence, grade, RR, model names, or extra paragraphs.
 
 VERDICT: BUY | SELL | WAIT
 STATUS: CONFIRMED | CONDITIONAL | NO TRADE
@@ -40,13 +40,21 @@ SL: exact supplied stop, or —
 TP1: exact supplied TP1, or —
 TP2: exact supplied TP2, or —
 WHY: one sentence, maximum 22 words, naming the two strongest verified ICT/SMC reasons or the decisive veto.
+THEORY: two short sentences, maximum 45 words total, plainly explaining the current market story (HTF bias, liquidity taken, structure shift, POI being used, invalidation) in trader language.
+ANSWER: one short sentence directly answering the user's actual question. Omit this line if the user asked nothing specific.
 
 CONFIRMED means take the listed setup. CONDITIONAL means do not enter yet; wait for the named trigger. WAIT always means NO TRADE. Never invent or adjust a price.`;
+
+function clampWords(text: string, max: number): string {
+  return text.replace(/\s+/g, " ").trim().split(/\s+/).slice(0, max).join(" ");
+}
 
 function compactSignalAnswer(raw: string, desk: ReturnType<typeof runExtensionDesk>): string {
   const verdictMatch = /^\s*VERDICT:\s*(BUY|SELL|WAIT)\b/im.exec(raw);
   const statusMatch = /^\s*STATUS:\s*(CONFIRMED|CONDITIONAL|NO TRADE)\b/im.exec(raw);
   const whyMatch = /^\s*WHY:\s*(.+)$/im.exec(raw);
+  const theoryMatch = /^\s*THEORY:\s*([\s\S]+?)(?=\n\s*[A-Z]{3,}:|\s*$)/im.exec(raw);
+  const answerMatch = /^\s*ANSWER:\s*(.+)$/im.exec(raw);
   const reviewedVerdict = verdictMatch?.[1];
   const verdict =
     reviewedVerdict === "WAIT" || reviewedVerdict === desk.direction ? reviewedVerdict : "WAIT";
@@ -66,17 +74,18 @@ function compactSignalAnswer(raw: string, desk: ReturnType<typeof runExtensionDe
     verdict === "WAIT"
       ? (desk.senior.reasons[0] ?? "No valid setup has enough verified ICT/SMC confluence.")
       : `${desk.bias} structure and verified liquidity evidence support the setup at the listed entry.`;
-  const why = (whyMatch?.[1] ?? fallbackWhy)
-    .replace(/\s+/g, " ")
-    .trim()
-    .split(/\s+/)
-    .slice(0, 22)
-    .join(" ");
+  const why = clampWords(whyMatch?.[1] ?? fallbackWhy, 22);
+  const fallbackTheory =
+    verdict === "WAIT"
+      ? `Higher-timeframe bias is ${desk.bias.toLowerCase()} but price has not delivered a clean sweep and structure shift. Stand aside until liquidity is taken and a valid POI forms.`
+      : `Higher-timeframe bias is ${desk.bias.toLowerCase()} after liquidity was taken and structure shifted. Price is reacting from the marked POI, and the idea fails if the stop level trades through.`;
+  const theory = clampWords(theoryMatch?.[1] ?? fallbackTheory, 45);
+  const answer = answerMatch?.[1] ? clampWords(answerMatch[1], 30) : "";
+
+  const tail = [`WHY: ${why}`, `THEORY: ${theory}`, ...(answer ? [`ANSWER: ${answer}`] : [])];
 
   if (verdict === "WAIT") {
-    return [`DECISION: ${takeTrade}`, "ENTRY: —", "SL: —", "TP1: —", "TP2: —", `WHY: ${why}`].join(
-      "\n",
-    );
+    return [`DECISION: ${takeTrade}`, "ENTRY: —", "SL: —", "TP1: —", "TP2: —", ...tail].join("\n");
   }
 
   return [
@@ -86,7 +95,7 @@ function compactSignalAnswer(raw: string, desk: ReturnType<typeof runExtensionDe
     `SL: ${desk.trade.sl.toFixed(2)}`,
     `TP1: ${(desk.trade.tp1 ?? desk.trade.tp).toFixed(2)}`,
     `TP2: ${(desk.trade.tp2 ?? desk.trade.tp).toFixed(2)}`,
-    `WHY: ${why}`,
+    ...tail,
   ].join("\n");
 }
 
@@ -417,7 +426,7 @@ async function handle({ request }: { request: Request }) {
         const primary = await callChatCompletion({
           models: [...(image ? EXTENSION_MODEL_CHAIN.vision : EXTENSION_MODEL_CHAIN.reasoning)],
           stage: "extension-primary-review",
-          maxTokens: 350,
+          maxTokens: 550,
           timeoutMs: 55_000,
           deadlineMs: 120_000,
           retriesPerModel: 1,
@@ -476,7 +485,7 @@ async function handle({ request }: { request: Request }) {
           const senior = await callChatCompletion({
             models: [...EXTENSION_MODEL_CHAIN.seniorReview],
             stage: "extension-senior-review",
-            maxTokens: 300,
+            maxTokens: 500,
             timeoutMs: 45_000,
             deadlineMs: 90_000,
             retriesPerModel: 1,
