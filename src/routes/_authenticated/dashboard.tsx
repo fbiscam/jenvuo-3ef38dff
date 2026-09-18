@@ -1571,7 +1571,7 @@ function ModelWorkspace() {
         </div>
 
         <aside className="min-w-0">
-          <h2 className="mb-4 pl-[58px] text-2xl font-normal text-foreground">Latest updates</h2>
+          <h2 className="mb-4 pl-[58px] text-2xl font-normal text-foreground">         Latest updates</h2>
           <div className="divide-y divide-border">
             {getLatestProductUpdates().map((update) => {
               const UpdateIcon = UPDATE_ICONS[update.icon];
