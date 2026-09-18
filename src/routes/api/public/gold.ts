@@ -528,8 +528,11 @@ async function handle({ request }: { request: Request }) {
       let seniorUsage = { promptTokens: 0, completionTokens: 0 };
       if (entitlement.seniorReview) {
         try {
+          const seniorModels = EXTENSION_MODEL_CHAIN.seniorReview.filter(
+            (model) => model !== primaryModel,
+          );
           const senior = await callChatCompletion({
-            models: [...EXTENSION_MODEL_CHAIN.seniorReview],
+            models: seniorModels.length > 0 ? seniorModels : [...EXTENSION_MODEL_CHAIN.seniorReview],
             stage: "extension-senior-review",
             maxTokens: 500,
             timeoutMs: 45_000,
@@ -576,7 +579,19 @@ async function handle({ request }: { request: Request }) {
         }
       }
       const secondReview = seniorReview;
-      analysisText = compactSignalAnswer(analysisText, desk);
+      analysisText =
+        entitlement.seniorReview && seniorReview.status === "unavailable"
+          ? [
+              "VERDICT: WAIT",
+              "STATUS: NO TRADE",
+              "ENTRY: —",
+              "SL: —",
+              "TP1: —",
+              "TP2: —",
+              "WHY: Senior review was unavailable, so this setup remains unconfirmed.",
+              "THEORY: The primary ICT/SMC review completed, but the required independent risk check did not. Do not take this trade until review succeeds.",
+            ].join("\n")
+          : compactSignalAnswer(analysisText, desk);
 
       const { chargeExtensionUsage } = await import("@/lib/extension-billing.server");
       const billing = await chargeExtensionUsage({

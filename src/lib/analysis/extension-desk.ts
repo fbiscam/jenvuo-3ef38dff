@@ -187,8 +187,10 @@ export function runExtensionDesk(input: DeskInput): DeskResult {
   if (!regime.favorable)
     reviewWarnings.push(regime.warning ?? `${regime.regime} conditions reduce execution quality`);
   if (scored.score < 65)
+    hardVetoReasons.push(`Weighted confluence is only ${scored.score}%, below the 65% execution floor.`);
+  else if (scored.score < 75)
     reviewWarnings.push(
-      `Weighted confluence is ${scored.score}%; reduced size or trigger confirmation is required.`,
+      `Weighted confluence is ${scored.score}%; trigger confirmation is required before execution.`,
     );
 
   const reviewReasons = [...hardVetoReasons, ...reviewWarnings];
