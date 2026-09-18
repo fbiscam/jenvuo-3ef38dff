@@ -854,12 +854,6 @@ function resetVideoEl() {
   } catch {
     /* ignore */
   }
-  try {
-    video.removeAttribute("src");
-    video.load();
-  } catch {
-    /* ignore */
-  }
   return video;
 }
 
