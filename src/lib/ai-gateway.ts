@@ -793,8 +793,15 @@ export async function callChatCompletion(
   const healthy = configured.filter((m) => !isModelUnhealthy(m));
   const models = healthy.length ? healthy : configured;
 
+  // Wall-clock budget for the whole chain walk, so a stalled provider cannot
+  // consume the caller's entire request.
+  const startedAt = Date.now();
+  const chainDeadline = Math.max(10_000, opts.deadlineMs ?? 180_000);
+  const remaining = () => chainDeadline - (Date.now() - startedAt);
+
   let lastErr: AiGatewayError | null = null;
   let attemptedModels = 0;
+
 
   for (let mi = 0; mi < models.length; mi++) {
     const model = models[mi];
