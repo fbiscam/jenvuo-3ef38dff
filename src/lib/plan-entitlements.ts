@@ -27,7 +27,7 @@ export const TOKEN_RATE_USD_PER_MILLION = 3
 
 /** Daily token allowance per plan (prompt + completion tokens combined). */
 export const PLAN_DAILY_TOKEN_LIMITS: Record<string, number> = {
-  free: 0,
+  free: 100_000,
   pro: 1_500_000,
   elite: 5_000_000,
   ultra: 10_000_000,
