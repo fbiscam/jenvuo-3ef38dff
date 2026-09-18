@@ -61,6 +61,11 @@ function validateSignalReview(content: string): true | string {
 }
 
 function sanitizeConversationalAnswer(content: string): string {
+  const structuredLabels = content.match(
+    /^\s*(?:DECISION|VERDICT|STATUS|DIRECTION|ENTRY|SL|STOP(?:\s+LOSS)?|TP\d*|TAKE\s+PROFIT|RR|CONFIDENCE)\s*:/gim,
+  );
+  if ((structuredLabels?.length ?? 0) < 2) return content.trim();
+
   const withoutPlan = content
     .split("\n")
     .filter(
