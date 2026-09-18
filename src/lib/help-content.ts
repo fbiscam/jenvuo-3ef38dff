@@ -345,6 +345,16 @@ export const collections: Collection[] = [
             "The amount available today is the lower of your plan ceiling and your balance-based quota.",
           ]},
 
+          { type: "h2", content: "Credits from top-ups and promo codes" },
+          { type: "ul", items: [
+            "Promo-code credit lands in the same wallet as a paid top-up, so it follows exactly the same rule.",
+            "Every complete $3 of balance unlocks another 1,000,000 tokens of daily usage.",
+            "Balances under $3 scale proportionally — $1 is roughly 333,000 tokens.",
+            "Your plan ceiling still applies, so extra balance cannot push you past the plan's daily maximum.",
+            "The same rule applies on every plan, including Free, and on accounts with an active subscription.",
+          ]},
+
+
           { type: "h2", content: "Free" },
           { type: "ul", items: [
             "100,000 tokens per day.",
@@ -424,6 +434,7 @@ export const collections: Collection[] = [
             "Your current wallet balance sets the available amount at $3 per 1,000,000 tokens, up to the plan ceiling.",
             "For example, a $5 balance provides one complete 1M-token block; below $3, the allowance scales down proportionally, so $1 provides about 333K tokens.",
             "Top-ups update the available limit automatically, while spending that reduces your balance can also reduce it.",
+            "Credit added with a promo code counts exactly like a paid top-up — same $3 = 1M rule, same plan ceiling.",
             "The allowance resets at 00:00 UTC every day.",
             "Once the daily allowance is used up, requests are refused until the reset.",
           ]},
@@ -458,7 +469,7 @@ export const collections: Collection[] = [
             "All keys on your account share one daily token allowance capped by the plan (Free 100K, Pro 1.5M, Elite 5M, Ultra 10M).",
             "The available limit is calculated from the current wallet at $3 per 1,000,000 tokens, without exceeding the plan ceiling.",
             "A $5 balance provides one complete 1M-token block. If the balance falls below $3, the quota scales proportionally; $1 provides about 333K tokens.",
-            "Top-ups and usage automatically update this number across the dashboard and Usage page.",
+            "Top-ups, promo-code credit and usage automatically update this number across the dashboard and Usage page.",
             "Requests over the daily limit are rejected with a rate-limit error explaining when it resets.",
             "If your wallet balance reaches zero, requests are rejected until you top up or renew.",
           ]},
