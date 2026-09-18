@@ -60,8 +60,49 @@ function validateSignalReview(content: string): true | string {
   return true;
 }
 
-function compactSignalAnswer(raw: string, desk: ReturnType<typeof runExtensionDesk>): string {
-  const verdictMatch = /^\s*VERDICT:\s*(BUY|SELL|WAIT)\b/im.exec(raw);
+// Hard safety gate applied after the AI review: a structurally "valid" idea is
+// still wrong if the quote is stale or price has already run past the plan.
+function invalidateStalePlan(
+  desk: ReturnType<typeof runExtensionDesk>,
+  guard: { livePrice: number; quoteAgeMs: number },
+): string | null {
+  if (!Number.isFinite(guard.livePrice) || guard.livePrice <= 0) {
+    return "Live XAU/USD price could not be verified, so no trade is issued.";
+  }
+  if (guard.quoteAgeMs > 180_000) {
+    return "Live price feed is stale, so this setup cannot be validated right now.";
+  }
+  const { entry, sl, tp1, tp } = desk.trade as {
+    entry: number;
+    sl: number;
+    tp1?: number;
+    tp: number;
+  };
+  const target = tp1 ?? tp;
+  if (![entry, sl, target].every((n) => Number.isFinite(n) && n > 0)) {
+    return "Engine levels are incomplete, so no trade is issued.";
+  }
+  const drift = Math.abs(guard.livePrice - entry) / guard.livePrice;
+  if (drift > 0.006) {
+    return "Price has moved too far from the planned entry, so the setup is no longer valid.";
+  }
+  const isBuy = desk.direction === "BUY";
+  const stopHit = isBuy ? guard.livePrice <= sl : guard.livePrice >= sl;
+  const targetHit = isBuy ? guard.livePrice >= target : guard.livePrice <= target;
+  if (stopHit) return "Price already trades beyond the stop level, so the setup is invalidated.";
+  if (targetHit) return "Price already reached the first target, so the entry is no longer valid.";
+  return null;
+}
+
+function compactSignalAnswer(
+  raw: string,
+  desk: ReturnType<typeof runExtensionDesk>,
+  guard?: { livePrice: number; quoteAgeMs: number },
+): string {
+  const staleReason = guard ? invalidateStalePlan(desk, guard) : null;
+  const verdictMatch = staleReason
+    ? null
+    : /^\s*VERDICT:\s*(BUY|SELL|WAIT)\b/im.exec(raw);
   const statusMatch = /^\s*STATUS:\s*(CONFIRMED|CONDITIONAL|NO TRADE)\b/im.exec(raw);
   const whyMatch = /^\s*WHY:\s*(.+)$/im.exec(raw);
   const theoryMatch = /^\s*THEORY:\s*([\s\S]+?)(?=\n\s*[A-Z]{3,}:|\s*$)/im.exec(raw);
@@ -85,12 +126,17 @@ function compactSignalAnswer(raw: string, desk: ReturnType<typeof runExtensionDe
     verdict === "WAIT"
       ? (desk.senior.reasons[0] ?? "No valid setup has enough verified ICT/SMC confluence.")
       : `${desk.bias} structure and verified liquidity evidence support the setup at the listed entry.`;
-  const why = clampWords(whyMatch?.[1] ?? fallbackWhy, 22);
+  const why = clampWords(staleReason ?? whyMatch?.[1] ?? fallbackWhy, 22);
   const fallbackTheory =
     verdict === "WAIT"
       ? `Higher-timeframe bias is ${desk.bias.toLowerCase()} but price has not delivered a clean sweep and structure shift. Stand aside until liquidity is taken and a valid POI forms.`
       : `Higher-timeframe bias is ${desk.bias.toLowerCase()} after liquidity was taken and structure shifted. Price is reacting from the marked POI, and the idea fails if the stop level trades through.`;
-  const theory = clampWords(theoryMatch?.[1] ?? fallbackTheory, 45);
+  const theory = clampWords(
+    staleReason
+      ? "A live-price safety check rejected this plan before it reached you. Entering after the level is gone turns a valid idea into a losing chase; wait for the next clean setup."
+      : (theoryMatch?.[1] ?? fallbackTheory),
+    45,
+  );
   const answer = answerMatch?.[1] ? clampWords(answerMatch[1], 30) : "";
 
   const tail = [`WHY: ${why}`, `THEORY: ${theory}`, ...(answer ? [`ANSWER: ${answer}`] : [])];
@@ -289,7 +335,7 @@ function requestsActionableAnalysis(question: string): boolean {
   const reversedAnalysisCommand =
     /\b(chart|screen|market|price|xau(?:\/usd)?|gold|setup|structure|liquidity|bias)\b[\s\S]{0,60}\b(analy[sz]e?|review|read|check|scan|inspect|mark)\b/i;
   const romanUrduRequest =
-    /(?:tajzia|tajziya|signal|setup|trade\s*plan|entry|sl|tp|kharid|bech|chart\s*(?:dekho|check)|market\s*(?:dekho|check))/i;
+    /\b(?:tajzia|tajziya|signal|setup|trade\s*plan|entry|sl|tp\d?|kharid|bech|chart\s*(?:dekho|check|dikhao)|market\s*(?:dekho|check))\b/i;
 
   return (
     directRequest.test(question) ||
@@ -597,7 +643,10 @@ async function handle({ request }: { request: Request }) {
               "WHY: Senior review was unavailable, so this setup remains unconfirmed.",
               "THEORY: The primary ICT/SMC review completed, but the required independent risk check did not. Do not take this trade until review succeeds.",
             ].join("\n")
-          : compactSignalAnswer(analysisText, desk);
+          : compactSignalAnswer(analysisText, desk, {
+              livePrice: market.ticker.price,
+              quoteAgeMs: market.freshness.quoteAgeMs,
+            });
 
       const { chargeExtensionUsage } = await import("@/lib/extension-billing.server");
       const billing = await chargeExtensionUsage({
