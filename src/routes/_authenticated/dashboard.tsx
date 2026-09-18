@@ -1477,7 +1477,7 @@ const RECOMMENDED_MODELS = [
   {
     name: " Grok 4.6",
     badge: "New",
-    description: "Fast, high context reasoning for demanding gold chart analysis.",
+    description: "Fast, high context reasoning for  gold analysis.",
     logo: null,
     logoImage: grokModelLogo,
     logoLabel: "",
