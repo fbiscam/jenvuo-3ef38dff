@@ -26,7 +26,7 @@ import { listExtensionKeys } from "@/lib/extension-keys.functions";
 import { Button } from "@/components/ui/button";
 import astraGalaxyBanner from "@/assets/astra-galaxy-banner.jpg";
 import astraParticleCardBackground from "@/assets/astra-particle-card-bg.jpg";
-import astraModelLogoAsset from "@/assets/astra-model-logo.png.asset.json";
+import grokModelLogoAsset from "@/assets/grok-logo.png.asset.json";
 import solLogoAsset from "@/assets/sol-logo.png.asset.json";
 
 
