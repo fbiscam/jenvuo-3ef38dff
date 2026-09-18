@@ -146,11 +146,20 @@ export const Route = createFileRoute("/api/public/v1/chat/completions")({
             calls: [{ model: result.model, usage: result.usage, stage: "public-api-chat" }],
           }).catch(() => null);
 
+          if (body?.stream === true) {
+            return sseStream({
+              id: requestId,
+              model: modelId,
+              content: result.content,
+              usage: result.usage,
+            });
+          }
+
           return extJson({
             id: requestId,
             object: "chat.completion",
             created: Math.floor(Date.now() / 1000),
-            model: result.model,
+            model: modelId,
             choices: [
               {
                 index: 0,
