@@ -1,10 +1,11 @@
 import { estimateCostUsd, logAiCost } from '@/lib/ai-cost-log.server'
-import { getEffectiveDailyTokenLimit, getPlanCapabilities } from '@/lib/plan-entitlements'
+import { getEffectiveDailyTokenLimit, getPlanCapabilities, tokensToUsd } from '@/lib/plan-entitlements'
 
 export const EXTENSION_BASE_FEE_USD = 0
 export const EXTENSION_TOKEN_PRICE_MULTIPLIER = 0.5
-export const EXTENSION_PRIMARY_REQUEST_FEE_USD = 0.03
-export const EXTENSION_SENIOR_REVIEW_FEE_USD = 0.2
+/** Legacy fixed fees — kept for historical ledger rows only. Usage is now billed per token. */
+export const EXTENSION_PRIMARY_REQUEST_FEE_USD = 0
+export const EXTENSION_SENIOR_REVIEW_FEE_USD = 0
 
 type Usage = { promptTokens: number; completionTokens: number; totalTokens?: number }
 type ModelCall = { model: string; usage: Usage; stage: string }
@@ -95,15 +96,15 @@ export async function chargeExtensionUsage(params: {
   if (!entitlement.allowed) return { ok: false, charged: 0, error: entitlement.error }
   const rawCost = params.calls.reduce((sum, call) => sum + estimateCostUsd(call.model, call.usage.promptTokens, call.usage.completionTokens), 0)
   const hasSeniorReview = params.calls.some((call) => call.stage === 'extension-senior-review' || call.stage === 'senior-review')
-  const charged = hasSeniorReview
-    ? EXTENSION_SENIOR_REVIEW_FEE_USD
-    : EXTENSION_PRIMARY_REQUEST_FEE_USD
-  if (entitlement.balance < charged) return { ok: false, charged: 0, error: 'Low balance. Add funds to continue using extension AI.' }
 
   const primary = params.calls[0]
   const senior = params.calls[1]
   const promptTokens = params.calls.reduce((sum, call) => sum + call.usage.promptTokens, 0)
   const completionTokens = params.calls.reduce((sum, call) => sum + call.usage.completionTokens, 0)
+  const totalTokens = promptTokens + completionTokens
+  // Pay-as-you-go: $3 per 1,000,000 tokens actually used (prompt + completion).
+  const charged = Math.round(tokensToUsd(totalTokens) * 1e6) / 1e6
+  if (charged > 0 && entitlement.balance < charged) return { ok: false, charged: 0, error: 'Low balance. Add funds to continue using extension AI.' }
   const models = params.calls.map((call) => call.model).join(',')
   const { supabaseAdmin } = await import('@/integrations/supabase/client.server')
   const { data, error } = await (supabaseAdmin as any).rpc('charge_extension_usage', {
@@ -115,10 +116,9 @@ export async function chargeExtensionUsage(params: {
       action: params.action, model: models, primary_model: primary?.model ?? null,
       senior_model: senior?.model ?? null, stage: 'extension_api', prompt_tokens: promptTokens,
       completion_tokens: completionTokens, raw_cost_usd: rawCost, base_fee_usd: EXTENSION_BASE_FEE_USD,
-       pricing_multiplier: EXTENSION_TOKEN_PRICE_MULTIPLIER, pricing_basis: hasSeniorReview ? 'fixed_senior_review_request' : 'fixed_primary_request',
+       pricing_multiplier: EXTENSION_TOKEN_PRICE_MULTIPLIER, pricing_basis: 'per_token_usd_3_per_million',
        charge_usd: charged, senior_review: hasSeniorReview,
-       primary_request_fee_usd: hasSeniorReview ? 0 : EXTENSION_PRIMARY_REQUEST_FEE_USD,
-       senior_review_fee_usd: hasSeniorReview ? EXTENSION_SENIOR_REVIEW_FEE_USD : 0,
+       total_tokens: totalTokens, token_rate_usd_per_million: 3,
     },
   })
   if (error) {
