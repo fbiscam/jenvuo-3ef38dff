@@ -808,8 +808,18 @@ export async function callChatCompletion(
     const isLastModel = mi === models.length - 1;
     attemptedModels++;
     for (let attempt = 1; attempt <= retriesPerModel; attempt++) {
+      if (remaining() <= 0) {
+        lastErr =
+          lastErr ?? new AiGatewayError("AI analysis timed out. Please try again.", 0, false);
+        break;
+      }
       try {
-        const { content, usage } = await singleAttempt(model, opts);
+        const perAttempt = Math.min(
+          Math.max(5_000, opts.timeoutMs ?? 90_000),
+          Math.max(5_000, remaining()),
+        );
+        const { content, usage } = await singleAttempt(model, opts, perAttempt);
+
         const validation = opts.validateContent?.(content, model) ?? true;
         if (validation !== true) {
           lastErr = new AiGatewayError(validation, 422, true);
