@@ -1388,7 +1388,6 @@ function UsageAnalytics({ stats, keysCount, loading, range, onRangeChange, onRef
   const spentSeries = points.length ? points.map((p) => p.spent) : empty;
   const tokenSeries = points.length ? points.map((p) => p.tokens) : empty;
   const avgCostSeries = points.length ? points.map((p) => (p.scans > 0 ? p.spent / p.scans : 0)) : empty;
-  const periodSpendLabel = range === "24h" ? "Today spend" : range === "7d" ? "7 day spend" : "30 day spend";
   const metricClass = "flex min-h-[126px] flex-col bg-card px-4 py-4 sm:px-5";
 
   return (
