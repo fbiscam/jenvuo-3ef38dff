@@ -495,13 +495,13 @@ export const collections: Collection[] = [
           { type: "code", content: "https://jenvu.com/api/public/v1" },
 
           { type: "h2", content: "Example request" },
-          { type: "code", content: "curl https://jenvu.com/api/public/v1/chat/completions \\\n  -H \"Authorization: Bearer YOUR_JENVU_KEY\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"model\": \"jenvu-pro\",\n    \"messages\": [{\"role\": \"user\", \"content\": \"Give me the XAU/USD bias\"}]\n  }'" },
+          { type: "code", content: "curl https://jenvu.com/api/public/v1/chat/completions \\\n  -H \"Authorization: Bearer YOUR_JENVU_KEY\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"model\": \"claude-sonnet-4.5\",\n    \"messages\": [{\"role\": \"user\", \"content\": \"Give me the XAU/USD bias\"}]\n  }'" },
 
           { type: "h2", content: "Available models" },
           { type: "ul", items: [
-            "jenvu-fast — quick conversational replies.",
-            "jenvu-pro — deep reasoning and analysis.",
-            "jenvu-vision — chart and image analysis.",
+            "claude-sonnet-4.5 — deep reasoning, analysis and chart/image input.",
+            "claude-haiku-4.5 — fast conversational replies.",
+            "glm-5 — text-only alternative reasoning model.",
           ]},
 
           { type: "h2", content: "Response details" },

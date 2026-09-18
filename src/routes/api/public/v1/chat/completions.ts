@@ -9,18 +9,35 @@ import {
   extJson,
   EXT_CORS_HEADERS,
 } from "@/lib/extension-auth.server";
-import { callChatCompletion, EXTENSION_MODEL_CHAIN, AiGatewayError } from "@/lib/ai-gateway";
+import { callChatCompletion, AiGatewayError } from "@/lib/ai-gateway";
 import type { ChatMessage } from "@/lib/ai-gateway";
+import {
+  PUBLIC_API_MODEL_IDS,
+  gatewayChainFor,
+  resolvePublicModel,
+} from "@/lib/public-api-models";
 
-const MODEL_ALIASES: Record<string, readonly string[]> = {
-  "jenvu-fast": EXTENSION_MODEL_CHAIN.conversation,
-  "jenvu-pro": EXTENSION_MODEL_CHAIN.reasoning,
-  "jenvu-vision": EXTENSION_MODEL_CHAIN.vision,
-};
-
-function resolveChain(model: unknown): readonly string[] {
-  const key = typeof model === "string" ? model.trim().toLowerCase() : "";
-  return MODEL_ALIASES[key] ?? EXTENSION_MODEL_CHAIN.conversation;
+function sseStream(payload: {
+  id: string;
+  model: string;
+  content: string;
+  usage: { promptTokens: number; completionTokens: number; totalTokens: number };
+}): Response {
+  const created = Math.floor(Date.now() / 1000);
+  const base = { id: payload.id, object: "chat.completion.chunk", created, model: payload.model };
+  const lines = [
+    `data: ${JSON.stringify({ ...base, choices: [{ index: 0, delta: { role: "assistant", content: payload.content }, finish_reason: null }] })}\n\n`,
+    `data: ${JSON.stringify({ ...base, choices: [{ index: 0, delta: {}, finish_reason: "stop" }], usage: { prompt_tokens: payload.usage.promptTokens, completion_tokens: payload.usage.completionTokens, total_tokens: payload.usage.totalTokens } })}\n\n`,
+    "data: [DONE]\n\n",
+  ];
+  return new Response(lines.join(""), {
+    status: 200,
+    headers: {
+      "content-type": "text/event-stream; charset=utf-8",
+      "cache-control": "no-cache",
+      ...EXT_CORS_HEADERS,
+    },
+  });
 }
 
 function normalizeMessages(input: unknown): ChatMessage[] | null {
@@ -93,12 +110,27 @@ export const Route = createFileRoute("/api/public/v1/chat/completions")({
           );
         }
 
+        const modelId = resolvePublicModel(body?.model);
+        if (!modelId) {
+          return extJson(
+            {
+              error: {
+                message: `Unknown model "${String(body?.model)}". Available models: ${PUBLIC_API_MODEL_IDS.join(", ")}.`,
+                type: "invalid_request_error",
+                code: "model_not_found",
+                param: "model",
+              },
+            },
+            400,
+          );
+        }
+
         const maxTokens = Math.min(4000, Math.max(16, Number(body?.max_tokens ?? 1200) || 1200));
         const requestId = `chatcmpl-${crypto.randomUUID()}`;
 
         try {
           const result = await callChatCompletion({
-            models: [...resolveChain(body?.model)],
+            models: gatewayChainFor(modelId),
             messages,
             maxTokens,
             stage: "public-api-chat",
@@ -114,11 +146,20 @@ export const Route = createFileRoute("/api/public/v1/chat/completions")({
             calls: [{ model: result.model, usage: result.usage, stage: "public-api-chat" }],
           }).catch(() => null);
 
+          if (body?.stream === true) {
+            return sseStream({
+              id: requestId,
+              model: modelId,
+              content: result.content,
+              usage: result.usage,
+            });
+          }
+
           return extJson({
             id: requestId,
             object: "chat.completion",
             created: Math.floor(Date.now() / 1000),
-            model: result.model,
+            model: modelId,
             choices: [
               {
                 index: 0,
