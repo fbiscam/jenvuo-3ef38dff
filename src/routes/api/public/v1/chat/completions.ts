@@ -110,12 +110,27 @@ export const Route = createFileRoute("/api/public/v1/chat/completions")({
           );
         }
 
+        const modelId = resolvePublicModel(body?.model);
+        if (!modelId) {
+          return extJson(
+            {
+              error: {
+                message: `Unknown model "${String(body?.model)}". Available models: ${PUBLIC_API_MODEL_IDS.join(", ")}.`,
+                type: "invalid_request_error",
+                code: "model_not_found",
+                param: "model",
+              },
+            },
+            400,
+          );
+        }
+
         const maxTokens = Math.min(4000, Math.max(16, Number(body?.max_tokens ?? 1200) || 1200));
         const requestId = `chatcmpl-${crypto.randomUUID()}`;
 
         try {
           const result = await callChatCompletion({
-            models: [...resolveChain(body?.model)],
+            models: gatewayChainFor(modelId),
             messages,
             maxTokens,
             stage: "public-api-chat",
