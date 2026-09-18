@@ -18,6 +18,7 @@ import {
   XAU_SENIOR_REVIEW_INSTRUCTIONS,
 } from "@/lib/analysis/agent-instructions";
 import { isGoldSymbol } from "@/lib/plan-entitlements";
+import { build15mCandleForecast, formatForecast } from "@/lib/analysis/candle-forecast";
 
 type Body = {
   action?: "snapshot" | "chat";
@@ -366,6 +367,52 @@ function requestsActionableAnalysis(question: string): boolean {
   );
 }
 
+function requestsCandleForecast(question: string): boolean {
+  return /\b(?:next|upcoming|agli|agla|agali|aglay)\s+(?:(?:15\s*(?:m|min|minute)s?)\s+)?candle\b|\b15\s*(?:m|min|minute)s?\s+(?:next\s+)?candle\b|\bcandle\s+(?:konsi|kaunsi|kesa|kaisa)\s+(?:banegi|bnegi|banay\s+gi|hog[ai])\b|\b(?:bullish|bearish)\s+(?:next|agli|agla|agali|aglay)\s+candle\b/i.test(
+    question,
+  );
+}
+
+function validateForecastReview(content: string): true | string {
+  const required = ["FORECAST", "CONFIDENCE", "CHARACTER", "WHY", "INVALIDATION"];
+  const missing = required.filter((field) => !new RegExp(`^\\s*${field}:`, "im").test(content));
+  if (missing.length) return `Missing forecast fields: ${missing.join(", ")}`;
+  if (!/^\s*FORECAST:\s*(BULLISH|BEARISH|INDECISIVE)\b/im.test(content))
+    return "Invalid candle forecast";
+  return true;
+}
+
+function normalizeForecastReview(
+  content: string,
+  forecast: ReturnType<typeof build15mCandleForecast>,
+): string {
+  const aiDirection = /^\s*FORECAST:\s*(BULLISH|BEARISH|INDECISIVE)\b/im.exec(content)?.[1];
+  const direction =
+    forecast.direction === "INDECISIVE" ||
+    (aiDirection !== forecast.direction && aiDirection !== "INDECISIVE")
+      ? "INDECISIVE"
+      : (aiDirection ?? "INDECISIVE");
+  const aiConfidence = Number(/^\s*CONFIDENCE:\s*(\d{1,3})/im.exec(content)?.[1]);
+  const confidence = Math.min(
+    forecast.confidence,
+    Number.isFinite(aiConfidence) ? Math.max(0, aiConfidence) : forecast.confidence,
+  );
+  const character =
+    /^\s*CHARACTER:\s*(.+)$/im.exec(content)?.[1]?.trim() ?? forecast.character.toUpperCase();
+  const why =
+    /^\s*WHY:\s*(.+)$/im.exec(content)?.[1]?.trim() ?? forecast.evidence.join(" · ");
+  const invalidation =
+    /^\s*INVALIDATION:\s*(.+)$/im.exec(content)?.[1]?.trim() ?? forecast.invalidation;
+  return [
+    `NEXT 15M CANDLE: ${direction}`,
+    `MODEL CONFIDENCE: ${Math.round(confidence)}%`,
+    `EXPECTED CHARACTER: ${clampWords(character, 5)}`,
+    `CURRENT CANDLE CLOSES: ${forecast.candleClosesAt} (in ${Math.floor(forecast.remainingSeconds / 60)}m ${String(forecast.remainingSeconds % 60).padStart(2, "0")}s; next candle starts then)`,
+    `WHY: ${clampWords(why, 28)}`,
+    `INVALIDATION: ${clampWords(invalidation, 24)}`,
+  ].join("\n");
+}
+
 async function handle({ request }: { request: Request }) {
   const auth = await authenticateExtensionRequest(request);
   if (!auth.ok) return extJson({ ok: false, error: auth.error }, auth.status);
@@ -431,8 +478,9 @@ async function handle({ request }: { request: Request }) {
       // Trading vocabulary alone does not request a live plan. Educational and
       // follow-up questions stay conversational unless actionable levels or a
       // chart review are explicitly requested.
-      const analysisIntent = requestsActionableAnalysis(question);
-      const conversational = !analysisIntent;
+      const candleForecastIntent = requestsCandleForecast(question);
+      const analysisIntent = !candleForecastIntent && requestsActionableAnalysis(question);
+      const conversational = !analysisIntent && !candleForecastIntent;
 
       if (conversational) {
         const quickReply = quickConversationReply(question);
@@ -501,6 +549,119 @@ async function handle({ request }: { request: Request }) {
           seniorReview: { included: false, model: null, status: "not_required" },
           secondReview: { included: false, model: null, status: "not_required" },
           usage: { requestId, charged: casualBilling.charged, balance: casualBilling.balance },
+        });
+      }
+
+      if (candleForecastIntent) {
+        if (!isGoldSymbol(symbol)) {
+          return extJson({ ok: false, code: "UNSUPPORTED_INSTRUMENT", error: "Jenvu forecasts XAU/USD only." }, 400);
+        }
+        const market = await loadMarket(symbol, "15m");
+        const forecast = build15mCandleForecast(market.candles, market.hourly);
+        const deterministicText = formatForecast(forecast);
+        let text = deterministicText;
+        let primaryModel = "";
+        let primaryUsage = { promptTokens: 0, completionTokens: 0 };
+        let seniorModel = "";
+        let seniorUsage = { promptTokens: 0, completionTokens: 0 };
+        let primaryReviewed = false;
+        let seniorReview: { included: boolean; model: string | null; status: string } = {
+          included: false,
+          model: null,
+          status: entitlement.seniorReview ? "unavailable" : "not_required",
+        };
+        if (!forecast.stale) {
+          try {
+            const primary = await callChatCompletion({
+              models: [...EXTENSION_MODEL_CHAIN.reasoning],
+              stage: "extension-candle-forecast",
+              maxTokens: 260,
+              retriesPerModel: 1,
+              validateContent: validateForecastReview,
+              messages: [
+                {
+                  role: "system",
+                  content: `Review a deterministic XAU/USD next-15m-candle forecast. You may downgrade it to INDECISIVE, but never reverse it or invent evidence. Return exactly: FORECAST, CONFIDENCE, CHARACTER, WHY, INVALIDATION. Confidence is model confidence, not a win-rate promise. Do not include entry, stop, targets, trade advice, markdown, or extra fields.\n\n${XAU_DESK_CORE_INSTRUCTIONS}`,
+                },
+                { role: "user", content: `${deterministicText}\nCalibration: ${forecast.calibration.accuracy}% over ${forecast.calibration.tested} tests; stability ${forecast.calibration.stability}%.` },
+              ],
+            });
+            text = normalizeForecastReview(primary.content, forecast);
+            primaryModel = primary.model;
+            primaryUsage = primary.usage;
+            primaryReviewed = true;
+            if (entitlement.seniorReview) {
+              const senior = await callChatCompletion({
+                models: EXTENSION_MODEL_CHAIN.seniorReview.filter((model) => model !== primary.model),
+                stage: "extension-candle-senior-review",
+                maxTokens: 240,
+                retriesPerModel: 1,
+                validateContent: validateForecastReview,
+                messages: [
+                  { role: "system", content: `Independently risk-review this XAU/USD 15m candle forecast. Confirm or downgrade to INDECISIVE; never reverse it or add trading levels. Return exactly: FORECAST, CONFIDENCE, CHARACTER, WHY, INVALIDATION.\n\n${XAU_SENIOR_REVIEW_INSTRUCTIONS}` },
+                  { role: "user", content: `${deterministicText}\nPrimary review:\n${text}` },
+                ],
+              });
+              text = normalizeForecastReview(senior.content, forecast);
+              seniorModel = senior.model;
+              seniorUsage = senior.usage;
+              seniorReview = { included: true, model: senior.model, status: "confirmed" };
+            }
+          } catch (error) {
+            console.warn("extension-candle-forecast review failed", { requestId, message: error instanceof Error ? error.message : "review failed" });
+            text = deterministicText;
+          }
+        }
+        const refreshedForecastTick = await fetchLiveInstrumentTick(market.inst).catch(() => null);
+        const refreshedForecastAge = refreshedForecastTick?.t
+          ? Math.max(0, Date.now() - refreshedForecastTick.t)
+          : Number.POSITIVE_INFINITY;
+        if (Date.now() >= Date.parse(forecast.nextCandleStartsAt) || refreshedForecastAge > 180_000) {
+          forecast.direction = "INDECISIVE";
+          forecast.confidence = 0;
+          forecast.stale = true;
+          forecast.invalidation =
+            Date.now() >= Date.parse(forecast.nextCandleStartsAt)
+              ? "The forecasted candle has already started; request a fresh forecast."
+              : "The live XAU/USD quote is stale; wait for a fresh quote before using this forecast.";
+          text = formatForecast(forecast);
+          seniorReview = { included: false, model: null, status: "expired" };
+        }
+        if (!forecast.stale && (!primaryReviewed || (entitlement.seniorReview && seniorReview.status !== "confirmed"))) {
+          forecast.direction = "INDECISIVE";
+          forecast.confidence = 0;
+          forecast.invalidation = !primaryReviewed
+            ? "The required AI review was unavailable; request a fresh forecast."
+            : "The required independent senior review was unavailable; request a fresh forecast.";
+          text = formatForecast(forecast);
+        }
+        const calls = [
+          ...(primaryModel ? [{ model: primaryModel, usage: primaryUsage, stage: "extension-candle-forecast" }] : []),
+          ...(seniorModel ? [{ model: seniorModel, usage: seniorUsage, stage: "extension-candle-senior-review" }] : []),
+        ];
+        const billing = calls.length
+          ? await (await import("@/lib/extension-billing.server")).chargeExtensionUsage({
+              userId: auth.userId,
+              keyId: auth.keyId,
+              keyName: auth.name,
+              requestId,
+              action: "candle_forecast",
+              calls,
+            })
+          : { ok: true, charged: 0, balance: entitlement.balance };
+        if (!billing.ok) return extJson({ ok: false, error: billing.error, code: "BILLING_FAILED" }, 502);
+        return extJson({
+          ok: true,
+          mode: "candle_forecast",
+          text,
+          forecast,
+          ticker: market.ticker,
+          chart: market.chart,
+          technicals: market.technicals,
+          freshness: market.freshness,
+          seniorReview,
+          secondReview: seniorReview,
+          usage: { requestId, charged: billing.charged, balance: billing.balance },
         });
       }
 

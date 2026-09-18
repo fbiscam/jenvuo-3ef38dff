@@ -46,6 +46,7 @@ function showKeyGate(show, message) {
 
 const TIMEFRAMES = ["15m", "1h", "4h", "1d"];
 const QUICKS = [
+  { label: "Next 15m candle", text: "Forecast the next 15 minute XAU/USD candle." },
   { label: "Read screen", text: "Read the chart on my screen using ICT/SMC concepts." },
   { label: "Trade plan", text: "Give me a trade plan now: bias, entry (POI), stop, TP1/TP2, RR." },
   {
@@ -53,6 +54,7 @@ const QUICKS = [
     text: "Where is liquidity resting and where should I expect the next sweep?",
   },
 ];
+const CANDLE_FORECAST_INTENT = /\b(?:next|upcoming|agli|agla|agali|aglay)\s+(?:(?:15\s*(?:m|min|minute)s?)\s+)?candle\b|\b15\s*(?:m|min|minute)s?\s+(?:next\s+)?candle\b|\bcandle\s+(?:konsi|kaunsi|kesa|kaisa)\s+(?:banegi|bnegi|banay\s+gi|hog[ai])\b|\b(?:bullish|bearish)\s+(?:next|agli|agla|agali|aglay)\s+candle\b/i;
 const ACTIONABLE_ANALYSIS_INTENT = [
   /\b(?:give|show|make|create|need|want|tell)\s+(?:me\s+)?(?:a\s+|the\s+|my\s+)?(?:live\s+|current\s+)?(?:signal|setup|trade\s*plan|entry|stop\s*loss|take\s*profit|tp\d?|sl)\b|\b(?:signal|setup|trade\s*plan|entry|stop\s*loss|take\s*profit|tp\d?|sl)\s+(?:now|please|batao|do|chahiye)\b|\b(?:buy\s*(?:or|\/)?\s*sell|long\s*(?:or|\/)?\s*short|should\s+i\s+(?:buy|sell|take\s+(?:the\s+)?trade)|where\s+is\s+liquidity|next\s+sweep)\b/i,
   /\b(analy[sz]e?|review|read|check|scan|inspect|mark)\b[\s\S]{0,60}\b(chart|screen|market|price|xau(?:\/usd)?|gold|setup|structure|liquidity|bias)\b/i,
@@ -68,6 +70,10 @@ function requestsActionableAnalysis(text) {
   )
     return false;
   return ACTIONABLE_ANALYSIS_INTENT.some((pattern) => pattern.test(text));
+}
+
+function requestsCandleForecast(text) {
+  return CANDLE_FORECAST_INTENT.test(text);
 }
 
 const $ = (id) => document.getElementById(id);
@@ -708,6 +714,16 @@ function drawChart(points) {
 
 let lastPrice = null;
 
+function updateCandleClock() {
+  const el = $("candleClock");
+  if (!el) return;
+  const now = Date.now();
+  const close = (Math.floor(now / 900000) + 1) * 900000;
+  const seconds = Math.max(0, Math.ceil((close - now) / 1000));
+  const minutes = Math.floor(seconds / 60);
+  el.textContent = `15m closes in ${String(minutes).padStart(2, "0")}:${String(seconds % 60).padStart(2, "0")}`;
+}
+
 function renderSnapshot(d) {
   const price = Number(d?.ticker?.price);
   const changePercent = Number(d?.ticker?.changePercent);
@@ -1121,10 +1137,15 @@ async function send(preset, silentUser) {
   busy = true;
   // A running screen share supplies context only when the user asks for live
   // analysis. It must not turn every ordinary message into a trade plan.
-  const analysisRequest = requestsActionableAnalysis(text);
+  const candleForecastRequest = requestsCandleForecast(text);
+  const analysisRequest = !candleForecastRequest && requestsActionableAnalysis(text);
   setReviewStatus(
-    analysisRequest ? "ICT analysis · Claude primary review…" : "Chat mode",
-    analysisRequest ? "checking" : "",
+    candleForecastRequest
+      ? "15m candle forecast · calibrating…"
+      : analysisRequest
+        ? "ICT analysis · Claude primary review…"
+        : "Chat mode",
+    analysisRequest || candleForecastRequest ? "checking" : "",
   );
   controller = new AbortController();
   $("send").disabled = false;
@@ -1213,6 +1234,13 @@ async function send(preset, silentUser) {
     }
     if (d.mode === "conversation") {
       setReviewStatus("Chat mode", "");
+    } else if (d.mode === "candle_forecast") {
+      setReviewStatus(
+        d.seniorReview?.status === "confirmed"
+          ? "15m forecast · senior reviewed"
+          : "15m forecast · calibrated model",
+        "verified",
+      );
     } else if (d.seniorReview?.status === "confirmed") {
       setReviewStatus("ICT analysis · senior review confirmed", "verified");
     } else if (d.seniorReview?.status === "vetoed") {
@@ -1286,6 +1314,8 @@ try {
 setInterval(() => {
   if (apiKey) loadSnapshot();
 }, 5000);
+updateCandleClock();
+setInterval(updateCandleClock, 1000);
 document.addEventListener("visibilitychange", () => {
   if (!document.hidden && apiKey) loadSnapshot();
 });
