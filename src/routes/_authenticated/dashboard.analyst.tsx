@@ -1,6 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { Bot, ExternalLink, RefreshCw } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/dashboard/analyst")({
   head: () => ({
