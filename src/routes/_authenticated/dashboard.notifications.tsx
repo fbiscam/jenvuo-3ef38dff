@@ -184,7 +184,7 @@ function NotificationsPage() {
     const { Icon, tone } = iconFor(n);
     const unread = !n.read_at;
     const explicit = typeof n.data?.url === "string" ? n.data.url : undefined;
-    const url = explicit ?? (n.type === "signal_alert" || categoryOf(n) === "signals" ? "/dashboard/alerts" : undefined);
+    const url = explicit ?? (n.type === "signal_alert" || categoryOf(n) === "signals" ? "/dashboard/notifications" : undefined);
     const inner = (
       <div className={cn(
         "group relative flex gap-3 rounded-2xl bg-white px-4 py-3.5 transition",

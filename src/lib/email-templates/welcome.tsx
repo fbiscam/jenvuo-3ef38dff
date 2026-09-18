@@ -79,7 +79,7 @@ const WelcomeEmail = ({
             </Text>
             <Text style={listItem}>
               3. Enable{' '}
-              <Link href={`${siteUrl}/dashboard/alerts`} style={linkStyle}>Signal Alerts</Link>{' '}
+              <Link href={`${siteUrl}/dashboard/notifications`} style={linkStyle}>Signal Alerts</Link>{' '}
               — never miss a killzone opportunity.
             </Text>
             <Text style={listItem}>

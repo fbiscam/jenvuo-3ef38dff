@@ -90,7 +90,6 @@ const NAV_GROUPS: Array<{ label: string; items: TabItem[] }> = [
     label: "",
     items: [
       { to: "/dashboard", label: "Overview", icon: LayoutDashboard, exact: true, countKey: "saved" },
-      { to: "/dashboard/alerts", label: "Live Signals", icon: BellRing, countKey: "alerts7d" },
     ],
   },
   {
