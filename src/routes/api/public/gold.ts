@@ -382,6 +382,37 @@ function validateForecastReview(content: string): true | string {
   return true;
 }
 
+function normalizeForecastReview(
+  content: string,
+  forecast: ReturnType<typeof build15mCandleForecast>,
+): string {
+  const aiDirection = /^\s*FORECAST:\s*(BULLISH|BEARISH|INDECISIVE)\b/im.exec(content)?.[1];
+  const direction =
+    forecast.direction === "INDECISIVE" ||
+    (aiDirection !== forecast.direction && aiDirection !== "INDECISIVE")
+      ? "INDECISIVE"
+      : (aiDirection ?? "INDECISIVE");
+  const aiConfidence = Number(/^\s*CONFIDENCE:\s*(\d{1,3})/im.exec(content)?.[1]);
+  const confidence = Math.min(
+    forecast.confidence,
+    Number.isFinite(aiConfidence) ? Math.max(0, aiConfidence) : forecast.confidence,
+  );
+  const character =
+    /^\s*CHARACTER:\s*(.+)$/im.exec(content)?.[1]?.trim() ?? forecast.character.toUpperCase();
+  const why =
+    /^\s*WHY:\s*(.+)$/im.exec(content)?.[1]?.trim() ?? forecast.evidence.join(" · ");
+  const invalidation =
+    /^\s*INVALIDATION:\s*(.+)$/im.exec(content)?.[1]?.trim() ?? forecast.invalidation;
+  return [
+    `NEXT 15M CANDLE: ${direction}`,
+    `MODEL CONFIDENCE: ${Math.round(confidence)}%`,
+    `EXPECTED CHARACTER: ${clampWords(character, 5)}`,
+    `CURRENT CANDLE CLOSES: ${forecast.candleClosesAt}`,
+    `WHY: ${clampWords(why, 28)}`,
+    `INVALIDATION: ${clampWords(invalidation, 24)}`,
+  ].join("\n");
+}
+
 async function handle({ request }: { request: Request }) {
   const auth = await authenticateExtensionRequest(request);
   if (!auth.ok) return extJson({ ok: false, error: auth.error }, auth.status);
@@ -554,7 +585,7 @@ async function handle({ request }: { request: Request }) {
                 { role: "user", content: `${deterministicText}\nCalibration: ${forecast.calibration.accuracy}% over ${forecast.calibration.tested} tests; stability ${forecast.calibration.stability}%.` },
               ],
             });
-            text = primary.content.trim();
+            text = normalizeForecastReview(primary.content, forecast);
             primaryModel = primary.model;
             primaryUsage = primary.usage;
             if (entitlement.seniorReview) {
@@ -569,7 +600,7 @@ async function handle({ request }: { request: Request }) {
                   { role: "user", content: `${deterministicText}\nPrimary review:\n${text}` },
                 ],
               });
-              text = senior.content.trim();
+              text = normalizeForecastReview(senior.content, forecast);
               seniorModel = senior.model;
               seniorUsage = senior.usage;
               seniorReview = { included: true, model: senior.model, status: "confirmed" };
@@ -578,6 +609,13 @@ async function handle({ request }: { request: Request }) {
             console.warn("extension-candle-forecast review failed", { requestId, message: error instanceof Error ? error.message : "review failed" });
             text = deterministicText;
           }
+        }
+        if (Date.now() >= Date.parse(forecast.nextCandleStartsAt)) {
+          forecast.direction = "INDECISIVE";
+          forecast.confidence = 0;
+          forecast.invalidation = "The forecasted candle has already started; request a fresh forecast.";
+          text = formatForecast(forecast);
+          seniorReview = { included: false, model: null, status: "expired" };
         }
         const { chargeExtensionUsage } = await import("@/lib/extension-billing.server");
         const billing = await chargeExtensionUsage({
