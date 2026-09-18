@@ -1,10 +1,11 @@
 import { estimateCostUsd, logAiCost } from '@/lib/ai-cost-log.server'
-import { getEffectiveDailyTokenLimit, getPlanCapabilities } from '@/lib/plan-entitlements'
+import { getEffectiveDailyTokenLimit, getPlanCapabilities, tokensToUsd } from '@/lib/plan-entitlements'
 
 export const EXTENSION_BASE_FEE_USD = 0
 export const EXTENSION_TOKEN_PRICE_MULTIPLIER = 0.5
-export const EXTENSION_PRIMARY_REQUEST_FEE_USD = 0.03
-export const EXTENSION_SENIOR_REVIEW_FEE_USD = 0.2
+/** Legacy fixed fees — kept for historical ledger rows only. Usage is now billed per token. */
+export const EXTENSION_PRIMARY_REQUEST_FEE_USD = 0
+export const EXTENSION_SENIOR_REVIEW_FEE_USD = 0
 
 type Usage = { promptTokens: number; completionTokens: number; totalTokens?: number }
 type ModelCall = { model: string; usage: Usage; stage: string }
