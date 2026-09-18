@@ -973,105 +973,73 @@ button.hicon:hover {
     padding: 6px 24px 26px;
   }
 
-  /* Empty landing: centred brand mark above a pill composer */
+  /* Empty landing: hero heading + card composer + get started grid */
   body:has(.thread.has-empty) .content {
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-end;
   }
   .thread.has-empty {
     padding: 0;
   }
   .thread.has-empty .empty {
     padding: 0;
-    margin: 0 auto 10px;
+    margin: 0 auto 22px;
     max-width: 760px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 6px;
+    gap: 10px;
     text-align: center;
   }
   .thread.has-empty .empty::before {
     display: none;
   }
-  .empty-logo {
-    height: 108px;
-    width: auto;
-    object-fit: contain;
-    margin-bottom: -10px;
+  .empty-title {
+    font-family: Georgia, "Times New Roman", Times, serif;
+    font-size: 40px;
+    line-height: 1.15;
+    font-weight: 400;
+    letter-spacing: -0.015em;
+    color: #3d3a34;
   }
   .empty-sub {
-    font-size: 13.5px;
+    font-size: 14px;
     color: var(--muted);
     max-width: 520px;
   }
 
-  /* Conversation typography (reference chat concept) */
-  .thread {
-    max-width: 768px;
-    margin: 0 auto;
-    gap: 22px;
-  }
-  .msg {
-    max-width: 95%;
-  }
-  .msg.user {
-    border-radius: 12px;
-    background: #f4f4f5;
-    padding: 12px 16px;
-    font-size: 16px;
-  }
-  .msg.ai {
-    font-size: 17px;
-    line-height: 1.7;
-  }
-
-  /* Pill composer */
   .composer {
-    border: 1px solid rgba(0, 0, 0, 0.25);
-    border-radius: 26px;
+    border: 1px solid #e7e4dd;
+    border-radius: 14px;
     background: #fff;
-    padding: 8px 10px 8px 16px;
-    box-shadow: none;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    flex-wrap: wrap;
+    padding: 16px 16px 12px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
   }
   .composer:focus-within {
-    border-color: rgba(0, 0, 0, 0.45);
-    box-shadow: none;
+    border-color: #d6d2c8;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.05);
   }
-  .composer:has(.shot-chip),
-  .composer:has(img.preview:not([hidden])) {
-    border-radius: 26px;
-  }
-  body:has(.thread.has-empty) textarea,
-  .composer textarea {
-    min-height: 40px;
-    max-height: 120px;
-    font-size: 15px;
-    line-height: 20px;
-    padding: 10px 2px;
+  body:has(.thread.has-empty) textarea {
+    min-height: 62px;
   }
   button.send {
-    width: 34px;
-    height: 34px;
-    border-radius: 999px;
-    border: none;
-    background: #1c1b1a;
-    color: #fff;
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    border: 1px solid #e0ddd5;
+    background: #fff;
+    color: #6f6b62;
   }
   button.send.active,
   button.send.stop {
-    background: #1c1b1a;
-    color: #fff;
-    border: none;
+    background: #fff;
+    color: #2b2822;
+    border-color: #cfcabf;
   }
   button.send.active:hover,
   button.send.stop:hover {
-    background: #000;
+    background: #f4f2ed;
   }
 
   /* Get started cards */

@@ -286,7 +286,7 @@ function emptyState() {
   const t = $("thread");
   t.classList.add("has-empty");
   t.innerHTML =
-    '<div class="empty"><img class="empty-logo" src="jenvu-logo.png" alt="Jenvu" />' +
+    '<div class="empty"><span class="empty-title">What would you like to do?</span>' +
     '<span class="empty-sub">Share your chart and I’ll read structure, liquidity, FVGs and entries in real time.</span></div>';
   updateQuickVisibility();
 }
