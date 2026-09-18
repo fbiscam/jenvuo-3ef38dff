@@ -1,3 +1,10 @@
+/* Jenvu web build: no chrome extension APIs available */
+if (typeof chrome === "undefined") {
+  window.chrome = {
+    tabs: { query: async () => [], sendMessage: async () => {} },
+    scripting: { executeScript: async () => {} },
+  };
+}
 const ENDPOINTS =
   location.protocol === "chrome-extension:"
     ? [
