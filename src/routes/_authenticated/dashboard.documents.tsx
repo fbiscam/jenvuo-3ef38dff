@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { UploadCloud, Trash2, FileVideo, FileImage, FileText, Check } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -79,6 +79,18 @@ function DocumentsPage() {
   const needsInfo = row?.document_status === "needs_info";
   const currentIdx = rejected || needsInfo ? 0 : statusIndex(row?.document_status);
   const canUpload = !!row && row.document_status !== "verified";
+
+  useEffect(() => {
+    if (row?.document_status !== "verified") return;
+    const previousHtmlOverflow = document.documentElement.style.overflowY;
+    const previousBodyOverflow = document.body.style.overflowY;
+    document.documentElement.style.overflowY = "hidden";
+    document.body.style.overflowY = "hidden";
+    return () => {
+      document.documentElement.style.overflowY = previousHtmlOverflow;
+      document.body.style.overflowY = previousBodyOverflow;
+    };
+  }, [row?.document_status]);
 
   const removeMut = useMutation({
     mutationFn: (id: string) => remove({ data: { id } } as any),
