@@ -20,21 +20,21 @@ export type ProductUpdate = {
 
 export const PRODUCT_UPDATES: ProductUpdate[] = [
   {
-    title: " Balance based daily limits",
+    title: "Balance based daily limits",
     copy: "Every $3 of balance unlocks another 1M tokens a day, on top of your plan cap.",
     at: "2026-09-18T08:10:00Z",
     tag: "Updated",
     icon: "gauge",
   },
   {
-    title: " Public api endpoint",
+    title: "Public api endpoint",
     copy: "Use your Jenvu key anywhere with the OpenAI compatible chat completions endpoint.",
     at: "2026-09-17T14:30:00Z",
     tag: "New",
     icon: "terminal",
   },
   {
-    title: " Daily token limits",
+    title: "Daily token limits",
     copy: "Free 100K, Pro 1.5M, Elite 5M and Ultra 10M tokens a day, resetting at 00:00 UTC.",
     at: "2026-09-16T10:05:00Z",
     tag: "Updated",
@@ -69,6 +69,11 @@ export function getLatestProductUpdates(limit = MAX_DASHBOARD_UPDATES): ProductU
   return [...PRODUCT_UPDATES]
     .sort((a, b) => new Date(b.at).getTime() - new Date(a.at).getTime())
     .slice(0, limit);
+}
+
+/** Titles/copy always render flush-left, whatever stray spacing an entry carries. */
+export function cleanUpdateText(value: string): string {
+  return value.replace(/[\s\u00a0]+/g, " ").trim();
 }
 
 export function formatUpdateTime(at: string): string {
