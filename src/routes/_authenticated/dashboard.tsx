@@ -1171,6 +1171,12 @@ function fmtUsd2(n: number) {
   return `$${n.toFixed(abs >= 1 ? 2 : 4)}`;
 }
 
+function fmtTokens(n: number) {
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(n >= 10_000_000 ? 0 : 1)}M`;
+  if (n >= 1_000) return `${(n / 1_000).toFixed(1)}k`;
+  return `${n}`;
+}
+
 function UsageLineChart({ values, height = 110, color = "#e01563" }: { values: number[]; height?: number; color?: string }) {
   const w = 320;
   const h = height;
