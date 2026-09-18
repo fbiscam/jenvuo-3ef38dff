@@ -1434,6 +1434,18 @@ function UsageAnalytics({ stats, keysCount, loading, range, onRangeChange, onRef
             <span>Personal</span><span className="tabular-nums">{fmtUsd2(totalSpent)} / {stats ? fmtUsd2(stats.allowance) : "$0.00"}</span>
           </div>
           <div className="mt-2 h-4 overflow-hidden rounded bg-muted"><div className="h-full bg-foreground" style={{ width: `${Math.min(100, Math.max(0, stats?.allowance ? (totalSpent / stats.allowance) * 100 : 0))}%` }} /></div>
+          <div className="mt-3 flex items-center justify-between gap-3 text-xs text-muted-foreground">
+            <span className="capitalize">{stats?.plan ? `${stats.plan} daily tokens` : "Daily tokens"}</span>
+            <span className="tabular-nums">
+              {fmtTokens(stats?.tokensUsedToday ?? 0)} / {stats?.dailyTokenLimit ? fmtTokens(stats.dailyTokenLimit) : "—"}
+            </span>
+          </div>
+          <div className="mt-1.5 h-2 overflow-hidden rounded bg-muted">
+            <div
+              className="h-full bg-[var(--chart-5)]"
+              style={{ width: `${Math.min(100, Math.max(0, stats?.dailyTokenLimit ? ((stats.tokensUsedToday ?? 0) / stats.dailyTokenLimit) * 100 : 0))}%` }}
+            />
+          </div>
         </div>
         <div className={metricClass} style={{ backgroundColor: "#FFFBED" }}>
           <span className="text-sm text-black">Credit balance</span>
