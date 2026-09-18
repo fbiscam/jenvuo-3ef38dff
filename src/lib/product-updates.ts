@@ -27,7 +27,7 @@ export const PRODUCT_UPDATES: ProductUpdate[] = [
     icon: "gauge",
   },
   {
-    title: "Public api endpoint",
+    title: " Public api endpoint",
     copy: "Use your Jenvu key anywhere with the OpenAI compatible chat completions endpoint.",
     at: "2026-09-17T14:30:00Z",
     tag: "New",
