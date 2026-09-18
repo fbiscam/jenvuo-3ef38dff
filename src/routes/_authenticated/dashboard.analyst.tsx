@@ -59,15 +59,16 @@ function AnalystPage() {
         </div>
       </div>
 
-      <div className="mx-auto w-full max-w-[440px] overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm">
+      <div className="w-full overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm">
         <iframe
           key={nonce}
           title="Jenvu AI Analyst"
           src="/analyst/sidepanel.html"
           allow="display-capture; clipboard-write"
-          className="block h-[calc(100vh-230px)] min-h-[560px] w-full border-0"
+          className="block h-[calc(100vh-190px)] min-h-[620px] w-full border-0"
         />
       </div>
+
     </div>
   );
 }
