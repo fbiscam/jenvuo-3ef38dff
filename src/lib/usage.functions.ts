@@ -40,6 +40,10 @@ export type UsageStats = {
   byReason: ReasonBucket[];
   ledger: LedgerRow[];
   recentExtensionKeys: RecentExtensionKey[];
+  plan: string;
+  dailyTokenLimit: number;
+  tokensUsedToday: number;
+  tokenRateUsdPerMillion: number;
 };
 
 export const getUsageStats = createServerFn({ method: "GET" })
