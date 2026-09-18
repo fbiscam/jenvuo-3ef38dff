@@ -834,48 +834,112 @@ function waitForVideoFrame(video, timeoutMs = 8000) {
   });
 }
 
-function stopShare() {
-  if (stream) stream.getTracks().forEach((t) => t.stop());
-  stream = null;
+function resetVideoEl() {
   const video = $("vid");
-  if (video) {
+  if (!video) return null;
+  try {
     video.pause();
-    video.srcObject = null;
+  } catch {
+    /* ignore */
   }
+  try {
+    video.srcObject = null;
+  } catch {
+    /* ignore */
+  }
+  try {
+    video.removeAttribute("src");
+    video.load();
+  } catch {
+    /* ignore */
+  }
+  return video;
+}
+
+function stopShare() {
+  if (stream) {
+    try {
+      stream.getTracks().forEach((t) => t.stop());
+    } catch {
+      /* ignore */
+    }
+  }
+  stream = null;
+  resetVideoEl();
   $("share").classList.remove("on");
   $("share").title = "Share screen";
   updateQuickVisibility();
 }
 
+let sharePending = false;
+
 async function startShare() {
+  // Always start from a clean video element so a second share works.
+  if (stream) {
+    try {
+      stream.getTracks().forEach((t) => t.stop());
+    } catch {
+      /* ignore */
+    }
+    stream = null;
+  }
+  const video = resetVideoEl();
+  if (!video) throw new Error("Screen preview is not ready. Reopen the panel and try again.");
+
   const nextStream = await navigator.mediaDevices.getDisplayMedia({
     video: { frameRate: { ideal: 2, max: 5 }, width: { ideal: 1920 }, height: { ideal: 1080 } },
     audio: false,
   });
   const track = nextStream.getVideoTracks()[0];
-  if (!track) throw new Error("Chrome did not provide a screen video track.");
-  const video = $("vid");
+  if (!track) {
+    nextStream.getTracks().forEach((t) => t.stop());
+    throw new Error("Chrome did not provide a screen video track.");
+  }
+
   video.srcObject = nextStream;
+  video.muted = true;
   stream = nextStream;
-  track.addEventListener("ended", stopShare, { once: true });
-  await video.play();
+  track.addEventListener(
+    "ended",
+    () => {
+      if (stream === nextStream) stopShare();
+    },
+    { once: true },
+  );
+
+  try {
+    await video.play();
+  } catch {
+    /* autoplay of a muted stream rarely fails; frame wait below is the real check */
+  }
   await waitForVideoFrame(video, 12000);
-  if (!grabFrame()) throw new Error("The shared screen did not produce a readable frame.");
+
+  // Give the compositor a few chances instead of failing on one blank frame.
+  let shot = grabFrame();
+  for (let i = 0; i < 6 && !shot; i++) {
+    await new Promise((r) => setTimeout(r, 250));
+    shot = grabFrame();
+  }
+  if (!shot) throw new Error("The shared screen did not produce a readable frame.");
 }
 
 $("share").onclick = async () => {
+  if (sharePending) return;
   if (stream) return stopShare();
+  sharePending = true;
   try {
     await startShare();
     $("share").classList.add("on");
     $("share").title = "Stop sharing";
   } catch (e) {
     stopShare();
-    addMsg(
-      "ai err",
-      e?.message ||
-        "Screen sharing start nahi ho saki. Chrome prompt mein chart tab ya window select karein.",
-    );
+    const msg = String(e?.name || "") === "NotAllowedError"
+      ? "Screen share cancelled. Click the share button again and pick your chart tab or window."
+      : e?.message ||
+        "Screen sharing start nahi ho saki. Chrome prompt mein chart tab ya window select karein.";
+    addMsg("ai err", msg);
+  } finally {
+    sharePending = false;
   }
   updateQuickVisibility();
 };
