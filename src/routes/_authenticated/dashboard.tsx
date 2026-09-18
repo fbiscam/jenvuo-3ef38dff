@@ -1479,7 +1479,7 @@ const RECOMMENDED_MODELS = [
     badge: "New",
     description: "Fast, high context reasoning for demanding gold chart analysis.",
     logo: null,
-    logoImage: grokModelLogoAsset.url,
+    logoImage: grokModelLogo,
     logoLabel: "",
     badgeTone: "bg-primary text-primary-foreground",
     featured: true,
