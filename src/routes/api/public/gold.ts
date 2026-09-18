@@ -407,7 +407,7 @@ function normalizeForecastReview(
     `NEXT 15M CANDLE: ${direction}`,
     `MODEL CONFIDENCE: ${Math.round(confidence)}%`,
     `EXPECTED CHARACTER: ${clampWords(character, 5)}`,
-    `CURRENT CANDLE CLOSES: ${forecast.candleClosesAt}`,
+    `CURRENT CANDLE CLOSES: ${forecast.candleClosesAt} (in ${Math.floor(forecast.remainingSeconds / 60)}m ${String(forecast.remainingSeconds % 60).padStart(2, "0")}s; next candle starts then)`,
     `WHY: ${clampWords(why, 28)}`,
     `INVALIDATION: ${clampWords(invalidation, 24)}`,
   ].join("\n");
@@ -610,10 +610,18 @@ async function handle({ request }: { request: Request }) {
             text = deterministicText;
           }
         }
-        if (Date.now() >= Date.parse(forecast.nextCandleStartsAt)) {
+        const refreshedForecastTick = await fetchLiveInstrumentTick(market.inst).catch(() => null);
+        const refreshedForecastAge = refreshedForecastTick?.t
+          ? Math.max(0, Date.now() - refreshedForecastTick.t)
+          : Number.POSITIVE_INFINITY;
+        if (Date.now() >= Date.parse(forecast.nextCandleStartsAt) || refreshedForecastAge > 180_000) {
           forecast.direction = "INDECISIVE";
           forecast.confidence = 0;
-          forecast.invalidation = "The forecasted candle has already started; request a fresh forecast.";
+          forecast.stale = true;
+          forecast.invalidation =
+            Date.now() >= Date.parse(forecast.nextCandleStartsAt)
+              ? "The forecasted candle has already started; request a fresh forecast."
+              : "The live XAU/USD quote is stale; wait for a fresh quote before using this forecast.";
           text = formatForecast(forecast);
           seniorReview = { included: false, model: null, status: "expired" };
         }

@@ -11,6 +11,7 @@ export type CandleForecast = {
   candleClosesAt: string;
   nextCandleStartsAt: string;
   generatedAt: string;
+  remainingSeconds: number;
   evidence: string[];
   invalidation: string;
   calibration: { tested: number; accuracy: number; stability: number };
@@ -60,7 +61,7 @@ export function build15mCandleForecast(
   const closedHourly = hourly.filter((candle) => candle.t < nowMs).slice(-360);
   const generatedAt = new Date(nowMs).toISOString();
   const lastClosed = closed[closed.length - 1];
-  const stale = !lastClosed || nowMs - (lastClosed.t + FIFTEEN_MINUTES_MS) > 45 * 60 * 1000;
+  const stale = !lastClosed || nowMs - (lastClosed.t + FIFTEEN_MINUTES_MS) > 20 * 60 * 1000;
   const signal = predict(closed.map(toIndicator), closedHourly.map((candle) => ({
     openTime: candle.t,
     open: candle.o,
@@ -79,6 +80,7 @@ export function build15mCandleForecast(
       candleClosesAt: new Date(boundary.currentCloseMs).toISOString(),
       nextCandleStartsAt: new Date(boundary.currentCloseMs).toISOString(),
       generatedAt,
+      remainingSeconds: Math.ceil(boundary.remainingMs / 1000),
       evidence: [stale ? "15m market data is stale" : "Insufficient closed 15m candle history"],
       invalidation: "Wait for fresh closed-candle data before requesting another forecast.",
       calibration: { tested: 0, accuracy: 0, stability: 0 },
@@ -129,6 +131,7 @@ export function build15mCandleForecast(
     candleClosesAt: new Date(boundary.currentCloseMs).toISOString(),
     nextCandleStartsAt: new Date(boundary.currentCloseMs).toISOString(),
     generatedAt,
+    remainingSeconds: Math.ceil(boundary.remainingMs / 1000),
     evidence: topEvidence(signal, closed, closedHourly),
     invalidation:
       direction === "INDECISIVE"
@@ -145,11 +148,13 @@ export function build15mCandleForecast(
 }
 
 export function formatForecast(forecast: CandleForecast): string {
+  const minutes = Math.floor(forecast.remainingSeconds / 60);
+  const seconds = String(forecast.remainingSeconds % 60).padStart(2, "0");
   return [
     `NEXT 15M CANDLE: ${forecast.direction}`,
     `MODEL CONFIDENCE: ${forecast.confidence}%`,
     `EXPECTED CHARACTER: ${forecast.character.toUpperCase()}`,
-    `CURRENT CANDLE CLOSES: ${forecast.candleClosesAt}`,
+    `CURRENT CANDLE CLOSES: ${forecast.candleClosesAt} (in ${minutes}m ${seconds}s; next candle starts then)`,
     `EVIDENCE: ${forecast.evidence.join(" · ")}`,
     `INVALIDATION: ${forecast.invalidation}`,
   ].join("\n");
