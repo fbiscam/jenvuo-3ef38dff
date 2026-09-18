@@ -761,42 +761,49 @@ async function loadSnapshot() {
 
 /* ---------- screen sharing ---------- */
 
-function canvasLooksBlank(ctx, width, height) {
-  try {
-    const cols = 8;
-    const rows = 6;
-    let visibleSamples = 0;
-    for (let y = 0; y < rows; y++) {
-      for (let x = 0; x < cols; x++) {
-        const px = ctx.getImageData(
-          Math.min(width - 1, Math.round(((x + 0.5) / cols) * width)),
-          Math.min(height - 1, Math.round(((y + 0.5) / rows) * height)),
-          1,
-          1,
-        ).data;
-        if (px[3] > 0 && px[0] + px[1] + px[2] > 24) visibleSamples++;
-      }
-    }
-    return visibleSamples < 3;
-  } catch {
-    return true;
-  }
+function frameFromSource(source, sourceWidth, sourceHeight) {
+  if (!sourceWidth || !sourceHeight) return null;
+  const cv = $("cv");
+  const w = Math.min(1600, sourceWidth);
+  cv.width = w;
+  cv.height = Math.max(1, Math.round((sourceHeight / sourceWidth) * w));
+  const ctx = cv.getContext("2d");
+  if (!ctx) return null;
+  ctx.drawImage(source, 0, 0, cv.width, cv.height);
+  const image = cv.toDataURL("image/jpeg", 0.82);
+  return image.length > 1000 ? image : null;
 }
 
-function grabFrame() {
+function grabVideoFrame() {
   if (!stream) return null;
   const v = $("vid");
   if (v.readyState < HTMLMediaElement.HAVE_CURRENT_DATA || !v.videoWidth || !v.videoHeight)
     return null;
-  const cv = $("cv");
-  const w = Math.min(1280, v.videoWidth);
-  cv.width = w;
-  cv.height = Math.round((v.videoHeight / v.videoWidth) * w);
-  const ctx = cv.getContext("2d", { willReadFrequently: true });
-  if (!ctx) return null;
-  ctx.drawImage(v, 0, 0, cv.width, cv.height);
-  if (canvasLooksBlank(ctx, cv.width, cv.height)) return null;
-  return cv.toDataURL("image/jpeg", 0.7);
+  return frameFromSource(v, v.videoWidth, v.videoHeight);
+}
+
+async function grabFrame() {
+  const activeStream = stream;
+  const track = activeStream?.getVideoTracks?.()[0];
+  if (!track || track.readyState !== "live") return null;
+
+  // ImageCapture reads from the MediaStreamTrack directly. This remains
+  // reliable when Chrome throttles the hidden side-panel video element.
+  if (typeof ImageCapture === "function") {
+    try {
+      const bitmap = await new ImageCapture(track).grabFrame();
+      try {
+        if (stream !== activeStream || track.readyState !== "live") return null;
+        return frameFromSource(bitmap, bitmap.width, bitmap.height);
+      } finally {
+        bitmap.close?.();
+      }
+    } catch {
+      /* Fall back to the video element below. */
+    }
+  }
+
+  return stream === activeStream ? grabVideoFrame() : null;
 }
 
 function waitForVideoFrame(video, timeoutMs = 8000) {
@@ -844,12 +851,6 @@ function resetVideoEl() {
   }
   try {
     video.srcObject = null;
-  } catch {
-    /* ignore */
-  }
-  try {
-    video.removeAttribute("src");
-    video.load();
   } catch {
     /* ignore */
   }
@@ -912,15 +913,19 @@ async function startShare() {
   } catch {
     /* autoplay of a muted stream rarely fails; frame wait below is the real check */
   }
-  await waitForVideoFrame(video, 12000);
+  await waitForVideoFrame(video, 12000).catch(() => {
+    // ImageCapture can still read a live track when the hidden preview element
+    // is delayed, so do not tear down an otherwise valid share here.
+  });
 
-  // Give the compositor a few chances instead of failing on one blank frame.
-  let shot = grabFrame();
-  for (let i = 0; i < 6 && !shot; i++) {
+  let shot = await grabFrame();
+  for (let i = 0; i < 8 && !shot && track.readyState === "live"; i++) {
     await new Promise((r) => setTimeout(r, 250));
-    shot = grabFrame();
+    shot = await grabFrame();
   }
-  if (!shot) throw new Error("The shared screen did not produce a readable frame.");
+  if (!shot && track.readyState !== "live") {
+    throw new Error("Chrome stopped the screen share before it was ready.");
+  }
 }
 
 $("share").onclick = async () => {
@@ -1158,11 +1163,11 @@ async function send(preset, silentUser) {
     return;
   }
 
-  let shot = analysisRequest ? grabFrame() : null;
+  let shot = analysisRequest ? await grabFrame() : null;
   if (!shot && stream && analysisRequest) {
-    for (let i = 0; i < 16 && !shot; i++) {
-      await new Promise((r) => setTimeout(r, 300));
-      shot = grabFrame();
+    for (let i = 0; i < 12 && !shot; i++) {
+      await new Promise((r) => setTimeout(r, 250));
+      shot = await grabFrame();
     }
   }
   if (!shot && stream && analysisRequest) {

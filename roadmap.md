@@ -89,3 +89,4 @@
 - [x] Rebuild and verify extension v1.9.9 with the compact signal contract
 - [x] Reserve structured trade plans for actionable XAU/USD analysis requests
 - [x] Resolve and verify the stale `src/lib/utils.ts` string return diagnostic
+- [x] Make repeated extension screen sharing use direct track capture and release v1.9.11

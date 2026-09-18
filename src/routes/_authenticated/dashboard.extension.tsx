@@ -176,12 +176,12 @@ function ExtensionPage() {
   const onDownload = async () => {
     setDownloading(true);
     try {
-      const res = await fetch("/jenvu-extension-v1.9.10.zip", { cache: "no-store" });
+      const res = await fetch("/jenvu-extension-v1.9.11.zip", { cache: "no-store" });
       if (!res.ok) throw new Error(`Download failed: ${res.status}`);
       const blob = await res.blob();
       const a = document.createElement("a");
       a.href = URL.createObjectURL(blob);
-      a.download = "jenvu-extension-v1.9.10.zip";
+      a.download = "jenvu-extension-v1.9.11.zip";
       a.click();
       URL.revokeObjectURL(a.href);
     } catch (e) {
@@ -546,12 +546,12 @@ function ExtensionPage() {
               </div>
             </div>
             <div className="flex items-center gap-2 text-[13px] text-zinc-800">
-              <span className={MONO}>v1.9.7</span>
+              <span className={MONO}>v1.9.11</span>
               <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-medium text-emerald-700">
                 Latest
               </span>
             </div>
-            <div className="text-[13px] text-zinc-600">Updated Sep 16, 2026</div>
+            <div className="text-[13px] text-zinc-600">Updated Sep 18, 2026</div>
             <button
               type="button"
               onClick={onDownload}
@@ -562,7 +562,7 @@ function ExtensionPage() {
             </button>
           </div>
           <p className="mt-4 text-[12px] text-zinc-500">
-            ZIP package · Chrome developer mode · Version 1.9.7
+            ZIP package · Chrome developer mode · Version 1.9.11
           </p>
         </div>
       )}
