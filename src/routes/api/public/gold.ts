@@ -635,18 +635,20 @@ async function handle({ request }: { request: Request }) {
             : "The required independent senior review was unavailable; request a fresh forecast.";
           text = formatForecast(forecast);
         }
-        const { chargeExtensionUsage } = await import("@/lib/extension-billing.server");
-        const billing = await chargeExtensionUsage({
-          userId: auth.userId,
-          keyId: auth.keyId,
-          keyName: auth.name,
-          requestId,
-          action: "candle_forecast",
-          calls: [
-            ...(primaryModel ? [{ model: primaryModel, usage: primaryUsage, stage: "extension-candle-forecast" }] : []),
-            ...(seniorModel ? [{ model: seniorModel, usage: seniorUsage, stage: "extension-candle-senior-review" }] : []),
-          ],
-        });
+        const calls = [
+          ...(primaryModel ? [{ model: primaryModel, usage: primaryUsage, stage: "extension-candle-forecast" }] : []),
+          ...(seniorModel ? [{ model: seniorModel, usage: seniorUsage, stage: "extension-candle-senior-review" }] : []),
+        ];
+        const billing = calls.length
+          ? await (await import("@/lib/extension-billing.server")).chargeExtensionUsage({
+              userId: auth.userId,
+              keyId: auth.keyId,
+              keyName: auth.name,
+              requestId,
+              action: "candle_forecast",
+              calls,
+            })
+          : { ok: true, charged: 0, balance: entitlement.balance };
         if (!billing.ok) return extJson({ ok: false, error: billing.error, code: "BILLING_FAILED" }, 502);
         return extJson({
           ok: true,
