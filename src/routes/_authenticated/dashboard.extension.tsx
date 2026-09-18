@@ -2,7 +2,17 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { Copy, Check, KeyRound, Trash2, Download, FileText, X, Sparkles } from "lucide-react";
+import {
+  Copy,
+  Check,
+  KeyRound,
+  Trash2,
+  Download,
+  FileText,
+  X,
+  Sparkles,
+  Terminal,
+} from "lucide-react";
 import {
   listExtensionKeys,
   createExtensionKey,
