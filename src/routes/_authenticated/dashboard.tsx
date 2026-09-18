@@ -26,7 +26,7 @@ import { listExtensionKeys } from "@/lib/extension-keys.functions";
 import { Button } from "@/components/ui/button";
 import astraGalaxyBanner from "@/assets/astra-galaxy-banner.jpg";
 import astraParticleCardBackground from "@/assets/astra-particle-card-bg.jpg";
-import grokModelLogoAsset from "@/assets/grok-logo.png.asset.json";
+import grokModelLogo from "@/assets/grok-logo-transparent.png";
 import solLogoAsset from "@/assets/sol-logo.png.asset.json";
 
 
@@ -1549,7 +1549,7 @@ function ModelWorkspace() {
                     <div className="flex items-start justify-between gap-3">
                       <div className={`flex h-11 items-center gap-2 rounded-md border px-2.5 ${model.featured ? "border-primary-foreground/30 bg-primary/75" : "border-border bg-background"}`} aria-label={`${model.logoLabel || model.name} model`}>
                         {model.logoImage ? (
-                          <img src={model.logoImage} alt={model.logoLabel || model.name} className="h-7 w-7 rounded-md object-cover" />
+                          <img src={model.logoImage} alt={model.logoLabel || model.name} className="h-9 w-9 object-contain" />
                         ) : ModelLogo ? (
                           <ModelLogo className="h-5 w-5" strokeWidth={1.8} />
                         ) : null}
