@@ -306,7 +306,8 @@ function updateQuickVisibility() {
   placeQuick();
   const hasMessages = !!$("thread").querySelector(".msg");
   const hasContext = !!chartImage || !!stream;
-  $("quick").classList.toggle("hidden", hasMessages || hasContext);
+  void hasContext;
+  $("quick").classList.add("hidden");
   const market = document.querySelector(".market");
   if (market) market.classList.toggle("hidden", hasMessages);
 }
