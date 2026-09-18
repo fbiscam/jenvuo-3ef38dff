@@ -2,7 +2,17 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { Copy, Check, KeyRound, Trash2, Download, FileText, X, Sparkles } from "lucide-react";
+import {
+  Copy,
+  Check,
+  KeyRound,
+  Trash2,
+  Download,
+  FileText,
+  X,
+  Sparkles,
+  Terminal,
+} from "lucide-react";
 import {
   listExtensionKeys,
   createExtensionKey,
@@ -43,6 +53,7 @@ function ExtensionPage() {
   const [creating, setCreating] = useState(false);
   const [showCreate, setShowCreate] = useState(false);
   const [showGuide, setShowGuide] = useState(false);
+  const [showEndpoint, setShowEndpoint] = useState(false);
   const [name, setName] = useState("");
   const [freshKey, setFreshKey] = useState<string | null>(null);
   const [copied, setCopied] = useState<string | null>(null);
@@ -202,6 +213,12 @@ function ExtensionPage() {
             <FileText className="h-4 w-4" /> API quickstart
           </button>
           <button
+            onClick={() => setShowEndpoint((v) => !v)}
+            className="hidden items-center gap-2 rounded-full px-3 py-2 text-[13px] text-zinc-700 hover:bg-zinc-100 sm:inline-flex"
+          >
+            <Terminal className="h-4 w-4" /> API endpoint
+          </button>
+          <button
             onClick={() => {
               setShowCreate(true);
               setFreshKey(null);
@@ -302,16 +319,24 @@ function ExtensionPage() {
         </div>
       )}
 
-      {/* Public API endpoint */}
-      {view === "keys" && (
-        <div className="mt-5 rounded-xl border border-zinc-200 bg-white p-4">
+      {/* Public API endpoint drawer */}
+      {view === "keys" && showEndpoint && (
+        <div className="mt-6 rounded-xl border border-zinc-200 bg-zinc-50 p-5">
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <h2 className="text-[16px] font-medium text-zinc-900"> Api endpoint</h2>
-            <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-medium text-emerald-700">
-              OpenAI-compatible
-            </span>
+            <div className="flex items-center gap-2">
+              <div className="text-[13px] font-medium text-zinc-900">Api endpoint</div>
+              <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-medium text-emerald-700">
+                OpenAI-compatible
+              </span>
+            </div>
+            <button
+              onClick={() => setShowEndpoint(false)}
+              className="rounded-full p-1 text-zinc-500 hover:bg-zinc-200"
+            >
+              <X className="h-4 w-4" />
+            </button>
           </div>
-          <p className="mt-1 text-[12px] text-zinc-500">
+          <p className="mt-3 text-[12px] leading-relaxed text-zinc-600">
             Use your key anywhere — Claude Desktop, scripts, or any OpenAI-compatible client. Usage
             counts against your plan&apos;s daily token limit and appears on the Usage page.
           </p>
