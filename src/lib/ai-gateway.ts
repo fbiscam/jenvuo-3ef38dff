@@ -435,9 +435,28 @@ async function callJustwoker(
 async function singleAttempt(
   model: string,
   opts: CallChatOptions,
-  _timeoutMs?: number,
+  timeoutMs?: number,
 ): Promise<{ content: string; usage: UsageInfo }> {
-  return singleAttemptInner(model, opts);
+  // A provider that accepts the connection but never answers must not hang the
+  // caller forever: bound each attempt so the chain can fall back.
+  const budget = Math.max(5_000, timeoutMs ?? opts.timeoutMs ?? 90_000);
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), budget);
+  try {
+    return await singleAttemptInner(model, opts, controller.signal);
+  } catch (err: any) {
+    if (controller.signal.aborted) {
+      // Retryable (status 0) so the chain advances to the next model.
+      throw new AiGatewayError(
+        `AI model did not respond in time (${Math.round(budget / 1000)}s).`,
+        0,
+        false,
+      );
+    }
+    throw err;
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
 async function singleAttemptInner(
@@ -773,6 +792,12 @@ export async function callChatCompletion(
   const healthy = configured.filter((m) => !isModelUnhealthy(m));
   const models = healthy.length ? healthy : configured;
 
+  // Wall-clock budget for the whole chain walk, so a stalled provider cannot
+  // consume the caller's entire request.
+  const startedAt = Date.now();
+  const chainDeadline = Math.max(10_000, opts.deadlineMs ?? 180_000);
+  const remaining = () => chainDeadline - (Date.now() - startedAt);
+
   let lastErr: AiGatewayError | null = null;
   let attemptedModels = 0;
 
@@ -781,8 +806,18 @@ export async function callChatCompletion(
     const isLastModel = mi === models.length - 1;
     attemptedModels++;
     for (let attempt = 1; attempt <= retriesPerModel; attempt++) {
+      if (remaining() <= 0) {
+        lastErr =
+          lastErr ?? new AiGatewayError("AI analysis timed out. Please try again.", 0, false);
+        break;
+      }
       try {
-        const { content, usage } = await singleAttempt(model, opts);
+        const perAttempt = Math.min(
+          Math.max(5_000, opts.timeoutMs ?? 90_000),
+          Math.max(5_000, remaining()),
+        );
+        const { content, usage } = await singleAttempt(model, opts, perAttempt);
+
         const validation = opts.validateContent?.(content, model) ?? true;
         if (validation !== true) {
           lastErr = new AiGatewayError(validation, 422, true);
