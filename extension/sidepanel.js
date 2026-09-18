@@ -1213,6 +1213,12 @@ async function send(preset, silentUser) {
     }
     if (d.mode === "conversation") {
       setReviewStatus("Chat mode", "");
+    } else if (d.seniorReview?.status === "confirmed") {
+      setReviewStatus("ICT analysis · senior review confirmed", "verified");
+    } else if (d.seniorReview?.status === "vetoed") {
+      setReviewStatus("ICT analysis · senior review blocked trade", "failed");
+    } else if (d.seniorReview?.status === "unavailable") {
+      setReviewStatus("ICT primary complete · senior review unavailable", "failed");
     } else {
       setReviewStatus("ICT primary review complete", "verified");
     }

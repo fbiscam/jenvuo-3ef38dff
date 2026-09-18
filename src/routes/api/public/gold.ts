@@ -49,6 +49,17 @@ function clampWords(text: string, max: number): string {
   return text.replace(/\s+/g, " ").trim().split(/\s+/).slice(0, max).join(" ");
 }
 
+function validateSignalReview(content: string): true | string {
+  const required = ["VERDICT", "STATUS", "ENTRY", "SL", "TP1", "TP2", "WHY", "THEORY"];
+  const missing = required.filter((field) => !new RegExp(`^\\s*${field}:`, "im").test(content));
+  if (missing.length > 0) return `Missing required review fields: ${missing.join(", ")}`;
+  if (!/^\s*VERDICT:\s*(BUY|SELL|WAIT)\b/im.test(content)) return "Invalid review verdict";
+  if (!/^\s*STATUS:\s*(CONFIRMED|CONDITIONAL|NO TRADE)\b/im.test(content)) {
+    return "Invalid review status";
+  }
+  return true;
+}
+
 function compactSignalAnswer(raw: string, desk: ReturnType<typeof runExtensionDesk>): string {
   const verdictMatch = /^\s*VERDICT:\s*(BUY|SELL|WAIT)\b/im.exec(raw);
   const statusMatch = /^\s*STATUS:\s*(CONFIRMED|CONDITIONAL|NO TRADE)\b/im.exec(raw);
@@ -315,7 +326,6 @@ async function handle({ request }: { request: Request }) {
           },
           entitlement.status,
         );
-      // Senior review is intentionally disabled: primary Claude review only.
       const question = String(body.question || "").slice(0, 2000);
       if (!question) return extJson({ ok: false, error: "Question is empty." }, 400);
 
@@ -380,6 +390,7 @@ async function handle({ request }: { request: Request }) {
           timeoutMs: image ? 40_000 : 8_000,
           deadlineMs: image ? 90_000 : 34_000,
           retriesPerModel: 1,
+          validateContent: validateSignalReview,
           messages: [
             {
               role: "system",
@@ -524,6 +535,7 @@ async function handle({ request }: { request: Request }) {
             timeoutMs: 45_000,
             deadlineMs: 90_000,
             retriesPerModel: 1,
+            validateContent: validateSignalReview,
             messages: [
               {
                 role: "system",

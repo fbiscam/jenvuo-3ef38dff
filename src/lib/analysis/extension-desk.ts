@@ -192,8 +192,11 @@ export function runExtensionDesk(input: DeskInput): DeskResult {
     );
 
   const reviewReasons = [...hardVetoReasons, ...reviewWarnings];
-  const seniorVeto = input.seniorReview && hardVetoReasons.length > 0;
-  const direction: DeskResult["direction"] = seniorVeto ? "WAIT" : candidateDirection;
+  // Hard safety failures block execution on every plan. Senior review adds an
+  // independent model opinion; it must never be the switch that enables the
+  // deterministic risk rules themselves.
+  const rulesVeto = hardVetoReasons.length > 0;
+  const direction: DeskResult["direction"] = rulesVeto ? "WAIT" : candidateDirection;
   const bias = directionBias(trade, h4.trend, h1.trend);
   const passed = scored.factors
     .filter((factor) => factor.pass)
@@ -216,7 +219,7 @@ export function runExtensionDesk(input: DeskInput): DeskResult {
           `RR: 1:${trade.rr.toFixed(2)}`,
         ];
   const reviewLabel = input.seniorReview
-    ? seniorVeto
+    ? rulesVeto
       ? `WAIT — independent rules review blocked execution: ${hardVetoReasons.slice(0, 3).join(" ")}`
       : reviewWarnings.length
         ? `CONDITIONAL — ${confirmations}/8 checks passed with no hard veto. ${reviewWarnings.slice(0, 2).join(" ")}`
