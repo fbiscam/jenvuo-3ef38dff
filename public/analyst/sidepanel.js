@@ -309,7 +309,19 @@ function emptyState() {
   updateQuickVisibility();
 }
 
+function placeQuick() {
+  const q = $("quick");
+  const wrap = document.querySelector(".composer-wrap");
+  const main = document.querySelector(".content");
+  if (!q || !wrap || !main) return;
+  const wide = window.innerWidth >= 720;
+  if (wide && q.parentElement !== wrap) wrap.appendChild(q);
+  if (!wide && q.parentElement !== main) main.appendChild(q);
+}
+window.addEventListener("resize", placeQuick);
+
 function updateQuickVisibility() {
+  placeQuick();
   const hasMessages = !!$("thread").querySelector(".msg");
   const hasContext = !!chartImage || !!stream;
   $("quick").classList.toggle("hidden", hasMessages || hasContext);

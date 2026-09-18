@@ -996,7 +996,7 @@ button.hicon:hover {
     display: none;
   }
   .empty-title {
-    font-family: "Georgia", "Times New Roman", serif;
+    font-family: Georgia, "Times New Roman", Times, serif;
     font-size: 40px;
     line-height: 1.15;
     font-weight: 400;
@@ -1045,7 +1045,7 @@ button.hicon:hover {
   /* Get started cards */
   body:has(.thread.has-empty) .quick {
     display: block;
-    margin: 18px auto 0;
+    margin: 14px auto 0;
     max-width: 880px;
     padding-bottom: 6px;
   }
