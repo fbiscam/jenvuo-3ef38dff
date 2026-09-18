@@ -187,13 +187,18 @@ export function runExtensionDesk(input: DeskInput): DeskResult {
   if (!regime.favorable)
     reviewWarnings.push(regime.warning ?? `${regime.regime} conditions reduce execution quality`);
   if (scored.score < 65)
+    hardVetoReasons.push(`Weighted confluence is only ${scored.score}%, below the 65% execution floor.`);
+  else if (scored.score < 75)
     reviewWarnings.push(
-      `Weighted confluence is ${scored.score}%; reduced size or trigger confirmation is required.`,
+      `Weighted confluence is ${scored.score}%; trigger confirmation is required before execution.`,
     );
 
   const reviewReasons = [...hardVetoReasons, ...reviewWarnings];
-  const seniorVeto = input.seniorReview && hardVetoReasons.length > 0;
-  const direction: DeskResult["direction"] = seniorVeto ? "WAIT" : candidateDirection;
+  // Hard safety failures block execution on every plan. Senior review adds an
+  // independent model opinion; it must never be the switch that enables the
+  // deterministic risk rules themselves.
+  const rulesVeto = hardVetoReasons.length > 0;
+  const direction: DeskResult["direction"] = rulesVeto ? "WAIT" : candidateDirection;
   const bias = directionBias(trade, h4.trend, h1.trend);
   const passed = scored.factors
     .filter((factor) => factor.pass)
@@ -216,7 +221,7 @@ export function runExtensionDesk(input: DeskInput): DeskResult {
           `RR: 1:${trade.rr.toFixed(2)}`,
         ];
   const reviewLabel = input.seniorReview
-    ? seniorVeto
+    ? rulesVeto
       ? `WAIT — independent rules review blocked execution: ${hardVetoReasons.slice(0, 3).join(" ")}`
       : reviewWarnings.length
         ? `CONDITIONAL — ${confirmations}/8 checks passed with no hard veto. ${reviewWarnings.slice(0, 2).join(" ")}`
