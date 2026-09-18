@@ -54,7 +54,7 @@ const QUICKS = [
   },
 ];
 const ANALYSIS_INTENT =
-  /\b(analy[sz]|signal|setup|trade|entry|exit|buy|sell|long|short|bias|tp\d?|sl|stop\s*loss|target|rr|risk|chart|candle|structure|bos|choch|fvg|order\s*block|liquidity|premium|discount|support|resistance|trend|price|market|xau|gold|forex|pair|timeframe|scalp|swing|position)\b|(?:tajzia|tajziya|signal|kharid|bech|entry|nishan|marking)/i;
+  /\b(analy[sz]|signal|setup|trade|entry|exit|buy|sell|long|short|bias|tp\d?|sl|stop\s*loss|target|rr|chart|structure|bos|choch|fvg|order\s*block|liquidity|premium|discount|support|resistance)\b|(?:tajzia|tajziya|signal|kharid|bech|entry|nishan|marking)/i;
 
 const $ = (id) => document.getElementById(id);
 
