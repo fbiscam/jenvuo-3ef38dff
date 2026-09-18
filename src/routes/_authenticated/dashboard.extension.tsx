@@ -25,7 +25,9 @@ import { getPlanCapabilities } from "@/lib/plan-entitlements";
 
 const MONO = "font-['JetBrains_Mono',ui-monospace,monospace]";
 const API_BASE = "https://jenvu.com/api/public/v1";
-const EXTENSION_DOWNLOAD_URL = "/jenvu-extension-v1.9.17.zip";
+// Keep the established static asset path so running deployments can serve a
+// newly packaged release without requiring their static-file manifest to restart.
+const EXTENSION_DOWNLOAD_URL = "/jenvu-extension-v1.9.16.zip";
 
 export const Route = createFileRoute("/_authenticated/dashboard/extension")({
   head: () => ({
