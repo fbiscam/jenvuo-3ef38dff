@@ -1,5 +1,4 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
 
 export const Route = createFileRoute("/_authenticated/dashboard/analyst")({
   head: () => ({
@@ -23,19 +22,12 @@ export const Route = createFileRoute("/_authenticated/dashboard/analyst")({
 });
 
 function AnalystPage() {
-  const [nonce, setNonce] = useState(0);
-
   return (
-    <div className="w-full bg-white">
-      <div className="w-full overflow-hidden bg-white">
-        <iframe
-          key={nonce}
-          title="Jenvu AI Analyst"
-          src="/analyst/sidepanel.html"
-          allow="display-capture; clipboard-write"
-          className="block h-[calc(100vh-120px)] min-h-[620px] w-full border-0 bg-white"
-        />
-      </div>
-    </div>
+    <iframe
+      title="Jenvu AI Analyst"
+      src="/analyst/sidepanel.html"
+      allow="display-capture; clipboard-write"
+      className="block h-screen w-full border-0 bg-white"
+    />
   );
 }
