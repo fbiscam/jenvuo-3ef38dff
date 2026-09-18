@@ -837,28 +837,40 @@ function waitForVideoFrame(video, timeoutMs = 8000) {
 function stopShare() {
   if (stream) stream.getTracks().forEach((t) => t.stop());
   stream = null;
+  const video = $("vid");
+  if (video) {
+    video.pause();
+    video.srcObject = null;
+  }
   $("share").classList.remove("on");
   $("share").title = "Share screen";
   updateQuickVisibility();
 }
 
+async function startShare() {
+  const nextStream = await navigator.mediaDevices.getDisplayMedia({
+    video: { frameRate: { ideal: 2, max: 5 }, width: { ideal: 1920 }, height: { ideal: 1080 } },
+    audio: false,
+  });
+  const track = nextStream.getVideoTracks()[0];
+  if (!track) throw new Error("Chrome did not provide a screen video track.");
+  const video = $("vid");
+  video.srcObject = nextStream;
+  track.addEventListener("ended", stopShare, { once: true });
+  await video.play();
+  await waitForVideoFrame(video, 12000);
+  if (!grabFrame()) throw new Error("The shared screen did not produce a readable frame.");
+  stream = nextStream;
+}
+
 $("share").onclick = async () => {
   if (stream) return stopShare();
   try {
-    stream = await navigator.mediaDevices.getDisplayMedia({
-      video: { frameRate: { ideal: 2, max: 5 } },
-      audio: false,
-    });
-    const video = $("vid");
-    video.srcObject = stream;
-    stream.getVideoTracks()[0].addEventListener("ended", stopShare);
-    await video.play();
-    await waitForVideoFrame(video);
+    await startShare();
     $("share").classList.add("on");
     $("share").title = "Stop sharing";
   } catch (e) {
-    if (stream) stream.getTracks().forEach((track) => track.stop());
-    stream = null;
+    stopShare();
     addMsg(
       "ai err",
       e?.message ||
