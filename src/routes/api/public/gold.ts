@@ -260,6 +260,10 @@ function quickConversationReply(question: string): string | null {
 }
 
 function requestsActionableAnalysis(question: string): boolean {
+  const educationalQuestion =
+    /^\s*(?:what\s+(?:is|are|does)|why\s+(?:is|does)|how\s+(?:does|do|to)|explain|define|meaning\s+of|tell\s+me\s+about)\b/i;
+  if (educationalQuestion.test(question)) return false;
+
   const directRequest =
     /\b(signal|setup|trade\s*plan|entry\s*(?:level|price|zone)?|stop\s*loss|take\s*profit|tp\d?|sl|buy\s*(?:or|\/)?\s*sell|long\s*(?:or|\/)?\s*short|should\s+i\s+(?:buy|sell|take\s+(?:the\s+)?trade)|where\s+is\s+liquidity|next\s+sweep)\b/i;
   const analysisCommand =

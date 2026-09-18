@@ -61,6 +61,12 @@ const ACTIONABLE_ANALYSIS_INTENT = [
 ];
 
 function requestsActionableAnalysis(text) {
+  if (
+    /^\s*(?:what\s+(?:is|are|does)|why\s+(?:is|does)|how\s+(?:does|do|to)|explain|define|meaning\s+of|tell\s+me\s+about)\b/i.test(
+      text,
+    )
+  )
+    return false;
   return ACTIONABLE_ANALYSIS_INTENT.some((pattern) => pattern.test(text));
 }
 
