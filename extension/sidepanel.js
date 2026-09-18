@@ -531,6 +531,8 @@ function addMsg(cls, text, shot) {
   return d;
 }
 
+const REQUEST_DEADLINE_MS = 240000;
+
 async function post(body, signal) {
   const requestId =
     "ext_" + Date.now().toString(36) + "_" + Math.random().toString(36).slice(2, 10);
@@ -540,7 +542,15 @@ async function post(body, signal) {
     const requestController = new AbortController();
     const abortFromUser = () => requestController.abort();
     signal?.addEventListener("abort", abortFromUser, { once: true });
+    // Safety net: a backend that accepts the request but never answers must
+    // not leave the panel stuck on "analyzing" forever.
+    let timedOut = false;
+    const deadlineTimer = setTimeout(() => {
+      timedOut = true;
+      requestController.abort();
+    }, REQUEST_DEADLINE_MS);
     try {
+
       const res = await fetch(url, {
         method: "POST",
         headers: {
