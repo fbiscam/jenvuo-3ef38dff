@@ -440,7 +440,7 @@ function ExtensionPage() {
                 <div className="min-w-0">
                   <div className="mb-1 text-[11px] text-zinc-500 md:hidden">Extension</div>
                   <div className="truncate text-[13px] text-blue-700">Jenvu XAU/USD Extension</div>
-                  <div className={`${MONO} truncate text-[12px] text-zinc-500`}>v1.9.15</div>
+                  <div className={`${MONO} truncate text-[12px] text-zinc-500`}>v1.9.16</div>
                 </div>
                 <div className="text-[13px] text-zinc-800">
                   <div className="mb-1 text-[11px] text-zinc-500 md:hidden">Created</div>
