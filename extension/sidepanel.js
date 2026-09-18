@@ -586,6 +586,9 @@ async function post(body, signal) {
     } catch (e) {
       if (e && e.name === "AbortError") {
         if (signal?.aborted) throw e;
+        if (timedOut) {
+          throw new Error("That took too long. Please try again in a moment.");
+        }
       }
       // Only move to another site address when the current address cannot be
       // reached. Replaying a completed 5xx analysis request against every
@@ -595,7 +598,9 @@ async function post(body, signal) {
       lastErr = e;
       if (!e.retryable && !e.tryNextEndpoint) break;
     } finally {
+      clearTimeout(deadlineTimer);
       signal?.removeEventListener("abort", abortFromUser);
+
     }
   }
   if (authErr) {
