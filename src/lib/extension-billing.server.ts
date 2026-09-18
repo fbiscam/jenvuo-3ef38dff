@@ -96,15 +96,15 @@ export async function chargeExtensionUsage(params: {
   if (!entitlement.allowed) return { ok: false, charged: 0, error: entitlement.error }
   const rawCost = params.calls.reduce((sum, call) => sum + estimateCostUsd(call.model, call.usage.promptTokens, call.usage.completionTokens), 0)
   const hasSeniorReview = params.calls.some((call) => call.stage === 'extension-senior-review' || call.stage === 'senior-review')
-  const charged = hasSeniorReview
-    ? EXTENSION_SENIOR_REVIEW_FEE_USD
-    : EXTENSION_PRIMARY_REQUEST_FEE_USD
-  if (entitlement.balance < charged) return { ok: false, charged: 0, error: 'Low balance. Add funds to continue using extension AI.' }
 
   const primary = params.calls[0]
   const senior = params.calls[1]
   const promptTokens = params.calls.reduce((sum, call) => sum + call.usage.promptTokens, 0)
   const completionTokens = params.calls.reduce((sum, call) => sum + call.usage.completionTokens, 0)
+  const totalTokens = promptTokens + completionTokens
+  // Pay-as-you-go: $3 per 1,000,000 tokens actually used (prompt + completion).
+  const charged = Math.round(tokensToUsd(totalTokens) * 1e6) / 1e6
+  if (charged > 0 && entitlement.balance < charged) return { ok: false, charged: 0, error: 'Low balance. Add funds to continue using extension AI.' }
   const models = params.calls.map((call) => call.model).join(',')
   const { supabaseAdmin } = await import('@/integrations/supabase/client.server')
   const { data, error } = await (supabaseAdmin as any).rpc('charge_extension_usage', {
