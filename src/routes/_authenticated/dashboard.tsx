@@ -1517,29 +1517,15 @@ const RECOMMENDED_MODELS = [
   },
 ] as const;
 
-const PRODUCT_UPDATES = [
-  {
-    age: "Latest",
-    title: " Smarter chart validation",
-    copy: "Chart images are now checked before GPT-6 Astra starts its analysis.",
-    time: "15 Sep 2026 · 09:40",
-    icon: ScanSearch,
-  },
-  {
-    age: "Latest",
-    title: " Reliable senior review",
-    copy: "Claude Opus 5 must complete its review before eligible signals are shown.",
-    time: "14 Sep 2026 · 17:05",
-    icon: ShieldCheckIcon,
-  },
-  {
-    age: "Updated",
-    title: "  Provider fallback",
-    copy: "Analysis continues through another provider when an AI account is unavailable.",
-    time: "12 Sep 2026 · 11:20",
-    icon: RefreshCw,
-  },
-] as const;
+const UPDATE_ICONS = {
+  scan: ScanSearch,
+  shield: ShieldCheckIcon,
+  refresh: RefreshCw,
+  sparkles: Sparkles,
+  gauge: Settings2,
+  terminal: Terminal,
+} as const;
+
 
 function ModelWorkspace() {
   return (
