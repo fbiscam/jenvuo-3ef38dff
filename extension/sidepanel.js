@@ -54,7 +54,7 @@ const QUICKS = [
   },
 ];
 const ACTIONABLE_ANALYSIS_INTENT = [
-  /\b(signal|setup|trade\s*plan|entry\s*(?:level|price|zone)?|stop\s*loss|take\s*profit|tp\d?|sl|buy\s*(?:or|\/)?\s*sell|long\s*(?:or|\/)?\s*short)\b/i,
+  /\b(signal|setup|trade\s*plan|entry\s*(?:level|price|zone)?|stop\s*loss|take\s*profit|tp\d?|sl|buy\s*(?:or|\/)?\s*sell|long\s*(?:or|\/)?\s*short|should\s+i\s+(?:buy|sell|take\s+(?:the\s+)?trade)|where\s+is\s+liquidity|next\s+sweep)\b/i,
   /\b(analy[sz]e?|review|read|check|scan|inspect|mark)\b[\s\S]{0,60}\b(chart|screen|market|price|xau(?:\/usd)?|gold|setup|structure|liquidity|bias)\b/i,
   /\b(chart|screen|market|price|xau(?:\/usd)?|gold|setup|structure|liquidity|bias)\b[\s\S]{0,60}\b(analy[sz]e?|review|read|check|scan|inspect|mark)\b/i,
   /(?:tajzia|tajziya|signal|setup|trade\s*plan|entry|sl|tp|kharid|bech|chart\s*(?:dekho|check)|market\s*(?:dekho|check))/i,

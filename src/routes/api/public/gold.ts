@@ -261,7 +261,7 @@ function quickConversationReply(question: string): string | null {
 
 function requestsActionableAnalysis(question: string): boolean {
   const directRequest =
-    /\b(signal|setup|trade\s*plan|entry\s*(?:level|price|zone)?|stop\s*loss|take\s*profit|tp\d?|sl|buy\s*(?:or|\/)?\s*sell|long\s*(?:or|\/)?\s*short)\b/i;
+    /\b(signal|setup|trade\s*plan|entry\s*(?:level|price|zone)?|stop\s*loss|take\s*profit|tp\d?|sl|buy\s*(?:or|\/)?\s*sell|long\s*(?:or|\/)?\s*short|should\s+i\s+(?:buy|sell|take\s+(?:the\s+)?trade)|where\s+is\s+liquidity|next\s+sweep)\b/i;
   const analysisCommand =
     /\b(analy[sz]e?|review|read|check|scan|inspect|mark)\b[\s\S]{0,60}\b(chart|screen|market|price|xau(?:\/usd)?|gold|setup|structure|liquidity|bias)\b/i;
   const reversedAnalysisCommand =

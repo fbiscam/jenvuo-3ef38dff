@@ -87,3 +87,5 @@
 - [x] Fix misleading server-busy failures, remove artificial AI cutoffs, and rebuild extension v1.9.8
 - [x] Keep deep ICT/SMC analysis internal and return only decision, direction, entry, SL, TP1/TP2, and one concise reason
 - [x] Rebuild and verify extension v1.9.9 with the compact signal contract
+- [x] Reserve structured trade plans for actionable XAU/USD analysis requests
+- [x] Resolve and verify the stale `src/lib/utils.ts` string return diagnostic
