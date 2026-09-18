@@ -228,6 +228,8 @@ function PricingPage() {
             <tbody>
               {([
                 { f: "Monthly AI wallet", b: "$10", c: "$40", d: "$90" },
+                { f: "Daily token limit", b: "1.5M", c: "5M", d: "10M" },
+                { f: "Balance-based quota ($3 = 1M)", b: true, c: true, d: true },
                 { f: "Active extension API keys", b: "2", c: "3", d: "5" },
                 { f: "GPT-6 Astra primary analysis", b: true, c: true, d: true },
                 { f: "Claude Opus 5 senior review", b: false, c: true, d: true },
@@ -393,6 +395,7 @@ function CustomTopUp({ signedOut }: { signedOut: boolean }) {
           
           <h3 className="mt-2 text-lg font-semibold tracking-tight">Pick your own amount</h3>
           <p className="mt-1 text-sm text-zinc-600">Minimum $5. $1 top-up = $1 wallet. Primary requests cost $0.03; completed senior-reviewed analysis costs $0.20.</p>
+          <p className="mt-1 text-sm text-zinc-600">Every $3 of balance — from a top-up or a promo code — unlocks 1,000,000 tokens of daily usage, up to your plan's ceiling. Balances under $3 scale proportionally, and the allowance resets at 00:00 UTC.</p>
         </div>
         <div className="flex items-center gap-3">
           <div className="flex items-center overflow-hidden rounded-md border border-border bg-background focus-within:ring-2 focus-within:ring-home-accent/40">
