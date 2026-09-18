@@ -856,11 +856,11 @@ async function startShare() {
   if (!track) throw new Error("Chrome did not provide a screen video track.");
   const video = $("vid");
   video.srcObject = nextStream;
+  stream = nextStream;
   track.addEventListener("ended", stopShare, { once: true });
   await video.play();
   await waitForVideoFrame(video, 12000);
   if (!grabFrame()) throw new Error("The shared screen did not produce a readable frame.");
-  stream = nextStream;
 }
 
 $("share").onclick = async () => {
