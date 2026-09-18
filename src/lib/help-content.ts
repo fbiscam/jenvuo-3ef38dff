@@ -345,6 +345,16 @@ export const collections: Collection[] = [
             "The amount available today is the lower of your plan ceiling and your balance-based quota.",
           ]},
 
+          { type: "h2", content: "Credits from top-ups and promo codes" },
+          { type: "ul", items: [
+            "Promo-code credit lands in the same wallet as a paid top-up, so it follows exactly the same rule.",
+            "Every complete $3 of balance unlocks another 1,000,000 tokens of daily usage.",
+            "Balances under $3 scale proportionally — $1 is roughly 333,000 tokens.",
+            "Your plan ceiling still applies, so extra balance cannot push you past the plan's daily maximum.",
+            "The same rule applies on every plan, including Free, and on accounts with an active subscription.",
+          ]},
+
+
           { type: "h2", content: "Free" },
           { type: "ul", items: [
             "100,000 tokens per day.",
