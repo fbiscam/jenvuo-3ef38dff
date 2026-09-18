@@ -257,7 +257,11 @@ function quickConversationReply(question: string): string | null {
     .trim()
     .toLowerCase()
     .replace(/[!?.،]+$/g, "");
-  if (/^(hi|hello|hey|hii+|helo|salam|salaam|assalam(?:u alaikum)?|aoa)$/.test(normalized)) {
+  if (
+    /^(?:(?:ok|okay|alright|theek|thik|acha|accha|got it)\s+)?(?:hi|hello|hey|hii+|helo|salam|salaam|assalam(?:u alaikum)?|aoa)$/.test(
+      normalized,
+    )
+  ) {
     return /salam|assalam|aoa/.test(normalized)
       ? "Wa Alaikum Assalam! Main Jenvu AI hoon. Aaj main aapki kis cheez mein help karun?"
       : "Hello! I’m Jenvu AI. How can I help you today?";
@@ -364,7 +368,7 @@ async function handle({ request }: { request: Request }) {
       const conversational = !analysisIntent;
 
       if (conversational) {
-        const quickReply = image ? null : quickConversationReply(question);
+        const quickReply = quickConversationReply(question);
         if (quickReply) {
           return extJson({
             ok: true,
