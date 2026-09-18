@@ -306,7 +306,7 @@ function ExtensionPage() {
       {view === "keys" && (
         <div className="mt-5 rounded-xl border border-zinc-200 bg-white p-4">
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <h2 className="text-[16px] font-medium text-zinc-900">API endpoint</h2>
+            <h2 className="text-[16px] font-medium text-zinc-900"> Api endpoint</h2>
             <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-medium text-emerald-700">
               OpenAI-compatible
             </span>
