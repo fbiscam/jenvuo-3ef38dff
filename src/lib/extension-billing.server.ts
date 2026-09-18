@@ -95,7 +95,7 @@ export async function chargeExtensionUsage(params: {
   const entitlement = await getExtensionEntitlement(params.userId)
   if (!entitlement.allowed) return { ok: false, charged: 0, error: entitlement.error }
   const rawCost = params.calls.reduce((sum, call) => sum + estimateCostUsd(call.model, call.usage.promptTokens, call.usage.completionTokens), 0)
-  const hasSeniorReview = params.calls.some((call) => call.stage === 'extension-senior-review' || call.stage === 'senior-review')
+  const hasSeniorReview = params.calls.some((call) => call.stage === 'extension-senior-review' || call.stage === 'extension-candle-senior-review' || call.stage === 'senior-review')
 
   const primary = params.calls[0]
   const senior = params.calls[1]

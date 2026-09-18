@@ -368,7 +368,7 @@ function requestsActionableAnalysis(question: string): boolean {
 }
 
 function requestsCandleForecast(question: string): boolean {
-  return /\b(?:next|upcoming|agli|agla)\s+(?:(?:15\s*(?:m|min|minute))\s+)?candle\b|\b15\s*(?:m|min|minute)\s+(?:next\s+)?candle\b|\bcandle\s+(?:konsi|kaunsi|kesa|kaisa)\s+(?:banegi|bnegi|hog[ai])\b|\b(?:bullish|bearish)\s+(?:next|agli|agla)\s+candle\b/i.test(
+  return /\b(?:next|upcoming|agli|agla|agali|aglay)\s+(?:(?:15\s*(?:m|min|minute)s?)\s+)?candle\b|\b15\s*(?:m|min|minute)s?\s+(?:next\s+)?candle\b|\bcandle\s+(?:konsi|kaunsi|kesa|kaisa)\s+(?:banegi|bnegi|banay\s+gi|hog[ai])\b|\b(?:bullish|bearish)\s+(?:next|agli|agla|agali|aglay)\s+candle\b/i.test(
     question,
   );
 }
