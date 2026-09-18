@@ -459,7 +459,6 @@ async function singleAttempt(
   }
 }
 
-
 async function singleAttemptInner(
   model: string,
   opts: CallChatOptions,
@@ -801,7 +800,6 @@ export async function callChatCompletion(
 
   let lastErr: AiGatewayError | null = null;
   let attemptedModels = 0;
-
 
   for (let mi = 0; mi < models.length; mi++) {
     const model = models[mi];

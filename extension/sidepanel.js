@@ -550,7 +550,6 @@ async function post(body, signal) {
       requestController.abort();
     }, REQUEST_DEADLINE_MS);
     try {
-
       const res = await fetch(url, {
         method: "POST",
         headers: {
@@ -600,7 +599,6 @@ async function post(body, signal) {
     } finally {
       clearTimeout(deadlineTimer);
       signal?.removeEventListener("abort", abortFromUser);
-
     }
   }
   if (authErr) {
