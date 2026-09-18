@@ -1163,8 +1163,11 @@ async function send(preset, silentUser) {
     return;
   }
 
-  let shot = analysisRequest ? await grabFrame() : null;
-  if (!shot && stream && analysisRequest) {
+  // Whenever a screen share is live the current frame travels with every
+  // message, so plain questions like "can you see my screen?" are answered
+  // from the actual picture instead of a blind "I cannot see it".
+  let shot = stream ? await grabFrame() : null;
+  if (!shot && stream) {
     for (let i = 0; i < 12 && !shot; i++) {
       await new Promise((r) => setTimeout(r, 250));
       shot = await grabFrame();
@@ -1177,7 +1180,7 @@ async function send(preset, silentUser) {
     updateSendState();
     addMsg(
       "ai err",
-      "Shared frame black ya unreadable hai. Share dobara start karke Chrome prompt mein chart tab/window select karein; minimized ya protected window select na karein.",
+      "Shared frame black ya unreadable hai. Share dobara start krka Chrome prompt mein chart tab/window select karein; minimized ya protected window select na karein.",
     );
     return;
   }
