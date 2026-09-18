@@ -435,10 +435,30 @@ async function callJustwoker(
 async function singleAttempt(
   model: string,
   opts: CallChatOptions,
-  _timeoutMs?: number,
+  timeoutMs?: number,
 ): Promise<{ content: string; usage: UsageInfo }> {
-  return singleAttemptInner(model, opts);
+  // A provider that accepts the connection but never answers must not hang the
+  // caller forever: bound each attempt so the chain can fall back.
+  const budget = Math.max(5_000, timeoutMs ?? opts.timeoutMs ?? 90_000);
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), budget);
+  try {
+    return await singleAttemptInner(model, opts, controller.signal);
+  } catch (err: any) {
+    if (controller.signal.aborted) {
+      // Retryable (status 0) so the chain advances to the next model.
+      throw new AiGatewayError(
+        `AI model did not respond in time (${Math.round(budget / 1000)}s).`,
+        0,
+        false,
+      );
+    }
+    throw err;
+  } finally {
+    clearTimeout(timer);
+  }
 }
+
 
 async function singleAttemptInner(
   model: string,
