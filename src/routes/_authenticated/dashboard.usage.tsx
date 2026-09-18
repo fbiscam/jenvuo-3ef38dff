@@ -61,6 +61,15 @@ function fmtUsd(n: number, decimals = 4) {
   return `$${n.toFixed(d)}`;
 }
 
+function fmtSpend(n: number) {
+  if (!Number.isFinite(n) || n === 0) return "$0.00";
+  const abs = Math.abs(n);
+  if (abs >= 1) return `$${n.toFixed(2)}`;
+  if (abs >= 0.01) return `$${n.toFixed(3)}`;
+  if (abs >= 0.0001) return `$${n.toFixed(5)}`;
+  return `<$0.0001`;
+}
+
 function fmtInt(n: number) {
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
   if (n >= 1_000) return `${(n / 1_000).toFixed(1)}k`;
