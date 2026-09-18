@@ -34,7 +34,7 @@ export const PRODUCT_UPDATES: ProductUpdate[] = [
     icon: "terminal",
   },
   {
-    title: "Daily token limits",
+    title: " Daily token limits",
     copy: "Free 100K, Pro 1.5M, Elite 5M and Ultra 10M tokens a day, resetting at 00:00 UTC.",
     at: "2026-09-16T10:05:00Z",
     tag: "Updated",
