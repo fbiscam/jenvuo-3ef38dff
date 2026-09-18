@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Jenvu Thunder \u2014 ICT/SMC Gold Analyst",
-  "version": "1.9.10",
+  "version": "1.9.11",
   "description": "Side panel: share your screen and get live ICT/SMC gold (XAU/USD) analysis on any page.",
   "permissions": ["sidePanel", "tabs", "storage", "scripting", "activeTab"],
   "host_permissions": [
