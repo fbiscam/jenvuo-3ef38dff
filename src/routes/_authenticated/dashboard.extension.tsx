@@ -25,6 +25,7 @@ import { getPlanCapabilities } from "@/lib/plan-entitlements";
 
 const MONO = "font-['JetBrains_Mono',ui-monospace,monospace]";
 const API_BASE = "https://jenvu.com/api/public/v1";
+const EXTENSION_DOWNLOAD_URL = "https://jenvu.com/jenvu-extension-v1.9.14.zip";
 
 export const Route = createFileRoute("/_authenticated/dashboard/extension")({
   head: () => ({
@@ -176,14 +177,13 @@ function ExtensionPage() {
   const onDownload = async () => {
     setDownloading(true);
     try {
-      const res = await fetch("/jenvu-extension-v1.9.14.zip", { cache: "no-store" });
-      if (!res.ok) throw new Error(`Download failed: ${res.status}`);
-      const blob = await res.blob();
       const a = document.createElement("a");
-      a.href = URL.createObjectURL(blob);
+      a.href = EXTENSION_DOWNLOAD_URL;
       a.download = "jenvu-extension-v1.9.14.zip";
+      a.rel = "noopener";
+      document.body.appendChild(a);
       a.click();
-      URL.revokeObjectURL(a.href);
+      a.remove();
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Download failed");
     } finally {
