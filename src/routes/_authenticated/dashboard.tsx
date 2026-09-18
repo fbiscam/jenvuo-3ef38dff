@@ -1517,6 +1517,8 @@ const RECOMMENDED_MODELS = [
   },
 ] as const;
 
+import { getLatestProductUpdates, formatUpdateTime } from "@/lib/product-updates";
+
 const UPDATE_ICONS = {
   scan: ScanSearch,
   shield: ShieldCheckIcon,
