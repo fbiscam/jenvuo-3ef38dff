@@ -178,20 +178,12 @@ export function runExtensionDesk(input: DeskInput): DeskResult {
   if (scored.vetos.length) hardVetoReasons.push(...scored.vetos.map((veto) => veto.reason));
   if (candidateDirection !== "WAIT" && trade.rr < 1.5)
     hardVetoReasons.push(`Risk/reward 1:${trade.rr.toFixed(2)} is below the 1:1.5 floor.`);
-  if (confirmations < 2)
-    hardVetoReasons.push(`Only ${confirmations}/8 independent execution confirmations passed.`);
-  else if (confirmations < 4)
-    reviewWarnings.push(
-      `Only ${confirmations}/8 independent execution confirmations passed; treat this as a pending setup.`,
-    );
+  if (confirmations < 4)
+    hardVetoReasons.push(`Only ${confirmations}/8 independent execution confirmations passed; four are required.`);
   if (!regime.favorable)
     reviewWarnings.push(regime.warning ?? `${regime.regime} conditions reduce execution quality`);
-  if (scored.score < 65)
-    hardVetoReasons.push(`Weighted confluence is only ${scored.score}%, below the 65% execution floor.`);
-  else if (scored.score < 75)
-    reviewWarnings.push(
-      `Weighted confluence is ${scored.score}%; trigger confirmation is required before execution.`,
-    );
+  if (scored.score < 75)
+    hardVetoReasons.push(`Weighted confluence is only ${scored.score}%, below the 75% execution floor.`);
 
   const reviewReasons = [...hardVetoReasons, ...reviewWarnings];
   // Hard safety failures block execution on every plan. Senior review adds an

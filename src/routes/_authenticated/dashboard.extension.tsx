@@ -25,7 +25,7 @@ import { getPlanCapabilities } from "@/lib/plan-entitlements";
 
 const MONO = "font-['JetBrains_Mono',ui-monospace,monospace]";
 const API_BASE = "https://jenvu.com/api/public/v1";
-const EXTENSION_DOWNLOAD_URL = "https://jenvu.com/jenvu-extension-v1.9.15.zip";
+const EXTENSION_DOWNLOAD_URL = "/jenvu-extension-v1.9.16.zip";
 
 export const Route = createFileRoute("/_authenticated/dashboard/extension")({
   head: () => ({
@@ -179,7 +179,7 @@ function ExtensionPage() {
     try {
       const a = document.createElement("a");
       a.href = EXTENSION_DOWNLOAD_URL;
-      a.download = "jenvu-extension-v1.9.15.zip";
+      a.download = "jenvu-extension-v1.9.16.zip";
       a.rel = "noopener";
       document.body.appendChild(a);
       a.click();
@@ -547,7 +547,7 @@ function ExtensionPage() {
               </div>
             </div>
             <div className="flex items-center gap-2 text-[13px] text-zinc-800">
-               <span className={MONO}>v1.9.15</span>
+               <span className={MONO}>v1.9.16</span>
               <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-medium text-emerald-700">
                 Latest
               </span>
@@ -563,7 +563,7 @@ function ExtensionPage() {
             </button>
           </div>
           <p className="mt-4 text-[12px] text-zinc-500">
-             ZIP package · Chrome developer mode · Version 1.9.15
+             ZIP package · Chrome developer mode · Version 1.9.16
           </p>
         </div>
       )}
@@ -581,9 +581,9 @@ function ExtensionPage() {
             </button>
           </div>
           <p className="mt-3 text-[12px] leading-relaxed text-zinc-600">
-            AI chat and primary-only analysis cost $0.03 per request. Each completed senior-reviewed
-            analysis costs $0.20. Pro includes GPT-6 Astra for XAU/USD; Elite and Ultra add
-            multi-pair scanning and mandatory Claude review.
+            Usage is charged only for the tokens actually processed at $3 per 1,000,000 tokens.
+            Your wallet balance and plan daily limit apply to chat and XAU/USD analysis; Elite and
+            Ultra include mandatory senior review.
           </p>
           <ol className="mt-3 space-y-2 text-[13px] leading-relaxed text-zinc-700">
             <li>1. Download the extension package above and unzip it.</li>

@@ -54,15 +54,15 @@ const QUICKS = [
   },
 ];
 const ACTIONABLE_ANALYSIS_INTENT = [
-  /\b(signal|setup|trade\s*plan|entry\s*(?:level|price|zone)?|stop\s*loss|take\s*profit|tp\d?|sl|buy\s*(?:or|\/)?\s*sell|long\s*(?:or|\/)?\s*short|should\s+i\s+(?:buy|sell|take\s+(?:the\s+)?trade)|where\s+is\s+liquidity|next\s+sweep)\b/i,
+  /\b(?:give|show|make|create|need|want|tell)\s+(?:me\s+)?(?:a\s+|the\s+|my\s+)?(?:live\s+|current\s+)?(?:signal|setup|trade\s*plan|entry|stop\s*loss|take\s*profit|tp\d?|sl)\b|\b(?:signal|setup|trade\s*plan|entry|stop\s*loss|take\s*profit|tp\d?|sl)\s+(?:now|please|batao|do|chahiye)\b|\b(?:buy\s*(?:or|\/)?\s*sell|long\s*(?:or|\/)?\s*short|should\s+i\s+(?:buy|sell|take\s+(?:the\s+)?trade)|where\s+is\s+liquidity|next\s+sweep)\b/i,
   /\b(analy[sz]e?|review|read|check|scan|inspect|mark)\b[\s\S]{0,60}\b(chart|screen|market|price|xau(?:\/usd)?|gold|setup|structure|liquidity|bias)\b/i,
   /\b(chart|screen|market|price|xau(?:\/usd)?|gold|setup|structure|liquidity|bias)\b[\s\S]{0,60}\b(analy[sz]e?|review|read|check|scan|inspect|mark)\b/i,
-  /\b(?:tajzia|tajziya|signal|setup|trade\s*plan|entry|sl|tp\d?|kharid|bech|chart\s*(?:dekho|check|dikhao)|market\s*(?:dekho|check))\b/i,
+  /\b(?:tajzia|tajziya)\s+(?:karo|kro|do)\b|\b(?:signal|setup|trade\s*plan|entry|sl|tp\d?)\s+(?:batao|do|chahiye)\b|\b(?:kharidun|bechun|buy\s+karun|sell\s+karun)\b|\b(?:chart|market)\s*(?:dekho|check|dikhao)\b/i,
 ];
 
 function requestsActionableAnalysis(text) {
   if (
-    /^\s*(?:what\s+(?:is|are|does)|why\s+(?:is|does)|how\s+(?:does|do|to)|explain|define|meaning\s+of|tell\s+me\s+about)\b/i.test(
+    /\b(?:what\s+(?:is|are|does)|why\s+(?:is|does)|how\s+(?:does|do|to)|explain|define|meaning\s+of|means?|difference\s+between|teach\s+me|learn\s+about|understand)\b/i.test(
       text,
     )
   )

@@ -60,6 +60,27 @@ function validateSignalReview(content: string): true | string {
   return true;
 }
 
+function sanitizeConversationalAnswer(content: string): string {
+  const structuredLabels = content.match(
+    /^\s*(?:DECISION|VERDICT|STATUS|DIRECTION|ENTRY|SL|STOP(?:\s+LOSS)?|TP\d*|TAKE\s+PROFIT|RR|CONFIDENCE)\s*:/gim,
+  );
+  if ((structuredLabels?.length ?? 0) < 2) return content.trim();
+
+  const withoutPlan = content
+    .split("\n")
+    .filter(
+      (line) =>
+        !/^\s*(?:DECISION|VERDICT|STATUS|DIRECTION|ENTRY|SL|STOP(?:\s+LOSS)?|TP\d*|TAKE\s+PROFIT|RR|CONFIDENCE)\s*:/i.test(
+          line,
+        ),
+    )
+    .join("\n")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+
+  return withoutPlan || "Please ask explicitly for a live XAU/USD chart analysis if you want entry, stop and target levels.";
+}
+
 // Hard safety gate applied after the AI review: a structurally "valid" idea is
 // still wrong if the quote is stale or price has already run past the plan.
 function invalidateStalePlan(
@@ -325,17 +346,17 @@ function quickConversationReply(question: string): string | null {
 
 function requestsActionableAnalysis(question: string): boolean {
   const educationalQuestion =
-    /^\s*(?:what\s+(?:is|are|does)|why\s+(?:is|does)|how\s+(?:does|do|to)|explain|define|meaning\s+of|tell\s+me\s+about)\b/i;
+    /\b(?:what\s+(?:is|are|does)|why\s+(?:is|does)|how\s+(?:does|do|to)|explain|define|meaning\s+of|means?|difference\s+between|teach\s+me|learn\s+about|understand)\b/i;
   if (educationalQuestion.test(question)) return false;
 
   const directRequest =
-    /\b(signal|setup|trade\s*plan|entry\s*(?:level|price|zone)?|stop\s*loss|take\s*profit|tp\d?|sl|buy\s*(?:or|\/)?\s*sell|long\s*(?:or|\/)?\s*short|should\s+i\s+(?:buy|sell|take\s+(?:the\s+)?trade)|where\s+is\s+liquidity|next\s+sweep)\b/i;
+    /\b(?:give|show|make|create|need|want|tell)\s+(?:me\s+)?(?:a\s+|the\s+|my\s+)?(?:live\s+|current\s+)?(?:signal|setup|trade\s*plan|entry|stop\s*loss|take\s*profit|tp\d?|sl)\b|\b(?:signal|setup|trade\s*plan|entry|stop\s*loss|take\s*profit|tp\d?|sl)\s+(?:now|please|batao|do|chahiye)\b|\b(?:buy\s*(?:or|\/)?\s*sell|long\s*(?:or|\/)?\s*short|should\s+i\s+(?:buy|sell|take\s+(?:the\s+)?trade)|where\s+is\s+liquidity|next\s+sweep)\b/i;
   const analysisCommand =
     /\b(analy[sz]e?|review|read|check|scan|inspect|mark)\b[\s\S]{0,60}\b(chart|screen|market|price|xau(?:\/usd)?|gold|setup|structure|liquidity|bias)\b/i;
   const reversedAnalysisCommand =
     /\b(chart|screen|market|price|xau(?:\/usd)?|gold|setup|structure|liquidity|bias)\b[\s\S]{0,60}\b(analy[sz]e?|review|read|check|scan|inspect|mark)\b/i;
   const romanUrduRequest =
-    /\b(?:tajzia|tajziya|signal|setup|trade\s*plan|entry|sl|tp\d?|kharid|bech|chart\s*(?:dekho|check|dikhao)|market\s*(?:dekho|check))\b/i;
+    /\b(?:tajzia|tajziya)\s+(?:karo|kro|do)\b|\b(?:signal|setup|trade\s*plan|entry|sl|tp\d?)\s+(?:batao|do|chahiye)\b|\b(?:kharidun|bechun|buy\s+karun|sell\s+karun)\b|\b(?:chart|market)\s*(?:dekho|check|dikhao)\b/i;
 
   return (
     directRequest.test(question) ||
@@ -475,7 +496,7 @@ async function handle({ request }: { request: Request }) {
 
         return extJson({
           ok: true,
-          text: casual.content,
+          text: sanitizeConversationalAnswer(casual.content),
           mode: "conversation",
           seniorReview: { included: false, model: null, status: "not_required" },
           secondReview: { included: false, model: null, status: "not_required" },
@@ -528,6 +549,7 @@ async function handle({ request }: { request: Request }) {
           timeoutMs: 55_000,
           deadlineMs: 120_000,
           retriesPerModel: 1,
+          validateContent: validateSignalReview,
           messages: [
             {
               role: "system",
@@ -631,6 +653,14 @@ async function handle({ request }: { request: Request }) {
         }
       }
       const secondReview = seniorReview;
+      const refreshedTick = await fetchLiveInstrumentTick(market.inst).catch(() => null);
+      const validationPrice = refreshedTick?.price ?? market.ticker.price;
+      const validationQuoteAgeMs = refreshedTick?.t
+        ? Math.max(0, Date.now() - refreshedTick.t)
+        : market.freshness.source === "live-tick"
+          ? market.freshness.quoteAgeMs + (Date.now() - Date.parse(market.freshness.generatedAt))
+          : Number.POSITIVE_INFINITY;
+
       analysisText =
         entitlement.seniorReview && seniorReview.status === "unavailable"
           ? [
@@ -644,8 +674,8 @@ async function handle({ request }: { request: Request }) {
               "THEORY: The primary ICT/SMC review completed, but the required independent risk check did not. Do not take this trade until review succeeds.",
             ].join("\n")
           : compactSignalAnswer(analysisText, desk, {
-              livePrice: market.ticker.price,
-              quoteAgeMs: market.freshness.quoteAgeMs,
+              livePrice: validationPrice,
+              quoteAgeMs: validationQuoteAgeMs,
             });
 
       const { chargeExtensionUsage } = await import("@/lib/extension-billing.server");
