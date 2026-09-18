@@ -577,7 +577,7 @@ function UsagePage() {
                     />
                   </div>
                   <div className="mt-2 text-[10px] text-muted-foreground">
-                    ${data.tokenRateUsdPerMillion} per 1M tokens · resets 00:00 UTC
+                    Balance based · ${data.tokenRateUsdPerMillion} per 1M tokens · resets 00:00 UTC
                   </div>
                 </div>
                 <div className="divide-y divide-border">

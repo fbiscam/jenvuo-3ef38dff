@@ -37,6 +37,20 @@ export function getPlanDailyTokenLimit(planId: string): number {
   return PLAN_DAILY_TOKEN_LIMITS[planId.toLowerCase()] ?? 0
 }
 
+/**
+ * Effective daily quota is capped by the plan and by the current wallet.
+ * Each complete $3 funds another 1M-token block. Below $3, the final block
+ * scales proportionally so a falling balance immediately lowers the quota.
+ */
+export function getEffectiveDailyTokenLimit(planId: string, balanceUsd: number): number {
+  const planLimit = getPlanDailyTokenLimit(planId)
+  const safeBalance = Math.max(0, balanceUsd)
+  const balanceLimit = safeBalance >= TOKEN_RATE_USD_PER_MILLION
+    ? Math.floor(safeBalance / TOKEN_RATE_USD_PER_MILLION) * 1_000_000
+    : Math.floor((safeBalance / TOKEN_RATE_USD_PER_MILLION) * 1_000_000)
+  return Math.min(planLimit, balanceLimit)
+}
+
 /** Cost in USD for a given token count at the flat $3 / 1M token rate. */
 export function tokensToUsd(tokens: number): number {
   return (Math.max(0, tokens) / 1_000_000) * TOKEN_RATE_USD_PER_MILLION
