@@ -131,7 +131,12 @@ function compactSignalAnswer(
     verdict === "WAIT"
       ? `Higher-timeframe bias is ${desk.bias.toLowerCase()} but price has not delivered a clean sweep and structure shift. Stand aside until liquidity is taken and a valid POI forms.`
       : `Higher-timeframe bias is ${desk.bias.toLowerCase()} after liquidity was taken and structure shifted. Price is reacting from the marked POI, and the idea fails if the stop level trades through.`;
-  const theory = clampWords(theoryMatch?.[1] ?? fallbackTheory, 45);
+  const theory = clampWords(
+    staleReason
+      ? "A live-price safety check rejected this plan before it reached you. Entering after the level is gone turns a valid idea into a losing chase; wait for the next clean setup."
+      : (theoryMatch?.[1] ?? fallbackTheory),
+    45,
+  );
   const answer = answerMatch?.[1] ? clampWords(answerMatch[1], 30) : "";
 
   const tail = [`WHY: ${why}`, `THEORY: ${theory}`, ...(answer ? [`ANSWER: ${answer}`] : [])];
