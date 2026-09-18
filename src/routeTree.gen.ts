@@ -78,7 +78,6 @@ import { Route as AuthenticatedDashboardExtensionRouteImport } from './routes/_a
 import { Route as AuthenticatedDashboardDocumentsRouteImport } from './routes/_authenticated/dashboard.documents'
 import { Route as AuthenticatedDashboardBillingRouteImport } from './routes/_authenticated/dashboard.billing'
 import { Route as AuthenticatedDashboardAnalyticsRouteImport } from './routes/_authenticated/dashboard.analytics'
-import { Route as AuthenticatedDashboardAlertsRouteImport } from './routes/_authenticated/dashboard.alerts'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
 import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
@@ -467,12 +466,6 @@ const AuthenticatedDashboardAnalyticsRoute =
     path: '/analytics',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
-const AuthenticatedDashboardAlertsRoute =
-  AuthenticatedDashboardAlertsRouteImport.update({
-    id: '/alerts',
-    path: '/alerts',
-    getParentRoute: () => AuthenticatedDashboardRoute,
-  } as any)
 const LovableEmailTransactionalPreviewRoute =
   LovableEmailTransactionalPreviewRouteImport.update({
     id: '/lovable/email/transactional/preview',
@@ -694,7 +687,6 @@ export interface FileRoutesByFullPath {
   '/jenvu-ops-x9k2/': typeof JenvuOpsX9k2IndexRoute
   '/leads/': typeof LeadsIndexRoute
   '/ops-x9k2-7m4n/': typeof OpsX9k27m4nIndexRoute
-  '/dashboard/alerts': typeof AuthenticatedDashboardAlertsRoute
   '/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
   '/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
   '/dashboard/documents': typeof AuthenticatedDashboardDocumentsRoute
@@ -789,7 +781,6 @@ export interface FileRoutesByTo {
   '/jenvu-ops-x9k2': typeof JenvuOpsX9k2IndexRoute
   '/leads': typeof LeadsIndexRoute
   '/ops-x9k2-7m4n': typeof OpsX9k27m4nIndexRoute
-  '/dashboard/alerts': typeof AuthenticatedDashboardAlertsRoute
   '/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
   '/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
   '/dashboard/documents': typeof AuthenticatedDashboardDocumentsRoute
@@ -891,7 +882,6 @@ export interface FileRoutesById {
   '/jenvu-ops-x9k2/': typeof JenvuOpsX9k2IndexRoute
   '/leads/': typeof LeadsIndexRoute
   '/ops-x9k2-7m4n/': typeof OpsX9k27m4nIndexRoute
-  '/_authenticated/dashboard/alerts': typeof AuthenticatedDashboardAlertsRoute
   '/_authenticated/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
   '/_authenticated/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
   '/_authenticated/dashboard/documents': typeof AuthenticatedDashboardDocumentsRoute
@@ -993,7 +983,6 @@ export interface FileRouteTypes {
     | '/jenvu-ops-x9k2/'
     | '/leads/'
     | '/ops-x9k2-7m4n/'
-    | '/dashboard/alerts'
     | '/dashboard/analytics'
     | '/dashboard/billing'
     | '/dashboard/documents'
@@ -1088,7 +1077,6 @@ export interface FileRouteTypes {
     | '/jenvu-ops-x9k2'
     | '/leads'
     | '/ops-x9k2-7m4n'
-    | '/dashboard/alerts'
     | '/dashboard/analytics'
     | '/dashboard/billing'
     | '/dashboard/documents'
@@ -1189,7 +1177,6 @@ export interface FileRouteTypes {
     | '/jenvu-ops-x9k2/'
     | '/leads/'
     | '/ops-x9k2-7m4n/'
-    | '/_authenticated/dashboard/alerts'
     | '/_authenticated/dashboard/analytics'
     | '/_authenticated/dashboard/billing'
     | '/_authenticated/dashboard/documents'
@@ -1782,13 +1769,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardAnalyticsRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
-    '/_authenticated/dashboard/alerts': {
-      id: '/_authenticated/dashboard/alerts'
-      path: '/alerts'
-      fullPath: '/dashboard/alerts'
-      preLoaderRoute: typeof AuthenticatedDashboardAlertsRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
-    }
     '/lovable/email/transactional/preview': {
       id: '/lovable/email/transactional/preview'
       path: '/lovable/email/transactional/preview'
@@ -1996,7 +1976,6 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedDashboardRouteChildren {
-  AuthenticatedDashboardAlertsRoute: typeof AuthenticatedDashboardAlertsRoute
   AuthenticatedDashboardAnalyticsRoute: typeof AuthenticatedDashboardAnalyticsRoute
   AuthenticatedDashboardBillingRoute: typeof AuthenticatedDashboardBillingRoute
   AuthenticatedDashboardDocumentsRoute: typeof AuthenticatedDashboardDocumentsRoute
@@ -2026,7 +2005,6 @@ interface AuthenticatedDashboardRouteChildren {
 
 const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
   {
-    AuthenticatedDashboardAlertsRoute: AuthenticatedDashboardAlertsRoute,
     AuthenticatedDashboardAnalyticsRoute: AuthenticatedDashboardAnalyticsRoute,
     AuthenticatedDashboardBillingRoute: AuthenticatedDashboardBillingRoute,
     AuthenticatedDashboardDocumentsRoute: AuthenticatedDashboardDocumentsRoute,
