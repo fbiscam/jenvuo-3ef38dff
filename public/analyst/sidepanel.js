@@ -53,11 +53,35 @@ function showKeyGate(show, message) {
 
 const TIMEFRAMES = ["15m", "1h", "4h", "1d"];
 const QUICKS = [
-  { label: "Read screen", text: "Read the chart on my screen using ICT/SMC concepts." },
-  { label: "Trade plan", text: "Give me a trade plan now: bias, entry (POI), stop, TP1/TP2, RR." },
   {
-    label: "Liquidity",
+    label: "Read my screen",
+    desc: "Live ICT/SMC read of the chart you share",
+    text: "Read the chart on my screen using ICT/SMC concepts.",
+  },
+  {
+    label: "Build a trade plan",
+    desc: "Bias, entry, stop, TP1/TP2 and RR",
+    text: "Give me a trade plan now: bias, entry (POI), stop, TP1/TP2, RR.",
+  },
+  {
+    label: "Map liquidity",
+    desc: "Where price is likely to sweep next",
     text: "Where is liquidity resting and where should I expect the next sweep?",
+  },
+  {
+    label: "Market structure",
+    desc: "HTF bias, BOS/CHoCH and key levels",
+    text: "Break down current XAU/USD market structure: HTF bias, BOS/CHoCH and key levels.",
+  },
+  {
+    label: "Session outlook",
+    desc: "What to watch this trading session",
+    text: "Give me the outlook for the current session on XAU/USD.",
+  },
+  {
+    label: "Explain a concept",
+    desc: "Learn an ICT/SMC idea in plain words",
+    text: "Explain what a fair value gap is and how to trade it.",
   },
 ];
 const ACTIONABLE_ANALYSIS_INTENT = [
@@ -254,24 +278,50 @@ $("historyClose").onclick = () => $("historyPanel").classList.add("hidden");
 function renderQuick() {
   const c = $("quick");
   c.innerHTML = "";
+  const head = document.createElement("div");
+  head.className = "quick-head";
+  head.textContent = "Get started";
+  c.appendChild(head);
+  const grid = document.createElement("div");
+  grid.className = "quick-grid";
   QUICKS.forEach((q) => {
     const b = document.createElement("button");
-    b.textContent = q.label;
+    b.className = "quick-card";
+    const title = document.createElement("span");
+    title.className = "qc-title";
+    title.textContent = q.label;
+    const desc = document.createElement("span");
+    desc.className = "qc-desc";
+    desc.textContent = q.desc || "";
+    b.append(title, desc);
     b.onclick = () => send(q.text);
-    c.appendChild(b);
+    grid.appendChild(b);
   });
+  c.appendChild(grid);
 }
 
 function emptyState() {
   const t = $("thread");
   t.classList.add("has-empty");
   t.innerHTML =
-    '<div class="empty">Your ICT/SMC gold analyst is ready.<br>' +
-    "Share your chart and I’ll read structure, liquidity, FVGs and entries in real time.</div>";
+    '<div class="empty"><span class="empty-title">What would you like to do?</span>' +
+    '<span class="empty-sub">Share your chart and I’ll read structure, liquidity, FVGs and entries in real time.</span></div>';
   updateQuickVisibility();
 }
 
+function placeQuick() {
+  const q = $("quick");
+  const wrap = document.querySelector(".composer-wrap");
+  const main = document.querySelector(".content");
+  if (!q || !wrap || !main) return;
+  const wide = window.innerWidth >= 720;
+  if (wide && q.parentElement !== wrap) wrap.appendChild(q);
+  if (!wide && q.parentElement !== main) main.appendChild(q);
+}
+window.addEventListener("resize", placeQuick);
+
 function updateQuickVisibility() {
+  placeQuick();
   const hasMessages = !!$("thread").querySelector(".msg");
   const hasContext = !!chartImage || !!stream;
   $("quick").classList.toggle("hidden", hasMessages || hasContext);
