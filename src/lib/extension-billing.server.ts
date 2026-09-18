@@ -1,5 +1,5 @@
 import { estimateCostUsd, logAiCost } from '@/lib/ai-cost-log.server'
-import { getPlanCapabilities } from '@/lib/plan-entitlements'
+import { getPlanCapabilities, getPlanDailyTokenLimit } from '@/lib/plan-entitlements'
 
 export const EXTENSION_BASE_FEE_USD = 0
 export const EXTENSION_TOKEN_PRICE_MULTIPLIER = 0.5
