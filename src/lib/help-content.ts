@@ -417,12 +417,96 @@ export const collections: Collection[] = [
             "Ultra: $100 wallet added on each billing date (~165 scans).",
             "Top-up packs never expire and stack on top of your plan.",
           ]},
+          { type: "h2", content: "Daily token usage" },
+          { type: "ul", items: [
+            "Every request also consumes tokens from your plan's daily allowance (Free 100K, Pro 1.5M, Elite 5M, Ultra 10M).",
+            "Tokens are priced at $3 per 1,000,000 tokens.",
+            "The allowance resets at 00:00 UTC every day.",
+            "Once the daily allowance is used up, requests are refused until the reset.",
+          ]},
 
-
-
-          { type: "note", tone: "tip", content: "Track usage live from Dashboard → Billing. The sparkline turns red when you've dropped below 30% of your monthly balance." },
+          { type: "note", tone: "tip", content: "Track usage live from Dashboard → Usage. The API Keys tab shows a daily limit bar plus tokens, requests and cost per key for today." },
         ],
       },
+      {
+        slug: "api-keys",
+        title: "API keys and quota limits",
+        summary: "Create a Jenvu API key, use it anywhere, and track its daily token quota.",
+        updatedAt: "2026-09-18",
+        body: [
+          { type: "p", content: "A Jenvu API key lets you use Jenvu outside the TradingView extension — from your own scripts, apps or any OpenAI-compatible client. Keys are available on paid plans." },
+
+          { type: "h2", content: "Create a key" },
+          { type: "ol", items: [
+            "Open Dashboard → API Keys.",
+            "Click 'Create key' and give it a name.",
+            "Copy the key immediately — it is shown once and never stored in plain text.",
+            "Revoke or delete a key any time from the same page.",
+          ]},
+
+          { type: "h2", content: "How many keys you get" },
+          { type: "ul", items: [
+            "Free — no API keys.",
+            "Pro, Elite and Ultra — key limits are shown on the API Keys page for your plan.",
+          ]},
+
+          { type: "h2", content: "Quota and limits" },
+          { type: "ul", items: [
+            "All keys on your account share one daily token allowance (Free 100K, Pro 1.5M, Elite 5M, Ultra 10M).",
+            "Tokens cost $3 per 1,000,000 tokens and the allowance resets at 00:00 UTC.",
+            "Requests over the daily limit are rejected with a rate-limit error explaining when it resets.",
+            "If your wallet balance reaches zero, requests are rejected until you top up or renew.",
+          ]},
+
+          { type: "h2", content: "Where usage is shown" },
+          { type: "ul", items: [
+            "Dashboard → Usage → API Keys: daily limit bar, tokens used today, share of the limit and today's cost per key.",
+            "Dashboard overview: a 'Daily limit' tile with your plan's token allowance and progress.",
+          ]},
+
+          { type: "note", tone: "warn", content: "Treat your key like a password. If it leaks, revoke it on the API Keys page — revoked keys stop working immediately." },
+        ],
+      },
+      {
+        slug: "api-endpoint",
+        title: "Using the Jenvu API endpoint",
+        summary: "OpenAI-compatible chat completions endpoint you can call from any client.",
+        updatedAt: "2026-09-18",
+        body: [
+          { type: "p", content: "Jenvu exposes an OpenAI-compatible endpoint, so most existing SDKs and tools work by simply changing the base URL and key." },
+
+          { type: "h2", content: "Base URL" },
+          { type: "code", content: "https://jenvu.com/api/public/v1" },
+
+          { type: "h2", content: "Example request" },
+          { type: "code", content: "curl https://jenvu.com/api/public/v1/chat/completions \\\n  -H \"Authorization: Bearer YOUR_JENVU_KEY\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"model\": \"jenvu-pro\",\n    \"messages\": [{\"role\": \"user\", \"content\": \"Give me the XAU/USD bias\"}]\n  }'" },
+
+          { type: "h2", content: "Available models" },
+          { type: "ul", items: [
+            "jenvu-fast — quick conversational replies.",
+            "jenvu-pro — deep reasoning and analysis.",
+            "jenvu-vision — chart and image analysis.",
+          ]},
+
+          { type: "h2", content: "Response details" },
+          { type: "ul", items: [
+            "Standard OpenAI-style choices and usage fields.",
+            "An extra 'jenvu' object with your daily token limit, tokens used today and plan.",
+            "GET /v1/models lists the available model aliases.",
+          ]},
+
+          { type: "h2", content: "Errors you may see" },
+          { type: "ul", items: [
+            "401 — missing or invalid key.",
+            "402 — wallet balance too low.",
+            "403 — your plan does not include API access.",
+            "429 — daily token limit reached; it resets at 00:00 UTC.",
+          ]},
+
+          { type: "note", tone: "info", content: "Every API call counts toward the same daily token allowance and wallet as the extension, and appears on the Usage page." },
+        ],
+      },
+
       {
         slug: "upgrade-cancel",
         title: "How do I upgrade or cancel?",
