@@ -90,10 +90,8 @@ const NAV_GROUPS: Array<{ label: string; items: TabItem[] }> = [
     label: "",
     items: [
       { to: "/dashboard", label: "Overview", icon: LayoutDashboard, exact: true, countKey: "saved" },
-      { to: "/dashboard/analyst", label: "AI Analyst", icon: Bot },
     ],
   },
-
   {
     label: "",
     items: [
@@ -1065,14 +1063,7 @@ function DashboardLayout() {
 
 
 
-      <main
-        className={
-          pathname === "/dashboard/analyst"
-            ? "w-full flex-1 bg-white p-0"
-            : "mx-auto w-full max-w-7xl flex-1 bg-white px-5 pt-14 pb-7 sm:px-8 sm:pt-7"
-        }
-        style={pathname === "/dashboard/analyst" ? undefined : { zoom: 0.9 }}
-      >
+      <main className="mx-auto w-full max-w-7xl flex-1 bg-white px-5 pt-14 pb-7 sm:px-8 sm:pt-7" style={{ zoom: 0.9 }}>
 
         <VerificationBanner isAdmin={isAdminUser} />
 
