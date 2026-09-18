@@ -126,7 +126,7 @@ function compactSignalAnswer(
     verdict === "WAIT"
       ? (desk.senior.reasons[0] ?? "No valid setup has enough verified ICT/SMC confluence.")
       : `${desk.bias} structure and verified liquidity evidence support the setup at the listed entry.`;
-  const why = clampWords(whyMatch?.[1] ?? fallbackWhy, 22);
+  const why = clampWords(staleReason ?? whyMatch?.[1] ?? fallbackWhy, 22);
   const fallbackTheory =
     verdict === "WAIT"
       ? `Higher-timeframe bias is ${desk.bias.toLowerCase()} but price has not delivered a clean sweep and structure shift. Stand aside until liquidity is taken and a valid POI forms.`
