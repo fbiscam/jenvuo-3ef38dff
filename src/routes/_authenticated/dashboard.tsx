@@ -1475,11 +1475,11 @@ function ClaudeLogo({ className }: { className?: string; strokeWidth?: number })
 
 const RECOMMENDED_MODELS = [
   {
-    name: " Gpt-6 astra",
+    name: " Grok 4.6",
     badge: "New",
-    description: "Our most capable model, built for demanding chart analysis.",
+    description: "Fast, high context reasoning for demanding gold chart analysis.",
     logo: null,
-    logoImage: astraModelLogoAsset.url,
+    logoImage: grokModelLogoAsset.url,
     logoLabel: "",
     badgeTone: "bg-primary text-primary-foreground",
     featured: true,
