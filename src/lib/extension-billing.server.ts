@@ -116,10 +116,9 @@ export async function chargeExtensionUsage(params: {
       action: params.action, model: models, primary_model: primary?.model ?? null,
       senior_model: senior?.model ?? null, stage: 'extension_api', prompt_tokens: promptTokens,
       completion_tokens: completionTokens, raw_cost_usd: rawCost, base_fee_usd: EXTENSION_BASE_FEE_USD,
-       pricing_multiplier: EXTENSION_TOKEN_PRICE_MULTIPLIER, pricing_basis: hasSeniorReview ? 'fixed_senior_review_request' : 'fixed_primary_request',
+       pricing_multiplier: EXTENSION_TOKEN_PRICE_MULTIPLIER, pricing_basis: 'per_token_usd_3_per_million',
        charge_usd: charged, senior_review: hasSeniorReview,
-       primary_request_fee_usd: hasSeniorReview ? 0 : EXTENSION_PRIMARY_REQUEST_FEE_USD,
-       senior_review_fee_usd: hasSeniorReview ? EXTENSION_SENIOR_REVIEW_FEE_USD : 0,
+       total_tokens: totalTokens, token_rate_usd_per_million: 3,
     },
   })
   if (error) {
