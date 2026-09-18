@@ -38,7 +38,7 @@ import {
   ChevronsLeft, ChevronsRight, Menu, X, Sparkles, LayoutGrid, LifeBuoy, Lightbulb,
   ChevronLeft, ChevronRight, Info, Settings2,
   LayoutDashboard, ChartNoAxesCombined, Puzzle, BadgeDollarSign, FileCheck2,
-  LockKeyhole, CircleHelp, Bot, Boxes, ScanSearch, ShieldCheckIcon, type LucideIcon,
+  LockKeyhole, CircleHelp, Bot, Boxes, ScanSearch, ShieldCheckIcon, Terminal, type LucideIcon,
 } from "lucide-react";
 import {
   DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuCheckboxItem, DropdownMenuSeparator, DropdownMenuLabel,
@@ -1517,29 +1517,17 @@ const RECOMMENDED_MODELS = [
   },
 ] as const;
 
-const PRODUCT_UPDATES = [
-  {
-    age: "Latest",
-    title: " Smarter chart validation",
-    copy: "Chart images are now checked before GPT-6 Astra starts its analysis.",
-    time: "15 Sep 2026 · 09:40",
-    icon: ScanSearch,
-  },
-  {
-    age: "Latest",
-    title: " Reliable senior review",
-    copy: "Claude Opus 5 must complete its review before eligible signals are shown.",
-    time: "14 Sep 2026 · 17:05",
-    icon: ShieldCheckIcon,
-  },
-  {
-    age: "Updated",
-    title: "  Provider fallback",
-    copy: "Analysis continues through another provider when an AI account is unavailable.",
-    time: "12 Sep 2026 · 11:20",
-    icon: RefreshCw,
-  },
-] as const;
+import { getLatestProductUpdates, formatUpdateTime } from "@/lib/product-updates";
+
+const UPDATE_ICONS = {
+  scan: ScanSearch,
+  shield: ShieldCheckIcon,
+  refresh: RefreshCw,
+  sparkles: Sparkles,
+  gauge: Settings2,
+  terminal: Terminal,
+} as const;
+
 
 function ModelWorkspace() {
   return (
@@ -1586,8 +1574,8 @@ function ModelWorkspace() {
         <aside className="min-w-0">
           <h2 className="mb-4 text-2xl font-normal text-foreground">        Latest updates</h2>
           <div className="divide-y divide-border">
-            {PRODUCT_UPDATES.map((update) => {
-              const UpdateIcon = update.icon;
+            {getLatestProductUpdates().map((update) => {
+              const UpdateIcon = UPDATE_ICONS[update.icon];
               return (
                 <article key={update.title} className="grid grid-cols-[42px_minmax(0,1fr)] gap-4 py-5 first:pt-4">
                   <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted text-primary">
@@ -1596,7 +1584,7 @@ function ModelWorkspace() {
                   <div className="min-w-0">
                     <h3 className="text-sm font-normal text-foreground">{update.title}</h3>
                     <p className="mt-1 text-sm leading-5 text-muted-foreground">{update.copy}</p>
-                    <p className="mt-2 text-xs text-muted-foreground/80">{update.time}</p>
+                    <p className="mt-2 text-xs text-muted-foreground/80">{update.tag} · {formatUpdateTime(update.at)}</p>
                   </div>
                 </article>
               );
