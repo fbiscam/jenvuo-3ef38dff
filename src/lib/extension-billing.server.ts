@@ -9,6 +9,35 @@ export const EXTENSION_SENIOR_REVIEW_FEE_USD = 0.2
 type Usage = { promptTokens: number; completionTokens: number; totalTokens?: number }
 type ModelCall = { model: string; usage: Usage; stage: string }
 
+export function startOfUtcDay(now = new Date()): string {
+  const d = new Date(now)
+  d.setUTCHours(0, 0, 0, 0)
+  return d.toISOString()
+}
+
+/** Tokens (prompt + completion) charged to this user since 00:00 UTC today. */
+export async function readDailyTokenUsage(client: any, userId: string) {
+  const { data } = await client
+    .from('credit_ledger')
+    .select('prompt_tokens, completion_tokens, metadata, created_at')
+    .eq('user_id', userId)
+    .eq('reason', 'extension_api')
+    .gte('created_at', startOfUtcDay())
+    .limit(2000)
+  const byKey = new Map<string, { tokens: number; requests: number }>()
+  let total = 0
+  for (const row of (data ?? []) as any[]) {
+    const tokens = Number(row.prompt_tokens ?? 0) + Number(row.completion_tokens ?? 0)
+    total += tokens
+    const keyId = String(row.metadata?.api_key_id ?? 'unknown')
+    const entry = byKey.get(keyId) ?? { tokens: 0, requests: 0 }
+    entry.tokens += tokens
+    entry.requests += 1
+    byKey.set(keyId, entry)
+  }
+  return { total, byKey }
+}
+
 export async function getExtensionEntitlement(userId: string) {
   const { supabaseAdmin } = await import('@/integrations/supabase/client.server')
   const admin = supabaseAdmin as any
