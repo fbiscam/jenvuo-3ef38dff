@@ -53,6 +53,7 @@ function ExtensionPage() {
   const [creating, setCreating] = useState(false);
   const [showCreate, setShowCreate] = useState(false);
   const [showGuide, setShowGuide] = useState(false);
+  const [showEndpoint, setShowEndpoint] = useState(false);
   const [name, setName] = useState("");
   const [freshKey, setFreshKey] = useState<string | null>(null);
   const [copied, setCopied] = useState<string | null>(null);
