@@ -364,10 +364,11 @@ function ExtensionPage() {
           >{`curl ${API_BASE}/chat/completions \\
   -H "Authorization: Bearer YOUR_JENVU_KEY" \\
   -H "Content-Type: application/json" \\
-  -d '{"model":"jenvu-pro","messages":[{"role":"user","content":"XAU/USD bias today?"}]}'`}</pre>
+  -d '{"model":"claude-sonnet-4.5","messages":[{"role":"user","content":"XAU/USD bias today?"}]}'`}</pre>
           <p className="mt-2 text-[12px] text-zinc-500">
-            Models: <span className={MONO}>jenvu-fast</span>, <span className={MONO}>jenvu-pro</span>
-            , <span className={MONO}>jenvu-vision</span>. List them at{" "}
+            Models: <span className={MONO}>claude-sonnet-4.5</span>,{" "}
+            <span className={MONO}>claude-haiku-4.5</span>, <span className={MONO}>glm-5</span>. List
+            them at{" "}
             <span className={MONO}>{API_BASE}/models</span>.
           </p>
         </div>
