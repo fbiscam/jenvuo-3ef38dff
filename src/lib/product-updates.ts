@@ -20,6 +20,13 @@ export type ProductUpdate = {
 
 export const PRODUCT_UPDATES: ProductUpdate[] = [
   {
+    title: " Grok 4.6 added",
+    copy: "Grok 4.6 now powers fast, high context gold chart analysis and replaces GPT Astra.",
+    at: "2026-09-18T10:55:00Z",
+    tag: "Model",
+    icon: "sparkles",
+  },
+  {
     title: " Balance based daily limits",
     copy: "Every $3 of balance unlocks another 1M tokens a day, on top of your plan cap.",
     at: "2026-09-18T08:10:00Z",
