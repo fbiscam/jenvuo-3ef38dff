@@ -153,7 +153,7 @@ function SecurityPage() {
       </section>
 
       <section className="py-6">
-        <h2 className="text-base font-medium text-foreground">Two-factor authentication</h2>
+        <h2 className="text-base font-medium text-foreground"> Two-factor authentication</h2>
         <p className="mt-1 text-sm text-muted-foreground">
           Require a six-digit code from your authenticator app every time you sign in.
         </p>
