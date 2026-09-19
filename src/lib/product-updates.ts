@@ -21,7 +21,7 @@ export type ProductUpdate = {
 export const PRODUCT_UPDATES: ProductUpdate[] = [
   {
     title: "Stronger institutional analysis engine",
-    copy: "Extension scans now verify inducement, repeated support/resistance and D1-to-M5 BOS/CHoCH alignment before issuing a trade.",
+    copy: "Extension scans now verify inducement, repeated support/resistance and D1-to-M5 BOS/CHoCH.",
     at: "2026-09-19T06:53:00Z",
     tag: "Updated",
     icon: "shield",
