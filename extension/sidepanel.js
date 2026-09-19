@@ -1198,7 +1198,7 @@ async function send(preset, silentUser) {
     candleForecastRequest
       ? "15m candle forecast · calibrating…"
       : analysisRequest
-        ? "ICT analysis · Claude primary review…"
+        ? "ICT analysis · OmniRoute review…"
         : "Chat mode",
     analysisRequest || candleForecastRequest ? "checking" : "",
   );

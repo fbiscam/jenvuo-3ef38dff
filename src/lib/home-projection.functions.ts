@@ -1,7 +1,7 @@
 // XAU/USD price projection for the public homepage terminal card.
 //
 // Pipeline: real candles -> ICT/SMC engine (structure, FVG/OB, ATR, regime,
-// killzone) -> BluesMind gpt-4o senior review -> projection read-out.
+// killzone) -> OmniRoute review -> projection read-out.
 // Deterministic engine output is used as the fallback whenever the AI call
 // fails, so the panel always renders real market-derived numbers.
 
@@ -18,7 +18,7 @@ import {
   fetchLiveInstrumentTick,
   resolveInstrument,
 } from "./gold-analysis.functions";
-import { callChatCompletion, tryParseJsonLoose } from "./ai-gateway";
+import { callChatCompletion, MODEL_CHAIN, tryParseJsonLoose } from "./ai-gateway";
 
 export type XauTradeSignal = {
   status: "active" | "wait";
@@ -392,7 +392,7 @@ async function seniorReview(base: XauProjection, c1h: Candle[], c4h: Candle[]): 
   };
 
   const { content, model } = await callChatCompletion({
-    models: ["bmind/gpt-4o"],
+    models: [...MODEL_CHAIN.narration],
     jsonMode: true,
     maxTokens: 700,
     timeoutMs: 20000,

@@ -1,16 +1,8 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { callChatCompletion, AiGatewayError } from "@/lib/ai-gateway";
+import { callChatCompletion, AiGatewayError, MODEL_CHAIN } from "@/lib/ai-gateway";
 
-// Fast conversational voice reply. Uses Bluesmind chat models (with fast
-// fallbacks) and plain text — no candles, no JSON schema — so replies land
-// in ~1–3s instead of the heavy analyze pipeline (~15–25s).
-const FAST_MODELS = [
-  "bmind/gpt-5.6-luna",
-  "bmind/gpt-5-mini",
-  "bmind/gpt-5.2-chat",
-  "bmind/gpt-4o",
-];
+// Fast conversational voice reply uses the shared OmniRoute-only chat chain.
 
 const SYSTEM = `You are Jenvu — a friendly voice trading assistant.
 Reply in 1–2 short sentences suitable for speaking aloud.
@@ -28,7 +20,7 @@ export const voiceQuickReply = createServerFn({ method: "POST" })
     if (!data.query.trim()) return { ok: true as const, reply: "I'm listening." };
     try {
       const { content } = await callChatCompletion({
-        models: FAST_MODELS,
+        models: [...MODEL_CHAIN.chat],
         messages: [
           { role: "system", content: SYSTEM },
           { role: "user", content: data.query },

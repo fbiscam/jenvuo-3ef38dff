@@ -58,30 +58,10 @@ function sleep(ms: number) {
 }
 
 function providerConfigured(model: string): boolean {
-  if (model.startsWith("omniroute/"))
-    return Boolean(process.env.CUSTOM_AI_API_KEY && process.env.CUSTOM_AI_BASE_URL);
-  if (model.startsWith("blackboxai/")) return Boolean(process.env.BLACKBOX_API_KEY);
-  if (model.startsWith("nvapi/")) return Boolean(process.env.NVIDIA_API_KEY);
-  if (model.startsWith("bmind/"))
-    return Boolean(
-      process.env.BLUESMIND_API_KEY || process.env.BLUESMINDS_API_KEY || process.env.OPENAI_API_KEY,
-    );
-  if (model.startsWith("tukenku/")) return Boolean(process.env.TUKENKU_API_KEY);
-  if (model.startsWith("unikey/")) return Boolean(process.env.UNIKEY_API_KEY);
-  if (model.startsWith("evolink/")) return Boolean(process.env.EVOLINK_API_KEY);
-  if (model.startsWith("unorouter/")) return Boolean(process.env.UNOROUTER_API_KEY);
-  if (model.startsWith("dsofficial/")) return Boolean(process.env.DEEPSEEK_API_KEY);
-  if (model.startsWith("oai/")) return Boolean(process.env.OPENAI_API_KEY);
-  if (model.startsWith("jw/")) return Boolean(process.env.JUSTWOKER_API_KEY);
-  if (model.startsWith("browseruse/"))
-    return Boolean(
-      process.env.BROWSER_USE_API_KEY ||
-      process.env.BROWSER_USE_API_KEY_2 ||
-      process.env.BROWSER_USE_API_KEY_3,
-    );
-  // Fail closed: an unknown/unprefixed model must never silently consume
-  // Lovable AI workspace credits.
-  return false;
+  // OmniRoute is the sole inference provider. Credential validation happens
+  // inside the request attempt so a missing deployment binding is reported
+  // accurately instead of being mistaken for an empty model chain.
+  return model.startsWith("omniroute/");
 }
 
 // -------- Per-worker model health cache -----------------------------------
@@ -437,26 +417,11 @@ async function singleAttempt(
   opts: CallChatOptions,
   timeoutMs?: number,
 ): Promise<{ content: string; usage: UsageInfo }> {
-  // A provider that accepts the connection but never answers must not hang the
-  // caller forever: bound each attempt so the chain can fall back.
-  const budget = Math.max(5_000, timeoutMs ?? opts.timeoutMs ?? 90_000);
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), budget);
-  try {
-    return await singleAttemptInner(model, opts, controller.signal);
-  } catch (err: any) {
-    if (controller.signal.aborted) {
-      // Retryable (status 0) so the chain advances to the next model.
-      throw new AiGatewayError(
-        `AI model did not respond in time (${Math.round(budget / 1000)}s).`,
-        0,
-        false,
-      );
-    }
-    throw err;
-  } finally {
-    clearTimeout(timer);
-  }
+  void timeoutMs;
+  // Never discard a paid generation with an artificial timer. Cancellation is
+  // reserved for an explicit caller abort, which this server helper can accept
+  // when its public API is extended with a request signal.
+  return singleAttemptInner(model, opts);
 }
 
 async function singleAttemptInner(
@@ -464,22 +429,7 @@ async function singleAttemptInner(
   opts: CallChatOptions,
   signal?: AbortSignal,
 ): Promise<{ content: string; usage: UsageInfo }> {
-  // Route by prefix:
-  //   `omniroute/*`   → Self-hosted OmniRoute (OpenAI-compatible)
-  //   `blackboxai/*` → Blackbox API
-  //   `nvapi/*`      → NVIDIA Integrate API (strip prefix to get real model id)
-  //   `bmind/*`      → Bluesminds unified gateway (OpenAI-compatible)
-  //   `tukenku/*`    → Tukenku / Monyet AI (OpenAI-compatible)
-  //   `unikey/*`     → GetUniKey (OpenAI-compatible)
-  //   `evolink/*`    → Evolink direct API (OpenAI-compatible)
-  //   `unorouter/*`  → UnoRouter (OpenAI-compatible)
-  //   `dsofficial/*` → DeepSeek official API (OpenAI-compatible)
-  //   `jw/*`         → JustWoker (Anthropic-style /v1/messages)
-  //   `browseruse/*` → Browser Use Cloud Agent v4
-  // Unknown/unprefixed models are rejected so this helper can never consume
-  // Lovable AI workspace credits.
-  if (model.startsWith("jw/")) return callJustwoker(model, opts, signal);
-  if (model.startsWith("browseruse/")) return callBrowserUse(model, opts, signal);
+  // OmniRoute is the only permitted inference provider.
   const isOmniRoute = model.startsWith("omniroute/");
   const isBlackbox = model.startsWith("blackboxai/");
   const isNvidia = model.startsWith("nvapi/");
@@ -501,8 +451,8 @@ async function singleAttemptInner(
     isUnoRouter ||
     isDsOfficial ||
     isOai;
-  if (!isExternalProvider) {
-    throw new AiGatewayError(`Unsupported external AI provider for model: ${model}`, 400, true);
+  if (!isOmniRoute) {
+    throw new AiGatewayError(`Only OmniRoute models are allowed: ${model}`, 400, true);
   }
   const blackboxKey = process.env.BLACKBOX_API_KEY;
   const omniRouteKey = process.env.CUSTOM_AI_API_KEY;
@@ -975,38 +925,29 @@ export function setCachedPlan<T>(key: string, value: T, ttlMs: number = PLAN_CAC
 // OmniRoute is the ONLY provider in use. Every chain below resolves through
 // CUSTOM_AI_BASE_URL and uses only models re-verified live under load
 // (5 concurrent requests each, all 5/5 OK):
-//   kr/claude-sonnet-4.5 (~4.0s) — strongest, vision OK
-//   kr/claude-sonnet-4   (~3.1s) — fast + strong, vision OK
-//   kr/claude-haiku-4.5  (~3.3s) — fastest Claude, vision OK
-//   kr/glm-5             (~6.8s) — text only (no image support)
-// Excluded (0/5 under load): every Claude Opus route and kr/claude-sonnet-5
-// (not in catalog), all Gemini routes (dva/* 500 sandbox error, tllm/* 403
-// egress blocked, aug/* invalid JSON), auto/* aliases that resolve to them.
+//   kr/claude-sonnet-4.5 — strongest verified model; primary for analysis/chat
+//   kr/claude-sonnet-4   — second-best verified fallback
+// Sonnet 5 is advertised by /models but currently rejects live requests, so it
+// is intentionally excluded until the upstream active catalog supports it.
 const PRIMARY_ANALYSIS_CHAIN = [
   "omniroute/kr/claude-sonnet-4.5",
   "omniroute/kr/claude-sonnet-4",
-  "omniroute/kr/claude-haiku-4.5",
-  "omniroute/kr/glm-5",
 ] as const;
 
 const SENIOR_REVIEW_MODELS = [
   "omniroute/kr/claude-sonnet-4.5",
   "omniroute/kr/claude-sonnet-4",
-  "omniroute/kr/glm-5",
-  "omniroute/kr/claude-haiku-4.5",
 ] as const;
 
 const FAST_CHAT_CHAIN = [
-  "omniroute/kr/claude-haiku-4.5",
-  "omniroute/kr/claude-sonnet-4",
   "omniroute/kr/claude-sonnet-4.5",
+  "omniroute/kr/claude-sonnet-4",
 ] as const;
 
 // Vision: GLM-5 is excluded — it does not accept image content.
 const VISION_CHAIN = [
   "omniroute/kr/claude-sonnet-4.5",
   "omniroute/kr/claude-sonnet-4",
-  "omniroute/kr/claude-haiku-4.5",
 ] as const;
 
 export const MODEL_CHAIN = {

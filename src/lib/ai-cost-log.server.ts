@@ -129,8 +129,8 @@ export function formatModelLabel(rawModel: string | null | undefined): string {
   }
   const m = raw.toLowerCase();
   if (m.startsWith("rules-engine/ict-smc")) return "ICT/SMC Rules Engine";
-  // Strip provider prefix (bmind/, openai/, nvapi/, google/, etc.)
-  const bare = m.replace(/^(dsofficial|bmind|tukenku|unikey|evolink|jw|browseruse|agentrouter|unorouter|openai|nvapi|google|anthropic)\//g, "").replace(/^myt\//, "").replace(/^orion\//, "").replace(/^deepseek-ai\//, "");
+  // Strip provider prefix and OmniRoute route namespace.
+  const bare = m.replace(/^(dsofficial|bmind|tukenku|unikey|evolink|jw|browseruse|agentrouter|unorouter|openai|nvapi|google|anthropic|omniroute)\//g, "").replace(/^(kr|kiro)\//, "").replace(/^myt\//, "").replace(/^orion\//, "").replace(/^deepseek-ai\//, "");
   if (bare.startsWith("claude-opus-5")) return "Claude Opus 5";
   if (bare.startsWith("claude-opus-4-8")) return "Claude Opus 4.8";
   if (bare.startsWith("claude-sonnet-4.5") || bare.startsWith("claude-4.5-sonnet")) return "Claude Sonnet 4.5";
@@ -260,7 +260,7 @@ export async function chargeSignalScan(params: {
     // Guarantee history always shows the model that ran — if the caller
     // didn't pass one (deterministic engine fallback path), default to the
     // current primary so no user's billing row is ever blank.
-    const primaryModel = params.model ?? "evolink/gpt-6-astra";
+    const primaryModel = params.model ?? "omniroute/kr/claude-sonnet-4.5";
     const meta: Record<string, unknown> = {
       model: primaryModel,
       model_label: formatModelLabel(primaryModel),
