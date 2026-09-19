@@ -32,6 +32,7 @@ import {
   findSwings,
   detectStructure,
   killzoneForPair,
+  MIN_EXECUTION_RR,
   scoreSetup,
   type BuiltTrade,
   type Candle,
@@ -70,9 +71,10 @@ function structureEvents(candles: Candle[]) {
 }
 
 function directionBias(trade: BuiltTrade, h4Trend: string, h1Trend: string): DeskResult["bias"] {
-  if (trade.direction === "BUY" || h4Trend === "bullish" || h1Trend === "bullish") return "BULLISH";
-  if (trade.direction === "SELL" || h4Trend === "bearish" || h1Trend === "bearish")
-    return "BEARISH";
+  if (trade.direction === "BUY") return "BULLISH";
+  if (trade.direction === "SELL") return "BEARISH";
+  if (h4Trend === "bullish" && h1Trend !== "bearish") return "BULLISH";
+  if (h4Trend === "bearish" && h1Trend !== "bullish") return "BEARISH";
   return "NEUTRAL";
 }
 
@@ -315,8 +317,8 @@ export function runExtensionDesk(input: DeskInput): DeskResult {
   const oppositeTrend = candidateDirection === "BUY" ? "bearish" : "bullish";
   if (candidateDirection === "WAIT") hardVetoReasons.push(trade.reason);
   if (scored.vetos.length) hardVetoReasons.push(...scored.vetos.map((veto) => veto.reason));
-  if (candidateDirection !== "WAIT" && trade.rr < 1.5)
-    hardVetoReasons.push(`Risk/reward 1:${trade.rr.toFixed(2)} is below the 1:1.5 floor.`);
+  if (candidateDirection !== "WAIT" && trade.rr < MIN_EXECUTION_RR)
+    hardVetoReasons.push(`Risk/reward 1:${trade.rr.toFixed(2)} is below the 1:${MIN_EXECUTION_RR} floor.`);
   if (confirmations < 6)
     hardVetoReasons.push(`Only ${confirmations}/13 independent execution confirmations passed; six are required.`);
   const htfConflicts = mtfStructure.conflicts.filter((conflict) => /^(D1|H4|H1)\b/.test(conflict));
@@ -326,6 +328,13 @@ export function runExtensionDesk(input: DeskInput): DeskResult {
     hardVetoReasons.push(`H4 structure is ${h4.trend}; it does not confirm the ${candidateDirection} draw.`);
   if (candidateDirection !== "WAIT" && (d1.trend === oppositeTrend || h1.trend === oppositeTrend))
     hardVetoReasons.push(`Higher-timeframe conflict: D1 is ${d1.trend} and H1 is ${h1.trend}.`);
+  const wrongDealingRangeSide = candidateDirection === "BUY"
+    ? input.livePrice > h4.equilibrium
+    : candidateDirection === "SELL"
+      ? input.livePrice < h4.equilibrium
+      : false;
+  if (wrongDealingRangeSide)
+    hardVetoReasons.push(`${candidateDirection} is on the wrong side of the H4 dealing range; wait for ${candidateDirection === "BUY" ? "discount" : "premium"}.`);
   if (!inducement.detected && !turtleSoup.triggered)
     hardVetoReasons.push("No verified inducement or failed-sweep reversal before the proposed entry.");
   if (!executionSweep.confirmed)

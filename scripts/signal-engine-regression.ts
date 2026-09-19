@@ -1,9 +1,11 @@
 import {
   buildLiquidityPools,
+  buildTrade,
   detectFVGs,
   detectStructure,
   type Candle,
   type Swing,
+  type TFAnalysis,
 } from "../src/lib/analysis/engine";
 import { detectRecentSweepReclaim } from "../src/lib/analysis/extension-desk";
 
@@ -103,6 +105,25 @@ const freshReclaim = [
 ];
 if (!detectRecentSweepReclaim(freshReclaim, sellSidePool, "BUY").confirmed) {
   throw new Error("A fresh sell-side sweep and close reclaim was missed");
+}
+
+const baseAnalysis: TFAnalysis = {
+  trend: "bullish",
+  swings: [],
+  lastStructure: null,
+  fvgs: [],
+  obs: [],
+  swingHigh: 105,
+  swingLow: 95,
+  equilibrium: 100,
+};
+const overheadBuyZone: TFAnalysis = {
+  ...baseAnalysis,
+  fvgs: [{ fromTime: 1, toTime: 2, priceLow: 101, priceHigh: 102, kind: "bullish", mitigated: false, size: 1 }],
+};
+const sideSafeTrade = buildTrade(baseAnalysis, overheadBuyZone, [], 100, 1, "metal");
+if (sideSafeTrade.zone && sideSafeTrade.zone.priceLow > 100) {
+  throw new Error("A BUY used an overhead FVG as its execution zone");
 }
 
 console.log("Signal-engine regression checks passed");
