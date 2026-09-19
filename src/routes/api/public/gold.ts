@@ -37,10 +37,11 @@ type Body = {
   timeframeImages?: Array<{ timeframe?: string; image?: string; capturedAt?: number }>;
 };
 
-const TF = new Set(["5m", "15m", "1h", "4h", "1d"]);
+const TF = new Set(["5m", "15m", "30m", "1h", "4h", "1d"]);
 const TF_MS: Record<string, number> = {
   "5m": 5 * 60_000,
   "15m": 15 * 60_000,
+  "30m": 30 * 60_000,
   "1h": 60 * 60_000,
   "4h": 4 * 60 * 60_000,
   "1d": 24 * 60 * 60_000,
