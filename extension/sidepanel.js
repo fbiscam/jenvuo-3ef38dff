@@ -1225,11 +1225,25 @@ function markMatchesTopic(mark, topics) {
   if (topics.has("all")) return true;
   const label = String(mark.label || "").toLowerCase();
   if (topics.has("fvg") && label.includes("fvg")) return true;
-  if (topics.has("ob") && label === "ob") return true;
+  if (topics.has("ob") && /\bob\b|order block/.test(label)) return true;
   if (topics.has("structure") && mark.kind === "event") return true;
   if (topics.has("liquidity") && mark.kind === "line" && /^(bsl|ssl)$/.test(label)) return true;
   if (topics.has("sweep") && mark.kind === "sweep") return true;
   return false;
+}
+
+function prioritizeMarks(marks) {
+  const rank = (mark) => {
+    const label = String(mark?.label || "").toLowerCase();
+    if (mark?.kind === "event") return 0;
+    if (mark?.kind === "sweep") return 1;
+    if (/pdh|pdl|bsl|ssl/.test(label)) return 2;
+    if (/fvg/.test(label)) return 3;
+    if (/\bob\b|order block/.test(label)) return 4;
+    if (/support|resistance/.test(label)) return 5;
+    return 6;
+  };
+  return [...marks].sort((a, b) => rank(a) - rank(b)).slice(0, 8);
 }
 
 async function markOnPage(text, signal, options = {}) {
@@ -1242,7 +1256,7 @@ async function markOnPage(text, signal, options = {}) {
   const availableMarks =
     Array.isArray(d.overlayMarks) && d.overlayMarks.length ? d.overlayMarks : d.marks || [];
   const topics = requestedMarkTopics(text);
-  const marks = availableMarks.filter((mark) => markMatchesTopic(mark, topics)).slice(0, 8);
+  const marks = prioritizeMarks(availableMarks.filter((mark) => markMatchesTopic(mark, topics)));
   if (!marks.length) throw new Error("Requested marking ka koi valid live level abhi nahi mila.");
   const pts = (d.chart || [])
     .map((c) => (typeof c === "number" ? c : (c.close ?? c.c ?? 0)))
@@ -1434,6 +1448,21 @@ async function send(preset, silentUser) {
       setReviewStatus("Multi-timeframe ICT analysis complete", "verified");
     }
     if (Array.isArray(d.chart) && d.chart.length) renderSnapshot(d);
+    if (analysisRequest && Array.isArray(d.overlayMarks)) {
+      await applyLiveMarksToPage(d).catch(() => {});
+      const currentShot = stream ? await grabFrame() : null;
+      if (currentShot && detectedTimeframe) {
+        reviewSession = reviewSession.symbol === symbol ? reviewSession : { symbol, frames: {} };
+        reviewSession.symbol = symbol;
+        reviewSession.frames[detectedTimeframe] = {
+          capturedAt: Date.now(),
+          image: currentShot,
+          marks: prioritizeMarks(d.overlayMarks),
+        };
+        saveReviewSession();
+        renderReviewFlow(`${freshReviewImages().length}/5 frames captured`);
+      }
+    }
   } catch (e) {
     pend.remove();
     if (e && e.name === "AbortError") addMsg("ai err", "Request stopped.");
