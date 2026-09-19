@@ -75,6 +75,7 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
   const liveBarRef = useRef<{ time: number; open: number; high: number; low: number; close: number } | null>(null);
   const bucketSecRef = useRef<number>(60);
   const lastPriceLineRef = useRef<IPriceLine | null>(null);
+  const hadDataRef = useRef(false);
 
 
   useEffect(() => {
@@ -193,6 +194,10 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
     try {
       s.setData(candles.map((c) => ({ ...c, time: Number(c.time) as Time })));
     } catch { return; }
+    if (!hadDataRef.current) {
+      hadDataRef.current = true;
+      try { chartRef.current?.timeScale().fitContent(); } catch { /* noop */ }
+    }
     const lastC = candles[candles.length - 1];
     const prevC = candles[candles.length - 2];
     if (lastC && prevC) bucketSecRef.current = Math.max(1, Number(lastC.time) - Number(prevC.time));
