@@ -838,6 +838,9 @@ html[data-pwa="1"] .pwa-tabbar {
 .jenvu-zoom-dashboard main .dashboard-hero h1 {
   font-weight: 500 !important;
 }
+.jenvu-zoom-dashboard main .dashboard-model-banner-heading {
+  color: #fff !important;
+}
 .jenvu-zoom-dashboard main button,
 .jenvu-zoom-dashboard main a[role="button"] {
   border-radius: 14px !important;
