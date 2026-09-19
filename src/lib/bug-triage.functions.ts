@@ -6,7 +6,7 @@
 
 import { createServerFn } from '@tanstack/react-start'
 import { requireSupabaseAuth } from '@/integrations/supabase/auth-middleware'
-import { callChatCompletion } from '@/lib/ai-gateway'
+import { callChatCompletion, MODEL_CHAIN } from '@/lib/ai-gateway'
 
 async function assertAdmin(context: { supabase: any; userId: string }) {
   const { data, error } = await context.supabase.rpc('has_role', {
@@ -102,7 +102,7 @@ Given error telemetry, produce:
 Respond as strict JSON: {"root_cause": string, "suggested_fix": string}.`
 
     const result = await callChatCompletion({
-      models: ['bmind/gpt-5.6-sol', 'bmind/gpt-5.2-chat', 'bmind/gpt-5-mini'],
+      models: [...MODEL_CHAIN.chat],
       messages: [
         { role: 'system', content: system },
         { role: 'user', content: context_text.slice(0, 12000) },

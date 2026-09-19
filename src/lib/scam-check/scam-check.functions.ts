@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 
 import { z } from "zod";
-import { callChatCompletion } from "@/lib/ai-gateway";
+import { callChatCompletion, MODEL_CHAIN } from "@/lib/ai-gateway";
 import { runRules, verdictFor, type Signal, type Verdict } from "@/lib/scam-check/rules";
 
 const InputSchema = z.object({
@@ -85,7 +85,7 @@ export const scamCheck = createServerFn({ method: "POST" })
 
     try {
       const res = await callChatCompletion({
-        models: ["unorouter/nemotron-3-ultra-550b-a55b:free", "unorouter/glm-5.3:free", "bmind/gpt-4o"],
+        models: [...MODEL_CHAIN.chat],
         messages: [
           { role: "system", content: SYSTEM },
           { role: "user", content: userMsg },
