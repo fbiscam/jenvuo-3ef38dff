@@ -106,7 +106,7 @@ function invalidateStalePlan(
   if (!Number.isFinite(guard.livePrice) || guard.livePrice <= 0) {
     return "The selected market's live price could not be verified, so no trade is issued.";
   }
-  if (guard.quoteAgeMs > 180_000) {
+  if (guard.quoteAgeMs > 90_000) {
     return "Live price feed is stale, so this setup cannot be validated right now.";
   }
   const { entry, sl, tp1, tp } = desk.trade as {
@@ -145,20 +145,22 @@ function compactSignalAnswer(
   const theoryMatch = /^\s*THEORY:\s*([\s\S]+?)(?=\n\s*[A-Z]{3,}:|\s*$)/im.exec(raw);
   const answerMatch = /^\s*ANSWER:\s*(.+)$/im.exec(raw);
   const reviewedVerdict = verdictMatch?.[1];
-  const verdict =
+  const reviewedDirection =
     reviewedVerdict === "WAIT" || reviewedVerdict === desk.direction ? reviewedVerdict : "WAIT";
+  // A conditional review is an idea awaiting evidence, not a signal. Never show
+  // actionable levels until both the deterministic desk and AI review confirm it.
+  const verdict =
+    reviewedDirection !== "WAIT" && statusMatch?.[1] === "CONFIRMED"
+      ? reviewedDirection
+      : "WAIT";
   const status =
     verdict === "WAIT"
       ? "NO TRADE"
-      : statusMatch?.[1] === "CONFIRMED"
-        ? "CONFIRMED"
-        : "CONDITIONAL";
+      : "CONFIRMED";
   const takeTrade =
     status === "CONFIRMED"
       ? "TAKE TRADE"
-      : status === "CONDITIONAL"
-        ? "WAIT FOR TRIGGER"
-        : "NO TRADE";
+      : "NO TRADE";
   const fallbackWhy =
     verdict === "WAIT"
       ? (desk.senior.reasons[0] ?? "No valid setup has enough verified ICT/SMC confluence.")

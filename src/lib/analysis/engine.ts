@@ -408,6 +408,8 @@ export type BuiltTrade = {
   notes?: string[];
 };
 
+export const MIN_EXECUTION_RR = 1.5;
+
 
 // Per-asset risk profile. Each asset class has different typical wick sizes,
 // spread, and news volatility — using the same buffer for XAU and EURUSD is wrong.
@@ -487,6 +489,8 @@ export function buildTrade(
   // price already tapped. We rank by distance and pick MARKET vs LIMIT below.
   type ZoneCandidate = { kind: "OB" | "FVG" | "OTE"; priceLow: number; priceHigh: number; dist: number };
   const candidates: ZoneCandidate[] = [];
+  const isOnExecutableSide = (lo: number, hi: number) =>
+    (dir === "BUY" && lo <= lastPrice) || (dir === "SELL" && hi >= lastPrice);
   const distanceFromExecutionZone = (lo: number, hi: number) => {
     if (lastPrice >= lo && lastPrice <= hi) return 0;
     return dir === "BUY" ? Math.max(0, lo - lastPrice, lastPrice - hi) : Math.max(0, lastPrice - hi, lo - lastPrice);
@@ -495,12 +499,14 @@ export function buildTrade(
     if (f.mitigated) continue;
     if (dir === "BUY" && f.kind !== "bullish") continue;
     if (dir === "SELL" && f.kind !== "bearish") continue;
+    if (!isOnExecutableSide(f.priceLow, f.priceHigh)) continue;
     candidates.push({ kind: "FVG", priceLow: f.priceLow, priceHigh: f.priceHigh, dist: distanceFromExecutionZone(f.priceLow, f.priceHigh) });
   }
   for (const o of ltf.obs) {
     if (o.mitigated) continue;
     if (dir === "BUY" && o.kind !== "demand") continue;
     if (dir === "SELL" && o.kind !== "supply") continue;
+    if (!isOnExecutableSide(o.priceLow, o.priceHigh)) continue;
     candidates.push({ kind: "OB", priceLow: o.priceLow, priceHigh: o.priceHigh, dist: distanceFromExecutionZone(o.priceLow, o.priceHigh) });
   }
 
@@ -510,7 +516,9 @@ export function buildTrade(
     if (range > 0) {
       const oteLo = dir === "BUY" ? htf.swingLow + range * 0.21 : htf.swingLow + range * 0.62;
       const oteHi = dir === "BUY" ? htf.swingLow + range * 0.38 : htf.swingLow + range * 0.79;
-      candidates.push({ kind: "OTE", priceLow: oteLo, priceHigh: oteHi, dist: distanceFromExecutionZone(oteLo, oteHi) });
+      if (isOnExecutableSide(oteLo, oteHi)) {
+        candidates.push({ kind: "OTE", priceLow: oteLo, priceHigh: oteHi, dist: distanceFromExecutionZone(oteLo, oteHi) });
+      }
     }
   }
 
@@ -778,9 +786,9 @@ export function scoreSetup(args: {
     if (kind === "metal" && dxyConfirms === false) {
       vetos.push({ key: "dxy_contra", label: "DXY contradicts trade direction", reason: "DXY not confirming inverse move — high failure risk on metals" });
     }
-    // 4. R:R < 1.2
-    if (trade.rr < 1.2) {
-      vetos.push({ key: "rr_low", label: "R:R below 1.2", reason: `Only 1:${trade.rr.toFixed(2)} — not worth the risk` });
+    // 4. R:R below the shared execution floor
+    if (trade.rr < MIN_EXECUTION_RR) {
+      vetos.push({ key: "rr_low", label: `R:R below ${MIN_EXECUTION_RR}`, reason: `Only 1:${trade.rr.toFixed(2)} — not worth the risk` });
     }
   }
 

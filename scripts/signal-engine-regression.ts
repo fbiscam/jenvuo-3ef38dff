@@ -1,10 +1,13 @@
 import {
   buildLiquidityPools,
+  buildTrade,
   detectFVGs,
   detectStructure,
   type Candle,
   type Swing,
+  type TFAnalysis,
 } from "../src/lib/analysis/engine";
+import { detectRecentSweepReclaim } from "../src/lib/analysis/extension-desk";
 
 const minute = 60_000;
 const base = Date.UTC(2026, 8, 18, 0, 0, 0);
@@ -79,6 +82,48 @@ const priorDayHigh = buildLiquidityPools(hourly, fiveMinute).find(
 );
 if (!priorDayHigh || priorDayHigh.swept) {
   throw new Error("A touch inside tolerance incorrectly counted as a prior-day sweep");
+}
+
+const sellSidePool = [{ price: 100, side: "sell" as const, label: "PDL" }];
+const staleSweep = Array.from({ length: 16 }, (_, index) =>
+  candle(index, 101, index === 0 ? 102 : 101.5, index === 0 ? 99 : 100.5, index === 0 ? 100.8 : 101),
+);
+if (detectRecentSweepReclaim(staleSweep, sellSidePool, "BUY", 12).confirmed) {
+  throw new Error("A stale liquidity sweep was accepted as a fresh execution trigger");
+}
+
+const wickWithoutReclaim = Array.from({ length: 12 }, (_, index) =>
+  candle(index, 101, 102, index === 11 ? 99 : 100.5, index === 11 ? 99.5 : 101),
+);
+if (detectRecentSweepReclaim(wickWithoutReclaim, sellSidePool, "BUY").confirmed) {
+  throw new Error("A wick through liquidity without a closing reclaim was accepted");
+}
+
+const freshReclaim = [
+  ...wickWithoutReclaim.slice(0, -1),
+  candle(11, 101, 102, 99, 100.6),
+];
+if (!detectRecentSweepReclaim(freshReclaim, sellSidePool, "BUY").confirmed) {
+  throw new Error("A fresh sell-side sweep and close reclaim was missed");
+}
+
+const baseAnalysis: TFAnalysis = {
+  trend: "bullish",
+  swings: [],
+  lastStructure: null,
+  fvgs: [],
+  obs: [],
+  swingHigh: 105,
+  swingLow: 95,
+  equilibrium: 100,
+};
+const overheadBuyZone: TFAnalysis = {
+  ...baseAnalysis,
+  fvgs: [{ fromTime: 1, toTime: 2, priceLow: 101, priceHigh: 102, kind: "bullish", mitigated: false, size: 1 }],
+};
+const sideSafeTrade = buildTrade(baseAnalysis, overheadBuyZone, [], 100, 1, "metal");
+if (sideSafeTrade.zone && sideSafeTrade.zone.priceLow > 100) {
+  throw new Error("A BUY used an overhead FVG as its execution zone");
 }
 
 console.log("Signal-engine regression checks passed");
