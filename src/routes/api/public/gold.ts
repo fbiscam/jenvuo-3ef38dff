@@ -579,7 +579,7 @@ async function handle({ request }: { request: Request }) {
         if (!forecast.stale) {
           try {
             const primary = await callChatCompletion({
-            models: ["openai/gpt-6-astra"],
+              models: [...EXTENSION_MODEL_CHAIN.reasoning],
               stage: "extension-candle-forecast",
               maxTokens: 260,
               retriesPerModel: 1,
@@ -693,7 +693,7 @@ async function handle({ request }: { request: Request }) {
       let primaryUsage = { promptTokens: 0, completionTokens: 0 };
       try {
         const primary = await callChatCompletion({
-          models: ["openai/gpt-6-astra"],
+          models: [...(image ? EXTENSION_MODEL_CHAIN.vision : EXTENSION_MODEL_CHAIN.reasoning)],
           stage: "extension-primary-review",
           maxTokens: 550,
           timeoutMs: 55_000,
