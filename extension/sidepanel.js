@@ -1115,7 +1115,7 @@ $("share").onclick = async () => {
     const msg = String(e?.name || "") === "NotAllowedError"
       ? "Screen share cancelled. Click the share button again and pick your chart tab or window."
       : e?.message ||
-        "Screen sharing start nahi ho saki. Chrome prompt mein chart tab ya window select karein.";
+        "Screen sharing could not start. In the Chrome prompt, select your chart tab or window.";
     addMsg("ai err", msg);
   } finally {
     sharePending = false;
@@ -1276,7 +1276,7 @@ async function markOnPage(text, signal, options = {}) {
   const targetTimeframe = requestedTimeframe(text) || timeframe;
   if (!options.skipDetection) await detectChartSymbol();
   if (detectedTimeframe && detectedTimeframe !== targetTimeframe) {
-    throw new Error(`TradingView par ${targetTimeframe.toUpperCase()} open karein; abhi ${detectedTimeframe.toUpperCase()} open hai.`);
+    throw new Error(`Open the ${targetTimeframe.toUpperCase()} chart on TradingView; ${detectedTimeframe.toUpperCase()} is currently open.`);
   }
   const topics = requestedMarkTopics(text, targetTimeframe);
   const needsValidatedPlan = topics.has("execution");
@@ -1300,8 +1300,8 @@ async function markOnPage(text, signal, options = {}) {
   if (!marks.length && !canRenderWithoutPriceMark) {
     throw new Error(
       needsValidatedPlan
-        ? "Valid entry/SL/TP setup confirm nahi hua, is liye unsafe levels mark nahi kiye."
-        : "Requested marking ka koi valid live level abhi nahi mila.",
+        ? "No valid entry/SL/TP setup was confirmed, so unsafe levels were not marked."
+        : "No valid live level was found for the requested marking.",
     );
   }
   const pts = (d.chart || [])
@@ -1314,7 +1314,7 @@ async function markOnPage(text, signal, options = {}) {
   const pad = (hi - lo) * 0.08 || 1;
 
   const [tab] = await chrome.tabs.query({ active: true, lastFocusedWindow: true });
-  if (!tab?.id) throw new Error("Koi active tab nahi mila.");
+  if (!tab?.id) throw new Error("No active tab was found.");
   await chrome.scripting.executeScript({ target: { tabId: tab.id }, files: ["content.js"] });
   await chrome.tabs.sendMessage(tab.id, {
     type: "JENVU_MARK",
@@ -1419,14 +1419,14 @@ async function send(preset, silentUser) {
       const names = result.names.length
         ? result.names.map((name) => name.toUpperCase()).join(", ")
         : "requested ICT/SMC";
-       const msg = `${result.timeframe.toUpperCase()} chart par ${names} ki ${result.count} simple marking${result.count === 1 ? "" : "s"} laga di hain. Agla timeframe kholain; Jenvu usay khud detect karega.`;
+       const msg = `Marked ${result.count} simple ${names} level${result.count === 1 ? "" : "s"} on the ${result.timeframe.toUpperCase()} chart. Open the next timeframe and Jenvu will detect it automatically.`;
       addMsg("ai", msg);
       saveMessage("ai", msg);
     } catch (e) {
       p.remove();
       addMsg(
         "ai err",
-        e && e.name === "AbortError" ? "Request stopped." : e.message || "Markings nahi lag sakin.",
+        e && e.name === "AbortError" ? "Request stopped." : e.message || "Markings could not be applied.",
       );
     }
     busy = false;
@@ -1456,7 +1456,7 @@ async function send(preset, silentUser) {
     updateSendState();
     addMsg(
       "ai err",
-      "Shared frame black ya unreadable hai. Share dobara start krka Chrome prompt mein chart tab/window select karein; minimized ya protected window select na karein.",
+      "The shared frame is black or unreadable. Restart sharing and select your chart tab or window in the Chrome prompt; do not pick a minimized or protected window.",
     );
     return;
   }
