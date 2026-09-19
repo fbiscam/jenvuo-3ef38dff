@@ -762,33 +762,26 @@ async function handle({ request }: { request: Request }) {
         );
       }
 
-      const market = await loadMarket(symbol, timeframe);
-      const desk = runExtensionDesk({
-        symbol: market.ticker.symbol,
-        timeframe,
-        selected: market.candles,
-        m5: market.fiveMinute,
-        h1: market.hourly,
-        h4: market.fourHourly,
-        d1: market.daily,
+      const market = await loadMarket(IB_SYMBOL, IB_TIMEFRAME);
+      const desk = runInsideBarDesk({
+        candles: market.candles as unknown as Array<Record<string, unknown>>,
         livePrice: market.ticker.price,
-        kind: market.inst.kind,
         decimals: market.inst.decimals,
       });
-       const analysisRequestText = `User request: ${question}\n\nLive price: ${market.ticker.price}\nTimeframe: ${timeframe}\n\nICT/SMC engine report:\n${desk.text}`;
+      const analysisRequestText = `User request: ${question}\n\nLive gold price: ${market.ticker.price}\nTimeframe: 30m (the only timeframe this strategy uses)\n\nDeterministic 30m mother/inside-bar engine report:\n${desk.text}`;
       const reviewImages = timeframeImages.length
         ? timeframeImages
         : image
-          ? [{ timeframe, image }]
+          ? [{ timeframe: IB_TIMEFRAME, image }]
           : [];
       const analysisUserContent = reviewImages.length
         ? [
             {
               type: "text" as const,
-                text: `${analysisRequestText}\n\nThis is the final review after the user presented all five charts in strict D1 -> H4 -> H1 -> M15 -> M5 order. Inspect every attached timeframe-labelled frame directly and reconcile them top down: D1 external draw and macro dealing range; H4 directional structure and premium/discount; H1 BOS/CHoCH, inducement and POIs; M15 sweep, displacement and confirmation; M5 execution trigger and invalidation. Verify the visible symbol/timeframe on each. Corroborate liquidity, FVG/OB freshness, support/resistance and displacement. A trade is CONFIRMED only when the complete liquidity-to-execution sequence is visible and agrees with the deterministic engine. If any frame conflicts, is unreadable, or lacks the required trigger, return WAIT. Live OHLCV controls exact prices. Frames: ${reviewImages.map((frame) => frame.timeframe.toUpperCase()).join(", ")}.`,
+              text: `${analysisRequestText}\n\nThe attached screenshot must show XAU/USD on the 30-minute chart. Confirm the mother candle, the inside bar(s), and that the break has not already run. If the visible symbol or timeframe is wrong, or the pattern is not visible, return WAIT. The deterministic engine controls every exact price.`,
             },
             ...reviewImages.flatMap((frame) => [
-              { type: "text" as const, text: `${frame.timeframe.toUpperCase()} chart frame` },
+              { type: "text" as const, text: `${frame.timeframe.toUpperCase()} gold chart frame` },
               { type: "image_url" as const, image_url: { url: frame.image, detail: "high" as const } },
             ]),
           ]
