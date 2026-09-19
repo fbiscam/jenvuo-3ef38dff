@@ -1300,7 +1300,7 @@ function DashboardHero({ keysCount, stats }: { keysCount: number | null; stats: 
     },
     {
       variant: "model" as const,
-      eyebrow: "Senior review with Claude Opus 5",
+      eyebrow: "  Senior review with claude opus 5",
       copy: "A mandatory second opinion checks every eligible analysis for structure, invalidation, risk, and consistency before a signal is returned.",
       action: "View model access",
       to: "/pricing" as const,
