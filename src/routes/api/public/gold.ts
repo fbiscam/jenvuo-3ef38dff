@@ -686,8 +686,8 @@ async function handle({ request }: { request: Request }) {
           ]
         : analysisRequestText;
 
-      // Primary market-structure review is mandatory. OmniRoute tries each
-      // verified Claude route in order; an unreviewed result is never returned.
+      // Primary market-structure review is mandatory. OmniRoute tries the
+      // strongest verified model, then the second-best verified fallback.
       let analysisText = "";
       let primaryModel = "";
       let primaryUsage = { promptTokens: 0, completionTokens: 0 };
@@ -717,7 +717,7 @@ async function handle({ request }: { request: Request }) {
             {
               ok: false,
               code: "PRIMARY_REVIEW_UNAVAILABLE",
-              error: "Claude primary review could not complete. Please retry in a moment.",
+              error: "OmniRoute analysis could not complete. Please retry in a moment.",
             },
             503,
           );
@@ -732,9 +732,9 @@ async function handle({ request }: { request: Request }) {
           {
             ok: false,
             code: "PRIMARY_REVIEW_UNAVAILABLE",
-            error: /rejected|blocked|key|model is unavailable|No configured AI provider/i.test(message)
+            error: /rejected|blocked|key|model is unavailable|missing on server|No configured AI provider/i.test(message)
               ? message
-              : "Claude primary review is temporarily unavailable after trying all fallback models. Please retry in a moment.",
+              : "OmniRoute analysis is temporarily unavailable after trying the primary and fallback models. Please retry in a moment.",
           },
           503,
         );

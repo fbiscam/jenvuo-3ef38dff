@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Jenvu Thunder \u2014 ICT/SMC Market Analyst",
-  "version": "1.9.21",
+  "version": "1.9.22",
   "description": "Share a chart and combine it with live multi-timeframe ICT/SMC market analysis.",
   "permissions": ["sidePanel", "tabs", "storage", "scripting", "activeTab"],
   "host_permissions": [
