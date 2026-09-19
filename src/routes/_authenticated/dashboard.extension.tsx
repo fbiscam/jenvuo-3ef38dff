@@ -25,8 +25,7 @@ import { getPlanCapabilities } from "@/lib/plan-entitlements";
 
 const MONO = "font-['JetBrains_Mono',ui-monospace,monospace]";
 const API_BASE = "https://jenvu.com/api/public/v1";
-// Keep the established static asset path so running deployments can serve a
-// newly packaged release without requiring their static-file manifest to restart.
+// Keep the established served asset path; the downloaded filename reflects the current release.
 const EXTENSION_DOWNLOAD_URL = "/jenvu-extension-v1.9.16.zip";
 
 export const Route = createFileRoute("/_authenticated/dashboard/extension")({
@@ -179,13 +178,18 @@ function ExtensionPage() {
   const onDownload = async () => {
     setDownloading(true);
     try {
+      const response = await fetch(EXTENSION_DOWNLOAD_URL);
+      if (!response.ok) throw new Error(`Download failed (${response.status})`);
+      const blobUrl = URL.createObjectURL(await response.blob());
       const a = document.createElement("a");
-      a.href = EXTENSION_DOWNLOAD_URL;
+      a.href = blobUrl;
       a.download = "jenvu-extension-v1.9.25.zip";
       a.rel = "noopener";
       document.body.appendChild(a);
       a.click();
       a.remove();
+      URL.revokeObjectURL(blobUrl);
+      toast.success("Extension download started");
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Download failed");
     } finally {
