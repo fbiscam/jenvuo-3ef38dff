@@ -48,15 +48,10 @@
 
     <main class="content">
       <section class="market" aria-label="Live market pulse">
-        <label class="symbol-field" for="symbolInput">
+        <div class="symbol-field">
           <span>Market</span>
-          <span class="market-controls">
-            <input id="symbolInput" type="text" value="XAUUSD" maxlength="16" spellcheck="false" aria-label="Market symbol" />
-            <select id="timeframeInput" aria-label="Execution timeframe">
-              <option value="5m">5m</option><option value="15m" selected>15m</option><option value="1h">1H</option><option value="4h">4H</option><option value="1d">1D</option>
-            </select>
-          </span>
-        </label>
+          <span id="detectedMarket" class="detected-market" aria-live="polite">Detecting TradingView…</span>
+        </div>
         <div class="quote">
           <div class="quote-left">
             <span class="currency">$</span><span id="price" class="hprice">—</span>
