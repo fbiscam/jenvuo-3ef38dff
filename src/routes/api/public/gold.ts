@@ -28,6 +28,7 @@ type Body = {
   symbol?: string;
   screenImage?: string;
   chartImage?: string;
+  timeframeImages?: Array<{ timeframe?: string; image?: string; capturedAt?: number }>;
 };
 
 const TF = new Set(["5m", "15m", "1h", "4h", "1d"]);
@@ -500,6 +501,14 @@ async function handle({ request }: { request: Request }) {
       // A deliberately attached chart takes precedence over a potentially stale
       // frame from an active screen-share session.
       const image = chartImage || screenImage;
+      const timeframeImages = (Array.isArray(body.timeframeImages) ? body.timeframeImages : [])
+        .slice(0, 5)
+        .flatMap((item) => {
+          const imageValue = validImage(item?.image);
+          const frame = TF.has(String(item?.timeframe)) ? String(item.timeframe) : null;
+          const fresh = Number.isFinite(item?.capturedAt) && Date.now() - Number(item.capturedAt) <= 10 * 60_000;
+          return imageValue && frame && fresh ? [{ timeframe: frame, image: imageValue }] : [];
+        });
 
       // Trading vocabulary alone does not request a live plan. Educational and
       // follow-up questions stay conversational unless actionable levels or a
@@ -694,13 +703,21 @@ async function handle({ request }: { request: Request }) {
         decimals: market.inst.decimals,
       });
       const analysisRequestText = `User request: ${question}\n\nLive price: ${market.ticker.price}\nTimeframe: ${timeframe}\n\nICT/SMC engine report:\n${desk.text}`;
-      const analysisUserContent = image
+      const reviewImages = timeframeImages.length
+        ? timeframeImages
+        : image
+          ? [{ timeframe, image }]
+          : [];
+      const analysisUserContent = reviewImages.length
         ? [
             {
               type: "text" as const,
-               text: `${analysisRequestText}\n\nInspect the attached chart directly. First verify the visible symbol and timeframe. Then corroborate candle structure, BOS/CHoCH sequence, inducement, liquidity, FVG/OB, support/resistance, displacement and proposed levels. If the visible symbol conflicts, the chart is unreadable, or the visual structure materially contradicts the deterministic report, return WAIT. Live OHLCV controls exact prices.`,
+               text: `${analysisRequestText}\n\nInspect the attached timeframe-labelled chart frames directly. Verify visible symbol/timeframe on each. Corroborate structure, BOS/CHoCH, inducement, liquidity, FVG/OB, support/resistance and displacement. If any visible symbol conflicts, a frame is unreadable, or visual structure materially contradicts live OHLCV, return WAIT. Live OHLCV controls exact prices. Frames: ${reviewImages.map((frame) => frame.timeframe.toUpperCase()).join(", ")}.`,
             },
-            { type: "image_url" as const, image_url: { url: image, detail: "high" as const } },
+            ...reviewImages.flatMap((frame) => [
+              { type: "text" as const, text: `${frame.timeframe.toUpperCase()} chart frame` },
+              { type: "image_url" as const, image_url: { url: frame.image, detail: "high" as const } },
+            ]),
           ]
         : analysisRequestText;
 
