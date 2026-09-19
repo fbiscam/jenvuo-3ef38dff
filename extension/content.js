@@ -89,7 +89,7 @@
     if (!ctx) return;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, innerWidth, innerHeight);
-    if (!state.marks.length || !(state.hi > state.lo)) return;
+    if (!state.marks.length && !state.bias && !state.showSession) return;
 
     const r = chartRect();
     state.rect = r;
@@ -97,7 +97,11 @@
     const top = r.y + padY;
     const height = (r.h - padY * 2) * state.scale;
     const scaleY = visiblePriceScale();
-    const y = (p) => scaleY ? scaleY(p) : top + state.offsetY + ((state.hi - p) / (state.hi - state.lo)) * height;
+    const y = (p) => scaleY
+      ? scaleY(p)
+      : state.hi > state.lo
+        ? top + state.offsetY + ((state.hi - p) / (state.hi - state.lo)) * height
+        : Number.NaN;
     const left = r.x + 8;
     const right = r.x + r.w - 8;
     const tone = (t) => (t === "buy" ? "#0f9d58" : t === "sell" ? "#d93025" : "#8a8f98");

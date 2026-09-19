@@ -739,16 +739,16 @@ async function detectChartSymbol() {
       pageContext = String(result?.context || "");
       const intervalText = String(result?.interval || "").toUpperCase();
       const intervalMatch = intervalText.match(/(?:^|\s)(5M?|15M?|1H|60|4H|240|1D|D)(?:\s|$)/);
-      const detectedTimeframe = intervalMatch?.[1];
-      const normalizedTimeframe = detectedTimeframe === "5" || detectedTimeframe === "5M"
+      const rawDetectedTimeframe = intervalMatch?.[1];
+      const normalizedTimeframe = rawDetectedTimeframe === "5" || rawDetectedTimeframe === "5M"
         ? "5m"
-        : detectedTimeframe === "15" || detectedTimeframe === "15M"
+        : rawDetectedTimeframe === "15" || rawDetectedTimeframe === "15M"
           ? "15m"
-          : detectedTimeframe === "1H" || detectedTimeframe === "60"
+          : rawDetectedTimeframe === "1H" || rawDetectedTimeframe === "60"
             ? "1h"
-            : detectedTimeframe === "4H" || detectedTimeframe === "240"
+            : rawDetectedTimeframe === "4H" || rawDetectedTimeframe === "240"
               ? "4h"
-              : detectedTimeframe === "1D" || detectedTimeframe === "D"
+              : rawDetectedTimeframe === "1D" || rawDetectedTimeframe === "D"
                 ? "1d"
                 : null;
       if (normalizedTimeframe) {
@@ -1218,19 +1218,39 @@ $("send").onclick = () => {
 const MARK_INTENT =
   /\b(mark|marking|draw|show|highlight|overlay|nishan)\b|mark(?:ing)?\s*(?:karo|kro|kara)|draw\s*kro|dikha\s*do/i;
 const MARK_TOPIC =
-  /\b(fvg|ob|order block|bos|choch|liquidity|liq|bsl|ssl|sweep|killzone|kill zone|price action|smc|imbalance|structure)\b/i;
+  /\b(fvg|ob|order block|supply|demand|bos|choch|trend|direction|bias|breakout|reversal|confirmation|entry|execution|retest|stop|sl|tp\d?|target|support|resistance|swing high|swing low|liquidity|liq|bsl|ssl|sweep|killzone|kill zone|price action|smc|ict|imbalance|structure)\b/i;
 
-function requestedMarkTopics(text) {
+function defaultMarkTopics(frame) {
+  if (frame === "1d" || frame === "4h") return new Set(["direction", "liquidity", "ob"]);
+  if (frame === "1h") return new Set(["structure", "ob", "fvg", "liquidity"]);
+  if (frame === "15m") return new Set(["confirmation", "execution", "retest", "liquidity"]);
+  return new Set(["execution", "confirmation"]);
+}
+
+function withoutTimeframeWords(text) {
+  return String(text || "")
+    .replace(/\b(?:d1|1d|daily|day|h4|4h|4\s*hour|h1|1h|1\s*hour|m15|15m|15\s*(?:min|minute)|m5|5m|5\s*(?:min|minute))\b/gi, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function requestedMarkTopics(text, frame) {
   const topics = new Set();
   if (/\b(fvg|fair value gap|imbalance)\b/i.test(text)) topics.add("fvg");
-  if (/\b(ob|order block)\b/i.test(text)) topics.add("ob");
-  if (/\b(bos|choch|ch\.o\.ch|break of structure|change of character|structure)\b/i.test(text))
+  if (/\b(ob|order block|supply|demand|supply and demand|supply & demand)\b/i.test(text)) topics.add("ob");
+  if (/\b(bos|choch|ch\.o\.ch|break of structure|change of character|structure|trend|breakout|reversal)\b/i.test(text))
     topics.add("structure");
+  if (/\b(direction|bias)\b/i.test(text)) topics.add("direction");
   if (/\b(liquidity|liq|bsl|ssl)\b/i.test(text)) topics.add("liquidity");
   if (/\b(sweep|stop raid)\b/i.test(text)) topics.add("sweep");
+  if (/\b(support|resistance)\b/i.test(text)) topics.add("levels");
+  if (/\b(swing high|swing low)\b/i.test(text)) topics.add("swings");
+  if (/\b(confirmation|confirmations)\b/i.test(text)) topics.add("confirmation");
+  if (/\b(retest|breakout retest)\b/i.test(text)) topics.add("retest");
+  if (/\b(entry|execution|stop|stop loss|sl|tp\d?|take profit|target)\b/i.test(text)) topics.add("execution");
+  if (/\b(killzone|kill zone|session)\b/i.test(text)) topics.add("session");
   if (/\b(smc|ict|everything|all|sab|sari|saari)\b/i.test(text)) topics.add("all");
-  if (!topics.size) topics.add("all");
-  return topics;
+  return topics.size ? topics : defaultMarkTopics(frame);
 }
 
 function markMatchesTopic(mark, topics) {
@@ -1239,8 +1259,14 @@ function markMatchesTopic(mark, topics) {
   if (topics.has("fvg") && label.includes("fvg")) return true;
   if (topics.has("ob") && /\bob\b|order block/.test(label)) return true;
   if (topics.has("structure") && mark.kind === "event") return true;
-  if (topics.has("liquidity") && mark.kind === "line" && /^(bsl|ssl)$/.test(label)) return true;
+  if (topics.has("liquidity") && /bsl|ssl|liquidity/.test(label)) return true;
   if (topics.has("sweep") && mark.kind === "sweep") return true;
+  if (topics.has("levels") && /support|resistance/.test(label)) return true;
+  if (topics.has("swings") && /swing high|swing low/.test(label)) return true;
+  if (topics.has("direction") && (mark.kind === "event" || /support|resistance|bsl|ssl/.test(label))) return true;
+  if (topics.has("confirmation") && (mark.kind === "event" || mark.kind === "sweep" || /fvg|\bob\b/.test(label))) return true;
+  if (topics.has("retest") && (mark.kind === "event" || /fvg|\bob\b/.test(label))) return true;
+  if (topics.has("execution") && /entry|stop|tp\d?|target/.test(label)) return true;
   return false;
 }
 
@@ -1264,12 +1290,32 @@ async function markOnPage(text, signal, options = {}) {
   if (detectedTimeframe && detectedTimeframe !== targetTimeframe) {
     throw new Error(`TradingView par ${targetTimeframe.toUpperCase()} open karein; abhi ${detectedTimeframe.toUpperCase()} open hai.`);
   }
-  const d = await post({ action: "snapshot", timeframe: targetTimeframe, symbol }, signal);
+  const topics = requestedMarkTopics(text, targetTimeframe);
+  const needsValidatedPlan = topics.has("execution");
+  const d = await post(
+    needsValidatedPlan
+      ? {
+          action: "chat",
+          timeframe: targetTimeframe,
+          symbol,
+          question: `Analyze the live chart and provide a validated trade plan for chart marking. User marking request: ${text}`,
+          history: history.slice(-8),
+          timeframeImages: freshReviewImages(),
+        }
+      : { action: "snapshot", timeframe: targetTimeframe, symbol },
+    signal,
+  );
   const availableMarks =
     Array.isArray(d.overlayMarks) && d.overlayMarks.length ? d.overlayMarks : d.marks || [];
-  const topics = requestedMarkTopics(text);
   const marks = prioritizeMarks(availableMarks.filter((mark) => markMatchesTopic(mark, topics)));
-  if (!marks.length) throw new Error("Requested marking ka koi valid live level abhi nahi mila.");
+  const canRenderWithoutPriceMark = topics.has("session") || topics.has("direction");
+  if (!marks.length && !canRenderWithoutPriceMark) {
+    throw new Error(
+      needsValidatedPlan
+        ? "Valid entry/SL/TP setup confirm nahi hua, is liye unsafe levels mark nahi kiye."
+        : "Requested marking ka koi valid live level abhi nahi mila.",
+    );
+  }
   const pts = (d.chart || [])
     .map((c) => (typeof c === "number" ? c : (c.close ?? c.c ?? 0)))
     .filter(Boolean);
@@ -1289,10 +1335,10 @@ async function markOnPage(text, signal, options = {}) {
     lo: lo - pad,
     hi: hi + pad,
     bias:
-      topics.has("all") || topics.has("structure")
+      topics.has("all") || topics.has("structure") || topics.has("direction")
         ? (d.marksBias ?? d.technicals?.smc?.structure?.bias ?? null)
         : null,
-    showSession: topics.has("all"),
+    showSession: topics.has("all") || topics.has("session"),
   });
   const shot = (stream ? await grabFrame() : null) || await captureTradingViewTab();
   reviewSession = reviewSession.symbol === symbol ? reviewSession : { symbol, frames: {} };
@@ -1302,6 +1348,7 @@ async function markOnPage(text, signal, options = {}) {
     image: shot,
     marks: marks.map((mark) => ({ ...mark })),
   };
+  if (!options.skipDetection) reviewSession.markRequest = withoutTimeframeWords(text);
   guidedReviewActive = true;
   saveReviewSession();
   renderReviewFlow(`${targetTimeframe.toUpperCase()} ${shot ? "marked and captured" : "marked · share screen to capture"}`);
@@ -1338,7 +1385,8 @@ async function refreshGuidedMarks() {
   markingRefreshPending = true;
   try {
     renderReviewFlow(`Marking ${detectedTimeframe.toUpperCase()}…`);
-    await markOnPage(`mark all ICT SMC on ${detectedTimeframe}`, undefined, { skipDetection: true });
+    const requestedMarks = reviewSession.markRequest || "mark all ICT SMC";
+    await markOnPage(`${requestedMarks} on ${detectedTimeframe}`, undefined, { skipDetection: true });
   } catch (error) {
     renderReviewFlow(error instanceof Error ? error.message : "Could not refresh marks");
   } finally {
