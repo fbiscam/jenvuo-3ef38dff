@@ -76,6 +76,10 @@ function directionBias(trade: BuiltTrade, h4Trend: string, h1Trend: string): Des
   return "NEUTRAL";
 }
 
+function timeframeSeconds(timeframe: string): number {
+  return ({ "5m": 300, "15m": 900, "1h": 3600, "4h": 14400, "1d": 86400 } as Record<string, number>)[timeframe] ?? 900;
+}
+
 export function runExtensionDesk(input: DeskInput): DeskResult {
   const price = (value: number) => value.toFixed(input.decimals);
   const selected = analyzeTF(input.selected);
@@ -140,6 +144,15 @@ export function runExtensionDesk(input: DeskInput): DeskResult {
     ],
     candidateDirection,
   );
+  const wantedStructure = candidateDirection === "BUY" ? "bullish" : "bearish";
+  const selectedLastClosedAt = Math.floor((input.selected[input.selected.length - 1]?.t ?? 0) / 1000);
+  const m5LastClosedAt = Math.floor((input.m5[input.m5.length - 1]?.t ?? 0) / 1000);
+  const latestSelectedTrigger = [...eventsSelected].reverse().find((event) => event.dir === wantedStructure);
+  const latestM5Trigger = [...eventsM5].reverse().find((event) => event.dir === wantedStructure);
+  const freshExecutionTrigger =
+    candidateDirection !== "WAIT" &&
+    ((latestSelectedTrigger?.toTime ?? 0) >= selectedLastClosedAt - timeframeSeconds(input.timeframe) * 8 ||
+      (latestM5Trigger?.toTime ?? 0) >= m5LastClosedAt - 5 * 60 * 12);
   // A veteran desk does not look for inducement on one chart only: internal
   // liquidity is engineered on the execution frame, refined on M5 and often
   // set up on H1. Accept the first verified sweep found across that ladder,
@@ -260,6 +273,8 @@ export function runExtensionDesk(input: DeskInput): DeskResult {
     hardVetoReasons.push("No verified inducement or failed-sweep reversal before the proposed entry.");
   if (!keyLevel.aligned)
     hardVetoReasons.push("The proposed entry is not backed by repeated candle-derived support/resistance.");
+  if (!freshExecutionTrigger)
+    hardVetoReasons.push("No fresh close-confirmed BOS/CHoCH trigger exists on the execution timeframe or M5.");
   if (!regime.favorable)
     reviewWarnings.push(regime.warning ?? `${regime.regime} conditions reduce execution quality`);
   if (scored.score < 75)

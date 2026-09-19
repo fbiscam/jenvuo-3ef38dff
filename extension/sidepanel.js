@@ -653,10 +653,31 @@ async function detectChartSymbol() {
               .slice(0, 20)
               .map((node) => `${node.getAttribute("data-symbol-short") || ""} ${node.textContent || ""}`),
           ];
-          return candidates.join(" ");
+          const intervalCandidates = [
+            ...Array.from(document.querySelectorAll('[data-name="interval-dialog-button"], [aria-label*="interval" i], [data-value]'))
+              .slice(0, 30)
+              .map((node) => `${node.getAttribute("data-value") || ""} ${node.textContent || ""}`),
+          ];
+          return { context: candidates.join(" "), intervals: intervalCandidates.join(" ") };
         },
       });
-      pageContext = String(results?.[0]?.result || "");
+      const result = results?.[0]?.result;
+      pageContext = String(result?.context || "");
+      const intervalText = String(result?.intervals || "").toUpperCase();
+      const intervalMatch = intervalText.match(/(?:^|\s)(5M?|15M?|1H|60|4H|240|1D|D)(?:\s|$)/);
+      const detectedTimeframe = intervalMatch?.[1];
+      const normalizedTimeframe = detectedTimeframe === "5" || detectedTimeframe === "5M"
+        ? "5m"
+        : detectedTimeframe === "15" || detectedTimeframe === "15M"
+          ? "15m"
+          : detectedTimeframe === "1H" || detectedTimeframe === "60"
+            ? "1h"
+            : detectedTimeframe === "4H" || detectedTimeframe === "240"
+              ? "4h"
+              : detectedTimeframe === "1D" || detectedTimeframe === "D"
+                ? "1d"
+                : null;
+      if (normalizedTimeframe) timeframe = normalizedTimeframe;
     } catch {
       pageContext = "";
     }
