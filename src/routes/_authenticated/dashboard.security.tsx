@@ -193,7 +193,7 @@ function SecurityPage() {
       </section>
 
       <section className="py-6">
-        <h2 className="text-base font-medium text-destructive">Danger zone</h2>
+        <h2 className="text-base font-medium text-destructive"> Danger zone</h2>
         <p className="mt-1 text-sm text-rose-600/80">Deleting your account is permanent and cannot be undone.</p>
         {!confirmDelete ? (
           <Button
