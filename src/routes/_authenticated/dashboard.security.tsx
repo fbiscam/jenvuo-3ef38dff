@@ -173,7 +173,7 @@ function SecurityPage() {
       </section>
 
       <section className="py-6">
-        <h2 className="text-base font-medium text-foreground">Session</h2>
+        <h2 className="text-base font-medium text-foreground"> Session</h2>
         <p className="mt-1 text-sm text-muted-foreground">
           Signing out clears your local session on this browser.&nbsp;
           <br />
