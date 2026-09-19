@@ -82,7 +82,7 @@ export function findSwings(candles: Candle[], lookback = 3): Swing[] {
 }
 
 export function detectStructure(candles: Candle[], swings: Swing[]): { events: StructureEvent[]; trend: TFAnalysis["trend"] } {
-  if (swings.length < 4) return { events, trend: "ranging" };
+  if (swings.length < 4) return { events: [], trend: "ranging" };
   const breakCandidates: Array<Omit<StructureEvent, "kind">> = [];
 
   // A swing is structure only after a later candle CLOSES through it. The old
