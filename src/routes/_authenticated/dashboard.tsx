@@ -95,7 +95,6 @@ const NAV_GROUPS: Array<{ label: string; items: TabItem[] }> = [
   {
     label: "",
     items: [
-      { to: "/dashboard/chart", label: "AI Chart", icon: ChartNoAxesCombined },
       { to: "/dashboard/usage", label: "Usage", icon: ChartNoAxesCombined },
     ],
   },
