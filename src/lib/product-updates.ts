@@ -100,8 +100,11 @@ export function getLatestProductUpdates(limit = MAX_DASHBOARD_UPDATES): ProductU
 }
 
 /** Titles/copy always render flush-left, whatever stray spacing an entry carries. */
-export function cleanUpdateText(value: string): string {
-  return value.replace(/[\s\u00a0]+/g, " ").trim();
+export function cleanUpdateText(value: string, maxWords = 15): string {
+  const text = value.replace(/[\s\u00a0]+/g, " ").trim();
+  const words = text.split(" ").filter(Boolean);
+  if (words.length <= maxWords) return text;
+  return `${words.slice(0, maxWords).join(" ").replace(/[.,;:–-]$/, "")}…`;
 }
 
 export function formatUpdateTime(at: string): string {
