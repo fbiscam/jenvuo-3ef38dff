@@ -54,19 +54,19 @@ function closedCandles<T extends { t: number }>(candles: T[], timeframe: string)
   return candles.filter((candle) => candle.t + duration <= now);
 }
 
-const EXTENSION_SIGNAL_OUTPUT_CONTRACT = `Analyze every supplied ICT/SMC factor internally, but expose only this compact trader-facing format. Do not add headings, disclaimers, confidence, grade, RR, model names, or extra paragraphs.
+const EXTENSION_SIGNAL_OUTPUT_CONTRACT = `Judge the supplied 30-minute mother candle / inside bar report internally, but expose only this compact trader-facing format. Do not add headings, disclaimers, confidence, grade, RR, model names, or extra paragraphs.
 
 VERDICT: BUY | SELL | WAIT
 STATUS: CONFIRMED | CONDITIONAL | NO TRADE
-ENTRY: exact supplied entry/zone, or —
+ENTRY: exact supplied entry, or —
 SL: exact supplied stop, or —
 TP1: exact supplied TP1, or —
 TP2: exact supplied TP2, or —
-WHY: one sentence, maximum 22 words, naming the two strongest verified ICT/SMC reasons or the decisive veto.
-THEORY: two short sentences, maximum 45 words total, plainly explaining the current market story (HTF bias, liquidity taken, structure shift, POI being used, invalidation) in trader language.
+WHY: one sentence, maximum 22 words, naming the fresh 30m extreme and the inside bar, or the decisive reason to stand aside.
+THEORY: two short sentences, maximum 45 words total, plainly explaining the reversal story (fresh high/low, inside-bar compression, break trigger, stop at the mother candle, 1:3 objective).
 ANSWER: one short sentence directly answering the user's actual question. Omit this line if the user asked nothing specific.
 
-CONFIRMED means take the listed setup. CONDITIONAL means do not enter yet; wait for the named trigger. WAIT always means NO TRADE. Never invent or adjust a price.`;
+CONFIRMED means take the listed setup. CONDITIONAL means do not enter yet; wait for the inside-bar break. WAIT always means NO TRADE. Never invent or adjust a price.`;
 
 function clampWords(text: string, max: number): string {
   return text.replace(/\s+/g, " ").trim().split(/\s+/).slice(0, max).join(" ");
