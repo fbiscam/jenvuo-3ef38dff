@@ -556,8 +556,8 @@ async function handle({ request }: { request: Request }) {
       }
 
       if (candleForecastIntent) {
-        if (!isGoldSymbol(symbol)) {
-          return extJson({ ok: false, code: "UNSUPPORTED_INSTRUMENT", error: "Jenvu forecasts XAU/USD only." }, 400);
+        if (!isSupportedTradeableSymbol(symbol)) {
+          return extJson({ ok: false, code: "UNSUPPORTED_INSTRUMENT", error: "Choose a supported market symbol before requesting a forecast." }, 400);
         }
         const market = await loadMarket(symbol, "15m");
         const forecast = build15mCandleForecast(market.candles, market.hourly);
@@ -565,13 +565,11 @@ async function handle({ request }: { request: Request }) {
         let text = deterministicText;
         let primaryModel = "";
         let primaryUsage = { promptTokens: 0, completionTokens: 0 };
-        let seniorModel = "";
-        let seniorUsage = { promptTokens: 0, completionTokens: 0 };
         let primaryReviewed = false;
         let seniorReview: { included: boolean; model: string | null; status: string } = {
           included: false,
           model: null,
-          status: entitlement.seniorReview ? "unavailable" : "not_required",
+          status: "not_required",
         };
         if (!forecast.stale) {
           try {
@@ -593,23 +591,6 @@ async function handle({ request }: { request: Request }) {
             primaryModel = primary.model;
             primaryUsage = primary.usage;
             primaryReviewed = true;
-            if (entitlement.seniorReview) {
-              const senior = await callChatCompletion({
-                models: EXTENSION_MODEL_CHAIN.seniorReview.filter((model) => model !== primary.model),
-                stage: "extension-candle-senior-review",
-                maxTokens: 240,
-                retriesPerModel: 1,
-                validateContent: validateForecastReview,
-                messages: [
-                  { role: "system", content: `Independently risk-review this XAU/USD 15m candle forecast. Confirm or downgrade to INDECISIVE; never reverse it or add trading levels. Return exactly: FORECAST, CONFIDENCE, CHARACTER, WHY, INVALIDATION.\n\n${XAU_SENIOR_REVIEW_INSTRUCTIONS}` },
-                  { role: "user", content: `${deterministicText}\nPrimary review:\n${text}` },
-                ],
-              });
-              text = normalizeForecastReview(senior.content, forecast);
-              seniorModel = senior.model;
-              seniorUsage = senior.usage;
-              seniorReview = { included: true, model: senior.model, status: "confirmed" };
-            }
           } catch (error) {
             console.warn("extension-candle-forecast review failed", { requestId, message: error instanceof Error ? error.message : "review failed" });
             text = deterministicText;
@@ -630,17 +611,14 @@ async function handle({ request }: { request: Request }) {
           text = formatForecast(forecast);
           seniorReview = { included: false, model: null, status: "expired" };
         }
-        if (!forecast.stale && (!primaryReviewed || (entitlement.seniorReview && seniorReview.status !== "confirmed"))) {
+        if (!forecast.stale && !primaryReviewed) {
           forecast.direction = "INDECISIVE";
           forecast.confidence = 0;
-          forecast.invalidation = !primaryReviewed
-            ? "The required AI review was unavailable; request a fresh forecast."
-            : "The required independent senior review was unavailable; request a fresh forecast.";
+          forecast.invalidation = "The required AI review was unavailable; request a fresh forecast.";
           text = formatForecast(forecast);
         }
         const calls = [
           ...(primaryModel ? [{ model: primaryModel, usage: primaryUsage, stage: "extension-candle-forecast" }] : []),
-          ...(seniorModel ? [{ model: seniorModel, usage: seniorUsage, stage: "extension-candle-senior-review" }] : []),
         ];
         const billing = calls.length
           ? await (await import("@/lib/extension-billing.server")).chargeExtensionUsage({
@@ -668,12 +646,12 @@ async function handle({ request }: { request: Request }) {
         });
       }
 
-      if (!isGoldSymbol(symbol)) {
+      if (!isSupportedTradeableSymbol(symbol)) {
         return extJson(
           {
             ok: false,
             code: "UNSUPPORTED_INSTRUMENT",
-            error: "Jenvu analyzes XAU/USD only. Open an XAU/USD chart and try again.",
+            error: "Unsupported market symbol. Enter the exact symbol shown on your chart.",
           },
           400,
         );
@@ -684,10 +662,13 @@ async function handle({ request }: { request: Request }) {
         symbol: market.ticker.symbol,
         timeframe,
         selected: market.candles,
+        m5: market.fiveMinute,
         h1: market.hourly,
         h4: market.fourHourly,
+        d1: market.daily,
         livePrice: market.ticker.price,
-        seniorReview: entitlement.seniorReview,
+        kind: market.inst.kind,
+        decimals: market.inst.decimals,
       });
       const analysisRequestText = `User request: ${question}\n\nLive price: ${market.ticker.price}\nTimeframe: ${timeframe}\n\nICT/SMC engine report:\n${desk.text}`;
       const analysisUserContent = image
@@ -717,7 +698,7 @@ async function handle({ request }: { request: Request }) {
           messages: [
             {
               role: "system",
-              content: `You are Jenvu, the primary XAU/USD desk analyst. Perform a deep independent review of the deterministic ICT/SMC engine report computed from live OHLCV. Preserve the engine's exact entry, stop and targets unless a hard veto invalidates them. A missing ideal confluence is a warning, not automatically a veto. If direction is valid but entry has not triggered, return a CONDITIONAL setup. Use WAIT only for an explicit hard failure: no directional edge, structurally invalid levels, RR below the floor, contradictory data, or fewer than two independent confirmations.\n\n${XAU_DESK_CORE_INSTRUCTIONS}\n\n${QUERY_RELEVANCE_INSTRUCTIONS}\n\n${EXTENSION_SIGNAL_OUTPUT_CONTRACT}`,
+               content: `You are Jenvu, the primary multi-market desk analyst. Review only the explicitly supplied instrument and the deterministic ICT/SMC report computed from live D1/H4/H1/execution/M5 OHLCV. Preserve exact engine levels unless a hard veto invalidates them. Treat the screenshot only as corroborating visual evidence; if its visible symbol conflicts with the supplied instrument, return WAIT.\n\n${XAU_DESK_CORE_INSTRUCTIONS}\n\n${QUERY_RELEVANCE_INSTRUCTIONS}\n\n${EXTENSION_SIGNAL_OUTPUT_CONTRACT}`,
             },
             ...history,
             {
