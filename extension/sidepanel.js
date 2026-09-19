@@ -980,6 +980,18 @@ async function grabFrame() {
   return stream === activeStream ? grabVideoFrame() : null;
 }
 
+async function captureTradingViewTab() {
+  if (typeof chrome === "undefined" || !chrome.tabs?.captureVisibleTab) return null;
+  try {
+    const [tab] = await chrome.tabs.query({ active: true, lastFocusedWindow: true });
+    if (!tab?.windowId || !/tradingview\.com/i.test(tab.url || "")) return null;
+    const image = await chrome.tabs.captureVisibleTab(tab.windowId, { format: "jpeg", quality: 82 });
+    return typeof image === "string" && image.length > 1000 ? image : null;
+  } catch {
+    return null;
+  }
+}
+
 function waitForVideoFrame(video, timeoutMs = 8000) {
   return new Promise((resolve, reject) => {
     if (video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA && video.videoWidth > 0) {
@@ -1282,17 +1294,17 @@ async function markOnPage(text, signal, options = {}) {
         : null,
     showSession: topics.has("all"),
   });
-  const shot = stream ? await grabFrame() : null;
+  const shot = (stream ? await grabFrame() : null) || await captureTradingViewTab();
   reviewSession = reviewSession.symbol === symbol ? reviewSession : { symbol, frames: {} };
   reviewSession.symbol = symbol;
   reviewSession.frames[targetTimeframe] = {
-    capturedAt: Date.now(),
+    capturedAt: shot ? Date.now() : 0,
     image: shot,
     marks: marks.map((mark) => ({ ...mark })),
   };
   guidedReviewActive = true;
   saveReviewSession();
-  renderReviewFlow(`${targetTimeframe.toUpperCase()} marked and captured`);
+  renderReviewFlow(`${targetTimeframe.toUpperCase()} ${shot ? "marked and captured" : "marked · share screen to capture"}`);
   return { count: marks.length, names: [...topics].filter((topic) => topic !== "all"), timeframe: targetTimeframe };
 }
 
@@ -1450,7 +1462,7 @@ async function send(preset, silentUser) {
     if (Array.isArray(d.chart) && d.chart.length) renderSnapshot(d);
     if (analysisRequest && Array.isArray(d.overlayMarks)) {
       await applyLiveMarksToPage(d).catch(() => {});
-      const currentShot = stream ? await grabFrame() : null;
+      const currentShot = (stream ? await grabFrame() : null) || await captureTradingViewTab();
       if (currentShot && detectedTimeframe) {
         reviewSession = reviewSession.symbol === symbol ? reviewSession : { symbol, frames: {} };
         reviewSession.symbol = symbol;
