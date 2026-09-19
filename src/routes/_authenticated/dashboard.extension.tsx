@@ -598,8 +598,8 @@ function ExtensionPage() {
               <span className="font-medium">Connect</span>.
             </li>
             <li>
-              5. Select the exact chart symbol and timeframe, then request a live ICT/SMC analysis.
-              Senior review appears automatically when your plan includes it.
+              5. Open the chart on TradingView, then request a live ICT/SMC analysis. The extension
+              detects the active symbol and timeframe automatically.
             </li>
           </ol>
           <div
