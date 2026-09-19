@@ -1581,7 +1581,7 @@ function ModelWorkspace() {
                     <UpdateIcon className="h-5 w-5" strokeWidth={1.8} />
                   </div>
                   <div className="min-w-0">
-                    <p className="text-sm leading-5 text-foreground">{cleanUpdateText(update.copy)}</p>
+                    <p className="line-clamp-2 text-sm leading-5 text-foreground">{cleanUpdateText(update.copy)}</p>
                     <p className="mt-2 text-xs text-muted-foreground/80">{update.tag} · {formatUpdateTime(update.at)}</p>
                   </div>
                 </article>
