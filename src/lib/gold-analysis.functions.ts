@@ -363,6 +363,10 @@ const inflightCandles = new Map<string, Promise<Candle[]>>();
 const CANDLE_FETCH_TIMEOUT_MS = 7000;
 const syntheticCandleKeys = new Set<string>();
 
+export function hasSyntheticInstrumentCandles(inst: ResolvedInstrument, timeframe: string): boolean {
+  return syntheticCandleKeys.has(`${inst.key}:${timeframe}`);
+}
+
 const TF_MS: Record<string, number> = {
   "1m": 60_000,
   "5m": 5 * 60_000,

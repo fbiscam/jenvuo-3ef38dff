@@ -7,6 +7,7 @@ import {
 import {
   resolveInstrument,
   isSupportedTradeableSymbol,
+  hasSyntheticInstrumentCandles,
   fetchInstrumentCandles,
   fetchLiveInstrumentTick,
 } from "@/lib/gold-analysis.functions";
@@ -198,6 +199,10 @@ async function loadMarket(symbol: string, timeframe: string) {
     timeframe === "1d" ? Promise.resolve(null) : fetchInstrumentCandles(inst, "1d").catch(() => null),
   ]);
   if (!candles || candles.length < 5) throw new Error("Live candles unavailable right now.");
+  const requiredFrames = [timeframe, "5m", "1h", "4h", "1d"];
+  if (requiredFrames.some((frame) => hasSyntheticInstrumentCandles(inst, frame))) {
+    throw new Error("Verified live multi-timeframe candles are unavailable; analysis is paused rather than using synthetic data.");
+  }
   const tick = await fetchLiveInstrumentTick(inst).catch(() => null);
   const closes = candles.map((c: any) => Number(c.close ?? c.c)).filter((n) => Number.isFinite(n));
   const last = tick?.price ?? (closes[closes.length - 1] as number);
