@@ -1336,7 +1336,7 @@ function DashboardHero({ keysCount, stats }: { keysCount: number | null; stats: 
               </div>
             </div>
             <div className="relative z-10 flex min-h-[180px] max-w-[720px] flex-col justify-center px-7 py-5 sm:min-h-[190px] sm:px-9">
-              <h2 className="text-xl font-semibold sm:text-2xl">{banner.eyebrow}</h2>
+              <h2 className="text-xl font-semibold text-white sm:text-2xl">{banner.eyebrow}</h2>
               <p className="mt-1.5 max-w-2xl text-sm leading-6 text-muted-foreground">{banner.copy}</p>
               <div className="mt-4 flex flex-wrap items-center gap-3">
                 <Button asChild size="sm" className="w-fit">
