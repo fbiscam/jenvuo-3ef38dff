@@ -210,12 +210,10 @@ export async function callChatCompletion(
   const models = healthy.length ? healthy : configured;
 
   let lastErr: AiGatewayError | null = null;
-  let attemptedModels = 0;
 
   for (let mi = 0; mi < models.length; mi++) {
     const model = models[mi];
     const isLastModel = mi === models.length - 1;
-    attemptedModels++;
     for (let attempt = 1; attempt <= retriesPerModel; attempt++) {
       try {
         const { content, usage } = await singleAttempt(model, opts);
