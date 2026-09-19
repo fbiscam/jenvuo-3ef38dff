@@ -109,3 +109,4 @@
 - [x] Keep the extension chart visible, attach the active TradingView chart, and restore Roman Urdu analysis replies; release v1.9.27
 - [x] Restore bounded previous-chat context for follow-up AI replies and release extension v1.9.29
 - [x] Enforce and live-test strict D1-to-M5 chart collection before final SMC trade planning; release extension v1.9.30
+- [x] Replace multi-timeframe SMC engine with the gold-only 30m Mother Candle / Inside Bar strategy; release extension v1.9.31
