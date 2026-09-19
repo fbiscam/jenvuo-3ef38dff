@@ -343,6 +343,9 @@ function updateQuickVisibility() {
   const hasMessages = !!$("thread").querySelector(".msg");
   const hasContext = !!chartImage || !!stream;
   $("quick").classList.toggle("hidden", hasMessages || hasContext);
+  // Live chart panel belongs to the home state only; hide it once a chat starts.
+  const market = document.querySelector(".market");
+  if (market) market.classList.toggle("hidden", hasMessages);
 }
 
 function scrollThread(force = false) {
