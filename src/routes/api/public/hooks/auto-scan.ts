@@ -14,6 +14,14 @@ export const Route = createFileRoute("/api/public/hooks/auto-scan")({
   server: {
     handlers: {
       POST: async ({ request }) => {
+        // Automated scanning/broadcasting is retired: the Live Signals page was
+        // removed, so no scheduled or manual broadcast scan runs any more.
+        // Analysis now happens on demand only (extension + dashboard requests).
+        return new Response(
+          JSON.stringify({ ok: true, disabled: true, reason: "automated_scanning_retired" }),
+          { status: 200, headers: { "content-type": "application/json" } },
+        );
+        // eslint-disable-next-line no-unreachable
         const cronSecret = process.env.CRON_SECRET ?? "";
         const providedCronSecret = request.headers.get("x-cron-secret") ?? "";
         const hasValidCronSecret =
