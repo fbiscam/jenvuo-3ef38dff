@@ -41,10 +41,13 @@ type DeskInput = {
   symbol: string;
   timeframe: string;
   selected: Candle[];
+  m5: Candle[];
   h1: Candle[];
   h4: Candle[];
+  d1: Candle[];
   livePrice: number;
-  seniorReview: boolean;
+  kind: "crypto" | "metal" | "forex" | "index" | "stock";
+  decimals: number;
 };
 
 export type DeskResult = {
@@ -57,8 +60,6 @@ export type DeskResult = {
   senior: { included: boolean; status: "completed" | "not_in_plan"; reasons: string[] };
   marks: Array<Record<string, string | number>>;
 };
-
-const price = (value: number) => value.toFixed(2);
 
 function structureEvents(candles: Candle[]) {
   const swings = findSwings(candles, 3);
@@ -73,15 +74,18 @@ function directionBias(trade: BuiltTrade, h4Trend: string, h1Trend: string): Des
 }
 
 export function runExtensionDesk(input: DeskInput): DeskResult {
+  const price = (value: number) => value.toFixed(input.decimals);
   const selected = analyzeTF(input.selected);
+  const m5 = analyzeTF(input.m5);
   const h1 = analyzeTF(input.h1);
   const h4 = analyzeTF(input.h4);
+  const d1 = analyzeTF(input.d1);
   const pools = buildLiquidityPools(input.h1, input.selected);
   const eventsH1 = structureEvents(input.h1);
   const atr = computeATR(input.selected);
   const killzone = killzoneForPair(input.symbol);
   const regime = detectMarketRegime(input.h1);
-  const trade = buildTrade(h4, selected, pools, input.livePrice, atr, "metal");
+  const trade = buildTrade(d1.trend === "ranging" ? h4 : d1, selected, pools, input.livePrice, atr, input.kind);
   const candidateDirection = trade.direction;
   const zone = trade.zone;
   const displacement = computeDisplacement(input.h1, eventsH1);
@@ -129,7 +133,7 @@ export function runExtensionDesk(input: DeskInput): DeskResult {
     imminentHighNews: false,
     dxyConfirms: null,
     lastPrice: input.livePrice,
-    kind: "metal",
+    kind: input.kind,
     structureQuality: computeStructureQuality(input.h1, eventsH1),
     nativeSession: killzone.nativeSession,
     zoneMitigated: false,
@@ -156,8 +160,10 @@ export function runExtensionDesk(input: DeskInput): DeskResult {
   });
 
   const confirmations = [
+    d1.trend !== "ranging" && d1.trend === (candidateDirection === "BUY" ? "bullish" : "bearish"),
     h4.trend !== "ranging" && h4.trend === (candidateDirection === "BUY" ? "bullish" : "bearish"),
     selected.trend === (candidateDirection === "BUY" ? "bullish" : "bearish"),
+    m5.trend === (candidateDirection === "BUY" ? "bullish" : "bearish"),
     pools.some(
       (pool) => pool.swept && pool.side === (candidateDirection === "BUY" ? "sell" : "buy"),
     ),
@@ -179,7 +185,7 @@ export function runExtensionDesk(input: DeskInput): DeskResult {
   if (candidateDirection !== "WAIT" && trade.rr < 1.5)
     hardVetoReasons.push(`Risk/reward 1:${trade.rr.toFixed(2)} is below the 1:1.5 floor.`);
   if (confirmations < 4)
-    hardVetoReasons.push(`Only ${confirmations}/8 independent execution confirmations passed; four are required.`);
+    hardVetoReasons.push(`Only ${confirmations}/10 independent execution confirmations passed; four are required.`);
   if (!regime.favorable)
     reviewWarnings.push(regime.warning ?? `${regime.regime} conditions reduce execution quality`);
   if (scored.score < 75)
@@ -212,22 +218,20 @@ export function runExtensionDesk(input: DeskInput): DeskResult {
           `TP1: ${price(trade.tp1 ?? trade.tp)} · TP2: ${price(trade.tp2 ?? trade.tp)} · Final: ${price(trade.tp)}`,
           `RR: 1:${trade.rr.toFixed(2)}`,
         ];
-  const reviewLabel = input.seniorReview
-    ? rulesVeto
-      ? `WAIT — independent rules review blocked execution: ${hardVetoReasons.slice(0, 3).join(" ")}`
-      : reviewWarnings.length
-        ? `CONDITIONAL — ${confirmations}/8 checks passed with no hard veto. ${reviewWarnings.slice(0, 2).join(" ")}`
-        : `CONFIRMED — ${confirmations}/8 independent checks passed with no hard veto.`
-    : "Not included in this plan.";
+  const reviewLabel = rulesVeto
+    ? `WAIT — deterministic rules blocked execution: ${hardVetoReasons.slice(0, 3).join(" ")}`
+    : reviewWarnings.length
+      ? `CONDITIONAL — ${confirmations}/10 checks passed with no hard veto. ${reviewWarnings.slice(0, 2).join(" ")}`
+      : `CONFIRMED — ${confirmations}/10 independent checks passed with no hard veto.`;
 
   const text = [
     `VERDICT: ${direction}`,
     `BIAS: ${bias}`,
-    `LIVE XAU/USD: ${price(input.livePrice)} · ${input.timeframe.toUpperCase()} execution · ${killzone.killzone}`,
+    `LIVE ${input.symbol}: ${price(input.livePrice)} · ${input.timeframe.toUpperCase()} execution · ${killzone.killzone}`,
     entryLine,
     ...riskLines,
     `CONFIDENCE: ${scored.score}% · Grade ${scored.grade}`,
-    `STRUCTURE: H4 ${h4.trend}, H1 ${h1.trend}, ${input.timeframe.toUpperCase()} ${selected.trend}. ${selected.lastStructure ? `${selected.lastStructure.kind} ${selected.lastStructure.dir} @ ${price(selected.lastStructure.price)}.` : "No recent confirmed BOS/CHoCH."}`,
+    `STRUCTURE: D1 ${d1.trend}, H4 ${h4.trend}, H1 ${h1.trend}, ${input.timeframe.toUpperCase()} ${selected.trend}, M5 ${m5.trend}. ${selected.lastStructure ? `${selected.lastStructure.kind} ${selected.lastStructure.dir} @ ${price(selected.lastStructure.price)}.` : "No recent confirmed BOS/CHoCH."}`,
     `LIQUIDITY: ${
       pools
         .filter((pool) => pool.swept)
@@ -236,7 +240,7 @@ export function runExtensionDesk(input: DeskInput): DeskResult {
     }`,
     `EVIDENCE: ${passed.map((factor) => factor.detail).join(" | ") || "No complete directional confluence."}`,
     `RISKS: ${failed.map((factor) => factor.detail).join(" | ") || "No scored warning beyond normal market risk."}`,
-    `SENIOR RULES REVIEW: ${reviewLabel}`,
+    `DETERMINISTIC RISK REVIEW: ${reviewLabel}`,
     `INVALIDATION: ${direction === "WAIT" ? (hardVetoReasons[0] ?? trade.reason) : trade.reason}`,
     "This is rules-based market analysis, not a profit guarantee. Risk only what you can afford to lose.",
   ].join("\n\n");
@@ -264,8 +268,8 @@ export function runExtensionDesk(input: DeskInput): DeskResult {
     grade: scored.grade,
     trade,
     senior: {
-      included: input.seniorReview,
-      status: input.seniorReview ? "completed" : "not_in_plan",
+      included: true,
+      status: "completed",
       reasons: reviewReasons,
     },
     marks,
