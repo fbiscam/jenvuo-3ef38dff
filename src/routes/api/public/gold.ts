@@ -735,69 +735,7 @@ async function handle({ request }: { request: Request }) {
         );
       }
 
-      // Senior review: a second, stronger pass that vets the primary analysis.
-      // It runs only for plans that include it; a failure never blocks the
-      // primary result — it is reported as unconfirmed instead.
-      let seniorReview: { included: boolean; model: string | null; status: string } = {
-        included: false,
-        model: null,
-        status: entitlement.seniorReview ? "unavailable" : "not_required",
-      };
-      let seniorModel = "";
-      let seniorUsage = { promptTokens: 0, completionTokens: 0 };
-      if (entitlement.seniorReview) {
-        try {
-          const seniorModels = EXTENSION_MODEL_CHAIN.seniorReview.filter(
-            (model) => model !== primaryModel,
-          );
-          const senior = await callChatCompletion({
-            models: seniorModels.length > 0 ? seniorModels : [...EXTENSION_MODEL_CHAIN.seniorReview],
-            stage: "extension-senior-review",
-            maxTokens: 500,
-            timeoutMs: 45_000,
-            deadlineMs: 90_000,
-            retriesPerModel: 1,
-            validateContent: validateSignalReview,
-            messages: [
-              {
-                role: "system",
-                content: `You are the independent senior XAU/USD desk head. Rebuild and verify the setup before ruling; do not merely summarize the primary response. Preserve all exact engine prices and never invent replacements. CONFIRM a supported triggered setup, mark an untriggered valid idea CONDITIONAL, and use WAIT only for a decisive hard veto. A missing ideal confluence by itself is not a veto.\n\n${XAU_DESK_CORE_INSTRUCTIONS}\n\n${XAU_SENIOR_REVIEW_INSTRUCTIONS}\n\n${QUERY_RELEVANCE_INSTRUCTIONS}\n\n${EXTENSION_SIGNAL_OUTPUT_CONTRACT}`,
-              },
-              {
-                role: "user",
-                content: image
-                  ? [
-                      {
-                        type: "text",
-                        text: `${analysisRequestText}\n\nPrimary analysis:\n${analysisText}\n\nIndependently verify the attached chart before ruling.`,
-                      },
-                      { type: "image_url", image_url: { url: image, detail: "high" } },
-                    ]
-                  : `${analysisRequestText}\n\nPrimary analysis:\n${analysisText}`,
-              },
-            ],
-          });
-          if (senior.content && senior.content.trim().length > 40) {
-            analysisText = senior.content.trim();
-            seniorModel = senior.model;
-            seniorUsage = senior.usage;
-            const seniorVerdict = /^\s*VERDICT:\s*(BUY|SELL|WAIT)\b/im.exec(analysisText)?.[1];
-            seniorReview = {
-              included: true,
-              model: senior.model,
-              status:
-                seniorVerdict === "WAIT" ? "vetoed" : seniorVerdict ? "confirmed" : "completed",
-            };
-          }
-        } catch (error) {
-          console.warn("extension-senior-review failed", {
-            requestId,
-            message: error instanceof Error ? error.message : "AI review failed.",
-          });
-          seniorReview = { included: false, model: null, status: "unavailable" };
-        }
-      }
-      const secondReview = seniorReview;
+      const seniorReview = { included: false, model: null, status: "not_required" };
       const refreshedTick = await fetchLiveInstrumentTick(market.inst).catch(() => null);
       const validationPrice = refreshedTick?.price ?? market.ticker.price;
       const validationQuoteAgeMs = refreshedTick?.t
@@ -806,22 +744,10 @@ async function handle({ request }: { request: Request }) {
           ? market.freshness.quoteAgeMs + (Date.now() - Date.parse(market.freshness.generatedAt))
           : Number.POSITIVE_INFINITY;
 
-      analysisText =
-        entitlement.seniorReview && seniorReview.status === "unavailable"
-          ? [
-              "VERDICT: WAIT",
-              "STATUS: NO TRADE",
-              "ENTRY: —",
-              "SL: —",
-              "TP1: —",
-              "TP2: —",
-              "WHY: Senior review was unavailable, so this setup remains unconfirmed.",
-              "THEORY: The primary ICT/SMC review completed, but the required independent risk check did not. Do not take this trade until review succeeds.",
-            ].join("\n")
-          : compactSignalAnswer(analysisText, desk, {
-              livePrice: validationPrice,
-              quoteAgeMs: validationQuoteAgeMs,
-            });
+      analysisText = compactSignalAnswer(analysisText, desk, {
+        livePrice: validationPrice,
+        quoteAgeMs: validationQuoteAgeMs,
+      });
 
       const { chargeExtensionUsage } = await import("@/lib/extension-billing.server");
       const billing = await chargeExtensionUsage({
@@ -832,9 +758,6 @@ async function handle({ request }: { request: Request }) {
         action: image ? "screen_analysis" : "chat",
         calls: [
           { model: primaryModel, usage: primaryUsage, stage: "extension-primary-review" },
-          ...(seniorModel
-            ? [{ model: seniorModel, usage: seniorUsage, stage: "extension-senior-review" }]
-            : []),
         ],
       });
       if (!billing.ok)
@@ -859,10 +782,10 @@ async function handle({ request }: { request: Request }) {
         analysisModels: {
           primary: primaryModel,
           engine: RULES_PRIMARY_MODEL,
-          senior: seniorModel || null,
+          senior: null,
         },
         seniorReview,
-        secondReview,
+        secondReview: seniorReview,
         usage: { requestId, charged: billing.charged, balance: billing.balance },
       });
     }
