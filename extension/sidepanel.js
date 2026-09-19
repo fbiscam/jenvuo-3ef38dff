@@ -1445,6 +1445,7 @@ async function send(preset, silentUser) {
       shot = await grabFrame();
     }
   }
+  if (!shot && analysisRequest) shot = await captureTradingViewTab();
   if (!shot && stream && analysisRequest) {
     busy = false;
     controller = null;

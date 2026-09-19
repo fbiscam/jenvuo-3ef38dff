@@ -749,7 +749,7 @@ async function handle({ request }: { request: Request }) {
             },
           ],
         });
-        if (!primary.content || primary.content.trim().length <= 40) {
+        if (!primary.content?.trim()) {
           return extJson(
             {
               ok: false,
