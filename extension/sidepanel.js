@@ -92,6 +92,23 @@ const SEND_ICON =
 const STOP_ICON =
   '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="7" width="10" height="10" rx="2" fill="currentColor" stroke="none"/></svg>';
 let history = [];
+const MAX_CONTEXT_MESSAGES = 24;
+const MAX_CONTEXT_CHARS = 1800;
+
+function conversationContext(messages = history) {
+  return messages
+    .filter(
+      (message) =>
+        (message?.role === "user" || message?.role === "assistant") &&
+        typeof message?.text === "string" &&
+        message.text.trim(),
+    )
+    .slice(-MAX_CONTEXT_MESSAGES)
+    .map((message) => ({
+      role: message.role,
+      text: message.text.trim().slice(0, MAX_CONTEXT_CHARS),
+    }));
+}
 
 function setReviewStatus(text, state) {
   const el = $("reviewStatus");
@@ -232,10 +249,14 @@ function loadThread(id) {
   const t = threads.find((x) => x.id === id);
   if (!t) return;
   activeId = id;
-  history = t.messages.map((m) => ({
-    role: m.cls === "user" ? "user" : "assistant",
-    text: m.text,
-  }));
+  history = conversationContext(
+    t.messages
+      .filter((m) => m.cls === "user" || m.cls === "ai")
+      .map((m) => ({
+        role: m.cls === "user" ? "user" : "assistant",
+        text: m.text,
+      })),
+  );
   const el = $("thread");
   el.innerHTML = "";
   if (!t.messages.length) emptyState();
@@ -1287,7 +1308,7 @@ async function markOnPage(text, signal, options = {}) {
           timeframe: targetTimeframe,
           symbol,
           question: `Analyze the live chart and provide a validated trade plan for chart marking. User marking request: ${text}`,
-          history: history.slice(-8),
+          history: conversationContext(),
           timeframeImages: freshReviewImages(),
         }
       : { action: "snapshot", timeframe: targetTimeframe, symbol },
@@ -1475,7 +1496,7 @@ async function send(preset, silentUser) {
         timeframe,
         symbol,
         question: text,
-        history: history.slice(-8),
+        history: conversationContext(),
         screenImage: shot || undefined,
         chartImage: chartImage || undefined,
         timeframeImages: analysisRequest ? freshReviewImages() : undefined,
@@ -1489,7 +1510,11 @@ async function send(preset, silentUser) {
     pend.remove();
     addMsg("ai", answer);
     saveMessage("ai", answer);
-    history.push({ role: "user", text }, { role: "assistant", text: answer });
+    history = conversationContext([
+      ...history,
+      { role: "user", text },
+      { role: "assistant", text: answer },
+    ]);
     if (d.ticker) {
       $("price").textContent = d.ticker.price.toFixed(2);
     }
@@ -1615,10 +1640,14 @@ store.get().then((data) => {
     const el = $("thread");
     el.innerHTML = "";
     t.messages.forEach((m) => addMsg(m.cls, m.text));
-    history = t.messages.map((m) => ({
-      role: m.cls === "user" ? "user" : "assistant",
-      text: m.text,
-    }));
+    history = conversationContext(
+      t.messages
+        .filter((m) => m.cls === "user" || m.cls === "ai")
+        .map((m) => ({
+          role: m.cls === "user" ? "user" : "assistant",
+          text: m.text,
+        })),
+    );
   }
   box.focus();
 });

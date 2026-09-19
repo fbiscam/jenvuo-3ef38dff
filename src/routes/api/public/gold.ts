@@ -479,10 +479,18 @@ async function handle({ request }: { request: Request }) {
       const question = String(body.question || "").slice(0, 2000);
       if (!question) return extJson({ ok: false, error: "Question is empty." }, 400);
 
-      const history = (body.history || []).slice(-8).map((h) => ({
-        role: h.role === "assistant" ? ("assistant" as const) : ("user" as const),
-        content: String(h.text || "").slice(0, 1500),
-      }));
+      const history = (body.history || [])
+        .filter(
+          (item) =>
+            (item?.role === "user" || item?.role === "assistant") &&
+            typeof item?.text === "string" &&
+            item.text.trim().length > 0,
+        )
+        .slice(-24)
+        .map((item) => ({
+          role: item.role === "assistant" ? ("assistant" as const) : ("user" as const),
+          content: item.text.trim().slice(0, 1800),
+        }));
 
       const suppliedChartImage = typeof body.chartImage === "string" && body.chartImage.length > 0;
       const suppliedScreenImage =

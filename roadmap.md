@@ -107,3 +107,4 @@
 - [x] Honor requested ICT/SMC concepts on every detected TradingView timeframe and release v1.9.25
 - [x] Require fresh sweep-reclaim, post-sweep structure, execution displacement, HTF agreement, and confirmed zone reaction before issuing entries
 - [x] Keep the extension chart visible, attach the active TradingView chart, and restore Roman Urdu analysis replies; release v1.9.27
+- [x] Restore bounded previous-chat context for follow-up AI replies and release extension v1.9.29
