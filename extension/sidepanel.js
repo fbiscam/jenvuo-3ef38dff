@@ -44,16 +44,12 @@ function showKeyGate(show, message) {
   if (err) err.textContent = message || "";
 }
 
-const TIMEFRAMES = ["5m", "15m", "1h", "4h", "1d"];
-const REVIEW_FRAMES = ["1d", "4h", "1h", "15m", "5m"];
+const TIMEFRAMES = ["30m"];
+const REVIEW_FRAMES = ["30m"];
 const QUICKS = [
-  { label: "Next 15m candle", text: "Forecast the next 15 minute candle for the selected market." },
-  { label: "Read screen", text: "Read the chart on my screen using ICT/SMC concepts." },
-  { label: "Trade plan", text: "Give me a trade plan now: bias, entry (POI), stop, TP1/TP2, RR." },
-  {
-    label: "Liquidity",
-    text: "Where is liquidity resting and where should I expect the next sweep?",
-  },
+  { label: "Analyse 30m gold", text: "Analyse the gold 30 minute chart on my screen." },
+  { label: "Mark the setup", text: "Mark the mother candle, inside bar, entry, stop and targets on my chart." },
+  { label: "Is there a trade?", text: "Is there a valid mother candle inside bar setup right now?" },
 ];
 const CANDLE_FORECAST_INTENT = /\b(?:next|upcoming|agli|agla|agali|aglay)\s+(?:(?:15\s*(?:m|min|minute)s?)\s+)?candle\b|\b15\s*(?:m|min|minute)s?\s+(?:next\s+)?candle\b|\bcandle\s+(?:konsi|kaunsi|kesa|kaisa)\s+(?:banegi|bnegi|banay\s+gi|hog[ai])\b|\b(?:bullish|bearish)\s+(?:next|agli|agla|agali|aglay)\s+candle\b/i;
 const ACTIONABLE_ANALYSIS_INTENT = [
@@ -164,17 +160,13 @@ function renderReviewFlow(status) {
     const evidence = reviewSession.symbol === symbol ? reviewSession.frames?.[frame] : null;
     return evidence && now - Number(evidence.capturedAt || 0) <= 10 * 60_000;
   });
-  statusEl.textContent = status || (completed.length ? `${completed.length}/5 frames captured` : "Open a timeframe to begin");
+  statusEl.textContent = status || (completed.length ? "30m gold chart captured" : "Open XAU/USD on the 30 minute chart");
 }
 
 function requestedTimeframe(text) {
   const value = String(text || "").toLowerCase();
-  if (/\b(?:d1|1d|daily|day)\b/.test(value)) return "1d";
-  if (/\b(?:h4|4h|4\s*hour)\b/.test(value)) return "4h";
-  if (/\b(?:h1|1h|1\s*hour)\b/.test(value)) return "1h";
-  if (/\b(?:m15|15m|15\s*(?:min|minute))\b/.test(value)) return "15m";
-  if (/\b(?:m5|5m|5\s*(?:min|minute))\b/.test(value)) return "5m";
-  return null;
+  if (/\b(?:m30|30m|30\s*(?:min|minute))\b/.test(value)) return "30m";
+  return "30m";
 }
 
 function freshReviewImages() {
@@ -762,17 +754,8 @@ async function detectChartSymbol() {
       const intervalText = String(result?.interval || "").toUpperCase();
       const intervalMatch = intervalText.match(/(?:^|\s)(5M?|15M?|1H|60|4H|240|1D|D)(?:\s|$)/);
       const rawDetectedTimeframe = intervalMatch?.[1];
-      const normalizedTimeframe = rawDetectedTimeframe === "5" || rawDetectedTimeframe === "5M"
-        ? "5m"
-        : rawDetectedTimeframe === "15" || rawDetectedTimeframe === "15M"
-          ? "15m"
-          : rawDetectedTimeframe === "1H" || rawDetectedTimeframe === "60"
-            ? "1h"
-            : rawDetectedTimeframe === "4H" || rawDetectedTimeframe === "240"
-              ? "4h"
-              : rawDetectedTimeframe === "1D" || rawDetectedTimeframe === "D"
-                ? "1d"
-                : null;
+      const normalizedTimeframe =
+        rawDetectedTimeframe === "30" || rawDetectedTimeframe === "30M" ? "30m" : null;
       if (normalizedTimeframe) {
         detectedTimeframe = normalizedTimeframe;
         timeframe = normalizedTimeframe;
@@ -782,7 +765,7 @@ async function detectChartSymbol() {
     }
     const source = `${tab.title || ""} ${tab.url || ""} ${pageContext}`.toUpperCase();
     const compact = source.replace(/[^A-Z0-9]/g, "");
-    const supported = ["XAUUSD", "XAGUSD", "EURUSD", "GBPUSD", "USDJPY", "AUDUSD", "NZDUSD", "USDCAD", "USDCHF", "EURJPY", "GBPJPY", "BTCUSD", "ETHUSD", "SOLUSD", "NAS100", "SPX500", "US30", "USOIL"];
+    const supported = ["XAUUSD"];
     const detected = supported.find((candidate) => compact.includes(candidate));
     const known = detected || (/GOLD/.test(source) ? "XAUUSD" : null);
     if (known) {
@@ -1242,11 +1225,8 @@ const MARK_INTENT =
 const MARK_TOPIC =
   /\b(fvg|ob|order block|supply|demand|bos|choch|trend|direction|bias|breakout|reversal|confirmation|entry|execution|retest|stop|sl|tp\d?|target|support|resistance|swing high|swing low|liquidity|liq|bsl|ssl|sweep|killzone|kill zone|price action|smc|ict|imbalance|structure)\b/i;
 
-function defaultMarkTopics(frame) {
-  if (frame === "1d" || frame === "4h") return new Set(["direction", "liquidity", "ob"]);
-  if (frame === "1h") return new Set(["structure", "ob", "fvg", "liquidity"]);
-  if (frame === "15m") return new Set(["confirmation", "execution", "retest", "liquidity"]);
-  return new Set(["execution", "confirmation"]);
+function defaultMarkTopics() {
+  return new Set(["mother", "inside", "entry", "stop", "target"]);
 }
 
 function withoutTimeframeWords(text) {
@@ -1272,7 +1252,7 @@ function requestedMarkTopics(text, frame) {
   if (/\b(entry|execution|stop|stop loss|sl|tp\d?|take profit|target)\b/i.test(text)) topics.add("execution");
   if (/\b(killzone|kill zone|session)\b/i.test(text)) topics.add("session");
   if (/\b(smc|ict|everything|all|sab|sari|saari)\b/i.test(text)) topics.add("all");
-  return topics.size ? topics : defaultMarkTopics(frame);
+  return topics.size ? topics : defaultMarkTopics();
 }
 
 function markMatchesTopic(mark, topics) {
