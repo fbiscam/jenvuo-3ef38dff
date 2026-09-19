@@ -20,6 +20,13 @@ export type ProductUpdate = {
 
 export const PRODUCT_UPDATES: ProductUpdate[] = [
   {
+    title: "Stronger institutional analysis engine",
+    copy: "Extension scans now verify inducement, repeated support/resistance and D1-to-M5 BOS/CHoCH alignment before issuing a trade.",
+    at: "2026-09-19T06:53:00Z",
+    tag: "Updated",
+    icon: "shield",
+  },
+  {
     title: "Multi-market extension analysis",
     copy: "Paid plans now analyze the selected supported market across D1, H4, H1, execution and M5 using one primary model.",
     at: "2026-09-19T12:00:00Z",

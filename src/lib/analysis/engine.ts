@@ -45,6 +45,26 @@ export type TFAnalysis = {
   equilibrium: number;
 };
 
+export type KeyLevelZone = {
+  kind: "support" | "resistance";
+  price: number;
+  touches: number;
+  strength: number;
+};
+
+export type InducementResult = {
+  detected: boolean;
+  level: number | null;
+  detail: string;
+};
+
+export type MtfStructureAlignment = {
+  aligned: boolean;
+  conflicts: string[];
+  confirmations: string[];
+  detail: string;
+};
+
 // ---------- swing / structure ----------
 
 export function findSwings(candles: Candle[], lookback = 3): Swing[] {
@@ -217,6 +237,118 @@ export function analyzeTF(candles: Candle[]): TFAnalysis {
     fvgs, obs,
     swingHigh: sh, swingLow: sl,
     equilibrium: (sh + sl) / 2,
+  };
+}
+
+// Cluster repeatedly defended swing prices into deterministic support and
+// resistance. These levels come only from OHLCV; narration cannot invent them.
+export function detectKeyLevels(
+  htfCandles: Candle[],
+  ltfCandles: Candle[],
+  maxLevels = 6,
+): KeyLevelZone[] {
+  const candles = [...htfCandles.slice(-180), ...ltfCandles.slice(-240)];
+  if (candles.length < 30) return [];
+  const current = ltfCandles[ltfCandles.length - 1]?.c ?? candles[candles.length - 1]?.c ?? 0;
+  if (!Number.isFinite(current) || current <= 0) return [];
+  const atr = computeATR(ltfCandles.length >= 20 ? ltfCandles : htfCandles);
+  const tolerance = Math.max(current * 0.0008, atr * 0.18);
+  const swings = [
+    ...findSwings(htfCandles, 3).map((s) => ({ ...s, weight: 2 })),
+    ...findSwings(ltfCandles, 3).map((s) => ({ ...s, weight: 1 })),
+  ];
+  const clusters: Array<{ sum: number; weight: number; touches: number }> = [];
+  for (const swing of swings) {
+    const hit = clusters.find((cluster) => Math.abs(cluster.sum / cluster.weight - swing.price) <= tolerance);
+    if (hit) {
+      hit.sum += swing.price * swing.weight;
+      hit.weight += swing.weight;
+      hit.touches += 1;
+    } else {
+      clusters.push({ sum: swing.price * swing.weight, weight: swing.weight, touches: 1 });
+    }
+  }
+  return clusters
+    .map((cluster) => {
+      const price = cluster.sum / cluster.weight;
+      return {
+        kind: price <= current ? ("support" as const) : ("resistance" as const),
+        price,
+        touches: cluster.touches,
+        strength: Math.min(100, cluster.touches * 18 + cluster.weight * 6),
+      };
+    })
+    .filter((level) => level.touches >= 2)
+    .sort((a, b) => b.strength - a.strength || Math.abs(a.price - current) - Math.abs(b.price - current))
+    .slice(0, maxLevels);
+}
+
+// ICT inducement: internal liquidity is swept immediately before a same-side
+// BOS/CHoCH. This is deliberately stricter than a generic swing sweep.
+export function detectInducement(
+  candles: Candle[],
+  swings: Swing[],
+  events: StructureEvent[],
+  dir: "BUY" | "SELL" | "WAIT",
+): InducementResult {
+  if (dir === "WAIT" || candles.length < 12 || swings.length < 4 || !events.length) {
+    return { detected: false, level: null, detail: "No confirmed inducement sequence" };
+  }
+  const wanted = dir === "BUY" ? "bullish" : "bearish";
+  const structure = [...events].reverse().find((event) => event.dir === wanted);
+  if (!structure) return { detected: false, level: null, detail: `No ${wanted} BOS/CHoCH after internal liquidity` };
+  const structureIndex = candles.findIndex((candle) => Math.floor(candle.t / 1000) === structure.toTime);
+  if (structureIndex < 3) return { detected: false, level: null, detail: "Structure break is too early to verify inducement" };
+  const internalKind = dir === "BUY" ? "low" : "high";
+  const internal = [...swings]
+    .reverse()
+    .find((swing) => swing.kind === internalKind && swing.i < structureIndex && swing.i >= Math.max(0, structureIndex - 18));
+  if (!internal) return { detected: false, level: null, detail: "No recent internal-liquidity swing before the break" };
+  const sweepWindow = candles.slice(internal.i + 1, structureIndex + 1);
+  const swept = dir === "BUY"
+    ? sweepWindow.some((candle) => candle.l < internal.price && candle.c > internal.price)
+    : sweepWindow.some((candle) => candle.h > internal.price && candle.c < internal.price);
+  return {
+    detected: swept,
+    level: internal.price,
+    detail: swept
+      ? `${internalKind === "low" ? "Sell-side" : "Buy-side"} inducement @ ${internal.price.toFixed(4)} swept before ${structure.kind}`
+      : `Internal ${internalKind} @ ${internal.price.toFixed(4)} was not swept before ${structure.kind}`,
+  };
+}
+
+export function detectMtfStructureAlignment(
+  frames: Array<{ label: string; events: StructureEvent[] }>,
+  dir: "BUY" | "SELL" | "WAIT",
+): MtfStructureAlignment {
+  if (dir === "WAIT") return { aligned: false, conflicts: ["No candidate direction"], confirmations: [], detail: "No candidate direction" };
+  const wanted = dir === "BUY" ? "bullish" : "bearish";
+  const confirmations: string[] = [];
+  const conflicts: string[] = [];
+  let lastConfirmedAt = 0;
+  for (const frame of frames) {
+    const latest = frame.events[frame.events.length - 1];
+    if (!latest) continue;
+    if (latest.dir === wanted) {
+      confirmations.push(`${frame.label} ${latest.kind} ${latest.dir}`);
+      lastConfirmedAt = Math.max(lastConfirmedAt, latest.toTime);
+    } else {
+      conflicts.push(`${frame.label} ${latest.kind} ${latest.dir}`);
+    }
+  }
+  const executionFrames = frames.slice(-2);
+  const hasExecutionTrigger = executionFrames.some((frame) => {
+    const latest = frame.events[frame.events.length - 1];
+    return latest?.dir === wanted && latest.toTime >= lastConfirmedAt - 7 * 24 * 3600;
+  });
+  const aligned = confirmations.length >= 3 && conflicts.length <= 1 && hasExecutionTrigger;
+  return {
+    aligned,
+    conflicts,
+    confirmations,
+    detail: aligned
+      ? `${confirmations.length}/${frames.length} timeframe structure events align with ${dir}`
+      : `Structure sequence incomplete: ${confirmations.length}/${frames.length} align${conflicts.length ? `; conflicts: ${conflicts.join(", ")}` : "; no execution BOS/CHoCH trigger"}`,
   };
 }
 
@@ -518,11 +650,11 @@ export type VetoResult = { key: string; label: string; reason: string };
 // These are the SEED defaults — the live active set is loaded from
 // public.signal_weight_configs and can be tuned via /dashboard/admin/tuning.
 export const DEFAULT_FACTOR_WEIGHTS: Record<AssetKind, Record<string, number>> = {
-  metal:  { bias: 12, sweep: 9, zone: 8, pd: 4, killzone: 6, dxy: 6, rr: 5, structure: 5, smt: 3, session_align: 3, displacement: 6, rejection: 5, confluence: 3, freshness: 2, eqhl: 3, turtle: 3, htf_poi: 5, silver_bullet: 3, power3: 3, mitigation: 3, ce: 4, liq_void: 4, momentum_div: 4, vol_spike: 3, midnight: 3, asian_range: 4, daily_open: 4, atr_room: 4, ltf_momentum: 3, range_pos: 3, swing_room: 4 },
-  forex:  { bias: 12, sweep: 9, zone: 8, pd: 4, killzone: 7, dxy: 4, rr: 5, structure: 5, smt: 4, session_align: 3, displacement: 6, rejection: 5, confluence: 3, freshness: 2, eqhl: 4, turtle: 3, htf_poi: 5, silver_bullet: 3, power3: 4, mitigation: 3, ce: 4, liq_void: 4, momentum_div: 4, vol_spike: 2, midnight: 3, asian_range: 5, daily_open: 4, atr_room: 4, ltf_momentum: 3, range_pos: 3, swing_room: 4 },
-  index:  { bias: 14, sweep: 9, zone: 8, pd: 4, killzone: 7, dxy: 0, rr: 5, structure: 6, smt: 4, session_align: 4, displacement: 8, rejection: 5, confluence: 2, freshness: 2, eqhl: 3, turtle: 3, htf_poi: 5, silver_bullet: 4, power3: 3, mitigation: 3, ce: 4, liq_void: 5, momentum_div: 4, vol_spike: 5, midnight: 3, asian_range: 3, daily_open: 5, atr_room: 4, ltf_momentum: 3, range_pos: 3, swing_room: 4 },
-  crypto: { bias: 16, sweep: 12, zone: 9, pd: 4, killzone: 0, dxy: 0, rr: 7, structure: 7, smt: 3, session_align: 2, displacement: 9, rejection: 5, confluence: 2, freshness: 0, eqhl: 4, turtle: 4, htf_poi: 5, silver_bullet: 0, power3: 0, mitigation: 3, ce: 4, liq_void: 6, momentum_div: 4, vol_spike: 6, midnight: 0, asian_range: 2, daily_open: 4, atr_room: 5, ltf_momentum: 4, range_pos: 3, swing_room: 4 },
-  stock:  { bias: 14, sweep: 9, zone: 8, pd: 4, killzone: 7, dxy: 0, rr: 5, structure: 6, smt: 4, session_align: 4, displacement: 8, rejection: 5, confluence: 2, freshness: 2, eqhl: 3, turtle: 3, htf_poi: 5, silver_bullet: 4, power3: 3, mitigation: 3, ce: 4, liq_void: 5, momentum_div: 4, vol_spike: 5, midnight: 3, asian_range: 3, daily_open: 5, atr_room: 4, ltf_momentum: 3, range_pos: 3, swing_room: 4 },
+  metal:  { bias: 12, sweep: 9, zone: 8, mtf_structure: 9, inducement: 6, key_level: 5, pd: 4, killzone: 6, dxy: 6, rr: 5, structure: 5, smt: 3, session_align: 3, displacement: 6, rejection: 5, confluence: 3, freshness: 2, eqhl: 3, turtle: 3, htf_poi: 5, silver_bullet: 3, power3: 3, mitigation: 3, ce: 4, liq_void: 4, momentum_div: 4, vol_spike: 3, midnight: 3, asian_range: 4, daily_open: 4, atr_room: 4, ltf_momentum: 3, range_pos: 3, swing_room: 4 },
+  forex:  { bias: 12, sweep: 9, zone: 8, mtf_structure: 9, inducement: 6, key_level: 5, pd: 4, killzone: 7, dxy: 4, rr: 5, structure: 5, smt: 4, session_align: 3, displacement: 6, rejection: 5, confluence: 3, freshness: 2, eqhl: 4, turtle: 3, htf_poi: 5, silver_bullet: 3, power3: 4, mitigation: 3, ce: 4, liq_void: 4, momentum_div: 4, vol_spike: 2, midnight: 3, asian_range: 5, daily_open: 4, atr_room: 4, ltf_momentum: 3, range_pos: 3, swing_room: 4 },
+  index:  { bias: 14, sweep: 9, zone: 8, mtf_structure: 10, inducement: 6, key_level: 5, pd: 4, killzone: 7, dxy: 0, rr: 5, structure: 6, smt: 4, session_align: 4, displacement: 8, rejection: 5, confluence: 2, freshness: 2, eqhl: 3, turtle: 3, htf_poi: 5, silver_bullet: 4, power3: 3, mitigation: 3, ce: 4, liq_void: 5, momentum_div: 4, vol_spike: 5, midnight: 3, asian_range: 3, daily_open: 5, atr_room: 4, ltf_momentum: 3, range_pos: 3, swing_room: 4 },
+  crypto: { bias: 16, sweep: 12, zone: 9, mtf_structure: 12, inducement: 8, key_level: 6, pd: 4, killzone: 0, dxy: 0, rr: 7, structure: 7, smt: 3, session_align: 2, displacement: 9, rejection: 5, confluence: 2, freshness: 0, eqhl: 4, turtle: 4, htf_poi: 5, silver_bullet: 0, power3: 0, mitigation: 3, ce: 4, liq_void: 6, momentum_div: 4, vol_spike: 6, midnight: 0, asian_range: 2, daily_open: 4, atr_room: 5, ltf_momentum: 4, range_pos: 3, swing_room: 4 },
+  stock:  { bias: 14, sweep: 9, zone: 8, mtf_structure: 10, inducement: 6, key_level: 5, pd: 4, killzone: 7, dxy: 0, rr: 5, structure: 6, smt: 4, session_align: 4, displacement: 8, rejection: 5, confluence: 2, freshness: 2, eqhl: 3, turtle: 3, htf_poi: 5, silver_bullet: 4, power3: 3, mitigation: 3, ce: 4, liq_void: 5, momentum_div: 4, vol_spike: 5, midnight: 3, asian_range: 3, daily_open: 5, atr_room: 4, ltf_momentum: 3, range_pos: 3, swing_room: 4 },
 };
 const FACTOR_WEIGHTS = DEFAULT_FACTOR_WEIGHTS;
 export type FactorWeightsByAsset = Record<AssetKind, Record<string, number>>;
@@ -568,6 +700,9 @@ export function scoreSetup(args: {
   ltfMomentum?: { aligned: boolean; detail: string } | null;
   rangePosition?: { ok: boolean; detail: string } | null;
   swingRoom?: { clear: boolean; detail: string } | null;
+  mtfStructure?: MtfStructureAlignment | null;
+  inducement?: InducementResult | null;
+  keyLevel?: { aligned: boolean; detail: string } | null;
   // ---- tuning override: swap in a candidate weight set without changing the module default ----
   weightsOverride?: FactorWeightsByAsset | null;
 }): {
@@ -583,6 +718,7 @@ export function scoreSetup(args: {
     equalHL, turtleSoup, htfPOI, silverBullet, powerOf3, mitigationBlock,
     ceTap, liquidityVoid, momentumDivergence, volumeSpike, midnightOpen,
     asianRange, dailyOpenSide, atrRoom, ltfMomentum, rangePosition, swingRoom,
+    mtfStructure, inducement, keyLevel,
     weightsOverride,
   } = args;
   const table = weightsOverride ?? FACTOR_WEIGHTS;
@@ -627,6 +763,10 @@ export function scoreSetup(args: {
   push("bias", "HTF bias aligned with trade",
     dir !== "WAIT" && htf.trend === (dir === "BUY" ? "bullish" : "bearish"),
     `HTF: ${htf.trend} · LTF: ${ltf.trend}${htf.trend !== ltf.trend && ltf.trend !== "ranging" ? " (LTF pullback into HTF bias — normal)" : ""}`);
+
+  if (mtfStructure) push("mtf_structure", "D1→M5 BOS/CHoCH sequence aligned", mtfStructure.aligned, mtfStructure.detail);
+  if (inducement) push("inducement", "Internal liquidity inducement confirmed", inducement.detected, inducement.detail);
+  if (keyLevel) push("key_level", "Entry respects deterministic support/resistance", keyLevel.aligned, keyLevel.detail);
 
   const sweptPool = pools.find(p => p.swept && (dir === "BUY" ? p.side === "sell" : p.side === "buy"));
   push("sweep", "Liquidity sweep before entry", !!sweptPool,

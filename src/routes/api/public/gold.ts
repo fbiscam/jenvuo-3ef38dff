@@ -680,7 +680,7 @@ async function handle({ request }: { request: Request }) {
         ? [
             {
               type: "text" as const,
-              text: `${analysisRequestText}\n\nInspect the attached chart directly. Use it to validate structure, visible timeframe, liquidity, displacement and the proposed levels. The live OHLCV report controls exact prices if the screenshot labels are unclear.`,
+               text: `${analysisRequestText}\n\nInspect the attached chart directly. First verify the visible symbol and timeframe. Then corroborate candle structure, BOS/CHoCH sequence, inducement, liquidity, FVG/OB, support/resistance, displacement and proposed levels. If the visible symbol conflicts, the chart is unreadable, or the visual structure materially contradicts the deterministic report, return WAIT. Live OHLCV controls exact prices.`,
             },
             { type: "image_url" as const, image_url: { url: image, detail: "high" as const } },
           ]

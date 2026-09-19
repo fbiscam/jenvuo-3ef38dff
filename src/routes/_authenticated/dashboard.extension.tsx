@@ -181,7 +181,7 @@ function ExtensionPage() {
     try {
       const a = document.createElement("a");
       a.href = EXTENSION_DOWNLOAD_URL;
-      a.download = "jenvu-extension-v1.9.18.zip";
+      a.download = "jenvu-extension-v1.9.19.zip";
       a.rel = "noopener";
       document.body.appendChild(a);
       a.click();
@@ -441,7 +441,7 @@ function ExtensionPage() {
                 <div className="min-w-0">
                   <div className="mb-1 text-[11px] text-zinc-500 md:hidden">Extension</div>
                   <div className="truncate text-[13px] text-blue-700">Jenvu XAU/USD Extension</div>
-                  <div className={`${MONO} truncate text-[12px] text-zinc-500`}>v1.9.18</div>
+                  <div className={`${MONO} truncate text-[12px] text-zinc-500`}>v1.9.19</div>
                 </div>
                 <div className="text-[13px] text-zinc-800">
                   <div className="mb-1 text-[11px] text-zinc-500 md:hidden">Created</div>
@@ -548,12 +548,12 @@ function ExtensionPage() {
               </div>
             </div>
             <div className="flex items-center gap-2 text-[13px] text-zinc-800">
-               <span className={MONO}>v1.9.18</span>
+               <span className={MONO}>v1.9.19</span>
               <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-medium text-emerald-700">
                 Latest
               </span>
             </div>
-            <div className="text-[13px] text-zinc-600">Updated Sep 18, 2026</div>
+            <div className="text-[13px] text-zinc-600">Updated Sep 19, 2026</div>
             <button
               type="button"
               onClick={onDownload}
@@ -564,7 +564,7 @@ function ExtensionPage() {
             </button>
           </div>
           <p className="mt-4 text-[12px] text-zinc-500">
-             ZIP package · Chrome developer mode · Version 1.9.18
+             ZIP package · Chrome developer mode · Version 1.9.19
           </p>
         </div>
       )}
