@@ -44,16 +44,12 @@ function showKeyGate(show, message) {
   if (err) err.textContent = message || "";
 }
 
-const TIMEFRAMES = ["5m", "15m", "1h", "4h", "1d"];
-const REVIEW_FRAMES = ["1d", "4h", "1h", "15m", "5m"];
+const TIMEFRAMES = ["30m"];
+const REVIEW_FRAMES = ["30m"];
 const QUICKS = [
-  { label: "Next 15m candle", text: "Forecast the next 15 minute candle for the selected market." },
-  { label: "Read screen", text: "Read the chart on my screen using ICT/SMC concepts." },
-  { label: "Trade plan", text: "Give me a trade plan now: bias, entry (POI), stop, TP1/TP2, RR." },
-  {
-    label: "Liquidity",
-    text: "Where is liquidity resting and where should I expect the next sweep?",
-  },
+  { label: "Analyse 30m gold", text: "Analyse the gold 30 minute chart on my screen." },
+  { label: "Mark the setup", text: "Mark the mother candle, inside bar, entry, stop and targets on my chart." },
+  { label: "Is there a trade?", text: "Is there a valid mother candle inside bar setup right now?" },
 ];
 const CANDLE_FORECAST_INTENT = /\b(?:next|upcoming|agli|agla|agali|aglay)\s+(?:(?:15\s*(?:m|min|minute)s?)\s+)?candle\b|\b15\s*(?:m|min|minute)s?\s+(?:next\s+)?candle\b|\bcandle\s+(?:konsi|kaunsi|kesa|kaisa)\s+(?:banegi|bnegi|banay\s+gi|hog[ai])\b|\b(?:bullish|bearish)\s+(?:next|agli|agla|agali|aglay)\s+candle\b/i;
 const ACTIONABLE_ANALYSIS_INTENT = [
@@ -164,17 +160,13 @@ function renderReviewFlow(status) {
     const evidence = reviewSession.symbol === symbol ? reviewSession.frames?.[frame] : null;
     return evidence && now - Number(evidence.capturedAt || 0) <= 10 * 60_000;
   });
-  statusEl.textContent = status || (completed.length ? `${completed.length}/5 frames captured` : "Open a timeframe to begin");
+  statusEl.textContent = status || (completed.length ? "30m gold chart captured" : "Open XAU/USD on the 30 minute chart");
 }
 
 function requestedTimeframe(text) {
   const value = String(text || "").toLowerCase();
-  if (/\b(?:d1|1d|daily|day)\b/.test(value)) return "1d";
-  if (/\b(?:h4|4h|4\s*hour)\b/.test(value)) return "4h";
-  if (/\b(?:h1|1h|1\s*hour)\b/.test(value)) return "1h";
-  if (/\b(?:m15|15m|15\s*(?:min|minute))\b/.test(value)) return "15m";
-  if (/\b(?:m5|5m|5\s*(?:min|minute))\b/.test(value)) return "5m";
-  return null;
+  if (/\b(?:m30|30m|30\s*(?:min|minute))\b/.test(value)) return "30m";
+  return "30m";
 }
 
 function freshReviewImages() {
@@ -762,17 +754,8 @@ async function detectChartSymbol() {
       const intervalText = String(result?.interval || "").toUpperCase();
       const intervalMatch = intervalText.match(/(?:^|\s)(5M?|15M?|1H|60|4H|240|1D|D)(?:\s|$)/);
       const rawDetectedTimeframe = intervalMatch?.[1];
-      const normalizedTimeframe = rawDetectedTimeframe === "5" || rawDetectedTimeframe === "5M"
-        ? "5m"
-        : rawDetectedTimeframe === "15" || rawDetectedTimeframe === "15M"
-          ? "15m"
-          : rawDetectedTimeframe === "1H" || rawDetectedTimeframe === "60"
-            ? "1h"
-            : rawDetectedTimeframe === "4H" || rawDetectedTimeframe === "240"
-              ? "4h"
-              : rawDetectedTimeframe === "1D" || rawDetectedTimeframe === "D"
-                ? "1d"
-                : null;
+      const normalizedTimeframe =
+        rawDetectedTimeframe === "30" || rawDetectedTimeframe === "30M" ? "30m" : null;
       if (normalizedTimeframe) {
         detectedTimeframe = normalizedTimeframe;
         timeframe = normalizedTimeframe;
@@ -782,7 +765,7 @@ async function detectChartSymbol() {
     }
     const source = `${tab.title || ""} ${tab.url || ""} ${pageContext}`.toUpperCase();
     const compact = source.replace(/[^A-Z0-9]/g, "");
-    const supported = ["XAUUSD", "XAGUSD", "EURUSD", "GBPUSD", "USDJPY", "AUDUSD", "NZDUSD", "USDCAD", "USDCHF", "EURJPY", "GBPJPY", "BTCUSD", "ETHUSD", "SOLUSD", "NAS100", "SPX500", "US30", "USOIL"];
+    const supported = ["XAUUSD"];
     const detected = supported.find((candidate) => compact.includes(candidate));
     const known = detected || (/GOLD/.test(source) ? "XAUUSD" : null);
     if (known) {
@@ -1240,13 +1223,10 @@ $("send").onclick = () => {
 const MARK_INTENT =
   /\b(mark|marking|draw|show|highlight|overlay|nishan)\b|mark(?:ing)?\s*(?:karo|kro|kara)|draw\s*kro|dikha\s*do/i;
 const MARK_TOPIC =
-  /\b(fvg|ob|order block|supply|demand|bos|choch|trend|direction|bias|breakout|reversal|confirmation|entry|execution|retest|stop|sl|tp\d?|target|support|resistance|swing high|swing low|liquidity|liq|bsl|ssl|sweep|killzone|kill zone|price action|smc|ict|imbalance|structure)\b/i;
+  /\b(mother|mother candle|inside|inside bar|baby|baby candle|entry|break|stop|sl|tp\d?|target|setup|candle|reversal|chart)\b/i;
 
-function defaultMarkTopics(frame) {
-  if (frame === "1d" || frame === "4h") return new Set(["direction", "liquidity", "ob"]);
-  if (frame === "1h") return new Set(["structure", "ob", "fvg", "liquidity"]);
-  if (frame === "15m") return new Set(["confirmation", "execution", "retest", "liquidity"]);
-  return new Set(["execution", "confirmation"]);
+function defaultMarkTopics() {
+  return new Set(["mother", "inside", "entry", "stop", "target"]);
 }
 
 function withoutTimeframeWords(text) {
@@ -1256,54 +1236,25 @@ function withoutTimeframeWords(text) {
     .trim();
 }
 
-function requestedMarkTopics(text, frame) {
-  const topics = new Set();
-  if (/\b(fvg|fair value gap|imbalance)\b/i.test(text)) topics.add("fvg");
-  if (/\b(ob|order block|supply|demand|supply and demand|supply & demand)\b/i.test(text)) topics.add("ob");
-  if (/\b(bos|choch|ch\.o\.ch|break of structure|change of character|structure|trend|breakout|reversal)\b/i.test(text))
-    topics.add("structure");
-  if (/\b(direction|bias)\b/i.test(text)) topics.add("direction");
-  if (/\b(liquidity|liq|bsl|ssl)\b/i.test(text)) topics.add("liquidity");
-  if (/\b(sweep|stop raid)\b/i.test(text)) topics.add("sweep");
-  if (/\b(support|resistance)\b/i.test(text)) topics.add("levels");
-  if (/\b(swing high|swing low)\b/i.test(text)) topics.add("swings");
-  if (/\b(confirmation|confirmations)\b/i.test(text)) topics.add("confirmation");
-  if (/\b(retest|breakout retest)\b/i.test(text)) topics.add("retest");
-  if (/\b(entry|execution|stop|stop loss|sl|tp\d?|take profit|target)\b/i.test(text)) topics.add("execution");
-  if (/\b(killzone|kill zone|session)\b/i.test(text)) topics.add("session");
-  if (/\b(smc|ict|everything|all|sab|sari|saari)\b/i.test(text)) topics.add("all");
-  return topics.size ? topics : defaultMarkTopics(frame);
+function requestedMarkTopics() {
+  // One strategy, one mark set: mother candle, inside bar, entry, stop, targets.
+  return defaultMarkTopics();
 }
 
-function markMatchesTopic(mark, topics) {
-  if (topics.has("all")) return true;
-  const label = String(mark.label || "").toLowerCase();
-  if (topics.has("fvg") && label.includes("fvg")) return true;
-  if (topics.has("ob") && /\bob\b|order block/.test(label)) return true;
-  if (topics.has("structure") && mark.kind === "event") return true;
-  if (topics.has("liquidity") && /bsl|ssl|liquidity/.test(label)) return true;
-  if (topics.has("sweep") && mark.kind === "sweep") return true;
-  if (topics.has("levels") && /support|resistance/.test(label)) return true;
-  if (topics.has("swings") && /swing high|swing low/.test(label)) return true;
-  if (topics.has("direction") && (mark.kind === "event" || /support|resistance|bsl|ssl/.test(label))) return true;
-  if (topics.has("confirmation") && (mark.kind === "event" || mark.kind === "sweep" || /fvg|\bob\b/.test(label))) return true;
-  if (topics.has("retest") && (mark.kind === "event" || /fvg|\bob\b/.test(label))) return true;
-  if (topics.has("execution") && /entry|stop|tp\d?|target/.test(label)) return true;
-  return false;
+function markMatchesTopic() {
+  return true;
 }
 
 function prioritizeMarks(marks) {
   const rank = (mark) => {
     const label = String(mark?.label || "").toLowerCase();
-    if (mark?.kind === "event") return 0;
-    if (mark?.kind === "sweep") return 1;
-    if (/pdh|pdl|bsl|ssl/.test(label)) return 2;
-    if (/fvg/.test(label)) return 3;
-    if (/\bob\b|order block/.test(label)) return 4;
-    if (/support|resistance/.test(label)) return 5;
-    return 6;
+    if (label.includes("mother")) return 0;
+    if (label.includes("inside")) return 1;
+    if (label.includes("entry")) return 2;
+    if (label.includes("stop")) return 3;
+    return 4;
   };
-  return [...marks].sort((a, b) => rank(a) - rank(b)).slice(0, 8);
+  return [...marks].sort((a, b) => rank(a) - rank(b)).slice(0, 6);
 }
 
 async function markOnPage(text, signal, options = {}) {
@@ -1312,7 +1263,7 @@ async function markOnPage(text, signal, options = {}) {
   if (detectedTimeframe && detectedTimeframe !== targetTimeframe) {
     throw new Error(`Open the ${targetTimeframe.toUpperCase()} chart on TradingView; ${detectedTimeframe.toUpperCase()} is currently open.`);
   }
-  const topics = requestedMarkTopics(text, targetTimeframe);
+  const topics = requestedMarkTopics();
   const needsValidatedPlan = topics.has("execution");
   const d = await post(
     needsValidatedPlan
@@ -1329,7 +1280,7 @@ async function markOnPage(text, signal, options = {}) {
   );
   const availableMarks =
     Array.isArray(d.overlayMarks) && d.overlayMarks.length ? d.overlayMarks : d.marks || [];
-  const marks = prioritizeMarks(availableMarks.filter((mark) => markMatchesTopic(mark, topics)));
+  const marks = prioritizeMarks(availableMarks.filter((mark) => markMatchesTopic()));
   const canRenderWithoutPriceMark = topics.has("session") || topics.has("direction");
   if (!marks.length && !canRenderWithoutPriceMark) {
     throw new Error(

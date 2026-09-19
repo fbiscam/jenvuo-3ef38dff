@@ -13,10 +13,16 @@ import {
 } from "@/lib/gold-analysis.functions";
 import { analyzeTF, buildLiquidityPools } from "@/lib/analysis/engine";
 import { callChatCompletion, EXTENSION_MODEL_CHAIN } from "@/lib/ai-gateway";
-import { runExtensionDesk, RULES_PRIMARY_MODEL } from "@/lib/analysis/extension-desk";
+import {
+  runInsideBarDesk,
+  IB_SYMBOL,
+  IB_TIMEFRAME,
+  IB_STRATEGY_MODEL,
+  type InsideBarResult,
+} from "@/lib/analysis/inside-bar";
 import {
   QUERY_RELEVANCE_INSTRUCTIONS,
-  XAU_DESK_CORE_INSTRUCTIONS,
+  GOLD_30M_INSIDE_BAR_INSTRUCTIONS,
 } from "@/lib/analysis/agent-instructions";
 import { build15mCandleForecast, formatForecast } from "@/lib/analysis/candle-forecast";
 
@@ -31,10 +37,11 @@ type Body = {
   timeframeImages?: Array<{ timeframe?: string; image?: string; capturedAt?: number }>;
 };
 
-const TF = new Set(["5m", "15m", "1h", "4h", "1d"]);
+const TF = new Set(["5m", "15m", "30m", "1h", "4h", "1d"]);
 const TF_MS: Record<string, number> = {
   "5m": 5 * 60_000,
   "15m": 15 * 60_000,
+  "30m": 30 * 60_000,
   "1h": 60 * 60_000,
   "4h": 4 * 60 * 60_000,
   "1d": 24 * 60 * 60_000,
@@ -47,19 +54,19 @@ function closedCandles<T extends { t: number }>(candles: T[], timeframe: string)
   return candles.filter((candle) => candle.t + duration <= now);
 }
 
-const EXTENSION_SIGNAL_OUTPUT_CONTRACT = `Analyze every supplied ICT/SMC factor internally, but expose only this compact trader-facing format. Do not add headings, disclaimers, confidence, grade, RR, model names, or extra paragraphs.
+const EXTENSION_SIGNAL_OUTPUT_CONTRACT = `Judge the supplied 30-minute mother candle / inside bar report internally, but expose only this compact trader-facing format. Do not add headings, disclaimers, confidence, grade, RR, model names, or extra paragraphs.
 
 VERDICT: BUY | SELL | WAIT
 STATUS: CONFIRMED | CONDITIONAL | NO TRADE
-ENTRY: exact supplied entry/zone, or —
+ENTRY: exact supplied entry, or —
 SL: exact supplied stop, or —
 TP1: exact supplied TP1, or —
 TP2: exact supplied TP2, or —
-WHY: one sentence, maximum 22 words, naming the two strongest verified ICT/SMC reasons or the decisive veto.
-THEORY: two short sentences, maximum 45 words total, plainly explaining the current market story (HTF bias, liquidity taken, structure shift, POI being used, invalidation) in trader language.
+WHY: one sentence, maximum 22 words, naming the fresh 30m extreme and the inside bar, or the decisive reason to stand aside.
+THEORY: two short sentences, maximum 45 words total, plainly explaining the reversal story (fresh high/low, inside-bar compression, break trigger, stop at the mother candle, 1:3 objective).
 ANSWER: one short sentence directly answering the user's actual question. Omit this line if the user asked nothing specific.
 
-CONFIRMED means take the listed setup. CONDITIONAL means do not enter yet; wait for the named trigger. WAIT always means NO TRADE. Never invent or adjust a price.`;
+CONFIRMED means take the listed setup. CONDITIONAL means do not enter yet; wait for the inside-bar break. WAIT always means NO TRADE. Never invent or adjust a price.`;
 
 function clampWords(text: string, max: number): string {
   return text.replace(/\s+/g, " ").trim().split(/\s+/).slice(0, max).join(" ");
@@ -100,7 +107,7 @@ function sanitizeConversationalAnswer(content: string): string {
 // Hard safety gate applied after the AI review: a structurally "valid" idea is
 // still wrong if the quote is stale or price has already run past the plan.
 function invalidateStalePlan(
-  desk: ReturnType<typeof runExtensionDesk>,
+  desk: InsideBarResult,
   guard: { livePrice: number; quoteAgeMs: number },
 ): string | null {
   if (!Number.isFinite(guard.livePrice) || guard.livePrice <= 0) {
@@ -133,7 +140,7 @@ function invalidateStalePlan(
 
 function compactSignalAnswer(
   raw: string,
-  desk: ReturnType<typeof runExtensionDesk>,
+  desk: InsideBarResult,
   guard?: { livePrice: number; quoteAgeMs: number },
 ): string {
   const staleReason = guard ? invalidateStalePlan(desk, guard) : null;
@@ -163,13 +170,13 @@ function compactSignalAnswer(
       : "NO TRADE";
   const fallbackWhy =
     verdict === "WAIT"
-      ? (desk.senior.reasons[0] ?? "No valid setup has enough verified ICT/SMC confluence.")
-      : `${desk.bias} structure and verified liquidity evidence support the setup at the listed entry.`;
+      ? (desk.senior.reasons[0] ?? "No valid 30-minute mother candle and inside bar reversal is present.")
+      : `Fresh 30m ${desk.direction === "BUY" ? "low" : "high"} with an inside bar; break of the baby candle triggers the reversal.`;
   const why = clampWords(staleReason ?? whyMatch?.[1] ?? fallbackWhy, 22);
   const fallbackTheory =
     verdict === "WAIT"
-      ? `Higher-timeframe bias is ${desk.bias.toLowerCase()} but price has not delivered a clean sweep and structure shift. Stand aside until liquidity is taken and a valid POI forms.`
-      : `Higher-timeframe bias is ${desk.bias.toLowerCase()} after liquidity was taken and structure shifted. Price is reacting from the marked POI, and the idea fails if the stop level trades through.`;
+      ? "Gold has not printed a fresh 30-minute extreme followed by a valid inside bar. Stand aside until that compression appears; skipping is part of the strategy."
+      : `Gold printed a fresh 30-minute ${desk.direction === "BUY" ? "low" : "high"} and compressed into an inside bar. The break is the trigger, the opposite end of the mother candle is the stop, and the objective is at least 1:3.`;
   const theory = clampWords(
     staleReason
       ? "A live-price safety check rejected this plan before it reached you. Entering after the level is gone turns a valid idea into a losing chase; wait for the next clean setup."
@@ -453,8 +460,9 @@ async function handle({ request }: { request: Request }) {
     /* empty body */
   }
 
-  const timeframe = TF.has(String(body.timeframe)) ? (body.timeframe as string) : "15m";
-  const symbol = (body.symbol || "XAUUSD").trim();
+  // Gold only, 30 minutes only. The strategy does not exist anywhere else.
+  const timeframe = IB_TIMEFRAME;
+  const symbol = IB_SYMBOL;
 
   try {
     if (body.action === "chat") {
@@ -525,19 +533,15 @@ async function handle({ request }: { request: Request }) {
       // Trading vocabulary alone does not request a live plan. Educational and
       // follow-up questions stay conversational unless actionable levels or a
       // chart review are explicitly requested.
-      const candleForecastIntent = requestsCandleForecast(question);
+      const candleForecastIntent = false; // single-strategy mode: no separate candle forecast
       const analysisIntent = !candleForecastIntent && requestsActionableAnalysis(question);
       const conversational = !analysisIntent && !candleForecastIntent;
 
       // Guided top-down review: a trade plan is only produced after the user has
       // walked through every required timeframe on their own chart, one by one.
-      const GUIDED_REVIEW_FRAMES = ["1d", "4h", "1h", "15m", "5m"] as const;
+      const GUIDED_REVIEW_FRAMES = ["30m"] as const;
       const GUIDED_FRAME_LABEL: Record<string, string> = {
-        "1d": "Daily (1D)",
-        "4h": "4 hour (4H)",
-        "1h": "1 hour (1H)",
-        "15m": "15 minute (15M)",
-        "5m": "5 minute (5M)",
+        "30m": "30 minute (30M) gold chart",
       };
       if (analysisIntent) {
         // Accept only a chronological D1 -> H4 -> H1 -> M15 -> M5 prefix.
@@ -556,15 +560,9 @@ async function handle({ request }: { request: Request }) {
           const next = missing[0];
           const done = GUIDED_REVIEW_FRAMES.filter((frame) => captured.has(frame));
           const text = [
-            "I work through the chart the way a desk analyst does: one timeframe at a time, top down, and only then a final trade plan.",
-            done.length
-              ? `Checked so far: ${done.map((frame) => GUIDED_FRAME_LABEL[frame]).join(", ")}.`
-              : "Nothing checked yet.",
-            `Next, please open ${GUIDED_FRAME_LABEL[next]} on your TradingView chart and ask me to analyse it.`,
-            `Still needed after that: ${missing
-              .slice(1)
-              .map((frame) => GUIDED_FRAME_LABEL[frame])
-              .join(", ") || "nothing — I will then give the full structure read, entry, stop, targets and reasoning."}`,
+            "I trade one setup only: the Mother Candle / Inside Bar reversal on gold, 30-minute chart.",
+            `Please open ${GUIDED_FRAME_LABEL[next]} (XAU/USD, 30 minutes) on TradingView and ask me to analyse it.`,
+            "Once I can see that chart I will mark the mother candle, the inside bar, the entry, the stop at the opposite end of the mother candle and the 1:3 target.",
           ].join("\n\n");
           return extJson({
             ok: true,
@@ -681,7 +679,7 @@ async function handle({ request }: { request: Request }) {
               messages: [
                 {
                   role: "system",
-                  content: `Review a deterministic ${market.ticker.symbol} next-15m-candle forecast. You may downgrade it to INDECISIVE, but never reverse it or invent evidence. Return exactly: FORECAST, CONFIDENCE, CHARACTER, WHY, INVALIDATION. Confidence is model confidence, not a win-rate promise. Do not include entry, stop, targets, trade advice, markdown, or extra fields.\n\n${XAU_DESK_CORE_INSTRUCTIONS}`,
+                  content: `Review a deterministic ${market.ticker.symbol} next-15m-candle forecast. You may downgrade it to INDECISIVE, but never reverse it or invent evidence. Return exactly: FORECAST, CONFIDENCE, CHARACTER, WHY, INVALIDATION. Confidence is model confidence, not a win-rate promise. Do not include entry, stop, targets, trade advice, markdown, or extra fields.\n\n${GOLD_30M_INSIDE_BAR_INSTRUCTIONS}`,
                 },
                 { role: "user", content: `${deterministicText}\nCalibration: ${forecast.calibration.accuracy}% over ${forecast.calibration.tested} tests; stability ${forecast.calibration.stability}%.` },
               ],
@@ -756,33 +754,26 @@ async function handle({ request }: { request: Request }) {
         );
       }
 
-      const market = await loadMarket(symbol, timeframe);
-      const desk = runExtensionDesk({
-        symbol: market.ticker.symbol,
-        timeframe,
-        selected: market.candles,
-        m5: market.fiveMinute,
-        h1: market.hourly,
-        h4: market.fourHourly,
-        d1: market.daily,
+      const market = await loadMarket(IB_SYMBOL, IB_TIMEFRAME);
+      const desk = runInsideBarDesk({
+        candles: market.candles as unknown as Array<Record<string, unknown>>,
         livePrice: market.ticker.price,
-        kind: market.inst.kind,
         decimals: market.inst.decimals,
       });
-       const analysisRequestText = `User request: ${question}\n\nLive price: ${market.ticker.price}\nTimeframe: ${timeframe}\n\nICT/SMC engine report:\n${desk.text}`;
+      const analysisRequestText = `User request: ${question}\n\nLive gold price: ${market.ticker.price}\nTimeframe: 30m (the only timeframe this strategy uses)\n\nDeterministic 30m mother/inside-bar engine report:\n${desk.text}`;
       const reviewImages = timeframeImages.length
         ? timeframeImages
         : image
-          ? [{ timeframe, image }]
+          ? [{ timeframe: IB_TIMEFRAME, image }]
           : [];
       const analysisUserContent = reviewImages.length
         ? [
             {
               type: "text" as const,
-                text: `${analysisRequestText}\n\nThis is the final review after the user presented all five charts in strict D1 -> H4 -> H1 -> M15 -> M5 order. Inspect every attached timeframe-labelled frame directly and reconcile them top down: D1 external draw and macro dealing range; H4 directional structure and premium/discount; H1 BOS/CHoCH, inducement and POIs; M15 sweep, displacement and confirmation; M5 execution trigger and invalidation. Verify the visible symbol/timeframe on each. Corroborate liquidity, FVG/OB freshness, support/resistance and displacement. A trade is CONFIRMED only when the complete liquidity-to-execution sequence is visible and agrees with the deterministic engine. If any frame conflicts, is unreadable, or lacks the required trigger, return WAIT. Live OHLCV controls exact prices. Frames: ${reviewImages.map((frame) => frame.timeframe.toUpperCase()).join(", ")}.`,
+              text: `${analysisRequestText}\n\nThe attached screenshot must show XAU/USD on the 30-minute chart. Confirm the mother candle, the inside bar(s), and that the break has not already run. If the visible symbol or timeframe is wrong, or the pattern is not visible, return WAIT. The deterministic engine controls every exact price.`,
             },
             ...reviewImages.flatMap((frame) => [
-              { type: "text" as const, text: `${frame.timeframe.toUpperCase()} chart frame` },
+              { type: "text" as const, text: `${frame.timeframe.toUpperCase()} gold chart frame` },
               { type: "image_url" as const, image_url: { url: frame.image, detail: "high" as const } },
             ]),
           ]
@@ -805,7 +796,7 @@ async function handle({ request }: { request: Request }) {
           messages: [
             {
               role: "system",
-               content: `You are Jenvu, the primary multi-market desk analyst. Review only the explicitly supplied instrument and the deterministic ICT/SMC report computed from live D1/H4/H1/execution/M5 OHLCV. Preserve exact engine levels unless a hard veto invalidates them. Treat the screenshot only as corroborating visual evidence; if its visible symbol conflicts with the supplied instrument, return WAIT.\n\n${XAU_DESK_CORE_INSTRUCTIONS}\n\n${QUERY_RELEVANCE_INSTRUCTIONS}\n\n${EXTENSION_SIGNAL_OUTPUT_CONTRACT}`,
+               content: `You are Jenvu, the primary multi-market desk analyst. Review only the explicitly supplied instrument and the deterministic ICT/SMC report computed from live D1/H4/H1/execution/M5 OHLCV. Preserve exact engine levels unless a hard veto invalidates them. Treat the screenshot only as corroborating visual evidence; if its visible symbol conflicts with the supplied instrument, return WAIT.\n\n${GOLD_30M_INSIDE_BAR_INSTRUCTIONS}\n\n${QUERY_RELEVANCE_INSTRUCTIONS}\n\n${EXTENSION_SIGNAL_OUTPUT_CONTRACT}`,
             },
             ...history,
             {
@@ -884,11 +875,11 @@ async function handle({ request }: { request: Request }) {
         chart: market.chart,
         technicals: market.technicals,
         freshness: market.freshness,
-        overlayMarks: [...market.marks, ...desk.marks],
+        overlayMarks: desk.marks,
         marksBias: desk.bias.toLowerCase(),
         analysisModels: {
           primary: primaryModel,
-          engine: RULES_PRIMARY_MODEL,
+          engine: IB_STRATEGY_MODEL,
           senior: null,
         },
         seniorReview,
@@ -904,9 +895,9 @@ async function handle({ request }: { request: Request }) {
       ticker: market.ticker,
       chart: market.chart,
       technicals: market.technicals,
-      marks: market.marks,
-      overlayMarks: market.marks,
-      marksBias: market.technicals.trend.toLowerCase(),
+      marks: [],
+      overlayMarks: [],
+      marksBias: "neutral",
       freshness: market.freshness,
     });
   } catch (e) {
