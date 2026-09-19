@@ -527,6 +527,51 @@ async function handle({ request }: { request: Request }) {
       const analysisIntent = !candleForecastIntent && requestsActionableAnalysis(question);
       const conversational = !analysisIntent && !candleForecastIntent;
 
+      // Guided top-down review: a trade plan is only produced after the user has
+      // walked through every required timeframe on their own chart, one by one.
+      const GUIDED_REVIEW_FRAMES = ["1d", "4h", "1h", "15m", "5m"] as const;
+      const GUIDED_FRAME_LABEL: Record<string, string> = {
+        "1d": "Daily (1D)",
+        "4h": "4 hour (4H)",
+        "1h": "1 hour (1H)",
+        "15m": "15 minute (15M)",
+        "5m": "5 minute (5M)",
+      };
+      if (analysisIntent) {
+        const captured = new Set(timeframeImages.map((frame) => frame.timeframe));
+        const missing = GUIDED_REVIEW_FRAMES.filter((frame) => !captured.has(frame));
+        if (missing.length) {
+          const next = missing[0];
+          const done = GUIDED_REVIEW_FRAMES.filter((frame) => captured.has(frame));
+          const text = [
+            "I work through the chart the way a desk analyst does: one timeframe at a time, top down, and only then a final trade plan.",
+            done.length
+              ? `Checked so far: ${done.map((frame) => GUIDED_FRAME_LABEL[frame]).join(", ")}.`
+              : "Nothing checked yet.",
+            `Next, please open ${GUIDED_FRAME_LABEL[next]} on your TradingView chart and ask me to analyse it.`,
+            `Still needed after that: ${missing
+              .slice(1)
+              .map((frame) => GUIDED_FRAME_LABEL[frame])
+              .join(", ") || "nothing — I will then give the full structure read, entry, stop, targets and reasoning."}`,
+          ].join("\n\n");
+          return extJson({
+            ok: true,
+            text,
+            mode: "guided_review",
+            guidedReview: {
+              required: [...GUIDED_REVIEW_FRAMES],
+              captured: [...captured],
+              missing,
+              next,
+            },
+            seniorReview: { included: false, model: null, status: "not_required" },
+            secondReview: { included: false, model: null, status: "not_required" },
+            usage: { requestId, charged: 0, balance: entitlement.balance },
+          });
+        }
+      }
+
+
       if (conversational) {
         const quickReply = quickConversationReply(question);
         if (quickReply) {
