@@ -517,7 +517,9 @@ async function handle({ request }: { request: Request }) {
           const imageValue = validImage(item?.image);
           const frame = TF.has(String(item?.timeframe)) ? String(item.timeframe) : null;
           const fresh = Number.isFinite(item?.capturedAt) && Date.now() - Number(item.capturedAt) <= 10 * 60_000;
-          return imageValue && frame && fresh ? [{ timeframe: frame, image: imageValue }] : [];
+          return imageValue && frame && fresh
+            ? [{ timeframe: frame, image: imageValue, capturedAt: Number(item.capturedAt) }]
+            : [];
         });
 
       // Trading vocabulary alone does not request a live plan. Educational and
@@ -538,7 +540,17 @@ async function handle({ request }: { request: Request }) {
         "5m": "5 minute (5M)",
       };
       if (analysisIntent) {
-        const captured = new Set(timeframeImages.map((frame) => frame.timeframe));
+        // Accept only a chronological D1 -> H4 -> H1 -> M15 -> M5 prefix.
+        // Later frames captured early cannot bypass the top-down workflow.
+        const evidenceByFrame = new Map(timeframeImages.map((frame) => [frame.timeframe, frame]));
+        const captured = new Set<string>();
+        let previousCapturedAt = 0;
+        for (const frame of GUIDED_REVIEW_FRAMES) {
+          const evidence = evidenceByFrame.get(frame);
+          if (!evidence || evidence.capturedAt < previousCapturedAt) break;
+          captured.add(frame);
+          previousCapturedAt = evidence.capturedAt;
+        }
         const missing = GUIDED_REVIEW_FRAMES.filter((frame) => !captured.has(frame));
         if (missing.length) {
           const next = missing[0];
@@ -757,7 +769,7 @@ async function handle({ request }: { request: Request }) {
         kind: market.inst.kind,
         decimals: market.inst.decimals,
       });
-      const analysisRequestText = `User request: ${question}\n\nLive price: ${market.ticker.price}\nTimeframe: ${timeframe}\n\nICT/SMC engine report:\n${desk.text}`;
+       const analysisRequestText = `User request: ${question}\n\nLive price: ${market.ticker.price}\nTimeframe: ${timeframe}\n\nICT/SMC engine report:\n${desk.text}`;
       const reviewImages = timeframeImages.length
         ? timeframeImages
         : image
@@ -767,7 +779,7 @@ async function handle({ request }: { request: Request }) {
         ? [
             {
               type: "text" as const,
-               text: `${analysisRequestText}\n\nInspect the attached timeframe-labelled chart frames directly. Verify visible symbol/timeframe on each. Corroborate structure, BOS/CHoCH, inducement, liquidity, FVG/OB, support/resistance and displacement. If any visible symbol conflicts, a frame is unreadable, or visual structure materially contradicts live OHLCV, return WAIT. Live OHLCV controls exact prices. Frames: ${reviewImages.map((frame) => frame.timeframe.toUpperCase()).join(", ")}.`,
+                text: `${analysisRequestText}\n\nThis is the final review after the user presented all five charts in strict D1 -> H4 -> H1 -> M15 -> M5 order. Inspect every attached timeframe-labelled frame directly and reconcile them top down: D1 external draw and macro dealing range; H4 directional structure and premium/discount; H1 BOS/CHoCH, inducement and POIs; M15 sweep, displacement and confirmation; M5 execution trigger and invalidation. Verify the visible symbol/timeframe on each. Corroborate liquidity, FVG/OB freshness, support/resistance and displacement. A trade is CONFIRMED only when the complete liquidity-to-execution sequence is visible and agrees with the deterministic engine. If any frame conflicts, is unreadable, or lacks the required trigger, return WAIT. Live OHLCV controls exact prices. Frames: ${reviewImages.map((frame) => frame.timeframe.toUpperCase()).join(", ")}.`,
             },
             ...reviewImages.flatMap((frame) => [
               { type: "text" as const, text: `${frame.timeframe.toUpperCase()} chart frame` },

@@ -188,6 +188,19 @@ function freshReviewImages() {
   });
 }
 
+function rememberReviewFrame(frame, image) {
+  if (!REVIEW_FRAMES.includes(frame) || !image) return;
+  reviewSession = reviewSession.symbol === symbol ? reviewSession : { symbol, frames: {} };
+  reviewSession.symbol = symbol;
+  reviewSession.frames[frame] = {
+    ...(reviewSession.frames?.[frame] || {}),
+    capturedAt: Date.now(),
+    image,
+  };
+  saveReviewSession();
+  renderReviewFlow(`${freshReviewImages().length}/5 frames captured`);
+}
+
 const store = {
   get() {
     return new Promise((resolve) => {
@@ -1481,6 +1494,11 @@ async function send(preset, silentUser) {
     );
     return;
   }
+  // Save the chart before calling the backend. This lets the first D1 request
+  // count immediately and ensures each follow-up carries the frame just shown.
+  if (analysisRequest && shot && detectedTimeframe) {
+    rememberReviewFrame(detectedTimeframe, shot);
+  }
   if (!silentUser) {
     addMsg("user", text, chartImage || shot || undefined);
     saveMessage("user", text);
@@ -1530,15 +1548,9 @@ async function send(preset, silentUser) {
       await applyLiveMarksToPage(d).catch(() => {});
       const currentShot = (stream ? await grabFrame() : null) || await captureTradingViewTab();
       if (currentShot && detectedTimeframe) {
-        reviewSession = reviewSession.symbol === symbol ? reviewSession : { symbol, frames: {} };
-        reviewSession.symbol = symbol;
-        reviewSession.frames[detectedTimeframe] = {
-          capturedAt: Date.now(),
-          image: currentShot,
-          marks: prioritizeMarks(d.overlayMarks),
-        };
+        rememberReviewFrame(detectedTimeframe, currentShot);
+        reviewSession.frames[detectedTimeframe].marks = prioritizeMarks(d.overlayMarks);
         saveReviewSession();
-        renderReviewFlow(`${freshReviewImages().length}/5 frames captured`);
       }
     }
   } catch (e) {
