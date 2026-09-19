@@ -263,11 +263,6 @@ function ExtensionPage() {
         </div>
       )}
 
-      {!loading && access && capabilities.extensionAi && (
-        <div className="mt-5 rounded-lg border border-blue-200 bg-blue-50 p-4 text-[13px] text-blue-900">
-          All paid plans include single-primary, multi-market analysis using D1, H4, H1, execution timeframe and M5 data.
-        </div>
-      )}
 
       {/* Filter row */}
       <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
