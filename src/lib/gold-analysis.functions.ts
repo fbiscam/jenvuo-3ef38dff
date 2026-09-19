@@ -122,11 +122,9 @@ export type ResolvedInstrument = {
 };
 
 // ------------------------------------------------------------
-// XAU-ONLY WHITELIST
-// Jenvu trades gold cross-pairs exclusively. Anything else is redirected
-// to XAU/USD as a safe default. resolveInstrument is the single choke
-// point — every entry point (agent, plan compute, alerts, chart, ticker)
-// flows through it.
+// VERIFIED MARKET CATALOGUE
+// Unknown symbols fail closed. They must never silently become XAU/USD,
+// because that can pair one chart image with another market's OHLCV.
 // ------------------------------------------------------------
 
 type XauQuote = "USD" | "EUR" | "GBP" | "JPY" | "AUD" | "CHF";
@@ -139,6 +137,32 @@ export const XAU_PAIR_LIST = Object.keys(XAU_PAIRS);
 
 const XAU_ALIASES: Record<string, string> = {
   GOLD: "XAUUSD", XAU: "XAUUSD", XAUUSD: "XAUUSD",
+};
+
+const TRADEABLE_INSTRUMENTS: Record<string, Omit<ResolvedInstrument, "raw">> = {
+  XAGUSD: { key: "METAL:XAGUSD", display: "XAG/USD", kind: "metal", decimals: 3, yahooSymbols: ["SI=F", "XAGUSD=X"], quote: "USD", needsUsdNews: true },
+  EURUSD: { key: "FX:EURUSD", display: "EUR/USD", kind: "forex", decimals: 5, yahooSymbols: ["EURUSD=X"], quote: "USD", needsUsdNews: true },
+  GBPUSD: { key: "FX:GBPUSD", display: "GBP/USD", kind: "forex", decimals: 5, yahooSymbols: ["GBPUSD=X"], quote: "USD", needsUsdNews: true },
+  USDJPY: { key: "FX:USDJPY", display: "USD/JPY", kind: "forex", decimals: 3, yahooSymbols: ["JPY=X"], quote: "JPY", needsUsdNews: true },
+  AUDUSD: { key: "FX:AUDUSD", display: "AUD/USD", kind: "forex", decimals: 5, yahooSymbols: ["AUDUSD=X"], quote: "USD", needsUsdNews: true },
+  NZDUSD: { key: "FX:NZDUSD", display: "NZD/USD", kind: "forex", decimals: 5, yahooSymbols: ["NZDUSD=X"], quote: "USD", needsUsdNews: true },
+  USDCAD: { key: "FX:USDCAD", display: "USD/CAD", kind: "forex", decimals: 5, yahooSymbols: ["CAD=X"], quote: "CAD", needsUsdNews: true },
+  USDCHF: { key: "FX:USDCHF", display: "USD/CHF", kind: "forex", decimals: 5, yahooSymbols: ["CHF=X"], quote: "CHF", needsUsdNews: true },
+  EURJPY: { key: "FX:EURJPY", display: "EUR/JPY", kind: "forex", decimals: 3, yahooSymbols: ["EURJPY=X"], quote: "JPY", needsUsdNews: true },
+  GBPJPY: { key: "FX:GBPJPY", display: "GBP/JPY", kind: "forex", decimals: 3, yahooSymbols: ["GBPJPY=X"], quote: "JPY", needsUsdNews: true },
+  BTCUSD: { key: "CRYPTO:BTCUSD", display: "BTC/USD", kind: "crypto", decimals: 2, yahooSymbols: ["BTC-USD"], binanceSymbols: ["BTCUSDT"], quote: "USD", needsUsdNews: false },
+  ETHUSD: { key: "CRYPTO:ETHUSD", display: "ETH/USD", kind: "crypto", decimals: 2, yahooSymbols: ["ETH-USD"], binanceSymbols: ["ETHUSDT"], quote: "USD", needsUsdNews: false },
+  SOLUSD: { key: "CRYPTO:SOLUSD", display: "SOL/USD", kind: "crypto", decimals: 3, yahooSymbols: ["SOL-USD"], binanceSymbols: ["SOLUSDT"], quote: "USD", needsUsdNews: false },
+  NAS100: { key: "INDEX:NAS100", display: "NAS100", kind: "index", decimals: 2, yahooSymbols: ["NQ=F", "^NDX"], quote: "USD", needsUsdNews: true },
+  SPX500: { key: "INDEX:SPX500", display: "SPX500", kind: "index", decimals: 2, yahooSymbols: ["ES=F", "^GSPC"], quote: "USD", needsUsdNews: true },
+  US30: { key: "INDEX:US30", display: "US30", kind: "index", decimals: 2, yahooSymbols: ["YM=F", "^DJI"], quote: "USD", needsUsdNews: true },
+  USOIL: { key: "INDEX:USOIL", display: "US Oil", kind: "index", decimals: 2, yahooSymbols: ["CL=F"], quote: "USD", needsUsdNews: true },
+};
+
+const TRADEABLE_ALIASES: Record<string, string> = {
+  SILVER: "XAGUSD", XAG: "XAGUSD", BTC: "BTCUSD", ETH: "ETHUSD", SOL: "SOLUSD",
+  NASDAQ: "NAS100", NDX: "NAS100", SPX: "SPX500", SP500: "SPX500", DJI: "US30",
+  DOW: "US30", WTI: "USOIL", OIL: "USOIL",
 };
 
 // Markets whose moves directly affect the XAU/USD price. These are context
@@ -179,45 +203,37 @@ export function resolveInstrument(input: string): ResolvedInstrument {
     };
   }
 
-  // Instruments that materially drive the XAU/USD price (context only —
-  // never tradable setups). Used by the ticker + macro confluence panels.
-  const ctx = GOLD_CORRELATED[cleaned];
-  if (ctx) {
-    // Silver must carry the canonical METAL:XAGUSD key so the metal spot
-    // provider requests XAG (a CTX: key silently returned the XAU price).
-    const isSilver = cleaned === "XAGUSD" || cleaned === "SILVER";
-    return {
-      raw: raw || cleaned,
-      key: isSilver ? "METAL:XAGUSD" : `CTX:${cleaned}`,
-      display: ctx.display,
-      kind: ctx.kind,
-      decimals: ctx.decimals,
-      yahooSymbols: ctx.yahooSymbols,
-      quote: "USD",
-      needsUsdNews: false,
-    };
-  }
-
-
-  const key = XAU_ALIASES[cleaned] ?? (XAU_PAIRS[cleaned] ? cleaned : "XAUUSD");
-  const p = XAU_PAIRS[key];
+  const xauKey = XAU_ALIASES[cleaned] ?? (XAU_PAIRS[cleaned] ? cleaned : null);
+  if (xauKey) {
+    const p = XAU_PAIRS[xauKey];
   // Gold spot from gold-api.com covers XAU/USD; cross-quote pairs derive
   // from XAU/USD × the currency rate at getLiveTick time. Yahoo cross-pair
   // (XAUEUR=X, etc.) is kept as a fallback for both quote and candles.
   // Do NOT include XAUUSD=X / GC=F in yahooSymbols for cross-pairs —
   // fetchYahooQuote would silently return USD-scale prices otherwise.
-  const yahooSymbols = key === "XAUUSD" ? [p.yahoo, "XAUUSD=X"] : [p.yahoo];
-  return {
-    raw: raw || key,
-    key: `METAL:${key}`,
-    display: p.display,
-    kind: "metal",
-    decimals: p.decimals,
-    yahooSymbols,
-    binanceSymbols: key === "XAUUSD" ? ["PAXGUSDT", "XAUTUSDT"] : undefined,
-    quote: p.quote,
-    needsUsdNews: true,
-  };
+    const yahooSymbols = xauKey === "XAUUSD" ? [p.yahoo, "XAUUSD=X"] : [p.yahoo];
+    return { raw: raw || xauKey, key: `METAL:${xauKey}`, display: p.display, kind: "metal", decimals: p.decimals, yahooSymbols, binanceSymbols: xauKey === "XAUUSD" ? ["PAXGUSDT", "XAUTUSDT"] : undefined, quote: p.quote, needsUsdNews: true };
+  }
+
+  const tradeableKey = TRADEABLE_ALIASES[cleaned] ?? cleaned;
+  const tradeable = TRADEABLE_INSTRUMENTS[tradeableKey];
+  if (tradeable) return { raw: raw || tradeableKey, ...tradeable };
+
+  // Stocks are accepted only as explicit 1–5 letter tickers. The live Yahoo
+  // fetch still has to succeed before analysis can run.
+  if (/^[A-Z]{1,5}$/.test(cleaned)) {
+    return { raw, key: `STOCK:${cleaned}`, display: cleaned, kind: "stock", decimals: 2, yahooSymbols: [cleaned], quote: "USD", needsUsdNews: true };
+  }
+  throw new Error(`Unsupported symbol: ${raw || "empty"}`);
+}
+
+export function isSupportedTradeableSymbol(input: string): boolean {
+  try {
+    const inst = resolveInstrument(input);
+    return inst.key !== "INDEX:DXY" && !inst.key.startsWith("CTX:");
+  } catch {
+    return false;
+  }
 }
 
 // Expected cross/USD price ratio bands. If a cross-pair tick falls outside
@@ -346,6 +362,10 @@ const CACHE_STALE_MAX = 10 * 60_000;
 const inflightCandles = new Map<string, Promise<Candle[]>>();
 const CANDLE_FETCH_TIMEOUT_MS = 7000;
 const syntheticCandleKeys = new Set<string>();
+
+export function hasSyntheticInstrumentCandles(inst: ResolvedInstrument, timeframe: string): boolean {
+  return syntheticCandleKeys.has(`${inst.key}:${timeframe}`);
+}
 
 const TF_MS: Record<string, number> = {
   "1m": 60_000,

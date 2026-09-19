@@ -1298,7 +1298,7 @@ export function getPairProfile(symbol: string): PairProfile | null {
   const s = symbol.toUpperCase().replace(/[^A-Z0-9]/g, "");
   if (PAIR_PROFILES[s]) return PAIR_PROFILES[s];
   if (s === "GOLD" || s === "XAU") return PAIR_PROFILES.XAUUSD;
-  return PAIR_PROFILES.XAUUSD;
+  return null;
 }
 
 

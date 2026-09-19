@@ -44,9 +44,9 @@ function showKeyGate(show, message) {
   if (err) err.textContent = message || "";
 }
 
-const TIMEFRAMES = ["15m", "1h", "4h", "1d"];
+const TIMEFRAMES = ["5m", "15m", "1h", "4h", "1d"];
 const QUICKS = [
-  { label: "Next 15m candle", text: "Forecast the next 15 minute XAU/USD candle." },
+  { label: "Next 15m candle", text: "Forecast the next 15 minute candle for the selected market." },
   { label: "Read screen", text: "Read the chart on my screen using ICT/SMC concepts." },
   { label: "Trade plan", text: "Give me a trade plan now: bias, entry (POI), stop, TP1/TP2, RR." },
   {
@@ -79,6 +79,7 @@ function requestsCandleForecast(text) {
 const $ = (id) => document.getElementById(id);
 
 let timeframe = "15m";
+let symbol = "XAUUSD";
 let chartImage = null;
 let stream = null;
 let watchTimer = null;
@@ -628,6 +629,24 @@ async function post(body, signal) {
   throw lastErr || new Error("Network error");
 }
 
+function cleanSymbol(value) {
+  return String(value || "").toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 16);
+}
+
+async function detectChartSymbol() {
+  try {
+    const [tab] = await chrome.tabs.query({ active: true, lastFocusedWindow: true });
+    const source = `${tab?.title || ""} ${tab?.url || ""}`.toUpperCase();
+    const known = source.match(/\b(XAUUSD|XAGUSD|EURUSD|GBPUSD|USDJPY|AUDUSD|NZDUSD|USDCAD|USDCHF|EURJPY|GBPJPY|BTCUSD|ETHUSD|SOLUSD|NAS100|SPX500|US30|USOIL)\b/);
+    if (known?.[1]) {
+      symbol = known[1];
+      if ($("symbolInput")) $("symbolInput").value = symbol;
+    }
+  } catch {
+    /* Manual symbol remains authoritative when tab metadata is unavailable. */
+  }
+}
+
 /* ---------- price chart ---------- */
 
 function drawChart(points) {
@@ -755,10 +774,10 @@ function renderSnapshot(d) {
 
 async function loadSnapshot() {
   try {
-    const d = await post({ action: "snapshot", timeframe });
+    const d = await post({ action: "snapshot", timeframe, symbol });
     renderSnapshot(d);
     try {
-      chrome.storage?.local?.set({ [SNAPSHOT_KEY]: { ...d, timeframe } });
+      chrome.storage?.local?.set({ [SNAPSHOT_KEY]: { ...d, timeframe, symbol } });
     } catch {
       /* cache is optional */
     }
@@ -1074,7 +1093,7 @@ function markMatchesTopic(mark, topics) {
 }
 
 async function markOnPage(text, signal) {
-  const d = await post({ action: "snapshot", timeframe }, signal);
+  const d = await post({ action: "snapshot", timeframe, symbol }, signal);
   const availableMarks =
     Array.isArray(d.overlayMarks) && d.overlayMarks.length ? d.overlayMarks : d.marks || [];
   const topics = requestedMarkTopics(text);
@@ -1218,6 +1237,7 @@ async function send(preset, silentUser) {
       {
         action: "chat",
         timeframe,
+        symbol,
         question: text,
         history: history.slice(-8),
         screenImage: shot || undefined,
@@ -1235,20 +1255,9 @@ async function send(preset, silentUser) {
     if (d.mode === "conversation") {
       setReviewStatus("Chat mode", "");
     } else if (d.mode === "candle_forecast") {
-      setReviewStatus(
-        d.seniorReview?.status === "confirmed"
-          ? "15m forecast · senior reviewed"
-          : "15m forecast · calibrated model",
-        "verified",
-      );
-    } else if (d.seniorReview?.status === "confirmed") {
-      setReviewStatus("ICT analysis · senior review confirmed", "verified");
-    } else if (d.seniorReview?.status === "vetoed") {
-      setReviewStatus("ICT analysis · senior review blocked trade", "failed");
-    } else if (d.seniorReview?.status === "unavailable") {
-      setReviewStatus("ICT primary complete · senior review unavailable", "failed");
+      setReviewStatus("15m forecast · primary model reviewed", "verified");
     } else {
-      setReviewStatus("ICT primary review complete", "verified");
+      setReviewStatus("Multi-timeframe ICT analysis complete", "verified");
     }
     if (Array.isArray(d.chart) && d.chart.length) renderSnapshot(d);
   } catch (e) {
@@ -1270,7 +1279,7 @@ emptyState();
 try {
   chrome.storage?.local?.get(SNAPSHOT_KEY, (saved) => {
     const snapshot = saved?.[SNAPSHOT_KEY];
-    if (snapshot?.timeframe === timeframe) {
+    if (snapshot?.timeframe === timeframe && snapshot?.symbol === symbol) {
       try {
         renderSnapshot(snapshot);
       } catch {
@@ -1283,6 +1292,27 @@ try {
 }
 (async () => {
   apiKey = await readKey();
+  await detectChartSymbol();
+  const symbolInput = $("symbolInput");
+  if (symbolInput) {
+    symbolInput.value = symbol;
+    symbolInput.addEventListener("change", () => {
+      const next = cleanSymbol(symbolInput.value);
+      symbol = next || "XAUUSD";
+      symbolInput.value = symbol;
+      lastPrice = null;
+      if (apiKey) loadSnapshot();
+    });
+  }
+  const timeframeInput = $("timeframeInput");
+  if (timeframeInput) {
+    timeframeInput.value = timeframe;
+    timeframeInput.addEventListener("change", () => {
+      timeframe = TIMEFRAMES.includes(timeframeInput.value) ? timeframeInput.value : "15m";
+      lastPrice = null;
+      if (apiKey) loadSnapshot();
+    });
+  }
   showKeyGate(!apiKey, "");
   const save = document.getElementById("keySave");
   const input = document.getElementById("keyInput");
@@ -1296,7 +1326,7 @@ try {
       save.disabled = true;
       apiKey = value;
       try {
-        await post({ action: "snapshot", timeframe });
+        await post({ action: "snapshot", timeframe, symbol });
         writeKey(value);
         input.value = "";
         showKeyGate(false, "");

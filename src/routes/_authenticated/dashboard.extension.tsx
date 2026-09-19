@@ -36,7 +36,7 @@ export const Route = createFileRoute("/_authenticated/dashboard/extension")({
       {
         name: "description",
         content:
-          "Create and manage the API keys the Jenvu XAU/USD ICT/SMC browser extension signs in with.",
+          "Create and manage API keys for Jenvu multi-market ICT/SMC browser extension analysis.",
       },
       { name: "robots", content: "noindex" },
     ],
@@ -181,7 +181,7 @@ function ExtensionPage() {
     try {
       const a = document.createElement("a");
       a.href = EXTENSION_DOWNLOAD_URL;
-      a.download = "jenvu-extension-v1.9.17.zip";
+      a.download = "jenvu-extension-v1.9.18.zip";
       a.rel = "noopener";
       document.body.appendChild(a);
       a.click();
@@ -263,10 +263,9 @@ function ExtensionPage() {
         </div>
       )}
 
-      {!loading && access && capabilities.extensionAi && !capabilities.seniorReview && (
+      {!loading && access && capabilities.extensionAi && (
         <div className="mt-5 rounded-lg border border-blue-200 bg-blue-50 p-4 text-[13px] text-blue-900">
-          Your Pro plan includes GPT-6 Astra primary analysis for XAU/USD. Elite or Ultra unlocks
-          multi-pair scanning and mandatory Claude senior review.
+          All paid plans include single-primary, multi-market analysis using D1, H4, H1, execution timeframe and M5 data.
         </div>
       )}
 
@@ -442,7 +441,7 @@ function ExtensionPage() {
                 <div className="min-w-0">
                   <div className="mb-1 text-[11px] text-zinc-500 md:hidden">Extension</div>
                   <div className="truncate text-[13px] text-blue-700">Jenvu XAU/USD Extension</div>
-                  <div className={`${MONO} truncate text-[12px] text-zinc-500`}>v1.9.17</div>
+                  <div className={`${MONO} truncate text-[12px] text-zinc-500`}>v1.9.18</div>
                 </div>
                 <div className="text-[13px] text-zinc-800">
                   <div className="mb-1 text-[11px] text-zinc-500 md:hidden">Created</div>
@@ -542,14 +541,14 @@ function ExtensionPage() {
           <div className="grid gap-4 border-b border-zinc-100 py-5 md:grid-cols-[minmax(0,1.8fr)_0.8fr_0.8fr_auto] md:items-center">
             <div className="min-w-0">
               <div className="truncate text-[14px] font-medium text-zinc-900">
-                Jenvu Thunder — ICT/SMC Gold Analyst
+                Jenvu Thunder — ICT/SMC Market Analyst
               </div>
               <div className="mt-1 text-[12px] text-zinc-500">
-                Chrome extension for live XAU/USD analysis
+                Chrome extension for live multi-market analysis
               </div>
             </div>
             <div className="flex items-center gap-2 text-[13px] text-zinc-800">
-               <span className={MONO}>v1.9.17</span>
+               <span className={MONO}>v1.9.18</span>
               <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-medium text-emerald-700">
                 Latest
               </span>
@@ -565,7 +564,7 @@ function ExtensionPage() {
             </button>
           </div>
           <p className="mt-4 text-[12px] text-zinc-500">
-             ZIP package · Chrome developer mode · Version 1.9.17
+             ZIP package · Chrome developer mode · Version 1.9.18
           </p>
         </div>
       )}
@@ -584,8 +583,7 @@ function ExtensionPage() {
           </div>
           <p className="mt-3 text-[12px] leading-relaxed text-zinc-600">
             Usage is charged only for the tokens actually processed at $3 per 1,000,000 tokens.
-            Your wallet balance and plan daily limit apply to chat and XAU/USD analysis; Elite and
-            Ultra include mandatory senior review.
+            Your wallet balance and plan daily limit apply to chat and multi-market analysis on every paid plan.
           </p>
           <ol className="mt-3 space-y-2 text-[13px] leading-relaxed text-zinc-700">
             <li>1. Download the extension package above and unzip it.</li>
@@ -605,7 +603,7 @@ function ExtensionPage() {
               <span className="font-medium">Connect</span>.
             </li>
             <li>
-              5. Press <span className="font-medium">Analyze XAU/USD</span> for a live ICT/SMC read.
+              5. Select the exact chart symbol and timeframe, then request a live ICT/SMC analysis.
               Senior review appears automatically when your plan includes it.
             </li>
           </ol>

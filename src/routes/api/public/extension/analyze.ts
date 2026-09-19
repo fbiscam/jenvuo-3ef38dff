@@ -1,7 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { authenticateExtensionRequest, extJson, EXT_CORS_HEADERS } from '@/lib/extension-auth.server'
-import { computeSignalPlan } from '@/lib/gold-analysis.functions'
-import { isGoldSymbol } from '@/lib/plan-entitlements'
+import { computeSignalPlan, isSupportedTradeableSymbol } from '@/lib/gold-analysis.functions'
 
 async function handle({ request }: { request: Request }) {
   const auth = await authenticateExtensionRequest(request)
@@ -23,11 +22,11 @@ async function handle({ request }: { request: Request }) {
     const { getExtensionEntitlement } = await import('@/lib/extension-billing.server')
     const entitlement = await getExtensionEntitlement(auth.userId)
     if (!entitlement.allowed) return extJson({ ok: false, error: entitlement.error, code: entitlement.status === 402 ? 'LOW_BALANCE' : 'PLAN_REQUIRED', balance: entitlement.balance }, entitlement.status)
-    if (!isGoldSymbol(symbol)) {
+    if (!isSupportedTradeableSymbol(symbol)) {
       return extJson({
         ok: false,
         code: 'UNSUPPORTED_INSTRUMENT',
-        error: 'Jenvu analyzes XAU/USD only. Open an XAU/USD chart and try again.',
+        error: 'Unsupported market symbol. Enter the exact symbol shown on your chart.',
       }, 400)
     }
     const plan = await computeSignalPlan({ symbol }, auth.userId, {

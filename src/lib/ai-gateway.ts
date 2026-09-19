@@ -1021,8 +1021,11 @@ export const MODEL_CHAIN = {
 
 export const EXTENSION_MODEL_CHAIN = {
   conversation: FAST_CHAT_CHAIN,
-  reasoning: PRIMARY_ANALYSIS_CHAIN,
-  vision: VISION_CHAIN,
+  // Extension analysis intentionally uses one strongest model. Deterministic
+  // rules fail closed if this review is unavailable; no weaker model silently
+  // changes the behavior of the same setup.
+  reasoning: [PRIMARY_ANALYSIS_CHAIN[0]],
+  vision: [VISION_CHAIN[0]],
   seniorReview: SENIOR_REVIEW_MODELS,
   // Alias retained for callers that identify the senior pass as review #2.
   secondReview: SENIOR_REVIEW_MODELS,
