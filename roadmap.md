@@ -100,3 +100,4 @@
 - [x] Upgrade the extension to safe all-symbol, single-primary, multi-timeframe analysis and release v1.9.18
 
 - [x] Add deterministic inducement, support/resistance, and cross-timeframe structure gates; test BTCUSD; release extension v1.9.19
+- [x] Retire automated scanning (cron + admin monitor) and upgrade multi-timeframe inducement detection; release extension v1.9.20
