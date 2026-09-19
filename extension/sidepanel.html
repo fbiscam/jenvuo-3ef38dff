@@ -12,7 +12,7 @@
         <img class="brand-mark" src="jenvu-logo.png" alt="Jenvu" width="36" height="36" />
         <div class="brand-text">
           <div class="brand-title"><h1>Jenvu</h1><img class="verified-tick" src="jenvu-tick.png" alt="Verified" width="20" height="20" /></div>
-          <span id="reviewStatus" class="review-status">Senior review ready</span>
+          <span id="reviewStatus" class="review-status">Multi-timeframe analysis ready</span>
         </div>
       </div>
       <div class="head-right">
@@ -47,7 +47,11 @@
     </div>
 
     <main class="content">
-      <section class="market" aria-label="Live gold market pulse">
+      <section class="market" aria-label="Live market pulse">
+        <label class="symbol-field" for="symbolInput">
+          <span>Market</span>
+          <input id="symbolInput" type="text" value="XAUUSD" maxlength="16" spellcheck="false" aria-label="Market symbol" />
+        </label>
         <div class="quote">
           <div class="quote-left">
             <span class="currency">$</span><span id="price" class="hprice">—</span>

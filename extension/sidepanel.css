@@ -148,6 +148,31 @@ h1 {
   border: 1px solid #edf0f2;
   background: var(--bg);
 }
+.symbol-field {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+.symbol-field input {
+  width: 112px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--fg);
+  padding: 5px 8px;
+  font: 500 12px/1.2 ui-monospace, Menlo, monospace;
+  text-align: right;
+  text-transform: uppercase;
+  outline: none;
+}
+.symbol-field input:focus {
+  border-color: var(--blue);
+}
 .market-top {
   display: flex;
   justify-content: space-between;
