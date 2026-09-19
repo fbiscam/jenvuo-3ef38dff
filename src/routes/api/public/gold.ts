@@ -459,8 +459,9 @@ async function handle({ request }: { request: Request }) {
     /* empty body */
   }
 
-  const timeframe = TF.has(String(body.timeframe)) ? (body.timeframe as string) : "15m";
-  const symbol = (body.symbol || "XAUUSD").trim();
+  // Gold only, 30 minutes only. The strategy does not exist anywhere else.
+  const timeframe = IB_TIMEFRAME;
+  const symbol = IB_SYMBOL;
 
   try {
     if (body.action === "chat") {
