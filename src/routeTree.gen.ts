@@ -76,6 +76,7 @@ import { Route as AuthenticatedDashboardNotificationsRouteImport } from './route
 import { Route as AuthenticatedDashboardJournalRouteImport } from './routes/_authenticated/dashboard.journal'
 import { Route as AuthenticatedDashboardExtensionRouteImport } from './routes/_authenticated/dashboard.extension'
 import { Route as AuthenticatedDashboardDocumentsRouteImport } from './routes/_authenticated/dashboard.documents'
+import { Route as AuthenticatedDashboardChartRouteImport } from './routes/_authenticated/dashboard.chart'
 import { Route as AuthenticatedDashboardBillingRouteImport } from './routes/_authenticated/dashboard.billing'
 import { Route as AuthenticatedDashboardAnalyticsRouteImport } from './routes/_authenticated/dashboard.analytics'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
@@ -453,6 +454,12 @@ const AuthenticatedDashboardDocumentsRoute =
     path: '/documents',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
+const AuthenticatedDashboardChartRoute =
+  AuthenticatedDashboardChartRouteImport.update({
+    id: '/chart',
+    path: '/chart',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
 const AuthenticatedDashboardBillingRoute =
   AuthenticatedDashboardBillingRouteImport.update({
     id: '/billing',
@@ -682,6 +689,7 @@ export interface FileRoutesByFullPath {
   '/ops-x9k2-7m4n/': typeof OpsX9k27m4nIndexRoute
   '/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
   '/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
+  '/dashboard/chart': typeof AuthenticatedDashboardChartRoute
   '/dashboard/documents': typeof AuthenticatedDashboardDocumentsRoute
   '/dashboard/extension': typeof AuthenticatedDashboardExtensionRoute
   '/dashboard/journal': typeof AuthenticatedDashboardJournalRoute
@@ -775,6 +783,7 @@ export interface FileRoutesByTo {
   '/ops-x9k2-7m4n': typeof OpsX9k27m4nIndexRoute
   '/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
   '/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
+  '/dashboard/chart': typeof AuthenticatedDashboardChartRoute
   '/dashboard/documents': typeof AuthenticatedDashboardDocumentsRoute
   '/dashboard/extension': typeof AuthenticatedDashboardExtensionRoute
   '/dashboard/journal': typeof AuthenticatedDashboardJournalRoute
@@ -875,6 +884,7 @@ export interface FileRoutesById {
   '/ops-x9k2-7m4n/': typeof OpsX9k27m4nIndexRoute
   '/_authenticated/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
   '/_authenticated/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
+  '/_authenticated/dashboard/chart': typeof AuthenticatedDashboardChartRoute
   '/_authenticated/dashboard/documents': typeof AuthenticatedDashboardDocumentsRoute
   '/_authenticated/dashboard/extension': typeof AuthenticatedDashboardExtensionRoute
   '/_authenticated/dashboard/journal': typeof AuthenticatedDashboardJournalRoute
@@ -975,6 +985,7 @@ export interface FileRouteTypes {
     | '/ops-x9k2-7m4n/'
     | '/dashboard/analytics'
     | '/dashboard/billing'
+    | '/dashboard/chart'
     | '/dashboard/documents'
     | '/dashboard/extension'
     | '/dashboard/journal'
@@ -1068,6 +1079,7 @@ export interface FileRouteTypes {
     | '/ops-x9k2-7m4n'
     | '/dashboard/analytics'
     | '/dashboard/billing'
+    | '/dashboard/chart'
     | '/dashboard/documents'
     | '/dashboard/extension'
     | '/dashboard/journal'
@@ -1167,6 +1179,7 @@ export interface FileRouteTypes {
     | '/ops-x9k2-7m4n/'
     | '/_authenticated/dashboard/analytics'
     | '/_authenticated/dashboard/billing'
+    | '/_authenticated/dashboard/chart'
     | '/_authenticated/dashboard/documents'
     | '/_authenticated/dashboard/extension'
     | '/_authenticated/dashboard/journal'
@@ -1742,6 +1755,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardDocumentsRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
+    '/_authenticated/dashboard/chart': {
+      id: '/_authenticated/dashboard/chart'
+      path: '/chart'
+      fullPath: '/dashboard/chart'
+      preLoaderRoute: typeof AuthenticatedDashboardChartRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
     '/_authenticated/dashboard/billing': {
       id: '/_authenticated/dashboard/billing'
       path: '/billing'
@@ -1958,6 +1978,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedDashboardRouteChildren {
   AuthenticatedDashboardAnalyticsRoute: typeof AuthenticatedDashboardAnalyticsRoute
   AuthenticatedDashboardBillingRoute: typeof AuthenticatedDashboardBillingRoute
+  AuthenticatedDashboardChartRoute: typeof AuthenticatedDashboardChartRoute
   AuthenticatedDashboardDocumentsRoute: typeof AuthenticatedDashboardDocumentsRoute
   AuthenticatedDashboardExtensionRoute: typeof AuthenticatedDashboardExtensionRoute
   AuthenticatedDashboardJournalRoute: typeof AuthenticatedDashboardJournalRoute
@@ -1986,6 +2007,7 @@ const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
   {
     AuthenticatedDashboardAnalyticsRoute: AuthenticatedDashboardAnalyticsRoute,
     AuthenticatedDashboardBillingRoute: AuthenticatedDashboardBillingRoute,
+    AuthenticatedDashboardChartRoute: AuthenticatedDashboardChartRoute,
     AuthenticatedDashboardDocumentsRoute: AuthenticatedDashboardDocumentsRoute,
     AuthenticatedDashboardExtensionRoute: AuthenticatedDashboardExtensionRoute,
     AuthenticatedDashboardJournalRoute: AuthenticatedDashboardJournalRoute,
