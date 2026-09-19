@@ -687,7 +687,7 @@ async function handle({ request }: { request: Request }) {
               messages: [
                 {
                   role: "system",
-                  content: `Review a deterministic ${market.ticker.symbol} next-15m-candle forecast. You may downgrade it to INDECISIVE, but never reverse it or invent evidence. Return exactly: FORECAST, CONFIDENCE, CHARACTER, WHY, INVALIDATION. Confidence is model confidence, not a win-rate promise. Do not include entry, stop, targets, trade advice, markdown, or extra fields.\n\n${XAU_DESK_CORE_INSTRUCTIONS}`,
+                  content: `Review a deterministic ${market.ticker.symbol} next-15m-candle forecast. You may downgrade it to INDECISIVE, but never reverse it or invent evidence. Return exactly: FORECAST, CONFIDENCE, CHARACTER, WHY, INVALIDATION. Confidence is model confidence, not a win-rate promise. Do not include entry, stop, targets, trade advice, markdown, or extra fields.\n\n${GOLD_30M_INSIDE_BAR_INSTRUCTIONS}`,
                 },
                 { role: "user", content: `${deterministicText}\nCalibration: ${forecast.calibration.accuracy}% over ${forecast.calibration.tested} tests; stability ${forecast.calibration.stability}%.` },
               ],
@@ -804,7 +804,7 @@ async function handle({ request }: { request: Request }) {
           messages: [
             {
               role: "system",
-               content: `You are Jenvu, the primary multi-market desk analyst. Review only the explicitly supplied instrument and the deterministic ICT/SMC report computed from live D1/H4/H1/execution/M5 OHLCV. Preserve exact engine levels unless a hard veto invalidates them. Treat the screenshot only as corroborating visual evidence; if its visible symbol conflicts with the supplied instrument, return WAIT.\n\n${XAU_DESK_CORE_INSTRUCTIONS}\n\n${QUERY_RELEVANCE_INSTRUCTIONS}\n\n${EXTENSION_SIGNAL_OUTPUT_CONTRACT}`,
+               content: `You are Jenvu, the primary multi-market desk analyst. Review only the explicitly supplied instrument and the deterministic ICT/SMC report computed from live D1/H4/H1/execution/M5 OHLCV. Preserve exact engine levels unless a hard veto invalidates them. Treat the screenshot only as corroborating visual evidence; if its visible symbol conflicts with the supplied instrument, return WAIT.\n\n${GOLD_30M_INSIDE_BAR_INSTRUCTIONS}\n\n${QUERY_RELEVANCE_INSTRUCTIONS}\n\n${EXTENSION_SIGNAL_OUTPUT_CONTRACT}`,
             },
             ...history,
             {
@@ -887,7 +887,7 @@ async function handle({ request }: { request: Request }) {
         marksBias: desk.bias.toLowerCase(),
         analysisModels: {
           primary: primaryModel,
-          engine: RULES_PRIMARY_MODEL,
+          engine: IB_STRATEGY_MODEL,
           senior: null,
         },
         seniorReview,
