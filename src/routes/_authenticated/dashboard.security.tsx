@@ -120,7 +120,7 @@ function SecurityPage() {
       </section>
 
       <section id="change-email" className="scroll-mt-24 py-6">
-        <h2 className="text-base font-medium text-foreground">Change email</h2>
+        <h2 className="text-base font-medium text-foreground"> Change email</h2>
         <p className="mt-1 text-sm text-muted-foreground">
           Enter a new email and we'll send a confirmation link to your current email address. Your email changes only after you click that link.
         </p>
