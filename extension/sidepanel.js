@@ -1223,8 +1223,15 @@ const MARK_TOPIC =
 function defaultMarkTopics(frame) {
   if (frame === "1d" || frame === "4h") return new Set(["direction", "liquidity", "ob"]);
   if (frame === "1h") return new Set(["structure", "ob", "fvg", "liquidity"]);
-  if (frame === "15m") return new Set(["confirmation", "entry", "retest", "liquidity"]);
-  return new Set(["execution", "confirmation", "entry"]);
+  if (frame === "15m") return new Set(["confirmation", "execution", "retest", "liquidity"]);
+  return new Set(["execution", "confirmation"]);
+}
+
+function withoutTimeframeWords(text) {
+  return String(text || "")
+    .replace(/\b(?:d1|1d|daily|day|h4|4h|4\s*hour|h1|1h|1\s*hour|m15|15m|15\s*(?:min|minute)|m5|5m|5\s*(?:min|minute))\b/gi, " ")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 function requestedMarkTopics(text, frame) {
@@ -1252,7 +1259,7 @@ function markMatchesTopic(mark, topics) {
   if (topics.has("fvg") && label.includes("fvg")) return true;
   if (topics.has("ob") && /\bob\b|order block/.test(label)) return true;
   if (topics.has("structure") && mark.kind === "event") return true;
-  if (topics.has("liquidity") && mark.kind === "line" && /^(bsl|ssl)$/.test(label)) return true;
+  if (topics.has("liquidity") && /bsl|ssl|liquidity/.test(label)) return true;
   if (topics.has("sweep") && mark.kind === "sweep") return true;
   if (topics.has("levels") && /support|resistance/.test(label)) return true;
   if (topics.has("swings") && /swing high|swing low/.test(label)) return true;
@@ -1341,6 +1348,7 @@ async function markOnPage(text, signal, options = {}) {
     image: shot,
     marks: marks.map((mark) => ({ ...mark })),
   };
+  if (!options.skipDetection) reviewSession.markRequest = withoutTimeframeWords(text);
   guidedReviewActive = true;
   saveReviewSession();
   renderReviewFlow(`${targetTimeframe.toUpperCase()} ${shot ? "marked and captured" : "marked · share screen to capture"}`);
@@ -1377,7 +1385,8 @@ async function refreshGuidedMarks() {
   markingRefreshPending = true;
   try {
     renderReviewFlow(`Marking ${detectedTimeframe.toUpperCase()}…`);
-    await markOnPage(`mark all ICT SMC on ${detectedTimeframe}`, undefined, { skipDetection: true });
+    const requestedMarks = reviewSession.markRequest || "mark all ICT SMC";
+    await markOnPage(`${requestedMarks} on ${detectedTimeframe}`, undefined, { skipDetection: true });
   } catch (error) {
     renderReviewFlow(error instanceof Error ? error.message : "Could not refresh marks");
   } finally {
