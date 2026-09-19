@@ -60,7 +60,7 @@ const ACTIONABLE_ANALYSIS_INTENT = [
   /\b(?:give|show|make|create|need|want|tell)\s+(?:me\s+)?(?:a\s+|the\s+|my\s+)?(?:live\s+|current\s+)?(?:signal|setup|trade\s*plan|entry|stop\s*loss|take\s*profit|tp\d?|sl)\b|\b(?:signal|setup|trade\s*plan|entry|stop\s*loss|take\s*profit|tp\d?|sl)\s+(?:now|please|batao|do|chahiye)\b|\b(?:buy\s*(?:or|\/)?\s*sell|long\s*(?:or|\/)?\s*short|should\s+i\s+(?:buy|sell|take\s+(?:the\s+)?trade)|where\s+is\s+liquidity|next\s+sweep)\b/i,
   /\b(analy[sz]e?|review|read|check|scan|inspect|mark)\b[\s\S]{0,60}\b(chart|screen|market|price|xau(?:\/usd)?|gold|setup|structure|liquidity|bias)\b/i,
   /\b(chart|screen|market|price|xau(?:\/usd)?|gold|setup|structure|liquidity|bias)\b[\s\S]{0,60}\b(analy[sz]e?|review|read|check|scan|inspect|mark)\b/i,
-  /\b(?:tajzia|tajziya)\s+(?:karo|kro|do)\b|\b(?:signal|setup|trade\s*plan|entry|sl|tp\d?)\s+(?:batao|do|chahiye)\b|\b(?:kharidun|bechun|buy\s+karun|sell\s+karun)\b|\b(?:chart|market)\s*(?:dekho|check|dikhao)\b/i,
+  /\b(?:(?:chart|market|gold|xau(?:\/usd)?)\s+)?(?:analysis|analy[sz]e|tajzia|tajziya)\s+(?:karo|kro|karain|karein|do)\b|\b(?:signal|setup|trade\s*plan|entry|sl|tp\d?)\s+(?:batao|do|chahiye)\b|\b(?:kharidun|bechun|buy\s+karun|sell\s+karun)\b|\b(?:chart|market)\s*(?:dekho|check|dikhao)\b/i,
 ];
 
 function requestsActionableAnalysis(text) {
@@ -343,8 +343,6 @@ function updateQuickVisibility() {
   const hasMessages = !!$("thread").querySelector(".msg");
   const hasContext = !!chartImage || !!stream;
   $("quick").classList.toggle("hidden", hasMessages || hasContext);
-  const market = document.querySelector(".market");
-  if (market) market.classList.toggle("hidden", hasMessages);
 }
 
 function scrollThread(force = false) {
@@ -620,8 +618,6 @@ function addMsg(cls, text, shot) {
   return d;
 }
 
-const REQUEST_DEADLINE_MS = 240000;
-
 async function post(body, signal) {
   const requestId =
     "ext_" + Date.now().toString(36) + "_" + Math.random().toString(36).slice(2, 10);
@@ -631,13 +627,6 @@ async function post(body, signal) {
     const requestController = new AbortController();
     const abortFromUser = () => requestController.abort();
     signal?.addEventListener("abort", abortFromUser, { once: true });
-    // Safety net: a backend that accepts the request but never answers must
-    // not leave the panel stuck on "analyzing" forever.
-    let timedOut = false;
-    const deadlineTimer = setTimeout(() => {
-      timedOut = true;
-      requestController.abort();
-    }, REQUEST_DEADLINE_MS);
     try {
       const res = await fetch(url, {
         method: "POST",
@@ -674,9 +663,6 @@ async function post(body, signal) {
     } catch (e) {
       if (e && e.name === "AbortError") {
         if (signal?.aborted) throw e;
-        if (timedOut) {
-          throw new Error("That took too long. Please try again in a moment.");
-        }
       }
       // Only move to another site address when the current address cannot be
       // reached. Replaying a completed 5xx analysis request against every
@@ -686,7 +672,6 @@ async function post(body, signal) {
       lastErr = e;
       if (!e.retryable && !e.tryNextEndpoint) break;
     } finally {
-      clearTimeout(deadlineTimer);
       signal?.removeEventListener("abort", abortFromUser);
     }
   }
@@ -1460,6 +1445,7 @@ async function send(preset, silentUser) {
       shot = await grabFrame();
     }
   }
+  if (!shot && analysisRequest) shot = await captureTradingViewTab();
   if (!shot && stream && analysisRequest) {
     busy = false;
     controller = null;
@@ -1493,10 +1479,14 @@ async function send(preset, silentUser) {
       },
       controller.signal,
     );
+    const answer = typeof d?.text === "string" ? d.text.trim() : "";
+    if (!answer) {
+      throw new Error("Analysis completed without a readable reply. Please retry the request.");
+    }
     pend.remove();
-    addMsg("ai", d.text);
-    saveMessage("ai", d.text);
-    history.push({ role: "user", text }, { role: "assistant", text: d.text });
+    addMsg("ai", answer);
+    saveMessage("ai", answer);
+    history.push({ role: "user", text }, { role: "assistant", text: answer });
     if (d.ticker) {
       $("price").textContent = d.ticker.price.toFixed(2);
     }
@@ -1524,9 +1514,10 @@ async function send(preset, silentUser) {
       }
     }
   } catch (e) {
-    pend.remove();
-    if (e && e.name === "AbortError") addMsg("ai err", "Request stopped.");
-    else addMsg("ai err", e.message);
+    pend.className = "msg ai err";
+    pend.textContent = e && e.name === "AbortError"
+      ? "Request stopped."
+      : e?.message || "Analysis could not complete. Please retry.";
     if (analysisRequest) setReviewStatus("Analysis could not complete · retry", "failed");
     else setReviewStatus("Chat mode", "");
   } finally {
