@@ -134,16 +134,16 @@ export function runExtensionDesk(input: DeskInput): DeskResult {
   const ltfMomentum = detectLtfMomentum(input.selected, candidateDirection);
   const rangePosition = detectRangePosition(input.selected, trade.entry || input.livePrice);
   const swingRoom = detectSwingRoom(selected.swings, trade.entry, firstTarget, candidateDirection);
-  const mtfStructure = detectMtfStructureAlignment(
-    [
+  const mtfFrames = [
       { label: "D1", events: eventsD1 },
       { label: "H4", events: eventsH4 },
       { label: "H1", events: eventsH1 },
       { label: input.timeframe.toUpperCase(), events: eventsSelected },
       { label: "M5", events: eventsM5 },
-    ],
-    candidateDirection,
-  );
+    ].filter(
+      (frame, index, frames) => frames.findIndex((candidate) => candidate.label === frame.label) === index,
+    );
+  const mtfStructure = detectMtfStructureAlignment(mtfFrames, candidateDirection);
   const wantedStructure = candidateDirection === "BUY" ? "bullish" : "bearish";
   const selectedLastClosedAt = Math.floor((input.selected[input.selected.length - 1]?.t ?? 0) / 1000);
   const m5LastClosedAt = Math.floor((input.m5[input.m5.length - 1]?.t ?? 0) / 1000);

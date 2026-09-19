@@ -653,17 +653,23 @@ async function detectChartSymbol() {
               .slice(0, 20)
               .map((node) => `${node.getAttribute("data-symbol-short") || ""} ${node.textContent || ""}`),
           ];
-          const intervalCandidates = [
-            ...Array.from(document.querySelectorAll('[data-name="interval-dialog-button"], [aria-label*="interval" i], [data-value]'))
-              .slice(0, 30)
-              .map((node) => `${node.getAttribute("data-value") || ""} ${node.textContent || ""}`),
-          ];
-          return { context: candidates.join(" "), intervals: intervalCandidates.join(" ") };
+          const intervalNode = Array.from(
+            document.querySelectorAll(
+              '[data-name="interval-dialog-button"], [data-name="header-toolbar-intervals"] button, button[aria-label*="interval" i]',
+            ),
+          ).find((node) => {
+            const rect = node.getBoundingClientRect();
+            return rect.width > 0 && rect.height > 0;
+          });
+          const interval = intervalNode
+            ? `${intervalNode.getAttribute("data-value") || ""} ${intervalNode.getAttribute("aria-label") || ""} ${intervalNode.textContent || ""}`
+            : "";
+          return { context: candidates.join(" "), interval };
         },
       });
       const result = results?.[0]?.result;
       pageContext = String(result?.context || "");
-      const intervalText = String(result?.intervals || "").toUpperCase();
+      const intervalText = String(result?.interval || "").toUpperCase();
       const intervalMatch = intervalText.match(/(?:^|\s)(5M?|15M?|1H|60|4H|240|1D|D)(?:\s|$)/);
       const detectedTimeframe = intervalMatch?.[1];
       const normalizedTimeframe = detectedTimeframe === "5" || detectedTimeframe === "5M"
