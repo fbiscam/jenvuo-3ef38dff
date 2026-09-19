@@ -1298,7 +1298,7 @@ async function markOnPage(text, signal, options = {}) {
           action: "chat",
           timeframe: targetTimeframe,
           symbol,
-          question: text,
+          question: `Analyze the live chart and provide a validated trade plan for chart marking. User marking request: ${text}`,
           history: history.slice(-8),
           timeframeImages: freshReviewImages(),
         }
