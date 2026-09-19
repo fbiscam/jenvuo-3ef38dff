@@ -173,6 +173,16 @@ h1 {
 .symbol-field input:focus {
   border-color: var(--blue);
 }
+.market-controls { display: flex; align-items: center; gap: 6px; }
+.market-controls select {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--fg);
+  padding: 5px 6px;
+  font: 500 11px/1.2 ui-monospace, Menlo, monospace;
+  outline: none;
+}
 .market-top {
   display: flex;
   justify-content: space-between;

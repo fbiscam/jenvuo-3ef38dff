@@ -78,7 +78,7 @@ function sanitizeConversationalAnswer(content: string): string {
     .replace(/\n{3,}/g, "\n\n")
     .trim();
 
-  return withoutPlan || "Please ask explicitly for a live XAU/USD chart analysis if you want entry, stop and target levels.";
+  return withoutPlan || "Please ask explicitly for a live market analysis if you want entry, stop and target levels.";
 }
 
 // Hard safety gate applied after the AI review: a structurally "valid" idea is
@@ -88,7 +88,7 @@ function invalidateStalePlan(
   guard: { livePrice: number; quoteAgeMs: number },
 ): string | null {
   if (!Number.isFinite(guard.livePrice) || guard.livePrice <= 0) {
-    return "Live XAU/USD price could not be verified, so no trade is issued.";
+    return "The selected market's live price could not be verified, so no trade is issued.";
   }
   if (guard.quoteAgeMs > 180_000) {
     return "Live price feed is stale, so this setup cannot be validated right now.";
@@ -518,7 +518,7 @@ async function handle({ request }: { request: Request }) {
           messages: [
             {
               role: "system",
-              content: `You are Jenvu, a friendly general-purpose AI assistant that also specializes in XAU/USD ICT-SMC analysis. IDENTITY RULE (absolute): your name is Jenvu and you were built by the Jenvu team. Never call yourself any other product or assistant name, never name the underlying model, lab, vendor or provider, and never mention being a coding/IDE assistant. Reply naturally, concisely, and in the user's language (Urdu/English/Roman Urdu). When a screenshot is attached, you CAN see the user's shared screen: describe or use what is visible and never claim you are unable to see their screen. Do NOT output a trade plan, verdict, bias, entry, stop or targets unless the user explicitly asks for XAU/USD market analysis. If asked what you can do, briefly mention XAU/USD chart analysis, marked levels, and ICT/SMC signals on request.\n\n${QUERY_RELEVANCE_INSTRUCTIONS}`,
+              content: `You are Jenvu, a friendly general-purpose AI assistant that also specializes in multi-market ICT/SMC analysis. IDENTITY RULE (absolute): your name is Jenvu and you were built by the Jenvu team. Never call yourself any other product or assistant name, never name the underlying model, lab, vendor or provider, and never mention being a coding/IDE assistant. Reply naturally, concisely, and in the user's language (Urdu/English/Roman Urdu). When a screenshot is attached, describe only what is genuinely visible. Do NOT output a trade plan, verdict, bias, entry, stop or targets unless the user explicitly requests actionable market analysis.\n\n${QUERY_RELEVANCE_INSTRUCTIONS}`,
             },
             ...history,
             { role: "user", content: casualUserContent },
@@ -574,7 +574,7 @@ async function handle({ request }: { request: Request }) {
         if (!forecast.stale) {
           try {
             const primary = await callChatCompletion({
-              models: [...EXTENSION_MODEL_CHAIN.reasoning],
+            models: ["openai/gpt-6-astra"],
               stage: "extension-candle-forecast",
               maxTokens: 260,
               retriesPerModel: 1,
@@ -582,7 +582,7 @@ async function handle({ request }: { request: Request }) {
               messages: [
                 {
                   role: "system",
-                  content: `Review a deterministic XAU/USD next-15m-candle forecast. You may downgrade it to INDECISIVE, but never reverse it or invent evidence. Return exactly: FORECAST, CONFIDENCE, CHARACTER, WHY, INVALIDATION. Confidence is model confidence, not a win-rate promise. Do not include entry, stop, targets, trade advice, markdown, or extra fields.\n\n${XAU_DESK_CORE_INSTRUCTIONS}`,
+                  content: `Review a deterministic ${market.ticker.symbol} next-15m-candle forecast. You may downgrade it to INDECISIVE, but never reverse it or invent evidence. Return exactly: FORECAST, CONFIDENCE, CHARACTER, WHY, INVALIDATION. Confidence is model confidence, not a win-rate promise. Do not include entry, stop, targets, trade advice, markdown, or extra fields.\n\n${XAU_DESK_CORE_INSTRUCTIONS}`,
                 },
                 { role: "user", content: `${deterministicText}\nCalibration: ${forecast.calibration.accuracy}% over ${forecast.calibration.tested} tests; stability ${forecast.calibration.stability}%.` },
               ],
@@ -688,7 +688,7 @@ async function handle({ request }: { request: Request }) {
       let primaryUsage = { promptTokens: 0, completionTokens: 0 };
       try {
         const primary = await callChatCompletion({
-          models: [...(image ? EXTENSION_MODEL_CHAIN.vision : EXTENSION_MODEL_CHAIN.reasoning)],
+          models: ["openai/gpt-6-astra"],
           stage: "extension-primary-review",
           maxTokens: 550,
           timeoutMs: 55_000,

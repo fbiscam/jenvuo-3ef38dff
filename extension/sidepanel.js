@@ -1304,6 +1304,15 @@ try {
       if (apiKey) loadSnapshot();
     });
   }
+  const timeframeInput = $("timeframeInput");
+  if (timeframeInput) {
+    timeframeInput.value = timeframe;
+    timeframeInput.addEventListener("change", () => {
+      timeframe = TIMEFRAMES.includes(timeframeInput.value) ? timeframeInput.value : "15m";
+      lastPrice = null;
+      if (apiKey) loadSnapshot();
+    });
+  }
   showKeyGate(!apiKey, "");
   const save = document.getElementById("keySave");
   const input = document.getElementById("keyInput");
