@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Jenvu Thunder \u2014 ICT/SMC Market Analyst",
-  "version": "1.9.33",
-  "description": "Share a chart and combine it with live multi-timeframe ICT/SMC market analysis.",
+  "name": "Jenvu Thunder \u2014 Gold 30M Analyst",
+  "version": "1.9.34",
+  "description": "Analyse XAU/USD 30-minute Mother Candle and Inside Bar reversal setups.",
   "permissions": ["sidePanel", "tabs", "storage", "scripting", "activeTab"],
   "host_permissions": [
     "https://jenvu.com/*",

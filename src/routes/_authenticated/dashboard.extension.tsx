@@ -26,7 +26,7 @@ import { getPlanCapabilities } from "@/lib/plan-entitlements";
 const MONO = "font-['JetBrains_Mono',ui-monospace,monospace]";
 const API_BASE = "https://jenvu.com/api/public/v1";
 // Keep the established served asset path; the downloaded filename reflects the current release.
-const EXTENSION_DOWNLOAD_URL = "/jenvu-extension-v1.9.16.zip";
+const EXTENSION_DOWNLOAD_URL = "/jenvu-extension-v1.9.34.zip";
 
 export const Route = createFileRoute("/_authenticated/dashboard/extension")({
   head: () => ({
@@ -183,7 +183,7 @@ function ExtensionPage() {
       const blobUrl = URL.createObjectURL(await response.blob());
       const a = document.createElement("a");
       a.href = blobUrl;
-      a.download = "jenvu-extension-v1.9.33.zip";
+      a.download = "jenvu-extension-v1.9.34.zip";
       a.rel = "noopener";
       document.body.appendChild(a);
       a.click();
@@ -440,7 +440,7 @@ function ExtensionPage() {
                 <div className="min-w-0">
                   <div className="mb-1 text-[11px] text-zinc-500 md:hidden">Extension</div>
                   <div className="truncate text-[13px] text-blue-700">Jenvu XAU/USD Extension</div>
-                  <div className={`${MONO} truncate text-[12px] text-zinc-500`}>v1.9.33</div>
+                  <div className={`${MONO} truncate text-[12px] text-zinc-500`}>v1.9.34</div>
                 </div>
                 <div className="text-[13px] text-zinc-800">
                   <div className="mb-1 text-[11px] text-zinc-500 md:hidden">Created</div>
@@ -540,14 +540,14 @@ function ExtensionPage() {
           <div className="grid gap-4 border-b border-zinc-100 py-5 md:grid-cols-[minmax(0,1.8fr)_0.8fr_0.8fr_auto] md:items-center">
             <div className="min-w-0">
               <div className="truncate text-[14px] font-medium text-zinc-900">
-                Jenvu Thunder — ICT/SMC Market Analyst
+                Jenvu Thunder — Gold 30M Analyst
               </div>
               <div className="mt-1 text-[12px] text-zinc-500">
-                Chrome extension for live multi-market analysis
+                Chrome extension for XAU/USD 30-minute setup analysis
               </div>
             </div>
             <div className="flex items-center gap-2 text-[13px] text-zinc-800">
-               <span className={MONO}>v1.9.33</span>
+               <span className={MONO}>v1.9.34</span>
               <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-medium text-emerald-700">
                 Latest
               </span>
@@ -563,7 +563,7 @@ function ExtensionPage() {
             </button>
           </div>
           <p className="mt-4 text-[12px] text-zinc-500">
-             ZIP package · Chrome developer mode · Version 1.9.33
+             ZIP package · Chrome developer mode · Version 1.9.34
           </p>
         </div>
       )}
