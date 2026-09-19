@@ -190,6 +190,37 @@ export function runInsideBarDesk(input: {
   }
 
   const direction: "BUY" | "SELL" = freshLow ? "BUY" : "SELL";
+
+  // Candle-direction confirmation chain: the mother candle, the inside bar and
+  // the candle after the inside bar must all close in the trade direction.
+  const bodyDir = (c: IbCandle): "BUY" | "SELL" | "FLAT" =>
+    c.c > c.o ? "BUY" : c.c < c.o ? "SELL" : "FLAT";
+  const colourWord = direction === "BUY" ? "bullish (green)" : "bearish (red)";
+
+  if (bodyDir(mother) !== direction) {
+    return empty(
+      `The candle after the fresh ${freshLow ? "low" : "high"} is not ${colourWord}, so the reversal is not confirmed.`,
+      basePattern,
+    );
+  }
+  const lastBaby = candles[lastBabyIndex] as IbCandle;
+  if (bodyDir(lastBaby) !== direction) {
+    return empty(`The inside bar is not ${colourWord}, so the reversal is not confirmed.`, basePattern);
+  }
+  const confirmation = candles[lastBabyIndex + 1] as IbCandle | undefined;
+  if (!confirmation) {
+    return empty(
+      "Waiting for the third candle after the inside bar to close and confirm the direction.",
+      basePattern,
+    );
+  }
+  if (bodyDir(confirmation) !== direction) {
+    return empty(
+      `The third candle after the inside bar closed against the setup (it must be ${colourWord}).`,
+      basePattern,
+    );
+  }
+
   const entry = direction === "BUY" ? babyHigh : babyLow;
   const sl = direction === "BUY" ? mother.l : mother.h;
   const risk = Math.abs(entry - sl);
