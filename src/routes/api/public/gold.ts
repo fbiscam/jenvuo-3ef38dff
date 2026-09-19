@@ -732,7 +732,7 @@ async function handle({ request }: { request: Request }) {
           {
             ok: false,
             code: "PRIMARY_REVIEW_UNAVAILABLE",
-            error: /rejected|blocked|key|model is unavailable/i.test(message)
+            error: /rejected|blocked|key|model is unavailable|No configured AI provider/i.test(message)
               ? message
               : "Claude primary review is temporarily unavailable after trying all fallback models. Please retry in a moment.",
           },
