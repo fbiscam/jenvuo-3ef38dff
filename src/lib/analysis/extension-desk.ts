@@ -140,7 +140,33 @@ export function runExtensionDesk(input: DeskInput): DeskResult {
     ],
     candidateDirection,
   );
-  const inducement = detectInducement(input.selected, selected.swings, eventsSelected, candidateDirection);
+  // A veteran desk does not look for inducement on one chart only: internal
+  // liquidity is engineered on the execution frame, refined on M5 and often
+  // set up on H1. Accept the first verified sweep found across that ladder,
+  // and fall back to a confirmed external-liquidity sweep (same purpose:
+  // liquidity taken before the move) so valid setups are not silently killed.
+  const inducementCandidates = [
+    { label: input.timeframe.toUpperCase(), res: detectInducement(input.selected, selected.swings, eventsSelected, candidateDirection) },
+    { label: "M5", res: detectInducement(input.m5, m5.swings, eventsM5, candidateDirection) },
+    { label: "H1", res: detectInducement(input.h1, h1.swings, eventsH1, candidateDirection) },
+  ];
+  const inducementHit = inducementCandidates.find((item) => item.res.detected);
+  const sweptPool = pools.find(
+    (pool) => pool.swept && pool.side === (candidateDirection === "BUY" ? "sell" : "buy"),
+  );
+  const inducement = inducementHit
+    ? { ...inducementHit.res, detail: `${inducementHit.label}: ${inducementHit.res.detail}` }
+    : sweptPool
+      ? {
+          detected: true,
+          level: sweptPool.price ?? null,
+          detail: `External liquidity taken: ${sweptPool.label} swept before the ${candidateDirection === "BUY" ? "bullish" : "bearish"} break`,
+        }
+      : {
+          detected: false,
+          level: null,
+          detail: `No inducement sweep on ${inducementCandidates.map((item) => item.label).join("/")} and no external pool swept`,
+        };
   const keyLevels = detectKeyLevels(input.h4, input.selected);
   const nearestSupport = keyLevels
     .filter((level) => level.kind === "support" && level.price <= (trade.entry || input.livePrice))
