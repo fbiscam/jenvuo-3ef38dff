@@ -533,7 +533,7 @@ async function handle({ request }: { request: Request }) {
       // Trading vocabulary alone does not request a live plan. Educational and
       // follow-up questions stay conversational unless actionable levels or a
       // chart review are explicitly requested.
-      const candleForecastIntent = requestsCandleForecast(question);
+      const candleForecastIntent = false; // single-strategy mode: no separate candle forecast
       const analysisIntent = !candleForecastIntent && requestsActionableAnalysis(question);
       const conversational = !analysisIntent && !candleForecastIntent;
 
@@ -875,7 +875,7 @@ async function handle({ request }: { request: Request }) {
         chart: market.chart,
         technicals: market.technicals,
         freshness: market.freshness,
-        overlayMarks: [...market.marks, ...desk.marks],
+        overlayMarks: desk.marks,
         marksBias: desk.bias.toLowerCase(),
         analysisModels: {
           primary: primaryModel,
@@ -895,9 +895,9 @@ async function handle({ request }: { request: Request }) {
       ticker: market.ticker,
       chart: market.chart,
       technicals: market.technicals,
-      marks: market.marks,
-      overlayMarks: market.marks,
-      marksBias: market.technicals.trend.toLowerCase(),
+      marks: [],
+      overlayMarks: [],
+      marksBias: "neutral",
       freshness: market.freshness,
     });
   } catch (e) {
