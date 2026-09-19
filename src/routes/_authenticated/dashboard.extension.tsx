@@ -36,7 +36,7 @@ export const Route = createFileRoute("/_authenticated/dashboard/extension")({
       {
         name: "description",
         content:
-          "Create and manage the API keys the Jenvu XAU/USD ICT/SMC browser extension signs in with.",
+          "Create and manage API keys for Jenvu multi-market ICT/SMC browser extension analysis.",
       },
       { name: "robots", content: "noindex" },
     ],
