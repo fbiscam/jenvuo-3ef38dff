@@ -693,7 +693,7 @@ async function handle({ request }: { request: Request }) {
       let primaryUsage = { promptTokens: 0, completionTokens: 0 };
       try {
         const primary = await callChatCompletion({
-          models: ["openai/gpt-6-astra"],
+          models: [...(image ? EXTENSION_MODEL_CHAIN.vision : EXTENSION_MODEL_CHAIN.reasoning)],
           stage: "extension-primary-review",
           maxTokens: 550,
           timeoutMs: 55_000,
