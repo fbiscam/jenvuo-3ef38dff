@@ -1,11 +1,10 @@
-// Shared multi-provider AI helper used by every server-side analyzer call.
+// Shared OmniRoute AI helper used by every server-side analyzer call.
 //
 // Purpose:
 //   1. One place to switch models (25-year-veteran quality tier).
-//   2. Auto retry (429 / 5xx / timeout) with exponential backoff.
+//   2. Auto retry (429 / 5xx) with exponential backoff.
 //   3. Model fallback chain when the primary is exhausted.
-//   4. Priority-tier ("fast mode") only for models that support it.
-//   5. Clear typed errors so callers can surface the right message.
+//   4. Clear typed errors so callers can surface the right message.
 //
 // This module has NO Supabase / Node-only imports, so it can be top-level
 // imported from *.functions.ts without leaking a server-only surface.
@@ -32,9 +31,9 @@ export type CallChatOptions = {
   // Retained for caller compatibility. No artificial chain deadline is used.
   deadlineMs?: number;
 
-  // If true and the model supports priority tier, request fast mode.
+  // Retained for caller compatibility; OmniRoute controls its own service tier.
   priority?: boolean;
-  // Max attempts per model on retryable failures (429, 5xx, timeout).
+  // Max attempts per model on retryable failures (429 and 5xx).
   retriesPerModel?: number;
   // For telemetry / debugging.
   stage?: string;
@@ -84,334 +83,8 @@ export function isModelUnhealthy(model: string): boolean {
 
 export type UsageInfo = { promptTokens: number; completionTokens: number; totalTokens: number };
 
-// -------- Browser Use Cloud Agent v4 ---------------------------------------
-// Browser Use exposes these hosted models through asynchronous agent runs,
-// rather than an OpenAI-compatible chat-completions endpoint. Translate the
-// conversation into a self-contained task, upload any chart images, and poll
-// the bounded run until it reaches a terminal state.
-function getBrowserUseApiKeys(): string[] {
-  return [
-    process.env.BROWSER_USE_API_KEY,
-    process.env.BROWSER_USE_API_KEY_2,
-    process.env.BROWSER_USE_API_KEY_3,
-  ].filter((key): key is string => Boolean(key));
-}
-
-async function callBrowserUseWithKey(
-  model: string,
-  opts: CallChatOptions,
-  key: string,
-  signal?: AbortSignal,
-): Promise<{ content: string; usage: UsageInfo }> {
-  const wireModel = model.slice("browseruse/".length);
-  const headers: Record<string, string> = {
-    "Content-Type": "application/json",
-    "X-Browser-Use-API-Key": key,
-  };
-
-  const textParts: string[] = [];
-  const images: Array<{ bytes: Uint8Array; contentType: string; name: string }> = [];
-  for (const [messageIndex, message] of opts.messages.entries()) {
-    const role = message.role.toUpperCase();
-    if (typeof message.content === "string") {
-      textParts.push(`${role}:\n${message.content}`);
-      continue;
-    }
-    const messageText: string[] = [];
-    for (const part of message.content) {
-      if (part.type === "text") {
-        messageText.push(part.text);
-        continue;
-      }
-      const match = /^data:(image\/[a-z0-9.+-]+);base64,(.+)$/i.exec(part.image_url.url);
-      if (!match) continue;
-      const contentType = match[1];
-      const extension = contentType.split("/")[1]?.replace("jpeg", "jpg") ?? "png";
-      images.push({
-        bytes: Uint8Array.from(atob(match[2]), (char) => char.charCodeAt(0)),
-        contentType,
-        name: `chart-${messageIndex + 1}-${images.length + 1}.${extension}`,
-      });
-    }
-    textParts.push(`${role}:\n${messageText.join("\n")}`);
-  }
-
-  let workspaceId: string | undefined;
-  const attachedFileIds: string[] = [];
-  try {
-    if (images.length) {
-      const workspaceResponse = await fetch("https://api.browser-use.com/api/v4/workspaces", {
-        method: "POST",
-        headers,
-        body: JSON.stringify({ name: "Jenvu chart analysis" }),
-        ...(signal ? { signal } : {}),
-      });
-      if (!workspaceResponse.ok)
-        throw new AiGatewayError(
-          "Unable to prepare chart analysis.",
-          workspaceResponse.status,
-          false,
-        );
-      const workspace = (await workspaceResponse.json()) as { id?: string };
-      workspaceId = workspace.id;
-      if (!workspaceId) throw new AiGatewayError("Unable to prepare chart analysis.", 0, false);
-
-      const uploadResponse = await fetch(
-        `https://api.browser-use.com/api/v4/workspaces/${workspaceId}/files/upload`,
-        {
-          method: "POST",
-          headers,
-          body: JSON.stringify({
-            files: images.map((image) => ({
-              name: image.name,
-              contentType: image.contentType,
-              size: image.bytes.byteLength,
-            })),
-          }),
-          ...(signal ? { signal } : {}),
-        },
-      );
-      if (!uploadResponse.ok)
-        throw new AiGatewayError("Unable to upload chart image.", uploadResponse.status, false);
-      const upload = (await uploadResponse.json()) as {
-        files?: Array<{ id?: string; uploadUrl?: string }>;
-      };
-      const slots = upload.files ?? [];
-      if (slots.length !== images.length)
-        throw new AiGatewayError("Unable to upload chart image.", 0, false);
-      for (let index = 0; index < slots.length; index++) {
-        const slot = slots[index];
-        const image = images[index];
-        if (!slot?.id || !slot.uploadUrl || !image)
-          throw new AiGatewayError("Unable to upload chart image.", 0, false);
-        const uploadBody = new ArrayBuffer(image.bytes.byteLength);
-        new Uint8Array(uploadBody).set(image.bytes);
-        const putResponse = await fetch(slot.uploadUrl, {
-          method: "PUT",
-          headers: {
-            "Content-Type": image.contentType,
-            "Content-Length": String(image.bytes.byteLength),
-          },
-          body: uploadBody,
-          ...(signal ? { signal } : {}),
-        });
-        if (!putResponse.ok)
-          throw new AiGatewayError("Unable to upload chart image.", putResponse.status, false);
-        attachedFileIds.push(slot.id);
-      }
-    }
-
-    const task = [
-      "Answer the conversation below directly. Do not browse the web or use browser tools. Treat attached images as chart inputs. Return only the requested answer, preserving any required JSON format.",
-      textParts.join("\n\n"),
-    ].join("\n\n");
-    const runResponse = await fetch("https://api.browser-use.com/api/v4/runs", {
-      method: "POST",
-      headers,
-      body: JSON.stringify({
-        task,
-        model: wireModel,
-        ...(wireModel === "gpt-6-astra" ? { modelParams: { reasoning: { effort: "high" } } } : {}),
-        ...(workspaceId ? { workspaceId } : {}),
-        ...(attachedFileIds.length ? { attachedFileIds } : {}),
-      }),
-      ...(signal ? { signal } : {}),
-    });
-    if (!runResponse.ok) {
-      const detail = await runResponse.text().catch(() => "");
-      const terminal = !(
-        runResponse.status === 429 ||
-        runResponse.status >= 500 ||
-        runResponse.status === 409
-      );
-      if (runResponse.status === 402)
-        throw new AiGatewayError(
-          "Browser Use balance is too low. Please top up to use this model.",
-          402,
-          true,
-        );
-      if (runResponse.status === 401 || runResponse.status === 403)
-        throw new AiGatewayError(
-          "AI key rejected. Please contact support.",
-          runResponse.status,
-          true,
-        );
-      if (runResponse.status === 404 || /model/i.test(detail))
-        markModelUnhealthy(model, 15 * 60 * 1000);
-      throw new AiGatewayError(
-        "Server busy — please try again in a moment.",
-        runResponse.status,
-        terminal,
-      );
-    }
-    const run = (await runResponse.json()) as { id?: string };
-    if (!run.id) throw new AiGatewayError("AI run could not be started.", 0, false);
-
-    while (!signal?.aborted) {
-      await sleep(750);
-      const statusResponse = await fetch(`https://api.browser-use.com/api/v4/runs/${run.id}`, {
-        headers: { "X-Browser-Use-API-Key": key },
-        ...(signal ? { signal } : {}),
-      });
-      if (!statusResponse.ok)
-        throw new AiGatewayError(
-          "Server busy — please try again in a moment.",
-          statusResponse.status,
-          false,
-        );
-      const status = (await statusResponse.json()) as {
-        status?: string;
-        result?: string | null;
-        error?: string | null;
-        totalInputTokens?: number;
-        totalOutputTokens?: number;
-      };
-      if (status.status === "completed") {
-        const content = status.result?.trim();
-        if (!content) throw new AiGatewayError("AI returned empty response.", 0, false);
-        const promptTokens = Number(status.totalInputTokens ?? 0) || 0;
-        const completionTokens = Number(status.totalOutputTokens ?? 0) || 0;
-        return {
-          content,
-          usage: { promptTokens, completionTokens, totalTokens: promptTokens + completionTokens },
-        };
-      }
-      if (status.status === "failed" || status.status === "cancelled") {
-        throw new AiGatewayError(
-          status.error || "Server busy — please try again in a moment.",
-          0,
-          false,
-        );
-      }
-    }
-    throw new AiGatewayError("Server busy — please try again in a moment.", 0, false);
-  } finally {
-    if (workspaceId) {
-      void fetch(`https://api.browser-use.com/api/v4/workspaces/${workspaceId}`, {
-        method: "DELETE",
-        headers: { "X-Browser-Use-API-Key": key },
-      }).catch(() => undefined);
-    }
-  }
-}
-
-async function callBrowserUse(
-  model: string,
-  opts: CallChatOptions,
-  signal?: AbortSignal,
-): Promise<{ content: string; usage: UsageInfo }> {
-  const keys = getBrowserUseApiKeys();
-  if (!keys.length)
-    throw new AiGatewayError("Browser Use API keys are missing on the server.", 0, true);
-
-  let lastError: unknown;
-  for (const key of keys) {
-    try {
-      return await callBrowserUseWithKey(model, opts, key, signal);
-    } catch (error) {
-      lastError = error;
-      if (signal?.aborted) throw error;
-      const status = error instanceof AiGatewayError ? error.status : 0;
-      // A depleted, revoked, or account-limited key should not block the next
-      // funded Browser Use account in the ordered fallback pool.
-      if (status !== 401 && status !== 402 && status !== 403) throw error;
-    }
-  }
-
-  if (lastError instanceof AiGatewayError) {
-    throw new AiGatewayError(lastError.message, lastError.status, true);
-  }
-  throw new AiGatewayError("All Browser Use accounts are unavailable.", 0, true);
-}
-
-// -------- JustWoker (api.justwoker.icu) ------------------------------------
-// This upstream fronts GPT-5.6 (sol / terra / luna). Its OpenAI-compatible
-// /v1/chat/completions path is blocked by the provider's WAF for server-side
-// calls, but the Anthropic-style /v1/messages path answers reliably, so we
-// speak that dialect and translate messages both ways.
-async function callJustwoker(
-  model: string,
-  opts: CallChatOptions,
-  signal?: AbortSignal,
-): Promise<{ content: string; usage: UsageInfo }> {
-  const key = process.env.JUSTWOKER_API_KEY;
-  if (!key) throw new AiGatewayError("JUSTWOKER_API_KEY missing on server", 0, true);
-  const wireModel = model.slice("jw/".length);
-
-  const systemParts: string[] = [];
-  const messages: Array<{ role: "user" | "assistant"; content: unknown }> = [];
-  for (const m of opts.messages) {
-    if (m.role === "system") {
-      systemParts.push(typeof m.content === "string" ? m.content : JSON.stringify(m.content));
-      continue;
-    }
-    if (typeof m.content === "string") {
-      messages.push({ role: m.role, content: m.content });
-      continue;
-    }
-    const blocks = m.content
-      .map((part) => {
-        if (part.type === "text") return { type: "text", text: part.text };
-        const url = part.image_url?.url ?? "";
-        const match = /^data:(image\/[a-z]+);base64,(.+)$/i.exec(url);
-        if (!match) return null;
-        return { type: "image", source: { type: "base64", media_type: match[1], data: match[2] } };
-      })
-      .filter(Boolean);
-    messages.push({ role: m.role, content: blocks });
-  }
-  if (!messages.length) messages.push({ role: "user", content: "." });
-
-  const res = await fetch("https://api.justwoker.icu/v1/messages", {
-    method: "POST",
-    ...(signal ? { signal } : {}),
-    headers: {
-      "Content-Type": "application/json",
-      "x-api-key": key,
-      "anthropic-version": "2023-06-01",
-    },
-    body: JSON.stringify({
-      model: wireModel,
-      max_tokens: opts.maxTokens ?? 1500,
-      ...(systemParts.length ? { system: systemParts.join("\n\n") } : {}),
-      messages,
-    }),
-  }).catch(() => {
-    throw new AiGatewayError("Server busy — please try again in a moment.", 0, false);
-  });
-
-  if (!res.ok) {
-    const txt = await res.text().catch(() => "");
-    const status = res.status;
-    const msg =
-      status === 402 || /insufficient|balance|credit/i.test(txt)
-        ? "JustWoker balance is too low. Please top up to use this model."
-        : status === 401 || status === 403
-          ? "AI key rejected. Please contact support."
-          : "Server busy — please try again in a moment.";
-    const terminal = !(status === 429 || status >= 500);
-    if (status === 404 || /model_not_found|not found/i.test(txt))
-      markModelUnhealthy(model, 15 * 60 * 1000);
-    throw new AiGatewayError(msg, status, terminal);
-  }
-
-  const json: any = await res.json();
-  const content = Array.isArray(json?.content)
-    ? json.content
-        .filter((b: any) => b?.type === "text")
-        .map((b: any) => String(b.text ?? ""))
-        .join("\n")
-        .trim()
-    : "";
-  if (!content) throw new AiGatewayError("AI returned empty response.", 0, false);
-  const promptTokens = Number(json?.usage?.input_tokens ?? 0) || 0;
-  const completionTokens = Number(json?.usage?.output_tokens ?? 0) || 0;
-  return {
-    content,
-    usage: { promptTokens, completionTokens, totalTokens: promptTokens + completionTokens },
-  };
-}
-
+// -------- OmniRoute request adapter -----------------------------------------
+// Calls the configured OpenAI-compatible OmniRoute endpoint.
 async function singleAttempt(
   model: string,
   opts: CallChatOptions,
@@ -429,302 +102,96 @@ async function singleAttemptInner(
   opts: CallChatOptions,
   signal?: AbortSignal,
 ): Promise<{ content: string; usage: UsageInfo }> {
-  // OmniRoute is the only permitted inference provider.
-  const isOmniRoute = model.startsWith("omniroute/");
-  const isBlackbox = model.startsWith("blackboxai/");
-  const isNvidia = model.startsWith("nvapi/");
-  const isBmind = model.startsWith("bmind/");
-  const isTukenku = model.startsWith("tukenku/");
-  const isUnikey = model.startsWith("unikey/");
-  const isEvolink = model.startsWith("evolink/");
-  const isUnoRouter = model.startsWith("unorouter/");
-  const isDsOfficial = model.startsWith("dsofficial/");
-  const isOai = model.startsWith("oai/");
-  const isExternalProvider =
-    isOmniRoute ||
-    isBlackbox ||
-    isNvidia ||
-    isBmind ||
-    isTukenku ||
-    isUnikey ||
-    isEvolink ||
-    isUnoRouter ||
-    isDsOfficial ||
-    isOai;
-  if (!isOmniRoute) {
+  if (!model.startsWith("omniroute/")) {
     throw new AiGatewayError(`Only OmniRoute models are allowed: ${model}`, 400, true);
   }
-  const blackboxKey = process.env.BLACKBOX_API_KEY;
+
   const omniRouteKey = process.env.CUSTOM_AI_API_KEY;
-  const nvidiaKey = process.env.NVIDIA_API_KEY;
-  // Prefer the newer second BluesMinds credential. The singular slot is kept
-  // only as a legacy fallback because that account can be out of quota.
-  const bmindKey =
-    process.env.BLUESMINDS_API_KEY || process.env.BLUESMIND_API_KEY || process.env.OPENAI_API_KEY;
-  const tukenkuKey = process.env.TUKENKU_API_KEY;
-  const unikeyKey = process.env.UNIKEY_API_KEY;
-  const evolinkKey = process.env.EVOLINK_API_KEY;
-  const unoRouterKey = process.env.UNOROUTER_API_KEY;
-  const deepseekKey = process.env.DEEPSEEK_API_KEY;
-  const openaiKey = process.env.OPENAI_API_KEY;
   const omniRouteBase = (process.env.CUSTOM_AI_BASE_URL || "").replace(/\/+$/, "");
-  if (isOmniRoute && !/^https:\/\//i.test(omniRouteBase)) {
-    throw new AiGatewayError("OmniRoute requires a public HTTPS server address.", 0, true);
+  if (!omniRouteKey) {
+    throw new AiGatewayError("OmniRoute API key is missing on the published server.", 0, true);
+  }
+  if (!/^https:\/\//i.test(omniRouteBase)) {
+    throw new AiGatewayError("OmniRoute server address is missing on the published server.", 0, true);
   }
 
-  // Bluesmind base URL is configurable (BLUESMIND_BASE_URL), e.g.
-  // "https://api.bluesminds.com/v1" — with or without a trailing
-  // /chat/completions.
-  const bmindBase = (process.env.BLUESMIND_BASE_URL || "https://api.bluesminds.com/v1").replace(
-    /\/+$/,
-    "",
-  );
-  const bmindEndpoint = /\/chat\/completions$/.test(bmindBase)
-    ? bmindBase
-    : `${bmindBase}/chat/completions`;
-
-  const endpoint = isOmniRoute
-    ? /\/chat\/completions$/i.test(omniRouteBase)
-      ? omniRouteBase
-      : `${omniRouteBase.replace(/\/v1$/i, "")}/v1/chat/completions`
-    : isOai
-      ? "https://api.openai.com/v1/chat/completions"
-      : isBlackbox
-        ? "https://api.blackbox.ai/v1/chat/completions"
-        : isNvidia
-          ? "https://integrate.api.nvidia.com/v1/chat/completions"
-          : isBmind
-            ? bmindEndpoint
-            : isTukenku
-              ? "https://tukenku.com/v1/chat/completions"
-              : isUnikey
-                ? "https://www.getunikey.ai/v1/chat/completions"
-                : isEvolink
-                  ? "https://direct.evolink.ai/v1/chat/completions"
-                  : isUnoRouter
-                    ? "https://api.unorouter.com/v1/chat/completions"
-                    : "https://api.deepseek.com/chat/completions";
-
-  const headers: Record<string, string> = { "Content-Type": "application/json" };
-  if (isOmniRoute) {
-    if (!omniRouteKey) throw new AiGatewayError("CUSTOM_AI_API_KEY missing on server", 0, true);
-    headers["Authorization"] = `Bearer ${omniRouteKey}`;
-  } else if (isBlackbox) {
-    if (!blackboxKey) throw new AiGatewayError("BLACKBOX_API_KEY missing on server", 0, true);
-    headers["Authorization"] = `Bearer ${blackboxKey}`;
-  } else if (isNvidia) {
-    if (!nvidiaKey) throw new AiGatewayError("NVIDIA_API_KEY missing on server", 0, true);
-    headers["Authorization"] = `Bearer ${nvidiaKey}`;
-  } else if (isBmind) {
-    if (!bmindKey) throw new AiGatewayError("BLUESMIND_API_KEY missing on server", 0, true);
-    headers["Authorization"] = `Bearer ${bmindKey}`;
-  } else if (isTukenku) {
-    if (!tukenkuKey) throw new AiGatewayError("TUKENKU_API_KEY missing on server", 0, true);
-    headers["Authorization"] = `Bearer ${tukenkuKey}`;
-  } else if (isUnikey) {
-    if (!unikeyKey) throw new AiGatewayError("UNIKEY_API_KEY missing on server", 0, true);
-    headers["Authorization"] = `Bearer ${unikeyKey}`;
-  } else if (isEvolink) {
-    if (!evolinkKey) throw new AiGatewayError("EVOLINK_API_KEY missing on server", 0, true);
-    headers["Authorization"] = `Bearer ${evolinkKey}`;
-  } else if (isUnoRouter) {
-    if (!unoRouterKey) throw new AiGatewayError("UNOROUTER_API_KEY missing on server", 0, true);
-    headers["Authorization"] = `Bearer ${unoRouterKey}`;
-  } else if (isDsOfficial) {
-    if (!deepseekKey) throw new AiGatewayError("DEEPSEEK_API_KEY missing on server", 0, true);
-    headers["Authorization"] = `Bearer ${deepseekKey}`;
-  } else if (isOai) {
-    if (!openaiKey) throw new AiGatewayError("OPENAI_API_KEY missing on server", 0, true);
-    headers["Authorization"] = `Bearer ${openaiKey}`;
-  }
-
-  // Strip provider prefixes to expose the real upstream model id.
-  const wireModel = isOai
-    ? model.slice("oai/".length)
-    : isNvidia
-      ? model.slice("nvapi/".length)
-      : isBmind
-        ? model.slice("bmind/".length)
-        : isTukenku
-          ? model.slice("tukenku/".length)
-          : isUnikey
-            ? model.slice("unikey/".length)
-            : isEvolink
-              ? model.slice("evolink/".length)
-              : isUnoRouter
-                ? model.slice("unorouter/".length)
-                : isDsOfficial
-                  ? model.slice("dsofficial/".length)
-                  : isOmniRoute
-                    ? model.slice("omniroute/".length)
-                    : model;
-
-  // Derive a stable seed for providers that explicitly support it. OmniRoute's
-  // Claude-compatible routes reject OpenAI's `seed` field on some upstream
-  // connections, so never send it there.
-  const seedBase = opts.messages
-    .map((m) => (typeof m.content === "string" ? m.content : JSON.stringify(m.content)))
-    .join("|");
-  let seed = 0;
-  for (let i = 0; i < seedBase.length; i++)
-    seed = ((seed << 5) - seed + seedBase.charCodeAt(i)) | 0;
-  seed = Math.abs(seed) || 1;
-
-  // GPT-5/6 family only accepts default temperature (1); skip temp/top_p there
-  // and keep the seed. OmniRoute's `auto/*` meta-routes pick a different, far
-  // slower upstream when sampling is pinned, so they are treated the same way;
-  // explicit OmniRoute model ids (kr/claude-*, kr/glm-*) DO get pinned sampling
-  // — without it Claude runs at temperature 1 and the same chart reads
-  // differently on every scan.
-  const usesDefaultTemperature =
-    /(^|\/)gpt-(?:5|6)/i.test(wireModel) || (isOmniRoute && /(^|\/)auto\//i.test(wireModel));
-
-  // Anthropic-backed routes dislike temperature and top_p together — pin only
-  // temperature there.
-  const pinnedSampling = usesDefaultTemperature
-    ? {}
-    : isOmniRoute
-      ? { temperature: 0 }
-      : { temperature: 0, top_p: 1 };
-
+  const endpoint = /\/chat\/completions$/i.test(omniRouteBase)
+    ? omniRouteBase
+    : `${omniRouteBase.replace(/\/v1$/i, "")}/v1/chat/completions`;
+  const wireModel = model.slice("omniroute/".length);
   const body: Record<string, unknown> = {
     model: wireModel,
     messages: opts.messages,
-    ...(!isOmniRoute ? { seed } : {}),
-    ...pinnedSampling,
-
-    // GPT-OSS otherwise spends most of the token/time budget on hidden chain
-    // of thought before emitting the visible answer. Low effort keeps the
-    // extension responsive while preserving the full ICT/SMC output schema.
-    ...(isBmind && /gpt-oss/i.test(wireModel) ? { reasoning_effort: "low" } : {}),
+    temperature: 0,
   };
-  // Blackbox/NVIDIA/Bluesminds/DeepSeek-official: don't force response_format — rely on system prompt.
-  if (opts.jsonMode && (isOai || isOmniRoute)) body.response_format = { type: "json_object" };
-  else if (
-    opts.jsonMode &&
-    !isOmniRoute &&
-    !isBlackbox &&
-    !isNvidia &&
-    !isBmind &&
-    !isTukenku &&
-    !isUnikey &&
-    !isEvolink &&
-    !isUnoRouter &&
-    !isDsOfficial &&
-    !isOai
-  )
-    body.response_format = { type: "json_object" };
-  if (opts.maxTokens) {
-    if (
-      ((isOai || isEvolink || isUnoRouter) && /^gpt-(?:5|6)/i.test(wireModel)) ||
-      (!isBlackbox &&
-        !isNvidia &&
-        !isBmind &&
-        !isTukenku &&
-        !isUnikey &&
-        !isEvolink &&
-        !isUnoRouter &&
-        !isDsOfficial &&
-        !isOai &&
-        /^openai\/gpt-(?:5|6)/i.test(model))
-    ) {
-      body.max_completion_tokens = opts.maxTokens;
-    } else {
-      body.max_tokens = opts.maxTokens;
-    }
-  }
+  if (opts.jsonMode) body.response_format = { type: "json_object" };
+  if (opts.maxTokens) body.max_tokens = opts.maxTokens;
+
   let res: Response;
   try {
     res = await fetch(endpoint, {
       ...(signal ? { signal } : {}),
       method: "POST",
-      headers,
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${omniRouteKey}`,
+      },
       body: JSON.stringify(body),
     });
-  } catch (err: any) {
-    throw new AiGatewayError("Server busy — please try again in a moment.", 0, false);
+  } catch {
+    throw new AiGatewayError("OmniRoute could not be reached. Please retry in a moment.", 0, false);
   }
 
   if (!res.ok) {
     const txt = await res.text().catch(() => "");
-    // Only rate limits and upstream 5xx failures are retryable. Replaying a
-    // malformed request or rejected credential against the same route cannot
-    // recover and previously produced repeated, misleading "server busy" UI.
     const terminal = !(res.status === 429 || res.status >= 500);
-
     let msg: string;
-    if (res.status === 429) msg = "Server busy — please try again in a moment.";
-    else if (res.status === 503 || res.status === 502 || res.status === 504)
-      msg = "Server busy — please try again in a moment.";
-    else if (res.status >= 500) msg = "Server busy — please try again in a moment.";
-    else if (res.status === 402 && isTukenku)
-      msg = "Tukenku balance is too low. Please top up Tukenku to use this model.";
-    else if (res.status === 402 && isUnikey)
-      msg = "Unikey balance is too low. Please top up Unikey to use this model.";
-    else if (res.status === 402 && isEvolink)
-      msg = "Evolink balance is too low. Please top up Evolink to use this model.";
-    else if (res.status === 402 && isUnoRouter)
-      msg = "UnoRouter balance is too low. Please top up UnoRouter to use this model.";
-    else if (res.status === 402) msg = "AI credits exhausted. Please top up your workspace.";
-    else if (res.status === 401) msg = "AI key rejected. Please contact support.";
-    else if (res.status === 403) msg = "AI provider access is blocked. Please contact support.";
-    else if (res.status === 400)
-      msg = "AI provider rejected the analysis request. Please contact support.";
-    else if (res.status === 404) msg = "The selected AI model is unavailable.";
-    else msg = "Server busy — please try again in a moment.";
-    // Attach Retry-After (seconds) as ms, if provided by the upstream.
-    const ra = res.headers.get("retry-after");
-    const raMs = ra
-      ? Number.isFinite(+ra)
-        ? +ra * 1000
-        : Math.max(0, Date.parse(ra) - Date.now())
+    if (res.status === 429 || res.status >= 500) msg = "OmniRoute is busy. Please retry in a moment.";
+    else if (res.status === 402) msg = "OmniRoute credits are exhausted. Please contact support.";
+    else if (res.status === 401) msg = "OmniRoute API key was rejected. Please contact support.";
+    else if (res.status === 403) msg = "OmniRoute access is blocked. Please contact support.";
+    else if (res.status === 400) msg = "OmniRoute rejected the analysis request. Please contact support.";
+    else if (res.status === 404) msg = "The selected OmniRoute model is unavailable.";
+    else msg = "OmniRoute request failed. Please retry in a moment.";
+
+    const retryAfter = res.headers.get("retry-after");
+    const retryAfterMs = retryAfter
+      ? Number.isFinite(+retryAfter)
+        ? +retryAfter * 1000
+        : Math.max(0, Date.parse(retryAfter) - Date.now())
       : 0;
-    const e = new AiGatewayError(msg, res.status, terminal);
-    (e as any).retryAfterMs = Number.isFinite(raMs) && raMs > 0 ? Math.min(raMs, 8000) : 0;
-    // Mark model unhealthy for TTL when it looks structurally dead
-    // (not just busy). This lets the runner skip it on the next call
-    // instead of burning retries + timeout on a known-dead upstream.
-    const bodyLower = txt.toLowerCase();
-    const modelNotFound =
-      bodyLower.includes("model_not_found") || bodyLower.includes("no available channel");
-    const upstreamDead =
-      bodyLower.includes("upstream error") ||
-      bodyLower.includes("do_request_failed") ||
-      (bodyLower.includes("endpoint") && bodyLower.includes("offline")) ||
-      bodyLower.includes("err_ngrok");
-    if (res.status === 404 || modelNotFound) {
-      markModelUnhealthy(model, 15 * 60 * 1000); // 15 min — model not provisioned
-    } else if (res.status >= 500 && upstreamDead) {
-      markModelUnhealthy(model, 5 * 60 * 1000); // 5 min — upstream flaky
+    const error = new AiGatewayError(msg, res.status, terminal);
+    (error as AiGatewayError & { retryAfterMs?: number }).retryAfterMs =
+      Number.isFinite(retryAfterMs) && retryAfterMs > 0 ? Math.min(retryAfterMs, 8000) : 0;
+
+    const detail = txt.toLowerCase();
+    if (res.status === 404 || detail.includes("model_not_found") || detail.includes("no available channel")) {
+      markModelUnhealthy(model, 15 * 60 * 1000);
+    } else if (res.status >= 500 && /upstream error|do_request_failed|endpoint.*offline|err_ngrok/.test(detail)) {
+      markModelUnhealthy(model, 5 * 60 * 1000);
     }
-    throw e;
+    throw error;
   }
 
   const json: any = await res.json();
   const content = json?.choices?.[0]?.message?.content;
-  if (typeof content !== "string" || !content.length) {
-    throw new AiGatewayError("AI returned empty response.", 0, false);
+  if (typeof content !== "string" || !content.trim()) {
+    throw new AiGatewayError("OmniRoute returned an empty response.", 0, false);
   }
-  const u = json?.usage ?? {};
-  let promptTokens = Number(u.prompt_tokens ?? u.promptTokens ?? 0) || 0;
-  let completionTokens = Number(u.completion_tokens ?? u.completionTokens ?? 0) || 0;
-  let totalTokens = Number(u.total_tokens ?? u.totalTokens ?? 0) || 0;
-  // Fallback: some providers (e.g. Bluesminds/bmind) omit `usage`. Approximate
-  // from character counts (~4 chars/token) so the billing history isn't blank.
+  const usageRaw = json?.usage ?? {};
+  let promptTokens = Number(usageRaw.prompt_tokens ?? usageRaw.promptTokens ?? 0) || 0;
+  let completionTokens = Number(usageRaw.completion_tokens ?? usageRaw.completionTokens ?? 0) || 0;
+  let totalTokens = Number(usageRaw.total_tokens ?? usageRaw.totalTokens ?? 0) || 0;
   if (promptTokens === 0 && completionTokens === 0) {
-    try {
-      const promptChars = (opts.messages ?? []).reduce(
-        (n, m) => n + (typeof m?.content === "string" ? m.content.length : 0),
-        0,
-      );
-      promptTokens = Math.max(1, Math.round(promptChars / 4));
-      completionTokens = Math.max(1, Math.round(String(content).length / 4));
-      totalTokens = promptTokens + completionTokens;
-    } catch {}
+    const promptChars = opts.messages.reduce(
+      (count, message) => count + (typeof message.content === "string" ? message.content.length : JSON.stringify(message.content).length),
+      0,
+    );
+    promptTokens = Math.max(1, Math.round(promptChars / 4));
+    completionTokens = Math.max(1, Math.round(content.length / 4));
   }
   if (totalTokens === 0) totalTokens = promptTokens + completionTokens;
-  const usage: UsageInfo = { promptTokens, completionTokens, totalTokens };
-  return { content, usage };
+  return { content: content.trim(), usage: { promptTokens, completionTokens, totalTokens } };
 }
 
 // Main entrypoint. Returns raw assistant content string plus model/usage.
@@ -742,31 +209,14 @@ export async function callChatCompletion(
   const healthy = configured.filter((m) => !isModelUnhealthy(m));
   const models = healthy.length ? healthy : configured;
 
-  // Wall-clock budget for the whole chain walk, so a stalled provider cannot
-  // consume the caller's entire request.
-  const startedAt = Date.now();
-  const chainDeadline = Math.max(10_000, opts.deadlineMs ?? 180_000);
-  const remaining = () => chainDeadline - (Date.now() - startedAt);
-
   let lastErr: AiGatewayError | null = null;
-  let attemptedModels = 0;
 
   for (let mi = 0; mi < models.length; mi++) {
     const model = models[mi];
     const isLastModel = mi === models.length - 1;
-    attemptedModels++;
     for (let attempt = 1; attempt <= retriesPerModel; attempt++) {
-      if (remaining() <= 0) {
-        lastErr =
-          lastErr ?? new AiGatewayError("AI analysis timed out. Please try again.", 0, false);
-        break;
-      }
       try {
-        const perAttempt = Math.min(
-          Math.max(5_000, opts.timeoutMs ?? 90_000),
-          Math.max(5_000, remaining()),
-        );
-        const { content, usage } = await singleAttempt(model, opts, perAttempt);
+        const { content, usage } = await singleAttempt(model, opts);
 
         const validation = opts.validateContent?.(content, model) ?? true;
         if (validation !== true) {
@@ -782,8 +232,8 @@ export async function callChatCompletion(
             : new AiGatewayError(String((err as any)?.message ?? err), 0, false);
 
         // Terminal errors must not be retried against the same provider.
-        // A provider-scoped auth/billing failure may still fall through to a
-        // separately configured provider later in the chain.
+        // A route-scoped model failure may still fall through to the second
+        // verified OmniRoute model later in the chain.
         if (lastErr.terminal) {
           const isAuthOrBilling =
             lastErr.status === 401 || lastErr.status === 402 || lastErr.status === 403;
@@ -793,14 +243,14 @@ export async function callChatCompletion(
           break;
         }
 
-        // On 429/503/502/504 or timeout (status 0), fall back to the next
-        // provider immediately on the last retry attempt for this model.
+        // On 429/503/502/504, fall back to the next OmniRoute model after the
+        // bounded retries for this model.
         const busy =
           lastErr.status === 429 ||
           lastErr.status === 503 ||
           lastErr.status === 502 ||
           lastErr.status === 504;
-        if (busy && attempt >= 2 && !isLastModel) break; // hop provider fast
+        if (busy && attempt >= 2 && !isLastModel) break;
 
         if (attempt === retriesPerModel) break;
 
@@ -812,21 +262,6 @@ export async function callChatCompletion(
         await sleep(Math.min(6000, base + jitter));
       }
     }
-  }
-
-  // Never expose the final provider's credential error as though the user's
-  // Jenvu extension key were invalid. In a multi-provider chain it only means
-  // every upstream route was unavailable, depleted, or rejected.
-  if (
-    attemptedModels > 1 &&
-    lastErr &&
-    (lastErr.status === 401 || lastErr.status === 402 || lastErr.status === 403)
-  ) {
-    throw new AiGatewayError(
-      "AI analysis is temporarily unavailable. Please retry in a moment.",
-      503,
-      false,
-    );
   }
 
   throw lastErr ?? new AiGatewayError("AI call failed with no error captured", 0, false);
@@ -913,7 +348,7 @@ export function setCachedPlan<T>(key: string, value: T, ttlMs: number = PLAN_CAC
 
 // -------- Model chains (single source of truth) ----------------------------
 
-// Senior review = SEQUENTIAL "best-available" chain.
+// Reviews use one sequential OmniRoute model chain.
 // Ordered strongest → weakest. The runner tries #1 first; if that model is
 // down / rate-limited / times out, it hops to the next best one that responds.
 // Health cache: markModelUnhealthy() is called automatically on 404 /
@@ -952,8 +387,7 @@ const VISION_CHAIN = [
 
 export const MODEL_CHAIN = {
   intent: FAST_CHAT_CHAIN,
-  // Auto-scan narration now runs the same primary-analysis chain as the
-  // extension, followed by the same senior review.
+  // Narration uses the same primary-analysis chain as the extension.
   narration: PRIMARY_ANALYSIS_CHAIN,
   seniorReview: SENIOR_REVIEW_MODELS,
   macroContext: FAST_CHAT_CHAIN,
@@ -962,11 +396,8 @@ export const MODEL_CHAIN = {
 
 export const EXTENSION_MODEL_CHAIN = {
   conversation: FAST_CHAT_CHAIN,
-  // Extension analysis intentionally uses one strongest model. Deterministic
-  // rules fail closed if this review is unavailable; no weaker model silently
-  // changes the behavior of the same setup.
-  // Strongest model first; the remaining verified routes are only used when
-  // the primary one is down, so analysis never fails outright.
+  // Strongest model first; Sonnet 4 is the verified fallback. Deterministic
+  // rules still fail closed if neither route returns a valid review.
   reasoning: PRIMARY_ANALYSIS_CHAIN,
   vision: VISION_CHAIN,
   seniorReview: SENIOR_REVIEW_MODELS,
