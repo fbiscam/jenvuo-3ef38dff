@@ -579,7 +579,7 @@ async function handle({ request }: { request: Request }) {
         if (!forecast.stale) {
           try {
             const primary = await callChatCompletion({
-            models: ["openai/gpt-6-astra"],
+              models: [...EXTENSION_MODEL_CHAIN.reasoning],
               stage: "extension-candle-forecast",
               maxTokens: 260,
               retriesPerModel: 1,
