@@ -96,7 +96,7 @@ function SecurityPage() {
   return (
     <div className="-mx-5 -mb-7 min-h-[calc(100dvh-4rem)] overflow-hidden bg-background text-foreground sm:-mx-8">
       <header className="border-b border-border px-4 py-3 sm:px-6">
-        <h1 className="text-lg font-medium text-foreground">Security</h1>
+        <h1 className="text-lg font-medium text-foreground"> Security</h1>
         <p className="mt-1 text-sm text-muted-foreground">
           Manage your password, two-factor authentication, and trusted devices.
         </p>
