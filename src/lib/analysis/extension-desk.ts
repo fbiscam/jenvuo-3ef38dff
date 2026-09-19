@@ -195,10 +195,10 @@ export function runExtensionDesk(input: DeskInput): DeskResult {
   const m5Sweep = detectRecentSweepReclaim(input.m5, pools, candidateDirection, 12);
   const executionSweep = selectedSweep.confirmed ? selectedSweep : m5Sweep;
   const selectedTriggerAfterSweep =
-    (latestSelectedTrigger?.toTime ?? 0) >= executionSweep.sweptAt &&
+    (latestSelectedTrigger?.toTime ?? 0) > executionSweep.sweptAt &&
     (latestSelectedTrigger?.toTime ?? 0) >= selectedLastClosedAt - timeframeSeconds(input.timeframe) * 4;
   const m5TriggerAfterSweep =
-    (latestM5Trigger?.toTime ?? 0) >= executionSweep.sweptAt &&
+    (latestM5Trigger?.toTime ?? 0) > executionSweep.sweptAt &&
     (latestM5Trigger?.toTime ?? 0) >= m5LastClosedAt - 5 * 60 * 6;
   const freshExecutionTrigger =
     candidateDirection !== "WAIT" &&
