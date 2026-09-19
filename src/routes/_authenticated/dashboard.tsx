@@ -1284,7 +1284,7 @@ function DashboardHero({ keysCount, stats }: { keysCount: number | null; stats: 
   const banners = [
     {
       variant: "model" as const,
-      eyebrow: "Introducing GPT-6 Astra",
+      eyebrow: "  Introducing gpt-6 astra",
       copy: "Our most capable model, built for precise market analysis. Astra combines reasoning, chart vision, and strong context awareness from capture to completion.",
       action: "Analyze with Astra",
       to: "/dashboard/extension" as const,
