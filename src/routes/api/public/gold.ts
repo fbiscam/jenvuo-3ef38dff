@@ -106,7 +106,7 @@ function sanitizeConversationalAnswer(content: string): string {
 // Hard safety gate applied after the AI review: a structurally "valid" idea is
 // still wrong if the quote is stale or price has already run past the plan.
 function invalidateStalePlan(
-  desk: ReturnType<typeof runExtensionDesk>,
+  desk: InsideBarResult,
   guard: { livePrice: number; quoteAgeMs: number },
 ): string | null {
   if (!Number.isFinite(guard.livePrice) || guard.livePrice <= 0) {
@@ -139,7 +139,7 @@ function invalidateStalePlan(
 
 function compactSignalAnswer(
   raw: string,
-  desk: ReturnType<typeof runExtensionDesk>,
+  desk: InsideBarResult,
   guard?: { livePrice: number; quoteAgeMs: number },
 ): string {
   const staleReason = guard ? invalidateStalePlan(desk, guard) : null;
