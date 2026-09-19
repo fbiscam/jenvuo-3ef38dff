@@ -13,10 +13,16 @@ import {
 } from "@/lib/gold-analysis.functions";
 import { analyzeTF, buildLiquidityPools } from "@/lib/analysis/engine";
 import { callChatCompletion, EXTENSION_MODEL_CHAIN } from "@/lib/ai-gateway";
-import { runExtensionDesk, RULES_PRIMARY_MODEL } from "@/lib/analysis/extension-desk";
+import {
+  runInsideBarDesk,
+  IB_SYMBOL,
+  IB_TIMEFRAME,
+  IB_STRATEGY_MODEL,
+  type InsideBarResult,
+} from "@/lib/analysis/inside-bar";
 import {
   QUERY_RELEVANCE_INSTRUCTIONS,
-  XAU_DESK_CORE_INSTRUCTIONS,
+  GOLD_30M_INSIDE_BAR_INSTRUCTIONS,
 } from "@/lib/analysis/agent-instructions";
 import { build15mCandleForecast, formatForecast } from "@/lib/analysis/candle-forecast";
 
