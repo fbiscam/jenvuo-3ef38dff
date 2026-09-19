@@ -35,7 +35,7 @@ export const PRODUCT_UPDATES: ProductUpdate[] = [
   },
   {
     title: " 15m candle forecast",
-    copy: "The extension now forecasts the next XAU/USD 15-minute candle with calibrated confidence.",
+    copy: "The extension now forecasts the next XAU/USD 15-minute candle with calibrated confidence",
     at: "2026-09-18T14:46:00Z",
     tag: "New",
     icon: "scan",
