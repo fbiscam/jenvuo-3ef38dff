@@ -264,6 +264,7 @@ export function runInsideBarDesk(input: {
 
   reasons.push(
     `Fresh 30m ${freshLow ? "low" : "high"} at ${(freshLow ? mother.l : mother.h).toFixed(decimals)} followed by ${babies.length} inside bar(s).`,
+    `Mother candle, inside bar and the third candle all closed ${colourWord}.`,
     `Stop sits at the opposite end of the mother candle (${sl.toFixed(decimals)}).`,
     `Reward to structure is ${rr.toFixed(2)}R.`,
   );
@@ -274,6 +275,7 @@ export function runInsideBarDesk(input: {
     `Mother candle: high ${mother.h.toFixed(decimals)} · low ${mother.l.toFixed(decimals)}`,
     `Inside bar(s): ${babies.length} · high ${babyHigh.toFixed(decimals)} · low ${babyLow.toFixed(decimals)}`,
     `Fresh extreme: ${freshLow ? "new swing LOW" : "new swing HIGH"} versus the previous ${FRESH_LOOKBACK} candles`,
+    `Confirmation: mother, inside bar and third candle all ${colourWord}`,
     `Bars since the last inside bar closed: ${barsSinceBaby}`,
     `Direction: ${direction} on the break of the inside bar`,
     `Entry (stop order): ${round(entry, decimals).toFixed(decimals)}`,
