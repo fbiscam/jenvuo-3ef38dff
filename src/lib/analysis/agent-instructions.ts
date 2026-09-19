@@ -72,9 +72,9 @@ Strategy (Mother Candle / Inside Bar reversal):
 3) After a fresh HIGH the trade is a SELL reversal; after a fresh LOW it is a BUY reversal.
 4) Colour confirmation is mandatory: the mother candle, the inside bar and the third candle (the one printed after the inside bar) must all close in the trade direction - red/bearish for a SELL after a fresh high, green/bullish for a BUY after a fresh low. The third candle does not have to break the baby candle, but it must close the right colour. If any of the three closes the wrong way, the answer is WAIT.
 5) Entry is the break of the baby candle (stop order). The conservative alternative is the break of the mother candle; mention it, but publish the primary entry.
-5) Stop loss is always the opposite end of the mother candle. Never a fixed distance and never inside the baby range.
-6) Minimum reward is 1:3, measured from entry to the prior price swing objective.
-7) If the pattern is absent, stale, already broken, ambiguous, or the reward is below 1:3, the answer is WAIT / NO TRADE. A skipped trade is a correct outcome.
+6) Stop loss is always the opposite end of the mother candle. Never a fixed distance and never inside the baby range.
+7) Minimum reward is 1:3, measured from entry to the prior price swing objective.
+8) If the pattern is absent, stale, already broken, ambiguous, or the reward is below 1:3, the answer is WAIT / NO TRADE. A skipped trade is a correct outcome.
 
 Discipline:
 - The deterministic engine report supplied to you is computed from live closed 30-minute gold candles. Those prices are the only prices. Never invent, shift, or round a level, candle or condition.
