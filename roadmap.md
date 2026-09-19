@@ -110,3 +110,4 @@
 - [x] Restore bounded previous-chat context for follow-up AI replies and release extension v1.9.29
 - [x] Enforce and live-test strict D1-to-M5 chart collection before final SMC trade planning; release extension v1.9.30
 - [x] Replace multi-timeframe SMC engine with the gold-only 30m Mother Candle / Inside Bar strategy; release extension v1.9.31
+- [x] Correct the three-candle reversal sequence so baby colour is ignored and only the mother plus third candle confirm direction; release extension v1.9.33
