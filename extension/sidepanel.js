@@ -636,14 +636,50 @@ function cleanSymbol(value) {
 async function detectChartSymbol() {
   try {
     const [tab] = await chrome.tabs.query({ active: true, lastFocusedWindow: true });
-    const source = `${tab?.title || ""} ${tab?.url || ""}`.toUpperCase();
-    const known = source.match(/\b(XAUUSD|XAGUSD|EURUSD|GBPUSD|USDJPY|AUDUSD|NZDUSD|USDCAD|USDCHF|EURJPY|GBPJPY|BTCUSD|ETHUSD|SOLUSD|NAS100|SPX500|US30|USOIL)\b/);
-    if (known?.[1]) {
-      symbol = known[1];
-      if ($("symbolInput")) $("symbolInput").value = symbol;
+    if (!tab?.id || !String(tab.url || "").includes("tradingview.com")) {
+      const label = $("detectedMarket");
+      if (label) label.textContent = "Open TradingView";
+      return false;
     }
+    let pageContext = "";
+    try {
+      const results = await chrome.scripting.executeScript({
+        target: { tabId: tab.id },
+        func: () => {
+          const candidates = [
+            document.title,
+            location.href,
+            ...Array.from(document.querySelectorAll('[data-symbol-short], [data-name="legend-source-title"], [class*="symbolTitle"]'))
+              .slice(0, 20)
+              .map((node) => `${node.getAttribute("data-symbol-short") || ""} ${node.textContent || ""}`),
+          ];
+          return candidates.join(" ");
+        },
+      });
+      pageContext = String(results?.[0]?.result || "");
+    } catch {
+      pageContext = "";
+    }
+    const source = `${tab.title || ""} ${tab.url || ""} ${pageContext}`.toUpperCase();
+    const compact = source.replace(/[^A-Z0-9]/g, "");
+    const supported = ["XAUUSD", "XAGUSD", "EURUSD", "GBPUSD", "USDJPY", "AUDUSD", "NZDUSD", "USDCAD", "USDCHF", "EURJPY", "GBPJPY", "BTCUSD", "ETHUSD", "SOLUSD", "NAS100", "SPX500", "US30", "USOIL"];
+    const detected = supported.find((candidate) => compact.includes(candidate));
+    const known = detected || (/GOLD/.test(source) ? "XAUUSD" : null);
+    if (known) {
+      const changed = symbol !== known;
+      symbol = known;
+      const label = $("detectedMarket");
+      if (label) label.textContent = symbol;
+      if (changed) lastPrice = null;
+      return true;
+    }
+    const label = $("detectedMarket");
+    if (label) label.textContent = "Pair not detected";
+    return false;
   } catch {
-    /* Manual symbol remains authoritative when tab metadata is unavailable. */
+    const label = $("detectedMarket");
+    if (label) label.textContent = "Pair not detected";
+    return false;
   }
 }
 
@@ -1203,6 +1239,8 @@ async function send(preset, silentUser) {
     return;
   }
 
+  await detectChartSymbol();
+
   // Whenever a screen share is live the current frame travels with every
   // message, so plain questions like "can you see my screen?" are answered
   // from the actual picture instead of a blind "I cannot see it".
@@ -1293,26 +1331,6 @@ try {
 (async () => {
   apiKey = await readKey();
   await detectChartSymbol();
-  const symbolInput = $("symbolInput");
-  if (symbolInput) {
-    symbolInput.value = symbol;
-    symbolInput.addEventListener("change", () => {
-      const next = cleanSymbol(symbolInput.value);
-      symbol = next || "XAUUSD";
-      symbolInput.value = symbol;
-      lastPrice = null;
-      if (apiKey) loadSnapshot();
-    });
-  }
-  const timeframeInput = $("timeframeInput");
-  if (timeframeInput) {
-    timeframeInput.value = timeframe;
-    timeframeInput.addEventListener("change", () => {
-      timeframe = TIMEFRAMES.includes(timeframeInput.value) ? timeframeInput.value : "15m";
-      lastPrice = null;
-      if (apiKey) loadSnapshot();
-    });
-  }
   showKeyGate(!apiKey, "");
   const save = document.getElementById("keySave");
   const input = document.getElementById("keyInput");
@@ -1342,12 +1360,18 @@ try {
   if (apiKey) loadSnapshot();
 })();
 setInterval(() => {
-  if (apiKey) loadSnapshot();
+  detectChartSymbol().then((detected) => {
+    if (apiKey && detected) loadSnapshot();
+  });
 }, 5000);
 updateCandleClock();
 setInterval(updateCandleClock, 1000);
 document.addEventListener("visibilitychange", () => {
-  if (!document.hidden && apiKey) loadSnapshot();
+  if (!document.hidden) {
+    detectChartSymbol().then((detected) => {
+      if (apiKey && detected) loadSnapshot();
+    });
+  }
 });
 
 // Restore last active chat (or start fresh)
