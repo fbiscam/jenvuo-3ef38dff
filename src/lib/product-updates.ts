@@ -28,7 +28,7 @@ export const PRODUCT_UPDATES: ProductUpdate[] = [
   },
   {
     title: "Multi-market extension analysis",
-    copy: "Paid plans now analyze the selected supported market across D1, H4, H1, execution and M5 using one primary model.",
+    copy: "Paid plans now analyze the selected supported market across D1, H4, H1, execution and M5   ",
     at: "2026-09-19T12:00:00Z",
     tag: "Updated",
     icon: "scan",
