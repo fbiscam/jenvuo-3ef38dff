@@ -151,6 +151,11 @@ export function runInsideBarDesk(input: {
   }
 
   const mother = candles[motherIndex] as IbCandle;
+  // The candle printed after the inside bar is the confirmation candle, even
+  // when it also happens to sit inside the mother range.
+  if (lastBabyIndex === candles.length - 1 && lastBabyIndex > motherIndex + 1) {
+    lastBabyIndex -= 1;
+  }
   const babies = candles.slice(motherIndex + 1, lastBabyIndex + 1);
   const babyHigh = Math.max(...babies.map((c) => c.h));
   const babyLow = Math.min(...babies.map((c) => c.l));
@@ -190,6 +195,37 @@ export function runInsideBarDesk(input: {
   }
 
   const direction: "BUY" | "SELL" = freshLow ? "BUY" : "SELL";
+
+  // Candle-direction confirmation chain: the mother candle, the inside bar and
+  // the candle after the inside bar must all close in the trade direction.
+  const bodyDir = (c: IbCandle): "BUY" | "SELL" | "FLAT" =>
+    c.c > c.o ? "BUY" : c.c < c.o ? "SELL" : "FLAT";
+  const colourWord = direction === "BUY" ? "bullish (green)" : "bearish (red)";
+
+  if (bodyDir(mother) !== direction) {
+    return empty(
+      `The candle after the fresh ${freshLow ? "low" : "high"} is not ${colourWord}, so the reversal is not confirmed.`,
+      basePattern,
+    );
+  }
+  const lastBaby = candles[lastBabyIndex] as IbCandle;
+  if (bodyDir(lastBaby) !== direction) {
+    return empty(`The inside bar is not ${colourWord}, so the reversal is not confirmed.`, basePattern);
+  }
+  const confirmation = candles[lastBabyIndex + 1] as IbCandle | undefined;
+  if (!confirmation) {
+    return empty(
+      "Waiting for the third candle after the inside bar to close and confirm the direction.",
+      basePattern,
+    );
+  }
+  if (bodyDir(confirmation) !== direction) {
+    return empty(
+      `The third candle after the inside bar closed against the setup (it must be ${colourWord}).`,
+      basePattern,
+    );
+  }
+
   const entry = direction === "BUY" ? babyHigh : babyLow;
   const sl = direction === "BUY" ? mother.l : mother.h;
   const risk = Math.abs(entry - sl);
@@ -233,6 +269,7 @@ export function runInsideBarDesk(input: {
 
   reasons.push(
     `Fresh 30m ${freshLow ? "low" : "high"} at ${(freshLow ? mother.l : mother.h).toFixed(decimals)} followed by ${babies.length} inside bar(s).`,
+    `Mother candle, inside bar and the third candle all closed ${colourWord}.`,
     `Stop sits at the opposite end of the mother candle (${sl.toFixed(decimals)}).`,
     `Reward to structure is ${rr.toFixed(2)}R.`,
   );
@@ -243,6 +280,7 @@ export function runInsideBarDesk(input: {
     `Mother candle: high ${mother.h.toFixed(decimals)} · low ${mother.l.toFixed(decimals)}`,
     `Inside bar(s): ${babies.length} · high ${babyHigh.toFixed(decimals)} · low ${babyLow.toFixed(decimals)}`,
     `Fresh extreme: ${freshLow ? "new swing LOW" : "new swing HIGH"} versus the previous ${FRESH_LOOKBACK} candles`,
+    `Confirmation: mother, inside bar and third candle all ${colourWord}`,
     `Bars since the last inside bar closed: ${barsSinceBaby}`,
     `Direction: ${direction} on the break of the inside bar`,
     `Entry (stop order): ${round(entry, decimals).toFixed(decimals)}`,
