@@ -105,7 +105,7 @@ function SecurityPage() {
       <div className="max-w-4xl divide-y divide-border px-4 sm:px-6">
 
       <section className="py-6">
-        <h2 className="text-base font-medium text-foreground">Password</h2>
+        <h2 className="text-base font-medium text-foreground"> Password</h2>
         <p className="mt-1 text-sm text-muted-foreground">
           We'll email a secure single-use link to {email || "your account email"} so you can set a new password.
         </p>
