@@ -151,6 +151,11 @@ export function runInsideBarDesk(input: {
   }
 
   const mother = candles[motherIndex] as IbCandle;
+  // The candle printed after the inside bar is the confirmation candle, even
+  // when it also happens to sit inside the mother range.
+  if (lastBabyIndex === candles.length - 1 && lastBabyIndex > motherIndex + 1) {
+    lastBabyIndex -= 1;
+  }
   const babies = candles.slice(motherIndex + 1, lastBabyIndex + 1);
   const babyHigh = Math.max(...babies.map((c) => c.h));
   const babyLow = Math.min(...babies.map((c) => c.l));
