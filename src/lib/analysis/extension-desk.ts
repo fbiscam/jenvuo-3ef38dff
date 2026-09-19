@@ -12,9 +12,12 @@ import {
   detectDailyOpenSide,
   detectEqualHighsLows,
   detectHTFPOIAlignment,
+  detectInducement,
+  detectKeyLevels,
   detectLiquidityVoidAtEntry,
   detectLtfMomentum,
   detectMarketRegime,
+  detectMtfStructureAlignment,
   detectMidnightOpenBias,
   detectMitigationAtEntry,
   detectMomentumDivergence,
@@ -82,6 +85,10 @@ export function runExtensionDesk(input: DeskInput): DeskResult {
   const d1 = analyzeTF(input.d1);
   const pools = buildLiquidityPools(input.h1, input.selected);
   const eventsH1 = structureEvents(input.h1);
+  const eventsD1 = structureEvents(input.d1);
+  const eventsH4 = structureEvents(input.h4);
+  const eventsSelected = structureEvents(input.selected);
+  const eventsM5 = structureEvents(input.m5);
   const atr = computeATR(input.selected);
   const killzone = killzoneForPair(input.symbol);
   const regime = detectMarketRegime(input.h1);
@@ -123,6 +130,34 @@ export function runExtensionDesk(input: DeskInput): DeskResult {
   const ltfMomentum = detectLtfMomentum(input.selected, candidateDirection);
   const rangePosition = detectRangePosition(input.selected, trade.entry || input.livePrice);
   const swingRoom = detectSwingRoom(selected.swings, trade.entry, firstTarget, candidateDirection);
+  const mtfStructure = detectMtfStructureAlignment(
+    [
+      { label: "D1", events: eventsD1 },
+      { label: "H4", events: eventsH4 },
+      { label: "H1", events: eventsH1 },
+      { label: input.timeframe.toUpperCase(), events: eventsSelected },
+      { label: "M5", events: eventsM5 },
+    ],
+    candidateDirection,
+  );
+  const inducement = detectInducement(input.selected, selected.swings, eventsSelected, candidateDirection);
+  const keyLevels = detectKeyLevels(input.h4, input.selected);
+  const nearestSupport = keyLevels
+    .filter((level) => level.kind === "support" && level.price <= (trade.entry || input.livePrice))
+    .sort((a, b) => b.price - a.price)[0];
+  const nearestResistance = keyLevels
+    .filter((level) => level.kind === "resistance" && level.price >= (trade.entry || input.livePrice))
+    .sort((a, b) => a.price - b.price)[0];
+  const relevantLevel = candidateDirection === "BUY" ? nearestSupport : nearestResistance;
+  const levelDistance = relevantLevel
+    ? Math.abs((trade.entry || input.livePrice) - relevantLevel.price) / input.livePrice
+    : Number.POSITIVE_INFINITY;
+  const keyLevel = {
+    aligned: Boolean(relevantLevel) && levelDistance <= Math.max(0.012, atr > 0 ? (atr * 2.5) / input.livePrice : 0),
+    detail: relevantLevel
+      ? `${relevantLevel.kind} ${price(relevantLevel.price)} has ${relevantLevel.touches} touches (${relevantLevel.strength}% strength)`
+      : `No repeated ${candidateDirection === "BUY" ? "support" : "resistance"} level near the proposed entry`,
+  };
 
   const scored = scoreSetup({
     trade,
@@ -157,6 +192,9 @@ export function runExtensionDesk(input: DeskInput): DeskResult {
     ltfMomentum,
     rangePosition,
     swingRoom,
+    mtfStructure,
+    inducement,
+    keyLevel,
   });
 
   const confirmations = [
@@ -176,6 +214,9 @@ export function runExtensionDesk(input: DeskInput): DeskResult {
       : candidateDirection === "BUY"
         ? input.livePrice <= h4.equilibrium
         : input.livePrice >= h4.equilibrium,
+    mtfStructure.aligned,
+    inducement.detected,
+    keyLevel.aligned,
   ].filter(Boolean).length;
 
   const hardVetoReasons: string[] = [];
@@ -184,8 +225,15 @@ export function runExtensionDesk(input: DeskInput): DeskResult {
   if (scored.vetos.length) hardVetoReasons.push(...scored.vetos.map((veto) => veto.reason));
   if (candidateDirection !== "WAIT" && trade.rr < 1.5)
     hardVetoReasons.push(`Risk/reward 1:${trade.rr.toFixed(2)} is below the 1:1.5 floor.`);
-  if (confirmations < 4)
-    hardVetoReasons.push(`Only ${confirmations}/10 independent execution confirmations passed; four are required.`);
+  if (confirmations < 6)
+    hardVetoReasons.push(`Only ${confirmations}/13 independent execution confirmations passed; six are required.`);
+  const htfConflicts = mtfStructure.conflicts.filter((conflict) => /^(D1|H4|H1)\b/.test(conflict));
+  if (!mtfStructure.aligned && htfConflicts.length >= 2)
+    hardVetoReasons.push(`Multi-timeframe BOS/CHoCH conflict: ${htfConflicts.join(", ")}.`);
+  if (!inducement.detected && !turtleSoup.triggered)
+    hardVetoReasons.push("No verified inducement or failed-sweep reversal before the proposed entry.");
+  if (!keyLevel.aligned)
+    hardVetoReasons.push("The proposed entry is not backed by repeated candle-derived support/resistance.");
   if (!regime.favorable)
     reviewWarnings.push(regime.warning ?? `${regime.regime} conditions reduce execution quality`);
   if (scored.score < 75)
@@ -221,8 +269,8 @@ export function runExtensionDesk(input: DeskInput): DeskResult {
   const reviewLabel = rulesVeto
     ? `WAIT — deterministic rules blocked execution: ${hardVetoReasons.slice(0, 3).join(" ")}`
     : reviewWarnings.length
-      ? `CONDITIONAL — ${confirmations}/10 checks passed with no hard veto. ${reviewWarnings.slice(0, 2).join(" ")}`
-      : `CONFIRMED — ${confirmations}/10 independent checks passed with no hard veto.`;
+       ? `CONDITIONAL — ${confirmations}/13 checks passed with no hard veto. ${reviewWarnings.slice(0, 2).join(" ")}`
+       : `CONFIRMED — ${confirmations}/13 independent checks passed with no hard veto.`;
 
   const text = [
     `VERDICT: ${direction}`,
@@ -232,6 +280,9 @@ export function runExtensionDesk(input: DeskInput): DeskResult {
     ...riskLines,
     `CONFIDENCE: ${scored.score}% · Grade ${scored.grade}`,
     `STRUCTURE: D1 ${d1.trend}, H4 ${h4.trend}, H1 ${h1.trend}, ${input.timeframe.toUpperCase()} ${selected.trend}, M5 ${m5.trend}. ${selected.lastStructure ? `${selected.lastStructure.kind} ${selected.lastStructure.dir} @ ${price(selected.lastStructure.price)}.` : "No recent confirmed BOS/CHoCH."}`,
+    `STRUCTURE SEQUENCE: ${mtfStructure.detail}`,
+    `INDUCEMENT: ${inducement.detail}`,
+    `SUPPORT/RESISTANCE: ${keyLevel.detail}`,
     `LIQUIDITY: ${
       pools
         .filter((pool) => pool.swept)
@@ -246,6 +297,9 @@ export function runExtensionDesk(input: DeskInput): DeskResult {
   ].join("\n\n");
 
   const marks: Array<Record<string, string | number>> = [];
+  for (const level of keyLevels.slice(0, 4)) {
+    marks.push({ kind: "line", level: level.price, label: `${level.kind.toUpperCase()} · ${level.touches} touches`, tone: level.kind === "support" ? "buy" : "sell" });
+  }
   if (direction !== "WAIT") {
     marks.push(
       {
