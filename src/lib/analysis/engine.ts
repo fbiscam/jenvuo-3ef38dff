@@ -200,7 +200,8 @@ export function buildLiquidityPools(htf: Candle[], ltf: Candle[]): LiquidityPool
 
   // Previous UTC day only. Including today's candles made the current high/low
   // both define and "sweep" the same pool.
-  const todayStart = new Date(); todayStart.setUTCHours(0, 0, 0, 0);
+  const latestTimestamp = Math.max(htf[htf.length - 1]?.t ?? 0, ltf[ltf.length - 1]?.t ?? 0);
+  const todayStart = new Date(latestTimestamp); todayStart.setUTCHours(0, 0, 0, 0);
   const previousStart = todayStart.getTime() - 24 * 3600_000;
   const prevDay = htf.filter(c => c.t >= previousStart && c.t < todayStart.getTime());
   const todayLtf = ltf.filter(c => c.t >= todayStart.getTime());
