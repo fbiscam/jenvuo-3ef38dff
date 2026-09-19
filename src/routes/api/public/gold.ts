@@ -170,13 +170,13 @@ function compactSignalAnswer(
       : "NO TRADE";
   const fallbackWhy =
     verdict === "WAIT"
-      ? (desk.senior.reasons[0] ?? "No valid setup has enough verified ICT/SMC confluence.")
-      : `${desk.bias} structure and verified liquidity evidence support the setup at the listed entry.`;
+      ? (desk.senior.reasons[0] ?? "No valid 30-minute mother candle and inside bar reversal is present.")
+      : `Fresh 30m ${desk.direction === "BUY" ? "low" : "high"} with an inside bar; break of the baby candle triggers the reversal.`;
   const why = clampWords(staleReason ?? whyMatch?.[1] ?? fallbackWhy, 22);
   const fallbackTheory =
     verdict === "WAIT"
-      ? `Higher-timeframe bias is ${desk.bias.toLowerCase()} but price has not delivered a clean sweep and structure shift. Stand aside until liquidity is taken and a valid POI forms.`
-      : `Higher-timeframe bias is ${desk.bias.toLowerCase()} after liquidity was taken and structure shifted. Price is reacting from the marked POI, and the idea fails if the stop level trades through.`;
+      ? "Gold has not printed a fresh 30-minute extreme followed by a valid inside bar. Stand aside until that compression appears; skipping is part of the strategy."
+      : `Gold printed a fresh 30-minute ${desk.direction === "BUY" ? "low" : "high"} and compressed into an inside bar. The break is the trigger, the opposite end of the mother candle is the stop, and the objective is at least 1:3.`;
   const theory = clampWords(
     staleReason
       ? "A live-price safety check rejected this plan before it reached you. Entering after the level is gone turns a valid idea into a losing chase; wait for the next clean setup."
