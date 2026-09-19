@@ -181,7 +181,7 @@ function ExtensionPage() {
     try {
       const a = document.createElement("a");
       a.href = EXTENSION_DOWNLOAD_URL;
-      a.download = "jenvu-extension-v1.9.23.zip";
+      a.download = "jenvu-extension-v1.9.24.zip";
       a.rel = "noopener";
       document.body.appendChild(a);
       a.click();

@@ -5,7 +5,7 @@
 (() => {
   if (window.__jenvuOverlay) return;
 
-  const state = { marks: [], lo: 0, hi: 0, bias: null, showSession: false, offsetY: 0, scale: 1, rect: null };
+  const state = { marks: [], lo: 0, hi: 0, bias: null, timeframe: null, showSession: false, offsetY: 0, scale: 1, rect: null };
 
   const host = document.createElement("div");
   host.id = "jenvu-overlay-host";
@@ -20,7 +20,7 @@
     "background:rgba(20,22,26,.92);color:#fff;border-radius:10px;padding:6px 8px;font:500 11px/1 system-ui,sans-serif;" +
     "box-shadow:0 4px 14px rgba(0,0,0,.35)";
   bar.innerHTML =
-    '<span style="opacity:.75">Jenvu markings · approx</span>' +
+    '<span data-label style="opacity:.75">Jenvu marks</span>' +
     '<button data-a="up">▲</button><button data-a="down">▼</button>' +
     '<button data-a="in">＋</button><button data-a="out">－</button>' +
     '<button data-a="close">✕</button>';
@@ -60,6 +60,27 @@
     { name: "New York KZ", from: 12, to: 15 },
   ];
 
+  function visiblePriceScale() {
+    const values = [];
+    const chart = chartRect();
+    const nodes = document.querySelectorAll('[class*="price-axis"] [class*="label"], [class*="priceAxis"] [class*="label"], [data-name="price-axis"] span');
+    for (const node of nodes) {
+      const rect = node.getBoundingClientRect();
+      const raw = String(node.textContent || "").replace(/,/g, "").trim();
+      const value = Number(raw);
+      if (!Number.isFinite(value) || rect.width <= 0 || rect.height <= 0) continue;
+      if (rect.top < chart.y - 4 || rect.bottom > chart.y + chart.h + 4) continue;
+      values.push({ value, y: rect.top + rect.height / 2 });
+    }
+    if (values.length < 2) return null;
+    values.sort((a, b) => a.y - b.y);
+    const top = values[0];
+    const bottom = values[values.length - 1];
+    return top && bottom && top.value !== bottom.value
+      ? (price) => top.y + ((top.value - price) / (top.value - bottom.value)) * (bottom.y - top.y)
+      : null;
+  }
+
   function draw() {
     const dpr = Math.min(devicePixelRatio || 1, 2);
     canvas.width = Math.floor(innerWidth * dpr);
@@ -75,7 +96,8 @@
     const padY = r.h * 0.06;
     const top = r.y + padY;
     const height = (r.h - padY * 2) * state.scale;
-    const y = (p) => top + state.offsetY + ((state.hi - p) / (state.hi - state.lo)) * height;
+    const scaleY = visiblePriceScale();
+    const y = (p) => scaleY ? scaleY(p) : top + state.offsetY + ((state.hi - p) / (state.hi - state.lo)) * height;
     const left = r.x + 8;
     const right = r.x + r.w - 8;
     const tone = (t) => (t === "buy" ? "#0f9d58" : t === "sell" ? "#d93025" : "#8a8f98");
@@ -93,7 +115,7 @@
       ctx.fillText(text, x + 5, yy + 1);
     };
 
-    for (const m of state.marks) {
+    for (const m of state.marks.slice(0, 8)) {
       if (m.kind === "zone") {
         const y1 = y(Math.max(m.from, m.to));
         const y2 = y(Math.min(m.from, m.to));
@@ -107,7 +129,7 @@
         ctx.lineWidth = 1;
         ctx.strokeRect(left, y1, right - left, Math.max(2, y2 - y1));
         ctx.setLineDash([]);
-        label(m.label, left + 4, y1 + 9, tone(m.tone));
+        label(`${state.timeframe ? state.timeframe.toUpperCase() + " · " : ""}${m.label}`, left + 4, y1 + 9, tone(m.tone));
       } else {
         const yy = y(m.level);
         if (!isFinite(yy)) continue;
@@ -120,7 +142,8 @@
         ctx.lineTo(right, yy);
         ctx.stroke();
         ctx.setLineDash([]);
-        const text = m.kind === "sweep" ? `${m.label}` : `${m.label} ${m.level}`;
+        const prefix = state.timeframe ? `${state.timeframe.toUpperCase()} · ` : "";
+        const text = m.kind === "sweep" ? `${prefix}${m.label}` : `${prefix}${m.label} ${m.level}`;
         label(text, right - ctx.measureText(text).width - 14, yy, color);
       }
     }
@@ -157,9 +180,12 @@
     state.lo = Number(msg.lo);
     state.hi = Number(msg.hi);
     state.bias = msg.bias ?? null;
+    state.timeframe = msg.timeframe ?? null;
     state.showSession = Boolean(msg.showSession);
     state.offsetY = 0;
     state.scale = 1;
+    const title = bar.querySelector('[data-label]');
+    if (title) title.textContent = `Jenvu · ${state.timeframe ? String(state.timeframe).toUpperCase() : "marks"}`;
     draw();
     reply?.({ ok: true, count: state.marks.length });
     return true;
