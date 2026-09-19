@@ -16,7 +16,7 @@ export function getPlanCapabilities(planId: string): PlanCapabilities {
     extensionAi: paid,
     primaryAnalysis: paid,
     seniorReview: senior,
-    multiPairScanner: senior,
+    multiPairScanner: paid,
     customAlertRules: senior,
     priorityDeskSupport: plan === 'ultra',
   }
