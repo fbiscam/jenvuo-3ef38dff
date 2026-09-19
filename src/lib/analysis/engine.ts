@@ -82,33 +82,38 @@ export function findSwings(candles: Candle[], lookback = 3): Swing[] {
 }
 
 export function detectStructure(candles: Candle[], swings: Swing[]): { events: StructureEvent[]; trend: TFAnalysis["trend"] } {
-  const events: StructureEvent[] = [];
-  if (swings.length < 4) return { events, trend: "ranging" };
+  if (swings.length < 4) return { events: [], trend: "ranging" };
+  const breakCandidates: Array<Omit<StructureEvent, "kind">> = [];
 
-  let trend: TFAnalysis["trend"] = "ranging";
-  let lastHigh: Swing | null = null;
-  let lastLow: Swing | null = null;
+  // A swing is structure only after a later candle CLOSES through it. The old
+  // implementation treated a newer higher-high/lower-low swing as the break,
+  // which promoted wick raids and still-forming pivots into false BOS/CHoCH.
+  for (const swing of swings) {
+    const breakingIndex = candles.findIndex((candle, index) => {
+      if (index <= swing.i + 3) return false;
+      return swing.kind === "high" ? candle.c > swing.price : candle.c < swing.price;
+    });
+    if (breakingIndex < 0) continue;
+    breakCandidates.push({
+      dir: swing.kind === "high" ? "bullish" : "bearish",
+      fromTime: swing.t,
+      toTime: Math.floor(candles[breakingIndex].t / 1000),
+      price: swing.price,
+    });
+  }
+
+  breakCandidates.sort((a, b) => a.toTime - b.toTime || a.fromTime - b.fromTime);
+  const events: StructureEvent[] = [];
   let lastTrend: "bullish" | "bearish" | "ranging" = "ranging";
 
-  for (const s of swings) {
-    if (s.kind === "high") {
-      if (lastHigh && s.price > lastHigh.price) {
-        const kind = lastTrend === "bearish" ? "CHoCH" : "BOS";
-        events.push({ kind, dir: "bullish", fromTime: lastHigh.t, toTime: s.t, price: s.price });
-        lastTrend = "bullish";
-      }
-      lastHigh = s;
-    } else {
-      if (lastLow && s.price < lastLow.price) {
-        const kind = lastTrend === "bullish" ? "CHoCH" : "BOS";
-        events.push({ kind, dir: "bearish", fromTime: lastLow.t, toTime: s.t, price: s.price });
-        lastTrend = "bearish";
-      }
-      lastLow = s;
-    }
+  for (const candidate of breakCandidates) {
+    const previous = events[events.length - 1];
+    if (previous?.dir === candidate.dir && previous.toTime === candidate.toTime) continue;
+    const kind = lastTrend !== "ranging" && lastTrend !== candidate.dir ? "CHoCH" : "BOS";
+    events.push({ ...candidate, kind });
+    lastTrend = candidate.dir;
   }
-  trend = lastTrend;
-  return { events, trend };
+  return { events, trend: lastTrend };
 }
 
 // ---------- FVG ----------
@@ -120,7 +125,7 @@ export function detectFVGs(candles: Candle[], currentPrice: number): FVG[] {
     // Bullish FVG: a.high < c.low → gap between
     if (a.h < c.l) {
       const lo = a.h, hi = c.l;
-      const mitigated = candles.slice(i + 1).some(k => k.l <= lo);
+      const mitigated = candles.slice(i + 1).some(k => k.l <= hi);
       out.push({
         fromTime: Math.floor(a.t / 1000),
         toTime: Math.floor(c.t / 1000),
@@ -130,7 +135,7 @@ export function detectFVGs(candles: Candle[], currentPrice: number): FVG[] {
     // Bearish FVG: a.low > c.high
     if (a.l > c.h) {
       const lo = c.h, hi = a.l;
-      const mitigated = candles.slice(i + 1).some(k => k.h >= hi);
+      const mitigated = candles.slice(i + 1).some(k => k.h >= lo);
       out.push({
         fromTime: Math.floor(a.t / 1000),
         toTime: Math.floor(c.t / 1000),
@@ -158,7 +163,7 @@ export function detectOBs(candles: Candle[], structure: StructureEvent[]): OB[] 
       for (let k = idx - 1; k >= Math.max(0, idx - 8); k--) {
         if (candles[k].c < candles[k].o) {
           const lo = candles[k].l, hi = candles[k].o;
-          const mitigated = candles.slice(idx + 1).some(c => c.l <= lo);
+          const mitigated = candles.slice(idx + 1).some(c => c.l <= hi);
           out.push({
             fromTime: Math.floor(candles[k].t / 1000),
             toTime: Math.floor(candles[Math.min(candles.length - 1, k + 3)].t / 1000),
@@ -171,7 +176,7 @@ export function detectOBs(candles: Candle[], structure: StructureEvent[]): OB[] 
       for (let k = idx - 1; k >= Math.max(0, idx - 8); k--) {
         if (candles[k].c > candles[k].o) {
           const lo = candles[k].o, hi = candles[k].h;
-          const mitigated = candles.slice(idx + 1).some(c => c.h >= hi);
+          const mitigated = candles.slice(idx + 1).some(c => c.h >= lo);
           out.push({
             fromTime: Math.floor(candles[k].t / 1000),
             toTime: Math.floor(candles[Math.min(candles.length - 1, k + 3)].t / 1000),
@@ -193,28 +198,53 @@ export function buildLiquidityPools(htf: Candle[], ltf: Candle[]): LiquidityPool
   const last = ltf[ltf.length - 1].c;
   const tol = last * 0.0005;
 
-  // Prior day (last 24 1H candles)
-  const prevDay = htf.slice(-24);
-  const pdh = Math.max(...prevDay.map(c => c.h));
-  const pdl = Math.min(...prevDay.map(c => c.l));
-  out.push({ price: pdh, side: "buy", label: "PDH", swept: ltf.slice(-6).some(c => c.h >= pdh - tol) });
-  out.push({ price: pdl, side: "sell", label: "PDL", swept: ltf.slice(-6).some(c => c.l <= pdl + tol) });
+  // Previous UTC day only. Including today's candles made the current high/low
+  // both define and "sweep" the same pool.
+  const latestTimestamp = Math.max(htf[htf.length - 1]?.t ?? 0, ltf[ltf.length - 1]?.t ?? 0);
+  const todayStart = new Date(latestTimestamp); todayStart.setUTCHours(0, 0, 0, 0);
+  const previousStart = todayStart.getTime() - 24 * 3600_000;
+  const prevDay = htf.filter(c => c.t >= previousStart && c.t < todayStart.getTime());
+  const todayLtf = ltf.filter(c => c.t >= todayStart.getTime());
+  if (prevDay.length) {
+    const pdh = Math.max(...prevDay.map(c => c.h));
+    const pdl = Math.min(...prevDay.map(c => c.l));
+    out.push({ price: pdh, side: "buy", label: "PDH", swept: todayLtf.some(c => c.h > pdh + tol) });
+    out.push({ price: pdl, side: "sell", label: "PDL", swept: todayLtf.some(c => c.l < pdl - tol) });
+  }
 
   // Asia range (00-07 UTC of today)
-  const today = new Date(); today.setUTCHours(0, 0, 0, 0);
-  const asia = htf.filter(c => c.t >= today.getTime() && c.t < today.getTime() + 7 * 3600_000);
+  const today = new Date(todayStart); 
+  const asiaEnd = today.getTime() + 7 * 3600_000;
+  const asia = htf.filter(c => c.t >= today.getTime() && c.t < asiaEnd);
+  const postAsia = ltf.filter(c => c.t >= asiaEnd);
   if (asia.length) {
     const ah = Math.max(...asia.map(c => c.h));
     const al = Math.min(...asia.map(c => c.l));
-    out.push({ price: ah, side: "buy", label: "Asia High", swept: ltf.slice(-12).some(c => c.h >= ah - tol) });
-    out.push({ price: al, side: "sell", label: "Asia Low", swept: ltf.slice(-12).some(c => c.l <= al + tol) });
+    out.push({ price: ah, side: "buy", label: "Asia High", swept: postAsia.some(c => c.h > ah + tol) });
+    out.push({ price: al, side: "sell", label: "Asia Low", swept: postAsia.some(c => c.l < al - tol) });
   }
 
-  // HTF swing extremes — dynamic swept check (was hard-coded false, causing false no_sweep vetoes)
-  const sh = Math.max(...htf.slice(-80).map(c => c.h));
-  const sl = Math.min(...htf.slice(-80).map(c => c.l));
-  out.push({ price: sh, side: "buy",  label: "HTF Swing High", swept: ltf.slice(-24).some(c => c.h >= sh - tol) });
-  out.push({ price: sl, side: "sell", label: "HTF Swing Low",  swept: ltf.slice(-24).some(c => c.l <= sl + tol) });
+  // Use confirmed older swings and check only candles formed after each swing.
+  // Comparing a range extreme with the same range always marked it as swept.
+  const htfSwings = findSwings(htf, 3);
+  const swingHigh = [...htfSwings].reverse().find(s => s.kind === "high");
+  const swingLow = [...htfSwings].reverse().find(s => s.kind === "low");
+  if (swingHigh) {
+    out.push({
+      price: swingHigh.price,
+      side: "buy",
+      label: "HTF Swing High",
+      swept: ltf.some(c => c.t > swingHigh.t * 1000 && c.h > swingHigh.price + tol),
+    });
+  }
+  if (swingLow) {
+    out.push({
+      price: swingLow.price,
+      side: "sell",
+      label: "HTF Swing Low",
+      swept: ltf.some(c => c.t > swingLow.t * 1000 && c.l < swingLow.price - tol),
+    });
+  }
 
   return out;
 }

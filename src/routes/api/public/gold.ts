@@ -31,6 +31,20 @@ type Body = {
 };
 
 const TF = new Set(["5m", "15m", "1h", "4h", "1d"]);
+const TF_MS: Record<string, number> = {
+  "5m": 5 * 60_000,
+  "15m": 15 * 60_000,
+  "1h": 60 * 60_000,
+  "4h": 4 * 60 * 60_000,
+  "1d": 24 * 60 * 60_000,
+};
+
+function closedCandles<T extends { t: number }>(candles: T[], timeframe: string): T[] {
+  const duration = TF_MS[timeframe];
+  if (!duration) return candles;
+  const now = Date.now();
+  return candles.filter((candle) => candle.t + duration <= now);
+}
 
 const EXTENSION_SIGNAL_OUTPUT_CONTRACT = `Analyze every supplied ICT/SMC factor internally, but expose only this compact trader-facing format. Do not add headings, disclaimers, confidence, grade, RR, model names, or extra paragraphs.
 
@@ -187,17 +201,18 @@ function ema(values: number[], period: number): number {
 
 async function loadMarket(symbol: string, timeframe: string) {
   const inst = resolveInstrument(symbol);
-  const [candles, fiveMinute, hourly, fourHourly, daily] = await Promise.all([
+  const [rawSelected, rawFiveMinute, rawHourly, rawFourHourly, rawDaily] = await Promise.all([
     fetchInstrumentCandles(inst, timeframe),
-    timeframe === "5m" ? Promise.resolve(null) : fetchInstrumentCandles(inst, "5m").catch(() => null),
-    timeframe === "1h"
-      ? Promise.resolve(null)
-      : fetchInstrumentCandles(inst, "1h").catch(() => null),
-    timeframe === "4h"
-      ? Promise.resolve(null)
-      : fetchInstrumentCandles(inst, "4h").catch(() => null),
-    timeframe === "1d" ? Promise.resolve(null) : fetchInstrumentCandles(inst, "1d").catch(() => null),
+    fetchInstrumentCandles(inst, "5m"),
+    fetchInstrumentCandles(inst, "1h"),
+    fetchInstrumentCandles(inst, "4h"),
+    fetchInstrumentCandles(inst, "1d"),
   ]);
+  const candles = closedCandles(rawSelected, timeframe);
+  const fiveMinute = closedCandles(rawFiveMinute, "5m");
+  const hourly = closedCandles(rawHourly, "1h");
+  const fourHourly = closedCandles(rawFourHourly, "4h");
+  const daily = closedCandles(rawDaily, "1d");
   if (!candles || candles.length < 5) throw new Error("Live candles unavailable right now.");
   const requiredFrames = [timeframe, "5m", "1h", "4h", "1d"];
   if (requiredFrames.some((frame) => hasSyntheticInstrumentCandles(inst, frame))) {
@@ -218,9 +233,12 @@ async function loadMarket(symbol: string, timeframe: string) {
   const swingHigh = Math.max(...swingWindow.map((c: any) => Number(c.high ?? c.h)));
   const swingLow = Math.min(...swingWindow.map((c: any) => Number(c.low ?? c.l)));
   const selected = analyzeTF(candles);
-  const h1 = analyzeTF(hourly?.length ? hourly : candles);
-  const h4 = analyzeTF(fourHourly?.length ? fourHourly : hourly?.length ? hourly : candles);
-  const liquidity = buildLiquidityPools(hourly?.length ? hourly : candles, candles);
+  if ([fiveMinute, hourly, fourHourly, daily].some((frame) => frame.length < 20)) {
+    throw new Error("Verified live multi-timeframe candles are incomplete; analysis is paused rather than reusing another timeframe.");
+  }
+  const h1 = analyzeTF(hourly);
+  const h4 = analyzeTF(fourHourly);
+  const liquidity = buildLiquidityPools(hourly, candles);
   const freshFvgs = selected.fvgs.slice(0, 3);
   const freshObs = selected.obs.slice(0, 3);
   const marks = [
@@ -280,10 +298,10 @@ async function loadMarket(symbol: string, timeframe: string) {
   return {
     inst,
     candles,
-    fiveMinute: fiveMinute?.length ? fiveMinute : candles,
-    hourly: hourly?.length ? hourly : candles,
-    fourHourly: fourHourly?.length ? fourHourly : hourly?.length ? hourly : candles,
-    daily: daily?.length ? daily : fourHourly?.length ? fourHourly : candles,
+    fiveMinute,
+    hourly,
+    fourHourly,
+    daily,
     ticker: { symbol: inst.display, price: last, changePercent },
     chart: recent.map((c: any) => ({
       o: Number(c.open ?? c.o),
