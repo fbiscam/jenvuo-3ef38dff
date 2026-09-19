@@ -6,6 +6,7 @@ import {
 } from "@/lib/extension-auth.server";
 import {
   resolveInstrument,
+  isSupportedTradeableSymbol,
   fetchInstrumentCandles,
   fetchLiveInstrumentTick,
 } from "@/lib/gold-analysis.functions";
@@ -15,9 +16,7 @@ import { runExtensionDesk, RULES_PRIMARY_MODEL } from "@/lib/analysis/extension-
 import {
   QUERY_RELEVANCE_INSTRUCTIONS,
   XAU_DESK_CORE_INSTRUCTIONS,
-  XAU_SENIOR_REVIEW_INSTRUCTIONS,
 } from "@/lib/analysis/agent-instructions";
-import { isGoldSymbol } from "@/lib/plan-entitlements";
 import { build15mCandleForecast, formatForecast } from "@/lib/analysis/candle-forecast";
 
 type Body = {
@@ -30,7 +29,7 @@ type Body = {
   chartImage?: string;
 };
 
-const TF = new Set(["15m", "1h", "4h", "1d"]);
+const TF = new Set(["5m", "15m", "1h", "4h", "1d"]);
 
 const EXTENSION_SIGNAL_OUTPUT_CONTRACT = `Analyze every supplied ICT/SMC factor internally, but expose only this compact trader-facing format. Do not add headings, disclaimers, confidence, grade, RR, model names, or extra paragraphs.
 
@@ -187,14 +186,16 @@ function ema(values: number[], period: number): number {
 
 async function loadMarket(symbol: string, timeframe: string) {
   const inst = resolveInstrument(symbol);
-  const [candles, hourly, fourHourly] = await Promise.all([
+  const [candles, fiveMinute, hourly, fourHourly, daily] = await Promise.all([
     fetchInstrumentCandles(inst, timeframe),
+    timeframe === "5m" ? Promise.resolve(null) : fetchInstrumentCandles(inst, "5m").catch(() => null),
     timeframe === "1h"
       ? Promise.resolve(null)
       : fetchInstrumentCandles(inst, "1h").catch(() => null),
     timeframe === "4h"
       ? Promise.resolve(null)
       : fetchInstrumentCandles(inst, "4h").catch(() => null),
+    timeframe === "1d" ? Promise.resolve(null) : fetchInstrumentCandles(inst, "1d").catch(() => null),
   ]);
   if (!candles || candles.length < 5) throw new Error("Live candles unavailable right now.");
   const tick = await fetchLiveInstrumentTick(inst).catch(() => null);
@@ -274,8 +275,10 @@ async function loadMarket(symbol: string, timeframe: string) {
   return {
     inst,
     candles,
+    fiveMinute: fiveMinute?.length ? fiveMinute : candles,
     hourly: hourly?.length ? hourly : candles,
     fourHourly: fourHourly?.length ? fourHourly : hourly?.length ? hourly : candles,
+    daily: daily?.length ? daily : fourHourly?.length ? fourHourly : candles,
     ticker: { symbol: inst.display, price: last, changePercent },
     chart: recent.map((c: any) => ({
       o: Number(c.open ?? c.o),
