@@ -80,6 +80,46 @@ function timeframeSeconds(timeframe: string): number {
   return ({ "5m": 300, "15m": 900, "1h": 3600, "4h": 14400, "1d": 86400 } as Record<string, number>)[timeframe] ?? 900;
 }
 
+export function detectRecentSweepReclaim(
+  candles: Candle[],
+  pools: Array<{ price: number; side: "buy" | "sell"; label: string }>,
+  direction: "BUY" | "SELL" | "WAIT",
+  maxBars = 12,
+): { confirmed: boolean; sweptAt: number; detail: string } {
+  if (direction === "WAIT" || candles.length < 3) {
+    return { confirmed: false, sweptAt: 0, detail: "No candidate direction for a sweep-reclaim sequence" };
+  }
+  const wantedSide = direction === "BUY" ? "sell" : "buy";
+  const recentStart = Math.max(0, candles.length - maxBars);
+  const toleranceBase = candles[candles.length - 1]?.c ?? 0;
+  const tolerance = toleranceBase * 0.00015;
+  const candidates = pools.filter((pool) => pool.side === wantedSide);
+
+  for (let index = candles.length - 1; index >= recentStart; index -= 1) {
+    const candle = candles[index];
+    if (!candle) continue;
+    for (const pool of candidates) {
+      const reclaimed =
+        direction === "BUY"
+          ? candle.l < pool.price - tolerance && candle.c > pool.price
+          : candle.h > pool.price + tolerance && candle.c < pool.price;
+      if (reclaimed) {
+        return {
+          confirmed: true,
+          sweptAt: Math.floor(candle.t / 1000),
+          detail: `${pool.label} was swept and reclaimed ${candles.length - index} closed candle(s) ago`,
+        };
+      }
+    }
+  }
+
+  return {
+    confirmed: false,
+    sweptAt: 0,
+    detail: `No fresh ${direction === "BUY" ? "sell-side" : "buy-side"} liquidity sweep closed back through its level`,
+  };
+}
+
 export function runExtensionDesk(input: DeskInput): DeskResult {
   const price = (value: number) => value.toFixed(input.decimals);
   const selected = analyzeTF(input.selected);
@@ -100,6 +140,8 @@ export function runExtensionDesk(input: DeskInput): DeskResult {
   const candidateDirection = trade.direction;
   const zone = trade.zone;
   const displacement = computeDisplacement(input.h1, eventsH1);
+  const executionDisplacement = computeDisplacement(input.selected, eventsSelected);
+  const m5Displacement = computeDisplacement(input.m5, eventsM5);
   const rejection = detectRejectionConfirmation(input.selected, zone, candidateDirection);
   const confluence = detectZoneConfluence(selected, candidateDirection);
   const equalHL = detectEqualHighsLows(input.selected, selected.swings, input.livePrice);
@@ -149,10 +191,19 @@ export function runExtensionDesk(input: DeskInput): DeskResult {
   const m5LastClosedAt = Math.floor((input.m5[input.m5.length - 1]?.t ?? 0) / 1000);
   const latestSelectedTrigger = [...eventsSelected].reverse().find((event) => event.dir === wantedStructure);
   const latestM5Trigger = [...eventsM5].reverse().find((event) => event.dir === wantedStructure);
+  const selectedSweep = detectRecentSweepReclaim(input.selected, pools, candidateDirection, 10);
+  const m5Sweep = detectRecentSweepReclaim(input.m5, pools, candidateDirection, 12);
+  const executionSweep = selectedSweep.confirmed ? selectedSweep : m5Sweep;
+  const selectedTriggerAfterSweep =
+    (latestSelectedTrigger?.toTime ?? 0) >= executionSweep.sweptAt &&
+    (latestSelectedTrigger?.toTime ?? 0) >= selectedLastClosedAt - timeframeSeconds(input.timeframe) * 4;
+  const m5TriggerAfterSweep =
+    (latestM5Trigger?.toTime ?? 0) >= executionSweep.sweptAt &&
+    (latestM5Trigger?.toTime ?? 0) >= m5LastClosedAt - 5 * 60 * 6;
   const freshExecutionTrigger =
     candidateDirection !== "WAIT" &&
-    ((latestSelectedTrigger?.toTime ?? 0) >= selectedLastClosedAt - timeframeSeconds(input.timeframe) * 8 ||
-      (latestM5Trigger?.toTime ?? 0) >= m5LastClosedAt - 5 * 60 * 12);
+    executionSweep.confirmed &&
+    (selectedTriggerAfterSweep || m5TriggerAfterSweep);
   // A veteran desk does not look for inducement on one chart only: internal
   // liquidity is engineered on the execution frame, refined on M5 and often
   // set up on H1. Accept the first verified sweep found across that ladder,
@@ -260,6 +311,8 @@ export function runExtensionDesk(input: DeskInput): DeskResult {
 
   const hardVetoReasons: string[] = [];
   const reviewWarnings: string[] = [];
+  const wantedTrend = candidateDirection === "BUY" ? "bullish" : "bearish";
+  const oppositeTrend = candidateDirection === "BUY" ? "bearish" : "bullish";
   if (candidateDirection === "WAIT") hardVetoReasons.push(trade.reason);
   if (scored.vetos.length) hardVetoReasons.push(...scored.vetos.map((veto) => veto.reason));
   if (candidateDirection !== "WAIT" && trade.rr < 1.5)
@@ -269,12 +322,24 @@ export function runExtensionDesk(input: DeskInput): DeskResult {
   const htfConflicts = mtfStructure.conflicts.filter((conflict) => /^(D1|H4|H1)\b/.test(conflict));
   if (!mtfStructure.aligned && htfConflicts.length >= 2)
     hardVetoReasons.push(`Multi-timeframe BOS/CHoCH conflict: ${htfConflicts.join(", ")}.`);
+  if (candidateDirection !== "WAIT" && h4.trend !== wantedTrend)
+    hardVetoReasons.push(`H4 structure is ${h4.trend}; it does not confirm the ${candidateDirection} draw.`);
+  if (candidateDirection !== "WAIT" && (d1.trend === oppositeTrend || h1.trend === oppositeTrend))
+    hardVetoReasons.push(`Higher-timeframe conflict: D1 is ${d1.trend} and H1 is ${h1.trend}.`);
   if (!inducement.detected && !turtleSoup.triggered)
     hardVetoReasons.push("No verified inducement or failed-sweep reversal before the proposed entry.");
+  if (!executionSweep.confirmed)
+    hardVetoReasons.push(executionSweep.detail);
   if (!keyLevel.aligned)
     hardVetoReasons.push("The proposed entry is not backed by repeated candle-derived support/resistance.");
   if (!freshExecutionTrigger)
-    hardVetoReasons.push("No fresh close-confirmed BOS/CHoCH trigger exists on the execution timeframe or M5.");
+    hardVetoReasons.push("No fresh close-confirmed BOS/CHoCH occurred after the liquidity sweep on the execution timeframe or M5.");
+  if (!executionDisplacement.passed && !m5Displacement.passed)
+    hardVetoReasons.push("The execution timeframe and M5 both lack directional displacement after the setup formed.");
+  if (candidateDirection !== "WAIT" && trade.entryType !== "MARKET")
+    hardVetoReasons.push("The proposed POI has not been tapped; this remains a pending idea, not an executable entry.");
+  if (candidateDirection !== "WAIT" && !rejection.confirmed && !turtleSoup.triggered)
+    hardVetoReasons.push("Price has not printed a closed rejection confirmation at the proposed entry zone.");
   if (!regime.favorable)
     reviewWarnings.push(regime.warning ?? `${regime.regime} conditions reduce execution quality`);
   if (scored.score < 75)
@@ -323,6 +388,7 @@ export function runExtensionDesk(input: DeskInput): DeskResult {
     `STRUCTURE: D1 ${d1.trend}, H4 ${h4.trend}, H1 ${h1.trend}, ${input.timeframe.toUpperCase()} ${selected.trend}, M5 ${m5.trend}. ${selected.lastStructure ? `${selected.lastStructure.kind} ${selected.lastStructure.dir} @ ${price(selected.lastStructure.price)}.` : "No recent confirmed BOS/CHoCH."}`,
     `STRUCTURE SEQUENCE: ${mtfStructure.detail}`,
     `INDUCEMENT: ${inducement.detail}`,
+    `EXECUTION SEQUENCE: ${executionSweep.detail}. ${freshExecutionTrigger ? "A later close-confirmed BOS/CHoCH validates the sequence." : "No later close-confirmed BOS/CHoCH validates the sequence."}`,
     `SUPPORT/RESISTANCE: ${keyLevel.detail}`,
     `LIQUIDITY: ${
       pools

@@ -105,3 +105,4 @@
 - [x] Fix false structure/sweep evidence, require distinct closed multi-timeframe candles, and auto-detect the TradingView timeframe; release v1.9.23
 - [x] Add guided D1-to-M5 chart marking, captured timeframe evidence, and release v1.9.24
 - [x] Honor requested ICT/SMC concepts on every detected TradingView timeframe and release v1.9.25
+- [x] Require fresh sweep-reclaim, post-sweep structure, execution displacement, HTF agreement, and confirmed zone reaction before issuing entries
