@@ -102,4 +102,4 @@
 - [x] Add deterministic inducement, support/resistance, and cross-timeframe structure gates; test BTCUSD; release extension v1.9.19
 - [x] Retire automated scanning (cron + admin monitor) and upgrade multi-timeframe inducement detection; release extension v1.9.20
 - [x] Enforce OmniRoute-only extension analysis/chat with tested Sonnet 4.5 primary and Sonnet 4 fallback; release v1.9.22
-- [x] Fix false structure/sweep evidence, require distinct closed multi-timeframe candles, and auto-detect the TradingView timeframe
+- [x] Fix false structure/sweep evidence, require distinct closed multi-timeframe candles, and auto-detect the TradingView timeframe; release v1.9.23
