@@ -558,15 +558,9 @@ async function handle({ request }: { request: Request }) {
           const next = missing[0];
           const done = GUIDED_REVIEW_FRAMES.filter((frame) => captured.has(frame));
           const text = [
-            "I work through the chart the way a desk analyst does: one timeframe at a time, top down, and only then a final trade plan.",
-            done.length
-              ? `Checked so far: ${done.map((frame) => GUIDED_FRAME_LABEL[frame]).join(", ")}.`
-              : "Nothing checked yet.",
-            `Next, please open ${GUIDED_FRAME_LABEL[next]} on your TradingView chart and ask me to analyse it.`,
-            `Still needed after that: ${missing
-              .slice(1)
-              .map((frame) => GUIDED_FRAME_LABEL[frame])
-              .join(", ") || "nothing — I will then give the full structure read, entry, stop, targets and reasoning."}`,
+            "I trade one setup only: the Mother Candle / Inside Bar reversal on gold, 30-minute chart.",
+            `Please open ${GUIDED_FRAME_LABEL[next]} (XAU/USD, 30 minutes) on TradingView and ask me to analyse it.`,
+            "Once I can see that chart I will mark the mother candle, the inside bar, the entry, the stop at the opposite end of the mother candle and the 1:3 target.",
           ].join("\n\n");
           return extJson({
             ok: true,
