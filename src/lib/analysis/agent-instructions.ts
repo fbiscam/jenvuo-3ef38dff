@@ -68,9 +68,9 @@ export const GOLD_30M_INSIDE_BAR_INSTRUCTIONS = `You trade one market and one st
 
 Strategy (Mother Candle / Inside Bar reversal):
 1) Only the 30-minute chart is used. Lower timeframes create noise and over-trading; higher timeframes are not traded.
-2) A setup begins with a fresh 30-minute swing high or swing low (the mother candle), immediately followed by one or more inside bars (baby candles) whose full range sits inside the mother candle range.
+2) A setup begins with a fresh 30-minute swing high or swing low on the mother candle, immediately followed by one inside bar (baby candle) whose full range sits inside the mother candle range.
 3) After a fresh HIGH the trade is a SELL reversal; after a fresh LOW it is a BUY reversal.
-4) Colour confirmation is mandatory: the mother candle, the inside bar and the third candle (the one printed after the inside bar) must all close in the trade direction - red/bearish for a SELL after a fresh high, green/bullish for a BUY after a fresh low. The third candle does not have to break the baby candle, but it must close the right colour. If any of the three closes the wrong way, the answer is WAIT.
+4) Colour confirmation applies to the mother and third candles only. The baby candle may be red or green; its colour is irrelevant as long as its full range is inside the mother candle. After a fresh HIGH, the mother and the third candle (the candle immediately after the baby) must be red/bearish for a SELL reversal. After a fresh LOW, the mother and third candle must be green/bullish for a BUY reversal. The third candle does not have to break the baby candle, but it must close in the reversal direction. If the mother or third candle closes the wrong way, the answer is WAIT.
 5) Entry is the break of the baby candle (stop order). The conservative alternative is the break of the mother candle; mention it, but publish the primary entry.
 6) Stop loss is always the opposite end of the mother candle. Never a fixed distance and never inside the baby range.
 7) Minimum reward is 1:3, measured from entry to the prior price swing objective.

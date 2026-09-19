@@ -130,19 +130,16 @@ export function runInsideBarDesk(input: {
     return empty("Live gold price could not be verified.");
   }
 
-  // Search backwards for the most recent live mother/inside-bar formation.
+  // Search backwards for the most recent complete three-candle formation:
+  // mother at the fresh extreme, one inside bar, then one confirmation candle.
   let motherIndex = -1;
   let lastBabyIndex = -1;
-  for (let i = candles.length - 2; i >= FRESH_LOOKBACK; i--) {
+  for (let i = candles.length - 3; i >= FRESH_LOOKBACK; i--) {
     const mother = candles[i] as IbCandle;
     const next = candles[i + 1] as IbCandle;
     if (!isInside(mother, next)) continue;
-    let babyEnd = i + 1;
-    while (babyEnd + 1 < candles.length && isInside(mother, candles[babyEnd + 1] as IbCandle)) {
-      babyEnd += 1;
-    }
     motherIndex = i;
-    lastBabyIndex = babyEnd;
+    lastBabyIndex = i + 1;
     break;
   }
 
@@ -151,11 +148,6 @@ export function runInsideBarDesk(input: {
   }
 
   const mother = candles[motherIndex] as IbCandle;
-  // The candle printed after the inside bar is the confirmation candle, even
-  // when it also happens to sit inside the mother range.
-  if (lastBabyIndex === candles.length - 1 && lastBabyIndex > motherIndex + 1) {
-    lastBabyIndex -= 1;
-  }
   const babies = candles.slice(motherIndex + 1, lastBabyIndex + 1);
   const babyHigh = Math.max(...babies.map((c) => c.h));
   const babyLow = Math.min(...babies.map((c) => c.l));
@@ -196,8 +188,8 @@ export function runInsideBarDesk(input: {
 
   const direction: "BUY" | "SELL" = freshLow ? "BUY" : "SELL";
 
-  // Candle-direction confirmation chain: the mother candle, the inside bar and
-  // the candle after the inside bar must all close in the trade direction.
+  // The mother must show the reversal direction. The baby candle's colour is
+  // irrelevant. Only the third candle must confirm the same reversal direction.
   const bodyDir = (c: IbCandle): "BUY" | "SELL" | "FLAT" =>
     c.c > c.o ? "BUY" : c.c < c.o ? "SELL" : "FLAT";
   const colourWord = direction === "BUY" ? "bullish (green)" : "bearish (red)";
@@ -207,10 +199,6 @@ export function runInsideBarDesk(input: {
       `The candle after the fresh ${freshLow ? "low" : "high"} is not ${colourWord}, so the reversal is not confirmed.`,
       basePattern,
     );
-  }
-  const lastBaby = candles[lastBabyIndex] as IbCandle;
-  if (bodyDir(lastBaby) !== direction) {
-    return empty(`The inside bar is not ${colourWord}, so the reversal is not confirmed.`, basePattern);
   }
   const confirmation = candles[lastBabyIndex + 1] as IbCandle | undefined;
   if (!confirmation) {
@@ -268,8 +256,8 @@ export function runInsideBarDesk(input: {
   }
 
   reasons.push(
-    `Fresh 30m ${freshLow ? "low" : "high"} at ${(freshLow ? mother.l : mother.h).toFixed(decimals)} followed by ${babies.length} inside bar(s).`,
-    `Mother candle, inside bar and the third candle all closed ${colourWord}.`,
+    `Fresh 30m ${freshLow ? "low" : "high"} at ${(freshLow ? mother.l : mother.h).toFixed(decimals)} followed by an inside bar.`,
+    `The inside bar colour was ignored; the mother and third candle both closed ${colourWord}.`,
     `Stop sits at the opposite end of the mother candle (${sl.toFixed(decimals)}).`,
     `Reward to structure is ${rr.toFixed(2)}R.`,
   );
@@ -278,9 +266,9 @@ export function runInsideBarDesk(input: {
     "GOLD 30M MOTHER / INSIDE BAR ENGINE",
     `Live price: ${price.toFixed(decimals)}`,
     `Mother candle: high ${mother.h.toFixed(decimals)} · low ${mother.l.toFixed(decimals)}`,
-    `Inside bar(s): ${babies.length} · high ${babyHigh.toFixed(decimals)} · low ${babyLow.toFixed(decimals)}`,
+    `Inside bar: high ${babyHigh.toFixed(decimals)} · low ${babyLow.toFixed(decimals)} · colour not used`,
     `Fresh extreme: ${freshLow ? "new swing LOW" : "new swing HIGH"} versus the previous ${FRESH_LOOKBACK} candles`,
-    `Confirmation: mother, inside bar and third candle all ${colourWord}`,
+    `Confirmation: mother and third candle ${colourWord}; inside-bar colour irrelevant`,
     `Bars since the last inside bar closed: ${barsSinceBaby}`,
     `Direction: ${direction} on the break of the inside bar`,
     `Entry (stop order): ${round(entry, decimals).toFixed(decimals)}`,
