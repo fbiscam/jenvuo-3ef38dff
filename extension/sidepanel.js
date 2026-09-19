@@ -1223,7 +1223,7 @@ $("send").onclick = () => {
 const MARK_INTENT =
   /\b(mark|marking|draw|show|highlight|overlay|nishan)\b|mark(?:ing)?\s*(?:karo|kro|kara)|draw\s*kro|dikha\s*do/i;
 const MARK_TOPIC =
-  /\b(fvg|ob|order block|supply|demand|bos|choch|trend|direction|bias|breakout|reversal|confirmation|entry|execution|retest|stop|sl|tp\d?|target|support|resistance|swing high|swing low|liquidity|liq|bsl|ssl|sweep|killzone|kill zone|price action|smc|ict|imbalance|structure)\b/i;
+  /\b(mother|mother candle|inside|inside bar|baby|baby candle|entry|break|stop|sl|tp\d?|target|setup|candle|reversal|chart)\b/i;
 
 function defaultMarkTopics() {
   return new Set(["mother", "inside", "entry", "stop", "target"]);
@@ -1236,54 +1236,25 @@ function withoutTimeframeWords(text) {
     .trim();
 }
 
-function requestedMarkTopics(text, frame) {
-  const topics = new Set();
-  if (/\b(fvg|fair value gap|imbalance)\b/i.test(text)) topics.add("fvg");
-  if (/\b(ob|order block|supply|demand|supply and demand|supply & demand)\b/i.test(text)) topics.add("ob");
-  if (/\b(bos|choch|ch\.o\.ch|break of structure|change of character|structure|trend|breakout|reversal)\b/i.test(text))
-    topics.add("structure");
-  if (/\b(direction|bias)\b/i.test(text)) topics.add("direction");
-  if (/\b(liquidity|liq|bsl|ssl)\b/i.test(text)) topics.add("liquidity");
-  if (/\b(sweep|stop raid)\b/i.test(text)) topics.add("sweep");
-  if (/\b(support|resistance)\b/i.test(text)) topics.add("levels");
-  if (/\b(swing high|swing low)\b/i.test(text)) topics.add("swings");
-  if (/\b(confirmation|confirmations)\b/i.test(text)) topics.add("confirmation");
-  if (/\b(retest|breakout retest)\b/i.test(text)) topics.add("retest");
-  if (/\b(entry|execution|stop|stop loss|sl|tp\d?|take profit|target)\b/i.test(text)) topics.add("execution");
-  if (/\b(killzone|kill zone|session)\b/i.test(text)) topics.add("session");
-  if (/\b(smc|ict|everything|all|sab|sari|saari)\b/i.test(text)) topics.add("all");
-  return topics.size ? topics : defaultMarkTopics();
+function requestedMarkTopics() {
+  // One strategy, one mark set: mother candle, inside bar, entry, stop, targets.
+  return defaultMarkTopics();
 }
 
-function markMatchesTopic(mark, topics) {
-  if (topics.has("all")) return true;
-  const label = String(mark.label || "").toLowerCase();
-  if (topics.has("fvg") && label.includes("fvg")) return true;
-  if (topics.has("ob") && /\bob\b|order block/.test(label)) return true;
-  if (topics.has("structure") && mark.kind === "event") return true;
-  if (topics.has("liquidity") && /bsl|ssl|liquidity/.test(label)) return true;
-  if (topics.has("sweep") && mark.kind === "sweep") return true;
-  if (topics.has("levels") && /support|resistance/.test(label)) return true;
-  if (topics.has("swings") && /swing high|swing low/.test(label)) return true;
-  if (topics.has("direction") && (mark.kind === "event" || /support|resistance|bsl|ssl/.test(label))) return true;
-  if (topics.has("confirmation") && (mark.kind === "event" || mark.kind === "sweep" || /fvg|\bob\b/.test(label))) return true;
-  if (topics.has("retest") && (mark.kind === "event" || /fvg|\bob\b/.test(label))) return true;
-  if (topics.has("execution") && /entry|stop|tp\d?|target/.test(label)) return true;
-  return false;
+function markMatchesTopic() {
+  return true;
 }
 
 function prioritizeMarks(marks) {
   const rank = (mark) => {
     const label = String(mark?.label || "").toLowerCase();
-    if (mark?.kind === "event") return 0;
-    if (mark?.kind === "sweep") return 1;
-    if (/pdh|pdl|bsl|ssl/.test(label)) return 2;
-    if (/fvg/.test(label)) return 3;
-    if (/\bob\b|order block/.test(label)) return 4;
-    if (/support|resistance/.test(label)) return 5;
-    return 6;
+    if (label.includes("mother")) return 0;
+    if (label.includes("inside")) return 1;
+    if (label.includes("entry")) return 2;
+    if (label.includes("stop")) return 3;
+    return 4;
   };
-  return [...marks].sort((a, b) => rank(a) - rank(b)).slice(0, 8);
+  return [...marks].sort((a, b) => rank(a) - rank(b)).slice(0, 6);
 }
 
 async function markOnPage(text, signal, options = {}) {
@@ -1292,7 +1263,7 @@ async function markOnPage(text, signal, options = {}) {
   if (detectedTimeframe && detectedTimeframe !== targetTimeframe) {
     throw new Error(`Open the ${targetTimeframe.toUpperCase()} chart on TradingView; ${detectedTimeframe.toUpperCase()} is currently open.`);
   }
-  const topics = requestedMarkTopics(text, targetTimeframe);
+  const topics = requestedMarkTopics();
   const needsValidatedPlan = topics.has("execution");
   const d = await post(
     needsValidatedPlan
@@ -1309,7 +1280,7 @@ async function markOnPage(text, signal, options = {}) {
   );
   const availableMarks =
     Array.isArray(d.overlayMarks) && d.overlayMarks.length ? d.overlayMarks : d.marks || [];
-  const marks = prioritizeMarks(availableMarks.filter((mark) => markMatchesTopic(mark, topics)));
+  const marks = prioritizeMarks(availableMarks.filter((mark) => markMatchesTopic()));
   const canRenderWithoutPriceMark = topics.has("session") || topics.has("direction");
   if (!marks.length && !canRenderWithoutPriceMark) {
     throw new Error(
