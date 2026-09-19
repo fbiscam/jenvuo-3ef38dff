@@ -537,13 +537,9 @@ async function handle({ request }: { request: Request }) {
 
       // Guided top-down review: a trade plan is only produced after the user has
       // walked through every required timeframe on their own chart, one by one.
-      const GUIDED_REVIEW_FRAMES = ["1d", "4h", "1h", "15m", "5m"] as const;
+      const GUIDED_REVIEW_FRAMES = ["30m"] as const;
       const GUIDED_FRAME_LABEL: Record<string, string> = {
-        "1d": "Daily (1D)",
-        "4h": "4 hour (4H)",
-        "1h": "1 hour (1H)",
-        "15m": "15 minute (15M)",
-        "5m": "5 minute (5M)",
+        "30m": "30 minute (30M) gold chart",
       };
       if (analysisIntent) {
         // Accept only a chronological D1 -> H4 -> H1 -> M15 -> M5 prefix.
