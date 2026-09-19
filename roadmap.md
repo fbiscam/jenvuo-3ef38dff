@@ -111,3 +111,4 @@
 - [x] Enforce and live-test strict D1-to-M5 chart collection before final SMC trade planning; release extension v1.9.30
 - [x] Replace multi-timeframe SMC engine with the gold-only 30m Mother Candle / Inside Bar strategy; release extension v1.9.31
 - [x] Correct the three-candle reversal sequence so baby colour is ignored and only the mother plus third candle confirm direction; release extension v1.9.33
+- [x] Rebuild the extension ZIP with manifest.json at its root so Chrome can load it; release v1.9.34
