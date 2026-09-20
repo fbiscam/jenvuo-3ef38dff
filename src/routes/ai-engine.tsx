@@ -25,7 +25,7 @@ function AIPage() {
       <section className="space-y-3">
         <H2>Perception Layer</H2>
         <P>
-          The extension captures the active TradingView chart and the user's request in
+          The terminal captures the active TradingView chart and the user's request in
           real time. A lightweight intent resolver separates normal chat from analysis
           requests before sending supported XAU/USD context into the signal pipeline.
         </P>
@@ -51,7 +51,7 @@ function AIPage() {
       <section className="space-y-3">
         <H2>Output Layer</H2>
         <P>
-          The plan appears in the extension chat with clear entry, invalidation and target
+          The plan appears in the terminal chat with clear entry, invalidation and target
           levels. Relevant FVGs, order blocks and liquidity zones can also be marked on the
           TradingView chart when the user explicitly requests analysis.
         </P>

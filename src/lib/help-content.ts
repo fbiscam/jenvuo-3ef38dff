@@ -45,15 +45,15 @@ export const collections: Collection[] = [
         slug: "what-is-jenvu",
         title: "What is Jenvu AI?",
         summary:
-          "Jenvu is an AI-powered TradingView extension focused on XAU/USD and built on ICT and SMC playbooks.",
+          "Jenvu is an AI-powered trading terminal focused on XAU/USD and built on ICT and SMC playbooks.",
         updatedAt: "2026-06-30",
         body: [
-          { type: "p", content: "Jenvu AI is a chart-aware TradingView extension. It analyses market structure, liquidity and bias using institutional ICT (Inner Circle Trader) and SMC (Smart Money Concepts) frameworks, then returns a clear answer with marked zones so you can see exactly what it sees." },
+          { type: "p", content: "Jenvu AI is a chart-aware built-in trading terminal. It analyses market structure, liquidity and bias using institutional ICT (Inner Circle Trader) and SMC (Smart Money Concepts) frameworks, then returns a clear answer with marked zones so you can see exactly what it sees." },
           { type: "p", content: "Think of it as having a senior bullion-desk analyst on call 24/7: ask for a setup on XAU/USD and Jenvu walks the chart aloud, points out the structure shifts, marks the liquidity it's hunting, and only delivers an entry when the confluence meets its A+ bar." },
 
           { type: "h2", content: "What you can do with Jenvu" },
           { type: "ul", items: [
-            "Chat with the extension like a desk analyst directly from your TradingView chart.",
+            "Chat with the terminal like a desk analyst directly from your TradingView chart.",
             "Generate A+ setups on demand for XAU/USD.",
             "Watch the AI mark structure, FVGs, order blocks and liquidity directly on the chart.",
             "Save signals to your dashboard and receive alerts when new A+ setups are detected.",
@@ -79,7 +79,7 @@ export const collections: Collection[] = [
         summary: "Sign up takes under a minute with email and password.",
         updatedAt: "2026-06-30",
         body: [
-          { type: "p", content: "Creating a Jenvu account takes less than 60 seconds. New accounts start on the Free plan and include starter credits so you can try the extension and signal engine immediately." },
+          { type: "p", content: "Creating a Jenvu account takes less than 60 seconds. New accounts start on the Free plan and include starter credits so you can try the terminal and signal engine immediately." },
 
           { type: "h2", content: "Sign up with email" },
           { type: "ol", items: [
@@ -92,7 +92,7 @@ export const collections: Collection[] = [
           { type: "h2", content: "What happens next" },
           { type: "ul", items: [
             "Your dashboard loads with starter credits already topped up.",
-            "You can install and manage the TradingView extension from your dashboard.",
+            "You can install and manage the built-in trading terminal from your dashboard.",
             "Upgrade to Pro or Elite any time from Dashboard → Billing.",
           ]},
 
@@ -105,13 +105,13 @@ export const collections: Collection[] = [
         summary: "From homepage to A+ setup in three clicks.",
         updatedAt: "2026-06-30",
         body: [
-          { type: "p", content: "Getting your first signal out of Jenvu is intentionally simple. The 7-stage pipeline does the heavy lifting — open your chart and ask the extension to analyze it." },
+          { type: "p", content: "Getting your first signal out of Jenvu is intentionally simple. The 7-stage pipeline does the heavy lifting — open your chart and ask the terminal to analyze it." },
 
           { type: "h2", content: "Step by step" },
           { type: "ol", items: [
             "Open the Jenvu desk from your dashboard.",
             "Confirm the instrument — XAU/USD (the only pair Jenvu trades).",
-            "Hit 'Analyze'. The extension reads the active chart and starts building the setup.",
+            "Hit 'Analyze'. The terminal reads the active chart and starts building the setup.",
             "Wait while the 7-stage pipeline runs — usually 10–25 seconds.",
             "If the final score is 85+, the setup is graded A+ and entry, stop and targets appear.",
           ]},
@@ -126,7 +126,7 @@ export const collections: Collection[] = [
           ]},
 
           { type: "h2", content: "Reviewing the analysis" },
-          { type: "p", content: "The extension explains each step in the chat and marks relevant structure on the chart. Eligible plans also require a second-model senior review before the final result appears." },
+          { type: "p", content: "The terminal explains each step in the chat and marks relevant structure on the chart. Eligible plans also require a second-model senior review before the final result appears." },
 
           { type: "note", tone: "warn", content: "If the setup scores below 85, Jenvu shows the read but does not issue an entry. Standing aside is a feature — it protects your win rate." },
         ],
@@ -152,8 +152,8 @@ export const collections: Collection[] = [
   },
   {
     slug: "tradingview-extension",
-    title: "TradingView Extension",
-    description: "Install Jenvu, chat with AI and analyze active charts.",
+    title: "Built-in Trading Terminal",
+    description: "Open the terminal, chat with AI and analyze live gold charts.",
     icon: "Puzzle",
     articles: [
       {
@@ -162,54 +162,54 @@ export const collections: Collection[] = [
         summary: "Ask general questions or request a chart analysis.",
         updatedAt: "2026-06-30",
         body: [
-          { type: "p", content: "Jenvu works like a familiar AI chat inside TradingView. It answers normal questions conversationally and only runs the signal engine when you ask it to analyze a chart or trading setup." },
+          { type: "p", content: "Jenvu works like a familiar AI chat next to your gold chart. It answers normal questions conversationally and only runs the ICT/SMC engine when you ask it to analyze a chart or trading setup." },
 
-          { type: "h2", content: "Open the extension" },
+          { type: "h2", content: "Open the terminal" },
           { type: "ol", items: [
-            "Open a supported XAU/USD chart in TradingView.",
-            "Open Jenvu from your browser toolbar.",
-            "Enter your extension API key when prompted.",
-            "Type a question or ask Jenvu to analyze the active chart.",
+            "Sign in and open Dashboard → Terminal.",
+            "The live XAU/USD chart loads automatically — no install needed.",
+            "Click 'Ask With AI' to open the AI panel.",
+            "Type a question or ask Jenvu to analyze the current structure.",
           ]},
 
           { type: "h2", content: "Chat mode and analysis mode" },
-          { type: "p", content: "Greetings and general questions stay in chat mode. Requests for a setup, signal or chart review trigger the ICT/SMC engine and use the live TradingView chart as context." },
+          { type: "p", content: "Greetings and general questions stay in chat mode. Requests for a setup, bias or chart review switch Jenvu into ICT/SMC mentor mode and use the live gold data as context." },
 
           { type: "h2", content: "Ask naturally" },
-          { type: "p", content: "Type into the composer and send your message. You can ask follow-up questions in the same conversation without repeating the full context." },
+          { type: "p", content: "Type into the composer and send your message. You can also attach a chart screenshot or use voice input, and ask follow-up questions in the same conversation without repeating context." },
 
-          { type: "note", tone: "tip", content: "Keep analysis requests specific — 'Analyze this XAU/USD chart' or 'What is the 15-minute bias?' produces the clearest result." },
+          { type: "note", tone: "tip", content: "Keep analysis requests specific — 'Review this XAU/USD structure' or 'What is the 30-minute bias?' produces the clearest result." },
         ],
       },
       {
         slug: "extension-troubleshooting",
-        title: "Extension isn't responding — what to check",
-        summary: "TradingView tab access, API key status and supported charts.",
+        title: "Terminal isn't responding — what to check",
+        summary: "Chart loading, plan status and wallet balance.",
         updatedAt: "2026-06-30",
         body: [
-          { type: "p", content: "If Jenvu does not respond or cannot read the chart, run through this checklist from top to bottom." },
+          { type: "p", content: "If the terminal does not respond or the chart fails to load, run through this checklist from top to bottom." },
 
-          { type: "h2", content: "1. TradingView access" },
+          { type: "h2", content: "1. Reload the terminal" },
           { type: "ul", items: [
-            "Make sure the active tab is a TradingView chart.",
-            "Allow the extension to access tradingview.com when prompted.",
-            "Reload the chart after changing extension permissions.",
+            "Refresh the page so the chart and AI panel reload.",
+            "Close and reopen the AI panel from 'Ask With AI'.",
+            "Try a different browser or disable blocking add-ons if the chart stays blank.",
           ]},
 
-          { type: "h2", content: "2. Extension API key" },
+          { type: "h2", content: "2. Plan and wallet" },
           { type: "ul", items: [
-            "Open Dashboard → Extension and copy an active key.",
-            "Paste the key into the extension settings exactly as shown.",
-            "Confirm your plan is active and has available AI wallet balance.",
+            "Confirm your plan is active on the Billing page.",
+            "Check the Usage page for remaining AI wallet balance and daily tokens.",
+            "Top up your wallet if the balance has run out.",
           ]},
 
           { type: "h2", content: "3. Supported market" },
-          { type: "p", content: "Jenvu is tuned for XAU/USD. Open a Gold versus U.S. Dollar chart before requesting a full setup analysis." },
+          { type: "p", content: "Jenvu is tuned for XAU/USD on the 30-minute timeframe. Requests about other markets stay in general chat mode." },
 
-          { type: "h2", content: "4. Reload the extension" },
-          { type: "p", content: "Close and reopen the side panel, then refresh the TradingView tab. If the issue continues, generate a new API key from the dashboard." },
+          { type: "h2", content: "4. Still stuck" },
+          { type: "p", content: "Start a new chat from the History menu in the AI panel, then retry your question. If the issue continues, contact support from the Help Center." },
 
-          { type: "note", tone: "warn", content: "Never share your extension API key. Revoke it immediately from the dashboard if it is exposed." },
+          { type: "note", tone: "warn", content: "Never share your API key. Revoke it immediately from the dashboard if it is exposed." },
         ],
       },
       {
@@ -359,7 +359,7 @@ export const collections: Collection[] = [
           { type: "ul", items: [
             "100,000 tokens per day.",
             "$2 wallet per month (~5 scans).",
-            "AI extension chat with starter wallet access.",
+            "AI terminal chat with starter wallet access.",
             "Full signal engine — A+ / A institutional signals.",
             "Full ICT / SMC narration.",
             "Trade journal & analytics.",
@@ -371,7 +371,7 @@ export const collections: Collection[] = [
           { type: "ul", items: [
             "1,500,000 tokens per day.",
             "$15 wallet per month (~35 scans).",
-            "AI extension chat billed from the included wallet.",
+            "AI terminal chat billed from the included wallet.",
             "Personal API keys for the Jenvu API endpoint.",
             "Full XAU/USD signal engine.",
             "Realtime A+ email & push alerts (no delay).",
@@ -415,7 +415,7 @@ export const collections: Collection[] = [
           { type: "ul", items: [
             "Signal analysis returning BUY or SELL — deducted from wallet at real cost.",
             "Signal returning WAIT (dead market) — free.",
-            "AI extension chat or analysis — actual prompt and reply tokens at $3 per 1,000,000 tokens.",
+            "AI terminal chat or analysis — actual prompt and reply tokens at $3 per 1,000,000 tokens.",
             "Senior review — its actual tokens are added at the same token rate, with no fixed fee.",
             "A+ broadcast alert delivered to you — free.",
           ]},
@@ -448,7 +448,7 @@ export const collections: Collection[] = [
         summary: "Create a Jenvu API key, use it anywhere, and track its daily token quota.",
         updatedAt: "2026-09-18",
         body: [
-          { type: "p", content: "A Jenvu API key lets you use Jenvu outside the TradingView extension — from your own scripts, apps or any OpenAI-compatible client. Keys are available on paid plans." },
+          { type: "p", content: "A Jenvu API key lets you use Jenvu outside the built-in trading terminal — from your own scripts, apps or any OpenAI-compatible client. Keys are available on paid plans." },
 
           { type: "h2", content: "Create a key" },
           { type: "ol", items: [
@@ -519,7 +519,7 @@ export const collections: Collection[] = [
             "429 — daily token limit reached; it resets at 00:00 UTC.",
           ]},
 
-          { type: "note", tone: "info", content: "Every API call counts toward the same daily token allowance and wallet as the extension, and appears on the Usage page." },
+          { type: "note", tone: "info", content: "Every API call counts toward the same daily token allowance and wallet as the terminal, and appears on the Usage page." },
         ],
       },
 

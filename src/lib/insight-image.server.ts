@@ -210,6 +210,60 @@ function base64ToBytes(b64: string): Uint8Array {
   return out;
 }
 
+function escapeXml(value: string): string {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+// Last-resort cover: rendered locally so an article is never blocked from
+// publishing when every external image provider is rate limited or down.
+function localCoverSvg(title: string, category: string, slug: string): string {
+  const h = hashString(slug || title);
+  const hue = h % 40; // warm gold/amber range
+  const words = title.split(/\s+/);
+  const lines: string[] = [];
+  let current = "";
+  for (const word of words) {
+    if ((current + " " + word).trim().length > 26) {
+      lines.push(current.trim());
+      current = word;
+    } else {
+      current = `${current} ${word}`;
+    }
+    if (lines.length === 3) break;
+  }
+  if (lines.length < 3 && current.trim()) lines.push(current.trim());
+
+  const text = lines
+    .map(
+      (line, i) =>
+        `<text x="80" y="${300 + i * 68}" font-family="Georgia, serif" font-size="54" fill="#f5e6c8">${escapeXml(line)}</text>`,
+    )
+    .join("");
+
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="hsl(${hue}, 28%, 9%)"/>
+      <stop offset="100%" stop-color="hsl(${(hue + 18) % 360}, 45%, 18%)"/>
+    </linearGradient>
+  </defs>
+  <rect width="1280" height="720" fill="url(#bg)"/>
+  <circle cx="1080" cy="180" r="220" fill="#d4af37" opacity="0.14"/>
+  <circle cx="1180" cy="620" r="160" fill="#d4af37" opacity="0.08"/>
+  <rect x="80" y="150" width="90" height="6" fill="#d4af37"/>
+  <text x="80" y="210" font-family="Helvetica, Arial, sans-serif" font-size="24" letter-spacing="6" fill="#d4af37">${escapeXml(
+    category.toUpperCase(),
+  )}</text>
+  ${text}
+  <text x="80" y="640" font-family="Helvetica, Arial, sans-serif" font-size="26" letter-spacing="4" fill="#9a8e74">JENVU · XAU/USD RESEARCH</text>
+</svg>`;
+}
+
+
 /**
  * Generates and stores a cover image. Returns the app-relative URL to use as
  * `insights.image_url`, or null when generation is unavailable.
@@ -219,20 +273,32 @@ export async function generateInsightCover(opts: {
   category: string;
   slug: string;
 }): Promise<string | null> {
-  const generated = await generateBase64(coverPrompt(opts.title, opts.category, opts.slug));
-  if (!generated) return null;
-
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  const mime = generated.mime || "image/png";
-  const ext = mime.includes("jpeg") || mime.includes("jpg") ? "jpg" : mime.includes("webp") ? "webp" : "png";
+  const generated = await generateBase64(coverPrompt(opts.title, opts.category, opts.slug));
+
+  let bytes: Uint8Array;
+  let mime: string;
+  if (generated) {
+    mime = generated.mime || "image/png";
+    bytes = base64ToBytes(generated.b64);
+  } else {
+    // Every external provider is unavailable — fall back to a locally drawn
+    // cover so the article still publishes on schedule.
+    console.warn("[insight-image] all providers unavailable, using local cover");
+    mime = "image/svg+xml";
+    bytes = new TextEncoder().encode(localCoverSvg(opts.title, opts.category, opts.slug));
+  }
+
+  const ext =
+    mime.includes("svg") ? "svg"
+    : mime.includes("jpeg") || mime.includes("jpg") ? "jpg"
+    : mime.includes("webp") ? "webp"
+    : "png";
   const path = `${opts.slug}-${Date.now()}.${ext}`;
 
   const { error } = await supabaseAdmin.storage
     .from(INSIGHT_IMAGE_BUCKET)
-    .upload(path, base64ToBytes(generated.b64), {
-      contentType: mime,
-      upsert: true,
-    });
+    .upload(path, bytes, { contentType: mime, upsert: true });
 
   if (error) {
     console.warn("[insight-image] upload failed", error.message);
@@ -241,3 +307,4 @@ export async function generateInsightCover(opts: {
 
   return `/api/public/insight-image/${path}`;
 }
+
