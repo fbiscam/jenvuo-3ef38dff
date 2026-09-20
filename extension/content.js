@@ -5,7 +5,17 @@
 (() => {
   if (window.__jenvuOverlay) return;
 
-  const state = { marks: [], lo: 0, hi: 0, bias: null, timeframe: null, showSession: false, offsetY: 0, scale: 1, rect: null };
+  const state = {
+    marks: [],
+    lo: 0,
+    hi: 0,
+    bias: null,
+    timeframe: null,
+    showSession: false,
+    offsetY: 0,
+    scale: 1,
+    rect: null,
+  };
 
   const host = document.createElement("div");
   host.id = "jenvu-overlay-host";
@@ -35,7 +45,11 @@
     if (a === "down") state.offsetY += 8;
     if (a === "in") state.scale *= 1.06;
     if (a === "out") state.scale /= 1.06;
-    if (a === "close") { host.remove(); window.__jenvuOverlay = false; return; }
+    if (a === "close") {
+      host.remove();
+      window.__jenvuOverlay = false;
+      return;
+    }
     draw();
   });
   host.appendChild(bar);
@@ -63,10 +77,14 @@
   function visiblePriceScale() {
     const values = [];
     const chart = chartRect();
-    const nodes = document.querySelectorAll('[class*="price-axis"] [class*="label"], [class*="priceAxis"] [class*="label"], [data-name="price-axis"] span');
+    const nodes = document.querySelectorAll(
+      '[class*="price-axis"] [class*="label"], [class*="priceAxis"] [class*="label"], [data-name="price-axis"] span',
+    );
     for (const node of nodes) {
       const rect = node.getBoundingClientRect();
-      const raw = String(node.textContent || "").replace(/,/g, "").trim();
+      const raw = String(node.textContent || "")
+        .replace(/,/g, "")
+        .trim();
       const value = Number(raw);
       if (!Number.isFinite(value) || rect.width <= 0 || rect.height <= 0) continue;
       if (rect.top < chart.y - 4 || rect.bottom > chart.y + chart.h + 4) continue;
@@ -97,11 +115,12 @@
     const top = r.y + padY;
     const height = (r.h - padY * 2) * state.scale;
     const scaleY = visiblePriceScale();
-    const y = (p) => scaleY
-      ? scaleY(p)
-      : state.hi > state.lo
-        ? top + state.offsetY + ((state.hi - p) / (state.hi - state.lo)) * height
-        : Number.NaN;
+    const y = (p) =>
+      scaleY
+        ? scaleY(p)
+        : state.hi > state.lo
+          ? top + state.offsetY + ((state.hi - p) / (state.hi - state.lo)) * height
+          : Number.NaN;
     const left = r.x + 8;
     const right = r.x + r.w - 8;
     const tone = (t) => (t === "buy" ? "#0f9d58" : t === "sell" ? "#d93025" : "#8a8f98");
@@ -133,7 +152,12 @@
         ctx.lineWidth = 1;
         ctx.strokeRect(left, y1, right - left, Math.max(2, y2 - y1));
         ctx.setLineDash([]);
-        label(`${state.timeframe ? state.timeframe.toUpperCase() + " · " : ""}${m.label}`, left + 4, y1 + 9, tone(m.tone));
+        label(
+          `${state.timeframe ? state.timeframe.toUpperCase() + " · " : ""}${m.label}`,
+          left + 4,
+          y1 + 9,
+          tone(m.tone),
+        );
       } else {
         const yy = y(m.level);
         if (!isFinite(yy)) continue;
@@ -167,7 +191,11 @@
     if (state.bias) {
       const b = `AI bias: ${String(state.bias).toUpperCase()}`;
       const bw = ctx.measureText(b).width + 16;
-      ctx.fillStyle = /bull/i.test(state.bias) ? "#0f9d58" : /bear/i.test(state.bias) ? "#d93025" : "#5f6368";
+      ctx.fillStyle = /bull/i.test(state.bias)
+        ? "#0f9d58"
+        : /bear/i.test(state.bias)
+          ? "#d93025"
+          : "#5f6368";
       ctx.fillRect(r.x + 12, r.y + 40, bw, 22);
       ctx.fillStyle = "#fff";
       ctx.fillText(b, r.x + 20, r.y + 52);
@@ -188,8 +216,9 @@
     state.showSession = Boolean(msg.showSession);
     state.offsetY = 0;
     state.scale = 1;
-    const title = bar.querySelector('[data-label]');
-    if (title) title.textContent = `Jenvu · ${state.timeframe ? String(state.timeframe).toUpperCase() : "marks"}`;
+    const title = bar.querySelector("[data-label]");
+    if (title)
+      title.textContent = `Jenvu · ${state.timeframe ? String(state.timeframe).toUpperCase() : "marks"}`;
     draw();
     reply?.({ ok: true, count: state.marks.length });
     return true;
