@@ -411,6 +411,10 @@ function TerminalPage() {
       // Desk and Pine panels always start closed so the chart opens exactly as left.
       const savedPine = window.localStorage.getItem(PINE_SCRIPT_KEY);
       if (savedPine) setPineCode(savedPine);
+      const savedIndicators = JSON.parse(
+        window.localStorage.getItem(PINE_INDICATORS_KEY) || "null",
+      ) as PineIndicator[] | null;
+      if (Array.isArray(savedIndicators)) setIndicators(savedIndicators);
 
       const CHART_USER_KEY = "jenvu:terminal:chart-user:v1";
       let chartUser = window.localStorage.getItem(CHART_USER_KEY);
