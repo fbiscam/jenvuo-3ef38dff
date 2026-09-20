@@ -530,7 +530,7 @@ function TerminalPage() {
           {deskOpen && (
             <aside className="relative flex h-[45%] min-h-0 w-full shrink-0 flex-col border-t border-border bg-card text-card-foreground lg:h-full lg:w-[380px] lg:border-l lg:border-t-0">
               <div className="flex min-h-17 items-center gap-2.5 border-b border-border px-4 py-3">
-                <div className="min-w-0">
+                <div className="ml-[46px] min-w-0">
                   <div className="flex items-center gap-1">
                     <span className="text-lg font-medium leading-none">Jenvu</span>
                     <img
