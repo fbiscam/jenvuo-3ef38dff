@@ -38,9 +38,7 @@ const TIMEFRAMES = [
   { key: "1d", tv: "D", label: "1D" },
 ];
 
-const WATCHLIST = [
-  { key: "XAUUSD", tv: "OANDA:XAUUSD", label: "XAU/USD", note: "Gold spot" },
-];
+const SYMBOL = { key: "XAUUSD", tv: "OANDA:XAUUSD", label: "XAU/USD" };
 
 type ChatMsg = { role: "user" | "assistant"; text: string; signal?: GoldSignal };
 
@@ -51,7 +49,6 @@ const QUICK = [
 ];
 
 function TerminalPage() {
-  const [symbol, setSymbol] = useState(WATCHLIST[0]);
   const [tf, setTf] = useState(TIMEFRAMES[3]);
   const [theme, setTheme] = useState<"light" | "dark">("dark");
   const [input, setInput] = useState("");
@@ -61,7 +58,7 @@ function TerminalPage() {
 
   const chartSrc = useMemo(() => {
     const params = new URLSearchParams({
-      symbol: symbol.tv,
+      symbol: SYMBOL.tv,
       interval: tf.tv,
       timezone: "Etc/UTC",
       theme,
@@ -76,7 +73,7 @@ function TerminalPage() {
       studies: JSON.stringify(["STD;EMA", "STD;RSI"]),
     });
     return `https://s.tradingview.com/widgetembed/?${params.toString()}`;
-  }, [symbol.tv, tf.tv, theme]);
+  }, [tf.tv, theme]);
 
   const ask = useMutation({
     mutationFn: async (query: string) => analyze({ data: { timeframe: tf.key, query } }),
@@ -116,7 +113,7 @@ function TerminalPage() {
       <div className="flex flex-wrap items-center gap-2 border-b border-border px-3 py-2">
         <div className="flex items-center gap-2 pr-3 font-semibold">
           <LineChart className="h-4 w-4 text-primary" />
-          <span>{symbol.label}</span>
+          <span>{SYMBOL.label}</span>
         </div>
         <div className="flex items-center gap-1 rounded-md border border-border p-0.5">
           {TIMEFRAMES.map((t) => (
@@ -142,32 +139,12 @@ function TerminalPage() {
       </div>
 
       <div className="flex min-h-0 flex-1 flex-col lg:flex-row">
-        {/* Watchlist */}
-        <aside className="hidden w-52 shrink-0 border-r border-border p-2 lg:block">
-          <p className="px-2 pb-2 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-            Watchlist
-          </p>
-          {WATCHLIST.map((s) => (
-            <button
-              key={s.key}
-              onClick={() => setSymbol(s)}
-              className={cn(
-                "flex w-full flex-col rounded-md px-2 py-2 text-left transition-colors",
-                s.key === symbol.key ? "bg-muted" : "hover:bg-muted/60",
-              )}
-            >
-              <span className="text-sm font-medium">{s.label}</span>
-              <span className="text-[11px] text-muted-foreground">{s.note}</span>
-            </button>
-          ))}
-        </aside>
-
         {/* Chart */}
         <main className="min-h-[420px] flex-1">
           <iframe
             key={chartSrc}
             src={chartSrc}
-            title={`${symbol.label} ${tf.label} chart`}
+            title={`${SYMBOL.label} ${tf.label} chart`}
             className="h-full w-full border-0"
             allowFullScreen
           />
@@ -178,7 +155,7 @@ function TerminalPage() {
           <div className="flex items-center gap-2 border-b border-border px-3 py-2">
             <Sparkles className="h-4 w-4 text-primary" />
             <span className="text-sm font-semibold">AI Desk</span>
-            <span className="ml-auto text-[11px] text-muted-foreground">{tf.label} · {symbol.label}</span>
+            <span className="ml-auto text-[11px] text-muted-foreground">{tf.label} · {SYMBOL.label}</span>
           </div>
 
           <div ref={scroller} className="min-h-0 flex-1 space-y-3 overflow-y-auto p-3">
