@@ -640,7 +640,7 @@ function TerminalPage() {
                 </div>
               )}
 
-              <Conversation className="min-h-0">
+              <Conversation className="min-h-0 flex-1">
                 <ConversationContent className="gap-5 px-4 py-5">
                   {messages.length === 0 && (
                     <div className="space-y-4">
@@ -733,7 +733,7 @@ function TerminalPage() {
                 <ConversationScrollButton className="bottom-2 h-8 w-8" />
               </Conversation>
 
-              <div className="bg-card px-3.5 pb-3 pt-2">
+              <div className="mt-auto shrink-0 border-t border-border bg-card px-3.5 pb-3 pt-2">
                 {(voiceError || isRecording || voice.isPending) && (
                   <p
                     className={cn(
