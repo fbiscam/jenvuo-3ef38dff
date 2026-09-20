@@ -32,7 +32,15 @@ export function PineIndicatorPane({ indicator, candles, onRemove }: Props) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const chartRef = useRef<IChartApi | null>(null);
 
+  const structure = useMemo(
+    () => (indicator.builtin === "market-structure" ? computeMarketStructure(candles) : null),
+    [indicator.builtin, candles],
+  );
+
   const compiled = useMemo(() => {
+    if (indicator.builtin === "market-structure") {
+      return { ok: true as const, value: { name: indicator.name, overlay: true, plots: [], hlines: [] } };
+    }
     try {
       return { ok: true as const, value: runPineScript(indicator.code, candles) };
     } catch (error) {
