@@ -201,9 +201,10 @@ function TerminalPage() {
   const [activeThreadId, setActiveThreadId] = useState<string | null>(null);
   const [historyOpen, setHistoryOpen] = useState(false);
   const [pineOpen, setPineOpen] = useState(false);
-  const [pineCode, setPineCode] = useState(
-    '//@version=6\nindicator("Jenvu Gold Workspace", overlay=true)\n\n// Write your Pine Script here\n',
-  );
+  const [pineCode, setPineCode] = useState(DEFAULT_PINE);
+  const [indicators, setIndicators] = useState<PineIndicator[]>([]);
+  const [pineError, setPineError] = useState("");
+  const [pineStatus, setPineStatus] = useState("");
   const [copied, setCopied] = useState(false);
   const [voiceError, setVoiceError] = useState("");
   const [isRecording, setIsRecording] = useState(false);
