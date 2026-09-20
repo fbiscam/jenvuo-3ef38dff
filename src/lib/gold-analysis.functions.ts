@@ -939,6 +939,11 @@ Return ONLY valid JSON (no markdown, no code fences) with this exact shape:
         ? "\nTRADING QUERY: answer as a concise ICT/SMC mentor. Guide and suggest only. Never output a committed entry/SL/TP plan; keep all trading fields empty."
         : "\nGENERAL QUERY: answer as a normal concise assistant. Do not mention gold, charts, trading, ICT, SMC, signals, or risk unless the user asked about them. Keep all trading fields empty."
       : "";
+    const requestInstruction = isTradingIntent
+      ? data.advisor
+        ? "This is a trading question. Give concise ICT/SMC guidance without a committed trade plan."
+        : "User wants a trading view — give the A+ ICT/SMC setup and fill the trading fields."
+      : "This is a general question. Reply naturally and concisely without introducing trading topics. Keep the trading fields empty.";
     const userPrompt = hasData
       ? `USER MESSAGE: ${data.query}
 
@@ -951,10 +956,10 @@ RECENT SWING LOW (150): ${swingLow.toFixed(2)}
 LAST 150 CANDLES (OHLC):
 ${compact}
 
-${isTradingIntent ? "User wants a trading view — give the A+ ICT/SMC setup, fill trading fields confidently." : "User is just chatting / asking general thing — REPLY conversationally in spokenSummary, set direction='WAIT', confidence=0, leave trading fields empty. Do NOT push a signal."}${advisorGuide}`
+${requestInstruction}${advisorGuide}`
       : `USER MESSAGE: ${data.query}
 
-${isTradingIntent ? "User wants trading view but live feed offline — answer conversationally, set direction='WAIT', confidence<=40, mention feed offline in fullAnalysis." : "User is just chatting — answer naturally in spokenSummary, set direction='WAIT', confidence=0, leave trading fields empty."}${advisorGuide}`;
+${isTradingIntent ? "The live feed is unavailable. Answer concisely without inventing market data and mention that limitation." : requestInstruction}${advisorGuide}`;
 
     const { content, model: __aiModel, usage: __aiUsage } = await callChatCompletion({
       models: [...MODEL_CHAIN.chat],
