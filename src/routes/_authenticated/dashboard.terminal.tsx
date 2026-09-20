@@ -249,7 +249,7 @@ function TerminalPage() {
   const [threads, setThreads] = useState<ChatThread[]>([]);
   const [activeThreadId, setActiveThreadId] = useState<string | null>(null);
   const [historyOpen, setHistoryOpen] = useState(false);
-  const [pineOpen] = useState(false);
+  const [pineOpen, setPineOpen] = useState(false);
   const [pineCode, setPineCode] = useState(DEFAULT_PINE);
   const [indicators, setIndicators] = useState<PineIndicator[]>([BUILTIN_INDICATOR]);
   const [pineError, setPineError] = useState("");
