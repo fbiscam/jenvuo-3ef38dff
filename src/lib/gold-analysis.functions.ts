@@ -774,7 +774,7 @@ function isTradingSetupIntent(q: string): boolean {
 }
 
 async function _analyzeGoldCompute(
-  data: { timeframe: string; query: string; chartImage?: string },
+  data: { timeframe: string; query: string; chartImage?: string; advisor?: boolean },
   __userId: string | null = null,
   __scanId: string | null = null,
 ): Promise<GoldSignal & { __billable: "signal" | "chat" }> {
