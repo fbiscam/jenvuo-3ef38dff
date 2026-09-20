@@ -2,7 +2,15 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import { Calendar, ChartColumn, ChevronDown, ChevronRight, Download, RefreshCw, Settings2 } from "lucide-react";
+import {
+  Calendar,
+  ChartColumn,
+  ChevronDown,
+  ChevronRight,
+  Download,
+  RefreshCw,
+  Settings2,
+} from "lucide-react";
 import { toast } from "sonner";
 import {
   Area,
@@ -23,9 +31,15 @@ export const Route = createFileRoute("/_authenticated/dashboard/usage")({
   head: () => ({
     meta: [
       { title: "Usage — Jenvu" },
-      { name: "description", content: "Track your USD wallet usage, per-scan model + cost history." },
+      {
+        name: "description",
+        content: "Track your USD wallet usage, per-scan model + cost history.",
+      },
       { property: "og:title", content: "Usage — Jenvu" },
-      { property: "og:description", content: "Track your USD wallet usage, per-scan model + cost history." },
+      {
+        property: "og:description",
+        content: "Track your USD wallet usage, per-scan model + cost history.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "robots", content: "noindex" },
@@ -78,7 +92,14 @@ function fmtInt(n: number) {
 
 function modelDisplay(raw: string) {
   const [providerId = "unknown", ...modelParts] = raw.split("/");
-  const provider = providerId === "browseruse" ? "Browser Use" : providerId === "evolink" ? "Evolink" : providerId === "agentrouter" ? "AgentRouter" : providerId;
+  const provider =
+    providerId === "browseruse"
+      ? "Browser Use"
+      : providerId === "evolink"
+        ? "Evolink"
+        : providerId === "agentrouter"
+          ? "AgentRouter"
+          : providerId;
   const modelId = modelParts.join("/") || raw;
   const model = modelId
     .replace(/^gpt-6-astra$/i, "GPT-6 Astra")
@@ -88,7 +109,8 @@ function modelDisplay(raw: string) {
 }
 
 function metadataEntries(metadata: unknown) {
-  if (!metadata || typeof metadata !== "object" || Array.isArray(metadata)) return [] as [string, unknown][];
+  if (!metadata || typeof metadata !== "object" || Array.isArray(metadata))
+    return [] as [string, unknown][];
   return Object.entries(metadata as Record<string, unknown>);
 }
 
@@ -101,7 +123,9 @@ function metadataNumber(metadata: unknown, pattern: RegExp) {
 }
 
 function metadataFlag(metadata: unknown, pattern: RegExp) {
-  return metadataEntries(metadata).some(([key, value]) => pattern.test(key) && value !== false && value !== 0 && value !== "false");
+  return metadataEntries(metadata).some(
+    ([key, value]) => pattern.test(key) && value !== false && value !== 0 && value !== "false",
+  );
 }
 
 const RANGES = [
@@ -119,7 +143,9 @@ function UsagePage() {
     refetchInterval: 30_000,
     refetchOnWindowFocus: true,
   });
-  const [tab, setTab] = useState<"capabilities" | "categories" | "caching" | "safety">("capabilities");
+  const [tab, setTab] = useState<"capabilities" | "categories" | "caching" | "safety">(
+    "capabilities",
+  );
   const [sideTab, setSideTab] = useState<"users" | "services" | "keys">("keys");
   const [rangeDays, setRangeDays] = useState<number>(30);
   const [model, setModel] = useState<string>("all");
@@ -148,11 +174,32 @@ function UsagePage() {
     const earnRows = rows.filter((r) => r.delta > 0);
     const spent = spendRows.reduce((s, r) => s + Math.abs(r.delta), 0);
     const earned = earnRows.reduce((s, r) => s + r.delta, 0);
-    const totalTokens = spendRows.reduce((s, r) => s + (r.prompt_tokens ?? 0) + (r.completion_tokens ?? 0), 0);
+    const totalTokens = spendRows.reduce(
+      (s, r) => s + (r.prompt_tokens ?? 0) + (r.completion_tokens ?? 0),
+      0,
+    );
     const inputTokens = spendRows.reduce((s, r) => s + (r.prompt_tokens ?? 0), 0);
     const outputTokens = totalTokens - inputTokens;
 
-    const days: { date: string; spent: number; earned: number; tokens: number; requests: number; responses: number; inputTokens: number; seniorReviews: number; seniorTokens: number; extensionRequests: number; additions: number; addedUsd: number; cacheReads: number; cacheWrites: number; cacheHits: number; safetyChecks: number; blockedRequests: number }[] = [];
+    const days: {
+      date: string;
+      spent: number;
+      earned: number;
+      tokens: number;
+      requests: number;
+      responses: number;
+      inputTokens: number;
+      seniorReviews: number;
+      seniorTokens: number;
+      extensionRequests: number;
+      additions: number;
+      addedUsd: number;
+      cacheReads: number;
+      cacheWrites: number;
+      cacheHits: number;
+      safetyChecks: number;
+      blockedRequests: number;
+    }[] = [];
     const idx = new Map<string, number>();
     for (let i = rangeDays - 1; i >= 0; i--) {
       const d = new Date();
@@ -160,7 +207,25 @@ function UsagePage() {
       d.setDate(d.getDate() - i);
       const key = d.toISOString().slice(0, 10);
       idx.set(key, days.length);
-      days.push({ date: key, spent: 0, earned: 0, tokens: 0, requests: 0, responses: 0, inputTokens: 0, seniorReviews: 0, seniorTokens: 0, extensionRequests: 0, additions: 0, addedUsd: 0, cacheReads: 0, cacheWrites: 0, cacheHits: 0, safetyChecks: 0, blockedRequests: 0 });
+      days.push({
+        date: key,
+        spent: 0,
+        earned: 0,
+        tokens: 0,
+        requests: 0,
+        responses: 0,
+        inputTokens: 0,
+        seniorReviews: 0,
+        seniorTokens: 0,
+        extensionRequests: 0,
+        additions: 0,
+        addedUsd: 0,
+        cacheReads: 0,
+        cacheWrites: 0,
+        cacheHits: 0,
+        safetyChecks: 0,
+        blockedRequests: 0,
+      });
     }
     for (const r of rows) {
       const i = idx.get(r.created_at.slice(0, 10));
@@ -194,7 +259,13 @@ function UsagePage() {
     const hasSpend = spent > 0 || earned > 0;
     const keySpend = new Map<string, { spend: number; requests: number }>();
     for (const row of spendRows) {
-      if (row.reason !== "extension_api" || !row.metadata || typeof row.metadata !== "object" || Array.isArray(row.metadata)) continue;
+      if (
+        row.reason !== "extension_api" ||
+        !row.metadata ||
+        typeof row.metadata !== "object" ||
+        Array.isArray(row.metadata)
+      )
+        continue;
       const keyId = typeof row.metadata.api_key_id === "string" ? row.metadata.api_key_id : null;
       if (!keyId) continue;
       const current = keySpend.get(keyId) ?? { spend: 0, requests: 0 };
@@ -203,8 +274,18 @@ function UsagePage() {
       keySpend.set(keyId, current);
     }
     return {
-      rows, spendRows, earnRows, spent, earned, totalTokens, inputTokens, outputTokens,
-      days, avgCost, lastActivity, hasSpend,
+      rows,
+      spendRows,
+      earnRows,
+      spent,
+      earned,
+      totalTokens,
+      inputTokens,
+      outputTokens,
+      days,
+      avgCost,
+      lastActivity,
+      hasSpend,
       tokenSeries: days.map((d) => d.tokens),
       requestSeries: days.map((d) => d.requests),
       keySpend,
@@ -238,7 +319,8 @@ function UsagePage() {
 
   const remaining = Math.max(0, Math.min(data.balance, data.allowance));
   const pct = data.allowance > 0 ? Math.min(100, (remaining / data.allowance) * 100) : 0;
-  const spendPct = data.allowance > 0 ? Math.min(100, (data.spentThisPeriod / data.allowance) * 100) : 0;
+  const spendPct =
+    data.allowance > 0 ? Math.min(100, (data.spentThisPeriod / data.allowance) * 100) : 0;
   const maxDaily = Math.max(0.0001, ...derived.days.map((d) => d.spent + d.earned));
   const daysLeft = data.periodResetsAt
     ? Math.max(0, Math.ceil((new Date(data.periodResetsAt).getTime() - Date.now()) / 86_400_000))
@@ -248,7 +330,16 @@ function UsagePage() {
 
   const exportCsv = () => {
     const rows = [
-      ["date", "reason", "model", "prompt_tokens", "completion_tokens", "raw_cost_usd", "delta_usd", "balance_after"],
+      [
+        "date",
+        "reason",
+        "model",
+        "prompt_tokens",
+        "completion_tokens",
+        "raw_cost_usd",
+        "delta_usd",
+        "balance_after",
+      ],
       ...derived.rows.map((r) => [
         r.created_at,
         label(r.reason),
@@ -271,27 +362,30 @@ function UsagePage() {
   };
 
   const rangeLabel = RANGES.find((r) => r.days === rangeDays)?.label ?? `Last ${rangeDays} days`;
-  const chartDays = groupDays === 1
-    ? derived.days
-    : derived.days.reduce<typeof derived.days>((groups, day, index) => {
-        const groupIndex = Math.floor(index / groupDays);
-        const current = groups[groupIndex];
-        if (current) {
-          current.spent += day.spent;
-          current.earned += day.earned;
-          current.tokens += day.tokens;
-          current.requests += day.requests;
-        } else {
-          groups.push({ ...day });
-        }
-        return groups;
-      }, []);
+  const chartDays =
+    groupDays === 1
+      ? derived.days
+      : derived.days.reduce<typeof derived.days>((groups, day, index) => {
+          const groupIndex = Math.floor(index / groupDays);
+          const current = groups[groupIndex];
+          if (current) {
+            current.spent += day.spent;
+            current.earned += day.earned;
+            current.tokens += day.tokens;
+            current.requests += day.requests;
+          } else {
+            groups.push({ ...day });
+          }
+          return groups;
+        }, []);
   const cachingRows = derived.spendRows.filter((row) => {
-    if (!row.metadata || typeof row.metadata !== "object" || Array.isArray(row.metadata)) return false;
+    if (!row.metadata || typeof row.metadata !== "object" || Array.isArray(row.metadata))
+      return false;
     return Object.keys(row.metadata).some((key) => key.toLowerCase().includes("cache"));
   });
   const safetyRows = derived.spendRows.filter((row) => {
-    if (!row.metadata || typeof row.metadata !== "object" || Array.isArray(row.metadata)) return false;
+    if (!row.metadata || typeof row.metadata !== "object" || Array.isArray(row.metadata))
+      return false;
     return Object.keys(row.metadata).some((key) => /safety|moderation|blocked/i.test(key));
   });
 
@@ -299,15 +393,21 @@ function UsagePage() {
     <div className="-mx-5 -mb-7 min-h-[calc(100dvh-4rem)] overflow-hidden bg-background text-foreground sm:-mx-8">
       {/* Header */}
       <div className="flex min-h-14 flex-col gap-3 border-b border-border px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-6">
-         <h1 className="text-lg font-medium text-foreground">  Usage</h1>
+        <h1 className="text-lg font-medium text-foreground">  Usage</h1>
         <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto_auto] items-center gap-2 sm:flex">
           <Dropdown
             open={openMenu === "model"}
             onToggle={() => setOpenMenu(openMenu === "model" ? null : "model")}
             trigger={model === "all" ? "All API keys" : model}
-            options={[{ value: "all", label: "All API keys" }, ...models.map((m) => ({ value: m, label: m }))]}
+            options={[
+              { value: "all", label: "All API keys" },
+              ...models.map((m) => ({ value: m, label: m })),
+            ]}
             value={model}
-            onSelect={(v) => { setModel(v); setOpenMenu(null); }}
+            onSelect={(v) => {
+              setModel(v);
+              setOpenMenu(null);
+            }}
           />
           <Dropdown
             open={openMenu === "range"}
@@ -316,10 +416,15 @@ function UsagePage() {
             icon={<Calendar className="h-3.5 w-3.5 text-zinc-500" />}
             options={RANGES.map((r) => ({ value: String(r.days), label: r.label }))}
             value={String(rangeDays)}
-            onSelect={(v) => { setRangeDays(Number(v)); setOpenMenu(null); }}
+            onSelect={(v) => {
+              setRangeDays(Number(v));
+              setOpenMenu(null);
+            }}
           />
           <Button
-            type="button" variant="ghost" size="icon"
+            type="button"
+            variant="ghost"
+            size="icon"
             onClick={async () => {
               const result = await refetch();
               if (result.isError) toast.error("Usage could not be refreshed");
@@ -331,7 +436,9 @@ function UsagePage() {
             <RefreshCw className={`h-4 w-4 ${isFetching ? "animate-spin" : ""}`} />
           </Button>
           <Button
-            type="button" variant="ghost" size="icon"
+            type="button"
+            variant="ghost"
+            size="icon"
             onClick={exportCsv}
             aria-label="Download usage CSV"
             className="shrink-0 text-muted-foreground"
@@ -351,23 +458,34 @@ function UsagePage() {
                   {derived.hasSpend ? fmtUsd(derived.spent, 2) : "No data"}
                 </div>
               </div>
-               <div className="flex items-center gap-2 text-[13px] text-muted-foreground">
+              <div className="flex items-center gap-2 text-[13px] text-muted-foreground">
                 <span className="hidden sm:inline">Group by</span>
-                 <Dropdown
-                   open={openMenu === "group"}
-                   onToggle={() => setOpenMenu(openMenu === "group" ? null : "group")}
-                   trigger={`${groupDays}d`}
-                   options={[1, 7, 14].filter((days) => days <= rangeDays).map((days) => ({ value: String(days), label: `${days} day${days === 1 ? "" : "s"}` }))}
-                   value={String(groupDays)}
-                   onSelect={(value) => { setGroupDays(Number(value)); setOpenMenu(null); }}
-                 />
+                <Dropdown
+                  open={openMenu === "group"}
+                  onToggle={() => setOpenMenu(openMenu === "group" ? null : "group")}
+                  trigger={`${groupDays}d`}
+                  options={[1, 7, 14]
+                    .filter((days) => days <= rangeDays)
+                    .map((days) => ({
+                      value: String(days),
+                      label: `${days} day${days === 1 ? "" : "s"}`,
+                    }))}
+                  value={String(groupDays)}
+                  onSelect={(value) => {
+                    setGroupDays(Number(value));
+                    setOpenMenu(null);
+                  }}
+                />
               </div>
             </div>
             <div className="px-4 pb-5 sm:px-7">
               {derived.hasSpend ? (
                 <div className="h-72 min-w-0 w-full sm:h-[310px]">
                   <ResponsiveContainer width="100%" height="100%">
-                    <ComposedChart data={chartDays} margin={{ top: 18, right: 6, bottom: 4, left: 0 }}>
+                    <ComposedChart
+                      data={chartDays}
+                      margin={{ top: 18, right: 6, bottom: 4, left: 0 }}
+                    >
                       <defs>
                         <linearGradient id="usageSpent" x1="0" y1="0" x2="0" y2="1">
                           <stop offset="0%" stopColor="#93c5fd" stopOpacity={0.82} />
@@ -383,7 +501,10 @@ function UsagePage() {
                         tickMargin={10}
                         tick={{ fill: "currentColor", fontSize: 11 }}
                         tickFormatter={(v: string) =>
-                          new Date(v).toLocaleDateString(undefined, { month: "short", day: "numeric" })
+                          new Date(v).toLocaleDateString(undefined, {
+                            month: "short",
+                            day: "numeric",
+                          })
                         }
                         minTickGap={24}
                       />
@@ -403,7 +524,7 @@ function UsagePage() {
                             day: "numeric",
                           })
                         }
-                         formatter={(value: number, name: string) => [fmtUsd(value, 2), name]}
+                        formatter={(value: number, name: string) => [fmtUsd(value, 2), name]}
                         contentStyle={{
                           borderRadius: 12,
                           border: "1px solid #ececef",
@@ -454,57 +575,179 @@ function UsagePage() {
           </section>
 
           <div className="flex max-w-full items-center gap-7 overflow-x-auto border-b border-border px-4 text-[13px] sm:px-6">
-            <TabButton active={tab === "capabilities"} onClick={() => setTab("capabilities")}>API capabilities</TabButton>
-            <TabButton active={tab === "categories"} onClick={() => setTab("categories")}>Spend categories</TabButton>
-            <TabButton active={tab === "caching"} onClick={() => setTab("caching")}>Prompt caching</TabButton>
-            <TabButton active={tab === "safety"} onClick={() => setTab("safety")}>Safety usage</TabButton>
+            <TabButton active={tab === "capabilities"} onClick={() => setTab("capabilities")}>
+              API capabilities
+            </TabButton>
+            <TabButton active={tab === "categories"} onClick={() => setTab("categories")}>
+              Spend categories
+            </TabButton>
+            <TabButton active={tab === "caching"} onClick={() => setTab("caching")}>
+              Prompt caching
+            </TabButton>
+            <TabButton active={tab === "safety"} onClick={() => setTab("safety")}>
+              Safety usage
+            </TabButton>
           </div>
 
           {tab === "capabilities" ? (
             <div className="grid grid-cols-1 gap-4 p-4 sm:grid-cols-2 sm:p-4">
-               <CapabilityCard title="Responses and Chat Completions" start={rangeStartLabel(rangeDays)} end={rangeEndLabel()} items={[
-                 { color: "bg-chart-1", label: `${fmtInt(derived.spendRows.length)} requests`, data: derived.days.map((d) => d.responses) },
-                 { color: "bg-chart-2", label: `${fmtInt(derived.inputTokens)} input tokens`, data: derived.days.map((d) => d.inputTokens) },
-               ]} />
-               <CapabilityCard title="Senior reviews" start={rangeStartLabel(rangeDays)} end={rangeEndLabel()} items={[
-                 { color: "bg-chart-1", label: `${fmtInt(derived.spendRows.filter((r) => r.stage === "senior_review").length)} requests`, data: derived.days.map((d) => d.seniorReviews) },
-                 { color: "bg-chart-2", label: `${fmtInt(derived.spendRows.filter((r) => r.stage === "senior_review").reduce((sum, r) => sum + (r.completion_tokens ?? 0), 0))} output tokens`, data: derived.days.map((d) => d.seniorTokens) },
-               ]} />
-               <CapabilityCard title="Extension API" start={rangeStartLabel(rangeDays)} end={rangeEndLabel()} items={[
-                 { color: "bg-chart-1", label: `${fmtInt(derived.spendRows.filter((r) => r.reason === "extension_api").length)} requests`, data: derived.days.map((d) => d.extensionRequests) },
-               ]} />
-               <CapabilityCard title="Credits and top-ups" start={rangeStartLabel(rangeDays)} end={rangeEndLabel()} items={[
-                 { color: "bg-chart-1", label: `${fmtInt(derived.earnRows.length)} additions`, data: derived.days.map((d) => d.additions) },
-                 { color: "bg-chart-2", label: `${fmtUsd(derived.earned, 2)} added`, data: derived.days.map((d) => d.addedUsd) },
-               ]} />
+              <CapabilityCard
+                title="Responses and Chat Completions"
+                start={rangeStartLabel(rangeDays)}
+                end={rangeEndLabel()}
+                items={[
+                  {
+                    color: "bg-chart-1",
+                    label: `${fmtInt(derived.spendRows.length)} requests`,
+                    data: derived.days.map((d) => d.responses),
+                  },
+                  {
+                    color: "bg-chart-2",
+                    label: `${fmtInt(derived.inputTokens)} input tokens`,
+                    data: derived.days.map((d) => d.inputTokens),
+                  },
+                ]}
+              />
+              <CapabilityCard
+                title="Senior reviews"
+                start={rangeStartLabel(rangeDays)}
+                end={rangeEndLabel()}
+                items={[
+                  {
+                    color: "bg-chart-1",
+                    label: `${fmtInt(derived.spendRows.filter((r) => r.stage === "senior_review").length)} requests`,
+                    data: derived.days.map((d) => d.seniorReviews),
+                  },
+                  {
+                    color: "bg-chart-2",
+                    label: `${fmtInt(derived.spendRows.filter((r) => r.stage === "senior_review").reduce((sum, r) => sum + (r.completion_tokens ?? 0), 0))} output tokens`,
+                    data: derived.days.map((d) => d.seniorTokens),
+                  },
+                ]}
+              />
+              <CapabilityCard
+                title="Extension API"
+                start={rangeStartLabel(rangeDays)}
+                end={rangeEndLabel()}
+                items={[
+                  {
+                    color: "bg-chart-1",
+                    label: `${fmtInt(derived.spendRows.filter((r) => r.reason === "extension_api").length)} requests`,
+                    data: derived.days.map((d) => d.extensionRequests),
+                  },
+                ]}
+              />
+              <CapabilityCard
+                title="Credits and top-ups"
+                start={rangeStartLabel(rangeDays)}
+                end={rangeEndLabel()}
+                items={[
+                  {
+                    color: "bg-chart-1",
+                    label: `${fmtInt(derived.earnRows.length)} additions`,
+                    data: derived.days.map((d) => d.additions),
+                  },
+                  {
+                    color: "bg-chart-2",
+                    label: `${fmtUsd(derived.earned, 2)} added`,
+                    data: derived.days.map((d) => d.addedUsd),
+                  },
+                ]}
+              />
             </div>
           ) : tab === "categories" ? (
             <div className="grid gap-8 p-5 md:grid-cols-2">
-               <div><h2 className="mb-4 text-[13px] text-foreground">  By service</h2><TypeBreakdown rows={derived.spendRows} /></div>
-               <div><h2 className="mb-4 text-[13px] text-foreground">       By model</h2><ModelBreakdown rows={derived.spendRows} /></div>
+              <div>
+                <h2 className="mb-4 text-[13px] text-foreground">  By service</h2>
+                <TypeBreakdown rows={derived.spendRows} />
+              </div>
+              <div>
+                <h2 className="mb-4 text-[13px] text-foreground">       By model</h2>
+                <ModelBreakdown rows={derived.spendRows} />
+              </div>
             </div>
           ) : tab === "caching" ? (
             <div className="grid grid-cols-1 gap-4 p-4 sm:grid-cols-2">
-              <CapabilityCard title="Cached input tokens" start={rangeStartLabel(rangeDays)} end={rangeEndLabel()} items={[
-                { color: "bg-chart-1", label: `${fmtInt(derived.cacheReads)} tokens reused`, data: derived.days.map((day) => day.cacheReads) },
-                { color: "bg-chart-2", label: `${fmtInt(derived.cacheHits)} cache hits`, data: derived.days.map((day) => day.cacheHits) },
-              ]} />
-              <CapabilityCard title="Cache writes" start={rangeStartLabel(rangeDays)} end={rangeEndLabel()} items={[
-                { color: "bg-chart-1", label: `${fmtInt(derived.cacheWrites)} tokens stored`, data: derived.days.map((day) => day.cacheWrites) },
-              ]} />
-              <UsageFeature title="Prompt caching activity" description="Requests with reusable prompt context are tracked here when the model provider reports cache usage." value={`${cachingRows.length} tracked requests`} />
-              <UsageFeature title="Estimated efficiency" description="Token reuse lowers repeated input processing while keeping the complete conversation context available." value={derived.cacheReads > 0 ? `${fmtInt(derived.cacheReads)} tokens reused` : "Ready to track"} />
+              <CapabilityCard
+                title="Cached input tokens"
+                start={rangeStartLabel(rangeDays)}
+                end={rangeEndLabel()}
+                items={[
+                  {
+                    color: "bg-chart-1",
+                    label: `${fmtInt(derived.cacheReads)} tokens reused`,
+                    data: derived.days.map((day) => day.cacheReads),
+                  },
+                  {
+                    color: "bg-chart-2",
+                    label: `${fmtInt(derived.cacheHits)} cache hits`,
+                    data: derived.days.map((day) => day.cacheHits),
+                  },
+                ]}
+              />
+              <CapabilityCard
+                title="Cache writes"
+                start={rangeStartLabel(rangeDays)}
+                end={rangeEndLabel()}
+                items={[
+                  {
+                    color: "bg-chart-1",
+                    label: `${fmtInt(derived.cacheWrites)} tokens stored`,
+                    data: derived.days.map((day) => day.cacheWrites),
+                  },
+                ]}
+              />
+              <UsageFeature
+                title="Prompt caching activity"
+                description="Requests with reusable prompt context are tracked here when the model provider reports cache usage."
+                value={`${cachingRows.length} tracked requests`}
+              />
+              <UsageFeature
+                title="Estimated efficiency"
+                description="Token reuse lowers repeated input processing while keeping the complete conversation context available."
+                value={
+                  derived.cacheReads > 0
+                    ? `${fmtInt(derived.cacheReads)} tokens reused`
+                    : "Ready to track"
+                }
+              />
             </div>
           ) : (
             <div className="grid grid-cols-1 gap-4 p-4 sm:grid-cols-2">
-              <CapabilityCard title="Safety checks" start={rangeStartLabel(rangeDays)} end={rangeEndLabel()} items={[
-                { color: "bg-chart-1", label: `${fmtInt(derived.safetyChecks)} checks`, data: derived.days.map((day) => day.safetyChecks) },
-              ]} />
-              <CapabilityCard title="Blocked requests" start={rangeStartLabel(rangeDays)} end={rangeEndLabel()} items={[
-                { color: "bg-chart-2", label: `${fmtInt(derived.blockedRequests)} blocked`, data: derived.days.map((day) => day.blockedRequests) },
-              ]} />
-              <UsageFeature title="Moderation events" description="Safety and moderation results reported by the analysis pipeline appear in this view." value={`${safetyRows.length} recorded events`} />
-              <UsageFeature title="Protection status" description="Chart uploads and prompts continue through the configured validation and review safeguards." value="Active" />
+              <CapabilityCard
+                title="Safety checks"
+                start={rangeStartLabel(rangeDays)}
+                end={rangeEndLabel()}
+                items={[
+                  {
+                    color: "bg-chart-1",
+                    label: `${fmtInt(derived.safetyChecks)} checks`,
+                    data: derived.days.map((day) => day.safetyChecks),
+                  },
+                ]}
+              />
+              <CapabilityCard
+                title="Blocked requests"
+                start={rangeStartLabel(rangeDays)}
+                end={rangeEndLabel()}
+                items={[
+                  {
+                    color: "bg-chart-2",
+                    label: `${fmtInt(derived.blockedRequests)} blocked`,
+                    data: derived.days.map((day) => day.blockedRequests),
+                  },
+                ]}
+              />
+              <UsageFeature
+                title="Moderation events"
+                description="Safety and moderation results reported by the analysis pipeline appear in this view."
+                value={`${safetyRows.length} recorded events`}
+              />
+              <UsageFeature
+                title="Protection status"
+                description="Chart uploads and prompts continue through the configured validation and review safeguards."
+                value="Active"
+              />
             </div>
           )}
         </div>
@@ -513,16 +756,29 @@ function UsagePage() {
           <section className="border-b border-border px-4 py-5">
             <div className="flex items-center justify-between text-[13px] text-foreground">
               <span>Monthly spend</span>
-              <Button asChild type="button" variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground">
-                <Link to="/dashboard/billing" aria-label="Manage monthly spend"><Settings2 className="h-4 w-4" /></Link>
+              <Button
+                asChild
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="h-7 w-7 text-muted-foreground"
+              >
+                <Link to="/dashboard/billing" aria-label="Manage monthly spend">
+                  <Settings2 className="h-4 w-4" />
+                </Link>
               </Button>
             </div>
             <div className="mt-5 flex items-center justify-between text-[13px]">
               <span className="text-foreground">Personal</span>
-              <span className="tabular-nums text-foreground">{fmtUsd(data.spentThisPeriod, 2)} / {fmtUsd(data.allowance, 2)}</span>
+              <span className="tabular-nums text-foreground">
+                {fmtUsd(data.spentThisPeriod, 2)} / {fmtUsd(data.allowance, 2)}
+              </span>
             </div>
             <div className="relative mt-3 h-4 w-full rounded-md bg-muted">
-              <div className="h-full rounded-md bg-foreground transition-all" style={{ width: `${spendPct}%` }} />
+              <div
+                className="h-full rounded-md bg-foreground transition-all"
+                style={{ width: `${spendPct}%` }}
+              />
             </div>
             <div className="mt-3 flex items-center justify-between text-[11.5px] text-muted-foreground">
               <span>Wallet balance</span>
@@ -530,33 +786,56 @@ function UsagePage() {
             </div>
             <div className="mt-1.5 flex items-center justify-between text-[11.5px] text-muted-foreground">
               <span>Added this period</span>
-              <span className="tabular-nums text-foreground">{fmtUsd(data.earnedThisPeriod, 2)}</span>
+              <span className="tabular-nums text-foreground">
+                {fmtUsd(data.earnedThisPeriod, 2)}
+              </span>
             </div>
             {daysLeft != null && (
-              <div className="mt-2 text-[11.5px] text-muted-foreground">Resets in {daysLeft} day{daysLeft === 1 ? "" : "s"}</div>
+              <div className="mt-2 text-[11.5px] text-muted-foreground">
+                Resets in {daysLeft} day{daysLeft === 1 ? "" : "s"}
+              </div>
             )}
           </section>
 
           <section className="border-b border-border px-4 py-5">
             <div className="text-[13px] text-foreground">Total tokens</div>
-            <div className="mt-1 text-xl font-medium tabular-nums text-foreground">{fmtInt(derived.totalTokens)}</div>
+            <div className="mt-1 text-xl font-medium tabular-nums text-foreground">
+              {fmtInt(derived.totalTokens)}
+            </div>
             <div className="mt-5">
-              <MiniLine data={derived.tokenSeries} color="#e11d63" filled={derived.totalTokens > 0} />
+              <MiniLine
+                data={derived.tokenSeries}
+                color="#e11d63"
+                filled={derived.totalTokens > 0}
+              />
             </div>
           </section>
 
           <section className="border-b border-border px-4 py-5">
             <div className="text-[13px] text-foreground">Total requests</div>
-            <div className="mt-1 text-xl font-medium tabular-nums text-foreground">{fmtInt(derived.spendRows.length)}</div>
+            <div className="mt-1 text-xl font-medium tabular-nums text-foreground">
+              {fmtInt(derived.spendRows.length)}
+            </div>
             <div className="mt-5">
-              <MiniLine data={derived.requestSeries} color="#a1a1aa" filled={derived.spendRows.length > 0} dashed />
+              <MiniLine
+                data={derived.requestSeries}
+                color="#a1a1aa"
+                filled={derived.spendRows.length > 0}
+                dashed
+              />
             </div>
           </section>
 
           <div className="flex items-center gap-7 border-b border-border px-4 text-[13px]">
-            <TabButton active={sideTab === "users"} onClick={() => setSideTab("users")}>Users</TabButton>
-            <TabButton active={sideTab === "services"} onClick={() => setSideTab("services")}>Services</TabButton>
-            <TabButton active={sideTab === "keys"} onClick={() => setSideTab("keys")}>API Keys</TabButton>
+            <TabButton active={sideTab === "users"} onClick={() => setSideTab("users")}>
+              Users
+            </TabButton>
+            <TabButton active={sideTab === "services"} onClick={() => setSideTab("services")}>
+              Services
+            </TabButton>
+            <TabButton active={sideTab === "keys"} onClick={() => setSideTab("keys")}>
+              API Keys
+            </TabButton>
           </div>
           <section className="px-4 py-5">
             {sideTab === "users" ? (
@@ -564,25 +843,37 @@ function UsagePage() {
                 <MetricRow label="Personal requests" value={fmtInt(derived.spendRows.length)} />
                 <MetricRow label="Personal spend" value={fmtUsd(derived.spent, 2)} />
                 <MetricRow label="Average per request" value={fmtUsd(derived.avgCost, 4)} />
-                <MetricRow label="Last activity" value={derived.lastActivity ? new Date(derived.lastActivity).toLocaleDateString() : "No activity"} />
+                <MetricRow
+                  label="Last activity"
+                  value={
+                    derived.lastActivity
+                      ? new Date(derived.lastActivity).toLocaleDateString()
+                      : "No activity"
+                  }
+                />
               </div>
             ) : sideTab === "services" ? (
               <TypeBreakdown rows={derived.spendRows} />
             ) : data.recentExtensionKeys.length === 0 ? (
-              <p className="py-20 text-center text-[13px] text-muted-foreground">There is no usage data for this period and group.</p>
+              <p className="py-20 text-center text-[13px] text-muted-foreground">
+                There is no usage data for this period and group.
+              </p>
             ) : (
               <div className="space-y-4">
                 <div className="rounded-lg border border-border p-3">
                   <div className="flex items-center justify-between text-[11.5px]">
                     <span className="text-muted-foreground">Daily token limit</span>
                     <span className="tabular-nums text-foreground">
-                      {fmtInt(data.tokensUsedToday)} / {data.dailyTokenLimit > 0 ? fmtInt(data.dailyTokenLimit) : "—"}
+                      {fmtInt(data.tokensUsedToday)} /{" "}
+                      {data.dailyTokenLimit > 0 ? fmtInt(data.dailyTokenLimit) : "—"}
                     </span>
                   </div>
                   <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-muted">
                     <div
                       className="h-full rounded-full bg-primary"
-                      style={{ width: `${data.dailyTokenLimit > 0 ? Math.min(100, (data.tokensUsedToday / data.dailyTokenLimit) * 100) : 0}%` }}
+                      style={{
+                        width: `${data.dailyTokenLimit > 0 ? Math.min(100, (data.tokensUsedToday / data.dailyTokenLimit) * 100) : 0}%`,
+                      }}
                     />
                   </div>
                   <div className="mt-2 text-[10px] text-muted-foreground">
@@ -592,29 +883,46 @@ function UsagePage() {
                 <div className="divide-y divide-border">
                   {data.recentExtensionKeys.map((key, index) => {
                     const usage = derived.keySpend.get(key.id) ?? { spend: 0, requests: 0 };
-                    const pctToday = data.dailyTokenLimit > 0 ? Math.min(100, (key.tokensToday / data.dailyTokenLimit) * 100) : 0;
+                    const pctToday =
+                      data.dailyTokenLimit > 0
+                        ? Math.min(100, (key.tokensToday / data.dailyTokenLimit) * 100)
+                        : 0;
                     return (
                       <div key={key.id} className="py-3">
                         <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
                           <div className="min-w-0">
                             <div className="flex items-center gap-2">
-                              <code className="truncate font-mono text-[11.5px] text-foreground">{key.keyPrefix}••••••••••</code>
-                              {index === 0 && <span className="rounded-full bg-muted px-1.5 py-0.5 text-[9px] font-medium text-foreground">Newest</span>}
+                              <code className="truncate font-mono text-[11.5px] text-foreground">
+                                {key.keyPrefix}••••••••••
+                              </code>
+                              {index === 0 && (
+                                <span className="rounded-full bg-muted px-1.5 py-0.5 text-[9px] font-medium text-foreground">
+                                  Newest
+                                </span>
+                              )}
                             </div>
                             <div className="mt-1 truncate text-[10.5px] text-muted-foreground">
-                              {key.name} · {usage.requests} request{usage.requests === 1 ? "" : "s"} · {key.revokedAt ? "Revoked" : "Active"}
+                              {key.name} · {usage.requests} request{usage.requests === 1 ? "" : "s"}{" "}
+                              · {key.revokedAt ? "Revoked" : "Active"}
                             </div>
                           </div>
                           <div className="shrink-0 text-right">
-                            <div className="text-[12px] font-medium tabular-nums text-foreground">{fmtUsd(usage.spend, 2)}</div>
+                            <div className="text-[12px] font-medium tabular-nums text-foreground">
+                              {fmtUsd(usage.spend, 2)}
+                            </div>
                             <div className="mt-0.5 text-[10px] text-muted-foreground">Spend</div>
                           </div>
                         </div>
                         <div className="mt-2 h-1 w-full overflow-hidden rounded-full bg-muted">
-                          <div className="h-full rounded-full bg-primary/70" style={{ width: `${pctToday}%` }} />
+                          <div
+                            className="h-full rounded-full bg-primary/70"
+                            style={{ width: `${pctToday}%` }}
+                          />
                         </div>
                         <div className="mt-1 flex items-center justify-between text-[10px] text-muted-foreground">
-                          <span className="tabular-nums">{fmtInt(key.tokensToday)} tokens today</span>
+                          <span className="tabular-nums">
+                            {fmtInt(key.tokensToday)} tokens today
+                          </span>
                           <span className="tabular-nums">{fmtUsd(key.costTodayUsd, 4)}</span>
                         </div>
                       </div>
@@ -644,9 +952,14 @@ function rangeEndLabel() {
   return dateLabel(new Date());
 }
 
-
 function Dropdown({
-  open, onToggle, trigger, icon, options, value, onSelect,
+  open,
+  onToggle,
+  trigger,
+  icon,
+  options,
+  value,
+  onSelect,
 }: {
   open: boolean;
   onToggle: () => void;
@@ -690,7 +1003,15 @@ function Dropdown({
   );
 }
 
-function TabButton({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
+function TabButton({
+  active,
+  onClick,
+  children,
+}: {
+  active: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
   return (
     <Button
       type="button"
@@ -707,7 +1028,17 @@ function TabButton({ active, onClick, children }: { active: boolean; onClick: ()
   );
 }
 
-function CapabilityCard({ title, items, start, end }: { title: string; items: { color: string; label: string; data: number[] }[]; start: string; end: string }) {
+function CapabilityCard({
+  title,
+  items,
+  start,
+  end,
+}: {
+  title: string;
+  items: { color: string; label: string; data: number[] }[];
+  start: string;
+  end: string;
+}) {
   return (
     <div className="flex min-h-64 flex-col rounded-lg border border-border bg-card p-4 sm:min-h-[250px]">
       <div className="flex items-center gap-1 text-[13px] text-card-foreground">
@@ -721,7 +1052,10 @@ function CapabilityCard({ title, items, start, end }: { title: string; items: { 
           </div>
         ))}
       </div>
-      <CapabilityChart title={title} series={items.map((item, index) => ({ data: item.data, tone: index }))} />
+      <CapabilityChart
+        title={title}
+        series={items.map((item, index) => ({ data: item.data, tone: index }))}
+      />
       <div className="mt-auto flex items-center justify-between px-7 text-[12px] text-muted-foreground">
         <span>{start}</span>
         <span>{end}</span>
@@ -730,7 +1064,13 @@ function CapabilityCard({ title, items, start, end }: { title: string; items: { 
   );
 }
 
-function CapabilityChart({ title, series }: { title: string; series: { data: number[]; tone: number }[] }) {
+function CapabilityChart({
+  title,
+  series,
+}: {
+  title: string;
+  series: { data: number[]; tone: number }[];
+}) {
   const width = 480;
   const height = 116;
   const top = 10;
@@ -746,30 +1086,76 @@ function CapabilityChart({ title, series }: { title: string; series: { data: num
     });
     return {
       tone,
-      line: points.map(([x, y], index) => `${index === 0 ? "M" : "L"}${x.toFixed(1)} ${y.toFixed(1)}`).join(" "),
+      line: points
+        .map(([x, y], index) => `${index === 0 ? "M" : "L"}${x.toFixed(1)} ${y.toFixed(1)}`)
+        .join(" "),
       area: `M0 ${bottom} ${points.map(([x, y]) => `L${x.toFixed(1)} ${y.toFixed(1)}`).join(" ")} L${width} ${bottom} Z`,
     };
   });
   const gradientId = `capability-${title.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
   return (
-    <div className="mt-5 min-h-0 flex-1" role="img" aria-label={`${title} usage trend from ${series[0]?.data.length ?? 0} daily data points`}>
-      <svg viewBox={`0 0 ${width} ${height}`} className="h-[116px] w-full" preserveAspectRatio="none">
+    <div
+      className="mt-5 min-h-0 flex-1"
+      role="img"
+      aria-label={`${title} usage trend from ${series[0]?.data.length ?? 0} daily data points`}
+    >
+      <svg
+        viewBox={`0 0 ${width} ${height}`}
+        className="h-[116px] w-full"
+        preserveAspectRatio="none"
+      >
         <defs>
           <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stopColor="var(--chart-1)" stopOpacity="0.2" />
             <stop offset="100%" stopColor="var(--chart-1)" stopOpacity="0" />
           </linearGradient>
         </defs>
-        {[top, (top + bottom) / 2, bottom].map((y) => <line key={y} x1="0" y1={y} x2={width} y2={y} stroke="var(--border)" strokeWidth="1" strokeDasharray="4 5" />)}
+        {[top, (top + bottom) / 2, bottom].map((y) => (
+          <line
+            key={y}
+            x1="0"
+            y1={y}
+            x2={width}
+            y2={y}
+            stroke="var(--border)"
+            strokeWidth="1"
+            strokeDasharray="4 5"
+          />
+        ))}
         {paths[0] && <path d={paths[0].area} fill={`url(#${gradientId})`} />}
-        {paths.map((path) => <path key={path.tone} d={path.line} fill="none" stroke={palette[path.tone] ?? "var(--chart-3)"} strokeWidth="2" vectorEffect="non-scaling-stroke" strokeLinecap="round" strokeLinejoin="round" />)}
+        {paths.map((path) => (
+          <path
+            key={path.tone}
+            d={path.line}
+            fill="none"
+            stroke={palette[path.tone] ?? "var(--chart-3)"}
+            strokeWidth="2"
+            vectorEffect="non-scaling-stroke"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        ))}
       </svg>
     </div>
   );
 }
 
-function ModelBreakdown({ rows }: { rows: { model?: string | null; prompt_tokens?: number | null; completion_tokens?: number | null; raw_cost_usd?: number | null; delta: number; created_at?: string }[] }) {
-  const byModel = new Map<string, { requests: number; tokens: number; cost: number; trend: { date: string; cost: number }[] }>();
+function ModelBreakdown({
+  rows,
+}: {
+  rows: {
+    model?: string | null;
+    prompt_tokens?: number | null;
+    completion_tokens?: number | null;
+    raw_cost_usd?: number | null;
+    delta: number;
+    created_at?: string;
+  }[];
+}) {
+  const byModel = new Map<
+    string,
+    { requests: number; tokens: number; cost: number; trend: { date: string; cost: number }[] }
+  >();
   for (const r of rows) {
     const key = r.model ?? "unknown";
     const cur = byModel.get(key) ?? { requests: 0, tokens: 0, cost: 0, trend: [] };
@@ -784,7 +1170,11 @@ function ModelBreakdown({ rows }: { rows: { model?: string | null; prompt_tokens
   }
   const list = [...byModel.entries()].sort((a, b) => b[1].cost - a[1].cost);
   if (list.length === 0) {
-    return <p className="p-5 text-center text-[13px] text-zinc-500">There is no usage data for this period and group.</p>;
+    return (
+      <p className="p-5 text-center text-[13px] text-zinc-500">
+        There is no usage data for this period and group.
+      </p>
+    );
   }
   return (
     <div className="divide-y divide-zinc-100">
@@ -793,7 +1183,9 @@ function ModelBreakdown({ rows }: { rows: { model?: string | null; prompt_tokens
           <div className="grid grid-cols-1 gap-2 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
             <div className="flex min-w-0 items-center gap-2">
               <ModelLogo model={model} />
-              <span className="min-w-0 truncate text-[12px] font-medium text-zinc-800">{modelDisplay(model).model}</span>
+              <span className="min-w-0 truncate text-[12px] font-medium text-zinc-800">
+                {modelDisplay(model).model}
+              </span>
             </div>
             <div className="grid grid-cols-3 items-center gap-2 tabular-nums text-[11px] text-zinc-500 sm:flex sm:shrink-0 sm:gap-4 sm:text-[12px]">
               <span>{fmtInt(s.requests)} requests</span>
@@ -817,48 +1209,133 @@ function ClaudeLogo({ className }: { className?: string }) {
 
 function ModelLogo({ model }: { model: string }) {
   const normalized = model.toLowerCase();
-  if (normalized.includes("astra")) return <img src={chatGptLogoAsset.url} alt="ChatGPT logo" className="h-7 w-7 shrink-0 object-contain" />;
-  if (normalized.includes("claude") || normalized.includes("fable")) return <span className="grid h-7 w-7 shrink-0 place-items-center text-[#D97757]"><ClaudeLogo className="h-6 w-6" /></span>;
-  if (normalized.includes("sol")) return <img src={solLogoAsset.url} alt="Sol logo" className="h-7 w-7 shrink-0 object-contain" />;
-  if (normalized.includes("gemini") || normalized.includes("google")) return <CompanyMark company="Google" />;
-  if (normalized.includes("grok") || normalized.includes("xai")) return <CompanyMark company="xAI" />;
+  if (normalized.includes("astra"))
+    return (
+      <img
+        src={chatGptLogoAsset.url}
+        alt="ChatGPT logo"
+        className="h-7 w-7 shrink-0 object-contain"
+      />
+    );
+  if (normalized.includes("claude") || normalized.includes("fable"))
+    return (
+      <span className="grid h-7 w-7 shrink-0 place-items-center text-[#D97757]">
+        <ClaudeLogo className="h-6 w-6" />
+      </span>
+    );
+  if (normalized.includes("sol"))
+    return (
+      <img src={solLogoAsset.url} alt="Sol logo" className="h-7 w-7 shrink-0 object-contain" />
+    );
+  if (normalized.includes("gemini") || normalized.includes("google"))
+    return <CompanyMark company="Google" />;
+  if (normalized.includes("grok") || normalized.includes("xai"))
+    return <CompanyMark company="xAI" />;
   if (normalized.includes("deepseek")) return <CompanyMark company="DeepSeek" />;
-  if (normalized.includes("llama") || normalized.includes("meta")) return <CompanyMark company="Meta" />;
+  if (normalized.includes("llama") || normalized.includes("meta"))
+    return <CompanyMark company="Meta" />;
   if (normalized.includes("mistral")) return <CompanyMark company="Mistral" />;
-  if (normalized.includes("nemotron") || normalized.includes("nvidia")) return <CompanyMark company="NVIDIA" />;
-  if (normalized.includes("gpt") || normalized.includes("openai")) return <CompanyMark company="OpenAI" />;
+  if (normalized.includes("nemotron") || normalized.includes("nvidia"))
+    return <CompanyMark company="NVIDIA" />;
+  if (normalized.includes("gpt") || normalized.includes("openai"))
+    return <CompanyMark company="OpenAI" />;
   const display = modelDisplay(model);
-  return <span className="grid h-7 w-7 shrink-0 place-items-center text-[10px] font-medium text-foreground" aria-hidden="true">{display.provider.slice(0, 1).toUpperCase()}</span>;
+  return (
+    <span
+      className="grid h-7 w-7 shrink-0 place-items-center text-[10px] font-medium text-foreground"
+      aria-hidden="true"
+    >
+      {display.provider.slice(0, 1).toUpperCase()}
+    </span>
+  );
 }
 
-function CompanyMark({ company }: { company: "Google" | "xAI" | "DeepSeek" | "Meta" | "Mistral" | "NVIDIA" | "OpenAI" }) {
+function CompanyMark({
+  company,
+}: {
+  company: "Google" | "xAI" | "DeepSeek" | "Meta" | "Mistral" | "NVIDIA" | "OpenAI";
+}) {
   if (company === "Google") {
-    return <span className="grid h-7 w-7 shrink-0 place-items-center text-lg font-medium text-foreground" aria-label="Google logo">G</span>;
+    return (
+      <span
+        className="grid h-7 w-7 shrink-0 place-items-center text-lg font-medium text-foreground"
+        aria-label="Google logo"
+      >
+        G
+      </span>
+    );
   }
   if (company === "xAI") {
-    return <span className="grid h-7 w-7 shrink-0 place-items-center text-base font-medium text-foreground" aria-label="xAI logo">𝕏</span>;
+    return (
+      <span
+        className="grid h-7 w-7 shrink-0 place-items-center text-base font-medium text-foreground"
+        aria-label="xAI logo"
+      >
+        𝕏
+      </span>
+    );
   }
   if (company === "Meta") {
-    return <span className="grid h-7 w-7 shrink-0 place-items-center text-xl text-foreground" aria-label="Meta logo">∞</span>;
+    return (
+      <span
+        className="grid h-7 w-7 shrink-0 place-items-center text-xl text-foreground"
+        aria-label="Meta logo"
+      >
+        ∞
+      </span>
+    );
   }
   if (company === "NVIDIA") {
-    return <span className="grid h-7 w-7 shrink-0 place-items-center text-[9px] font-medium text-foreground" aria-label="NVIDIA logo">NVIDIA</span>;
+    return (
+      <span
+        className="grid h-7 w-7 shrink-0 place-items-center text-[9px] font-medium text-foreground"
+        aria-label="NVIDIA logo"
+      >
+        NVIDIA
+      </span>
+    );
   }
   if (company === "Mistral") {
-    return <span className="grid h-7 w-7 shrink-0 place-items-center text-base font-medium text-foreground" aria-label="Mistral AI logo">M</span>;
+    return (
+      <span
+        className="grid h-7 w-7 shrink-0 place-items-center text-base font-medium text-foreground"
+        aria-label="Mistral AI logo"
+      >
+        M
+      </span>
+    );
   }
   if (company === "DeepSeek") {
-    return <span className="grid h-7 w-7 shrink-0 place-items-center text-base font-medium text-foreground" aria-label="DeepSeek logo">DS</span>;
+    return (
+      <span
+        className="grid h-7 w-7 shrink-0 place-items-center text-base font-medium text-foreground"
+        aria-label="DeepSeek logo"
+      >
+        DS
+      </span>
+    );
   }
   return (
-    <svg viewBox="0 0 24 24" role="img" aria-label="OpenAI logo" className="h-6 w-6 shrink-0 text-foreground" fill="none" stroke="currentColor" strokeWidth="1.6">
+    <svg
+      viewBox="0 0 24 24"
+      role="img"
+      aria-label="OpenAI logo"
+      className="h-6 w-6 shrink-0 text-foreground"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.6"
+    >
       <path d="M12 3.1a4.45 4.45 0 0 1 7.65 3.08 4.46 4.46 0 0 1 1.04 7.96 4.45 4.45 0 0 1-4.87 6.65A4.46 4.46 0 0 1 8.1 19.8a4.45 4.45 0 0 1-4.76-6.72A4.46 4.46 0 0 1 4.4 5.14 4.45 4.45 0 0 1 12 3.1Z" />
       <path d="m8.15 7.8 3.86-2.22 3.85 2.22v4.45L12 14.48 8.15 12.25V7.8Zm0 4.45v4.45L12 18.92l3.86-2.22v-4.45M12 14.48v4.44" />
     </svg>
   );
 }
 
-function TypeBreakdown({ rows }: { rows: { reason: string; delta: number; created_at?: string }[] }) {
+function TypeBreakdown({
+  rows,
+}: {
+  rows: { reason: string; delta: number; created_at?: string }[];
+}) {
   const byType = new Map<string, { count: number; cost: number }>();
   for (const r of rows) {
     const key = label(r.reason);
@@ -869,7 +1346,11 @@ function TypeBreakdown({ rows }: { rows: { reason: string; delta: number; create
   }
   const list = [...byType.entries()].sort((a, b) => b[1].cost - a[1].cost);
   if (list.length === 0) {
-    return <p className="py-8 text-center text-[13px] text-zinc-500">There is no usage data for this period and group.</p>;
+    return (
+      <p className="py-8 text-center text-[13px] text-zinc-500">
+        There is no usage data for this period and group.
+      </p>
+    );
   }
   const max = Math.max(...list.map(([, s]) => s.cost), 0.0001);
   return (
@@ -878,10 +1359,15 @@ function TypeBreakdown({ rows }: { rows: { reason: string; delta: number; create
         <div key={name}>
           <div className="flex items-center justify-between text-[12px]">
             <span className="font-medium text-zinc-700">{name}</span>
-            <span className="tabular-nums text-zinc-500">{fmtInt(s.count)} · {fmtSpend(s.cost)}</span>
+            <span className="tabular-nums text-zinc-500">
+              {fmtInt(s.count)} · {fmtSpend(s.cost)}
+            </span>
           </div>
           <div className="mt-1 h-1.5 w-full rounded-full bg-zinc-100">
-            <div className="h-full rounded-full bg-zinc-800" style={{ width: `${(s.cost / max) * 100}%` }} />
+            <div
+              className="h-full rounded-full bg-zinc-800"
+              style={{ width: `${(s.cost / max) * 100}%` }}
+            />
           </div>
           {name.toLowerCase().includes("ict") && (
             <div className="mt-2" aria-label={`${name} usage graph`}>
@@ -901,11 +1387,23 @@ function TypeBreakdown({ rows }: { rows: { reason: string; delta: number; create
   );
 }
 
-function UsageSubset({ title, rows, empty }: { title: string; rows: { reason: string; delta: number }[]; empty: string }) {
+function UsageSubset({
+  title,
+  rows,
+  empty,
+}: {
+  title: string;
+  rows: { reason: string; delta: number }[];
+  empty: string;
+}) {
   return (
     <div className="p-5">
       <h2 className="text-[13px] text-foreground">{title}</h2>
-      {rows.length > 0 ? <div className="mt-4"><TypeBreakdown rows={rows} /></div> : (
+      {rows.length > 0 ? (
+        <div className="mt-4">
+          <TypeBreakdown rows={rows} />
+        </div>
+      ) : (
         <div className="flex min-h-48 flex-col items-center justify-center text-center">
           <ChartColumn className="h-5 w-5 text-muted-foreground" />
           <p className="mt-3 text-[13px] text-muted-foreground">{empty}</p>
@@ -915,7 +1413,15 @@ function UsageSubset({ title, rows, empty }: { title: string; rows: { reason: st
   );
 }
 
-function UsageFeature({ title, description, value }: { title: string; description: string; value: string }) {
+function UsageFeature({
+  title,
+  description,
+  value,
+}: {
+  title: string;
+  description: string;
+  value: string;
+}) {
   return (
     <div className="min-h-40 rounded-lg border border-border bg-card p-4">
       <div className="text-[13px] text-card-foreground">{title}</div>
@@ -926,10 +1432,25 @@ function UsageFeature({ title, description, value }: { title: string; descriptio
 }
 
 function MetricRow({ label, value }: { label: string; value: string }) {
-  return <div className="flex items-center justify-between gap-3"><span className="text-muted-foreground">{label}</span><span className="text-right tabular-nums text-foreground">{value}</span></div>;
+  return (
+    <div className="flex items-center justify-between gap-3">
+      <span className="text-muted-foreground">{label}</span>
+      <span className="text-right tabular-nums text-foreground">{value}</span>
+    </div>
+  );
 }
 
-function MiniLine({ data, color, filled, dashed }: { data: number[]; color: string; filled: boolean; dashed?: boolean }) {
+function MiniLine({
+  data,
+  color,
+  filled,
+  dashed,
+}: {
+  data: number[];
+  color: string;
+  filled: boolean;
+  dashed?: boolean;
+}) {
   const W = 260;
   const H = 44;
   const n = Math.max(data.length, 2);
@@ -939,24 +1460,45 @@ function MiniLine({ data, color, filled, dashed }: { data: number[]; color: stri
     const y = H - 4 - ((data[i] ?? 0) / max) * (H - 10);
     return [x, y] as const;
   });
-  const dPath = pts.map(([x, y], i) => `${i === 0 ? "M" : "L"}${x.toFixed(1)} ${y.toFixed(1)}`).join(" ");
+  const dPath = pts
+    .map(([x, y], i) => `${i === 0 ? "M" : "L"}${x.toFixed(1)} ${y.toFixed(1)}`)
+    .join(" ");
   const last = pts[pts.length - 1];
   if (!filled) {
     // dashed empty baseline, like the reference
     const segs = 7;
     return (
-      <svg viewBox={`0 0 ${W} ${H}`} className="w-full" preserveAspectRatio="none" style={{ height: H }}>
+      <svg
+        viewBox={`0 0 ${W} ${H}`}
+        className="w-full"
+        preserveAspectRatio="none"
+        style={{ height: H }}
+      >
         {Array.from({ length: segs }, (_, i) => {
           const x0 = (i / segs) * W + 2;
           const x1 = ((i + 1) / segs) * W - 6;
-          return <line key={i} x1={x0} y1={H - 4} x2={x1} y2={H - 4} stroke={color} strokeWidth={1.5} />;
+          return (
+            <line key={i} x1={x0} y1={H - 4} x2={x1} y2={H - 4} stroke={color} strokeWidth={1.5} />
+          );
         })}
       </svg>
     );
   }
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} className="w-full" preserveAspectRatio="none" style={{ height: H }}>
-      <path d={dPath} fill="none" stroke={color} strokeWidth={1.5} strokeDasharray={dashed ? "5 4" : undefined} strokeLinecap="round" />
+    <svg
+      viewBox={`0 0 ${W} ${H}`}
+      className="w-full"
+      preserveAspectRatio="none"
+      style={{ height: H }}
+    >
+      <path
+        d={dPath}
+        fill="none"
+        stroke={color}
+        strokeWidth={1.5}
+        strokeDasharray={dashed ? "5 4" : undefined}
+        strokeLinecap="round"
+      />
       <circle cx={last[0]} cy={last[1]} r={3.5} fill="white" stroke={color} strokeWidth={1.5} />
     </svg>
   );
