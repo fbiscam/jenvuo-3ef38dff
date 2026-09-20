@@ -724,11 +724,12 @@ function DashboardLayout() {
   }, []);
   useEffect(() => {
     if (typeof window === "undefined") return;
+    if (pathname === "/dashboard/terminal") return;
     window.localStorage.setItem("jenvu:dash:sidebar-collapsed", sidebarCollapsed ? "1" : "0");
-  }, [sidebarCollapsed]);
-  // Auto-collapse the sidebar when entering the terminal page
+  }, [sidebarCollapsed, pathname]);
+  // Collapse only on the terminal page; every other page opens the sidebar again
   useEffect(() => {
-    if (pathname === "/dashboard/terminal") setSidebarCollapsed(true);
+    setSidebarCollapsed(pathname === "/dashboard/terminal");
   }, [pathname]);
   // Close mobile drawer on route change
   useEffect(() => {
