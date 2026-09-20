@@ -2,7 +2,16 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation } from "@tanstack/react-query";
-import { Send, LineChart, Loader2, Moon, Sun, Sparkles } from "lucide-react";
+import {
+  Send,
+  LineChart,
+  Loader2,
+  Moon,
+  Sun,
+  Sparkles,
+  PanelRightClose,
+  PanelRightOpen,
+} from "lucide-react";
 import { analyzeGold, type GoldSignal } from "@/lib/gold-analysis.functions";
 import { cn } from "@/lib/utils";
 
@@ -51,6 +60,7 @@ const QUICK = [
 function TerminalPage() {
   const [tf, setTf] = useState(TIMEFRAMES[3]);
   const [theme, setTheme] = useState<"light" | "dark">("dark");
+  const [deskOpen, setDeskOpen] = useState(true);
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<ChatMsg[]>([]);
   const scroller = useRef<HTMLDivElement>(null);
@@ -108,7 +118,7 @@ function TerminalPage() {
   }
 
   return (
-    <div className="flex h-[calc(100vh-4rem)] min-h-[600px] w-full flex-col bg-background">
+    <div className="fixed inset-0 z-40 flex w-full flex-col overflow-hidden bg-background">
       {/* Top toolbar */}
       <div className="flex flex-wrap items-center gap-2 border-b border-border px-3 py-2">
         <div className="flex items-center gap-2 pr-3 font-semibold">
@@ -136,11 +146,19 @@ function TerminalPage() {
           {theme === "dark" ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
           {theme === "dark" ? "Light" : "Dark"}
         </button>
+        <button
+          onClick={() => setDeskOpen((v) => !v)}
+          className="inline-flex items-center gap-1.5 rounded-md border border-border px-2 py-1 text-xs text-muted-foreground hover:bg-muted"
+          aria-pressed={deskOpen}
+        >
+          {deskOpen ? <PanelRightClose className="h-3.5 w-3.5" /> : <PanelRightOpen className="h-3.5 w-3.5" />}
+          {deskOpen ? "Hide AI Desk" : "Show AI Desk"}
+        </button>
       </div>
 
       <div className="flex min-h-0 flex-1 flex-col lg:flex-row">
         {/* Chart */}
-        <main className="min-h-[420px] flex-1">
+        <main className="min-h-0 flex-1">
           <iframe
             key={chartSrc}
             src={chartSrc}
@@ -151,7 +169,8 @@ function TerminalPage() {
         </main>
 
         {/* AI desk */}
-        <aside className="flex h-[440px] w-full shrink-0 flex-col border-t border-border lg:h-auto lg:w-96 lg:border-l lg:border-t-0">
+        {deskOpen && (
+        <aside className="flex h-[45%] w-full shrink-0 flex-col border-t border-border lg:h-auto lg:w-96 lg:border-l lg:border-t-0">
           <div className="flex items-center gap-2 border-b border-border px-3 py-2">
             <Sparkles className="h-4 w-4 text-primary" />
             <span className="text-sm font-semibold">AI Desk</span>
@@ -230,6 +249,7 @@ function TerminalPage() {
             </button>
           </form>
         </aside>
+        )}
       </div>
     </div>
   );
