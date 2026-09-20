@@ -1,17 +1,26 @@
 import { useEffect, useMemo, useRef } from "react";
 import {
   createChart,
+  createSeriesMarkers,
   CandlestickSeries,
   LineSeries,
   LineStyle,
   type IChartApi,
+  type SeriesMarker,
   type Time,
 } from "lightweight-charts";
 import { X } from "lucide-react";
 import { PineError, runPineScript, type PineCandle } from "@/lib/pine/engine";
+import { computeMarketStructure } from "@/lib/pine/market-structure";
 import { Button } from "@/components/ui/button";
 
-export type PineIndicator = { id: string; name: string; code: string };
+export type PineIndicator = {
+  id: string;
+  name: string;
+  code: string;
+  builtin?: "market-structure";
+  locked?: boolean;
+};
 
 type Props = {
   indicator: PineIndicator;
