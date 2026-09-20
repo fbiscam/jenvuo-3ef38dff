@@ -3,31 +3,21 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation } from "@tanstack/react-query";
 import {
-  Bell,
-  BellRing,
   History,
   ImagePlus,
   Mic,
   PanelRightClose,
   Square,
   SquarePen,
+  Timer,
   Trash2,
   X,
 } from "lucide-react";
 import type { FileUIPart } from "ai";
 import { analyzeGold, type GoldSignal } from "@/lib/gold-analysis.functions";
-import { fetchGoldSpot } from "@/lib/candle-feed.functions";
 import { transcribeVoiceMessage } from "@/lib/transcription.functions";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import {
   Conversation,
@@ -109,15 +99,31 @@ type ChatThread = {
 
 const THREADS_KEY = "jenvu:terminal:threads:v1";
 const TERMINAL_SETTINGS_KEY = "jenvu:terminal:settings:v1";
-const PRICE_ALERTS_KEY = "jenvu:terminal:price-alerts:v1";
 
-type PriceAlert = {
-  id: string;
-  direction: "above" | "below";
-  target: number;
-  createdAt: number;
-  triggeredAt?: number;
-};
+function candleSecondsLeft(tvInterval: string): number {
+  const now = Date.now();
+  if (tvInterval === "D") {
+    const next = Date.UTC(
+      new Date(now).getUTCFullYear(),
+      new Date(now).getUTCMonth(),
+      new Date(now).getUTCDate() + 1,
+    );
+    return Math.max(0, Math.floor((next - now) / 1000));
+  }
+  const minutes = Number(tvInterval);
+  if (!Number.isFinite(minutes) || minutes <= 0) return 0;
+  const period = minutes * 60_000;
+  return Math.max(0, Math.ceil((period - (now % period)) / 1000));
+}
+
+function formatCountdown(totalSeconds: number): string {
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+  const pad = (value: number) => String(value).padStart(2, "0");
+  return hours > 0 ? `${hours}:${pad(minutes)}:${pad(seconds)}` : `${pad(minutes)}:${pad(seconds)}`;
+}
+
 
 const QUICK = [
   "Analyse the current chart",
@@ -212,12 +218,7 @@ function TerminalPage() {
   const [threads, setThreads] = useState<ChatThread[]>([]);
   const [activeThreadId, setActiveThreadId] = useState<string | null>(null);
   const [historyOpen, setHistoryOpen] = useState(false);
-  const [alertsOpen, setAlertsOpen] = useState(false);
-  const [priceAlerts, setPriceAlerts] = useState<PriceAlert[]>([]);
-  const [alertDirection, setAlertDirection] = useState<PriceAlert["direction"]>("above");
-  const [alertTarget, setAlertTarget] = useState("");
-  const [liveGoldPrice, setLiveGoldPrice] = useState<number | null>(null);
-  const [alertError, setAlertError] = useState("");
+  const [secondsLeft, setSecondsLeft] = useState(0);
   const [voiceError, setVoiceError] = useState("");
   const [isRecording, setIsRecording] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
@@ -230,7 +231,6 @@ function TerminalPage() {
   const activeThreadIdRef = useRef<string | null>(null);
   const analyze = useServerFn(analyzeGold);
   const transcribe = useServerFn(transcribeVoiceMessage);
-  const getGoldSpot = useServerFn(fetchGoldSpot);
 
   function addMessage(message: ChatMsg) {
     setMessages((current) => [...current, message]);
@@ -379,25 +379,10 @@ function TerminalPage() {
         timeframe?: string;
         theme?: "light" | "dark";
         deskOpen?: boolean;
-        alertsOpen?: boolean;
       } | null;
       const savedTimeframe = TIMEFRAMES.find((timeframe) => timeframe.key === settings?.timeframe);
       if (savedTimeframe) setTf(savedTimeframe);
-      // Desk and alert panels always start closed so the chart opens exactly as left.
-      const savedAlerts = JSON.parse(
-        window.localStorage.getItem(PRICE_ALERTS_KEY) || "[]",
-      ) as PriceAlert[];
-      if (Array.isArray(savedAlerts)) {
-        setPriceAlerts(
-          savedAlerts.filter(
-            (alert) =>
-              alert &&
-              typeof alert.id === "string" &&
-              (alert.direction === "above" || alert.direction === "below") &&
-              Number.isFinite(alert.target),
-          ),
-        );
-      }
+      // The AI desk always starts closed so the chart opens exactly as left.
 
       const CHART_USER_KEY = "jenvu:terminal:chart-user:v1";
       let chartUser = window.localStorage.getItem(CHART_USER_KEY);
@@ -426,51 +411,15 @@ function TerminalPage() {
     if (!hydratedRef.current) return;
     window.localStorage.setItem(
       TERMINAL_SETTINGS_KEY,
-      JSON.stringify({ timeframe: tf.key, deskOpen, alertsOpen }),
+      JSON.stringify({ timeframe: tf.key, deskOpen }),
     );
-  }, [tf.key, deskOpen, alertsOpen]);
+  }, [tf.key, deskOpen]);
 
   useEffect(() => {
-    if (!hydratedRef.current) return;
-    window.localStorage.setItem(PRICE_ALERTS_KEY, JSON.stringify(priceAlerts));
-  }, [priceAlerts]);
-
-  useEffect(() => {
-    let stopped = false;
-    const checkAlerts = async () => {
-      try {
-        const quote = await getGoldSpot({ data: { asset: "XAUUSD" } });
-        if (stopped || quote.price == null) return;
-        const currentPrice = quote.price;
-        setLiveGoldPrice(currentPrice);
-        setAlertError("");
-        setPriceAlerts((current) =>
-          current.map((alert) => {
-            if (alert.triggeredAt) return alert;
-            const reached =
-              alert.direction === "above"
-                ? currentPrice >= alert.target
-                : currentPrice <= alert.target;
-            if (!reached) return alert;
-            if ("Notification" in window && Notification.permission === "granted") {
-              new Notification("Jenvu XAU/USD alert", {
-                body: `Gold reached ${currentPrice.toFixed(2)} (${alert.direction} ${alert.target.toFixed(2)}).`,
-              });
-            }
-            return { ...alert, triggeredAt: Date.now() };
-          }),
-        );
-      } catch {
-        if (!stopped) setAlertError("Live gold price is temporarily unavailable.");
-      }
-    };
-    void checkAlerts();
-    const timer = window.setInterval(checkAlerts, 10_000);
-    return () => {
-      stopped = true;
-      window.clearInterval(timer);
-    };
-  }, [getGoldSpot]);
+    setSecondsLeft(candleSecondsLeft(tf.tv));
+    const timer = window.setInterval(() => setSecondsLeft(candleSecondsLeft(tf.tv)), 1000);
+    return () => window.clearInterval(timer);
+  }, [tf.tv]);
 
   useEffect(() => {
     if (!ask.isPending && !voice.isPending && !isRecording) textareaRef.current?.focus();
