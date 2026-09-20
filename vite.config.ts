@@ -126,14 +126,14 @@ export default defineConfig({
           find: /^entities\/lib\/decode\.js$/,
           replacement: path.resolve(
             __dirname,
-            "node_modules/htmlparser2/node_modules/entities/lib/esm/decode.js",
+            "node_modules/entities/lib/esm/decode.js",
           ),
         },
         {
           find: /^entities\/lib\/encode\.js$/,
           replacement: path.resolve(
             __dirname,
-            "node_modules/htmlparser2/node_modules/entities/lib/esm/encode.js",
+            "node_modules/entities/lib/esm/encode.js",
           ),
         },
         {
