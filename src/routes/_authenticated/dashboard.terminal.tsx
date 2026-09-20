@@ -441,19 +441,20 @@ function TerminalPage() {
       try {
         const quote = await getGoldSpot({ data: { asset: "XAUUSD" } });
         if (stopped || quote.price == null) return;
-        setLiveGoldPrice(quote.price);
+        const currentPrice = quote.price;
+        setLiveGoldPrice(currentPrice);
         setAlertError("");
         setPriceAlerts((current) =>
           current.map((alert) => {
             if (alert.triggeredAt) return alert;
             const reached =
               alert.direction === "above"
-                ? quote.price! >= alert.target
-                : quote.price! <= alert.target;
+                ? currentPrice >= alert.target
+                : currentPrice <= alert.target;
             if (!reached) return alert;
             if ("Notification" in window && Notification.permission === "granted") {
               new Notification("Jenvu XAU/USD alert", {
-                body: `Gold reached ${quote.price!.toFixed(2)} (${alert.direction} ${alert.target.toFixed(2)}).`,
+                body: `Gold reached ${currentPrice.toFixed(2)} (${alert.direction} ${alert.target.toFixed(2)}).`,
               });
             }
             return { ...alert, triggeredAt: Date.now() };
@@ -632,7 +633,9 @@ function TerminalPage() {
                     <div className="flex flex-col gap-2 sm:flex-row">
                       <Select
                         value={alertDirection}
-                        onValueChange={(value: PriceAlert["direction"]) => setAlertDirection(value)}
+                        onValueChange={(value) => {
+                          if (value === "above" || value === "below") setAlertDirection(value);
+                        }}
                       >
                         <SelectTrigger className="sm:w-32" aria-label="Alert condition">
                           <SelectValue />
