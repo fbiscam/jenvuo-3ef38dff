@@ -273,20 +273,32 @@ export async function generateInsightCover(opts: {
   category: string;
   slug: string;
 }): Promise<string | null> {
-  const generated = await generateBase64(coverPrompt(opts.title, opts.category, opts.slug));
-  if (!generated) return null;
-
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  const mime = generated.mime || "image/png";
-  const ext = mime.includes("jpeg") || mime.includes("jpg") ? "jpg" : mime.includes("webp") ? "webp" : "png";
+  const generated = await generateBase64(coverPrompt(opts.title, opts.category, opts.slug));
+
+  let bytes: Uint8Array;
+  let mime: string;
+  if (generated) {
+    mime = generated.mime || "image/png";
+    bytes = base64ToBytes(generated.b64);
+  } else {
+    // Every external provider is unavailable — fall back to a locally drawn
+    // cover so the article still publishes on schedule.
+    console.warn("[insight-image] all providers unavailable, using local cover");
+    mime = "image/svg+xml";
+    bytes = new TextEncoder().encode(localCoverSvg(opts.title, opts.category, opts.slug));
+  }
+
+  const ext =
+    mime.includes("svg") ? "svg"
+    : mime.includes("jpeg") || mime.includes("jpg") ? "jpg"
+    : mime.includes("webp") ? "webp"
+    : "png";
   const path = `${opts.slug}-${Date.now()}.${ext}`;
 
   const { error } = await supabaseAdmin.storage
     .from(INSIGHT_IMAGE_BUCKET)
-    .upload(path, base64ToBytes(generated.b64), {
-      contentType: mime,
-      upsert: true,
-    });
+    .upload(path, bytes, { contentType: mime, upsert: true });
 
   if (error) {
     console.warn("[insight-image] upload failed", error.message);
@@ -295,3 +307,4 @@ export async function generateInsightCover(opts: {
 
   return `/api/public/insight-image/${path}`;
 }
+
