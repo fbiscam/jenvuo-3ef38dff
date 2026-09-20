@@ -111,14 +111,15 @@ export const Route = createFileRoute("/api/public/hooks/generate-insight")({
             .eq("job_key", JOB_KEY);
         };
 
-        // Daily cap: 1 article per 24h (bypass with ?force=1 for manual publishing)
+        // Daily cap: up to 2 articles per 24h (bypass with ?force=1 for manual publishing)
         const force = new URL(request.url).searchParams.get("force") === "1";
+        const DAILY_ARTICLE_CAP = 2;
         const since = new Date(Date.now() - 24 * 3600 * 1000).toISOString();
         const { count: recentCount } = await supabaseAdmin
           .from("insights")
           .select("id", { count: "exact", head: true })
           .gte("created_at", since);
-        if (!force && (recentCount ?? 0) >= 1) {
+        if (!force && (recentCount ?? 0) >= DAILY_ARTICLE_CAP) {
           await updateJob({ status: "completed", last_completed_at: new Date().toISOString() });
           return Response.json({ skipped: "daily-cap-reached", recentCount });
         }
