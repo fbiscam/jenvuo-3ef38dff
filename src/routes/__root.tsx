@@ -137,7 +137,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "application-name", content: "Jenvu" },
       { name: "robots", content: "index, follow, max-image-preview:large, max-snippet:-1" },
       { name: "google-site-verification", content: "tbza8oQV5Q94J94ETfj9TDnV7gI8eoXIAF6q9nctPnQ" },
-      { name: "google-adsense-account", content: "ca-pub-7687697849515472" },
+      { name: "google-adsense-account", content: "ca-pub-9179643691974639" },
+      { name: "google-adsense-account", content: "ca-pub-8708842688547386" },
+      { name: "google-adsense-account", content: "ca-pub-6031688799547633" },
       { title: "Jenvu — AI Gold Trading" },
       { name: "description", content: "AI-powered TradingView extension for XAU/USD with live ICT/SMC analysis, chart context, A+ setups and reviewed trade signals." },
       { name: "author", content: "Jenvu AI" },
@@ -155,6 +157,21 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
     ],
     scripts: [
+      {
+        src: "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9179643691974639",
+        async: true,
+        crossOrigin: "anonymous",
+      },
+      {
+        src: "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8708842688547386",
+        async: true,
+        crossOrigin: "anonymous",
+      },
+      {
+        src: "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6031688799547633",
+        async: true,
+        crossOrigin: "anonymous",
+      },
       ...(googleAnalyticsId
         ? [
             {
