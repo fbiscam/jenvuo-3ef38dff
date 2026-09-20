@@ -137,13 +137,19 @@ function Billing() {
   const planLabel = trial.active ? "Pay as you go" : plan ? "Pay as you go" : "Pay as you go";
   const remaining = credits.balance;
 
-  const shortcuts = [
-    { icon: CreditCard, title: "Payment methods", desc: "Manage your deposit addresses and crypto networks", to: "/dashboard/pay" },
-    { icon: Settings, title: "Manage plan", desc: "Upgrade, downgrade or cancel your current plan", to: "/dashboard/pay" },
+  const shortcuts: Array<{
+    icon: typeof CreditCard;
+    title: string;
+    desc: string;
+    tab?: (typeof TABS)[number];
+    to?: string;
+  }> = [
+    { icon: CreditCard, title: "Payment methods", desc: "Manage your deposit addresses and crypto networks", tab: "Payment methods" },
+    { icon: Settings, title: "Manage plan", desc: "Upgrade, downgrade or cancel your current plan", to: "/pricing" },
     { icon: BarChart3, title: "Usage", desc: "See your token, request and credit spend over time", to: "/dashboard/usage" },
-    { icon: FileText, title: "Invoices", desc: "Download PDF receipts for approved top-up payments", to: "/dashboard/billing" },
-    { icon: SlidersHorizontal, title: "Preferences", desc: "Auto-reload thresholds and billing notifications", to: "/dashboard/notifications" },
-    { icon: ArrowRight, title: "Promotions", desc: "Redeem promo codes and view your bonus credit history", to: "/dashboard/pay" },
+    { icon: FileText, title: "Invoices", desc: "Download PDF receipts for approved top-up payments", tab: "Billing history" },
+    { icon: SlidersHorizontal, title: "Preferences", desc: "Auto-reload thresholds and billing notifications", tab: "Preferences" },
+    { icon: ArrowRight, title: "Promotions", desc: "Redeem promo codes and view your bonus credit history", tab: "Promotions" },
   ];
 
   return (
@@ -237,21 +243,36 @@ function Billing() {
 
       {/* Shortcut grid */}
       <section className="grid grid-cols-1 gap-x-8 gap-y-5 sm:grid-cols-2">
-        {shortcuts.map((s) => (
-          <Link
-            key={s.title}
-            to={s.to}
-            className="flex items-center gap-3 group"
-          >
-            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-zinc-100 text-zinc-600 group-hover:bg-zinc-200 transition-colors">
-              <s.icon className="h-4.5 w-4.5" />
-            </span>
-            <span className="min-w-0">
-              <span className="block text-sm font-medium text-zinc-900">{s.title}</span>
-              <span className="block text-xs text-zinc-500">{s.desc}</span>
-            </span>
-          </Link>
-        ))}
+        {shortcuts.map((s) => {
+          const inner = (
+            <>
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-zinc-100 text-zinc-600 group-hover:bg-zinc-200 transition-colors">
+                <s.icon className="h-4.5 w-4.5" />
+              </span>
+              <span className="min-w-0 text-left">
+                <span className="block text-sm font-medium text-zinc-900">{s.title}</span>
+                <span className="block text-xs text-zinc-500">{s.desc}</span>
+              </span>
+            </>
+          );
+          if (s.tab) {
+            return (
+              <button
+                key={s.title}
+                type="button"
+                onClick={() => setActiveTab(s.tab!)}
+                className="flex items-center gap-3 group"
+              >
+                {inner}
+              </button>
+            );
+          }
+          return (
+            <Link key={s.title} to={s.to!} className="flex items-center gap-3 group">
+              {inner}
+            </Link>
+          );
+        })}
       </section>
       </div>
       )}
