@@ -75,7 +75,7 @@ import {
   Settings2,
   LayoutDashboard,
   ChartNoAxesCombined,
-  Puzzle,
+  KeyRound,
   BadgeDollarSign,
   FileCheck2,
   LockKeyhole,
@@ -186,7 +186,7 @@ const NAV_GROUPS: Array<{ label: string; items: TabItem[] }> = [
   {
     label: "",
     items: [
-      { to: "/dashboard/extension", label: "API Keys", icon: Puzzle },
+      { to: "/dashboard/extension", label: "API Keys", icon: KeyRound },
       { to: "/pricing", label: "Pricing", icon: Tag },
     ],
   },
