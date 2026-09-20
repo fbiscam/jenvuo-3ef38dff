@@ -46,7 +46,6 @@ import {
   Attachments,
 } from "@/components/ai-elements/attachments";
 import { Shimmer } from "@/components/ai-elements/shimmer";
-import claudeLogo from "@/assets/claude-logo.svg.asset.json";
 import jenvuLogo from "@/assets/jenvu-logo.png";
 import jenvuTick from "@/assets/jenvu-tick.png";
 
