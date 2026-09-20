@@ -498,27 +498,6 @@ function TerminalPage() {
     }
   }
 
-  async function addPriceAlert() {
-    const target = Number(alertTarget);
-    if (!Number.isFinite(target) || target <= 0) {
-      setAlertError("Enter a valid XAU/USD price.");
-      return;
-    }
-    if ("Notification" in window && Notification.permission === "default") {
-      await Notification.requestPermission();
-    }
-    setPriceAlerts((current) => [
-      {
-        id: `alert-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`,
-        direction: alertDirection,
-        target,
-        createdAt: Date.now(),
-      },
-      ...current,
-    ]);
-    setAlertTarget("");
-    setAlertError("");
-  }
 
   return (
     <TooltipProvider>
@@ -537,17 +516,14 @@ function TerminalPage() {
                 <img src={jenvuLogo} alt="" className="h-4 w-4 shrink-0 object-contain" />
                 Ask With AI
               </button>
-              <Button
-                type="button"
-                variant={alertsOpen ? "secondary" : "ghost"}
-                size="icon"
-                onClick={() => setAlertsOpen((open) => !open)}
-                className="h-7 w-7 text-muted-foreground"
-                title="Price alerts"
-                aria-label="Price alerts"
+              <div
+                className="flex h-7 items-center gap-1.5 rounded-md border border-border bg-white px-2 font-mono text-xs font-semibold text-foreground"
+                title={`Time left on the current ${tf.label} candle`}
+                aria-label={`Current ${tf.label} candle closes in ${formatCountdown(secondsLeft)}`}
               >
-                <Bell className="h-3.5 w-3.5" />
-              </Button>
+                <Timer className="h-3.5 w-3.5 text-muted-foreground" />
+                {formatCountdown(secondsLeft)}
+              </div>
             </div>
             <iframe
               key={chartSrc}
@@ -556,122 +532,6 @@ function TerminalPage() {
               className="h-full w-full border-0"
               allowFullScreen
             />
-            {alertsOpen && (
-              <section className="absolute inset-x-0 bottom-0 z-20 flex h-[42%] min-h-56 flex-col border-t border-border bg-background shadow-2xl">
-                <div className="flex h-11 shrink-0 items-center border-b border-border px-4">
-                  <BellRing className="mr-2 h-4 w-4 text-primary" />
-                  <h2 className="text-sm font-medium">XAU/USD Price Alerts</h2>
-                  <span className="ml-3 font-mono text-xs text-muted-foreground">
-                    Live {liveGoldPrice == null ? "—" : liveGoldPrice.toFixed(2)}
-                  </span>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    className="ml-auto h-7 w-7"
-                    onClick={() => setAlertsOpen(false)}
-                    title="Close alerts"
-                    aria-label="Close alerts"
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
-                </div>
-                <div className="grid min-h-0 flex-1 gap-5 overflow-y-auto p-4 lg:grid-cols-[minmax(300px,0.8fr)_minmax(360px,1.2fr)]">
-                  <div>
-                    <p className="mb-3 text-xs font-medium text-muted-foreground">Create alert</p>
-                    <div className="flex flex-col gap-2 sm:flex-row">
-                      <Select
-                        value={alertDirection}
-                        onValueChange={(value) => {
-                          if (value === "above" || value === "below") setAlertDirection(value);
-                        }}
-                      >
-                        <SelectTrigger className="sm:w-32" aria-label="Alert condition">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="above">Crosses above</SelectItem>
-                          <SelectItem value="below">Crosses below</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <Input
-                        type="number"
-                        inputMode="decimal"
-                        min="0"
-                        step="0.01"
-                        value={alertTarget}
-                        onChange={(event) => setAlertTarget(event.target.value)}
-                        onKeyDown={(event) => {
-                          if (event.key === "Enter") void addPriceAlert();
-                        }}
-                        placeholder="Target price"
-                        aria-label="Target XAU/USD price"
-                        className="font-mono"
-                      />
-                      <Button type="button" onClick={() => void addPriceAlert()}>
-                        Create
-                      </Button>
-                    </div>
-                    {alertError && (
-                      <p className="mt-2 text-xs text-destructive" role="alert">
-                        {alertError}
-                      </p>
-                    )}
-                    <p className="mt-3 text-xs leading-5 text-muted-foreground">
-                      Alerts are saved in this browser and checked while the terminal is open.
-                    </p>
-                  </div>
-                  <div className="min-h-0">
-                    <p className="mb-3 text-xs font-medium text-muted-foreground">Your alerts</p>
-                    {priceAlerts.length === 0 ? (
-                      <div className="flex h-24 items-center justify-center border border-dashed border-border text-sm text-muted-foreground">
-                        No price alerts yet.
-                      </div>
-                    ) : (
-                      <div className="space-y-2">
-                        {priceAlerts.map((alert) => (
-                          <div
-                            key={alert.id}
-                            className="flex items-center gap-3 rounded-md border border-border px-3 py-2"
-                          >
-                            <Bell
-                              className={cn(
-                                "h-4 w-4 shrink-0",
-                                alert.triggeredAt ? "text-primary" : "text-muted-foreground",
-                              )}
-                            />
-                            <div className="min-w-0 flex-1">
-                              <p className="text-sm font-medium">
-                                XAU/USD {alert.direction} {alert.target.toFixed(2)}
-                              </p>
-                              <p className="text-xs text-muted-foreground">
-                                {alert.triggeredAt
-                                  ? `Triggered ${new Date(alert.triggeredAt).toLocaleString()}`
-                                  : "Active"}
-                              </p>
-                            </div>
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="icon"
-                              className="h-8 w-8 shrink-0 text-muted-foreground hover:text-destructive"
-                              onClick={() =>
-                                setPriceAlerts((current) =>
-                                  current.filter((item) => item.id !== alert.id),
-                                )
-                              }
-                              aria-label={`Delete alert at ${alert.target.toFixed(2)}`}
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </section>
-            )}
           </main>
 
           {/* AI desk */}
