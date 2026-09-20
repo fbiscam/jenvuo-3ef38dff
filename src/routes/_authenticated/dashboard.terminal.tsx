@@ -615,24 +615,48 @@ function TerminalPage() {
                 <Code2 className="h-3.5 w-3.5" />
               </Button>
             </div>
-            <iframe
-              key={chartSrc}
-              src={chartSrc}
-              title={`${SYMBOL.label} ${tf.label} chart`}
-              className="h-full w-full border-0"
-              allowFullScreen
-            />
+            <div className="flex h-full min-h-0 w-full flex-col">
+              <iframe
+                key={chartSrc}
+                src={chartSrc}
+                title={`${SYMBOL.label} ${tf.label} chart`}
+                className="min-h-0 w-full flex-1 border-0"
+                allowFullScreen
+              />
+              {indicators.length > 0 && (
+                <div className="max-h-[45%] shrink-0 overflow-y-auto">
+                  {indicators.map((indicator) => (
+                    <PineIndicatorPane
+                      key={indicator.id}
+                      indicator={indicator}
+                      candles={pineCandles}
+                      onRemove={(id) =>
+                        setIndicators((current) => current.filter((item) => item.id !== id))
+                      }
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
             {pineOpen && (
               <section className="absolute inset-x-0 bottom-0 z-20 flex h-[42%] min-h-56 flex-col border-t border-border bg-background shadow-2xl">
                 <div className="flex h-10 shrink-0 items-center border-b border-border px-3">
                   <Code2 className="mr-2 h-4 w-4 text-primary" />
-                  <h2 className="text-sm font-medium">Pine Script</h2>
+                  <h2 className="text-sm font-medium">Pine Editor</h2>
                   <span className="ml-2 text-xs text-muted-foreground">Saved automatically</span>
+                  <Button
+                    type="button"
+                    size="sm"
+                    className="ml-auto h-7 px-3 text-xs"
+                    onClick={addIndicatorToChart}
+                  >
+                    Add to chart
+                  </Button>
                   <Button
                     type="button"
                     variant="ghost"
                     size="icon"
-                    className="ml-auto h-7 w-7"
+                    className="ml-1 h-7 w-7"
                     onClick={async () => {
                       await navigator.clipboard.writeText(pineCode);
                       setCopied(true);
@@ -649,19 +673,33 @@ function TerminalPage() {
                     size="icon"
                     className="h-7 w-7"
                     onClick={() => setPineOpen(false)}
-                    title="Close Pine Script"
-                    aria-label="Close Pine Script"
+                    title="Close Pine Editor"
+                    aria-label="Close Pine Editor"
                   >
                     <X className="h-4 w-4" />
                   </Button>
                 </div>
                 <textarea
                   value={pineCode}
-                  onChange={(event) => setPineCode(event.target.value)}
+                  onChange={(event) => {
+                    setPineCode(event.target.value);
+                    setPineError("");
+                    setPineStatus("");
+                  }}
                   spellCheck={false}
                   aria-label="Pine Script editor"
                   className="min-h-0 flex-1 resize-none bg-background p-4 font-mono text-sm leading-6 text-foreground outline-none"
                 />
+                {(pineError || pineStatus) && (
+                  <div
+                    className={cn(
+                      "shrink-0 border-t border-border px-4 py-2 font-mono text-xs",
+                      pineError ? "text-destructive" : "text-muted-foreground",
+                    )}
+                  >
+                    {pineError || pineStatus}
+                  </div>
+                )}
               </section>
             )}
           </main>
