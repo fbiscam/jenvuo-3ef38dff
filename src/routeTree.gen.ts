@@ -57,7 +57,6 @@ import { Route as LeadsActivityRouteImport } from './routes/leads.activity'
 import { Route as LeadsAccountRouteImport } from './routes/leads.account'
 import { Route as JenvuOpsX9k2InboxRouteImport } from './routes/jenvu-ops-x9k2.inbox'
 import { Route as InsightsSlugRouteImport } from './routes/insights.$slug'
-import { Route as AuthenticatedTerminalRouteImport } from './routes/_authenticated/terminal'
 import { Route as AuthenticatedInboxRouteImport } from './routes/_authenticated/inbox'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as HelpCollectionIndexRouteImport } from './routes/help.$collection.index'
@@ -68,6 +67,7 @@ import { Route as HelpCollectionSlugRouteImport } from './routes/help.$collectio
 import { Route as ApiPublicGoldRouteImport } from './routes/api/public/gold'
 import { Route as AuthenticatedDashboardWorkspaceRouteImport } from './routes/_authenticated/dashboard.workspace'
 import { Route as AuthenticatedDashboardUsageRouteImport } from './routes/_authenticated/dashboard.usage'
+import { Route as AuthenticatedDashboardTerminalRouteImport } from './routes/_authenticated/dashboard.terminal'
 import { Route as AuthenticatedDashboardSecurityRouteImport } from './routes/_authenticated/dashboard.security'
 import { Route as AuthenticatedDashboardRiskRouteImport } from './routes/_authenticated/dashboard.risk'
 import { Route as AuthenticatedDashboardReferralsRouteImport } from './routes/_authenticated/dashboard.referrals'
@@ -347,11 +347,6 @@ const InsightsSlugRoute = InsightsSlugRouteImport.update({
   path: '/$slug',
   getParentRoute: () => InsightsRoute,
 } as any)
-const AuthenticatedTerminalRoute = AuthenticatedTerminalRouteImport.update({
-  id: '/terminal',
-  path: '/terminal',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
 const AuthenticatedInboxRoute = AuthenticatedInboxRouteImport.update({
   id: '/inbox',
   path: '/inbox',
@@ -403,6 +398,12 @@ const AuthenticatedDashboardUsageRoute =
   AuthenticatedDashboardUsageRouteImport.update({
     id: '/usage',
     path: '/usage',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
+const AuthenticatedDashboardTerminalRoute =
+  AuthenticatedDashboardTerminalRouteImport.update({
+    id: '/terminal',
+    path: '/terminal',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
 const AuthenticatedDashboardSecurityRoute =
@@ -669,7 +670,6 @@ export interface FileRoutesByFullPath {
   '/terms': typeof TermsRoute
   '/dashboard': typeof AuthenticatedDashboardRouteWithChildren
   '/inbox': typeof AuthenticatedInboxRoute
-  '/terminal': typeof AuthenticatedTerminalRoute
   '/insights/$slug': typeof InsightsSlugRoute
   '/jenvu-ops-x9k2/inbox': typeof JenvuOpsX9k2InboxRoute
   '/leads/account': typeof LeadsAccountRoute
@@ -698,6 +698,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/referrals': typeof AuthenticatedDashboardReferralsRoute
   '/dashboard/risk': typeof AuthenticatedDashboardRiskRoute
   '/dashboard/security': typeof AuthenticatedDashboardSecurityRoute
+  '/dashboard/terminal': typeof AuthenticatedDashboardTerminalRoute
   '/dashboard/usage': typeof AuthenticatedDashboardUsageRoute
   '/dashboard/workspace': typeof AuthenticatedDashboardWorkspaceRoute
   '/api/public/gold': typeof ApiPublicGoldRoute
@@ -763,7 +764,6 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/inbox': typeof AuthenticatedInboxRoute
-  '/terminal': typeof AuthenticatedTerminalRoute
   '/insights/$slug': typeof InsightsSlugRoute
   '/jenvu-ops-x9k2/inbox': typeof JenvuOpsX9k2InboxRoute
   '/leads/account': typeof LeadsAccountRoute
@@ -792,6 +792,7 @@ export interface FileRoutesByTo {
   '/dashboard/referrals': typeof AuthenticatedDashboardReferralsRoute
   '/dashboard/risk': typeof AuthenticatedDashboardRiskRoute
   '/dashboard/security': typeof AuthenticatedDashboardSecurityRoute
+  '/dashboard/terminal': typeof AuthenticatedDashboardTerminalRoute
   '/dashboard/usage': typeof AuthenticatedDashboardUsageRoute
   '/dashboard/workspace': typeof AuthenticatedDashboardWorkspaceRoute
   '/api/public/gold': typeof ApiPublicGoldRoute
@@ -864,7 +865,6 @@ export interface FileRoutesById {
   '/terms': typeof TermsRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRouteWithChildren
   '/_authenticated/inbox': typeof AuthenticatedInboxRoute
-  '/_authenticated/terminal': typeof AuthenticatedTerminalRoute
   '/insights/$slug': typeof InsightsSlugRoute
   '/jenvu-ops-x9k2/inbox': typeof JenvuOpsX9k2InboxRoute
   '/leads/account': typeof LeadsAccountRoute
@@ -893,6 +893,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/referrals': typeof AuthenticatedDashboardReferralsRoute
   '/_authenticated/dashboard/risk': typeof AuthenticatedDashboardRiskRoute
   '/_authenticated/dashboard/security': typeof AuthenticatedDashboardSecurityRoute
+  '/_authenticated/dashboard/terminal': typeof AuthenticatedDashboardTerminalRoute
   '/_authenticated/dashboard/usage': typeof AuthenticatedDashboardUsageRoute
   '/_authenticated/dashboard/workspace': typeof AuthenticatedDashboardWorkspaceRoute
   '/api/public/gold': typeof ApiPublicGoldRoute
@@ -965,7 +966,6 @@ export interface FileRouteTypes {
     | '/terms'
     | '/dashboard'
     | '/inbox'
-    | '/terminal'
     | '/insights/$slug'
     | '/jenvu-ops-x9k2/inbox'
     | '/leads/account'
@@ -994,6 +994,7 @@ export interface FileRouteTypes {
     | '/dashboard/referrals'
     | '/dashboard/risk'
     | '/dashboard/security'
+    | '/dashboard/terminal'
     | '/dashboard/usage'
     | '/dashboard/workspace'
     | '/api/public/gold'
@@ -1059,7 +1060,6 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/terms'
     | '/inbox'
-    | '/terminal'
     | '/insights/$slug'
     | '/jenvu-ops-x9k2/inbox'
     | '/leads/account'
@@ -1088,6 +1088,7 @@ export interface FileRouteTypes {
     | '/dashboard/referrals'
     | '/dashboard/risk'
     | '/dashboard/security'
+    | '/dashboard/terminal'
     | '/dashboard/usage'
     | '/dashboard/workspace'
     | '/api/public/gold'
@@ -1159,7 +1160,6 @@ export interface FileRouteTypes {
     | '/terms'
     | '/_authenticated/dashboard'
     | '/_authenticated/inbox'
-    | '/_authenticated/terminal'
     | '/insights/$slug'
     | '/jenvu-ops-x9k2/inbox'
     | '/leads/account'
@@ -1188,6 +1188,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/referrals'
     | '/_authenticated/dashboard/risk'
     | '/_authenticated/dashboard/security'
+    | '/_authenticated/dashboard/terminal'
     | '/_authenticated/dashboard/usage'
     | '/_authenticated/dashboard/workspace'
     | '/api/public/gold'
@@ -1621,13 +1622,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof InsightsSlugRouteImport
       parentRoute: typeof InsightsRoute
     }
-    '/_authenticated/terminal': {
-      id: '/_authenticated/terminal'
-      path: '/terminal'
-      fullPath: '/terminal'
-      preLoaderRoute: typeof AuthenticatedTerminalRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
     '/_authenticated/inbox': {
       id: '/_authenticated/inbox'
       path: '/inbox'
@@ -1696,6 +1690,13 @@ declare module '@tanstack/react-router' {
       path: '/usage'
       fullPath: '/dashboard/usage'
       preLoaderRoute: typeof AuthenticatedDashboardUsageRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
+    '/_authenticated/dashboard/terminal': {
+      id: '/_authenticated/dashboard/terminal'
+      path: '/terminal'
+      fullPath: '/dashboard/terminal'
+      preLoaderRoute: typeof AuthenticatedDashboardTerminalRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
     '/_authenticated/dashboard/security': {
@@ -1986,6 +1987,7 @@ interface AuthenticatedDashboardRouteChildren {
   AuthenticatedDashboardReferralsRoute: typeof AuthenticatedDashboardReferralsRoute
   AuthenticatedDashboardRiskRoute: typeof AuthenticatedDashboardRiskRoute
   AuthenticatedDashboardSecurityRoute: typeof AuthenticatedDashboardSecurityRoute
+  AuthenticatedDashboardTerminalRoute: typeof AuthenticatedDashboardTerminalRoute
   AuthenticatedDashboardUsageRoute: typeof AuthenticatedDashboardUsageRoute
   AuthenticatedDashboardWorkspaceRoute: typeof AuthenticatedDashboardWorkspaceRoute
   AuthenticatedDashboardIndexRoute: typeof AuthenticatedDashboardIndexRoute
@@ -2015,6 +2017,7 @@ const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
     AuthenticatedDashboardReferralsRoute: AuthenticatedDashboardReferralsRoute,
     AuthenticatedDashboardRiskRoute: AuthenticatedDashboardRiskRoute,
     AuthenticatedDashboardSecurityRoute: AuthenticatedDashboardSecurityRoute,
+    AuthenticatedDashboardTerminalRoute: AuthenticatedDashboardTerminalRoute,
     AuthenticatedDashboardUsageRoute: AuthenticatedDashboardUsageRoute,
     AuthenticatedDashboardWorkspaceRoute: AuthenticatedDashboardWorkspaceRoute,
     AuthenticatedDashboardIndexRoute: AuthenticatedDashboardIndexRoute,
@@ -2047,13 +2050,11 @@ const AuthenticatedDashboardRouteWithChildren =
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRouteWithChildren
   AuthenticatedInboxRoute: typeof AuthenticatedInboxRoute
-  AuthenticatedTerminalRoute: typeof AuthenticatedTerminalRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRouteWithChildren,
   AuthenticatedInboxRoute: AuthenticatedInboxRoute,
-  AuthenticatedTerminalRoute: AuthenticatedTerminalRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =

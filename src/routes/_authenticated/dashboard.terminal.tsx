@@ -450,55 +450,21 @@ function TerminalPage() {
 
   return (
     <TooltipProvider>
-      <div className="fixed inset-0 z-40 flex w-full flex-col overflow-hidden bg-background">
+      <div className="flex h-[calc(100vh-8rem)] min-h-[34rem] w-full flex-col overflow-hidden rounded-lg border border-border bg-background">
         <div className="flex min-h-0 flex-1 flex-col lg:flex-row">
           {/* Chart */}
           <main className="relative min-h-0 flex-1 bg-background">
-            <div className="absolute left-3 top-3 z-10 flex max-w-[calc(100%-5rem)] flex-wrap items-center gap-1 rounded-md border border-border bg-background/95 p-1 shadow-sm backdrop-blur">
-              {TIMEFRAMES.map((t) => (
-                <Button
-                  key={t.key}
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setTf(t)}
-                  className={cn(
-                    "h-7 rounded px-2 text-xs shadow-none",
-                    t.key === tf.key
-                      ? "bg-primary text-primary-foreground"
-                      : "text-muted-foreground hover:bg-muted",
-                  )}
-                >
-                  {t.label}
-                </Button>
-              ))}
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                className="h-7 w-7 text-muted-foreground"
-                title={theme === "dark" ? "Use light chart" : "Use dark chart"}
-                aria-label={theme === "dark" ? "Use light chart" : "Use dark chart"}
-              >
-                {theme === "dark" ? (
-                  <Sun className="h-3.5 w-3.5" />
-                ) : (
-                  <Moon className="h-3.5 w-3.5" />
-                )}
-              </Button>
-              <Button
-                type="button"
-                variant={pineOpen ? "secondary" : "ghost"}
-                size="icon"
-                onClick={() => setPineOpen((open) => !open)}
-                className="h-7 w-7 text-muted-foreground"
-                title="Pine Script workspace"
-                aria-label="Pine Script workspace"
-              >
-                <Code2 className="h-3.5 w-3.5" />
-              </Button>
-            </div>
+            <Button
+              type="button"
+              variant={pineOpen ? "secondary" : "ghost"}
+              size="icon"
+              onClick={() => setPineOpen((open) => !open)}
+              className="absolute right-34 top-1.5 z-10 h-7 w-7 text-muted-foreground"
+              title="Pine Script workspace"
+              aria-label="Pine Script workspace"
+            >
+              <Code2 className="h-3.5 w-3.5" />
+            </Button>
             {!deskOpen && (
               <Button
                 type="button"
