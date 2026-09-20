@@ -359,8 +359,7 @@ function TerminalPage() {
       } | null;
       const savedTimeframe = TIMEFRAMES.find((timeframe) => timeframe.key === settings?.timeframe);
       if (savedTimeframe) setTf(savedTimeframe);
-      if (typeof settings?.deskOpen === "boolean") setDeskOpen(settings.deskOpen);
-      if (typeof settings?.pineOpen === "boolean") setPineOpen(settings.pineOpen);
+      // Desk and Pine panels always start closed so the chart opens exactly as left.
       const savedPine = window.localStorage.getItem(PINE_SCRIPT_KEY);
       if (savedPine) setPineCode(savedPine);
 
