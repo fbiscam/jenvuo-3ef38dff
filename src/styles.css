@@ -869,6 +869,8 @@ html[data-pwa="1"] .pwa-tabbar {
 .dashboard-terminal-sidebar {
   --dashboard-sidebar-scale: 1;
 }
+@media (min-width: 1024px) { .dashboard-terminal-sidebar { --dashboard-sidebar-scale: 0.878; } }
+@media (min-width: 1200px) { .dashboard-terminal-sidebar { --dashboard-sidebar-scale: 0.970; } }
 @media (min-width: 1360px) { .dashboard-terminal-sidebar { --dashboard-sidebar-scale: 1.063; } }
 @media (min-width: 1500px) { .dashboard-terminal-sidebar { --dashboard-sidebar-scale: 1.155; } }
 @media (min-width: 1600px) { .dashboard-terminal-sidebar { --dashboard-sidebar-scale: 1.271; } }
