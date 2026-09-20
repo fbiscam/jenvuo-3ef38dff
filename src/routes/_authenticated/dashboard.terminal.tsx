@@ -530,7 +530,6 @@ function TerminalPage() {
           {deskOpen && (
             <aside className="relative flex h-[45%] min-h-0 w-full shrink-0 flex-col border-t border-border bg-card text-card-foreground lg:h-full lg:w-[380px] lg:border-l lg:border-t-0">
               <div className="flex min-h-17 items-center gap-2.5 border-b border-border px-4 py-3">
-                <img src={jenvuLogo} alt="Jenvu" className="h-9 w-9 shrink-0 object-contain" />
                 <div className="min-w-0">
                   <div className="flex items-center gap-1">
                     <span className="text-lg font-medium leading-none">Jenvu</span>
@@ -609,20 +608,21 @@ function TerminalPage() {
                             thread.id === activeThreadId && "bg-secondary",
                           )}
                         >
-                          <Button
+                          <button
                             type="button"
-                            variant="ghost"
-                            className="h-auto min-w-0 flex-1 justify-start px-1 py-1 text-left"
+                            className="flex min-w-0 flex-1 items-center gap-2 rounded-md px-1 py-1 text-left"
                             onClick={() => loadThread(thread)}
                           >
-                            <span className="min-w-0 flex-1 truncate text-sm">{thread.title}</span>
-                            <span className="ml-2 shrink-0 text-[10px] text-muted-foreground">
+                            <span className="min-w-0 flex-1 truncate text-left text-sm leading-5">
+                              {thread.title}
+                            </span>
+                            <span className="shrink-0 text-[10px] leading-5 text-muted-foreground">
                               {new Date(thread.updatedAt).toLocaleDateString("en-US", {
                                 day: "numeric",
                                 month: "short",
                               })}
                             </span>
-                          </Button>
+                          </button>
                           <Button
                             type="button"
                             variant="ghost"
