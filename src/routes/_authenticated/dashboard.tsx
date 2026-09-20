@@ -1289,7 +1289,7 @@ function DashboardLayout() {
 
   return (
     <div
-      className={`flex min-h-screen bg-white text-zinc-900 font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif] antialiased jenvu-zoom-dashboard`}
+      className={`flex ${pathname === "/dashboard/terminal" ? "h-dvh overflow-hidden jenvu-terminal-shell" : "min-h-screen jenvu-zoom-dashboard"} bg-white text-zinc-900 font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif] antialiased`}
     >
       {/* Mobile overlay */}
       {mobileNavOpen && !embedMode && (
@@ -1476,7 +1476,7 @@ function DashboardLayout() {
 
       {/* Right column */}
       <div
-        className={`dashboard-right-col flex min-w-0 flex-1 flex-col bg-white ${embedMode ? "" : sidebarCollapsed ? "collapsed lg:pl-[60px]" : "lg:pl-[200px]"}`}
+        className={`dashboard-right-col flex min-w-0 min-h-0 flex-1 flex-col bg-white ${embedMode ? "" : sidebarCollapsed ? "collapsed lg:pl-[60px]" : "lg:pl-[200px]"}`}
       >
         {/* Mobile menu toggle (floating) */}
         {!embedMode && (
@@ -1493,7 +1493,7 @@ function DashboardLayout() {
         <main
           className={
             pathname === "/dashboard/terminal"
-              ? "h-dvh w-full overflow-hidden bg-white p-2"
+              ? "h-full min-h-0 w-full flex-1 overflow-hidden bg-white p-2"
               : "mx-auto w-full max-w-7xl flex-1 bg-white px-5 pt-14 pb-7 sm:px-8 sm:pt-7"
           }
           style={pathname === "/dashboard/terminal" ? undefined : { zoom: 0.9 }}
