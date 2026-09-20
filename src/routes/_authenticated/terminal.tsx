@@ -169,7 +169,8 @@ function TerminalPage() {
         </main>
 
         {/* AI desk */}
-        <aside className="flex h-[440px] w-full shrink-0 flex-col border-t border-border lg:h-auto lg:w-96 lg:border-l lg:border-t-0">
+        {deskOpen && (
+        <aside className="flex h-[45%] w-full shrink-0 flex-col border-t border-border lg:h-auto lg:w-96 lg:border-l lg:border-t-0">
           <div className="flex items-center gap-2 border-b border-border px-3 py-2">
             <Sparkles className="h-4 w-4 text-primary" />
             <span className="text-sm font-semibold">AI Desk</span>
@@ -248,6 +249,7 @@ function TerminalPage() {
             </button>
           </form>
         </aside>
+        )}
       </div>
     </div>
   );
