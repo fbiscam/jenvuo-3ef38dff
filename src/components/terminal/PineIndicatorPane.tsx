@@ -93,6 +93,42 @@ export function PineIndicatorPane({ indicator, candles, onRemove }: Props) {
           close: c.close,
         })),
       );
+
+      if (structure) {
+        const markers: SeriesMarker<Time>[] = [];
+        for (const swing of structure.swings.slice(-40)) {
+          const bullish = swing.label === "HH" || swing.label === "HL";
+          markers.push({
+            time: swing.time as Time,
+            position: swing.label === "HH" || swing.label === "LH" ? "aboveBar" : "belowBar",
+            color: bullish ? "#00a67d" : "#e91e63",
+            shape: swing.label === "HH" || swing.label === "LH" ? "arrowDown" : "arrowUp",
+            text: swing.label,
+          });
+        }
+        for (const event of structure.events.slice(-12)) {
+          markers.push({
+            time: event.time as Time,
+            position: event.direction === "bullish" ? "belowBar" : "aboveBar",
+            color: event.kind === "CHoCH" ? "#f59e0b" : event.direction === "bullish" ? "#00a67d" : "#e91e63",
+            shape: "circle",
+            text: event.kind,
+          });
+          const level = chart.addSeries(LineSeries, {
+            color: event.kind === "CHoCH" ? "#f59e0b" : "#64748b",
+            lineWidth: 1,
+            lineStyle: LineStyle.Dashed,
+            priceLineVisible: false,
+            lastValueVisible: false,
+            crosshairMarkerVisible: false,
+          });
+          level.setData([
+            { time: event.fromTime as Time, value: event.price },
+            { time: event.time as Time, value: event.price },
+          ]);
+        }
+        createSeriesMarkers(price, markers.sort((a, b) => Number(a.time) - Number(b.time)));
+      }
     }
 
     for (const plot of result.plots) {
