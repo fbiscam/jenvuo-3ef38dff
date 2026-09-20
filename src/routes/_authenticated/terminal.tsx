@@ -317,9 +317,10 @@ function TerminalPage() {
 
   useEffect(() => {
     try {
-      const storedThreads = JSON.parse(
-        window.localStorage.getItem(THREADS_KEY) || "null",
-      ) as { threads?: ChatThread[]; activeThreadId?: string | null } | null;
+      const storedThreads = JSON.parse(window.localStorage.getItem(THREADS_KEY) || "null") as {
+        threads?: ChatThread[];
+        activeThreadId?: string | null;
+      } | null;
       const savedThreads = Array.isArray(storedThreads?.threads) ? storedThreads.threads : [];
       const savedActiveId = storedThreads?.activeThreadId ?? savedThreads[0]?.id ?? null;
       setThreads(savedThreads);
@@ -327,9 +328,12 @@ function TerminalPage() {
       activeThreadIdRef.current = savedActiveId;
       setMessages(savedThreads.find((thread) => thread.id === savedActiveId)?.messages ?? []);
 
-      const settings = JSON.parse(
-        window.localStorage.getItem(TERMINAL_SETTINGS_KEY) || "null",
-      ) as { timeframe?: string; theme?: "light" | "dark"; deskOpen?: boolean; pineOpen?: boolean } | null;
+      const settings = JSON.parse(window.localStorage.getItem(TERMINAL_SETTINGS_KEY) || "null") as {
+        timeframe?: string;
+        theme?: "light" | "dark";
+        deskOpen?: boolean;
+        pineOpen?: boolean;
+      } | null;
       const savedTimeframe = TIMEFRAMES.find((timeframe) => timeframe.key === settings?.timeframe);
       if (savedTimeframe) setTf(savedTimeframe);
       if (settings?.theme === "light" || settings?.theme === "dark") setTheme(settings.theme);
@@ -450,23 +454,23 @@ function TerminalPage() {
           {/* Chart */}
           <main className="relative min-h-0 flex-1 bg-background">
             <div className="absolute left-3 top-3 z-10 flex max-w-[calc(100%-5rem)] flex-wrap items-center gap-1 rounded-md border border-border bg-background/95 p-1 shadow-sm backdrop-blur">
-            {TIMEFRAMES.map((t) => (
-              <Button
-                key={t.key}
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={() => setTf(t)}
-                className={cn(
-                  "h-7 rounded px-2 text-xs shadow-none",
-                  t.key === tf.key
-                    ? "bg-primary text-primary-foreground"
-                    : "text-muted-foreground hover:bg-muted",
-                )}
-              >
-                {t.label}
-              </Button>
-            ))}
+              {TIMEFRAMES.map((t) => (
+                <Button
+                  key={t.key}
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setTf(t)}
+                  className={cn(
+                    "h-7 rounded px-2 text-xs shadow-none",
+                    t.key === tf.key
+                      ? "bg-primary text-primary-foreground"
+                      : "text-muted-foreground hover:bg-muted",
+                  )}
+                >
+                  {t.label}
+                </Button>
+              ))}
               <Button
                 type="button"
                 variant="ghost"
@@ -476,7 +480,11 @@ function TerminalPage() {
                 title={theme === "dark" ? "Use light chart" : "Use dark chart"}
                 aria-label={theme === "dark" ? "Use light chart" : "Use dark chart"}
               >
-                {theme === "dark" ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
+                {theme === "dark" ? (
+                  <Sun className="h-3.5 w-3.5" />
+                ) : (
+                  <Moon className="h-3.5 w-3.5" />
+                )}
               </Button>
               <Button
                 type="button"
