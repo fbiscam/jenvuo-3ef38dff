@@ -90,6 +90,49 @@ const TIMEFRAMES = [
 
 const SYMBOL = { key: "XAUUSD", tv: "OANDA:XAUUSD", label: "XAU/USD" };
 
+const TF_MINUTES: Record<string, number> = {
+  "1m": 1,
+  "5m": 5,
+  "15m": 15,
+  "30m": 30,
+  "1h": 60,
+  "4h": 240,
+  "1d": 1440,
+};
+
+function CandleCountdown({ tfKey }: { tfKey: string }) {
+  const minutes = TF_MINUTES[tfKey] ?? 30;
+  const [left, setLeft] = useState(() => msToClose(minutes));
+
+  useEffect(() => {
+    setLeft(msToClose(minutes));
+    const timer = window.setInterval(() => setLeft(msToClose(minutes)), 1000);
+    return () => window.clearInterval(timer);
+  }, [minutes]);
+
+  const total = Math.max(0, Math.floor(left / 1000));
+  const hh = Math.floor(total / 3600);
+  const mm = Math.floor((total % 3600) / 60);
+  const ss = total % 60;
+  const pad = (value: number) => String(value).padStart(2, "0");
+
+  return (
+    <span
+      className="rounded-md bg-foreground/85 px-2 py-1 font-mono text-[11px] font-semibold tabular-nums text-background"
+      title="Time left until the current candle closes"
+    >
+      {hh > 0 ? `${pad(hh)}:` : ""}
+      {pad(mm)}:{pad(ss)}
+    </span>
+  );
+}
+
+function msToClose(minutes: number) {
+  const period = minutes * 60_000;
+  const now = Date.now();
+  return period - (now % period);
+}
+
 type ChatMsg = {
   role: "user" | "assistant";
   text: string;
@@ -610,6 +653,7 @@ function TerminalPage() {
           {/* Chart */}
           <main className="relative min-h-0 flex-1 bg-background">
             <div className="absolute right-28 top-1.5 z-10 flex items-center gap-2">
+              <CandleCountdown tfKey={tf.key} />
               <button
                 type="button"
                 onClick={() => setDeskOpen(true)}
