@@ -153,7 +153,7 @@ export const collections: Collection[] = [
   {
     slug: "tradingview-extension",
     title: "Built-in Trading Terminal",
-    description: "Install Jenvu, chat with AI and analyze active charts.",
+    description: "Open the terminal, chat with AI and analyze live gold charts.",
     icon: "Puzzle",
     articles: [
       {
@@ -162,52 +162,52 @@ export const collections: Collection[] = [
         summary: "Ask general questions or request a chart analysis.",
         updatedAt: "2026-06-30",
         body: [
-          { type: "p", content: "Jenvu works like a familiar AI chat inside TradingView. It answers normal questions conversationally and only runs the signal engine when you ask it to analyze a chart or trading setup." },
+          { type: "p", content: "Jenvu works like a familiar AI chat next to your gold chart. It answers normal questions conversationally and only runs the ICT/SMC engine when you ask it to analyze a chart or trading setup." },
 
           { type: "h2", content: "Open the terminal" },
           { type: "ol", items: [
-            "Open a supported XAU/USD chart in TradingView.",
-            "Open Jenvu from your browser toolbar.",
-            "Enter your API key when prompted.",
-            "Type a question or ask Jenvu to analyze the active chart.",
+            "Sign in and open Dashboard → Terminal.",
+            "The live XAU/USD chart loads automatically — no install needed.",
+            "Click 'Ask With AI' to open the AI panel.",
+            "Type a question or ask Jenvu to analyze the current structure.",
           ]},
 
           { type: "h2", content: "Chat mode and analysis mode" },
-          { type: "p", content: "Greetings and general questions stay in chat mode. Requests for a setup, signal or chart review trigger the ICT/SMC engine and use the live TradingView chart as context." },
+          { type: "p", content: "Greetings and general questions stay in chat mode. Requests for a setup, bias or chart review switch Jenvu into ICT/SMC mentor mode and use the live gold data as context." },
 
           { type: "h2", content: "Ask naturally" },
-          { type: "p", content: "Type into the composer and send your message. You can ask follow-up questions in the same conversation without repeating the full context." },
+          { type: "p", content: "Type into the composer and send your message. You can also attach a chart screenshot or use voice input, and ask follow-up questions in the same conversation without repeating context." },
 
-          { type: "note", tone: "tip", content: "Keep analysis requests specific — 'Analyze this XAU/USD chart' or 'What is the 15-minute bias?' produces the clearest result." },
+          { type: "note", tone: "tip", content: "Keep analysis requests specific — 'Review this XAU/USD structure' or 'What is the 30-minute bias?' produces the clearest result." },
         ],
       },
       {
         slug: "extension-troubleshooting",
         title: "Terminal isn't responding — what to check",
-        summary: "TradingView tab access, API key status and supported charts.",
+        summary: "Chart loading, plan status and wallet balance.",
         updatedAt: "2026-06-30",
         body: [
-          { type: "p", content: "If Jenvu does not respond or cannot read the chart, run through this checklist from top to bottom." },
+          { type: "p", content: "If the terminal does not respond or the chart fails to load, run through this checklist from top to bottom." },
 
-          { type: "h2", content: "1. TradingView access" },
+          { type: "h2", content: "1. Reload the terminal" },
           { type: "ul", items: [
-            "Make sure the active tab is a TradingView chart.",
-            "Allow the terminal to access tradingview.com when prompted.",
-            "Reload the chart after changing terminal settings.",
+            "Refresh the page so the chart and AI panel reload.",
+            "Close and reopen the AI panel from 'Ask With AI'.",
+            "Try a different browser or disable blocking add-ons if the chart stays blank.",
           ]},
 
-          { type: "h2", content: "2. API key" },
+          { type: "h2", content: "2. Plan and wallet" },
           { type: "ul", items: [
-            "Open Dashboard → API Keys and copy an active key.",
-            "Paste the key into the terminal settings exactly as shown.",
-            "Confirm your plan is active and has available AI wallet balance.",
+            "Confirm your plan is active on the Billing page.",
+            "Check the Usage page for remaining AI wallet balance and daily tokens.",
+            "Top up your wallet if the balance has run out.",
           ]},
 
           { type: "h2", content: "3. Supported market" },
-          { type: "p", content: "Jenvu is tuned for XAU/USD. Open a Gold versus U.S. Dollar chart before requesting a full setup analysis." },
+          { type: "p", content: "Jenvu is tuned for XAU/USD on the 30-minute timeframe. Requests about other markets stay in general chat mode." },
 
-          { type: "h2", content: "4. Reload the terminal" },
-          { type: "p", content: "Close and reopen the side panel, then refresh the TradingView tab. If the issue continues, generate a new API key from the dashboard." },
+          { type: "h2", content: "4. Still stuck" },
+          { type: "p", content: "Start a new chat from the History menu in the AI panel, then retry your question. If the issue continues, contact support from the Help Center." },
 
           { type: "note", tone: "warn", content: "Never share your API key. Revoke it immediately from the dashboard if it is exposed." },
         ],
