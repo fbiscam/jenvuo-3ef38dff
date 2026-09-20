@@ -115,3 +115,8 @@
 - [x] Add chart-image upload and visual review to the Terminal AI Desk
 - [x] Add secure voice recording and transcription to the Terminal AI Desk
 - [x] Verify image, voice, TypeScript, lint, and responsive Terminal behavior
+
+- [x] Add Terminal to dashboard navigation and remove its top toolbar
+- [x] Add persistent Terminal chat history, chart settings, and Pine Script workspace
+- [x] Move history and desk visibility controls into the AI header and enlarge chat text
+- [x] Verify Terminal persistence, navigation, responsive layout, and TypeScript
