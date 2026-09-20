@@ -967,12 +967,12 @@ ${isTradingIntent ? "User wants trading view but live feed offline — answer co
 
     const signal: GoldSignal = {
       bias: parsed.bias ?? "NEUTRAL",
-      direction: parsed.direction ?? "WAIT",
-      entry: String(parsed.entry ?? "-"),
-      stopLoss: String(parsed.stopLoss ?? "-"),
-      takeProfits: Array.isArray(parsed.takeProfits) ? parsed.takeProfits.map(String) : [],
-      riskReward: String(parsed.riskReward ?? "-"),
-      confidence: Number(parsed.confidence ?? 0),
+      direction: data.advisor ? "WAIT" : (parsed.direction ?? "WAIT"),
+      entry: data.advisor ? "-" : String(parsed.entry ?? "-"),
+      stopLoss: data.advisor ? "-" : String(parsed.stopLoss ?? "-"),
+      takeProfits: data.advisor ? [] : Array.isArray(parsed.takeProfits) ? parsed.takeProfits.map(String) : [],
+      riskReward: data.advisor ? "-" : String(parsed.riskReward ?? "-"),
+      confidence: data.advisor ? 0 : Number(parsed.confidence ?? 0),
       killzone: String(parsed.killzone ?? "-"),
       confluences: Array.isArray(parsed.confluences) ? parsed.confluences.map(String) : [],
       ictAnalysis: String(parsed.ictAnalysis ?? ""),
