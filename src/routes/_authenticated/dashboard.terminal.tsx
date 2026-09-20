@@ -301,6 +301,8 @@ function TerminalPage() {
       client_id: "jenvu.com",
       user_id: chartUserId || "jenvu-guest",
       studies: JSON.stringify(["STD;EMA", "STD;RSI"]),
+      enabled_features: JSON.stringify(["countdown"]),
+      disabled_features: JSON.stringify([]),
     });
     return `https://s.tradingview.com/widgetembed/?${params.toString()}`;
   }, [tf.tv, chartUserId]);
