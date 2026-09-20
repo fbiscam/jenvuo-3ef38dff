@@ -124,7 +124,6 @@ function formatCountdown(totalSeconds: number): string {
   return hours > 0 ? `${hours}:${pad(minutes)}:${pad(seconds)}` : `${pad(minutes)}:${pad(seconds)}`;
 }
 
-
 const QUICK = [
   "Analyse the current chart",
   "Where is liquidity sitting?",
@@ -497,7 +496,6 @@ function TerminalPage() {
       // The mutation displays the safe error in the composer.
     }
   }
-
 
   return (
     <TooltipProvider>
