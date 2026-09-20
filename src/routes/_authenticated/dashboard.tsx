@@ -1304,7 +1304,7 @@ function DashboardLayout() {
       {!embedMode && (
         /* Sidebar (Firebase-style) */
         <aside
-          className={`dashboard-sidebar-root max-lg:fixed max-lg:inset-y-0 max-lg:left-0 max-lg:z-50 lg:fixed lg:inset-y-0 lg:left-0 flex min-h-0 shrink-0 flex-col overflow-hidden border-r border-zinc-200 bg-sidebar transition-[width,transform] duration-200 ease-out ${sidebarCollapsed ? "w-[60px]" : "w-[200px]"} ${mobileNavOpen ? "max-lg:translate-x-0" : "max-lg:-translate-x-full"}`}
+          className={`dashboard-sidebar-root ${pathname === "/dashboard/terminal" ? "dashboard-terminal-sidebar" : ""} max-lg:fixed max-lg:inset-y-0 max-lg:left-0 max-lg:z-50 lg:fixed lg:inset-y-0 lg:left-0 flex min-h-0 shrink-0 flex-col overflow-hidden border-r border-zinc-200 bg-sidebar transition-[width,transform] duration-200 ease-out ${sidebarCollapsed ? "w-[60px]" : "w-[200px]"} ${mobileNavOpen ? "max-lg:translate-x-0" : "max-lg:-translate-x-full"}`}
           style={{
             fontFamily: '"Google Sans", "Product Sans", "Roboto", system-ui, sans-serif',
             fontWeight: 400,
@@ -1319,11 +1319,11 @@ function DashboardLayout() {
               <img
                 src="/favicon.png"
                 alt="JENVU"
-                className="h-7 w-7 shrink-0 rounded-md object-contain"
+                className="dashboard-sidebar-logo h-7 w-7 shrink-0 rounded-md object-contain"
               />
               {!sidebarCollapsed && (
                 <span
-                  className="truncate text-[22px] tracking-tight leading-none"
+                  className="dashboard-sidebar-brand truncate text-[22px] tracking-tight leading-none"
                   style={{
                     color: "#3c4043",
                     fontFamily: '"Google Sans", "Product Sans", "DM Sans", system-ui, sans-serif',
@@ -1376,10 +1376,10 @@ function DashboardLayout() {
                           setMobileNavOpen(false);
                         }}
                         title={sidebarCollapsed ? t.label : undefined}
-                        className={`group relative flex items-center rounded-full text-[12.5px] font-normal text-foreground transition ${sidebarCollapsed ? "justify-center px-2 py-1.5" : "gap-3 px-2.5 py-1.5"} ${active ? "bg-[#EBEBEB]" : "hover:bg-zinc-50"}`}
+                        className={`dashboard-sidebar-link group relative flex items-center rounded-full text-[12.5px] font-normal text-foreground transition ${sidebarCollapsed ? "justify-center px-2 py-1.5" : "gap-3 px-2.5 py-1.5"} ${active ? "bg-[#EBEBEB]" : "hover:bg-zinc-50"}`}
                       >
                         <Icon
-                          className="h-[19px] w-[19px] shrink-0 text-current"
+                          className="dashboard-sidebar-icon h-[19px] w-[19px] shrink-0 text-current"
                           strokeWidth={1.75}
                           aria-hidden="true"
                         />

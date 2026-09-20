@@ -122,3 +122,4 @@
 - [x] Verify Terminal persistence, navigation, responsive layout, and TypeScript
 - [x] Fit the Terminal chart and AI desk within the dashboard viewport without page scrolling
 - [x] Attach the Terminal directly to the dashboard sidebar and keep the AI desk fixed in view
+- [x] Keep Terminal sidebar logos, icons, and text at the dashboard's responsive size

@@ -863,6 +863,34 @@ html[data-pwa="1"] .pwa-tabbar {
 .dashboard-sidebar-root {
   background-color: var(--sidebar) !important;
 }
+
+/* The Terminal itself stays unzoomed so it fits the viewport. Match only its
+   sidebar typography and icons to the dashboard's responsive visual scale. */
+.dashboard-terminal-sidebar {
+  --dashboard-sidebar-scale: 1;
+}
+@media (min-width: 1024px) { .dashboard-terminal-sidebar { --dashboard-sidebar-scale: 0.878; } }
+@media (min-width: 1200px) { .dashboard-terminal-sidebar { --dashboard-sidebar-scale: 0.970; } }
+@media (min-width: 1360px) { .dashboard-terminal-sidebar { --dashboard-sidebar-scale: 1.063; } }
+@media (min-width: 1500px) { .dashboard-terminal-sidebar { --dashboard-sidebar-scale: 1.155; } }
+@media (min-width: 1600px) { .dashboard-terminal-sidebar { --dashboard-sidebar-scale: 1.271; } }
+@media (min-width: 1680px) { .dashboard-terminal-sidebar { --dashboard-sidebar-scale: 1.342; } }
+@media (min-width: 1920px) { .dashboard-terminal-sidebar { --dashboard-sidebar-scale: 1.432; } }
+
+.dashboard-terminal-sidebar .dashboard-sidebar-logo {
+  width: calc(28px * var(--dashboard-sidebar-scale));
+  height: calc(28px * var(--dashboard-sidebar-scale));
+}
+.dashboard-terminal-sidebar .dashboard-sidebar-brand {
+  font-size: calc(22px * var(--dashboard-sidebar-scale));
+}
+.dashboard-terminal-sidebar .dashboard-sidebar-link {
+  font-size: calc(12.5px * var(--dashboard-sidebar-scale));
+}
+.dashboard-terminal-sidebar .dashboard-sidebar-icon {
+  width: calc(19px * var(--dashboard-sidebar-scale));
+  height: calc(19px * var(--dashboard-sidebar-scale));
+}
 .dashboard-sidebar-root .sidebar-group-label,
 .dashboard-sidebar-root nav > div > div:first-child {
   text-transform: none !important;
