@@ -3,31 +3,21 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation } from "@tanstack/react-query";
 import {
-  Bell,
-  BellRing,
   History,
   ImagePlus,
   Mic,
   PanelRightClose,
   Square,
   SquarePen,
+  Timer,
   Trash2,
   X,
 } from "lucide-react";
 import type { FileUIPart } from "ai";
 import { analyzeGold, type GoldSignal } from "@/lib/gold-analysis.functions";
-import { fetchGoldSpot } from "@/lib/candle-feed.functions";
 import { transcribeVoiceMessage } from "@/lib/transcription.functions";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import {
   Conversation,
@@ -109,15 +99,30 @@ type ChatThread = {
 
 const THREADS_KEY = "jenvu:terminal:threads:v1";
 const TERMINAL_SETTINGS_KEY = "jenvu:terminal:settings:v1";
-const PRICE_ALERTS_KEY = "jenvu:terminal:price-alerts:v1";
 
-type PriceAlert = {
-  id: string;
-  direction: "above" | "below";
-  target: number;
-  createdAt: number;
-  triggeredAt?: number;
-};
+function candleSecondsLeft(tvInterval: string): number {
+  const now = Date.now();
+  if (tvInterval === "D") {
+    const next = Date.UTC(
+      new Date(now).getUTCFullYear(),
+      new Date(now).getUTCMonth(),
+      new Date(now).getUTCDate() + 1,
+    );
+    return Math.max(0, Math.floor((next - now) / 1000));
+  }
+  const minutes = Number(tvInterval);
+  if (!Number.isFinite(minutes) || minutes <= 0) return 0;
+  const period = minutes * 60_000;
+  return Math.max(0, Math.ceil((period - (now % period)) / 1000));
+}
+
+function formatCountdown(totalSeconds: number): string {
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+  const pad = (value: number) => String(value).padStart(2, "0");
+  return hours > 0 ? `${hours}:${pad(minutes)}:${pad(seconds)}` : `${pad(minutes)}:${pad(seconds)}`;
+}
 
 const QUICK = [
   "Analyse the current chart",
@@ -212,12 +217,7 @@ function TerminalPage() {
   const [threads, setThreads] = useState<ChatThread[]>([]);
   const [activeThreadId, setActiveThreadId] = useState<string | null>(null);
   const [historyOpen, setHistoryOpen] = useState(false);
-  const [alertsOpen, setAlertsOpen] = useState(false);
-  const [priceAlerts, setPriceAlerts] = useState<PriceAlert[]>([]);
-  const [alertDirection, setAlertDirection] = useState<PriceAlert["direction"]>("above");
-  const [alertTarget, setAlertTarget] = useState("");
-  const [liveGoldPrice, setLiveGoldPrice] = useState<number | null>(null);
-  const [alertError, setAlertError] = useState("");
+  const [secondsLeft, setSecondsLeft] = useState(0);
   const [voiceError, setVoiceError] = useState("");
   const [isRecording, setIsRecording] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
@@ -230,7 +230,6 @@ function TerminalPage() {
   const activeThreadIdRef = useRef<string | null>(null);
   const analyze = useServerFn(analyzeGold);
   const transcribe = useServerFn(transcribeVoiceMessage);
-  const getGoldSpot = useServerFn(fetchGoldSpot);
 
   function addMessage(message: ChatMsg) {
     setMessages((current) => [...current, message]);
@@ -379,25 +378,10 @@ function TerminalPage() {
         timeframe?: string;
         theme?: "light" | "dark";
         deskOpen?: boolean;
-        alertsOpen?: boolean;
       } | null;
       const savedTimeframe = TIMEFRAMES.find((timeframe) => timeframe.key === settings?.timeframe);
       if (savedTimeframe) setTf(savedTimeframe);
-      // Desk and alert panels always start closed so the chart opens exactly as left.
-      const savedAlerts = JSON.parse(
-        window.localStorage.getItem(PRICE_ALERTS_KEY) || "[]",
-      ) as PriceAlert[];
-      if (Array.isArray(savedAlerts)) {
-        setPriceAlerts(
-          savedAlerts.filter(
-            (alert) =>
-              alert &&
-              typeof alert.id === "string" &&
-              (alert.direction === "above" || alert.direction === "below") &&
-              Number.isFinite(alert.target),
-          ),
-        );
-      }
+      // The AI desk always starts closed so the chart opens exactly as left.
 
       const CHART_USER_KEY = "jenvu:terminal:chart-user:v1";
       let chartUser = window.localStorage.getItem(CHART_USER_KEY);
@@ -426,51 +410,15 @@ function TerminalPage() {
     if (!hydratedRef.current) return;
     window.localStorage.setItem(
       TERMINAL_SETTINGS_KEY,
-      JSON.stringify({ timeframe: tf.key, deskOpen, alertsOpen }),
+      JSON.stringify({ timeframe: tf.key, deskOpen }),
     );
-  }, [tf.key, deskOpen, alertsOpen]);
+  }, [tf.key, deskOpen]);
 
   useEffect(() => {
-    if (!hydratedRef.current) return;
-    window.localStorage.setItem(PRICE_ALERTS_KEY, JSON.stringify(priceAlerts));
-  }, [priceAlerts]);
-
-  useEffect(() => {
-    let stopped = false;
-    const checkAlerts = async () => {
-      try {
-        const quote = await getGoldSpot({ data: { asset: "XAUUSD" } });
-        if (stopped || quote.price == null) return;
-        const currentPrice = quote.price;
-        setLiveGoldPrice(currentPrice);
-        setAlertError("");
-        setPriceAlerts((current) =>
-          current.map((alert) => {
-            if (alert.triggeredAt) return alert;
-            const reached =
-              alert.direction === "above"
-                ? currentPrice >= alert.target
-                : currentPrice <= alert.target;
-            if (!reached) return alert;
-            if ("Notification" in window && Notification.permission === "granted") {
-              new Notification("Jenvu XAU/USD alert", {
-                body: `Gold reached ${currentPrice.toFixed(2)} (${alert.direction} ${alert.target.toFixed(2)}).`,
-              });
-            }
-            return { ...alert, triggeredAt: Date.now() };
-          }),
-        );
-      } catch {
-        if (!stopped) setAlertError("Live gold price is temporarily unavailable.");
-      }
-    };
-    void checkAlerts();
-    const timer = window.setInterval(checkAlerts, 10_000);
-    return () => {
-      stopped = true;
-      window.clearInterval(timer);
-    };
-  }, [getGoldSpot]);
+    setSecondsLeft(candleSecondsLeft(tf.tv));
+    const timer = window.setInterval(() => setSecondsLeft(candleSecondsLeft(tf.tv)), 1000);
+    return () => window.clearInterval(timer);
+  }, [tf.tv]);
 
   useEffect(() => {
     if (!ask.isPending && !voice.isPending && !isRecording) textareaRef.current?.focus();
@@ -549,28 +497,6 @@ function TerminalPage() {
     }
   }
 
-  async function addPriceAlert() {
-    const target = Number(alertTarget);
-    if (!Number.isFinite(target) || target <= 0) {
-      setAlertError("Enter a valid XAU/USD price.");
-      return;
-    }
-    if ("Notification" in window && Notification.permission === "default") {
-      await Notification.requestPermission();
-    }
-    setPriceAlerts((current) => [
-      {
-        id: `alert-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`,
-        direction: alertDirection,
-        target,
-        createdAt: Date.now(),
-      },
-      ...current,
-    ]);
-    setAlertTarget("");
-    setAlertError("");
-  }
-
   return (
     <TooltipProvider>
       <div className="flex h-full min-h-0 w-full flex-col overflow-hidden bg-background">
@@ -588,17 +514,14 @@ function TerminalPage() {
                 <img src={jenvuLogo} alt="" className="h-4 w-4 shrink-0 object-contain" />
                 Ask With AI
               </button>
-              <Button
-                type="button"
-                variant={alertsOpen ? "secondary" : "ghost"}
-                size="icon"
-                onClick={() => setAlertsOpen((open) => !open)}
-                className="h-7 w-7 text-muted-foreground"
-                title="Price alerts"
-                aria-label="Price alerts"
+              <div
+                className="flex h-7 items-center gap-1.5 rounded-md border border-border bg-white px-2 font-mono text-xs font-semibold text-foreground"
+                title={`Time left on the current ${tf.label} candle`}
+                aria-label={`Current ${tf.label} candle closes in ${formatCountdown(secondsLeft)}`}
               >
-                <Bell className="h-3.5 w-3.5" />
-              </Button>
+                <Timer className="h-3.5 w-3.5 text-muted-foreground" />
+                {formatCountdown(secondsLeft)}
+              </div>
             </div>
             <iframe
               key={chartSrc}
@@ -607,122 +530,6 @@ function TerminalPage() {
               className="h-full w-full border-0"
               allowFullScreen
             />
-            {alertsOpen && (
-              <section className="absolute inset-x-0 bottom-0 z-20 flex h-[42%] min-h-56 flex-col border-t border-border bg-background shadow-2xl">
-                <div className="flex h-11 shrink-0 items-center border-b border-border px-4">
-                  <BellRing className="mr-2 h-4 w-4 text-primary" />
-                  <h2 className="text-sm font-medium">XAU/USD Price Alerts</h2>
-                  <span className="ml-3 font-mono text-xs text-muted-foreground">
-                    Live {liveGoldPrice == null ? "—" : liveGoldPrice.toFixed(2)}
-                  </span>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    className="ml-auto h-7 w-7"
-                    onClick={() => setAlertsOpen(false)}
-                    title="Close alerts"
-                    aria-label="Close alerts"
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
-                </div>
-                <div className="grid min-h-0 flex-1 gap-5 overflow-y-auto p-4 lg:grid-cols-[minmax(300px,0.8fr)_minmax(360px,1.2fr)]">
-                  <div>
-                    <p className="mb-3 text-xs font-medium text-muted-foreground">Create alert</p>
-                    <div className="flex flex-col gap-2 sm:flex-row">
-                      <Select
-                        value={alertDirection}
-                        onValueChange={(value) => {
-                          if (value === "above" || value === "below") setAlertDirection(value);
-                        }}
-                      >
-                        <SelectTrigger className="sm:w-32" aria-label="Alert condition">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="above">Crosses above</SelectItem>
-                          <SelectItem value="below">Crosses below</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <Input
-                        type="number"
-                        inputMode="decimal"
-                        min="0"
-                        step="0.01"
-                        value={alertTarget}
-                        onChange={(event) => setAlertTarget(event.target.value)}
-                        onKeyDown={(event) => {
-                          if (event.key === "Enter") void addPriceAlert();
-                        }}
-                        placeholder="Target price"
-                        aria-label="Target XAU/USD price"
-                        className="font-mono"
-                      />
-                      <Button type="button" onClick={() => void addPriceAlert()}>
-                        Create
-                      </Button>
-                    </div>
-                    {alertError && (
-                      <p className="mt-2 text-xs text-destructive" role="alert">
-                        {alertError}
-                      </p>
-                    )}
-                    <p className="mt-3 text-xs leading-5 text-muted-foreground">
-                      Alerts are saved in this browser and checked while the terminal is open.
-                    </p>
-                  </div>
-                  <div className="min-h-0">
-                    <p className="mb-3 text-xs font-medium text-muted-foreground">Your alerts</p>
-                    {priceAlerts.length === 0 ? (
-                      <div className="flex h-24 items-center justify-center border border-dashed border-border text-sm text-muted-foreground">
-                        No price alerts yet.
-                      </div>
-                    ) : (
-                      <div className="space-y-2">
-                        {priceAlerts.map((alert) => (
-                          <div
-                            key={alert.id}
-                            className="flex items-center gap-3 rounded-md border border-border px-3 py-2"
-                          >
-                            <Bell
-                              className={cn(
-                                "h-4 w-4 shrink-0",
-                                alert.triggeredAt ? "text-primary" : "text-muted-foreground",
-                              )}
-                            />
-                            <div className="min-w-0 flex-1">
-                              <p className="text-sm font-medium">
-                                XAU/USD {alert.direction} {alert.target.toFixed(2)}
-                              </p>
-                              <p className="text-xs text-muted-foreground">
-                                {alert.triggeredAt
-                                  ? `Triggered ${new Date(alert.triggeredAt).toLocaleString()}`
-                                  : "Active"}
-                              </p>
-                            </div>
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="icon"
-                              className="h-8 w-8 shrink-0 text-muted-foreground hover:text-destructive"
-                              onClick={() =>
-                                setPriceAlerts((current) =>
-                                  current.filter((item) => item.id !== alert.id),
-                                )
-                              }
-                              aria-label={`Delete alert at ${alert.target.toFixed(2)}`}
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </section>
-            )}
           </main>
 
           {/* AI desk */}
