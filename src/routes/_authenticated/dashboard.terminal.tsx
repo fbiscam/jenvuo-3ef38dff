@@ -295,7 +295,7 @@ function TerminalPage() {
 
   const ask = useMutation({
     mutationFn: async ({ query, chartImage }: { query: string; chartImage?: string }) =>
-      analyze({ data: { timeframe: tf.key, query, chartImage } }),
+      analyze({ data: { timeframe: tf.key, query, chartImage, advisor: true } }),
     onSuccess: (signal) => {
       addMessage({
         role: "assistant",
