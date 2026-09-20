@@ -816,7 +816,7 @@ async function _analyzeGoldCompute(
       };
     }
 
-    const wantsTradingSetup = isTradingSetupIntent(data.query);
+    const wantsTradingSetup = !data.advisor && isTradingSetupIntent(data.query);
     if (wantsTradingSetup) {
       try {
         const plan = await computeSignalPlan({ symbol: inferInstrumentFromText(data.query) }, __userId, { scanId: __scanId });
