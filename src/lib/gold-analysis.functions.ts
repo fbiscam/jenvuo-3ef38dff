@@ -774,11 +774,47 @@ function isTradingSetupIntent(q: string): boolean {
 }
 
 async function _analyzeGoldCompute(
-  data: { timeframe: string; query: string },
+  data: { timeframe: string; query: string; chartImage?: string },
   __userId: string | null = null,
   __scanId: string | null = null,
 ): Promise<GoldSignal & { __billable: "signal" | "chat" }> {
     // AI key is validated inside callChatCompletion — no local read needed.
+
+    if (data.chartImage) {
+      const imagePrompt = `Review this user-provided XAU/USD chart screenshot on ${data.timeframe.toUpperCase()} and answer the user's request: ${data.query}\n\nApply only the gold Mother Candle / Inside Bar reversal sequence: a fresh HH/LH needs a bearish mother candle, one inside baby candle of either colour, then a bearish third candle; a fresh LL/HL needs a bullish mother candle, one inside baby candle of either colour, then a bullish third candle. Do not invent candles or prices you cannot read. If the full pattern or readable price scale is absent, return WAIT and state exactly what is missing. Return the same JSON shape defined by the system instructions.`;
+      const system = `You are Jenvu's XAU/USD chart reviewer. Reply only in English. Return only valid JSON with this shape: {"bias":"BULLISH|BEARISH|NEUTRAL","direction":"BUY|SELL|WAIT","entry":"price or -","stopLoss":"price or -","takeProfits":[],"riskReward":"value or -","confidence":0,"killzone":"-","confluences":[],"ictAnalysis":"","smcAnalysis":"","marketStructure":"","spokenSummary":"","fullAnalysis":""}. Never claim certainty and never issue a trade from an unreadable or incomplete chart.`;
+      const { content, model, usage } = await callChatCompletion({
+        models: [...EXTENSION_MODEL_CHAIN.vision],
+        messages: [
+          { role: "system", content: system },
+          { role: "user", content: [{ type: "text", text: imagePrompt }, { type: "image_url", image_url: { url: data.chartImage, detail: "high" } }] },
+        ],
+        jsonMode: true,
+        stage: "terminal-chart-review",
+      });
+      import("@/lib/ai-cost-log.server").then((m) => m.logAiCost({ userId: __userId, stage: "terminal-chart-review", model, usage })).catch(() => {});
+      const parsed: any = tryParseJsonLoose(content);
+      return {
+        bias: parsed.bias === "BULLISH" || parsed.bias === "BEARISH" ? parsed.bias : "NEUTRAL",
+        direction: parsed.direction === "BUY" || parsed.direction === "SELL" ? parsed.direction : "WAIT",
+        entry: String(parsed.entry ?? "-"),
+        stopLoss: String(parsed.stopLoss ?? "-"),
+        takeProfits: Array.isArray(parsed.takeProfits) ? parsed.takeProfits.map(String) : [],
+        riskReward: String(parsed.riskReward ?? "-"),
+        confidence: Math.max(0, Math.min(100, Number(parsed.confidence ?? 0))),
+        killzone: String(parsed.killzone ?? "-"),
+        confluences: Array.isArray(parsed.confluences) ? parsed.confluences.map(String) : [],
+        ictAnalysis: String(parsed.ictAnalysis ?? ""),
+        smcAnalysis: String(parsed.smcAnalysis ?? ""),
+        marketStructure: String(parsed.marketStructure ?? ""),
+        spokenSummary: String(parsed.spokenSummary ?? "Chart review complete."),
+        fullAnalysis: String(parsed.fullAnalysis ?? parsed.spokenSummary ?? "Chart review complete."),
+        timeframe: data.timeframe,
+        currentPrice: 0,
+        generatedAt: new Date().toISOString(),
+        __billable: "chat",
+      };
+    }
 
     const wantsTradingSetup = isTradingSetupIntent(data.query);
     if (wantsTradingSetup) {
@@ -961,11 +997,20 @@ function parsePx(s: string | undefined): number {
 
 export const analyzeGold = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { timeframe: string; query: string }) => ({
+  .inputValidator((d: { timeframe: string; query: string; chartImage?: string }) => ({
     timeframe: String(d?.timeframe || "15m").toLowerCase(),
     query: String(d?.query || "Give me the best A+ setup right now"),
+    chartImage: typeof d?.chartImage === "string" && /^data:image\/(?:png|jpeg|webp);base64,/i.test(d.chartImage) && d.chartImage.length <= 4_500_000
+      ? d.chartImage
+      : undefined,
   }))
   .handler(async ({ data, context }) => {
+    if (data.chartImage) {
+      const result = await _analyzeGoldCompute(data, context.userId, null);
+      const { __billable: _billable, ...clean } = result;
+      void _billable;
+      return clean as GoldSignal;
+    }
     const instSym = inferInstrumentFromText(data.query);
     const now = Date.now();
 
