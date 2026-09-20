@@ -77,7 +77,7 @@ export function PineIndicatorPane({ indicator, candles, onRemove }: Props) {
     chartRef.current = chart;
 
     if (result.overlay) {
-      const price = chart.addSeries(CandlestickSeries, {
+      const price: ReturnType<typeof chart.addSeries> = chart.addSeries(CandlestickSeries, {
         upColor: "#26a69a",
         downColor: "#ef5350",
         borderVisible: false,
