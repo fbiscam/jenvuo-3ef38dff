@@ -2,7 +2,17 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation } from "@tanstack/react-query";
-import { ImagePlus, LineChart, Mic, Moon, PanelRightClose, PanelRightOpen, Square, SquarePen, Sun } from "lucide-react";
+import {
+  ImagePlus,
+  LineChart,
+  Mic,
+  Moon,
+  PanelRightClose,
+  PanelRightOpen,
+  Square,
+  SquarePen,
+  Sun,
+} from "lucide-react";
 import type { FileUIPart } from "ai";
 import { analyzeGold, type GoldSignal } from "@/lib/gold-analysis.functions";
 import { transcribeVoiceMessage } from "@/lib/transcription.functions";
@@ -72,7 +82,12 @@ const TIMEFRAMES = [
 
 const SYMBOL = { key: "XAUUSD", tv: "OANDA:XAUUSD", label: "XAU/USD" };
 
-type ChatMsg = { role: "user" | "assistant"; text: string; signal?: GoldSignal; files?: FileUIPart[] };
+type ChatMsg = {
+  role: "user" | "assistant";
+  text: string;
+  signal?: GoldSignal;
+  files?: FileUIPart[];
+};
 
 const QUICK = [
   "Analyse the current chart",
@@ -113,7 +128,8 @@ function encodeWav(chunks: Float32Array[], inputRate: number): Blob {
   const buffer = new ArrayBuffer(44 + sampleCount * 2);
   const view = new DataView(buffer);
   const write = (position: number, value: string) => {
-    for (let index = 0; index < value.length; index += 1) view.setUint8(position + index, value.charCodeAt(index));
+    for (let index = 0; index < value.length; index += 1)
+      view.setUint8(position + index, value.charCodeAt(index));
   };
   write(0, "RIFF");
   view.setUint32(4, 36 + sampleCount * 2, true);
@@ -138,7 +154,10 @@ function encodeWav(chunks: Float32Array[], inputRate: number): Blob {
 async function blobToDataUrl(blob: Blob): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
-    reader.onload = () => typeof reader.result === "string" ? resolve(reader.result) : reject(new Error("Recording could not be read."));
+    reader.onload = () =>
+      typeof reader.result === "string"
+        ? resolve(reader.result)
+        : reject(new Error("Recording could not be read."));
     reader.onerror = () => reject(new Error("Recording could not be read."));
     reader.readAsDataURL(blob);
   });
@@ -210,23 +229,27 @@ function TerminalPage() {
   const voice = useMutation({
     mutationFn: async (audioDataUrl: string) => transcribe({ data: { audioDataUrl } }),
     onSuccess: ({ text }) => {
-      setInput((current) => current ? `${current} ${text}` : text);
+      setInput((current) => (current ? `${current} ${text}` : text));
       setVoiceError("");
       requestAnimationFrame(() => textareaRef.current?.focus());
     },
-    onError: (error: unknown) => setVoiceError(error instanceof Error ? error.message : "Voice transcription failed."),
+    onError: (error: unknown) =>
+      setVoiceError(error instanceof Error ? error.message : "Voice transcription failed."),
   });
 
   useEffect(() => {
     if (!ask.isPending && !voice.isPending && !isRecording) textareaRef.current?.focus();
   }, [ask.isPending, voice.isPending, isRecording]);
 
-  useEffect(() => () => {
-    audioStreamRef.current?.getTracks().forEach((track) => track.stop());
-    audioProcessorRef.current?.disconnect();
-    audioSourceRef.current?.disconnect();
-    void audioContextRef.current?.close();
-  }, []);
+  useEffect(
+    () => () => {
+      audioStreamRef.current?.getTracks().forEach((track) => track.stop());
+      audioProcessorRef.current?.disconnect();
+      audioSourceRef.current?.disconnect();
+      void audioContextRef.current?.close();
+    },
+    [],
+  );
 
   async function send(message: { text: string; files?: FileUIPart[] }) {
     const image = message.files?.find((file) => file.mediaType?.startsWith("image/") && file.url);
@@ -244,12 +267,15 @@ function TerminalPage() {
       return;
     }
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } });
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: { echoCancellation: true, noiseSuppression: true },
+      });
       const context = new AudioContext();
       const source = context.createMediaStreamSource(stream);
       const processor = context.createScriptProcessor(4096, 1, 1);
       audioChunksRef.current = [];
-      processor.onaudioprocess = (event) => audioChunksRef.current.push(new Float32Array(event.inputBuffer.getChannelData(0)));
+      processor.onaudioprocess = (event) =>
+        audioChunksRef.current.push(new Float32Array(event.inputBuffer.getChannelData(0)));
       source.connect(processor);
       processor.connect(context.destination);
       audioStreamRef.current = stream;
@@ -450,7 +476,10 @@ function TerminalPage() {
                       {m.files && m.files.length > 0 && (
                         <Attachments variant="grid" className="mb-1 ml-0">
                           {m.files.map((file, fileIndex) => (
-                            <Attachment data={{ ...file, id: `${i}-${fileIndex}` }} key={`${i}-${fileIndex}`}>
+                            <Attachment
+                              data={{ ...file, id: `${i}-${fileIndex}` }}
+                              key={`${i}-${fileIndex}`}
+                            >
                               <AttachmentPreview />
                             </Attachment>
                           ))}
@@ -477,15 +506,30 @@ function TerminalPage() {
 
             <div className="bg-card px-3.5 pb-3 pt-2">
               {(voiceError || isRecording || voice.isPending) && (
-                <p className={cn("mb-2 px-1 text-xs", voiceError ? "text-destructive" : "text-muted-foreground")} role={voiceError ? "alert" : "status"}>
-                  {voiceError || (isRecording ? "Listening… tap stop when you are finished." : "Transcribing your voice message…")}
+                <p
+                  className={cn(
+                    "mb-2 px-1 text-xs",
+                    voiceError ? "text-destructive" : "text-muted-foreground",
+                  )}
+                  role={voiceError ? "alert" : "status"}
+                >
+                  {voiceError ||
+                    (isRecording
+                      ? "Listening… tap stop when you are finished."
+                      : "Transcribing your voice message…")}
                 </p>
               )}
               <PromptInput
                 accept="image/png,image/jpeg,image/webp"
                 maxFiles={1}
                 maxFileSize={MAX_IMAGE_BYTES}
-                onError={(error) => setVoiceError(error.code === "max_file_size" ? "Chart images must be under 3 MB." : "Attach one PNG, JPEG, or WebP chart image.")}
+                onError={(error) =>
+                  setVoiceError(
+                    error.code === "max_file_size"
+                      ? "Chart images must be under 3 MB."
+                      : "Attach one PNG, JPEG, or WebP chart image.",
+                  )
+                }
                 onSubmit={(message) => send(message)}
                 className="rounded-[18px] border-border bg-card shadow-sm transition-shadow focus-within:shadow-md"
               >
@@ -500,7 +544,10 @@ function TerminalPage() {
                 <PromptInputFooter className="px-2 pb-2">
                   <PromptInputTools>
                     <PromptInputActionMenu>
-                      <PromptInputActionMenuTrigger aria-label="Attach chart image" tooltip="Attach chart image">
+                      <PromptInputActionMenuTrigger
+                        aria-label="Attach chart image"
+                        tooltip="Attach chart image"
+                      >
                         <ImagePlus className="size-4" />
                       </PromptInputActionMenuTrigger>
                       <PromptInputActionMenuContent>
@@ -512,9 +559,16 @@ function TerminalPage() {
                       tooltip={isRecording ? "Stop recording" : "Record voice message"}
                       disabled={voice.isPending}
                       onClick={() => void (isRecording ? stopRecording() : startRecording())}
-                      className={cn(isRecording && "bg-destructive text-destructive-foreground hover:bg-destructive/90")}
+                      className={cn(
+                        isRecording &&
+                          "bg-destructive text-destructive-foreground hover:bg-destructive/90",
+                      )}
                     >
-                      {isRecording ? <Square className="size-3 fill-current" /> : <Mic className="size-4" />}
+                      {isRecording ? (
+                        <Square className="size-3 fill-current" />
+                      ) : (
+                        <Mic className="size-4" />
+                      )}
                     </PromptInputButton>
                     <span className="pl-1 text-[11px] text-muted-foreground">Jenvu AI</span>
                   </PromptInputTools>

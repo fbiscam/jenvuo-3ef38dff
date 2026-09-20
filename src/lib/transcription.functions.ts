@@ -10,7 +10,8 @@ function decodeWavDataUrl(value: string): Uint8Array {
   }
   const encoded = value.slice(WAV_PREFIX.length);
   const estimatedBytes = Math.floor((encoded.length * 3) / 4);
-  if (!encoded || estimatedBytes < 2048) throw new Error("That recording was empty. Please try again.");
+  if (!encoded || estimatedBytes < 2048)
+    throw new Error("That recording was empty. Please try again.");
   if (estimatedBytes > MAX_AUDIO_BYTES) throw new Error("Voice messages must be under 4 MB.");
   const binary = atob(encoded);
   const bytes = new Uint8Array(binary.length);
@@ -55,14 +56,17 @@ export const transcribeVoiceMessage = createServerFn({ method: "POST" })
     audioDataUrl: String(input?.audioDataUrl || ""),
   }))
   .handler(async ({ data }) => {
-    const apiKey = process.env['LOVABLE_API_KEY'];
+    const apiKey = process.env["LOVABLE_API_KEY"];
     if (!apiKey) throw new Error("Voice transcription is not configured.");
 
     const bytes = decodeWavDataUrl(data.audioDataUrl);
     const form = new FormData();
     form.append("model", "google/gemini-3.5-transcribe");
     form.append("stream", "true");
-    const wavBuffer = bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) as ArrayBuffer;
+    const wavBuffer = bytes.buffer.slice(
+      bytes.byteOffset,
+      bytes.byteOffset + bytes.byteLength,
+    ) as ArrayBuffer;
     form.append("file", new Blob([wavBuffer], { type: "audio/wav" }), "recording.wav");
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/audio/transcriptions", {
