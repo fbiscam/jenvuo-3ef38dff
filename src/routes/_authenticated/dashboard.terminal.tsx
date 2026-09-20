@@ -316,12 +316,16 @@ function TerminalPage() {
       });
     },
     onError: (err: unknown) => {
+      const message = err instanceof Error ? err.message : "";
       addMessage({
         role: "assistant",
-        text:
-          err instanceof Error && err.message.includes("INSUFFICIENT_CREDITS")
-            ? "You are out of balance for a new read. Top up and try again."
-            : "The desk could not answer just now. Please try again in a moment.",
+        text: /INSUFFICIENT_CREDITS|Low balance/i.test(message)
+          ? "You are out of balance. Top up and try again."
+          : /Daily token limit/i.test(message)
+            ? message
+            : /not included|Upgrade to/i.test(message)
+              ? message
+              : "The desk could not answer just now. Please try again in a moment.",
       });
     },
   });
