@@ -189,7 +189,7 @@ async function blobToDataUrl(blob: Blob): Promise<string> {
 function TerminalPage() {
   const [tf, setTf] = useState(TIMEFRAMES[3]);
   const theme = "light" as const;
-  const [deskOpen, setDeskOpen] = useState(true);
+  const [deskOpen, setDeskOpen] = useState(false);
   const [chartUserId, setChartUserId] = useState<string | null>(null);
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<ChatMsg[]>([]);
@@ -295,7 +295,7 @@ function TerminalPage() {
       hide_side_toolbar: "0",
       allow_symbol_change: "0",
       withdateranges: "1",
-      details: "1",
+      details: "0",
       save_chart_properties_to_local_storage: "1",
       saveimage: "1",
       client_id: "jenvu.com",
