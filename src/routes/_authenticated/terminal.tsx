@@ -1,19 +1,33 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation } from "@tanstack/react-query";
 import {
-  Send,
   LineChart,
-  Loader2,
   Moon,
   Sun,
-  Sparkles,
   PanelRightClose,
   PanelRightOpen,
+  SquarePen,
 } from "lucide-react";
 import { analyzeGold, type GoldSignal } from "@/lib/gold-analysis.functions";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import {
+  Conversation,
+  ConversationContent,
+  ConversationScrollButton,
+} from "@/components/ai-elements/conversation";
+import { Message, MessageContent, MessageResponse } from "@/components/ai-elements/message";
+import {
+  PromptInput,
+  PromptInputFooter,
+  PromptInputSubmit,
+  PromptInputTextarea,
+} from "@/components/ai-elements/prompt-input";
+import { Shimmer } from "@/components/ai-elements/shimmer";
+import jenvuLogo from "@/assets/jenvu-logo.png";
+import jenvuTick from "@/assets/jenvu-tick.png";
 
 export const Route = createFileRoute("/_authenticated/terminal")({
   head: () => ({
@@ -63,7 +77,6 @@ function TerminalPage() {
   const [deskOpen, setDeskOpen] = useState(true);
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<ChatMsg[]>([]);
-  const scroller = useRef<HTMLDivElement>(null);
   const analyze = useServerFn(analyzeGold);
 
   const chartSrc = useMemo(() => {
@@ -92,7 +105,6 @@ function TerminalPage() {
         ...m,
         { role: "assistant", text: signal.fullAnalysis || signal.spokenSummary || "No read available.", signal },
       ]);
-      requestAnimationFrame(() => scroller.current?.scrollTo({ top: 1e6, behavior: "smooth" }));
     },
     onError: (err: unknown) => {
       setMessages((m) => [
@@ -114,7 +126,6 @@ function TerminalPage() {
     setMessages((m) => [...m, { role: "user", text: query }]);
     setInput("");
     ask.mutate(query);
-    requestAnimationFrame(() => scroller.current?.scrollTo({ top: 1e6, behavior: "smooth" }));
   }
 
   return (
@@ -127,33 +138,42 @@ function TerminalPage() {
         </div>
         <div className="flex items-center gap-1 rounded-md border border-border p-0.5">
           {TIMEFRAMES.map((t) => (
-            <button
+            <Button
               key={t.key}
+              type="button"
+              variant="ghost"
+              size="sm"
               onClick={() => setTf(t)}
               className={cn(
-                "rounded px-2 py-1 text-xs font-medium transition-colors",
+                "h-7 rounded px-2 text-xs shadow-none",
                 t.key === tf.key ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted",
               )}
             >
               {t.label}
-            </button>
+            </Button>
           ))}
         </div>
-        <button
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
           onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-          className="ml-auto inline-flex items-center gap-1.5 rounded-md border border-border px-2 py-1 text-xs text-muted-foreground hover:bg-muted"
+          className="ml-auto h-7 gap-1.5 px-2 text-xs text-muted-foreground shadow-none"
         >
           {theme === "dark" ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
           {theme === "dark" ? "Light" : "Dark"}
-        </button>
-        <button
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
           onClick={() => setDeskOpen((v) => !v)}
-          className="inline-flex items-center gap-1.5 rounded-md border border-border px-2 py-1 text-xs text-muted-foreground hover:bg-muted"
+          className="h-7 gap-1.5 px-2 text-xs text-muted-foreground shadow-none"
           aria-pressed={deskOpen}
         >
           {deskOpen ? <PanelRightClose className="h-3.5 w-3.5" /> : <PanelRightOpen className="h-3.5 w-3.5" />}
           {deskOpen ? "Hide AI Desk" : "Show AI Desk"}
-        </button>
+        </Button>
       </div>
 
       <div className="flex min-h-0 flex-1 flex-col lg:flex-row">
@@ -170,84 +190,111 @@ function TerminalPage() {
 
         {/* AI desk */}
         {deskOpen && (
-        <aside className="flex h-[45%] w-full shrink-0 flex-col border-t border-border lg:h-auto lg:w-96 lg:border-l lg:border-t-0">
-          <div className="flex items-center gap-2 border-b border-border px-3 py-2">
-            <Sparkles className="h-4 w-4 text-primary" />
-            <span className="text-sm font-semibold">AI Desk</span>
-            <span className="ml-auto text-[11px] text-muted-foreground">{tf.label} · {SYMBOL.label}</span>
+        <aside className="flex h-[45%] w-full shrink-0 flex-col border-t border-border bg-card text-card-foreground lg:h-auto lg:w-96 lg:border-l lg:border-t-0">
+          <div className="flex min-h-17 items-center gap-2.5 border-b border-border px-4 py-3">
+            <img src={jenvuLogo} alt="Jenvu" className="h-9 w-9 shrink-0 object-contain" />
+            <div className="min-w-0">
+              <div className="flex items-center gap-1">
+                <span className="text-lg font-medium leading-none">Jenvu</span>
+                <img src={jenvuTick} alt="Verified" className="h-4.5 w-4.5 shrink-0 object-contain" />
+              </div>
+              <p className="mt-1 text-[10px] font-medium text-muted-foreground">Gold 30-minute analysis ready</p>
+            </div>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="ml-auto h-8 w-8 rounded-full text-muted-foreground"
+              onClick={() => setMessages([])}
+              title="Start a new chat"
+              aria-label="Start a new chat"
+            >
+              <SquarePen className="h-4 w-4" />
+            </Button>
           </div>
 
-          <div ref={scroller} className="min-h-0 flex-1 space-y-3 overflow-y-auto p-3">
+          <Conversation className="min-h-0">
+            <ConversationContent className="gap-5 px-4 py-5">
             {messages.length === 0 && (
-              <div className="space-y-3">
-                <p className="text-sm text-muted-foreground">
-                  Ask about the chart you are looking at. The desk uses live gold data for the selected timeframe.
-                </p>
-                <div className="flex flex-wrap gap-2">
+              <div className="space-y-4">
+                <div className="flex gap-2.5 text-sm leading-6">
+                  <img src={jenvuLogo} alt="" className="mt-0.5 h-6 w-6 shrink-0 object-contain" />
+                  <p>
+                    Ask about the chart you are looking at. I use live gold data for the selected timeframe.
+                  </p>
+                </div>
+                <div className="ml-8 flex flex-wrap gap-1.5">
                   {QUICK.map((q) => (
-                    <button
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
                       key={q}
                       onClick={() => send(q)}
-                      className="rounded-full border border-border px-3 py-1 text-xs text-muted-foreground hover:bg-muted"
+                      className="h-auto rounded-full px-2.5 py-1.5 text-[11px] font-normal text-muted-foreground shadow-none hover:text-primary"
                     >
                       {q}
-                    </button>
+                    </Button>
                   ))}
                 </div>
+                <p className="ml-8 text-[10px] font-medium uppercase text-muted-foreground">{tf.label} · {SYMBOL.label}</p>
               </div>
             )}
 
             {messages.map((m, i) => (
-              <div
-                key={i}
-                className={cn(
-                  "rounded-lg px-3 py-2 text-sm whitespace-pre-wrap",
-                  m.role === "user" ? "ml-6 bg-primary text-primary-foreground" : "mr-2 bg-muted",
-                )}
-              >
-                {m.signal && (
-                  <div className="mb-2 flex flex-wrap gap-2 text-[11px] font-semibold">
-                    <span className="rounded bg-background/70 px-2 py-0.5">{m.signal.direction}</span>
-                    <span className="rounded bg-background/70 px-2 py-0.5">Entry {m.signal.entry}</span>
-                    <span className="rounded bg-background/70 px-2 py-0.5">SL {m.signal.stopLoss}</span>
-                    {m.signal.takeProfits?.[0] && (
-                      <span className="rounded bg-background/70 px-2 py-0.5">TP {m.signal.takeProfits[0]}</span>
-                    )}
-                  </div>
-                )}
-                {m.text}
-              </div>
+              <Message key={`${m.role}-${i}`} from={m.role}>
+                <MessageContent
+                  className={cn(
+                    "text-[13px] leading-6",
+                    m.role === "user" && "rounded-2xl bg-secondary px-3.5 py-2.5 text-secondary-foreground",
+                  )}
+                >
+                  {m.signal && (
+                    <div className="mb-2 flex flex-wrap gap-1.5 text-[10px] font-semibold">
+                      <span className="rounded bg-secondary px-2 py-0.5">{m.signal.direction}</span>
+                      <span className="rounded bg-secondary px-2 py-0.5">Entry {m.signal.entry}</span>
+                      <span className="rounded bg-secondary px-2 py-0.5">SL {m.signal.stopLoss}</span>
+                      {m.signal.takeProfits?.[0] && (
+                        <span className="rounded bg-secondary px-2 py-0.5">TP {m.signal.takeProfits[0]}</span>
+                      )}
+                    </div>
+                  )}
+                  {m.role === "assistant" ? <MessageResponse>{m.text}</MessageResponse> : m.text}
+                </MessageContent>
+              </Message>
             ))}
 
             {ask.isPending && (
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Loader2 className="h-4 w-4 animate-spin" /> Reading the {tf.label} chart…
+              <div className="flex items-center gap-2.5 text-sm">
+                <img src={jenvuLogo} alt="" className="h-6 w-6 shrink-0 object-contain" />
+                <Shimmer>Reading the {tf.label} gold chart…</Shimmer>
               </div>
             )}
-          </div>
+            </ConversationContent>
+            <ConversationScrollButton className="bottom-2 h-8 w-8" />
+          </Conversation>
 
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              send(input);
-            }}
-            className="flex items-center gap-2 border-t border-border p-2"
-          >
-            <input
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder="Ask the desk about this chart…"
-              className="min-w-0 flex-1 rounded-md border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary"
-            />
-            <button
-              type="submit"
-              disabled={ask.isPending || !input.trim()}
-              className="inline-flex h-9 w-9 items-center justify-center rounded-md bg-primary text-primary-foreground disabled:opacity-50"
-              aria-label="Send"
+          <div className="bg-card px-3.5 pb-3 pt-2">
+            <PromptInput
+              onSubmit={(message) => send(message.text)}
+              className="rounded-[18px] border-border bg-card shadow-sm transition-shadow focus-within:shadow-md"
             >
-              <Send className="h-4 w-4" />
-            </button>
-          </form>
+              <PromptInputTextarea
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                placeholder="How can I help you today?"
+                className="min-h-14 max-h-32 px-3 pt-3 text-sm"
+              />
+              <PromptInputFooter className="px-2 pb-2">
+                <span className="pl-1 text-[11px] text-muted-foreground">Jenvu AI</span>
+                <PromptInputSubmit
+                  status={ask.isPending ? "submitted" : "ready"}
+                  disabled={ask.isPending || !input.trim()}
+                  className="h-8 w-8 rounded-full"
+                />
+              </PromptInputFooter>
+            </PromptInput>
+          </div>
         </aside>
         )}
       </div>
