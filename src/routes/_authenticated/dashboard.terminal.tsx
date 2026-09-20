@@ -515,7 +515,7 @@ function TerminalPage() {
                 Ask With AI
               </button>
               <div
-                className="flex h-7 items-center gap-1.5 rounded-md border border-border bg-white px-2 font-mono text-xs font-semibold text-foreground"
+                className="flex h-7 items-center gap-1.5 rounded-md bg-white px-2 font-mono text-xs font-semibold text-foreground"
                 title={`Time left on the current ${tf.label} candle`}
                 aria-label={`Current ${tf.label} candle closes in ${formatCountdown(secondsLeft)}`}
               >
