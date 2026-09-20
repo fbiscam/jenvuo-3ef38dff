@@ -180,7 +180,7 @@ async function blobToDataUrl(blob: Blob): Promise<string> {
 
 function TerminalPage() {
   const [tf, setTf] = useState(TIMEFRAMES[3]);
-  const [theme, setTheme] = useState<"light" | "dark">("dark");
+  const theme = "light" as const;
   const [deskOpen, setDeskOpen] = useState(true);
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<ChatMsg[]>([]);
@@ -280,7 +280,7 @@ function TerminalPage() {
       studies: JSON.stringify(["STD;EMA", "STD;RSI"]),
     });
     return `https://s.tradingview.com/widgetembed/?${params.toString()}`;
-  }, [tf.tv, theme]);
+  }, [tf.tv]);
 
   const ask = useMutation({
     mutationFn: async ({ query, chartImage }: { query: string; chartImage?: string }) =>
@@ -335,7 +335,6 @@ function TerminalPage() {
       } | null;
       const savedTimeframe = TIMEFRAMES.find((timeframe) => timeframe.key === settings?.timeframe);
       if (savedTimeframe) setTf(savedTimeframe);
-      if (settings?.theme === "light" || settings?.theme === "dark") setTheme(settings.theme);
       if (typeof settings?.deskOpen === "boolean") setDeskOpen(settings.deskOpen);
       if (typeof settings?.pineOpen === "boolean") setPineOpen(settings.pineOpen);
       const savedPine = window.localStorage.getItem(PINE_SCRIPT_KEY);
@@ -360,9 +359,9 @@ function TerminalPage() {
     if (!hydratedRef.current) return;
     window.localStorage.setItem(
       TERMINAL_SETTINGS_KEY,
-      JSON.stringify({ timeframe: tf.key, theme, deskOpen, pineOpen }),
+      JSON.stringify({ timeframe: tf.key, deskOpen, pineOpen }),
     );
-  }, [tf.key, theme, deskOpen, pineOpen]);
+  }, [tf.key, deskOpen, pineOpen]);
 
   useEffect(() => {
     if (!hydratedRef.current) return;
@@ -448,7 +447,7 @@ function TerminalPage() {
 
   return (
     <TooltipProvider>
-      <div className="flex h-[calc(100vh-8rem)] min-h-[34rem] w-full flex-col overflow-hidden rounded-lg border border-border bg-background">
+      <div className="flex h-[calc(100vh/0.9)] w-full flex-col overflow-hidden bg-background">
         <div className="flex min-h-0 flex-1 flex-col lg:flex-row">
           {/* Chart */}
           <main className="relative min-h-0 flex-1 bg-background">
