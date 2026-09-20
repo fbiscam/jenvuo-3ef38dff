@@ -243,21 +243,36 @@ function Billing() {
 
       {/* Shortcut grid */}
       <section className="grid grid-cols-1 gap-x-8 gap-y-5 sm:grid-cols-2">
-        {shortcuts.map((s) => (
-          <Link
-            key={s.title}
-            to={s.to}
-            className="flex items-center gap-3 group"
-          >
-            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-zinc-100 text-zinc-600 group-hover:bg-zinc-200 transition-colors">
-              <s.icon className="h-4.5 w-4.5" />
-            </span>
-            <span className="min-w-0">
-              <span className="block text-sm font-medium text-zinc-900">{s.title}</span>
-              <span className="block text-xs text-zinc-500">{s.desc}</span>
-            </span>
-          </Link>
-        ))}
+        {shortcuts.map((s) => {
+          const inner = (
+            <>
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-zinc-100 text-zinc-600 group-hover:bg-zinc-200 transition-colors">
+                <s.icon className="h-4.5 w-4.5" />
+              </span>
+              <span className="min-w-0 text-left">
+                <span className="block text-sm font-medium text-zinc-900">{s.title}</span>
+                <span className="block text-xs text-zinc-500">{s.desc}</span>
+              </span>
+            </>
+          );
+          if (s.tab) {
+            return (
+              <button
+                key={s.title}
+                type="button"
+                onClick={() => setActiveTab(s.tab!)}
+                className="flex items-center gap-3 group"
+              >
+                {inner}
+              </button>
+            );
+          }
+          return (
+            <Link key={s.title} to={s.to!} className="flex items-center gap-3 group">
+              {inner}
+            </Link>
+          );
+        })}
       </section>
       </div>
       )}
