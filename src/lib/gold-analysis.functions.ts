@@ -928,6 +928,9 @@ Return ONLY valid JSON (no markdown, no code fences) with this exact shape:
 }`;
 
     const isTradingIntent = /\b(setup|signal|entry|buy|sell|long|short|trade|analyze|analysis|bias|tp|sl|stop\s*loss|take\s*profit|gold|xau|chart|trend|market|price|level|zone|fvg|ob|order\s*block|liquidity|bos|choch|smc|ict|killzone|scalp|swing)\b/i.test(normalizeQuery(data.query));
+    const advisorGuide = data.advisor
+      ? "\nCOACH MODE: guide and suggest only. Explain the ICT/SMC picture and what the user should look for. Never output a committed entry/SL/TP trade plan; keep all trading fields empty."
+      : "";
     const userPrompt = hasData
       ? `USER MESSAGE: ${data.query}
 
@@ -940,10 +943,10 @@ RECENT SWING LOW (150): ${swingLow.toFixed(2)}
 LAST 150 CANDLES (OHLC):
 ${compact}
 
-${isTradingIntent ? "User wants a trading view — give the A+ ICT/SMC setup, fill trading fields confidently." : "User is just chatting / asking general thing — REPLY conversationally in spokenSummary, set direction='WAIT', confidence=0, leave trading fields empty. Do NOT push a signal."}`
+${isTradingIntent ? "User wants a trading view — give the A+ ICT/SMC setup, fill trading fields confidently." : "User is just chatting / asking general thing — REPLY conversationally in spokenSummary, set direction='WAIT', confidence=0, leave trading fields empty. Do NOT push a signal."}${advisorGuide}`
       : `USER MESSAGE: ${data.query}
 
-${isTradingIntent ? "User wants trading view but live feed offline — answer conversationally, set direction='WAIT', confidence<=40, mention feed offline in fullAnalysis." : "User is just chatting — answer naturally in spokenSummary, set direction='WAIT', confidence=0, leave trading fields empty."}`;
+${isTradingIntent ? "User wants trading view but live feed offline — answer conversationally, set direction='WAIT', confidence<=40, mention feed offline in fullAnalysis." : "User is just chatting — answer naturally in spokenSummary, set direction='WAIT', confidence=0, leave trading fields empty."}${advisorGuide}`;
 
     const { content, model: __aiModel, usage: __aiUsage } = await callChatCompletion({
       models: [...MODEL_CHAIN.chat],
