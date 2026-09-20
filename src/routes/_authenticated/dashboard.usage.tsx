@@ -36,7 +36,7 @@ export const Route = createFileRoute("/_authenticated/dashboard/usage")({
 
 const REASON_LABEL: Record<string, string> = {
   ai_scan: "AI scan",
-  extension_api: "Extension API",
+  extension_api: "AI usage",
   signal: "Signal scan",
   ict_narration: "ICT narration",
   alert: "Alert broadcast",

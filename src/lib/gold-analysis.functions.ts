@@ -777,6 +777,7 @@ async function _analyzeGoldCompute(
   data: { timeframe: string; query: string; chartImage?: string; advisor?: boolean },
   __userId: string | null = null,
   __scanId: string | null = null,
+  __terminalRequestId: string | null = null,
 ): Promise<GoldSignal & { __billable: "signal" | "chat" }> {
     // AI key is validated inside callChatCompletion — no local read needed.
 
@@ -792,7 +793,20 @@ async function _analyzeGoldCompute(
         jsonMode: true,
         stage: "terminal-chart-review",
       });
-      import("@/lib/ai-cost-log.server").then((m) => m.logAiCost({ userId: __userId, stage: "terminal-chart-review", model, usage })).catch(() => {});
+      if (data.advisor && __userId && __terminalRequestId) {
+        const { chargeExtensionUsage } = await import("@/lib/extension-billing.server");
+        const charged = await chargeExtensionUsage({
+          userId: __userId,
+          keyId: "terminal-ai",
+          keyName: "Terminal AI Desk",
+          requestId: __terminalRequestId,
+          action: "terminal.chart_review",
+          calls: [{ model, usage, stage: "terminal-chart-review" }],
+        });
+        if (!charged.ok) throw new Error(charged.error ?? "Terminal AI usage could not be charged.");
+      } else {
+        import("@/lib/ai-cost-log.server").then((m) => m.logAiCost({ userId: __userId, stage: "terminal-chart-review", model, usage })).catch(() => {});
+      }
       const parsed: any = tryParseJsonLoose(content);
       return {
         bias: parsed.bias === "BULLISH" || parsed.bias === "BEARISH" ? parsed.bias : "NEUTRAL",
@@ -975,7 +989,20 @@ ${isTradingIntent ? "The live feed is unavailable. Answer concisely without inve
       if (err instanceof AiGatewayError) throw new Error(err.message);
       throw err;
     });
-    import("@/lib/ai-cost-log.server").then((m) => m.logAiCost({ userId: __userId, stage: "chat-signal", model: __aiModel, usage: __aiUsage })).catch(() => {});
+    if (data.advisor && __userId && __terminalRequestId) {
+      const { chargeExtensionUsage } = await import("@/lib/extension-billing.server");
+      const charged = await chargeExtensionUsage({
+        userId: __userId,
+        keyId: "terminal-ai",
+        keyName: "Terminal AI Desk",
+        requestId: __terminalRequestId,
+        action: "terminal.chat",
+        calls: [{ model: __aiModel, usage: __aiUsage, stage: "terminal-chat" }],
+      });
+      if (!charged.ok) throw new Error(charged.error ?? "Terminal AI usage could not be charged.");
+    } else {
+      import("@/lib/ai-cost-log.server").then((m) => m.logAiCost({ userId: __userId, stage: "chat-signal", model: __aiModel, usage: __aiUsage })).catch(() => {});
+    }
     const parsed: any = tryParseJsonLoose(content);
 
     const signal: GoldSignal = {
@@ -1039,7 +1066,14 @@ export const analyzeGold = createServerFn({ method: "POST" })
   }))
   .handler(async ({ data, context }) => {
     if (data.chartImage || data.advisor) {
-      const result = await _analyzeGoldCompute(data, context.userId, null);
+      let terminalRequestId: string | null = null;
+      if (data.advisor) {
+        const { getExtensionEntitlement } = await import("@/lib/extension-billing.server");
+        const entitlement = await getExtensionEntitlement(context.userId);
+        if (!entitlement.allowed) throw new Error(entitlement.error ?? "Terminal AI is unavailable for this account.");
+        terminalRequestId = `terminal-${crypto.randomUUID()}`;
+      }
+      const result = await _analyzeGoldCompute(data, context.userId, null, terminalRequestId);
       const { __billable: _billable, ...clean } = result;
       void _billable;
       return clean as GoldSignal;
