@@ -300,6 +300,7 @@ function TerminalPage() {
   }
 
   const chartSrc = useMemo(() => {
+    if (!chartUserId) return null;
     const params = new URLSearchParams({
       symbol: SYMBOL.tv,
       interval: tf.tv,
@@ -316,9 +317,13 @@ function TerminalPage() {
       save_chart_properties_to_local_storage: "1",
       saveimage: "1",
       client_id: "jenvu.com",
-      user_id: chartUserId || "jenvu-guest",
+      user_id: chartUserId,
       studies: JSON.stringify(["STD;EMA", "STD;RSI"]),
-      enabled_features: JSON.stringify(["countdown"]),
+      enabled_features: JSON.stringify([
+        "countdown",
+        "save_chart_properties_to_local_storage",
+        "use_localstorage_for_settings",
+      ]),
       disabled_features: JSON.stringify([]),
     });
     return `https://s.tradingview.com/widgetembed/?${params.toString()}`;
@@ -523,13 +528,16 @@ function TerminalPage() {
                 {formatCountdown(secondsLeft)}
               </div>
             </div>
-            <iframe
-              key={chartSrc}
-              src={chartSrc}
-              title={`${SYMBOL.label} ${tf.label} chart`}
-              className="h-full w-full border-0"
-              allowFullScreen
-            />
+            {chartSrc ? (
+              <iframe
+                src={chartSrc}
+                title={`${SYMBOL.label} ${tf.label} chart`}
+                className="h-full w-full border-0"
+                allowFullScreen
+              />
+            ) : (
+              <div className="h-full w-full bg-background" aria-label="Loading chart" />
+            )}
           </main>
 
           {/* AI desk */}
