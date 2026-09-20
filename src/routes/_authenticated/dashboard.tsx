@@ -1493,12 +1493,12 @@ function DashboardLayout() {
         <main
           className={
             pathname === "/dashboard/terminal"
-              ? "h-[calc(100dvh/0.9)] w-full overflow-hidden bg-white"
+              ? "h-dvh w-full overflow-hidden bg-white p-2"
               : "mx-auto w-full max-w-7xl flex-1 bg-white px-5 pt-14 pb-7 sm:px-8 sm:pt-7"
           }
-          style={{ zoom: 0.9 }}
+          style={pathname === "/dashboard/terminal" ? undefined : { zoom: 0.9 }}
         >
-          <VerificationBanner isAdmin={isAdminUser} />
+          {pathname !== "/dashboard/terminal" && <VerificationBanner isAdmin={isAdminUser} />}
 
           {pathname === "/dashboard" ? (
             <>
