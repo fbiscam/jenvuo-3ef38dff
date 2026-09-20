@@ -10,7 +10,6 @@ import {
   ImagePlus,
   Mic,
   PanelRightClose,
-  PanelRightOpen,
   Square,
   SquarePen,
   Trash2,
