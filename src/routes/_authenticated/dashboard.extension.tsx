@@ -2,16 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import {
-  Copy,
-  Check,
-  KeyRound,
-  Trash2,
-  FileText,
-  X,
-  Sparkles,
-  Terminal,
-} from "lucide-react";
+import { Copy, Check, KeyRound, Trash2, FileText, X, Sparkles, Terminal } from "lucide-react";
 import {
   listExtensionKeys,
   createExtensionKey,
@@ -235,11 +226,10 @@ function ExtensionPage() {
 
       {!loading && access && !capabilities.extensionAi && (
         <div className="mt-5 rounded-lg border border-amber-200 bg-amber-50 p-4 text-[13px] text-amber-900">
-AI access is not included in your current plan. Upgrade to Pro, Elite, or Ultra to
-          create keys and use AI analysis.
+          AI access is not included in your current plan. Upgrade to Pro, Elite, or Ultra to create
+          keys and use AI analysis.
         </div>
       )}
-
 
       {/* Fresh key banner */}
       {freshKey && (
@@ -316,15 +306,14 @@ AI access is not included in your current plan. Upgrade to Pro, Elite, or Ultra 
   -d '{"model":"claude-sonnet-4.5","messages":[{"role":"user","content":"XAU/USD bias today?"}]}'`}</pre>
           <p className="mt-2 text-[12px] text-zinc-500">
             Models: <span className={MONO}>claude-sonnet-4.5</span>,{" "}
-            <span className={MONO}>claude-haiku-4.5</span>, <span className={MONO}>glm-5</span>. List
-            them at{" "}
-            <span className={MONO}>{API_BASE}/models</span>.
+            <span className={MONO}>claude-haiku-4.5</span>, <span className={MONO}>glm-5</span>.
+            List them at <span className={MONO}>{API_BASE}/models</span>.
           </p>
         </div>
       )}
 
       {/* API key list */}
-      {(
+      {
         <div className="mt-5">
           <div className="mb-4 flex items-end justify-between gap-3">
             <div>
@@ -469,7 +458,7 @@ AI access is not included in your current plan. Upgrade to Pro, Elite, or Ultra 
             </div>
           )}
         </div>
-      )}
+      }
 
       {/* Quickstart drawer */}
       {showGuide && (
@@ -484,8 +473,9 @@ AI access is not included in your current plan. Upgrade to Pro, Elite, or Ultra 
             </button>
           </div>
           <p className="mt-3 text-[12px] leading-relaxed text-zinc-600">
-            Usage is charged only for the tokens actually processed at $3 per 1,000,000 tokens.
-            Your wallet balance and plan daily limit apply to chat and multi-market analysis on every paid plan.
+            Usage is charged only for the tokens actually processed at $3 per 1,000,000 tokens. Your
+            wallet balance and plan daily limit apply to chat and multi-market analysis on every
+            paid plan.
           </p>
           <ol className="mt-3 space-y-2 text-[13px] leading-relaxed text-zinc-700">
             <li>1. Create an API key above and copy it once.</li>
