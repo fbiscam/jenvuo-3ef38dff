@@ -48,10 +48,17 @@ const TIMEFRAMES = ["30m"];
 const REVIEW_FRAMES = ["30m"];
 const QUICKS = [
   { label: "Analyse 30m gold", text: "Analyse the gold 30 minute chart on my screen." },
-  { label: "Mark the setup", text: "Mark the mother candle, inside bar, entry, stop and targets on my chart." },
-  { label: "Is there a trade?", text: "Is there a valid mother candle inside bar setup right now?" },
+  {
+    label: "Mark the setup",
+    text: "Mark the mother candle, inside bar, entry, stop and targets on my chart.",
+  },
+  {
+    label: "Is there a trade?",
+    text: "Is there a valid mother candle inside bar setup right now?",
+  },
 ];
-const CANDLE_FORECAST_INTENT = /\b(?:next|upcoming|agli|agla|agali|aglay)\s+(?:(?:15\s*(?:m|min|minute)s?)\s+)?candle\b|\b15\s*(?:m|min|minute)s?\s+(?:next\s+)?candle\b|\bcandle\s+(?:konsi|kaunsi|kesa|kaisa)\s+(?:banegi|bnegi|banay\s+gi|hog[ai])\b|\b(?:bullish|bearish)\s+(?:next|agli|agla|agali|aglay)\s+candle\b/i;
+const CANDLE_FORECAST_INTENT =
+  /\b(?:next|upcoming|agli|agla|agali|aglay)\s+(?:(?:15\s*(?:m|min|minute)s?)\s+)?candle\b|\b15\s*(?:m|min|minute)s?\s+(?:next\s+)?candle\b|\bcandle\s+(?:konsi|kaunsi|kesa|kaisa)\s+(?:banegi|bnegi|banay\s+gi|hog[ai])\b|\b(?:bullish|bearish)\s+(?:next|agli|agla|agali|aglay)\s+candle\b/i;
 const ACTIONABLE_ANALYSIS_INTENT = [
   /\b(?:give|show|make|create|need|want|tell)\s+(?:me\s+)?(?:a\s+|the\s+|my\s+)?(?:live\s+|current\s+)?(?:signal|setup|trade\s*plan|entry|stop\s*loss|take\s*profit|tp\d?|sl)\b|\b(?:signal|setup|trade\s*plan|entry|stop\s*loss|take\s*profit|tp\d?|sl)\s+(?:now|please|batao|do|chahiye)\b|\b(?:buy\s*(?:or|\/)?\s*sell|long\s*(?:or|\/)?\s*short|should\s+i\s+(?:buy|sell|take\s+(?:the\s+)?trade)|where\s+is\s+liquidity|next\s+sweep)\b/i,
   /\b(analy[sz]e?|review|read|check|scan|inspect|mark)\b[\s\S]{0,60}\b(chart|screen|market|price|xau(?:\/usd)?|gold|setup|structure|liquidity|bias)\b/i,
@@ -150,9 +157,10 @@ function renderReviewFlow(status) {
         : `Open ${frame.toUpperCase()} on TradingView`;
     button.onclick = () => {
       guidedReviewActive = true;
-      statusEl.textContent = detectedTimeframe === frame
-        ? `Ask me to mark ${frame.toUpperCase()}`
-        : `Open ${frame.toUpperCase()} on TradingView`;
+      statusEl.textContent =
+        detectedTimeframe === frame
+          ? `Ask me to mark ${frame.toUpperCase()}`
+          : `Open ${frame.toUpperCase()} on TradingView`;
     };
     container.appendChild(button);
   }
@@ -160,7 +168,9 @@ function renderReviewFlow(status) {
     const evidence = reviewSession.symbol === symbol ? reviewSession.frames?.[frame] : null;
     return evidence && now - Number(evidence.capturedAt || 0) <= 10 * 60_000;
   });
-  statusEl.textContent = status || (completed.length ? "30m gold chart captured" : "Open XAU/USD on the 30 minute chart");
+  statusEl.textContent =
+    status ||
+    (completed.length ? "30m gold chart captured" : "Open XAU/USD on the 30 minute chart");
 }
 
 function requestedTimeframe(text) {
@@ -712,7 +722,10 @@ async function post(body, signal) {
 }
 
 function cleanSymbol(value) {
-  return String(value || "").toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 16);
+  return String(value || "")
+    .toUpperCase()
+    .replace(/[^A-Z0-9]/g, "")
+    .slice(0, 16);
 }
 
 async function detectChartSymbol() {
@@ -731,9 +744,16 @@ async function detectChartSymbol() {
           const candidates = [
             document.title,
             location.href,
-            ...Array.from(document.querySelectorAll('[data-symbol-short], [data-name="legend-source-title"], [class*="symbolTitle"]'))
+            ...Array.from(
+              document.querySelectorAll(
+                '[data-symbol-short], [data-name="legend-source-title"], [class*="symbolTitle"]',
+              ),
+            )
               .slice(0, 20)
-              .map((node) => `${node.getAttribute("data-symbol-short") || ""} ${node.textContent || ""}`),
+              .map(
+                (node) =>
+                  `${node.getAttribute("data-symbol-short") || ""} ${node.textContent || ""}`,
+              ),
           ];
           const intervalNode = Array.from(
             document.querySelectorAll(
@@ -990,7 +1010,10 @@ async function captureTradingViewTab() {
   try {
     const [tab] = await chrome.tabs.query({ active: true, lastFocusedWindow: true });
     if (!tab?.windowId || !/tradingview\.com/i.test(tab.url || "")) return null;
-    const image = await chrome.tabs.captureVisibleTab(tab.windowId, { format: "jpeg", quality: 82 });
+    const image = await chrome.tabs.captureVisibleTab(tab.windowId, {
+      format: "jpeg",
+      quality: 82,
+    });
     return typeof image === "string" && image.length > 1000 ? image : null;
   } catch {
     return null;
@@ -1129,10 +1152,11 @@ $("share").onclick = async () => {
     $("share").title = "Stop sharing";
   } catch (e) {
     stopShare();
-    const msg = String(e?.name || "") === "NotAllowedError"
-      ? "Screen share cancelled. Click the share button again and pick your chart tab or window."
-      : e?.message ||
-        "Screen sharing could not start. In the Chrome prompt, select your chart tab or window.";
+    const msg =
+      String(e?.name || "") === "NotAllowedError"
+        ? "Screen share cancelled. Click the share button again and pick your chart tab or window."
+        : e?.message ||
+          "Screen sharing could not start. In the Chrome prompt, select your chart tab or window.";
     addMsg("ai err", msg);
   } finally {
     sharePending = false;
@@ -1231,7 +1255,10 @@ function defaultMarkTopics() {
 
 function withoutTimeframeWords(text) {
   return String(text || "")
-    .replace(/\b(?:d1|1d|daily|day|h4|4h|4\s*hour|h1|1h|1\s*hour|m15|15m|15\s*(?:min|minute)|m5|5m|5\s*(?:min|minute))\b/gi, " ")
+    .replace(
+      /\b(?:d1|1d|daily|day|h4|4h|4\s*hour|h1|1h|1\s*hour|m15|15m|15\s*(?:min|minute)|m5|5m|5\s*(?:min|minute))\b/gi,
+      " ",
+    )
     .replace(/\s+/g, " ")
     .trim();
 }
@@ -1261,7 +1288,9 @@ async function markOnPage(text, signal, options = {}) {
   const targetTimeframe = requestedTimeframe(text) || timeframe;
   if (!options.skipDetection) await detectChartSymbol();
   if (detectedTimeframe && detectedTimeframe !== targetTimeframe) {
-    throw new Error(`Open the ${targetTimeframe.toUpperCase()} chart on TradingView; ${detectedTimeframe.toUpperCase()} is currently open.`);
+    throw new Error(
+      `Open the ${targetTimeframe.toUpperCase()} chart on TradingView; ${detectedTimeframe.toUpperCase()} is currently open.`,
+    );
   }
   const topics = requestedMarkTopics();
   const needsValidatedPlan = topics.has("execution");
@@ -1313,7 +1342,7 @@ async function markOnPage(text, signal, options = {}) {
         : null,
     showSession: topics.has("all") || topics.has("session"),
   });
-  const shot = (stream ? await grabFrame() : null) || await captureTradingViewTab();
+  const shot = (stream ? await grabFrame() : null) || (await captureTradingViewTab());
   reviewSession = reviewSession.symbol === symbol ? reviewSession : { symbol, frames: {} };
   reviewSession.symbol = symbol;
   reviewSession.frames[targetTimeframe] = {
@@ -1324,8 +1353,14 @@ async function markOnPage(text, signal, options = {}) {
   if (!options.skipDetection) reviewSession.markRequest = withoutTimeframeWords(text);
   guidedReviewActive = true;
   saveReviewSession();
-  renderReviewFlow(`${targetTimeframe.toUpperCase()} ${shot ? "marked and captured" : "marked · share screen to capture"}`);
-  return { count: marks.length, names: [...topics].filter((topic) => topic !== "all"), timeframe: targetTimeframe };
+  renderReviewFlow(
+    `${targetTimeframe.toUpperCase()} ${shot ? "marked and captured" : "marked · share screen to capture"}`,
+  );
+  return {
+    count: marks.length,
+    names: [...topics].filter((topic) => topic !== "all"),
+    timeframe: targetTimeframe,
+  };
 }
 
 async function applyLiveMarksToPage(d) {
@@ -1359,7 +1394,9 @@ async function refreshGuidedMarks() {
   try {
     renderReviewFlow(`Marking ${detectedTimeframe.toUpperCase()}…`);
     const requestedMarks = reviewSession.markRequest || "mark all ICT SMC";
-    await markOnPage(`${requestedMarks} on ${detectedTimeframe}`, undefined, { skipDetection: true });
+    await markOnPage(`${requestedMarks} on ${detectedTimeframe}`, undefined, {
+      skipDetection: true,
+    });
   } catch (error) {
     renderReviewFlow(error instanceof Error ? error.message : "Could not refresh marks");
   } finally {
@@ -1399,19 +1436,21 @@ async function send(preset, silentUser) {
     }
     const p = addMsg("ai", "Chart par markings laga raha hoon…");
     try {
-       const result = await markOnPage(text, controller.signal);
+      const result = await markOnPage(text, controller.signal);
       p.remove();
       const names = result.names.length
         ? result.names.map((name) => name.toUpperCase()).join(", ")
         : "requested ICT/SMC";
-       const msg = `Marked ${result.count} simple ${names} level${result.count === 1 ? "" : "s"} on the ${result.timeframe.toUpperCase()} chart. Open the next timeframe and Jenvu will detect it automatically.`;
+      const msg = `Marked ${result.count} simple ${names} level${result.count === 1 ? "" : "s"} on the ${result.timeframe.toUpperCase()} chart. Open the next timeframe and Jenvu will detect it automatically.`;
       addMsg("ai", msg);
       saveMessage("ai", msg);
     } catch (e) {
       p.remove();
       addMsg(
         "ai err",
-        e && e.name === "AbortError" ? "Request stopped." : e.message || "Markings could not be applied.",
+        e && e.name === "AbortError"
+          ? "Request stopped."
+          : e.message || "Markings could not be applied.",
       );
     }
     busy = false;
@@ -1497,7 +1536,7 @@ async function send(preset, silentUser) {
     if (Array.isArray(d.chart) && d.chart.length) renderSnapshot(d);
     if (analysisRequest && Array.isArray(d.overlayMarks)) {
       await applyLiveMarksToPage(d).catch(() => {});
-      const currentShot = (stream ? await grabFrame() : null) || await captureTradingViewTab();
+      const currentShot = (stream ? await grabFrame() : null) || (await captureTradingViewTab());
       if (currentShot && detectedTimeframe) {
         rememberReviewFrame(detectedTimeframe, currentShot);
         reviewSession.frames[detectedTimeframe].marks = prioritizeMarks(d.overlayMarks);
@@ -1506,9 +1545,10 @@ async function send(preset, silentUser) {
     }
   } catch (e) {
     pend.className = "msg ai err";
-    pend.textContent = e && e.name === "AbortError"
-      ? "Request stopped."
-      : e?.message || "Analysis could not complete. Please retry.";
+    pend.textContent =
+      e && e.name === "AbortError"
+        ? "Request stopped."
+        : e?.message || "Analysis could not complete. Please retry.";
     if (analysisRequest) setReviewStatus("Analysis could not complete · retry", "failed");
     else setReviewStatus("Chat mode", "");
   } finally {
@@ -1540,7 +1580,9 @@ try {
   apiKey = await readKey();
   try {
     const savedReview = await new Promise((resolve) =>
-      chrome.storage?.local?.get(REVIEW_STORE_KEY, (saved) => resolve(saved?.[REVIEW_STORE_KEY] || null)),
+      chrome.storage?.local?.get(REVIEW_STORE_KEY, (saved) =>
+        resolve(saved?.[REVIEW_STORE_KEY] || null),
+      ),
     );
     if (savedReview?.frames) reviewSession = savedReview;
   } catch {
