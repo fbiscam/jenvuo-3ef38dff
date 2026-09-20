@@ -726,7 +726,10 @@ function DashboardLayout() {
     if (typeof window === "undefined") return;
     window.localStorage.setItem("jenvu:dash:sidebar-collapsed", sidebarCollapsed ? "1" : "0");
   }, [sidebarCollapsed]);
-  // (removed emails auto-collapse — page no longer exists)
+  // Auto-collapse the sidebar when entering the terminal page
+  useEffect(() => {
+    if (pathname === "/dashboard/terminal") setSidebarCollapsed(true);
+  }, [pathname]);
   // Close mobile drawer on route change
   useEffect(() => {
     setMobileNavOpen(false);
