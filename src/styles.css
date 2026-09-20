@@ -688,6 +688,16 @@ html[data-pwa="1"] .jenvu-zoom-dashboard {
   background: #ffffff !important;
 }
 
+/* Terminal page: never zoom, never scroll — everything fits the viewport */
+.jenvu-terminal-shell,
+html[data-pwa="1"] .jenvu-terminal-shell {
+  zoom: 1 !important;
+  height: 100dvh;
+  max-height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
+}
+
 /* Upgrade every card-ish surface inside the app */
 html[data-pwa="1"] main .rounded-xl,
 html[data-pwa="1"] main .rounded-2xl,

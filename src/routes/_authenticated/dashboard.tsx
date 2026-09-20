@@ -1289,7 +1289,7 @@ function DashboardLayout() {
 
   return (
     <div
-      className={`flex min-h-screen bg-white text-zinc-900 font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif] antialiased jenvu-zoom-dashboard`}
+      className={`flex ${pathname === "/dashboard/terminal" ? "h-dvh overflow-hidden jenvu-terminal-shell" : "min-h-screen jenvu-zoom-dashboard"} bg-white text-zinc-900 font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif] antialiased`}
     >
       {/* Mobile overlay */}
       {mobileNavOpen && !embedMode && (
