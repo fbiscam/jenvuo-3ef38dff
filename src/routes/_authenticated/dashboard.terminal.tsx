@@ -483,27 +483,29 @@ function TerminalPage() {
         <div className="flex min-h-0 flex-1 flex-col lg:flex-row">
           {/* Chart */}
           <main className="relative min-h-0 flex-1 bg-background">
-            <Button
-              type="button"
-              variant={pineOpen ? "secondary" : "ghost"}
-              size="icon"
-              onClick={() => setPineOpen((open) => !open)}
-              className="absolute right-34 top-1.5 z-10 h-7 w-7 text-muted-foreground"
-              title="Pine Script workspace"
-              aria-label="Pine Script workspace"
-            >
-              <Code2 className="h-3.5 w-3.5" />
-            </Button>
-            <button
-              type="button"
-              onClick={() => setDeskOpen(true)}
-              className="absolute right-44 top-1.5 z-10 flex h-7 items-center gap-1.5 rounded-md px-2 text-xs font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
-              title="Ask With AI"
-              aria-label="Ask With AI"
-            >
-              <img src={jenvuLogo} alt="" className="h-4 w-4 shrink-0 object-contain" />
-              Ask With AI
-            </button>
+            <div className="absolute right-28 top-1.5 z-10 flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setDeskOpen(true)}
+                className="flex h-7 items-center gap-1.5 rounded-md px-2 text-xs font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                title="Ask With AI"
+                aria-label="Ask With AI"
+              >
+                <img src={jenvuLogo} alt="" className="h-4 w-4 shrink-0 object-contain" />
+                Ask With AI
+              </button>
+              <Button
+                type="button"
+                variant={pineOpen ? "secondary" : "ghost"}
+                size="icon"
+                onClick={() => setPineOpen((open) => !open)}
+                className="h-7 w-7 text-muted-foreground"
+                title="Pine Script workspace"
+                aria-label="Pine Script workspace"
+              >
+                <Code2 className="h-3.5 w-3.5" />
+              </Button>
+            </div>
             <iframe
               key={chartSrc}
               src={chartSrc}
