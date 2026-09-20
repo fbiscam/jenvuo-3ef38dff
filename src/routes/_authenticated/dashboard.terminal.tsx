@@ -113,7 +113,10 @@ const MAX_IMAGE_BYTES = 3 * 1024 * 1024;
 
 function pendingLabel(query: string, hasImage: boolean): string {
   if (hasImage) return "Reviewing your chart…";
-  const tradingQuery = /\b(gold|xau|chart|trade|trading|setup|signal|entry|buy|sell|long|short|analysis|analyze|bias|price|trend|level|zone|liquidity|fvg|order\s*block|bos|choch|smc|ict|killzone|scalp|swing)\b/i.test(query);
+  const tradingQuery =
+    /\b(gold|xau|chart|trade|trading|setup|signal|entry|buy|sell|long|short|analysis|analyze|bias|price|trend|level|zone|liquidity|fvg|order\s*block|bos|choch|smc|ict|killzone|scalp|swing)\b/i.test(
+      query,
+    );
   return tradingQuery ? "Reviewing gold structure…" : "Preparing your answer…";
 }
 
@@ -322,10 +325,7 @@ function TerminalPage() {
       });
     },
   });
-  const loadingLabel = pendingLabel(
-    ask.variables?.query ?? "",
-    Boolean(ask.variables?.chartImage),
-  );
+  const loadingLabel = pendingLabel(ask.variables?.query ?? "", Boolean(ask.variables?.chartImage));
 
   const voice = useMutation({
     mutationFn: async (audioDataUrl: string) => transcribe({ data: { audioDataUrl } }),
@@ -710,24 +710,25 @@ function TerminalPage() {
                             "rounded-2xl bg-secondary px-3.5 py-2.5 text-secondary-foreground",
                         )}
                       >
-                        {m.signal && (m.signal.direction === "BUY" || m.signal.direction === "SELL") && (
-                          <div className="mb-2 flex flex-wrap gap-1.5 text-[10px] font-semibold">
-                            <span className="rounded bg-secondary px-2 py-0.5">
-                              {m.signal.direction}
-                            </span>
-                            <span className="rounded bg-secondary px-2 py-0.5">
-                              Entry {m.signal.entry}
-                            </span>
-                            <span className="rounded bg-secondary px-2 py-0.5">
-                              SL {m.signal.stopLoss}
-                            </span>
-                            {m.signal.takeProfits?.[0] && (
+                        {m.signal &&
+                          (m.signal.direction === "BUY" || m.signal.direction === "SELL") && (
+                            <div className="mb-2 flex flex-wrap gap-1.5 text-[10px] font-semibold">
                               <span className="rounded bg-secondary px-2 py-0.5">
-                                TP {m.signal.takeProfits[0]}
+                                {m.signal.direction}
                               </span>
-                            )}
-                          </div>
-                        )}
+                              <span className="rounded bg-secondary px-2 py-0.5">
+                                Entry {m.signal.entry}
+                              </span>
+                              <span className="rounded bg-secondary px-2 py-0.5">
+                                SL {m.signal.stopLoss}
+                              </span>
+                              {m.signal.takeProfits?.[0] && (
+                                <span className="rounded bg-secondary px-2 py-0.5">
+                                  TP {m.signal.takeProfits[0]}
+                                </span>
+                              )}
+                            </div>
+                          )}
                         {m.files && m.files.length > 0 && (
                           <Attachments variant="grid" className="mb-1 ml-0">
                             {m.files.map((file, fileIndex) => (
