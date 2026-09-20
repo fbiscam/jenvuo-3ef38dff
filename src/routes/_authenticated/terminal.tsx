@@ -278,6 +278,7 @@ function TerminalPage() {
       allow_symbol_change: "0",
       withdateranges: "1",
       details: "1",
+      save_chart_properties_to_local_storage: "1",
       studies: JSON.stringify(["STD;EMA", "STD;RSI"]),
     });
     return `https://s.tradingview.com/widgetembed/?${params.toString()}`;

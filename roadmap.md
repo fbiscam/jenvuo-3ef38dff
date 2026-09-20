@@ -116,7 +116,7 @@
 - [x] Add secure voice recording and transcription to the Terminal AI Desk
 - [x] Verify image, voice, TypeScript, lint, and responsive Terminal behavior
 
-- [ ] Add Terminal to dashboard navigation and remove its top toolbar
-- [ ] Add persistent Terminal chat history, chart settings, and Pine Script workspace
-- [ ] Move history and desk visibility controls into the AI header and enlarge chat text
-- [ ] Verify Terminal persistence, navigation, responsive layout, and TypeScript
+- [x] Add Terminal to dashboard navigation and remove its top toolbar
+- [x] Add persistent Terminal chat history, chart settings, and Pine Script workspace
+- [x] Move history and desk visibility controls into the AI header and enlarge chat text
+- [x] Verify Terminal persistence, navigation, responsive layout, and TypeScript
