@@ -495,19 +495,16 @@ function TerminalPage() {
             >
               <Code2 className="h-3.5 w-3.5" />
             </Button>
-            {!deskOpen && (
-              <Button
-                type="button"
-                variant="secondary"
-                size="icon"
-                onClick={() => setDeskOpen(true)}
-                className="absolute right-3 top-3 z-10 h-9 w-9 shadow-sm"
-                title="Show AI Desk"
-                aria-label="Show AI Desk"
-              >
-                <PanelRightOpen className="h-4 w-4" />
-              </Button>
-            )}
+            <button
+              type="button"
+              onClick={() => setDeskOpen(true)}
+              className="absolute right-44 top-1.5 z-10 flex h-7 items-center gap-1.5 rounded-md px-2 text-xs font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+              title="Ask With AI"
+              aria-label="Ask With AI"
+            >
+              <img src={jenvuLogo} alt="" className="h-4 w-4 shrink-0 object-contain" />
+              Ask With AI
+            </button>
             <iframe
               key={chartSrc}
               src={chartSrc}
