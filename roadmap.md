@@ -120,3 +120,4 @@
 - [x] Add persistent Terminal chat history, chart settings, and Pine Script workspace
 - [x] Move history and desk visibility controls into the AI header and enlarge chat text
 - [x] Verify Terminal persistence, navigation, responsive layout, and TypeScript
+- [x] Fit the Terminal chart and AI desk within the dashboard viewport without page scrolling
