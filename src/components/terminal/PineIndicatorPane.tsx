@@ -167,13 +167,16 @@ export function PineIndicatorPane({ indicator, candles, onRemove }: Props) {
       chart.remove();
       chartRef.current = null;
     };
-  }, [compiled, candles]);
+  }, [compiled, candles, structure]);
 
   return (
     <div className="flex min-h-0 flex-col border-t border-border bg-background">
       <div className="flex h-8 shrink-0 items-center gap-2 px-3">
         <span className="truncate text-xs font-medium">{indicator.name}</span>
         {!compiled.ok && <span className="text-xs text-destructive">Script error</span>}
+        {indicator.locked ? (
+          <span className="ml-auto text-[10px] uppercase text-muted-foreground">Default</span>
+        ) : (
         <Button
           type="button"
           variant="ghost"
@@ -185,6 +188,7 @@ export function PineIndicatorPane({ indicator, candles, onRemove }: Props) {
         >
           <X className="h-3.5 w-3.5" />
         </Button>
+        )}
       </div>
       {compiled.ok ? (
         <div ref={containerRef} className="h-[170px] w-full" />
