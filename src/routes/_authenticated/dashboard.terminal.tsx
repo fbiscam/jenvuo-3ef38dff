@@ -669,9 +669,6 @@ function TerminalPage() {
                           </Button>
                         ))}
                       </div>
-                      <p className="ml-8 text-[10px] font-medium uppercase text-muted-foreground">
-                        {tf.label} · {SYMBOL.label}
-                      </p>
                     </div>
                   )}
 
