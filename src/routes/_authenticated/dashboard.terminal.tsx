@@ -17,6 +17,10 @@ import {
 } from "lucide-react";
 import type { FileUIPart } from "ai";
 import { analyzeGold, type GoldSignal } from "@/lib/gold-analysis.functions";
+import { fetchGoldCandles } from "@/lib/candle-feed.functions";
+import { PineError, runPineScript, type PineCandle } from "@/lib/pine/engine";
+import { PineIndicatorPane, type PineIndicator } from "@/components/terminal/PineIndicatorPane";
+import { useQuery } from "@tanstack/react-query";
 import { transcribeVoiceMessage } from "@/lib/transcription.functions";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
