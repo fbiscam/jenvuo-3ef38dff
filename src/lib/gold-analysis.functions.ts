@@ -774,7 +774,7 @@ function isTradingSetupIntent(q: string): boolean {
 }
 
 async function _analyzeGoldCompute(
-  data: { timeframe: string; query: string; chartImage?: string },
+  data: { timeframe: string; query: string; chartImage?: string; advisor?: boolean },
   __userId: string | null = null,
   __scanId: string | null = null,
 ): Promise<GoldSignal & { __billable: "signal" | "chat" }> {
@@ -816,7 +816,7 @@ async function _analyzeGoldCompute(
       };
     }
 
-    const wantsTradingSetup = isTradingSetupIntent(data.query);
+    const wantsTradingSetup = !data.advisor && isTradingSetupIntent(data.query);
     if (wantsTradingSetup) {
       try {
         const plan = await computeSignalPlan({ symbol: inferInstrumentFromText(data.query) }, __userId, { scanId: __scanId });
@@ -885,7 +885,23 @@ async function _analyzeGoldCompute(
       )
       .join("\n");
 
-    const system = `You are Jenvu — a witty, warm, highly intelligent personal AI assistant (Jarvis-style) for the user. You answer ANY question the user asks: casual chat, life advice, general knowledge, coding help, math, weather concepts, jokes, productivity — anything. Your SPECIALTY is XAU/USD (Gold) trading using ICT/SMC methodology (BOS/CHOCH, OB, FVG, liquidity sweeps, OTE 62-79%, killzones), but you are NOT limited to trading.
+    const advisorSystem = `You are Jenvu Desk — an expert XAU/USD trading mentor with extreme, institutional-level mastery of ICT and SMC concepts (market structure, BOS/CHOCH, order blocks, breaker blocks, fair value gaps, liquidity pools and sweeps, premium/discount and OTE 62-79%, killzones, PD arrays, displacement, mitigation, risk management and position sizing).
+
+Your job is to COACH, not to hand out trades:
+- Answer exactly what the user asked, nothing more. Stay on their question.
+- Guide the user to build their OWN trade plan: explain what structure/confluence you see, what would make a setup valid or invalid, where risk logically sits, and what to wait for.
+- You may SUGGEST and RECOMMEND ("if price reclaims this OB, a short could be considered"), but never deliver a finished trade signal with a committed entry, stop loss and take profit as instructions to follow.
+- Always keep entry, stopLoss, takeProfits, riskReward as "-" or [], direction "WAIT", confidence 0. The trading fields are not used in this mode.
+- Teach clearly: short paragraphs, plain English, define ICT/SMC terms when useful.
+- Never claim certainty, never promise wins, always remind that the user decides and manages risk.
+- Reply only in English.
+
+Put your full coaching answer in fullAnalysis and a short version (max 40 words) in spokenSummary.
+
+Return ONLY valid JSON (no markdown, no code fences) with this exact shape:
+{"bias":"BULLISH|BEARISH|NEUTRAL","direction":"WAIT","entry":"-","stopLoss":"-","takeProfits":[],"riskReward":"-","confidence":0,"killzone":"-","confluences":[],"ictAnalysis":"","smcAnalysis":"","marketStructure":"","spokenSummary":"","fullAnalysis":""}`;
+
+    const system = data.advisor ? advisorSystem : `You are Jenvu — a witty, warm, highly intelligent personal AI assistant (Jarvis-style) for the user. You answer ANY question the user asks: casual chat, life advice, general knowledge, coding help, math, weather concepts, jokes, productivity — anything. Your SPECIALTY is XAU/USD (Gold) trading using ICT/SMC methodology (BOS/CHOCH, OB, FVG, liquidity sweeps, OTE 62-79%, killzones), but you are NOT limited to trading.
 
 You speak naturally in the same language the user used (English, Urdu, Roman Urdu, Hindi, Hinglish). Keep voice replies short, friendly and confident — like Jarvis to Tony Stark.
 
@@ -912,6 +928,9 @@ Return ONLY valid JSON (no markdown, no code fences) with this exact shape:
 }`;
 
     const isTradingIntent = /\b(setup|signal|entry|buy|sell|long|short|trade|analyze|analysis|bias|tp|sl|stop\s*loss|take\s*profit|gold|xau|chart|trend|market|price|level|zone|fvg|ob|order\s*block|liquidity|bos|choch|smc|ict|killzone|scalp|swing)\b/i.test(normalizeQuery(data.query));
+    const advisorGuide = data.advisor
+      ? "\nCOACH MODE: guide and suggest only. Explain the ICT/SMC picture and what the user should look for. Never output a committed entry/SL/TP trade plan; keep all trading fields empty."
+      : "";
     const userPrompt = hasData
       ? `USER MESSAGE: ${data.query}
 
@@ -924,10 +943,10 @@ RECENT SWING LOW (150): ${swingLow.toFixed(2)}
 LAST 150 CANDLES (OHLC):
 ${compact}
 
-${isTradingIntent ? "User wants a trading view — give the A+ ICT/SMC setup, fill trading fields confidently." : "User is just chatting / asking general thing — REPLY conversationally in spokenSummary, set direction='WAIT', confidence=0, leave trading fields empty. Do NOT push a signal."}`
+${isTradingIntent ? "User wants a trading view — give the A+ ICT/SMC setup, fill trading fields confidently." : "User is just chatting / asking general thing — REPLY conversationally in spokenSummary, set direction='WAIT', confidence=0, leave trading fields empty. Do NOT push a signal."}${advisorGuide}`
       : `USER MESSAGE: ${data.query}
 
-${isTradingIntent ? "User wants trading view but live feed offline — answer conversationally, set direction='WAIT', confidence<=40, mention feed offline in fullAnalysis." : "User is just chatting — answer naturally in spokenSummary, set direction='WAIT', confidence=0, leave trading fields empty."}`;
+${isTradingIntent ? "User wants trading view but live feed offline — answer conversationally, set direction='WAIT', confidence<=40, mention feed offline in fullAnalysis." : "User is just chatting — answer naturally in spokenSummary, set direction='WAIT', confidence=0, leave trading fields empty."}${advisorGuide}`;
 
     const { content, model: __aiModel, usage: __aiUsage } = await callChatCompletion({
       models: [...MODEL_CHAIN.chat],
@@ -948,12 +967,12 @@ ${isTradingIntent ? "User wants trading view but live feed offline — answer co
 
     const signal: GoldSignal = {
       bias: parsed.bias ?? "NEUTRAL",
-      direction: parsed.direction ?? "WAIT",
-      entry: String(parsed.entry ?? "-"),
-      stopLoss: String(parsed.stopLoss ?? "-"),
-      takeProfits: Array.isArray(parsed.takeProfits) ? parsed.takeProfits.map(String) : [],
-      riskReward: String(parsed.riskReward ?? "-"),
-      confidence: Number(parsed.confidence ?? 0),
+      direction: data.advisor ? "WAIT" : (parsed.direction ?? "WAIT"),
+      entry: data.advisor ? "-" : String(parsed.entry ?? "-"),
+      stopLoss: data.advisor ? "-" : String(parsed.stopLoss ?? "-"),
+      takeProfits: data.advisor ? [] : Array.isArray(parsed.takeProfits) ? parsed.takeProfits.map(String) : [],
+      riskReward: data.advisor ? "-" : String(parsed.riskReward ?? "-"),
+      confidence: data.advisor ? 0 : Number(parsed.confidence ?? 0),
       killzone: String(parsed.killzone ?? "-"),
       confluences: Array.isArray(parsed.confluences) ? parsed.confluences.map(String) : [],
       ictAnalysis: String(parsed.ictAnalysis ?? ""),
@@ -997,15 +1016,16 @@ function parsePx(s: string | undefined): number {
 
 export const analyzeGold = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { timeframe: string; query: string; chartImage?: string }) => ({
+  .inputValidator((d: { timeframe: string; query: string; chartImage?: string; advisor?: boolean }) => ({
     timeframe: String(d?.timeframe || "15m").toLowerCase(),
     query: String(d?.query || "Give me the best A+ setup right now"),
+    advisor: d?.advisor === true,
     chartImage: typeof d?.chartImage === "string" && /^data:image\/(?:png|jpeg|webp);base64,/i.test(d.chartImage) && d.chartImage.length <= 4_500_000
       ? d.chartImage
       : undefined,
   }))
   .handler(async ({ data, context }) => {
-    if (data.chartImage) {
+    if (data.chartImage || data.advisor) {
       const result = await _analyzeGoldCompute(data, context.userId, null);
       const { __billable: _billable, ...clean } = result;
       void _billable;

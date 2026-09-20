@@ -2,17 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import {
-  Copy,
-  Check,
-  KeyRound,
-  Trash2,
-  Download,
-  FileText,
-  X,
-  Sparkles,
-  Terminal,
-} from "lucide-react";
+import { Copy, Check, KeyRound, Trash2, FileText, X, Sparkles, Terminal } from "lucide-react";
 import {
   listExtensionKeys,
   createExtensionKey,
@@ -25,8 +15,6 @@ import { getPlanCapabilities } from "@/lib/plan-entitlements";
 
 const MONO = "font-['JetBrains_Mono',ui-monospace,monospace]";
 const API_BASE = "https://jenvu.com/api/public/v1";
-// Keep the established served asset path; the downloaded filename reflects the current release.
-const EXTENSION_DOWNLOAD_URL = "/jenvu-extension-v1.9.34.zip";
 
 export const Route = createFileRoute("/_authenticated/dashboard/extension")({
   head: () => ({
@@ -60,8 +48,6 @@ function ExtensionPage() {
   const [freshKey, setFreshKey] = useState<string | null>(null);
   const [copied, setCopied] = useState<string | null>(null);
   const [origin, setOrigin] = useState("https://jenvu.com");
-  const [downloading, setDownloading] = useState(false);
-  const [view, setView] = useState<"keys" | "extension">("keys");
   const [deleteTarget, setDeleteTarget] = useState<ExtensionKeyRow | null>(null);
   const [deleting, setDeleting] = useState(false);
 
@@ -175,28 +161,6 @@ function ExtensionPage() {
     );
   };
 
-  const onDownload = async () => {
-    setDownloading(true);
-    try {
-      const response = await fetch(EXTENSION_DOWNLOAD_URL);
-      if (!response.ok) throw new Error(`Download failed (${response.status})`);
-      const blobUrl = URL.createObjectURL(await response.blob());
-      const a = document.createElement("a");
-      a.href = blobUrl;
-      a.download = "jenvu-extension-v1.9.34.zip";
-      a.rel = "noopener";
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(blobUrl);
-      toast.success("Extension download started");
-    } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Download failed");
-    } finally {
-      setDownloading(false);
-    }
-  };
-
   const activeKeys = keys.filter((k) => !k.revoked_at);
   const displayedKeys = [...keys]
     .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
@@ -262,35 +226,10 @@ function ExtensionPage() {
 
       {!loading && access && !capabilities.extensionAi && (
         <div className="mt-5 rounded-lg border border-amber-200 bg-amber-50 p-4 text-[13px] text-amber-900">
-          Extension AI is not included in your current plan. Upgrade to Pro, Elite, or Ultra to
-          create keys and use AI analysis.
+          AI access is not included in your current plan. Upgrade to Pro, Elite, or Ultra to create
+          keys and use AI analysis.
         </div>
       )}
-
-
-      {/* Filter row */}
-      <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-2">
-          <span className="text-[13px] text-zinc-500">Group by</span>
-          <div className="flex items-center gap-1 rounded-full bg-zinc-100 p-0.5">
-            <button
-              type="button"
-              onClick={() => setView("keys")}
-              className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[13px] ${view === "keys" ? "bg-white text-zinc-900 shadow-sm" : "text-zinc-600 hover:text-zinc-900"}`}
-            >
-              {view === "keys" && <span className="h-1.5 w-1.5 rounded-full bg-zinc-900" />} API Key
-            </button>
-            <button
-              type="button"
-              onClick={() => setView("extension")}
-              className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[13px] ${view === "extension" ? "bg-white text-zinc-900 shadow-sm" : "text-zinc-600 hover:text-zinc-900"}`}
-            >
-              {view === "extension" && <span className="h-1.5 w-1.5 rounded-full bg-zinc-900" />}{" "}
-              Extension
-            </button>
-          </div>
-        </div>
-      </div>
 
       {/* Fresh key banner */}
       {freshKey && (
@@ -320,7 +259,7 @@ function ExtensionPage() {
       )}
 
       {/* Public API endpoint drawer */}
-      {view === "keys" && showEndpoint && (
+      {showEndpoint && (
         <div className="mt-6 rounded-xl border border-zinc-200 bg-zinc-50 p-5">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div className="flex items-center gap-2">
@@ -367,15 +306,14 @@ function ExtensionPage() {
   -d '{"model":"claude-sonnet-4.5","messages":[{"role":"user","content":"XAU/USD bias today?"}]}'`}</pre>
           <p className="mt-2 text-[12px] text-zinc-500">
             Models: <span className={MONO}>claude-sonnet-4.5</span>,{" "}
-            <span className={MONO}>claude-haiku-4.5</span>, <span className={MONO}>glm-5</span>. List
-            them at{" "}
-            <span className={MONO}>{API_BASE}/models</span>.
+            <span className={MONO}>claude-haiku-4.5</span>, <span className={MONO}>glm-5</span>.
+            List them at <span className={MONO}>{API_BASE}/models</span>.
           </p>
         </div>
       )}
 
       {/* API key list */}
-      {view === "keys" && (
+      {
         <div className="mt-5">
           <div className="mb-4 flex items-end justify-between gap-3">
             <div>
@@ -520,53 +458,7 @@ function ExtensionPage() {
             </div>
           )}
         </div>
-      )}
-
-      {/* Extension releases */}
-      {view === "extension" && (
-        <div className="mt-5">
-          <div className="mb-4">
-            <h2 className="text-[16px] font-medium text-zinc-900">  Latest extension</h2>
-            <p className="mt-1 text-[12px] text-zinc-500">
-              The newest tested release available for your account.
-            </p>
-          </div>
-          <div className="hidden grid-cols-[minmax(0,1.8fr)_0.8fr_0.8fr_auto] items-center gap-4 border-b border-zinc-200 pb-3 text-[13px] text-zinc-700 md:grid">
-            <div>Extension</div>
-            <div>Version</div>
-            <div>Release</div>
-            <div className="w-40" />
-          </div>
-          <div className="grid gap-4 border-b border-zinc-100 py-5 md:grid-cols-[minmax(0,1.8fr)_0.8fr_0.8fr_auto] md:items-center">
-            <div className="min-w-0">
-              <div className="truncate text-[14px] font-medium text-zinc-900">
-                Jenvu Thunder — Gold 30M Analyst
-              </div>
-              <div className="mt-1 text-[12px] text-zinc-500">
-                Chrome extension for XAU/USD 30-minute setup analysis
-              </div>
-            </div>
-            <div className="flex items-center gap-2 text-[13px] text-zinc-800">
-               <span className={MONO}>v1.9.34</span>
-              <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-medium text-emerald-700">
-                Latest
-              </span>
-            </div>
-            <div className="text-[13px] text-zinc-600">Updated Sep 19, 2026</div>
-            <button
-              type="button"
-              onClick={onDownload}
-              disabled={downloading}
-              className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-zinc-300 px-3 py-2 text-[13px] font-medium text-zinc-900 hover:bg-zinc-50 disabled:opacity-60 md:w-40"
-            >
-              <Download className="h-4 w-4" /> {downloading ? "Preparing…" : "Download latest"}
-            </button>
-          </div>
-          <p className="mt-4 text-[12px] text-zinc-500">
-             ZIP package · Chrome developer mode · Version 1.9.34
-          </p>
-        </div>
-      )}
+      }
 
       {/* Quickstart drawer */}
       {showGuide && (
@@ -581,30 +473,20 @@ function ExtensionPage() {
             </button>
           </div>
           <p className="mt-3 text-[12px] leading-relaxed text-zinc-600">
-            Usage is charged only for the tokens actually processed at $3 per 1,000,000 tokens.
-            Your wallet balance and plan daily limit apply to chat and multi-market analysis on every paid plan.
+            Usage is charged only for the tokens actually processed at $3 per 1,000,000 tokens. Your
+            wallet balance and plan daily limit apply to chat and multi-market analysis on every
+            paid plan.
           </p>
           <ol className="mt-3 space-y-2 text-[13px] leading-relaxed text-zinc-700">
-            <li>1. Download the extension package above and unzip it.</li>
+            <li>1. Create an API key above and copy it once.</li>
             <li>
-              2. Open{" "}
+              2. Send it as{" "}
               <span className={`${MONO} rounded bg-white px-1.5 py-0.5 text-[12px]`}>
-                chrome://extensions
+                Authorization: Bearer &lt;your key&gt;
               </span>
-              , turn on Developer mode.
+              .
             </li>
-            <li>
-              3. Click <span className="font-medium">Load unpacked</span> and select the unzipped
-              folder.
-            </li>
-            <li>
-              4. Open the Jenvu icon, paste your API key and press{" "}
-              <span className="font-medium">Connect</span>.
-            </li>
-            <li>
-              5. Open the chart on TradingView, then request a live ICT/SMC analysis. The extension
-              detects the active symbol and timeframe automatically.
-            </li>
+            <li>3. Call the endpoints below from your own tools or scripts.</li>
           </ol>
           <div
             className={`${MONO} mt-4 space-y-1 rounded-lg border border-zinc-200 bg-white p-3 text-[12px] text-zinc-700`}
