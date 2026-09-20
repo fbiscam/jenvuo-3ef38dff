@@ -119,11 +119,38 @@ export default defineConfig({
       allowedHosts: [".jenvu.com", ".lovable.app", "localhost"],
     },
     resolve: {
-      alias: {
-        "entities/lib/decode.js": path.resolve(__dirname, "node_modules/entities/lib/decode.js"),
-        "entities/lib/encode.js": path.resolve(__dirname, "node_modules/entities/lib/encode.js"),
-        "entities": path.resolve(__dirname, "node_modules/entities"),
-      },
+      alias: [
+        // htmlparser2 needs entities v4 deep paths; parse5 needs entities v6 subpath
+        // exports. Pin each import specifier to the matching installed copy.
+        {
+          find: /^entities\/lib\/decode\.js$/,
+          replacement: path.resolve(
+            __dirname,
+            "node_modules/htmlparser2/node_modules/entities/lib/esm/decode.js",
+          ),
+        },
+        {
+          find: /^entities\/lib\/encode\.js$/,
+          replacement: path.resolve(
+            __dirname,
+            "node_modules/htmlparser2/node_modules/entities/lib/esm/encode.js",
+          ),
+        },
+        {
+          find: /^entities\/escape$/,
+          replacement: path.resolve(
+            __dirname,
+            "node_modules/parse5/node_modules/entities/dist/esm/escape.js",
+          ),
+        },
+        {
+          find: /^entities\/decode$/,
+          replacement: path.resolve(
+            __dirname,
+            "node_modules/parse5/node_modules/entities/dist/esm/decode.js",
+          ),
+        },
+      ],
     },
   },
 });
