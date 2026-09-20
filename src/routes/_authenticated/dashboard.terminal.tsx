@@ -9,12 +9,10 @@ import {
   History,
   ImagePlus,
   Mic,
-  Moon,
   PanelRightClose,
   PanelRightOpen,
   Square,
   SquarePen,
-  Sun,
   Trash2,
   X,
 } from "lucide-react";
