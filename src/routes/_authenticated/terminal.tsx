@@ -18,6 +18,7 @@ import { analyzeGold, type GoldSignal } from "@/lib/gold-analysis.functions";
 import { transcribeVoiceMessage } from "@/lib/transcription.functions";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import {
   Conversation,
   ConversationContent,
@@ -315,7 +316,8 @@ function TerminalPage() {
   }
 
   return (
-    <div className="fixed inset-0 z-40 flex w-full flex-col overflow-hidden bg-background">
+    <TooltipProvider>
+      <div className="fixed inset-0 z-40 flex w-full flex-col overflow-hidden bg-background">
       {/* Top toolbar */}
       <div className="flex flex-wrap items-center gap-2 border-b border-border px-3 py-2">
         <div className="flex items-center gap-2 pr-3 font-semibold">
@@ -583,6 +585,7 @@ function TerminalPage() {
           </aside>
         )}
       </div>
-    </div>
+      </div>
+    </TooltipProvider>
   );
 }
