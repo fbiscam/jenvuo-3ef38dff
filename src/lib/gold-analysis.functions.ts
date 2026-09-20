@@ -1016,15 +1016,16 @@ function parsePx(s: string | undefined): number {
 
 export const analyzeGold = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { timeframe: string; query: string; chartImage?: string }) => ({
+  .inputValidator((d: { timeframe: string; query: string; chartImage?: string; advisor?: boolean }) => ({
     timeframe: String(d?.timeframe || "15m").toLowerCase(),
     query: String(d?.query || "Give me the best A+ setup right now"),
+    advisor: d?.advisor === true,
     chartImage: typeof d?.chartImage === "string" && /^data:image\/(?:png|jpeg|webp);base64,/i.test(d.chartImage) && d.chartImage.length <= 4_500_000
       ? d.chartImage
       : undefined,
   }))
   .handler(async ({ data, context }) => {
-    if (data.chartImage) {
+    if (data.chartImage || data.advisor) {
       const result = await _analyzeGoldCompute(data, context.userId, null);
       const { __billable: _billable, ...clean } = result;
       void _billable;
