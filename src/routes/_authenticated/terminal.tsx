@@ -3,8 +3,11 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation } from "@tanstack/react-query";
 import {
+  Check,
+  Code2,
+  Copy,
+  History,
   ImagePlus,
-  LineChart,
   Mic,
   Moon,
   PanelRightClose,
@@ -12,6 +15,8 @@ import {
   Square,
   SquarePen,
   Sun,
+  Trash2,
+  X,
 } from "lucide-react";
 import type { FileUIPart } from "ai";
 import { analyzeGold, type GoldSignal } from "@/lib/gold-analysis.functions";
@@ -89,6 +94,17 @@ type ChatMsg = {
   signal?: GoldSignal;
   files?: FileUIPart[];
 };
+
+type ChatThread = {
+  id: string;
+  title: string;
+  updatedAt: number;
+  messages: ChatMsg[];
+};
+
+const THREADS_KEY = "jenvu:terminal:threads:v1";
+const TERMINAL_SETTINGS_KEY = "jenvu:terminal:settings:v1";
+const PINE_SCRIPT_KEY = "jenvu:terminal:pine-script:v1";
 
 const QUICK = [
   "Analyse the current chart",
@@ -170,6 +186,14 @@ function TerminalPage() {
   const [deskOpen, setDeskOpen] = useState(true);
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<ChatMsg[]>([]);
+  const [threads, setThreads] = useState<ChatThread[]>([]);
+  const [activeThreadId, setActiveThreadId] = useState<string | null>(null);
+  const [historyOpen, setHistoryOpen] = useState(false);
+  const [pineOpen, setPineOpen] = useState(false);
+  const [pineCode, setPineCode] = useState(
+    '//@version=6\nindicator("Jenvu Gold Workspace", overlay=true)\n\n// Write your Pine Script here\n',
+  );
+  const [copied, setCopied] = useState(false);
   const [voiceError, setVoiceError] = useState("");
   const [isRecording, setIsRecording] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
@@ -178,8 +202,67 @@ function TerminalPage() {
   const audioSourceRef = useRef<MediaStreamAudioSourceNode | null>(null);
   const audioProcessorRef = useRef<ScriptProcessorNode | null>(null);
   const audioChunksRef = useRef<Float32Array[]>([]);
+  const hydratedRef = useRef(false);
+  const activeThreadIdRef = useRef<string | null>(null);
   const analyze = useServerFn(analyzeGold);
   const transcribe = useServerFn(transcribeVoiceMessage);
+
+  function addMessage(message: ChatMsg) {
+    setMessages((current) => [...current, message]);
+    setThreads((current) => {
+      let threadId = activeThreadIdRef.current;
+      let next = current;
+      if (!threadId) {
+        threadId = `terminal-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`;
+        activeThreadIdRef.current = threadId;
+        setActiveThreadId(threadId);
+        next = [
+          {
+            id: threadId,
+            title: message.role === "user" ? message.text.slice(0, 48) : "New chat",
+            updatedAt: Date.now(),
+            messages: [],
+          },
+          ...current,
+        ];
+      }
+      return next
+        .map((thread) =>
+          thread.id === threadId
+            ? {
+                ...thread,
+                title:
+                  thread.title === "New chat" && message.role === "user"
+                    ? message.text.slice(0, 48)
+                    : thread.title,
+                updatedAt: Date.now(),
+                messages: [...thread.messages, { ...message, files: undefined }].slice(-80),
+              }
+            : thread,
+        )
+        .sort((a, b) => b.updatedAt - a.updatedAt);
+    });
+  }
+
+  function startNewChat() {
+    activeThreadIdRef.current = null;
+    setActiveThreadId(null);
+    setMessages([]);
+    setHistoryOpen(false);
+    requestAnimationFrame(() => textareaRef.current?.focus());
+  }
+
+  function loadThread(thread: ChatThread) {
+    activeThreadIdRef.current = thread.id;
+    setActiveThreadId(thread.id);
+    setMessages(thread.messages);
+    setHistoryOpen(false);
+  }
+
+  function deleteThread(id: string) {
+    setThreads((current) => current.filter((thread) => thread.id !== id));
+    if (activeThreadIdRef.current === id) startNewChat();
+  }
 
   const chartSrc = useMemo(() => {
     const params = new URLSearchParams({
@@ -204,26 +287,20 @@ function TerminalPage() {
     mutationFn: async ({ query, chartImage }: { query: string; chartImage?: string }) =>
       analyze({ data: { timeframe: tf.key, query, chartImage } }),
     onSuccess: (signal) => {
-      setMessages((m) => [
-        ...m,
-        {
-          role: "assistant",
-          text: signal.fullAnalysis || signal.spokenSummary || "No read available.",
-          signal,
-        },
-      ]);
+      addMessage({
+        role: "assistant",
+        text: signal.fullAnalysis || signal.spokenSummary || "No read available.",
+        signal,
+      });
     },
     onError: (err: unknown) => {
-      setMessages((m) => [
-        ...m,
-        {
-          role: "assistant",
-          text:
-            err instanceof Error && err.message.includes("INSUFFICIENT_CREDITS")
-              ? "You are out of balance for a new read. Top up and try again."
-              : "The desk could not answer just now. Please try again in a moment.",
-        },
-      ]);
+      addMessage({
+        role: "assistant",
+        text:
+          err instanceof Error && err.message.includes("INSUFFICIENT_CREDITS")
+            ? "You are out of balance for a new read. Top up and try again."
+            : "The desk could not answer just now. Please try again in a moment.",
+      });
     },
   });
 
@@ -237,6 +314,57 @@ function TerminalPage() {
     onError: (error: unknown) =>
       setVoiceError(error instanceof Error ? error.message : "Voice transcription failed."),
   });
+
+  useEffect(() => {
+    try {
+      const storedThreads = JSON.parse(
+        window.localStorage.getItem(THREADS_KEY) || "null",
+      ) as { threads?: ChatThread[]; activeThreadId?: string | null } | null;
+      const savedThreads = Array.isArray(storedThreads?.threads) ? storedThreads.threads : [];
+      const savedActiveId = storedThreads?.activeThreadId ?? savedThreads[0]?.id ?? null;
+      setThreads(savedThreads);
+      setActiveThreadId(savedActiveId);
+      activeThreadIdRef.current = savedActiveId;
+      setMessages(savedThreads.find((thread) => thread.id === savedActiveId)?.messages ?? []);
+
+      const settings = JSON.parse(
+        window.localStorage.getItem(TERMINAL_SETTINGS_KEY) || "null",
+      ) as { timeframe?: string; theme?: "light" | "dark"; deskOpen?: boolean; pineOpen?: boolean } | null;
+      const savedTimeframe = TIMEFRAMES.find((timeframe) => timeframe.key === settings?.timeframe);
+      if (savedTimeframe) setTf(savedTimeframe);
+      if (settings?.theme === "light" || settings?.theme === "dark") setTheme(settings.theme);
+      if (typeof settings?.deskOpen === "boolean") setDeskOpen(settings.deskOpen);
+      if (typeof settings?.pineOpen === "boolean") setPineOpen(settings.pineOpen);
+      const savedPine = window.localStorage.getItem(PINE_SCRIPT_KEY);
+      if (savedPine) setPineCode(savedPine);
+    } catch {
+      // Keep a clean workspace if saved browser data is unavailable or malformed.
+    } finally {
+      hydratedRef.current = true;
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!hydratedRef.current) return;
+    try {
+      window.localStorage.setItem(THREADS_KEY, JSON.stringify({ threads, activeThreadId }));
+    } catch {
+      setVoiceError("Chat history storage is full. Remove an older chat and try again.");
+    }
+  }, [threads, activeThreadId]);
+
+  useEffect(() => {
+    if (!hydratedRef.current) return;
+    window.localStorage.setItem(
+      TERMINAL_SETTINGS_KEY,
+      JSON.stringify({ timeframe: tf.key, theme, deskOpen, pineOpen }),
+    );
+  }, [tf.key, theme, deskOpen, pineOpen]);
+
+  useEffect(() => {
+    if (!hydratedRef.current) return;
+    window.localStorage.setItem(PINE_SCRIPT_KEY, pineCode);
+  }, [pineCode]);
 
   useEffect(() => {
     if (!ask.isPending && !voice.isPending && !isRecording) textareaRef.current?.focus();
@@ -256,7 +384,7 @@ function TerminalPage() {
     const image = message.files?.find((file) => file.mediaType?.startsWith("image/") && file.url);
     const query = message.text.trim() || (image ? "Analyze this XAU/USD chart screenshot." : "");
     if (!query || ask.isPending) return;
-    setMessages((m) => [...m, { role: "user", text: query, files: image ? [image] : undefined }]);
+    addMessage({ role: "user", text: query, files: image ? [image] : undefined });
     setInput("");
     await ask.mutateAsync({ query, chartImage: image?.url });
   }
@@ -318,13 +446,10 @@ function TerminalPage() {
   return (
     <TooltipProvider>
       <div className="fixed inset-0 z-40 flex w-full flex-col overflow-hidden bg-background">
-        {/* Top toolbar */}
-        <div className="flex flex-wrap items-center gap-2 border-b border-border px-3 py-2">
-          <div className="flex items-center gap-2 pr-3 font-semibold">
-            <LineChart className="h-4 w-4 text-primary" />
-            <span>{SYMBOL.label}</span>
-          </div>
-          <div className="flex items-center gap-1 rounded-md border border-border p-0.5">
+        <div className="flex min-h-0 flex-1 flex-col lg:flex-row">
+          {/* Chart */}
+          <main className="relative min-h-0 flex-1 bg-background">
+            <div className="absolute left-3 top-3 z-10 flex max-w-[calc(100%-5rem)] flex-wrap items-center gap-1 rounded-md border border-border bg-background/95 p-1 shadow-sm backdrop-blur">
             {TIMEFRAMES.map((t) => (
               <Button
                 key={t.key}
@@ -342,37 +467,42 @@ function TerminalPage() {
                 {t.label}
               </Button>
             ))}
-          </div>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-            className="ml-auto h-7 gap-1.5 px-2 text-xs text-muted-foreground shadow-none"
-          >
-            {theme === "dark" ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
-            {theme === "dark" ? "Light" : "Dark"}
-          </Button>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={() => setDeskOpen((v) => !v)}
-            className="h-7 gap-1.5 px-2 text-xs text-muted-foreground shadow-none"
-            aria-pressed={deskOpen}
-          >
-            {deskOpen ? (
-              <PanelRightClose className="h-3.5 w-3.5" />
-            ) : (
-              <PanelRightOpen className="h-3.5 w-3.5" />
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                className="h-7 w-7 text-muted-foreground"
+                title={theme === "dark" ? "Use light chart" : "Use dark chart"}
+                aria-label={theme === "dark" ? "Use light chart" : "Use dark chart"}
+              >
+                {theme === "dark" ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
+              </Button>
+              <Button
+                type="button"
+                variant={pineOpen ? "secondary" : "ghost"}
+                size="icon"
+                onClick={() => setPineOpen((open) => !open)}
+                className="h-7 w-7 text-muted-foreground"
+                title="Pine Script workspace"
+                aria-label="Pine Script workspace"
+              >
+                <Code2 className="h-3.5 w-3.5" />
+              </Button>
+            </div>
+            {!deskOpen && (
+              <Button
+                type="button"
+                variant="secondary"
+                size="icon"
+                onClick={() => setDeskOpen(true)}
+                className="absolute right-3 top-3 z-10 h-9 w-9 shadow-sm"
+                title="Show AI Desk"
+                aria-label="Show AI Desk"
+              >
+                <PanelRightOpen className="h-4 w-4" />
+              </Button>
             )}
-            {deskOpen ? "Hide AI Desk" : "Show AI Desk"}
-          </Button>
-        </div>
-
-        <div className="flex min-h-0 flex-1 flex-col lg:flex-row">
-          {/* Chart */}
-          <main className="min-h-0 flex-1">
             <iframe
               key={chartSrc}
               src={chartSrc}
@@ -380,11 +510,53 @@ function TerminalPage() {
               className="h-full w-full border-0"
               allowFullScreen
             />
+            {pineOpen && (
+              <section className="absolute inset-x-0 bottom-0 z-20 flex h-[42%] min-h-56 flex-col border-t border-border bg-background shadow-2xl">
+                <div className="flex h-10 shrink-0 items-center border-b border-border px-3">
+                  <Code2 className="mr-2 h-4 w-4 text-primary" />
+                  <h2 className="text-sm font-medium">Pine Script</h2>
+                  <span className="ml-2 text-xs text-muted-foreground">Saved automatically</span>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="ml-auto h-7 w-7"
+                    onClick={async () => {
+                      await navigator.clipboard.writeText(pineCode);
+                      setCopied(true);
+                      window.setTimeout(() => setCopied(false), 1500);
+                    }}
+                    title="Copy Pine Script"
+                    aria-label="Copy Pine Script"
+                  >
+                    {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="h-7 w-7"
+                    onClick={() => setPineOpen(false)}
+                    title="Close Pine Script"
+                    aria-label="Close Pine Script"
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+                <textarea
+                  value={pineCode}
+                  onChange={(event) => setPineCode(event.target.value)}
+                  spellCheck={false}
+                  aria-label="Pine Script editor"
+                  className="min-h-0 flex-1 resize-none bg-background p-4 font-mono text-sm leading-6 text-foreground outline-none"
+                />
+              </section>
+            )}
           </main>
 
           {/* AI desk */}
           {deskOpen && (
-            <aside className="flex h-[45%] w-full shrink-0 flex-col border-t border-border bg-card text-card-foreground lg:h-auto lg:w-96 lg:border-l lg:border-t-0">
+            <aside className="relative flex h-[45%] w-full shrink-0 flex-col border-t border-border bg-card text-card-foreground lg:h-auto lg:w-96 lg:border-l lg:border-t-0">
               <div className="flex min-h-17 items-center gap-2.5 border-b border-border px-4 py-3">
                 <img src={jenvuLogo} alt="Jenvu" className="h-9 w-9 shrink-0 object-contain" />
                 <div className="min-w-0">
@@ -405,13 +577,96 @@ function TerminalPage() {
                   variant="ghost"
                   size="icon"
                   className="ml-auto h-8 w-8 rounded-full text-muted-foreground"
-                  onClick={() => setMessages([])}
+                  onClick={() => setHistoryOpen((open) => !open)}
+                  title="View past chats"
+                  aria-label="Chat history"
+                >
+                  <History className="h-4 w-4" />
+                </Button>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 rounded-full text-muted-foreground"
+                  onClick={startNewChat}
                   title="Start a new chat"
                   aria-label="Start a new chat"
                 >
                   <SquarePen className="h-4 w-4" />
                 </Button>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 rounded-full text-muted-foreground"
+                  onClick={() => setDeskOpen(false)}
+                  title="Hide AI Desk"
+                  aria-label="Hide AI Desk"
+                >
+                  <PanelRightClose className="h-4 w-4" />
+                </Button>
               </div>
+
+              {historyOpen && (
+                <div className="absolute inset-0 z-30 flex flex-col bg-card">
+                  <div className="flex min-h-17 items-center border-b border-border px-4">
+                    <History className="mr-2 h-4 w-4" />
+                    <h2 className="text-sm font-medium">Past chats</h2>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="ml-auto h-8 w-8"
+                      onClick={() => setHistoryOpen(false)}
+                      aria-label="Close chat history"
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  <div className="flex-1 space-y-1.5 overflow-y-auto p-3">
+                    {threads.length === 0 ? (
+                      <p className="px-3 py-10 text-center text-sm text-muted-foreground">
+                        No past chats yet.
+                      </p>
+                    ) : (
+                      threads.map((thread) => (
+                        <div
+                          key={thread.id}
+                          className={cn(
+                            "flex items-center rounded-md border border-border px-2 py-2",
+                            thread.id === activeThreadId && "bg-secondary",
+                          )}
+                        >
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            className="h-auto min-w-0 flex-1 justify-start px-1 py-1 text-left"
+                            onClick={() => loadThread(thread)}
+                          >
+                            <span className="min-w-0 flex-1 truncate text-sm">{thread.title}</span>
+                            <span className="ml-2 shrink-0 text-[10px] text-muted-foreground">
+                              {new Date(thread.updatedAt).toLocaleDateString("en-US", {
+                                day: "numeric",
+                                month: "short",
+                              })}
+                            </span>
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="h-7 w-7 shrink-0 text-muted-foreground hover:text-destructive"
+                            onClick={() => deleteThread(thread.id)}
+                            aria-label={`Delete ${thread.title}`}
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </Button>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+              )}
 
               <Conversation className="min-h-0">
                 <ConversationContent className="gap-5 px-4 py-5">
@@ -452,7 +707,7 @@ function TerminalPage() {
                     <Message key={`${m.role}-${i}`} from={m.role}>
                       <MessageContent
                         className={cn(
-                          "text-[13px] leading-6",
+                          "text-[15px] leading-7",
                           m.role === "user" &&
                             "rounded-2xl bg-secondary px-3.5 py-2.5 text-secondary-foreground",
                         )}

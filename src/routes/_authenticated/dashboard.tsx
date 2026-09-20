@@ -90,6 +90,7 @@ const NAV_GROUPS: Array<{ label: string; items: TabItem[] }> = [
     label: "",
     items: [
       { to: "/dashboard", label: "Overview", icon: LayoutDashboard, exact: true, countKey: "saved" },
+      { to: "/terminal", label: "Terminal", icon: Terminal },
     ],
   },
   {
