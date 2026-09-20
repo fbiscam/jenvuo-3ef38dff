@@ -17,7 +17,6 @@ import path from "node:path";
 const serverEnv = loadEnv(process.env.NODE_ENV || "development", process.cwd(), "");
 Object.assign(process.env, serverEnv);
 
-
 // Dev-only fix for "Invalid server function ID" 500s.
 //
 // TanStack Start's server-fn plugin only registers a fn's ID when the *server
@@ -38,8 +37,11 @@ function serverFnManifestRegen(): Plugin {
     const out: string[] = [];
     async function walk(dir: string) {
       let entries;
-      try { entries = await fs.readdir(dir, { withFileTypes: true }); }
-      catch { return; }
+      try {
+        entries = await fs.readdir(dir, { withFileTypes: true });
+      } catch {
+        return;
+      }
       for (const e of entries) {
         const full = path.join(dir, e.name);
         if (e.isDirectory()) {
@@ -62,7 +64,11 @@ function serverFnManifestRegen(): Plugin {
     // the client-side base64 IDs get registered in the manifest. Using
     // ssrLoadModule alone only registers the SSR flavor, so client bundles
     // that POST with a base64 ID still 500 with "Invalid server function ID".
-    const envs = (server as unknown as { environments?: Record<string, { transformRequest?: (url: string) => Promise<unknown> }> }).environments;
+    const envs = (
+      server as unknown as {
+        environments?: Record<string, { transformRequest?: (url: string) => Promise<unknown> }>;
+      }
+    ).environments;
     await Promise.allSettled(
       files.flatMap((f) => {
         const tasks: Array<Promise<unknown>> = [server.ssrLoadModule(f).catch(() => undefined)];
@@ -85,7 +91,9 @@ function serverFnManifestRegen(): Plugin {
     name: "lovable:serverfn-manifest-regen",
     apply: "serve",
     configureServer(server) {
-      server.httpServer?.once("listening", () => { void warmLoad(server); });
+      server.httpServer?.once("listening", () => {
+        void warmLoad(server);
+      });
     },
     // handleHotUpdate fires on every file change Vite watches (across all
     // environments), unlike `server.watcher` which in Vite 7 only surfaces a
@@ -124,17 +132,11 @@ export default defineConfig({
         // exports. Pin each import specifier to the matching installed copy.
         {
           find: /^entities\/lib\/decode\.js$/,
-          replacement: path.resolve(
-            __dirname,
-            "node_modules/htmlparser2/node_modules/entities/lib/esm/decode.js",
-          ),
+          replacement: path.resolve(__dirname, "node_modules/entities/lib/esm/decode.js"),
         },
         {
           find: /^entities\/lib\/encode\.js$/,
-          replacement: path.resolve(
-            __dirname,
-            "node_modules/htmlparser2/node_modules/entities/lib/esm/encode.js",
-          ),
+          replacement: path.resolve(__dirname, "node_modules/entities/lib/esm/encode.js"),
         },
         {
           find: /^entities\/escape$/,
