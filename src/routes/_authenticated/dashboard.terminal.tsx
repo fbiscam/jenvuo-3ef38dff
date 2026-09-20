@@ -3,6 +3,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation } from "@tanstack/react-query";
 import {
+  Check,
   History,
   ImagePlus,
   Mic,
@@ -47,7 +48,6 @@ import {
 } from "@/components/ai-elements/attachments";
 import { Shimmer } from "@/components/ai-elements/shimmer";
 import jenvuLogo from "@/assets/jenvu-logo.png";
-import jenvuTick from "@/assets/jenvu-tick.png";
 
 export const Route = createFileRoute("/_authenticated/dashboard/terminal")({
   head: () => ({
@@ -547,11 +547,13 @@ function TerminalPage() {
                 <div className="ml-[46px] min-w-0">
                   <div className="flex items-center gap-1">
                     <span className="text-lg font-medium leading-none">Jenvu</span>
-                    <img
-                      src={jenvuTick}
-                      alt="Verified"
-                      className="h-4.5 w-4.5 shrink-0 object-contain"
-                    />
+                    <span
+                      className="flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full bg-home-accent text-home-accent-foreground"
+                      title="Verified"
+                      aria-label="Verified"
+                    >
+                      <Check className="h-3 w-3" strokeWidth={3} />
+                    </span>
                   </div>
                   <p className="mt-1 text-[10px] font-medium text-muted-foreground">
                     Gold 30-minute analysis ready
