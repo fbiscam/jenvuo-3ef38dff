@@ -17,6 +17,10 @@ import {
 } from "lucide-react";
 import type { FileUIPart } from "ai";
 import { analyzeGold, type GoldSignal } from "@/lib/gold-analysis.functions";
+import { fetchGoldCandles } from "@/lib/candle-feed.functions";
+import { PineError, runPineScript, type PineCandle } from "@/lib/pine/engine";
+import { PineIndicatorPane, type PineIndicator } from "@/components/terminal/PineIndicatorPane";
+import { useQuery } from "@tanstack/react-query";
 import { transcribeVoiceMessage } from "@/lib/transcription.functions";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -102,6 +106,46 @@ type ChatThread = {
 const THREADS_KEY = "jenvu:terminal:threads:v1";
 const TERMINAL_SETTINGS_KEY = "jenvu:terminal:settings:v1";
 const PINE_SCRIPT_KEY = "jenvu:terminal:pine-script:v1";
+const PINE_INDICATORS_KEY = "jenvu:terminal:pine-indicators:v1";
+
+const DEFAULT_PINE = `//@version=6
+indicator("My Gold EMA", overlay=true)
+
+fast = ta.ema(close, 20)
+slow = ta.ema(close, 50)
+
+plot(fast, "EMA 20", color=color.blue, linewidth=2)
+plot(slow, "EMA 50", color=color.orange, linewidth=2)
+`;
+
+// The Jenvu candle feed serves 1m / 5m / 15m / 1h bars, so higher timeframes are
+// built by merging the closest supported interval.
+const FEED_SOURCE: Record<string, { interval: "1m" | "5m" | "15m" | "1h"; merge: number }> = {
+  "1m": { interval: "1m", merge: 1 },
+  "5m": { interval: "5m", merge: 1 },
+  "15m": { interval: "15m", merge: 1 },
+  "30m": { interval: "15m", merge: 2 },
+  "1h": { interval: "1h", merge: 1 },
+  "4h": { interval: "1h", merge: 4 },
+  "1d": { interval: "1h", merge: 24 },
+};
+
+function mergeCandles(candles: PineCandle[], size: number): PineCandle[] {
+  if (size <= 1) return candles;
+  const out: PineCandle[] = [];
+  for (let i = 0; i + size <= candles.length; i += size) {
+    const group = candles.slice(i, i + size);
+    out.push({
+      time: group[0]!.time,
+      open: group[0]!.open,
+      high: Math.max(...group.map((c) => c.high)),
+      low: Math.min(...group.map((c) => c.low)),
+      close: group[group.length - 1]!.close,
+      volume: group.reduce((sum, c) => sum + c.volume, 0),
+    });
+  }
+  return out;
+}
 
 const QUICK = [
   "Analyse the current chart",
@@ -197,9 +241,10 @@ function TerminalPage() {
   const [activeThreadId, setActiveThreadId] = useState<string | null>(null);
   const [historyOpen, setHistoryOpen] = useState(false);
   const [pineOpen, setPineOpen] = useState(false);
-  const [pineCode, setPineCode] = useState(
-    '//@version=6\nindicator("Jenvu Gold Workspace", overlay=true)\n\n// Write your Pine Script here\n',
-  );
+  const [pineCode, setPineCode] = useState(DEFAULT_PINE);
+  const [indicators, setIndicators] = useState<PineIndicator[]>([]);
+  const [pineError, setPineError] = useState("");
+  const [pineStatus, setPineStatus] = useState("");
   const [copied, setCopied] = useState(false);
   const [voiceError, setVoiceError] = useState("");
   const [isRecording, setIsRecording] = useState(false);
@@ -213,6 +258,58 @@ function TerminalPage() {
   const activeThreadIdRef = useRef<string | null>(null);
   const analyze = useServerFn(analyzeGold);
   const transcribe = useServerFn(transcribeVoiceMessage);
+  const loadCandles = useServerFn(fetchGoldCandles);
+
+  const feed = FEED_SOURCE[tf.key] ?? FEED_SOURCE["30m"]!;
+  const candlesQuery = useQuery({
+    queryKey: ["terminal-pine-candles", feed.interval, feed.merge],
+    enabled: indicators.length > 0 || pineOpen,
+    staleTime: 60_000,
+    refetchInterval: 60_000,
+    queryFn: async () => {
+      const rows = await loadCandles({ data: { interval: feed.interval, asset: "XAUUSD" } });
+      return mergeCandles(
+        rows.map((row) => ({
+          time: Math.floor(row.openTime / 1000),
+          open: row.open,
+          high: row.high,
+          low: row.low,
+          close: row.close,
+          volume: row.volume,
+        })),
+        feed.merge,
+      );
+    },
+  });
+  const pineCandles = useMemo(() => candlesQuery.data ?? [], [candlesQuery.data]);
+
+  function addIndicatorToChart() {
+    setPineStatus("");
+    if (pineCandles.length === 0) {
+      setPineError(
+        candlesQuery.isFetching
+          ? "Loading price data — try again in a moment."
+          : "Price data is not available right now. Please try again.",
+      );
+      return;
+    }
+    try {
+      const compiled = runPineScript(pineCode, pineCandles);
+      const id = `pine-${Date.now().toString(36)}`;
+      setIndicators((current) => [...current, { id, name: compiled.name, code: pineCode }]);
+      setPineError("");
+      setPineStatus(`"${compiled.name}" added to the chart.`);
+    } catch (error) {
+      setPineStatus("");
+      setPineError(
+        error instanceof PineError
+          ? `Line ${error.line}: ${error.message}`
+          : error instanceof Error
+            ? error.message
+            : "This script could not be compiled.",
+      );
+    }
+  }
 
   function addMessage(message: ChatMsg) {
     setMessages((current) => [...current, message]);
@@ -366,6 +463,10 @@ function TerminalPage() {
       // Desk and Pine panels always start closed so the chart opens exactly as left.
       const savedPine = window.localStorage.getItem(PINE_SCRIPT_KEY);
       if (savedPine) setPineCode(savedPine);
+      const savedIndicators = JSON.parse(
+        window.localStorage.getItem(PINE_INDICATORS_KEY) || "null",
+      ) as PineIndicator[] | null;
+      if (Array.isArray(savedIndicators)) setIndicators(savedIndicators);
 
       const CHART_USER_KEY = "jenvu:terminal:chart-user:v1";
       let chartUser = window.localStorage.getItem(CHART_USER_KEY);
@@ -402,6 +503,11 @@ function TerminalPage() {
     if (!hydratedRef.current) return;
     window.localStorage.setItem(PINE_SCRIPT_KEY, pineCode);
   }, [pineCode]);
+
+  useEffect(() => {
+    if (!hydratedRef.current) return;
+    window.localStorage.setItem(PINE_INDICATORS_KEY, JSON.stringify(indicators));
+  }, [indicators]);
 
   useEffect(() => {
     if (!ask.isPending && !voice.isPending && !isRecording) textareaRef.current?.focus();
@@ -509,24 +615,48 @@ function TerminalPage() {
                 <Code2 className="h-3.5 w-3.5" />
               </Button>
             </div>
-            <iframe
-              key={chartSrc}
-              src={chartSrc}
-              title={`${SYMBOL.label} ${tf.label} chart`}
-              className="h-full w-full border-0"
-              allowFullScreen
-            />
+            <div className="flex h-full min-h-0 w-full flex-col">
+              <iframe
+                key={chartSrc}
+                src={chartSrc}
+                title={`${SYMBOL.label} ${tf.label} chart`}
+                className="min-h-0 w-full flex-1 border-0"
+                allowFullScreen
+              />
+              {indicators.length > 0 && (
+                <div className="max-h-[45%] shrink-0 overflow-y-auto">
+                  {indicators.map((indicator) => (
+                    <PineIndicatorPane
+                      key={indicator.id}
+                      indicator={indicator}
+                      candles={pineCandles}
+                      onRemove={(id) =>
+                        setIndicators((current) => current.filter((item) => item.id !== id))
+                      }
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
             {pineOpen && (
               <section className="absolute inset-x-0 bottom-0 z-20 flex h-[42%] min-h-56 flex-col border-t border-border bg-background shadow-2xl">
                 <div className="flex h-10 shrink-0 items-center border-b border-border px-3">
                   <Code2 className="mr-2 h-4 w-4 text-primary" />
-                  <h2 className="text-sm font-medium">Pine Script</h2>
+                  <h2 className="text-sm font-medium">Pine Editor</h2>
                   <span className="ml-2 text-xs text-muted-foreground">Saved automatically</span>
+                  <Button
+                    type="button"
+                    size="sm"
+                    className="ml-auto h-7 px-3 text-xs"
+                    onClick={addIndicatorToChart}
+                  >
+                    Add to chart
+                  </Button>
                   <Button
                     type="button"
                     variant="ghost"
                     size="icon"
-                    className="ml-auto h-7 w-7"
+                    className="ml-1 h-7 w-7"
                     onClick={async () => {
                       await navigator.clipboard.writeText(pineCode);
                       setCopied(true);
@@ -543,19 +673,33 @@ function TerminalPage() {
                     size="icon"
                     className="h-7 w-7"
                     onClick={() => setPineOpen(false)}
-                    title="Close Pine Script"
-                    aria-label="Close Pine Script"
+                    title="Close Pine Editor"
+                    aria-label="Close Pine Editor"
                   >
                     <X className="h-4 w-4" />
                   </Button>
                 </div>
                 <textarea
                   value={pineCode}
-                  onChange={(event) => setPineCode(event.target.value)}
+                  onChange={(event) => {
+                    setPineCode(event.target.value);
+                    setPineError("");
+                    setPineStatus("");
+                  }}
                   spellCheck={false}
                   aria-label="Pine Script editor"
                   className="min-h-0 flex-1 resize-none bg-background p-4 font-mono text-sm leading-6 text-foreground outline-none"
                 />
+                {(pineError || pineStatus) && (
+                  <div
+                    className={cn(
+                      "shrink-0 border-t border-border px-4 py-2 font-mono text-xs",
+                      pineError ? "text-destructive" : "text-muted-foreground",
+                    )}
+                  >
+                    {pineError || pineStatus}
+                  </div>
+                )}
               </section>
             )}
           </main>
