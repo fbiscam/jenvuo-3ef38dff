@@ -250,9 +250,6 @@ function localCoverSvg(title: string, category: string, slug: string): string {
       <stop offset="0%" stop-color="hsl(${hue}, 28%, 9%)"/>
       <stop offset="100%" stop-color="hsl(${(hue + 18) % 360}, 45%, 18%)"/>
     </linearGradient>
-    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#d4a котор"/>
-    </linearGradient>
   </defs>
   <rect width="1280" height="720" fill="url(#bg)"/>
   <circle cx="1080" cy="180" r="220" fill="#d4af37" opacity="0.14"/>
