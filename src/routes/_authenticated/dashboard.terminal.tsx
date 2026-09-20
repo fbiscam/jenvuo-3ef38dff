@@ -258,6 +258,58 @@ function TerminalPage() {
   const activeThreadIdRef = useRef<string | null>(null);
   const analyze = useServerFn(analyzeGold);
   const transcribe = useServerFn(transcribeVoiceMessage);
+  const loadCandles = useServerFn(fetchGoldCandles);
+
+  const feed = FEED_SOURCE[tf.key] ?? FEED_SOURCE["30m"]!;
+  const candlesQuery = useQuery({
+    queryKey: ["terminal-pine-candles", feed.interval, feed.merge],
+    enabled: indicators.length > 0 || pineOpen,
+    staleTime: 60_000,
+    refetchInterval: 60_000,
+    queryFn: async () => {
+      const rows = await loadCandles({ data: { interval: feed.interval, asset: "XAUUSD" } });
+      return mergeCandles(
+        rows.map((row) => ({
+          time: Math.floor(row.openTime / 1000),
+          open: row.open,
+          high: row.high,
+          low: row.low,
+          close: row.close,
+          volume: row.volume,
+        })),
+        feed.merge,
+      );
+    },
+  });
+  const pineCandles = useMemo(() => candlesQuery.data ?? [], [candlesQuery.data]);
+
+  function addIndicatorToChart() {
+    setPineStatus("");
+    if (pineCandles.length === 0) {
+      setPineError(
+        candlesQuery.isFetching
+          ? "Loading price data — try again in a moment."
+          : "Price data is not available right now. Please try again.",
+      );
+      return;
+    }
+    try {
+      const compiled = runPineScript(pineCode, pineCandles);
+      const id = `pine-${Date.now().toString(36)}`;
+      setIndicators((current) => [...current, { id, name: compiled.name, code: pineCode }]);
+      setPineError("");
+      setPineStatus(`"${compiled.name}" added to the chart.`);
+    } catch (error) {
+      setPineStatus("");
+      setPineError(
+        error instanceof PineError
+          ? `Line ${error.line}: ${error.message}`
+          : error instanceof Error
+            ? error.message
+            : "This script could not be compiled.",
+      );
+    }
+  }
 
   function addMessage(message: ChatMsg) {
     setMessages((current) => [...current, message]);
