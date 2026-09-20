@@ -207,33 +207,44 @@ function TerminalPage() {
 
   function addMessage(message: ChatMsg) {
     setMessages((current) => [...current, message]);
+    // The thread id is resolved outside the state updater so the updater stays
+    // pure — an impure updater silently dropped saved chats in development.
+    let threadId = activeThreadIdRef.current;
+    const isNewThread = !threadId;
+    if (!threadId) {
+      threadId = `terminal-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`;
+      activeThreadIdRef.current = threadId;
+      setActiveThreadId(threadId);
+    }
+    const id = threadId;
+    const stamp = Date.now();
     setThreads((current) => {
-      let threadId = activeThreadIdRef.current;
-      let next = current;
-      if (!threadId) {
-        threadId = `terminal-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`;
-        activeThreadIdRef.current = threadId;
-        setActiveThreadId(threadId);
-        next = [
-          {
-            id: threadId,
-            title: message.role === "user" ? message.text.slice(0, 48) : "New chat",
-            updatedAt: Date.now(),
-            messages: [],
-          },
-          ...current,
-        ];
-      }
-      return next
+      const exists = current.some((thread) => thread.id === id);
+      const base =
+        exists || !isNewThread
+          ? current
+          : [
+              {
+                id,
+                title: message.role === "user" ? message.text.slice(0, 48) : "New chat",
+                updatedAt: stamp,
+                messages: [] as ChatMsg[],
+              },
+              ...current,
+            ];
+      const withThread = base.some((thread) => thread.id === id)
+        ? base
+        : [{ id, title: "New chat", updatedAt: stamp, messages: [] as ChatMsg[] }, ...base];
+      return withThread
         .map((thread) =>
-          thread.id === threadId
+          thread.id === id
             ? {
                 ...thread,
                 title:
                   thread.title === "New chat" && message.role === "user"
                     ? message.text.slice(0, 48)
                     : thread.title,
-                updatedAt: Date.now(),
+                updatedAt: stamp,
                 messages: [...thread.messages, { ...message, files: undefined }].slice(-80),
               }
             : thread,
