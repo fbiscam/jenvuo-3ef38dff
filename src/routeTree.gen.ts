@@ -57,6 +57,7 @@ import { Route as LeadsActivityRouteImport } from './routes/leads.activity'
 import { Route as LeadsAccountRouteImport } from './routes/leads.account'
 import { Route as JenvuOpsX9k2InboxRouteImport } from './routes/jenvu-ops-x9k2.inbox'
 import { Route as InsightsSlugRouteImport } from './routes/insights.$slug'
+import { Route as AuthenticatedTerminalRouteImport } from './routes/_authenticated/terminal'
 import { Route as AuthenticatedInboxRouteImport } from './routes/_authenticated/inbox'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as HelpCollectionIndexRouteImport } from './routes/help.$collection.index'
@@ -345,6 +346,11 @@ const InsightsSlugRoute = InsightsSlugRouteImport.update({
   id: '/$slug',
   path: '/$slug',
   getParentRoute: () => InsightsRoute,
+} as any)
+const AuthenticatedTerminalRoute = AuthenticatedTerminalRouteImport.update({
+  id: '/terminal',
+  path: '/terminal',
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedInboxRoute = AuthenticatedInboxRouteImport.update({
   id: '/inbox',
@@ -663,6 +669,7 @@ export interface FileRoutesByFullPath {
   '/terms': typeof TermsRoute
   '/dashboard': typeof AuthenticatedDashboardRouteWithChildren
   '/inbox': typeof AuthenticatedInboxRoute
+  '/terminal': typeof AuthenticatedTerminalRoute
   '/insights/$slug': typeof InsightsSlugRoute
   '/jenvu-ops-x9k2/inbox': typeof JenvuOpsX9k2InboxRoute
   '/leads/account': typeof LeadsAccountRoute
@@ -756,6 +763,7 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/inbox': typeof AuthenticatedInboxRoute
+  '/terminal': typeof AuthenticatedTerminalRoute
   '/insights/$slug': typeof InsightsSlugRoute
   '/jenvu-ops-x9k2/inbox': typeof JenvuOpsX9k2InboxRoute
   '/leads/account': typeof LeadsAccountRoute
@@ -856,6 +864,7 @@ export interface FileRoutesById {
   '/terms': typeof TermsRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRouteWithChildren
   '/_authenticated/inbox': typeof AuthenticatedInboxRoute
+  '/_authenticated/terminal': typeof AuthenticatedTerminalRoute
   '/insights/$slug': typeof InsightsSlugRoute
   '/jenvu-ops-x9k2/inbox': typeof JenvuOpsX9k2InboxRoute
   '/leads/account': typeof LeadsAccountRoute
@@ -956,6 +965,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/dashboard'
     | '/inbox'
+    | '/terminal'
     | '/insights/$slug'
     | '/jenvu-ops-x9k2/inbox'
     | '/leads/account'
@@ -1049,6 +1059,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/terms'
     | '/inbox'
+    | '/terminal'
     | '/insights/$slug'
     | '/jenvu-ops-x9k2/inbox'
     | '/leads/account'
@@ -1148,6 +1159,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/_authenticated/dashboard'
     | '/_authenticated/inbox'
+    | '/_authenticated/terminal'
     | '/insights/$slug'
     | '/jenvu-ops-x9k2/inbox'
     | '/leads/account'
@@ -1609,6 +1621,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof InsightsSlugRouteImport
       parentRoute: typeof InsightsRoute
     }
+    '/_authenticated/terminal': {
+      id: '/_authenticated/terminal'
+      path: '/terminal'
+      fullPath: '/terminal'
+      preLoaderRoute: typeof AuthenticatedTerminalRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/inbox': {
       id: '/_authenticated/inbox'
       path: '/inbox'
@@ -2028,11 +2047,13 @@ const AuthenticatedDashboardRouteWithChildren =
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRouteWithChildren
   AuthenticatedInboxRoute: typeof AuthenticatedInboxRoute
+  AuthenticatedTerminalRoute: typeof AuthenticatedTerminalRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRouteWithChildren,
   AuthenticatedInboxRoute: AuthenticatedInboxRoute,
+  AuthenticatedTerminalRoute: AuthenticatedTerminalRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
