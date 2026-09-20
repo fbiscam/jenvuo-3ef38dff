@@ -885,18 +885,24 @@ async function _analyzeGoldCompute(
       )
       .join("\n");
 
-    const advisorSystem = `You are Jenvu Desk — an expert XAU/USD trading mentor with extreme, institutional-level mastery of ICT and SMC concepts (market structure, BOS/CHOCH, order blocks, breaker blocks, fair value gaps, liquidity pools and sweeps, premium/discount and OTE 62-79%, killzones, PD arrays, displacement, mitigation, risk management and position sizing).
+    const advisorSystem = `You are Jenvu Desk, a concise general-purpose AI assistant with expert XAU/USD trading knowledge.
 
-Your job is to COACH, not to hand out trades:
-- Answer exactly what the user asked, nothing more. Stay on their question.
-- Guide the user to build their OWN trade plan: explain what structure/confluence you see, what would make a setup valid or invalid, where risk logically sits, and what to wait for.
-- You may SUGGEST and RECOMMEND ("if price reclaims this OB, a short could be considered"), but never deliver a finished trade signal with a committed entry, stop loss and take profit as instructions to follow.
-- Always keep entry, stopLoss, takeProfits, riskReward as "-" or [], direction "WAIT", confidence 0. The trading fields are not used in this mode.
-- Teach clearly: short paragraphs, plain English, define ICT/SMC terms when useful.
-- Never claim certainty, never promise wins, always remind that the user decides and manages risk.
+First identify the user's intent:
+- For greetings, casual conversation, or any non-trading question, reply as a normal helpful assistant. Do not mention charts, gold, trading, ICT, SMC, risk, or your trading expertise unless the user asks about them.
+- Only for trading-related questions, act as an expert XAU/USD mentor with institutional-level ICT/SMC knowledge, including market structure, BOS/CHOCH, order blocks, breaker blocks, fair value gaps, liquidity sweeps, premium/discount, OTE, killzones, displacement, mitigation, and risk management.
+
+Rules for every reply:
+- Answer exactly what the user asked and nothing more.
+- Keep the complete answer concise: normally 1-3 short sentences and under 80 words. Use a longer answer only when essential to resolve the question.
 - Reply only in English.
+- Always keep entry, stopLoss, takeProfits, riskReward as "-" or [], direction "WAIT", and confidence 0.
 
-Put your full coaching answer in fullAnalysis and a short version (max 40 words) in spokenSummary.
+Additional rules only for trading questions:
+- Coach the user to build their own plan by explaining relevant structure, confirmation, invalidation, or risk.
+- You may suggest what to watch, but never provide a finished signal with committed entry, stop loss, and take profit.
+- Never claim certainty or promise wins.
+
+Put the same concise answer in fullAnalysis and spokenSummary. spokenSummary must be no more than 30 words.
 
 Return ONLY valid JSON (no markdown, no code fences) with this exact shape:
 {"bias":"BULLISH|BEARISH|NEUTRAL","direction":"WAIT","entry":"-","stopLoss":"-","takeProfits":[],"riskReward":"-","confidence":0,"killzone":"-","confluences":[],"ictAnalysis":"","smcAnalysis":"","marketStructure":"","spokenSummary":"","fullAnalysis":""}`;
@@ -929,8 +935,15 @@ Return ONLY valid JSON (no markdown, no code fences) with this exact shape:
 
     const isTradingIntent = /\b(setup|signal|entry|buy|sell|long|short|trade|analyze|analysis|bias|tp|sl|stop\s*loss|take\s*profit|gold|xau|chart|trend|market|price|level|zone|fvg|ob|order\s*block|liquidity|bos|choch|smc|ict|killzone|scalp|swing)\b/i.test(normalizeQuery(data.query));
     const advisorGuide = data.advisor
-      ? "\nCOACH MODE: guide and suggest only. Explain the ICT/SMC picture and what the user should look for. Never output a committed entry/SL/TP trade plan; keep all trading fields empty."
+      ? isTradingIntent
+        ? "\nTRADING QUERY: answer as a concise ICT/SMC mentor. Guide and suggest only. Never output a committed entry/SL/TP plan; keep all trading fields empty."
+        : "\nGENERAL QUERY: answer as a normal concise assistant. Do not mention gold, charts, trading, ICT, SMC, signals, or risk unless the user asked about them. Keep all trading fields empty."
       : "";
+    const requestInstruction = isTradingIntent
+      ? data.advisor
+        ? "This is a trading question. Give concise ICT/SMC guidance without a committed trade plan."
+        : "User wants a trading view — give the A+ ICT/SMC setup and fill the trading fields."
+      : "This is a general question. Reply naturally and concisely without introducing trading topics. Keep the trading fields empty.";
     const userPrompt = hasData
       ? `USER MESSAGE: ${data.query}
 
@@ -943,10 +956,10 @@ RECENT SWING LOW (150): ${swingLow.toFixed(2)}
 LAST 150 CANDLES (OHLC):
 ${compact}
 
-${isTradingIntent ? "User wants a trading view — give the A+ ICT/SMC setup, fill trading fields confidently." : "User is just chatting / asking general thing — REPLY conversationally in spokenSummary, set direction='WAIT', confidence=0, leave trading fields empty. Do NOT push a signal."}${advisorGuide}`
+${requestInstruction}${advisorGuide}`
       : `USER MESSAGE: ${data.query}
 
-${isTradingIntent ? "User wants trading view but live feed offline — answer conversationally, set direction='WAIT', confidence<=40, mention feed offline in fullAnalysis." : "User is just chatting — answer naturally in spokenSummary, set direction='WAIT', confidence=0, leave trading fields empty."}${advisorGuide}`;
+${isTradingIntent ? "The live feed is unavailable. Answer concisely without inventing market data and mention that limitation." : requestInstruction}${advisorGuide}`;
 
     const { content, model: __aiModel, usage: __aiUsage } = await callChatCompletion({
       models: [...MODEL_CHAIN.chat],
