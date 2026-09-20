@@ -447,7 +447,7 @@ function TerminalPage() {
 
   return (
     <TooltipProvider>
-      <div className="flex h-[calc(100vh/0.9)] w-full flex-col overflow-hidden bg-background">
+      <div className="flex h-full w-full flex-col overflow-hidden bg-background">
         <div className="flex min-h-0 flex-1 flex-col lg:flex-row">
           {/* Chart */}
           <main className="relative min-h-0 flex-1 bg-background">
