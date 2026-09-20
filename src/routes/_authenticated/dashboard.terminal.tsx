@@ -453,6 +453,11 @@ function TerminalPage() {
   }, [pineCode]);
 
   useEffect(() => {
+    if (!hydratedRef.current) return;
+    window.localStorage.setItem(PINE_INDICATORS_KEY, JSON.stringify(indicators));
+  }, [indicators]);
+
+  useEffect(() => {
     if (!ask.isPending && !voice.isPending && !isRecording) textareaRef.current?.focus();
   }, [ask.isPending, voice.isPending, isRecording]);
 
