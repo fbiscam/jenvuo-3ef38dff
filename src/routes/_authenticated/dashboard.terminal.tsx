@@ -188,6 +188,7 @@ function TerminalPage() {
   const [tf, setTf] = useState(TIMEFRAMES[3]);
   const theme = "light" as const;
   const [deskOpen, setDeskOpen] = useState(true);
+  const [chartUserId, setChartUserId] = useState<string | null>(null);
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<ChatMsg[]>([]);
   const [threads, setThreads] = useState<ChatThread[]>([]);
