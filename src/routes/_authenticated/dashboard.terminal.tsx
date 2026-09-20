@@ -46,6 +46,7 @@ import {
   Attachments,
 } from "@/components/ai-elements/attachments";
 import { Shimmer } from "@/components/ai-elements/shimmer";
+import claudeLogo from "@/assets/claude-logo.svg.asset.json";
 import jenvuLogo from "@/assets/jenvu-logo.png";
 import jenvuTick from "@/assets/jenvu-tick.png";
 
@@ -811,7 +812,15 @@ function TerminalPage() {
                           <Mic className="size-4" />
                         )}
                       </PromptInputButton>
-                      <span className="pl-1 text-[11px] text-muted-foreground">Jenvu AI</span>
+                      <span className="flex items-center gap-1.5 pl-1 text-[11px] text-muted-foreground">
+                        <img
+                          src={claudeLogo.url}
+                          alt=""
+                          aria-hidden="true"
+                          className="size-3.5 shrink-0 object-contain"
+                        />
+                        Claude Sonnet 4.5
+                      </span>
                     </PromptInputTools>
                     <PromptInputSubmit
                       status={ask.isPending ? "submitted" : "ready"}
