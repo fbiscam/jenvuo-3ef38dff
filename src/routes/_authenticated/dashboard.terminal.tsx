@@ -106,6 +106,46 @@ type ChatThread = {
 const THREADS_KEY = "jenvu:terminal:threads:v1";
 const TERMINAL_SETTINGS_KEY = "jenvu:terminal:settings:v1";
 const PINE_SCRIPT_KEY = "jenvu:terminal:pine-script:v1";
+const PINE_INDICATORS_KEY = "jenvu:terminal:pine-indicators:v1";
+
+const DEFAULT_PINE = `//@version=6
+indicator("My Gold EMA", overlay=true)
+
+fast = ta.ema(close, 20)
+slow = ta.ema(close, 50)
+
+plot(fast, "EMA 20", color=color.blue, linewidth=2)
+plot(slow, "EMA 50", color=color.orange, linewidth=2)
+`;
+
+// The Jenvu candle feed serves 1m / 5m / 15m / 1h bars, so higher timeframes are
+// built by merging the closest supported interval.
+const FEED_SOURCE: Record<string, { interval: "1m" | "5m" | "15m" | "1h"; merge: number }> = {
+  "1m": { interval: "1m", merge: 1 },
+  "5m": { interval: "5m", merge: 1 },
+  "15m": { interval: "15m", merge: 1 },
+  "30m": { interval: "15m", merge: 2 },
+  "1h": { interval: "1h", merge: 1 },
+  "4h": { interval: "1h", merge: 4 },
+  "1d": { interval: "1h", merge: 24 },
+};
+
+function mergeCandles(candles: PineCandle[], size: number): PineCandle[] {
+  if (size <= 1) return candles;
+  const out: PineCandle[] = [];
+  for (let i = 0; i + size <= candles.length; i += size) {
+    const group = candles.slice(i, i + size);
+    out.push({
+      time: group[0]!.time,
+      open: group[0]!.open,
+      high: Math.max(...group.map((c) => c.high)),
+      low: Math.min(...group.map((c) => c.low)),
+      close: group[group.length - 1]!.close,
+      volume: group.reduce((sum, c) => sum + c.volume, 0),
+    });
+  }
+  return out;
+}
 
 const QUICK = [
   "Analyse the current chart",
