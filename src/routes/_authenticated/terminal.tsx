@@ -1,9 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation } from "@tanstack/react-query";
-import { LineChart, Moon, Sun, PanelRightClose, PanelRightOpen, SquarePen } from "lucide-react";
+import { ImagePlus, LineChart, Mic, Moon, PanelRightClose, PanelRightOpen, Square, SquarePen, Sun } from "lucide-react";
+import type { FileUIPart } from "ai";
 import { analyzeGold, type GoldSignal } from "@/lib/gold-analysis.functions";
+import { transcribeVoiceMessage } from "@/lib/transcription.functions";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,11 +15,25 @@ import {
 } from "@/components/ai-elements/conversation";
 import { Message, MessageContent, MessageResponse } from "@/components/ai-elements/message";
 import {
+  PromptInputActionAddAttachments,
+  PromptInputActionMenu,
+  PromptInputActionMenuContent,
+  PromptInputActionMenuTrigger,
   PromptInput,
   PromptInputFooter,
+  PromptInputHeader,
+  PromptInputButton,
   PromptInputSubmit,
   PromptInputTextarea,
+  PromptInputTools,
+  usePromptInputAttachments,
 } from "@/components/ai-elements/prompt-input";
+import {
+  Attachment,
+  AttachmentPreview,
+  AttachmentRemove,
+  Attachments,
+} from "@/components/ai-elements/attachments";
 import { Shimmer } from "@/components/ai-elements/shimmer";
 import jenvuLogo from "@/assets/jenvu-logo.png";
 import jenvuTick from "@/assets/jenvu-tick.png";
@@ -56,7 +72,7 @@ const TIMEFRAMES = [
 
 const SYMBOL = { key: "XAUUSD", tv: "OANDA:XAUUSD", label: "XAU/USD" };
 
-type ChatMsg = { role: "user" | "assistant"; text: string; signal?: GoldSignal };
+type ChatMsg = { role: "user" | "assistant"; text: string; signal?: GoldSignal; files?: FileUIPart[] };
 
 const QUICK = [
   "Analyse the current chart",
@@ -64,13 +80,86 @@ const QUICK = [
   "Is there a valid setup right now?",
 ];
 
+const MAX_IMAGE_BYTES = 3 * 1024 * 1024;
+
+function ComposerAttachments() {
+  const attachments = usePromptInputAttachments();
+  if (attachments.files.length === 0) return null;
+  return (
+    <PromptInputHeader>
+      <Attachments variant="grid">
+        {attachments.files.map((file) => (
+          <Attachment data={file} key={file.id} onRemove={() => attachments.remove(file.id)}>
+            <AttachmentPreview />
+            <AttachmentRemove className="opacity-100" />
+          </Attachment>
+        ))}
+      </Attachments>
+    </PromptInputHeader>
+  );
+}
+
+function encodeWav(chunks: Float32Array[], inputRate: number): Blob {
+  const sourceLength = chunks.reduce((sum, chunk) => sum + chunk.length, 0);
+  const source = new Float32Array(sourceLength);
+  let offset = 0;
+  for (const chunk of chunks) {
+    source.set(chunk, offset);
+    offset += chunk.length;
+  }
+  const outputRate = 16_000;
+  const ratio = inputRate / outputRate;
+  const sampleCount = Math.max(0, Math.floor(source.length / ratio));
+  const buffer = new ArrayBuffer(44 + sampleCount * 2);
+  const view = new DataView(buffer);
+  const write = (position: number, value: string) => {
+    for (let index = 0; index < value.length; index += 1) view.setUint8(position + index, value.charCodeAt(index));
+  };
+  write(0, "RIFF");
+  view.setUint32(4, 36 + sampleCount * 2, true);
+  write(8, "WAVE");
+  write(12, "fmt ");
+  view.setUint32(16, 16, true);
+  view.setUint16(20, 1, true);
+  view.setUint16(22, 1, true);
+  view.setUint32(24, outputRate, true);
+  view.setUint32(28, outputRate * 2, true);
+  view.setUint16(32, 2, true);
+  view.setUint16(34, 16, true);
+  write(36, "data");
+  view.setUint32(40, sampleCount * 2, true);
+  for (let index = 0; index < sampleCount; index += 1) {
+    const sample = Math.max(-1, Math.min(1, source[Math.floor(index * ratio)] ?? 0));
+    view.setInt16(44 + index * 2, sample < 0 ? sample * 0x8000 : sample * 0x7fff, true);
+  }
+  return new Blob([buffer], { type: "audio/wav" });
+}
+
+async function blobToDataUrl(blob: Blob): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => typeof reader.result === "string" ? resolve(reader.result) : reject(new Error("Recording could not be read."));
+    reader.onerror = () => reject(new Error("Recording could not be read."));
+    reader.readAsDataURL(blob);
+  });
+}
+
 function TerminalPage() {
   const [tf, setTf] = useState(TIMEFRAMES[3]);
   const [theme, setTheme] = useState<"light" | "dark">("dark");
   const [deskOpen, setDeskOpen] = useState(true);
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<ChatMsg[]>([]);
+  const [voiceError, setVoiceError] = useState("");
+  const [isRecording, setIsRecording] = useState(false);
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const audioStreamRef = useRef<MediaStream | null>(null);
+  const audioSourceRef = useRef<MediaStreamAudioSourceNode | null>(null);
+  const audioProcessorRef = useRef<ScriptProcessorNode | null>(null);
+  const audioChunksRef = useRef<Float32Array[]>([]);
   const analyze = useServerFn(analyzeGold);
+  const transcribe = useServerFn(transcribeVoiceMessage);
 
   const chartSrc = useMemo(() => {
     const params = new URLSearchParams({
@@ -92,7 +181,8 @@ function TerminalPage() {
   }, [tf.tv, theme]);
 
   const ask = useMutation({
-    mutationFn: async (query: string) => analyze({ data: { timeframe: tf.key, query } }),
+    mutationFn: async ({ query, chartImage }: { query: string; chartImage?: string }) =>
+      analyze({ data: { timeframe: tf.key, query, chartImage } }),
     onSuccess: (signal) => {
       setMessages((m) => [
         ...m,
@@ -117,12 +207,85 @@ function TerminalPage() {
     },
   });
 
-  function send(text: string) {
-    const query = text.trim();
+  const voice = useMutation({
+    mutationFn: async (audioDataUrl: string) => transcribe({ data: { audioDataUrl } }),
+    onSuccess: ({ text }) => {
+      setInput((current) => current ? `${current} ${text}` : text);
+      setVoiceError("");
+      requestAnimationFrame(() => textareaRef.current?.focus());
+    },
+    onError: (error: unknown) => setVoiceError(error instanceof Error ? error.message : "Voice transcription failed."),
+  });
+
+  useEffect(() => {
+    if (!ask.isPending && !voice.isPending && !isRecording) textareaRef.current?.focus();
+  }, [ask.isPending, voice.isPending, isRecording]);
+
+  useEffect(() => () => {
+    audioStreamRef.current?.getTracks().forEach((track) => track.stop());
+    audioProcessorRef.current?.disconnect();
+    audioSourceRef.current?.disconnect();
+    void audioContextRef.current?.close();
+  }, []);
+
+  async function send(message: { text: string; files?: FileUIPart[] }) {
+    const image = message.files?.find((file) => file.mediaType?.startsWith("image/") && file.url);
+    const query = message.text.trim() || (image ? "Analyze this XAU/USD chart screenshot." : "");
     if (!query || ask.isPending) return;
-    setMessages((m) => [...m, { role: "user", text: query }]);
+    setMessages((m) => [...m, { role: "user", text: query, files: image ? [image] : undefined }]);
     setInput("");
-    ask.mutate(query);
+    await ask.mutateAsync({ query, chartImage: image?.url });
+  }
+
+  async function startRecording() {
+    setVoiceError("");
+    if (!navigator.mediaDevices?.getUserMedia) {
+      setVoiceError("Voice recording is not supported in this browser.");
+      return;
+    }
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } });
+      const context = new AudioContext();
+      const source = context.createMediaStreamSource(stream);
+      const processor = context.createScriptProcessor(4096, 1, 1);
+      audioChunksRef.current = [];
+      processor.onaudioprocess = (event) => audioChunksRef.current.push(new Float32Array(event.inputBuffer.getChannelData(0)));
+      source.connect(processor);
+      processor.connect(context.destination);
+      audioStreamRef.current = stream;
+      audioContextRef.current = context;
+      audioSourceRef.current = source;
+      audioProcessorRef.current = processor;
+      setIsRecording(true);
+    } catch {
+      setVoiceError("Microphone access is needed to record a voice message.");
+    }
+  }
+
+  async function stopRecording() {
+    const context = audioContextRef.current;
+    const stream = audioStreamRef.current;
+    setIsRecording(false);
+    stream?.getTracks().forEach((track) => track.stop());
+    audioProcessorRef.current?.disconnect();
+    audioSourceRef.current?.disconnect();
+    audioProcessorRef.current = null;
+    audioSourceRef.current = null;
+    audioStreamRef.current = null;
+    if (!context) return;
+    const blob = encodeWav(audioChunksRef.current, context.sampleRate);
+    audioChunksRef.current = [];
+    await context.close();
+    audioContextRef.current = null;
+    if (blob.size < 2048) {
+      setVoiceError("That recording was empty. Please try again.");
+      return;
+    }
+    try {
+      await voice.mutateAsync(await blobToDataUrl(blob));
+    } catch {
+      // The mutation displays the safe error in the composer.
+    }
   }
 
   return (
@@ -244,7 +407,7 @@ function TerminalPage() {
                           variant="outline"
                           size="sm"
                           key={q}
-                          onClick={() => send(q)}
+                          onClick={() => void send({ text: q })}
                           className="h-auto rounded-full px-2.5 py-1.5 text-[11px] font-normal text-muted-foreground shadow-none hover:text-primary"
                         >
                           {q}
@@ -284,6 +447,15 @@ function TerminalPage() {
                           )}
                         </div>
                       )}
+                      {m.files && m.files.length > 0 && (
+                        <Attachments variant="grid" className="mb-1 ml-0">
+                          {m.files.map((file, fileIndex) => (
+                            <Attachment data={{ ...file, id: `${i}-${fileIndex}` }} key={`${i}-${fileIndex}`}>
+                              <AttachmentPreview />
+                            </Attachment>
+                          ))}
+                        </Attachments>
+                      )}
                       {m.role === "assistant" ? (
                         <MessageResponse>{m.text}</MessageResponse>
                       ) : (
@@ -304,21 +476,51 @@ function TerminalPage() {
             </Conversation>
 
             <div className="bg-card px-3.5 pb-3 pt-2">
+              {(voiceError || isRecording || voice.isPending) && (
+                <p className={cn("mb-2 px-1 text-xs", voiceError ? "text-destructive" : "text-muted-foreground")} role={voiceError ? "alert" : "status"}>
+                  {voiceError || (isRecording ? "Listening… tap stop when you are finished." : "Transcribing your voice message…")}
+                </p>
+              )}
               <PromptInput
-                onSubmit={(message) => send(message.text)}
+                accept="image/png,image/jpeg,image/webp"
+                maxFiles={1}
+                maxFileSize={MAX_IMAGE_BYTES}
+                onError={(error) => setVoiceError(error.code === "max_file_size" ? "Chart images must be under 3 MB." : "Attach one PNG, JPEG, or WebP chart image.")}
+                onSubmit={(message) => send(message)}
                 className="rounded-[18px] border-border bg-card shadow-sm transition-shadow focus-within:shadow-md"
               >
+                <ComposerAttachments />
                 <PromptInputTextarea
+                  ref={textareaRef}
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   placeholder="How can I help you today?"
                   className="min-h-14 max-h-32 px-3 pt-3 text-sm"
                 />
                 <PromptInputFooter className="px-2 pb-2">
-                  <span className="pl-1 text-[11px] text-muted-foreground">Jenvu AI</span>
+                  <PromptInputTools>
+                    <PromptInputActionMenu>
+                      <PromptInputActionMenuTrigger aria-label="Attach chart image" tooltip="Attach chart image">
+                        <ImagePlus className="size-4" />
+                      </PromptInputActionMenuTrigger>
+                      <PromptInputActionMenuContent>
+                        <PromptInputActionAddAttachments label="Upload chart image" />
+                      </PromptInputActionMenuContent>
+                    </PromptInputActionMenu>
+                    <PromptInputButton
+                      aria-label={isRecording ? "Stop recording" : "Record voice message"}
+                      tooltip={isRecording ? "Stop recording" : "Record voice message"}
+                      disabled={voice.isPending}
+                      onClick={() => void (isRecording ? stopRecording() : startRecording())}
+                      className={cn(isRecording && "bg-destructive text-destructive-foreground hover:bg-destructive/90")}
+                    >
+                      {isRecording ? <Square className="size-3 fill-current" /> : <Mic className="size-4" />}
+                    </PromptInputButton>
+                    <span className="pl-1 text-[11px] text-muted-foreground">Jenvu AI</span>
+                  </PromptInputTools>
                   <PromptInputSubmit
                     status={ask.isPending ? "submitted" : "ready"}
-                    disabled={ask.isPending || !input.trim()}
+                    disabled={ask.isPending || voice.isPending || isRecording}
                     className="h-8 w-8 rounded-full"
                   />
                 </PromptInputFooter>

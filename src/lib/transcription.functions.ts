@@ -62,7 +62,8 @@ export const transcribeVoiceMessage = createServerFn({ method: "POST" })
     const form = new FormData();
     form.append("model", "google/gemini-3.5-transcribe");
     form.append("stream", "true");
-    form.append("file", new Blob([bytes], { type: "audio/wav" }), "recording.wav");
+    const wavBuffer = bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) as ArrayBuffer;
+    form.append("file", new Blob([wavBuffer], { type: "audio/wav" }), "recording.wav");
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/audio/transcriptions", {
       method: "POST",
