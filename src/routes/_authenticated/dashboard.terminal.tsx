@@ -54,7 +54,7 @@ import { Shimmer } from "@/components/ai-elements/shimmer";
 import jenvuLogo from "@/assets/jenvu-logo.png";
 import jenvuTick from "@/assets/jenvu-tick.png";
 
-export const Route = createFileRoute("/_authenticated/terminal")({
+export const Route = createFileRoute("/_authenticated/dashboard/terminal")({
   head: () => ({
     meta: [
       { title: "Jenvu Terminal — Live XAU/USD Chart & AI Desk" },

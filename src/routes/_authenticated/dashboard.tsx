@@ -176,7 +176,7 @@ const NAV_GROUPS: Array<{ label: string; items: TabItem[] }> = [
         exact: true,
         countKey: "saved",
       },
-      { to: "/terminal", label: "Terminal", icon: Terminal },
+      { to: "/dashboard/terminal", label: "Terminal", icon: Terminal },
     ],
   },
   {
