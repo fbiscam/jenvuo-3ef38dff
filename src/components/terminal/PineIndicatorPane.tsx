@@ -1,17 +1,26 @@
 import { useEffect, useMemo, useRef } from "react";
 import {
   createChart,
+  createSeriesMarkers,
   CandlestickSeries,
   LineSeries,
   LineStyle,
   type IChartApi,
+  type SeriesMarker,
   type Time,
 } from "lightweight-charts";
 import { X } from "lucide-react";
 import { PineError, runPineScript, type PineCandle } from "@/lib/pine/engine";
+import { computeMarketStructure } from "@/lib/pine/market-structure";
 import { Button } from "@/components/ui/button";
 
-export type PineIndicator = { id: string; name: string; code: string };
+export type PineIndicator = {
+  id: string;
+  name: string;
+  code: string;
+  builtin?: "market-structure";
+  locked?: boolean;
+};
 
 type Props = {
   indicator: PineIndicator;
@@ -23,7 +32,15 @@ export function PineIndicatorPane({ indicator, candles, onRemove }: Props) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const chartRef = useRef<IChartApi | null>(null);
 
+  const structure = useMemo(
+    () => (indicator.builtin === "market-structure" ? computeMarketStructure(candles) : null),
+    [indicator.builtin, candles],
+  );
+
   const compiled = useMemo(() => {
+    if (indicator.builtin === "market-structure") {
+      return { ok: true as const, value: { name: indicator.name, overlay: true, plots: [], hlines: [] } };
+    }
     try {
       return { ok: true as const, value: runPineScript(indicator.code, candles) };
     } catch (error) {
@@ -60,7 +77,7 @@ export function PineIndicatorPane({ indicator, candles, onRemove }: Props) {
     chartRef.current = chart;
 
     if (result.overlay) {
-      const price = chart.addSeries(CandlestickSeries, {
+      const price: ReturnType<typeof chart.addSeries> = chart.addSeries(CandlestickSeries, {
         upColor: "#26a69a",
         downColor: "#ef5350",
         borderVisible: false,
@@ -76,6 +93,42 @@ export function PineIndicatorPane({ indicator, candles, onRemove }: Props) {
           close: c.close,
         })),
       );
+
+      if (structure) {
+        const markers: SeriesMarker<Time>[] = [];
+        for (const swing of structure.swings.slice(-40)) {
+          const bullish = swing.label === "HH" || swing.label === "HL";
+          markers.push({
+            time: swing.time as Time,
+            position: swing.label === "HH" || swing.label === "LH" ? "aboveBar" : "belowBar",
+            color: bullish ? "#00a67d" : "#e91e63",
+            shape: swing.label === "HH" || swing.label === "LH" ? "arrowDown" : "arrowUp",
+            text: swing.label,
+          });
+        }
+        for (const event of structure.events.slice(-12)) {
+          markers.push({
+            time: event.time as Time,
+            position: event.direction === "bullish" ? "belowBar" : "aboveBar",
+            color: event.kind === "CHoCH" ? "#f59e0b" : event.direction === "bullish" ? "#00a67d" : "#e91e63",
+            shape: "circle",
+            text: event.kind,
+          });
+          const level = chart.addSeries(LineSeries, {
+            color: event.kind === "CHoCH" ? "#f59e0b" : "#64748b",
+            lineWidth: 1,
+            lineStyle: LineStyle.Dashed,
+            priceLineVisible: false,
+            lastValueVisible: false,
+            crosshairMarkerVisible: false,
+          });
+          level.setData([
+            { time: event.fromTime as Time, value: event.price },
+            { time: event.time as Time, value: event.price },
+          ]);
+        }
+        createSeriesMarkers(price, markers.sort((a, b) => Number(a.time) - Number(b.time)));
+      }
     }
 
     for (const plot of result.plots) {
@@ -114,13 +167,16 @@ export function PineIndicatorPane({ indicator, candles, onRemove }: Props) {
       chart.remove();
       chartRef.current = null;
     };
-  }, [compiled, candles]);
+  }, [compiled, candles, structure]);
 
   return (
     <div className="flex min-h-0 flex-col border-t border-border bg-background">
       <div className="flex h-8 shrink-0 items-center gap-2 px-3">
         <span className="truncate text-xs font-medium">{indicator.name}</span>
         {!compiled.ok && <span className="text-xs text-destructive">Script error</span>}
+        {indicator.locked ? (
+          <span className="ml-auto text-[10px] uppercase text-muted-foreground">Default</span>
+        ) : (
         <Button
           type="button"
           variant="ghost"
@@ -132,6 +188,7 @@ export function PineIndicatorPane({ indicator, candles, onRemove }: Props) {
         >
           <X className="h-3.5 w-3.5" />
         </Button>
+        )}
       </div>
       {compiled.ok ? (
         <div ref={containerRef} className="h-[170px] w-full" />

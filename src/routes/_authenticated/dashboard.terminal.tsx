@@ -8,6 +8,7 @@ import {
   Copy,
   History,
   ImagePlus,
+  Lock,
   Mic,
   PanelRightClose,
   Square,
@@ -107,6 +108,14 @@ const THREADS_KEY = "jenvu:terminal:threads:v1";
 const TERMINAL_SETTINGS_KEY = "jenvu:terminal:settings:v1";
 const PINE_SCRIPT_KEY = "jenvu:terminal:pine-script:v1";
 const PINE_INDICATORS_KEY = "jenvu:terminal:pine-indicators:v1";
+
+const BUILTIN_INDICATOR: PineIndicator = {
+  id: "builtin-market-structure",
+  name: "JENVU AI Market Structure (HH/HL/LH/LL · BOS · CHoCH)",
+  code: "",
+  builtin: "market-structure",
+  locked: true,
+};
 
 const DEFAULT_PINE = `//@version=6
 indicator("My Gold EMA", overlay=true)
@@ -242,7 +251,7 @@ function TerminalPage() {
   const [historyOpen, setHistoryOpen] = useState(false);
   const [pineOpen, setPineOpen] = useState(false);
   const [pineCode, setPineCode] = useState(DEFAULT_PINE);
-  const [indicators, setIndicators] = useState<PineIndicator[]>([]);
+  const [indicators, setIndicators] = useState<PineIndicator[]>([BUILTIN_INDICATOR]);
   const [pineError, setPineError] = useState("");
   const [pineStatus, setPineStatus] = useState("");
   const [copied, setCopied] = useState(false);
@@ -466,7 +475,12 @@ function TerminalPage() {
       const savedIndicators = JSON.parse(
         window.localStorage.getItem(PINE_INDICATORS_KEY) || "null",
       ) as PineIndicator[] | null;
-      if (Array.isArray(savedIndicators)) setIndicators(savedIndicators);
+      if (Array.isArray(savedIndicators)) {
+        setIndicators([
+          BUILTIN_INDICATOR,
+          ...savedIndicators.filter((item) => item && !item.locked && item.id !== BUILTIN_INDICATOR.id),
+        ]);
+      }
 
       const CHART_USER_KEY = "jenvu:terminal:chart-user:v1";
       let chartUser = window.localStorage.getItem(CHART_USER_KEY);
@@ -506,7 +520,10 @@ function TerminalPage() {
 
   useEffect(() => {
     if (!hydratedRef.current) return;
-    window.localStorage.setItem(PINE_INDICATORS_KEY, JSON.stringify(indicators));
+    window.localStorage.setItem(
+      PINE_INDICATORS_KEY,
+      JSON.stringify(indicators.filter((item) => !item.locked)),
+    );
   }, [indicators]);
 
   useEffect(() => {
@@ -603,17 +620,15 @@ function TerminalPage() {
                 <img src={jenvuLogo} alt="" className="h-4 w-4 shrink-0 object-contain" />
                 Ask With AI
               </button>
-              <Button
-                type="button"
-                variant={pineOpen ? "secondary" : "ghost"}
-                size="icon"
-                onClick={() => setPineOpen((open) => !open)}
-                className="h-7 w-7 text-muted-foreground"
-                title="Pine Script workspace"
-                aria-label="Pine Script workspace"
+              <span
+                className="relative flex h-7 w-7 cursor-not-allowed items-center justify-center rounded-md text-muted-foreground opacity-60"
+                title="Pine Script is locked"
+                aria-label="Pine Script is locked"
+                aria-disabled="true"
               >
                 <Code2 className="h-3.5 w-3.5" />
-              </Button>
+                <Lock className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 text-foreground" />
+              </span>
             </div>
             <div className="flex h-full min-h-0 w-full flex-col">
               <iframe
