@@ -10,7 +10,6 @@ import {
   ImagePlus,
   Mic,
   PanelRightClose,
-  PanelRightOpen,
   Square,
   SquarePen,
   Trash2,
@@ -114,7 +113,10 @@ const MAX_IMAGE_BYTES = 3 * 1024 * 1024;
 
 function pendingLabel(query: string, hasImage: boolean): string {
   if (hasImage) return "Reviewing your chart…";
-  const tradingQuery = /\b(gold|xau|chart|trade|trading|setup|signal|entry|buy|sell|long|short|analysis|analyze|bias|price|trend|level|zone|liquidity|fvg|order\s*block|bos|choch|smc|ict|killzone|scalp|swing)\b/i.test(query);
+  const tradingQuery =
+    /\b(gold|xau|chart|trade|trading|setup|signal|entry|buy|sell|long|short|analysis|analyze|bias|price|trend|level|zone|liquidity|fvg|order\s*block|bos|choch|smc|ict|killzone|scalp|swing)\b/i.test(
+      query,
+    );
   return tradingQuery ? "Reviewing gold structure…" : "Preparing your answer…";
 }
 
@@ -188,6 +190,7 @@ function TerminalPage() {
   const [tf, setTf] = useState(TIMEFRAMES[3]);
   const theme = "light" as const;
   const [deskOpen, setDeskOpen] = useState(true);
+  const [chartUserId, setChartUserId] = useState<string | null>(null);
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<ChatMsg[]>([]);
   const [threads, setThreads] = useState<ChatThread[]>([]);
@@ -294,10 +297,13 @@ function TerminalPage() {
       withdateranges: "1",
       details: "1",
       save_chart_properties_to_local_storage: "1",
+      saveimage: "1",
+      client_id: "jenvu.com",
+      user_id: chartUserId || "jenvu-guest",
       studies: JSON.stringify(["STD;EMA", "STD;RSI"]),
     });
     return `https://s.tradingview.com/widgetembed/?${params.toString()}`;
-  }, [tf.tv]);
+  }, [tf.tv, chartUserId]);
 
   const ask = useMutation({
     mutationFn: async ({ query, chartImage }: { query: string; chartImage?: string }) =>
@@ -319,10 +325,7 @@ function TerminalPage() {
       });
     },
   });
-  const loadingLabel = pendingLabel(
-    ask.variables?.query ?? "",
-    Boolean(ask.variables?.chartImage),
-  );
+  const loadingLabel = pendingLabel(ask.variables?.query ?? "", Boolean(ask.variables?.chartImage));
 
   const voice = useMutation({
     mutationFn: async (audioDataUrl: string) => transcribe({ data: { audioDataUrl } }),
@@ -360,6 +363,14 @@ function TerminalPage() {
       if (typeof settings?.pineOpen === "boolean") setPineOpen(settings.pineOpen);
       const savedPine = window.localStorage.getItem(PINE_SCRIPT_KEY);
       if (savedPine) setPineCode(savedPine);
+
+      const CHART_USER_KEY = "jenvu:terminal:chart-user:v1";
+      let chartUser = window.localStorage.getItem(CHART_USER_KEY);
+      if (!chartUser) {
+        chartUser = `jenvu-${Math.random().toString(36).slice(2, 12)}`;
+        window.localStorage.setItem(CHART_USER_KEY, chartUser);
+      }
+      setChartUserId(chartUser);
     } catch {
       // Keep a clean workspace if saved browser data is unavailable or malformed.
     } finally {
@@ -483,19 +494,16 @@ function TerminalPage() {
             >
               <Code2 className="h-3.5 w-3.5" />
             </Button>
-            {!deskOpen && (
-              <Button
-                type="button"
-                variant="secondary"
-                size="icon"
-                onClick={() => setDeskOpen(true)}
-                className="absolute right-3 top-3 z-10 h-9 w-9 shadow-sm"
-                title="Show AI Desk"
-                aria-label="Show AI Desk"
-              >
-                <PanelRightOpen className="h-4 w-4" />
-              </Button>
-            )}
+            <button
+              type="button"
+              onClick={() => setDeskOpen(true)}
+              className="absolute right-44 top-1.5 z-10 flex h-7 items-center gap-1.5 rounded-md px-2 text-xs font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+              title="Ask With AI"
+              aria-label="Ask With AI"
+            >
+              <img src={jenvuLogo} alt="" className="h-4 w-4 shrink-0 object-contain" />
+              Ask With AI
+            </button>
             <iframe
               key={chartSrc}
               src={chartSrc}
@@ -702,24 +710,25 @@ function TerminalPage() {
                             "rounded-2xl bg-secondary px-3.5 py-2.5 text-secondary-foreground",
                         )}
                       >
-                        {m.signal && (m.signal.direction === "BUY" || m.signal.direction === "SELL") && (
-                          <div className="mb-2 flex flex-wrap gap-1.5 text-[10px] font-semibold">
-                            <span className="rounded bg-secondary px-2 py-0.5">
-                              {m.signal.direction}
-                            </span>
-                            <span className="rounded bg-secondary px-2 py-0.5">
-                              Entry {m.signal.entry}
-                            </span>
-                            <span className="rounded bg-secondary px-2 py-0.5">
-                              SL {m.signal.stopLoss}
-                            </span>
-                            {m.signal.takeProfits?.[0] && (
+                        {m.signal &&
+                          (m.signal.direction === "BUY" || m.signal.direction === "SELL") && (
+                            <div className="mb-2 flex flex-wrap gap-1.5 text-[10px] font-semibold">
                               <span className="rounded bg-secondary px-2 py-0.5">
-                                TP {m.signal.takeProfits[0]}
+                                {m.signal.direction}
                               </span>
-                            )}
-                          </div>
-                        )}
+                              <span className="rounded bg-secondary px-2 py-0.5">
+                                Entry {m.signal.entry}
+                              </span>
+                              <span className="rounded bg-secondary px-2 py-0.5">
+                                SL {m.signal.stopLoss}
+                              </span>
+                              {m.signal.takeProfits?.[0] && (
+                                <span className="rounded bg-secondary px-2 py-0.5">
+                                  TP {m.signal.takeProfits[0]}
+                                </span>
+                              )}
+                            </div>
+                          )}
                         {m.files && m.files.length > 0 && (
                           <Attachments variant="grid" className="mb-1 ml-0">
                             {m.files.map((file, fileIndex) => (
