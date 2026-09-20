@@ -5,9 +5,9 @@ export const Route = createFileRoute("/about")({
   head: () => ({
     meta: [
       { title: "About Jenvu — Our Mission" },
-      { name: "description", content: "Meet Jenvu — the mission, philosophy and team behind the AI gold trading extension for XAU/USD." },
+      { name: "description", content: "Meet Jenvu — the mission, philosophy and team behind the AI gold trading terminal for XAU/USD." },
       { property: "og:title", content: "Who We Are — Jenvu" },
-      { property: "og:description", content: "The mission, philosophy and team behind Jenvu's AI-powered TradingView extension." },
+      { property: "og:description", content: "The mission, philosophy and team behind Jenvu's AI-powered trading terminal." },
       { property: "og:url", content: "https://jenvu.com/about" },
     ],
     links: [{ rel: "canonical", href: "https://jenvu.com/about" }],
@@ -20,7 +20,7 @@ function AboutPage() {
     <PageShell
       eyebrow="About"
       title={"Built for traders\u00a0\nwho refuse to guess."}
-      intro="Jenvu was built on a simple thesis: institutional logic shouldn't be locked behind a Bloomberg terminal. We turned ICT and SMC playbooks into an AI extension any serious trader can use directly in TradingView."
+      intro="Jenvu was built on a simple thesis: institutional logic shouldn't be locked behind a Bloomberg terminal. We turned ICT and SMC playbooks into an AI trading terminal any serious trader can use directly in TradingView."
     >
       <section className="space-y-3">
         <H2>The Mission</H2>

@@ -113,7 +113,7 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "Jenvu is an AI TradingView extension for live ICT/SMC gold analysis with precise entries, stops, targets and mandatory senior review on eligible plans.",
+          "Jenvu is an AI trading terminal for live ICT/SMC gold analysis with precise entries, stops, targets and mandatory senior review on eligible plans.",
       },
       { property: "og:title", content: "AI Gold Trading — Jenvu" },
       {
@@ -134,7 +134,7 @@ export const Route = createFileRoute("/")({
           applicationCategory: "FinanceApplication",
           operatingSystem: "Web",
           description:
-            "AI TradingView extension with institutional ICT/SMC analysis and reviewed signals for XAU/USD.",
+            "AI trading terminal with institutional ICT/SMC analysis and reviewed signals for XAU/USD.",
           offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
         }),
       },
@@ -520,7 +520,7 @@ function HomePage() {
 
           {/* Category tabs */}
           <div className="flex flex-wrap items-center justify-center gap-2">
-            {["Wallet & Credits", "Signal Engine", "API & Extension"].map((t, i) => (
+            {["Wallet & Credits", "Signal Engine", "API & Terminal"].map((t, i) => (
               <span
                 key={t}
                 className={`rounded-full border px-4 py-1.5 text-[13px] font-medium ${
@@ -542,7 +542,7 @@ function HomePage() {
               </h3>
               <p className="mt-3 text-[15px] leading-relaxed text-zinc-500">
                 Paid plans unlock realtime A+ signals, AI chart analysis,
-                and API keys for the browser extension.
+                and API keys for the trading terminal.
               </p>
             </div>
             <div className="flex items-center justify-center gap-4">
@@ -601,7 +601,7 @@ function HomePage() {
                   ["Signals / day", "Unlimited"],
                   ["Signal latency", "Realtime"],
                   ["AI chart queries", "Wallet based"],
-                  ["API & Extension", "Included"],
+                  ["API & Terminal", "Included"],
                 ].map(([k, v]) => (
                   <div key={k} className="flex items-center justify-between rounded-lg border border-dashed border-home-accent/50 bg-white px-4 py-2.5">
                     <span className="text-[13px] text-zinc-600">{k}</span>
@@ -711,7 +711,7 @@ function HomePage() {
               <div className="flex w-max items-center gap-10 whitespace-nowrap" style={{ animation: "jenvu-marquee 28s linear infinite" }}>
                 {Array.from({ length: 2 }).map((_, dup) => (
                   <div key={dup} className="flex items-center gap-10 pr-10 text-xs font-medium text-home-accent-foreground">
-                    <span>◈ TradingView extension analyzing gold charts 24/7</span>
+                    <span>◈ built-in trading terminal analyzing gold charts 24/7</span>
                     <span>◉ Real-time gold signals without surprises</span>
                     <span>⌁ Research, reasoning &amp; risk context in one terminal</span>
                     <span>▣ Battle-tested feeds powering desks worldwide</span>

@@ -16,9 +16,9 @@ export const Route = createFileRoute("/pricing")({
   head: () => ({
     meta: [
       { title: "Pricing Plans — Jenvu" },
-      { name: "description", content: "Compare Jenvu plans, extension API key limits, monthly AI wallets, and senior-reviewed GPT/Claude market analysis." },
+      { name: "description", content: "Compare Jenvu plans, API key limits, monthly AI wallets, and senior-reviewed GPT/Claude market analysis." },
       { property: "og:title", content: "Jenvu Pricing — Pro & Elite Plans" },
-      { property: "og:description", content: "Compare Jenvu plans with extension API keys, AI wallets, and senior-reviewed GPT/Claude market analysis." },
+      { property: "og:description", content: "Compare Jenvu plans with API keys, AI wallets, and senior-reviewed GPT/Claude market analysis." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { property: "og:url", content: "https://jenvu.com/pricing" },
@@ -56,14 +56,14 @@ const TIERS = [
     credits: 10,
     features: [
 
-      "AI extension chat",
+      "AI terminal chat",
       "A+ / A institutional signals",
       "Institutional-grade signal engine",
       "Realtime email & push alerts",
       "Full ICT / SMC breakdown",
       "Trade journal & analytics",
       "Multi-timeframe bias engine",
-      "2 extension API keys · $10 AI wallet",
+      "2 API keys · $10 AI wallet",
       "GPT-6 Astra primary analysis",
     ],
 
@@ -81,13 +81,13 @@ const TIERS = [
     credits: 40,
     features: [
 
-      "AI extension chat",
+      "AI terminal chat",
       "Everything in Pro",
       "Institutional-grade signal engine",
       "Priority A+ alerts (< 30s)",
       "Dedicated XAU/USD scanner with DXY overlay",
       "API access & webhooks",
-      "3 extension API keys · $40 AI wallet",
+      "3 API keys · $40 AI wallet",
       "Claude Opus 5 mandatory senior review",
       "Custom alert rules",
       "Dedicated onboarding & SLA",
@@ -99,7 +99,7 @@ const TIERS = [
 
 type Mark = boolean | string;
 const MATRIX: Array<{ feature: string; free: Mark; pro: Mark; elite: Mark }> = [
-  { feature: "AI extension chat", free: "Limited", pro: "$10 wallet", elite: "$40 wallet" },
+  { feature: "AI terminal chat", free: "Limited", pro: "$10 wallet", elite: "$40 wallet" },
   { feature: "A+ signal access", free: true, pro: true, elite: true },
   { feature: "AI models", free: "OpenAI", pro: "OpenAI + DeepSeek + Google", elite: "OpenAI + DeepSeek + Google" },
   { feature: "Alert latency", free: "No alerts", pro: "Realtime", elite: "Realtime" },
@@ -107,7 +107,7 @@ const MATRIX: Array<{ feature: string; free: Mark; pro: Mark; elite: Mark }> = [
   { feature: "Multi-timeframe bias", free: true, pro: true, elite: true },
   { feature: "Trade journal", free: true, pro: true, elite: true },
   { feature: "Dedicated XAU/USD scanner", free: false, pro: true, elite: true },
-  { feature: "Extension API keys", free: false, pro: "2", elite: "3" },
+  { feature: "API keys", free: false, pro: "2", elite: "3" },
   { feature: "Custom alert rules", free: false, pro: false, elite: true },
   { feature: "Dedicated onboarding", free: false, pro: false, elite: true },
 ];
@@ -230,13 +230,13 @@ function PricingPage() {
                 { f: "Monthly AI wallet", b: "$10", c: "$40", d: "$90" },
                 { f: "Daily token limit", b: "1.5M", c: "5M", d: "10M" },
                 { f: "Balance-based quota ($3 = 1M)", b: true, c: true, d: true },
-                { f: "Active extension API keys", b: "2", c: "3", d: "5" },
+                { f: "Active API keys", b: "2", c: "3", d: "5" },
                 { f: "GPT-6 Astra primary analysis", b: true, c: true, d: true },
                 { f: "Claude Opus 5 senior review", b: false, c: true, d: true },
                 { f: "Chat / primary request", b: "$0.03", c: "$0.03", d: "$0.03" },
                 { f: "Senior-reviewed analysis", b: false, c: "$0.20", d: "$0.20" },
 
-                { f: "AI extension chat", b: "$10 wallet", c: "$40 wallet", d: "$90 wallet" },
+                { f: "AI terminal chat", b: "$10 wallet", c: "$40 wallet", d: "$90 wallet" },
 
                 { f: "Signal latency", b: "Realtime", c: "Realtime", d: "Realtime" },
                 { f: "AI models", b: "__MODELS_PLUS__", c: "__MODELS_PLUS__", d: "__MODELS_PLUS__" },

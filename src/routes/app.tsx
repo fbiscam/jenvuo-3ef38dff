@@ -52,7 +52,7 @@ export const Route = createFileRoute("/app")({
         content:
           "Ask Jenvu for live institutional ICT/SMC analysis on XAU/USD — A+ setups, structured entries, stops and targets with clear chart context.",
       },
-      { name: "keywords", content: "gold trading extension, XAU/USD AI analysis, ICT gold analysis, SMC bullion AI, XAUUSD signals" },
+      { name: "keywords", content: "gold trading terminal, XAU/USD AI analysis, ICT gold analysis, SMC bullion AI, XAUUSD signals" },
       { property: "og:title", content: "AI Gold Analysis — Jenvu" },
       { property: "og:description", content: "Institutional AI chart analysis focused on XAU/USD." },
       { property: "og:url", content: "https://jenvu.com/app" },
