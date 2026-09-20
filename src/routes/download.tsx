@@ -32,7 +32,7 @@ export const Route = createFileRoute("/download")({
           applicationCategory: "FinanceApplication",
           operatingSystem: "iOS, Android, Web",
           description:
-            "AI-powered gold chart analysis extension with institutional ICT/SMC logic, reviewed signals and live alerts.",
+            "AI-powered gold chart analysis terminal with institutional ICT/SMC logic, reviewed signals and live alerts.",
           offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
         }),
       },
