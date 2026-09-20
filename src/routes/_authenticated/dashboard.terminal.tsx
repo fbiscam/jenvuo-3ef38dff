@@ -364,6 +364,14 @@ function TerminalPage() {
       if (typeof settings?.pineOpen === "boolean") setPineOpen(settings.pineOpen);
       const savedPine = window.localStorage.getItem(PINE_SCRIPT_KEY);
       if (savedPine) setPineCode(savedPine);
+
+      const CHART_USER_KEY = "jenvu:terminal:chart-user:v1";
+      let chartUser = window.localStorage.getItem(CHART_USER_KEY);
+      if (!chartUser) {
+        chartUser = `jenvu-${Math.random().toString(36).slice(2, 12)}`;
+        window.localStorage.setItem(CHART_USER_KEY, chartUser);
+      }
+      setChartUserId(chartUser);
     } catch {
       // Keep a clean workspace if saved browser data is unavailable or malformed.
     } finally {
