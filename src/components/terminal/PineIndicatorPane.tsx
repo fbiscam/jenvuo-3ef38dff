@@ -43,7 +43,8 @@ export function PineIndicatorPane({ indicator, candles, onRemove }: Props) {
     const result = compiled.value;
 
     const chart = createChart(host, {
-      autoSize: true,
+      width: host.clientWidth || 600,
+      height: host.clientHeight || 170,
       layout: {
         background: { color: "#ffffff" },
         textColor: "#4b5563",
@@ -103,7 +104,13 @@ export function PineIndicatorPane({ indicator, candles, onRemove }: Props) {
     }
 
     chart.timeScale().fitContent();
+    const observer = new ResizeObserver(() => {
+      chart.resize(host.clientWidth, host.clientHeight);
+      chart.timeScale().fitContent();
+    });
+    observer.observe(host);
     return () => {
+      observer.disconnect();
       chart.remove();
       chartRef.current = null;
     };
