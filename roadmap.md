@@ -121,3 +121,4 @@
 - [x] Move history and desk visibility controls into the AI header and enlarge chat text
 - [x] Verify Terminal persistence, navigation, responsive layout, and TypeScript
 - [x] Fit the Terminal chart and AI desk within the dashboard viewport without page scrolling
+- [x] Attach the Terminal directly to the dashboard sidebar and keep the AI desk fixed in view
