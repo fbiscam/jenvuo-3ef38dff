@@ -267,7 +267,7 @@ function TerminalPage() {
             {ask.isPending && (
               <div className="flex items-center gap-2.5 text-sm">
                 <img src={jenvuLogo} alt="" className="h-6 w-6 shrink-0 object-contain" />
-                <Shimmer>Reading the {tf.label} gold chart…</Shimmer>
+                <Shimmer>{`Reading the ${tf.label} gold chart…`}</Shimmer>
               </div>
             )}
             </ConversationContent>
