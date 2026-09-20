@@ -294,10 +294,13 @@ function TerminalPage() {
       withdateranges: "1",
       details: "1",
       save_chart_properties_to_local_storage: "1",
+      saveimage: "1",
+      client_id: "jenvu.com",
+      user_id: chartUserId || "jenvu-guest",
       studies: JSON.stringify(["STD;EMA", "STD;RSI"]),
     });
     return `https://s.tradingview.com/widgetembed/?${params.toString()}`;
-  }, [tf.tv]);
+  }, [tf.tv, chartUserId]);
 
   const ask = useMutation({
     mutationFn: async ({ query, chartImage }: { query: string; chartImage?: string }) =>
