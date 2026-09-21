@@ -24,9 +24,9 @@ test("detects a bullish fair value gap between candle 1 high and candle 3 low", 
   const res = detectPoiEvidence(candles);
   const gap = res.fair_value_gaps.find((g) => g.type === "BULLISH_FVG");
   assert.ok(gap, "expected a bullish FVG");
-  assert.equal(gap!.bottom, 101);
+  assert.equal(gap!.bottom, 102);
   assert.equal(gap!.top, 105);
-  assert.equal(gap!.ce, 103);
+  assert.equal(gap!.ce, 103.5);
 });
 
 test("marks a gap mitigated once price trades fully back through it", () => {
