@@ -1561,7 +1561,6 @@ REVERSAL RULE: quote only these measured levels. A status other than ARMED_BUY_S
     quantBlock,
     apexBlock,
     reversalBlock,
-    reversalBlock,
     structureBlock,
     breakBlock,
     patternBlock,
