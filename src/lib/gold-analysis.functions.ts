@@ -61,6 +61,7 @@ import {
 } from "@/lib/analysis/market-structure-evidence";
 import { detectPoiEvidence } from "@/lib/analysis/poi-evidence";
 import { buildExecutionEvidence } from "@/lib/analysis/execution-evidence";
+import { buildQuantEvidence } from "@/lib/analysis/quant-evidence";
 import { detectCandlestickPatterns } from "@/lib/analysis/candlestick-pattern-evidence";
 
 async function _spendUserCredits(
