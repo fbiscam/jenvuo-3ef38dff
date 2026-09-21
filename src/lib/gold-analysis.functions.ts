@@ -1360,6 +1360,7 @@ POI RULE: quote only these zones with their exact boundaries. A zone is only val
     liquidityBlock,
     advancedLiquidityBlock,
     mtfTrendBlock,
+    poiBlock,
     structureBlock,
     breakBlock,
     patternBlock,
@@ -1463,6 +1464,7 @@ RECENT SWING LOW (150): ${ev.swingLow.toFixed(2)}
 ${ev.liquidityBlock}
 ${ev.advancedLiquidityBlock}
 ${ev.mtfTrendBlock}
+${ev.poiBlock}
 ${ev.structureBlock}
 ${ev.breakBlock}
 ${ev.patternBlock}
@@ -1612,6 +1614,7 @@ Perform an evidence-first chart review. Inspect only what is visibly supported: 
     liquidityBlock,
     advancedLiquidityBlock,
     mtfTrendBlock,
+    poiBlock,
     structureBlock,
     breakBlock,
     patternBlock,
@@ -1721,6 +1724,7 @@ RECENT SWING LOW (150): ${swingLow.toFixed(2)}
 ${liquidityBlock}
 ${advancedLiquidityBlock}
 ${mtfTrendBlock}
+${poiBlock}
 ${structureBlock}
 ${breakBlock}
 ${patternBlock}
