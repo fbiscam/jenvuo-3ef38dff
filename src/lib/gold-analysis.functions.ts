@@ -1364,7 +1364,8 @@ Perform an evidence-first chart review. Inspect only what is visibly supported: 
       ictAnalysis: String(parsed.ictAnalysis ?? ""),
       smcAnalysis: String(parsed.smcAnalysis ?? ""),
       marketStructure: String(parsed.marketStructure ?? ""),
-      spokenSummary: deterministicStructure ?? String(parsed.spokenSummary ?? "Chart review complete."),
+      spokenSummary:
+        deterministicStructure ?? String(parsed.spokenSummary ?? "Chart review complete."),
       fullAnalysis:
         deterministicStructure ??
         String(parsed.fullAnalysis ?? parsed.spokenSummary ?? "Chart review complete."),
