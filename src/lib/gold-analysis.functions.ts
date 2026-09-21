@@ -1490,6 +1490,52 @@ APEX CONFLUENCE: ${apex.trade_execution.apex_confluence_score}${apex.notes.lengt
 APEX RULE: never claim CVD, delta or footprint data beyond this proxy, and never state a win rate or probability — the Apex score is a checklist count. A PRE_FIX_BLACKOUT means no entry until the LBMA fix sweep is confirmed; MACRO_DIVERGENCE means half risk or stand aside; an ABORT verdict overrides every lower-layer setup.`
     : "VERIFIED APEX PREDATOR LAYER: unavailable (insufficient closed candles)";
 
+  // Extreme M30 Gold Reversal Engine (Three Stocks funded edition): location,
+  // session, anatomy, 1:3 clean traffic and the 2-trades-per-day lock.
+  const [m30Candles, h4Candles, h1Candles] = await Promise.all([
+    fetchTerminalGoldEvidenceCandles("30m")
+      .then((c) => closedCandlesOnly(c, "30m").slice(-200))
+      .catch(() => [] as Candle[]),
+    fetchTerminalGoldEvidenceCandles("4h")
+      .then((c) => closedCandlesOnly(c, "4h").slice(-150))
+      .catch(() => [] as Candle[]),
+    fetchTerminalGoldEvidenceCandles("1h")
+      .then((c) => closedCandlesOnly(c, "1h").slice(-150))
+      .catch(() => [] as Candle[]),
+  ]);
+  const reversal =
+    m30Candles.length >= 20
+      ? buildThreeStocksEvidence({
+          m30: m30Candles.map((c) => ({ t: c.t, o: c.o, h: c.h, l: c.l, c: c.c, v: c.v })),
+          h4: h4Candles.map((c) => ({ t: c.t, o: c.o, h: c.h, l: c.l, c: c.c, v: c.v })),
+          h1: h1Candles.map((c) => ({ t: c.t, o: c.o, h: c.h, l: c.l, c: c.c, v: c.v })),
+        })
+      : null;
+  const reversalBlock = reversal
+    ? `VERIFIED EXTREME M30 GOLD REVERSAL ENGINE (Three Stocks mother/inside-bar, closed M30 candles only):
+STATUS: ${reversal.status}
+SESSION: ${reversal.session} (${reversal.session_allowed ? "London/NY killzone — accepted" : "outside London Open / NY Open — reversals ignored"})
+M30 ATR(14): ${reversal.atr_14.toFixed(2)}
+DAILY TRADES TAKEN: ${reversal.daily_trades_taken}/2${reversal.engine_locked ? " — ENGINE LOCKED" : ""}
+SWEPT MAJOR LEVEL: ${
+        reversal.swept_level
+          ? `${reversal.swept_level.timeframe} ${reversal.swept_level.kind} ${reversal.swept_level.price.toFixed(2)} @ ${stamp(reversal.swept_level.t)}`
+          : "none (pattern not at an H4/H1 extreme)"
+      }
+PATTERN: ${
+        reversal.pattern
+          ? `mother ${reversal.pattern.mother_low.toFixed(2)}–${reversal.pattern.mother_high.toFixed(2)} (range ${reversal.pattern.mother_range.toFixed(2)}) @ ${stamp(reversal.pattern.mother_t)}; inside ${reversal.pattern.inside_low.toFixed(2)}–${reversal.pattern.inside_high.toFixed(2)} @ ${stamp(reversal.pattern.inside_t)}; volume mother ${reversal.pattern.mother_volume ?? "n/a"} vs inside ${reversal.pattern.inside_volume ?? "n/a"}`
+          : "no mother / inside-bar pair on the last two closed M30 candles"
+      }
+PLAN: ${
+        reversal.plan
+          ? `${reversal.plan.direction} STOP | entry ${reversal.plan.entry.toFixed(2)} | SL ${reversal.plan.stop_loss.toFixed(2)} | risk ${reversal.plan.risk.toFixed(2)} | 1:3 target ${reversal.plan.target_1_3.toFixed(2)} | break-even at ${reversal.plan.break_even_trigger.toFixed(2)} (1:1.5 RR) | nearest opposing M30 swing ${reversal.plan.nearest_opposing_swing?.toFixed(2) ?? "none"} | clean traffic ${reversal.plan.clean_traffic ? "YES" : "NO"}`
+          : "none"
+      }${reversal.rejections.length ? `\nREJECTIONS: ${reversal.rejections.join(" ")}` : ""}
+REVERSAL RULE: quote only these measured levels. A status other than ARMED_BUY_STOP / ARMED_SELL_STOP means there is no valid Three Stocks setup — say so plainly instead of improvising one. Entry, stop and target are study references from closed candles, never a guaranteed outcome or win rate, and the 2-trade daily lock is absolute.`
+    : "VERIFIED EXTREME M30 GOLD REVERSAL ENGINE: unavailable (insufficient closed M30 candles)";
+
+
   const compact = recent
     .map(
       (c) =>
