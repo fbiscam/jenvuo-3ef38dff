@@ -1543,6 +1543,7 @@ ${ev.advancedLiquidityBlock}
 ${ev.mtfTrendBlock}
 ${ev.poiBlock}
 ${ev.executionBlock}
+${ev.quantBlock}
 ${ev.structureBlock}
 ${ev.breakBlock}
 ${ev.patternBlock}
@@ -1694,6 +1695,7 @@ Perform an evidence-first chart review. Inspect only what is visibly supported: 
     mtfTrendBlock,
     poiBlock,
     executionBlock,
+    quantBlock,
     structureBlock,
     breakBlock,
     patternBlock,
