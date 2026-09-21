@@ -154,7 +154,7 @@ export function classifyVsa(candles: QuantCandle[], index: number): VsaSignature
 export function detectMotherInsideBar(candles: QuantCandle[]): MotherInsideBar | null {
   if (candles.length < 5) return null;
   const atr = computeAtr(candles);
-  for (let i = candles.length - 2; i >= 2; i--) {
+  for (let i = candles.length - 1; i >= 2; i--) {
     const mother = candles[i - 1];
     const inside = candles[i];
     if (!mother || !inside) continue;
@@ -323,6 +323,8 @@ export function buildQuantEvidence(input: {
     notes.push("Latest mother/inside formation already broke — parameters are historical, not live.");
   } else if (!pattern) {
     notes.push("No qualifying mother candle + inside bar in the supplied window.");
+  } else if (patternBias === "UNRESOLVED") {
+    notes.push("Mother/inside formation is unresolved — no directional bias, so no order parameters.");
   }
 
   const confluences = [

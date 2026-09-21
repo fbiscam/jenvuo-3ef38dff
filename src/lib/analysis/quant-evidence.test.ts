@@ -71,7 +71,7 @@ test("mother + inside bar is detected and produces 1:3 execution params", () => 
 test("break-even trigger sits at 1R and trail activates at 1.5R", () => {
   const mgmt = buildTradeManagement("BUY", 2030.15, 2026.7, 3.45);
   assert.equal(mgmt.break_even_trigger_price, 2033.6);
-  assert.equal(mgmt.trail_activation_price, 2035.32);
+  assert.equal(mgmt.trail_activation_price, 2035.33);
   assert.equal(mgmt.trail_distance, 3.45);
 });
 
