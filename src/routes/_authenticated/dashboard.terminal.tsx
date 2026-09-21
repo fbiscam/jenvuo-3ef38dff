@@ -47,7 +47,6 @@ import {
 } from "@/components/ai-elements/attachments";
 import { Shimmer } from "@/components/ai-elements/shimmer";
 import jenvuLogo from "@/assets/jenvu-logo.png";
-import jenvuTick from "@/assets/jenvu-tick.png";
 
 export const Route = createFileRoute("/_authenticated/dashboard/terminal")({
   head: () => ({
@@ -544,19 +543,6 @@ function TerminalPage() {
           {deskOpen && (
             <aside className="relative flex h-[45%] min-h-0 w-full shrink-0 flex-col border-t border-border bg-card text-card-foreground lg:h-full lg:w-[380px] lg:border-l lg:border-t-0">
               <div className="flex min-h-17 items-center gap-2.5 border-b border-border px-4 py-3">
-                <div className="ml-[46px] min-w-0">
-                  <div className="flex items-center gap-1">
-                    <span className="text-lg font-medium leading-none">Jenvu</span>
-                    <img
-                      src={jenvuTick}
-                      alt="Verified"
-                      className="h-4.5 w-4.5 shrink-0 object-contain"
-                    />
-                  </div>
-                  <p className="mt-1 text-[10px] font-medium text-muted-foreground">
-                    Gold 30-minute analysis ready
-                  </p>
-                </div>
                 <Button
                   type="button"
                   variant="ghost"
