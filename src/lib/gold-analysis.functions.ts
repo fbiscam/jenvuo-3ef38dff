@@ -1293,6 +1293,71 @@ LAST CONFIRMED HIGH: ${lastHigh ? fmtPivot(lastHigh) : "n/a"}
 LAST CONFIRMED LOW: ${lastLow ? fmtPivot(lastLow) : "n/a"}
 ${lastShift}`
     : "";
+
+  // ---- Deterministic BOS / CHOCH / IDM detection -------------------------
+  // A pivot only becomes tradable structure two bars after it prints, so we
+  // replay the candles in order and only allow breaks of already-confirmed
+  // swing points. Everything the model says about BOS, CHOCH, inducement and
+  // trend is read from this block instead of being guessed from the chart.
+  const indexByTime = new Map<number, number>();
+  recent.forEach((c, i) => indexByTime.set(c.t, i));
+  type Break = { t: number; type: "BOS" | "CHOCH"; dir: "bullish" | "bearish"; level: number };
+  const breaks: Break[] = [];
+  let liveTrend: "bullish" | "bearish" | "none" = "none";
+  let activeHigh: Pivot | null = null;
+  let activeLow: Pivot | null = null;
+  let pivotCursor = 0;
+  for (let i = 0; i < recent.length; i++) {
+    while (pivotCursor < pivots.length) {
+      const p = pivots[pivotCursor];
+      const pi = indexByTime.get(p.t);
+      if (pi === undefined || pi + 2 > i) break;
+      if (p.kind === "high") activeHigh = p;
+      else activeLow = p;
+      pivotCursor += 1;
+    }
+    const c = recent[i];
+    if (activeHigh && c.c > activeHigh.price) {
+      const type = liveTrend === "bearish" ? "CHOCH" : "BOS";
+      breaks.push({ t: c.t, type, dir: "bullish", level: activeHigh.price });
+      liveTrend = "bullish";
+      activeHigh = null;
+    } else if (activeLow && c.c < activeLow.price) {
+      const type = liveTrend === "bullish" ? "CHOCH" : "BOS";
+      breaks.push({ t: c.t, type, dir: "bearish", level: activeLow.price });
+      liveTrend = "bearish";
+      activeLow = null;
+    }
+  }
+  const stamp = (t: number) => new Date(t).toISOString().slice(5, 16) + "Z";
+  const recentBreaks = breaks.slice(-5);
+  const lastBreak = breaks[breaks.length - 1] ?? null;
+  // Inducement = the last opposite-side pivot printed before the break; price
+  // usually has to take that liquidity before respecting the POI behind it.
+  const idmLine = (() => {
+    if (!lastBreak) return "INDUCEMENT (IDM): no confirmed break in the supplied window";
+    const wanted = lastBreak.dir === "bullish" ? "low" : "high";
+    const idm = [...pivots].reverse().find((p) => p.kind === wanted && p.t < lastBreak.t);
+    if (!idm) return "INDUCEMENT (IDM): no qualifying pivot before the last break";
+    const after = recent.filter((c) => c.t > lastBreak.t);
+    const swept =
+      wanted === "low"
+        ? after.some((c) => c.l < idm.price)
+        : after.some((c) => c.h > idm.price);
+    return `INDUCEMENT (IDM): ${wanted === "low" ? "sell-side" : "buy-side"} pool at ${idm.price.toFixed(
+      2,
+    )} (${stamp(idm.t)}) — ${swept ? "already swept after the break" : "still unswept"}`;
+  })();
+  const breakBlock = breaks.length
+    ? `CONFIRMED BREAKS (close-through of a confirmed swing, oldest -> newest):
+${recentBreaks
+  .map((b) => `${b.type} ${b.dir} through ${b.level.toFixed(2)} @ ${stamp(b.t)}`)
+  .join("\n")}
+LAST BREAK: ${lastBreak ? `${lastBreak.type} ${lastBreak.dir} through ${lastBreak.level.toFixed(2)} @ ${stamp(lastBreak.t)}` : "n/a"}
+TREND FROM BREAKS: ${liveTrend === "none" ? "undecided" : liveTrend.toUpperCase()}
+${idmLine}`
+    : "CONFIRMED BREAKS: none inside the supplied window (no close-through of a confirmed swing)";
+
   const price = last ? last.c : 0;
   const buySideLevels = Array.from(new Set(pivotHighs.filter((h) => h > price)))
     .sort((a, b) => a - b)
@@ -1341,7 +1406,10 @@ Additional rules only for trading questions:
 - Every price level you mention MUST be copied exactly from the supplied CURRENT PRICE, swing high/low, LIQUIDITY levels, or OHLC rows. Never round, guess, or extrapolate a level, and never quote a level outside the supplied swing high/low range.
 - When asked where liquidity is sitting, quote the nearest supplied buy-side and sell-side levels first and state their distance from the current price.
 - Market structure is already computed for you in CONFIRMED SWING STRUCTURE. When the user asks where an HH, HL, LH or LL formed, answer with the exact labelled pivot price and its timestamp from that block. Never re-derive, rename, or invent a swing point, and never label a level the block does not label.
-- Use CURRENT STRUCTURE for bias, and cite the listed last structure change when explaining a BOS or CHOCH.
+- BOS, CHOCH and inducement are already computed in CONFIRMED BREAKS. A BOS is a close-through of a confirmed swing in the direction of the existing trend (continuation); a CHOCH is the first close-through of a confirmed swing against it (possible reversal). Only call something a BOS or CHOCH if it is listed there, and quote its level and timestamp.
+- Use TREND FROM BREAKS together with CURRENT STRUCTURE for bias; if they disagree, say so and explain that the market is transitioning.
+- When asked about inducement/IDM, use the INDUCEMENT line: the engineered pool traders get trapped in before price respects the POI behind it. State whether it is swept or unswept and what that implies for the next leg.
+- Explain the mechanics (why liquidity was taken, where the displacement came from, what invalidates it), not just the labels.
 - Coach the user to build their own plan by explaining relevant structure, confirmation, invalidation, or risk.
 - You may suggest what to watch, but never provide a finished signal with committed entry, stop loss, and take profit.
 - Never claim certainty, guaranteed accuracy, personal years of experience, or guaranteed wins.
@@ -1404,6 +1472,7 @@ RECENT SWING HIGH (150): ${swingHigh.toFixed(2)}
 RECENT SWING LOW (150): ${swingLow.toFixed(2)}
 ${liquidityBlock}
 ${structureBlock}
+${breakBlock}
 LAST 150 CANDLES (OHLC):
 ${compact}
 
