@@ -101,9 +101,7 @@ export function detectCandlestickPatterns(input: StructureCandle[]): Candlestick
         patterns,
         candle,
         i,
-        upWick >= candleRange * 0.4 && downWick >= candleRange * 0.4
-          ? "Long-legged doji"
-          : "Doji",
+        upWick >= candleRange * 0.4 && downWick >= candleRange * 0.4 ? "Long-legged doji" : "Doji",
         "neutral",
         "weak",
         "Indecision only; require a later close beyond this candle's high or low.",
@@ -200,7 +198,12 @@ export function detectCandlestickPatterns(input: StructureCandle[]): Candlestick
       );
     }
 
-    if (direction === "down" && bearish(previous) && bullish(candle) && candle.c > midpoint(previous)) {
+    if (
+      direction === "down" &&
+      bearish(previous) &&
+      bullish(candle) &&
+      candle.c > midpoint(previous)
+    ) {
       addPattern(
         patterns,
         candle,
