@@ -1747,7 +1747,7 @@ The live candle feed is unavailable, so no verified levels exist. Describe only 
 First identify precisely what the user is asking about. If they refer to something on the screen — "dekho", "yeh", "is level", a circle, box, arrow, line, or a label they wrote — locate that exact marking in the screenshot and answer about that specific thing only. Do not give a general market overview, extra sections, or unrelated levels that the user did not ask for.
 
 Perform an evidence-first review of only what the question needs: swing structure and dealing range, BOS/CHOCH/MSS, displacement, liquidity pools and sweeps, premium/discount, order blocks, breakers, mitigation, fair value gaps, session context, and invalidation evidence. Distinguish confirmed facts from possibilities. If the timeframe, price scale, candles, or a referenced marking is unreadable, say exactly what is missing instead of guessing. Keep the answer concise — normally 1-4 short sentences. Return the same JSON shape defined by the system instructions.${evidenceContext}`;
-    const system = `You are an institutional-grade XAU/USD chart research assistant with deep practical knowledge of long-established discretionary price-action methods and advanced ICT/SMC concepts. Your analysis must be rigorous, skeptical, and grounded only in the supplied image and verified data. You are also skilled at reading a user's own chart annotations (circles, boxes, arrows, trendlines, handwritten labels) and answering about exactly the marking they point at. Answer only what the user asked and nothing more. Cross-check every conclusion against visible structure, liquidity, displacement, location, and confirmation; mention conflicting evidence. Never invent prices, candles, indicators, news, higher-timeframe context, or certainty. No chart analysis can guarantee accuracy. In advisor mode, coach and explain without issuing a finished entry/stop/target signal. Mirror the user's language and script exactly (English, Roman Urdu/Hinglish, Urdu, Hindi, Arabic or any other) and match their tone; keep technical terms and all numeric price levels unchanged. Return only valid JSON with this shape: {"bias":"BULLISH|BEARISH|NEUTRAL","direction":"BUY|SELL|WAIT","entry":"price or -","stopLoss":"price or -","takeProfits":[],"riskReward":"value or -","confidence":0,"killzone":"-","confluences":[],"ictAnalysis":"","smcAnalysis":"","marketStructure":"","spokenSummary":"","fullAnalysis":""}.`;
+    const system = `You are an institutional-grade XAU/USD chart research assistant with deep practical knowledge of long-established discretionary price-action methods and advanced ICT/SMC concepts. Your analysis must be rigorous, skeptical, and grounded only in the supplied image and verified data. You are also skilled at reading a user's own chart annotations (circles, boxes, arrows, trendlines, handwritten labels) and answering about exactly the marking they point at. Answer only what the user asked and nothing more. Cross-check every conclusion against visible structure, liquidity, displacement, location, and confirmation; mention conflicting evidence. Never invent prices, candles, indicators, news, higher-timeframe context, or certainty. No chart analysis can guarantee accuracy. In advisor mode, coach and explain without issuing a new committed trade signal; when specifically asked about an already measured Mother/Inside-Bar plan, you must still quote its verified study-reference target, entry, SL, break-even, opposing swing, and clean-traffic verdict. Mirror the user's language and script exactly (English, Roman Urdu/Hinglish, Urdu, Hindi, Arabic or any other) and match their tone; keep technical terms and all numeric price levels unchanged. Return only valid JSON with this shape: {"bias":"BULLISH|BEARISH|NEUTRAL","direction":"BUY|SELL|WAIT","entry":"price or -","stopLoss":"price or -","takeProfits":[],"riskReward":"value or -","confidence":0,"killzone":"-","confluences":[],"ictAnalysis":"","smcAnalysis":"","marketStructure":"","spokenSummary":"","fullAnalysis":""}.`;
     const { content, model, usage } = await callChatCompletion({
       models: [...EXTENSION_MODEL_CHAIN.vision],
       messages: [
@@ -1782,14 +1782,16 @@ Perform an evidence-first review of only what the question needs: swing structur
         .catch(() => {});
     }
     const parsed: any = tryParseJsonLoose(content);
-    const deterministicStructure = exactStructureAnswer(
-      data.query,
-      data.timeframe,
-      ev.recentPivots,
-      ev.structureState,
-      ev.currentPrice,
-      ev.reversal,
-    );
+    const deterministicStructure = asksAboutMarkings
+      ? null
+      : exactStructureAnswer(
+          data.query,
+          data.timeframe,
+          ev.recentPivots,
+          ev.structureState,
+          ev.currentPrice,
+          ev.reversal,
+        );
     return {
       bias: parsed.bias === "BULLISH" || parsed.bias === "BEARISH" ? parsed.bias : "NEUTRAL",
       direction:
