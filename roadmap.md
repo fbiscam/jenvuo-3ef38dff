@@ -128,3 +128,4 @@
 - [x] Add deterministic closed-candle pattern evidence to Terminal AI and verify TypeScript
 - [x] Align Terminal chart timeframe and spot-gold feed with deterministic HH/LH/HL/LL replies
 - [x] Add deterministic FVG, order block, supply/demand and rejection-signal evidence to Terminal AI
+- [x] Add and test deterministic killzone, breaker, AMD, OTE, and execution evidence for Terminal AI

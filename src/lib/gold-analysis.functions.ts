@@ -60,6 +60,7 @@ import {
   mapAdvancedSmcState,
 } from "@/lib/analysis/market-structure-evidence";
 import { detectPoiEvidence } from "@/lib/analysis/poi-evidence";
+import { buildExecutionEvidence } from "@/lib/analysis/execution-evidence";
 import { detectCandlestickPatterns } from "@/lib/analysis/candlestick-pattern-evidence";
 
 async function _spendUserCredits(
@@ -1341,6 +1342,40 @@ TRENDLINE LIQUIDITY: ${
 ${poiLines.join("\n")}
 POI RULE: quote only these zones with their exact boundaries. A zone is only valid while UNMITIGATED or PARTIAL; once MITIGATED it is spent. Confluence grade is not a probability or a guarantee.`;
 
+  const executionEvidence = buildExecutionEvidence(
+    toStructureCandles(recent),
+    advancedBars,
+    poiEvidence,
+  );
+  const executionBlock = `VERIFIED TIME, AMD & EXECUTION STATE (America/New_York, closed candles only):
+SYSTEM STATUS: ${executionEvidence.system_status}
+SESSION: ${executionEvidence.current_session} @ ${executionEvidence.new_york_time} | TRADE ALLOWED: ${executionEvidence.trade_allowed ? "YES" : "NO"}
+AMD: ${executionEvidence.amd_phase} | JUDAS SWING: ${executionEvidence.judas_swing ?? "NONE"}
+ASIAN RANGE: ${executionEvidence.asian_range ? `${executionEvidence.asian_range.low.toFixed(2)}–${executionEvidence.asian_range.high.toFixed(2)} (${executionEvidence.asian_range.trading_date})` : "UNAVAILABLE"}
+ACTIVE BREAKERS: ${
+    executionEvidence.breakers.filter((breaker) => breaker.status !== "MITIGATED").length
+      ? executionEvidence.breakers
+          .filter((breaker) => breaker.status !== "MITIGATED")
+          .slice(-4)
+          .map(
+            (breaker) =>
+              `${breaker.type} ${breaker.bottom.toFixed(2)}–${breaker.top.toFixed(2)} ${breaker.status}`,
+          )
+          .join("; ")
+      : "NONE"
+  }
+OTE: ${
+    executionEvidence.ote
+      ? `${executionEvidence.ote.direction} ${executionEvidence.ote.zone_bottom.toFixed(2)}–${executionEvidence.ote.zone_top.toFixed(2)} | 0.705 ${executionEvidence.ote.level_705.toFixed(2)} | current price ${executionEvidence.ote.price_inside ? "INSIDE" : "OUTSIDE"}`
+      : "UNAVAILABLE"
+  }
+EXECUTION: ${
+    executionEvidence.trade_signal
+      ? `${executionEvidence.trade_signal.direction} ${executionEvidence.trade_signal.trigger_type} | entry ${executionEvidence.trade_signal.entry_price.toFixed(2)} | SL ${executionEvidence.trade_signal.stop_loss.toFixed(2)} | TP1 ${executionEvidence.trade_signal.take_profit_1.toFixed(2)} | TP2 ${executionEvidence.trade_signal.take_profit_2.toFixed(2)} | TP3 ${executionEvidence.trade_signal.take_profit_3.toFixed(2)} | RR 1:${executionEvidence.trade_signal.risk_reward_ratio.toFixed(1)} | confluence ${executionEvidence.trade_signal.confluence_score}`
+      : "NO VERIFIED ORDER PARAMETERS"
+  }
+EXECUTION RULE: READY_TO_EXECUTE requires an allowed killzone, price inside OTE, and overlap with an active FVG or breaker. A score is a checklist count, never probability or certainty.`;
+
   const compact = recent
     .map(
       (c) =>
@@ -1361,6 +1396,7 @@ POI RULE: quote only these zones with their exact boundaries. A zone is only val
     advancedLiquidityBlock,
     mtfTrendBlock,
     poiBlock,
+    executionBlock,
     structureBlock,
     breakBlock,
     patternBlock,
@@ -1465,6 +1501,7 @@ ${ev.liquidityBlock}
 ${ev.advancedLiquidityBlock}
 ${ev.mtfTrendBlock}
 ${ev.poiBlock}
+${ev.executionBlock}
 ${ev.structureBlock}
 ${ev.breakBlock}
 ${ev.patternBlock}
@@ -1615,6 +1652,7 @@ Perform an evidence-first chart review. Inspect only what is visibly supported: 
     advancedLiquidityBlock,
     mtfTrendBlock,
     poiBlock,
+    executionBlock,
     structureBlock,
     breakBlock,
     patternBlock,
@@ -1655,6 +1693,7 @@ Additional rules only for trading questions:
 - Treat VERIFIED ADVANCED SMC STATE as authoritative for trend, premium/discount, EQH/EQL, IDM, trendline liquidity, BOS/CHoCH and sweeps. A wick beyond a level that closes back inside is a BSL_SWEEP or SSL_SWEEP and must never be called BOS. Only a close beyond a confirmed swing changes trend. Never claim an IDM exists unless it is listed, and always state SWEPT versus UNSWEPT.
 - MULTI-TIMEFRAME TREND is a closed-candle consensus. If it says MIXED, do not claim full timeframe alignment.
 - VERIFIED POINTS OF INTEREST is authoritative for fair value gaps, order blocks, supply/demand zones and rejection signatures. Quote only listed zones with their exact boundaries and CE, and never invent or shift a zone. A MITIGATED zone is spent; only UNMITIGATED or PARTIAL zones may be discussed as live. State whether a zone is FVG-aligned, whether liquidity was swept into it and whether displacement was present, and treat a zone with all three as higher-quality confluence — never as a probability or guarantee. Any entry or invalidation you mention must be the reference entry and invalidation from PRICE ACTION SIGNATURES, described as a study reference, not a committed trade instruction.
+- VERIFIED TIME, AMD & EXECUTION STATE is authoritative for New York session, Asian range, Judas swing, breaker blocks, OTE and order parameters. Never infer a killzone from server time, invent a breaker, shift an OTE level, or call a setup executable unless SYSTEM STATUS says READY_TO_EXECUTE. WAITING_FOR_KILLZONE and NO_SETUP always mean no executable order. Confluence scores are checklist grades, not win probabilities or guarantees.
 - Market structure is already computed for you in CONFIRMED SWING STRUCTURE. When the user asks where an HH, HL, LH or LL formed, answer with the exact labelled pivot price and its timestamp from that block. Never re-derive, rename, or invent a swing point, and never label a level the block does not label.
 - BOS, CHOCH, MSS and inducement are already computed in CONFIRMED BREAKS. MSS is the first directional break when prior trend is unconfirmed; BOS is continuation; CHOCH is the first opposite break. Only quote listed events with their exact level and timestamp. A weak close without displacement is lower-quality evidence and must not be described as strong confirmation.
 - Use TREND FROM BREAKS together with CURRENT STRUCTURE for bias; if they disagree, say so and explain that the market is transitioning.
@@ -1726,6 +1765,7 @@ ${liquidityBlock}
 ${advancedLiquidityBlock}
 ${mtfTrendBlock}
 ${poiBlock}
+${executionBlock}
 ${structureBlock}
 ${breakBlock}
 ${patternBlock}
