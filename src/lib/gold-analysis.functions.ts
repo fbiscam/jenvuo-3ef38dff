@@ -1674,9 +1674,14 @@ async function _analyzeGoldCompute(
       ev.structureState,
       ev.currentPrice,
     );
-    if (data.advisor && exactAnswer) {
+    const asksAboutMarkings =
+      /(circle|circled|marked|marking|mark\s*ki|draw|drawn|drawing|arrow|box|rectangle|highlight|annotat|line\s*(khinch|draw)|screenshot|screen\s*dekh|chart\s*dekh|dekho|yahan|yeh\s*(level|zone|area|point)|is\s*(level|zone|area|point)|kya\s*hai\s*ye|what\s*(is|did)\s*i)/i.test(
+        data.query || "",
+      );
+    if (data.advisor && exactAnswer && !asksAboutMarkings) {
       return deterministicAdvisorResult(exactAnswer, data.timeframe, ev.currentPrice);
     }
+
     const evidenceContext = ev.hasData
       ? `
 
