@@ -509,6 +509,22 @@ function TerminalPage() {
           {/* Chart */}
           <main className="relative min-h-0 flex-1 bg-background">
             <div className="absolute right-28 top-1.5 z-10 flex items-center gap-2">
+              <select
+                value={tf.key}
+                onChange={(event) => {
+                  const next = TIMEFRAMES.find((item) => item.key === event.target.value);
+                  if (next) setTf(next);
+                }}
+                aria-label="Chart timeframe"
+                title="Timeframe used by the timer and the AI desk"
+                className="h-7 rounded-md bg-white px-1.5 text-xs font-semibold text-foreground outline-none"
+              >
+                {TIMEFRAMES.map((item) => (
+                  <option key={item.key} value={item.key}>
+                    {item.label}
+                  </option>
+                ))}
+              </select>
               <button
                 type="button"
                 onClick={() => setDeskOpen(true)}
@@ -550,7 +566,7 @@ function TerminalPage() {
                     <img src={jenvuTick} alt="Verified" className="size-3.5 shrink-0" />
                   </div>
                   <p className="truncate text-[11px] text-muted-foreground">
-                    Gold 30-minute analysis ready
+                    Gold {tf.label} analysis ready
                   </p>
                 </div>
                 <Button
