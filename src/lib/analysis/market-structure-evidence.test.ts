@@ -51,7 +51,10 @@ describe("mapMarketStructure", () => {
 
   test("requires a strict pivot and rejects equal-high plateaus", () => {
     const input = candles([10, 11, 15, 15, 11, 10], [8, 9, 10, 10, 8, 7]);
-    assert.equal(mapMarketStructure(input).some((candle) => candle.is_swing_high), false);
+    assert.equal(
+      mapMarketStructure(input).some((candle) => candle.is_swing_high),
+      false,
+    );
   });
 
   test("places break events only on close-through candles", () => {
