@@ -1589,6 +1589,7 @@ REVERSAL RULE: quote only these measured levels. A status other than ARMED_BUY_S
     patternBlock,
     compact,
     recentPivots,
+    structurePivots: labelled,
     structureState,
   };
 }
@@ -1704,7 +1705,7 @@ async function _analyzeGoldCompute(
     const exactAnswer = exactStructureAnswer(
       data.query,
       data.timeframe,
-      ev.recentPivots,
+      ev.structurePivots,
       ev.structureState,
       ev.currentPrice,
       ev.reversal,
@@ -1787,7 +1788,7 @@ Perform an evidence-first review of only what the question needs: swing structur
       : exactStructureAnswer(
           data.query,
           data.timeframe,
-          ev.recentPivots,
+          ev.structurePivots,
           ev.structureState,
           ev.currentPrice,
           ev.reversal,
@@ -1925,6 +1926,7 @@ Perform an evidence-first review of only what the question needs: swing structur
     patternBlock,
     compact,
     recentPivots,
+    structurePivots,
     structureState,
     currentPrice,
     reversal,
@@ -1932,7 +1934,7 @@ Perform an evidence-first review of only what the question needs: swing structur
   const exactAnswer = exactStructureAnswer(
     data.query,
     data.timeframe,
-    recentPivots,
+    structurePivots,
     structureState,
     currentPrice,
     reversal,
@@ -2093,7 +2095,7 @@ ${isTradingIntent ? `${hasLivePrice ? `VERIFIED LIVE XAU/USD PRICE: ${currentPri
   const deterministicStructure = exactStructureAnswer(
     data.query,
     data.timeframe,
-    recentPivots,
+    structurePivots,
     structureState,
     currentPrice,
     reversal,
