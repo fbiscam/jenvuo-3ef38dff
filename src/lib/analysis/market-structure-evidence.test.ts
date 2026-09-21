@@ -126,7 +126,11 @@ describe("mapMarketStructure", () => {
   });
 
   test("classifies timeframe consensus without hiding disagreement", () => {
-    const base = candles([10, 11, 15, 12, 11, 16, 16], [8, 9, 10, 8, 7, 10, 10], [9, 10, 12, 10, 9, 14.9, 15.5]);
+    const base = candles(
+      [10, 11, 15, 12, 11, 16, 16],
+      [8, 9, 10, 8, 7, 10, 10],
+      [9, 10, 12, 10, 9, 14.9, 15.5],
+    );
     const bullish = mapAdvancedSmcState(base);
     const bearish = mapAdvancedSmcState(
       candles([10, 11, 15, 12, 11, 10, 9], [8, 9, 10, 8, 7, 6, 5], [9, 10, 12, 10, 9, 6.9, 6.5]),
