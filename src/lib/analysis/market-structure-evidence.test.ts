@@ -2,7 +2,9 @@ import assert from "node:assert/strict";
 import { describe, test } from "node:test";
 
 import {
+  classifyMultiTimeframeTrend,
   detectMarketStructureEvidence,
+  mapAdvancedSmcState,
   mapMarketStructure,
   type MarketStructureCandle,
 } from "./market-structure-evidence";
@@ -96,5 +98,44 @@ describe("mapMarketStructure", () => {
     const input = candles([10, 11, 12], [8, 9, 10]);
     input[1].high = 7;
     assert.throws(() => mapMarketStructure(input), /Invalid OHLC candle at index 1/);
+  });
+
+  test("distinguishes a buy-side wick sweep from a later bullish close break", () => {
+    const input = candles(
+      [10, 11, 15, 12, 11, 16, 16],
+      [8, 9, 10, 8, 7, 10, 10],
+      [9, 10, 12, 10, 9, 14.9, 15.5],
+    );
+    const state = mapAdvancedSmcState(input);
+
+    assert.equal(state[5].trend_state, "SIDEWAYS");
+    assert.equal(state[5].last_event, "BSL_SWEEP");
+    assert.equal(state[6].trend_state, "BULLISH");
+    assert.equal(state[6].last_event, "BOS");
+  });
+
+  test("groups confirmed Gold equal highs and lows within 0.30", () => {
+    const input = candles(
+      [10, 11, 15, 12, 11, 13, 15.2, 13, 12, 13, 14],
+      [8, 9, 10, 8, 5, 7, 9, 8, 5.2, 7, 8],
+    );
+    const latest = mapAdvancedSmcState(input).at(-1);
+
+    assert.ok(latest?.active_liquidity_pools.some((pool) => pool.type === "EQH"));
+    assert.ok(latest?.active_liquidity_pools.some((pool) => pool.type === "EQL"));
+  });
+
+  test("classifies timeframe consensus without hiding disagreement", () => {
+    const base = candles([10, 11, 15, 12, 11, 16, 16], [8, 9, 10, 8, 7, 10, 10], [9, 10, 12, 10, 9, 14.9, 15.5]);
+    const bullish = mapAdvancedSmcState(base);
+    const bearish = mapAdvancedSmcState(
+      candles([10, 11, 15, 12, 11, 10, 9], [8, 9, 10, 8, 7, 6, 5], [9, 10, 12, 10, 9, 6.9, 6.5]),
+    );
+    const consensus = classifyMultiTimeframeTrend({ "1h": bullish, "1d": bearish });
+
+    assert.equal(consensus.state, "SIDEWAYS");
+    assert.equal(consensus.aligned, false);
+    assert.deepEqual(consensus.bullish, ["1h"]);
+    assert.deepEqual(consensus.bearish, ["1d"]);
   });
 });

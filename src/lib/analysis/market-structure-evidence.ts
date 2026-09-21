@@ -468,7 +468,6 @@ export function mapAdvancedSmcState(
       bar.close <= activeHigh.price
     ) {
       lastEvent = "BSL_SWEEP";
-      consumedBreaks.add(activeHigh.index);
     } else if (
       activeLow &&
       !consumedBreaks.has(activeLow.index) &&
@@ -476,7 +475,6 @@ export function mapAdvancedSmcState(
       bar.close >= activeLow.price
     ) {
       lastEvent = "SSL_SWEEP";
-      consumedBreaks.add(activeLow.index);
     }
 
     for (const pool of pools) {
