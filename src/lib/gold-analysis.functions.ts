@@ -1207,9 +1207,27 @@ async function _analyzeGoldCompute(
   // AI key is validated inside callChatCompletion — no local read needed.
 
   if (data.chartImage) {
+    const ev = await buildEvidenceContext(data.timeframe);
+    const evidenceContext = ev.hasData
+      ? `
+
+VERIFIED MARKET DATA for XAU/USD ${data.timeframe.toUpperCase()} (computed from real closed candles — this is authoritative and overrides anything you think you see in the image):
+CURRENT PRICE: ${ev.last!.c.toFixed(2)}
+RECENT SWING HIGH (150): ${ev.swingHigh.toFixed(2)}
+RECENT SWING LOW (150): ${ev.swingLow.toFixed(2)}
+${ev.liquidityBlock}
+${ev.structureBlock}
+${ev.breakBlock}
+LAST 150 CANDLES (OHLC):
+${ev.compact}
+
+Rules: use the screenshot only for visual corroboration (what the user has drawn, visible zones, chart context). Every HH, HL, LH, LL, BOS, CHOCH, MSS, inducement and liquidity level you state MUST be copied exactly from the verified data above, with its price and timestamp. Never read a swing label off the image, never invent or round a level, and never quote a price outside ${ev.swingLow.toFixed(2)}-${ev.swingHigh.toFixed(2)}. If the image contradicts the verified data, say so and trust the verified data.`
+      : `
+
+The live candle feed is unavailable, so no verified levels exist. Describe only what is clearly visible in the image, avoid exact price claims, and state that limitation.`;
     const imagePrompt = `Review this user-provided XAU/USD chart screenshot on ${data.timeframe.toUpperCase()} and answer only the user's request: ${data.query}
 
-Perform an evidence-first chart review. Inspect only what is visibly supported: swing structure and dealing range, BOS/CHOCH/MSS, displacement, liquidity pools and sweeps, premium/discount, order blocks, breakers, mitigation, fair value gaps/imbalances, session context, and invalidation evidence. Distinguish confirmed facts from possibilities. If the timeframe, price scale, candles, or required context is unreadable, say exactly what is missing instead of guessing. Return the same JSON shape defined by the system instructions.`;
+Perform an evidence-first chart review. Inspect only what is visibly supported: swing structure and dealing range, BOS/CHOCH/MSS, displacement, liquidity pools and sweeps, premium/discount, order blocks, breakers, mitigation, fair value gaps/imbalances, session context, and invalidation evidence. Distinguish confirmed facts from possibilities. If the timeframe, price scale, candles, or required context is unreadable, say exactly what is missing instead of guessing. Keep the answer concise. Return the same JSON shape defined by the system instructions.${evidenceContext}`;
     const system = `You are an institutional-grade XAU/USD chart research assistant with deep practical knowledge of long-established discretionary price-action methods and advanced ICT/SMC concepts. Your analysis must be rigorous, skeptical, and grounded only in the supplied image. Cross-check every conclusion against visible structure, liquidity, displacement, location, and confirmation; mention conflicting evidence. Never invent prices, candles, indicators, news, higher-timeframe context, or certainty. No chart analysis can guarantee accuracy. In advisor mode, coach and explain without issuing a finished entry/stop/target signal. Reply only in concise English. Return only valid JSON with this shape: {"bias":"BULLISH|BEARISH|NEUTRAL","direction":"BUY|SELL|WAIT","entry":"price or -","stopLoss":"price or -","takeProfits":[],"riskReward":"value or -","confidence":0,"killzone":"-","confluences":[],"ictAnalysis":"","smcAnalysis":"","marketStructure":"","spokenSummary":"","fullAnalysis":""}.`;
     const { content, model, usage } = await callChatCompletion({
       models: [...EXTENSION_MODEL_CHAIN.vision],
