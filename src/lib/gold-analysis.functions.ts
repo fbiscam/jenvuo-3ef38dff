@@ -1263,8 +1263,9 @@ function exactStructureAnswer(
 ): string | null {
   if (!isStructureLabelQuery(query)) return null;
   if (pivots.length === 0) {
-    const romanUrdu =
-      /\b(kaha|kidhar|hai|ha|bata|banao|bana|ya|yar|wala|wali|mujhe|muje)\b/i.test(query);
+    const romanUrdu = /\b(kaha|kidhar|hai|ha|bata|banao|bana|ya|yar|wala|wali|mujhe|muje)\b/i.test(
+      query,
+    );
     return romanUrdu
       ? `${timeframe.toUpperCase()} par abhi verified closed-candle feed ya enough confirmed pivots available nahi hain, is liye main HH/LH/HL/LL ki value guess nahi karunga.`
       : `Verified closed-candle data or enough confirmed pivots are not currently available on ${timeframe.toUpperCase()}, so I will not guess HH/LH/HL/LL values.`;
