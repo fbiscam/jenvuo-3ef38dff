@@ -1809,6 +1809,7 @@ ${advancedLiquidityBlock}
 ${mtfTrendBlock}
 ${poiBlock}
 ${executionBlock}
+${quantBlock}
 ${structureBlock}
 ${breakBlock}
 ${patternBlock}
