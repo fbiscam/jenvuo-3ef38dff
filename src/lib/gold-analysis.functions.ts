@@ -1513,6 +1513,7 @@ APEX RULE: never claim CVD, delta or footprint data beyond this proxy, and never
     executionBlock,
     quantBlock,
     apexBlock,
+    reversalBlock,
     structureBlock,
     breakBlock,
     patternBlock,
