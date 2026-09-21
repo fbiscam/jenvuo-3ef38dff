@@ -135,3 +135,4 @@
 - [x] Verify the Extreme M30 Gold reversal layer against live closed-candle inputs
 - [x] Connect its two-trades-per-New-York-day lock to the authenticated trade journal
 - [x] Reject unverified volume and false distant-level touches in reversal validation
+- [x] Make the strict M30 reversal verdict the final gate for every requested Gold trade setup
