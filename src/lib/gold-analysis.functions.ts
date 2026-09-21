@@ -1605,9 +1605,8 @@ function exactStructureAnswer(
   currentPrice: number,
   reversal?: ThreeStocksEvidence | null,
 ): string | null {
-  const romanUrdu = /\b(kaha|kidhar|hai|ha|bata|banao|bana|ya|yar|wala|wali|mujhe|muje|tak|sakta)\b/i.test(
-    query,
-  );
+  const romanUrdu =
+    /\b(kaha|kidhar|hai|ha|bata|banao|bana|ya|yar|wala|wali|mujhe|muje|tak|sakta)\b/i.test(query);
   const asksMotherTarget =
     /\b(mother|inside[\s-]*bar|three\s*stocks?)\b/i.test(query) &&
     /\b(tp|take\s*profit|target|kaha\s*tak|kitna)\b/i.test(query);
