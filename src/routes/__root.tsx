@@ -12,7 +12,6 @@ import { Toaster as SonnerToaster } from "sonner";
 import { LiveChatWidget } from "@/components/LiveChatWidget";
 import { PwaTabBar } from "@/components/PwaTabBar";
 
-
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { installIntlGuard } from "../lib/intl-guard";
@@ -66,7 +65,9 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
             source: "client",
           },
         });
-      } catch { /* ignore */ }
+      } catch {
+        /* ignore */
+      }
     })();
 
     // Deploys can briefly leave an already-open tab pointing at an old JS
@@ -74,7 +75,9 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
     // user on the error boundary. The URL-scoped marker prevents reload loops.
     const message = `${error.name} ${error.message} ${error.stack ?? ""}`;
     const isStaleBundle =
-      /Failed to fetch dynamically imported module|Importing a module script failed|Loading chunk [^ ]+ failed|ChunkLoadError|module is not defined|is not defined/i.test(message);
+      /Failed to fetch dynamically imported module|Importing a module script failed|Loading chunk [^ ]+ failed|ChunkLoadError|module is not defined|is not defined/i.test(
+        message,
+      );
     if (isStaleBundle && !recoveryStarted.current && typeof window !== "undefined") {
       recoveryStarted.current = true;
       const recoveryKey = `jenvu:recovered:${window.location.pathname}`;
@@ -92,7 +95,6 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
     const timer = window.setTimeout(() => window.sessionStorage.removeItem(recoveryKey), 10_000);
     return () => window.clearTimeout(timer);
   }, []);
-
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
@@ -141,20 +143,39 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "google-adsense-account", content: "ca-pub-8708842688547386" },
       { name: "google-adsense-account", content: "ca-pub-6031688799547633" },
       { title: "Jenvu — AI Gold Trading" },
-      { name: "description", content: "AI-powered TradingView extension for XAU/USD with live ICT/SMC analysis, chart context, A+ setups and reviewed trade signals." },
+      {
+        name: "description",
+        content:
+          "AI-powered TradingView extension for XAU/USD with live ICT/SMC analysis, chart context, A+ setups and reviewed trade signals.",
+      },
       { name: "author", content: "Jenvu AI" },
       { name: "theme-color", content: "#000000" },
       { property: "og:site_name", content: "Jenvu AI" },
       { property: "og:title", content: "Jenvu AI — Institutional Gold Trading Desk" },
-      { property: "og:description", content: "Analyze gold charts directly in TradingView with institutional ICT/SMC logic, reviewed signals and clear risk context." },
+      {
+        property: "og:description",
+        content:
+          "Analyze gold charts directly in TradingView with institutional ICT/SMC logic, reviewed signals and clear risk context.",
+      },
       { property: "og:type", content: "website" },
       { property: "og:locale", content: "en_US" },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/afb81f86-c6e3-4892-b81f-eb551ed99e17/id-preview-cf5425ce--06cd4260-299b-4286-8096-c43f2f596dee.lovable.app-1782731006346.png" },
+      {
+        property: "og:image",
+        content:
+          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/afb81f86-c6e3-4892-b81f-eb551ed99e17/id-preview-cf5425ce--06cd4260-299b-4286-8096-c43f2f596dee.lovable.app-1782731006346.png",
+      },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "Jenvu AI — Institutional Gold Trading Desk" },
-      { name: "twitter:description", content: "AI TradingView extension for XAU/USD with ICT/SMC analysis and reviewed trade signals." },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/afb81f86-c6e3-4892-b81f-eb551ed99e17/id-preview-cf5425ce--06cd4260-299b-4286-8096-c43f2f596dee.lovable.app-1782731006346.png" },
-
+      {
+        name: "twitter:description",
+        content:
+          "AI TradingView extension for XAU/USD with ICT/SMC analysis and reviewed trade signals.",
+      },
+      {
+        name: "twitter:image",
+        content:
+          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/afb81f86-c6e3-4892-b81f-eb551ed99e17/id-preview-cf5425ce--06cd4260-299b-4286-8096-c43f2f596dee.lovable.app-1782731006346.png",
+      },
     ],
     scripts: [
       {
@@ -224,13 +245,34 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "manifest", href: "/manifest.webmanifest" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" },
-      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap" },
-      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" },
-      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Google+Sans:wght@300;400;500;600;700&display=swap" },
-      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600;700&display=swap" },
-      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap" },
-      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20,400,1,0&display=block" },
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap",
+      },
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap",
+      },
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap",
+      },
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Google+Sans:wght@300;400;500;600;700&display=swap",
+      },
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600;700&display=swap",
+      },
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap",
+      },
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20,400,1,0&display=block",
+      },
       {
         rel: "stylesheet",
         href: appCss,
@@ -266,9 +308,7 @@ function RootComponent() {
 
   useEffect(() => {
     // Native (Capacitor) bootstrap: status bar + hide splash. No-op on web.
-    import("../lib/native/bootstrap")
-      .then((m) => m.bootstrapNative())
-      .catch(() => {});
+    import("../lib/native/bootstrap").then((m) => m.bootstrapNative()).catch(() => {});
   }, []);
 
   // Global runtime error capture → error_log table.
@@ -290,7 +330,8 @@ function RootComponent() {
         if (recent.size > 50) recent = new Map(Array.from(recent.entries()).slice(-25));
 
         // Skip noise: extension errors, resize observers, network aborts.
-        if (/ResizeObserver|Non-Error promise rejection|AbortError|Load failed/i.test(message)) return;
+        if (/ResizeObserver|Non-Error promise rejection|AbortError|Load failed/i.test(message))
+          return;
 
         const { logError } = await import("../lib/error-log.functions");
         await logError({
@@ -315,7 +356,8 @@ function RootComponent() {
     };
     const onRej = (e: PromiseRejectionEvent) => {
       const reason: any = e.reason;
-      const msg = reason instanceof Error ? reason.message : String(reason ?? "unhandled rejection");
+      const msg =
+        reason instanceof Error ? reason.message : String(reason ?? "unhandled rejection");
       const stack = reason instanceof Error ? reason.stack : undefined;
       void report(msg, stack, "unhandledrejection");
     };
@@ -327,7 +369,6 @@ function RootComponent() {
     };
   }, []);
 
-
   useEffect(() => {
     const mq = window.matchMedia("(max-width: 640px)");
     const update = () => setIsMobile(mq.matches);
@@ -335,10 +376,6 @@ function RootComponent() {
     mq.addEventListener("change", update);
     return () => mq.removeEventListener("change", update);
   }, []);
-
-
-
-
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -348,12 +385,21 @@ function RootComponent() {
       <div className="hide-in-pwa">
         <LiveChatWidget />
       </div>
-      
+
       <SonnerToaster
         theme="light"
         position={isMobile ? "bottom-center" : "top-right"}
         offset={isMobile ? 24 : 96}
-        toastOptions={{ style: { background: "#ffffff", color: "#000000", border: "1px solid #e4e4e7", whiteSpace: "nowrap", width: "max-content", maxWidth: "min(92vw, 640px)" } }}
+        toastOptions={{
+          style: {
+            background: "#ffffff",
+            color: "#000000",
+            border: "1px solid #e4e4e7",
+            whiteSpace: "nowrap",
+            width: "max-content",
+            maxWidth: "min(92vw, 640px)",
+          },
+        }}
       />
     </QueryClientProvider>
   );
