@@ -1303,7 +1303,7 @@ TRENDLINE LIQUIDITY: ${
   }] | sideways [${mtfTrend.sideways.join(", ") || "none"}]`;
 
   const poiEvidence = hasData
-    ? detectPoiEvidence(toStructureCandles(recent))
+    ? detectPoiEvidence(recent.map((c) => ({ t: c.t, o: c.o, h: c.h, l: c.l, c: c.c })))
     : { fair_value_gaps: [], order_blocks: [], price_action_signals: [] };
   const poiLines: string[] = [];
   const liveGaps = poiEvidence.fair_value_gaps.filter((g) => g.status !== "MITIGATED").slice(-6);
