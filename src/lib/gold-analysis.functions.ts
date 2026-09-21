@@ -1302,7 +1302,9 @@ ${lastShift}`
     .slice(0, 4);
   const liquidityBlock = hasData
     ? `BUY-SIDE LIQUIDITY (swing highs above price, nearest first): ${
-        buySideLevels.length ? buySideLevels.map((v) => v.toFixed(2)).join(", ") : "none above price"
+        buySideLevels.length
+          ? buySideLevels.map((v) => v.toFixed(2)).join(", ")
+          : "none above price"
       }
 SELL-SIDE LIQUIDITY (swing lows below price, nearest first): ${
         sellSideLevels.length
@@ -1310,7 +1312,6 @@ SELL-SIDE LIQUIDITY (swing lows below price, nearest first): ${
           : "none below price"
       }`
     : "";
-
 
   const compact = recent
     .map(
@@ -1320,7 +1321,6 @@ SELL-SIDE LIQUIDITY (swing lows below price, nearest first): ${
         )} L${c.l.toFixed(2)} C${c.c.toFixed(2)}`,
     )
     .join("\n");
-
 
   const advisorSystem = `You are a concise general-purpose AI assistant and an institutional-grade XAU/USD research mentor. Your trading knowledge reflects decades of established discretionary price-action practice without pretending to possess personal human experience.
 
