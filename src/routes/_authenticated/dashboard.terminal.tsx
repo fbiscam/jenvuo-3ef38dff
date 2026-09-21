@@ -673,7 +673,7 @@ function TerminalPage() {
                             size="sm"
                             key={q}
                             onClick={() => void send({ text: q })}
-                            className="h-auto rounded-full px-2.5 py-1.5 text-[11px] font-normal text-muted-foreground shadow-none hover:text-primary"
+                            className="h-auto rounded-full px-3.5 py-2 text-[14px] font-normal text-muted-foreground shadow-none hover:text-primary"
                           >
                             {q}
                           </Button>
