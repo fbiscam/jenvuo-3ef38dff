@@ -80,6 +80,18 @@ describe("mapMarketStructure", () => {
     assert.equal(mapped.filter((candle) => candle.smc_event).length, evidence.breaks.length);
   });
 
+  test("ignores a wick through structure until a candle closes beyond the buffered level", () => {
+    const input = candles(
+      [10, 11, 15, 12, 11, 16, 16],
+      [8, 9, 10, 8, 7, 10, 10],
+      [9, 10, 12, 10, 9, 14.9, 15.5],
+    );
+    const mapped = mapMarketStructure(input);
+
+    assert.equal(mapped[5].smc_event, null);
+    assert.equal(mapped[6].smc_event, "BOS");
+  });
+
   test("rejects malformed OHLC instead of silently shifting indexes", () => {
     const input = candles([10, 11, 12], [8, 9, 10]);
     input[1].high = 7;
