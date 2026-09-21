@@ -1213,6 +1213,44 @@ Perform an evidence-first chart review. Inspect only what is visibly supported: 
   const swingHigh = hasData ? Math.max(...highs) : 0;
   const swingLow = hasData ? Math.min(...lows) : 0;
 
+  // Deterministic liquidity map so the model never invents far-away levels.
+  const pivotHighs: number[] = [];
+  const pivotLows: number[] = [];
+  for (let i = 2; i < recent.length - 2; i++) {
+    const c = recent[i];
+    if (
+      c.h >= recent[i - 1].h &&
+      c.h >= recent[i - 2].h &&
+      c.h >= recent[i + 1].h &&
+      c.h >= recent[i + 2].h
+    )
+      pivotHighs.push(c.h);
+    if (
+      c.l <= recent[i - 1].l &&
+      c.l <= recent[i - 2].l &&
+      c.l <= recent[i + 1].l &&
+      c.l <= recent[i + 2].l
+    )
+      pivotLows.push(c.l);
+  }
+  const price = last ? last.c : 0;
+  const buySideLevels = Array.from(new Set(pivotHighs.filter((h) => h > price)))
+    .sort((a, b) => a - b)
+    .slice(0, 4);
+  const sellSideLevels = Array.from(new Set(pivotLows.filter((l) => l < price)))
+    .sort((a, b) => b - a)
+    .slice(0, 4);
+  const liquidityBlock = hasData
+    ? `BUY-SIDE LIQUIDITY (swing highs above price, nearest first): ${
+        buySideLevels.length ? buySideLevels.map((v) => v.toFixed(2)).join(", ") : "none above price"
+      }
+SELL-SIDE LIQUIDITY (swing lows below price, nearest first): ${
+        sellSideLevels.length
+          ? sellSideLevels.map((v) => v.toFixed(2)).join(", ")
+          : "none below price"
+      }`
+    : "";
+
   const compact = recent
     .map(
       (c) =>
@@ -1221,6 +1259,7 @@ Perform an evidence-first chart review. Inspect only what is visibly supported: 
         )} L${c.l.toFixed(2)} C${c.c.toFixed(2)}`,
     )
     .join("\n");
+
 
   const advisorSystem = `You are a concise general-purpose AI assistant and an institutional-grade XAU/USD research mentor. Your trading knowledge reflects decades of established discretionary price-action practice without pretending to possess personal human experience.
 
