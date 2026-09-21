@@ -66,6 +66,7 @@ import { buildApexEvidence } from "@/lib/analysis/apex-evidence";
 import {
   buildThreeStocksEvidence,
   newYorkTradingDayRange,
+  type ThreeStocksEvidence,
 } from "@/lib/analysis/three-stocks-evidence";
 import { detectCandlestickPatterns } from "@/lib/analysis/candlestick-pattern-evidence";
 
@@ -1602,12 +1603,31 @@ function exactStructureAnswer(
   pivots: Array<{ label: string; price: number; t: number; kind: "high" | "low" }>,
   structureState: string,
   currentPrice: number,
+  reversal?: ThreeStocksEvidence | null,
 ): string | null {
+  const romanUrdu = /\b(kaha|kidhar|hai|ha|bata|banao|bana|ya|yar|wala|wali|mujhe|muje|tak|sakta)\b/i.test(
+    query,
+  );
+  const asksMotherTarget =
+    /\b(mother|inside[\s-]*bar|three\s*stocks?)\b/i.test(query) &&
+    /\b(tp|take\s*profit|target|kaha\s*tak|kitna)\b/i.test(query);
+  if (asksMotherTarget) {
+    if (!reversal?.plan || !reversal.status.startsWith("ARMED_")) {
+      const reason =
+        reversal?.rejections[0] ??
+        "Verified closed M30 candles are unavailable, so the target cannot be calculated.";
+      return romanUrdu
+        ? `Abhi valid M30 Mother/Inside-Bar setup armed nahi hai, is liye verified TP nahi banta. Reason: ${reason}`
+        : `No valid M30 Mother/Inside-Bar setup is armed, so there is no verified TP. Reason: ${reason}`;
+    }
+    const plan = reversal.plan;
+    const opposing = plan.nearest_opposing_swing;
+    return romanUrdu
+      ? `${plan.direction} Mother/Inside-Bar plan ka measured 1:3 TP ${plan.target_1_3.toFixed(2)} hai; entry ${plan.entry.toFixed(2)}, SL ${plan.stop_loss.toFixed(2)}, aur BE ${plan.break_even_trigger.toFixed(2)} par. ${opposing == null ? "Is window mein target se pehle koi confirmed opposing M30 swing nahi mila." : `Nearest opposing M30 swing ${opposing.toFixed(2)} hai aur clean traffic ${plan.clean_traffic ? "YES" : "NO"}.`} Ye closed-candle study reference hai.`
+      : `The measured 1:3 TP for the ${plan.direction} Mother/Inside-Bar plan is ${plan.target_1_3.toFixed(2)}; entry ${plan.entry.toFixed(2)}, SL ${plan.stop_loss.toFixed(2)}, and break-even ${plan.break_even_trigger.toFixed(2)}. ${opposing == null ? "No confirmed opposing M30 swing appears before the target in this window." : `The nearest opposing M30 swing is ${opposing.toFixed(2)} and clean traffic is ${plan.clean_traffic ? "YES" : "NO"}.`} This is a closed-candle study reference.`;
+  }
   if (!isStructureLabelQuery(query)) return null;
   if (pivots.length === 0) {
-    const romanUrdu = /\b(kaha|kidhar|hai|ha|bata|banao|bana|ya|yar|wala|wali|mujhe|muje)\b/i.test(
-      query,
-    );
     const livePrice =
       Number.isFinite(currentPrice) && currentPrice > 0
         ? ` Verified live XAU/USD price: ${currentPrice.toFixed(2)}.`
@@ -1621,9 +1641,24 @@ function exactStructureAnswer(
     (pivot) =>
       `${pivot.label} ${pivot.price.toFixed(2)} @ ${new Date(pivot.t).toISOString().slice(5, 16)}Z`,
   );
-  const romanUrdu = /\b(kaha|kidhar|hai|ha|bata|banao|bana|ya|yar|wala|wali|mujhe|muje)\b/i.test(
-    query,
-  );
+  const asksNextStructure =
+    /\b(next|agla|agli|ban\s*sakta|banega|bnega|kaha\s*par|kidhar)\b/i.test(query) &&
+    /\b(HH|HL|LH|LL|higher\s+high|higher\s+low|lower\s+high|lower\s+low)\b/i.test(query);
+  if (asksNextStructure) {
+    const latestLow = [...pivots].reverse().find((pivot) => pivot.kind === "low");
+    const latestHigh = [...pivots].reverse().find((pivot) => pivot.kind === "high");
+    if (!latestHigh) {
+      return romanUrdu
+        ? `${timeframe.toUpperCase()} par next LH/HH ka exact level abhi project nahi ho sakta kyunki confirmed high reference available nahi hai.`
+        : `The next LH/HH cannot yet be projected on ${timeframe.toUpperCase()} because no confirmed high reference is available.`;
+    }
+    const lowContext = latestLow
+      ? `${latestLow.label} ${latestLow.price.toFixed(2)} @ ${new Date(latestLow.t).toISOString().slice(5, 16)}Z`
+      : "latest low unavailable";
+    return romanUrdu
+      ? `${timeframe.toUpperCase()} par ${lowContext} confirmed hai. Agla high abhi confirmed nahi: ${latestHigh.price.toFixed(2)} ke neeche reversal + 2 closed candles milein to woh LH hoga; ${latestHigh.price.toFixed(2)} ke upar close ke baad 2-candle pivot confirmation mile to HH hoga. Is se pehle exact turning price guess nahi ki ja sakti.`
+      : `${lowContext} is confirmed on ${timeframe.toUpperCase()}. The next high is not confirmed yet: a reversal below ${latestHigh.price.toFixed(2)} followed by two closed candles would form an LH; a close above ${latestHigh.price.toFixed(2)} followed by two-candle pivot confirmation would form an HH. An exact turning price cannot be known before confirmation.`;
+  }
   return romanUrdu
     ? `${timeframe.toUpperCase()} par latest confirmed structure: ${lines.join("; ")}. Current state: ${structureState}. Ye sirf closed candles ke confirmed pivots hain; chalti candle ko label nahi kiya gaya.`
     : `${timeframe.toUpperCase()} latest confirmed structure: ${lines.join("; ")}. Current state: ${structureState}. These are confirmed pivots from closed candles only; the live candle is not labelled.`;
@@ -1673,6 +1708,7 @@ async function _analyzeGoldCompute(
       ev.recentPivots,
       ev.structureState,
       ev.currentPrice,
+      ev.reversal,
     );
     const asksAboutMarkings =
       /(circle|circled|marked|marking|mark\s*ki|draw|drawn|drawing|arrow|box|rectangle|highlight|annotat|line\s*(khinch|draw)|screenshot|screen\s*dekh|chart\s*dekh|dekho|yahan|yeh\s*(level|zone|area|point)|is\s*(level|zone|area|point)|kya\s*hai\s*ye|what\s*(is|did)\s*i)/i.test(
@@ -1753,6 +1789,7 @@ Perform an evidence-first review of only what the question needs: swing structur
       ev.recentPivots,
       ev.structureState,
       ev.currentPrice,
+      ev.reversal,
     );
     return {
       bias: parsed.bias === "BULLISH" || parsed.bias === "BEARISH" ? parsed.bias : "NEUTRAL",
@@ -1889,6 +1926,7 @@ Perform an evidence-first review of only what the question needs: swing structur
     recentPivots,
     structureState,
     currentPrice,
+    reversal,
   } = await buildEvidenceContext(data.timeframe, __dailyTradesTaken);
   const exactAnswer = exactStructureAnswer(
     data.query,
@@ -1896,6 +1934,7 @@ Perform an evidence-first review of only what the question needs: swing structur
     recentPivots,
     structureState,
     currentPrice,
+    reversal,
   );
   if (data.advisor && exactAnswer) {
     return deterministicAdvisorResult(exactAnswer, data.timeframe, currentPrice);
@@ -1924,6 +1963,8 @@ Additional rules only for trading questions:
 - VERIFIED POINTS OF INTEREST is authoritative for fair value gaps, order blocks, supply/demand zones and rejection signatures. Quote only listed zones with their exact boundaries and CE, and never invent or shift a zone. A MITIGATED zone is spent; only UNMITIGATED or PARTIAL zones may be discussed as live. State whether a zone is FVG-aligned, whether liquidity was swept into it and whether displacement was present, and treat a zone with all three as higher-quality confluence — never as a probability or guarantee. Any entry or invalidation you mention must be the reference entry and invalidation from PRICE ACTION SIGNATURES, described as a study reference, not a committed trade instruction.
 - VERIFIED TIME, AMD & EXECUTION STATE is authoritative for New York session, Asian range, Judas swing, breaker blocks, OTE and order parameters. Never infer a killzone from server time, invent a breaker, shift an OTE level, or call a setup executable unless SYSTEM STATUS says READY_TO_EXECUTE. WAITING_FOR_KILLZONE and NO_SETUP always mean no executable order. Confluence scores are checklist grades, not win probabilities or guarantees.
 - Market structure is already computed for you in CONFIRMED SWING STRUCTURE. When the user asks where an HH, HL, LH or LL formed, answer with the exact labelled pivot price and its timestamp from that block. Never re-derive, rename, or invent a swing point, and never label a level the block does not label.
+- When the user asks where the next LH/HH could form after an LL, answer conditionally from the latest confirmed high: below it can confirm as LH; only a close above it followed by two closed candles can confirm HH. State the exact reference price and never pretend the future turning candle is already known.
+- When the user asks how far a Mother/Inside-Bar setup's TP can go, answer directly from VERIFIED EXTREME M30 GOLD REVERSAL ENGINE: quote its measured 1:3 target, entry, SL, break-even trigger, nearest opposing M30 swing, and clean-traffic verdict. If the engine is not armed, give its rejection reason instead of withholding the answer or inventing a TP.
 - BOS, CHOCH, MSS and inducement are already computed in CONFIRMED BREAKS. MSS is the first directional break when prior trend is unconfirmed; BOS is continuation; CHOCH is the first opposite break. Only quote listed events with their exact level and timestamp. A weak close without displacement is lower-quality evidence and must not be described as strong confirmation.
 - Use TREND FROM BREAKS together with CURRENT STRUCTURE for bias; if they disagree, say so and explain that the market is transitioning.
 - When asked about inducement/IDM, use the INDUCEMENT line. Call it a candidate internal-liquidity pool, never proof that institutions engineered a trap. State whether it is swept or unswept and require displacement plus follow-through before treating it as meaningful.
@@ -2054,6 +2095,7 @@ ${isTradingIntent ? `${hasLivePrice ? `VERIFIED LIVE XAU/USD PRICE: ${currentPri
     recentPivots,
     structureState,
     currentPrice,
+    reversal,
   );
 
   const signal: GoldSignal = {
