@@ -1561,6 +1561,7 @@ REVERSAL RULE: quote only these measured levels. A status other than ARMED_BUY_S
     quantBlock,
     apexBlock,
     reversalBlock,
+    reversalBlock,
     structureBlock,
     breakBlock,
     patternBlock,
@@ -1668,6 +1669,7 @@ ${ev.poiBlock}
 ${ev.executionBlock}
 ${ev.quantBlock}
 ${ev.apexBlock}
+${ev.reversalBlock}
 ${ev.structureBlock}
 ${ev.breakBlock}
 ${ev.patternBlock}
@@ -1821,6 +1823,7 @@ Perform an evidence-first chart review. Inspect only what is visibly supported: 
     executionBlock,
     quantBlock,
     apexBlock,
+    reversalBlock,
     structureBlock,
     breakBlock,
     patternBlock,
@@ -1936,6 +1939,7 @@ ${poiBlock}
 ${executionBlock}
 ${quantBlock}
 ${apexBlock}
+${reversalBlock}
 ${structureBlock}
 ${breakBlock}
 ${patternBlock}
