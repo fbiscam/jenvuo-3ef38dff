@@ -19,7 +19,7 @@ function AboutPage() {
   return (
     <PageShell
       eyebrow="About"
-      title={"Built for traders\u00a0\nwho refuse to guess."}
+      title={"About Jenvu — the AI gold\u00a0\ntrading terminal for XAU/USD"}
       intro="Jenvu was built on a simple thesis: institutional logic shouldn't be locked behind a Bloomberg terminal. We turned ICT and SMC playbooks into an AI trading terminal any serious trader can use directly in TradingView."
     >
       <section className="space-y-3">
