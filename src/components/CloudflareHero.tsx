@@ -9,9 +9,9 @@ export default function CloudflareHero() {
 
         <div className="relative z-10 m-auto w-full max-w-[760px] text-center text-home-accent-foreground">
           <div className="mx-auto inline-flex max-w-[326px] flex-wrap items-center justify-center gap-x-1.5 gap-y-1 rounded-md border border-primary-foreground/50 px-3 py-2.5 text-center text-[10px] leading-[1.35] text-home-accent-foreground sm:max-w-full sm:py-2 sm:text-[11px] sm:leading-none">
-            <span className="font-medium">Jenvu 2026</span>
+            <span className="font-medium">Jenvu</span>
             <span className="text-home-accent-foreground">·</span>
-            <span>The Agentic Trading Network of the Year</span>
+            <span>AI trading terminal for XAU/USD</span>
             <span className="text-home-accent-foreground">·</span>
             <span>Live 24/7</span>
             <span className="text-home-accent-foreground">·</span>
