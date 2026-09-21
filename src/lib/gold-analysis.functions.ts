@@ -1403,6 +1403,7 @@ CURRENT PRICE: ${last!.c.toFixed(2)}
 RECENT SWING HIGH (150): ${swingHigh.toFixed(2)}
 RECENT SWING LOW (150): ${swingLow.toFixed(2)}
 ${liquidityBlock}
+${structureBlock}
 LAST 150 CANDLES (OHLC):
 ${compact}
 
