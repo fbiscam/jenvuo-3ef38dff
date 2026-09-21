@@ -1214,6 +1214,8 @@ Perform an evidence-first chart review. Inspect only what is visibly supported: 
   const swingLow = hasData ? Math.min(...lows) : 0;
 
   // Deterministic liquidity map so the model never invents far-away levels.
+  type Pivot = { t: number; price: number; kind: "high" | "low"; label: string };
+  const pivots: Pivot[] = [];
   const pivotHighs: number[] = [];
   const pivotLows: number[] = [];
   for (let i = 2; i < recent.length - 2; i++) {
@@ -1223,16 +1225,74 @@ Perform an evidence-first chart review. Inspect only what is visibly supported: 
       c.h >= recent[i - 2].h &&
       c.h >= recent[i + 1].h &&
       c.h >= recent[i + 2].h
-    )
+    ) {
       pivotHighs.push(c.h);
+      pivots.push({ t: c.t, price: c.h, kind: "high", label: "" });
+    }
     if (
       c.l <= recent[i - 1].l &&
       c.l <= recent[i - 2].l &&
       c.l <= recent[i + 1].l &&
       c.l <= recent[i + 2].l
-    )
+    ) {
       pivotLows.push(c.l);
+      pivots.push({ t: c.t, price: c.l, kind: "low", label: "" });
+    }
   }
+  pivots.sort((a, b) => a.t - b.t);
+
+  // Label every confirmed pivot as HH / LH / HL / LL against the previous
+  // pivot of the same kind, so the model never has to guess where structure
+  // shifted — it reads the labels straight from real candle data.
+  let prevHigh: Pivot | null = null;
+  let prevLow: Pivot | null = null;
+  for (const p of pivots) {
+    if (p.kind === "high") {
+      p.label = !prevHigh ? "H" : p.price > prevHigh.price ? "HH" : "LH";
+      prevHigh = p;
+    } else {
+      p.label = !prevLow ? "L" : p.price < prevLow.price ? "LL" : "HL";
+      prevLow = p;
+    }
+  }
+  const labelled = pivots.filter((p) => p.label.length === 2);
+  const recentPivots = labelled.slice(-10);
+  const fmtPivot = (p: Pivot) =>
+    `${p.label} ${p.price.toFixed(2)} @ ${new Date(p.t).toISOString().slice(5, 16)}Z`;
+  const lastHigh = [...labelled].reverse().find((p) => p.kind === "high") ?? null;
+  const lastLow = [...labelled].reverse().find((p) => p.kind === "low") ?? null;
+  const structureState =
+    lastHigh?.label === "HH" && lastLow?.label === "HL"
+      ? "BULLISH (HH + HL sequence)"
+      : lastHigh?.label === "LH" && lastLow?.label === "LL"
+        ? "BEARISH (LH + LL sequence)"
+        : lastHigh && lastLow
+          ? `MIXED / RANGING (last high ${lastHigh.label}, last low ${lastLow.label})`
+          : "UNDEFINED (not enough confirmed pivots)";
+  const lastShift = (() => {
+    for (let i = labelled.length - 1; i >= 1; i--) {
+      const cur = labelled[i];
+      const prevSame = [...labelled.slice(0, i)].reverse().find((p) => p.kind === cur.kind);
+      if (!prevSame) continue;
+      if (
+        (cur.kind === "high" && cur.label !== prevSame.label) ||
+        (cur.kind === "low" && cur.label !== prevSame.label)
+      ) {
+        return `Last structure change: ${prevSame.label} -> ${cur.label} at ${cur.price.toFixed(
+          2,
+        )} (${new Date(cur.t).toISOString().slice(5, 16)}Z)`;
+      }
+    }
+    return "Last structure change: none inside the supplied window";
+  })();
+  const structureBlock = labelled.length
+    ? `CONFIRMED SWING STRUCTURE (5-bar fractal pivots, oldest -> newest):
+${recentPivots.map(fmtPivot).join("\n")}
+CURRENT STRUCTURE: ${structureState}
+LAST CONFIRMED HIGH: ${lastHigh ? fmtPivot(lastHigh) : "n/a"}
+LAST CONFIRMED LOW: ${lastLow ? fmtPivot(lastLow) : "n/a"}
+${lastShift}`
+    : "";
   const price = last ? last.c : 0;
   const buySideLevels = Array.from(new Set(pivotHighs.filter((h) => h > price)))
     .sort((a, b) => a - b)
@@ -1242,7 +1302,9 @@ Perform an evidence-first chart review. Inspect only what is visibly supported: 
     .slice(0, 4);
   const liquidityBlock = hasData
     ? `BUY-SIDE LIQUIDITY (swing highs above price, nearest first): ${
-        buySideLevels.length ? buySideLevels.map((v) => v.toFixed(2)).join(", ") : "none above price"
+        buySideLevels.length
+          ? buySideLevels.map((v) => v.toFixed(2)).join(", ")
+          : "none above price"
       }
 SELL-SIDE LIQUIDITY (swing lows below price, nearest first): ${
         sellSideLevels.length
@@ -1259,7 +1321,6 @@ SELL-SIDE LIQUIDITY (swing lows below price, nearest first): ${
         )} L${c.l.toFixed(2)} C${c.c.toFixed(2)}`,
     )
     .join("\n");
-
 
   const advisorSystem = `You are a concise general-purpose AI assistant and an institutional-grade XAU/USD research mentor. Your trading knowledge reflects decades of established discretionary price-action practice without pretending to possess personal human experience.
 
@@ -1279,6 +1340,8 @@ Additional rules only for trading questions:
 - Never invent live prices, chart features, indicators, news, or higher-timeframe context that was not supplied.
 - Every price level you mention MUST be copied exactly from the supplied CURRENT PRICE, swing high/low, LIQUIDITY levels, or OHLC rows. Never round, guess, or extrapolate a level, and never quote a level outside the supplied swing high/low range.
 - When asked where liquidity is sitting, quote the nearest supplied buy-side and sell-side levels first and state their distance from the current price.
+- Market structure is already computed for you in CONFIRMED SWING STRUCTURE. When the user asks where an HH, HL, LH or LL formed, answer with the exact labelled pivot price and its timestamp from that block. Never re-derive, rename, or invent a swing point, and never label a level the block does not label.
+- Use CURRENT STRUCTURE for bias, and cite the listed last structure change when explaining a BOS or CHOCH.
 - Coach the user to build their own plan by explaining relevant structure, confirmation, invalidation, or risk.
 - You may suggest what to watch, but never provide a finished signal with committed entry, stop loss, and take profit.
 - Never claim certainty, guaranteed accuracy, personal years of experience, or guaranteed wins.
@@ -1340,6 +1403,7 @@ CURRENT PRICE: ${last!.c.toFixed(2)}
 RECENT SWING HIGH (150): ${swingHigh.toFixed(2)}
 RECENT SWING LOW (150): ${swingLow.toFixed(2)}
 ${liquidityBlock}
+${structureBlock}
 LAST 150 CANDLES (OHLC):
 ${compact}
 
