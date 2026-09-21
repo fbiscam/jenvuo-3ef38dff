@@ -1064,6 +1064,13 @@ async function fetchGoldCandles(tf: string): Promise<Candle[]> {
   return fetchInstrumentCandles(resolveInstrument("XAUUSD"), tf);
 }
 
+// Terminal chart evidence must stay on the spot-Gold scale shown by the
+// OANDA:XAUUSD embed. Never fall through to GC futures or tokenized Gold here:
+// their premium/discount can make otherwise valid pivots look incorrect.
+async function fetchTerminalGoldEvidenceCandles(tf: string): Promise<Candle[]> {
+  return fetchFromYahooSymbols(["XAUUSD=X"], tf);
+}
+
 function closedCandlesOnly(candles: Candle[], timeframe: string, now = Date.now()): Candle[] {
   const step = TF_MS[timeframe] ?? TF_MS["15m"];
   const currentBucket = Math.floor(now / step) * step;
@@ -1104,16 +1111,21 @@ function isTradingSetupIntent(q: string): boolean {
  */
 async function buildEvidenceContext(timeframe: string) {
   let candles: Candle[] = [];
+  const liveTick = await resolveLiveTick(resolveInstrument("XAUUSD")).catch(() => null);
   try {
-    candles = closedCandlesOnly(await fetchGoldCandles(timeframe), timeframe);
+    candles = closedCandlesOnly(await fetchTerminalGoldEvidenceCandles(timeframe), timeframe);
   } catch {
     candles = [];
   }
-  // Synthetic fallback bars are useful for keeping generic UI alive, but they
-  // must never be presented as real HH/LH/HL/LL evidence.
-  const hasData =
-    candles.length >= 10 && !hasSyntheticInstrumentCandles(resolveInstrument("XAUUSD"), timeframe);
+  const hasData = candles.length >= 10;
+  const hasLivePrice = Boolean(
+    liveTick?.price && Number.isFinite(liveTick.price) && liveTick.price > 0,
+  );
   const last = hasData ? candles[candles.length - 1] : null;
+  const currentPrice =
+    liveTick?.price && Number.isFinite(liveTick.price) && liveTick.price > 0
+      ? liveTick.price
+      : (last?.c ?? 0);
   const recent = hasData ? candles.slice(-150) : [];
   const highs = recent.map((c) => c.h);
   const lows = recent.map((c) => c.l);
@@ -1195,7 +1207,7 @@ ${candlestickEvidence.latest
 PATTERN RULE: names describe candle geometry plus preceding direction, not a guaranteed reversal or continuation. Structure, location, liquidity and a later confirming close decide whether a pattern matters.`
     : "RECENT CONFIRMED CANDLESTICK FORMATIONS: none objectively qualified in the latest eight closed candles";
 
-  const price = last ? last.c : 0;
+  const price = currentPrice;
   const buySideLevels = Array.from(
     new Set(
       structureEvidence.pivots
@@ -1238,7 +1250,9 @@ SELL-SIDE LIQUIDITY (swing lows below price, nearest first): ${
 
   return {
     hasData,
+    hasLivePrice,
     last,
+    currentPrice,
     swingHigh,
     swingLow,
     liquidityBlock,
@@ -1260,15 +1274,20 @@ function exactStructureAnswer(
   timeframe: string,
   pivots: Array<{ label: string; price: number; t: number; kind: "high" | "low" }>,
   structureState: string,
+  currentPrice: number,
 ): string | null {
   if (!isStructureLabelQuery(query)) return null;
   if (pivots.length === 0) {
     const romanUrdu = /\b(kaha|kidhar|hai|ha|bata|banao|bana|ya|yar|wala|wali|mujhe|muje)\b/i.test(
       query,
     );
+    const livePrice =
+      Number.isFinite(currentPrice) && currentPrice > 0
+        ? ` Verified live XAU/USD price: ${currentPrice.toFixed(2)}.`
+        : "";
     return romanUrdu
-      ? `${timeframe.toUpperCase()} par abhi verified closed-candle feed ya enough confirmed pivots available nahi hain, is liye main HH/LH/HL/LL ki value guess nahi karunga.`
-      : `Verified closed-candle data or enough confirmed pivots are not currently available on ${timeframe.toUpperCase()}, so I will not guess HH/LH/HL/LL values.`;
+      ? `${timeframe.toUpperCase()} par abhi verified closed-candle feed ya enough confirmed pivots available nahi hain, is liye main HH/LH/HL/LL ki value guess nahi karunga.${livePrice}`
+      : `Verified closed-candle data or enough confirmed pivots are not currently available on ${timeframe.toUpperCase()}, so I will not guess HH/LH/HL/LL values.${livePrice}`;
   }
   const latest = pivots.slice(-6);
   const lines = latest.map(
@@ -1325,15 +1344,16 @@ async function _analyzeGoldCompute(
       data.timeframe,
       ev.recentPivots,
       ev.structureState,
+      ev.currentPrice,
     );
     if (data.advisor && exactAnswer) {
-      return deterministicAdvisorResult(exactAnswer, data.timeframe, ev.last?.c ?? 0);
+      return deterministicAdvisorResult(exactAnswer, data.timeframe, ev.currentPrice);
     }
     const evidenceContext = ev.hasData
       ? `
 
 VERIFIED MARKET DATA for XAU/USD ${data.timeframe.toUpperCase()} (computed from real closed candles — this is authoritative and overrides anything you think you see in the image):
-CURRENT PRICE: ${ev.last!.c.toFixed(2)}
+CURRENT PRICE: ${ev.currentPrice.toFixed(2)}
 RECENT SWING HIGH (150): ${ev.swingHigh.toFixed(2)}
 RECENT SWING LOW (150): ${ev.swingLow.toFixed(2)}
 ${ev.liquidityBlock}
@@ -1390,6 +1410,7 @@ Perform an evidence-first chart review. Inspect only what is visibly supported: 
       data.timeframe,
       ev.recentPivots,
       ev.structureState,
+      ev.currentPrice,
     );
     return {
       bias: parsed.bias === "BULLISH" || parsed.bias === "BEARISH" ? parsed.bias : "NEUTRAL",
@@ -1414,7 +1435,7 @@ Perform an evidence-first chart review. Inspect only what is visibly supported: 
         deterministicStructure ??
         String(parsed.fullAnalysis ?? parsed.spokenSummary ?? "Chart review complete."),
       timeframe: data.timeframe,
-      currentPrice: 0,
+      currentPrice: ev.currentPrice,
       generatedAt: new Date().toISOString(),
       __billable: "chat",
     };
@@ -1478,6 +1499,7 @@ Perform an evidence-first chart review. Inspect only what is visibly supported: 
 
   const {
     hasData,
+    hasLivePrice,
     swingHigh,
     swingLow,
     last,
@@ -1488,15 +1510,17 @@ Perform an evidence-first chart review. Inspect only what is visibly supported: 
     compact,
     recentPivots,
     structureState,
+    currentPrice,
   } = await buildEvidenceContext(data.timeframe);
   const exactAnswer = exactStructureAnswer(
     data.query,
     data.timeframe,
     recentPivots,
     structureState,
+    currentPrice,
   );
   if (data.advisor && exactAnswer) {
-    return deterministicAdvisorResult(exactAnswer, data.timeframe, last?.c ?? 0);
+    return deterministicAdvisorResult(exactAnswer, data.timeframe, currentPrice);
   }
 
   const advisorSystem = `You are a concise general-purpose AI assistant and an institutional-grade XAU/USD research mentor. Your trading knowledge reflects decades of established discretionary price-action practice without pretending to possess personal human experience.
@@ -1581,7 +1605,7 @@ Return ONLY valid JSON (no markdown, no code fences) with this exact shape:
 CONTEXT (use ONLY if user is asking about gold trading):
 TIMEFRAME: ${data.timeframe.toUpperCase()}
 SYMBOL: XAU/USD (Gold)
-CURRENT PRICE: ${last!.c.toFixed(2)}
+CURRENT PRICE: ${currentPrice.toFixed(2)}
 RECENT SWING HIGH (150): ${swingHigh.toFixed(2)}
 RECENT SWING LOW (150): ${swingLow.toFixed(2)}
 ${liquidityBlock}
@@ -1596,7 +1620,7 @@ Only cite price levels that appear above. Do not state any level outside ${swing
 ${requestInstruction}${advisorGuide}`
     : `USER MESSAGE: ${data.query}
 
-${isTradingIntent ? "The live feed is unavailable. Answer concisely without inventing market data and mention that limitation." : requestInstruction}${advisorGuide}`;
+${isTradingIntent ? `${hasLivePrice ? `VERIFIED LIVE XAU/USD PRICE: ${currentPrice.toFixed(2)}. ` : ""}Verified closed-candle structure is unavailable. Answer concisely without inventing HH/HL/LH/LL, liquidity, entries, or other market levels, and mention that limitation.` : requestInstruction}${advisorGuide}`;
 
   const {
     content,
@@ -1640,6 +1664,7 @@ ${isTradingIntent ? "The live feed is unavailable. Answer concisely without inve
     data.timeframe,
     recentPivots,
     structureState,
+    currentPrice,
   );
 
   const signal: GoldSignal = {
@@ -1662,7 +1687,7 @@ ${isTradingIntent ? "The live feed is unavailable. Answer concisely without inve
     spokenSummary: deterministicStructure ?? String(parsed.spokenSummary ?? "Analysis complete."),
     fullAnalysis: deterministicStructure ?? String(parsed.fullAnalysis ?? ""),
     timeframe: data.timeframe,
-    currentPrice: last?.c ?? 0,
+    currentPrice,
     generatedAt: new Date().toISOString(),
   };
 
