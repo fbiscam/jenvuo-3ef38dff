@@ -1417,6 +1417,79 @@ CONFLUENCE: ${quant.confluence_score}${quant.notes.length ? `\nNOTES: ${quant.no
 QUANT RULE: quote only these measured values. Volume status is participation evidence, never proof of direction. Break-even and trailing levels are risk management references, not guarantees, and a confluence count is a checklist grade, never a probability.`
     : "VERIFIED INSTITUTIONAL QUANT LAYER: unavailable (insufficient closed candles)";
 
+  // Apex Predator layer: order flow proxy (CVD + footprint imbalance), macro
+  // triangulation (DXY + US10Y), IFVG/BPR geometry and the LBMA fix filter.
+  const [dxyCandles, us10yCandles] = hasData
+    ? await Promise.all([
+        fetchInstrumentCandles(resolveInstrument("DXY"), "1h").catch(() => [] as Candle[]),
+        fetchInstrumentCandles(
+          {
+            raw: "US10Y",
+            key: "INDEX:US10Y",
+            display: "US10Y",
+            kind: "index",
+            decimals: 3,
+            yahooSymbols: ["^TNX"],
+            quote: "USD",
+            needsUsdNews: false,
+          },
+          "1h",
+        ).catch(() => [] as Candle[]),
+      ])
+    : [[] as Candle[], [] as Candle[]];
+  const apex = hasData
+    ? buildApexEvidence({
+        candles: recent.map((c) => ({ t: c.t, o: c.o, h: c.h, l: c.l, c: c.c, v: c.v ?? 0 })),
+        fvgs: poiEvidence.fair_value_gaps.map((g) => ({
+          type: g.type,
+          index: g.index,
+          t: g.t,
+          top: g.top,
+          bottom: g.bottom,
+          status: g.status,
+        })),
+        dxyCandles,
+        us10yCandles,
+        direction:
+          quant?.execution_params?.signal === "BUY_STOP"
+            ? "BUY"
+            : quant?.execution_params?.signal === "SELL_STOP"
+              ? "SELL"
+              : null,
+        entry: quant?.execution_params?.trigger_price ?? null,
+        stopLoss: quant?.execution_params?.dynamic_sl ?? null,
+        target: quant?.market_context.htf_draw_on_liquidity ?? null,
+        patternInsideT: quant?.pattern?.inside_t ?? null,
+        currentPrice,
+        now: Date.now(),
+      })
+    : null;
+  const apexBlock = apex
+    ? `VERIFIED APEX PREDATOR LAYER (order flow proxy + macro + IFVG/BPR + LBMA fix, closed candles only):
+ORDER FLOW: CVD ${apex.apex_validations.cvd_delta_divergence} | trigger-candle footprint ${apex.apex_validations.footprint_imbalance} (candle-derived delta proxy — broker level-2 tape is not available)
+MACRO TRIANGULATION: DXY H1 ${apex.apex_validations.macro_triangulation.dxy_trend} | US10Y H1 ${apex.apex_validations.macro_triangulation.us10y_trend} | gold alignment ${apex.apex_validations.macro_triangulation.gold_alignment}
+ICT GEOMETRY: ${apex.apex_validations.ict_geometry}${
+        apex.geometry.inversion_fvgs.length
+          ? ` | IFVGs: ${apex.geometry.inversion_fvgs
+              .map(
+                (z) =>
+                  `${z.type} ${z.bottom.toFixed(2)}–${z.top.toFixed(2)} inverted ${stamp(z.inverted_t)} ${z.fresh ? "FRESH" : "RETESTED"}`,
+              )
+              .join("; ")}`
+          : ""
+      }${
+        apex.geometry.balanced_price_ranges.length
+          ? ` | BPRs: ${apex.geometry.balanced_price_ranges
+              .map((z) => `${z.bottom.toFixed(2)}–${z.top.toFixed(2)} ${z.status}`)
+              .join("; ")}`
+          : ""
+      }
+LBMA GOLD FIX: ${apex.apex_validations.lbma_fix_status}
+APEX VERDICT: ${apex.trade_execution.action} ${apex.trade_execution.direction} | entry ${apex.trade_execution.entry_zone?.toFixed(2) ?? "n/a"} | invalidation ${apex.trade_execution.invalidation_level?.toFixed(2) ?? "n/a"} | primary liquidity target ${apex.trade_execution.primary_liquidity_target?.toFixed(2) ?? "n/a"} | risk ${apex.trade_execution.dynamic_risk_allocation}
+APEX CONFLUENCE: ${apex.trade_execution.apex_confluence_score}${apex.notes.length ? `\nNOTES: ${apex.notes.join(" ")}` : ""}
+APEX RULE: never claim CVD, delta or footprint data beyond this proxy, and never state a win rate or probability — the Apex score is a checklist count. A PRE_FIX_BLACKOUT means no entry until the LBMA fix sweep is confirmed; MACRO_DIVERGENCE means half risk or stand aside; an ABORT verdict overrides every lower-layer setup.`
+    : "VERIFIED APEX PREDATOR LAYER: unavailable (insufficient closed candles)";
+
   const compact = recent
     .map(
       (c) =>
