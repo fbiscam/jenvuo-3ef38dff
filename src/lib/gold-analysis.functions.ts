@@ -1339,8 +1339,11 @@ SYMBOL: XAU/USD (Gold)
 CURRENT PRICE: ${last!.c.toFixed(2)}
 RECENT SWING HIGH (150): ${swingHigh.toFixed(2)}
 RECENT SWING LOW (150): ${swingLow.toFixed(2)}
+${liquidityBlock}
 LAST 150 CANDLES (OHLC):
 ${compact}
+
+Only cite price levels that appear above. Do not state any level outside ${swingLow.toFixed(2)}-${swingHigh.toFixed(2)}.
 
 ${requestInstruction}${advisorGuide}`
     : `USER MESSAGE: ${data.query}
