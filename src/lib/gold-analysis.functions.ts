@@ -60,8 +60,6 @@ import {
   mapAdvancedSmcState,
 } from "@/lib/analysis/market-structure-evidence";
 import { detectPoiEvidence } from "@/lib/analysis/poi-evidence";
-import {
-} from "@/lib/analysis/market-structure-evidence";
 import { detectCandlestickPatterns } from "@/lib/analysis/candlestick-pattern-evidence";
 
 async function _spendUserCredits(
