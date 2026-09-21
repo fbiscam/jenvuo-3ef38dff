@@ -270,20 +270,23 @@ export function mapMarketStructure(
   });
 
   const evidence = detectMarketStructureEvidence(candles, radius);
-  const mapped = input.map((candle) => ({
+  const mapped: MappedMarketStructureCandle[] = input.map((candle) => ({
     ...candle,
     is_swing_high: false,
     is_swing_low: false,
     structure_label: null,
     smc_event: null,
-  })) satisfies MappedMarketStructureCandle[];
+  }));
 
   for (const pivot of evidence.pivots) {
     const candle = mapped[pivot.index];
     if (!candle) continue;
     if (pivot.kind === "high") candle.is_swing_high = true;
     else candle.is_swing_low = true;
-    candle.structure_label = pivot.label.length === 2 ? pivot.label : null;
+    candle.structure_label =
+      pivot.label === "HH" || pivot.label === "HL" || pivot.label === "LH" || pivot.label === "LL"
+        ? pivot.label
+        : null;
   }
 
   for (const event of evidence.breaks) {

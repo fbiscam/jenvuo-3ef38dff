@@ -1,4 +1,5 @@
-import { describe, expect, test } from "bun:test";
+import assert from "node:assert/strict";
+import { describe, test } from "node:test";
 
 import {
   detectMarketStructureEvidence,
@@ -28,26 +29,29 @@ describe("mapMarketStructure", () => {
     );
     const mapped = mapMarketStructure(input);
 
-    expect(mapped[2].is_swing_high).toBe(true);
-    expect(mapped[2].structure_label).toBeNull();
-    expect(mapped[4].is_swing_low).toBe(true);
-    expect(mapped[4].structure_label).toBeNull();
-    expect(mapped[6].structure_label).toBe("HH");
-    expect(mapped[8].structure_label).toBe("HL");
-    expect(mapped[10].structure_label).toBe("LH");
-    expect(mapped[12].structure_label).toBeNull();
+    assert.equal(mapped[2].is_swing_high, true);
+    assert.equal(mapped[2].structure_label, null);
+    assert.equal(mapped[4].is_swing_low, true);
+    assert.equal(mapped[4].structure_label, null);
+    assert.equal(mapped[6].structure_label, "HH");
+    assert.equal(mapped[8].structure_label, "HL");
+    assert.equal(mapped[10].structure_label, "LH");
+    assert.equal(mapped[12].structure_label, null);
   });
 
   test("does not confirm a swing before the right-side candles close", () => {
     const input = candles([10, 11, 15, 12, 11], [8, 9, 10, 8, 7]);
 
-    expect(mapMarketStructure(input.slice(0, 4)).some((candle) => candle.is_swing_high)).toBe(false);
-    expect(mapMarketStructure(input).at(2)?.is_swing_high).toBe(true);
+    assert.equal(
+      mapMarketStructure(input.slice(0, 4)).some((candle) => candle.is_swing_high),
+      false,
+    );
+    assert.equal(mapMarketStructure(input).at(2)?.is_swing_high, true);
   });
 
   test("requires a strict pivot and rejects equal-high plateaus", () => {
     const input = candles([10, 11, 15, 15, 11, 10], [8, 9, 10, 10, 8, 7]);
-    expect(mapMarketStructure(input).some((candle) => candle.is_swing_high)).toBe(false);
+    assert.equal(mapMarketStructure(input).some((candle) => candle.is_swing_high), false);
   });
 
   test("places break events only on close-through candles", () => {
@@ -68,14 +72,14 @@ describe("mapMarketStructure", () => {
     );
 
     for (const event of evidence.breaks) {
-      expect(mapped[event.index].smc_event).toBe(event.type === "CHOCH" ? "CHoCH" : "BOS");
+      assert.equal(mapped[event.index].smc_event, event.type === "CHOCH" ? "CHoCH" : "BOS");
     }
-    expect(mapped.filter((candle) => candle.smc_event).length).toBe(evidence.breaks.length);
+    assert.equal(mapped.filter((candle) => candle.smc_event).length, evidence.breaks.length);
   });
 
   test("rejects malformed OHLC instead of silently shifting indexes", () => {
     const input = candles([10, 11, 12], [8, 9, 10]);
     input[1].high = 7;
-    expect(() => mapMarketStructure(input)).toThrow("Invalid OHLC candle at index 1");
+    assert.throws(() => mapMarketStructure(input), /Invalid OHLC candle at index 1/);
   });
 });
