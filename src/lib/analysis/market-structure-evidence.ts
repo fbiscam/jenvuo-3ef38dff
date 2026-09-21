@@ -88,7 +88,7 @@ export function detectMarketStructureEvidence(
       c.h >= Math.max(c.o, c.c) &&
       c.l <= Math.min(c.o, c.c),
   );
-  if (candles.length < radius * 2 + 3) {
+  if (candles.length < radius * 2 + 1) {
     return { pivots: [], breaks: [], trend: "undecided", inducement: null };
   }
 
