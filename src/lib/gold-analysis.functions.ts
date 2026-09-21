@@ -54,6 +54,7 @@ import {
   XAU_DESK_CORE_INSTRUCTIONS,
   XAU_SENIOR_REVIEW_INSTRUCTIONS,
 } from "@/lib/analysis/agent-instructions";
+import { detectMarketStructureEvidence } from "@/lib/analysis/market-structure-evidence";
 
 async function _spendUserCredits(
   userId: string,
@@ -1213,51 +1214,12 @@ Perform an evidence-first chart review. Inspect only what is visibly supported: 
   const swingHigh = hasData ? Math.max(...highs) : 0;
   const swingLow = hasData ? Math.min(...lows) : 0;
 
-  // Deterministic liquidity map so the model never invents far-away levels.
-  type Pivot = { t: number; price: number; kind: "high" | "low"; label: string };
-  const pivots: Pivot[] = [];
-  const pivotHighs: number[] = [];
-  const pivotLows: number[] = [];
-  for (let i = 2; i < recent.length - 2; i++) {
-    const c = recent[i];
-    if (
-      c.h >= recent[i - 1].h &&
-      c.h >= recent[i - 2].h &&
-      c.h >= recent[i + 1].h &&
-      c.h >= recent[i + 2].h
-    ) {
-      pivotHighs.push(c.h);
-      pivots.push({ t: c.t, price: c.h, kind: "high", label: "" });
-    }
-    if (
-      c.l <= recent[i - 1].l &&
-      c.l <= recent[i - 2].l &&
-      c.l <= recent[i + 1].l &&
-      c.l <= recent[i + 2].l
-    ) {
-      pivotLows.push(c.l);
-      pivots.push({ t: c.t, price: c.l, kind: "low", label: "" });
-    }
-  }
-  pivots.sort((a, b) => a.t - b.t);
-
-  // Label every confirmed pivot as HH / LH / HL / LL against the previous
-  // pivot of the same kind, so the model never has to guess where structure
-  // shifted — it reads the labels straight from real candle data.
-  let prevHigh: Pivot | null = null;
-  let prevLow: Pivot | null = null;
-  for (const p of pivots) {
-    if (p.kind === "high") {
-      p.label = !prevHigh ? "H" : p.price > prevHigh.price ? "HH" : "LH";
-      prevHigh = p;
-    } else {
-      p.label = !prevLow ? "L" : p.price < prevLow.price ? "LL" : "HL";
-      prevLow = p;
-    }
-  }
-  const labelled = pivots.filter((p) => p.label.length === 2);
+  // Deterministic, causal structure evidence. Pivots are not available until
+  // two later candles close; breaks require a buffered close through the level.
+  const structureEvidence = detectMarketStructureEvidence(recent);
+  const labelled = structureEvidence.pivots.filter((p) => p.label.length === 2);
   const recentPivots = labelled.slice(-10);
-  const fmtPivot = (p: Pivot) =>
+  const fmtPivot = (p: (typeof labelled)[number]) =>
     `${p.label} ${p.price.toFixed(2)} @ ${new Date(p.t).toISOString().slice(5, 16)}Z`;
   const lastHigh = [...labelled].reverse().find((p) => p.kind === "high") ?? null;
   const lastLow = [...labelled].reverse().find((p) => p.kind === "low") ?? null;
@@ -1294,75 +1256,44 @@ LAST CONFIRMED LOW: ${lastLow ? fmtPivot(lastLow) : "n/a"}
 ${lastShift}`
     : "";
 
-  // ---- Deterministic BOS / CHOCH / IDM detection -------------------------
-  // A pivot only becomes tradable structure two bars after it prints, so we
-  // replay the candles in order and only allow breaks of already-confirmed
-  // swing points. Everything the model says about BOS, CHOCH, inducement and
-  // trend is read from this block instead of being guessed from the chart.
-  const indexByTime = new Map<number, number>();
-  recent.forEach((c, i) => indexByTime.set(c.t, i));
-  type Break = { t: number; type: "BOS" | "CHOCH"; dir: "bullish" | "bearish"; level: number };
-  const breaks: Break[] = [];
-  let liveTrend: "bullish" | "bearish" | "none" = "none";
-  let activeHigh: Pivot | null = null;
-  let activeLow: Pivot | null = null;
-  let pivotCursor = 0;
-  for (let i = 0; i < recent.length; i++) {
-    while (pivotCursor < pivots.length) {
-      const p = pivots[pivotCursor];
-      const pi = indexByTime.get(p.t);
-      if (pi === undefined || pi + 2 > i) break;
-      if (p.kind === "high") activeHigh = p;
-      else activeLow = p;
-      pivotCursor += 1;
-    }
-    const c = recent[i];
-    if (activeHigh && c.c > activeHigh.price) {
-      const type = liveTrend === "bearish" ? "CHOCH" : "BOS";
-      breaks.push({ t: c.t, type, dir: "bullish", level: activeHigh.price });
-      liveTrend = "bullish";
-      activeHigh = null;
-    } else if (activeLow && c.c < activeLow.price) {
-      const type = liveTrend === "bullish" ? "CHOCH" : "BOS";
-      breaks.push({ t: c.t, type, dir: "bearish", level: activeLow.price });
-      liveTrend = "bearish";
-      activeLow = null;
-    }
-  }
+  const breaks = structureEvidence.breaks;
   const stamp = (t: number) => new Date(t).toISOString().slice(5, 16) + "Z";
   const recentBreaks = breaks.slice(-5);
   const lastBreak = breaks[breaks.length - 1] ?? null;
-  // Inducement = the last opposite-side pivot printed before the break; price
-  // usually has to take that liquidity before respecting the POI behind it.
-  const idmLine = (() => {
-    if (!lastBreak) return "INDUCEMENT (IDM): no confirmed break in the supplied window";
-    const wanted = lastBreak.dir === "bullish" ? "low" : "high";
-    const idm = [...pivots].reverse().find((p) => p.kind === wanted && p.t < lastBreak.t);
-    if (!idm) return "INDUCEMENT (IDM): no qualifying pivot before the last break";
-    const after = recent.filter((c) => c.t > lastBreak.t);
-    const swept =
-      wanted === "low"
-        ? after.some((c) => c.l < idm.price)
-        : after.some((c) => c.h > idm.price);
-    return `INDUCEMENT (IDM): ${wanted === "low" ? "sell-side" : "buy-side"} pool at ${idm.price.toFixed(
-      2,
-    )} (${stamp(idm.t)}) — ${swept ? "already swept after the break" : "still unswept"}`;
-  })();
+  const idm = structureEvidence.inducement;
+  const idmLine = idm
+    ? `INDUCEMENT (IDM) CANDIDATE: ${idm.kind} pool at ${idm.price.toFixed(2)} (${stamp(idm.t)}) — ${idm.swept ? "already swept after the break" : "still unswept"}. Treat this as a candidate, not proof of institutional intent.`
+    : "INDUCEMENT (IDM): no qualifying internal pivot tied to the last confirmed break";
   const breakBlock = breaks.length
-    ? `CONFIRMED BREAKS (close-through of a confirmed swing, oldest -> newest):
+    ? `CONFIRMED BREAKS (buffered close-through of an already-confirmed swing, oldest -> newest):
 ${recentBreaks
-  .map((b) => `${b.type} ${b.dir} through ${b.level.toFixed(2)} @ ${stamp(b.t)}`)
+  .map(
+    (b) =>
+      `${b.type} ${b.dir} through ${b.level.toFixed(2)} @ ${stamp(b.t)} — ${b.displacement ? "displacement confirmed" : "weak close; no displacement"}`,
+  )
   .join("\n")}
 LAST BREAK: ${lastBreak ? `${lastBreak.type} ${lastBreak.dir} through ${lastBreak.level.toFixed(2)} @ ${stamp(lastBreak.t)}` : "n/a"}
-TREND FROM BREAKS: ${liveTrend === "none" ? "undecided" : liveTrend.toUpperCase()}
+TREND FROM BREAKS: ${structureEvidence.trend.toUpperCase()}
 ${idmLine}`
     : "CONFIRMED BREAKS: none inside the supplied window (no close-through of a confirmed swing)";
 
   const price = last ? last.c : 0;
-  const buySideLevels = Array.from(new Set(pivotHighs.filter((h) => h > price)))
+  const buySideLevels = Array.from(
+    new Set(
+      structureEvidence.pivots
+        .filter((p) => p.kind === "high" && p.price > price)
+        .map((p) => p.price),
+    ),
+  )
     .sort((a, b) => a - b)
     .slice(0, 4);
-  const sellSideLevels = Array.from(new Set(pivotLows.filter((l) => l < price)))
+  const sellSideLevels = Array.from(
+    new Set(
+      structureEvidence.pivots
+        .filter((p) => p.kind === "low" && p.price < price)
+        .map((p) => p.price),
+    ),
+  )
     .sort((a, b) => b - a)
     .slice(0, 4);
   const liquidityBlock = hasData
@@ -1406,9 +1337,9 @@ Additional rules only for trading questions:
 - Every price level you mention MUST be copied exactly from the supplied CURRENT PRICE, swing high/low, LIQUIDITY levels, or OHLC rows. Never round, guess, or extrapolate a level, and never quote a level outside the supplied swing high/low range.
 - When asked where liquidity is sitting, quote the nearest supplied buy-side and sell-side levels first and state their distance from the current price.
 - Market structure is already computed for you in CONFIRMED SWING STRUCTURE. When the user asks where an HH, HL, LH or LL formed, answer with the exact labelled pivot price and its timestamp from that block. Never re-derive, rename, or invent a swing point, and never label a level the block does not label.
-- BOS, CHOCH and inducement are already computed in CONFIRMED BREAKS. A BOS is a close-through of a confirmed swing in the direction of the existing trend (continuation); a CHOCH is the first close-through of a confirmed swing against it (possible reversal). Only call something a BOS or CHOCH if it is listed there, and quote its level and timestamp.
+- BOS, CHOCH, MSS and inducement are already computed in CONFIRMED BREAKS. MSS is the first directional break when prior trend is unconfirmed; BOS is continuation; CHOCH is the first opposite break. Only quote listed events with their exact level and timestamp. A weak close without displacement is lower-quality evidence and must not be described as strong confirmation.
 - Use TREND FROM BREAKS together with CURRENT STRUCTURE for bias; if they disagree, say so and explain that the market is transitioning.
-- When asked about inducement/IDM, use the INDUCEMENT line: the engineered pool traders get trapped in before price respects the POI behind it. State whether it is swept or unswept and what that implies for the next leg.
+- When asked about inducement/IDM, use the INDUCEMENT line. Call it a candidate internal-liquidity pool, never proof that institutions engineered a trap. State whether it is swept or unswept and require displacement plus follow-through before treating it as meaningful.
 - Explain the mechanics (why liquidity was taken, where the displacement came from, what invalidates it), not just the labels.
 - Coach the user to build their own plan by explaining relevant structure, confirmation, invalidation, or risk.
 - You may suggest what to watch, but never provide a finished signal with committed entry, stop loss, and take profit.
