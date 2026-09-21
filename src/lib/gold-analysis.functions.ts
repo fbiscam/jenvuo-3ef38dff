@@ -1419,6 +1419,8 @@ CURRENT PRICE: ${ev.currentPrice.toFixed(2)}
 RECENT SWING HIGH (150): ${ev.swingHigh.toFixed(2)}
 RECENT SWING LOW (150): ${ev.swingLow.toFixed(2)}
 ${ev.liquidityBlock}
+${ev.advancedLiquidityBlock}
+${ev.mtfTrendBlock}
 ${ev.structureBlock}
 ${ev.breakBlock}
 ${ev.patternBlock}
@@ -1566,6 +1568,8 @@ Perform an evidence-first chart review. Inspect only what is visibly supported: 
     swingLow,
     last,
     liquidityBlock,
+    advancedLiquidityBlock,
+    mtfTrendBlock,
     structureBlock,
     breakBlock,
     patternBlock,
@@ -1603,6 +1607,8 @@ Additional rules only for trading questions:
 - Never invent live prices, chart features, indicators, news, or higher-timeframe context that was not supplied.
 - Every price level you mention MUST be copied exactly from the supplied CURRENT PRICE, swing high/low, LIQUIDITY levels, or OHLC rows. Never round, guess, or extrapolate a level, and never quote a level outside the supplied swing high/low range.
 - When asked where liquidity is sitting, quote the nearest supplied buy-side and sell-side levels first and state their distance from the current price.
+- Treat VERIFIED ADVANCED SMC STATE as authoritative for trend, premium/discount, EQH/EQL, IDM, trendline liquidity, BOS/CHoCH and sweeps. A wick beyond a level that closes back inside is a BSL_SWEEP or SSL_SWEEP and must never be called BOS. Only a close beyond a confirmed swing changes trend. Never claim an IDM exists unless it is listed, and always state SWEPT versus UNSWEPT.
+- MULTI-TIMEFRAME TREND is a closed-candle consensus. If it says MIXED, do not claim full timeframe alignment.
 - Market structure is already computed for you in CONFIRMED SWING STRUCTURE. When the user asks where an HH, HL, LH or LL formed, answer with the exact labelled pivot price and its timestamp from that block. Never re-derive, rename, or invent a swing point, and never label a level the block does not label.
 - BOS, CHOCH, MSS and inducement are already computed in CONFIRMED BREAKS. MSS is the first directional break when prior trend is unconfirmed; BOS is continuation; CHOCH is the first opposite break. Only quote listed events with their exact level and timestamp. A weak close without displacement is lower-quality evidence and must not be described as strong confirmation.
 - Use TREND FROM BREAKS together with CURRENT STRUCTURE for bias; if they disagree, say so and explain that the market is transitioning.
@@ -1671,6 +1677,8 @@ CURRENT PRICE: ${currentPrice.toFixed(2)}
 RECENT SWING HIGH (150): ${swingHigh.toFixed(2)}
 RECENT SWING LOW (150): ${swingLow.toFixed(2)}
 ${liquidityBlock}
+${advancedLiquidityBlock}
+${mtfTrendBlock}
 ${structureBlock}
 ${breakBlock}
 ${patternBlock}
