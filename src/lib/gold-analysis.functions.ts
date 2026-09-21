@@ -63,7 +63,10 @@ import { detectPoiEvidence } from "@/lib/analysis/poi-evidence";
 import { buildExecutionEvidence } from "@/lib/analysis/execution-evidence";
 import { buildQuantEvidence } from "@/lib/analysis/quant-evidence";
 import { buildApexEvidence } from "@/lib/analysis/apex-evidence";
-import { buildThreeStocksEvidence } from "@/lib/analysis/three-stocks-evidence";
+import {
+  buildThreeStocksEvidence,
+  newYorkTradingDayRange,
+} from "@/lib/analysis/three-stocks-evidence";
 import { detectCandlestickPatterns } from "@/lib/analysis/candlestick-pattern-evidence";
 
 async function _spendUserCredits(
@@ -1077,7 +1080,25 @@ async function fetchGoldCandles(tf: string): Promise<Candle[]> {
 // OANDA:XAUUSD embed. Never fall through to GC futures or tokenized Gold here:
 // their premium/discount can make otherwise valid pivots look incorrect.
 async function fetchTerminalGoldEvidenceCandles(tf: string): Promise<Candle[]> {
-  return fetchFromYahooSymbols(["XAUUSD=X"], tf);
+  try {
+    return await fetchFromYahooSymbols(["XAUUSD=X"], tf);
+  } catch {
+    // Yahoo currently delists/rejects its anonymous spot-Gold chart endpoint.
+    // Use exchange-traded, fully real PAXG candles rather than synthetic bars;
+    // normalize them to the live XAU/USD tick so levels remain on the terminal's
+    // OANDA spot scale while preserving the real candle structure and volume.
+    const proxy = await fetchFromBinanceSymbols(["PAXGUSDT"], tf);
+    const latestProxy = proxy.at(-1)?.c ?? 0;
+    const spot = await resolveLiveTick(resolveInstrument("XAUUSD")).catch(() => null);
+    const scale = spot?.price && latestProxy > 0 ? spot.price / latestProxy : 1;
+    return proxy.map((candle) => ({
+      ...candle,
+      o: candle.o * scale,
+      h: candle.h * scale,
+      l: candle.l * scale,
+      c: candle.c * scale,
+    }));
+  }
 }
 
 function closedCandlesOnly(candles: Candle[], timeframe: string, now = Date.now()): Candle[] {
@@ -1118,7 +1139,7 @@ function isTradingSetupIntent(q: string): boolean {
  * the text path and the chart-screenshot path so the AI never has to guess
  * where an HH/HL/LH/LL, BOS/CHOCH/MSS, inducement or liquidity pool sits.
  */
-async function buildEvidenceContext(timeframe: string) {
+async function buildEvidenceContext(timeframe: string, dailyTradesTaken = 0) {
   let candles: Candle[] = [];
   const liveTick = await resolveLiveTick(resolveInstrument("XAUUSD")).catch(() => null);
   try {
@@ -1510,6 +1531,7 @@ APEX RULE: never claim CVD, delta or footprint data beyond this proxy, and never
           m30: m30Candles.map((c) => ({ t: c.t, o: c.o, h: c.h, l: c.l, c: c.c, v: c.v })),
           h4: h4Candles.map((c) => ({ t: c.t, o: c.o, h: c.h, l: c.l, c: c.c, v: c.v })),
           h1: h1Candles.map((c) => ({ t: c.t, o: c.o, h: c.h, l: c.l, c: c.c, v: c.v })),
+          dailyTradesTaken,
         })
       : null;
   const reversalBlock = reversal
@@ -1638,11 +1660,12 @@ async function _analyzeGoldCompute(
   __userId: string | null = null,
   __scanId: string | null = null,
   __terminalRequestId: string | null = null,
+  __dailyTradesTaken = 0,
 ): Promise<GoldSignal & { __billable: "signal" | "chat" }> {
   // AI key is validated inside callChatCompletion — no local read needed.
 
   if (data.chartImage) {
-    const ev = await buildEvidenceContext(data.timeframe);
+    const ev = await buildEvidenceContext(data.timeframe, __dailyTradesTaken);
     const exactAnswer = exactStructureAnswer(
       data.query,
       data.timeframe,
@@ -1829,7 +1852,7 @@ Perform an evidence-first chart review. Inspect only what is visibly supported: 
     recentPivots,
     structureState,
     currentPrice,
-  } = await buildEvidenceContext(data.timeframe);
+  } = await buildEvidenceContext(data.timeframe, __dailyTradesTaken);
   const exactAnswer = exactStructureAnswer(
     data.query,
     data.timeframe,
@@ -2073,7 +2096,21 @@ export const analyzeGold = createServerFn({ method: "POST" })
           throw new Error(entitlement.error ?? "Terminal AI is unavailable for this account.");
         terminalRequestId = `terminal-${crypto.randomUUID()}`;
       }
-      const result = await _analyzeGoldCompute(data, context.userId, null, terminalRequestId);
+      const { start, end } = newYorkTradingDayRange();
+      const { count: dailyTradesTaken } = await context.supabase
+        .from("trade_journal")
+        .select("id", { count: "exact", head: true })
+        .eq("user_id", context.userId)
+        .eq("pair", "XAUUSD")
+        .gte("opened_at", start)
+        .lt("opened_at", end);
+      const result = await _analyzeGoldCompute(
+        data,
+        context.userId,
+        null,
+        terminalRequestId,
+        dailyTradesTaken ?? 0,
+      );
       const { __billable: _billable, ...clean } = result;
       void _billable;
       return clean as GoldSignal;

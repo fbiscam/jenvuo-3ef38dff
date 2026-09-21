@@ -131,3 +131,7 @@
 - [x] Add and test deterministic killzone, breaker, AMD, OTE, and execution evidence for Terminal AI
 - [x] Add institutional quant layer (VSA, ATR risk pricing, HTF DOL, M30 mother/inside-bar execution and trade management) to Terminal AI
 - [x] Add Apex Predator layer (CVD/footprint order flow proxy, DXY+US10Y macro triangulation, IFVG/BPR geometry, LBMA fix filter) to Terminal AI
+
+- [x] Verify the Extreme M30 Gold reversal layer against live closed-candle inputs
+- [x] Connect its two-trades-per-New-York-day lock to the authenticated trade journal
+- [x] Reject unverified volume and false distant-level touches in reversal validation
