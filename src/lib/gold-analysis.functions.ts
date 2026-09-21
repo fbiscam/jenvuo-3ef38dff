@@ -1406,7 +1406,10 @@ Additional rules only for trading questions:
 - Every price level you mention MUST be copied exactly from the supplied CURRENT PRICE, swing high/low, LIQUIDITY levels, or OHLC rows. Never round, guess, or extrapolate a level, and never quote a level outside the supplied swing high/low range.
 - When asked where liquidity is sitting, quote the nearest supplied buy-side and sell-side levels first and state their distance from the current price.
 - Market structure is already computed for you in CONFIRMED SWING STRUCTURE. When the user asks where an HH, HL, LH or LL formed, answer with the exact labelled pivot price and its timestamp from that block. Never re-derive, rename, or invent a swing point, and never label a level the block does not label.
-- Use CURRENT STRUCTURE for bias, and cite the listed last structure change when explaining a BOS or CHOCH.
+- BOS, CHOCH and inducement are already computed in CONFIRMED BREAKS. A BOS is a close-through of a confirmed swing in the direction of the existing trend (continuation); a CHOCH is the first close-through of a confirmed swing against it (possible reversal). Only call something a BOS or CHOCH if it is listed there, and quote its level and timestamp.
+- Use TREND FROM BREAKS together with CURRENT STRUCTURE for bias; if they disagree, say so and explain that the market is transitioning.
+- When asked about inducement/IDM, use the INDUCEMENT line: the engineered pool traders get trapped in before price respects the POI behind it. State whether it is swept or unswept and what that implies for the next leg.
+- Explain the mechanics (why liquidity was taken, where the displacement came from, what invalidates it), not just the labels.
 - Coach the user to build their own plan by explaining relevant structure, confirmation, invalidation, or risk.
 - You may suggest what to watch, but never provide a finished signal with committed entry, stop loss, and take profit.
 - Never claim certainty, guaranteed accuracy, personal years of experience, or guaranteed wins.
@@ -1469,6 +1472,7 @@ RECENT SWING HIGH (150): ${swingHigh.toFixed(2)}
 RECENT SWING LOW (150): ${swingLow.toFixed(2)}
 ${liquidityBlock}
 ${structureBlock}
+${breakBlock}
 LAST 150 CANDLES (OHLC):
 ${compact}
 
