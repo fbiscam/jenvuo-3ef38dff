@@ -1674,9 +1674,14 @@ async function _analyzeGoldCompute(
       ev.structureState,
       ev.currentPrice,
     );
-    if (data.advisor && exactAnswer) {
+    const asksAboutMarkings =
+      /(circle|circled|marked|marking|mark\s*ki|draw|drawn|drawing|arrow|box|rectangle|highlight|annotat|line\s*(khinch|draw)|screenshot|screen\s*dekh|chart\s*dekh|dekho|yahan|yeh\s*(level|zone|area|point)|is\s*(level|zone|area|point)|kya\s*hai\s*ye|what\s*(is|did)\s*i)/i.test(
+        data.query || "",
+      );
+    if (data.advisor && exactAnswer && !asksAboutMarkings) {
       return deterministicAdvisorResult(exactAnswer, data.timeframe, ev.currentPrice);
     }
+
     const evidenceContext = ev.hasData
       ? `
 
@@ -1698,14 +1703,16 @@ ${ev.patternBlock}
 LAST 150 CANDLES (OHLC):
 ${ev.compact}
 
-Rules: use the screenshot only for visual corroboration (what the user has drawn, visible zones, chart context). Every HH, HL, LH, LL, BOS, CHOCH, MSS, inducement, liquidity level and named candlestick formation you state MUST be copied exactly from the verified data above, with its price/time evidence. Never read a swing or candle-pattern label off the image, never invent or round a level, and never quote a price outside ${ev.swingLow.toFixed(2)}-${ev.swingHigh.toFixed(2)}. If the image contradicts the verified data, say so and trust the verified data.`
+Rules: read the screenshot carefully for everything the user has personally drawn or annotated — circles, boxes, rectangles, arrows, trendlines, horizontal levels, text labels such as HH/HL/LH/LL/BOS/CHOCH, and highlighted candles or zones. Describe the position of each relevant marking (roughly which price area and which candles it covers), then map it to the nearest matching verified level or pivot above and state whether the user's marking agrees with the verified data or is mislabelled, naming the correct label and price when it is wrong. Every HH, HL, LH, LL, BOS, CHOCH, MSS, inducement, liquidity level and named candlestick formation you state MUST be copied exactly from the verified data above, with its price/time evidence. Never read a swing or candle-pattern label off the image as fact, never invent or round a level, and never quote a price outside ${ev.swingLow.toFixed(2)}-${ev.swingHigh.toFixed(2)}. If the image contradicts the verified data, say so and trust the verified data. If a marking is too unclear to locate, say exactly that instead of guessing.`
       : `
 
-The live candle feed is unavailable, so no verified levels exist. Describe only what is clearly visible in the image, avoid exact price claims, and state that limitation.`;
-    const imagePrompt = `Review this user-provided XAU/USD chart screenshot on ${data.timeframe.toUpperCase()} and answer only the user's request: ${data.query}
+The live candle feed is unavailable, so no verified levels exist. Describe only what is clearly visible in the image, including the user's own drawings and labels, avoid exact price claims, and state that limitation.`;
+    const imagePrompt = `Review this user-provided XAU/USD chart screenshot on ${data.timeframe.toUpperCase()} and answer ONLY the user's request, nothing else: ${data.query}
 
-Perform an evidence-first chart review. Inspect only what is visibly supported: swing structure and dealing range, BOS/CHOCH/MSS, displacement, liquidity pools and sweeps, premium/discount, order blocks, breakers, mitigation, fair value gaps/imbalances, session context, and invalidation evidence. Distinguish confirmed facts from possibilities. If the timeframe, price scale, candles, or required context is unreadable, say exactly what is missing instead of guessing. Keep the answer concise. Return the same JSON shape defined by the system instructions.${evidenceContext}`;
-    const system = `You are an institutional-grade XAU/USD chart research assistant with deep practical knowledge of long-established discretionary price-action methods and advanced ICT/SMC concepts. Your analysis must be rigorous, skeptical, and grounded only in the supplied image. Cross-check every conclusion against visible structure, liquidity, displacement, location, and confirmation; mention conflicting evidence. Never invent prices, candles, indicators, news, higher-timeframe context, or certainty. No chart analysis can guarantee accuracy. In advisor mode, coach and explain without issuing a finished entry/stop/target signal. Reply only in concise English. Return only valid JSON with this shape: {"bias":"BULLISH|BEARISH|NEUTRAL","direction":"BUY|SELL|WAIT","entry":"price or -","stopLoss":"price or -","takeProfits":[],"riskReward":"value or -","confidence":0,"killzone":"-","confluences":[],"ictAnalysis":"","smcAnalysis":"","marketStructure":"","spokenSummary":"","fullAnalysis":""}.`;
+First identify precisely what the user is asking about. If they refer to something on the screen — "dekho", "yeh", "is level", a circle, box, arrow, line, or a label they wrote — locate that exact marking in the screenshot and answer about that specific thing only. Do not give a general market overview, extra sections, or unrelated levels that the user did not ask for.
+
+Perform an evidence-first review of only what the question needs: swing structure and dealing range, BOS/CHOCH/MSS, displacement, liquidity pools and sweeps, premium/discount, order blocks, breakers, mitigation, fair value gaps, session context, and invalidation evidence. Distinguish confirmed facts from possibilities. If the timeframe, price scale, candles, or a referenced marking is unreadable, say exactly what is missing instead of guessing. Keep the answer concise — normally 1-4 short sentences. Return the same JSON shape defined by the system instructions.${evidenceContext}`;
+    const system = `You are an institutional-grade XAU/USD chart research assistant with deep practical knowledge of long-established discretionary price-action methods and advanced ICT/SMC concepts. Your analysis must be rigorous, skeptical, and grounded only in the supplied image and verified data. You are also skilled at reading a user's own chart annotations (circles, boxes, arrows, trendlines, handwritten labels) and answering about exactly the marking they point at. Answer only what the user asked and nothing more. Cross-check every conclusion against visible structure, liquidity, displacement, location, and confirmation; mention conflicting evidence. Never invent prices, candles, indicators, news, higher-timeframe context, or certainty. No chart analysis can guarantee accuracy. In advisor mode, coach and explain without issuing a finished entry/stop/target signal. Mirror the user's language and script exactly (English, Roman Urdu/Hinglish, Urdu, Hindi, Arabic or any other) and match their tone; keep technical terms and all numeric price levels unchanged. Return only valid JSON with this shape: {"bias":"BULLISH|BEARISH|NEUTRAL","direction":"BUY|SELL|WAIT","entry":"price or -","stopLoss":"price or -","takeProfits":[],"riskReward":"value or -","confidence":0,"killzone":"-","confluences":[],"ictAnalysis":"","smcAnalysis":"","marketStructure":"","spokenSummary":"","fullAnalysis":""}.`;
     const { content, model, usage } = await callChatCompletion({
       models: [...EXTENSION_MODEL_CHAIN.vision],
       messages: [
