@@ -1111,18 +1111,16 @@ function isTradingSetupIntent(q: string): boolean {
  */
 async function buildEvidenceContext(timeframe: string) {
   let candles: Candle[] = [];
-  let liveTick: LiveTick | null = null;
+  const liveTick = await resolveLiveTick(resolveInstrument("XAUUSD")).catch(() => null);
   try {
-    [candles, liveTick] = await Promise.all([
-      fetchTerminalGoldEvidenceCandles(timeframe).then((rows) =>
-        closedCandlesOnly(rows, timeframe),
-      ),
-      resolveLiveTick(resolveInstrument("XAUUSD")).catch(() => null),
-    ]);
+    candles = closedCandlesOnly(await fetchTerminalGoldEvidenceCandles(timeframe), timeframe);
   } catch {
     candles = [];
   }
   const hasData = candles.length >= 10;
+  const hasLivePrice = Boolean(
+    liveTick?.price && Number.isFinite(liveTick.price) && liveTick.price > 0,
+  );
   const last = hasData ? candles[candles.length - 1] : null;
   const currentPrice =
     liveTick?.price && Number.isFinite(liveTick.price) && liveTick.price > 0
@@ -1252,6 +1250,7 @@ SELL-SIDE LIQUIDITY (swing lows below price, nearest first): ${
 
   return {
     hasData,
+    hasLivePrice,
     last,
     currentPrice,
     swingHigh,
@@ -1493,6 +1492,7 @@ Perform an evidence-first chart review. Inspect only what is visibly supported: 
 
   const {
     hasData,
+    hasLivePrice,
     swingHigh,
     swingLow,
     last,
@@ -1612,7 +1612,7 @@ Only cite price levels that appear above. Do not state any level outside ${swing
 ${requestInstruction}${advisorGuide}`
     : `USER MESSAGE: ${data.query}
 
-${isTradingIntent ? "The live feed is unavailable. Answer concisely without inventing market data and mention that limitation." : requestInstruction}${advisorGuide}`;
+${isTradingIntent ? `${hasLivePrice ? `VERIFIED LIVE XAU/USD PRICE: ${currentPrice.toFixed(2)}. ` : ""}Verified closed-candle structure is unavailable. Answer concisely without inventing HH/HL/LH/LL, liquidity, entries, or other market levels, and mention that limitation.` : requestInstruction}${advisorGuide}`;
 
   const {
     content,
