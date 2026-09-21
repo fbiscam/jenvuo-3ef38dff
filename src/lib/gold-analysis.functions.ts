@@ -1071,6 +1071,139 @@ function isTradingSetupIntent(q: string): boolean {
   );
 }
 
+/**
+ * Deterministic market evidence built from real closed candles. Used by both
+ * the text path and the chart-screenshot path so the AI never has to guess
+ * where an HH/HL/LH/LL, BOS/CHOCH/MSS, inducement or liquidity pool sits.
+ */
+async function buildEvidenceContext(timeframe: string) {
+  let candles: Candle[] = [];
+  try {
+    candles = await fetchGoldCandles(timeframe);
+  } catch {
+    candles = [];
+  }
+  const hasData = candles.length >= 10;
+  const last = hasData ? candles[candles.length - 1] : null;
+  const recent = candles.slice(-150);
+  const highs = recent.map((c) => c.h);
+  const lows = recent.map((c) => c.l);
+  const swingHigh = hasData ? Math.max(...highs) : 0;
+  const swingLow = hasData ? Math.min(...lows) : 0;
+
+  // Pivots are not available until two later candles close; breaks require a
+  // buffered close through an already-confirmed swing.
+  const structureEvidence = detectMarketStructureEvidence(recent);
+  const labelled = structureEvidence.pivots.filter((p) => p.label.length === 2);
+  const recentPivots = labelled.slice(-10);
+  const fmtPivot = (p: (typeof labelled)[number]) =>
+    `${p.label} ${p.price.toFixed(2)} @ ${new Date(p.t).toISOString().slice(5, 16)}Z`;
+  const lastHigh = [...labelled].reverse().find((p) => p.kind === "high") ?? null;
+  const lastLow = [...labelled].reverse().find((p) => p.kind === "low") ?? null;
+  const structureState =
+    lastHigh?.label === "HH" && lastLow?.label === "HL"
+      ? "BULLISH (HH + HL sequence)"
+      : lastHigh?.label === "LH" && lastLow?.label === "LL"
+        ? "BEARISH (LH + LL sequence)"
+        : lastHigh && lastLow
+          ? `MIXED / RANGING (last high ${lastHigh.label}, last low ${lastLow.label})`
+          : "UNDEFINED (not enough confirmed pivots)";
+  const lastShift = (() => {
+    for (let i = labelled.length - 1; i >= 1; i--) {
+      const cur = labelled[i];
+      const prevSame = [...labelled.slice(0, i)].reverse().find((p) => p.kind === cur.kind);
+      if (!prevSame) continue;
+      if (cur.label !== prevSame.label) {
+        return `Last structure change: ${prevSame.label} -> ${cur.label} at ${cur.price.toFixed(
+          2,
+        )} (${new Date(cur.t).toISOString().slice(5, 16)}Z)`;
+      }
+    }
+    return "Last structure change: none inside the supplied window";
+  })();
+  const structureBlock = labelled.length
+    ? `CONFIRMED SWING STRUCTURE (5-bar fractal pivots, oldest -> newest):
+${recentPivots.map(fmtPivot).join("\n")}
+CURRENT STRUCTURE: ${structureState}
+LAST CONFIRMED HIGH: ${lastHigh ? fmtPivot(lastHigh) : "n/a"}
+LAST CONFIRMED LOW: ${lastLow ? fmtPivot(lastLow) : "n/a"}
+${lastShift}`
+    : "";
+
+  const breaks = structureEvidence.breaks;
+  const stamp = (t: number) => new Date(t).toISOString().slice(5, 16) + "Z";
+  const recentBreaks = breaks.slice(-5);
+  const lastBreak = breaks[breaks.length - 1] ?? null;
+  const idm = structureEvidence.inducement;
+  const idmLine = idm
+    ? `INDUCEMENT (IDM) CANDIDATE: ${idm.kind} pool at ${idm.price.toFixed(2)} (${stamp(idm.t)}) — ${idm.swept ? "already swept after the break" : "still unswept"}. Treat this as a candidate, not proof of institutional intent.`
+    : "INDUCEMENT (IDM): no qualifying internal pivot tied to the last confirmed break";
+  const breakBlock = breaks.length
+    ? `CONFIRMED BREAKS (buffered close-through of an already-confirmed swing, oldest -> newest):
+${recentBreaks
+  .map(
+    (b) =>
+      `${b.type} ${b.dir} through ${b.level.toFixed(2)} @ ${stamp(b.t)} — ${b.displacement ? "displacement confirmed" : "weak close; no displacement"}`,
+  )
+  .join("\n")}
+LAST BREAK: ${lastBreak ? `${lastBreak.type} ${lastBreak.dir} through ${lastBreak.level.toFixed(2)} @ ${stamp(lastBreak.t)}` : "n/a"}
+TREND FROM BREAKS: ${structureEvidence.trend.toUpperCase()}
+${idmLine}`
+    : "CONFIRMED BREAKS: none inside the supplied window (no close-through of a confirmed swing)";
+
+  const price = last ? last.c : 0;
+  const buySideLevels = Array.from(
+    new Set(
+      structureEvidence.pivots
+        .filter((p) => p.kind === "high" && p.price > price)
+        .map((p) => p.price),
+    ),
+  )
+    .sort((a, b) => a - b)
+    .slice(0, 4);
+  const sellSideLevels = Array.from(
+    new Set(
+      structureEvidence.pivots
+        .filter((p) => p.kind === "low" && p.price < price)
+        .map((p) => p.price),
+    ),
+  )
+    .sort((a, b) => b - a)
+    .slice(0, 4);
+  const liquidityBlock = hasData
+    ? `BUY-SIDE LIQUIDITY (swing highs above price, nearest first): ${
+        buySideLevels.length
+          ? buySideLevels.map((v) => v.toFixed(2)).join(", ")
+          : "none above price"
+      }
+SELL-SIDE LIQUIDITY (swing lows below price, nearest first): ${
+        sellSideLevels.length
+          ? sellSideLevels.map((v) => v.toFixed(2)).join(", ")
+          : "none below price"
+      }`
+    : "";
+
+  const compact = recent
+    .map(
+      (c) =>
+        `${new Date(c.t).toISOString().slice(5, 16)} O${c.o.toFixed(2)} H${c.h.toFixed(
+          2,
+        )} L${c.l.toFixed(2)} C${c.c.toFixed(2)}`,
+    )
+    .join("\n");
+
+  return {
+    hasData,
+    last,
+    swingHigh,
+    swingLow,
+    liquidityBlock,
+    structureBlock,
+    breakBlock,
+    compact,
+  };
+}
+
 async function _analyzeGoldCompute(
   data: { timeframe: string; query: string; chartImage?: string; advisor?: boolean },
   __userId: string | null = null,
@@ -1080,9 +1213,27 @@ async function _analyzeGoldCompute(
   // AI key is validated inside callChatCompletion — no local read needed.
 
   if (data.chartImage) {
+    const ev = await buildEvidenceContext(data.timeframe);
+    const evidenceContext = ev.hasData
+      ? `
+
+VERIFIED MARKET DATA for XAU/USD ${data.timeframe.toUpperCase()} (computed from real closed candles — this is authoritative and overrides anything you think you see in the image):
+CURRENT PRICE: ${ev.last!.c.toFixed(2)}
+RECENT SWING HIGH (150): ${ev.swingHigh.toFixed(2)}
+RECENT SWING LOW (150): ${ev.swingLow.toFixed(2)}
+${ev.liquidityBlock}
+${ev.structureBlock}
+${ev.breakBlock}
+LAST 150 CANDLES (OHLC):
+${ev.compact}
+
+Rules: use the screenshot only for visual corroboration (what the user has drawn, visible zones, chart context). Every HH, HL, LH, LL, BOS, CHOCH, MSS, inducement and liquidity level you state MUST be copied exactly from the verified data above, with its price and timestamp. Never read a swing label off the image, never invent or round a level, and never quote a price outside ${ev.swingLow.toFixed(2)}-${ev.swingHigh.toFixed(2)}. If the image contradicts the verified data, say so and trust the verified data.`
+      : `
+
+The live candle feed is unavailable, so no verified levels exist. Describe only what is clearly visible in the image, avoid exact price claims, and state that limitation.`;
     const imagePrompt = `Review this user-provided XAU/USD chart screenshot on ${data.timeframe.toUpperCase()} and answer only the user's request: ${data.query}
 
-Perform an evidence-first chart review. Inspect only what is visibly supported: swing structure and dealing range, BOS/CHOCH/MSS, displacement, liquidity pools and sweeps, premium/discount, order blocks, breakers, mitigation, fair value gaps/imbalances, session context, and invalidation evidence. Distinguish confirmed facts from possibilities. If the timeframe, price scale, candles, or required context is unreadable, say exactly what is missing instead of guessing. Return the same JSON shape defined by the system instructions.`;
+Perform an evidence-first chart review. Inspect only what is visibly supported: swing structure and dealing range, BOS/CHOCH/MSS, displacement, liquidity pools and sweeps, premium/discount, order blocks, breakers, mitigation, fair value gaps/imbalances, session context, and invalidation evidence. Distinguish confirmed facts from possibilities. If the timeframe, price scale, candles, or required context is unreadable, say exactly what is missing instead of guessing. Keep the answer concise. Return the same JSON shape defined by the system instructions.${evidenceContext}`;
     const system = `You are an institutional-grade XAU/USD chart research assistant with deep practical knowledge of long-established discretionary price-action methods and advanced ICT/SMC concepts. Your analysis must be rigorous, skeptical, and grounded only in the supplied image. Cross-check every conclusion against visible structure, liquidity, displacement, location, and confirmation; mention conflicting evidence. Never invent prices, candles, indicators, news, higher-timeframe context, or certainty. No chart analysis can guarantee accuracy. In advisor mode, coach and explain without issuing a finished entry/stop/target signal. Reply only in concise English. Return only valid JSON with this shape: {"bias":"BULLISH|BEARISH|NEUTRAL","direction":"BUY|SELL|WAIT","entry":"price or -","stopLoss":"price or -","takeProfits":[],"riskReward":"value or -","confidence":0,"killzone":"-","confluences":[],"ictAnalysis":"","smcAnalysis":"","marketStructure":"","spokenSummary":"","fullAnalysis":""}.`;
     const { content, model, usage } = await callChatCompletion({
       models: [...EXTENSION_MODEL_CHAIN.vision],
@@ -1200,123 +1351,16 @@ Perform an evidence-first chart review. Inspect only what is visibly supported: 
     }
   }
 
-  let candles: Candle[] = [];
-  try {
-    candles = await fetchGoldCandles(data.timeframe);
-  } catch {
-    candles = [];
-  }
-  const hasData = candles.length >= 10;
-  const last = hasData ? candles[candles.length - 1] : null;
-  const recent = candles.slice(-150);
-  const highs = recent.map((c) => c.h);
-  const lows = recent.map((c) => c.l);
-  const swingHigh = hasData ? Math.max(...highs) : 0;
-  const swingLow = hasData ? Math.min(...lows) : 0;
-
-  // Deterministic, causal structure evidence. Pivots are not available until
-  // two later candles close; breaks require a buffered close through the level.
-  const structureEvidence = detectMarketStructureEvidence(recent);
-  const labelled = structureEvidence.pivots.filter((p) => p.label.length === 2);
-  const recentPivots = labelled.slice(-10);
-  const fmtPivot = (p: (typeof labelled)[number]) =>
-    `${p.label} ${p.price.toFixed(2)} @ ${new Date(p.t).toISOString().slice(5, 16)}Z`;
-  const lastHigh = [...labelled].reverse().find((p) => p.kind === "high") ?? null;
-  const lastLow = [...labelled].reverse().find((p) => p.kind === "low") ?? null;
-  const structureState =
-    lastHigh?.label === "HH" && lastLow?.label === "HL"
-      ? "BULLISH (HH + HL sequence)"
-      : lastHigh?.label === "LH" && lastLow?.label === "LL"
-        ? "BEARISH (LH + LL sequence)"
-        : lastHigh && lastLow
-          ? `MIXED / RANGING (last high ${lastHigh.label}, last low ${lastLow.label})`
-          : "UNDEFINED (not enough confirmed pivots)";
-  const lastShift = (() => {
-    for (let i = labelled.length - 1; i >= 1; i--) {
-      const cur = labelled[i];
-      const prevSame = [...labelled.slice(0, i)].reverse().find((p) => p.kind === cur.kind);
-      if (!prevSame) continue;
-      if (
-        (cur.kind === "high" && cur.label !== prevSame.label) ||
-        (cur.kind === "low" && cur.label !== prevSame.label)
-      ) {
-        return `Last structure change: ${prevSame.label} -> ${cur.label} at ${cur.price.toFixed(
-          2,
-        )} (${new Date(cur.t).toISOString().slice(5, 16)}Z)`;
-      }
-    }
-    return "Last structure change: none inside the supplied window";
-  })();
-  const structureBlock = labelled.length
-    ? `CONFIRMED SWING STRUCTURE (5-bar fractal pivots, oldest -> newest):
-${recentPivots.map(fmtPivot).join("\n")}
-CURRENT STRUCTURE: ${structureState}
-LAST CONFIRMED HIGH: ${lastHigh ? fmtPivot(lastHigh) : "n/a"}
-LAST CONFIRMED LOW: ${lastLow ? fmtPivot(lastLow) : "n/a"}
-${lastShift}`
-    : "";
-
-  const breaks = structureEvidence.breaks;
-  const stamp = (t: number) => new Date(t).toISOString().slice(5, 16) + "Z";
-  const recentBreaks = breaks.slice(-5);
-  const lastBreak = breaks[breaks.length - 1] ?? null;
-  const idm = structureEvidence.inducement;
-  const idmLine = idm
-    ? `INDUCEMENT (IDM) CANDIDATE: ${idm.kind} pool at ${idm.price.toFixed(2)} (${stamp(idm.t)}) — ${idm.swept ? "already swept after the break" : "still unswept"}. Treat this as a candidate, not proof of institutional intent.`
-    : "INDUCEMENT (IDM): no qualifying internal pivot tied to the last confirmed break";
-  const breakBlock = breaks.length
-    ? `CONFIRMED BREAKS (buffered close-through of an already-confirmed swing, oldest -> newest):
-${recentBreaks
-  .map(
-    (b) =>
-      `${b.type} ${b.dir} through ${b.level.toFixed(2)} @ ${stamp(b.t)} — ${b.displacement ? "displacement confirmed" : "weak close; no displacement"}`,
-  )
-  .join("\n")}
-LAST BREAK: ${lastBreak ? `${lastBreak.type} ${lastBreak.dir} through ${lastBreak.level.toFixed(2)} @ ${stamp(lastBreak.t)}` : "n/a"}
-TREND FROM BREAKS: ${structureEvidence.trend.toUpperCase()}
-${idmLine}`
-    : "CONFIRMED BREAKS: none inside the supplied window (no close-through of a confirmed swing)";
-
-  const price = last ? last.c : 0;
-  const buySideLevels = Array.from(
-    new Set(
-      structureEvidence.pivots
-        .filter((p) => p.kind === "high" && p.price > price)
-        .map((p) => p.price),
-    ),
-  )
-    .sort((a, b) => a - b)
-    .slice(0, 4);
-  const sellSideLevels = Array.from(
-    new Set(
-      structureEvidence.pivots
-        .filter((p) => p.kind === "low" && p.price < price)
-        .map((p) => p.price),
-    ),
-  )
-    .sort((a, b) => b - a)
-    .slice(0, 4);
-  const liquidityBlock = hasData
-    ? `BUY-SIDE LIQUIDITY (swing highs above price, nearest first): ${
-        buySideLevels.length
-          ? buySideLevels.map((v) => v.toFixed(2)).join(", ")
-          : "none above price"
-      }
-SELL-SIDE LIQUIDITY (swing lows below price, nearest first): ${
-        sellSideLevels.length
-          ? sellSideLevels.map((v) => v.toFixed(2)).join(", ")
-          : "none below price"
-      }`
-    : "";
-
-  const compact = recent
-    .map(
-      (c) =>
-        `${new Date(c.t).toISOString().slice(5, 16)} O${c.o.toFixed(2)} H${c.h.toFixed(
-          2,
-        )} L${c.l.toFixed(2)} C${c.c.toFixed(2)}`,
-    )
-    .join("\n");
+  const {
+    hasData,
+    swingHigh,
+    swingLow,
+    last,
+    liquidityBlock,
+    structureBlock,
+    breakBlock,
+    compact,
+  } = await buildEvidenceContext(data.timeframe);
 
   const advisorSystem = `You are a concise general-purpose AI assistant and an institutional-grade XAU/USD research mentor. Your trading knowledge reflects decades of established discretionary price-action practice without pretending to possess personal human experience.
 
