@@ -1126,13 +1126,9 @@ Perform an evidence-first chart review. Inspect only what is visibly supported: 
       entry: data.advisor ? "-" : String(parsed.entry ?? "-"),
       stopLoss: data.advisor ? "-" : String(parsed.stopLoss ?? "-"),
       takeProfits:
-        !data.advisor && Array.isArray(parsed.takeProfits)
-          ? parsed.takeProfits.map(String)
-          : [],
+        !data.advisor && Array.isArray(parsed.takeProfits) ? parsed.takeProfits.map(String) : [],
       riskReward: data.advisor ? "-" : String(parsed.riskReward ?? "-"),
-      confidence: data.advisor
-        ? 0
-        : Math.max(0, Math.min(100, Number(parsed.confidence ?? 0))),
+      confidence: data.advisor ? 0 : Math.max(0, Math.min(100, Number(parsed.confidence ?? 0))),
       killzone: String(parsed.killzone ?? "-"),
       confluences: Array.isArray(parsed.confluences) ? parsed.confluences.map(String) : [],
       ictAnalysis: String(parsed.ictAnalysis ?? ""),
