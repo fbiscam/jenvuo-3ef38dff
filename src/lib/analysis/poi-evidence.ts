@@ -201,7 +201,9 @@ export function detectPoiEvidence(candles: StructureCandle[]): PoiEvidence {
     for (let i = startIndex; i < candles.length; i += 1) {
       const c = candles[i]!;
       const body = Math.abs(c.c - c.o);
-      const tapped = bullish ? c.l <= zone.top && c.l >= zone.bottom : c.h >= zone.bottom && c.h <= zone.top;
+      const tapped = bullish
+        ? c.l <= zone.top && c.l >= zone.bottom
+        : c.h >= zone.bottom && c.h <= zone.top;
       if (!tapped) continue;
       const wick = bullish ? Math.min(c.o, c.c) - c.l : c.h - Math.max(c.o, c.c);
       const closedBack = bullish ? c.c > zone.top : c.c < zone.bottom;
