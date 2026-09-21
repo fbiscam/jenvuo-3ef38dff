@@ -244,11 +244,7 @@ function detectJudas(
   for (const candle of london) {
     if (candle.high > range.high && candle.close <= range.high && candle.close >= range.low) {
       result = "BEARISH_JUDAS_SWING";
-    } else if (
-      candle.low < range.low &&
-      candle.close >= range.low &&
-      candle.close <= range.high
-    ) {
+    } else if (candle.low < range.low && candle.close >= range.low && candle.close <= range.high) {
       result = "BULLISH_JUDAS_SWING";
     }
   }
@@ -368,27 +364,29 @@ export function buildExecutionEvidence(
   const overlapsOte = Boolean(
     ote && poiZone && poiZone.bottom <= ote.zone_top && poiZone.top >= ote.zone_bottom,
   );
-  const entry = ote && poiZone ? Math.max(ote.zone_bottom, Math.min(ote.level_705, ote.zone_top)) : 0;
+  const entry =
+    ote && poiZone ? Math.max(ote.zone_bottom, Math.min(ote.level_705, ote.zone_top)) : 0;
   const stop =
-    direction && poiZone
-      ? direction === "BUY"
-        ? poiZone.bottom - 1.5
-        : poiZone.top + 1.5
-      : 0;
+    direction && poiZone ? (direction === "BUY" ? poiZone.bottom - 1.5 : poiZone.top + 1.5) : 0;
   const risk = Math.abs(entry - stop);
   const tp2 = direction === "BUY" ? entry + risk * 3 : entry - risk * 3;
   const external = pair ? (direction === "BUY" ? pair.high : pair.low) : 0;
   const tp1 = direction
-    ? nearestTarget(state.active_liquidity_pools, direction, entry, range?.[direction === "BUY" ? "high" : "low"] ?? external)
+    ? nearestTarget(
+        state.active_liquidity_pools,
+        direction,
+        entry,
+        range?.[direction === "BUY" ? "high" : "low"] ?? external,
+      )
     : 0;
   const setupReady = Boolean(
     direction &&
-      ote?.price_inside &&
-      overlapsOte &&
-      poiZone &&
-      risk > 0 &&
-      session.tradeAllowed &&
-      session.session !== "OFF_HOURS",
+    ote?.price_inside &&
+    overlapsOte &&
+    poiZone &&
+    risk > 0 &&
+    session.tradeAllowed &&
+    session.session !== "OFF_HOURS",
   );
   const trigger: ExecutionSignal["trigger_type"] = activeBreaker
     ? "BREAKER_BLOCK_RETEST"
