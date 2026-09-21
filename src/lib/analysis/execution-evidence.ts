@@ -58,6 +58,8 @@ export type ExecutionEvidence = {
   trade_signal: ExecutionSignal | null;
 };
 
+export type OteEvidence = NonNullable<ExecutionEvidence["ote"]>;
+
 type NyParts = { year: number; month: number; day: number; hour: number; minute: number };
 
 const nyFormatter = new Intl.DateTimeFormat("en-US", {
@@ -259,6 +261,48 @@ function latestPair(pivots: StructurePivot[], direction: "BUY" | "SELL") {
   return high && low && high.price > low.price ? { high: high.price, low: low.price } : null;
 }
 
+export function calculateOte(
+  direction: "BUY" | "SELL",
+  rangeLow: number,
+  rangeHigh: number,
+  currentPrice: number,
+): OteEvidence | null {
+  if (![rangeLow, rangeHigh, currentPrice].every(Number.isFinite) || rangeHigh <= rangeLow) {
+    return null;
+  }
+  const size = rangeHigh - rangeLow;
+  const level618 = direction === "BUY" ? rangeHigh - size * 0.618 : rangeLow + size * 0.618;
+  const level705 = direction === "BUY" ? rangeHigh - size * 0.705 : rangeLow + size * 0.705;
+  const level790 = direction === "BUY" ? rangeHigh - size * 0.79 : rangeLow + size * 0.79;
+  const zoneTop = Math.max(level618, level790);
+  const zoneBottom = Math.min(level618, level790);
+  return {
+    direction,
+    level_618: level618,
+    level_705: level705,
+    level_790: level790,
+    zone_top: zoneTop,
+    zone_bottom: zoneBottom,
+    price_inside: currentPrice >= zoneBottom && currentPrice <= zoneTop,
+  };
+}
+
+export function calculateOrderParameters(
+  direction: "BUY" | "SELL",
+  entry: number,
+  zone: { top: number; bottom: number },
+): { stopLoss: number; takeProfit2: number; risk: number } | null {
+  if (![entry, zone.top, zone.bottom].every(Number.isFinite) || zone.top <= zone.bottom) return null;
+  const stopLoss = direction === "BUY" ? zone.bottom - 1.5 : zone.top + 1.5;
+  const risk = Math.abs(entry - stopLoss);
+  if (risk <= 0) return null;
+  return {
+    stopLoss,
+    takeProfit2: direction === "BUY" ? entry + risk * 3 : entry - risk * 3,
+    risk,
+  };
+}
+
 function nearestTarget(
   pools: ActiveLiquidityPool[],
   direction: "BUY" | "SELL",
@@ -322,24 +366,7 @@ export function buildExecutionEvidence(
             ? "SELL"
             : null;
   const pair = direction ? latestPair(structure.pivots, direction) : null;
-  const ote = (() => {
-    if (!direction || !pair) return null;
-    const size = pair.high - pair.low;
-    const level618 = direction === "BUY" ? pair.high - size * 0.618 : pair.low + size * 0.618;
-    const level705 = direction === "BUY" ? pair.high - size * 0.705 : pair.low + size * 0.705;
-    const level790 = direction === "BUY" ? pair.high - size * 0.79 : pair.low + size * 0.79;
-    const zoneTop = Math.max(level618, level790);
-    const zoneBottom = Math.min(level618, level790);
-    return {
-      direction,
-      level_618: level618,
-      level_705: level705,
-      level_790: level790,
-      zone_top: zoneTop,
-      zone_bottom: zoneBottom,
-      price_inside: latest.close >= zoneBottom && latest.close <= zoneTop,
-    };
-  })();
+  const ote = direction && pair ? calculateOte(direction, pair.low, pair.high, latest.close) : null;
 
   const activeBreaker = direction
     ? [...breakers]
@@ -366,10 +393,10 @@ export function buildExecutionEvidence(
   );
   const entry =
     ote && poiZone ? Math.max(ote.zone_bottom, Math.min(ote.level_705, ote.zone_top)) : 0;
-  const stop =
-    direction && poiZone ? (direction === "BUY" ? poiZone.bottom - 1.5 : poiZone.top + 1.5) : 0;
-  const risk = Math.abs(entry - stop);
-  const tp2 = direction === "BUY" ? entry + risk * 3 : entry - risk * 3;
+  const order = direction && poiZone ? calculateOrderParameters(direction, entry, poiZone) : null;
+  const stop = order?.stopLoss ?? 0;
+  const risk = order?.risk ?? 0;
+  const tp2 = order?.takeProfit2 ?? 0;
   const external = pair ? (direction === "BUY" ? pair.high : pair.low) : 0;
   const tp1 = direction
     ? nearestTarget(
@@ -404,7 +431,7 @@ export function buildExecutionEvidence(
           take_profit_2: tp2,
           take_profit_3: external,
           risk_reward_ratio: 3,
-          confluence_score: activeBreaker && judas ? "10/10" : "8/10",
+          confluence_score: "10/10",
         }
       : null;
   const phase =

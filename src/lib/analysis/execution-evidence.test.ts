@@ -3,6 +3,8 @@ import { describe, test } from "node:test";
 
 import {
   buildExecutionEvidence,
+  calculateOrderParameters,
+  calculateOte,
   classifyNewYorkSession,
   detectBreakerBlocks,
 } from "./execution-evidence";
@@ -18,6 +20,27 @@ describe("ICT time and execution evidence", () => {
     assert.equal(classifyNewYorkSession(Date.UTC(2026, 6, 1, 6, 30)).session, "LONDON_OPEN");
     assert.equal(classifyNewYorkSession(Date.UTC(2026, 0, 1, 7, 30)).session, "LONDON_OPEN");
     assert.equal(classifyNewYorkSession(Date.UTC(2026, 6, 1, 18, 0)).tradeAllowed, false);
+  });
+
+  test("calculates the 0.618, 0.705 and 0.79 OTE band in both directions", () => {
+    const buy = calculateOte("BUY", 3300, 3400, 3330);
+    const sell = calculateOte("SELL", 3300, 3400, 3370);
+    assert.equal(buy?.level_618, 3338.2);
+    assert.equal(buy?.level_705, 3329.5);
+    assert.equal(buy?.level_790, 3321);
+    assert.equal(buy?.price_inside, true);
+    assert.equal(sell?.level_705, 3370.5);
+    assert.equal(sell?.price_inside, true);
+  });
+
+  test("adds the 1.5 Gold buffer and enforces a minimum 1:3 TP2", () => {
+    const buy = calculateOrderParameters("BUY", 3330, { bottom: 3320, top: 3335 });
+    const sell = calculateOrderParameters("SELL", 3370, { bottom: 3365, top: 3380 });
+    assert.equal(buy?.stopLoss, 3318.5);
+    assert.equal(buy?.takeProfit2, 3364.5);
+    assert.equal((buy?.takeProfit2 ?? 0) - 3330, (buy?.risk ?? 0) * 3);
+    assert.equal(sell?.stopLoss, 3381.5);
+    assert.equal(3370 - (sell?.takeProfit2 ?? 0), (sell?.risk ?? 0) * 3);
   });
 
   test("marks the Asian range as accumulation and blocks execution", () => {
