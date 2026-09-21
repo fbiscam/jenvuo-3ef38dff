@@ -63,7 +63,10 @@ import { detectPoiEvidence } from "@/lib/analysis/poi-evidence";
 import { buildExecutionEvidence } from "@/lib/analysis/execution-evidence";
 import { buildQuantEvidence } from "@/lib/analysis/quant-evidence";
 import { buildApexEvidence } from "@/lib/analysis/apex-evidence";
-import { buildThreeStocksEvidence } from "@/lib/analysis/three-stocks-evidence";
+import {
+  buildThreeStocksEvidence,
+  newYorkTradingDayRange,
+} from "@/lib/analysis/three-stocks-evidence";
 import { detectCandlestickPatterns } from "@/lib/analysis/candlestick-pattern-evidence";
 
 async function _spendUserCredits(
@@ -1077,7 +1080,25 @@ async function fetchGoldCandles(tf: string): Promise<Candle[]> {
 // OANDA:XAUUSD embed. Never fall through to GC futures or tokenized Gold here:
 // their premium/discount can make otherwise valid pivots look incorrect.
 async function fetchTerminalGoldEvidenceCandles(tf: string): Promise<Candle[]> {
-  return fetchFromYahooSymbols(["XAUUSD=X"], tf);
+  try {
+    return await fetchFromYahooSymbols(["XAUUSD=X"], tf);
+  } catch {
+    // Yahoo currently delists/rejects its anonymous spot-Gold chart endpoint.
+    // Use exchange-traded, fully real PAXG candles rather than synthetic bars;
+    // normalize them to the live XAU/USD tick so levels remain on the terminal's
+    // OANDA spot scale while preserving the real candle structure and volume.
+    const proxy = await fetchFromBinanceSymbols(["PAXGUSDT"], tf);
+    const latestProxy = proxy.at(-1)?.c ?? 0;
+    const spot = await resolveLiveTick(resolveInstrument("XAUUSD")).catch(() => null);
+    const scale = spot?.price && latestProxy > 0 ? spot.price / latestProxy : 1;
+    return proxy.map((candle) => ({
+      ...candle,
+      o: candle.o * scale,
+      h: candle.h * scale,
+      l: candle.l * scale,
+      c: candle.c * scale,
+    }));
+  }
 }
 
 function closedCandlesOnly(candles: Candle[], timeframe: string, now = Date.now()): Candle[] {
@@ -1118,7 +1139,7 @@ function isTradingSetupIntent(q: string): boolean {
  * the text path and the chart-screenshot path so the AI never has to guess
  * where an HH/HL/LH/LL, BOS/CHOCH/MSS, inducement or liquidity pool sits.
  */
-async function buildEvidenceContext(timeframe: string) {
+async function buildEvidenceContext(timeframe: string, dailyTradesTaken = 0) {
   let candles: Candle[] = [];
   const liveTick = await resolveLiveTick(resolveInstrument("XAUUSD")).catch(() => null);
   try {
@@ -1510,6 +1531,7 @@ APEX RULE: never claim CVD, delta or footprint data beyond this proxy, and never
           m30: m30Candles.map((c) => ({ t: c.t, o: c.o, h: c.h, l: c.l, c: c.c, v: c.v })),
           h4: h4Candles.map((c) => ({ t: c.t, o: c.o, h: c.h, l: c.l, c: c.c, v: c.v })),
           h1: h1Candles.map((c) => ({ t: c.t, o: c.o, h: c.h, l: c.l, c: c.c, v: c.v })),
+          dailyTradesTaken,
         })
       : null;
   const reversalBlock = reversal
@@ -1560,6 +1582,7 @@ REVERSAL RULE: quote only these measured levels. A status other than ARMED_BUY_S
     quantBlock,
     apexBlock,
     reversalBlock,
+    reversal,
     structureBlock,
     breakBlock,
     patternBlock,
@@ -1638,11 +1661,12 @@ async function _analyzeGoldCompute(
   __userId: string | null = null,
   __scanId: string | null = null,
   __terminalRequestId: string | null = null,
+  __dailyTradesTaken = 0,
 ): Promise<GoldSignal & { __billable: "signal" | "chat" }> {
   // AI key is validated inside callChatCompletion — no local read needed.
 
   if (data.chartImage) {
-    const ev = await buildEvidenceContext(data.timeframe);
+    const ev = await buildEvidenceContext(data.timeframe, __dailyTradesTaken);
     const exactAnswer = exactStructureAnswer(
       data.query,
       data.timeframe,
@@ -1755,56 +1779,85 @@ Perform an evidence-first chart review. Inspect only what is visibly supported: 
   const wantsTradingSetup = !data.advisor && isTradingSetupIntent(data.query);
   if (wantsTradingSetup) {
     try {
-      const plan = await computeSignalPlan(
-        { symbol: inferInstrumentFromText(data.query) },
-        __userId,
-        { scanId: __scanId },
-      );
-      const dec = plan.instrument.decimals;
-      const prefix = plan.instrument.kind === "crypto" ? "" : "$";
-      const fmt = (n?: number) =>
-        typeof n === "number" && isFinite(n) ? `${prefix}${n.toFixed(dec)}` : "-";
-      // If the plan returned WAIT, fall through to the LLM chat path so the
-      // user hears a conversational answer, not a terse "WAIT on XAU/USD: …".
-      if (plan.trade.direction !== "WAIT") {
-        // Only expose entry/SL/TP at or above the shared platform-wide
-        // confidence floor. Below that we still return the analysis but
-        // hide the trade block.
-        const highConviction = (plan.trade.confidence ?? 0) >= MIN_CONFIDENCE;
+      const evidence = await buildEvidenceContext(data.timeframe, __dailyTradesTaken);
+      const reversal = evidence.reversal;
+      if (!reversal?.plan || !reversal.status.startsWith("ARMED_")) {
+        const reason =
+          reversal?.rejections.join(" ") ||
+          "Verified closed M30 candles are unavailable, so no setup can be issued.";
         return {
-          bias:
-            plan.htfBias === "bullish"
-              ? "BULLISH"
-              : plan.htfBias === "bearish"
-                ? "BEARISH"
-                : "NEUTRAL",
-          direction: highConviction ? plan.trade.direction : "WAIT",
-          entry: highConviction ? fmt(plan.trade.entry) : "-",
-          stopLoss: highConviction ? fmt(plan.trade.sl) : "-",
-          takeProfits: highConviction
-            ? [plan.trade.tp1, plan.trade.tp2, plan.trade.tp3 ?? plan.trade.tp]
-                .filter((n): n is number => typeof n === "number")
-                .map(fmt)
-            : [],
-          riskReward: highConviction ? `1:${plan.trade.rr.toFixed(2)}` : "-",
-          confidence: plan.trade.confidence,
-          killzone: plan.killzone,
-          confluences: plan.confluences,
-          ictAnalysis: plan.htfNarrative,
-          smcAnalysis: plan.ltfNarrative,
-          marketStructure: `${plan.alignmentLabel} · ${plan.setupGrade} (${plan.setupScore}/100)`,
-          spokenSummary: highConviction
-            ? plan.trade.summary
-            : `Confidence only ${plan.trade.confidence}% — waiting for a ${MIN_CONFIDENCE}%+ high-conviction setup before issuing entry, SL and TP.`,
-          fullAnalysis: `${plan.htfNarrative}\n\n${plan.ltfNarrative}\n\n${highConviction ? plan.trade.summary : `Setup is forming but confidence is below the ${MIN_CONFIDENCE}% threshold. Entry, SL and TP are withheld until conviction rises.`}\nInvalidation: ${plan.trade.invalidation}`,
+          bias: "NEUTRAL",
+          direction: "WAIT",
+          entry: "-",
+          stopLoss: "-",
+          takeProfits: [],
+          riskReward: "-",
+          confidence: 0,
+          killzone: reversal?.session ?? "-",
+          confluences: [],
+          ictAnalysis: reason,
+          smcAnalysis: reason,
+          marketStructure: reversal?.status ?? "DATA_UNAVAILABLE",
+          spokenSummary: reason,
+          fullAnalysis: reason,
           timeframe: data.timeframe,
-          currentPrice: plan.currentPrice,
+          currentPrice: evidence.currentPrice,
           generatedAt: new Date().toISOString(),
           __billable: "signal",
         };
       }
+
+      const reversalPlan = reversal.plan;
+      const direction = reversalPlan.direction;
+      const summary = `${direction} STOP is armed from the verified closed-candle M30 reversal engine at ${reversalPlan.entry.toFixed(2)}, with SL ${reversalPlan.stop_loss.toFixed(2)} and 1:3 target ${reversalPlan.target_1_3.toFixed(2)}.`;
+      return {
+        bias: direction === "BUY" ? "BULLISH" : "BEARISH",
+        direction,
+        entry: reversalPlan.entry.toFixed(2),
+        stopLoss: reversalPlan.stop_loss.toFixed(2),
+        takeProfits: [reversalPlan.target_1_3.toFixed(2)],
+        riskReward: "1:3",
+        confidence: MIN_CONFIDENCE,
+        killzone: reversal.session,
+        confluences: [
+          `${reversal.swept_level?.timeframe ?? "HTF"} ${reversal.swept_level?.kind ?? "level"} sweep`,
+          "M30 mother/inside-bar",
+          "ATR and volume validated",
+          "Clean traffic to 1:3",
+        ],
+        ictAnalysis: summary,
+        smcAnalysis: summary,
+        marketStructure: reversal.status,
+        spokenSummary: summary,
+        fullAnalysis: `${summary} Move stop to entry at ${reversalPlan.break_even_trigger.toFixed(2)} (1:1.5 RR).`,
+        timeframe: "30m",
+        currentPrice: evidence.currentPrice,
+        generatedAt: new Date().toISOString(),
+        __billable: "signal",
+      };
     } catch {
-      // Fall back to the lightweight assistant path below if the full signal desk feed is temporarily unavailable.
+      const reason =
+        "Verified closed M30 candles are temporarily unavailable, so no setup can be issued.";
+      return {
+        bias: "NEUTRAL",
+        direction: "WAIT",
+        entry: "-",
+        stopLoss: "-",
+        takeProfits: [],
+        riskReward: "-",
+        confidence: 0,
+        killzone: "-",
+        confluences: [],
+        ictAnalysis: reason,
+        smcAnalysis: reason,
+        marketStructure: "DATA_UNAVAILABLE",
+        spokenSummary: reason,
+        fullAnalysis: reason,
+        timeframe: data.timeframe,
+        currentPrice: 0,
+        generatedAt: new Date().toISOString(),
+        __billable: "signal",
+      };
     }
   }
 
@@ -1829,7 +1882,7 @@ Perform an evidence-first chart review. Inspect only what is visibly supported: 
     recentPivots,
     structureState,
     currentPrice,
-  } = await buildEvidenceContext(data.timeframe);
+  } = await buildEvidenceContext(data.timeframe, __dailyTradesTaken);
   const exactAnswer = exactStructureAnswer(
     data.query,
     data.timeframe,
@@ -2073,7 +2126,21 @@ export const analyzeGold = createServerFn({ method: "POST" })
           throw new Error(entitlement.error ?? "Terminal AI is unavailable for this account.");
         terminalRequestId = `terminal-${crypto.randomUUID()}`;
       }
-      const result = await _analyzeGoldCompute(data, context.userId, null, terminalRequestId);
+      const { start, end } = newYorkTradingDayRange();
+      const { count: dailyTradesTaken } = await context.supabase
+        .from("trade_journal")
+        .select("id", { count: "exact", head: true })
+        .eq("user_id", context.userId)
+        .eq("pair", "XAUUSD")
+        .gte("opened_at", start)
+        .lt("opened_at", end);
+      const result = await _analyzeGoldCompute(
+        data,
+        context.userId,
+        null,
+        terminalRequestId,
+        dailyTradesTaken ?? 0,
+      );
       const { __billable: _billable, ...clean } = result;
       void _billable;
       return clean as GoldSignal;

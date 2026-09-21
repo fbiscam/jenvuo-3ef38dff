@@ -6,6 +6,7 @@ import {
   detectMotherInside,
   findSwings,
   atr14,
+  newYorkTradingDayRange,
   type ReversalCandle,
 } from "./three-stocks-evidence";
 
@@ -58,6 +59,17 @@ test("findSwings marks strict fractal pivots", () => {
   const swings = findSwings(c, "H1");
   assert.equal(swings.filter((s) => s.kind === "HIGH").length, 1);
   assert.equal(swings.find((s) => s.kind === "HIGH")?.price, 6);
+});
+
+test("New York trading-day bounds remain correct across daylight saving time", () => {
+  assert.deepEqual(newYorkTradingDayRange(Date.UTC(2026, 0, 5, 15)), {
+    start: "2026-01-05T05:00:00.000Z",
+    end: "2026-01-06T05:00:00.000Z",
+  });
+  assert.deepEqual(newYorkTradingDayRange(Date.UTC(2026, 6, 5, 15)), {
+    start: "2026-07-05T04:00:00.000Z",
+    end: "2026-07-06T04:00:00.000Z",
+  });
 });
 
 test("detectMotherInside requires full containment", () => {
@@ -125,6 +137,11 @@ test("rejects patterns formed away from major levels", () => {
   assert.equal(ev.status, "REJECTED_LOCATION");
 });
 
+test("does not mistake a distant already-crossed level for a fresh extreme touch", () => {
+  const ev = buildThreeStocksEvidence({ m30: baseM30(), h4: htfLow(2200), h1: [] });
+  assert.equal(ev.status, "REJECTED_LOCATION");
+});
+
 test("locks the engine after two trades", () => {
   const ev = buildThreeStocksEvidence({
     m30: baseM30(),
@@ -141,6 +158,13 @@ test("rejects inside bar with volume expansion", () => {
   m30[m30.length - 1].v = 5000;
   const ev = buildThreeStocksEvidence({ m30, h4: htfLow(1999), h1: [] });
   assert.equal(ev.status, "REJECTED_VOLUME");
+});
+
+test("rejects a setup when tick volume is unavailable", () => {
+  const m30 = baseM30().map((c) => ({ ...c, v: 0 }));
+  const ev = buildThreeStocksEvidence({ m30, h4: htfLow(1999), h1: [] });
+  assert.equal(ev.status, "REJECTED_VOLUME");
+  assert.match(ev.rejections[0] ?? "", /unavailable/i);
 });
 
 test("rejects a mother candle smaller than ATR(14)", () => {

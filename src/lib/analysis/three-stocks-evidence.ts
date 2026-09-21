@@ -88,6 +88,53 @@ const DAILY_TRADE_LIMIT = 2;
 /** Mother candle must reach within this fraction of ATR of a major level. */
 const SWEEP_TOLERANCE_ATR = 0.25;
 
+/** UTC bounds for the current America/New_York trading date (DST-safe). */
+export function newYorkTradingDayRange(now = Date.now()): { start: string; end: string } {
+  const formatter = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "America/New_York",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hourCycle: "h23",
+  });
+  const partsFor = (timestamp: number) =>
+    Object.fromEntries(
+      formatter
+        .formatToParts(new Date(timestamp))
+        .filter((part) => part.type !== "literal")
+        .map((part) => [part.type, Number(part.value)]),
+    );
+  const nowParts = partsFor(now);
+  const localMidnightUtc = (year: number, month: number, day: number) => {
+    const target = Date.UTC(year, month - 1, day);
+    let guess = target;
+    for (let attempt = 0; attempt < 2; attempt++) {
+      const actual = partsFor(guess);
+      const representedLocal = Date.UTC(
+        actual.year,
+        actual.month - 1,
+        actual.day,
+        actual.hour,
+        actual.minute,
+        actual.second,
+      );
+      guess += target - representedLocal;
+    }
+    return guess;
+  };
+  const startMs = localMidnightUtc(nowParts.year, nowParts.month, nowParts.day);
+  const nextDate = new Date(Date.UTC(nowParts.year, nowParts.month - 1, nowParts.day + 1));
+  const endMs = localMidnightUtc(
+    nextDate.getUTCFullYear(),
+    nextDate.getUTCMonth() + 1,
+    nextDate.getUTCDate(),
+  );
+  return { start: new Date(startMs).toISOString(), end: new Date(endMs).toISOString() };
+}
+
 export function atr14(candles: ReversalCandle[], period = 14): number {
   if (candles.length < 2) return 0;
   const trs: number[] = [];
@@ -201,10 +248,10 @@ export function buildThreeStocksEvidence(input: {
   const tol = Math.max(atr * SWEEP_TOLERANCE_ATR, 0.2);
   const swept =
     majorLevels
-      .filter((lvl) =>
-        lvl.kind === "HIGH"
-          ? pattern.mother_high >= lvl.price - tol
-          : pattern.mother_low <= lvl.price + tol,
+      .filter(
+        (lvl) =>
+          Math.abs((lvl.kind === "HIGH" ? pattern.mother_high : pattern.mother_low) - lvl.price) <=
+          tol,
       )
       .sort(
         (a, b) =>
@@ -231,12 +278,17 @@ export function buildThreeStocksEvidence(input: {
     return { ...base, swept_level: swept, status: "REJECTED_VOLATILITY" };
   }
   if (
-    pattern.mother_volume != null &&
-    pattern.inside_volume != null &&
-    pattern.mother_volume > 0 &&
+    pattern.mother_volume == null ||
+    pattern.inside_volume == null ||
+    pattern.mother_volume <= 0 ||
+    pattern.inside_volume < 0 ||
     pattern.inside_volume >= pattern.mother_volume
   ) {
-    rejections.push("Inside-bar volume did not dry up below the mother bar — no compression.");
+    rejections.push(
+      pattern.mother_volume == null || pattern.inside_volume == null || pattern.mother_volume <= 0
+        ? "Reliable tick volume is unavailable — volume compression cannot be verified."
+        : "Inside-bar volume did not dry up below the mother bar — no compression.",
+    );
     return { ...base, swept_level: swept, status: "REJECTED_VOLUME" };
   }
 
