@@ -1283,6 +1283,33 @@ function exactStructureAnswer(
     : `${timeframe.toUpperCase()} latest confirmed structure: ${lines.join("; ")}. Current state: ${structureState}. These are confirmed pivots from closed candles only; the live candle is not labelled.`;
 }
 
+function deterministicAdvisorResult(
+  answer: string,
+  timeframe: string,
+  currentPrice: number,
+): GoldSignal & { __billable: "chat" } {
+  return {
+    bias: "NEUTRAL",
+    direction: "WAIT",
+    entry: "-",
+    stopLoss: "-",
+    takeProfits: [],
+    riskReward: "-",
+    confidence: 0,
+    killzone: "-",
+    confluences: [],
+    ictAnalysis: "",
+    smcAnalysis: "",
+    marketStructure: answer,
+    spokenSummary: answer,
+    fullAnalysis: answer,
+    timeframe,
+    currentPrice,
+    generatedAt: new Date().toISOString(),
+    __billable: "chat",
+  };
+}
+
 async function _analyzeGoldCompute(
   data: { timeframe: string; query: string; chartImage?: string; advisor?: boolean },
   __userId: string | null = null,
@@ -1293,6 +1320,15 @@ async function _analyzeGoldCompute(
 
   if (data.chartImage) {
     const ev = await buildEvidenceContext(data.timeframe);
+    const exactAnswer = exactStructureAnswer(
+      data.query,
+      data.timeframe,
+      ev.recentPivots,
+      ev.structureState,
+    );
+    if (data.advisor && exactAnswer) {
+      return deterministicAdvisorResult(exactAnswer, data.timeframe, ev.last?.c ?? 0);
+    }
     const evidenceContext = ev.hasData
       ? `
 
@@ -1453,6 +1489,15 @@ Perform an evidence-first chart review. Inspect only what is visibly supported: 
     recentPivots,
     structureState,
   } = await buildEvidenceContext(data.timeframe);
+  const exactAnswer = exactStructureAnswer(
+    data.query,
+    data.timeframe,
+    recentPivots,
+    structureState,
+  );
+  if (data.advisor && exactAnswer) {
+    return deterministicAdvisorResult(exactAnswer, data.timeframe, last?.c ?? 0);
+  }
 
   const advisorSystem = `You are a concise general-purpose AI assistant and an institutional-grade XAU/USD research mentor. Your trading knowledge reflects decades of established discretionary price-action practice without pretending to possess personal human experience.
 
