@@ -1274,15 +1274,20 @@ function exactStructureAnswer(
   timeframe: string,
   pivots: Array<{ label: string; price: number; t: number; kind: "high" | "low" }>,
   structureState: string,
+  currentPrice: number,
 ): string | null {
   if (!isStructureLabelQuery(query)) return null;
   if (pivots.length === 0) {
     const romanUrdu = /\b(kaha|kidhar|hai|ha|bata|banao|bana|ya|yar|wala|wali|mujhe|muje)\b/i.test(
       query,
     );
+    const livePrice =
+      Number.isFinite(currentPrice) && currentPrice > 0
+        ? ` Verified live XAU/USD price: ${currentPrice.toFixed(2)}.`
+        : "";
     return romanUrdu
-      ? `${timeframe.toUpperCase()} par abhi verified closed-candle feed ya enough confirmed pivots available nahi hain, is liye main HH/LH/HL/LL ki value guess nahi karunga.`
-      : `Verified closed-candle data or enough confirmed pivots are not currently available on ${timeframe.toUpperCase()}, so I will not guess HH/LH/HL/LL values.`;
+      ? `${timeframe.toUpperCase()} par abhi verified closed-candle feed ya enough confirmed pivots available nahi hain, is liye main HH/LH/HL/LL ki value guess nahi karunga.${livePrice}`
+      : `Verified closed-candle data or enough confirmed pivots are not currently available on ${timeframe.toUpperCase()}, so I will not guess HH/LH/HL/LL values.${livePrice}`;
   }
   const latest = pivots.slice(-6);
   const lines = latest.map(
@@ -1339,6 +1344,7 @@ async function _analyzeGoldCompute(
       data.timeframe,
       ev.recentPivots,
       ev.structureState,
+      ev.currentPrice,
     );
     if (data.advisor && exactAnswer) {
       return deterministicAdvisorResult(exactAnswer, data.timeframe, ev.currentPrice);
@@ -1404,6 +1410,7 @@ Perform an evidence-first chart review. Inspect only what is visibly supported: 
       data.timeframe,
       ev.recentPivots,
       ev.structureState,
+      ev.currentPrice,
     );
     return {
       bias: parsed.bias === "BULLISH" || parsed.bias === "BEARISH" ? parsed.bias : "NEUTRAL",
@@ -1504,12 +1511,14 @@ Perform an evidence-first chart review. Inspect only what is visibly supported: 
     recentPivots,
     structureState,
     currentPrice,
+    currentPrice,
   } = await buildEvidenceContext(data.timeframe);
   const exactAnswer = exactStructureAnswer(
     data.query,
     data.timeframe,
     recentPivots,
     structureState,
+    currentPrice,
   );
   if (data.advisor && exactAnswer) {
     return deterministicAdvisorResult(exactAnswer, data.timeframe, currentPrice);
