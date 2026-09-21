@@ -1512,6 +1512,7 @@ APEX RULE: never claim CVD, delta or footprint data beyond this proxy, and never
     poiBlock,
     executionBlock,
     quantBlock,
+    apexBlock,
     structureBlock,
     breakBlock,
     patternBlock,
@@ -1618,6 +1619,7 @@ ${ev.mtfTrendBlock}
 ${ev.poiBlock}
 ${ev.executionBlock}
 ${ev.quantBlock}
+${ev.apexBlock}
 ${ev.structureBlock}
 ${ev.breakBlock}
 ${ev.patternBlock}
@@ -1770,6 +1772,7 @@ Perform an evidence-first chart review. Inspect only what is visibly supported: 
     poiBlock,
     executionBlock,
     quantBlock,
+    apexBlock,
     structureBlock,
     breakBlock,
     patternBlock,
@@ -1884,6 +1887,7 @@ ${mtfTrendBlock}
 ${poiBlock}
 ${executionBlock}
 ${quantBlock}
+${apexBlock}
 ${structureBlock}
 ${breakBlock}
 ${patternBlock}
