@@ -136,3 +136,4 @@
 - [x] Connect its two-trades-per-New-York-day lock to the authenticated trade journal
 - [x] Reject unverified volume and false distant-level touches in reversal validation
 - [x] Make the strict M30 reversal verdict the final gate for every requested Gold trade setup
+- [x] Answer Mother/Inside-Bar TP and next LH/HH questions directly from verified structure evidence
