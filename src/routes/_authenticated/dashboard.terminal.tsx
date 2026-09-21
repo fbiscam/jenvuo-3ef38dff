@@ -47,6 +47,7 @@ import {
 } from "@/components/ai-elements/attachments";
 import { Shimmer } from "@/components/ai-elements/shimmer";
 import jenvuLogo from "@/assets/jenvu-logo.png";
+import jenvuTick from "@/assets/jenvu-tick.png";
 
 export const Route = createFileRoute("/_authenticated/dashboard/terminal")({
   head: () => ({
