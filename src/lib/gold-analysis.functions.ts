@@ -1299,6 +1299,47 @@ TRENDLINE LIQUIDITY: ${
     mtfTrend.bearish.join(", ") || "none"
   }] | sideways [${mtfTrend.sideways.join(", ") || "none"}]`;
 
+  const poiEvidence = hasData
+    ? detectPoiEvidence(toStructureCandles(recent))
+    : { fair_value_gaps: [], order_blocks: [], price_action_signals: [] };
+  const poiLines: string[] = [];
+  const liveGaps = poiEvidence.fair_value_gaps.filter((g) => g.status !== "MITIGATED").slice(-6);
+  poiLines.push(
+    liveGaps.length
+      ? `FAIR VALUE GAPS (unfilled/partial): ${liveGaps
+          .map(
+            (g) =>
+              `${g.type} ${g.bottom.toFixed(2)}–${g.top.toFixed(2)} (CE ${g.ce.toFixed(2)}) @ ${stamp(g.t)} ${g.status}`,
+          )
+          .join("; ")}`
+      : "FAIR VALUE GAPS: none unfilled in the supplied window",
+  );
+  const liveZones = poiEvidence.order_blocks.filter((z) => z.status !== "MITIGATED").slice(-6);
+  poiLines.push(
+    liveZones.length
+      ? `ORDER BLOCKS / SUPPLY-DEMAND (unmitigated or partially tapped): ${liveZones
+          .map(
+            (z) =>
+              `${z.type} ${z.bottom.toFixed(2)}–${z.top.toFixed(2)} @ ${stamp(z.t)} ${z.status}; FVG-aligned ${z.is_fvg_aligned ? "yes" : "no"}; liquidity swept ${z.swept_liquidity ? "yes" : "no"}; displacement ${z.displacement ? "yes" : "no"}`,
+          )
+          .join("; ")}`
+      : "ORDER BLOCKS / SUPPLY-DEMAND: none valid and unmitigated in the supplied window",
+  );
+  const signals = poiEvidence.price_action_signals.slice(-4);
+  poiLines.push(
+    signals.length
+      ? `PRICE ACTION SIGNATURES: ${signals
+          .map(
+            (s) =>
+              `${s.signal_type} on ${s.zone_tapped} @ ${stamp(s.t)} — ${s.direction}, reference entry ${s.entry_price.toFixed(2)}, invalidation ${s.stop_loss.toFixed(2)}, confluence ${s.confidence_score}`,
+          )
+          .join("; ")}`
+      : "PRICE ACTION SIGNATURES: no qualifying rejection into a mapped zone",
+  );
+  const poiBlock = `VERIFIED POINTS OF INTEREST (closed candles only):
+${poiLines.join("\n")}
+POI RULE: quote only these zones with their exact boundaries. A zone is only valid while UNMITIGATED or PARTIAL; once MITIGATED it is spent. Confluence grade is not a probability or a guarantee.`;
+
   const compact = recent
     .map(
       (c) =>
