@@ -481,8 +481,7 @@ export function mapAdvancedSmcState(
 
     for (const pool of pools) {
       if (pool.status === "SWEPT" || index <= pool.sourceIndex) continue;
-      const swept =
-        pool.side === "high" ? bar.high > pool.price_level : bar.low < pool.price_level;
+      const swept = pool.side === "high" ? bar.high > pool.price_level : bar.low < pool.price_level;
       if (!swept) continue;
       pool.status = "SWEPT";
       if (pool.type === "IDM") lastEvent = "IDM_SWEEP";
@@ -539,8 +538,7 @@ export function mapAdvancedSmcState(
 
     const rangeHigh = trend === "BULLISH" ? lastBullishExternal?.price : lastBearishInternal?.price;
     const rangeLow = trend === "BULLISH" ? lastBullishInternal?.price : lastBearishExternal?.price;
-    const equilibrium =
-      rangeHigh != null && rangeLow != null ? (rangeHigh + rangeLow) / 2 : null;
+    const equilibrium = rangeHigh != null && rangeLow != null ? (rangeHigh + rangeLow) / 2 : null;
     const dealingZone: DealingZone =
       equilibrium == null
         ? "EQUILIBRIUM"
@@ -591,7 +589,9 @@ export function classifyMultiTimeframeTrend(
         : "SIDEWAYS";
   return {
     state,
-    aligned: directionalCount >= 2 && (bullish.length === directionalCount || bearish.length === directionalCount),
+    aligned:
+      directionalCount >= 2 &&
+      (bullish.length === directionalCount || bearish.length === directionalCount),
     bullish,
     bearish,
     sideways,
