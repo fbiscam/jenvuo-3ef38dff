@@ -292,7 +292,8 @@ export function calculateOrderParameters(
   entry: number,
   zone: { top: number; bottom: number },
 ): { stopLoss: number; takeProfit2: number; risk: number } | null {
-  if (![entry, zone.top, zone.bottom].every(Number.isFinite) || zone.top <= zone.bottom) return null;
+  if (![entry, zone.top, zone.bottom].every(Number.isFinite) || zone.top <= zone.bottom)
+    return null;
   const stopLoss = direction === "BUY" ? zone.bottom - 1.5 : zone.top + 1.5;
   const risk = Math.abs(entry - stopLoss);
   if (risk <= 0) return null;
