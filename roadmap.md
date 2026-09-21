@@ -123,5 +123,5 @@
 - [x] Fit the Terminal chart and AI desk within the dashboard viewport without page scrolling
 - [x] Attach the Terminal directly to the dashboard sidebar and keep the AI desk fixed in view
 - [x] Keep Terminal sidebar logos, icons, and text at the dashboard's responsive size
-- [ ] Harden and test Terminal CHOCH, BOS, MSS, IDM, trend, and liquidity evidence
-- [ ] Verify the reported `src/lib/utils.ts` type diagnostic against the current source
+- [x] Harden and test Terminal CHOCH, BOS, MSS, IDM, trend, and liquidity evidence
+- [x] Verify the reported `src/lib/utils.ts` type diagnostic against the current source
