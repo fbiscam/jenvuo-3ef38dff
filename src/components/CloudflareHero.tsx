@@ -9,9 +9,9 @@ export default function CloudflareHero() {
 
         <div className="relative z-10 m-auto w-full max-w-[760px] text-center text-home-accent-foreground">
           <div className="mx-auto inline-flex max-w-[326px] flex-wrap items-center justify-center gap-x-1.5 gap-y-1 rounded-md border border-primary-foreground/50 px-3 py-2.5 text-center text-[10px] leading-[1.35] text-home-accent-foreground sm:max-w-full sm:py-2 sm:text-[11px] sm:leading-none">
-            <span className="font-medium">Jenvu 2026</span>
+            <span className="font-medium">Jenvu</span>
             <span className="text-home-accent-foreground">·</span>
-            <span>The Agentic Trading Network of the Year</span>
+            <span>AI trading terminal for XAU/USD</span>
             <span className="text-home-accent-foreground">·</span>
             <span>Live 24/7</span>
             <span className="text-home-accent-foreground">·</span>
@@ -21,11 +21,11 @@ export default function CloudflareHero() {
           </div>
 
           <h1 className="mx-auto mt-8 max-w-[330px] text-center text-[34px] font-semibold leading-[1.05] tracking-normal text-home-accent-foreground sm:max-w-[740px] sm:text-[44px] sm:leading-[0.98] md:text-[48px]">
-             Everything we learned from powering gold trading
+             AI gold trading terminal for XAU/USD chart analysis
           </h1>
 
           <p className="mx-auto mt-8 max-w-[320px] text-center text-[13px] leading-[1.45] text-home-accent-foreground sm:max-w-xl sm:text-sm sm:leading-[1.25]">
-            One extension for chart analysis, reviewed signals, and your trading desk.
+            One built-in terminal for chart analysis, reviewed signals, and your trading desk.
             <br className="hidden sm:block" />{" "}
             <span className="sm:hidden"> </span>Deploy, analyze, and scale without managing infrastructure.
           </p>

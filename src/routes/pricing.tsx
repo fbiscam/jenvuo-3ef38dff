@@ -150,7 +150,7 @@ function PricingPage() {
       <section className="border-b border-border bg-background">
         <div className="mx-auto max-w-5xl px-5 pb-20 pt-20 text-center sm:px-6 sm:pb-24 sm:pt-28">
           <h1 className="text-4xl font-semibold leading-tight sm:text-5xl">
-            Scale predictably.
+            Jenvu pricing plans for the XAU/USD trading terminal
           </h1>
           <p className="mx-auto mt-3 max-w-2xl text-sm leading-relaxed text-muted-foreground sm:text-base">
             Start with the plan that fits your trading desk. Every paid plan includes a monthly AI wallet billed by actual token use.
