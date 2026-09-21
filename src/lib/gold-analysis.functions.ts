@@ -1120,12 +1120,19 @@ Perform an evidence-first chart review. Inspect only what is visibly supported: 
     return {
       bias: parsed.bias === "BULLISH" || parsed.bias === "BEARISH" ? parsed.bias : "NEUTRAL",
       direction:
-        parsed.direction === "BUY" || parsed.direction === "SELL" ? parsed.direction : "WAIT",
-      entry: String(parsed.entry ?? "-"),
-      stopLoss: String(parsed.stopLoss ?? "-"),
-      takeProfits: Array.isArray(parsed.takeProfits) ? parsed.takeProfits.map(String) : [],
-      riskReward: String(parsed.riskReward ?? "-"),
-      confidence: Math.max(0, Math.min(100, Number(parsed.confidence ?? 0))),
+        !data.advisor && (parsed.direction === "BUY" || parsed.direction === "SELL")
+          ? parsed.direction
+          : "WAIT",
+      entry: data.advisor ? "-" : String(parsed.entry ?? "-"),
+      stopLoss: data.advisor ? "-" : String(parsed.stopLoss ?? "-"),
+      takeProfits:
+        !data.advisor && Array.isArray(parsed.takeProfits)
+          ? parsed.takeProfits.map(String)
+          : [],
+      riskReward: data.advisor ? "-" : String(parsed.riskReward ?? "-"),
+      confidence: data.advisor
+        ? 0
+        : Math.max(0, Math.min(100, Number(parsed.confidence ?? 0))),
       killzone: String(parsed.killzone ?? "-"),
       confluences: Array.isArray(parsed.confluences) ? parsed.confluences.map(String) : [],
       ictAnalysis: String(parsed.ictAnalysis ?? ""),
