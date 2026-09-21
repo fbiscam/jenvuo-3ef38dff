@@ -1817,7 +1817,7 @@ Perform an evidence-first chart review. Inspect only what is visibly supported: 
         stopLoss: reversalPlan.stop_loss.toFixed(2),
         takeProfits: [reversalPlan.target_1_3.toFixed(2)],
         riskReward: "1:3",
-        confidence: 100,
+        confidence: MIN_CONFIDENCE,
         killzone: reversal.session,
         confluences: [
           `${reversal.swept_level?.timeframe ?? "HTF"} ${reversal.swept_level?.kind ?? "level"} sweep`,
@@ -1836,7 +1836,28 @@ Perform an evidence-first chart review. Inspect only what is visibly supported: 
         __billable: "signal",
       };
     } catch {
-      // Fall back to the lightweight assistant path below if the full signal desk feed is temporarily unavailable.
+      const reason =
+        "Verified closed M30 candles are temporarily unavailable, so no setup can be issued.";
+      return {
+        bias: "NEUTRAL",
+        direction: "WAIT",
+        entry: "-",
+        stopLoss: "-",
+        takeProfits: [],
+        riskReward: "-",
+        confidence: 0,
+        killzone: "-",
+        confluences: [],
+        ictAnalysis: reason,
+        smcAnalysis: reason,
+        marketStructure: "DATA_UNAVAILABLE",
+        spokenSummary: reason,
+        fullAnalysis: reason,
+        timeframe: data.timeframe,
+        currentPrice: 0,
+        generatedAt: new Date().toISOString(),
+        __billable: "signal",
+      };
     }
   }
 
