@@ -184,6 +184,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           ]
         : []),
       {
+        children:
+          "(function(){var r=document.documentElement;var done=function(){r.classList.add('ms-icons-ready')};try{if(document.fonts&&document.fonts.load){document.fonts.load('20px \"Material Symbols Rounded\"','space_dashboard').then(done).catch(done)}else{done()}}catch(e){done()}setTimeout(done,2500)})();",
+      },
+      {
         type: "application/ld+json",
         children: JSON.stringify({
           "@context": "https://schema.org",
