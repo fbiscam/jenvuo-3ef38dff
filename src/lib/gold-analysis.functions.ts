@@ -1582,6 +1582,7 @@ REVERSAL RULE: quote only these measured levels. A status other than ARMED_BUY_S
     quantBlock,
     apexBlock,
     reversalBlock,
+    reversal,
     structureBlock,
     breakBlock,
     patternBlock,
@@ -1778,6 +1779,66 @@ Perform an evidence-first chart review. Inspect only what is visibly supported: 
   const wantsTradingSetup = !data.advisor && isTradingSetupIntent(data.query);
   if (wantsTradingSetup) {
     try {
+      const evidence = await buildEvidenceContext(data.timeframe, __dailyTradesTaken);
+      const reversal = evidence.reversal;
+      if (!reversal?.plan || !reversal.status.startsWith("ARMED_")) {
+        const reason =
+          reversal?.rejections.join(" ") ||
+          "Verified closed M30 candles are unavailable, so no setup can be issued.";
+        return {
+          bias: "NEUTRAL",
+          direction: "WAIT",
+          entry: "-",
+          stopLoss: "-",
+          takeProfits: [],
+          riskReward: "-",
+          confidence: 0,
+          killzone: reversal?.session ?? "-",
+          confluences: [],
+          ictAnalysis: reason,
+          smcAnalysis: reason,
+          marketStructure: reversal?.status ?? "DATA_UNAVAILABLE",
+          spokenSummary: reason,
+          fullAnalysis: reason,
+          timeframe: data.timeframe,
+          currentPrice: evidence.currentPrice,
+          generatedAt: new Date().toISOString(),
+          __billable: "signal",
+        };
+      }
+
+      const reversalPlan = reversal.plan;
+      const direction = reversalPlan.direction;
+      const summary = `${direction} STOP is armed from the verified closed-candle M30 reversal engine at ${reversalPlan.entry.toFixed(2)}, with SL ${reversalPlan.stop_loss.toFixed(2)} and 1:3 target ${reversalPlan.target_1_3.toFixed(2)}.`;
+      return {
+        bias: direction === "BUY" ? "BULLISH" : "BEARISH",
+        direction,
+        entry: reversalPlan.entry.toFixed(2),
+        stopLoss: reversalPlan.stop_loss.toFixed(2),
+        takeProfits: [reversalPlan.target_1_3.toFixed(2)],
+        riskReward: "1:3",
+        confidence: 100,
+        killzone: reversal.session,
+        confluences: [
+          `${reversal.swept_level?.timeframe ?? "HTF"} ${reversal.swept_level?.kind ?? "level"} sweep`,
+          "M30 mother/inside-bar",
+          "ATR and volume validated",
+          "Clean traffic to 1:3",
+        ],
+        ictAnalysis: summary,
+        smcAnalysis: summary,
+        marketStructure: reversal.status,
+        spokenSummary: summary,
+        fullAnalysis: `${summary} Move stop to entry at ${reversalPlan.break_even_trigger.toFixed(2)} (1:1.5 RR).`,
+        timeframe: "30m",
+        currentPrice: evidence.currentPrice,
+        generatedAt: new Date().toISOString(),
+        __billable: "signal",
+      };
+
+      /* The legacy multi-strategy plan is intentionally unreachable for Gold
+       * setup requests: the strict M30 reversal verdict is the final gate. */
+      /* c8 ignore next 2 */
       const plan = await computeSignalPlan(
         { symbol: inferInstrumentFromText(data.query) },
         __userId,
