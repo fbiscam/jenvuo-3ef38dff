@@ -165,8 +165,7 @@ export function buildThreeStocksEvidence(input: {
   const sessionInfo = last
     ? classifyNewYorkSession(last.t)
     : { session: "OFF_HOURS" as TradingSession, trade_allowed: false };
-  const sessionAllowed =
-    sessionInfo.session === "LONDON_OPEN" || sessionInfo.session === "NY_OPEN";
+  const sessionAllowed = sessionInfo.session === "LONDON_OPEN" || sessionInfo.session === "NY_OPEN";
 
   const majorLevels = [...findSwings(h4, "H4"), ...findSwings(h1, "H1")]
     .sort((a, b) => a.t - b.t)
@@ -245,13 +244,9 @@ export function buildThreeStocksEvidence(input: {
   // bearish reversal, a swept low a bullish one.
   const direction: "BUY" | "SELL" = swept.kind === "LOW" ? "BUY" : "SELL";
   const entry =
-    direction === "BUY"
-      ? pattern.mother_high + SPREAD_BUFFER
-      : pattern.mother_low - SPREAD_BUFFER;
+    direction === "BUY" ? pattern.mother_high + SPREAD_BUFFER : pattern.mother_low - SPREAD_BUFFER;
   const stopLoss =
-    direction === "BUY"
-      ? pattern.mother_low - SPREAD_BUFFER
-      : pattern.mother_high + SPREAD_BUFFER;
+    direction === "BUY" ? pattern.mother_low - SPREAD_BUFFER : pattern.mother_high + SPREAD_BUFFER;
   const risk = Math.abs(entry - stopLoss);
   const target = direction === "BUY" ? entry + risk * 3 : entry - risk * 3;
   const breakEven = direction === "BUY" ? entry + risk * 1.5 : entry - risk * 1.5;

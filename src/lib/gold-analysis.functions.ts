@@ -1536,7 +1536,6 @@ PLAN: ${
 REVERSAL RULE: quote only these measured levels. A status other than ARMED_BUY_STOP / ARMED_SELL_STOP means there is no valid Three Stocks setup — say so plainly instead of improvising one. Entry, stop and target are study references from closed candles, never a guaranteed outcome or win rate, and the 2-trade daily lock is absolute.`
     : "VERIFIED EXTREME M30 GOLD REVERSAL ENGINE: unavailable (insufficient closed M30 candles)";
 
-
   const compact = recent
     .map(
       (c) =>
