@@ -1349,7 +1349,7 @@ function DashboardLayout() {
 
           <nav className="sidebar-hover-scroll flex-1 min-h-0 overflow-y-auto overflow-x-hidden bg-sidebar px-2 py-2">
             {[...NAV_GROUPS].map((group, gi) => (
-              <div key={group.label} className={gi > 0 ? "mt-2" : ""}>
+              <div key={group.label || `nav-group-${gi}`} className={gi > 0 ? "mt-2" : ""}>
                 {!sidebarCollapsed && group.label && (
                   <div className="mb-1.5 px-2.5 text-[10px] font-normal tracking-wider text-[#6B6C6B]">
                     {group.label}
@@ -2160,9 +2160,7 @@ function ModelWorkspace() {
         </div>
 
         <aside className="min-w-0">
-           <h2 className="mb-4 text-right text-2xl font-normal text-foreground">
-             
-           </h2>
+          <h2 className="mb-4 text-right text-2xl font-normal text-foreground"></h2>
           <div className="divide-y divide-border">
             {getLatestProductUpdates().map((update) => {
               const UpdateIcon = UPDATE_ICONS[update.icon];
