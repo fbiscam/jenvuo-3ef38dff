@@ -1835,7 +1835,6 @@ Perform an evidence-first chart review. Inspect only what is visibly supported: 
         generatedAt: new Date().toISOString(),
         __billable: "signal",
       };
-
     } catch {
       // Fall back to the lightweight assistant path below if the full signal desk feed is temporarily unavailable.
     }
