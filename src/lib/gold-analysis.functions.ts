@@ -61,6 +61,7 @@ import {
 } from "@/lib/analysis/market-structure-evidence";
 import { detectPoiEvidence } from "@/lib/analysis/poi-evidence";
 import { buildExecutionEvidence } from "@/lib/analysis/execution-evidence";
+import { buildQuantEvidence } from "@/lib/analysis/quant-evidence";
 import { detectCandlestickPatterns } from "@/lib/analysis/candlestick-pattern-evidence";
 
 async function _spendUserCredits(
@@ -1376,6 +1377,45 @@ EXECUTION: ${
   }
 EXECUTION RULE: READY_TO_EXECUTE requires an allowed killzone, price inside OTE, and overlap with an active FVG or breaker. A score is a checklist count, never probability or certainty.`;
 
+  // Institutional quant layer: VSA, ATR risk pricing, HTF draw on liquidity,
+  // M30 mother/inside-bar order parameters and algorithmic trade management.
+  const htfBars = mtfFrames["1d"] ?? mtfFrames["1h"] ?? advancedBars;
+  const htfPools = htfBars.at(-1)?.active_liquidity_pools ?? [];
+  const quant = hasData
+    ? buildQuantEvidence({
+        candles: recent.map((c) => ({ t: c.t, o: c.o, h: c.h, l: c.l, c: c.c, v: c.v ?? 0 })),
+        liquidityPools: htfPools.map((pool) => ({
+          price_level: pool.price_level,
+          status: pool.status,
+          type: pool.type,
+        })),
+        trendState: advancedState?.trend_state ?? null,
+        currentPrice,
+      })
+    : null;
+  const quantBlock = quant
+    ? `VERIFIED INSTITUTIONAL QUANT LAYER (VSA + ATR + DOL + M30 pattern, closed candles only):
+ATR(14): ${quant.market_context.atr_14_current.toFixed(2)}
+HTF DRAW ON LIQUIDITY: ${
+        quant.market_context.htf_draw_on_liquidity == null
+          ? "UNRESOLVED"
+          : `${quant.market_context.htf_draw_on_liquidity.toFixed(2)} (${quant.market_context.dol_side})`
+      }
+VOLUME: mother bar ${quant.market_context.mother_bar_volume_status} | inside bar ${quant.market_context.inside_bar_volume_status} | latest VSA signature ${quant.market_context.vsa_signature}${quant.market_context.volume_available ? "" : " (no volume feed — VSA unverified)"}
+MOTHER / INSIDE BAR: ${
+        quant.pattern
+          ? `mother ${quant.pattern.mother_low.toFixed(2)}–${quant.pattern.mother_high.toFixed(2)} @ ${stamp(quant.pattern.mother_t)}; inside ${quant.pattern.inside_low.toFixed(2)}–${quant.pattern.inside_high.toFixed(2)} @ ${stamp(quant.pattern.inside_t)}; inside bars ${quant.pattern.inside_bar_count}; ${quant.pattern.broken ? "already broken" : "still unbroken"}`
+          : "none qualified"
+      }
+EXECUTION PARAMS: ${
+        quant.execution_params
+          ? `${quant.execution_params.signal} | trigger ${quant.execution_params.trigger_price.toFixed(2)} | dynamic SL ${quant.execution_params.dynamic_sl.toFixed(2)} | TP ${quant.execution_params.take_profit_absolute.toFixed(2)} | RR 1:${quant.execution_params.rr_ratio.toFixed(1)} | break-even at ${quant.execution_params.break_even_trigger_price.toFixed(2)} | trail from ${quant.execution_params.trail_activation_price.toFixed(2)} by ${quant.execution_params.trail_distance.toFixed(2)}`
+          : "NONE"
+      }
+CONFLUENCE: ${quant.confluence_score}${quant.notes.length ? `\nNOTES: ${quant.notes.join(" ")}` : ""}
+QUANT RULE: quote only these measured values. Volume status is participation evidence, never proof of direction. Break-even and trailing levels are risk management references, not guarantees, and a confluence count is a checklist grade, never a probability.`
+    : "VERIFIED INSTITUTIONAL QUANT LAYER: unavailable (insufficient closed candles)";
+
   const compact = recent
     .map(
       (c) =>
@@ -1397,6 +1437,7 @@ EXECUTION RULE: READY_TO_EXECUTE requires an allowed killzone, price inside OTE,
     mtfTrendBlock,
     poiBlock,
     executionBlock,
+    quantBlock,
     structureBlock,
     breakBlock,
     patternBlock,
@@ -1502,6 +1543,7 @@ ${ev.advancedLiquidityBlock}
 ${ev.mtfTrendBlock}
 ${ev.poiBlock}
 ${ev.executionBlock}
+${ev.quantBlock}
 ${ev.structureBlock}
 ${ev.breakBlock}
 ${ev.patternBlock}
@@ -1653,6 +1695,7 @@ Perform an evidence-first chart review. Inspect only what is visibly supported: 
     mtfTrendBlock,
     poiBlock,
     executionBlock,
+    quantBlock,
     structureBlock,
     breakBlock,
     patternBlock,
@@ -1766,6 +1809,7 @@ ${advancedLiquidityBlock}
 ${mtfTrendBlock}
 ${poiBlock}
 ${executionBlock}
+${quantBlock}
 ${structureBlock}
 ${breakBlock}
 ${patternBlock}

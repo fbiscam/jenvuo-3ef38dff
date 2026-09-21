@@ -129,3 +129,4 @@
 - [x] Align Terminal chart timeframe and spot-gold feed with deterministic HH/LH/HL/LL replies
 - [x] Add deterministic FVG, order block, supply/demand and rejection-signal evidence to Terminal AI
 - [x] Add and test deterministic killzone, breaker, AMD, OTE, and execution evidence for Terminal AI
+- [x] Add institutional quant layer (VSA, ATR risk pricing, HTF DOL, M30 mother/inside-bar execution and trade management) to Terminal AI
