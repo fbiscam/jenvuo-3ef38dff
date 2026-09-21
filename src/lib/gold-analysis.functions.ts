@@ -1114,7 +1114,7 @@ async function buildEvidenceContext(timeframe: string) {
   const hasData =
     candles.length >= 10 && !hasSyntheticInstrumentCandles(resolveInstrument("XAUUSD"), timeframe);
   const last = hasData ? candles[candles.length - 1] : null;
-  const recent = candles.slice(-150);
+  const recent = hasData ? candles.slice(-150) : [];
   const highs = recent.map((c) => c.h);
   const lows = recent.map((c) => c.l);
   const swingHigh = hasData ? Math.max(...highs) : 0;
@@ -1261,7 +1261,14 @@ function exactStructureAnswer(
   pivots: Array<{ label: string; price: number; t: number; kind: "high" | "low" }>,
   structureState: string,
 ): string | null {
-  if (!isStructureLabelQuery(query) || pivots.length === 0) return null;
+  if (!isStructureLabelQuery(query)) return null;
+  if (pivots.length === 0) {
+    const romanUrdu =
+      /\b(kaha|kidhar|hai|ha|bata|banao|bana|ya|yar|wala|wali|mujhe|muje)\b/i.test(query);
+    return romanUrdu
+      ? `${timeframe.toUpperCase()} par abhi verified closed-candle feed ya enough confirmed pivots available nahi hain, is liye main HH/LH/HL/LL ki value guess nahi karunga.`
+      : `Verified closed-candle data or enough confirmed pivots are not currently available on ${timeframe.toUpperCase()}, so I will not guess HH/LH/HL/LL values.`;
+  }
   const latest = pivots.slice(-6);
   const lines = latest.map(
     (pivot) =>
