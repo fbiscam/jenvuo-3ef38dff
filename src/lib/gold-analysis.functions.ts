@@ -54,7 +54,11 @@ import {
   XAU_DESK_CORE_INSTRUCTIONS,
   XAU_SENIOR_REVIEW_INSTRUCTIONS,
 } from "@/lib/analysis/agent-instructions";
-import { detectMarketStructureEvidence } from "@/lib/analysis/market-structure-evidence";
+import {
+  classifyMultiTimeframeTrend,
+  detectMarketStructureEvidence,
+  mapAdvancedSmcState,
+} from "@/lib/analysis/market-structure-evidence";
 import { detectCandlestickPatterns } from "@/lib/analysis/candlestick-pattern-evidence";
 
 async function _spendUserCredits(
@@ -1135,6 +1139,16 @@ async function buildEvidenceContext(timeframe: string) {
   // Pivots are not available until two later candles close; breaks require a
   // buffered close through an already-confirmed swing.
   const structureEvidence = detectMarketStructureEvidence(recent);
+  const toStructureCandles = (items: Candle[]) =>
+    items.map((candle) => ({
+      timestamp: candle.t,
+      open: candle.o,
+      high: candle.h,
+      low: candle.l,
+      close: candle.c,
+    }));
+  const advancedBars = hasData ? mapAdvancedSmcState(toStructureCandles(recent)) : [];
+  const advancedState = advancedBars.at(-1) ?? null;
   const labelled = structureEvidence.pivots.filter((p) => p.label.length === 2);
   const recentPivots = labelled.slice(-10);
   const fmtPivot = (p: (typeof labelled)[number]) =>
@@ -1239,6 +1253,52 @@ SELL-SIDE LIQUIDITY (swing lows below price, nearest first): ${
       }`
     : "";
 
+  const advancedLiquidityBlock = advancedState
+    ? `VERIFIED ADVANCED SMC STATE:
+TREND STATE: ${advancedState.trend_state}
+DEALING ZONE: ${advancedState.dealing_zone}${advancedState.equilibrium == null ? " (external range not confirmed)" : ` | EQUILIBRIUM: ${advancedState.equilibrium.toFixed(2)}`}
+LAST EVENT: ${advancedState.last_event ?? "NONE"}
+ACTIVE LIQUIDITY POOLS: ${
+        advancedState.active_liquidity_pools.length
+          ? advancedState.active_liquidity_pools
+              .slice(-12)
+              .map((pool) => `${pool.type} ${pool.price_level.toFixed(2)} ${pool.status}`)
+              .join("; ")
+          : "NONE"
+      }
+TRENDLINE LIQUIDITY: ${
+        advancedState.trendline_liquidity.length
+          ? advancedState.trendline_liquidity
+              .slice(-4)
+              .map((pool) => `${pool.side} ${pool.price_level.toFixed(2)} ${pool.status}`)
+              .join("; ")
+          : "NONE"
+      }`
+    : "VERIFIED ADVANCED SMC STATE: unavailable";
+
+  const mtfFrames: Record<string, ReturnType<typeof mapAdvancedSmcState>> = {};
+  const mtfTimeframes = Array.from(new Set(["1d", "1h", timeframe]));
+  const mtfResults = await Promise.allSettled(
+    mtfTimeframes.map(async (tf) => {
+      if (tf === timeframe && hasData) return [tf, advancedBars] as const;
+      const frameCandles = closedCandlesOnly(await fetchTerminalGoldEvidenceCandles(tf), tf).slice(
+        -150,
+      );
+      return [tf, mapAdvancedSmcState(toStructureCandles(frameCandles))] as const;
+    }),
+  );
+  for (const result of mtfResults) {
+    if (result.status === "fulfilled" && result.value[1].length) {
+      mtfFrames[result.value[0]] = result.value[1];
+    }
+  }
+  const mtfTrend = classifyMultiTimeframeTrend(mtfFrames);
+  const mtfTrendBlock = `MULTI-TIMEFRAME TREND (closed candles): ${mtfTrend.state} | ${
+    mtfTrend.aligned ? "ALIGNED" : "MIXED"
+  } | bullish [${mtfTrend.bullish.join(", ") || "none"}] | bearish [${
+    mtfTrend.bearish.join(", ") || "none"
+  }] | sideways [${mtfTrend.sideways.join(", ") || "none"}]`;
+
   const compact = recent
     .map(
       (c) =>
@@ -1256,6 +1316,8 @@ SELL-SIDE LIQUIDITY (swing lows below price, nearest first): ${
     swingHigh,
     swingLow,
     liquidityBlock,
+    advancedLiquidityBlock,
+    mtfTrendBlock,
     structureBlock,
     breakBlock,
     patternBlock,
