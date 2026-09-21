@@ -67,7 +67,9 @@ test("BPR is the overlap of opposing fair value gaps", () => {
 
 test("apex aborts when macro opposes the setup direction", () => {
   const candles = Array.from({ length: 30 }, (_, i) => candle(i, 2000, 2005, 1995, 2001, 100));
-  const dxyUp = Array.from({ length: 30 }, (_, i) => candle(i, 100 + i, 101 + i, 99 + i, 100.5 + i));
+  const dxyUp = Array.from({ length: 30 }, (_, i) =>
+    candle(i, 100 + i, 101 + i, 99 + i, 100.5 + i),
+  );
   const result = buildApexEvidence({
     candles,
     dxyCandles: dxyUp,

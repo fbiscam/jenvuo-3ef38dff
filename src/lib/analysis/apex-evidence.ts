@@ -52,11 +52,7 @@ export type MacroAlignment =
   | "NO_ALIGNMENT"
   | "UNAVAILABLE";
 
-export type LbmaFixStatus =
-  | "PRE_FIX_BLACKOUT"
-  | "POST_FIX_WINDOW"
-  | "CLEAR_OF_FIX"
-  | "UNAVAILABLE";
+export type LbmaFixStatus = "PRE_FIX_BLACKOUT" | "POST_FIX_WINDOW" | "CLEAR_OF_FIX" | "UNAVAILABLE";
 
 export type InversionFvg = {
   type: "BULLISH_IFVG" | "BEARISH_IFVG";
@@ -215,10 +211,7 @@ export function triangulateMacro(dxy: MacroTrend, us10y: MacroTrend): MacroAlign
   if (dxy === "UNAVAILABLE" || us10y === "UNAVAILABLE") return "UNAVAILABLE";
   if (dxy === "BEARISH" && us10y === "BEARISH") return "PERFECT_BUY";
   if (dxy === "BULLISH" && us10y === "BULLISH") return "PERFECT_SELL";
-  if (
-    (dxy === "BULLISH" && us10y === "BEARISH") ||
-    (dxy === "BEARISH" && us10y === "BULLISH")
-  ) {
+  if ((dxy === "BULLISH" && us10y === "BEARISH") || (dxy === "BEARISH" && us10y === "BULLISH")) {
     return "MACRO_DIVERGENCE";
   }
   return "NO_ALIGNMENT";
@@ -377,7 +370,9 @@ export function buildApexEvidence(input: {
   const freshIfvgAtPattern = inversions.find(
     (ifvg) =>
       ifvg.fresh ||
-      (input.patternInsideT != null && zoneOverlaps(price, ifvg) && ifvg.inverted_t < input.patternInsideT),
+      (input.patternInsideT != null &&
+        zoneOverlaps(price, ifvg) &&
+        ifvg.inverted_t < input.patternInsideT),
   );
   const patternOnIfvg = Boolean(freshIfvgAtPattern && zoneOverlaps(price, freshIfvgAtPattern));
   const patternOnBpr = bprs.some((b) => b.status !== "MITIGATED" && zoneOverlaps(price, b));
@@ -402,11 +397,15 @@ export function buildApexEvidence(input: {
       (direction === "BUY" && alignment === "PERFECT_BUY") ||
       (direction === "SELL" && alignment === "PERFECT_SELL");
     const flowAgainst =
-      (direction === "BUY" && (cvd === "CONFIRMED_SELL_ABSORPTION" || imbalance === "SELL_IMBALANCE_3X")) ||
-      (direction === "SELL" && (cvd === "CONFIRMED_BUY_ABSORPTION" || imbalance === "BUY_IMBALANCE_3X"));
+      (direction === "BUY" &&
+        (cvd === "CONFIRMED_SELL_ABSORPTION" || imbalance === "SELL_IMBALANCE_3X")) ||
+      (direction === "SELL" &&
+        (cvd === "CONFIRMED_BUY_ABSORPTION" || imbalance === "BUY_IMBALANCE_3X"));
     const flowWith =
-      (direction === "BUY" && (cvd === "CONFIRMED_BUY_ABSORPTION" || imbalance === "BUY_IMBALANCE_3X")) ||
-      (direction === "SELL" && (cvd === "CONFIRMED_SELL_ABSORPTION" || imbalance === "SELL_IMBALANCE_3X"));
+      (direction === "BUY" &&
+        (cvd === "CONFIRMED_BUY_ABSORPTION" || imbalance === "BUY_IMBALANCE_3X")) ||
+      (direction === "SELL" &&
+        (cvd === "CONFIRMED_SELL_ABSORPTION" || imbalance === "SELL_IMBALANCE_3X"));
 
     if (macroConflict) {
       action = "ABORT_MACRO_CONFLICT";
