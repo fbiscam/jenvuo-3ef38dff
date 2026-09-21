@@ -324,7 +324,10 @@ function TerminalPage() {
         "save_chart_properties_to_local_storage",
         "use_localstorage_for_settings",
       ]),
-      disabled_features: JSON.stringify([]),
+      // The parent cannot observe timeframe changes made inside TradingView's
+      // cross-origin iframe. Keep our selector authoritative so chart, timer,
+      // and AI always use the exact same interval.
+      disabled_features: JSON.stringify(["header_resolutions", "header_interval_dialog_button"]),
     });
     return `https://s.tradingview.com/widgetembed/?${params.toString()}`;
   }, [tf.tv, chartUserId]);

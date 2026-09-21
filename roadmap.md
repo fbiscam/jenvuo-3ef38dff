@@ -126,3 +126,4 @@
 - [x] Harden and test Terminal CHOCH, BOS, MSS, IDM, trend, and liquidity evidence
 - [x] Verify the reported `src/lib/utils.ts` type diagnostic against the current source
 - [x] Add deterministic closed-candle pattern evidence to Terminal AI and verify TypeScript
+- [x] Align Terminal chart timeframe and spot-gold feed with deterministic HH/LH/HL/LL replies

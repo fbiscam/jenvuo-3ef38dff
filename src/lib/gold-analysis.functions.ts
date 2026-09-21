@@ -406,7 +406,10 @@ export function resolveInstrument(input: string): ResolvedInstrument {
     // (XAUEUR=X, etc.) is kept as a fallback for both quote and candles.
     // Do NOT include XAUUSD=X / GC=F in yahooSymbols for cross-pairs —
     // fetchYahooQuote would silently return USD-scale prices otherwise.
-    const yahooSymbols = xauKey === "XAUUSD" ? [p.yahoo, "XAUUSD=X"] : [p.yahoo];
+    // Terminal embeds OANDA spot gold, so prefer Yahoo's spot feed before the
+    // GC futures proxy. Futures can trade at a material premium/discount and
+    // made otherwise-correct swing labels appear at the wrong chart prices.
+    const yahooSymbols = xauKey === "XAUUSD" ? ["XAUUSD=X", p.yahoo] : [p.yahoo];
     return {
       raw: raw || xauKey,
       key: `METAL:${xauKey}`,
@@ -1061,6 +1064,28 @@ async function fetchGoldCandles(tf: string): Promise<Candle[]> {
   return fetchInstrumentCandles(resolveInstrument("XAUUSD"), tf);
 }
 
+function closedCandlesOnly(candles: Candle[], timeframe: string, now = Date.now()): Candle[] {
+  const step = TF_MS[timeframe] ?? TF_MS["15m"];
+  const currentBucket = Math.floor(now / step) * step;
+  const sorted = [...candles]
+    .filter(
+      (candle) =>
+        Number.isFinite(candle.t) &&
+        Number.isFinite(candle.o) &&
+        Number.isFinite(candle.h) &&
+        Number.isFinite(candle.l) &&
+        Number.isFinite(candle.c) &&
+        candle.t < currentBucket,
+    )
+    .sort((a, b) => a.t - b.t);
+
+  // Provider retries can return the same timestamp twice. Keep one canonical
+  // candle per bucket so duplicate bars cannot create false pivots.
+  const byBucket = new Map<number, Candle>();
+  for (const candle of sorted) byBucket.set(Math.floor(candle.t / step) * step, candle);
+  return [...byBucket.values()].sort((a, b) => a.t - b.t);
+}
+
 // Returns whether the query looks like a real trading-setup request (as opposed
 // to casual chat like "how is gold looking?"). Keep this list tight — vague
 // market words like "gold/price/trend/market/chart" would fire on chit-chat and
@@ -1080,13 +1105,16 @@ function isTradingSetupIntent(q: string): boolean {
 async function buildEvidenceContext(timeframe: string) {
   let candles: Candle[] = [];
   try {
-    candles = await fetchGoldCandles(timeframe);
+    candles = closedCandlesOnly(await fetchGoldCandles(timeframe), timeframe);
   } catch {
     candles = [];
   }
-  const hasData = candles.length >= 10;
+  // Synthetic fallback bars are useful for keeping generic UI alive, but they
+  // must never be presented as real HH/LH/HL/LL evidence.
+  const hasData =
+    candles.length >= 10 && !hasSyntheticInstrumentCandles(resolveInstrument("XAUUSD"), timeframe);
   const last = hasData ? candles[candles.length - 1] : null;
-  const recent = candles.slice(-150);
+  const recent = hasData ? candles.slice(-150) : [];
   const highs = recent.map((c) => c.h);
   const lows = recent.map((c) => c.l);
   const swingHigh = hasData ? Math.max(...highs) : 0;
@@ -1218,6 +1246,67 @@ SELL-SIDE LIQUIDITY (swing lows below price, nearest first): ${
     breakBlock,
     patternBlock,
     compact,
+    recentPivots,
+    structureState,
+  };
+}
+
+function isStructureLabelQuery(query: string): boolean {
+  return /\b(HH|HL|LH|LL|higher\s+high|higher\s+low|lower\s+high|lower\s+low)\b/i.test(query);
+}
+
+function exactStructureAnswer(
+  query: string,
+  timeframe: string,
+  pivots: Array<{ label: string; price: number; t: number; kind: "high" | "low" }>,
+  structureState: string,
+): string | null {
+  if (!isStructureLabelQuery(query)) return null;
+  if (pivots.length === 0) {
+    const romanUrdu = /\b(kaha|kidhar|hai|ha|bata|banao|bana|ya|yar|wala|wali|mujhe|muje)\b/i.test(
+      query,
+    );
+    return romanUrdu
+      ? `${timeframe.toUpperCase()} par abhi verified closed-candle feed ya enough confirmed pivots available nahi hain, is liye main HH/LH/HL/LL ki value guess nahi karunga.`
+      : `Verified closed-candle data or enough confirmed pivots are not currently available on ${timeframe.toUpperCase()}, so I will not guess HH/LH/HL/LL values.`;
+  }
+  const latest = pivots.slice(-6);
+  const lines = latest.map(
+    (pivot) =>
+      `${pivot.label} ${pivot.price.toFixed(2)} @ ${new Date(pivot.t).toISOString().slice(5, 16)}Z`,
+  );
+  const romanUrdu = /\b(kaha|kidhar|hai|ha|bata|banao|bana|ya|yar|wala|wali|mujhe|muje)\b/i.test(
+    query,
+  );
+  return romanUrdu
+    ? `${timeframe.toUpperCase()} par latest confirmed structure: ${lines.join("; ")}. Current state: ${structureState}. Ye sirf closed candles ke confirmed pivots hain; chalti candle ko label nahi kiya gaya.`
+    : `${timeframe.toUpperCase()} latest confirmed structure: ${lines.join("; ")}. Current state: ${structureState}. These are confirmed pivots from closed candles only; the live candle is not labelled.`;
+}
+
+function deterministicAdvisorResult(
+  answer: string,
+  timeframe: string,
+  currentPrice: number,
+): GoldSignal & { __billable: "chat" } {
+  return {
+    bias: "NEUTRAL",
+    direction: "WAIT",
+    entry: "-",
+    stopLoss: "-",
+    takeProfits: [],
+    riskReward: "-",
+    confidence: 0,
+    killzone: "-",
+    confluences: [],
+    ictAnalysis: "",
+    smcAnalysis: "",
+    marketStructure: answer,
+    spokenSummary: answer,
+    fullAnalysis: answer,
+    timeframe,
+    currentPrice,
+    generatedAt: new Date().toISOString(),
+    __billable: "chat",
   };
 }
 
@@ -1231,6 +1320,15 @@ async function _analyzeGoldCompute(
 
   if (data.chartImage) {
     const ev = await buildEvidenceContext(data.timeframe);
+    const exactAnswer = exactStructureAnswer(
+      data.query,
+      data.timeframe,
+      ev.recentPivots,
+      ev.structureState,
+    );
+    if (data.advisor && exactAnswer) {
+      return deterministicAdvisorResult(exactAnswer, data.timeframe, ev.last?.c ?? 0);
+    }
     const evidenceContext = ev.hasData
       ? `
 
@@ -1287,6 +1385,12 @@ Perform an evidence-first chart review. Inspect only what is visibly supported: 
         .catch(() => {});
     }
     const parsed: any = tryParseJsonLoose(content);
+    const deterministicStructure = exactStructureAnswer(
+      data.query,
+      data.timeframe,
+      ev.recentPivots,
+      ev.structureState,
+    );
     return {
       bias: parsed.bias === "BULLISH" || parsed.bias === "BEARISH" ? parsed.bias : "NEUTRAL",
       direction:
@@ -1304,8 +1408,11 @@ Perform an evidence-first chart review. Inspect only what is visibly supported: 
       ictAnalysis: String(parsed.ictAnalysis ?? ""),
       smcAnalysis: String(parsed.smcAnalysis ?? ""),
       marketStructure: String(parsed.marketStructure ?? ""),
-      spokenSummary: String(parsed.spokenSummary ?? "Chart review complete."),
-      fullAnalysis: String(parsed.fullAnalysis ?? parsed.spokenSummary ?? "Chart review complete."),
+      spokenSummary:
+        deterministicStructure ?? String(parsed.spokenSummary ?? "Chart review complete."),
+      fullAnalysis:
+        deterministicStructure ??
+        String(parsed.fullAnalysis ?? parsed.spokenSummary ?? "Chart review complete."),
       timeframe: data.timeframe,
       currentPrice: 0,
       generatedAt: new Date().toISOString(),
@@ -1379,7 +1486,18 @@ Perform an evidence-first chart review. Inspect only what is visibly supported: 
     breakBlock,
     patternBlock,
     compact,
+    recentPivots,
+    structureState,
   } = await buildEvidenceContext(data.timeframe);
+  const exactAnswer = exactStructureAnswer(
+    data.query,
+    data.timeframe,
+    recentPivots,
+    structureState,
+  );
+  if (data.advisor && exactAnswer) {
+    return deterministicAdvisorResult(exactAnswer, data.timeframe, last?.c ?? 0);
+  }
 
   const advisorSystem = `You are a concise general-purpose AI assistant and an institutional-grade XAU/USD research mentor. Your trading knowledge reflects decades of established discretionary price-action practice without pretending to possess personal human experience.
 
@@ -1517,6 +1635,12 @@ ${isTradingIntent ? "The live feed is unavailable. Answer concisely without inve
       .catch(() => {});
   }
   const parsed: any = tryParseJsonLoose(content);
+  const deterministicStructure = exactStructureAnswer(
+    data.query,
+    data.timeframe,
+    recentPivots,
+    structureState,
+  );
 
   const signal: GoldSignal = {
     bias: parsed.bias ?? "NEUTRAL",
@@ -1535,8 +1659,8 @@ ${isTradingIntent ? "The live feed is unavailable. Answer concisely without inve
     ictAnalysis: String(parsed.ictAnalysis ?? ""),
     smcAnalysis: String(parsed.smcAnalysis ?? ""),
     marketStructure: String(parsed.marketStructure ?? ""),
-    spokenSummary: String(parsed.spokenSummary ?? "Analysis complete."),
-    fullAnalysis: String(parsed.fullAnalysis ?? ""),
+    spokenSummary: deterministicStructure ?? String(parsed.spokenSummary ?? "Analysis complete."),
+    fullAnalysis: deterministicStructure ?? String(parsed.fullAnalysis ?? ""),
     timeframe: data.timeframe,
     currentPrice: last?.c ?? 0,
     generatedAt: new Date().toISOString(),
