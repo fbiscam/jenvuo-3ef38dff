@@ -566,7 +566,7 @@ function TerminalPage() {
                     <img src={jenvuTick} alt="Verified" className="size-3.5 shrink-0" />
                   </div>
                   <p className="truncate text-[11px] text-muted-foreground">
-                    Gold 30-minute analysis ready
+                    Gold {tf.label} analysis ready
                   </p>
                 </div>
                 <Button
