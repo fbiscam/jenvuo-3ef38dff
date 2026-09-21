@@ -53,6 +53,38 @@ export type MappedMarketStructureCandle = MarketStructureCandle & {
   smc_event: "BOS" | "CHoCH" | null;
 };
 
+export type AdvancedTrendState = "BULLISH" | "BEARISH" | "SIDEWAYS";
+export type DealingZone = "PREMIUM" | "DISCOUNT" | "EQUILIBRIUM";
+export type AdvancedSmcEvent = "BOS" | "CHoCH" | "BSL_SWEEP" | "SSL_SWEEP" | "IDM_SWEEP";
+export type LiquidityPoolType = "BSL" | "SSL" | "EQH" | "EQL" | "IDM";
+
+export type ActiveLiquidityPool = {
+  type: LiquidityPoolType;
+  price_level: number;
+  status: "UNSWEPT" | "SWEPT";
+};
+
+export type AdvancedSmcBar = MarketStructureCandle & {
+  trend_state: AdvancedTrendState;
+  dealing_zone: DealingZone;
+  active_liquidity_pools: ActiveLiquidityPool[];
+  trendline_liquidity: Array<{
+    side: "BSL" | "SSL";
+    price_level: number;
+    status: "UNSWEPT" | "SWEPT";
+  }>;
+  equilibrium: number | null;
+  last_event: AdvancedSmcEvent | null;
+};
+
+export type MultiTimeframeTrend = {
+  state: AdvancedTrendState;
+  aligned: boolean;
+  bullish: string[];
+  bearish: string[];
+  sideways: string[];
+};
+
 function trueRange(current: StructureCandle, previous?: StructureCandle): number {
   if (!previous) return current.h - current.l;
   return Math.max(
@@ -296,4 +328,270 @@ export function mapMarketStructure(
   }
 
   return mapped;
+}
+
+type InternalPool = ActiveLiquidityPool & {
+  sourceIndex: number;
+  side: "high" | "low";
+};
+
+function samePool(a: InternalPool, b: InternalPool, tolerance: number): boolean {
+  return a.type === b.type && Math.abs(a.price_level - b.price_level) <= tolerance;
+}
+
+/**
+ * Builds causal SMC state for every closed bar. The XAU/USD defaults use a
+ * 0.30 equal-high/low tolerance and a 0.15 trendline alignment tolerance.
+ */
+export function mapAdvancedSmcState(
+  input: MarketStructureCandle[],
+  options: { radius?: number; equalTolerance?: number; trendlineTolerance?: number } = {},
+): AdvancedSmcBar[] {
+  const radius = options.radius ?? 2;
+  const equalTolerance = options.equalTolerance ?? 0.3;
+  const trendlineTolerance = options.trendlineTolerance ?? 0.15;
+  if (equalTolerance < 0 || trendlineTolerance < 0) {
+    throw new RangeError("Liquidity tolerances cannot be negative");
+  }
+
+  const mapped = mapMarketStructure(input, radius);
+  const candles: StructureCandle[] = input.map((candle) => ({
+    t: candle.timestamp,
+    o: candle.open,
+    h: candle.high,
+    l: candle.low,
+    c: candle.close,
+  }));
+  const evidence = detectMarketStructureEvidence(candles, radius);
+  const confirmations = new Map<number, StructurePivot[]>();
+  for (const pivot of evidence.pivots) {
+    const atIndex = confirmations.get(pivot.confirmedIndex) ?? [];
+    atIndex.push(pivot);
+    confirmations.set(pivot.confirmedIndex, atIndex);
+  }
+
+  let trend: AdvancedTrendState = "SIDEWAYS";
+  let lastEvent: AdvancedSmcEvent | null = null;
+  let activeHigh: StructurePivot | null = null;
+  let activeLow: StructurePivot | null = null;
+  let lastBullishExternal: StructurePivot | null = null;
+  let lastBullishInternal: StructurePivot | null = null;
+  let lastBearishExternal: StructurePivot | null = null;
+  let lastBearishInternal: StructurePivot | null = null;
+  let waitingBullishIdmAfter = -1;
+  let waitingBearishIdmAfter = -1;
+  const confirmedHighs: StructurePivot[] = [];
+  const confirmedLows: StructurePivot[] = [];
+  const pools: InternalPool[] = [];
+  const trendlinePools: InternalPool[] = [];
+  const consumedBreaks = new Set<number>();
+
+  const addPool = (pool: InternalPool) => {
+    if (!pools.some((existing) => samePool(existing, pool, equalTolerance / 3))) pools.push(pool);
+  };
+
+  return mapped.map((bar, index): AdvancedSmcBar => {
+    for (const pivot of confirmations.get(index) ?? []) {
+      if (pivot.kind === "high") {
+        activeHigh = pivot;
+        const equal = [...confirmedHighs]
+          .reverse()
+          .find((previous) => Math.abs(previous.price - pivot.price) <= equalTolerance);
+        addPool({
+          type: equal ? "EQH" : "BSL",
+          price_level: equal ? (equal.price + pivot.price) / 2 : pivot.price,
+          status: "UNSWEPT",
+          sourceIndex: pivot.index,
+          side: "high",
+        });
+        confirmedHighs.push(pivot);
+        if (trend === "BEARISH" && pivot.index > waitingBearishIdmAfter) {
+          addPool({
+            type: "IDM",
+            price_level: pivot.price,
+            status: "UNSWEPT",
+            sourceIndex: pivot.index,
+            side: "high",
+          });
+          lastBearishInternal = pivot;
+          waitingBearishIdmAfter = Number.POSITIVE_INFINITY;
+        }
+      } else {
+        activeLow = pivot;
+        const equal = [...confirmedLows]
+          .reverse()
+          .find((previous) => Math.abs(previous.price - pivot.price) <= equalTolerance);
+        addPool({
+          type: equal ? "EQL" : "SSL",
+          price_level: equal ? (equal.price + pivot.price) / 2 : pivot.price,
+          status: "UNSWEPT",
+          sourceIndex: pivot.index,
+          side: "low",
+        });
+        confirmedLows.push(pivot);
+        if (trend === "BULLISH" && pivot.index > waitingBullishIdmAfter) {
+          addPool({
+            type: "IDM",
+            price_level: pivot.price,
+            status: "UNSWEPT",
+            sourceIndex: pivot.index,
+            side: "low",
+          });
+          lastBullishInternal = pivot;
+          waitingBullishIdmAfter = Number.POSITIVE_INFINITY;
+        }
+      }
+    }
+
+    const previousTrend = trend;
+    const bullishCloseBreak =
+      activeHigh && !consumedBreaks.has(activeHigh.index) && bar.close > activeHigh.price;
+    const bearishCloseBreak =
+      activeLow && !consumedBreaks.has(activeLow.index) && bar.close < activeLow.price;
+
+    if (bullishCloseBreak && activeHigh) {
+      lastEvent = previousTrend === "BEARISH" ? "CHoCH" : "BOS";
+      trend = "BULLISH";
+      lastBullishExternal = activeHigh;
+      waitingBullishIdmAfter = activeHigh.index;
+      consumedBreaks.add(activeHigh.index);
+    } else if (bearishCloseBreak && activeLow) {
+      lastEvent = previousTrend === "BULLISH" ? "CHoCH" : "BOS";
+      trend = "BEARISH";
+      lastBearishExternal = activeLow;
+      waitingBearishIdmAfter = activeLow.index;
+      consumedBreaks.add(activeLow.index);
+    } else if (
+      activeHigh &&
+      !consumedBreaks.has(activeHigh.index) &&
+      bar.high > activeHigh.price &&
+      bar.close <= activeHigh.price
+    ) {
+      lastEvent = "BSL_SWEEP";
+    } else if (
+      activeLow &&
+      !consumedBreaks.has(activeLow.index) &&
+      bar.low < activeLow.price &&
+      bar.close >= activeLow.price
+    ) {
+      lastEvent = "SSL_SWEEP";
+    }
+
+    for (const pool of pools) {
+      if (pool.status === "SWEPT" || index <= pool.sourceIndex) continue;
+      const swept = pool.side === "high" ? bar.high > pool.price_level : bar.low < pool.price_level;
+      if (!swept) continue;
+      pool.status = "SWEPT";
+      if (pool.type === "IDM") lastEvent = "IDM_SWEEP";
+    }
+
+    const recentLows = confirmedLows.slice(-3);
+    if (
+      recentLows.length === 3 &&
+      recentLows[0].price < recentLows[1].price &&
+      recentLows[1].price < recentLows[2].price
+    ) {
+      const firstSlope = recentLows[1].price - recentLows[0].price;
+      const secondSlope = recentLows[2].price - recentLows[1].price;
+      if (Math.abs(firstSlope - secondSlope) <= trendlineTolerance) {
+        const candidate: InternalPool = {
+          type: "SSL",
+          price_level: recentLows[2].price,
+          status: "UNSWEPT",
+          sourceIndex: recentLows[2].index,
+          side: "low",
+        };
+        if (!trendlinePools.some((pool) => samePool(pool, candidate, trendlineTolerance))) {
+          trendlinePools.push(candidate);
+        }
+      }
+    }
+    const recentHighs = confirmedHighs.slice(-3);
+    if (
+      recentHighs.length === 3 &&
+      recentHighs[0].price > recentHighs[1].price &&
+      recentHighs[1].price > recentHighs[2].price
+    ) {
+      const firstSlope = recentHighs[0].price - recentHighs[1].price;
+      const secondSlope = recentHighs[1].price - recentHighs[2].price;
+      if (Math.abs(firstSlope - secondSlope) <= trendlineTolerance) {
+        const candidate: InternalPool = {
+          type: "BSL",
+          price_level: recentHighs[2].price,
+          status: "UNSWEPT",
+          sourceIndex: recentHighs[2].index,
+          side: "high",
+        };
+        if (!trendlinePools.some((pool) => samePool(pool, candidate, trendlineTolerance))) {
+          trendlinePools.push(candidate);
+        }
+      }
+    }
+    for (const pool of trendlinePools) {
+      if (pool.status === "SWEPT" || index <= pool.sourceIndex) continue;
+      if (pool.side === "high" ? bar.high > pool.price_level : bar.low < pool.price_level) {
+        pool.status = "SWEPT";
+      }
+    }
+
+    const rangeHigh = trend === "BULLISH" ? lastBullishExternal?.price : lastBearishInternal?.price;
+    const rangeLow = trend === "BULLISH" ? lastBullishInternal?.price : lastBearishExternal?.price;
+    const equilibrium = rangeHigh != null && rangeLow != null ? (rangeHigh + rangeLow) / 2 : null;
+    const dealingZone: DealingZone =
+      equilibrium == null
+        ? "EQUILIBRIUM"
+        : Math.abs(bar.close - equilibrium) <= 0.01
+          ? "EQUILIBRIUM"
+          : bar.close > equilibrium
+            ? "PREMIUM"
+            : "DISCOUNT";
+
+    return {
+      ...input[index],
+      trend_state: trend,
+      dealing_zone: dealingZone,
+      active_liquidity_pools: pools.map(({ type, price_level, status }) => ({
+        type,
+        price_level,
+        status,
+      })),
+      trendline_liquidity: trendlinePools.map(({ side, price_level, status }) => ({
+        side: side === "high" ? "BSL" : "SSL",
+        price_level,
+        status,
+      })),
+      equilibrium,
+      last_event: lastEvent,
+    };
+  });
+}
+
+export function classifyMultiTimeframeTrend(
+  frames: Record<string, AdvancedSmcBar[]>,
+): MultiTimeframeTrend {
+  const bullish: string[] = [];
+  const bearish: string[] = [];
+  const sideways: string[] = [];
+  for (const [timeframe, bars] of Object.entries(frames)) {
+    const state = bars.at(-1)?.trend_state ?? "SIDEWAYS";
+    if (state === "BULLISH") bullish.push(timeframe);
+    else if (state === "BEARISH") bearish.push(timeframe);
+    else sideways.push(timeframe);
+  }
+  const directionalCount = bullish.length + bearish.length;
+  const state: AdvancedTrendState =
+    bullish.length > bearish.length
+      ? "BULLISH"
+      : bearish.length > bullish.length
+        ? "BEARISH"
+        : "SIDEWAYS";
+  return {
+    state,
+    aligned:
+      directionalCount >= 2 &&
+      (bullish.length === directionalCount || bearish.length === directionalCount),
+    bullish,
+    bearish,
+    sideways,
+  };
 }

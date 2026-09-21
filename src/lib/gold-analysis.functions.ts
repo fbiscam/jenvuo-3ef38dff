@@ -54,7 +54,11 @@ import {
   XAU_DESK_CORE_INSTRUCTIONS,
   XAU_SENIOR_REVIEW_INSTRUCTIONS,
 } from "@/lib/analysis/agent-instructions";
-import { detectMarketStructureEvidence } from "@/lib/analysis/market-structure-evidence";
+import {
+  classifyMultiTimeframeTrend,
+  detectMarketStructureEvidence,
+  mapAdvancedSmcState,
+} from "@/lib/analysis/market-structure-evidence";
 import { detectCandlestickPatterns } from "@/lib/analysis/candlestick-pattern-evidence";
 
 async function _spendUserCredits(
@@ -1135,6 +1139,16 @@ async function buildEvidenceContext(timeframe: string) {
   // Pivots are not available until two later candles close; breaks require a
   // buffered close through an already-confirmed swing.
   const structureEvidence = detectMarketStructureEvidence(recent);
+  const toStructureCandles = (items: Candle[]) =>
+    items.map((candle) => ({
+      timestamp: candle.t,
+      open: candle.o,
+      high: candle.h,
+      low: candle.l,
+      close: candle.c,
+    }));
+  const advancedBars = hasData ? mapAdvancedSmcState(toStructureCandles(recent)) : [];
+  const advancedState = advancedBars.at(-1) ?? null;
   const labelled = structureEvidence.pivots.filter((p) => p.label.length === 2);
   const recentPivots = labelled.slice(-10);
   const fmtPivot = (p: (typeof labelled)[number]) =>
@@ -1239,6 +1253,52 @@ SELL-SIDE LIQUIDITY (swing lows below price, nearest first): ${
       }`
     : "";
 
+  const advancedLiquidityBlock = advancedState
+    ? `VERIFIED ADVANCED SMC STATE:
+TREND STATE: ${advancedState.trend_state}
+DEALING ZONE: ${advancedState.dealing_zone}${advancedState.equilibrium == null ? " (external range not confirmed)" : ` | EQUILIBRIUM: ${advancedState.equilibrium.toFixed(2)}`}
+LAST EVENT: ${advancedState.last_event ?? "NONE"}
+ACTIVE LIQUIDITY POOLS: ${
+        advancedState.active_liquidity_pools.length
+          ? advancedState.active_liquidity_pools
+              .slice(-12)
+              .map((pool) => `${pool.type} ${pool.price_level.toFixed(2)} ${pool.status}`)
+              .join("; ")
+          : "NONE"
+      }
+TRENDLINE LIQUIDITY: ${
+        advancedState.trendline_liquidity.length
+          ? advancedState.trendline_liquidity
+              .slice(-4)
+              .map((pool) => `${pool.side} ${pool.price_level.toFixed(2)} ${pool.status}`)
+              .join("; ")
+          : "NONE"
+      }`
+    : "VERIFIED ADVANCED SMC STATE: unavailable";
+
+  const mtfFrames: Record<string, ReturnType<typeof mapAdvancedSmcState>> = {};
+  const mtfTimeframes = Array.from(new Set(["1d", "1h", timeframe]));
+  const mtfResults = await Promise.allSettled(
+    mtfTimeframes.map(async (tf) => {
+      if (tf === timeframe && hasData) return [tf, advancedBars] as const;
+      const frameCandles = closedCandlesOnly(await fetchTerminalGoldEvidenceCandles(tf), tf).slice(
+        -150,
+      );
+      return [tf, mapAdvancedSmcState(toStructureCandles(frameCandles))] as const;
+    }),
+  );
+  for (const result of mtfResults) {
+    if (result.status === "fulfilled" && result.value[1].length) {
+      mtfFrames[result.value[0]] = result.value[1];
+    }
+  }
+  const mtfTrend = classifyMultiTimeframeTrend(mtfFrames);
+  const mtfTrendBlock = `MULTI-TIMEFRAME TREND (closed candles): ${mtfTrend.state} | ${
+    mtfTrend.aligned ? "ALIGNED" : "MIXED"
+  } | bullish [${mtfTrend.bullish.join(", ") || "none"}] | bearish [${
+    mtfTrend.bearish.join(", ") || "none"
+  }] | sideways [${mtfTrend.sideways.join(", ") || "none"}]`;
+
   const compact = recent
     .map(
       (c) =>
@@ -1256,6 +1316,8 @@ SELL-SIDE LIQUIDITY (swing lows below price, nearest first): ${
     swingHigh,
     swingLow,
     liquidityBlock,
+    advancedLiquidityBlock,
+    mtfTrendBlock,
     structureBlock,
     breakBlock,
     patternBlock,
@@ -1357,6 +1419,8 @@ CURRENT PRICE: ${ev.currentPrice.toFixed(2)}
 RECENT SWING HIGH (150): ${ev.swingHigh.toFixed(2)}
 RECENT SWING LOW (150): ${ev.swingLow.toFixed(2)}
 ${ev.liquidityBlock}
+${ev.advancedLiquidityBlock}
+${ev.mtfTrendBlock}
 ${ev.structureBlock}
 ${ev.breakBlock}
 ${ev.patternBlock}
@@ -1504,6 +1568,8 @@ Perform an evidence-first chart review. Inspect only what is visibly supported: 
     swingLow,
     last,
     liquidityBlock,
+    advancedLiquidityBlock,
+    mtfTrendBlock,
     structureBlock,
     breakBlock,
     patternBlock,
@@ -1541,6 +1607,8 @@ Additional rules only for trading questions:
 - Never invent live prices, chart features, indicators, news, or higher-timeframe context that was not supplied.
 - Every price level you mention MUST be copied exactly from the supplied CURRENT PRICE, swing high/low, LIQUIDITY levels, or OHLC rows. Never round, guess, or extrapolate a level, and never quote a level outside the supplied swing high/low range.
 - When asked where liquidity is sitting, quote the nearest supplied buy-side and sell-side levels first and state their distance from the current price.
+- Treat VERIFIED ADVANCED SMC STATE as authoritative for trend, premium/discount, EQH/EQL, IDM, trendline liquidity, BOS/CHoCH and sweeps. A wick beyond a level that closes back inside is a BSL_SWEEP or SSL_SWEEP and must never be called BOS. Only a close beyond a confirmed swing changes trend. Never claim an IDM exists unless it is listed, and always state SWEPT versus UNSWEPT.
+- MULTI-TIMEFRAME TREND is a closed-candle consensus. If it says MIXED, do not claim full timeframe alignment.
 - Market structure is already computed for you in CONFIRMED SWING STRUCTURE. When the user asks where an HH, HL, LH or LL formed, answer with the exact labelled pivot price and its timestamp from that block. Never re-derive, rename, or invent a swing point, and never label a level the block does not label.
 - BOS, CHOCH, MSS and inducement are already computed in CONFIRMED BREAKS. MSS is the first directional break when prior trend is unconfirmed; BOS is continuation; CHOCH is the first opposite break. Only quote listed events with their exact level and timestamp. A weak close without displacement is lower-quality evidence and must not be described as strong confirmation.
 - Use TREND FROM BREAKS together with CURRENT STRUCTURE for bias; if they disagree, say so and explain that the market is transitioning.
@@ -1609,6 +1677,8 @@ CURRENT PRICE: ${currentPrice.toFixed(2)}
 RECENT SWING HIGH (150): ${swingHigh.toFixed(2)}
 RECENT SWING LOW (150): ${swingLow.toFixed(2)}
 ${liquidityBlock}
+${advancedLiquidityBlock}
+${mtfTrendBlock}
 ${structureBlock}
 ${breakBlock}
 ${patternBlock}
