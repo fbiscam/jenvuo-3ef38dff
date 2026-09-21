@@ -1511,7 +1511,6 @@ Perform an evidence-first chart review. Inspect only what is visibly supported: 
     recentPivots,
     structureState,
     currentPrice,
-    currentPrice,
   } = await buildEvidenceContext(data.timeframe);
   const exactAnswer = exactStructureAnswer(
     data.query,
@@ -1665,6 +1664,7 @@ ${isTradingIntent ? `${hasLivePrice ? `VERIFIED LIVE XAU/USD PRICE: ${currentPri
     data.timeframe,
     recentPivots,
     structureState,
+    currentPrice,
   );
 
   const signal: GoldSignal = {
