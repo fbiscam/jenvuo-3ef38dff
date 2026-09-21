@@ -48,7 +48,10 @@ function localDirection(candles: StructureCandle[], index: number): "up" | "down
   const start = Math.max(0, index - 5);
   const sample = candles.slice(start, index);
   if (sample.length < 3) return "flat";
-  const move = sample.at(-1)!.c - sample[0].c;
+  const first = sample[0];
+  const last = sample.at(-1);
+  if (!first || !last) return "flat";
+  const move = last.c - first.c;
   const averageRange = sample.reduce((sum, candle) => sum + range(candle), 0) / sample.length;
   if (move > averageRange * 0.75) return "up";
   if (move < -averageRange * 0.75) return "down";

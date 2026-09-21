@@ -55,6 +55,7 @@ import {
   XAU_SENIOR_REVIEW_INSTRUCTIONS,
 } from "@/lib/analysis/agent-instructions";
 import { detectMarketStructureEvidence } from "@/lib/analysis/market-structure-evidence";
+import { detectCandlestickPatterns } from "@/lib/analysis/candlestick-pattern-evidence";
 
 async function _spendUserCredits(
   userId: string,
@@ -1151,6 +1152,21 @@ TREND FROM BREAKS: ${structureEvidence.trend.toUpperCase()}
 ${idmLine}`
     : "CONFIRMED BREAKS: none inside the supplied window (no close-through of a confirmed swing)";
 
+  const candlestickEvidence = detectCandlestickPatterns(recent);
+  const patternBlock = candlestickEvidence.latest.length
+    ? `RECENT CONFIRMED CANDLESTICK FORMATIONS (closed OHLC only, oldest -> newest):
+${candlestickEvidence.latest
+  .slice(-8)
+  .map((pattern) => {
+    const candle = recent[pattern.index];
+    if (!candle) return null;
+    return `${pattern.name.toUpperCase()} @ ${stamp(pattern.t)} — ${pattern.bias} / ${pattern.strength}; O${candle.o.toFixed(2)} H${candle.h.toFixed(2)} L${candle.l.toFixed(2)} C${candle.c.toFixed(2)}. ${pattern.confirmation}`;
+  })
+  .filter((line): line is string => Boolean(line))
+  .join("\n")}
+PATTERN RULE: names describe candle geometry plus preceding direction, not a guaranteed reversal or continuation. Structure, location, liquidity and a later confirming close decide whether a pattern matters.`
+    : "RECENT CONFIRMED CANDLESTICK FORMATIONS: none objectively qualified in the latest eight closed candles";
+
   const price = last ? last.c : 0;
   const buySideLevels = Array.from(
     new Set(
@@ -1200,6 +1216,7 @@ SELL-SIDE LIQUIDITY (swing lows below price, nearest first): ${
     liquidityBlock,
     structureBlock,
     breakBlock,
+    patternBlock,
     compact,
   };
 }
@@ -1224,10 +1241,11 @@ RECENT SWING LOW (150): ${ev.swingLow.toFixed(2)}
 ${ev.liquidityBlock}
 ${ev.structureBlock}
 ${ev.breakBlock}
+${ev.patternBlock}
 LAST 150 CANDLES (OHLC):
 ${ev.compact}
 
-Rules: use the screenshot only for visual corroboration (what the user has drawn, visible zones, chart context). Every HH, HL, LH, LL, BOS, CHOCH, MSS, inducement and liquidity level you state MUST be copied exactly from the verified data above, with its price and timestamp. Never read a swing label off the image, never invent or round a level, and never quote a price outside ${ev.swingLow.toFixed(2)}-${ev.swingHigh.toFixed(2)}. If the image contradicts the verified data, say so and trust the verified data.`
+Rules: use the screenshot only for visual corroboration (what the user has drawn, visible zones, chart context). Every HH, HL, LH, LL, BOS, CHOCH, MSS, inducement, liquidity level and named candlestick formation you state MUST be copied exactly from the verified data above, with its price/time evidence. Never read a swing or candle-pattern label off the image, never invent or round a level, and never quote a price outside ${ev.swingLow.toFixed(2)}-${ev.swingHigh.toFixed(2)}. If the image contradicts the verified data, say so and trust the verified data.`
       : `
 
 The live candle feed is unavailable, so no verified levels exist. Describe only what is clearly visible in the image, avoid exact price claims, and state that limitation.`;
@@ -1359,6 +1377,7 @@ Perform an evidence-first chart review. Inspect only what is visibly supported: 
     liquidityBlock,
     structureBlock,
     breakBlock,
+    patternBlock,
     compact,
   } = await buildEvidenceContext(data.timeframe);
 
@@ -1366,7 +1385,7 @@ Perform an evidence-first chart review. Inspect only what is visibly supported: 
 
 First identify the user's intent:
 - For greetings, casual conversation, or any non-trading question, reply as a normal helpful assistant. Do not mention charts, gold, trading, ICT, SMC, risk, or your trading expertise unless the user asks about them.
-- Only for trading-related questions, apply advanced ICT/SMC knowledge: external and internal structure, BOS/CHOCH/MSS, dealing ranges, premium/discount, OTE, displacement, order/mitigation/breaker blocks, FVG/IFVG/BPR, liquidity pools and sweeps, inducement, session profiles, killzones, intermarket context, invalidation, and risk management.
+- Only for trading-related questions, apply advanced ICT/SMC knowledge plus professional candlestick reading: single-, double-, and three-candle formations; body/wick anatomy; rejection versus acceptance; compression/inside bars; expansion/outside bars; engulfing patterns; doji variants; hammer, hanging man, shooting star and inverted hammer; piercing/dark-cloud patterns; morning/evening stars; and three-candle momentum sequences. Always interpret them through structure, location, liquidity, displacement and confirmation.
 
 Rules for every reply:
 - Answer exactly what the user asked and nothing more.
@@ -1384,6 +1403,8 @@ Additional rules only for trading questions:
 - BOS, CHOCH, MSS and inducement are already computed in CONFIRMED BREAKS. MSS is the first directional break when prior trend is unconfirmed; BOS is continuation; CHOCH is the first opposite break. Only quote listed events with their exact level and timestamp. A weak close without displacement is lower-quality evidence and must not be described as strong confirmation.
 - Use TREND FROM BREAKS together with CURRENT STRUCTURE for bias; if they disagree, say so and explain that the market is transitioning.
 - When asked about inducement/IDM, use the INDUCEMENT line. Call it a candidate internal-liquidity pool, never proof that institutions engineered a trap. State whether it is swept or unswept and require displacement plus follow-through before treating it as meaningful.
+- Named candlestick formations are already computed in RECENT CONFIRMED CANDLESTICK FORMATIONS from closed OHLC candles. Quote only listed formations and their exact timestamp/OHLC; never identify a pattern solely from the screenshot. Explain whether it is bullish, bearish or neutral, its strength, required confirmation, and whether structure/location supports or conflicts with it.
+- A candlestick pattern alone never proves the next move. Do not call a reversal confirmed until the stated confirmation close occurs; do not promote doji or inside bars beyond indecision/compression before a closed breakout.
 - Explain the mechanics (why liquidity was taken, where the displacement came from, what invalidates it), not just the labels.
 - Coach the user to build their own plan by explaining relevant structure, confirmation, invalidation, or risk.
 - You may suggest what to watch, but never provide a finished signal with committed entry, stop loss, and take profit.
@@ -1448,6 +1469,7 @@ RECENT SWING LOW (150): ${swingLow.toFixed(2)}
 ${liquidityBlock}
 ${structureBlock}
 ${breakBlock}
+${patternBlock}
 LAST 150 CANDLES (OHLC):
 ${compact}
 
