@@ -1836,57 +1836,6 @@ Perform an evidence-first chart review. Inspect only what is visibly supported: 
         __billable: "signal",
       };
 
-      /* The legacy multi-strategy plan is intentionally unreachable for Gold
-       * setup requests: the strict M30 reversal verdict is the final gate. */
-      /* c8 ignore next 2 */
-      const plan = await computeSignalPlan(
-        { symbol: inferInstrumentFromText(data.query) },
-        __userId,
-        { scanId: __scanId },
-      );
-      const dec = plan.instrument.decimals;
-      const prefix = plan.instrument.kind === "crypto" ? "" : "$";
-      const fmt = (n?: number) =>
-        typeof n === "number" && isFinite(n) ? `${prefix}${n.toFixed(dec)}` : "-";
-      // If the plan returned WAIT, fall through to the LLM chat path so the
-      // user hears a conversational answer, not a terse "WAIT on XAU/USD: …".
-      if (plan.trade.direction !== "WAIT") {
-        // Only expose entry/SL/TP at or above the shared platform-wide
-        // confidence floor. Below that we still return the analysis but
-        // hide the trade block.
-        const highConviction = (plan.trade.confidence ?? 0) >= MIN_CONFIDENCE;
-        return {
-          bias:
-            plan.htfBias === "bullish"
-              ? "BULLISH"
-              : plan.htfBias === "bearish"
-                ? "BEARISH"
-                : "NEUTRAL",
-          direction: highConviction ? plan.trade.direction : "WAIT",
-          entry: highConviction ? fmt(plan.trade.entry) : "-",
-          stopLoss: highConviction ? fmt(plan.trade.sl) : "-",
-          takeProfits: highConviction
-            ? [plan.trade.tp1, plan.trade.tp2, plan.trade.tp3 ?? plan.trade.tp]
-                .filter((n): n is number => typeof n === "number")
-                .map(fmt)
-            : [],
-          riskReward: highConviction ? `1:${plan.trade.rr.toFixed(2)}` : "-",
-          confidence: plan.trade.confidence,
-          killzone: plan.killzone,
-          confluences: plan.confluences,
-          ictAnalysis: plan.htfNarrative,
-          smcAnalysis: plan.ltfNarrative,
-          marketStructure: `${plan.alignmentLabel} · ${plan.setupGrade} (${plan.setupScore}/100)`,
-          spokenSummary: highConviction
-            ? plan.trade.summary
-            : `Confidence only ${plan.trade.confidence}% — waiting for a ${MIN_CONFIDENCE}%+ high-conviction setup before issuing entry, SL and TP.`,
-          fullAnalysis: `${plan.htfNarrative}\n\n${plan.ltfNarrative}\n\n${highConviction ? plan.trade.summary : `Setup is forming but confidence is below the ${MIN_CONFIDENCE}% threshold. Entry, SL and TP are withheld until conviction rises.`}\nInvalidation: ${plan.trade.invalidation}`,
-          timeframe: data.timeframe,
-          currentPrice: plan.currentPrice,
-          generatedAt: new Date().toISOString(),
-          __billable: "signal",
-        };
-      }
     } catch {
       // Fall back to the lightweight assistant path below if the full signal desk feed is temporarily unavailable.
     }
