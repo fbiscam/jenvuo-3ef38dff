@@ -11,14 +11,7 @@ import {
   type QuantCandle,
 } from "./quant-evidence";
 
-function candle(
-  t: number,
-  o: number,
-  h: number,
-  l: number,
-  c: number,
-  v = 1000,
-): QuantCandle {
+function candle(t: number, o: number, h: number, l: number, c: number, v = 1000): QuantCandle {
   return { t, o, h, l, c, v };
 }
 

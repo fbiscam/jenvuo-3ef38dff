@@ -86,9 +86,7 @@ export function computeAtr(candles: QuantCandle[], period = 14): number {
   for (let i = 1; i < candles.length; i++) {
     const cur = candles[i];
     const prev = candles[i - 1];
-    trs.push(
-      Math.max(cur.h - cur.l, Math.abs(cur.h - prev.c), Math.abs(cur.l - prev.c)),
-    );
+    trs.push(Math.max(cur.h - cur.l, Math.abs(cur.h - prev.c), Math.abs(cur.l - prev.c)));
   }
   const window = trs.slice(-period);
   if (!window.length) return 0;
@@ -103,11 +101,7 @@ function averageVolume(candles: QuantCandle[], index: number, lookback = 20): nu
   return slice.reduce((a, b) => a + (b.v || 0), 0) / slice.length;
 }
 
-export function classifyVolume(
-  candles: QuantCandle[],
-  index: number,
-  lookback = 20,
-): VolumeStatus {
+export function classifyVolume(candles: QuantCandle[], index: number, lookback = 20): VolumeStatus {
   const bar = candles[index];
   if (!bar || !Number.isFinite(bar.v) || bar.v <= 0) return "VOLUME_UNAVAILABLE";
   const avg = averageVolume(candles, index, lookback);
@@ -252,7 +246,8 @@ export function buildQuantEvidence(input: {
   currentPrice?: number;
 }): QuantEvidence {
   const candles = input.candles.filter(
-    (c) => Number.isFinite(c.o) && Number.isFinite(c.h) && Number.isFinite(c.l) && Number.isFinite(c.c),
+    (c) =>
+      Number.isFinite(c.o) && Number.isFinite(c.h) && Number.isFinite(c.l) && Number.isFinite(c.c),
   );
   const notes: string[] = [];
   const atr = round2(computeAtr(candles));
@@ -315,16 +310,22 @@ export function buildQuantEvidence(input: {
       if (dol.level != null) {
         const towardsDol = direction === "BUY" ? dol.level > trigger : dol.level < trigger;
         if (!towardsDol) {
-          notes.push("Draw on liquidity sits against the pattern break — treat the setup as low grade.");
+          notes.push(
+            "Draw on liquidity sits against the pattern break — treat the setup as low grade.",
+          );
         }
       }
     }
   } else if (pattern?.broken) {
-    notes.push("Latest mother/inside formation already broke — parameters are historical, not live.");
+    notes.push(
+      "Latest mother/inside formation already broke — parameters are historical, not live.",
+    );
   } else if (!pattern) {
     notes.push("No qualifying mother candle + inside bar in the supplied window.");
   } else if (patternBias === "UNRESOLVED") {
-    notes.push("Mother/inside formation is unresolved — no directional bias, so no order parameters.");
+    notes.push(
+      "Mother/inside formation is unresolved — no directional bias, so no order parameters.",
+    );
   }
 
   const confluences = [
