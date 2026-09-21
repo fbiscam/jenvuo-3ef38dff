@@ -38,6 +38,21 @@ export type MarketStructureEvidence = {
   inducement: InducementEvidence | null;
 };
 
+export type MarketStructureCandle = {
+  timestamp: number;
+  open: number;
+  high: number;
+  low: number;
+  close: number;
+};
+
+export type MappedMarketStructureCandle = MarketStructureCandle & {
+  is_swing_high: boolean;
+  is_swing_low: boolean;
+  structure_label: "HH" | "HL" | "LH" | "LL" | null;
+  smc_event: "BOS" | "CHoCH" | null;
+};
+
 function trueRange(current: StructureCandle, previous?: StructureCandle): number {
   if (!previous) return current.h - current.l;
   return Math.max(
@@ -73,7 +88,7 @@ export function detectMarketStructureEvidence(
       c.h >= Math.max(c.o, c.c) &&
       c.l <= Math.min(c.o, c.c),
   );
-  if (candles.length < radius * 2 + 3) {
+  if (candles.length < radius * 2 + 1) {
     return { pivots: [], breaks: [], trend: "undecided", inducement: null };
   }
 
@@ -83,9 +98,9 @@ export function detectMarketStructureEvidence(
     const left = candles.slice(i - radius, i);
     const right = candles.slice(i + 1, i + radius + 1);
     const isHigh =
-      left.every((item) => candle.h > item.h) && right.every((item) => candle.h >= item.h);
+      left.every((item) => candle.h > item.h) && right.every((item) => candle.h > item.h);
     const isLow =
-      left.every((item) => candle.l < item.l) && right.every((item) => candle.l <= item.l);
+      left.every((item) => candle.l < item.l) && right.every((item) => candle.l < item.l);
     if (isHigh) {
       raw.push({
         index: i,
@@ -217,4 +232,68 @@ export function detectMarketStructureEvidence(
       ? "transitioning"
       : trend;
   return { pivots, breaks, trend: finalTrend, inducement };
+}
+
+/**
+ * Maps confirmed market structure back onto the supplied OHLC candles.
+ *
+ * This function is causal when called with closed candles: a swing at index N
+ * is not emitted until `radius` candles after N are present, and BOS/CHoCH is
+ * emitted only on the candle whose close breaks an already-confirmed swing.
+ * The first directional break establishes trend and is exposed as BOS; a later
+ * opposite break is exposed as CHoCH.
+ */
+export function mapMarketStructure(
+  input: MarketStructureCandle[],
+  radius = 2,
+): MappedMarketStructureCandle[] {
+  if (!Number.isInteger(radius) || radius < 1) {
+    throw new RangeError("Market-structure radius must be a positive integer");
+  }
+
+  const candles: StructureCandle[] = input.map((candle, index) => {
+    const values = [candle.timestamp, candle.open, candle.high, candle.low, candle.close];
+    if (
+      values.some((value) => !Number.isFinite(value)) ||
+      candle.high < Math.max(candle.open, candle.close) ||
+      candle.low > Math.min(candle.open, candle.close)
+    ) {
+      throw new TypeError(`Invalid OHLC candle at index ${index}`);
+    }
+    return {
+      t: candle.timestamp,
+      o: candle.open,
+      h: candle.high,
+      l: candle.low,
+      c: candle.close,
+    };
+  });
+
+  const evidence = detectMarketStructureEvidence(candles, radius);
+  const mapped: MappedMarketStructureCandle[] = input.map((candle) => ({
+    ...candle,
+    is_swing_high: false,
+    is_swing_low: false,
+    structure_label: null,
+    smc_event: null,
+  }));
+
+  for (const pivot of evidence.pivots) {
+    const candle = mapped[pivot.index];
+    if (!candle) continue;
+    if (pivot.kind === "high") candle.is_swing_high = true;
+    else candle.is_swing_low = true;
+    candle.structure_label =
+      pivot.label === "HH" || pivot.label === "HL" || pivot.label === "LH" || pivot.label === "LL"
+        ? pivot.label
+        : null;
+  }
+
+  for (const event of evidence.breaks) {
+    const candle = mapped[event.index];
+    if (!candle) continue;
+    candle.smc_event = event.type === "CHOCH" ? "CHoCH" : "BOS";
+  }
+
+  return mapped;
 }
