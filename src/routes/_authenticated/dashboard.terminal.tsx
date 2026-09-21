@@ -544,6 +544,15 @@ function TerminalPage() {
           {deskOpen && (
             <aside className="relative flex h-[45%] min-h-0 w-full shrink-0 flex-col border-t border-border bg-card text-card-foreground lg:h-full lg:w-[380px] lg:border-l lg:border-t-0">
               <div className="flex min-h-17 items-center gap-2.5 border-b border-border px-4 py-3">
+                <div className="min-w-0">
+                  <div className="flex items-center gap-1">
+                    <h2 className="truncate text-sm font-semibold">Jenvu</h2>
+                    <img src={jenvuTick} alt="Verified" className="size-3.5 shrink-0" />
+                  </div>
+                  <p className="truncate text-[11px] text-muted-foreground">
+                    Gold 30-minute analysis ready
+                  </p>
+                </div>
                 <Button
                   type="button"
                   variant="ghost"
