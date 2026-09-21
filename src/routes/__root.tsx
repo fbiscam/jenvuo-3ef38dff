@@ -245,18 +245,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
-    // suppressHydrationWarning: the inline Material Symbols script below adds
+    // suppressHydrationWarning: the Material Symbols script in head() adds
     // the `ms-icons-ready` class to <html> before React hydrates.
     <html lang="en" suppressHydrationWarning>
       <head>
         <HeadContent />
-        {/* PWA standalone mode disabled — always render website look */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html:
-              "(function(){var r=document.documentElement;var done=function(){r.classList.add('ms-icons-ready')};try{if(document.fonts&&document.fonts.load){document.fonts.load('20px \"Material Symbols Rounded\"','space_dashboard').then(done).catch(done)}else{done()}}catch(e){done()}setTimeout(done,2500)})();",
-          }}
-        />
       </head>
 
       <body>
