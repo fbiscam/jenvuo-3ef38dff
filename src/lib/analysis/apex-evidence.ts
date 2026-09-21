@@ -169,10 +169,15 @@ export function detectCvdDivergence(candles: ApexCandle[], lookback = 12): CvdSt
   const highB = half + idxOf(second, (a, b) => a.h > b.h);
   const tol = (Math.max(...window.map((c) => c.h)) - Math.min(...window.map((c) => c.l))) * 0.1;
 
-  if (window[lowB].l <= window[lowA].l + tol && cvd[lowB] > cvd[lowA]) {
+  // Compare delta generated inside each half, not the running total, so an
+  // early trend does not mask absorption at the later swing.
+  const deltaFirst = cvd[half - 1];
+  const deltaSecond = cvd[cvd.length - 1] - cvd[half - 1];
+
+  if (window[lowB].l <= window[lowA].l + tol && deltaSecond > deltaFirst) {
     return "CONFIRMED_BUY_ABSORPTION";
   }
-  if (window[highB].h >= window[highA].h - tol && cvd[highB] < cvd[highA]) {
+  if (window[highB].h >= window[highA].h - tol && deltaSecond < deltaFirst) {
     return "CONFIRMED_SELL_ABSORPTION";
   }
   return "NO_DIVERGENCE";
