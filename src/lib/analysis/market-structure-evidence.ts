@@ -87,7 +87,13 @@ export function detectMarketStructureEvidence(
     const isLow =
       left.every((item) => candle.l < item.l) && right.every((item) => candle.l <= item.l);
     if (isHigh) {
-      raw.push({ index: i, confirmedIndex: i + radius, t: candle.t, price: candle.h, kind: "high" });
+      raw.push({
+        index: i,
+        confirmedIndex: i + radius,
+        t: candle.t,
+        price: candle.h,
+        kind: "high",
+      });
     }
     if (isLow) {
       raw.push({ index: i, confirmedIndex: i + radius, t: candle.t, price: candle.l, kind: "low" });
@@ -138,18 +144,34 @@ export function detectMarketStructureEvidence(
     const displacement = atr > 0 && body >= atr * 0.6;
     const closeBuffer = atr * 0.03;
     const bullishBreak =
-      activeHigh && activeHigh.index !== brokenHighIndex && candle.c > activeHigh.price + closeBuffer;
+      activeHigh &&
+      activeHigh.index !== brokenHighIndex &&
+      candle.c > activeHigh.price + closeBuffer;
     const bearishBreak =
       activeLow && activeLow.index !== brokenLowIndex && candle.c < activeLow.price - closeBuffer;
 
     if (bullishBreak && activeHigh) {
       const type = trend === "bearish" ? "CHOCH" : trend === "bullish" ? "BOS" : "MSS";
-      breaks.push({ index: i, t: candle.t, type, dir: "bullish", level: activeHigh.price, displacement });
+      breaks.push({
+        index: i,
+        t: candle.t,
+        type,
+        dir: "bullish",
+        level: activeHigh.price,
+        displacement,
+      });
       brokenHighIndex = activeHigh.index;
       trend = "bullish";
     } else if (bearishBreak && activeLow) {
       const type = trend === "bullish" ? "CHOCH" : trend === "bearish" ? "BOS" : "MSS";
-      breaks.push({ index: i, t: candle.t, type, dir: "bearish", level: activeLow.price, displacement });
+      breaks.push({
+        index: i,
+        t: candle.t,
+        type,
+        dir: "bearish",
+        level: activeLow.price,
+        displacement,
+      });
       brokenLowIndex = activeLow.index;
       trend = "bearish";
     }

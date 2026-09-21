@@ -1279,12 +1279,20 @@ ${idmLine}`
 
   const price = last ? last.c : 0;
   const buySideLevels = Array.from(
-    new Set(structureEvidence.pivots.filter((p) => p.kind === "high" && p.price > price).map((p) => p.price)),
+    new Set(
+      structureEvidence.pivots
+        .filter((p) => p.kind === "high" && p.price > price)
+        .map((p) => p.price),
+    ),
   )
     .sort((a, b) => a - b)
     .slice(0, 4);
   const sellSideLevels = Array.from(
-    new Set(structureEvidence.pivots.filter((p) => p.kind === "low" && p.price < price).map((p) => p.price)),
+    new Set(
+      structureEvidence.pivots
+        .filter((p) => p.kind === "low" && p.price < price)
+        .map((p) => p.price),
+    ),
   )
     .sort((a, b) => b - a)
     .slice(0, 4);
