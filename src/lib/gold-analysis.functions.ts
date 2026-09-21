@@ -59,6 +59,7 @@ import {
   detectMarketStructureEvidence,
   mapAdvancedSmcState,
 } from "@/lib/analysis/market-structure-evidence";
+import { detectPoiEvidence } from "@/lib/analysis/poi-evidence";
 import { detectCandlestickPatterns } from "@/lib/analysis/candlestick-pattern-evidence";
 
 async function _spendUserCredits(
@@ -1299,6 +1300,47 @@ TRENDLINE LIQUIDITY: ${
     mtfTrend.bearish.join(", ") || "none"
   }] | sideways [${mtfTrend.sideways.join(", ") || "none"}]`;
 
+  const poiEvidence = hasData
+    ? detectPoiEvidence(recent.map((c) => ({ t: c.t, o: c.o, h: c.h, l: c.l, c: c.c })))
+    : { fair_value_gaps: [], order_blocks: [], price_action_signals: [] };
+  const poiLines: string[] = [];
+  const liveGaps = poiEvidence.fair_value_gaps.filter((g) => g.status !== "MITIGATED").slice(-6);
+  poiLines.push(
+    liveGaps.length
+      ? `FAIR VALUE GAPS (unfilled/partial): ${liveGaps
+          .map(
+            (g) =>
+              `${g.type} ${g.bottom.toFixed(2)}–${g.top.toFixed(2)} (CE ${g.ce.toFixed(2)}) @ ${stamp(g.t)} ${g.status}`,
+          )
+          .join("; ")}`
+      : "FAIR VALUE GAPS: none unfilled in the supplied window",
+  );
+  const liveZones = poiEvidence.order_blocks.filter((z) => z.status !== "MITIGATED").slice(-6);
+  poiLines.push(
+    liveZones.length
+      ? `ORDER BLOCKS / SUPPLY-DEMAND (unmitigated or partially tapped): ${liveZones
+          .map(
+            (z) =>
+              `${z.type} ${z.bottom.toFixed(2)}–${z.top.toFixed(2)} @ ${stamp(z.t)} ${z.status}; FVG-aligned ${z.is_fvg_aligned ? "yes" : "no"}; liquidity swept ${z.swept_liquidity ? "yes" : "no"}; displacement ${z.displacement ? "yes" : "no"}`,
+          )
+          .join("; ")}`
+      : "ORDER BLOCKS / SUPPLY-DEMAND: none valid and unmitigated in the supplied window",
+  );
+  const signals = poiEvidence.price_action_signals.slice(-4);
+  poiLines.push(
+    signals.length
+      ? `PRICE ACTION SIGNATURES: ${signals
+          .map(
+            (s) =>
+              `${s.signal_type} on ${s.zone_tapped} @ ${stamp(s.t)} — ${s.direction}, reference entry ${s.entry_price.toFixed(2)}, invalidation ${s.stop_loss.toFixed(2)}, confluence ${s.confidence_score}`,
+          )
+          .join("; ")}`
+      : "PRICE ACTION SIGNATURES: no qualifying rejection into a mapped zone",
+  );
+  const poiBlock = `VERIFIED POINTS OF INTEREST (closed candles only):
+${poiLines.join("\n")}
+POI RULE: quote only these zones with their exact boundaries. A zone is only valid while UNMITIGATED or PARTIAL; once MITIGATED it is spent. Confluence grade is not a probability or a guarantee.`;
+
   const compact = recent
     .map(
       (c) =>
@@ -1318,6 +1360,7 @@ TRENDLINE LIQUIDITY: ${
     liquidityBlock,
     advancedLiquidityBlock,
     mtfTrendBlock,
+    poiBlock,
     structureBlock,
     breakBlock,
     patternBlock,
@@ -1421,6 +1464,7 @@ RECENT SWING LOW (150): ${ev.swingLow.toFixed(2)}
 ${ev.liquidityBlock}
 ${ev.advancedLiquidityBlock}
 ${ev.mtfTrendBlock}
+${ev.poiBlock}
 ${ev.structureBlock}
 ${ev.breakBlock}
 ${ev.patternBlock}
@@ -1570,6 +1614,7 @@ Perform an evidence-first chart review. Inspect only what is visibly supported: 
     liquidityBlock,
     advancedLiquidityBlock,
     mtfTrendBlock,
+    poiBlock,
     structureBlock,
     breakBlock,
     patternBlock,
@@ -1609,6 +1654,7 @@ Additional rules only for trading questions:
 - When asked where liquidity is sitting, quote the nearest supplied buy-side and sell-side levels first and state their distance from the current price.
 - Treat VERIFIED ADVANCED SMC STATE as authoritative for trend, premium/discount, EQH/EQL, IDM, trendline liquidity, BOS/CHoCH and sweeps. A wick beyond a level that closes back inside is a BSL_SWEEP or SSL_SWEEP and must never be called BOS. Only a close beyond a confirmed swing changes trend. Never claim an IDM exists unless it is listed, and always state SWEPT versus UNSWEPT.
 - MULTI-TIMEFRAME TREND is a closed-candle consensus. If it says MIXED, do not claim full timeframe alignment.
+- VERIFIED POINTS OF INTEREST is authoritative for fair value gaps, order blocks, supply/demand zones and rejection signatures. Quote only listed zones with their exact boundaries and CE, and never invent or shift a zone. A MITIGATED zone is spent; only UNMITIGATED or PARTIAL zones may be discussed as live. State whether a zone is FVG-aligned, whether liquidity was swept into it and whether displacement was present, and treat a zone with all three as higher-quality confluence — never as a probability or guarantee. Any entry or invalidation you mention must be the reference entry and invalidation from PRICE ACTION SIGNATURES, described as a study reference, not a committed trade instruction.
 - Market structure is already computed for you in CONFIRMED SWING STRUCTURE. When the user asks where an HH, HL, LH or LL formed, answer with the exact labelled pivot price and its timestamp from that block. Never re-derive, rename, or invent a swing point, and never label a level the block does not label.
 - BOS, CHOCH, MSS and inducement are already computed in CONFIRMED BREAKS. MSS is the first directional break when prior trend is unconfirmed; BOS is continuation; CHOCH is the first opposite break. Only quote listed events with their exact level and timestamp. A weak close without displacement is lower-quality evidence and must not be described as strong confirmation.
 - Use TREND FROM BREAKS together with CURRENT STRUCTURE for bias; if they disagree, say so and explain that the market is transitioning.
@@ -1679,6 +1725,7 @@ RECENT SWING LOW (150): ${swingLow.toFixed(2)}
 ${liquidityBlock}
 ${advancedLiquidityBlock}
 ${mtfTrendBlock}
+${poiBlock}
 ${structureBlock}
 ${breakBlock}
 ${patternBlock}

@@ -127,3 +127,4 @@
 - [x] Verify the reported `src/lib/utils.ts` type diagnostic against the current source
 - [x] Add deterministic closed-candle pattern evidence to Terminal AI and verify TypeScript
 - [x] Align Terminal chart timeframe and spot-gold feed with deterministic HH/LH/HL/LL replies
+- [x] Add deterministic FVG, order block, supply/demand and rejection-signal evidence to Terminal AI
