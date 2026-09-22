@@ -193,7 +193,7 @@ function PricingPage() {
                 ) : disabled ? (
                   <button type="button" disabled className="mt-auto h-10 cursor-not-allowed rounded-full border border-border bg-muted text-sm text-muted-foreground">Locked in trial</button>
                 ) : (
-                  <Link to={destination} search={currentPlan === null ? { plan: plan.key } : undefined} className={`mt-auto flex h-10 items-center justify-center rounded-full border text-sm font-medium transition ${plan.key === "pro" ? "border-home-accent bg-home-accent text-home-accent-foreground hover:opacity-90" : "border-border bg-background hover:border-home-accent"}`}>
+                  <Link to={destination} className={`mt-auto flex h-10 items-center justify-center rounded-full border text-sm font-medium transition ${plan.key === "pro" ? "border-home-accent bg-home-accent text-home-accent-foreground hover:opacity-90" : "border-border bg-background hover:border-home-accent"}`}>
                     {trialPro ? "Upgrade to Pro" : currentPlan !== null ? "Upgrade" : "Apply now"}
                   </Link>
                 )}
