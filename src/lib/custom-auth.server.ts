@@ -33,6 +33,10 @@ function normalizeEmail(email: string) {
   return email.trim().toLowerCase()
 }
 
+function assertPublicSignupOpen(): never {
+  throw new Error('Jenvu is invite only. Apply to the Founding Trader Program for access.')
+}
+
 function serverSecret() {
   const secret = process.env.LOVABLE_API_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY
   if (!secret) throw new Error('Server is missing secure auth configuration.')
