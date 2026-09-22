@@ -1691,6 +1691,23 @@ function deterministicAdvisorResult(
   };
 }
 
+/** Prior conversation turns so the desk remembers what was already discussed. */
+function buildHistoryMessages(
+  history?: Array<{ role: "user" | "assistant"; content: string }>,
+): Array<{ role: "user" | "assistant"; content: string }> {
+  if (!Array.isArray(history) || history.length === 0) return [];
+  return history
+    .filter(
+      (m) =>
+        m &&
+        (m.role === "user" || m.role === "assistant") &&
+        typeof m.content === "string" &&
+        m.content.trim().length > 0,
+    )
+    .slice(-12)
+    .map((m) => ({ role: m.role, content: String(m.content).slice(0, 1200) }));
+}
+
 async function _analyzeGoldCompute(
   data: {
     timeframe: string;
