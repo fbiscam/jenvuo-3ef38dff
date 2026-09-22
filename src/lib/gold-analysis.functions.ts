@@ -1608,9 +1608,13 @@ function exactStructureAnswer(
 ): string | null {
   const romanUrdu =
     /\b(kaha|kidhar|hai|ha|bata|banao|bana|ya|yar|wala|wali|mujhe|muje|tak|sakta)\b/i.test(query);
+  const mentionsMother =
+    /(mother[\s-]*son|mother|inside[\s-]*bar|three\s*stocks?|ma+\s*son)/i.test(query);
   const asksMotherTarget =
-    /\b(mother|inside[\s-]*bar|three\s*stocks?)\b/i.test(query) &&
-    /\b(tp|take\s*profit|target|kaha\s*tak|kitna)\b/i.test(query);
+    mentionsMother &&
+    /\b(tp|take\s*profit|target|kaha\s*tak|kahan\s*tak|kitna|entry|sl|stop\s*loss|setup|plan|status|strategy|implement|kaam|pata|hai|ha|kya|kia)\b/i.test(
+      query,
+    );
   if (asksMotherTarget) {
     if (!reversal?.plan || !reversal.status.startsWith("ARMED_")) {
       const reason =
