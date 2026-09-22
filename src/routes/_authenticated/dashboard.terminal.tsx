@@ -333,8 +333,15 @@ function TerminalPage() {
   }, [tf.tv, chartUserId]);
 
   const ask = useMutation({
-    mutationFn: async ({ query, chartImage }: { query: string; chartImage?: string }) =>
-      analyze({ data: { timeframe: tf.key, query, chartImage, advisor: true } }),
+    mutationFn: async ({
+      query,
+      chartImage,
+      history,
+    }: {
+      query: string;
+      chartImage?: string;
+      history?: Array<{ role: "user" | "assistant"; content: string }>;
+    }) => analyze({ data: { timeframe: tf.key, query, chartImage, history, advisor: true } }),
     onSuccess: (signal) => {
       addMessage({
         role: "assistant",
