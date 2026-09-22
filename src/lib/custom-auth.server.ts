@@ -176,10 +176,7 @@ async function assertDeviceUnderCap(ip: string | undefined, fingerprint: string)
 }
 
 export async function createSignupOtp(input: { email: string; password: string; fullName: string; siteUrl?: string; ip?: string; country?: string; fingerprint: string; userAgent?: string }) {
-  throw new Error('Jenvu is invite only. Apply to the Founding Trader Program for access.')
-
-  // Retained for approved invite flows if public registration is reopened later.
-  /* c8 ignore start */
+  assertPublicSignupOpen()
   const { supabaseAdmin } = await import('@/integrations/supabase/client.server')
   const email = normalizeEmail(input.email)
 
@@ -248,7 +245,6 @@ export async function createSignupOtp(input: { email: string; password: string; 
   if (error) throw new Error(error.message)
 
   await sendCustomAuthEmail({ to: email, type: 'signup', code, siteUrl: input.siteUrl })
-  /* c8 ignore stop */
 }
 
 
@@ -284,10 +280,7 @@ export async function createRecoveryOtp(input: { email: string; siteUrl?: string
 
 
 export async function verifySignupOtp(input: { email: string; code: string; password: string; ip?: string; country?: string; fingerprint: string; userAgent?: string }): Promise<CustomAuthResult> {
-  void input
-  return { ok: false, error: 'Jenvu is invite only. Apply to the Founding Trader Program for access.' }
-
-  /* c8 ignore start */
+  assertPublicSignupOpen()
   const email = normalizeEmail(input.email)
   const verified = await verifyCustomOtp(email, 'signup', input.code)
   if (!verified.ok) return { ok: false, error: verified.error }
@@ -348,7 +341,6 @@ export async function verifySignupOtp(input: { email: string; code: string; pass
 
   await consumeOtp(verified.row.id)
   return { ok: true, session: data.session }
-  /* c8 ignore stop */
 }
 
 /**
