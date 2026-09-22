@@ -137,3 +137,5 @@
 - [x] Reject unverified volume and false distant-level touches in reversal validation
 - [x] Make the strict M30 reversal verdict the final gate for every requested Gold trade setup
 - [x] Answer Mother/Inside-Bar TP and next LH/HH questions directly from verified structure evidence
+- [x] Restore invite-only access and close public signup
+- [x] Restore the Founding Program pricing application flow and related enabled-state features

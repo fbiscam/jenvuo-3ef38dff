@@ -33,6 +33,16 @@ function normalizeEmail(email: string) {
   return email.trim().toLowerCase()
 }
 
+function publicSignupEnabled(): boolean {
+  return false
+}
+
+function assertPublicSignupOpen() {
+  if (!publicSignupEnabled()) {
+    throw new Error('Jenvu is invite only. Apply to the Founding Trader Program for access.')
+  }
+}
+
 function serverSecret() {
   const secret = process.env.LOVABLE_API_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY
   if (!secret) throw new Error('Server is missing secure auth configuration.')
@@ -176,6 +186,7 @@ async function assertDeviceUnderCap(ip: string | undefined, fingerprint: string)
 }
 
 export async function createSignupOtp(input: { email: string; password: string; fullName: string; siteUrl?: string; ip?: string; country?: string; fingerprint: string; userAgent?: string }) {
+  assertPublicSignupOpen()
   const { supabaseAdmin } = await import('@/integrations/supabase/client.server')
   const email = normalizeEmail(input.email)
 
@@ -279,6 +290,7 @@ export async function createRecoveryOtp(input: { email: string; siteUrl?: string
 
 
 export async function verifySignupOtp(input: { email: string; code: string; password: string; ip?: string; country?: string; fingerprint: string; userAgent?: string }): Promise<CustomAuthResult> {
+  assertPublicSignupOpen()
   const email = normalizeEmail(input.email)
   const verified = await verifyCustomOtp(email, 'signup', input.code)
   if (!verified.ok) return { ok: false, error: verified.error }
