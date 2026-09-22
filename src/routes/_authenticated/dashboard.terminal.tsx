@@ -455,7 +455,11 @@ function TerminalPage() {
     if (!query || ask.isPending) return;
     addMessage({ role: "user", text: query, files: image ? [image] : undefined });
     setInput("");
-    await ask.mutateAsync({ query, chartImage: image?.url });
+    const history = messages
+      .filter((m) => m.text.trim().length > 0)
+      .slice(-12)
+      .map((m) => ({ role: m.role, content: m.text.slice(0, 1200) }));
+    await ask.mutateAsync({ query, chartImage: image?.url, history });
   }
 
   async function startRecording() {
