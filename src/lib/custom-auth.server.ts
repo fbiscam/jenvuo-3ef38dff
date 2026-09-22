@@ -33,8 +33,14 @@ function normalizeEmail(email: string) {
   return email.trim().toLowerCase()
 }
 
-function assertPublicSignupOpen(): never {
-  throw new Error('Jenvu is invite only. Apply to the Founding Trader Program for access.')
+function publicSignupEnabled(): boolean {
+  return false
+}
+
+function assertPublicSignupOpen() {
+  if (!publicSignupEnabled()) {
+    throw new Error('Jenvu is invite only. Apply to the Founding Trader Program for access.')
+  }
 }
 
 function serverSecret() {
