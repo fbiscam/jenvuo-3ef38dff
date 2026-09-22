@@ -76,24 +76,24 @@ export const collections: Collection[] = [
       {
         slug: "create-account",
         title: "How do I create an account?",
-        summary: "Sign up takes under a minute with email and password.",
-        updatedAt: "2026-06-30",
+        summary: "Jenvu access is invite-only through the Founding Trader Program.",
+        updatedAt: "2026-09-22",
         body: [
-          { type: "p", content: "Creating a Jenvu account takes less than 60 seconds. New accounts start on the Free plan and include starter credits so you can try the terminal and signal engine immediately." },
+          { type: "p", content: "New Jenvu accounts are currently invite-only. Apply to the Founding Trader Program and the team will review your application." },
 
-          { type: "h2", content: "Sign up with email" },
+          { type: "h2", content: "Apply for access" },
           { type: "ol", items: [
-            "Open the Sign In page from the top-right of any page.",
-            "Switch to the 'Create account' tab.",
-            "Enter your full name, email and a password of 8+ characters.",
-            "Click 'Create account' — you'll be signed in straight away.",
+            "Open the Founding Trader Program page from the top-right of any page.",
+            "Choose your preferred plan and complete the short application.",
+            "The team reviews every application manually, usually within 48 hours.",
+            "If approved, use the secure link in your email to set your password.",
           ]},
 
           { type: "h2", content: "What happens next" },
           { type: "ul", items: [
-            "Your dashboard loads with starter credits already topped up.",
-            "You can install and manage the built-in trading terminal from your dashboard.",
-            "Upgrade to Pro or Elite any time from Dashboard → Billing.",
+            "Approved applicants receive a private account invitation by email.",
+            "Your selected plan is prepared after approval.",
+            "You can then sign in and access your dashboard and trading terminal.",
           ]},
 
           { type: "note", tone: "tip", content: "Use a real email — password resets, A+ signal alerts and billing receipts are all sent there." },
