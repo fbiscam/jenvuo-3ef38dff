@@ -3,6 +3,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation } from "@tanstack/react-query";
 import {
+  Activity,
   History,
   ImagePlus,
   Mic,
@@ -211,6 +212,7 @@ function TerminalPage() {
   const [tf, setTf] = useState(TIMEFRAMES[3]);
   const theme = "light" as const;
   const [deskOpen, setDeskOpen] = useState(false);
+  const [indicatorsVisible, setIndicatorsVisible] = useState(true);
   const [chartUserId, setChartUserId] = useState<string | null>(null);
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<ChatMsg[]>([]);
@@ -318,7 +320,7 @@ function TerminalPage() {
       saveimage: "1",
       client_id: "jenvu.com",
       user_id: chartUserId,
-      studies: JSON.stringify(["STD;EMA", "STD;RSI"]),
+      studies: JSON.stringify(indicatorsVisible ? ["STD;EMA", "STD;RSI"] : []),
       enabled_features: JSON.stringify([
         "countdown",
         "save_chart_properties_to_local_storage",
@@ -330,7 +332,7 @@ function TerminalPage() {
       disabled_features: JSON.stringify(["header_resolutions", "header_interval_dialog_button"]),
     });
     return `https://s.tradingview.com/widgetembed/?${params.toString()}`;
-  }, [tf.tv, chartUserId]);
+  }, [tf.tv, chartUserId, indicatorsVisible]);
 
   const ask = useMutation({
     mutationFn: async ({ query, chartImage }: { query: string; chartImage?: string }) =>
@@ -386,9 +388,13 @@ function TerminalPage() {
         timeframe?: string;
         theme?: "light" | "dark";
         deskOpen?: boolean;
+        indicatorsVisible?: boolean;
       } | null;
       const savedTimeframe = TIMEFRAMES.find((timeframe) => timeframe.key === settings?.timeframe);
       if (savedTimeframe) setTf(savedTimeframe);
+      if (typeof settings?.indicatorsVisible === "boolean") {
+        setIndicatorsVisible(settings.indicatorsVisible);
+      }
       // The AI desk always starts closed so the chart opens exactly as left.
 
       const CHART_USER_KEY = "jenvu:terminal:chart-user:v1";
@@ -418,9 +424,9 @@ function TerminalPage() {
     if (!hydratedRef.current) return;
     window.localStorage.setItem(
       TERMINAL_SETTINGS_KEY,
-      JSON.stringify({ timeframe: tf.key, deskOpen }),
+      JSON.stringify({ timeframe: tf.key, deskOpen, indicatorsVisible }),
     );
-  }, [tf.key, deskOpen]);
+  }, [tf.key, deskOpen, indicatorsVisible]);
 
   useEffect(() => {
     setSecondsLeft(candleSecondsLeft(tf.tv));
@@ -528,6 +534,18 @@ function TerminalPage() {
                   </option>
                 ))}
               </select>
+              <Button
+                type="button"
+                variant={indicatorsVisible ? "secondary" : "ghost"}
+                size="sm"
+                className="h-7 gap-1.5 rounded-md px-2 text-xs font-medium shadow-none"
+                onClick={() => setIndicatorsVisible((visible) => !visible)}
+                aria-pressed={indicatorsVisible}
+                title={`${indicatorsVisible ? "Hide" : "Show"} EMA and RSI indicators`}
+              >
+                <Activity className="h-3.5 w-3.5" />
+                Indicators
+              </Button>
               <button
                 type="button"
                 onClick={() => setDeskOpen(true)}
