@@ -1608,9 +1608,13 @@ function exactStructureAnswer(
 ): string | null {
   const romanUrdu =
     /\b(kaha|kidhar|hai|ha|bata|banao|bana|ya|yar|wala|wali|mujhe|muje|tak|sakta)\b/i.test(query);
+  const mentionsMother =
+    /(mother[\s-]*son|mother|inside[\s-]*bar|three\s*stocks?|ma+\s*son)/i.test(query);
   const asksMotherTarget =
-    /\b(mother|inside[\s-]*bar|three\s*stocks?)\b/i.test(query) &&
-    /\b(tp|take\s*profit|target|kaha\s*tak|kitna)\b/i.test(query);
+    mentionsMother &&
+    /\b(tp|take\s*profit|target|kaha\s*tak|kahan\s*tak|kitna|entry|sl|stop\s*loss|setup|plan|status|strategy|implement|kaam|pata|hai|ha|kya|kia)\b/i.test(
+      query,
+    );
   if (asksMotherTarget) {
     if (!reversal?.plan || !reversal.status.startsWith("ARMED_")) {
       const reason =
@@ -1691,8 +1695,31 @@ function deterministicAdvisorResult(
   };
 }
 
+/** Prior conversation turns so the desk remembers what was already discussed. */
+function buildHistoryMessages(
+  history?: Array<{ role: "user" | "assistant"; content: string }>,
+): Array<{ role: "user" | "assistant"; content: string }> {
+  if (!Array.isArray(history) || history.length === 0) return [];
+  return history
+    .filter(
+      (m) =>
+        m &&
+        (m.role === "user" || m.role === "assistant") &&
+        typeof m.content === "string" &&
+        m.content.trim().length > 0,
+    )
+    .slice(-12)
+    .map((m) => ({ role: m.role, content: String(m.content).slice(0, 1200) }));
+}
+
 async function _analyzeGoldCompute(
-  data: { timeframe: string; query: string; chartImage?: string; advisor?: boolean },
+  data: {
+    timeframe: string;
+    query: string;
+    chartImage?: string;
+    advisor?: boolean;
+    history?: Array<{ role: "user" | "assistant"; content: string }>;
+  },
   __userId: string | null = null,
   __scanId: string | null = null,
   __terminalRequestId: string | null = null,
@@ -1753,6 +1780,7 @@ Perform an evidence-first review of only what the question needs: swing structur
       models: [...EXTENSION_MODEL_CHAIN.vision],
       messages: [
         { role: "system", content: system },
+        ...buildHistoryMessages(data.history),
         {
           role: "user",
           content: [
@@ -1949,6 +1977,11 @@ First identify the user's intent:
 - For greetings, casual conversation, or any non-trading question, reply as a normal helpful assistant. Do not mention charts, gold, trading, ICT, SMC, risk, or your trading expertise unless the user asks about them.
 - Only for trading-related questions, apply advanced ICT/SMC knowledge plus professional candlestick reading: single-, double-, and three-candle formations; body/wick anatomy; rejection versus acceptance; compression/inside bars; expansion/outside bars; engulfing patterns; doji variants; hammer, hanging man, shooting star and inverted hammer; piercing/dark-cloud patterns; morning/evening stars; and three-candle momentum sequences. Always interpret them through structure, location, liquidity, displacement and confirmation.
 
+Conversation memory and context rules:
+- Earlier turns of this same conversation are supplied before the latest user message. Use them: resolve "yeh", "wohi", "is level", "phir", "aur batao" and other follow-ups against what was already discussed, and never ask the user to repeat something they already told you.
+- There is exactly ONE chart in context: the user's XAU/USD (Gold) terminal chart on the timeframe given below. Never ask "which chart" or "konsa chart" — when the user says chart dekho / screen dekh / dekho, answer from the supplied verified data (and the screenshot when one is attached).
+- "Mother Son", "mother-son strategy", "mother candle", "inside bar" and "Three Stocks Funded" all refer to the same implemented M30 Mother Candle + Inside Bar reversal engine that is supplied to you as VERIFIED EXTREME M30 GOLD REVERSAL ENGINE. You DO know this strategy: never say you are unaware of it. Explain its rules (M30 only, Mother Candle at an H4/H1 extreme, mother range >= ATR(14), inside bar fully contained with lower volume, London/NY sessions only, stop/entry buffered 1.5 pips, 1:3 target with clean-traffic check, break-even at 1:1.5 RR, max 2 trades per day) and quote the engine's current status, rejection reason, or measured plan numbers from the supplied block.
+
 Rules for every reply:
 - Answer exactly what the user asked and nothing more.
 - Keep the complete answer concise: normally 1-3 short sentences and under 80 words. Use a longer answer only when essential to resolve the question.
@@ -2063,6 +2096,7 @@ ${isTradingIntent ? `${hasLivePrice ? `VERIFIED LIVE XAU/USD PRICE: ${currentPri
     models: [...MODEL_CHAIN.chat],
     messages: [
       { role: "system", content: system },
+      ...buildHistoryMessages(data.history),
       { role: "user", content: userPrompt },
     ],
     jsonMode: true,
@@ -2156,10 +2190,28 @@ function parsePx(s: string | undefined): number {
 export const analyzeGold = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator(
-    (d: { timeframe: string; query: string; chartImage?: string; advisor?: boolean }) => ({
+    (d: {
+      timeframe: string;
+      query: string;
+      chartImage?: string;
+      advisor?: boolean;
+      history?: Array<{ role: "user" | "assistant"; content: string }>;
+    }) => ({
       timeframe: String(d?.timeframe || "15m").toLowerCase(),
       query: String(d?.query || "Give me the best A+ setup right now"),
       advisor: d?.advisor === true,
+      history: Array.isArray(d?.history)
+        ? d.history
+            .filter(
+              (m) =>
+                m &&
+                (m.role === "user" || m.role === "assistant") &&
+                typeof m.content === "string" &&
+                m.content.trim().length > 0,
+            )
+            .slice(-12)
+            .map((m) => ({ role: m.role, content: String(m.content).slice(0, 1200) }))
+        : [],
       chartImage:
         typeof d?.chartImage === "string" &&
         /^data:image\/(?:png|jpeg|webp);base64,/i.test(d.chartImage) &&

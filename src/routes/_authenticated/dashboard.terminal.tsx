@@ -333,8 +333,15 @@ function TerminalPage() {
   }, [tf.tv, chartUserId]);
 
   const ask = useMutation({
-    mutationFn: async ({ query, chartImage }: { query: string; chartImage?: string }) =>
-      analyze({ data: { timeframe: tf.key, query, chartImage, advisor: true } }),
+    mutationFn: async ({
+      query,
+      chartImage,
+      history,
+    }: {
+      query: string;
+      chartImage?: string;
+      history?: Array<{ role: "user" | "assistant"; content: string }>;
+    }) => analyze({ data: { timeframe: tf.key, query, chartImage, history, advisor: true } }),
     onSuccess: (signal) => {
       addMessage({
         role: "assistant",
@@ -448,7 +455,11 @@ function TerminalPage() {
     if (!query || ask.isPending) return;
     addMessage({ role: "user", text: query, files: image ? [image] : undefined });
     setInput("");
-    await ask.mutateAsync({ query, chartImage: image?.url });
+    const history = messages
+      .filter((m) => m.text.trim().length > 0)
+      .slice(-12)
+      .map((m) => ({ role: m.role, content: m.text.slice(0, 1200) }));
+    await ask.mutateAsync({ query, chartImage: image?.url, history });
   }
 
   async function startRecording() {
