@@ -2087,6 +2087,7 @@ ${isTradingIntent ? `${hasLivePrice ? `VERIFIED LIVE XAU/USD PRICE: ${currentPri
     models: [...MODEL_CHAIN.chat],
     messages: [
       { role: "system", content: system },
+      ...buildHistoryMessages(data.history),
       { role: "user", content: userPrompt },
     ],
     jsonMode: true,
