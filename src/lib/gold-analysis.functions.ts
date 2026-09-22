@@ -1759,6 +1759,7 @@ Perform an evidence-first review of only what the question needs: swing structur
       models: [...EXTENSION_MODEL_CHAIN.vision],
       messages: [
         { role: "system", content: system },
+        ...buildHistoryMessages(data.history),
         {
           role: "user",
           content: [
