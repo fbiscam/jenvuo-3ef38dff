@@ -110,16 +110,6 @@ function AuthPage() {
     search.mode === "signup" ? "signup" : "signin",
   );
 
-  // Exact date the 14-day Pro trial would end for someone signing up now.
-  // Computed after mount so SSR and client markup match.
-  const [trialEndsLabel, setTrialEndsLabel] = React.useState("in 14 days");
-  React.useEffect(() => {
-    const end = new Date(Date.now() + 14 * 86_400_000);
-    setTrialEndsLabel(
-      end.toLocaleDateString(undefined, { day: "numeric", month: "long", year: "numeric" }),
-    );
-  }, []);
-
   const [fullName, setFullName] = React.useState("");
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
@@ -991,95 +981,15 @@ function AuthPage() {
                         </div>
                       </form>
                     ) : (
-                      <form onSubmit={signUp} className="mt-4 space-y-3">
-
-
-                        <div>
-                          <label className="mb-2 block text-[14px] font-medium text-zinc-900">
-                            Full Name
-                          </label>
-                          <div className="relative">
-                            <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
-                            <input
-                              type="text"
-                              required
-                              maxLength={100}
-                              autoComplete="name"
-                              value={fullName}
-                              onChange={(e) => setFullName(e.target.value)}
-                              className="w-full rounded-xl border border-zinc-200 bg-white pl-11 pr-4 py-2.5 text-sm text-zinc-900 outline-none focus:border-zinc-900 transition placeholder:text-zinc-300"
-                              placeholder="Your name..."
-                            />
-                          </div>
-                        </div>
-
-                        <div>
-                          <label className="mb-2 block text-[14px] font-medium text-zinc-900">
-                            Email
-                          </label>
-                          <div className="relative">
-                            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
-                            <input
-                              type="email"
-                              required
-                              maxLength={255}
-                              autoComplete="username"
-                              value={email}
-                              onChange={(e) => setEmail(e.target.value)}
-                              className="w-full rounded-xl border border-zinc-200 bg-white pl-11 pr-4 py-2.5 text-sm text-zinc-900 outline-none focus:border-zinc-900 transition placeholder:text-zinc-300"
-                              placeholder="Institutional email..."
-                            />
-                          </div>
-                          {flashInline("email")}
-                        </div>
-
-                        <div>
-                          <label className="mb-2 block text-[14px] font-medium text-zinc-900">
-                            Password
-                          </label>
-                          <div className="relative">
-                            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
-                            <input
-                              type={showPassword ? "text" : "password"}
-                              required
-                              minLength={8}
-                              autoComplete="new-password"
-                              value={password}
-                              onChange={(e) => setPassword(e.target.value)}
-                              className="w-full rounded-xl border border-zinc-200 bg-white pl-11 pr-11 py-2.5 text-sm text-zinc-900 outline-none focus:border-zinc-900 transition placeholder:text-zinc-300"
-                              placeholder="Min 8 characters..."
-                            />
-                            <button
-                              type="button"
-                              onClick={() => setShowPassword((v) => !v)}
-                              aria-label={showPassword ? "Hide password" : "Show password"}
-                              className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-700"
-                            >
-                              {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                            </button>
-                          </div>
-                          {flashInline("password")}
-                        </div>
-
-                        {errorMsg && (
-                          <div className={`flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[12px] text-red-700 ${MONO}`}>
-                            <span className="mt-[2px] inline-block h-1.5 w-1.5 rounded-full bg-red-500 shrink-0" />
-                            <span className="leading-snug">{errorMsg}</span>
-                          </div>
-                        )}
-
-                        <button
-                          type="submit"
-                          disabled={loading}
-                          className="group w-full rounded-lg bg-zinc-900 px-5 py-3 text-sm font-medium text-white hover:bg-zinc-800 transition inline-flex items-center justify-center gap-2 disabled:opacity-60"
-                        >
-                          {loading ? btnLoading("Creating account...") : (<>Start 14-day Pro trial <ArrowRight className={`w-4 h-4 group-hover:translate-x-0.5 transition ${MONO}`} /></>)}
-                        </button>
-
-                        <p className="pt-1 text-center text-[11.5px] text-zinc-500">
-                          Trial ends automatically after 14 days — no charge, no card.
+                      <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3.5 text-[13px] leading-snug text-amber-900">
+                        <div className="font-semibold text-amber-950">Jenvu Founding Program — Invite Only</div>
+                        <p className="mt-1.5">
+                          New accounts are available only to approved founding members. Review the program and apply for access:{" "}
+                          <Link to="/founding" className="font-semibold underline hover:text-amber-950">
+                            Read more & apply →
+                          </Link>
                         </p>
-                      </form>
+                      </div>
                     )
 
                   ) : mode === "forgot" ? (
@@ -1324,14 +1234,10 @@ function AuthPage() {
                   {mode === "signin" && !mfaChallenge && (
                     <div className="mt-6 space-y-1.5 text-center text-[13px] text-zinc-500">
                       <p>
-                        Don't have an account?{" "}
-                         <button
-                           type="button"
-                           onClick={() => { setMode("signup"); setErrorMsg(null); }}
-                           className="font-medium text-zinc-900 underline underline-offset-2"
-                         >
-                           Sign up with email
-                         </button>
+                        New here?{" "}
+                        <Link to="/founding" className="font-medium text-zinc-900 underline underline-offset-2">
+                          Apply to the Founding Program →
+                        </Link>
                       </p>
                       <p>
                         Forgot your password?{" "}
@@ -1387,7 +1293,7 @@ function AuthPage() {
                   to="/founding"
                   className="rounded-md bg-white px-4 py-2 text-[13px] font-semibold text-zinc-900 shadow-sm transition hover:bg-zinc-100"
                 >
-                  Sign up
+                  Apply now
                 </Link>
               </div>
               <div className="relative z-10 flex flex-1 flex-col justify-center px-14 pb-24">

@@ -464,12 +464,11 @@ function HomePage() {
                     Sign In
                   </Link>
                   <Link
-                    to="/auth"
-                    search={{ mode: "signup" }}
+                    to="/founding"
                     onClick={() => setMobileMenuOpen(false)}
                     className="inline-flex items-center justify-center rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm font-medium text-zinc-950 hover:bg-zinc-50"
                   >
-                    Sign Up
+                    Apply now
                   </Link>
                 </div>
               )}
@@ -564,8 +563,8 @@ function HomePage() {
           <div className="mx-auto mt-12 grid max-w-4xl gap-6 md:grid-cols-2">
             {/* Free */}
             <div className="rounded-2xl border border-zinc-200 bg-white p-7">
-              <h4 className="text-lg font-semibold text-zinc-900">Free</h4>
-              <p className="mt-1 text-[13px] text-zinc-500">30-day trial for every new desk</p>
+              <h4 className="text-lg font-semibold text-zinc-900">Founding access</h4>
+              <p className="mt-1 text-[13px] text-zinc-500">Invite-only access for approved traders</p>
               <div className="mt-5 space-y-3">
                 {[
                   ["Signals / day", "5"],

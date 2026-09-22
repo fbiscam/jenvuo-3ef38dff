@@ -8,6 +8,12 @@ import HeaderAuthButtons from "@/components/HeaderAuthButtons";
 import { submitFoundingApplication, foundingStats } from "@/lib/founding.functions";
 
 export const Route = createFileRoute("/founding")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    plan:
+      search.plan === "pro" || search.plan === "elite" || search.plan === "ultra"
+        ? search.plan
+        : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "Founding Trader Program — Jenvu" },
@@ -30,6 +36,7 @@ export const Route = createFileRoute("/founding")({
 });
 
 function FoundingPage() {
+  const search = Route.useSearch();
   const submit = useServerFn(submitFoundingApplication);
   const stats = useServerFn(foundingStats);
   const [submitting, setSubmitting] = React.useState(false);
@@ -60,7 +67,7 @@ function FoundingPage() {
   const remaining = Math.max(0, seats.total - seats.filled);
   const pct = Math.min(100, Math.round((seats.filled / seats.total) * 100));
 
-  const [plan, setPlan] = React.useState<"pro" | "elite" | "ultra">("elite");
+  const [plan, setPlan] = React.useState<"pro" | "elite" | "ultra">(search.plan ?? "elite");
   const [refEmail, setRefEmail] = React.useState<string>("");
 
   React.useEffect(() => {

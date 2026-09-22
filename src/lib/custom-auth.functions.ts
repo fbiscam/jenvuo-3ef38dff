@@ -59,12 +59,10 @@ export const requestSignupOtp = createServerFn({ method: 'POST' })
       .parse(data),
   )
   .handler(async ({ data }) => {
-    try {
-      const ua = (() => { try { return getRequest().headers.get('user-agent') || '' } catch { return '' } })()
-      await createSignupOtp({ ...data, ip: readClientIp(), country: readTrustedCountry(), fingerprint: data.fingerprint, userAgent: ua })
-      return { ok: true as const }
-    } catch (error) {
-      return { ok: false as const, error: error instanceof Error ? error.message : 'Could not send code.' }
+    void data
+    return {
+      ok: false as const,
+      error: 'Jenvu is invite only. Apply to the Founding Trader Program for access.',
     }
   })
 
@@ -80,8 +78,11 @@ export const confirmSignupOtp = createServerFn({ method: 'POST' })
       .parse(data),
   )
   .handler(async ({ data }) => {
-    const ua = (() => { try { return getRequest().headers.get('user-agent') || '' } catch { return '' } })()
-    return verifySignupOtp({ ...data, ip: readClientIp(), country: readTrustedCountry(), fingerprint: data.fingerprint, userAgent: ua })
+    void data
+    return {
+      ok: false as const,
+      error: 'Jenvu is invite only. Apply to the Founding Trader Program for access.',
+    }
   })
 
 export const requestRecoveryOtp = createServerFn({ method: 'POST' })

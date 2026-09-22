@@ -193,8 +193,8 @@ function PricingPage() {
                 ) : disabled ? (
                   <button type="button" disabled className="mt-auto h-10 cursor-not-allowed rounded-full border border-border bg-muted text-sm text-muted-foreground">Locked in trial</button>
                 ) : (
-                  <Link to={destination} className={`mt-auto flex h-10 items-center justify-center rounded-full border text-sm font-medium transition ${plan.key === "pro" ? "border-home-accent bg-home-accent text-home-accent-foreground hover:opacity-90" : "border-border bg-background hover:border-home-accent"}`}>
-                    {trialPro ? "Upgrade to Pro" : currentPlan !== null ? "Upgrade" : "Get started"}
+                  <Link to={destination} search={currentPlan === null ? { plan: plan.key } : undefined} className={`mt-auto flex h-10 items-center justify-center rounded-full border text-sm font-medium transition ${plan.key === "pro" ? "border-home-accent bg-home-accent text-home-accent-foreground hover:opacity-90" : "border-border bg-background hover:border-home-accent"}`}>
+                    {trialPro ? "Upgrade to Pro" : currentPlan !== null ? "Upgrade" : "Apply now"}
                   </Link>
                 )}
               </article>
@@ -340,7 +340,7 @@ function PricingPage() {
                <div className="mt-1 text-sm text-zinc-700">${p.price} one-time · about {Math.floor(p.price / 0.03)} primary AI requests</div>
               {signedOut ? (
                 <Link to="/founding" className="mt-5 inline-flex w-full items-center justify-center rounded-md bg-home-accent px-3 py-2 text-xs font-medium text-home-accent-foreground hover:opacity-90">
-                  Buy Now
+                  Apply now
                 </Link>
               ) : (
                 <Link to="/dashboard/pay" search={{ amount: p.price }} className="mt-5 inline-flex w-full items-center justify-center rounded-md bg-home-accent px-3 py-2 text-xs font-medium text-home-accent-foreground hover:opacity-90">
@@ -418,7 +418,7 @@ function CustomTopUp({ signedOut }: { signedOut: boolean }) {
               to="/founding"
               className="inline-flex items-center justify-center whitespace-nowrap rounded-md bg-home-accent px-4 py-2 text-xs font-medium text-home-accent-foreground hover:opacity-90"
             >
-              Buy Now
+              Apply now
             </Link>
           ) : (
             <Link
