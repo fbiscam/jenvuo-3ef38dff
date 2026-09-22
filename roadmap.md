@@ -143,3 +143,4 @@
 - [x] Replace the OmniRoute API key and endpoint securely, verify the live AI Desk reply, and confirm TypeScript is clean
 
 - [x] Verify homepage Earth and footer slider animation behavior under US locale/timezone on preview and live domain
+- [x] Add a persistent hide/show control for built-in EMA and RSI studies in the Terminal
