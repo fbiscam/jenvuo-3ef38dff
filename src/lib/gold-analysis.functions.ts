@@ -2156,10 +2156,28 @@ function parsePx(s: string | undefined): number {
 export const analyzeGold = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator(
-    (d: { timeframe: string; query: string; chartImage?: string; advisor?: boolean }) => ({
+    (d: {
+      timeframe: string;
+      query: string;
+      chartImage?: string;
+      advisor?: boolean;
+      history?: Array<{ role: "user" | "assistant"; content: string }>;
+    }) => ({
       timeframe: String(d?.timeframe || "15m").toLowerCase(),
       query: String(d?.query || "Give me the best A+ setup right now"),
       advisor: d?.advisor === true,
+      history: Array.isArray(d?.history)
+        ? d.history
+            .filter(
+              (m) =>
+                m &&
+                (m.role === "user" || m.role === "assistant") &&
+                typeof m.content === "string" &&
+                m.content.trim().length > 0,
+            )
+            .slice(-12)
+            .map((m) => ({ role: m.role, content: String(m.content).slice(0, 1200) }))
+        : [],
       chartImage:
         typeof d?.chartImage === "string" &&
         /^data:image\/(?:png|jpeg|webp);base64,/i.test(d.chartImage) &&
