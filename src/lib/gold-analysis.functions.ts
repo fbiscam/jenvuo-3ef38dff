@@ -1692,7 +1692,13 @@ function deterministicAdvisorResult(
 }
 
 async function _analyzeGoldCompute(
-  data: { timeframe: string; query: string; chartImage?: string; advisor?: boolean },
+  data: {
+    timeframe: string;
+    query: string;
+    chartImage?: string;
+    advisor?: boolean;
+    history?: Array<{ role: "user" | "assistant"; content: string }>;
+  },
   __userId: string | null = null,
   __scanId: string | null = null,
   __terminalRequestId: string | null = null,
