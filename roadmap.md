@@ -158,8 +158,8 @@
 - [x] Make Terminal AI replies concise, point-to-point and reliable (direct answer line + short evidence bullets; unswept liquidity first)
 - [x] Add the next high-impact Gold news event beside the Terminal candle timer in New York time
 - [x] Make four-candle scenarios update live every 10 seconds and strengthen confirmed extreme-level reactions
-- [ ] Restyle every email CTA as white with black text and refine the shared email theme
-- [ ] Give approved Founding users a 30-day trial and zero their wallet when it expires
+- [x] Restyle every email CTA as white with black text and refine the shared email theme
+- [x] Give approved Founding users a 30-day trial and zero their wallet when it expires
 - [ ] Verify the email, trial-expiry, and current TypeScript behavior
 
 - [ ] Replace three public automation keys with the private scheduler secret (blocked: managed secret access denied during schedule migration)
