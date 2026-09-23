@@ -35,7 +35,7 @@ function shell(title: string, lines: string[], accent: string): string {
     <tr><td style="font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:#71717a">Jenvu · Billing</td></tr>
     <tr><td style="padding-top:10px;font-size:22px;font-weight:600;color:${accent}">${title}</td></tr>
     ${lines.map((l) => `<tr><td style="padding-top:12px;font-size:14px;line-height:1.6;color:#3f3f46">${l}</td></tr>`).join("")}
-    <tr><td style="padding-top:22px"><a href="https://jenvu.com/dashboard/billing" style="display:inline-block;background:#18181b;color:#fff;text-decoration:none;padding:11px 18px;border-radius:10px;font-size:14px">Open billing</a></td></tr>
+    <tr><td style="padding-top:22px"><a href="https://jenvu.com/dashboard/billing" style="display:inline-block;background:#ffffff;color:#111827;text-decoration:none;padding:12px 20px;border-radius:10px;border:1px solid #e5e7eb;box-shadow:0 1px 2px rgba(17,24,39,.08);font-size:14px;font-weight:600">Open billing</a></td></tr>
     <tr><td style="padding-top:22px;font-size:12px;color:#a1a1aa">Need help? Reply to this email or contact support@jenvu.com</td></tr>
   </table></td></tr></table></body></html>`;
 }

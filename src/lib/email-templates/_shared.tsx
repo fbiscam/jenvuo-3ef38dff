@@ -17,7 +17,7 @@ export const URBANIST = INTER
 export const MONO = INTER
 
 export const COLORS = {
-  bg: '#f7f7f8',
+  bg: '#f4f5f7',
   card: '#ffffff',
   ink: '#111827',
   body: '#4b5563',
@@ -107,11 +107,11 @@ export const shellStyles = {
     maxWidth: '560px',
     margin: '0 auto',
     backgroundColor: COLORS.card,
-    borderRadius: '12px',
+    borderRadius: '16px',
     border: `1px solid ${COLORS.border}`,
     overflow: 'hidden' as const,
   },
-  card: { padding: '28px 28px 24px' },
+  card: { padding: '32px 32px 28px' },
   eyebrow: {
     fontFamily: INTER,
     fontSize: '12px',
@@ -122,7 +122,7 @@ export const shellStyles = {
   },
   h1: {
     fontFamily: INTER,
-    fontSize: '22px',
+    fontSize: '24px',
     fontWeight: 600 as const,
     color: COLORS.ink,
     letterSpacing: '-0.02em',
@@ -144,16 +144,17 @@ export const shellStyles = {
   },
   button: {
     display: 'inline-block',
-    backgroundColor: COLORS.accent,
-    color: '#ffffff',
-    border: `1px solid ${COLORS.accent}`,
+    backgroundColor: '#ffffff',
+    color: COLORS.ink,
+    border: `1px solid ${COLORS.border}`,
     fontFamily: INTER,
     fontSize: '14px',
-    fontWeight: 500 as const,
-    borderRadius: '8px',
-    padding: '11px 20px',
+    fontWeight: 600 as const,
+    borderRadius: '10px',
+    padding: '12px 22px',
     textDecoration: 'none',
     margin: '4px 0 0',
+    boxShadow: '0 1px 2px rgba(17,24,39,0.08)',
   },
 
   actionWrap: {
