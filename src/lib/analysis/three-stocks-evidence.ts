@@ -188,7 +188,7 @@ export function findSwings(
  * without being misrepresented as a currently executable setup.
  */
 export function detectMotherInsidePatterns(candles: ReversalCandle[]): ThreeStocksPattern[] {
-  if (candles.length < 3) return null;
+  if (candles.length < 3) return [];
   const patterns: ThreeStocksPattern[] = [];
   for (let insideIndex = candles.length - 1; insideIndex >= 2; insideIndex -= 1) {
     const inside = candles[insideIndex];
