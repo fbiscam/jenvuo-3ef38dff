@@ -27,6 +27,7 @@ import {
 } from "@/lib/chart/drawings";
 import { renderSmcOverlay, type SmcOverlay, type SmcToggles } from "@/lib/chart/smc-overlay";
 import type { OhlcvBar } from "@/lib/chart/indicators";
+import type { CandleProjection } from "@/lib/chart/projection";
 import type { ScriptResult } from "@/lib/chart/jenvu-script";
 import { buildIndicatorSeries, type IndicatorId } from "./indicator-specs";
 
@@ -52,6 +53,7 @@ type Props = {
   scripts: Array<{ id: string; result: ScriptResult }>;
   smc: SmcOverlay | null;
   smcToggles: SmcToggles;
+  projection: CandleProjection | null;
   drawings: Drawing[];
   drawingsVisible: boolean;
   tool: DrawingTool;
@@ -74,6 +76,8 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
   const chartRef = useRef<IChartApi | null>(null);
   const candleRef = useRef<ISeriesApi<"Candlestick"> | null>(null);
   const markersRef = useRef<ISeriesMarkersPluginApi<Time> | null>(null);
+  const ghostRef = useRef<ISeriesApi<"Candlestick"> | null>(null);
+  const ghostMarkersRef = useRef<ISeriesMarkersPluginApi<Time> | null>(null);
   const extraSeriesRef = useRef<ISeriesApi<"Line" | "Histogram">[]>([]);
   const candlePriceLinesRef = useRef<IPriceLine[]>([]);
   const propsRef = useRef(props);
@@ -203,6 +207,13 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
     chartRef.current = chart;
     candleRef.current = candles;
     markersRef.current = createSeriesMarkers(candles, []);
+    const ghost = chart.addSeries(CandlestickSeries, {
+      lastValueVisible: false,
+      priceLineVisible: false,
+      priceFormat: { type: "price", precision: 2, minMove: 0.01 },
+    });
+    ghostRef.current = ghost;
+    ghostMarkersRef.current = createSeriesMarkers(ghost, []);
 
     const bump = () => (dirtyRef.current += 1);
     chart.timeScale().subscribeVisibleLogicalRangeChange(bump);
@@ -222,6 +233,8 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
       chartRef.current = null;
       candleRef.current = null;
       markersRef.current = null;
+      ghostRef.current = null;
+      ghostMarkersRef.current = null;
       extraSeriesRef.current = [];
       lastBarsRef.current = null;
     };
@@ -256,6 +269,37 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
     lastBarsRef.current = { first, len: bars.length };
     dirtyRef.current += 1;
   }, [props.bars]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ------------------------------------------------- scenario ghost candles
+  useEffect(() => {
+    const ghost = ghostRef.current;
+    if (!ghost) return;
+    const proj = props.projection;
+    if (!proj) {
+      ghost.setData([]);
+      ghostMarkersRef.current?.setMarkers([]);
+      return;
+    }
+    ghost.setData(
+      proj.candles.map((c) => {
+        const col = c.bullish ? "rgba(8,153,129,0.35)" : "rgba(242,54,69,0.35)";
+        const edge = c.bullish ? "rgba(8,153,129,0.8)" : "rgba(242,54,69,0.8)";
+        return { time: c.time as UTCTimestamp, open: c.open, high: c.high, low: c.low, close: c.close, color: col, borderColor: edge, wickColor: edge };
+      }),
+    );
+    const first = proj.candles[0];
+    const up = proj.bias !== "bearish";
+    ghostMarkersRef.current?.setMarkers([
+      {
+        time: first.time as UTCTimestamp,
+        position: up ? "aboveBar" : "belowBar",
+        shape: "circle",
+        size: 0,
+        color: proj.bias === "bullish" ? CHART_COLORS.up : proj.bias === "bearish" ? CHART_COLORS.down : "#787b86",
+        text: `Projection · ${proj.bias} ${proj.confidence}%`,
+      },
+    ]);
+  }, [props.projection]);
 
   useEffect(() => {
     // Timeframe switch: show the most recent ~150 bars.
