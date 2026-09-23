@@ -50,6 +50,7 @@ export type SmcToggles = {
   fvg: boolean;
   orderBlocks: boolean;
   liquidity: boolean;
+  projection: boolean;
 };
 
 export const DEFAULT_SMC: SmcToggles = {
@@ -58,6 +59,7 @@ export const DEFAULT_SMC: SmcToggles = {
   fvg: false,
   orderBlocks: false,
   liquidity: true,
+  projection: true,
 };
 
 type Candle = { t: number; o: number; h: number; l: number; c: number };

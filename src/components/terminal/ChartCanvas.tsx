@@ -287,18 +287,7 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
         return { time: c.time as UTCTimestamp, open: c.open, high: c.high, low: c.low, close: c.close, color: col, borderColor: edge, wickColor: edge };
       }),
     );
-    const first = proj.candles[0];
-    const up = proj.bias !== "bearish";
-    ghostMarkersRef.current?.setMarkers([
-      {
-        time: first.time as UTCTimestamp,
-        position: up ? "aboveBar" : "belowBar",
-        shape: "circle",
-        size: 0,
-        color: proj.bias === "bullish" ? CHART_COLORS.up : proj.bias === "bearish" ? CHART_COLORS.down : "#787b86",
-        text: `Projection · ${proj.bias} ${proj.confidence}%`,
-      },
-    ]);
+    ghostMarkersRef.current?.setMarkers([]);
   }, [props.projection]);
 
   useEffect(() => {
