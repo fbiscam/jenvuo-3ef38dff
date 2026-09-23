@@ -1353,23 +1353,22 @@ async function scaleProxyToSpot(proxy: Candle[]): Promise<Candle[]> {
 
 async function loadTerminalChart(tf: string): Promise<TerminalChartPayload> {
   const hit = terminalChartCache.get(tf);
-  if (hit && Date.now() - hit.at < 4000) return hit.data;
+  if (hit && Date.now() - hit.at < 4000) return { ...hit.data, serverTime: Date.now() };
   let candles: Candle[] = [];
   let source: TerminalChartPayload["source"] = "spot";
+  let provider = "Yahoo spot";
   try {
     candles = await fetchFromYahooSymbols(["XAUUSD=X"], tf);
   } catch {
     source = "paxg-scaled";
     try {
-      const proxy = await fetchGoldProxyDeep(tf, 1000);
-      const latestProxy = proxy.at(-1)?.c ?? 0;
-      const spot = await resolveLiveTick(resolveInstrument("XAUUSD")).catch(() => null);
-      const scale = spot?.price && latestProxy > 0 ? spot.price / latestProxy : 1;
-      candles = proxy.map((c) => ({ ...c, o: c.o * scale, h: c.h * scale, l: c.l * scale, c: c.c * scale }));
+      const picked = await fetchGoldProxyDeepWithProvider(tf, 1000);
+      provider = picked.provider;
+      candles = await scaleProxyToSpot(picked.candles);
     } catch (err) {
       // Every source failed this tick — keep serving the last good chart for a
       // while instead of blanking the terminal.
-      if (hit && Date.now() - hit.at < CACHE_STALE_MAX) return hit.data;
+      if (hit && Date.now() - hit.at < CACHE_STALE_MAX) return { ...hit.data, serverTime: Date.now() };
       throw err;
     }
   }
@@ -1389,7 +1388,14 @@ async function loadTerminalChart(tf: string): Promise<TerminalChartPayload> {
       close: c.c,
       volume: Number.isFinite(c.v) ? c.v : 0,
     }));
-  const data: TerminalChartPayload = { timeframe: tf, source, stepSeconds: step / 1000, bars };
+  const data: TerminalChartPayload = {
+    timeframe: tf,
+    source,
+    provider,
+    serverTime: Date.now(),
+    stepSeconds: step / 1000,
+    bars,
+  };
   terminalChartCache.set(tf, { at: Date.now(), data });
   return data;
 }
