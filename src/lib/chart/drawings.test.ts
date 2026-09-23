@@ -51,6 +51,20 @@ describe("drawings", () => {
     expect(positionLevels(d)).toEqual({ entry: 2010, stop: 2000, target: 2030 });
   });
 
+  it("keeps the short stop above entry and the target below entry", () => {
+    const d: Drawing = {
+      id: "short",
+      tool: "short",
+      points: [
+        { t: 1, p: 2010 },
+        { t: 2, p: 2000 },
+      ],
+      color: "#f23645",
+      createdAt: 1,
+    };
+    expect(positionLevels(d)).toEqual({ entry: 2010, stop: 2020, target: 1990 });
+  });
+
   it("hit-tests horizontal lines and handles", () => {
     const h: Drawing = { id: "h", tool: "hline", color: "#000", createdAt: 0, points: [{ t: bars[1].time, p: 2050 }] };
     const t: Drawing = {

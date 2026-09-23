@@ -82,8 +82,8 @@ function project(d: Drawing, pr: Projector): Px[] | null {
 export function positionLevels(d: Drawing): { entry: number; stop: number; target: number } | null {
   if ((d.tool !== "long" && d.tool !== "short") || d.points.length < 2) return null;
   const entry = d.points[0].p;
-  const stop = d.points[1].p;
-  const risk = Math.abs(entry - stop);
+  const risk = Math.abs(entry - d.points[1].p);
+  const stop = d.tool === "long" ? entry - risk : entry + risk;
   const target = d.points[2]?.p ?? (d.tool === "long" ? entry + risk * 2 : entry - risk * 2);
   return { entry, stop, target };
 }
