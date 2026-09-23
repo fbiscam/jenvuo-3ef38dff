@@ -70,7 +70,7 @@ function PositionToolIcon({ side }: { side: "long" | "short" }) {
       className="h-5 w-5"
       fill="none"
       stroke="currentColor"
-      strokeWidth="1.8"
+      strokeWidth="1.3"
       strokeLinecap="round"
       strokeLinejoin="round"
     >
