@@ -878,8 +878,8 @@ html[data-pwa="1"] .pwa-tabbar {
 @media (min-width: 1920px) { .dashboard-terminal-sidebar { --dashboard-sidebar-scale: 1.432; } }
 
 .dashboard-terminal-sidebar .dashboard-sidebar-logo {
-  width: calc(28px * var(--dashboard-sidebar-scale));
-  height: calc(28px * var(--dashboard-sidebar-scale));
+  width: calc(25px * var(--dashboard-sidebar-scale));
+  height: calc(25px * var(--dashboard-sidebar-scale));
 }
 .dashboard-terminal-sidebar .dashboard-sidebar-brand {
   font-size: calc(22px * var(--dashboard-sidebar-scale));
