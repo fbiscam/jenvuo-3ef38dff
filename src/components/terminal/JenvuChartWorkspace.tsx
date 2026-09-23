@@ -57,6 +57,7 @@ const DRAWINGS_KEY = "jenvu:terminal:drawings:v1";
 const INDICATORS_KEY = "jenvu:terminal:indicators:v1";
 const SMC_KEY = "jenvu:terminal:smc:v1";
 const SCRIPTS_KEY = "jenvu:terminal:scripts:v1";
+const DRAWINGS_VISIBLE_KEY = "jenvu:terminal:drawings-visible:v1";
 
 export type TimeframeOption = { key: string; label: string };
 
@@ -149,6 +150,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
   const fetchChart = useServerFn(getTerminalChart);
   const chartRef = useRef<ChartCanvasHandle | null>(null);
   const hydrated = useRef(false);
+  const [ready, setReady] = useState(false);
   const [indicators, setIndicators] = useState<IndicatorId[]>(["volume", "ema20", "ema50"]);
   const [smcToggles, setSmcToggles] = useState<SmcToggles>(DEFAULT_SMC);
   const [drawings, setDrawings] = useState<Drawing[]>([]);
@@ -161,31 +163,42 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [hoverIndex, setHoverIndex] = useState<number | null>(null);
 
+  // Load saved chart state once. `ready` is React state (not a ref) so the
+  // save effects below only run on the render AFTER saved values are applied —
+  // otherwise the initial defaults overwrite the user's saved setup on mount
+  // (and React StrictMode's double-mount then reads those defaults back).
   useEffect(() => {
     const savedDrawings = readJson<Drawing[]>(DRAWINGS_KEY, []);
     if (Array.isArray(savedDrawings)) setDrawings(savedDrawings.filter((d) => d && Array.isArray(d.points)));
-    const savedIndicators = readJson<unknown[]>(INDICATORS_KEY, []);
-    if (Array.isArray(savedIndicators) && savedIndicators.length)
-      setIndicators(savedIndicators.filter(isIndicatorId));
+    // `null` = never saved → keep defaults. An empty array means the user
+    // removed every indicator on purpose, so respect it.
+    const savedIndicators = readJson<unknown[] | null>(INDICATORS_KEY, null);
+    if (Array.isArray(savedIndicators)) setIndicators(savedIndicators.filter(isIndicatorId));
     const savedSmc = readJson<Partial<SmcToggles> | null>(SMC_KEY, null);
-    if (savedSmc) setSmcToggles({ ...DEFAULT_SMC, ...savedSmc });
+    if (savedSmc && typeof savedSmc === "object") setSmcToggles({ ...DEFAULT_SMC, ...savedSmc });
     const savedScripts = readJson<SavedScript[]>(SCRIPTS_KEY, []);
     if (Array.isArray(savedScripts)) setScripts(savedScripts);
+    const savedVisible = readJson<boolean | null>(DRAWINGS_VISIBLE_KEY, null);
+    if (typeof savedVisible === "boolean") setDrawingsVisible(savedVisible);
     hydrated.current = true;
+    setReady(true);
   }, []);
 
   useEffect(() => {
-    if (hydrated.current) window.localStorage.setItem(DRAWINGS_KEY, JSON.stringify(drawings));
-  }, [drawings]);
+    if (ready) window.localStorage.setItem(DRAWINGS_KEY, JSON.stringify(drawings));
+  }, [ready, drawings]);
   useEffect(() => {
-    if (hydrated.current) window.localStorage.setItem(INDICATORS_KEY, JSON.stringify(indicators));
-  }, [indicators]);
+    if (ready) window.localStorage.setItem(INDICATORS_KEY, JSON.stringify(indicators));
+  }, [ready, indicators]);
   useEffect(() => {
-    if (hydrated.current) window.localStorage.setItem(SMC_KEY, JSON.stringify(smcToggles));
-  }, [smcToggles]);
+    if (ready) window.localStorage.setItem(SMC_KEY, JSON.stringify(smcToggles));
+  }, [ready, smcToggles]);
   useEffect(() => {
-    if (hydrated.current) window.localStorage.setItem(SCRIPTS_KEY, JSON.stringify(scripts));
-  }, [scripts]);
+    if (ready) window.localStorage.setItem(SCRIPTS_KEY, JSON.stringify(scripts));
+  }, [ready, scripts]);
+  useEffect(() => {
+    if (ready) window.localStorage.setItem(DRAWINGS_VISIBLE_KEY, JSON.stringify(drawingsVisible));
+  }, [ready, drawingsVisible]);
 
   const chartQuery = useQuery({
     queryKey: ["terminal-chart", timeframe.key],
