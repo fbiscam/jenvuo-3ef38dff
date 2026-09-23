@@ -220,12 +220,16 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
   const bars: OhlcvBar[] = useMemo(() => payload?.bars ?? [], [payload]);
   const stepSeconds = payload?.stepSeconds ?? 1800;
 
+  // Use the SERVER clock to decide which candles are closed. A device clock that
+  // is a few minutes off would otherwise include/exclude a candle and shift the
+  // HH/HL/LH/LL, BOS/CHoCH and liquidity labels between accounts.
+  const serverTime = payload?.serverTime;
   const smc = useMemo(() => {
     if (bars.length < 10) return null;
-    const now = Date.now();
+    const now = serverTime ?? Date.now();
     const closed = bars.filter((b) => (b.time + stepSeconds) * 1000 <= now);
     return computeSmcOverlay(closed, bars[bars.length - 1].close);
-  }, [bars, stepSeconds]);
+  }, [bars, stepSeconds, serverTime]);
 
   const scriptRuns = useMemo(
     () =>
@@ -264,7 +268,10 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
         timeframeLabel: s.timeframe.label,
         bars: s.bars,
         stepSeconds: s.stepSeconds,
-        source: s.payload?.source === "spot" ? "spot XAU/USD" : "PAXG candles scaled to live XAU/USD spot",
+        source:
+          s.payload?.source === "spot"
+            ? "spot XAU/USD"
+            : `PAXG candles (${s.payload?.provider ?? "exchange"}) scaled to live XAU/USD spot`,
         indicators: s.indicators,
         smc: s.smc,
         smcToggles: s.smcToggles,
@@ -275,6 +282,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
           .filter((r) => r.script.enabled)
           .map((r) => ({ name: r.script.name, result: r.result, error: r.error })),
         visible: chartRef.current?.visibleWindow() ?? null,
+        now: s.payload?.serverTime,
       });
     },
     hasDrawings: () => stateRef.current.drawingsVisible && stateRef.current.drawings.length > 0,
