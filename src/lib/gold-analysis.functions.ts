@@ -1115,31 +1115,116 @@ export type TerminalChartPayload = {
   bars: Array<{ time: number; open: number; high: number; low: number; close: number; volume: number }>;
 };
 
-async function fetchBinanceDeep(symbol: string, tf: string, limit: number): Promise<Candle[]> {
-  const hosts = ["data-api.binance.vision", "api.binance.com"];
-  let lastErr: unknown = null;
-  for (const host of hosts) {
-    try {
-      const res = await fetchWithTimeout(
-        `https://${host}/api/v3/klines?symbol=${symbol}&interval=${tf}&limit=${limit}`,
-        { headers: { "User-Agent": "Mozilla/5.0" } },
-        CANDLE_FETCH_TIMEOUT_MS,
-      );
-      if (!res.ok) {
-        if (res.body) await res.body.cancel().catch(() => {});
-        throw new Error(`Binance ${symbol}: ${res.status}`);
-      }
-      const rows: any[] = await res.json();
-      const out = rows
-        .map((r) => ({ t: r[0], o: +r[1], h: +r[2], l: +r[3], c: +r[4], v: +r[5] }))
-        .filter((c) => Number.isFinite(c.c));
-      if (out.length >= 10) return out;
-      throw new Error("Too few candles");
-    } catch (err) {
-      lastErr = err;
-    }
+const PROXY_FETCH_TIMEOUT_MS = 5000;
+
+async function fetchProxyJson(url: string, label: string): Promise<any> {
+  const res = await fetchWithTimeout(
+    url,
+    { headers: { "User-Agent": "Mozilla/5.0", Accept: "application/json" } },
+    PROXY_FETCH_TIMEOUT_MS,
+  );
+  if (!res.ok) {
+    if (res.body) await res.body.cancel().catch(() => {});
+    throw new Error(`${label}: HTTP ${res.status}`);
   }
-  throw lastErr instanceof Error ? lastErr : new Error("Chart feed unavailable");
+  return res.json();
+}
+
+function finiteCandles(rows: Candle[], label: string): Candle[] {
+  const out = rows
+    .filter((c) => [c.t, c.o, c.h, c.l, c.c].every(Number.isFinite) && c.c > 0)
+    .sort((a, b) => a.t - b.t);
+  if (out.length < 10) throw new Error(`${label}: too few candles`);
+  return out;
+}
+
+async function fetchBinanceHostDeep(host: string, symbol: string, tf: string, limit: number) {
+  const rows: any[] = await fetchProxyJson(
+    `https://${host}/api/v3/klines?symbol=${symbol}&interval=${tf}&limit=${limit}`,
+    `Binance(${host})`,
+  );
+  return finiteCandles(
+    rows.map((r) => ({ t: +r[0], o: +r[1], h: +r[2], l: +r[3], c: +r[4], v: +r[5] })),
+    "Binance",
+  );
+}
+
+async function fetchOkxDeep(tf: string, limit: number): Promise<Candle[]> {
+  const bar: Record<string, string> = {
+    "1m": "1m", "5m": "5m", "15m": "15m", "30m": "30m", "1h": "1H", "4h": "4H", "1d": "1Dutc",
+  };
+  const json = await fetchProxyJson(
+    `https://www.okx.com/api/v5/market/candles?instId=PAXG-USDT&bar=${bar[tf] ?? "30m"}&limit=${Math.min(limit, 300)}`,
+    "OKX",
+  );
+  const rows: any[] = Array.isArray(json?.data) ? json.data : [];
+  return finiteCandles(
+    rows.map((r) => ({ t: +r[0], o: +r[1], h: +r[2], l: +r[3], c: +r[4], v: +r[5] })),
+    "OKX",
+  );
+}
+
+async function fetchBybitDeep(tf: string, limit: number): Promise<Candle[]> {
+  const interval: Record<string, string> = {
+    "1m": "1", "5m": "5", "15m": "15", "30m": "30", "1h": "60", "4h": "240", "1d": "D",
+  };
+  const json = await fetchProxyJson(
+    `https://api.bybit.com/v5/market/kline?category=spot&symbol=PAXGUSDT&interval=${interval[tf] ?? "30"}&limit=${Math.min(limit, 1000)}`,
+    "Bybit",
+  );
+  const rows: any[] = Array.isArray(json?.result?.list) ? json.result.list : [];
+  return finiteCandles(
+    rows.map((r) => ({ t: +r[0], o: +r[1], h: +r[2], l: +r[3], c: +r[4], v: +r[5] })),
+    "Bybit",
+  );
+}
+
+async function fetchKrakenDeep(tf: string, limit: number): Promise<Candle[]> {
+  const interval: Record<string, number> = {
+    "1m": 1, "5m": 5, "15m": 15, "30m": 30, "1h": 60, "4h": 240, "1d": 1440,
+  };
+  const json = await fetchProxyJson(
+    `https://api.kraken.com/0/public/OHLC?pair=PAXGUSD&interval=${interval[tf] ?? 30}`,
+    "Kraken",
+  );
+  const result = json?.result ?? {};
+  const key = Object.keys(result).find((k) => k !== "last");
+  const rows: any[] = key && Array.isArray(result[key]) ? result[key] : [];
+  return finiteCandles(
+    rows.map((r) => ({ t: +r[0] * 1000, o: +r[1], h: +r[2], l: +r[3], c: +r[4], v: +r[6] })),
+    "Kraken",
+  ).slice(-limit);
+}
+
+/**
+ * Real PAXG (gold-backed token) candles with multi-exchange failover. Binance is
+ * preferred; when it is blocked or slow for the server's region, OKX, Bybit and
+ * Kraken are raced so the terminal chart and the AI never go dark.
+ */
+async function fetchGoldProxyDeep(tf: string, limit: number): Promise<Candle[]> {
+  const errors: string[] = [];
+  const tryGroup = async (fetchers: Array<() => Promise<Candle[]>>) => {
+    try {
+      return await Promise.any(fetchers.map((f) => f()));
+    } catch (err) {
+      const list = err instanceof AggregateError ? err.errors : [err];
+      for (const e of list) errors.push(e instanceof Error ? e.message : String(e));
+      return null;
+    }
+  };
+  const binance = await tryGroup([
+    () => fetchBinanceHostDeep("data-api.binance.vision", "PAXGUSDT", tf, limit),
+    () => fetchBinanceHostDeep("api.binance.com", "PAXGUSDT", tf, limit),
+  ]);
+  if (binance) return binance;
+  const others = await tryGroup([
+    () => fetchBybitDeep(tf, limit),
+    () => fetchOkxDeep(tf, limit),
+    () => fetchKrakenDeep(tf, limit),
+  ]);
+  if (others) return others;
+  console.error("[gold-feed] all candle sources failed", tf, errors.join(" | "));
+  throw new Error("Chart feed unavailable");
 }
 
 async function loadTerminalChart(tf: string): Promise<TerminalChartPayload> {
@@ -1151,11 +1236,18 @@ async function loadTerminalChart(tf: string): Promise<TerminalChartPayload> {
     candles = await fetchFromYahooSymbols(["XAUUSD=X"], tf);
   } catch {
     source = "paxg-scaled";
-    const proxy = await fetchBinanceDeep("PAXGUSDT", tf, 1000);
-    const latestProxy = proxy.at(-1)?.c ?? 0;
-    const spot = await resolveLiveTick(resolveInstrument("XAUUSD")).catch(() => null);
-    const scale = spot?.price && latestProxy > 0 ? spot.price / latestProxy : 1;
-    candles = proxy.map((c) => ({ ...c, o: c.o * scale, h: c.h * scale, l: c.l * scale, c: c.c * scale }));
+    try {
+      const proxy = await fetchGoldProxyDeep(tf, 1000);
+      const latestProxy = proxy.at(-1)?.c ?? 0;
+      const spot = await resolveLiveTick(resolveInstrument("XAUUSD")).catch(() => null);
+      const scale = spot?.price && latestProxy > 0 ? spot.price / latestProxy : 1;
+      candles = proxy.map((c) => ({ ...c, o: c.o * scale, h: c.h * scale, l: c.l * scale, c: c.c * scale }));
+    } catch (err) {
+      // Every source failed this tick — keep serving the last good chart for a
+      // while instead of blanking the terminal.
+      if (hit && Date.now() - hit.at < CACHE_STALE_MAX) return hit.data;
+      throw err;
+    }
   }
   const step = TF_MS[tf] ?? TF_MS["30m"];
   const byBucket = new Map<number, Candle>();
