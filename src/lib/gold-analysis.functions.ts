@@ -2432,7 +2432,7 @@ ${compact}
 
 Only cite price levels that appear above. Do not state any level outside ${swingLow.toFixed(2)}-${swingHigh.toFixed(2)}.
 
-${requestInstruction}${advisorGuide}${chartStateBlock(data.chartContext)}`
+${requestInstruction}${advisorGuide}${chartStateBlock(data.chartContext)}${data.advisor ? REPLY_FORMAT_REMINDER : ""}`
     : `USER MESSAGE: ${data.query}
 
 ${isTradingIntent ? `${hasLivePrice ? `VERIFIED LIVE XAU/USD PRICE: ${currentPrice.toFixed(2)}. ` : ""}Verified closed-candle structure is unavailable. Answer concisely without inventing HH/HL/LH/LL, liquidity, entries, or other market levels, and mention that limitation.` : requestInstruction}${advisorGuide}${chartStateBlock(data.chartContext)}`;
