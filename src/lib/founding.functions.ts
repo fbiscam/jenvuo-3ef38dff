@@ -576,10 +576,9 @@ export const updateFoundingApplication = createServerFn({ method: "POST" })
           if (!userList?.users?.length || (userList.users.length < 1000)) break;
         }
         if (matchedUserId) {
-          const { error: rpcErr } = await admin.rpc("set_user_plan" as any, {
+          const { error: rpcErr } = await admin.rpc("activate_founding_trial" as any, {
             _user_id: matchedUserId,
             _plan_id: planId,
-            _billing_interval: "monthly",
           });
           if (rpcErr) throw new Error(`plan activation: ${rpcErr.message}`);
         }
