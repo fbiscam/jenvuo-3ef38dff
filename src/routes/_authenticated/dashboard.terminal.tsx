@@ -153,28 +153,18 @@ function formatNewYorkNewsTime(isoDate: string): { date: string; time: string } 
 
 function UpcomingGoldNews({ event, loading }: { event?: NewsEvent; loading: boolean }) {
   const stamp = event ? formatNewYorkNewsTime(event.date) : null;
+  const text = loading
+    ? "Checking news…"
+    : event && stamp
+      ? `News: ${event.title} · ${stamp.date}, ${stamp.time} NY (UTC−4)`
+      : "No important news ahead";
   return (
-    <div
-      className="flex h-8 min-w-0 max-w-[330px] items-center gap-2 rounded-md border border-border/70 bg-background/90 px-2.5 text-foreground shadow-sm backdrop-blur-sm"
-      title={event ? `${event.title} — ${stamp?.date}, ${stamp?.time} New York` : undefined}
-      aria-label={
-        event
-          ? `Next important Gold news: ${event.title}, ${stamp?.date} at ${stamp?.time}, UTC minus 4 New York time`
-          : "No upcoming high-impact Gold news found"
-      }
+    <span
+      className="min-w-0 max-w-[360px] truncate whitespace-nowrap px-1 text-xs font-normal text-muted-foreground"
+      title={text}
     >
-      <span className="flex size-5 shrink-0 items-center justify-center rounded bg-destructive/10 text-destructive">
-        <Newspaper className="size-3.5" />
-      </span>
-      <span className="min-w-0 leading-none">
-        <span className="block truncate text-[10px] font-semibold">
-          {loading ? "Checking Gold news…" : event?.title ?? "No high-impact news ahead"}
-        </span>
-        <span className="mt-0.5 block truncate font-mono text-[9px] text-muted-foreground">
-          {stamp ? `${stamp.date} · ${stamp.time} · UTC−4 New York` : "Gold / USD calendar"}
-        </span>
-      </span>
-    </div>
+      {text}
+    </span>
   );
 }
 
