@@ -1,6 +1,6 @@
 /**
  * Jenvu SMC overlays for the chart. Uses exactly the same deterministic
- * engines and the same 150-closed-candle window as the Terminal AI evidence,
+ * engines and the same 400-closed-candle structure window as the Terminal AI evidence,
  * so what the user sees on the chart is what the AI verifies.
  */
 import {
@@ -137,7 +137,6 @@ export function computeSmcOverlay(
       windowStart: null,
     };
   }
-  const structure = detectMarketStructureEvidence(recent);
   const poi = detectPoiEvidence(recent);
   const price = currentPrice ?? recent[recent.length - 1].c;
 
@@ -147,19 +146,21 @@ export function computeSmcOverlay(
   const pivotsLabelled = fractal.pivots.filter((p) => p.label.length === 2);
   const livePivots = computeLivePivots(fractalBars, forming ? toCandle(forming) : null, fractal.pivots);
 
-  const breaks = structure.breaks.map((b) => {
-    const src = [...structure.pivots]
+  // Structure labels, breaks, trend and liquidity must all come from this same
+  // confirmed 10-bar pivot set. Provisional tail pivots never create events.
+  const breaks = fractal.breaks.map((b) => {
+    const src = [...fractal.pivots]
       .reverse()
       .find((p) => p.index < b.index && Math.abs(p.price - b.level) < 1e-9);
-    return { ...b, fromT: src?.t ?? recent[Math.max(0, b.index - 5)].t };
+    return { ...b, fromT: src?.t ?? fractalBars[Math.max(0, b.index - FRACTAL_RADIUS)].t };
   });
   const buySide = Array.from(
-    new Set(structure.pivots.filter((p) => p.kind === "high" && p.price > price).map((p) => p.price)),
+    new Set(fractal.pivots.filter((p) => p.kind === "high" && p.price > price).map((p) => p.price)),
   )
     .sort((a, b) => a - b)
     .slice(0, 4);
   const sellSide = Array.from(
-    new Set(structure.pivots.filter((p) => p.kind === "low" && p.price < price).map((p) => p.price)),
+    new Set(fractal.pivots.filter((p) => p.kind === "low" && p.price < price).map((p) => p.price)),
   )
     .sort((a, b) => b - a)
     .slice(0, 4);
@@ -171,8 +172,8 @@ export function computeSmcOverlay(
     orderBlocks: poi.order_blocks.filter((z) => z.status !== "MITIGATED").slice(-6),
     buySide,
     sellSide,
-    trend: structure.trend,
-    windowStart: recent[0].t,
+    trend: fractal.trend,
+    windowStart: fractalBars[0].t,
   };
 }
 

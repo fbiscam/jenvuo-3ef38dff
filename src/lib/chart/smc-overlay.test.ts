@@ -36,4 +36,33 @@ describe("smc overlay fractal labels", () => {
     expect(high?.onFormingCandle).toBe(true);
     expect(high?.barsAfter).toBe(0);
   });
+
+  it("derives BOS/CHoCH and liquidity only from confirmed 10-bar pivots", () => {
+    const bars = Array.from({ length: 80 }, (_, i): OhlcvBar => ({
+      time: 1_700_000_000 + i * 1800,
+      open: 100,
+      high: i === 20 ? 120 : i === 45 ? 122 : 105 + (i % 3) * 0.1,
+      low: i === 60 ? 85 : 95 - (i % 2) * 0.1,
+      close: i === 45 ? 121 : 100,
+      volume: 100,
+    }));
+    const smc = computeSmcOverlay(bars, bars.at(-1)?.close ?? null);
+    const isTenBarPivot = (price: number, kind: "high" | "low") => {
+      const idx = bars.findIndex((b) => (kind === "high" ? b.high : b.low) === price);
+      if (idx < FRACTAL_RADIUS || idx >= bars.length - FRACTAL_RADIUS) return false;
+      const neighbours = bars
+        .slice(idx - FRACTAL_RADIUS, idx + FRACTAL_RADIUS + 1)
+        .filter((_, offset) => offset !== FRACTAL_RADIUS);
+      return kind === "high"
+        ? neighbours.every((b) => b.high < price)
+        : neighbours.every((b) => b.low > price);
+    };
+
+    expect(smc.breaks.length > 0).toBe(true);
+    for (const event of smc.breaks) {
+      expect(isTenBarPivot(event.level, event.dir === "bullish" ? "high" : "low")).toBe(true);
+    }
+    for (const price of smc.buySide) expect(isTenBarPivot(price, "high")).toBe(true);
+    for (const price of smc.sellSide) expect(isTenBarPivot(price, "low")).toBe(true);
+  });
 });
