@@ -380,7 +380,7 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
           axisLabelVisible: true,
           title: h.title,
         });
-        if (line && host === candles) candlePriceLinesRef.current.push(line);
+        if (line && !created[0]) candlePriceLinesRef.current.push(line);
       });
       extraSeriesRef.current.push(...created);
     }
