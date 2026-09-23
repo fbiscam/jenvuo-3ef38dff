@@ -610,6 +610,7 @@ const TF_MS: Record<string, number> = {
   "5m": 5 * 60_000,
   "15m": 15 * 60_000,
   "30m": 30 * 60_000,
+  "45m": 45 * 60_000,
   "1h": 60 * 60_000,
   "4h": 4 * 60 * 60_000,
   "1d": 24 * 60 * 60_000,
@@ -1361,12 +1362,14 @@ async function loadTerminalChart(tf: string): Promise<TerminalChartPayload> {
   let candles: Candle[] = [];
   let source: TerminalChartPayload["source"] = "spot";
   let provider = "Yahoo spot";
+  // No provider serves 45m candles — build them from 15m candles.
+  const fetchTf = tf === "45m" ? "15m" : tf;
   try {
-    candles = await fetchFromYahooSymbols(["XAUUSD=X"], tf);
+    candles = await fetchFromYahooSymbols(["XAUUSD=X"], fetchTf);
   } catch {
     source = "paxg-scaled";
     try {
-      const picked = await fetchGoldProxyDeepWithProvider(tf, 1000);
+      const picked = await fetchGoldProxyDeepWithProvider(fetchTf, 1000);
       provider = picked.provider;
       candles = await scaleProxyToSpot(picked.candles);
     } catch (err) {
@@ -1380,7 +1383,19 @@ async function loadTerminalChart(tf: string): Promise<TerminalChartPayload> {
   const byBucket = new Map<number, Candle>();
   for (const c of candles) {
     if (![c.t, c.o, c.h, c.l, c.c].every(Number.isFinite)) continue;
-    byBucket.set(Math.floor(c.t / step) * step, c);
+    const bucket = Math.floor(c.t / step) * step;
+    const prev = byBucket.get(bucket);
+    if (prev && fetchTf !== tf) {
+      byBucket.set(bucket, {
+        ...prev,
+        h: Math.max(prev.h, c.h),
+        l: Math.min(prev.l, c.l),
+        c: c.c,
+        v: (Number.isFinite(prev.v) ? prev.v : 0) + (Number.isFinite(c.v) ? c.v : 0),
+      });
+    } else {
+      byBucket.set(bucket, c);
+    }
   }
   const bars = [...byBucket.entries()]
     .sort((a, b) => a[0] - b[0])
