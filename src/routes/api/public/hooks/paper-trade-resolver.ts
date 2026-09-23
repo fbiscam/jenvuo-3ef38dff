@@ -1,5 +1,4 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { verifyCronRequest } from "@/lib/cron-auth.server";
 import {
   resolveTradeOutcome,
   EVAL_WINDOW_HOURS,
@@ -245,8 +244,11 @@ export const Route = createFileRoute("/api/public/hooks/paper-trade-resolver")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const unauthorized = verifyCronRequest(request);
-        if (unauthorized) return unauthorized;
+        const apikey = request.headers.get("apikey") ?? "";
+        const expected = process.env.SUPABASE_PUBLISHABLE_KEY ?? "";
+        if (!apikey || apikey !== expected) {
+          return new Response("Unauthorized", { status: 401 });
+        }
 
         const { supabaseAdmin } = await import(
           "@/integrations/supabase/client.server"

@@ -1,6 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { getLiveTick, computeSignalPlan } from "@/lib/gold-analysis.functions";
-import { verifyCronRequest } from "@/lib/cron-auth.server";
 
 // Signal reversal monitor — runs every 2 min via pg_cron.
 // For each recently broadcast signal (pending paper trade in the last 4h),
@@ -60,8 +59,11 @@ export const Route = createFileRoute(
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const unauthorized = verifyCronRequest(request);
-        if (unauthorized) return unauthorized;
+        const apikey = request.headers.get("apikey") ?? "";
+        const expected = process.env.SUPABASE_PUBLISHABLE_KEY ?? "";
+        if (!apikey || apikey !== expected) {
+          return new Response("Unauthorized", { status: 401 });
+        }
 
         const { supabaseAdmin } = await import(
           "@/integrations/supabase/client.server"
