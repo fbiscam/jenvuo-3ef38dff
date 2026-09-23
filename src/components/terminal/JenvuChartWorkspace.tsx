@@ -38,6 +38,7 @@ import {
 import { getTerminalChart } from "@/lib/gold-analysis.functions";
 import { cn } from "@/lib/utils";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { XauUsdLogo } from "./XauUsdLogo";
 import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
@@ -293,7 +294,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
       {/* Top bar */}
       <div className="flex h-11 shrink-0 items-center gap-1 border-b border-border px-2">
         <div className="mr-1 flex items-center gap-2 pl-1 pr-2">
-          <span className="h-2.5 w-2.5 rounded-full bg-[#d4a017]" aria-hidden="true" />
+          <XauUsdLogo size={22} />
           <span className="text-sm font-semibold tracking-tight">XAU/USD</span>
         </div>
         <div className="flex items-center" role="group" aria-label="Chart timeframe">
@@ -528,7 +529,10 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
             {/* Legend */}
             <div className="pointer-events-none absolute left-2 top-1.5 z-[3] max-w-[70%] space-y-0.5 font-mono text-[11px] leading-4">
               <div className="flex flex-wrap items-center gap-x-2">
-                <span className="font-sans text-xs font-semibold">XAU/USD · {timeframe.label} · Jenvu</span>
+                <span className="flex items-center gap-1.5 font-sans text-xs font-semibold">
+                  <XauUsdLogo size={16} />
+                  XAU/USD · {timeframe.label} · Jenvu
+                </span>
                 {hovered && (
                   <>
                     <span>
