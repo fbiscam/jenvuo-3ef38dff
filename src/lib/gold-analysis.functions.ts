@@ -1203,10 +1203,70 @@ async function fetchKrakenDeep(tf: string, limit: number): Promise<Candle[]> {
   ).slice(-limit);
 }
 
+async function fetchGateDeep(tf: string, limit: number): Promise<Candle[]> {
+  const interval: Record<string, string> = {
+    "1m": "1m", "5m": "5m", "15m": "15m", "30m": "30m", "1h": "1h", "4h": "4h", "1d": "1d",
+  };
+  const rows: any[] = await fetchProxyJson(
+    `https://api.gateio.ws/api/v4/spot/candlesticks?currency_pair=PAXG_USDT&interval=${interval[tf] ?? "30m"}&limit=${Math.min(limit, 1000)}`,
+    "Gate",
+  );
+  return finiteCandles(
+    rows.map((r) => ({ t: +r[0] * 1000, o: +r[5], h: +r[3], l: +r[4], c: +r[2], v: +r[6] })),
+    "Gate",
+  ).slice(-limit);
+}
+
+async function fetchKucoinDeep(tf: string, limit: number): Promise<Candle[]> {
+  const type: Record<string, string> = {
+    "1m": "1min", "5m": "5min", "15m": "15min", "30m": "30min", "1h": "1hour", "4h": "4hour", "1d": "1day",
+  };
+  const json = await fetchProxyJson(
+    `https://api.kucoin.com/api/v1/market/candles?type=${type[tf] ?? "30min"}&symbol=PAXG-USDT`,
+    "KuCoin",
+  );
+  const rows: any[] = Array.isArray(json?.data) ? json.data : [];
+  return finiteCandles(
+    rows.map((r) => ({ t: +r[0] * 1000, o: +r[1], h: +r[3], l: +r[4], c: +r[2], v: +r[5] })),
+    "KuCoin",
+  ).slice(-limit);
+}
+
+async function fetchBitgetDeep(tf: string, limit: number): Promise<Candle[]> {
+  const granularity: Record<string, string> = {
+    "1m": "1min", "5m": "5min", "15m": "15min", "30m": "30min", "1h": "1h", "4h": "4h", "1d": "1day",
+  };
+  const json = await fetchProxyJson(
+    `https://api.bitget.com/api/v2/spot/market/candles?symbol=PAXGUSDT&granularity=${granularity[tf] ?? "30min"}&limit=${Math.min(limit, 1000)}`,
+    "Bitget",
+  );
+  const rows: any[] = Array.isArray(json?.data) ? json.data : [];
+  return finiteCandles(
+    rows.map((r) => ({ t: +r[0], o: +r[1], h: +r[2], l: +r[3], c: +r[4], v: +r[5] })),
+    "Bitget",
+  ).slice(-limit);
+}
+
+async function fetchGeminiDeep(tf: string, limit: number): Promise<Candle[]> {
+  const interval: Partial<Record<string, string>> = {
+    "1m": "1m", "5m": "5m", "15m": "15m", "30m": "30m", "1h": "1hr", "1d": "1day",
+  };
+  const candleInterval = interval[tf];
+  if (!candleInterval) throw new Error(`Gemini: unsupported ${tf}`);
+  const rows: any[] = await fetchProxyJson(
+    `https://api.gemini.com/v2/candles/paxgusd/${candleInterval}`,
+    "Gemini",
+  );
+  return finiteCandles(
+    rows.map((r) => ({ t: +r[0], o: +r[1], h: +r[2], l: +r[3], c: +r[4], v: +r[5] })),
+    "Gemini",
+  ).slice(-limit);
+}
+
 /**
  * Real PAXG (gold-backed token) candles with multi-exchange failover. Binance is
- * preferred; when it is blocked or slow for the server's region, OKX, Bybit and
- * Kraken are raced so the terminal chart and the AI never go dark.
+ * preferred; when it is blocked or slow for the server's region, independent
+ * exchange feeds are raced so the terminal chart and the AI never go dark.
  */
 async function fetchGoldProxyDeep(tf: string, limit: number): Promise<Candle[]> {
   const errors: string[] = [];
@@ -1225,6 +1285,10 @@ async function fetchGoldProxyDeep(tf: string, limit: number): Promise<Candle[]> 
   ]);
   if (binance) return binance;
   const others = await tryGroup([
+    () => fetchGateDeep(tf, limit),
+    () => fetchKucoinDeep(tf, limit),
+    () => fetchBitgetDeep(tf, limit),
+    () => fetchGeminiDeep(tf, limit),
     () => fetchBybitDeep(tf, limit),
     () => fetchOkxDeep(tf, limit),
     () => fetchKrakenDeep(tf, limit),
