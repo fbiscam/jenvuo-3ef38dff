@@ -160,7 +160,7 @@
 - [x] Make four-candle scenarios update live every 10 seconds and strengthen confirmed extreme-level reactions
 - [x] Restyle every email CTA as white with black text and refine the shared email theme
 - [x] Give approved Founding users a 30-day trial and zero their wallet when it expires
-- [ ] Verify the email, trial-expiry, and current TypeScript behavior
+- [x] Verify the email, trial-expiry, and current TypeScript behavior
 
 - [ ] Replace three public automation keys with the private scheduler secret (blocked: managed secret access denied during schedule migration)
 - [x] Audit all pages, APIs, Google Search Console visibility, and the complete Terminal flow
