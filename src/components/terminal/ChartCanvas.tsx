@@ -187,7 +187,9 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
         rightOffset: 8,
         barSpacing: 8,
       },
-      localization: { priceFormatter: (p: number) => p.toFixed(2) },
+      // Fixed locale: some browsers report tags like "en-US@posix" that make
+      // Intl throw and stop the chart from drawing candles.
+      localization: { locale: "en-US", priceFormatter: (p: number) => p.toFixed(2) },
     });
     const candles = chart.addSeries(CandlestickSeries, {
       upColor: CHART_COLORS.up,
