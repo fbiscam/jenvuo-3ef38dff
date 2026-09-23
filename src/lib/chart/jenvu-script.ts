@@ -761,11 +761,7 @@ plotshape(ta.crossunder(fast, slow), "Bear cross", location=location.abovebar, c
     source: `//@version=5
 indicator("Mother + Inside Bar", overlay=true)
 inside = high < high[1] and low > low[1]
-plotshape(inside, "Inside bar", location=location.abovebar, color=color.orange, style=shape.circle, text="IB")
-motherHigh = inside ? high[1] : na
-motherLow = inside ? low[1] : na
-plot(motherHigh, "Mother high", color=color.green)
-plot(motherLow, "Mother low", color=color.red)`,
+plotshape(inside, "Inside bar", location=location.abovebar, color=color.orange, style=shape.circle, text="IB")`,
   },
   {
     name: "RSI",
