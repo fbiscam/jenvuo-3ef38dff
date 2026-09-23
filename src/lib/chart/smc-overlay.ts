@@ -217,6 +217,29 @@ export function renderSmcOverlay(
         `${bull ? "Bull" : "Bear"} FVG${g.status === "PARTIAL" ? " · partial" : ""}`,
       );
     }
+    // Live (unconfirmed) swings: outlined dashed badge that follows the forming candle.
+    for (const p of smc.livePivots ?? []) {
+      const x = pr.x(p.t / 1000);
+      const y = pr.y(p.price);
+      if (x == null || y == null) continue;
+      const up = p.kind === "high";
+      const color = p.label === "HH" || p.label === "HL" || p.label === "L" ? "#089981" : "#f23645";
+      const text = p.label;
+      const w = ctx.measureText(text).width + 8;
+      const yy = up ? y - 20 : y + 6;
+      ctx.fillStyle = "rgba(255,255,255,0.92)";
+      ctx.beginPath();
+      ctx.roundRect?.(x - w / 2, yy, w, 14, 3);
+      if (!ctx.roundRect) ctx.rect(x - w / 2, yy, w, 14);
+      ctx.fill();
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 1;
+      ctx.setLineDash([2, 2]);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = color;
+      ctx.fillText(text, x - w / 2 + 4, yy + 10.5);
+    }
   }
   if (toggles.orderBlocks) {
     for (const z of smc.orderBlocks) {

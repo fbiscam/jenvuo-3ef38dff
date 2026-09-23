@@ -68,12 +68,22 @@ export function buildChartContext(input: {
   lines.push(
     `Jenvu SMC overlays shown: ${on.length ? on.join(", ") : "none"} (drawn from the same verified engine as the market evidence; last 150 closed candles).`,
   );
-  if (input.smc && on.length) {
+  if (input.smc && input.smcToggles.structure) {
     const recentPivots = input.smc.pivots
       .slice(-6)
       .map((p) => `${p.label} ${p.price.toFixed(2)} @ ${fmt(p.t / 1000)}`)
       .join(", ");
-    if (recentPivots) lines.push(`Overlay swing labels visible (latest): ${recentPivots}.`);
+    if (recentPivots)
+      lines.push(
+        `Chart HH/HL/LH/LL labels use a 10-bar fractal (10 candles each side, like the Fractals indicator); latest confirmed: ${recentPivots}.`,
+      );
+    const live = (input.smc.livePivots ?? [])
+      .map(
+        (p) =>
+          `${p.label} ${p.price.toFixed(2)} @ ${fmt(p.t / 1000)}${p.onFormingCandle ? " (on the forming candle)" : ""}, ${p.barsAfter}/10 candles after it — provisional, can still change`,
+      )
+      .join("; ");
+    if (live) lines.push(`Live unconfirmed swing labels (dashed on chart): ${live}.`);
   }
 
   const drawings = input.drawings.slice(-25);

@@ -228,7 +228,9 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
     if (bars.length < 10) return null;
     const now = serverTime ?? Date.now();
     const closed = bars.filter((b) => (b.time + stepSeconds) * 1000 <= now);
-    return computeSmcOverlay(closed, bars[bars.length - 1].close);
+    const last = bars[bars.length - 1];
+    const forming = closed.length < bars.length ? last : null;
+    return computeSmcOverlay(closed, last.close, forming);
   }, [bars, stepSeconds, serverTime]);
 
   const scriptRuns = useMemo(
