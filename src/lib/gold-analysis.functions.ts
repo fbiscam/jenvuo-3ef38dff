@@ -1095,17 +1095,9 @@ async function fetchTerminalGoldEvidenceCandles(tf: string): Promise<Candle[]> {
     // Use exchange-traded, fully real PAXG candles rather than synthetic bars;
     // normalize them to the live XAU/USD tick so levels remain on the terminal's
     // OANDA spot scale while preserving the real candle structure and volume.
-    const proxy = (await fetchGoldProxyDeep(tf, 200)).slice(-200);
-    const latestProxy = proxy.at(-1)?.c ?? 0;
-    const spot = await resolveLiveTick(resolveInstrument("XAUUSD")).catch(() => null);
-    const scale = spot?.price && latestProxy > 0 ? spot.price / latestProxy : 1;
-    return proxy.map((candle) => ({
-      ...candle,
-      o: candle.o * scale,
-      h: candle.h * scale,
-      l: candle.l * scale,
-      c: candle.c * scale,
-    }));
+    // Same provider priority + same scale as the chart, so the AI and every
+    // account read identical candles.
+    return scaleProxyToSpot((await fetchGoldProxyDeep(tf, 200)).slice(-200));
   }
 }
 
@@ -1118,6 +1110,10 @@ const terminalChartCache = new Map<string, { at: number; data: TerminalChartPayl
 export type TerminalChartPayload = {
   timeframe: string;
   source: "spot" | "paxg-scaled";
+  /** Exchange that supplied the candles (fixed priority, identical for all accounts). */
+  provider: string;
+  /** Server clock (ms) — used to decide which candles are closed, so a wrong device clock can't change SMC labels. */
+  serverTime: number;
   stepSeconds: number;
   bars: Array<{ time: number; open: number; high: number; low: number; close: number; volume: number }>;
 };
@@ -1264,38 +1260,95 @@ async function fetchGeminiDeep(tf: string, limit: number): Promise<Candle[]> {
 }
 
 /**
- * Real PAXG (gold-backed token) candles with multi-exchange failover. Binance is
- * preferred; when it is blocked or slow for the server's region, independent
- * exchange feeds are raced so the terminal chart and the AI never go dark.
+ * Real PAXG (gold-backed token) candles with multi-exchange failover.
+ *
+ * CONSISTENCY RULE: every account must see the same candles, so the provider
+ * is chosen by a FIXED priority order — never by "whoever answers first".
+ * Racing exchanges made different users (and different server instances) get
+ * different wicks, and therefore different pivots, liquidity and SMC labels on
+ * the same timeframe. Fallbacks are fetched in parallel for speed, but the
+ * highest-priority provider that succeeds always wins.
  */
-async function fetchGoldProxyDeep(tf: string, limit: number): Promise<Candle[]> {
+export const GOLD_PROXY_PRIORITY = [
+  "Binance",
+  "Gate",
+  "KuCoin",
+  "Bitget",
+  "Gemini",
+  "Bybit",
+  "OKX",
+  "Kraken",
+] as const;
+export type GoldProxyProvider = (typeof GOLD_PROXY_PRIORITY)[number];
+
+async function fetchGoldProxyDeepWithProvider(
+  tf: string,
+  limit: number,
+): Promise<{ provider: GoldProxyProvider; candles: Candle[] }> {
   const errors: string[] = [];
-  const tryGroup = async (fetchers: Array<() => Promise<Candle[]>>) => {
+  // Both Binance hosts serve the identical order book, so racing them is safe.
+  try {
+    const candles = await Promise.any([
+      fetchBinanceHostDeep("data-api.binance.vision", "PAXGUSDT", tf, limit),
+      fetchBinanceHostDeep("api.binance.com", "PAXGUSDT", tf, limit),
+    ]);
+    return { provider: "Binance", candles };
+  } catch (err) {
+    const list = err instanceof AggregateError ? err.errors : [err];
+    for (const e of list) errors.push(e instanceof Error ? e.message : String(e));
+  }
+  const fallbacks: Array<[GoldProxyProvider, () => Promise<Candle[]>]> = [
+    ["Gate", () => fetchGateDeep(tf, limit)],
+    ["KuCoin", () => fetchKucoinDeep(tf, limit)],
+    ["Bitget", () => fetchBitgetDeep(tf, limit)],
+    ["Gemini", () => fetchGeminiDeep(tf, limit)],
+    ["Bybit", () => fetchBybitDeep(tf, limit)],
+    ["OKX", () => fetchOkxDeep(tf, limit)],
+    ["Kraken", () => fetchKrakenDeep(tf, limit)],
+  ];
+  // Start all in parallel, then accept results strictly in priority order.
+  const started = fallbacks.map(([name, run]) => {
+    const p = run();
+    p.catch(() => {});
+    return [name, p] as const;
+  });
+  for (const [name, p] of started) {
     try {
-      return await Promise.any(fetchers.map((f) => f()));
-    } catch (err) {
-      const list = err instanceof AggregateError ? err.errors : [err];
-      for (const e of list) errors.push(e instanceof Error ? e.message : String(e));
-      return null;
+      return { provider: name, candles: await p };
+    } catch (e) {
+      errors.push(e instanceof Error ? e.message : String(e));
     }
-  };
-  const binance = await tryGroup([
-    () => fetchBinanceHostDeep("data-api.binance.vision", "PAXGUSDT", tf, limit),
-    () => fetchBinanceHostDeep("api.binance.com", "PAXGUSDT", tf, limit),
-  ]);
-  if (binance) return binance;
-  const others = await tryGroup([
-    () => fetchGateDeep(tf, limit),
-    () => fetchKucoinDeep(tf, limit),
-    () => fetchBitgetDeep(tf, limit),
-    () => fetchGeminiDeep(tf, limit),
-    () => fetchBybitDeep(tf, limit),
-    () => fetchOkxDeep(tf, limit),
-    () => fetchKrakenDeep(tf, limit),
-  ]);
-  if (others) return others;
+  }
   console.error("[gold-feed] all candle sources failed", tf, errors.join(" | "));
   throw new Error("Chart feed unavailable");
+}
+
+async function fetchGoldProxyDeep(tf: string, limit: number): Promise<Candle[]> {
+  return (await fetchGoldProxyDeepWithProvider(tf, limit)).candles;
+}
+
+/**
+ * PAXG → XAU/USD spot scale. Recomputing the raw ratio on every request made
+ * every historical level drift a little per poll, so two accounts loading a few
+ * seconds apart saw slightly different liquidity prices. The ratio is quantized
+ * (0.0001 ≈ $0.40 at $4000) and only moved when spot drifts beyond that step,
+ * so the whole history stays identical between requests.
+ */
+let lastGoldScale: number | null = null;
+const GOLD_SCALE_STEP = 0.0001;
+export function quantizeGoldScale(raw: number, previous: number | null): number {
+  if (!Number.isFinite(raw) || raw <= 0) return previous ?? 1;
+  if (previous != null && Math.abs(raw - previous) < GOLD_SCALE_STEP) return previous;
+  return Math.round(raw / GOLD_SCALE_STEP) * GOLD_SCALE_STEP;
+}
+
+async function scaleProxyToSpot(proxy: Candle[]): Promise<Candle[]> {
+  const latestProxy = proxy.at(-1)?.c ?? 0;
+  const spot = await resolveLiveTick(resolveInstrument("XAUUSD")).catch(() => null);
+  const raw = spot?.price && latestProxy > 0 ? spot.price / latestProxy : NaN;
+  const scale = quantizeGoldScale(raw, lastGoldScale);
+  lastGoldScale = scale;
+  return proxy.map((c) => ({ ...c, o: c.o * scale, h: c.h * scale, l: c.l * scale, c: c.c * scale }));
 }
 
 async function loadTerminalChart(tf: string): Promise<TerminalChartPayload> {
