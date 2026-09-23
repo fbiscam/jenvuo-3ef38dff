@@ -1,4 +1,5 @@
-import { describe, expect, it } from "bun:test";
+import { describe, it } from "node:test";
+import { expect } from "./test-expect";
 import { describeDrawing, hitTest, positionLevels, type Drawing, type Projector } from "./drawings";
 import type { OhlcvBar } from "./indicators";
 

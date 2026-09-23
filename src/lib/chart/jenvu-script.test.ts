@@ -1,4 +1,5 @@
-import { describe, expect, it } from "bun:test";
+import { describe, it } from "node:test";
+import { expect } from "./test-expect";
 import { runJenvuScript, SCRIPT_TEMPLATES, ScriptError } from "./jenvu-script";
 import { ema, rsi, sma } from "./indicators";
 import type { OhlcvBar } from "./indicators";
