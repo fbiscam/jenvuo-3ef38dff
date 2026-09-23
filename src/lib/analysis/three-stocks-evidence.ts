@@ -28,6 +28,7 @@ export type ReversalStatus =
   | "ARMED_BUY_STOP"
   | "ARMED_SELL_STOP"
   | "NO_PATTERN"
+  | "STALE_PATTERN"
   | "REJECTED_LOCATION"
   | "REJECTED_SESSION"
   | "REJECTED_VOLATILITY"
@@ -53,6 +54,14 @@ export type ThreeStocksPattern = {
   mother_volume: number | null;
   inside_volume: number | null;
   direction_bias: "BULLISH_REVERSAL" | "BEARISH_REVERSAL" | "UNRESOLVED";
+  bars_since_inside: number;
+};
+
+export type SetupQuality = {
+  score: number;
+  grade: "A" | "B" | "C" | "REJECTED";
+  passed_checks: number;
+  total_checks: 6;
 };
 
 export type ThreeStocksPlan = {
@@ -79,6 +88,8 @@ export type ThreeStocksEvidence = {
   major_levels: MajorLevel[];
   pattern: ThreeStocksPattern | null;
   plan: ThreeStocksPlan | null;
+  patterns_scanned: number;
+  setup_quality: SetupQuality;
   rejections: string[];
 };
 
@@ -87,6 +98,7 @@ export const SPREAD_BUFFER = 0.15;
 const DAILY_TRADE_LIMIT = 2;
 /** Mother candle must reach within this fraction of ATR of a major level. */
 const SWEEP_TOLERANCE_ATR = 0.25;
+const MAX_LIVE_PATTERN_AGE_BARS = 3;
 
 /** UTC bounds for the current America/New_York trading date (DST-safe). */
 export function newYorkTradingDayRange(now = Date.now()): { start: string; end: string } {
@@ -170,31 +182,45 @@ export function findSwings(
   return out;
 }
 
-/** Latest mother / inside-bar pair where the inside bar is the last closed candle. */
-export function detectMotherInside(candles: ReversalCandle[]): ThreeStocksPattern | null {
+/**
+ * Every Mother / Inside-Bar pair in the supplied closed M30 history, newest
+ * first. The age is explicit so an older chart formation can be identified
+ * without being misrepresented as a currently executable setup.
+ */
+export function detectMotherInsidePatterns(candles: ReversalCandle[]): ThreeStocksPattern[] {
   if (candles.length < 3) return null;
-  const inside = candles[candles.length - 1];
-  const mother = candles[candles.length - 2];
-  if (!(inside.h <= mother.h && inside.l >= mother.l)) return null;
-  const prior = candles[candles.length - 3];
-  const bias =
-    mother.c < mother.o && mother.l < prior.l
-      ? "BULLISH_REVERSAL"
-      : mother.c > mother.o && mother.h > prior.h
-        ? "BEARISH_REVERSAL"
-        : "UNRESOLVED";
-  return {
-    mother_t: mother.t,
-    inside_t: inside.t,
-    mother_high: mother.h,
-    mother_low: mother.l,
-    mother_range: mother.h - mother.l,
-    inside_high: inside.h,
-    inside_low: inside.l,
-    mother_volume: Number.isFinite(mother.v) ? (mother.v as number) : null,
-    inside_volume: Number.isFinite(inside.v) ? (inside.v as number) : null,
-    direction_bias: bias,
-  };
+  const patterns: ThreeStocksPattern[] = [];
+  for (let insideIndex = candles.length - 1; insideIndex >= 2; insideIndex -= 1) {
+    const inside = candles[insideIndex];
+    const mother = candles[insideIndex - 1];
+    const prior = candles[insideIndex - 2];
+    if (!inside || !mother || !prior) continue;
+    if (!(inside.h <= mother.h && inside.l >= mother.l)) continue;
+    const bias =
+      mother.c < mother.o && mother.l < prior.l
+        ? "BULLISH_REVERSAL"
+        : mother.c > mother.o && mother.h > prior.h
+          ? "BEARISH_REVERSAL"
+          : "UNRESOLVED";
+    patterns.push({
+      mother_t: mother.t,
+      inside_t: inside.t,
+      mother_high: mother.h,
+      mother_low: mother.l,
+      mother_range: mother.h - mother.l,
+      inside_high: inside.h,
+      inside_low: inside.l,
+      mother_volume: Number.isFinite(mother.v) ? (mother.v as number) : null,
+      inside_volume: Number.isFinite(inside.v) ? (inside.v as number) : null,
+      direction_bias: bias,
+      bars_since_inside: candles.length - 1 - insideIndex,
+    });
+  }
+  return patterns;
+}
+
+export function detectMotherInside(candles: ReversalCandle[]): ThreeStocksPattern | null {
+  return detectMotherInsidePatterns(candles)[0] ?? null;
 }
 
 export function buildThreeStocksEvidence(input: {
@@ -206,11 +232,13 @@ export function buildThreeStocksEvidence(input: {
   const { m30, h4, h1 } = input;
   const dailyTradesTaken = Math.max(0, Math.floor(input.dailyTradesTaken ?? 0));
   const engineLocked = dailyTradesTaken >= DAILY_TRADE_LIMIT;
-  const atr = atr14(m30);
-  const pattern = detectMotherInside(m30);
-  const last = m30.at(-1) ?? null;
-  const sessionInfo = last
-    ? classifyNewYorkSession(last.t)
+  const patterns = detectMotherInsidePatterns(m30);
+  const pattern = patterns[0] ?? null;
+  const patternIndex = pattern ? m30.findIndex((c) => c.t === pattern.inside_t) : -1;
+  const patternWindow = patternIndex >= 0 ? m30.slice(0, patternIndex + 1) : m30;
+  const atr = atr14(patternWindow);
+  const sessionInfo = pattern
+    ? classifyNewYorkSession(pattern.inside_t)
     : { session: "OFF_HOURS" as TradingSession, trade_allowed: false };
   const sessionAllowed = sessionInfo.session === "LONDON_OPEN" || sessionInfo.session === "NY_OPEN";
 
@@ -232,6 +260,8 @@ export function buildThreeStocksEvidence(input: {
     major_levels: majorLevels,
     pattern,
     plan: null,
+    patterns_scanned: patterns.length,
+    setup_quality: { score: 0, grade: "REJECTED", passed_checks: 0, total_checks: 6 },
     rejections,
   };
 
@@ -240,8 +270,15 @@ export function buildThreeStocksEvidence(input: {
     return { ...base, status: "ENGINE_LOCKED_DAILY_LIMIT" };
   }
   if (!pattern) {
-    rejections.push("No mother / inside-bar pair on the last two closed M30 candles.");
+    rejections.push(`No mother / inside-bar pair in the ${m30.length} supplied closed M30 candles.`);
     return base;
+  }
+
+  if (pattern.bars_since_inside > MAX_LIVE_PATTERN_AGE_BARS) {
+    rejections.push(
+      `The latest Mother / Inside-Bar pair was found ${pattern.bars_since_inside} closed M30 candles ago and is stale for a new entry.`,
+    );
+    return { ...base, status: "STALE_PATTERN" };
   }
 
   // Phase 1 — location: the mother candle must touch or sweep a major H4/H1 level.
@@ -329,18 +366,44 @@ export function buildThreeStocksEvidence(input: {
     nearest_opposing_swing: opposing?.price ?? null,
     clean_traffic: cleanTraffic,
   };
+  const passedChecks = [
+    !engineLocked,
+    Boolean(swept),
+    sessionAllowed,
+    atr > 0 && pattern.mother_range >= atr,
+    pattern.mother_volume != null &&
+      pattern.inside_volume != null &&
+      pattern.mother_volume > 0 &&
+      pattern.inside_volume >= 0 &&
+      pattern.inside_volume < pattern.mother_volume,
+    cleanTraffic,
+  ].filter(Boolean).length;
+  const qualityScore = Math.round((passedChecks / 6) * 100);
+  const setupQuality: SetupQuality = {
+    score: qualityScore,
+    grade: qualityScore >= 100 ? "A" : qualityScore >= 83 ? "B" : qualityScore >= 67 ? "C" : "REJECTED",
+    passed_checks: passedChecks,
+    total_checks: 6,
+  };
 
   if (!cleanTraffic) {
     rejections.push(
       `Next major M30 swing at ${opposing?.price.toFixed(2)} sits before the 1:3 target ${target.toFixed(2)} — structure does not support the required RR.`,
     );
-    return { ...base, swept_level: swept, plan, status: "REJECTED_RR_TRAFFIC" };
+    return {
+      ...base,
+      swept_level: swept,
+      plan,
+      setup_quality: setupQuality,
+      status: "REJECTED_RR_TRAFFIC",
+    };
   }
 
   return {
     ...base,
     swept_level: swept,
     plan,
+    setup_quality: setupQuality,
     status: direction === "BUY" ? "ARMED_BUY_STOP" : "ARMED_SELL_STOP",
   };
 }

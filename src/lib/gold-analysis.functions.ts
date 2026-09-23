@@ -1538,6 +1538,7 @@ APEX RULE: never claim CVD, delta or footprint data beyond this proxy, and never
   const reversalBlock = reversal
     ? `VERIFIED EXTREME M30 GOLD REVERSAL ENGINE (Three Stocks mother/inside-bar, closed M30 candles only):
 STATUS: ${reversal.status}
+FULL M30 HISTORY SCAN: ${reversal.patterns_scanned} Mother/Inside-Bar candidate(s) found across ${m30Candles.length} supplied closed candles; newest candidate selected
 SESSION: ${reversal.session} (${reversal.session_allowed ? "London/NY killzone — accepted" : "outside London Open / NY Open — reversals ignored"})
 M30 ATR(14): ${reversal.atr_14.toFixed(2)}
 DAILY TRADES TAKEN: ${reversal.daily_trades_taken}/2${reversal.engine_locked ? " — ENGINE LOCKED" : ""}
@@ -1548,9 +1549,10 @@ SWEPT MAJOR LEVEL: ${
       }
 PATTERN: ${
         reversal.pattern
-          ? `mother ${reversal.pattern.mother_low.toFixed(2)}–${reversal.pattern.mother_high.toFixed(2)} (range ${reversal.pattern.mother_range.toFixed(2)}) @ ${stamp(reversal.pattern.mother_t)}; inside ${reversal.pattern.inside_low.toFixed(2)}–${reversal.pattern.inside_high.toFixed(2)} @ ${stamp(reversal.pattern.inside_t)}; volume mother ${reversal.pattern.mother_volume ?? "n/a"} vs inside ${reversal.pattern.inside_volume ?? "n/a"}`
-          : "no mother / inside-bar pair on the last two closed M30 candles"
+          ? `mother ${reversal.pattern.mother_low.toFixed(2)}–${reversal.pattern.mother_high.toFixed(2)} (range ${reversal.pattern.mother_range.toFixed(2)}) @ ${stamp(reversal.pattern.mother_t)}; inside ${reversal.pattern.inside_low.toFixed(2)}–${reversal.pattern.inside_high.toFixed(2)} @ ${stamp(reversal.pattern.inside_t)}; ${reversal.pattern.bars_since_inside} closed M30 candle(s) since inside bar; volume mother ${reversal.pattern.mother_volume ?? "n/a"} vs inside ${reversal.pattern.inside_volume ?? "n/a"}`
+          : `no mother / inside-bar pair in the ${m30Candles.length} supplied closed M30 candles`
       }
+SETUP QUALITY: ${reversal.setup_quality.score}% · Grade ${reversal.setup_quality.grade} · ${reversal.setup_quality.passed_checks}/${reversal.setup_quality.total_checks} deterministic checks passed (quality score, not win probability)
 PLAN: ${
         reversal.plan
           ? `${reversal.plan.direction} STOP | entry ${reversal.plan.entry.toFixed(2)} | SL ${reversal.plan.stop_loss.toFixed(2)} | risk ${reversal.plan.risk.toFixed(2)} | 1:3 target ${reversal.plan.target_1_3.toFixed(2)} | break-even at ${reversal.plan.break_even_trigger.toFixed(2)} (1:1.5 RR) | nearest opposing M30 swing ${reversal.plan.nearest_opposing_swing?.toFixed(2) ?? "none"} | clean traffic ${reversal.plan.clean_traffic ? "YES" : "NO"}`
@@ -1621,14 +1623,14 @@ function exactStructureAnswer(
         reversal?.rejections[0] ??
         "Verified closed M30 candles are unavailable, so the target cannot be calculated.";
       return romanUrdu
-        ? `Abhi valid M30 Mother/Inside-Bar setup armed nahi hai, is liye verified TP nahi banta. Reason: ${reason}`
-        : `No valid M30 Mother/Inside-Bar setup is armed, so there is no verified TP. Reason: ${reason}`;
+        ? `Poora supplied M30 chart scan hua: ${reversal?.patterns_scanned ?? 0} Mother/Inside-Bar candidate mile. Abhi valid setup armed nahi hai, is liye verified TP nahi banta. Status: ${reversal?.status ?? "UNAVAILABLE"}. Reason: ${reason}${reversal?.pattern ? ` Latest pattern ${reversal.pattern.bars_since_inside} closed M30 candle(s) purana hai.` : ""}`
+        : `The full supplied M30 chart was scanned and ${reversal?.patterns_scanned ?? 0} Mother/Inside-Bar candidate(s) were found. No valid setup is armed, so there is no verified TP. Status: ${reversal?.status ?? "UNAVAILABLE"}. Reason: ${reason}${reversal?.pattern ? ` The latest pattern is ${reversal.pattern.bars_since_inside} closed M30 candle(s) old.` : ""}`;
     }
     const plan = reversal.plan;
     const opposing = plan.nearest_opposing_swing;
     return romanUrdu
-      ? `${plan.direction} Mother/Inside-Bar plan ka measured 1:3 TP ${plan.target_1_3.toFixed(2)} hai; entry ${plan.entry.toFixed(2)}, SL ${plan.stop_loss.toFixed(2)}, aur BE ${plan.break_even_trigger.toFixed(2)} par. ${opposing == null ? "Is window mein target se pehle koi confirmed opposing M30 swing nahi mila." : `Nearest opposing M30 swing ${opposing.toFixed(2)} hai aur clean traffic ${plan.clean_traffic ? "YES" : "NO"}.`} Ye closed-candle study reference hai.`
-      : `The measured 1:3 TP for the ${plan.direction} Mother/Inside-Bar plan is ${plan.target_1_3.toFixed(2)}; entry ${plan.entry.toFixed(2)}, SL ${plan.stop_loss.toFixed(2)}, and break-even ${plan.break_even_trigger.toFixed(2)}. ${opposing == null ? "No confirmed opposing M30 swing appears before the target in this window." : `The nearest opposing M30 swing is ${opposing.toFixed(2)} and clean traffic is ${plan.clean_traffic ? "YES" : "NO"}.`} This is a closed-candle study reference.`;
+      ? `Poora supplied M30 chart scan hua aur latest valid ${plan.direction} Mother/Inside-Bar setup mila. Entry ${plan.entry.toFixed(2)}, SL ${plan.stop_loss.toFixed(2)}, measured 1:3 TP ${plan.target_1_3.toFixed(2)}, aur BE ${plan.break_even_trigger.toFixed(2)} par hai. Quality ${reversal.setup_quality.score}% (${reversal.setup_quality.passed_checks}/${reversal.setup_quality.total_checks} checks), win guarantee nahi. ${opposing == null ? "Target se pehle koi confirmed opposing M30 swing nahi mila." : `Nearest opposing M30 swing ${opposing.toFixed(2)} hai aur clean traffic ${plan.clean_traffic ? "YES" : "NO"}.`}`
+      : `The full supplied M30 chart was scanned and the latest valid ${plan.direction} Mother/Inside-Bar setup was found. Entry is ${plan.entry.toFixed(2)}, SL ${plan.stop_loss.toFixed(2)}, measured 1:3 TP ${plan.target_1_3.toFixed(2)}, and break-even ${plan.break_even_trigger.toFixed(2)}. Quality is ${reversal.setup_quality.score}% (${reversal.setup_quality.passed_checks}/${reversal.setup_quality.total_checks} checks), not a win guarantee. ${opposing == null ? "No confirmed opposing M30 swing appears before the target." : `The nearest opposing M30 swing is ${opposing.toFixed(2)} and clean traffic is ${plan.clean_traffic ? "YES" : "NO"}.`}`;
   }
   if (!isStructureLabelQuery(query)) return null;
   if (pivots.length === 0) {
@@ -1981,6 +1983,7 @@ Conversation memory and context rules:
 - Earlier turns of this same conversation are supplied before the latest user message. Use them: resolve "yeh", "wohi", "is level", "phir", "aur batao" and other follow-ups against what was already discussed, and never ask the user to repeat something they already told you.
 - There is exactly ONE chart in context: the user's XAU/USD (Gold) terminal chart on the timeframe given below. Never ask "which chart" or "konsa chart" — when the user says chart dekho / screen dekh / dekho, answer from the supplied verified data (and the screenshot when one is attached).
 - "Mother Son", "mother-son strategy", "mother candle", "inside bar" and "Three Stocks Funded" all refer to the same implemented M30 Mother Candle + Inside Bar reversal engine that is supplied to you as VERIFIED EXTREME M30 GOLD REVERSAL ENGINE. You DO know this strategy: never say you are unaware of it. Explain its rules (M30 only, Mother Candle at an H4/H1 extreme, mother range >= ATR(14), inside bar fully contained with lower volume, London/NY sessions only, stop/entry buffered 1.5 pips, 1:3 target with clean-traffic check, break-even at 1:1.5 RR, max 2 trades per day) and quote the engine's current status, rejection reason, or measured plan numbers from the supplied block.
+- For every Mother/Son or Mother/Baby question, use the FULL M30 HISTORY SCAN line. The engine scans all supplied closed M30 candles newest-first; never judge this strategy from only the screenshot's last two candles. State the latest candidate's age and status. Its setup-quality percentage is the proportion of deterministic checks passed, never a win-rate forecast.
 
 Rules for every reply:
 - Answer exactly what the user asked and nothing more.
