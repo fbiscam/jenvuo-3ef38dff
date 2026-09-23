@@ -23,11 +23,13 @@ export function buildChartContext(input: {
   selectedId: string | null;
   scripts: Array<{ name: string; result?: ScriptResult; error?: string }>;
   visible: { from: number; to: number; lo: number; hi: number } | null;
+  /** Server clock (ms) so forming-candle detection matches the SMC overlay. */
+  now?: number;
 }): string {
   const { bars } = input;
   if (!bars.length) return "";
   const last = bars[bars.length - 1];
-  const forming = (last.time + input.stepSeconds) * 1000 > Date.now();
+  const forming = (last.time + input.stepSeconds) * 1000 > (input.now ?? Date.now());
   const lines: string[] = [];
   lines.push(
     `Chart: XAU/USD ${input.timeframeLabel} on the Jenvu chart (${bars.length} bars loaded, feed: ${input.source}).`,

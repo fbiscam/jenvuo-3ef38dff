@@ -282,6 +282,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
           .filter((r) => r.script.enabled)
           .map((r) => ({ name: r.script.name, result: r.result, error: r.error })),
         visible: chartRef.current?.visibleWindow() ?? null,
+        now: s.payload?.serverTime,
       });
     },
     hasDrawings: () => stateRef.current.drawingsVisible && stateRef.current.drawings.length > 0,
