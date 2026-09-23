@@ -144,4 +144,4 @@
 
 - [x] Verify homepage Earth and footer slider animation behavior under US locale/timezone on preview and live domain
 - [x] Replace the latest OmniRoute endpoint and API key, then verify a live response
-- [ ] Decide whether community profiles and avatars should remain publicly viewable
+- [x] Restrict direct community profile and avatar access while preserving signed-in community views
