@@ -1792,7 +1792,7 @@ function chartStateBlock(chartContext?: string): string {
 USER'S JENVU CHART STATE (read directly from the user's own chart — exact coordinates, not a guess):
 ${chartContext}
 
-Chart-state rules: these drawings, indicator readings and script outputs are exactly what the user sees. When the user refers to a drawing ("circle", "box", "line", "yeh level", "jo mark kiya"), identify it from this list by type, time and price, then compare it with the verified market evidence and say whether it matches (e.g. whether a circled swing is really the verified HH/HL/LH/LL) and give the correct label/price when it does not. If several drawings could match, name them briefly and answer about the most recent one. Indicator/script values listed here are computed from the same chart candles.`;
+Chart-state rules: these drawings, indicator readings and script outputs are exactly what the user sees. Any attached image is a snapshot of this same Jenvu chart. When the user refers to a drawing ("circle", "box", "line", "yeh level", "jo mark kiya"), identify it from this list by type, time and price, then compare it with the verified market evidence and say whether it matches (e.g. whether a circled swing is really the verified HH/HL/LH/LL) and give the correct label/price when it does not. Prefer a drawing marked [SELECTED by user]; otherwise, if several drawings could match, name them briefly and answer about the most recent one. Indicator/script values listed here are computed from the same chart candles. Never ask the user which chart they mean.`;
 }
 
 /** Prior conversation turns so the desk remembers what was already discussed. */
