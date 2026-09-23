@@ -925,6 +925,13 @@ async function fetchCrossPairCandlesFromProxy(
       /* fall through */
     }
   }
+  if (!xauUsd.length) {
+    try {
+      xauUsd = (await fetchGoldProxyDeep(tf, 200)).slice(-200);
+    } catch {
+      /* fall through */
+    }
+  }
   if (!xauUsd.length) throw new Error("no XAU/USD candle source for cross-pair");
 
   // 2) FX proxy candles: Yahoo first. If Yahoo is unavailable, fall back to a
