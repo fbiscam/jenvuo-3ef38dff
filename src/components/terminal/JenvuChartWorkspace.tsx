@@ -14,8 +14,6 @@ import { useServerFn } from "@tanstack/react-start";
 import {
   Activity,
   AlignJustify,
-  ArrowDownFromLine,
-  ArrowUpFromLine,
   ArrowUpRight,
   Camera,
   Circle,
