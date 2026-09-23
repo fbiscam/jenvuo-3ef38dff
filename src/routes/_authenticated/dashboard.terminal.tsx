@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import {
   Camera,
   History,
@@ -293,7 +293,7 @@ function TerminalPage() {
     retry: 2,
   });
   const nextGoldNews = newsQuery.data?.find(
-    (event) => event.impact === "High" && new Date(event.date).getTime() > Date.now(),
+    (event: NewsEvent) => event.impact === "High" && new Date(event.date).getTime() > Date.now(),
   );
 
   function addMessage(message: ChatMsg) {
