@@ -1,4 +1,4 @@
-import { describe, it } from "bun:test";
+import { describe, it } from "node:test";
 import { computeLivePivots, computeSmcOverlay, FRACTAL_RADIUS } from "./smc-overlay";
 import { expect } from "./test-expect";
 import type { OhlcvBar } from "./indicators";
