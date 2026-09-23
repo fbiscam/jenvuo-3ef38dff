@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Plus, Play, Trash2, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Switch } from "@/components/ui/switch";
@@ -20,8 +20,35 @@ function nameFromSource(source: string, fallback: string): string {
   return (m?.[1] ?? fallback).slice(0, 48);
 }
 
+const SYNTAX_PATTERN = /(\/\/[^\n]*|"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|\b(?:indicator|strategy|study|plot|plotshape|plotchar|hline|if|else|for|while|switch|var|float|int|bool|string|color|and|or|not)\b|\b(?:ta|math|input|color)\.[A-Za-z_]\w*|\b(?:open|high|low|close|volume|time|true|false|na)\b|\b\d+(?:\.\d+)?\b)/g;
+const SYNTAX_TOKEN_PATTERN = /^(?:\/\/[^\n]*|"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|(?:indicator|strategy|study|plot|plotshape|plotchar|hline|if|else|for|while|switch|var|float|int|bool|string|color|and|or|not)|(?:ta|math|input|color)\.[A-Za-z_]\w*|(?:open|high|low|close|volume|time|true|false|na)|\d+(?:\.\d+)?)$/;
+
+function syntaxClass(token: string): string {
+  if (token.startsWith("//")) return "text-emerald-600";
+  if (token.startsWith('"') || token.startsWith("'")) return "text-amber-600";
+  if (/^\d/.test(token)) return "text-cyan-600";
+  if (/^(?:ta|math|input|color)\./.test(token)) return "text-blue-600";
+  if (/^(?:open|high|low|close|volume|time|true|false|na)$/.test(token)) return "text-orange-600";
+  return "text-fuchsia-600";
+}
+
+function highlightedSource(source: string) {
+  const parts = source.split(SYNTAX_PATTERN);
+  return parts.map((part, index) =>
+    SYNTAX_TOKEN_PATTERN.test(part) ? (
+      <span key={`${index}-${part}`} className={syntaxClass(part)}>
+        {part}
+      </span>
+    ) : (
+      part
+    ),
+  );
+}
+
 export function ScriptPanel({ scripts, runs, onChange, onClose }: Props) {
   const [activeId, setActiveId] = useState<string | null>(scripts[0]?.id ?? null);
+  const highlightRef = useRef<HTMLPreElement>(null);
+  const gutterRef = useRef<HTMLPreElement>(null);
   const active = scripts.find((s) => s.id === activeId) ?? null;
   const [draft, setDraft] = useState(active?.source ?? SCRIPT_TEMPLATES[0].source);
 
@@ -169,32 +196,51 @@ export function ScriptPanel({ scripts, runs, onChange, onClose }: Props) {
         </div>
         <div className="flex min-h-0 flex-1 overflow-hidden">
           <pre
+            ref={gutterRef}
             aria-hidden="true"
             className="select-none overflow-hidden border-r border-border bg-muted px-2 py-2 text-right font-mono text-[12px] leading-5 text-muted-foreground"
           >
             {Array.from({ length: lineCount }, (_, i) => i + 1).join("\n")}
           </pre>
-          <textarea
-            value={draft}
-            onChange={(e) => setDraft(e.target.value)}
-            onKeyDown={(e) => {
-              if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
-                e.preventDefault();
-                apply();
-              }
-              if (e.key === "Tab") {
-                e.preventDefault();
-                const el = e.currentTarget;
-                const start = el.selectionStart;
-                const next = `${draft.slice(0, start)}    ${draft.slice(el.selectionEnd)}`;
-                setDraft(next);
-                requestAnimationFrame(() => el.setSelectionRange(start + 4, start + 4));
-              }
-            }}
-            spellCheck={false}
-            aria-label="Script source"
-            className="min-w-0 flex-1 resize-none bg-card px-3 py-2 font-mono text-[12px] leading-5 outline-none"
-          />
+          <div className="relative min-w-0 flex-1 overflow-hidden bg-card">
+            <pre
+              ref={highlightRef}
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-0 overflow-hidden whitespace-pre px-3 py-2 font-mono text-[12px] leading-5 text-foreground"
+            >
+              {highlightedSource(draft)}
+              {draft.endsWith("\n") ? "\n" : null}
+            </pre>
+            <textarea
+              value={draft}
+              onChange={(e) => setDraft(e.target.value)}
+              onScroll={(e) => {
+                const editor = e.currentTarget;
+                if (highlightRef.current) {
+                  highlightRef.current.scrollTop = editor.scrollTop;
+                  highlightRef.current.scrollLeft = editor.scrollLeft;
+                }
+                if (gutterRef.current) gutterRef.current.scrollTop = editor.scrollTop;
+              }}
+              onKeyDown={(e) => {
+                if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
+                  e.preventDefault();
+                  apply();
+                }
+                if (e.key === "Tab") {
+                  e.preventDefault();
+                  const el = e.currentTarget;
+                  const start = el.selectionStart;
+                  const next = `${draft.slice(0, start)}    ${draft.slice(el.selectionEnd)}`;
+                  setDraft(next);
+                  requestAnimationFrame(() => el.setSelectionRange(start + 4, start + 4));
+                }
+              }}
+              spellCheck={false}
+              aria-label="Script source"
+              className="absolute inset-0 h-full w-full resize-none overflow-auto bg-transparent px-3 py-2 font-mono text-[12px] leading-5 text-transparent caret-foreground outline-none selection:bg-primary/20 selection:text-transparent"
+            />
+          </div>
         </div>
         <div
           role="status"
