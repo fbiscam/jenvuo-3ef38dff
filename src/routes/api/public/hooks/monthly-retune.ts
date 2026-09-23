@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { DEFAULT_FACTOR_WEIGHTS, type FactorWeightsByAsset } from "@/lib/analysis/engine";
 import { fetchBacktestSeries, simulateOnCandles } from "@/lib/backtest-historical.functions";
+import { verifyCronRequest } from "@/lib/cron-auth.server";
 
 /**
  * Monthly automated re-tuning (Phase 5).
@@ -16,9 +17,8 @@ import { fetchBacktestSeries, simulateOnCandles } from "@/lib/backtest-historica
  *   4. If passed → retire current active, activate new config, invalidate
  *      weights cache. Otherwise → leave candidate in the review queue.
  *
- * Triggered by pg_cron on the 1st of each month at 03:00 UTC. Secured with
- * the Supabase publishable key in the `apikey` header (matches the pattern
- * used by paper-trade-resolver and auto-scan).
+ * Triggered by the scheduler on the 1st of each month at 03:00 UTC. Secured
+ * with the private cron secret in the `x-cron-secret` header.
  */
 
 const SYMBOL = "XAUUSD";
@@ -39,11 +39,8 @@ export const Route = createFileRoute("/api/public/hooks/monthly-retune")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const apikey = request.headers.get("apikey") ?? "";
-        const expected = process.env.SUPABASE_PUBLISHABLE_KEY ?? "";
-        if (!apikey || apikey !== expected) {
-          return new Response("Unauthorized", { status: 401 });
-        }
+        const unauthorized = verifyCronRequest(request);
+        if (unauthorized) return unauthorized;
 
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
