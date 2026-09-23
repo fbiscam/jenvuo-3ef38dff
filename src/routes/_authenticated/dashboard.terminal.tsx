@@ -7,6 +7,7 @@ import {
   History,
   ImagePlus,
   Mic,
+  Newspaper,
   PanelRightClose,
   Square,
   SquarePen,
@@ -159,10 +160,14 @@ function UpcomingGoldNews({ event, loading }: { event?: NewsEvent; loading: bool
       : "No important news ahead";
   return (
     <span
-      className="min-w-0 max-w-[360px] truncate whitespace-nowrap px-1 text-xs font-normal text-muted-foreground"
+      className="flex min-w-0 max-w-[360px] items-center gap-1.5 whitespace-nowrap px-1 text-xs font-normal text-muted-foreground"
       title={text}
     >
-      {text}
+      <Newspaper
+        aria-hidden="true"
+        className={cn("h-3.5 w-3.5 shrink-0", event ? "text-red-500" : "text-amber-500")}
+      />
+      <span className="truncate">{text}</span>
     </span>
   );
 }
