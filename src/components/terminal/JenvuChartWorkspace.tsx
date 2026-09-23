@@ -637,7 +637,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
 
             {/* Legend */}
             <div className="pointer-events-none absolute left-2 top-1.5 z-[3] max-w-[70%] space-y-0.5 font-mono text-[11px] leading-4">
-              <div className="flex flex-wrap items-center gap-x-2">
+              <div className="mb-2 flex flex-wrap items-center gap-x-2">
                 <span className="flex items-center gap-1.5 font-sans text-xs font-semibold">
                   <XauUsdLogo size={16} />
                   XAU/USD · {timeframe.label} · Jenvu
