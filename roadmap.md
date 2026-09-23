@@ -151,3 +151,5 @@
 - [x] Add Jenvu Script (Pine-style) editor that plots on the chart
 - [x] Let Terminal AI read the chart's drawings, indicators, scripts and an automatic snapshot
 - [x] Restore Terminal chart loading for all accounts with independently tested gold-feed failover
+
+- [x] Same SMC/liquidity/indicators on every account: fixed-priority gold feed (no racing), stable spot scale, server clock for closed candles
