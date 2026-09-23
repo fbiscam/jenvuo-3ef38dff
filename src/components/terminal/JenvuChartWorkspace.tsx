@@ -385,7 +385,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
       <div className="flex h-11 shrink-0 items-center gap-1 border-b border-border px-2">
         <div className="mr-1 flex items-center gap-2 pl-1 pr-2">
           <XauUsdLogo size={22} />
-          <span className="text-sm font-semibold tracking-tight">XAU/USD</span>
+          <span className="text-sm font-semibold tracking-tight">GOLD</span>
         </div>
         <div className="flex items-center" role="group" aria-label="Chart timeframe">
           {timeframes.map((item) => (
