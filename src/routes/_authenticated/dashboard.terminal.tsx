@@ -7,7 +7,6 @@ import {
   History,
   ImagePlus,
   Mic,
-  Newspaper,
   PanelRightClose,
   Square,
   SquarePen,
