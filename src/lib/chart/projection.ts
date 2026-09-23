@@ -52,7 +52,9 @@ export function projectNextCandles(
   // Mere proximity is not enough, which prevents blind counter-trend guesses.
   const bearishRejection = atUpperExtreme && upperWick / range >= 0.45 && last.close < last.open;
   const bullishRejection = atLowerExtreme && lowerWick / range >= 0.45 && last.close > last.open;
-  const extremeVote = bullishRejection ? 2 : bearishRejection ? -2 : 0;
+  // A verified rejection outweighs short-term slope/momentum because those
+  // lag precisely where an extreme reversal starts.
+  const extremeVote = bullishRejection ? 3 : bearishRejection ? -3 : 0;
   const votes = [structure, Math.sign(slope), Math.sign(momentum), extremeVote];
   const score = votes.reduce((sum, vote) => sum + vote, 0);
   const bias = score >= 1 ? "bullish" : score <= -1 ? "bearish" : "neutral";
