@@ -141,8 +141,8 @@ function ResetPasswordPage() {
               </div>
             ) : (
               <form onSubmit={submit} className="mt-4 space-y-3">
-                <div className={`rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-[13px] text-zinc-700 ${MONO}`}>
-                  <p className="leading-relaxed">Choose a new password for your Jenvu account.</p>
+                <div className={`rounded-xl border border-zinc-200 bg-zinc-50 px-3 py-3 text-[11px] sm:text-[12px] text-zinc-700 ${MONO}`}>
+                  <p className="leading-relaxed whitespace-nowrap overflow-hidden text-ellipsis">Choose a new password for your Jenvu account.</p>
                 </div>
 
                 <div>
@@ -213,7 +213,7 @@ function ResetPasswordPage() {
                   {saving ? "Updating..." : "Update password"}
                 </button>
 
-                <p className="pt-1 text-center text-[11.5px] text-zinc-500">
+                <p className="pt-1 text-center text-[10px] sm:text-[11px] text-zinc-500 whitespace-nowrap overflow-hidden text-ellipsis">
                   After updating, you'll be signed out everywhere and asked to sign in again.
                 </p>
               </form>
