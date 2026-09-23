@@ -157,6 +157,7 @@
 - [x] Add chart-only fullscreen mode and TradingView-style Long/Short position tools
 - [x] Make Terminal AI replies concise, point-to-point and reliable (direct answer line + short evidence bullets; unswept liquidity first)
 - [x] Add the next high-impact Gold news event beside the Terminal candle timer in New York time
+- [x] Make four-candle scenarios update live every 10 seconds and strengthen confirmed extreme-level reactions
 
 - [ ] Replace three public automation keys with the private scheduler secret (blocked: managed secret access denied during schedule migration)
 - [x] Audit all pages, APIs, Google Search Console visibility, and the complete Terminal flow
