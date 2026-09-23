@@ -38,9 +38,14 @@ describe("smc overlay fractal labels", () => {
   });
 
   it("derives BOS/CHoCH and liquidity only from confirmed 10-bar pivots", () => {
-    const bars = Array.from({ length: 260 }, (_, i) =>
-      bar(i, 100 + 12 * Math.sin((i / 36) * 2 * Math.PI) + i * 0.025),
-    );
+    const bars = Array.from({ length: 80 }, (_, i): OhlcvBar => ({
+      time: 1_700_000_000 + i * 1800,
+      open: 100,
+      high: i === 20 ? 120 : i === 45 ? 122 : 105 + (i % 3) * 0.1,
+      low: i === 60 ? 85 : 95 - (i % 2) * 0.1,
+      close: i === 45 ? 121 : 100,
+      volume: 100,
+    }));
     const smc = computeSmcOverlay(bars, bars.at(-1)?.close ?? null);
     const isTenBarPivot = (price: number, kind: "high" | "low") => {
       const idx = bars.findIndex((b) => (kind === "high" ? b.high : b.low) === price);
