@@ -178,21 +178,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
     ],
     scripts: [
-      {
-        src: "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9179643691974639",
-        async: true,
-        crossOrigin: "anonymous",
-      },
-      {
-        src: "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8708842688547386",
-        async: true,
-        crossOrigin: "anonymous",
-      },
-      {
-        src: "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6031688799547633",
-        async: true,
-        crossOrigin: "anonymous",
-      },
+      ...[
+        "ca-pub-9179643691974639",
+        "ca-pub-8708842688547386",
+        "ca-pub-6031688799547633",
+      ].map((client) => ({
+        children: `window.addEventListener('load',function(){setTimeout(function(){var s=document.createElement('script');s.async=true;s.crossOrigin='anonymous';s.src='https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${client}';document.head.appendChild(s)},1000)},{once:true});`,
+      })),
       ...(googleAnalyticsId
         ? [
             {
