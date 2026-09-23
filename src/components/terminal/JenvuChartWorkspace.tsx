@@ -476,7 +476,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
                   <span className="block text-[11px] text-muted-foreground">{item.hint}</span>
                 </span>
                 <Switch
-                  checked={smcToggles[item.key]}
+                  checked={smcToggles[item.key] ?? DEFAULT_SMC[item.key]}
                   onCheckedChange={(v) => setSmcToggles((cur) => ({ ...cur, [item.key]: v }))}
                 />
               </label>
