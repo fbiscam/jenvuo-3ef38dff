@@ -235,7 +235,17 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
     const savedSmc = readJson<Partial<SmcToggles> | null>(SMC_KEY, null);
     if (savedSmc && typeof savedSmc === "object") setSmcToggles({ ...DEFAULT_SMC, ...savedSmc });
     const savedScripts = readJson<SavedScript[]>(SCRIPTS_KEY, []);
-    if (Array.isArray(savedScripts)) setScripts(savedScripts);
+    if (Array.isArray(savedScripts)) {
+      // Mother/Son strategy: keep only the IB markers, drop the Mother high/low lines.
+      const MOTHER_LINE_RE = /^\s*(motherHigh|motherLow)\s*=.*$|^\s*plot\((motherHigh|motherLow)\b.*$/;
+      setScripts(
+        savedScripts.map((s) =>
+          typeof s?.source === "string" && /motherHigh|motherLow/.test(s.source)
+            ? { ...s, source: s.source.split("\n").filter((l) => !MOTHER_LINE_RE.test(l)).join("\n") }
+            : s,
+        ),
+      );
+    }
     const savedVisible = readJson<boolean | null>(DRAWINGS_VISIBLE_KEY, null);
     if (typeof savedVisible === "boolean") setDrawingsVisible(savedVisible);
     setReady(true);
