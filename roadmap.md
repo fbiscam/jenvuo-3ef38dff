@@ -147,6 +147,6 @@
 - [x] Restrict direct community profile and avatar access while preserving signed-in community views
 - [x] Scan full closed M30 chart history for the latest Mother/Baby setup and report verified TP, SL, and evidence-based quality
 
-- [ ] Replace the Terminal TradingView embed with Jenvu's own chart (M1–D1, drawings, indicators, SMC overlays)
-- [ ] Add Jenvu Script (Pine-style) editor that plots on the chart
-- [ ] Let Terminal AI read the chart's drawings, indicators, scripts and an automatic snapshot
+- [x] Replace the Terminal TradingView embed with Jenvu's own chart (M1–D1, drawings, indicators, SMC overlays)
+- [x] Add Jenvu Script (Pine-style) editor that plots on the chart
+- [x] Let Terminal AI read the chart's drawings, indicators, scripts and an automatic snapshot
