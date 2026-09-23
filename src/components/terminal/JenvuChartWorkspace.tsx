@@ -149,7 +149,6 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
 ) {
   const fetchChart = useServerFn(getTerminalChart);
   const chartRef = useRef<ChartCanvasHandle | null>(null);
-  const hydrated = useRef(false);
   const [ready, setReady] = useState(false);
   const [indicators, setIndicators] = useState<IndicatorId[]>(["volume", "ema20", "ema50"]);
   const [smcToggles, setSmcToggles] = useState<SmcToggles>(DEFAULT_SMC);
@@ -180,7 +179,6 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
     if (Array.isArray(savedScripts)) setScripts(savedScripts);
     const savedVisible = readJson<boolean | null>(DRAWINGS_VISIBLE_KEY, null);
     if (typeof savedVisible === "boolean") setDrawingsVisible(savedVisible);
-    hydrated.current = true;
     setReady(true);
   }, []);
 
