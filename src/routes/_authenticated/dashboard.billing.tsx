@@ -192,7 +192,7 @@ function Billing() {
         </div>
         {trial.active && (
           <p className="mt-1 text-xs text-amber-600">
-            Free Pro trial ends {trial.endsAtLabel} · {trial.daysLeft > 1 ? `${trial.daysLeft}d left` : trial.hoursLeft > 1 ? `${trial.hoursLeft}h left` : "ends today"}
+            30-day Pro access ends {trial.endsAtLabel} · {trial.daysLeft > 1 ? `${trial.daysLeft}d left` : trial.hoursLeft > 1 ? `${trial.hoursLeft}h left` : "ends today"} · remaining trial credit becomes $0.00
           </p>
         )}
       </section>

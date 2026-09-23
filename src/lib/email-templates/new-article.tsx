@@ -240,14 +240,16 @@ const lead: React.CSSProperties = {
 }
 const cta: React.CSSProperties = {
   display: 'inline-block',
-  backgroundColor: '#09090b',
-  color: '#ffffff',
+  backgroundColor: '#ffffff',
+  color: '#09090b',
+  border: '1px solid #e4e4e7',
   padding: '12px 22px',
   borderRadius: 10,
   fontSize: 14,
   fontWeight: 600,
   textDecoration: 'none',
   letterSpacing: '0.01em',
+  boxShadow: '0 1px 2px rgba(9,9,11,0.08)',
 }
 const fineprint: React.CSSProperties = {
   fontSize: 12,

@@ -69,6 +69,10 @@ export const getCreditState = createServerFn({ method: "GET" })
   .handler(async ({ context }): Promise<CreditState> => {
     const { supabase, userId } = context;
 
+    // Apply an elapsed trial immediately when the user returns, rather than
+    // waiting for the scheduled sweep. Paid/top-up accounts are not touched.
+    await supabase.rpc("expire_my_pro_trial" as any);
+
     const [{ data: sub }, { data: bal }, { data: ledger }, { data: positiveLedger }, { data: promoRedemptions }] = await Promise.all([
       supabase
         .from("user_subscriptions")
@@ -213,6 +217,9 @@ export const spendCredits = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => spendSchema.parse(data))
   .handler(async ({ context }) => {
     const { supabase, userId } = context;
+
+    // Close the exact-boundary gap between trial expiry and the scheduled job.
+    await supabase.rpc("expire_my_pro_trial" as any);
 
     // Document gate: after 30 days from approval, unverified users must
     // submit identity documents before running any scan.
