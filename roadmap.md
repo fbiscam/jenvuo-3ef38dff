@@ -154,3 +154,4 @@
 
 - [x] Same SMC/liquidity/indicators on every account: fixed-priority gold feed (no racing), stable spot scale, server clock for closed candles
 - [x] Align Terminal HH/HL/LH/LL, BOS/CHoCH, liquidity, and AI evidence to confirmed 10-bar pivots
+- [x] Add chart-only fullscreen mode and TradingView-style Long/Short position tools

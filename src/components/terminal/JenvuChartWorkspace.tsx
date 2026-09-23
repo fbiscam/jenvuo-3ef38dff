@@ -24,6 +24,8 @@ import {
   EyeOff,
   Layers,
   Magnet,
+  Maximize2,
+  Minimize2,
   Minus,
   MousePointer2,
   MoveUpRight,
@@ -59,6 +61,16 @@ const SMC_KEY = "jenvu:terminal:smc:v1";
 const SCRIPTS_KEY = "jenvu:terminal:scripts:v1";
 const DRAWINGS_VISIBLE_KEY = "jenvu:terminal:drawings-visible:v1";
 
+function PositionToolIcon({ side }: { side: "long" | "short" }) {
+  const isLong = side === "long";
+  return (
+    <svg viewBox="0 0 18 18" aria-hidden="true" className="h-[18px] w-[18px]" fill="none">
+      <circle cx="3" cy={isLong ? 4 : 14} r="1.5" stroke="currentColor" strokeWidth="1.2" />
+      <path d={isLong ? "M5.5 4H15M11.5 4v5H15" : "M5.5 14H15M11.5 14V9H15"} stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 export type TimeframeOption = { key: string; label: string };
 
 export type JenvuChartHandle = {
@@ -86,8 +98,6 @@ const TOOLS: Array<{ id: DrawingTool; icon: LucideIcon; label: string }> = [
   { id: "rect", icon: RectangleHorizontal, label: TOOL_LABELS.rect },
   { id: "circle", icon: Circle, label: TOOL_LABELS.circle },
   { id: "fib", icon: AlignJustify, label: TOOL_LABELS.fib },
-  { id: "long", icon: ArrowUpFromLine, label: TOOL_LABELS.long },
-  { id: "short", icon: ArrowDownFromLine, label: TOOL_LABELS.short },
   { id: "text", icon: Type, label: TOOL_LABELS.text },
 ];
 
@@ -157,6 +167,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
   ref,
 ) {
   const fetchChart = useServerFn(getTerminalChart);
+  const workspaceRef = useRef<HTMLDivElement | null>(null);
   const chartRef = useRef<ChartCanvasHandle | null>(null);
   const [ready, setReady] = useState(false);
   const [indicators, setIndicators] = useState<IndicatorId[]>(["volume", "ema20", "ema50"]);
@@ -170,6 +181,23 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
   const [magnet, setMagnet] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [hoverIndex, setHoverIndex] = useState<number | null>(null);
+  const [fullscreen, setFullscreen] = useState(false);
+
+  useEffect(() => {
+    const syncFullscreen = () => setFullscreen(document.fullscreenElement === workspaceRef.current);
+    document.addEventListener("fullscreenchange", syncFullscreen);
+    return () => document.removeEventListener("fullscreenchange", syncFullscreen);
+  }, []);
+
+  async function toggleFullscreen() {
+    const workspace = workspaceRef.current;
+    if (!workspace) return;
+    if (document.fullscreenElement === workspace) {
+      await document.exitFullscreen();
+      return;
+    }
+    await workspace.requestFullscreen();
+  }
 
   // Load saved chart state once. `ready` is React state (not a ref) so the
   // save effects below only run on the render AFTER saved values are applied —
@@ -320,7 +348,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
   const selected = drawings.find((d) => d.id === selectedId) ?? null;
 
   return (
-    <div className="flex h-full min-h-0 w-full flex-col bg-background">
+    <div ref={workspaceRef} className="flex h-full min-h-0 w-full flex-col bg-background">
       {/* Top bar */}
       <div className="flex h-11 shrink-0 items-center gap-1 border-b border-border px-2">
         <div className="mr-1 flex items-center gap-2 pl-1 pr-2">
@@ -456,6 +484,19 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
           </TooltipTrigger>
           <TooltipContent>Reset view</TooltipContent>
         </Tooltip>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button
+              type="button"
+              onClick={() => void toggleFullscreen()}
+              aria-label={fullscreen ? "Exit fullscreen chart" : "Fullscreen chart"}
+              className="flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground"
+            >
+              {fullscreen ? <Minimize2 className="h-3.5 w-3.5" /> : <Maximize2 className="h-3.5 w-3.5" />}
+            </button>
+          </TooltipTrigger>
+          <TooltipContent>{fullscreen ? "Exit fullscreen" : "Fullscreen chart"}</TooltipContent>
+        </Tooltip>
 
         <div className="ml-auto flex items-center gap-2">{rightSlot}</div>
       </div>
@@ -471,6 +512,12 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
               <t.icon className="h-4 w-4" />
             </ToolButton>
           ))}
+          <ToolButton label={TOOL_LABELS.long} active={tool === "long"} onClick={() => setTool("long")}>
+            <PositionToolIcon side="long" />
+          </ToolButton>
+          <ToolButton label={TOOL_LABELS.short} active={tool === "short"} onClick={() => setTool("short")}>
+            <PositionToolIcon side="short" />
+          </ToolButton>
           <span className="my-1 h-px w-6 bg-border" aria-hidden="true" />
           <Popover>
             <Tooltip>
