@@ -61,20 +61,34 @@ const DRAWINGS_VISIBLE_KEY = "jenvu:terminal:drawings-visible:v1";
 
 function PositionToolIcon({ side }: { side: "long" | "short" }) {
   const isLong = side === "long";
-  // Same 24px grid, 2px stroke and 16px render size as the other toolbar icons.
+  // TradingView-style position icon: two anchored target/stop rails, an
+  // entry rail, and a clear "L" / "S" letter between them.
   return (
     <svg
       viewBox="0 0 24 24"
       aria-hidden="true"
-      className="h-4 w-4"
+      className="h-5 w-5"
       fill="none"
       stroke="currentColor"
-      strokeWidth="2"
+      strokeWidth="1.8"
       strokeLinecap="round"
       strokeLinejoin="round"
     >
-      <circle cx="4.5" cy={isLong ? 6 : 18} r="2.5" />
-      <path d={isLong ? "M8 6h13M14 6v8h7" : "M8 18h13M14 18v-8h7"} />
+      <circle cx="4.5" cy="4" r="2" />
+      <path d="M6.5 4H21" />
+      <circle cx="4.5" cy="20" r="2" />
+      <path d="M6.5 20H21" />
+      {isLong ? (
+        <>
+          <path d="M12 7.5v5h4" />
+          <path d="M6 15.5h15" />
+        </>
+      ) : (
+        <>
+          <path d="M6 8.5h15" />
+          <path d="M16 11.6c-.5-.7-1.3-1.1-2.2-1.1-1.2 0-2.1.6-2.1 1.5 0 2 4.5 1 4.5 3.1 0 .9-.9 1.6-2.2 1.6-1 0-1.9-.4-2.4-1.1" />
+        </>
+      )}
     </svg>
   );
 }
