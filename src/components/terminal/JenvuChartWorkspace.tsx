@@ -61,10 +61,20 @@ const DRAWINGS_VISIBLE_KEY = "jenvu:terminal:drawings-visible:v1";
 
 function PositionToolIcon({ side }: { side: "long" | "short" }) {
   const isLong = side === "long";
+  // Same 24px grid, 2px stroke and 16px render size as the other toolbar icons.
   return (
-    <svg viewBox="0 0 18 18" aria-hidden="true" className="h-[18px] w-[18px]" fill="none">
-      <circle cx="3" cy={isLong ? 4 : 14} r="1.5" stroke="currentColor" strokeWidth="1.2" />
-      <path d={isLong ? "M5.5 4H15M11.5 4v5H15" : "M5.5 14H15M11.5 14V9H15"} stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+    <svg
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+      className="h-4 w-4"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <circle cx="4.5" cy={isLong ? 6 : 18} r="2.5" />
+      <path d={isLong ? "M8 6h13M14 6v8h7" : "M8 18h13M14 18v-8h7"} />
     </svg>
   );
 }

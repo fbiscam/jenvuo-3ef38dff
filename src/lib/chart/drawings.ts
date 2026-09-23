@@ -218,19 +218,10 @@ export function renderDrawing(
       ctx.fillRect(x0, Math.min(yE, yT), w, Math.abs(yT - yE));
       ctx.fillStyle = "rgba(242, 54, 69, 0.18)";
       ctx.fillRect(x0, Math.min(yE, yS), w, Math.abs(yS - yE));
+      // Clean TradingView-style zones only: no TP/SL dashed lines or text tags.
       ctx.strokeStyle = "#787b86";
       ctx.lineWidth = 1;
       line({ x: x0, y: yE }, { x: x0 + w, y: yE });
-      ctx.setLineDash([4, 3]);
-      ctx.strokeStyle = "#089981";
-      line({ x: x0, y: yT }, { x: x0 + w, y: yT });
-      ctx.strokeStyle = "#f23645";
-      line({ x: x0, y: yS }, { x: x0 + w, y: yS });
-      ctx.setLineDash([]);
-      const rr = Math.abs(lv.target - lv.entry) / Math.max(1e-9, Math.abs(lv.entry - lv.stop));
-      tag(`TP ${lv.target.toFixed(dec)}`, x0 + w - 84, yT, "#089981");
-      tag(`SL ${lv.stop.toFixed(dec)}`, x0 + w - 84, yS, "#f23645");
-      tag(`${d.tool === "long" ? "LONG" : "SHORT"} ${lv.entry.toFixed(dec)} · 1:${rr.toFixed(2)}`, x0 + 4, yE, "#131722");
       break;
     }
     case "text": {
