@@ -21,6 +21,7 @@ function nameFromSource(source: string, fallback: string): string {
 }
 
 const SYNTAX_PATTERN = /(\/\/[^\n]*|"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|\b(?:indicator|strategy|study|plot|plotshape|plotchar|hline|if|else|for|while|switch|var|float|int|bool|string|color|and|or|not)\b|\b(?:ta|math|input|color)\.[A-Za-z_]\w*|\b(?:open|high|low|close|volume|time|true|false|na)\b|\b\d+(?:\.\d+)?\b)/g;
+const SYNTAX_TOKEN_PATTERN = /^(?:\/\/[^\n]*|"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|(?:indicator|strategy|study|plot|plotshape|plotchar|hline|if|else|for|while|switch|var|float|int|bool|string|color|and|or|not)|(?:ta|math|input|color)\.[A-Za-z_]\w*|(?:open|high|low|close|volume|time|true|false|na)|\d+(?:\.\d+)?)$/;
 
 function syntaxClass(token: string): string {
   if (token.startsWith("//")) return "text-emerald-600";
@@ -34,7 +35,7 @@ function syntaxClass(token: string): string {
 function highlightedSource(source: string) {
   const parts = source.split(SYNTAX_PATTERN);
   return parts.map((part, index) =>
-    SYNTAX_PATTERN.test(part) ? (
+    SYNTAX_TOKEN_PATTERN.test(part) ? (
       <span key={`${index}-${part}`} className={syntaxClass(part)}>
         {part}
       </span>
