@@ -108,6 +108,15 @@ function readJson<T>(key: string, fallback: T): T {
   }
 }
 
+function writeJson(key: string, value: unknown): void {
+  try {
+    window.localStorage.setItem(key, JSON.stringify(value));
+  } catch {
+    // The chart must remain usable when browser storage is full, disabled, or
+    // restricted. The current in-memory setup remains active for this visit.
+  }
+}
+
 function ToolButton({
   active,
   label,
@@ -183,19 +192,19 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
   }, []);
 
   useEffect(() => {
-    if (ready) window.localStorage.setItem(DRAWINGS_KEY, JSON.stringify(drawings));
+    if (ready) writeJson(DRAWINGS_KEY, drawings);
   }, [ready, drawings]);
   useEffect(() => {
-    if (ready) window.localStorage.setItem(INDICATORS_KEY, JSON.stringify(indicators));
+    if (ready) writeJson(INDICATORS_KEY, indicators);
   }, [ready, indicators]);
   useEffect(() => {
-    if (ready) window.localStorage.setItem(SMC_KEY, JSON.stringify(smcToggles));
+    if (ready) writeJson(SMC_KEY, smcToggles);
   }, [ready, smcToggles]);
   useEffect(() => {
-    if (ready) window.localStorage.setItem(SCRIPTS_KEY, JSON.stringify(scripts));
+    if (ready) writeJson(SCRIPTS_KEY, scripts);
   }, [ready, scripts]);
   useEffect(() => {
-    if (ready) window.localStorage.setItem(DRAWINGS_VISIBLE_KEY, JSON.stringify(drawingsVisible));
+    if (ready) writeJson(DRAWINGS_VISIBLE_KEY, drawingsVisible);
   }, [ready, drawingsVisible]);
 
   const chartQuery = useQuery({
