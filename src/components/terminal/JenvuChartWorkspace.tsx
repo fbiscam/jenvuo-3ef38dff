@@ -128,6 +128,7 @@ const SMC_LABELS: Array<{ key: keyof SmcToggles; label: string; hint: string }> 
   { key: "structure", label: "Swing structure", hint: "HH / HL / LH / LL labels" },
   { key: "breaks", label: "BOS / CHoCH", hint: "Confirmed close-through breaks" },
   { key: "liquidity", label: "Liquidity", hint: "Nearest buy-side / sell-side pools" },
+  { key: "projection", label: "Next candles", hint: "Four regularly refreshed scenario candles" },
   { key: "fvg", label: "Fair value gaps", hint: "Unmitigated and partial FVGs" },
   { key: "orderBlocks", label: "Order blocks", hint: "Strict demand / supply blocks" },
 ];
@@ -295,8 +296,8 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
   }, [bars, stepSeconds, serverTime]);
 
   const projection = useMemo(
-    () => (smc ? projectNextCandles(bars, stepSeconds, smc.trend, smc.buySide, smc.sellSide, 4) : null),
-    [bars, stepSeconds, smc],
+    () => (smc && smcToggles.projection ? projectNextCandles(bars, stepSeconds, smc.trend, smc.buySide, smc.sellSide, 4) : null),
+    [bars, stepSeconds, smc, smcToggles.projection],
   );
 
   const scriptRuns = useMemo(
