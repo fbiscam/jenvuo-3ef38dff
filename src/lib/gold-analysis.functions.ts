@@ -1088,7 +1088,7 @@ async function fetchTerminalGoldEvidenceCandles(tf: string): Promise<Candle[]> {
     // Use exchange-traded, fully real PAXG candles rather than synthetic bars;
     // normalize them to the live XAU/USD tick so levels remain on the terminal's
     // OANDA spot scale while preserving the real candle structure and volume.
-    const proxy = await fetchFromBinanceSymbols(["PAXGUSDT"], tf);
+    const proxy = (await fetchGoldProxyDeep(tf, 200)).slice(-200);
     const latestProxy = proxy.at(-1)?.c ?? 0;
     const spot = await resolveLiveTick(resolveInstrument("XAUUSD")).catch(() => null);
     const scale = spot?.price && latestProxy > 0 ? spot.price / latestProxy : 1;
