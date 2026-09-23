@@ -46,6 +46,7 @@ import { DRAWING_COLORS, TOOL_LABELS, type Drawing, type DrawingTool } from "@/l
 import type { OhlcvBar } from "@/lib/chart/indicators";
 import { runJenvuScript, type ScriptResult } from "@/lib/chart/jenvu-script";
 import { computeSmcOverlay, DEFAULT_SMC, type SmcToggles } from "@/lib/chart/smc-overlay";
+import { projectNextCandles } from "@/lib/chart/projection";
 import { ChartCanvas, type ChartCanvasHandle } from "./ChartCanvas";
 import { INDICATOR_LIST, buildIndicatorSeries, isIndicatorId, type IndicatorId } from "./indicator-specs";
 import { ScriptPanel, type SavedScript } from "./ScriptPanel";
@@ -292,6 +293,11 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
     const forming = closed.length < bars.length ? last : null;
     return computeSmcOverlay(closed, last.close, forming);
   }, [bars, stepSeconds, serverTime]);
+
+  const projection = useMemo(
+    () => (smc ? projectNextCandles(bars, stepSeconds, smc.trend, smc.buySide, smc.sellSide, 4) : null),
+    [bars, stepSeconds, smc],
+  );
 
   const scriptRuns = useMemo(
     () =>
@@ -622,6 +628,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
               scripts={chartScripts}
               smc={smc}
               smcToggles={smcToggles}
+              projection={projection}
               drawings={drawings}
               drawingsVisible={drawingsVisible}
               tool={tool}
