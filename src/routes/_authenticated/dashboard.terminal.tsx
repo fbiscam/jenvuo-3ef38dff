@@ -1,8 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation } from "@tanstack/react-query";
 import {
+  Camera,
   History,
   ImagePlus,
   Mic,
@@ -15,6 +16,10 @@ import {
 } from "lucide-react";
 import type { FileUIPart } from "ai";
 import { analyzeGold, type GoldSignal } from "@/lib/gold-analysis.functions";
+import {
+  JenvuChartWorkspace,
+  type JenvuChartHandle,
+} from "@/components/terminal/JenvuChartWorkspace";
 import { transcribeVoiceMessage } from "@/lib/transcription.functions";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -81,13 +86,16 @@ const TIMEFRAMES = [
   { key: "1d", tv: "D", label: "1D" },
 ];
 
-const SYMBOL = { key: "XAUUSD", tv: "OANDA:XAUUSD", label: "XAU/USD" };
+/** Questions about what is on screen get an automatic chart snapshot. */
+const CHART_INTENT_RE =
+  /\b(chart|screen|dekh\w*|dikh\w*|mark\w*|circle|circled|gol|draw\w*|drawing|line|lines|box|rectangle|arrow|fib\w*|position|indicator\w*|script\w*|pine|ema|sma|rsi|macd|vwap|bollinger|atr|this|these|that|ye|yeh|yahan|yaha|waha|wahan|visible|see|look)\b/i;
 
 type ChatMsg = {
   role: "user" | "assistant";
   text: string;
   signal?: GoldSignal;
   files?: FileUIPart[];
+  chartShared?: boolean;
 };
 
 type ChatThread = {
@@ -209,9 +217,8 @@ async function blobToDataUrl(blob: Blob): Promise<string> {
 
 function TerminalPage() {
   const [tf, setTf] = useState(TIMEFRAMES[3]);
-  const theme = "light" as const;
   const [deskOpen, setDeskOpen] = useState(false);
-  const [chartUserId, setChartUserId] = useState<string | null>(null);
+  const chartRef = useRef<JenvuChartHandle | null>(null);
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<ChatMsg[]>([]);
   const [threads, setThreads] = useState<ChatThread[]>([]);
@@ -299,49 +306,21 @@ function TerminalPage() {
     if (activeThreadIdRef.current === id) startNewChat();
   }
 
-  const chartSrc = useMemo(() => {
-    if (!chartUserId) return null;
-    const params = new URLSearchParams({
-      symbol: SYMBOL.tv,
-      interval: tf.tv,
-      timezone: "Etc/UTC",
-      theme,
-      style: "1",
-      locale: "en",
-      hide_top_toolbar: "0",
-      hide_legend: "0",
-      hide_side_toolbar: "0",
-      allow_symbol_change: "0",
-      withdateranges: "1",
-      details: "0",
-      save_chart_properties_to_local_storage: "1",
-      saveimage: "1",
-      client_id: "jenvu.com",
-      user_id: chartUserId,
-      studies: JSON.stringify(["STD;EMA", "STD;RSI"]),
-      enabled_features: JSON.stringify([
-        "countdown",
-        "save_chart_properties_to_local_storage",
-        "use_localstorage_for_settings",
-      ]),
-      // The parent cannot observe timeframe changes made inside TradingView's
-      // cross-origin iframe. Keep our selector authoritative so chart, timer,
-      // and AI always use the exact same interval.
-      disabled_features: JSON.stringify(["header_resolutions", "header_interval_dialog_button"]),
-    });
-    return `https://s.tradingview.com/widgetembed/?${params.toString()}`;
-  }, [tf.tv, chartUserId]);
-
   const ask = useMutation({
     mutationFn: async ({
       query,
       chartImage,
       history,
+      chartContext,
     }: {
       query: string;
       chartImage?: string;
       history?: Array<{ role: "user" | "assistant"; content: string }>;
-    }) => analyze({ data: { timeframe: tf.key, query, chartImage, history, advisor: true } }),
+      chartContext?: string;
+    }) =>
+      analyze({
+        data: { timeframe: tf.key, query, chartImage, history, chartContext, advisor: true },
+      }),
     onSuccess: (signal) => {
       addMessage({
         role: "assistant",
@@ -397,14 +376,6 @@ function TerminalPage() {
       const savedTimeframe = TIMEFRAMES.find((timeframe) => timeframe.key === settings?.timeframe);
       if (savedTimeframe) setTf(savedTimeframe);
       // The AI desk always starts closed so the chart opens exactly as left.
-
-      const CHART_USER_KEY = "jenvu:terminal:chart-user:v1";
-      let chartUser = window.localStorage.getItem(CHART_USER_KEY);
-      if (!chartUser) {
-        chartUser = `jenvu-${Math.random().toString(36).slice(2, 12)}`;
-        window.localStorage.setItem(CHART_USER_KEY, chartUser);
-      }
-      setChartUserId(chartUser);
     } catch {
       // Keep a clean workspace if saved browser data is unavailable or malformed.
     } finally {
@@ -453,13 +424,26 @@ function TerminalPage() {
     const image = message.files?.find((file) => file.mediaType?.startsWith("image/") && file.url);
     const query = message.text.trim() || (image ? "Analyze this XAU/USD chart screenshot." : "");
     if (!query || ask.isPending) return;
-    addMessage({ role: "user", text: query, files: image ? [image] : undefined });
+    // The AI desk always reads the exact chart state (drawings, indicators,
+    // scripts). When the question is about what is on screen, it also gets a
+    // snapshot of the Jenvu chart so it can see the drawings visually.
+    const chartContext = chartRef.current?.describe() || undefined;
+    let chartImage = image?.url;
+    let chartShared = false;
+    if (!chartImage && (CHART_INTENT_RE.test(query) || chartRef.current?.hasDrawings())) {
+      const shot = chartRef.current?.snapshot();
+      if (shot && shot.length < MAX_IMAGE_BYTES * 1.3) {
+        chartImage = shot;
+        chartShared = true;
+      }
+    }
+    addMessage({ role: "user", text: query, files: image ? [image] : undefined, chartShared });
     setInput("");
     const history = messages
       .filter((m) => m.text.trim().length > 0)
       .slice(-12)
       .map((m) => ({ role: m.role, content: m.text.slice(0, 1200) }));
-    await ask.mutateAsync({ query, chartImage: image?.url, history });
+    await ask.mutateAsync({ query, chartImage, history, chartContext });
   }
 
   async function startRecording() {
@@ -521,54 +505,41 @@ function TerminalPage() {
       <div className="flex h-full min-h-0 w-full flex-col overflow-hidden bg-background">
         <div className="flex min-h-0 flex-1 flex-col lg:flex-row">
           {/* Chart */}
-          <main className="relative min-h-0 flex-1 bg-background">
-            <div className="absolute right-28 top-1.5 z-10 flex items-center gap-2">
-              <select
-                value={tf.key}
-                onChange={(event) => {
-                  const next = TIMEFRAMES.find((item) => item.key === event.target.value);
-                  if (next) setTf(next);
-                }}
-                aria-label="Chart timeframe"
-                title="Timeframe used by the timer and the AI desk"
-                className="h-7 rounded-md bg-white px-1.5 text-xs font-semibold text-foreground outline-none"
-              >
-                {TIMEFRAMES.map((item) => (
-                  <option key={item.key} value={item.key}>
-                    {item.label}
-                  </option>
-                ))}
-              </select>
-              <button
-                type="button"
-                onClick={() => setDeskOpen(true)}
-                className="flex h-7 items-center gap-1.5 rounded-md px-2 text-xs font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
-                title="Ask With AI"
-                aria-label="Ask With AI"
-              >
-                <img src={jenvuLogo} alt="" className="h-4 w-4 shrink-0 object-contain" />
-                Ask With AI
-              </button>
-              <div
-                className="flex h-7 items-center gap-1.5 rounded-md bg-white px-2 font-mono text-xs font-semibold text-foreground"
-                title={`Time left on the current ${tf.label} candle`}
-                aria-label={`Current ${tf.label} candle closes in ${formatCountdown(secondsLeft)}`}
-              >
-                <Timer className="h-3.5 w-3.5 text-muted-foreground" />
-                {formatCountdown(secondsLeft)}
-              </div>
-            </div>
-            {chartSrc ? (
-              <iframe
-                src={chartSrc}
-                title={`${SYMBOL.label} ${tf.label} chart`}
-                className="h-full w-full border-0"
-                allowFullScreen
-              />
-            ) : (
-              <div className="h-full w-full bg-background" aria-label="Loading chart" />
-            )}
-          </main>
+          <section aria-label="XAU/USD chart" className="relative min-h-0 flex-1 bg-background">
+            <JenvuChartWorkspace
+              ref={chartRef}
+              timeframes={TIMEFRAMES}
+              timeframe={tf}
+              onTimeframeChange={(next) => {
+                const match = TIMEFRAMES.find((item) => item.key === next.key);
+                if (match) setTf(match);
+              }}
+              rightSlot={
+                <>
+                  <div
+                    className="flex h-7 items-center gap-1.5 rounded-md px-2 font-mono text-xs font-semibold text-foreground"
+                    title={`Time left on the current ${tf.label} candle`}
+                    aria-label={`Current ${tf.label} candle closes in ${formatCountdown(secondsLeft)}`}
+                  >
+                    <Timer className="h-3.5 w-3.5 text-muted-foreground" />
+                    {formatCountdown(secondsLeft)}
+                  </div>
+                  {!deskOpen && (
+                    <button
+                      type="button"
+                      onClick={() => setDeskOpen(true)}
+                      className="flex h-7 items-center gap-1.5 rounded-md px-2 text-xs font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                      title="Ask With AI"
+                      aria-label="Ask With AI"
+                    >
+                      <img src={jenvuLogo} alt="" className="h-4 w-4 shrink-0 object-contain" />
+                      Ask With AI
+                    </button>
+                  )}
+                </>
+              }
+            />
+          </section>
 
           {/* AI desk */}
           {deskOpen && (
@@ -756,6 +727,12 @@ function TerminalPage() {
                           <MessageResponse>{m.text}</MessageResponse>
                         ) : (
                           m.text
+                        )}
+                        {m.role === "user" && m.chartShared && (
+                          <span className="mt-1 flex items-center gap-1 text-[11px] text-muted-foreground">
+                            <Camera className="h-3 w-3" />
+                            Chart view shared with Jenvu
+                          </span>
                         )}
                       </MessageContent>
                     </Message>

@@ -1102,6 +1102,90 @@ async function fetchTerminalGoldEvidenceCandles(tf: string): Promise<Candle[]> {
   }
 }
 
+/**
+ * Deep chart history for the Jenvu terminal chart. Same source + scaling as the
+ * AI evidence feed (so pivots/levels line up), but up to 1000 bars and the
+ * forming candle included.
+ */
+const terminalChartCache = new Map<string, { at: number; data: TerminalChartPayload }>();
+export type TerminalChartPayload = {
+  timeframe: string;
+  source: "spot" | "paxg-scaled";
+  stepSeconds: number;
+  bars: Array<{ time: number; open: number; high: number; low: number; close: number; volume: number }>;
+};
+
+async function fetchBinanceDeep(symbol: string, tf: string, limit: number): Promise<Candle[]> {
+  const hosts = ["data-api.binance.vision", "api.binance.com"];
+  let lastErr: unknown = null;
+  for (const host of hosts) {
+    try {
+      const res = await fetchWithTimeout(
+        `https://${host}/api/v3/klines?symbol=${symbol}&interval=${tf}&limit=${limit}`,
+        { headers: { "User-Agent": "Mozilla/5.0" } },
+        CANDLE_FETCH_TIMEOUT_MS,
+      );
+      if (!res.ok) {
+        if (res.body) await res.body.cancel().catch(() => {});
+        throw new Error(`Binance ${symbol}: ${res.status}`);
+      }
+      const rows: any[] = await res.json();
+      const out = rows
+        .map((r) => ({ t: r[0], o: +r[1], h: +r[2], l: +r[3], c: +r[4], v: +r[5] }))
+        .filter((c) => Number.isFinite(c.c));
+      if (out.length >= 10) return out;
+      throw new Error("Too few candles");
+    } catch (err) {
+      lastErr = err;
+    }
+  }
+  throw lastErr instanceof Error ? lastErr : new Error("Chart feed unavailable");
+}
+
+async function loadTerminalChart(tf: string): Promise<TerminalChartPayload> {
+  const hit = terminalChartCache.get(tf);
+  if (hit && Date.now() - hit.at < 4000) return hit.data;
+  let candles: Candle[] = [];
+  let source: TerminalChartPayload["source"] = "spot";
+  try {
+    candles = await fetchFromYahooSymbols(["XAUUSD=X"], tf);
+  } catch {
+    source = "paxg-scaled";
+    const proxy = await fetchBinanceDeep("PAXGUSDT", tf, 1000);
+    const latestProxy = proxy.at(-1)?.c ?? 0;
+    const spot = await resolveLiveTick(resolveInstrument("XAUUSD")).catch(() => null);
+    const scale = spot?.price && latestProxy > 0 ? spot.price / latestProxy : 1;
+    candles = proxy.map((c) => ({ ...c, o: c.o * scale, h: c.h * scale, l: c.l * scale, c: c.c * scale }));
+  }
+  const step = TF_MS[tf] ?? TF_MS["30m"];
+  const byBucket = new Map<number, Candle>();
+  for (const c of candles) {
+    if (![c.t, c.o, c.h, c.l, c.c].every(Number.isFinite)) continue;
+    byBucket.set(Math.floor(c.t / step) * step, c);
+  }
+  const bars = [...byBucket.entries()]
+    .sort((a, b) => a[0] - b[0])
+    .map(([bucket, c]) => ({
+      time: Math.floor(bucket / 1000),
+      open: c.o,
+      high: Math.max(c.h, c.o, c.c),
+      low: Math.min(c.l, c.o, c.c),
+      close: c.c,
+      volume: Number.isFinite(c.v) ? c.v : 0,
+    }));
+  const data: TerminalChartPayload = { timeframe: tf, source, stepSeconds: step / 1000, bars };
+  terminalChartCache.set(tf, { at: Date.now(), data });
+  return data;
+}
+
+export const getTerminalChart = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: { timeframe: string }) => {
+    const tf = String(d?.timeframe || "30m").toLowerCase();
+    return { timeframe: TF_MS[tf] ? tf : "30m" };
+  })
+  .handler(async ({ data }) => loadTerminalChart(data.timeframe));
+
 function closedCandlesOnly(candles: Candle[], timeframe: string, now = Date.now()): Candle[] {
   const step = TF_MS[timeframe] ?? TF_MS["15m"];
   const currentBucket = Math.floor(now / step) * step;
@@ -1697,6 +1781,20 @@ function deterministicAdvisorResult(
   };
 }
 
+const MARKING_QUERY_RE =
+  /(circle|circled|marked|marking|mark\s*ki|mark\s*kiya|draw|drawn|drawing|arrow|box|rectangle|fib|trend\s*line|trendline|highlight|annotat|line\s*(khinch|draw)|screenshot|screen\s*dekh|chart\s*dekh|dekho|yahan|yeh\s*(level|zone|area|point)|is\s*(level|zone|area|point)|kya\s*hai\s*ye|what\s*(is|did)\s*i|indicator|script|ema|rsi|macd|vwap|bollinger)/i;
+
+/** Exact state of the user's Jenvu chart (drawings, indicators, scripts). */
+function chartStateBlock(chartContext?: string): string {
+  if (!chartContext) return "";
+  return `
+
+USER'S JENVU CHART STATE (read directly from the user's own chart — exact coordinates, not a guess):
+${chartContext}
+
+Chart-state rules: these drawings, indicator readings and script outputs are exactly what the user sees. Any attached image is a snapshot of this same Jenvu chart. When the user refers to a drawing ("circle", "box", "line", "yeh level", "jo mark kiya"), identify it from this list by type, time and price, then compare it with the verified market evidence and say whether it matches (e.g. whether a circled swing is really the verified HH/HL/LH/LL) and give the correct label/price when it does not. Prefer a drawing marked [SELECTED by user]; otherwise, if several drawings could match, name them briefly and answer about the most recent one. Indicator/script values listed here are computed from the same chart candles. Never ask the user which chart they mean.`;
+}
+
 /** Prior conversation turns so the desk remembers what was already discussed. */
 function buildHistoryMessages(
   history?: Array<{ role: "user" | "assistant"; content: string }>,
@@ -1721,6 +1819,7 @@ async function _analyzeGoldCompute(
     chartImage?: string;
     advisor?: boolean;
     history?: Array<{ role: "user" | "assistant"; content: string }>;
+    chartContext?: string;
   },
   __userId: string | null = null,
   __scanId: string | null = null,
@@ -1739,10 +1838,7 @@ async function _analyzeGoldCompute(
       ev.currentPrice,
       ev.reversal,
     );
-    const asksAboutMarkings =
-      /(circle|circled|marked|marking|mark\s*ki|draw|drawn|drawing|arrow|box|rectangle|highlight|annotat|line\s*(khinch|draw)|screenshot|screen\s*dekh|chart\s*dekh|dekho|yahan|yeh\s*(level|zone|area|point)|is\s*(level|zone|area|point)|kya\s*hai\s*ye|what\s*(is|did)\s*i)/i.test(
-        data.query || "",
-      );
+    const asksAboutMarkings = MARKING_QUERY_RE.test(data.query || "");
     if (data.advisor && exactAnswer && !asksAboutMarkings) {
       return deterministicAdvisorResult(exactAnswer, data.timeframe, ev.currentPrice);
     }
@@ -1776,7 +1872,7 @@ The live candle feed is unavailable, so no verified levels exist. Describe only 
 
 First identify precisely what the user is asking about. If they refer to something on the screen — "dekho", "yeh", "is level", a circle, box, arrow, line, or a label they wrote — locate that exact marking in the screenshot and answer about that specific thing only. Do not give a general market overview, extra sections, or unrelated levels that the user did not ask for.
 
-Perform an evidence-first review of only what the question needs: swing structure and dealing range, BOS/CHOCH/MSS, displacement, liquidity pools and sweeps, premium/discount, order blocks, breakers, mitigation, fair value gaps, session context, and invalidation evidence. Distinguish confirmed facts from possibilities. If the timeframe, price scale, candles, or a referenced marking is unreadable, say exactly what is missing instead of guessing. Keep the answer concise — normally 1-4 short sentences. Return the same JSON shape defined by the system instructions.${evidenceContext}`;
+Perform an evidence-first review of only what the question needs: swing structure and dealing range, BOS/CHOCH/MSS, displacement, liquidity pools and sweeps, premium/discount, order blocks, breakers, mitigation, fair value gaps, session context, and invalidation evidence. Distinguish confirmed facts from possibilities. If the timeframe, price scale, candles, or a referenced marking is unreadable, say exactly what is missing instead of guessing. Keep the answer concise — normally 1-4 short sentences. Return the same JSON shape defined by the system instructions.${evidenceContext}${chartStateBlock(data.chartContext)}`;
     const system = `You are an institutional-grade XAU/USD chart research assistant with deep practical knowledge of long-established discretionary price-action methods and advanced ICT/SMC concepts. Your analysis must be rigorous, skeptical, and grounded only in the supplied image and verified data. You are also skilled at reading a user's own chart annotations (circles, boxes, arrows, trendlines, handwritten labels) and answering about exactly the marking they point at. Answer only what the user asked and nothing more. Cross-check every conclusion against visible structure, liquidity, displacement, location, and confirmation; mention conflicting evidence. Never invent prices, candles, indicators, news, higher-timeframe context, or certainty. No chart analysis can guarantee accuracy. In advisor mode, coach and explain without issuing a new committed trade signal; when specifically asked about an already measured Mother/Inside-Bar plan, you must still quote its verified study-reference target, entry, SL, break-even, opposing swing, and clean-traffic verdict. Mirror the user's language and script exactly (English, Roman Urdu/Hinglish, Urdu, Hindi, Arabic or any other) and match their tone; keep technical terms and all numeric price levels unchanged. Return only valid JSON with this shape: {"bias":"BULLISH|BEARISH|NEUTRAL","direction":"BUY|SELL|WAIT","entry":"price or -","stopLoss":"price or -","takeProfits":[],"riskReward":"value or -","confidence":0,"killzone":"-","confluences":[],"ictAnalysis":"","smcAnalysis":"","marketStructure":"","spokenSummary":"","fullAnalysis":""}.`;
     const { content, model, usage } = await callChatCompletion({
       models: [...EXTENSION_MODEL_CHAIN.vision],
@@ -1969,7 +2065,8 @@ Perform an evidence-first review of only what the question needs: swing structur
     currentPrice,
     reversal,
   );
-  if (data.advisor && exactAnswer) {
+  const asksAboutChartState = Boolean(data.chartContext) && MARKING_QUERY_RE.test(data.query || "");
+  if (data.advisor && exactAnswer && !asksAboutChartState) {
     return deterministicAdvisorResult(exactAnswer, data.timeframe, currentPrice);
   }
 
@@ -2086,10 +2183,10 @@ ${compact}
 
 Only cite price levels that appear above. Do not state any level outside ${swingLow.toFixed(2)}-${swingHigh.toFixed(2)}.
 
-${requestInstruction}${advisorGuide}`
+${requestInstruction}${advisorGuide}${chartStateBlock(data.chartContext)}`
     : `USER MESSAGE: ${data.query}
 
-${isTradingIntent ? `${hasLivePrice ? `VERIFIED LIVE XAU/USD PRICE: ${currentPrice.toFixed(2)}. ` : ""}Verified closed-candle structure is unavailable. Answer concisely without inventing HH/HL/LH/LL, liquidity, entries, or other market levels, and mention that limitation.` : requestInstruction}${advisorGuide}`;
+${isTradingIntent ? `${hasLivePrice ? `VERIFIED LIVE XAU/USD PRICE: ${currentPrice.toFixed(2)}. ` : ""}Verified closed-candle structure is unavailable. Answer concisely without inventing HH/HL/LH/LL, liquidity, entries, or other market levels, and mention that limitation.` : requestInstruction}${advisorGuide}${chartStateBlock(data.chartContext)}`;
 
   const {
     content,
@@ -2129,14 +2226,16 @@ ${isTradingIntent ? `${hasLivePrice ? `VERIFIED LIVE XAU/USD PRICE: ${currentPri
       .catch(() => {});
   }
   const parsed: any = tryParseJsonLoose(content);
-  const deterministicStructure = exactStructureAnswer(
-    data.query,
-    data.timeframe,
-    structurePivots,
-    structureState,
-    currentPrice,
-    reversal,
-  );
+  const deterministicStructure = asksAboutChartState
+    ? null
+    : exactStructureAnswer(
+        data.query,
+        data.timeframe,
+        structurePivots,
+        structureState,
+        currentPrice,
+        reversal,
+      );
 
   const signal: GoldSignal = {
     bias: parsed.bias ?? "NEUTRAL",
@@ -2199,8 +2298,13 @@ export const analyzeGold = createServerFn({ method: "POST" })
       chartImage?: string;
       advisor?: boolean;
       history?: Array<{ role: "user" | "assistant"; content: string }>;
+      chartContext?: string;
     }) => ({
       timeframe: String(d?.timeframe || "15m").toLowerCase(),
+      chartContext:
+        typeof d?.chartContext === "string" && d.chartContext.trim()
+          ? d.chartContext.slice(0, 8000)
+          : undefined,
       query: String(d?.query || "Give me the best A+ setup right now"),
       advisor: d?.advisor === true,
       history: Array.isArray(d?.history)
