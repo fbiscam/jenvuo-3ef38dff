@@ -122,6 +122,10 @@ async function _spendUserCredits(
 
 type Candle = { t: number; o: number; h: number; l: number; c: number; v: number };
 
+/** Shared non-repainting swing basis for chart labels, breaks, liquidity and AI evidence. */
+const SMC_FRACTAL_RADIUS = 10;
+const SMC_STRUCTURE_WINDOW = 400;
+
 export type GoldSignal = {
   bias: "BULLISH" | "BEARISH" | "NEUTRAL";
   direction: "BUY" | "SELL" | "WAIT";
@@ -1464,14 +1468,18 @@ async function buildEvidenceContext(timeframe: string, dailyTradesTaken = 0) {
       ? liveTick.price
       : (last?.c ?? 0);
   const recent = hasData ? candles.slice(-150) : [];
+  const structureCandles = hasData ? candles.slice(-SMC_STRUCTURE_WINDOW) : [];
   const highs = recent.map((c) => c.h);
   const lows = recent.map((c) => c.l);
   const swingHigh = hasData ? Math.max(...highs) : 0;
   const swingLow = hasData ? Math.min(...lows) : 0;
 
-  // Pivots are not available until two later candles close; breaks require a
+  // Pivots are not available until ten later candles close; breaks require a
   // buffered close through an already-confirmed swing.
-  const structureEvidence = detectMarketStructureEvidence(recent);
+  const structureEvidence = detectMarketStructureEvidence(
+    structureCandles,
+    SMC_FRACTAL_RADIUS,
+  );
   const toStructureCandles = (items: Candle[]) =>
     items.map((candle) => ({
       timestamp: candle.t,
@@ -1480,7 +1488,9 @@ async function buildEvidenceContext(timeframe: string, dailyTradesTaken = 0) {
       low: candle.l,
       close: candle.c,
     }));
-  const advancedBars = hasData ? mapAdvancedSmcState(toStructureCandles(recent)) : [];
+  const advancedBars = hasData
+    ? mapAdvancedSmcState(toStructureCandles(structureCandles), { radius: SMC_FRACTAL_RADIUS })
+    : [];
   const advancedState = advancedBars.at(-1) ?? null;
   const labelled = structureEvidence.pivots.filter((p) => p.label.length === 2);
   const recentPivots = labelled.slice(-10);
@@ -1510,7 +1520,7 @@ async function buildEvidenceContext(timeframe: string, dailyTradesTaken = 0) {
     return "Last structure change: none inside the supplied window";
   })();
   const structureBlock = labelled.length
-    ? `CONFIRMED SWING STRUCTURE (5-bar fractal pivots, oldest -> newest):
+    ? `CONFIRMED SWING STRUCTURE (10-bar fractal pivots, 10 closed candles required on each side, oldest -> newest):
 ${recentPivots.map(fmtPivot).join("\n")}
 CURRENT STRUCTURE: ${structureState}
 LAST CONFIRMED HIGH: ${lastHigh ? fmtPivot(lastHigh) : "n/a"}
@@ -1615,9 +1625,12 @@ TRENDLINE LIQUIDITY: ${
     mtfTimeframes.map(async (tf) => {
       if (tf === timeframe && hasData) return [tf, advancedBars] as const;
       const frameCandles = closedCandlesOnly(await fetchTerminalGoldEvidenceCandles(tf), tf).slice(
-        -150,
+        -SMC_STRUCTURE_WINDOW,
       );
-      return [tf, mapAdvancedSmcState(toStructureCandles(frameCandles))] as const;
+      return [
+        tf,
+        mapAdvancedSmcState(toStructureCandles(frameCandles), { radius: SMC_FRACTAL_RADIUS }),
+      ] as const;
     }),
   );
   for (const result of mtfResults) {

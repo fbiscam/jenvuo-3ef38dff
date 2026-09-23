@@ -66,7 +66,7 @@ export function buildChartContext(input: {
     .filter(([, v]) => v)
     .map(([k]) => k);
   lines.push(
-    `Jenvu SMC overlays shown: ${on.length ? on.join(", ") : "none"} (drawn from the same verified engine as the market evidence; last 150 closed candles).`,
+    `Jenvu SMC overlays shown: ${on.length ? on.join(", ") : "none"} (confirmed structure, BOS/CHoCH and liquidity all use the same 10-bar fractal pivots over up to 400 closed candles).`,
   );
   if (input.smc && input.smcToggles.structure) {
     const recentPivots = input.smc.pivots
@@ -84,6 +84,18 @@ export function buildChartContext(input: {
       )
       .join("; ");
     if (live) lines.push(`Live unconfirmed swing labels (dashed on chart): ${live}.`);
+  }
+  if (input.smc && input.smcToggles.breaks) {
+    const recentBreaks = input.smc.breaks
+      .slice(-5)
+      .map((b) => `${b.type === "CHOCH" ? "CHoCH" : b.type} ${b.dir} through ${b.level.toFixed(2)} @ ${fmt(b.t / 1000)}`)
+      .join("; ");
+    lines.push(`Chart confirmed 10-bar structure breaks: ${recentBreaks || "none"}.`);
+  }
+  if (input.smc && input.smcToggles.liquidity) {
+    lines.push(
+      `Chart confirmed 10-bar liquidity: BSL ${input.smc.buySide.map((p) => p.toFixed(2)).join(", ") || "none"}; SSL ${input.smc.sellSide.map((p) => p.toFixed(2)).join(", ") || "none"}.`,
+    );
   }
 
   const drawings = input.drawings.slice(-25);
