@@ -15,6 +15,13 @@
       "when": 1790147968755,
       "tag": "0001_restrict_community_profiles_and_avatars",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1790192213830,
+      "tag": "0002_founding_30_day_trial_lifecycle",
+      "breakpoints": true
     }
   ]
 }

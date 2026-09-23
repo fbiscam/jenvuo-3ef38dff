@@ -3434,6 +3434,10 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      activate_founding_trial: {
+        Args: { _plan_id: string; _user_id: string }
+        Returns: undefined
+      }
       admin_auto_scan_cron_history: {
         Args: never
         Returns: {
@@ -3489,7 +3493,9 @@ export type Database = {
         Returns: string
       }
       expire_credits: { Args: never; Returns: number }
+      expire_my_pro_trial: { Args: never; Returns: boolean }
       expire_pro_trials: { Args: never; Returns: number }
+      expire_trial_account: { Args: { _user_id: string }; Returns: boolean }
       get_guest_messages: {
         Args: { _token: string }
         Returns: {
