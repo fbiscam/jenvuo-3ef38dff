@@ -2226,14 +2226,16 @@ ${isTradingIntent ? `${hasLivePrice ? `VERIFIED LIVE XAU/USD PRICE: ${currentPri
       .catch(() => {});
   }
   const parsed: any = tryParseJsonLoose(content);
-  const deterministicStructure = exactStructureAnswer(
-    data.query,
-    data.timeframe,
-    structurePivots,
-    structureState,
-    currentPrice,
-    reversal,
-  );
+  const deterministicStructure = asksAboutChartState
+    ? null
+    : exactStructureAnswer(
+        data.query,
+        data.timeframe,
+        structurePivots,
+        structureState,
+        currentPrice,
+        reversal,
+      );
 
   const signal: GoldSignal = {
     bias: parsed.bias ?? "NEUTRAL",
