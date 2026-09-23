@@ -101,7 +101,7 @@ export function renderDrawing(
   ctx.strokeStyle = d.color;
   ctx.fillStyle = d.color;
   ctx.lineWidth = opts.selected || opts.hovered ? 2.5 : 1.75;
-  ctx.font = "11px 'IBM Plex Mono', ui-monospace, monospace";
+  ctx.font = "11px 'JetBrains Mono', ui-monospace, monospace";
   const [a, b] = pts;
 
   const line = (p1: Px, p2: Px) => {
@@ -229,7 +229,7 @@ export function renderDrawing(
     }
     case "text": {
       const text = d.text || "Text";
-      ctx.font = "600 12px 'IBM Plex Sans', system-ui, sans-serif";
+      ctx.font = "600 12px 'DM Sans', system-ui, sans-serif";
       const w = ctx.measureText(text).width + 10;
       ctx.fillStyle = withAlpha(d.color, 0.14);
       ctx.fillRect(a.x - 2, a.y - 14, w, 20);

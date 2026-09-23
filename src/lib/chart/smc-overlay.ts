@@ -39,8 +39,8 @@ export type SmcToggles = {
 export const DEFAULT_SMC: SmcToggles = {
   structure: true,
   breaks: true,
-  fvg: true,
-  orderBlocks: true,
+  fvg: false,
+  orderBlocks: false,
   liquidity: true,
 };
 
@@ -101,7 +101,7 @@ export function renderSmcOverlay(
   pr: SmcProjector,
 ) {
   ctx.save();
-  ctx.font = "600 10px 'IBM Plex Mono', ui-monospace, monospace";
+  ctx.font = "600 10px 'JetBrains Mono', ui-monospace, monospace";
   const box = (tMs: number, top: number, bottom: number, fill: string, stroke: string, label: string) => {
     const x0 = pr.x(tMs / 1000);
     const y0 = pr.y(top);

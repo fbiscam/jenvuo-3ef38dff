@@ -11,6 +11,7 @@ import {
   type IChartApi,
   type ISeriesApi,
   type ISeriesMarkersPluginApi,
+  type IPriceLine,
   type SeriesMarker,
   type Time,
   type UTCTimestamp,
@@ -74,6 +75,7 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
   const candleRef = useRef<ISeriesApi<"Candlestick"> | null>(null);
   const markersRef = useRef<ISeriesMarkersPluginApi<Time> | null>(null);
   const extraSeriesRef = useRef<ISeriesApi<"Line" | "Histogram">[]>([]);
+  const candlePriceLinesRef = useRef<IPriceLine[]>([]);
   const propsRef = useRef(props);
   propsRef.current = props;
   const pendingRef = useRef<Drawing | null>(null);
@@ -277,7 +279,8 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
     if (!chart || !candles) return;
     for (const s of extraSeriesRef.current) chart.removeSeries(s);
     extraSeriesRef.current = [];
-    candles.priceLines?.().forEach((l) => candles.removePriceLine(l));
+    candlePriceLinesRef.current.forEach((l) => candles.removePriceLine(l));
+    candlePriceLinesRef.current = [];
     while (chart.panes().length > 1) chart.removePane(chart.panes().length - 1);
 
     const { bars } = propsRef.current;
@@ -366,17 +369,19 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
           pane,
         ),
       );
-      const host = created[0] ?? (script.result.overlay ? candles : null);
-      script.result.hlines.forEach((h) =>
-        host?.createPriceLine({
+      const host: ISeriesApi<"Line"> | ISeriesApi<"Candlestick"> | null =
+        created[0] ?? (script.result.overlay ? candles : null);
+      script.result.hlines.forEach((h) => {
+        const line = host?.createPriceLine({
           price: h.price,
           color: h.color,
           lineWidth: 1,
           lineStyle: LineStyle.Dashed,
           axisLabelVisible: true,
           title: h.title,
-        }),
-      );
+        });
+        if (line && host === candles) candlePriceLinesRef.current.push(line);
+      });
       extraSeriesRef.current.push(...created);
     }
 
