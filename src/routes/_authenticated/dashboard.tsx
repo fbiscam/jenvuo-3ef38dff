@@ -1320,7 +1320,7 @@ function DashboardLayout() {
               <img
                 src="/favicon.png"
                 alt="JENVU"
-                className="dashboard-sidebar-logo h-7 w-7 shrink-0 rounded-md object-contain"
+                className="dashboard-sidebar-logo h-6 w-6 shrink-0 rounded-md object-contain"
               />
               {!sidebarCollapsed && (
                 <span
