@@ -156,3 +156,4 @@
 - [x] Align Terminal HH/HL/LH/LL, BOS/CHoCH, liquidity, and AI evidence to confirmed 10-bar pivots
 - [x] Add chart-only fullscreen mode and TradingView-style Long/Short position tools
 - [x] Make Terminal AI replies concise, point-to-point and reliable (direct answer line + short evidence bullets; unswept liquidity first)
+- [x] Add the next high-impact Gold news event beside the Terminal candle timer in New York time

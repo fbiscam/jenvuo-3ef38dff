@@ -29,7 +29,7 @@ export const getGoldNews = createServerFn({ method: "GET" }).handler(
       if (!res.ok) return [];
       const raw = (await res.json()) as FFEvent[];
       const now = Date.now();
-      const horizon = now + 1000 * 60 * 60 * 36; // next 36h
+      const horizon = now + 1000 * 60 * 60 * 24 * 7; // remainder of this week / next 7 days
       return raw
         .filter(
           (e) =>

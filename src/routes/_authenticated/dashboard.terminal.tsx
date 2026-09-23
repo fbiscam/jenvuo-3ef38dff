@@ -7,6 +7,7 @@ import {
   History,
   ImagePlus,
   Mic,
+  Newspaper,
   PanelRightClose,
   Square,
   SquarePen,
@@ -16,6 +17,7 @@ import {
 } from "lucide-react";
 import type { FileUIPart } from "ai";
 import { analyzeGold, type GoldSignal } from "@/lib/gold-analysis.functions";
+import { getGoldNews, type NewsEvent } from "@/lib/news.functions";
 import {
   JenvuChartWorkspace,
   type JenvuChartHandle,
@@ -132,6 +134,50 @@ function formatCountdown(totalSeconds: number): string {
   return hours > 0 ? `${hours}:${pad(minutes)}:${pad(seconds)}` : `${pad(minutes)}:${pad(seconds)}`;
 }
 
+function formatNewYorkNewsTime(isoDate: string): { date: string; time: string } {
+  const date = new Date(isoDate);
+  return {
+    date: new Intl.DateTimeFormat("en-US", {
+      timeZone: "America/New_York",
+      month: "short",
+      day: "numeric",
+    }).format(date),
+    time: new Intl.DateTimeFormat("en-US", {
+      timeZone: "America/New_York",
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: true,
+    }).format(date),
+  };
+}
+
+function UpcomingGoldNews({ event, loading }: { event?: NewsEvent; loading: boolean }) {
+  const stamp = event ? formatNewYorkNewsTime(event.date) : null;
+  return (
+    <div
+      className="flex h-8 min-w-0 max-w-[330px] items-center gap-2 rounded-md border border-border/70 bg-background/90 px-2.5 text-foreground shadow-sm backdrop-blur-sm"
+      title={event ? `${event.title} — ${stamp?.date}, ${stamp?.time} New York` : undefined}
+      aria-label={
+        event
+          ? `Next important Gold news: ${event.title}, ${stamp?.date} at ${stamp?.time}, UTC minus 4 New York time`
+          : "No upcoming high-impact Gold news found"
+      }
+    >
+      <span className="flex size-5 shrink-0 items-center justify-center rounded bg-destructive/10 text-destructive">
+        <Newspaper className="size-3.5" />
+      </span>
+      <span className="min-w-0 leading-none">
+        <span className="block truncate text-[10px] font-semibold">
+          {loading ? "Checking Gold news…" : event?.title ?? "No high-impact news ahead"}
+        </span>
+        <span className="mt-0.5 block truncate font-mono text-[9px] text-muted-foreground">
+          {stamp ? `${stamp.date} · ${stamp.time} · UTC−4 New York` : "Gold / USD calendar"}
+        </span>
+      </span>
+    </div>
+  );
+}
+
 const QUICK = [
   "Analyse the current chart",
   "Where is liquidity sitting?",
@@ -237,6 +283,18 @@ function TerminalPage() {
   const activeThreadIdRef = useRef<string | null>(null);
   const analyze = useServerFn(analyzeGold);
   const transcribe = useServerFn(transcribeVoiceMessage);
+  const fetchGoldNews = useServerFn(getGoldNews);
+  const newsQuery = useQuery({
+    queryKey: ["terminal-gold-news"],
+    queryFn: fetchGoldNews,
+    staleTime: 5 * 60_000,
+    refetchInterval: 5 * 60_000,
+    refetchIntervalInBackground: false,
+    retry: 2,
+  });
+  const nextGoldNews = newsQuery.data?.find(
+    (event) => event.impact === "High" && new Date(event.date).getTime() > Date.now(),
+  );
 
   function addMessage(message: ChatMsg) {
     setMessages((current) => [...current, message]);
@@ -516,6 +574,7 @@ function TerminalPage() {
               }}
               rightSlot={
                 <>
+                  <UpcomingGoldNews event={nextGoldNews} loading={newsQuery.isPending} />
                   <div
                     className="flex h-7 items-center gap-1.5 rounded-md px-2 font-mono text-xs font-semibold text-foreground"
                     title={`Time left on the current ${tf.label} candle`}
