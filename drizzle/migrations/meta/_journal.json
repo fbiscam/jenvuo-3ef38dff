@@ -8,6 +8,13 @@
       "when": 1789943649012,
       "tag": "0000_insight_twice_daily_and_eu_topics",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1790147968755,
+      "tag": "0001_restrict_community_profiles_and_avatars",
+      "breakpoints": true
     }
   ]
 }
