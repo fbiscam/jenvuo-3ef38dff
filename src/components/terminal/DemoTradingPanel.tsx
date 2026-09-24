@@ -10,6 +10,7 @@ import {
   type DemoAccount,
   type DemoPosition,
   type DemoSide,
+  triggeredExit,
 } from "@/lib/chart/demo-trading";
 import { cn } from "@/lib/utils";
 
@@ -48,6 +49,8 @@ export function DemoTradingPanel({
 }) {
   const [account, setAccount] = useState<DemoAccount>(() => createDemoAccount());
   const [quantity, setQuantity] = useState("1");
+  const [slDistance, setSlDistance] = useState("5");
+  const [tpDistance, setTpDistance] = useState("15");
   const [error, setError] = useState("");
   const [ready, setReady] = useState(false);
 
@@ -65,6 +68,19 @@ export function DemoTradingPanel({
     }
     onPositionsChange(account.positions);
   }, [account, onPositionsChange, ready]);
+
+  // Auto-close positions when live price reaches SL or TP.
+  useEffect(() => {
+    if (!ready || !currentPrice) return;
+    setAccount((current) => {
+      let next = current;
+      for (const position of current.positions) {
+        const hit = triggeredExit(position, currentPrice);
+        if (hit) next = closeDemoPosition(next, position.id, hit.price, hit.reason);
+      }
+      return next;
+    });
+  }, [currentPrice, ready]);
 
   const metrics = useMemo(() => {
     if (currentPrice) return accountMetrics(account, currentPrice);
@@ -90,6 +106,8 @@ export function DemoTradingPanel({
       setError("Enter a quantity greater than zero.");
       return;
     }
+    const sl = Number(slDistance);
+    const tp = Number(tpDistance);
     if (amount * currentPrice > metrics.availableBuyingPower) {
       setError("This order exceeds your available demo buying power.");
       return;
@@ -104,6 +122,8 @@ export function DemoTradingPanel({
           quantity: amount,
           entryPrice: currentPrice,
           openedAt: Date.now(),
+          stopLoss: sl > 0 ? (side === "buy" ? currentPrice - sl : currentPrice + sl) : null,
+          takeProfit: tp > 0 ? (side === "buy" ? currentPrice + tp : currentPrice - tp) : null,
         },
       ],
     }));
@@ -181,6 +201,16 @@ export function DemoTradingPanel({
             </div>
           </div>
           <div className="grid grid-cols-2 gap-2">
+            <label className="text-xs font-medium text-muted-foreground">
+              Stop loss ($ distance)
+              <Input aria-label="Stop loss distance" type="number" min="0" step="0.1" value={slDistance} onChange={(e) => setSlDistance(e.target.value)} className="mt-1 h-9 font-mono text-sm" />
+            </label>
+            <label className="text-xs font-medium text-muted-foreground">
+              Take profit ($ distance)
+              <Input aria-label="Take profit distance" type="number" min="0" step="0.1" value={tpDistance} onChange={(e) => setTpDistance(e.target.value)} className="mt-1 h-9 font-mono text-sm" />
+            </label>
+          </div>
+          <div className="grid grid-cols-2 gap-2">
             <Button type="button" size="sm" className="bg-chart-2 text-primary-foreground hover:bg-chart-2/90" onClick={() => placeOrder("buy")}>Buy</Button>
             <Button type="button" size="sm" variant="destructive" onClick={() => placeOrder("sell")}>Sell</Button>
           </div>
@@ -202,6 +232,7 @@ export function DemoTradingPanel({
                   <div className="min-w-0">
                     <p className="text-sm font-semibold"><span className={position.side === "buy" ? "text-chart-2" : "text-destructive"}>{position.side.toUpperCase()}</span> {position.quantity} oz</p>
                     <p className="font-mono text-xs font-normal text-muted-foreground">{position.entryPrice.toFixed(2)} → {currentPrice?.toFixed(2) ?? "—"}</p>
+                    <p className="font-mono text-[11px] text-muted-foreground"><span className="text-destructive">SL {position.stopLoss?.toFixed(2) ?? "—"}</span> · <span className="text-chart-2">TP {position.takeProfit?.toFixed(2) ?? "—"}</span></p>
                   </div>
                   <div className="flex items-center gap-1.5">
                     <span className={cn("font-mono text-sm font-semibold", pnl > 0 && "text-chart-2", pnl < 0 && "text-destructive")}>{money.format(pnl)}</span>
@@ -211,6 +242,20 @@ export function DemoTradingPanel({
               );
             })}
           </div>
+          {(account.history?.length ?? 0) > 0 && (
+            <div className="space-y-1 border-t border-border pt-3">
+              <p className="text-sm font-medium text-foreground">Closed trades</p>
+              <div className="max-h-32 space-y-1 overflow-y-auto">
+                {account.history!.map((trade) => (
+                  <div key={trade.id} className="flex items-center justify-between gap-2 text-xs">
+                    <span className={cn("rounded px-1.5 py-0.5 font-semibold", trade.pnl >= 0 ? "bg-chart-2/15 text-chart-2" : "bg-destructive/15 text-destructive")}>{trade.pnl >= 0 ? "WIN" : "LOSS"}</span>
+                    <span className="min-w-0 flex-1 truncate font-mono text-muted-foreground">{trade.side.toUpperCase()} {trade.entryPrice.toFixed(2)} → {trade.exitPrice.toFixed(2)} · {trade.reason.toUpperCase()}</span>
+                    <span className={cn("font-mono font-medium", trade.pnl >= 0 ? "text-chart-2" : "text-destructive")}>{money.format(trade.pnl)}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
           <div className="flex justify-between border-t border-border pt-2 text-xs font-normal text-muted-foreground">
             <span>Buying power {money.format(metrics.availableBuyingPower)}</span>
             <span>Realized {money.format(account.realizedPnl)}</span>

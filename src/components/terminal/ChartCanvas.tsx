@@ -61,6 +61,7 @@ type Props = {
   smcToggles: SmcToggles;
   projection: CandleProjection | null;
   demoPositions: DemoPosition[];
+  demoPrice?: number | null;
   drawings: Drawing[];
   drawingsVisible: boolean;
   tool: DrawingTool;
@@ -327,18 +328,33 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
     const candles = candleRef.current;
     if (!candles) return;
     demoPriceLinesRef.current.forEach((line) => candles.removePriceLine(line));
-    demoPriceLinesRef.current = props.demoPositions.map((position) =>
-      candles.createPriceLine({
-        price: position.entryPrice,
-        color: position.side === "buy" ? CHART_COLORS.up : CHART_COLORS.down,
-        lineWidth: 1,
-        lineStyle: LineStyle.Dashed,
-        axisLabelVisible: true,
-        title: `${position.side.toUpperCase()} ${position.quantity} oz`,
-      }),
-    );
+    const price = props.demoPrice ?? null;
+    const fmt = (v: number) => `${v >= 0 ? "+" : "-"}$${Math.abs(v).toFixed(2)}`;
+    demoPriceLinesRef.current = props.demoPositions.flatMap((position) => {
+      const dir = position.side === "buy" ? 1 : -1;
+      const live = price == null ? 0 : (price - position.entryPrice) * dir * position.quantity;
+      const lines = [
+        candles.createPriceLine({
+          price: position.entryPrice,
+          color: live >= 0 ? CHART_COLORS.up : CHART_COLORS.down,
+          lineWidth: 2,
+          lineStyle: LineStyle.Solid,
+          axisLabelVisible: true,
+          title: `${position.side.toUpperCase()} ${position.quantity} oz  ${fmt(live)}`,
+        }),
+      ];
+      if (position.stopLoss) lines.push(candles.createPriceLine({
+        price: position.stopLoss, color: CHART_COLORS.down, lineWidth: 1, lineStyle: LineStyle.Dashed, axisLabelVisible: true,
+        title: `SL ${fmt((position.stopLoss - position.entryPrice) * dir * position.quantity)}`,
+      }));
+      if (position.takeProfit) lines.push(candles.createPriceLine({
+        price: position.takeProfit, color: CHART_COLORS.up, lineWidth: 1, lineStyle: LineStyle.Dashed, axisLabelVisible: true,
+        title: `TP ${fmt((position.takeProfit - position.entryPrice) * dir * position.quantity)}`,
+      }));
+      return lines;
+    });
     dirtyRef.current += 1;
-  }, [props.demoPositions]);
+  }, [props.demoPositions, props.demoPrice]);
 
   useEffect(() => {
     // Timeframe switch: show the most recent ~150 bars.

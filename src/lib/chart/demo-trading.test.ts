@@ -26,7 +26,7 @@ const sell: DemoPosition = {
 
 describe("demo trading", () => {
   it("starts with a virtual $100,000 balance", () => {
-    expect(createDemoAccount()).toEqual({ balance: 100000, realizedPnl: 0, positions: [] });
+    expect(createDemoAccount()).toEqual({ balance: 100000, realizedPnl: 0, positions: [], history: [] });
   });
 
   it("calculates long and short profit from the current price", () => {
