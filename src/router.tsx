@@ -24,7 +24,7 @@ export const getRouter = () => {
     defaultPreloadStaleTime: 0,
     defaultPendingMs: 200,
     defaultPendingMinMs: 100,
-    defaultPendingComponent: RouteSpinner,
+    defaultPendingComponent: () => null,
     // Clean URLs on the apex domain: /alerts, /billing, /admin/*, etc.
     // The internal route tree still lives at /dashboard/* for the dashboard section.
     rewrite: {
