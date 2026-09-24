@@ -172,7 +172,7 @@ export function DemoTradingPanel({
       <PopoverTrigger asChild>
         <Button type="button" variant="ghost" size="sm" className="h-7 shrink-0 px-2 text-xs">
           <BarChart3 className="h-3.5 w-3.5" />
-          Demo
+          Open Trade
           {account.positions.length > 0 && (
             <span className="rounded bg-secondary px-1 font-mono text-[10px]">{account.positions.length}</span>
           )}
