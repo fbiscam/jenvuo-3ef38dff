@@ -1,7 +1,6 @@
 import { QueryClient } from "@tanstack/react-query";
 import { createRouter } from "@tanstack/react-router";
 import { routeTree } from "./routeTree.gen";
-import { RouteSpinner } from "./components/RouteSpinner";
 import { rewriteInput, rewriteOutput } from "./lib/url-rewrite";
 
 export const getRouter = () => {
