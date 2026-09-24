@@ -109,7 +109,7 @@ const SPECS: Record<IndicatorId, IndicatorSpec> = {
   vwap: {
     id: "vwap",
     name: "VWAP",
-    description: "Volume-weighted average price, resets each UTC day",
+    description: "Volume-weighted average price,",
     pane: "main",
     lines: [{ title: "VWAP", color: "#e040fb", kind: "line", width: 2 }],
     compute: (bars) => [vwap(bars)],
