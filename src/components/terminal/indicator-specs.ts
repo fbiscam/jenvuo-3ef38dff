@@ -150,7 +150,7 @@ const SPECS: Record<IndicatorId, IndicatorSpec> = {
   sr: {
     id: "sr",
     name: "Support & Resistance",
-    description: "Latest confirmed 10-bar swing high (resistance) and swing low (support)",
+    description: "Nearest active confirmed 10-bar swing resistance and support",
     pane: "main",
     lines: [
       { title: "Resistance", color: "#f23645", kind: "line", width: 2, dashed: true },
@@ -160,8 +160,8 @@ const SPECS: Record<IndicatorId, IndicatorSpec> = {
       const r = 10;
       const res = new Array<number>(bars.length).fill(NaN);
       const sup = new Array<number>(bars.length).fill(NaN);
-      let curR = NaN;
-      let curS = NaN;
+      const activeHighs: number[] = [];
+      const activeLows: number[] = [];
       for (let i = 0; i < bars.length; i++) {
         const p = i - r; // pivot confirmed once r bars closed after it
         if (p >= r) {
@@ -172,11 +172,23 @@ const SPECS: Record<IndicatorId, IndicatorSpec> = {
             if (bars[j].high >= bars[p].high) isHigh = false;
             if (bars[j].low <= bars[p].low) isLow = false;
           }
-          if (isHigh) curR = bars[p].high;
-          if (isLow) curS = bars[p].low;
+          if (isHigh) activeHighs.push(bars[p].high);
+          if (isLow) activeLows.push(bars[p].low);
         }
-        res[i] = curR;
-        sup[i] = curS;
+
+        // A candle close through a level consumes it. Do not resurrect broken
+        // levels if price later returns; only a newly confirmed pivot can add one.
+        for (let j = activeHighs.length - 1; j >= 0; j--) {
+          if (bars[i].close > activeHighs[j]) activeHighs.splice(j, 1);
+        }
+        for (let j = activeLows.length - 1; j >= 0; j--) {
+          if (bars[i].close < activeLows[j]) activeLows.splice(j, 1);
+        }
+
+        const resistance = activeHighs.filter((level) => level >= bars[i].close).sort((a, b) => a - b)[0];
+        const support = activeLows.filter((level) => level <= bars[i].close).sort((a, b) => b - a)[0];
+        res[i] = resistance ?? NaN;
+        sup[i] = support ?? NaN;
       }
       return [res, sup];
     },
