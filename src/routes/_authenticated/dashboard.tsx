@@ -224,7 +224,7 @@ function RecentChats({ collapsed, onPick }: { collapsed: boolean; onPick: () => 
   if (collapsed || threads.length === 0) return null;
   return (
     <div className="mt-5">
-      <div className="mb-1.5 px-2.5 text-[12px] text-[#6B6C6B]">Recent</div>
+      <div className="mb-1.5 px-2.5 text-[12px] text-[#6B6C6B]">Recents</div>
       <div className="flex flex-col gap-0.5">
         {threads.slice(0, 15).map((t) => (
           <div key={t.id} className="group flex items-center rounded-full pr-1 hover:bg-zinc-100">
