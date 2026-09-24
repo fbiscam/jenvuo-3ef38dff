@@ -32,10 +32,12 @@ import type { ScriptResult } from "@/lib/chart/jenvu-script";
 import { buildIndicatorSeries, type IndicatorId } from "./indicator-specs";
 
 export const CHART_COLORS = {
-  light: { bg: "#ffffff", text: "#131722", grid: "#f0f3fa", border: "#e0e3eb" },
-  dark: { bg: "#0b0f17", text: "#cbd5e1", grid: "#1e293b", border: "#334155" },
-  up: "#22c7a7",
-  down: "#ff5b6e",
+  bg: "#ffffff",
+  text: "#131722",
+  grid: "#f0f3fa",
+  border: "#e0e3eb",
+  up: "#089981",
+  down: "#f23645",
 };
 
 export type ChartCanvasHandle = {
@@ -45,7 +47,6 @@ export type ChartCanvasHandle = {
 };
 
 type Props = {
-  dark: boolean;
   bars: OhlcvBar[];
   stepSeconds: number;
   indicators: IndicatorId[];
@@ -168,28 +169,23 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
   useEffect(() => {
     const host = hostRef.current;
     if (!host) return;
-    const palette = props.dark ? CHART_COLORS.dark : CHART_COLORS.light;
     const chart = createChart(host, {
       autoSize: true,
       layout: {
-        background: { type: ColorType.Solid, color: palette.bg },
-        textColor: palette.text,
+        background: { type: ColorType.Solid, color: CHART_COLORS.bg },
+        textColor: CHART_COLORS.text,
         fontFamily: "'DM Sans', system-ui, sans-serif",
         fontSize: 11,
-        panes: { separatorColor: palette.border, enableResize: true },
+        panes: { separatorColor: CHART_COLORS.border, enableResize: true },
       },
       grid: {
-        vertLines: { color: palette.grid },
-        horzLines: { color: palette.grid },
+        vertLines: { color: CHART_COLORS.grid },
+        horzLines: { color: CHART_COLORS.grid },
       },
-      crosshair: {
-        mode: CrosshairMode.Normal,
-        vertLine: { color: palette.border, labelBackgroundColor: palette.border },
-        horzLine: { color: palette.border, labelBackgroundColor: palette.border },
-      },
-      rightPriceScale: { borderColor: palette.border },
+      crosshair: { mode: CrosshairMode.Normal },
+      rightPriceScale: { borderColor: CHART_COLORS.border },
       timeScale: {
-        borderColor: palette.border,
+        borderColor: CHART_COLORS.border,
         timeVisible: true,
         secondsVisible: false,
         rightOffset: 8,
@@ -244,31 +240,6 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  useEffect(() => {
-    const chart = chartRef.current;
-    if (!chart) return;
-    const palette = props.dark ? CHART_COLORS.dark : CHART_COLORS.light;
-    chart.applyOptions({
-      layout: {
-        background: { type: ColorType.Solid, color: palette.bg },
-        textColor: palette.text,
-        panes: { separatorColor: palette.border, enableResize: true },
-      },
-      grid: {
-        vertLines: { color: palette.grid },
-        horzLines: { color: palette.grid },
-      },
-      crosshair: {
-        mode: CrosshairMode.Normal,
-        vertLine: { color: palette.border, labelBackgroundColor: palette.border },
-        horzLine: { color: palette.border, labelBackgroundColor: palette.border },
-      },
-      rightPriceScale: { borderColor: palette.border },
-      timeScale: { borderColor: palette.border },
-    });
-    dirtyRef.current += 1;
-  }, [props.dark]);
 
   const visibleDrawings = () => {
     const p = propsRef.current;
@@ -566,11 +537,11 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
       ctx.clip();
       const p = propsRef.current;
       const pr = projector();
-      if (p.smc) renderSmcOverlay(ctx, p.smc, p.smcToggles, pr, p.dark);
+      if (p.smc) renderSmcOverlay(ctx, p.smc, p.smcToggles, pr);
       const list = visibleDrawings();
       for (const d of list)
-        renderDrawing(ctx, d, pr, { selected: d.id === p.selectedId, hovered: d.id === hoverRef.current, dark: p.dark });
-      if (pendingRef.current) renderDrawing(ctx, pendingRef.current, pr, { selected: true, dark: p.dark });
+        renderDrawing(ctx, d, pr, { selected: d.id === p.selectedId, hovered: d.id === hoverRef.current });
+      if (pendingRef.current) renderDrawing(ctx, pendingRef.current, pr, { selected: true });
       ctx.restore();
     };
     raf = requestAnimationFrame(loop);
@@ -762,9 +733,9 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
       const ctx = out.getContext("2d");
       if (!ctx) return null;
       ctx.scale(scale, scale);
-      ctx.fillStyle = propsRef.current.dark ? CHART_COLORS.dark.bg : CHART_COLORS.light.bg;
+      ctx.fillStyle = "#ffffff";
       ctx.fillRect(0, 0, shot.width, shot.height + headerH);
-      ctx.fillStyle = propsRef.current.dark ? CHART_COLORS.dark.text : CHART_COLORS.light.text;
+      ctx.fillStyle = "#131722";
       ctx.font = `600 ${Math.round(headerH * 0.5)}px 'DM Sans', sans-serif`;
       ctx.fillText(header, Math.round(headerH * 0.4), Math.round(headerH * 0.68));
       ctx.drawImage(shot, 0, headerH);

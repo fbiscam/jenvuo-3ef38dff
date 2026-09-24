@@ -195,7 +195,6 @@ export function renderSmcOverlay(
   smc: SmcOverlay,
   toggles: SmcToggles,
   pr: SmcProjector,
-  dark = false,
 ) {
   ctx.save();
   ctx.font = "600 10px 'JetBrains Mono', ui-monospace, monospace";
@@ -218,13 +217,13 @@ export function renderSmcOverlay(
     for (const g of smc.fvgs) {
       const bull = g.type === "BULLISH_FVG";
       // Bearish gap sits above → line on top edge; bullish below → bottom edge.
-      dottedLine(g.t, bull ? g.bottom : g.top, dark ? "rgb(74,222,128)" : "rgb(22,163,74)");
+      dottedLine(g.t, bull ? g.bottom : g.top, "rgb(34,197,94)");
     }
   }
   if (toggles.orderBlocks) {
     for (const ob of smc.orderBlocks) {
       const supply = ob.type === "SUPPLY";
-      dottedLine(ob.t, supply ? ob.top : ob.bottom, dark ? "rgb(250,204,21)" : "rgb(202,138,4)");
+      dottedLine(ob.t, supply ? ob.top : ob.bottom, "rgb(234,179,8)");
     }
   }
   if (toggles.liquidity) {
@@ -240,8 +239,8 @@ export function renderSmcOverlay(
       ctx.fillStyle = color;
       ctx.fillText(`${label} ${price.toFixed(2)}`, pr.width * 0.55 + 4, y - 3);
     };
-    smc.buySide.slice(0, 2).forEach((p) => liq(p, "BSL", dark ? "#2dd4bf" : "#089981"));
-    smc.sellSide.slice(0, 2).forEach((p) => liq(p, "SSL", dark ? "#fb7185" : "#f23645"));
+    smc.buySide.slice(0, 2).forEach((p) => liq(p, "BSL", "#089981"));
+    smc.sellSide.slice(0, 2).forEach((p) => liq(p, "SSL", "#f23645"));
     ctx.setLineDash([]);
   }
   if (toggles.breaks) {
@@ -250,7 +249,7 @@ export function renderSmcOverlay(
       const x1 = pr.x(b.t / 1000);
       const y = pr.y(b.level);
       if (x0 == null || x1 == null || y == null) continue;
-      const color = b.dir === "bullish" ? (dark ? "#2dd4bf" : "#089981") : (dark ? "#fb7185" : "#f23645");
+      const color = b.dir === "bullish" ? "#089981" : "#f23645";
       ctx.strokeStyle = color;
       ctx.setLineDash([3, 3]);
       ctx.beginPath();
@@ -270,7 +269,7 @@ export function renderSmcOverlay(
       const y = pr.y(p.price);
       if (x == null || y == null) continue;
       const up = p.kind === "high";
-      const color = p.label === "HH" || p.label === "HL" ? (dark ? "#14b8a6" : "#089981") : (dark ? "#f43f5e" : "#f23645");
+      const color = p.label === "HH" || p.label === "HL" ? "#089981" : "#f23645";
       const w = ctx.measureText(p.label).width + 8;
       const yy = up ? y - 20 : y + 6;
       ctx.fillStyle = color;
@@ -287,11 +286,11 @@ export function renderSmcOverlay(
       const y = pr.y(p.price);
       if (x == null || y == null) continue;
       const up = p.kind === "high";
-      const color = p.label === "HH" || p.label === "HL" || p.label === "L" ? (dark ? "#2dd4bf" : "#089981") : (dark ? "#fb7185" : "#f23645");
+      const color = p.label === "HH" || p.label === "HL" || p.label === "L" ? "#089981" : "#f23645";
       const text = p.label;
       const w = ctx.measureText(text).width + 8;
       const yy = up ? y - 20 : y + 6;
-      ctx.fillStyle = dark ? "rgba(11,15,23,0.94)" : "rgba(255,255,255,0.92)";
+      ctx.fillStyle = "rgba(255,255,255,0.92)";
       ctx.beginPath();
       ctx.roundRect?.(x - w / 2, yy, w, 14, 3);
       if (!ctx.roundRect) ctx.rect(x - w / 2, yy, w, 14);
