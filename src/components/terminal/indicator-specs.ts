@@ -150,7 +150,7 @@ const SPECS: Record<IndicatorId, IndicatorSpec> = {
   sr: {
     id: "sr",
     name: "Support & Resistance",
-    description: "Nearest active confirmed 10-bar swing resistance and support",
+    description: "0-bar swing resistance and support",
     pane: "main",
     lines: [
       { title: "Resistance", color: "#f23645", kind: "line", width: 2, dashed: true },
