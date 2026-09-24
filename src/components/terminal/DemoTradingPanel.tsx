@@ -157,7 +157,7 @@ export function DemoTradingPanel({
           <div className="mt-3 grid grid-cols-3 gap-3">
             <div><p className="text-[10px] uppercase text-muted-foreground">Balance</p><p className="font-mono text-xs font-semibold">{money.format(account.balance)}</p></div>
             <div><p className="text-[10px] uppercase text-muted-foreground">Equity</p><p className="font-mono text-xs font-semibold">{money.format(metrics.equity)}</p></div>
-            <div><p className="text-[10px] uppercase text-muted-foreground">Open P&amp;L</p><p className={cn("font-mono text-xs font-semibold", metrics.unrealizedPnl > 0 && "text-emerald-600", metrics.unrealizedPnl < 0 && "text-destructive")}>{money.format(metrics.unrealizedPnl)}</p></div>
+            <div><p className="text-[10px] uppercase text-muted-foreground">Open P&amp;L</p><p className={cn("font-mono text-xs font-semibold", metrics.unrealizedPnl > 0 && "text-chart-2", metrics.unrealizedPnl < 0 && "text-destructive")}>{money.format(metrics.unrealizedPnl)}</p></div>
           </div>
         </div>
 
@@ -204,7 +204,7 @@ export function DemoTradingPanel({
                     <p className="font-mono text-[10px] text-muted-foreground">{position.entryPrice.toFixed(2)} → {currentPrice?.toFixed(2) ?? "—"}</p>
                   </div>
                   <div className="flex items-center gap-1.5">
-                    <span className={cn("font-mono text-xs font-semibold", pnl > 0 && "text-emerald-600", pnl < 0 && "text-destructive")}>{money.format(pnl)}</span>
+                    <span className={cn("font-mono text-xs font-semibold", pnl > 0 && "text-chart-2", pnl < 0 && "text-destructive")}>{money.format(pnl)}</span>
                     <Button type="button" variant="ghost" size="icon-sm" className="h-7 w-7" onClick={() => closePosition(position.id)} title="Close position"><X className="h-3.5 w-3.5" /><span className="sr-only">Close position</span></Button>
                   </div>
                 </div>
