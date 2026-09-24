@@ -32,10 +32,10 @@ import type { ScriptResult } from "@/lib/chart/jenvu-script";
 import { buildIndicatorSeries, type IndicatorId } from "./indicator-specs";
 
 export const CHART_COLORS = {
-  bg: "#ffffff",
-  text: "#131722",
-  grid: "#f0f3fa",
-  border: "#e0e3eb",
+  bg: "#131722",
+  text: "#d1d4dc",
+  grid: "#1f2430",
+  border: "#2a2e39",
   up: "#089981",
   down: "#f23645",
   insideBar: "#38bdf8",
