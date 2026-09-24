@@ -29,6 +29,7 @@ import { renderSmcOverlay, type SmcOverlay, type SmcToggles } from "@/lib/chart/
 import type { OhlcvBar } from "@/lib/chart/indicators";
 import type { CandleProjection } from "@/lib/chart/projection";
 import type { ScriptResult } from "@/lib/chart/jenvu-script";
+import type { DemoPosition } from "@/lib/chart/demo-trading";
 import { buildIndicatorSeries, type IndicatorId } from "./indicator-specs";
 
 export const CHART_COLORS = {
@@ -59,6 +60,7 @@ type Props = {
   smc: SmcOverlay | null;
   smcToggles: SmcToggles;
   projection: CandleProjection | null;
+  demoPositions: DemoPosition[];
   drawings: Drawing[];
   drawingsVisible: boolean;
   tool: DrawingTool;
@@ -85,6 +87,7 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
   const ghostMarkersRef = useRef<ISeriesMarkersPluginApi<Time> | null>(null);
   const extraSeriesRef = useRef<ISeriesApi<"Line" | "Histogram">[]>([]);
   const candlePriceLinesRef = useRef<IPriceLine[]>([]);
+  const demoPriceLinesRef = useRef<IPriceLine[]>([]);
   const propsRef = useRef(props);
   propsRef.current = props;
   const pendingRef = useRef<Drawing | null>(null);
@@ -241,6 +244,7 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
       ghostRef.current = null;
       ghostMarkersRef.current = null;
       extraSeriesRef.current = [];
+      demoPriceLinesRef.current = [];
       lastBarsRef.current = null;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -318,6 +322,23 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
     );
     ghostMarkersRef.current?.setMarkers([]);
   }, [props.projection]);
+
+  useEffect(() => {
+    const candles = candleRef.current;
+    if (!candles) return;
+    demoPriceLinesRef.current.forEach((line) => candles.removePriceLine(line));
+    demoPriceLinesRef.current = props.demoPositions.map((position) =>
+      candles.createPriceLine({
+        price: position.entryPrice,
+        color: position.side === "buy" ? CHART_COLORS.up : CHART_COLORS.down,
+        lineWidth: 1,
+        lineStyle: LineStyle.Dashed,
+        axisLabelVisible: true,
+        title: `${position.side.toUpperCase()} ${position.quantity} oz`,
+      }),
+    );
+    dirtyRef.current += 1;
+  }, [props.demoPositions]);
 
   useEffect(() => {
     // Timeframe switch: show the most recent ~150 bars.
