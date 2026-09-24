@@ -165,3 +165,4 @@
 - [ ] Replace three public automation keys with the private scheduler secret (blocked: managed secret access denied during schedule migration)
 - [x] Audit all pages, APIs, Google Search Console visibility, and the complete Terminal flow
 - [x] Restore the Founding confirmation popup as a proper embedded form block matching its original layout
+- [x] Show only the strongest untouched demand, supply, and directional FVG zones without same-side overlap
