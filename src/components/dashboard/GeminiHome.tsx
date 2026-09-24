@@ -5,7 +5,7 @@ import { ArrowUp, CornerDownRight, Plus, Search, X } from "lucide-react";
 import { analyzeGold } from "@/lib/gold-analysis.functions";
 
 export type HomeMessage = { role: "user" | "assistant"; text: string };
-export type HomeThread = { id: string; title: string; updatedAt: number; messages: HomeMessage[] };
+export type HomeThread = { id: string; title: string; updatedAt: number; messages: HomeMessage[]; pinned?: boolean };
 
 export const HOME_THREADS_KEY = "jenvu:home:threads:v1";
 export const HOME_ACTIVE_KEY = "jenvu:home:active:v1";
@@ -21,7 +21,7 @@ export function readHomeThreads(): HomeThread[] {
   }
 }
 
-function writeHomeThreads(threads: HomeThread[]) {
+export function writeHomeThreads(threads: HomeThread[]) {
   localStorage.setItem(HOME_THREADS_KEY, JSON.stringify(threads.slice(0, 50)));
   window.dispatchEvent(new Event(HOME_EVENT));
 }
