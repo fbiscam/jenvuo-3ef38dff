@@ -1082,3 +1082,11 @@ html:not(.ms-icons-ready) .material-symbols-rounded {
 }
 .jenvu-zoom-dashboard main .bg-zinc-900 *,
 .jenvu-zoom-dashboard main .bg-black * { color: inherit; }
+.jenvu-zoom-dashboard > div:not(.dashboard-sidebar-root),
+.jenvu-zoom-dashboard > div:not(.dashboard-sidebar-root) > .bg-white:not(main *) { background-color: transparent !important; }
+.jenvu-zoom-dashboard {
+  background:
+    radial-gradient(45% 50% at 60% 38%, #cfe6ff 0%, #e4f0ff 40%, transparent 72%),
+    #ffffff !important;
+  background-attachment: fixed !important;
+}
