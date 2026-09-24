@@ -145,10 +145,10 @@
   --brand-gemini: oklch(0.62 0.23 285);
   --brand-deepseek: oklch(0.59 0.22 271);
   --brand-claude: oklch(0.7 0.12 55);
-  --home-accent: #1a73e8;
+  --home-accent: #fd540f;
   --home-accent-foreground: #ffffff;
-  --home-accent-soft: oklch(0.95 0.02 240);
-  --home-accent-canvas: rgb(237 244 255);
+  --home-accent-soft: oklch(0.95 0.035 55);
+  --home-accent-canvas: oklch(0.98 0.015 55);
   --dashboard-canvas: #fafafa;
   --auth-action: oklch(0.72 0.14 255);
   --auth-action-foreground: oklch(1 0 0);
