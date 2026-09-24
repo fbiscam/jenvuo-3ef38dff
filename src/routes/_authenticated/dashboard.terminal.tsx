@@ -604,9 +604,6 @@ function TerminalPage() {
                     <h2 className="truncate text-sm font-semibold">Jenvu</h2>
                     <img src={jenvuTick} alt="Verified" className="size-3.5 shrink-0" />
                   </div>
-                  <p className="truncate text-[11px] text-muted-foreground">
-                    Gold {tf.label} analysis ready
-                  </p>
                 </div>
                 <Button
                   type="button"
