@@ -264,17 +264,18 @@ export function renderSmcOverlay(
       // Solid accent bar at origin candle
       ctx.fillStyle = `rgba(${rgb},0.95)`;
       ctx.fillRect(x, top, 3, h);
-      // Label pill
+      // Label pill centred inside the block
       const label = `${demand ? "Demand OB" : "Supply OB"}${z.status === "PARTIAL" ? " · partial" : ""}`;
       const tw = ctx.measureText(label).width + 12;
-      const ly = demand ? top + h + 3 : top - 17;
+      const lx = x + Math.max(6, (w - tw) / 2);
+      const ly = top + h / 2 - 7;
       ctx.beginPath();
-      ctx.roundRect?.(x + 6, ly, tw, 14, 7);
-      if (!ctx.roundRect) ctx.rect(x + 6, ly, tw, 14);
+      ctx.roundRect?.(lx, ly, tw, 14, 7);
+      if (!ctx.roundRect) ctx.rect(lx, ly, tw, 14);
       ctx.fillStyle = `rgba(${rgb},0.95)`;
       ctx.fill();
       ctx.fillStyle = "#ffffff";
-      ctx.fillText(label, x + 12, ly + 10.5);
+      ctx.fillText(label, lx + 6, ly + 10.5);
     }
   }
   if (toggles.liquidity) {
