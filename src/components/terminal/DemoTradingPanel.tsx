@@ -297,13 +297,7 @@ export function OrderTicket({ side, onSideChange, onClose, price, trading, onPla
           <span className="block text-sm font-semibold">{side === "buy" ? "Buy" : "Sell"}</span>
           <span className="block text-[11px] font-medium opacity-90">{qty} XAUUSD {type.toUpperCase()}{type !== "market" && limitPrice ? ` @ ${limitPrice}` : ""}</span>
         </button>
-        <div className="mt-2 flex items-center justify-center gap-2 text-[11px] text-muted-foreground">
-          <ArrowLeftRight className="h-3.5 w-3.5" aria-hidden />
-          <span>Live trades: {trading.account.positions.length}</span>
-          <span className="font-medium" style={{ color: pnlColor(trading.metrics.unrealizedPnl) }}>
-            {trading.account.positions.length ? `${signed(trading.metrics.unrealizedPnl)} USD` : "—"}
-          </span>
-        </div>
+        <p className="mt-2 text-center text-[10px] text-muted-foreground">{"\n"}</p>
       </div>
     </div>
   );
