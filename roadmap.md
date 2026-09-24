@@ -167,4 +167,4 @@
 - [x] Restore the Founding confirmation popup as a proper embedded form block matching its original layout
 - [x] Show only the strongest untouched demand, supply, and directional FVG zones without same-side overlap
 - [x] Upgrade Terminal AI to a veteran, SMC-first mindset with explicit conditional trade plans and no fabricated win-rate claims
-- [ ] Add TradingView-style persistent demo trading to the Terminal and verify the full position lifecycle
+- [x] Add TradingView-style persistent demo trading to the Terminal and verify the full position lifecycle

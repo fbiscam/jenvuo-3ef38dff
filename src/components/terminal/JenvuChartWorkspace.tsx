@@ -52,6 +52,8 @@ import { ChartCanvas, type ChartCanvasHandle } from "./ChartCanvas";
 import { INDICATOR_LIST, buildIndicatorSeries, isIndicatorId, type IndicatorId } from "./indicator-specs";
 import { ScriptPanel, type SavedScript } from "./ScriptPanel";
 import { buildChartContext } from "./chart-context";
+import { DemoTradingPanel } from "./DemoTradingPanel";
+import type { DemoPosition } from "@/lib/chart/demo-trading";
 
 const MemoChart = memo(ChartCanvas);
 
@@ -206,6 +208,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [hoverIndex, setHoverIndex] = useState<number | null>(null);
   const [fullscreen, setFullscreen] = useState(false);
+  const [demoPositions, setDemoPositions] = useState<DemoPosition[]>([]);
 
   useEffect(() => {
     const syncFullscreen = () => setFullscreen(document.fullscreenElement === workspaceRef.current);
@@ -281,6 +284,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
   const payload = chartQuery.data;
   const bars: OhlcvBar[] = useMemo(() => payload?.bars ?? [], [payload]);
   const stepSeconds = payload?.stepSeconds ?? 1800;
+  const currentPrice = bars.at(-1)?.close ?? null;
 
   // Use the SERVER clock to decide which candles are closed. A device clock that
   // is a few minutes off would otherwise include/exclude a candle and shift the
@@ -547,6 +551,8 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
           <TooltipContent>{fullscreen ? "Exit fullscreen" : "Fullscreen chart"}</TooltipContent>
         </Tooltip>
 
+        <DemoTradingPanel currentPrice={currentPrice} onPositionsChange={setDemoPositions} />
+
         <div className="ml-auto flex shrink-0 items-center gap-2">{rightSlot}</div>
       </div>
 
@@ -640,6 +646,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
               smc={smc}
               smcToggles={smcToggles}
               projection={projection}
+              demoPositions={demoPositions}
               drawings={drawings}
               drawingsVisible={drawingsVisible}
               tool={tool}
