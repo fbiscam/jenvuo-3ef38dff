@@ -19,7 +19,8 @@ export type IndicatorId =
   | "vwap"
   | "rsi"
   | "macd"
-  | "atr";
+  | "atr"
+  | "sr";
 
 export type IndicatorLine = {
   title: string;
@@ -144,6 +145,40 @@ const SPECS: Record<IndicatorId, IndicatorSpec> = {
     compute: (bars) => {
       const m = macd(closes(bars));
       return [m.hist, m.macd, m.signal];
+    },
+  },
+  sr: {
+    id: "sr",
+    name: "Support & Resistance",
+    description: "Latest confirmed 10-bar swing high (resistance) and swing low (support)",
+    pane: "main",
+    lines: [
+      { title: "Resistance", color: "#f23645", kind: "line", width: 2, dashed: true },
+      { title: "Support", color: "#089981", kind: "line", width: 2, dashed: true },
+    ],
+    compute: (bars) => {
+      const r = 10;
+      const res = new Array<number>(bars.length).fill(NaN);
+      const sup = new Array<number>(bars.length).fill(NaN);
+      let curR = NaN;
+      let curS = NaN;
+      for (let i = 0; i < bars.length; i++) {
+        const p = i - r; // pivot confirmed once r bars closed after it
+        if (p >= r) {
+          let isHigh = true;
+          let isLow = true;
+          for (let j = p - r; j <= p + r; j++) {
+            if (j === p) continue;
+            if (bars[j].high >= bars[p].high) isHigh = false;
+            if (bars[j].low <= bars[p].low) isLow = false;
+          }
+          if (isHigh) curR = bars[p].high;
+          if (isLow) curS = bars[p].low;
+        }
+        res[i] = curR;
+        sup[i] = curS;
+      }
+      return [res, sup];
     },
   },
   atr: {
