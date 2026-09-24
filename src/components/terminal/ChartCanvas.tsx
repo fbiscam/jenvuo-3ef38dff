@@ -40,6 +40,7 @@ export const CHART_COLORS = {
   down: "#f23645",
   insideBar: "#38bdf8",
   insideBarCandle: "#000000",
+  motherCandle: "#eab308",
 };
 
 const isInsideBarMarker = (title: string, text: string) =>
@@ -266,10 +267,14 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
     if (!candles) return;
     const { bars } = props;
     const insideBarIndexes = new Set<number>();
+    const motherIndexes = new Set<number>();
     for (const script of props.scripts) {
       for (const shape of script.result.shapes) {
         if (!isInsideBarMarker(shape.title, shape.text)) continue;
-        for (const index of shape.bars) insideBarIndexes.add(index);
+        for (const index of shape.bars) {
+          insideBarIndexes.add(index);
+          if (index > 0) motherIndexes.add(index - 1);
+        }
       }
     }
     const data = bars.map((b, index) => {
@@ -280,13 +285,13 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
         low: b.low,
         close: b.close,
       };
-      if (!insideBarIndexes.has(index)) return base;
-      return {
-        ...base,
-        color: CHART_COLORS.insideBarCandle,
-        borderColor: CHART_COLORS.insideBarCandle,
-        wickColor: CHART_COLORS.insideBarCandle,
-      };
+      const color = insideBarIndexes.has(index)
+        ? CHART_COLORS.insideBarCandle
+        : motherIndexes.has(index)
+          ? CHART_COLORS.motherCandle
+          : null;
+      if (!color) return base;
+      return { ...base, color, borderColor: color, wickColor: color };
     });
     const prev = lastBarsRef.current;
     const first = bars[0]?.time ?? 0;
@@ -575,28 +580,6 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
       ctx.save();
       ctx.font = "600 10px 'DM Sans', system-ui, sans-serif";
       ctx.textAlign = "center";
-      for (const script of p.scripts) {
-        for (const shape of script.result.shapes) {
-          if (!isInsideBarMarker(shape.title, shape.text)) continue;
-          for (const i of shape.bars.slice(-300)) {
-            const bar = p.bars[i];
-            if (!bar) continue;
-            const x = pr.x(bar.time);
-            const anchor = shape.location === "above" ? bar.high : bar.low;
-            const y = pr.y(anchor);
-            if (x == null || y == null) continue;
-            const above = shape.location === "above";
-            const dotY = above ? y - 10 : y + 10;
-            const textY = above ? dotY - 8 : dotY + 15;
-            ctx.fillStyle = CHART_COLORS.insideBar;
-            ctx.beginPath();
-            ctx.arc(x, dotY, 3.5, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.fillStyle = CHART_COLORS.text;
-            ctx.fillText("IB", x, textY);
-          }
-        }
-      }
       ctx.restore();
       const list = visibleDrawings();
       for (const d of list)
