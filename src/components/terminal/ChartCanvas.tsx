@@ -39,6 +39,7 @@ export const CHART_COLORS = {
   up: "#089981",
   down: "#f23645",
   insideBar: "#38bdf8",
+  insideBarCandle: "#000000",
 };
 
 const isInsideBarMarker = (title: string, text: string) =>
@@ -252,17 +253,41 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
   };
 
   // ------------------------------------------------------------- candle data
+  const insideBarKey = props.scripts
+    .flatMap((script) =>
+      script.result.shapes
+        .filter((shape) => isInsideBarMarker(shape.title, shape.text))
+        .flatMap((shape) => shape.bars),
+    )
+    .join(",");
+
   useEffect(() => {
     const candles = candleRef.current;
     if (!candles) return;
     const { bars } = props;
-    const data = bars.map((b) => ({
-      time: b.time as UTCTimestamp,
-      open: b.open,
-      high: b.high,
-      low: b.low,
-      close: b.close,
-    }));
+    const insideBarIndexes = new Set<number>();
+    for (const script of props.scripts) {
+      for (const shape of script.result.shapes) {
+        if (!isInsideBarMarker(shape.title, shape.text)) continue;
+        for (const index of shape.bars) insideBarIndexes.add(index);
+      }
+    }
+    const data = bars.map((b, index) => {
+      const base = {
+        time: b.time as UTCTimestamp,
+        open: b.open,
+        high: b.high,
+        low: b.low,
+        close: b.close,
+      };
+      if (!insideBarIndexes.has(index)) return base;
+      return {
+        ...base,
+        color: CHART_COLORS.insideBarCandle,
+        borderColor: CHART_COLORS.insideBarCandle,
+        wickColor: CHART_COLORS.insideBarCandle,
+      };
+    });
     const prev = lastBarsRef.current;
     const first = bars[0]?.time ?? 0;
     if (prev && prev.first === first && bars.length >= prev.len && bars.length - prev.len <= 2 && prev.len > 0) {
@@ -272,7 +297,7 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
     }
     lastBarsRef.current = { first, len: bars.length };
     dirtyRef.current += 1;
-  }, [props.bars]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [props.bars, insideBarKey]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ------------------------------------------------- scenario ghost candles
   useEffect(() => {
