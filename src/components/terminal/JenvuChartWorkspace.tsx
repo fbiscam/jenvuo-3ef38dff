@@ -647,6 +647,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
               smcToggles={smcToggles}
               projection={projection}
               demoPositions={demoPositions}
+              demoPrice={demoPositions.length ? currentPrice : null}
               drawings={drawings}
               drawingsVisible={drawingsVisible}
               tool={tool}
