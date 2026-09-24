@@ -1,5 +1,6 @@
-import { describe, expect, test } from "bun:test";
+import { describe, it } from "node:test";
 import type { OhlcvBar } from "@/lib/chart/indicators";
+import { expect } from "../../lib/chart/test-expect";
 import { buildIndicatorSeries } from "./indicator-specs";
 
 const bar = (index: number, high: number, low: number, close = 100): OhlcvBar => ({
@@ -12,7 +13,7 @@ const bar = (index: number, high: number, low: number, close = 100): OhlcvBar =>
 });
 
 describe("Support & Resistance", () => {
-  test("uses confirmed 10-bar pivots and removes levels after a close-through", () => {
+  it("uses confirmed 10-bar pivots and removes levels after a close-through", () => {
     const bars = Array.from({ length: 35 }, (_, i) => bar(i, 105, 95));
     bars[10] = bar(10, 120, 94);
     bars[12] = bar(12, 106, 80);
