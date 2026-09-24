@@ -1093,17 +1093,18 @@ async function fetchGoldCandles(tf: string): Promise<Candle[]> {
 // OANDA:XAUUSD embed. Never fall through to GC futures or tokenized Gold here:
 // their premium/discount can make otherwise valid pivots look incorrect.
 async function fetchTerminalGoldEvidenceCandles(tf: string): Promise<Candle[]> {
-  try {
-    return await fetchFromYahooSymbols(["XAUUSD=X"], tf);
-  } catch {
-    // Yahoo currently delists/rejects its anonymous spot-Gold chart endpoint.
-    // Use exchange-traded, fully real PAXG candles rather than synthetic bars;
-    // normalize them to the live XAU/USD tick so levels remain on the terminal's
-    // OANDA spot scale while preserving the real candle structure and volume.
-    // Same provider priority + same scale as the chart, so the AI and every
-    // account read identical candles.
-    return scaleProxyToSpot((await fetchGoldProxyDeep(tf, 200)).slice(-200));
-  }
+  // Reuse the exact chart loader: same provider priority, same spot scale,
+  // real 45m aggregation from 15m bars, and last-good-chart fallback when
+  // every feed fails at once.
+  const payload = await loadTerminalChart(tf);
+  return payload.bars.slice(-200).map((b) => ({
+    t: b.time * 1000,
+    o: b.open,
+    h: b.high,
+    l: b.low,
+    c: b.close,
+    v: b.volume,
+  })) as Candle[];
 }
 
 /**
