@@ -40,6 +40,13 @@ export const CHART_COLORS = {
   down: "#f23645",
 };
 
+export const CHART_DARK_COLORS = {
+  bg: "#0f1115",
+  text: "#c9ced8",
+  grid: "#1a1e26",
+  border: "#262b35",
+};
+
 export type ChartCanvasHandle = {
   snapshot: (header: string) => string | null;
   visibleWindow: () => { from: number; to: number; lo: number; hi: number } | null;
@@ -65,6 +72,7 @@ type Props = {
   onToolDone: () => void;
   onHoverBar: (index: number | null) => void;
   resetKey: string;
+  dark?: boolean;
 };
 
 const uid = () => `d-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`;
@@ -718,6 +726,19 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
   }, []);
 
   // ------------------------------------------------------------- handle
+  // Apply light/dark palette without rebuilding the chart.
+  useEffect(() => {
+    const chart = chartRef.current;
+    if (!chart) return;
+    const c = props.dark ? CHART_DARK_COLORS : CHART_COLORS;
+    chart.applyOptions({
+      layout: { background: { type: ColorType.Solid, color: c.bg }, textColor: c.text, panes: { separatorColor: c.border, enableResize: true } },
+      grid: { vertLines: { color: c.grid }, horzLines: { color: c.grid } },
+      rightPriceScale: { borderColor: c.border },
+      timeScale: { borderColor: c.border },
+    });
+  }, [props.dark]);
+
   useImperativeHandle(ref, () => ({
     snapshot: (header: string) => {
       const chart = chartRef.current;
