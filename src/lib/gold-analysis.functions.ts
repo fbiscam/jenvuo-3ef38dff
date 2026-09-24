@@ -590,6 +590,9 @@ const CACHE_TTL = 30_000;
 // structure is far better than the synthetic sine-wave fallback (which forces
 // the whole scan into quote-only "WAIT" mode).
 const CACHE_STALE_MAX = 10 * 60_000;
+// Terminal chart: when every feed is down, keep showing the last good chart for
+// up to 2 hours instead of blanking (outages of 15+ minutes were observed).
+const TERMINAL_STALE_MAX = 2 * 60 * 60_000;
 // Candle fetches are deduplicated: one scan pulls 5 timeframes and cross-pairs
 // derive from XAU/USD + an FX proxy, so without this the same Yahoo endpoint is
 // hit ~30x per scan and starts 429-ing — that was the "some pairs analyze, some
@@ -1093,17 +1096,18 @@ async function fetchGoldCandles(tf: string): Promise<Candle[]> {
 // OANDA:XAUUSD embed. Never fall through to GC futures or tokenized Gold here:
 // their premium/discount can make otherwise valid pivots look incorrect.
 async function fetchTerminalGoldEvidenceCandles(tf: string): Promise<Candle[]> {
-  try {
-    return await fetchFromYahooSymbols(["XAUUSD=X"], tf);
-  } catch {
-    // Yahoo currently delists/rejects its anonymous spot-Gold chart endpoint.
-    // Use exchange-traded, fully real PAXG candles rather than synthetic bars;
-    // normalize them to the live XAU/USD tick so levels remain on the terminal's
-    // OANDA spot scale while preserving the real candle structure and volume.
-    // Same provider priority + same scale as the chart, so the AI and every
-    // account read identical candles.
-    return scaleProxyToSpot((await fetchGoldProxyDeep(tf, 200)).slice(-200));
-  }
+  // Reuse the exact chart loader: same provider priority, same spot scale,
+  // real 45m aggregation from 15m bars, and last-good-chart fallback when
+  // every feed fails at once.
+  const payload = await loadTerminalChart(tf);
+  return payload.bars.slice(-200).map((b) => ({
+    t: b.time * 1000,
+    o: b.open,
+    h: b.high,
+    l: b.low,
+    c: b.close,
+    v: b.volume,
+  })) as Candle[];
 }
 
 /**
@@ -1375,7 +1379,7 @@ async function loadTerminalChart(tf: string): Promise<TerminalChartPayload> {
     } catch (err) {
       // Every source failed this tick — keep serving the last good chart for a
       // while instead of blanking the terminal.
-      if (hit && Date.now() - hit.at < CACHE_STALE_MAX) return { ...hit.data, serverTime: Date.now() };
+      if (hit && Date.now() - hit.at < TERMINAL_STALE_MAX) return { ...hit.data, serverTime: Date.now() };
       throw err;
     }
   }
