@@ -41,6 +41,7 @@ import {
   openHomeSearch,
   openHomeThread,
   readHomeThreads,
+  writeHomeThreads,
   type HomeThread,
 } from "@/components/dashboard/GeminiHome";
 import { SquarePen, Search as SearchIcon, Settings as SettingsIcon } from "lucide-react";
@@ -91,6 +92,11 @@ import {
   ScanSearch,
   ShieldCheckIcon,
   Terminal,
+  MoreVertical,
+  Share2,
+  Pin,
+  Pencil,
+  Trash2,
   type LucideIcon,
 } from "lucide-react";
 import {
@@ -182,23 +188,83 @@ function RecentChats({ collapsed, onPick }: { collapsed: boolean; onPick: () => 
     window.addEventListener(HOME_EVENT, sync);
     return () => window.removeEventListener(HOME_EVENT, sync);
   }, []);
+  const updateThreads = (next: HomeThread[]) => {
+    writeHomeThreads(next);
+    setThreads(next);
+  };
+  const shareThread = async (thread: HomeThread) => {
+    const text = thread.messages.map((message) => `${message.role === "user" ? "You" : "Jenvu"}: ${message.text}`).join("\n\n");
+    try {
+      if (navigator.share) await navigator.share({ title: thread.title, text });
+      else {
+        await navigator.clipboard.writeText(text);
+        toast.success("Conversation copied");
+      }
+    } catch (error) {
+      if (error instanceof DOMException && error.name === "AbortError") return;
+      toast.error("Conversation could not be shared");
+    }
+  };
+  const togglePinned = (id: string) => {
+    const next = threads
+      .map((thread) => (thread.id === id ? { ...thread, pinned: !thread.pinned } : thread))
+      .sort((a, b) => Number(Boolean(b.pinned)) - Number(Boolean(a.pinned)) || b.updatedAt - a.updatedAt);
+    updateThreads(next);
+  };
+  const renameThread = (thread: HomeThread) => {
+    const title = window.prompt("Rename conversation", thread.title)?.trim();
+    if (!title) return;
+    updateThreads(threads.map((item) => (item.id === thread.id ? { ...item, title: title.slice(0, 60) } : item)));
+  };
+  const deleteThread = (id: string) => {
+    updateThreads(threads.filter((thread) => thread.id !== id));
+    if (localStorage.getItem(HOME_ACTIVE_KEY) === id) openHomeThread(null);
+  };
   if (collapsed || threads.length === 0) return null;
   return (
     <div className="mt-5">
       <div className="mb-1.5 px-2.5 text-[12px] text-[#6B6C6B]">Recent</div>
       <div className="flex flex-col gap-0.5">
         {threads.slice(0, 15).map((t) => (
-          <Link
-            key={t.id}
-            to="/dashboard"
-            onClick={() => {
-              openHomeThread(t.id);
-              onPick();
-            }}
-            className="truncate rounded-full px-2.5 py-1.5 text-[13px] text-foreground hover:bg-zinc-100"
-          >
-            {t.title}
-          </Link>
+          <div key={t.id} className="group flex items-center rounded-full pr-1 hover:bg-zinc-100">
+            <Link
+              to="/dashboard"
+              onClick={() => {
+                openHomeThread(t.id);
+                onPick();
+              }}
+              className="min-w-0 flex-1 truncate px-2.5 py-1.5 text-[13px] text-foreground"
+            >
+              {t.title}
+            </Link>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  aria-label={`Options for ${t.title}`}
+                  className="h-7 w-7 shrink-0 rounded-full opacity-0 group-hover:opacity-100 data-[state=open]:opacity-100"
+                >
+                  <MoreVertical className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent side="right" align="start" className="w-44 rounded-2xl p-2">
+                <DropdownMenuItem onSelect={() => void shareThread(t)} className="gap-3 rounded-lg py-2">
+                  <Share2 className="h-4 w-4" /> Share conversation
+                </DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => togglePinned(t.id)} className="gap-3 rounded-lg py-2">
+                  <Pin className="h-4 w-4" /> {t.pinned ? "Unpin" : "Pin"}
+                </DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => renameThread(t)} className="gap-3 rounded-lg py-2">
+                  <Pencil className="h-4 w-4" /> Rename
+                </DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => deleteThread(t.id)} className="gap-3 rounded-lg py-2 text-destructive focus:text-destructive">
+                  <Trash2 className="h-4 w-4" /> Delete
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         ))}
       </div>
     </div>
