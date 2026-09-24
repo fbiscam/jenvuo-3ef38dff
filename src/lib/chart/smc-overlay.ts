@@ -229,14 +229,52 @@ export function renderSmcOverlay(
   if (toggles.orderBlocks) {
     for (const z of smc.orderBlocks) {
       const demand = z.type === "DEMAND";
-      box(
-        z.t,
-        z.top,
-        z.bottom,
-        demand ? "rgba(41,98,255,0.10)" : "rgba(255,152,0,0.12)",
-        demand ? "rgba(41,98,255,0.85)" : "rgba(230,120,0,0.9)",
-        `${demand ? "Demand OB" : "Supply OB"}${z.status === "PARTIAL" ? " · partial" : ""}`,
-      );
+      const x0 = pr.x(z.t / 1000);
+      const yTop = pr.y(z.top);
+      const yBot = pr.y(z.bottom);
+      if (x0 == null || yTop == null || yBot == null) continue;
+      const x = Math.max(0, x0);
+      const top = Math.min(yTop, yBot);
+      const h = Math.max(2, Math.abs(yBot - yTop));
+      const w = pr.width - x;
+      const rgb = demand ? "41,98,255" : "242,54,69";
+      // Soft gradient body fading to the right
+      const grad = ctx.createLinearGradient(x, 0, pr.width, 0);
+      grad.addColorStop(0, `rgba(${rgb},0.22)`);
+      grad.addColorStop(1, `rgba(${rgb},0.04)`);
+      ctx.fillStyle = grad;
+      ctx.fillRect(x, top, w, h);
+      // Top/bottom edges
+      ctx.strokeStyle = `rgba(${rgb},0.55)`;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(x, top + 0.5);
+      ctx.lineTo(pr.width, top + 0.5);
+      ctx.moveTo(x, top + h - 0.5);
+      ctx.lineTo(pr.width, top + h - 0.5);
+      ctx.stroke();
+      // 50% mean threshold
+      ctx.setLineDash([4, 4]);
+      ctx.strokeStyle = `rgba(${rgb},0.45)`;
+      ctx.beginPath();
+      ctx.moveTo(x, top + h / 2);
+      ctx.lineTo(pr.width, top + h / 2);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      // Solid accent bar at origin candle
+      ctx.fillStyle = `rgba(${rgb},0.95)`;
+      ctx.fillRect(x, top, 3, h);
+      // Label pill
+      const label = `${demand ? "Demand OB" : "Supply OB"}${z.status === "PARTIAL" ? " · partial" : ""}`;
+      const tw = ctx.measureText(label).width + 12;
+      const ly = demand ? top + h + 3 : top - 17;
+      ctx.beginPath();
+      ctx.roundRect?.(x + 6, ly, tw, 14, 7);
+      if (!ctx.roundRect) ctx.rect(x + 6, ly, tw, 14);
+      ctx.fillStyle = `rgba(${rgb},0.95)`;
+      ctx.fill();
+      ctx.fillStyle = "#ffffff";
+      ctx.fillText(label, x + 12, ly + 10.5);
     }
   }
   if (toggles.liquidity) {
