@@ -1369,6 +1369,7 @@ function DashboardLayout() {
               onClick={() => {
                 setMobileNavOpen(false);
                 openHomeSearch();
+                if (pathname !== "/dashboard") window.location.assign("/dashboard");
               }}
               title={sidebarCollapsed ? "Search chats" : undefined}
               className={`dashboard-sidebar-link mb-1.5 flex w-full items-center rounded-full text-[12.5px] text-foreground hover:bg-zinc-50 ${sidebarCollapsed ? "justify-center px-2 py-1.5" : "gap-3 px-2.5 py-1.5"}`}

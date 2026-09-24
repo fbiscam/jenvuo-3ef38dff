@@ -33,6 +33,7 @@ export function openHomeThread(id: string | null) {
 }
 
 export function openHomeSearch() {
+  sessionStorage.setItem("jenvu:open-search", "1");
   window.dispatchEvent(new Event("jenvu:home-search"));
 }
 
@@ -58,8 +59,15 @@ export function GeminiHome() {
       setThreads(readHomeThreads());
       setActiveId(localStorage.getItem(HOME_ACTIVE_KEY));
     };
-    const onSearch = () => setSearchOpen(true);
+    const onSearch = () => {
+      sessionStorage.removeItem("jenvu:open-search");
+      setSearchOpen(true);
+    };
     sync();
+    if (sessionStorage.getItem("jenvu:open-search") === "1") {
+      sessionStorage.removeItem("jenvu:open-search");
+      setSearchOpen(true);
+    }
     window.addEventListener(HOME_EVENT, sync);
     window.addEventListener("jenvu:home-search", onSearch);
     return () => {
