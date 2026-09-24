@@ -37,6 +37,7 @@ import solLogoAsset from "@/assets/sol-logo.png.asset.json";
 
 import {
   GeminiHome,
+  HOME_ACTIVE_KEY,
   HOME_EVENT,
   openHomeSearch,
   openHomeThread,
