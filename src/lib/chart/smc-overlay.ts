@@ -213,36 +213,36 @@ export function renderSmcOverlay(
     ctx.fillText(label, x + 4, Math.min(y0, y1) + 11);
   };
 
+  const statusText = (s: string) =>
+    s === "PARTIAL" ? " · Partial" : s === "FULLY_MITIGATED" ? " · Mitigated" : "";
+  const dottedLine = (tMs: number, price: number, color: string, label: string, above: boolean) => {
+    const x0 = pr.x(tMs / 1000);
+    const y = pr.y(price);
+    if (x0 == null || y == null) return;
+    const x = Math.max(0, x0);
+    ctx.setLineDash([3, 3]);
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(pr.width, y);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = "#000000";
+    ctx.fillText(label, x + 4, above ? y - 4 : y + 12);
+  };
+
   if (toggles.fvg) {
     for (const g of smc.fvgs) {
       const bull = g.type === "BULLISH_FVG";
-      box(
-        g.t,
-        g.top,
-        g.bottom,
-        bull ? "rgba(8,153,129,0.10)" : "rgba(242,54,69,0.10)",
-        bull ? "rgba(8,153,129,0.75)" : "rgba(242,54,69,0.75)",
-        `${bull ? "Bull" : "Bear"} FVG${g.status === "PARTIAL" ? " · partial" : ""}`,
-      );
+      // Bearish gap sits above → line on top edge; bullish below → bottom edge.
+      dottedLine(g.t, bull ? g.bottom : g.top, "rgb(34,197,94)", `FVG${statusText(g.status)}`, !bull);
     }
   }
   if (toggles.orderBlocks) {
     for (const ob of smc.orderBlocks) {
-      const x = pr.x(ob.t / 1000);
-      const y0 = pr.y(ob.top);
-      const y1 = pr.y(ob.bottom);
-      if (x == null || y0 == null || y1 == null) continue;
-      const top = Math.min(y0, y1);
-      const height = Math.max(3, Math.abs(y1 - y0));
-      const width = 10;
-      ctx.fillStyle = "rgba(56,189,248,0.18)";
-      ctx.strokeStyle = "rgba(14,165,233,0.95)";
-      ctx.lineWidth = 1.25;
-      ctx.beginPath();
-      ctx.roundRect?.(x - width / 2, top, width, height, 2);
-      if (!ctx.roundRect) ctx.rect(x - width / 2, top, width, height);
-      ctx.fill();
-      ctx.stroke();
+      const supply = ob.type === "SUPPLY";
+      dottedLine(ob.t, supply ? ob.top : ob.bottom, "rgb(234,179,8)", `Order Block${statusText(ob.status)}`, supply);
     }
   }
   if (toggles.liquidity) {
