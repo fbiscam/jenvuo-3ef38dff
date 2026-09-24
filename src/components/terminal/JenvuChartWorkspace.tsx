@@ -52,9 +52,8 @@ import { ChartCanvas, type ChartCanvasHandle } from "./ChartCanvas";
 import { INDICATOR_LIST, buildIndicatorSeries, isIndicatorId, type IndicatorId } from "./indicator-specs";
 import { ScriptPanel, type SavedScript } from "./ScriptPanel";
 import { buildChartContext } from "./chart-context";
-import { DemoTradingPanel } from "./DemoTradingPanel";
-import type { DemoPosition } from "@/lib/chart/demo-trading";
-import type { DemoOrderActions } from "./DemoOrderOverlay";
+import { DemoTradingPanel, OrderTicket, PaperTradingPanel, QuickTradeButtons, useDemoTrading } from "./DemoTradingPanel";
+import type { DemoSide } from "@/lib/chart/demo-trading";
 import { useLivePriceStream } from "@/hooks/useLivePriceStream";
 
 const MemoChart = memo(ChartCanvas);
@@ -210,8 +209,8 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [hoverIndex, setHoverIndex] = useState<number | null>(null);
   const [fullscreen, setFullscreen] = useState(false);
-  const [demoPositions, setDemoPositions] = useState<DemoPosition[]>([]);
-  const [demoActions, setDemoActions] = useState<DemoOrderActions | null>(null);
+  const [ticketSide, setTicketSide] = useState<DemoSide | null>(null);
+  const [paperOpen, setPaperOpen] = useState(false);
 
   useEffect(() => {
     const syncFullscreen = () => setFullscreen(document.fullscreenElement === workspaceRef.current);
@@ -301,6 +300,9 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
   }, [rawBars, livePrice]);
   const stepSeconds = payload?.stepSeconds ?? 1800;
   const currentPrice = bars.at(-1)?.close ?? null;
+  const demo = useDemoTrading(currentPrice);
+  const demoPositions = demo.account.positions;
+  const demoActions = demo.actions;
 
   // Use the SERVER clock to decide which candles are closed. A device clock that
   // is a few minutes off would otherwise include/exclude a candle and shift the
@@ -567,7 +569,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
           <TooltipContent>{fullscreen ? "Exit fullscreen" : "Fullscreen chart"}</TooltipContent>
         </Tooltip>
 
-        <DemoTradingPanel currentPrice={currentPrice} onPositionsChange={setDemoPositions} onActions={setDemoActions} />
+        <DemoTradingPanel open={paperOpen} onToggle={() => setPaperOpen((v) => !v)} count={demoPositions.length} />
 
         <div className="ml-auto flex shrink-0 items-center gap-2">{rightSlot}</div>
       </div>
@@ -704,6 +706,9 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
                   </>
                 )}
               </div>
+              <div className="mb-1.5">
+                <QuickTradeButtons price={currentPrice} onPick={setTicketSide} />
+              </div>
               {legendIndicators.map(({ spec, values }) => (
                 <div key={spec.id} className="flex flex-wrap gap-x-2 text-muted-foreground">
                   <span>{spec.name}</span>
@@ -731,6 +736,19 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
                 </div>
               ))}
             </div>
+
+            {ticketSide && (
+              <div className="absolute left-2 top-16 z-[6] max-h-[calc(100%-4.5rem)] overflow-y-auto">
+                <OrderTicket
+                  side={ticketSide}
+                  onSideChange={setTicketSide}
+                  onClose={() => setTicketSide(null)}
+                  price={currentPrice}
+                  trading={demo}
+                  onPlaced={() => { setTicketSide(null); setPaperOpen(true); }}
+                />
+              </div>
+            )}
 
             {tool !== "cursor" && (
               <div className="pointer-events-none absolute bottom-3 left-1/2 z-[3] -translate-x-1/2 rounded-full bg-foreground px-3 py-1 text-xs text-background">
@@ -761,6 +779,8 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
               </div>
             )}
           </div>
+
+          {paperOpen && <PaperTradingPanel trading={demo} price={currentPrice} onClose={() => setPaperOpen(false)} />}
 
           {scriptPanelOpen && (
             <ScriptPanel

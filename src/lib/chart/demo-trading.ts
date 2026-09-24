@@ -26,6 +26,7 @@ export type DemoAccount = {
   realizedPnl: number;
   positions: DemoPosition[];
   history?: DemoClosedTrade[];
+  orders?: DemoPendingOrder[];
 };
 
 export const DEMO_STARTING_BALANCE = 100_000;
@@ -83,6 +84,7 @@ export function closeDemoPosition(
   if (!position) return account;
   const pnl = positionPnl(position, currentPrice);
   return {
+    ...account,
     balance: account.balance + pnl,
     realizedPnl: account.realizedPnl + pnl,
     positions: account.positions.filter((item) => item.id !== positionId),
@@ -91,4 +93,30 @@ export function closeDemoPosition(
       ...(account.history ?? []),
     ].slice(0, 20),
   };
+}
+
+// ---- Pending orders, spread & leverage (paper trading) ----
+export const DEMO_SPREAD = 0.4; // $ between bid and ask
+export const DEMO_LEVERAGE = 10;
+
+export const bidAsk = (mid: number) => ({ bid: mid - DEMO_SPREAD / 2, ask: mid + DEMO_SPREAD / 2 });
+
+export type DemoOrderType = "market" | "limit" | "stop";
+
+export type DemoPendingOrder = {
+  id: string;
+  side: DemoSide;
+  type: "limit" | "stop";
+  quantity: number;
+  price: number;
+  stopLoss?: number | null;
+  takeProfit?: number | null;
+  createdAt: number;
+};
+
+/** True when a pending order should fill at the current mid price. */
+export function pendingShouldFill(order: DemoPendingOrder, mid: number): boolean {
+  const { bid, ask } = bidAsk(mid);
+  if (order.side === "buy") return order.type === "limit" ? ask <= order.price : ask >= order.price;
+  return order.type === "limit" ? bid >= order.price : bid <= order.price;
 }
