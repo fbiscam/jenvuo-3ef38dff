@@ -175,8 +175,16 @@ export function computeSmcOverlay(
     pivots: pivotsLabelled,
     livePivots,
     breaks: breaks.slice(-8),
-    fvgs: poi.fair_value_gaps.filter((g) => g.status !== "MITIGATED").slice(-5),
-    orderBlocks: poi.order_blocks.filter((z) => z.status !== "MITIGATED").slice(-4),
+    // Only high-quality zones: unmitigated FVGs of meaningful size, and order
+    // blocks backed by displacement plus a liquidity sweep or FVG alignment.
+    fvgs: (() => {
+      const live = poi.fair_value_gaps.filter((g) => g.status !== "MITIGATED");
+      const avg = live.reduce((a, g) => a + g.size, 0) / Math.max(1, live.length);
+      return live.filter((g) => g.size >= avg).slice(-3);
+    })(),
+    orderBlocks: poi.order_blocks
+      .filter((z) => z.status !== "MITIGATED" && z.displacement && (z.swept_liquidity || z.is_fvg_aligned))
+      .slice(-3),
     buySide,
     sellSide,
     trend: fractal.trend,
@@ -312,8 +320,8 @@ export function renderSmcOverlay(
       ctx.fillStyle = color;
       ctx.fillText(`${label} ${price.toFixed(2)}`, pr.width * 0.55 + 4, y - 3);
     };
-    smc.buySide.slice(0, 2).forEach((p) => liq(p, "BSL", "#089981"));
-    smc.sellSide.slice(0, 2).forEach((p) => liq(p, "SSL", "#f23645"));
+    smc.buySide.slice(0, 1).forEach((p) => liq(p, "BSL", "#089981"));
+    smc.sellSide.slice(0, 1).forEach((p) => liq(p, "SSL", "#f23645"));
     ctx.setLineDash([]);
   }
   if (toggles.breaks) {
