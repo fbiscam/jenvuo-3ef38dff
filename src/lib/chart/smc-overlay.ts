@@ -109,7 +109,7 @@ export function selectHighConfidencePois(
 
   // Untouched OBs; confluence (sweep / FVG / displacement) boosts score so the
   // strongest zone per side wins, but a valid zone is never hidden entirely.
-  const activeOrderBlocks = poi.order_blocks.filter((zone) => zone.status !== "FULLY_MITIGATED" && zone.status !== "MITIGATED");
+  const activeOrderBlocks = poi.order_blocks.filter((zone) => zone.status !== "MITIGATED");
   const orderBlocks = chooseOnePerType(
     activeOrderBlocks,
     (zone) =>
