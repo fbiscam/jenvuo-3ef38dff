@@ -183,6 +183,10 @@ const NAV_GROUPS: Array<{ label: string; items: TabItem[] }> = [
       { to: "/dashboard/notifications", label: "Alerts", icon: Bell },
       { to: "/dashboard/billing", label: "Billing", icon: Wallet },
       { to: "/dashboard/usage", label: "Usage", icon: ChartNoAxesCombined },
+      { to: "/dashboard/extension", label: "API Keys", icon: KeyRound },
+      { to: "/dashboard/pay", label: "Payments", icon: CreditCard },
+      { to: "/dashboard/documents", label: "Documents", icon: FileCheck2 },
+      { to: "/dashboard/security", label: "Security", icon: LockKeyhole },
     ],
   },
 ];
