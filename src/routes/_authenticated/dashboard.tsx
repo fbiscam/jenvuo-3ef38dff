@@ -36,6 +36,15 @@ import grokModelLogo from "@/assets/grok-logo-transparent.png";
 import solLogoAsset from "@/assets/sol-logo.png.asset.json";
 
 import {
+  GeminiHome,
+  HOME_EVENT,
+  openHomeSearch,
+  openHomeThread,
+  readHomeThreads,
+  type HomeThread,
+} from "@/components/dashboard/GeminiHome";
+import { SquarePen, Search as SearchIcon, Settings as SettingsIcon } from "lucide-react";
+import {
   Bookmark,
   Bell,
   BellRing,
@@ -169,38 +178,45 @@ const NAV_GROUPS: Array<{ label: string; items: TabItem[] }> = [
   {
     label: "",
     items: [
-      {
-        to: "/dashboard",
-        label: "Overview",
-        icon: LayoutDashboard,
-        exact: true,
-        countKey: "saved",
-      },
+      { to: "/dashboard", label: "New chat", icon: SquarePen, exact: true },
       { to: "/dashboard/terminal", label: "Terminal", icon: Terminal },
-    ],
-  },
-  {
-    label: "",
-    items: [{ to: "/dashboard/usage", label: "Usage", icon: ChartNoAxesCombined }],
-  },
-  {
-    label: "",
-    items: [
-      { to: "/dashboard/extension", label: "API Keys", icon: KeyRound },
-      { to: "/pricing", label: "Pricing", icon: Tag },
-    ],
-  },
-  {
-    label: "",
-    items: [
+      { to: "/dashboard/notifications", label: "Alerts", icon: Bell },
       { to: "/dashboard/billing", label: "Billing", icon: Wallet },
-      { to: "/dashboard/pay", label: "Payments", icon: BadgeDollarSign },
-      { to: "/dashboard/documents", label: "Documents", icon: FileCheck2 },
-      { to: "/dashboard/security", label: "Security", icon: LockKeyhole },
-      { to: "/help", label: "Help Center", icon: CircleHelp },
+      { to: "/dashboard/usage", label: "Usage", icon: ChartNoAxesCombined },
     ],
   },
 ];
+
+function RecentChats({ collapsed, onPick }: { collapsed: boolean; onPick: () => void }) {
+  const [threads, setThreads] = useState<HomeThread[]>([]);
+  useEffect(() => {
+    const sync = () => setThreads(readHomeThreads());
+    sync();
+    window.addEventListener(HOME_EVENT, sync);
+    return () => window.removeEventListener(HOME_EVENT, sync);
+  }, []);
+  if (collapsed || threads.length === 0) return null;
+  return (
+    <div className="mt-5">
+      <div className="mb-1.5 px-2.5 text-[12px] text-[#6B6C6B]">Recent</div>
+      <div className="flex flex-col gap-0.5">
+        {threads.slice(0, 15).map((t) => (
+          <Link
+            key={t.id}
+            to="/dashboard"
+            onClick={() => {
+              openHomeThread(t.id);
+              onPick();
+            }}
+            className="truncate rounded-full px-2.5 py-1.5 text-[13px] text-foreground hover:bg-zinc-100"
+          >
+            {t.title}
+          </Link>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 const TABS: TabItem[] = NAV_GROUPS.flatMap((g) => g.items);
 
