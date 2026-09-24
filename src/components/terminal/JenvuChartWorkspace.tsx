@@ -438,25 +438,25 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
               )}
             </button>
           </PopoverTrigger>
-          <PopoverContent align="start" className="w-72 p-2">
-            <p className="px-2 pb-2 pt-1 text-xs font-semibold text-muted-foreground">Indicators</p>
+          <PopoverContent align="start" className="w-80 p-2 font-sans subpixel-antialiased">
+            <p className="px-2 pb-2 pt-1 text-sm font-bold text-foreground">Indicators</p>
             {INDICATOR_LIST.map((spec) => {
               const on = indicators.includes(spec.id);
               return (
                 <label
                   key={spec.id}
-                  className="flex cursor-pointer items-start gap-2.5 rounded-md px-2 py-1.5 hover:bg-accent"
+                  className="flex cursor-pointer items-start gap-2.5 rounded-md px-2 py-2 hover:bg-accent"
                 >
                   <Checkbox
                     checked={on}
                     onCheckedChange={(v) =>
                       setIndicators((cur) => (v ? [...cur.filter((x) => x !== spec.id), spec.id] : cur.filter((x) => x !== spec.id)))
                     }
-                    className="mt-0.5 data-[state=checked]:border-[#FD5510] data-[state=checked]:bg-[#FD5510] data-[state=checked]:text-white"
+                    className="mt-0.5 data-[state=checked]:border-home-accent data-[state=checked]:bg-home-accent data-[state=checked]:text-home-accent-foreground"
                   />
                   <span className="min-w-0">
-                    <span className="block text-sm">{spec.name}</span>
-                    <span className="block text-[11px] text-muted-foreground">{spec.description}</span>
+                    <span className="block text-[15px] font-semibold leading-5 text-foreground">{spec.name}</span>
+                    <span className="block text-xs font-medium leading-4 text-muted-foreground">{spec.description}</span>
                   </span>
                 </label>
               );
@@ -474,24 +474,24 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
               Jenvu SMC
             </button>
           </PopoverTrigger>
-          <PopoverContent align="start" className="w-72 p-2">
-            <p className="px-2 pb-1 pt-1 text-xs font-semibold text-muted-foreground">Smart-money overlays</p>
-            <p className="px-2 pb-2 text-[11px] text-muted-foreground">
+          <PopoverContent align="start" className="w-80 p-2 font-sans subpixel-antialiased">
+            <p className="px-2 pb-1 pt-1 text-sm font-bold text-foreground">Smart-money overlays</p>
+            <p className="px-2 pb-2 text-xs font-medium leading-4 text-muted-foreground">
               Same 10-bar structure engine the AI desk
             </p>
             {SMC_LABELS.map((item) => (
               <label
                 key={item.key}
-                className="flex cursor-pointer items-center justify-between gap-3 rounded-md px-2 py-1.5 hover:bg-accent"
+                className="flex cursor-pointer items-center justify-between gap-3 rounded-md px-2 py-2 hover:bg-accent"
               >
                 <span>
-                  <span className="block text-sm">{item.label}</span>
-                  <span className="block text-[11px] text-muted-foreground">{item.hint}</span>
+                  <span className="block text-[15px] font-semibold leading-5 text-foreground">{item.label}</span>
+                  <span className="block text-xs font-medium leading-4 text-muted-foreground">{item.hint}</span>
                 </span>
                 <Switch
                   checked={smcToggles[item.key] ?? DEFAULT_SMC[item.key]}
                   onCheckedChange={(v) => setSmcToggles((cur) => ({ ...cur, [item.key]: v }))}
-                  className="data-[state=checked]:bg-[#FD5510]"
+                  className="data-[state=checked]:bg-home-accent"
                 />
               </label>
             ))}
