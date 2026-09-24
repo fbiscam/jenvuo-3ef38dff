@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { BarChart3, RotateCcw, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,6 +13,7 @@ import {
   triggeredExit,
 } from "@/lib/chart/demo-trading";
 import { cn } from "@/lib/utils";
+import type { DemoOrderActions } from "./DemoOrderOverlay";
 
 const STORAGE_KEY = "jenvu:terminal:demo-account:v1";
 
@@ -43,9 +44,11 @@ function loadAccount(): DemoAccount {
 export function DemoTradingPanel({
   currentPrice,
   onPositionsChange,
+  onActions,
 }: {
   currentPrice: number | null;
   onPositionsChange: (positions: DemoPosition[]) => void;
+  onActions?: (actions: DemoOrderActions) => void;
 }) {
   const [account, setAccount] = useState<DemoAccount>(() => createDemoAccount());
   const [quantity, setQuantity] = useState("1");
@@ -144,6 +147,19 @@ export function DemoTradingPanel({
       ),
     );
   }
+
+  const priceRef = useRef(currentPrice);
+  priceRef.current = currentPrice;
+  useEffect(() => {
+    onActions?.({
+      update: (id, patch) =>
+        setAccount((cur) => ({ ...cur, positions: cur.positions.map((p) => (p.id === id ? { ...p, ...patch } : p)) })),
+      close: (id) => {
+        const px = priceRef.current;
+        if (px) setAccount((cur) => closeDemoPosition(cur, id, px));
+      },
+    });
+  }, [onActions]);
 
   function resetAccount() {
     if (!window.confirm("Reset the demo account to $100,000 and remove all positions?")) return;
