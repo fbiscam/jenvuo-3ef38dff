@@ -1,8 +1,20 @@
 import { useEffect, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import ReactMarkdown from "react-markdown";
-import { ArrowUp, CornerDownRight, Plus, Search, X } from "lucide-react";
+import { ArrowUp, Check, Copy, CornerDownRight, MoreHorizontal, Plus, RotateCcw, Search, ThumbsDown, ThumbsUp, X } from "lucide-react";
 import { analyzeGold } from "@/lib/gold-analysis.functions";
+import {
+  Conversation,
+  ConversationContent,
+  ConversationScrollButton,
+} from "@/components/ai-elements/conversation";
+import {
+  Message,
+  MessageAction,
+  MessageActions,
+  MessageContent,
+  MessageResponse,
+} from "@/components/ai-elements/message";
+import { Shimmer } from "@/components/ai-elements/shimmer";
 
 export type HomeMessage = { role: "user" | "assistant"; text: string };
 export type HomeThread = { id: string; title: string; updatedAt: number; messages: HomeMessage[]; pinned?: boolean };
@@ -51,6 +63,8 @@ export function GeminiHome() {
   const [pending, setPending] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQ, setSearchQ] = useState("");
+  const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
+  const [feedback, setFeedback] = useState<Record<number, "up" | "down">>({});
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const endRef = useRef<HTMLDivElement>(null);
 
@@ -125,6 +139,43 @@ export function GeminiHome() {
     setPending(false);
   };
 
+  const copyReply = async (text: string, index: number) => {
+    await navigator.clipboard.writeText(text);
+    setCopiedIndex(index);
+    window.setTimeout(() => setCopiedIndex((current) => current === index ? null : current), 1600);
+  };
+
+  const retryReply = async (assistantIndex: number) => {
+    if (pending || !active) return;
+    let userIndex = -1;
+    for (let index = assistantIndex - 1; index >= 0; index -= 1) {
+      if (active.messages[index]?.role === "user") {
+        userIndex = index;
+        break;
+      }
+    }
+    if (userIndex < 0) return;
+    const query = active.messages[userIndex]?.text;
+    if (!query) return;
+    const history = active.messages.slice(0, userIndex).map((message) => ({ role: message.role, content: message.text }));
+    setPending(true);
+    try {
+      const res = await analyze({ data: { timeframe: "15m", query, history, advisor: true } });
+      const reply = res.fullAnalysis || res.spokenSummary || "No read available.";
+      const latest = readHomeThreads();
+      const thread = latest.find((item) => item.id === active.id);
+      if (thread?.messages[assistantIndex]?.role === "assistant") {
+        thread.messages[assistantIndex] = { role: "assistant", text: reply };
+        thread.updatedAt = Date.now();
+        writeHomeThreads(latest);
+      }
+    } catch {
+      // Keep the existing answer visible if a retry is unavailable.
+    } finally {
+      setPending(false);
+    }
+  };
+
   const composer = (
     <form
       onSubmit={(e) => {
@@ -166,7 +217,7 @@ export function GeminiHome() {
 
   return (
     <div className="gemini-home relative flex h-full min-h-0 flex-col overflow-hidden">
-      <div aria-hidden className="gemini-glow pointer-events-none absolute inset-0" />
+      {messages.length === 0 && !pending && <div aria-hidden className="gemini-glow pointer-events-none absolute inset-0" />}
 
       {messages.length === 0 && !pending ? (
         <div className="relative z-10 flex flex-1 flex-col items-center justify-center px-5 pb-32">
@@ -185,23 +236,53 @@ export function GeminiHome() {
         </div>
       ) : (
         <>
-          <div className="relative z-10 flex-1 overflow-y-auto px-5">
-            <div className="mx-auto flex max-w-[760px] flex-col gap-6 py-10">
-              {messages.map((m, i) =>
-                m.role === "user" ? (
-                  <div key={i} className="ml-auto max-w-[80%] whitespace-pre-wrap rounded-3xl rounded-tr-md bg-[var(--gemini-bubble)] px-5 py-3 text-[15px] text-foreground">
-                    {m.text}
-                  </div>
-                ) : (
-                  <div key={i} className="prose prose-sm max-w-none text-[15px] text-foreground">
-                    <ReactMarkdown>{m.text}</ReactMarkdown>
-                  </div>
-                ),
-              )}
-              {pending && <div className="animate-pulse text-sm text-muted-foreground">Jenvu is thinking…</div>}
+          <Conversation className="relative z-10">
+            <ConversationContent className="mx-auto w-full max-w-[760px] gap-9 px-5 pb-24 pt-12">
+              {messages.map((m, i) => (
+                <Message key={i} from={m.role} className={m.role === "user" ? "max-w-[70%]" : "max-w-full"}>
+                  <MessageContent
+                    className={m.role === "user"
+                      ? "rounded-[28px] bg-secondary px-5 py-3 text-[15px] leading-6 text-secondary-foreground shadow-none"
+                      : "w-full bg-transparent p-0 text-[15px] leading-7 text-foreground"}
+                  >
+                    {m.role === "assistant" ? <MessageResponse>{m.text}</MessageResponse> : <span className="whitespace-pre-wrap">{m.text}</span>}
+                  </MessageContent>
+                  {m.role === "assistant" && (
+                    <MessageActions className="mt-1 gap-0.5 text-muted-foreground">
+                      <MessageAction
+                        tooltip="Helpful"
+                        aria-pressed={feedback[i] === "up"}
+                        onClick={() => setFeedback((current) => ({ ...current, [i]: "up" }))}
+                        className={feedback[i] === "up" ? "bg-accent text-accent-foreground" : ""}
+                      >
+                        <ThumbsUp />
+                      </MessageAction>
+                      <MessageAction
+                        tooltip="Not helpful"
+                        aria-pressed={feedback[i] === "down"}
+                        onClick={() => setFeedback((current) => ({ ...current, [i]: "down" }))}
+                        className={feedback[i] === "down" ? "bg-accent text-accent-foreground" : ""}
+                      >
+                        <ThumbsDown />
+                      </MessageAction>
+                      <MessageAction tooltip="Try again" onClick={() => void retryReply(i)} disabled={pending}>
+                        <RotateCcw />
+                      </MessageAction>
+                      <MessageAction tooltip={copiedIndex === i ? "Copied" : "Copy"} onClick={() => void copyReply(m.text, i)}>
+                        {copiedIndex === i ? <Check /> : <Copy />}
+                      </MessageAction>
+                      <MessageAction tooltip="More options">
+                        <MoreHorizontal />
+                      </MessageAction>
+                    </MessageActions>
+                  )}
+                </Message>
+              ))}
+              {pending && <Shimmer className="text-sm">Jenvu is thinking…</Shimmer>}
               <div ref={endRef} />
-            </div>
-          </div>
+            </ConversationContent>
+            <ConversationScrollButton />
+          </Conversation>
           <div className="relative z-10 mx-auto w-full max-w-[760px] px-5 pb-6">{composer}</div>
         </>
       )}
