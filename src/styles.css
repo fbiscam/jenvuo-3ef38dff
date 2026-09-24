@@ -1047,3 +1047,13 @@ html:not(.ms-icons-ready) .material-symbols-rounded {
   box-shadow: 0 1px 3px color-mix(in oklab, var(--foreground) 12%, transparent), 0 4px 18px color-mix(in oklab, var(--home-accent) 16%, transparent);
 }
 .gemini-home, .gemini-home * { font-family: "Google Sans", "Product Sans", "Roboto", system-ui, sans-serif; }
+
+/* Dashboard home only: blue accent + no page scroll */
+.gemini-home {
+  --home-accent: oklch(0.62 0.17 255);
+  --home-accent-soft: oklch(0.95 0.02 240);
+  --home-accent-canvas: rgb(237 244 255);
+  --gemini-accent: var(--home-accent);
+  --gemini-bubble: var(--home-accent-soft);
+}
+html:has(.gemini-home), html:has(.gemini-home) body { height: 100%; overflow: hidden; }
