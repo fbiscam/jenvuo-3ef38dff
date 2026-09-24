@@ -439,7 +439,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
             </button>
           </PopoverTrigger>
           <PopoverContent align="start" className="w-80 p-2 font-sans subpixel-antialiased">
-            <p className="px-2 pb-2 pt-1 text-sm font-bold text-foreground">Indicators</p>
+            <p className="px-2 pb-2 pt-1 text-sm font-semibold text-foreground">Indicators</p>
             {INDICATOR_LIST.map((spec) => {
               const on = indicators.includes(spec.id);
               return (
@@ -455,8 +455,8 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
                     className="mt-0.5 data-[state=checked]:border-home-accent data-[state=checked]:bg-home-accent data-[state=checked]:text-home-accent-foreground"
                   />
                   <span className="min-w-0">
-                    <span className="block text-[15px] font-semibold leading-5 text-foreground">{spec.name}</span>
-                    <span className="block text-xs font-medium leading-4 text-muted-foreground">{spec.description}</span>
+                    <span className="block text-[15px] font-medium leading-5 text-foreground">{spec.name}</span>
+                    <span className="block text-xs font-normal leading-4 text-muted-foreground">{spec.description}</span>
                   </span>
                 </label>
               );
@@ -475,8 +475,8 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
             </button>
           </PopoverTrigger>
           <PopoverContent align="start" className="w-80 p-2 font-sans subpixel-antialiased">
-            <p className="px-2 pb-1 pt-1 text-sm font-bold text-foreground">Smart-money overlays</p>
-            <p className="px-2 pb-2 text-xs font-medium leading-4 text-muted-foreground">
+            <p className="px-2 pb-1 pt-1 text-sm font-semibold text-foreground">Smart-money overlays</p>
+            <p className="px-2 pb-2 text-xs font-normal leading-4 text-muted-foreground">
               Same 10-bar structure engine the AI desk
             </p>
             {SMC_LABELS.map((item) => (
@@ -485,8 +485,8 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
                 className="flex cursor-pointer items-center justify-between gap-3 rounded-md px-2 py-2 hover:bg-accent"
               >
                 <span>
-                  <span className="block text-[15px] font-semibold leading-5 text-foreground">{item.label}</span>
-                  <span className="block text-xs font-medium leading-4 text-muted-foreground">{item.hint}</span>
+                  <span className="block text-[15px] font-medium leading-5 text-foreground">{item.label}</span>
+                  <span className="block text-xs font-normal leading-4 text-muted-foreground">{item.hint}</span>
                 </span>
                 <Switch
                   checked={smcToggles[item.key] ?? DEFAULT_SMC[item.key]}

@@ -146,8 +146,8 @@ export function DemoTradingPanel({
         <div className="border-b border-border px-4 py-3">
           <div className="flex items-center justify-between gap-3">
             <div>
-              <p className="text-base font-bold text-foreground">Demo Trading</p>
-              <p className="text-xs font-medium text-muted-foreground">Virtual funds only · no real orders</p>
+              <p className="text-base font-semibold text-foreground">Demo Trading</p>
+              <p className="text-xs font-normal text-muted-foreground">Virtual funds only · no real orders</p>
             </div>
             <Button type="button" variant="ghost" size="icon-sm" onClick={resetAccount} title="Reset demo account">
               <RotateCcw className="h-3.5 w-3.5" />
@@ -155,15 +155,15 @@ export function DemoTradingPanel({
             </Button>
           </div>
           <div className="mt-3 grid grid-cols-3 gap-3">
-            <div><p className="text-[11px] font-semibold uppercase text-muted-foreground">Balance</p><p className="font-mono text-sm font-bold text-foreground">{money.format(account.balance)}</p></div>
-            <div><p className="text-[11px] font-semibold uppercase text-muted-foreground">Equity</p><p className="font-mono text-sm font-bold text-foreground">{money.format(metrics.equity)}</p></div>
-            <div><p className="text-[11px] font-semibold uppercase text-muted-foreground">Open P&amp;L</p><p className={cn("font-mono text-sm font-bold text-foreground", metrics.unrealizedPnl > 0 && "text-chart-2", metrics.unrealizedPnl < 0 && "text-destructive")}>{money.format(metrics.unrealizedPnl)}</p></div>
+            <div><p className="text-[11px] font-medium uppercase text-muted-foreground">Balance</p><p className="font-mono text-sm font-semibold text-foreground">{money.format(account.balance)}</p></div>
+            <div><p className="text-[11px] font-medium uppercase text-muted-foreground">Equity</p><p className="font-mono text-sm font-semibold text-foreground">{money.format(metrics.equity)}</p></div>
+            <div><p className="text-[11px] font-medium uppercase text-muted-foreground">Open P&amp;L</p><p className={cn("font-mono text-sm font-semibold text-foreground", metrics.unrealizedPnl > 0 && "text-chart-2", metrics.unrealizedPnl < 0 && "text-destructive")}>{money.format(metrics.unrealizedPnl)}</p></div>
           </div>
         </div>
 
         <div className="space-y-3 p-4">
           <div className="flex items-end gap-2">
-            <label className="min-w-0 flex-1 text-xs font-semibold text-muted-foreground">
+            <label className="min-w-0 flex-1 text-xs font-medium text-muted-foreground">
               Quantity (oz)
               <Input
                 aria-label="Demo order quantity in ounces"
@@ -172,12 +172,12 @@ export function DemoTradingPanel({
                 step="0.01"
                 value={quantity}
                 onChange={(event) => setQuantity(event.target.value)}
-                className="mt-1 h-9 font-mono text-sm font-semibold"
+                className="mt-1 h-9 font-mono text-sm font-medium"
               />
             </label>
             <div className="pb-1 text-right">
-              <p className="text-[11px] font-semibold uppercase text-muted-foreground">Live XAU/USD</p>
-              <p className="font-mono text-sm font-bold text-foreground">{currentPrice ? currentPrice.toFixed(2) : "—"}</p>
+              <p className="text-[11px] font-medium uppercase text-muted-foreground">Live XAU/USD</p>
+              <p className="font-mono text-sm font-semibold text-foreground">{currentPrice ? currentPrice.toFixed(2) : "—"}</p>
             </div>
           </div>
           <div className="grid grid-cols-2 gap-2">
@@ -187,31 +187,31 @@ export function DemoTradingPanel({
           {error && <p role="alert" className="text-xs text-destructive">{error}</p>}
 
           <div className="flex items-center justify-between border-t border-border pt-3">
-            <p className="text-sm font-bold text-foreground">Open positions</p>
+            <p className="text-sm font-semibold text-foreground">Open positions</p>
             {account.positions.length > 0 && (
               <Button type="button" variant="ghost" size="sm" className="h-7 text-[11px]" onClick={closeAll}>Close all</Button>
             )}
           </div>
           <div className="max-h-48 space-y-1.5 overflow-y-auto">
             {account.positions.length === 0 ? (
-              <p className="py-3 text-center text-sm font-medium text-muted-foreground">No open demo positions</p>
+              <p className="py-3 text-center text-sm font-normal text-muted-foreground">No open demo positions</p>
             ) : account.positions.map((position) => {
               const pnl = currentPrice ? (currentPrice - position.entryPrice) * position.quantity * (position.side === "buy" ? 1 : -1) : 0;
               return (
                 <div key={position.id} className="grid grid-cols-[1fr_auto] items-center gap-3 rounded-md border border-border px-3 py-2">
                   <div className="min-w-0">
-                    <p className="text-sm font-bold"><span className={position.side === "buy" ? "text-chart-2" : "text-destructive"}>{position.side.toUpperCase()}</span> {position.quantity} oz</p>
-                    <p className="font-mono text-xs font-medium text-muted-foreground">{position.entryPrice.toFixed(2)} → {currentPrice?.toFixed(2) ?? "—"}</p>
+                    <p className="text-sm font-semibold"><span className={position.side === "buy" ? "text-chart-2" : "text-destructive"}>{position.side.toUpperCase()}</span> {position.quantity} oz</p>
+                    <p className="font-mono text-xs font-normal text-muted-foreground">{position.entryPrice.toFixed(2)} → {currentPrice?.toFixed(2) ?? "—"}</p>
                   </div>
                   <div className="flex items-center gap-1.5">
-                    <span className={cn("font-mono text-sm font-bold", pnl > 0 && "text-chart-2", pnl < 0 && "text-destructive")}>{money.format(pnl)}</span>
+                    <span className={cn("font-mono text-sm font-semibold", pnl > 0 && "text-chart-2", pnl < 0 && "text-destructive")}>{money.format(pnl)}</span>
                     <Button type="button" variant="ghost" size="icon-sm" className="h-7 w-7" onClick={() => closePosition(position.id)} title="Close position"><X className="h-3.5 w-3.5" /><span className="sr-only">Close position</span></Button>
                   </div>
                 </div>
               );
             })}
           </div>
-          <div className="flex justify-between border-t border-border pt-2 text-xs font-medium text-muted-foreground">
+          <div className="flex justify-between border-t border-border pt-2 text-xs font-normal text-muted-foreground">
             <span>Buying power {money.format(metrics.availableBuyingPower)}</span>
             <span>Realized {money.format(account.realizedPnl)}</span>
           </div>
