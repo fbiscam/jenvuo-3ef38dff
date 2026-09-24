@@ -66,10 +66,19 @@ export function DemoTradingPanel({
     onPositionsChange(account.positions);
   }, [account, onPositionsChange, ready]);
 
-  const metrics = useMemo(
-    () => accountMetrics(account, currentPrice ?? 0),
-    [account, currentPrice],
-  );
+  const metrics = useMemo(() => {
+    if (currentPrice) return accountMetrics(account, currentPrice);
+    const openNotional = account.positions.reduce(
+      (sum, position) => sum + position.entryPrice * position.quantity,
+      0,
+    );
+    return {
+      unrealizedPnl: 0,
+      openNotional,
+      equity: account.balance,
+      availableBuyingPower: Math.max(0, account.balance - openNotional),
+    };
+  }, [account, currentPrice]);
 
   function placeOrder(side: DemoSide) {
     const amount = Number(quantity);
@@ -172,7 +181,7 @@ export function DemoTradingPanel({
             </div>
           </div>
           <div className="grid grid-cols-2 gap-2">
-            <Button type="button" size="sm" className="bg-emerald-600 text-primary-foreground hover:bg-emerald-600/90" onClick={() => placeOrder("buy")}>Buy</Button>
+            <Button type="button" size="sm" className="bg-chart-2 text-primary-foreground hover:bg-chart-2/90" onClick={() => placeOrder("buy")}>Buy</Button>
             <Button type="button" size="sm" variant="destructive" onClick={() => placeOrder("sell")}>Sell</Button>
           </div>
           {error && <p role="alert" className="text-xs text-destructive">{error}</p>}
@@ -191,7 +200,7 @@ export function DemoTradingPanel({
               return (
                 <div key={position.id} className="grid grid-cols-[1fr_auto] items-center gap-3 rounded-md border border-border px-3 py-2">
                   <div className="min-w-0">
-                    <p className="text-xs font-semibold"><span className={position.side === "buy" ? "text-emerald-600" : "text-destructive"}>{position.side.toUpperCase()}</span> {position.quantity} oz</p>
+                    <p className="text-xs font-semibold"><span className={position.side === "buy" ? "text-chart-2" : "text-destructive"}>{position.side.toUpperCase()}</span> {position.quantity} oz</p>
                     <p className="font-mono text-[10px] text-muted-foreground">{position.entryPrice.toFixed(2)} → {currentPrice?.toFixed(2) ?? "—"}</p>
                   </div>
                   <div className="flex items-center gap-1.5">

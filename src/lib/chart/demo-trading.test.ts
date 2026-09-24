@@ -1,4 +1,4 @@
-import { describe, expect, test } from "bun:test";
+import { describe, it } from "node:test";
 import {
   accountMetrics,
   closeDemoPosition,
@@ -6,6 +6,7 @@ import {
   positionPnl,
   type DemoPosition,
 } from "./demo-trading";
+import { expect } from "./test-expect";
 
 const buy: DemoPosition = {
   id: "buy-1",
@@ -24,16 +25,16 @@ const sell: DemoPosition = {
 };
 
 describe("demo trading", () => {
-  test("starts with a virtual $100,000 balance", () => {
+  it("starts with a virtual $100,000 balance", () => {
     expect(createDemoAccount()).toEqual({ balance: 100000, realizedPnl: 0, positions: [] });
   });
 
-  test("calculates long and short profit from the current price", () => {
+  it("calculates long and short profit from the current price", () => {
     expect(positionPnl(buy, 3010)).toBe(20);
     expect(positionPnl(sell, 3000)).toBe(10);
   });
 
-  test("calculates equity and available buying power", () => {
+  it("calculates equity and available buying power", () => {
     const metrics = accountMetrics({ balance: 100000, realizedPnl: 0, positions: [buy, sell] }, 3010);
     expect(metrics.unrealizedPnl).toBe(20);
     expect(metrics.equity).toBe(100020);
@@ -41,7 +42,7 @@ describe("demo trading", () => {
     expect(metrics.availableBuyingPower).toBe(91010);
   });
 
-  test("realizes profit when a position closes", () => {
+  it("realizes profit when a position closes", () => {
     const account = closeDemoPosition(
       { balance: 100000, realizedPnl: 0, positions: [buy, sell] },
       buy.id,
