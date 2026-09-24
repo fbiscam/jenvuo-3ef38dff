@@ -131,7 +131,7 @@ export function GeminiHome() {
         e.preventDefault();
         void send(input);
       }}
-      className="gemini-composer flex w-full items-center gap-2 rounded-full bg-card px-4 py-2.5"
+      className="gemini-composer flex w-full items-center gap-2 rounded-full bg-card px-4 py-2"
     >
       <button type="button" onClick={() => openHomeThread(null)} aria-label="New chat" className="rounded-full p-1.5 text-foreground hover:bg-muted">
         <Plus className="h-5 w-5" strokeWidth={1.75} />
@@ -148,7 +148,7 @@ export function GeminiHome() {
           }
         }}
         placeholder="Ask Jenvu"
-        className="max-h-40 flex-1 resize-none bg-transparent py-1.5 text-[17px] text-foreground outline-none placeholder:text-muted-foreground"
+        className="max-h-40 flex-1 resize-none bg-transparent py-1.5 text-[15px] text-foreground outline-none placeholder:text-muted-foreground"
       />
       <span className="hidden text-sm text-foreground sm:inline">Sonnet 4.5</span>
       <button
@@ -170,12 +170,12 @@ export function GeminiHome() {
 
       {messages.length === 0 && !pending ? (
         <div className="relative z-10 flex flex-1 flex-col items-center justify-center px-5 pb-16">
-          <h1 className="mb-12 text-center text-[34px] font-normal tracking-tight text-foreground">Where should we start?</h1>
-          <div className="w-full max-w-[660px]">
+          <h1 className="mb-8 text-center text-[28px] font-normal tracking-tight text-foreground">Where should we start?</h1>
+          <div className="w-full max-w-[600px]">
             {composer}
             <div className="mt-8 flex flex-col gap-5 pl-5">
               {SUGGESTIONS.map((s) => (
-                <button key={s} type="button" onClick={() => void send(s)} className="flex items-center gap-3 text-left text-[15px] text-foreground hover:opacity-70">
+                <button key={s} type="button" onClick={() => void send(s)} className="flex items-center gap-3 text-left text-[14px] text-foreground hover:opacity-70">
                   <CornerDownRight className="h-4 w-4 text-muted-foreground" />
                   {s}
                 </button>

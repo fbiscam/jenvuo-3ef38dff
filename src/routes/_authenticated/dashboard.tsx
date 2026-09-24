@@ -180,12 +180,9 @@ const NAV_GROUPS: Array<{ label: string; items: TabItem[] }> = [
     items: [
       { to: "/dashboard", label: "New chat", icon: SquarePen, exact: true },
       { to: "/dashboard/terminal", label: "Terminal", icon: Terminal },
-      { to: "/dashboard/notifications", label: "Alerts", icon: Bell },
       { to: "/dashboard/billing", label: "Billing", icon: Wallet },
       { to: "/dashboard/usage", label: "Usage", icon: ChartNoAxesCombined },
       { to: "/dashboard/extension", label: "API Keys", icon: KeyRound },
-      { to: "/dashboard/pay", label: "Payments", icon: CreditCard },
-      { to: "/dashboard/documents", label: "Documents", icon: FileCheck2 },
       { to: "/dashboard/security", label: "Security", icon: LockKeyhole },
     ],
   },
@@ -1368,19 +1365,6 @@ function DashboardLayout() {
           {/* Nav */}
 
           <nav className="sidebar-hover-scroll flex-1 min-h-0 overflow-y-auto overflow-x-hidden bg-sidebar px-2 py-2">
-            <button
-              type="button"
-              onClick={() => {
-                setMobileNavOpen(false);
-                openHomeSearch();
-                if (pathname !== "/dashboard") window.location.assign("/dashboard");
-              }}
-              title={sidebarCollapsed ? "Search chats" : undefined}
-              className={`dashboard-sidebar-link mb-1.5 flex w-full items-center rounded-full text-[12.5px] text-foreground hover:bg-zinc-50 ${sidebarCollapsed ? "justify-center px-2 py-1.5" : "gap-3 px-2.5 py-1.5"}`}
-            >
-              <SearchIcon className="h-[19px] w-[19px] shrink-0" strokeWidth={1.75} />
-              {!sidebarCollapsed && <span>Search chats</span>}
-            </button>
             {[...NAV_GROUPS].map((group, gi) => (
               <div key={group.label || `nav-group-${gi}`} className={gi > 0 ? "mt-2" : ""}>
                 {!sidebarCollapsed && group.label && (
@@ -1392,7 +1376,23 @@ function DashboardLayout() {
                   <div className="mx-3 mb-1 h-px bg-zinc-100" />
                 )}
                 <div className="flex flex-col gap-1.5">
-                  {group.items.map((t) => {
+                  {gi === 0 && (
+                    <button
+                      type="button"
+                      style={{ order: 1 }}
+                      onClick={() => {
+                        setMobileNavOpen(false);
+                        openHomeSearch();
+                        if (pathname !== "/dashboard") window.location.assign("/dashboard");
+                      }}
+                      title={sidebarCollapsed ? "Search chats" : undefined}
+                      className={`dashboard-sidebar-link flex w-full items-center rounded-full text-[12.5px] text-foreground hover:bg-zinc-50 ${sidebarCollapsed ? "justify-center px-2 py-1.5" : "gap-3 px-2.5 py-1.5"}`}
+                    >
+                      <SearchIcon className="h-[19px] w-[19px] shrink-0" strokeWidth={1.75} />
+                      {!sidebarCollapsed && <span>Search chats</span>}
+                    </button>
+                  )}
+                  {group.items.map((t, idx) => {
                     const active = t.exact ? pathname === t.to : pathname.startsWith(t.to);
                     const Icon = t.icon;
                     const count = t.countKey
@@ -1410,6 +1410,7 @@ function DashboardLayout() {
                           setMobileNavOpen(false);
                         }}
                         title={sidebarCollapsed ? t.label : undefined}
+                        style={{ order: idx * 2 }}
                         className={`dashboard-sidebar-link group relative flex items-center rounded-full text-[12.5px] font-normal text-foreground transition ${sidebarCollapsed ? "justify-center px-2 py-1.5" : "gap-3 px-2.5 py-1.5"} ${active ? "bg-[#EBEBEB]" : "hover:bg-zinc-50"}`}
                       >
                         <Icon
