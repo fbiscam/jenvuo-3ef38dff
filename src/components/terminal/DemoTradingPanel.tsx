@@ -146,7 +146,7 @@ export function DemoTradingPanel({
         <div className="border-b border-border px-4 py-3">
           <div className="flex items-center justify-between gap-3">
             <div>
-              <p className="text-base font-semibold text-foreground">Demo Trading</p>
+              <p className="text-base font-medium text-foreground">Demo Trading</p>
               <p className="text-xs font-normal text-muted-foreground">Virtual funds only · no real orders</p>
             </div>
             <Button type="button" variant="ghost" size="icon-sm" onClick={resetAccount} title="Reset demo account">
@@ -187,7 +187,7 @@ export function DemoTradingPanel({
           {error && <p role="alert" className="text-xs text-destructive">{error}</p>}
 
           <div className="flex items-center justify-between border-t border-border pt-3">
-            <p className="text-sm font-semibold text-foreground">Open positions</p>
+            <p className="text-sm font-medium text-foreground">Open positions</p>
             {account.positions.length > 0 && (
               <Button type="button" variant="ghost" size="sm" className="h-7 text-[11px]" onClick={closeAll}>Close all</Button>
             )}
