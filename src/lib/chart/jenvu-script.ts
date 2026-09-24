@@ -761,7 +761,7 @@ plotshape(ta.crossunder(fast, slow), "Bear cross", location=location.abovebar, c
     source: `//@version=5
 indicator("Mother + Inside Bar", overlay=true)
 inside = high < high[1] and low > low[1]
-plotshape(inside, "Inside bar", location=location.abovebar, color=color.orange, style=shape.circle, text="IB")`,
+plotshape(inside, "Inside bar", location=location.abovebar, color="#38bdf8", style=shape.circle, text="IB")`,
   },
   {
     name: "RSI",

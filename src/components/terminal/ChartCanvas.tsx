@@ -38,7 +38,11 @@ export const CHART_COLORS = {
   border: "#e0e3eb",
   up: "#089981",
   down: "#f23645",
+  insideBar: "#38bdf8",
 };
+
+const isInsideBarMarker = (title: string, text: string) =>
+  text.trim().toUpperCase() === "IB" || title.trim().toLowerCase() === "inside bar";
 
 export type ChartCanvasHandle = {
   snapshot: (header: string) => string | null;
@@ -454,15 +458,16 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
     const markers: SeriesMarker<Time>[] = [];
     for (const script of scripts) {
       for (const shape of script.result.shapes) {
+        const insideBar = isInsideBarMarker(shape.title, shape.text);
         for (const i of shape.bars.slice(-300)) {
           const bar = bars[i];
           if (!bar) continue;
           markers.push({
             time: bar.time as UTCTimestamp,
             position: shape.location === "above" ? "aboveBar" : "belowBar",
-            color: shape.color,
+            color: insideBar ? CHART_COLORS.insideBar : shape.color,
             shape: shape.shape,
-            text: shape.text || undefined,
+            text: insideBar ? undefined : shape.text || undefined,
           });
         }
       }
@@ -538,6 +543,25 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
       const p = propsRef.current;
       const pr = projector();
       if (p.smc) renderSmcOverlay(ctx, p.smc, p.smcToggles, pr);
+      ctx.save();
+      ctx.fillStyle = CHART_COLORS.text;
+      ctx.font = "600 10px 'DM Sans', system-ui, sans-serif";
+      ctx.textAlign = "center";
+      for (const script of p.scripts) {
+        for (const shape of script.result.shapes) {
+          if (!isInsideBarMarker(shape.title, shape.text)) continue;
+          for (const i of shape.bars.slice(-300)) {
+            const bar = p.bars[i];
+            if (!bar) continue;
+            const x = pr.x(bar.time);
+            const anchor = shape.location === "above" ? bar.high : bar.low;
+            const y = pr.y(anchor);
+            if (x == null || y == null) continue;
+            ctx.fillText("IB", x, shape.location === "above" ? y - 23 : y + 29);
+          }
+        }
+      }
+      ctx.restore();
       const list = visibleDrawings();
       for (const d of list)
         renderDrawing(ctx, d, pr, { selected: d.id === p.selectedId, hovered: d.id === hoverRef.current });
