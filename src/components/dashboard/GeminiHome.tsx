@@ -131,7 +131,7 @@ export function GeminiHome() {
         e.preventDefault();
         void send(input);
       }}
-      className="gemini-composer flex w-full items-center gap-2 rounded-full bg-card px-4 py-2"
+      className="gemini-composer flex w-full items-center gap-2 rounded-2xl border border-border bg-card px-4 py-2.5"
     >
       <button type="button" onClick={() => openHomeThread(null)} aria-label="New chat" className="rounded-full p-1.5 text-foreground hover:bg-muted">
         <Plus className="h-5 w-5" strokeWidth={1.75} />
@@ -170,13 +170,18 @@ export function GeminiHome() {
 
       {messages.length === 0 && !pending ? (
         <div className="relative z-10 flex flex-1 flex-col items-center justify-center px-5 pb-16">
-          <h1 className="mb-8 text-center text-[28px] font-normal tracking-tight text-foreground">Where should we start?</h1>
-          <div className="w-full max-w-[600px]">
+          <span className="mb-4 inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1 text-[12px] text-muted-foreground">
+            <span className="h-1.5 w-1.5 rounded-full bg-[var(--gemini-accent)]" />
+            XAU/USD desk · live
+          </span>
+          <h1 className="mb-2 text-center text-[30px] font-semibold tracking-tight text-foreground">What's the gold play today?</h1>
+          <p className="mb-7 text-center text-[14px] text-muted-foreground">Ask about structure, liquidity or setups — answers use live candles.</p>
+          <div className="w-full max-w-[620px]">
             {composer}
-            <div className="mt-8 flex flex-col gap-5 pl-5">
+            <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
               {SUGGESTIONS.map((s) => (
-                <button key={s} type="button" onClick={() => void send(s)} className="flex items-center gap-3 text-left text-[14px] text-foreground hover:opacity-70">
-                  <CornerDownRight className="h-4 w-4 text-muted-foreground" />
+                <button key={s} type="button" onClick={() => void send(s)} className="flex items-start gap-2 rounded-2xl border border-border bg-card p-3 text-left text-[13px] leading-snug text-foreground shadow-sm transition hover:-translate-y-0.5 hover:border-[var(--gemini-accent)]">
+                  <CornerDownRight className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
                   {s}
                 </button>
               ))}
