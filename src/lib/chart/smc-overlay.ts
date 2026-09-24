@@ -362,19 +362,22 @@ export function renderSmcOverlay(
   }
   if (toggles.liquidity) {
     ctx.setLineDash([6, 4]);
-    const liq = (price: number, label: string, color: string) => {
-      const y = pr.y(price);
-      if (y == null) return;
+    // BSL sits just above (label above), SSL just below (label below) so they
+    // never overlap supply/demand zone edges or their labels.
+    const liq = (price: number, label: string, color: string, above: boolean) => {
+      const rawY = pr.y(price);
+      if (rawY == null) return;
+      const y = above ? rawY - 5 : rawY + 5;
       ctx.strokeStyle = color;
       ctx.beginPath();
       ctx.moveTo(pr.width * 0.55, y);
       ctx.lineTo(pr.width, y);
       ctx.stroke();
       ctx.fillStyle = color;
-      ctx.fillText(`${label} ${price.toFixed(2)}`, pr.width * 0.55 + 4, y - 3);
+      ctx.fillText(`${label} ${price.toFixed(2)}`, pr.width * 0.55 + 4, above ? y - 4 : y + 12);
     };
-    smc.buySide.slice(0, 1).forEach((p) => liq(p, "BSL", "#089981"));
-    smc.sellSide.slice(0, 1).forEach((p) => liq(p, "SSL", "#f23645"));
+    smc.buySide.slice(0, 1).forEach((p) => liq(p, "BSL", "#089981", true));
+    smc.sellSide.slice(0, 1).forEach((p) => liq(p, "SSL", "#f23645", false));
     ctx.setLineDash([]);
   }
   if (toggles.breaks) {
