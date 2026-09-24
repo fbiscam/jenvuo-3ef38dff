@@ -55,6 +55,7 @@ import { buildChartContext } from "./chart-context";
 import { DemoTradingPanel } from "./DemoTradingPanel";
 import type { DemoPosition } from "@/lib/chart/demo-trading";
 import type { DemoOrderActions } from "./DemoOrderOverlay";
+import { useLivePriceStream } from "@/hooks/useLivePriceStream";
 
 const MemoChart = memo(ChartCanvas);
 
@@ -284,7 +285,20 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
   });
 
   const payload = chartQuery.data;
-  const bars: OhlcvBar[] = useMemo(() => payload?.bars ?? [], [payload]);
+  const rawBars: OhlcvBar[] = useMemo(() => payload?.bars ?? [], [payload]);
+  const livePrice = useLivePriceStream("XAUUSD", rawBars.at(-1)?.close ?? null);
+  const bars = useMemo(() => {
+    if (!livePrice || rawBars.length === 0) return rawBars;
+    const last = rawBars[rawBars.length - 1];
+    const nextBars = [...rawBars];
+    nextBars[rawBars.length - 1] = {
+      ...last,
+      close: livePrice,
+      high: Math.max(last.high, livePrice),
+      low: Math.min(last.low, livePrice),
+    };
+    return nextBars;
+  }, [rawBars, livePrice]);
   const stepSeconds = payload?.stepSeconds ?? 1800;
   const currentPrice = bars.at(-1)?.close ?? null;
 
