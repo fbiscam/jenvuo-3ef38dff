@@ -169,7 +169,7 @@ export function GeminiHome() {
       <div aria-hidden className="gemini-glow pointer-events-none absolute inset-0" />
 
       {messages.length === 0 && !pending ? (
-        <div className="relative z-10 flex flex-1 flex-col items-center justify-center px-5 pb-16">
+        <div className="relative z-10 flex flex-1 flex-col items-center justify-center px-5 pb-32">
           <h1 className="mb-8 text-center text-[28px] font-normal tracking-tight text-foreground">Where should we start?</h1>
           <div className="w-full max-w-[600px]">
             {composer}
