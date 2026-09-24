@@ -745,7 +745,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
             </div>
 
             {ticketSide && (
-              <div className="absolute left-2 top-16 z-[6] max-h-[calc(100%-4.5rem)] overflow-y-auto">
+              <div className="fixed inset-0 z-50 flex items-center justify-center overflow-hidden bg-background/60 p-3 backdrop-blur-sm" onClick={(e) => { if (e.target === e.currentTarget) setTicketSide(null); }}>
                 <OrderTicket
                   side={ticketSide}
                   onSideChange={setTicketSide}
