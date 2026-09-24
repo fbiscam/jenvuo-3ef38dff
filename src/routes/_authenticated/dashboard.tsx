@@ -1322,7 +1322,7 @@ function DashboardLayout() {
       {!embedMode && (
         /* Sidebar (Firebase-style) */
         <aside
-          className={`dashboard-sidebar-root ${pathname === "/dashboard/terminal" ? "dashboard-terminal-sidebar" : ""} max-lg:fixed max-lg:inset-y-0 max-lg:left-0 max-lg:z-50 lg:fixed lg:inset-y-0 lg:left-0 flex min-h-0 shrink-0 flex-col overflow-hidden border-r border-zinc-200 bg-sidebar transition-[width,transform] duration-200 ease-out ${sidebarCollapsed ? "w-[60px]" : "w-[200px]"} ${mobileNavOpen ? "max-lg:translate-x-0" : "max-lg:-translate-x-full"}`}
+          className={`dashboard-sidebar-root ${pathname === "/dashboard/terminal" ? "dashboard-terminal-sidebar" : ""} max-lg:fixed max-lg:inset-y-0 max-lg:left-0 max-lg:z-50 lg:fixed lg:inset-y-0 lg:left-0 flex min-h-0 shrink-0 flex-col overflow-hidden border-r border-zinc-200 bg-sidebar transition-[width,transform] duration-200 ease-out ${sidebarCollapsed ? "w-[60px]" : "w-[220px]"} ${mobileNavOpen ? "max-lg:translate-x-0" : "max-lg:-translate-x-full"}`}
           style={{
             fontFamily: '"Google Sans", "Product Sans", "Roboto", system-ui, sans-serif',
             fontWeight: 400,
@@ -1522,7 +1522,7 @@ function DashboardLayout() {
 
       {/* Right column */}
       <div
-        className={`dashboard-right-col flex min-w-0 min-h-0 flex-1 flex-col ${pathname === "/dashboard" ? "overflow-hidden bg-dashboard-canvas" : "bg-white"} ${embedMode ? "" : sidebarCollapsed ? "collapsed lg:pl-[60px]" : "lg:pl-[200px]"}`}
+        className={`dashboard-right-col flex min-w-0 min-h-0 flex-1 flex-col ${pathname === "/dashboard" ? "overflow-hidden bg-dashboard-canvas" : "bg-white"} ${embedMode ? "" : sidebarCollapsed ? "collapsed lg:pl-[60px]" : "lg:pl-[220px]"}`}
       >
         {/* Mobile menu toggle (floating) */}
         {!embedMode && (
