@@ -1029,3 +1029,81 @@ html:not(.ms-icons-ready) .material-symbols-rounded {
 @media (prefers-reduced-motion: reduce) {
   .td-marquee { animation: td-marquee 56s linear infinite !important; }
 }
+
+/* ====== Gemini-style light dashboard ====== */
+:root {
+  --gemini-surface: #ffffff;
+  --gemini-sidebar: #f8fafd;
+  --gemini-active: #e9eef6;
+  --gemini-hover: #eef2f8;
+  --gemini-glow: #c9e3ff;
+  --gemini-accent: #c2e7ff;
+  --gemini-accent-ink: #001d35;
+}
+.jenvu-zoom-dashboard {
+  background:
+    radial-gradient(60% 55% at 58% 42%, color-mix(in oklab, var(--gemini-glow) 70%, transparent) 0%, color-mix(in oklab, var(--gemini-glow) 25%, transparent) 45%, transparent 75%),
+    var(--gemini-surface) !important;
+  background-attachment: fixed !important;
+  font-family: "Google Sans", "Product Sans", "Roboto", system-ui, sans-serif !important;
+}
+.jenvu-zoom-dashboard main { background: transparent !important; }
+.dashboard-sidebar-root {
+  background-color: var(--gemini-sidebar) !important;
+  border-right-color: transparent !important;
+}
+.dashboard-sidebar-root .dashboard-sidebar-link { color: #1f1f1f !important; }
+.dashboard-sidebar-root .dashboard-sidebar-link.bg-\[\#EBEBEB\] {
+  background-color: var(--gemini-active) !important;
+  font-weight: 500 !important;
+}
+.dashboard-sidebar-root .dashboard-sidebar-link:hover { background-color: var(--gemini-hover); }
+.jenvu-zoom-dashboard main .bg-white {
+  background-color: rgba(255,255,255,0.85) !important;
+  border-color: rgba(31,31,31,0.06) !important;
+  box-shadow: 0 1px 3px rgba(60,64,67,0.08), 0 4px 16px -8px rgba(66,133,244,0.12) !important;
+}
+.jenvu-zoom-dashboard main .rounded-xl,
+.jenvu-zoom-dashboard main .rounded-2xl,
+.jenvu-zoom-dashboard main .rounded-lg { border-radius: 24px !important; }
+.jenvu-zoom-dashboard main button,
+.jenvu-zoom-dashboard main a[role="button"] { border-radius: 9999px !important; }
+.jenvu-zoom-dashboard main input,
+.jenvu-zoom-dashboard main textarea,
+.jenvu-zoom-dashboard main select { border-radius: 9999px; }
+.jenvu-zoom-dashboard main textarea { border-radius: 20px; }
+.jenvu-zoom-dashboard main h1,
+.jenvu-zoom-dashboard main h2,
+.jenvu-zoom-dashboard main h3 { color: #1f1f1f !important; font-weight: 400 !important; }
+.jenvu-zoom-dashboard main .bg-zinc-900,
+.jenvu-zoom-dashboard main .bg-black {
+  background-color: var(--gemini-accent) !important;
+  color: var(--gemini-accent-ink) !important;
+}
+.jenvu-zoom-dashboard main .bg-zinc-900 *,
+.jenvu-zoom-dashboard main .bg-black * { color: inherit; }
+.jenvu-zoom-dashboard > div:not(.dashboard-sidebar-root),
+.jenvu-zoom-dashboard > div:not(.dashboard-sidebar-root) > .bg-white:not(main *) { background-color: transparent !important; }
+.jenvu-zoom-dashboard {
+  background:
+    radial-gradient(45% 50% at 60% 38%, #cfe6ff 0%, #e4f0ff 40%, transparent 72%),
+    #ffffff !important;
+  background-attachment: fixed !important;
+}
+.jenvu-zoom-dashboard {
+  background:
+    radial-gradient(70% 60% at 60% 20%, #cde5ff 0%, #e2efff 45%, transparent 80%),
+    radial-gradient(50% 50% at 90% 90%, #e3efff 0%, transparent 70%),
+    #f8fbff !important;
+  background-attachment: fixed !important;
+}
+.jenvu-zoom-dashboard main .bg-white:not([class*="border"]):not([class*="shadow"]):not([class*="ring"]) {
+  background-color: transparent !important;
+  box-shadow: none !important;
+}
+.jenvu-zoom-dashboard main > section.bg-background,
+.jenvu-zoom-dashboard main > div > section.bg-background,
+.jenvu-zoom-dashboard main .analytics-section,
+.jenvu-zoom-dashboard main > .bg-background { background-color: transparent !important; }
+.jenvu-zoom-dashboard main section.bg-background,
+.jenvu-zoom-dashboard main div.bg-background:not([class*="border"]) { background-color: transparent !important; }
