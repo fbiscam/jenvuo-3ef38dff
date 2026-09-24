@@ -252,7 +252,7 @@ function RecentChats({ collapsed, onPick }: { collapsed: boolean; onPick: () => 
               </DropdownMenuTrigger>
               <DropdownMenuContent side="right" align="start" className="w-44 rounded-2xl p-2">
                 <DropdownMenuItem onSelect={() => void shareThread(t)} className="gap-3 rounded-lg py-2">
-                  <Share2 className="h-4 w-4" /> Share conversation
+                  <Share2 className="h-4 w-4" /> Share
                 </DropdownMenuItem>
                 <DropdownMenuItem onSelect={() => togglePinned(t.id)} className="gap-3 rounded-lg py-2">
                   <Pin className="h-4 w-4" /> {t.pinned ? "Unpin" : "Pin"}
