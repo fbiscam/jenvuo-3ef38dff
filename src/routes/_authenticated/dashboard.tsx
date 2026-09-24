@@ -36,17 +36,6 @@ import grokModelLogo from "@/assets/grok-logo-transparent.png";
 import solLogoAsset from "@/assets/sol-logo.png.asset.json";
 
 import {
-  GeminiHome,
-  HOME_ACTIVE_KEY,
-  HOME_EVENT,
-  openHomeSearch,
-  openHomeThread,
-  readHomeThreads,
-  writeHomeThreads,
-  type HomeThread,
-} from "@/components/dashboard/GeminiHome";
-import { SquarePen, Search as SearchIcon, Settings as SettingsIcon } from "lucide-react";
-import {
   Bookmark,
   Bell,
   BellRing,
@@ -54,6 +43,7 @@ import {
   BookOpen,
   User,
   LogOut,
+  Power,
   Mic,
   Plus,
   Wallet,
@@ -71,6 +61,8 @@ import {
   RefreshCw,
   Gift,
   PieChart,
+  ChevronsLeft,
+  ChevronsRight,
   Menu,
   X,
   Sparkles,
@@ -93,11 +85,6 @@ import {
   ScanSearch,
   ShieldCheckIcon,
   Terminal,
-  MoreVertical,
-  Share2,
-  Pin,
-  Pencil,
-  Trash2,
   type LucideIcon,
 } from "lucide-react";
 import {
@@ -111,6 +98,17 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 type RangeKey = "24h" | "7d" | "30d" | "90d" | "all";
+function clearStoredAuthSession() {
+  if (typeof window === "undefined") return;
+  for (const storage of [window.localStorage, window.sessionStorage]) {
+    for (let i = storage.length - 1; i >= 0; i--) {
+      const key = storage.key(i);
+      if (key?.startsWith("sb-") && key.endsWith("-auth-token")) {
+        storage.removeItem(key);
+      }
+    }
+  }
+}
 
 const RANGE_LABELS: Record<RangeKey, string> = {
   "24h": "Last 24 hours",
@@ -171,106 +169,38 @@ const NAV_GROUPS: Array<{ label: string; items: TabItem[] }> = [
   {
     label: "",
     items: [
-      { to: "/dashboard", label: "New chat", icon: SquarePen, exact: true },
+      {
+        to: "/dashboard",
+        label: "Overview",
+        icon: LayoutDashboard,
+        exact: true,
+        countKey: "saved",
+      },
       { to: "/dashboard/terminal", label: "Terminal", icon: Terminal },
-      { to: "/dashboard/billing", label: "Billing", icon: Wallet },
-      { to: "/dashboard/usage", label: "Usage", icon: ChartNoAxesCombined },
+    ],
+  },
+  {
+    label: "",
+    items: [{ to: "/dashboard/usage", label: "Usage", icon: ChartNoAxesCombined }],
+  },
+  {
+    label: "",
+    items: [
       { to: "/dashboard/extension", label: "API Keys", icon: KeyRound },
+      { to: "/pricing", label: "Pricing", icon: Tag },
+    ],
+  },
+  {
+    label: "",
+    items: [
+      { to: "/dashboard/billing", label: "Billing", icon: Wallet },
+      { to: "/dashboard/pay", label: "Payments", icon: BadgeDollarSign },
+      { to: "/dashboard/documents", label: "Documents", icon: FileCheck2 },
       { to: "/dashboard/security", label: "Security", icon: LockKeyhole },
+      { to: "/help", label: "Help Center", icon: CircleHelp },
     ],
   },
 ];
-
-function RecentChats({ collapsed, onPick }: { collapsed: boolean; onPick: () => void }) {
-  const [threads, setThreads] = useState<HomeThread[]>([]);
-  useEffect(() => {
-    const sync = () => setThreads(readHomeThreads());
-    sync();
-    window.addEventListener(HOME_EVENT, sync);
-    return () => window.removeEventListener(HOME_EVENT, sync);
-  }, []);
-  const updateThreads = (next: HomeThread[]) => {
-    writeHomeThreads(next);
-    setThreads(next);
-  };
-  const shareThread = async (thread: HomeThread) => {
-    const text = thread.messages.map((message) => `${message.role === "user" ? "You" : "Jenvu"}: ${message.text}`).join("\n\n");
-    try {
-      if (navigator.share) await navigator.share({ title: thread.title, text });
-      else {
-        await navigator.clipboard.writeText(text);
-        toast.success("Conversation copied");
-      }
-    } catch (error) {
-      if (error instanceof DOMException && error.name === "AbortError") return;
-      toast.error("Conversation could not be shared");
-    }
-  };
-  const togglePinned = (id: string) => {
-    const next = threads
-      .map((thread) => (thread.id === id ? { ...thread, pinned: !thread.pinned } : thread))
-      .sort((a, b) => Number(Boolean(b.pinned)) - Number(Boolean(a.pinned)) || b.updatedAt - a.updatedAt);
-    updateThreads(next);
-  };
-  const renameThread = (thread: HomeThread) => {
-    const title = window.prompt("Rename conversation", thread.title)?.trim();
-    if (!title) return;
-    updateThreads(threads.map((item) => (item.id === thread.id ? { ...item, title: title.slice(0, 60) } : item)));
-  };
-  const deleteThread = (id: string) => {
-    updateThreads(threads.filter((thread) => thread.id !== id));
-    if (localStorage.getItem(HOME_ACTIVE_KEY) === id) openHomeThread(null);
-  };
-  if (collapsed || threads.length === 0) return null;
-  return (
-    <div className="mt-5">
-      <div className="mb-1.5 px-2.5 text-[12px] text-[#6B6C6B]">Recents</div>
-      <div className="flex flex-col gap-0.5">
-        {threads.slice(0, 15).map((t) => (
-          <div key={t.id} className="group flex items-center rounded-full pr-1 hover:bg-zinc-100">
-            <Link
-              to="/dashboard"
-              onClick={() => {
-                openHomeThread(t.id);
-                onPick();
-              }}
-              className="min-w-0 flex-1 truncate px-2.5 py-1.5 text-[13px] text-foreground"
-            >
-              {t.title}
-            </Link>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  aria-label={`Options for ${t.title}`}
-                  className="h-7 w-7 shrink-0 rounded-full opacity-0 group-hover:opacity-100 data-[state=open]:opacity-100"
-                >
-                  <MoreVertical className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent side="right" align="start" className="w-44 rounded-2xl p-2">
-                <DropdownMenuItem onSelect={() => void shareThread(t)} className="gap-3 rounded-lg py-2">
-                  <Share2 className="h-4 w-4" /> Share
-                </DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => togglePinned(t.id)} className="gap-3 rounded-lg py-2">
-                  <Pin className="h-4 w-4" /> {t.pinned ? "Unpin" : "Pin"}
-                </DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => renameThread(t)} className="gap-3 rounded-lg py-2">
-                  <Pencil className="h-4 w-4" /> Rename
-                </DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => deleteThread(t.id)} className="gap-3 rounded-lg py-2 text-destructive focus:text-destructive">
-                  <Trash2 className="h-4 w-4" /> Delete
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
 
 const TABS: TabItem[] = NAV_GROUPS.flatMap((g) => g.items);
 
@@ -1224,6 +1154,18 @@ function DashboardLayout() {
     setRefreshTick((t) => t + 1);
   };
 
+  const signOut = async () => {
+    // NOTE: Do NOT revoke the trusted-device row here — a normal sign-out
+    // must keep this browser trusted so the user isn't prompted for MFA on
+    // every subsequent login. Trusted devices are only cleared when the user
+    // explicitly uses "Forget this device" / "Revoke" in Security settings.
+    clearStoredAuthSession();
+    void supabase.auth.signOut({ scope: "global" }).catch(() => {
+      /* ignore network errors */
+    });
+    window.location.replace("/");
+  };
+
   const planTier = (
     (credits.plan as { tier?: string; name?: string } | null)?.tier ??
     (credits.plan as { name?: string } | null)?.name ??
@@ -1348,7 +1290,7 @@ function DashboardLayout() {
 
   return (
     <div
-      className={`flex ${pathname === "/dashboard/terminal" ? "h-dvh overflow-hidden jenvu-terminal-shell" : pathname === "/dashboard" ? "h-dvh overflow-hidden jenvu-zoom-dashboard" : "min-h-screen jenvu-zoom-dashboard"} ${pathname === "/dashboard" ? "bg-dashboard-canvas" : "bg-white"} text-zinc-900 font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif] antialiased`}
+      className={`flex ${pathname === "/dashboard/terminal" ? "h-dvh overflow-hidden jenvu-terminal-shell" : "min-h-screen jenvu-zoom-dashboard"} bg-white text-zinc-900 font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif] antialiased`}
     >
       {/* Mobile overlay */}
       {mobileNavOpen && !embedMode && (
@@ -1363,7 +1305,7 @@ function DashboardLayout() {
       {!embedMode && (
         /* Sidebar (Firebase-style) */
         <aside
-          className={`dashboard-sidebar-root ${pathname === "/dashboard/terminal" ? "dashboard-terminal-sidebar" : ""} max-lg:fixed max-lg:inset-y-0 max-lg:left-0 max-lg:z-50 lg:fixed lg:inset-y-0 lg:left-0 flex min-h-0 shrink-0 flex-col overflow-hidden border-r border-zinc-200 bg-sidebar transition-[width,transform] duration-200 ease-out ${sidebarCollapsed ? "w-[60px]" : "w-[220px]"} ${mobileNavOpen ? "max-lg:translate-x-0" : "max-lg:-translate-x-full"}`}
+          className={`dashboard-sidebar-root ${pathname === "/dashboard/terminal" ? "dashboard-terminal-sidebar" : ""} max-lg:fixed max-lg:inset-y-0 max-lg:left-0 max-lg:z-50 lg:fixed lg:inset-y-0 lg:left-0 flex min-h-0 shrink-0 flex-col overflow-hidden border-r border-zinc-200 bg-sidebar transition-[width,transform] duration-200 ease-out ${sidebarCollapsed ? "w-[60px]" : "w-[200px]"} ${mobileNavOpen ? "max-lg:translate-x-0" : "max-lg:-translate-x-full"}`}
           style={{
             fontFamily: '"Google Sans", "Product Sans", "Roboto", system-ui, sans-serif',
             fontWeight: 400,
@@ -1417,23 +1359,7 @@ function DashboardLayout() {
                   <div className="mx-3 mb-1 h-px bg-zinc-100" />
                 )}
                 <div className="flex flex-col gap-1.5">
-                  {gi === 0 && (
-                    <button
-                      type="button"
-                      style={{ order: 1 }}
-                      onClick={() => {
-                        setMobileNavOpen(false);
-                        openHomeSearch();
-                        if (pathname !== "/dashboard") window.location.assign("/dashboard");
-                      }}
-                      title={sidebarCollapsed ? "Search chats" : undefined}
-                      className={`dashboard-sidebar-link flex w-full items-center rounded-full text-[12.5px] text-foreground hover:bg-zinc-50 ${sidebarCollapsed ? "justify-center px-2 py-1.5" : "gap-3 px-2.5 py-1.5"}`}
-                    >
-                      <SearchIcon className="h-[19px] w-[19px] shrink-0" strokeWidth={1.75} />
-                      {!sidebarCollapsed && <span>Search chats</span>}
-                    </button>
-                  )}
-                  {group.items.map((t, idx) => {
+                  {group.items.map((t) => {
                     const active = t.exact ? pathname === t.to : pathname.startsWith(t.to);
                     const Icon = t.icon;
                     const count = t.countKey
@@ -1451,7 +1377,6 @@ function DashboardLayout() {
                           setMobileNavOpen(false);
                         }}
                         title={sidebarCollapsed ? t.label : undefined}
-                        style={{ order: idx * 2 }}
                         className={`dashboard-sidebar-link group relative flex items-center rounded-full text-[12.5px] font-normal text-foreground transition ${sidebarCollapsed ? "justify-center px-2 py-1.5" : "gap-3 px-2.5 py-1.5"} ${active ? "bg-[#EBEBEB]" : "hover:bg-zinc-50"}`}
                       >
                         <Icon
@@ -1514,25 +1439,45 @@ function DashboardLayout() {
                 </div>
               </div>
             ))}
-            <RecentChats collapsed={sidebarCollapsed} onPick={() => setMobileNavOpen(false)} />
           </nav>
 
-          {!sidebarCollapsed && (
-            <div className="flex shrink-0 items-center gap-2.5 bg-sidebar px-3 py-2">
-              <img src={avatarUrl || "/favicon.png"} alt="" className="h-7 w-7 rounded-full object-cover" />
-              <span className="flex-1 truncate text-[14px] text-foreground">{fullName || email || "Account"}</span>
-              <Link to="/dashboard/profile" aria-label="Settings" className="rounded-full p-1.5 text-foreground hover:bg-zinc-100">
-                <SettingsIcon className="h-[18px] w-[18px]" strokeWidth={1.75} />
-              </Link>
+          {/* Quick actions: Sign out (left, icon) + Collapse (right) */}
+          <div
+            className={`mt-auto shrink-0 flex items-center border-t border-zinc-200 bg-sidebar py-2 ${sidebarCollapsed ? "justify-center px-2" : "justify-between pl-3 pr-2"}`}
+          >
+            {!sidebarCollapsed && (
+              <button
+                type="button"
+                onClick={signOut}
+                title="Sign out"
+                aria-label="Sign out"
+                className="inline-flex h-7 w-7 items-center justify-center rounded-md text-zinc-900 hover:bg-red-50 hover:text-red-600"
+              >
+                <Power className="h-3.5 w-3.5" strokeWidth={2.25} />
+              </button>
+            )}
+            <div className="flex items-center gap-1">
+              <button
+                type="button"
+                onClick={() => setSidebarCollapsed((v) => !v)}
+                title={sidebarCollapsed ? "Expand" : "Collapse"}
+                aria-label={sidebarCollapsed ? "Expand" : "Collapse"}
+                className="inline-flex h-7 w-7 items-center justify-center rounded-md text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900"
+              >
+                {sidebarCollapsed ? (
+                  <ChevronsRight className="h-3.5 w-3.5" />
+                ) : (
+                  <ChevronsLeft className="h-3.5 w-3.5" />
+                )}
+              </button>
             </div>
-          )}
-
+          </div>
         </aside>
       )}
 
       {/* Right column */}
       <div
-        className={`dashboard-right-col flex min-w-0 min-h-0 flex-1 flex-col ${pathname === "/dashboard" ? "overflow-hidden bg-dashboard-canvas" : "bg-white"} ${embedMode ? "" : sidebarCollapsed ? "collapsed lg:pl-[60px]" : "lg:pl-[220px]"}`}
+        className={`dashboard-right-col flex min-w-0 min-h-0 flex-1 flex-col bg-white ${embedMode ? "" : sidebarCollapsed ? "collapsed lg:pl-[60px]" : "lg:pl-[200px]"}`}
       >
         {/* Mobile menu toggle (floating) */}
         {!embedMode && (
@@ -1548,16 +1493,33 @@ function DashboardLayout() {
 
         <main
           className={
-            pathname === "/dashboard/terminal" || pathname === "/dashboard"
-              ? `h-dvh min-h-0 w-full flex-1 overflow-hidden ${pathname === "/dashboard" ? "bg-dashboard-canvas" : "bg-white"}`
+            pathname === "/dashboard/terminal"
+              ? "h-full min-h-0 w-full flex-1 overflow-hidden bg-white"
               : "mx-auto w-full max-w-7xl flex-1 bg-white px-5 pt-14 pb-7 sm:px-8 sm:pt-7"
           }
-          style={pathname === "/dashboard/terminal" || pathname === "/dashboard" ? undefined : { zoom: 0.9 }}
+          style={pathname === "/dashboard/terminal" ? undefined : { zoom: 0.9 }}
         >
-          {pathname !== "/dashboard/terminal" && pathname !== "/dashboard" && <VerificationBanner isAdmin={isAdminUser} />}
+          {pathname !== "/dashboard/terminal" && <VerificationBanner isAdmin={isAdminUser} />}
 
           {pathname === "/dashboard" ? (
-            <GeminiHome />
+            <>
+              {/* Extension usage analytics — Cloudflare-style */}
+              <DashboardHero keysCount={extKeyCount} stats={usageStats} />
+
+              {/* Extension usage analytics — Cloudflare-style */}
+              <UsageAnalytics
+                stats={usageStats}
+                keysCount={extKeyCount}
+                loading={usageLoading}
+                range={usageRange}
+                onRangeChange={setUsageRange}
+                onRefresh={handleRefresh}
+              />
+
+              <ModelWorkspace />
+
+              <div className="h-12" />
+            </>
           ) : verificationLocked ? (
             <VerificationLocked />
           ) : (

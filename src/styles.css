@@ -97,7 +97,6 @@
   --color-home-accent: var(--home-accent);
   --color-home-accent-soft: var(--home-accent-soft);
   --color-home-accent-foreground: var(--home-accent-foreground);
-  --color-dashboard-canvas: var(--dashboard-canvas);
   --color-auth-action: var(--auth-action);
   --color-auth-action-foreground: var(--auth-action-foreground);
 }
@@ -133,7 +132,7 @@
   --chart-3: oklch(0.72 0.17 60);                /* orange */
   --chart-4: oklch(0.78 0.16 95);                /* yellow */
   --chart-5: oklch(0.55 0.18 330);               /* reddish purple */
-  --sidebar: #ffffff;
+  --sidebar: #fafafa;
   --sidebar-foreground: oklch(0.145 0.02 264);
   --sidebar-primary: oklch(0.208 0.042 265.755);
   --sidebar-primary-foreground: oklch(0.984 0.003 247.858);
@@ -147,9 +146,8 @@
   --brand-claude: oklch(0.7 0.12 55);
   --home-accent: #fd540f;
   --home-accent-foreground: #ffffff;
-  --home-accent-soft: oklch(0.95 0.035 55);
-  --home-accent-canvas: oklch(0.98 0.015 55);
-  --dashboard-canvas: #fafafa;
+  --home-accent-soft: oklch(0.95 0.04 60);
+  --home-accent-canvas: rgb(255 244 237);
   --auth-action: oklch(0.72 0.14 255);
   --auth-action-foreground: oklch(1 0 0);
 }
@@ -195,7 +193,6 @@
   --home-accent-foreground: #ffffff;
   --home-accent-soft: oklch(0.32 0.10 55);
   --home-accent-canvas: rgb(45 24 12);
-  --dashboard-canvas: #fafafa;
   --auth-action: oklch(0.72 0.14 255);
   --auth-action-foreground: oklch(1 0 0);
 }
@@ -1032,28 +1029,3 @@ html:not(.ms-icons-ready) .material-symbols-rounded {
 @media (prefers-reduced-motion: reduce) {
   .td-marquee { animation: td-marquee 56s linear infinite !important; }
 }
-
-/* Gemini-style dashboard home */
-:root {
-  --gemini-accent: var(--home-accent);
-  --gemini-bubble: var(--home-accent-soft);
-}
-.gemini-glow {
-  background:
-    radial-gradient(ellipse 45% 55% at 58% 48%, color-mix(in oklab, var(--home-accent-soft) 82%, transparent), transparent 70%),
-    radial-gradient(ellipse 60% 40% at 50% 60%, color-mix(in oklab, var(--home-accent) 12%, transparent), transparent 75%);
-}
-.gemini-composer {
-  box-shadow: 0 1px 3px color-mix(in oklab, var(--foreground) 12%, transparent), 0 4px 18px color-mix(in oklab, var(--home-accent) 16%, transparent);
-}
-.gemini-home, .gemini-home * { font-family: "Google Sans", "Product Sans", "Roboto", system-ui, sans-serif; }
-
-/* Dashboard home only: blue accent + no page scroll */
-.gemini-home {
-  --home-accent: oklch(0.62 0.17 255);
-  --home-accent-soft: oklch(0.95 0.02 240);
-  --home-accent-canvas: rgb(237 244 255);
-  --gemini-accent: var(--home-accent);
-  --gemini-bubble: var(--home-accent-soft);
-}
-html:has(.gemini-home), html:has(.gemini-home) body { height: 100%; overflow: hidden; }
