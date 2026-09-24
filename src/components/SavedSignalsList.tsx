@@ -56,7 +56,7 @@ export function SavedSignalsList() {
     setRows((r) => r.filter((x) => x.id !== id));
   };
 
-  if (loading) return <div className="text-sm text-zinc-500">Loading saved setups…</div>;
+  if (loading) return null;
 
   if (!rows.length) {
     return (

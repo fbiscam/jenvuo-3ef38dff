@@ -2343,7 +2343,7 @@ function VoiceAgentHistory() {
   }, []);
 
   if (!mounted) {
-    return <div className="flex-1 px-5 py-6 text-[12px] text-zinc-400">Loading…</div>;
+    return <div className="flex-1" />;
   }
 
   if (items.length === 0) {
