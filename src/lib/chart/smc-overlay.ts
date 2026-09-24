@@ -213,6 +213,47 @@ export function renderSmcOverlay(
     ctx.setLineDash([]);
   };
 
+  const orderBlock = (ob: OrderBlockZone) => {
+    const x0 = pr.x(ob.t / 1000);
+    const topY = pr.y(ob.top);
+    const bottomY = pr.y(ob.bottom);
+    if (x0 == null || topY == null || bottomY == null) return;
+
+    const supply = ob.type === "SUPPLY";
+    const x = Math.max(0, x0);
+    const width = Math.max(1, pr.width - x);
+    const y = Math.min(topY, bottomY);
+    const height = Math.max(2, Math.abs(bottomY - topY));
+    const edge = supply ? "rgb(239,68,68)" : "rgb(16,185,129)";
+    const fill = supply ? "rgba(239,68,68,0.11)" : "rgba(16,185,129,0.11)";
+    const label = supply ? "SUPPLY ZONE" : "DEMAND ZONE";
+
+    ctx.fillStyle = fill;
+    ctx.fillRect(x, y, width, height);
+    ctx.strokeStyle = edge;
+    ctx.lineWidth = 1.25;
+    ctx.setLineDash([]);
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(pr.width, y);
+    ctx.moveTo(x, y + height);
+    ctx.lineTo(pr.width, y + height);
+    ctx.stroke();
+
+    const textWidth = ctx.measureText(label).width;
+    const labelX = Math.min(pr.width - textWidth - 12, Math.max(x + 8, x + width / 2 - textWidth / 2));
+    const labelY = y + height / 2;
+    ctx.fillStyle = "rgba(255,255,255,0.92)";
+    ctx.beginPath();
+    ctx.roundRect?.(labelX - 5, labelY - 8, textWidth + 10, 16, 3);
+    if (!ctx.roundRect) ctx.rect(labelX - 5, labelY - 8, textWidth + 10, 16);
+    ctx.fill();
+    ctx.fillStyle = edge;
+    ctx.textBaseline = "middle";
+    ctx.fillText(label, labelX, labelY + 0.5);
+    ctx.textBaseline = "alphabetic";
+  };
+
   if (toggles.fvg) {
     for (const g of smc.fvgs) {
       const bull = g.type === "BULLISH_FVG";
@@ -221,10 +262,7 @@ export function renderSmcOverlay(
     }
   }
   if (toggles.orderBlocks) {
-    for (const ob of smc.orderBlocks) {
-      const supply = ob.type === "SUPPLY";
-      dottedLine(ob.t, supply ? ob.top : ob.bottom, "rgb(234,179,8)");
-    }
+    for (const ob of smc.orderBlocks) orderBlock(ob);
   }
   if (toggles.liquidity) {
     ctx.setLineDash([6, 4]);
