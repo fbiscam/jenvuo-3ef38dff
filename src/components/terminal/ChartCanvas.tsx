@@ -248,38 +248,27 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
   };
 
   // ------------------------------------------------------------- candle data
-  // Order-block origin candles are painted sky blue instead of drawing zones.
-  const obKey =
-    props.smc && props.smcToggles.orderBlocks
-      ? props.smc.orderBlocks.map((z) => Math.round(z.t / 1000)).join(",")
-      : "";
-  const obKeyRef = useRef("");
   useEffect(() => {
     const candles = candleRef.current;
     if (!candles) return;
     const { bars } = props;
-    const obTimes = new Set(obKey ? obKey.split(",").map(Number) : []);
-    const OB = "#38bdf8";
     const data = bars.map((b) => ({
       time: b.time as UTCTimestamp,
       open: b.open,
       high: b.high,
       low: b.low,
       close: b.close,
-      ...(obTimes.has(b.time) ? { color: OB, wickColor: OB, borderColor: OB } : {}),
     }));
     const prev = lastBarsRef.current;
     const first = bars[0]?.time ?? 0;
-    const obChanged = obKeyRef.current !== obKey;
-    obKeyRef.current = obKey;
-    if (!obChanged && prev && prev.first === first && bars.length >= prev.len && bars.length - prev.len <= 2 && prev.len > 0) {
+    if (prev && prev.first === first && bars.length >= prev.len && bars.length - prev.len <= 2 && prev.len > 0) {
       for (let i = Math.max(0, prev.len - 1); i < data.length; i++) candles.update(data[i]);
     } else {
       candles.setData(data);
     }
     lastBarsRef.current = { first, len: bars.length };
     dirtyRef.current += 1;
-  }, [props.bars, obKey]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [props.bars]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ------------------------------------------------- scenario ghost candles
   useEffect(() => {

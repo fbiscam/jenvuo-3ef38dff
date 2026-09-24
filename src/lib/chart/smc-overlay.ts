@@ -226,7 +226,25 @@ export function renderSmcOverlay(
       );
     }
   }
-  // Order blocks are shown by colouring their origin candle sky blue (see ChartCanvas); no zones drawn.
+  if (toggles.orderBlocks) {
+    for (const ob of smc.orderBlocks) {
+      const x = pr.x(ob.t / 1000);
+      const y0 = pr.y(ob.top);
+      const y1 = pr.y(ob.bottom);
+      if (x == null || y0 == null || y1 == null) continue;
+      const top = Math.min(y0, y1);
+      const height = Math.max(3, Math.abs(y1 - y0));
+      const width = 10;
+      ctx.fillStyle = "rgba(56,189,248,0.18)";
+      ctx.strokeStyle = "rgba(14,165,233,0.95)";
+      ctx.lineWidth = 1.25;
+      ctx.beginPath();
+      ctx.roundRect?.(x - width / 2, top, width, height, 2);
+      if (!ctx.roundRect) ctx.rect(x - width / 2, top, width, height);
+      ctx.fill();
+      ctx.stroke();
+    }
+  }
   if (toggles.liquidity) {
     ctx.setLineDash([6, 4]);
     const liq = (price: number, label: string, color: string) => {
