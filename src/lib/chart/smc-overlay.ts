@@ -84,11 +84,16 @@ export function computeLivePivots(
   for (const kind of ["high", "low"] as const) {
     const val = (c: Candle) => (kind === "high" ? c.h : c.l);
     const beats = (a: number, b: number) => (kind === "high" ? a > b : a < b);
-    for (let i = all.length - 1; i >= firstUnconfirmed; i--) {
+    // Pick the most extreme candle in the unconfirmed tail (latest wins ties),
+    // so the newest low/high — including the forming candle — always gets its label.
+    let best = -1;
+    for (let i = firstUnconfirmed; i < all.length; i++) {
+      if (best < 0 || !beats(val(all[best]), val(all[i]))) best = i;
+    }
+    for (let i = best; i >= 0 && i === best; i--) {
       const v = val(all[i]);
       let ok = true;
-      for (let k = i - radius; k < i && ok; k++) if (!beats(v, val(all[k]))) ok = false;
-      for (let k = i + 1; k < all.length && ok; k++) if (!beats(v, val(all[k]))) ok = false;
+      for (let k = Math.max(0, i - radius); k < i && ok; k++) if (beats(val(all[k]), v)) ok = false;
       if (!ok) continue;
       const prev = [...confirmed].reverse().find((p) => p.kind === kind);
       const label: LivePivot["label"] = !prev
