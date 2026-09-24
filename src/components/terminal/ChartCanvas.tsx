@@ -39,8 +39,7 @@ export const CHART_COLORS = {
   up: "#089981",
   down: "#f23645",
   insideBar: "#38bdf8",
-  insideBarCandle: "#000000",
-  motherCandle: "#eab308",
+  insideBarCandle: "#eab308",
 };
 
 const isInsideBarMarker = (title: string, text: string) =>
@@ -267,13 +266,11 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
     if (!candles) return;
     const { bars } = props;
     const insideBarIndexes = new Set<number>();
-    const motherIndexes = new Set<number>();
     for (const script of props.scripts) {
       for (const shape of script.result.shapes) {
         if (!isInsideBarMarker(shape.title, shape.text)) continue;
         for (const index of shape.bars) {
           insideBarIndexes.add(index);
-          if (index > 0) motherIndexes.add(index - 1);
         }
       }
     }
@@ -287,9 +284,7 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
       };
       const color = insideBarIndexes.has(index)
         ? CHART_COLORS.insideBarCandle
-        : motherIndexes.has(index)
-          ? CHART_COLORS.motherCandle
-          : null;
+        : null;
       if (!color) return base;
       return { ...base, color, borderColor: color, wickColor: color };
     });
