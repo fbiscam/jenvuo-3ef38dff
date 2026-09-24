@@ -64,6 +64,61 @@ export const DEFAULT_SMC: SmcToggles = {
 
 type Candle = { t: number; o: number; h: number; l: number; c: number };
 
+type PoiSelection = {
+  fvgs: FairValueGap[];
+  orderBlocks: OrderBlockZone[];
+};
+
+const zoneDistance = (top: number, bottom: number, price: number) => {
+  if (price >= bottom && price <= top) return 0;
+  return Math.min(Math.abs(price - top), Math.abs(price - bottom));
+};
+
+/**
+ * Keeps only the strongest untouched POI in each direction. This prevents two
+ * same-side zones from stacking over each other while retaining the most
+ * actionable high-confidence demand, supply and FVG around current price.
+ */
+export function selectHighConfidencePois(
+  poi: Pick<ReturnType<typeof detectPoiEvidence>, "fair_value_gaps" | "order_blocks">,
+  price: number,
+): PoiSelection {
+  const chooseOnePerType = <T extends { type: string; index: number; top: number; bottom: number }>(
+    zones: T[],
+    score: (zone: T) => number,
+  ) => {
+    const best = new Map<string, T>();
+    for (const zone of zones) {
+      const current = best.get(zone.type);
+      if (!current || score(zone) > score(current)) best.set(zone.type, zone);
+    }
+    return [...best.values()].sort((a, b) => a.index - b.index);
+  };
+
+  const untouchedFvgs = poi.fair_value_gaps.filter((gap) => gap.status === "UNMITIGATED");
+  const averageFvgSize =
+    untouchedFvgs.reduce((total, gap) => total + gap.size, 0) / Math.max(1, untouchedFvgs.length);
+  const meaningfulFvgs = untouchedFvgs.filter((gap) => gap.size >= averageFvgSize);
+  const fvgs = chooseOnePerType(
+    meaningfulFvgs,
+    (gap) =>
+      (gap.size / Math.max(averageFvgSize, Number.EPSILON)) * 100 +
+      gap.index +
+      500 / (1 + zoneDistance(gap.top, gap.bottom, price)),
+  );
+
+  const strictOrderBlocks = poi.order_blocks.filter(
+    (zone) =>
+      zone.status === "UNMITIGATED" && zone.displacement && zone.swept_liquidity && zone.is_fvg_aligned,
+  );
+  const orderBlocks = chooseOnePerType(
+    strictOrderBlocks,
+    (zone) => zone.index + 500 / (1 + zoneDistance(zone.top, zone.bottom, price)),
+  );
+
+  return { fvgs, orderBlocks };
+}
+
 const toCandle = (b: OhlcvBar): Candle => ({ t: b.time * 1000, o: b.open, h: b.high, l: b.low, c: b.close });
 
 /**
@@ -152,6 +207,7 @@ export function computeSmcOverlay(
   const fractal = detectMarketStructureEvidence(fractalBars, FRACTAL_RADIUS);
   const pivotsLabelled = fractal.pivots.filter((p) => p.label.length === 2);
   const livePivots = computeLivePivots(fractalBars, forming ? toCandle(forming) : null, fractal.pivots);
+  const selectedPois = selectHighConfidencePois(poi, price);
 
   // Structure labels, breaks, trend and liquidity must all come from this same
   // confirmed 10-bar pivot set. Provisional tail pivots never create events.
@@ -175,16 +231,8 @@ export function computeSmcOverlay(
     pivots: pivotsLabelled,
     livePivots,
     breaks: breaks.slice(-8),
-    // Only high-quality zones: unmitigated FVGs of meaningful size, and order
-    // blocks backed by displacement plus a liquidity sweep or FVG alignment.
-    fvgs: (() => {
-      const live = poi.fair_value_gaps.filter((g) => g.status !== "MITIGATED");
-      const avg = live.reduce((a, g) => a + g.size, 0) / Math.max(1, live.length);
-      return live.filter((g) => g.size >= avg).slice(-3);
-    })(),
-    orderBlocks: poi.order_blocks
-      .filter((z) => z.status !== "MITIGATED" && z.displacement && (z.swept_liquidity || z.is_fvg_aligned))
-      .slice(-3),
+    fvgs: selectedPois.fvgs,
+    orderBlocks: selectedPois.orderBlocks,
     buySide,
     sellSide,
     trend: fractal.trend,
