@@ -590,6 +590,9 @@ const CACHE_TTL = 30_000;
 // structure is far better than the synthetic sine-wave fallback (which forces
 // the whole scan into quote-only "WAIT" mode).
 const CACHE_STALE_MAX = 10 * 60_000;
+// Terminal chart: when every feed is down, keep showing the last good chart for
+// up to 2 hours instead of blanking (outages of 15+ minutes were observed).
+const TERMINAL_STALE_MAX = 2 * 60 * 60_000;
 // Candle fetches are deduplicated: one scan pulls 5 timeframes and cross-pairs
 // derive from XAU/USD + an FX proxy, so without this the same Yahoo endpoint is
 // hit ~30x per scan and starts 429-ing — that was the "some pairs analyze, some
