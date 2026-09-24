@@ -278,9 +278,9 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
   const chartQuery = useQuery({
     queryKey: ["terminal-chart", timeframe.key],
     queryFn: () => fetchChart({ data: { timeframe: timeframe.key } }),
-    refetchInterval: 10000,
+    refetchInterval: 5000,
     refetchIntervalInBackground: true,
-    staleTime: 3000,
+    staleTime: 1000,
     retry: 2,
   });
 
