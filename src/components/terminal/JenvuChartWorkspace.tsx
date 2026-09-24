@@ -390,8 +390,8 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
   return (
     <div ref={workspaceRef} className="flex h-full min-h-0 w-full flex-col bg-background">
       {/* Top bar */}
-      <div className="flex h-11 shrink-0 items-center gap-1 border-b border-border px-2">
-        <div className="mr-1 flex items-center gap-2 pl-1 pr-2">
+      <div className="flex h-11 shrink-0 items-center gap-1 overflow-x-auto border-b border-border px-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:overflow-x-visible">
+        <div className="mr-1 flex shrink-0 items-center gap-2 pl-1 pr-2">
           <button
             type="button"
             aria-label="Open menu"
@@ -403,7 +403,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
           <span className="hidden md:inline-flex"><XauUsdLogo size={22} /></span>
           <span className="text-sm font-semibold tracking-tight">{"\n"}</span>
         </div>
-        <div className="flex items-center" role="group" aria-label="Chart timeframe">
+        <div className="flex shrink-0 items-center" role="group" aria-label="Chart timeframe">
           {timeframes.map((item) => (
             <button
               type="button"
@@ -419,13 +419,13 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
             </button>
           ))}
         </div>
-        <span className="mx-1 h-5 w-px bg-border" aria-hidden="true" />
+        <span className="mx-1 h-5 w-px shrink-0 bg-border" aria-hidden="true" />
 
         <Popover>
           <PopoverTrigger asChild>
             <button
               type="button"
-              className="flex h-7 items-center gap-1.5 rounded-md px-2 text-xs font-medium text-muted-foreground hover:bg-accent hover:text-foreground"
+              className="flex h-7 shrink-0 items-center gap-1.5 rounded-md px-2 text-xs font-medium text-muted-foreground hover:bg-accent hover:text-foreground"
             >
               <Activity className="h-3.5 w-3.5" />
               Indicators
@@ -464,7 +464,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
           <PopoverTrigger asChild>
             <button
               type="button"
-              className="flex h-7 items-center gap-1.5 rounded-md px-2 text-xs font-medium text-muted-foreground hover:bg-accent hover:text-foreground"
+              className="flex h-7 shrink-0 items-center gap-1.5 rounded-md px-2 text-xs font-medium text-muted-foreground hover:bg-accent hover:text-foreground"
             >
               <Layers className="h-3.5 w-3.5" />
               Jenvu SMC
@@ -498,7 +498,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
           onClick={() => setScriptPanelOpen((v) => !v)}
           aria-pressed={scriptPanelOpen}
           className={cn(
-            "flex h-7 items-center gap-1.5 rounded-md px-2 text-xs font-medium text-muted-foreground hover:bg-accent hover:text-foreground",
+            "flex h-7 shrink-0 items-center gap-1.5 rounded-md px-2 text-xs font-medium text-muted-foreground hover:bg-accent hover:text-foreground",
             scriptPanelOpen && "bg-accent text-foreground",
           )}
         >
@@ -546,7 +546,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
           <TooltipContent>{fullscreen ? "Exit fullscreen" : "Fullscreen chart"}</TooltipContent>
         </Tooltip>
 
-        <div className="ml-auto flex items-center gap-2">{rightSlot}</div>
+        <div className="ml-auto flex shrink-0 items-center gap-2">{rightSlot}</div>
       </div>
 
       <div className="flex min-h-0 flex-1">
