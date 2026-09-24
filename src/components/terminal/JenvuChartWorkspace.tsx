@@ -54,8 +54,6 @@ import { ScriptPanel, type SavedScript } from "./ScriptPanel";
 import { buildChartContext } from "./chart-context";
 import { DemoTradingPanel, OrderTicket, PaperTradingPanel, QuickTradeButtons, useDemoTrading } from "./DemoTradingPanel";
 import type { DemoSide } from "@/lib/chart/demo-trading";
-import type { DemoPosition } from "@/lib/chart/demo-trading";
-import type { DemoOrderActions } from "./DemoOrderOverlay";
 import { useLivePriceStream } from "@/hooks/useLivePriceStream";
 
 const MemoChart = memo(ChartCanvas);
@@ -302,6 +300,9 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
   }, [rawBars, livePrice]);
   const stepSeconds = payload?.stepSeconds ?? 1800;
   const currentPrice = bars.at(-1)?.close ?? null;
+  const demo = useDemoTrading(currentPrice);
+  const demoPositions = demo.account.positions;
+  const demoActions = demo.actions;
 
   // Use the SERVER clock to decide which candles are closed. A device clock that
   // is a few minutes off would otherwise include/exclude a candle and shift the
