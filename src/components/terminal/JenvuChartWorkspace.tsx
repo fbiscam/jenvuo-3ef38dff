@@ -439,7 +439,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
             </button>
           </PopoverTrigger>
           <PopoverContent align="start" className="w-80 p-2 font-sans subpixel-antialiased">
-            <p className="px-2 pb-2 pt-1 text-sm font-semibold text-foreground">Indicators</p>
+            <p className="px-2 pb-2 pt-1 text-sm font-medium text-foreground">Indicators</p>
             {INDICATOR_LIST.map((spec) => {
               const on = indicators.includes(spec.id);
               return (
@@ -475,7 +475,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
             </button>
           </PopoverTrigger>
           <PopoverContent align="start" className="w-80 p-2 font-sans subpixel-antialiased">
-            <p className="px-2 pb-1 pt-1 text-sm font-semibold text-foreground">Smart-money overlays</p>
+            <p className="px-2 pb-1 pt-1 text-sm font-medium text-foreground">Smart-money overlays</p>
             <p className="px-2 pb-2 text-xs font-normal leading-4 text-muted-foreground">
               Same 10-bar structure engine the AI desk
             </p>
