@@ -237,7 +237,7 @@ export function renderSmcOverlay(
       const top = Math.min(yTop, yBot);
       const h = Math.max(2, Math.abs(yBot - yTop));
       const w = pr.width - x;
-      const rgb = demand ? "41,98,255" : "242,54,69";
+      const rgb = demand ? "41,98,255" : "234,179,8";
       // Soft gradient body fading to the right
       const grad = ctx.createLinearGradient(x, 0, pr.width, 0);
       grad.addColorStop(0, `rgba(${rgb},0.22)`);
