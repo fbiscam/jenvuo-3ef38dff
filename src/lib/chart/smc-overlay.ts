@@ -107,13 +107,18 @@ export function selectHighConfidencePois(
       500 / (1 + zoneDistance(gap.top, gap.bottom, price)),
   );
 
-  const strictOrderBlocks = poi.order_blocks.filter(
-    (zone) =>
-      zone.status === "UNMITIGATED" && zone.displacement && zone.swept_liquidity && zone.is_fvg_aligned,
-  );
+  // Untouched OBs; confluence (sweep / FVG / displacement) boosts score so the
+  // strongest zone per side wins, but a valid zone is never hidden entirely.
+  const activeOrderBlocks = poi.order_blocks.filter((zone) => zone.status !== "MITIGATED");
   const orderBlocks = chooseOnePerType(
-    strictOrderBlocks,
-    (zone) => zone.index + 500 / (1 + zoneDistance(zone.top, zone.bottom, price)),
+    activeOrderBlocks,
+    (zone) =>
+      (zone.displacement ? 400 : 0) +
+      (zone.swept_liquidity ? 300 : 0) +
+      (zone.is_fvg_aligned ? 300 : 0) +
+      (zone.status === "UNMITIGATED" ? 200 : 0) +
+      zone.index +
+      500 / (1 + zoneDistance(zone.top, zone.bottom, price)),
   );
 
   return { fvgs, orderBlocks };
