@@ -77,9 +77,10 @@ describe("smc overlay fractal labels", () => {
           { ...base, type: "SUPPLY", index: 31, t: 31, top: 104, bottom: 103, displacement: true, swept_liquidity: false, is_fvg_aligned: true },
         ],
         fair_value_gaps: [
-          { ...base, type: "BULLISH_FVG", index: 11, t: 11, top: 98, bottom: 97, ce: 97.5, size: 1 },
-          { ...base, type: "BULLISH_FVG", index: 21, t: 21, top: 100, bottom: 98, ce: 99, size: 2 },
-          { ...base, type: "BEARISH_FVG", index: 31, t: 31, top: 105, bottom: 103, ce: 104, size: 2 },
+          { ...base, type: "BULLISH_FVG", index: 11, t: 11, top: 95, bottom: 94, ce: 94.5, size: 1 },
+          { ...base, type: "BULLISH_FVG", index: 21, t: 21, top: 95.5, bottom: 93.5, ce: 94.5, size: 2 },
+          { ...base, type: "BEARISH_FVG", index: 31, t: 31, top: 108, bottom: 107, ce: 107.5, size: 2 },
+          { ...base, type: "BEARISH_FVG", index: 32, t: 32, top: 106, bottom: 105, ce: 105.5, size: 1 },
         ],
       },
       101,
@@ -90,5 +91,11 @@ describe("smc overlay fractal labels", () => {
     expect(result.orderBlocks.some((zone) => zone.index === 31)).toBe(false);
     expect(result.fvgs.filter((gap) => gap.type === "BULLISH_FVG")).toHaveLength(1);
     expect(result.fvgs.filter((gap) => gap.type === "BEARISH_FVG")).toHaveLength(1);
+    const allZones = [...result.orderBlocks, ...result.fvgs];
+    for (let i = 0; i < allZones.length; i++) {
+      for (let j = i + 1; j < allZones.length; j++) {
+        expect(allZones[i].bottom >= allZones[j].top || allZones[i].top <= allZones[j].bottom).toBe(true);
+      }
+    }
   });
 });
