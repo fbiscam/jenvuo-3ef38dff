@@ -52,7 +52,6 @@ import {
   BookOpen,
   User,
   LogOut,
-  Power,
   Mic,
   Plus,
   Wallet,
@@ -70,8 +69,6 @@ import {
   RefreshCw,
   Gift,
   PieChart,
-  ChevronsLeft,
-  ChevronsRight,
   Menu,
   X,
   Sparkles,
@@ -107,17 +104,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 type RangeKey = "24h" | "7d" | "30d" | "90d" | "all";
-function clearStoredAuthSession() {
-  if (typeof window === "undefined") return;
-  for (const storage of [window.localStorage, window.sessionStorage]) {
-    for (let i = storage.length - 1; i >= 0; i--) {
-      const key = storage.key(i);
-      if (key?.startsWith("sb-") && key.endsWith("-auth-token")) {
-        storage.removeItem(key);
-      }
-    }
-  }
-}
 
 const RANGE_LABELS: Record<RangeKey, string> = {
   "24h": "Last 24 hours",
@@ -1169,18 +1155,6 @@ function DashboardLayout() {
   const handleRefresh = () => {
     if (refreshing) return;
     setRefreshTick((t) => t + 1);
-  };
-
-  const signOut = async () => {
-    // NOTE: Do NOT revoke the trusted-device row here — a normal sign-out
-    // must keep this browser trusted so the user isn't prompted for MFA on
-    // every subsequent login. Trusted devices are only cleared when the user
-    // explicitly uses "Forget this device" / "Revoke" in Security settings.
-    clearStoredAuthSession();
-    void supabase.auth.signOut({ scope: "global" }).catch(() => {
-      /* ignore network errors */
-    });
-    window.location.replace("/");
   };
 
   const planTier = (
