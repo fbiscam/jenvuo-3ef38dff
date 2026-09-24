@@ -23,8 +23,6 @@ import {
   Layers,
   Magnet,
   Maximize2,
-  Moon,
-  Sun,
   Minimize2,
   Minus,
   MousePointer2,
@@ -61,7 +59,6 @@ const INDICATORS_KEY = "jenvu:terminal:indicators:v1";
 const SMC_KEY = "jenvu:terminal:smc:v1";
 const SCRIPTS_KEY = "jenvu:terminal:scripts:v1";
 const DRAWINGS_VISIBLE_KEY = "jenvu:terminal:drawings-visible:v1";
-const THEME_KEY = "jenvu:terminal:chart-theme:v1";
 
 function PositionToolIcon({ side }: { side: "long" | "short" }) {
   const isLong = side === "long";
@@ -209,14 +206,6 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [hoverIndex, setHoverIndex] = useState<number | null>(null);
   const [fullscreen, setFullscreen] = useState(false);
-  const [darkChart, setDarkChart] = useState(false);
-  useEffect(() => {
-    try { setDarkChart(localStorage.getItem(THEME_KEY) === "dark"); } catch { /* ignore */ }
-  }, []);
-  const toggleDark = () => setDarkChart((d) => {
-    try { localStorage.setItem(THEME_KEY, d ? "light" : "dark"); } catch { /* ignore */ }
-    return !d;
-  });
 
   useEffect(() => {
     const syncFullscreen = () => setFullscreen(document.fullscreenElement === workspaceRef.current);
@@ -398,7 +387,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
   const selected = drawings.find((d) => d.id === selectedId) ?? null;
 
   return (
-    <div ref={workspaceRef} className={`flex h-full min-h-0 w-full flex-col bg-background text-foreground ${darkChart ? "dark" : ""}`}>
+    <div ref={workspaceRef} className="flex h-full min-h-0 w-full flex-col bg-background">
       {/* Top bar */}
       <div className="flex h-11 shrink-0 items-center gap-1 border-b border-border px-2">
         <div className="mr-1 flex items-center gap-2 pl-1 pr-2">
@@ -538,19 +527,6 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
           <TooltipTrigger asChild>
             <button
               type="button"
-              onClick={toggleDark}
-              aria-label={darkChart ? "Light chart theme" : "Dark chart theme"}
-              className="flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground"
-            >
-              {darkChart ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
-            </button>
-          </TooltipTrigger>
-          <TooltipContent>{darkChart ? "Light theme" : "Dark theme"}</TooltipContent>
-        </Tooltip>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <button
-              type="button"
               onClick={() => void toggleFullscreen()}
               aria-label={fullscreen ? "Exit fullscreen chart" : "Fullscreen chart"}
               className="flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground"
@@ -647,7 +623,6 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
           <div className="relative min-h-0 flex-1">
             <MemoChart
               ref={chartRef}
-              dark={darkChart}
               bars={bars}
               stepSeconds={stepSeconds}
               indicators={indicators}
