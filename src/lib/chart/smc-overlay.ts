@@ -237,45 +237,19 @@ export function renderSmcOverlay(
       const top = Math.min(yTop, yBot);
       const h = Math.max(2, Math.abs(yBot - yTop));
       const w = pr.width - x;
-      const rgb = demand ? "41,98,255" : "234,179,8";
-      // Soft gradient body fading to the right
+      const rgb = demand ? "41,98,255" : "56,189,248";
+      // Clean sky-blue zone: soft gradient body, thin rounded outline, no text.
       const grad = ctx.createLinearGradient(x, 0, pr.width, 0);
-      grad.addColorStop(0, `rgba(${rgb},0.22)`);
-      grad.addColorStop(1, `rgba(${rgb},0.04)`);
+      grad.addColorStop(0, `rgba(${rgb},0.28)`);
+      grad.addColorStop(1, `rgba(${rgb},0.08)`);
+      ctx.beginPath();
+      ctx.roundRect?.(x, top, w, h, 3);
+      if (!ctx.roundRect) ctx.rect(x, top, w, h);
       ctx.fillStyle = grad;
-      ctx.fillRect(x, top, w, h);
-      // Top/bottom edges
-      ctx.strokeStyle = `rgba(${rgb},0.55)`;
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.moveTo(x, top + 0.5);
-      ctx.lineTo(pr.width, top + 0.5);
-      ctx.moveTo(x, top + h - 0.5);
-      ctx.lineTo(pr.width, top + h - 0.5);
-      ctx.stroke();
-      // 50% mean threshold
-      ctx.setLineDash([4, 4]);
-      ctx.strokeStyle = `rgba(${rgb},0.45)`;
-      ctx.beginPath();
-      ctx.moveTo(x, top + h / 2);
-      ctx.lineTo(pr.width, top + h / 2);
-      ctx.stroke();
-      ctx.setLineDash([]);
-      // Solid accent bar at origin candle
-      ctx.fillStyle = `rgba(${rgb},0.95)`;
-      ctx.fillRect(x, top, 3, h);
-      // Label pill centred inside the block
-      const label = `${demand ? "Demand OB" : "Supply OB"}${z.status === "PARTIAL" ? " · partial" : ""}`;
-      const tw = ctx.measureText(label).width + 12;
-      const lx = x + Math.max(6, (w - tw) / 2);
-      const ly = top + h / 2 - 7;
-      ctx.beginPath();
-      ctx.roundRect?.(lx, ly, tw, 14, 7);
-      if (!ctx.roundRect) ctx.rect(lx, ly, tw, 14);
-      ctx.fillStyle = `rgba(${rgb},0.95)`;
       ctx.fill();
-      ctx.fillStyle = "#ffffff";
-      ctx.fillText(label, lx + 6, ly + 10.5);
+      ctx.strokeStyle = `rgba(${rgb},0.7)`;
+      ctx.lineWidth = 1;
+      ctx.stroke();
     }
   }
   if (toggles.liquidity) {
