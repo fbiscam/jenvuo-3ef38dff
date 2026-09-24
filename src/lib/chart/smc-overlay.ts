@@ -176,7 +176,7 @@ export function computeSmcOverlay(
     livePivots,
     breaks: breaks.slice(-8),
     fvgs: poi.fair_value_gaps.filter((g) => g.status !== "MITIGATED").slice(-5),
-    orderBlocks: poi.order_blocks.filter((z) => z.status !== "MITIGATED").slice(-5),
+    orderBlocks: poi.order_blocks.filter((z) => z.status !== "MITIGATED").slice(-4),
     buySide,
     sellSide,
     trend: fractal.trend,
