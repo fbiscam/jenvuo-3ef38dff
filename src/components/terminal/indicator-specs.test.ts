@@ -21,16 +21,16 @@ describe("Support & Resistance", () => {
     bars[22] = bar(22, 106, 96, 100);
 
     const [resistance, support] = buildIndicatorSeries("sr").compute(bars);
-    expect(resistance[19]).toBeNaN();
+    expect(Number.isNaN(resistance[19])).toBe(true);
     expect(resistance[20]).toBe(120);
-    expect(support[21]).toBeNaN();
+    expect(Number.isNaN(support[21])).toBe(true);
     expect(support[22]).toBe(80);
 
     bars[24] = bar(24, 123, 99, 121);
     bars[26] = bar(26, 101, 78, 79);
     const [afterBreakResistance, afterBreakSupport] = buildIndicatorSeries("sr").compute(bars);
-    expect(afterBreakResistance[24]).toBeNaN();
-    expect(afterBreakResistance[25]).toBeNaN();
-    expect(afterBreakSupport[26]).toBeNaN();
+    expect(Number.isNaN(afterBreakResistance[24])).toBe(true);
+    expect(Number.isNaN(afterBreakResistance[25])).toBe(true);
+    expect(Number.isNaN(afterBreakSupport[26])).toBe(true);
   });
 });
