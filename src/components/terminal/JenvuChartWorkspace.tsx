@@ -39,6 +39,7 @@ import { getTerminalChart } from "@/lib/gold-analysis.functions";
 import { cn } from "@/lib/utils";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { XauUsdLogo } from "./XauUsdLogo";
+import { Menu } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
@@ -391,7 +392,15 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
       {/* Top bar */}
       <div className="flex h-11 shrink-0 items-center gap-1 border-b border-border px-2">
         <div className="mr-1 flex items-center gap-2 pl-1 pr-2">
-          <XauUsdLogo size={22} />
+          <button
+            type="button"
+            aria-label="Open menu"
+            onClick={() => window.dispatchEvent(new Event("jenvu:open-mobile-nav"))}
+            className="inline-flex h-7 w-7 items-center justify-center rounded-md text-foreground hover:bg-muted md:hidden"
+          >
+            <Menu className="h-4 w-4" />
+          </button>
+          <span className="hidden md:inline-flex"><XauUsdLogo size={22} /></span>
           <span className="text-sm font-semibold tracking-tight">{"\n"}</span>
         </div>
         <div className="flex items-center" role="group" aria-label="Chart timeframe">
