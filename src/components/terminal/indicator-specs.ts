@@ -130,7 +130,7 @@ const SPECS: Record<IndicatorId, IndicatorSpec> = {
   macd: {
     id: "macd",
     name: "MACD 12/26/9",
-    description: "MACD line, signal and histogram in its own panel",
+    description: "MACD line, signal and histogram on panel",
     pane: "separate",
     lines: [
       {
