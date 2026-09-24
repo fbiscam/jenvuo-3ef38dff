@@ -1032,15 +1032,15 @@ html:not(.ms-icons-ready) .material-symbols-rounded {
 
 /* Gemini-style dashboard home */
 :root {
-  --gemini-accent: oklch(0.86 0.07 240);
-  --gemini-bubble: oklch(0.95 0.02 240);
+  --gemini-accent: var(--home-accent);
+  --gemini-bubble: var(--home-accent-soft);
 }
 .gemini-glow {
   background:
-    radial-gradient(ellipse 45% 55% at 58% 48%, oklch(0.9 0.06 235 / 0.75), transparent 70%),
-    radial-gradient(ellipse 60% 40% at 50% 60%, oklch(0.95 0.03 230 / 0.6), transparent 75%);
+    radial-gradient(ellipse 45% 55% at 58% 48%, color-mix(in oklab, var(--home-accent-soft) 82%, transparent), transparent 70%),
+    radial-gradient(ellipse 60% 40% at 50% 60%, color-mix(in oklab, var(--home-accent) 12%, transparent), transparent 75%);
 }
 .gemini-composer {
-  box-shadow: 0 1px 3px oklch(0.4 0.03 240 / 0.12), 0 4px 18px oklch(0.6 0.06 240 / 0.12);
+  box-shadow: 0 1px 3px color-mix(in oklab, var(--foreground) 12%, transparent), 0 4px 18px color-mix(in oklab, var(--home-accent) 16%, transparent);
 }
 .gemini-home, .gemini-home * { font-family: "Google Sans", "Product Sans", "Roboto", system-ui, sans-serif; }
