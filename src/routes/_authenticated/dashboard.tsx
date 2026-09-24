@@ -52,7 +52,6 @@ import {
   BookOpen,
   User,
   LogOut,
-  Power,
   Mic,
   Plus,
   Wallet,
@@ -70,8 +69,6 @@ import {
   RefreshCw,
   Gift,
   PieChart,
-  ChevronsLeft,
-  ChevronsRight,
   Menu,
   X,
   Sparkles,
@@ -107,17 +104,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 type RangeKey = "24h" | "7d" | "30d" | "90d" | "all";
-function clearStoredAuthSession() {
-  if (typeof window === "undefined") return;
-  for (const storage of [window.localStorage, window.sessionStorage]) {
-    for (let i = storage.length - 1; i >= 0; i--) {
-      const key = storage.key(i);
-      if (key?.startsWith("sb-") && key.endsWith("-auth-token")) {
-        storage.removeItem(key);
-      }
-    }
-  }
-}
 
 const RANGE_LABELS: Record<RangeKey, string> = {
   "24h": "Last 24 hours",
@@ -1171,18 +1157,6 @@ function DashboardLayout() {
     setRefreshTick((t) => t + 1);
   };
 
-  const signOut = async () => {
-    // NOTE: Do NOT revoke the trusted-device row here — a normal sign-out
-    // must keep this browser trusted so the user isn't prompted for MFA on
-    // every subsequent login. Trusted devices are only cleared when the user
-    // explicitly uses "Forget this device" / "Revoke" in Security settings.
-    clearStoredAuthSession();
-    void supabase.auth.signOut({ scope: "global" }).catch(() => {
-      /* ignore network errors */
-    });
-    window.location.replace("/");
-  };
-
   const planTier = (
     (credits.plan as { tier?: string; name?: string } | null)?.tier ??
     (credits.plan as { name?: string } | null)?.name ??
@@ -1486,37 +1460,6 @@ function DashboardLayout() {
             </div>
           )}
 
-          {/* Quick actions: Sign out (left, icon) + Collapse (right) */}
-          <div
-            className={`mt-auto shrink-0 flex items-center border-t border-zinc-200 bg-sidebar py-2 ${sidebarCollapsed ? "justify-center px-2" : "justify-between pl-3 pr-2"}`}
-          >
-            {!sidebarCollapsed && (
-              <button
-                type="button"
-                onClick={signOut}
-                title="Sign out"
-                aria-label="Sign out"
-                className="inline-flex h-7 w-7 items-center justify-center rounded-md text-zinc-900 hover:bg-red-50 hover:text-red-600"
-              >
-                <Power className="h-3.5 w-3.5" strokeWidth={2.25} />
-              </button>
-            )}
-            <div className="flex items-center gap-1">
-              <button
-                type="button"
-                onClick={() => setSidebarCollapsed((v) => !v)}
-                title={sidebarCollapsed ? "Expand" : "Collapse"}
-                aria-label={sidebarCollapsed ? "Expand" : "Collapse"}
-                className="inline-flex h-7 w-7 items-center justify-center rounded-md text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900"
-              >
-                {sidebarCollapsed ? (
-                  <ChevronsRight className="h-3.5 w-3.5" />
-                ) : (
-                  <ChevronsLeft className="h-3.5 w-3.5" />
-                )}
-              </button>
-            </div>
-          </div>
         </aside>
       )}
 
