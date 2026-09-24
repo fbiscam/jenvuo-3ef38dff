@@ -30,7 +30,7 @@ export type Drawing = {
   createdAt: number;
 };
 
-export const DRAWING_COLORS = ["#2962ff", "#f23645", "#089981", "#ff9800", "#9c27b0", "#131722"];
+export const DRAWING_COLORS = ["#60a5fa", "#fb7185", "#2dd4bf", "#fbbf24", "#c084fc", "#f8fafc"];
 
 /** Tools needing a single click. */
 export const SINGLE_POINT_TOOLS = new Set<DrawingTool>(["hline", "vline", "text"]);
@@ -92,14 +92,15 @@ export function renderDrawing(
   ctx: CanvasRenderingContext2D,
   d: Drawing,
   pr: Projector,
-  opts: { selected?: boolean; hovered?: boolean; decimals?: number } = {},
+  opts: { selected?: boolean; hovered?: boolean; decimals?: number; dark?: boolean } = {},
 ) {
   const pts = project(d, pr);
   if (!pts || !pts.length) return;
   const dec = opts.decimals ?? 2;
   ctx.save();
-  ctx.strokeStyle = d.color;
-  ctx.fillStyle = d.color;
+  const drawingColor = opts.dark && d.color.toLowerCase() === "#131722" ? "#f8fafc" : d.color;
+  ctx.strokeStyle = drawingColor;
+  ctx.fillStyle = drawingColor;
   ctx.lineWidth = opts.selected || opts.hovered ? 2.5 : 1.75;
   ctx.font = "11px 'JetBrains Mono', ui-monospace, monospace";
   const [a, b] = pts;
@@ -187,9 +188,9 @@ export function renderDrawing(
           const price = p1 + (p0 - p1) * lvl;
           const y = pr.y(price);
           if (y == null) continue;
-          ctx.strokeStyle = withAlpha(d.color, lvl === 0 || lvl === 1 ? 0.9 : 0.6);
+          ctx.strokeStyle = withAlpha(drawingColor, lvl === 0 || lvl === 1 ? 0.9 : 0.6);
           line({ x: x0, y }, { x: x1, y });
-          ctx.fillStyle = d.color;
+          ctx.fillStyle = drawingColor;
           ctx.fillText(`${lvl} (${price.toFixed(dec)})`, x0 + 2, y - 3);
         }
         const yTop = pr.y(Math.max(p0, p1));
@@ -197,7 +198,7 @@ export function renderDrawing(
         const y618 = pr.y(p1 + (p0 - p1) * 0.618);
         const y79 = pr.y(p1 + (p0 - p1) * 0.79);
         if (y618 != null && y79 != null) {
-          ctx.fillStyle = withAlpha(d.color, 0.1);
+          ctx.fillStyle = withAlpha(drawingColor, 0.1);
           ctx.fillRect(x0, Math.min(y618, y79), x1 - x0, Math.abs(y79 - y618));
         }
         void yTop;
@@ -228,9 +229,9 @@ export function renderDrawing(
       const text = d.text || "Text";
       ctx.font = "600 12px 'DM Sans', system-ui, sans-serif";
       const w = ctx.measureText(text).width + 10;
-      ctx.fillStyle = withAlpha(d.color, 0.14);
+      ctx.fillStyle = withAlpha(drawingColor, 0.14);
       ctx.fillRect(a.x - 2, a.y - 14, w, 20);
-      ctx.fillStyle = d.color;
+      ctx.fillStyle = drawingColor;
       ctx.fillText(text, a.x + 3, a.y);
       break;
     }
@@ -243,7 +244,7 @@ export function renderDrawing(
       ctx.arc(p.x, p.y, 4.5, 0, Math.PI * 2);
       ctx.fillStyle = "#ffffff";
       ctx.fill();
-      ctx.strokeStyle = d.color;
+      ctx.strokeStyle = drawingColor;
       ctx.lineWidth = 1.5;
       ctx.stroke();
     }
