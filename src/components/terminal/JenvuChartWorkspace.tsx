@@ -54,6 +54,7 @@ import { ScriptPanel, type SavedScript } from "./ScriptPanel";
 import { buildChartContext } from "./chart-context";
 import { DemoTradingPanel } from "./DemoTradingPanel";
 import type { DemoPosition } from "@/lib/chart/demo-trading";
+import type { DemoOrderActions } from "./DemoOrderOverlay";
 
 const MemoChart = memo(ChartCanvas);
 
@@ -209,6 +210,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
   const [hoverIndex, setHoverIndex] = useState<number | null>(null);
   const [fullscreen, setFullscreen] = useState(false);
   const [demoPositions, setDemoPositions] = useState<DemoPosition[]>([]);
+  const [demoActions, setDemoActions] = useState<DemoOrderActions | null>(null);
 
   useEffect(() => {
     const syncFullscreen = () => setFullscreen(document.fullscreenElement === workspaceRef.current);
@@ -551,7 +553,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
           <TooltipContent>{fullscreen ? "Exit fullscreen" : "Fullscreen chart"}</TooltipContent>
         </Tooltip>
 
-        <DemoTradingPanel currentPrice={currentPrice} onPositionsChange={setDemoPositions} />
+        <DemoTradingPanel currentPrice={currentPrice} onPositionsChange={setDemoPositions} onActions={setDemoActions} />
 
         <div className="ml-auto flex shrink-0 items-center gap-2">{rightSlot}</div>
       </div>
@@ -648,6 +650,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
               projection={projection}
               demoPositions={demoPositions}
               demoPrice={demoPositions.length ? currentPrice : null}
+              demoActions={demoActions}
               drawings={drawings}
               drawingsVisible={drawingsVisible}
               tool={tool}

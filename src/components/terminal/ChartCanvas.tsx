@@ -30,6 +30,7 @@ import type { OhlcvBar } from "@/lib/chart/indicators";
 import type { CandleProjection } from "@/lib/chart/projection";
 import type { ScriptResult } from "@/lib/chart/jenvu-script";
 import type { DemoPosition } from "@/lib/chart/demo-trading";
+import { DemoOrderOverlay, type DemoOrderActions } from "./DemoOrderOverlay";
 import { buildIndicatorSeries, type IndicatorId } from "./indicator-specs";
 
 export const CHART_COLORS = {
@@ -62,6 +63,7 @@ type Props = {
   projection: CandleProjection | null;
   demoPositions: DemoPosition[];
   demoPrice?: number | null;
+  demoActions?: DemoOrderActions | null;
   drawings: Drawing[];
   drawingsVisible: boolean;
   tool: DrawingTool;
@@ -328,31 +330,7 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
     const candles = candleRef.current;
     if (!candles) return;
     demoPriceLinesRef.current.forEach((line) => candles.removePriceLine(line));
-    const price = props.demoPrice ?? null;
-    const fmt = (v: number) => `${v >= 0 ? "+" : "-"}$${Math.abs(v).toFixed(2)}`;
-    demoPriceLinesRef.current = props.demoPositions.flatMap((position) => {
-      const dir = position.side === "buy" ? 1 : -1;
-      const live = price == null ? 0 : (price - position.entryPrice) * dir * position.quantity;
-      const lines = [
-        candles.createPriceLine({
-          price: position.entryPrice,
-          color: live >= 0 ? CHART_COLORS.up : CHART_COLORS.down,
-          lineWidth: 2,
-          lineStyle: LineStyle.Solid,
-          axisLabelVisible: true,
-          title: `${position.side.toUpperCase()} ${position.quantity} oz  ${fmt(live)}`,
-        }),
-      ];
-      if (position.stopLoss) lines.push(candles.createPriceLine({
-        price: position.stopLoss, color: CHART_COLORS.down, lineWidth: 1, lineStyle: LineStyle.Dashed, axisLabelVisible: true,
-        title: `SL ${fmt((position.stopLoss - position.entryPrice) * dir * position.quantity)}`,
-      }));
-      if (position.takeProfit) lines.push(candles.createPriceLine({
-        price: position.takeProfit, color: CHART_COLORS.up, lineWidth: 1, lineStyle: LineStyle.Dashed, axisLabelVisible: true,
-        title: `TP ${fmt((position.takeProfit - position.entryPrice) * dir * position.quantity)}`,
-      }));
-      return lines;
-    });
+    demoPriceLinesRef.current = [];
     dirtyRef.current += 1;
   }, [props.demoPositions, props.demoPrice]);
 
@@ -851,6 +829,14 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
         onPointerDown={onCanvasPointerDown}
         onPointerUp={onCanvasPointerUp}
         aria-label="Chart drawings layer"
+      />
+      <DemoOrderOverlay
+        positions={props.demoPositions}
+        price={props.demoPrice ?? null}
+        priceToY={priceToY}
+        yToPrice={yToPrice}
+        areaWidth={() => mainArea().width}
+        actions={props.demoActions ?? null}
       />
     </div>
   );
