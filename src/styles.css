@@ -132,7 +132,7 @@
   --chart-3: oklch(0.72 0.17 60);                /* orange */
   --chart-4: oklch(0.78 0.16 95);                /* yellow */
   --chart-5: oklch(0.55 0.18 330);               /* reddish purple */
-  --sidebar: #fafafa;
+  --sidebar: #ffffff;
   --sidebar-foreground: oklch(0.145 0.02 264);
   --sidebar-primary: oklch(0.208 0.042 265.755);
   --sidebar-primary-foreground: oklch(0.984 0.003 247.858);
@@ -144,10 +144,10 @@
   --brand-gemini: oklch(0.62 0.23 285);
   --brand-deepseek: oklch(0.59 0.22 271);
   --brand-claude: oklch(0.7 0.12 55);
-  --home-accent: #fd540f;
+  --home-accent: #1a73e8;
   --home-accent-foreground: #ffffff;
-  --home-accent-soft: oklch(0.95 0.04 60);
-  --home-accent-canvas: rgb(255 244 237);
+  --home-accent-soft: oklch(0.95 0.02 240);
+  --home-accent-canvas: rgb(237 244 255);
   --auth-action: oklch(0.72 0.14 255);
   --auth-action-foreground: oklch(1 0 0);
 }
