@@ -448,7 +448,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
                     onCheckedChange={(v) =>
                       setIndicators((cur) => (v ? [...cur.filter((x) => x !== spec.id), spec.id] : cur.filter((x) => x !== spec.id)))
                     }
-                    className="mt-0.5 data-[state=checked]:border-[#D97757] data-[state=checked]:bg-[#D97757] data-[state=checked]:text-white"
+                    className="mt-0.5 data-[state=checked]:border-[#C2410C] data-[state=checked]:bg-[#C2410C] data-[state=checked]:text-white"
                   />
                   <span className="min-w-0">
                     <span className="block text-sm">{spec.name}</span>
@@ -487,7 +487,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
                 <Switch
                   checked={smcToggles[item.key] ?? DEFAULT_SMC[item.key]}
                   onCheckedChange={(v) => setSmcToggles((cur) => ({ ...cur, [item.key]: v }))}
-                  className="data-[state=checked]:bg-[#D97757]"
+                  className="data-[state=checked]:bg-[#C2410C]"
                 />
               </label>
             ))}
