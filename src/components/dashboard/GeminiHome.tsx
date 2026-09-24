@@ -147,7 +147,13 @@ export function GeminiHome() {
 
   const retryReply = async (assistantIndex: number) => {
     if (pending || !active) return;
-    const userIndex = active.messages.slice(0, assistantIndex).findLastIndex((message) => message.role === "user");
+    let userIndex = -1;
+    for (let index = assistantIndex - 1; index >= 0; index -= 1) {
+      if (active.messages[index]?.role === "user") {
+        userIndex = index;
+        break;
+      }
+    }
     if (userIndex < 0) return;
     const query = active.messages[userIndex]?.text;
     if (!query) return;
