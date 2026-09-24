@@ -690,6 +690,11 @@ function DashboardLayout() {
   const [refreshTick, setRefreshTick] = useState(0);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  useEffect(() => {
+    const open = () => setMobileNavOpen(true);
+    window.addEventListener("jenvu:open-mobile-nav", open);
+    return () => window.removeEventListener("jenvu:open-mobile-nav", open);
+  }, []);
   // Embed mode: hide sidebar/chrome when rendered inside the Ops Hub iframe.
   const embedMode = useMemo(() => {
     if (typeof window === "undefined") return false;
@@ -1288,6 +1293,8 @@ function DashboardLayout() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authUser?.id, authLoading, refreshTick]);
 
+  const navCollapsed = sidebarCollapsed && !mobileNavOpen;
+
   return (
     <div
       className={`flex ${pathname === "/dashboard/terminal" ? "h-dvh overflow-hidden jenvu-terminal-shell" : "min-h-screen jenvu-zoom-dashboard"} bg-white text-zinc-900 font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif] antialiased`}
@@ -1305,7 +1312,7 @@ function DashboardLayout() {
       {!embedMode && (
         /* Sidebar (Firebase-style) */
         <aside
-          className={`dashboard-sidebar-root ${pathname === "/dashboard/terminal" ? "dashboard-terminal-sidebar" : ""} max-lg:fixed max-lg:inset-y-0 max-lg:left-0 max-lg:z-50 lg:fixed lg:inset-y-0 lg:left-0 flex min-h-0 shrink-0 flex-col overflow-hidden border-r border-zinc-200 bg-sidebar transition-[width,transform] duration-200 ease-out ${sidebarCollapsed ? "w-[60px]" : "w-[200px]"} ${mobileNavOpen ? "max-lg:translate-x-0" : "max-lg:-translate-x-full"}`}
+          className={`dashboard-sidebar-root ${pathname === "/dashboard/terminal" ? "dashboard-terminal-sidebar" : ""} max-lg:fixed max-lg:inset-y-0 max-lg:left-0 max-lg:z-50 lg:fixed lg:inset-y-0 lg:left-0 flex min-h-0 shrink-0 flex-col overflow-hidden border-r border-zinc-200 bg-sidebar transition-[width,transform] duration-200 ease-out ${navCollapsed ? "w-[60px]" : "w-[200px]"} ${mobileNavOpen ? "max-lg:translate-x-0" : "max-lg:-translate-x-full"}`}
           style={{
             fontFamily: '"Google Sans", "Product Sans", "Roboto", system-ui, sans-serif',
             fontWeight: 400,
@@ -1314,7 +1321,7 @@ function DashboardLayout() {
           <style>{`.dashboard-sidebar-root, .dashboard-sidebar-root *:not(img):not(svg):not(.material-symbols-rounded) { font-family: "Google Sans", "Product Sans", "Roboto", system-ui, sans-serif !important; text-transform: none !important; letter-spacing: normal !important; } .dashboard-sidebar-root .material-symbols-rounded { font-family: "Material Symbols Rounded" !important; font-weight: normal !important; font-style: normal !important; text-transform: none !important; letter-spacing: normal !important; white-space: nowrap; word-wrap: normal; direction: ltr; -webkit-font-feature-settings: "liga"; -webkit-font-smoothing: antialiased; }`}</style>
           {/* Brand */}
           <div
-            className={`flex h-11 shrink-0 items-center gap-2.5 bg-sidebar ${sidebarCollapsed ? "justify-center px-2" : "px-4"}`}
+            className={`flex h-11 shrink-0 items-center gap-2.5 bg-sidebar ${navCollapsed ? "justify-center px-2" : "px-4"}`}
           >
             <Link to="/" className="flex items-center gap-2.5 min-w-0">
               <img
@@ -1322,7 +1329,7 @@ function DashboardLayout() {
                 alt="JENVU"
                 className="dashboard-sidebar-logo h-6 w-6 shrink-0 rounded-md object-contain"
               />
-              {!sidebarCollapsed && (
+              {!navCollapsed && (
                 <span
                   className="dashboard-sidebar-brand truncate text-[22px] tracking-tight leading-none"
                   style={{
@@ -1350,12 +1357,12 @@ function DashboardLayout() {
           <nav className="sidebar-hover-scroll flex-1 min-h-0 overflow-y-auto overflow-x-hidden bg-sidebar px-2 py-2">
             {[...NAV_GROUPS].map((group, gi) => (
               <div key={group.label || `nav-group-${gi}`} className={gi > 0 ? "mt-2" : ""}>
-                {!sidebarCollapsed && group.label && (
+                {!navCollapsed && group.label && (
                   <div className="mb-1.5 px-2.5 text-[10px] font-normal tracking-wider text-[#6B6C6B]">
                     {group.label}
                   </div>
                 )}
-                {sidebarCollapsed && gi > 0 && group.label && (
+                {navCollapsed && gi > 0 && group.label && (
                   <div className="mx-3 mb-1 h-px bg-zinc-100" />
                 )}
                 <div className="flex flex-col gap-1.5">
@@ -1376,16 +1383,16 @@ function DashboardLayout() {
                           markTabSeen(t.countKey);
                           setMobileNavOpen(false);
                         }}
-                        title={sidebarCollapsed ? t.label : undefined}
-                        className={`dashboard-sidebar-link group relative flex items-center rounded-full text-[12.5px] font-normal text-foreground transition ${sidebarCollapsed ? "justify-center px-2 py-1.5" : "gap-3 px-2.5 py-1.5"} ${active ? "bg-[#EBEBEB]" : "hover:bg-zinc-50"}`}
+                        title={navCollapsed ? t.label : undefined}
+                        className={`dashboard-sidebar-link group relative flex items-center rounded-full text-[12.5px] font-normal text-foreground transition ${navCollapsed ? "justify-center px-2 py-1.5" : "gap-3 px-2.5 py-1.5"} ${active ? "bg-[#EBEBEB]" : "hover:bg-zinc-50"}`}
                       >
                         <Icon
                           className="dashboard-sidebar-icon h-[19px] w-[19px] shrink-0 text-current"
                           strokeWidth={1.75}
                           aria-hidden="true"
                         />
-                        {!sidebarCollapsed && <span className="truncate">{t.label}</span>}
-                        {!sidebarCollapsed && typeof count === "number" && count > 0 && !active && (
+                        {!navCollapsed && <span className="truncate">{t.label}</span>}
+                        {!navCollapsed && typeof count === "number" && count > 0 && !active && (
                           <span
                             className="ml-auto inline-flex shrink-0 items-center justify-center rounded-full bg-rose-600 text-white ring-2 ring-white"
                             style={{
@@ -1401,7 +1408,7 @@ function DashboardLayout() {
                             New
                           </span>
                         )}
-                        {!sidebarCollapsed && hasUnread && (
+                        {!navCollapsed && hasUnread && (
                           <span
                             className="ml-auto inline-flex shrink-0 items-center justify-center rounded-full bg-rose-600 text-white ring-2 ring-white"
                             style={{
@@ -1417,7 +1424,7 @@ function DashboardLayout() {
                             New
                           </span>
                         )}
-                        {sidebarCollapsed &&
+                        {navCollapsed &&
                           ((typeof count === "number" && count > 0 && !active) || hasUnread) && (
                             <span
                               className="absolute -right-1 -top-1 inline-flex items-center justify-center rounded-full bg-rose-600 text-white"
@@ -1443,9 +1450,9 @@ function DashboardLayout() {
 
           {/* Quick actions: Sign out (left, icon) + Collapse (right) */}
           <div
-            className={`mt-auto shrink-0 flex items-center border-t border-zinc-200 bg-sidebar py-2 ${sidebarCollapsed ? "justify-center px-2" : "justify-between pl-3 pr-2"}`}
+            className={`mt-auto shrink-0 flex items-center border-t border-zinc-200 bg-sidebar py-2 ${navCollapsed ? "justify-center px-2" : "justify-between pl-3 pr-2"}`}
           >
-            {!sidebarCollapsed && (
+            {!navCollapsed && (
               <button
                 type="button"
                 onClick={signOut}
@@ -1460,11 +1467,11 @@ function DashboardLayout() {
               <button
                 type="button"
                 onClick={() => setSidebarCollapsed((v) => !v)}
-                title={sidebarCollapsed ? "Expand" : "Collapse"}
-                aria-label={sidebarCollapsed ? "Expand" : "Collapse"}
+                title={navCollapsed ? "Expand" : "Collapse"}
+                aria-label={navCollapsed ? "Expand" : "Collapse"}
                 className="inline-flex h-7 w-7 items-center justify-center rounded-md text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900"
               >
-                {sidebarCollapsed ? (
+                {navCollapsed ? (
                   <ChevronsRight className="h-3.5 w-3.5" />
                 ) : (
                   <ChevronsLeft className="h-3.5 w-3.5" />
@@ -1480,7 +1487,7 @@ function DashboardLayout() {
         className={`dashboard-right-col flex min-w-0 min-h-0 flex-1 flex-col bg-white ${embedMode ? "" : sidebarCollapsed ? "collapsed lg:pl-[60px]" : "lg:pl-[200px]"}`}
       >
         {/* Mobile menu toggle (floating) */}
-        {!embedMode && (
+        {!embedMode && pathname !== "/dashboard/terminal" && (
           <button
             type="button"
             aria-label="Open menu"
