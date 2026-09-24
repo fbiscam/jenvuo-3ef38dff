@@ -176,7 +176,7 @@ export function computeSmcOverlay(
     livePivots,
     breaks: breaks.slice(-8),
     fvgs: poi.fair_value_gaps.filter((g) => g.status !== "MITIGATED").slice(-6),
-    orderBlocks: poi.order_blocks.filter((z) => z.status !== "MITIGATED").slice(-6),
+    orderBlocks: poi.order_blocks.filter((z) => z.status !== "MITIGATED").slice(-3),
     buySide,
     sellSide,
     trend: fractal.trend,
@@ -198,24 +198,7 @@ export function renderSmcOverlay(
 ) {
   ctx.save();
   ctx.font = "600 10px 'JetBrains Mono', ui-monospace, monospace";
-  const box = (tMs: number, top: number, bottom: number, fill: string, stroke: string, label: string) => {
-    const x0 = pr.x(tMs / 1000);
-    const y0 = pr.y(top);
-    const y1 = pr.y(bottom);
-    if (x0 == null || y0 == null || y1 == null) return;
-    const x = Math.max(0, x0);
-    ctx.fillStyle = fill;
-    ctx.fillRect(x, Math.min(y0, y1), pr.width - x, Math.abs(y1 - y0));
-    ctx.strokeStyle = stroke;
-    ctx.lineWidth = 1;
-    ctx.strokeRect(x, Math.min(y0, y1), pr.width - x, Math.abs(y1 - y0));
-    ctx.fillStyle = stroke;
-    ctx.fillText(label, x + 4, Math.min(y0, y1) + 11);
-  };
-
-  const statusText = (s: string) =>
-    s === "PARTIAL" ? " · Partial" : s === "FULLY_MITIGATED" ? " · Mitigated" : "";
-  const dottedLine = (tMs: number, price: number, color: string, label: string, above: boolean) => {
+  const dottedLine = (tMs: number, price: number, color: string) => {
     const x0 = pr.x(tMs / 1000);
     const y = pr.y(price);
     if (x0 == null || y == null) return;
@@ -228,21 +211,19 @@ export function renderSmcOverlay(
     ctx.lineTo(pr.width, y);
     ctx.stroke();
     ctx.setLineDash([]);
-    ctx.fillStyle = "#000000";
-    ctx.fillText(label, x + 4, above ? y - 4 : y + 12);
   };
 
   if (toggles.fvg) {
     for (const g of smc.fvgs) {
       const bull = g.type === "BULLISH_FVG";
       // Bearish gap sits above → line on top edge; bullish below → bottom edge.
-      dottedLine(g.t, bull ? g.bottom : g.top, "rgb(34,197,94)", `FVG${statusText(g.status)}`, !bull);
+      dottedLine(g.t, bull ? g.bottom : g.top, "rgb(34,197,94)");
     }
   }
   if (toggles.orderBlocks) {
     for (const ob of smc.orderBlocks) {
       const supply = ob.type === "SUPPLY";
-      dottedLine(ob.t, supply ? ob.top : ob.bottom, "rgb(234,179,8)", `Order Block${statusText(ob.status)}`, supply);
+      dottedLine(ob.t, supply ? ob.top : ob.bottom, "rgb(234,179,8)");
     }
   }
   if (toggles.liquidity) {
