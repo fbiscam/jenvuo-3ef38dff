@@ -1379,7 +1379,7 @@ async function loadTerminalChart(tf: string): Promise<TerminalChartPayload> {
     } catch (err) {
       // Every source failed this tick — keep serving the last good chart for a
       // while instead of blanking the terminal.
-      if (hit && Date.now() - hit.at < CACHE_STALE_MAX) return { ...hit.data, serverTime: Date.now() };
+      if (hit && Date.now() - hit.at < TERMINAL_STALE_MAX) return { ...hit.data, serverTime: Date.now() };
       throw err;
     }
   }
