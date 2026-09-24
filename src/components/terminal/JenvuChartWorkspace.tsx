@@ -35,6 +35,7 @@ import {
   Type,
   type LucideIcon,
 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 import { getTerminalChart } from "@/lib/gold-analysis.functions";
 import { cn } from "@/lib/utils";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -276,7 +277,13 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
 
   const chartQuery = useQuery({
     queryKey: ["terminal-chart", timeframe.key],
-    queryFn: () => fetchChart({ data: { timeframe: timeframe.key } }),
+    queryFn: async () => {
+      // Skip the protected call while the sign-in session is missing (e.g. mid-refresh or signed out);
+      // the chart keeps showing its last good candles instead of erroring.
+      const { data } = await supabase.auth.getSession();
+      if (!data.session) throw new Error("Session not ready");
+      return fetchChart({ data: { timeframe: timeframe.key } });
+    },
     refetchInterval: 5000,
     refetchIntervalInBackground: true,
     staleTime: 1000,

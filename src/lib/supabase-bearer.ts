@@ -11,7 +11,7 @@ export const attachFreshSupabaseAuth = createMiddleware({ type: "function" }).cl
       let session = data.session;
       const expiresAt = session?.expires_at ?? 0;
       // Refresh when missing, expired, or expiring within 60s.
-      if (session && expiresAt * 1000 - Date.now() < 60_000) {
+      if (!session || expiresAt * 1000 - Date.now() < 60_000) {
         const { data: refreshed } = await supabase.auth.refreshSession();
         session = refreshed.session ?? session;
       }
