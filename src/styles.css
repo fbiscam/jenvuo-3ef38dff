@@ -1105,3 +1105,5 @@ html:not(.ms-icons-ready) .material-symbols-rounded {
 .jenvu-zoom-dashboard main > div > section.bg-background,
 .jenvu-zoom-dashboard main .analytics-section,
 .jenvu-zoom-dashboard main > .bg-background { background-color: transparent !important; }
+.jenvu-zoom-dashboard main section.bg-background,
+.jenvu-zoom-dashboard main div.bg-background:not([class*="border"]) { background-color: transparent !important; }
