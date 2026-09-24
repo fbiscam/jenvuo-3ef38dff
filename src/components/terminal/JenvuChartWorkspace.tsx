@@ -473,7 +473,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
           <PopoverContent align="start" className="w-72 p-2">
             <p className="px-2 pb-1 pt-1 text-xs font-semibold text-muted-foreground">Smart-money overlays</p>
             <p className="px-2 pb-2 text-[11px] text-muted-foreground">
-              Same 10-bar structure engine the AI desk uses — up to 400 closed candles.
+              Same 10-bar structure engine the AI desk
             </p>
             {SMC_LABELS.map((item) => (
               <label
