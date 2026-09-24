@@ -297,7 +297,7 @@ export function OrderTicket({ side, onSideChange, onClose, price, trading, onPla
           <span className="block text-sm font-semibold">{side === "buy" ? "Buy" : "Sell"}</span>
           <span className="block text-[11px] font-medium opacity-90">{qty} XAUUSD {type.toUpperCase()}{type !== "market" && limitPrice ? ` @ ${limitPrice}` : ""}</span>
         </button>
-        <p className="mt-2 text-center text-[10px] text-muted-foreground">Virtual funds only · no real orders</p>
+        <p className="mt-2 text-center text-[10px] text-muted-foreground">{"\n"}</p>
       </div>
     </div>
   );
