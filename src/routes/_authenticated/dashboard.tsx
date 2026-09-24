@@ -1364,6 +1364,18 @@ function DashboardLayout() {
           {/* Nav */}
 
           <nav className="sidebar-hover-scroll flex-1 min-h-0 overflow-y-auto overflow-x-hidden bg-sidebar px-2 py-2">
+            <button
+              type="button"
+              onClick={() => {
+                setMobileNavOpen(false);
+                openHomeSearch();
+              }}
+              title={sidebarCollapsed ? "Search chats" : undefined}
+              className={`dashboard-sidebar-link mb-1.5 flex w-full items-center rounded-full text-[12.5px] text-foreground hover:bg-zinc-50 ${sidebarCollapsed ? "justify-center px-2 py-1.5" : "gap-3 px-2.5 py-1.5"}`}
+            >
+              <SearchIcon className="h-[19px] w-[19px] shrink-0" strokeWidth={1.75} />
+              {!sidebarCollapsed && <span>Search chats</span>}
+            </button>
             {[...NAV_GROUPS].map((group, gi) => (
               <div key={group.label || `nav-group-${gi}`} className={gi > 0 ? "mt-2" : ""}>
                 {!sidebarCollapsed && group.label && (
@@ -1455,7 +1467,18 @@ function DashboardLayout() {
                 </div>
               </div>
             ))}
+            <RecentChats collapsed={sidebarCollapsed} onPick={() => setMobileNavOpen(false)} />
           </nav>
+
+          {!sidebarCollapsed && (
+            <div className="flex shrink-0 items-center gap-2.5 bg-sidebar px-3 py-2">
+              <img src={avatarUrl || "/favicon.png"} alt="" className="h-7 w-7 rounded-full object-cover" />
+              <span className="flex-1 truncate text-[14px] text-foreground">{fullName || email || "Account"}</span>
+              <Link to="/dashboard/profile" aria-label="Settings" className="rounded-full p-1.5 text-foreground hover:bg-zinc-100">
+                <SettingsIcon className="h-[18px] w-[18px]" strokeWidth={1.75} />
+              </Link>
+            </div>
+          )}
 
           {/* Quick actions: Sign out (left, icon) + Collapse (right) */}
           <div
@@ -1509,33 +1532,16 @@ function DashboardLayout() {
 
         <main
           className={
-            pathname === "/dashboard/terminal"
-              ? "h-full min-h-0 w-full flex-1 overflow-hidden bg-white"
+            pathname === "/dashboard/terminal" || pathname === "/dashboard"
+              ? "h-screen min-h-0 w-full flex-1 overflow-hidden bg-white"
               : "mx-auto w-full max-w-7xl flex-1 bg-white px-5 pt-14 pb-7 sm:px-8 sm:pt-7"
           }
-          style={pathname === "/dashboard/terminal" ? undefined : { zoom: 0.9 }}
+          style={pathname === "/dashboard/terminal" || pathname === "/dashboard" ? undefined : { zoom: 0.9 }}
         >
-          {pathname !== "/dashboard/terminal" && <VerificationBanner isAdmin={isAdminUser} />}
+          {pathname !== "/dashboard/terminal" && pathname !== "/dashboard" && <VerificationBanner isAdmin={isAdminUser} />}
 
           {pathname === "/dashboard" ? (
-            <>
-              {/* Extension usage analytics — Cloudflare-style */}
-              <DashboardHero keysCount={extKeyCount} stats={usageStats} />
-
-              {/* Extension usage analytics — Cloudflare-style */}
-              <UsageAnalytics
-                stats={usageStats}
-                keysCount={extKeyCount}
-                loading={usageLoading}
-                range={usageRange}
-                onRangeChange={setUsageRange}
-                onRefresh={handleRefresh}
-              />
-
-              <ModelWorkspace />
-
-              <div className="h-12" />
-            </>
+            <GeminiHome />
           ) : verificationLocked ? (
             <VerificationLocked />
           ) : (
