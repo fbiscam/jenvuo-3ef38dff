@@ -3655,7 +3655,10 @@ async function fetchCoinbaseQuote(symbols: string[]): Promise<LiveTick | null> {
 // Short-lived tick cache — coalesces bursts of parallel analysis requests so
 // we don't hammer upstream APIs (Yahoo especially) and hit 429s.
 const tickCache = new Map<string, { at: number; tick: LiveTick }>();
-const TICK_TTL = 2_500;
+// Keep only a sub-second quote cache. This still coalesces simultaneous UI
+// requests while allowing the terminal's one-second ticker to receive a fresh
+// provider quote rather than repeating a 2.5-second-old value.
+const TICK_TTL = 750;
 
 async function getXauUsdGuardPrice(now: number): Promise<number | null> {
   const cached = tickCache.get("METAL:XAUUSD")?.tick.price;

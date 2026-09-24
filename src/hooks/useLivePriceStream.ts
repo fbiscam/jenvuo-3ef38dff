@@ -30,7 +30,7 @@ export function useLivePriceStream(
 ) {
   const [price, setPrice] = useState<number | null>(seedPrice ?? null);
   const fetchTick = useServerFn(getLiveTick);
-  const intervalMs = opts?.intervalMs ?? 1500;
+  const intervalMs = opts?.intervalMs ?? 1000;
 
   const targetRef = useRef<number | null>(seedPrice ?? null);
   const displayRef = useRef<number | null>(seedPrice ?? null);
@@ -41,7 +41,7 @@ export function useLivePriceStream(
     if (!symbol) return;
     let stopped = false;
     let ws: WebSocket | null = null;
-    let pollId: ReturnType<typeof setInterval> | null = null;
+    let pollId: ReturnType<typeof setTimeout> | null = null;
     let raf: number | null = null;
 
     // Reset refs on symbol change so first tick from the new market renders
@@ -66,15 +66,20 @@ export function useLivePriceStream(
     const startPolling = (ms: number) => {
       if (pollId) return;
       const tick = async () => {
-        if (isHidden()) return; // skip work when tab is backgrounded
+        if (isHidden()) {
+          if (!stopped) pollId = setTimeout(tick, ms);
+          return;
+        }
         try {
           const t = await fetchTick({ data: { symbol } });
           if (stopped || !t) return;
           pushTick(t.price, typeof t.t === "number" ? t.t : Date.now());
         } catch { /* keep last */ }
+        finally {
+          if (!stopped) pollId = setTimeout(tick, ms);
+        }
       };
       void tick();
-      pollId = setInterval(tick, ms);
     };
 
     const stream = binanceStreamFor(symbol);
@@ -138,7 +143,7 @@ export function useLivePriceStream(
       stopped = true;
       if (firstTickTimer) clearTimeout(firstTickTimer);
       if (ws) { try { ws.close(); } catch { /* ignore */ } }
-      if (pollId) clearInterval(pollId);
+      if (pollId) clearTimeout(pollId);
       if (raf != null) cancelAnimationFrame(raf);
       if (typeof document !== "undefined") {
         document.removeEventListener("visibilitychange", onVis);
