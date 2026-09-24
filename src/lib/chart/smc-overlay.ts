@@ -226,32 +226,7 @@ export function renderSmcOverlay(
       );
     }
   }
-  if (toggles.orderBlocks) {
-    for (const z of smc.orderBlocks) {
-      const demand = z.type === "DEMAND";
-      const x0 = pr.x(z.t / 1000);
-      const yTop = pr.y(z.top);
-      const yBot = pr.y(z.bottom);
-      if (x0 == null || yTop == null || yBot == null) continue;
-      const x = Math.max(0, x0);
-      const top = Math.min(yTop, yBot);
-      const h = Math.max(2, Math.abs(yBot - yTop));
-      const w = pr.width - x;
-      const rgb = demand ? "41,98,255" : "56,189,248";
-      // Clean sky-blue zone: soft gradient body, thin rounded outline, no text.
-      const grad = ctx.createLinearGradient(x, 0, pr.width, 0);
-      grad.addColorStop(0, `rgba(${rgb},0.28)`);
-      grad.addColorStop(1, `rgba(${rgb},0.08)`);
-      ctx.beginPath();
-      ctx.roundRect?.(x, top, w, h, 3);
-      if (!ctx.roundRect) ctx.rect(x, top, w, h);
-      ctx.fillStyle = grad;
-      ctx.fill();
-      ctx.strokeStyle = `rgba(${rgb},0.7)`;
-      ctx.lineWidth = 1;
-      ctx.stroke();
-    }
-  }
+  // Order blocks are shown by colouring their origin candle sky blue (see ChartCanvas); no zones drawn.
   if (toggles.liquidity) {
     ctx.setLineDash([6, 4]);
     const liq = (price: number, label: string, color: string) => {
