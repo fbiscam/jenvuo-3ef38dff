@@ -462,12 +462,16 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
         for (const i of shape.bars.slice(-300)) {
           const bar = bars[i];
           if (!bar) continue;
+          // Render Inside Bar markers on the overlay below. Keeping the dot and
+          // label in one coordinate system prevents them drifting apart while
+          // live candles update or the timeframe changes.
+          if (insideBar) continue;
           markers.push({
             time: bar.time as UTCTimestamp,
             position: shape.location === "above" ? "aboveBar" : "belowBar",
-            color: insideBar ? CHART_COLORS.insideBar : shape.color,
+            color: shape.color,
             shape: shape.shape,
-            text: insideBar ? undefined : shape.text || undefined,
+            text: shape.text || undefined,
           });
         }
       }
@@ -544,7 +548,6 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
       const pr = projector();
       if (p.smc) renderSmcOverlay(ctx, p.smc, p.smcToggles, pr);
       ctx.save();
-      ctx.fillStyle = CHART_COLORS.text;
       ctx.font = "600 10px 'DM Sans', system-ui, sans-serif";
       ctx.textAlign = "center";
       for (const script of p.scripts) {
@@ -557,7 +560,15 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
             const anchor = shape.location === "above" ? bar.high : bar.low;
             const y = pr.y(anchor);
             if (x == null || y == null) continue;
-            ctx.fillText("IB", x, shape.location === "above" ? y - 23 : y + 29);
+            const above = shape.location === "above";
+            const dotY = above ? y - 10 : y + 10;
+            const textY = above ? dotY - 8 : dotY + 15;
+            ctx.fillStyle = CHART_COLORS.insideBar;
+            ctx.beginPath();
+            ctx.arc(x, dotY, 3.5, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = CHART_COLORS.text;
+            ctx.fillText("IB", x, textY);
           }
         }
       }
