@@ -254,12 +254,47 @@ export function renderSmcOverlay(
     ctx.textBaseline = "alphabetic";
   };
 
+  const fairValueGap = (gap: FairValueGap) => {
+    const x0 = pr.x(gap.t / 1000);
+    const topY = pr.y(gap.top);
+    const bottomY = pr.y(gap.bottom);
+    if (x0 == null || topY == null || bottomY == null) return;
+
+    const x = Math.max(0, x0);
+    const width = Math.max(1, pr.width - x);
+    const y = Math.min(topY, bottomY);
+    const height = Math.max(2, Math.abs(bottomY - topY));
+    const edge = "rgb(34,197,94)";
+    const label = gap.type === "BULLISH_FVG" ? "BULLISH FVG" : "BEARISH FVG";
+
+    ctx.fillStyle = "rgba(34,197,94,0.1)";
+    ctx.fillRect(x, y, width, height);
+    ctx.strokeStyle = edge;
+    ctx.lineWidth = 1.25;
+    ctx.setLineDash([]);
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(pr.width, y);
+    ctx.moveTo(x, y + height);
+    ctx.lineTo(pr.width, y + height);
+    ctx.stroke();
+
+    const textWidth = ctx.measureText(label).width;
+    const labelX = Math.min(pr.width - textWidth - 12, Math.max(x + 8, x + width / 2 - textWidth / 2));
+    const labelY = y + height / 2;
+    ctx.fillStyle = "rgba(255,255,255,0.92)";
+    ctx.beginPath();
+    ctx.roundRect?.(labelX - 5, labelY - 8, textWidth + 10, 16, 3);
+    if (!ctx.roundRect) ctx.rect(labelX - 5, labelY - 8, textWidth + 10, 16);
+    ctx.fill();
+    ctx.fillStyle = edge;
+    ctx.textBaseline = "middle";
+    ctx.fillText(label, labelX, labelY + 0.5);
+    ctx.textBaseline = "alphabetic";
+  };
+
   if (toggles.fvg) {
-    for (const g of smc.fvgs) {
-      const bull = g.type === "BULLISH_FVG";
-      // Bearish gap sits above → line on top edge; bullish below → bottom edge.
-      dottedLine(g.t, bull ? g.bottom : g.top, "rgb(34,197,94)");
-    }
+    for (const gap of smc.fvgs) fairValueGap(gap);
   }
   if (toggles.orderBlocks) {
     for (const ob of smc.orderBlocks) orderBlock(ob);
