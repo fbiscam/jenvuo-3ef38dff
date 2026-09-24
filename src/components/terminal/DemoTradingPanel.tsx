@@ -429,12 +429,21 @@ function Empty({ text }: { text: string }) {
 }
 
 /** Toolbar toggle for the paper trading panel. */
-export function DemoTradingPanel({ open, onToggle, count }: { open: boolean; onToggle: () => void; count: number }) {
+export function DemoTradingPanel({ open, onToggle, count, pnl = 0 }: { open: boolean; onToggle: () => void; count: number; pnl?: number }) {
+  const up = pnl >= 0;
   return (
-    <Button type="button" variant={open ? "secondary" : "ghost"} size="sm" className="h-7 shrink-0 px-2 text-xs" onClick={onToggle} aria-pressed={open}>
-      <BarChart3 className="h-3.5 w-3.5" />
-      Open Trade
-      {count > 0 && <span className="rounded bg-secondary px-1 font-mono text-[10px]">{count}</span>}
+    <Button type="button" variant={open ? "secondary" : "ghost"} size="sm" className="h-7 shrink-0 gap-1.5 px-2 text-xs" onClick={onToggle} aria-pressed={open} aria-label="Trades">
+      <ArrowLeftRight className="h-4 w-4" />
+      {count > 0 ? (
+        <>
+          <span className="font-medium">Live {count}</span>
+          <span className="font-mono font-medium tabular-nums" style={{ color: up ? "#089981" : "#f23645" }}>
+            {up ? "+" : "-"}${Math.abs(pnl).toFixed(2)}
+          </span>
+        </>
+      ) : (
+        <span className="text-muted-foreground">No trades</span>
+      )}
     </Button>
   );
 }
