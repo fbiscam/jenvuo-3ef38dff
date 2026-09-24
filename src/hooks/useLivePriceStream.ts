@@ -66,7 +66,10 @@ export function useLivePriceStream(
     const startPolling = (ms: number) => {
       if (pollId) return;
       const tick = async () => {
-        if (isHidden()) return; // skip work when tab is backgrounded
+        if (isHidden()) {
+          if (!stopped) pollId = setTimeout(tick, ms);
+          return;
+        }
         try {
           const t = await fetchTick({ data: { symbol } });
           if (stopped || !t) return;
