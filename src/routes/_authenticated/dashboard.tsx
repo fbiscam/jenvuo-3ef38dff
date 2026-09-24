@@ -1406,6 +1406,7 @@ function DashboardLayout() {
                         to={t.to as "/dashboard"}
                         resetScroll={false}
                         onClick={() => {
+                          if (t.label === "New chat") openHomeThread(null);
                           markTabSeen(t.countKey);
                           setMobileNavOpen(false);
                         }}
