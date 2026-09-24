@@ -25,6 +25,7 @@ import {
   Maximize2,
   Minimize2,
   Minus,
+  Moon,
   MousePointer2,
   MoveUpRight,
   RectangleHorizontal,
@@ -33,6 +34,7 @@ import {
   Trash2,
   TrendingUp,
   Type,
+  Sun,
   type LucideIcon,
 } from "lucide-react";
 import { getTerminalChart } from "@/lib/gold-analysis.functions";
@@ -59,6 +61,7 @@ const INDICATORS_KEY = "jenvu:terminal:indicators:v1";
 const SMC_KEY = "jenvu:terminal:smc:v1";
 const SCRIPTS_KEY = "jenvu:terminal:scripts:v1";
 const DRAWINGS_VISIBLE_KEY = "jenvu:terminal:drawings-visible:v1";
+const CHART_THEME_KEY = "jenvu:terminal:chart-theme:v1";
 
 function PositionToolIcon({ side }: { side: "long" | "short" }) {
   const isLong = side === "long";
@@ -205,6 +208,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [hoverIndex, setHoverIndex] = useState<number | null>(null);
   const [fullscreen, setFullscreen] = useState(false);
+  const [dark, setDark] = useState(true);
 
   useEffect(() => {
     const syncFullscreen = () => setFullscreen(document.fullscreenElement === workspaceRef.current);
@@ -249,6 +253,8 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
     }
     const savedVisible = readJson<boolean | null>(DRAWINGS_VISIBLE_KEY, null);
     if (typeof savedVisible === "boolean") setDrawingsVisible(savedVisible);
+    const savedTheme = readJson<"dark" | "light" | null>(CHART_THEME_KEY, null);
+    if (savedTheme) setDark(savedTheme === "dark");
     setReady(true);
   }, []);
 
@@ -267,6 +273,9 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
   useEffect(() => {
     if (ready) writeJson(DRAWINGS_VISIBLE_KEY, drawingsVisible);
   }, [ready, drawingsVisible]);
+  useEffect(() => {
+    if (ready) writeJson(CHART_THEME_KEY, dark ? "dark" : "light");
+  }, [ready, dark]);
 
   const chartQuery = useQuery({
     queryKey: ["terminal-chart", timeframe.key],
@@ -387,7 +396,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
   const selected = drawings.find((d) => d.id === selectedId) ?? null;
 
   return (
-    <div ref={workspaceRef} className="flex h-full min-h-0 w-full flex-col bg-background">
+    <div ref={workspaceRef} className={cn("flex h-full min-h-0 w-full flex-col bg-background", dark && "dark")}>
       {/* Top bar */}
       <div className="flex h-11 shrink-0 items-center gap-1 border-b border-border px-2">
         <div className="mr-1 flex items-center gap-2 pl-1 pr-2">
@@ -514,6 +523,19 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
           <TooltipTrigger asChild>
             <button
               type="button"
+              onClick={() => setDark((value) => !value)}
+              aria-label={dark ? "Use light chart theme" : "Use dark chart theme"}
+              className="flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground"
+            >
+              {dark ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
+            </button>
+          </TooltipTrigger>
+          <TooltipContent>{dark ? "Light chart" : "Dark chart"}</TooltipContent>
+        </Tooltip>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button
+              type="button"
               onClick={() => chartRef.current?.fit()}
               aria-label="Reset chart view"
               className="flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground"
@@ -623,6 +645,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
           <div className="relative min-h-0 flex-1">
             <MemoChart
               ref={chartRef}
+              dark={dark}
               bars={bars}
               stepSeconds={stepSeconds}
               indicators={indicators}
