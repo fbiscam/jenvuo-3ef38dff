@@ -121,7 +121,20 @@ export function selectHighConfidencePois(
       500 / (1 + zoneDistance(zone.top, zone.bottom, price)),
   );
 
-  return { fvgs, orderBlocks };
+  // Never let markings sit on top of each other: keep order blocks first
+  // (supply before demand by score), then FVGs that don't overlap any kept zone.
+  const pad = Math.max(price * 0.0002, 0.1);
+  const kept: { top: number; bottom: number }[] = [];
+  const free = (z: { top: number; bottom: number }) =>
+    kept.every((k) => z.bottom - pad >= k.top || z.top + pad <= k.bottom);
+  const keepIfFree = <T extends { top: number; bottom: number }>(z: T) => {
+    if (!free(z)) return false;
+    kept.push(z);
+    return true;
+  };
+  const obsOut = orderBlocks.filter(keepIfFree);
+  const fvgsOut = fvgs.filter(keepIfFree);
+  return { fvgs: fvgsOut, orderBlocks: obsOut };
 }
 
 const toCandle = (b: OhlcvBar): Candle => ({ t: b.time * 1000, o: b.open, h: b.high, l: b.low, c: b.close });
