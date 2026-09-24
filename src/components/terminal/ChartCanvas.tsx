@@ -182,7 +182,11 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
         vertLines: { color: palette.grid },
         horzLines: { color: palette.grid },
       },
-      crosshair: { mode: CrosshairMode.Normal },
+      crosshair: {
+        mode: CrosshairMode.Normal,
+        vertLine: { color: palette.border, labelBackgroundColor: palette.border },
+        horzLine: { color: palette.border, labelBackgroundColor: palette.border },
+      },
       rightPriceScale: { borderColor: palette.border },
       timeScale: {
         borderColor: palette.border,
@@ -239,6 +243,31 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
       lastBarsRef.current = null;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    const chart = chartRef.current;
+    if (!chart) return;
+    const palette = props.dark ? CHART_COLORS.dark : CHART_COLORS.light;
+    chart.applyOptions({
+      layout: {
+        background: { type: ColorType.Solid, color: palette.bg },
+        textColor: palette.text,
+        panes: { separatorColor: palette.border, enableResize: true },
+      },
+      grid: {
+        vertLines: { color: palette.grid },
+        horzLines: { color: palette.grid },
+      },
+      crosshair: {
+        mode: CrosshairMode.Normal,
+        vertLine: { color: palette.border, labelBackgroundColor: palette.border },
+        horzLine: { color: palette.border, labelBackgroundColor: palette.border },
+      },
+      rightPriceScale: { borderColor: palette.border },
+      timeScale: { borderColor: palette.border },
+    });
+    dirtyRef.current += 1;
   }, [props.dark]);
 
   const visibleDrawings = () => {
