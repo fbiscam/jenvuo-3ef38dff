@@ -54,7 +54,7 @@ import { INDICATOR_LIST, buildIndicatorSeries, isIndicatorId, type IndicatorId }
 import { ScriptPanel, type SavedScript } from "./ScriptPanel";
 import { buildChartContext } from "./chart-context";
 import { DemoTradingPanel, OrderTicket, PaperTradingPanel, QuickTradeButtons, useDemoTrading } from "./DemoTradingPanel";
-import type { DemoSide } from "@/lib/chart/demo-trading";
+import { positionPnl, type DemoSide } from "@/lib/chart/demo-trading";
 import { useLivePriceStream } from "@/hooks/useLivePriceStream";
 
 const MemoChart = memo(ChartCanvas);
@@ -576,7 +576,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
           <TooltipContent>{fullscreen ? "Exit fullscreen" : "Fullscreen chart"}</TooltipContent>
         </Tooltip>
 
-        <DemoTradingPanel open={paperOpen} onToggle={() => setPaperOpen((v) => !v)} count={demoPositions.length} />
+        <DemoTradingPanel open={paperOpen} onToggle={() => setPaperOpen((v) => !v)} count={demoPositions.length} pnl={currentPrice ? demoPositions.reduce((s, p) => s + positionPnl(p, currentPrice), 0) : 0} />
 
         <div className="ml-auto flex shrink-0 items-center gap-2">{rightSlot}</div>
       </div>
