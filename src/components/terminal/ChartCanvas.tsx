@@ -33,16 +33,33 @@ import type { DemoPosition } from "@/lib/chart/demo-trading";
 import { DemoOrderOverlay, type DemoOrderActions } from "./DemoOrderOverlay";
 import { buildIndicatorSeries, type IndicatorId } from "./indicator-specs";
 
-export const CHART_COLORS = {
-  bg: "#ffffff",
-  text: "#131722",
-  grid: "#d3d9e2",
-  border: "#d6dae3",
-  up: "#089981",
-  down: "#f23645",
-  insideBar: "#38bdf8",
-  insideBarCandle: "#eab308",
+export type ChartTheme = "light" | "dark";
+
+export const CHART_THEMES: Record<ChartTheme, { bg: string; text: string; grid: string; border: string; up: string; down: string; insideBar: string; insideBarCandle: string }> = {
+  light: {
+    bg: "#ffffff",
+    text: "#131722",
+    grid: "#d3d9e2",
+    border: "#d6dae3",
+    up: "#089981",
+    down: "#f23645",
+    insideBar: "#38bdf8",
+    insideBarCandle: "#eab308",
+  },
+  // TradingView-style dark palette
+  dark: {
+    bg: "#131722",
+    text: "#d1d4dc",
+    grid: "#1e222d",
+    border: "#2a2e39",
+    up: "#089981",
+    down: "#f23645",
+    insideBar: "#38bdf8",
+    insideBarCandle: "#eab308",
+  },
 };
+
+export const CHART_COLORS = CHART_THEMES.light;
 
 const isInsideBarMarker = (title: string, text: string) =>
   text.trim().toUpperCase() === "IB" || title.trim().toLowerCase() === "inside bar";
