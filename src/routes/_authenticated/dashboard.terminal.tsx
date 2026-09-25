@@ -268,6 +268,8 @@ function TerminalPage() {
   const [voiceError, setVoiceError] = useState("");
   const [isRecording, setIsRecording] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+  const messagesRef = useRef<ChatMsg[]>([]);
+  const sendLockedRef = useRef(false);
   const audioContextRef = useRef<AudioContext | null>(null);
   const audioStreamRef = useRef<MediaStream | null>(null);
   const audioSourceRef = useRef<MediaStreamAudioSourceNode | null>(null);
@@ -291,7 +293,17 @@ function TerminalPage() {
   );
 
   function addMessage(message: ChatMsg) {
-    setMessages((current) => [...current, message]);
+    const previous = messagesRef.current.at(-1);
+    if (
+      message.role === "assistant" &&
+      previous?.role === "assistant" &&
+      previous.text.trim() === message.text.trim()
+    ) {
+      return;
+    }
+    const nextMessages = [...messagesRef.current, message];
+    messagesRef.current = nextMessages;
+    setMessages(nextMessages);
     // The thread id is resolved outside the state updater so the updater stays
     // pure — an impure updater silently dropped saved chats in development.
     let threadId = activeThreadIdRef.current;
@@ -341,6 +353,7 @@ function TerminalPage() {
   function startNewChat() {
     activeThreadIdRef.current = null;
     setActiveThreadId(null);
+    messagesRef.current = [];
     setMessages([]);
     setHistoryOpen(false);
     requestAnimationFrame(() => textareaRef.current?.focus());
@@ -349,6 +362,7 @@ function TerminalPage() {
   function loadThread(thread: ChatThread) {
     activeThreadIdRef.current = thread.id;
     setActiveThreadId(thread.id);
+    messagesRef.current = thread.messages;
     setMessages(thread.messages);
     setHistoryOpen(false);
   }
@@ -418,7 +432,9 @@ function TerminalPage() {
       setThreads(savedThreads);
       setActiveThreadId(savedActiveId);
       activeThreadIdRef.current = savedActiveId;
-      setMessages(savedThreads.find((thread) => thread.id === savedActiveId)?.messages ?? []);
+      const savedMessages = savedThreads.find((thread) => thread.id === savedActiveId)?.messages ?? [];
+      messagesRef.current = savedMessages;
+      setMessages(savedMessages);
 
       const settings = JSON.parse(window.localStorage.getItem(TERMINAL_SETTINGS_KEY) || "null") as {
         timeframe?: string;
@@ -475,7 +491,8 @@ function TerminalPage() {
   async function send(message: { text: string; files?: FileUIPart[] }) {
     const image = message.files?.find((file) => file.mediaType?.startsWith("image/") && file.url);
     const query = message.text.trim() || (image ? "Analyze this XAU/USD chart screenshot." : "");
-    if (!query || ask.isPending) return;
+    if (!query || sendLockedRef.current || ask.isPending) return;
+    sendLockedRef.current = true;
     // The AI desk always reads the exact chart state (drawings, indicators,
     // scripts). When the question is about what is on screen, it also gets a
     // snapshot of the Jenvu chart so it can see the drawings visually.
@@ -491,11 +508,15 @@ function TerminalPage() {
     }
     addMessage({ role: "user", text: query, files: image ? [image] : undefined, chartShared });
     setInput("");
-    const history = messages
+    const history = messagesRef.current
       .filter((m) => m.text.trim().length > 0)
       .slice(-12)
       .map((m) => ({ role: m.role, content: m.text.slice(0, 1200) }));
-    await ask.mutateAsync({ query, chartImage, history, chartContext });
+    try {
+      await ask.mutateAsync({ query, chartImage, history, chartContext });
+    } finally {
+      sendLockedRef.current = false;
+    }
   }
 
   async function startRecording() {
