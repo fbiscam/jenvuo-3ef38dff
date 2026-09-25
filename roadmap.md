@@ -172,3 +172,4 @@
 - [x] Sharpen and enlarge typography in the Indicators, Jenvu SMC, and Demo Trading menus
 - [x] Auto-close demo trades reliably when live candle ranges touch SL or TP
 - [x] Restore bearish FVG red styling and Inside Bar labels on the Terminal chart
+- [x] Make BTC/USD charts load reliably across Chrome profiles and every timeframe
