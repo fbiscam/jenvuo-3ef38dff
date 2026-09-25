@@ -850,27 +850,6 @@ export function renderSmcOverlay(
         line(rv.tp2, "#089981", "TP2 1:3", [5, 3]);
       }
       line(rv.sl, "#f23645", "SL", [5, 3]);
-      // Status box.
-      const head = rv.stage === "confirmed"
-        ? `${buy ? "BUY" : "SELL"} ENTRY CONFIRMED`
-        : `POSSIBLE ${buy ? "BUY" : "SELL"} REVERSAL`;
-      const sub = `${rv.score}%${rv.swept ? " · sweep" : ""} · ${rv.stage === "confirmed" ? "SL beyond wick" : `wait close ${buy ? "above" : "below"} body`}`;
-      ctx.font = "700 11px 'JetBrains Mono', ui-monospace, monospace";
-      const bw = Math.max(ctx.measureText(head).width, ctx.measureText(sub).width) + 14;
-      const bh = 32;
-      const bx = x - bw / 2;
-      const by = buy ? ay + 8 : ay - 8 - bh;
-      ctx.fillStyle = rv.stage === "confirmed" ? col : "rgba(255,255,255,0.97)";
-      ctx.strokeStyle = col;
-      ctx.lineWidth = 1.25;
-      ctx.beginPath();
-      ctx.roundRect?.(bx, by, bw, bh, 5);
-      if (!ctx.roundRect) ctx.rect(bx, by, bw, bh);
-      ctx.fill(); ctx.stroke();
-      ctx.fillStyle = rv.stage === "confirmed" ? "#ffffff" : col;
-      ctx.fillText(head, bx + 7, by + 13);
-      ctx.font = "600 10px 'JetBrains Mono', ui-monospace, monospace";
-      ctx.fillText(sub, bx + 7, by + 26);
       ctx.restore();
     }
   }
