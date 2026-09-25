@@ -257,6 +257,22 @@ async function blobToDataUrl(blob: Blob): Promise<string> {
 
 function TerminalPage() {
   const [tf, setTf] = useState(TIMEFRAMES[3]);
+  const [asset, setAsset] = useState<"XAUUSD" | "BTCUSD">("XAUUSD");
+  useEffect(() => {
+    try {
+      if (window.localStorage.getItem("jenvu-terminal-asset") === "BTCUSD") setAsset("BTCUSD");
+    } catch {
+      /* storage unavailable */
+    }
+  }, []);
+  const changeAsset = (next: "XAUUSD" | "BTCUSD") => {
+    setAsset(next);
+    try {
+      window.localStorage.setItem("jenvu-terminal-asset", next);
+    } catch {
+      /* storage unavailable */
+    }
+  };
   const [deskOpen, setDeskOpen] = useState(false);
   const chartRef = useRef<JenvuChartHandle | null>(null);
   const [input, setInput] = useState("");
@@ -385,7 +401,7 @@ function TerminalPage() {
       chartContext?: string;
     }) =>
       analyze({
-        data: { timeframe: tf.key, query, chartImage, history, chartContext, advisor: true },
+        data: { timeframe: tf.key, asset, query, chartImage, history, chartContext, advisor: true },
       }),
     onSuccess: (signal) => {
       addMessage({
@@ -583,6 +599,8 @@ function TerminalPage() {
               ref={chartRef}
               timeframes={TIMEFRAMES}
               timeframe={tf}
+              asset={asset}
+              onAssetChange={changeAsset}
               onTimeframeChange={(next) => {
                 const match = TIMEFRAMES.find((item) => item.key === next.key);
                 if (match) setTf(match);
