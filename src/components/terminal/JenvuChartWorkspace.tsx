@@ -737,7 +737,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
               onDrawingsChange={setDrawings}
               onToolDone={onToolDone}
               onHoverBar={onHoverBar}
-              resetKey={`${timeframe.key}:${payload ? "ready" : "loading"}`}
+              resetKey={`${asset}:${timeframe.key}:${payload ? "ready" : "loading"}`}
               theme={chartTheme}
             />
 
