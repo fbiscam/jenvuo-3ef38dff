@@ -624,6 +624,18 @@ export function renderSmcOverlay(
        // Fixed to the pivot candle wick — no edge clamping, so it never drifts.
        const yy = up ? y - 24 : y + 5;
        const xx = x;
+      if (p.confirmedByOpposite) {
+        // Solid badge, same as a confirmed pivot — no countdown.
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        ctx.roundRect?.(xx - w / 2, yy, w, 18, 4);
+        if (!ctx.roundRect) ctx.rect(xx - w / 2, yy, w, 18);
+        ctx.fill();
+        ctx.fillStyle = "#ffffff";
+        ctx.fillText(text, xx - w / 2 + 7, yy + 13.5);
+        pressureBadge(p.t, xx, yy, up);
+        continue;
+      }
       ctx.fillStyle = "rgba(255,255,255,0.92)";
       ctx.beginPath();
        ctx.roundRect?.(xx - w / 2, yy, w, 18, 4);
