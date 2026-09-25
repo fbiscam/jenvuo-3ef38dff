@@ -241,9 +241,12 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
         const r = base();
         if (!r?.priceRange) return r;
         const lr = chart.timeScale().getVisibleLogicalRange();
-        const key = `${propsRef.current.bars.length}|${lr ? Math.round(Number(lr.from)) : 0}|${lr ? Math.round(Number(lr.to)) : 0}`;
+        const b0 = propsRef.current.bars[0];
+        const key = `${b0?.time ?? 0}:${b0?.open ?? 0}|${propsRef.current.bars.length}|${lr ? Math.round(Number(lr.from)) : 0}|${lr ? Math.round(Number(lr.to)) : 0}`;
         const st = stickyRangeRef.current;
-        if (!st || st.key !== key) {
+        // A new dataset (pair/timeframe switch) that doesn't overlap the old range starts fresh.
+        const disjoint = st && (r.priceRange.minValue > st.max || r.priceRange.maxValue < st.min);
+        if (!st || st.key !== key || disjoint) {
           stickyRangeRef.current = { key, min: r.priceRange.minValue, max: r.priceRange.maxValue };
         } else {
           st.min = Math.min(st.min, r.priceRange.minValue);
@@ -401,7 +404,9 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
     const chart = chartRef.current;
     if (!chart) return;
     lastBarsRef.current = null;
+    stickyRangeRef.current = null;
     const id = window.setTimeout(() => {
+      stickyRangeRef.current = null;
       const n = propsRef.current.bars.length;
       if (n > 0) chart.timeScale().setVisibleLogicalRange({ from: Math.max(0, n - 150), to: n + 8 });
     }, 50);
