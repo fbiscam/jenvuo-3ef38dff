@@ -45,10 +45,8 @@ function normalizeMessages(input: unknown): ChatMessage[] | null {
   const out: ChatMessage[] = [];
   for (const raw of input.slice(0, 40)) {
     const msg = raw as { role?: unknown; content?: unknown };
-    const role =
-      msg.role === "system" || msg.role === "assistant" || msg.role === "user"
-        ? msg.role
-        : "user";
+    // Callers may never set system instructions; only the server does.
+    const role: "assistant" | "user" = msg.role === "assistant" ? "assistant" : "user";
     if (typeof msg.content === "string") {
       out.push({ role, content: msg.content.slice(0, 40_000) });
     } else if (Array.isArray(msg.content)) {
