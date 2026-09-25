@@ -816,15 +816,6 @@ export function renderSmcOverlay(
     if (x != null && y != null) {
       const buy = rv.side === "buy";
       const col = buy ? "#089981" : "#f23645";
-      // Arrow at the swing candle (beyond label + pressure box).
-      const ay = buy ? y + 60 : y - 60;
-      ctx.save();
-      ctx.fillStyle = col;
-      ctx.beginPath();
-      if (buy) { ctx.moveTo(x, ay - 10); ctx.lineTo(x - 8, ay + 4); ctx.lineTo(x + 8, ay + 4); }
-      else { ctx.moveTo(x, ay + 10); ctx.lineTo(x - 8, ay - 4); ctx.lineTo(x + 8, ay - 4); }
-      ctx.closePath();
-      ctx.fill();
       // Level lines to the right edge.
       const x0 = Math.max(0, pr.x((rv.entryT ?? rv.t) / 1000) ?? x);
       const line = (price: number | null, color: string, text: string, dash: number[]) => {
