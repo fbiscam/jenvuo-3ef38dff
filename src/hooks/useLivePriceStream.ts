@@ -4,8 +4,10 @@ import { getLiveTick } from "@/lib/gold-analysis.functions";
 
 // XAU-only build: no Binance streams. All XAU pairs are polled via the
 // server tick fetcher so the header stays in sync with the analysis feed.
-function binanceStreamFor(_symbol: string): string | null {
-  return null;
+// XAU/USD: Binance PAXG trades give sub-second movement; we add a basis so
+// the price stays aligned with real spot gold from the server feed.
+function binanceStreamFor(symbol: string): string | null {
+  return symbol.toUpperCase().replace("/", "") === "XAUUSD" ? "paxgusdt" : null;
 }
 
 
@@ -73,7 +75,18 @@ export function useLivePriceStream(
         try {
           const t = await fetchTick({ data: { symbol } });
           if (stopped || !t) return;
-          pushTick(t.price, typeof t.t === "number" ? t.t : Date.now());
+          if (stream && lastStreamPrice != null) {
+            // Recalibrate basis only when spot actually prints a new value.
+            if (t.price !== lastSpot) {
+              lastSpot = t.price;
+              basis = t.price - lastStreamPrice;
+            }
+            if (basis == null) basis = t.price - lastStreamPrice;
+            if (!streamAlive()) pushTick(t.price, typeof t.t === "number" ? t.t : Date.now());
+          } else {
+            lastSpot = t.price;
+            pushTick(t.price, typeof t.t === "number" ? t.t : Date.now());
+          }
         } catch { /* keep last */ }
         finally {
           if (!stopped) pollId = setTimeout(tick, ms);
@@ -83,6 +96,11 @@ export function useLivePriceStream(
     };
 
     const stream = binanceStreamFor(symbol);
+    let lastStreamPrice: number | null = null;
+    let lastStreamAt = 0;
+    let lastSpot: number | null = null;
+    let basis: number | null = null;
+    const streamAlive = () => Date.now() - lastStreamAt < 5000;
     let firstTickTimer: ReturnType<typeof setTimeout> | null = null;
     if (stream && typeof WebSocket !== "undefined") {
       try {
@@ -91,13 +109,15 @@ export function useLivePriceStream(
           try {
             const d = JSON.parse(ev.data);
             const p = parseFloat(d.p);
-            pushTick(p, typeof d.T === "number" ? d.T : Date.now());
-            if (firstTickTimer) { clearTimeout(firstTickTimer); firstTickTimer = null; }
+            if (!Number.isFinite(p) || p <= 0) return;
+            lastStreamPrice = p;
+            lastStreamAt = Date.now();
+            if (basis != null) pushTick(p + basis, Date.now());
           } catch { /* ignore */ }
         };
         ws.onerror = () => { /* fall through to onclose */ };
-        ws.onclose = () => { if (!stopped) startPolling(intervalMs); };
-        firstTickTimer = setTimeout(() => { if (!stopped) startPolling(intervalMs); }, 4000);
+        // Polling keeps running to supply spot basis and as fallback.
+        startPolling(intervalMs);
       } catch {
         startPolling(intervalMs);
       }
