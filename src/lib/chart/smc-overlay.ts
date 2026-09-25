@@ -30,6 +30,7 @@ export type LivePivot = {
   onFormingCandle: boolean;
   /** Candles printed after the swing so far (needs FRACTAL_RADIUS to confirm). */
   barsAfter: number;
+  confirmIn: number;
 };
 
 export type SmcOverlay = {
@@ -200,6 +201,8 @@ export function computeLivePivots(
         label,
         onFormingCandle: forming != null && i === all.length - 1,
         barsAfter: all.length - 1 - i,
+        // Closed candles still needed after this swing before it locks in.
+        confirmIn: Math.max(0, radius - Math.max(0, closed.length - 1 - i)),
       });
       break;
     }
@@ -620,6 +623,37 @@ export function renderSmcOverlay(
       ctx.fillStyle = color;
        ctx.fillText(text, xx - w / 2 + 7, yy + 13.5);
       pressureBadge(p.t, xx, yy, up);
+      // Confirmation tracker: candles left + invalidation level.
+      const left = p.confirmIn ?? 0;
+      const done = FRACTAL_RADIUS - left;
+      const tw = 158;
+      const th = 30;
+      const tx = xx - tw / 2;
+      const ty = up ? yy - 22 - 4 - th - 4 : yy + 20 + 4 + 22 + 4;
+      ctx.save();
+      ctx.fillStyle = "rgba(255,255,255,0.97)";
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 1;
+      ctx.setLineDash([3, 2]);
+      ctx.beginPath();
+      ctx.roundRect?.(tx, ty, tw, th, 5);
+      if (!ctx.roundRect) ctx.rect(tx, ty, tw, th);
+      ctx.fill();
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.font = "700 11px 'JetBrains Mono', ui-monospace, monospace";
+      ctx.fillStyle = color;
+      const head = left === 0 ? `${p.label} confirming…` : `${p.label} confirm in ${left} candle${left === 1 ? "" : "s"}`;
+      ctx.fillText(head, tx + 6, ty + 12);
+      ctx.font = "600 10px 'JetBrains Mono', ui-monospace, monospace";
+      ctx.fillStyle = "#475569";
+      ctx.fillText(`${up ? "Cancel above" : "Cancel below"} ${p.price.toFixed(2)}`, tx + 6, ty + 23);
+      const segW = (tw - 12) / FRACTAL_RADIUS;
+      for (let s = 0; s < FRACTAL_RADIUS; s++) {
+        ctx.fillStyle = s < done ? color : "#e2e8f0";
+        ctx.fillRect(tx + 6 + s * segW, ty + th - 4, segW - 1.5, 2);
+      }
+      ctx.restore();
     }
   }
   ctx.restore();
