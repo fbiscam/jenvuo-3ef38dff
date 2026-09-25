@@ -498,16 +498,17 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
     const markers: SeriesMarker<Time>[] = [];
     for (const script of scripts) {
       for (const shape of script.result.shapes) {
-        const insideBar = isInsideBarMarker(shape.title, shape.text);
+        // Inside bars are shown only as yellow candles — no dot or "IB" text.
+        if (isInsideBarMarker(shape.title, shape.text)) continue;
         for (const i of shape.bars.slice(-300)) {
           const bar = bars[i];
           if (!bar) continue;
           markers.push({
             time: bar.time as UTCTimestamp,
             position: shape.location === "above" ? "aboveBar" : "belowBar",
-            color: insideBar ? CHART_COLORS.insideBar : shape.color,
+            color: shape.color,
             shape: shape.shape,
-            text: insideBar ? "IB" : shape.text || undefined,
+            text: shape.text || undefined,
           });
         }
       }
