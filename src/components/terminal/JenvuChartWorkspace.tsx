@@ -201,6 +201,25 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
   const workspaceRef = useRef<HTMLDivElement | null>(null);
   const chartRef = useRef<ChartCanvasHandle | null>(null);
   const [ready, setReady] = useState(false);
+  const [chartTheme, setChartTheme] = useState<"light" | "dark">("light");
+  useEffect(() => {
+    try {
+      if (window.localStorage.getItem("jenvu-chart-theme") === "dark") setChartTheme("dark");
+    } catch {
+      /* storage unavailable */
+    }
+  }, []);
+  const toggleChartTheme = () => {
+    setChartTheme((cur) => {
+      const next = cur === "dark" ? "light" : "dark";
+      try {
+        window.localStorage.setItem("jenvu-chart-theme", next);
+      } catch {
+        /* storage unavailable */
+      }
+      return next;
+    });
+  };
   const [indicators, setIndicators] = useState<IndicatorId[]>(["volume", "ema20", "ema50"]);
   const [smcToggles, setSmcToggles] = useState<SmcToggles>(DEFAULT_SMC);
   const [drawings, setDrawings] = useState<Drawing[]>([]);
