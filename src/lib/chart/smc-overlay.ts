@@ -338,10 +338,12 @@ export function renderSmcOverlay(
     const width = Math.max(1, pr.width - x);
     const y = Math.min(topY, bottomY);
     const height = Math.max(2, Math.abs(bottomY - topY));
-    const edge = "rgb(34,197,94)";
-    const label = gap.type === "BULLISH_FVG" ? "BULLISH FVG" : "BEARISH FVG";
+    const bullish = gap.type === "BULLISH_FVG";
+    const edge = bullish ? "rgb(34,197,94)" : "rgb(242,54,69)";
+    const fill = bullish ? "rgba(34,197,94,0.1)" : "rgba(242,54,69,0.1)";
+    const label = bullish ? "BULLISH FVG" : "BEARISH FVG";
 
-    ctx.fillStyle = "rgba(34,197,94,0.1)";
+    ctx.fillStyle = fill;
     ctx.fillRect(x, y, width, height);
     ctx.strokeStyle = edge;
     ctx.lineWidth = 1.25;
