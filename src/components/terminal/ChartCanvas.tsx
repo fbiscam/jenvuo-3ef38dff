@@ -101,6 +101,7 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
   const wrapRef = useRef<HTMLDivElement | null>(null);
   const hostRef = useRef<HTMLDivElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const stickyRangeRef = useRef<{ key: string; min: number; max: number } | null>(null);
   const chartRef = useRef<IChartApi | null>(null);
   const candleRef = useRef<ISeriesApi<"Candlestick"> | null>(null);
   const markersRef = useRef<ISeriesMarkersPluginApi<Time> | null>(null);
@@ -233,6 +234,24 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
       wickUpColor: CHART_COLORS.up,
       wickDownColor: CHART_COLORS.down,
       priceFormat: { type: "price", precision: 2, minMove: 0.01 },
+      // Sticky autoscale: a live spike may widen the range, but the range never
+      // shrinks/bounces back on every tick. It re-fits only when a candle closes
+      // or the user scrolls/zooms, so old candles and SMC markings stay put.
+      autoscaleInfoProvider: (base: () => { priceRange: { minValue: number; maxValue: number } | null } | null) => {
+        const r = base();
+        if (!r?.priceRange) return r;
+        const lr = chart.timeScale().getVisibleLogicalRange();
+        const key = `${propsRef.current.bars.length}|${lr ? Math.round(Number(lr.from)) : 0}|${lr ? Math.round(Number(lr.to)) : 0}`;
+        const st = stickyRangeRef.current;
+        if (!st || st.key !== key) {
+          stickyRangeRef.current = { key, min: r.priceRange.minValue, max: r.priceRange.maxValue };
+        } else {
+          st.min = Math.min(st.min, r.priceRange.minValue);
+          st.max = Math.max(st.max, r.priceRange.maxValue);
+        }
+        const cur = stickyRangeRef.current!;
+        return { ...r, priceRange: { minValue: cur.min, maxValue: cur.max } };
+      },
     });
     chartRef.current = chart;
     candleRef.current = candles;
@@ -341,10 +360,7 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
       // lightweight-charts auto-scales after every candle update. Preserve the
       // user's current price range so a live tick moves only the forming candle,
       // not every historical candle and price-anchored SMC marking on screen.
-      const priceScale = chartRef.current?.priceScale("right");
-      const visiblePriceRange = priceScale?.getVisibleRange();
       for (let i = Math.max(0, prev.len - 1); i < data.length; i++) candles.update(data[i]);
-      if (visiblePriceRange) priceScale?.setVisibleRange(visiblePriceRange);
     } else {
       candles.setData(data);
     }
