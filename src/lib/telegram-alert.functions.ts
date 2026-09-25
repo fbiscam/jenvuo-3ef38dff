@@ -43,11 +43,35 @@ export const connectTelegramAlertLink = createServerFn({ method: 'POST' })
   .inputValidator((d: unknown) => z.object({ chatId: z.string().min(3).max(32) }).parse(d))
   .handler(async ({ data, context }) => {
     const chatId = data.chatId.trim().replace(/\s+/g, '')
-    if (!/^-?\d{3,20}$/.test(chatId)) {
-      throw new Error('Enter a numeric Telegram chat ID, e.g. 123456789 (get it from @userinfobot)')
+    // Only personal (private) chats — group/channel IDs are negative.
+    if (!/^\d{3,20}$/.test(chatId)) {
+      throw new Error('Enter your personal numeric Telegram chat ID, e.g. 123456789 (get it from @userinfobot)')
     }
 
-    const code = String(Math.floor(100000 + Math.random() * 900000))
+    // Resend cooldown: at most one verification message per minute per account.
+    const { data: existing } = await (await admin())
+      .select('code_expires_at')
+      .eq('user_id', context.userId)
+      .maybeSingle()
+    const prevExpiry = (existing as Partial<LinkRow> | null)?.code_expires_at
+    if (prevExpiry && new Date(prevExpiry).getTime() - 9 * 60 * 1000 > Date.now()) {
+      throw new Error('Please wait a minute before requesting another code.')
+    }
+
+    // A chat already verified by another account cannot be claimed again.
+    const { data: taken } = await (await admin())
+      .select('user_id')
+      .eq('chat_id', chatId)
+      .not('verified_at', 'is', null)
+      .neq('user_id', context.userId)
+      .limit(1)
+    if (Array.isArray(taken) && taken.length > 0) {
+      throw new Error('That Telegram chat is already linked to another account.')
+    }
+
+    const rnd = new Uint32Array(1)
+    crypto.getRandomValues(rnd)
+    const code = String(100000 + (rnd[0] % 900000))
     const expires = new Date(Date.now() + 10 * 60 * 1000).toISOString()
 
     const { error } = await (await admin()).upsert(
