@@ -668,6 +668,13 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
             {drawingsVisible ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
           </ToolButton>
           <ToolButton
+            label={chartTheme === "dark" ? "Light chart theme" : "Dark chart theme"}
+            active={chartTheme === "dark"}
+            onClick={toggleChartTheme}
+          >
+            {chartTheme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+          </ToolButton>
+          <ToolButton
             label={selected ? "Delete selected drawing (Del)" : "Remove all drawings"}
             disabled={!drawings.length}
             onClick={() => {
@@ -708,10 +715,16 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
               onToolDone={onToolDone}
               onHoverBar={onHoverBar}
               resetKey={`${timeframe.key}:${payload ? "ready" : "loading"}`}
+              theme={chartTheme}
             />
 
             {/* Legend */}
-            <div className="pointer-events-none absolute left-2 top-1.5 z-[3] max-w-[70%] space-y-0.5 font-mono text-[11px] leading-4">
+            <div
+              className={cn(
+                "pointer-events-none absolute left-2 top-1.5 z-[3] max-w-[70%] space-y-0.5 font-mono text-[11px] leading-4",
+                chartTheme === "dark" ? "text-slate-300" : "text-slate-700",
+              )}
+            >
               <div className="mb-2 flex flex-wrap items-center gap-x-2">
                 {hovered && (
                   <>
