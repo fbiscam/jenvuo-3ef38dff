@@ -200,6 +200,8 @@ export function computeLivePivots(
         label,
         onFormingCandle: forming != null && i === all.length - 1,
         barsAfter: all.length - 1 - i,
+        // Closed candles still needed after this swing before it locks in.
+        confirmIn: Math.max(0, radius - Math.max(0, closed.length - 1 - i)),
       });
       break;
     }
