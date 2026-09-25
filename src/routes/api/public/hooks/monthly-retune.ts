@@ -17,7 +17,7 @@ import { fetchBacktestSeries, simulateOnCandles } from "@/lib/backtest-historica
  *      weights cache. Otherwise → leave candidate in the review queue.
  *
  * Triggered by pg_cron on the 1st of each month at 03:00 UTC. Secured with
- * the Supabase publishable key in the `apikey` header (matches the pattern
+ * the scheduler credential (x-cron-secret) verified server-side (see pattern
  * used by paper-trade-resolver and auto-scan).
  */
 

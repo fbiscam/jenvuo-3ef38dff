@@ -2,7 +2,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { createClient } from '@supabase/supabase-js'
 
 // Fan-out route called by the insights AFTER INSERT Postgres trigger.
-// Authenticated with the Supabase anon key in the `apikey` header (pg_net pattern).
+// Authenticated with the scheduler credential (x-cron-secret), verified server-side.
 // Reads the just-published article + active subscribers, then enqueues one
 // transactional email per subscriber through the internal queue.
 
