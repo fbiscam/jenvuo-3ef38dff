@@ -6,6 +6,7 @@ import {
   Loader2, Copy, Check, ArrowLeft, Sparkles,
 } from "lucide-react";
 import { scamCheck, type ScamCheckResult } from "@/lib/scam-check/scam-check.functions";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/scam-check")({
   head: () => ({
@@ -156,20 +157,20 @@ function ScamCheckPage() {
   const VIcon = v?.icon ?? ShieldCheck;
 
   return (
-    <div className={`min-h-screen bg-white text-slate-900 ${SANS}`}>
-      <div className="mx-auto w-full max-w-3xl px-5 py-10 sm:py-14">
-        <Link to="/" className="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-slate-900">
+    <div className={`min-h-screen bg-background text-foreground ${SANS}`}>
+      <div className="mx-auto w-full max-w-5xl px-5 py-8 sm:px-8 lg:py-12">
+        <Link to="/" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
           <ArrowLeft className="h-4 w-4" />
           Back to home
         </Link>
 
-        <header className="mt-8">
-          <div className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs text-slate-600">
+        <header className="mt-7 border-b border-border pb-6">
+          <div className="inline-flex items-center gap-2 rounded-full border border-border bg-muted px-3 py-1 text-xs text-muted-foreground">
             <Sparkles className="h-3.5 w-3.5" />
             Free tool · No sign-up · Nothing is stored
           </div>
-          <h1 className="mt-4 text-3xl font-semibold tracking-tight sm:text-4xl">Scam Check</h1>
-          <p className="mt-3 max-w-2xl text-base leading-relaxed text-slate-600">
+          <h1 className="mt-4 text-[28px] font-medium sm:text-[32px]">Scam Check</h1>
+          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground">
             Paste a link, an email address or a message. We run it through a rule engine of known
             phishing and spam patterns, then a second AI review, and show you exactly which warning
             signs fired.
@@ -177,26 +178,27 @@ function ScamCheckPage() {
         </header>
 
         {/* Tabs */}
-        <div className="mt-8 flex flex-wrap gap-2">
+        <div className="mt-6 grid grid-cols-3 gap-2">
           {TABS.map((t) => {
             const Icon = t.icon;
             const active = t.kind === kind;
             return (
-              <button
+              <Button
                 key={t.kind}
                 type="button"
                 onClick={() => switchTab(t.kind)}
-                className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm transition ${ active ? "border-slate-900 bg-slate-900 text-white" : "border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:text-slate-900" }`}
+                variant={active ? "default" : "outline"}
+                className="w-full text-[13px]"
               >
                 <Icon className="h-4 w-4" />
                 {t.label}
-              </button>
+              </Button>
             );
           })}
         </div>
 
         {/* Input */}
-        <form onSubmit={onSubmit} className="mt-5 rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+        <form onSubmit={onSubmit} className="mt-5 rounded-xl border border-border bg-card p-5 ring-1 ring-background/60 sm:p-6">
           {kind === "text" ? (
             <textarea
               value={value}
@@ -204,7 +206,7 @@ function ScamCheckPage() {
               placeholder={tab.placeholder}
               rows={6}
               maxLength={4000}
-              className="w-full resize-y rounded-xl border border-slate-200 bg-slate-50/50 p-3 text-sm text-slate-900 outline-none placeholder:text-slate-400 focus:border-slate-400 focus:bg-white"
+              className="w-full resize-y rounded-md border border-input bg-background p-3 text-sm text-foreground outline-hidden placeholder:text-muted-foreground focus:border-ring focus:ring-1 focus:ring-ring"
             />
           ) : (
             <input
@@ -216,20 +218,19 @@ function ScamCheckPage() {
               autoCapitalize="off"
               autoCorrect="off"
               spellCheck={false}
-              className="w-full rounded-xl border border-slate-200 bg-slate-50/50 p-3 text-sm text-slate-900 outline-none placeholder:text-slate-400 focus:border-slate-400 focus:bg-white"
+              className="w-full rounded-md border border-input bg-background p-3 text-sm text-foreground outline-hidden placeholder:text-muted-foreground focus:border-ring focus:ring-1 focus:ring-ring"
             />
           )}
 
           <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <p className="text-xs text-slate-500">{tab.hint}</p>
-            <button
+            <p className="text-xs text-muted-foreground">{tab.hint}</p>
+            <Button
               type="submit"
               disabled={loading || !value.trim()}
-              className="inline-flex items-center justify-center gap-2 rounded-full bg-slate-900 px-5 py-2.5 text-sm text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-40"
             >
               {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ShieldCheck className="h-4 w-4" />}
               {loading ? "Analysing…" : "Check now"}
-            </button>
+            </Button>
           </div>
         </form>
 
@@ -306,7 +307,7 @@ function ScamCheckPage() {
         )}
 
         {/* Safety tips */}
-        <section className="mt-10 rounded-2xl border border-slate-200 bg-slate-50/60 p-5">
+        <section className="mt-6 rounded-xl border border-border bg-muted/45 p-5 sm:p-6">
           <h2 className="text-sm font-semibold text-slate-900">Three rules that stop most scams</h2>
           <ul className="mt-3 space-y-2 text-sm text-slate-600">
             <li>• Never share an OTP, password, CVV or wallet recovery phrase — nobody legitimate asks.</li>

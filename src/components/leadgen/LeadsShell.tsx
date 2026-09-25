@@ -9,7 +9,10 @@ import {
   ListChecks,
   Activity,
   Shield,
+  Menu,
 } from "lucide-react";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
 import type { Me } from "@/lib/leadgen/shared";
 
 /**
@@ -34,6 +37,7 @@ const NAV = [
 
 export function LeadsShell({ me, children }: { me: Me | null; children: ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const [mobileOpen, setMobileOpen] = useState(false);
   const isActive = (to: string, exact?: boolean) =>
     exact ? pathname === to || pathname === `${to}/` : pathname.startsWith(to);
 
@@ -43,19 +47,28 @@ export function LeadsShell({ me, children }: { me: Me | null; children: ReactNod
 
   return (
     <div
-      className="lg-console leads-shell-zoom flex min-h-dvh w-full bg-[#FAFAFA] text-zinc-900 antialiased selection:bg-zinc-900 selection:text-white"
+      className="lg-console leads-shell-zoom flex min-h-dvh w-full bg-background text-foreground antialiased"
       style={{ fontFamily: JENVU_SANS }}
     >
+      {mobileOpen && (
+        <Button
+          type="button"
+          variant="ghost"
+          aria-label="Close navigation"
+          className="fixed inset-0 z-40 h-auto w-auto rounded-none bg-foreground/15 p-0 hover:bg-foreground/15 lg:hidden"
+          onClick={() => setMobileOpen(false)}
+        />
+      )}
       <aside
-        className="leads-sidebar-root fixed left-0 top-0 z-20 hidden h-dvh w-[200px] flex-col overflow-hidden border-r border-zinc-200 bg-white md:flex"
+        className={`leads-sidebar-root fixed inset-y-0 left-0 z-50 flex h-dvh w-[min(82vw,280px)] flex-col overflow-hidden border-r border-border bg-sidebar transition-transform duration-200 lg:w-[200px] lg:translate-x-0 ${mobileOpen ? "translate-x-0" : "-translate-x-full"}`}
         style={{ fontFamily: JENVU_SANS, fontWeight: 400 }}
       >
         {/* Brand */}
         <div className="flex h-11 shrink-0 items-center gap-2.5 px-4">
-          <img src="/favicon.png" alt="Jenvu" className="h-7 w-7 shrink-0 rounded-md object-contain" />
+          <img src="/favicon.png" alt="Jenvu" className="h-6 w-6 shrink-0 rounded-md object-contain" />
           <span
-            className="truncate text-[22px] leading-none tracking-tight"
-            style={{ color: "#3c4043", fontWeight: 500 }}
+            className="truncate text-[22px] leading-none text-foreground"
+            style={{ fontWeight: 500 }}
           >
             Jenvu
           </span>
@@ -69,16 +82,16 @@ export function LeadsShell({ me, children }: { me: Me | null; children: ReactNod
                 <Link
                   key={item.to}
                   to={item.to}
-                  className={`group relative flex items-center gap-3 rounded-full px-2.5 py-1.5 text-[13.5px] font-medium transition ${
+                    onClick={() => setMobileOpen(false)}
+                    className={`group relative flex items-center gap-3 rounded-full px-2.5 py-1.5 text-[12.5px] font-normal transition ${
                     active
-                      ? "bg-zinc-100 font-semibold text-zinc-900"
-                      : "text-[#5E5E5E] hover:bg-zinc-50 hover:text-zinc-900"
+                      ? "bg-[#EBEBEB] text-foreground"
+                      : "text-foreground hover:bg-accent"
                   }`}
                 >
                   <item.icon
                     className="h-[19px] w-[19px] shrink-0"
                     strokeWidth={active ? 2.1 : 1.7}
-                    style={{ color: active ? "#18181b" : "#5E5E5E" }}
                   />
                   <span className="truncate">{item.label}</span>
                 </Link>
@@ -109,11 +122,14 @@ export function LeadsShell({ me, children }: { me: Me | null; children: ReactNod
 
 
 
-      <div className="flex min-w-0 flex-1 flex-col md:ml-[200px]">
-        <header className="flex h-14 shrink-0 items-center justify-between border-b border-zinc-100 bg-white/85 px-4 backdrop-blur-md md:px-6">
-          <div className="flex items-center gap-2.5 md:hidden">
-            <img src="/favicon.png" alt="" className="h-7 w-7 rounded-md object-contain" />
-            <span className="text-[17px] tracking-tight text-[#3c4043]" style={{ fontWeight: 500 }}>
+      <div className="flex min-w-0 flex-1 flex-col lg:ml-[200px]">
+        <header className="flex h-12 shrink-0 items-center justify-between border-b border-border bg-background px-4 lg:px-6">
+          <div className="flex min-w-0 items-center gap-2.5 lg:hidden">
+            <Button variant="ghost" size="icon-sm" aria-label="Open navigation" onClick={() => setMobileOpen(true)}>
+              <Menu className="h-5 w-5" />
+            </Button>
+            <img src="/favicon.png" alt="" className="h-6 w-6 shrink-0 rounded-md object-contain" />
+            <span className="truncate text-[17px] text-foreground" style={{ fontWeight: 500 }}>
               Jenvu <span className="text-zinc-400">Leads</span>
             </span>
           </div>
@@ -129,32 +145,11 @@ export function LeadsShell({ me, children }: { me: Me | null; children: ReactNod
                 )}
               </span>
             )}
-            <Link
-              to="/leads/account"
-              className="rounded-lg border border-zinc-200 px-3 py-1.5 text-[12px] font-medium text-zinc-900 hover:bg-zinc-50"
-            >
-              Account
-            </Link>
+            <Button asChild variant="outline" size="sm"><Link to="/leads/account">Account</Link></Button>
           </div>
         </header>
 
-        <nav className="flex gap-1 overflow-x-auto border-b border-zinc-100 bg-white px-2 md:hidden">
-          {NAV.map((item) => (
-            <Link
-              key={item.to}
-              to={item.to}
-              className={`whitespace-nowrap px-3 py-2.5 text-[12px] ${
-                isActive(item.to, item.exact)
-                  ? "border-b-2 border-zinc-900 font-medium text-zinc-900"
-                  : "text-zinc-500"
-              }`}
-            >
-              {item.label}
-            </Link>
-          ))}
-        </nav>
-
-        <main className="mx-auto w-full max-w-7xl min-w-0 flex-1 overflow-x-hidden px-4 py-6 md:px-6 md:py-8">{children}</main>
+        <main className="mx-auto w-full max-w-7xl min-w-0 flex-1 overflow-x-hidden px-4 py-7 sm:px-6 lg:px-8 lg:py-8">{children}</main>
       </div>
     </div>
   );
@@ -170,10 +165,10 @@ export function PageHeader({
   actions?: ReactNode;
 }) {
   return (
-    <div className="mb-6 flex flex-wrap items-start justify-between gap-3 pb-5">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight text-zinc-900">{title}</h1>
-        {description && <p className="mt-1 text-[13px] text-zinc-600">{description}</p>}
+    <div className="mb-6 grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3 pb-3 sm:flex sm:flex-wrap sm:justify-between">
+      <div className="min-w-0">
+        <h1 className="truncate text-[25px] font-medium leading-tight text-foreground">{title}</h1>
+        {description && <p className="mt-1 text-[13px] text-muted-foreground">{description}</p>}
       </div>
       {actions && <div className="flex items-center gap-2">{actions}</div>}
     </div>
@@ -183,7 +178,7 @@ export function PageHeader({
 export function Card({ children, className = "" }: { children: ReactNode; className?: string }) {
   return (
     <div
-      className={`rounded-lg border border-zinc-200 bg-white ${className}`}
+      className={`overflow-hidden rounded-xl border border-border bg-card ring-1 ring-background/60 ${className}`}
     >
       {children}
     </div>
@@ -191,9 +186,9 @@ export function Card({ children, className = "" }: { children: ReactNode; classN
 }
 
 export const btnPrimary =
-  "inline-flex items-center justify-center gap-2 rounded-lg bg-zinc-900 px-4 py-2 text-[13px] font-medium text-white transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-50";
+  "inline-flex items-center justify-center gap-2 rounded-md bg-primary px-4 py-2 text-[13px] font-medium text-primary-foreground transition hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50";
 export const btnGhost =
-  "inline-flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-4 py-2 text-[13px] font-medium text-zinc-900 transition hover:bg-zinc-50 disabled:opacity-50";
+  "inline-flex items-center justify-center gap-2 rounded-md border border-input bg-background px-4 py-2 text-[13px] font-medium text-foreground transition hover:bg-accent disabled:opacity-50";
 export const inputCls =
-  "w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px] text-zinc-900 outline-none transition placeholder:text-zinc-400 focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900/10";
-export const labelCls = "mb-1.5 block text-[12px] font-medium text-zinc-600";
+  "w-full rounded-md border border-input bg-background px-3 py-2 text-[13px] text-foreground outline-hidden transition placeholder:text-muted-foreground focus:border-ring focus:ring-1 focus:ring-ring";
+export const labelCls = "mb-1.5 block text-[12px] font-medium text-muted-foreground";

@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { getMe } from "@/lib/leadgen/core.functions";
 import { LeadsShell } from "@/components/leadgen/LeadsShell";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/leads")({
   ssr: false,
@@ -48,20 +49,21 @@ function LeadsLayout() {
 
   if (error) {
     return (
-      <div className="flex min-h-dvh items-center justify-center bg-[#F8F9FA] p-6">
-        <div className="max-w-sm rounded-lg border border-[#DADCE0] bg-white p-6 text-center">
-          <p className="text-[14px] text-[#202124]">
+      <div className="flex min-h-dvh items-center justify-center bg-muted p-6">
+        <div className="max-w-sm rounded-xl border border-border bg-card p-6 text-center">
+          <p className="text-[14px] text-foreground">
             {error instanceof Error ? error.message : "Could not load your account."}
           </p>
-          <button
+          <Button
+            variant="outline"
             onClick={async () => {
               await supabase.auth.signOut();
               router.navigate({ to: "/leads-signin", replace: true });
             }}
-            className="mt-4 rounded border border-[#DADCE0] px-4 py-2 text-[13px] hover:bg-[#F1F3F4]"
+            className="mt-4"
           >
             Sign out
-          </button>
+          </Button>
         </div>
       </div>
     );
