@@ -16,6 +16,7 @@ import {
 import { Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { scamToolCheck, type ScamToolResult } from "@/lib/scam-check/scam-tool.functions";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/scam-tool")({
   head: () => ({
@@ -155,49 +156,50 @@ function ScamToolPage() {
   const ui = result ? VERDICT_UI[result.verdict] : null;
 
   return (
-    <div className={`min-h-screen bg-white text-zinc-900 ${SANS}`}>
-      <div className="mx-auto max-w-3xl px-5 py-10 sm:py-14">
+    <div className={`min-h-screen bg-background text-foreground ${SANS}`}>
+      <div className="mx-auto w-full max-w-5xl px-5 py-8 sm:px-8 lg:py-12">
         <Link
           to="/"
-          className="inline-flex items-center gap-2 text-sm text-zinc-500 hover:text-black transition-colors mb-6"
+          className="mb-7 inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
         >
           <ArrowLeft className="w-4 h-4" />
           Back to home
         </Link>
 
-        <div className="mb-8">
-          <h1 className="text-3xl sm:text-4xl font-medium text-black tracking-tight">
+        <div className="mb-7 border-b border-border pb-6">
+          <h1 className="text-[28px] font-medium text-foreground sm:text-[32px]">
             Scam Tool
           </h1>
-          <p className="mt-2 text-base text-zinc-600">
+          <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
             Verify brokers, links, signal sellers and payment requests before you send money.
           </p>
         </div>
 
         {/* Tabs */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-6">
+        <div className="mb-5 grid grid-cols-2 gap-2 sm:grid-cols-4">
           {TABS.map((t) => {
             const Icon = t.icon;
             const active = kind === t.kind;
             return (
-              <button
+              <Button
                 key={t.kind}
                 onClick={() => {
                   setKind(t.kind);
                   setValue("");
                   setResult(null);
                 }}
-                className={`flex items-center justify-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${ active ? "bg-black text-white" : "bg-zinc-50 text-zinc-600 hover:bg-zinc-100" }`}
+                variant={active ? "default" : "outline"}
+                className="h-10 w-full text-[13px]"
               >
                 <Icon className="w-4 h-4" />
                 {t.label}
-              </button>
+              </Button>
             );
           })}
         </div>
 
         {/* Input form */}
-        <form onSubmit={onSubmit} className="space-y-3">
+        <form onSubmit={onSubmit} className="rounded-xl border border-border bg-card p-5 ring-1 ring-background/60 sm:p-6">
           <div className="relative">
             <activeTab.icon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-400" />
             <input
@@ -205,14 +207,14 @@ function ScamToolPage() {
               value={value}
               onChange={(e) => setValue(e.target.value)}
               placeholder={activeTab.placeholder}
-              className="w-full rounded-xl border border-zinc-200 bg-white pl-11 pr-4 py-3.5 text-base text-zinc-900 placeholder:text-zinc-400 outline-none focus:border-black focus:ring-1 focus:ring-black"
+              className="w-full rounded-md border border-input bg-background py-3 pl-11 pr-4 text-sm text-foreground outline-hidden placeholder:text-muted-foreground focus:border-ring focus:ring-1 focus:ring-ring"
             />
           </div>
-          <p className="text-xs text-zinc-500">{activeTab.hint}</p>
-          <button
+          <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-xs text-muted-foreground">{activeTab.hint}</p>
+          <Button
             type="submit"
             disabled={!value.trim() || loading}
-            className="inline-flex items-center gap-2 rounded-lg bg-black px-5 py-2.5 text-sm font-medium text-white hover:bg-zinc-800 disabled:opacity-50 transition-colors"
           >
             {loading ? (
               <Loader2 className="w-4 h-4 animate-spin" />
@@ -220,7 +222,8 @@ function ScamToolPage() {
               <Search className="w-4 h-4" />
             )}
             {loading ? "Analysing…" : "Check now"}
-          </button>
+          </Button>
+          </div>
         </form>
 
         {error && (
@@ -306,7 +309,7 @@ function ScamToolPage() {
         )}
 
         {/* Red flags checklist */}
-        <div className="mt-10 rounded-xl border border-zinc-200 bg-zinc-50 p-5 sm:p-6">
+        <div className="mt-6 rounded-xl border border-border bg-muted/45 p-5 sm:p-6">
           <h3 className="text-base font-medium text-black mb-3">
             Common trading scam red flags
           </h3>
@@ -324,7 +327,7 @@ function ScamToolPage() {
         </div>
 
         {/* Full scam check link */}
-        <div className="mt-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 rounded-xl border border-zinc-200 p-4">
+        <div className="mt-5 flex flex-col gap-3 rounded-xl border border-border bg-card p-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="text-sm font-medium text-black">
               Need a deeper link/email/text analysis?
