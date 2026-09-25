@@ -300,7 +300,7 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
     const incremental = Boolean(
       prev && prev.first === first && bars.length >= prev.len && bars.length - prev.len <= 2 && prev.len > 0,
     );
-    if (incremental) {
+    if (incremental && prev) {
       // lightweight-charts auto-scales after every candle update. Preserve the
       // user's current price range so a live tick moves only the forming candle,
       // not every historical candle and price-anchored SMC marking on screen.
