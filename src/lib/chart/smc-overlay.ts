@@ -160,6 +160,7 @@ export function selectHighConfidencePois(
 }
 
 const toCandle = (b: OhlcvBar): Candle => ({ t: b.time * 1000, o: b.open, h: b.high, l: b.low, c: b.close, v: b.volume });
+const SHOW_PROVISIONAL_PIVOTS = false;
 const lockedLabels = new Map<string, string>();
 
 /**
@@ -676,6 +677,8 @@ export function renderSmcOverlay(
         pressureBadge(p.t, xx, yy, up);
         continue;
       }
+      // Unconfirmed swings are not drawn: a label appears only once, final, on its own candle.
+      if (!SHOW_PROVISIONAL_PIVOTS) continue;
       ctx.fillStyle = "rgba(255,255,255,0.92)";
       ctx.beginPath();
        ctx.roundRect?.(xx - w / 2, yy, w, 18, 4);
