@@ -272,6 +272,24 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // ------------------------------------------------------------- theme switch
+  useEffect(() => {
+    const chart = chartRef.current;
+    if (!chart) return;
+    const t = CHART_THEMES[props.theme ?? "light"];
+    chart.applyOptions({
+      layout: {
+        background: { type: ColorType.Solid, color: t.bg },
+        textColor: t.text,
+        panes: { separatorColor: t.border, enableResize: true },
+      },
+      grid: { vertLines: { color: t.grid }, horzLines: { color: t.grid } },
+      rightPriceScale: { borderColor: t.border },
+      timeScale: { borderColor: t.border },
+    });
+    dirtyRef.current += 1;
+  }, [props.theme]);
+
   const visibleDrawings = () => {
     const p = propsRef.current;
     if (!p.drawingsVisible) return [];
