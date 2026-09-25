@@ -434,6 +434,7 @@ export function renderSmcOverlay(
       const x = pr.x(p.t / 1000);
       const y = pr.y(p.price);
       if (x == null || y == null) continue;
+       if (x < 0 || x > pr.width) continue;
       const up = p.kind === "high";
       const color = p.label === "HH" || p.label === "HL" ? "#089981" : "#f23645";
       const w = ctx.measureText(p.label).width + 8;
@@ -452,6 +453,7 @@ export function renderSmcOverlay(
       const x = pr.x(p.t / 1000);
       const y = pr.y(p.price);
       if (x == null || y == null) continue;
+       if (x < 0 || x > pr.width) continue;
       const up = p.kind === "high";
       const color = p.label === "HH" || p.label === "HL" || p.label === "L" ? "#089981" : "#f23645";
       const text = p.label;
