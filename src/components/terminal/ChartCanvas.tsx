@@ -38,8 +38,8 @@ export const CHART_COLORS = {
   text: "#131722",
   grid: "#b8c0cc",
   border: "#d6dae3",
-  up: "#0a7d64",
-  down: "#d32f3f",
+  up: "#089981",
+  down: "#f23645",
   insideBar: "#38bdf8",
   insideBarCandle: "#eab308",
 };
