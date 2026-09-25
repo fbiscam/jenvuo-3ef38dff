@@ -809,5 +809,70 @@ export function renderSmcOverlay(
       ctx.restore();
     }
   }
+  const rv = smc.reversal;
+  if (toggles.structure && rv && rv.stage !== "cancelled") {
+    const x = pr.x(rv.t / 1000);
+    const y = pr.y(rv.pivotPrice);
+    if (x != null && y != null) {
+      const buy = rv.side === "buy";
+      const col = buy ? "#089981" : "#f23645";
+      // Arrow at the swing candle (beyond label + pressure box).
+      const ay = buy ? y + 60 : y - 60;
+      ctx.save();
+      ctx.fillStyle = col;
+      ctx.beginPath();
+      if (buy) { ctx.moveTo(x, ay - 10); ctx.lineTo(x - 8, ay + 4); ctx.lineTo(x + 8, ay + 4); }
+      else { ctx.moveTo(x, ay + 10); ctx.lineTo(x - 8, ay - 4); ctx.lineTo(x + 8, ay - 4); }
+      ctx.closePath();
+      ctx.fill();
+      // Level lines to the right edge.
+      const x0 = Math.max(0, pr.x((rv.entryT ?? rv.t) / 1000) ?? x);
+      const line = (price: number | null, color: string, text: string, dash: number[]) => {
+        if (price == null) return;
+        const ly = pr.y(price);
+        if (ly == null) return;
+        ctx.setLineDash(dash);
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 1.25;
+        ctx.beginPath(); ctx.moveTo(x0, ly); ctx.lineTo(pr.width, ly); ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.font = "700 11px 'JetBrains Mono', ui-monospace, monospace";
+        const s = `${text} ${price.toFixed(2)}`;
+        const w = ctx.measureText(s).width + 10;
+        ctx.fillStyle = color;
+        ctx.fillRect(pr.width - w - 70, ly - 8, w, 16);
+        ctx.fillStyle = "#ffffff";
+        ctx.fillText(s, pr.width - w - 65, ly + 4);
+      };
+      if (rv.stage === "confirmed") {
+        line(rv.entry, "#2962ff", "ENTRY", []);
+        line(rv.tp1, "#089981", "TP1", [5, 3]);
+        line(rv.tp2, "#089981", "TP2 1:3", [5, 3]);
+      }
+      line(rv.sl, "#f23645", "SL", [5, 3]);
+      // Status box.
+      const head = rv.stage === "confirmed"
+        ? `${buy ? "BUY" : "SELL"} ENTRY CONFIRMED`
+        : `POSSIBLE ${buy ? "BUY" : "SELL"} REVERSAL`;
+      const sub = `${rv.score}%${rv.swept ? " · sweep" : ""} · ${rv.stage === "confirmed" ? "SL beyond wick" : `wait close ${buy ? "above" : "below"} body`}`;
+      ctx.font = "700 11px 'JetBrains Mono', ui-monospace, monospace";
+      const bw = Math.max(ctx.measureText(head).width, ctx.measureText(sub).width) + 14;
+      const bh = 32;
+      const bx = x - bw / 2;
+      const by = buy ? ay + 8 : ay - 8 - bh;
+      ctx.fillStyle = rv.stage === "confirmed" ? col : "rgba(255,255,255,0.97)";
+      ctx.strokeStyle = col;
+      ctx.lineWidth = 1.25;
+      ctx.beginPath();
+      ctx.roundRect?.(bx, by, bw, bh, 5);
+      if (!ctx.roundRect) ctx.rect(bx, by, bw, bh);
+      ctx.fill(); ctx.stroke();
+      ctx.fillStyle = rv.stage === "confirmed" ? "#ffffff" : col;
+      ctx.fillText(head, bx + 7, by + 13);
+      ctx.font = "600 10px 'JetBrains Mono', ui-monospace, monospace";
+      ctx.fillText(sub, bx + 7, by + 26);
+      ctx.restore();
+    }
+  }
   ctx.restore();
 }
