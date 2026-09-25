@@ -80,7 +80,7 @@ export function buildChartContext(input: {
     const live = (input.smc.livePivots ?? [])
       .map(
         (p) =>
-          `${p.label} ${p.price.toFixed(2)} @ ${fmt(p.t / 1000)}${p.onFormingCandle ? " (on the forming candle)" : ""}, ${p.barsAfter}/10 candles after it — provisional; confirms after ${p.confirmIn} more closed candle(s) if price does not trade ${p.kind === "high" ? "above" : "below"} ${p.price.toFixed(2)}`,
+          `${p.label} ${p.price.toFixed(2)} @ ${fmt(p.t / 1000)}${p.onFormingCandle ? " (on the forming candle)" : ""}, ${p.barsAfter}/10 candles after it — provisional; confirms after ${p.confirmIn} more closed candle(s) if price does not trade ${p.kind === "high" ? "above" : "below"} ${p.price.toFixed(2)}; early lock on a close ${p.kind === "high" ? "below" : "above"} ${p.earlyLevel?.toFixed(2) ?? "n/a"}; hold chance ~${p.confirmChance ?? 0}%${p.confirmAt ? `; ETA ${fmt(p.confirmAt / 1000)}` : ""}`,
       )
       .join("; ");
     if (live) lines.push(`Live unconfirmed swing labels (dashed on chart): ${live}.`);
