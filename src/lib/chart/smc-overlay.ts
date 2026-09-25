@@ -414,18 +414,22 @@ export function renderSmcOverlay(
       const x1 = pr.x(b.t / 1000);
       const y = pr.y(b.level);
       if (x0 == null || x1 == null || y == null) continue;
+       if (x1 < 0 || x0 > pr.width) continue;
+       const lineStart = Math.max(0, x0);
+       const lineEnd = Math.min(pr.width, x1);
+       if (lineEnd - lineStart < 24) continue;
       const color = b.dir === "bullish" ? "#089981" : "#f23645";
       ctx.strokeStyle = color;
       ctx.setLineDash([3, 3]);
       ctx.beginPath();
-      ctx.moveTo(x0, y);
-      ctx.lineTo(x1, y);
+       ctx.moveTo(lineStart, y);
+       ctx.lineTo(lineEnd, y);
       ctx.stroke();
       ctx.setLineDash([]);
       ctx.fillStyle = color;
       const label = b.type === "CHOCH" ? "CHoCH" : b.type;
       const w = ctx.measureText(label).width;
-       const labelX = Math.max(2, Math.min(pr.width - w - 2, (x0 + x1) / 2 - w / 2));
+       const labelX = Math.max(2, Math.min(pr.width - w - 2, (lineStart + lineEnd) / 2 - w / 2));
        ctx.fillText(label, labelX, breakLabelBaseline(y, b.dir === "bullish", pr.height));
     }
   }
