@@ -4,14 +4,8 @@ import { submitToGoogle, submitToIndexNow } from "./generate-insight";
 const BASE_URL = "https://jenvu.com";
 
 async function handle(request: Request) {
-  const cronSecret = process.env.CRON_SECRET;
-  const provided =
-    request.headers.get("x-cron-secret") ||
-    new URL(request.url).searchParams.get("secret") ||
-    "";
-  if (!cronSecret || provided !== cronSecret) {
-    return new Response(JSON.stringify({ error: "unauthorized" }), { status: 401 });
-  }
+  const { isAuthorizedCronRequest, cronUnauthorized } = await import("@/lib/cron-guard.server");
+  if (!(await isAuthorizedCronRequest(request))) return cronUnauthorized();
 
   const url = new URL(request.url);
   const force = url.searchParams.get("force") === "1";

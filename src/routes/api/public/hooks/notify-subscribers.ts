@@ -12,18 +12,14 @@ export const Route = createFileRoute('/api/public/hooks/notify-subscribers')({
       POST: async ({ request }) => {
         const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
         const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-        const cronSecret = process.env.CRON_SECRET
-
-        if (!supabaseUrl || !supabaseServiceKey || !cronSecret) {
+        if (!supabaseUrl || !supabaseServiceKey) {
           console.error('notify-subscribers: missing env')
           return Response.json({ error: 'server_misconfigured' }, { status: 500 })
         }
 
         // Authenticate the caller with the shared cron secret
-        const provided = request.headers.get('x-cron-secret') || ''
-        if (provided !== cronSecret) {
-          return Response.json({ error: 'unauthorized' }, { status: 401 })
-        }
+        const { isAuthorizedCronRequest, cronUnauthorized } = await import("@/lib/cron-guard.server")
+        if (!(await isAuthorizedCronRequest(request))) return cronUnauthorized()
 
         let body: { slug?: string; id?: string }
         try {
