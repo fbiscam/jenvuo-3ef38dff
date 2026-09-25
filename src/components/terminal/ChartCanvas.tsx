@@ -502,16 +502,12 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
         for (const i of shape.bars.slice(-300)) {
           const bar = bars[i];
           if (!bar) continue;
-          // Render Inside Bar markers on the overlay below. Keeping the dot and
-          // label in one coordinate system prevents them drifting apart while
-          // live candles update or the timeframe changes.
-          if (insideBar) continue;
           markers.push({
             time: bar.time as UTCTimestamp,
             position: shape.location === "above" ? "aboveBar" : "belowBar",
-            color: shape.color,
+            color: insideBar ? CHART_COLORS.insideBar : shape.color,
             shape: shape.shape,
-            text: shape.text || undefined,
+            text: insideBar ? "IB" : shape.text || undefined,
           });
         }
       }
