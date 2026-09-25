@@ -213,6 +213,8 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
   const [fullscreen, setFullscreen] = useState(false);
   const [ticketSide, setTicketSide] = useState<DemoSide | null>(null);
   const [paperOpen, setPaperOpen] = useState(false);
+  // Demo trading is temporarily disabled. Set to true to re-enable buy/sell buttons, order ticket and paper trading panel.
+  const demoTradingEnabled = false;
 
   useEffect(() => {
     const syncFullscreen = () => setFullscreen(document.fullscreenElement === workspaceRef.current);
@@ -574,7 +576,9 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
           <TooltipContent>{fullscreen ? "Exit fullscreen" : "Fullscreen chart"}</TooltipContent>
         </Tooltip>
 
-        <DemoTradingPanel open={paperOpen} onToggle={() => setPaperOpen((v) => !v)} count={demoPositions.length} pnl={currentPrice ? demoPositions.reduce((s, p) => s + positionPnl(p, currentPrice), 0) : 0} />
+        {demoTradingEnabled && (
+          <DemoTradingPanel open={paperOpen} onToggle={() => setPaperOpen((v) => !v)} count={demoPositions.length} pnl={currentPrice ? demoPositions.reduce((s, p) => s + positionPnl(p, currentPrice), 0) : 0} />
+        )}
 
         <div className="ml-auto flex shrink-0 items-center gap-2">{rightSlot}</div>
       </div>
@@ -669,8 +673,8 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
               smc={smc}
               smcToggles={smcToggles}
               projection={projection}
-              demoPositions={demoPositions}
-              demoPrice={demoPositions.length ? currentPrice : null}
+              demoPositions={demoTradingEnabled ? demoPositions : []}
+              demoPrice={demoTradingEnabled && demoPositions.length ? currentPrice : null}
               demoActions={demoActions}
               drawings={drawings}
               drawingsVisible={drawingsVisible}
@@ -711,9 +715,11 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
                   </>
                 )}
               </div>
-              <div className="mb-1.5">
-                <QuickTradeButtons price={currentPrice} onPick={setTicketSide} />
-              </div>
+              {demoTradingEnabled && (
+                <div className="mb-1.5">
+                  <QuickTradeButtons price={currentPrice} onPick={setTicketSide} />
+                </div>
+              )}
               {legendIndicators.map(({ spec, values }) => (
                 <div key={spec.id} className="flex flex-wrap gap-x-2 text-muted-foreground">
                   <span>{spec.name}</span>
@@ -742,7 +748,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
               ))}
             </div>
 
-            {ticketSide && (
+            {demoTradingEnabled && ticketSide && (
               <div className="fixed inset-0 z-50 flex items-center justify-center overflow-hidden bg-transparent p-3" onClick={(e) => { if (e.target === e.currentTarget) setTicketSide(null); }}>
                 <OrderTicket
                   side={ticketSide}
@@ -775,7 +781,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
             )}
           </div>
 
-          {paperOpen && <PaperTradingPanel trading={demo} price={currentPrice} onClose={() => setPaperOpen(false)} />}
+          {demoTradingEnabled && paperOpen && <PaperTradingPanel trading={demo} price={currentPrice} onClose={() => setPaperOpen(false)} />}
 
           {scriptPanelOpen && (
             <ScriptPanel
