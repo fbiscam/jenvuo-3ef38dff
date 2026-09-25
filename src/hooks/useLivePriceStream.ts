@@ -4,10 +4,10 @@ import { getLiveTick } from "@/lib/gold-analysis.functions";
 
 // XAU-only build: no Binance streams. All XAU pairs are polled via the
 // server tick fetcher so the header stays in sync with the analysis feed.
-// XAU/USD: Binance PAXG trades give sub-second movement; we add a basis so
+// XAU/USD: Binance gold perpetual order book gives sub-second movement; we add a basis so
 // the price stays aligned with real spot gold from the server feed.
 function binanceStreamFor(symbol: string): string | null {
-  return symbol.toUpperCase().replace("/", "") === "XAUUSD" ? "paxgusdt" : null;
+  return symbol.toUpperCase().replace("/", "") === "XAUUSD" ? "wss://fstream.binance.com/ws/xauusdt@bookTicker" : null;
 }
 
 
@@ -104,7 +104,7 @@ export function useLivePriceStream(
     let firstTickTimer: ReturnType<typeof setTimeout> | null = null;
     if (stream && typeof WebSocket !== "undefined") {
       try {
-        ws = new WebSocket(`wss://stream.binance.com:9443/ws/${stream}@bookTicker`);
+        ws = new WebSocket(stream);
         ws.onmessage = (ev) => {
           try {
             const d = JSON.parse(ev.data);
