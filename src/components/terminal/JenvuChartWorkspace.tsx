@@ -390,10 +390,13 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
       const s = stateRef.current;
       return buildChartContext({
         timeframeLabel: s.timeframe.label,
+        pairLabel: s.payload?.asset === "BTCUSD" ? "BTC/USD" : "XAU/USD",
         bars: s.bars,
         stepSeconds: s.stepSeconds,
         source:
-          s.payload?.source === "spot"
+          s.payload?.source === "binance"
+            ? "Binance BTC/USDT live candles"
+            : s.payload?.source === "spot"
             ? `spot ${pairLabel}`
             : `PAXG candles (${s.payload?.provider ?? "exchange"}) scaled to live XAU/USD spot`,
         indicators: s.indicators,
