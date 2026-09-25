@@ -104,12 +104,13 @@ export function useLivePriceStream(
     let firstTickTimer: ReturnType<typeof setTimeout> | null = null;
     if (stream && typeof WebSocket !== "undefined") {
       try {
-        ws = new WebSocket(`wss://stream.binance.com:9443/ws/${stream}@trade`);
+        ws = new WebSocket(`wss://stream.binance.com:9443/ws/${stream}@bookTicker`);
         ws.onmessage = (ev) => {
           try {
             const d = JSON.parse(ev.data);
-            const p = parseFloat(d.p);
+            const p = (parseFloat(d.b) + parseFloat(d.a)) / 2;
             if (!Number.isFinite(p) || p <= 0) return;
+            if (p === lastStreamPrice) { lastStreamAt = Date.now(); return; }
             lastStreamPrice = p;
             lastStreamAt = Date.now();
             if (basis != null) pushTick(p + basis, Date.now());
