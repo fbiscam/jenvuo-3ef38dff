@@ -55,6 +55,7 @@ import { ScriptPanel, type SavedScript } from "./ScriptPanel";
 import { buildChartContext } from "./chart-context";
 import { DemoTradingPanel, OrderTicket, PaperTradingPanel, QuickTradeButtons, useDemoTrading } from "./DemoTradingPanel";
 import { positionPnl, type DemoSide } from "@/lib/chart/demo-trading";
+import { buildLiveBars } from "@/lib/chart/live-candle";
 import { useLivePriceStream } from "@/hooks/useLivePriceStream";
 
 const MemoChart = memo(ChartCanvas);
@@ -295,32 +296,8 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
   const livePrice = useLivePriceStream("XAUUSD", rawBars.at(-1)?.close ?? null);
   const stepSeconds = payload?.stepSeconds ?? 1800;
   const bars = useMemo(() => {
-    if (!livePrice || rawBars.length === 0) return rawBars;
-    const last = rawBars[rawBars.length - 1];
     const liveBucket = Math.floor(Date.now() / (stepSeconds * 1000)) * stepSeconds;
-    const nextBars = [...rawBars];
-
-    // Candle feeds can be one completed bar behind. Start the active bucket
-    // from the live quote immediately instead of stretching the old candle.
-    if (last.time < liveBucket) {
-      nextBars.push({
-        time: liveBucket,
-        open: livePrice,
-        high: livePrice,
-        low: livePrice,
-        close: livePrice,
-        volume: 0,
-      });
-      return nextBars;
-    }
-
-    nextBars[rawBars.length - 1] = {
-      ...last,
-      close: livePrice,
-      high: Math.max(last.high, livePrice),
-      low: Math.min(last.low, livePrice),
-    };
-    return nextBars;
+    return buildLiveBars(rawBars, livePrice, liveBucket);
   }, [rawBars, livePrice, stepSeconds]);
   const activeBar = bars.at(-1);
   const currentPrice = activeBar?.close ?? null;

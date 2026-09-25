@@ -98,6 +98,7 @@
 - [x] Replace stale fixed-request pricing copy and release extension v1.9.16
 - [x] Add calibrated next-15m-candle forecasting, live candle countdown, and release extension v1.9.17
 - [x] Upgrade the extension to safe all-symbol, single-primary, multi-timeframe analysis and release v1.9.18
+- [x] Align HH/HL/LH/LL and BOS/CHoCH to candle wicks and block malformed live candles
 
 - [x] Add deterministic inducement, support/resistance, and cross-timeframe structure gates; test BTCUSD; release extension v1.9.19
 - [x] Retire automated scanning (cron + admin monitor) and upgrade multi-timeframe inducement detection; release extension v1.9.20

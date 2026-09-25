@@ -262,7 +262,20 @@ export type SmcProjector = {
   x: (tSeconds: number) => number | null;
   y: (p: number) => number | null;
   width: number;
+  height: number;
 };
+
+export function structureBadgeTop(wickY: number, isHigh: boolean, chartHeight: number): number {
+  const badgeHeight = 14;
+  const gap = 5;
+  const wanted = isHigh ? wickY - badgeHeight - gap : wickY + gap;
+  return Math.max(2, Math.min(Math.max(2, chartHeight - badgeHeight - 2), wanted));
+}
+
+export function breakLabelBaseline(lineY: number, bullish: boolean, chartHeight: number): number {
+  const wanted = bullish ? lineY - 5 : lineY + 13;
+  return Math.max(11, Math.min(Math.max(11, chartHeight - 3), wanted));
+}
 
 export function renderSmcOverlay(
   ctx: CanvasRenderingContext2D,
@@ -412,7 +425,8 @@ export function renderSmcOverlay(
       ctx.fillStyle = color;
       const label = b.type === "CHOCH" ? "CHoCH" : b.type;
       const w = ctx.measureText(label).width;
-      ctx.fillText(label, (x0 + x1) / 2 - w / 2, b.dir === "bullish" ? y - 4 : y + 12);
+       const labelX = Math.max(2, Math.min(pr.width - w - 2, (x0 + x1) / 2 - w / 2));
+       ctx.fillText(label, labelX, breakLabelBaseline(y, b.dir === "bullish", pr.height));
     }
   }
   if (toggles.structure) {
@@ -423,14 +437,15 @@ export function renderSmcOverlay(
       const up = p.kind === "high";
       const color = p.label === "HH" || p.label === "HL" ? "#089981" : "#f23645";
       const w = ctx.measureText(p.label).width + 8;
-      const yy = up ? y - 20 : y + 6;
+       const yy = structureBadgeTop(y, up, pr.height);
+       const xx = Math.max(w / 2 + 2, Math.min(pr.width - w / 2 - 2, x));
       ctx.fillStyle = color;
       ctx.beginPath();
-      ctx.roundRect?.(x - w / 2, yy, w, 14, 3);
-      if (!ctx.roundRect) ctx.rect(x - w / 2, yy, w, 14);
+       ctx.roundRect?.(xx - w / 2, yy, w, 14, 3);
+       if (!ctx.roundRect) ctx.rect(xx - w / 2, yy, w, 14);
       ctx.fill();
       ctx.fillStyle = "#ffffff";
-      ctx.fillText(p.label, x - w / 2 + 4, yy + 10.5);
+       ctx.fillText(p.label, xx - w / 2 + 4, yy + 10.5);
     }
     // Live (unconfirmed) swings: outlined dashed badge that follows the forming candle.
     for (const p of smc.livePivots ?? []) {
@@ -441,11 +456,12 @@ export function renderSmcOverlay(
       const color = p.label === "HH" || p.label === "HL" || p.label === "L" ? "#089981" : "#f23645";
       const text = p.label;
       const w = ctx.measureText(text).width + 8;
-      const yy = up ? y - 20 : y + 6;
+       const yy = structureBadgeTop(y, up, pr.height);
+       const xx = Math.max(w / 2 + 2, Math.min(pr.width - w / 2 - 2, x));
       ctx.fillStyle = "rgba(255,255,255,0.92)";
       ctx.beginPath();
-      ctx.roundRect?.(x - w / 2, yy, w, 14, 3);
-      if (!ctx.roundRect) ctx.rect(x - w / 2, yy, w, 14);
+       ctx.roundRect?.(xx - w / 2, yy, w, 14, 3);
+       if (!ctx.roundRect) ctx.rect(xx - w / 2, yy, w, 14);
       ctx.fill();
       ctx.strokeStyle = color;
       ctx.lineWidth = 1;
@@ -453,7 +469,7 @@ export function renderSmcOverlay(
       ctx.stroke();
       ctx.setLineDash([]);
       ctx.fillStyle = color;
-      ctx.fillText(text, x - w / 2 + 4, yy + 10.5);
+       ctx.fillText(text, xx - w / 2 + 4, yy + 10.5);
     }
   }
   ctx.restore();

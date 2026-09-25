@@ -1,5 +1,12 @@
 import { describe, it } from "node:test";
-import { computeLivePivots, computeSmcOverlay, FRACTAL_RADIUS, selectHighConfidencePois } from "./smc-overlay";
+import {
+  breakLabelBaseline,
+  computeLivePivots,
+  computeSmcOverlay,
+  FRACTAL_RADIUS,
+  selectHighConfidencePois,
+  structureBadgeTop,
+} from "./smc-overlay";
 import { expect } from "./test-expect";
 import type { OhlcvBar } from "./indicators";
 
@@ -13,6 +20,13 @@ const bar = (i: number, mid: number): OhlcvBar => ({
 });
 
 describe("smc overlay fractal labels", () => {
+  it("keeps structure and break labels inside the chart at extreme wicks", () => {
+    expect(structureBadgeTop(1, true, 300)).toBe(2);
+    expect(structureBadgeTop(299, false, 300)).toBe(284);
+    expect(breakLabelBaseline(1, true, 300)).toBe(11);
+    expect(breakLabelBaseline(299, false, 300)).toBe(297);
+  });
+
   it("only labels swings with 10 lower candles on each side", () => {
     // Zig-zag with a 25-bar period: swings every ~12 bars.
     const bars = Array.from({ length: 200 }, (_, i) => bar(i, 100 + 10 * Math.sin((i / 25) * 2 * Math.PI) + i * 0.05));
