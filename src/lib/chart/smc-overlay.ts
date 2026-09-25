@@ -160,6 +160,8 @@ export function selectHighConfidencePois(
 }
 
 const toCandle = (b: OhlcvBar): Candle => ({ t: b.time * 1000, o: b.open, h: b.high, l: b.low, c: b.close, v: b.volume });
+const SHOW_PROVISIONAL_PIVOTS = false;
+const lockedLabels = new Map<string, string>();
 
 /**
  * Provisional swings in the unconfirmed tail: a candle whose high (low) beats
@@ -281,8 +283,19 @@ export function computeSmcOverlay(
   // HH/HL/LH/LL labels: 10-bar fractal swings (like the Fractals indicator).
   const fractalBars = bars.slice(-FRACTAL_WINDOW).map(toCandle);
   const fractal = detectMarketStructureEvidence(fractalBars, FRACTAL_RADIUS);
-  const pivotsLabelled = fractal.pivots.filter((p) => p.label.length === 2);
-  const livePivots = computeLivePivots(fractalBars, forming ? toCandle(forming) : null, fractal.pivots);
+  // Final-once: a confirmed swing keeps the first label it received on its own
+  // candle forever — later window shifts can never rename or move it.
+  const lockLabel = <T extends { t: number; kind: string; price: number; label: string }>(p: T): T => {
+    const key = `${p.kind}:${p.t}:${p.price}`;
+    const locked = lockedLabels.get(key);
+    if (locked) return { ...p, label: locked };
+    lockedLabels.set(key, p.label);
+    if (lockedLabels.size > 5000) lockedLabels.delete(lockedLabels.keys().next().value as string);
+    return p;
+  };
+  const pivotsLabelled = fractal.pivots.filter((p) => p.label.length === 2).map(lockLabel);
+  const livePivots = computeLivePivots(fractalBars, forming ? toCandle(forming) : null, fractal.pivots)
+    .map((p) => (p.confirmedByOpposite && p.label.length === 2 ? lockLabel(p) : p));
   const selectedPois = selectHighConfidencePois(poi, price);
 
   // Structure labels, breaks, trend and liquidity must all come from this same
@@ -664,6 +677,8 @@ export function renderSmcOverlay(
         pressureBadge(p.t, xx, yy, up);
         continue;
       }
+      // Unconfirmed swings are not drawn: a label appears only once, final, on its own candle.
+      if (!SHOW_PROVISIONAL_PIVOTS) continue;
       ctx.fillStyle = "rgba(255,255,255,0.92)";
       ctx.beginPath();
        ctx.roundRect?.(xx - w / 2, yy, w, 18, 4);
