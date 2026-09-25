@@ -4,6 +4,7 @@ import {
   closeDemoPosition,
   createDemoAccount,
   positionPnl,
+  triggeredExitInRange,
   type DemoPosition,
 } from "./demo-trading";
 import { expect } from "./test-expect";
@@ -51,5 +52,22 @@ describe("demo trading", () => {
     expect(account.balance).toBe(100020);
     expect(account.realizedPnl).toBe(20);
     expect(account.positions).toEqual([sell]);
+  });
+
+  it("detects BUY stop-loss and take-profit touches across the live range", () => {
+    const protectedBuy = { ...buy, stopLoss: 2995, takeProfit: 3015 };
+    expect(triggeredExitInRange(protectedBuy, 2995.1, 3004)).toEqual({ reason: "sl", price: 2995 });
+    expect(triggeredExitInRange(protectedBuy, 3002, 3015.3)).toEqual({ reason: "tp", price: 3015 });
+  });
+
+  it("detects SELL stop-loss and take-profit touches across the live range", () => {
+    const protectedSell = { ...sell, stopLoss: 3015, takeProfit: 2995 };
+    expect(triggeredExitInRange(protectedSell, 3004, 3014.9)).toEqual({ reason: "sl", price: 3015 });
+    expect(triggeredExitInRange(protectedSell, 2994.7, 3006)).toEqual({ reason: "tp", price: 2995 });
+  });
+
+  it("keeps a position open when neither exit was touched", () => {
+    const protectedBuy = { ...buy, stopLoss: 2995, takeProfit: 3015 };
+    expect(triggeredExitInRange(protectedBuy, 2996, 3014)).toBe(null);
   });
 });
