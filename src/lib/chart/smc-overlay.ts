@@ -578,17 +578,17 @@ export function renderSmcOverlay(
        if (x < 0 || x > pr.width) continue;
       const up = p.kind === "high";
       const color = p.label === "HH" || p.label === "HL" ? "#089981" : "#f23645";
-      const w = ctx.measureText(p.label).width + 8;
+      const w = ctx.measureText(p.label).width + 14;
        // Fixed to the pivot candle wick — no edge clamping, so it never drifts.
-       const yy = up ? y - 19 : y + 5;
+       const yy = up ? y - 24 : y + 5;
        const xx = x;
       ctx.fillStyle = color;
       ctx.beginPath();
-       ctx.roundRect?.(xx - w / 2, yy, w, 14, 3);
-       if (!ctx.roundRect) ctx.rect(xx - w / 2, yy, w, 14);
+       ctx.roundRect?.(xx - w / 2, yy, w, 18, 4);
+       if (!ctx.roundRect) ctx.rect(xx - w / 2, yy, w, 18);
       ctx.fill();
       ctx.fillStyle = "#ffffff";
-       ctx.fillText(p.label, xx - w / 2 + 4, yy + 10.5);
+       ctx.fillText(p.label, xx - w / 2 + 7, yy + 13.5);
       pressureBadge(p.t, xx, yy, up);
     }
     // Live (unconfirmed) swings: outlined dashed badge that follows the forming candle.
@@ -600,22 +600,22 @@ export function renderSmcOverlay(
       const up = p.kind === "high";
       const color = p.label === "HH" || p.label === "HL" || p.label === "L" ? "#089981" : "#f23645";
       const text = p.label;
-      const w = ctx.measureText(text).width + 8;
+      const w = ctx.measureText(text).width + 14;
        // Fixed to the pivot candle wick — no edge clamping, so it never drifts.
-       const yy = up ? y - 19 : y + 5;
+       const yy = up ? y - 24 : y + 5;
        const xx = x;
       ctx.fillStyle = "rgba(255,255,255,0.92)";
       ctx.beginPath();
-       ctx.roundRect?.(xx - w / 2, yy, w, 14, 3);
-       if (!ctx.roundRect) ctx.rect(xx - w / 2, yy, w, 14);
+       ctx.roundRect?.(xx - w / 2, yy, w, 18, 4);
+       if (!ctx.roundRect) ctx.rect(xx - w / 2, yy, w, 18);
       ctx.fill();
       ctx.strokeStyle = color;
-      ctx.lineWidth = 1;
+      ctx.lineWidth = 1.25;
       ctx.setLineDash([2, 2]);
       ctx.stroke();
       ctx.setLineDash([]);
       ctx.fillStyle = color;
-       ctx.fillText(text, xx - w / 2 + 4, yy + 10.5);
+       ctx.fillText(text, xx - w / 2 + 7, yy + 13.5);
       pressureBadge(p.t, xx, yy, up);
     }
   }
