@@ -508,7 +508,7 @@ export function renderSmcOverlay(
       ctx.lineTo(pr.width, y);
       ctx.stroke();
       ctx.fillStyle = color;
-      ctx.fillText(`${label} ${price.toFixed(2)}`, pr.width * 0.55 + 4, above ? y - 4 : y + 12);
+      ctx.fillText(`${label} ${price.toFixed(2)}`, pr.width * 0.55 + 4, above ? y - 5 : y + 15);
     };
     smc.buySide.slice(0, 1).forEach((p) => liq(p, "BSL", "#089981", true));
     smc.sellSide.slice(0, 1).forEach((p) => liq(p, "SSL", "#f23645", false));
@@ -537,7 +537,7 @@ export function renderSmcOverlay(
       const w = ctx.measureText(label).width;
        // Anchor to the real break segment (not the visible clip) so it never slides.
        const labelX = (x0 + x1) / 2 - w / 2;
-       ctx.fillText(label, labelX, b.dir === "bullish" ? y - 5 : y + 13);
+       ctx.fillText(label, labelX, b.dir === "bullish" ? y - 7 : y + 16);
     }
   }
   const pressureBadge = (t: number, xx: number, yy: number, up: boolean) => {
