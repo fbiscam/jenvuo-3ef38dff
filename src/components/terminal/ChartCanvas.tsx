@@ -297,8 +297,17 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
     });
     const prev = lastBarsRef.current;
     const first = bars[0]?.time ?? 0;
-    if (prev && prev.first === first && bars.length >= prev.len && bars.length - prev.len <= 2 && prev.len > 0) {
+    const incremental = Boolean(
+      prev && prev.first === first && bars.length >= prev.len && bars.length - prev.len <= 2 && prev.len > 0,
+    );
+    if (incremental && prev) {
+      // lightweight-charts auto-scales after every candle update. Preserve the
+      // user's current price range so a live tick moves only the forming candle,
+      // not every historical candle and price-anchored SMC marking on screen.
+      const priceScale = chartRef.current?.priceScale("right");
+      const visiblePriceRange = priceScale?.getVisibleRange();
       for (let i = Math.max(0, prev.len - 1); i < data.length; i++) candles.update(data[i]);
+      if (visiblePriceRange) priceScale?.setVisibleRange(visiblePriceRange);
     } else {
       candles.setData(data);
     }
