@@ -715,9 +715,11 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
                   </>
                 )}
               </div>
-              <div className="mb-1.5">
-                <QuickTradeButtons price={currentPrice} onPick={setTicketSide} />
-              </div>
+              {demoTradingEnabled && (
+                <div className="mb-1.5">
+                  <QuickTradeButtons price={currentPrice} onPick={setTicketSide} />
+                </div>
+              )}
               {legendIndicators.map(({ spec, values }) => (
                 <div key={spec.id} className="flex flex-wrap gap-x-2 text-muted-foreground">
                   <span>{spec.name}</span>
@@ -746,7 +748,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
               ))}
             </div>
 
-            {ticketSide && (
+            {demoTradingEnabled && ticketSide && (
               <div className="fixed inset-0 z-50 flex items-center justify-center overflow-hidden bg-transparent p-3" onClick={(e) => { if (e.target === e.currentTarget) setTicketSide(null); }}>
                 <OrderTicket
                   side={ticketSide}
@@ -779,7 +781,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
             )}
           </div>
 
-          {paperOpen && <PaperTradingPanel trading={demo} price={currentPrice} onClose={() => setPaperOpen(false)} />}
+          {demoTradingEnabled && paperOpen && <PaperTradingPanel trading={demo} price={currentPrice} onClose={() => setPaperOpen(false)} />}
 
           {scriptPanelOpen && (
             <ScriptPanel
