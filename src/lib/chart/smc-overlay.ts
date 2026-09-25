@@ -372,15 +372,15 @@ export type SmcProjector = {
 };
 
 export function structureBadgeTop(wickY: number, isHigh: boolean, chartHeight: number): number {
-  const badgeHeight = 14;
-  const gap = 5;
+  const badgeHeight = 18;
+  const gap = 4;
   const wanted = isHigh ? wickY - badgeHeight - gap : wickY + gap;
   return Math.max(2, Math.min(Math.max(2, chartHeight - badgeHeight - 2), wanted));
 }
 
 export function breakLabelBaseline(lineY: number, bullish: boolean, chartHeight: number): number {
-  const wanted = bullish ? lineY - 5 : lineY + 13;
-  return Math.max(11, Math.min(Math.max(11, chartHeight - 3), wanted));
+  const wanted = bullish ? lineY - 7 : lineY + 17;
+  return Math.max(15, Math.min(Math.max(15, chartHeight - 3), wanted));
 }
 
 export function renderSmcOverlay(
@@ -390,7 +390,7 @@ export function renderSmcOverlay(
   pr: SmcProjector,
 ) {
   ctx.save();
-  ctx.font = "600 10px 'JetBrains Mono', ui-monospace, monospace";
+  ctx.font = "600 13px 'JetBrains Mono', ui-monospace, monospace";
   const dottedLine = (tMs: number, price: number, color: string) => {
     const x0 = pr.x(tMs / 1000);
     const y = pr.y(price);
@@ -438,12 +438,12 @@ export function renderSmcOverlay(
     const labelY = y + height / 2;
     ctx.fillStyle = "rgba(255,255,255,0.92)";
     ctx.beginPath();
-    ctx.roundRect?.(labelX - 5, labelY - 8, textWidth + 10, 16, 3);
-    if (!ctx.roundRect) ctx.rect(labelX - 5, labelY - 8, textWidth + 10, 16);
+    ctx.roundRect?.(labelX - 6, labelY - 11, textWidth + 12, 22, 4);
+    if (!ctx.roundRect) ctx.rect(labelX - 6, labelY - 11, textWidth + 12, 22);
     ctx.fill();
     ctx.fillStyle = edge;
     ctx.textBaseline = "middle";
-    ctx.fillText(label, labelX, labelY + 0.5);
+    ctx.fillText(label, labelX, labelY + 1);
     ctx.textBaseline = "alphabetic";
   };
 
@@ -479,12 +479,12 @@ export function renderSmcOverlay(
     const labelY = y + height / 2;
     ctx.fillStyle = "rgba(255,255,255,0.92)";
     ctx.beginPath();
-    ctx.roundRect?.(labelX - 5, labelY - 8, textWidth + 10, 16, 3);
-    if (!ctx.roundRect) ctx.rect(labelX - 5, labelY - 8, textWidth + 10, 16);
+    ctx.roundRect?.(labelX - 6, labelY - 11, textWidth + 12, 22, 4);
+    if (!ctx.roundRect) ctx.rect(labelX - 6, labelY - 11, textWidth + 12, 22);
     ctx.fill();
     ctx.fillStyle = edge;
     ctx.textBaseline = "middle";
-    ctx.fillText(label, labelX, labelY + 0.5);
+    ctx.fillText(label, labelX, labelY + 1);
     ctx.textBaseline = "alphabetic";
   };
 
@@ -508,7 +508,7 @@ export function renderSmcOverlay(
       ctx.lineTo(pr.width, y);
       ctx.stroke();
       ctx.fillStyle = color;
-      ctx.fillText(`${label} ${price.toFixed(2)}`, pr.width * 0.55 + 4, above ? y - 4 : y + 12);
+      ctx.fillText(`${label} ${price.toFixed(2)}`, pr.width * 0.55 + 4, above ? y - 5 : y + 15);
     };
     smc.buySide.slice(0, 1).forEach((p) => liq(p, "BSL", "#089981", true));
     smc.sellSide.slice(0, 1).forEach((p) => liq(p, "SSL", "#f23645", false));
@@ -537,37 +537,37 @@ export function renderSmcOverlay(
       const w = ctx.measureText(label).width;
        // Anchor to the real break segment (not the visible clip) so it never slides.
        const labelX = (x0 + x1) / 2 - w / 2;
-       ctx.fillText(label, labelX, b.dir === "bullish" ? y - 5 : y + 13);
+       ctx.fillText(label, labelX, b.dir === "bullish" ? y - 7 : y + 16);
     }
   }
   const pressureBadge = (t: number, xx: number, yy: number, up: boolean) => {
     const buy = smc.pressure?.[t];
     if (buy == null) return;
     const sell = 100 - buy;
-    const bw = 64;
-    const bh = 16;
+    const bw = 92;
+    const bh = 22;
     const bx = xx - bw / 2;
-    const by = up ? yy - bh - 3 : yy + 14 + 3;
+    const by = up ? yy - bh - 4 : yy + 20 + 4;
     ctx.save();
     ctx.fillStyle = "rgba(255,255,255,0.96)";
     ctx.strokeStyle = "#d6dae3";
     ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.roundRect?.(bx, by, bw, bh, 4);
+    ctx.roundRect?.(bx, by, bw, bh, 5);
     if (!ctx.roundRect) ctx.rect(bx, by, bw, bh);
     ctx.fill();
     ctx.stroke();
-    const barY = by + bh - 4;
+    const barY = by + bh - 5;
     ctx.fillStyle = "#089981";
-    ctx.fillRect(bx + 3, barY, ((bw - 6) * buy) / 100, 2);
+    ctx.fillRect(bx + 4, barY, ((bw - 8) * buy) / 100, 3);
     ctx.fillStyle = "#f23645";
-    ctx.fillRect(bx + 3 + ((bw - 6) * buy) / 100, barY, ((bw - 6) * sell) / 100, 2);
-    ctx.font = "600 9px 'JetBrains Mono', ui-monospace, monospace";
+    ctx.fillRect(bx + 4 + ((bw - 8) * buy) / 100, barY, ((bw - 8) * sell) / 100, 3);
+    ctx.font = "700 12px 'JetBrains Mono', ui-monospace, monospace";
     ctx.fillStyle = "#089981";
-    ctx.fillText(`B${buy}%`, bx + 4, by + 9);
+    ctx.fillText(`B${buy}%`, bx + 5, by + 13);
     ctx.fillStyle = "#f23645";
     const st = `S${sell}%`;
-    ctx.fillText(st, bx + bw - 4 - ctx.measureText(st).width, by + 9);
+    ctx.fillText(st, bx + bw - 5 - ctx.measureText(st).width, by + 13);
     ctx.restore();
   };
   if (toggles.structure) {
@@ -578,17 +578,17 @@ export function renderSmcOverlay(
        if (x < 0 || x > pr.width) continue;
       const up = p.kind === "high";
       const color = p.label === "HH" || p.label === "HL" ? "#089981" : "#f23645";
-      const w = ctx.measureText(p.label).width + 8;
+      const w = ctx.measureText(p.label).width + 14;
        // Fixed to the pivot candle wick — no edge clamping, so it never drifts.
-       const yy = up ? y - 19 : y + 5;
+       const yy = up ? y - 24 : y + 5;
        const xx = x;
       ctx.fillStyle = color;
       ctx.beginPath();
-       ctx.roundRect?.(xx - w / 2, yy, w, 14, 3);
-       if (!ctx.roundRect) ctx.rect(xx - w / 2, yy, w, 14);
+       ctx.roundRect?.(xx - w / 2, yy, w, 18, 4);
+       if (!ctx.roundRect) ctx.rect(xx - w / 2, yy, w, 18);
       ctx.fill();
       ctx.fillStyle = "#ffffff";
-       ctx.fillText(p.label, xx - w / 2 + 4, yy + 10.5);
+       ctx.fillText(p.label, xx - w / 2 + 7, yy + 13.5);
       pressureBadge(p.t, xx, yy, up);
     }
     // Live (unconfirmed) swings: outlined dashed badge that follows the forming candle.
@@ -600,22 +600,22 @@ export function renderSmcOverlay(
       const up = p.kind === "high";
       const color = p.label === "HH" || p.label === "HL" || p.label === "L" ? "#089981" : "#f23645";
       const text = p.label;
-      const w = ctx.measureText(text).width + 8;
+      const w = ctx.measureText(text).width + 14;
        // Fixed to the pivot candle wick — no edge clamping, so it never drifts.
-       const yy = up ? y - 19 : y + 5;
+       const yy = up ? y - 24 : y + 5;
        const xx = x;
       ctx.fillStyle = "rgba(255,255,255,0.92)";
       ctx.beginPath();
-       ctx.roundRect?.(xx - w / 2, yy, w, 14, 3);
-       if (!ctx.roundRect) ctx.rect(xx - w / 2, yy, w, 14);
+       ctx.roundRect?.(xx - w / 2, yy, w, 18, 4);
+       if (!ctx.roundRect) ctx.rect(xx - w / 2, yy, w, 18);
       ctx.fill();
       ctx.strokeStyle = color;
-      ctx.lineWidth = 1;
+      ctx.lineWidth = 1.25;
       ctx.setLineDash([2, 2]);
       ctx.stroke();
       ctx.setLineDash([]);
       ctx.fillStyle = color;
-       ctx.fillText(text, xx - w / 2 + 4, yy + 10.5);
+       ctx.fillText(text, xx - w / 2 + 7, yy + 13.5);
       pressureBadge(p.t, xx, yy, up);
     }
   }

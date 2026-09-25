@@ -22,8 +22,8 @@ const bar = (i: number, mid: number): OhlcvBar => ({
 describe("smc overlay fractal labels", () => {
   it("keeps structure and break labels inside the chart at extreme wicks", () => {
     expect(structureBadgeTop(1, true, 300)).toBe(2);
-    expect(structureBadgeTop(299, false, 300)).toBe(284);
-    expect(breakLabelBaseline(1, true, 300)).toBe(11);
+    expect(structureBadgeTop(299, false, 300)).toBe(280);
+    expect(breakLabelBaseline(1, true, 300)).toBe(15);
     expect(breakLabelBaseline(299, false, 300)).toBe(297);
   });
 
