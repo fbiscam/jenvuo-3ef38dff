@@ -344,7 +344,10 @@ export function computeSmcOverlay(
     // Direction lock: a swing low is where buyers won (market went up), a swing
     // high is where sellers won (market went down). The signals only decide HOW
     // strong the winning side is, never flip it to the losing side.
-    const strength = Math.min(0.45, Math.max(0.06, Math.abs(buy - 0.5), move * 0.35));
+    // Only evidence that agrees with the reversal adds strength; opposing
+    // signals no longer inflate the winning side's percentage.
+    const agree = high ? 0.5 - buy : buy - 0.5;
+    const strength = Math.min(0.45, Math.max(0.06, agree, move * 0.35));
     buy = high ? 0.5 - strength : 0.5 + strength;
     pressure[t] = Math.round(clamp01(buy) * 100);
   };
