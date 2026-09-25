@@ -117,6 +117,8 @@ type Props = {
   timeframe: TimeframeOption;
   onTimeframeChange: (tf: TimeframeOption) => void;
   rightSlot?: ReactNode;
+  asset?: "XAUUSD" | "BTCUSD";
+  onAssetChange?: (asset: "XAUUSD" | "BTCUSD") => void;
 };
 
 const TOOLS: Array<{ id: DrawingTool; icon: LucideIcon; label: string }> = [
@@ -194,7 +196,7 @@ function ToolButton({
 }
 
 export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function JenvuChartWorkspace(
-  { timeframes, timeframe, onTimeframeChange, rightSlot },
+  { timeframes, timeframe, onTimeframeChange, rightSlot, asset = "XAUUSD", onAssetChange },
   ref,
 ) {
   const fetchChart = useServerFn(getTerminalChart);
@@ -300,23 +302,25 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
   }, [ready, drawingsVisible]);
 
   const chartQuery = useQuery({
-    queryKey: ["terminal-chart", timeframe.key],
+    queryKey: ["terminal-chart", asset, timeframe.key],
     queryFn: async () => {
       // Skip the protected call while the sign-in session is missing (e.g. mid-refresh or signed out);
       // the chart keeps showing its last good candles instead of erroring.
       const { data } = await supabase.auth.getSession();
       if (!data.session) throw new Error("Session not ready");
-      return fetchChart({ data: { timeframe: timeframe.key } });
+      return fetchChart({ data: { timeframe: timeframe.key, asset } });
     },
     refetchInterval: 5000,
+    placeholderData: (prev) => (prev?.asset === asset || (!prev?.asset && asset === "XAUUSD") ? prev : undefined),
     refetchIntervalInBackground: true,
     staleTime: 1000,
     retry: 2,
   });
 
   const payload = chartQuery.data;
+  const pairLabel = asset === "BTCUSD" ? "BTC/USD" : "XAU/USD";
   const rawBars: OhlcvBar[] = useMemo(() => payload?.bars ?? [], [payload]);
-  const livePrice = useLivePriceStream("XAUUSD", rawBars.at(-1)?.close ?? null);
+  const livePrice = useLivePriceStream(asset, rawBars.at(-1)?.close ?? null);
   const stepSeconds = payload?.stepSeconds ?? 1800;
   const bars = useMemo(() => {
     const liveBucket = Math.floor(Date.now() / (stepSeconds * 1000)) * stepSeconds;
@@ -380,7 +384,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
   useImperativeHandle(ref, () => ({
     snapshot: () =>
       chartRef.current?.snapshot(
-        `Jenvu chart · XAU/USD · ${stateRef.current.timeframe.label} · ${new Date().toISOString().slice(0, 16).replace("T", " ")}Z`,
+        `Jenvu chart · ${pairLabel} · ${stateRef.current.timeframe.label} · ${new Date().toISOString().slice(0, 16).replace("T", " ")}Z`,
       ) ?? null,
     describe: () => {
       const s = stateRef.current;
@@ -390,7 +394,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
         stepSeconds: s.stepSeconds,
         source:
           s.payload?.source === "spot"
-            ? "spot XAU/USD"
+            ? `spot ${pairLabel}`
             : `PAXG candles (${s.payload?.provider ?? "exchange"}) scaled to live XAU/USD spot`,
         indicators: s.indicators,
         smc: s.smc,
@@ -426,7 +430,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
 
   function downloadSnapshot() {
     const url = chartRef.current?.snapshot(
-      `Jenvu chart · XAU/USD · ${timeframe.label} · ${new Date().toISOString().slice(0, 16).replace("T", " ")}Z`,
+      `Jenvu chart · ${pairLabel} · ${timeframe.label} · ${new Date().toISOString().slice(0, 16).replace("T", " ")}Z`,
     );
     if (!url) return;
     const a = document.createElement("a");
@@ -451,6 +455,22 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
             <Menu className="h-4 w-4" />
           </button>
           <span className="hidden md:inline-flex"><XauUsdLogo size={22} /></span>
+          <div className="ml-1 flex shrink-0 items-center rounded-md border border-border p-0.5" role="group" aria-label="Trading pair">
+            {(["XAUUSD", "BTCUSD"] as const).map((a) => (
+              <button
+                type="button"
+                key={a}
+                aria-pressed={asset === a}
+                onClick={() => onAssetChange?.(a)}
+                className={cn(
+                  "h-6 rounded px-2 font-mono text-xs font-semibold text-muted-foreground transition-colors hover:text-foreground",
+                  asset === a && "bg-accent text-foreground",
+                )}
+              >
+                {a === "XAUUSD" ? "XAU/USD" : "BTC/USD"}
+              </button>
+            ))}
+          </div>
           <span className="text-sm font-semibold tracking-tight">{"\n"}</span>
         </div>
         <div className="flex shrink-0 items-center" role="group" aria-label="Chart timeframe">
@@ -798,7 +818,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
 
             {chartQuery.isPending && (
               <div className="absolute inset-0 z-[4] flex items-center justify-center bg-background/70 text-sm text-muted-foreground">
-                Loading XAU/USD {timeframe.label} candles…
+                Loading {pairLabel} {timeframe.label} candles…
               </div>
             )}
             {chartQuery.isError && !payload && (
