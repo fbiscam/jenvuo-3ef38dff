@@ -11,6 +11,8 @@ export async function isOpsUnlocked(): Promise<boolean> {
   try {
     const secret = process.env.OPS_CONSOLE_SESSION_SECRET;
     if (!secret) return false;
+    const { isSameOriginRequest } = await import("./csrf-guard.server");
+    if (!isSameOriginRequest()) return false;
     const session = await useSession<OpsSession>({
       password: secret,
       name: "jenvu-ops",
