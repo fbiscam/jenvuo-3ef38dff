@@ -59,6 +59,12 @@ export const getJournalStats = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) => rangeSchema.parse(data))
   .handler(async ({ data, context }): Promise<JournalStats> => {
+    const { data: entitled } = await context.supabase.rpc("user_has_plan_feature", {
+      _user_id: context.userId,
+      _feature: "feature_journal",
+    });
+    if (!entitled) throw new Error("Journal analytics require a plan with the Trade Journal feature.");
+
     // Ensure default setups seeded
     await context.supabase.rpc("seed_default_setups", { _user_id: context.userId });
 

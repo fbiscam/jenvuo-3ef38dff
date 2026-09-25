@@ -6,6 +6,7 @@
 // fails, so the panel always renders real market-derived numbers.
 
 import { createServerFn } from "@tanstack/react-start";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import {
   analyzeTF,
   computeATR,
@@ -498,7 +499,7 @@ function isCoherent(p: XauProjection | null | undefined): boolean {
   return p.confidence < SIGNAL_MIN_CONFIDENCE;
 }
 
-export const getXauProjection = createServerFn({ method: "GET" }).handler(
+export const getXauProjection = createServerFn({ method: "GET" }).middleware([requireSupabaseAuth]).handler(
   async (): Promise<XauProjection | null> => {
     if (cache && Date.now() - cache.at < TTL_MS) return cache.data;
     // Cold isolate (or expired local cache): consult the shared DB cache so

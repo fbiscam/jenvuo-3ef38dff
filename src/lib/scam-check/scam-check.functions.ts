@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 import { z } from "zod";
 import { callChatCompletion, MODEL_CHAIN } from "@/lib/ai-gateway";
@@ -42,6 +43,7 @@ Return STRICT JSON only:
 Rules: be decisive but fair. Write every string in plain English only — never mix in other languages. A normal well-known domain or a plain harmless message must score low (<25). Never invent facts about domain age or blacklists you cannot verify. extra_signals may be an empty array; include at most 3 that the heuristics missed.`;
 
 export const scamCheck = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => InputSchema.parse(input))
   .handler(async ({ data }): Promise<ScamCheckResult> => {
     const { getRequestHeader } = await import("@tanstack/react-start/server");

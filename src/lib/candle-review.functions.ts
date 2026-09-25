@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
 
 import { callChatCompletion, MODEL_CHAIN } from "@/lib/ai-gateway";
@@ -43,6 +44,7 @@ const unavailable = (msg: string): CandleAiReview => ({
 });
 
 export const reviewNextCandle = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) => schema.parse(data))
   .handler(async ({ data }): Promise<CandleAiReview> => {
     const prompt = `Tum ek institutional XAU/USD (gold) intraday analyst ho — ICT / SMC playbook use karte ho.
