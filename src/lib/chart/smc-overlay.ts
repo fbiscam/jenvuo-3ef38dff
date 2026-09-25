@@ -160,7 +160,7 @@ export function selectHighConfidencePois(
 }
 
 const toCandle = (b: OhlcvBar): Candle => ({ t: b.time * 1000, o: b.open, h: b.high, l: b.low, c: b.close, v: b.volume });
-const SHOW_PROVISIONAL_PIVOTS = false;
+const SHOW_PROVISIONAL_PIVOTS = true;
 const lockedLabels = new Map<string, string>();
 
 /**
