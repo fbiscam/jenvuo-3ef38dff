@@ -79,7 +79,7 @@ export const DEFAULT_SMC: SmcToggles = {
   projection: true,
 };
 
-type Candle = { t: number; o: number; h: number; l: number; c: number };
+type Candle = { t: number; o: number; h: number; l: number; c: number; v?: number };
 
 type PoiSelection = {
   fvgs: FairValueGap[];
@@ -150,7 +150,7 @@ export function selectHighConfidencePois(
   return { fvgs: fvgsOut, orderBlocks: obsOut };
 }
 
-const toCandle = (b: OhlcvBar): Candle => ({ t: b.time * 1000, o: b.open, h: b.high, l: b.low, c: b.close });
+const toCandle = (b: OhlcvBar): Candle => ({ t: b.time * 1000, o: b.open, h: b.high, l: b.low, c: b.close, v: b.volume });
 
 /**
  * Provisional swings in the unconfirmed tail: a candle whose high (low) beats
@@ -261,33 +261,58 @@ export function computeSmcOverlay(
   const all = forming ? [...fractalBars, toCandle(forming)] : fractalBars;
   const pressure: Record<number, number> = {};
   const idxOf = new Map(all.map((c, i) => [c.t, i]));
-  // Extreme-level pressure: who took control AT the swing, not who built the leg.
-  // Uses the swing candle's wick rejection plus the reaction candles after it,
-  // so a high where sellers stepped in reads seller-heavy (and vice versa).
+  // Extreme-level pressure: who took control AT the swing. Blends three signals
+  // into a buyer share (0-1): wick rejection on the swing candle, volume-weighted
+  // order flow of the reaction candles, and displacement away from the level in ATR.
+  const atr = (() => {
+    const n = Math.min(14, all.length - 1);
+    let sum = 0;
+    for (let k = all.length - n; k < all.length; k++) {
+      const c = all[k], p = all[k - 1];
+      sum += Math.max(c.h - c.l, Math.abs(c.h - p.c), Math.abs(c.l - p.c));
+    }
+    return n > 0 ? sum / n : 0;
+  })();
+  const clamp01 = (x: number) => Math.max(0, Math.min(1, x));
   const legFor = (t: number, kind: "high" | "low") => {
     const i = idxOf.get(t);
     if (i == null) return;
     const piv = all[i];
     const range = piv.h - piv.l;
-    let buy = 0;
-    let total = 0;
-    if (range > 0) {
-      // Rejection wick on the extreme candle counts double for the rejecting side.
-      const upper = piv.h - Math.max(piv.o, piv.c);
-      const lower = Math.min(piv.o, piv.c) - piv.l;
-      const w = 2;
-      buy += (kind === "low" ? lower : 0) * w + (piv.c - piv.l);
-      total += (kind === "low" ? lower : upper) * w + range;
-    }
+    if (!(range > 0)) return;
+    const high = kind === "high";
+    // 1) Rejection: wick at the extreme + where the swing candle closed.
+    const wick = high ? piv.h - Math.max(piv.o, piv.c) : Math.min(piv.o, piv.c) - piv.l;
+    const closeLoc = (piv.c - piv.l) / range;
+    const rejectSide = clamp01(0.6 * (wick / range) + 0.4 * (high ? 1 - closeLoc : closeLoc));
+    const rejection = high ? 1 - rejectSide : rejectSide;
+    // 2) Reaction flow: volume-weighted close location + body direction.
     const end = Math.min(all.length - 1, i + FRACTAL_RADIUS);
+    const avgV = all.slice(Math.max(0, i - 20), i + 1).reduce((s, c) => s + (c.v ?? 0), 0) / 21 || 1;
+    let fb = 0, fw = 0, far = high ? Infinity : -Infinity;
     for (let k = i + 1; k <= end; k++) {
       const c = all[k];
       const r = c.h - c.l;
       if (!(r > 0)) continue;
-      buy += c.c - c.l;
-      total += r;
+      const w = (c.v && c.v > 0 ? c.v / avgV : 1) * r;
+      const loc = (c.c - c.l) / r;
+      const body = (c.c - c.o) / r; // -1..1
+      fb += w * clamp01(0.6 * loc + 0.4 * (0.5 + body / 2));
+      fw += w;
+      far = high ? Math.min(far, c.l) : Math.max(far, c.h);
     }
-    if (total > 0) pressure[t] = Math.round((buy / total) * 100);
+    const bars = end - i;
+    const evidence = Math.min(1, bars / FRACTAL_RADIUS);
+    const flow = fw > 0 ? fb / fw : 0.5;
+    // 3) Displacement: distance price travelled away from the level (2 ATR = full).
+    const move = bars > 0 && atr > 0 ? clamp01((high ? piv.h - far : far - piv.l) / (2 * atr)) : 0;
+    const disp = high ? 0.5 - move / 2 : 0.5 + move / 2;
+    // Fresh swings lean on rejection until reaction candles print.
+    const wRej = 0.35 + 0.35 * (1 - evidence);
+    const wFlow = 0.4 * evidence;
+    const wDisp = 0.25 * evidence;
+    const buy = (rejection * wRej + flow * wFlow + disp * wDisp) / (wRej + wFlow + wDisp);
+    pressure[t] = Math.round(clamp01(buy) * 100);
   };
   for (const p of pivotsLabelled) legFor(p.t, p.kind);
   for (const p of livePivots) legFor(p.t, p.kind);
