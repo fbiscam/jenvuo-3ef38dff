@@ -12,6 +12,7 @@ const fmt = (t: number) => new Date(t * 1000).toISOString().slice(0, 16).replace
  */
 export function buildChartContext(input: {
   timeframeLabel: string;
+  pairLabel?: string;
   bars: OhlcvBar[];
   stepSeconds: number;
   source: string;
@@ -32,7 +33,7 @@ export function buildChartContext(input: {
   const forming = (last.time + input.stepSeconds) * 1000 > (input.now ?? Date.now());
   const lines: string[] = [];
   lines.push(
-    `Chart: XAU/USD ${input.timeframeLabel} on the Jenvu chart (${bars.length} bars loaded, feed: ${input.source}).`,
+    `Chart: ${input.pairLabel ?? "XAU/USD"} ${input.timeframeLabel} on the Jenvu chart (${bars.length} bars loaded, feed: ${input.source}).`,
   );
   lines.push(
     `Latest candle ${fmt(last.time)}${forming ? " (still forming)" : ""}: O ${last.open.toFixed(2)} H ${last.high.toFixed(2)} L ${last.low.toFixed(2)} C ${last.close.toFixed(2)}.`,

@@ -7,8 +7,13 @@ import { getLiveTick } from "@/lib/gold-analysis.functions";
 // XAU/USD: Binance gold perpetual order book gives sub-second movement; we add a basis so
 // the price stays aligned with real spot gold from the server feed.
 function binanceStreamFor(symbol: string): string | null {
-  return symbol.toUpperCase().replace("/", "") === "XAUUSD" ? "wss://fstream.binance.com/ws/xauusdt@bookTicker" : null;
+  const s = symbol.toUpperCase().replace("/", "");
+  if (s === "XAUUSD") return "wss://fstream.binance.com/ws/xauusdt@bookTicker";
+  if (s === "BTCUSD") return "wss://stream.binance.com:9443/ws/btcusdt@bookTicker";
+  return null;
 }
+/** Streams already quoted on the chart's own scale need no spot basis. */
+const NO_BASIS = new Set(["BTCUSD"]);
 
 
 
@@ -77,9 +82,13 @@ export function useLivePriceStream(
           if (stopped || !t) return;
           if (stream && lastStreamPrice != null) {
             // Recalibrate basis only when spot actually prints a new value.
-            if (t.price !== lastSpot) {
+            if (NO_BASIS.has(symbol.toUpperCase().replace("/", ""))) {
+              basis = 0;
+            } else if (t.price !== lastSpot) {
               lastSpot = t.price;
-              basis = t.price - lastStreamPrice;
+              const raw = t.price - lastStreamPrice;
+              // Smooth the spot adjustment so the price doesn't jump on every recalibration.
+              basis = basis == null || Math.abs(raw - basis) > 5 ? raw : basis * 0.6 + raw * 0.4;
             }
             if (basis == null) basis = t.price - lastStreamPrice;
             if (!streamAlive()) pushTick(t.price, typeof t.t === "number" ? t.t : Date.now());
@@ -99,7 +108,7 @@ export function useLivePriceStream(
     let lastStreamPrice: number | null = null;
     let lastStreamAt = 0;
     let lastSpot: number | null = null;
-    let basis: number | null = null;
+    let basis: number | null = NO_BASIS.has(symbol.toUpperCase().replace("/", "")) ? 0 : null;
     const streamAlive = () => Date.now() - lastStreamAt < 5000;
     let firstTickTimer: ReturnType<typeof setTimeout> | null = null;
     if (stream && typeof WebSocket !== "undefined") {

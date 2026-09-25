@@ -1095,11 +1095,12 @@ async function fetchGoldCandles(tf: string): Promise<Candle[]> {
 // Terminal chart evidence must stay on the spot-Gold scale shown by the
 // OANDA:XAUUSD embed. Never fall through to GC futures or tokenized Gold here:
 // their premium/discount can make otherwise valid pivots look incorrect.
-async function fetchTerminalGoldEvidenceCandles(tf: string): Promise<Candle[]> {
+export type TerminalAsset = "XAUUSD" | "BTCUSD";
+async function fetchTerminalGoldEvidenceCandles(tf: string, asset: TerminalAsset = "XAUUSD"): Promise<Candle[]> {
   // Reuse the exact chart loader: same provider priority, same spot scale,
   // real 45m aggregation from 15m bars, and last-good-chart fallback when
   // every feed fails at once.
-  const payload = await loadTerminalChart(tf);
+  const payload = await loadTerminalChart(tf, asset);
   return payload.bars.slice(-200).map((b) => ({
     t: b.time * 1000,
     o: b.open,
@@ -1118,7 +1119,8 @@ async function fetchTerminalGoldEvidenceCandles(tf: string): Promise<Candle[]> {
 const terminalChartCache = new Map<string, { at: number; data: TerminalChartPayload }>();
 export type TerminalChartPayload = {
   timeframe: string;
-  source: "spot" | "paxg-scaled";
+  source: "spot" | "paxg-scaled" | "binance";
+  asset?: TerminalAsset;
   /** Exchange that supplied the candles (fixed priority, identical for all accounts). */
   provider: string;
   /** Server clock (ms) — used to decide which candles are closed, so a wrong device clock can't change SMC labels. */
@@ -1360,7 +1362,52 @@ async function scaleProxyToSpot(proxy: Candle[]): Promise<Candle[]> {
   return proxy.map((c) => ({ ...c, o: c.o * scale, h: c.h * scale, l: c.l * scale, c: c.c * scale }));
 }
 
-async function loadTerminalChart(tf: string): Promise<TerminalChartPayload> {
+async function loadBtcTerminalChart(tf: string): Promise<TerminalChartPayload> {
+  const key = `BTCUSD:${tf}`;
+  const hit = terminalChartCache.get(key);
+  if (hit && Date.now() - hit.at < 3000) return { ...hit.data, serverTime: Date.now() };
+  const fetchTf = tf === "45m" ? "15m" : tf;
+  let candles: Candle[];
+  try {
+    candles = await Promise.any([
+      fetchBinanceHostDeep("data-api.binance.vision", "BTCUSDT", fetchTf, 1000),
+      fetchBinanceHostDeep("api.binance.com", "BTCUSDT", fetchTf, 1000),
+    ]);
+  } catch (err) {
+    if (hit && Date.now() - hit.at < TERMINAL_STALE_MAX) return { ...hit.data, serverTime: Date.now() };
+    throw new Error("BTC chart feed unavailable");
+  }
+  const step = TF_MS[tf] ?? TF_MS["30m"];
+  const byBucket = new Map<number, Candle>();
+  for (const c of candles) {
+    const bucket = Math.floor(c.t / step) * step;
+    const prev = byBucket.get(bucket);
+    byBucket.set(bucket, prev && fetchTf !== tf
+      ? { ...prev, h: Math.max(prev.h, c.h), l: Math.min(prev.l, c.l), c: c.c, v: (prev.v || 0) + (c.v || 0) }
+      : c);
+  }
+  const data: TerminalChartPayload = {
+    timeframe: tf,
+    asset: "BTCUSD",
+    source: "binance",
+    provider: "Binance",
+    serverTime: Date.now(),
+    stepSeconds: step / 1000,
+    bars: [...byBucket.entries()].sort((a, b) => a[0] - b[0]).map(([bucket, c]) => ({
+      time: Math.floor(bucket / 1000),
+      open: c.o,
+      high: Math.max(c.h, c.o, c.c),
+      low: Math.min(c.l, c.o, c.c),
+      close: c.c,
+      volume: Number.isFinite(c.v) ? c.v : 0,
+    })),
+  };
+  terminalChartCache.set(key, { at: Date.now(), data });
+  return data;
+}
+
+async function loadTerminalChart(tf: string, asset: TerminalAsset = "XAUUSD"): Promise<TerminalChartPayload> {
+  if (asset === "BTCUSD") return loadBtcTerminalChart(tf);
   const hit = terminalChartCache.get(tf);
   if (hit && Date.now() - hit.at < 4000) return { ...hit.data, serverTime: Date.now() };
   let candles: Candle[] = [];
@@ -1425,11 +1472,12 @@ async function loadTerminalChart(tf: string): Promise<TerminalChartPayload> {
 
 export const getTerminalChart = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { timeframe: string }) => {
+  .inputValidator((d: { timeframe: string; asset?: string }) => {
     const tf = String(d?.timeframe || "30m").toLowerCase();
-    return { timeframe: TF_MS[tf] ? tf : "30m" };
+    const asset: TerminalAsset = d?.asset === "BTCUSD" ? "BTCUSD" : "XAUUSD";
+    return { timeframe: TF_MS[tf] ? tf : "30m", asset };
   })
-  .handler(async ({ data }) => loadTerminalChart(data.timeframe));
+  .handler(async ({ data }) => loadTerminalChart(data.timeframe, data.asset));
 
 function closedCandlesOnly(candles: Candle[], timeframe: string, now = Date.now()): Candle[] {
   const step = TF_MS[timeframe] ?? TF_MS["15m"];
@@ -1469,11 +1517,11 @@ function isTradingSetupIntent(q: string): boolean {
  * the text path and the chart-screenshot path so the AI never has to guess
  * where an HH/HL/LH/LL, BOS/CHOCH/MSS, inducement or liquidity pool sits.
  */
-async function buildEvidenceContext(timeframe: string, dailyTradesTaken = 0) {
+async function buildEvidenceContext(timeframe: string, dailyTradesTaken = 0, asset: TerminalAsset = "XAUUSD") {
   let candles: Candle[] = [];
-  const liveTick = await resolveLiveTick(resolveInstrument("XAUUSD")).catch(() => null);
+  const liveTick = await resolveLiveTick(resolveInstrument(asset)).catch(() => null);
   try {
-    candles = closedCandlesOnly(await fetchTerminalGoldEvidenceCandles(timeframe), timeframe);
+    candles = closedCandlesOnly(await fetchTerminalGoldEvidenceCandles(timeframe, asset), timeframe);
   } catch {
     candles = [];
   }
@@ -1643,7 +1691,7 @@ TRENDLINE LIQUIDITY: ${
   const mtfResults = await Promise.allSettled(
     mtfTimeframes.map(async (tf) => {
       if (tf === timeframe && hasData) return [tf, advancedBars] as const;
-      const frameCandles = closedCandlesOnly(await fetchTerminalGoldEvidenceCandles(tf), tf).slice(
+      const frameCandles = closedCandlesOnly(await fetchTerminalGoldEvidenceCandles(tf, asset), tf).slice(
         -SMC_STRUCTURE_WINDOW,
       );
       return [
@@ -1854,13 +1902,13 @@ APEX RULE: never claim CVD, delta or footprint data beyond this proxy, and never
   // Extreme M30 Gold Reversal Engine (Three Stocks funded edition): location,
   // session, anatomy, 1:3 clean traffic and the 2-trades-per-day lock.
   const [m30Candles, h4Candles, h1Candles] = await Promise.all([
-    fetchTerminalGoldEvidenceCandles("30m")
+    fetchTerminalGoldEvidenceCandles("30m", asset)
       .then((c) => closedCandlesOnly(c, "30m").slice(-200))
       .catch(() => [] as Candle[]),
-    fetchTerminalGoldEvidenceCandles("4h")
+    fetchTerminalGoldEvidenceCandles("4h", asset)
       .then((c) => closedCandlesOnly(c, "4h").slice(-150))
       .catch(() => [] as Candle[]),
-    fetchTerminalGoldEvidenceCandles("1h")
+    fetchTerminalGoldEvidenceCandles("1h", asset)
       .then((c) => closedCandlesOnly(c, "1h").slice(-150))
       .catch(() => [] as Candle[]),
   ]);
@@ -2086,6 +2134,7 @@ async function _analyzeGoldCompute(
     advisor?: boolean;
     history?: Array<{ role: "user" | "assistant"; content: string }>;
     chartContext?: string;
+    asset?: TerminalAsset;
   },
   __userId: string | null = null,
   __scanId: string | null = null,
@@ -2095,7 +2144,7 @@ async function _analyzeGoldCompute(
   // AI key is validated inside callChatCompletion — no local read needed.
 
   if (data.chartImage) {
-    const ev = await buildEvidenceContext(data.timeframe, __dailyTradesTaken);
+    const ev = await buildEvidenceContext(data.timeframe, __dailyTradesTaken, data.asset ?? "XAUUSD");
     const exactAnswer = exactStructureAnswer(
       data.query,
       data.timeframe,
@@ -2217,7 +2266,7 @@ Perform an evidence-first review of only what the question needs: swing structur
   const wantsTradingSetup = !data.advisor && isTradingSetupIntent(data.query);
   if (wantsTradingSetup) {
     try {
-      const evidence = await buildEvidenceContext(data.timeframe, __dailyTradesTaken);
+      const evidence = await buildEvidenceContext(data.timeframe, __dailyTradesTaken, data.asset ?? "XAUUSD");
       const reversal = evidence.reversal;
       if (!reversal?.plan || !reversal.status.startsWith("ARMED_")) {
         const reason =
@@ -2322,7 +2371,7 @@ Perform an evidence-first review of only what the question needs: swing structur
     structureState,
     currentPrice,
     reversal,
-  } = await buildEvidenceContext(data.timeframe, __dailyTradesTaken);
+  } = await buildEvidenceContext(data.timeframe, __dailyTradesTaken, data.asset ?? "XAUUSD");
   const exactAnswer = exactStructureAnswer(
     data.query,
     data.timeframe,
@@ -2578,12 +2627,15 @@ export const analyzeGold = createServerFn({ method: "POST" })
       advisor?: boolean;
       history?: Array<{ role: "user" | "assistant"; content: string }>;
       chartContext?: string;
+      asset?: string;
     }) => ({
       timeframe: String(d?.timeframe || "15m").toLowerCase(),
-      chartContext:
-        typeof d?.chartContext === "string" && d.chartContext.trim()
-          ? d.chartContext.slice(0, 8000)
-          : undefined,
+      asset: (d?.asset === "BTCUSD" ? "BTCUSD" : "XAUUSD") as TerminalAsset,
+      chartContext: (() => {
+        const ctx = typeof d?.chartContext === "string" && d.chartContext.trim() ? d.chartContext.slice(0, 8000) : "";
+        if (d?.asset !== "BTCUSD") return ctx || undefined;
+        return `ACTIVE INSTRUMENT: BTC/USD (Bitcoin, 24/7 crypto). Every price, level, candle and plan in this conversation is BTC/USD — never quote gold prices. Gold-only rules (LBMA fix, gold killzone lock, DXY gold correlation, pip buffers) do not apply; use the same SMC/ICT structure logic on BTC candles with ATR-based buffers.\n${ctx}`;
+      })(),
       query: String(d?.query || "Give me the best A+ setup right now"),
       advisor: d?.advisor === true,
       history: Array.isArray(d?.history)
@@ -3568,9 +3620,38 @@ async function fetchFxProxyRate(symbol: string): Promise<number | null> {
 // Real-time spot quote for precious metals (XAU/XAG). Yahoo's XAUUSD=X can lag
 // several dollars vs live spot; gold-api.com mirrors what TradingView's OANDA
 // spot feed shows and is refreshed every few seconds.
+/** Swissquote public bid/ask feed — real-time spot gold (updates every second). */
+async function fetchSwissquoteXau(): Promise<LiveTick | null> {
+  try {
+    const res = await fetchWithTimeout(
+      "https://forex-data-feed.swissquote.com/public-quotes/bboquotes/instrument/XAU/USD",
+      { headers: { "User-Agent": "Mozilla/5.0", Accept: "application/json" } },
+    );
+    if (!res.ok) return null;
+    const rows: any[] = await res.json();
+    let best: { t: number; mid: number } | null = null;
+    for (const row of Array.isArray(rows) ? rows : []) {
+      const p = row?.spreadProfilePrices?.[0];
+      const bid = Number(p?.bid);
+      const ask = Number(p?.ask);
+      const t = Number(row?.ts);
+      if (!(bid > 0 && ask > 0 && Number.isFinite(t))) continue;
+      if (!best || t > best.t) best = { t, mid: (bid + ask) / 2 };
+    }
+    if (!best || Date.now() - best.t > 120_000) return null;
+    return { price: Math.round(best.mid * 100) / 100, t: best.t } as LiveTick;
+  } catch {
+    return null;
+  }
+}
+
 async function fetchMetalSpotQuote(inst: ResolvedInstrument): Promise<LiveTick | null> {
   if (inst.kind !== "metal") return null;
   const base = inst.key === "METAL:XAGUSD" ? "XAG" : "XAU";
+  if (inst.key === "METAL:XAUUSD") {
+    const sq = await fetchSwissquoteXau();
+    if (sq) return sq;
+  }
   try {
     const res = await fetchWithTimeout(`https://api.gold-api.com/price/${base}`, {
       headers: { "User-Agent": "Mozilla/5.0", Accept: "application/json" },
