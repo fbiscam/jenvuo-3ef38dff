@@ -34,6 +34,16 @@ Payments / misc:
 
 Backend auto (add na karein): SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, SUPABASE_SERVICE_ROLE_KEY.
 
+Abhi project me saved sab secrets (sab dobara add karein, taake kuch na toote):
+ADMIN_PASSWORD, ADMIN_SESSION_SECRET, ADMIN_USERNAME, AGENTROUTER_API_KEY, AGENTROUTER_BASE_URL,
+BLACKBOX_API_KEY, BLUESMINDS_API_KEY, BLUESMIND_API_KEY, BROWSER_USE_API_KEY, BROWSER_USE_API_KEY_2,
+BROWSER_USE_API_KEY_3, BUG_NOTIFY_SECRET, BYNARA_API_KEY, CLOUDFLARE_API_TOKEN, CRON_SECRET,
+CUSTOM_AI_API_KEY, CUSTOM_AI_BASE_URL, DEEPSEEK_API_KEY, EVOLINK_API_KEY, GPT56_API_KEY,
+JUSTWOKER_API_KEY, NVIDIA_API_KEY, OPENAI_API_KEY, OPS_CONSOLE_ID, OPS_CONSOLE_PASS,
+OPS_CONSOLE_SESSION_SECRET, TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_IDS, TG_SELFTEST_TOKEN,
+TOOLS_SESSION_SECRET, TUKENKU_API_KEY, UNIKEY_API_KEY, UNOROUTER_API_KEY, WHATSAPP_API_TOKEN,
+WHATSAPP_PHONE_NUMBER_ID. Connectors: Apollo, Firecrawl, Google Analytics, Google Maps, Google Search Console.
+
 Scheduled jobs (cron) ka password database ke andar private jagah (`internal.scheduler_credential`) me hai,
 isliye woh backend ke saath khud move hota hai. Move ke baad check karein ke scheduled jobs chal rahe hain
 (auto-scan, news alerts, insight generation) — agar 401 aaye to cron credential dobara rotate karein.
