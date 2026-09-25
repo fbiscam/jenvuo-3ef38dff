@@ -53,9 +53,83 @@ export type SmcOverlay = {
   windowStart: number | null;
   /** Buyer % (0-100) for the leg that built each swing, keyed by pivot time. */
   pressure?: Record<number, number>;
+  /** Latest reversal setup at the newest swing (alert → confirmed → cancelled). */
+  reversal?: ReversalSignal | null;
+};
+
+export type ReversalSignal = {
+  side: "buy" | "sell";
+  /** Swing candle time (ms) and extreme price. */
+  t: number;
+  pivotPrice: number;
+  label: string;
+  stage: "alert" | "confirmed" | "cancelled";
+  /** 0–100 strength estimate (not a guarantee). */
+  score: number;
+  swept: boolean;
+  entry: number | null;
+  entryT: number | null;
+  sl: number;
+  tp1: number | null;
+  tp2: number | null;
 };
 
 type PCandle = { t: number; o: number; h: number; l: number; c: number };
+
+/**
+ * Reversal setup on the newest swing:
+ *  - alert: a fresh swing extreme exists (sweep / rejection / pressure scored)
+ *  - confirmed: a later CLOSED candle closes beyond the swing candle's body on the reversal side
+ *  - cancelled: price trades beyond the swing extreme afterwards
+ * Entry = confirmation close, SL = beyond wick (+ small ATR buffer), TP1 = opposing liquidity, TP2 = 1:3.
+ */
+export function computeReversalSignal(
+  closed: PCandle[],
+  forming: PCandle | null,
+  swings: Array<{ t: number; price: number; kind: "high" | "low"; label: string }>,
+  pressure: Record<number, number>,
+  atr: number,
+  buySide: number[],
+  sellSide: number[],
+): ReversalSignal | null {
+  if (!swings.length || !closed.length) return null;
+  const last = [...swings].sort((a, b) => a.t - b.t).at(-1)!;
+  const all = forming ? [...closed, forming] : closed;
+  const i = all.findIndex((c) => c.t === last.t);
+  if (i < 0) return null;
+  const high = last.kind === "high";
+  const piv = all[i];
+  const range = piv.h - piv.l || 1e-9;
+  const wick = high ? piv.h - Math.max(piv.o, piv.c) : Math.min(piv.o, piv.c) - piv.l;
+  const prior = swings.filter((s) => s.kind === last.kind && s.t < last.t).sort((a, b) => b.t - a.t)[0];
+  const swept = !!prior && (high ? last.price > prior.price : last.price < prior.price);
+  const buyPct = pressure[last.t] ?? 50;
+  const winPct = high ? 100 - buyPct : buyPct;
+  let score = 35 + (winPct - 50) * 0.6 + Math.min(20, (wick / range) * 30) + (swept ? 12 : 0);
+  const buffer = Math.max(atr * 0.1, last.price * 0.00003);
+  const sl = high ? last.price + buffer : last.price - buffer;
+  let stage: ReversalSignal["stage"] = "alert";
+  let entry: number | null = null;
+  let entryT: number | null = null;
+  const trigger = high ? Math.min(piv.o, piv.c) : Math.max(piv.o, piv.c);
+  for (let k = i + 1; k < all.length; k++) {
+    const c = all[k];
+    if (high ? c.h > last.price : c.l < last.price) { stage = "cancelled"; break; }
+    const isClosed = k < closed.length;
+    if (entry == null && isClosed && (high ? c.c < trigger : c.c > trigger)) {
+      entry = c.c; entryT = c.t; stage = "confirmed";
+    }
+  }
+  if (stage === "confirmed") score += 15;
+  score = Math.round(Math.max(5, Math.min(92, score)));
+  const ref = entry ?? (forming?.c ?? closed.at(-1)!.c);
+  const risk = Math.abs(ref - sl);
+  const tp1 = high
+    ? sellSide.find((p) => p < ref - risk) ?? null
+    : buySide.find((p) => p > ref + risk) ?? null;
+  const tp2 = risk > 0 ? (high ? ref - 3 * risk : ref + 3 * risk) : null;
+  return { side: high ? "sell" : "buy", t: last.t, pivotPrice: last.price, label: last.label, stage, score, swept, entry, entryT, sl, tp1, tp2 };
+}
 /** Buyer share of the leg ending at `end`: close position inside each candle's range. */
 export function legBuyerPercent(candles: PCandle[], start: number, end: number): number | null {
   let buy = 0;
@@ -411,7 +485,12 @@ export function computeSmcOverlay(
   };
   for (const p of pivotsLabelled) legFor(p.t, p.kind);
   for (const p of livePivots) legFor(p.t, p.kind);
+  const reversal = computeReversalSignal(fractalBars, forming ? toCandle(forming) : null, [
+    ...pivotsLabelled,
+    ...livePivots,
+  ], pressure, atr, buySide, sellSide);
   return {
+    reversal,
     pressure,
     pivots: pivotsLabelled,
     livePivots,
@@ -727,6 +806,71 @@ export function renderSmcOverlay(
         ctx.fillStyle = s < done ? color : "#e2e8f0";
         ctx.fillRect(tx + 6 + s * segW, ty + th - 4, segW - 1.5, 2);
       }
+      ctx.restore();
+    }
+  }
+  const rv = smc.reversal;
+  if (toggles.structure && rv && rv.stage !== "cancelled") {
+    const x = pr.x(rv.t / 1000);
+    const y = pr.y(rv.pivotPrice);
+    if (x != null && y != null) {
+      const buy = rv.side === "buy";
+      const col = buy ? "#089981" : "#f23645";
+      // Arrow at the swing candle (beyond label + pressure box).
+      const ay = buy ? y + 60 : y - 60;
+      ctx.save();
+      ctx.fillStyle = col;
+      ctx.beginPath();
+      if (buy) { ctx.moveTo(x, ay - 10); ctx.lineTo(x - 8, ay + 4); ctx.lineTo(x + 8, ay + 4); }
+      else { ctx.moveTo(x, ay + 10); ctx.lineTo(x - 8, ay - 4); ctx.lineTo(x + 8, ay - 4); }
+      ctx.closePath();
+      ctx.fill();
+      // Level lines to the right edge.
+      const x0 = Math.max(0, pr.x((rv.entryT ?? rv.t) / 1000) ?? x);
+      const line = (price: number | null, color: string, text: string, dash: number[]) => {
+        if (price == null) return;
+        const ly = pr.y(price);
+        if (ly == null) return;
+        ctx.setLineDash(dash);
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 1.25;
+        ctx.beginPath(); ctx.moveTo(x0, ly); ctx.lineTo(pr.width, ly); ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.font = "700 11px 'JetBrains Mono', ui-monospace, monospace";
+        const s = `${text} ${price.toFixed(2)}`;
+        const w = ctx.measureText(s).width + 10;
+        ctx.fillStyle = color;
+        ctx.fillRect(pr.width - w - 70, ly - 8, w, 16);
+        ctx.fillStyle = "#ffffff";
+        ctx.fillText(s, pr.width - w - 65, ly + 4);
+      };
+      if (rv.stage === "confirmed") {
+        line(rv.entry, "#2962ff", "ENTRY", []);
+        line(rv.tp1, "#089981", "TP1", [5, 3]);
+        line(rv.tp2, "#089981", "TP2 1:3", [5, 3]);
+      }
+      line(rv.sl, "#f23645", "SL", [5, 3]);
+      // Status box.
+      const head = rv.stage === "confirmed"
+        ? `${buy ? "BUY" : "SELL"} ENTRY CONFIRMED`
+        : `POSSIBLE ${buy ? "BUY" : "SELL"} REVERSAL`;
+      const sub = `${rv.score}%${rv.swept ? " · sweep" : ""} · ${rv.stage === "confirmed" ? "SL beyond wick" : `wait close ${buy ? "above" : "below"} body`}`;
+      ctx.font = "700 11px 'JetBrains Mono', ui-monospace, monospace";
+      const bw = Math.max(ctx.measureText(head).width, ctx.measureText(sub).width) + 14;
+      const bh = 32;
+      const bx = x - bw / 2;
+      const by = buy ? ay + 8 : ay - 8 - bh;
+      ctx.fillStyle = rv.stage === "confirmed" ? col : "rgba(255,255,255,0.97)";
+      ctx.strokeStyle = col;
+      ctx.lineWidth = 1.25;
+      ctx.beginPath();
+      ctx.roundRect?.(bx, by, bw, bh, 5);
+      if (!ctx.roundRect) ctx.rect(bx, by, bw, bh);
+      ctx.fill(); ctx.stroke();
+      ctx.fillStyle = rv.stage === "confirmed" ? "#ffffff" : col;
+      ctx.fillText(head, bx + 7, by + 13);
+      ctx.font = "600 10px 'JetBrains Mono', ui-monospace, monospace";
+      ctx.fillText(sub, bx + 7, by + 26);
       ctx.restore();
     }
   }
