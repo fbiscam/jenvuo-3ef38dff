@@ -327,8 +327,8 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
     }
     ghost.setData(
       proj.candles.map((c) => {
-        const col = c.bullish ? "rgba(8,153,129,0.35)" : "rgba(242,54,69,0.35)";
-        const edge = c.bullish ? "rgba(8,153,129,0.8)" : "rgba(242,54,69,0.8)";
+        const col = c.bullish ? "rgba(10,125,100,0.35)" : "rgba(211,47,63,0.35)";
+        const edge = c.bullish ? "rgba(10,125,100,0.8)" : "rgba(211,47,63,0.8)";
         return { time: c.time as UTCTimestamp, open: c.open, high: c.high, low: c.low, close: c.close, color: col, borderColor: edge, wickColor: edge };
       }),
     );
