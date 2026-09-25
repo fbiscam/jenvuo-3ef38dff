@@ -814,8 +814,7 @@ export function renderSmcOverlay(
     const x = pr.x(rv.t / 1000);
     const y = pr.y(rv.pivotPrice);
     if (x != null && y != null) {
-      const buy = rv.side === "buy";
-      const col = buy ? "#089981" : "#f23645";
+
       // Level lines to the right edge.
       const x0 = Math.max(0, pr.x((rv.entryT ?? rv.t) / 1000) ?? x);
       const line = (price: number | null, color: string, text: string, dash: number[]) => {
