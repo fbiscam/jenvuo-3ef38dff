@@ -626,7 +626,7 @@ export function renderSmcOverlay(
       // Confirmation tracker: candles left + invalidation level.
       const left = p.confirmIn ?? 0;
       const done = FRACTAL_RADIUS - left;
-      const tw = 132;
+      const tw = 158;
       const th = 30;
       const tx = xx - tw / 2;
       const ty = up ? yy - 22 - 4 - th - 4 : yy + 20 + 4 + 22 + 4;
