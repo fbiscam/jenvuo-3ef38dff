@@ -166,35 +166,18 @@ export function useDemoTrading(currentPrice: number | null, currentRange?: DemoP
 export type DemoTrading = ReturnType<typeof useDemoTrading>;
 
 /** TradingView-style SELL / BUY quick buttons shown on the chart. */
-function QuotePrice({ value }: { value: number | null }) {
-  if (value == null) return <span className="text-[14px] font-semibold">—</span>;
-  const s = value.toLocaleString("en-US", { minimumFractionDigits: 3, maximumFractionDigits: 3 });
-  return (
-    <span className="text-[14px] font-semibold tabular-nums">
-      {s.slice(0, -1)}<sup className="ml-px text-[9px] font-semibold">{s.slice(-1)}</sup>
-    </span>
-  );
-}
-
-const SHINY = {
-  sell: { background: "linear-gradient(180deg,#ff5a67 0%,#f23645 55%,#d91e2e 100%)" },
-  buy: { background: "linear-gradient(180deg,#5b8cff 0%,#2962ff 55%,#1848d6 100%)" },
-};
-const shinyClass =
-  "relative flex min-w-[84px] flex-col items-center overflow-hidden rounded-md px-2.5 py-1 leading-tight text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.45),0_2px_6px_rgba(0,0,0,0.25)] transition hover:brightness-110 active:brightness-95 before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-1/2 before:bg-white/15";
-
 export function QuickTradeButtons({ price, onPick }: { price: number | null; onPick: (side: DemoSide) => void }) {
   const q = price ? bidAsk(price) : null;
   return (
     <div className="pointer-events-auto flex items-center gap-1.5 font-sans">
-      <button type="button" onClick={() => onPick("sell")} aria-label="Sell XAU/USD" className={shinyClass} style={SHINY.sell}>
-        <QuotePrice value={q?.bid ?? null} />
-        <span className="text-[10px] font-semibold tracking-wide">SELL</span>
+      <button type="button" onClick={() => onPick("sell")} aria-label="Sell XAU/USD" className="flex min-w-[76px] flex-col items-center rounded-md px-2 py-1 leading-tight text-primary-foreground shadow-sm hover:opacity-90" style={{ background: SELL }}>
+        <span className="font-mono text-[13px] font-semibold">{q ? num(q.bid) : "—"}</span>
+        <span className="text-[10px] font-medium tracking-wide">SELL</span>
       </button>
       <span className="font-mono text-[10px] text-muted-foreground">{(DEMO_SPREAD * 100).toFixed(1)}</span>
-      <button type="button" onClick={() => onPick("buy")} aria-label="Buy XAU/USD" className={shinyClass} style={SHINY.buy}>
-        <QuotePrice value={q?.ask ?? null} />
-        <span className="text-[10px] font-semibold tracking-wide">BUY</span>
+      <button type="button" onClick={() => onPick("buy")} aria-label="Buy XAU/USD" className="flex min-w-[76px] flex-col items-center rounded-md px-2 py-1 leading-tight text-primary-foreground shadow-sm hover:opacity-90" style={{ background: BUY }}>
+        <span className="font-mono text-[13px] font-semibold">{q ? num(q.ask) : "—"}</span>
+        <span className="text-[10px] font-medium tracking-wide">BUY</span>
       </button>
     </div>
   );
