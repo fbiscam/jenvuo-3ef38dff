@@ -37,7 +37,6 @@ import {
   Type,
   type LucideIcon,
 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
 import { getTerminalChart } from "@/lib/gold-analysis.functions";
 import { cn } from "@/lib/utils";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -303,18 +302,16 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
 
   const chartQuery = useQuery({
     queryKey: ["terminal-chart", asset, timeframe.key],
-    queryFn: async () => {
-      // Skip the protected call while the sign-in session is missing (e.g. mid-refresh or signed out);
-      // the chart keeps showing its last good candles instead of erroring.
-      const { data } = await supabase.auth.getSession();
-      if (!data.session) throw new Error("Session not ready");
-      return fetchChart({ data: { timeframe: timeframe.key, asset } });
-    },
+    // The authenticated route already guarantees a session. The server-function
+    // middleware refreshes and attaches its token; checking getSession again here
+    // created a race in newly opened Chrome profiles and left the query in error.
+    queryFn: () => fetchChart({ data: { timeframe: timeframe.key, asset } }),
     refetchInterval: 5000,
     placeholderData: (prev) => (prev?.asset === asset || (!prev?.asset && asset === "XAUUSD") ? prev : undefined),
     refetchIntervalInBackground: true,
     staleTime: 1000,
-    retry: 2,
+    retry: 4,
+    retryDelay: (attempt) => Math.min(500 * 2 ** attempt, 4000),
   });
 
   const payload = chartQuery.data;
@@ -716,6 +713,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
         <div className="flex min-h-0 min-w-0 flex-1 flex-col">
           <div className="relative min-h-0 flex-1">
             <MemoChart
+              key={`${asset}:${timeframe.key}`}
               ref={chartRef}
               bars={bars}
               stepSeconds={stepSeconds}
@@ -826,7 +824,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
             )}
             {chartQuery.isError && !payload && (
               <div className="absolute inset-0 z-[4] flex flex-col items-center justify-center gap-2 bg-background text-sm">
-                <p>The gold price feed is not responding right now.</p>
+                <p>The {pairLabel} price feed is not responding right now.</p>
                 <button
                   type="button"
                   className="rounded-md border border-border px-3 py-1.5 text-xs font-medium hover:bg-accent"
