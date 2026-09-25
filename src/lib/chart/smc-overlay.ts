@@ -809,38 +809,5 @@ export function renderSmcOverlay(
       ctx.restore();
     }
   }
-  const rv = smc.reversal;
-  if (toggles.structure && rv && rv.stage !== "cancelled") {
-    const x = pr.x(rv.t / 1000);
-    const y = pr.y(rv.pivotPrice);
-    if (x != null && y != null) {
-
-      // Level lines to the right edge.
-      const x0 = Math.max(0, pr.x((rv.entryT ?? rv.t) / 1000) ?? x);
-      const line = (price: number | null, color: string, text: string, dash: number[]) => {
-        if (price == null) return;
-        const ly = pr.y(price);
-        if (ly == null) return;
-        ctx.setLineDash(dash);
-        ctx.strokeStyle = color;
-        ctx.lineWidth = 1.25;
-        ctx.beginPath(); ctx.moveTo(x0, ly); ctx.lineTo(pr.width, ly); ctx.stroke();
-        ctx.setLineDash([]);
-        ctx.font = "700 11px 'JetBrains Mono', ui-monospace, monospace";
-        const s = `${text} ${price.toFixed(2)}`;
-        const w = ctx.measureText(s).width + 10;
-        ctx.fillStyle = color;
-        ctx.fillRect(pr.width - w - 70, ly - 8, w, 16);
-        ctx.fillStyle = "#ffffff";
-        ctx.fillText(s, pr.width - w - 65, ly + 4);
-      };
-      if (rv.stage === "confirmed") {
-        line(rv.entry, "#2962ff", "ENTRY", []);
-        line(rv.tp1, "#089981", "TP1", [5, 3]);
-        line(rv.tp2, "#089981", "TP2 1:3", [5, 3]);
-      }
-      line(rv.sl, "#f23645", "SL", [5, 3]);
-    }
-  }
   ctx.restore();
 }
