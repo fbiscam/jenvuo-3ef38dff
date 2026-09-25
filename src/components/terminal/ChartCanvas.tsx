@@ -92,6 +92,7 @@ type Props = {
   onToolDone: () => void;
   onHoverBar: (index: number | null) => void;
   resetKey: string;
+  theme?: ChartTheme;
 };
 
 const uid = () => `d-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`;
