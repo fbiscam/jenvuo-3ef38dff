@@ -22,36 +22,28 @@ const UNOROUTER_IMAGE_MODELS = [
   "dreamshaper:free",
 ] as const;
 
-// Each article must get a visually distinct cover. A stable hash of the slug
-// picks a scene/palette/angle combination, and a random seed suffix keeps two
-// articles on the same topic family from rendering near-identical images.
+// Each article gets a distinct, CoinDesk-style editorial cover in Jenvu's
+// brand colours (signal orange #FD5510, deep black, clean white). A stable
+// hash of the slug picks the hero subject and composition.
 const COVER_SCENES = [
-  "macro shot of a molten gold ingot surface with rippling liquid metal",
-  "abstract 3D candlestick canyon rendered as polished metal blocks",
-  "an institutional trading floor abstracted into glowing glass planes",
-  "a slow-motion burst of gold dust particles over a dark grid",
-  "layered depth-of-market ribbons flowing like silk through darkness",
-  "a precision mechanical vault mechanism with gold gearing",
-  "topographic liquidity map carved into brushed metal",
-  "orbiting concentric rings of light around a single gold sphere",
-  "cracked obsidian slab revealing veins of glowing gold",
-  "long-exposure light trails forming an upward market structure",
-] as const;
-
-const COVER_PALETTES = [
-  "deep charcoal with champagne gold highlights",
-  "near-black navy with amber and bronze accents",
-  "graphite grey with warm honey gold rim light",
-  "midnight teal with pale gold and ivory highlights",
-  "espresso brown with burnished copper-gold glow",
+  "a single polished gold bar standing upright, glowing orange rim light",
+  "a stack of gold coins rising like a bullish bar chart",
+  "a bold 3D upward arrow made of brushed gold breaking through a glass floor",
+  "a gold bar balanced on a minimal scale against a US dollar symbol sculpture",
+  "a 3D gold nugget orbited by thin glowing orange rings",
+  "a sleek bank vault door half-open with warm orange light spilling out",
+  "abstract 3D candlesticks carved from gold and matte black stone",
+  "a gold bull figurine facing a black bear figurine on a clean pedestal",
+  "a glowing orange globe with a gold bar resting on top, macro economy theme",
+  "a gold bar cracked open revealing bright orange molten core",
 ] as const;
 
 const COVER_TREATMENTS = [
-  "cinematic wide shot, shallow depth of field",
-  "top-down flat-lay composition, hard directional light",
-  "extreme macro detail, soft volumetric haze",
-  "isometric 3D render, clean studio lighting",
-  "long-exposure motion blur, dramatic side light",
+  "centered hero object, clean studio lighting, soft shadow",
+  "low-angle heroic shot, dramatic rim light",
+  "isometric 3D illustration, crisp edges",
+  "close-up product shot, shallow depth of field",
+  "minimal composition with generous negative space on the left",
 ] as const;
 
 function hashString(value: string): number {
@@ -66,17 +58,18 @@ function hashString(value: string): number {
 function coverPrompt(title: string, category: string, slug = ""): string {
   const h = hashString(slug || title);
   const scene = COVER_SCENES[h % COVER_SCENES.length];
-  const palette = COVER_PALETTES[Math.floor(h / 7) % COVER_PALETTES.length];
   const treatment = COVER_TREATMENTS[Math.floor(h / 53) % COVER_TREATMENTS.length];
   return [
-    "Create a premium, editorial cover image for a professional gold-trading research article.",
-    `Article title: "${title}". Category: ${category}.`,
-    `Visual concept: ${scene}.`,
-    `Colour palette: ${palette}.`,
-    `Photography/render treatment: ${treatment}.`,
-    "Premium fintech aesthetic, high detail, 16:9 composition, no text, no words, no letters,",
-    "no logos, no watermarks, no charts with labels, no human faces.",
-    `Unique variation id: ${h % 99991}.`,
+    "High-end editorial featured image for a financial news article, in the style of CoinDesk and Bloomberg feature art:",
+    "modern glossy 3D render, one clear hero subject, bold and instantly readable at thumbnail size.",
+    `Article topic: "${title}" (${category}, gold / XAU-USD market).`,
+    `Hero subject: ${scene}.`,
+    `Composition: ${treatment}.`,
+    "Strict brand colour palette: vivid signal orange (#FD5510) as the key accent and lighting colour,",
+    "rich gold metal tones, deep matte black background with a subtle orange gradient glow. No other dominant colours.",
+    "Ultra sharp, 8k detail, realistic materials, cinematic lighting, 16:9.",
+    "No text, no words, no letters, no numbers, no logos, no watermarks, no people, no faces, no clutter, not distorted.",
+    `Variation ${h % 99991}.`,
   ].join(" ");
 }
 
@@ -244,22 +237,24 @@ function localCoverSvg(title: string, category: string, slug: string): string {
     )
     .join("");
 
+  void hue;
   return `<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720">
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="hsl(${hue}, 28%, 9%)"/>
-      <stop offset="100%" stop-color="hsl(${(hue + 18) % 360}, 45%, 18%)"/>
-    </linearGradient>
+    <radialGradient id="glow" cx="0.85" cy="0.3" r="0.7">
+      <stop offset="0%" stop-color="#FD5510" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#0b0b0b" stop-opacity="0"/>
+    </radialGradient>
   </defs>
-  <rect width="1280" height="720" fill="url(#bg)"/>
-  <circle cx="1080" cy="180" r="220" fill="#d4af37" opacity="0.14"/>
-  <circle cx="1180" cy="620" r="160" fill="#d4af37" opacity="0.08"/>
-  <rect x="80" y="150" width="90" height="6" fill="#d4af37"/>
-  <text x="80" y="210" font-family="Helvetica, Arial, sans-serif" font-size="24" letter-spacing="6" fill="#d4af37">${escapeXml(
+  <rect width="1280" height="720" fill="#0b0b0b"/>
+  <rect width="1280" height="720" fill="url(#glow)"/>
+  <circle cx="1080" cy="220" r="170" fill="none" stroke="#FD5510" stroke-width="3" opacity="0.6"/>
+  <circle cx="1080" cy="220" r="110" fill="#d4af37" opacity="0.9"/>
+  <rect x="80" y="150" width="90" height="6" fill="#FD5510"/>
+  <text x="80" y="210" font-family="Helvetica, Arial, sans-serif" font-size="24" font-weight="700" letter-spacing="6" fill="#FD5510">${escapeXml(
     category.toUpperCase(),
   )}</text>
-  ${text}
-  <text x="80" y="640" font-family="Helvetica, Arial, sans-serif" font-size="26" letter-spacing="4" fill="#9a8e74">JENVU · XAU/USD RESEARCH</text>
+  ${text.replaceAll('font-family="Georgia, serif"', 'font-family="Helvetica, Arial, sans-serif" font-weight="700"').replaceAll("#f5e6c8", "#ffffff")}
+  <text x="80" y="640" font-family="Helvetica, Arial, sans-serif" font-size="24" letter-spacing="4" fill="#bdbdbd">JENVU · GOLD RESEARCH</text>
 </svg>`;
 }
 
