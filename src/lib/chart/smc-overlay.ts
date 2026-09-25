@@ -429,8 +429,9 @@ export function renderSmcOverlay(
       ctx.fillStyle = color;
       const label = b.type === "CHOCH" ? "CHoCH" : b.type;
       const w = ctx.measureText(label).width;
-       const labelX = Math.max(2, Math.min(pr.width - w - 2, (lineStart + lineEnd) / 2 - w / 2));
-       ctx.fillText(label, labelX, breakLabelBaseline(y, b.dir === "bullish", pr.height));
+       // Anchor to the real break segment (not the visible clip) so it never slides.
+       const labelX = (x0 + x1) / 2 - w / 2;
+       ctx.fillText(label, labelX, b.dir === "bullish" ? y - 5 : y + 13);
     }
   }
   if (toggles.structure) {
@@ -442,8 +443,9 @@ export function renderSmcOverlay(
       const up = p.kind === "high";
       const color = p.label === "HH" || p.label === "HL" ? "#089981" : "#f23645";
       const w = ctx.measureText(p.label).width + 8;
-       const yy = structureBadgeTop(y, up, pr.height);
-       const xx = Math.max(w / 2 + 2, Math.min(pr.width - w / 2 - 2, x));
+       // Fixed to the pivot candle wick — no edge clamping, so it never drifts.
+       const yy = up ? y - 19 : y + 5;
+       const xx = x;
       ctx.fillStyle = color;
       ctx.beginPath();
        ctx.roundRect?.(xx - w / 2, yy, w, 14, 3);
@@ -462,8 +464,9 @@ export function renderSmcOverlay(
       const color = p.label === "HH" || p.label === "HL" || p.label === "L" ? "#089981" : "#f23645";
       const text = p.label;
       const w = ctx.measureText(text).width + 8;
-       const yy = structureBadgeTop(y, up, pr.height);
-       const xx = Math.max(w / 2 + 2, Math.min(pr.width - w / 2 - 2, x));
+       // Fixed to the pivot candle wick — no edge clamping, so it never drifts.
+       const yy = up ? y - 19 : y + 5;
+       const xx = x;
       ctx.fillStyle = "rgba(255,255,255,0.92)";
       ctx.beginPath();
        ctx.roundRect?.(xx - w / 2, yy, w, 14, 3);
