@@ -36,10 +36,10 @@ import { buildIndicatorSeries, type IndicatorId } from "./indicator-specs";
 export const CHART_COLORS = {
   bg: "#ffffff",
   text: "#131722",
-  grid: "#f0f3fa",
-  border: "#e0e3eb",
-  up: "#089981",
-  down: "#f23645",
+  grid: "#e8ecf3",
+  border: "#d6dae3",
+  up: "#0a7d64",
+  down: "#d32f3f",
   insideBar: "#38bdf8",
   insideBarCandle: "#eab308",
 };
@@ -327,8 +327,8 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
     }
     ghost.setData(
       proj.candles.map((c) => {
-        const col = c.bullish ? "rgba(8,153,129,0.35)" : "rgba(242,54,69,0.35)";
-        const edge = c.bullish ? "rgba(8,153,129,0.8)" : "rgba(242,54,69,0.8)";
+        const col = c.bullish ? "rgba(10,125,100,0.35)" : "rgba(211,47,63,0.35)";
+        const edge = c.bullish ? "rgba(10,125,100,0.8)" : "rgba(211,47,63,0.8)";
         return { time: c.time as UTCTimestamp, open: c.open, high: c.high, low: c.low, close: c.close, color: col, borderColor: edge, wickColor: edge };
       }),
     );
