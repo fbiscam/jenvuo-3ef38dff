@@ -840,7 +840,6 @@ export function renderSmcOverlay(
         line(rv.tp2, "#089981", "TP2 1:3", [5, 3]);
       }
       line(rv.sl, "#f23645", "SL", [5, 3]);
-      ctx.restore();
     }
   }
   ctx.restore();
