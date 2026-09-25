@@ -755,16 +755,6 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
               </div>
             )}
 
-            {tool !== "cursor" && (
-              <div className="pointer-events-none absolute bottom-3 left-1/2 z-[3] -translate-x-1/2 rounded-full bg-foreground px-3 py-1 text-xs text-background">
-                {tool === "hline" || tool === "vline" || tool === "text"
-                  ? `Click to place the ${TOOL_LABELS[tool as Exclude<DrawingTool, "cursor">].toLowerCase()}`
-                  : tool === "long" || tool === "short"
-                    ? "Click the entry, then click the stop loss"
-                    : `Click two points to draw the ${TOOL_LABELS[tool as Exclude<DrawingTool, "cursor">].toLowerCase()}`}{" "}
-                · Esc to cancel
-              </div>
-            )}
 
             {chartQuery.isPending && (
               <div className="absolute inset-0 z-[4] flex items-center justify-center bg-background/70 text-sm text-muted-foreground">
