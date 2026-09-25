@@ -372,15 +372,15 @@ export type SmcProjector = {
 };
 
 export function structureBadgeTop(wickY: number, isHigh: boolean, chartHeight: number): number {
-  const badgeHeight = 14;
-  const gap = 5;
+  const badgeHeight = 18;
+  const gap = 4;
   const wanted = isHigh ? wickY - badgeHeight - gap : wickY + gap;
   return Math.max(2, Math.min(Math.max(2, chartHeight - badgeHeight - 2), wanted));
 }
 
 export function breakLabelBaseline(lineY: number, bullish: boolean, chartHeight: number): number {
-  const wanted = bullish ? lineY - 5 : lineY + 13;
-  return Math.max(11, Math.min(Math.max(11, chartHeight - 3), wanted));
+  const wanted = bullish ? lineY - 7 : lineY + 17;
+  return Math.max(15, Math.min(Math.max(15, chartHeight - 3), wanted));
 }
 
 export function renderSmcOverlay(
@@ -390,7 +390,7 @@ export function renderSmcOverlay(
   pr: SmcProjector,
 ) {
   ctx.save();
-  ctx.font = "600 10px 'JetBrains Mono', ui-monospace, monospace";
+  ctx.font = "600 13px 'JetBrains Mono', ui-monospace, monospace";
   const dottedLine = (tMs: number, price: number, color: string) => {
     const x0 = pr.x(tMs / 1000);
     const y = pr.y(price);
