@@ -51,10 +51,11 @@ export function LeadsShell({ me, children }: { me: Me | null; children: ReactNod
       style={{ fontFamily: JENVU_SANS }}
     >
       {mobileOpen && (
-        <button
+        <Button
           type="button"
+          variant="ghost"
           aria-label="Close navigation"
-          className="fixed inset-0 z-40 bg-foreground/15 lg:hidden"
+          className="fixed inset-0 z-40 h-auto w-auto rounded-none bg-foreground/15 p-0 hover:bg-foreground/15 lg:hidden"
           onClick={() => setMobileOpen(false)}
         />
       )}
