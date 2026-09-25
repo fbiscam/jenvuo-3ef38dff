@@ -31,6 +31,8 @@ export type LivePivot = {
   /** Candles printed after the swing so far (needs FRACTAL_RADIUS to confirm). */
   barsAfter: number;
   confirmIn: number;
+  /** Locked early because the opposite swing already formed after it. */
+  confirmedByOpposite?: boolean;
 };
 
 export type SmcOverlay = {
@@ -205,6 +207,18 @@ export function computeLivePivots(
         confirmIn: Math.max(0, radius - Math.max(0, closed.length - 1 - i)),
       });
       break;
+    }
+  }
+  // Structural confirmation: once the opposite swing has printed AFTER a live
+  // pivot (e.g. high → new low → price moved up), the earlier swing is locked
+  // in immediately — no need to wait for the full 10 candles.
+  const hi = out.find((p) => p.kind === "high");
+  const lo = out.find((p) => p.kind === "low");
+  if (hi && lo && hi.t !== lo.t) {
+    const [earlier, later] = hi.t < lo.t ? [hi, lo] : [lo, hi];
+    if (later.barsAfter >= 1) {
+      earlier.confirmIn = 0;
+      earlier.confirmedByOpposite = true;
     }
   }
   return out;
