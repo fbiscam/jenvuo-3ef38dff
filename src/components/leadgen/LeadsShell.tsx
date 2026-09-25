@@ -10,7 +10,6 @@ import {
   Activity,
   Shield,
   Menu,
-  X,
 } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -60,7 +59,7 @@ export function LeadsShell({ me, children }: { me: Me | null; children: ReactNod
         />
       )}
       <aside
-        className={`leads-sidebar-root fixed inset-y-0 left-0 z-50 flex h-dvh w-[200px] flex-col overflow-hidden border-r border-border bg-sidebar transition-transform duration-200 lg:translate-x-0 ${mobileOpen ? "translate-x-0" : "-translate-x-full"}`}
+        className={`leads-sidebar-root fixed inset-y-0 left-0 z-50 flex h-dvh w-[min(82vw,280px)] flex-col overflow-hidden border-r border-border bg-sidebar transition-transform duration-200 lg:w-[200px] lg:translate-x-0 ${mobileOpen ? "translate-x-0" : "-translate-x-full"}`}
         style={{ fontFamily: JENVU_SANS, fontWeight: 400 }}
       >
         {/* Brand */}
