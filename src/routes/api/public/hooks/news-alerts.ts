@@ -31,14 +31,11 @@ export const Route = createFileRoute('/api/public/hooks/news-alerts')({
       POST: async ({ request }) => {
         const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
         const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-        const cronSecret = process.env.CRON_SECRET
-        if (!supabaseUrl || !serviceKey || !cronSecret) {
+        if (!supabaseUrl || !serviceKey) {
           return Response.json({ error: 'server_misconfigured' }, { status: 500 })
         }
-        const provided = request.headers.get('x-cron-secret') || ''
-        if (provided !== cronSecret) {
-          return Response.json({ error: 'unauthorized' }, { status: 401 })
-        }
+        const { isAuthorizedCronRequest, cronUnauthorized } = await import("@/lib/cron-guard.server")
+        if (!(await isAuthorizedCronRequest(request))) return cronUnauthorized()
 
         const admin = createClient(supabaseUrl, serviceKey, {
           auth: { persistSession: false, autoRefreshToken: false },

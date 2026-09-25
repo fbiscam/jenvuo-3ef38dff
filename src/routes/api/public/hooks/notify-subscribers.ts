@@ -2,7 +2,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { createClient } from '@supabase/supabase-js'
 
 // Fan-out route called by the insights AFTER INSERT Postgres trigger.
-// Authenticated with the Supabase anon key in the `apikey` header (pg_net pattern).
+// Authenticated with the scheduler credential (x-cron-secret), verified server-side.
 // Reads the just-published article + active subscribers, then enqueues one
 // transactional email per subscriber through the internal queue.
 
@@ -12,18 +12,14 @@ export const Route = createFileRoute('/api/public/hooks/notify-subscribers')({
       POST: async ({ request }) => {
         const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
         const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-        const cronSecret = process.env.CRON_SECRET
-
-        if (!supabaseUrl || !supabaseServiceKey || !cronSecret) {
+        if (!supabaseUrl || !supabaseServiceKey) {
           console.error('notify-subscribers: missing env')
           return Response.json({ error: 'server_misconfigured' }, { status: 500 })
         }
 
         // Authenticate the caller with the shared cron secret
-        const provided = request.headers.get('x-cron-secret') || ''
-        if (provided !== cronSecret) {
-          return Response.json({ error: 'unauthorized' }, { status: 401 })
-        }
+        const { isAuthorizedCronRequest, cronUnauthorized } = await import("@/lib/cron-guard.server")
+        if (!(await isAuthorizedCronRequest(request))) return cronUnauthorized()
 
         let body: { slug?: string; id?: string }
         try {

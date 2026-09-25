@@ -17,7 +17,7 @@ import { fetchBacktestSeries, simulateOnCandles } from "@/lib/backtest-historica
  *      weights cache. Otherwise → leave candidate in the review queue.
  *
  * Triggered by pg_cron on the 1st of each month at 03:00 UTC. Secured with
- * the Supabase publishable key in the `apikey` header (matches the pattern
+ * the scheduler credential (x-cron-secret) verified server-side (see pattern
  * used by paper-trade-resolver and auto-scan).
  */
 
@@ -39,11 +39,8 @@ export const Route = createFileRoute("/api/public/hooks/monthly-retune")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const apikey = request.headers.get("apikey") ?? "";
-        const expected = process.env.SUPABASE_PUBLISHABLE_KEY ?? "";
-        if (!apikey || apikey !== expected) {
-          return new Response("Unauthorized", { status: 401 });
-        }
+        const { isAuthorizedCronRequest, cronUnauthorized } = await import("@/lib/cron-guard.server");
+        if (!(await isAuthorizedCronRequest(request))) return cronUnauthorized();
 
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 

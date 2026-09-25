@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
 import { callChatCompletion, MODEL_CHAIN } from "@/lib/ai-gateway";
 
@@ -129,6 +130,7 @@ Rules:
 - Plain English only, no other language, no markdown.`;
 
 export const scamToolCheck = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => InputSchema.parse(input))
   .handler(async ({ data }): Promise<ScamToolResult> => {
     const { getRequestHeader } = await import("@tanstack/react-start/server");

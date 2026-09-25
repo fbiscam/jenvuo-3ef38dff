@@ -109,6 +109,8 @@ export const opsUnlock = createServerFn({ method: "POST" })
   });
 
 export const opsLock = createServerFn({ method: "POST" }).handler(async () => {
+  const { assertSameOrigin } = await import("./csrf-guard.server");
+  assertSameOrigin();
   const session = await useSession<OpsSession>(sessionConfig());
   await session.clear();
   return { ok: true as const };
