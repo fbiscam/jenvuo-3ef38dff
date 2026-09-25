@@ -1366,23 +1366,36 @@ async function loadBtcTerminalChart(tf: string): Promise<TerminalChartPayload> {
   const key = `BTCUSD:${tf}`;
   const hit = terminalChartCache.get(key);
   if (hit && Date.now() - hit.at < 3000) return { ...hit.data, serverTime: Date.now() };
-  const fetchTf = tf === "45m" ? "15m" : tf;
+  let fetchTf = tf === "45m" ? "15m" : tf;
   let candles: Candle[];
+  let provider = "Binance";
   try {
     candles = await Promise.any([
       fetchBinanceHostDeep("data-api.binance.vision", "BTCUSDT", fetchTf, 1000),
       fetchBinanceHostDeep("api.binance.com", "BTCUSDT", fetchTf, 1000),
     ]);
-  } catch (err) {
-    if (hit && Date.now() - hit.at < TERMINAL_STALE_MAX) return { ...hit.data, serverTime: Date.now() };
-    throw new Error("BTC chart feed unavailable");
+  } catch {
+    // Binance blocks some server regions — fall back to Coinbase (aggregated).
+    const cbBase: Record<string, string> = {
+      "1m": "1m", "5m": "5m", "15m": "15m", "30m": "15m", "45m": "15m",
+      "1h": "1h", "4h": "1h", "1d": "1d", "1D": "1d",
+    };
+    fetchTf = cbBase[tf] ?? "15m";
+    try {
+      candles = await fetchFromCoinbaseSymbols(["BTCUSDT"], fetchTf);
+      provider = "Coinbase";
+    } catch {
+      if (hit && Date.now() - hit.at < TERMINAL_STALE_MAX) return { ...hit.data, serverTime: Date.now() };
+      throw new Error("BTC chart feed unavailable");
+    }
   }
   const step = TF_MS[tf] ?? TF_MS["30m"];
+  const aggregate = (TF_MS[fetchTf] ?? step) !== step;
   const byBucket = new Map<number, Candle>();
   for (const c of candles) {
     const bucket = Math.floor(c.t / step) * step;
     const prev = byBucket.get(bucket);
-    byBucket.set(bucket, prev && fetchTf !== tf
+    byBucket.set(bucket, prev && aggregate
       ? { ...prev, h: Math.max(prev.h, c.h), l: Math.min(prev.l, c.l), c: c.c, v: (prev.v || 0) + (c.v || 0) }
       : c);
   }
@@ -1390,7 +1403,7 @@ async function loadBtcTerminalChart(tf: string): Promise<TerminalChartPayload> {
     timeframe: tf,
     asset: "BTCUSD",
     source: "binance",
-    provider: "Binance",
+    provider,
     serverTime: Date.now(),
     stepSeconds: step / 1000,
     bars: [...byBucket.entries()].sort((a, b) => a[0] - b[0]).map(([bucket, c]) => ({
