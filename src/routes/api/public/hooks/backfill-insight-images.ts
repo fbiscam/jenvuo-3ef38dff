@@ -6,11 +6,8 @@ export const Route = createFileRoute("/api/public/hooks/backfill-insight-images"
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const cronSecret = process.env.CRON_SECRET || process.env.LOVABLE_CRON_SECRET;
-        if (!cronSecret) return Response.json({ error: "CRON_SECRET missing" }, { status: 500 });
-        if ((request.headers.get("x-cron-secret") || "") !== cronSecret) {
-          return Response.json({ error: "unauthorized" }, { status: 401 });
-        }
+        const { isAuthorizedCronRequest, cronUnauthorized } = await import("@/lib/cron-guard.server");
+        if (!(await isAuthorizedCronRequest(request))) return cronUnauthorized();
 
         const url = new URL(request.url);
         const limit = Math.min(Number(url.searchParams.get("limit") || 3), 8);

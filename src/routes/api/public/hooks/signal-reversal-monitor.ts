@@ -59,11 +59,8 @@ export const Route = createFileRoute(
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const apikey = request.headers.get("apikey") ?? "";
-        const expected = process.env.SUPABASE_PUBLISHABLE_KEY ?? "";
-        if (!apikey || apikey !== expected) {
-          return new Response("Unauthorized", { status: 401 });
-        }
+        const { isAuthorizedCronRequest, cronUnauthorized } = await import("@/lib/cron-guard.server");
+        if (!(await isAuthorizedCronRequest(request))) return cronUnauthorized();
 
         const { supabaseAdmin } = await import(
           "@/integrations/supabase/client.server"
@@ -86,7 +83,7 @@ export const Route = createFileRoute(
 
         if (error) {
           return Response.json(
-            { ok: false, error: error.message },
+            { ok: false, error: "database_error" },
             { status: 500 },
           );
         }

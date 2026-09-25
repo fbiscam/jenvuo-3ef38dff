@@ -65,14 +65,8 @@ export const Route = createFileRoute("/api/public/hooks/generate-insight")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const cronSecret = process.env.CRON_SECRET;
-        if (!cronSecret) {
-          return new Response(JSON.stringify({ error: "CRON_SECRET missing" }), { status: 500 });
-        }
-        const provided = request.headers.get("x-cron-secret") || "";
-        if (provided !== cronSecret) {
-          return new Response(JSON.stringify({ error: "unauthorized" }), { status: 401 });
-        }
+        const { isAuthorizedCronRequest, cronUnauthorized } = await import("@/lib/cron-guard.server");
+        if (!(await isAuthorizedCronRequest(request))) return cronUnauthorized();
 
 
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");

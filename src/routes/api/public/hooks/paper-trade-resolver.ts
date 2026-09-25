@@ -244,11 +244,8 @@ export const Route = createFileRoute("/api/public/hooks/paper-trade-resolver")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const apikey = request.headers.get("apikey") ?? "";
-        const expected = process.env.SUPABASE_PUBLISHABLE_KEY ?? "";
-        if (!apikey || apikey !== expected) {
-          return new Response("Unauthorized", { status: 401 });
-        }
+        const { isAuthorizedCronRequest, cronUnauthorized } = await import("@/lib/cron-guard.server");
+        if (!(await isAuthorizedCronRequest(request))) return cronUnauthorized();
 
         const { supabaseAdmin } = await import(
           "@/integrations/supabase/client.server"
@@ -268,7 +265,7 @@ export const Route = createFileRoute("/api/public/hooks/paper-trade-resolver")({
           .limit(200);
 
         if (error) {
-          return Response.json({ ok: false, error: error.message }, { status: 500 });
+          return Response.json({ ok: false, error: "database_error" }, { status: 500 });
         }
         if (!pending || pending.length === 0) {
           return Response.json({ ok: true, resolved: 0 });
