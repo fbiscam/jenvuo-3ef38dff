@@ -261,13 +261,33 @@ export function computeSmcOverlay(
   const all = forming ? [...fractalBars, toCandle(forming)] : fractalBars;
   const pressure: Record<number, number> = {};
   const idxOf = new Map(all.map((c, i) => [c.t, i]));
+  // Extreme-level pressure: who took control AT the swing, not who built the leg.
+  // Uses the swing candle's wick rejection plus the reaction candles after it,
+  // so a high where sellers stepped in reads seller-heavy (and vice versa).
   const legFor = (t: number, kind: "high" | "low") => {
-    const end = idxOf.get(t);
-    if (end == null) return;
-    const prevOpp = [...fractal.pivots].reverse().find((q) => q.kind !== kind && q.t < t);
-    const start = prevOpp ? (idxOf.get(prevOpp.t) ?? end - FRACTAL_RADIUS) : end - FRACTAL_RADIUS;
-    const pct = legBuyerPercent(all, start, end);
-    if (pct != null) pressure[t] = pct;
+    const i = idxOf.get(t);
+    if (i == null) return;
+    const piv = all[i];
+    const range = piv.h - piv.l;
+    let buy = 0;
+    let total = 0;
+    if (range > 0) {
+      // Rejection wick on the extreme candle counts double for the rejecting side.
+      const upper = piv.h - Math.max(piv.o, piv.c);
+      const lower = Math.min(piv.o, piv.c) - piv.l;
+      const w = 2;
+      buy += (kind === "low" ? lower : 0) * w + (piv.c - piv.l);
+      total += (kind === "low" ? lower : upper) * w + range;
+    }
+    const end = Math.min(all.length - 1, i + FRACTAL_RADIUS);
+    for (let k = i + 1; k <= end; k++) {
+      const c = all[k];
+      const r = c.h - c.l;
+      if (!(r > 0)) continue;
+      buy += c.c - c.l;
+      total += r;
+    }
+    if (total > 0) pressure[t] = Math.round((buy / total) * 100);
   };
   for (const p of pivotsLabelled) legFor(p.t, p.kind);
   for (const p of livePivots) legFor(p.t, p.kind);
