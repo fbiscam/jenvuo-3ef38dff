@@ -42,7 +42,24 @@ export type SmcOverlay = {
   sellSide: number[];
   trend: string;
   windowStart: number | null;
+  /** Buyer % (0-100) for the leg that built each swing, keyed by pivot time. */
+  pressure?: Record<number, number>;
 };
+
+type PCandle = { t: number; o: number; h: number; l: number; c: number };
+/** Buyer share of the leg ending at `end`: close position inside each candle's range. */
+export function legBuyerPercent(candles: PCandle[], start: number, end: number): number | null {
+  let buy = 0;
+  let total = 0;
+  for (let i = Math.max(0, start); i <= Math.min(end, candles.length - 1); i++) {
+    const k = candles[i];
+    const range = k.h - k.l;
+    if (!(range > 0)) continue;
+    buy += k.c - k.l;
+    total += range;
+  }
+  return total > 0 ? Math.round((buy / total) * 100) : null;
+}
 
 export type SmcToggles = {
   structure: boolean;
@@ -241,7 +258,21 @@ export function computeSmcOverlay(
   )
     .sort((a, b) => b - a)
     .slice(0, 4);
+  const all = forming ? [...fractalBars, toCandle(forming)] : fractalBars;
+  const pressure: Record<number, number> = {};
+  const idxOf = new Map(all.map((c, i) => [c.t, i]));
+  const legFor = (t: number, kind: "high" | "low") => {
+    const end = idxOf.get(t);
+    if (end == null) return;
+    const prevOpp = [...fractal.pivots].reverse().find((q) => q.kind !== kind && q.t < t);
+    const start = prevOpp ? (idxOf.get(prevOpp.t) ?? end - FRACTAL_RADIUS) : end - FRACTAL_RADIUS;
+    const pct = legBuyerPercent(all, start, end);
+    if (pct != null) pressure[t] = pct;
+  };
+  for (const p of pivotsLabelled) legFor(p.t, p.kind);
+  for (const p of livePivots) legFor(p.t, p.kind);
   return {
+    pressure,
     pivots: pivotsLabelled,
     livePivots,
     breaks: breaks.slice(-8),
@@ -430,6 +461,36 @@ export function renderSmcOverlay(
        ctx.fillText(label, labelX, b.dir === "bullish" ? y - 5 : y + 13);
     }
   }
+  const pressureBadge = (t: number, xx: number, yy: number, up: boolean) => {
+    const buy = smc.pressure?.[t];
+    if (buy == null) return;
+    const sell = 100 - buy;
+    const bw = 64;
+    const bh = 16;
+    const bx = xx - bw / 2;
+    const by = up ? yy - bh - 3 : yy + 14 + 3;
+    ctx.save();
+    ctx.fillStyle = "rgba(255,255,255,0.96)";
+    ctx.strokeStyle = "#d6dae3";
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.roundRect?.(bx, by, bw, bh, 4);
+    if (!ctx.roundRect) ctx.rect(bx, by, bw, bh);
+    ctx.fill();
+    ctx.stroke();
+    const barY = by + bh - 4;
+    ctx.fillStyle = "#089981";
+    ctx.fillRect(bx + 3, barY, ((bw - 6) * buy) / 100, 2);
+    ctx.fillStyle = "#f23645";
+    ctx.fillRect(bx + 3 + ((bw - 6) * buy) / 100, barY, ((bw - 6) * sell) / 100, 2);
+    ctx.font = "600 9px 'JetBrains Mono', ui-monospace, monospace";
+    ctx.fillStyle = "#089981";
+    ctx.fillText(`B${buy}%`, bx + 4, by + 9);
+    ctx.fillStyle = "#f23645";
+    const st = `S${sell}%`;
+    ctx.fillText(st, bx + bw - 4 - ctx.measureText(st).width, by + 9);
+    ctx.restore();
+  };
   if (toggles.structure) {
     for (const p of smc.pivots) {
       const x = pr.x(p.t / 1000);
@@ -449,6 +510,7 @@ export function renderSmcOverlay(
       ctx.fill();
       ctx.fillStyle = "#ffffff";
        ctx.fillText(p.label, xx - w / 2 + 4, yy + 10.5);
+      pressureBadge(p.t, xx, yy, up);
     }
     // Live (unconfirmed) swings: outlined dashed badge that follows the forming candle.
     for (const p of smc.livePivots ?? []) {
@@ -475,6 +537,7 @@ export function renderSmcOverlay(
       ctx.setLineDash([]);
       ctx.fillStyle = color;
        ctx.fillText(text, xx - w / 2 + 4, yy + 10.5);
+      pressureBadge(p.t, xx, yy, up);
     }
   }
   ctx.restore();
