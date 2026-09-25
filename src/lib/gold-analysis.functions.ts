@@ -3568,9 +3568,38 @@ async function fetchFxProxyRate(symbol: string): Promise<number | null> {
 // Real-time spot quote for precious metals (XAU/XAG). Yahoo's XAUUSD=X can lag
 // several dollars vs live spot; gold-api.com mirrors what TradingView's OANDA
 // spot feed shows and is refreshed every few seconds.
+/** Swissquote public bid/ask feed — real-time spot gold (updates every second). */
+async function fetchSwissquoteXau(): Promise<LiveTick | null> {
+  try {
+    const res = await fetchWithTimeout(
+      "https://forex-data-feed.swissquote.com/public-quotes/bboquotes/instrument/XAU/USD",
+      { headers: { "User-Agent": "Mozilla/5.0", Accept: "application/json" } },
+    );
+    if (!res.ok) return null;
+    const rows: any[] = await res.json();
+    let best: { t: number; mid: number } | null = null;
+    for (const row of Array.isArray(rows) ? rows : []) {
+      const p = row?.spreadProfilePrices?.[0];
+      const bid = Number(p?.bid);
+      const ask = Number(p?.ask);
+      const t = Number(row?.ts);
+      if (!(bid > 0 && ask > 0 && Number.isFinite(t))) continue;
+      if (!best || t > best.t) best = { t, mid: (bid + ask) / 2 };
+    }
+    if (!best || Date.now() - best.t > 120_000) return null;
+    return { price: Math.round(best.mid * 100) / 100, t: best.t } as LiveTick;
+  } catch {
+    return null;
+  }
+}
+
 async function fetchMetalSpotQuote(inst: ResolvedInstrument): Promise<LiveTick | null> {
   if (inst.kind !== "metal") return null;
   const base = inst.key === "METAL:XAGUSD" ? "XAG" : "XAU";
+  if (inst.key === "METAL:XAUUSD") {
+    const sq = await fetchSwissquoteXau();
+    if (sq) return sq;
+  }
   try {
     const res = await fetchWithTimeout(`https://api.gold-api.com/price/${base}`, {
       headers: { "User-Agent": "Mozilla/5.0", Accept: "application/json" },
