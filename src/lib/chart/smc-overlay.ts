@@ -289,16 +289,30 @@ export function computeSmcOverlay(
     // 2) Reaction flow: volume-weighted close location + body direction.
     const end = Math.min(all.length - 1, i + FRACTAL_RADIUS);
     const avgV = all.slice(Math.max(0, i - 20), i + 1).reduce((s, c) => s + (c.v ?? 0), 0) / 21 || 1;
+    const avgR =
+      all.slice(Math.max(0, i - 20), i + 1).reduce((s, c) => s + (c.h - c.l), 0) / 21 || 1;
     let fb = 0, fw = 0, far = high ? Infinity : -Infinity;
+    let streak = 0; // consecutive candles closing in the reversal direction
+    let delta = 0; // cumulative body, signed + = buyers
+    let climaxVol = 0; // biggest volume spike in the reaction
     for (let k = i + 1; k <= end; k++) {
       const c = all[k];
       const r = c.h - c.l;
       if (!(r > 0)) continue;
-      const w = (c.v && c.v > 0 ? c.v / avgV : 1) * r;
+      const volW = c.v && c.v > 0 ? c.v / avgV : 1;
+      const w = volW * r;
       const loc = (c.c - c.l) / r;
       const body = (c.c - c.o) / r; // -1..1
       fb += w * clamp01(0.6 * loc + 0.4 * (0.5 + body / 2));
       fw += w;
+      delta += body * volW;
+      if (volW > climaxVol) climaxVol = volW;
+      // Momentum streak: does the reaction keep printing same-direction candles?
+      const dir = c.c > c.o ? 1 : c.c < c.o ? -1 : 0;
+      if (dir !== 0) {
+        const revDir = high ? -1 : 1; // after a high, sellers = bearish candles
+        streak = dir === revDir ? streak + 1 : 0;
+      }
       far = high ? Math.min(far, c.l) : Math.max(far, c.h);
     }
     const bars = end - i;
@@ -307,11 +321,28 @@ export function computeSmcOverlay(
     // 3) Displacement: distance price travelled away from the level (2 ATR = full).
     const move = bars > 0 && atr > 0 ? clamp01((high ? piv.h - far : far - piv.l) / (2 * atr)) : 0;
     const disp = high ? 0.5 - move / 2 : 0.5 + move / 2;
+    // 4) Momentum burst: signed cumulative delta normalised by bars, plus the
+    //    longest same-direction streak. Strong one-sided reactions = strong side.
+    const deltaNorm = bars > 0 ? clamp01(0.5 + delta / (bars * 2)) : 0.5;
+    const streakNorm = clamp01(streak / 3); // 3+ consecutive candles = full
+    const momentum = 0.6 * deltaNorm + 0.4 * streakNorm;
+    // 5) Exhaustion climax: a volume spike >= 1.5x average at the extreme marks
+    //    capitulation; blend it toward the side that won the rejection.
+    const climax = clamp01((climaxVol - 1) / 1.5); // 0 until 1.5x, 1 at 2.5x+
     // Fresh swings lean on rejection until reaction candles print.
-    const wRej = 0.35 + 0.35 * (1 - evidence);
-    const wFlow = 0.4 * evidence;
-    const wDisp = 0.25 * evidence;
-    const buy = (rejection * wRej + flow * wFlow + disp * wDisp) / (wRej + wFlow + wDisp);
+    const wRej = 0.3 + 0.3 * (1 - evidence);
+    const wFlow = 0.3 * evidence;
+    const wDisp = 0.2 * evidence;
+    const wMom = 0.2 * evidence;
+    let buy =
+      (rejection * wRej + flow * wFlow + disp * wDisp + momentum * wMom) /
+      (wRej + wFlow + wDisp + wMom);
+    // Climax volume amplifies whichever side the rejection already favours.
+    buy = buy + (buy - 0.5) * 0.4 * climax;
+    // Conviction sharpening: the more closed-candle evidence we have, the more
+    // the score is pushed away from 50/50 toward the winning side.
+    const sharpen = 1 + 0.5 * evidence;
+    buy = 0.5 + (buy - 0.5) * sharpen;
     pressure[t] = Math.round(clamp01(buy) * 100);
   };
   for (const p of pivotsLabelled) legFor(p.t, p.kind);
