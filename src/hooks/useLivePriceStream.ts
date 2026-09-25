@@ -86,7 +86,9 @@ export function useLivePriceStream(
               basis = 0;
             } else if (t.price !== lastSpot) {
               lastSpot = t.price;
-              basis = t.price - lastStreamPrice;
+              const raw = t.price - lastStreamPrice;
+              // Smooth the spot adjustment so the price doesn't jump on every recalibration.
+              basis = basis == null || Math.abs(raw - basis) > 5 ? raw : basis * 0.6 + raw * 0.4;
             }
             if (basis == null) basis = t.price - lastStreamPrice;
             if (!streamAlive()) pushTick(t.price, typeof t.t === "number" ? t.t : Date.now());
