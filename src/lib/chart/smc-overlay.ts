@@ -289,8 +289,6 @@ export function computeSmcOverlay(
     // 2) Reaction flow: volume-weighted close location + body direction.
     const end = Math.min(all.length - 1, i + FRACTAL_RADIUS);
     const avgV = all.slice(Math.max(0, i - 20), i + 1).reduce((s, c) => s + (c.v ?? 0), 0) / 21 || 1;
-    const avgR =
-      all.slice(Math.max(0, i - 20), i + 1).reduce((s, c) => s + (c.h - c.l), 0) / 21 || 1;
     let fb = 0, fw = 0, far = high ? Infinity : -Infinity;
     let streak = 0; // consecutive candles closing in the reversal direction
     let delta = 0; // cumulative body, signed + = buyers
