@@ -99,16 +99,13 @@ export function selectHighConfidencePois(
   const averageFvgSize =
     untouchedFvgs.reduce((total, gap) => total + gap.size, 0) / Math.max(1, untouchedFvgs.length);
   const meaningfulFvgs = untouchedFvgs.filter((gap) => gap.size >= averageFvgSize);
+  // Scores depend only on closed-candle facts (never live price) so the chosen
+  // zone stays fixed while the forming candle moves instead of flickering.
   const fvgs = chooseOnePerType(
     meaningfulFvgs,
-    (gap) =>
-      (gap.size / Math.max(averageFvgSize, Number.EPSILON)) * 100 +
-      gap.index +
-      500 / (1 + zoneDistance(gap.top, gap.bottom, price)),
+    (gap) => (gap.size / Math.max(averageFvgSize, Number.EPSILON)) * 100 + gap.index,
   );
 
-  // Untouched OBs; confluence (sweep / FVG / displacement) boosts score so the
-  // strongest zone per side wins, but a valid zone is never hidden entirely.
   const activeOrderBlocks = poi.order_blocks.filter((zone) => zone.status !== "MITIGATED");
   const orderBlocks = chooseOnePerType(
     activeOrderBlocks,
@@ -117,8 +114,7 @@ export function selectHighConfidencePois(
       (zone.swept_liquidity ? 300 : 0) +
       (zone.is_fvg_aligned ? 300 : 0) +
       (zone.status === "UNMITIGATED" ? 200 : 0) +
-      zone.index +
-      500 / (1 + zoneDistance(zone.top, zone.bottom, price)),
+      zone.index,
   );
 
   // Never let markings sit on top of each other: keep order blocks first
