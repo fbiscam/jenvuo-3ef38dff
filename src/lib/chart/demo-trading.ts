@@ -40,13 +40,24 @@ export const createDemoAccount = (): DemoAccount => ({
 
 /** Returns the SL/TP price hit by the current price, if any. */
 export function triggeredExit(position: DemoPosition, price: number): { reason: "tp" | "sl"; price: number } | null {
+  return triggeredExitInRange(position, price, price);
+}
+
+/**
+ * Returns the configured exit touched anywhere inside a live mid-price range.
+ * Long positions execute against bid; short positions execute against ask.
+ * If an unknown intrabar path spans both exits, SL wins conservatively.
+ */
+export function triggeredExitInRange(position: DemoPosition, low: number, high: number): { reason: "tp" | "sl"; price: number } | null {
   const { stopLoss: sl, takeProfit: tp, side } = position;
+  const lowQuote = bidAsk(Math.min(low, high));
+  const highQuote = bidAsk(Math.max(low, high));
   if (side === "buy") {
-    if (sl && price <= sl) return { reason: "sl", price: sl };
-    if (tp && price >= tp) return { reason: "tp", price: tp };
+    if (sl != null && lowQuote.bid <= sl) return { reason: "sl", price: sl };
+    if (tp != null && highQuote.bid >= tp) return { reason: "tp", price: tp };
   } else {
-    if (sl && price >= sl) return { reason: "sl", price: sl };
-    if (tp && price <= tp) return { reason: "tp", price: tp };
+    if (sl != null && highQuote.ask >= sl) return { reason: "sl", price: sl };
+    if (tp != null && lowQuote.ask <= tp) return { reason: "tp", price: tp };
   }
   return null;
 }

@@ -169,3 +169,4 @@
 - [x] Upgrade Terminal AI to a veteran, SMC-first mindset with explicit conditional trade plans and no fabricated win-rate claims
 - [x] Add TradingView-style persistent demo trading to the Terminal and verify the full position lifecycle
 - [x] Sharpen and enlarge typography in the Indicators, Jenvu SMC, and Demo Trading menus
+- [x] Auto-close demo trades reliably when live candle ranges touch SL or TP

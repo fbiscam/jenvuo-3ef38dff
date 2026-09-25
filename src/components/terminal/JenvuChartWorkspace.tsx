@@ -322,8 +322,13 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
     };
     return nextBars;
   }, [rawBars, livePrice, stepSeconds]);
-  const currentPrice = bars.at(-1)?.close ?? null;
-  const demo = useDemoTrading(currentPrice);
+  const activeBar = bars.at(-1);
+  const currentPrice = activeBar?.close ?? null;
+  const demo = useDemoTrading(currentPrice, activeBar ? {
+    low: activeBar.low,
+    high: activeBar.high,
+    startedAt: activeBar.time * 1000,
+  } : null);
   const demoPositions = demo.account.positions;
   const demoActions = demo.actions;
 

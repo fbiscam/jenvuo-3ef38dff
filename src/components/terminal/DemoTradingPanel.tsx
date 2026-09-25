@@ -12,7 +12,7 @@ import {
   DEMO_STARTING_BALANCE,
   pendingShouldFill,
   positionPnl,
-  triggeredExit,
+  triggeredExitInRange,
   type DemoAccount,
   type DemoOrderType,
   type DemoPosition,
@@ -52,8 +52,14 @@ export type OrderRequest = {
   takeProfit?: number | null;
 };
 
+export type DemoPriceRange = {
+  low: number;
+  high: number;
+  startedAt: number;
+};
+
 /** Paper-trading state: persistence, auto SL/TP exits, pending-order fills. */
-export function useDemoTrading(currentPrice: number | null) {
+export function useDemoTrading(currentPrice: number | null, currentRange?: DemoPriceRange | null) {
   const [account, setAccount] = useState<DemoAccount>(() => createDemoAccount());
   const [ready, setReady] = useState(false);
   const priceRef = useRef(currentPrice);
@@ -79,7 +85,11 @@ export function useDemoTrading(currentPrice: number | null) {
       let next = cur;
       const { bid, ask } = bidAsk(currentPrice);
       for (const p of cur.positions) {
-        const hit = triggeredExit(p, currentPrice);
+        // A candle's earlier wick must not close a position opened later in that candle.
+        const canUseWholeRange = currentRange && p.openedAt <= currentRange.startedAt;
+        const low = canUseWholeRange ? currentRange.low : currentPrice;
+        const high = canUseWholeRange ? currentRange.high : currentPrice;
+        const hit = triggeredExitInRange(p, low, high);
         if (hit) next = closeDemoPosition(next, p.id, hit.price, hit.reason);
       }
       const orders = next.orders ?? [];
@@ -104,7 +114,7 @@ export function useDemoTrading(currentPrice: number | null) {
       }
       return next;
     });
-  }, [currentPrice, ready]);
+  }, [currentPrice, currentRange?.high, currentRange?.low, currentRange?.startedAt, ready]);
 
   const metrics = useMemo(() => {
     const px = currentPrice ?? 0;
