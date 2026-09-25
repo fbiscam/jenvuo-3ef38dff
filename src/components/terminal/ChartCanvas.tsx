@@ -33,16 +33,33 @@ import type { DemoPosition } from "@/lib/chart/demo-trading";
 import { DemoOrderOverlay, type DemoOrderActions } from "./DemoOrderOverlay";
 import { buildIndicatorSeries, type IndicatorId } from "./indicator-specs";
 
-export const CHART_COLORS = {
-  bg: "#ffffff",
-  text: "#131722",
-  grid: "#d3d9e2",
-  border: "#d6dae3",
-  up: "#089981",
-  down: "#f23645",
-  insideBar: "#38bdf8",
-  insideBarCandle: "#eab308",
+export type ChartTheme = "light" | "dark";
+
+export const CHART_THEMES: Record<ChartTheme, { bg: string; text: string; grid: string; border: string; up: string; down: string; insideBar: string; insideBarCandle: string }> = {
+  light: {
+    bg: "#ffffff",
+    text: "#131722",
+    grid: "#d3d9e2",
+    border: "#d6dae3",
+    up: "#089981",
+    down: "#f23645",
+    insideBar: "#38bdf8",
+    insideBarCandle: "#eab308",
+  },
+  // TradingView-style dark palette
+  dark: {
+    bg: "#131722",
+    text: "#d1d4dc",
+    grid: "#1e222d",
+    border: "#2a2e39",
+    up: "#089981",
+    down: "#f23645",
+    insideBar: "#38bdf8",
+    insideBarCandle: "#eab308",
+  },
 };
+
+export const CHART_COLORS = CHART_THEMES.light;
 
 const isInsideBarMarker = (title: string, text: string) =>
   text.trim().toUpperCase() === "IB" || title.trim().toLowerCase() === "inside bar";
@@ -75,6 +92,7 @@ type Props = {
   onToolDone: () => void;
   onHoverBar: (index: number | null) => void;
   resetKey: string;
+  theme?: ChartTheme;
 };
 
 const uid = () => `d-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`;
@@ -180,23 +198,24 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
   useEffect(() => {
     const host = hostRef.current;
     if (!host) return;
+    const themeColors = CHART_THEMES[propsRef.current.theme ?? "light"];
     const chart = createChart(host, {
       autoSize: true,
       layout: {
-        background: { type: ColorType.Solid, color: CHART_COLORS.bg },
-        textColor: CHART_COLORS.text,
+        background: { type: ColorType.Solid, color: themeColors.bg },
+        textColor: themeColors.text,
         fontFamily: "'DM Sans', system-ui, sans-serif",
         fontSize: 11,
-        panes: { separatorColor: CHART_COLORS.border, enableResize: true },
+        panes: { separatorColor: themeColors.border, enableResize: true },
       },
       grid: {
-        vertLines: { color: CHART_COLORS.grid },
-        horzLines: { color: CHART_COLORS.grid },
+        vertLines: { color: themeColors.grid },
+        horzLines: { color: themeColors.grid },
       },
       crosshair: { mode: CrosshairMode.Normal },
-      rightPriceScale: { borderColor: CHART_COLORS.border },
+      rightPriceScale: { borderColor: themeColors.border },
       timeScale: {
-        borderColor: CHART_COLORS.border,
+        borderColor: themeColors.border,
         timeVisible: true,
         secondsVisible: false,
         rightOffset: 8,
@@ -252,6 +271,24 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // ------------------------------------------------------------- theme switch
+  useEffect(() => {
+    const chart = chartRef.current;
+    if (!chart) return;
+    const t = CHART_THEMES[props.theme ?? "light"];
+    chart.applyOptions({
+      layout: {
+        background: { type: ColorType.Solid, color: t.bg },
+        textColor: t.text,
+        panes: { separatorColor: t.border, enableResize: true },
+      },
+      grid: { vertLines: { color: t.grid }, horzLines: { color: t.grid } },
+      rightPriceScale: { borderColor: t.border },
+      timeScale: { borderColor: t.border },
+    });
+    dirtyRef.current += 1;
+  }, [props.theme]);
 
   const visibleDrawings = () => {
     const p = propsRef.current;
