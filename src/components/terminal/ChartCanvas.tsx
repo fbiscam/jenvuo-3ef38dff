@@ -198,23 +198,24 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
   useEffect(() => {
     const host = hostRef.current;
     if (!host) return;
+    const themeColors = CHART_THEMES[propsRef.current.theme ?? "light"];
     const chart = createChart(host, {
       autoSize: true,
       layout: {
-        background: { type: ColorType.Solid, color: CHART_COLORS.bg },
-        textColor: CHART_COLORS.text,
+        background: { type: ColorType.Solid, color: themeColors.bg },
+        textColor: themeColors.text,
         fontFamily: "'DM Sans', system-ui, sans-serif",
         fontSize: 11,
-        panes: { separatorColor: CHART_COLORS.border, enableResize: true },
+        panes: { separatorColor: themeColors.border, enableResize: true },
       },
       grid: {
-        vertLines: { color: CHART_COLORS.grid },
-        horzLines: { color: CHART_COLORS.grid },
+        vertLines: { color: themeColors.grid },
+        horzLines: { color: themeColors.grid },
       },
       crosshair: { mode: CrosshairMode.Normal },
-      rightPriceScale: { borderColor: CHART_COLORS.border },
+      rightPriceScale: { borderColor: themeColors.border },
       timeScale: {
-        borderColor: CHART_COLORS.border,
+        borderColor: themeColors.border,
         timeVisible: true,
         secondsVisible: false,
         rightOffset: 8,
