@@ -241,7 +241,8 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
         const r = base();
         if (!r?.priceRange) return r;
         const lr = chart.timeScale().getVisibleLogicalRange();
-        const key = `${propsRef.current.bars.length}|${lr ? Math.round(Number(lr.from)) : 0}|${lr ? Math.round(Number(lr.to)) : 0}`;
+        const b0 = propsRef.current.bars[0];
+        const key = `${b0?.time ?? 0}:${b0?.open ?? 0}|${propsRef.current.bars.length}|${lr ? Math.round(Number(lr.from)) : 0}|${lr ? Math.round(Number(lr.to)) : 0}`;
         const st = stickyRangeRef.current;
         // A new dataset (pair/timeframe switch) that doesn't overlap the old range starts fresh.
         const disjoint = st && (r.priceRange.minValue > st.max || r.priceRange.maxValue < st.min);
