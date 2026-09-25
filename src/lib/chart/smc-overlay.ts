@@ -33,6 +33,12 @@ export type LivePivot = {
   confirmIn: number;
   /** Locked early because the opposite swing already formed after it. */
   confirmedByOpposite?: boolean;
+  /** A candle CLOSE beyond this level (above for a low, below for a high) locks the swing early. */
+  earlyLevel?: number;
+  /** 0–100 likelihood the swing holds until confirmation. */
+  confirmChance?: number;
+  /** Epoch ms when the last required candle closes. */
+  confirmAt?: number;
 };
 
 export type SmcOverlay = {
@@ -214,11 +220,33 @@ export function computeLivePivots(
   // in immediately — no need to wait for the full 10 candles.
   const hi = out.find((p) => p.kind === "high");
   const lo = out.find((p) => p.kind === "low");
+  // Heavy confirmation read: early-lock level, hold probability and ETA.
+  const step = closed.length > 1 ? closed[closed.length - 1].t - closed[closed.length - 2].t : 0;
+  const trs = closed.slice(-14).map((c, k, a) => Math.max(c.h - c.l, k ? Math.abs(c.h - a[k - 1].c) : 0, k ? Math.abs(c.l - a[k - 1].c) : 0));
+  const atr = trs.length ? trs.reduce((x, y) => x + y, 0) / trs.length : 0;
+  const last = all[all.length - 1];
+  for (const p of out) {
+    const idx = all.findIndex((c) => c.t === p.t);
+    const piv = all[idx];
+    const isHigh = p.kind === "high";
+    // Early lock: close through the swing candle's opposite extreme (displacement away).
+    p.earlyLevel = isHigh ? piv.l : piv.h;
+    const lastClosedT = closed.length ? closed[closed.length - 1].t : piv.t;
+    p.confirmAt = step > 0 ? lastClosedT + step * (p.confirmIn + (forming ? 1 : 0)) : undefined;
+    const dist = atr > 0 ? Math.abs(last.c - p.price) / atr : 0;
+    const wick = piv.h - piv.l > 0 ? (isHigh ? piv.h - Math.max(piv.o, piv.c) : Math.min(piv.o, piv.c) - piv.l) / (piv.h - piv.l) : 0;
+    const done = (radius - p.confirmIn) / radius;
+    const early = isHigh ? last.c < p.earlyLevel : last.c > p.earlyLevel;
+    let chance = 25 + done * 35 + Math.min(1, dist / 2) * 25 + wick * 10 + (early ? 10 : 0);
+    if (p.onFormingCandle) chance = Math.min(chance, 40);
+    p.confirmChance = Math.round(Math.max(5, Math.min(97, chance)));
+  }
   if (hi && lo && hi.t !== lo.t) {
     const [earlier, later] = hi.t < lo.t ? [hi, lo] : [lo, hi];
     if (later.barsAfter >= 1) {
       earlier.confirmIn = 0;
       earlier.confirmedByOpposite = true;
+      earlier.confirmChance = 100;
     }
   }
   return out;
@@ -652,8 +680,8 @@ export function renderSmcOverlay(
       // Confirmation tracker: candles left + invalidation level.
       const left = p.confirmIn ?? 0;
       const done = FRACTAL_RADIUS - left;
-      const tw = 158;
-      const th = 30;
+      const tw = 190;
+      const th = 52;
       const tx = xx - tw / 2;
       const ty = up ? yy - 22 - 4 - th - 4 : yy + 20 + 4 + 22 + 4;
       ctx.save();
@@ -674,6 +702,11 @@ export function renderSmcOverlay(
       ctx.font = "600 10px 'JetBrains Mono', ui-monospace, monospace";
       ctx.fillStyle = "#475569";
       ctx.fillText(`${up ? "Cancel above" : "Cancel below"} ${p.price.toFixed(2)}`, tx + 6, ty + 23);
+      if (p.earlyLevel != null)
+        ctx.fillText(`Early: close ${up ? "below" : "above"} ${p.earlyLevel.toFixed(2)}`, tx + 6, ty + 34);
+      const eta = p.confirmAt ? new Date(p.confirmAt).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" }) : "—";
+      ctx.fillStyle = color;
+      ctx.fillText(`Hold ${p.confirmChance ?? 0}% · ETA ${eta}`, tx + 6, ty + 45);
       const segW = (tw - 12) / FRACTAL_RADIUS;
       for (let s = 0; s < FRACTAL_RADIUS; s++) {
         ctx.fillStyle = s < done ? color : "#e2e8f0";
