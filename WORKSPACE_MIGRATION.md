@@ -10,19 +10,43 @@ Settings → Secrets se dobara add karni hongi.
 - Auth providers: Email/Password + Google. Naye workspace me Google provider dobara configure karna pad sakta hai.
 
 ## 2. Secrets (dobara add karne hain)
+Yeh list code se verify ki gayi hai (jo naam code me `process.env` se padhe jaate hain).
+
 Trading / AI:
-- BLUESMINDS_API_KEY, BLUESMIND_API_KEY (primary AI: bmind/gpt-4o, gpt-5.6-sol senior review)
-- OPENAI_API_KEY, DEEPSEEK_API_KEY, NVIDIA_API_KEY, BLACKBOX_API_KEY, GPT56_API_KEY
+- BLUESMIND_API_KEY, BLUESMIND_API_URL (primary AI)
+- CUSTOM_AI_API_KEY, CUSTOM_AI_BASE_URL (OmniRoute)
+- UNOROUTER_API_KEY (insight cover images), GOOGLE_AI_API_KEY (image fallback)
 - LOVABLE_API_KEY (managed — auto provision hoti hai, manually add na karein)
 
 Alerts:
-- WHATSAPP_API_TOKEN, WHATSAPP_PHONE_NUMBER_ID
-- TELEGRAM_BOT_TOKEN, TG_SELFTEST_TOKEN
+- WHATSAPP_API_TOKEN, WHATSAPP_ACCESS_TOKEN, WHATSAPP_PHONE_NUMBER_ID
+- TELEGRAM_BOT_TOKEN, TELEGRAM_API_KEY, TELEGRAM_CHAT_ID, TELEGRAM_CHAT_IDS
 
-Admin / ops:
+Admin / ops / cron:
 - ADMIN_USERNAME, ADMIN_PASSWORD, ADMIN_SESSION_SECRET
 - OPS_CONSOLE_ID, OPS_CONSOLE_PASS, OPS_CONSOLE_SESSION_SECRET
-- TOOLS_SESSION_SECRET, BUG_NOTIFY_SECRET, CRON_SECRET
+- CRON_SECRET, LOVABLE_CRON_SECRET, LOVABLE_CRON_SECRET_PREVIOUS
+
+Payments / misc:
+- CRYPTO_ADDR_BEP20, CRYPTO_ADDR_ERC20, CRYPTO_ADDR_TRC20, ETHERSCAN_API_KEY
+- APOLLO_API_KEY, FIRECRAWL_API_KEY, GOOGLE_MAPS_API_KEY, GOOGLE_SEARCH_CONSOLE_API_KEY (connectors se aate hain)
+- PUBLIC_APP_URL, LOVABLE_SEND_URL
+
+Backend auto (add na karein): SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, SUPABASE_SERVICE_ROLE_KEY.
+
+Abhi project me saved sab secrets (sab dobara add karein, taake kuch na toote):
+ADMIN_PASSWORD, ADMIN_SESSION_SECRET, ADMIN_USERNAME, AGENTROUTER_API_KEY, AGENTROUTER_BASE_URL,
+BLACKBOX_API_KEY, BLUESMINDS_API_KEY, BLUESMIND_API_KEY, BROWSER_USE_API_KEY, BROWSER_USE_API_KEY_2,
+BROWSER_USE_API_KEY_3, BUG_NOTIFY_SECRET, BYNARA_API_KEY, CLOUDFLARE_API_TOKEN, CRON_SECRET,
+CUSTOM_AI_API_KEY, CUSTOM_AI_BASE_URL, DEEPSEEK_API_KEY, EVOLINK_API_KEY, GPT56_API_KEY,
+JUSTWOKER_API_KEY, NVIDIA_API_KEY, OPENAI_API_KEY, OPS_CONSOLE_ID, OPS_CONSOLE_PASS,
+OPS_CONSOLE_SESSION_SECRET, TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_IDS, TG_SELFTEST_TOKEN,
+TOOLS_SESSION_SECRET, TUKENKU_API_KEY, UNIKEY_API_KEY, UNOROUTER_API_KEY, WHATSAPP_API_TOKEN,
+WHATSAPP_PHONE_NUMBER_ID. Connectors: Apollo, Firecrawl, Google Analytics, Google Maps, Google Search Console.
+
+Scheduled jobs (cron) ka password database ke andar private jagah (`internal.scheduler_credential`) me hai,
+isliye woh backend ke saath khud move hota hai. Move ke baad check karein ke scheduled jobs chal rahe hain
+(auto-scan, news alerts, insight generation) — agar 401 aaye to cron credential dobara rotate karein.
 
 ## 3. Connectors (naye workspace me dobara connect karne hain)
 - Apollo.io
