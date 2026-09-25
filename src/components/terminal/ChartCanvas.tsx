@@ -36,7 +36,7 @@ import { buildIndicatorSeries, type IndicatorId } from "./indicator-specs";
 export const CHART_COLORS = {
   bg: "#ffffff",
   text: "#131722",
-  grid: "#e8ecf3",
+  grid: "#b8c0cc",
   border: "#d6dae3",
   up: "#0a7d64",
   down: "#d32f3f",
