@@ -352,7 +352,7 @@ export function PaperTradingPanel({ trading, price, onClose, onEdit }: { trading
       </div>
       <div className="flex items-center gap-1.5 overflow-x-auto px-3 pb-2">
         {tabs.map(([id, label, count]) => (
-          <button key={id} type="button" onClick={() => setTab(id)} className={cn("shrink-0 rounded-full px-3 py-1 text-[13px] font-medium", tab === id ? "bg-foreground text-background" : "bg-secondary text-foreground hover:bg-accent")}>
+          <button key={id} type="button" onClick={() => setTab(id)} className={cn("shrink-0 rounded-full px-3 py-1 text-[13px] font-medium", tab === id ? "border border-foreground bg-background text-foreground" : "border border-transparent bg-secondary text-foreground hover:bg-accent")}>
             {label}{count != null && <span className="ml-1 opacity-60">{count}</span>}
           </button>
         ))}
