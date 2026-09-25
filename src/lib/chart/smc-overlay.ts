@@ -438,12 +438,12 @@ export function renderSmcOverlay(
     const labelY = y + height / 2;
     ctx.fillStyle = "rgba(255,255,255,0.92)";
     ctx.beginPath();
-    ctx.roundRect?.(labelX - 5, labelY - 8, textWidth + 10, 16, 3);
-    if (!ctx.roundRect) ctx.rect(labelX - 5, labelY - 8, textWidth + 10, 16);
+    ctx.roundRect?.(labelX - 6, labelY - 11, textWidth + 12, 22, 4);
+    if (!ctx.roundRect) ctx.rect(labelX - 6, labelY - 11, textWidth + 12, 22);
     ctx.fill();
     ctx.fillStyle = edge;
     ctx.textBaseline = "middle";
-    ctx.fillText(label, labelX, labelY + 0.5);
+    ctx.fillText(label, labelX, labelY + 1);
     ctx.textBaseline = "alphabetic";
   };
 
@@ -479,12 +479,12 @@ export function renderSmcOverlay(
     const labelY = y + height / 2;
     ctx.fillStyle = "rgba(255,255,255,0.92)";
     ctx.beginPath();
-    ctx.roundRect?.(labelX - 5, labelY - 8, textWidth + 10, 16, 3);
-    if (!ctx.roundRect) ctx.rect(labelX - 5, labelY - 8, textWidth + 10, 16);
+    ctx.roundRect?.(labelX - 6, labelY - 11, textWidth + 12, 22, 4);
+    if (!ctx.roundRect) ctx.rect(labelX - 6, labelY - 11, textWidth + 12, 22);
     ctx.fill();
     ctx.fillStyle = edge;
     ctx.textBaseline = "middle";
-    ctx.fillText(label, labelX, labelY + 0.5);
+    ctx.fillText(label, labelX, labelY + 1);
     ctx.textBaseline = "alphabetic";
   };
 
