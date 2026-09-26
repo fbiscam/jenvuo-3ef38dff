@@ -234,7 +234,8 @@ export function selectHighConfidencePois(
 }
 
 const toCandle = (b: OhlcvBar): Candle => ({ t: b.time * 1000, o: b.open, h: b.high, l: b.low, c: b.close, v: b.volume });
-const SHOW_PROVISIONAL_PIVOTS = true;
+// Only final, confirmed HH/HL/LH/LL labels render — no dashed provisional labels or countdown trackers.
+const SHOW_PROVISIONAL_PIVOTS = false;
 const lockedLabels = new Map<string, string>();
 
 /**
