@@ -757,8 +757,23 @@ export function renderSmcOverlay(
         pressureBadge(p.t, xx, yy, up);
         continue;
       }
-      // Unconfirmed swings are not drawn: a label appears only once, final, on its own candle.
-      if (!SHOW_PROVISIONAL_PIVOTS) continue;
+      // Early "High"/"Low" marker on the running swing (no countdown box).
+      if (!SHOW_PROVISIONAL_PIVOTS) {
+        const lp = smc.livePivots ?? [];
+        const latest = lp.reduce((a, b) => (b.t > a.t ? b : a), lp[0]);
+        if (p !== latest) continue;
+        const tag = up ? "High" : "Low";
+        const tw2 = ctx.measureText(tag).width + 14;
+        const ty2 = up ? y - 24 : y + 5;
+        ctx.fillStyle = up ? "rgba(242,54,69,0.45)" : "rgba(8,153,129,0.45)";
+        ctx.beginPath();
+        ctx.roundRect?.(xx - tw2 / 2, ty2, tw2, 18, 4);
+        if (!ctx.roundRect) ctx.rect(xx - tw2 / 2, ty2, tw2, 18);
+        ctx.fill();
+        ctx.fillStyle = "#ffffff";
+        ctx.fillText(tag, xx - tw2 / 2 + 7, ty2 + 13.5);
+        continue;
+      }
       ctx.fillStyle = "rgba(255,255,255,0.92)";
       ctx.beginPath();
        ctx.roundRect?.(xx - w / 2, yy, w, 18, 4);
