@@ -14,6 +14,9 @@ function binanceStreamFor(symbol: string): string | null {
 }
 /** Streams already quoted on the chart's own scale need no spot basis. */
 const NO_BASIS = new Set(["BTCUSD"]);
+const BACKUP_STREAMS: Record<string, string[]> = {
+  BTCUSD: ["wss://data-stream.binance.vision/ws/btcusdt@bookTicker", "wss://stream.binance.com:443/ws/btcusdt@bookTicker"],
+};
 
 
 
@@ -112,8 +115,19 @@ export function useLivePriceStream(
     const streamAlive = () => Date.now() - lastStreamAt < 5000;
     let firstTickTimer: ReturnType<typeof setTimeout> | null = null;
     if (stream && typeof WebSocket !== "undefined") {
-      try {
-        ws = new WebSocket(stream);
+      // Rotate between primary and backup hosts and reconnect when a socket drops,
+      // so the chart keeps moving on networks that block one Binance host.
+      const hosts = [stream, ...(BACKUP_STREAMS[symbol.toUpperCase().replace("/", "")] ?? [])];
+      let attempt = 0;
+      const connect = () => {
+        if (stopped) return;
+        try {
+          ws = new WebSocket(hosts[attempt % hosts.length]);
+        } catch {
+          attempt++;
+          firstTickTimer = setTimeout(connect, 2000);
+          return;
+        }
         ws.onmessage = (ev) => {
           try {
             const d = JSON.parse(ev.data);
@@ -126,11 +140,15 @@ export function useLivePriceStream(
           } catch { /* ignore */ }
         };
         ws.onerror = () => { /* fall through to onclose */ };
-        // Polling keeps running to supply spot basis and as fallback.
-        startPolling(intervalMs);
-      } catch {
-        startPolling(intervalMs);
-      }
+        ws.onclose = () => {
+          if (stopped) return;
+          attempt++;
+          firstTickTimer = setTimeout(connect, Math.min(1000 * attempt, 5000));
+        };
+      };
+      connect();
+      // Polling keeps running to supply spot basis and as fallback.
+      startPolling(intervalMs);
     } else {
       startPolling(intervalMs);
     }
