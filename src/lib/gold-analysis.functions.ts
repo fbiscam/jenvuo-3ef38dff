@@ -855,7 +855,7 @@ async function fetchFromBinanceSymbolsRaw(symbols: string[], tf: string): Promis
   throw lastErr instanceof Error ? lastErr : new Error("Binance unavailable");
 }
 
-async function fetchFromCoinbaseSymbols(symbols: string[], tf: string): Promise<Candle[]> {
+async function fetchFromCoinbaseSymbols(symbols: string[], tf: string, pages = 1): Promise<Candle[]> {
   const granularity: Record<string, number> = {
     "1m": 60,
     "5m": 300,
@@ -882,6 +882,28 @@ async function fetchFromCoinbaseSymbols(symbols: string[], tf: string): Promise<
         continue;
       }
       const rows: any[] = await res.json();
+      if (pages > 1 && rows.length) {
+        // Page backwards (300 candles per request) for deeper history.
+        let oldest = Math.min(...rows.map((r) => Number(r[0])));
+        const older = await Promise.all(
+          Array.from({ length: pages - 1 }, (_, i) => {
+            const end = oldest - i * 300 * g;
+            const start = end - 300 * g;
+            return fetchWithTimeout(
+              `https://api.exchange.coinbase.com/products/${product}/candles?granularity=${g}&start=${new Date(start * 1000).toISOString()}&end=${new Date(end * 1000).toISOString()}`,
+              { headers: { "User-Agent": "Mozilla/5.0", Accept: "application/json" } },
+              CANDLE_FETCH_TIMEOUT_MS,
+            )
+              .then((r) => (r.ok ? r.json() : []))
+              .catch(() => []);
+          }),
+        );
+        const seen = new Set(rows.map((r) => Number(r[0])));
+        for (const page of older) for (const r of Array.isArray(page) ? page : []) {
+          if (!seen.has(Number(r[0]))) { seen.add(Number(r[0])); rows.push(r); }
+        }
+        oldest = 0;
+      }
       const candles: Candle[] = rows
         .map((r) => ({
           t: Number(r[0]) * 1000,
@@ -893,7 +915,7 @@ async function fetchFromCoinbaseSymbols(symbols: string[], tf: string): Promise<
         }))
         .filter((c) => Number.isFinite(c.t) && Number.isFinite(c.c) && c.c > 0)
         .sort((a, b) => a.t - b.t);
-      if (candles.length >= 10) return candles.slice(-200);
+      if (candles.length >= 10) return pages > 1 ? candles : candles.slice(-200);
     } catch (e) {
       lastErr = e;
     }
@@ -1382,7 +1404,7 @@ async function loadBtcTerminalChart(tf: string): Promise<TerminalChartPayload> {
     };
     fetchTf = cbBase[tf] ?? "15m";
     try {
-      candles = await fetchFromCoinbaseSymbols(["BTCUSDT"], fetchTf);
+      candles = await fetchFromCoinbaseSymbols(["BTCUSDT"], fetchTf, 4);
       provider = "Coinbase";
     } catch {
       if (hit && Date.now() - hit.at < TERMINAL_STALE_MAX) return { ...hit.data, serverTime: Date.now() };
