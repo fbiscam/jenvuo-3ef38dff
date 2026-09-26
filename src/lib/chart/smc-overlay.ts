@@ -759,7 +759,8 @@ export function renderSmcOverlay(
       }
       // Early "High"/"Low" marker on the running swing (no countdown box).
       if (!SHOW_PROVISIONAL_PIVOTS) {
-        // New swing shown immediately with its real label (HH/HL/LH/LL) + buyer/seller %.
+        // New swing shown immediately with its real label (HH/HL/LH/LL).
+        // Buyer/seller % is only drawn on confirmed fractal-10 pivots.
         ctx.fillStyle = color;
         ctx.beginPath();
         ctx.roundRect?.(xx - w / 2, yy, w, 18, 4);
@@ -767,7 +768,6 @@ export function renderSmcOverlay(
         ctx.fill();
         ctx.fillStyle = "#ffffff";
         ctx.fillText(text, xx - w / 2 + 7, yy + 13.5);
-        pressureBadge(p.t, xx, yy, up);
         continue;
       }
       ctx.fillStyle = "rgba(255,255,255,0.92)";
