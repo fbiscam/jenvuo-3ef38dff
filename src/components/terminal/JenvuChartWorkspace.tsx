@@ -307,7 +307,10 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
     // created a race in newly opened Chrome profiles and left the query in error.
     queryFn: () => fetchChart({ data: { timeframe: timeframe.key, asset } }),
     refetchInterval: 5000,
-    placeholderData: (prev) => (prev?.asset === asset || (!prev?.asset && asset === "XAUUSD") ? prev : undefined),
+    // Only reuse the previous payload for the SAME pair and timeframe; showing
+    // another timeframe's candles while switching made the chart look broken.
+    placeholderData: (prev) =>
+      prev && prev.timeframe === timeframe.key && (prev.asset === asset || (!prev.asset && asset === "XAUUSD")) ? prev : undefined,
     refetchIntervalInBackground: true,
     staleTime: 1000,
     retry: 4,
