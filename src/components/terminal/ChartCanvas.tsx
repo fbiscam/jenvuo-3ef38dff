@@ -220,7 +220,7 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
         timeVisible: true,
         secondsVisible: false,
         rightOffset: 8,
-        barSpacing: 8,
+        barSpacing: 4,
       },
       // Fixed locale: some browsers report tags like "en-US@posix" that make
       // Intl throw and stop the chart from drawing candles.
@@ -408,7 +408,7 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
     const id = window.setTimeout(() => {
       stickyRangeRef.current = null;
       const n = propsRef.current.bars.length;
-      if (n > 0) chart.timeScale().setVisibleLogicalRange({ from: Math.max(0, n - 150), to: n + 8 });
+      if (n > 0) chart.timeScale().setVisibleLogicalRange({ from: Math.max(0, n - 320), to: n + 10 });
     }, 50);
     return () => window.clearTimeout(id);
   }, [props.resetKey]);
@@ -878,7 +878,7 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
     },
     fit: () => {
       const n = propsRef.current.bars.length;
-      chartRef.current?.timeScale().setVisibleLogicalRange({ from: Math.max(0, n - 150), to: n + 8 });
+      chartRef.current?.timeScale().setVisibleLogicalRange({ from: Math.max(0, n - 320), to: n + 10 });
       chartRef.current?.priceScale("right").applyOptions({ autoScale: true });
     },
   }));
