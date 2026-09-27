@@ -235,8 +235,11 @@ export function apexRedirectTarget(url: URL): string | null {
     if (target && target.host !== host) {
       const next = new URL(url);
       next.hostname = target.host;
-      next.pathname =
-        p === target.prefix ? "/" : p.slice(target.prefix.length);
+      next.pathname = target.prefix === "/dashboard"
+        ? p
+        : p === target.prefix
+          ? "/"
+          : p.slice(target.prefix.length);
       return next.toString();
     }
   }
@@ -371,7 +374,11 @@ export function rewriteOutput(url: URL): URL | undefined {
   if (target && target.host !== host) {
     const next = new URL(url);
     next.hostname = target.host;
-    next.pathname = p === target.prefix ? "/" : p.slice(target.prefix.length);
+    next.pathname = target.prefix === "/dashboard"
+      ? p
+      : p === target.prefix
+        ? "/"
+        : p.slice(target.prefix.length);
     return next;
   }
 
