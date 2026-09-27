@@ -156,7 +156,7 @@ function UpcomingGoldNews({ event, loading }: { event?: NewsEvent; loading: bool
   const text = loading
     ? "Checking news…"
     : event && stamp
-      ? `News: ${event.title} · ${stamp.date}, ${stamp.time} NY (UTC−4)`
+      ? `News: ${event.title} · ${stamp.time} NY`
       : "No important news ahead";
   return (
     <span
@@ -594,7 +594,7 @@ function TerminalPage() {
       <div className="flex h-full min-h-0 w-full flex-col overflow-hidden bg-background">
         <div className="flex min-h-0 flex-1 flex-col lg:flex-row">
           {/* Chart */}
-          <section aria-label="XAU/USD chart" className="relative min-h-0 flex-1 bg-background">
+          <section aria-label="XAU/USD chart" className="relative min-h-0 min-w-0 flex-1 bg-background">
             <JenvuChartWorkspace
               ref={chartRef}
               timeframes={TIMEFRAMES}
