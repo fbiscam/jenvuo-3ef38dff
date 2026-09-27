@@ -15,6 +15,7 @@ import { PwaTabBar } from "@/components/PwaTabBar";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { installIntlGuard } from "../lib/intl-guard";
+import { initCrossDomainSession } from "../lib/cross-domain-session";
 
 const googleAnalyticsId = import.meta.env.VITE_LOVABLE_CONNECTOR_GOOGLE_ANALYTICS_API_KEY;
 
@@ -297,6 +298,12 @@ function RootShell({ children }: { children: ReactNode }) {
 const JENVU_HOSTS = ["jenvu.com", "dash.jenvu.com", "support.jenvu.com", "leads.jenvu.com", "blogs.jenvu.com"];
 
 function RootComponent() {
+  // Share the auth session across jenvu.com subdomains so a signed-in user
+  // stays signed in on dash/support/blogs/leads.
+  useEffect(() => {
+    initCrossDomainSession();
+  }, []);
+
   // Fast cross-subdomain navigation: warm connections, prefetch on hover,
   // and skip the in-app router for links to another jenvu host.
   useEffect(() => {

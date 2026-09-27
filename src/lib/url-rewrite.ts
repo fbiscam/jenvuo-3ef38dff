@@ -98,6 +98,24 @@ function isManagedHost(host: string): boolean {
   return isApex(host) || isDash(host) || Boolean(SECTION_HOSTS[host]);
 }
 
+// Global pages that live on every host as-is (never section-prefixed on
+// subdomains): sign-in, signup/apply, pricing, legal, etc.
+const GLOBAL_PATHS = new Set([
+  "auth",
+  "founding",
+  "pricing",
+  "privacy",
+  "terms",
+  "reset-password",
+  "leads-signin",
+  "leads-signup",
+]);
+
+function isGlobalPath(pathname: string): boolean {
+  const first = pathname.split("/").filter(Boolean)[0];
+  return Boolean(first && GLOBAL_PATHS.has(first));
+}
+
 /**
  * Server-level redirect target.
  *
@@ -213,6 +231,8 @@ export function rewriteInput(url: URL): URL | undefined {
       next.pathname = section;
       return next;
     }
+    // Global pages (auth, founding, pricing, ...) resolve as-is on every host.
+    if (isGlobalPath(p)) return undefined;
     if (p !== section && !p.startsWith(`${section}/`)) {
       const next = new URL(url);
       next.pathname = `${section}${p}`;

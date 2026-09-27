@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import {
   MapPin,
   Users,
@@ -10,6 +11,7 @@ import {
   ArrowRight,
 } from "lucide-react";
 import { JENVU_SANS, MONO } from "@/components/leadgen/LeadsShell";
+import { useAuthUser } from "@/hooks/useAuthUser";
 
 const FEATURES = [
   {
@@ -62,6 +64,12 @@ const PLAN_POINTS = [
 ];
 
 export function LeadsLanding() {
+  const { user } = useAuthUser();
+  // Avoid SSR/CSR mismatch: reveal the signed-in variant after mount.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  const signedIn = mounted && Boolean(user);
+
   return (
     <div
       className="leads-landing-zoom min-h-dvh w-full bg-[#FAFAFA] text-zinc-900 antialiased selection:bg-zinc-900 selection:text-white"
@@ -80,18 +88,29 @@ export function LeadsLanding() {
             </span>
           </Link>
           <div className="flex items-center gap-2">
-            <Link
-              to="/leads-signin"
-              className="hidden rounded-lg border border-zinc-200 bg-white px-4 py-2 text-sm font-medium text-zinc-900 hover:bg-zinc-50 sm:inline-flex"
-            >
-              Sign in
-            </Link>
-            <Link
-              to="/leads-signup"
-              className="inline-flex items-center justify-center rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800"
-            >
-              Create free account
-            </Link>
+            {signedIn ? (
+              <Link
+                to="/dashboard"
+                className="inline-flex items-center justify-center rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800"
+              >
+                Open dashboard
+              </Link>
+            ) : (
+              <>
+                <Link
+                  to="/leads-signin"
+                  className="hidden rounded-lg border border-zinc-200 bg-white px-4 py-2 text-sm font-medium text-zinc-900 hover:bg-zinc-50 sm:inline-flex"
+                >
+                  Sign in
+                </Link>
+                <Link
+                  to="/leads-signup"
+                  className="inline-flex items-center justify-center rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800"
+                >
+                  Create free account
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </header>
@@ -116,19 +135,31 @@ export function LeadsLanding() {
                 start selling.
               </p>
               <div className="mt-7 flex flex-col items-stretch gap-3 sm:flex-row sm:items-start">
-                <Link
-                  to="/leads-signup"
-                  className="hover-lift inline-flex items-center justify-center gap-2 rounded-lg bg-zinc-900 px-5 py-3 text-sm font-medium text-white hover:bg-zinc-800"
-                >
-                  Get 50 free credits
-                  <ArrowRight className="h-4 w-4 opacity-80" />
-                </Link>
-                <Link
-                  to="/leads-signin"
-                  className="hover-glow inline-flex items-center justify-center rounded-lg border border-zinc-200 bg-white px-5 py-3 text-sm font-medium text-zinc-900 hover:bg-white"
-                >
-                  Sign in
-                </Link>
+                {signedIn ? (
+                  <Link
+                    to="/dashboard"
+                    className="hover-lift inline-flex items-center justify-center gap-2 rounded-lg bg-zinc-900 px-5 py-3 text-sm font-medium text-white hover:bg-zinc-800"
+                  >
+                    Open dashboard
+                    <ArrowRight className="h-4 w-4 opacity-80" />
+                  </Link>
+                ) : (
+                  <>
+                    <Link
+                      to="/leads-signup"
+                      className="hover-lift inline-flex items-center justify-center gap-2 rounded-lg bg-zinc-900 px-5 py-3 text-sm font-medium text-white hover:bg-zinc-800"
+                    >
+                      Get 50 free credits
+                      <ArrowRight className="h-4 w-4 opacity-80" />
+                    </Link>
+                    <Link
+                      to="/leads-signin"
+                      className="hover-glow inline-flex items-center justify-center rounded-lg border border-zinc-200 bg-white px-5 py-3 text-sm font-medium text-zinc-900 hover:bg-white"
+                    >
+                      Sign in
+                    </Link>
+                  </>
+                )}
               </div>
             </div>
 
@@ -256,9 +287,15 @@ export function LeadsLanding() {
             <a href="https://support.jenvu.com" className="hover:text-zinc-900">
               Support
             </a>
-            <Link to="/leads-signin" className="hover:text-zinc-900">
-              Sign in
-            </Link>
+            {signedIn ? (
+              <Link to="/dashboard" className="hover:text-zinc-900">
+                Dashboard
+              </Link>
+            ) : (
+              <Link to="/leads-signin" className="hover:text-zinc-900">
+                Sign in
+              </Link>
+            )}
           </div>
         </div>
       </footer>
