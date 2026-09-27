@@ -64,6 +64,12 @@ const PLAN_POINTS = [
 ];
 
 export function LeadsLanding() {
+  const { user } = useAuthUser();
+  // Avoid SSR/CSR mismatch: reveal the signed-in variant after mount.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  const signedIn = mounted && Boolean(user);
+
   return (
     <div
       className="leads-landing-zoom min-h-dvh w-full bg-[#FAFAFA] text-zinc-900 antialiased selection:bg-zinc-900 selection:text-white"
