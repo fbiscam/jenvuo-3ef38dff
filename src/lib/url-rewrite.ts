@@ -123,8 +123,19 @@ export function apexRedirectTarget(url: URL): string | null {
     const sub = host.slice(0, host.length - `.${ROOT_DOMAIN}`.length);
     if (sub.includes(".")) return null;
     // dash/blogs/leads/support subdomains host their sections directly —
-    // never redirect them away.
-    if (sub === "dash" || SECTION_HOSTS[host]) return null;
+    // but a path belonging to another section goes to that section's host
+    // (e.g. dash.jenvu.com/help -> support.jenvu.com/).
+    if (sub === "dash" || SECTION_HOSTS[host]) {
+      const target = hostForPath(p);
+      if (target && target.host !== host) {
+        const next = new URL(url);
+        next.hostname = target.host;
+        next.pathname =
+          p === target.prefix ? "/" : p.slice(target.prefix.length);
+        return next.toString();
+      }
+      return null;
+    }
     const section = SUBDOMAIN_SECTIONS[sub];
     if (!section) return null;
     const next = new URL(url);
