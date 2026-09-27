@@ -31,7 +31,7 @@ const DASHBOARD_CHILDREN = new Set([
   "analytics",
   "billing",
   "documents",
-  "extension",
+  "api",
   "journal",
   "pay",
   "terminal",
