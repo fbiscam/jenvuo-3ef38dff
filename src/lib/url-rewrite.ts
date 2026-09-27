@@ -163,7 +163,12 @@ export function apexRedirectTarget(url: URL): string | null {
       next.pathname = "/sign-in";
       return next.toString();
     }
-    if (p === "/" || p === "/sign-in") return null;
+    if (p === "/") {
+      const next = new URL(url);
+      next.pathname = "/sign-in";
+      return next.toString();
+    }
+    if (p === "/sign-in") return null;
     const next = new URL(url);
     next.hostname = ROOT_DOMAIN;
     return next.toString();
@@ -193,6 +198,19 @@ export function apexRedirectTarget(url: URL): string | null {
         next.pathname =
           p === target.prefix ? "/" : p.slice(target.prefix.length);
         return next.toString();
+      }
+      if (sub === "dash") {
+        if (p === "/") {
+          const next = new URL(url);
+          next.pathname = "/dashboard";
+          return next.toString();
+        }
+        const segments = p.split("/").filter(Boolean);
+        if (segments[0] === "admin" || (segments.length === 1 && DASHBOARD_CHILDREN.has(segments[0]))) {
+          const next = new URL(url);
+          next.pathname = `/dashboard${p}`;
+          return next.toString();
+        }
       }
       return null;
     }
