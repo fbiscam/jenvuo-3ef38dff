@@ -29,7 +29,7 @@ describe("smc overlay fractal labels", () => {
     expect(breakLabelBaseline(299, false, 300)).toBe(297);
   });
 
-  it("only labels swings with 10 lower candles on each side", () => {
+  it("only labels swings with 3 lower candles on each side", () => {
     // Zig-zag with a 25-bar period: swings every ~12 bars.
     const bars = Array.from({ length: 200 }, (_, i) => bar(i, 100 + 10 * Math.sin((i / 25) * 2 * Math.PI) + i * 0.05));
     const smc = computeSmcOverlay(bars, bars.at(-1)!.close);
@@ -53,7 +53,7 @@ describe("smc overlay fractal labels", () => {
     expect(high?.barsAfter).toBe(0);
   });
 
-  it("derives BOS/CHoCH and liquidity only from confirmed 10-bar pivots", () => {
+  it("derives BOS/CHoCH and liquidity only from confirmed 3-candle pivots", () => {
     const bars = Array.from({ length: 80 }, (_, i): OhlcvBar => ({
       time: 1_700_000_000 + i * 1800,
       open: 100,

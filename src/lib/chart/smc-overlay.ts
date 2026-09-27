@@ -31,7 +31,7 @@ import {
 export const SMC_WINDOW = 150;
 /** HH/HL/LH/LL lock after 3 closed candles each side (no repainting). */
 export const FRACTAL_RADIUS = CLUSTER_RADIUS;
-/** Closed bars scanned for 10-bar fractal labels (wider window so enough swings form). */
+/** Closed bars scanned for locked 3-candle swing labels. */
 export const FRACTAL_WINDOW = 400;
 
 export type LivePivot = {
@@ -456,7 +456,7 @@ export function computeSmcOverlay(
   const poi = detectPoiEvidence(recent);
   const price = currentPrice ?? recent[recent.length - 1].c;
 
-  // HH/HL/LH/LL labels: 10-bar fractal swings (like the Fractals indicator).
+  // HH/HL/LH/LL labels: locked 3-candle swings with alternating + ATR filters.
   const fractalBars = bars.slice(-FRACTAL_WINDOW).map(toCandle);
   const fractal = detectMarketStructureEvidence(fractalBars, FRACTAL_RADIUS);
   // Final-once: a confirmed swing keeps the first label it received on its own
@@ -475,7 +475,7 @@ export function computeSmcOverlay(
   const selectedPois = selectHighConfidencePois(poi, price);
 
   // Structure labels, breaks, trend and liquidity must all come from this same
-  // confirmed 10-bar pivot set. Provisional tail pivots never create events.
+  // confirmed filtered pivot set. Provisional tail pivots never create events.
   const breaks = fractal.breaks.map((b) => {
     const src = [...fractal.pivots]
       .reverse()
