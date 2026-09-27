@@ -258,6 +258,14 @@ async function blobToDataUrl(blob: Blob): Promise<string> {
 function TerminalPage() {
   const [tf, setTf] = useState(TIMEFRAMES[3]);
   const [asset, setAsset] = useState<"XAUUSD" | "BTCUSD">("XAUUSD");
+  // Daily terminal access fee ($0.30 per UTC day, charged once server-side).
+  useEffect(() => {
+    void import("@/integrations/supabase/client").then(({ supabase }) =>
+      (supabase.rpc as any)("charge_terminal_daily_access").then(({ error }: { error: { message?: string } | null }) => {
+        if (error) console.warn("Terminal daily fee not charged:", error.message);
+      }),
+    );
+  }, []);
   useEffect(() => {
     try {
       if (window.localStorage.getItem("jenvu-terminal-asset") === "BTCUSD") setAsset("BTCUSD");
