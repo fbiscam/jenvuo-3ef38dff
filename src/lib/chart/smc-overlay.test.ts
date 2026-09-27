@@ -131,6 +131,22 @@ describe("smc overlay fractal labels", () => {
     expect(strength < 0.25).toBe(true);
   });
 
+  it("never treats one extreme footprint as strong confidence", () => {
+    const strength = reversalPressureStrength({
+      directionalAgreement: 0.5,
+      displacement: 1,
+      footprint: 1,
+      confirmation: 0,
+      followThrough: 0,
+      streak: 0,
+      evidence: 0,
+      directionalBias: 0.5,
+      efficiency: 0,
+      persistence: 0,
+    });
+    expect(strength < 0.2).toBe(true);
+  });
+
   it("reserves high pressure for confirmed, efficient reversals", () => {
     const weak = reversalPressureStrength({
       directionalAgreement: 0.25,
@@ -194,6 +210,7 @@ describe("smc overlay fractal labels", () => {
     );
     expect(signal?.stage).toBe("confirmed");
     expect(signal?.entry).toBe(99);
+    expect(signal?.score).toBe(85);
     expect(signal?.tp1).toBeCloseTo(82.2);
     expect(signal?.tp2).toBeCloseTo(65.4);
   });
