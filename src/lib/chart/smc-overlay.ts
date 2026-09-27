@@ -164,6 +164,62 @@ export const DEFAULT_SMC: SmcToggles = {
 
 type Candle = { t: number; o: number; h: number; l: number; c: number; v?: number };
 
+export type ReversalPressureEvidence = {
+  directionalAgreement: number;
+  displacement: number;
+  footprint: number;
+  confirmation: number;
+  followThrough: number;
+  streak: number;
+  evidence: number;
+  directionalBias: number;
+  efficiency: number;
+  persistence: number;
+};
+
+/**
+ * Converts independent reversal evidence into distance from neutral (0..0.46).
+ * A high score requires footprint, confirmation and follow-through to agree;
+ * one dramatic wick or volume spike can no longer create a high percentage.
+ */
+export function reversalPressureStrength(input: ReversalPressureEvidence): number {
+  const clamp01 = (value: number) => Math.max(0, Math.min(1, value));
+  const footprint = clamp01(input.footprint);
+  const confirmation = clamp01(input.confirmation);
+  const followThrough = clamp01(input.followThrough);
+  const displacement = clamp01(input.displacement);
+  const streak = clamp01(input.streak);
+  const evidence = clamp01(input.evidence);
+  const directionalBias = clamp01(input.directionalBias);
+  const efficiency = clamp01(input.efficiency);
+  const persistence = clamp01(input.persistence);
+  const agreement = Math.max(0, input.directionalAgreement);
+
+  const strongFamilies = [footprint, confirmation, followThrough]
+    .filter((value) => value >= 0.55).length;
+  const weakestCore = Math.min(footprint, confirmation, followThrough);
+  const weightedConfluence =
+    0.24 * footprint + 0.31 * confirmation + 0.29 * followThrough +
+    0.1 * displacement + 0.06 * streak;
+
+  // Contradictory order flow and choppy price action actively reduce the score.
+  const directionalConflict = clamp01((0.5 - directionalBias) * 2);
+  const chop = evidence >= 0.3
+    ? 0.55 * (1 - efficiency) + 0.45 * (1 - persistence)
+    : 0;
+  const contradiction = 0.1 * directionalConflict + 0.055 * chop;
+
+  let strength =
+    0.025 + 0.22 * agreement + 0.08 * displacement +
+    0.19 * weightedConfluence + 0.08 * weakestCore - contradiction;
+
+  // Strict confidence ceilings stop a single signal from looking trade-ready.
+  const familyCap = strongFamilies === 3 ? 0.46 : strongFamilies === 2 ? 0.34 : strongFamilies === 1 ? 0.24 : 0.17;
+  const maturityCap = 0.2 + 0.26 * evidence;
+  strength = Math.min(strength, familyCap, maturityCap);
+  return Math.max(0.03, Math.min(0.46, strength));
+}
+
 type PoiSelection = {
   fvgs: FairValueGap[];
   orderBlocks: OrderBlockZone[];
@@ -557,14 +613,18 @@ export function computeSmcOverlay(
     const footprint = Math.max(sweep, absorb, exhaustion);
     const confirmation = Math.max(engulf, bos, defended);
     const followThrough = 0.4 * efficiency + 0.35 * persistence + 0.25 * directionalBias;
-    const confluenceCount = [footprint, confirmation, followThrough, move, streakNorm]
-      .filter((value) => value >= 0.55).length;
-    const confluence = clamp01((confluenceCount - 1) / 3);
-    const bonus =
-      0.07 * sweep + 0.035 * exhaustion + 0.035 * absorb + 0.045 * engulf +
-      0.055 * bos + 0.035 * defended + 0.07 * followThrough + 0.055 * confluence;
-    const contradiction = clamp01((0.5 - directionalBias) * 2) * 0.07;
-    const strength = Math.min(0.46, Math.max(0.04, agree, move * 0.32) + bonus - contradiction);
+    const strength = reversalPressureStrength({
+      directionalAgreement: agree,
+      displacement: move,
+      footprint,
+      confirmation,
+      followThrough,
+      streak: streakNorm,
+      evidence,
+      directionalBias,
+      efficiency,
+      persistence,
+    });
     buy = high ? 0.5 - strength : 0.5 + strength;
     pressure[t] = Math.round(clamp01(buy) * 100);
   };
