@@ -174,3 +174,4 @@
 - [x] Restore bearish FVG red styling and Inside Bar labels on the Terminal chart
 - [x] Make BTC/USD charts load reliably across Chrome profiles and every timeframe
 - [x] Restrict buyer/seller reversal pressure and its AI evidence to 1H XAU/USD and BTC/USD
+- [x] Add body-close and two-candle retest confirmation to 1H reversal entries
