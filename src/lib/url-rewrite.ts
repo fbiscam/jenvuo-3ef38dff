@@ -59,6 +59,11 @@ function isApex(host: string): boolean {
   return host === ROOT_DOMAIN || host === `www.${ROOT_DOMAIN}`;
 }
 
+// The trading dashboard is hosted directly on the dash subdomain.
+function isDash(host: string): boolean {
+  return host === `dash.${ROOT_DOMAIN}`;
+}
+
 /**
  * Server-level redirect target.
  *
@@ -83,6 +88,8 @@ export function apexRedirectTarget(url: URL): string | null {
   if (host !== ROOT_DOMAIN && host.endsWith(`.${ROOT_DOMAIN}`)) {
     const sub = host.slice(0, host.length - `.${ROOT_DOMAIN}`.length);
     if (sub.includes(".")) return null;
+    // dash.jenvu.com hosts the dashboard directly — never redirect it away.
+    if (sub === "dash") return null;
     const section = SUBDOMAIN_SECTIONS[sub];
     if (!section) return null;
     const next = new URL(url);
@@ -129,9 +136,17 @@ export function apexRedirectTarget(url: URL): string | null {
  */
 export function rewriteInput(url: URL): URL | undefined {
   const host = url.hostname.toLowerCase();
-  if (!isApex(host)) return undefined;
+  if (!isApex(host) && !isDash(host)) return undefined;
   const p = url.pathname;
   if (isReserved(p)) return undefined;
+
+  // On the dash subdomain the dashboard lives at the root:
+  // dash.jenvu.com/ -> /dashboard, dash.jenvu.com/alerts -> /dashboard/alerts
+  if (isDash(host) && (p === "/" || p === "")) {
+    const next = new URL(url);
+    next.pathname = "/dashboard";
+    return next;
+  }
 
   // Admin paths: /admin/* -> /dashboard/admin/*
   if (p === "/admin" || p.startsWith("/admin/")) {
@@ -159,9 +174,16 @@ export function rewriteInput(url: URL): URL | undefined {
  */
 export function rewriteOutput(url: URL): URL | undefined {
   const host = url.hostname.toLowerCase();
-  if (!isApex(host)) return undefined;
+  if (!isApex(host) && !isDash(host)) return undefined;
   const p = url.pathname;
   if (isReserved(p)) return undefined;
+
+  // On the dash subdomain the dashboard index is the root URL.
+  if (isDash(host) && p === "/dashboard") {
+    const next = new URL(url);
+    next.pathname = "/";
+    return next;
+  }
 
   // Admin paths: /dashboard/admin/* -> /admin/*
   if (p === "/dashboard/admin" || p.startsWith("/dashboard/admin/")) {
