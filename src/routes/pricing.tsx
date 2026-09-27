@@ -248,7 +248,7 @@ function PricingPage() {
                 { f: "Multi-timeframe bias", b: true, c: true, d: true },
                 { f: "Trade journal", b: true, c: true, d: true },
                 { f: "Chart-aware AI context", b: true, c: true, d: true },
-                { f: "1H XAU/USD & BTC/USD reversal pressure", b: true, c: true, d: true, badge: "new" },
+                { f: "1H XAU/USD reversal pressure", b: true, c: true, d: true, badge: "new" },
                 { f: "Body-break + retest confirmation", b: true, c: true, d: true },
                 { f: "Pressure-gated entry, SL & TP levels", b: true, c: true, d: true },
                 { f: "API access & webhooks", b: false, c: true, d: true },
