@@ -232,11 +232,11 @@ describe("smc overlay fractal labels", () => {
       { 2: 15 },
       2,
       [],
-      [60],
+      [70],
     );
-    expect(signal?.tp1).toBe(60.5);
+    expect(signal?.tp1).toBe(70.5);
     expect((signal?.tp1 ?? 0) > (signal?.tp2 ?? 0)).toBe(true);
-    expect(signal?.rr).toBeCloseTo(39.5 / 12);
+    expect(signal?.rr).toBeCloseTo(29.5 / 12);
     expect(signal?.tradeReady).toBe(true);
   });
 

@@ -13,3 +13,4 @@
 - Expose buyer/seller reversal pressure and pressure-gated trade levels only on 1H XAU/USD and BTC/USD; this keeps one deliberate decision timeframe while preserving structure labels elsewhere.
 - Confirm reversal entries only after a closed-candle body break followed by a directional retest-and-hold candle; wick-only breaks remain unconfirmed.
 - Require reversal-side buyer/seller pressure above 55% before confirming an entry; neutral or opposing pressure remains an alert only.
+- Build 1H reversal plans as non-executing CHoCH retest limits; require a buffered confirmed structure TP of at least 1:2, with $2 SL and $0.50 TP buffers on Gold.
