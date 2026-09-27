@@ -1,6 +1,7 @@
 import { describe, it } from "node:test";
 import {
   breakLabelBaseline,
+  computeReversalSignal,
   computeLivePivots,
   computeSmcOverlay,
   FRACTAL_RADIUS,
@@ -174,5 +175,45 @@ describe("smc overlay fractal labels", () => {
     const aligned = reversalPressureStrength({ ...shared, directionalBias: 0.85 });
     const opposed = reversalPressureStrength({ ...shared, directionalBias: 0.2 });
     expect(aligned > opposed).toBe(true);
+  });
+
+  it("always provides TP1 and TP2 after confirmation when liquidity is absent", () => {
+    const candles = [
+      { t: 1, o: 100, h: 101, l: 99, c: 100 },
+      { t: 2, o: 100, h: 110, l: 99, c: 108 },
+      { t: 3, o: 107, h: 108, l: 98, c: 99 },
+    ];
+    const signal = computeReversalSignal(
+      candles,
+      null,
+      [{ t: 2, price: 110, kind: "high", label: "HH" }],
+      { 2: 15 },
+      2,
+      [],
+      [],
+    );
+    expect(signal?.stage).toBe("confirmed");
+    expect(signal?.entry).toBe(99);
+    expect(signal?.tp1).toBe(81.3);
+    expect(signal?.tp2).toBe(63.6);
+  });
+
+  it("uses opposing liquidity for TP1 only when it sits between 1R and TP2", () => {
+    const candles = [
+      { t: 1, o: 100, h: 101, l: 99, c: 100 },
+      { t: 2, o: 100, h: 110, l: 99, c: 108 },
+      { t: 3, o: 107, h: 108, l: 98, c: 99 },
+    ];
+    const signal = computeReversalSignal(
+      candles,
+      null,
+      [{ t: 2, price: 110, kind: "high", label: "HH" }],
+      { 2: 15 },
+      2,
+      [],
+      [85],
+    );
+    expect(signal?.tp1).toBe(85);
+    expect((signal?.tp1 ?? 0) > (signal?.tp2 ?? 0)).toBe(true);
   });
 });

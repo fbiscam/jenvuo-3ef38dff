@@ -124,10 +124,15 @@ export function computeReversalSignal(
   score = Math.round(Math.max(5, Math.min(92, score)));
   const ref = entry ?? (forming?.c ?? closed.at(-1)!.c);
   const risk = Math.abs(ref - sl);
-  const tp1 = high
-    ? sellSide.find((p) => p < ref - risk) ?? null
-    : buySide.find((p) => p > ref + risk) ?? null;
   const tp2 = risk > 0 ? (high ? ref - 3 * risk : ref + 3 * risk) : null;
+  const liquidityTarget = high
+    ? sellSide.find((p) => p < ref - risk && (tp2 == null || p > tp2))
+    : buySide.find((p) => p > ref + risk && (tp2 == null || p < tp2));
+  // TP1 must remain visible even when no clean opposing liquidity pivot exists.
+  // Prefer that liquidity; otherwise use a deterministic 1.5R partial target.
+  const tp1 = risk > 0
+    ? liquidityTarget ?? (high ? ref - 1.5 * risk : ref + 1.5 * risk)
+    : null;
   return { side: high ? "sell" : "buy", t: last.t, pivotPrice: last.price, label: last.label, stage, score, swept, entry, entryT, sl, tp1, tp2 };
 }
 /** Buyer share of the leg ending at `end`: close position inside each candle's range. */
