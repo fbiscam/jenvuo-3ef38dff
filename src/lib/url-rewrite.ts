@@ -59,6 +59,11 @@ function isApex(host: string): boolean {
   return host === ROOT_DOMAIN || host === `www.${ROOT_DOMAIN}`;
 }
 
+// The trading dashboard is hosted directly on the dash subdomain.
+function isDash(host: string): boolean {
+  return host === `dash.${ROOT_DOMAIN}`;
+}
+
 /**
  * Server-level redirect target.
  *
