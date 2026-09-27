@@ -13,4 +13,4 @@
 - Expose buyer/seller reversal pressure and pressure-gated trade levels only on 1H XAU/USD and BTC/USD; this keeps one deliberate decision timeframe while preserving structure labels elsewhere.
 - Confirm reversal entries only after a closed-candle body break followed by a directional retest-and-hold candle; wick-only breaks remain unconfirmed.
 - Require reversal-side buyer/seller pressure above 55% before confirming an entry; neutral or opposing pressure remains an alert only.
-- Keep canonical section addresses stable: dashboard under dash.jenvu.com/dashboard, sign-in at auth.jenvu.com/sign-in, blog at blogs.jenvu.com, help at support.jenvu.com, and global public pages on jenvu.com to avoid section-slug collisions.
+- Keep canonical section addresses stable: dashboard under dash.jenvu.com/dashboard, billing at dash.jenvu.com/billing, sign-in at auth.jenvu.com/sign-in, blog at blogs.jenvu.com, help at support.jenvu.com, and global public pages on jenvu.com to avoid section-slug collisions.

@@ -2,7 +2,7 @@
  * URL rewriting across Jenvu's canonical section domains.
  *
  * Goals:
- *  - Keep dashboard routes under dash.jenvu.com/dashboard/*.
+ *  - Keep dashboard routes under dash.jenvu.com/dashboard/*, with billing at /billing.
  *  - Serve sign-in at auth.jenvu.com/sign-in.
  *  - Mount blog, leads, and support route trees on their section hosts.
  *  - Send global public pages such as Contact and Download to jenvu.com.
