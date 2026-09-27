@@ -1754,7 +1754,7 @@ function DashboardHero({
   const banners = [
     {
       variant: "model" as const,
-      eyebrow: "  Introducing Claude Opus 5",
+      eyebrow: "  Introducing grok 4.6 reasoning",
       copy: "Our most capable model, built for precise market analysis. Opus 5 combines reasoning, chart vision, and strong context awareness from capture to completion.",
       action: "Analyze with Opus 5",
       to: "/dashboard/extension" as const,
