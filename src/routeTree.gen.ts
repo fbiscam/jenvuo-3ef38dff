@@ -79,6 +79,7 @@ import { Route as AuthenticatedDashboardJournalRouteImport } from './routes/_aut
 import { Route as AuthenticatedDashboardExtensionRouteImport } from './routes/_authenticated/dashboard.extension'
 import { Route as AuthenticatedDashboardDocumentsRouteImport } from './routes/_authenticated/dashboard.documents'
 import { Route as AuthenticatedDashboardBillingRouteImport } from './routes/_authenticated/dashboard.billing'
+import { Route as AuthenticatedDashboardApiRouteImport } from './routes/_authenticated/dashboard.api'
 import { Route as AuthenticatedDashboardAnalyticsRouteImport } from './routes/_authenticated/dashboard.analytics'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
 import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
@@ -472,6 +473,12 @@ const AuthenticatedDashboardBillingRoute =
     path: '/billing',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
+const AuthenticatedDashboardApiRoute =
+  AuthenticatedDashboardApiRouteImport.update({
+    id: '/api',
+    path: '/api',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
 const AuthenticatedDashboardAnalyticsRoute =
   AuthenticatedDashboardAnalyticsRouteImport.update({
     id: '/analytics',
@@ -695,6 +702,7 @@ export interface FileRoutesByFullPath {
   '/leads/': typeof LeadsIndexRoute
   '/ops-x9k2-7m4n/': typeof OpsX9k27m4nIndexRoute
   '/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
+  '/dashboard/api': typeof AuthenticatedDashboardApiRoute
   '/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
   '/dashboard/documents': typeof AuthenticatedDashboardDocumentsRoute
   '/dashboard/extension': typeof AuthenticatedDashboardExtensionRoute
@@ -790,6 +798,7 @@ export interface FileRoutesByTo {
   '/leads': typeof LeadsIndexRoute
   '/ops-x9k2-7m4n': typeof OpsX9k27m4nIndexRoute
   '/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
+  '/dashboard/api': typeof AuthenticatedDashboardApiRoute
   '/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
   '/dashboard/documents': typeof AuthenticatedDashboardDocumentsRoute
   '/dashboard/extension': typeof AuthenticatedDashboardExtensionRoute
@@ -892,6 +901,7 @@ export interface FileRoutesById {
   '/leads/': typeof LeadsIndexRoute
   '/ops-x9k2-7m4n/': typeof OpsX9k27m4nIndexRoute
   '/_authenticated/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
+  '/_authenticated/dashboard/api': typeof AuthenticatedDashboardApiRoute
   '/_authenticated/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
   '/_authenticated/dashboard/documents': typeof AuthenticatedDashboardDocumentsRoute
   '/_authenticated/dashboard/extension': typeof AuthenticatedDashboardExtensionRoute
@@ -994,6 +1004,7 @@ export interface FileRouteTypes {
     | '/leads/'
     | '/ops-x9k2-7m4n/'
     | '/dashboard/analytics'
+    | '/dashboard/api'
     | '/dashboard/billing'
     | '/dashboard/documents'
     | '/dashboard/extension'
@@ -1089,6 +1100,7 @@ export interface FileRouteTypes {
     | '/leads'
     | '/ops-x9k2-7m4n'
     | '/dashboard/analytics'
+    | '/dashboard/api'
     | '/dashboard/billing'
     | '/dashboard/documents'
     | '/dashboard/extension'
@@ -1190,6 +1202,7 @@ export interface FileRouteTypes {
     | '/leads/'
     | '/ops-x9k2-7m4n/'
     | '/_authenticated/dashboard/analytics'
+    | '/_authenticated/dashboard/api'
     | '/_authenticated/dashboard/billing'
     | '/_authenticated/dashboard/documents'
     | '/_authenticated/dashboard/extension'
@@ -1788,6 +1801,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardBillingRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
+    '/_authenticated/dashboard/api': {
+      id: '/_authenticated/dashboard/api'
+      path: '/api'
+      fullPath: '/dashboard/api'
+      preLoaderRoute: typeof AuthenticatedDashboardApiRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
     '/_authenticated/dashboard/analytics': {
       id: '/_authenticated/dashboard/analytics'
       path: '/analytics'
@@ -1996,6 +2016,7 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedDashboardRouteChildren {
   AuthenticatedDashboardAnalyticsRoute: typeof AuthenticatedDashboardAnalyticsRoute
+  AuthenticatedDashboardApiRoute: typeof AuthenticatedDashboardApiRoute
   AuthenticatedDashboardBillingRoute: typeof AuthenticatedDashboardBillingRoute
   AuthenticatedDashboardDocumentsRoute: typeof AuthenticatedDashboardDocumentsRoute
   AuthenticatedDashboardExtensionRoute: typeof AuthenticatedDashboardExtensionRoute
@@ -2025,6 +2046,7 @@ interface AuthenticatedDashboardRouteChildren {
 const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
   {
     AuthenticatedDashboardAnalyticsRoute: AuthenticatedDashboardAnalyticsRoute,
+    AuthenticatedDashboardApiRoute: AuthenticatedDashboardApiRoute,
     AuthenticatedDashboardBillingRoute: AuthenticatedDashboardBillingRoute,
     AuthenticatedDashboardDocumentsRoute: AuthenticatedDashboardDocumentsRoute,
     AuthenticatedDashboardExtensionRoute: AuthenticatedDashboardExtensionRoute,
