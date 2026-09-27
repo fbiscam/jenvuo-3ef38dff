@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import {
   MapPin,
   Users,
@@ -10,6 +11,7 @@ import {
   ArrowRight,
 } from "lucide-react";
 import { JENVU_SANS, MONO } from "@/components/leadgen/LeadsShell";
+import { useAuthUser } from "@/hooks/useAuthUser";
 
 const FEATURES = [
   {
