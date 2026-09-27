@@ -15,6 +15,7 @@ import { PwaTabBar } from "@/components/PwaTabBar";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { installIntlGuard } from "../lib/intl-guard";
+import { initCrossDomainSession } from "../lib/cross-domain-session";
 
 const googleAnalyticsId = import.meta.env.VITE_LOVABLE_CONNECTOR_GOOGLE_ANALYTICS_API_KEY;
 
