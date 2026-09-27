@@ -115,23 +115,28 @@ export function apexRedirectTarget(url: URL): string | null {
   }
 
 
-  // 2. Apex domain: redirect /dashboard/child -> /child for clean URLs.
+  // 2. Apex domain: the dashboard lives on dash.jenvu.com — send every
+  // dashboard URL there (jenvu.com/dashboard/billing -> dash.jenvu.com/billing).
   if (isApex(host)) {
     const segments = p.split("/").filter(Boolean);
-    if (segments.length >= 2 && segments[0] === "dashboard") {
-      const child = segments[1];
-      const isAdmin = child === "admin";
-      const isKnownChild = DASHBOARD_CHILDREN.has(child);
-      if (isKnownChild || isAdmin) {
+    const dashHost = `dash.${ROOT_DOMAIN}`;
+
+    // /dashboard and /dashboard/*
+    if (segments[0] === "dashboard") {
+      const next = new URL(url);
+      next.hostname = dashHost;
+      const rest = segments.slice(1).join("/");
+      next.pathname = rest ? `/${rest}` : "/";
+      return next.toString();
+    }
+
+    // Clean dashboard child URLs: /alerts, /billing, /admin/*
+    if (segments.length >= 1) {
+      const child = segments[0];
+      if (child === "admin" || DASHBOARD_CHILDREN.has(child)) {
         const next = new URL(url);
-        next.hostname = ROOT_DOMAIN;
-        if (isAdmin) {
-          // /dashboard/admin/accuracy -> /admin/accuracy
-          next.pathname = "/" + segments.slice(1).join("/");
-        } else {
-          // /dashboard/alerts -> /alerts
-          next.pathname = "/" + segments.slice(1).join("/");
-        }
+        next.hostname = dashHost;
+        next.pathname = p;
         return next.toString();
       }
     }
