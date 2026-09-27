@@ -135,19 +135,31 @@ export function LeadsLanding() {
                 start selling.
               </p>
               <div className="mt-7 flex flex-col items-stretch gap-3 sm:flex-row sm:items-start">
-                <Link
-                  to="/leads-signup"
-                  className="hover-lift inline-flex items-center justify-center gap-2 rounded-lg bg-zinc-900 px-5 py-3 text-sm font-medium text-white hover:bg-zinc-800"
-                >
-                  Get 50 free credits
-                  <ArrowRight className="h-4 w-4 opacity-80" />
-                </Link>
-                <Link
-                  to="/leads-signin"
-                  className="hover-glow inline-flex items-center justify-center rounded-lg border border-zinc-200 bg-white px-5 py-3 text-sm font-medium text-zinc-900 hover:bg-white"
-                >
-                  Sign in
-                </Link>
+                {signedIn ? (
+                  <Link
+                    to="/dashboard"
+                    className="hover-lift inline-flex items-center justify-center gap-2 rounded-lg bg-zinc-900 px-5 py-3 text-sm font-medium text-white hover:bg-zinc-800"
+                  >
+                    Open dashboard
+                    <ArrowRight className="h-4 w-4 opacity-80" />
+                  </Link>
+                ) : (
+                  <>
+                    <Link
+                      to="/leads-signup"
+                      className="hover-lift inline-flex items-center justify-center gap-2 rounded-lg bg-zinc-900 px-5 py-3 text-sm font-medium text-white hover:bg-zinc-800"
+                    >
+                      Get 50 free credits
+                      <ArrowRight className="h-4 w-4 opacity-80" />
+                    </Link>
+                    <Link
+                      to="/leads-signin"
+                      className="hover-glow inline-flex items-center justify-center rounded-lg border border-zinc-200 bg-white px-5 py-3 text-sm font-medium text-zinc-900 hover:bg-white"
+                    >
+                      Sign in
+                    </Link>
+                  </>
+                )}
               </div>
             </div>
 
