@@ -380,9 +380,9 @@ const PRIMARY_ANALYSIS_CHAIN = [
 const SENIOR_REVIEW_MODELS = PRIMARY_ANALYSIS_CHAIN;
 
 const FAST_CHAT_CHAIN = [
+  "codecraft/claude-fable-5.1",
   "codecraft/grok-4.6",
   "codecraft/gpt-5.5",
-  "codecraft/claude-fable-5.1",
 ] as const;
 
 // Vision: Grok/GPT excluded — Claude models verified for image content.
