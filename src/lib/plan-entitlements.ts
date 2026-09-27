@@ -23,7 +23,7 @@ export function getPlanCapabilities(planId: string): PlanCapabilities {
 }
 
 /** USD charged per 1,000,000 tokens of extension/API usage. */
-export const TOKEN_RATE_USD_PER_MILLION = 3
+export const TOKEN_RATE_USD_PER_MILLION = 5
 
 /** Daily token allowance per plan (prompt + completion tokens combined). */
 export const PLAN_DAILY_TOKEN_LIMITS: Record<string, number> = {
@@ -39,7 +39,7 @@ export function getPlanDailyTokenLimit(planId: string): number {
 
 /**
  * Effective daily quota is capped by the plan and by the current wallet.
- * Each complete $3 funds another 1M-token block. Below $3, the final block
+ * Each complete $5 funds another 1M-token block. Below $5, the final block
  * scales proportionally so a falling balance immediately lowers the quota.
  */
 export function getEffectiveDailyTokenLimit(planId: string, balanceUsd: number): number {
@@ -51,7 +51,7 @@ export function getEffectiveDailyTokenLimit(planId: string, balanceUsd: number):
   return Math.min(planLimit, balanceLimit)
 }
 
-/** Cost in USD for a given token count at the flat $3 / 1M token rate. */
+/** Cost in USD for a given token count at the flat $5 / 1M token rate. */
 export function tokensToUsd(tokens: number): number {
   return (Math.max(0, tokens) / 1_000_000) * TOKEN_RATE_USD_PER_MILLION
 }

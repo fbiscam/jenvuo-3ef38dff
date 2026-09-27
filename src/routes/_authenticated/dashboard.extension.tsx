@@ -473,7 +473,7 @@ function ExtensionPage() {
             </button>
           </div>
           <p className="mt-3 text-[12px] leading-relaxed text-zinc-600">
-            Usage is charged only for the tokens actually processed at $3 per 1,000,000 tokens. Your
+            Usage is charged only for the tokens actually processed at $5 per 1,000,000 tokens. Your
             wallet balance and plan daily limit apply to chat and multi-market analysis on every
             paid plan.
           </p>

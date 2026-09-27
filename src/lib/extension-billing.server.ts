@@ -102,7 +102,7 @@ export async function chargeExtensionUsage(params: {
   const promptTokens = params.calls.reduce((sum, call) => sum + call.usage.promptTokens, 0)
   const completionTokens = params.calls.reduce((sum, call) => sum + call.usage.completionTokens, 0)
   const totalTokens = promptTokens + completionTokens
-  // Pay-as-you-go: $3 per 1,000,000 tokens actually used (prompt + completion).
+  // Pay-as-you-go: $5 per 1,000,000 tokens actually used (prompt + completion).
   const charged = Math.round(tokensToUsd(totalTokens) * 1e6) / 1e6
   if (charged > 0 && entitlement.balance < charged) return { ok: false, charged: 0, error: 'Low balance. Add funds to continue using extension AI.' }
   const models = params.calls.map((call) => call.model).join(',')
@@ -116,7 +116,7 @@ export async function chargeExtensionUsage(params: {
       action: params.action, model: models, primary_model: primary?.model ?? null,
       senior_model: senior?.model ?? null, stage: 'extension_api', prompt_tokens: promptTokens,
       completion_tokens: completionTokens, raw_cost_usd: rawCost, base_fee_usd: EXTENSION_BASE_FEE_USD,
-       pricing_multiplier: EXTENSION_TOKEN_PRICE_MULTIPLIER, pricing_basis: 'per_token_usd_3_per_million',
+       pricing_multiplier: EXTENSION_TOKEN_PRICE_MULTIPLIER, pricing_basis: 'per_token_usd_5_per_million',
        charge_usd: charged, senior_review: hasSeniorReview,
        total_tokens: totalTokens, token_rate_usd_per_million: 3,
     },
