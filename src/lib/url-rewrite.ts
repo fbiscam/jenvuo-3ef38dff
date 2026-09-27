@@ -139,6 +139,19 @@ export function apexRedirectTarget(url: URL): string | null {
   }
 
 
+  // 1b. Cross-section navigation: if the path belongs to a section hosted on
+  // another subdomain (e.g. dash.jenvu.com/help), send it to that host.
+  if (isManagedHost(host)) {
+    const target = hostForPath(p);
+    if (target && target.host !== host) {
+      const next = new URL(url);
+      next.hostname = target.host;
+      next.pathname =
+        p === target.prefix ? "/" : p.slice(target.prefix.length);
+      return next.toString();
+    }
+  }
+
   // 2. Apex domain: the dashboard lives on dash.jenvu.com — send every
   // dashboard URL there (jenvu.com/dashboard/billing -> dash.jenvu.com/billing).
   if (isApex(host)) {
@@ -234,6 +247,17 @@ export function rewriteOutput(url: URL): URL | undefined {
   if (!isApex(host) && !isDash(host) && !SECTION_HOSTS[host]) return undefined;
   const p = url.pathname;
   if (isReserved(p)) return undefined;
+
+  // Cross-section navigation: links to a section hosted on another subdomain
+  // point at that host with the prefix stripped (e.g. on dash.jenvu.com,
+  // /help/getting-started -> support.jenvu.com/getting-started).
+  const target = hostForPath(p);
+  if (target && target.host !== host) {
+    const next = new URL(url);
+    next.hostname = target.host;
+    next.pathname = p === target.prefix ? "/" : p.slice(target.prefix.length);
+    return next;
+  }
 
   // Section subdomains: strip the section prefix so the address bar stays
   // clean — /insights/my-post -> blogs.jenvu.com/my-post
