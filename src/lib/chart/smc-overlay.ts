@@ -14,10 +14,23 @@ import {
   type OrderBlockZone,
 } from "@/lib/analysis/poi-evidence";
 import type { OhlcvBar } from "./indicators";
+import {
+  CLUSTER_RADIUS,
+  clusterBuyerPercent,
+  computeExecutionSignal,
+  computeJenvuSignals,
+  computeTopBottom,
+  computeVortexCloud,
+  detectLiquiditySweeps,
+  type ExecutionSignal,
+  type JenvuMark,
+  type JenvuSignal,
+  type LiquiditySweep,
+} from "./institutional-engine";
 
 export const SMC_WINDOW = 150;
-/** HH/HL/LH/LL chart labels use a Fractals-style swing length of 10 bars each side. */
-export const FRACTAL_RADIUS = 10;
+/** HH/HL/LH/LL lock after 3 closed candles each side (no repainting). */
+export const FRACTAL_RADIUS = CLUSTER_RADIUS;
 /** Closed bars scanned for 10-bar fractal labels (wider window so enough swings form). */
 export const FRACTAL_WINDOW = 400;
 
@@ -55,6 +68,13 @@ export type SmcOverlay = {
   pressure?: Record<number, number>;
   /** Latest reversal setup at the newest swing (alert → confirmed → cancelled). */
   reversal?: ReversalSignal | null;
+  /** Confluence strength (0-100 buyer share) used to grade reversals. */
+  confluence?: Record<number, number>;
+  sweeps?: LiquiditySweep[];
+  execution?: ExecutionSignal | null;
+  jenvuSignals?: JenvuSignal[];
+  topBottom?: JenvuMark[];
+  cloud?: Array<{ t: number; fast: number; slow: number }>;
 };
 
 export type ReversalSignal = {
@@ -155,6 +175,10 @@ export type SmcToggles = {
   orderBlocks: boolean;
   liquidity: boolean;
   projection: boolean;
+  execution: boolean;
+  jenvuSignals: boolean;
+  topBottom: boolean;
+  cloud: boolean;
 };
 
 export const DEFAULT_SMC: SmcToggles = {
@@ -164,6 +188,10 @@ export const DEFAULT_SMC: SmcToggles = {
   orderBlocks: false,
   liquidity: true,
   projection: true,
+  execution: true,
+  jenvuSignals: true,
+  topBottom: true,
+  cloud: false,
 };
 
 type Candle = { t: number; o: number; h: number; l: number; c: number; v?: number };
@@ -466,6 +494,7 @@ export function computeSmcOverlay(
     .slice(0, 4);
   const all = forming ? [...fractalBars, toCandle(forming)] : fractalBars;
   const pressure: Record<number, number> = {};
+  const confluence: Record<number, number> = {};
   const idxOf = new Map(all.map((c, i) => [c.t, i]));
   // Extreme-level pressure: who took control AT the swing. Blends three signals
   // into a buyer share (0-1): wick rejection on the swing candle, volume-weighted
@@ -656,7 +685,9 @@ export function computeSmcOverlay(
       invalidated,
     });
     buy = high ? 0.5 - strength : 0.5 + strength;
-    pressure[t] = Math.round(clamp01(buy) * 100);
+    confluence[t] = Math.round(clamp01(buy) * 100);
+    // Displayed B%/S%: Volume Block Engine over the 3-candle swing cluster.
+    pressure[t] = clusterBuyerPercent(all, i) ?? 50;
   };
   for (const p of pivotsLabelled) legFor(p.t, p.kind);
   for (const p of livePivots) legFor(p.t, p.kind);
@@ -672,9 +703,22 @@ export function computeSmcOverlay(
     ...pivotsLabelled,
     ...livePivots,
   ], pressure, atr, targetBuySide, targetSellSide);
+  const closedE = fractalBars;
+  const sweeps = detectLiquiditySweeps(closedE, fractal.pivots);
+  const zones = [...selectedPois.orderBlocks, ...selectedPois.fvgs].map((z) => ({ top: z.top, bottom: z.bottom, type: z.type }));
+  const execution = computeExecutionSignal(closedE, fractal.pivots, fractal.breaks, zones, sweeps);
+  const jenvuSignals = computeJenvuSignals(closedE).slice(-20);
+  const topBottom = computeTopBottom(closedE).slice(-20);
+  const cloud = computeVortexCloud(closedE);
   return {
     reversal,
     pressure,
+    confluence,
+    sweeps,
+    execution,
+    jenvuSignals,
+    topBottom,
+    cloud,
     pivots: pivotsLabelled,
     livePivots,
     breaks: breaks.slice(-8),
