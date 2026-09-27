@@ -21,7 +21,8 @@ export default function CloudflareHero() {
           </div>
 
           <h1 className="mx-auto mt-8 max-w-[330px] text-center text-[34px] font-semibold leading-[1.05] tracking-normal text-home-accent-foreground sm:max-w-[740px] sm:text-[44px] sm:leading-[0.98] md:text-[48px]">
-             AI gold trading terminal for XAU/USD
+             <span className="sm:hidden">AI gold trading terminal for XAU/USD</span>
+             <span className="hidden sm:inline">AI gold trading terminal for XAU/USD chart analysis</span>
           </h1>
 
           <p className="mx-auto mt-8 max-w-[320px] text-center text-[13px] leading-[1.45] text-home-accent-foreground sm:max-w-xl sm:text-sm sm:leading-[1.25]">
