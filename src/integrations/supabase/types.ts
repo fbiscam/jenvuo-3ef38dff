@@ -3473,6 +3473,7 @@ export type Database = {
         }
         Returns: number
       }
+      charge_terminal_daily_access: { Args: never; Returns: Json }
       close_chat_session: { Args: { _session_id: string }; Returns: undefined }
       community_bump_counter: {
         Args: { _col: string; _delta: number; _post_id: string }
