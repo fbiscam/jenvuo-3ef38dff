@@ -72,13 +72,7 @@ export type ReversalSignal = {
   sl: number;
   tp1: number | null;
   tp2: number | null;
-  /** Reward/risk to the first structure target after execution buffers. */
-  rr: number | null;
-  /** True only when the complete buffered plan clears the minimum 1:2 filter. */
-  tradeReady: boolean;
 };
-
-export type ReversalMarket = "XAUUSD" | "BTCUSD";
 
 type PCandle = { t: number; o: number; h: number; l: number; c: number };
 
@@ -88,9 +82,7 @@ type PCandle = { t: number; o: number; h: number; l: number; c: number };
  *  - confirmed: candle 1 body-closes beyond the swing candle's body, then candle 2
  *    retests/holds that level and closes in the reversal direction
  *  - cancelled: price trades beyond the swing extreme afterwards
- * Entry = body-break retest level, SL = beyond the confirmed swing, TP1 =
- * opposing confirmed liquidity, and TP2 = 1:3. Gold uses the requested fixed
- * execution buffers; BTC keeps volatility-aware buffers.
+ * Entry = confirmation close, SL = beyond wick (+ small ATR buffer), TP1 = opposing liquidity, TP2 = 1:3.
  */
 export function computeReversalSignal(
   closed: PCandle[],
@@ -100,7 +92,6 @@ export function computeReversalSignal(
   atr: number,
   buySide: number[],
   sellSide: number[],
-  market: ReversalMarket = "XAUUSD",
 ): ReversalSignal | null {
   if (!swings.length || !closed.length) return null;
   const last = [...swings].sort((a, b) => a.t - b.t).at(-1)!;
@@ -118,9 +109,8 @@ export function computeReversalSignal(
   // calculated by reversalPressureStrength. A separate wick/sweep formula
   // could otherwise advertise a stronger setup than the chart badge.
   const score = winPct;
-  const slBuffer = market === "XAUUSD" ? Math.max(2, atr * 0.1) : Math.max(atr * 0.1, last.price * 0.00003);
-  const tpBuffer = market === "XAUUSD" ? 0.5 : Math.max(atr * 0.025, last.price * 0.00001);
-  const sl = high ? last.price + slBuffer : last.price - slBuffer;
+  const buffer = Math.max(atr * 0.1, last.price * 0.00003);
+  const sl = high ? last.price + buffer : last.price - buffer;
   let stage: ReversalSignal["stage"] = "alert";
   let entry: number | null = null;
   let entryT: number | null = null;
@@ -141,8 +131,7 @@ export function computeReversalSignal(
       const held = high ? c.c < trigger : c.c > trigger;
       const directionalClose = high ? c.c < c.o : c.c > c.o;
       if (retested && held && directionalClose && pressureAligned) {
-        // Pending limit at the body-close CHoCH level: do not chase candle 2.
-        entry = trigger;
+        entry = c.c;
         entryT = c.t;
         stage = "confirmed";
       } else {
@@ -153,22 +142,15 @@ export function computeReversalSignal(
   const ref = entry ?? (forming?.c ?? closed.at(-1)!.c);
   const risk = Math.abs(ref - sl);
   const tp2 = risk > 0 ? (high ? ref - 3 * risk : ref + 3 * risk) : null;
-  const rawLiquidityTarget = high
+  const liquidityTarget = high
     ? sellSide.find((p) => p < ref - risk && (tp2 == null || p > tp2))
     : buySide.find((p) => p > ref + risk && (tp2 == null || p < tp2));
-  const bufferedLiquidityTarget = rawLiquidityTarget == null
-    ? null
-    : high
-      ? rawLiquidityTarget + tpBuffer
-      : rawLiquidityTarget - tpBuffer;
-  // A structure target is mandatory for a trade-ready limit plan. TP2 remains
-  // available as the deterministic runner, but no synthetic TP1 can qualify it.
-  const tp1 = bufferedLiquidityTarget;
-  const reward = entry != null && tp1 != null ? Math.abs(tp1 - entry) : 0;
-  const rr = risk > 0 && reward > 0 ? reward / risk : null;
-  const targetDirectionValid = entry != null && tp1 != null && (high ? tp1 < entry : tp1 > entry);
-  const tradeReady = stage === "confirmed" && pressureAligned && targetDirectionValid && rr != null && rr >= 2;
-  return { side: high ? "sell" : "buy", t: last.t, pivotPrice: last.price, label: last.label, stage, score, swept, entry, entryT, sl, tp1, tp2, rr, tradeReady };
+  // TP1 must remain visible even when no clean opposing liquidity pivot exists.
+  // Prefer that liquidity; otherwise use a deterministic 1.5R partial target.
+  const tp1 = risk > 0
+    ? liquidityTarget ?? (high ? ref - 1.5 * risk : ref + 1.5 * risk)
+    : null;
+  return { side: high ? "sell" : "buy", t: last.t, pivotPrice: last.price, label: last.label, stage, score, swept, entry, entryT, sl, tp1, tp2 };
 }
 /** Buyer share of the leg ending at `end`: close position inside each candle's range. */
 export function legBuyerPercent(candles: PCandle[], start: number, end: number): number | null {
@@ -446,7 +428,6 @@ export function computeSmcOverlay(
   bars: OhlcvBar[],
   currentPrice: number | null,
   forming: OhlcvBar | null = null,
-  market: ReversalMarket = "XAUUSD",
 ): SmcOverlay {
   const recent = bars.slice(-SMC_WINDOW).map(toCandle);
   if (recent.length < 10) {
@@ -729,7 +710,7 @@ export function computeSmcOverlay(
   const reversal = computeReversalSignal(fractalBars, forming ? toCandle(forming) : null, [
     ...pivotsLabelled,
     ...livePivots,
-  ], pressure, atr, targetBuySide, targetSellSide, market);
+  ], pressure, atr, targetBuySide, targetSellSide);
   return {
     reversal,
     pressure,
@@ -1069,7 +1050,7 @@ export function renderSmcOverlay(
   const rv = smc.reversal;
   const rvBuy = rv ? smc.pressure?.[rv.t] : undefined;
   const rvPct = rv && rvBuy != null ? (rv.side === "sell" ? 100 - rvBuy : rvBuy) : 0;
-  if (showPressure && rv?.tradeReady && rv.entry != null && rvPct >= REVERSAL_TRADE_MIN_PCT) {
+  if (showPressure && rv && rv.stage === "confirmed" && rv.entry != null && rvPct >= REVERSAL_TRADE_MIN_PCT) {
     const x0 = rv.entryT != null ? pr.x(rv.entryT / 1000) : null;
     const start = Math.max(0, x0 ?? pr.width * 0.6);
     const line = (price: number | null, label: string, color: string, dash: number[]) => {

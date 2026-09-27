@@ -175,4 +175,3 @@
 - [x] Make BTC/USD charts load reliably across Chrome profiles and every timeframe
 - [x] Restrict buyer/seller reversal pressure and its AI evidence to 1H XAU/USD and BTC/USD
 - [x] Add body-close and two-candle retest confirmation to 1H reversal entries
-- [x] Add buffered CHoCH limit-entry plans with confirmed structure targets and a minimum 1:2 safety filter
