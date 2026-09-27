@@ -186,7 +186,7 @@ const NAV_GROUPS: Array<{ label: string; items: TabItem[] }> = [
   {
     label: "",
     items: [
-      { to: "/dashboard/extension", label: "API Keys", icon: KeyRound },
+      { to: "/dashboard/api", label: "API Keys", icon: KeyRound },
       { to: "/pricing", label: "Pricing", icon: Tag },
     ],
   },
@@ -1757,7 +1757,7 @@ function DashboardHero({
       eyebrow: "  Introducing grok 4.6 reasoning",
       copy: "Our most capable model, built for precise market analysis. Grok 4.6 combines reasoning, chart vision, and strong context awareness from capture to completion.",
       action: "Analyze with Grok 4.6",
-      to: "/dashboard/extension" as const,
+      to: "/dashboard/api" as const,
       note: "",
     },
     {
@@ -2414,7 +2414,7 @@ function QuickActions() {
   const actions: { label: string; to: string; icon: typeof Activity; tone: string }[] = [
     {
       label: "New Scan",
-      to: "/dashboard/extension",
+      to: "/dashboard/api",
       icon: Activity,
       tone: "bg-blue-50 text-blue-700 border-blue-100",
     },
