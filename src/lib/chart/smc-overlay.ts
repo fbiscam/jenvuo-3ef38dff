@@ -500,8 +500,38 @@ export function computeSmcOverlay(
     const exhaustion = avgB > 0 ? clamp01(1 - avgA / avgB) : 0;
     // 8) Swing-candle volume vs average: absorption at the level.
     const absorb = piv.v && piv.v > 0 ? clamp01((piv.v / avgV - 1) / 1.5) : 0;
-    const bonus = 0.08 * sweep + 0.05 * exhaustion + 0.04 * absorb;
-    const strength = Math.min(0.45, Math.max(0.06, agree, move * 0.35) + bonus);
+    // 9) Engulfing confirmation: first reaction candle engulfs the swing body
+    //    in the reversal direction.
+    let engulf = 0;
+    const nx = all[i + 1];
+    if (nx) {
+      const lo = Math.min(piv.o, piv.c), hi = Math.max(piv.o, piv.c);
+      const revBody = high ? nx.c < nx.o : nx.c > nx.o;
+      if (revBody && Math.min(nx.o, nx.c) <= lo && Math.max(nx.o, nx.c) >= hi) engulf = 1;
+    }
+    // 10) Structure break: reaction closed beyond the opposite end of the
+    //     leg into the swing (mini BOS/CHoCH).
+    let bos = 0;
+    if (a.length) {
+      const legEnd = high ? Math.min(...a.map((c) => c.l)) : Math.max(...a.map((c) => c.h));
+      for (let k = i + 1; k <= end; k++) {
+        if (high ? all[k].c < legEnd : all[k].c > legEnd) { bos = 1; break; }
+      }
+    }
+    // 11) Failed retest: price came back near the extreme (within 0.3 ATR)
+    //     but could not close beyond it — level defended twice.
+    let defended = 0;
+    if (atr > 0) {
+      for (let k = i + 2; k <= end; k++) {
+        const c = all[k];
+        const near = high ? piv.h - c.h <= 0.3 * atr : c.l - piv.l <= 0.3 * atr;
+        const held = high ? c.c < piv.h : c.c > piv.l;
+        if (near && held) { defended = 1; break; }
+      }
+    }
+    const bonus =
+      0.08 * sweep + 0.05 * exhaustion + 0.04 * absorb + 0.05 * engulf + 0.06 * bos + 0.04 * defended;
+    const strength = Math.min(0.46, Math.max(0.06, agree, move * 0.35) + bonus);
     buy = high ? 0.5 - strength : 0.5 + strength;
     pressure[t] = Math.round(clamp01(buy) * 100);
   };
