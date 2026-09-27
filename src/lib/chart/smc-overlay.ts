@@ -175,6 +175,10 @@ export type ReversalPressureEvidence = {
   directionalBias: number;
   efficiency: number;
   persistence: number;
+  /** 0..1 location quality in the recent dealing range (1 = extreme premium for highs / discount for lows). */
+  context?: number;
+  /** True once a later closed candle closes beyond the swing extreme. */
+  invalidated?: boolean;
 };
 
 /**
@@ -195,8 +199,12 @@ export function reversalPressureStrength(input: ReversalPressureEvidence): numbe
   const persistence = clamp01(input.persistence);
   const agreement = Math.max(0, input.directionalAgreement);
 
-  const strongFamilies = [footprint, confirmation, followThrough]
+  // Optional location context: highs in premium / lows in discount of the
+  // recent dealing range. Undefined = legacy neutral behaviour.
+  const context = input.context == null ? null : clamp01(input.context);
+  const coreStrong = [footprint, confirmation, followThrough]
     .filter((value) => value >= 0.55).length;
+  const strongFamilies = coreStrong;
   const weakestCore = Math.min(footprint, confirmation, followThrough);
   const weightedConfluence =
     0.24 * footprint + 0.31 * confirmation + 0.29 * followThrough +
@@ -212,11 +220,16 @@ export function reversalPressureStrength(input: ReversalPressureEvidence): numbe
   let strength =
     0.025 + 0.22 * agreement + 0.08 * displacement +
     0.19 * weightedConfluence + 0.08 * weakestCore - contradiction;
+  if (context != null) strength += 0.04 * (context - 0.5);
 
   // Strict confidence ceilings stop a single signal from looking trade-ready.
-  const familyCap = strongFamilies === 3 ? 0.46 : strongFamilies === 2 ? 0.34 : strongFamilies === 1 ? 0.24 : 0.17;
+  // The top tier additionally requires a favourable range location.
+  let familyCap = strongFamilies === 3 ? 0.46 : strongFamilies === 2 ? 0.34 : strongFamilies === 1 ? 0.24 : 0.17;
+  if (strongFamilies === 3 && context != null && context < 0.55) familyCap = 0.4;
   const maturityCap = 0.2 + 0.26 * evidence;
   strength = Math.min(strength, familyCap, maturityCap);
+  // A swing whose extreme has been closed through is invalidated.
+  if (input.invalidated) strength = Math.min(strength, 0.08);
   return Math.max(0.03, Math.min(0.46, strength));
 }
 
@@ -613,6 +626,17 @@ export function computeSmcOverlay(
     const footprint = Math.max(sweep, absorb, exhaustion);
     const confirmation = Math.max(engulf, bos, defended);
     const followThrough = 0.4 * efficiency + 0.35 * persistence + 0.25 * directionalBias;
+    // 13) Range location: highs in premium, lows in discount of last 50 bars.
+    const rng = all.slice(Math.max(0, i - 50), i + 1);
+    const rHi = Math.max(...rng.map((c) => c.h));
+    const rLo = Math.min(...rng.map((c) => c.l));
+    const pos = rHi > rLo ? ((high ? piv.h : piv.l) - rLo) / (rHi - rLo) : 0.5;
+    const context = rng.length >= 20 ? clamp01(high ? pos : 1 - pos) : undefined;
+    // 14) Invalidation: any later CLOSED candle closing beyond the extreme.
+    let invalidated = false;
+    for (let k = i + 1; k < fractalBars.length; k++) {
+      if (high ? all[k].c > piv.h : all[k].c < piv.l) { invalidated = true; break; }
+    }
     const strength = reversalPressureStrength({
       directionalAgreement: agree,
       displacement: move,
@@ -624,6 +648,8 @@ export function computeSmcOverlay(
       directionalBias,
       efficiency,
       persistence,
+      context,
+      invalidated,
     });
     buy = high ? 0.5 - strength : 0.5 + strength;
     pressure[t] = Math.round(clamp01(buy) * 100);
