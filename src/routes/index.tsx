@@ -683,7 +683,7 @@ function HomePage() {
                 Build without boundaries
               </h2>
               <p className="mx-auto mt-6 max-w-[320px] text-[13px] leading-[1.45] text-home-accent-foreground sm:max-w-xl sm:text-sm sm:leading-snug">
-                Your TradingView copilot is one click away — reading, reasoning, research
+                Your TradingView copilot is one click away reading, reasoning, research
                 <br className="hidden sm:block" />{" "}
                 &amp; reviewing. Analyze the market now, no credit card required.
               </p>
