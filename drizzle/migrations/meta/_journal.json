@@ -29,6 +29,13 @@
       "when": 1790316934809,
       "tag": "0003_rotate_scheduler_credential_and_tighten_public_reads",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1790541729062,
+      "tag": "0004_terminal_daily_access_fee",
+      "breakpoints": true
     }
   ]
 }
