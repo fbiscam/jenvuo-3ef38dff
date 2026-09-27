@@ -298,6 +298,12 @@ function RootShell({ children }: { children: ReactNode }) {
 const JENVU_HOSTS = ["jenvu.com", "dash.jenvu.com", "support.jenvu.com", "leads.jenvu.com", "blogs.jenvu.com"];
 
 function RootComponent() {
+  // Share the auth session across jenvu.com subdomains so a signed-in user
+  // stays signed in on dash/support/blogs/leads.
+  useEffect(() => {
+    initCrossDomainSession();
+  }, []);
+
   // Fast cross-subdomain navigation: warm connections, prefetch on hover,
   // and skip the in-app router for links to another jenvu host.
   useEffect(() => {
