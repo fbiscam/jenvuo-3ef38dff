@@ -347,8 +347,8 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
     const closed = bars.filter((b) => (b.time + stepSeconds) * 1000 <= now);
     const last = bars[bars.length - 1];
     const forming = closed.length < bars.length ? last : null;
-    return computeSmcOverlay(closed, last.close, forming);
-  }, [bars, stepSeconds, serverTime]);
+    return computeSmcOverlay(closed, last.close, forming, asset);
+  }, [asset, bars, stepSeconds, serverTime]);
 
   // Next-candle projection removed from the chart.
   const projection = useMemo(
