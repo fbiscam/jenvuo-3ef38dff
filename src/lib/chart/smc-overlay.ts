@@ -626,6 +626,17 @@ export function computeSmcOverlay(
     const footprint = Math.max(sweep, absorb, exhaustion);
     const confirmation = Math.max(engulf, bos, defended);
     const followThrough = 0.4 * efficiency + 0.35 * persistence + 0.25 * directionalBias;
+    // 13) Range location: highs in premium, lows in discount of last 50 bars.
+    const rng = all.slice(Math.max(0, i - 50), i + 1);
+    const rHi = Math.max(...rng.map((c) => c.h));
+    const rLo = Math.min(...rng.map((c) => c.l));
+    const pos = rHi > rLo ? ((high ? piv.h : piv.l) - rLo) / (rHi - rLo) : 0.5;
+    const context = rng.length >= 20 ? clamp01(high ? pos : 1 - pos) : undefined;
+    // 14) Invalidation: any later CLOSED candle closing beyond the extreme.
+    let invalidated = false;
+    for (let k = i + 1; k < fractalBars.length; k++) {
+      if (high ? all[k].c > piv.h : all[k].c < piv.l) { invalidated = true; break; }
+    }
     const strength = reversalPressureStrength({
       directionalAgreement: agree,
       displacement: move,
@@ -637,6 +648,8 @@ export function computeSmcOverlay(
       directionalBias,
       efficiency,
       persistence,
+      context,
+      invalidated,
     });
     buy = high ? 0.5 - strength : 0.5 + strength;
     pressure[t] = Math.round(clamp01(buy) * 100);
