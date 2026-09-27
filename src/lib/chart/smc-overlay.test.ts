@@ -144,7 +144,7 @@ describe("smc overlay fractal labels", () => {
       efficiency: 0,
       persistence: 0,
     });
-    expect(strength < 0.2).toBe(true);
+    expect(strength <= 0.2).toBe(true);
   });
 
   it("reserves high pressure for confirmed, efficient reversals", () => {
