@@ -228,6 +228,14 @@ export function rewriteOutput(url: URL): URL | undefined {
     return undefined;
   }
 
+  // On the apex domain, dashboard links point at the dash subdomain.
+  if (isApex(host) && (p === "/dashboard" || p.startsWith("/dashboard/"))) {
+    const next = new URL(url);
+    next.hostname = `dash.${ROOT_DOMAIN}`;
+    next.pathname = p === "/dashboard" ? "/" : p.slice("/dashboard".length);
+    return next;
+  }
+
   // On the dash subdomain the dashboard index is the root URL.
   if (isDash(host) && p === "/dashboard") {
     const next = new URL(url);
