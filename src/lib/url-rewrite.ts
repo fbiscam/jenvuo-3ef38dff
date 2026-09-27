@@ -178,6 +178,13 @@ export function rewriteOutput(url: URL): URL | undefined {
   const p = url.pathname;
   if (isReserved(p)) return undefined;
 
+  // On the dash subdomain the dashboard index is the root URL.
+  if (isDash(host) && p === "/dashboard") {
+    const next = new URL(url);
+    next.pathname = "/";
+    return next;
+  }
+
   // Admin paths: /dashboard/admin/* -> /admin/*
   if (p === "/dashboard/admin" || p.startsWith("/dashboard/admin/")) {
     const next = new URL(url);
