@@ -8,6 +8,7 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import type { Tables } from "@/integrations/supabase/types";
 import SiteFooter from "@/components/SiteFooter";
+import { insightCoverUrl } from "@/lib/insight-cover";
 
 type Insight = Tables<"insights">;
 
@@ -37,23 +38,24 @@ const insightDetailQueryOptions = (slug: string) => queryOptions({
 export const Route = createFileRoute("/insights/$slug")({
   head: ({ params, loaderData }) => {
     const data = loaderData as Insight | undefined;
-    const url = `https://jenvu.com/insights/${params.slug}`;
+    const url = `https://blogs.jenvu.com/${params.slug}`;
     const title = data ? `${data.title} — Jenvu` : "Market Insight — Jenvu";
     const desc = data?.excerpt || "Institutional market analysis from Jenvu.";
-    const img = data?.image_url || "https://jenvu.com/favicon.png";
+    const imagePath = data ? insightCoverUrl(data.title, data.category, data.image_url) : null;
+    const img = imagePath?.startsWith("http") ? imagePath : imagePath ? `https://blogs.jenvu.com${imagePath}` : null;
     return {
       meta: [
         { title },
         { name: "description", content: desc },
         { property: "og:title", content: data?.title || title },
         { property: "og:description", content: desc },
-        { property: "og:image", content: img },
+        ...(img ? [{ property: "og:image", content: img }] : []),
         { property: "og:url", content: url },
         { property: "og:type", content: "article" },
         { name: "twitter:card", content: "summary_large_image" },
         { name: "twitter:title", content: data?.title || title },
         { name: "twitter:description", content: desc },
-        { name: "twitter:image", content: img },
+        ...(img ? [{ name: "twitter:image", content: img }] : []),
       ],
       links: [{ rel: "canonical", href: url }],
       scripts: data
@@ -65,7 +67,7 @@ export const Route = createFileRoute("/insights/$slug")({
                 "@type": "Article",
                 headline: data.title,
                 description: data.excerpt,
-                image: [img],
+                ...(img ? { image: [img] } : {}),
                 datePublished: data.published_at,
                 dateModified: data.updated_at || data.published_at,
                 author: { "@type": "Organization", name: "Jenvu" },
@@ -85,7 +87,7 @@ export const Route = createFileRoute("/insights/$slug")({
                 "@type": "BreadcrumbList",
                 itemListElement: [
                   { "@type": "ListItem", position: 1, name: "Home", item: "https://jenvu.com/" },
-                  { "@type": "ListItem", position: 2, name: "Insights", item: "https://jenvu.com/insights" },
+                  { "@type": "ListItem", position: 2, name: "Insights", item: "https://blogs.jenvu.com/" },
                   { "@type": "ListItem", position: 3, name: data.title, item: url },
                 ],
               }),
@@ -151,10 +153,10 @@ function InsightDetailPage() {
             aria-hidden="true"
           />
           <div className="relative mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-3 px-5 py-3 sm:px-6 sm:py-4 md:flex md:justify-between">
-            <Link to="/" className="flex min-w-0 items-center gap-2.5">
+            <a href="https://jenvu.com" className="flex min-w-0 items-center gap-2.5">
               <img src="/favicon.png" alt="Jenvu" className="h-7 w-7 shrink-0 rounded-md object-contain" />
               <span className="truncate text-[22px] tracking-tight leading-none" style={{ color: "#3c4043", fontFamily: "\"Google Sans\", \"Product Sans\", \"DM Sans\", system-ui, sans-serif", fontWeight: 500 }}>Jenvu</span>
-            </Link>
+            </a>
             <SiteNavLinks active="/insights" />
             <HeaderAuthButtons />
           </div>
@@ -184,12 +186,14 @@ function InsightDetailPage() {
 
           <div className="aspect-[21/9] rounded-2xl overflow-hidden mb-12 border border-zinc-100 shadow-xl bg-zinc-100">
             <img
-              src={insight.image_url || "https://images.unsplash.com/photo-1610375461246-83df859d849d?w=1600&q=80"}
+              src={insightCoverUrl(insight.title, insight.category, insight.image_url)}
               alt={insight.title}
+              width={1280}
+              height={720}
               onError={(e) => {
                 const t = e.currentTarget;
                 t.onerror = null;
-                t.src = "https://images.unsplash.com/photo-1610375461246-83df859d849d?w=1600&q=80";
+                t.src = insightCoverUrl(insight.title, insight.category);
               }}
               className="w-full h-full object-cover"
             />

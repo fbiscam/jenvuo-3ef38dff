@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-const BASE_URL = "https://jenvu.com";
+const BASE_URL = "https://blogs.jenvu.com";
 const INDEXNOW_KEY = "31f95befb924351f7ab6c1f5ce4bc15b";
 const JOB_KEY = "daily-insight";
 const ARTICLE_MODELS = [
@@ -151,7 +151,7 @@ export const Route = createFileRoute("/api/public/hooks/generate-insight")({
         };
         const langName = langNames[langCode] || "British English";
 
-        const sys = `You are a senior institutional trading analyst writing for Jenvu — an AI XAU/USD trading terminal. Write a comprehensive, factually accurate, SEO-optimized markdown article targeted at European retail and prop-firm traders (UK, Germany, France, Italy, Spain, Netherlands, Poland, Switzerland). Write the ENTIRE article, title, slug and excerpt in ${langName}. Target the primary keyword exactly as given plus its natural long-tail and question variants, and weave in relevant high-intent European search terms (London killzone, Frankfurt open, XAU/USD analysis, London session gold, prop firm challenge, MT5 gold signals, ICT concepts, smart money concepts) plus proven high-volume gold search terms where naturally relevant (gold price today, gold price forecast, XAU/USD forecast, gold trading strategy, how to trade gold, gold signals, gold technical analysis, is gold a good investment) without keyword stuffing. Write a click-worthy but honest title in news-headline style (like CoinDesk), and an excerpt under 155 characters that contains the primary keyword. Keep trading analysis and product positioning strictly focused on XAU/USD; discuss macro or news only as context affecting XAU/USD, never as another supported market. Reference European market hours and regulation where relevant. Style: precise, professional, no fluff, no hype, no emojis, no invented statistics, prices, testimonials or guarantees — describe drivers and method instead of quoting live numbers. Use ICT/SMC concepts correctly. Include H2/H3 headings, bullet lists or a comparison table where they answer better than prose, and a final FAQ section with 3 Q&A pairs answering long-tail European queries. 900-1300 words.`;
+        const sys = `You are a rigorous markets editor writing for Jenvu, an AI chart-analysis platform for XAU/USD and BTC/USD. Produce a comprehensive, original, factually careful article for traders in the United States, United Kingdom, Canada, Germany, Italy, and France. Write the entire article in ${langName}. Use the primary keyword and natural question variants without keyword stuffing. Semrush-supported topic families include gold trading strategy, ICT trading strategy, smart money concepts, XAUUSD analysis, gold price forecast, and Bitcoin technical analysis. For localized articles use natural local-language terms such as Goldpreis Prognose and Gold Trading Strategie (German), previsioni prezzo oro and analisi XAUUSD (Italian), or analyse XAUUSD and prévision cours de l'or (French). Never mix foreign-language keywords into English prose merely for ranking. Keep market-hour, tax, regulation, and broker claims country-specific and omit them unless they can be stated safely without current unverifiable detail. Never invent live prices, statistics, sources, testimonials, performance, or guarantees. Explain uncertainty, invalidation, and risk. Use ICT/SMC concepts precisely and distinguish a wick sweep from a body-close structure break. Include a descriptive title, a direct introduction, substantive H2/H3 sections, useful lists or a table, practical examples without fabricated prices, key takeaways, and exactly three FAQ answers. Avoid generic filler and repeated ideas. Target 1,200-1,600 words.`;
 
         const userPrompt = `Write a complete article on: "${topic.keyword}"
 Angle: ${topic.angle || "comprehensive guide"}
@@ -159,19 +159,20 @@ Category: ${topic.category}
 Language: ${langName}
 Primary keyword must appear in the title, the first 100 words, and at least one H2.
 
-Return Markdown only. Start with one '# ' title of no more than 60 characters, then the complete 900-1300 word article. Use ## H2 sections, lists, a final ## FAQ section, and natural internal links to /signal, /app, /insights, or /download. Do not wrap the Markdown in a code fence.`;
+Return Markdown only. Start with one '# ' title of no more than 60 characters. Use ## H2 sections, lists, a final ## FAQ section, and natural internal links to https://dash.jenvu.com/dashboard/terminal, https://blogs.jenvu.com, or https://jenvu.com/download where genuinely useful. Do not wrap the Markdown in a code fence.`;
 
 
         let raw = "";
         let lastErr = "";
         try {
-          const sectionPrompts = [
-            `${userPrompt}\n\nWrite part 1 of 3 only: the title, introduction, and first two substantive H2 sections. Aim for 350-450 words.`,
-            `Continue the same article on "${topic.keyword}" in ${langName}. Write part 2 of 3 only: three new substantive H2 sections covering practical method, European sessions, and risk. Do not repeat the title or introduction. Aim for 350-450 words.`,
-            `Finish the same article on "${topic.keyword}" in ${langName}. Write part 3 of 3 only: key takeaways, a concise conclusion, and a final ## FAQ with exactly 3 useful Q&A pairs. Do not repeat earlier sections. Aim for 300-400 words.`,
-          ];
           const parts: string[] = [];
-          for (const prompt of sectionPrompts) {
+          for (let part = 0; part < 3; part += 1) {
+            const prior = parts.join("\n\n");
+            const prompt = part === 0
+              ? `${userPrompt}\n\nWrite part 1 of 3 only: the title, direct introduction, and first two substantive H2 sections. Aim for 400-500 words.`
+              : part === 1
+                ? `Continue the article below without repeating its title, introduction, claims, or examples. Add three substantive H2 sections covering practical method, the market sessions relevant to the target regions, and risk/invalidation. Aim for 450-550 words.\n\nARTICLE SO FAR:\n${prior}`
+                : `Finish the article below without repeating earlier ideas. Add key takeaways, a concise conclusion, and a final ## FAQ with exactly 3 useful question-and-answer pairs. Aim for 350-450 words.\n\nARTICLE SO FAR:\n${prior}`;
             parts.push(
               (await (await import("@/lib/ai-gateway")).callChatCompletion({
                 models: ARTICLE_MODELS,
@@ -296,10 +297,10 @@ Return Markdown only. Start with one '# ' title of no more than 60 characters, t
         await supabaseAdmin.from("insight_topics").update({ last_used_at: new Date().toISOString() }).eq("id", topic.id);
 
         // Submit to search engines (Google indexing API + IndexNow → Bing/Yandex)
-        const url = `${BASE_URL}/insights/${slug}`;
+        const url = `${BASE_URL}/${slug}`;
         const [google, indexnow] = await Promise.all([
           submitToGoogle(url),
-          submitToIndexNow([url, `${BASE_URL}/insights`, `${BASE_URL}/sitemap.xml`]),
+          submitToIndexNow([url, BASE_URL, "https://jenvu.com/sitemap.xml"]),
         ]);
 
         if (!inserted) {
