@@ -41,7 +41,6 @@ import { getTerminalChart } from "@/lib/gold-analysis.functions";
 import { cn } from "@/lib/utils";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { XauUsdLogo } from "./XauUsdLogo";
-import { ExecutionHud } from "./ExecutionHud";
 import { Menu } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -140,10 +139,6 @@ const SMC_LABELS: Array<{ key: keyof SmcToggles; label: string; hint: string }> 
   { key: "liquidity", label: "Liquidity", hint: "Nearest buy-side / sell-side pools" },
   { key: "fvg", label: "Fair value gaps", hint: "Unmitigated and partial FVGs" },
   { key: "orderBlocks", label: "Order blocks", hint: "Strict demand / supply blocks" },
-  { key: "execution", label: "Execution engine", hint: "CHoCH pullback Entry / SL / TP1 / TP2" },
-  { key: "jenvuSignals", label: "JENVU AI signals", hint: "LONG / SHORT trend flips" },
-  { key: "topBottom", label: "Top / Bottom", hint: "Don't buy / don't sell crosses" },
-  { key: "cloud", label: "Vortex cloud", hint: "Combined MA trend cloud" },
 ];
 
 function readJson<T>(key: string, fallback: T): T {
@@ -746,8 +741,6 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
               resetKey={`${asset}:${timeframe.key}:${payload ? "ready" : "loading"}`}
               theme={chartTheme}
             />
-
-            <ExecutionHud smc={smc} asset={asset} />
 
             {/* Legend */}
             <div

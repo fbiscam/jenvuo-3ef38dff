@@ -38,11 +38,6 @@ export type MarketStructureEvidence = {
   inducement: InducementEvidence | null;
 };
 
-/** Three closed candles on each side lock a structural swing. */
-export const MARKET_STRUCTURE_RADIUS = 3;
-/** Ignore internal wiggles smaller than 1.2 ATR from the opposite swing. */
-export const MIN_SWING_ATR_MULTIPLE = 1.2;
-
 export type MarketStructureCandle = {
   timestamp: number;
   open: number;
@@ -109,14 +104,11 @@ function atrAt(candles: StructureCandle[], index: number, period = 14): number {
 
 /**
  * Produces confirmed, causal market-structure evidence from closed candles.
- * A two-sided pivot becomes available only after three later candles close.
- * Locked pivots alternate high/low and must travel at least 1.2 ATR from the
- * immediately previous opposite pivot, suppressing minor internal noise.
+ * A two-sided pivot becomes available only after two later candles close.
  */
 export function detectMarketStructureEvidence(
   input: StructureCandle[],
-  radius = MARKET_STRUCTURE_RADIUS,
-  minSwingAtrMultiple = MIN_SWING_ATR_MULTIPLE,
+  radius = 2,
 ): MarketStructureEvidence {
   const candles = input.filter(
     (c) =>
@@ -156,20 +148,9 @@ export function detectMarketStructureEvidence(
   }
   raw.sort((a, b) => a.index - b.index || (a.kind === "high" ? -1 : 1));
 
-  const accepted: typeof raw = [];
-  for (const candidate of raw) {
-    const previous = accepted.at(-1);
-    if (previous?.kind === candidate.kind) continue;
-    if (previous) {
-      const atr = atrAt(candles, candidate.index);
-      if (Math.abs(candidate.price - previous.price) <= minSwingAtrMultiple * atr) continue;
-    }
-    accepted.push(candidate);
-  }
-
   let previousHigh: StructurePivot | null = null;
   let previousLow: StructurePivot | null = null;
-  const pivots: StructurePivot[] = accepted.map((pivot) => {
+  const pivots: StructurePivot[] = raw.map((pivot) => {
     const label =
       pivot.kind === "high"
         ? previousHigh
@@ -296,7 +277,7 @@ export function detectMarketStructureEvidence(
  */
 export function mapMarketStructure(
   input: MarketStructureCandle[],
-  radius = MARKET_STRUCTURE_RADIUS,
+  radius = 2,
 ): MappedMarketStructureCandle[] {
   if (!Number.isInteger(radius) || radius < 1) {
     throw new RangeError("Market-structure radius must be a positive integer");
@@ -366,7 +347,7 @@ export function mapAdvancedSmcState(
   input: MarketStructureCandle[],
   options: { radius?: number; equalTolerance?: number; trendlineTolerance?: number } = {},
 ): AdvancedSmcBar[] {
-  const radius = options.radius ?? MARKET_STRUCTURE_RADIUS;
+  const radius = options.radius ?? 2;
   const equalTolerance = options.equalTolerance ?? 0.3;
   const trendlineTolerance = options.trendlineTolerance ?? 0.15;
   if (equalTolerance < 0 || trendlineTolerance < 0) {
