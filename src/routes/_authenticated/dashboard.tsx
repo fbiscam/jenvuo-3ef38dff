@@ -1755,8 +1755,8 @@ function DashboardHero({
     {
       variant: "model" as const,
       eyebrow: "  Introducing gpt-6 astra",
-      copy: "Our most capable model, built for precise market analysis. Astra combines reasoning, chart vision, and strong context awareness from capture to completion.",
-      action: "Analyze with Astra",
+      copy: "Our most capable model, built for precise market analysis. Opus 5 combines reasoning, chart vision, and strong context awareness from capture to completion.",
+      action: "Analyze with Opus 5",
       to: "/dashboard/extension" as const,
       note: "",
     },
@@ -1840,7 +1840,7 @@ function DashboardHero({
           <div className="relative min-h-[180px] overflow-hidden rounded-lg border border-border bg-primary text-primary-foreground sm:min-h-[190px]">
             <img
               src={astraGalaxyBanner}
-              alt="Spiral galaxy representing GPT-6 Astra"
+              alt="Spiral galaxy representing Claude Opus 5"
               width={1536}
               height={512}
               className="absolute inset-0 h-full w-full object-cover object-right"
