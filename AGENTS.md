@@ -8,3 +8,5 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+- Keep reversal pressure scoring deterministic and confluence-gated; a single wick or volume clue must never produce strong confidence, preventing inflated live signals.

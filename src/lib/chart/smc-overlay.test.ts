@@ -4,6 +4,7 @@ import {
   computeLivePivots,
   computeSmcOverlay,
   FRACTAL_RADIUS,
+  reversalPressureStrength,
   selectHighConfidencePois,
   structureBadgeTop,
 } from "./smc-overlay";
@@ -111,5 +112,67 @@ describe("smc overlay fractal labels", () => {
         expect(allZones[i].bottom >= allZones[j].top || allZones[i].top <= allZones[j].bottom).toBe(true);
       }
     }
+  });
+
+  it("keeps isolated reversal clues below strong pressure", () => {
+    const strength = reversalPressureStrength({
+      directionalAgreement: 0.4,
+      displacement: 0.8,
+      footprint: 1,
+      confirmation: 0.1,
+      followThrough: 0.15,
+      streak: 0.2,
+      evidence: 1,
+      directionalBias: 0.45,
+      efficiency: 0.2,
+      persistence: 0.2,
+    });
+    expect(strength < 0.25).toBe(true);
+  });
+
+  it("reserves high pressure for confirmed, efficient reversals", () => {
+    const weak = reversalPressureStrength({
+      directionalAgreement: 0.25,
+      displacement: 0.45,
+      footprint: 0.7,
+      confirmation: 0.3,
+      followThrough: 0.35,
+      streak: 0.35,
+      evidence: 1,
+      directionalBias: 0.55,
+      efficiency: 0.35,
+      persistence: 0.4,
+    });
+    const strong = reversalPressureStrength({
+      directionalAgreement: 0.45,
+      displacement: 1,
+      footprint: 1,
+      confirmation: 1,
+      followThrough: 0.95,
+      streak: 1,
+      evidence: 1,
+      directionalBias: 0.95,
+      efficiency: 0.9,
+      persistence: 0.9,
+    });
+    expect(strong > weak).toBe(true);
+    expect(strong >= 0.4).toBe(true);
+  });
+
+  it("penalizes contradictory directional flow", () => {
+    const shared = {
+      directionalAgreement: 0.32,
+      displacement: 0.7,
+      footprint: 0.8,
+      confirmation: 0.8,
+      followThrough: 0.7,
+      streak: 0.7,
+      evidence: 1,
+      efficiency: 0.7,
+      persistence: 0.7,
+    };
+    const aligned = reversalPressureStrength({ ...shared, directionalBias: 0.85 });
+    const opposed = reversalPressureStrength({ ...shared, directionalBias: 0.2 });
+    expect(aligned > opposed).toBe(true);
   });
 });
