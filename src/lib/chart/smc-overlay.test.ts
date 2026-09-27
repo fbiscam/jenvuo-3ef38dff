@@ -42,7 +42,7 @@ describe("smc overlay fractal labels", () => {
     }
   });
 
-  it("puts a live label on the forming candle when it makes the new extreme", () => {
+  it("tracks a forming extreme internally without adding it to locked pivots", () => {
     const closed = Array.from({ length: 40 }, (_, i) => ({ t: i, o: 100, h: 101 + (i === 15 ? 5 : 0), l: 99, c: 100 }));
     const forming = { t: 40, o: 100, h: 110, l: 99.5, c: 109 };
     const confirmed = [{ index: 15, confirmedIndex: 25, t: 15, price: 106, kind: "high" as const, label: "H" as const }];

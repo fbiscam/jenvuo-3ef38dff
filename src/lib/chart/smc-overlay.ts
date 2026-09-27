@@ -470,8 +470,7 @@ export function computeSmcOverlay(
     return p;
   };
   const pivotsLabelled = fractal.pivots.filter((p) => p.label.length === 2).map(lockLabel);
-  const livePivots = computeLivePivots(fractalBars, forming ? toCandle(forming) : null, fractal.pivots)
-    .map((p) => (p.confirmedByOpposite && p.label.length === 2 ? lockLabel(p) : p));
+  const livePivots = computeLivePivots(fractalBars, forming ? toCandle(forming) : null, fractal.pivots);
   const selectedPois = selectHighConfidencePois(poi, price);
 
   // Structure labels, breaks, trend and liquidity must all come from this same
@@ -701,7 +700,6 @@ export function computeSmcOverlay(
     .sort((a, b) => b - a);
   const reversal = computeReversalSignal(fractalBars, forming ? toCandle(forming) : null, [
     ...pivotsLabelled,
-    ...livePivots,
   ], pressure, atr, targetBuySide, targetSellSide);
   const closedE = fractalBars;
   const sweeps = detectLiquiditySweeps(closedE, fractal.pivots);
@@ -960,6 +958,9 @@ export function renderSmcOverlay(
     }
     // Live (unconfirmed) swings: outlined dashed badge that follows the forming candle.
     for (const p of smc.livePivots ?? []) {
+      // The tuned structure view shows only pivots locked by three closed bars
+      // on each side; provisional and early-opposite candidates stay hidden.
+      if (!SHOW_PROVISIONAL_PIVOTS) continue;
       const x = pr.x(p.t / 1000);
       const y = pr.y(p.price);
       if (x == null || y == null) continue;
@@ -984,8 +985,6 @@ export function renderSmcOverlay(
         continue;
       }
       // Early "High"/"Low" marker on the running swing (no countdown box).
-      // Spec: a swing is shown only once 3 closed candles lock it.
-      if (!SHOW_PROVISIONAL_PIVOTS) continue;
       ctx.fillStyle = "rgba(255,255,255,0.92)";
       ctx.beginPath();
        ctx.roundRect?.(xx - w / 2, yy, w, 18, 4);
