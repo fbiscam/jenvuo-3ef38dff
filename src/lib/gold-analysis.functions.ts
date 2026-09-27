@@ -122,8 +122,8 @@ async function _spendUserCredits(
 
 type Candle = { t: number; o: number; h: number; l: number; c: number; v: number };
 
-/** Shared non-repainting swing basis for chart labels, breaks, liquidity and AI evidence. */
-const SMC_FRACTAL_RADIUS = 10;
+/** Shared non-repainting 3-candle swing basis for chart labels and AI evidence. */
+const SMC_FRACTAL_RADIUS = 3;
 const SMC_STRUCTURE_WINDOW = 400;
 
 export type GoldSignal = {
@@ -1576,7 +1576,7 @@ async function buildEvidenceContext(timeframe: string, dailyTradesTaken = 0, ass
   const swingHigh = hasData ? Math.max(...highs) : 0;
   const swingLow = hasData ? Math.min(...lows) : 0;
 
-  // Pivots are not available until ten later candles close; breaks require a
+  // Pivots lock after three later candles close; breaks require a
   // buffered close through an already-confirmed swing.
   const structureEvidence = detectMarketStructureEvidence(
     structureCandles,

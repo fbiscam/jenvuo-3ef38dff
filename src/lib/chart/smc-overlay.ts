@@ -31,7 +31,7 @@ import {
 export const SMC_WINDOW = 150;
 /** HH/HL/LH/LL lock after 3 closed candles each side (no repainting). */
 export const FRACTAL_RADIUS = CLUSTER_RADIUS;
-/** Closed bars scanned for 10-bar fractal labels (wider window so enough swings form). */
+/** Closed bars scanned for locked 3-candle swing labels. */
 export const FRACTAL_WINDOW = 400;
 
 export type LivePivot = {
@@ -456,7 +456,7 @@ export function computeSmcOverlay(
   const poi = detectPoiEvidence(recent);
   const price = currentPrice ?? recent[recent.length - 1].c;
 
-  // HH/HL/LH/LL labels: 10-bar fractal swings (like the Fractals indicator).
+  // HH/HL/LH/LL labels: locked 3-candle swings with alternating + ATR filters.
   const fractalBars = bars.slice(-FRACTAL_WINDOW).map(toCandle);
   const fractal = detectMarketStructureEvidence(fractalBars, FRACTAL_RADIUS);
   // Final-once: a confirmed swing keeps the first label it received on its own
@@ -470,12 +470,11 @@ export function computeSmcOverlay(
     return p;
   };
   const pivotsLabelled = fractal.pivots.filter((p) => p.label.length === 2).map(lockLabel);
-  const livePivots = computeLivePivots(fractalBars, forming ? toCandle(forming) : null, fractal.pivots)
-    .map((p) => (p.confirmedByOpposite && p.label.length === 2 ? lockLabel(p) : p));
+  const livePivots = computeLivePivots(fractalBars, forming ? toCandle(forming) : null, fractal.pivots);
   const selectedPois = selectHighConfidencePois(poi, price);
 
   // Structure labels, breaks, trend and liquidity must all come from this same
-  // confirmed 10-bar pivot set. Provisional tail pivots never create events.
+  // confirmed filtered pivot set. Provisional tail pivots never create events.
   const breaks = fractal.breaks.map((b) => {
     const src = [...fractal.pivots]
       .reverse()
@@ -701,7 +700,6 @@ export function computeSmcOverlay(
     .sort((a, b) => b - a);
   const reversal = computeReversalSignal(fractalBars, forming ? toCandle(forming) : null, [
     ...pivotsLabelled,
-    ...livePivots,
   ], pressure, atr, targetBuySide, targetSellSide);
   const closedE = fractalBars;
   const sweeps = detectLiquiditySweeps(closedE, fractal.pivots);
@@ -960,6 +958,9 @@ export function renderSmcOverlay(
     }
     // Live (unconfirmed) swings: outlined dashed badge that follows the forming candle.
     for (const p of smc.livePivots ?? []) {
+      // The tuned structure view shows only pivots locked by three closed bars
+      // on each side; provisional and early-opposite candidates stay hidden.
+      if (!SHOW_PROVISIONAL_PIVOTS) continue;
       const x = pr.x(p.t / 1000);
       const y = pr.y(p.price);
       if (x == null || y == null) continue;
@@ -984,8 +985,6 @@ export function renderSmcOverlay(
         continue;
       }
       // Early "High"/"Low" marker on the running swing (no countdown box).
-      // Spec: a swing is shown only once 3 closed candles lock it.
-      if (!SHOW_PROVISIONAL_PIVOTS) continue;
       ctx.fillStyle = "rgba(255,255,255,0.92)";
       ctx.beginPath();
        ctx.roundRect?.(xx - w / 2, yy, w, 18, 4);
