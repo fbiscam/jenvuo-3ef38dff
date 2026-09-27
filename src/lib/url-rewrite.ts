@@ -64,6 +64,16 @@ function isDash(host: string): boolean {
   return host === `dash.${ROOT_DOMAIN}`;
 }
 
+// Subdomains that host a section directly:
+//   blogs.jenvu.com   -> /insights (blog)
+//   leads.jenvu.com   -> /leads
+//   support.jenvu.com -> /help (help centre)
+const SECTION_HOSTS: Record<string, string> = {
+  [`blogs.${ROOT_DOMAIN}`]: "/insights",
+  [`leads.${ROOT_DOMAIN}`]: "/leads",
+  [`support.${ROOT_DOMAIN}`]: "/help",
+};
+
 /**
  * Server-level redirect target.
  *
@@ -88,8 +98,9 @@ export function apexRedirectTarget(url: URL): string | null {
   if (host !== ROOT_DOMAIN && host.endsWith(`.${ROOT_DOMAIN}`)) {
     const sub = host.slice(0, host.length - `.${ROOT_DOMAIN}`.length);
     if (sub.includes(".")) return null;
-    // dash.jenvu.com hosts the dashboard directly — never redirect it away.
-    if (sub === "dash") return null;
+    // dash/blogs/leads/support subdomains host their sections directly —
+    // never redirect them away.
+    if (sub === "dash" || SECTION_HOSTS[host]) return null;
     const section = SUBDOMAIN_SECTIONS[sub];
     if (!section) return null;
     const next = new URL(url);
@@ -136,9 +147,26 @@ export function apexRedirectTarget(url: URL): string | null {
  */
 export function rewriteInput(url: URL): URL | undefined {
   const host = url.hostname.toLowerCase();
-  if (!isApex(host) && !isDash(host)) return undefined;
+  if (!isApex(host) && !isDash(host) && !SECTION_HOSTS[host]) return undefined;
   const p = url.pathname;
   if (isReserved(p)) return undefined;
+
+  // Section subdomains: blogs.jenvu.com/ -> /insights,
+  // support.jenvu.com/getting-started -> /help/getting-started, etc.
+  const section = SECTION_HOSTS[host];
+  if (section) {
+    if (p === "/" || p === "") {
+      const next = new URL(url);
+      next.pathname = section;
+      return next;
+    }
+    if (p !== section && !p.startsWith(`${section}/`)) {
+      const next = new URL(url);
+      next.pathname = `${section}${p}`;
+      return next;
+    }
+    return undefined;
+  }
 
   // On the dash subdomain the dashboard lives at the root:
   // dash.jenvu.com/ -> /dashboard, dash.jenvu.com/alerts -> /dashboard/alerts
@@ -174,9 +202,26 @@ export function rewriteInput(url: URL): URL | undefined {
  */
 export function rewriteOutput(url: URL): URL | undefined {
   const host = url.hostname.toLowerCase();
-  if (!isApex(host) && !isDash(host)) return undefined;
+  if (!isApex(host) && !isDash(host) && !SECTION_HOSTS[host]) return undefined;
   const p = url.pathname;
   if (isReserved(p)) return undefined;
+
+  // Section subdomains: strip the section prefix so the address bar stays
+  // clean — /insights/my-post -> blogs.jenvu.com/my-post
+  const section = SECTION_HOSTS[host];
+  if (section) {
+    if (p === section) {
+      const next = new URL(url);
+      next.pathname = "/";
+      return next;
+    }
+    if (p.startsWith(`${section}/`)) {
+      const next = new URL(url);
+      next.pathname = p.slice(section.length);
+      return next;
+    }
+    return undefined;
+  }
 
   // On the dash subdomain the dashboard index is the root URL.
   if (isDash(host) && p === "/dashboard") {
