@@ -17,6 +17,7 @@
  */
 
 const ROOT_DOMAIN = "jenvu.com";
+const AUTH_HOST = `auth.${ROOT_DOMAIN}`;
 
 const SUBDOMAIN_SECTIONS: Record<string, string> = {
   leads: "/leads",
@@ -98,16 +99,32 @@ function hostForPath(pathname: string): { host: string; prefix: string } | null 
 
 /** True for every host we manage (apex, www, dash, section subdomains). */
 function isManagedHost(host: string): boolean {
-  return isApex(host) || isDash(host) || Boolean(SECTION_HOSTS[host]);
+  return isApex(host) || isDash(host) || host === AUTH_HOST || Boolean(SECTION_HOSTS[host]);
 }
 
 // Global pages that live on every host as-is (never section-prefixed on
 // subdomains): sign-in, signup/apply, pricing, legal, etc.
 const GLOBAL_PATHS = new Set([
+  "about",
+  "ai-engine",
+  "app",
   "auth",
+  "broadcasts",
+  "cancellation",
+  "confirm-email-change",
+  "contact",
+  "development",
+  "disclaimer",
+  "download",
   "founding",
+  "founder",
+  "killzones",
+  "llm",
   "pricing",
   "privacy",
+  "refund",
+  "scam-check",
+  "scam-tool",
   "terms",
   "reset-password",
   "leads-signin",
@@ -140,6 +157,18 @@ export function apexRedirectTarget(url: URL): string | null {
     return next.toString();
   }
 
+  if (host === AUTH_HOST) {
+    if (p === "/auth") {
+      const next = new URL(url);
+      next.pathname = "/sign-in";
+      return next.toString();
+    }
+    if (p === "/" || p === "/sign-in") return null;
+    const next = new URL(url);
+    next.hostname = ROOT_DOMAIN;
+    return next.toString();
+  }
+
   if (host !== ROOT_DOMAIN && host.endsWith(`.${ROOT_DOMAIN}`)) {
     const sub = host.slice(0, host.length - `.${ROOT_DOMAIN}`.length);
     if (sub.includes(".")) return null;
@@ -147,6 +176,16 @@ export function apexRedirectTarget(url: URL): string | null {
     // but a path belonging to another section goes to that section's host
     // (e.g. dash.jenvu.com/help -> support.jenvu.com/).
     if (sub === "dash" || SECTION_HOSTS[host]) {
+      if (isGlobalPath(p)) {
+        const next = new URL(url);
+        if (p === "/auth") {
+          next.hostname = AUTH_HOST;
+          next.pathname = "/sign-in";
+        } else {
+          next.hostname = ROOT_DOMAIN;
+        }
+        return next.toString();
+      }
       const target = hostForPath(p);
       if (target && target.host !== host) {
         const next = new URL(url);
@@ -184,6 +223,13 @@ export function apexRedirectTarget(url: URL): string | null {
     }
   }
 
+  if (isApex(host) && p === "/auth") {
+    const next = new URL(url);
+    next.hostname = AUTH_HOST;
+    next.pathname = "/sign-in";
+    return next.toString();
+  }
+
   // 2. Apex domain: the dashboard lives on dash.jenvu.com — send every
   // dashboard URL there (jenvu.com/dashboard/billing -> dash.jenvu.com/billing).
   if (isApex(host)) {
@@ -194,8 +240,7 @@ export function apexRedirectTarget(url: URL): string | null {
     if (segments[0] === "dashboard") {
       const next = new URL(url);
       next.hostname = dashHost;
-      const rest = segments.slice(1).join("/");
-      next.pathname = rest ? `/${rest}` : "/";
+      next.pathname = p;
       return next.toString();
     }
 
@@ -221,9 +266,15 @@ export function apexRedirectTarget(url: URL): string | null {
  */
 export function rewriteInput(url: URL): URL | undefined {
   const host = url.hostname.toLowerCase();
-  if (!isApex(host) && !isDash(host) && !SECTION_HOSTS[host]) return undefined;
+  if (!isApex(host) && !isDash(host) && host !== AUTH_HOST && !SECTION_HOSTS[host]) return undefined;
   const p = url.pathname;
   if (isReserved(p)) return undefined;
+
+  if (host === AUTH_HOST && (p === "/" || p === "/sign-in")) {
+    const next = new URL(url);
+    next.pathname = "/auth";
+    return next;
+  }
 
   // Section subdomains: blogs.jenvu.com/ -> /insights,
   // support.jenvu.com/getting-started -> /help/getting-started, etc.
@@ -278,9 +329,22 @@ export function rewriteInput(url: URL): URL | undefined {
  */
 export function rewriteOutput(url: URL): URL | undefined {
   const host = url.hostname.toLowerCase();
-  if (!isApex(host) && !isDash(host) && !SECTION_HOSTS[host]) return undefined;
+  if (!isApex(host) && !isDash(host) && host !== AUTH_HOST && !SECTION_HOSTS[host]) return undefined;
   const p = url.pathname;
   if (isReserved(p)) return undefined;
+
+  if (p === "/auth") {
+    const next = new URL(url);
+    next.hostname = AUTH_HOST;
+    next.pathname = "/sign-in";
+    return next;
+  }
+
+  if (host === AUTH_HOST && p !== "/auth") {
+    const next = new URL(url);
+    next.hostname = ROOT_DOMAIN;
+    return next;
+  }
 
   // Cross-section navigation: links to a section hosted on another subdomain
   // point at that host with the prefix stripped (e.g. on dash.jenvu.com,
@@ -297,6 +361,11 @@ export function rewriteOutput(url: URL): URL | undefined {
   // clean — /insights/my-post -> blogs.jenvu.com/my-post
   const section = SECTION_HOSTS[host];
   if (section) {
+    if (isGlobalPath(p) || p === "/") {
+      const next = new URL(url);
+      next.hostname = ROOT_DOMAIN;
+      return next;
+    }
     if (p === section) {
       const next = new URL(url);
       next.pathname = "/";
@@ -314,30 +383,7 @@ export function rewriteOutput(url: URL): URL | undefined {
   if (isApex(host) && (p === "/dashboard" || p.startsWith("/dashboard/"))) {
     const next = new URL(url);
     next.hostname = `dash.${ROOT_DOMAIN}`;
-    next.pathname = p === "/dashboard" ? "/" : p.slice("/dashboard".length);
-    return next;
-  }
-
-  // On the dash subdomain the dashboard index is the root URL.
-  if (isDash(host) && p === "/dashboard") {
-    const next = new URL(url);
-    next.pathname = "/";
-    return next;
-  }
-
-  // Admin paths: /dashboard/admin/* -> /admin/*
-  if (p === "/dashboard/admin" || p.startsWith("/dashboard/admin/")) {
-    const next = new URL(url);
-    next.pathname = "/admin" + (p === "/dashboard/admin" ? "" : p.slice("/dashboard/admin".length));
-    return next;
-  }
-
-
-  // Dashboard child paths: /dashboard/alerts -> /alerts
-  const segments = p.split("/").filter(Boolean);
-  if (segments.length === 2 && segments[0] === "dashboard" && DASHBOARD_CHILDREN.has(segments[1])) {
-    const next = new URL(url);
-    next.pathname = `/${segments[1]}`;
+    next.pathname = p;
     return next;
   }
 

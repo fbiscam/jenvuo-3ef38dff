@@ -4,6 +4,7 @@ import { Menu, X } from "lucide-react";
 
 /** Canonical top-navigation links, shared by every public page. */
 export const SITE_NAV_LINKS = [
+  { to: "/", label: "Home", external: true },
   { to: "/pricing", label: "Pricing" },
   { to: "/insights", label: "Insights" },
   { to: "/help", label: "Help Centre" },
@@ -18,7 +19,13 @@ export default function SiteNavLinks({ active }: { active?: string }) {
     <>
       <nav className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-7 text-sm text-foreground md:flex">
         {SITE_NAV_LINKS.map((l) => (
-          <Link
+          "external" in l ? <a
+            key={l.to}
+            href="https://jenvu.com"
+            className="text-muted-foreground transition-colors hover:text-home-accent"
+          >
+            {l.label}
+          </a> : <Link
             key={l.to}
             to={l.to}
             className={
@@ -46,7 +53,14 @@ export default function SiteNavLinks({ active }: { active?: string }) {
         <div className="absolute left-0 right-0 top-full z-50 border-b border-border bg-background px-5 py-3 shadow-sm md:hidden">
           <div className="flex flex-col">
             {SITE_NAV_LINKS.map((l) => (
-              <Link
+              "external" in l ? <a
+                key={l.to}
+                href="https://jenvu.com"
+                onClick={() => setOpen(false)}
+                className="min-h-11 py-2 text-sm text-muted-foreground"
+              >
+                {l.label}
+              </a> : <Link
                 key={l.to}
                 to={l.to}
                 onClick={() => setOpen(false)}

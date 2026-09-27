@@ -295,7 +295,7 @@ function RootShell({ children }: { children: ReactNode }) {
   );
 }
 
-const JENVU_HOSTS = ["jenvu.com", "dash.jenvu.com", "support.jenvu.com", "leads.jenvu.com", "blogs.jenvu.com"];
+const JENVU_HOSTS = ["jenvu.com", "auth.jenvu.com", "dash.jenvu.com", "support.jenvu.com", "leads.jenvu.com", "blogs.jenvu.com"];
 
 function RootComponent() {
   // Share the auth session across jenvu.com subdomains so a signed-in user

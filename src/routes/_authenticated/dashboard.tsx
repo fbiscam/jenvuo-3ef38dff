@@ -1323,7 +1323,7 @@ function DashboardLayout() {
           <div
             className={`flex h-11 shrink-0 items-center gap-2.5 bg-sidebar ${navCollapsed ? "justify-center px-2" : "px-4"}`}
           >
-            <Link to="/" className="flex items-center gap-2.5 min-w-0">
+            <a href="https://jenvu.com" className="flex items-center gap-2.5 min-w-0">
               <img
                 src="/favicon.png"
                 alt="JENVU"
@@ -1341,7 +1341,7 @@ function DashboardLayout() {
                   Jenvu
                 </span>
               )}
-            </Link>
+            </a>
             <button
               type="button"
               aria-label="Close menu"

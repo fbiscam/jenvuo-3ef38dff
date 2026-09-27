@@ -78,7 +78,7 @@ export function LeadsLanding() {
       {/* NAV */}
       <header className="sticky top-0 z-50 border-b border-zinc-100 bg-white/85 backdrop-blur-md">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-5 py-3 sm:px-6 sm:py-4">
-          <Link to="/leads" className="flex min-w-0 items-center gap-2.5">
+          <a href="https://jenvu.com" className="flex min-w-0 items-center gap-2.5">
             <img src="/favicon.png" alt="Jenvu" className="h-7 w-7 shrink-0 rounded-md object-contain" />
             <span
               className="truncate text-[22px] leading-none tracking-tight text-[#3c4043]"
@@ -86,7 +86,7 @@ export function LeadsLanding() {
             >
               Jenvu <span className="text-zinc-900">Leads</span>
             </span>
-          </Link>
+          </a>
           <div className="flex items-center gap-2">
             {signedIn ? (
               <Link

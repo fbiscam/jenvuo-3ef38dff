@@ -64,7 +64,7 @@ export function LeadsShell({ me, children }: { me: Me | null; children: ReactNod
         style={{ fontFamily: JENVU_SANS, fontWeight: 400 }}
       >
         {/* Brand */}
-        <div className="flex h-11 shrink-0 items-center gap-2.5 px-4">
+        <a href="https://jenvu.com" className="flex h-11 shrink-0 items-center gap-2.5 px-4">
           <img src="/favicon.png" alt="Jenvu" className="h-6 w-6 shrink-0 rounded-md object-contain" />
           <span
             className="truncate text-[22px] leading-none text-foreground"
@@ -72,7 +72,7 @@ export function LeadsShell({ me, children }: { me: Me | null; children: ReactNod
           >
             Jenvu
           </span>
-        </div>
+        </a>
 
         <nav className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden px-2 py-2">
           <div className="flex flex-col gap-1.5">
