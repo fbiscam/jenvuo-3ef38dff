@@ -19,6 +19,7 @@ export function buildChartContext(input: {
   indicators: IndicatorId[];
   smc: SmcOverlay | null;
   smcToggles: SmcToggles;
+  includePressure?: boolean;
   drawings: Drawing[];
   drawingsVisible: boolean;
   selectedId: string | null;
@@ -78,6 +79,28 @@ export function buildChartContext(input: {
       lines.push(
         `Chart HH/HL/LH/LL labels use a 10-bar fractal (10 candles each side, like the Fractals indicator); latest confirmed: ${recentPivots}.`,
       );
+    if (input.includePressure) {
+      const confirmedPressure = input.smc.pivots
+        .slice(-6)
+        .map((p) => {
+          const buy = input.smc?.pressure?.[p.t];
+          return buy == null ? null : `${p.label} ${p.price.toFixed(2)} @ ${fmt(p.t / 1000)}: buyers ${buy}%, sellers ${100 - buy}%`;
+        })
+        .filter((value): value is string => value != null)
+        .join("; ");
+      const livePressure = (input.smc.livePivots ?? [])
+        .map((p) => {
+          const buy = input.smc?.pressure?.[p.t];
+          return buy == null ? null : `${p.label} ${p.price.toFixed(2)} @ ${fmt(p.t / 1000)}: buyers ${buy}%, sellers ${100 - buy}% (fresh, unconfirmed swing)`;
+        })
+        .filter((value): value is string => value != null)
+        .join("; ");
+      lines.push(
+        `1H reversal pressure for this ${input.pairLabel ?? "XAU/USD"} chart (deterministic confluence score, not win probability): ${confirmedPressure || "no confirmed readings"}${livePressure ? `; fresh: ${livePressure}` : ""}.`,
+      );
+    } else {
+      lines.push("Buyer/seller reversal pressure is intentionally unavailable outside the 1H XAU/USD and BTC/USD charts.");
+    }
     const live = (input.smc.livePivots ?? [])
       .map(
         (p) =>

@@ -711,6 +711,7 @@ export function renderSmcOverlay(
   smc: SmcOverlay,
   toggles: SmcToggles,
   pr: SmcProjector,
+  showPressure = true,
 ) {
   ctx.save();
   ctx.font = "600 13px 'JetBrains Mono', ui-monospace, monospace";
@@ -864,6 +865,7 @@ export function renderSmcOverlay(
     }
   }
   const pressureBadge = (t: number, xx: number, yy: number, up: boolean) => {
+    if (!showPressure) return;
     const buy = smc.pressure?.[t];
     if (buy == null) return;
     const sell = 100 - buy;
@@ -1009,7 +1011,7 @@ export function renderSmcOverlay(
   const rv = smc.reversal;
   const rvBuy = rv ? smc.pressure?.[rv.t] : undefined;
   const rvPct = rv && rvBuy != null ? (rv.side === "sell" ? 100 - rvBuy : rvBuy) : 0;
-  if (rv && rv.stage === "confirmed" && rv.entry != null && rvPct >= REVERSAL_TRADE_MIN_PCT) {
+  if (showPressure && rv && rv.stage === "confirmed" && rv.entry != null && rvPct >= REVERSAL_TRADE_MIN_PCT) {
     const x0 = rv.entryT != null ? pr.x(rv.entryT / 1000) : null;
     const start = Math.max(0, x0 ?? pr.width * 0.6);
     const line = (price: number | null, label: string, color: string, dash: number[]) => {

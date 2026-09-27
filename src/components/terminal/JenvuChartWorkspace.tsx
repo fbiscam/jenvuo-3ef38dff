@@ -319,6 +319,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
 
   const payload = chartQuery.data;
   const pairLabel = asset === "BTCUSD" ? "BTC/USD" : "XAU/USD";
+  const showSmcPressure = timeframe.key === "1h" && (asset === "XAUUSD" || asset === "BTCUSD");
   const rawBars: OhlcvBar[] = useMemo(() => payload?.bars ?? [], [payload]);
   const livePrice = useLivePriceStream(asset, rawBars.at(-1)?.close ?? null);
   const stepSeconds = payload?.stepSeconds ?? 1800;
@@ -402,6 +403,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
         indicators: s.indicators,
         smc: s.smc,
         smcToggles: s.smcToggles,
+        includePressure: s.timeframe.key === "1h" && (s.payload?.asset === "XAUUSD" || s.payload?.asset === "BTCUSD"),
         drawings: s.drawings,
         drawingsVisible: s.drawingsVisible,
         selectedId: s.selectedId,
@@ -724,6 +726,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
               scripts={chartScripts}
               smc={smc}
               smcToggles={smcToggles}
+              showSmcPressure={showSmcPressure}
               projection={projection}
               demoPositions={demoTradingEnabled ? demoPositions : []}
               demoPrice={demoTradingEnabled && demoPositions.length ? currentPrice : null}
