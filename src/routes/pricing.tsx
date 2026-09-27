@@ -64,7 +64,7 @@ const TIERS = [
       "Trade journal & analytics",
       "Multi-timeframe bias engine",
       "2 API keys · $10 AI wallet",
-      "GPT-6 Astra primary analysis",
+      "Claude Opus 5 primary analysis",
     ],
 
     highlight: true,
@@ -231,7 +231,7 @@ function PricingPage() {
                 { f: "Daily token limit", b: "1.5M", c: "5M", d: "10M" },
                 { f: "Balance-based quota ($3 = 1M)", b: true, c: true, d: true },
                 { f: "Active API keys", b: "2", c: "3", d: "5" },
-                { f: "GPT-6 Astra primary analysis", b: true, c: true, d: true },
+                { f: "Claude Opus 5 primary analysis", b: true, c: true, d: true },
                 { f: "Claude Opus 5 senior review", b: false, c: true, d: true },
                 { f: "Chat / primary request", b: "$0.03", c: "$0.03", d: "$0.03" },
                 { f: "Senior-reviewed analysis", b: false, c: "$0.20", d: "$0.20" },
@@ -284,7 +284,7 @@ function PricingPage() {
                           <span className="inline-flex flex-col items-center justify-center gap-1 whitespace-nowrap">
                             <span className="inline-flex items-center gap-1 rounded-md border border-zinc-200 bg-white px-1.5 py-0.5">
                               <svg viewBox="0 0 24 24" width="10" height="10" fill="#000" aria-hidden="true"><path d="M22.28 9.82a5.98 5.98 0 0 0-.51-4.91 6.05 6.05 0 0 0-6.52-2.9A6 6 0 0 0 4.98 4.18a5.98 5.98 0 0 0-4 2.9 6.05 6.05 0 0 0 .74 7.1 5.98 5.98 0 0 0 .51 4.91 6.05 6.05 0 0 0 6.52 2.9A6 6 0 0 0 19.02 19.8a5.98 5.98 0 0 0 4-2.9 6.05 6.05 0 0 0-.74-7.1zm-9.06 12.67a4.5 4.5 0 0 1-2.88-1.04l.14-.08 4.79-2.77a.78.78 0 0 0 .39-.68v-6.76l2.03 1.17.02.05v5.6a4.5 4.5 0 0 1-4.49 4.51zM3.5 18.55a4.47 4.47 0 0 1-.54-3.03l.14.08 4.79 2.77a.78.78 0 0 0 .79 0l5.85-3.38v2.35l.02.05-4.85 2.8a4.5 4.5 0 0 1-6.2-1.64zM2.24 8.03a4.5 4.5 0 0 1 2.35-1.98v5.7a.77.77 0 0 0 .39.68l5.83 3.36-2.03 1.17a.07.07 0 0 1-.07 0l-4.84-2.8a4.5 4.5 0 0 1-1.63-6.13zm16.63 3.87-5.85-3.4L15.05 7.34a.07.07 0 0 1 .07 0l4.84 2.8a4.5 4.5 0 0 1-.68 8.11v-5.7a.79.79 0 0 0-.4-.65zm2.02-3.04-.14-.09-4.78-2.79a.78.78 0 0 0-.79 0L9.33 9.36V7.01l-.02-.05 4.85-2.8a4.5 4.5 0 0 1 6.68 4.66zM8.22 12.99l-2.03-1.17-.02-.05v-5.6a4.5 4.5 0 0 1 7.38-3.45l-.14.08L8.62 5.57a.78.78 0 0 0-.4.68zm1.1-2.38 2.61-1.5 2.6 1.5v3l-2.6 1.5-2.6-1.5z"/></svg>
-                               <span className="text-[10px] font-medium text-zinc-800 whitespace-nowrap">GPT-6 Astra</span>
+                               <span className="text-[10px] font-medium text-zinc-800 whitespace-nowrap">Claude Opus 5</span>
                             </span>
                           </span>
                           {(v === "__MODELS__" || v === "__MODELS_PLUS__") && (
@@ -316,7 +316,7 @@ function PricingPage() {
           <div>
             
             <h2 className="mt-2 text-2xl sm:text-3xl font-semibold tracking-tight">Need more wallet balance?</h2>
-             <p className="mt-2 max-w-xl text-sm text-zinc-600 lg:max-w-none lg:whitespace-nowrap">Live market data is free. Pro uses GPT-6 Astra; Elite and Ultra add mandatory Claude Opus 5 review. Requests cost $0.03 or $0.20 with senior review.</p>
+             <p className="mt-2 max-w-xl text-sm text-zinc-600 lg:max-w-none lg:whitespace-nowrap">Live market data is free. Pro uses Claude Opus 5; Elite and Ultra add mandatory Claude Fable 5.1 review. Requests cost $0.03 or $0.20 with senior review.</p>
           </div>
         </div>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">

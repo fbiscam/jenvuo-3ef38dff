@@ -4,12 +4,12 @@ const BASE_URL = "https://jenvu.com";
 const INDEXNOW_KEY = "31f95befb924351f7ab6c1f5ce4bc15b";
 const JOB_KEY = "daily-insight";
 const ARTICLE_MODELS = [
-  "omniroute/kr/claude-sonnet-4.5",
-  "omniroute/kr/claude-sonnet-4",
-  "omniroute/kr/glm-5",
-  "omniroute/kr/claude-haiku-4.5",
+  "codecraft/claude-opus-5",
+  "codecraft/claude-fable-5.1",
+  "codecraft/gpt-5.5",
+  "codecraft/grok-4.6",
 ];
-const ARTICLE_MODEL_LABEL = "Claude Sonnet 4.5 (OmniRoute)";
+const ARTICLE_MODEL_LABEL = "Claude Opus 5 (CodeCraft)";
 
 function slugify(s: string) {
   return s
