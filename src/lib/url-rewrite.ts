@@ -231,6 +231,8 @@ export function rewriteInput(url: URL): URL | undefined {
       next.pathname = section;
       return next;
     }
+    // Global pages (auth, founding, pricing, ...) resolve as-is on every host.
+    if (isGlobalPath(p)) return undefined;
     if (p !== section && !p.startsWith(`${section}/`)) {
       const next = new URL(url);
       next.pathname = `${section}${p}`;
