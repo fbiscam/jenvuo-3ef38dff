@@ -8,7 +8,7 @@ export default function CloudflareHero() {
         <div className="hero-bottom-glow pointer-events-none absolute inset-x-0 bottom-0 h-2/3" />
 
         <div className="relative z-10 m-auto w-full max-w-[760px] text-center text-home-accent-foreground">
-          <div className="mx-auto inline-flex max-w-full flex-nowrap items-center justify-center gap-x-1 whitespace-nowrap rounded-md border border-primary-foreground/50 px-2 py-2.5 text-center text-[8px] leading-none text-home-accent-foreground sm:gap-x-1.5 sm:px-3 sm:py-2 sm:text-[11px]">
+          <div className="mx-auto inline-flex max-w-full flex-nowrap items-center justify-center gap-x-1 whitespace-nowrap rounded-md border border-primary-foreground/50 px-2 py-2.5 text-center text-[10px] leading-none text-home-accent-foreground sm:gap-x-1.5 sm:px-3 sm:py-2 sm:text-[11px]">
             <span className="font-medium">Jenvu</span>
             <span className="text-home-accent-foreground">·</span>
             <span>AI trading terminal for XAU/USD</span>
