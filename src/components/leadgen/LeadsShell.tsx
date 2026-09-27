@@ -128,10 +128,12 @@ export function LeadsShell({ me, children }: { me: Me | null; children: ReactNod
             <Button variant="ghost" size="icon-sm" aria-label="Open navigation" onClick={() => setMobileOpen(true)}>
               <Menu className="h-5 w-5" />
             </Button>
-            <img src="/favicon.png" alt="" className="h-6 w-6 shrink-0 rounded-md object-contain" />
-            <span className="truncate text-[17px] text-foreground" style={{ fontWeight: 500 }}>
-              Jenvu <span className="text-zinc-400">Leads</span>
-            </span>
+            <a href="https://jenvu.com" className="flex min-w-0 items-center gap-2.5" aria-label="Jenvu homepage">
+              <img src="/favicon.png" alt="" className="h-6 w-6 shrink-0 rounded-md object-contain" />
+              <span className="truncate text-[17px] text-foreground" style={{ fontWeight: 500 }}>
+                Jenvu <span className="text-zinc-400">Leads</span>
+              </span>
+            </a>
           </div>
           <div className="hidden md:block" />
           <div className="flex items-center gap-3">

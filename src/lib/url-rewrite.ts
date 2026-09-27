@@ -1,19 +1,14 @@
 /**
- * URL rewriting for the apex domain (jenvu.com).
+ * URL rewriting across Jenvu's canonical section domains.
  *
  * Goals:
- *  - Stop the subdomain mounting scene (dash./leads./blogs./support.jenvu.com).
- *  - Keep the internal route tree at /dashboard/* for the trading dashboard.
- *  - Expose clean public URLs on the apex domain:
- *      jenvu.com/alerts           -> /dashboard/alerts
- *      jenvu.com/billing          -> /dashboard/billing
- *      jenvu.com/admin/accuracy   -> /dashboard/admin/accuracy
- *      jenvu.com/dashboard        -> /dashboard (overview, no rewrite)
- *      jenvu.com/leads/*          -> /leads/* (no rewrite, just the normal route)
+ *  - Keep dashboard routes under dash.jenvu.com/dashboard/*.
+ *  - Serve sign-in at auth.jenvu.com/sign-in.
+ *  - Mount blog, leads, and support route trees on their section hosts.
+ *  - Send global public pages such as Contact and Download to jenvu.com.
  *
- * On the server, `apexRedirectTarget` sends subdomain traffic and legacy
- * /dashboard/child paths to the new apex URL, then the router rewrite maps
- * the apex URL to the internal route tree.
+ * Server redirects canonicalize incoming addresses; router rewrites retain the
+ * existing internal route tree without exposing implementation prefixes.
  */
 
 const ROOT_DOMAIN = "jenvu.com";
@@ -26,7 +21,7 @@ const SUBDOMAIN_SECTIONS: Record<string, string> = {
   support: "/help",
 };
 
-// Top-level dashboard children that should be exposed at the root.
+// Legacy top-level dashboard children that redirect under /dashboard.
 const DASHBOARD_CHILDREN = new Set([
   "alerts",
   "analytics",
@@ -139,17 +134,14 @@ function isGlobalPath(pathname: string): boolean {
 /**
  * Server-level redirect target.
  *
- * 1. Send all jenvu.com subdomains (and www) to the apex domain with the
- *    correct section prefix so old bookmarks still work.
- * 2. On the apex domain, redirect legacy /dashboard/child URLs to the
- *    clean /child URL (the router will map back to /dashboard/child internally).
+ * Canonicalizes managed hosts while preserving query strings and hashes.
  */
 export function apexRedirectTarget(url: URL): string | null {
   const host = url.hostname.toLowerCase();
   const p = url.pathname;
   if (isReserved(p)) return null;
 
-  // 1. Subdomain -> apex (with section prefix). Handle www. specially.
+  // Normalize www to the apex host.
   if (host === `www.${ROOT_DOMAIN}`) {
     if (isReserved(p)) return null;
     const next = new URL(url);
@@ -228,7 +220,7 @@ export function apexRedirectTarget(url: URL): string | null {
   }
 
 
-  // 1b. Cross-section navigation: if the path belongs to a section hosted on
+  // Cross-section navigation: if the path belongs to a section hosted on
   // another subdomain (e.g. dash.jenvu.com/help), send it to that host.
   if (isManagedHost(host)) {
     const target = hostForPath(p);
@@ -252,7 +244,7 @@ export function apexRedirectTarget(url: URL): string | null {
   }
 
   // 2. Apex domain: the dashboard lives on dash.jenvu.com — send every
-  // dashboard URL there (jenvu.com/dashboard/billing -> dash.jenvu.com/billing).
+  // dashboard URL there (jenvu.com/dashboard/billing -> dash.jenvu.com/dashboard/billing).
   if (isApex(host)) {
     const segments = p.split("/").filter(Boolean);
     const dashHost = `dash.${ROOT_DOMAIN}`;
@@ -345,8 +337,7 @@ export function rewriteInput(url: URL): URL | undefined {
 /**
  * Internal router URL -> external address-bar URL.
  *
- * Strips the /dashboard prefix from dashboard children so the address bar stays
- * clean while the internal route tree still resolves.
+ * Keeps canonical section hosts visible while the internal route tree resolves.
  */
 export function rewriteOutput(url: URL): URL | undefined {
   const host = url.hostname.toLowerCase();
