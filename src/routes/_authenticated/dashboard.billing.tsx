@@ -21,6 +21,17 @@ import {
 import { Info, CreditCard, Settings, BarChart3, FileText, SlidersHorizontal, ArrowRight, Tag } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/dashboard/billing")({
+  head: () => ({
+    meta: [
+      { title: "Billing — Jenvu" },
+      { name: "description", content: "Manage your Jenvu plan, wallet balance, payments, invoices, and billing preferences." },
+      { property: "og:title", content: "Billing — Jenvu" },
+      { property: "og:description", content: "Manage your Jenvu plan, wallet balance, payments, invoices, and billing preferences." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+      { name: "robots", content: "noindex,nofollow" },
+    ],
+  }),
   component: Billing,
 });
 
@@ -121,7 +132,10 @@ function Billing() {
     }
   };
 
-  const isLoading = currentPlan === null || (credits.isLoading && !credits.state);
+  // A cancelled account legitimately has no current plan. Only wait for the
+  // credit request itself; treating a null plan as loading caused an endless
+  // skeleton immediately after cancellation.
+  const isLoading = credits.isLoading && !credits.state;
 
   if (isLoading) {
     return (
@@ -206,13 +220,22 @@ function Billing() {
         >
           Buy credits
         </Link>
-        <button
-          type="button"
-          onClick={() => setCancelDialogOpen(true)}
-          className="rounded-lg border border-zinc-200 bg-zinc-100 px-5 py-2.5 text-sm font-medium text-zinc-900 hover:bg-zinc-200 transition-colors"
-        >
-          Cancel plan
-        </button>
+        {plan ? (
+          <button
+            type="button"
+            onClick={() => setCancelDialogOpen(true)}
+            className="rounded-lg border border-zinc-200 bg-zinc-100 px-5 py-2.5 text-sm font-medium text-zinc-900 hover:bg-zinc-200 transition-colors"
+          >
+            Cancel plan
+          </button>
+        ) : (
+          <Link
+            to="/pricing"
+            className="rounded-lg border border-zinc-200 bg-zinc-100 px-5 py-2.5 text-sm font-medium text-zinc-900 hover:bg-zinc-200 transition-colors"
+          >
+            Choose a plan
+          </Link>
+        )}
       </section>
 
       <AlertDialog open={cancelDialogOpen} onOpenChange={(open) => !cancellingPlan && setCancelDialogOpen(open)}>

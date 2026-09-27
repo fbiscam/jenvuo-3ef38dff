@@ -9,6 +9,8 @@ import { useTrial } from "@/hooks/useTrial";
 
 import { Zap, Crown } from "lucide-react";
 import xaiLogo from "@/assets/xai-logo.png";
+import openAiLogo from "@/assets/openai-logo.png";
+import claudeLogo from "@/assets/claude-logo.png";
 
 const MONO = "font-['Google_Sans','Product_Sans','Roboto',system-ui,sans-serif] font-normal normal-case tracking-normal";
 const SANS = "font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif]";
@@ -232,7 +234,7 @@ function PricingPage() {
                 { f: "Daily token limit", b: "1.5M", c: "5M", d: "10M" },
                 { f: "Balance-based quota ($5 = 1M)", b: true, c: true, d: true },
                 { f: "Active API keys", b: "2", c: "3", d: "5" },
-                { f: "Claude Fable 5 primary analysis", b: true, c: true, d: true },
+                { f: "ChatGPT 5.5 Pro primary analysis", b: true, c: true, d: true },
                 { f: "Claude Fable 5.1 senior review", b: false, c: true, d: true },
                 { f: "Chat / primary request", b: "$0.03", c: "$0.03", d: "$0.03" },
                 { f: "Senior-reviewed analysis", b: false, c: "$0.20", d: "$0.20" },
@@ -283,13 +285,13 @@ function PricingPage() {
                       ) : v === "__MODELS__" || v === "__GPT_ONLY__" || v === "__MODELS_PLUS__" ? (
                           <span className="inline-flex flex-col items-center justify-center gap-1">
                             <span className="inline-flex items-center gap-1.5 rounded-md border border-zinc-200 bg-white px-1.5 py-0.5">
-                              <span className="grid h-3.5 w-3.5 place-items-center rounded-sm bg-brand-claude text-[7px] font-bold text-white" aria-hidden="true">AI</span>
-                              <span className="whitespace-nowrap text-[10px] font-medium text-zinc-800">Claude Fable 5</span>
+                              <img src={openAiLogo} alt="OpenAI" className="h-3.5 w-3.5 object-contain" />
+                              <span className="whitespace-nowrap text-[10px] font-medium text-zinc-800">ChatGPT 5.5 Pro</span>
                             </span>
                             {(v === "__MODELS__" || v === "__MODELS_PLUS__") && (
                               <>
                                 <span className="inline-flex items-center gap-1.5 rounded-md border border-zinc-200 bg-white px-1.5 py-0.5">
-                                  <span className="grid h-3.5 w-3.5 place-items-center rounded-sm bg-brand-claude text-[7px] font-bold text-white" aria-hidden="true">AI</span>
+                                  <img src={claudeLogo} alt="Anthropic" className="h-3.5 w-3.5 object-contain" />
                                   <span className="whitespace-nowrap text-[10px] font-medium text-zinc-800">Claude Fable 5.1</span>
                                 </span>
                                 <span className="inline-flex items-center gap-1.5 rounded-md border border-zinc-200 bg-white px-1.5 py-0.5">
@@ -321,7 +323,7 @@ function PricingPage() {
           <div>
             
             <h2 className="mt-2 text-2xl sm:text-3xl font-semibold tracking-tight">Need more wallet balance?</h2>
-             <p className="mt-2 max-w-xl text-sm text-zinc-600 lg:max-w-none lg:whitespace-nowrap">Live market data is free. Claude Fable 5 handles primary analysis, Claude Fable 5.1 reviews eligible plans, and Grok 4.6 powers normal chat.</p>
+             <p className="mt-2 max-w-xl text-sm text-zinc-600 lg:max-w-none lg:whitespace-nowrap">Live market data is free. ChatGPT 5.5 Pro handles primary analysis, Claude Fable 5.1 reviews eligible plans, and Grok 4.6 powers normal chat.</p>
           </div>
         </div>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">

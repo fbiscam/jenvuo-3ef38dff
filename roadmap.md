@@ -178,4 +178,5 @@
 - [x] Keep dashboard URLs under dash.jenvu.com/dashboard and move sign-in to auth.jenvu.com/sign-in
 - [x] Add universal Home navigation and fix public-page links from support/blog subdomains
 - [x] Add Help Centre to the homepage menu and show Claude Fable 5, Fable 5.1, and Grok 4.6 with company marks in pricing
+- [x] Show ChatGPT 5.5 Pro, Claude Fable 5.1, and Grok 4.6 logos in pricing; restore cancelled-account billing and use dash.jenvu.com/billing
 - [x] Add original unbranded blog visuals and strengthen six-market SEO article generation
