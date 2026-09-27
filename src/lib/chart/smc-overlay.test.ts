@@ -193,7 +193,7 @@ describe("smc overlay fractal labels", () => {
     expect(aligned > opposed).toBe(true);
   });
 
-  it("always provides TP1 and TP2 after confirmation when liquidity is absent", () => {
+  it("keeps a confirmed alert but does not invent TP1 when structure liquidity is absent", () => {
     const candles = [
       { t: 1, o: 100, h: 101, l: 99, c: 100 },
       { t: 2, o: 100, h: 110, l: 99, c: 108 },
@@ -210,10 +210,12 @@ describe("smc overlay fractal labels", () => {
       [],
     );
     expect(signal?.stage).toBe("confirmed");
-    expect(signal?.entry).toBe(98);
+    expect(signal?.entry).toBe(100);
     expect(signal?.score).toBe(85);
-    expect(signal?.tp1).toBeCloseTo(79.7);
-    expect(signal?.tp2).toBeCloseTo(61.4);
+    expect(signal?.sl).toBe(112);
+    expect(signal?.tp1).toBe(null);
+    expect(signal?.tp2).toBe(64);
+    expect(signal?.tradeReady).toBe(false);
   });
 
   it("uses opposing liquidity for TP1 only when it sits between 1R and TP2", () => {
@@ -230,10 +232,75 @@ describe("smc overlay fractal labels", () => {
       { 2: 15 },
       2,
       [],
-      [85],
+      [60],
     );
-    expect(signal?.tp1).toBe(85);
+    expect(signal?.tp1).toBe(60.5);
     expect((signal?.tp1 ?? 0) > (signal?.tp2 ?? 0)).toBe(true);
+    expect(signal?.rr).toBeCloseTo(39.5 / 12);
+    expect(signal?.tradeReady).toBe(true);
+  });
+
+  it("builds a buffered 1H Gold buy limit plan from confirmed structure", () => {
+    const signal = computeReversalSignal(
+      [
+        { t: 1, o: 100, h: 101, l: 99, c: 100 },
+        { t: 2, o: 100, h: 101, l: 90, c: 92 },
+        { t: 3, o: 93, h: 102, l: 92, c: 101 },
+        { t: 4, o: 100.5, h: 103, l: 99.9, c: 102 },
+      ],
+      null,
+      [{ t: 2, price: 90, kind: "low", label: "LL" }],
+      { 2: 85 },
+      2,
+      [130],
+      [],
+      "XAUUSD",
+    );
+    expect(signal?.stage).toBe("confirmed");
+    expect(signal?.entry).toBe(100);
+    expect(signal?.sl).toBe(88);
+    expect(signal?.tp1).toBe(129.5);
+    expect(signal?.tp2).toBe(136);
+    expect(signal?.rr).toBeCloseTo(29.5 / 12);
+    expect(signal?.tradeReady).toBe(true);
+  });
+
+  it("rejects a buffered plan below the minimum 1:2 reward-to-risk", () => {
+    const signal = computeReversalSignal(
+      [
+        { t: 1, o: 100, h: 101, l: 99, c: 100 },
+        { t: 2, o: 100, h: 110, l: 99, c: 108 },
+        { t: 3, o: 107, h: 108, l: 98, c: 99 },
+        { t: 4, o: 99.5, h: 100.1, l: 97, c: 98 },
+      ],
+      null,
+      [{ t: 2, price: 110, kind: "high", label: "HH" }],
+      { 2: 15 },
+      2,
+      [],
+      [80],
+      "XAUUSD",
+    );
+    expect(signal?.stage).toBe("confirmed");
+    expect(signal?.tp1).toBe(80.5);
+    expect(signal?.rr).toBeCloseTo(19.5 / 12);
+    expect(signal?.tradeReady).toBe(false);
+  });
+
+  it("requires reversal pressure strictly above 55 percent", () => {
+    const candles = [
+      { t: 1, o: 100, h: 101, l: 99, c: 100 },
+      { t: 2, o: 100, h: 101, l: 90, c: 92 },
+      { t: 3, o: 93, h: 102, l: 92, c: 101 },
+      { t: 4, o: 100.5, h: 103, l: 99.9, c: 102 },
+    ];
+    const swing = [{ t: 2, price: 90, kind: "low" as const, label: "LL" }];
+    const atBoundary = computeReversalSignal(candles, null, swing, { 2: 55 }, 2, [130], [], "XAUUSD");
+    const aboveBoundary = computeReversalSignal(candles, null, swing, { 2: 55.01 }, 2, [130], [], "XAUUSD");
+    expect(atBoundary?.stage).toBe("alert");
+    expect(atBoundary?.tradeReady).toBe(false);
+    expect(aboveBoundary?.stage).toBe("confirmed");
+    expect(aboveBoundary?.tradeReady).toBe(true);
   });
 
   it("does not confirm a reversal from a wick-only break", () => {
