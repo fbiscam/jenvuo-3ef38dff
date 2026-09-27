@@ -22,7 +22,7 @@ const UNOROUTER_IMAGE_MODELS = [
   "dreamshaper:free",
 ] as const;
 
-// Each article gets a distinct, CoinDesk-style editorial cover in Jenvu's
+// Each article gets a distinct, original editorial cover in Jenvu's
 // brand colours (signal orange #FD5510, deep black, clean white). A stable
 // hash of the slug picks the hero subject and composition.
 const COVER_SCENES = [
@@ -60,7 +60,7 @@ function coverPrompt(title: string, category: string, slug = ""): string {
   const scene = COVER_SCENES[h % COVER_SCENES.length];
   const treatment = COVER_TREATMENTS[Math.floor(h / 53) % COVER_TREATMENTS.length];
   return [
-    "High-end editorial featured image for a financial news article, in the style of CoinDesk and Bloomberg feature art:",
+    "High-end original editorial featured image for an international financial news article:",
     "modern glossy 3D render, one clear hero subject, bold and instantly readable at thumbnail size.",
     `Article topic: "${title}" (${category}, gold / XAU-USD market).`,
     `Hero subject: ${scene}.`,
@@ -68,7 +68,7 @@ function coverPrompt(title: string, category: string, slug = ""): string {
     "Strict brand colour palette: vivid signal orange (#FD5510) as the key accent and lighting colour,",
     "rich gold metal tones, deep matte black background with a subtle orange gradient glow. No other dominant colours.",
     "Ultra sharp, 8k detail, realistic materials, cinematic lighting, 16:9.",
-    "No text, no words, no letters, no numbers, no logos, no watermarks, no people, no faces, no clutter, not distorted.",
+    "Original composition only. No imitation of another publisher's visual identity. No text, words, letters, numbers, logos, watermarks, people, faces, or clutter.",
     `Variation ${h % 99991}.`,
   ].join(" ");
 }

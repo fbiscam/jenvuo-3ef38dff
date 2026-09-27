@@ -175,3 +175,6 @@
 - [x] Make BTC/USD charts load reliably across Chrome profiles and every timeframe
 - [x] Restrict buyer/seller reversal pressure and its AI evidence to 1H XAU/USD and BTC/USD
 - [x] Add body-close and two-candle retest confirmation to 1H reversal entries
+- [x] Keep dashboard URLs under dash.jenvu.com/dashboard and move sign-in to auth.jenvu.com/sign-in
+- [x] Add universal Home navigation and fix public-page links from support/blog subdomains
+- [x] Add original unbranded blog visuals and strengthen six-market SEO article generation

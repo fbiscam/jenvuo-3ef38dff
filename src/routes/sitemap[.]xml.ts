@@ -2,9 +2,12 @@ import { createFileRoute } from "@tanstack/react-router";
 import { createClient } from "@supabase/supabase-js";
 
 const BASE_URL = "https://jenvu.com";
+const BLOG_URL = "https://blogs.jenvu.com";
+const SUPPORT_URL = "https://support.jenvu.com";
 
 interface SitemapEntry {
   path: string;
+  origin?: string;
   changefreq?: "always" | "hourly" | "daily" | "weekly" | "monthly" | "yearly" | "never";
   priority?: string;
   lastmod?: string;
@@ -22,7 +25,7 @@ export const Route = createFileRoute("/sitemap.xml")({
 
           { path: "/download", changefreq: "weekly", priority: "0.8" },
           { path: "/pricing", changefreq: "weekly", priority: "0.9" },
-          { path: "/insights", changefreq: "daily", priority: "0.9" },
+          { path: "/", origin: BLOG_URL, changefreq: "daily", priority: "0.9" },
           { path: "/about", changefreq: "monthly", priority: "0.7" },
           { path: "/contact", changefreq: "monthly", priority: "0.7" },
           { path: "/ai-engine", changefreq: "monthly", priority: "0.7" },
@@ -34,7 +37,7 @@ export const Route = createFileRoute("/sitemap.xml")({
           { path: "/cancellation", changefreq: "yearly", priority: "0.3" },
           { path: "/refund", changefreq: "yearly", priority: "0.3" },
           { path: "/killzones", changefreq: "daily", priority: "0.7" },
-          { path: "/help", changefreq: "weekly", priority: "0.6" },
+          { path: "/", origin: SUPPORT_URL, changefreq: "weekly", priority: "0.6" },
           { path: "/broadcasts", changefreq: "daily", priority: "0.7" },
         ];
 
@@ -42,10 +45,11 @@ export const Route = createFileRoute("/sitemap.xml")({
         try {
           const { collections } = await import("@/lib/help-content");
           for (const c of collections) {
-            entries.push({ path: `/help/${c.slug}`, changefreq: "monthly", priority: "0.5" });
+            entries.push({ path: `/${c.slug}`, origin: SUPPORT_URL, changefreq: "monthly", priority: "0.5" });
             for (const a of c.articles) {
               entries.push({
-                path: `/help/${c.slug}/${a.slug}`,
+                path: `/${c.slug}/${a.slug}`,
+                origin: SUPPORT_URL,
                 changefreq: "monthly",
                 priority: "0.5",
                 lastmod: a.updatedAt,
@@ -71,7 +75,8 @@ export const Route = createFileRoute("/sitemap.xml")({
             .limit(1000);
           for (const p of posts ?? []) {
             entries.push({
-              path: `/insights/${p.slug}`,
+              path: `/${p.slug}`,
+              origin: BLOG_URL,
               changefreq: "weekly",
               priority: "0.7",
               lastmod: new Date(p.published_at).toISOString().slice(0, 10),
@@ -85,7 +90,7 @@ export const Route = createFileRoute("/sitemap.xml")({
         const urls = entries.map((e) =>
           [
             `  <url>`,
-            `    <loc>${BASE_URL}${e.path}</loc>`,
+            `    <loc>${e.origin ?? BASE_URL}${e.path}</loc>`,
             `    <lastmod>${e.lastmod ?? today}</lastmod>`,
             e.changefreq ? `    <changefreq>${e.changefreq}</changefreq>` : null,
             e.priority ? `    <priority>${e.priority}</priority>` : null,

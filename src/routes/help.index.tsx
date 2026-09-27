@@ -17,13 +17,13 @@ export const Route = createFileRoute("/help/")({
       { name: "keywords", content: "Jenvu help, Jenvu terminal support, ICT SMC signals help, gold trading AI FAQ, Jenvu billing" },
       { property: "og:title", content: "Help Center — Jenvu AI" },
       { property: "og:description", content: "Guides, FAQs and troubleshooting for Jenvu's built-in trading terminal, signal engine and billing." },
-      { property: "og:url", content: "https://jenvu.com/help" },
+      { property: "og:url", content: "https://support.jenvu.com/" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "Help Center — Jenvu AI" },
       { name: "twitter:description", content: "Guides, FAQs and troubleshooting for the Jenvu built-in trading terminal." },
     ],
-    links: [{ rel: "canonical", href: "https://jenvu.com/help" }],
+    links: [{ rel: "canonical", href: "https://support.jenvu.com/" }],
   }),
   component: HelpCenterPage,
 });
@@ -64,10 +64,10 @@ function HelpCenterPage() {
         {/* NAV */}
         <header className="sticky top-0 z-50 border-b border-zinc-100 bg-white">
           <div className="relative mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-3 px-5 py-3 sm:px-6 sm:py-4 md:flex md:justify-between">
-            <Link to="/" className="flex min-w-0 items-center gap-2.5">
+            <a href="https://jenvu.com" className="flex min-w-0 items-center gap-2.5">
               <img src="/favicon.png" alt="Jenvu" className="h-7 w-7 shrink-0 rounded-md object-contain" />
               <span className="truncate text-[22px] tracking-tight leading-none" style={{ color: "#3c4043", fontFamily: "\"Google Sans\", \"Product Sans\", \"DM Sans\", system-ui, sans-serif", fontWeight: 500 }}>Jenvu</span>
-            </Link>
+            </a>
             <SiteNavLinks />
             <HeaderAuthButtons />
           </div>

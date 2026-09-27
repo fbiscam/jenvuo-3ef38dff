@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
 import type { Tables } from "@/integrations/supabase/types";
 import SiteFooter from "@/components/SiteFooter";
+import { insightCoverUrl } from "@/lib/insight-cover";
 
 type Insight = Tables<"insights">;
 
@@ -52,13 +53,13 @@ export const Route = createFileRoute("/insights/")({
         property: "og:description",
         content: "Daily gold analysis, ICT and SMC briefings, and institutional market updates from the Jenvu desk.",
       },
-      { property: "og:url", content: "https://jenvu.com/insights" },
+      { property: "og:url", content: "https://blogs.jenvu.com/" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "Our Insights — Jenvu" },
       { name: "twitter:description", content: "Daily gold analysis, ICT and SMC briefings from the Jenvu desk." },
     ],
-    links: [{ rel: "canonical", href: "https://jenvu.com/insights" }],
+    links: [{ rel: "canonical", href: "https://blogs.jenvu.com/" }],
     scripts: [
       {
         type: "application/ld+json",
@@ -68,7 +69,7 @@ export const Route = createFileRoute("/insights/")({
           name: "Market Insights",
           description:
             "Daily gold analysis, ICT and SMC briefings, and institutional market updates from the Jenvu desk.",
-          url: "https://jenvu.com/insights",
+          url: "https://blogs.jenvu.com/",
           isPartOf: { "@type": "WebSite", name: "Jenvu", url: "https://jenvu.com/" },
         }),
       },
@@ -150,10 +151,10 @@ function InsightsPage() {
         {/* NAV */}
         <header className="sticky top-0 z-50 border-b border-zinc-100 bg-white">
           <div className="relative mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-3 px-5 py-3 sm:px-6 sm:py-4 md:flex md:justify-between">
-            <Link to="/" className="flex min-w-0 items-center gap-2.5">
+            <a href="https://jenvu.com" className="flex min-w-0 items-center gap-2.5">
               <img src="/favicon.png" alt="Jenvu" className="h-7 w-7 shrink-0 rounded-md object-contain" />
               <span className="truncate text-[22px] tracking-tight leading-none" style={{ color: "#3c4043", fontFamily: "\"Google Sans\", \"Product Sans\", \"DM Sans\", system-ui, sans-serif", fontWeight: 500 }}>Jenvu</span>
-            </Link>
+            </a>
             <SiteNavLinks active="/insights" />
             <HeaderAuthButtons />
           </div>
@@ -215,12 +216,14 @@ function InsightsPage() {
                 <div className="lg:col-span-5">
                   <div className="aspect-[4/3] rounded-2xl overflow-hidden bg-zinc-200 border border-zinc-200 shadow-2xl relative group">
                     <img
-                      src={featured.image_url || "https://images.unsplash.com/photo-1610375461246-83df859d849d?w=1600&q=80"}
+                      src={insightCoverUrl(featured.title, featured.category, featured.image_url)}
                       alt={featured.title}
+                      width={1280}
+                      height={720}
                       onError={(e) => {
                         const t = e.currentTarget;
                         t.onerror = null;
-                        t.src = "https://images.unsplash.com/photo-1610375461246-83df859d849d?w=1600&q=80";
+                        t.src = insightCoverUrl(featured.title, featured.category);
                       }}
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                     />
@@ -272,26 +275,19 @@ function InsightsPage() {
               <article key={item.id} className="group cursor-pointer">
                 <Link to="/insights/$slug" params={{ slug: item.slug }} className="block">
                   <div className="aspect-video rounded-xl overflow-hidden bg-zinc-100 border border-zinc-100 mb-5">
-                    {item.image_url ? (
-                      <img
-                        src={item.image_url}
+                    <img
+                        src={insightCoverUrl(item.title, item.category, item.image_url)}
                         alt={item.title}
                         loading="lazy"
+                        width={1280}
+                        height={720}
                         onError={(e) => {
                           const t = e.currentTarget;
                           t.onerror = null;
-                          t.src = "https://images.unsplash.com/photo-1610375461246-83df859d849d?w=1600&q=80";
+                          t.src = insightCoverUrl(item.title, item.category);
                         }}
                         className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                       />
-                    ) : (
-                      <img
-                        src={"https://images.unsplash.com/photo-1610375461246-83df859d849d?w=1600&q=80"}
-                        alt={item.title}
-                        loading="lazy"
-                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                      />
-                    )}
                   </div>
                   <div className={`${MONO} text-[10px] uppercase tracking-widest text-zinc-500 mb-2`}>
                     {item.category}

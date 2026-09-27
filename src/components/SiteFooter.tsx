@@ -104,10 +104,10 @@ export default function SiteFooter({ className }: { className?: string }) {
         <div className="grid grid-cols-2 gap-x-8 gap-y-10 md:grid-cols-5">
           {/* Brand */}
           <div className="col-span-2 md:col-span-1 space-y-4">
-            <Link to="/" className="flex items-center gap-2.5">
+            <a href="https://jenvu.com" className="flex items-center gap-2.5">
               <img src="/favicon.png" alt="Jenvu" className="h-7 w-7 rounded object-contain" />
               <span className="text-[17px] font-semibold tracking-tight text-zinc-900">Jenvu AI</span>
-            </Link>
+            </a>
           </div>
 
           {/* Link columns */}
