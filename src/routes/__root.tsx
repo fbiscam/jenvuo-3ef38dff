@@ -294,7 +294,56 @@ function RootShell({ children }: { children: ReactNode }) {
   );
 }
 
+const JENVU_HOSTS = ["jenvu.com", "dash.jenvu.com", "support.jenvu.com", "leads.jenvu.com", "blogs.jenvu.com"];
+
 function RootComponent() {
+  // Fast cross-subdomain navigation: warm connections, prefetch on hover,
+  // and skip the in-app router for links to another jenvu host.
+  useEffect(() => {
+    const here = window.location.hostname;
+    if (!here.endsWith("jenvu.com")) return;
+    for (const h of JENVU_HOSTS) {
+      if (h === here) continue;
+      const l = document.createElement("link");
+      l.rel = "preconnect";
+      l.href = `https://${h}`;
+      document.head.appendChild(l);
+    }
+    const prefetched = new Set<string>();
+    const crossAnchor = (e: Event) => {
+      const a = (e.target as Element | null)?.closest?.("a[href]") as HTMLAnchorElement | null;
+      if (!a || a.target === "_blank") return null;
+      try {
+        const u = new URL(a.href);
+        return u.hostname !== here && JENVU_HOSTS.includes(u.hostname) ? u : null;
+      } catch { return null; }
+    };
+    const onHover = (e: Event) => {
+      const u = crossAnchor(e);
+      if (!u || prefetched.has(u.href)) return;
+      prefetched.add(u.href);
+      const l = document.createElement("link");
+      l.rel = "prefetch";
+      l.href = u.href;
+      document.head.appendChild(l);
+    };
+    const onClick = (e: MouseEvent) => {
+      if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      const u = crossAnchor(e);
+      if (!u) return;
+      e.preventDefault();
+      e.stopPropagation();
+      window.location.assign(u.href);
+    };
+    document.addEventListener("pointerover", onHover, true);
+    document.addEventListener("touchstart", onHover, { capture: true, passive: true });
+    document.addEventListener("click", onClick, true);
+    return () => {
+      document.removeEventListener("pointerover", onHover, true);
+      document.removeEventListener("touchstart", onHover, true);
+      document.removeEventListener("click", onClick, true);
+    };
+  }, []);
   const { queryClient } = Route.useRouteContext();
   const [isMobile, setIsMobile] = useState(false);
 
