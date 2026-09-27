@@ -49,7 +49,7 @@ export const PRODUCT_UPDATES: ProductUpdate[] = [
   },
   {
     title: " Balance based daily limits",
-    copy: "Every $3 of balance unlocks another 1M tokens a day, on top of your plan cap.",
+    copy: "Every $5 of balance unlocks another 1M tokens a day, on top of your plan cap.",
     at: "2026-09-18T08:10:00Z",
     tag: "Updated",
     icon: "gauge",

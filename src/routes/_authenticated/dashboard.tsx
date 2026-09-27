@@ -1996,7 +1996,7 @@ function UsageAnalytics({
               />
             </div>
             <div className="mt-3 text-xs text-muted-foreground">
-              $3 = 1M tokens · resets 00:00 UTC
+              $5 = 1M tokens · resets 00:00 UTC
             </div>
           </div>
           <div className={metricClass} style={{ backgroundColor: "#FFFBED" }}>
