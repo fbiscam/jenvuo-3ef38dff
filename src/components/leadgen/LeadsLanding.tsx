@@ -287,9 +287,15 @@ export function LeadsLanding() {
             <a href="https://support.jenvu.com" className="hover:text-zinc-900">
               Support
             </a>
-            <Link to="/leads-signin" className="hover:text-zinc-900">
-              Sign in
-            </Link>
+            {signedIn ? (
+              <Link to="/dashboard" className="hover:text-zinc-900">
+                Dashboard
+              </Link>
+            ) : (
+              <Link to="/leads-signin" className="hover:text-zinc-900">
+                Sign in
+              </Link>
+            )}
           </div>
         </div>
       </footer>
