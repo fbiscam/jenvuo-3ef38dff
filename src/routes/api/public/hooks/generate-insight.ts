@@ -9,7 +9,7 @@ const ARTICLE_MODELS = [
   "codecraft/gpt-5.5",
   "codecraft/grok-4.6",
 ];
-const ARTICLE_MODEL_LABEL = "Claude Opus 5 (CodeCraft)";
+const ARTICLE_MODEL_LABEL = "Claude Fable 5.1 (CodeCraft)";
 
 function slugify(s: string) {
   return s

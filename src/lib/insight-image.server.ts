@@ -22,7 +22,7 @@ const UNOROUTER_IMAGE_MODELS = [
   "dreamshaper:free",
 ] as const;
 
-// Each article gets a distinct, CoinDesk-style editorial cover in Jenvu's
+// Each article gets a distinct, original editorial cover in Jenvu's
 // brand colours (signal orange #FD5510, deep black, clean white). A stable
 // hash of the slug picks the hero subject and composition.
 const COVER_SCENES = [
