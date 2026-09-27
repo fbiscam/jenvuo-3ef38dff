@@ -367,30 +367,29 @@ export function setCachedPlan<T>(key: string, value: T, ttlMs: number = PLAN_CAC
 //   kr/claude-sonnet-4   — second-best verified fallback
 // Sonnet 5 is advertised by /models but currently rejects live requests, so it
 // is intentionally excluded until the upstream active catalog supports it.
-// AI Analysis: CodeCraft Claude Opus 5 (best tested on ICT/SMC reasoning),
-// then Fable 5.1, Opus 5.5, Grok 4.6, GPT 5.5 (all live-tested OK),
-// then OmniRoute Sonnet 4.5 as last-resort fallback.
+// AI Analysis: CodeCraft top models only (all live-tested OK).
+// Claude Sonnet 5 is excluded — advertised but rejects live requests.
 const PRIMARY_ANALYSIS_CHAIN = [
   "codecraft/claude-opus-5",
   "codecraft/claude-fable-5.1",
   "codecraft/claude-opus-5.5",
   "codecraft/grok-4.6",
   "codecraft/gpt-5.5",
-  "omniroute/kr/claude-sonnet-4.5",
 ] as const;
 
 const SENIOR_REVIEW_MODELS = PRIMARY_ANALYSIS_CHAIN;
 
 const FAST_CHAT_CHAIN = [
-  "omniroute/kr/claude-sonnet-4.5",
-  "omniroute/kr/claude-sonnet-4",
+  "codecraft/grok-4.6",
+  "codecraft/gpt-5.5",
+  "codecraft/claude-fable-5.1",
 ] as const;
 
-// Vision: GLM-5 is excluded — it does not accept image content.
+// Vision: Grok/GPT excluded — Claude models verified for image content.
 const VISION_CHAIN = [
   "codecraft/claude-opus-5",
-  "omniroute/kr/claude-sonnet-4.5",
-  "omniroute/kr/claude-sonnet-4",
+  "codecraft/claude-fable-5.1",
+  "codecraft/claude-opus-5.5",
 ] as const;
 
 export const MODEL_CHAIN = {

@@ -3,11 +3,11 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
 import { callChatCompletion } from "@/lib/ai-gateway";
 
-// OmniRoute only: load-verified working routes.
+// CodeCraft top models: load-verified working routes.
 const WRITER_CHAIN = [
-  "omniroute/kr/claude-sonnet-4.5",
-  "omniroute/kr/claude-sonnet-4",
-  "omniroute/kr/glm-5",
+  "codecraft/claude-opus-5",
+  "codecraft/claude-fable-5.1",
+  "codecraft/gpt-5.5",
 ];
 
 async function assertAdmin(supabase: any, userId: string) {
