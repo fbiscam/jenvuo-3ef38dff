@@ -1756,7 +1756,7 @@ function DashboardHero({
       variant: "model" as const,
       eyebrow: "  Introducing grok 4.6 reasoning",
       copy: "Our most capable model, built for precise market analysis. Grok 4.6 combines reasoning, chart vision, and strong context awareness from capture to completion.",
-      action: "Analyze with Opus 5",
+      action: "Analyze with Grok 4.6",
       to: "/dashboard/extension" as const,
       note: "",
     },
