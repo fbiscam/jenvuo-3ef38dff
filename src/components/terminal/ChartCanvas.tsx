@@ -77,6 +77,7 @@ type Props = {
   scripts: Array<{ id: string; result: ScriptResult }>;
   smc: SmcOverlay | null;
   smcToggles: SmcToggles;
+  showSmcPressure?: boolean;
   projection: CandleProjection | null;
   demoPositions: DemoPosition[];
   demoPrice?: number | null;
@@ -650,7 +651,7 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
       ctx.clip();
       const p = propsRef.current;
       const pr = projector();
-      if (p.smc) renderSmcOverlay(ctx, p.smc, p.smcToggles, pr);
+      if (p.smc) renderSmcOverlay(ctx, p.smc, p.smcToggles, pr, p.showSmcPressure ?? true);
       ctx.save();
       ctx.font = "600 10px 'DM Sans', system-ui, sans-serif";
       ctx.textAlign = "center";
