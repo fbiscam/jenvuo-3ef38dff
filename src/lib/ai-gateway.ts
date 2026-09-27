@@ -368,10 +368,14 @@ export function setCachedPlan<T>(key: string, value: T, ttlMs: number = PLAN_CAC
 // Sonnet 5 is advertised by /models but currently rejects live requests, so it
 // is intentionally excluded until the upstream active catalog supports it.
 // AI Analysis: CodeCraft Claude Opus 5 (best tested on ICT/SMC reasoning),
-// Opus 5.5 as second, then OmniRoute Sonnet 4.5 as last-resort fallback.
+// then Fable 5.1, Opus 5.5, Grok 4.6, GPT 5.5 (all live-tested OK),
+// then OmniRoute Sonnet 4.5 as last-resort fallback.
 const PRIMARY_ANALYSIS_CHAIN = [
   "codecraft/claude-opus-5",
+  "codecraft/claude-fable-5.1",
   "codecraft/claude-opus-5.5",
+  "codecraft/grok-4.6",
+  "codecraft/gpt-5.5",
   "omniroute/kr/claude-sonnet-4.5",
 ] as const;
 
