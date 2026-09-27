@@ -99,13 +99,14 @@ export function computeReversalSignal(
   if (i < 0) return null;
   const high = last.kind === "high";
   const piv = all[i];
-  const range = piv.h - piv.l || 1e-9;
-  const wick = high ? piv.h - Math.max(piv.o, piv.c) : Math.min(piv.o, piv.c) - piv.l;
   const prior = swings.filter((s) => s.kind === last.kind && s.t < last.t).sort((a, b) => b.t - a.t)[0];
   const swept = !!prior && (high ? last.price > prior.price : last.price < prior.price);
   const buyPct = pressure[last.t] ?? 50;
   const winPct = high ? 100 - buyPct : buyPct;
-  let score = 35 + (winPct - 50) * 0.6 + Math.min(20, (wick / range) * 30) + (swept ? 12 : 0);
+  // Keep one confidence source everywhere: the confluence-gated pressure
+  // calculated by reversalPressureStrength. A separate wick/sweep formula
+  // could otherwise advertise a stronger setup than the chart badge.
+  const score = winPct;
   const buffer = Math.max(atr * 0.1, last.price * 0.00003);
   const sl = high ? last.price + buffer : last.price - buffer;
   let stage: ReversalSignal["stage"] = "alert";
@@ -120,14 +121,17 @@ export function computeReversalSignal(
       entry = c.c; entryT = c.t; stage = "confirmed";
     }
   }
-  if (stage === "confirmed") score += 15;
-  score = Math.round(Math.max(5, Math.min(92, score)));
   const ref = entry ?? (forming?.c ?? closed.at(-1)!.c);
   const risk = Math.abs(ref - sl);
-  const tp1 = high
-    ? sellSide.find((p) => p < ref - risk) ?? null
-    : buySide.find((p) => p > ref + risk) ?? null;
   const tp2 = risk > 0 ? (high ? ref - 3 * risk : ref + 3 * risk) : null;
+  const liquidityTarget = high
+    ? sellSide.find((p) => p < ref - risk && (tp2 == null || p > tp2))
+    : buySide.find((p) => p > ref + risk && (tp2 == null || p < tp2));
+  // TP1 must remain visible even when no clean opposing liquidity pivot exists.
+  // Prefer that liquidity; otherwise use a deterministic 1.5R partial target.
+  const tp1 = risk > 0
+    ? liquidityTarget ?? (high ? ref - 1.5 * risk : ref + 1.5 * risk)
+    : null;
   return { side: high ? "sell" : "buy", t: last.t, pivotPrice: last.price, label: last.label, stage, score, swept, entry, entryT, sl, tp1, tp2 };
 }
 /** Buyer share of the leg ending at `end`: close position inside each candle's range. */
@@ -656,10 +660,18 @@ export function computeSmcOverlay(
   };
   for (const p of pivotsLabelled) legFor(p.t, p.kind);
   for (const p of livePivots) legFor(p.t, p.kind);
+  const targetBuySide = fractal.pivots
+    .filter((p) => p.kind === "high")
+    .map((p) => p.price)
+    .sort((a, b) => a - b);
+  const targetSellSide = fractal.pivots
+    .filter((p) => p.kind === "low")
+    .map((p) => p.price)
+    .sort((a, b) => b - a);
   const reversal = computeReversalSignal(fractalBars, forming ? toCandle(forming) : null, [
     ...pivotsLabelled,
     ...livePivots,
-  ], pressure, atr, buySide, sellSide);
+  ], pressure, atr, targetBuySide, targetSellSide);
   return {
     reversal,
     pressure,
