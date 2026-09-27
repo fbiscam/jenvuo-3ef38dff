@@ -60,7 +60,7 @@ function providerConfigured(model: string): boolean {
   // OmniRoute is the sole inference provider. Credential validation happens
   // inside the request attempt so a missing deployment binding is reported
   // accurately instead of being mistaken for an empty model chain.
-  return model.startsWith("omniroute/");
+  return model.startsWith("omniroute/") || model.startsWith("codecraft/");
 }
 
 // -------- Per-worker model health cache -----------------------------------
@@ -102,12 +102,15 @@ async function singleAttemptInner(
   opts: CallChatOptions,
   signal?: AbortSignal,
 ): Promise<{ content: string; usage: UsageInfo }> {
-  if (!model.startsWith("omniroute/")) {
-    throw new AiGatewayError(`Only OmniRoute models are allowed: ${model}`, 400, true);
+  const isCodeCraft = model.startsWith("codecraft/");
+  if (!isCodeCraft && !model.startsWith("omniroute/")) {
+    throw new AiGatewayError(`Unsupported model provider: ${model}`, 400, true);
   }
 
-  const omniRouteKey = process.env.CUSTOM_AI_API_KEY;
-  const omniRouteBase = (process.env.CUSTOM_AI_BASE_URL || "").replace(/\/+$/, "");
+  const omniRouteKey = isCodeCraft ? process.env.CODECRAFT_API_KEY : process.env.CUSTOM_AI_API_KEY;
+  const omniRouteBase = isCodeCraft
+    ? "https://codecraftapi.com/v1"
+    : (process.env.CUSTOM_AI_BASE_URL || "").replace(/\/+$/, "");
   if (!omniRouteKey) {
     throw new AiGatewayError("OmniRoute API key is missing on the published server.", 0, true);
   }
@@ -118,7 +121,7 @@ async function singleAttemptInner(
   const endpoint = /\/chat\/completions$/i.test(omniRouteBase)
     ? omniRouteBase
     : `${omniRouteBase.replace(/\/v1$/i, "")}/v1/chat/completions`;
-  const wireModel = model.slice("omniroute/".length);
+  const wireModel = model.slice(isCodeCraft ? "codecraft/".length : "omniroute/".length);
   const body: Record<string, unknown> = {
     model: wireModel,
     messages: opts.messages,
@@ -364,15 +367,15 @@ export function setCachedPlan<T>(key: string, value: T, ttlMs: number = PLAN_CAC
 //   kr/claude-sonnet-4   — second-best verified fallback
 // Sonnet 5 is advertised by /models but currently rejects live requests, so it
 // is intentionally excluded until the upstream active catalog supports it.
+// AI Analysis: CodeCraft Claude Opus 5 (best tested on ICT/SMC reasoning),
+// Opus 5.5 as second, then OmniRoute Sonnet 4.5 as last-resort fallback.
 const PRIMARY_ANALYSIS_CHAIN = [
+  "codecraft/claude-opus-5",
+  "codecraft/claude-opus-5.5",
   "omniroute/kr/claude-sonnet-4.5",
-  "omniroute/kr/claude-sonnet-4",
 ] as const;
 
-const SENIOR_REVIEW_MODELS = [
-  "omniroute/kr/claude-sonnet-4.5",
-  "omniroute/kr/claude-sonnet-4",
-] as const;
+const SENIOR_REVIEW_MODELS = PRIMARY_ANALYSIS_CHAIN;
 
 const FAST_CHAT_CHAIN = [
   "omniroute/kr/claude-sonnet-4.5",
@@ -381,6 +384,7 @@ const FAST_CHAT_CHAIN = [
 
 // Vision: GLM-5 is excluded — it does not accept image content.
 const VISION_CHAIN = [
+  "codecraft/claude-opus-5",
   "omniroute/kr/claude-sonnet-4.5",
   "omniroute/kr/claude-sonnet-4",
 ] as const;
