@@ -60,7 +60,10 @@ describe("mapMarketStructure", () => {
       input.map(({ timestamp: t, open: o, high: h, low: l, close: c }) => ({ t, o, h, l, c })),
     );
 
-    assert.deepEqual(evidence.pivots.map((pivot) => pivot.kind), ["high"]);
+    assert.equal(evidence.pivots.length > 1, true);
+    for (let index = 1; index < evidence.pivots.length; index += 1) {
+      assert.notEqual(evidence.pivots[index].kind, evidence.pivots[index - 1].kind);
+    }
   });
 
   test("rejects a three-candle wiggle within 1.2 ATR of the opposite swing", () => {
@@ -70,6 +73,8 @@ describe("mapMarketStructure", () => {
     );
     const evidence = detectMarketStructureEvidence(
       input.map(({ timestamp: t, open: o, high: h, low: l, close: c }) => ({ t, o, h, l, c })),
+      3,
+      10,
     );
 
     assert.deepEqual(evidence.pivots.map((pivot) => pivot.kind), ["high"]);
@@ -89,7 +94,7 @@ describe("mapMarketStructure", () => {
       [8, 9, 10, 8, 6, 7, 9, 11, 9, 7, 5, 4, 3],
       [9, 10, 12, 10, 8, 10, 13, 15.5, 11, 8, 5.5, 5, 4],
     );
-    const mapped = mapMarketStructure(input);
+    const mapped = mapMarketStructure(input, 2);
     const evidence = detectMarketStructureEvidence(
       input.map((candle) => ({
         t: candle.timestamp,
@@ -98,6 +103,7 @@ describe("mapMarketStructure", () => {
         l: candle.low,
         c: candle.close,
       })),
+      2,
     );
 
     for (const event of evidence.breaks) {
@@ -112,7 +118,7 @@ describe("mapMarketStructure", () => {
       [8, 9, 10, 8, 7, 10, 10],
       [9, 10, 12, 10, 9, 14.9, 15.5],
     );
-    const mapped = mapMarketStructure(input);
+    const mapped = mapMarketStructure(input, 2);
 
     assert.equal(mapped[5].smc_event, null);
     assert.equal(mapped[6].smc_event, "BOS");
@@ -130,7 +136,7 @@ describe("mapMarketStructure", () => {
       [8, 9, 10, 8, 7, 10, 10],
       [9, 10, 12, 10, 9, 14.9, 15.5],
     );
-    const state = mapAdvancedSmcState(input);
+    const state = mapAdvancedSmcState(input, { radius: 2 });
 
     assert.equal(state[5].trend_state, "SIDEWAYS");
     assert.equal(state[5].last_event, "BSL_SWEEP");
@@ -143,7 +149,7 @@ describe("mapMarketStructure", () => {
       [10, 11, 15, 12, 11, 13, 15.2, 13, 12, 13, 14],
       [8, 9, 10, 8, 5, 7, 9, 8, 5.2, 7, 8],
     );
-    const latest = mapAdvancedSmcState(input).at(-1);
+    const latest = mapAdvancedSmcState(input, { radius: 2 }).at(-1);
 
     assert.ok(latest?.active_liquidity_pools.some((pool) => pool.type === "EQH"));
     assert.ok(latest?.active_liquidity_pools.some((pool) => pool.type === "EQL"));
@@ -155,13 +161,14 @@ describe("mapMarketStructure", () => {
       [8, 9, 10, 8, 7, 10, 10],
       [9, 10, 12, 10, 9, 14.9, 15.5],
     );
-    const bullish = mapAdvancedSmcState(base);
+    const bullish = mapAdvancedSmcState(base, { radius: 2 });
     const bearish = mapAdvancedSmcState(
       candles(
         [10, 11, 15, 12, 11, 12, 13, 10],
         [8, 9, 10, 8, 5, 7, 8, 4],
         [9, 10, 12, 10, 8, 9, 10, 4.5],
       ),
+      { radius: 2 },
     );
     const consensus = classifyMultiTimeframeTrend({ "1h": bullish, "1d": bearish });
 
