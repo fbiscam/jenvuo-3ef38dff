@@ -607,7 +607,9 @@ function TerminalPage() {
               }}
               rightSlot={
                 <>
-                  <UpcomingGoldNews event={nextGoldNews} loading={newsQuery.isPending} />
+                  {!deskOpen && (
+                    <UpcomingGoldNews event={nextGoldNews} loading={newsQuery.isPending} />
+                  )}
                   <div
                     className="flex h-7 items-center gap-1.5 rounded-md px-2 font-mono text-xs font-semibold text-foreground"
                     title={`Time left on the current ${tf.label} candle`}
