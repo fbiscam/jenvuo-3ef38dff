@@ -32,7 +32,7 @@ const ALIASES: Record<string, PublicApiModelId> = {
 /** Resolve a requested model name to a public model id, or null if unknown. */
 export function resolvePublicModel(model: unknown): PublicApiModelId | null {
   const key = typeof model === "string" ? model.trim().toLowerCase() : "";
-  if (!key) return "claude-sonnet-4.5";
+  if (!key) return "claude-opus-5";
   if ((PUBLIC_API_MODEL_IDS as readonly string[]).includes(key)) return key as PublicApiModelId;
   return ALIASES[key] ?? null;
 }
