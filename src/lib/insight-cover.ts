@@ -16,7 +16,7 @@ export function fallbackInsightCover(title: string, category = ""): string {
 }
 
 export function insightCoverUrl(title: string, category: string, imageUrl?: string | null): string {
-  if (!imageUrl || /images\.unsplash\.com|source\.unsplash\.com/i.test(imageUrl)) {
+  if (!imageUrl || /images\.unsplash\.com|source\.unsplash\.com|\/insight-image\/[^?]+\.svg(?:\?|$)/i.test(imageUrl)) {
     return fallbackInsightCover(title, category);
   }
   return imageUrl;
