@@ -2,7 +2,7 @@
  * URL rewriting across Jenvu's canonical section domains.
  *
  * Goals:
- *  - Keep dashboard routes under dash.jenvu.com/dashboard/*, with billing at /billing.
+ *  - Dashboard home at dash.jenvu.com/overview; child pages at dash.jenvu.com/<page> (payment at /payment).
  *  - Serve sign-in at auth.jenvu.com/sign-in.
  *  - Mount blog, leads, and support route trees on their section hosts.
  *  - Send global public pages such as Contact and Download to jenvu.com.
@@ -38,7 +38,29 @@ const DASHBOARD_CHILDREN = new Set([
   "security",
   "usage",
   "workspace",
+  "extension",
 ]);
+
+/** Internal dashboard path -> clean dash.jenvu.com path. */
+export function dashExternal(p: string): string {
+  if (p === "/dashboard" || p === "/dashboard/") return "/overview";
+  if (p === "/dashboard/pay") return "/payment";
+  if (p.startsWith("/dashboard/")) {
+    const rest = p.slice("/dashboard".length);
+    const first = rest.split("/").filter(Boolean)[0];
+    if (first === "admin" || DASHBOARD_CHILDREN.has(first)) return rest;
+  }
+  return p;
+}
+
+/** Clean dash.jenvu.com path -> internal dashboard path, or null. */
+export function dashInternal(p: string): string | null {
+  if (p === "/" || p === "" || p === "/overview") return "/dashboard";
+  if (p === "/payment") return "/dashboard/pay";
+  const first = p.split("/").filter(Boolean)[0];
+  if (first === "admin" || (first && DASHBOARD_CHILDREN.has(first))) return `/dashboard${p}`;
+  return null;
+}
 
 /** Paths that must never be rewritten or redirected (server endpoints, assets, RPC). */
 function isReserved(pathname: string): boolean {
@@ -192,20 +214,13 @@ export function apexRedirectTarget(url: URL): string | null {
         return next.toString();
       }
       if (sub === "dash") {
-        if (p === "/") {
+        let want: string | null = null;
+        if (p === "/") want = "/overview";
+        else if (p === "/pay") want = "/payment";
+        else if (p === "/dashboard" || p.startsWith("/dashboard/")) want = dashExternal(p);
+        if (want && want !== p) {
           const next = new URL(url);
-          next.pathname = "/dashboard";
-          return next.toString();
-        }
-        if (p === "/dashboard/billing") {
-          const next = new URL(url);
-          next.pathname = "/billing";
-          return next.toString();
-        }
-        const segments = p.split("/").filter(Boolean);
-        if (segments[0] === "admin" || (segments.length === 1 && DASHBOARD_CHILDREN.has(segments[0]) && segments[0] !== "billing")) {
-          const next = new URL(url);
-          next.pathname = `/dashboard${p}`;
+          next.pathname = want;
           return next.toString();
         }
       }
@@ -233,7 +248,7 @@ export function apexRedirectTarget(url: URL): string | null {
       const next = new URL(url);
       next.hostname = target.host;
       next.pathname = target.prefix === "/dashboard"
-        ? p
+        ? dashExternal(p)
         : p === target.prefix
           ? "/"
           : p.slice(target.prefix.length);
@@ -258,7 +273,7 @@ export function apexRedirectTarget(url: URL): string | null {
     if (segments[0] === "dashboard") {
       const next = new URL(url);
       next.hostname = dashHost;
-      next.pathname = p;
+      next.pathname = dashExternal(p);
       return next.toString();
     }
 
@@ -315,10 +330,14 @@ export function rewriteInput(url: URL): URL | undefined {
 
   // On the dash subdomain the dashboard lives at the root:
   // dash.jenvu.com/ -> /dashboard, dash.jenvu.com/alerts -> /dashboard/alerts
-  if (isDash(host) && (p === "/" || p === "")) {
-    const next = new URL(url);
-    next.pathname = "/dashboard";
-    return next;
+  if (isDash(host)) {
+    const internal = dashInternal(p);
+    if (internal) {
+      const next = new URL(url);
+      next.pathname = internal;
+      return next;
+    }
+    return undefined;
   }
 
   // Admin paths: /admin/* -> /dashboard/admin/*
@@ -371,16 +390,18 @@ export function rewriteOutput(url: URL): URL | undefined {
     const next = new URL(url);
     next.hostname = target.host;
     next.pathname = target.prefix === "/dashboard"
-      ? p
+      ? dashExternal(p)
       : p === target.prefix
         ? "/"
         : p.slice(target.prefix.length);
     return next;
   }
 
-  if (isDash(host) && p === "/dashboard/billing") {
+  if (isDash(host) && (p === "/dashboard" || p.startsWith("/dashboard/"))) {
+    const ext = dashExternal(p);
+    if (ext === p) return undefined;
     const next = new URL(url);
-    next.pathname = "/billing";
+    next.pathname = ext;
     return next;
   }
 
@@ -410,7 +431,7 @@ export function rewriteOutput(url: URL): URL | undefined {
   if (isApex(host) && (p === "/dashboard" || p.startsWith("/dashboard/"))) {
     const next = new URL(url);
     next.hostname = `dash.${ROOT_DOMAIN}`;
-    next.pathname = p;
+    next.pathname = dashExternal(p);
     return next;
   }
 
