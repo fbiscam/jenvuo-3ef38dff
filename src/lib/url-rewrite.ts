@@ -74,6 +74,30 @@ const SECTION_HOSTS: Record<string, string> = {
   [`support.${ROOT_DOMAIN}`]: "/help",
 };
 
+// Internal path prefix -> the subdomain that hosts it. Used to send users to
+// the right host when they navigate across sections (e.g. dashboard -> help).
+const PATH_HOSTS: Array<[prefix: string, host: string]> = [
+  ["/dashboard", `dash.${ROOT_DOMAIN}`],
+  ["/help", `support.${ROOT_DOMAIN}`],
+  ["/leads", `leads.${ROOT_DOMAIN}`],
+  ["/insights", `blogs.${ROOT_DOMAIN}`],
+];
+
+/** Host that should serve this internal path, or null if it stays put. */
+function hostForPath(pathname: string): { host: string; prefix: string } | null {
+  for (const [prefix, host] of PATH_HOSTS) {
+    if (pathname === prefix || pathname.startsWith(`${prefix}/`)) {
+      return { host, prefix };
+    }
+  }
+  return null;
+}
+
+/** True for every host we manage (apex, www, dash, section subdomains). */
+function isManagedHost(host: string): boolean {
+  return isApex(host) || isDash(host) || Boolean(SECTION_HOSTS[host]);
+}
+
 /**
  * Server-level redirect target.
  *
