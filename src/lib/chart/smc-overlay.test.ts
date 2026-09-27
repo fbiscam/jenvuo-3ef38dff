@@ -273,4 +273,23 @@ describe("smc overlay fractal labels", () => {
     expect(signal?.stage).toBe("alert");
     expect(signal?.entry).toBe(null);
   });
+
+  it("rejects a two-candle reversal when pressure is not directionally aligned", () => {
+    const signal = computeReversalSignal(
+      [
+        { t: 1, o: 100, h: 101, l: 99, c: 100 },
+        { t: 2, o: 100, h: 110, l: 99, c: 108 },
+        { t: 3, o: 107, h: 108, l: 98, c: 99 },
+        { t: 4, o: 99.5, h: 100.1, l: 97, c: 98 },
+      ],
+      null,
+      [{ t: 2, price: 110, kind: "high", label: "HH" }],
+      { 2: 50 },
+      2,
+      [],
+      [],
+    );
+    expect(signal?.stage).toBe("alert");
+    expect(signal?.entry).toBe(null);
+  });
 });

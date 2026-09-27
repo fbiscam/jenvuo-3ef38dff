@@ -104,6 +104,7 @@ export function computeReversalSignal(
   const swept = !!prior && (high ? last.price > prior.price : last.price < prior.price);
   const buyPct = pressure[last.t] ?? 50;
   const winPct = high ? 100 - buyPct : buyPct;
+  const pressureAligned = winPct > 55;
   // Keep one confidence source everywhere: the confluence-gated pressure
   // calculated by reversalPressureStrength. A separate wick/sweep formula
   // could otherwise advertise a stronger setup than the chart badge.
@@ -129,7 +130,7 @@ export function computeReversalSignal(
       const retested = high ? c.h >= trigger - tolerance : c.l <= trigger + tolerance;
       const held = high ? c.c < trigger : c.c > trigger;
       const directionalClose = high ? c.c < c.o : c.c > c.o;
-      if (retested && held && directionalClose) {
+      if (retested && held && directionalClose && pressureAligned) {
         entry = c.c;
         entryT = c.t;
         stage = "confirmed";
