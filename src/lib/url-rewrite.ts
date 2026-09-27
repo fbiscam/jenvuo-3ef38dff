@@ -74,6 +74,30 @@ const SECTION_HOSTS: Record<string, string> = {
   [`support.${ROOT_DOMAIN}`]: "/help",
 };
 
+// Internal path prefix -> the subdomain that hosts it. Used to send users to
+// the right host when they navigate across sections (e.g. dashboard -> help).
+const PATH_HOSTS: Array<[prefix: string, host: string]> = [
+  ["/dashboard", `dash.${ROOT_DOMAIN}`],
+  ["/help", `support.${ROOT_DOMAIN}`],
+  ["/leads", `leads.${ROOT_DOMAIN}`],
+  ["/insights", `blogs.${ROOT_DOMAIN}`],
+];
+
+/** Host that should serve this internal path, or null if it stays put. */
+function hostForPath(pathname: string): { host: string; prefix: string } | null {
+  for (const [prefix, host] of PATH_HOSTS) {
+    if (pathname === prefix || pathname.startsWith(`${prefix}/`)) {
+      return { host, prefix };
+    }
+  }
+  return null;
+}
+
+/** True for every host we manage (apex, www, dash, section subdomains). */
+function isManagedHost(host: string): boolean {
+  return isApex(host) || isDash(host) || Boolean(SECTION_HOSTS[host]);
+}
+
 /**
  * Server-level redirect target.
  *
@@ -99,8 +123,19 @@ export function apexRedirectTarget(url: URL): string | null {
     const sub = host.slice(0, host.length - `.${ROOT_DOMAIN}`.length);
     if (sub.includes(".")) return null;
     // dash/blogs/leads/support subdomains host their sections directly —
-    // never redirect them away.
-    if (sub === "dash" || SECTION_HOSTS[host]) return null;
+    // but a path belonging to another section goes to that section's host
+    // (e.g. dash.jenvu.com/help -> support.jenvu.com/).
+    if (sub === "dash" || SECTION_HOSTS[host]) {
+      const target = hostForPath(p);
+      if (target && target.host !== host) {
+        const next = new URL(url);
+        next.hostname = target.host;
+        next.pathname =
+          p === target.prefix ? "/" : p.slice(target.prefix.length);
+        return next.toString();
+      }
+      return null;
+    }
     const section = SUBDOMAIN_SECTIONS[sub];
     if (!section) return null;
     const next = new URL(url);
@@ -114,6 +149,19 @@ export function apexRedirectTarget(url: URL): string | null {
     return next.toString();
   }
 
+
+  // 1b. Cross-section navigation: if the path belongs to a section hosted on
+  // another subdomain (e.g. dash.jenvu.com/help), send it to that host.
+  if (isManagedHost(host)) {
+    const target = hostForPath(p);
+    if (target && target.host !== host) {
+      const next = new URL(url);
+      next.hostname = target.host;
+      next.pathname =
+        p === target.prefix ? "/" : p.slice(target.prefix.length);
+      return next.toString();
+    }
+  }
 
   // 2. Apex domain: the dashboard lives on dash.jenvu.com — send every
   // dashboard URL there (jenvu.com/dashboard/billing -> dash.jenvu.com/billing).
@@ -210,6 +258,17 @@ export function rewriteOutput(url: URL): URL | undefined {
   if (!isApex(host) && !isDash(host) && !SECTION_HOSTS[host]) return undefined;
   const p = url.pathname;
   if (isReserved(p)) return undefined;
+
+  // Cross-section navigation: links to a section hosted on another subdomain
+  // point at that host with the prefix stripped (e.g. on dash.jenvu.com,
+  // /help/getting-started -> support.jenvu.com/getting-started).
+  const target = hostForPath(p);
+  if (target && target.host !== host) {
+    const next = new URL(url);
+    next.hostname = target.host;
+    next.pathname = p === target.prefix ? "/" : p.slice(target.prefix.length);
+    return next;
+  }
 
   // Section subdomains: strip the section prefix so the address bar stays
   // clean — /insights/my-post -> blogs.jenvu.com/my-post
