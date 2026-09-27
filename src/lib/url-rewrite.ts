@@ -2,7 +2,7 @@
  * URL rewriting across Jenvu's canonical section domains.
  *
  * Goals:
- *  - Keep dashboard routes under dash.jenvu.com/dashboard/*.
+ *  - Keep dashboard routes under dash.jenvu.com/dashboard/*, with billing at /billing.
  *  - Serve sign-in at auth.jenvu.com/sign-in.
  *  - Mount blog, leads, and support route trees on their section hosts.
  *  - Send global public pages such as Contact and Download to jenvu.com.
@@ -197,8 +197,13 @@ export function apexRedirectTarget(url: URL): string | null {
           next.pathname = "/dashboard";
           return next.toString();
         }
+        if (p === "/dashboard/billing") {
+          const next = new URL(url);
+          next.pathname = "/billing";
+          return next.toString();
+        }
         const segments = p.split("/").filter(Boolean);
-        if (segments[0] === "admin" || (segments.length === 1 && DASHBOARD_CHILDREN.has(segments[0]))) {
+        if (segments[0] === "admin" || (segments.length === 1 && DASHBOARD_CHILDREN.has(segments[0]) && segments[0] !== "billing")) {
           const next = new URL(url);
           next.pathname = `/dashboard${p}`;
           return next.toString();
@@ -370,6 +375,12 @@ export function rewriteOutput(url: URL): URL | undefined {
       : p === target.prefix
         ? "/"
         : p.slice(target.prefix.length);
+    return next;
+  }
+
+  if (isDash(host) && p === "/dashboard/billing") {
+    const next = new URL(url);
+    next.pathname = "/billing";
     return next;
   }
 
