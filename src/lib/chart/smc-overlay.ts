@@ -79,7 +79,8 @@ type PCandle = { t: number; o: number; h: number; l: number; c: number };
 /**
  * Reversal setup on the newest swing:
  *  - alert: a fresh swing extreme exists (sweep / rejection / pressure scored)
- *  - confirmed: a later CLOSED candle closes beyond the swing candle's body on the reversal side
+ *  - confirmed: candle 1 body-closes beyond the swing candle's body, then candle 2
+ *    retests/holds that level and closes in the reversal direction
  *  - cancelled: price trades beyond the swing extreme afterwards
  * Entry = confirmation close, SL = beyond wick (+ small ATR buffer), TP1 = opposing liquidity, TP2 = 1:3.
  */
@@ -113,12 +114,28 @@ export function computeReversalSignal(
   let entry: number | null = null;
   let entryT: number | null = null;
   const trigger = high ? Math.min(piv.o, piv.c) : Math.max(piv.o, piv.c);
+  let breakIndex = -1;
   for (let k = i + 1; k < all.length; k++) {
     const c = all[k];
     if (high ? c.h > last.price : c.l < last.price) { stage = "cancelled"; break; }
     const isClosed = k < closed.length;
-    if (entry == null && isClosed && (high ? c.c < trigger : c.c > trigger)) {
-      entry = c.c; entryT = c.t; stage = "confirmed";
+    if (!isClosed) continue;
+    if (breakIndex < 0 && (high ? c.c < trigger : c.c > trigger)) {
+      breakIndex = k;
+      continue;
+    }
+    if (breakIndex >= 0 && k === breakIndex + 1) {
+      const tolerance = Math.max(atr * 0.2, last.price * 0.00002);
+      const retested = high ? c.h >= trigger - tolerance : c.l <= trigger + tolerance;
+      const held = high ? c.c < trigger : c.c > trigger;
+      const directionalClose = high ? c.c < c.o : c.c > c.o;
+      if (retested && held && directionalClose) {
+        entry = c.c;
+        entryT = c.t;
+        stage = "confirmed";
+      } else {
+        breakIndex = -1;
+      }
     }
   }
   const ref = entry ?? (forming?.c ?? closed.at(-1)!.c);
@@ -616,7 +633,26 @@ export function computeSmcOverlay(
         if (near && held) { defended = 1; break; }
       }
     }
-    // 12) Reaction quality. A real reversal should move efficiently away from
+    // 12) Strict two-candle reversal confirmation. Candle 1 must BODY-close
+    // through the swing body's opposite edge; candle 2 must retest that edge,
+    // hold beyond it and close in the reversal direction. A wick never counts.
+    const trigger = high ? Math.min(piv.o, piv.c) : Math.max(piv.o, piv.c);
+    let twoCandleConfirmation = 0;
+    for (let k = i + 1; k < end; k++) {
+      const first = all[k];
+      const second = all[k + 1];
+      const bodyBreak = high ? first.c < trigger : first.c > trigger;
+      if (!bodyBreak) continue;
+      const tolerance = Math.max(atr * 0.2, piv.c * 0.00002);
+      const retested = high ? second.h >= trigger - tolerance : second.l <= trigger + tolerance;
+      const held = high ? second.c < trigger : second.c > trigger;
+      const directionalClose = high ? second.c < second.o : second.c > second.o;
+      if (retested && held && directionalClose) {
+        twoCandleConfirmation = 1;
+        break;
+      }
+    }
+    // 13) Reaction quality. A real reversal should move efficiently away from
     //     the wick, keep closes beyond the pivot midpoint and carry directional
     //     volume. Choppy reactions therefore cannot earn an inflated score.
     const netMove = bars > 0 ? Math.abs(all[end].c - piv.c) : 0;
@@ -628,15 +664,17 @@ export function computeSmcOverlay(
     // Require independent evidence families to agree. Bonuses only become
     // strong when price action, structure and participation confirm together.
     const footprint = Math.max(sweep, absorb, exhaustion);
-    const confirmation = Math.max(engulf, bos, defended);
+    // A lone engulfing candle, BOS or defended wick can support the score but
+    // cannot equal a completed break-and-retest sequence.
+    const confirmation = Math.max(0.55 * engulf, 0.7 * bos, 0.6 * defended, twoCandleConfirmation);
     const followThrough = 0.4 * efficiency + 0.35 * persistence + 0.25 * directionalBias;
-    // 13) Range location: highs in premium, lows in discount of last 50 bars.
+    // 14) Range location: highs in premium, lows in discount of last 50 bars.
     const rng = all.slice(Math.max(0, i - 50), i + 1);
     const rHi = Math.max(...rng.map((c) => c.h));
     const rLo = Math.min(...rng.map((c) => c.l));
     const pos = rHi > rLo ? ((high ? piv.h : piv.l) - rLo) / (rHi - rLo) : 0.5;
     const context = rng.length >= 20 ? clamp01(high ? pos : 1 - pos) : undefined;
-    // 14) Invalidation: any later CLOSED candle closing beyond the extreme.
+    // 15) Invalidation: any later CLOSED candle closing beyond the extreme.
     let invalidated = false;
     for (let k = i + 1; k < fractalBars.length; k++) {
       if (high ? all[k].c > piv.h : all[k].c < piv.l) { invalidated = true; break; }

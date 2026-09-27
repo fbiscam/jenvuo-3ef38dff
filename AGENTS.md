@@ -11,3 +11,4 @@
 
 - Keep reversal pressure scoring deterministic and confluence-gated; a single wick or volume clue must never produce strong confidence, preventing inflated live signals.
 - Expose buyer/seller reversal pressure and pressure-gated trade levels only on 1H XAU/USD and BTC/USD; this keeps one deliberate decision timeframe while preserving structure labels elsewhere.
+- Confirm reversal entries only after a closed-candle body break followed by a directional retest-and-hold candle; wick-only breaks remain unconfirmed.

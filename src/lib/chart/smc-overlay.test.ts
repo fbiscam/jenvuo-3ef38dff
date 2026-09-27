@@ -198,6 +198,7 @@ describe("smc overlay fractal labels", () => {
       { t: 1, o: 100, h: 101, l: 99, c: 100 },
       { t: 2, o: 100, h: 110, l: 99, c: 108 },
       { t: 3, o: 107, h: 108, l: 98, c: 99 },
+      { t: 4, o: 99.5, h: 100.1, l: 97, c: 98 },
     ];
     const signal = computeReversalSignal(
       candles,
@@ -209,10 +210,10 @@ describe("smc overlay fractal labels", () => {
       [],
     );
     expect(signal?.stage).toBe("confirmed");
-    expect(signal?.entry).toBe(99);
+    expect(signal?.entry).toBe(98);
     expect(signal?.score).toBe(85);
-    expect(signal?.tp1).toBeCloseTo(82.2);
-    expect(signal?.tp2).toBeCloseTo(65.4);
+    expect(signal?.tp1).toBeCloseTo(80.2);
+    expect(signal?.tp2).toBeCloseTo(62.4);
   });
 
   it("uses opposing liquidity for TP1 only when it sits between 1R and TP2", () => {
@@ -220,6 +221,7 @@ describe("smc overlay fractal labels", () => {
       { t: 1, o: 100, h: 101, l: 99, c: 100 },
       { t: 2, o: 100, h: 110, l: 99, c: 108 },
       { t: 3, o: 107, h: 108, l: 98, c: 99 },
+      { t: 4, o: 99.5, h: 100.1, l: 97, c: 98 },
     ];
     const signal = computeReversalSignal(
       candles,
@@ -232,5 +234,43 @@ describe("smc overlay fractal labels", () => {
     );
     expect(signal?.tp1).toBe(85);
     expect((signal?.tp1 ?? 0) > (signal?.tp2 ?? 0)).toBe(true);
+  });
+
+  it("does not confirm a reversal from a wick-only break", () => {
+    const signal = computeReversalSignal(
+      [
+        { t: 1, o: 100, h: 101, l: 99, c: 100 },
+        { t: 2, o: 100, h: 110, l: 99, c: 108 },
+        { t: 3, o: 102, h: 103, l: 98, c: 101 },
+        { t: 4, o: 101, h: 102, l: 99, c: 100.5 },
+      ],
+      null,
+      [{ t: 2, price: 110, kind: "high", label: "HH" }],
+      { 2: 15 },
+      2,
+      [],
+      [],
+    );
+    expect(signal?.stage).toBe("alert");
+    expect(signal?.entry).toBe(null);
+  });
+
+  it("waits for the second candle to retest and hold the body-break level", () => {
+    const signal = computeReversalSignal(
+      [
+        { t: 1, o: 100, h: 101, l: 99, c: 100 },
+        { t: 2, o: 100, h: 110, l: 99, c: 108 },
+        { t: 3, o: 107, h: 108, l: 98, c: 99 },
+        { t: 4, o: 98.5, h: 98.8, l: 96, c: 97 },
+      ],
+      null,
+      [{ t: 2, price: 110, kind: "high", label: "HH" }],
+      { 2: 15 },
+      2,
+      [],
+      [],
+    );
+    expect(signal?.stage).toBe("alert");
+    expect(signal?.entry).toBe(null);
   });
 });
