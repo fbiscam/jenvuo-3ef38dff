@@ -2054,7 +2054,7 @@ const RECOMMENDED_MODELS = [
     featured: true,
   },
   {
-    name: "  Claude sonnet 4 & 4.5 + haiku 4.5",
+    name: "  Claude fable 5.1 & 5 ",
     badge: "Senior review",
     description: " Independent validation for structure, risk",
     logo: ClaudeLogo,
