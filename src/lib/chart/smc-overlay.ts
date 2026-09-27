@@ -14,10 +14,23 @@ import {
   type OrderBlockZone,
 } from "@/lib/analysis/poi-evidence";
 import type { OhlcvBar } from "./indicators";
+import {
+  CLUSTER_RADIUS,
+  clusterBuyerPercent,
+  computeExecutionSignal,
+  computeJenvuSignals,
+  computeTopBottom,
+  computeVortexCloud,
+  detectLiquiditySweeps,
+  type ExecutionSignal,
+  type JenvuMark,
+  type JenvuSignal,
+  type LiquiditySweep,
+} from "./institutional-engine";
 
 export const SMC_WINDOW = 150;
-/** HH/HL/LH/LL chart labels use a Fractals-style swing length of 10 bars each side. */
-export const FRACTAL_RADIUS = 10;
+/** HH/HL/LH/LL lock after 3 closed candles each side (no repainting). */
+export const FRACTAL_RADIUS = CLUSTER_RADIUS;
 /** Closed bars scanned for 10-bar fractal labels (wider window so enough swings form). */
 export const FRACTAL_WINDOW = 400;
 
@@ -55,6 +68,13 @@ export type SmcOverlay = {
   pressure?: Record<number, number>;
   /** Latest reversal setup at the newest swing (alert → confirmed → cancelled). */
   reversal?: ReversalSignal | null;
+  /** Confluence strength (0-100 buyer share) used to grade reversals. */
+  confluence?: Record<number, number>;
+  sweeps?: LiquiditySweep[];
+  execution?: ExecutionSignal | null;
+  jenvuSignals?: JenvuSignal[];
+  topBottom?: JenvuMark[];
+  cloud?: Array<{ t: number; fast: number; slow: number }>;
 };
 
 export type ReversalSignal = {
@@ -155,6 +175,10 @@ export type SmcToggles = {
   orderBlocks: boolean;
   liquidity: boolean;
   projection: boolean;
+  execution: boolean;
+  jenvuSignals: boolean;
+  topBottom: boolean;
+  cloud: boolean;
 };
 
 export const DEFAULT_SMC: SmcToggles = {
@@ -164,6 +188,10 @@ export const DEFAULT_SMC: SmcToggles = {
   orderBlocks: false,
   liquidity: true,
   projection: true,
+  execution: true,
+  jenvuSignals: true,
+  topBottom: true,
+  cloud: false,
 };
 
 type Candle = { t: number; o: number; h: number; l: number; c: number; v?: number };
@@ -466,6 +494,7 @@ export function computeSmcOverlay(
     .slice(0, 4);
   const all = forming ? [...fractalBars, toCandle(forming)] : fractalBars;
   const pressure: Record<number, number> = {};
+  const confluence: Record<number, number> = {};
   const idxOf = new Map(all.map((c, i) => [c.t, i]));
   // Extreme-level pressure: who took control AT the swing. Blends three signals
   // into a buyer share (0-1): wick rejection on the swing candle, volume-weighted
@@ -656,7 +685,9 @@ export function computeSmcOverlay(
       invalidated,
     });
     buy = high ? 0.5 - strength : 0.5 + strength;
-    pressure[t] = Math.round(clamp01(buy) * 100);
+    confluence[t] = Math.round(clamp01(buy) * 100);
+    // Displayed B%/S%: Volume Block Engine over the 3-candle swing cluster.
+    pressure[t] = clusterBuyerPercent(all, i) ?? 50;
   };
   for (const p of pivotsLabelled) legFor(p.t, p.kind);
   for (const p of livePivots) legFor(p.t, p.kind);
@@ -672,9 +703,22 @@ export function computeSmcOverlay(
     ...pivotsLabelled,
     ...livePivots,
   ], pressure, atr, targetBuySide, targetSellSide);
+  const closedE = fractalBars;
+  const sweeps = detectLiquiditySweeps(closedE, fractal.pivots);
+  const zones = [...selectedPois.orderBlocks, ...selectedPois.fvgs].map((z) => ({ top: z.top, bottom: z.bottom, type: z.type }));
+  const execution = computeExecutionSignal(closedE, fractal.pivots, fractal.breaks, zones, sweeps);
+  const jenvuSignals = computeJenvuSignals(closedE).slice(-20);
+  const topBottom = computeTopBottom(closedE).slice(-20);
+  const cloud = computeVortexCloud(closedE);
   return {
     reversal,
     pressure,
+    confluence,
+    sweeps,
+    execution,
+    jenvuSignals,
+    topBottom,
+    cloud,
     pivots: pivotsLabelled,
     livePivots,
     breaks: breaks.slice(-8),
@@ -940,19 +984,8 @@ export function renderSmcOverlay(
         continue;
       }
       // Early "High"/"Low" marker on the running swing (no countdown box).
-      if (!SHOW_PROVISIONAL_PIVOTS) {
-        // New swing shown immediately with its real label (HH/HL/LH/LL)
-        // plus fresh buyer/seller pressure as soon as the high/low forms.
-        ctx.fillStyle = color;
-        ctx.beginPath();
-        ctx.roundRect?.(xx - w / 2, yy, w, 18, 4);
-        if (!ctx.roundRect) ctx.rect(xx - w / 2, yy, w, 18);
-        ctx.fill();
-        ctx.fillStyle = "#ffffff";
-        ctx.fillText(text, xx - w / 2 + 7, yy + 13.5);
-        pressureBadge(p.t, xx, yy, up);
-        continue;
-      }
+      // Spec: a swing is shown only once 3 closed candles lock it.
+      if (!SHOW_PROVISIONAL_PIVOTS) continue;
       ctx.fillStyle = "rgba(255,255,255,0.92)";
       ctx.beginPath();
        ctx.roundRect?.(xx - w / 2, yy, w, 18, 4);
@@ -1004,28 +1037,81 @@ export function renderSmcOverlay(
       ctx.restore();
     }
   }
-  // Reversal trade lines: only after entry confirmation AND reversal-side
-  // pressure >= 75% on the newest swing. Cancelled setups draw nothing.
-  const rv = smc.reversal;
-  const rvBuy = rv ? smc.pressure?.[rv.t] : undefined;
-  const rvPct = rv && rvBuy != null ? (rv.side === "sell" ? 100 - rvBuy : rvBuy) : 0;
-  if (rv && rv.stage === "confirmed" && rv.entry != null && rvPct >= REVERSAL_TRADE_MIN_PCT) {
-    const x0 = rv.entryT != null ? pr.x(rv.entryT / 1000) : null;
+  const mono = "700 11px 'JetBrains Mono', ui-monospace, monospace";
+  // Vortex cloud (JENVU AI): fast/slow combined MA band.
+  if (toggles.cloud && smc.cloud?.length) {
+    const pts = smc.cloud
+      .map((c) => ({ x: pr.x(c.t / 1000), f: pr.y(c.fast), s: pr.y(c.slow), up: c.fast > c.slow }))
+      .filter((p): p is { x: number; f: number; s: number; up: boolean } => p.x != null && p.f != null && p.s != null);
+    for (let k = 1; k < pts.length; k++) {
+      const a0 = pts[k - 1], a1 = pts[k];
+      ctx.fillStyle = a1.up ? "rgba(0,219,255,0.12)" : "rgba(233,30,99,0.12)";
+      ctx.beginPath();
+      ctx.moveTo(a0.x, a0.f); ctx.lineTo(a1.x, a1.f); ctx.lineTo(a1.x, a1.s); ctx.lineTo(a0.x, a0.s);
+      ctx.closePath(); ctx.fill();
+    }
+  }
+  // Liquidity sweeps: wick through a locked swing, body closed back = fake-out.
+  if (toggles.breaks) {
+    for (const sw of smc.sweeps ?? []) {
+      const x0 = pr.x(sw.fromT / 1000), x1 = pr.x(sw.t / 1000), y = pr.y(sw.level);
+      if (x1 == null || y == null) continue;
+      ctx.save();
+      ctx.strokeStyle = "#f59e0b"; ctx.lineWidth = 1; ctx.setLineDash([2, 2]);
+      ctx.beginPath(); ctx.moveTo(Math.max(0, x0 ?? x1 - 40), y); ctx.lineTo(x1, y); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.font = "700 10px 'JetBrains Mono', ui-monospace, monospace";
+      ctx.fillStyle = "#b45309";
+      const txt = "Liquidity Sweep";
+      ctx.fillText(txt, x1 - ctx.measureText(txt).width - 4, sw.dir === "bullish" ? y + 13 : y - 5);
+      ctx.restore();
+    }
+  }
+  // JENVU AI LONG/SHORT labels + Top/Bottom crosses.
+  if (toggles.jenvuSignals) {
+    for (const sg of smc.jenvuSignals ?? []) {
+      const x = pr.x(sg.t / 1000), y = pr.y(sg.price);
+      if (x == null || y == null || x < 0 || x > pr.width) continue;
+      const long = sg.side === "long";
+      const txt = long ? "LONG" : "SHORT";
+      ctx.font = "700 10px 'JetBrains Mono', ui-monospace, monospace";
+      const w = ctx.measureText(txt).width + 10;
+      const yy = long ? y + 6 : y - 22;
+      ctx.fillStyle = long ? "#00a9c7" : "#E91E63";
+      ctx.beginPath();
+      ctx.roundRect?.(x - w / 2, yy, w, 16, 3);
+      if (!ctx.roundRect) ctx.rect(x - w / 2, yy, w, 16);
+      ctx.fill();
+      ctx.fillStyle = "#ffffff";
+      ctx.fillText(txt, x - w / 2 + 5, yy + 11.5);
+    }
+  }
+  if (toggles.topBottom) {
+    for (const m of smc.topBottom ?? []) {
+      const x = pr.x(m.t / 1000), y = pr.y(m.price);
+      if (x == null || y == null || x < 0 || x > pr.width) continue;
+      const yy = m.kind === "top" ? y - 8 : y + 8;
+      ctx.strokeStyle = m.kind === "top" ? "#E91E63" : "#00a9c7";
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(x - 4, yy - 4); ctx.lineTo(x + 4, yy + 4);
+      ctx.moveTo(x + 4, yy - 4); ctx.lineTo(x - 4, yy + 4);
+      ctx.stroke();
+    }
+  }
+  // Execution engine lines (CHoCH → pullback): Entry blue, SL red, TP1 light green, TP2 dark green.
+  const ex = smc.execution;
+  if (toggles.execution && ex && ex.stage !== "invalidated" && !ex.blockedBySweep) {
+    const x0 = pr.x(ex.chochT / 1000);
     const start = Math.max(0, x0 ?? pr.width * 0.6);
-    const line = (price: number | null, label: string, color: string, dash: number[]) => {
-      if (price == null) return;
+    const line = (price: number, label: string, color: string, dash: number[]) => {
       const y = pr.y(price);
       if (y == null) return;
       ctx.save();
-      ctx.strokeStyle = color;
-      ctx.lineWidth = 1.25;
-      ctx.setLineDash(dash);
-      ctx.beginPath();
-      ctx.moveTo(start, y);
-      ctx.lineTo(pr.width, y);
-      ctx.stroke();
+      ctx.strokeStyle = color; ctx.lineWidth = 1.25; ctx.setLineDash(dash);
+      ctx.beginPath(); ctx.moveTo(start, y); ctx.lineTo(pr.width, y); ctx.stroke();
       ctx.setLineDash([]);
-      ctx.font = "700 11px 'JetBrains Mono', ui-monospace, monospace";
+      ctx.font = mono;
       const text = `${label} ${price.toFixed(2)}`;
       const tw = ctx.measureText(text).width;
       const lx = pr.width - tw - 70;
@@ -1035,11 +1121,11 @@ export function renderSmcOverlay(
       ctx.fillText(text, lx, y + 4);
       ctx.restore();
     };
-    const sideTxt = rv.side === "buy" ? "BUY" : "SELL";
-    line(rv.entry, `${sideTxt} ENTRY ${rvPct}%`, "#2962ff", []);
-    line(rv.sl, "SL", "#f23645", [4, 3]);
-    line(rv.tp1, "TP1", "#089981", [4, 3]);
-    line(rv.tp2, "TP2 1:3", "#089981", [2, 3]);
+    const sideTxt = ex.side === "buy" ? "BUY" : "SELL";
+    line(ex.entry, `${sideTxt} ${ex.stage === "triggered" ? "ENTRY" : "LIMIT"}`, "#2962ff", []);
+    line(ex.sl, "SL", "#f23645", [4, 3]);
+    line(ex.tp1, `TP1 1:${ex.rr1.toFixed(1)}`, "#4ade80", [4, 3]);
+    line(ex.tp2, `TP2 1:${ex.rr2.toFixed(1)}`, "#15803d", [2, 3]);
   }
   ctx.restore();
 }
