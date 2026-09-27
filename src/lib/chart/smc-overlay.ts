@@ -421,11 +421,18 @@ export function computeSmcOverlay(
     const rejection = high ? 1 - rejectSide : rejectSide;
     // 2) Reaction flow: volume-weighted close location + body direction.
     const end = Math.min(all.length - 1, i + FRACTAL_RADIUS);
-    const avgV = all.slice(Math.max(0, i - 20), i + 1).reduce((s, c) => s + (c.v ?? 0), 0) / 21 || 1;
+    const volumeSample = all.slice(Math.max(0, i - 20), i + 1);
+    const avgV = volumeSample.reduce((s, c) => s + (c.v ?? 0), 0) / Math.max(1, volumeSample.length) || 1;
     let fb = 0, fw = 0, far = high ? Infinity : -Infinity;
-    let streak = 0; // consecutive candles closing in the reversal direction
+    let streak = 0; // current consecutive candles closing in the reversal direction
+    let maxStreak = 0;
     let delta = 0; // cumulative body, signed + = buyers
     let climaxVol = 0; // biggest volume spike in the reaction
+    let directionalVolume = 0;
+    let totalVolume = 0;
+    let path = 0;
+    let priorClose = piv.c;
+    let closesAway = 0;
     for (let k = i + 1; k <= end; k++) {
       const c = all[k];
       const r = c.h - c.l;
@@ -437,13 +444,20 @@ export function computeSmcOverlay(
       fb += w * clamp01(0.6 * loc + 0.4 * (0.5 + body / 2));
       fw += w;
       delta += body * volW;
+      directionalVolume += body * (c.v && c.v > 0 ? c.v : avgV);
+      totalVolume += c.v && c.v > 0 ? c.v : avgV;
+      path += Math.abs(c.c - priorClose);
+      priorClose = c.c;
       if (volW > climaxVol) climaxVol = volW;
       // Momentum streak: does the reaction keep printing same-direction candles?
       const dir = c.c > c.o ? 1 : c.c < c.o ? -1 : 0;
       if (dir !== 0) {
         const revDir = high ? -1 : 1; // after a high, sellers = bearish candles
         streak = dir === revDir ? streak + 1 : 0;
+        maxStreak = Math.max(maxStreak, streak);
       }
+      const pivotMid = (piv.h + piv.l) / 2;
+      if (high ? c.c < pivotMid : c.c > pivotMid) closesAway += 1;
       far = high ? Math.min(far, c.l) : Math.max(far, c.h);
     }
     const bars = end - i;
@@ -455,7 +469,7 @@ export function computeSmcOverlay(
     // 4) Momentum burst: signed cumulative delta normalised by bars, plus the
     //    longest same-direction streak. Strong one-sided reactions = strong side.
     const deltaNorm = bars > 0 ? clamp01(0.5 + delta / (bars * 2)) : 0.5;
-    const streakNorm = clamp01(streak / 3); // 3+ consecutive candles = full
+    const streakNorm = clamp01(maxStreak / 3); // 3+ consecutive candles = full
     const momentum = 0.6 * deltaNorm + 0.4 * streakNorm;
     // 5) Exhaustion climax: a volume spike >= 1.5x average at the extreme marks
     //    capitulation; blend it toward the side that won the rejection.
@@ -524,14 +538,33 @@ export function computeSmcOverlay(
     if (atr > 0) {
       for (let k = i + 2; k <= end; k++) {
         const c = all[k];
-        const near = high ? piv.h - c.h <= 0.3 * atr : c.l - piv.l <= 0.3 * atr;
+        const near = high ? Math.abs(piv.h - c.h) <= 0.3 * atr : Math.abs(c.l - piv.l) <= 0.3 * atr;
         const held = high ? c.c < piv.h : c.c > piv.l;
         if (near && held) { defended = 1; break; }
       }
     }
+    // 12) Reaction quality. A real reversal should move efficiently away from
+    //     the wick, keep closes beyond the pivot midpoint and carry directional
+    //     volume. Choppy reactions therefore cannot earn an inflated score.
+    const netMove = bars > 0 ? Math.abs(all[end].c - piv.c) : 0;
+    const efficiency = path > 0 ? clamp01(netMove / path) : 0;
+    const persistence = bars > 0 ? clamp01(closesAway / bars) : 0;
+    const volumeBias = totalVolume > 0 ? clamp01(0.5 + directionalVolume / (2 * totalVolume)) : 0.5;
+    const directionalBias = high ? 1 - volumeBias : volumeBias;
+
+    // Require independent evidence families to agree. Bonuses only become
+    // strong when price action, structure and participation confirm together.
+    const footprint = Math.max(sweep, absorb, exhaustion);
+    const confirmation = Math.max(engulf, bos, defended);
+    const followThrough = 0.4 * efficiency + 0.35 * persistence + 0.25 * directionalBias;
+    const confluenceCount = [footprint, confirmation, followThrough, move, streakNorm]
+      .filter((value) => value >= 0.55).length;
+    const confluence = clamp01((confluenceCount - 1) / 3);
     const bonus =
-      0.08 * sweep + 0.05 * exhaustion + 0.04 * absorb + 0.05 * engulf + 0.06 * bos + 0.04 * defended;
-    const strength = Math.min(0.46, Math.max(0.06, agree, move * 0.35) + bonus);
+      0.07 * sweep + 0.035 * exhaustion + 0.035 * absorb + 0.045 * engulf +
+      0.055 * bos + 0.035 * defended + 0.07 * followThrough + 0.055 * confluence;
+    const contradiction = clamp01((0.5 - directionalBias) * 2) * 0.07;
+    const strength = Math.min(0.46, Math.max(0.04, agree, move * 0.32) + bonus - contradiction);
     buy = high ? 0.5 - strength : 0.5 + strength;
     pressure[t] = Math.round(clamp01(buy) * 100);
   };
