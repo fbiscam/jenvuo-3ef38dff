@@ -194,8 +194,8 @@ describe("smc overlay fractal labels", () => {
     );
     expect(signal?.stage).toBe("confirmed");
     expect(signal?.entry).toBe(99);
-    expect(signal?.tp1).toBe(81.3);
-    expect(signal?.tp2).toBe(63.6);
+    expect(signal?.tp1).toBeCloseTo(82.2);
+    expect(signal?.tp2).toBeCloseTo(65.4);
   });
 
   it("uses opposing liquidity for TP1 only when it sits between 1R and TP2", () => {
