@@ -480,7 +480,28 @@ export function computeSmcOverlay(
     // Only evidence that agrees with the reversal adds strength; opposing
     // signals no longer inflate the winning side's percentage.
     const agree = high ? 0.5 - buy : buy - 0.5;
-    const strength = Math.min(0.45, Math.max(0.06, agree, move * 0.35));
+    // 6) Liquidity sweep: swing candle ran past the prior 20-bar extreme and
+    //    closed back inside — stop hunt, strongest reversal footprint.
+    const look = all.slice(Math.max(0, i - 20), i);
+    let sweep = 0;
+    if (look.length >= 5) {
+      const prior = high ? Math.max(...look.map((c) => c.h)) : Math.min(...look.map((c) => c.l));
+      const took = high ? piv.h > prior : piv.l < prior;
+      const closedBack = high ? piv.c < prior : piv.c > prior;
+      if (took && closedBack) sweep = 1;
+      else if (took) sweep = 0.4;
+    }
+    // 7) Approach exhaustion: bodies shrinking into the extreme (last 3 vs
+    //    previous 3 candles) = the pushing side is running out of fuel.
+    const bodyOf = (c: Candle) => Math.abs(c.c - c.o);
+    const a = all.slice(Math.max(0, i - 3), i), b0 = all.slice(Math.max(0, i - 6), Math.max(0, i - 3));
+    const avgA = a.length ? a.reduce((s, c) => s + bodyOf(c), 0) / a.length : 0;
+    const avgB = b0.length ? b0.reduce((s, c) => s + bodyOf(c), 0) / b0.length : 0;
+    const exhaustion = avgB > 0 ? clamp01(1 - avgA / avgB) : 0;
+    // 8) Swing-candle volume vs average: absorption at the level.
+    const absorb = piv.v && piv.v > 0 ? clamp01((piv.v / avgV - 1) / 1.5) : 0;
+    const bonus = 0.08 * sweep + 0.05 * exhaustion + 0.04 * absorb;
+    const strength = Math.min(0.45, Math.max(0.06, agree, move * 0.35) + bonus);
     buy = high ? 0.5 - strength : 0.5 + strength;
     pressure[t] = Math.round(clamp01(buy) * 100);
   };
