@@ -58,7 +58,8 @@ import { buildLiveBars } from "@/lib/chart/live-candle";
 import { useLivePriceStream } from "@/hooks/useLivePriceStream";
 
 /** Buyer/seller reversal pressure is computed only on these decision timeframes. */
-const PRESSURE_TIMEFRAMES = new Set(["1h", "2h", "4h", "1d"]);
+// Buyer/seller pressure is shown on every chart timeframe.
+const PRESSURE_TIMEFRAMES = { has: (_key: string) => true };
 
 const MemoChart = memo(ChartCanvas);
 
