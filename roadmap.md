@@ -181,3 +181,4 @@
 - [x] Show ChatGPT 5.5 Pro, Claude Fable 5.1, and Grok 4.6 logos in pricing; restore cancelled-account billing and use dash.jenvu.com/billing
 - [x] Add original unbranded blog visuals and strengthen six-market SEO article generation
 - [x] Remove alerts from pricing plans and replace them with API workflow, 1H reversal-pressure, and confirmed-entry capabilities
+- [ ] Audit and correct 1H XAU/USD buyer/seller pressure against closed-candle reversal evidence
