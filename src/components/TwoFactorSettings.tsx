@@ -58,7 +58,9 @@ export function TwoFactorSettings() {
       return;
     }
     // Clean up incomplete attempts from the server before creating a new one.
-    const existingUnverified = latest?.totp?.filter((f) => f.status === "unverified") ?? [];
+    const existingUnverified = latest?.all?.filter(
+      (f) => f.factor_type === "totp" && f.status === "unverified",
+    ) ?? [];
     for (const f of existingUnverified) {
       const { error: cleanupError } = await supabase.auth.mfa.unenroll({ factorId: f.id });
       if (cleanupError) {

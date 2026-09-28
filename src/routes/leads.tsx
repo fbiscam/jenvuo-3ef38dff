@@ -1,4 +1,4 @@
-import { createFileRoute, Outlet, redirect, useRouter } from "@tanstack/react-router";
+import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -34,7 +34,6 @@ export const Route = createFileRoute("/leads")({
 });
 
 function LeadsLayout() {
-  const router = useRouter();
   const { signedIn } = Route.useRouteContext();
   const fetchMe = useServerFn(getMe);
   const { data: me, error } = useQuery({
