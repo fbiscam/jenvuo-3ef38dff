@@ -18,24 +18,13 @@ import { voiceQuickReply } from "@/lib/voice-quick-reply.functions";
 import PageLoading from "@/components/PageLoading";
 import { CloudOrb as SharedCloudOrb } from "@/components/CloudOrb";
 import { useAuthUser } from "@/hooks/useAuthUser";
+import { authSignInUrl, signOutAndRedirect } from "@/lib/cross-domain-session";
 
 
 import { cn } from "@/lib/utils";
 
 const MONO = "font-['JetBrains_Mono',ui-monospace,monospace]";
 const SANS = "font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif]";
-
-function clearStoredAuthSession() {
-  if (typeof window === "undefined") return;
-  for (const storage of [window.localStorage, window.sessionStorage]) {
-    for (let i = storage.length - 1; i >= 0; i--) {
-      const key = storage.key(i);
-      if (key?.startsWith("sb-") && key.endsWith("-auth-token")) {
-        storage.removeItem(key);
-      }
-    }
-  }
-}
 
 /* ---------- ticker (matches homepage) ---------- */
 import { useLiveTicker, type TickerRow } from "@/hooks/useLiveTicker";
@@ -178,21 +167,19 @@ function Home() {
   const { user: authUser, loading: authLoading } = useAuthUser();
   useEffect(() => {
     if (authLoading || authUser) return;
-    navigate({ to: "/auth", replace: true });
+    window.location.replace(authSignInUrl("/app"));
     const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
-      if (!session) navigate({ to: "/auth", replace: true });
+      if (!session) window.location.replace(authSignInUrl("/app"));
     });
     return () => { sub.subscription.unsubscribe(); };
-  }, [authLoading, authUser, navigate]);
+  }, [authLoading, authUser]);
 
   const signOut = async () => {
     // NOTE: Do NOT revoke the trusted-device row here — a normal sign-out
     // must keep this browser trusted so the user isn't prompted for MFA on
     // every subsequent login. Trusted devices are only cleared when the user
     // explicitly uses "Forget this device" / "Revoke" in Security settings.
-    clearStoredAuthSession();
-    void supabase.auth.signOut({ scope: "global" }).catch(() => { /* ignore network errors */ });
-    navigate({ to: "/auth", replace: true });
+    await signOutAndRedirect("/app");
   };
 
 

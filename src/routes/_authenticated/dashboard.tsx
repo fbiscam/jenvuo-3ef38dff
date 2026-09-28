@@ -26,6 +26,7 @@ import {
 } from "@/lib/voice-history";
 import { getDefaultAvatar } from "@/lib/default-avatar";
 import { readCachedAvatar, writeCachedAvatar, AVATAR_TTL_SECONDS } from "@/lib/avatar-cache";
+import { signOutAndRedirect } from "@/lib/cross-domain-session";
 
 import { getUsageStats, type UsageStats } from "@/lib/usage.functions";
 import { listExtensionKeys } from "@/lib/extension-keys.functions";
@@ -98,17 +99,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 type RangeKey = "24h" | "7d" | "30d" | "90d" | "all";
-function clearStoredAuthSession() {
-  if (typeof window === "undefined") return;
-  for (const storage of [window.localStorage, window.sessionStorage]) {
-    for (let i = storage.length - 1; i >= 0; i--) {
-      const key = storage.key(i);
-      if (key?.startsWith("sb-") && key.endsWith("-auth-token")) {
-        storage.removeItem(key);
-      }
-    }
-  }
-}
 
 const RANGE_LABELS: Record<RangeKey, string> = {
   "24h": "Last 24 hours",
@@ -1164,11 +1154,7 @@ function DashboardLayout() {
     // must keep this browser trusted so the user isn't prompted for MFA on
     // every subsequent login. Trusted devices are only cleared when the user
     // explicitly uses "Forget this device" / "Revoke" in Security settings.
-    clearStoredAuthSession();
-    void supabase.auth.signOut({ scope: "global" }).catch(() => {
-      /* ignore network errors */
-    });
-    window.location.replace("/");
+    await signOutAndRedirect("/dashboard");
   };
 
   const planTier = (

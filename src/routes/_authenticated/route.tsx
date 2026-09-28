@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAutoCloseTrades } from "@/hooks/useAutoCloseTrades";
 import { useGlobalNotificationToasts } from "@/hooks/useGlobalNotificationToasts";
 import { verifyTrustedDevice } from "@/lib/trusted-devices.functions";
+import { authSignInUrl } from "@/lib/cross-domain-session";
 
 const TRUSTED_DEVICE_KEY = (uid: string) => `mfa_trusted_device:${uid}`;
 
@@ -45,6 +46,13 @@ export const Route = createFileRoute("/_authenticated")({
     const { data: sessionData } = await supabase.auth.getSession();
     const session = sessionData.session;
     if (!session?.user) {
+      if (typeof window !== "undefined") {
+        const destination = authSignInUrl(location.href);
+        if (destination.startsWith("https://")) {
+          window.location.replace(destination);
+          return;
+        }
+      }
       throw redirect({ to: "/auth", search: { redirect: location.href } });
     }
     const user = session.user;

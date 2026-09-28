@@ -39,8 +39,53 @@ function writeSessionCookie(accessToken: string, refreshToken: string) {
   document.cookie = `${COOKIE_NAME}=${value}; Domain=${COOKIE_DOMAIN}; Path=/; Max-Age=${MAX_AGE}; SameSite=Lax; Secure`;
 }
 
-function clearSessionCookie() {
+export function clearSharedAuthSession() {
+  if (typeof document === "undefined") return;
   document.cookie = `${COOKIE_NAME}=; Domain=${COOKIE_DOMAIN}; Path=/; Max-Age=0; SameSite=Lax; Secure`;
+}
+
+function clearSessionCookie() {
+  clearSharedAuthSession();
+}
+
+export function authSignInUrl(redirectPath = "/dashboard"): string {
+  const safeRedirect = redirectPath.startsWith("/") && !redirectPath.startsWith("//")
+    ? redirectPath
+    : "/dashboard";
+  if (typeof window === "undefined") {
+    return `/auth?redirect=${encodeURIComponent(safeRedirect)}`;
+  }
+  const host = window.location.hostname.toLowerCase();
+  const isCanonicalJenvuHost = host === "jenvu.com" || host.endsWith(".jenvu.com");
+  if (!isCanonicalJenvuHost) {
+    return `/auth?redirect=${encodeURIComponent(safeRedirect)}`;
+  }
+  return `https://auth.jenvu.com/sign-in?redirect=${encodeURIComponent(safeRedirect)}`;
+}
+
+export function clearStoredAuthSessions() {
+  if (typeof window === "undefined") return;
+  clearSharedAuthSession();
+  for (const storage of [window.localStorage, window.sessionStorage]) {
+    for (let i = storage.length - 1; i >= 0; i -= 1) {
+      const key = storage.key(i);
+      if (key?.startsWith("sb-") && key.endsWith("-auth-token")) {
+        storage.removeItem(key);
+      }
+    }
+  }
+}
+
+export async function signOutAndRedirect(redirectPath = "/dashboard") {
+  if (typeof window === "undefined") return;
+  const destination = authSignInUrl(redirectPath);
+  clearStoredAuthSessions();
+  await Promise.race([
+    supabase.auth.signOut({ scope: "global" }).catch(() => undefined),
+    new Promise<void>((resolve) => window.setTimeout(resolve, 1_500)),
+  ]);
+  clearStoredAuthSessions();
+  window.location.replace(destination);
 }
 
 let initialized = false;
