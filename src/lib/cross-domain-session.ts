@@ -180,15 +180,16 @@ function canonicalDestination(path: string): string | null {
  * full-page hop to the destination's own host. In preview/local it falls back
  * to in-app navigation.
  */
-export async function goAfterSignIn(path: string, fallback: () => void) {
+export async function goAfterSignIn(path: string, fallback: () => void): Promise<boolean> {
   const url = typeof window === "undefined" ? null : canonicalDestination(path);
   if (!url || new URL(url).host === window.location.host) {
     fallback();
-    return;
+    return false;
   }
   const { data } = await supabase.auth.getSession();
   if (data.session) {
     writeSessionCookie(data.session.access_token, data.session.refresh_token);
   }
   window.location.replace(url);
+  return true;
 }

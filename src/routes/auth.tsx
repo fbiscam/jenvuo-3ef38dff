@@ -72,9 +72,7 @@ export const Route = createFileRoute("/auth")({
       if (aal && aal.currentLevel === "aal1" && aal.nextLevel === "aal2") return;
       const dest = sanitizeRedirect(search.redirect);
       if (typeof window !== "undefined") {
-        let hopped = false;
-        await goAfterSignIn(dest, () => undefined).then(() => { hopped = window.location.pathname !== "/auth"; });
-        void hopped;
+        if (await goAfterSignIn(dest, () => undefined)) return;
       }
       throw redirect({ to: dest as "/dashboard" });
     }
