@@ -30,7 +30,7 @@ const PHASES: Phase[] = [
     title: "Phase 1 — Foundations",
     goal: "Understand what Smart Money is and how swings form.",
     lessons: [
-      { id: "jwjjWHzEaJc", title: " True smart money concept", about: "What SMC is, how institutions move price, and the mindset behind it." },
+      { id: "jwjjWHzEaJc", title: "  True smart money concept", about: "What SMC is, how institutions move price, and the mindset behind it." },
       { id: "4_33Wsc9fcg", title: "What Is a Fractal?", about: "Identify valid swing highs and lows — the building block of structure." },
     ],
   },
