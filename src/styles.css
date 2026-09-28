@@ -698,10 +698,10 @@ html[data-pwa="1"] .jenvu-terminal-shell {
   overflow: hidden;
 }
 
-/* Terminal page: sidebar turns pure white (matches the chart canvas). */
+/* Terminal page: sidebar uses the requested near-white surface. */
 .dashboard-terminal-sidebar,
 .dashboard-terminal-sidebar .bg-sidebar {
-  background-color: #ffffff !important;
+  background-color: #fcfcfc !important;
 }
 
 /* Upgrade every card-ish surface inside the app */
