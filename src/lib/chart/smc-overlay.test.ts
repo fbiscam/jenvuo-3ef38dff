@@ -193,6 +193,48 @@ describe("smc overlay fractal labels", () => {
     expect(aligned > opposed).toBe(true);
   });
 
+  it("keeps a confirmed swing pressure fixed when later volatility changes", () => {
+    const base = Array.from({ length: 55 }, (_, i): OhlcvBar => ({
+      time: 1_700_000_000 + i * 3600,
+      open: 100,
+      high: i === 20 ? 120 : 103,
+      low: i === 40 ? 80 : 97,
+      close: i > 20 && i <= 30 ? 98 : i > 40 ? 102 : 100,
+      volume: 100,
+    }));
+    const initial = computeSmcOverlay(base, base.at(-1)?.close ?? null);
+    const high = initial.pivots.find((pivot) => pivot.kind === "high" && pivot.price === 120);
+    expect(high != null).toBe(true);
+    const initialPressure = high ? initial.pressure?.[high.t] : undefined;
+
+    const later = Array.from({ length: 20 }, (_, offset): OhlcvBar => ({
+      time: 1_700_000_000 + (55 + offset) * 3600,
+      open: 100,
+      high: 115,
+      low: 85,
+      close: 100,
+      volume: 100,
+    }));
+    const extended = computeSmcOverlay([...base, ...later], 100);
+    expect(high ? extended.pressure?.[high.t] : undefined).toBe(initialPressure);
+  });
+
+  it("does not count a wick-only reaction as body displacement", () => {
+    const bars = Array.from({ length: 45 }, (_, i): OhlcvBar => ({
+      time: 1_700_000_000 + i * 3600,
+      open: 100,
+      high: i === 20 ? 120 : i > 20 && i <= 30 ? 105 : 103,
+      low: i > 20 && i <= 30 ? 70 : 97,
+      close: 100,
+      volume: 100,
+    }));
+    const smc = computeSmcOverlay(bars, 100);
+    const high = smc.pivots.find((pivot) => pivot.kind === "high" && pivot.price === 120);
+    const buy = high ? smc.pressure?.[high.t] : undefined;
+    expect(buy != null).toBe(true);
+    expect((buy ?? 0) >= 25).toBe(true);
+  });
+
   it("always provides TP1 and TP2 after confirmation when liquidity is absent", () => {
     const candles = [
       { t: 1, o: 100, h: 101, l: 99, c: 100 },

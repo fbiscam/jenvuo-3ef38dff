@@ -685,9 +685,11 @@ export function computeSmcOverlay(
     const rLo = Math.min(...rng.map((c) => c.l));
     const pos = rHi > rLo ? ((high ? piv.h : piv.l) - rLo) / (rHi - rLo) : 0.5;
     const context = rng.length >= 20 ? clamp01(high ? pos : 1 - pos) : undefined;
-    // 15) Invalidation: any later CLOSED candle closing beyond the extreme.
+    // 15) Invalidation during the same fixed confirmation window. Scanning all
+    // future history would repaint an old signal with information unavailable
+    // when its ten-candle reading became final.
     let invalidated = false;
-    for (let k = i + 1; k < fractalBars.length; k++) {
+    for (let k = i + 1; k <= Math.min(end, fractalBars.length - 1); k++) {
       if (high ? all[k].c > piv.h : all[k].c < piv.l) { invalidated = true; break; }
     }
     const strength = reversalPressureStrength({
