@@ -44,7 +44,7 @@ export const connectWhatsappAlertLink = createServerFn({ method: "POST" })
     const phone = normalizePhone(data.phoneNumber);
     if (phone.length < 8) throw new Error("Enter a valid number with country code, e.g. +923001234567");
 
-    const code = String(Math.floor(100000 + Math.random() * 900000));
+    const code = String(100000 + (crypto.getRandomValues(new Uint32Array(1))[0] % 900000));
     const expires = new Date(Date.now() + 10 * 60 * 1000).toISOString();
 
     const { error } = await supabaseAdmin

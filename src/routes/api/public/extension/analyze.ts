@@ -35,8 +35,8 @@ async function handle({ request }: { request: Request }) {
     })
     return extJson({ ok: true, plan, requestId })
   } catch (e) {
-    const message = e instanceof Error ? e.message : 'Analysis failed.'
-    return extJson({ ok: false, error: message }, 502)
+    console.error('[extension/analyze] failed', e)
+    return extJson({ ok: false, error: 'Analysis is temporarily unavailable. Please try again.' }, 502)
   }
 }
 

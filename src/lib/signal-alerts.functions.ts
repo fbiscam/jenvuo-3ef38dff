@@ -66,6 +66,15 @@ export const subscribeToAlerts = createServerFn({ method: 'POST' })
   })
   .handler(async ({ data, context }) => {
     const { supabaseAdmin } = await import('@/integrations/supabase/client.server')
+    // Never let a caller take over a subscription owned by another account.
+    const { data: existing } = await supabaseAdmin
+      .from('signal_alert_subscribers')
+      .select('user_id')
+      .eq('email', data.email)
+      .maybeSingle()
+    if (existing?.user_id && existing.user_id !== context.userId) {
+      return { ok: false, error: 'This email is already subscribed by another account.' }
+    }
     // Upsert by email; attach user_id so this account stays remembered
     // across browsers even if a different email is entered later.
     const { error } = await supabaseAdmin
