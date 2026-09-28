@@ -194,12 +194,12 @@ describe("smc overlay fractal labels", () => {
   });
 
   it("keeps a confirmed swing pressure fixed when later volatility changes", () => {
-    const base = Array.from({ length: 55 }, (_, i): OhlcvBar => ({
+    const base = Array.from({ length: 70 }, (_, i): OhlcvBar => ({
       time: 1_700_000_000 + i * 3600,
       open: 100,
-      high: i === 20 ? 120 : 103 + (i % 3) * 0.1,
-      low: i === 40 ? 80 : 97 - (i % 2) * 0.1,
-      close: i > 20 && i <= 30 ? 98 : i > 40 ? 102 : 100,
+      high: i === 12 ? 110 : i === 35 ? 120 : 103 + (i % 3) * 0.1,
+      low: i === 24 ? 90 : i === 52 ? 80 : 97 - (i % 2) * 0.1,
+      close: i > 35 && i <= 45 ? 98 : i > 52 ? 102 : 100,
       volume: 100,
     }));
     const initial = computeSmcOverlay(base, base.at(-1)?.close ?? null);
@@ -208,7 +208,7 @@ describe("smc overlay fractal labels", () => {
     const initialPressure = high ? initial.pressure?.[high.t] : undefined;
 
     const later = Array.from({ length: 20 }, (_, offset): OhlcvBar => ({
-      time: 1_700_000_000 + (55 + offset) * 3600,
+      time: 1_700_000_000 + (70 + offset) * 3600,
       open: 100,
       high: 115,
       low: 85,
@@ -220,11 +220,11 @@ describe("smc overlay fractal labels", () => {
   });
 
   it("does not count a wick-only reaction as body displacement", () => {
-    const bars = Array.from({ length: 45 }, (_, i): OhlcvBar => ({
+    const bars = Array.from({ length: 60 }, (_, i): OhlcvBar => ({
       time: 1_700_000_000 + i * 3600,
       open: 100,
-      high: i === 20 ? 120 : i > 20 && i <= 30 ? 105 + (i % 3) * 0.1 : 103 + (i % 3) * 0.1,
-      low: i > 20 && i <= 30 ? 70 - (i % 2) * 0.1 : 97 - (i % 2) * 0.1,
+      high: i === 12 ? 110 : i === 35 ? 120 : i > 35 && i <= 45 ? 105 + (i % 3) * 0.1 : 103 + (i % 3) * 0.1,
+      low: i === 24 ? 90 : i > 35 && i <= 45 ? 70 - (i % 2) * 0.1 : 97 - (i % 2) * 0.1,
       close: 100,
       volume: 100,
     }));
