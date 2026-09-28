@@ -698,6 +698,12 @@ html[data-pwa="1"] .jenvu-terminal-shell {
   overflow: hidden;
 }
 
+/* Terminal page: sidebar turns pure white (matches the chart canvas). */
+.dashboard-terminal-sidebar,
+.dashboard-terminal-sidebar .bg-sidebar {
+  background-color: #ffffff !important;
+}
+
 /* Upgrade every card-ish surface inside the app */
 html[data-pwa="1"] main .rounded-xl,
 html[data-pwa="1"] main .rounded-2xl,
@@ -860,7 +866,7 @@ html[data-pwa="1"] .pwa-tabbar {
 }
 
 /* ====== Dashboard Sidebar: plain full-height ====== */
-.dashboard-sidebar-root {
+.dashboard-sidebar-root:not(.dashboard-terminal-sidebar) {
   background-color: var(--sidebar) !important;
 }
 
