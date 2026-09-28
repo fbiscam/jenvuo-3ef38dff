@@ -348,11 +348,15 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
   const smc = useMemo(() => {
     if (bars.length < 10) return null;
     const now = serverTime ?? Date.now();
-    const closed = bars.filter((b) => (b.time + stepSeconds) * 1000 <= now);
+    // Closed candles come ONLY from the shared server feed. Live ticks differ per
+    // browser/network (and per device clock), so letting them shape closed candles
+    // made buyer/seller % differ between accounts and sessions.
+    const closed = rawBars.filter((b) => (b.time + stepSeconds) * 1000 <= now);
     const last = bars[bars.length - 1];
-    const forming = closed.length < bars.length ? last : null;
-    return computeSmcOverlay(closed, last.close, forming);
-  }, [bars, stepSeconds, serverTime]);
+    const lastClosedT = closed.at(-1)?.time ?? -Infinity;
+    const forming = last.time > lastClosedT ? last : null;
+    return computeSmcOverlay(closed, last.close, forming, { useVolume: asset === "BTCUSD" });
+  }, [bars, rawBars, stepSeconds, serverTime, asset]);
 
   // Next-candle projection removed from the chart.
   const projection = useMemo(
