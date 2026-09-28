@@ -65,7 +65,11 @@ export const Route = createFileRoute("/_authenticated")({
         .email_confirmed_at ??
       (user as { confirmed_at?: string | null }).confirmed_at;
     if (!confirmedAt) {
-      await supabase.auth.signOut();
+      if (typeof window !== "undefined") {
+        await supabase.auth.signOut();
+        window.location.replace(authSignInUrl("/dashboard"));
+        return;
+      }
       throw redirect({ to: "/auth", search: { verify: "1" } as never });
     }
 

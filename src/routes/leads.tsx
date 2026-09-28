@@ -1,10 +1,11 @@
-import { createFileRoute, Outlet, redirect, useRouter } from "@tanstack/react-router";
+import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { getMe } from "@/lib/leadgen/core.functions";
 import { LeadsShell } from "@/components/leadgen/LeadsShell";
 import { Button } from "@/components/ui/button";
+import { signOutAndRedirect } from "@/lib/cross-domain-session";
 
 export const Route = createFileRoute("/leads")({
   ssr: false,
@@ -33,7 +34,6 @@ export const Route = createFileRoute("/leads")({
 });
 
 function LeadsLayout() {
-  const router = useRouter();
   const { signedIn } = Route.useRouteContext();
   const fetchMe = useServerFn(getMe);
   const { data: me, error } = useQuery({
@@ -57,8 +57,7 @@ function LeadsLayout() {
           <Button
             variant="outline"
             onClick={async () => {
-              await supabase.auth.signOut();
-              router.navigate({ to: "/leads-signin", replace: true });
+              await signOutAndRedirect("/leads");
             }}
             className="mt-4"
           >

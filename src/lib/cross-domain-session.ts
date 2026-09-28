@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 const COOKIE_NAME = "jenvu_session";
 const COOKIE_DOMAIN = ".jenvu.com";
 const MAX_AGE = 60 * 60 * 24 * 7; // 7 days
+let signOutInProgress = false;
 
 function isJenvuHost(): boolean {
   return (
@@ -48,10 +49,29 @@ function clearSessionCookie() {
   clearSharedAuthSession();
 }
 
+function normalizeRedirectPath(redirectPath: string): string {
+  if (redirectPath.startsWith("/") && !redirectPath.startsWith("//")) {
+    return redirectPath;
+  }
+  try {
+    const url = new URL(redirectPath);
+    const host = url.hostname.toLowerCase();
+    if (host === "dash.jenvu.com") {
+      if (url.pathname === "/" || url.pathname === "/overview") return "/dashboard";
+      if (url.pathname === "/payment") return "/dashboard/pay";
+      return `/dashboard${url.pathname}${url.search}${url.hash}`;
+    }
+    if (host === "jenvu.com" || host.endsWith(".jenvu.com")) {
+      return `${url.pathname}${url.search}${url.hash}`;
+    }
+  } catch {
+    // Invalid or untrusted destinations always return to the dashboard.
+  }
+  return "/dashboard";
+}
+
 export function authSignInUrl(redirectPath = "/dashboard"): string {
-  const safeRedirect = redirectPath.startsWith("/") && !redirectPath.startsWith("//")
-    ? redirectPath
-    : "/dashboard";
+  const safeRedirect = normalizeRedirectPath(redirectPath);
   if (typeof window === "undefined") {
     return `/auth?redirect=${encodeURIComponent(safeRedirect)}`;
   }
@@ -79,6 +99,7 @@ export function clearStoredAuthSessions() {
 export async function signOutAndRedirect(redirectPath = "/dashboard") {
   if (typeof window === "undefined") return;
   const destination = authSignInUrl(redirectPath);
+  signOutInProgress = true;
   clearStoredAuthSessions();
   await Promise.race([
     supabase.auth.signOut({ scope: "global" }).catch(() => undefined),
@@ -96,6 +117,10 @@ export function initCrossDomainSession() {
 
   // Restore: no local session on this subdomain but a shared cookie exists.
   supabase.auth.getSession().then(({ data }) => {
+    if (signOutInProgress) {
+      clearSessionCookie();
+      return;
+    }
     if (data.session) return;
     const tokens = readSessionCookie();
     if (!tokens) return;
@@ -109,6 +134,10 @@ export function initCrossDomainSession() {
 
   // Mirror: keep the shared cookie in sync with sign-in / refresh / sign-out.
   supabase.auth.onAuthStateChange((evt, session) => {
+    if (signOutInProgress) {
+      clearSessionCookie();
+      return;
+    }
     if (session?.access_token && session?.refresh_token) {
       writeSessionCookie(session.access_token, session.refresh_token);
     } else if (evt === "SIGNED_OUT") {

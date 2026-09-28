@@ -1,9 +1,10 @@
-import { createFileRoute, useRouter } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { signOutAndRedirect } from "@/lib/cross-domain-session";
 import { getMe } from "@/lib/leadgen/core.functions";
 import { changeOwnPassword } from "@/lib/leadgen/admin.functions";
 import { Card, PageHeader, btnGhost, btnPrimary, inputCls, labelCls } from "@/components/leadgen/LeadsShell";
@@ -20,7 +21,6 @@ export const Route = createFileRoute("/leads/account")({
 });
 
 function Account() {
-  const router = useRouter();
   const fetchMe = useServerFn(getMe);
   const setPassword = useServerFn(changeOwnPassword);
   const { data: me } = useQuery({ queryKey: ["lg-me"], queryFn: () => fetchMe() });
@@ -112,8 +112,7 @@ function Account() {
           <h2 className="text-[15px] font-medium">Session</h2>
           <button
             onClick={async () => {
-              await supabase.auth.signOut();
-              router.navigate({ to: "/leads-signin", replace: true });
+              await signOutAndRedirect("/leads");
             }}
             className={`${btnGhost} mt-4`}
           >
