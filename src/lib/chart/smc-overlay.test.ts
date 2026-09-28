@@ -197,8 +197,8 @@ describe("smc overlay fractal labels", () => {
     const base = Array.from({ length: 55 }, (_, i): OhlcvBar => ({
       time: 1_700_000_000 + i * 3600,
       open: 100,
-      high: i === 20 ? 120 : 103,
-      low: i === 40 ? 80 : 97,
+      high: i === 20 ? 120 : 103 + (i % 3) * 0.1,
+      low: i === 40 ? 80 : 97 - (i % 2) * 0.1,
       close: i > 20 && i <= 30 ? 98 : i > 40 ? 102 : 100,
       volume: 100,
     }));
@@ -223,8 +223,8 @@ describe("smc overlay fractal labels", () => {
     const bars = Array.from({ length: 45 }, (_, i): OhlcvBar => ({
       time: 1_700_000_000 + i * 3600,
       open: 100,
-      high: i === 20 ? 120 : i > 20 && i <= 30 ? 105 : 103,
-      low: i > 20 && i <= 30 ? 70 : 97,
+      high: i === 20 ? 120 : i > 20 && i <= 30 ? 105 + (i % 3) * 0.1 : 103 + (i % 3) * 0.1,
+      low: i > 20 && i <= 30 ? 70 - (i % 2) * 0.1 : 97 - (i % 2) * 0.1,
       close: 100,
       volume: 100,
     }));
