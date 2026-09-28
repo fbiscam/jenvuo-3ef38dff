@@ -866,7 +866,7 @@ html[data-pwa="1"] .pwa-tabbar {
 }
 
 /* ====== Dashboard Sidebar: plain full-height ====== */
-.dashboard-sidebar-root {
+.dashboard-sidebar-root:not(.dashboard-terminal-sidebar) {
   background-color: var(--sidebar) !important;
 }
 
