@@ -34,56 +34,6 @@ async function loadLogo(): Promise<string | null> {
   }
 }
 
-type JsPDF = import("jspdf").jsPDF;
-
-async function loadFontBase64(path: string): Promise<string | null> {
-  try {
-    const res = await fetch(path);
-    if (!res.ok) return null;
-    const blob = await res.blob();
-    return await new Promise((resolve) => {
-      const fr = new FileReader();
-      fr.onload = () => {
-        const dataUrl = String(fr.result);
-        const base64 = dataUrl.split(",")[1];
-        resolve(base64 ?? null);
-      };
-      fr.onerror = () => resolve(null);
-      fr.readAsDataURL(blob);
-    });
-  } catch {
-    return null;
-  }
-}
-
-async function embedGoogleSans(doc: JsPDF) {
-  const [normal, medium, semibold, bold] = await Promise.all([
-    loadFontBase64("/fonts/googlesans-400.ttf"),
-    loadFontBase64("/fonts/googlesans-500.ttf"),
-    loadFontBase64("/fonts/googlesans-600.ttf"),
-    loadFontBase64("/fonts/googlesans-700.ttf"),
-  ]);
-
-  if (normal) {
-    doc.addFileToVFS("GoogleSansNormal.ttf", normal);
-    doc.addFont("GoogleSansNormal.ttf", "GoogleSans", "normal");
-  }
-  if (medium) {
-    doc.addFileToVFS("GoogleSansMedium.ttf", medium);
-    doc.addFont("GoogleSansMedium.ttf", "GoogleSans", "medium");
-  }
-  if (semibold) {
-    doc.addFileToVFS("GoogleSansSemiBold.ttf", semibold);
-    doc.addFont("GoogleSansSemiBold.ttf", "GoogleSans", "semibold");
-  }
-  if (bold) {
-    doc.addFileToVFS("GoogleSansBold.ttf", bold);
-    doc.addFont("GoogleSansBold.ttf", "GoogleSans", "bold");
-  }
-
-  return { hasFont: Boolean(normal) };
-}
-
 export default function InvoiceHistory() {
   const listFn = useServerFn(listMyOrders);
   const [email, setEmail] = useState<string>("");
