@@ -84,6 +84,7 @@ const TIMEFRAMES = [
   { key: "30m", tv: "30", label: "30m" },
   { key: "45m", tv: "45", label: "45m" },
   { key: "1h", tv: "60", label: "1H" },
+  { key: "2h", tv: "120", label: "2H" },
   { key: "4h", tv: "240", label: "4H" },
   { key: "1d", tv: "D", label: "1D" },
 ];

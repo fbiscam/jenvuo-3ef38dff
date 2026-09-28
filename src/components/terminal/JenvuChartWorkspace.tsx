@@ -59,6 +59,9 @@ import { positionPnl, type DemoSide } from "@/lib/chart/demo-trading";
 import { buildLiveBars } from "@/lib/chart/live-candle";
 import { useLivePriceStream } from "@/hooks/useLivePriceStream";
 
+/** Buyer/seller reversal pressure is computed only on these decision timeframes. */
+const PRESSURE_TIMEFRAMES = new Set(["1h", "2h", "4h", "1d"]);
+
 const MemoChart = memo(ChartCanvas);
 
 const DRAWINGS_KEY = "jenvu:terminal:drawings:v1";
@@ -319,7 +322,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
 
   const payload = chartQuery.data;
   const pairLabel = asset === "BTCUSD" ? "BTC/USD" : "XAU/USD";
-  const showSmcPressure = timeframe.key === "1h" && (asset === "XAUUSD" || asset === "BTCUSD");
+  const showSmcPressure = PRESSURE_TIMEFRAMES.has(timeframe.key) && (asset === "XAUUSD" || asset === "BTCUSD");
   const rawBars: OhlcvBar[] = useMemo(() => payload?.bars ?? [], [payload]);
   const livePrice = useLivePriceStream(asset, rawBars.at(-1)?.close ?? null);
   const stepSeconds = payload?.stepSeconds ?? 1800;
@@ -406,7 +409,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
         // Use the selected chart state, just like the visible overlay. The Gold
         // payload historically omitted its asset echo, which made the chart
         // show pressure while telling the AI that pressure was unavailable.
-        includePressure: s.timeframe.key === "1h" && (asset === "XAUUSD" || asset === "BTCUSD"),
+        includePressure: PRESSURE_TIMEFRAMES.has(s.timeframe.key) && (asset === "XAUUSD" || asset === "BTCUSD"),
         drawings: s.drawings,
         drawingsVisible: s.drawingsVisible,
         selectedId: s.selectedId,
