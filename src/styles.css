@@ -701,7 +701,7 @@ html[data-pwa="1"] .jenvu-terminal-shell {
 /* Terminal page: sidebar turns pure white (matches the chart canvas). */
 .dashboard-terminal-sidebar,
 .dashboard-terminal-sidebar .bg-sidebar {
-  background-color: #ffffff;
+  background-color: #ffffff !important;
 }
 
 /* Upgrade every card-ish surface inside the app */
