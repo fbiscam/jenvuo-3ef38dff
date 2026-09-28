@@ -156,7 +156,7 @@ function CoursePage() {
 
         <aside className="h-fit rounded-2xl border border-border bg-card lg:sticky lg:top-4">
           <div className="border-b border-border p-4">
-            <h3 className="font-semibold text-foreground">Course content</h3>
+            <h3 className="font-semibold text-foreground">{"\u00a0Course content"}</h3>
             <p className="text-xs text-muted-foreground">{PHASES.length} phases · {ALL.length} lessons</p>
           </div>
           <div className="max-h-[70vh] overflow-y-auto">
