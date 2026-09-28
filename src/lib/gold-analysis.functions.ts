@@ -615,6 +615,7 @@ const TF_MS: Record<string, number> = {
   "30m": 30 * 60_000,
   "45m": 45 * 60_000,
   "1h": 60 * 60_000,
+  "2h": 2 * 60 * 60_000,
   "4h": 4 * 60 * 60_000,
   "1d": 24 * 60 * 60_000,
 };
@@ -1400,7 +1401,7 @@ async function loadBtcTerminalChart(tf: string): Promise<TerminalChartPayload> {
     // Binance blocks some server regions — fall back to Coinbase (aggregated).
     const cbBase: Record<string, string> = {
       "1m": "1m", "5m": "5m", "15m": "15m", "30m": "15m", "45m": "15m",
-      "1h": "1h", "4h": "1h", "1d": "1d", "1D": "1d",
+      "1h": "1h", "2h": "1h", "4h": "1h", "1d": "1d", "1D": "1d",
     };
     fetchTf = cbBase[tf] ?? "15m";
     try {
@@ -1449,7 +1450,7 @@ async function loadTerminalChart(tf: string, asset: TerminalAsset = "XAUUSD"): P
   let source: TerminalChartPayload["source"] = "spot";
   let provider = "Yahoo spot";
   // No provider serves 45m candles — build them from 15m candles.
-  const fetchTf = tf === "45m" ? "15m" : tf;
+  const fetchTf = tf === "45m" ? "15m" : tf === "2h" ? "1h" : tf;
   try {
     candles = await fetchFromYahooSymbols(["XAUUSD=X"], fetchTf);
   } catch {
@@ -2142,7 +2143,7 @@ function chartStateBlock(chartContext?: string): string {
 USER'S JENVU CHART STATE (read directly from the user's own chart — exact coordinates, not a guess):
 ${chartContext}
 
-Chart-state rules: these drawings, indicator readings and script outputs are exactly what the user sees. Any attached image is a snapshot of this same Jenvu chart. When the user refers to a drawing ("circle", "box", "line", "yeh level", "jo mark kiya"), identify it from this list by type, time and price, then compare it with the verified market evidence and say whether it matches (e.g. whether a circled swing is really the verified HH/HL/LH/LL) and give the correct label/price when it does not. Prefer a drawing marked [SELECTED by user]; otherwise, if several drawings could match, name them briefly and answer about the most recent one. Indicator/script values listed here are computed from the same chart candles. Never ask the user which chart they mean. Buyer/seller reversal pressure is authoritative only when this state explicitly supplies a 1H XAU/USD or BTC/USD reading. Treat it as a deterministic confluence score, not a win probability: validate the swing's 10-bar structure, extreme-range location, rejection/absorption, confirmation, directional participation, efficient follow-through, persistence and invalidation before explaining it. Never infer or invent this percentage on another timeframe.`;
+Chart-state rules: these drawings, indicator readings and script outputs are exactly what the user sees. Any attached image is a snapshot of this same Jenvu chart. When the user refers to a drawing ("circle", "box", "line", "yeh level", "jo mark kiya"), identify it from this list by type, time and price, then compare it with the verified market evidence and say whether it matches (e.g. whether a circled swing is really the verified HH/HL/LH/LL) and give the correct label/price when it does not. Prefer a drawing marked [SELECTED by user]; otherwise, if several drawings could match, name them briefly and answer about the most recent one. Indicator/script values listed here are computed from the same chart candles. Never ask the user which chart they mean. Buyer/seller reversal pressure is authoritative only when this state explicitly supplies a 1H, 2H, 4H or 1D XAU/USD or BTC/USD reading. Treat it as a deterministic confluence score, not a win probability: validate the swing's 10-bar structure, extreme-range location, rejection/absorption, confirmation, directional participation, efficient follow-through, persistence and invalidation before explaining it. Never infer or invent this percentage on another timeframe.`;
 }
 
 /** Prior conversation turns so the desk remembers what was already discussed. */

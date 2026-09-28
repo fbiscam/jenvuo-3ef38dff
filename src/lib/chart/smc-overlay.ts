@@ -1059,7 +1059,7 @@ export function renderSmcOverlay(
     }
   }
   // Reversal trade lines: only after entry confirmation AND reversal-side
-  // pressure >= 75% on the newest swing. Cancelled setups draw nothing.
+  // pressure >= 72% on the newest swing. Cancelled setups draw nothing.
   const rv = smc.reversal;
   const rvBuy = rv ? smc.pressure?.[rv.t] : undefined;
   const rvPct = rv && rvBuy != null ? (rv.side === "sell" ? 100 - rvBuy : rvBuy) : 0;
@@ -1098,4 +1098,4 @@ export function renderSmcOverlay(
   ctx.restore();
 }
 
-export const REVERSAL_TRADE_MIN_PCT = 75;
+export const REVERSAL_TRADE_MIN_PCT = 72;
