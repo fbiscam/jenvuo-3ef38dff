@@ -430,7 +430,13 @@ export function computeSmcOverlay(
   bars: OhlcvBar[],
   currentPrice: number | null,
   forming: OhlcvBar | null = null,
+  opts: { useVolume?: boolean } = {},
 ): SmcOverlay {
+  // Gold spot has no central volume; different feeds report different (or zero)
+  // tick volume, so volume-weighting made the same swing score differently.
+  const useVolume = opts.useVolume ?? true;
+  if (!useVolume) bars = bars.map((b) => ({ ...b, volume: 0 }));
+  if (!useVolume && forming) forming = { ...forming, volume: 0 };
   const recent = bars.slice(-SMC_WINDOW).map(toCandle);
   if (recent.length < 10) {
     return {
