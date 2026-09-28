@@ -124,3 +124,13 @@ Change both in `capacitor.config.ts` only if you rebrand — then re-run `npx ca
 - **Mic not working on iOS:** ensure `NSMicrophoneUsageDescription` is set in `ios/App/App/Info.plist`.
 - **Push not arriving:** check device logs via `npx cap run ios -l` or `adb logcat`.
 - **Live-reload not loading:** confirm `CAP_SERVER_URL` was set during `cap sync`, and the device is online.
+
+---
+
+## App icon & launch screen
+
+Jenvu logo sources live in `resources/` (icon, adaptive foreground/background, splash). After `npx cap add`, run:
+```bash
+npx @capacitor/assets generate --iconBackgroundColor '#000000' --splashBackgroundColor '#000000'
+npx cap sync
+```

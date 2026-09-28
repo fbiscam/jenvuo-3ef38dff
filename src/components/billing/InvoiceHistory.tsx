@@ -34,56 +34,6 @@ async function loadLogo(): Promise<string | null> {
   }
 }
 
-type JsPDF = import("jspdf").jsPDF;
-
-async function loadFontBase64(path: string): Promise<string | null> {
-  try {
-    const res = await fetch(path);
-    if (!res.ok) return null;
-    const blob = await res.blob();
-    return await new Promise((resolve) => {
-      const fr = new FileReader();
-      fr.onload = () => {
-        const dataUrl = String(fr.result);
-        const base64 = dataUrl.split(",")[1];
-        resolve(base64 ?? null);
-      };
-      fr.onerror = () => resolve(null);
-      fr.readAsDataURL(blob);
-    });
-  } catch {
-    return null;
-  }
-}
-
-async function embedGoogleSans(doc: JsPDF) {
-  const [normal, medium, semibold, bold] = await Promise.all([
-    loadFontBase64("/fonts/googlesans-400.ttf"),
-    loadFontBase64("/fonts/googlesans-500.ttf"),
-    loadFontBase64("/fonts/googlesans-600.ttf"),
-    loadFontBase64("/fonts/googlesans-700.ttf"),
-  ]);
-
-  if (normal) {
-    doc.addFileToVFS("GoogleSansNormal.ttf", normal);
-    doc.addFont("GoogleSansNormal.ttf", "GoogleSans", "normal");
-  }
-  if (medium) {
-    doc.addFileToVFS("GoogleSansMedium.ttf", medium);
-    doc.addFont("GoogleSansMedium.ttf", "GoogleSans", "medium");
-  }
-  if (semibold) {
-    doc.addFileToVFS("GoogleSansSemiBold.ttf", semibold);
-    doc.addFont("GoogleSansSemiBold.ttf", "GoogleSans", "semibold");
-  }
-  if (bold) {
-    doc.addFileToVFS("GoogleSansBold.ttf", bold);
-    doc.addFont("GoogleSansBold.ttf", "GoogleSans", "bold");
-  }
-
-  return { hasFont: Boolean(normal) };
-}
-
 export default function InvoiceHistory() {
   const listFn = useServerFn(listMyOrders);
   const [email, setEmail] = useState<string>("");
@@ -123,8 +73,8 @@ export default function InvoiceHistory() {
       const L = 48;
       const R = W - L;
       const net = networkMeta(o.network);
-      const { hasFont } = await embedGoogleSans(doc);
-      const F = hasFont ? "GoogleSans" : "helvetica";
+      // Built-in Helvetica renders crisp vector text in every PDF viewer.
+      const F = "helvetica";
 
       const date = fmtDateLong(o.decided_at ?? o.created_at);
       const paid = Number(o.pay_amount_usd);
@@ -134,7 +84,7 @@ export default function InvoiceHistory() {
       // ── Header: big INVOICE title left, company block + logo right ──────
       if (logo) {
         try {
-          doc.addImage(logo, "PNG", R - 34, 30, 34, 34);
+          doc.addImage(logo, "PNG", R - 34, 30, 34, 34, undefined, "NONE");
         } catch {
           /* ignore */
         }
@@ -151,7 +101,7 @@ export default function InvoiceHistory() {
       doc.text("Jenvu", R, 96, { align: "right" });
       doc.setFontSize(10);
       doc.setTextColor(60, 60, 60);
-      doc.text("jenvu.com · support@jenvu.net", R, 116, { align: "right" });
+      doc.text("jenvu.com · info@jenvu.com", R, 116, { align: "right" });
       doc.text("Florida, United States", R, 131, { align: "right" });
 
       // ── Grey band: invoice for (left) / meta (right) ─────────────────────
@@ -252,7 +202,7 @@ export default function InvoiceHistory() {
         H - 64,
       );
       doc.text(
-        "support@jenvu.net · This invoice was generated electronically and is valid without signature.",
+        "info@jenvu.com · This invoice was generated electronically and is valid without signature.",
         L,
         H - 48,
       );
