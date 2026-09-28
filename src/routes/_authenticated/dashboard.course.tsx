@@ -98,45 +98,33 @@ function CoursePage() {
     [done],
   );
 
-  const phase = PHASES[lesson.phase];
-
   return (
-    <div className="mx-auto w-full max-w-7xl px-4 py-6 md:px-8 md:py-8">
-      {/* Header */}
-      <section className="mb-8 grid gap-6 border-b border-border pb-8 md:grid-cols-[minmax(0,1fr)_280px] md:items-end">
-        <div className="min-w-0">
-          <span className="inline-flex items-center gap-2 rounded-full border border-border bg-muted/60 px-3 py-1 text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
-            <span className="h-1.5 w-1.5 rounded-full bg-primary" /> Jenvu Academy
-          </span>
-          <h1 className="mt-4 text-3xl font-semibold tracking-tight text-foreground md:text-4xl">SMC A to Z</h1>
-          <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-muted-foreground">
-            Smart Money Concepts from zero to a complete ICT trade model. Learn step by step, phase by phase.
-          </p>
-          <div className="mt-5 flex flex-wrap gap-2 text-xs">
-            {[`${PHASES.length} phases`, `${ALL.length} lessons`, "Hindi / Urdu", "Beginner → Advanced"].map((t) => (
-              <span key={t} className="rounded-md border border-border bg-card px-2.5 py-1 font-medium text-foreground">{t}</span>
-            ))}
-          </div>
-        </div>
-        <div className="rounded-xl border border-border bg-card p-4">
-          <div className="flex items-baseline justify-between">
-            <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Progress</span>
-            <span className="text-2xl font-semibold tabular-nums text-foreground">{pct}%</span>
-          </div>
-          <Progress value={pct} className="mt-3 h-2" />
-          <p className="mt-2 text-xs text-muted-foreground">
-            {pct === 100 ? (
-              <span className="inline-flex items-center gap-1 font-medium text-primary"><Award className="h-3.5 w-3.5" /> Course completed</span>
-            ) : (
-              `${done.length} of ${ALL.length} lessons completed`
-            )}
+    <div className="mx-auto w-full max-w-7xl px-4 py-6 md:px-8">
+      <div className="mb-6 flex flex-col gap-4 rounded-2xl border border-border bg-card p-6 md:flex-row md:items-center md:justify-between">
+        <div>
+          <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Jenvu Academy · Course</p>
+          <h1 className="mt-1 text-2xl font-semibold text-foreground md:text-3xl">SMC A to Z</h1>
+          <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
+            Smart Money Concepts from zero to a complete ICT trade model — 4 phases, {ALL.length} lessons, in Hindi/Urdu.
           </p>
         </div>
-      </section>
+        <div className="w-full md:w-64">
+          <div className="mb-2 flex justify-between text-sm">
+            <span className="text-muted-foreground">Your progress</span>
+            <span className="font-medium text-foreground">{done.length}/{ALL.length} · {pct}%</span>
+          </div>
+          <Progress value={pct} />
+          {pct === 100 && (
+            <p className="mt-2 flex items-center gap-1 text-sm font-medium text-primary">
+              <Award className="h-4 w-4" /> Course completed
+            </p>
+          )}
+        </div>
+      </div>
 
-      <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_360px]">
+      <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
         <div className="min-w-0">
-          <div className="aspect-video w-full overflow-hidden rounded-xl border border-border bg-muted shadow-sm">
+          <div className="aspect-video w-full overflow-hidden rounded-2xl border border-border bg-muted">
             <iframe
               key={lesson.id}
               className="h-full w-full"
@@ -146,84 +134,75 @@ function CoursePage() {
               allowFullScreen
             />
           </div>
-
-          <div className="mt-6">
-            <div className="flex flex-wrap items-center gap-2 text-xs font-medium text-muted-foreground">
-              <span className="text-primary">{phase.title.split(" — ")[0]}</span>
-              <span>·</span>
-              <span>{phase.title.split(" — ")[1]}</span>
-              <span>·</span>
-              <span>Lesson {current + 1} of {ALL.length}</span>
-            </div>
-            <h2 className="mt-2 text-2xl font-semibold tracking-tight text-foreground">{lesson.title}</h2>
-            <p className="mt-2 max-w-3xl text-[15px] leading-relaxed text-muted-foreground">{lesson.about}</p>
-
-            <div className="mt-6 grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 border-t border-border pt-5">
-              <Button variant="outline" disabled={current === 0} onClick={() => save(done, current - 1)}>
-                <ChevronLeft className="h-4 w-4" /> <span className="hidden sm:inline">Previous</span>
+          <div className="mt-4 rounded-2xl border border-border bg-card p-5">
+            <p className="text-xs font-medium text-muted-foreground">
+              {PHASES[lesson.phase].title} · Lesson {current + 1} of {ALL.length}
+            </p>
+            <h2 className="mt-1 text-xl font-semibold text-foreground">{lesson.title}</h2>
+            <p className="mt-2 text-sm text-muted-foreground">{lesson.about}</p>
+            <div className="mt-4 flex flex-wrap items-center gap-2">
+              <Button variant="outline" size="sm" disabled={current === 0} onClick={() => save(done, current - 1)}>
+                <ChevronLeft className="h-4 w-4" /> Previous
               </Button>
-              <div className="flex justify-center">
-                <Button variant={isDone ? "secondary" : "default"} onClick={toggleDone} className="min-w-[180px]">
-                  <CheckCircle2 className="h-4 w-4" /> {isDone ? "Completed" : "Mark as complete"}
-                </Button>
-              </div>
-              <Button variant="outline" disabled={current === ALL.length - 1} onClick={() => save(done, current + 1)}>
-                <span className="hidden sm:inline">Next</span> <ChevronRight className="h-4 w-4" />
+              <Button size="sm" variant={isDone ? "secondary" : "default"} onClick={toggleDone}>
+                <CheckCircle2 className="h-4 w-4" /> {isDone ? "Completed" : "Mark as complete"}
+              </Button>
+              <Button variant="outline" size="sm" disabled={current === ALL.length - 1} onClick={() => save(done, current + 1)}>
+                Next <ChevronRight className="h-4 w-4" />
               </Button>
             </div>
           </div>
         </div>
 
-        <aside className="h-fit overflow-hidden rounded-xl border border-border bg-card lg:sticky lg:top-4">
-          <div className="flex items-center justify-between border-b border-border px-5 py-4">
-            <h3 className="text-sm font-semibold text-foreground">Course content</h3>
-            <span className="text-xs tabular-nums text-muted-foreground">{done.length}/{ALL.length}</span>
+        <aside className="h-fit rounded-2xl border border-border bg-card lg:sticky lg:top-4">
+          <div className="border-b border-border p-4">
+            <h3 className="font-semibold text-foreground">Course content</h3>
+            <p className="text-xs text-muted-foreground">{PHASES.length} phases · {ALL.length} lessons</p>
           </div>
-          <div className="max-h-[72vh] overflow-y-auto">
-            {PHASES.map((p, pi) => {
-              const [num, name] = p.title.split(" — ");
-              return (
-                <div key={p.title} className="border-b border-border last:border-0">
-                  <div className="px-5 pb-2 pt-4">
-                    <div className="flex items-center justify-between gap-2">
-                      <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-primary">{num}</p>
-                      <span className="text-[11px] tabular-nums text-muted-foreground">{phaseProgress[pi]}/{p.lessons.length}</span>
-                    </div>
-                    <p className="mt-1 text-sm font-semibold text-foreground">{name}</p>
-                    <p className="mt-0.5 text-xs leading-relaxed text-muted-foreground">{p.goal}</p>
+          <div className="max-h-[70vh] overflow-y-auto">
+            {PHASES.map((p, pi) => (
+              <div key={p.title} className="border-b border-border last:border-0">
+                <div className="bg-muted/50 px-4 py-3">
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="text-sm font-semibold text-foreground">{p.title}</p>
+                    <span className="text-xs text-muted-foreground">{phaseProgress[pi]}/{p.lessons.length}</span>
                   </div>
-                  <div className="pb-2">
-                    {p.lessons.map((l) => {
-                      const idx = ALL.findIndex((a) => a.id === l.id);
-                      const active = idx === current;
-                      const d = done.includes(l.id);
-                      return (
-                        <button
-                          key={l.id}
-                          onClick={() => save(done, idx)}
-                          className={cn(
-                            "grid w-full grid-cols-[20px_minmax(0,1fr)] items-start gap-3 border-l-2 border-transparent px-5 py-2.5 text-left transition-colors hover:bg-muted/60",
-                            active && "border-primary bg-muted/70",
-                          )}
-                        >
-                          {d ? (
-                            <CheckCircle2 className="mt-0.5 h-4 w-4 text-primary" />
-                          ) : active ? (
-                            <PlayCircle className="mt-0.5 h-4 w-4 text-foreground" />
-                          ) : (
-                            <Circle className="mt-0.5 h-4 w-4 text-muted-foreground/60" />
-                          )}
-                          <span className={cn("text-sm leading-snug", active ? "font-medium text-foreground" : "text-muted-foreground")}>
-                            <span className="mr-1.5 tabular-nums">{String(idx + 1).padStart(2, "0")}</span>
-                            {l.title}
-                          </span>
-                        </button>
-                      );
-                    })}
-                  </div>
+                  <p className="text-xs text-muted-foreground">{p.goal}</p>
                 </div>
-              );
-            })}
+                {p.lessons.map((l) => {
+                  const idx = ALL.findIndex((a) => a.id === l.id);
+                  const active = idx === current;
+                  const d = done.includes(l.id);
+                  return (
+                    <button
+                      key={l.id}
+                      onClick={() => save(done, idx)}
+                      className={cn(
+                        "flex w-full items-start gap-3 px-4 py-3 text-left text-sm transition-colors hover:bg-muted",
+                        active && "bg-accent",
+                      )}
+                    >
+                      {d ? (
+                        <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                      ) : active ? (
+                        <PlayCircle className="mt-0.5 h-4 w-4 shrink-0 text-foreground" />
+                      ) : (
+                        <Circle className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
+                      )}
+                      <span className="flex-1">
+                        <span className="block text-foreground">{idx + 1}. {l.title}</span>
+                        <img
+                          src={`https://i.ytimg.com/vi/${l.id}/mqdefault.jpg`}
+                          alt=""
+                          loading="lazy"
+                          className={cn("mt-2 w-28 rounded-md border border-border", !active && "hidden")}
+                        />
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            ))}
           </div>
         </aside>
       </div>
