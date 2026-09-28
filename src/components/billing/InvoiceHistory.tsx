@@ -123,8 +123,8 @@ export default function InvoiceHistory() {
       const L = 48;
       const R = W - L;
       const net = networkMeta(o.network);
-      const { hasFont } = await embedGoogleSans(doc);
-      const F = hasFont ? "GoogleSans" : "helvetica";
+      // Built-in Helvetica renders crisp vector text in every PDF viewer.
+      const F = "helvetica";
 
       const date = fmtDateLong(o.decided_at ?? o.created_at);
       const paid = Number(o.pay_amount_usd);
@@ -134,7 +134,7 @@ export default function InvoiceHistory() {
       // ── Header: big INVOICE title left, company block + logo right ──────
       if (logo) {
         try {
-          doc.addImage(logo, "PNG", R - 34, 30, 34, 34);
+          doc.addImage(logo, "PNG", R - 34, 30, 34, 34, undefined, "NONE");
         } catch {
           /* ignore */
         }
@@ -151,7 +151,7 @@ export default function InvoiceHistory() {
       doc.text("Jenvu", R, 96, { align: "right" });
       doc.setFontSize(10);
       doc.setTextColor(60, 60, 60);
-      doc.text("jenvu.com · support@jenvu.net", R, 116, { align: "right" });
+      doc.text("jenvu.com · info@jenvu.com", R, 116, { align: "right" });
       doc.text("Florida, United States", R, 131, { align: "right" });
 
       // ── Grey band: invoice for (left) / meta (right) ─────────────────────
@@ -252,7 +252,7 @@ export default function InvoiceHistory() {
         H - 64,
       );
       doc.text(
-        "support@jenvu.net · This invoice was generated electronically and is valid without signature.",
+        "info@jenvu.com · This invoice was generated electronically and is valid without signature.",
         L,
         H - 48,
       );
