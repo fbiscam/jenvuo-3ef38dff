@@ -488,15 +488,17 @@ export function computeSmcOverlay(
   // Extreme-level pressure: who took control AT the swing. Blends three signals
   // into a buyer share (0-1): wick rejection on the swing candle, volume-weighted
   // order flow of the reaction candles, and displacement away from the level in ATR.
-  const atr = (() => {
-    const n = Math.min(14, all.length - 1);
+  const atrAt = (end: number) => {
+    const first = Math.max(1, end - 13);
     let sum = 0;
-    for (let k = all.length - n; k < all.length; k++) {
+    let count = 0;
+    for (let k = first; k <= end; k++) {
       const c = all[k], p = all[k - 1];
       sum += Math.max(c.h - c.l, Math.abs(c.h - p.c), Math.abs(c.l - p.c));
+      count += 1;
     }
-    return n > 0 ? sum / n : 0;
-  })();
+    return count > 0 ? sum / count : 0;
+  };
   const clamp01 = (x: number) => Math.max(0, Math.min(1, x));
   const legFor = (t: number, kind: "high" | "low") => {
     const i = idxOf.get(t);
@@ -505,6 +507,10 @@ export function computeSmcOverlay(
     const range = piv.h - piv.l;
     if (!(range > 0)) return;
     const high = kind === "high";
+    // Anchor volatility to information available around this swing. Using the
+    // newest chart ATR made old percentages drift whenever current volatility
+    // changed, even though their ten-candle confirmation window was unchanged.
+    const localAtr = atrAt(i);
     // 1) Rejection: wick at the extreme + where the swing candle closed.
     const wick = high ? piv.h - Math.max(piv.o, piv.c) : Math.min(piv.o, piv.c) - piv.l;
     const closeLoc = (piv.c - piv.l) / range;
@@ -514,7 +520,7 @@ export function computeSmcOverlay(
     const end = Math.min(all.length - 1, i + FRACTAL_RADIUS);
     const volumeSample = all.slice(Math.max(0, i - 20), i + 1);
     const avgV = volumeSample.reduce((s, c) => s + (c.v ?? 0), 0) / Math.max(1, volumeSample.length) || 1;
-    let fb = 0, fw = 0, far = high ? Infinity : -Infinity;
+    let fb = 0, fw = 0, farClose = high ? Infinity : -Infinity;
     let streak = 0; // current consecutive candles closing in the reversal direction
     let maxStreak = 0;
     let delta = 0; // cumulative body, signed + = buyers
@@ -549,13 +555,17 @@ export function computeSmcOverlay(
       }
       const pivotMid = (piv.h + piv.l) / 2;
       if (high ? c.c < pivotMid : c.c > pivotMid) closesAway += 1;
-      far = high ? Math.min(far, c.l) : Math.max(far, c.h);
+      // Displacement is body-close based. A later wick alone must not inflate
+      // reversal pressure or make a weak reaction look confirmed.
+      farClose = high ? Math.min(farClose, c.c) : Math.max(farClose, c.c);
     }
     const bars = end - i;
     const evidence = Math.min(1, bars / FRACTAL_RADIUS);
     const flow = fw > 0 ? fb / fw : 0.5;
     // 3) Displacement: distance price travelled away from the level (2 ATR = full).
-    const move = bars > 0 && atr > 0 ? clamp01((high ? piv.h - far : far - piv.l) / (2 * atr)) : 0;
+    const move = bars > 0 && localAtr > 0
+      ? clamp01((high ? piv.h - farClose : farClose - piv.l) / (2 * localAtr))
+      : 0;
     const disp = high ? 0.5 - move / 2 : 0.5 + move / 2;
     // 4) Momentum burst: signed cumulative delta normalised by bars, plus the
     //    longest same-direction streak. Strong one-sided reactions = strong side.
@@ -626,10 +636,10 @@ export function computeSmcOverlay(
     // 11) Failed retest: price came back near the extreme (within 0.3 ATR)
     //     but could not close beyond it — level defended twice.
     let defended = 0;
-    if (atr > 0) {
+    if (localAtr > 0) {
       for (let k = i + 2; k <= end; k++) {
         const c = all[k];
-        const near = high ? Math.abs(piv.h - c.h) <= 0.3 * atr : Math.abs(c.l - piv.l) <= 0.3 * atr;
+        const near = high ? Math.abs(piv.h - c.h) <= 0.3 * localAtr : Math.abs(c.l - piv.l) <= 0.3 * localAtr;
         const held = high ? c.c < piv.h : c.c > piv.l;
         if (near && held) { defended = 1; break; }
       }
@@ -644,7 +654,7 @@ export function computeSmcOverlay(
       const second = all[k + 1];
       const bodyBreak = high ? first.c < trigger : first.c > trigger;
       if (!bodyBreak) continue;
-      const tolerance = Math.max(atr * 0.2, piv.c * 0.00002);
+      const tolerance = Math.max(localAtr * 0.2, piv.c * 0.00002);
       const retested = high ? second.h >= trigger - tolerance : second.l <= trigger + tolerance;
       const held = high ? second.c < trigger : second.c > trigger;
       const directionalClose = high ? second.c < second.o : second.c > second.o;
@@ -675,9 +685,11 @@ export function computeSmcOverlay(
     const rLo = Math.min(...rng.map((c) => c.l));
     const pos = rHi > rLo ? ((high ? piv.h : piv.l) - rLo) / (rHi - rLo) : 0.5;
     const context = rng.length >= 20 ? clamp01(high ? pos : 1 - pos) : undefined;
-    // 15) Invalidation: any later CLOSED candle closing beyond the extreme.
+    // 15) Invalidation during the same fixed confirmation window. Scanning all
+    // future history would repaint an old signal with information unavailable
+    // when its ten-candle reading became final.
     let invalidated = false;
-    for (let k = i + 1; k < fractalBars.length; k++) {
+    for (let k = i + 1; k <= Math.min(end, fractalBars.length - 1); k++) {
       if (high ? all[k].c > piv.h : all[k].c < piv.l) { invalidated = true; break; }
     }
     const strength = reversalPressureStrength({
@@ -707,10 +719,11 @@ export function computeSmcOverlay(
     .filter((p) => p.kind === "low")
     .map((p) => p.price)
     .sort((a, b) => b - a);
+  const latestAtr = atrAt(all.length - 1);
   const reversal = computeReversalSignal(fractalBars, forming ? toCandle(forming) : null, [
     ...pivotsLabelled,
     ...livePivots,
-  ], pressure, atr, targetBuySide, targetSellSide);
+  ], pressure, latestAtr, targetBuySide, targetSellSide);
   return {
     reversal,
     pressure,

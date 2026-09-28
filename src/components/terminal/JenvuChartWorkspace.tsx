@@ -403,7 +403,10 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
         indicators: s.indicators,
         smc: s.smc,
         smcToggles: s.smcToggles,
-        includePressure: s.timeframe.key === "1h" && (s.payload?.asset === "XAUUSD" || s.payload?.asset === "BTCUSD"),
+        // Use the selected chart state, just like the visible overlay. The Gold
+        // payload historically omitted its asset echo, which made the chart
+        // show pressure while telling the AI that pressure was unavailable.
+        includePressure: s.timeframe.key === "1h" && (asset === "XAUUSD" || asset === "BTCUSD"),
         drawings: s.drawings,
         drawingsVisible: s.drawingsVisible,
         selectedId: s.selectedId,
