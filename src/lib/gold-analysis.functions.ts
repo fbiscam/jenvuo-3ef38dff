@@ -1495,6 +1495,7 @@ async function loadTerminalChart(tf: string, asset: TerminalAsset = "XAUUSD"): P
     }));
   const data: TerminalChartPayload = {
     timeframe: tf,
+    asset: "XAUUSD",
     source,
     provider,
     serverTime: Date.now(),

@@ -651,7 +651,9 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
       ctx.clip();
       const p = propsRef.current;
       const pr = projector();
-      if (p.smc) renderSmcOverlay(ctx, p.smc, p.smcToggles, pr, p.showSmcPressure ?? true);
+      // Pressure is opt-in so unsupported pairs/timeframes can never inherit it
+      // when a caller omits the flag.
+      if (p.smc) renderSmcOverlay(ctx, p.smc, p.smcToggles, pr, p.showSmcPressure ?? false);
       ctx.save();
       ctx.font = "600 10px 'DM Sans', system-ui, sans-serif";
       ctx.textAlign = "center";
