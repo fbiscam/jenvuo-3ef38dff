@@ -183,3 +183,4 @@
 - [x] Remove alerts from pricing plans and replace them with API workflow, 1H reversal-pressure, and confirmed-entry capabilities
 - [x] Audit and correct 1H XAU/USD buyer/seller pressure against closed-candle reversal evidence
 - [x] Fix cross-subdomain sign-out and redirect signed-out dashboard visitors to the canonical sign-in page
+- [x] Make every sign-out destination consistent and repair authenticator 2FA enrollment retries

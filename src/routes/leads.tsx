@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { getMe } from "@/lib/leadgen/core.functions";
 import { LeadsShell } from "@/components/leadgen/LeadsShell";
 import { Button } from "@/components/ui/button";
+import { signOutAndRedirect } from "@/lib/cross-domain-session";
 
 export const Route = createFileRoute("/leads")({
   ssr: false,
@@ -57,8 +58,7 @@ function LeadsLayout() {
           <Button
             variant="outline"
             onClick={async () => {
-              await supabase.auth.signOut();
-              router.navigate({ to: "/leads-signin", replace: true });
+              await signOutAndRedirect("/leads");
             }}
             className="mt-4"
           >
