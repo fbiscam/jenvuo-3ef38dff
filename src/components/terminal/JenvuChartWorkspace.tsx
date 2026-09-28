@@ -25,13 +25,11 @@ import {
   Maximize2,
   Minimize2,
   Minus,
-  Moon,
   MousePointer2,
   MoveUpRight,
   RectangleHorizontal,
   RotateCcw,
   SeparatorVertical,
-  Sun,
   Trash2,
   TrendingUp,
   Type,
@@ -206,25 +204,6 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
   const workspaceRef = useRef<HTMLDivElement | null>(null);
   const chartRef = useRef<ChartCanvasHandle | null>(null);
   const [ready, setReady] = useState(false);
-  const [chartTheme, setChartTheme] = useState<"light" | "dark">("light");
-  useEffect(() => {
-    try {
-      if (window.localStorage.getItem("jenvu-chart-theme") === "dark") setChartTheme("dark");
-    } catch {
-      /* storage unavailable */
-    }
-  }, []);
-  const toggleChartTheme = () => {
-    setChartTheme((cur) => {
-      const next = cur === "dark" ? "light" : "dark";
-      try {
-        window.localStorage.setItem("jenvu-chart-theme", next);
-      } catch {
-        /* storage unavailable */
-      }
-      return next;
-    });
-  };
   const [indicators, setIndicators] = useState<IndicatorId[]>(["volume", "ema20", "ema50"]);
   const [smcToggles, setSmcToggles] = useState<SmcToggles>(DEFAULT_SMC);
   const [drawings, setDrawings] = useState<Drawing[]>([]);
@@ -704,13 +683,6 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
             {drawingsVisible ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
           </ToolButton>
           <ToolButton
-            label={chartTheme === "dark" ? "Light chart theme" : "Dark chart theme"}
-            active={chartTheme === "dark"}
-            onClick={toggleChartTheme}
-          >
-            {chartTheme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-          </ToolButton>
-          <ToolButton
             label={selected ? "Delete selected drawing (Del)" : "Remove all drawings"}
             disabled={!drawings.length}
             onClick={() => {
@@ -753,14 +725,14 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
               onToolDone={onToolDone}
               onHoverBar={onHoverBar}
               resetKey={`${asset}:${timeframe.key}:${payload ? "ready" : "loading"}`}
-              theme={chartTheme}
+              theme="light"
             />
 
             {/* Legend */}
             <div
               className={cn(
                 "pointer-events-none absolute left-2 top-1.5 z-[3] max-w-[70%] space-y-0.5 font-mono text-[11px] leading-4",
-                chartTheme === "dark" ? "text-slate-300" : "text-slate-700",
+                "text-slate-700",
               )}
             >
               <div className="mb-2 flex flex-wrap items-center gap-x-2">
