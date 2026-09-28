@@ -138,6 +138,7 @@ const TOOLS: Array<{ id: DrawingTool; icon: LucideIcon; label: string }> = [
 
 const SMC_LABELS: Array<{ key: keyof SmcToggles; label: string; hint: string }> = [
   { key: "structure", label: "Swing structure", hint: "HH / HL / LH / LL labels" },
+  { key: "pressure", label: "Buyer / seller pressure", hint: "Percentages and confirmed trade levels" },
   { key: "breaks", label: "BOS / CHoCH", hint: "Confirmed close-through breaks" },
   { key: "liquidity", label: "Liquidity", hint: "Nearest buy-side / sell-side pools" },
   { key: "fvg", label: "Fair value gaps", hint: "Unmitigated and partial FVGs" },
@@ -322,7 +323,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
 
   const payload = chartQuery.data;
   const pairLabel = asset === "BTCUSD" ? "BTC/USD" : "XAU/USD";
-  const showSmcPressure = PRESSURE_TIMEFRAMES.has(timeframe.key) && (asset === "XAUUSD" || asset === "BTCUSD");
+  const showSmcPressure = smcToggles.pressure && PRESSURE_TIMEFRAMES.has(timeframe.key) && (asset === "XAUUSD" || asset === "BTCUSD");
   const rawBars: OhlcvBar[] = useMemo(() => payload?.bars ?? [], [payload]);
   const livePrice = useLivePriceStream(asset, rawBars.at(-1)?.close ?? null);
   const stepSeconds = payload?.stepSeconds ?? 1800;
@@ -409,7 +410,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
         // Use the selected chart state, just like the visible overlay. The Gold
         // payload historically omitted its asset echo, which made the chart
         // show pressure while telling the AI that pressure was unavailable.
-        includePressure: PRESSURE_TIMEFRAMES.has(s.timeframe.key) && (asset === "XAUUSD" || asset === "BTCUSD"),
+        includePressure: smcToggles.pressure && PRESSURE_TIMEFRAMES.has(s.timeframe.key) && (asset === "XAUUSD" || asset === "BTCUSD"),
         drawings: s.drawings,
         drawingsVisible: s.drawingsVisible,
         selectedId: s.selectedId,

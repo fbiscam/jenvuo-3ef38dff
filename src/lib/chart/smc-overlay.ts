@@ -168,6 +168,7 @@ export function legBuyerPercent(candles: PCandle[], start: number, end: number):
 
 export type SmcToggles = {
   structure: boolean;
+  pressure: boolean;
   breaks: boolean;
   fvg: boolean;
   orderBlocks: boolean;
@@ -177,6 +178,7 @@ export type SmcToggles = {
 
 export const DEFAULT_SMC: SmcToggles = {
   structure: true,
+  pressure: true,
   breaks: true,
   fvg: false,
   orderBlocks: false,
