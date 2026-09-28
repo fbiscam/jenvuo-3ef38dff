@@ -139,7 +139,7 @@ export async function enqueueSignalAlertEmails(a: EnqueueAlertEmailsArgs): Promi
         idempotencyKey: `alert-${a.alertId}-${normalized}`,
       })
     } catch (err) {
-      console.error('signal-alert send failed for', email, (err as Error)?.message)
+      console.error('signal-alert send failed', { alertId: a.alertId, error: (err as Error)?.message })
       return false
     }
   }
