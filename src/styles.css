@@ -132,7 +132,7 @@
   --chart-3: oklch(0.72 0.17 60);                /* orange */
   --chart-4: oklch(0.78 0.16 95);                /* yellow */
   --chart-5: oklch(0.55 0.18 330);               /* reddish purple */
-  --sidebar: #fafafa;
+  --sidebar: #fcfcfc;
   --sidebar-foreground: oklch(0.145 0.02 264);
   --sidebar-primary: oklch(0.208 0.042 265.755);
   --sidebar-primary-foreground: oklch(0.984 0.003 247.858);
@@ -698,10 +698,10 @@ html[data-pwa="1"] .jenvu-terminal-shell {
   overflow: hidden;
 }
 
-/* Terminal page: sidebar uses the requested near-white surface. */
+/* Terminal page: sidebar is pure white. */
 .dashboard-terminal-sidebar,
 .dashboard-terminal-sidebar .bg-sidebar {
-  background-color: #fcfcfc !important;
+  background-color: #ffffff !important;
 }
 
 /* Upgrade every card-ish surface inside the app */
