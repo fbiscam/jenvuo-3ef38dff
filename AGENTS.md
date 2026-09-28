@@ -15,3 +15,4 @@
 - Confirm reversal entries only after a closed-candle body break followed by a directional retest-and-hold candle; wick-only breaks remain unconfirmed.
 - Require reversal-side buyer/seller pressure above 55% before confirming an entry; neutral or opposing pressure remains an alert only.
 - Keep canonical section addresses stable: dashboard home at dash.jenvu.com/overview with child pages at dash.jenvu.com/<page> (usage, api, billing, payment), sign-in at auth.jenvu.com/sign-in, blog at blogs.jenvu.com, help at support.jenvu.com, and global public pages on jenvu.com to avoid section-slug collisions.
+- Centralize sign-out through the cross-domain session helper so local tokens and the shared `.jenvu.com` cookie are cleared before redirecting to `auth.jenvu.com/sign-in`; this prevents session restoration races and blank auth pages.

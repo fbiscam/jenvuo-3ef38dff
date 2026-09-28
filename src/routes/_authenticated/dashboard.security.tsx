@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -7,6 +7,7 @@ import { TrustedDevicesSettings } from "@/components/TrustedDevicesSettings";
 import { requestEmailChange } from "@/lib/email-change.functions";
 import { deleteMyAccount } from "@/lib/delete-account.functions";
 import { Button } from "@/components/ui/button";
+import { signOutAndRedirect } from "@/lib/cross-domain-session";
 
 export const Route = createFileRoute("/_authenticated/dashboard/security")({
   head: () => ({
@@ -24,7 +25,6 @@ export const Route = createFileRoute("/_authenticated/dashboard/security")({
 });
 
 function SecurityPage() {
-  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [sending, setSending] = useState(false);
   const [newEmail, setNewEmail] = useState("");
@@ -83,9 +83,8 @@ function SecurityPage() {
     setDeleting(true);
     try {
       await deleteMyAccount();
-      await supabase.auth.signOut();
       toast.success("Account deleted");
-      navigate({ to: "/auth" });
+      await signOutAndRedirect("/dashboard");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Could not delete account");
       setDeleting(false);
@@ -183,8 +182,7 @@ function SecurityPage() {
         <Button
           variant="outline"
           onClick={async () => {
-            await supabase.auth.signOut();
-            window.location.href = "/auth";
+            await signOutAndRedirect("/dashboard/security");
           }}
           className="mt-4"
         >
