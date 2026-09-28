@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import { dashExternal } from "@/lib/url-rewrite";
 
 // Shares the auth session across jenvu.com subdomains (dash, support, blogs,
 // leads). localStorage is per-origin, so without this a user signed in on
@@ -144,4 +145,50 @@ export function initCrossDomainSession() {
       clearSessionCookie();
     }
   });
+}
+
+/**
+ * Awaitable restore used by route guards: on a subdomain with no local
+ * session, adopt the shared cookie BEFORE deciding the user is signed out.
+ * Without this, dash.jenvu.com bounced freshly signed-in users back to
+ * sign-in (and sometimes on to the dashboard) depending on timing.
+ */
+export async function restoreSharedSession(): Promise<boolean> {
+  if (!isJenvuHost() || signOutInProgress) return false;
+  const tokens = readSessionCookie();
+  if (!tokens) return false;
+  const { data, error } = await supabase.auth.setSession(tokens);
+  if (error || !data.session) {
+    clearSessionCookie();
+    return false;
+  }
+  return true;
+}
+
+/** Full URL for a post-sign-in destination on its canonical Jenvu host. */
+function canonicalDestination(path: string): string | null {
+  if (!isJenvuHost()) return null;
+  if (path === "/dashboard" || path.startsWith("/dashboard/")) {
+    const target = dashExternal(path);
+    return `https://dash.jenvu.com${target}`;
+  }
+  return `https://jenvu.com${path}`;
+}
+
+/**
+ * After sign-in: mirror the session into the shared cookie, then do a single
+ * full-page hop to the destination's own host. In preview/local it falls back
+ * to in-app navigation.
+ */
+export async function goAfterSignIn(path: string, fallback: () => void) {
+  const url = typeof window === "undefined" ? null : canonicalDestination(path);
+  if (!url || new URL(url).host === window.location.host) {
+    fallback();
+    return;
+  }
+  const { data } = await supabase.auth.getSession();
+  if (data.session) {
+    writeSessionCookie(data.session.access_token, data.session.refresh_token);
+  }
+  window.location.replace(url);
 }

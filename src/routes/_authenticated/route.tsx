@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAutoCloseTrades } from "@/hooks/useAutoCloseTrades";
 import { useGlobalNotificationToasts } from "@/hooks/useGlobalNotificationToasts";
 import { verifyTrustedDevice } from "@/lib/trusted-devices.functions";
-import { authSignInUrl } from "@/lib/cross-domain-session";
+import { restoreSharedSession, authSignInUrl } from "@/lib/cross-domain-session";
 
 const TRUSTED_DEVICE_KEY = (uid: string) => `mfa_trusted_device:${uid}`;
 
@@ -44,7 +44,10 @@ export const Route = createFileRoute("/_authenticated")({
     // Fast path: session is stored in localStorage and reads synchronously —
     // no network round-trip. This eliminates the inter-page blink.
     const { data: sessionData } = await supabase.auth.getSession();
-    const session = sessionData.session;
+    let session = sessionData.session;
+    if (!session?.user && (await restoreSharedSession())) {
+      session = (await supabase.auth.getSession()).data.session;
+    }
     if (!session?.user) {
       if (typeof window !== "undefined") {
         const destination = authSignInUrl(location.href);

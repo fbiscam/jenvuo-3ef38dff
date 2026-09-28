@@ -1,4 +1,5 @@
 import * as React from "react";
+import { goAfterSignIn } from "@/lib/cross-domain-session";
 import { createFileRoute, useNavigate, Link, redirect } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
@@ -69,7 +70,13 @@ export const Route = createFileRoute("/auth")({
       // which would just bounce back here (redirect loop).
       const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
       if (aal && aal.currentLevel === "aal1" && aal.nextLevel === "aal2") return;
-      throw redirect({ to: sanitizeRedirect(search.redirect) as "/dashboard" });
+      const dest = sanitizeRedirect(search.redirect);
+      if (typeof window !== "undefined") {
+        let hopped = false;
+        await goAfterSignIn(dest, () => undefined).then(() => { hopped = window.location.pathname !== "/auth"; });
+        void hopped;
+      }
+      throw redirect({ to: dest as "/dashboard" });
     }
   },
   head: () => ({
@@ -250,7 +257,7 @@ function AuthPage() {
         const res = await verifyTrustedDeviceFn({ data: { token: savedToken } });
         if (res?.valid) {
           await applyPendingReferral();
-          navigate({ to: redirectTo as "/dashboard", replace: true });
+          void goAfterSignIn(redirectTo, () => navigate({ to: redirectTo as "/dashboard", replace: true }));
           return true;
         }
         window.localStorage.removeItem(TRUSTED_DEVICE_KEY(uid));
@@ -303,7 +310,7 @@ function AuthPage() {
                   const res = await verifyTrustedDeviceFn({ data: { token: savedToken } });
                   if (res?.valid) {
                     await applyPendingReferral();
-                    navigate({ to: redirectTo as "/dashboard", replace: true });
+                    void goAfterSignIn(redirectTo, () => navigate({ to: redirectTo as "/dashboard", replace: true }));
                     return;
                   }
                   // Stale/expired — clear it so we don't retry every login.
@@ -326,7 +333,7 @@ function AuthPage() {
             }
           }
           await applyPendingReferral();
-          navigate({ to: redirectTo as "/dashboard", replace: true });
+          void goAfterSignIn(redirectTo, () => navigate({ to: redirectTo as "/dashboard", replace: true }));
         })();
       }
     });
@@ -521,7 +528,7 @@ function AuthPage() {
     }
 
     setLoading(false);
-    navigate({ to: redirectTo as "/dashboard", replace: true });
+    void goAfterSignIn(redirectTo, () => navigate({ to: redirectTo as "/dashboard", replace: true }));
   };
 
   const cancelMfa = async () => {
@@ -781,7 +788,7 @@ function AuthPage() {
     toast.success("Password updated"); flashInfo("Password updated", "password");
     recoveryModeRef.current = false;
     setNewPassword("");
-    navigate({ to: redirectTo as "/dashboard", replace: true });
+    void goAfterSignIn(redirectTo, () => navigate({ to: redirectTo as "/dashboard", replace: true }));
   };
 
 
