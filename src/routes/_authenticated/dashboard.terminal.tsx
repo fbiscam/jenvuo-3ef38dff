@@ -157,7 +157,7 @@ function UpcomingGoldNews({ event, loading }: { event?: NewsEvent; loading: bool
   const text = loading
     ? "Checking news…"
     : event && stamp
-      ? `News: ${event.title} · ${stamp.time} NY`
+      ? `News: ${event.title} · ${stamp.date}, ${stamp.time} NY`
       : "No important news ahead";
   return (
     <span
