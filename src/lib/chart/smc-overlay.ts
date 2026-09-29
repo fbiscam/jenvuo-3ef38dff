@@ -917,13 +917,13 @@ export function renderSmcOverlay(
       : `rgba(16,185,129,${z.fresh ? 0.11 : 0.07})`;
     const kind = supply ? "SUPPLY" : "DEMAND";
     const state = z.live ? "NEW " : z.fresh ? "FRESH " : "";
-    const label = `${state}${kind} · ${z.label}`;
+    const label = `${state}${kind} · ${z.label} · ${z.grade} ${z.strength}%`;
 
     ctx.save();
     ctx.fillStyle = fill;
     ctx.fillRect(x, y, width, height);
     ctx.strokeStyle = edge;
-    ctx.lineWidth = 1.25;
+    ctx.lineWidth = z.grade === "EXTREME" ? 2 : 1.25;
     if (z.live) ctx.setLineDash([5, 3]);
     ctx.beginPath();
     ctx.moveTo(x, y);
@@ -946,11 +946,69 @@ export function renderSmcOverlay(
     ctx.textBaseline = "middle";
     ctx.fillText(label, labelX, labelY + 1);
     ctx.textBaseline = "alphabetic";
+
+    // Extreme level tag at the zone's far edge (exact swing wick).
+    if (z.extreme) {
+      const ey = pr.y(z.extremeLevel);
+      if (ey != null) {
+        ctx.font = "700 11px 'JetBrains Mono', ui-monospace, monospace";
+        const tag = `EXTREME ${z.extremeLevel.toFixed(2)}`;
+        ctx.fillStyle = edge;
+        ctx.fillText(tag, x + 6, supply ? ey - 4 : ey + 13);
+      }
+    }
+    ctx.restore();
+  };
+
+  // Entry / SL / TP1 / TP2 lines for a fresh zone's limit-order plan.
+  const sdPlan = (z: SdZone) => {
+    const plan = z.plan;
+    if (!plan) return;
+    const x0 = pr.x(z.t / 1000);
+    if (x0 == null || x0 > pr.width) return;
+    const x = Math.max(0, x0);
+    const rows: Array<[string, number, string]> = [
+      [`${plan.side} ENTRY`, plan.entry, "#FD5510"],
+      ["SL", plan.sl, "rgb(239,68,68)"],
+      ["TP1", plan.tp1, "rgb(16,185,129)"],
+      ["TP2", plan.tp2, "rgb(5,150,105)"],
+    ];
+    ctx.save();
+    ctx.font = "700 11px 'JetBrains Mono', ui-monospace, monospace";
+    ctx.lineWidth = 1.25;
+    for (const [name, price, color] of rows) {
+      const y = pr.y(price);
+      if (y == null) continue;
+      ctx.strokeStyle = color;
+      ctx.setLineDash(name === "SL" || name.endsWith("ENTRY") ? [] : [4, 3]);
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.lineTo(pr.width, y);
+      ctx.stroke();
+      const text = `${name} ${price.toFixed(2)}`;
+      const tw = ctx.measureText(text).width;
+      const lx = pr.width - tw - 14;
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.roundRect?.(lx - 5, y - 9, tw + 10, 18, 3);
+      if (!ctx.roundRect) ctx.rect(lx - 5, y - 9, tw + 10, 18);
+      ctx.fill();
+      ctx.fillStyle = "#ffffff";
+      ctx.textBaseline = "middle";
+      ctx.fillText(text, lx, y + 1);
+      ctx.textBaseline = "alphabetic";
+    }
+    ctx.setLineDash([]);
     ctx.restore();
   };
 
   if (toggles.sdZones) {
-    for (const z of smc.sdZones ?? []) sdZone(z);
+    const zones = smc.sdZones ?? [];
+    for (const z of zones) sdZone(z);
+    // Plan lines only for the newest fresh zone on each side to keep the chart readable.
+    const newestFresh = (type: SdZone["type"]) =>
+      [...zones].reverse().find((z) => z.type === type && z.plan);
+    for (const z of [newestFresh("SUPPLY"), newestFresh("DEMAND")]) if (z) sdPlan(z);
   }
   if (toggles.fvg) {
     for (const gap of smc.fvgs) fairValueGap(gap);
