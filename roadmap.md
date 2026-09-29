@@ -192,3 +192,4 @@
 - [x] Supply/demand: newest 3 zones, no stacking, one Entry/SL/TP, only 45m/1H/4H/1D; deeper 45m history
 - [x] Zones: plain SUPPLY/DEMAND labels, newer same-side zone replaces older, finished trades hide; chart timescale crash guard
 - [x] Zones: newest 4, also on 30m, Entry/SL/TP on/off switch; EMA/SMA/VWAP no price-panel tags
+- [x] Liquidity sweep indicator (EQH/EQL pools, next sweep target, confirmed sweeps) with SMC toggle
