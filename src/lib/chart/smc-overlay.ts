@@ -1007,12 +1007,10 @@ export function renderSmcOverlay(
 
   if (toggles.sdZones) {
     const zones = smc.sdZones ?? [];
-    // Plan lines only for the newest fresh zone on each side to keep the chart readable.
-    const newestFresh = (type: SdZone["type"]) =>
-      [...zones].reverse().find((z) => z.type === type && z.plan);
-    const planned = [newestFresh("SUPPLY"), newestFresh("DEMAND")].filter((z): z is SdZone => !!z);
-    for (const z of zones) sdZone(z, planned.includes(z));
-    for (const z of planned) sdPlan(z);
+    // Entry / SL / TP only for the single newest zone that has a plan.
+    const planned = [...zones].reverse().find((z) => z.plan);
+    for (const z of zones) sdZone(z, z === planned);
+    if (planned) sdPlan(planned);
   }
   if (toggles.fvg) {
     for (const gap of smc.fvgs) fairValueGap(gap);
