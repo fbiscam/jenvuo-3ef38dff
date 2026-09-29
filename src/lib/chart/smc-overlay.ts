@@ -954,17 +954,6 @@ export function renderSmcOverlay(
     ctx.textBaseline = "middle";
     ctx.fillText(label, labelX, labelY + 1);
     ctx.textBaseline = "alphabetic";
-
-    // Extreme level tag at the zone's far edge (exact swing wick).
-    if (z.extreme) {
-      const ey = pr.y(z.extremeLevel);
-      if (ey != null) {
-        ctx.font = "700 11px 'JetBrains Mono', ui-monospace, monospace";
-        const tag = `EXTREME ${z.extremeLevel.toFixed(2)}`;
-        ctx.fillStyle = edge;
-        ctx.fillText(tag, x + 6, supply ? ey - 4 : ey + 13);
-      }
-    }
     ctx.restore();
   };
 

@@ -428,7 +428,13 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
     const id = window.setTimeout(() => {
       stickyRangeRef.current = null;
       const n = propsRef.current.bars.length;
-      if (n > 0) chart.timeScale().setVisibleLogicalRange({ from: Math.max(0, n - 320), to: n + 10 });
+      if (n > 0) {
+        try {
+          chart.timeScale().setVisibleLogicalRange({ from: Math.max(0, n - 320), to: n + 10 });
+        } catch {
+          /* chart hidden or disposed */
+        }
+      }
     }, 50);
     return () => window.clearTimeout(id);
   }, [props.resetKey]);
@@ -900,8 +906,13 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
     },
     fit: () => {
       const n = propsRef.current.bars.length;
-      chartRef.current?.timeScale().setVisibleLogicalRange({ from: Math.max(0, n - 320), to: n + 10 });
-      chartRef.current?.priceScale("right").applyOptions({ autoScale: true });
+      if (n === 0) return;
+      try {
+        chartRef.current?.timeScale().setVisibleLogicalRange({ from: Math.max(0, n - 320), to: n + 10 });
+        chartRef.current?.priceScale("right").applyOptions({ autoScale: true });
+      } catch {
+        /* chart hidden or disposed (e.g. phone layout with the AI panel open) */
+      }
     },
   }));
 
