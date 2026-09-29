@@ -178,6 +178,8 @@ export type SmcToggles = {
   liquidity: boolean;
   projection: boolean;
   sdZones: boolean;
+  /** Entry / SL / TP lines on the newest fresh supply/demand zone. */
+  sdPlan: boolean;
 };
 
 export const DEFAULT_SMC: SmcToggles = {
@@ -189,6 +191,7 @@ export const DEFAULT_SMC: SmcToggles = {
   liquidity: true,
   projection: true,
   sdZones: true,
+  sdPlan: true,
 };
 
 type Candle = { t: number; o: number; h: number; l: number; c: number; v?: number };
@@ -1002,7 +1005,7 @@ export function renderSmcOverlay(
   if (toggles.sdZones) {
     const zones = smc.sdZones ?? [];
     // Entry / SL / TP only for the single newest zone that has a plan.
-    const planned = [...zones].reverse().find((z) => z.plan);
+    const planned = toggles.sdPlan === false ? undefined : [...zones].reverse().find((z) => z.plan);
     for (const z of zones) sdZone(z, z === planned);
     if (planned) sdPlan(planned);
   }
