@@ -186,3 +186,4 @@
 - [x] Make every sign-out destination consistent and repair authenticator 2FA enrollment retries
 - [x] Remove Terminal dark mode and show the news date with its New York time
 - [x] Stabilize complete 1m, 5m, and 15m Terminal candle history on one deep Gold feed
+- [x] Fresh supply/demand zone indicator (SMC toggle) from new swing highs/lows
