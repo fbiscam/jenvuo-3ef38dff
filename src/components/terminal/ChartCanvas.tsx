@@ -486,7 +486,7 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
                   // no coloured price tag on the price panel.
                   lastValueVisible: spec.pane !== "main",
                   crosshairMarkerVisible: false,
-                  title: line.title,
+                  title: spec.pane === "main" ? "" : line.title,
                   lineStyle: line.dashed ? LineStyle.Dashed : LineStyle.Solid,
                 },
                 pane,
@@ -538,7 +538,7 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
             priceLineVisible: false,
             lastValueVisible: !script.result.overlay,
             crosshairMarkerVisible: false,
-            title: plot.title,
+            title: script.result.overlay ? "" : plot.title,
           },
           pane,
         ),
