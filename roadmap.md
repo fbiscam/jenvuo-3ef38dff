@@ -187,3 +187,4 @@
 - [x] Remove Terminal dark mode and show the news date with its New York time
 - [x] Stabilize complete 1m, 5m, and 15m Terminal candle history on one deep Gold feed
 - [x] Fresh supply/demand zone indicator (SMC toggle) from new swing highs/lows
+- [x] Instant supply/demand zones on every swing label (OB/FVG style) + stop candles vanishing on refresh

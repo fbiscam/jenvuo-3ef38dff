@@ -19,4 +19,5 @@
 - Build authenticator 2FA setup from the auth service's returned QR/URI and remove incomplete factors before retrying; this avoids mismatched secrets and duplicate enrollment failures.
 - Compute SMC pressure from server-fed closed candles only (live ticks only shape the forming candle) and ignore gold volume; per-browser ticks and feed-specific volume made percentages differ between accounts.
 - Load XAU/USD Terminal history from one fixed-priority deep Gold proxy feed and keep its spot-scale anchor stable; mixing shallow feeds or re-scaling old bars breaks 1m/5m/15m history.
-- Build Fresh supply/demand zones only from confirmed fractal swings with ≥1 ATR closed-body displacement, delete them on a body close beyond the far edge, and let newer zones win overlaps; this keeps zones fixed and non-overlapping.
+- Draw supply/demand zones on every HH/HL/LH/LL swing: live swings show immediately, confirmed swings need ≥0.5 ATR closed-body displacement, only closed candles break/test a zone, and newer zones win overlaps; this keeps zones instant yet stable.
+- Pin the chart view to the latest candle when history is replaced and ignore empty polls; the index-based view otherwise lands on empty space and candles vanish.
