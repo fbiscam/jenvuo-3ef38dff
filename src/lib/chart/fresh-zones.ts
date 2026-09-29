@@ -1,16 +1,32 @@
 /**
- * Fresh supply & demand zones built from confirmed 10-bar fractal swings.
+ * Supply & demand zones built from every HH/HL/LH/LL swing.
  *
- * Every new confirmed swing high can create a SUPPLY zone and every swing low
- * a DEMAND zone, but only when price displaced away from the swing by closed
- * candle bodies (>= 1 ATR within the fractal confirmation window). Zones are
- * anchored to the swing candle (body edge → wick) so they never move once
- * printed. A closed candle beyond the far edge deletes the zone; a wick back
- * into it marks the zone as tested (no longer fresh).
+ * - Live swings show their zone the moment the label appears.
+ * - Confirmed swings keep a zone only after closed-body displacement
+ *   (>= SD_MIN_DISPLACEMENT_ATR within the confirmation window).
+ * - Zones are anchored to the swing candle (body edge -> wick extreme) so they
+ *   never move once printed. A closed candle beyond the far edge deletes the
+ *   zone; a wick back into it marks it tested (no longer fresh).
+ * - Each zone gets a deterministic strength score (displacement, outer
+ *   extreme, wick rejection, freshness) and every fresh zone carries a
+ *   limit-order trade plan (entry at the proximal edge, SL beyond the extreme,
+ *   TP1 = 2R, TP2 = 3R).
+ * - Only the newest SD_MAX_TOTAL zones are returned, so older zones hide as new
+ *   ones form.
  */
 import type { StructurePivot } from "@/lib/analysis/market-structure-evidence";
 
 type Candle = { t: number; o: number; h: number; l: number; c: number };
+
+export type SdGrade = "EXTREME" | "STRONG" | "MODERATE";
+
+export type SdTradePlan = {
+  side: "BUY" | "SELL";
+  entry: number;
+  sl: number;
+  tp1: number;
+  tp2: number;
+};
 
 export type SdZone = {
   type: "SUPPLY" | "DEMAND";
@@ -26,17 +42,27 @@ export type SdZone = {
   touches: number;
   /** Close-based displacement away from the swing, in ATR. */
   displacementAtr: number;
-  /** True for fresh extremes (HH at highs, LL at lows). */
+  /** True when the swing wick is the outermost high/low of the prior 50 candles. */
   extreme: boolean;
-  /** Swing is still forming (not yet 10-bar confirmed) — shown immediately. */
+  /** Exact wick price of the swing (zone's far edge). */
+  extremeLevel: number;
+  /** Swing is still forming (not yet confirmed) — shown immediately. */
   live: boolean;
+  /** Deterministic 0-100 strength score. */
+  strength: number;
+  grade: SdGrade;
+  /** Limit-order plan, present only while the zone is fresh and graded STRONG/EXTREME. */
+  plan?: SdTradePlan;
 };
 
 export type ZonePivot = Pick<StructurePivot, "index" | "t" | "price" | "kind" | "label"> & { live?: boolean };
 
 /** Confirmed swings need this much closed-body displacement to keep a zone. */
 export const SD_MIN_DISPLACEMENT_ATR = 0.5;
-export const SD_MAX_PER_SIDE = 5;
+/** Newest zones shown on the chart (both sides together). */
+export const SD_MAX_TOTAL = 5;
+export const SD_EXTREME_LOOKBACK = 50;
+export const SD_SL_BUFFER_ATR = 0.15;
 
 function atrAt(bars: Candle[], end: number, period = 14): number {
   const first = Math.max(1, end - period + 1);
@@ -51,6 +77,30 @@ function atrAt(bars: Candle[], end: number, period = 14): number {
   if (n) return sum / n;
   const b = bars[end];
   return b ? b.h - b.l : 0;
+}
+
+const round = (v: number) => Math.round(v * 100) / 100;
+
+/**
+ * Deterministic strength: no single clue can reach STRONG on its own.
+ * displacement (<=35) + outer extreme (<=25) + wick rejection (<=15) +
+ * freshness (<=15) + structural label (<=10).
+ */
+export function zoneStrength(input: {
+  displacementAtr: number;
+  extreme: boolean;
+  wickRatio: number;
+  touches: number;
+  extremeLabel: boolean;
+}): { strength: number; grade: SdGrade } {
+  const disp = Math.min(Math.max(input.displacementAtr, 0) / 2, 1) * 35;
+  const ext = input.extreme ? 25 : 0;
+  const wick = Math.min(Math.max(input.wickRatio, 0), 1) * 15;
+  const fresh = input.touches === 0 ? 15 : input.touches === 1 ? 7 : 0;
+  const lbl = input.extremeLabel ? 10 : 4;
+  const strength = Math.round(Math.min(100, disp + ext + wick + fresh + lbl));
+  const grade: SdGrade = strength >= 75 ? "EXTREME" : strength >= 55 ? "STRONG" : "MODERATE";
+  return { strength, grade };
 }
 
 /**
@@ -85,19 +135,17 @@ export function computeFreshZones(
     for (let k = i + 1; k <= end; k++) {
       far = supply ? Math.min(far, bars[k].c) : Math.max(far, bars[k].c);
     }
-    const displacementAtr = (supply ? bodyEdge - far : far - bodyEdge) / atr;
-    // Live swings show the moment their HH/HL/LH/LL label appears; confirmed
-    // swings must have been rejected by closed bodies to keep their zone.
+    const displacementAtr = Math.max(0, (supply ? bodyEdge - far : far - bodyEdge) / atr);
     const live = !!p.live;
     if (!live && displacementAtr < SD_MIN_DISPLACEMENT_ATR) continue;
 
-    // Zone: swing candle body edge → wick extreme, sized between 0.25 and 1 ATR.
+    // Zone: swing candle body edge -> wick extreme, sized between 0.25 and 1 ATR.
     let depth = Math.abs(p.price - bodyEdge);
     depth = Math.min(Math.max(depth, atr * 0.25), atr);
     const top = supply ? p.price : p.price + depth;
     const bottom = supply ? p.price - depth : p.price;
 
-    // Lifecycle after formation: body close beyond the far edge kills the zone.
+    // Lifecycle: body close beyond the far edge kills the zone.
     let broken = false;
     let touches = 0;
     let inside = false;
@@ -107,12 +155,47 @@ export function computeFreshZones(
         broken = true;
         break;
       }
-      // Only count touches once price has left the zone at least once.
       const touching = supply ? b.h >= bottom : b.l <= top;
       if (k > i + 1 && touching && !inside) touches++;
       inside = touching;
     }
     if (broken) continue;
+
+    // Outer extreme: swing wick beyond every candle in the prior lookback
+    // (fixed window before the swing, so it never changes later).
+    let extreme = true;
+    for (let k = Math.max(0, i - SD_EXTREME_LOOKBACK); k < i; k++) {
+      if (supply ? bars[k].h >= p.price : bars[k].l <= p.price) {
+        extreme = false;
+        break;
+      }
+    }
+    const range = Math.max(swing.h - swing.l, 1e-9);
+    const wick = supply ? swing.h - Math.max(swing.o, swing.c) : Math.min(swing.o, swing.c) - swing.l;
+    const extremeLabel = supply ? p.label === "HH" || p.label === "H" : p.label === "LL" || p.label === "L";
+    const { strength, grade } = zoneStrength({
+      displacementAtr,
+      extreme,
+      wickRatio: wick / range,
+      touches,
+      extremeLabel,
+    });
+
+    const fresh = touches === 0;
+    let plan: SdTradePlan | undefined;
+    // Only STRONG / EXTREME fresh zones get trade levels; weak zones stay label-only.
+    if (fresh && grade !== "MODERATE") {
+      const entry = supply ? bottom : top;
+      const sl = supply ? p.price + atr * SD_SL_BUFFER_ATR : p.price - atr * SD_SL_BUFFER_ATR;
+      const risk = Math.abs(entry - sl);
+      plan = {
+        side: supply ? "SELL" : "BUY",
+        entry: round(entry),
+        sl: round(sl),
+        tp1: round(supply ? entry - risk * 2 : entry + risk * 2),
+        tp2: round(supply ? entry - risk * 3 : entry + risk * 3),
+      };
+    }
 
     zones.push({
       type: supply ? "SUPPLY" : "DEMAND",
@@ -120,33 +203,25 @@ export function computeFreshZones(
       top,
       bottom,
       label: p.label,
-      fresh: touches === 0,
+      fresh,
       touches,
-      displacementAtr: Math.max(0, Math.round(displacementAtr * 10) / 10),
-      extreme: supply ? p.label === "HH" || p.label === "H" : p.label === "LL" || p.label === "L",
+      displacementAtr: Math.round(displacementAtr * 10) / 10,
+      extreme,
+      extremeLevel: p.price,
       live,
+      strength,
+      grade,
+      plan,
     });
   }
 
-  // Newer zones win overlaps with older zones of the same type.
-  const pick = (type: SdZone["type"]) => {
-    const list = zones.filter((z) => z.type === type).sort((a, b) => b.t - a.t);
-    const kept: SdZone[] = [];
-    for (const z of list) {
-      if (kept.some((k) => z.bottom <= k.top && z.top >= k.bottom)) continue;
-      kept.push(z);
-      if (kept.length >= SD_MAX_PER_SIDE) break;
-    }
-    return kept;
-  };
-  const supplies = pick("SUPPLY");
-  const demands = pick("DEMAND");
-  // Opposite zones never overlap: keep the newer one.
-  const out = [...supplies];
-  for (const d of demands) {
-    const clash = out.find((s) => d.bottom <= s.top && d.top >= s.bottom);
-    if (!clash) out.push(d);
-    else if (d.t > clash.t) out.splice(out.indexOf(clash), 1, d);
+  // Newest first; newer zones win any overlap (same or opposite type).
+  zones.sort((a, b) => b.t - a.t);
+  const kept: SdZone[] = [];
+  for (const z of zones) {
+    if (kept.some((k) => z.bottom <= k.top && z.top >= k.bottom)) continue;
+    kept.push(z);
+    if (kept.length >= SD_MAX_TOTAL) break;
   }
-  return out.sort((a, b) => a.t - b.t);
+  return kept.sort((a, b) => a.t - b.t);
 }
