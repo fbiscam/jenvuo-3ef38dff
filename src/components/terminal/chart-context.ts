@@ -99,7 +99,7 @@ export function buildChartContext(input: {
         `${input.timeframeLabel ?? "1H"} reversal pressure for this ${input.pairLabel ?? "XAU/USD"} chart (deterministic confluence score, not win probability): ${confirmedPressure || "no confirmed readings"}${livePressure ? `; fresh: ${livePressure}` : ""}.`,
       );
     } else {
-      lines.push("Buyer/seller reversal pressure is intentionally unavailable outside the 1H, 2H, 4H and 1D XAU/USD and BTC/USD charts.");
+      lines.push("Buyer/seller reversal pressure is intentionally unavailable outside the XAU/USD and BTC/USD charts.");
     }
     const live = (input.smc.livePivots ?? [])
       .map(
