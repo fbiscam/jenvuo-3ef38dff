@@ -1441,8 +1441,8 @@ async function loadBtcTerminalChart(tf: string): Promise<TerminalChartPayload> {
   let provider = "Binance";
   try {
     candles = await Promise.any([
-      fetchBinanceHostDeep("data-api.binance.vision", "BTCUSDT", fetchTf, 1000),
-      fetchBinanceHostDeep("api.binance.com", "BTCUSDT", fetchTf, 1000),
+      fetchBinanceHostDeep("data-api.binance.vision", "BTCUSDT", fetchTf, tf === "45m" ? 3000 : 1000),
+      fetchBinanceHostDeep("api.binance.com", "BTCUSDT", fetchTf, tf === "45m" ? 3000 : 1000),
     ]);
   } catch {
     // Binance blocks some server regions — fall back to Coinbase (aggregated).
