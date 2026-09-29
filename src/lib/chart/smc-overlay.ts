@@ -749,7 +749,14 @@ export function computeSmcOverlay(
     ...pivotsLabelled,
     ...livePivots,
   ], pressure, latestAtr, targetBuySide, targetSellSide);
-  const sdZones = computeFreshZones(fractalBars, fractal.pivots);
+  // Zones on every swing label: confirmed pivots plus the live HH/HL/LH/LL
+  // swings, so a new zone appears the moment its label does.
+  const confirmedKeys = new Set(fractal.pivots.map((p) => `${p.kind}:${p.t}`));
+  const liveZonePivots = livePivots
+    .filter((p) => !confirmedKeys.has(`${p.kind}:${p.t}`))
+    .map((p) => ({ index: idxOf.get(p.t) ?? -1, t: p.t, price: p.price, kind: p.kind, label: p.label, live: !p.confirmedByOpposite }))
+    .filter((p) => p.index >= 0);
+  const sdZones = computeFreshZones(all, [...fractal.pivots, ...liveZonePivots], fractalBars.length);
   return {
     reversal,
     pressure,
@@ -891,6 +898,8 @@ export function renderSmcOverlay(
     ctx.textBaseline = "alphabetic";
   };
 
+  // Same visual language as order blocks / FVGs: soft fill, solid edges to
+  // the right, centred white label with coloured text.
   const sdZone = (z: SdZone) => {
     const x0 = pr.x(z.t / 1000);
     const topY = pr.y(z.top);
@@ -901,63 +910,42 @@ export function renderSmcOverlay(
     const x = Math.max(0, x0);
     const width = Math.max(1, pr.width - x);
     const y = Math.min(topY, bottomY);
-    const height = Math.max(3, Math.abs(bottomY - topY));
-    const edge = supply ? "#e5484d" : "#12a594";
-    const alpha = z.fresh ? 0.16 : 0.08;
+    const height = Math.max(2, Math.abs(bottomY - topY));
+    const edge = supply ? "rgb(239,68,68)" : "rgb(16,185,129)";
+    const fill = supply
+      ? `rgba(239,68,68,${z.fresh ? 0.11 : 0.07})`
+      : `rgba(16,185,129,${z.fresh ? 0.11 : 0.07})`;
+    const kind = supply ? "SUPPLY" : "DEMAND";
+    const state = z.live ? "NEW " : z.fresh ? "FRESH " : "";
+    const label = `${state}${kind} · ${z.label}`;
+
     ctx.save();
-    ctx.fillStyle = supply ? `rgba(229,72,77,${alpha})` : `rgba(18,165,148,${alpha})`;
+    ctx.fillStyle = fill;
     ctx.fillRect(x, y, width, height);
-    // Solid edge on the side price must break; dashed on the inner edge.
     ctx.strokeStyle = edge;
-    ctx.lineWidth = z.fresh ? 1.5 : 1;
-    ctx.setLineDash([]);
+    ctx.lineWidth = 1.25;
+    if (z.live) ctx.setLineDash([5, 3]);
     ctx.beginPath();
-    const outerY = supply ? y : y + height;
-    const innerY = supply ? y + height : y;
-    ctx.moveTo(x, outerY);
-    ctx.lineTo(pr.width, outerY);
-    ctx.stroke();
-    ctx.setLineDash([4, 3]);
-    ctx.beginPath();
-    ctx.moveTo(x, innerY);
-    ctx.lineTo(pr.width, innerY);
+    ctx.moveTo(x, y);
+    ctx.lineTo(pr.width, y);
+    ctx.moveTo(x, y + height);
+    ctx.lineTo(pr.width, y + height);
     ctx.stroke();
     ctx.setLineDash([]);
-    // Anchor tick on the swing candle.
-    if (x0 >= 0) {
-      ctx.fillStyle = edge;
-      ctx.fillRect(x0 - 1, y, 2, height);
-    }
-    const name = `${z.fresh ? "FRESH " : ""}${supply ? "SUPPLY" : "DEMAND"}`;
-    const meta = z.fresh ? `${z.label} · ${z.displacementAtr > 5 ? ">5" : z.displacementAtr}×ATR` : `${z.label} · tested ${z.touches}×`;
-    ctx.font = "700 11px 'JetBrains Mono', ui-monospace, monospace";
-    const nameW = ctx.measureText(name).width;
-    ctx.font = "500 10px 'JetBrains Mono', ui-monospace, monospace";
-    const metaW = ctx.measureText(meta).width;
-    const boxW = nameW + metaW + 22;
-    // Start past the swing badge (centred on the swing candle, ~92px wide) so they never collide.
-    const bx = Math.min(pr.width - boxW - 70, x + 54);
-    if (bx >= 0) {
-      // Near the right edge the label can't clear the swing badge horizontally,
-      // so flip it to the zone's inner side (below supply, above demand).
-      const flipped = bx < x + 54;
-      const outside = supply ? !flipped : flipped;
-      const by = outside ? y - 20 : y + height + 2;
-      const clampedY = Math.max(2, Math.min(pr.height - 20, by));
-      ctx.fillStyle = edge;
-      ctx.beginPath();
-      ctx.roundRect?.(bx, clampedY, boxW, 18, 4);
-      if (!ctx.roundRect) ctx.rect(bx, clampedY, boxW, 18);
-      ctx.fill();
-      ctx.fillStyle = "#ffffff";
-      ctx.textBaseline = "middle";
-      ctx.font = "700 11px 'JetBrains Mono', ui-monospace, monospace";
-      ctx.fillText(name, bx + 7, clampedY + 9.5);
-      ctx.font = "500 10px 'JetBrains Mono', ui-monospace, monospace";
-      ctx.globalAlpha = 0.9;
-      ctx.fillText(meta, bx + 15 + nameW, clampedY + 9.5);
-      ctx.textBaseline = "alphabetic";
-    }
+
+    ctx.font = "600 13px 'JetBrains Mono', ui-monospace, monospace";
+    const textWidth = ctx.measureText(label).width;
+    const labelX = Math.min(pr.width - textWidth - 12, Math.max(x + 8, x + width / 2 - textWidth / 2));
+    const labelY = y + height / 2;
+    ctx.fillStyle = "rgba(255,255,255,0.92)";
+    ctx.beginPath();
+    ctx.roundRect?.(labelX - 6, labelY - 11, textWidth + 12, 22, 4);
+    if (!ctx.roundRect) ctx.rect(labelX - 6, labelY - 11, textWidth + 12, 22);
+    ctx.fill();
+    ctx.fillStyle = edge;
+    ctx.textBaseline = "middle";
+    ctx.fillText(label, labelX, labelY + 1);
+    ctx.textBaseline = "alphabetic";
     ctx.restore();
   };
 

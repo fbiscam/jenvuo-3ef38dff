@@ -332,6 +332,8 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
     const candles = candleRef.current;
     if (!candles) return;
     const { bars } = props;
+    // An empty refresh on the same timeframe must never wipe the candles on screen.
+    if (!bars.length && lastBarsRef.current) return;
     const insideBarIndexes = new Set<number>();
     for (const script of props.scripts) {
       for (const shape of script.result.shapes) {
@@ -366,9 +368,26 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
       // not every historical candle and price-anchored SMC marking on screen.
       for (let i = Math.max(0, prev.len - 1); i < data.length; i++) candles.update(data[i]);
     } else {
+      // A refreshed history window can hold a different number of candles.
+      // The visible range is index-based, so keep it pinned to the same
+      // distance from the latest candle; otherwise the view lands on empty
+      // indexes and the candles appear to vanish.
+      const chart = chartRef.current;
+      const lr = prev && prev.len > 0 ? chart?.timeScale().getVisibleLogicalRange() : null;
       candles.setData(data);
+      if (chart && lr && prev && data.length > 0) {
+        const fromEnd = prev.len - 1 - Number(lr.to);
+        const span = Math.max(20, Number(lr.to) - Number(lr.from));
+        const to = data.length - 1 - fromEnd;
+        const from = Math.max(-5, to - span);
+        try {
+          chart.timeScale().setVisibleLogicalRange({ from, to: Math.max(from + 20, to) });
+        } catch {
+          /* chart disposed */
+        }
+      }
     }
-    lastBarsRef.current = { first, len: bars.length };
+    lastBarsRef.current = bars.length ? { first, len: bars.length } : null;
     dirtyRef.current += 1;
   }, [props.bars, insideBarKey]); // eslint-disable-line react-hooks/exhaustive-deps
 
