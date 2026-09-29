@@ -1169,8 +1169,19 @@ async function fetchProxyJson(url: string, label: string): Promise<any> {
 
 function finiteCandles(rows: Candle[], label: string): Candle[] {
   const out = rows
-    .filter((c) => [c.t, c.o, c.h, c.l, c.c].every(Number.isFinite) && c.c > 0)
-    .sort((a, b) => a.t - b.t);
+    .filter(
+      (c) =>
+        [c.t, c.o, c.h, c.l, c.c].every(Number.isFinite) &&
+        c.t > 0 &&
+        c.o > 0 &&
+        c.h > 0 &&
+        c.l > 0 &&
+        c.c > 0 &&
+        c.h >= Math.max(c.o, c.c) &&
+        c.l <= Math.min(c.o, c.c),
+    )
+    .sort((a, b) => a.t - b.t)
+    .filter((c, index, sorted) => index === sorted.length - 1 || c.t !== sorted[index + 1].t);
   if (out.length < 10) throw new Error(`${label}: too few candles`);
   return out;
 }
@@ -1370,9 +1381,13 @@ async function fetchGoldProxyDeep(tf: string, limit: number): Promise<Candle[]> 
  */
 let lastGoldScale: number | null = null;
 const GOLD_SCALE_STEP = 0.0001;
+const GOLD_SCALE_REANCHOR_PCT = 0.0025;
 export function quantizeGoldScale(raw: number, previous: number | null): number {
   if (!Number.isFinite(raw) || raw <= 0) return previous ?? 1;
-  if (previous != null && Math.abs(raw - previous) < GOLD_SCALE_STEP) return previous;
+  // Keep every historical candle fixed while spot and the Gold proxy make
+  // normal short-term moves. Re-scaling all 1m/5m/15m history on each poll made
+  // old candles appear to move even though only the forming candle was live.
+  if (previous != null && Math.abs(raw / previous - 1) < GOLD_SCALE_REANCHOR_PCT) return previous;
   return Math.round(raw / GOLD_SCALE_STEP) * GOLD_SCALE_STEP;
 }
 
@@ -1447,24 +1462,23 @@ async function loadTerminalChart(tf: string, asset: TerminalAsset = "XAUUSD"): P
   const hit = terminalChartCache.get(tf);
   if (hit && Date.now() - hit.at < 4000) return { ...hit.data, serverTime: Date.now() };
   let candles: Candle[] = [];
-  let source: TerminalChartPayload["source"] = "spot";
-  let provider = "Yahoo spot";
+  let source: TerminalChartPayload["source"] = "paxg-scaled";
+  let provider = "Binance";
   // No provider serves 45m candles — build them from 15m candles.
   const fetchTf = tf === "45m" ? "15m" : tf === "2h" ? "1h" : tf;
   try {
-    candles = await fetchFromYahooSymbols(["XAUUSD=X"], fetchTf);
-  } catch {
-    source = "paxg-scaled";
-    try {
-      const picked = await fetchGoldProxyDeepWithProvider(fetchTf, 1000);
-      provider = picked.provider;
-      candles = await scaleProxyToSpot(picked.candles);
-    } catch (err) {
-      // Every source failed this tick — keep serving the last good chart for a
-      // while instead of blanking the terminal.
-      if (hit && Date.now() - hit.at < TERMINAL_STALE_MAX) return { ...hit.data, serverTime: Date.now() };
-      throw err;
-    }
+    // Use one deep, fixed-priority source on every timeframe. Yahoo's XAUUSD=X
+    // intraday endpoint currently returns no chart and, when it did answer, only
+    // returned 200 bars. Mixing it with 1000-bar exchange fallbacks made short
+    // timeframe history vary between refreshes and accounts.
+    const picked = await fetchGoldProxyDeepWithProvider(fetchTf, 1000);
+    provider = picked.provider;
+    candles = await scaleProxyToSpot(picked.candles);
+  } catch (err) {
+    // Every source failed this tick — keep serving the last good chart for a
+    // while instead of blanking the terminal.
+    if (hit && Date.now() - hit.at < TERMINAL_STALE_MAX) return { ...hit.data, serverTime: Date.now() };
+    throw err;
   }
   const step = TF_MS[tf] ?? TF_MS["30m"];
   const byBucket = new Map<number, Candle>();
