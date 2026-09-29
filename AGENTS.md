@@ -18,3 +18,4 @@
 - Centralize sign-out through the cross-domain session helper so local tokens and the shared `.jenvu.com` cookie are cleared before redirecting to `auth.jenvu.com/sign-in`; this prevents session restoration races and blank auth pages.
 - Build authenticator 2FA setup from the auth service's returned QR/URI and remove incomplete factors before retrying; this avoids mismatched secrets and duplicate enrollment failures.
 - Compute SMC pressure from server-fed closed candles only (live ticks only shape the forming candle) and ignore gold volume; per-browser ticks and feed-specific volume made percentages differ between accounts.
+- Load XAU/USD Terminal history from one fixed-priority deep Gold proxy feed and keep its spot-scale anchor stable; mixing shallow feeds or re-scaling old bars breaks 1m/5m/15m history.
