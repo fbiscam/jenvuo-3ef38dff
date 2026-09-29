@@ -590,18 +590,6 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
         }
       }
     }
-    if (propsRef.current.smcToggles.liquiditySweeps) {
-      for (const [i, kind] of liquidityFor(bars)) {
-        const bar = bars[i];
-        if (!bar) continue;
-        markers.push({
-          time: bar.time as UTCTimestamp,
-          position: kind === "buyer" ? "belowBar" : "aboveBar",
-          color: LIQUIDITY_COLORS[kind],
-          shape: kind === "buyer" ? "arrowUp" : "arrowDown",
-        });
-      }
-    }
     markers.sort((a, b) => Number(a.time) - Number(b.time));
     markersRef.current?.setMarkers(markers);
   };
@@ -636,7 +624,7 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
     indicatorUpdateRef.current();
     applyScriptData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [props.bars, props.scripts, props.smcToggles.liquiditySweeps]);
+  }, [props.bars, props.scripts]);
 
   // ------------------------------------------------------------- overlay loop
   useEffect(() => {
