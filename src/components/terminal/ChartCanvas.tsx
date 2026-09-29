@@ -536,7 +536,7 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
             color: plot.color,
             lineWidth: plot.lineWidth as 1,
             priceLineVisible: false,
-            lastValueVisible: true,
+            lastValueVisible: !script.result.overlay,
             crosshairMarkerVisible: false,
             title: plot.title,
           },

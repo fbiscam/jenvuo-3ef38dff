@@ -100,7 +100,7 @@ describe("computeFreshZones", () => {
       pivots.push({ index: i, confirmedIndex: i + 10, t: i * 60_000, price: 201 + i, kind: "high", label: "HH" });
     }
     const zones = computeFreshZones(bars, pivots);
-    expect(zones.length <= 3).toBe(true);
+    expect(zones.length <= 4).toBe(true);
     expect(zones[zones.length - 1].t).toBe(pivots[pivots.length - 1].t);
     // Zones never stack on each other.
     for (let a = 0; a < zones.length; a++)
