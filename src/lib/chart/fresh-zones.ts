@@ -191,9 +191,6 @@ export function computeFreshZones(
     const tp1 = supply ? entry - risk * 2 : entry + risk * 2;
     const tp2 = supply ? entry - risk * 3 : entry + risk * 3;
 
-    // Once price trades back to the entry the zone is no longer fresh, so a
-    // played-out trade never keeps its Entry/SL/TP lines; the zone itself stays.
-
     // Every zone carries its levels; only the newest kept zone shows them.
     const plan: SdTradePlan = {
       side: supply ? "SELL" : "BUY",
