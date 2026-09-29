@@ -1503,7 +1503,10 @@ async function loadTerminalChart(tf: string, asset: TerminalAsset = "XAUUSD"): P
     // intraday endpoint currently returns no chart and, when it did answer, only
     // returned 200 bars. Mixing it with 1000-bar exchange fallbacks made short
     // timeframe history vary between refreshes and accounts.
-    const picked = await fetchGoldProxyDeepWithProvider(fetchTf, 1000);
+    // 45m / 2H are built from smaller candles, so fetch enough source candles
+    // for ~1000 finished bars of history.
+    const sourceLimit = tf === "45m" ? 3000 : tf === "2h" ? 2000 : 1000;
+    const picked = await fetchGoldProxyDeepWithProvider(fetchTf, sourceLimit);
     provider = picked.provider;
     candles = await scaleProxyToSpot(picked.candles);
   } catch (err) {
