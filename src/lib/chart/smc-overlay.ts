@@ -17,6 +17,9 @@ import type { OhlcvBar } from "./indicators";
 import { computeFreshZones, type SdZone } from "./fresh-zones";
 import { computeLiquidityMap, type LiquidityMap } from "./liquidity-sweeps";
 
+/** Sweeps below this strength are not drawn. */
+const LIQ_MIN_DRAWN_SWEEP = 40;
+
 export const SMC_WINDOW = 150;
 /** HH/HL/LH/LL chart labels use a Fractals-style swing length of 10 bars each side. */
 export const FRACTAL_RADIUS = 10;
@@ -1039,12 +1042,11 @@ export function renderSmcOverlay(
       ctx.fillStyle = color;
       ctx.fillText(`${label} ${price.toFixed(2)}`, pr.width * 0.55 + 4, above ? y - 5 : y + 15);
     };
-    // The sweep indicator already draws these pools — never draw them twice.
-    const drawn = toggles.sweeps
-      ? new Set((smc.liquidityMap?.pools ?? []).flatMap((pool) => pool.touches.map((x) => x.price)))
-      : new Set<number>();
-    smc.buySide.slice(0, 1).filter((p) => !drawn.has(p)).forEach((p) => liq(p, "BSL", "#089981", true));
-    smc.sellSide.slice(0, 1).filter((p) => !drawn.has(p)).forEach((p) => liq(p, "SSL", "#f23645", false));
+    // The sweep indicator already draws every pool — never draw them twice.
+    if (!toggles.sweeps) {
+      smc.buySide.slice(0, 1).forEach((p) => liq(p, "BSL", "#089981", true));
+      smc.sellSide.slice(0, 1).forEach((p) => liq(p, "SSL", "#f23645", false));
+    }
     ctx.setLineDash([]);
   }
   if (toggles.sweeps && smc.liquidityMap) renderLiquidityMap(ctx, smc.liquidityMap, pr);
@@ -1319,7 +1321,8 @@ function renderLiquidityMap(ctx: CanvasRenderingContext2D, map: LiquidityMap, pr
     ctx.fillText(text, lx, ly + 1);
     ctx.textBaseline = "alphabetic";
   }
-  for (const s of map.sweeps) {
+  // Only meaningful sweeps are drawn; weak grabs stay off the chart.
+  for (const s of map.sweeps.filter((x) => x.strength >= LIQ_MIN_DRAWN_SWEEP).slice(-4)) {
     const x0 = pr.x(s.fromT / 1000);
     const x1 = pr.x(s.t / 1000);
     const y = pr.y(s.level);
