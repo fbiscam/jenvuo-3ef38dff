@@ -482,7 +482,9 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
                   color: line.color,
                   lineWidth: (line.width ?? 1) as 1,
                   priceLineVisible: false,
-                  lastValueVisible: true,
+                  // Main-chart overlays (EMA/SMA/VWAP…) draw only the line —
+                  // no coloured price tag on the price panel.
+                  lastValueVisible: spec.pane !== "main",
                   crosshairMarkerVisible: false,
                   title: line.title,
                   lineStyle: line.dashed ? LineStyle.Dashed : LineStyle.Solid,

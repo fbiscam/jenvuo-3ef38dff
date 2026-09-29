@@ -60,7 +60,7 @@ import { useLivePriceStream } from "@/hooks/useLivePriceStream";
 // Buyer/seller pressure is shown on every chart timeframe.
 const PRESSURE_TIMEFRAMES = { has: (_key: string) => true };
 /** Fresh supply/demand zones are drawn only on these higher timeframes. */
-const SD_ZONE_TIMEFRAMES = new Set(["45m", "1h", "4h", "1d"]);
+const SD_ZONE_TIMEFRAMES = new Set(["30m", "45m", "1h", "4h", "1d"]);
 
 const MemoChart = memo(ChartCanvas);
 
@@ -141,6 +141,7 @@ const SMC_LABELS: Array<{ key: keyof SmcToggles; label: string; hint: string }> 
   { key: "pressure", label: "Buyer / seller pressure", hint: "Percentages and confirmed trade levels" },
   { key: "breaks", label: "BOS / CHoCH", hint: "Confirmed close-through breaks" },
   { key: "sdZones", label: "Fresh supply / demand", hint: "Zones from new swing highs and lows" },
+  { key: "sdPlan", label: "Zone Entry / SL / TP", hint: "Trade levels on the newest fresh zone" },
   { key: "liquidity", label: "Liquidity", hint: "Nearest buy-side / sell-side pools" },
   { key: "fvg", label: "Fair value gaps", hint: "Unmitigated and partial FVGs" },
   { key: "orderBlocks", label: "Order blocks", hint: "Strict demand / supply blocks" },

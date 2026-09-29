@@ -60,7 +60,7 @@ export type ZonePivot = Pick<StructurePivot, "index" | "t" | "price" | "kind" | 
 /** Confirmed swings need this much closed-body displacement to keep a zone. */
 export const SD_MIN_DISPLACEMENT_ATR = 0.5;
 /** Newest zones shown on the chart (both sides together). */
-export const SD_MAX_TOTAL = 3;
+export const SD_MAX_TOTAL = 4;
 /** Minimum clear gap between any two kept zones, in current ATR, so they never stack. */
 export const SD_MIN_GAP_ATR = 0.3;
 export const SD_EXTREME_LOOKBACK = 50;
