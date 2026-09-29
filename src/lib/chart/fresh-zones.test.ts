@@ -76,11 +76,15 @@ describe("computeFreshZones", () => {
     expect(z.strength >= 55).toBe(true);
   });
 
-  test("tested zone has no trade plan", () => {
+  test("the latest zone carries Entry/SL/TP even after price tested it", () => {
     const { bars, pivots } = series((i) => {
       const c = i < 30 ? 104 - (i - 20) * 0.4 : 104.5;
       return { o: c, h: i === 34 ? 105.5 : c + 0.2, l: c - 0.3, c };
     });
+    const [z] = computeFreshZones(bars, pivots);
+    expect(z.fresh).toBe(false);
+    expect(z.plan?.side).toBe("SELL");
+  });
     const [z] = computeFreshZones(bars, pivots);
     expect(z.fresh).toBe(false);
     expect(z.plan).toBe(undefined);
@@ -107,6 +111,7 @@ describe("computeFreshZones", () => {
       for (let b = a + 1; b < zones.length; b++)
         expect(zones[a].bottom > zones[b].top || zones[a].top < zones[b].bottom).toBe(true);
     // Entry / SL / TP only on one zone at most.
-    expect(zones.filter((z) => z.plan).length <= 1).toBe(true);
+    expect(zones.filter((z) => z.plan).length).toBe(1);
+    expect(zones[zones.length - 1].plan !== undefined).toBe(true);
   });
 });

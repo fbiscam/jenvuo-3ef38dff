@@ -194,17 +194,14 @@ export function computeFreshZones(
     // Once price trades back to the entry the zone is no longer fresh, so a
     // played-out trade never keeps its Entry/SL/TP lines; the zone itself stays.
 
-    let plan: SdTradePlan | undefined;
-    // Only STRONG / EXTREME fresh zones get trade levels; weak zones stay label-only.
-    if (fresh && grade !== "MODERATE") {
-      plan = {
-        side: supply ? "SELL" : "BUY",
-        entry: round(entry),
-        sl: round(sl),
-        tp1: round(tp1),
-        tp2: round(tp2),
-      };
-    }
+    // Every zone carries its levels; only the newest kept zone shows them.
+    const plan: SdTradePlan = {
+      side: supply ? "SELL" : "BUY",
+      entry: round(entry),
+      sl: round(sl),
+      tp1: round(tp1),
+      tp2: round(tp2),
+    };
 
     zones.push({
       type: supply ? "SUPPLY" : "DEMAND",
@@ -235,7 +232,7 @@ export function computeFreshZones(
     if (kept.length >= SD_MAX_TOTAL) break;
   }
   kept.sort((a, b) => a.t - b.t);
-  // Entry / SL / TP only on the single newest zone that has a plan.
-  const planned = [...kept].reverse().find((z) => z.plan);
-  return kept.map((z) => (z === planned || !z.plan ? z : { ...z, plan: undefined }));
+  // Entry / SL / TP always belong to the latest zone on the chart.
+  const newest = kept[kept.length - 1];
+  return kept.map((z) => (z === newest ? z : { ...z, plan: undefined }));
 }
