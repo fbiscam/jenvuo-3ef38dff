@@ -56,6 +56,7 @@ import { DemoTradingPanel, OrderTicket, PaperTradingPanel, QuickTradeButtons, us
 import { positionPnl, type DemoSide } from "@/lib/chart/demo-trading";
 import { buildLiveBars } from "@/lib/chart/live-candle";
 import { useLivePriceStream } from "@/hooks/useLivePriceStream";
+import { computeLiquidityTracker } from "@/lib/chart/liquidity-tracker";
 
 /** Buyer/seller reversal pressure is computed only on these decision timeframes. */
 // Buyer/seller pressure is shown on every chart timeframe.
@@ -337,6 +338,12 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
     const forming = last.time > lastClosedT ? last : null;
     return computeSmcOverlay(closed, last.close, forming, { useVolume: asset === "BTCUSD" });
   }, [bars, rawBars, stepSeconds, serverTime, asset]);
+  const liquidityTracker = useMemo(() => {
+    if (asset !== "XAUUSD" || timeframe.key !== "15m") return null;
+    const now = serverTime ?? Date.now();
+    const closed = rawBars.filter((bar) => (bar.time + stepSeconds) * 1000 <= now);
+    return computeLiquidityTracker(closed, { volumeReliable: false });
+  }, [asset, timeframe.key, rawBars, stepSeconds, serverTime]);
 
   // Next-candle projection removed from the chart.
   const projection = useMemo(
@@ -367,8 +374,8 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
   const onToolDone = useCallback(() => setTool("cursor"), []);
   const onHoverBar = useCallback((i: number | null) => setHoverIndex(i == null ? null : Math.round(i)), []);
 
-  const stateRef = useRef({ bars, stepSeconds, indicators, smc, smcToggles, drawings, drawingsVisible, selectedId, scriptRuns, timeframe, payload });
-  stateRef.current = { bars, stepSeconds, indicators, smc, smcToggles, drawings, drawingsVisible, selectedId, scriptRuns, timeframe, payload };
+  const stateRef = useRef({ bars, stepSeconds, indicators, smc, smcToggles, liquidityTracker, drawings, drawingsVisible, selectedId, scriptRuns, timeframe, payload });
+  stateRef.current = { bars, stepSeconds, indicators, smc, smcToggles, liquidityTracker, drawings, drawingsVisible, selectedId, scriptRuns, timeframe, payload };
 
   useImperativeHandle(ref, () => ({
     snapshot: () =>
@@ -391,6 +398,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
         indicators: s.indicators,
         smc: s.smc,
         smcToggles: s.smcToggles,
+        liquidityTracker: s.liquidityTracker,
         // Use the selected chart state, just like the visible overlay. The Gold
         // payload historically omitted its asset echo, which made the chart
         // show pressure while telling the AI that pressure was unavailable.
@@ -711,6 +719,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
               smc={smc}
               smcToggles={smcToggles}
               showSmcPressure={showSmcPressure}
+              liquidityTracker={liquidityTracker}
               projection={projection}
               demoPositions={demoTradingEnabled ? demoPositions : []}
               demoPrice={demoTradingEnabled && demoPositions.length ? currentPrice : null}
@@ -792,6 +801,33 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
                 </div>
               ))}
             </div>
+
+            {liquidityTracker && (
+              <aside
+                aria-label="15-minute liquidity tracker"
+                className="pointer-events-none absolute right-16 top-3 z-[3] w-52 border border-border bg-background/95 p-3 shadow-sm"
+              >
+                <p className="text-[10px] font-semibold uppercase text-muted-foreground">15M Liquidity Tracker</p>
+                <dl className="mt-2 space-y-2 text-xs">
+                  <div>
+                    <dt className="text-muted-foreground">Current Session State</dt>
+                    <dd className="mt-0.5 font-semibold text-foreground">{liquidityTracker.sessionState}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-muted-foreground">1H HTF Alignment</dt>
+                    <dd className={cn("mt-0.5 font-semibold", liquidityTracker.htfAlignment === "Bullish" ? "text-emerald-600" : liquidityTracker.htfAlignment === "Bearish" ? "text-red-600" : "text-foreground")}>
+                      {liquidityTracker.htfAlignment}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-muted-foreground">Volume Spike Ratio</dt>
+                    <dd className="mt-0.5 font-mono font-semibold text-foreground">
+                      {liquidityTracker.volumeSpikeRatio == null ? "N/A (spot feed)" : `${liquidityTracker.volumeSpikeRatio.toFixed(2)}×`}
+                    </dd>
+                  </div>
+                </dl>
+              </aside>
+            )}
 
             {demoTradingEnabled && ticketSide && (
               <div className="fixed inset-0 z-50 flex items-center justify-center overflow-hidden bg-transparent p-3" onClick={(e) => { if (e.target === e.currentTarget) setTicketSide(null); }}>

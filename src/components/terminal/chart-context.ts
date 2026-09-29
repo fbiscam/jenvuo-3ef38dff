@@ -2,6 +2,7 @@ import { describeDrawing, type Drawing } from "@/lib/chart/drawings";
 import { lastFinite, type OhlcvBar } from "@/lib/chart/indicators";
 import type { ScriptResult } from "@/lib/chart/jenvu-script";
 import type { SmcOverlay, SmcToggles } from "@/lib/chart/smc-overlay";
+import type { LiquidityTracker } from "@/lib/chart/liquidity-tracker";
 import { buildIndicatorSeries, type IndicatorId } from "./indicator-specs";
 
 const fmt = (t: number) => new Date(t * 1000).toISOString().slice(0, 16).replace("T", " ") + "Z";
@@ -19,6 +20,7 @@ export function buildChartContext(input: {
   indicators: IndicatorId[];
   smc: SmcOverlay | null;
   smcToggles: SmcToggles;
+  liquidityTracker?: LiquidityTracker | null;
   includePressure?: boolean;
   drawings: Drawing[];
   drawingsVisible: boolean;
@@ -120,6 +122,19 @@ export function buildChartContext(input: {
     lines.push(
       `Chart confirmed 10-bar liquidity: BSL ${input.smc.buySide.map((p) => p.toFixed(2)).join(", ") || "none"}; SSL ${input.smc.sellSide.map((p) => p.toFixed(2)).join(", ") || "none"}.`,
     );
+  }
+  if (input.liquidityTracker) {
+    const tracker = input.liquidityTracker;
+    const levels = tracker.levels.map((level) => `${level.kind} ${level.price.toFixed(2)}`).join(", ") || "none";
+    const latestSweep = tracker.sweeps.at(-1);
+    lines.push(
+      `15M session liquidity tracker: ${tracker.sessionState}; 1H alignment ${tracker.htfAlignment}; volume spike ratio ${tracker.volumeSpikeRatio == null ? "unavailable on the spot-Gold feed" : `${tracker.volumeSpikeRatio.toFixed(2)}x`}; locked levels ${levels}.`,
+    );
+    if (latestSweep) {
+      lines.push(
+        `Latest 15M liquidity hunt: ${latestSweep.session} ${latestSweep.direction} sweep of ${latestSweep.level} ${latestSweep.levelPrice.toFixed(2)} @ ${fmt(latestSweep.t / 1000)}; wick ${(latestSweep.wickRatio * 100).toFixed(0)}%; 1H confluence ${latestSweep.htfConfluence ? "yes" : "no"}; next-candle hold ${latestSweep.holdConfirmed ? "yes" : "no"}; MSS within three candles ${latestSweep.mssConfirmed ? "yes" : "no"}; high probability ${latestSweep.highProbability ? "yes" : "no"}.`,
+      );
+    }
   }
 
   const drawings = input.drawings.slice(-25);
