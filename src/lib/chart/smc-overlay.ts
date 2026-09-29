@@ -749,7 +749,7 @@ export function computeSmcOverlay(
     ...pivotsLabelled,
     ...livePivots,
   ], pressure, latestAtr, targetBuySide, targetSellSide);
-  const sdZones = computeFreshZones(fractalBars, fractal.pivots.filter((p) => p.label.length === 2 || p.label.length === 1));
+  const sdZones = computeFreshZones(fractalBars, fractal.pivots);
   return {
     reversal,
     pressure,
