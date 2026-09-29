@@ -191,9 +191,8 @@ export function computeFreshZones(
     const tp1 = supply ? entry - risk * 2 : entry + risk * 2;
     const tp2 = supply ? entry - risk * 3 : entry + risk * 3;
 
-    // A zone whose trade already played out (entry filled, then SL or final TP
-    // hit on closed candles) is finished and hides from the chart.
-    if (tradeFinished(bars, i + 2, last, supply, entry, sl, tp2)) continue;
+    // Once price trades back to the entry the zone is no longer fresh, so a
+    // played-out trade never keeps its Entry/SL/TP lines; the zone itself stays.
 
     let plan: SdTradePlan | undefined;
     // Only STRONG / EXTREME fresh zones get trade levels; weak zones stay label-only.
@@ -239,25 +238,4 @@ export function computeFreshZones(
   // Entry / SL / TP only on the single newest zone that has a plan.
   const planned = [...kept].reverse().find((z) => z.plan);
   return kept.map((z) => (z === planned || !z.plan ? z : { ...z, plan: undefined }));
-}
-
-/** Entry filled by a closed candle, then SL or TP2 reached (same candle counts). */
-function tradeFinished(
-  bars: Candle[],
-  from: number,
-  last: number,
-  supply: boolean,
-  entry: number,
-  sl: number,
-  tp2: number,
-): boolean {
-  let filled = false;
-  for (let k = from; k <= last; k++) {
-    const b = bars[k];
-    if (!b) break;
-    if (!filled) filled = supply ? b.h >= entry : b.l <= entry;
-    if (!filled) continue;
-    if (supply ? b.h >= sl || b.l <= tp2 : b.l <= sl || b.h >= tp2) return true;
-  }
-  return false;
 }

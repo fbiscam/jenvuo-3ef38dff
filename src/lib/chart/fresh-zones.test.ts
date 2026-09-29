@@ -109,14 +109,6 @@ describe("computeFreshZones", () => {
     // Entry / SL / TP only on one zone at most.
     expect(zones.filter((z) => z.plan).length <= 1).toBe(true);
   });
-
-  test("zone hides once its trade played out (entry filled, then SL hit)", () => {
-    const { bars, pivots } = series((i) => {
-      const c = 104 - (i - 20) * 0.4;
-      // Candle 34 wicks through entry and SL but closes back below the zone.
-      if (i === 34) return { o: 100, h: 107, l: 99.5, c: 100 };
-      return { o: c + 0.2, h: c + 0.5, l: c - 0.3, c };
-    });
     expect(computeFreshZones(bars, pivots)).toHaveLength(0);
   });
 });
