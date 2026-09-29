@@ -57,9 +57,10 @@ import { positionPnl, type DemoSide } from "@/lib/chart/demo-trading";
 import { buildLiveBars } from "@/lib/chart/live-candle";
 import { useLivePriceStream } from "@/hooks/useLivePriceStream";
 
-/** Buyer/seller reversal pressure is computed only on these decision timeframes. */
 // Buyer/seller pressure is shown on every chart timeframe.
 const PRESSURE_TIMEFRAMES = { has: (_key: string) => true };
+/** Fresh supply/demand zones are drawn only on these higher timeframes. */
+const SD_ZONE_TIMEFRAMES = new Set(["45m", "1h", "4h", "1d"]);
 
 const MemoChart = memo(ChartCanvas);
 
@@ -305,6 +306,11 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
   const payload = chartQuery.data;
   const pairLabel = asset === "BTCUSD" ? "BTC/USD" : "XAU/USD";
   const showSmcPressure = smcToggles.pressure && PRESSURE_TIMEFRAMES.has(timeframe.key) && (asset === "XAUUSD" || asset === "BTCUSD");
+  // The saved switch stays as the user set it; zones simply don't draw on lower timeframes.
+  const chartSmcToggles = useMemo<SmcToggles>(
+    () => ({ ...smcToggles, sdZones: smcToggles.sdZones && SD_ZONE_TIMEFRAMES.has(timeframe.key) }),
+    [smcToggles, timeframe.key],
+  );
   // Keep the last non-empty history for this pair/timeframe so a failed or
   // empty poll never blanks the chart.
   const lastGoodBarsRef = useRef<{ key: string; bars: OhlcvBar[] } | null>(null);
@@ -379,8 +385,8 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
   const onToolDone = useCallback(() => setTool("cursor"), []);
   const onHoverBar = useCallback((i: number | null) => setHoverIndex(i == null ? null : Math.round(i)), []);
 
-  const stateRef = useRef({ bars, stepSeconds, indicators, smc, smcToggles, drawings, drawingsVisible, selectedId, scriptRuns, timeframe, payload });
-  stateRef.current = { bars, stepSeconds, indicators, smc, smcToggles, drawings, drawingsVisible, selectedId, scriptRuns, timeframe, payload };
+  const stateRef = useRef({ bars, stepSeconds, indicators, smc, smcToggles: chartSmcToggles, drawings, drawingsVisible, selectedId, scriptRuns, timeframe, payload });
+  stateRef.current = { bars, stepSeconds, indicators, smc, smcToggles: chartSmcToggles, drawings, drawingsVisible, selectedId, scriptRuns, timeframe, payload };
 
   useImperativeHandle(ref, () => ({
     snapshot: () =>
@@ -721,7 +727,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
               indicators={indicators}
               scripts={chartScripts}
               smc={smc}
-              smcToggles={smcToggles}
+              smcToggles={chartSmcToggles}
               showSmcPressure={showSmcPressure}
               projection={projection}
               demoPositions={demoTradingEnabled ? demoPositions : []}

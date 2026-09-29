@@ -898,6 +898,7 @@ export function renderSmcOverlay(
     ctx.textBaseline = "alphabetic";
   };
 
+  const sdLabelRects: Array<{ x0: number; x1: number; y: number }> = [];
   // Same visual language as order blocks / FVGs: soft fill, solid edges to
   // the right, centred white label with coloured text.
   const sdZone = (z: SdZone, withPlan = false) => {
@@ -939,7 +940,12 @@ export function renderSmcOverlay(
     const planReserve = withPlan ? 150 : 0;
     let labelX = Math.min(pr.width - textWidth - 12 - planReserve, Math.max(x + 8, x + width / 2 - textWidth / 2));
     if (withPlan && labelX < x + 8) labelX = Math.max(8, x - textWidth - 14);
-    const labelY = y + height / 2;
+    // Keep zone labels from stacking on each other when zones sit close on screen.
+    const collides = (cy: number) =>
+      sdLabelRects.some((r) => Math.abs(r.y - cy) < 24 && labelX < r.x1 && labelX + textWidth > r.x0);
+    const candidates = [y + height / 2, y - 13, y + height + 13, y - 37, y + height + 37];
+    const labelY = candidates.find((cy) => !collides(cy)) ?? candidates[0];
+    sdLabelRects.push({ x0: labelX - 6, x1: labelX + textWidth + 6, y: labelY });
     ctx.fillStyle = "rgba(255,255,255,0.92)";
     ctx.beginPath();
     ctx.roundRect?.(labelX - 6, labelY - 11, textWidth + 12, 22, 4);
@@ -1007,12 +1013,10 @@ export function renderSmcOverlay(
 
   if (toggles.sdZones) {
     const zones = smc.sdZones ?? [];
-    // Plan lines only for the newest fresh zone on each side to keep the chart readable.
-    const newestFresh = (type: SdZone["type"]) =>
-      [...zones].reverse().find((z) => z.type === type && z.plan);
-    const planned = [newestFresh("SUPPLY"), newestFresh("DEMAND")].filter((z): z is SdZone => !!z);
-    for (const z of zones) sdZone(z, planned.includes(z));
-    for (const z of planned) sdPlan(z);
+    // Entry / SL / TP only for the single newest zone that has a plan.
+    const planned = [...zones].reverse().find((z) => z.plan);
+    for (const z of zones) sdZone(z, z === planned);
+    if (planned) sdPlan(planned);
   }
   if (toggles.fvg) {
     for (const gap of smc.fvgs) fairValueGap(gap);

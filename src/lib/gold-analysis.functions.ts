@@ -1187,10 +1187,17 @@ function finiteCandles(rows: Candle[], label: string): Candle[] {
 }
 
 async function fetchBinanceHostDeep(host: string, symbol: string, tf: string, limit: number) {
-  const rows: any[] = await fetchProxyJson(
-    `https://${host}/api/v3/klines?symbol=${symbol}&interval=${tf}&limit=${limit}`,
-    `Binance(${host})`,
-  );
+  const url = (n: number, endTime?: number) =>
+    `https://${host}/api/v3/klines?symbol=${symbol}&interval=${tf}&limit=${n}${endTime ? `&endTime=${endTime}` : ""}`;
+  let rows: any[] = await fetchProxyJson(url(Math.min(limit, 1000)), `Binance(${host})`);
+  // Aggregated timeframes (45m from 15m, 2H from 1H) need more than one page
+  // of source candles for a full history; page backwards with endTime.
+  while (limit > 1000 && rows.length > 0 && rows.length < limit) {
+    const oldest = +rows[0][0];
+    const older: any[] = await fetchProxyJson(url(Math.min(1000, limit - rows.length), oldest - 1), `Binance(${host})`).catch(() => []);
+    if (!Array.isArray(older) || !older.length) break;
+    rows = [...older, ...rows];
+  }
   return finiteCandles(
     rows.map((r) => ({ t: +r[0], o: +r[1], h: +r[2], l: +r[3], c: +r[4], v: +r[5] })),
     "Binance",
@@ -1434,8 +1441,8 @@ async function loadBtcTerminalChart(tf: string): Promise<TerminalChartPayload> {
   let provider = "Binance";
   try {
     candles = await Promise.any([
-      fetchBinanceHostDeep("data-api.binance.vision", "BTCUSDT", fetchTf, 1000),
-      fetchBinanceHostDeep("api.binance.com", "BTCUSDT", fetchTf, 1000),
+      fetchBinanceHostDeep("data-api.binance.vision", "BTCUSDT", fetchTf, tf === "45m" ? 3000 : 1000),
+      fetchBinanceHostDeep("api.binance.com", "BTCUSDT", fetchTf, tf === "45m" ? 3000 : 1000),
     ]);
   } catch {
     // Binance blocks some server regions — fall back to Coinbase (aggregated).
@@ -1496,7 +1503,10 @@ async function loadTerminalChart(tf: string, asset: TerminalAsset = "XAUUSD"): P
     // intraday endpoint currently returns no chart and, when it did answer, only
     // returned 200 bars. Mixing it with 1000-bar exchange fallbacks made short
     // timeframe history vary between refreshes and accounts.
-    const picked = await fetchGoldProxyDeepWithProvider(fetchTf, 1000);
+    // 45m / 2H are built from smaller candles, so fetch enough source candles
+    // for ~1000 finished bars of history.
+    const sourceLimit = tf === "45m" ? 3000 : tf === "2h" ? 2000 : 1000;
+    const picked = await fetchGoldProxyDeepWithProvider(fetchTf, sourceLimit);
     provider = picked.provider;
     candles = await scaleProxyToSpot(picked.candles);
   } catch (err) {
