@@ -70,17 +70,18 @@ export function computeFreshZones(
     if (!(atr > 0)) continue;
     const supply = p.kind === "high";
 
-    // Displacement: how far closed bodies travelled away from the swing.
+    // Displacement: how far closed bodies travelled away from the swing
+    // candle's body edge (wicks never count as displacement).
+    const bodyEdge = supply ? Math.max(swing.o, swing.c) : Math.min(swing.o, swing.c);
     const end = Math.min(last, i + displacementWindow);
-    let far = swing.c;
+    let far = bodyEdge;
     for (let k = i + 1; k <= end; k++) {
       far = supply ? Math.min(far, bars[k].c) : Math.max(far, bars[k].c);
     }
-    const displacementAtr = (supply ? p.price - far : far - p.price) / atr;
+    const displacementAtr = (supply ? bodyEdge - far : far - bodyEdge) / atr;
     if (displacementAtr < SD_MIN_DISPLACEMENT_ATR) continue;
 
     // Zone: swing candle body edge → wick extreme, sized between 0.25 and 1 ATR.
-    const bodyEdge = supply ? Math.max(swing.o, swing.c) : Math.min(swing.o, swing.c);
     let depth = Math.abs(p.price - bodyEdge);
     depth = Math.min(Math.max(depth, atr * 0.25), atr);
     const top = supply ? p.price : p.price + depth;
