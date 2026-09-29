@@ -1326,18 +1326,39 @@ export const GOLD_PROXY_PRIORITY = [
 ] as const;
 export type GoldProxyProvider = (typeof GOLD_PROXY_PRIORITY)[number];
 
+/**
+ * Thin-liquidity feeds return mostly flat bars (open = high = low = close) with
+ * long gaps, which renders as scattered dashes and giant jump candles on
+ * 1m/5m/15m. Score a feed by the share of real (ranged) bars so a thin feed is
+ * skipped in favour of the next priority provider.
+ */
+function goldFeedQuality(candles: Candle[]): number {
+  if (candles.length < 50) return 0;
+  const recent = candles.slice(-300);
+  const ranged = recent.filter((c) => c.h > c.l).length;
+  return ranged / recent.length;
+}
+const GOLD_FEED_MIN_QUALITY = 0.8;
+
 async function fetchGoldProxyDeepWithProvider(
   tf: string,
   limit: number,
 ): Promise<{ provider: GoldProxyProvider; candles: Candle[] }> {
   const errors: string[] = [];
+  let best: { provider: GoldProxyProvider; candles: Candle[]; q: number } | null = null;
+  const consider = (provider: GoldProxyProvider, candles: Candle[]) => {
+    const q = goldFeedQuality(candles);
+    if (!best || q > best.q) best = { provider, candles, q };
+    return q >= GOLD_FEED_MIN_QUALITY;
+  };
   // Both Binance hosts serve the identical order book, so racing them is safe.
   try {
     const candles = await Promise.any([
       fetchBinanceHostDeep("data-api.binance.vision", "PAXGUSDT", tf, limit),
       fetchBinanceHostDeep("api.binance.com", "PAXGUSDT", tf, limit),
     ]);
-    return { provider: "Binance", candles };
+    if (consider("Binance", candles)) return { provider: "Binance", candles };
+    errors.push("Binance thin feed");
   } catch (err) {
     const list = err instanceof AggregateError ? err.errors : [err];
     for (const e of list) errors.push(e instanceof Error ? e.message : String(e));
@@ -1359,11 +1380,15 @@ async function fetchGoldProxyDeepWithProvider(
   });
   for (const [name, p] of started) {
     try {
-      return { provider: name, candles: await p };
+      const candles = await p;
+      if (consider(name, candles)) return { provider: name, candles };
+      errors.push(`${name} thin feed`);
     } catch (e) {
       errors.push(e instanceof Error ? e.message : String(e));
     }
   }
+  const fallback = best as { provider: GoldProxyProvider; candles: Candle[]; q: number } | null;
+  if (fallback && fallback.q > 0) return { provider: fallback.provider, candles: fallback.candles };
   console.error("[gold-feed] all candle sources failed", tf, errors.join(" | "));
   throw new Error("Chart feed unavailable");
 }
