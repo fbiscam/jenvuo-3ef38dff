@@ -1,4 +1,5 @@
-import { describe, expect, test } from "bun:test";
+import { describe, it as test } from "node:test";
+import { expect } from "./test-expect";
 import { computeFreshZones } from "./fresh-zones";
 import type { StructurePivot } from "@/lib/analysis/market-structure-evidence";
 
