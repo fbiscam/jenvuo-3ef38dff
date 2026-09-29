@@ -332,6 +332,8 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
     const candles = candleRef.current;
     if (!candles) return;
     const { bars } = props;
+    // An empty refresh on the same timeframe must never wipe the candles on screen.
+    if (!bars.length && lastBarsRef.current) return;
     const insideBarIndexes = new Set<number>();
     for (const script of props.scripts) {
       for (const shape of script.result.shapes) {
@@ -385,8 +387,7 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
         }
       }
     }
-    if (!bars.length) return;
-    lastBarsRef.current = { first, len: bars.length };
+    lastBarsRef.current = bars.length ? { first, len: bars.length } : null;
     dirtyRef.current += 1;
   }, [props.bars, insideBarKey]); // eslint-disable-line react-hooks/exhaustive-deps
 

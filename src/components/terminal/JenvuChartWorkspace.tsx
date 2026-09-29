@@ -305,7 +305,18 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
   const payload = chartQuery.data;
   const pairLabel = asset === "BTCUSD" ? "BTC/USD" : "XAU/USD";
   const showSmcPressure = smcToggles.pressure && PRESSURE_TIMEFRAMES.has(timeframe.key) && (asset === "XAUUSD" || asset === "BTCUSD");
-  const rawBars: OhlcvBar[] = useMemo(() => payload?.bars ?? [], [payload]);
+  // Keep the last non-empty history for this pair/timeframe so a failed or
+  // empty poll never blanks the chart.
+  const lastGoodBarsRef = useRef<{ key: string; bars: OhlcvBar[] } | null>(null);
+  const rawBars: OhlcvBar[] = useMemo(() => {
+    const key = `${asset}:${timeframe.key}`;
+    const next = payload?.bars ?? [];
+    if (next.length) {
+      lastGoodBarsRef.current = { key, bars: next };
+      return next;
+    }
+    return lastGoodBarsRef.current?.key === key ? lastGoodBarsRef.current.bars : next;
+  }, [payload, asset, timeframe.key]);
   const livePrice = useLivePriceStream(asset, rawBars.at(-1)?.close ?? null);
   const stepSeconds = payload?.stepSeconds ?? 1800;
   const bars = useMemo(() => {
