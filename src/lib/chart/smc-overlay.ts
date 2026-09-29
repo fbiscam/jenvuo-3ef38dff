@@ -15,6 +15,10 @@ import {
 } from "@/lib/analysis/poi-evidence";
 import type { OhlcvBar } from "./indicators";
 import { computeFreshZones, type SdZone } from "./fresh-zones";
+import { computeLiquidityMap, type LiquidityMap } from "./liquidity-sweeps";
+
+/** Sweeps below this strength are not drawn. */
+const LIQ_MIN_DRAWN_SWEEP = 40;
 
 export const SMC_WINDOW = 150;
 /** HH/HL/LH/LL chart labels use a Fractals-style swing length of 10 bars each side. */
@@ -58,6 +62,8 @@ export type SmcOverlay = {
   reversal?: ReversalSignal | null;
   /** Fresh supply/demand zones anchored to confirmed swing highs/lows. */
   sdZones?: SdZone[];
+  /** Resting liquidity pools (next sweep targets) and confirmed sweeps. */
+  liquidityMap?: LiquidityMap;
 };
 
 export type ReversalSignal = {
@@ -180,6 +186,8 @@ export type SmcToggles = {
   sdZones: boolean;
   /** Entry / SL / TP lines on the newest fresh supply/demand zone. */
   sdPlan: boolean;
+  /** Liquidity sweep indicator: EQH/EQL pools, next sweep targets, sweeps. */
+  sweeps: boolean;
 };
 
 export const DEFAULT_SMC: SmcToggles = {
@@ -192,6 +200,7 @@ export const DEFAULT_SMC: SmcToggles = {
   projection: true,
   sdZones: true,
   sdPlan: true,
+  sweeps: true,
 };
 
 type Candle = { t: number; o: number; h: number; l: number; c: number; v?: number };
@@ -760,10 +769,12 @@ export function computeSmcOverlay(
     .map((p) => ({ index: idxOf.get(p.t) ?? -1, t: p.t, price: p.price, kind: p.kind, label: p.label, live: !p.confirmedByOpposite }))
     .filter((p) => p.index >= 0);
   const sdZones = computeFreshZones(all, [...fractal.pivots, ...liveZonePivots], fractalBars.length);
+  const liquidityMap = computeLiquidityMap(fractalBars, forming ? toCandle(forming) : null, fractal.pivots);
   return {
     reversal,
     pressure,
     sdZones,
+    liquidityMap,
     pivots: pivotsLabelled,
     livePivots,
     breaks: breaks.slice(-8),
@@ -1031,10 +1042,14 @@ export function renderSmcOverlay(
       ctx.fillStyle = color;
       ctx.fillText(`${label} ${price.toFixed(2)}`, pr.width * 0.55 + 4, above ? y - 5 : y + 15);
     };
-    smc.buySide.slice(0, 1).forEach((p) => liq(p, "BSL", "#089981", true));
-    smc.sellSide.slice(0, 1).forEach((p) => liq(p, "SSL", "#f23645", false));
+    // The sweep indicator already draws every pool — never draw them twice.
+    if (!toggles.sweeps) {
+      smc.buySide.slice(0, 1).forEach((p) => liq(p, "BSL", "#089981", true));
+      smc.sellSide.slice(0, 1).forEach((p) => liq(p, "SSL", "#f23645", false));
+    }
     ctx.setLineDash([]);
   }
+  if (toggles.sweeps && smc.liquidityMap) renderLiquidityMap(ctx, smc.liquidityMap, pr);
   if (toggles.breaks) {
     for (const b of smc.breaks) {
       const x0 = pr.x(b.fromT / 1000);
@@ -1244,3 +1259,104 @@ export function renderSmcOverlay(
 }
 
 export const REVERSAL_TRADE_MIN_PCT = 72;
+
+/** Liquidity sweep indicator: resting pools (next sweep targets) + sweeps. */
+function renderLiquidityMap(ctx: CanvasRenderingContext2D, map: LiquidityMap, pr: SmcProjector) {
+  const BSL = "#7c3aed";
+  const SSL = "#0891b2";
+  ctx.save();
+  const usedY: number[] = [];
+  const freeY = (y: number, dir: number) => {
+    let yy = y;
+    for (let n = 0; n < 6 && usedY.some((u) => Math.abs(u - yy) < 17); n++) yy += 17 * dir;
+    usedY.push(yy);
+    return yy;
+  };
+  for (const pool of map.pools) {
+    const y = pr.y(pool.level);
+    if (y == null || y < -20 || y > pr.height + 20) continue;
+    const color = pool.side === "BSL" ? BSL : SSL;
+    const x0 = pr.x(pool.t / 1000);
+    const start = Math.max(0, x0 ?? 0);
+    ctx.strokeStyle = color;
+    ctx.globalAlpha = pool.next ? 1 : 0.7;
+    ctx.lineWidth = pool.next ? 2 : 1;
+    ctx.setLineDash(pool.next ? [8, 4] : [3, 4]);
+    ctx.beginPath();
+    ctx.moveTo(start, y);
+    ctx.lineTo(pr.width, y);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = color;
+    for (const touch of pool.touches) {
+      const tx = pr.x(touch.t / 1000);
+      const ty = pr.y(touch.price);
+      if (tx == null || ty == null || tx < 0 || tx > pr.width) continue;
+      ctx.beginPath();
+      ctx.arc(tx, ty, 3, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    const eq = pool.count > 1 ? ` · ${pool.side === "BSL" ? "EQH" : "EQL"}×${pool.count}` : "";
+    const head = pool.taking ? "SWEEPING " : pool.next ? "NEXT SWEEP · " : "";
+    const text = `${head}${pool.side} ${pool.level.toFixed(2)}${eq} · ${pool.score}%`;
+    ctx.font = `${pool.next || pool.taking ? 700 : 600} 11px 'JetBrains Mono', ui-monospace, monospace`;
+    const tw = ctx.measureText(text).width;
+    const up = pool.side === "BSL";
+    const ly = freeY(up ? y - 10 : y + 10, up ? -1 : 1);
+    const lx = Math.max(4, pr.width - tw - 110);
+    if (pool.next || pool.taking) {
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.roundRect?.(lx - 5, ly - 8, tw + 10, 16, 3);
+      if (!ctx.roundRect) ctx.rect(lx - 5, ly - 8, tw + 10, 16);
+      ctx.fill();
+      ctx.fillStyle = "#ffffff";
+    } else {
+      ctx.fillStyle = "rgba(255,255,255,0.9)";
+      ctx.fillRect(lx - 3, ly - 8, tw + 6, 16);
+      ctx.fillStyle = color;
+    }
+    ctx.textBaseline = "middle";
+    ctx.fillText(text, lx, ly + 1);
+    ctx.textBaseline = "alphabetic";
+  }
+  // Only meaningful sweeps are drawn; weak grabs stay off the chart.
+  for (const s of map.sweeps.filter((x) => x.strength >= LIQ_MIN_DRAWN_SWEEP).slice(-4)) {
+    const x0 = pr.x(s.fromT / 1000);
+    const x1 = pr.x(s.t / 1000);
+    const y = pr.y(s.level);
+    const yx = pr.y(s.extreme);
+    if (x0 == null || x1 == null || y == null || yx == null) continue;
+    if (x1 < 0 || x0 > pr.width) continue;
+    // BSL sweep is bearish (sellers took the highs), SSL sweep is bullish.
+    const color = s.side === "BSL" ? "#f23645" : "#089981";
+    ctx.strokeStyle = color;
+    ctx.lineWidth = s.strong ? 1.75 : 1.1;
+    ctx.setLineDash(s.confirmed ? [] : [4, 3]);
+    ctx.beginPath();
+    ctx.moveTo(Math.max(0, x0), y);
+    ctx.lineTo(Math.min(pr.width, x1), y);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    // X at the wick tip that grabbed the liquidity.
+    const r = 4;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(x1 - r, yx - r);
+    ctx.lineTo(x1 + r, yx + r);
+    ctx.moveTo(x1 + r, yx - r);
+    ctx.lineTo(x1 - r, yx + r);
+    ctx.stroke();
+    ctx.font = "700 10px 'JetBrains Mono', ui-monospace, monospace";
+    const text = `${s.strong ? "STRONG " : ""}${s.side} SWEEP${s.count > 1 ? ` ×${s.count}` : ""} ${s.strength}%${s.confirmed ? "" : " · pending"}`;
+    const tw = ctx.measureText(text).width;
+    const lx = Math.max(2, x1 - tw - 8);
+    const ly = s.side === "BSL" ? y + 12 : y - 5;
+    ctx.fillStyle = "rgba(255,255,255,0.9)";
+    ctx.fillRect(lx - 2, ly - 9, tw + 4, 12);
+    ctx.fillStyle = color;
+    ctx.fillText(text, lx, ly);
+  }
+  ctx.restore();
+}
