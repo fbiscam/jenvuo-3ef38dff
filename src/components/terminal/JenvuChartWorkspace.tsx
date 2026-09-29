@@ -140,7 +140,7 @@ const SMC_LABELS: Array<{ key: keyof SmcToggles; label: string; hint: string }> 
   { key: "pressure", label: "Buyer / seller pressure", hint: "Percentages and confirmed trade levels" },
   { key: "breaks", label: "BOS / CHoCH", hint: "Confirmed close-through breaks" },
   { key: "liquidity", label: "Liquidity", hint: "Nearest buy-side / sell-side pools" },
-  { key: "liquiditySweeps", label: "Liquidity candles", hint: "Dark blue = buyer sweep, dark orange = seller sweep" },
+  { key: "liquiditySweeps", label: "Liquidity candles", hint: "Green dot above = buyer liquidity, red dot below = seller liquidity" },
   { key: "fvg", label: "Fair value gaps", hint: "Unmitigated and partial FVGs" },
   { key: "orderBlocks", label: "Order blocks", hint: "Strict demand / supply blocks" },
 ];

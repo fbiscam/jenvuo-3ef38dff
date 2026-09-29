@@ -6,8 +6,8 @@
  *    in the pool until they are taken.
  * 2. A candle "grabs liquidity" when its wick trades beyond an untaken level but
  *    the candle CLOSES back inside it:
- *      - wick below a swing low, close above it  -> buyer liquidity (dark blue)
- *      - wick above a swing high, close below it -> seller liquidity (dark orange)
+ *      - wick below a swing low, close above it  -> buyer liquidity
+ *      - wick above a swing high, close below it -> seller liquidity
  * 3. A level is removed once swept or once a candle body closes through it, so
  *    each level can only produce one liquidity candle.
  * Pure price logic (no feed-specific volume), so every account sees the same.
@@ -15,7 +15,7 @@
 export type LiquidityBar = { time: number; open: number; high: number; low: number; close: number; volume?: number };
 export type LiquidityKind = "buyer" | "seller";
 
-export const LIQUIDITY_COLORS = { buyer: "#1E3A8A", seller: "#C2410C" } as const;
+export const LIQUIDITY_MARKER_COLORS = { buyer: "#16A34A", seller: "#DC2626" } as const;
 
 type Level = { price: number; index: number };
 
