@@ -100,7 +100,13 @@ describe("computeFreshZones", () => {
       pivots.push({ index: i, confirmedIndex: i + 10, t: i * 60_000, price: 201 + i, kind: "high", label: "HH" });
     }
     const zones = computeFreshZones(bars, pivots);
-    expect(zones.length <= 5).toBe(true);
+    expect(zones.length <= 3).toBe(true);
     expect(zones[zones.length - 1].t).toBe(pivots[pivots.length - 1].t);
+    // Zones never stack on each other.
+    for (let a = 0; a < zones.length; a++)
+      for (let b = a + 1; b < zones.length; b++)
+        expect(zones[a].bottom > zones[b].top || zones[a].top < zones[b].bottom).toBe(true);
+    // Entry / SL / TP only on one zone at most.
+    expect(zones.filter((z) => z.plan).length <= 1).toBe(true);
   });
 });
