@@ -938,7 +938,11 @@ export function renderSmcOverlay(
     // Start past the swing badge (centred on the swing candle, ~92px wide) so they never collide.
     const bx = Math.min(pr.width - boxW - 70, x + 54);
     if (bx >= 0) {
-      const by = supply ? y - 20 : y + height + 2;
+      // Near the right edge the label can't clear the swing badge horizontally,
+      // so flip it to the zone's inner side (below supply, above demand).
+      const flipped = bx < x + 54;
+      const outside = supply ? !flipped : flipped;
+      const by = outside ? y - 20 : y + height + 2;
       const clampedY = Math.max(2, Math.min(pr.height - 20, by));
       ctx.fillStyle = edge;
       ctx.beginPath();
