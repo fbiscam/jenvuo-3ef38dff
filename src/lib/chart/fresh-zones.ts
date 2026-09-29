@@ -184,18 +184,26 @@ export function computeFreshZones(
     });
 
     const fresh = touches === 0;
+    // Limit-order levels: entry at the proximal edge, SL beyond the extreme.
+    const entry = supply ? bottom : top;
+    const sl = supply ? p.price + atr * SD_SL_BUFFER_ATR : p.price - atr * SD_SL_BUFFER_ATR;
+    const risk = Math.abs(entry - sl);
+    const tp1 = supply ? entry - risk * 2 : entry + risk * 2;
+    const tp2 = supply ? entry - risk * 3 : entry + risk * 3;
+
+    // A zone whose trade already played out (entry filled, then SL or final TP
+    // hit on closed candles) is finished and hides from the chart.
+    if (tradeFinished(bars, i + 2, last, supply, entry, sl, tp2)) continue;
+
     let plan: SdTradePlan | undefined;
     // Only STRONG / EXTREME fresh zones get trade levels; weak zones stay label-only.
     if (fresh && grade !== "MODERATE") {
-      const entry = supply ? bottom : top;
-      const sl = supply ? p.price + atr * SD_SL_BUFFER_ATR : p.price - atr * SD_SL_BUFFER_ATR;
-      const risk = Math.abs(entry - sl);
       plan = {
         side: supply ? "SELL" : "BUY",
         entry: round(entry),
         sl: round(sl),
-        tp1: round(supply ? entry - risk * 2 : entry + risk * 2),
-        tp2: round(supply ? entry - risk * 3 : entry + risk * 3),
+        tp1: round(tp1),
+        tp2: round(tp2),
       };
     }
 
@@ -219,11 +227,17 @@ export function computeFreshZones(
 
   // Newest first; newer zones win any overlap (same or opposite type). A zone
   // must also sit a clear gap away from every kept zone, so none ever stack.
+  // A newer demand zone printed above an older demand zone (or a newer supply
+  // below an older supply) replaces the older one.
   zones.sort((a, b) => b.t - a.t);
   const gap = Math.max(0, atrAt(bars, Math.max(1, last))) * SD_MIN_GAP_ATR;
   const kept: SdZone[] = [];
   for (const z of zones) {
     if (kept.some((k) => z.bottom - gap < k.top && z.top + gap > k.bottom)) continue;
+    const superseded = kept.some((k) =>
+      k.type !== z.type ? false : z.type === "DEMAND" ? k.bottom >= z.top : k.top <= z.bottom,
+    );
+    if (superseded) continue;
     kept.push(z);
     if (kept.length >= SD_MAX_TOTAL) break;
   }
@@ -231,4 +245,25 @@ export function computeFreshZones(
   // Entry / SL / TP only on the single newest zone that has a plan.
   const planned = [...kept].reverse().find((z) => z.plan);
   return kept.map((z) => (z === planned || !z.plan ? z : { ...z, plan: undefined }));
+}
+
+/** Entry filled by a closed candle, then SL or TP2 reached (same candle counts). */
+function tradeFinished(
+  bars: Candle[],
+  from: number,
+  last: number,
+  supply: boolean,
+  entry: number,
+  sl: number,
+  tp2: number,
+): boolean {
+  let filled = false;
+  for (let k = from; k <= last; k++) {
+    const b = bars[k];
+    if (!b) break;
+    if (!filled) filled = supply ? b.h >= entry : b.l <= entry;
+    if (!filled) continue;
+    if (supply ? b.h >= sl || b.l <= tp2 : b.l <= sl || b.h >= tp2) return true;
+  }
+  return false;
 }
