@@ -173,7 +173,6 @@ export type SmcToggles = {
   fvg: boolean;
   orderBlocks: boolean;
   liquidity: boolean;
-  liquiditySweeps: boolean;
   projection: boolean;
 };
 
@@ -184,7 +183,6 @@ export const DEFAULT_SMC: SmcToggles = {
   fvg: false,
   orderBlocks: false,
   liquidity: true,
-  liquiditySweeps: true,
   projection: true,
 };
 

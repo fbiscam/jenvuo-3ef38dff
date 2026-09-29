@@ -1,4 +1,3 @@
-import { detectLiquidityCandles, LIQUIDITY_MARKER_COLORS } from "@/lib/chart/liquidity-candles";
 import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
 import {
   CandlestickSeries,
@@ -96,10 +95,6 @@ type Props = {
   resetKey: string;
   theme?: ChartTheme;
 };
-
-// Closed candles only: the forming (last) candle never receives a liquidity
-// marker, so a live tick cannot make a signal appear and then disappear.
-const liquidityFor = (bars: Props["bars"]) => detectLiquidityCandles(bars.slice(0, -1));
 
 const uid = () => `d-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`;
 
@@ -354,7 +349,9 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
         low: b.low,
         close: b.close,
       };
-      const color = insideBarIndexes.has(index) ? CHART_COLORS.insideBarCandle : null;
+      const color = insideBarIndexes.has(index)
+        ? CHART_COLORS.insideBarCandle
+        : null;
       if (!color) return base;
       return { ...base, color, borderColor: color, wickColor: color };
     });
@@ -373,7 +370,7 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
     }
     lastBarsRef.current = { first, len: bars.length };
     dirtyRef.current += 1;
-  }, [props.bars, insideBarKey, props.smcToggles.liquiditySweeps]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [props.bars, insideBarKey]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ------------------------------------------------- scenario ghost candles
   useEffect(() => {
@@ -567,19 +564,6 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
       });
     }
     const markers: SeriesMarker<Time>[] = [];
-    if (propsRef.current.smcToggles.liquiditySweeps) {
-      for (const [index, kind] of liquidityFor(bars)) {
-        const bar = bars[index];
-        if (!bar) continue;
-        markers.push({
-          time: bar.time as UTCTimestamp,
-          position: kind === "buyer" ? "aboveBar" : "belowBar",
-          color: LIQUIDITY_MARKER_COLORS[kind],
-          shape: "circle",
-          size: 1.5,
-        });
-      }
-    }
     for (const script of scripts) {
       for (const shape of script.result.shapes) {
         // Inside bars are shown only as yellow candles — no dot or "IB" text.
@@ -631,7 +615,7 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
     indicatorUpdateRef.current();
     applyScriptData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [props.bars, props.scripts, props.smcToggles.liquiditySweeps]);
+  }, [props.bars, props.scripts]);
 
   // ------------------------------------------------------------- overlay loop
   useEffect(() => {
