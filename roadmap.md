@@ -190,3 +190,4 @@
 - [x] Instant supply/demand zones on every swing label (OB/FVG style) + stop candles vanishing on refresh
 - [x] Stronger supply/demand: strength grade + extreme level, entry/SL/TP1/TP2 on fresh zones, only newest 5 zones shown
 - [x] Supply/demand: newest 3 zones, no stacking, one Entry/SL/TP, only 45m/1H/4H/1D; deeper 45m history
+- [x] Zones: plain SUPPLY/DEMAND labels, newer same-side zone replaces older, finished trades hide; chart timescale crash guard
