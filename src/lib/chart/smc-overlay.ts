@@ -715,6 +715,18 @@ export function computeSmcOverlay(
       invalidated,
     });
     buy = high ? 0.5 - strength : 0.5 + strength;
+    // Failed reversal: if closed candles in the window moved AGAINST the swing
+    // (market kept rising after a high / kept falling after a low) the
+    // opposite side is in control. Show that side instead of a misleading
+    // reversal-side majority. Capped at 70% so it never reaches the 72% gate.
+    const closedEnd = Math.min(end, fractalBars.length - 1);
+    const netSigned = closedEnd > i ? all[closedEnd].c - piv.c : 0;
+    const againstMove = high ? netSigned : -netSigned;
+    if (invalidated || (againstMove > 0 && agree <= 0)) {
+      const againstAtr = localAtr > 0 ? clamp01(againstMove / (2 * localAtr)) : 0;
+      const counter = Math.min(0.2, 0.04 + 0.14 * againstAtr + (invalidated ? 0.04 : 0));
+      buy = high ? 0.5 + counter : 0.5 - counter;
+    }
     pressure[t] = Math.round(clamp01(buy) * 100);
   };
   for (const p of pivotsLabelled) legFor(p.t, p.kind);
