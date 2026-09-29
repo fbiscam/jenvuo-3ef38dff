@@ -30,7 +30,6 @@ import type { OhlcvBar } from "@/lib/chart/indicators";
 import type { CandleProjection } from "@/lib/chart/projection";
 import type { ScriptResult } from "@/lib/chart/jenvu-script";
 import type { DemoPosition } from "@/lib/chart/demo-trading";
-import { renderLiquidityTracker, type LiquidityTracker } from "@/lib/chart/liquidity-tracker";
 import { DemoOrderOverlay, type DemoOrderActions } from "./DemoOrderOverlay";
 import { buildIndicatorSeries, type IndicatorId } from "./indicator-specs";
 
@@ -79,7 +78,6 @@ type Props = {
   smc: SmcOverlay | null;
   smcToggles: SmcToggles;
   showSmcPressure?: boolean;
-  liquidityTracker?: LiquidityTracker | null;
   projection: CandleProjection | null;
   demoPositions: DemoPosition[];
   demoPrice?: number | null;
@@ -343,9 +341,6 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
         }
       }
     }
-    const sweepByTime = new Map(
-      (props.liquidityTracker?.sweeps ?? []).map((sweep) => [sweep.t / 1000, sweep]),
-    );
     const data = bars.map((b, index) => {
       const base = {
         time: b.time as UTCTimestamp,
@@ -354,14 +349,9 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
         low: b.low,
         close: b.close,
       };
-      const sweep = sweepByTime.get(b.time);
-      const color = sweep
-        ? sweep.highProbability
-          ? sweep.direction === "bullish" ? "#059669" : "#dc2626"
-          : "#f59e0b"
-        : insideBarIndexes.has(index)
-          ? CHART_COLORS.insideBarCandle
-          : null;
+      const color = insideBarIndexes.has(index)
+        ? CHART_COLORS.insideBarCandle
+        : null;
       if (!color) return base;
       return { ...base, color, borderColor: color, wickColor: color };
     });
@@ -380,7 +370,7 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
     }
     lastBarsRef.current = { first, len: bars.length };
     dirtyRef.current += 1;
-  }, [props.bars, props.liquidityTracker, insideBarKey]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [props.bars, insideBarKey]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ------------------------------------------------- scenario ghost candles
   useEffect(() => {
@@ -664,7 +654,6 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
       // Pressure is opt-in so unsupported pairs/timeframes can never inherit it
       // when a caller omits the flag.
       if (p.smc) renderSmcOverlay(ctx, p.smc, p.smcToggles, pr, p.showSmcPressure ?? false);
-      if (p.liquidityTracker && p.smcToggles.liquidity) renderLiquidityTracker(ctx, p.liquidityTracker, pr);
       ctx.save();
       ctx.font = "600 10px 'DM Sans', system-ui, sans-serif";
       ctx.textAlign = "center";
@@ -682,7 +671,7 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
 
   useEffect(() => {
     dirtyRef.current += 1;
-  }, [props.drawings, props.selectedId, props.smc, props.smcToggles, props.liquidityTracker, props.drawingsVisible]);
+  }, [props.drawings, props.selectedId, props.smc, props.smcToggles, props.drawingsVisible]);
 
   useEffect(() => {
     pendingRef.current = null;

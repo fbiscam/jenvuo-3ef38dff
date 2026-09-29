@@ -164,7 +164,6 @@
 - [x] Verify the email, trial-expiry, and current TypeScript behavior
 
 - [ ] Replace three public automation keys with the private scheduler secret (blocked: managed secret access denied during schedule migration)
-- [x] Add the deterministic 15M XAU/USD session liquidity tracker with locked Asia levels, sweep candles, 1H confluence, MSS validation, and chart status panel
 - [x] Audit all pages, APIs, Google Search Console visibility, and the complete Terminal flow
 - [x] Restore the Founding confirmation popup as a proper embedded form block matching its original layout
 - [x] Show only the strongest untouched demand, supply, and directional FVG zones without same-side overlap
