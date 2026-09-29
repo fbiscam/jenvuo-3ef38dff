@@ -139,6 +139,7 @@ const SMC_LABELS: Array<{ key: keyof SmcToggles; label: string; hint: string }> 
   { key: "structure", label: "Swing structure", hint: "HH / HL / LH / LL labels" },
   { key: "pressure", label: "Buyer / seller pressure", hint: "Percentages and confirmed trade levels" },
   { key: "breaks", label: "BOS / CHoCH", hint: "Confirmed close-through breaks" },
+  { key: "sdZones", label: "Fresh supply / demand", hint: "Zones from new swing highs and lows" },
   { key: "liquidity", label: "Liquidity", hint: "Nearest buy-side / sell-side pools" },
   { key: "fvg", label: "Fair value gaps", hint: "Unmitigated and partial FVGs" },
   { key: "orderBlocks", label: "Order blocks", hint: "Strict demand / supply blocks" },

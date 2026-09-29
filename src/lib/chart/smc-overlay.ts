@@ -14,6 +14,7 @@ import {
   type OrderBlockZone,
 } from "@/lib/analysis/poi-evidence";
 import type { OhlcvBar } from "./indicators";
+import { computeFreshZones, type SdZone } from "./fresh-zones";
 
 export const SMC_WINDOW = 150;
 /** HH/HL/LH/LL chart labels use a Fractals-style swing length of 10 bars each side. */
@@ -55,6 +56,8 @@ export type SmcOverlay = {
   pressure?: Record<number, number>;
   /** Latest reversal setup at the newest swing (alert → confirmed → cancelled). */
   reversal?: ReversalSignal | null;
+  /** Fresh supply/demand zones anchored to confirmed swing highs/lows. */
+  sdZones?: SdZone[];
 };
 
 export type ReversalSignal = {
@@ -174,6 +177,7 @@ export type SmcToggles = {
   orderBlocks: boolean;
   liquidity: boolean;
   projection: boolean;
+  sdZones: boolean;
 };
 
 export const DEFAULT_SMC: SmcToggles = {
@@ -184,6 +188,7 @@ export const DEFAULT_SMC: SmcToggles = {
   orderBlocks: false,
   liquidity: true,
   projection: true,
+  sdZones: true,
 };
 
 type Candle = { t: number; o: number; h: number; l: number; c: number; v?: number };
@@ -744,9 +749,11 @@ export function computeSmcOverlay(
     ...pivotsLabelled,
     ...livePivots,
   ], pressure, latestAtr, targetBuySide, targetSellSide);
+  const sdZones = computeFreshZones(fractalBars, fractal.pivots);
   return {
     reversal,
     pressure,
+    sdZones,
     pivots: pivotsLabelled,
     livePivots,
     breaks: breaks.slice(-8),
@@ -884,6 +891,79 @@ export function renderSmcOverlay(
     ctx.textBaseline = "alphabetic";
   };
 
+  const sdZone = (z: SdZone) => {
+    const x0 = pr.x(z.t / 1000);
+    const topY = pr.y(z.top);
+    const bottomY = pr.y(z.bottom);
+    if (x0 == null || topY == null || bottomY == null) return;
+    if (x0 > pr.width) return;
+    const supply = z.type === "SUPPLY";
+    const x = Math.max(0, x0);
+    const width = Math.max(1, pr.width - x);
+    const y = Math.min(topY, bottomY);
+    const height = Math.max(3, Math.abs(bottomY - topY));
+    const edge = supply ? "#e5484d" : "#12a594";
+    const alpha = z.fresh ? 0.16 : 0.08;
+    ctx.save();
+    ctx.fillStyle = supply ? `rgba(229,72,77,${alpha})` : `rgba(18,165,148,${alpha})`;
+    ctx.fillRect(x, y, width, height);
+    // Solid edge on the side price must break; dashed on the inner edge.
+    ctx.strokeStyle = edge;
+    ctx.lineWidth = z.fresh ? 1.5 : 1;
+    ctx.setLineDash([]);
+    ctx.beginPath();
+    const outerY = supply ? y : y + height;
+    const innerY = supply ? y + height : y;
+    ctx.moveTo(x, outerY);
+    ctx.lineTo(pr.width, outerY);
+    ctx.stroke();
+    ctx.setLineDash([4, 3]);
+    ctx.beginPath();
+    ctx.moveTo(x, innerY);
+    ctx.lineTo(pr.width, innerY);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    // Anchor tick on the swing candle.
+    if (x0 >= 0) {
+      ctx.fillStyle = edge;
+      ctx.fillRect(x0 - 1, y, 2, height);
+    }
+    const name = `${z.fresh ? "FRESH " : ""}${supply ? "SUPPLY" : "DEMAND"}`;
+    const meta = z.fresh ? `${z.label} · ${z.displacementAtr > 5 ? ">5" : z.displacementAtr}×ATR` : `${z.label} · tested ${z.touches}×`;
+    ctx.font = "700 11px 'JetBrains Mono', ui-monospace, monospace";
+    const nameW = ctx.measureText(name).width;
+    ctx.font = "500 10px 'JetBrains Mono', ui-monospace, monospace";
+    const metaW = ctx.measureText(meta).width;
+    const boxW = nameW + metaW + 22;
+    // Start past the swing badge (centred on the swing candle, ~92px wide) so they never collide.
+    const bx = Math.min(pr.width - boxW - 70, x + 54);
+    if (bx >= 0) {
+      // Near the right edge the label can't clear the swing badge horizontally,
+      // so flip it to the zone's inner side (below supply, above demand).
+      const flipped = bx < x + 54;
+      const outside = supply ? !flipped : flipped;
+      const by = outside ? y - 20 : y + height + 2;
+      const clampedY = Math.max(2, Math.min(pr.height - 20, by));
+      ctx.fillStyle = edge;
+      ctx.beginPath();
+      ctx.roundRect?.(bx, clampedY, boxW, 18, 4);
+      if (!ctx.roundRect) ctx.rect(bx, clampedY, boxW, 18);
+      ctx.fill();
+      ctx.fillStyle = "#ffffff";
+      ctx.textBaseline = "middle";
+      ctx.font = "700 11px 'JetBrains Mono', ui-monospace, monospace";
+      ctx.fillText(name, bx + 7, clampedY + 9.5);
+      ctx.font = "500 10px 'JetBrains Mono', ui-monospace, monospace";
+      ctx.globalAlpha = 0.9;
+      ctx.fillText(meta, bx + 15 + nameW, clampedY + 9.5);
+      ctx.textBaseline = "alphabetic";
+    }
+    ctx.restore();
+  };
+
+  if (toggles.sdZones) {
+    for (const z of smc.sdZones ?? []) sdZone(z);
+  }
   if (toggles.fvg) {
     for (const gap of smc.fvgs) fairValueGap(gap);
   }
