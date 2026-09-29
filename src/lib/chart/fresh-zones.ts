@@ -227,17 +227,11 @@ export function computeFreshZones(
 
   // Newest first; newer zones win any overlap (same or opposite type). A zone
   // must also sit a clear gap away from every kept zone, so none ever stack.
-  // A newer demand zone printed above an older demand zone (or a newer supply
-  // below an older supply) replaces the older one.
   zones.sort((a, b) => b.t - a.t);
   const gap = Math.max(0, atrAt(bars, Math.max(1, last))) * SD_MIN_GAP_ATR;
   const kept: SdZone[] = [];
   for (const z of zones) {
     if (kept.some((k) => z.bottom - gap < k.top && z.top + gap > k.bottom)) continue;
-    const superseded = kept.some((k) =>
-      k.type !== z.type ? false : z.type === "DEMAND" ? k.bottom >= z.top : k.top <= z.bottom,
-    );
-    if (superseded) continue;
     kept.push(z);
     if (kept.length >= SD_MAX_TOTAL) break;
   }

@@ -119,17 +119,4 @@ describe("computeFreshZones", () => {
     });
     expect(computeFreshZones(bars, pivots)).toHaveLength(0);
   });
-
-  test("a newer demand zone above an older one replaces it", () => {
-    const bars = [] as ReturnType<typeof bar>[];
-    for (let i = 0; i < 45; i++) bars.push(bar(i, 100, 100.3, 99.7, 100));
-    bars[22] = bar(22, 100, 100.3, 95, 99.8);
-    bars[32] = bar(32, 100, 100.3, 99, 99.9);
-    const zones = computeFreshZones(bars, [
-      { index: 22, t: 22 * 60_000, price: 95, kind: "low", label: "LL", live: true },
-      { index: 32, t: 32 * 60_000, price: 99, kind: "low", label: "HL", live: true },
-    ]);
-    expect(zones).toHaveLength(1);
-    expect(zones[0].t).toBe(32 * 60_000);
-  });
 });
