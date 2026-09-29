@@ -1,3 +1,4 @@
+import { detectLiquidityCandles, LIQUIDITY_COLORS } from "@/lib/chart/liquidity-candles";
 import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
 import {
   CandlestickSeries,
@@ -95,6 +96,10 @@ type Props = {
   resetKey: string;
   theme?: ChartTheme;
 };
+
+// Closed candles only: the forming (last) candle is never coloured, so a live
+// tick cannot make a liquidity candle appear and then disappear.
+const liquidityFor = (bars: Props["bars"]) => detectLiquidityCandles(bars.slice(0, -1));
 
 const uid = () => `d-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`;
 
@@ -341,6 +346,7 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
         }
       }
     }
+    const sweeps = props.smcToggles.liquiditySweeps ? liquidityFor(bars) : null;
     const data = bars.map((b, index) => {
       const base = {
         time: b.time as UTCTimestamp,
@@ -349,9 +355,12 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
         low: b.low,
         close: b.close,
       };
-      const color = insideBarIndexes.has(index)
-        ? CHART_COLORS.insideBarCandle
-        : null;
+      const sweep = sweeps?.get(index);
+      const color = sweep
+        ? LIQUIDITY_COLORS[sweep]
+        : insideBarIndexes.has(index)
+          ? CHART_COLORS.insideBarCandle
+          : null;
       if (!color) return base;
       return { ...base, color, borderColor: color, wickColor: color };
     });
@@ -370,7 +379,7 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
     }
     lastBarsRef.current = { first, len: bars.length };
     dirtyRef.current += 1;
-  }, [props.bars, insideBarKey]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [props.bars, insideBarKey, props.smcToggles.liquiditySweeps]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ------------------------------------------------- scenario ghost candles
   useEffect(() => {
@@ -581,6 +590,18 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
         }
       }
     }
+    if (propsRef.current.smcToggles.liquiditySweeps) {
+      for (const [i, kind] of liquidityFor(bars)) {
+        const bar = bars[i];
+        if (!bar) continue;
+        markers.push({
+          time: bar.time as UTCTimestamp,
+          position: kind === "buyer" ? "belowBar" : "aboveBar",
+          color: LIQUIDITY_COLORS[kind],
+          shape: kind === "buyer" ? "arrowUp" : "arrowDown",
+        });
+      }
+    }
     markers.sort((a, b) => Number(a.time) - Number(b.time));
     markersRef.current?.setMarkers(markers);
   };
@@ -615,7 +636,7 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
     indicatorUpdateRef.current();
     applyScriptData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [props.bars, props.scripts]);
+  }, [props.bars, props.scripts, props.smcToggles.liquiditySweeps]);
 
   // ------------------------------------------------------------- overlay loop
   useEffect(() => {
