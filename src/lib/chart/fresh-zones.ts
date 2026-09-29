@@ -28,10 +28,15 @@ export type SdZone = {
   displacementAtr: number;
   /** True for fresh extremes (HH at highs, LL at lows). */
   extreme: boolean;
+  /** Swing is still forming (not yet 10-bar confirmed) — shown immediately. */
+  live: boolean;
 };
 
-export const SD_MIN_DISPLACEMENT_ATR = 1;
-export const SD_MAX_PER_SIDE = 3;
+export type ZonePivot = Pick<StructurePivot, "index" | "t" | "price" | "kind" | "label"> & { live?: boolean };
+
+/** Confirmed swings need this much closed-body displacement to keep a zone. */
+export const SD_MIN_DISPLACEMENT_ATR = 0.5;
+export const SD_MAX_PER_SIDE = 5;
 
 function atrAt(bars: Candle[], end: number, period = 14): number {
   const first = Math.max(1, end - period + 1);
@@ -49,18 +54,20 @@ function atrAt(bars: Candle[], end: number, period = 14): number {
 }
 
 /**
- * @param bars closed candles only (the same window used to detect `pivots`).
- * @param pivots confirmed fractal pivots indexed into `bars`.
- * @param displacementWindow closed candles after the swing used to measure displacement.
+ * @param bars closed candles, optionally followed by the forming candle.
+ * @param pivots confirmed fractal pivots plus live (unconfirmed) swings, indexed into `bars`.
+ * @param closedCount number of closed candles at the start of `bars` (defaults to all).
+ *   Only closed candles can displace, break or test a zone, so ticks never flicker it.
  */
 export function computeFreshZones(
   bars: Candle[],
-  pivots: StructurePivot[],
+  pivots: ZonePivot[],
+  closedCount = bars.length,
   displacementWindow = 10,
 ): SdZone[] {
   if (bars.length < 20) return [];
   const zones: SdZone[] = [];
-  const last = bars.length - 1;
+  const last = Math.min(bars.length, closedCount) - 1;
 
   for (const p of pivots) {
     const i = p.index;
@@ -79,7 +86,10 @@ export function computeFreshZones(
       far = supply ? Math.min(far, bars[k].c) : Math.max(far, bars[k].c);
     }
     const displacementAtr = (supply ? bodyEdge - far : far - bodyEdge) / atr;
-    if (displacementAtr < SD_MIN_DISPLACEMENT_ATR) continue;
+    // Live swings show the moment their HH/HL/LH/LL label appears; confirmed
+    // swings must have been rejected by closed bodies to keep their zone.
+    const live = !!p.live;
+    if (!live && displacementAtr < SD_MIN_DISPLACEMENT_ATR) continue;
 
     // Zone: swing candle body edge → wick extreme, sized between 0.25 and 1 ATR.
     let depth = Math.abs(p.price - bodyEdge);
@@ -112,8 +122,9 @@ export function computeFreshZones(
       label: p.label,
       fresh: touches === 0,
       touches,
-      displacementAtr: Math.round(displacementAtr * 10) / 10,
+      displacementAtr: Math.max(0, Math.round(displacementAtr * 10) / 10),
       extreme: supply ? p.label === "HH" || p.label === "H" : p.label === "LL" || p.label === "L",
+      live,
     });
   }
 
