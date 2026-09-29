@@ -1187,10 +1187,17 @@ function finiteCandles(rows: Candle[], label: string): Candle[] {
 }
 
 async function fetchBinanceHostDeep(host: string, symbol: string, tf: string, limit: number) {
-  const rows: any[] = await fetchProxyJson(
-    `https://${host}/api/v3/klines?symbol=${symbol}&interval=${tf}&limit=${limit}`,
-    `Binance(${host})`,
-  );
+  const url = (n: number, endTime?: number) =>
+    `https://${host}/api/v3/klines?symbol=${symbol}&interval=${tf}&limit=${n}${endTime ? `&endTime=${endTime}` : ""}`;
+  let rows: any[] = await fetchProxyJson(url(Math.min(limit, 1000)), `Binance(${host})`);
+  // Aggregated timeframes (45m from 15m, 2H from 1H) need more than one page
+  // of source candles for a full history; page backwards with endTime.
+  while (limit > 1000 && rows.length > 0 && rows.length < limit) {
+    const oldest = +rows[0][0];
+    const older: any[] = await fetchProxyJson(url(Math.min(1000, limit - rows.length), oldest - 1), `Binance(${host})`).catch(() => []);
+    if (!Array.isArray(older) || !older.length) break;
+    rows = [...older, ...rows];
+  }
   return finiteCandles(
     rows.map((r) => ({ t: +r[0], o: +r[1], h: +r[2], l: +r[3], c: +r[4], v: +r[5] })),
     "Binance",
