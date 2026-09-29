@@ -109,6 +109,4 @@ describe("computeFreshZones", () => {
     // Entry / SL / TP only on one zone at most.
     expect(zones.filter((z) => z.plan).length <= 1).toBe(true);
   });
-    expect(computeFreshZones(bars, pivots)).toHaveLength(0);
-  });
 });
