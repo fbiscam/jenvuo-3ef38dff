@@ -51,7 +51,7 @@ export type SdZone = {
   /** Deterministic 0-100 strength score. */
   strength: number;
   grade: SdGrade;
-  /** Limit-order plan, present only while the zone is fresh and graded STRONG/EXTREME. */
+  /** Entry / SL / TP levels — kept only on the latest zone. */
   plan?: SdTradePlan;
 };
 
