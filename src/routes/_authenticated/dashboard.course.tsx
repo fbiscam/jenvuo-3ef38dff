@@ -103,7 +103,7 @@ function CoursePage() {
       <div className="mb-6 flex flex-col gap-4 rounded-2xl border border-border bg-card p-6 md:flex-row md:items-center md:justify-between">
         <div>
           <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">{"\n"}</p>
-          <h1 className="mt-1 text-2xl font-semibold text-foreground md:text-3xl"> Smc a to z</h1>
+          <h1 className="mt-1 text-2xl font-semibold text-foreground md:text-3xl">Smc a to z</h1>
           <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
             Smart Money Concepts from zero to a complete ICT trade model — 4 phases, {ALL.length} lessons, in Hindi/Urdu.
           </p>
