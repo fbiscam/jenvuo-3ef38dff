@@ -900,7 +900,7 @@ export function renderSmcOverlay(
 
   // Same visual language as order blocks / FVGs: soft fill, solid edges to
   // the right, centred white label with coloured text.
-  const sdZone = (z: SdZone) => {
+  const sdZone = (z: SdZone, withPlan = false) => {
     const x0 = pr.x(z.t / 1000);
     const topY = pr.y(z.top);
     const bottomY = pr.y(z.bottom);
@@ -935,7 +935,10 @@ export function renderSmcOverlay(
 
     ctx.font = "600 13px 'JetBrains Mono', ui-monospace, monospace";
     const textWidth = ctx.measureText(label).width;
-    const labelX = Math.min(pr.width - textWidth - 12, Math.max(x + 8, x + width / 2 - textWidth / 2));
+    // Zones with plan tags on the right edge keep their label clear of them.
+    const planReserve = withPlan ? 150 : 0;
+    let labelX = Math.min(pr.width - textWidth - 12 - planReserve, Math.max(x + 8, x + width / 2 - textWidth / 2));
+    if (withPlan && labelX < x + 8) labelX = Math.max(8, x - textWidth - 14);
     const labelY = y + height / 2;
     ctx.fillStyle = "rgba(255,255,255,0.92)";
     ctx.beginPath();
@@ -1004,11 +1007,12 @@ export function renderSmcOverlay(
 
   if (toggles.sdZones) {
     const zones = smc.sdZones ?? [];
-    for (const z of zones) sdZone(z);
     // Plan lines only for the newest fresh zone on each side to keep the chart readable.
     const newestFresh = (type: SdZone["type"]) =>
       [...zones].reverse().find((z) => z.type === type && z.plan);
-    for (const z of [newestFresh("SUPPLY"), newestFresh("DEMAND")]) if (z) sdPlan(z);
+    const planned = [newestFresh("SUPPLY"), newestFresh("DEMAND")].filter((z): z is SdZone => !!z);
+    for (const z of zones) sdZone(z, planned.includes(z));
+    for (const z of planned) sdPlan(z);
   }
   if (toggles.fvg) {
     for (const gap of smc.fvgs) fairValueGap(gap);

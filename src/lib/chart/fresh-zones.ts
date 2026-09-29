@@ -51,7 +51,7 @@ export type SdZone = {
   /** Deterministic 0-100 strength score. */
   strength: number;
   grade: SdGrade;
-  /** Limit-order plan, present only while the zone is fresh. */
+  /** Limit-order plan, present only while the zone is fresh and graded STRONG/EXTREME. */
   plan?: SdTradePlan;
 };
 
@@ -183,7 +183,8 @@ export function computeFreshZones(
 
     const fresh = touches === 0;
     let plan: SdTradePlan | undefined;
-    if (fresh) {
+    // Only STRONG / EXTREME fresh zones get trade levels; weak zones stay label-only.
+    if (fresh && grade !== "MODERATE") {
       const entry = supply ? bottom : top;
       const sl = supply ? p.price + atr * SD_SL_BUFFER_ATR : p.price - atr * SD_SL_BUFFER_ATR;
       const risk = Math.abs(entry - sl);
