@@ -929,13 +929,14 @@ export function renderSmcOverlay(
       ctx.fillRect(x0 - 1, y, 2, height);
     }
     const name = `${z.fresh ? "FRESH " : ""}${supply ? "SUPPLY" : "DEMAND"}`;
-    const meta = z.fresh ? `${z.label} · ${z.displacementAtr}×ATR` : `${z.label} · tested ${z.touches}×`;
+    const meta = z.fresh ? `${z.label} · ${z.displacementAtr > 5 ? ">5" : z.displacementAtr}×ATR` : `${z.label} · tested ${z.touches}×`;
     ctx.font = "700 11px 'JetBrains Mono', ui-monospace, monospace";
     const nameW = ctx.measureText(name).width;
     ctx.font = "500 10px 'JetBrains Mono', ui-monospace, monospace";
     const metaW = ctx.measureText(meta).width;
     const boxW = nameW + metaW + 22;
-    const bx = Math.min(pr.width - boxW - 70, x + 8);
+    // Start past the swing badge (centred on the swing candle, ~92px wide) so they never collide.
+    const bx = Math.min(pr.width - boxW - 70, x + 54);
     if (bx >= 0) {
       const by = supply ? y - 20 : y + height + 2;
       const clampedY = Math.max(2, Math.min(pr.height - 20, by));
