@@ -85,10 +85,6 @@ describe("computeFreshZones", () => {
     expect(z.fresh).toBe(false);
     expect(z.plan?.side).toBe("SELL");
   });
-    const [z] = computeFreshZones(bars, pivots);
-    expect(z.fresh).toBe(false);
-    expect(z.plan).toBe(undefined);
-  });
 
   test("only the newest 5 zones are kept", () => {
     const bars = [] as ReturnType<typeof bar>[];
