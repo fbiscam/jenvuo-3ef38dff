@@ -34,6 +34,13 @@ export type LiquidityTracker = {
   sweeps: LiquiditySweep[];
 };
 
+export type LiquidityProjector = {
+  x: (timeSeconds: number) => number | null;
+  y: (price: number) => number | null;
+  width: number;
+  height: number;
+};
+
 type CompactCandle = { t: number; o: number; h: number; l: number; c: number };
 
 const HOUR = 3600;
@@ -191,4 +198,51 @@ export function computeLiquidityTracker(
     levels: levels.filter((level) => level.dayStart === dayStartUtc(latest.time)).slice(-4),
     sweeps: sweeps.slice(-12),
   };
+}
+
+export function renderLiquidityTracker(
+  context: CanvasRenderingContext2D,
+  tracker: LiquidityTracker,
+  projector: LiquidityProjector,
+): void {
+  context.save();
+  context.font = "700 10px 'JetBrains Mono', ui-monospace, monospace";
+  for (const level of tracker.levels) {
+    const y = projector.y(level.price);
+    const start = projector.x((level.dayStart + (level.kind.startsWith("ASIA") ? 6 : 9) * HOUR));
+    if (y == null || start == null) continue;
+    const label = level.kind.replace("_", " ");
+    context.strokeStyle = level.kind.startsWith("ASIA") ? "#2563eb" : "#d97706";
+    context.fillStyle = context.strokeStyle;
+    context.lineWidth = 1.25;
+    context.setLineDash([3, 4]);
+    context.beginPath();
+    context.moveTo(Math.max(0, start), y);
+    context.lineTo(projector.width, y);
+    context.stroke();
+    context.setLineDash([]);
+    context.fillText(`${label} ${level.price.toFixed(2)}`, Math.max(4, Math.min(projector.width - 130, start + 5)), y - 5);
+  }
+  for (const sweep of tracker.sweeps) {
+    if (!sweep.highProbability) continue;
+    const x = projector.x(sweep.t / 1000);
+    const y = projector.y(sweep.levelPrice);
+    if (x == null || y == null || x < 0 || x > projector.width) continue;
+    const label = "🔥 15M Institutional Sweep";
+    context.font = "700 11px 'JetBrains Mono', ui-monospace, monospace";
+    const width = context.measureText(label).width + 18;
+    const left = Math.max(3, Math.min(projector.width - width - 3, x - width / 2));
+    const top = Math.max(4, Math.min(projector.height - 26, sweep.direction === "bullish" ? y + 12 : y - 34));
+    context.shadowColor = sweep.direction === "bullish" ? "#10b981" : "#ef4444";
+    context.shadowBlur = 12;
+    context.fillStyle = sweep.direction === "bullish" ? "#047857" : "#b91c1c";
+    context.beginPath();
+    context.roundRect?.(left, top, width, 24, 4);
+    if (!context.roundRect) context.rect(left, top, width, 24);
+    context.fill();
+    context.shadowBlur = 0;
+    context.fillStyle = "#ffffff";
+    context.fillText(label, left + 9, top + 16);
+  }
+  context.restore();
 }
