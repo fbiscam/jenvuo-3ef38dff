@@ -916,15 +916,14 @@ export function renderSmcOverlay(
     const fill = supply
       ? `rgba(239,68,68,${z.fresh ? 0.11 : 0.07})`
       : `rgba(16,185,129,${z.fresh ? 0.11 : 0.07})`;
-    const kind = supply ? "SUPPLY" : "DEMAND";
-    const state = z.live ? "NEW " : z.fresh ? "FRESH " : "";
-    const label = `${state}${kind} · ${z.label} · ${z.grade} ${z.strength}%`;
+    // Simple zone label only — grade/strength stay internal (they gate the plan).
+    const label = supply ? "SUPPLY ZONE" : "DEMAND ZONE";
 
     ctx.save();
     ctx.fillStyle = fill;
     ctx.fillRect(x, y, width, height);
     ctx.strokeStyle = edge;
-    ctx.lineWidth = z.grade === "EXTREME" ? 2 : 1.25;
+    ctx.lineWidth = 1.25;
     if (z.live) ctx.setLineDash([5, 3]);
     ctx.beginPath();
     ctx.moveTo(x, y);
@@ -955,17 +954,6 @@ export function renderSmcOverlay(
     ctx.textBaseline = "middle";
     ctx.fillText(label, labelX, labelY + 1);
     ctx.textBaseline = "alphabetic";
-
-    // Extreme level tag at the zone's far edge (exact swing wick).
-    if (z.extreme) {
-      const ey = pr.y(z.extremeLevel);
-      if (ey != null) {
-        ctx.font = "700 11px 'JetBrains Mono', ui-monospace, monospace";
-        const tag = `EXTREME ${z.extremeLevel.toFixed(2)}`;
-        ctx.fillStyle = edge;
-        ctx.fillText(tag, x + 6, supply ? ey - 4 : ey + 13);
-      }
-    }
     ctx.restore();
   };
 
