@@ -43,4 +43,20 @@ describe("computeFreshZones", () => {
     });
     expect(computeFreshZones(bars, pivots)).toHaveLength(0);
   });
+
+  test("a live swing shows its zone immediately, before any displacement", () => {
+    const { bars, pivots } = series(() => ({ o: 104.3, h: 104.9, l: 104, c: 104.4 }));
+    const zones = computeFreshZones(bars, [{ ...pivots[0], live: true }]);
+    expect(zones).toHaveLength(1);
+    expect(zones[0].live).toBe(true);
+  });
+
+  test("the forming candle never breaks a zone", () => {
+    const { bars, pivots } = series((i) => {
+      const c = i < 39 ? 104 - (i - 20) * 0.4 : 107;
+      return { o: c, h: c + 0.3, l: c - 0.3, c };
+    });
+    expect(computeFreshZones(bars, pivots, bars.length - 1)).toHaveLength(1);
+    expect(computeFreshZones(bars, pivots)).toHaveLength(0);
+  });
 });
