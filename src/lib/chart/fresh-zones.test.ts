@@ -183,7 +183,7 @@ describe("zone + displacement FVG strategy", () => {
     bars.push(bar(21, 105.8, 107.5, 105.7, 107.4));
     bars.push(bar(22, 107.4, 108.6, 106.6, 108.5));
     for (let i = 23; i < 36; i++) bars.push(bar(i, 108.5, 108.9, 108.1, 108.6));
-    const [z] = computeFreshZones(bars, [{ index: 20, confirmedIndex: 30, t: 20 * 60_000, price: 104, kind: "low", label: "LL" }]);
+    const [z] = computeFreshZones(bars, [{ index: 20, t: 20 * 60_000, price: 104, kind: "low", label: "LL" }]);
     expect(z.fvg?.type).toBe("BULLISH");
     expect(z.fvg!.bottom).toBe(106.2);
     expect(z.fvg!.top).toBe(106.6);

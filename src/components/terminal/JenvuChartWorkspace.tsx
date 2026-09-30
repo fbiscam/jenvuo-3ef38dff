@@ -141,7 +141,7 @@ const SMC_LABELS: Array<{ key: keyof SmcToggles; label: string; hint: string }> 
   { key: "structure", label: "Swing structure", hint: "HH / HL / LH / LL labels" },
   { key: "pressure", label: "Buyer / seller pressure", hint: "Percentages and confirmed trade levels" },
   { key: "breaks", label: "BOS / CHoCH", hint: "Confirmed close-through breaks" },
-  { key: "sdZones", label: "Fresh supply / demand", hint: "Zones from new swing highs and lows" },
+  { key: "sdZones", label: "Fresh supply / demand", hint: "Last 3 zones with their displacement FVG" },
   { key: "sdPlan", label: "Zone Entry / SL / TP", hint: "Trade levels on the newest fresh zone" },
   { key: "sweeps", label: "Liquidity sweeps", hint: "EQH / EQL pools, next sweep target" },
   { key: "liquidity", label: "Liquidity", hint: "Nearest buy-side / sell-side pools" },
