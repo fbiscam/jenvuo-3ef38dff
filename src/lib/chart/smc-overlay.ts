@@ -1262,89 +1262,23 @@ export const REVERSAL_TRADE_MIN_PCT = 72;
 
 /** Liquidity sweep indicator: resting pools (next sweep targets) + sweeps. */
 function renderLiquidityMap(ctx: CanvasRenderingContext2D, map: LiquidityMap, pr: SmcProjector) {
-  const BSL = "#7c3aed";
-  const SSL = "#0891b2";
+  // Only a small cross on the candle that grabbed liquidity — no lines or labels.
   ctx.save();
-  const usedY: number[] = [];
-  const freeY = (y: number, dir: number) => {
-    let yy = y;
-    for (let n = 0; n < 6 && usedY.some((u) => Math.abs(u - yy) < 17); n++) yy += 17 * dir;
-    usedY.push(yy);
-    return yy;
-  };
-  for (const pool of map.pools) {
-    const y = pr.y(pool.level);
-    if (y == null || y < -20 || y > pr.height + 20) continue;
-    const color = pool.side === "BSL" ? BSL : SSL;
-    const x0 = pr.x(pool.t / 1000);
-    const start = Math.max(0, x0 ?? 0);
-    ctx.strokeStyle = color;
-    ctx.globalAlpha = pool.next ? 1 : 0.7;
-    ctx.lineWidth = pool.next ? 2 : 1;
-    ctx.setLineDash(pool.next ? [8, 4] : [3, 4]);
-    ctx.beginPath();
-    ctx.moveTo(start, y);
-    ctx.lineTo(pr.width, y);
-    ctx.stroke();
-    ctx.setLineDash([]);
-    ctx.globalAlpha = 1;
-    ctx.fillStyle = color;
-    for (const touch of pool.touches) {
-      const tx = pr.x(touch.t / 1000);
-      const ty = pr.y(touch.price);
-      if (tx == null || ty == null || tx < 0 || tx > pr.width) continue;
-      ctx.beginPath();
-      ctx.arc(tx, ty, 3, 0, Math.PI * 2);
-      ctx.fill();
-    }
-    const eq = pool.count > 1 ? ` · ${pool.side === "BSL" ? "EQH" : "EQL"}×${pool.count}` : "";
-    const head = pool.taking ? "SWEEPING " : pool.next ? "NEXT SWEEP · " : "";
-    const text = `${head}${pool.side} ${pool.level.toFixed(2)}${eq} · ${pool.score}%`;
-    ctx.font = `${pool.next || pool.taking ? 700 : 600} 11px 'JetBrains Mono', ui-monospace, monospace`;
-    const tw = ctx.measureText(text).width;
-    const up = pool.side === "BSL";
-    const ly = freeY(up ? y - 10 : y + 10, up ? -1 : 1);
-    const lx = Math.max(4, pr.width - tw - 110);
-    // Transparent labels with black text; the coloured dotted line carries the side.
-    ctx.fillStyle = "#000000";
-    ctx.textBaseline = "middle";
-    ctx.fillText(text, lx, ly + 1);
-    ctx.textBaseline = "alphabetic";
-  }
-  // Only meaningful sweeps are drawn; weak grabs stay off the chart.
+  ctx.lineWidth = 2;
   for (const s of map.sweeps.filter((x) => x.strength >= LIQ_MIN_DRAWN_SWEEP).slice(-4)) {
-    const x0 = pr.x(s.fromT / 1000);
-    const x1 = pr.x(s.t / 1000);
-    const y = pr.y(s.level);
+    const x = pr.x(s.t / 1000);
     const yx = pr.y(s.extreme);
-    if (x0 == null || x1 == null || y == null || yx == null) continue;
-    if (x1 < 0 || x0 > pr.width) continue;
-    // BSL sweep is bearish (sellers took the highs), SSL sweep is bullish.
-    const color = s.side === "BSL" ? "#f23645" : "#089981";
-    ctx.strokeStyle = color;
-    ctx.lineWidth = s.strong ? 1.75 : 1.1;
-    ctx.setLineDash(s.confirmed ? [] : [4, 3]);
-    ctx.beginPath();
-    ctx.moveTo(Math.max(0, x0), y);
-    ctx.lineTo(Math.min(pr.width, x1), y);
-    ctx.stroke();
-    ctx.setLineDash([]);
-    // X at the wick tip that grabbed the liquidity.
+    if (x == null || yx == null || x < 0 || x > pr.width) continue;
+    // SSL sweep: cross under the low wick. BSL sweep: cross just beyond the high wick.
+    const y = s.side === "SSL" ? yx + 12 : yx - 12;
     const r = 4;
-    ctx.lineWidth = 2;
+    ctx.strokeStyle = s.side === "BSL" ? "#f23645" : "#089981";
     ctx.beginPath();
-    ctx.moveTo(x1 - r, yx - r);
-    ctx.lineTo(x1 + r, yx + r);
-    ctx.moveTo(x1 + r, yx - r);
-    ctx.lineTo(x1 - r, yx + r);
+    ctx.moveTo(x - r, y - r);
+    ctx.lineTo(x + r, y + r);
+    ctx.moveTo(x + r, y - r);
+    ctx.lineTo(x - r, y + r);
     ctx.stroke();
-    ctx.font = "700 10px 'JetBrains Mono', ui-monospace, monospace";
-    const text = `${s.strong ? "STRONG " : ""}${s.side} SWEEP${s.count > 1 ? ` ×${s.count}` : ""} ${s.strength}%${s.confirmed ? "" : " · pending"}`;
-    const tw = ctx.measureText(text).width;
-    const lx = Math.max(2, x1 - tw - 8);
-    const ly = s.side === "BSL" ? y + 12 : y - 5;
-    ctx.fillStyle = "#000000";
-    ctx.fillText(text, lx, ly);
   }
   ctx.restore();
 }
