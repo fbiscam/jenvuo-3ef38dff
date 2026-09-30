@@ -190,3 +190,17 @@ describe("zone + displacement FVG strategy", () => {
     expect(z.plan?.side).toBe("BUY");
   });
 });
+
+describe("strategy switch", () => {
+  test("classic mode keeps a strong zone that has no departure FVG", () => {
+    const { bars, pivots } = series((i) => {
+      const c = 104 - (i - 20) * 0.4;
+      return { o: c + 0.2, h: c + 0.5, l: c - 0.3, c };
+    }, false);
+    const extreme = { ...pivots[0] };
+    const strategy = computeFreshZones(bars, [extreme], undefined, undefined, true);
+    const classic = computeFreshZones(bars, [extreme], undefined, undefined, false);
+    expect(strategy).toHaveLength(0);
+    expect(classic.length <= 1).toBe(true);
+  });
+});
