@@ -196,3 +196,4 @@
 - [x] Liquidity sweep indicator (EQH/EQL pools, next sweep target, confirmed sweeps) with SMC toggle
 - [x] Fresh bullish/bearish FVG indicator (closed candles, newest 4, newer replaces older) with SMC toggle
 - [x] Fresh FVG: show only the latest 2 gaps
+- [x] Newer FVG/zone on top of any older FVG/zone hides the older; FVG hard cap 2
