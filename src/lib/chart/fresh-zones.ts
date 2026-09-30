@@ -53,6 +53,9 @@ export type SdZone = {
   grade: SdGrade;
   /** Entry / SL / TP levels — kept only on the latest zone. */
   plan?: SdTradePlan;
+  /** The zone's own levels (always set) so the chart can move the plan to
+   *  the newest zone still visible after overlap removal. */
+  levels?: SdTradePlan;
 };
 
 export type ZonePivot = Pick<StructurePivot, "index" | "t" | "price" | "kind" | "label"> & { live?: boolean };
@@ -216,6 +219,7 @@ export function computeFreshZones(
       strength,
       grade,
       plan,
+      levels: plan,
       broken,
     } as SdZone & { broken: boolean });
   }

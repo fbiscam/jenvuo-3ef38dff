@@ -50,7 +50,7 @@ function atrAt(bars: Candle[], end: number, period = 14): number {
 }
 
 /** @param bars closed candles only, oldest first. */
-export function computeFreshFvgs(bars: Candle[]): FreshFvg[] {
+export function computeFreshFvgs(bars: Candle[], maxTotal = FVG_MAX_TOTAL): FreshFvg[] {
   if (bars.length < 20) return [];
   const last = bars.length - 1;
   const found: FreshFvg[] = [];
@@ -108,7 +108,7 @@ export function computeFreshFvgs(bars: Candle[]): FreshFvg[] {
     if (kept.some((k) => k.type === f.type && f.bottom - supersede < k.top && f.top + supersede > k.bottom)) continue;
     if (kept.some((k) => f.bottom - gap < k.top && f.top + gap > k.bottom)) continue;
     kept.push(f);
-    if (kept.length >= FVG_MAX_TOTAL) break;
+    if (kept.length >= maxTotal) break;
   }
   return kept.sort((x, y) => x.t - y.t);
 }

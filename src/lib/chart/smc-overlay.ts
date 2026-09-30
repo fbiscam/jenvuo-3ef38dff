@@ -16,7 +16,40 @@ import {
 import type { OhlcvBar } from "./indicators";
 import { computeFreshZones, type SdZone } from "./fresh-zones";
 import { computeLiquidityMap, type LiquidityMap } from "./liquidity-sweeps";
-import { computeFreshFvgs, type FreshFvg } from "./fresh-fvgs";
+import { computeFreshFvgs, FVG_MAX_TOTAL, type FreshFvg } from "./fresh-fvgs";
+
+/**
+ * Newest wins across supply/demand zones AND FVGs: any older zone or FVG that
+ * a newer one prints on top of is hidden. FVGs are capped to the newest
+ * `maxFvg` survivors, and Entry/SL/TP move to the newest surviving zone.
+ */
+export function resolveZoneOverlaps(
+  sdZones: SdZone[],
+  fvgs: FreshFvg[],
+  maxFvg = FVG_MAX_TOTAL,
+): { sdZones: SdZone[]; fvgs: FreshFvg[] } {
+  type Item = { t: number; top: number; bottom: number; sd?: SdZone; fvg?: FreshFvg };
+  const items: Item[] = [
+    ...sdZones.map((z) => ({ t: z.t, top: z.top, bottom: z.bottom, sd: z })),
+    ...fvgs.map((f) => ({ t: f.t, top: f.top, bottom: f.bottom, fvg: f })),
+  ].sort((a, b) => b.t - a.t);
+  const kept: Item[] = [];
+  let fvgCount = 0;
+  for (const it of items) {
+    if (it.fvg && fvgCount >= maxFvg) continue;
+    if (kept.some((k) => it.bottom < k.top && it.top > k.bottom)) continue;
+    kept.push(it);
+    if (it.fvg) fvgCount++;
+  }
+  const keptSd = kept.filter((k) => k.sd).map((k) => k.sd!).sort((a, b) => a.t - b.t);
+  const newest = keptSd[keptSd.length - 1];
+  return {
+    sdZones: keptSd.map((z) =>
+      z === newest ? { ...z, plan: z.plan ?? z.levels } : { ...z, plan: undefined },
+    ),
+    fvgs: kept.filter((k) => k.fvg).map((k) => k.fvg!).sort((a, b) => a.t - b.t),
+  };
+}
 
 /** Sweeps below this strength are not drawn. */
 const LIQ_MIN_DRAWN_SWEEP = 40;
@@ -778,7 +811,8 @@ export function computeSmcOverlay(
     .filter((p) => p.index >= 0);
   const sdZones = computeFreshZones(fractalBars, [...fractal.pivots, ...liveZonePivots]);
   const liquidityMap = computeLiquidityMap(fractalBars, forming ? toCandle(forming) : null, fractal.pivots);
-  const freshFvgs = computeFreshFvgs(fractalBars);
+  // Wider pool: the chart keeps the newest 2 that survive overlap removal.
+  const freshFvgs = computeFreshFvgs(fractalBars, 8);
   return {
     freshFvgs,
     reversal,
@@ -1074,17 +1108,20 @@ export function renderSmcOverlay(
     ctx.restore();
   };
 
+  // Newest wins across zones and FVGs; only the newest 2 FVGs survive.
+  const visible = resolveZoneOverlaps(
+    toggles.sdZones ? smc.sdZones ?? [] : [],
+    toggles.freshFvg ? smc.freshFvgs ?? [] : [],
+  );
   if (toggles.sdZones) {
-    const zones = smc.sdZones ?? [];
+    const zones = visible.sdZones;
     // Entry / SL / TP only for the single newest zone that has a plan.
     const planned = toggles.sdPlan === false ? undefined : [...zones].reverse().find((z) => z.plan);
     for (const z of zones) sdZone(z, z === planned);
     if (planned) sdPlan(planned);
   }
   if (toggles.freshFvg) {
-    for (const f of smc.freshFvgs ?? []) freshFvg(f);
-  } else if (toggles.fvg) {
-    for (const gap of smc.fvgs) fairValueGap(gap);
+    for (const f of visible.fvgs) freshFvg(f);
   }
   if (toggles.orderBlocks) {
     for (const ob of smc.orderBlocks) orderBlock(ob);
