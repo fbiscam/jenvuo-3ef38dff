@@ -118,7 +118,7 @@ export function computeFreshZones(
   displacementWindow = 10,
 ): SdZone[] {
   if (bars.length < 20) return [];
-  const zones: SdZone[] = [];
+  const zones: (SdZone & { broken?: boolean })[] = [];
   const last = Math.min(bars.length, closedCount) - 1;
 
   for (const p of pivots) {
@@ -161,7 +161,6 @@ export function computeFreshZones(
       if (k > i + 1 && touching && !inside) touches++;
       inside = touching;
     }
-    if (broken) continue;
 
     // Outer extreme: swing wick beyond every candle in the prior lookback
     // (fixed window before the swing, so it never changes later).
@@ -215,19 +214,24 @@ export function computeFreshZones(
       strength,
       grade,
       plan,
-    });
+      broken,
+    } as SdZone & { broken: boolean });
   }
 
   // Newest first; newer zones win any overlap (same or opposite type). A zone
   // must also sit a clear gap away from every kept zone, so none ever stack.
   zones.sort((a, b) => b.t - a.t);
   const gap = Math.max(0, atrAt(bars, Math.max(1, last))) * SD_MIN_GAP_ATR;
-  const kept: SdZone[] = [];
+  // The newest SD_MAX_TOTAL zones form a rolling window: when a new zone
+  // prints, the oldest leaves the window for good. A broken zone still holds
+  // its slot, so older zones never reappear when a newer one is broken.
+  const windowed: (SdZone & { broken?: boolean })[] = [];
   for (const z of zones) {
-    if (kept.some((k) => z.bottom - gap < k.top && z.top + gap > k.bottom)) continue;
-    kept.push(z);
-    if (kept.length >= SD_MAX_TOTAL) break;
+    if (!z.broken && windowed.some((k) => !k.broken && z.bottom - gap < k.top && z.top + gap > k.bottom)) continue;
+    windowed.push(z);
+    if (windowed.length >= SD_MAX_TOTAL) break;
   }
+  const kept: SdZone[] = windowed.filter((z) => !z.broken).map(({ broken: _b, ...z }) => z);
   kept.sort((a, b) => a.t - b.t);
   // Entry / SL / TP always belong to the latest zone on the chart.
   const newest = kept[kept.length - 1];
