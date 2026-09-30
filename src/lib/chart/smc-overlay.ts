@@ -1142,7 +1142,9 @@ export function renderSmcOverlay(
     : resolveZoneOverlaps(smc.sdZones ?? [], smc.freshFvgs ?? [], FVG_MAX_TOTAL, 1);
   if (toggles.sdZones) {
     const zones = visible.sdZones;
-    if (strategy && toggles.freshFvg) {
+    // Strategy zones always draw with their own FVG (one indicator), even
+    // when the standalone Fresh FVG switch is off.
+    if (strategy) {
       for (const z of zones) if (z.fvg) freshFvg(z.fvg);
     }
     const planned = toggles.sdPlan === false ? undefined : [...zones].reverse().find((z) => z.plan);
