@@ -18,20 +18,29 @@ import { computeFreshZones, type SdZone } from "./fresh-zones";
 import { computeLiquidityMap, type LiquidityMap } from "./liquidity-sweeps";
 import { computeFreshFvgs, FVG_MAX_TOTAL, type FreshFvg } from "./fresh-fvgs";
 
+/** Supply/demand zones (each with its own displacement FVG) shown on the chart. */
+export const SD_VISIBLE_ZONES = 3;
+
 /**
- * Newest wins across supply/demand zones AND FVGs: any older zone or FVG that
- * a newer one prints on top of is hidden. FVGs are capped to the newest
- * `maxFvg` survivors, and Entry/SL/TP move to the newest surviving zone.
+ * Newest wins across supply/demand zones AND standalone FVGs: any older zone
+ * or FVG that a newer one prints on top of is hidden. A zone's own
+ * displacement FVG never hides it. FVGs are capped to the newest `maxFvg`
+ * survivors, zones to the newest `maxZones`, and Entry/SL/TP move to the
+ * newest surviving zone.
  */
 export function resolveZoneOverlaps(
   sdZones: SdZone[],
   fvgs: FreshFvg[],
   maxFvg = FVG_MAX_TOTAL,
+  maxZones = SD_VISIBLE_ZONES,
 ): { sdZones: SdZone[]; fvgs: FreshFvg[] } {
   type Item = { t: number; top: number; bottom: number; sd?: SdZone; fvg?: FreshFvg };
+  const paired = new Set(sdZones.filter((z) => z.fvg).map((z) => `${z.fvg!.type}:${z.fvg!.t}`));
   const items: Item[] = [
     ...sdZones.map((z) => ({ t: z.t, top: z.top, bottom: z.bottom, sd: z })),
-    ...fvgs.map((f) => ({ t: f.t, top: f.top, bottom: f.bottom, fvg: f })),
+    ...fvgs
+      .filter((f) => !paired.has(`${f.type}:${f.t}`))
+      .map((f) => ({ t: f.t, top: f.top, bottom: f.bottom, fvg: f })),
   ].sort((a, b) => b.t - a.t);
   const kept: Item[] = [];
   let fvgCount = 0;
@@ -41,12 +50,11 @@ export function resolveZoneOverlaps(
     kept.push(it);
     if (it.fvg) fvgCount++;
   }
-  // Only the single latest surviving supply/demand zone is shown.
   const keptSd = kept
     .filter((k) => k.sd)
     .map((k) => k.sd!)
     .sort((a, b) => a.t - b.t)
-    .slice(-1);
+    .slice(-maxZones);
   const newest = keptSd[keptSd.length - 1];
   return {
     sdZones: keptSd.map((z) =>
@@ -1113,22 +1121,25 @@ export function renderSmcOverlay(
     ctx.restore();
   };
 
-  // Newest wins across zones and FVGs; only the newest 2 FVGs survive.
-  // Always resolve with BOTH lists so a hidden FVG still removes the zone it
-  // printed on top of — otherwise browsers with different switch settings
-  // showed different zones. The switches only control what gets drawn.
+  // Newest wins across zones and FVGs. Always resolve with BOTH lists so a
+  // hidden FVG still removes the zone it printed on top of — otherwise
+  // browsers with different switch settings showed different zones. The
+  // switches only control what gets drawn.
   const visible = resolveZoneOverlaps(
     smc.sdZones ?? [],
     smc.freshFvgs ?? [],
   );
   if (toggles.sdZones) {
     const zones = visible.sdZones;
-    // Entry / SL / TP only for the single newest zone that has a plan.
+    // Strategy view: the last 3 zones, each with the displacement FVG that
+    // left it; Entry / SL / TP only on the newest zone.
+    if (toggles.freshFvg) {
+      for (const z of zones) if (z.fvg) freshFvg(z.fvg);
+    }
     const planned = toggles.sdPlan === false ? undefined : [...zones].reverse().find((z) => z.plan);
     for (const z of zones) sdZone(z, z === planned);
     if (planned) sdPlan(planned);
-  }
-  if (toggles.freshFvg) {
+  } else if (toggles.freshFvg) {
     for (const f of visible.fvgs) freshFvg(f);
   }
   if (toggles.orderBlocks) {
