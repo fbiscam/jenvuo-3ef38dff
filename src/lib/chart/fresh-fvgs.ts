@@ -10,7 +10,7 @@
  * - A closed candle beyond the far edge invalidates the gap (removed). A wick
  *   back into it marks it tested and tracks how much has been filled.
  * - Newest first: a newer same-type gap on top of an older one replaces it,
- *   kept gaps never stack, and only the newest FVG_MAX_TOTAL are returned.
+ *   kept gaps never stack, and only the newest FVG_MAX_TOTAL (2) are returned.
  */
 type Candle = { t: number; o: number; h: number; l: number; c: number };
 
@@ -30,7 +30,7 @@ export type FreshFvg = {
 
 export const FVG_MIN_SIZE_ATR = 0.1;
 export const FVG_MIN_BODY_RATIO = 0.5;
-export const FVG_MAX_TOTAL = 4;
+export const FVG_MAX_TOTAL = 2;
 export const FVG_MIN_GAP_ATR = 0.15;
 export const FVG_SUPERSEDE_ATR = 0.5;
 

@@ -41,7 +41,7 @@ describe("computeFreshFvgs", () => {
     expect(fvgs[0].fresh).toBe(false);
   });
 
-  test("keeps only the newest gaps", () => {
+  test("keeps only the newest 2 gaps", () => {
     const bars = flat(20);
     let p = 100;
     for (let s = 0; s < 8; s++) {
