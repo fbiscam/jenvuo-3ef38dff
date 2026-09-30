@@ -1255,12 +1255,24 @@ async function fetchGateDeep(tf: string, limit: number): Promise<Candle[]> {
   const interval: Record<string, string> = {
     "1m": "1m", "5m": "5m", "15m": "15m", "30m": "30m", "1h": "1h", "4h": "4h", "1d": "1d",
   };
-  const rows: any[] = await fetchProxyJson(
-    `https://api.gateio.ws/api/v4/spot/candlesticks?currency_pair=PAXG_USDT&interval=${interval[tf] ?? "30m"}&limit=${Math.min(limit, 1000)}`,
-    "Gate",
-  );
+  const iv = interval[tf] ?? "30m";
+  const base = `https://api.gateio.ws/api/v4/spot/candlesticks?currency_pair=PAXG_USDT&interval=${iv}`;
+  const rows: any[] = await fetchProxyJson(`${base}&limit=${Math.min(limit, 1000)}`, "Gate");
+  // Gate caps one page at 1000 candles. 45m / 2H need deeper history, so page
+  // backwards with from/to until the requested depth is reached.
+  const stepSec = (TF_MS[tf] ?? TF_MS["30m"]) / 1000;
+  let all = rows;
+  for (let page = 0; all.length < limit && all.length > 0 && page < 3; page++) {
+    const oldest = Number(all[0]?.[0]);
+    if (!Number.isFinite(oldest)) break;
+    const to = oldest - stepSec;
+    const from = to - stepSec * 999;
+    const older: any[] = await fetchProxyJson(`${base}&from=${from}&to=${to}`, "Gate").catch(() => []);
+    if (!Array.isArray(older) || older.length === 0) break;
+    all = [...older, ...all];
+  }
   return finiteCandles(
-    rows.map((r) => ({ t: +r[0] * 1000, o: +r[5], h: +r[3], l: +r[4], c: +r[2], v: +r[6] })),
+    all.map((r) => ({ t: +r[0] * 1000, o: +r[5], h: +r[3], l: +r[4], c: +r[2], v: +r[6] })),
     "Gate",
   ).slice(-limit);
 }
@@ -1358,20 +1370,26 @@ async function fetchGoldProxyDeepWithProvider(
     if (!best || q > best.q) best = { provider, candles, q };
     return q >= GOLD_FEED_MIN_QUALITY;
   };
-  // Both Binance hosts serve the identical order book, so racing them is safe.
+  // Gate is the primary source because it answers from every server location.
+  // Binance blocks the live site's server region, so with Binance first the
+  // preview drew Binance candles while the live site drew Gate candles — two
+  // different exchanges, different wicks, different swings and zones.
   try {
-    const candles = await Promise.any([
-      fetchBinanceHostDeep("data-api.binance.vision", "PAXGUSDT", tf, limit),
-      fetchBinanceHostDeep("api.binance.com", "PAXGUSDT", tf, limit),
-    ]);
-    if (consider("Binance", candles)) return { provider: "Binance", candles };
-    errors.push("Binance thin feed");
-  } catch (err) {
-    const list = err instanceof AggregateError ? err.errors : [err];
-    for (const e of list) errors.push(e instanceof Error ? e.message : String(e));
+    const candles = await fetchGateDeep(tf, limit);
+    if (consider("Gate", candles)) return { provider: "Gate", candles };
+    errors.push("Gate thin feed");
+  } catch (e) {
+    errors.push(e instanceof Error ? e.message : String(e));
   }
   const fallbacks: Array<[GoldProxyProvider, () => Promise<Candle[]>]> = [
-    ["Gate", () => fetchGateDeep(tf, limit)],
+    [
+      "Binance",
+      () =>
+        Promise.any([
+          fetchBinanceHostDeep("data-api.binance.vision", "PAXGUSDT", tf, limit),
+          fetchBinanceHostDeep("api.binance.com", "PAXGUSDT", tf, limit),
+        ]),
+    ],
     ["KuCoin", () => fetchKucoinDeep(tf, limit)],
     ["Bitget", () => fetchBitgetDeep(tf, limit)],
     ["Gemini", () => fetchGeminiDeep(tf, limit)],
