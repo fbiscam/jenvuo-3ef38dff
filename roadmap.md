@@ -194,3 +194,4 @@
 - [x] Zones: plain SUPPLY/DEMAND labels, newer same-side zone replaces older, finished trades hide; chart timescale crash guard
 - [x] Zones: newest 4, also on 30m, Entry/SL/TP on/off switch; EMA/SMA/VWAP no price-panel tags
 - [x] Liquidity sweep indicator (EQH/EQL pools, next sweep target, confirmed sweeps) with SMC toggle
+- [x] Fresh bullish/bearish FVG indicator (closed candles, newest 4, newer replaces older) with SMC toggle
