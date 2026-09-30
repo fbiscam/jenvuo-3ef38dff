@@ -18,8 +18,8 @@ import { computeFreshZones, type SdZone } from "./fresh-zones";
 import { computeLiquidityMap, type LiquidityMap } from "./liquidity-sweeps";
 import { computeFreshFvgs, FVG_MAX_TOTAL, type FreshFvg } from "./fresh-fvgs";
 
-/** Zone + FVG strategy: latest zones (each with its own displacement FVG) shown. */
-export const SD_VISIBLE_ZONES = 2;
+/** Zone + FVG strategy: only the single latest zone (with its own displacement FVG and plan) is shown. */
+export const SD_VISIBLE_ZONES = 1;
 
 /**
  * Newest wins across supply/demand zones AND standalone FVGs: any older zone

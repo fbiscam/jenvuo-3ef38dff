@@ -268,6 +268,16 @@ export function computeFreshZones(
     const risk = Math.abs(entry - sl);
     const tp1 = supply ? entry - risk * 2 : entry + risk * 2;
     const tp2 = supply ? entry - risk * 3 : entry + risk * 3;
+    // Strategy mode: a closed candle whose wick ran the stop means the setup
+    // already failed, so the zone is not shown.
+    let stopped = false;
+    for (let k = i + 1; k <= last; k++) {
+      if (supply ? bars[k].h >= sl : bars[k].l <= sl) {
+        stopped = true;
+        break;
+      }
+    }
+
 
     // Every zone carries its levels; only the newest kept zone shows them.
     const plan: SdTradePlan = {
@@ -296,7 +306,11 @@ export function computeFreshZones(
       grade,
       plan,
       levels: plan,
-      broken: broken || countered || (requireFvg && !departure) || strength < SD_MIN_STRENGTH,
+      broken:
+        broken ||
+        countered ||
+        (requireFvg && (!departure || departure.filled >= 1 || stopped)) ||
+        strength < SD_MIN_STRENGTH,
     } as SdZone & { broken: boolean });
   }
 
