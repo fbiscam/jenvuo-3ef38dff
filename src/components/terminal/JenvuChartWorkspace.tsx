@@ -145,7 +145,7 @@ const SMC_LABELS: Array<{ key: keyof SmcToggles; label: string; hint: string }> 
   { key: "sdPlan", label: "Zone Entry / SL / TP", hint: "Trade levels on the newest fresh zone" },
   { key: "sweeps", label: "Liquidity sweeps", hint: "EQH / EQL pools, next sweep target" },
   { key: "liquidity", label: "Liquidity", hint: "Nearest buy-side / sell-side pools" },
-  { key: "fvg", label: "Fair value gaps", hint: "Unmitigated and partial FVGs" },
+  { key: "freshFvg", label: "Fresh FVG", hint: "Bullish / bearish fair value gaps" },
   { key: "orderBlocks", label: "Order blocks", hint: "Strict demand / supply blocks" },
 ];
 

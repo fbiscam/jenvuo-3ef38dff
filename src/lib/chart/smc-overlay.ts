@@ -16,6 +16,7 @@ import {
 import type { OhlcvBar } from "./indicators";
 import { computeFreshZones, type SdZone } from "./fresh-zones";
 import { computeLiquidityMap, type LiquidityMap } from "./liquidity-sweeps";
+import { computeFreshFvgs, type FreshFvg } from "./fresh-fvgs";
 
 /** Sweeps below this strength are not drawn. */
 const LIQ_MIN_DRAWN_SWEEP = 40;
@@ -64,6 +65,8 @@ export type SmcOverlay = {
   sdZones?: SdZone[];
   /** Resting liquidity pools (next sweep targets) and confirmed sweeps. */
   liquidityMap?: LiquidityMap;
+  /** Fresh bullish / bearish FVGs from closed candles (newest few). */
+  freshFvgs?: FreshFvg[];
 };
 
 export type ReversalSignal = {
@@ -188,6 +191,8 @@ export type SmcToggles = {
   sdPlan: boolean;
   /** Liquidity sweep indicator: EQH/EQL pools, next sweep targets, sweeps. */
   sweeps: boolean;
+  /** Fresh bullish / bearish FVG indicator (closed-candle lifecycle). */
+  freshFvg: boolean;
 };
 
 export const DEFAULT_SMC: SmcToggles = {
@@ -201,6 +206,7 @@ export const DEFAULT_SMC: SmcToggles = {
   sdZones: true,
   sdPlan: true,
   sweeps: true,
+  freshFvg: true,
 };
 
 type Candle = { t: number; o: number; h: number; l: number; c: number; v?: number };
@@ -772,7 +778,9 @@ export function computeSmcOverlay(
     .filter((p) => p.index >= 0);
   const sdZones = computeFreshZones(fractalBars, [...fractal.pivots, ...liveZonePivots]);
   const liquidityMap = computeLiquidityMap(fractalBars, forming ? toCandle(forming) : null, fractal.pivots);
+  const freshFvgs = computeFreshFvgs(fractalBars);
   return {
+    freshFvgs,
     reversal,
     pressure,
     sdZones,
@@ -973,6 +981,57 @@ export function renderSmcOverlay(
     ctx.restore();
   };
 
+  // Fresh FVG: same look as supply/demand zones (soft fill, solid edges,
+  // centred white label). Tested gaps get a lighter fill and dashed edges.
+  const freshFvg = (f: FreshFvg) => {
+    const x0 = pr.x(f.t / 1000);
+    const topY = pr.y(f.top);
+    const bottomY = pr.y(f.bottom);
+    if (x0 == null || topY == null || bottomY == null) return;
+    if (x0 > pr.width) return;
+    const bullish = f.type === "BULLISH";
+    const x = Math.max(0, x0);
+    const width = Math.max(1, pr.width - x);
+    const y = Math.min(topY, bottomY);
+    const height = Math.max(2, Math.abs(bottomY - topY));
+    const edge = bullish ? "rgb(34,197,94)" : "rgb(242,54,69)";
+    const fill = bullish
+      ? `rgba(34,197,94,${f.fresh ? 0.12 : 0.07})`
+      : `rgba(242,54,69,${f.fresh ? 0.12 : 0.07})`;
+    const label = bullish ? "BULLISH FVG" : "BEARISH FVG";
+    ctx.save();
+    ctx.fillStyle = fill;
+    ctx.fillRect(x, y, width, height);
+    ctx.strokeStyle = edge;
+    ctx.lineWidth = 1.25;
+    if (!f.fresh) ctx.setLineDash([4, 3]);
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(pr.width, y);
+    ctx.moveTo(x, y + height);
+    ctx.lineTo(pr.width, y + height);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.font = "600 12px 'JetBrains Mono', ui-monospace, monospace";
+    const textWidth = ctx.measureText(label).width;
+    const labelX = Math.min(pr.width - textWidth - 12, Math.max(x + 8, x + width / 2 - textWidth / 2));
+    const collides = (cy: number) =>
+      sdLabelRects.some((r) => Math.abs(r.y - cy) < 22 && labelX < r.x1 && labelX + textWidth > r.x0);
+    const candidates = [y + height / 2, y - 12, y + height + 12, y - 34, y + height + 34];
+    const labelY = candidates.find((cy) => !collides(cy)) ?? candidates[0];
+    sdLabelRects.push({ x0: labelX - 6, x1: labelX + textWidth + 6, y: labelY });
+    ctx.fillStyle = "rgba(255,255,255,0.92)";
+    ctx.beginPath();
+    ctx.roundRect?.(labelX - 6, labelY - 10, textWidth + 12, 20, 4);
+    if (!ctx.roundRect) ctx.rect(labelX - 6, labelY - 10, textWidth + 12, 20);
+    ctx.fill();
+    ctx.fillStyle = edge;
+    ctx.textBaseline = "middle";
+    ctx.fillText(label, labelX, labelY + 1);
+    ctx.textBaseline = "alphabetic";
+    ctx.restore();
+  };
+
   // Entry / SL / TP1 / TP2 lines for a fresh zone's limit-order plan.
   const sdPlan = (z: SdZone) => {
     const plan = z.plan;
@@ -1022,7 +1081,9 @@ export function renderSmcOverlay(
     for (const z of zones) sdZone(z, z === planned);
     if (planned) sdPlan(planned);
   }
-  if (toggles.fvg) {
+  if (toggles.freshFvg) {
+    for (const f of smc.freshFvgs ?? []) freshFvg(f);
+  } else if (toggles.fvg) {
     for (const gap of smc.fvgs) fairValueGap(gap);
   }
   if (toggles.orderBlocks) {
