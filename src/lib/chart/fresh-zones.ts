@@ -63,6 +63,8 @@ export const SD_MIN_DISPLACEMENT_ATR = 0.5;
 export const SD_MAX_TOTAL = 4;
 /** Minimum clear gap between any two kept zones, in current ATR, so they never stack. */
 export const SD_MIN_GAP_ATR = 0.3;
+/** A newer same-type zone printed on top of (or within this many ATR of) an older one replaces it. */
+export const SD_SUPERSEDE_ATR = 1;
 export const SD_EXTREME_LOOKBACK = 50;
 export const SD_SL_BUFFER_ATR = 0.15;
 
@@ -221,13 +223,18 @@ export function computeFreshZones(
   // Newest first; newer zones win any overlap (same or opposite type). A zone
   // must also sit a clear gap away from every kept zone, so none ever stack.
   zones.sort((a, b) => b.t - a.t);
-  const gap = Math.max(0, atrAt(bars, Math.max(1, last))) * SD_MIN_GAP_ATR;
+  const nowAtr = Math.max(0, atrAt(bars, Math.max(1, last)));
+  const gap = nowAtr * SD_MIN_GAP_ATR;
+  const supersede = nowAtr * SD_SUPERSEDE_ATR;
   // Keep the newest SD_MAX_TOTAL valid (unbroken) zones: when a new zone
   // prints, the oldest kept one drops off. Broken zones never take a slot,
   // so strong trends no longer leave the chart empty.
   const kept: SdZone[] = [];
   for (const z of zones) {
     if (z.broken) continue;
+    // A newer zone printed on top of an older one replaces it: the old zone
+    // hides and the fresh one shows.
+    if (kept.some((k) => k.type === z.type && z.bottom - supersede < k.top && z.top + supersede > k.bottom)) continue;
     if (kept.some((k) => z.bottom - gap < k.top && z.top + gap > k.bottom)) continue;
     const { broken: _b, ...clean } = z;
     kept.push(clean);
