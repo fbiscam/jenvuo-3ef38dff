@@ -54,3 +54,36 @@ describe("computeFreshFvgs", () => {
     expect(computeFreshFvgs(bars).length <= FVG_MAX_TOTAL).toBe(true);
   });
 });
+
+import { resolveZoneOverlaps } from "./smc-overlay";
+import type { SdZone } from "./fresh-zones";
+
+describe("resolveZoneOverlaps", () => {
+  const zone = (t: number, top: number, bottom: number): SdZone => ({
+    type: "DEMAND", t, top, bottom, label: "HL", fresh: true, touches: 0, displacementAtr: 1,
+    extreme: false, extremeLevel: bottom, live: false, strength: 60, grade: "STRONG",
+    levels: { side: "BUY", entry: top, sl: bottom - 1, tp1: top + 2, tp2: top + 3 },
+  });
+  const fvg = (t: number, top: number, bottom: number) =>
+    ({ type: "BULLISH" as const, t, top, bottom, fresh: true, filled: 0, sizeAtr: 1 });
+
+  test("a newer FVG on top of an older zone hides the zone", () => {
+    const r = resolveZoneOverlaps([zone(1, 105, 100)], [fvg(5, 104, 102)]);
+    expect(r.sdZones).toHaveLength(0);
+    expect(r.fvgs).toHaveLength(1);
+  });
+
+  test("a newer zone on top of an older FVG hides the FVG and carries the plan", () => {
+    const r = resolveZoneOverlaps([zone(9, 105, 100), zone(2, 90, 88)], [fvg(5, 104, 102)]);
+    expect(r.fvgs).toHaveLength(0);
+    expect(r.sdZones).toHaveLength(2);
+    expect(r.sdZones[1].plan?.side).toBe("BUY");
+    expect(r.sdZones[0].plan === undefined).toBe(true);
+  });
+
+  test("shows at most 2 FVGs", () => {
+    const r = resolveZoneOverlaps([], [fvg(1, 10, 9), fvg(2, 20, 19), fvg(3, 30, 29), fvg(4, 40, 39)]);
+    expect(r.fvgs).toHaveLength(2);
+    expect(r.fvgs[1].t).toBe(4);
+  });
+});
