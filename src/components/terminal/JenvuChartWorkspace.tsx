@@ -61,7 +61,7 @@ import { useLivePriceStream } from "@/hooks/useLivePriceStream";
 const PRESSURE_TIMEFRAMES = { has: (_key: string) => true };
 /** Fresh supply/demand zones are drawn only on these higher timeframes. */
 // Fresh supply/demand zones (and their menu switches) exist on the 30m chart only.
-const SD_ZONE_TIMEFRAMES = new Set(["30m"]);
+const SD_ZONE_TIMEFRAMES = new Set(["15m", "30m"]);
 
 const MemoChart = memo(ChartCanvas);
 
