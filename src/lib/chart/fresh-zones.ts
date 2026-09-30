@@ -88,6 +88,8 @@ export const SD_SL_BUFFER_ATR = 0.15;
 export const SD_MIN_STRENGTH = 55;
 /** An opposing FVG within this many ATR of the zone's proximal edge rejects it. */
 export const SD_COUNTER_FVG_ATR = 3;
+/** Strategy mode: the departure FVG's displacement candle must be within this many candles of the swing. */
+export const SD_STRATEGY_FVG_BARS = 5;
 
 function atrAt(bars: Candle[], end: number, period = 14): number {
   const first = Math.max(1, end - period + 1);
@@ -208,7 +210,10 @@ export function computeFreshZones(
     // real-bodied displacement candle inside the fixed window proves
     // institutional displacement off the zone. Zones without one are hidden.
     let departure: FreshFvg | undefined;
-    for (let k = i + 1; k < end; k++) {
+    // Strategy mode is strict: the displacement FVG must print right off the
+    // swing (within SD_STRATEGY_FVG_BARS candles), not somewhere later.
+    const fvgEnd = requireFvg ? Math.min(end, i + 1 + SD_STRATEGY_FVG_BARS) : end;
+    for (let k = i + 1; k < fvgEnd; k++) {
       const a = bars[k - 1];
       const mid = bars[k];
       const c = bars[k + 1];
@@ -263,6 +268,16 @@ export function computeFreshZones(
     const risk = Math.abs(entry - sl);
     const tp1 = supply ? entry - risk * 2 : entry + risk * 2;
     const tp2 = supply ? entry - risk * 3 : entry + risk * 3;
+    // Strategy mode: a closed candle whose wick ran the stop means the setup
+    // already failed, so the zone is not shown.
+    let stopped = false;
+    for (let k = i + 1; k <= last; k++) {
+      if (supply ? bars[k].h >= sl : bars[k].l <= sl) {
+        stopped = true;
+        break;
+      }
+    }
+
 
     // Every zone carries its levels; only the newest kept zone shows them.
     const plan: SdTradePlan = {
@@ -291,7 +306,11 @@ export function computeFreshZones(
       grade,
       plan,
       levels: plan,
-      broken: broken || countered || (requireFvg && !departure) || strength < SD_MIN_STRENGTH,
+      broken:
+        broken ||
+        countered ||
+        (requireFvg && (!departure || stopped)) ||
+        strength < SD_MIN_STRENGTH,
     } as SdZone & { broken: boolean });
   }
 
