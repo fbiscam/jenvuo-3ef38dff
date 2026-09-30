@@ -1413,14 +1413,30 @@ async function fetchGoldProxyDeep(tf: string, limit: number): Promise<Candle[]> 
  */
 let lastGoldScale: number | null = null;
 const GOLD_SCALE_STEP = 0.0001;
-const GOLD_SCALE_REANCHOR_PCT = 0.0025;
+// 0.05% ≈ $2 at $4000. Small enough that closed candles never sit visibly away
+// from the live spot price (0.25% let them drift ~$8-10 and then re-scale the
+// whole history in one jump), large enough that ordinary proxy/spot jitter
+// between polls does not move old candles.
+export const GOLD_SCALE_REANCHOR_PCT = 0.0005;
 export function quantizeGoldScale(raw: number, previous: number | null): number {
   if (!Number.isFinite(raw) || raw <= 0) return previous ?? 1;
-  // Keep every historical candle fixed while spot and the Gold proxy make
-  // normal short-term moves. Re-scaling all 1m/5m/15m history on each poll made
-  // old candles appear to move even though only the forming candle was live.
   if (previous != null && Math.abs(raw / previous - 1) < GOLD_SCALE_REANCHOR_PCT) return previous;
   return Math.round(raw / GOLD_SCALE_STEP) * GOLD_SCALE_STEP;
+}
+
+/**
+ * Scale proxy candles to spot, then pin the forming (last) candle's close to the
+ * live spot price so the server-fed forming candle and the client's live tick
+ * agree exactly — no step between closed history and the live candle.
+ * Closed candles are only ever touched by the (rare, ≤~$2) re-anchor.
+ */
+export function applyGoldScale(proxy: Candle[], scale: number, spot: number | null): Candle[] {
+  const scaled = proxy.map((c) => ({ ...c, o: c.o * scale, h: c.h * scale, l: c.l * scale, c: c.c * scale }));
+  const last = scaled.at(-1);
+  if (last && spot != null && Number.isFinite(spot) && spot > 0 && Math.abs(spot / last.c - 1) < 0.005) {
+    scaled[scaled.length - 1] = { ...last, c: spot, h: Math.max(last.h, spot), l: Math.min(last.l, spot) };
+  }
+  return scaled;
 }
 
 async function scaleProxyToSpot(proxy: Candle[]): Promise<Candle[]> {
@@ -1429,7 +1445,7 @@ async function scaleProxyToSpot(proxy: Candle[]): Promise<Candle[]> {
   const raw = spot?.price && latestProxy > 0 ? spot.price / latestProxy : NaN;
   const scale = quantizeGoldScale(raw, lastGoldScale);
   lastGoldScale = scale;
-  return proxy.map((c) => ({ ...c, o: c.o * scale, h: c.h * scale, l: c.l * scale, c: c.c * scale }));
+  return applyGoldScale(proxy, scale, spot?.price ?? null);
 }
 
 async function loadBtcTerminalChart(tf: string): Promise<TerminalChartPayload> {
