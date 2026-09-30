@@ -13,6 +13,9 @@
  *   TP1 = 2R, TP2 = 3R).
  * - Only STRONG zones (strength >= SD_MIN_STRENGTH) are shown, so the chart
  *   only marks zones price is likely to respect.
+ * - Strategy gate: a zone is shown only when a same-direction displacement
+ *   FVG formed as price left it (bearish FVG under supply, bullish FVG above
+ *   demand). That FVG is stored on the zone and drawn with it.
  * - A zone is rejected when an opposing, still-alive FVG prints after it on
  *   the zone's side of price (bearish FVG just above a demand zone, bullish
  *   FVG just below a supply zone): sellers/buyers are displacing toward the
@@ -21,7 +24,7 @@
  *   ones form.
  */
 import type { StructurePivot } from "@/lib/analysis/market-structure-evidence";
-import { detectLiveFvgs } from "./fresh-fvgs";
+import { detectLiveFvgs, FVG_MIN_BODY_RATIO, FVG_MIN_SIZE_ATR, type FreshFvg } from "./fresh-fvgs";
 
 type Candle = { t: number; o: number; h: number; l: number; c: number };
 
@@ -57,6 +60,8 @@ export type SdZone = {
   live: boolean;
   /** A same-direction 3-candle imbalance formed in the departure leg. */
   imbalance?: boolean;
+  /** The displacement FVG that left this zone (drawn together with it). */
+  fvg?: FreshFvg;
   /** Deterministic 0-100 strength score. */
   strength: number;
   grade: SdGrade;
@@ -72,7 +77,7 @@ export type ZonePivot = Pick<StructurePivot, "index" | "t" | "price" | "kind" | 
 /** Confirmed swings need this much closed-body displacement to keep a zone. */
 export const SD_MIN_DISPLACEMENT_ATR = 0.5;
 /** Newest zones shown on the chart (both sides together). */
-export const SD_MAX_TOTAL = 4;
+export const SD_MAX_TOTAL = 3;
 /** Minimum clear gap between any two kept zones, in current ATR, so they never stack. */
 export const SD_MIN_GAP_ATR = 0.3;
 /** A newer same-type zone printed on top of (or within this many ATR of) an older one replaces it. */
@@ -197,15 +202,40 @@ export function computeFreshZones(
     const range = Math.max(swing.h - swing.l, 1e-9);
     const wick = supply ? swing.h - Math.max(swing.o, swing.c) : Math.min(swing.o, swing.c) - swing.l;
     const extremeLabel = supply ? p.label === "HH" || p.label === "H" : p.label === "LL" || p.label === "L";
-    // Departure imbalance: a same-direction 3-candle gap inside the fixed
-    // displacement window proves institutional displacement off the zone.
-    let imbalance = false;
+    // Departure FVG (strategy step 2): a same-direction 3-candle gap with a
+    // real-bodied displacement candle inside the fixed window proves
+    // institutional displacement off the zone. Zones without one are hidden.
+    let departure: FreshFvg | undefined;
     for (let k = i + 1; k < end; k++) {
-      if (supply ? bars[k + 1].h < bars[k - 1].l : bars[k + 1].l > bars[k - 1].h) {
-        imbalance = true;
-        break;
+      const a = bars[k - 1];
+      const mid = bars[k];
+      const c = bars[k + 1];
+      if (!(supply ? c.h < a.l : c.l > a.h)) continue;
+      const midRange = mid.h - mid.l;
+      if (!(midRange > 0) || Math.abs(mid.c - mid.o) / midRange < FVG_MIN_BODY_RATIO) continue;
+      if (supply ? mid.c >= mid.o : mid.c <= mid.o) continue;
+      const fTop = supply ? a.l : c.l;
+      const fBottom = supply ? c.h : a.h;
+      const size = fTop - fBottom;
+      if (size < atr * FVG_MIN_SIZE_ATR) continue;
+      // Closed-candle lifecycle: fill depth only (the zone keeps its FVG).
+      let deepest = supply ? fBottom : fTop;
+      for (let m = k + 2; m <= last; m++) {
+        deepest = supply ? Math.max(deepest, bars[m].h) : Math.min(deepest, bars[m].l);
       }
+      const filled = Math.max(0, Math.min(1, (supply ? deepest - fBottom : fTop - deepest) / size));
+      departure = {
+        type: supply ? "BEARISH" : "BULLISH",
+        t: mid.t,
+        top: fTop,
+        bottom: fBottom,
+        fresh: filled === 0,
+        filled: Math.round(filled * 100) / 100,
+        sizeAtr: Math.round((size / atr) * 10) / 10,
+      };
+      break;
     }
+    const imbalance = !!departure;
     const { strength, grade } = zoneStrength({
       displacementAtr,
       extreme,
@@ -254,11 +284,12 @@ export function computeFreshZones(
       extremeLevel: p.price,
       live,
       imbalance,
+      fvg: departure,
       strength,
       grade,
       plan,
       levels: plan,
-      broken: broken || countered || strength < SD_MIN_STRENGTH,
+      broken: broken || countered || !departure || strength < SD_MIN_STRENGTH,
     } as SdZone & { broken: boolean });
   }
 
