@@ -76,14 +76,14 @@ describe("resolveZoneOverlaps", () => {
   test("a newer zone on top of an older FVG hides the FVG and carries the plan", () => {
     const r = resolveZoneOverlaps([zone(9, 105, 100), zone(2, 90, 88)], [fvg(5, 104, 102)]);
     expect(r.fvgs).toHaveLength(0);
-    expect(r.sdZones).toHaveLength(2);
-    expect(r.sdZones[1].plan?.side).toBe("BUY");
-    expect(r.sdZones[0].plan === undefined).toBe(true);
+    expect(r.sdZones).toHaveLength(1);
+    expect(r.sdZones[0].t).toBe(9);
+    expect(r.sdZones[0].plan?.side).toBe("BUY");
   });
 
-  test("shows at most 2 FVGs", () => {
+  test("shows only the latest FVG", () => {
     const r = resolveZoneOverlaps([], [fvg(1, 10, 9), fvg(2, 20, 19), fvg(3, 30, 29), fvg(4, 40, 39)]);
-    expect(r.fvgs).toHaveLength(2);
-    expect(r.fvgs[1].t).toBe(4);
+    expect(r.fvgs).toHaveLength(1);
+    expect(r.fvgs[0].t).toBe(4);
   });
 });
