@@ -761,14 +761,16 @@ export function computeSmcOverlay(
     ...pivotsLabelled,
     ...livePivots,
   ], pressure, latestAtr, targetBuySide, targetSellSide);
-  // Zones on every swing label: confirmed pivots plus the live HH/HL/LH/LL
-  // swings, so a new zone appears the moment its label does.
+  // Zones on every swing label, built from server-fed CLOSED candles only
+  // (live swings included) so every browser/account sees identical zones;
+  // per-browser live ticks on the forming candle never create or move a zone.
   const confirmedKeys = new Set(fractal.pivots.map((p) => `${p.kind}:${p.t}`));
-  const liveZonePivots = livePivots
+  const closedIdx = new Map(fractalBars.map((b, k) => [b.t, k] as const));
+  const liveZonePivots = computeLivePivots(fractalBars, null, fractal.pivots)
     .filter((p) => !confirmedKeys.has(`${p.kind}:${p.t}`))
-    .map((p) => ({ index: idxOf.get(p.t) ?? -1, t: p.t, price: p.price, kind: p.kind, label: p.label, live: !p.confirmedByOpposite }))
+    .map((p) => ({ index: closedIdx.get(p.t) ?? -1, t: p.t, price: p.price, kind: p.kind, label: p.label, live: !p.confirmedByOpposite }))
     .filter((p) => p.index >= 0);
-  const sdZones = computeFreshZones(all, [...fractal.pivots, ...liveZonePivots], fractalBars.length);
+  const sdZones = computeFreshZones(fractalBars, [...fractal.pivots, ...liveZonePivots]);
   const liquidityMap = computeLiquidityMap(fractalBars, forming ? toCandle(forming) : null, fractal.pivots);
   return {
     reversal,
