@@ -41,7 +41,12 @@ export function resolveZoneOverlaps(
     kept.push(it);
     if (it.fvg) fvgCount++;
   }
-  const keptSd = kept.filter((k) => k.sd).map((k) => k.sd!).sort((a, b) => a.t - b.t);
+  // Only the single latest surviving supply/demand zone is shown.
+  const keptSd = kept
+    .filter((k) => k.sd)
+    .map((k) => k.sd!)
+    .sort((a, b) => a.t - b.t)
+    .slice(-1);
   const newest = keptSd[keptSd.length - 1];
   return {
     sdZones: keptSd.map((z) =>
