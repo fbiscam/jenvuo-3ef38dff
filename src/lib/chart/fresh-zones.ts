@@ -88,6 +88,8 @@ export const SD_SL_BUFFER_ATR = 0.15;
 export const SD_MIN_STRENGTH = 55;
 /** An opposing FVG within this many ATR of the zone's proximal edge rejects it. */
 export const SD_COUNTER_FVG_ATR = 3;
+/** Strategy mode: the departure FVG's displacement candle must be within this many candles of the swing. */
+export const SD_STRATEGY_FVG_BARS = 5;
 
 function atrAt(bars: Candle[], end: number, period = 14): number {
   const first = Math.max(1, end - period + 1);
@@ -208,7 +210,10 @@ export function computeFreshZones(
     // real-bodied displacement candle inside the fixed window proves
     // institutional displacement off the zone. Zones without one are hidden.
     let departure: FreshFvg | undefined;
-    for (let k = i + 1; k < end; k++) {
+    // Strategy mode is strict: the displacement FVG must print right off the
+    // swing (within SD_STRATEGY_FVG_BARS candles), not somewhere later.
+    const fvgEnd = requireFvg ? Math.min(end, i + 1 + SD_STRATEGY_FVG_BARS) : end;
+    for (let k = i + 1; k < fvgEnd; k++) {
       const a = bars[k - 1];
       const mid = bars[k];
       const c = bars[k + 1];
