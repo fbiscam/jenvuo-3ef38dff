@@ -1134,7 +1134,7 @@ export function renderSmcOverlay(
   // browsers with different switch settings showed different zones. The
   // switches only control what gets drawn.
   // Strategy ON: every new HH/HL/LH/LL is checked for a fresh zone that a
-  // same-direction displacement FVG confirmed; the latest 2 show, each with
+  // same-direction displacement FVG confirmed; only the latest 1 shows, with
   // its FVG. Strategy OFF: classic view, 1 zone + 1 standalone FVG.
   const strategy = toggles.sdZones && toggles.sdStrategy !== false;
   const visible = strategy
