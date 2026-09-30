@@ -49,8 +49,13 @@ function atrAt(bars: Candle[], end: number, period = 14): number {
   return b ? b.h - b.l : 0;
 }
 
-/** @param bars closed candles only, oldest first. */
-export function computeFreshFvgs(bars: Candle[], maxTotal = FVG_MAX_TOTAL): FreshFvg[] {
+/**
+ * Every valid gap that is still alive (not closed through, not fully filled),
+ * before any overlap/cap filtering. Used by the supply/demand engine to spot
+ * opposing FVGs that invalidate a zone.
+ * @param bars closed candles only, oldest first.
+ */
+export function detectLiveFvgs(bars: Candle[]): FreshFvg[] {
   if (bars.length < 20) return [];
   const last = bars.length - 1;
   const found: FreshFvg[] = [];
@@ -98,7 +103,14 @@ export function computeFreshFvgs(bars: Candle[], maxTotal = FVG_MAX_TOTAL): Fres
       sizeAtr: Math.round((size / atr) * 10) / 10,
     });
   }
+  return found;
+}
 
+/** @param bars closed candles only, oldest first. */
+export function computeFreshFvgs(bars: Candle[], maxTotal = FVG_MAX_TOTAL): FreshFvg[] {
+  if (bars.length < 20) return [];
+  const last = bars.length - 1;
+  const found = detectLiveFvgs(bars);
   found.sort((x, y) => y.t - x.t);
   const nowAtr = Math.max(0, atrAt(bars, last));
   const gap = nowAtr * FVG_MIN_GAP_ATR;
