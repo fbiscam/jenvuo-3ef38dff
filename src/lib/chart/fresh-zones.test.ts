@@ -110,4 +110,18 @@ describe("computeFreshZones", () => {
     expect(zones.filter((z) => z.plan).length).toBe(1);
     expect(zones[zones.length - 1].plan !== undefined).toBe(true);
   });
+
+  test("a newer zone printed on top of an older same-type zone replaces it", () => {
+    const { bars, pivots } = series((i) => {
+      const c = 104 - (i - 20) * 0.4;
+      return { o: c + 0.2, h: c + 0.5, l: c - 0.3, c };
+    });
+    // second swing high at the same level, later
+    bars[25] = bar(25, 104, 105.9, 103.5, 103.6);
+    const newer: StructurePivot = { index: 25, confirmedIndex: 35, t: 25 * 60_000, price: 105.9, kind: "high", label: "LH" };
+    const zones = computeFreshZones(bars, [pivots[0], newer]);
+    expect(zones).toHaveLength(1);
+    expect(zones[0].t).toBe(newer.t);
+    expect(zones[0].plan?.side).toBe("SELL");
+  });
 });
