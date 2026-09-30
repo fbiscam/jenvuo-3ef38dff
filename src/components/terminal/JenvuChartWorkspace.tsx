@@ -141,9 +141,7 @@ const SMC_LABELS: Array<{ key: keyof SmcToggles; label: string; hint: string }> 
   { key: "structure", label: "Swing structure", hint: "HH / HL / LH / LL labels" },
   { key: "pressure", label: "Buyer / seller pressure", hint: "Percentages and confirmed trade levels" },
   { key: "breaks", label: "BOS / CHoCH", hint: "Confirmed close-through breaks" },
-  { key: "sdZones", label: "Fresh supply / demand", hint: "Zones from new swing highs and lows" },
-  { key: "sdStrategy", label: "Zone + FVG strategy", hint: "Latest 2 zones confirmed by an FVG, with Entry / SL / TP" },
-  { key: "sdPlan", label: "Zone Entry / SL / TP", hint: "Trade levels on the newest fresh zone" },
+  { key: "sdStrategy", label: "Zone + FVG strategy", hint: "Supply / demand zones, their FVG and Entry / SL / TP together" },
   { key: "sweeps", label: "Liquidity sweeps", hint: "EQH / EQL pools, next sweep target" },
   { key: "liquidity", label: "Liquidity", hint: "Nearest buy-side / sell-side pools" },
   { key: "freshFvg", label: "Fresh FVG", hint: "Bullish / bearish fair value gaps" },
@@ -310,11 +308,12 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
   const payload = chartQuery.data;
   const pairLabel = asset === "BTCUSD" ? "BTC/USD" : "XAU/USD";
   const showSmcPressure = smcToggles.pressure && PRESSURE_TIMEFRAMES.has(timeframe.key) && (asset === "XAUUSD" || asset === "BTCUSD");
-  // The saved switch stays as the user set it; zones simply don't draw on lower timeframes.
-  const chartSmcToggles = useMemo<SmcToggles>(
-    () => ({ ...smcToggles, sdZones: smcToggles.sdZones && SD_ZONE_TIMEFRAMES.has(timeframe.key) }),
-    [smcToggles, timeframe.key],
-  );
+  // One "Zone + FVG strategy" switch drives zones, their FVGs and Entry/SL/TP
+  // together (15m/30m only); the saved switch stays as the user set it.
+  const chartSmcToggles = useMemo<SmcToggles>(() => {
+    const zonesOn = (smcToggles.sdStrategy ?? true) && SD_ZONE_TIMEFRAMES.has(timeframe.key);
+    return { ...smcToggles, sdZones: zonesOn, sdStrategy: zonesOn, sdPlan: true };
+  }, [smcToggles, timeframe.key]);
   // Keep the last non-empty history for this pair/timeframe so a failed or
   // empty poll never blanks the chart.
   const lastGoodBarsRef = useRef<{ key: string; bars: OhlcvBar[] } | null>(null);
@@ -565,7 +564,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
             </p>
             {SMC_LABELS.filter(
               (item) =>
-                (item.key !== "sdZones" && item.key !== "sdPlan" && item.key !== "sdStrategy") ||
+                item.key !== "sdStrategy" ||
                 SD_ZONE_TIMEFRAMES.has(timeframe.key),
             ).map((item) => (
               <label
