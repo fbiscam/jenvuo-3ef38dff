@@ -1114,9 +1114,12 @@ export function renderSmcOverlay(
   };
 
   // Newest wins across zones and FVGs; only the newest 2 FVGs survive.
+  // Always resolve with BOTH lists so a hidden FVG still removes the zone it
+  // printed on top of — otherwise browsers with different switch settings
+  // showed different zones. The switches only control what gets drawn.
   const visible = resolveZoneOverlaps(
-    toggles.sdZones ? smc.sdZones ?? [] : [],
-    toggles.freshFvg ? smc.freshFvgs ?? [] : [],
+    smc.sdZones ?? [],
+    smc.freshFvgs ?? [],
   );
   if (toggles.sdZones) {
     const zones = visible.sdZones;
