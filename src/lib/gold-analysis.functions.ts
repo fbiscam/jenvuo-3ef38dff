@@ -1418,6 +1418,8 @@ const GOLD_SCALE_STEP = 0.0001;
 // whole history in one jump), large enough that ordinary proxy/spot jitter
 // between polls does not move old candles.
 export const GOLD_SCALE_REANCHOR_PCT = 0.0005;
+/** Fixed ratio grid (≈ $2 at $4000) shared by every server instance. */
+export const GOLD_SCALE_GRID = 0.0005;
 export function quantizeGoldScale(raw: number, previous: number | null): number {
   if (!Number.isFinite(raw) || raw <= 0) return previous ?? 1;
   if (previous != null && Math.abs(raw / previous - 1) < GOLD_SCALE_REANCHOR_PCT) return previous;
@@ -1443,7 +1445,13 @@ async function scaleProxyToSpot(proxy: Candle[]): Promise<Candle[]> {
   const latestProxy = proxy.at(-1)?.c ?? 0;
   const spot = await resolveLiveTick(resolveInstrument("XAUUSD")).catch(() => null);
   const raw = spot?.price && latestProxy > 0 ? spot.price / latestProxy : NaN;
-  const scale = quantizeGoldScale(raw, lastGoldScale);
+  // Stateless grid: every server instance (preview, live site, any region)
+  // maps the same spot/proxy ratio to the same scale. The old per-instance
+  // hysteresis kept a different anchor on each server, so accounts served by
+  // different instances saw candles — and zones — at different prices.
+  const scale = Number.isFinite(raw) && raw > 0
+    ? Math.round(raw / GOLD_SCALE_GRID) * GOLD_SCALE_GRID
+    : (lastGoldScale ?? 1);
   lastGoldScale = scale;
   return applyGoldScale(proxy, scale, spot?.price ?? null);
 }
