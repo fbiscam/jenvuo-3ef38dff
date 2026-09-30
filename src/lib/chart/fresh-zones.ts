@@ -141,6 +141,8 @@ export function computeFreshZones(
   pivots: ZonePivot[],
   closedCount = bars.length,
   displacementWindow = 10,
+  /** Strategy mode: hide zones without a same-direction departure FVG. */
+  requireFvg = true,
 ): SdZone[] {
   if (bars.length < 20) return [];
   const zones: (SdZone & { broken?: boolean })[] = [];
@@ -289,7 +291,7 @@ export function computeFreshZones(
       grade,
       plan,
       levels: plan,
-      broken: broken || countered || !departure || strength < SD_MIN_STRENGTH,
+      broken: broken || countered || (requireFvg && !departure) || strength < SD_MIN_STRENGTH,
     } as SdZone & { broken: boolean });
   }
 

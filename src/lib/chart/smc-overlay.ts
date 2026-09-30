@@ -18,8 +18,8 @@ import { computeFreshZones, type SdZone } from "./fresh-zones";
 import { computeLiquidityMap, type LiquidityMap } from "./liquidity-sweeps";
 import { computeFreshFvgs, FVG_MAX_TOTAL, type FreshFvg } from "./fresh-fvgs";
 
-/** Supply/demand zones (each with its own displacement FVG) shown on the chart. */
-export const SD_VISIBLE_ZONES = 3;
+/** Zone + FVG strategy: latest zones (each with its own displacement FVG) shown. */
+export const SD_VISIBLE_ZONES = 2;
 
 /**
  * Newest wins across supply/demand zones AND standalone FVGs: any older zone
@@ -109,6 +109,8 @@ export type SmcOverlay = {
   reversal?: ReversalSignal | null;
   /** Fresh supply/demand zones anchored to confirmed swing highs/lows. */
   sdZones?: SdZone[];
+  /** Strategy zones: only swings followed by a same-direction displacement FVG. */
+  sdStrategyZones?: SdZone[];
   /** Resting liquidity pools (next sweep targets) and confirmed sweeps. */
   liquidityMap?: LiquidityMap;
   /** Fresh bullish / bearish FVGs from closed candles (newest few). */
@@ -233,6 +235,8 @@ export type SmcToggles = {
   liquidity: boolean;
   projection: boolean;
   sdZones: boolean;
+  /** Zone + FVG strategy: latest 2 zones confirmed by a displacement FVG. */
+  sdStrategy?: boolean;
   /** Entry / SL / TP lines on the newest fresh supply/demand zone. */
   sdPlan: boolean;
   /** Liquidity sweep indicator: EQH/EQL pools, next sweep targets, sweeps. */
@@ -250,6 +254,7 @@ export const DEFAULT_SMC: SmcToggles = {
   liquidity: true,
   projection: true,
   sdZones: true,
+  sdStrategy: true,
   sdPlan: true,
   sweeps: true,
   freshFvg: true,
@@ -822,7 +827,9 @@ export function computeSmcOverlay(
     .filter((p) => !confirmedKeys.has(`${p.kind}:${p.t}`))
     .map((p) => ({ index: closedIdx.get(p.t) ?? -1, t: p.t, price: p.price, kind: p.kind, label: p.label, live: !p.confirmedByOpposite }))
     .filter((p) => p.index >= 0);
-  const sdZones = computeFreshZones(fractalBars, [...fractal.pivots, ...liveZonePivots]);
+  const zonePivots = [...fractal.pivots, ...liveZonePivots];
+  const sdZones = computeFreshZones(fractalBars, zonePivots, undefined, undefined, false);
+  const sdStrategyZones = computeFreshZones(fractalBars, zonePivots, undefined, undefined, true);
   const liquidityMap = computeLiquidityMap(fractalBars, forming ? toCandle(forming) : null, fractal.pivots);
   // Wider pool: the chart keeps the newest 2 that survive overlap removal.
   const freshFvgs = computeFreshFvgs(fractalBars, 8);
@@ -831,6 +838,7 @@ export function computeSmcOverlay(
     reversal,
     pressure,
     sdZones,
+    sdStrategyZones,
     liquidityMap,
     pivots: pivotsLabelled,
     livePivots,
@@ -1125,21 +1133,23 @@ export function renderSmcOverlay(
   // hidden FVG still removes the zone it printed on top of — otherwise
   // browsers with different switch settings showed different zones. The
   // switches only control what gets drawn.
-  const visible = resolveZoneOverlaps(
-    smc.sdZones ?? [],
-    smc.freshFvgs ?? [],
-  );
+  // Strategy ON: every new HH/HL/LH/LL is checked for a fresh zone that a
+  // same-direction displacement FVG confirmed; the latest 2 show, each with
+  // its FVG. Strategy OFF: classic view, 1 zone + 1 standalone FVG.
+  const strategy = toggles.sdZones && toggles.sdStrategy !== false;
+  const visible = strategy
+    ? resolveZoneOverlaps(smc.sdStrategyZones ?? [], smc.freshFvgs ?? [], FVG_MAX_TOTAL, SD_VISIBLE_ZONES)
+    : resolveZoneOverlaps(smc.sdZones ?? [], smc.freshFvgs ?? [], FVG_MAX_TOTAL, 1);
   if (toggles.sdZones) {
     const zones = visible.sdZones;
-    // Strategy view: the last 3 zones, each with the displacement FVG that
-    // left it; Entry / SL / TP only on the newest zone.
-    if (toggles.freshFvg) {
+    if (strategy && toggles.freshFvg) {
       for (const z of zones) if (z.fvg) freshFvg(z.fvg);
     }
     const planned = toggles.sdPlan === false ? undefined : [...zones].reverse().find((z) => z.plan);
     for (const z of zones) sdZone(z, z === planned);
     if (planned) sdPlan(planned);
-  } else if (toggles.freshFvg) {
+  }
+  if (toggles.freshFvg && !strategy) {
     for (const f of visible.fvgs) freshFvg(f);
   }
   if (toggles.orderBlocks) {
