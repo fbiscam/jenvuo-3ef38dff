@@ -1207,7 +1207,10 @@ export function renderSmcOverlay(
        ctx.fillText(label, labelX, b.dir === "bullish" ? y - 7 : y + 16);
     }
   }
-  const pressureBadge = (t: number, xx: number, yy: number, up: boolean) => {
+  // live = swing not fully confirmed yet: the % is from closed candles only
+  // (moves only when a candle closes) and is drawn dashed with a dot until it
+  // locks as the final solid badge.
+  const pressureBadge = (t: number, xx: number, yy: number, up: boolean, live = false) => {
     if (!showPressure) return;
     const buy = smc.pressure?.[t];
     if (buy == null) return;
@@ -1224,7 +1227,15 @@ export function renderSmcOverlay(
     ctx.roundRect?.(bx, by, bw, bh, 5);
     if (!ctx.roundRect) ctx.rect(bx, by, bw, bh);
     ctx.fill();
+    if (live) ctx.setLineDash([3, 2]);
     ctx.stroke();
+    ctx.setLineDash([]);
+    if (live) {
+      ctx.fillStyle = "#f59e0b";
+      ctx.beginPath();
+      ctx.arc(xx, by + 8, 2.5, 0, Math.PI * 2);
+      ctx.fill();
+    }
     const barY = by + bh - 5;
     ctx.fillStyle = "#089981";
     ctx.fillRect(bx + 4, barY, ((bw - 8) * buy) / 100, 3);
@@ -1281,14 +1292,14 @@ export function renderSmcOverlay(
         ctx.fill();
         ctx.fillStyle = "#ffffff";
         ctx.fillText(text, xx - w / 2 + 7, yy + 13.5);
-        // Buyer/seller % only on fully confirmed swings, so it never changes.
+        pressureBadge(p.t, xx, yy, up, true);
         continue;
       }
       // Early "High"/"Low" marker on the running swing (no countdown box).
       if (!SHOW_PROVISIONAL_PIVOTS) {
         // New swing shown immediately with its real label (HH/HL/LH/LL).
-        // Its buyer/seller % waits until the swing is fully confirmed, so the
-        // number shown is final and never moves.
+        // Its buyer/seller % shows at once as a dashed LIVE badge and locks
+        // solid once the swing is fully confirmed.
         ctx.fillStyle = color;
         ctx.beginPath();
         ctx.roundRect?.(xx - w / 2, yy, w, 18, 4);
@@ -1296,6 +1307,7 @@ export function renderSmcOverlay(
         ctx.fill();
         ctx.fillStyle = "#ffffff";
         ctx.fillText(text, xx - w / 2 + 7, yy + 13.5);
+        pressureBadge(p.t, xx, yy, up, true);
         continue;
       }
       ctx.fillStyle = "rgba(255,255,255,0.92)";
