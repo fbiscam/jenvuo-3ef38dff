@@ -222,16 +222,17 @@ export function computeFreshZones(
   // must also sit a clear gap away from every kept zone, so none ever stack.
   zones.sort((a, b) => b.t - a.t);
   const gap = Math.max(0, atrAt(bars, Math.max(1, last))) * SD_MIN_GAP_ATR;
-  // The newest SD_MAX_TOTAL zones form a rolling window: when a new zone
-  // prints, the oldest leaves the window for good. A broken zone still holds
-  // its slot, so older zones never reappear when a newer one is broken.
-  const windowed: (SdZone & { broken?: boolean })[] = [];
+  // Keep the newest SD_MAX_TOTAL valid (unbroken) zones: when a new zone
+  // prints, the oldest kept one drops off. Broken zones never take a slot,
+  // so strong trends no longer leave the chart empty.
+  const kept: SdZone[] = [];
   for (const z of zones) {
-    if (!z.broken && windowed.some((k) => !k.broken && z.bottom - gap < k.top && z.top + gap > k.bottom)) continue;
-    windowed.push(z);
-    if (windowed.length >= SD_MAX_TOTAL) break;
+    if (z.broken) continue;
+    if (kept.some((k) => z.bottom - gap < k.top && z.top + gap > k.bottom)) continue;
+    const { broken: _b, ...clean } = z;
+    kept.push(clean);
+    if (kept.length >= SD_MAX_TOTAL) break;
   }
-  const kept: SdZone[] = windowed.filter((z) => !z.broken).map(({ broken: _b, ...z }) => z);
   kept.sort((a, b) => a.t - b.t);
   // Entry / SL / TP always belong to the latest zone on the chart.
   const newest = kept[kept.length - 1];
