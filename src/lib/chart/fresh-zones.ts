@@ -309,7 +309,7 @@ export function computeFreshZones(
       broken:
         broken ||
         countered ||
-        (requireFvg && (!departure || departure.filled >= 1 || stopped)) ||
+        (requireFvg && (!departure || stopped)) ||
         strength < SD_MIN_STRENGTH,
     } as SdZone & { broken: boolean });
   }
