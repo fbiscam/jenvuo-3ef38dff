@@ -195,3 +195,4 @@
 - [x] Zones: newest 4, also on 30m, Entry/SL/TP on/off switch; EMA/SMA/VWAP no price-panel tags
 - [x] Liquidity sweep indicator (EQH/EQL pools, next sweep target, confirmed sweeps) with SMC toggle
 - [x] Fresh bullish/bearish FVG indicator (closed candles, newest 4, newer replaces older) with SMC toggle
+- [x] Fresh FVG: show only the latest 2 gaps
