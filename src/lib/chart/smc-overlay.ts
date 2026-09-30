@@ -1305,18 +1305,8 @@ function renderLiquidityMap(ctx: CanvasRenderingContext2D, map: LiquidityMap, pr
     const up = pool.side === "BSL";
     const ly = freeY(up ? y - 10 : y + 10, up ? -1 : 1);
     const lx = Math.max(4, pr.width - tw - 110);
-    if (pool.next || pool.taking) {
-      ctx.fillStyle = color;
-      ctx.beginPath();
-      ctx.roundRect?.(lx - 5, ly - 8, tw + 10, 16, 3);
-      if (!ctx.roundRect) ctx.rect(lx - 5, ly - 8, tw + 10, 16);
-      ctx.fill();
-      ctx.fillStyle = "#ffffff";
-    } else {
-      ctx.fillStyle = "rgba(255,255,255,0.9)";
-      ctx.fillRect(lx - 3, ly - 8, tw + 6, 16);
-      ctx.fillStyle = color;
-    }
+    // Transparent labels with black text; the coloured dotted line carries the side.
+    ctx.fillStyle = "#000000";
     ctx.textBaseline = "middle";
     ctx.fillText(text, lx, ly + 1);
     ctx.textBaseline = "alphabetic";
@@ -1353,9 +1343,7 @@ function renderLiquidityMap(ctx: CanvasRenderingContext2D, map: LiquidityMap, pr
     const tw = ctx.measureText(text).width;
     const lx = Math.max(2, x1 - tw - 8);
     const ly = s.side === "BSL" ? y + 12 : y - 5;
-    ctx.fillStyle = "rgba(255,255,255,0.9)";
-    ctx.fillRect(lx - 2, ly - 9, tw + 4, 12);
-    ctx.fillStyle = color;
+    ctx.fillStyle = "#000000";
     ctx.fillText(text, lx, ly);
   }
   ctx.restore();

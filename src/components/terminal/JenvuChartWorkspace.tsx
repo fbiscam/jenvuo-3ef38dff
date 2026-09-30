@@ -60,7 +60,8 @@ import { useLivePriceStream } from "@/hooks/useLivePriceStream";
 // Buyer/seller pressure is shown on every chart timeframe.
 const PRESSURE_TIMEFRAMES = { has: (_key: string) => true };
 /** Fresh supply/demand zones are drawn only on these higher timeframes. */
-const SD_ZONE_TIMEFRAMES = new Set(["30m", "45m", "1h", "4h", "1d"]);
+// Fresh supply/demand zones (and their menu switches) exist on the 30m chart only.
+const SD_ZONE_TIMEFRAMES = new Set(["30m"]);
 
 const MemoChart = memo(ChartCanvas);
 
@@ -561,7 +562,9 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
             <p className="px-2 pb-2 text-xs font-normal leading-4 text-muted-foreground">
               Same 10-bar structure engine the AI desk
             </p>
-            {SMC_LABELS.map((item) => (
+            {SMC_LABELS.filter(
+              (item) => (item.key !== "sdZones" && item.key !== "sdPlan") || SD_ZONE_TIMEFRAMES.has(timeframe.key),
+            ).map((item) => (
               <label
                 key={item.key}
                 className="flex cursor-pointer items-center justify-between gap-3 rounded-md px-2 py-2 hover:bg-accent"
