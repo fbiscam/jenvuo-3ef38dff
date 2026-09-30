@@ -76,14 +76,24 @@ describe("resolveZoneOverlaps", () => {
   test("a newer zone on top of an older FVG hides the FVG and carries the plan", () => {
     const r = resolveZoneOverlaps([zone(9, 105, 100), zone(2, 90, 88)], [fvg(5, 104, 102)]);
     expect(r.fvgs).toHaveLength(0);
-    expect(r.sdZones).toHaveLength(1);
-    expect(r.sdZones[0].t).toBe(9);
-    expect(r.sdZones[0].plan?.side).toBe("BUY");
+    expect(r.sdZones).toHaveLength(2);
+    expect(r.sdZones[1].t).toBe(9);
+    expect(r.sdZones[1].plan?.side).toBe("BUY");
+    expect(r.sdZones[0].plan).toBe(undefined);
   });
 
   test("shows only the latest FVG", () => {
     const r = resolveZoneOverlaps([], [fvg(1, 10, 9), fvg(2, 20, 19), fvg(3, 30, 29), fvg(4, 40, 39)]);
     expect(r.fvgs).toHaveLength(1);
     expect(r.fvgs[0].t).toBe(4);
+  });
+
+  test("keeps the last 3 zones and never lets a zone's own FVG hide it", () => {
+    const own = fvg(12, 106, 105.5);
+    const zones = [zone(1, 10, 9), zone(3, 30, 29), zone(6, 60, 59), { ...zone(10, 106, 104), fvg: own }];
+    const r = resolveZoneOverlaps(zones, [own]);
+    expect(r.sdZones.map((z) => z.t).join(",")).toBe("3,6,10");
+    expect(r.sdZones.filter((z) => z.plan).length).toBe(1);
+    expect(r.sdZones[2].plan?.side).toBe("BUY");
   });
 });

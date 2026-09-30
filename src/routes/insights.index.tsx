@@ -81,7 +81,7 @@ export const Route = createFileRoute("/insights/")({
     <div className="min-h-dvh w-full bg-[#FAFAFA] text-zinc-900 flex flex-col items-center justify-center px-6 text-center">
       <div className="text-xs font-mono uppercase tracking-widest text-red-600 mb-3">Insights unavailable</div>
       <h1 className="text-2xl font-semibold mb-3">We couldn't load the insights feed.</h1>
-      <p className="text-sm text-zinc-500 max-w-md">{error?.message || "Please refresh and try again."}</p>
+      <p className="text-sm text-zinc-500 max-w-md">{(error as Error | undefined)?.message || "Please refresh and try again."}</p>
     </div>
   ),
   notFoundComponent: () => (
