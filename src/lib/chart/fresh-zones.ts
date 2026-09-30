@@ -11,10 +11,17 @@
  *   extreme, wick rejection, freshness) and every fresh zone carries a
  *   limit-order trade plan (entry at the proximal edge, SL beyond the extreme,
  *   TP1 = 2R, TP2 = 3R).
+ * - Only STRONG zones (strength >= SD_MIN_STRENGTH) are shown, so the chart
+ *   only marks zones price is likely to respect.
+ * - A zone is rejected when an opposing, still-alive FVG prints after it on
+ *   the zone's side of price (bearish FVG just above a demand zone, bullish
+ *   FVG just below a supply zone): sellers/buyers are displacing toward the
+ *   zone, so it is likely to break rather than hold.
  * - Only the newest SD_MAX_TOTAL zones are returned, so older zones hide as new
  *   ones form.
  */
 import type { StructurePivot } from "@/lib/analysis/market-structure-evidence";
+import { detectLiveFvgs } from "./fresh-fvgs";
 
 type Candle = { t: number; o: number; h: number; l: number; c: number };
 
@@ -48,6 +55,8 @@ export type SdZone = {
   extremeLevel: number;
   /** Swing is still forming (not yet confirmed) — shown immediately. */
   live: boolean;
+  /** A same-direction 3-candle imbalance formed in the departure leg. */
+  imbalance?: boolean;
   /** Deterministic 0-100 strength score. */
   strength: number;
   grade: SdGrade;
@@ -70,6 +79,10 @@ export const SD_MIN_GAP_ATR = 0.3;
 export const SD_SUPERSEDE_ATR = 1;
 export const SD_EXTREME_LOOKBACK = 50;
 export const SD_SL_BUFFER_ATR = 0.15;
+/** Zones below this strength are not shown (weak zones tend to fail). */
+export const SD_MIN_STRENGTH = 55;
+/** An opposing FVG within this many ATR of the zone's proximal edge rejects it. */
+export const SD_COUNTER_FVG_ATR = 3;
 
 function atrAt(bars: Candle[], end: number, period = 14): number {
   const first = Math.max(1, end - period + 1);
@@ -90,8 +103,8 @@ const round = (v: number) => Math.round(v * 100) / 100;
 
 /**
  * Deterministic strength: no single clue can reach STRONG on its own.
- * displacement (<=35) + outer extreme (<=25) + wick rejection (<=15) +
- * freshness (<=15) + structural label (<=10).
+ * displacement (<=30) + outer extreme (<=20) + wick rejection (<=10) +
+ * freshness (<=15) + structural label (<=10) + departure imbalance (<=15).
  */
 export function zoneStrength(input: {
   displacementAtr: number;
@@ -99,13 +112,15 @@ export function zoneStrength(input: {
   wickRatio: number;
   touches: number;
   extremeLabel: boolean;
+  imbalance?: boolean;
 }): { strength: number; grade: SdGrade } {
-  const disp = Math.min(Math.max(input.displacementAtr, 0) / 2, 1) * 35;
-  const ext = input.extreme ? 25 : 0;
-  const wick = Math.min(Math.max(input.wickRatio, 0), 1) * 15;
+  const disp = Math.min(Math.max(input.displacementAtr, 0) / 2, 1) * 30;
+  const ext = input.extreme ? 20 : 0;
+  const wick = Math.min(Math.max(input.wickRatio, 0), 1) * 10;
   const fresh = input.touches === 0 ? 15 : input.touches === 1 ? 7 : 0;
   const lbl = input.extremeLabel ? 10 : 4;
-  const strength = Math.round(Math.min(100, disp + ext + wick + fresh + lbl));
+  const imb = input.imbalance ? 15 : 0;
+  const strength = Math.round(Math.min(100, disp + ext + wick + fresh + lbl + imb));
   const grade: SdGrade = strength >= 75 ? "EXTREME" : strength >= 55 ? "STRONG" : "MODERATE";
   return { strength, grade };
 }
@@ -125,6 +140,9 @@ export function computeFreshZones(
   if (bars.length < 20) return [];
   const zones: (SdZone & { broken?: boolean })[] = [];
   const last = Math.min(bars.length, closedCount) - 1;
+  // Alive FVGs from closed candles only — used to reject zones that an
+  // opposing gap is pushing into.
+  const liveFvgs = detectLiveFvgs(bars.slice(0, last + 1));
 
   for (const p of pivots) {
     const i = p.index;
@@ -179,13 +197,32 @@ export function computeFreshZones(
     const range = Math.max(swing.h - swing.l, 1e-9);
     const wick = supply ? swing.h - Math.max(swing.o, swing.c) : Math.min(swing.o, swing.c) - swing.l;
     const extremeLabel = supply ? p.label === "HH" || p.label === "H" : p.label === "LL" || p.label === "L";
+    // Departure imbalance: a same-direction 3-candle gap inside the fixed
+    // displacement window proves institutional displacement off the zone.
+    let imbalance = false;
+    for (let k = i + 1; k < end; k++) {
+      if (supply ? bars[k + 1].h < bars[k - 1].l : bars[k + 1].l > bars[k - 1].h) {
+        imbalance = true;
+        break;
+      }
+    }
     const { strength, grade } = zoneStrength({
       displacementAtr,
       extreme,
       wickRatio: wick / range,
       touches,
       extremeLabel,
+      imbalance,
     });
+
+    // Opposing FVG printed after the zone on its side of price rejects it.
+    const reach = atr * SD_COUNTER_FVG_ATR;
+    const countered = liveFvgs.some((f) =>
+      f.t > p.t &&
+      (supply
+        ? f.type === "BULLISH" && f.top <= top && f.top >= bottom - reach
+        : f.type === "BEARISH" && f.bottom >= bottom && f.bottom <= top + reach),
+    );
 
     const fresh = touches === 0;
     // Limit-order levels: entry at the proximal edge, SL beyond the extreme.
@@ -216,11 +253,12 @@ export function computeFreshZones(
       extreme,
       extremeLevel: p.price,
       live,
+      imbalance,
       strength,
       grade,
       plan,
       levels: plan,
-      broken,
+      broken: broken || countered || strength < SD_MIN_STRENGTH,
     } as SdZone & { broken: boolean });
   }
 
@@ -230,7 +268,7 @@ export function computeFreshZones(
   const nowAtr = Math.max(0, atrAt(bars, Math.max(1, last)));
   const gap = nowAtr * SD_MIN_GAP_ATR;
   const supersede = nowAtr * SD_SUPERSEDE_ATR;
-  // Keep the newest SD_MAX_TOTAL valid (unbroken) zones: when a new zone
+  // Keep the newest SD_MAX_TOTAL valid (unbroken, strong, not countered) zones: when a new zone
   // prints, the oldest kept one drops off. Broken zones never take a slot,
   // so strong trends no longer leave the chart empty.
   const kept: SdZone[] = [];

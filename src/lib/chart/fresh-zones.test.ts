@@ -44,11 +44,9 @@ describe("computeFreshZones", () => {
     expect(computeFreshZones(bars, pivots)).toHaveLength(0);
   });
 
-  test("a live swing shows its zone immediately, before any displacement", () => {
+  test("a weak live swing with no displacement stays hidden (strong zones only)", () => {
     const { bars, pivots } = series(() => ({ o: 104.3, h: 104.9, l: 104, c: 104.4 }));
-    const zones = computeFreshZones(bars, [{ ...pivots[0], live: true }]);
-    expect(zones).toHaveLength(1);
-    expect(zones[0].live).toBe(true);
+    expect(computeFreshZones(bars, [{ ...pivots[0], live: true }])).toHaveLength(0);
   });
 
   test("the forming candle never breaks a zone", () => {
@@ -123,5 +121,40 @@ describe("computeFreshZones", () => {
     expect(zones).toHaveLength(1);
     expect(zones[0].t).toBe(newer.t);
     expect(zones[0].plan?.side).toBe("SELL");
+  });
+});
+
+describe("strong-zone filter", () => {
+  function demandSeries(withBearishFvg: boolean) {
+    const bars = [] as ReturnType<typeof bar>[];
+    for (let i = 0; i < 20; i++) bars.push(bar(i, 110 - i * 0.2, 110.4 - i * 0.2, 109.4 - i * 0.2, 109.7 - i * 0.2));
+    bars.push(bar(20, 106, 106.2, 104, 105.8)); // swing low with lower wick
+    // strong rally with a bullish imbalance off the low
+    bars.push(bar(21, 105.8, 107.5, 105.7, 107.4));
+    bars.push(bar(22, 107.4, 108.6, 106.6, 108.5));
+    for (let i = 23; i < 30; i++) bars.push(bar(i, 108.5, 108.9, 108.1, 108.6));
+    if (withBearishFvg) {
+      bars.push(bar(30, 108.6, 108.7, 108.2, 108.3));
+      bars.push(bar(31, 108.3, 108.35, 106.9, 107.0)); // bearish displacement
+      bars.push(bar(32, 107.0, 107.4, 106.6, 106.8)); // high 107.4 < 108.2 low of bar 30
+    } else {
+      for (let i = 30; i < 33; i++) bars.push(bar(i, 108.5, 108.9, 108.1, 108.6));
+    }
+    for (let i = 33; i < 36; i++) bars.push(bar(i, 106.8, 107.1, 106.5, 106.9));
+    const pivot: StructurePivot = { index: 20, confirmedIndex: 30, t: 20 * 60_000, price: 104, kind: "low", label: "LL" };
+    return { bars, pivots: [pivot] };
+  }
+
+  test("a strong demand zone with a departure imbalance is shown", () => {
+    const { bars, pivots } = demandSeries(false);
+    const zones = computeFreshZones(bars, pivots);
+    expect(zones).toHaveLength(1);
+    expect(zones[0].type).toBe("DEMAND");
+    expect(zones[0].imbalance).toBe(true);
+  });
+
+  test("a bearish FVG printed just above a demand zone rejects it", () => {
+    const { bars, pivots } = demandSeries(true);
+    expect(computeFreshZones(bars, pivots)).toHaveLength(0);
   });
 });
