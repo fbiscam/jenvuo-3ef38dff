@@ -64,14 +64,15 @@ describe("computeFreshZones", () => {
     expect(computeFreshZones(bars, pivots)).toHaveLength(0);
   });
 
-  test("fresh zone carries a SELL plan: entry at proximal edge, SL beyond extreme, TP1 2R, TP2 3R", () => {
+  test("fresh zone carries a SELL plan: entry on the FVG retest, SL beyond extreme, TP1 2R, TP2 3R", () => {
     const { bars, pivots } = series((i) => {
       const c = 104 - (i - 20) * 0.4;
       return { o: c + 0.2, h: c + 0.5, l: c - 0.3, c };
     });
     const [z] = computeFreshZones(bars, pivots);
     expect(z.plan?.side).toBe("SELL");
-    expect(z.plan!.entry).toBe(Math.round(z.bottom * 100) / 100);
+    const expectedEntry = z.fvg ? z.fvg.bottom : z.bottom;
+    expect(z.plan!.entry).toBe(Math.round(expectedEntry * 100) / 100);
     expect(z.plan!.sl > 106).toBe(true);
     const risk = z.plan!.sl - z.plan!.entry;
     expect(Math.abs(z.plan!.entry - z.plan!.tp1 - risk * 2) < 0.02).toBe(true);
