@@ -1410,47 +1410,10 @@ export function renderSmcOverlay(
       ctx.restore();
     }
   }
-  // Reversal trade lines: only after entry confirmation AND reversal-side
-  // pressure >= 72% on the newest swing. Cancelled setups draw nothing.
-  const rv = smc.reversal;
-  const rvBuy = rv ? smc.pressure?.[rv.t] : undefined;
-  const rvPct = rv && rvBuy != null ? (rv.side === "sell" ? 100 - rvBuy : rvBuy) : 0;
-  if (showPressure && rv && rv.stage === "confirmed" && rv.entry != null && rvPct >= REVERSAL_TRADE_MIN_PCT) {
-    const x0 = rv.entryT != null ? pr.x(rv.entryT / 1000) : null;
-    const start = Math.max(0, x0 ?? pr.width * 0.6);
-    const line = (price: number | null, label: string, color: string, dash: number[]) => {
-      if (price == null) return;
-      const y = pr.y(price);
-      if (y == null) return;
-      ctx.save();
-      ctx.strokeStyle = color;
-      ctx.lineWidth = 1.25;
-      ctx.setLineDash(dash);
-      ctx.beginPath();
-      ctx.moveTo(start, y);
-      ctx.lineTo(pr.width, y);
-      ctx.stroke();
-      ctx.setLineDash([]);
-      ctx.font = "700 11px 'JetBrains Mono', ui-monospace, monospace";
-      const text = `${label} ${price.toFixed(2)}`;
-      const tw = ctx.measureText(text).width;
-      const lx = pr.width - tw - 70;
-      ctx.fillStyle = "rgba(255,255,255,0.95)";
-      ctx.fillRect(lx - 4, y - 8, tw + 8, 16);
-      ctx.fillStyle = color;
-      ctx.fillText(text, lx, y + 4);
-      ctx.restore();
-    };
-    const sideTxt = rv.side === "buy" ? "BUY" : "SELL";
-    line(rv.entry, `${sideTxt} ENTRY ${rvPct}%`, "#2962ff", []);
-    line(rv.sl, "SL", "#f23645", [4, 3]);
-    line(rv.tp1, "TP1", "#089981", [4, 3]);
-    line(rv.tp2, "TP2 1:3", "#089981", [2, 3]);
-  }
+  // Pressure no longer draws any Entry/SL/TP lines (user request); trade
+  // plans come only from the Zone + FVG strategy.
   ctx.restore();
 }
-
-export const REVERSAL_TRADE_MIN_PCT = 72;
 
 /** Liquidity sweep indicator: resting pools (next sweep targets) + sweeps. */
 function renderLiquidityMap(ctx: CanvasRenderingContext2D, map: LiquidityMap, pr: SmcProjector) {
