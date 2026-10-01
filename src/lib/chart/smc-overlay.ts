@@ -573,6 +573,8 @@ export function computeSmcOverlay(
     for (const [key, p] of mem.pivots) {
       const i = barIdx.get(p.t);
       if (i == null || have.has(key)) continue;
+      // Same swing re-detected on a neighbouring candle: keep one label only.
+      if (fractal.pivots.some((q) => q.kind === p.kind && Math.abs(q.index - i) < FRACTAL_RADIUS)) continue;
       const c = fractalBars[i];
       fractal.pivots.push({ ...p, index: i, confirmedIndex: Math.min(fractalBars.length - 1, i + FRACTAL_RADIUS), price: p.kind === "high" ? c.h : c.l });
     }
@@ -580,7 +582,8 @@ export function computeSmcOverlay(
   }
   const pivotsLabelled = fractal.pivots.filter((p) => p.label.length === 2).map(lockLabel);
   const livePivots = computeLivePivots(fractalBars, forming ? toCandle(forming) : null, fractal.pivots)
-    .map((p) => (p.confirmedByOpposite && p.label.length === 2 ? lockLabel(p) : p));
+    .map((p) => (p.confirmedByOpposite && p.label.length === 2 ? lockLabel(p) : p))
+    .filter((p) => !pivotsLabelled.some((q) => q.kind === p.kind && q.t === p.t));
   const selectedPois = selectHighConfidencePois(poi, price);
 
   // Structure labels, breaks, trend and liquidity must all come from this same
