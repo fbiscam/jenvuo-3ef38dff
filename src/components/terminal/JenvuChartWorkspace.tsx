@@ -59,9 +59,8 @@ import { useLivePriceStream } from "@/hooks/useLivePriceStream";
 
 // Buyer/seller pressure is shown on every chart timeframe.
 const PRESSURE_TIMEFRAMES = { has: (_key: string) => true };
-/** Fresh supply/demand zones are drawn only on these higher timeframes. */
-// Fresh supply/demand zones (and their menu switches) exist on the 30m chart only.
-const SD_ZONE_TIMEFRAMES = new Set(["15m", "30m"]);
+/** Zone + FVG strategy (zones, their FVG, Entry/SL/TP) and its menu switch exist only on these timeframes. */
+const SD_ZONE_TIMEFRAMES = new Set(["15m", "30m", "45m", "1h", "4h", "1d"]);
 
 const MemoChart = memo(ChartCanvas);
 
