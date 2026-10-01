@@ -1137,9 +1137,12 @@ export function renderSmcOverlay(
   // same-direction displacement FVG confirmed; only the latest 1 shows, with
   // its FVG. Strategy OFF: classic view, 1 zone + 1 standalone FVG.
   const strategy = toggles.sdZones && toggles.sdStrategy !== false;
+  // Only things that are actually drawn may suppress each other: strategy
+  // mode never draws standalone FVGs (zones already passed the opposing-FVG
+  // check), and timeframes without zones must not let hidden zones remove FVGs.
   const visible = strategy
-    ? resolveZoneOverlaps(smc.sdStrategyZones ?? [], smc.freshFvgs ?? [], FVG_MAX_TOTAL, SD_VISIBLE_ZONES)
-    : resolveZoneOverlaps(smc.sdZones ?? [], smc.freshFvgs ?? [], FVG_MAX_TOTAL, 1);
+    ? resolveZoneOverlaps(smc.sdStrategyZones ?? [], [], FVG_MAX_TOTAL, SD_VISIBLE_ZONES)
+    : resolveZoneOverlaps(toggles.sdZones ? smc.sdZones ?? [] : [], smc.freshFvgs ?? [], FVG_MAX_TOTAL, 1);
   if (toggles.sdZones) {
     const zones = visible.sdZones;
     // Strategy zones always draw with their own FVG (one indicator), even
