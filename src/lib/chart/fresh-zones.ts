@@ -83,7 +83,9 @@ export const SD_MIN_GAP_ATR = 0.3;
 /** A newer same-type zone printed on top of (or within this many ATR of) an older one replaces it. */
 export const SD_SUPERSEDE_ATR = 1;
 export const SD_EXTREME_LOOKBACK = 50;
-export const SD_SL_BUFFER_ATR = 0.15;
+export const SD_SL_BUFFER_ATR = 0.25;
+/** Entry-to-SL distance is never thinner than this, in ATR. */
+export const SD_MIN_RISK_ATR = 0.5;
 /** Zones below this strength are not shown (weak zones tend to fail). */
 export const SD_MIN_STRENGTH = 55;
 /** An opposing FVG within this many ATR of the zone's proximal edge rejects it. */
@@ -270,10 +272,24 @@ export function computeFreshZones(
     const entry = departure
       ? supply ? departure.bottom : departure.top
       : supply ? bottom : top;
-    const sl = supply ? p.price + atr * SD_SL_BUFFER_ATR : p.price - atr * SD_SL_BUFFER_ATR;
+    // SL beyond the swing extreme with a gold buffer; risk never thinner than
+    // SD_MIN_RISK_ATR so spread/noise cannot stop a valid retest.
+    let sl = supply ? p.price + atr * SD_SL_BUFFER_ATR : p.price - atr * SD_SL_BUFFER_ATR;
+    if (Math.abs(entry - sl) < atr * SD_MIN_RISK_ATR) {
+      sl = supply ? entry + atr * SD_MIN_RISK_ATR : entry - atr * SD_MIN_RISK_ATR;
+    }
     const risk = Math.abs(entry - sl);
-    const tp1 = supply ? entry - risk * 2 : entry + risk * 2;
-    const tp2 = supply ? entry - risk * 3 : entry + risk * 3;
+    // Structural target: the departure leg's extreme (the next major high for
+    // BUY / low for SELL), fixed from closed candles. TP1 = 2R minimum;
+    // TP2 = the larger of 3R and that structural target.
+    let peak = supply ? Infinity : -Infinity;
+    for (let k = i + 1; k <= last; k++) {
+      peak = supply ? Math.min(peak, bars[k].l) : Math.max(peak, bars[k].h);
+    }
+    const r2 = supply ? entry - risk * 2 : entry + risk * 2;
+    const r3 = supply ? entry - risk * 3 : entry + risk * 3;
+    const tp1 = r2;
+    const tp2 = Number.isFinite(peak) ? (supply ? Math.min(r3, peak) : Math.max(r3, peak)) : r3;
     // Strategy mode: a closed candle whose wick ran the stop means the setup
     // already failed, so the zone is not shown.
     let stopped = false;
