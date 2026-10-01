@@ -147,7 +147,7 @@ export function computeFreshZones(
   requireFvg = true,
 ): SdZone[] {
   if (bars.length < 20) return [];
-  const zones: (SdZone & { broken?: boolean })[] = [];
+  const zones: (SdZone & { broken?: boolean; formed?: boolean })[] = [];
   const last = Math.min(bars.length, closedCount) - 1;
   // Alive FVGs from closed candles only — used to reject zones that an
   // opposing gap is pushing into.
@@ -330,7 +330,8 @@ export function computeFreshZones(
         countered ||
         (requireFvg && (!departure || stopped)) ||
         strength < SD_MIN_STRENGTH,
-    } as SdZone & { broken: boolean });
+      formed: (!requireFvg || !!departure) && strength >= SD_MIN_STRENGTH,
+    } as SdZone & { broken: boolean; formed: boolean });
   }
 
   // Newest first; newer zones win any overlap (same or opposite type). A zone
@@ -343,13 +344,19 @@ export function computeFreshZones(
   // prints, the oldest kept one drops off. Broken zones never take a slot,
   // so strong trends no longer leave the chart empty.
   const kept: SdZone[] = [];
+  // Once a newer same-type zone has formed, older zones of that type are
+  // superseded for good: if the newer one later dies (SL, close-through,
+  // opposing FVG) an older zone must not resurface in its place.
+  const superseded = new Set<string>();
   for (const z of zones) {
+    if (superseded.has(z.type)) continue;
+    if (z.formed) superseded.add(z.type);
     if (z.broken) continue;
     // A newer zone printed on top of an older one replaces it: the old zone
     // hides and the fresh one shows.
     if (kept.some((k) => k.type === z.type && z.bottom - supersede < k.top && z.top + supersede > k.bottom)) continue;
     if (kept.some((k) => z.bottom - gap < k.top && z.top + gap > k.bottom)) continue;
-    const { broken: _b, ...clean } = z;
+    const { broken: _b, formed: _f, ...clean } = z;
     kept.push(clean);
     if (kept.length >= SD_MAX_TOTAL) break;
   }
