@@ -78,6 +78,9 @@ export default {
 
 
     } catch (error) {
+      if (request.signal?.aborted) {
+        return new Response(null, { status: 499 });
+      }
       console.error(error);
       return new Response(renderErrorPage(), {
         status: 500,
