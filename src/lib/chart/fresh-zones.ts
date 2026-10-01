@@ -243,11 +243,24 @@ export function computeFreshZones(
       break;
     }
     const imbalance = !!departure;
+    // Strength is frozen at formation (when the departure FVG / displacement
+    // window completes). Later retests are the trade itself, so they must not
+    // decay the score and silently hide a zone that has neither hit SL nor
+    // been replaced.
+    const formIdx = departure ? Math.min(last, i + 1 + Math.max(0, (bars.findIndex((b) => b.t === departure!.t)) - i)) : end;
+    let formTouches = 0;
+    let formInside = false;
+    for (let k = i + 1; k <= formIdx; k++) {
+      const b = bars[k];
+      const touching = supply ? b.h >= bottom : b.l <= top;
+      if (k > i + 1 && touching && !formInside) formTouches++;
+      formInside = touching;
+    }
     const { strength, grade } = zoneStrength({
       displacementAtr,
       extreme,
       wickRatio: wick / range,
-      touches,
+      touches: formTouches,
       extremeLabel,
       imbalance,
     });
