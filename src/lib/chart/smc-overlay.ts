@@ -404,6 +404,22 @@ const toCandle = (b: OhlcvBar): Candle => ({ t: b.time * 1000, o: b.open, h: b.h
 // Only final, confirmed HH/HL/LH/LL labels render — no dashed provisional labels or countdown trackers.
 const SHOW_PROVISIONAL_PIVOTS = false;
 const lockedLabels = new Map<string, string>();
+type StructureMemory = {
+  pivots: Map<string, StructurePivot>;
+  breaks: Map<string, StructureBreak & { fromT: number; fromKind: "high" | "low" }>;
+};
+/** Per-series (asset + timeframe) memory of confirmed swings and breaks. */
+const structureMemory = new Map<string, StructureMemory>();
+function memoryFor(key: string): StructureMemory {
+  let m = structureMemory.get(key);
+  if (!m) {
+    m = { pivots: new Map(), breaks: new Map() };
+    structureMemory.set(key, m);
+  }
+  if (m.pivots.size > 3000) m.pivots.delete(m.pivots.keys().next().value as string);
+  if (m.breaks.size > 1000) m.breaks.delete(m.breaks.keys().next().value as string);
+  return m;
+}
 
 /**
  * Provisional swings in the unconfirmed tail: a candle whose high (low) beats
@@ -504,7 +520,7 @@ export function computeSmcOverlay(
   bars: OhlcvBar[],
   currentPrice: number | null,
   forming: OhlcvBar | null = null,
-  opts: { useVolume?: boolean } = {},
+  opts: { useVolume?: boolean; seriesKey?: string } = {},
 ): SmcOverlay {
   // Gold spot has no central volume; different feeds report different (or zero)
   // tick volume, so volume-weighting made the same swing score differently.
@@ -541,6 +557,27 @@ export function computeSmcOverlay(
     if (lockedLabels.size > 5000) lockedLabels.delete(lockedLabels.keys().next().value as string);
     return p;
   };
+  // Historical structure is frozen: once a swing or break is confirmed on a
+  // candle it stays on that candle with the same label, even if a later window
+  // shift or price rescale would re-derive it differently. Only live swings move.
+  const mem = opts.seriesKey ? memoryFor(opts.seriesKey) : null;
+  const barIdx = new Map(fractalBars.map((b, k) => [b.t, k] as const));
+  if (mem) {
+    for (const p of fractal.pivots) {
+      const key = `${p.kind}:${p.t}`;
+      const prev = mem.pivots.get(key);
+      if (prev) p.label = prev.label;
+      else mem.pivots.set(key, { ...p });
+    }
+    const have = new Set(fractal.pivots.map((p) => `${p.kind}:${p.t}`));
+    for (const [key, p] of mem.pivots) {
+      const i = barIdx.get(p.t);
+      if (i == null || have.has(key)) continue;
+      const c = fractalBars[i];
+      fractal.pivots.push({ ...p, index: i, confirmedIndex: Math.min(fractalBars.length - 1, i + FRACTAL_RADIUS), price: p.kind === "high" ? c.h : c.l });
+    }
+    fractal.pivots.sort((a, b) => a.index - b.index || (a.kind === "high" ? -1 : 1));
+  }
   const pivotsLabelled = fractal.pivots.filter((p) => p.label.length === 2).map(lockLabel);
   const livePivots = computeLivePivots(fractalBars, forming ? toCandle(forming) : null, fractal.pivots)
     .map((p) => (p.confirmedByOpposite && p.label.length === 2 ? lockLabel(p) : p));
@@ -554,6 +591,24 @@ export function computeSmcOverlay(
       .find((p) => p.index < b.index && Math.abs(p.price - b.level) < 1e-9);
     return { ...b, fromT: src?.t ?? fractalBars[Math.max(0, b.index - FRACTAL_RADIUS)].t };
   });
+  if (mem) {
+    const have = new Set(breaks.map((b) => `${b.dir}:${b.t}`));
+    for (const b of breaks) {
+      const key = `${b.dir}:${b.t}`;
+      const prev = mem.breaks.get(key);
+      if (prev) b.type = prev.type;
+      else mem.breaks.set(key, { ...b, fromKind: b.dir === "bullish" ? "high" : "low" });
+    }
+    for (const [key, b] of mem.breaks) {
+      const i = barIdx.get(b.t);
+      const fi = barIdx.get(b.fromT);
+      if (i == null || fi == null || have.has(key)) continue;
+      const src = fractalBars[fi];
+      const { fromKind, ...rest } = b;
+      breaks.push({ ...rest, index: i, level: fromKind === "high" ? src.h : src.l });
+    }
+    breaks.sort((a, b) => a.index - b.index);
+  }
   const buySide = Array.from(
     new Set(fractal.pivots.filter((p) => p.kind === "high" && p.price > price).map((p) => p.price)),
   )
