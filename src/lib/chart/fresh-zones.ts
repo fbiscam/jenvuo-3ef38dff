@@ -262,8 +262,14 @@ export function computeFreshZones(
     );
 
     const fresh = touches === 0;
-    // Limit-order levels: entry at the proximal edge, SL beyond the extreme.
-    const entry = supply ? bottom : top;
+    // Strategy step 3: price leaves the zone, prints the displacement FVG,
+    // then comes back to retest that FVG. Entry is the FVG's near edge
+    // (bullish FVG top for BUY, bearish FVG bottom for SELL), SL sits beyond
+    // the zone's swing extreme with a gold buffer, TP1 = 2R, TP2 = 3R.
+    // Without a departure FVG (strategy off) the entry stays on the zone edge.
+    const entry = departure
+      ? supply ? departure.bottom : departure.top
+      : supply ? bottom : top;
     const sl = supply ? p.price + atr * SD_SL_BUFFER_ATR : p.price - atr * SD_SL_BUFFER_ATR;
     const risk = Math.abs(entry - sl);
     const tp1 = supply ? entry - risk * 2 : entry + risk * 2;
