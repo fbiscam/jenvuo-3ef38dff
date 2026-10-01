@@ -355,7 +355,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
     const last = bars[bars.length - 1];
     const lastClosedT = closed.at(-1)?.time ?? -Infinity;
     const forming = last.time > lastClosedT ? last : null;
-    return computeSmcOverlay(closed, last.close, forming, { useVolume: asset === "BTCUSD" });
+    return computeSmcOverlay(closed, last.close, forming, { useVolume: asset === "BTCUSD", seriesKey: `${asset}:${stepSeconds}` });
   }, [bars, rawBars, stepSeconds, serverTime, asset]);
 
   // Next-candle projection removed from the chart.
