@@ -593,6 +593,8 @@ const CACHE_STALE_MAX = 10 * 60_000;
 // Terminal chart: when every feed is down, keep showing the last good chart for
 // up to 2 hours instead of blanking (outages of 15+ minutes were observed).
 const TERMINAL_STALE_MAX = 2 * 60 * 60_000;
+/** How long a Gate-sourced chart is kept when Gate briefly fails or thins out. */
+const GATE_STICKY_MS = 15 * 60_000;
 // Candle fetches are deduplicated: one scan pulls 5 timeframes and cross-pairs
 // derive from XAU/USD + an FX proxy, so without this the same Yahoo endpoint is
 // hit ~30x per scan and starts 429-ing — that was the "some pairs analyze, some
@@ -1555,6 +1557,13 @@ async function loadTerminalChart(tf: string, asset: TerminalAsset = "XAUUSD"): P
     // for ~1000 finished bars of history.
     const sourceLimit = tf === "45m" ? 3000 : tf === "2h" ? 2000 : 1000;
     const picked = await fetchGoldProxyDeepWithProvider(fetchTf, sourceLimit);
+    // A momentary Gate hiccup must not swap the whole chart to another
+    // exchange's candles (different wicks / gappy thin feeds = candles that
+    // change shape between refreshes). Keep the last Gate chart for a while.
+    if (hit && hit.data.provider === "Gate" && picked.provider !== "Gate" && Date.now() - hit.at < GATE_STICKY_MS)
+      return { ...hit.data, serverTime: Date.now() };
+    if (picked.thin && hit && Date.now() - hit.at < TERMINAL_STALE_MAX)
+      return { ...hit.data, serverTime: Date.now() };
     provider = picked.provider;
     candles = await scaleProxyToSpot(picked.candles);
   } catch (err) {
@@ -1581,9 +1590,24 @@ async function loadTerminalChart(tf: string, asset: TerminalAsset = "XAUUSD"): P
       byBucket.set(bucket, c);
     }
   }
-  const bars = [...byBucket.entries()]
-    .sort((a, b) => a[0] - b[0])
-    .map(([bucket, c]) => ({
+  const sorted = [...byBucket.entries()].sort((a, b) => a[0] - b[0]);
+  // Feeds that skip no-trade minutes leave holes; the chart is index-based, so
+  // holes squeeze time and candles look scattered. Fill each missing bucket with
+  // a flat no-trade bar at the previous close (bounded so long outages stay gaps).
+  const filled: Array<[number, Candle]> = [];
+  for (const entry of sorted) {
+    const prev = filled.at(-1);
+    if (prev) {
+      const missing = Math.round((entry[0] - prev[0]) / step) - 1;
+      if (missing > 0 && missing <= 30) {
+        const pc = prev[1].c;
+        for (let k = 1; k <= missing; k++)
+          filled.push([prev[0] + k * step, { t: prev[0] + k * step, o: pc, h: pc, l: pc, c: pc, v: 0 }]);
+      }
+    }
+    filled.push(entry);
+  }
+  const bars = filled.map(([bucket, c]) => ({
       time: Math.floor(bucket / 1000),
       open: c.o,
       high: Math.max(c.h, c.o, c.c),
