@@ -593,6 +593,8 @@ const CACHE_STALE_MAX = 10 * 60_000;
 // Terminal chart: when every feed is down, keep showing the last good chart for
 // up to 2 hours instead of blanking (outages of 15+ minutes were observed).
 const TERMINAL_STALE_MAX = 2 * 60 * 60_000;
+/** How long a Gate-sourced chart is kept when Gate briefly fails or thins out. */
+const GATE_STICKY_MS = 5 * 60_000;
 // Candle fetches are deduplicated: one scan pulls 5 timeframes and cross-pairs
 // derive from XAU/USD + an FX proxy, so without this the same Yahoo endpoint is
 // hit ~30x per scan and starts 429-ing — that was the "some pairs analyze, some
@@ -1358,17 +1360,23 @@ function goldFeedQuality(candles: Candle[]): number {
   return ranged / recent.length;
 }
 const GOLD_FEED_MIN_QUALITY = 0.8;
+// Gate is the primary feed on every server. Its 1m PAXG book is normally
+// ~85-90% ranged bars but dips in quiet hours; with the 0.8 bar applied to Gate
+// too, quiet minutes flipped the chart to another exchange (different wicks,
+// sometimes a gappy feed that drew scattered dashes), so candles changed shape
+// between refreshes. Gate keeps the chart unless it is genuinely broken.
+const GATE_MIN_QUALITY = 0.5;
 
 async function fetchGoldProxyDeepWithProvider(
   tf: string,
   limit: number,
-): Promise<{ provider: GoldProxyProvider; candles: Candle[] }> {
+): Promise<{ provider: GoldProxyProvider; candles: Candle[]; thin?: boolean }> {
   const errors: string[] = [];
   let best: { provider: GoldProxyProvider; candles: Candle[]; q: number } | null = null;
-  const consider = (provider: GoldProxyProvider, candles: Candle[]) => {
+  const consider = (provider: GoldProxyProvider, candles: Candle[], min = GOLD_FEED_MIN_QUALITY) => {
     const q = goldFeedQuality(candles);
     if (!best || q > best.q) best = { provider, candles, q };
-    return q >= GOLD_FEED_MIN_QUALITY;
+    return q >= min;
   };
   // Gate is the primary source because it answers from every server location.
   // Binance blocks the live site's server region, so with Binance first the
@@ -1376,7 +1384,7 @@ async function fetchGoldProxyDeepWithProvider(
   // different exchanges, different wicks, different swings and zones.
   try {
     const candles = await fetchGateDeep(tf, limit);
-    if (consider("Gate", candles)) return { provider: "Gate", candles };
+    if (consider("Gate", candles, GATE_MIN_QUALITY)) return { provider: "Gate", candles };
     errors.push("Gate thin feed");
   } catch (e) {
     errors.push(e instanceof Error ? e.message : String(e));
@@ -1413,7 +1421,7 @@ async function fetchGoldProxyDeepWithProvider(
     }
   }
   const fallback = best as { provider: GoldProxyProvider; candles: Candle[]; q: number } | null;
-  if (fallback && fallback.q > 0) return { provider: fallback.provider, candles: fallback.candles };
+  if (fallback && fallback.q > 0) return { provider: fallback.provider, candles: fallback.candles, thin: true };
   console.error("[gold-feed] all candle sources failed", tf, errors.join(" | "));
   throw new Error("Chart feed unavailable");
 }
@@ -1549,6 +1557,13 @@ async function loadTerminalChart(tf: string, asset: TerminalAsset = "XAUUSD"): P
     // for ~1000 finished bars of history.
     const sourceLimit = tf === "45m" ? 3000 : tf === "2h" ? 2000 : 1000;
     const picked = await fetchGoldProxyDeepWithProvider(fetchTf, sourceLimit);
+    // A momentary Gate hiccup must not swap the whole chart to another
+    // exchange's candles (different wicks / gappy thin feeds = candles that
+    // change shape between refreshes). Keep the last Gate chart for a while.
+    if (hit && hit.data.provider === "Gate" && picked.provider !== "Gate" && Date.now() - hit.at < GATE_STICKY_MS)
+      return { ...hit.data, serverTime: Date.now() };
+    if (picked.thin && hit && Date.now() - hit.at < TERMINAL_STALE_MAX)
+      return { ...hit.data, serverTime: Date.now() };
     provider = picked.provider;
     candles = await scaleProxyToSpot(picked.candles);
   } catch (err) {
@@ -1575,9 +1590,24 @@ async function loadTerminalChart(tf: string, asset: TerminalAsset = "XAUUSD"): P
       byBucket.set(bucket, c);
     }
   }
-  const bars = [...byBucket.entries()]
-    .sort((a, b) => a[0] - b[0])
-    .map(([bucket, c]) => ({
+  const sorted = [...byBucket.entries()].sort((a, b) => a[0] - b[0]);
+  // Feeds that skip no-trade minutes leave holes; the chart is index-based, so
+  // holes squeeze time and candles look scattered. Fill each missing bucket with
+  // a flat no-trade bar at the previous close (bounded so long outages stay gaps).
+  const filled: Array<[number, Candle]> = [];
+  for (const entry of sorted) {
+    const prev = filled.at(-1);
+    if (prev) {
+      const missing = Math.round((entry[0] - prev[0]) / step) - 1;
+      if (missing > 0 && missing <= 30) {
+        const pc = prev[1].c;
+        for (let k = 1; k <= missing; k++)
+          filled.push([prev[0] + k * step, { t: prev[0] + k * step, o: pc, h: pc, l: pc, c: pc, v: 0 }]);
+      }
+    }
+    filled.push(entry);
+  }
+  const bars = filled.map(([bucket, c]) => ({
       time: Math.floor(bucket / 1000),
       open: c.o,
       high: Math.max(c.h, c.o, c.c),
