@@ -119,6 +119,7 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
   const draftRef = useRef<Drawing[] | null>(null);
   const dirtyRef = useRef(0);
   const lastBarsRef = useRef<{ first: number; len: number } | null>(null);
+  const prevBarsRef = useRef<Array<{ time: number; open: number; high: number; low: number; close: number }> | null>(null);
 
   // ------------------------------------------------------------- coordinates
   const timeToX = (t: number): number | null => {
@@ -359,8 +360,23 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
     });
     const prev = lastBarsRef.current;
     const first = bars[0]?.time ?? 0;
+    // Incremental updates only touch the last candle. If the server revised any
+    // older candle (price-scale re-anchor, filled minute replaced by real data),
+    // the chart kept the stale history while HH/HL/LH/LL, zones and FVGs were
+    // placed on the new prices — labels floated above/below their candles.
+    const prevBars = prevBarsRef.current;
+    const historyUnchanged = (() => {
+      if (!prevBars || !prev) return false;
+      const upTo = Math.min(prev.len - 1, bars.length - 1, prevBars.length - 1);
+      for (let i = 0; i < upTo; i++) {
+        const a = prevBars[i];
+        const b = bars[i];
+        if (a.time !== b.time || a.open !== b.open || a.high !== b.high || a.low !== b.low || a.close !== b.close) return false;
+      }
+      return true;
+    })();
     const incremental = Boolean(
-      prev && prev.first === first && bars.length >= prev.len && bars.length - prev.len <= 2 && prev.len > 0,
+      prev && prev.first === first && bars.length >= prev.len && bars.length - prev.len <= 2 && prev.len > 0 && historyUnchanged,
     );
     if (incremental && prev) {
       // lightweight-charts auto-scales after every candle update. Preserve the
@@ -388,6 +404,7 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
       }
     }
     lastBarsRef.current = bars.length ? { first, len: bars.length } : null;
+    prevBarsRef.current = bars.length ? bars : null;
     dirtyRef.current += 1;
   }, [props.bars, insideBarKey]); // eslint-disable-line react-hooks/exhaustive-deps
 

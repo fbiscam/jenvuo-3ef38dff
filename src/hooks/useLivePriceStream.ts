@@ -101,7 +101,9 @@ export function useLivePriceStream(
           }
         } catch { /* keep last */ }
         finally {
-          if (!stopped) pollId = setTimeout(tick, ms);
+          // While the free browser stream is delivering ticks, the server poll
+          // only recalibrates the spot basis — no need to pay for it every second.
+          if (!stopped) pollId = setTimeout(tick, stream && streamAlive() ? Math.max(ms, 15_000) : ms);
         }
       };
       void tick();
