@@ -60,7 +60,7 @@ import { useLivePriceStream } from "@/hooks/useLivePriceStream";
 // Buyer/seller pressure is shown on every chart timeframe.
 const PRESSURE_TIMEFRAMES = { has: (_key: string) => true };
 /** Zone + FVG strategy (zones, their FVG, Entry/SL/TP) and its menu switch exist only on these timeframes. */
-const SD_ZONE_TIMEFRAMES = new Set(["15m", "30m", "45m", "1h", "4h", "1d"]);
+const SD_ZONE_TIMEFRAMES = new Set(["1m", "5m", "15m", "30m", "45m", "1h", "4h", "1d"]);
 
 const MemoChart = memo(ChartCanvas);
 
