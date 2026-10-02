@@ -1358,17 +1358,23 @@ function goldFeedQuality(candles: Candle[]): number {
   return ranged / recent.length;
 }
 const GOLD_FEED_MIN_QUALITY = 0.8;
+// Gate is the primary feed on every server. Its 1m PAXG book is normally
+// ~85-90% ranged bars but dips in quiet hours; with the 0.8 bar applied to Gate
+// too, quiet minutes flipped the chart to another exchange (different wicks,
+// sometimes a gappy feed that drew scattered dashes), so candles changed shape
+// between refreshes. Gate keeps the chart unless it is genuinely broken.
+const GATE_MIN_QUALITY = 0.5;
 
 async function fetchGoldProxyDeepWithProvider(
   tf: string,
   limit: number,
-): Promise<{ provider: GoldProxyProvider; candles: Candle[] }> {
+): Promise<{ provider: GoldProxyProvider; candles: Candle[]; thin?: boolean }> {
   const errors: string[] = [];
   let best: { provider: GoldProxyProvider; candles: Candle[]; q: number } | null = null;
-  const consider = (provider: GoldProxyProvider, candles: Candle[]) => {
+  const consider = (provider: GoldProxyProvider, candles: Candle[], min = GOLD_FEED_MIN_QUALITY) => {
     const q = goldFeedQuality(candles);
     if (!best || q > best.q) best = { provider, candles, q };
-    return q >= GOLD_FEED_MIN_QUALITY;
+    return q >= min;
   };
   // Gate is the primary source because it answers from every server location.
   // Binance blocks the live site's server region, so with Binance first the
@@ -1376,7 +1382,7 @@ async function fetchGoldProxyDeepWithProvider(
   // different exchanges, different wicks, different swings and zones.
   try {
     const candles = await fetchGateDeep(tf, limit);
-    if (consider("Gate", candles)) return { provider: "Gate", candles };
+    if (consider("Gate", candles, GATE_MIN_QUALITY)) return { provider: "Gate", candles };
     errors.push("Gate thin feed");
   } catch (e) {
     errors.push(e instanceof Error ? e.message : String(e));
@@ -1413,7 +1419,7 @@ async function fetchGoldProxyDeepWithProvider(
     }
   }
   const fallback = best as { provider: GoldProxyProvider; candles: Candle[]; q: number } | null;
-  if (fallback && fallback.q > 0) return { provider: fallback.provider, candles: fallback.candles };
+  if (fallback && fallback.q > 0) return { provider: fallback.provider, candles: fallback.candles, thin: true };
   console.error("[gold-feed] all candle sources failed", tf, errors.join(" | "));
   throw new Error("Chart feed unavailable");
 }
