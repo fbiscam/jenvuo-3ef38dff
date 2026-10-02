@@ -293,12 +293,14 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
     // middleware refreshes and attaches its token; checking getSession again here
     // created a race in newly opened Chrome profiles and left the query in error.
     queryFn: () => fetchChart({ data: { timeframe: timeframe.key, asset } }),
-    refetchInterval: 5000,
+    // History refresh only; the forming candle follows the live price stream.
+    // Every refresh is a paid server call, so 15s and paused when the tab is hidden.
+    refetchInterval: 15_000,
     // Only reuse the previous payload for the SAME pair and timeframe; showing
     // another timeframe's candles while switching made the chart look broken.
     placeholderData: (prev) =>
       prev && prev.timeframe === timeframe.key && (prev.asset === asset || (!prev.asset && asset === "XAUUSD")) ? prev : undefined,
-    refetchIntervalInBackground: true,
+    refetchIntervalInBackground: false,
     staleTime: 1000,
     retry: 4,
     retryDelay: (attempt) => Math.min(500 * 2 ** attempt, 4000),
@@ -325,7 +327,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
     }
     return lastGoodBarsRef.current?.key === key ? lastGoodBarsRef.current.bars : next;
   }, [payload, asset, timeframe.key]);
-  const livePrice = useLivePriceStream(asset, rawBars.at(-1)?.close ?? null);
+  const livePrice = useLivePriceStream(asset, rawBars.at(-1)?.close ?? null, undefined, { intervalMs: 3000 });
   const stepSeconds = payload?.stepSeconds ?? 1800;
   const bars = useMemo(() => {
     const liveBucket = Math.floor(Date.now() / (stepSeconds * 1000)) * stepSeconds;

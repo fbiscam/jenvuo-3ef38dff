@@ -66,7 +66,7 @@ export function useLiveTicker(initial: TickerRow[] = DEFAULT_TICKER_ROWS): Ticke
       }
     };
     run();
-    const id = setInterval(run, 5_000);
+    const id = setInterval(() => { if (document.visibilityState !== "hidden") void run(); }, 30_000);
     return () => {
       alive = false;
       clearInterval(id);
