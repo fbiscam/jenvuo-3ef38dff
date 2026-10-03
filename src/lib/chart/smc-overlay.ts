@@ -111,6 +111,8 @@ export type SmcOverlay = {
   sdZones?: SdZone[];
   /** Strategy zones: only swings followed by a same-direction displacement FVG. */
   sdStrategyZones?: SdZone[];
+  /** Previous 10 Zone + FVG strategy zones (newest first) with their end time. */
+  sdHistoryZones?: SdZone[];
   /** Resting liquidity pools (next sweep targets) and confirmed sweeps. */
   liquidityMap?: LiquidityMap;
   /** Fresh bullish / bearish FVGs from closed candles (newest few). */
@@ -237,6 +239,8 @@ export type SmcToggles = {
   sdZones: boolean;
   /** Zone + FVG strategy: latest 2 zones confirmed by a displacement FVG. */
   sdStrategy?: boolean;
+  /** Previous 10 strategy zones + their FVGs (15m and higher only). */
+  sdHistory?: boolean;
   /** Entry / SL / TP lines on the newest fresh supply/demand zone. */
   sdPlan: boolean;
   /** Liquidity sweep indicator: EQH/EQL pools, next sweep targets, sweeps. */
@@ -255,6 +259,7 @@ export const DEFAULT_SMC: SmcToggles = {
   projection: true,
   sdZones: true,
   sdStrategy: true,
+  sdHistory: false,
   sdPlan: true,
   sweeps: true,
   freshFvg: true,
@@ -887,7 +892,8 @@ export function computeSmcOverlay(
     .filter((p) => p.index >= 0);
   const zonePivots = [...fractal.pivots, ...liveZonePivots];
   const sdZones = computeFreshZones(fractalBars, zonePivots, undefined, undefined, false);
-  const sdStrategyZones = computeFreshZones(fractalBars, zonePivots, undefined, undefined, true);
+  const sdHistoryZones: SdZone[] = [];
+  const sdStrategyZones = computeFreshZones(fractalBars, zonePivots, undefined, undefined, true, sdHistoryZones, 10);
   const liquidityMap = computeLiquidityMap(fractalBars, forming ? toCandle(forming) : null, fractal.pivots);
   // Wider pool: the chart keeps the newest 2 that survive overlap removal.
   const freshFvgs = computeFreshFvgs(fractalBars, 8);
@@ -897,6 +903,7 @@ export function computeSmcOverlay(
     pressure,
     sdZones,
     sdStrategyZones,
+    sdHistoryZones,
     liquidityMap,
     pivots: pivotsLabelled,
     livePivots,
@@ -1145,6 +1152,48 @@ export function renderSmcOverlay(
     ctx.restore();
   };
 
+  // Previous zone + its FVG: faded, dashed box ending where the zone died.
+  const previousZone = (z: SdZone) => {
+    const x0 = pr.x(z.t / 1000);
+    if (x0 == null || x0 > pr.width) return;
+    const x1raw = z.endT != null ? pr.x(z.endT / 1000) : pr.width;
+    const x1 = Math.min(pr.width, x1raw ?? pr.width);
+    if (x1 < 0) return;
+    const xa = Math.max(0, x0);
+    const box = (top: number, bottom: number, color: string, label: string, fromX: number) => {
+      const topY = pr.y(top);
+      const bottomY = pr.y(bottom);
+      if (topY == null || bottomY == null) return;
+      const y = Math.min(topY, bottomY);
+      const h = Math.max(2, Math.abs(bottomY - topY));
+      const w = Math.max(6, x1 - fromX);
+      ctx.fillStyle = `rgba(${color},0.06)`;
+      ctx.fillRect(fromX, y, w, h);
+      ctx.strokeStyle = `rgba(${color},0.55)`;
+      ctx.lineWidth = 1;
+      ctx.setLineDash([4, 3]);
+      ctx.strokeRect(fromX, y, w, h);
+      ctx.setLineDash([]);
+      ctx.font = "600 10px 'JetBrains Mono', ui-monospace, monospace";
+      const tw = ctx.measureText(label).width;
+      if (w < tw + 8) return;
+      ctx.fillStyle = `rgba(${color},0.85)`;
+      ctx.textBaseline = "middle";
+      ctx.fillText(label, fromX + 4, y + h / 2);
+      ctx.textBaseline = "alphabetic";
+    };
+    const supply = z.type === "SUPPLY";
+    ctx.save();
+    box(z.top, z.bottom, supply ? "239,68,68" : "16,185,129", supply ? "PREV SUPPLY" : "PREV DEMAND", xa);
+    if (z.fvg) {
+      const fx = pr.x(z.fvg.t / 1000);
+      if (fx != null && fx < x1) {
+        box(z.fvg.top, z.fvg.bottom, z.fvg.type === "BULLISH" ? "34,197,94" : "242,54,69", "PREV FVG", Math.max(0, fx));
+      }
+    }
+    ctx.restore();
+  };
+
   // Entry / SL / TP1 / TP2 lines for a fresh zone's limit-order plan.
   const sdPlan = (z: SdZone) => {
     const plan = z.plan;
@@ -1201,6 +1250,11 @@ export function renderSmcOverlay(
   const visible = strategy
     ? resolveZoneOverlaps(smc.sdStrategyZones ?? [], [], FVG_MAX_TOTAL, SD_VISIBLE_ZONES)
     : resolveZoneOverlaps(toggles.sdZones ? smc.sdZones ?? [] : [], smc.freshFvgs ?? [], FVG_MAX_TOTAL, 1);
+  if (toggles.sdHistory) {
+    // Previous zones sit underneath the live ones, faded and boxed between the
+    // swing candle and the candle where each zone ended.
+    for (const z of smc.sdHistoryZones ?? []) previousZone(z);
+  }
   if (toggles.sdZones) {
     const zones = visible.sdZones;
     // Strategy zones always draw with their own FVG (one indicator), even
