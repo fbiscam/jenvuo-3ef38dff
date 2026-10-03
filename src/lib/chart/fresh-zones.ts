@@ -70,6 +70,9 @@ export type SdZone = {
   /** The zone's own levels (always set) so the chart can move the plan to
    *  the newest zone still visible after overlap removal. */
   levels?: SdTradePlan;
+  /** Previous-zone history only: candle time (ms) where the zone ended
+   *  (close through, SL wick or replaced by a newer zone); unset = still alive. */
+  endT?: number;
 };
 
 export type ZonePivot = Pick<StructurePivot, "index" | "t" | "price" | "kind" | "label"> & { live?: boolean };
@@ -145,9 +148,12 @@ export function computeFreshZones(
   displacementWindow = 10,
   /** Strategy mode: hide zones without a same-direction departure FVG. */
   requireFvg = true,
+  /** Optional output: past formed zones (newest first) for the history view. */
+  history?: SdZone[],
+  historyLimit = 10,
 ): SdZone[] {
   if (bars.length < 20) return [];
-  const zones: (SdZone & { broken?: boolean; formed?: boolean })[] = [];
+  const zones: (SdZone & { broken?: boolean; formed?: boolean; endIdx?: number })[] = [];
   const last = Math.min(bars.length, closedCount) - 1;
   // Alive FVGs from closed candles only — used to reject zones that an
   // opposing gap is pushing into.
@@ -181,12 +187,14 @@ export function computeFreshZones(
 
     // Lifecycle: body close beyond the far edge kills the zone.
     let broken = false;
+    let brokenIdx = Infinity;
     let touches = 0;
     let inside = false;
     for (let k = i + 1; k <= last; k++) {
       const b = bars[k];
       if (supply ? b.c > top : b.c < bottom) {
         broken = true;
+        brokenIdx = k;
         break;
       }
       const touching = supply ? b.h >= bottom : b.l <= top;
@@ -290,9 +298,11 @@ export function computeFreshZones(
     // Strategy mode: a closed candle whose wick ran the stop means the setup
     // already failed, so the zone is not shown.
     let stopped = false;
+    let stoppedIdx = Infinity;
     for (let k = i + 1; k <= last; k++) {
       if (supply ? bars[k].h >= sl : bars[k].l <= sl) {
         stopped = true;
+        stoppedIdx = k;
         break;
       }
     }
@@ -331,7 +341,8 @@ export function computeFreshZones(
         (requireFvg && (!departure || stopped)) ||
         strength < SD_MIN_STRENGTH,
       formed: (!requireFvg || !!departure) && strength >= SD_MIN_STRENGTH,
-    } as SdZone & { broken: boolean; formed: boolean });
+      endIdx: Math.min(brokenIdx, requireFvg ? stoppedIdx : Infinity),
+    } as SdZone & { broken: boolean; formed: boolean; endIdx: number });
   }
 
   // Newest first; newer zones win any overlap (same or opposite type). A zone
@@ -356,11 +367,29 @@ export function computeFreshZones(
     // hides and the fresh one shows.
     if (kept.some((k) => k.type === z.type && z.bottom - supersede < k.top && z.top + supersede > k.bottom)) continue;
     if (kept.some((k) => z.bottom - gap < k.top && z.top + gap > k.bottom)) continue;
-    const { broken: _b, formed: _f, ...clean } = z;
+    const { broken: _b, formed: _f, endIdx: _e, ...clean } = z;
     kept.push(clean);
     if (kept.length >= SD_MAX_TOTAL) break;
   }
   kept.sort((a, b) => a.t - b.t);
+  if (history) {
+    // Previous zones: every zone that properly formed (FVG + strength), newest
+    // first, minus the ones still on the chart. Each ends where it died: a
+    // closed candle through it, an SL wick, or a newer same-type zone forming.
+    const shown = new Set(kept.map((k) => `${k.type}:${k.t}`));
+    const formed = zones.filter((z) => z.formed);
+    for (const z of formed) {
+      if (history.length >= historyLimit) break;
+      if (shown.has(`${z.type}:${z.t}`)) continue;
+      const replacedBy = formed
+        .filter((n) => n.type === z.type && n.t > z.t)
+        .reduce<number | undefined>((min, n) => (min == null || n.t < min ? n.t : min), undefined);
+      const diedAt = Number.isFinite(z.endIdx) ? bars[z.endIdx!]?.t : undefined;
+      const endT = [diedAt, replacedBy].filter((v): v is number => v != null).sort((a, b) => a - b)[0];
+      const { broken: _b, formed: _f, endIdx: _e, plan: _p, ...clean } = z;
+      history.push({ ...clean, endT });
+    }
+  }
   // Entry / SL / TP always belong to the latest zone on the chart.
   const newest = kept[kept.length - 1];
   return kept.map((z) => (z === newest ? z : { ...z, plan: undefined }));
