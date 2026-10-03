@@ -56,6 +56,14 @@ import { DemoTradingPanel, OrderTicket, PaperTradingPanel, QuickTradeButtons, us
 import { positionPnl, type DemoSide } from "@/lib/chart/demo-trading";
 import { buildLiveBars } from "@/lib/chart/live-candle";
 import { useLivePriceStream } from "@/hooks/useLivePriceStream";
+import { isMarketClosed } from "@/lib/signals/qualification";
+
+/** Unix seconds of the most recent Friday 21:00 UTC gold close. */
+function lastGoldClose(now: Date): number {
+  const d = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 21));
+  while (d.getUTCDay() !== 5 || d.getTime() > now.getTime()) d.setUTCDate(d.getUTCDate() - 1);
+  return Math.floor(d.getTime() / 1000);
+}
 
 // Buyer/seller pressure is shown on every chart timeframe.
 const PRESSURE_TIMEFRAMES = { has: (_key: string) => true };
@@ -327,12 +335,16 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
     }
     return lastGoodBarsRef.current?.key === key ? lastGoodBarsRef.current.bars : next;
   }, [payload, asset, timeframe.key]);
-  const livePrice = useLivePriceStream(asset, rawBars.at(-1)?.close ?? null, undefined, { intervalMs: 3000 });
+  // Gold is closed Fri 21:00 → Sun 22:00 UTC; the 24/7 PAXG feed keeps
+  // printing, so freeze the chart at Friday's close during the weekend.
+  const goldClosedSince = asset === "XAUUSD" && isMarketClosed(new Date()) ? lastGoldClose(new Date()) : null;
+  const livePrice = useLivePriceStream(goldClosedSince ? undefined : asset, rawBars.at(-1)?.close ?? null, undefined, { intervalMs: 3000 });
   const stepSeconds = payload?.stepSeconds ?? 1800;
   const bars = useMemo(() => {
+    if (goldClosedSince) return rawBars.filter((b) => b.time < goldClosedSince);
     const liveBucket = Math.floor(Date.now() / (stepSeconds * 1000)) * stepSeconds;
     return buildLiveBars(rawBars, livePrice, liveBucket);
-  }, [rawBars, livePrice, stepSeconds]);
+  }, [rawBars, livePrice, stepSeconds, goldClosedSince]);
   const activeBar = bars.at(-1);
   const currentPrice = activeBar?.close ?? null;
   const demo = useDemoTrading(currentPrice, activeBar ? {
@@ -591,7 +603,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
           onClick={() => setScriptPanelOpen((v) => !v)}
           aria-pressed={scriptPanelOpen}
           className={cn(
-            "flex h-7 shrink-0 items-center gap-1.5 rounded-md px-2 text-xs font-medium text-muted-foreground hover:bg-accent hover:text-foreground",
+            "hidden h-7 shrink-0 items-center gap-1.5 rounded-md px-2 text-xs font-medium text-muted-foreground hover:bg-accent hover:text-foreground md:flex",
             scriptPanelOpen && "bg-accent text-foreground",
           )}
         >
