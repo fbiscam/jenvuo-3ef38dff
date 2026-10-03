@@ -1880,8 +1880,11 @@ function UsageAnalytics({
   const totalScans = points.reduce((s, p) => s + p.scans, 0);
   const totalSpent = points.reduce((s, p) => s + p.spent, 0);
   const totalTokens = points.reduce((s, p) => s + p.tokens, 0);
-  const balance = stats ? Math.max(0, Math.min(stats.balance, stats.allowance)) : 0;
-  const remainingPct = stats && stats.allowance > 0 ? (balance / stats.allowance) * 100 : 0;
+  // Show the real wallet balance (same number as the Billing page). Top-ups can
+  // push it above the monthly allowance, so never cap it for display.
+  const balance = stats ? Math.max(0, stats.balance) : 0;
+  const remainingPct =
+    stats && stats.allowance > 0 ? Math.min(100, (balance / stats.allowance) * 100) : 0;
   const empty = [0];
   const scanSeries = points.length ? points.map((p) => p.scans) : empty;
   const spentSeries = points.length ? points.map((p) => p.spent) : empty;
