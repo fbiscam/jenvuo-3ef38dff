@@ -58,17 +58,13 @@ import { buildLiveBars } from "@/lib/chart/live-candle";
 import { useLivePriceStream } from "@/hooks/useLivePriceStream";
 import { isMarketClosed } from "@/lib/signals/qualification";
 
-/** Unix seconds of the most recent Friday 21:00 UTC gold close. */
-function lastGoldClose(now: Date): number {
-  const d = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 21));
-  while (d.getUTCDay() !== 5 || d.getTime() > now.getTime()) d.setUTCDate(d.getUTCDate() - 1);
-  return Math.floor(d.getTime() / 1000);
-}
 
 // Buyer/seller pressure is shown on every chart timeframe.
 const PRESSURE_TIMEFRAMES = { has: (_key: string) => true };
 /** Zone + FVG strategy (zones, their FVG, Entry/SL/TP) and its menu switch exist only on these timeframes. */
 const SD_ZONE_TIMEFRAMES = new Set(["1m", "5m", "15m", "30m", "45m", "1h", "4h", "1d"]);
+/** "Previous zones & FVG" (last 10 strategy zones) and its switch: 15m and higher only. */
+const SD_HISTORY_TIMEFRAMES = new Set(["15m", "30m", "45m", "1h", "4h", "1d"]);
 
 const MemoChart = memo(ChartCanvas);
 
@@ -149,6 +145,7 @@ const SMC_LABELS: Array<{ key: keyof SmcToggles; label: string; hint: string }> 
   { key: "pressure", label: "Buyer / seller pressure", hint: "Percentages and confirmed trade levels" },
   { key: "breaks", label: "BOS / CHoCH", hint: "Confirmed close-through breaks" },
   { key: "sdStrategy", label: "Zone + FVG strategy", hint: "Supply / demand zones, their FVG" },
+  { key: "sdHistory", label: "Previous zones & FVG", hint: "Last 10 supply / demand zones with their FVG" },
   { key: "sweeps", label: "Liquidity sweeps", hint: "EQH / EQL pools, next sweep target" },
   { key: "liquidity", label: "Liquidity", hint: "Nearest buy-side / sell-side pools" },
   { key: "freshFvg", label: "Fresh FVG", hint: "Bullish / bearish fair value gaps" },
@@ -295,6 +292,9 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
     if (ready) writeJson(DRAWINGS_VISIBLE_KEY, drawingsVisible);
   }, [ready, drawingsVisible]);
 
+  // Gold is closed Fri 21:00 → Sun 22:00 UTC. The candles already printed stay
+  // on the chart, but nothing moves: no history polling and no live price.
+  const goldClosed = asset === "XAUUSD" && isMarketClosed(new Date());
   const chartQuery = useQuery({
     queryKey: ["terminal-chart", asset, timeframe.key],
     // The authenticated route already guarantees a session. The server-function
@@ -303,7 +303,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
     queryFn: () => fetchChart({ data: { timeframe: timeframe.key, asset } }),
     // History refresh only; the forming candle follows the live price stream.
     // Every refresh is a paid server call, so 15s and paused when the tab is hidden.
-    refetchInterval: 15_000,
+    refetchInterval: goldClosed ? false : 15_000,
     // Only reuse the previous payload for the SAME pair and timeframe; showing
     // another timeframe's candles while switching made the chart look broken.
     placeholderData: (prev) =>
@@ -321,7 +321,8 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
   // together (15m/30m only); the saved switch stays as the user set it.
   const chartSmcToggles = useMemo<SmcToggles>(() => {
     const zonesOn = (smcToggles.sdStrategy ?? true) && SD_ZONE_TIMEFRAMES.has(timeframe.key);
-    return { ...smcToggles, sdZones: zonesOn, sdStrategy: zonesOn, sdPlan: true };
+    const historyOn = (smcToggles.sdHistory ?? false) && SD_HISTORY_TIMEFRAMES.has(timeframe.key);
+    return { ...smcToggles, sdZones: zonesOn, sdStrategy: zonesOn, sdHistory: historyOn, sdPlan: true };
   }, [smcToggles, timeframe.key]);
   // Keep the last non-empty history for this pair/timeframe so a failed or
   // empty poll never blanks the chart.
@@ -335,16 +336,13 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
     }
     return lastGoodBarsRef.current?.key === key ? lastGoodBarsRef.current.bars : next;
   }, [payload, asset, timeframe.key]);
-  // Gold is closed Fri 21:00 → Sun 22:00 UTC; the 24/7 PAXG feed keeps
-  // printing, so freeze the chart at Friday's close during the weekend.
-  const goldClosedSince = asset === "XAUUSD" && isMarketClosed(new Date()) ? lastGoldClose(new Date()) : null;
-  const livePrice = useLivePriceStream(goldClosedSince ? undefined : asset, rawBars.at(-1)?.close ?? null, undefined, { intervalMs: 3000 });
+  const livePrice = useLivePriceStream(goldClosed ? undefined : asset, rawBars.at(-1)?.close ?? null, undefined, { intervalMs: 3000 });
   const stepSeconds = payload?.stepSeconds ?? 1800;
   const bars = useMemo(() => {
-    if (goldClosedSince) return rawBars.filter((b) => b.time < goldClosedSince);
+    if (goldClosed) return rawBars;
     const liveBucket = Math.floor(Date.now() / (stepSeconds * 1000)) * stepSeconds;
     return buildLiveBars(rawBars, livePrice, liveBucket);
-  }, [rawBars, livePrice, stepSeconds, goldClosedSince]);
+  }, [rawBars, livePrice, stepSeconds, goldClosed]);
   const activeBar = bars.at(-1);
   const currentPrice = activeBar?.close ?? null;
   const demo = useDemoTrading(currentPrice, activeBar ? {
@@ -577,8 +575,8 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
             </p>
             {SMC_LABELS.filter(
               (item) =>
-                item.key !== "sdStrategy" ||
-                SD_ZONE_TIMEFRAMES.has(timeframe.key),
+                (item.key !== "sdStrategy" || SD_ZONE_TIMEFRAMES.has(timeframe.key)) &&
+                (item.key !== "sdHistory" || SD_HISTORY_TIMEFRAMES.has(timeframe.key)),
             ).map((item) => (
               <label
                 key={item.key}
