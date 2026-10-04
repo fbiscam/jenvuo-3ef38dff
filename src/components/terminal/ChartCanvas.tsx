@@ -447,7 +447,7 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
       const n = propsRef.current.bars.length;
       if (n > 0) {
         try {
-          chart.timeScale().setVisibleLogicalRange({ from: Math.max(0, n - 320), to: n + 10 });
+          chart.timeScale().setVisibleLogicalRange({ from: Math.max(0, n - 160), to: n + 10 });
         } catch {
           /* chart hidden or disposed */
         }
@@ -927,7 +927,7 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
       const n = propsRef.current.bars.length;
       if (n === 0) return;
       try {
-        chartRef.current?.timeScale().setVisibleLogicalRange({ from: Math.max(0, n - 320), to: n + 10 });
+        chartRef.current?.timeScale().setVisibleLogicalRange({ from: Math.max(0, n - 160), to: n + 10 });
         chartRef.current?.priceScale("right").applyOptions({ autoScale: true });
       } catch {
         /* chart hidden or disposed (e.g. phone layout with the AI panel open) */
