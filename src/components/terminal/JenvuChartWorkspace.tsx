@@ -123,7 +123,8 @@ type Props = {
   timeframe: TimeframeOption;
   onTimeframeChange: (tf: TimeframeOption) => void;
   rightSlot?: ReactNode;
-  asset?: "XAUUSD";
+  asset?: "XAUUSD" | "BTCUSD";
+  onAssetChange?: (asset: "XAUUSD" | "BTCUSD") => void;
   theme?: "light" | "dark";
 };
 
@@ -206,7 +207,7 @@ function ToolButton({
 }
 
 export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function JenvuChartWorkspace(
-  { timeframes, timeframe, onTimeframeChange, rightSlot, asset = "XAUUSD", theme = "light" },
+  { timeframes, timeframe, onTimeframeChange, rightSlot, asset = "XAUUSD", onAssetChange, theme = "light" },
   ref,
 ) {
   const fetchChart = useServerFn(getTerminalChart);
@@ -315,8 +316,8 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
   });
 
   const payload = chartQuery.data;
-  const pairLabel = "XAU/USD";
-  const showSmcPressure = smcToggles.pressure && PRESSURE_TIMEFRAMES.has(timeframe.key);
+  const pairLabel = asset === "BTCUSD" ? "BTC/USD" : "XAU/USD";
+  const showSmcPressure = smcToggles.pressure && PRESSURE_TIMEFRAMES.has(timeframe.key) && (asset === "XAUUSD" || asset === "BTCUSD");
   // One "Zone + FVG strategy" switch drives zones, their FVGs and Entry/SL/TP
   // together (15m/30m only); the saved switch stays as the user set it.
   const chartSmcToggles = useMemo<SmcToggles>(() => {
@@ -367,7 +368,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
     const last = bars[bars.length - 1];
     const lastClosedT = closed.at(-1)?.time ?? -Infinity;
     const forming = last.time > lastClosedT ? last : null;
-    return computeSmcOverlay(closed, last.close, forming, { useVolume: false, seriesKey: `${asset}:${stepSeconds}` });
+    return computeSmcOverlay(closed, last.close, forming, { useVolume: asset === "BTCUSD", seriesKey: `${asset}:${stepSeconds}` });
   }, [bars, rawBars, stepSeconds, serverTime, asset]);
 
   // Next-candle projection removed from the chart.
@@ -411,11 +412,13 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
       const s = stateRef.current;
       return buildChartContext({
         timeframeLabel: s.timeframe.label,
-        pairLabel: "XAU/USD",
+        pairLabel: s.payload?.asset === "BTCUSD" ? "BTC/USD" : "XAU/USD",
         bars: s.bars,
         stepSeconds: s.stepSeconds,
         source:
-          s.payload?.source === "spot"
+          s.payload?.source === "binance"
+            ? "Binance BTC/USDT live candles"
+            : s.payload?.source === "spot"
             ? `spot ${pairLabel}`
             : `PAXG candles (${s.payload?.provider ?? "exchange"}) scaled to live XAU/USD spot`,
         indicators: s.indicators,
@@ -424,7 +427,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
         // Use the selected chart state, just like the visible overlay. The Gold
         // payload historically omitted its asset echo, which made the chart
         // show pressure while telling the AI that pressure was unavailable.
-        includePressure: smcToggles.pressure && PRESSURE_TIMEFRAMES.has(s.timeframe.key),
+        includePressure: smcToggles.pressure && PRESSURE_TIMEFRAMES.has(s.timeframe.key) && (asset === "XAUUSD" || asset === "BTCUSD"),
         drawings: s.drawings,
         drawingsVisible: s.drawingsVisible,
         selectedId: s.selectedId,
@@ -481,9 +484,22 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
             <Menu className="h-4 w-4" />
           </button>
           <span className="hidden md:inline-flex"><XauUsdLogo size={22} /></span>
-          <span className="ml-1 shrink-0 rounded-md border border-border px-2 py-1 font-mono text-xs font-semibold text-foreground">
-            XAU/USD
-          </span>
+          <div className="ml-1 flex shrink-0 items-center rounded-md border border-border p-0.5" role="group" aria-label="Trading pair">
+            {(["XAUUSD", "BTCUSD"] as const).map((a) => (
+              <button
+                type="button"
+                key={a}
+                aria-pressed={asset === a}
+                onClick={() => onAssetChange?.(a)}
+                className={cn(
+                  "h-6 rounded px-2 font-mono text-xs font-semibold text-muted-foreground transition-colors hover:text-foreground",
+                  asset === a && "bg-accent text-foreground",
+                )}
+              >
+                {a === "XAUUSD" ? "XAU/USD" : "BTC/USD"}
+              </button>
+            ))}
+          </div>
           <span className="text-sm font-semibold tracking-tight">{"\n"}</span>
         </div>
         <div className="flex shrink-0 items-center" role="group" aria-label="Chart timeframe">
@@ -496,6 +512,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
               className={cn(
                 "h-7 rounded-md px-2 font-mono text-xs font-semibold text-muted-foreground transition-colors hover:bg-accent hover:text-foreground",
                 item.key === timeframe.key && "bg-accent text-foreground",
+                item.key === timeframe.key && theme === "dark" && "bg-foreground text-background hover:bg-foreground hover:text-background",
               )}
             >
               {item.label}

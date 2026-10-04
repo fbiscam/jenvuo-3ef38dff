@@ -262,7 +262,7 @@ async function blobToDataUrl(blob: Blob): Promise<string> {
 
 function TerminalPage() {
   const [tf, setTf] = useState(TIMEFRAMES[3]);
-  const asset = "XAUUSD" as const;
+  const [asset, setAsset] = useState<"XAUUSD" | "BTCUSD">("XAUUSD");
   // Daily terminal access fee ($0.30 per UTC day, charged once server-side).
   useEffect(() => {
     void import("@/integrations/supabase/client").then(({ supabase }) =>
@@ -271,6 +271,21 @@ function TerminalPage() {
       }),
     );
   }, []);
+  useEffect(() => {
+    try {
+      if (window.localStorage.getItem("jenvu-terminal-asset") === "BTCUSD") setAsset("BTCUSD");
+    } catch {
+      /* storage unavailable */
+    }
+  }, []);
+  const changeAsset = (next: "XAUUSD" | "BTCUSD") => {
+    setAsset(next);
+    try {
+      window.localStorage.setItem("jenvu-terminal-asset", next);
+    } catch {
+      /* storage unavailable */
+    }
+  };
   const [deskOpen, setDeskOpen] = useState(false);
   const [theme, setTheme] = useState<"light" | "dark">("light");
   const [watchlistOpen, setWatchlistOpen] = useState(true);
@@ -610,6 +625,7 @@ function TerminalPage() {
               timeframes={TIMEFRAMES}
               timeframe={tf}
               asset={asset}
+              onAssetChange={changeAsset}
               theme={theme}
               onTimeframeChange={(next) => {
                 const match = TIMEFRAMES.find((item) => item.key === next.key);
@@ -673,6 +689,7 @@ function TerminalPage() {
             <TerminalWatchlist
               className="hidden lg:flex"
               asset={asset}
+              onAssetChange={changeAsset}
               news={nextGoldNews}
               newsLoading={newsQuery.isPending}
               onClose={() => setWatchlistOpen(false)}
