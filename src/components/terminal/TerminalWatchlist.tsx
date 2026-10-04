@@ -149,7 +149,7 @@ export function TerminalWatchlist({
     <aside
       aria-label="Watchlist"
       className={cn(
-        "min-h-0 w-[320px] shrink-0 flex-col border-l border-border bg-card text-card-foreground",
+        "min-h-0 w-[330px] shrink-0 flex-col border-l border-border bg-card text-card-foreground",
         className,
       )}
     >
@@ -166,7 +166,7 @@ export function TerminalWatchlist({
         </button>
       </div>
 
-      <div className="grid shrink-0 grid-cols-[1fr_84px_64px_58px] gap-1 border-b border-border px-3 py-1.5 text-[11px] text-muted-foreground">
+      <div className="grid shrink-0 grid-cols-[minmax(0,1fr)_78px_58px_54px] gap-1 border-b border-border px-3 py-1.5 text-[11px] text-muted-foreground">
         <span>Symbol</span>
         <span className="text-right">Last</span>
         <span className="text-right">Chg</span>
@@ -205,7 +205,7 @@ export function TerminalWatchlist({
                       }}
                       title={item.chartable ? `Open ${item.symbol} chart` : item.name}
                       className={cn(
-                        "grid w-full grid-cols-[1fr_84px_64px_58px] items-center gap-1 border-l-2 border-transparent px-3 py-1.5 text-left font-mono text-xs tabular-nums transition-colors hover:bg-accent",
+                        "grid w-full grid-cols-[minmax(0,1fr)_78px_58px_54px] items-center gap-1 border-l-2 border-transparent px-3 py-1.5 text-left font-mono text-xs tabular-nums transition-colors hover:bg-accent",
                         isFocus && "bg-accent",
                         isChart && "border-l-primary",
                       )}
@@ -213,12 +213,6 @@ export function TerminalWatchlist({
                       <span className="flex min-w-0 items-center gap-2 font-sans font-semibold">
                         <SymbolBadge item={item} />
                         <span className="truncate">{item.symbol}</span>
-                        {item.chartable && (
-                          <span
-                            className="h-1.5 w-1.5 shrink-0 rounded-full bg-[#089981]"
-                            aria-label="Chart available"
-                          />
-                        )}
                       </span>
                       <span className="text-right">{q ? fmt(q.price, q.decimals) : "—"}</span>
                       <span className={cn("text-right", q && (up ? UP : DOWN))}>
