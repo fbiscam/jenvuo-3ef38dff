@@ -6,11 +6,14 @@ import {
   Camera,
   History,
   ImagePlus,
+  ListChecks,
   Mic,
+  Moon,
   Newspaper,
   PanelRightClose,
   Square,
   SquarePen,
+  Sun,
   Timer,
   Trash2,
   X,
@@ -22,6 +25,7 @@ import {
   JenvuChartWorkspace,
   type JenvuChartHandle,
 } from "@/components/terminal/JenvuChartWorkspace";
+import { TerminalWatchlist } from "@/components/terminal/TerminalWatchlist";
 import { transcribeVoiceMessage } from "@/lib/transcription.functions";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -283,6 +287,10 @@ function TerminalPage() {
     }
   };
   const [deskOpen, setDeskOpen] = useState(false);
+  const [theme, setTheme] = useState<"light" | "dark">("light");
+  const [watchlistOpen, setWatchlistOpen] = useState(true);
+  // The watchlist fills the right side whenever the AI desk is closed.
+  const showWatchlist = !deskOpen && watchlistOpen;
   const chartRef = useRef<JenvuChartHandle | null>(null);
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<ChatMsg[]>([]);
@@ -465,9 +473,12 @@ function TerminalPage() {
         timeframe?: string;
         theme?: "light" | "dark";
         deskOpen?: boolean;
+        watchlistOpen?: boolean;
       } | null;
       const savedTimeframe = TIMEFRAMES.find((timeframe) => timeframe.key === settings?.timeframe);
       if (savedTimeframe) setTf(savedTimeframe);
+      if (settings?.theme === "dark" || settings?.theme === "light") setTheme(settings.theme);
+      if (settings?.watchlistOpen === false) setWatchlistOpen(false);
       // The AI desk always starts closed so the chart opens exactly as left.
     } catch {
       // Keep a clean workspace if saved browser data is unavailable or malformed.
@@ -489,9 +500,9 @@ function TerminalPage() {
     if (!hydratedRef.current) return;
     window.localStorage.setItem(
       TERMINAL_SETTINGS_KEY,
-      JSON.stringify({ timeframe: tf.key, deskOpen }),
+      JSON.stringify({ timeframe: tf.key, deskOpen, theme, watchlistOpen }),
     );
-  }, [tf.key, deskOpen]);
+  }, [tf.key, deskOpen, theme, watchlistOpen]);
 
   useEffect(() => {
     setSecondsLeft(candleSecondsLeft(tf.tv));
@@ -600,7 +611,12 @@ function TerminalPage() {
 
   return (
     <TooltipProvider>
-      <div className="flex h-full min-h-0 w-full flex-col overflow-hidden bg-background">
+      <div
+        className={cn(
+          "flex h-full min-h-0 w-full flex-col overflow-hidden bg-background text-foreground",
+          theme === "dark" && "dark terminal-dark",
+        )}
+      >
         <div className="flex min-h-0 flex-1 flex-col lg:flex-row">
           {/* Chart */}
           <section aria-label="XAU/USD chart" className="relative min-h-0 min-w-0 flex-1 bg-background">
@@ -610,6 +626,7 @@ function TerminalPage() {
               timeframe={tf}
               asset={asset}
               onAssetChange={changeAsset}
+              theme={theme}
               onTimeframeChange={(next) => {
                 const match = TIMEFRAMES.find((item) => item.key === next.key);
                 if (match) setTf(match);
@@ -617,7 +634,9 @@ function TerminalPage() {
               rightSlot={
                 <>
                   {!deskOpen && (
-                    <UpcomingGoldNews event={nextGoldNews} loading={newsQuery.isPending} />
+                    <span className={cn(showWatchlist && "lg:hidden")}>
+                      <UpcomingGoldNews event={nextGoldNews} loading={newsQuery.isPending} />
+                    </span>
                   )}
                   <div
                     className="flex h-7 items-center gap-1.5 rounded-md px-2 font-mono text-xs font-semibold text-foreground"
@@ -627,6 +646,27 @@ function TerminalPage() {
                     <Timer className="h-3.5 w-3.5 text-muted-foreground" />
                     {formatCountdown(secondsLeft)}
                   </div>
+                  <button
+                    type="button"
+                    onClick={() => setTheme((t) => (t === "dark" ? "light" : "dark"))}
+                    className="flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                    title={theme === "dark" ? "Switch to white theme" : "Switch to black theme"}
+                    aria-label={theme === "dark" ? "Switch to white theme" : "Switch to black theme"}
+                  >
+                    {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+                  </button>
+                  {!deskOpen && !watchlistOpen && (
+                    <button
+                      type="button"
+                      onClick={() => setWatchlistOpen(true)}
+                      className="hidden h-7 items-center gap-1.5 rounded-md px-2 text-xs font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground lg:flex"
+                      title="Show watchlist"
+                      aria-label="Show watchlist"
+                    >
+                      <ListChecks className="h-4 w-4" />
+                      Watchlist
+                    </button>
+                  )}
                   {!deskOpen && (
                     <button
                       type="button"
@@ -643,6 +683,18 @@ function TerminalPage() {
               }
             />
           </section>
+
+          {/* Watchlist (desktop) — replaced by the AI desk while it is open */}
+          {showWatchlist && (
+            <TerminalWatchlist
+              className="hidden lg:flex"
+              asset={asset}
+              onAssetChange={changeAsset}
+              news={nextGoldNews}
+              newsLoading={newsQuery.isPending}
+              onClose={() => setWatchlistOpen(false)}
+            />
+          )}
 
           {/* AI desk */}
           {deskOpen && (
