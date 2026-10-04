@@ -180,9 +180,9 @@ export function ScriptPanel({ scripts, runs, onChange, onClose }: Props) {
           <button
             type="button"
             onClick={apply}
-            className="ml-auto flex h-7 items-center gap-1.5 rounded-md border border-neutral-300 bg-white px-2.5 text-xs font-medium text-black shadow-sm transition-colors hover:bg-neutral-100"
+            className="ml-auto flex h-7 items-center gap-1.5 rounded-md border border-border bg-background px-2.5 text-xs font-medium text-foreground shadow-sm transition-colors hover:bg-accent"
           >
-            <Play className="h-3 w-3 text-black" />
+            <Play className="h-3 w-3" />
             {active ? "Update on chart" : "Add to chart"}
           </button>
           <button

@@ -28,6 +28,16 @@ export const SD_VISIBLE_ZONES = 1;
  * survivors, zones to the newest `maxZones`, and Entry/SL/TP move to the
  * newest surviving zone.
  */
+
+/** Label plate colours follow the terminal theme (black theme = dark plates). */
+function isDarkCanvas(ctx: CanvasRenderingContext2D): boolean {
+  const c = ctx.canvas as HTMLCanvasElement;
+  return typeof c.closest === "function" && !!c.closest(".terminal-dark");
+}
+function plate(ctx: CanvasRenderingContext2D, alpha = 0.92): string {
+  return isDarkCanvas(ctx) ? `rgba(24,24,24,${alpha})` : `rgba(255,255,255,${alpha})`;
+}
+
 export function resolveZoneOverlaps(
   sdZones: SdZone[],
   fvgs: FreshFvg[],
@@ -990,7 +1000,7 @@ export function renderSmcOverlay(
     const textWidth = ctx.measureText(label).width;
     const labelX = Math.min(pr.width - textWidth - 12, Math.max(x + 8, x + width / 2 - textWidth / 2));
     const labelY = y + height / 2;
-    ctx.fillStyle = "rgba(255,255,255,0.92)";
+    ctx.fillStyle = plate(ctx, 0.92);
     ctx.beginPath();
     ctx.roundRect?.(labelX - 6, labelY - 11, textWidth + 12, 22, 4);
     if (!ctx.roundRect) ctx.rect(labelX - 6, labelY - 11, textWidth + 12, 22);
@@ -1031,7 +1041,7 @@ export function renderSmcOverlay(
     const textWidth = ctx.measureText(label).width;
     const labelX = Math.min(pr.width - textWidth - 12, Math.max(x + 8, x + width / 2 - textWidth / 2));
     const labelY = y + height / 2;
-    ctx.fillStyle = "rgba(255,255,255,0.92)";
+    ctx.fillStyle = plate(ctx, 0.92);
     ctx.beginPath();
     ctx.roundRect?.(labelX - 6, labelY - 11, textWidth + 12, 22, 4);
     if (!ctx.roundRect) ctx.rect(labelX - 6, labelY - 11, textWidth + 12, 22);
@@ -1089,7 +1099,7 @@ export function renderSmcOverlay(
     const candidates = [y + height / 2, y - 13, y + height + 13, y - 37, y + height + 37];
     const labelY = candidates.find((cy) => !collides(cy)) ?? candidates[0];
     sdLabelRects.push({ x0: labelX - 6, x1: labelX + textWidth + 6, y: labelY });
-    ctx.fillStyle = "rgba(255,255,255,0.92)";
+    ctx.fillStyle = plate(ctx, 0.92);
     ctx.beginPath();
     ctx.roundRect?.(labelX - 6, labelY - 11, textWidth + 12, 22, 4);
     if (!ctx.roundRect) ctx.rect(labelX - 6, labelY - 11, textWidth + 12, 22);
@@ -1140,7 +1150,7 @@ export function renderSmcOverlay(
     const candidates = [y + height / 2, y - 12, y + height + 12, y - 34, y + height + 34];
     const labelY = candidates.find((cy) => !collides(cy)) ?? candidates[0];
     sdLabelRects.push({ x0: labelX - 6, x1: labelX + textWidth + 6, y: labelY });
-    ctx.fillStyle = "rgba(255,255,255,0.92)";
+    ctx.fillStyle = plate(ctx, 0.92);
     ctx.beginPath();
     ctx.roundRect?.(labelX - 6, labelY - 10, textWidth + 12, 20, 4);
     if (!ctx.roundRect) ctx.rect(labelX - 6, labelY - 10, textWidth + 12, 20);
@@ -1332,8 +1342,8 @@ export function renderSmcOverlay(
     const bx = xx - bw / 2;
     const by = up ? yy - bh - 4 : yy + 20 + 4;
     ctx.save();
-    ctx.fillStyle = "rgba(255,255,255,0.96)";
-    ctx.strokeStyle = "#d6dae3";
+    ctx.fillStyle = plate(ctx, 0.96);
+    ctx.strokeStyle = isDarkCanvas(ctx) ? "#3a3a3a" : "#d6dae3";
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.roundRect?.(bx, by, bw, bh, 5);
@@ -1413,7 +1423,7 @@ export function renderSmcOverlay(
         pressureBadge(p.t, xx, yy, up);
         continue;
       }
-      ctx.fillStyle = "rgba(255,255,255,0.92)";
+      ctx.fillStyle = plate(ctx, 0.92);
       ctx.beginPath();
        ctx.roundRect?.(xx - w / 2, yy, w, 18, 4);
        if (!ctx.roundRect) ctx.rect(xx - w / 2, yy, w, 18);
@@ -1434,7 +1444,7 @@ export function renderSmcOverlay(
       const tx = xx - tw / 2;
       const ty = up ? yy - 22 - 4 - th - 4 : yy + 20 + 4 + 22 + 4;
       ctx.save();
-      ctx.fillStyle = "rgba(255,255,255,0.97)";
+      ctx.fillStyle = plate(ctx, 0.97);
       ctx.strokeStyle = color;
       ctx.lineWidth = 1;
       ctx.setLineDash([3, 2]);
