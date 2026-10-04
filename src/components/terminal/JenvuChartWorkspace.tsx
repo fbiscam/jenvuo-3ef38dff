@@ -533,7 +533,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
               )}
             </button>
           </PopoverTrigger>
-          <PopoverContent align="start" className="w-80 p-2 font-sans subpixel-antialiased">
+          <PopoverContent align="start" className={cn("w-80 p-2 font-sans subpixel-antialiased", theme === "dark" && "dark terminal-dark border-border bg-popover text-popover-foreground")}>
             <p className="px-2 pb-2 pt-1 text-sm font-normal text-foreground">Indicators</p>
             {INDICATOR_LIST.map((spec) => {
               const on = indicators.includes(spec.id);
@@ -569,7 +569,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
               Jenvu SMC
             </button>
           </PopoverTrigger>
-          <PopoverContent align="start" className="w-80 p-2 font-sans subpixel-antialiased">
+          <PopoverContent align="start" className={cn("w-80 p-2 font-sans subpixel-antialiased", theme === "dark" && "dark terminal-dark border-border bg-popover text-popover-foreground")}>
             <p className="px-2 pb-1 pt-1 text-sm font-normal text-foreground">Smart-money overlays</p>
             <p className="px-2 pb-2 text-xs font-normal leading-4 text-muted-foreground">
               Same 10-bar structure engine the AI desk
@@ -690,7 +690,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
               </TooltipTrigger>
               <TooltipContent side="right">Drawing color</TooltipContent>
             </Tooltip>
-            <PopoverContent side="right" className="flex w-auto gap-1.5 p-2">
+            <PopoverContent side="right" className={cn("flex w-auto gap-1.5 p-2", theme === "dark" && "dark terminal-dark")}>
               {DRAWING_COLORS.map((c) => (
                 <button
                   type="button"
