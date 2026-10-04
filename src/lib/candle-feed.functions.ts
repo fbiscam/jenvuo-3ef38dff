@@ -5,7 +5,7 @@ import type { Candle } from "./candle/indicators";
 
 const schema = z.object({
   interval: z.enum(["1m", "5m", "15m", "1h"]),
-  asset: z.enum(["XAUUSD", "BTCUSD"]).default("XAUUSD"),
+  asset: z.enum(["XAUUSD"]).default("XAUUSD"),
 });
 
 
@@ -169,7 +169,7 @@ function onlyClosed(rows: Candle[], interval: string): Candle[] {
 /** Live spot price (display ke liye) — XAU/USD (MT5 jaisa) ya BTC/USD. */
 export const fetchGoldSpot = createServerFn({ method: "GET" })
   .inputValidator((data: unknown) =>
-    z.object({ asset: z.enum(["XAUUSD", "BTCUSD"]).default("XAUUSD") }).parse(data ?? {}),
+    z.object({ asset: z.enum(["XAUUSD"]).default("XAUUSD") }).parse(data ?? {}),
   )
   .handler(async ({ data }): Promise<{ price: number | null; at: number }> => ({
     price: data.asset === "BTCUSD" ? await fetchBinancePrice("BTCUSDT") : await fetchSpot(),

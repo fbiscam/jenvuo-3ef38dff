@@ -125,7 +125,6 @@ function formatNewsStamp(iso: string): string {
 
 export function TerminalWatchlist({
   asset,
-  onAssetChange,
   news,
   newsLoading,
   onClose,
