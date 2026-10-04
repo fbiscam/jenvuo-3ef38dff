@@ -30,7 +30,7 @@ export type Drawing = {
   createdAt: number;
 };
 
-export const DRAWING_COLORS = ["#2962ff", "#f23645", "#089981", "#ff9800", "#9c27b0", "#131722"];
+export const DRAWING_COLORS = ["#2962ff", "#f23645", "#089981", "#ff9800", "#9c27b0", "#131722", "#ffffff"];
 
 /** Tools needing a single click. */
 export const SINGLE_POINT_TOOLS = new Set<DrawingTool>(["hline", "vline", "text"]);

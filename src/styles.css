@@ -1039,7 +1039,7 @@ html:not(.ms-icons-ready) .material-symbols-rounded {
 /* Terminal black theme — TradingView-style near-black surfaces, scoped to the terminal. */
 .dark.terminal-dark {
   --background: oklch(0.165 0 0);
-  --foreground: oklch(0.98 0 0);
+  --foreground: oklch(1 0 0);
   --card: oklch(0.165 0 0);
   --card-foreground: oklch(0.98 0 0);
   --popover: oklch(0.22 0 0);
@@ -1049,9 +1049,9 @@ html:not(.ms-icons-ready) .material-symbols-rounded {
   --secondary: oklch(0.25 0 0);
   --secondary-foreground: oklch(0.98 0 0);
   --muted: oklch(0.23 0 0);
-  --muted-foreground: oklch(0.9 0 0);
+  --muted-foreground: oklch(1 0 0);
   --accent: oklch(0.27 0 0);
-  --accent-foreground: oklch(0.99 0 0);
+  --accent-foreground: oklch(1 0 0);
   --border: oklch(0.27 0 0);
   --input: oklch(0.29 0 0);
 }
@@ -1065,7 +1065,7 @@ body:has(.terminal-dark) .dashboard-terminal-sidebar .bg-sidebar {
 body:has(.terminal-dark) .dashboard-terminal-sidebar .dashboard-sidebar-link,
 body:has(.terminal-dark) .dashboard-terminal-sidebar .dashboard-sidebar-brand,
 body:has(.terminal-dark) .dashboard-terminal-sidebar button {
-  color: oklch(0.98 0 0) !important;
+  color: oklch(1 0 0) !important;
 }
 body:has(.terminal-dark) .dashboard-terminal-sidebar .dashboard-sidebar-link:hover,
 body:has(.terminal-dark) .dashboard-terminal-sidebar .dashboard-sidebar-link[aria-current="page"],
