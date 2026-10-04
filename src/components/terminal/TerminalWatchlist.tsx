@@ -141,11 +141,9 @@ export function TerminalWatchlist({
   const focusQuote = quotes.data?.[focusItem.symbol];
   const focusChange =
     focusQuote && focusQuote.prevClose != null ? focusQuote.price - focusQuote.prevClose : null;
-  const goldLike = focusItem.symbol === "XAUUSD" || focusItem.symbol === "XAGUSD";
+  // Crypto trades 24/7; metals, forex and indices share the weekend close.
   const closed =
-    focusItem.symbol === "BTCUSD" || focusItem.symbol === "ETHUSD"
-      ? false
-      : isMarketClosed(new Date()) && (goldLike || true);
+    focusItem.symbol !== "BTCUSD" && focusItem.symbol !== "ETHUSD" && isMarketClosed(new Date());
 
   return (
     <aside

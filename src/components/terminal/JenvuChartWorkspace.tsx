@@ -125,6 +125,7 @@ type Props = {
   rightSlot?: ReactNode;
   asset?: "XAUUSD" | "BTCUSD";
   onAssetChange?: (asset: "XAUUSD" | "BTCUSD") => void;
+  theme?: "light" | "dark";
 };
 
 const TOOLS: Array<{ id: DrawingTool; icon: LucideIcon; label: string }> = [
@@ -206,7 +207,7 @@ function ToolButton({
 }
 
 export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function JenvuChartWorkspace(
-  { timeframes, timeframe, onTimeframeChange, rightSlot, asset = "XAUUSD", onAssetChange },
+  { timeframes, timeframe, onTimeframeChange, rightSlot, asset = "XAUUSD", onAssetChange, theme = "light" },
   ref,
 ) {
   const fetchChart = useServerFn(getTerminalChart);
@@ -762,14 +763,14 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
               onToolDone={onToolDone}
               onHoverBar={onHoverBar}
               resetKey={`${asset}:${timeframe.key}:${payload ? "ready" : "loading"}`}
-              theme="light"
+              theme={theme}
             />
 
             {/* Legend */}
             <div
               className={cn(
                 "pointer-events-none absolute left-2 top-1.5 z-[3] max-w-[70%] space-y-0.5 font-mono text-[11px] leading-4",
-                "text-slate-700",
+                "text-foreground/80",
               )}
             >
               <div className="mb-2 flex flex-wrap items-center gap-x-2">
