@@ -7,7 +7,6 @@ import type { NewsEvent } from "@/lib/news.functions";
 import { isMarketClosed } from "@/lib/signals/qualification";
 import { cn } from "@/lib/utils";
 import { XauUsdLogo } from "./XauUsdLogo";
-import btcLogo from "@/assets/watchlist/btc.svg";
 import ethLogo from "@/assets/watchlist/eth.svg";
 import xagLogo from "@/assets/watchlist/xag.svg";
 import spxLogo from "@/assets/watchlist/spx.svg";
@@ -17,7 +16,7 @@ import flagGb from "@/assets/watchlist/flag-gb.svg";
 import flagUs from "@/assets/watchlist/flag-us.svg";
 import flagJp from "@/assets/watchlist/flag-jp.svg";
 
-type ChartAsset = "XAUUSD" | "BTCUSD";
+type ChartAsset = "XAUUSD";
 
 type WatchItem = {
   symbol: string;
@@ -38,7 +37,6 @@ const GROUPS: Array<{ label: string; items: WatchItem[] }> = [
   {
     label: "Crypto",
     items: [
-      { symbol: "BTCUSD", name: "Bitcoin / U.S. Dollar", logo: btcLogo, chartable: "BTCUSD" },
       { symbol: "ETHUSD", name: "Ethereum / U.S. Dollar", logo: ethLogo },
     ],
   },
@@ -127,14 +125,12 @@ function formatNewsStamp(iso: string): string {
 
 export function TerminalWatchlist({
   asset,
-  onAssetChange,
   news,
   newsLoading,
   onClose,
   className,
 }: {
   asset: ChartAsset;
-  onAssetChange: (asset: ChartAsset) => void;
   news?: NewsEvent;
   newsLoading: boolean;
   onClose: () => void;
@@ -168,7 +164,7 @@ export function TerminalWatchlist({
     focusQuote && focusQuote.prevClose != null ? focusQuote.price - focusQuote.prevClose : null;
   // Crypto trades 24/7; metals, forex and indices share the weekend close.
   const closed =
-    focusItem.symbol !== "BTCUSD" && focusItem.symbol !== "ETHUSD" && isMarketClosed(new Date());
+    focusItem.symbol !== "ETHUSD" && isMarketClosed(new Date());
 
   return (
     <aside
@@ -226,9 +222,8 @@ export function TerminalWatchlist({
                       key={item.symbol}
                       onClick={() => {
                         setFocus(item.symbol);
-                        if (item.chartable) onAssetChange(item.chartable);
                       }}
-                      title={item.chartable ? `Open ${item.symbol} chart` : item.name}
+                      title={item.name}
                       className={cn(
                         "grid w-full grid-cols-[minmax(0,1fr)_78px_58px_54px] items-center gap-1 border-l-2 border-transparent px-3 py-2 text-left text-[13px] tabular-nums text-foreground transition-colors hover:bg-accent",
                         isFocus && "bg-accent",

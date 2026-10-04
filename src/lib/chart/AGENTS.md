@@ -2,7 +2,7 @@
 
 - Keep reversal pressure scoring deterministic and confluence-gated; a single wick or volume clue must never produce strong confidence, preventing inflated live signals.
 - Anchor each swing's pressure to its local closed-candle ATR and body-close displacement so historical percentages stay fixed and later wicks cannot inflate them.
-- Expose buyer/seller reversal pressure on every chart timeframe for XAU/USD and BTC/USD but never draw Entry/SL/TP from pressure; the user wants trade plans only from the Zone + FVG strategy.
+- Expose buyer/seller reversal pressure on every chart timeframe for XAU/USD (the only terminal pair; BTC/USD was removed) but never draw Entry/SL/TP from pressure; the user wants trade plans only from the Zone + FVG strategy.
 - Confirm reversal entries only after a closed-candle body break followed by a directional retest-and-hold candle; wick-only breaks remain unconfirmed.
 - Require reversal-side buyer/seller pressure above 55% before confirming an entry; neutral or opposing pressure remains an alert only.
 - Compute SMC pressure from server-fed closed candles only (live ticks only shape the forming candle) and ignore gold volume; per-browser ticks and feed-specific volume made percentages differ between accounts.

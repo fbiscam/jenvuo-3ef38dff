@@ -5,7 +5,7 @@ import type { Candle } from "./candle/indicators";
 
 const schema = z.object({
   interval: z.enum(["1m", "5m", "15m", "1h"]),
-  asset: z.enum(["XAUUSD", "BTCUSD"]).default("XAUUSD"),
+  asset: z.enum(["XAUUSD"]).default("XAUUSD"),
 });
 
 
@@ -26,14 +26,6 @@ const YF_INTERVAL: Record<string, string> = {
 export const fetchGoldCandles = createServerFn({ method: "GET" })
   .inputValidator((data: unknown) => schema.parse(data))
   .handler(async ({ data }): Promise<Candle[]> => {
-    // BTC/USD — Binance BTCUSDT real-time klines (24/7, no delay)
-    if (data.asset === "BTCUSD") {
-      const btc = await fetchBinance("BTCUSDT", data.interval);
-      if (!btc) throw new Error("BTC data load nahi hua.");
-      const closed = onlyClosed(btc, data.interval);
-      if (closed.length < 60) throw new Error("BTC candles kaafi nahi hain.");
-      return closed.slice(-300);
-    }
 
     // 1) Bluesmind API (agar configured hai) — primary source
     const bm = await fetchBluesmind(data.interval);
@@ -166,30 +158,15 @@ function onlyClosed(rows: Candle[], interval: string): Candle[] {
   return rows.filter((c) => c.openTime % ms === 0 && c.openTime + ms <= now);
 }
 
-/** Live spot price (display ke liye) — XAU/USD (MT5 jaisa) ya BTC/USD. */
+/** Live spot price (display ke liye) — XAU/USD (MT5 jaisa). */
 export const fetchGoldSpot = createServerFn({ method: "GET" })
   .inputValidator((data: unknown) =>
-    z.object({ asset: z.enum(["XAUUSD", "BTCUSD"]).default("XAUUSD") }).parse(data ?? {}),
+    z.object({ asset: z.enum(["XAUUSD"]).default("XAUUSD") }).parse(data ?? {}),
   )
-  .handler(async ({ data }): Promise<{ price: number | null; at: number }> => ({
-    price: data.asset === "BTCUSD" ? await fetchBinancePrice("BTCUSDT") : await fetchSpot(),
+  .handler(async (): Promise<{ price: number | null; at: number }> => ({
+    price: await fetchSpot(),
     at: Date.now(),
   }));
-
-async function fetchBinancePrice(symbol: string): Promise<number | null> {
-  try {
-    const res = await fetch(`https://api.binance.com/api/v3/ticker/price?symbol=${symbol}`, {
-      headers: { "User-Agent": "Mozilla/5.0" },
-    });
-    if (!res.ok) return null;
-    const json = (await res.json()) as { price?: string };
-    const n = Number(json.price);
-    return Number.isFinite(n) && n > 0 ? n : null;
-  } catch {
-    return null;
-  }
-}
-
 
 async function fetchSpot(): Promise<number | null> {
   try {
