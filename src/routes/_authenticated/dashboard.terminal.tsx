@@ -161,7 +161,7 @@ function UpcomingGoldNews({ event, loading }: { event?: NewsEvent; loading: bool
       : "No important news ahead";
   return (
     <span
-      className="flex min-w-0 max-w-[360px] items-center gap-1.5 whitespace-nowrap px-1 text-xs font-normal text-muted-foreground"
+      className="flex w-[260px] shrink-0 items-center gap-1.5 whitespace-nowrap px-1 text-xs font-normal text-muted-foreground"
       title={text}
     >
       <Newspaper
