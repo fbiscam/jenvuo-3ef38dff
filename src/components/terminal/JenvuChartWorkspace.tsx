@@ -124,7 +124,6 @@ type Props = {
   onTimeframeChange: (tf: TimeframeOption) => void;
   rightSlot?: ReactNode;
   asset?: "XAUUSD";
-  onAssetChange?: (asset: "XAUUSD") => void;
   theme?: "light" | "dark";
 };
 
@@ -207,7 +206,7 @@ function ToolButton({
 }
 
 export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function JenvuChartWorkspace(
-  { timeframes, timeframe, onTimeframeChange, rightSlot, asset = "XAUUSD", onAssetChange, theme = "light" },
+  { timeframes, timeframe, onTimeframeChange, rightSlot, asset = "XAUUSD", theme = "light" },
   ref,
 ) {
   const fetchChart = useServerFn(getTerminalChart);
