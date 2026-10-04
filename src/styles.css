@@ -1055,3 +1055,23 @@ html:not(.ms-icons-ready) .material-symbols-rounded {
   --border: oklch(0.27 0 0);
   --input: oklch(0.29 0 0);
 }
+
+/* Black terminal: the left app menu turns near-black with white icons too. */
+body:has(.terminal-dark) .dashboard-terminal-sidebar,
+body:has(.terminal-dark) .dashboard-terminal-sidebar .bg-sidebar {
+  background-color: oklch(0.165 0 0) !important;
+  border-color: oklch(0.27 0 0) !important;
+}
+body:has(.terminal-dark) .dashboard-terminal-sidebar .dashboard-sidebar-link,
+body:has(.terminal-dark) .dashboard-terminal-sidebar .dashboard-sidebar-brand,
+body:has(.terminal-dark) .dashboard-terminal-sidebar button {
+  color: oklch(0.98 0 0) !important;
+}
+body:has(.terminal-dark) .dashboard-terminal-sidebar .dashboard-sidebar-link:hover,
+body:has(.terminal-dark) .dashboard-terminal-sidebar .dashboard-sidebar-link[aria-current="page"],
+body:has(.terminal-dark) .dashboard-terminal-sidebar .dashboard-sidebar-link.active {
+  background-color: oklch(0.27 0 0) !important;
+}
+body:has(.terminal-dark) .dashboard-terminal-sidebar .h-px {
+  background-color: oklch(0.27 0 0) !important;
+}
