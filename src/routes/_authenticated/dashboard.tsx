@@ -86,7 +86,6 @@ import {
   ScanSearch,
   ShieldCheckIcon,
   Terminal,
-  GraduationCap,
   type LucideIcon,
 } from "lucide-react";
 import {
@@ -168,7 +167,6 @@ const NAV_GROUPS: Array<{ label: string; items: TabItem[] }> = [
         countKey: "saved",
       },
       { to: "/dashboard/terminal", label: "Terminal", icon: Terminal },
-      { to: "/dashboard/course", label: "Course", icon: GraduationCap },
     ],
   },
   {
