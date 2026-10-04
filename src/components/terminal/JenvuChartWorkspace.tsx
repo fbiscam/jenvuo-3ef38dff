@@ -416,9 +416,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
         bars: s.bars,
         stepSeconds: s.stepSeconds,
         source:
-          s.payload?.source === "binance"
-            ? "Binance BTC/USDT live candles"
-            : s.payload?.source === "spot"
+          s.payload?.source === "spot"
             ? `spot ${pairLabel}`
             : `PAXG candles (${s.payload?.provider ?? "exchange"}) scaled to live XAU/USD spot`,
         indicators: s.indicators,
@@ -484,22 +482,9 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
             <Menu className="h-4 w-4" />
           </button>
           <span className="hidden md:inline-flex"><XauUsdLogo size={22} /></span>
-          <div className="ml-1 flex shrink-0 items-center rounded-md border border-border p-0.5" role="group" aria-label="Trading pair">
-            {(["XAUUSD", "BTCUSD"] as const).map((a) => (
-              <button
-                type="button"
-                key={a}
-                aria-pressed={asset === a}
-                onClick={() => onAssetChange?.(a)}
-                className={cn(
-                  "h-6 rounded px-2 font-mono text-xs font-semibold text-muted-foreground transition-colors hover:text-foreground",
-                  asset === a && "bg-accent text-foreground",
-                )}
-              >
-                {a === "XAUUSD" ? "XAU/USD" : "BTC/USD"}
-              </button>
-            ))}
-          </div>
+          <span className="ml-1 shrink-0 rounded-md border border-border px-2 py-1 font-mono text-xs font-semibold text-foreground">
+            XAU/USD
+          </span>
           <span className="text-sm font-semibold tracking-tight">{"\n"}</span>
         </div>
         <div className="flex shrink-0 items-center" role="group" aria-label="Chart timeframe">
@@ -512,7 +497,6 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
               className={cn(
                 "h-7 rounded-md px-2 font-mono text-xs font-semibold text-muted-foreground transition-colors hover:bg-accent hover:text-foreground",
                 item.key === timeframe.key && "bg-accent text-foreground",
-                item.key === timeframe.key && theme === "dark" && "text-white hover:text-white",
               )}
             >
               {item.label}
