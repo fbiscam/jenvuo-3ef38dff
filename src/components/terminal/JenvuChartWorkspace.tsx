@@ -770,7 +770,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
             <div
               className={cn(
                 "pointer-events-none absolute left-2 top-1.5 z-[3] max-w-[70%] space-y-0.5 font-mono text-[11px] leading-4",
-                "text-foreground/80",
+                "text-foreground",
               )}
             >
               <div className="mb-2 flex flex-wrap items-center gap-x-2">

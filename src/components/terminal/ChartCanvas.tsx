@@ -49,9 +49,9 @@ export const CHART_THEMES: Record<ChartTheme, { bg: string; text: string; grid: 
   // TradingView-style dark palette
   dark: {
     bg: "#0f0f0f",
-    text: "#d1d4dc",
-    grid: "#1c1c1c",
-    border: "#2a2a2a",
+    text: "#f2f2f2",
+    grid: "#1f1f1f",
+    border: "#2e2e2e",
     up: "#089981",
     down: "#f23645",
     insideBar: "#38bdf8",
@@ -222,7 +222,7 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
         timeVisible: true,
         secondsVisible: false,
         rightOffset: 8,
-        barSpacing: 4,
+        barSpacing: 6,
       },
       // Fixed locale: some browsers report tags like "en-US@posix" that make
       // Intl throw and stop the chart from drawing candles.
@@ -447,7 +447,7 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
       const n = propsRef.current.bars.length;
       if (n > 0) {
         try {
-          chart.timeScale().setVisibleLogicalRange({ from: Math.max(0, n - 320), to: n + 10 });
+          chart.timeScale().setVisibleLogicalRange({ from: Math.max(0, n - 160), to: n + 10 });
         } catch {
           /* chart hidden or disposed */
         }
@@ -927,7 +927,7 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
       const n = propsRef.current.bars.length;
       if (n === 0) return;
       try {
-        chartRef.current?.timeScale().setVisibleLogicalRange({ from: Math.max(0, n - 320), to: n + 10 });
+        chartRef.current?.timeScale().setVisibleLogicalRange({ from: Math.max(0, n - 160), to: n + 10 });
         chartRef.current?.priceScale("right").applyOptions({ autoScale: true });
       } catch {
         /* chart hidden or disposed (e.g. phone layout with the AI panel open) */
