@@ -1200,7 +1200,8 @@ export function renderSmcOverlay(
       const w = Math.max(6, x1 - fromX);
       ctx.fillStyle = `rgba(${color},0.06)`;
       ctx.fillRect(fromX, y, w, h);
-      ctx.strokeStyle = `rgba(${color},0.55)`;
+      const lineRgb = isDarkCanvas(ctx) ? "255,255,255" : color;
+      ctx.strokeStyle = `rgba(${lineRgb},0.55)`;
       ctx.lineWidth = 1;
       ctx.setLineDash([4, 3]);
       ctx.strokeRect(fromX, y, w, h);
@@ -1208,7 +1209,7 @@ export function renderSmcOverlay(
       ctx.font = "600 10px 'JetBrains Mono', ui-monospace, monospace";
       const tw = ctx.measureText(label).width;
       if (w < tw + 8) return;
-      ctx.fillStyle = `rgba(${color},0.85)`;
+      ctx.fillStyle = `rgba(${lineRgb},0.85)`;
       ctx.textBaseline = "middle";
       ctx.fillText(label, fromX + 4, y + h / 2);
       ctx.textBaseline = "alphabetic";
