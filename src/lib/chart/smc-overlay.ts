@@ -34,19 +34,12 @@ function isDarkCanvas(ctx: CanvasRenderingContext2D): boolean {
   const c = ctx.canvas as HTMLCanvasElement;
   return typeof c.closest === "function" && !!c.closest(".terminal-dark");
 }
-/** Zone / FVG colours: black theme uses brighter TradingView-style tones and a stronger fill. */
+/** Zone / FVG colours: identical in both themes (only label plates follow the theme). */
 function zoneTone(ctx: CanvasRenderingContext2D, kind: "supply" | "demand" | "bearFvg" | "bullFvg", fresh = true) {
   const dark = isDarkCanvas(ctx);
-  const rgb = dark
-    ? { supply: "247,82,95", demand: "34,171,148", bearFvg: "255,154,162", bullFvg: "111,227,196" }[kind]
-    : { supply: "239,68,68", demand: "16,185,129", bearFvg: "242,54,69", bullFvg: "34,197,94" }[kind];
+  const rgb = { supply: "239,68,68", demand: "16,185,129", bearFvg: "242,54,69", bullFvg: "34,197,94" }[kind];
   const isFvg = kind === "bearFvg" || kind === "bullFvg";
-  const a = dark ? (isFvg ? (fresh ? 0.13 : 0.08) : fresh ? 0.17 : 0.1) : isFvg ? (fresh ? 0.12 : 0.07) : fresh ? 0.11 : 0.07;
-  // Black theme: white borders + white shade; only the label text keeps green/red.
-  if (dark) {
-    const wa = isFvg ? (fresh ? 0.09 : 0.05) : fresh ? 0.12 : 0.07;
-    return { edge: "rgb(255,255,255)", fill: `rgba(255,255,255,${wa})`, text: `rgb(${rgb})`, dark };
-  }
+  const a = isFvg ? (fresh ? 0.12 : 0.07) : fresh ? 0.11 : 0.07;
   return { edge: `rgb(${rgb})`, fill: `rgba(${rgb},${a})`, text: `rgb(${rgb})`, dark };
 }
 function plate(ctx: CanvasRenderingContext2D, alpha = 0.92): string {
@@ -1221,7 +1214,7 @@ export function renderSmcOverlay(
     };
     const supply = z.type === "SUPPLY";
     ctx.save();
-    box(z.top, z.bottom, supply ? (isDarkCanvas(ctx) ? "247,82,95" : "239,68,68") : (isDarkCanvas(ctx) ? "34,171,148" : "16,185,129"), supply ? "PREV SUPPLY" : "PREV DEMAND", xa);
+    box(z.top, z.bottom, supply ? "239,68,68" : "16,185,129", supply ? "PREV SUPPLY" : "PREV DEMAND", xa);
     if (z.fvg) {
       const fx = pr.x(z.fvg.t / 1000);
       if (fx != null && fx < x1) {
