@@ -1385,6 +1385,14 @@ export function renderSmcOverlay(
     ctx.fillText(st, bx + bw - 5 - ctx.measureText(st).width, by + 13);
     ctx.restore();
   };
+  // HH/HL/LH/LL: plain text (no filled block) — pure white in black theme, green/red in white theme.
+  const swingText = (text: string, xx: number, yy: number, color: string) => {
+    ctx.save();
+    ctx.font = "700 13px 'JetBrains Mono', ui-monospace, monospace";
+    ctx.fillStyle = isDarkCanvas(ctx) ? "#ffffff" : color;
+    ctx.fillText(text, xx - ctx.measureText(text).width / 2, yy + 13.5);
+    ctx.restore();
+  };
   if (toggles.structure) {
     for (const p of smc.pivots) {
       const x = pr.x(p.t / 1000);
@@ -1397,13 +1405,7 @@ export function renderSmcOverlay(
        // Fixed to the pivot candle wick — no edge clamping, so it never drifts.
        const yy = up ? y - 24 : y + 5;
        const xx = x;
-      ctx.fillStyle = color;
-      ctx.beginPath();
-       ctx.roundRect?.(xx - w / 2, yy, w, 18, 4);
-       if (!ctx.roundRect) ctx.rect(xx - w / 2, yy, w, 18);
-      ctx.fill();
-      ctx.fillStyle = "#ffffff";
-       ctx.fillText(p.label, xx - w / 2 + 7, yy + 13.5);
+      swingText(p.label, xx, yy, color);
       pressureBadge(p.t, xx, yy, up);
     }
     // Live (unconfirmed) swings: outlined dashed badge that follows the forming candle.
@@ -1421,13 +1423,7 @@ export function renderSmcOverlay(
        const xx = x;
       if (p.confirmedByOpposite) {
         // Solid badge, same as a confirmed pivot — no countdown.
-        ctx.fillStyle = color;
-        ctx.beginPath();
-        ctx.roundRect?.(xx - w / 2, yy, w, 18, 4);
-        if (!ctx.roundRect) ctx.rect(xx - w / 2, yy, w, 18);
-        ctx.fill();
-        ctx.fillStyle = "#ffffff";
-        ctx.fillText(text, xx - w / 2 + 7, yy + 13.5);
+        swingText(text, xx, yy, color);
         pressureBadge(p.t, xx, yy, up);
         continue;
       }
@@ -1435,13 +1431,7 @@ export function renderSmcOverlay(
       if (!SHOW_PROVISIONAL_PIVOTS) {
         // New swing shown immediately with its real label (HH/HL/LH/LL)
         // plus fresh buyer/seller pressure as soon as the high/low forms.
-        ctx.fillStyle = color;
-        ctx.beginPath();
-        ctx.roundRect?.(xx - w / 2, yy, w, 18, 4);
-        if (!ctx.roundRect) ctx.rect(xx - w / 2, yy, w, 18);
-        ctx.fill();
-        ctx.fillStyle = "#ffffff";
-        ctx.fillText(text, xx - w / 2 + 7, yy + 13.5);
+        swingText(text, xx, yy, color);
         pressureBadge(p.t, xx, yy, up);
         continue;
       }
