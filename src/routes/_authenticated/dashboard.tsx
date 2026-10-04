@@ -1295,10 +1295,12 @@ function DashboardLayout() {
   }, [authUser?.id, authLoading, refreshTick]);
 
   const navCollapsed = sidebarCollapsed && !mobileNavOpen;
+  const themeApplies = pathname !== "/dashboard" && pathname !== "/dashboard/terminal";
+  const dashDark = themeApplies && dashTheme === "dark";
 
   return (
     <div
-      className={`flex ${pathname === "/dashboard/terminal" ? "h-dvh overflow-hidden jenvu-terminal-shell" : "min-h-screen jenvu-zoom-dashboard"} bg-white text-zinc-900 font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif] antialiased`}
+      className={`flex ${pathname === "/dashboard/terminal" ? "h-dvh overflow-hidden jenvu-terminal-shell" : "min-h-screen jenvu-zoom-dashboard"} ${dashDark ? "dark dash-dark" : ""} bg-white text-zinc-900 font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif] antialiased`}
     >
       {/* Mobile overlay */}
       {mobileNavOpen && !embedMode && (
@@ -1449,7 +1451,7 @@ function DashboardLayout() {
             ))}
           </nav>
 
-          {/* Quick actions: Sign out (left, icon) + Collapse (right) */}
+          {/* Quick actions: Sign out (left, icon) + Theme + Collapse (right) */}
           <div
             className={`mt-auto shrink-0 flex items-center border-t border-zinc-200 bg-sidebar py-2 ${navCollapsed ? "justify-center px-2" : "justify-between pl-3 pr-2"}`}
           >
@@ -1459,18 +1461,33 @@ function DashboardLayout() {
                 onClick={signOut}
                 title="Sign out"
                 aria-label="Sign out"
-                className="inline-flex h-7 w-7 items-center justify-center rounded-md text-zinc-900 hover:bg-red-50 hover:text-red-600"
+                className="sidebar-quick-btn inline-flex h-7 w-7 items-center justify-center rounded-md text-zinc-900"
               >
                 <Power className="h-3.5 w-3.5" strokeWidth={2.25} />
               </button>
             )}
-            <div className="flex items-center gap-1">
+            <div className={`flex items-center gap-1 ${navCollapsed ? "flex-col" : ""}`}>
+              {themeApplies && (
+                <button
+                  type="button"
+                  onClick={toggleDashTheme}
+                  title={dashTheme === "dark" ? "White theme" : "Black theme"}
+                  aria-label={dashTheme === "dark" ? "Switch to white theme" : "Switch to black theme"}
+                  className="sidebar-quick-btn inline-flex h-7 w-7 items-center justify-center rounded-md text-zinc-600"
+                >
+                  {dashTheme === "dark" ? (
+                    <Sun className="h-3.5 w-3.5" strokeWidth={2.25} />
+                  ) : (
+                    <Moon className="h-3.5 w-3.5" strokeWidth={2.25} />
+                  )}
+                </button>
+              )}
               <button
                 type="button"
                 onClick={() => setSidebarCollapsed((v) => !v)}
                 title={navCollapsed ? "Expand" : "Collapse"}
                 aria-label={navCollapsed ? "Expand" : "Collapse"}
-                className="inline-flex h-7 w-7 items-center justify-center rounded-md text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900"
+                className="sidebar-quick-btn inline-flex h-7 w-7 items-center justify-center rounded-md text-zinc-600"
               >
                 {navCollapsed ? (
                   <ChevronsRight className="h-3.5 w-3.5" />
