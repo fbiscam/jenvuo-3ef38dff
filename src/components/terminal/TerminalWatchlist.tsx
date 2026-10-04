@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { ChevronDown, Newspaper, PanelRightClose } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { getMarketSnapshotsBatch } from "@/lib/gold-analysis.functions";
 import type { NewsEvent } from "@/lib/news.functions";
 import { isMarketClosed } from "@/lib/signals/qualification";
@@ -154,11 +154,29 @@ export function TerminalWatchlist({
       }
       return map;
     },
-    staleTime: 25_000,
-    refetchInterval: 30_000,
+    staleTime: 8_000,
+    refetchInterval: 10_000,
     refetchIntervalInBackground: false,
     placeholderData: (previous) => previous,
   });
+
+  // Flash each price green/red when it ticks up/down, like a trading terminal.
+  const prevPrices = useRef<Record<string, number>>({});
+  const [flash, setFlash] = useState<Record<string, "up" | "down">>({});
+  useEffect(() => {
+    const data = quotes.data;
+    if (!data) return;
+    const next: Record<string, "up" | "down"> = {};
+    for (const [sym, q] of Object.entries(data)) {
+      const before = prevPrices.current[sym];
+      if (before != null && q.price !== before) next[sym] = q.price > before ? "up" : "down";
+      prevPrices.current[sym] = q.price;
+    }
+    if (Object.keys(next).length === 0) return;
+    setFlash(next);
+    const id = window.setTimeout(() => setFlash({}), 900);
+    return () => window.clearTimeout(id);
+  }, [quotes.data]);
 
   const allItems = GROUPS.flatMap((group) => group.items);
   const focusSymbol = allItems.some((item) => item.symbol === focus) ? focus : asset;
@@ -239,7 +257,15 @@ export function TerminalWatchlist({
                         <SymbolBadge item={item} />
                         <span className="truncate">{item.symbol}</span>
                       </span>
-                      <span className="text-right">{q ? fmt(q.price, q.decimals) : "—"}</span>
+                      <span
+                        className={cn(
+                          "rounded-sm px-0.5 text-right transition-colors duration-500",
+                          flash[item.symbol] === "up" && "bg-[#089981]/25 text-[#089981]",
+                          flash[item.symbol] === "down" && "bg-[#f23645]/25 text-[#f23645]",
+                        )}
+                      >
+                        {q ? fmt(q.price, q.decimals) : "—"}
+                      </span>
                       <span className={cn("text-right", q && (up ? UP : DOWN))}>
                         {chg != null ? `${chg >= 0 ? "+" : ""}${fmt(chg, Math.min(q!.decimals, 3))}` : "—"}
                       </span>

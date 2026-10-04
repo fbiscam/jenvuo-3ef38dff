@@ -512,7 +512,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
               className={cn(
                 "h-7 rounded-md px-2 font-mono text-xs font-semibold text-muted-foreground transition-colors hover:bg-accent hover:text-foreground",
                 item.key === timeframe.key && "bg-accent text-foreground",
-                item.key === timeframe.key && theme === "dark" && "bg-foreground text-background hover:bg-foreground hover:text-background",
+                item.key === timeframe.key && theme === "dark" && "bg-[#2a2a2a] text-white hover:bg-[#2a2a2a] hover:text-white",
               )}
             >
               {item.label}
