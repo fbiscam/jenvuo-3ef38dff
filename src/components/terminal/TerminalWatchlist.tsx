@@ -198,7 +198,7 @@ export function TerminalWatchlist({
         <span className="text-right">Chg%</span>
       </div>
 
-      <div className="min-h-0 flex-1 overflow-y-auto">
+      <div className="sidebar-hover-scroll watchlist-scroll min-h-0 flex-1 overflow-y-auto">
         <div className="py-1">
           {GROUPS.map((group) => (
             <div key={group.label}>

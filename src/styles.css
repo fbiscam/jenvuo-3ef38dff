@@ -1075,3 +1075,11 @@ body:has(.terminal-dark) .dashboard-terminal-sidebar .dashboard-sidebar-link.act
 body:has(.terminal-dark) .dashboard-terminal-sidebar .h-px {
   background-color: oklch(0.27 0 0) !important;
 }
+
+/* Watchlist scrollbar: hidden until hover; light thumb on the black theme. */
+.terminal-dark .watchlist-scroll:hover {
+  scrollbar-color: rgba(255, 255, 255, 0.25) transparent;
+}
+.terminal-dark .watchlist-scroll:hover::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.25);
+}
