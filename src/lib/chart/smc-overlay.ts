@@ -34,13 +34,14 @@ function isDarkCanvas(ctx: CanvasRenderingContext2D): boolean {
   const c = ctx.canvas as HTMLCanvasElement;
   return typeof c.closest === "function" && !!c.closest(".terminal-dark");
 }
-/** Zone / FVG colours: identical in both themes (only label plates follow the theme). */
+/** Zone / FVG colours: same red/green shade in both themes; black theme draws borders and label text pure white. */
 function zoneTone(ctx: CanvasRenderingContext2D, kind: "supply" | "demand" | "bearFvg" | "bullFvg", fresh = true) {
   const dark = isDarkCanvas(ctx);
   const rgb = { supply: "239,68,68", demand: "16,185,129", bearFvg: "242,54,69", bullFvg: "34,197,94" }[kind];
   const isFvg = kind === "bearFvg" || kind === "bullFvg";
   const a = isFvg ? (fresh ? 0.12 : 0.07) : fresh ? 0.11 : 0.07;
-  return { edge: `rgb(${rgb})`, fill: `rgba(${rgb},${a})`, text: `rgb(${rgb})`, dark };
+  const line = dark ? "rgb(255,255,255)" : `rgb(${rgb})`;
+  return { edge: line, fill: `rgba(${rgb},${a})`, text: line, dark };
 }
 function plate(ctx: CanvasRenderingContext2D, alpha = 0.92): string {
   return isDarkCanvas(ctx) ? `rgba(24,24,24,${alpha})` : `rgba(255,255,255,${alpha})`;
