@@ -1035,3 +1035,23 @@ html:not(.ms-icons-ready) .material-symbols-rounded {
 @media (prefers-reduced-motion: reduce) {
   .td-marquee { animation: td-marquee 56s linear infinite !important; }
 }
+
+/* Terminal black theme — TradingView-style near-black surfaces, scoped to the terminal. */
+.dark.terminal-dark {
+  --background: oklch(0.17 0 0);
+  --foreground: oklch(0.88 0.01 260);
+  --card: oklch(0.17 0 0);
+  --card-foreground: oklch(0.88 0.01 260);
+  --popover: oklch(0.22 0 0);
+  --popover-foreground: oklch(0.88 0.01 260);
+  --primary: oklch(0.96 0.005 260);
+  --primary-foreground: oklch(0.17 0 0);
+  --secondary: oklch(0.25 0 0);
+  --secondary-foreground: oklch(0.88 0.01 260);
+  --muted: oklch(0.23 0 0);
+  --muted-foreground: oklch(0.66 0.01 260);
+  --accent: oklch(0.27 0 0);
+  --accent-foreground: oklch(0.96 0.005 260);
+  --border: oklch(0.29 0 0);
+  --input: oklch(0.29 0 0);
+}
