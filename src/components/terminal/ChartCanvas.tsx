@@ -222,7 +222,7 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
         timeVisible: true,
         secondsVisible: false,
         rightOffset: 8,
-        barSpacing: 4,
+        barSpacing: 6,
       },
       // Fixed locale: some browsers report tags like "en-US@posix" that make
       // Intl throw and stop the chart from drawing candles.
