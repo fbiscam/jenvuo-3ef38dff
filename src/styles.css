@@ -1177,3 +1177,9 @@ html body .dash-dark main.bg-white { background-color: oklch(0.165 0 0) !importa
 .dash-dark .dashboard-sidebar-link.bg-\[\#EBEBEB\] { background-color: oklch(0.29 0 0); }
 .dash-dark .dashboard-sidebar-link:hover { background-color: oklch(0.25 0 0); }
 .dash-dark .dashboard-sidebar-root .sidebar-quick-btn { color: oklch(0.95 0 0); }
+.jenvu-zoom-dashboard.dash-dark main h1,
+.jenvu-zoom-dashboard.dash-dark main h2,
+.jenvu-zoom-dashboard.dash-dark main h3,
+.jenvu-zoom-dashboard.dash-dark main h4 { color: oklch(0.97 0 0) !important; }
+.dash-dark main button.bg-white,
+.dash-dark main a.bg-white { box-shadow: 0 0 0 1px oklch(0.3 0 0) !important; }
