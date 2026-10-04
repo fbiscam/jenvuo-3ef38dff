@@ -1295,7 +1295,7 @@ function DashboardLayout() {
   }, [authUser?.id, authLoading, refreshTick]);
 
   const navCollapsed = sidebarCollapsed && !mobileNavOpen;
-  const themeApplies = pathname !== "/dashboard" && pathname !== "/dashboard/terminal";
+  const themeApplies = false; // Black theme only on the Terminal page (its own switch).
   const dashDark = themeApplies && dashTheme === "dark";
 
   return (
