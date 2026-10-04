@@ -132,7 +132,6 @@ export function TerminalWatchlist({
   className,
 }: {
   asset: ChartAsset;
-  onAssetChange: (asset: ChartAsset) => void;
   news?: NewsEvent;
   newsLoading: boolean;
   onClose: () => void;
@@ -224,9 +223,8 @@ export function TerminalWatchlist({
                       key={item.symbol}
                       onClick={() => {
                         setFocus(item.symbol);
-                        if (item.chartable) onAssetChange(item.chartable);
                       }}
-                      title={item.chartable ? `Open ${item.symbol} chart` : item.name}
+                      title={item.name}
                       className={cn(
                         "grid w-full grid-cols-[minmax(0,1fr)_78px_58px_54px] items-center gap-1 border-l-2 border-transparent px-3 py-2 text-left text-[13px] tabular-nums text-foreground transition-colors hover:bg-accent",
                         isFocus && "bg-accent",

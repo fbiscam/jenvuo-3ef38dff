@@ -1120,7 +1120,7 @@ async function fetchGoldCandles(tf: string): Promise<Candle[]> {
 // Terminal chart evidence must stay on the spot-Gold scale shown by the
 // OANDA:XAUUSD embed. Never fall through to GC futures or tokenized Gold here:
 // their premium/discount can make otherwise valid pivots look incorrect.
-export type TerminalAsset = "XAUUSD" | "BTCUSD";
+export type TerminalAsset = "XAUUSD";
 async function fetchTerminalGoldEvidenceCandles(tf: string, asset: TerminalAsset = "XAUUSD"): Promise<Candle[]> {
   // Reuse the exact chart loader: same provider priority, same spot scale,
   // real 45m aggregation from 15m bars, and last-good-chart fallback when
@@ -1540,7 +1540,7 @@ async function loadBtcTerminalChart(tf: string): Promise<TerminalChartPayload> {
 }
 
 async function loadTerminalChart(tf: string, asset: TerminalAsset = "XAUUSD"): Promise<TerminalChartPayload> {
-  if (asset === "BTCUSD") return loadBtcTerminalChart(tf);
+
   const hit = terminalChartCache.get(tf);
   if (hit && Date.now() - hit.at < 4000) return { ...hit.data, serverTime: Date.now() };
   let candles: Candle[] = [];
@@ -1632,7 +1632,7 @@ export const getTerminalChart = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: { timeframe: string; asset?: string }) => {
     const tf = String(d?.timeframe || "30m").toLowerCase();
-    const asset: TerminalAsset = d?.asset === "BTCUSD" ? "BTCUSD" : "XAUUSD";
+    const asset: TerminalAsset = "XAUUSD";
     return { timeframe: TF_MS[tf] ? tf : "30m", asset };
   })
   .handler(async ({ data }) => loadTerminalChart(data.timeframe, data.asset));
