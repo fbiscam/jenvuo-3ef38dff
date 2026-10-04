@@ -45,6 +45,8 @@ import {
   User,
   LogOut,
   Power,
+  Sun,
+  Moon,
   Mic,
   Plus,
   Wallet,
@@ -680,6 +682,19 @@ function DashboardLayout() {
   const [refreshTick, setRefreshTick] = useState(0);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  // Dashboard page theme (black by default). Overview and Terminal keep their own look.
+  const [dashTheme, setDashTheme] = useState<"light" | "dark">("dark");
+  useEffect(() => {
+    const stored = window.localStorage.getItem("jenvu:dash:theme");
+    if (stored === "light" || stored === "dark") setDashTheme(stored);
+  }, []);
+  const toggleDashTheme = () => {
+    setDashTheme((t) => {
+      const next = t === "dark" ? "light" : "dark";
+      window.localStorage.setItem("jenvu:dash:theme", next);
+      return next;
+    });
+  };
   useEffect(() => {
     const open = () => setMobileNavOpen(true);
     window.addEventListener("jenvu:open-mobile-nav", open);
