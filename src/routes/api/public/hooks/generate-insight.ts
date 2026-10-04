@@ -49,7 +49,7 @@ export async function submitToIndexNow(urls: string[]) {
       method: "POST",
       headers: { "Content-Type": "application/json; charset=utf-8" },
       body: JSON.stringify({
-        host: "jenvu.com",
+        host: "blogs.jenvu.com",
         key: INDEXNOW_KEY,
         keyLocation: `${BASE_URL}/${INDEXNOW_KEY}.txt`,
         urlList: urls,
@@ -180,8 +180,10 @@ Return Markdown only. Start with one '# ' title of no more than 60 characters. U
                   { role: "system", content: sys },
                   { role: "user", content: prompt },
                 ],
-                maxTokens: 1800,
-                retriesPerModel: 1,
+                // Thinking models spend part of the budget on hidden reasoning;
+                // a tight cap returned empty text, so leave generous headroom.
+                maxTokens: 6000,
+                retriesPerModel: 2,
                 timeoutMs: 120_000,
                 deadlineMs: 300_000,
                 stage: "daily-insight",
@@ -300,7 +302,7 @@ Return Markdown only. Start with one '# ' title of no more than 60 characters. U
         const url = `${BASE_URL}/${slug}`;
         const [google, indexnow] = await Promise.all([
           submitToGoogle(url),
-          submitToIndexNow([url, BASE_URL, "https://jenvu.com/sitemap.xml"]),
+          submitToIndexNow([url, BASE_URL]),
         ]);
 
         if (!inserted) {

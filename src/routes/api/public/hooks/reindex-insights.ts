@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { submitToGoogle, submitToIndexNow } from "./generate-insight";
 
-const BASE_URL = "https://jenvu.com";
+const BASE_URL = "https://blogs.jenvu.com";
 
 async function handle(request: Request) {
   const { isAuthorizedCronRequest, cronUnauthorized } = await import("@/lib/cron-guard.server");
