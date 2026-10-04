@@ -7,14 +7,23 @@ import type { NewsEvent } from "@/lib/news.functions";
 import { isMarketClosed } from "@/lib/signals/qualification";
 import { cn } from "@/lib/utils";
 import { XauUsdLogo } from "./XauUsdLogo";
+import btcLogo from "@/assets/watchlist/btc.svg";
+import ethLogo from "@/assets/watchlist/eth.svg";
+import xagLogo from "@/assets/watchlist/xag.svg";
+import spxLogo from "@/assets/watchlist/spx.svg";
+import dxyLogo from "@/assets/watchlist/dxy.svg";
+import flagEu from "@/assets/watchlist/flag-eu.svg";
+import flagGb from "@/assets/watchlist/flag-gb.svg";
+import flagUs from "@/assets/watchlist/flag-us.svg";
+import flagJp from "@/assets/watchlist/flag-jp.svg";
 
 type ChartAsset = "XAUUSD" | "BTCUSD";
 
 type WatchItem = {
   symbol: string;
   name: string;
-  badge: string;
-  badgeClass: string;
+  /** Single round logo, or [base, quote] flags drawn as an overlapping pair. */
+  logo: string | [string, string];
   chartable?: ChartAsset;
 };
 
@@ -22,30 +31,30 @@ const GROUPS: Array<{ label: string; items: WatchItem[] }> = [
   {
     label: "Metals",
     items: [
-      { symbol: "XAUUSD", name: "Gold Spot / U.S. Dollar", badge: "Au", badgeClass: "bg-amber-500", chartable: "XAUUSD" },
-      { symbol: "XAGUSD", name: "Silver / U.S. Dollar", badge: "Ag", badgeClass: "bg-slate-400" },
+      { symbol: "XAUUSD", name: "Gold Spot / U.S. Dollar", logo: "xau", chartable: "XAUUSD" },
+      { symbol: "XAGUSD", name: "Silver / U.S. Dollar", logo: xagLogo },
     ],
   },
   {
     label: "Crypto",
     items: [
-      { symbol: "BTCUSD", name: "Bitcoin / U.S. Dollar", badge: "₿", badgeClass: "bg-orange-500", chartable: "BTCUSD" },
-      { symbol: "ETHUSD", name: "Ethereum / U.S. Dollar", badge: "Ξ", badgeClass: "bg-indigo-500" },
+      { symbol: "BTCUSD", name: "Bitcoin / U.S. Dollar", logo: btcLogo, chartable: "BTCUSD" },
+      { symbol: "ETHUSD", name: "Ethereum / U.S. Dollar", logo: ethLogo },
     ],
   },
   {
     label: "Forex",
     items: [
-      { symbol: "EURUSD", name: "Euro / U.S. Dollar", badge: "€", badgeClass: "bg-blue-600" },
-      { symbol: "GBPUSD", name: "British Pound / U.S. Dollar", badge: "£", badgeClass: "bg-red-600" },
-      { symbol: "USDJPY", name: "U.S. Dollar / Japanese Yen", badge: "¥", badgeClass: "bg-rose-500" },
+      { symbol: "EURUSD", name: "Euro / U.S. Dollar", logo: [flagEu, flagUs] },
+      { symbol: "GBPUSD", name: "British Pound / U.S. Dollar", logo: [flagGb, flagUs] },
+      { symbol: "USDJPY", name: "U.S. Dollar / Japanese Yen", logo: [flagUs, flagJp] },
     ],
   },
   {
     label: "Indices",
     items: [
-      { symbol: "DXY", name: "U.S. Dollar Index", badge: "$", badgeClass: "bg-emerald-600" },
-      { symbol: "SPX", name: "S&P 500 Index", badge: "S", badgeClass: "bg-sky-600" },
+      { symbol: "DXY", name: "U.S. Dollar Index", logo: dxyLogo },
+      { symbol: "SPX", name: "S&P 500 Index", logo: spxLogo },
     ],
   },
 ];
@@ -70,18 +79,34 @@ function fmt(value: number, decimals: number): string {
 }
 
 function SymbolBadge({ item, size = 18 }: { item: WatchItem; size?: number }) {
-  if (item.symbol === "XAUUSD") return <XauUsdLogo size={size} />;
+  if (item.logo === "xau") return <XauUsdLogo size={size} />;
+  if (Array.isArray(item.logo)) {
+    const flag = Math.round(size * 0.72);
+    return (
+      <span className="relative shrink-0" style={{ width: size, height: size }} aria-hidden="true">
+        <img
+          src={item.logo[0]}
+          alt=""
+          className="absolute left-0 top-0 rounded-full object-cover ring-1 ring-card"
+          style={{ width: flag, height: flag }}
+        />
+        <img
+          src={item.logo[1]}
+          alt=""
+          className="absolute bottom-0 right-0 rounded-full object-cover ring-1 ring-card"
+          style={{ width: flag, height: flag }}
+        />
+      </span>
+    );
+  }
   return (
-    <span
-      className={cn(
-        "flex shrink-0 items-center justify-center rounded-full text-[9px] font-bold text-white",
-        item.badgeClass,
-      )}
-      style={{ width: size, height: size }}
+    <img
+      src={item.logo}
+      alt=""
       aria-hidden="true"
-    >
-      {item.badge}
-    </span>
+      className="shrink-0 rounded-full object-cover"
+      style={{ width: size, height: size }}
+    />
   );
 }
 
@@ -154,7 +179,7 @@ export function TerminalWatchlist({
       )}
     >
       <div className="flex h-11 shrink-0 items-center gap-2 border-b border-border px-3">
-        <h2 className="text-sm font-semibold">Watchlist</h2>
+        <h2 className="text-sm font-semibold text-foreground">Watchlist</h2>
         <button
           type="button"
           onClick={onClose}
@@ -205,12 +230,12 @@ export function TerminalWatchlist({
                       }}
                       title={item.chartable ? `Open ${item.symbol} chart` : item.name}
                       className={cn(
-                        "grid w-full grid-cols-[minmax(0,1fr)_78px_58px_54px] items-center gap-1 border-l-2 border-transparent px-3 py-1.5 text-left font-mono text-xs tabular-nums transition-colors hover:bg-accent",
+                        "grid w-full grid-cols-[minmax(0,1fr)_78px_58px_54px] items-center gap-1 border-l-2 border-transparent px-3 py-2 text-left text-[13px] tabular-nums text-foreground transition-colors hover:bg-accent",
                         isFocus && "bg-accent",
                         isChart && "border-l-primary",
                       )}
                     >
-                      <span className="flex min-w-0 items-center gap-2 font-sans font-semibold">
+                      <span className="flex min-w-0 items-center gap-2 font-medium">
                         <SymbolBadge item={item} />
                         <span className="truncate">{item.symbol}</span>
                       </span>
@@ -238,7 +263,7 @@ export function TerminalWatchlist({
           </div>
           <p className="mt-2 text-xs text-foreground">{focusItem.name}</p>
           <div className="mt-3 flex items-baseline gap-1.5">
-            <span className="font-mono text-[28px] font-semibold leading-none tabular-nums">
+            <span className="text-[28px] font-semibold leading-none tabular-nums">
               {focusQuote ? fmt(focusQuote.price, focusQuote.decimals) : "—"}
             </span>
             <span className="text-[11px] text-muted-foreground">
@@ -248,7 +273,7 @@ export function TerminalWatchlist({
           {focusQuote && focusChange != null && (
             <p
               className={cn(
-                "mt-1.5 font-mono text-sm font-semibold tabular-nums",
+                "mt-1.5 text-sm font-semibold tabular-nums",
                 focusChange >= 0 ? UP : DOWN,
               )}
             >
