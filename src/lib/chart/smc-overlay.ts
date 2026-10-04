@@ -34,6 +34,16 @@ function isDarkCanvas(ctx: CanvasRenderingContext2D): boolean {
   const c = ctx.canvas as HTMLCanvasElement;
   return typeof c.closest === "function" && !!c.closest(".terminal-dark");
 }
+/** Zone / FVG colours: black theme uses brighter TradingView-style tones and a stronger fill. */
+function zoneTone(ctx: CanvasRenderingContext2D, kind: "supply" | "demand" | "bearFvg" | "bullFvg", fresh = true) {
+  const dark = isDarkCanvas(ctx);
+  const rgb = dark
+    ? { supply: "247,82,95", demand: "34,171,148", bearFvg: "255,154,162", bullFvg: "111,227,196" }[kind]
+    : { supply: "239,68,68", demand: "16,185,129", bearFvg: "242,54,69", bullFvg: "34,197,94" }[kind];
+  const isFvg = kind === "bearFvg" || kind === "bullFvg";
+  const a = dark ? (isFvg ? (fresh ? 0.13 : 0.08) : fresh ? 0.17 : 0.1) : isFvg ? (fresh ? 0.12 : 0.07) : fresh ? 0.11 : 0.07;
+  return { edge: `rgb(${rgb})`, fill: `rgba(${rgb},${a})`, dark };
+}
 function plate(ctx: CanvasRenderingContext2D, alpha = 0.92): string {
   return isDarkCanvas(ctx) ? `rgba(24,24,24,${alpha})` : `rgba(255,255,255,${alpha})`;
 }
@@ -981,8 +991,7 @@ export function renderSmcOverlay(
     const width = Math.max(1, pr.width - x);
     const y = Math.min(topY, bottomY);
     const height = Math.max(2, Math.abs(bottomY - topY));
-    const edge = supply ? "rgb(239,68,68)" : "rgb(16,185,129)";
-    const fill = supply ? "rgba(239,68,68,0.11)" : "rgba(16,185,129,0.11)";
+    const { edge, fill } = zoneTone(ctx, supply ? "supply" : "demand");
     const label = supply ? "SUPPLY ZONE" : "DEMAND ZONE";
 
     ctx.fillStyle = fill;
@@ -1005,6 +1014,11 @@ export function renderSmcOverlay(
     ctx.roundRect?.(labelX - 6, labelY - 11, textWidth + 12, 22, 4);
     if (!ctx.roundRect) ctx.rect(labelX - 6, labelY - 11, textWidth + 12, 22);
     ctx.fill();
+    if (isDarkCanvas(ctx)) {
+      ctx.strokeStyle = edge;
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    }
     ctx.fillStyle = edge;
     ctx.textBaseline = "middle";
     ctx.fillText(label, labelX, labelY + 1);
@@ -1022,8 +1036,7 @@ export function renderSmcOverlay(
     const y = Math.min(topY, bottomY);
     const height = Math.max(2, Math.abs(bottomY - topY));
     const bullish = gap.type === "BULLISH_FVG";
-    const edge = bullish ? "rgb(34,197,94)" : "rgb(242,54,69)";
-    const fill = bullish ? "rgba(34,197,94,0.1)" : "rgba(242,54,69,0.1)";
+    const { edge, fill } = zoneTone(ctx, bullish ? "bullFvg" : "bearFvg");
     const label = bullish ? "BULLISH FVG" : "BEARISH FVG";
 
     ctx.fillStyle = fill;
@@ -1046,6 +1059,11 @@ export function renderSmcOverlay(
     ctx.roundRect?.(labelX - 6, labelY - 11, textWidth + 12, 22, 4);
     if (!ctx.roundRect) ctx.rect(labelX - 6, labelY - 11, textWidth + 12, 22);
     ctx.fill();
+    if (isDarkCanvas(ctx)) {
+      ctx.strokeStyle = edge;
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    }
     ctx.fillStyle = edge;
     ctx.textBaseline = "middle";
     ctx.fillText(label, labelX, labelY + 1);
@@ -1066,10 +1084,7 @@ export function renderSmcOverlay(
     const width = Math.max(1, pr.width - x);
     const y = Math.min(topY, bottomY);
     const height = Math.max(2, Math.abs(bottomY - topY));
-    const edge = supply ? "rgb(239,68,68)" : "rgb(16,185,129)";
-    const fill = supply
-      ? `rgba(239,68,68,${z.fresh ? 0.11 : 0.07})`
-      : `rgba(16,185,129,${z.fresh ? 0.11 : 0.07})`;
+    const { edge, fill } = zoneTone(ctx, supply ? "supply" : "demand", z.fresh);
     // Simple zone label only — grade/strength stay internal (they gate the plan).
     const label = supply ? "SUPPLY ZONE" : "DEMAND ZONE";
 
@@ -1104,6 +1119,11 @@ export function renderSmcOverlay(
     ctx.roundRect?.(labelX - 6, labelY - 11, textWidth + 12, 22, 4);
     if (!ctx.roundRect) ctx.rect(labelX - 6, labelY - 11, textWidth + 12, 22);
     ctx.fill();
+    if (isDarkCanvas(ctx)) {
+      ctx.strokeStyle = edge;
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    }
     ctx.fillStyle = edge;
     ctx.textBaseline = "middle";
     ctx.fillText(label, labelX, labelY + 1);
@@ -1124,10 +1144,7 @@ export function renderSmcOverlay(
     const width = Math.max(1, pr.width - x);
     const y = Math.min(topY, bottomY);
     const height = Math.max(2, Math.abs(bottomY - topY));
-    const edge = bullish ? "rgb(34,197,94)" : "rgb(242,54,69)";
-    const fill = bullish
-      ? `rgba(34,197,94,${f.fresh ? 0.12 : 0.07})`
-      : `rgba(242,54,69,${f.fresh ? 0.12 : 0.07})`;
+    const { edge, fill } = zoneTone(ctx, bullish ? "bullFvg" : "bearFvg", f.fresh);
     const label = bullish ? "BULLISH FVG" : "BEARISH FVG";
     ctx.save();
     ctx.fillStyle = fill;
@@ -1155,6 +1172,11 @@ export function renderSmcOverlay(
     ctx.roundRect?.(labelX - 6, labelY - 10, textWidth + 12, 20, 4);
     if (!ctx.roundRect) ctx.rect(labelX - 6, labelY - 10, textWidth + 12, 20);
     ctx.fill();
+    if (isDarkCanvas(ctx)) {
+      ctx.strokeStyle = edge;
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    }
     ctx.fillStyle = edge;
     ctx.textBaseline = "middle";
     ctx.fillText(label, labelX, labelY + 1);
@@ -1194,7 +1216,7 @@ export function renderSmcOverlay(
     };
     const supply = z.type === "SUPPLY";
     ctx.save();
-    box(z.top, z.bottom, supply ? "239,68,68" : "16,185,129", supply ? "PREV SUPPLY" : "PREV DEMAND", xa);
+    box(z.top, z.bottom, supply ? (isDarkCanvas(ctx) ? "247,82,95" : "239,68,68") : (isDarkCanvas(ctx) ? "34,171,148" : "16,185,129"), supply ? "PREV SUPPLY" : "PREV DEMAND", xa);
     if (z.fvg) {
       const fx = pr.x(z.fvg.t / 1000);
       if (fx != null && fx < x1) {
