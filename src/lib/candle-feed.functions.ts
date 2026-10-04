@@ -168,21 +168,6 @@ export const fetchGoldSpot = createServerFn({ method: "GET" })
     at: Date.now(),
   }));
 
-async function fetchBinancePrice(symbol: string): Promise<number | null> {
-  try {
-    const res = await fetch(`https://api.binance.com/api/v3/ticker/price?symbol=${symbol}`, {
-      headers: { "User-Agent": "Mozilla/5.0" },
-    });
-    if (!res.ok) return null;
-    const json = (await res.json()) as { price?: string };
-    const n = Number(json.price);
-    return Number.isFinite(n) && n > 0 ? n : null;
-  } catch {
-    return null;
-  }
-}
-
-
 async function fetchSpot(): Promise<number | null> {
   try {
     const res = await fetch("https://api.gold-api.com/price/XAU", {
