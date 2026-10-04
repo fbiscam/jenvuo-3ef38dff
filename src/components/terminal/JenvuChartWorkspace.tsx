@@ -123,8 +123,8 @@ type Props = {
   timeframe: TimeframeOption;
   onTimeframeChange: (tf: TimeframeOption) => void;
   rightSlot?: ReactNode;
-  asset?: "XAUUSD" | "BTCUSD";
-  onAssetChange?: (asset: "XAUUSD" | "BTCUSD") => void;
+  asset?: "XAUUSD";
+  onAssetChange?: (asset: "XAUUSD") => void;
   theme?: "light" | "dark";
 };
 
@@ -316,8 +316,8 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
   });
 
   const payload = chartQuery.data;
-  const pairLabel = asset === "BTCUSD" ? "BTC/USD" : "XAU/USD";
-  const showSmcPressure = smcToggles.pressure && PRESSURE_TIMEFRAMES.has(timeframe.key) && (asset === "XAUUSD" || asset === "BTCUSD");
+  const pairLabel = "XAU/USD";
+  const showSmcPressure = smcToggles.pressure && PRESSURE_TIMEFRAMES.has(timeframe.key);
   // One "Zone + FVG strategy" switch drives zones, their FVGs and Entry/SL/TP
   // together (15m/30m only); the saved switch stays as the user set it.
   const chartSmcToggles = useMemo<SmcToggles>(() => {
@@ -368,7 +368,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
     const last = bars[bars.length - 1];
     const lastClosedT = closed.at(-1)?.time ?? -Infinity;
     const forming = last.time > lastClosedT ? last : null;
-    return computeSmcOverlay(closed, last.close, forming, { useVolume: asset === "BTCUSD", seriesKey: `${asset}:${stepSeconds}` });
+    return computeSmcOverlay(closed, last.close, forming, { useVolume: false, seriesKey: `${asset}:${stepSeconds}` });
   }, [bars, rawBars, stepSeconds, serverTime, asset]);
 
   // Next-candle projection removed from the chart.
@@ -412,7 +412,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
       const s = stateRef.current;
       return buildChartContext({
         timeframeLabel: s.timeframe.label,
-        pairLabel: s.payload?.asset === "BTCUSD" ? "BTC/USD" : "XAU/USD",
+        pairLabel: "XAU/USD",
         bars: s.bars,
         stepSeconds: s.stepSeconds,
         source:
@@ -427,7 +427,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
         // Use the selected chart state, just like the visible overlay. The Gold
         // payload historically omitted its asset echo, which made the chart
         // show pressure while telling the AI that pressure was unavailable.
-        includePressure: smcToggles.pressure && PRESSURE_TIMEFRAMES.has(s.timeframe.key) && (asset === "XAUUSD" || asset === "BTCUSD"),
+        includePressure: smcToggles.pressure && PRESSURE_TIMEFRAMES.has(s.timeframe.key),
         drawings: s.drawings,
         drawingsVisible: s.drawingsVisible,
         selectedId: s.selectedId,
@@ -512,7 +512,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
               className={cn(
                 "h-7 rounded-md px-2 font-mono text-xs font-semibold text-muted-foreground transition-colors hover:bg-accent hover:text-foreground",
                 item.key === timeframe.key && "bg-accent text-foreground",
-                item.key === timeframe.key && theme === "dark" && "bg-foreground text-background hover:bg-foreground hover:text-background",
+                item.key === timeframe.key && theme === "dark" && "text-white hover:text-white",
               )}
             >
               {item.label}
