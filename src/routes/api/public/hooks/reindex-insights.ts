@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { submitToGoogle, submitToIndexNow } from "./generate-insight";
 
-const BASE_URL = "https://jenvu.com";
+const BASE_URL = "https://blogs.jenvu.com";
 
 async function handle(request: Request) {
   const { isAuthorizedCronRequest, cronUnauthorized } = await import("@/lib/cron-guard.server");
@@ -25,13 +25,13 @@ async function handle(request: Request) {
   const items = rows ?? [];
   if (!items.length) return Response.json({ ok: true, count: 0, note: "nothing-to-index" });
 
-  const urls = items.map((r) => `${BASE_URL}/insights/${r.slug}`);
-  const indexnow = await submitToIndexNow([...urls, `${BASE_URL}/sitemap.xml`]);
+  const urls = items.map((r) => `${BASE_URL}/${r.slug}`);
+  const indexnow = await submitToIndexNow(urls);
 
   const google: Record<string, unknown> = {};
   await Promise.all(
     items.map(async (r) => {
-      const u = `${BASE_URL}/insights/${r.slug}`;
+      const u = `${BASE_URL}/${r.slug}`;
       const res = await submitToGoogle(u);
       google[r.slug] = res;
       await supabaseAdmin
