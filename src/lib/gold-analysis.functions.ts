@@ -1258,14 +1258,16 @@ async function fetchGateDeep(tf: string, limit: number): Promise<Candle[]> {
     "1m": "1m", "5m": "5m", "15m": "15m", "30m": "30m", "1h": "1h", "4h": "4h", "1d": "1d",
   };
   const iv = interval[tf] ?? "30m";
-  const base = `https://api.gateio.ws/api/v4/spot/candlesticks?currency_pair=PAXG_USDT&interval=${iv}`;
+  // Gate's XAU_USDT gold contract tracks spot gold like TradingView. The PAXG
+  // token was so thin that 5m/15m candles often had the opposite colour.
+  const base = `https://api.gateio.ws/api/v4/futures/usdt/candlesticks?contract=XAU_USDT&interval=${iv}`;
   const rows: any[] = await fetchProxyJson(`${base}&limit=${Math.min(limit, 1000)}`, "Gate");
   // Gate caps one page at 1000 candles. 45m / 2H need deeper history, so page
   // backwards with from/to until the requested depth is reached.
   const stepSec = (TF_MS[tf] ?? TF_MS["30m"]) / 1000;
   let all = rows;
   for (let page = 0; all.length < limit && all.length > 0 && page < 3; page++) {
-    const oldest = Number(all[0]?.[0]);
+    const oldest = Number(all[0]?.t);
     if (!Number.isFinite(oldest)) break;
     const to = oldest - stepSec;
     const from = to - stepSec * 999;
@@ -1274,7 +1276,7 @@ async function fetchGateDeep(tf: string, limit: number): Promise<Candle[]> {
     all = [...older, ...all];
   }
   return finiteCandles(
-    all.map((r) => ({ t: +r[0] * 1000, o: +r[5], h: +r[3], l: +r[4], c: +r[2], v: +r[6] })),
+    all.map((r) => ({ t: +r.t * 1000, o: +r.o, h: +r.h, l: +r.l, c: +r.c, v: +r.v })),
     "Gate",
   ).slice(-limit);
 }
