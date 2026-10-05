@@ -273,9 +273,12 @@ export function computeFreshZones(
       imbalance,
     });
 
-    // Opposing FVG printed after the zone on its side of price rejects it.
+    // Opposing FVG printed after the zone on its side of price rejects it
+    // (classic mode only). In strategy mode a formed zone stays until its SL
+    // wick, a close through it, or a newer zone replaces it — a pullback leg
+    // (e.g. a fresh LH with no zone of its own) must not erase it.
     const reach = atr * SD_COUNTER_FVG_ATR;
-    const countered = liveFvgs.some((f) =>
+    const countered = !requireFvg && liveFvgs.some((f) =>
       f.t > p.t &&
       (supply
         ? f.type === "BULLISH" && f.top <= top && f.top >= bottom - reach
