@@ -13,4 +13,4 @@
 - Centralize sign-out through the cross-domain session helper so local tokens and the shared `.jenvu.com` cookie are cleared before redirecting to `auth.jenvu.com/sign-in`; this prevents session restoration races and blank auth pages.
 - Build authenticator 2FA setup from the auth service's returned QR/URI and remove incomplete factors before retrying; this avoids mismatched secrets and duplicate enrollment failures.
 - Chart, pressure, zone, FVG and sweep rules live in `src/lib/chart/AGENTS.md`.
-- Gold terminal candles use Gate PAXG_USDT as the primary feed (Binance only as fallback): Binance blocks the live server region, so Binance-first made preview and live draw different candles and zones.
+- Gold terminal candles use Gate XAU_USDT gold contract as the primary feed (PAXG token was too thin, candle colours differed from TradingView) (Binance only as fallback): Binance blocks the live server region, so Binance-first made preview and live draw different candles and zones.
