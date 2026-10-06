@@ -619,6 +619,8 @@ const TF_MS: Record<string, number> = {
   "1h": 60 * 60_000,
   "2h": 2 * 60 * 60_000,
   "4h": 4 * 60 * 60_000,
+  "6h": 6 * 60 * 60_000,
+  "8h": 8 * 60 * 60_000,
   "1d": 24 * 60 * 60_000,
 };
 
@@ -1500,7 +1502,7 @@ async function loadBtcTerminalChart(tf: string): Promise<TerminalChartPayload> {
     // Binance blocks some server regions — fall back to Coinbase (aggregated).
     const cbBase: Record<string, string> = {
       "1m": "1m", "5m": "5m", "15m": "15m", "30m": "15m", "45m": "15m",
-      "1h": "1h", "2h": "1h", "4h": "1h", "1d": "1d", "1D": "1d",
+      "1h": "1h", "2h": "1h", "4h": "1h", "6h": "1h", "8h": "1h", "1d": "1d", "1D": "1d",
     };
     fetchTf = cbBase[tf] ?? "15m";
     try {
@@ -1549,7 +1551,7 @@ async function loadTerminalChart(tf: string, asset: TerminalAsset = "XAUUSD"): P
   let source: TerminalChartPayload["source"] = "paxg-scaled";
   let provider = "Binance";
   // No provider serves 45m candles — build them from 15m candles.
-  const fetchTf = tf === "45m" ? "15m" : tf === "2h" ? "1h" : tf;
+  const fetchTf = tf === "45m" ? "15m" : tf === "2h" || tf === "6h" || tf === "8h" ? "1h" : tf;
   try {
     // Use one deep, fixed-priority source on every timeframe. Yahoo's XAUUSD=X
     // intraday endpoint currently returns no chart and, when it did answer, only
@@ -1557,7 +1559,7 @@ async function loadTerminalChart(tf: string, asset: TerminalAsset = "XAUUSD"): P
     // timeframe history vary between refreshes and accounts.
     // 45m / 2H are built from smaller candles, so fetch enough source candles
     // for ~1000 finished bars of history.
-    const sourceLimit = tf === "45m" ? 3000 : tf === "2h" ? 2000 : 1000;
+    const sourceLimit = tf === "45m" ? 3000 : tf === "2h" ? 2000 : tf === "6h" || tf === "8h" ? 4000 : 1000;
     const picked = await fetchGoldProxyDeepWithProvider(fetchTf, sourceLimit);
     // A momentary Gate hiccup must not swap the whole chart to another
     // exchange's candles (different wicks / gappy thin feeds = candles that
