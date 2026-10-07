@@ -102,8 +102,10 @@ export function classifySwingPriceAction(
     }
   }
 
+  // A strong reversal can still print until all reaction candles have closed,
+  // so weak verdicts wait instead of flipping later.
+  if (pattern === "none" && after < i + PA_REACTION_BARS) pattern = "pending";
   if (pattern === "none" && range > 0 && body <= 0.1 * range) pattern = "indecision";
-  if (pattern === "none" && after === i) pattern = "pending";
 
   const strong = pattern === "pin" || pattern === "engulfing" || pattern === "displacement";
   const reacted = strong && reversalControl;
