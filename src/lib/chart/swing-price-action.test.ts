@@ -23,10 +23,22 @@ describe("swing price action", () => {
     const bars = [...base, bar(15, 100, 102, 99.5, 101.5)];
     expect(classifySwingPriceAction(bars, 15, "high", 50).pattern).toBe("pending");
   });
-  it("reports no reaction when price stays balanced", () => {
+  it("keeps waiting until all reaction candles have closed", () => {
     const bars = [...base, bar(15, 100, 102, 99.5, 101.5), bar(16, 101.5, 101.8, 100.8, 101.2)];
+    expect(classifySwingPriceAction(bars, 15, "high", 50).pattern).toBe("pending");
+  });
+  it("reports no reaction when price stays balanced", () => {
+    const flat = (t: number) => bar(t, 101.5, 101.8, 100.8, 101.2);
+    const bars = [...base, bar(15, 100, 102, 99.5, 101.5), flat(16), flat(17), flat(18)];
     const pa = classifySwingPriceAction(bars, 15, "high", 50);
     expect(pa.pattern).toBe("none");
     expect(pa.reacted).toBe(false);
+  });
+  it("does not flip a settled verdict when later candles close", () => {
+    const flat = (t: number) => bar(t, 101.5, 101.8, 100.8, 101.2);
+    const bars = [...base, bar(15, 100, 102, 99.5, 101.5), flat(16), flat(17), flat(18)];
+    const before = classifySwingPriceAction(bars, 15, "high", 50).pattern;
+    const later = classifySwingPriceAction([...bars, bar(19, 101, 101, 90, 90)], 15, "high", 50).pattern;
+    expect(later).toBe(before);
   });
 });
