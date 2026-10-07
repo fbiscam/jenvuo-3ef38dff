@@ -341,9 +341,12 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
   const stepSeconds = payload?.stepSeconds ?? 1800;
   const bars = useMemo(() => {
     if (goldClosed) return rawBars;
-    const liveBucket = Math.floor(Date.now() / (stepSeconds * 1000)) * stepSeconds;
+    const liveBucket =
+      asset === "XAUUSD"
+        ? Math.floor(sessionBucketMs(Date.now(), stepSeconds * 1000) / 1000)
+        : Math.floor(Date.now() / (stepSeconds * 1000)) * stepSeconds;
     return buildLiveBars(rawBars, livePrice, liveBucket);
-  }, [rawBars, livePrice, stepSeconds, goldClosed]);
+  }, [rawBars, livePrice, stepSeconds, goldClosed, asset]);
   const activeBar = bars.at(-1);
   const currentPrice = activeBar?.close ?? null;
   const demo = useDemoTrading(currentPrice, activeBar ? {

@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { sessionBucketMs } from "@/lib/chart/session-buckets";
 import {
   analyzeTF,
   buildLiquidityPools,
@@ -1548,8 +1549,10 @@ async function loadTerminalChart(tf: string, asset: TerminalAsset = "XAUUSD"): P
   let candles: Candle[] = [];
   let source: TerminalChartPayload["source"] = "paxg-scaled";
   let provider = "Binance";
-  // No provider serves 45m candles — build them from 15m candles.
-  const fetchTf = tf === "45m" ? "15m" : tf === "2h" ? "1h" : tf;
+  // TradingView starts 45m / 2H / 4H / 1D gold candles at the 17:00 New York
+  // session open; exchanges bucket from UTC midnight. Build those timeframes
+  // from smaller candles with session-anchored buckets so they match.
+  const fetchTf = tf === "45m" ? "15m" : tf === "2h" || tf === "4h" || tf === "1d" ? "1h" : tf;
   try {
     // Use one deep, fixed-priority source on every timeframe. Yahoo's XAUUSD=X
     // intraday endpoint currently returns no chart and, when it did answer, only
@@ -1557,7 +1560,7 @@ async function loadTerminalChart(tf: string, asset: TerminalAsset = "XAUUSD"): P
     // timeframe history vary between refreshes and accounts.
     // 45m / 2H are built from smaller candles, so fetch enough source candles
     // for ~1000 finished bars of history.
-    const sourceLimit = tf === "45m" ? 3000 : tf === "2h" ? 2000 : 1000;
+    const sourceLimit = tf === "45m" ? 3000 : tf === "2h" ? 2000 : tf === "4h" || tf === "1d" ? 4000 : 1000;
     const picked = await fetchGoldProxyDeepWithProvider(fetchTf, sourceLimit);
     // A momentary Gate hiccup must not swap the whole chart to another
     // exchange's candles (different wicks / gappy thin feeds = candles that
@@ -1578,7 +1581,7 @@ async function loadTerminalChart(tf: string, asset: TerminalAsset = "XAUUSD"): P
   const byBucket = new Map<number, Candle>();
   for (const c of candles) {
     if (![c.t, c.o, c.h, c.l, c.c].every(Number.isFinite)) continue;
-    const bucket = Math.floor(c.t / step) * step;
+    const bucket = sessionBucketMs(c.t, step);
     const prev = byBucket.get(bucket);
     if (prev && fetchTf !== tf) {
       byBucket.set(bucket, {
