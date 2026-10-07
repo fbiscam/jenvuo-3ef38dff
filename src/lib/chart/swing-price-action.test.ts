@@ -1,4 +1,4 @@
-import { describe, it } from "vitest";
+import { describe, it } from "node:test";
 import { expect } from "./test-expect";
 import { classifySwingPriceAction } from "./swing-price-action";
 
