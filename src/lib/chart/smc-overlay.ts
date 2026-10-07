@@ -17,6 +17,7 @@ import type { OhlcvBar } from "./indicators";
 import { computeFreshZones, type SdZone } from "./fresh-zones";
 import { computeLiquidityMap, type LiquidityMap } from "./liquidity-sweeps";
 import { computeFreshFvgs, FVG_MAX_TOTAL, type FreshFvg } from "./fresh-fvgs";
+import { classifySwingPriceAction, type SwingPriceAction } from "./swing-price-action";
 
 /** Zone + FVG strategy: only the single latest zone (with its own displacement FVG and plan) is shown. */
 export const SD_VISIBLE_ZONES = 1;
@@ -136,6 +137,8 @@ export type SmcOverlay = {
   liquidityMap?: LiquidityMap;
   /** Fresh bullish / bearish FVGs from closed candles (newest few). */
   freshFvgs?: FreshFvg[];
+  /** Price action verdict at each swing (pattern + who controls), keyed by pivot time. */
+  priceAction?: Record<number, SwingPriceAction>;
 };
 
 export type ReversalSignal = {
@@ -266,6 +269,8 @@ export type SmcToggles = {
   sweeps: boolean;
   /** Fresh bullish / bearish FVG indicator (closed-candle lifecycle). */
   freshFvg: boolean;
+  /** Price action verdict (pattern + buyers/sellers) on every fresh high/low. */
+  priceAction?: boolean;
 };
 
 export const DEFAULT_SMC: SmcToggles = {
@@ -282,6 +287,7 @@ export const DEFAULT_SMC: SmcToggles = {
   sdPlan: true,
   sweeps: true,
   freshFvg: true,
+  priceAction: true,
 };
 
 type Candle = { t: number; o: number; h: number; l: number; c: number; v?: number };
@@ -916,7 +922,12 @@ export function computeSmcOverlay(
   const liquidityMap = computeLiquidityMap(fractalBars, forming ? toCandle(forming) : null, fractal.pivots);
   // Wider pool: the chart keeps the newest 2 that survive overlap removal.
   const freshFvgs = computeFreshFvgs(fractalBars, 8);
+  const priceAction: Record<number, SwingPriceAction> = {};
+  for (const p of [...pivotsLabelled, ...livePivots]) {
+    priceAction[p.t] = classifySwingPriceAction(fractalBars, closedIdx.get(p.t) ?? -1, p.kind, pressure[p.t]);
+  }
   return {
+    priceAction,
     freshFvgs,
     reversal,
     pressure,
@@ -1385,6 +1396,26 @@ export function renderSmcOverlay(
     ctx.fillText(st, bx + bw - 5 - ctx.measureText(st).width, by + 13);
     ctx.restore();
   };
+  // Price action verdict beside each swing, stacked outside the pressure badge.
+  const priceActionTag = (t: number, xx: number, yy: number, up: boolean) => {
+    if (toggles.priceAction === false) return;
+    const pa = smc.priceAction?.[t];
+    if (!pa) return;
+    const hasBadge = showPressure && smc.pressure?.[t] != null;
+    const baseline = up ? (hasBadge ? yy - 32 : yy - 6) : (hasBadge ? yy + 60 : yy + 34);
+    ctx.save();
+    ctx.font = "600 11px 'JetBrains Mono', ui-monospace, monospace";
+    const w = ctx.measureText(pa.text).width;
+    const bx = xx - w / 2 - 5;
+    ctx.fillStyle = plate(ctx, 0.9);
+    ctx.beginPath();
+    ctx.roundRect?.(bx, baseline - 12, w + 10, 16, 4);
+    if (!ctx.roundRect) ctx.rect(bx, baseline - 12, w + 10, 16);
+    ctx.fill();
+    ctx.fillStyle = pa.control === "buyers" ? "#089981" : pa.control === "sellers" ? "#f23645" : isDarkCanvas(ctx) ? "#d1d4dc" : "#5d606b";
+    ctx.fillText(pa.text, xx - w / 2, baseline);
+    ctx.restore();
+  };
   // HH/HL/LH/LL: plain text (no filled block) — pure white in black theme, green/red in white theme.
   const swingText = (text: string, xx: number, yy: number, color: string) => {
     ctx.save();
@@ -1407,6 +1438,7 @@ export function renderSmcOverlay(
        const xx = x;
       swingText(p.label, xx, yy, color);
       pressureBadge(p.t, xx, yy, up);
+      priceActionTag(p.t, xx, yy, up);
     }
     // Live (unconfirmed) swings: outlined dashed badge that follows the forming candle.
     for (const p of smc.livePivots ?? []) {
@@ -1425,6 +1457,7 @@ export function renderSmcOverlay(
         // Solid badge, same as a confirmed pivot — no countdown.
         swingText(text, xx, yy, color);
         pressureBadge(p.t, xx, yy, up);
+      priceActionTag(p.t, xx, yy, up);
         continue;
       }
       // Early "High"/"Low" marker on the running swing (no countdown box).
@@ -1433,6 +1466,7 @@ export function renderSmcOverlay(
         // plus fresh buyer/seller pressure as soon as the high/low forms.
         swingText(text, xx, yy, color);
         pressureBadge(p.t, xx, yy, up);
+      priceActionTag(p.t, xx, yy, up);
         continue;
       }
       ctx.fillStyle = plate(ctx, 0.92);
@@ -1448,6 +1482,7 @@ export function renderSmcOverlay(
       ctx.fillStyle = color;
        ctx.fillText(text, xx - w / 2 + 7, yy + 13.5);
       pressureBadge(p.t, xx, yy, up);
+      priceActionTag(p.t, xx, yy, up);
       // Confirmation tracker: candles left + invalidation level.
       const left = p.confirmIn ?? 0;
       const done = FRACTAL_RADIUS - left;
