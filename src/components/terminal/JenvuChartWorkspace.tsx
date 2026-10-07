@@ -55,6 +55,7 @@ import { buildChartContext } from "./chart-context";
 import { DemoTradingPanel, OrderTicket, PaperTradingPanel, QuickTradeButtons, useDemoTrading } from "./DemoTradingPanel";
 import { positionPnl, type DemoSide } from "@/lib/chart/demo-trading";
 import { buildLiveBars } from "@/lib/chart/live-candle";
+import { sessionBucketMs } from "@/lib/chart/session-buckets";
 import { useLivePriceStream } from "@/hooks/useLivePriceStream";
 import { isMarketClosed } from "@/lib/signals/qualification";
 
