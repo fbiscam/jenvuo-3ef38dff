@@ -28,6 +28,7 @@ import {
 import { renderSmcOverlay, type SmcOverlay, type SmcToggles } from "@/lib/chart/smc-overlay";
 import type { OhlcvBar } from "@/lib/chart/indicators";
 import type { CandleProjection } from "@/lib/chart/projection";
+import type { CandleRangePlan, CandleRangeReport } from "@/lib/chart/candle-range";
 import type { ScriptResult } from "@/lib/chart/jenvu-script";
 import type { DemoPosition } from "@/lib/chart/demo-trading";
 import { DemoOrderOverlay, type DemoOrderActions } from "./DemoOrderOverlay";
@@ -79,6 +80,8 @@ type Props = {
   smcToggles: SmcToggles;
   showSmcPressure?: boolean;
   projection: CandleProjection | null;
+  /** Expected high/low + TP/SL for the current and previous 5 candles. */
+  candleRange?: CandleRangeReport | null;
   demoPositions: DemoPosition[];
   demoPrice?: number | null;
   demoActions?: DemoOrderActions | null;
@@ -116,6 +119,9 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
   const pendingRef = useRef<Drawing | null>(null);
   const dragRef = useRef<{ id: string; handle: number | null; start: Anchor; original: Anchor[]; moved: boolean } | null>(null);
   const hoverRef = useRef<string | null>(null);
+  /** Candle-range focus: clicked candle time, and the candle under the mouse. */
+  const rangeClickRef = useRef<number | null>(null);
+  const rangeHoverRef = useRef<number | null>(null);
   const draftRef = useRef<Drawing[] | null>(null);
   const dirtyRef = useRef(0);
   const lastBarsRef = useRef<{ first: number; len: number } | null>(null);
@@ -274,12 +280,21 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
     chart.subscribeCrosshairMove((param) => {
       bump();
       const logical = param.logical;
+      const hb = logical == null ? null : propsRef.current.bars[Math.round(Number(logical))];
+      rangeHoverRef.current = hb ? hb.time : null;
       propsRef.current.onHoverBar(logical == null ? null : Number(logical));
     });
     chart.subscribeClick((param) => {
       if (propsRef.current.tool !== "cursor" || !param.point) return;
       const hit = hitTest(visibleDrawings(), projector(), param.point.x, param.point.y);
       propsRef.current.onSelect(hit?.id ?? null);
+      if (!hit) {
+        const plans = propsRef.current.candleRange?.plans ?? [];
+        const cb = param.logical == null ? null : propsRef.current.bars[Math.round(Number(param.logical))];
+        const plan = cb ? plans.find((pl) => pl.time === cb.time) : undefined;
+        rangeClickRef.current = plan && rangeClickRef.current !== plan.time ? plan.time : null;
+        dirtyRef.current += 1;
+      }
     });
 
     return () => {
@@ -698,6 +713,14 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
       // Pressure is opt-in so unsupported pairs/timeframes can never inherit it
       // when a caller omits the flag.
       if (p.smc) renderSmcOverlay(ctx, p.smc, p.smcToggles, pr, p.showSmcPressure ?? false);
+      if (p.candleRange?.plans.length) {
+        const plans = p.candleRange.plans;
+        const current = plans[plans.length - 1];
+        const focusT = rangeClickRef.current ?? rangeHoverRef.current;
+        const focus = focusT != null ? plans.find((pl) => pl.time === focusT && pl !== current) : undefined;
+        renderCandleRange(ctx, current, pr, p.stepSeconds, p.theme ?? "light", p.candleRange.track, true);
+        if (focus) renderCandleRange(ctx, focus, pr, p.stepSeconds, p.theme ?? "light", null, false);
+      }
       ctx.save();
       ctx.font = "600 10px 'DM Sans', system-ui, sans-serif";
       ctx.textAlign = "center";
@@ -715,7 +738,7 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
 
   useEffect(() => {
     dirtyRef.current += 1;
-  }, [props.drawings, props.selectedId, props.smc, props.smcToggles, props.drawingsVisible]);
+  }, [props.drawings, props.selectedId, props.smc, props.smcToggles, props.drawingsVisible, props.candleRange]);
 
   useEffect(() => {
     pendingRef.current = null;
@@ -957,3 +980,97 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
     </div>
   );
 });
+
+const OUTCOME_TEXT: Record<CandleRangePlan["outcome"], string> = {
+  live: "running",
+  tp: "TP hit",
+  sl: "SL hit",
+  both: "TP + SL touched",
+  none: "neither hit",
+};
+
+/** Draws one candle's expected range and TP / SL scenario beside the candle. */
+function renderCandleRange(
+  ctx: CanvasRenderingContext2D,
+  plan: CandleRangePlan,
+  pr: Projector,
+  stepSeconds: number,
+  theme: ChartTheme,
+  track: CandleRangeReport["track"],
+  isCurrent: boolean,
+) {
+  const x0 = pr.x(plan.time - stepSeconds * 0.45);
+  const x1 = pr.x(plan.time + stepSeconds * 6);
+  if (x0 == null || x1 == null) return;
+  const dark = theme === "dark";
+  const muted = dark ? "rgba(242,242,242,0.75)" : "rgba(19,23,34,0.7)";
+  const up = "#089981";
+  const down = "#f23645";
+  const line = (price: number, color: string, dash: number[], label: string) => {
+    const y = pr.y(price);
+    if (y == null) return;
+    ctx.save();
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 1.25;
+    ctx.setLineDash(dash);
+    ctx.beginPath();
+    ctx.moveTo(x0, y);
+    ctx.lineTo(x1, y);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.font = "600 10px 'DM Sans', system-ui, sans-serif";
+    ctx.textAlign = "left";
+    ctx.textBaseline = "middle";
+    const text = `${label} ${price.toFixed(2)}`;
+    const w = ctx.measureText(text).width + 8;
+    ctx.fillStyle = dark ? "rgba(15,15,15,0.85)" : "rgba(255,255,255,0.9)";
+    ctx.fillRect(x1 + 2, y - 7, w, 14);
+    ctx.fillStyle = color;
+    ctx.fillText(text, x1 + 6, y);
+    ctx.restore();
+  };
+  const yHi = pr.y(plan.expHigh);
+  const yLo = pr.y(plan.expLow);
+  if (yHi != null && yLo != null) {
+    ctx.save();
+    ctx.fillStyle = dark ? "rgba(255,255,255,0.05)" : "rgba(19,23,34,0.04)";
+    ctx.fillRect(x0, yHi, x1 - x0, yLo - yHi);
+    ctx.restore();
+  }
+  line(plan.expHigh, muted, [2, 3], "Exp high");
+  line(plan.expLow, muted, [2, 3], "Exp low");
+  const tpColor = plan.bias === "bullish" ? up : down;
+  const slColor = plan.bias === "bullish" ? down : up;
+  if (plan.tp != null) line(plan.tp, tpColor, [6, 3], "TP");
+  if (plan.sl != null) line(plan.sl, slColor, [6, 3], "SL");
+  line(plan.open, muted, [], "Open");
+
+  const topPrice = Math.max(plan.expHigh, plan.sl ?? -Infinity, plan.tp ?? -Infinity);
+  const yTop = pr.y(topPrice);
+  if (yTop == null) return;
+  const head = plan.bias === "neutral"
+    ? `${isCurrent ? "This candle" : "Past candle"} · No clear side (range only)`
+    : `${isCurrent ? "This candle" : "Past candle"} · ${plan.bias === "bullish" ? "Buy" : "Sell"} bias ${plan.confidence}%`;
+  const sub = isCurrent
+    ? plan.tp != null && track
+      ? `${OUTCOME_TEXT[plan.outcome]} · past ${track.samples}: TP only ${track.tpFirstPct}%, SL ${track.slPct}%`
+      : OUTCOME_TEXT[plan.outcome]
+    : plan.tp != null ? OUTCOME_TEXT[plan.outcome] : "range only";
+  ctx.save();
+  ctx.font = "600 10px 'DM Sans', system-ui, sans-serif";
+  ctx.textAlign = "left";
+  ctx.textBaseline = "alphabetic";
+  const w = Math.max(ctx.measureText(head).width, ctx.measureText(sub).width) + 10;
+  const bx = x0;
+  const by = yTop - 34;
+  ctx.fillStyle = dark ? "rgba(15,15,15,0.9)" : "rgba(255,255,255,0.92)";
+  ctx.strokeStyle = plan.bias === "neutral" ? muted : tpColor;
+  ctx.lineWidth = 1;
+  ctx.fillRect(bx, by, w, 28);
+  ctx.strokeRect(bx + 0.5, by + 0.5, w - 1, 27);
+  ctx.fillStyle = plan.bias === "neutral" ? muted : tpColor;
+  ctx.fillText(head, bx + 5, by + 12);
+  ctx.fillStyle = muted;
+  ctx.fillText(sub, bx + 5, by + 24);
+  ctx.restore();
+}
