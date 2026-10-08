@@ -30,12 +30,12 @@ describe("trend bias", () => {
     expect(tb?.direction).toBe("down");
   });
   it("reads Sideways when votes disagree", () => {
-    const flat = Array.from({ length: 250 }, (_, k) => ({ t: k, c: 100 + (k % 2 ? 0.1 : -0.1) }));
+    const flat = Array.from({ length: 150 }, (_, k) => ({ t: k, c: 100 + (k % 2 ? -0.1 : 0.1) }));
     const tb = computeTrendBias(
       flat,
       [
-        { t: 200, price: 101, kind: "high", label: "LH" },
-        { t: 220, price: 99, kind: "low", label: "HL" },
+        { t: 120, price: 99, kind: "low", label: "HL" },
+        { t: 130, price: 101, kind: "high", label: "LH" },
       ],
       [{ t: 230, dir: "bullish", type: "CHOCH" }],
     );
