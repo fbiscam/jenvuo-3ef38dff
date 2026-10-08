@@ -825,7 +825,15 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
                   <span>
                     {smc.trendBias.direction === "up" ? "▲ TREND UP" : smc.trendBias.direction === "down" ? "▼ TREND DOWN" : "◆ SIDEWAYS"}
                   </span>
-                  <span className="opacity-80">{smc.trendBias.strength}%</span>
+                  <span className="opacity-80">
+                    {smc.trendBias.direction !== "sideways"
+                      ? `${smc.trendBias.strength}%`
+                      : smc.trendBias.score > 0
+                        ? "· leaning up"
+                        : smc.trendBias.score < 0
+                          ? "· leaning down"
+                          : "· no clear side"}
+                  </span>
                   <span className="hidden font-normal text-muted-foreground sm:inline">{smc.trendBias.reasons.join(" · ")}</span>
                 </div>
               )}
