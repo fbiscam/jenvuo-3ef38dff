@@ -530,10 +530,12 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
           <PopoverTrigger asChild>
             <button
               type="button"
+              aria-label="Indicators"
+              title="Indicators"
               className="flex h-7 shrink-0 items-center gap-1.5 rounded-md px-2 text-xs font-medium text-muted-foreground hover:bg-accent hover:text-foreground"
             >
               <Activity className="h-3.5 w-3.5" />
-              Indicators
+              <span className="hidden 2xl:inline">Indicators</span>
               {indicators.length > 0 && (
                 <span className="rounded bg-secondary px-1 font-mono text-[10px]">{indicators.length}</span>
               )}
@@ -569,10 +571,12 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
           <PopoverTrigger asChild>
             <button
               type="button"
+              aria-label="Jenvu SMC"
+              title="Jenvu SMC"
               className="flex h-7 shrink-0 items-center gap-1.5 rounded-md px-2 text-xs font-medium text-muted-foreground hover:bg-accent hover:text-foreground"
             >
               <Layers className="h-3.5 w-3.5" />
-              Jenvu SMC
+              <span className="hidden 2xl:inline">Jenvu SMC</span>
             </button>
           </PopoverTrigger>
           <PopoverContent align="start" className={cn("w-80 p-2 font-sans subpixel-antialiased", theme === "dark" && "dark terminal-dark border-border bg-popover text-popover-foreground")}>
@@ -607,13 +611,15 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
           type="button"
           onClick={() => setScriptPanelOpen((v) => !v)}
           aria-pressed={scriptPanelOpen}
+          aria-label="Jenvu Script"
+          title="Jenvu Script"
           className={cn(
             "hidden h-7 shrink-0 items-center gap-1.5 rounded-md px-2 text-xs font-medium text-muted-foreground hover:bg-accent hover:text-foreground md:flex",
             scriptPanelOpen && "bg-accent text-foreground",
           )}
         >
           <Code className="h-3.5 w-3.5" />
-          Jenvu Script
+          <span className="hidden 2xl:inline">Jenvu Script</span>
         </button>
 
         <Tooltip>
@@ -622,7 +628,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
               type="button"
               onClick={downloadSnapshot}
               aria-label="Download chart snapshot"
-              className="flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground"
+              className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground"
             >
               <Camera className="h-3.5 w-3.5" />
             </button>
@@ -635,7 +641,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
               type="button"
               onClick={() => chartRef.current?.fit()}
               aria-label="Reset chart view"
-              className="flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground"
+              className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground"
             >
               <RotateCcw className="h-3.5 w-3.5" />
             </button>
@@ -648,7 +654,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
               type="button"
               onClick={() => void toggleFullscreen()}
               aria-label={fullscreen ? "Exit fullscreen chart" : "Fullscreen chart"}
-              className="flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground"
+              className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground"
             >
               {fullscreen ? <Minimize2 className="h-3.5 w-3.5" /> : <Maximize2 className="h-3.5 w-3.5" />}
             </button>
