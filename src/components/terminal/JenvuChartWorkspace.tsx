@@ -145,7 +145,6 @@ const TOOLS: Array<{ id: DrawingTool; icon: LucideIcon; label: string }> = [
 const SMC_LABELS: Array<{ key: keyof SmcToggles; label: string; hint: string }> = [
   { key: "structure", label: "Swing structure", hint: "HH / HL / LH / LL labels" },
   { key: "pressure", label: "Buyer / seller pressure", hint: "Percentages and confirmed trade levels" },
-  { key: "trendBias", label: "Trend direction", hint: "Up / Down / Sideways from structure, BOS and EMAs" },
   { key: "priceAction", label: "Swing price action", hint: "Pattern + buyers / sellers at each high / low" },
   { key: "breaks", label: "BOS / CHoCH", hint: "Confirmed close-through breaks" },
   { key: "sdStrategy", label: "Zone + FVG strategy", hint: "Supply / demand zones, their FVG" },
@@ -810,33 +809,6 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
                   </>
                 )}
               </div>
-              {smcToggles.trendBias !== false && smc?.trendBias && (
-                <div
-                  className={cn(
-                    "mb-1.5 inline-flex items-center gap-1.5 rounded border px-1.5 py-0.5 text-[11px] font-semibold",
-                    smc.trendBias.direction === "up"
-                      ? "border-[#089981]/50 text-[#089981]"
-                      : smc.trendBias.direction === "down"
-                        ? "border-[#f23645]/50 text-[#f23645]"
-                        : "border-border text-muted-foreground",
-                  )}
-                  title={smc.trendBias.reasons.join(" · ")}
-                >
-                  <span>
-                    {smc.trendBias.direction === "up" ? "▲ TREND UP" : smc.trendBias.direction === "down" ? "▼ TREND DOWN" : "◆ SIDEWAYS"}
-                  </span>
-                  <span className="opacity-80">
-                    {smc.trendBias.direction !== "sideways"
-                      ? `${smc.trendBias.strength}%`
-                      : smc.trendBias.score > 0
-                        ? "· leaning up"
-                        : smc.trendBias.score < 0
-                          ? "· leaning down"
-                          : "· no clear side"}
-                  </span>
-                  <span className="hidden font-normal text-muted-foreground sm:inline">{smc.trendBias.reasons.join(" · ")}</span>
-                </div>
-              )}
               {demoTradingEnabled && (
                 <div className="mb-1.5">
                   <QuickTradeButtons price={currentPrice} onPick={setTicketSide} />
