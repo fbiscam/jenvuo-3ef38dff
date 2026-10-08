@@ -17,6 +17,7 @@ import type { OhlcvBar } from "./indicators";
 import { computeFreshZones, type SdZone } from "./fresh-zones";
 import { computeLiquidityMap, type LiquidityMap } from "./liquidity-sweeps";
 import { computeFreshFvgs, FVG_MAX_TOTAL, type FreshFvg } from "./fresh-fvgs";
+import { classifySwingSweep, type SwingSweep } from "./swing-sweep";
 import { classifySwingPriceAction, type SwingPriceAction } from "./swing-price-action";
 
 /** Zone + FVG strategy: only the single latest zone (with its own displacement FVG and plan) is shown. */
@@ -139,6 +140,8 @@ export type SmcOverlay = {
   freshFvgs?: FreshFvg[];
   /** Price action verdict at each swing (pattern + who controls), keyed by pivot time. */
   priceAction?: Record<number, SwingPriceAction>;
+  /** Fresh-swing liquidity sweep verdict (previous 10 candles), keyed by pivot time. */
+  swingSweeps?: Record<number, SwingSweep>;
 };
 
 export type ReversalSignal = {
@@ -271,6 +274,8 @@ export type SmcToggles = {
   freshFvg: boolean;
   /** Price action verdict (pattern + buyers/sellers) on every fresh high/low. */
   priceAction?: boolean;
+  /** Fresh-swing liquidity sweep tag (4H only). */
+  swingSweep?: boolean;
 };
 
 export const DEFAULT_SMC: SmcToggles = {
@@ -288,6 +293,7 @@ export const DEFAULT_SMC: SmcToggles = {
   sweeps: true,
   freshFvg: true,
   priceAction: true,
+  swingSweep: true,
 };
 
 type Candle = { t: number; o: number; h: number; l: number; c: number; v?: number };
@@ -926,7 +932,12 @@ export function computeSmcOverlay(
   for (const p of [...pivotsLabelled, ...livePivots]) {
     priceAction[p.t] = classifySwingPriceAction(fractalBars, closedIdx.get(p.t) ?? -1, p.kind, pressure[p.t]);
   }
+  const swingSweeps: Record<number, SwingSweep> = {};
+  for (const p of [...pivotsLabelled, ...livePivots]) {
+    swingSweeps[p.t] = classifySwingSweep(fractalBars, closedIdx.get(p.t) ?? -1, p.kind);
+  }
   return {
+    swingSweeps,
     priceAction,
     freshFvgs,
     reversal,
@@ -1396,6 +1407,22 @@ export function renderSmcOverlay(
     ctx.fillText(st, bx + bw - 5 - ctx.measureText(st).width, by + 13);
     ctx.restore();
   };
+  const sweepTag = (t: number, xx: number, baseline: number) => {
+    if (!toggles.swingSweep) return;
+    const sw = smc.swingSweeps?.[t];
+    if (!sw || sw.status === "none") return;
+    ctx.save();
+    ctx.font = "700 11px 'JetBrains Mono', ui-monospace, monospace";
+    const w = ctx.measureText(sw.text).width;
+    ctx.fillStyle = plate(ctx, 0.9);
+    ctx.beginPath();
+    ctx.roundRect?.(xx - w / 2 - 5, baseline - 12, w + 10, 16, 4);
+    if (!ctx.roundRect) ctx.rect(xx - w / 2 - 5, baseline - 12, w + 10, 16);
+    ctx.fill();
+    ctx.fillStyle = sw.status === "confirmed" ? "#2962ff" : sw.status === "failed" ? "#f23645" : isDarkCanvas(ctx) ? "#d1d4dc" : "#5d606b";
+    ctx.fillText(sw.text, xx - w / 2, baseline);
+    ctx.restore();
+  };
   // Price action verdict beside each swing, stacked outside the pressure badge.
   const priceActionTag = (t: number, xx: number, yy: number, up: boolean) => {
     if (toggles.priceAction === false) return;
@@ -1415,6 +1442,7 @@ export function renderSmcOverlay(
     ctx.fillStyle = pa.control === "buyers" ? "#089981" : pa.control === "sellers" ? "#f23645" : isDarkCanvas(ctx) ? "#d1d4dc" : "#5d606b";
     ctx.fillText(pa.text, xx - w / 2, baseline);
     ctx.restore();
+    sweepTag(t, xx, up ? baseline - 18 : baseline + 18);
   };
   // HH/HL/LH/LL: plain text (no filled block) — pure white in black theme, green/red in white theme.
   const swingText = (text: string, xx: number, yy: number, color: string) => {
