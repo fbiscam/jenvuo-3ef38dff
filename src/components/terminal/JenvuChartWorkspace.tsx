@@ -48,7 +48,6 @@ import type { OhlcvBar } from "@/lib/chart/indicators";
 import { runJenvuScript, type ScriptResult } from "@/lib/chart/jenvu-script";
 import { computeSmcOverlay, DEFAULT_SMC, type SmcToggles } from "@/lib/chart/smc-overlay";
 import { projectNextCandles } from "@/lib/chart/projection";
-import { computeCandleRanges } from "@/lib/chart/candle-range";
 import { ChartCanvas, type ChartCanvasHandle } from "./ChartCanvas";
 import { INDICATOR_LIST, buildIndicatorSeries, isIndicatorId, type IndicatorId } from "./indicator-specs";
 import { ScriptPanel, type SavedScript } from "./ScriptPanel";
@@ -67,8 +66,6 @@ const PRESSURE_TIMEFRAMES = { has: (_key: string) => true };
 const SD_ZONE_TIMEFRAMES = new Set(["1m", "5m", "15m", "30m", "45m", "1h", "4h", "1d"]);
 /** "Previous zones & FVG" (last 10 strategy zones) and its switch: 15m and higher only. */
 const SD_HISTORY_TIMEFRAMES = new Set(["15m", "30m", "45m", "1h", "4h", "1d"]);
-/** Candle range (expected high/low + TP/SL per candle): 15m and higher. */
-const CANDLE_RANGE_TIMEFRAMES = new Set(["15m", "30m", "45m", "1h", "2h", "4h", "1d"]);
 
 const MemoChart = memo(ChartCanvas);
 
@@ -149,7 +146,6 @@ const SMC_LABELS: Array<{ key: keyof SmcToggles; label: string; hint: string }> 
   { key: "structure", label: "Swing structure", hint: "HH / HL / LH / LL labels" },
   { key: "pressure", label: "Buyer / seller pressure", hint: "Percentages and confirmed trade levels" },
   { key: "priceAction", label: "Swing price action", hint: "Pattern + buyers / sellers at each high / low" },
-  { key: "candleRange", label: "Candle range (TP / SL)", hint: "Expected high / low per candle, click a candle" },
   { key: "breaks", label: "BOS / CHoCH", hint: "Confirmed close-through breaks" },
   { key: "sdStrategy", label: "Zone + FVG strategy", hint: "Supply / demand zones, their FVG" },
   { key: "sdHistory", label: "Previous zones & FVG", hint: "Last 10 supply / demand zones with FVG" },
@@ -386,13 +382,6 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
     [bars, stepSeconds, smc],
   );
 
-  const candleRangeOn = (smcToggles.candleRange ?? true) && CANDLE_RANGE_TIMEFRAMES.has(timeframe.key);
-  const candleRange = useMemo(() => {
-    if (!candleRangeOn || !bars.length) return null;
-    const last = bars[bars.length - 1];
-    return computeCandleRanges(bars, (last.time + stepSeconds) * 1000 > Date.now());
-  }, [candleRangeOn, bars, stepSeconds]);
-
   const scriptRuns = useMemo(
     () =>
       scripts.map((s) => {
@@ -598,8 +587,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
             {SMC_LABELS.filter(
               (item) =>
                 (item.key !== "sdStrategy" || SD_ZONE_TIMEFRAMES.has(timeframe.key)) &&
-                (item.key !== "sdHistory" || SD_HISTORY_TIMEFRAMES.has(timeframe.key)) &&
-                (item.key !== "candleRange" || CANDLE_RANGE_TIMEFRAMES.has(timeframe.key)),
+                (item.key !== "sdHistory" || SD_HISTORY_TIMEFRAMES.has(timeframe.key)),
             ).map((item) => (
               <label
                 key={item.key}
@@ -773,7 +761,6 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
               smcToggles={chartSmcToggles}
               showSmcPressure={showSmcPressure}
               projection={projection}
-              candleRange={candleRange}
               demoPositions={demoTradingEnabled ? demoPositions : []}
               demoPrice={demoTradingEnabled && demoPositions.length ? currentPrice : null}
               demoActions={demoActions}
