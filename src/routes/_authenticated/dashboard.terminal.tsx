@@ -21,6 +21,7 @@ import {
 import type { FileUIPart } from "ai";
 import { analyzeGold, type GoldSignal } from "@/lib/gold-analysis.functions";
 import { getGoldNews, type NewsEvent } from "@/lib/news.functions";
+import { toast } from "sonner";
 import {
   JenvuChartWorkspace,
   type JenvuChartHandle,
@@ -156,13 +157,24 @@ function formatNewYorkNewsTime(isoDate: string): { date: string; time: string } 
   };
 }
 
-function UpcomingGoldNews({ event, loading }: { event?: NewsEvent; loading: boolean }) {
+function UpcomingGoldNews({
+  event,
+  loading,
+  failed,
+}: {
+  event?: NewsEvent;
+  loading: boolean;
+  failed?: boolean;
+}) {
   const stamp = event ? formatNewYorkNewsTime(event.date) : null;
+  const live = event ? new Date(event.date).getTime() <= Date.now() : false;
   const text = loading
     ? "Checking news…"
     : event && stamp
-      ? `News: ${event.title} · ${stamp.date}, ${stamp.time} NY`
-      : "No important news ahead";
+      ? `${live ? "Released" : "News"}${event.impact === "High" ? " (High)" : ""}: ${event.title} · ${stamp.date}, ${stamp.time} NY`
+      : failed
+        ? "News feed unavailable — check calendar"
+        : "No important news ahead";
   return (
     <span
       className="flex w-[260px] shrink-0 items-center gap-1.5 whitespace-nowrap px-1 text-xs font-normal text-muted-foreground"
@@ -170,7 +182,10 @@ function UpcomingGoldNews({ event, loading }: { event?: NewsEvent; loading: bool
     >
       <Newspaper
         aria-hidden="true"
-        className={cn("h-3.5 w-3.5 shrink-0", event ? "text-red-500" : "text-amber-500")}
+        className={cn(
+          "h-3.5 w-3.5 shrink-0",
+          event?.impact === "High" ? "text-red-500" : event ? "text-orange-500" : "text-amber-500",
+        )}
       />
       <span className="truncate">{text}</span>
     </span>
@@ -321,9 +336,40 @@ function TerminalPage() {
     refetchIntervalInBackground: false,
     retry: 2,
   });
-  const nextGoldNews = newsQuery.data?.find(
-    (event: NewsEvent) => event.impact === "High" && new Date(event.date).getTime() > Date.now(),
+  // Re-evaluate every 30s so a release moves from "upcoming" to "released" on time.
+  const [newsNow, setNewsNow] = useState(() => Date.now());
+  useEffect(() => {
+    const id = window.setInterval(() => setNewsNow(Date.now()), 30_000);
+    return () => window.clearInterval(id);
+  }, []);
+  // Show the nearest important event; keep it on screen for 30 min after release.
+  const relevantNews = (newsQuery.data ?? []).filter(
+    (event: NewsEvent) => new Date(event.date).getTime() > newsNow - 30 * 60_000,
   );
+  const nextGoldNews =
+    relevantNews.find((event) => new Date(event.date).getTime() > newsNow - 30 * 60_000) ??
+    undefined;
+
+  // Pop-up reminders 30 min, 5 min before and at release — visible even when
+  // the AI desk hides the news strip.
+  const newsAlertedRef = useRef<Set<string>>(new Set());
+  useEffect(() => {
+    for (const event of relevantNews) {
+      const mins = (new Date(event.date).getTime() - newsNow) / 60_000;
+      const stage = mins <= 0 && mins > -5 ? "now" : mins <= 5 && mins > 0 ? "5" : mins <= 30 && mins > 5 ? "30" : null;
+      if (!stage) continue;
+      const key = `${event.date}|${event.title}|${stage}`;
+      if (newsAlertedRef.current.has(key)) continue;
+      newsAlertedRef.current.add(key);
+      const stamp = formatNewYorkNewsTime(event.date);
+      const lead = stage === "now" ? "Releasing now" : `In ${Math.max(1, Math.round(mins))} min`;
+      const show = event.impact === "High" ? toast.warning : toast.info;
+      show(`${lead}: ${event.country} ${event.title}`, {
+        description: `${event.impact} impact · ${stamp.date}, ${stamp.time} NY${event.forecast ? ` · Forecast ${event.forecast}` : ""}${event.previous ? ` · Previous ${event.previous}` : ""}`,
+        duration: stage === "30" ? 10_000 : 20_000,
+      });
+    }
+  }, [relevantNews, newsNow]);
 
   function addMessage(message: ChatMsg) {
     const previous = messagesRef.current.at(-1);
