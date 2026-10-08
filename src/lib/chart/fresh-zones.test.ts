@@ -162,9 +162,16 @@ describe("strong-zone filter", () => {
     expect(zones[0].imbalance).toBe(true);
   });
 
-  test("a bearish FVG printed just above a demand zone rejects it", () => {
+  test("classic mode: a bearish FVG printed just above a demand zone rejects it", () => {
     const { bars, pivots } = demandSeries(true);
-    expect(computeFreshZones(bars, pivots)).toHaveLength(0);
+    expect(computeFreshZones(bars, pivots, undefined, undefined, false)).toHaveLength(0);
+  });
+
+  test("strategy mode: a formed demand zone survives a later opposing FVG", () => {
+    const { bars, pivots } = demandSeries(true);
+    const zones = computeFreshZones(bars, pivots);
+    expect(zones).toHaveLength(1);
+    expect(zones[0].type).toBe("DEMAND");
   });
 });
 
