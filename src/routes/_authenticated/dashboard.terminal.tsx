@@ -724,7 +724,7 @@ function TerminalPage() {
                       aria-label="Ask With AI"
                     >
                       <img src={jenvuLogo} alt="" className="h-4 w-4 shrink-0 object-contain" />
-                      Ask With AI
+                      <span className={cn(showWatchlist && "lg:hidden 2xl:inline")}>Ask With AI</span>
                     </button>
                   )}
                 </>
