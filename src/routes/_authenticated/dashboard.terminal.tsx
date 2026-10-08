@@ -346,9 +346,7 @@ function TerminalPage() {
   const relevantNews = (newsQuery.data ?? []).filter(
     (event: NewsEvent) => new Date(event.date).getTime() > newsNow - 30 * 60_000,
   );
-  const nextGoldNews =
-    relevantNews.find((event) => new Date(event.date).getTime() > newsNow - 30 * 60_000) ??
-    undefined;
+  const nextGoldNews: NewsEvent | undefined = relevantNews[0];
 
   // Pop-up reminders 30 min, 5 min before and at release — visible even when
   // the AI desk hides the news strip.
@@ -681,7 +679,11 @@ function TerminalPage() {
                 <>
                   {!deskOpen && (
                     <span className={cn(showWatchlist && "lg:hidden")}>
-                      <UpcomingGoldNews event={nextGoldNews} loading={newsQuery.isPending} />
+                      <UpcomingGoldNews
+                        event={nextGoldNews}
+                        loading={newsQuery.isPending}
+                        failed={newsQuery.isError && !newsQuery.data}
+                      />
                     </span>
                   )}
                   <div
@@ -737,7 +739,9 @@ function TerminalPage() {
               asset={asset}
               onAssetChange={changeAsset}
               news={nextGoldNews}
+              upcomingNews={relevantNews.slice(0, 6)}
               newsLoading={newsQuery.isPending}
+              newsFailed={newsQuery.isError && !newsQuery.data}
               onClose={() => setWatchlistOpen(false)}
             />
           )}
