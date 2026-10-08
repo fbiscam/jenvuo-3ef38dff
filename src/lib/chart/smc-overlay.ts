@@ -15,6 +15,7 @@ import {
 } from "@/lib/analysis/poi-evidence";
 import type { OhlcvBar } from "./indicators";
 import { computeFreshZones, type SdZone } from "./fresh-zones";
+import { computeTrendBias, type TrendBias } from "./trend-bias";
 import { computeLiquidityMap, type LiquidityMap } from "./liquidity-sweeps";
 import { computeFreshFvgs, FVG_MAX_TOTAL, type FreshFvg } from "./fresh-fvgs";
 import { classifySwingPriceAction, type SwingPriceAction } from "./swing-price-action";
@@ -139,6 +140,8 @@ export type SmcOverlay = {
   freshFvgs?: FreshFvg[];
   /** Price action verdict at each swing (pattern + who controls), keyed by pivot time. */
   priceAction?: Record<number, SwingPriceAction>;
+  /** Up / Down / Sideways reading from closed-candle structure, breaks and EMAs. */
+  trendBias?: TrendBias | null;
 };
 
 export type ReversalSignal = {
@@ -271,6 +274,8 @@ export type SmcToggles = {
   freshFvg: boolean;
   /** Price action verdict (pattern + buyers/sellers) on every fresh high/low. */
   priceAction?: boolean;
+  /** Trend direction badge (Up / Down / Sideways). */
+  trendBias?: boolean;
 };
 
 export const DEFAULT_SMC: SmcToggles = {
@@ -288,6 +293,7 @@ export const DEFAULT_SMC: SmcToggles = {
   sweeps: true,
   freshFvg: true,
   priceAction: true,
+  trendBias: true,
 };
 
 type Candle = { t: number; o: number; h: number; l: number; c: number; v?: number };
@@ -926,8 +932,10 @@ export function computeSmcOverlay(
   for (const p of [...pivotsLabelled, ...livePivots]) {
     priceAction[p.t] = classifySwingPriceAction(fractalBars, closedIdx.get(p.t) ?? -1, p.kind, pressure[p.t]);
   }
+  const trendBias = computeTrendBias(fractalBars, pivotsLabelled, breaks);
   return {
     priceAction,
+    trendBias,
     freshFvgs,
     reversal,
     pressure,
