@@ -271,6 +271,8 @@ export type SmcToggles = {
   freshFvg: boolean;
   /** Price action verdict (pattern + buyers/sellers) on every fresh high/low. */
   priceAction?: boolean;
+  /** Expected high/low + TP/SL scenario for the current and previous 5 candles. */
+  candleRange?: boolean;
 };
 
 export const DEFAULT_SMC: SmcToggles = {
@@ -288,6 +290,7 @@ export const DEFAULT_SMC: SmcToggles = {
   sweeps: true,
   freshFvg: true,
   priceAction: true,
+  candleRange: true,
 };
 
 type Candle = { t: number; o: number; h: number; l: number; c: number; v?: number };
