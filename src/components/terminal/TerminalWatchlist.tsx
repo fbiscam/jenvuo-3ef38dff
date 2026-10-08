@@ -129,14 +129,18 @@ export function TerminalWatchlist({
   asset,
   onAssetChange,
   news,
+  upcomingNews = [],
   newsLoading,
+  newsFailed,
   onClose,
   className,
 }: {
   asset: ChartAsset;
   onAssetChange: (asset: ChartAsset) => void;
   news?: NewsEvent;
+  upcomingNews?: NewsEvent[];
   newsLoading: boolean;
+  newsFailed?: boolean;
   onClose: () => void;
   className?: string;
 }) {
@@ -327,7 +331,7 @@ export function TerminalWatchlist({
 
           <div className="mt-4 rounded-lg border border-border bg-secondary/60 p-3">
             <p className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
-              <Newspaper className={cn("h-3.5 w-3.5", news ? "text-[#f23645]" : "text-amber-500")} />
+              <Newspaper className={cn("h-3.5 w-3.5", news?.impact === "High" ? "text-[#f23645]" : news ? "text-orange-500" : "text-amber-500")} />
               <span className="font-semibold text-foreground">Upcoming news</span>
               {news && <span>· {formatNewsStamp(news.date)}</span>}
             </p>
@@ -336,7 +340,9 @@ export function TerminalWatchlist({
                 ? "Checking news…"
                 : news
                   ? `${news.country} · ${news.title}`
-                  : "No important news ahead"}
+                  : newsFailed
+                    ? "News feed unavailable — check the calendar before trading"
+                    : "No important news ahead"}
             </p>
             {news && (news.forecast || news.previous) && (
               <p className="mt-1 text-[11px] text-muted-foreground">
@@ -344,6 +350,27 @@ export function TerminalWatchlist({
                 {news.forecast && news.previous ? " · " : ""}
                 {news.previous ? `Previous ${news.previous}` : ""}
               </p>
+            )}
+            {upcomingNews.length > 1 && (
+              <ul className="mt-2.5 space-y-1.5 border-t border-border pt-2.5">
+                {upcomingNews.slice(1).map((event) => (
+                  <li key={`${event.date}-${event.title}`} className="flex items-start gap-1.5 text-[11px]">
+                    <span
+                      className={cn(
+                        "mt-1 h-1.5 w-1.5 shrink-0 rounded-full",
+                        event.impact === "High" ? "bg-[#f23645]" : "bg-orange-500",
+                      )}
+                      title={`${event.impact} impact`}
+                    />
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate text-foreground">
+                        {event.country} · {event.title}
+                      </span>
+                      <span className="text-muted-foreground">{formatNewsStamp(event.date)}</span>
+                    </span>
+                  </li>
+                ))}
+              </ul>
             )}
           </div>
         </div>
