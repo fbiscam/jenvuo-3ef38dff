@@ -305,7 +305,8 @@ function TerminalPage() {
   const [theme, setTheme] = useState<"light" | "dark">("light");
   const [watchlistOpen, setWatchlistOpen] = useState(true);
   // The watchlist fills the right side whenever the AI desk is closed.
-  const showWatchlist = !deskOpen && watchlistOpen;
+  // Watchlist removed at user request; chart uses the full width.
+  const showWatchlist = false as boolean;
   const chartRef = useRef<JenvuChartHandle | null>(null);
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<ChatMsg[]>([]);
@@ -703,7 +704,7 @@ function TerminalPage() {
                   >
                     {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
                   </button>
-                  {!deskOpen && !watchlistOpen && (
+                  {false && !deskOpen && !watchlistOpen && (
                     <button
                       type="button"
                       onClick={() => setWatchlistOpen(true)}
