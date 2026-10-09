@@ -1,20 +1,24 @@
 /**
- * Fresh-swing liquidity sweep (4H tool). Closed candles only.
+ * Fresh-swing liquidity sweep (1H / 4H tool). Closed candles only.
  *
  * At a fresh swing high (low) candle, did its wick take the highest high
  * (lowest low) of the previous SWEEP_LOOKBACK closed candles and close back
  * inside (or the very next closed candle closed back inside)? Then, did
  * price move away in the reversal direction — a close beyond the swing
- * candle's body within SWEEP_MOVE_BARS closed candles?
+ * candle's body?
+ *  - within SWEEP_MOVE_BARS candles (the reclaim candle counts) → confirmed
+ *  - only on a later candle up to SWEEP_LATE_BARS → "late move"
+ *  - close beyond the swing extreme first → failed
  * Verdict is "pending" until those candles close, then never changes.
  */
 type Bar = { t: number; o: number; h: number; l: number; c: number };
 
-export type SwingSweepStatus = "confirmed" | "failed" | "none" | "pending";
+export type SwingSweepStatus = "confirmed" | "late" | "failed" | "none" | "pending";
 export type SwingSweep = { status: SwingSweepStatus; level: number | null; text: string };
 
 export const SWEEP_LOOKBACK = 10;
 export const SWEEP_MOVE_BARS = 2;
+export const SWEEP_LATE_BARS = 5;
 
 export function classifySwingSweep(closed: Bar[], i: number, kind: "high" | "low"): SwingSweep {
   const high = kind === "high";
@@ -32,12 +36,22 @@ export function classifySwingSweep(closed: Bar[], i: number, kind: "high" | "low
     reclaim = i + 1;
   }
   const bodyEdge = high ? Math.min(s.o, s.c) : Math.max(s.o, s.c);
-  const last = Math.min(closed.length - 1, reclaim + SWEEP_MOVE_BARS);
-  for (let k = reclaim + 1; k <= last; k++) {
+  // Candles counted after the swing candle; a next-candle reclaim is itself candle 1.
+  const first = reclaim === i ? i + 1 : reclaim;
+  for (let n = 0; n < SWEEP_LATE_BARS; n++) {
+    const k = first + n;
+    if (k >= closed.length) {
+      return n < SWEEP_MOVE_BARS
+        ? { status: "pending", level, text: "Sweep – waiting move" }
+        : { status: "pending", level, text: "Sweep – slow, waiting" };
+    }
     const c = closed[k].c;
     if (high ? c > s.h : c < s.l) return { status: "failed", level, text: "Sweep failed" };
-    if (high ? c < bodyEdge : c > bodyEdge) return { status: "confirmed", level, text: "Sweep ✓ confirmed" };
+    if (high ? c < bodyEdge : c > bodyEdge) {
+      return n < SWEEP_MOVE_BARS
+        ? { status: "confirmed", level, text: "Sweep ✓ confirmed" }
+        : { status: "late", level, text: "Sweep ✓ late move" };
+    }
   }
-  if (last < reclaim + SWEEP_MOVE_BARS) return { status: "pending", level, text: "Sweep – waiting move" };
   return { status: "failed", level, text: "Sweep, no move" };
 }

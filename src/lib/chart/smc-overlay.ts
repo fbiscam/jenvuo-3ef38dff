@@ -1419,7 +1419,7 @@ export function renderSmcOverlay(
     ctx.roundRect?.(xx - w / 2 - 5, baseline - 12, w + 10, 16, 4);
     if (!ctx.roundRect) ctx.rect(xx - w / 2 - 5, baseline - 12, w + 10, 16);
     ctx.fill();
-    ctx.fillStyle = sw.status === "confirmed" ? "#2962ff" : sw.status === "failed" ? "#f23645" : isDarkCanvas(ctx) ? "#d1d4dc" : "#5d606b";
+    ctx.fillStyle = sw.status === "confirmed" ? "#2962ff" : sw.status === "late" ? "#f59e0b" : sw.status === "failed" ? "#f23645" : isDarkCanvas(ctx) ? "#d1d4dc" : "#5d606b";
     ctx.fillText(sw.text, xx - w / 2, baseline);
     ctx.restore();
   };
