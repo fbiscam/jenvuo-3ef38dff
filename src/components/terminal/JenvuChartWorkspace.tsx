@@ -218,6 +218,8 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
   const workspaceRef = useRef<HTMLDivElement | null>(null);
   const chartRef = useRef<ChartCanvasHandle | null>(null);
   const [ready, setReady] = useState(false);
+  // Phones only: drawing tools stay hidden until opened from the top bar.
+  const [mobileToolsOpen, setMobileToolsOpen] = useState(false);
   const [indicators, setIndicators] = useState<IndicatorId[]>(["volume", "ema20", "ema50"]);
   const [smcToggles, setSmcToggles] = useState<SmcToggles>(DEFAULT_SMC);
   const [drawings, setDrawings] = useState<Drawing[]>([]);
