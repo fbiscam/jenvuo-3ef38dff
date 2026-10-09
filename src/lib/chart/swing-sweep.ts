@@ -14,7 +14,7 @@ export type SwingSweepStatus = "confirmed" | "failed" | "none" | "pending";
 export type SwingSweep = { status: SwingSweepStatus; level: number | null; text: string };
 
 export const SWEEP_LOOKBACK = 10;
-export const SWEEP_MOVE_BARS = 3;
+export const SWEEP_MOVE_BARS = 2;
 
 export function classifySwingSweep(closed: Bar[], i: number, kind: "high" | "low"): SwingSweep {
   const high = kind === "high";
