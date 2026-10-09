@@ -30,4 +30,18 @@ describe("classifySwingSweep", () => {
     b.push(bar(13, 99.4, 101.2, 99.2, 101));
     expect(classifySwingSweep(b, 12, "low").status).toBe("confirmed");
   });
+  test("no move within 2 candles = failed (no move)", () => {
+    const b = base();
+    b.push(bar(12, 100.5, 103, 100, 100.6));
+    b.push(bar(13, 100.6, 101, 100.2, 100.7));
+    b.push(bar(14, 100.7, 101, 100.2, 100.8));
+    expect(classifySwingSweep(b, 12, "high").status).toBe("failed");
+  });
+  test("move on the 2nd candle still confirms", () => {
+    const b = base();
+    b.push(bar(12, 100.5, 103, 100, 100.6));
+    b.push(bar(13, 100.6, 101, 100.2, 100.7));
+    b.push(bar(14, 100.7, 100.8, 99, 99.5));
+    expect(classifySwingSweep(b, 12, "high").status).toBe("confirmed");
+  });
 });
