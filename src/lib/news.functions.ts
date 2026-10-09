@@ -50,6 +50,9 @@ async function loadCalendar(): Promise<FFEvent[]> {
   }
 }
 
+/** Every news list in the product shows at most this many events. */
+export const MAX_NEWS = 4;
+
 export const getGoldNews = createServerFn({ method: "GET" }).handler(
   async (): Promise<NewsEvent[]> => {
     // Throwing (instead of returning []) lets the terminal say the feed is
@@ -77,6 +80,6 @@ export const getGoldNews = createServerFn({ method: "GET" }).handler(
         return Number.isFinite(t) && t >= now - 1000 * 60 * 60 && t <= horizon;
       })
       .sort((a, b) => +new Date(a.date) - +new Date(b.date))
-      .slice(0, 40);
+      .slice(0, MAX_NEWS);
   },
 );

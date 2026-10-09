@@ -3344,7 +3344,7 @@ async function fetchGoldNewsInline(): Promise<NewsItem[]> {
       })
       .filter((e) => e.minutesUntil >= -30 && e.minutesUntil <= 60 * 24)
       .sort((a, b) => a.minutesUntil - b.minutesUntil)
-      .slice(0, 6);
+      .slice(0, 4);
   } catch {
     return [];
   }
@@ -5531,7 +5531,7 @@ Run the full 25-year desk-head review internally through the elite lens above, t
     try {
       const newsLines =
         upcomingNews
-          .slice(0, 5)
+          .slice(0, 4)
           .map((n) => `- [${n.impact}] ${n.title} in ${Math.round(n.minutesUntil)}m (${n.country})`)
           .join("\n") || "- No high-impact events in the window";
       const macroSystem = `You are a senior macro strategist for a gold trading desk. In 1-2 short sentences, describe the CURRENT macro/news backdrop for ${inst.display} and whether it SUPPORTS or CONFLICTS with the desk's directional bias. Focus on: imminent USD events, DXY tone, rates/risk sentiment. No preamble. Reply ONLY as JSON: {"narrative":"<1-2 sentences>","impact":"supports"|"conflicts"|"neutral"}`;

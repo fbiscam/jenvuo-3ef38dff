@@ -20,7 +20,7 @@ import {
 } from "lucide-react";
 import type { FileUIPart } from "ai";
 import { analyzeGold, type GoldSignal } from "@/lib/gold-analysis.functions";
-import { getGoldNews, type NewsEvent } from "@/lib/news.functions";
+import { getGoldNews, MAX_NEWS, type NewsEvent } from "@/lib/news.functions";
 import { toast } from "sonner";
 import {
   JenvuChartWorkspace,
@@ -180,8 +180,9 @@ function UpcomingGoldNews({
   return (
     <span
       className={cn(
-        "flex items-center gap-1.5 px-1 text-xs font-normal text-muted-foreground",
-        wrap ? "w-full items-start" : "w-[260px] shrink-0 whitespace-nowrap",
+        "flex items-start gap-1.5 px-1 text-xs font-normal leading-snug text-muted-foreground",
+        // Desktop keeps the whole line readable (wraps instead of cutting the date/time off).
+        wrap ? "w-full" : "md:max-w-[430px] md:min-w-[150px] md:shrink-0",
       )}
       title={text}
     >
@@ -192,7 +193,7 @@ function UpcomingGoldNews({
           event?.impact === "High" ? "text-red-500" : event ? "text-orange-500" : "text-amber-500",
         )}
       />
-      <span className={wrap ? "min-w-0 break-words" : "truncate"}>{text}</span>
+      <span className="min-w-0 break-words">{text}</span>
     </span>
   );
 }
@@ -754,7 +755,7 @@ function TerminalPage() {
               asset={asset}
               onAssetChange={changeAsset}
               news={nextGoldNews}
-              upcomingNews={relevantNews.slice(0, 6)}
+              upcomingNews={relevantNews.slice(0, MAX_NEWS)}
               newsLoading={newsQuery.isPending}
               newsFailed={newsQuery.isError && !newsQuery.data}
               onClose={() => setWatchlistOpen(false)}
