@@ -31,7 +31,7 @@ export function NewsPanel({ events }: { events: NewsEvent[] }) {
         </span>
       </div>
       <ul className="space-y-2 max-h-64 overflow-y-auto pr-1">
-        {events.map((e, i) => {
+        {shown.map((e, i) => {
           const soon = e.minutesUntil >= 0 && e.minutesUntil <= 15;
           const live = e.minutesUntil < 0 && e.minutesUntil > -30;
           return (
