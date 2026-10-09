@@ -173,7 +173,7 @@ function UpcomingGoldNews({
   const text = loading
     ? "Checking news…"
     : event && stamp
-      ? `${live ? "Released" : "News"}${event.impact === "High" ? " (High)" : ""}: ${event.title} · ${stamp.date}, ${stamp.time} NY`
+      ? `${live ? "Released" : ""}${live && event.impact === "High" ? " (High)" : ""}${live ? ": " : ""}${event.title} · ${stamp.date}, ${stamp.time} NY`
       : failed
         ? "News feed unavailable — check calendar"
         : "No important news ahead";
