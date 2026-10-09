@@ -20,7 +20,7 @@ import {
 } from "lucide-react";
 import type { FileUIPart } from "ai";
 import { analyzeGold, type GoldSignal } from "@/lib/gold-analysis.functions";
-import { getGoldNews, type NewsEvent } from "@/lib/news.functions";
+import { getGoldNews, MAX_NEWS, type NewsEvent } from "@/lib/news.functions";
 import { toast } from "sonner";
 import {
   JenvuChartWorkspace,
