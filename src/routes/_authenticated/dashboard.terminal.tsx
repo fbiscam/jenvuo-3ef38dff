@@ -182,7 +182,7 @@ function UpcomingGoldNews({
       className={cn(
         "flex items-start gap-1.5 px-1 text-xs font-normal leading-snug text-muted-foreground",
         // Desktop keeps the whole line readable (wraps instead of cutting the date/time off).
-        wrap ? "w-full" : "w-full items-center md:max-w-[430px] md:min-w-[150px] md:shrink-0",
+        wrap ? "w-full" : "md:max-w-[430px] md:min-w-[150px] md:shrink-0",
       )}
       title={text}
     >
