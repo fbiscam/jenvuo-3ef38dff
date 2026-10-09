@@ -30,12 +30,13 @@ describe("classifySwingSweep", () => {
     b.push(bar(13, 99.4, 101.2, 99.2, 101));
     expect(classifySwingSweep(b, 12, "low").status).toBe("confirmed");
   });
-  test("no move within 2 candles = failed (no move)", () => {
+  test("no move within 5 candles = failed (no move)", () => {
     const b = base();
     b.push(bar(12, 100.5, 103, 100, 100.6));
-    b.push(bar(13, 100.6, 101, 100.2, 100.7));
-    b.push(bar(14, 100.7, 101, 100.2, 100.8));
-    expect(classifySwingSweep(b, 12, "high").status).toBe("failed");
+    for (let k = 13; k <= 17; k++) b.push(bar(k, 100.6, 101, 100.2, 100.7));
+    const r = classifySwingSweep(b, 12, "high");
+    expect(r.status).toBe("failed");
+    expect(r.text).toBe("Sweep, no move");
   });
   test("move on the 2nd candle still confirms", () => {
     const b = base();
@@ -43,5 +44,22 @@ describe("classifySwingSweep", () => {
     b.push(bar(13, 100.6, 101, 100.2, 100.7));
     b.push(bar(14, 100.7, 100.8, 99, 99.5));
     expect(classifySwingSweep(b, 12, "high").status).toBe("confirmed");
+  });
+  test("move on the 4th candle = late move, not no move", () => {
+    const b = base();
+    b.push(bar(12, 100.5, 103, 100, 100.6));
+    b.push(bar(13, 100.6, 101, 100.2, 100.7));
+    b.push(bar(14, 100.7, 101, 100.2, 100.7));
+    b.push(bar(15, 100.7, 101, 100.2, 100.7));
+    b.push(bar(16, 100.7, 100.8, 99, 99.5));
+    expect(classifySwingSweep(b, 12, "high").status).toBe("late");
+  });
+  test("next-candle reclaim that already closes past the body confirms", () => {
+    const b = base();
+    b.push(bar(12, 100.8, 100.9, 97, 98.6)); // wick below 99, closes below level
+    b.push(bar(13, 98.6, 101.5, 98.5, 101.2)); // reclaims and closes above body top
+    b.push(bar(14, 101.2, 101.4, 100.6, 100.9));
+    b.push(bar(15, 100.9, 101.1, 100.5, 100.7));
+    expect(classifySwingSweep(b, 12, "low").status).toBe("confirmed");
   });
 });
