@@ -182,7 +182,10 @@ function UpcomingGoldNews({
       className={cn(
         "flex items-start gap-1.5 px-1 text-xs font-normal leading-snug text-muted-foreground",
         // Desktop keeps the whole line readable (wraps instead of cutting the date/time off).
-        wrap ? "w-full" : "md:max-w-[430px] md:min-w-[150px] md:shrink-0",
+        // Phones: one full line inside the scrollable toolbar, never cut short.
+        wrap
+          ? "w-full"
+          : "shrink-0 whitespace-nowrap md:max-w-[430px] md:min-w-[150px] md:whitespace-normal",
       )}
       title={text}
     >
@@ -669,15 +672,6 @@ function TerminalPage() {
         )}
       >
         <div className="flex min-h-0 flex-1 flex-col lg:flex-row">
-          {/* Phones: full news line with date and time */}
-          <div className="flex shrink-0 items-start gap-1.5 border-b border-border px-3 py-1.5 text-xs leading-snug text-muted-foreground md:hidden">
-            <UpcomingGoldNews
-              event={nextGoldNews}
-              loading={newsQuery.isPending}
-              failed={newsQuery.isError && !newsQuery.data}
-              wrap
-            />
-          </div>
           {/* Chart */}
           <section aria-label="XAU/USD chart" className="relative min-h-0 min-w-0 flex-1 bg-background">
             <JenvuChartWorkspace
@@ -694,13 +688,11 @@ function TerminalPage() {
               rightSlot={
                 <>
                   {!deskOpen && (
-                    <span className="hidden md:inline">
-                      <UpcomingGoldNews
-                        event={nextGoldNews}
-                        loading={newsQuery.isPending}
-                        failed={newsQuery.isError && !newsQuery.data}
-                      />
-                    </span>
+                    <UpcomingGoldNews
+                      event={nextGoldNews}
+                      loading={newsQuery.isPending}
+                      failed={newsQuery.isError && !newsQuery.data}
+                    />
                   )}
                   <div
                     className="flex h-7 items-center gap-1.5 rounded-md px-2 font-mono text-xs font-semibold text-foreground"
