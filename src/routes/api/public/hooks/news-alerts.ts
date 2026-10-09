@@ -57,7 +57,7 @@ export const Route = createFileRoute('/api/public/hooks/news-alerts')({
           .map((e) => ({ ...e, ts: new Date(e.date).getTime() }))
           .filter((e) => Number.isFinite(e.ts) && e.ts > now && e.ts <= now + 75 * 60 * 1000)
           .sort((a, b) => a.ts - b.ts)
-          .slice(0, 5)
+          .slice(0, 4)
 
         if (upcoming.length === 0) {
           return Response.json({ ok: true, events: 0 })

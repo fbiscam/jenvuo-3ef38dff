@@ -15,7 +15,8 @@ function fmtCountdown(mins: number) {
 }
 
 export function NewsPanel({ events }: { events: NewsEvent[] }) {
-  if (!events.length) return null;
+  const shown = events.slice(0, 4);
+  if (!shown.length) return null;
   return (
     <div className="rounded-2xl border border-white/10 bg-neutral-950/70 backdrop-blur p-4 shadow-xl">
       <div className="flex items-center justify-between mb-3">
