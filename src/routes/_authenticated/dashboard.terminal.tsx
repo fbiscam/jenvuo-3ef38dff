@@ -161,10 +161,12 @@ function UpcomingGoldNews({
   event,
   loading,
   failed,
+  wrap,
 }: {
   event?: NewsEvent;
   loading: boolean;
   failed?: boolean;
+  wrap?: boolean;
 }) {
   const stamp = event ? formatNewYorkNewsTime(event.date) : null;
   const live = event ? new Date(event.date).getTime() <= Date.now() : false;
@@ -177,7 +179,10 @@ function UpcomingGoldNews({
         : "No important news ahead";
   return (
     <span
-      className="flex w-[260px] shrink-0 items-center gap-1.5 whitespace-nowrap px-1 text-xs font-normal text-muted-foreground"
+      className={cn(
+        "flex items-center gap-1.5 px-1 text-xs font-normal text-muted-foreground",
+        wrap ? "w-full items-start" : "w-[260px] shrink-0 whitespace-nowrap",
+      )}
       title={text}
     >
       <Newspaper
@@ -187,7 +192,7 @@ function UpcomingGoldNews({
           event?.impact === "High" ? "text-red-500" : event ? "text-orange-500" : "text-amber-500",
         )}
       />
-      <span className="truncate">{text}</span>
+      <span className={wrap ? "min-w-0 break-words" : "truncate"}>{text}</span>
     </span>
   );
 }
@@ -663,6 +668,15 @@ function TerminalPage() {
         )}
       >
         <div className="flex min-h-0 flex-1 flex-col lg:flex-row">
+          {/* Phones: full news line with date and time */}
+          <div className="flex shrink-0 items-start gap-1.5 border-b border-border px-3 py-1.5 text-xs leading-snug text-muted-foreground md:hidden">
+            <UpcomingGoldNews
+              event={nextGoldNews}
+              loading={newsQuery.isPending}
+              failed={newsQuery.isError && !newsQuery.data}
+              wrap
+            />
+          </div>
           {/* Chart */}
           <section aria-label="XAU/USD chart" className="relative min-h-0 min-w-0 flex-1 bg-background">
             <JenvuChartWorkspace
@@ -679,7 +693,7 @@ function TerminalPage() {
               rightSlot={
                 <>
                   {!deskOpen && (
-                    <span className={cn(showWatchlist && "lg:hidden")}>
+                    <span className="hidden md:inline">
                       <UpcomingGoldNews
                         event={nextGoldNews}
                         loading={newsQuery.isPending}

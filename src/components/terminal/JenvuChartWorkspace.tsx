@@ -39,7 +39,7 @@ import { getTerminalChart } from "@/lib/gold-analysis.functions";
 import { cn } from "@/lib/utils";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { XauUsdLogo } from "./XauUsdLogo";
-import { Menu } from "lucide-react";
+import { Menu, PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
@@ -218,6 +218,8 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
   const workspaceRef = useRef<HTMLDivElement | null>(null);
   const chartRef = useRef<ChartCanvasHandle | null>(null);
   const [ready, setReady] = useState(false);
+  // Phones only: drawing tools stay hidden until opened from the top bar.
+  const [mobileToolsOpen, setMobileToolsOpen] = useState(false);
   const [indicators, setIndicators] = useState<IndicatorId[]>(["volume", "ema20", "ema50"]);
   const [smcToggles, setSmcToggles] = useState<SmcToggles>(DEFAULT_SMC);
   const [drawings, setDrawings] = useState<Drawing[]>([]);
@@ -490,6 +492,15 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
           >
             <Menu className="h-4 w-4" />
           </button>
+          <button
+            type="button"
+            aria-label={mobileToolsOpen ? "Hide drawing tools" : "Show drawing tools"}
+            title={mobileToolsOpen ? "Hide drawing tools" : "Show drawing tools"}
+            onClick={() => setMobileToolsOpen((v) => !v)}
+            className="inline-flex h-7 w-7 items-center justify-center rounded-md text-foreground hover:bg-muted md:hidden"
+          >
+            {mobileToolsOpen ? <PanelLeftClose className="h-4 w-4" /> : <PanelLeftOpen className="h-4 w-4" />}
+          </button>
           <span className="hidden md:inline-flex"><XauUsdLogo size={22} /></span>
           <div className="ml-1 flex shrink-0 items-center rounded-md border border-border p-0.5" role="group" aria-label="Trading pair">
             {(["XAUUSD", "BTCUSD"] as const).map((a) => (
@@ -676,8 +687,20 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
         {/* Drawing toolbar */}
         <nav
           aria-label="Drawing tools"
-          className="flex w-11 shrink-0 flex-col items-center gap-0.5 overflow-y-auto border-r border-border py-1.5"
+          className={cn(
+            "w-11 shrink-0 flex-col items-center gap-0.5 overflow-y-auto border-r border-border py-1.5 md:flex",
+            mobileToolsOpen ? "flex" : "hidden",
+          )}
         >
+          <button
+            type="button"
+            onClick={() => setMobileToolsOpen(false)}
+            aria-label="Close drawing tools"
+            title="Close drawing tools"
+            className="mb-1 inline-flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground md:hidden"
+          >
+            <PanelLeftClose className="h-4 w-4" />
+          </button>
           {TOOLS.map((t) => (
             <ToolButton key={t.id} label={t.label} active={tool === t.id} onClick={() => setTool(t.id)}>
               <t.icon className="h-4 w-4" />
