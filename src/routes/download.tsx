@@ -135,6 +135,7 @@ function DownloadPage() {
 
         {/* PLATFORM GRID */}
         <section className="mx-auto max-w-6xl px-5 pb-14 sm:px-6 sm:pb-20">
+          <h2 className="sr-only">Download options</h2>
           <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
             {PLATFORMS.map((p) => {
               const available = p.status === "INSTALL" && !!p.href;
