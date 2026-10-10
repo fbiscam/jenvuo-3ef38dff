@@ -29,6 +29,7 @@ export const Route = createFileRoute("/sitemap.xml")({
           { path: "/about", changefreq: "monthly", priority: "0.7" },
           { path: "/contact", changefreq: "monthly", priority: "0.7" },
           { path: "/ai-engine", changefreq: "monthly", priority: "0.7" },
+          { path: "/strategies/ict-gold-trading", changefreq: "monthly", priority: "0.8" },
           { path: "/llm", changefreq: "monthly", priority: "0.6" },
           { path: "/development", changefreq: "monthly", priority: "0.5" },
           { path: "/privacy", changefreq: "yearly", priority: "0.3" },
@@ -86,12 +87,11 @@ export const Route = createFileRoute("/sitemap.xml")({
           // ignore — sitemap still serves with static routes
         }
 
-        const today = new Date().toISOString().slice(0, 10);
         const urls = entries.map((e) =>
           [
             `  <url>`,
             `    <loc>${e.origin ?? BASE_URL}${e.path}</loc>`,
-            `    <lastmod>${e.lastmod ?? today}</lastmod>`,
+            e.lastmod ? `    <lastmod>${e.lastmod}</lastmod>` : null,
             e.changefreq ? `    <changefreq>${e.changefreq}</changefreq>` : null,
             e.priority ? `    <priority>${e.priority}</priority>` : null,
             `  </url>`,

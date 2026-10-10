@@ -62,6 +62,7 @@ import { Route as OpsX9k27m4nIndexRouteImport } from './routes/ops-x9k2-7m4n.ind
 import { Route as OpsX9k27m4nHubRouteImport } from './routes/ops-x9k2-7m4n.hub'
 import { Route as OpsX9k27m4nLeadsCreditsRouteImport } from './routes/ops-x9k2-7m4n.leads-credits'
 import { Route as OpsX9k27m4nPaymentsRouteImport } from './routes/ops-x9k2-7m4n.payments'
+import { Route as StrategiesIctGoldTradingRouteImport } from './routes/strategies.ict-gold-trading'
 import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
 import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated/dashboard.index'
 import { Route as AuthenticatedDashboardAnalyticsRouteImport } from './routes/_authenticated/dashboard.analytics'
@@ -379,6 +380,12 @@ const OpsX9k27m4nPaymentsRoute = OpsX9k27m4nPaymentsRouteImport.update({
   path: '/payments',
   getParentRoute: () => OpsX9k27m4nRoute,
 } as any)
+const StrategiesIctGoldTradingRoute =
+  StrategiesIctGoldTradingRouteImport.update({
+    id: '/strategies/ict-gold-trading',
+    path: '/strategies/ict-gold-trading',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const DotlovableOauthConsentRoute = DotlovableOauthConsentRouteImport.update({
   id: '/.lovable/oauth/consent',
   path: '/.lovable/oauth/consent',
@@ -724,6 +731,7 @@ export interface FileRoutesByFullPath {
   '/ops-x9k2-7m4n/hub': typeof OpsX9k27m4nHubRoute
   '/ops-x9k2-7m4n/leads-credits': typeof OpsX9k27m4nLeadsCreditsRoute
   '/ops-x9k2-7m4n/payments': typeof OpsX9k27m4nPaymentsRoute
+  '/strategies/ict-gold-trading': typeof StrategiesIctGoldTradingRoute
   '/help/': typeof HelpIndexRoute
   '/insights/': typeof InsightsIndexRoute
   '/jenvu-ops-x9k2/': typeof JenvuOpsX9k2IndexRoute
@@ -824,6 +832,7 @@ export interface FileRoutesByTo {
   '/ops-x9k2-7m4n/hub': typeof OpsX9k27m4nHubRoute
   '/ops-x9k2-7m4n/leads-credits': typeof OpsX9k27m4nLeadsCreditsRoute
   '/ops-x9k2-7m4n/payments': typeof OpsX9k27m4nPaymentsRoute
+  '/strategies/ict-gold-trading': typeof StrategiesIctGoldTradingRoute
   '/help': typeof HelpIndexRoute
   '/insights': typeof InsightsIndexRoute
   '/jenvu-ops-x9k2': typeof JenvuOpsX9k2IndexRoute
@@ -931,6 +940,7 @@ export interface FileRoutesById {
   '/ops-x9k2-7m4n/hub': typeof OpsX9k27m4nHubRoute
   '/ops-x9k2-7m4n/leads-credits': typeof OpsX9k27m4nLeadsCreditsRoute
   '/ops-x9k2-7m4n/payments': typeof OpsX9k27m4nPaymentsRoute
+  '/strategies/ict-gold-trading': typeof StrategiesIctGoldTradingRoute
   '/help/': typeof HelpIndexRoute
   '/insights/': typeof InsightsIndexRoute
   '/jenvu-ops-x9k2/': typeof JenvuOpsX9k2IndexRoute
@@ -1038,6 +1048,7 @@ export interface FileRouteTypes {
     | '/ops-x9k2-7m4n/hub'
     | '/ops-x9k2-7m4n/leads-credits'
     | '/ops-x9k2-7m4n/payments'
+    | '/strategies/ict-gold-trading'
     | '/help/'
     | '/insights/'
     | '/jenvu-ops-x9k2/'
@@ -1138,6 +1149,7 @@ export interface FileRouteTypes {
     | '/ops-x9k2-7m4n/hub'
     | '/ops-x9k2-7m4n/leads-credits'
     | '/ops-x9k2-7m4n/payments'
+    | '/strategies/ict-gold-trading'
     | '/help'
     | '/insights'
     | '/jenvu-ops-x9k2'
@@ -1244,6 +1256,7 @@ export interface FileRouteTypes {
     | '/ops-x9k2-7m4n/hub'
     | '/ops-x9k2-7m4n/leads-credits'
     | '/ops-x9k2-7m4n/payments'
+    | '/strategies/ict-gold-trading'
     | '/help/'
     | '/insights/'
     | '/jenvu-ops-x9k2/'
@@ -1336,6 +1349,7 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
   Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
+  StrategiesIctGoldTradingRoute: typeof StrategiesIctGoldTradingRoute
   HelpIndexRoute: typeof HelpIndexRoute
   DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
   ApiPublicGoldRoute: typeof ApiPublicGoldRoute
@@ -1734,6 +1748,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/ops-x9k2-7m4n/payments'
       preLoaderRoute: typeof OpsX9k27m4nPaymentsRouteImport
       parentRoute: typeof OpsX9k27m4nRoute
+    }
+    '/strategies/ict-gold-trading': {
+      id: '/strategies/ict-gold-trading'
+      path: '/strategies/ict-gold-trading'
+      fullPath: '/strategies/ict-gold-trading'
+      preLoaderRoute: typeof StrategiesIctGoldTradingRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/.lovable/oauth/consent': {
       id: '/.lovable/oauth/consent'
@@ -2293,6 +2314,7 @@ const rootRouteChildren: RootRouteChildren = {
   TermsRoute: TermsRoute,
   Char91DotwellKnownChar93OauthProtectedResourceRoute:
     Char91DotwellKnownChar93OauthProtectedResourceRoute,
+  StrategiesIctGoldTradingRoute: StrategiesIctGoldTradingRoute,
   HelpIndexRoute: HelpIndexRoute,
   DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
   ApiPublicGoldRoute: ApiPublicGoldRoute,

@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { PageShell, H2, P, UL } from "@/components/PageShell";
 
 export const Route = createFileRoute("/ai-engine")({
@@ -54,6 +54,10 @@ function AIPage() {
           The plan appears in the terminal chat with clear entry, invalidation and target
           levels. Relevant FVGs, order blocks and liquidity zones can also be marked on the
           TradingView chart when the user explicitly requests analysis.
+        </P>
+        <P>
+          New to these concepts? Read the{" "}
+          <Link to="/strategies/ict-gold-trading" className="underline">ICT &amp; SMC gold trading guide</Link>.
         </P>
       </section>
     </PageShell>
