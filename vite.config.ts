@@ -9,6 +9,7 @@ import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 
 import type { Plugin, ViteDevServer } from "vite";
 import { loadEnv } from "vite";
+import { mcpPlugin } from "@lovable.dev/mcp-js/stacks/tanstack/vite";
 import { promises as fs } from "node:fs";
 import path from "node:path";
 
@@ -121,7 +122,7 @@ export default defineConfig({
     server: { entry: "server" },
   },
   vite: {
-    plugins: [serverFnManifestRegen()],
+    plugins: [serverFnManifestRegen(), mcpPlugin()],
     server: {
       // Allow the jenvu.com subdomains so dev/preview can serve them too.
       allowedHosts: [".jenvu.com", ".lovable.app", "localhost"],

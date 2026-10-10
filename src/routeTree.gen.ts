@@ -31,6 +31,7 @@ import { Route as LeadsRouteImport } from './routes/leads'
 import { Route as LeadsSigninRouteImport } from './routes/leads-signin'
 import { Route as LeadsSignupRouteImport } from './routes/leads-signup'
 import { Route as LlmRouteImport } from './routes/llm'
+import { Route as McpRouteImport } from './routes/mcp'
 import { Route as OpsX9k27m4nRouteImport } from './routes/ops-x9k2-7m4n'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as PrivacyRouteImport } from './routes/privacy'
@@ -40,6 +41,7 @@ import { Route as ScamCheckRouteImport } from './routes/scam-check'
 import { Route as ScamToolRouteImport } from './routes/scam-tool'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as TermsRouteImport } from './routes/terms'
+import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedInboxRouteImport } from './routes/_authenticated/inbox'
 import { Route as AuthenticatedTerminalRouteImport } from './routes/_authenticated/terminal'
@@ -60,6 +62,7 @@ import { Route as OpsX9k27m4nIndexRouteImport } from './routes/ops-x9k2-7m4n.ind
 import { Route as OpsX9k27m4nHubRouteImport } from './routes/ops-x9k2-7m4n.hub'
 import { Route as OpsX9k27m4nLeadsCreditsRouteImport } from './routes/ops-x9k2-7m4n.leads-credits'
 import { Route as OpsX9k27m4nPaymentsRouteImport } from './routes/ops-x9k2-7m4n.payments'
+import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
 import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated/dashboard.index'
 import { Route as AuthenticatedDashboardAnalyticsRouteImport } from './routes/_authenticated/dashboard.analytics'
 import { Route as AuthenticatedDashboardApiRouteImport } from './routes/_authenticated/dashboard.api'
@@ -220,6 +223,11 @@ const LlmRoute = LlmRouteImport.update({
   path: '/llm',
   getParentRoute: () => rootRouteImport,
 } as any)
+const McpRoute = McpRouteImport.update({
+  id: '/mcp',
+  path: '/mcp',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const OpsX9k27m4nRoute = OpsX9k27m4nRouteImport.update({
   id: '/ops-x9k2-7m4n',
   path: '/ops-x9k2-7m4n',
@@ -265,6 +273,12 @@ const TermsRoute = TermsRouteImport.update({
   path: '/terms',
   getParentRoute: () => rootRouteImport,
 } as any)
+const Char91DotwellKnownChar93OauthProtectedResourceRoute =
+  Char91DotwellKnownChar93OauthProtectedResourceRouteImport.update({
+    id: '/.well-known/oauth-protected-resource',
+    path: '/.well-known/oauth-protected-resource',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -364,6 +378,11 @@ const OpsX9k27m4nPaymentsRoute = OpsX9k27m4nPaymentsRouteImport.update({
   id: '/payments',
   path: '/payments',
   getParentRoute: () => OpsX9k27m4nRoute,
+} as any)
+const DotlovableOauthConsentRoute = DotlovableOauthConsentRouteImport.update({
+  id: '/.lovable/oauth/consent',
+  path: '/.lovable/oauth/consent',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedDashboardIndexRoute =
   AuthenticatedDashboardIndexRouteImport.update({
@@ -679,6 +698,7 @@ export interface FileRoutesByFullPath {
   '/leads-signin': typeof LeadsSigninRoute
   '/leads-signup': typeof LeadsSignupRoute
   '/llm': typeof LlmRoute
+  '/mcp': typeof McpRoute
   '/ops-x9k2-7m4n': typeof OpsX9k27m4nRouteWithChildren
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
@@ -688,6 +708,7 @@ export interface FileRoutesByFullPath {
   '/scam-tool': typeof ScamToolRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/dashboard': typeof AuthenticatedDashboardRouteWithChildren
   '/inbox': typeof AuthenticatedInboxRoute
   '/terminal': typeof AuthenticatedTerminalRoute
@@ -708,6 +729,7 @@ export interface FileRoutesByFullPath {
   '/jenvu-ops-x9k2/': typeof JenvuOpsX9k2IndexRoute
   '/leads/': typeof LeadsIndexRoute
   '/ops-x9k2-7m4n/': typeof OpsX9k27m4nIndexRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
   '/dashboard/api': typeof AuthenticatedDashboardApiRoute
   '/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
@@ -778,6 +800,7 @@ export interface FileRoutesByTo {
   '/leads-signin': typeof LeadsSigninRoute
   '/leads-signup': typeof LeadsSignupRoute
   '/llm': typeof LlmRoute
+  '/mcp': typeof McpRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/refund': typeof RefundRoute
@@ -786,6 +809,7 @@ export interface FileRoutesByTo {
   '/scam-tool': typeof ScamToolRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/inbox': typeof AuthenticatedInboxRoute
   '/terminal': typeof AuthenticatedTerminalRoute
   '/insights/$slug': typeof InsightsSlugRoute
@@ -805,6 +829,7 @@ export interface FileRoutesByTo {
   '/jenvu-ops-x9k2': typeof JenvuOpsX9k2IndexRoute
   '/leads': typeof LeadsIndexRoute
   '/ops-x9k2-7m4n': typeof OpsX9k27m4nIndexRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
   '/dashboard/api': typeof AuthenticatedDashboardApiRoute
   '/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
@@ -880,6 +905,7 @@ export interface FileRoutesById {
   '/leads-signin': typeof LeadsSigninRoute
   '/leads-signup': typeof LeadsSignupRoute
   '/llm': typeof LlmRoute
+  '/mcp': typeof McpRoute
   '/ops-x9k2-7m4n': typeof OpsX9k27m4nRouteWithChildren
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
@@ -889,6 +915,7 @@ export interface FileRoutesById {
   '/scam-tool': typeof ScamToolRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRouteWithChildren
   '/_authenticated/inbox': typeof AuthenticatedInboxRoute
   '/_authenticated/terminal': typeof AuthenticatedTerminalRoute
@@ -909,6 +936,7 @@ export interface FileRoutesById {
   '/jenvu-ops-x9k2/': typeof JenvuOpsX9k2IndexRoute
   '/leads/': typeof LeadsIndexRoute
   '/ops-x9k2-7m4n/': typeof OpsX9k27m4nIndexRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/_authenticated/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
   '/_authenticated/dashboard/api': typeof AuthenticatedDashboardApiRoute
   '/_authenticated/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
@@ -984,6 +1012,7 @@ export interface FileRouteTypes {
     | '/leads-signin'
     | '/leads-signup'
     | '/llm'
+    | '/mcp'
     | '/ops-x9k2-7m4n'
     | '/pricing'
     | '/privacy'
@@ -993,6 +1022,7 @@ export interface FileRouteTypes {
     | '/scam-tool'
     | '/sitemap.xml'
     | '/terms'
+    | '/.well-known/oauth-protected-resource'
     | '/dashboard'
     | '/inbox'
     | '/terminal'
@@ -1013,6 +1043,7 @@ export interface FileRouteTypes {
     | '/jenvu-ops-x9k2/'
     | '/leads/'
     | '/ops-x9k2-7m4n/'
+    | '/.lovable/oauth/consent'
     | '/dashboard/analytics'
     | '/dashboard/api'
     | '/dashboard/billing'
@@ -1083,6 +1114,7 @@ export interface FileRouteTypes {
     | '/leads-signin'
     | '/leads-signup'
     | '/llm'
+    | '/mcp'
     | '/pricing'
     | '/privacy'
     | '/refund'
@@ -1091,6 +1123,7 @@ export interface FileRouteTypes {
     | '/scam-tool'
     | '/sitemap.xml'
     | '/terms'
+    | '/.well-known/oauth-protected-resource'
     | '/inbox'
     | '/terminal'
     | '/insights/$slug'
@@ -1110,6 +1143,7 @@ export interface FileRouteTypes {
     | '/jenvu-ops-x9k2'
     | '/leads'
     | '/ops-x9k2-7m4n'
+    | '/.lovable/oauth/consent'
     | '/dashboard/analytics'
     | '/dashboard/api'
     | '/dashboard/billing'
@@ -1184,6 +1218,7 @@ export interface FileRouteTypes {
     | '/leads-signin'
     | '/leads-signup'
     | '/llm'
+    | '/mcp'
     | '/ops-x9k2-7m4n'
     | '/pricing'
     | '/privacy'
@@ -1193,6 +1228,7 @@ export interface FileRouteTypes {
     | '/scam-tool'
     | '/sitemap.xml'
     | '/terms'
+    | '/.well-known/oauth-protected-resource'
     | '/_authenticated/dashboard'
     | '/_authenticated/inbox'
     | '/_authenticated/terminal'
@@ -1213,6 +1249,7 @@ export interface FileRouteTypes {
     | '/jenvu-ops-x9k2/'
     | '/leads/'
     | '/ops-x9k2-7m4n/'
+    | '/.lovable/oauth/consent'
     | '/_authenticated/dashboard/analytics'
     | '/_authenticated/dashboard/api'
     | '/_authenticated/dashboard/billing'
@@ -1288,6 +1325,7 @@ export interface RootRouteChildren {
   LeadsSigninRoute: typeof LeadsSigninRoute
   LeadsSignupRoute: typeof LeadsSignupRoute
   LlmRoute: typeof LlmRoute
+  McpRoute: typeof McpRoute
   OpsX9k27m4nRoute: typeof OpsX9k27m4nRouteWithChildren
   PricingRoute: typeof PricingRoute
   PrivacyRoute: typeof PrivacyRoute
@@ -1297,7 +1335,9 @@ export interface RootRouteChildren {
   ScamToolRoute: typeof ScamToolRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
+  Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   HelpIndexRoute: typeof HelpIndexRoute
+  DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
   ApiPublicGoldRoute: typeof ApiPublicGoldRoute
   HelpCollectionSlugRoute: typeof HelpCollectionSlugRoute
   LovableEmailEventsRoute: typeof LovableEmailEventsRoute
@@ -1478,6 +1518,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LlmRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/mcp': {
+      id: '/mcp'
+      path: '/mcp'
+      fullPath: '/mcp'
+      preLoaderRoute: typeof McpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/ops-x9k2-7m4n': {
       id: '/ops-x9k2-7m4n'
       path: '/ops-x9k2-7m4n'
@@ -1539,6 +1586,13 @@ declare module '@tanstack/react-router' {
       path: '/terms'
       fullPath: '/terms'
       preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/.well-known/oauth-protected-resource': {
+      id: '/.well-known/oauth-protected-resource'
+      path: '/.well-known/oauth-protected-resource'
+      fullPath: '/.well-known/oauth-protected-resource'
+      preLoaderRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/dashboard': {
@@ -1680,6 +1734,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/ops-x9k2-7m4n/payments'
       preLoaderRoute: typeof OpsX9k27m4nPaymentsRouteImport
       parentRoute: typeof OpsX9k27m4nRoute
+    }
+    '/.lovable/oauth/consent': {
+      id: '/.lovable/oauth/consent'
+      path: '/.lovable/oauth/consent'
+      fullPath: '/.lovable/oauth/consent'
+      preLoaderRoute: typeof DotlovableOauthConsentRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/dashboard/': {
       id: '/_authenticated/dashboard/'
@@ -2220,6 +2281,7 @@ const rootRouteChildren: RootRouteChildren = {
   LeadsSigninRoute: LeadsSigninRoute,
   LeadsSignupRoute: LeadsSignupRoute,
   LlmRoute: LlmRoute,
+  McpRoute: McpRoute,
   OpsX9k27m4nRoute: OpsX9k27m4nRouteWithChildren,
   PricingRoute: PricingRoute,
   PrivacyRoute: PrivacyRoute,
@@ -2229,7 +2291,10 @@ const rootRouteChildren: RootRouteChildren = {
   ScamToolRoute: ScamToolRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermsRoute: TermsRoute,
+  Char91DotwellKnownChar93OauthProtectedResourceRoute:
+    Char91DotwellKnownChar93OauthProtectedResourceRoute,
   HelpIndexRoute: HelpIndexRoute,
+  DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
   ApiPublicGoldRoute: ApiPublicGoldRoute,
   HelpCollectionSlugRoute: HelpCollectionSlugRoute,
   LovableEmailEventsRoute: LovableEmailEventsRoute,
