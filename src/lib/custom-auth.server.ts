@@ -361,21 +361,23 @@ export async function verifySignupOtp(input: { email: string; code: string; pass
 async function claimProTrial(userId: string, fingerprint?: string, ip?: string) {
   const { supabaseAdmin } = await import('@/integrations/supabase/client.server')
   const admin = supabaseAdmin as any
-  const fp = (fingerprint || '').slice(0, 128) || null
+  const rawFp = typeof fingerprint === 'string' ? fingerprint.slice(0, 128) : ''
+  const fp = /^[A-Za-z0-9_-]{8,128}$/.test(rawFp) ? rawFp : null
   const ipHash = ip ? await sha256Hex(`jenvu-trial:${ip}`) : null
 
   let alreadyUsed = false
   if (fp || ipHash) {
-    const filters: string[] = []
-    if (fp) filters.push(`fingerprint.eq.${fp}`)
-    if (ipHash) filters.push(`ip_hash.eq.${ipHash}`)
-    const { data: prior } = await admin
-      .from('trial_claims')
-      .select('id')
-      .or(filters.join(','))
-      .neq('user_id', userId)
-      .limit(1)
-    alreadyUsed = Array.isArray(prior) && prior.length > 0
+    // Separate parameterized lookups — never interpolate caller input into filters.
+    for (const [col, val] of [['fingerprint', fp], ['ip_hash', ipHash]] as const) {
+      if (!val || alreadyUsed) continue
+      const { data: prior } = await admin
+        .from('trial_claims')
+        .select('id')
+        .eq(col, val)
+        .neq('user_id', userId)
+        .limit(1)
+      alreadyUsed = Array.isArray(prior) && prior.length > 0
+    }
   }
 
   if (alreadyUsed) {
