@@ -29,6 +29,7 @@ import {
 import { TerminalWatchlist } from "@/components/terminal/TerminalWatchlist";
 import { transcribeVoiceMessage } from "@/lib/transcription.functions";
 import { cn } from "@/lib/utils";
+import { isMarketClosed } from "@/lib/signals/qualification";
 import { Button } from "@/components/ui/button";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import {
@@ -323,6 +324,7 @@ function TerminalPage() {
   const [activeThreadId, setActiveThreadId] = useState<string | null>(null);
   const [historyOpen, setHistoryOpen] = useState(false);
   const [secondsLeft, setSecondsLeft] = useState(0);
+  const [marketClosed, setMarketClosed] = useState(false);
   const [voiceError, setVoiceError] = useState("");
   const [isRecording, setIsRecording] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
@@ -559,10 +561,17 @@ function TerminalPage() {
   }, [tf.key, deskOpen, theme, watchlistOpen]);
 
   useEffect(() => {
-    setSecondsLeft(candleSecondsLeft(tf.tv));
-    const timer = window.setInterval(() => setSecondsLeft(candleSecondsLeft(tf.tv)), 1000);
+    // Gold weekend (Fri 21:00 → Sun 22:00 UTC): the last candle has closed, so
+    // the timer stops at 00:00 like TradingView instead of counting new candles.
+    const tick = () => {
+      const closed = asset === "XAUUSD" && isMarketClosed(new Date());
+      setMarketClosed(closed);
+      setSecondsLeft(closed ? 0 : candleSecondsLeft(tf.tv));
+    };
+    tick();
+    const timer = window.setInterval(tick, 1000);
     return () => window.clearInterval(timer);
-  }, [tf.tv]);
+  }, [tf.tv, asset]);
 
   useEffect(() => {
     if (!ask.isPending && !voice.isPending && !isRecording) textareaRef.current?.focus();
@@ -696,11 +705,16 @@ function TerminalPage() {
                   )}
                   <div
                     className="flex h-7 items-center gap-1.5 rounded-md px-2 font-mono text-xs font-semibold text-foreground"
-                    title={`Time left on the current ${tf.label} candle`}
-                    aria-label={`Current ${tf.label} candle closes in ${formatCountdown(secondsLeft)}`}
+                    title={marketClosed ? "Gold market is closed for the weekend" : `Time left on the current ${tf.label} candle`}
+                    aria-label={marketClosed ? "Market closed" : `Current ${tf.label} candle closes in ${formatCountdown(secondsLeft)}`}
                   >
                     <Timer className="h-3.5 w-3.5 text-muted-foreground" />
                     {formatCountdown(secondsLeft)}
+                    {marketClosed && (
+                      <span className="whitespace-nowrap font-sans text-[10px] font-medium text-muted-foreground">
+                        Market closed
+                      </span>
+                    )}
                   </div>
                   <button
                     type="button"
