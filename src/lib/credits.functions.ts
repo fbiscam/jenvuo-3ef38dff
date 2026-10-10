@@ -202,7 +202,7 @@ export const getCreditState = createServerFn({ method: "GET" })
 
 const spendSchema = z.object({
   action: z.enum(["voice_query", "signal", "ict_narration", "alert"]),
-  metadata: z.record(z.unknown()).optional(),
+  metadata: z.record(z.string(), z.unknown()).optional(),
 });
 
 // USD-wallet system: pre-flight balance check only. Actual $ cost is deducted
