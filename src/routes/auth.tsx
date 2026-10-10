@@ -1,6 +1,7 @@
 import * as React from "react";
 import { goAfterSignIn } from "@/lib/cross-domain-session";
 import { createFileRoute, useNavigate, Link, redirect } from "@tanstack/react-router";
+import { oauthReturnPath } from "@/lib/oauth-return-path";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { Mail, Lock, ArrowRight, User, Loader2, Eye, EyeOff, Globe } from "lucide-react";
@@ -39,6 +40,11 @@ type AuthSearch = { redirect?: string; emailChanged?: "1"; newEmail?: string; mf
 export function sanitizeRedirect(r?: string): string {
   if (!r || typeof r !== "string") return "/dashboard";
   if (!r.startsWith("/") || r.startsWith("//")) return "/dashboard";
+  // OAuth consent needs its authorization_id query preserved.
+  if (r.startsWith("/.lovable/oauth/consent")) {
+    const safe = oauthReturnPath(r);
+    return safe === "/" ? "/dashboard" : safe;
+  }
   // Strip query/hash — TanStack's navigate({ to }) expects a route path only.
   // Lovable preview appends cache-buster params (__lovable_sha, __lovable_load_id)
   // that break route matching and cause sign-in to silently stall on /auth.

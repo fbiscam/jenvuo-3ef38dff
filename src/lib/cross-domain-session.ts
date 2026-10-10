@@ -181,6 +181,11 @@ function canonicalDestination(path: string): string | null {
  * to in-app navigation.
  */
 export async function goAfterSignIn(path: string, fallback: () => void): Promise<boolean> {
+  // OAuth consent must stay on the current host with its query intact.
+  if (typeof window !== "undefined" && path.startsWith("/.lovable/oauth/consent")) {
+    window.location.replace(path);
+    return true;
+  }
   const url = typeof window === "undefined" ? null : canonicalDestination(path);
   if (!url || new URL(url).host === window.location.host) {
     fallback();
