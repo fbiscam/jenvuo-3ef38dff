@@ -14,3 +14,4 @@
 - Build authenticator 2FA setup from the auth service's returned QR/URI and remove incomplete factors before retrying; this avoids mismatched secrets and duplicate enrollment failures.
 - Chart, pressure, zone, FVG and sweep rules live in `src/lib/chart/AGENTS.md`.
 - Gold terminal candles use Gate XAU_USDT gold contract as the primary feed (PAXG token was too thin, candle colours differed from TradingView) (Binance only as fallback): Binance blocks the live server region, so Binance-first made preview and live draw different candles and zones.
+- MCP server lives in `src/lib/mcp/` (one tool per file, OAuth via the backend issuer, caller token forwarded so RLS applies): keeps external assistants scoped to the signed-in user's own data.
