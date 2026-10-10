@@ -60,6 +60,7 @@ import { Route as OpsX9k27m4nIndexRouteImport } from './routes/ops-x9k2-7m4n.ind
 import { Route as OpsX9k27m4nHubRouteImport } from './routes/ops-x9k2-7m4n.hub'
 import { Route as OpsX9k27m4nLeadsCreditsRouteImport } from './routes/ops-x9k2-7m4n.leads-credits'
 import { Route as OpsX9k27m4nPaymentsRouteImport } from './routes/ops-x9k2-7m4n.payments'
+import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
 import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated/dashboard.index'
 import { Route as AuthenticatedDashboardAnalyticsRouteImport } from './routes/_authenticated/dashboard.analytics'
 import { Route as AuthenticatedDashboardApiRouteImport } from './routes/_authenticated/dashboard.api'
@@ -364,6 +365,11 @@ const OpsX9k27m4nPaymentsRoute = OpsX9k27m4nPaymentsRouteImport.update({
   id: '/payments',
   path: '/payments',
   getParentRoute: () => OpsX9k27m4nRoute,
+} as any)
+const DotlovableOauthConsentRoute = DotlovableOauthConsentRouteImport.update({
+  id: '/.lovable/oauth/consent',
+  path: '/.lovable/oauth/consent',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedDashboardIndexRoute =
   AuthenticatedDashboardIndexRouteImport.update({
@@ -708,6 +714,7 @@ export interface FileRoutesByFullPath {
   '/jenvu-ops-x9k2/': typeof JenvuOpsX9k2IndexRoute
   '/leads/': typeof LeadsIndexRoute
   '/ops-x9k2-7m4n/': typeof OpsX9k27m4nIndexRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
   '/dashboard/api': typeof AuthenticatedDashboardApiRoute
   '/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
@@ -805,6 +812,7 @@ export interface FileRoutesByTo {
   '/jenvu-ops-x9k2': typeof JenvuOpsX9k2IndexRoute
   '/leads': typeof LeadsIndexRoute
   '/ops-x9k2-7m4n': typeof OpsX9k27m4nIndexRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
   '/dashboard/api': typeof AuthenticatedDashboardApiRoute
   '/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
@@ -909,6 +917,7 @@ export interface FileRoutesById {
   '/jenvu-ops-x9k2/': typeof JenvuOpsX9k2IndexRoute
   '/leads/': typeof LeadsIndexRoute
   '/ops-x9k2-7m4n/': typeof OpsX9k27m4nIndexRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/_authenticated/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
   '/_authenticated/dashboard/api': typeof AuthenticatedDashboardApiRoute
   '/_authenticated/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
@@ -1013,6 +1022,7 @@ export interface FileRouteTypes {
     | '/jenvu-ops-x9k2/'
     | '/leads/'
     | '/ops-x9k2-7m4n/'
+    | '/.lovable/oauth/consent'
     | '/dashboard/analytics'
     | '/dashboard/api'
     | '/dashboard/billing'
@@ -1110,6 +1120,7 @@ export interface FileRouteTypes {
     | '/jenvu-ops-x9k2'
     | '/leads'
     | '/ops-x9k2-7m4n'
+    | '/.lovable/oauth/consent'
     | '/dashboard/analytics'
     | '/dashboard/api'
     | '/dashboard/billing'
@@ -1213,6 +1224,7 @@ export interface FileRouteTypes {
     | '/jenvu-ops-x9k2/'
     | '/leads/'
     | '/ops-x9k2-7m4n/'
+    | '/.lovable/oauth/consent'
     | '/_authenticated/dashboard/analytics'
     | '/_authenticated/dashboard/api'
     | '/_authenticated/dashboard/billing'
@@ -1298,6 +1310,7 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
   HelpIndexRoute: typeof HelpIndexRoute
+  DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
   ApiPublicGoldRoute: typeof ApiPublicGoldRoute
   HelpCollectionSlugRoute: typeof HelpCollectionSlugRoute
   LovableEmailEventsRoute: typeof LovableEmailEventsRoute
@@ -1680,6 +1693,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/ops-x9k2-7m4n/payments'
       preLoaderRoute: typeof OpsX9k27m4nPaymentsRouteImport
       parentRoute: typeof OpsX9k27m4nRoute
+    }
+    '/.lovable/oauth/consent': {
+      id: '/.lovable/oauth/consent'
+      path: '/.lovable/oauth/consent'
+      fullPath: '/.lovable/oauth/consent'
+      preLoaderRoute: typeof DotlovableOauthConsentRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/dashboard/': {
       id: '/_authenticated/dashboard/'
@@ -2230,6 +2250,7 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermsRoute: TermsRoute,
   HelpIndexRoute: HelpIndexRoute,
+  DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
   ApiPublicGoldRoute: ApiPublicGoldRoute,
   HelpCollectionSlugRoute: HelpCollectionSlugRoute,
   LovableEmailEventsRoute: LovableEmailEventsRoute,
