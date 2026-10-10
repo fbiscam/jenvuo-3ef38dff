@@ -323,9 +323,9 @@ function KillzonesPage() {
             return (
               <section key={section}>
                 <div className="mb-3 flex items-center gap-2">
-                  <div className={`${MONO} text-[11px] uppercase tracking-[0.2em] text-zinc-500`}>
+                  <h2 className={`${MONO} text-[11px] font-normal uppercase tracking-[0.2em] text-zinc-500`}>
                     {section}
-                  </div>
+                  </h2>
                   <div className="h-px flex-1 bg-zinc-200" />
                   <div className={`${MONO} text-[10px] text-zinc-400`}>{items.length}</div>
                 </div>
