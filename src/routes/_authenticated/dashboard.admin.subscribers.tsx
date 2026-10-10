@@ -53,10 +53,16 @@ function AdminSubscribersPage() {
 
   const active = rows.filter((r) => r.status === "active").length;
 
+  const csvCell = (v: unknown) => {
+    let s = String(v ?? "");
+    if (/^[=+\-@\t\r]/.test(s)) s = `'${s}`;
+    return `"${s.replace(/"/g, '""')}"`;
+  };
+
   const exportCsv = () => {
     const header = "email,status,subscribed_at\n";
     const body = filtered
-      .map((r) => `${r.email},${r.status},${r.subscribed_at}`)
+      .map((r) => [r.email, r.status, r.subscribed_at].map(csvCell).join(","))
       .join("\n");
     const blob = new Blob([header + body], { type: "text/csv" });
     const url = URL.createObjectURL(blob);

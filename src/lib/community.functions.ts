@@ -54,6 +54,13 @@ async function signAvatars(admin: any, paths: string[]): Promise<Map<string, str
   return map;
 }
 
+function isOwnedMediaRef(ref: unknown, ownerId: string): boolean {
+  if (typeof ref !== "string" || !ref || ref.length > 500) return false;
+  if (/^https?:\/\//i.test(ref)) return true;
+  if (ref.includes("..") || ref.startsWith("/")) return false;
+  return ref.startsWith(`${ownerId}/`);
+}
+
 async function signCommunityMedia(admin: any, paths: string[]): Promise<Map<string, string>> {
   const map = new Map<string, string>();
   const priv = paths.filter((p) => p && !/^https?:\/\//i.test(p));
@@ -87,7 +94,14 @@ async function hydratePosts(admin: any, rows: any[], viewerId: string): Promise<
   const avatarPaths = Array.from(new Set(Array.from(profMap.values()).map((p) => p.avatar).filter((x): x is string => !!x)));
   const avatarSigned = await signAvatars(admin, avatarPaths);
 
-  const allMedia = Array.from(new Set(rows.flatMap((r) => r.media_urls || [])));
+  // Only sign storage paths inside the post author's own folder.
+  const allMedia = Array.from(
+    new Set(
+      rows.flatMap((r) =>
+        (r.media_urls || []).filter((m: string) => isOwnedMediaRef(m, r.author_id)),
+      ),
+    ),
+  );
   const mediaSigned = await signCommunityMedia(admin, allMedia);
 
   // tier lookup
@@ -257,7 +271,9 @@ export const createCommunityPost = createServerFn({ method: "POST" })
     const body = String(d.body || "").trim();
     if (!body && !(d.media_urls || []).length) throw new Error("Post is empty");
     if (body.length > 500) throw new Error("Post too long (max 500 chars)");
-    const media = (d.media_urls || []).slice(0, 4);
+    const media = (Array.isArray(d.media_urls) ? d.media_urls : [])
+      .filter((m) => typeof m === "string" && m.length > 0 && m.length <= 500)
+      .slice(0, 4);
     const cashtags = Array.from(new Set((body.match(/\$[A-Za-z]{1,10}/g) || []).map((s) => s.slice(1).toUpperCase())));
     return { body, media_urls: media, parent_post_id: d.parent_post_id ?? null, cashtags };
   })
@@ -265,6 +281,9 @@ export const createCommunityPost = createServerFn({ method: "POST" })
     // ensure profile exists
     const { data: prof } = await context.supabase.from("community_profiles").select("user_id").eq("user_id", context.userId).maybeSingle();
     if (!prof) throw new Error("Claim a @handle first");
+    if (data.media_urls.some((m) => !isOwnedMediaRef(m, context.userId))) {
+      throw new Error("Invalid media reference");
+    }
     const { data: inserted, error } = await context.supabase
       .from("community_posts")
       .insert({

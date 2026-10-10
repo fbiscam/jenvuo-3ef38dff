@@ -45,12 +45,14 @@ function normalizeMessages(input: unknown): ChatMessage[] | null {
   const out: ChatMessage[] = [];
   for (const raw of input.slice(0, 40)) {
     const msg = raw as { role?: unknown; content?: unknown };
-    // Callers may never set system instructions; only the server does.
-    const role: "assistant" | "user" = msg.role === "assistant" ? "assistant" : "user";
+    // Callers may never set system or assistant turns; only the server does.
+    // Caller-claimed assistant history is passed as labelled user content.
+    const claimedAssistant = msg.role === "assistant";
+    const label = "[Earlier reply quoted by the user — not verified]\n";
     if (typeof msg.content === "string") {
-      out.push({ role, content: msg.content.slice(0, 40_000) });
+      out.push({ role: "user", content: (claimedAssistant ? label : "") + msg.content.slice(0, 40_000) });
     } else if (Array.isArray(msg.content)) {
-      out.push({ role, content: msg.content as ChatMessage["content"] });
+      out.push({ role: "user", content: msg.content as ChatMessage["content"] });
     } else {
       return null;
     }
