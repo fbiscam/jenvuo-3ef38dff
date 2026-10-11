@@ -208,7 +208,7 @@ function Profile() {
         <div className="rounded-2xl border border-border bg-card p-4">
           <div className="text-xs text-muted-foreground">Current balance</div>
           <div className="mt-1 text-3xl font-bold tabular-nums">${Number(balance).toFixed(2)}</div>
-          <div className="mt-1 text-xs text-muted-foreground capitalize">Plan: {plan ?? "free"}</div>
+          <div className="mt-1 text-xs text-muted-foreground capitalize">Plan: {typeof plan === "string" ? plan : plan?.name ?? "free"}</div>
           <Link to="/dashboard/pay" className="mt-3 block text-center rounded-xl bg-primary text-primary-foreground py-2.5 font-semibold">Add funds</Link>
         </div>
       </section>
