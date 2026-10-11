@@ -38,7 +38,6 @@ const GROUPS: Array<{ label: string; items: WatchItem[] }> = [
   {
     label: "Crypto",
     items: [
-      { symbol: "BTCUSD", name: "Bitcoin / U.S. Dollar", logo: btcLogo, chartable: "BTCUSD" },
       { symbol: "ETHUSD", name: "Ethereum / U.S. Dollar", logo: ethLogo },
     ],
   },

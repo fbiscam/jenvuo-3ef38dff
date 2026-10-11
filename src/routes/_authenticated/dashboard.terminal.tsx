@@ -298,12 +298,14 @@ function TerminalPage() {
   }, []);
   useEffect(() => {
     try {
-      if (window.localStorage.getItem("jenvu-terminal-asset") === "BTCUSD") setAsset("BTCUSD");
+      window.localStorage.removeItem("jenvu-terminal-asset");
+      setAsset("XAUUSD");
     } catch {
       /* storage unavailable */
     }
   }, []);
-  const changeAsset = (next: "XAUUSD" | "BTCUSD") => {
+  const changeAsset = (_next: "XAUUSD" | "BTCUSD") => {
+    const next = "XAUUSD" as const;
     setAsset(next);
     try {
       window.localStorage.setItem("jenvu-terminal-asset", next);
