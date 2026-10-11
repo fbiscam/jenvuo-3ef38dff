@@ -336,7 +336,10 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
   const lastGoodBarsRef = useRef<{ key: string; bars: OhlcvBar[] } | null>(null);
   const rawBars: OhlcvBar[] = useMemo(() => {
     const key = `${asset}:${timeframe.key}`;
-    const next = payload?.bars ?? [];
+    // Gold feed trades 24/7, but real gold is shut Fri 21:00 → Sun 22:00 UTC.
+    // Drop candles that open inside that window so the chart matches TradingView.
+    const fed = payload?.bars ?? [];
+    const next = asset === "XAUUSD" ? fed.filter((b) => !isMarketClosed(new Date(Number(b.time) * 1000))) : fed;
     if (next.length) {
       lastGoodBarsRef.current = { key, bars: next };
       return next;
