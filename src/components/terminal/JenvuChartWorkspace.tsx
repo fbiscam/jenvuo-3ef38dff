@@ -505,23 +505,6 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
             {mobileToolsOpen ? <PanelLeftClose className="h-4 w-4" /> : <PanelLeftOpen className="h-4 w-4" />}
           </button>
           <span className="hidden md:inline-flex"><XauUsdLogo size={22} /></span>
-          <div className="ml-1 flex shrink-0 items-center rounded-md border border-border p-0.5" role="group" aria-label="Trading pair">
-            {(["XAUUSD", "BTCUSD"] as const).map((a) => (
-              <button
-                type="button"
-                key={a}
-                aria-pressed={asset === a}
-                onClick={() => onAssetChange?.(a)}
-                className={cn(
-                  "h-6 rounded px-2 font-mono text-xs font-semibold text-muted-foreground transition-colors hover:text-foreground",
-                  asset === a && "bg-accent text-foreground",
-                )}
-              >
-                {a === "XAUUSD" ? "XAU/USD" : "BTC/USD"}
-              </button>
-            ))}
-          </div>
-          <span className="text-sm font-semibold tracking-tight">{"\n"}</span>
         </div>
         <div className="flex shrink-0 items-center" role="group" aria-label="Chart timeframe">
           {timeframes.map((item) => (
