@@ -32,6 +32,7 @@ import { Route as LeadsSigninRouteImport } from './routes/leads-signin'
 import { Route as LeadsSignupRouteImport } from './routes/leads-signup'
 import { Route as LlmRouteImport } from './routes/llm'
 import { Route as McpRouteImport } from './routes/mcp'
+import { Route as MobileRouteImport } from './routes/mobile'
 import { Route as OpsX9k27m4nRouteImport } from './routes/ops-x9k2-7m4n'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as PrivacyRouteImport } from './routes/privacy'
@@ -227,6 +228,11 @@ const LlmRoute = LlmRouteImport.update({
 const McpRoute = McpRouteImport.update({
   id: '/mcp',
   path: '/mcp',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MobileRoute = MobileRouteImport.update({
+  id: '/mobile',
+  path: '/mobile',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OpsX9k27m4nRoute = OpsX9k27m4nRouteImport.update({
@@ -706,6 +712,7 @@ export interface FileRoutesByFullPath {
   '/leads-signup': typeof LeadsSignupRoute
   '/llm': typeof LlmRoute
   '/mcp': typeof McpRoute
+  '/mobile': typeof MobileRoute
   '/ops-x9k2-7m4n': typeof OpsX9k27m4nRouteWithChildren
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
@@ -809,6 +816,7 @@ export interface FileRoutesByTo {
   '/leads-signup': typeof LeadsSignupRoute
   '/llm': typeof LlmRoute
   '/mcp': typeof McpRoute
+  '/mobile': typeof MobileRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/refund': typeof RefundRoute
@@ -915,6 +923,7 @@ export interface FileRoutesById {
   '/leads-signup': typeof LeadsSignupRoute
   '/llm': typeof LlmRoute
   '/mcp': typeof McpRoute
+  '/mobile': typeof MobileRoute
   '/ops-x9k2-7m4n': typeof OpsX9k27m4nRouteWithChildren
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
@@ -1023,6 +1032,7 @@ export interface FileRouteTypes {
     | '/leads-signup'
     | '/llm'
     | '/mcp'
+    | '/mobile'
     | '/ops-x9k2-7m4n'
     | '/pricing'
     | '/privacy'
@@ -1126,6 +1136,7 @@ export interface FileRouteTypes {
     | '/leads-signup'
     | '/llm'
     | '/mcp'
+    | '/mobile'
     | '/pricing'
     | '/privacy'
     | '/refund'
@@ -1231,6 +1242,7 @@ export interface FileRouteTypes {
     | '/leads-signup'
     | '/llm'
     | '/mcp'
+    | '/mobile'
     | '/ops-x9k2-7m4n'
     | '/pricing'
     | '/privacy'
@@ -1339,6 +1351,7 @@ export interface RootRouteChildren {
   LeadsSignupRoute: typeof LeadsSignupRoute
   LlmRoute: typeof LlmRoute
   McpRoute: typeof McpRoute
+  MobileRoute: typeof MobileRoute
   OpsX9k27m4nRoute: typeof OpsX9k27m4nRouteWithChildren
   PricingRoute: typeof PricingRoute
   PrivacyRoute: typeof PrivacyRoute
@@ -1537,6 +1550,13 @@ declare module '@tanstack/react-router' {
       path: '/mcp'
       fullPath: '/mcp'
       preLoaderRoute: typeof McpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mobile': {
+      id: '/mobile'
+      path: '/mobile'
+      fullPath: '/mobile'
+      preLoaderRoute: typeof MobileRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/ops-x9k2-7m4n': {
@@ -2303,6 +2323,7 @@ const rootRouteChildren: RootRouteChildren = {
   LeadsSignupRoute: LeadsSignupRoute,
   LlmRoute: LlmRoute,
   McpRoute: McpRoute,
+  MobileRoute: MobileRoute,
   OpsX9k27m4nRoute: OpsX9k27m4nRouteWithChildren,
   PricingRoute: PricingRoute,
   PrivacyRoute: PrivacyRoute,
