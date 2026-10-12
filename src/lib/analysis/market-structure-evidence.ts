@@ -129,10 +129,13 @@ export function detectMarketStructureEvidence(
     const candle = candles[i];
     const left = candles.slice(i - radius, i);
     const right = candles.slice(i + 1, i + radius + 1);
+    // Equal highs/lows (very common on gold) used to cancel each other so no
+    // swing was drawn at all. The first candle of an equal pair now wins:
+    // strictly beats the left side, ties allowed on the right side.
     const isHigh =
-      left.every((item) => candle.h > item.h) && right.every((item) => candle.h > item.h);
+      left.every((item) => candle.h > item.h) && right.every((item) => candle.h >= item.h);
     const isLow =
-      left.every((item) => candle.l < item.l) && right.every((item) => candle.l < item.l);
+      left.every((item) => candle.l < item.l) && right.every((item) => candle.l <= item.l);
     if (isHigh) {
       raw.push({
         index: i,
