@@ -67,7 +67,6 @@ const SD_ZONE_TIMEFRAMES = new Set(["1m", "5m", "15m", "30m", "45m", "1h", "4h",
 /** "Previous zones & FVG" (last 10 strategy zones) and its switch: 15m and higher only. */
 const SD_HISTORY_TIMEFRAMES = new Set(["15m", "30m", "45m", "1h", "4h", "1d"]);
 const SWING_SWEEP_TIMEFRAMES = new Set(["15m", "1h", "4h"]);
-const ORDER_FLOW_TIMEFRAMES = new Set(["1h", "2h", "4h"]);
 
 const MemoChart = memo(ChartCanvas);
 
@@ -149,7 +148,6 @@ const SMC_LABELS: Array<{ key: keyof SmcToggles; label: string; hint: string }> 
   { key: "pressure", label: "Buyer / seller pressure", hint: "Percentages and confirmed trade levels" },
   { key: "priceAction", label: "Swing price action", hint: "Pattern + buyers / sellers at each high / low" },
   { key: "swingSweep", label: "Fresh swing sweep (15M / 1H / 4H)", hint: "Did the fresh high / low sweep \n" },
-  { key: "orderFlow", label: "Order flow delta (1H / 2H / 4H)", hint: "Buyers vs sellers at each fresh high / low" },
   { key: "breaks", label: "BOS / CHoCH", hint: "Confirmed close-through breaks" },
   { key: "sdStrategy", label: "Zone + FVG strategy", hint: "Supply / demand zones, their FVG" },
   { key: "sdHistory", label: "Previous zones & FVG", hint: "Last 10 supply / demand zones with FVG" },
@@ -331,7 +329,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
   const chartSmcToggles = useMemo<SmcToggles>(() => {
     const zonesOn = (smcToggles.sdStrategy ?? true) && SD_ZONE_TIMEFRAMES.has(timeframe.key);
     const historyOn = (smcToggles.sdHistory ?? false) && SD_HISTORY_TIMEFRAMES.has(timeframe.key);
-    return { ...smcToggles, sdZones: zonesOn, sdStrategy: zonesOn, sdHistory: historyOn, sdPlan: true, swingSweep: (smcToggles.swingSweep ?? true) && SWING_SWEEP_TIMEFRAMES.has(timeframe.key), orderFlow: (smcToggles.orderFlow ?? true) && ORDER_FLOW_TIMEFRAMES.has(timeframe.key) };
+    return { ...smcToggles, sdZones: zonesOn, sdStrategy: zonesOn, sdHistory: historyOn, sdPlan: true, swingSweep: (smcToggles.swingSweep ?? true) && SWING_SWEEP_TIMEFRAMES.has(timeframe.key) };
   }, [smcToggles, timeframe.key]);
   // Keep the last non-empty history for this pair/timeframe so a failed or
   // empty poll never blanks the chart.
@@ -589,8 +587,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
               (item) =>
                 (item.key !== "sdStrategy" || SD_ZONE_TIMEFRAMES.has(timeframe.key)) &&
                 (item.key !== "sdHistory" || SD_HISTORY_TIMEFRAMES.has(timeframe.key)) &&
-                (item.key !== "swingSweep" || SWING_SWEEP_TIMEFRAMES.has(timeframe.key)) &&
-                (item.key !== "orderFlow" || ORDER_FLOW_TIMEFRAMES.has(timeframe.key)),
+                (item.key !== "swingSweep" || SWING_SWEEP_TIMEFRAMES.has(timeframe.key)),
             ).map((item) => (
               <label
                 key={item.key}
