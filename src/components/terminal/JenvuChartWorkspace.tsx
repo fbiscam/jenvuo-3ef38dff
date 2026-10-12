@@ -66,7 +66,7 @@ const PRESSURE_TIMEFRAMES = { has: (_key: string) => true };
 const SD_ZONE_TIMEFRAMES = new Set(["1m", "5m", "15m", "30m", "45m", "1h", "4h", "1d"]);
 /** "Previous zones & FVG" (last 10 strategy zones) and its switch: 15m and higher only. */
 const SD_HISTORY_TIMEFRAMES = new Set(["15m", "30m", "45m", "1h", "4h", "1d"]);
-const SWING_SWEEP_TIMEFRAMES = new Set(["15m", "1h", "4h"]);
+const SWING_SWEEP_TIMEFRAMES = new Set(["15m", "1h", "2h", "4h"]);
 
 const MemoChart = memo(ChartCanvas);
 
@@ -147,7 +147,7 @@ const SMC_LABELS: Array<{ key: keyof SmcToggles; label: string; hint: string }> 
   { key: "structure", label: "Swing structure", hint: "HH / HL / LH / LL labels" },
   { key: "pressure", label: "Buyer / seller pressure", hint: "Percentages and confirmed trade levels" },
   { key: "priceAction", label: "Swing price action", hint: "Pattern + buyers / sellers at each high / low" },
-  { key: "swingSweep", label: "Fresh swing sweep (15M / 1H / 4H)", hint: "Did the fresh high / low sweep \n" },
+  { key: "swingSweep", label: "Fresh swing sweep (15M / 1H / 2H / 4H)", hint: "Did the fresh high / low sweep \n" },
   { key: "breaks", label: "BOS / CHoCH", hint: "Confirmed close-through breaks" },
   { key: "sdStrategy", label: "Zone + FVG strategy", hint: "Supply / demand zones, their FVG" },
   { key: "sdHistory", label: "Previous zones & FVG", hint: "Last 10 supply / demand zones with FVG" },
