@@ -9,16 +9,23 @@
  *  - within SWEEP_MOVE_BARS candles (the reclaim candle counts) → confirmed
  *  - only on a later candle up to SWEEP_LATE_BARS → "late move"
  *  - close beyond the swing extreme first → failed
+ * Fakeout filters: a wick poking past the level by < SWEEP_MIN_DEPTH × avg
+ * range is noise. A confirmed sweep whose own candle closed back inside with
+ * a rejection wick ≥ 1.5× body is "strong". Gold volume is ignored (feed-specific).
  * Verdict is "pending" until those candles close, then never changes.
  */
 type Bar = { t: number; o: number; h: number; l: number; c: number };
 
 export type SwingSweepStatus = "confirmed" | "late" | "failed" | "none" | "pending";
-export type SwingSweep = { status: SwingSweepStatus; level: number | null; text: string };
+export type SwingSweep = { status: SwingSweepStatus; level: number | null; text: string; strong?: boolean };
 
 export const SWEEP_LOOKBACK = 10;
 export const SWEEP_MOVE_BARS = 2;
 export const SWEEP_LATE_BARS = 5;
+/** Rejection wick must be ≥ this × body for a "strong" sweep (institutional pin). */
+export const SWEEP_WICK_BODY_RATIO = 1.5;
+/** Wick must poke past the level by ≥ this × average lookback range, else it's noise. */
+export const SWEEP_MIN_DEPTH = 0.1;
 
 export function classifySwingSweep(closed: Bar[], i: number, kind: "high" | "low"): SwingSweep {
   const high = kind === "high";
@@ -28,6 +35,14 @@ export function classifySwingSweep(closed: Bar[], i: number, kind: "high" | "low
   const s = closed[i];
   const took = high ? s.h > level : s.l < level;
   if (!took) return { status: "none", level, text: "No sweep" };
+  let avgRange = 0;
+  for (let k = i - SWEEP_LOOKBACK; k < i; k++) avgRange += closed[k].h - closed[k].l;
+  avgRange /= SWEEP_LOOKBACK;
+  const depth = high ? s.h - level : level - s.l;
+  if (depth < avgRange * SWEEP_MIN_DEPTH) return { status: "none", level, text: "No sweep (tiny poke)" };
+  const body = Math.abs(s.c - s.o);
+  const rejWick = high ? s.h - Math.max(s.o, s.c) : Math.min(s.o, s.c) - s.l;
+  const strongWick = rejWick >= Math.max(body, avgRange * 0.05) * SWEEP_WICK_BODY_RATIO;
   const inside = (c: number) => (high ? c < level : c > level);
   let reclaim = i;
   if (!inside(s.c)) {
@@ -35,6 +50,7 @@ export function classifySwingSweep(closed: Bar[], i: number, kind: "high" | "low
     if (!inside(closed[i + 1].c)) return { status: "none", level, text: "No sweep (broke out)" };
     reclaim = i + 1;
   }
+  const strong = reclaim === i && strongWick;
   const bodyEdge = high ? Math.min(s.o, s.c) : Math.max(s.o, s.c);
   // Candles counted after the swing candle; a next-candle reclaim is itself candle 1.
   const first = reclaim === i ? i + 1 : reclaim;
@@ -49,7 +65,9 @@ export function classifySwingSweep(closed: Bar[], i: number, kind: "high" | "low
     if (high ? c > s.h : c < s.l) return { status: "failed", level, text: "Sweep failed" };
     if (high ? c < bodyEdge : c > bodyEdge) {
       return n < SWEEP_MOVE_BARS
-        ? { status: "confirmed", level, text: "Sweep ✓ confirmed" }
+        ? strong
+          ? { status: "confirmed", level, text: "Sweep ✓ strong", strong: true }
+          : { status: "confirmed", level, text: "Sweep ✓ confirmed" }
         : { status: "late", level, text: "Sweep ✓ late move" };
     }
   }
