@@ -1,4 +1,5 @@
-import { describe, expect, it } from "bun:test";
+import { describe, it } from "node:test";
+import { expect } from "./test-expect";
 import { classifySwingOrderFlow } from "./swing-order-flow";
 
 const bar = (t: number, o: number, h: number, l: number, c: number) => ({ t, o, h, l, c });
