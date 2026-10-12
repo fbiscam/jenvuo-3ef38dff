@@ -11,10 +11,12 @@ describe("classifySwingOrderFlow", () => {
   });
   it("reads buyers when candles close at their highs", () => {
     const bars = [0, 1, 2, 3].map((t) => bar(t, 10, 12, 10, 12));
-    expect(classifySwingOrderFlow(bars, 0)).toMatchObject({ delta: 100, side: "buyers" });
+    expect(classifySwingOrderFlow(bars, 0).delta).toBe(100);
+    expect(classifySwingOrderFlow(bars, 0).side).toBe("buyers");
   });
   it("reads sellers when candles close at their lows", () => {
     const bars = [0, 1, 2, 3].map((t) => bar(t, 12, 12, 10, 10));
-    expect(classifySwingOrderFlow(bars, 0)).toMatchObject({ delta: -100, side: "sellers" });
+    expect(classifySwingOrderFlow(bars, 0).delta).toBe(-100);
+    expect(classifySwingOrderFlow(bars, 0).side).toBe("sellers");
   });
 });
