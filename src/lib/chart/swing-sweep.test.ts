@@ -62,4 +62,24 @@ describe("classifySwingSweep", () => {
     b.push(bar(15, 100.9, 101.1, 100.5, 100.7));
     expect(classifySwingSweep(b, 12, "low").status).toBe("confirmed");
   });
+  test("long rejection wick (>=1.5x body) confirmed sweep is strong", () => {
+    const b = base();
+    b.push(bar(12, 100.5, 103, 100, 100.6));
+    b.push(bar(13, 100.6, 100.8, 98.5, 99));
+    const r = classifySwingSweep(b, 12, "high");
+    expect(r.text).toBe("Sweep ✓ strong");
+  });
+  test("big body with small wick confirms but is not strong", () => {
+    const b = base();
+    b.push(bar(12, 102.6, 103, 100, 100.8));
+    b.push(bar(13, 100.8, 100.9, 99, 99.5));
+    const r = classifySwingSweep(b, 12, "high");
+    expect(r.text).toBe("Sweep ✓ confirmed");
+  });
+  test("tiny poke past the level is ignored", () => {
+    const b = base();
+    b.push(bar(12, 100.5, 101.1, 100, 100.6));
+    b.push(bar(13, 100.6, 100.8, 98.5, 99));
+    expect(classifySwingSweep(b, 12, "high").status).toBe("none");
+  });
 });
