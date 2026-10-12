@@ -30,6 +30,7 @@ import { TerminalWatchlist } from "@/components/terminal/TerminalWatchlist";
 import { transcribeVoiceMessage } from "@/lib/transcription.functions";
 import { cn } from "@/lib/utils";
 import { isMarketClosed } from "@/lib/signals/qualification";
+import { sessionAnchor, sessionBucketMs } from "@/lib/chart/session-buckets";
 import { Button } from "@/components/ui/button";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import {
@@ -119,18 +120,16 @@ const TERMINAL_SETTINGS_KEY = "jenvu:terminal:settings:v1";
 
 function candleSecondsLeft(tvInterval: string): number {
   const now = Date.now();
+  // Same 17:00 New York session buckets the chart candles use (TradingView-style).
   if (tvInterval === "D") {
-    const next = Date.UTC(
-      new Date(now).getUTCFullYear(),
-      new Date(now).getUTCMonth(),
-      new Date(now).getUTCDate() + 1,
-    );
-    return Math.max(0, Math.floor((next - now) / 1000));
+    const next = sessionAnchor(now) + 86_400_000;
+    return Math.max(0, Math.ceil((next - now) / 1000));
   }
   const minutes = Number(tvInterval);
   if (!Number.isFinite(minutes) || minutes <= 0) return 0;
   const period = minutes * 60_000;
-  return Math.max(0, Math.ceil((period - (now % period)) / 1000));
+  const end = Math.min(sessionBucketMs(now, period) + period, sessionAnchor(now) + 86_400_000);
+  return Math.max(0, Math.ceil((end - now) / 1000));
 }
 
 function formatCountdown(totalSeconds: number): string {
