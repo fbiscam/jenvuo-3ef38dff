@@ -303,7 +303,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
   // on the chart, but nothing moves: no history polling and no live price.
   const goldClosed = asset === "XAUUSD" && isMarketClosed(new Date());
   const chartQuery = useQuery({
-    queryKey: ["terminal-chart", asset, timeframe.key],
+    queryKey: ["terminal-chart", "trusted-gold-v2", asset, timeframe.key],
     // The authenticated route already guarantees a session. The server-function
     // middleware refreshes and attaches its token; checking getSession again here
     // created a race in newly opened Chrome profiles and left the query in error.

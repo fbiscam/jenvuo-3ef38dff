@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { sessionBucketMs } from "@/lib/chart/session-buckets";
+import { isTerminalGoldProvider } from "@/lib/chart/gold-feed-policy";
 import {
   analyzeTF,
   buildLiquidityPools,
@@ -1373,6 +1374,7 @@ const GATE_MIN_QUALITY = 0.5;
 async function fetchGoldProxyDeepWithProvider(
   tf: string,
   limit: number,
+  terminalOnly = false,
 ): Promise<{ provider: GoldProxyProvider; candles: Candle[]; thin?: boolean }> {
   const errors: string[] = [];
   let best: { provider: GoldProxyProvider; candles: Candle[]; q: number } | null = null;
@@ -1409,7 +1411,7 @@ async function fetchGoldProxyDeepWithProvider(
     ["Kraken", () => fetchKrakenDeep(tf, limit)],
   ];
   // Start all in parallel, then accept results strictly in priority order.
-  const started = fallbacks.map(([name, run]) => {
+  const started = fallbacks.filter(([name]) => !terminalOnly || isTerminalGoldProvider(name)).map(([name, run]) => {
     const p = run();
     p.catch(() => {});
     return [name, p] as const;
@@ -1424,7 +1426,7 @@ async function fetchGoldProxyDeepWithProvider(
     }
   }
   const fallback = best as { provider: GoldProxyProvider; candles: Candle[]; q: number } | null;
-  if (fallback && fallback.q > 0) return { provider: fallback.provider, candles: fallback.candles, thin: true };
+  if (!terminalOnly && fallback && fallback.q > 0) return { provider: fallback.provider, candles: fallback.candles, thin: true };
   console.error("[gold-feed] all candle sources failed", tf, errors.join(" | "));
   throw new Error("Chart feed unavailable");
 }
@@ -1544,7 +1546,9 @@ async function loadBtcTerminalChart(tf: string): Promise<TerminalChartPayload> {
 
 async function loadTerminalChart(tf: string, asset: TerminalAsset = "XAUUSD"): Promise<TerminalChartPayload> {
   if (asset === "BTCUSD") return loadBtcTerminalChart(tf);
-  const hit = terminalChartCache.get(tf);
+  const cached = terminalChartCache.get(tf);
+  // Never restore a spot-token fallback whose thin book produced giant wicks.
+  const hit = cached && isTerminalGoldProvider(cached.data.provider) ? cached : undefined;
   if (hit && Date.now() - hit.at < 4000) return { ...hit.data, serverTime: Date.now() };
   let candles: Candle[] = [];
   let source: TerminalChartPayload["source"] = "paxg-scaled";
@@ -1561,7 +1565,7 @@ async function loadTerminalChart(tf: string, asset: TerminalAsset = "XAUUSD"): P
     // 45m / 2H are built from smaller candles, so fetch enough source candles
     // for ~1000 finished bars of history.
     const sourceLimit = tf === "45m" ? 3000 : tf === "2h" ? 2000 : tf === "4h" || tf === "1d" ? 4000 : 1000;
-    const picked = await fetchGoldProxyDeepWithProvider(fetchTf, sourceLimit);
+    const picked = await fetchGoldProxyDeepWithProvider(fetchTf, sourceLimit, true);
     // A momentary Gate hiccup must not swap the whole chart to another
     // exchange's candles (different wicks / gappy thin feeds = candles that
     // change shape between refreshes). Keep the last Gate chart for a while.

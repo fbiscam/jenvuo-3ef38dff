@@ -197,3 +197,5 @@
 - [x] Fresh bullish/bearish FVG indicator (closed candles, newest 4, newer replaces older) with SMC toggle
 - [x] Fresh FVG: show only the latest 2 gaps
 - [x] Newer FVG/zone on top of any older FVG/zone hides the older; FVG hard cap 2
+- [x] Restrict Terminal gold history to trusted Gate/Binance feeds and discard thin-token fallback caches
+- [x] Verify trusted-feed regression tests and signed-in 2H refresh flow
