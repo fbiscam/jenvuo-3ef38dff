@@ -22,7 +22,7 @@ import {
   Download,
 } from "lucide-react";
 
-const PLAN_AMOUNT: Record<string, string> = { pro: "$15", elite: "$50", ultra: "$100", free: "$2" };
+const PLAN_AMOUNT: Record<string, string> = { pro: "$10", elite: "$25", ultra: "$50", free: "$2" };
 
 import { isAdmin } from "@/lib/admin-messages.functions";
 import {
@@ -421,7 +421,7 @@ function AdminFoundingPage() {
                         onClick={() => markProfit(r.id)}
                         className="inline-flex items-center gap-1 rounded-lg bg-amber-500 px-2.5 py-1.5 text-[12px] font-medium text-white hover:bg-amber-600 disabled:opacity-50"
                       >
-                        Fund {PLAN_AMOUNT[(r.requested_plan || "elite").toLowerCase()] || "$50"} ({(r.requested_plan || "elite").toUpperCase()}) → Active
+                        Fund {PLAN_AMOUNT[(r.requested_plan || "elite").toLowerCase()] || "$25"} ({(r.requested_plan || "elite").toUpperCase()}) → Active
                       </button>
                     )}
                     {r.status === "rejected" && (

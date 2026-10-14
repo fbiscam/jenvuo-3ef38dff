@@ -50,7 +50,7 @@ const TIERS = [
   {
     id: "pro",
     name: "Pro",
-    price: 15,
+    price: 10,
     icon: Zap,
     bestFor: "Active trader",
     tagline: "For serious gold traders.",
@@ -75,13 +75,13 @@ const TIERS = [
   {
     id: "elite",
     name: "Elite",
-    price: 50,
+    price: 25,
     icon: Crown,
     bestFor: "Desk / fund",
     tagline: "For prop desks & funds.",
     cta: "Talk to sales",
     ctaTo: "/contact",
-    credits: 40,
+    credits: 25,
     features: [
 
       "AI terminal chat",
@@ -90,7 +90,7 @@ const TIERS = [
       "Confirmed body-break + retest workflow",
       "1H XAU/USD & BTC/USD pressure engine",
       "API access & webhooks",
-      "3 API keys · $40 AI wallet",
+      "3 API keys · $25 AI wallet",
       "Claude Fable 5.1 senior review",
       "API usage controls & request logs",
       "Dedicated onboarding & SLA",
@@ -102,7 +102,7 @@ const TIERS = [
 
 type Mark = boolean | string;
 const MATRIX: Array<{ feature: string; free: Mark; pro: Mark; elite: Mark }> = [
-  { feature: "AI terminal chat", free: "Limited", pro: "$10 wallet", elite: "$40 wallet" },
+  { feature: "AI terminal chat", free: "Limited", pro: "$10 wallet", elite: "$25 wallet" },
   { feature: "A+ signal access", free: true, pro: true, elite: true },
   { feature: "AI models", free: "ChatGPT", pro: "ChatGPT + Claude + Grok", elite: "ChatGPT + Claude + Grok" },
   { feature: "Chart-aware analysis", free: true, pro: true, elite: true },
@@ -171,9 +171,9 @@ function PricingPage() {
         <div className="mx-auto max-w-7xl px-5 py-10 sm:px-8 sm:py-14">
         <div className="grid overflow-hidden border border-border bg-background sm:grid-cols-3">
           {[
-            { name: "Pro", price: signedOut ? priceOf({ id: "pro", price: 15 }) : priceOf({ id: "pro", price: 15 }), description: "For active traders who need precise primary analysis.", wallet: "$10 AI wallet", key: "pro" as const },
-            { name: "Elite", price: priceOf({ id: "elite", price: 50 }), description: "For trading desks that require a senior-reviewed signal.", wallet: "$40 AI wallet", key: "elite" as const },
-            { name: "Ultra", price: priceOf({ id: "ultra", price: 100 }), description: "For high-volume desks needing maximum review capacity.", wallet: "$90 AI wallet", key: "ultra" as const },
+            { name: "Pro", price: signedOut ? priceOf({ id: "pro", price: 10 }) : priceOf({ id: "pro", price: 10 }), description: "For active traders who need precise primary analysis.", wallet: "$10 AI wallet", key: "pro" as const },
+            { name: "Elite", price: priceOf({ id: "elite", price: 25 }), description: "For trading desks that require a senior-reviewed signal.", wallet: "$25 AI wallet", key: "elite" as const },
+            { name: "Ultra", price: priceOf({ id: "ultra", price: 50 }), description: "For high-volume desks needing maximum review capacity.", wallet: "$50 AI wallet", key: "ultra" as const },
           ].map((plan) => {
             const trialPro = trial.active && plan.key === "pro";
             const isCurrent = currentPlan === plan.key && !trialPro;
@@ -230,16 +230,16 @@ function PricingPage() {
 
             <tbody>
               {([
-                { f: "Monthly AI wallet", b: "$10", c: "$40", d: "$90" },
+                { f: "Monthly AI wallet", b: "$10", c: "$25", d: "$50" },
                 { f: "Daily token limit", b: "1.5M", c: "5M", d: "10M" },
-                { f: "Balance-based quota ($5 = 1M)", b: true, c: true, d: true },
+                { f: "Balance-based quota ($3 = 1M)", b: true, c: true, d: true },
                 { f: "Active API keys", b: "2", c: "3", d: "5" },
                 { f: "ChatGPT 5.5 Pro primary analysis", b: true, c: true, d: true },
                 { f: "Claude Fable 5.1 senior review", b: false, c: true, d: true },
                 { f: "Chat / primary request", b: "$0.03", c: "$0.03", d: "$0.03" },
                 { f: "Senior-reviewed analysis", b: false, c: "$0.20", d: "$0.20" },
 
-                { f: "AI terminal chat", b: "$10 wallet", c: "$40 wallet", d: "$90 wallet" },
+                { f: "AI terminal chat", b: "$10 wallet", c: "$25 wallet", d: "$50 wallet" },
 
                 { f: "Live chart analysis", b: "Realtime", c: "Realtime", d: "Realtime" },
                 { f: "AI models", b: "__MODELS_PLUS__", c: "__MODELS_PLUS__", d: "__MODELS_PLUS__" },
@@ -404,7 +404,7 @@ function CustomTopUp({ signedOut }: { signedOut: boolean }) {
           
           <h3 className="mt-2 text-lg font-semibold tracking-tight">Pick your own amount</h3>
           <p className="mt-1 text-sm text-zinc-600">Minimum $5. $1 top-up = $1 wallet. Primary requests cost $0.03; completed senior-reviewed analysis costs $0.20.</p>
-          <p className="mt-1 text-sm text-zinc-600">Every $5 of balance — from a top-up or a promo code — unlocks 1,000,000 tokens of daily usage, up to your plan's ceiling. Balances under $5 scale proportionally, and the allowance resets at 00:00 UTC.</p>
+          <p className="mt-1 text-sm text-zinc-600">Every $3 of balance — from a top-up or a promo code — unlocks 1,000,000 tokens of daily usage, up to your plan's ceiling. Balances under $3 scale proportionally, and the allowance resets at 00:00 UTC.</p>
         </div>
         <div className="flex items-center gap-3">
           <div className="flex items-center overflow-hidden rounded-md border border-border bg-background focus-within:ring-2 focus-within:ring-home-accent/40">

@@ -92,9 +92,9 @@ function PayPage() {
   const qSeq = useRef(0);
 
   const PLANS = [
-    { id: "pro", name: "Pro", price: 15, features: ["Realtime Alerts", "Journal Access", "Multi-Timeframe Bias"] },
-    { id: "elite", name: "Elite", price: 50, features: ["XAU/USD Senior Review", "Custom Alert Rules", "AI Model Analysis"] },
-    { id: "ultra", name: "Ultra", price: 100, features: ["Priority Support", "Advanced Signals", "Full ICT Narration"] },
+    { id: "pro", name: "Pro", price: 10, features: ["Realtime Alerts", "Journal Access", "Multi-Timeframe Bias"] },
+    { id: "elite", name: "Elite", price: 25, features: ["XAU/USD Senior Review", "Custom Alert Rules", "AI Model Analysis"] },
+    { id: "ultra", name: "Ultra", price: 50, features: ["Priority Support", "Advanced Signals", "Full ICT Narration"] },
   ];
 
   const currentPrice = useMemo(() => {

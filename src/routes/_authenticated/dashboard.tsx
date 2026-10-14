@@ -1814,7 +1814,7 @@ function DashboardHero({
       copy: "Capture any chart, get Claude Opus 5 analysis, and unlock a mandatory \nClaude Fable 5.1 senior review on eligible plans.",
       action: "Compare plans",
       to: "/pricing" as const,
-      note: "Plans from $15 · $2 free testing credit",
+      note: "Plans from $10 · $2 free testing credit",
     },
     {
       variant: "model" as const,
@@ -2047,7 +2047,7 @@ function UsageAnalytics({
               />
             </div>
             <div className="mt-3 text-xs text-muted-foreground">
-              $5 = 1M tokens · resets 00:00 UTC
+              $3 = 1M tokens · resets 00:00 UTC
             </div>
           </div>
           <div className={metricClass} style={{ backgroundColor: "#FFFBED" }}>

@@ -36,6 +36,13 @@
       "when": 1790541729062,
       "tag": "0004_terminal_daily_access_fee",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1791996118864,
+      "tag": "0005_reprice_plans_10_25_50",
+      "breakpoints": true
     }
   ]
 }
