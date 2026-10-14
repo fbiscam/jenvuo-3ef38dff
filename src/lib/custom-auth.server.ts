@@ -145,7 +145,7 @@ async function findUserByEmail(email: string): Promise<User | null> {
 const SIGNUP_IP_LIMIT_PER_HOUR = 5
 const SIGNUP_DOMAIN_LIMIT_PER_HOUR = 20
 const MAX_ACCOUNTS_PER_DEVICE = 2
-const MAX_ACCOUNTS_PER_IP = 3
+const MAX_ACCOUNTS_PER_IP = 2
 
 // Public email providers — skip domain-level rate limit (millions of legit users share these).
 // Abuse from these is caught by device fingerprint + IP caps instead.
@@ -160,11 +160,34 @@ const PUBLIC_EMAIL_PROVIDERS = new Set([
 ])
 
 function assertSignupSignals(input: { country?: string; fingerprint?: string; userAgent?: string }) {
-  if (input.country === 'PK') throw new Error('New account creation is not available in your region.')
   if (!input.fingerprint || input.fingerprint.length < 32) throw new Error('Device verification failed. Refresh the page and try again.')
   const userAgent = (input.userAgent || '').trim()
   if (userAgent.length < 10 || /^(curl|wget|python-requests|postmanruntime|insomnia)\b/i.test(userAgent)) {
     throw new Error('This browser could not be verified. Please use a current web browser.')
+  }
+}
+
+// Blocks sign-ups from VPN / proxy / Tor / hosting networks (proxycheck.io).
+// Fails open on lookup errors so a provider outage never blocks every sign-up.
+async function assertNotVpn(ip: string | undefined) {
+  const addr = (ip || '').trim()
+  if (!addr || addr === '127.0.0.1' || addr === '::1') return
+  try {
+    const key = process.env.PROXYCHECK_API_KEY
+    const url = `https://proxycheck.io/v2/${encodeURIComponent(addr)}?vpn=3&risk=1${key ? `&key=${encodeURIComponent(key)}` : ''}`
+    const res = await fetch(url, { signal: AbortSignal.timeout(4000) })
+    if (!res.ok) return
+    const json: any = await res.json()
+    const info = json?.[addr]
+    if (!info) return
+    const type = String(info.type || '').toLowerCase()
+    if (info.proxy === 'yes' || info.vpn === 'yes' || type === 'vpn' || type === 'tor' || type === 'hosting') {
+      throw new Error('VPN_BLOCKED')
+    }
+  } catch (e) {
+    if ((e as Error)?.message === 'VPN_BLOCKED') {
+      throw new Error('Account creation is not allowed over a VPN or proxy. Please turn it off and try again.')
+    }
   }
 }
 
@@ -199,6 +222,7 @@ export async function createSignupOtp(input: { email: string; password: string; 
   }
 
   assertSignupSignals(input)
+  await assertNotVpn(input.ip)
   await assertDeviceUnderCap(input.ip, input.fingerprint)
 
   // 3. Per-email-domain rate limit: skipped for public providers (gmail/yahoo/etc.);
@@ -309,6 +333,7 @@ export async function verifySignupOtp(input: { email: string; code: string; pass
   // Re-check device cap at the confirm step, in case someone tried to bypass the request step.
   try {
     assertSignupSignals(input)
+    await assertNotVpn(input.ip)
     await assertDeviceUnderCap(input.ip, input.fingerprint)
   } catch (e) {
     return { ok: false, error: e instanceof Error ? e.message : 'Signup not allowed on this device.' }
