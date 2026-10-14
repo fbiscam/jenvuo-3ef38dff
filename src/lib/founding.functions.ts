@@ -549,6 +549,16 @@ export const updateFoundingApplication = createServerFn({ method: "POST" })
             console.error(`[founding] generateLink(${linkType}) failed:`, linkErr.message);
           }
           approvedResetUrl = (linkData as any)?.properties?.action_link || null;
+          // Approved members get their selected plan right away (Terminal
+          // unlocks too; ID verification must follow within 2 days).
+          const planUserId = existingUserId || (linkData as any)?.user?.id || null;
+          if (planUserId) {
+            const { error: planErr } = await admin.rpc("activate_founding_trial" as any, {
+              _user_id: planUserId,
+              _plan_id: planId,
+            });
+            if (planErr) console.error("[founding] plan activation on approval failed:", planErr.message);
+          }
         } catch (e) {
           console.error("[founding] generateLink threw:", (e as Error)?.message);
         }
