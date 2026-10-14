@@ -32,7 +32,7 @@ function NewsletterSubscribe() {
   };
 
   return (
-    <form onSubmit={onSubmit} className="flex w-full max-w-xs flex-col gap-1.5 sm:flex-row sm:-translate-y-1">
+    <form onSubmit={onSubmit} className="flex w-full max-w-xs flex-col gap-1.5 sm:flex-row sm:items-center">
       <input
         type="email"
         required
