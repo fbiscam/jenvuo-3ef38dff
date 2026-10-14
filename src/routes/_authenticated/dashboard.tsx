@@ -3,7 +3,7 @@ import { getIpGeo } from "@/lib/ip-geo";
 import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
 import { useVerification, isVerificationAllowedPath } from "@/hooks/useVerification";
 import { VerificationBanner, VerificationLocked } from "@/components/VerificationGate";
-import { TerminalLocked, TerminalChecking, useTerminalAccess } from "@/components/TerminalLockGate";
+import { TerminalLocked, TerminalChecking, useTerminalAccess, IdVerificationDeadlineNotice } from "@/components/TerminalLockGate";
 import { Lock as TerminalLockIcon } from "lucide-react";
 import xaiLogo from "@/assets/xai-logo.png";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -1551,6 +1551,7 @@ function DashboardLayout() {
           }
           style={pathname === "/dashboard/terminal" ? undefined : { zoom: 0.9 }}
         >
+          <IdVerificationDeadlineNotice access={terminalAccess} />
           {pathname !== "/dashboard/terminal" && <VerificationBanner isAdmin={isAdminUser} />}
 
           {pathname === "/dashboard" ? (
@@ -1573,8 +1574,8 @@ function DashboardLayout() {
               <div className="h-12" />
             </>
           ) : pathname === "/dashboard/terminal" && !terminalAccess.allowed ? (
-            terminalAccess.loading ? <TerminalChecking /> : <TerminalLocked />
-          ) : verificationLocked ? (
+            terminalAccess.loading ? <TerminalChecking /> : <TerminalLocked reason={terminalAccess.reason} />
+          ) : verificationLocked && pathname !== "/dashboard/terminal" ? (
             <VerificationLocked />
           ) : (
             <Outlet />
