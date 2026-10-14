@@ -15,3 +15,4 @@
 - Chart, pressure, zone, FVG and sweep rules live in `src/lib/chart/AGENTS.md`.
 - Gold terminal candles use Gate XAU_USDT gold contract as the primary feed (PAXG token was too thin, candle colours differed from TradingView) (Binance only as fallback): Binance blocks the live server region, so Binance-first made preview and live draw different candles and zones.
 - MCP server lives in `src/lib/mcp/` (one tool per file, OAuth via the backend issuer, caller token forwarded so RLS applies): keeps external assistants scoped to the signed-in user's own data.
+- Signup is public; the Terminal (page + chart server function) is unlocked only for admins and approved Founding Program applications via `src/lib/terminal-access.server.ts`: the UI lock alone could be bypassed by calling the server function directly.
