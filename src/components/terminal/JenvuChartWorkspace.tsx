@@ -125,6 +125,7 @@ type Props = {
   timeframe: TimeframeOption;
   onTimeframeChange: (tf: TimeframeOption) => void;
   rightSlot?: ReactNode;
+  mobileNewsRow?: ReactNode;
   asset?: "XAUUSD" | "BTCUSD";
   onAssetChange?: (asset: "XAUUSD" | "BTCUSD") => void;
   theme?: "light" | "dark";
@@ -211,7 +212,7 @@ function ToolButton({
 }
 
 export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function JenvuChartWorkspace(
-  { timeframes, timeframe, onTimeframeChange, rightSlot, asset = "XAUUSD", onAssetChange, theme = "light" },
+  { timeframes, timeframe, onTimeframeChange, rightSlot, mobileNewsRow, asset = "XAUUSD", onAssetChange, theme = "light" },
   ref,
 ) {
   const fetchChart = useServerFn(getTerminalChart);
@@ -668,6 +669,12 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
 
         <div className="ml-auto flex shrink-0 items-center gap-2">{rightSlot}</div>
       </div>
+
+      {mobileNewsRow && (
+        <div className="flex shrink-0 items-center border-b border-border px-2 py-1.5 md:hidden">
+          {mobileNewsRow}
+        </div>
+      )}
 
       <div className="flex min-h-0 flex-1">
         {/* Drawing toolbar */}

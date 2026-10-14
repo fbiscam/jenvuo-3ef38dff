@@ -698,11 +698,13 @@ function TerminalPage() {
               rightSlot={
                 <>
                   {!deskOpen && (
-                    <UpcomingGoldNews
-                      event={nextGoldNews}
-                      loading={newsQuery.isPending}
-                      failed={newsQuery.isError && !newsQuery.data}
-                    />
+                    <span className="hidden md:flex">
+                      <UpcomingGoldNews
+                        event={nextGoldNews}
+                        loading={newsQuery.isPending}
+                        failed={newsQuery.isError && !newsQuery.data}
+                      />
+                    </span>
                   )}
                   <div
                     className="flex h-7 items-center gap-1.5 rounded-md px-2 font-mono text-xs font-semibold text-foreground"
@@ -751,6 +753,16 @@ function TerminalPage() {
                     </button>
                   )}
                 </>
+              }
+              mobileNewsRow={
+                !deskOpen ? (
+                  <UpcomingGoldNews
+                    event={nextGoldNews}
+                    loading={newsQuery.isPending}
+                    failed={newsQuery.isError && !newsQuery.data}
+                    wrap
+                  />
+                ) : undefined
               }
             />
           </section>
