@@ -1310,6 +1310,16 @@ function AuthPage() {
                     <div className="mt-6 space-y-1.5 text-center text-[13px] text-zinc-500">
                       <p>
                         New here?{" "}
+                        <button
+                          type="button"
+                          onClick={() => { setMode("signup"); setErrorMsg(null); setOtpStep(false); }}
+                          className="font-medium text-zinc-900 underline underline-offset-2"
+                        >
+                          Create an account
+                        </button>
+                      </p>
+                      <p>
+                        Founding member?{" "}
                         <Link to="/founding" className="font-medium text-zinc-900 underline underline-offset-2">
                           Apply to the Founding Program →
                         </Link>
