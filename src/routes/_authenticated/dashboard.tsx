@@ -1572,6 +1572,8 @@ function DashboardLayout() {
 
               <div className="h-12" />
             </>
+          ) : pathname === "/dashboard/terminal" && !terminalAccess.allowed ? (
+            terminalAccess.loading ? <TerminalChecking /> : <TerminalLocked />
           ) : verificationLocked ? (
             <VerificationLocked />
           ) : (
