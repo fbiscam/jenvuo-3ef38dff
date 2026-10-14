@@ -568,7 +568,8 @@ export const updateFoundingApplication = createServerFn({ method: "POST" })
     // On ACTIVE (admin marked account funded / $100): activate the plan and
     // send the "account funded" email. This is the point where the wallet
     // actually gets credited.
-    if (data.status === "active" && data.status !== p?.status && p?.email) {
+    // Skipped when coming from "approved": the plan was already granted then.
+    if (data.status === "active" && data.status !== p?.status && p?.status !== "approved" && p?.email) {
       const url = process.env.SUPABASE_URL;
       const service = process.env.SUPABASE_SERVICE_ROLE_KEY;
       if (url && service) {
