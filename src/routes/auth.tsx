@@ -817,7 +817,7 @@ function AuthPage() {
                 : mode === "forgot"
                   ? "Reset your password"
                   : mode === "signup"
-                    ? "Invite-only access"
+                    ? "Create your Jenvu account"
                     : "Sign in to Jenvu"}
             </h1>
 
@@ -992,15 +992,79 @@ function AuthPage() {
                         </div>
                       </form>
                     ) : (
-                      <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3.5 text-[13px] leading-snug text-amber-900">
-                        <div className="font-semibold text-amber-950">Jenvu Founding Program — Invite Only</div>
-                        <p className="mt-1.5">
-                          New accounts are available only to approved founding members. Review the program and apply for access:{" "}
-                          <Link to="/founding" className="font-semibold underline hover:text-amber-950">
-                            Read more & apply →
+                      <form onSubmit={signUp} className="mt-4 space-y-4">
+                        <div>
+                          <label htmlFor="signup-name" className="mb-2 block text-[14px] font-medium text-zinc-900">
+                            Full name
+                          </label>
+                          <input
+                            type="text"
+                            id="signup-name"
+                            required
+                            autoComplete="name"
+                            value={fullName}
+                            onChange={(e) => setFullName(e.target.value)}
+                            className="h-[43px] w-full rounded-lg border border-zinc-200 bg-white px-3 text-sm text-zinc-900 outline-none transition focus:border-auth-action focus:ring-1 focus:ring-auth-action"
+                          />
+                        </div>
+                        <div>
+                          <label htmlFor="signup-email" className="mb-2 block text-[14px] font-medium text-zinc-900">
+                            Email
+                          </label>
+                          <input
+                            type="email"
+                            id="signup-email"
+                            required
+                            autoComplete="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            className="h-[43px] w-full rounded-lg border border-zinc-200 bg-white px-3 text-sm text-zinc-900 outline-none transition focus:border-auth-action focus:ring-1 focus:ring-auth-action"
+                          />
+                          {flashInline("email")}
+                        </div>
+                        <div>
+                          <label htmlFor="signup-password" className="mb-2 block text-[14px] font-medium text-zinc-900">
+                            Password
+                          </label>
+                          <div className="relative">
+                            <input
+                              type={showPassword ? "text" : "password"}
+                              id="signup-password"
+                              required
+                              autoComplete="new-password"
+                              value={password}
+                              onChange={(e) => setPassword(e.target.value)}
+                              className="h-[43px] w-full rounded-lg border border-zinc-200 bg-white px-3 pr-12 text-sm text-zinc-900 outline-none transition focus:border-auth-action focus:ring-1 focus:ring-auth-action"
+                            />
+                            <Button type="button" variant="ghost" size="icon" onClick={() => setShowPassword((v) => !v)} aria-label={showPassword ? "Hide password" : "Show password"} className="absolute right-1 top-1/2 -translate-y-1/2 text-zinc-700 hover:bg-transparent hover:text-zinc-900">
+                              {showPassword ? <EyeOff className="h-[18px] w-[18px]" /> : <Eye className="h-[18px] w-[18px]" />}
+                            </Button>
+                          </div>
+                          {flashInline("password")}
+                        </div>
+
+                        <p className="text-[12px] leading-snug text-zinc-500">
+                          The Terminal unlocks for approved Founding Program members.{" "}
+                          <Link to="/founding" className="font-medium text-zinc-900 underline underline-offset-2">
+                            Apply here
                           </Link>
                         </p>
-                      </div>
+
+                        {errorMsg && (
+                          <div className={`flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[12px] text-red-700 ${MONO}`}>
+                            <span className="mt-[2px] inline-block h-1.5 w-1.5 rounded-full bg-red-500 shrink-0" />
+                            <span className="leading-snug">{errorMsg}</span>
+                          </div>
+                        )}
+
+                        <Button
+                          type="submit"
+                          disabled={loading}
+                          className="group h-[43px] w-full rounded-lg bg-auth-action px-5 text-sm font-semibold text-auth-action-foreground shadow-none transition hover:bg-auth-action/90"
+                        >
+                          {loading ? btnLoading("Sending code...") : "Create account"}
+                        </Button>
+                      </form>
                     )
 
                   ) : mode === "forgot" ? (
@@ -1246,6 +1310,16 @@ function AuthPage() {
                     <div className="mt-6 space-y-1.5 text-center text-[13px] text-zinc-500">
                       <p>
                         New here?{" "}
+                        <button
+                          type="button"
+                          onClick={() => { setMode("signup"); setErrorMsg(null); setOtpStep(false); }}
+                          className="font-medium text-zinc-900 underline underline-offset-2"
+                        >
+                          Create an account
+                        </button>
+                      </p>
+                      <p>
+                        Founding member?{" "}
                         <Link to="/founding" className="font-medium text-zinc-900 underline underline-offset-2">
                           Apply to the Founding Program →
                         </Link>
@@ -1265,7 +1339,7 @@ function AuthPage() {
 
                   {mode === "signup" && !otpStep && !mfaChallenge && (
                     <p className="mt-6 text-center text-[13px] text-zinc-500">
-                      Already invited?{" "}
+                      Already have an account?{" "}
                       <button
                         type="button"
                         onClick={() => { setMode("signin"); setErrorMsg(null); }}

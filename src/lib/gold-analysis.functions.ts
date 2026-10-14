@@ -1644,7 +1644,13 @@ export const getTerminalChart = createServerFn({ method: "POST" })
     const asset: TerminalAsset = d?.asset === "BTCUSD" ? "BTCUSD" : "XAUUSD";
     return { timeframe: TF_MS[tf] ? tf : "30m", asset };
   })
-  .handler(async ({ data }) => loadTerminalChart(data.timeframe, data.asset));
+  .handler(async ({ data, context }) => {
+    const { checkTerminalAccess } = await import("@/lib/terminal-access.server");
+    const email = (context.claims as { email?: string } | undefined)?.email ?? null;
+    const access = await checkTerminalAccess(context.supabase as any, context.userId, email);
+    if (!access.allowed) throw new Error("TERMINAL_LOCKED: Terminal is available to approved Founding Program members only.");
+    return loadTerminalChart(data.timeframe, data.asset);
+  });
 
 function closedCandlesOnly(candles: Candle[], timeframe: string, now = Date.now()): Candle[] {
   const step = TF_MS[timeframe] ?? TF_MS["15m"];
