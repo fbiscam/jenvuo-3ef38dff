@@ -556,7 +556,7 @@ function HomePage() {
               </svg>
               <div className="flex h-24 w-28 flex-col items-center justify-center rounded-xl border-2 border-home-accent bg-home-accent-soft">
                 <span className={`${MONO} text-[10px] uppercase tracking-wider text-home-accent`}>Paid</span>
-                <span className="mt-1 text-lg font-semibold text-zinc-900">$15+</span>
+                <span className="mt-1 text-lg font-semibold text-zinc-900">$10+</span>
               </div>
             </div>
           </div>

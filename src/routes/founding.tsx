@@ -235,9 +235,9 @@ function FoundingPage() {
                 </label>
                 <div className="mt-2 grid grid-cols-3 gap-1.5 sm:gap-2">
                   {([
-                    { id: "pro", label: "Pro", desc: "$15 wallet" },
-                    { id: "elite", label: "Elite", desc: "$50 wallet" },
-                    { id: "ultra", label: "Ultra", desc: "$100 wallet" },
+                    { id: "pro", label: "Pro", desc: "$10 wallet" },
+                    { id: "elite", label: "Elite", desc: "$25 wallet" },
+                    { id: "ultra", label: "Ultra", desc: "$50 wallet" },
                   ] as const).map((p) => {
                     const active = plan === p.id;
                     return (

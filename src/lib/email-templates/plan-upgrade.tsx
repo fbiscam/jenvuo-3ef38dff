@@ -29,7 +29,7 @@ const PlanUpgradeEmail = ({
   fromPlan = 'Signal',
   toPlan = 'ICT Pro',
   effectiveDate = new Date().toUTCString(),
-  amount = '$79 / month',
+  amount = '$10 / month',
   features = [
     'AI extension chat and chart analysis',
     'Real-time ICT session alerts',
@@ -143,7 +143,7 @@ export const template: TemplateEntry = {
     fromPlan: 'Signal',
     toPlan: 'ICT Pro',
     effectiveDate: new Date().toUTCString(),
-    amount: '$79 / month',
+    amount: '$10 / month',
     features: [
       'AI extension chat and chart analysis',
       'Real-time ICT session alerts',

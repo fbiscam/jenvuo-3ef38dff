@@ -7,7 +7,7 @@
 - [Home](/): Overview of the Jenvu TradingView extension, signal engine and AI chart workflow.
 - [Dashboard](/dashboard): Manage extension keys, plans, signals, usage and account settings.
 - [AI Engine](/ai-engine): How the two-stage AI pipeline scores institutional gold setups.
-- [Pricing](/pricing): Pro ($15/mo), Elite ($50/mo) and Ultra ($100/mo) token-wallet plans.
+- [Pricing](/pricing): Pro ($10/mo), Elite ($25/mo) and Ultra ($50/mo) token-wallet plans.
 - [Download](/download): iOS and Android app downloads.
 - [Insights](/insights): Daily AI-authored gold and macro market analysis.
 - [Help Center](/help): Product guides for the TradingView extension, signal engine and trade journal.
