@@ -1044,7 +1044,7 @@ function AuthPage() {
                         </div>
 
                         <p className="text-[12px] leading-snug text-zinc-500">
-                          The Terminal unlocks for approved Founding Program members.{" "}
+                          The Terminal approved Founding Program members.{" "}
                           <Link to="/founding" className="font-medium text-zinc-900 underline underline-offset-2">
                             Apply here
                           </Link>
