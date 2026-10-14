@@ -1381,6 +1381,29 @@ function DashboardLayout() {
                       : undefined;
                     const isNotifs = t.to === "/dashboard/notifications";
                     const hasUnread = isNotifs && unreadNotifs > 0 && !active;
+                    if (t.to === "/dashboard/terminal" && terminalLocked) {
+                      return (
+                        <span
+                          key={t.to}
+                          role="link"
+                          aria-disabled="true"
+                          title="Terminal is for approved Founding Program members only"
+                          className={`dashboard-sidebar-link relative flex cursor-not-allowed select-none items-center rounded-full text-[12.5px] font-normal text-foreground opacity-50 ${navCollapsed ? "justify-center px-2 py-1.5" : "gap-3 px-2.5 py-1.5"}`}
+                        >
+                          <Icon
+                            className="dashboard-sidebar-icon h-[19px] w-[19px] shrink-0 text-current"
+                            strokeWidth={1.75}
+                            aria-hidden="true"
+                          />
+                          {!navCollapsed && <span className="truncate">{t.label}</span>}
+                          {navCollapsed ? (
+                            <TerminalLockIcon className="absolute -right-0.5 -top-0.5 h-3 w-3 text-current" aria-hidden="true" />
+                          ) : (
+                            <TerminalLockIcon className="ml-auto h-3.5 w-3.5 shrink-0 text-current" aria-label="Locked" />
+                          )}
+                        </span>
+                      );
+                    }
                     return (
                       <Link
                         key={t.to}
