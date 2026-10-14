@@ -3,6 +3,8 @@ import { getIpGeo } from "@/lib/ip-geo";
 import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
 import { useVerification, isVerificationAllowedPath } from "@/hooks/useVerification";
 import { VerificationBanner, VerificationLocked } from "@/components/VerificationGate";
+import { TerminalLocked, TerminalChecking, useTerminalAccess } from "@/components/TerminalLockGate";
+import { Lock as TerminalLockIcon } from "lucide-react";
 import xaiLogo from "@/assets/xai-logo.png";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
@@ -720,6 +722,8 @@ function DashboardLayout() {
     !isVerificationAllowedPath(pathname);
   const credits = useCredits();
   const { user: authUser, loading: authLoading } = useAuthUser();
+  const terminalAccess = useTerminalAccess(authUser?.id);
+  const terminalLocked = !terminalAccess.loading && !terminalAccess.allowed;
   const localHour = useLocalHour();
   const greetingText = pickGreeting(localHour);
   const currentPlan = useCurrentPlan();
