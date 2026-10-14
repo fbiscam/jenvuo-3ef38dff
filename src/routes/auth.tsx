@@ -817,7 +817,7 @@ function AuthPage() {
                 : mode === "forgot"
                   ? "Reset your password"
                   : mode === "signup"
-                    ? "Invite-only access"
+                    ? "Create your Jenvu account"
                     : "Sign in to Jenvu"}
             </h1>
 
@@ -1329,7 +1329,7 @@ function AuthPage() {
 
                   {mode === "signup" && !otpStep && !mfaChallenge && (
                     <p className="mt-6 text-center text-[13px] text-zinc-500">
-                      Already invited?{" "}
+                      Already have an account?{" "}
                       <button
                         type="button"
                         onClick={() => { setMode("signin"); setErrorMsg(null); }}
