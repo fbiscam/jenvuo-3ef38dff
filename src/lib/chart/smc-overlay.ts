@@ -1425,11 +1425,14 @@ export function renderSmcOverlay(
   };
   // Price action verdict beside each swing, stacked outside the pressure badge.
   const priceActionTag = (t: number, xx: number, yy: number, up: boolean) => {
-    if (toggles.priceAction === false) return;
-    const pa = smc.priceAction?.[t];
-    if (!pa) return;
     const hasBadge = showPressure && smc.pressure?.[t] != null;
     const baseline = up ? (hasBadge ? yy - 32 : yy - 6) : (hasBadge ? yy + 60 : yy + 34);
+    const pa = toggles.priceAction === false ? undefined : smc.priceAction?.[t];
+    // Sweep is independent: with price action off/absent it takes the same slot.
+    if (!pa) {
+      sweepTag(t, xx, baseline);
+      return;
+    }
     ctx.save();
     ctx.font = "600 11px 'JetBrains Mono', ui-monospace, monospace";
     const w = ctx.measureText(pa.text).width;
