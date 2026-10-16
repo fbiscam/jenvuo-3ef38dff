@@ -477,7 +477,10 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
     let nextPane = 1;
     const updaters: Array<(b: OhlcvBar[]) => void> = [];
 
-    for (const id of propsRef.current.indicators) {
+    const activeIds = propsRef.current.indicators;
+    for (const id of activeIds) {
+      // RVOL already draws the same volume bars in the bottom strip.
+      if (id === "volume" && activeIds.includes("rvol")) continue;
       const spec = buildIndicatorSeries(id);
       const pane = spec.pane === "main" ? 0 : spec.pane === "volume" ? 0 : nextPane++;
       const created = spec.lines.map((line) => {
@@ -503,9 +506,10 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
                   priceLineVisible: false,
                   // Main-chart overlays (EMA/SMA/VWAP…) draw only the line —
                   // no coloured price tag on the price panel.
-                  lastValueVisible: spec.pane !== "main",
+                  priceScaleId: spec.pane === "volume" ? "volume" : undefined,
+                  lastValueVisible: spec.pane !== "main" && spec.pane !== "volume",
                   crosshairMarkerVisible: false,
-                  title: spec.pane === "main" ? "" : line.title,
+                  title: spec.pane === "main" || spec.pane === "volume" ? "" : line.title,
                   lineStyle: line.dashed ? LineStyle.Dashed : LineStyle.Solid,
                   ...(spec.id === "rvol" ? { priceFormat: { type: "custom" as const, minMove: 1, formatter: formatVolume } } : {}),
                 },

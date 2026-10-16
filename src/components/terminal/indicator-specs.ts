@@ -8,7 +8,7 @@ import {
   vwap,
   type OhlcvBar,
 } from "@/lib/chart/indicators";
-import { RVOL_PERIOD, rvolLevel, volumeBaseline, volumeSplit } from "@/lib/chart/relative-volume";
+import { RVOL_PERIOD, volumeBaseline } from "@/lib/chart/relative-volume";
 
 export type IndicatorId =
   | "volume"
@@ -65,23 +65,14 @@ const SPECS: Record<IndicatorId, IndicatorSpec> = {
   rvol: {
     id: "rvol",
     name: "Volume (RVOL + Spike)",
-    description: "Buy / sell volume per candle, 20-candle average, spikes ≥1.5× / ≥2.5×",
-    pane: "separate",
+    description: "Volume bars with 20-candle average line, fixed at the bottom like Volume",
+    pane: "volume",
     lines: [
       {
         title: "Volume",
-        color: "rgba(120,123,134,0.45)",
+        color: "rgba(120,123,134,0.35)",
         kind: "histogram",
-        colorFor: (bar, v, j, all) => {
-          const base = all?.[1]?.[j ?? -1];
-          const ratio = Number.isFinite(base) && (base as number) > 0 ? v / (base as number) : NaN;
-          const level = rvolLevel(ratio);
-          // Bar colour = which side the volume came from (buy green / sell red).
-          const side = volumeSplit(bar).side;
-          if (level === "ultra") return side === "buy" ? "rgba(0,200,140,1)" : side === "sell" ? "rgba(255,40,60,1)" : "rgba(255,170,0,1)";
-          if (level === "high") return side === "buy" ? "rgba(0,200,140,0.75)" : side === "sell" ? "rgba(255,40,60,0.75)" : "rgba(255,170,0,0.9)";
-          return side === "buy" ? "rgba(8,153,129,0.35)" : side === "sell" ? "rgba(242,54,69,0.35)" : "rgba(120,123,134,0.35)";
-        },
+        colorFor: (bar) => (bar.close >= bar.open ? "rgba(8,153,129,0.35)" : "rgba(242,54,69,0.35)"),
       },
       { title: "MA 20", color: "#ff9800", kind: "line", width: 1 },
     ],
