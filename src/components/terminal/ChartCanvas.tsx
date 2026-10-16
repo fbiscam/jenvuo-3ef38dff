@@ -31,6 +31,7 @@ import type { CandleProjection } from "@/lib/chart/projection";
 import type { ScriptResult } from "@/lib/chart/jenvu-script";
 import type { DemoPosition } from "@/lib/chart/demo-trading";
 import { DemoOrderOverlay, type DemoOrderActions } from "./DemoOrderOverlay";
+import { formatVolume } from "@/lib/chart/relative-volume";
 import { buildIndicatorSeries, type IndicatorId } from "./indicator-specs";
 
 export type ChartTheme = "light" | "dark";
@@ -490,7 +491,7 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
                   lastValueVisible: spec.pane !== "volume",
                   priceLineVisible: false,
                   title: spec.pane === "volume" ? "" : line.title,
-                  ...(spec.id === "rvol" ? { priceFormat: { type: "volume" as const } } : {}),
+                  ...(spec.id === "rvol" ? { priceFormat: { type: "custom" as const, minMove: 1, formatter: formatVolume } } : {}),
                 },
                 pane,
               )
@@ -506,7 +507,7 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
                   crosshairMarkerVisible: false,
                   title: spec.pane === "main" ? "" : line.title,
                   lineStyle: line.dashed ? LineStyle.Dashed : LineStyle.Solid,
-                  ...(spec.id === "rvol" ? { priceFormat: { type: "volume" as const } } : {}),
+                  ...(spec.id === "rvol" ? { priceFormat: { type: "custom" as const, minMove: 1, formatter: formatVolume } } : {}),
                 },
                 pane,
               );
