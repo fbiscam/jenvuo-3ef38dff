@@ -37,7 +37,9 @@ export function useTerminalAccess(userId: string | null | undefined): TerminalAc
               idSubmitted: Boolean(r?.idSubmitted),
             }),
         )
-        .catch(() => !cancelled && setState({ ...INITIAL, loading: false }));
+        // A failed poll (network blip, slow reply) must not lock out a user who
+        // was already allowed — keep the previous state and try again next minute.
+        .catch(() => !cancelled && setState((s) => ({ ...s, loading: false })));
     setState((s) => ({ ...s, loading: true }));
     load();
     // Re-check every minute so the lock applies as soon as the 2-day window ends.
