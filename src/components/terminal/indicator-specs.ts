@@ -8,9 +8,11 @@ import {
   vwap,
   type OhlcvBar,
 } from "@/lib/chart/indicators";
+import { RVOL_PERIOD, rvolLevel, volumeBaseline } from "@/lib/chart/relative-volume";
 
 export type IndicatorId =
   | "volume"
+  | "rvol"
   | "ema20"
   | "ema50"
   | "ema200"
@@ -28,7 +30,8 @@ export type IndicatorLine = {
   kind: "line" | "histogram";
   width?: number;
   dashed?: boolean;
-  colorFor?: (bar: OhlcvBar, value: number) => string;
+  /** `index` and `all` (every computed line) let a bar compare itself to a baseline. */
+  colorFor?: (bar: OhlcvBar, value: number, index?: number, all?: number[][]) => string;
 };
 
 export type IndicatorSpec = {
@@ -58,6 +61,33 @@ const SPECS: Record<IndicatorId, IndicatorSpec> = {
       },
     ],
     compute: (bars) => [bars.map((b) => b.volume)],
+  },
+  rvol: {
+    id: "rvol",
+    name: "Volume (RVOL + Spike)",
+    description: "Volume bars with 20-candle average; spikes ≥1.5× / ≥2.5× highlighted",
+    pane: "separate",
+    lines: [
+      {
+        title: "Volume",
+        color: "rgba(120,123,134,0.45)",
+        kind: "histogram",
+        colorFor: (bar, v, j, all) => {
+          const base = all?.[1]?.[j ?? -1];
+          const ratio = Number.isFinite(base) && (base as number) > 0 ? v / (base as number) : NaN;
+          const level = rvolLevel(ratio);
+          const up = bar.close >= bar.open;
+          if (level === "ultra") return up ? "rgba(0,200,140,1)" : "rgba(255,40,60,1)";
+          if (level === "high") return "rgba(255,170,0,0.9)";
+          return up ? "rgba(8,153,129,0.4)" : "rgba(242,54,69,0.4)";
+        },
+      },
+      { title: "MA 20", color: "#ff9800", kind: "line", width: 1 },
+    ],
+    compute: (bars) => {
+      const v = bars.map((b) => b.volume);
+      return [v, volumeBaseline(v, RVOL_PERIOD)];
+    },
   },
   ema20: {
     id: "ema20",

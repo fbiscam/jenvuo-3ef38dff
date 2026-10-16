@@ -534,7 +534,7 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
               const v = vals[j];
               if (!Number.isFinite(v)) return { time: bar.time as UTCTimestamp };
               if (line.kind === "histogram") {
-                const color = line.colorFor ? line.colorFor(bar, v) : line.color;
+                const color = line.colorFor ? line.colorFor(bar, v, j, values) : line.color;
                 return { time: bar.time as UTCTimestamp, value: v, color };
               }
               return { time: bar.time as UTCTimestamp, value: v };
@@ -646,7 +646,7 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
             const v = vals[j];
             if (!Number.isFinite(v)) return { time: bar.time as UTCTimestamp };
             if (line.kind === "histogram")
-              return { time: bar.time as UTCTimestamp, value: v, color: line.colorFor ? line.colorFor(bar, v) : line.color };
+              return { time: bar.time as UTCTimestamp, value: v, color: line.colorFor ? line.colorFor(bar, v, j, values) : line.color };
             return { time: bar.time as UTCTimestamp, value: v };
           }) as never,
         );
