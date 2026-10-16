@@ -48,7 +48,7 @@ import type { OhlcvBar } from "@/lib/chart/indicators";
 import { runJenvuScript, type ScriptResult } from "@/lib/chart/jenvu-script";
 import { computeSmcOverlay, DEFAULT_SMC, type SmcToggles } from "@/lib/chart/smc-overlay";
 import { projectNextCandles } from "@/lib/chart/projection";
-import { RVOL_LABEL, formatVolume, relativeVolume, rvolLevel } from "@/lib/chart/relative-volume";
+import { RVOL_LABEL, formatVolume, relativeVolume, rvolLevel, volumeSplit } from "@/lib/chart/relative-volume";
 import { ChartCanvas, type ChartCanvasHandle } from "./ChartCanvas";
 import { INDICATOR_LIST, buildIndicatorSeries, isIndicatorId, type IndicatorId } from "./indicator-specs";
 import { ScriptPanel, type SavedScript } from "./ScriptPanel";
@@ -491,6 +491,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
           ratio: rvolSeries[hoveredIdx],
           level: rvolLevel(rvolSeries[hoveredIdx]),
           forming: hoveredIdx === bars.length - 1,
+          split: volumeSplit(hovered),
         }
       : null;
 
@@ -873,6 +874,19 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
                       {rvolLegend.level === "ultra" ? " 🔥" : rvolLegend.level === "high" ? " ⚠" : ""}
                     </span>
                   )}
+                  <span className="text-[#089981]">Buy {Math.round(rvolLegend.split.buyShare * 100)}%</span>
+                  <span className="text-[#f23645]">Sell {Math.round((1 - rvolLegend.split.buyShare) * 100)}%</span>
+                  <b
+                    className={cn(
+                      rvolLegend.split.side === "buy" && "text-[#089981]",
+                      rvolLegend.split.side === "sell" && "text-[#f23645]",
+                    )}
+                  >
+                    {rvolLegend.split.side === "buy" ? "Buyers" : rvolLegend.split.side === "sell" ? "Sellers" : "Balanced"}
+                    {(rvolLegend.level === "high" || rvolLegend.level === "ultra") && rvolLegend.split.side !== "balanced"
+                      ? rvolLegend.split.side === "buy" ? " · Buy spike" : " · Sell spike"
+                      : ""}
+                  </b>
                   {rvolLegend.forming && <span className="opacity-70">(forming)</span>}
                 </div>
               )}

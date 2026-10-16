@@ -54,3 +54,19 @@ export function formatVolume(v: number): string {
   if (a >= 1e3) return `${(v / 1e3).toFixed(1)}K`;
   return v.toFixed(0);
 }
+
+export type VolumeSide = "buy" | "sell" | "balanced";
+
+/**
+ * Estimated buy/sell split of one candle's volume from where it closed inside
+ * its range (close-location value): close at the high = all buying, at the low
+ * = all selling. The gold feed has no real aggressor (buy/sell) data, so this
+ * is an estimate, not exchange order flow.
+ */
+export function volumeSplit(bar: { high: number; low: number; close: number; volume: number }) {
+  const range = bar.high - bar.low;
+  const buyShare = range > 0 ? Math.min(1, Math.max(0, (bar.close - bar.low) / range)) : 0.5;
+  const v = bar.volume || 0;
+  const side: VolumeSide = buyShare >= 0.6 ? "buy" : buyShare <= 0.4 ? "sell" : "balanced";
+  return { buy: v * buyShare, sell: v * (1 - buyShare), buyShare, side };
+}
