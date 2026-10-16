@@ -490,6 +490,7 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
                   lastValueVisible: spec.pane !== "volume",
                   priceLineVisible: false,
                   title: spec.pane === "volume" ? "" : line.title,
+                  ...(spec.id === "rvol" ? { priceFormat: { type: "volume" as const } } : {}),
                 },
                 pane,
               )
@@ -505,6 +506,7 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
                   crosshairMarkerVisible: false,
                   title: spec.pane === "main" ? "" : line.title,
                   lineStyle: line.dashed ? LineStyle.Dashed : LineStyle.Solid,
+                  ...(spec.id === "rvol" ? { priceFormat: { type: "volume" as const } } : {}),
                 },
                 pane,
               );
