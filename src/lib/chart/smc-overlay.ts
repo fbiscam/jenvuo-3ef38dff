@@ -1316,9 +1316,9 @@ export function renderSmcOverlay(
     if (strategy) {
       for (const z of zones) if (z.fvg) freshFvg(z.fvg);
     }
-    const planned = toggles.sdPlan === false ? undefined : [...zones].reverse().find((z) => z.plan);
-    for (const z of zones) sdZone(z, z === planned);
-    if (planned) sdPlan(planned);
+    // User request: zones show without Entry/SL/TP lines.
+    void sdPlan;
+    for (const z of zones) sdZone(z, false);
   }
   if (toggles.freshFvg && !strategy) {
     for (const f of visible.fvgs) freshFvg(f);
