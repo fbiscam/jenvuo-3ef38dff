@@ -1,4 +1,5 @@
-import { describe, expect, it } from "vitest";
+import { describe, it } from "node:test";
+import { expect } from "./test-expect";
 import { relativeVolume, rvolLevel, volumeBaseline } from "./relative-volume";
 
 describe("relative volume", () => {
