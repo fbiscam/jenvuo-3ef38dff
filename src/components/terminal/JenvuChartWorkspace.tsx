@@ -48,6 +48,7 @@ import type { OhlcvBar } from "@/lib/chart/indicators";
 import { runJenvuScript, type ScriptResult } from "@/lib/chart/jenvu-script";
 import { computeSmcOverlay, DEFAULT_SMC, type SmcToggles } from "@/lib/chart/smc-overlay";
 import { projectNextCandles } from "@/lib/chart/projection";
+import { RVOL_LABEL, formatVolume, relativeVolume, rvolLevel } from "@/lib/chart/relative-volume";
 import { ChartCanvas, type ChartCanvasHandle } from "./ChartCanvas";
 import { INDICATOR_LIST, buildIndicatorSeries, isIndicatorId, type IndicatorId } from "./indicator-specs";
 import { ScriptPanel, type SavedScript } from "./ScriptPanel";
@@ -221,7 +222,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
   const [ready, setReady] = useState(false);
   // Phones only: drawing tools stay hidden until opened from the top bar.
   const [mobileToolsOpen, setMobileToolsOpen] = useState(false);
-  const [indicators, setIndicators] = useState<IndicatorId[]>(["volume", "ema20", "ema50"]);
+  const [indicators, setIndicators] = useState<IndicatorId[]>(["volume", "rvol", "ema20", "ema50"]);
   const [smcToggles, setSmcToggles] = useState<SmcToggles>(DEFAULT_SMC);
   const [drawings, setDrawings] = useState<Drawing[]>([]);
   const [drawingsVisible, setDrawingsVisible] = useState(true);
@@ -264,7 +265,16 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
     // `null` = never saved → keep defaults. An empty array means the user
     // removed every indicator on purpose, so respect it.
     const savedIndicators = readJson<unknown[] | null>(INDICATORS_KEY, null);
-    if (Array.isArray(savedIndicators)) setIndicators(savedIndicators.filter(isIndicatorId));
+    if (Array.isArray(savedIndicators)) {
+      const list = savedIndicators.filter(isIndicatorId);
+      // One-time: switch the new RVOL volume indicator on for existing setups.
+      const RVOL_INTRO_KEY = "jenvu:terminal:rvol-intro:v1";
+      if (!readJson<boolean>(RVOL_INTRO_KEY, false)) {
+        writeJson(RVOL_INTRO_KEY, true);
+        if (!list.includes("rvol")) list.push("rvol");
+      }
+      setIndicators(list);
+    }
     const savedSmc = readJson<Partial<SmcToggles> | null>(SMC_KEY, null);
     if (savedSmc && typeof savedSmc === "object") setSmcToggles({ ...DEFAULT_SMC, ...savedSmc });
     const savedScripts = readJson<SavedScript[]>(SCRIPTS_KEY, []);
@@ -462,13 +472,27 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
   const legendIndicators = useMemo(
     () =>
       indicators
-        .filter((id) => id !== "volume")
+        .filter((id) => id !== "volume" && id !== "rvol")
         .map((id) => {
           const spec = buildIndicatorSeries(id);
           return { spec, values: spec.compute(bars) };
         }),
     [indicators, bars],
   );
+
+  const rvolSeries = useMemo(
+    () => (indicators.includes("rvol") ? relativeVolume(bars.map((b) => b.volume)) : null),
+    [indicators, bars],
+  );
+  const rvolLegend =
+    rvolSeries && hovered && hoveredIdx >= 0
+      ? {
+          volume: hovered.volume,
+          ratio: rvolSeries[hoveredIdx],
+          level: rvolLevel(rvolSeries[hoveredIdx]),
+          forming: hoveredIdx === bars.length - 1,
+        }
+      : null;
 
   function downloadSnapshot() {
     const url = chartRef.current?.snapshot(
@@ -831,6 +855,25 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
               {demoTradingEnabled && (
                 <div className="mb-1.5">
                   <QuickTradeButtons price={currentPrice} onPick={setTicketSide} />
+                </div>
+              )}
+              {rvolLegend && (
+                <div className="flex flex-wrap items-center gap-x-2 text-muted-foreground">
+                  <span>Vol</span>
+                  <b className="text-foreground">{formatVolume(rvolLegend.volume)}</b>
+                  {rvolLegend.level && (
+                    <span
+                      className={cn(
+                        "rounded px-1",
+                        rvolLegend.level === "ultra" && "bg-destructive/15 font-semibold text-destructive",
+                        rvolLegend.level === "high" && "bg-primary/10 font-semibold text-primary",
+                      )}
+                    >
+                      {rvolLegend.ratio.toFixed(1)}× {RVOL_LABEL[rvolLegend.level]}
+                      {rvolLegend.level === "ultra" ? " 🔥" : rvolLegend.level === "high" ? " ⚠" : ""}
+                    </span>
+                  )}
+                  {rvolLegend.forming && <span className="opacity-70">(forming)</span>}
                 </div>
               )}
               {legendIndicators.map(({ spec, values }) => (
