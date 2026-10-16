@@ -65,7 +65,7 @@ const SPECS: Record<IndicatorId, IndicatorSpec> = {
   rvol: {
     id: "rvol",
     name: "Volume (RVOL + Spike)",
-    description: "Buy / sell volume bars with spike colours and 20-candle average, fixed at the bottom like Volume",
+    description: "Buy / sell volume bars with spike colours ",
     pane: "volume",
     lines: [
       {
