@@ -36,9 +36,7 @@ import { getUsageStats, type UsageStats } from "@/lib/usage.functions";
 import { listExtensionKeys } from "@/lib/extension-keys.functions";
 import { Button } from "@/components/ui/button";
 import astraGalaxyBanner from "@/assets/astra-galaxy-banner.jpg";
-import astraParticleCardBackground from "@/assets/astra-particle-card-bg.jpg";
 import grokModelLogo from "@/assets/grok-logo-transparent.png";
-import solLogoAsset from "@/assets/sol-logo.png.asset.json";
 
 import {
   Bookmark,
@@ -89,8 +87,6 @@ import {
   CircleHelp,
   Bot,
   Boxes,
-  ScanSearch,
-  ShieldCheckIcon,
   Terminal,
   type LucideIcon,
 } from "lucide-react";
@@ -1571,7 +1567,6 @@ function DashboardLayout() {
                 onRefresh={handleRefresh}
               />
 
-              <ModelWorkspace />
 
               <div className="h-12" />
             </>
@@ -2082,169 +2077,6 @@ function UsageAnalytics({
             </div>
           </div>
         </div>
-      </div>
-    </section>
-  );
-}
-
-function ClaudeLogo({ className }: { className?: string; strokeWidth?: number }) {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true" className={className} fill="#D97757">
-      <path d="M4.709 15.955l4.72-2.647.079-.23-.08-.128H9.2l-.79-.048-2.698-.073-2.339-.097-2.266-.122-.571-.121L0 11.784l.055-.352.48-.321.686.06 1.52.103 2.278.158 1.652.097 2.449.255h.389l.055-.157-.134-.098-.103-.097-2.358-1.596-2.552-1.688-1.336-.972-.724-.491-.364-.462-.158-1.008.656-.722.881.06.225.061.893.686 1.908 1.476 2.491 1.833.365.304.145-.103.019-.073-.164-.274-1.355-2.446-1.446-2.49-.644-1.032-.17-.619a2.97 2.97 0 01-.104-.729L6.283.134 6.696 0l.996.134.42.364.62 1.414 1.002 2.229 1.555 3.03.456.898.243.832.091.255h.158V9.01l.128-1.706.237-2.095.23-2.695.08-.76.376-.91.747-.492.584.28.48.685-.067.444-.286 1.851-.559 2.903-.364 1.942h.212l.243-.242.985-1.306 1.652-2.064.73-.82.85-.904.547-.431h1.033l.76 1.129-.34 1.166-1.064 1.347-.881 1.142-1.264 1.7-.79 1.36.073.11.188-.02 2.856-.606 1.543-.28 1.841-.315.833.388.091.395-.328.807-1.969.486-2.309.462-3.439.813-.042.03.049.061 1.549.146.662.036h1.622l3.02.225.79.522.474.638-.079.485-1.215.62-1.64-.389-3.829-.91-1.312-.329h-.182v.11l1.093 1.068 2.006 1.81 2.509 2.33.127.578-.322.455-.34-.049-2.205-1.657-.851-.747-1.926-1.62h-.128v.17l.444.649 2.345 3.521.122 1.08-.17.353-.607.213-.667-.122-1.373-1.925-1.415-2.167-1.143-1.943-.14.08-.674 7.254-.316.37-.729.28-.607-.461-.322-.747.322-1.476.389-1.924.315-1.53.286-1.9.17-.632-.012-.042-.14.018-1.434 1.967-2.18 2.945-1.726 1.845-.414.164-.717-.37.067-.662.401-.589 2.388-3.036 1.44-1.882.93-1.086-.006-.158h-.055L4.132 18.56l-1.13.146-.487-.456.061-.746.231-.243 1.913-1.315-.012.008z" />
-    </svg>
-  );
-}
-
-const RECOMMENDED_MODELS = [
-  {
-    name: " Grok 4.6",
-    badge: "New",
-    description: "Fast, high context reasoning for  gold analysis.",
-    logo: null,
-    logoImage: grokModelLogo,
-    logoLabel: "",
-    badgeTone: "bg-primary text-primary-foreground",
-    featured: true,
-  },
-  {
-    name: "  Claude fable 5 & 5.1",
-    badge: "Senior review",
-    description: " Independent validation for structure, risk",
-    logo: ClaudeLogo,
-    logoImage: null,
-    logoLabel: "Claude",
-    badgeTone: "bg-chart-2/15 text-chart-2",
-    featured: false,
-  },
-  {
-    name: "  Gpt-5.6 sol",
-    badge: "Efficient",
-    description: " Fast reasoning for everyday market questions ",
-    logo: null,
-    logoImage: solLogoAsset.url,
-    logoLabel: "Sol",
-    badgeTone: "bg-chart-1/15 text-chart-1",
-    featured: false,
-  },
-  {
-    name: "  Ict / smc engine",
-    badge: "Built in",
-    description: " Maps structure, liquidity, order blocks",
-    logo: ChartNoAxesCombined,
-    logoImage: null,
-    logoLabel: "SMC",
-    badgeTone: "bg-accent text-accent-foreground",
-    featured: false,
-  },
-] as const;
-
-import { getLatestProductUpdates, formatUpdateTime, cleanUpdateText } from "@/lib/product-updates";
-
-const UPDATE_ICONS = {
-  scan: ScanSearch,
-  shield: ShieldCheckIcon,
-  refresh: RefreshCw,
-  sparkles: Sparkles,
-  gauge: Settings2,
-  terminal: Terminal,
-} as const;
-
-function ModelWorkspace() {
-  return (
-    <section className="mt-10 bg-background" aria-label="Models and product updates">
-      <div className="mx-auto grid w-full max-w-6xl gap-9 lg:grid-cols-[minmax(0,1.7fr)_minmax(260px,0.9fr)] lg:gap-10">
-        <div className="min-w-0">
-          <h2 className="mb-4 text-2xl font-normal text-foreground">
-            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Recommended models
-          </h2>
-          <div className="grid gap-4 sm:grid-cols-2">
-            {RECOMMENDED_MODELS.map((model) => {
-              const ModelLogo = model.logo;
-              return (
-                <article
-                  key={model.name}
-                  className={`relative min-h-[154px] overflow-hidden rounded-lg border p-5 ${model.featured ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card text-card-foreground"}`}
-                >
-                  {model.featured && (
-                    <img
-                      src={astraParticleCardBackground}
-                      alt=""
-                      loading="lazy"
-                      width={1200}
-                      height={600}
-                      className="absolute inset-0 h-full w-full object-cover object-right"
-                    />
-                  )}
-                  <div className="relative z-10 flex h-full flex-col">
-                    <div className="flex items-start justify-between gap-3">
-                      <div
-                        className={`flex h-11 items-center gap-2 rounded-md border px-2.5 ${model.featured ? "border-primary-foreground/30 bg-foreground" : "border-border bg-background"}`}
-                        aria-label={`${model.logoLabel || model.name} model`}
-                      >
-                        {model.logoImage ? (
-                          <img
-                            src={model.logoImage}
-                            alt={model.logoLabel || model.name}
-                            className="h-9 w-9 object-contain"
-                          />
-                        ) : ModelLogo ? (
-                          <ModelLogo className="h-5 w-5" strokeWidth={1.8} />
-                        ) : null}
-                        {model.logoLabel ? (
-                          <span className="text-xs font-semibold">{model.logoLabel}</span>
-                        ) : null}
-                      </div>
-                      <span
-                        className={`rounded px-2 py-1 text-xs font-semibold ${model.featured ? "bg-primary-foreground text-primary" : model.badgeTone}`}
-                      >
-                        {model.badge}
-                      </span>
-                    </div>
-                    <div className="mt-4 text-left">
-                      <h3
-                        className={`text-base font-normal ${model.featured ? "!text-white" : "text-card-foreground"}`}
-                      >
-                        {model.name}
-                      </h3>
-                      <p
-                        className={`mt-1 text-sm leading-5 ${model.featured ? "text-primary-foreground" : "text-muted-foreground"}`}
-                      >
-                        {model.description}
-                      </p>
-                    </div>
-                  </div>
-                </article>
-              );
-            })}
-          </div>
-        </div>
-
-        <aside className="min-w-0">
-          <h2 className="mb-4 text-right text-2xl font-normal text-foreground"></h2>
-          <div className="divide-y divide-border">
-            {getLatestProductUpdates().map((update) => {
-              const UpdateIcon = UPDATE_ICONS[update.icon];
-              return (
-                <article
-                  key={update.title}
-                  className="grid grid-cols-[42px_minmax(0,1fr)] gap-4 py-5 first:pt-4"
-                >
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted text-primary">
-                    <UpdateIcon className="h-5 w-5" strokeWidth={1.8} />
-                  </div>
-                  <div className="min-w-0">
-                    <p className="line-clamp-2 text-sm leading-5 sm:text-[15px] sm:leading-6 text-foreground">
-                      {cleanUpdateText(update.copy)}
-                    </p>
-                    <p className="mt-2 text-xs sm:text-[13px] text-muted-foreground/80">
-                      {update.tag} · {formatUpdateTime(update.at)}
-                    </p>
-                  </div>
-                </article>
-              );
-            })}
-          </div>
-        </aside>
       </div>
     </section>
   );
