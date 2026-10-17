@@ -191,7 +191,7 @@ function ContactPage() {
               <a href="mailto:support@jenvu.com" className="mt-6 flex w-full items-center justify-center gap-2 rounded-full bg-home-accent px-5 py-3 text-[16px] font-medium text-home-accent-foreground hover:opacity-90">
                 support@jenvu.com
               </a>
-              <p className="mt-4 text-[15px] text-gc-ink-muted">Available Monday to Friday, 09:00 – 18:00 GMT</p>
+              <p className="mt-4 text-[15px] text-gc-ink-muted">Monday to Friday, 09:00 – 18:00 GMT\u00a0</p>
             </div>
             <SideCard text="New customers get $100 credit and 14 days of Pro." link="Get started for free" href="https://auth.jenvu.com/sign-in" />
             <SideCard text="Get help with your account, resolve billing issues, and find helpful guides." link="Visit Jenvu Support" href="https://support.jenvu.com" />
