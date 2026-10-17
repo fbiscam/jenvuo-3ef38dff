@@ -17,7 +17,15 @@ import { getMarketSnapshotsBatch } from "@/lib/gold-analysis.functions";
 import RegionEarth from "@/components/RegionEarth";
 import TrustedDesks from "@/components/TrustedDesks";
 import { WhyJenvu } from "@/components/WhyJenvu";
-import CloudflareHero from "@/components/CloudflareHero";
+import {
+  CloudAnnouncement,
+  CloudHero,
+  CloudProducts,
+  CloudUseCases,
+  CloudPricing,
+  CloudResources,
+  CloudFinalCta,
+} from "@/components/home/CloudHome";
 import TailoredToDesk from "@/components/TailoredToDesk";
 
 import {
@@ -356,9 +364,7 @@ function Sparkline({ series, up }: { series: number[]; up: boolean }) {
 function HomePage() {
   const ticker = useLiveTicker();
   
-  const board = useCorrelatedMarkets(
-    (Route.useLoaderData() as { board?: CorrelatedBoard | null } | undefined)?.board ?? null,
-  );
+  const xau = ticker.find((r) => r[0] === "XAU/USD");
   const currentPlan = useCurrentPlan();
   const upgradeLock = useUpgradeLock();
   const trial = useTrial();
@@ -374,16 +380,16 @@ function HomePage() {
   }, [mobileMenuOpen]);
   return (
     <>
-    <div className={`jenvu-zoom min-h-dvh w-full bg-white text-zinc-900 ${SANS} antialiased selection:bg-zinc-900 selection:text-white`}>
+    <div className={`jenvu-zoom min-h-dvh w-full bg-background text-gc-ink ${SANS} antialiased`}>
       {/* NAV */}
-      <header className="sticky top-0 z-50 border-b border-zinc-100 bg-white">
-        <div className="relative mx-auto flex max-w-6xl items-center justify-between gap-3 px-5 py-3 sm:px-6 sm:py-4">
+      <header className="sticky top-0 z-50 border-b border-gc-line bg-background">
+        <div className="relative mx-auto flex max-w-[1296px] items-center justify-between gap-3 px-5 py-3 sm:px-8">
           <Link to="/" className="flex min-w-0 items-center gap-2.5">
             <img src="/favicon.png" alt="Jenvu" className="h-7 w-7 shrink-0 rounded-md object-contain" />
             <span className="truncate text-[22px] tracking-tight leading-none" style={{ color: "#3c4043", fontFamily: "\"Google Sans\", \"Product Sans\", \"DM Sans\", system-ui, sans-serif", fontWeight: 500 }}>Jenvu</span>
           </Link>
 
-          <nav className={`hidden md:flex absolute left-1/2 -translate-x-1/2 items-center gap-7 text-sm text-zinc-900`}>
+          <nav className="hidden md:flex mr-auto ml-10 items-center gap-1 text-[14px] font-medium text-gc-ink-muted [&>a]:rounded-md [&>a]:px-3 [&>a]:py-2 [&>a:hover]:bg-gc-surface [&>a:hover]:text-gc-ink">
             <Link to="/pricing" className="hover:text-zinc-900">Pricing</Link>
             <Link to="/founding" className="hover:text-zinc-900">Founding</Link>
             <Link to="/insights" className="hover:text-zinc-900">Insights</Link>
@@ -480,248 +486,14 @@ function HomePage() {
       )}
 
 
+      <CloudAnnouncement />
       <main>
-      {/* HERO */}
-      <CloudflareHero />
-
-
-
-
-
-
-      {/* REGION: EARTH */}
-      <section>
-        <RegionEarth />
-      </section>
-
-
-      {/* TRUSTED DESKS / REVIEWS */}
-      <section className="bg-white">
-        <TrustedDesks />
-      </section>
-
-      {/* WHY JENVU — Cloudflare-style split panel */}
-      <section className="bg-white">
-        <WhyJenvu />
-      </section>
-
-
-      {/* PRICING — Free vs Paid panels */}
-      <section className="bg-white">
-        <div className="mx-auto max-w-6xl px-5 py-16 sm:px-6 sm:py-24">
-          <div className="mx-auto mb-10 max-w-2xl text-center">
-            <h2 className="text-3xl font-semibold tracking-tight text-zinc-900 sm:text-4xl md:text-[44px] md:leading-[1.1]">
-              Compare Jenvu Plans
-            </h2>
-            <p className="mx-auto mt-4 max-w-xl text-[15px] leading-relaxed text-zinc-500 sm:text-base">
-              Choose the wallet and desk access that fits how you trade gold.
-            </p>
-          </div>
-
-          {/* Category tabs */}
-          <div className="flex flex-wrap items-center justify-center gap-2">
-            {["Wallet & Credits", "Signal Engine", "API & Terminal"].map((t, i) => (
-              <span
-                key={t}
-                className={`rounded-full border px-4 py-1.5 text-[13px] font-medium ${
-                  i === 0
-                    ? "border-home-accent bg-home-accent-soft text-home-accent"
-                    : "border-zinc-200 bg-white text-zinc-600"
-                }`}
-              >
-                {t}
-              </span>
-            ))}
-          </div>
-
-          {/* Trial vs Paid explainer */}
-          <div className="mx-auto mt-12 grid max-w-4xl items-center gap-8 md:grid-cols-2">
-            <div>
-              <h3 className="text-xl font-semibold tracking-tight text-zinc-900 sm:text-2xl">
-                Free Trial vs. Paid Plans
-              </h3>
-              <p className="mt-3 text-[15px] leading-relaxed text-zinc-500">
-                Paid plans unlock realtime A+ signals, AI chart analysis,
-                and API keys for the trading terminal.
-              </p>
-            </div>
-            <div className="flex items-center justify-center gap-4">
-              <div className="flex h-24 w-28 flex-col items-center justify-center rounded-xl border border-zinc-200 bg-white">
-                <span className={`${MONO} text-[10px] uppercase tracking-wider text-zinc-400`}>Trial</span>
-                <span className="mt-1 text-lg font-semibold text-zinc-900">$0</span>
-              </div>
-              <svg width="48" height="24" viewBox="0 0 48 24" fill="none" aria-hidden>
-                <line x1="2" y1="12" x2="40" y2="12" stroke="currentColor" strokeWidth="2" className="text-home-accent" strokeDasharray="4 4" />
-                <path d="M36 5l8 7-8 7" stroke="currentColor" strokeWidth="2" fill="none" className="text-home-accent" />
-              </svg>
-              <div className="flex h-24 w-28 flex-col items-center justify-center rounded-xl border-2 border-home-accent bg-home-accent-soft">
-                <span className={`${MONO} text-[10px] uppercase tracking-wider text-home-accent`}>Paid</span>
-                <span className="mt-1 text-lg font-semibold text-zinc-900">$10+</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Free / Paid panels */}
-          <div className="mx-auto mt-12 grid max-w-4xl gap-6 md:grid-cols-2">
-            {/* Free */}
-            <div className="rounded-2xl border border-zinc-200 bg-white p-7">
-              <h4 className="text-lg font-semibold text-zinc-900">Founding access</h4>
-              <p className="mt-1 text-[13px] text-zinc-500">Invite-only access for approved traders</p>
-              <div className="mt-5 space-y-3">
-                {[
-                  ["Signals / day", "5"],
-                  ["Signal latency", "15 min"],
-                  ["AI chart queries", "20 / day"],
-                ].map(([k, v]) => (
-                  <div key={k} className="flex items-center justify-between rounded-lg border border-dashed border-zinc-300 px-4 py-2.5">
-                    <span className="text-[13px] text-zinc-600">{k}</span>
-                    <span className={`${MONO} text-[13px] font-semibold text-zinc-900`}>{v}</span>
-                  </div>
-                ))}
-              </div>
-              <Link
-                to="/founding"
-                className="mt-6 inline-flex h-10 w-full items-center justify-center rounded-full border border-zinc-300 bg-white text-sm font-semibold text-zinc-900 transition hover:bg-zinc-50"
-              >
-                See more
-              </Link>
-            </div>
-
-            {/* Paid */}
-            <div className="rounded-2xl border-2 border-home-accent bg-home-accent-soft/40 p-7">
-              <div className="flex items-center gap-2">
-                <h4 className="text-lg font-semibold text-zinc-900">Paid</h4>
-                <span className={`${MONO} rounded-sm bg-home-accent px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wider text-white`}>
-                  Popular
-                </span>
-              </div>
-              <p className="mt-1 text-[13px] text-zinc-500">Pro, Elite and Ultra wallet tiers</p>
-              <div className="mt-5 space-y-3">
-                {[
-                  ["Signals / day", "Unlimited"],
-                  ["Signal latency", "Realtime"],
-                  ["AI chart queries", "Wallet based"],
-                  ["API & Terminal", "Included"],
-                ].map(([k, v]) => (
-                  <div key={k} className="flex items-center justify-between rounded-lg border border-dashed border-home-accent/50 bg-white px-4 py-2.5">
-                    <span className="text-[13px] text-zinc-600">{k}</span>
-                    <span className={`${MONO} text-[13px] font-semibold text-home-accent`}>{v}</span>
-                  </div>
-                ))}
-              </div>
-              <Link
-                to="/pricing"
-                className="mt-6 inline-flex h-10 w-full items-center justify-center rounded-full bg-home-accent text-sm font-semibold text-white transition hover:opacity-90"
-              >
-                See more
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
-
-
-
-
-      {/* TAILORED TO YOUR DESK */}
-      <TailoredToDesk />
-
-
-
-      {/* INTEGRATIONS */}
-      <section className="border-t border-zinc-100 bg-white">
-        <div className="mx-auto max-w-6xl px-5 py-10 sm:px-6 sm:py-12">
-          <div className="flex min-w-0 flex-col items-start justify-between gap-6 md:flex-row">
-            <div className="w-full text-center md:w-auto md:text-left">
-              <h3 className="text-lg font-semibold tracking-tight text-zinc-900 sm:text-xl">
-                Wired into the venues&nbsp;
-              </h3>
-            </div>
-            <div className="-mx-5 flex w-[calc(100%+2.5rem)] min-w-0 snap-x snap-mandatory flex-nowrap items-center justify-start gap-3 overflow-x-auto overscroll-x-contain px-5 pb-2 [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [touch-action:pan-x] [&::-webkit-scrollbar]:hidden sm:-mx-6 sm:w-[calc(100%+3rem)] sm:px-6 md:mx-0 md:w-auto md:flex-wrap md:justify-end md:overflow-visible md:px-0 md:pb-0 md:[touch-action:auto]">
-              {["OANDA XAU feeds", "Yahoo Finance", "LBMA fix", "TradingView", "COMEX / COT", "DXY"].map((n) => (
-                <span
-                  key={n}
-                  className={`shrink-0 snap-start rounded-full border border-zinc-200 bg-white px-3.5 py-1.5 ${MONO} text-[11px] tracking-wider text-zinc-900`}
-                >
-                  {n}
-                </span>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-
-
-
-
-      <section className="overflow-hidden border-t border-border bg-background">
-        <div className="mx-auto max-w-[1200px] px-3 pb-24 pt-10 sm:px-4">
-          <div className="build-boundaries-panel relative min-h-[396px] overflow-hidden rounded-[14px] bg-home-accent">
-            {/* dot grid */}
-            <div className="build-boundaries-dots pointer-events-none absolute inset-0" />
-
-            {/* floating dashed tiles */}
-            {[
-              { Icon: Chrome, cls: "left-[14%] top-[8%] rotate-12", delay: "0s" },
-              { Icon: MessageSquare, cls: "left-[8%] top-[27%] -rotate-6", delay: "0.8s" },
-              { Icon: ScanLine, cls: "left-[21%] top-[32%] -rotate-12", delay: "1.6s" },
-              { Icon: Database, cls: "right-[22%] top-[28%] rotate-6", delay: "0.4s" },
-              { Icon: Wifi, cls: "right-[8%] top-[9%] rotate-12", delay: "1.2s" },
-              { Icon: Box, cls: "right-[5%] top-[35%] -rotate-12", delay: "2s" },
-            ].map(({ Icon, cls, delay }, i) => (
-              <div
-                key={i}
-                className={`pointer-events-none absolute hidden h-14 w-14 items-center justify-center rounded-sm border border-primary-foreground/60 sm:flex ${cls}`}
-                style={{ animation: `cfhero-float 7s ease-in-out ${delay} infinite` }}
-              >
-                <Icon className="h-5 w-5 text-home-accent-foreground" strokeWidth={1.75} />
-              </div>
-            ))}
-
-            {/* content */}
-            <div className="relative z-10 mx-auto max-w-3xl px-5 pb-24 pt-16 text-center sm:px-10 sm:pt-24">
-              <h2 className="mx-auto max-w-[330px] text-[30px] font-semibold leading-[1.08] text-home-accent-foreground sm:max-w-none sm:text-4xl md:text-[42px]">
-                Build without boundaries
-              </h2>
-              <p className="mx-auto mt-6 max-w-[320px] text-[13px] leading-[1.45] text-home-accent-foreground sm:max-w-xl sm:text-sm sm:leading-snug">
-                Your TradingView copilot is one click away reading, reasoning, research
-                <br className="hidden sm:block" />{" "}
-                &amp; reviewing. Analyze the market now, no credit card required.
-              </p>
-              <div className="mx-auto mt-8 flex w-full max-w-[300px] flex-col items-stretch justify-center gap-2 sm:max-w-none sm:flex-row sm:items-center">
-                <Link
-                  to="/dashboard"
-                  className="inline-flex h-10 items-center justify-center rounded-full bg-background px-6 text-sm font-semibold text-foreground shadow-sm transition hover:bg-muted"
-                >
-                  Open Dashboard
-                </Link>
-                <Link
-                  to="/pricing"
-                  className="inline-flex h-10 items-center justify-center rounded-full border border-primary-foreground/20 bg-primary-foreground/15 px-6 text-sm font-semibold text-home-accent-foreground backdrop-blur transition hover:bg-primary-foreground/25"
-                >
-                  View Pricing
-                </Link>
-              </div>
-            </div>
-
-
-            {/* ticker bar */}
-            <div className="absolute inset-x-0 bottom-0 z-10 overflow-hidden border-t border-primary-foreground/25 bg-foreground/10 py-3">
-              <div className="flex w-max items-center gap-10 whitespace-nowrap" style={{ animation: "jenvu-marquee 28s linear infinite" }}>
-                {Array.from({ length: 2 }).map((_, dup) => (
-                  <div key={dup} className="flex items-center gap-10 pr-10 text-xs font-medium text-home-accent-foreground">
-                    <span>◈ built-in trading terminal analyzing gold charts 24/7</span>
-                    <span>◉ Real-time gold signals without surprises</span>
-                    <span>⌁ Research, reasoning &amp; risk context in one terminal</span>
-                    <span>▣ Battle-tested feeds powering desks worldwide</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+        <CloudHero price={xau?.[1] ?? "—"} delta={xau?.[2] ?? "…"} />
+        <CloudProducts />
+        <CloudUseCases />
+        <CloudPricing />
+        <CloudResources />
+        <CloudFinalCta />
       </main>
 
       <SiteFooter />
