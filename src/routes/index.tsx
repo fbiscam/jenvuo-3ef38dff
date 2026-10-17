@@ -19,6 +19,7 @@ import TrustedDesks from "@/components/TrustedDesks";
 import { WhyJenvu } from "@/components/WhyJenvu";
 import {
   CloudAudiences,
+  CloudBuildWith,
   CloudHero,
   CloudProducts,
   CloudUseCases,
@@ -516,6 +517,7 @@ function HomePage() {
         <main>
           <CloudHero price={xau?.[1] ?? "—"} delta={xau?.[2] ?? "…"} />
           <CloudAudiences />
+          <CloudBuildWith />
           <CloudProducts />
           <CloudUseCases />
           <CloudPricing />
