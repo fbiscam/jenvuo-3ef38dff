@@ -6,6 +6,13 @@ import type { Database } from "@/integrations/supabase/types";
 const ContactInput = z.object({
   name: z.string().trim().min(1, "Name is required").max(100, "Name is too long"),
   email: z.string().trim().email("Enter a valid email").max(255, "Email is too long"),
+  phone: z
+    .string()
+    .trim()
+    .max(30, "Phone number is too long")
+    .regex(/^[+()\-.\s\d]*$/, "Enter a valid phone number")
+    .optional()
+    .default(""),
   subject: z.string().trim().min(1, "Subject is required").max(150, "Subject is too long"),
   message: z.string().trim().min(5, "Message is too short").max(2000, "Message is too long"),
 });
@@ -28,6 +35,7 @@ function buildNotification(input: ContactInputType) {
   const safeName = escapeHtml(input.name);
   const safeEmail = escapeHtml(input.email);
   const safeSubject = escapeHtml(input.subject);
+  const safePhone = escapeHtml(input.phone || "—");
   const safeMessage = escapeHtml(input.message).replace(/\n/g, "<br/>");
   const html = `<!doctype html><html><body style="font-family:Arial,sans-serif;background:#ffffff;color:#111;padding:24px">
     <div style="max-width:560px;margin:0 auto;border:1px solid #e5e7eb;border-radius:12px;padding:24px">
@@ -36,11 +44,12 @@ function buildNotification(input: ContactInputType) {
       <table style="width:100%;font-size:14px;border-collapse:collapse;margin-bottom:16px">
         <tr><td style="color:#6b7280;padding:4px 0;width:80px">From</td><td style="padding:4px 0"><strong>${safeName}</strong></td></tr>
         <tr><td style="color:#6b7280;padding:4px 0">Email</td><td style="padding:4px 0"><a href="mailto:${safeEmail}">${safeEmail}</a></td></tr>
+        <tr><td style="color:#6b7280;padding:4px 0">Phone</td><td style="padding:4px 0">${safePhone}</td></tr>
       </table>
       <div style="font-size:14px;line-height:1.6;white-space:pre-wrap;border-top:1px solid #e5e7eb;padding-top:16px">${safeMessage}</div>
       <p style="font-size:12px;color:#6b7280;margin-top:24px">Reply directly to this email — it goes straight to ${safeName}.</p>
     </div></body></html>`;
-  const text = `New contact message\n\nFrom: ${input.name} <${input.email}>\nSubject: ${input.subject}\n\n${input.message}\n\nReply to this email to respond directly.`;
+  const text = `New contact message\n\nFrom: ${input.name} <${input.email}>\nPhone: ${input.phone || "—"}\nSubject: ${input.subject}\n\n${input.message}\n\nReply to this email to respond directly.`;
   return { html, text };
 }
 
@@ -61,6 +70,7 @@ export const submitContactMessage = createServerFn({ method: "POST" })
     const { error } = await supabase.from("contact_messages").insert({
       name: data.name,
       email: data.email,
+      phone: data.phone || null,
       subject: data.subject,
       message: data.message,
     });
