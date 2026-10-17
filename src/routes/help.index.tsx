@@ -1,13 +1,10 @@
 import * as React from "react";
 import SiteHeader from "@/components/SiteHeader";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import {
-  Compass, Puzzle, LineChart, CreditCard, Shield, Smartphone,
-  Search, ArrowRight, HelpCircle, MessageCircle,
-} from "lucide-react";
+import { Search, ArrowRight, ChevronDown, ChevronsUpDown, Send } from "lucide-react";
 import SiteFooter from "@/components/SiteFooter";
-import HeaderAuthButtons from "@/components/HeaderAuthButtons";
-import { collections, allArticles, type Collection } from "@/lib/help-content";
+import { NextStep } from "@/components/PageShell";
+import { collections, allArticles } from "@/lib/help-content";
 
 export const Route = createFileRoute("/help/")({
   head: () => ({
@@ -28,10 +25,8 @@ export const Route = createFileRoute("/help/")({
   component: HelpCenterPage,
 });
 
-const MONO = "font-['JetBrains_Mono',ui-monospace,monospace]";
 const SANS = "font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif]";
 
-const ICONS = { Compass, Puzzle, LineChart, CreditCard, Shield, Smartphone } as const;
 
 function HelpCenterPage() {
   const [q, setQ] = React.useState("");
