@@ -512,9 +512,9 @@
 
 
 /* Homepage: menu keeps the site zoom, page content renders smaller */
-@media (min-width: 1024px) { .jenvu-home-content { zoom: 0.8; } }
-@media (min-width: 1360px) { .jenvu-home-content { zoom: 0.9; } }
-@media (min-width: 1680px) { .jenvu-home-content { zoom: 1; } }
+@media (min-width: 1024px) { .jenvu-home-content { zoom: 0.72; } }
+@media (min-width: 1360px) { .jenvu-home-content { zoom: 0.78; } }
+@media (min-width: 1680px) { .jenvu-home-content { zoom: 0.82; } }
 
 @media (min-width: 1024px) { .killzones-root { zoom: 1.25; } }
 @media (min-width: 1280px) and (min-height: 800px) { .jenvu-auth-zoom { zoom: 1.21; } }
