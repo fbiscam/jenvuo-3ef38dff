@@ -129,8 +129,8 @@ export function CloudLogoStrip() {
           }}
         >
           <div
-            className="flex w-max items-center py-8"
-            style={{ animation: "gc-marquee 35s linear infinite", animationPlayState: playing ? "running" : "paused" }}
+            className="gc-logo-marquee flex w-max items-center py-8"
+            style={{ animationPlayState: playing ? "running" : "paused" }}
           >
             {row.map((b, i) => (
               <div key={i} className="flex h-12 shrink-0 items-center gap-2 pr-16 text-gc-ink" aria-hidden={i >= BRANDS.length}>
