@@ -115,6 +115,9 @@
   --color-gc-navy: var(--gc-navy);
   --color-gc-blue-deep: var(--gc-blue-deep);
   --color-gc-sky: var(--gc-sky);
+  --color-gc-canvas: var(--gc-canvas);
+  --color-gc-nav-active: var(--gc-nav-active);
+  --color-gc-notice: var(--gc-notice);
   --color-auth-action: var(--auth-action);
   --color-auth-action-foreground: var(--auth-action-foreground);
 }
@@ -185,6 +188,10 @@
   --gc-navy: #283593;
   --gc-blue-deep: #0b57d0;
   --gc-sky: #dcefff;
+  /* Dashboard console shell (Google Cloud console-style) */
+  --gc-canvas: #f8fafd;
+  --gc-nav-active: #dfe5ef;
+  --gc-notice: #e9eef6;
   --auth-action: oklch(0.72 0.14 255);
   --auth-action-foreground: oklch(1 0 0);
 }
