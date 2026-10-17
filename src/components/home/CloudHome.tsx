@@ -37,6 +37,10 @@ import devDocs from "@/assets/home/dev-docs.jpg";
 import progFounding from "@/assets/home/prog-founding.jpg";
 import progPlans from "@/assets/home/prog-plans.jpg";
 import progSupport from "@/assets/home/prog-support.jpg";
+import placeFloor from "@/assets/home/place-floor.jpg";
+import placeVault from "@/assets/home/place-vault.jpg";
+import placeLondon from "@/assets/home/place-london.jpg";
+import placeDev from "@/assets/home/place-dev.jpg";
 
 type Tone = "blue" | "red" | "yellow" | "green";
 
@@ -159,6 +163,10 @@ const STORIES = [
   { img: cardAi, tag: "AI ANNOUNCEMENTS", title: "What's new in the Jenvu AI desk this month", to: "/ai-engine" },
   { img: cardWave, tag: "VOLUME", title: "RVOL spikes and buyer/seller share on every candle", to: "/help" },
   { img: cardGold, tag: "GOLD MARKET", title: "Daily XAU/USD insights and trading guides", to: "/insights" },
+  { img: placeFloor, tag: "DEMO TRADING", title: "Practice on a $100,000 demo account with no risk", to: "/pricing" },
+  { img: placeVault, tag: "FOUNDING PROGRAM", title: "Apply to the invite-only Founding Program today", to: "/founding" },
+  { img: placeLondon, tag: "SESSIONS", title: "Trade the London and New York sessions with clear zones", to: "/insights" },
+  { img: placeDev, tag: "DEVELOPERS", title: "Build with Jenvu models using API keys and the extension", to: "/download" },
 ];
 
 export function CloudHero({ price: _price, delta: _delta }: { price: string; delta: string }) {
