@@ -801,16 +801,17 @@ function AuthPage() {
     <div className={`min-h-dvh w-full bg-white text-zinc-900 ${SANS} antialiased selection:bg-zinc-900 selection:text-white lg:flex`}>
 
       {/* LEFT — form column */}
-      <div className="flex min-h-dvh w-full flex-col lg:w-[46%]">
-        <div className="px-6 pt-6 sm:px-10 sm:pt-8">
-          <Link to="/" aria-label="Jenvu home" className="inline-flex">
-            <img src="/favicon.png" alt="Jenvu" className="h-9 w-9 rounded-md object-contain" />
+      <div className="flex min-h-dvh w-full flex-col lg:w-1/2 lg:items-end">
+        <div className="mx-auto w-full max-w-[384px] px-6 pt-8 sm:pt-12 lg:mx-0 lg:mr-16 lg:px-0 xl:mr-24">
+          <Link to="/" aria-label="Jenvu home" className="inline-flex items-center gap-2.5">
+            <img src="/favicon.png" alt="Jenvu" className="h-7 w-7 object-contain" />
+            <span className="text-[15px] text-gc-ink-muted">Try Jenvu for free</span>
           </Link>
         </div>
 
-        <div className="flex flex-1 items-start justify-center px-6 pb-16 pt-10 sm:pt-14">
-          <div className="w-full max-w-[354px]">
-            <h1 className="text-center text-[26px] font-semibold tracking-tight text-zinc-900">
+        <div className="flex w-full flex-1 items-start justify-center px-6 pb-16 pt-10 lg:justify-end lg:px-0 lg:pt-12">
+          <div className="w-full max-w-[384px] lg:mr-16 xl:mr-24">
+            <h1 className="text-left text-[26px] font-semibold tracking-tight text-zinc-900">
               {mfaChallenge
                 ? "Two-factor authentication"
                 : mode === "forgot"
@@ -1359,7 +1360,7 @@ function AuthPage() {
             </div>
 
             {/* RIGHT — Google Cloud-style info panel */}
-            <div className="relative hidden min-h-dvh w-[54%] overflow-hidden border-l border-gc-line bg-background lg:flex lg:flex-col">
+            <div className="relative hidden min-h-dvh w-1/2 overflow-hidden bg-background lg:flex lg:flex-col">
               <svg className="pointer-events-none absolute right-0 top-0 h-full w-[38%]" viewBox="0 0 300 800" fill="none" aria-hidden>
                 <line x1="20" y1="0" x2="200" y2="320" className="stroke-gc-ink-muted" strokeWidth="1" strokeDasharray="1 4" />
                 <circle cx="90" cy="70" r="2.5" className="fill-gc-line" />
@@ -1368,8 +1369,8 @@ function AuthPage() {
                 <circle cx="105" cy="545" r="8" className="fill-gc-red" />
                 <path d="M40 760 l20 -16 M50 770 l20 -16 M60 780 l20 -16" className="stroke-gc-ink-muted" strokeWidth="1" strokeDasharray="1 3" />
               </svg>
-              <div className="relative z-10 flex flex-1 flex-col justify-center px-14 xl:px-20">
-                <div className="max-w-[300px] space-y-7">
+              <div className="relative z-10 flex flex-1 flex-col pl-16 pt-[120px] xl:pl-24 sm:pt-[136px]">
+                <div className="max-w-[340px] space-y-7">
                   <div>
                     <h2 className="text-[20px] font-normal text-gc-ink">Access to Jenvu tools</h2>
                     <p className="mt-2 text-[14px] leading-[1.55] text-gc-ink-muted">
