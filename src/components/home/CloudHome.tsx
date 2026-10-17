@@ -101,8 +101,8 @@ function HeroMockup({ price, delta }: { price: string; delta: string }) {
           </span>
         </div>
         <svg viewBox="0 0 240 100" className="mt-2 h-44 w-full px-3" aria-hidden="true">
-          <rect x="132" y="22" width="108" height="16" rx="2" className="fill-gc-red-soft" />
-          <text x="236" y="33" textAnchor="end" className="fill-gc-red text-[6px] font-medium">SUPPLY ZONE</text>
+          <rect x="132" y="2" width="108" height="14" rx="2" className="fill-gc-red-soft" />
+          <text x="236" y="11" textAnchor="end" className="fill-gc-red text-[6px] font-medium">SUPPLY ZONE</text>
           {candles.map(([o, c, l, h], i) => {
             const x = 10 + i * 19;
             const bull = c < o;
@@ -114,8 +114,8 @@ function HeroMockup({ price, delta }: { price: string; delta: string }) {
               </g>
             );
           })}
-          <line x1="0" x2="240" y1="18" y2="18" strokeDasharray="3 3" className="stroke-gc-blue" strokeWidth="0.8" />
-          <text x="4" y="14" className="fill-gc-blue text-[6px] font-medium">Fresh sweep ✓</text>
+          <line x1="0" x2="240" y1="20" y2="20" strokeDasharray="3 3" className="stroke-gc-blue" strokeWidth="0.8" />
+          <text x="4" y="28" className="fill-gc-blue text-[6px] font-medium">Fresh sweep ✓</text>
         </svg>
         <div className="grid grid-cols-3 border-t border-gc-line text-center">
           {[
@@ -136,7 +136,7 @@ function HeroMockup({ price, delta }: { price: string; delta: string }) {
 
 export function CloudHero({ price, delta }: { price: string; delta: string }) {
   return (
-    <section className="bg-background">
+    <section className="overflow-hidden bg-background">
       <div className="mx-auto grid max-w-[1296px] items-center gap-14 px-5 pb-20 pt-14 sm:px-8 md:grid-cols-2 md:pb-28 md:pt-20">
         <div>
           <h1 className="text-[40px] font-normal leading-[1.1] tracking-[-0.5px] text-gc-ink sm:text-[52px] md:text-[56px]">
