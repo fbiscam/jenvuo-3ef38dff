@@ -312,47 +312,48 @@ export function CloudAudiences() {
 }
 
 /* ---------------- Build-with accordion (Google Cloud-style) ---------------- */
-const BUILD_ITEMS: Array<{ key: string; title: string; points: string[] }> = [
+type BuildPart = string | { link: string; to: string };
+const BUILD_ITEMS: Array<{ key: string; title: string; points: BuildPart[][] }> = [
   {
     key: "terminal",
-    title: "Gold Terminal",
+    title: "Gold Terminal and chart analysis",
     points: [
-      "Live XAU/USD candles with HH, HL, LH and LL labels that never repaint once a candle closes",
-      "Supply and demand zones paired with fair value gaps, drawn only when they score strong",
-      "Fresh sweep checks on 15M, 1H, 2H and 4H with fakeout filters",
+      ["Read live XAU/USD candles with HH, HL, LH and LL labels on our ", { link: "non-repainting gold Terminal", to: "/pricing" }, ", plus BOS and CHoCH breaks that stay fixed once a candle closes"],
+      ["Spot supply and demand zones paired with ", { link: "fair value gaps", to: "/help" }, ", drawn only when they score strong and kept until a clear invalidation"],
+      ["Check fresh liquidity sweeps on 15M, 1H, 2H and 4H with ", { link: "fakeout filters", to: "/help" }, " that flag weak pokes and re-accepted levels"],
     ],
   },
   {
     key: "ai",
-    title: "AI desk",
+    title: "AI desk and copilot",
     points: [
-      "Ask about the chart in plain language and get a focused answer to exactly what you asked",
-      "Chat with images and voice, backed by top-tier AI models",
-      "A clear WAIT when the evidence or risk isn't there",
+      ["Ask about the chart in plain language with the ", { link: "Jenvu AI desk", to: "/ai-engine" }, " and get a focused answer to exactly what you asked"],
+      ["Chat with screenshots and voice, backed by ", { link: "top-tier AI models", to: "/ai-engine" }, " that read the same chart data you see"],
+      ["Get a clear WAIT when the evidence or risk isn't there, instead of a forced trade idea"],
     ],
   },
   {
     key: "volume",
-    title: "Volume and pressure",
+    title: "Volume and market pressure",
     points: [
-      "RVOL spike colours on every volume bar with a 20-candle average line",
-      "Estimated buyer and seller share for each candle at a glance",
+      ["See ", { link: "RVOL spike colours", to: "/help" }, " on every volume bar with a 20-candle average line fixed at the bottom of the chart"],
+      ["Read an estimated buyer and seller share for each candle, so pressure shifts are easy to notice"],
     ],
   },
   {
     key: "practice",
-    title: "Demo trading",
+    title: "Demo trading and practice",
     points: [
-      "Practice your ideas on a $100,000 demo account with automatic closing",
-      "TradingView-style order tickets and a full trade history",
+      ["Practice your ideas on a ", { link: "$100,000 demo account", to: "/pricing" }, " with automatic closing at your stop loss and take profit"],
+      ["Use TradingView-style order tickets and review every result in your full trade history"],
     ],
   },
   {
     key: "developers",
-    title: "API and extension",
+    title: "API keys and browser extension",
     points: [
-      "Plug Jenvu models into your apps and bots with API keys at $3 per million tokens",
-      "Bring Jenvu analysis into TradingView with the browser extension",
+      ["Plug Jenvu models into your apps and bots with ", { link: "API keys", to: "/pricing" }, " at $3 per million tokens"],
+      ["Bring Jenvu analysis into TradingView with the ", { link: "browser extension", to: "/download" }, " side panel that reads your chart"],
     ],
   },
 ];
@@ -362,27 +363,27 @@ export function CloudBuildWith() {
   const toggle = (key: string) =>
     setOpen((cur) => (cur.includes(key) ? cur.filter((k) => k !== key) : [...cur, key]));
   return (
-    <section className="bg-background">
-      <div className="mx-auto grid max-w-[1296px] items-start gap-10 px-5 pb-20 pt-6 sm:px-8 md:grid-cols-2 md:gap-16 md:pb-24">
+    <section className="jenvu-build-zoom bg-background">
+      <div className="mx-auto grid max-w-[1296px] items-start gap-10 px-5 pb-20 pt-8 sm:px-8 md:grid-cols-2 md:gap-20 md:pb-24">
         <div className="md:sticky md:top-24">
           <h2 className="text-[30px] font-normal leading-[1.25] text-gc-ink sm:text-[36px]">
             Build with the gold platform
             <br />
             <span className="text-gc-blue">designed for traders and AI</span>
           </h2>
-          <p className="mt-5 max-w-[480px] text-[15px] leading-[1.6] text-gc-ink-muted">
-            Try Jenvu with 14 days of Pro access on sign-up, plus live sweeps, zones and FVGs.
+          <p className="mt-5 max-w-[540px] text-[16px] leading-[1.6] text-gc-ink-muted">
+            Try Jenvu with live sweeps, zones and FVGs on gold, plus new sign-ups get 14 days of Pro access free.
           </p>
-          <div className="mt-7 flex flex-wrap items-center gap-6">
+          <div className="mt-7 flex flex-wrap items-center gap-7">
             <Link
               to="/auth"
               search={{ mode: "signup" } as never}
-              className="inline-flex h-11 items-center justify-center rounded-full bg-gc-blue px-6 text-[15px] font-medium text-gc-on-blue transition hover:bg-gc-blue-hover"
+              className="inline-flex h-12 items-center justify-center rounded-full bg-gc-blue px-6 text-[15px] font-medium text-gc-on-blue transition hover:bg-gc-blue-hover"
             >
               Get started for free
             </Link>
             <Link to="/pricing" className="text-[15px] font-medium text-gc-blue hover:underline">
-              See all plans
+              See all plans and tools
             </Link>
           </div>
         </div>
@@ -390,24 +391,32 @@ export function CloudBuildWith() {
           {BUILD_ITEMS.map((b) => {
             const isOpen = open.includes(b.key);
             return (
-              <div key={b.key}>
+              <div key={b.key} className="border-b-2 border-gc-line">
                 <button
                   type="button"
                   aria-expanded={isOpen}
                   onClick={() => toggle(b.key)}
-                  className={`flex w-full items-center justify-between gap-4 py-5 text-left ${
-                    isOpen ? "border-b-2 border-gc-navy" : "border-b border-gc-line"
-                  }`}
+                  className={`flex w-full items-center justify-between gap-4 py-6 text-left ${isOpen ? "border-b-2 border-gc-line" : ""}`}
                 >
-                  <span className="text-[17px] font-medium text-gc-blue">{b.title}</span>
-                  <ChevronDown className={`h-5 w-5 shrink-0 text-gc-blue transition ${isOpen ? "rotate-180" : ""}`} />
+                  <span className="text-[19px] text-gc-blue">{b.title}</span>
+                  <ChevronDown className={`h-6 w-6 shrink-0 text-gc-blue transition ${isOpen ? "rotate-180" : ""}`} />
                 </button>
                 {isOpen && (
-                  <ul className="space-y-5 border-b border-gc-line py-7">
-                    {b.points.map((p) => (
-                      <li key={p} className="flex items-start gap-4 text-[15px] leading-[1.6] text-gc-ink">
-                        <Check className="mt-1 h-4 w-4 shrink-0 text-gc-green" strokeWidth={2.5} />
-                        {p}
+                  <ul className="space-y-6 py-8">
+                    {b.points.map((parts, i) => (
+                      <li key={i} className="flex items-start gap-4 text-[16px] leading-[1.75] text-gc-ink-muted">
+                        <Check className="mt-1.5 h-5 w-5 shrink-0 text-gc-green" strokeWidth={2.25} />
+                        <span>
+                          {parts.map((p, j) =>
+                            typeof p === "string" ? (
+                              <React.Fragment key={j}>{p}</React.Fragment>
+                            ) : (
+                              <Link key={j} to={p.to} className="text-gc-blue underline underline-offset-2 hover:text-gc-blue-hover">
+                                {p.link}
+                              </Link>
+                            ),
+                          )}
+                        </span>
                       </li>
                     ))}
                   </ul>
