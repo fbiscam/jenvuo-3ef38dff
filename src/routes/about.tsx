@@ -26,7 +26,7 @@ function AboutPage() {
         <H2>The Mission</H2>
         <P>
           Give independent traders the same structural read of the market that desk
-          analysts have been using for decades — explained in real time, drawn on the chart,
+          analysts have been using for decades explained in real time, drawn on the chart,
           and available the moment an idea hits.
         </P>
       </section>
