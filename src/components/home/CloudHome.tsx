@@ -173,7 +173,7 @@ export function CloudHero({ price, delta }: { price: string; delta: string }) {
           </Link>
         </div>
       </div>
-      <div className="flex snap-x snap-mandatory gap-6 overflow-x-auto px-5 pb-16 [scrollbar-width:none] sm:px-8 [&::-webkit-scrollbar]:hidden">
+      <div ref={railRef} className="flex snap-x snap-mandatory scroll-smooth gap-6 overflow-x-auto px-5 [scrollbar-width:none] sm:px-8 [&::-webkit-scrollbar]:hidden">
         {STORIES.map((s, i) => (
           <Link
             key={s.title}
@@ -195,6 +195,16 @@ export function CloudHero({ price, delta }: { price: string; delta: string }) {
             </div>
           </Link>
         ))}
+      </div>
+      <div className="px-5 pb-10 pt-6 sm:px-8 md:px-[72px]">
+        <div className="inline-flex items-center rounded-full bg-gc-surface p-1">
+          <button type="button" aria-label="Previous stories" onClick={() => scrollRail(-1)} className="inline-flex h-10 w-10 items-center justify-center rounded-full text-gc-ink hover:bg-gc-line/60">
+            <ChevronLeft className="h-5 w-5" />
+          </button>
+          <button type="button" aria-label="Next stories" onClick={() => scrollRail(1)} className="inline-flex h-10 w-10 items-center justify-center rounded-full text-gc-ink hover:bg-gc-line/60">
+            <ChevronRight className="h-5 w-5" />
+          </button>
+        </div>
       </div>
     </section>
   );
