@@ -26,7 +26,7 @@ export function PageShell({
   wide?: boolean;
   children: ReactNode;
 }) {
-  const showEyebrow = !!eyebrow && eyebrow.trim().length > 0;
+  const showEyebrow = !!eyebrow && eyebrow.replace(/\\n/g, "").trim().length > 0;
   return (
     <div className={`public-cloudflare jenvu-zoom min-h-dvh w-full bg-background text-foreground ${SANS} antialiased selection:bg-home-accent selection:text-home-accent-foreground`}>
       <header className="hide-in-pwa sticky top-0 z-50 border-b border-gc-line bg-background">
