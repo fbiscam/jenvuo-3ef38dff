@@ -163,7 +163,7 @@ function FeatureCard({ card }: { card: Card }) {
         </button>
         <div className="absolute bottom-5 left-7 text-[22px] font-medium leading-[1.2] text-gc-night-ink">
           {card.name}
-          <br />+ Jenvu
+          <br />
         </div>
         {playing && (
           <span className="absolute right-4 top-4 flex items-center gap-1.5 rounded-full bg-gc-red px-2 py-0.5 text-[10px] font-medium tracking-wide text-gc-on-blue">
