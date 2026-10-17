@@ -1369,7 +1369,7 @@ function AuthPage() {
                 <circle cx="105" cy="545" r="8" className="fill-gc-red" />
                 <path d="M40 760 l20 -16 M50 770 l20 -16 M60 780 l20 -16" className="stroke-gc-ink-muted" strokeWidth="1" strokeDasharray="1 3" />
               </svg>
-              <div className="relative z-10 flex flex-1 flex-col pl-16 pt-[110px] xl:pl-24 sm:pt-[126px]">
+              <div className="relative z-10 flex flex-1 flex-col pl-16 pt-[120px] xl:pl-24 sm:pt-[136px]">
                 <div className="max-w-[340px] space-y-7">
                   <div>
                     <h2 className="text-[20px] font-normal text-gc-ink">Access to Jenvu tools</h2>
