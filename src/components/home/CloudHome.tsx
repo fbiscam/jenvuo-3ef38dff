@@ -244,7 +244,7 @@ const AUDIENCES: Array<{ key: string; label: string; cards: AudienceCard[] }> = 
     label: "Developers",
     cards: [
       { tag: "TOP-TIER MODELS", text: "We provide top-tier AI models to developers who wants to build", to: "/ai-engine", img: devModels },
-      { tag: "API & EXTENSION", text: "Plug Jenvu models into your apps and bots with API keys, or use our TradingView extension.", to: "/pricing", img: devExtension },
+      { tag: "API & EXTENSION", text: "Plug Jenvu models into your apps and bots with API keys, with top models", to: "/pricing", img: devExtension },
       { tag: "DEVELOPER DOCS", text: "Clear docs and guides help you connect, test and ship your project with Jenvu fast.", to: "/help", img: devDocs },
     ],
   },
