@@ -411,7 +411,7 @@ export function CloudBuildWith() {
                             typeof p === "string" ? (
                               <React.Fragment key={j}>{p}</React.Fragment>
                             ) : (
-                              <Link key={j} to={p.to} className="text-gc-blue-deep underline underline-offset-2 hover:text-gc-blue-deep-hover">
+                              <Link key={j} to={p.to} className="text-gc-blue-deep underline underline-offset-2 hover:text-gc-navy">
                                 {p.link}
                               </Link>
                             ),
