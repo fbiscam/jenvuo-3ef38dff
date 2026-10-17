@@ -56,169 +56,146 @@ function HelpCenterPage() {
       .slice(0, 6);
   }, [q]);
 
-  const popular = allArticles().slice(0, 4);
+  const [picked, setPicked] = React.useState<string[]>([]);
+  const [filtersOpen, setFiltersOpen] = React.useState(true);
+  const shown = picked.length ? collections.filter((c) => picked.includes(c.slug)) : collections;
+  const toggle = (s: string) => setPicked((p) => (p.includes(s) ? p.filter((x) => x !== s) : [...p, s]));
+
+  const faqs = [
+    { q: "How do I cancel my Jenvu subscription?", a: "Open Dashboard → Billing and choose Cancel plan. You keep access until the end of the period you already paid for. See the Cancellation policy for details." },
+    { q: "How do I start the free trial?", a: "After signing up, click “Start free” in the banner at the top of your dashboard. It adds $100 credit and 14 days of Pro, once per account." },
+    { q: "How do I get access to the Terminal?", a: "The Terminal is open to approved Founding Program members. Apply on the Founding page; we review every application." },
+    { q: "How do I contact Jenvu support?", a: "Email support@jenvu.com or use the Contact page. We reply within one business day, Monday to Friday." },
+  ];
+  const [open, setOpen] = React.useState<number[]>([]);
+  const allOpen = open.length === faqs.length;
 
   return (
-    <>
-      <div className={`public-cloudflare jenvu-zoom min-h-dvh bg-background text-foreground ${SANS} antialiased`}>
-        {/* NAV */}
-        <SiteHeader />
+    <div className={`public-cloudflare jenvu-zoom min-h-dvh bg-background text-gc-ink ${SANS} antialiased`}>
+      <SiteHeader />
 
-        {/* HERO + SEARCH */}
-        <section className="public-page-hero border-b border-border">
-          <div className="mx-auto max-w-3xl px-5 sm:px-6 py-16 sm:py-24 text-left sm:text-center">
-            <h1 className="text-3xl sm:text-5xl font-semibold tracking-tight text-zinc-900">
-              How can we help?
-            </h1>
-            <p className="mt-4 text-zinc-600 text-base sm:text-lg">
-              Search articles or browse a collection below.
+      <div className="mx-auto max-w-[1300px] px-5 sm:px-8">
+        {/* HERO */}
+        <section className="grid gap-8 py-12 sm:py-16 lg:grid-cols-[1fr_416px] lg:items-start">
+          <div>
+            <h1 className="text-[36px] leading-tight tracking-tight sm:text-[46px]">Jenvu Customer Care</h1>
+            <p className="mt-5 max-w-[830px] text-[18px] leading-relaxed text-gc-ink-muted">
+              Check our self-serve guides or learn more about getting help with your account, billing and the Terminal. Choose the topic that's right for you.
             </p>
+            <a href="https://auth.jenvu.com/sign-in" className="mt-7 inline-block rounded-full bg-home-accent px-6 py-3 text-[16px] font-medium text-home-accent-foreground hover:opacity-90">
+              Sign up
+            </a>
+          </div>
+          <div className="rounded-lg bg-gc-canvas p-6">
+            <p className="text-[15px] text-gc-ink-muted">Looking for something else?</p>
+            <p className="mt-6 text-[15px] leading-relaxed">
+              Talk directly with our team about partnerships, press or anything else on the{" "}
+              <Link to="/contact" className="text-gc-blue-deep underline">Contact page</Link>.
+            </p>
+          </div>
+        </section>
 
-            <div className="relative mt-8">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" />
+        {/* FILTER + CONTENT */}
+        <section className="grid gap-6 pb-16 lg:grid-cols-[307px_1fr]">
+          <aside className="h-fit rounded-lg border border-gc-line bg-background shadow-sm lg:sticky lg:top-24">
+            <div className="border-b border-gc-line px-6 py-6 text-[13px] uppercase tracking-wide text-gc-ink-muted">Filter by</div>
+            <button type="button" onClick={() => setFiltersOpen((o) => !o)} className="flex w-full items-center justify-between px-6 py-6 text-[15px]">
+              Filters <ChevronDown className={`h-5 w-5 transition ${filtersOpen ? "rotate-180" : ""}`} />
+            </button>
+            {filtersOpen && (
+              <div className="space-y-5 px-6 pb-7">
+                {collections.map((c) => (
+                  <label key={c.slug} className="flex cursor-pointer items-center gap-4 text-[16px] text-gc-ink-muted">
+                    <input type="checkbox" checked={picked.includes(c.slug)} onChange={() => toggle(c.slug)} className="h-[18px] w-[18px] accent-[var(--gc-blue-deep)]" />
+                    {c.title}
+                  </label>
+                ))}
+              </div>
+            )}
+          </aside>
+
+          <div className="min-w-0">
+            <div className="relative">
+              <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-gc-ink-muted" />
               <input
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
                 onKeyDown={(e) => {
                   if (e.key === "Enter" && results[0]) {
-                    navigate({
-                      to: "/help/$collection/$slug",
-                      params: { collection: results[0].collection.slug, slug: results[0].article.slug },
-                    });
+                    navigate({ to: "/help/$collection/$slug", params: { collection: results[0].collection.slug, slug: results[0].article.slug } });
                   }
                 }}
-                placeholder="Search for articles..."
-                className="w-full rounded-full border border-zinc-200 bg-white py-3 pl-11 pr-4 text-sm outline-none focus:border-zinc-400 transition"
+                placeholder="Search"
                 aria-label="Search help articles"
+                className="w-full rounded-[4px] border border-gc-ink-muted/60 bg-background py-4 pl-12 pr-12 text-[16px] outline-none focus:border-gc-blue-deep"
               />
+              <Send className="absolute right-4 top-1/2 h-5 w-5 -translate-y-1/2 text-gc-ink-muted" />
               {q.trim() && (
-                <div className="absolute z-20 mt-2 w-full overflow-hidden rounded-xl border border-zinc-200 bg-white text-left">
+                <div className="absolute z-20 mt-2 w-full overflow-hidden rounded-lg border border-gc-line bg-background shadow-lg">
                   {results.length === 0 ? (
-                    <div className="px-4 py-6 text-sm text-zinc-500">
-                      No articles match "{q}".
-                    </div>
+                    <div className="px-4 py-6 text-sm text-gc-ink-muted">No articles match "{q}".</div>
                   ) : (
                     results.map(({ collection, article }) => (
-                      <Link
-                        key={`${collection.slug}/${article.slug}`}
-                        to="/help/$collection/$slug"
-                        params={{ collection: collection.slug, slug: article.slug }}
-                        className="flex items-start justify-between gap-4 border-b border-zinc-100 px-4 py-3 last:border-b-0 hover:bg-zinc-50"
-                      >
+                      <Link key={`${collection.slug}/${article.slug}`} to="/help/$collection/$slug" params={{ collection: collection.slug, slug: article.slug }} className="flex items-start justify-between gap-4 border-b border-gc-line px-4 py-3 last:border-b-0 hover:bg-gc-canvas">
                         <div>
-                          <div className="text-sm font-medium text-zinc-900">{article.title}</div>
-                          <div className={`${MONO} mt-1 text-[10px] uppercase tracking-[0.22em] text-zinc-500`}>
-                            {collection.title}
-                          </div>
+                          <div className="text-sm font-medium">{article.title}</div>
+                          <div className="mt-1 text-xs text-gc-ink-muted">{collection.title}</div>
                         </div>
-                        <ArrowRight className="mt-1 h-4 w-4 shrink-0 text-zinc-400" />
+                        <ArrowRight className="mt-1 h-4 w-4 shrink-0 text-gc-ink-muted" />
                       </Link>
                     ))
                   )}
                 </div>
               )}
             </div>
-          </div>
-        </section>
 
-        {/* COLLECTIONS */}
-        <section className="mx-auto max-w-6xl px-5 sm:px-6 py-14 sm:py-20">
-          <div className="flex items-end justify-between mb-8">
-            <div>
-              <h2 className="mt-2 text-2xl sm:text-3xl font-semibold tracking-tight">
-                Browse by topic
-              </h2>
-            </div>
-            <div className={`${MONO} hidden sm:block text-[10px] uppercase tracking-[0.22em] text-zinc-500`}>
-              {collections.length} collections · {allArticles().length} articles
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {collections.map((c) => (
-              <CollectionCard key={c.slug} c={c} />
+            {shown.map((c) => (
+              <div key={c.slug} className="mt-14 border-b border-gc-line pb-12 last:border-b-0">
+                <h2 className="text-[34px] tracking-tight">{c.title}</h2>
+                <p className="mt-4 text-[16px] text-gc-ink-muted">
+                  {c.description}{" "}
+                  <Link to="/help/$collection" params={{ collection: c.slug }} className="text-gc-blue-deep underline">See all {c.articles.length} articles</Link>.
+                </p>
+                <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
+                  {c.articles.slice(0, 6).map((a) => (
+                    <Link key={a.slug} to="/help/$collection/$slug" params={{ collection: c.slug, slug: a.slug }} className="rounded-lg border border-gc-line p-6 transition hover:shadow-md">
+                      <div className="text-[20px] leading-snug">{a.title}</div>
+                      <div className="mt-3 text-[16px] leading-relaxed text-gc-ink-muted line-clamp-4">{a.summary}</div>
+                    </Link>
+                  ))}
+                </div>
+              </div>
             ))}
           </div>
         </section>
 
-        {/* POPULAR */}
-        <section className="bg-zinc-50/60">
-          <div className="mx-auto max-w-6xl px-5 sm:px-6 py-14 sm:py-20">
-            <h2 className="mt-2 text-2xl sm:text-3xl font-semibold tracking-tight">
-              Frequently read
-            </h2>
-            <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
-              {popular.map(({ collection, article }) => (
-                <Link
-                  key={`${collection.slug}/${article.slug}`}
-                  to="/help/$collection/$slug"
-                  params={{ collection: collection.slug, slug: article.slug }}
-                  className="group flex items-start justify-between gap-4 rounded-xl border border-zinc-200 bg-white p-5 hover:border-zinc-900 transition"
-                >
-                  <div>
-                    <div className={`${MONO} text-[10px] uppercase tracking-[0.22em] text-zinc-500`}>
-                      {collection.title}
-                    </div>
-                    <div className="mt-2 text-base font-medium text-zinc-900">{article.title}</div>
-                    <div className="mt-1 text-sm text-zinc-600 line-clamp-2">{article.summary}</div>
-                  </div>
-                  <ArrowRight className="mt-1 h-4 w-4 shrink-0 text-zinc-400 group-hover:text-zinc-900 transition" />
-                </Link>
-              ))}
-            </div>
+        {/* FAQ */}
+        <section className="pb-20">
+          <h2 className="text-[28px] tracking-tight">Frequently asked support questions</h2>
+          <div className="mt-6 flex justify-end">
+            <button type="button" onClick={() => setOpen(allOpen ? [] : faqs.map((_, i) => i))} className="flex items-center gap-2 text-[16px] text-gc-blue-deep">
+              {allOpen ? "Collapse all" : "Expand all"} <ChevronsUpDown className="h-4 w-4" />
+            </button>
+          </div>
+          <div className="mt-4 border-t-2 border-gc-line">
+            {faqs.map((f, i) => {
+              const isOpen = open.includes(i);
+              return (
+                <div key={f.q} className="border-b-2 border-gc-line">
+                  <button type="button" onClick={() => setOpen((o) => (isOpen ? o.filter((x) => x !== i) : [...o, i]))} className="flex w-full items-center justify-between py-7 text-left text-[19px] text-gc-blue-deep">
+                    {f.q}
+                    <ChevronDown className={`h-6 w-6 shrink-0 transition ${isOpen ? "rotate-180" : ""}`} />
+                  </button>
+                  {isOpen && <p className="border-t-2 border-gc-line py-8 text-[16px] leading-relaxed text-gc-ink-muted">{f.a}</p>}
+                </div>
+              );
+            })}
           </div>
         </section>
-
-        {/* CONTACT CTA */}
-        <section className="mx-auto max-w-6xl px-5 sm:px-6 py-14 sm:py-20">
-          <div className="rounded-xl border border-zinc-200 bg-white text-zinc-900 p-8 sm:p-12 flex flex-col md:flex-row items-start md:items-start justify-between gap-6">
-            <div>
-              <h3 className="mt-2 text-2xl sm:text-3xl font-semibold tracking-tight">
-                Talk to a human.
-              </h3>
-              <p className="mt-2 text-zinc-600 max-w-md whitespace-pre-line">
-                Our team replies within one business day.&nbsp;&nbsp;
-                Send a message and we'll get back to you.
-              </p>
-            </div>
-            <Link
-              to="/contact"
-                className="inline-flex items-center gap-2 rounded-full bg-home-accent px-5 py-3 text-sm font-medium text-home-accent-foreground transition hover:opacity-90"
-            >
-              <MessageCircle className="h-4 w-4" />
-              Contact support
-            </Link>
-          </div>
-        </section>
-
-        <SiteFooter />
       </div>
-    </>
-  );
-}
 
-function CollectionCard({ c }: { c: Collection }) {
-  const Icon = ICONS[c.icon];
-  return (
-    <Link
-      to="/help/$collection"
-      params={{ collection: c.slug }}
-      className="group rounded-xl border border-zinc-200 bg-white p-6 hover:border-zinc-900 transition"
-    >
-      <div className="flex items-center gap-3">
-        <div className="grid place-items-center h-10 w-10 rounded-xl bg-white border border-zinc-200 text-zinc-900">
-          <Icon className="h-5 w-5" />
-        </div>
-        <div className={`${MONO} text-[10px] uppercase tracking-[0.22em] text-zinc-500`}>
-          {c.articles.length} articles
-        </div>
-      </div>
-      <div className="mt-5 text-lg font-semibold tracking-tight">{c.title}</div>
-      <div className="mt-1 text-sm text-zinc-600">{c.description}</div>
-      <div className="mt-5 inline-flex items-center gap-1.5 text-sm font-medium text-zinc-900">
-        Explore
-        <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition" />
-      </div>
-    </Link>
+      <NextStep />
+      <SiteFooter />
+    </div>
   );
 }
