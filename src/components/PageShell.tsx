@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import SiteFooter from "@/components/SiteFooter";
 import HeaderAuthButtons from "@/components/HeaderAuthButtons";
-import SiteNavLinks from "@/components/SiteNavLinks";
+import SiteHeader from "@/components/SiteHeader";
 
 const SANS = "font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif]";
 
@@ -29,16 +29,7 @@ export function PageShell({
   const showEyebrow = !!eyebrow && eyebrow.replace(/\\n/g, "").trim().length > 0;
   return (
     <div className={`public-cloudflare jenvu-zoom min-h-dvh w-full bg-background text-foreground ${SANS} antialiased selection:bg-home-accent selection:text-home-accent-foreground`}>
-      <header className="hide-in-pwa sticky top-0 z-50 border-b border-gc-line bg-background">
-        <div className="relative mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-3 px-5 py-3 sm:px-6 sm:py-4 md:flex md:justify-between">
-          <a href="https://jenvu.com" className="flex min-w-0 items-center gap-2.5">
-            <img src="/favicon.png" alt="Jenvu" className="h-7 w-7 shrink-0 rounded-md object-contain" />
-            <span className="truncate text-[22px] font-medium leading-none tracking-tight text-gc-ink">Jenvu</span>
-          </a>
-          <SiteNavLinks />
-          <HeaderAuthButtons />
-        </div>
-      </header>
+      <SiteHeader />
 
       {/* HERO — centered */}
       <section className="bg-background">

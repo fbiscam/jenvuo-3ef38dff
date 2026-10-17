@@ -1,5 +1,5 @@
 import * as React from "react";
-import SiteNavLinks from "@/components/SiteNavLinks";
+import SiteHeader from "@/components/SiteHeader";
 import HeaderAuthButtons from "@/components/HeaderAuthButtons";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
@@ -116,16 +116,7 @@ function ContactPage() {
     <>
       <div className={`public-cloudflare jenvu-zoom min-h-dvh w-full bg-background text-foreground ${SANS} antialiased selection:bg-home-accent selection:text-home-accent-foreground`}>
         {/* NAV */}
-        <header className="sticky top-0 z-50 bg-white">
-          <div className="relative mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-3 px-5 py-3 sm:px-6 sm:py-4 md:flex md:justify-between">
-            <Link to="/" className="flex min-w-0 items-center gap-2.5">
-              <img src="/favicon.png" alt="Jenvu" className="h-7 w-7 shrink-0 rounded-md object-contain" />
-              <span className="truncate text-[22px] tracking-tight leading-none" style={{ color: "#3c4043", fontFamily: "\"Google Sans\", \"Product Sans\", \"DM Sans\", system-ui, sans-serif", fontWeight: 500 }}>Jenvu</span>
-            </Link>
-            <SiteNavLinks active="/contact" />
-            <HeaderAuthButtons />
-          </div>
-        </header>
+        <SiteHeader />
 
         {/* HERO */}
         <section className="public-page-hero">
