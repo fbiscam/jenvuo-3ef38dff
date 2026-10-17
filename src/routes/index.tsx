@@ -18,7 +18,7 @@ import RegionEarth from "@/components/RegionEarth";
 import TrustedDesks from "@/components/TrustedDesks";
 import { WhyJenvu } from "@/components/WhyJenvu";
 import {
-  CloudAnnouncement,
+  CloudAudiences,
   CloudHero,
   CloudProducts,
   CloudUseCases,
