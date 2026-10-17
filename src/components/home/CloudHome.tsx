@@ -290,9 +290,9 @@ export function CloudAudiences() {
             >
               <div className="flex min-w-0 flex-1 flex-col justify-center px-4 py-5">
                 <div className="text-[12px] font-medium tracking-wide text-gc-ink/80">{c.tag}</div>
-                <p className="mt-1 line-clamp-3 text-[15px] font-medium leading-[1.5] text-gc-ink">{c.text}</p>
+                <p className="mt-1 text-[15px] font-medium leading-[1.5] text-gc-ink">{c.text}</p>
               </div>
-              {c.img && <img src={c.img} alt="" loading="lazy" className="w-[112px] shrink-0 object-cover" />}
+              {c.img && <img src={c.img} alt="" loading="lazy" className="w-[100px] shrink-0 object-cover" />}
               {c.logo && (
                 <div className="flex w-[84px] shrink-0 items-center justify-center">
                   <img src="/favicon.png" alt="" className="h-14 w-14 object-contain" />
