@@ -2,6 +2,8 @@ import * as React from "react";
 import { Link } from "@tanstack/react-router";
 import {
   ArrowRight,
+  ChevronLeft,
+  ChevronRight,
   BarChart3,
   Bell,
   Bot,
@@ -210,6 +212,85 @@ export function CloudHero({ price: _price, delta: _delta }: { price: string; del
           <button type="button" aria-label="Next stories" onClick={() => scrollRail(1)} className="inline-flex h-10 w-10 items-center justify-center rounded-full text-gc-ink hover:bg-gc-line/60">
             <ChevronRight className="h-5 w-5" />
           </button>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ---------------- Audience tabs (Google Cloud-style panel) ---------------- */
+type AudienceCard = { tag: string; text: string; to: string; img?: string; logo?: boolean };
+const AUDIENCES: Array<{ key: string; label: string; cards: AudienceCard[] }> = [
+  {
+    key: "traders",
+    label: "Traders",
+    cards: [
+      { tag: "NEW TRADERS", text: "New sign-ups get 14 days of Pro access to the gold Terminal, AI desk and alerts.", to: "/auth" },
+      { tag: "PRACTICE", text: "Test your ideas on a $100,000 demo account with automatic stop loss and take profit.", to: "/pricing" },
+      { tag: "LEARN", text: "Read daily XAU/USD insights and step-by-step guides to sweeps, zones and FVGs.", to: "/insights" },
+    ],
+  },
+  {
+    key: "developers",
+    label: "Developers",
+    cards: [
+      { tag: "API", text: "Use Jenvu models in your own tools with API keys at $3 per million tokens.", to: "/pricing", img: cardAi },
+      { tag: "EXTENSION", text: "Bring Jenvu analysis into TradingView with the browser side panel.", to: "/download", img: cardWave },
+      { tag: "DOCS", text: "Guides for the Terminal, AI desk, extension and API keys in the Help Centre.", to: "/help", logo: true },
+    ],
+  },
+  {
+    key: "programs",
+    label: "Special programs",
+    cards: [
+      { tag: "FOUNDING PROGRAM", text: "Apply to the invite-only Founding Program and get your chosen plan once approved.", to: "/founding" },
+      { tag: "PLANS", text: "Pro $10, Elite $25 and Ultra $50 a month. Pick the plan that fits how you trade.", to: "/pricing" },
+      { tag: "SUPPORT", text: "Questions about plans or the Terminal? Our team answers through the contact page.", to: "/contact" },
+    ],
+  },
+];
+
+export function CloudAudiences() {
+  const [active, setActive] = React.useState(AUDIENCES[0].key);
+  const current = AUDIENCES.find((a) => a.key === active) ?? AUDIENCES[0];
+  return (
+    <section className="bg-background px-3 pb-16 sm:px-4">
+      <div className="rounded-[28px] bg-gc-panel px-5 py-8 sm:px-10 md:px-[128px] md:py-10">
+        <div role="tablist" className="flex gap-1 overflow-x-auto border-b-2 border-gc-line [scrollbar-width:none]">
+          {AUDIENCES.map((a) => (
+            <button
+              key={a.key}
+              type="button"
+              role="tab"
+              aria-selected={a.key === active}
+              onClick={() => setActive(a.key)}
+              className={`-mb-0.5 shrink-0 border-b-[3px] px-4 py-3 text-[16px] transition ${
+                a.key === active ? "border-gc-navy text-gc-ink" : "border-transparent text-gc-ink-muted hover:text-gc-ink"
+              }`}
+            >
+              {a.label}
+            </button>
+          ))}
+        </div>
+        <div className="mt-9 grid gap-6 md:grid-cols-3">
+          {current.cards.map((c) => (
+            <Link
+              key={c.tag}
+              to={c.to}
+              className="group flex min-h-[124px] overflow-hidden rounded-lg border border-gc-line bg-background transition hover:shadow-[0_1px_2px_rgba(60,64,67,0.3),0_2px_6px_2px_rgba(60,64,67,0.15)]"
+            >
+              <div className="flex min-w-0 flex-1 flex-col justify-center px-4 py-5">
+                <div className="text-[12px] tracking-wide text-gc-ink-muted">{c.tag}</div>
+                <p className="mt-1 text-[16px] leading-[1.5] text-gc-ink">{c.text}</p>
+              </div>
+              {c.img && <img src={c.img} alt="" loading="lazy" className="w-[110px] shrink-0 object-cover" />}
+              {c.logo && (
+                <div className="flex w-[110px] shrink-0 items-center justify-center">
+                  <img src="/favicon.png" alt="" className="h-14 w-14 object-contain" />
+                </div>
+              )}
+            </Link>
+          ))}
         </div>
       </div>
     </section>
