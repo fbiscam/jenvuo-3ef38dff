@@ -59,7 +59,14 @@ export default function CloudWelcome() {
 
   return (
     <section className="dashboard-cloud-welcome -mx-5 -mt-14 mb-10 sm:-mx-8 sm:-mt-7">
-      <div className="relative overflow-hidden border-b border-gc-line bg-gc-surface px-5 py-12 sm:px-8 lg:py-16">
+      <div
+        className="relative overflow-hidden bg-gc-surface px-5 py-12 sm:px-8 lg:py-16"
+        style={{
+          // full-bleed band: extend the #f8f9fa surface to the panel edges on both sides
+          boxShadow: "0 0 0 100vmax var(--gc-surface), 0 1px 0 100vmax var(--gc-line)",
+          clipPath: "inset(0 -100vmax -1px)",
+        }}
+      >
         {/* decorative shapes */}
         <svg className="pointer-events-none absolute inset-0 h-full w-full" aria-hidden="true">
           <circle cx="47%" cy="18%" r="10" className="fill-gc-blue" />

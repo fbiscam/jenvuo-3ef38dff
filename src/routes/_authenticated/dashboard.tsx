@@ -1333,7 +1333,7 @@ function DashboardLayout() {
         <aside
           className={`dashboard-sidebar-root ${
             drawerMode
-              ? `fixed inset-y-0 left-0 z-50 w-[280px] rounded-r-2xl shadow-2xl ${mobileNavOpen ? "translate-x-0" : "-translate-x-full"}`
+              ? `fixed inset-y-0 left-0 z-50 w-[280px] rounded-r-2xl ${mobileNavOpen ? "translate-x-0 shadow-2xl" : "-translate-x-full shadow-none"}`
               : `${pathname === "/dashboard/terminal" ? "dashboard-terminal-sidebar border-r border-zinc-200" : ""} max-lg:fixed max-lg:inset-y-0 max-lg:left-0 max-lg:z-50 lg:fixed lg:inset-y-0 lg:left-0 ${navCollapsed ? "w-[60px]" : "w-[224px]"} ${mobileNavOpen ? "max-lg:translate-x-0" : "max-lg:-translate-x-full"}`
           } flex min-h-0 shrink-0 flex-col overflow-hidden bg-gc-canvas transition-[width,transform] duration-200 ease-out`}
           aria-hidden={drawerMode && !mobileNavOpen ? true : undefined}
