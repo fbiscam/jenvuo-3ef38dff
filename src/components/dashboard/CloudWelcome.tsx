@@ -1,0 +1,175 @@
+import { useState, type ReactNode } from "react";
+import { Link } from "@tanstack/react-router";
+import { Check, Loader2, Plus, ArrowRight } from "lucide-react";
+import { useFreeTrial } from "@/hooks/useFreeTrial";
+
+const QUICK_ACTIONS = [
+  { label: "Create API key", to: "/dashboard/api" },
+  { label: "Open gold Terminal", to: "/dashboard/terminal" },
+  { label: "Set up alerts", to: "/dashboard/notifications" },
+  { label: "Log a trade", to: "/dashboard/journal" },
+  { label: "Install extension", to: "/dashboard/extension" },
+  { label: "View usage", to: "/dashboard/usage" },
+] as const;
+
+type Resource = { title: string; text: string; to: string };
+const RESOURCES: Record<string, Resource[]> = {
+  "Terminal and charts": [
+    { title: "Read sweeps and zones", text: "Learn how fresh sweeps, supply and demand zones and FVGs show on the chart.", to: "/help" },
+    { title: "Daily XAU/USD insights", text: "Follow gold sessions with short daily notes and step-by-step guides.", to: "/insights" },
+    { title: "Volume and pressure", text: "See how RVOL spikes and buyer and seller estimates are shown on every candle.", to: "/help" },
+  ],
+  "AI desk and models": [
+    { title: "Ask the AI desk", text: "Get clear chart reads from top-tier AI models, answered only to your question.", to: "/ai-engine" },
+    { title: "Model access by plan", text: "Compare which models and limits come with Pro, Elite and Ultra.", to: "/pricing" },
+    { title: "Token pricing", text: "Usage is charged at $3 per million tokens from your credit wallet.", to: "/pricing" },
+  ],
+  "API and extension": [
+    { title: "Create your first API key", text: "Plug Jenvu models into your own apps and bots in a few steps.", to: "/dashboard/api" },
+    { title: "Browser extension", text: "Capture any chart in your browser and get an analysis in seconds.", to: "/dashboard/extension" },
+    { title: "Developer docs", text: "Clear guides help you connect, test and ship your project.", to: "/help" },
+  ],
+  "Billing and plans": [
+    { title: "Plans and pricing", text: "Pro $10, Elite $25 and Ultra $50 per month.", to: "/pricing" },
+    { title: "Manage billing", text: "Change plan, top up credit and see your invoices.", to: "/dashboard/billing" },
+    { title: "Founding Program", text: "Apply to the invite-only program for Terminal access.", to: "/founding" },
+  ],
+  General: [
+    { title: "Help Center", text: "Answers about accounts, security, billing and the Terminal.", to: "/help" },
+    { title: "Contact support", text: "Our support team is here to help you get started.", to: "/contact" },
+    { title: "Risk disclaimer", text: "Trading involves risk. Read how Jenvu should and should not be used.", to: "/disclaimer" },
+  ],
+};
+
+function Tick({ children }: { children: ReactNode }) {
+  return (
+    <li className="flex items-center gap-4 text-[16px] text-gc-ink">
+      <Check className="h-5 w-5 shrink-0 text-gc-green" strokeWidth={2.25} aria-hidden="true" />
+      {children}
+    </li>
+  );
+}
+
+/** Google Cloud console-style welcome panel for the dashboard home. */
+export default function CloudWelcome() {
+  const { user, eligible, starting, start } = useFreeTrial();
+  const [filter, setFilter] = useState<string>(Object.keys(RESOURCES)[0]);
+  const meta = (user?.user_metadata ?? {}) as Record<string, unknown>;
+  const name = String(meta.full_name || meta.name || user?.email?.split("@")[0] || "trader");
+
+  return (
+    <section className="dashboard-cloud-welcome -mx-5 -mt-14 mb-10 sm:-mx-8 sm:-mt-7">
+      <div className="relative overflow-hidden border-b border-gc-line bg-gc-surface px-5 py-12 sm:px-8 lg:py-16">
+        {/* decorative shapes */}
+        <svg className="pointer-events-none absolute inset-0 h-full w-full" aria-hidden="true">
+          <circle cx="47%" cy="18%" r="10" className="fill-gc-blue" />
+          <circle cx="40%" cy="68%" r="14" className="fill-gc-yellow" />
+          <circle cx="82%" cy="20%" r="20" className="fill-gc-green" />
+          <circle cx="75%" cy="86%" r="7" className="fill-gc-red" />
+        </svg>
+        <div className="relative mx-auto grid max-w-6xl gap-10 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
+          <div className="min-w-0">
+            <p className="text-[17px] text-gc-ink">Welcome, {name}</p>
+            <div role="heading" aria-level={1} className="mt-2 text-[28px] font-normal leading-tight text-gc-ink sm:text-[34px]">
+              {eligible ? "Try Jenvu with $100 in free credits" : "Make the most of Jenvu"}
+            </div>
+            <ul className="mt-6 space-y-5">
+              {eligible ? (
+                <>
+                  <Tick>Access to the gold Terminal, AI desk and alerts</Tick>
+                  <Tick>14 days of Pro to spend your credits</Tick>
+                  <Tick>No billing during trial</Tick>
+                </>
+              ) : (
+                <>
+                  <Tick>Read live sweeps, zones and FVGs on XAU/USD</Tick>
+                  <Tick>Ask the AI desk about any chart</Tick>
+                  <Tick>Get alerts when your setups appear</Tick>
+                </>
+              )}
+            </ul>
+            {eligible ? (
+              <button
+                type="button"
+                onClick={() => void start()}
+                disabled={starting}
+                className="mt-7 inline-flex h-9 items-center gap-1.5 rounded bg-gc-blue-deep px-4 text-[14px] font-medium text-gc-on-blue hover:bg-gc-navy disabled:opacity-60"
+              >
+                {starting && <Loader2 className="h-4 w-4 animate-spin" />}
+                Try for free
+              </button>
+            ) : (
+              <Link
+                to="/dashboard/billing"
+                className="mt-7 inline-flex h-9 items-center rounded bg-gc-blue-deep px-4 text-[14px] font-medium text-gc-on-blue hover:bg-gc-navy"
+              >
+                View my plan
+              </Link>
+            )}
+          </div>
+
+          <div className="min-w-0 border-gc-line lg:border-l lg:pl-6">
+            <p className="text-[14px] text-gc-ink-muted">Other options</p>
+            <p className="mt-4 text-[16px] text-gc-ink">Try the latest top-tier AI models</p>
+            <Link to="/ai-engine" className="mt-4 inline-block text-[14px] font-medium text-gc-blue-deep hover:text-gc-navy">
+              Try the AI desk
+            </Link>
+            <p className="mt-6 text-[16px] leading-relaxed text-gc-ink">
+              Join the invite-only Founding Program for full gold Terminal access.
+            </p>
+            <Link to="/founding" className="mt-4 inline-block text-[14px] font-medium text-gc-blue-deep hover:text-gc-navy">
+              Founding Program
+            </Link>
+          </div>
+        </div>
+      </div>
+
+      <div className="mx-auto max-w-6xl px-5 pt-6 sm:px-8 lg:px-0">
+        <div className="flex flex-wrap gap-3">
+          {QUICK_ACTIONS.map((a) => (
+            <Link
+              key={a.label}
+              to={a.to}
+              className="inline-flex h-9 items-center gap-2 rounded border border-gc-line bg-background px-3.5 text-[14px] text-gc-ink hover:bg-gc-surface"
+            >
+              <Plus className="h-4 w-4" aria-hidden="true" />
+              {a.label}
+            </Link>
+          ))}
+        </div>
+
+        <div role="heading" aria-level={2} className="mt-8 text-[24px] font-normal text-gc-ink">Popular getting started resources</div>
+        <p className="mt-4 text-[15px] text-gc-ink-muted">Filter by</p>
+        <div className="mt-3 flex flex-wrap gap-2">
+          {Object.keys(RESOURCES).map((k) => (
+            <button
+              key={k}
+              type="button"
+              onClick={() => setFilter(k)}
+              className={`h-8 rounded-full px-4 text-[14px] transition ${
+                filter === k ? "bg-gc-blue-soft text-gc-blue-deep" : "bg-gc-surface text-gc-ink hover:bg-gc-line/60"
+              }`}
+            >
+              {k}
+            </button>
+          ))}
+        </div>
+        <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {RESOURCES[filter].map((r) => (
+            <Link
+              key={r.title}
+              to={r.to}
+              className="group rounded-lg border border-gc-line bg-background p-5 transition hover:shadow-md"
+            >
+              <div className="text-[16px] font-medium text-gc-ink">{r.title}</div>
+              <p className="mt-2 text-[14px] leading-relaxed text-gc-ink-muted">{r.text}</p>
+              <span className="mt-4 inline-flex items-center gap-1 text-[14px] font-medium text-gc-blue-deep">
+                Learn more <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
+              </span>
+            </Link>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}

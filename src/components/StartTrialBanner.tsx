@@ -1,34 +1,17 @@
 import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Gift, Loader2 } from "lucide-react";
-import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
-import { useAuthUser } from "@/hooks/useAuthUser";
-import { useCredits } from "@/hooks/useCredits";
+import { useFreeTrial } from "@/hooks/useFreeTrial";
 
 const DISMISS_KEY = "jenvu:start-trial-banner-dismissed";
 
 /** Thin top strip offering the one-time free trial ($100 credit + 14 days Pro). */
 export default function StartTrialBanner() {
-  const { user } = useAuthUser();
-  const { refresh } = useCredits();
-  const [eligible, setEligible] = useState(false);
+  const { user, eligible, starting, start } = useFreeTrial();
   const [dismissed, setDismissed] = useState(true);
-  const [starting, setStarting] = useState(false);
 
   useEffect(() => {
     setDismissed(window.localStorage.getItem(`${DISMISS_KEY}:${user?.id ?? ""}`) === "1");
-  }, [user?.id]);
-
-  useEffect(() => {
-    if (!user?.id) return;
-    let cancelled = false;
-    void supabase.rpc("free_trial_eligible").then(({ data, error }) => {
-      if (!cancelled && !error) setEligible(data === true);
-    });
-    return () => {
-      cancelled = true;
-    };
   }, [user?.id]);
 
   if (!user || !eligible || dismissed) return null;
@@ -36,19 +19,6 @@ export default function StartTrialBanner() {
   const dismiss = () => {
     window.localStorage.setItem(`${DISMISS_KEY}:${user.id}`, "1");
     setDismissed(true);
-  };
-
-  const start = async () => {
-    setStarting(true);
-    const { error } = await supabase.rpc("claim_free_trial");
-    setStarting(false);
-    if (error) {
-      toast.error(error.message || "Could not start your free trial. Please try again.");
-      return;
-    }
-    setEligible(false);
-    void refresh();
-    toast.success("Your free trial has started: $100 credit and 14 days of Pro.");
   };
 
   return (
@@ -70,7 +40,7 @@ export default function StartTrialBanner() {
         </button>
         <button
           type="button"
-          onClick={start}
+          onClick={() => void start()}
           disabled={starting}
           className="inline-flex h-8 items-center gap-1.5 rounded-full bg-gc-blue-deep px-4 text-[13px] font-medium text-gc-on-blue hover:bg-gc-navy disabled:opacity-60"
         >

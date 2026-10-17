@@ -16,6 +16,7 @@ import NotificationBell from "@/components/NotificationBell";
 import { useCredits } from "@/hooks/useCredits";
 import { useAuthUser } from "@/hooks/useAuthUser";
 import StartTrialBanner from "@/components/StartTrialBanner";
+import CloudWelcome from "@/components/dashboard/CloudWelcome";
 import { useLivePriceStream } from "@/hooks/useLivePriceStream";
 import { useLivePrices } from "@/hooks/useLivePrices";
 import { getMarketSnapshot } from "@/lib/gold-analysis.functions";
@@ -1558,8 +1559,7 @@ function DashboardLayout() {
 
           {pathname === "/dashboard" ? (
             <>
-              {/* Extension usage analytics — Cloudflare-style */}
-              <DashboardHero keysCount={extKeyCount} stats={usageStats} />
+              <CloudWelcome />
 
               {/* Extension usage analytics — Cloudflare-style */}
               <UsageAnalytics
