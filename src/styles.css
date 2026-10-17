@@ -114,6 +114,9 @@
   --color-gc-panel: var(--gc-panel);
   --color-gc-navy: var(--gc-navy);
   --color-gc-blue-deep: var(--gc-blue-deep);
+  --color-gc-night: var(--gc-night);
+  --color-gc-night-grid: var(--gc-night-grid);
+  --color-gc-night-ink: var(--gc-night-ink);
   --color-auth-action: var(--auth-action);
   --color-auth-action-foreground: var(--auth-action-foreground);
 }
@@ -183,6 +186,9 @@
   --gc-panel: #eef2f7;
   --gc-navy: #283593;
   --gc-blue-deep: #0b57d0;
+  --gc-night: #0b0d12;
+  --gc-night-grid: #1c2029;
+  --gc-night-ink: #f1f3f4;
   --auth-action: oklch(0.72 0.14 255);
   --auth-action-foreground: oklch(1 0 0);
 }
