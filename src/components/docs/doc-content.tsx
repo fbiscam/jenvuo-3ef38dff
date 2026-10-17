@@ -327,8 +327,8 @@ export const DOC_GROUPS: DocGroup[] = [
         keywords: "deterministic engines analysis rules",
         body: (
           <p>
-            Behind the chart are seven rule-based engines covering structure, zones, fair value gaps, liquidity sweeps, sessions,
-            volume and risk. They always give the same result for the same candles, so markings are consistent and repeatable. The
+            Behind the chart are seven rule-based engines that read things like market structure, zones, fair value gaps and
+            liquidity. They always give the same result for the same candles, so markings are consistent and repeatable. The
             AI explains their output — it does not invent its own levels.
           </p>
         ),

@@ -28,6 +28,7 @@ export const Route = createFileRoute("/sitemap.xml")({
           { path: "/", origin: BLOG_URL, changefreq: "daily", priority: "0.9" },
           { path: "/about", changefreq: "monthly", priority: "0.7" },
           { path: "/contact", changefreq: "monthly", priority: "0.7" },
+          { path: "/docs", changefreq: "monthly", priority: "0.8" },
           { path: "/ai-engine", changefreq: "monthly", priority: "0.7" },
           { path: "/strategies/ict-gold-trading", changefreq: "monthly", priority: "0.8" },
           { path: "/llm", changefreq: "monthly", priority: "0.6" },

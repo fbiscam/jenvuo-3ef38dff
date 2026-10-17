@@ -21,6 +21,7 @@ import { Route as ConfirmEmailChangeRouteImport } from './routes/confirm-email-c
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as DevelopmentRouteImport } from './routes/development'
 import { Route as DisclaimerRouteImport } from './routes/disclaimer'
+import { Route as DocsRouteImport } from './routes/docs'
 import { Route as DownloadRouteImport } from './routes/download'
 import { Route as FounderRouteImport } from './routes/founder'
 import { Route as FoundingRouteImport } from './routes/founding'
@@ -172,6 +173,11 @@ const DevelopmentRoute = DevelopmentRouteImport.update({
 const DisclaimerRoute = DisclaimerRouteImport.update({
   id: '/disclaimer',
   path: '/disclaimer',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DocsRoute = DocsRouteImport.update({
+  id: '/docs',
+  path: '/docs',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DownloadRoute = DownloadRouteImport.update({
@@ -695,6 +701,7 @@ export interface FileRoutesByFullPath {
   '/contact': typeof ContactRoute
   '/development': typeof DevelopmentRoute
   '/disclaimer': typeof DisclaimerRoute
+  '/docs': typeof DocsRoute
   '/download': typeof DownloadRoute
   '/founder': typeof FounderRoute
   '/founding': typeof FoundingRoute
@@ -801,6 +808,7 @@ export interface FileRoutesByTo {
   '/contact': typeof ContactRoute
   '/development': typeof DevelopmentRoute
   '/disclaimer': typeof DisclaimerRoute
+  '/docs': typeof DocsRoute
   '/download': typeof DownloadRoute
   '/founder': typeof FounderRoute
   '/founding': typeof FoundingRoute
@@ -904,6 +912,7 @@ export interface FileRoutesById {
   '/contact': typeof ContactRoute
   '/development': typeof DevelopmentRoute
   '/disclaimer': typeof DisclaimerRoute
+  '/docs': typeof DocsRoute
   '/download': typeof DownloadRoute
   '/founder': typeof FounderRoute
   '/founding': typeof FoundingRoute
@@ -1012,6 +1021,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/development'
     | '/disclaimer'
+    | '/docs'
     | '/download'
     | '/founder'
     | '/founding'
@@ -1118,6 +1128,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/development'
     | '/disclaimer'
+    | '/docs'
     | '/download'
     | '/founder'
     | '/founding'
@@ -1220,6 +1231,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/development'
     | '/disclaimer'
+    | '/docs'
     | '/download'
     | '/founder'
     | '/founding'
@@ -1328,6 +1340,7 @@ export interface RootRouteChildren {
   ContactRoute: typeof ContactRoute
   DevelopmentRoute: typeof DevelopmentRoute
   DisclaimerRoute: typeof DisclaimerRoute
+  DocsRoute: typeof DocsRoute
   DownloadRoute: typeof DownloadRoute
   FounderRoute: typeof FounderRoute
   FoundingRoute: typeof FoundingRoute
@@ -1460,6 +1473,13 @@ declare module '@tanstack/react-router' {
       path: '/disclaimer'
       fullPath: '/disclaimer'
       preLoaderRoute: typeof DisclaimerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/docs': {
+      id: '/docs'
+      path: '/docs'
+      fullPath: '/docs'
+      preLoaderRoute: typeof DocsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/download': {
@@ -2292,6 +2312,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContactRoute: ContactRoute,
   DevelopmentRoute: DevelopmentRoute,
   DisclaimerRoute: DisclaimerRoute,
+  DocsRoute: DocsRoute,
   DownloadRoute: DownloadRoute,
   FounderRoute: FounderRoute,
   FoundingRoute: FoundingRoute,
