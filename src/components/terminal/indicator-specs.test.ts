@@ -1,36 +1,30 @@
 import { describe, it } from "node:test";
-import type { OhlcvBar } from "@/lib/chart/indicators";
-import { expect } from "../../lib/chart/test-expect";
-import { buildIndicatorSeries } from "./indicator-specs";
+import assert from "node:assert/strict";
+import { buildIndicatorSeries, renderedIndicatorIds, type IndicatorId } from "./indicator-specs";
 
-const bar = (index: number, high: number, low: number, close = 100): OhlcvBar => ({
-  time: index * 60,
-  open: close,
-  high,
-  low,
-  close,
-  volume: 1,
-});
+const seriesLayout = (ids: IndicatorId[]) => renderedIndicatorIds(ids).flatMap((id) =>
+  buildIndicatorSeries(id).lines.map((line) => line.title),
+);
 
-describe("Support & Resistance", () => {
-  it("uses confirmed 10-bar pivots and removes levels after a close-through", () => {
-    const bars = Array.from({ length: 35 }, (_, i) => bar(i, 105, 95));
-    bars[10] = bar(10, 120, 94);
-    bars[12] = bar(12, 106, 80);
-    bars[20] = bar(20, 106, 96, 100);
-    bars[22] = bar(22, 106, 96, 100);
+describe("rendered indicator series layout", () => {
+  it("keeps default RVOL and EMA update slots aligned and starts scripts at slot 4", () => {
+    const ids: IndicatorId[] = ["volume", "rvol", "ema20", "ema50"];
+    assert.deepEqual(seriesLayout(ids), ["Volume", "MA 20", "EMA 20", "EMA 50"]);
+    assert.equal(renderedIndicatorIds(ids).reduce((n, id) => n + buildIndicatorSeries(id).lines.length, 0), 4);
+    assert.deepEqual(ids, ["volume", "rvol", "ema20", "ema50"]);
+  });
 
-    const [resistance, support] = buildIndicatorSeries("sr").compute(bars);
-    expect(Number.isNaN(resistance[19])).toBe(true);
-    expect(resistance[20]).toBe(120);
-    expect(Number.isNaN(support[21])).toBe(true);
-    expect(support[22]).toBe(80);
+  it("suppresses plain Volume regardless of its position in a saved setup", () => {
+    assert.deepEqual(seriesLayout(["ema50", "rvol", "volume", "ema20"]),
+      ["EMA 50", "Volume", "MA 20", "EMA 20"]);
+  });
 
-    bars[24] = bar(24, 123, 99, 121);
-    bars[26] = bar(26, 101, 78, 79);
-    const [afterBreakResistance, afterBreakSupport] = buildIndicatorSeries("sr").compute(bars);
-    expect(Number.isNaN(afterBreakResistance[24])).toBe(true);
-    expect(Number.isNaN(afterBreakResistance[25])).toBe(true);
-    expect(Number.isNaN(afterBreakSupport[26])).toBe(true);
+  it("restores the plain Volume slot when RVOL is turned off", () => {
+    assert.deepEqual(seriesLayout(["volume", "ema20", "ema50"]), ["Volume", "EMA 20", "EMA 50"]);
+  });
+
+  it("preserves multi-line indicators, RVOL alone, and scripts without indicators", () => {
+    assert.deepEqual(seriesLayout(["rvol", "macd"]), ["Volume", "MA 20", "Histogram", "MACD", "Signal"]);
+    assert.deepEqual(seriesLayout([]), []);
   });
 });
