@@ -1528,6 +1528,7 @@ function DashboardLayout() {
                   )}
                 </button>
               )}
+              {!drawerMode && (
               <button
                 type="button"
                 onClick={() => setSidebarCollapsed((v) => !v)}
@@ -1541,6 +1542,7 @@ function DashboardLayout() {
                   <ChevronsLeft className="h-3.5 w-3.5" />
                 )}
               </button>
+              )}
             </div>
           </div>
         </aside>
@@ -1548,34 +1550,33 @@ function DashboardLayout() {
 
       {/* Right column */}
       <div
-        className={`dashboard-right-col flex min-w-0 min-h-0 flex-1 flex-col ${pathname === "/dashboard/terminal" ? "bg-white" : "bg-gc-canvas"} ${embedMode ? "" : sidebarCollapsed ? "collapsed lg:pl-[60px]" : "lg:pl-[224px]"}`}
+        className={`dashboard-right-col flex min-w-0 min-h-0 flex-1 flex-col ${pathname === "/dashboard/terminal" ? "bg-white" : "bg-gc-canvas"} ${embedMode || drawerMode ? "" : sidebarCollapsed ? "collapsed lg:pl-[60px]" : "lg:pl-[224px]"}`}
       >
+        {drawerMode && (
+          <DashboardTopBar
+            links={TABS.map((t) => ({ to: t.to, label: t.label }))}
+            onMenu={() => setMobileNavOpen(true)}
+            avatarUrl={avatarUrl || getDefaultAvatar(email || authUser?.id)}
+            name={fullName}
+            email={email}
+            onSignOut={() => void signOut()}
+          />
+        )}
         <div
           className={
-            pathname === "/dashboard/terminal" || embedMode
+            !drawerMode
               ? "flex min-h-0 w-full flex-1 flex-col"
-              : "flex min-h-0 w-full flex-1 flex-col overflow-hidden bg-background lg:mr-2 lg:mt-2 lg:w-auto lg:rounded-t-[20px]"
+              : "flex min-h-0 w-full flex-1 flex-col overflow-hidden bg-background sm:mx-2 sm:w-auto sm:rounded-t-[20px]"
           }
         >
-        {!embedMode && pathname !== "/dashboard/terminal" && <StartTrialBanner />}
-        {!embedMode && pathname !== "/dashboard/terminal" && <NotificationStrip />}
-        {/* Mobile menu toggle (floating) */}
-        {!embedMode && pathname !== "/dashboard/terminal" && (
-          <button
-            type="button"
-            aria-label="Open menu"
-            onClick={() => setMobileNavOpen(true)}
-            className="fixed top-3 right-3 z-30 inline-flex items-center justify-center rounded-md border border-zinc-200 bg-white p-1.5 text-zinc-700 shadow-sm hover:bg-zinc-50 md:hidden"
-          >
-            <Menu className="h-4 w-4" />
-          </button>
-        )}
+        {drawerMode && <StartTrialBanner />}
+        {drawerMode && <NotificationStrip />}
 
         <main
           className={
             pathname === "/dashboard/terminal"
               ? "h-full min-h-0 w-full flex-1 overflow-hidden bg-white"
-              : "mx-auto w-full max-w-7xl flex-1 bg-white px-5 pt-14 pb-7 sm:px-8 sm:pt-7"
+              : "mx-auto w-full max-w-7xl flex-1 bg-white px-5 pt-7 pb-7 sm:px-8"
           }
           style={pathname === "/dashboard/terminal" ? undefined : { zoom: 0.9 }}
         >
