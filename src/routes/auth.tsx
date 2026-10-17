@@ -1386,7 +1386,7 @@ function AuthPage() {
                   <div>
                     <h2 className="text-[20px] font-normal text-gc-ink">14 days of Pro access</h2>
                     <p className="mt-2 text-[14px] leading-[1.55] text-gc-ink-muted">
-                      New sign-ups get Pro free for 14 days. Upgrade only if you decide Jenvu is right for you.
+                      Start 14 days of Pro free from your dashboard. Upgrade only if Jenvu is right for you.
                     </p>
                   </div>
                 </div>
