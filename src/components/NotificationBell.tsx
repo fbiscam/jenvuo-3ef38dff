@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { Link } from "@tanstack/react-router";
 import {
   Bell,
   TrendingUp,
@@ -204,7 +203,7 @@ export default function NotificationBell() {
             <span className="text-[14px] font-normal text-gc-ink">Notifications</span>
           </div>
 
-          <div className="max-h-[380px] overflow-y-auto py-1">
+          <div className="max-h-[min(460px,70vh)] overflow-y-auto overscroll-contain py-1">
             {items.length === 0 ? (
               <div className="px-4 py-8 text-center">
                 <p className="text-[13px] text-gc-ink">You're all caught up</p>
@@ -213,46 +212,33 @@ export default function NotificationBell() {
                 </p>
               </div>
             ) : (
-              items.slice(0, 5).map((n) => {
+              items.map((n) => {
                 const v = visualFor(n);
                 const Icon = v.Icon;
                 return (
-                  <Link
+                  <div
                     key={n.id}
-                    to={v.href}
-                    search={v.search as never}
-                    title={n.body ?? undefined}
-                    onClick={() => {
+                    onMouseEnter={() => {
                       if (!n.read_at) markOne(n.id);
-                      setOpen(false);
                     }}
                     className={cn(
-                      "flex items-center gap-3 px-4 py-3 transition-colors hover:bg-gc-nav-active",
+                      "flex items-start gap-3 px-4 py-3 transition-colors hover:bg-gc-nav-active",
                       !n.read_at && "bg-gc-nav-active/60",
                     )}
                   >
-                    <Icon className={cn("h-[18px] w-[18px] shrink-0", v.tone)} />
-                    <p className="min-w-0 flex-1 truncate text-[14px] text-gc-ink">{n.title}</p>
+                    <Icon className={cn("mt-0.5 h-[18px] w-[18px] shrink-0", v.tone)} />
+                    <div className="min-w-0 flex-1">
+                      <p className="text-[14px] text-gc-ink">{n.title}</p>
+                      {n.body && <p className="mt-0.5 text-[13px] leading-snug text-gc-ink-muted">{n.body}</p>}
+                    </div>
                     <span className="shrink-0 text-[12px] text-gc-ink-muted">
                       {timeAgo(n.created_at)}
                     </span>
-                  </Link>
+                  </div>
                 );
               })
             )}
           </div>
-
-          {items.length > 0 && (
-            <div className="border-t border-gc-blue-deep/15 px-4 py-2 text-center">
-              <Link
-                to="/dashboard/notifications"
-                onClick={() => setOpen(false)}
-                className="text-[13px] font-medium text-gc-blue-deep hover:underline"
-              >
-                View all
-              </Link>
-            </div>
-          )}
         </div>
       )}
     </div>

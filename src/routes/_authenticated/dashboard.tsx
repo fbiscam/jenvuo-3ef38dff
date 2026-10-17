@@ -1391,7 +1391,7 @@ function DashboardLayout() {
 
           <nav className={`sidebar-hover-scroll flex-1 min-h-0 overflow-y-auto overflow-x-hidden py-1 ${navCollapsed ? "px-2" : "pl-0 pr-3"}`}>
             {[...NAV_GROUPS].map((group, gi) => (
-              <div key={group.label || `nav-group-${gi}`} className={gi > 0 ? "mt-2" : ""}>
+              <div key={group.label || `nav-group-${gi}`} className={gi > 0 ? "mt-1" : ""}>
                 {!navCollapsed && group.label && (
                   <div className="mb-1.5 px-2.5 text-[10px] font-normal tracking-wider text-[#6B6C6B]">
                     {group.label}
@@ -1400,7 +1400,7 @@ function DashboardLayout() {
                 {navCollapsed && gi > 0 && group.label && (
                   <div className="mx-3 mb-1 h-px bg-zinc-100" />
                 )}
-                <div className="flex flex-col gap-0.5">
+                <div className="flex flex-col gap-1">
                   {group.items.map((t) => {
                     const active = t.exact ? pathname === t.to : pathname.startsWith(t.to);
                     const Icon = t.icon;
