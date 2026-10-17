@@ -187,7 +187,7 @@ function ContactPage() {
           <div className="max-w-[370px] space-y-4">
             <div className="rounded-xl border border-gc-line bg-background p-6">
               <img src="/favicon.png" alt="Jenvu" className="h-10 w-10 rounded-lg object-contain" />
-              <h2 className="mt-4 text-[20px]">Contact our team directly</h2>
+              <h2 className="mt-4 text-[20px]">Contact our team direct</h2>
               <a href="mailto:support@jenvu.com" className="mt-6 flex w-full items-center justify-center gap-2 rounded-full bg-home-accent px-5 py-3 text-[16px] font-medium text-home-accent-foreground hover:opacity-90">
                 support@jenvu.com
               </a>
