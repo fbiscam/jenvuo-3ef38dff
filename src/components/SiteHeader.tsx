@@ -41,7 +41,7 @@ export default function SiteHeader() {
             </Link>
             <div className="hidden items-center whitespace-nowrap text-[14px] md:flex [&>a]:rounded-md [&>a]:px-2.5 [&>a]:py-2 [&>a:hover]:bg-gc-surface">
               <Link to="/help" className="text-gc-ink-muted hover:text-gc-ink">Docs</Link>
-              <Link to="/contact" className="text-gc-ink-muted hover:text-gc-ink">Support</Link>
+              <a href="https://support.jenvu.com" className="text-gc-ink-muted hover:text-gc-ink">Support</a>
               <Link to="/dashboard/terminal" className="text-gc-blue">Terminal</Link>
             </div>
             {isAuthed ? (
