@@ -750,6 +750,15 @@ function DashboardLayout() {
   useEffect(() => {
     setMobileNavOpen(false);
   }, [pathname]);
+  // Close the menu with Escape
+  useEffect(() => {
+    if (!mobileNavOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setMobileNavOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [mobileNavOpen]);
 
   // Detect admin role to conditionally show admin nav items
   useEffect(() => {
