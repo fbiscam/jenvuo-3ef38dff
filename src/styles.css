@@ -1259,3 +1259,10 @@ html body .dash-dark main.bg-white { background-color: oklch(0.165 0 0) !importa
 }
 @media (min-width: 1024px) { .jenvu-solutions-zoom { zoom: 1.265; } }
 @media (min-width: 1024px) { .jenvu-videos-zoom { zoom: 1.1; } .jenvu-logos-zoom { zoom: 1.21; } .jenvu-start-zoom { zoom: 1.1; } }
+
+/* Shared site menu looks the same size on every page: undo the page-level zoom */
+@media (min-width: 1024px) { .jenvu-zoom .jenvu-home-header { zoom: calc(0.772 / 1.05); } }
+@media (min-width: 1200px) { .jenvu-zoom .jenvu-home-header { zoom: calc(0.851 / 1.15); } }
+@media (min-width: 1360px) { .jenvu-zoom .jenvu-home-header { zoom: calc(0.945 / 1.28); } }
+@media (min-width: 1500px) { .jenvu-zoom .jenvu-home-header { zoom: calc(1.04 / 1.4); } }
+@media (min-width: 1680px) { .jenvu-zoom .jenvu-home-header { zoom: calc(1.103 / 1.5); } }

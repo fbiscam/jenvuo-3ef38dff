@@ -1,4 +1,4 @@
-import SiteNavLinks from "@/components/SiteNavLinks";
+import SiteHeader from "@/components/SiteHeader";
 import HeaderAuthButtons from "@/components/HeaderAuthButtons";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, useMemo } from "react";
@@ -149,41 +149,7 @@ function InsightsPage() {
     <>
       <div className={`public-cloudflare jenvu-zoom min-h-dvh w-full bg-background text-foreground ${SANS} antialiased selection:bg-home-accent selection:text-home-accent-foreground`}>
         {/* NAV */}
-        <header className="sticky top-0 z-50 border-b border-zinc-100 bg-white">
-          <div className="relative mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-3 px-5 py-3 sm:px-6 sm:py-4 md:flex md:justify-between">
-            <a href="https://jenvu.com" className="flex min-w-0 items-center gap-2.5">
-              <img src="/favicon.png" alt="Jenvu" className="h-7 w-7 shrink-0 rounded-md object-contain" />
-              <span className="truncate text-[22px] tracking-tight leading-none" style={{ color: "#3c4043", fontFamily: "\"Google Sans\", \"Product Sans\", \"DM Sans\", system-ui, sans-serif", fontWeight: 500 }}>Jenvu</span>
-            </a>
-            <SiteNavLinks active="/insights" />
-            <HeaderAuthButtons />
-          </div>
-          
-          {/* CNN-STYLE BREAKING TICKER — clickable, links to articles */}
-          {tickerItems.length > 0 && (
-            <div className="overflow-hidden bg-home-accent px-4 py-1.5 text-home-accent-foreground sm:px-6">
-              <div className="mx-auto max-w-6xl flex items-center gap-4">
-                <span className={`${MONO} text-[10px] font-bold uppercase bg-white text-red-600 px-1.5 py-0.5 rounded shrink-0 animate-pulse`}>
-                  Live
-                </span>
-                <div className="flex-1 overflow-hidden">
-                  <div className="flex gap-10 whitespace-nowrap animate-ticker-fast">
-                    {[...tickerItems, ...tickerItems].map((news, i) => (
-                      <Link
-                        key={news.id + "-" + i}
-                        to="/insights/$slug"
-                        params={{ slug: news.slug }}
-                        className="text-xs font-medium tracking-tight hover:underline shrink-0"
-                      >
-                        {news.is_breaking ? "● BREAKING — " : "› "}{news.title}
-                      </Link>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-        </header>
+        <SiteHeader />
 
         {/* HERO SECTION - FEATURED ARTICLE */}
         {featured ? (

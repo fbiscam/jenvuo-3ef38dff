@@ -6,9 +6,9 @@ import { useFreeTrial } from "@/hooks/useFreeTrial";
 const QUICK_ACTIONS = [
   { label: "Create API key", to: "/dashboard/api" },
   { label: "Open gold Terminal", to: "/dashboard/terminal" },
-  { label: "Set up alerts", to: "/dashboard/notifications" },
+  { label: "Manage billing", to: "/dashboard/billing" },
   { label: "Log a trade", to: "/dashboard/journal" },
-  { label: "Install extension", to: "/dashboard/extension" },
+  { label: "Security settings", to: "/dashboard/security" },
   { label: "View usage", to: "/dashboard/usage" },
 ] as const;
 
@@ -24,9 +24,9 @@ const RESOURCES: Record<string, Resource[]> = {
     { title: "Model access by plan", text: "Compare which models and limits come with Pro, Elite and Ultra.", to: "/pricing" },
     { title: "Token pricing", text: "Usage is charged at $3 per million tokens from your credit wallet.", to: "/pricing" },
   ],
-  "API and extension": [
+  "API and developers": [
     { title: "Create your first API key", text: "Plug Jenvu models into your own apps and bots in a few steps.", to: "/dashboard/api" },
-    { title: "Browser extension", text: "Capture any chart in your browser and get an analysis in seconds.", to: "/dashboard/extension" },
+    { title: "Track your usage", text: "See tokens, requests and credit spend for every API key.", to: "/dashboard/usage" },
     { title: "Developer docs", text: "Clear guides help you connect, test and ship your project.", to: "/help" },
   ],
   "Billing and plans": [
@@ -91,7 +91,7 @@ export default function CloudWelcome() {
                 <>
                   <Tick>Read live sweeps, zones and FVGs on XAU/USD</Tick>
                   <Tick>Ask the AI desk about any chart</Tick>
-                  <Tick>Get alerts when your setups appear</Tick>
+                  <Tick>Track usage, billing and API keys in one place</Tick>
                 </>
               )}
             </ul>

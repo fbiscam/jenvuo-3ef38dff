@@ -1,4 +1,4 @@
-import SiteNavLinks from "@/components/SiteNavLinks";
+import SiteHeader from "@/components/SiteHeader";
 import HeaderAuthButtons from "@/components/HeaderAuthButtons";
 import { createFileRoute, Link, useParams, notFound } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
@@ -146,21 +146,7 @@ function InsightDetailPage() {
     <>
       <div className={`jenvu-zoom min-h-dvh w-full bg-[#FAFAFA] text-zinc-900 ${SANS} antialiased selection:bg-zinc-900 selection:text-white`}>
         {/* NAV */}
-        <header className="sticky top-0 z-50 border-b border-zinc-100 bg-white">
-          <div
-            className="absolute left-0 top-0 h-[3px] bg-gradient-to-r from-red-500 via-amber-500 to-emerald-500 transition-[width] duration-150 ease-out"
-            style={{ width: `${progress}%` }}
-            aria-hidden="true"
-          />
-          <div className="relative mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-3 px-5 py-3 sm:px-6 sm:py-4 md:flex md:justify-between">
-            <a href="https://jenvu.com" className="flex min-w-0 items-center gap-2.5">
-              <img src="/favicon.png" alt="Jenvu" className="h-7 w-7 shrink-0 rounded-md object-contain" />
-              <span className="truncate text-[22px] tracking-tight leading-none" style={{ color: "#3c4043", fontFamily: "\"Google Sans\", \"Product Sans\", \"DM Sans\", system-ui, sans-serif", fontWeight: 500 }}>Jenvu</span>
-            </a>
-            <SiteNavLinks active="/insights" />
-            <HeaderAuthButtons />
-          </div>
-        </header>
+        <SiteHeader />
 
         <main className="mx-auto max-w-4xl px-5 sm:px-6 py-12 sm:py-20">
           <Link

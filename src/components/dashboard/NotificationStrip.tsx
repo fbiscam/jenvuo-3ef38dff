@@ -77,12 +77,6 @@ export default function NotificationStrip() {
         >
           Dismiss
         </button>
-        <Link
-          to="/dashboard/notifications"
-          className="inline-flex h-8 items-center rounded-full border border-gc-ink-muted/60 bg-background px-4 text-[13px] font-medium text-gc-ink hover:bg-gc-surface"
-        >
-          View all
-        </Link>
       </div>
     </div>
   );
