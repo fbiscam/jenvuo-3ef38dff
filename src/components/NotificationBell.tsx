@@ -5,12 +5,11 @@ import {
   Bell,
   TrendingUp,
   TrendingDown,
-  Sparkles,
   Crown,
   Coins,
   Mail,
   ShieldCheck,
-  Info,
+  CheckCircle2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
@@ -23,14 +22,15 @@ import {
 
 function timeAgo(iso: string): string {
   const diff = Date.now() - new Date(iso).getTime();
-  const s = Math.floor(diff / 1000);
-  if (s < 60) return `${s}s`;
+  const s = Math.max(0, Math.floor(diff / 1000));
+  const plural = (n: number, unit: string) => `${n} ${unit}${n === 1 ? "" : "s"} ago`;
+  if (s < 60) return "just now";
   const m = Math.floor(s / 60);
-  if (m < 60) return `${m}m`;
+  if (m < 60) return plural(m, "minute");
   const h = Math.floor(m / 60);
-  if (h < 24) return `${h}h`;
+  if (h < 24) return plural(h, "hour");
   const d = Math.floor(h / 24);
-  return `${d}d`;
+  return plural(d, "day");
 }
 
 function beep() {
@@ -61,7 +61,7 @@ function beep() {
 
 type Visual = {
   Icon: React.ComponentType<{ className?: string }>;
-  wrap: string;
+  tone: string;
   href: string;
   search?: Record<string, string>;
 };
@@ -73,22 +73,20 @@ function visualFor(n: NotificationRow): Visual {
     const alertId = (n.data?.alert_id as string) || undefined;
     return {
       Icon: isBuy ? TrendingUp : TrendingDown,
-      wrap: isBuy ? "bg-emerald-50 text-emerald-600" : "bg-red-50 text-red-600",
+      tone: isBuy ? "text-gc-success" : "text-destructive",
       href: "/dashboard/notifications",
       search: alertId ? { alertId } : undefined,
     };
   }
-  if (t === "welcome")
-    return { Icon: Sparkles, wrap: "bg-violet-50 text-violet-600", href: "/dashboard" };
   if (t === "plan_upgrade" || t === "plan-upgrade")
-    return { Icon: Crown, wrap: "bg-amber-50 text-amber-600", href: "/dashboard" };
+    return { Icon: Crown, tone: "text-gc-blue-deep", href: "/dashboard" };
   if (t === "credits_low" || t === "credits")
-    return { Icon: Coins, wrap: "bg-orange-50 text-orange-600", href: "/dashboard" };
+    return { Icon: Coins, tone: "text-gc-blue-deep", href: "/dashboard" };
   if (t === "email" || t === "message")
-    return { Icon: Mail, wrap: "bg-sky-50 text-sky-600", href: "/dashboard" };
+    return { Icon: Mail, tone: "text-gc-blue-deep", href: "/dashboard" };
   if (t === "security")
-    return { Icon: ShieldCheck, wrap: "bg-emerald-50 text-emerald-600", href: "/dashboard/security" };
-  return { Icon: Info, wrap: "bg-zinc-100 text-zinc-600", href: "/dashboard" };
+    return { Icon: ShieldCheck, tone: "text-gc-success", href: "/dashboard/security" };
+  return { Icon: CheckCircle2, tone: "text-gc-success", href: "/dashboard" };
 }
 
 export default function NotificationBell() {
@@ -201,40 +199,21 @@ export default function NotificationBell() {
       </button>
 
       {open && (
-        <div className="fixed left-2 right-2 top-14 z-50 w-auto overflow-hidden rounded-xl border border-zinc-200/80 bg-white shadow-[0_8px_28px_-8px_rgba(0,0,0,0.15)] sm:absolute sm:left-auto sm:right-0 sm:top-11 sm:w-[320px]">
-          <div className="flex items-center justify-between border-b border-zinc-100 px-3 py-2">
-            <div className="flex items-center gap-2">
-              <span className="text-[13px] font-semibold text-zinc-900">Notifications</span>
-              {unread > 0 && (
-                <span className="inline-flex h-4 min-w-[16px] items-center justify-center rounded-full bg-zinc-900 px-1 text-[10px] font-semibold text-white">
-                  {unread}
-                </span>
-              )}
-            </div>
-            {items.length > 0 && (
-              <Link
-                to="/dashboard/notifications"
-                onClick={() => setOpen(false)}
-                className="text-[11px] font-medium text-zinc-500 hover:text-zinc-900"
-              >
-                View all
-              </Link>
-            )}
+        <div className="fixed left-2 right-2 top-14 z-50 w-auto overflow-hidden rounded-2xl bg-gc-canvas shadow-[0_4px_16px_rgba(60,64,67,0.18),0_1px_3px_rgba(60,64,67,0.12)] sm:absolute sm:left-auto sm:right-0 sm:top-11 sm:w-[400px]">
+          <div className="border-b border-gc-blue-deep/25 px-4 py-3.5 text-center">
+            <span className="text-[14px] font-normal text-gc-ink">Notifications</span>
           </div>
 
-          <div className="max-h-[380px] overflow-y-auto">
+          <div className="max-h-[380px] overflow-y-auto py-1">
             {items.length === 0 ? (
-              <div className="flex flex-col items-center justify-center px-4 py-10 text-center">
-                <div className="mb-2 flex h-9 w-9 items-center justify-center rounded-full bg-zinc-100 text-zinc-400">
-                  <Bell className="h-4 w-4" />
-                </div>
-                <p className="text-[12px] font-medium text-zinc-700">You're all caught up</p>
-                <p className="mt-0.5 text-[11px] text-zinc-500">
+              <div className="px-4 py-8 text-center">
+                <p className="text-[13px] text-gc-ink">You're all caught up</p>
+                <p className="mt-0.5 text-[12px] text-gc-ink-muted">
                   Signals, plan updates & alerts land here.
                 </p>
               </div>
             ) : (
-              items.slice(0, 4).map((n) => {
+              items.slice(0, 5).map((n) => {
                 const v = visualFor(n);
                 const Icon = v.Icon;
                 return (
@@ -242,49 +221,38 @@ export default function NotificationBell() {
                     key={n.id}
                     to={v.href}
                     search={v.search as never}
+                    title={n.body ?? undefined}
                     onClick={() => {
                       if (!n.read_at) markOne(n.id);
                       setOpen(false);
                     }}
                     className={cn(
-                      "group flex items-start gap-2.5 border-b border-zinc-50 px-3 py-2.5 transition-colors last:border-b-0 hover:bg-zinc-50/70",
-                      !n.read_at && "bg-blue-50/30",
+                      "flex items-center gap-3 px-4 py-3 transition-colors hover:bg-gc-nav-active",
+                      !n.read_at && "bg-gc-nav-active/60",
                     )}
                   >
-                    <div
-                      className={cn(
-                        "mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full",
-                        v.wrap,
-                      )}
-                    >
-                      <Icon className="h-3.5 w-3.5" />
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-start justify-between gap-2">
-                        <p className="truncate text-[12.5px] font-semibold leading-tight text-zinc-900">
-                          {n.title}
-                        </p>
-                        <span className="shrink-0 text-[10px] leading-tight text-zinc-400">
-                          {timeAgo(n.created_at)}
-                        </span>
-                      </div>
-                      {n.body && (
-                        <p className="mt-0.5 line-clamp-2 text-[11px] leading-snug text-zinc-500">
-                          {n.body}
-                        </p>
-                      )}
-                    </div>
-                    {!n.read_at && (
-                      <span
-                        aria-hidden
-                        className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-blue-500"
-                      />
-                    )}
+                    <Icon className={cn("h-[18px] w-[18px] shrink-0", v.tone)} />
+                    <p className="min-w-0 flex-1 truncate text-[14px] text-gc-ink">{n.title}</p>
+                    <span className="shrink-0 text-[12px] text-gc-ink-muted">
+                      {timeAgo(n.created_at)}
+                    </span>
                   </Link>
                 );
               })
             )}
           </div>
+
+          {items.length > 0 && (
+            <div className="border-t border-gc-blue-deep/15 px-4 py-2 text-center">
+              <Link
+                to="/dashboard/notifications"
+                onClick={() => setOpen(false)}
+                className="text-[13px] font-medium text-gc-blue-deep hover:underline"
+              >
+                View all
+              </Link>
+            </div>
+          )}
         </div>
       )}
     </div>
