@@ -19,6 +19,7 @@ function PrivacyPage() {
   return (
     <PageShell
       eyebrow="Legal"
+      highlight={{ title: 'Your data, your control', text: 'We collect only what is needed to run your account and analysis, never sell personal data, and you can ask us to export or delete it at any time.' }}
       title="Privacy Policy"
       intro="Jenvu ('we', 'us', 'our') respects your privacy. This policy explains what we collect when you use jenvu.com or our TradingView extension, how we use it, and the rights you have over that data."
     >

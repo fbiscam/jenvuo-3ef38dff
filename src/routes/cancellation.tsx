@@ -19,6 +19,7 @@ function CancellationPage() {
   return (
     <PageShell
       eyebrow="Legal"
+      highlight={{ title: 'Cancel any time', text: 'You can stop your subscription whenever you like. Access continues until the end of the paid period, and no further charges are made after cancelling.' }}
       title="Cancellation Policy"
       intro="You can cancel your Jenvu subscription at any time. This policy explains how cancellation works and how it interacts with billing, credits and refunds."
     >
