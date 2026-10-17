@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import { Check, Loader2, Plus, ArrowRight } from "lucide-react";
 import { useFreeTrial } from "@/hooks/useFreeTrial";
@@ -41,7 +41,7 @@ const RESOURCES: Record<string, Resource[]> = {
   ],
 };
 
-function Tick({ children }: { children: React.ReactNode }) {
+function Tick({ children }: { children: ReactNode }) {
   return (
     <li className="flex items-center gap-4 text-[16px] text-gc-ink">
       <Check className="h-5 w-5 shrink-0 text-gc-green" strokeWidth={2.25} aria-hidden="true" />
