@@ -4,10 +4,9 @@ import { createFileRoute, useNavigate, Link, redirect } from "@tanstack/react-ro
 import { oauthReturnPath } from "@/lib/oauth-return-path";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { Mail, Lock, ArrowRight, User, Loader2, Eye, EyeOff, Globe } from "lucide-react";
+import { Mail, Lock, ArrowRight, User, Loader2, Eye, EyeOff } from "lucide-react";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
-import authPanel from "@/assets/auth-panel.jpg.asset.json";
 import {
   confirmRecoveryOtp,
   confirmSignupOtp,
