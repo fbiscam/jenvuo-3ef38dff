@@ -166,10 +166,10 @@
   --brand-gemini: oklch(0.62 0.23 285);
   --brand-deepseek: oklch(0.59 0.22 271);
   --brand-claude: oklch(0.7 0.12 55);
-  --home-accent: #fd540f;
+  --home-accent: #1a73e8;
   --home-accent-foreground: #ffffff;
-  --home-accent-soft: oklch(0.95 0.04 60);
-  --home-accent-canvas: rgb(255 244 237);
+  --home-accent-soft: #e8f0fe;
+  --home-accent-canvas: #f0f5fe;
   /* Homepage (Google Cloud-style) palette */
   --gc-blue: #1a73e8;
   --gc-blue-hover: #1765cc;
@@ -386,8 +386,10 @@
 .public-page-hero {
   position: relative;
   overflow: hidden;
-  background-color: var(--background);
+  background-color: var(--gc-canvas);
 }
+.public-page-hero::before,
+.public-page-hero::after { display: none; }
 
 .public-page-hero::before,
 .public-page-hero::after,
