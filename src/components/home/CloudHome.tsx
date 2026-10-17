@@ -145,7 +145,13 @@ const STORIES = [
   { img: cardGold, tag: "GOLD MARKET", title: "Daily XAU/USD insights and trading guides", to: "/insights" },
 ];
 
-export function CloudHero({ price, delta }: { price: string; delta: string }) {
+export function CloudHero({ price: _price, delta: _delta }: { price: string; delta: string }) {
+  const railRef = React.useRef<HTMLDivElement>(null);
+  const scrollRail = (dir: 1 | -1) => {
+    const el = railRef.current;
+    if (!el) return;
+    el.scrollBy({ left: dir * Math.max(320, el.clientWidth * 0.6), behavior: "smooth" });
+  };
   return (
     <section className="overflow-hidden bg-background">
       <div className="mx-auto max-w-[1296px] px-5 pb-14 pt-12 text-center sm:px-8 md:pt-14">
