@@ -54,6 +54,7 @@ const SANS = "font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif]
 const ClientSchema = z.object({
   name: z.string().trim().min(1, "Enter your name").max(100),
   email: z.string().trim().email("Enter a valid email").max(255),
+  phone: z.string().trim().max(30, "Phone number is too long").regex(/^[+()\-.\s\d]*$/, "Enter a valid phone number"),
   subject: z.string().trim().min(1, "Add a subject").max(150),
   message: z.string().trim().min(5, "Message is too short").max(2000),
 });
@@ -61,11 +62,12 @@ const ClientSchema = z.object({
 type FormState = {
   name: string;
   email: string;
+  phone: string;
   subject: string;
   message: string;
 };
 
-const INITIAL: FormState = { name: "", email: "", subject: "", message: "" };
+const INITIAL: FormState = { name: "", email: "", phone: "", subject: "", message: "" };
 
 function ContactPage() {
   const submit = useServerFn(submitContactMessage);
@@ -154,9 +156,14 @@ function ContactPage() {
                     <input id="c-email" type="email" autoComplete="email" maxLength={255} value={form.email} onChange={onChange("email")} className={inputClass(!!errors.email)} placeholder="Email*" />
                   </Field>
                 </div>
-                <Field label="Subject*" htmlFor="c-subject" error={errors.subject}>
-                  <input id="c-subject" type="text" maxLength={150} value={form.subject} onChange={onChange("subject")} className={inputClass(!!errors.subject)} placeholder="Subject*" />
-                </Field>
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <Field label="Phone number (optional)" htmlFor="c-phone" error={errors.phone}>
+                    <input id="c-phone" type="tel" inputMode="tel" autoComplete="tel" maxLength={30} value={form.phone} onChange={onChange("phone")} className={inputClass(!!errors.phone)} placeholder="Phone number (optional)" />
+                  </Field>
+                  <Field label="Subject*" htmlFor="c-subject" error={errors.subject}>
+                    <input id="c-subject" type="text" maxLength={150} value={form.subject} onChange={onChange("subject")} className={inputClass(!!errors.subject)} placeholder="Subject*" />
+                  </Field>
+                </div>
                 <div>
                   <label htmlFor="c-message" className="text-[15px] text-gc-ink-muted">Describe what you need*</label>
                   <textarea id="c-message" rows={4} maxLength={2000} value={form.message} onChange={onChange("message")} className={`${inputClass(!!errors.message)} mt-1.5 min-h-[104px] resize-y`} placeholder="e.g., I'd like to know more about the Elite plan." />

@@ -1,0 +1,1 @@
+ALTER TABLE public.contact_messages ADD COLUMN IF NOT EXISTS phone text CHECK (phone IS NULL OR char_length(phone) <= 30);
