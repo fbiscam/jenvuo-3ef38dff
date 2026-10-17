@@ -1413,7 +1413,7 @@ function DashboardLayout() {
                           setMobileNavOpen(false);
                         }}
                         title={navCollapsed ? t.label : undefined}
-                        className={`dashboard-sidebar-link group relative flex items-center text-[14px] font-normal text-gc-ink transition ${navCollapsed ? "justify-center rounded-full px-2 py-2" : "gap-3.5 rounded-r-full py-2 pl-4 pr-3"} ${active ? "bg-gc-nav-active" : "hover:bg-gc-panel"}`}
+                        className={`dashboard-sidebar-link group relative flex items-center text-[14px] font-normal text-gc-ink transition ${navCollapsed ? "justify-center rounded-full px-2 py-2" : "gap-3.5 rounded-r-full py-2 pl-4 pr-3"} ${active ? "bg-gc-nav-active" : "hover:bg-gc-notice"}`}
                       >
                         <Icon
                           className="dashboard-sidebar-icon h-[19px] w-[19px] shrink-0 text-current"

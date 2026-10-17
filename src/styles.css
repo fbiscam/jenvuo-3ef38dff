@@ -189,8 +189,8 @@
   --gc-blue-deep: #0b57d0;
   --gc-sky: #dcefff;
   /* Dashboard console shell (Google Cloud console-style) */
-  --gc-canvas: #f8fafd;
-  --gc-nav-active: #dfe5ef;
+  --gc-canvas: #f0f5fe;
+  --gc-nav-active: #dbedfc;
   --gc-notice: #e9eef6;
   --auth-action: oklch(0.72 0.14 255);
   --auth-action-foreground: oklch(1 0 0);
@@ -930,7 +930,7 @@ html[data-pwa="1"] .pwa-tabbar {
 
 /* ====== Dashboard Sidebar: plain full-height ====== */
 .dashboard-sidebar-root:not(.dashboard-terminal-sidebar) {
-  background-color: var(--sidebar) !important;
+  background-color: var(--gc-canvas) !important;
 }
 
 /* The Terminal itself stays unzoomed so it fits the viewport. Match only its
