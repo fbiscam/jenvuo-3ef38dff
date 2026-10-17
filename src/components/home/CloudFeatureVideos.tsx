@@ -129,7 +129,7 @@ function SceneDemo({ t }: { t: number }) {
 
 type Card = { name: string; text: React.ReactNode; to: string; Scene: React.ComponentType<{ t: number }> };
 const CARDS: Card[] = [
-  { name: "Live candles", to: "/pricing", Scene: SceneCandles, text: <><b className="font-medium text-gc-ink">Jenvu Terminal</b> streams live XAU/USD candles with swing labels that stay fixed once each candle closes</> },
+  { name: "Live candles", to: "/pricing", Scene: SceneCandles, text: <><b className="font-medium text-gc-ink">Jenvu Terminal</b> streams live XAU/USD candles with swing labels that stay fixed once</> },
   { name: "Fresh sweep", to: "/help", Scene: SceneSweep, text: <><b className="font-medium text-gc-ink">Fresh sweep</b> spots wicks that take prior highs or lows, then confirms only when price really reverses</> },
   { name: "AI desk", to: "/ai-engine", Scene: SceneAi, text: <><b className="font-medium text-gc-ink">Jenvu AI</b> reads the same chart you see and answers exactly the question you asked</> },
   { name: "Volume RVOL", to: "/help", Scene: SceneVolume, text: <><b className="font-medium text-gc-ink">RVOL</b> colours unusual volume spikes and shows an estimated buyer and seller share on every candle</> },
