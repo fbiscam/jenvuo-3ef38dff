@@ -177,7 +177,8 @@ export function CloudHero({ price: _price, delta: _delta }: { price: string; del
         </h1>
         <p className="line-clamp-2 mx-auto mt-5 max-w-[820px] text-[16px] leading-[1.6] text-gc-ink-muted sm:text-[17px]">
           Read the chart with AI. Spot sweeps, zones and FVGs live.{" "}
-          <span className="font-medium text-gc-ink">Start now with 14 days of Pro access.</span>
+          <span className="font-medium text-gc-ink">Start with $100 credits or a Pro access.</span>
+          <span className="font-medium text-gc-ink">Start now $100 credit witof Pro access.</span>
         </p>
         <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
           <Link
