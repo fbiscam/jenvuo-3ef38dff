@@ -119,7 +119,7 @@ export function CloudLogoStrip() {
   const [playing, setPlaying] = React.useState(true);
   const row = [...BRANDS, ...BRANDS];
   return (
-    <section className="bg-background pb-20">
+    <section className="jenvu-logos-zoom bg-background pb-20">
       <div className="relative mx-auto max-w-6xl overflow-hidden px-6">
         <div
           className="flex w-max items-center gap-16 py-8"
