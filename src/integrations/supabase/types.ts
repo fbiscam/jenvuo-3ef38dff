@@ -623,6 +623,7 @@ export type Database = {
           id: string
           message: string
           name: string
+          phone: string | null
           status: string
           subject: string
           updated_at: string
@@ -633,6 +634,7 @@ export type Database = {
           id?: string
           message: string
           name: string
+          phone?: string | null
           status?: string
           subject: string
           updated_at?: string
@@ -643,6 +645,7 @@ export type Database = {
           id?: string
           message?: string
           name?: string
+          phone?: string | null
           status?: string
           subject?: string
           updated_at?: string
