@@ -312,91 +312,109 @@ export function CloudAudiences() {
 }
 
 /* ---------------- Build-with accordion (Google Cloud-style) ---------------- */
-const BUILD_ITEMS: Array<{ key: string; title: string; body: string; points: string[]; img: string; to: string; cta: string }> = [
+const BUILD_ITEMS: Array<{ key: string; title: string; points: string[] }> = [
   {
     key: "terminal",
-    title: "Read gold with the Jenvu Terminal",
-    body: "Live XAU/USD candles with structure, zones and fair value gaps drawn from closed candles only.",
-    points: ["HH / HL / LH / LL labels that never repaint", "Supply and demand zones with FVG", "Fresh sweep checks on 15M, 1H, 2H and 4H"],
-    img: tradeChart,
-    to: "/pricing",
-    cta: "Open the Terminal",
+    title: "Gold Terminal",
+    points: [
+      "Live XAU/USD candles with HH, HL, LH and LL labels that never repaint once a candle closes",
+      "Supply and demand zones paired with fair value gaps, drawn only when they score strong",
+      "Fresh sweep checks on 15M, 1H, 2H and 4H with fakeout filters",
+    ],
   },
   {
     key: "ai",
-    title: "Ask the AI desk about your chart",
-    body: "Get a focused answer to exactly what you asked, with a clear WAIT when risk is unclear.",
-    points: ["Chart-aware answers in plain language", "Image and voice chat", "Top-tier models behind every reply"],
-    img: tradeDesk,
-    to: "/ai-engine",
-    cta: "Meet the AI desk",
+    title: "AI desk",
+    points: [
+      "Ask about the chart in plain language and get a focused answer to exactly what you asked",
+      "Chat with images and voice, backed by top-tier AI models",
+      "A clear WAIT when the evidence or risk isn't there",
+    ],
   },
   {
     key: "volume",
-    title: "Spot volume spikes and pressure",
-    body: "RVOL highlights unusual candles and shows an estimated buyer and seller share at a glance.",
-    points: ["Spike colours on every volume bar", "20-candle average line", "Estimated buy / sell split"],
-    img: tradeGold,
-    to: "/help",
-    cta: "Learn about RVOL",
+    title: "Volume and pressure",
+    points: [
+      "RVOL spike colours on every volume bar with a 20-candle average line",
+      "Estimated buyer and seller share for each candle at a glance",
+    ],
   },
   {
-    key: "build",
-    title: "Build your own tools with Jenvu models",
-    body: "Use API keys to plug Jenvu models into your apps and bots at $3 per million tokens.",
-    points: ["Simple API keys from your dashboard", "TradingView browser extension", "Clear docs and guides"],
-    img: devModels,
-    to: "/pricing",
-    cta: "Get an API key",
+    key: "practice",
+    title: "Demo trading",
+    points: [
+      "Practice your ideas on a $100,000 demo account with automatic closing",
+      "TradingView-style order tickets and a full trade history",
+    ],
+  },
+  {
+    key: "developers",
+    title: "API and extension",
+    points: [
+      "Plug Jenvu models into your apps and bots with API keys at $3 per million tokens",
+      "Bring Jenvu analysis into TradingView with the browser extension",
+    ],
   },
 ];
 
 export function CloudBuildWith() {
-  const [open, setOpen] = React.useState(BUILD_ITEMS[0].key);
-  const current = BUILD_ITEMS.find((b) => b.key === open) ?? BUILD_ITEMS[0];
+  const [open, setOpen] = React.useState<string[]>([BUILD_ITEMS[0].key]);
+  const toggle = (key: string) =>
+    setOpen((cur) => (cur.includes(key) ? cur.filter((k) => k !== key) : [...cur, key]));
   return (
     <section className="bg-background">
-      <div className="mx-auto max-w-[1296px] px-5 pb-20 pt-4 sm:px-8 md:pb-24">
-        <h2 className="text-[32px] font-normal leading-[1.2] text-gc-ink sm:text-[40px]">Build with the Jenvu gold platform</h2>
-        <div className="mt-10 grid items-start gap-10 md:grid-cols-2">
-          <div className="border-t border-gc-line">
-            {BUILD_ITEMS.map((b) => {
-              const isOpen = b.key === open;
-              return (
-                <div key={b.key} className="border-b border-gc-line">
-                  <button
-                    type="button"
-                    aria-expanded={isOpen}
-                    onClick={() => setOpen(b.key)}
-                    className="flex w-full items-center justify-between gap-4 py-5 text-left"
-                  >
-                    <span className={`text-[20px] leading-[1.4] ${isOpen ? "font-medium text-gc-ink" : "text-gc-ink/80"}`}>{b.title}</span>
-                    <ChevronDown className={`h-5 w-5 shrink-0 text-gc-ink-muted transition ${isOpen ? "rotate-180" : ""}`} />
-                  </button>
-                  {isOpen && (
-                    <div className="pb-6">
-                      <p className="text-[16px] leading-[1.6] text-gc-ink-muted">{b.body}</p>
-                      <ul className="mt-4 space-y-3">
-                        {b.points.map((p) => (
-                          <li key={p} className="flex items-start gap-3 text-[15px] text-gc-ink">
-                            <Check className="mt-0.5 h-5 w-5 shrink-0 text-gc-blue" />
-                            {p}
-                          </li>
-                        ))}
-                      </ul>
-                      <Link to={b.to} className="mt-5 inline-flex items-center gap-1 text-[15px] font-medium text-gc-blue hover:underline">
-                        {b.cta} <ArrowRight className="h-4 w-4" />
-                      </Link>
-                      <img src={b.img} alt="" loading="lazy" className="mt-6 aspect-[4/3] w-full rounded-2xl object-cover md:hidden" />
-                    </div>
-                  )}
-                </div>
-              );
-            })}
+      <div className="mx-auto grid max-w-[1296px] items-start gap-10 px-5 pb-20 pt-6 sm:px-8 md:grid-cols-2 md:gap-16 md:pb-24">
+        <div className="md:sticky md:top-24">
+          <h2 className="text-[30px] font-normal leading-[1.25] text-gc-ink sm:text-[36px]">
+            Build with the gold platform
+            <br />
+            <span className="text-gc-blue">designed for traders and AI</span>
+          </h2>
+          <p className="mt-5 max-w-[480px] text-[15px] leading-[1.6] text-gc-ink-muted">
+            Try Jenvu with 14 days of Pro access on sign-up, plus live sweeps, zones and FVGs.
+          </p>
+          <div className="mt-7 flex flex-wrap items-center gap-6">
+            <Link
+              to="/auth"
+              search={{ mode: "signup" } as never}
+              className="inline-flex h-11 items-center justify-center rounded-full bg-gc-blue px-6 text-[15px] font-medium text-gc-on-blue transition hover:bg-gc-blue-hover"
+            >
+              Get started for free
+            </Link>
+            <Link to="/pricing" className="text-[15px] font-medium text-gc-blue hover:underline">
+              See all plans
+            </Link>
           </div>
-          <div className="hidden overflow-hidden rounded-3xl bg-gc-panel md:block">
-            <img key={current.key} src={current.img} alt="" loading="lazy" className="aspect-[4/3] w-full object-cover" />
-          </div>
+        </div>
+        <div>
+          {BUILD_ITEMS.map((b) => {
+            const isOpen = open.includes(b.key);
+            return (
+              <div key={b.key}>
+                <button
+                  type="button"
+                  aria-expanded={isOpen}
+                  onClick={() => toggle(b.key)}
+                  className={`flex w-full items-center justify-between gap-4 py-5 text-left ${
+                    isOpen ? "border-b-2 border-gc-navy" : "border-b border-gc-line"
+                  }`}
+                >
+                  <span className="text-[17px] font-medium text-gc-blue">{b.title}</span>
+                  <ChevronDown className={`h-5 w-5 shrink-0 text-gc-blue transition ${isOpen ? "rotate-180" : ""}`} />
+                </button>
+                {isOpen && (
+                  <ul className="space-y-5 border-b border-gc-line py-7">
+                    {b.points.map((p) => (
+                      <li key={p} className="flex items-start gap-4 text-[15px] leading-[1.6] text-gc-ink">
+                        <Check className="mt-1 h-4 w-4 shrink-0 text-gc-green" strokeWidth={2.5} />
+                        {p}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            );
+          })}
         </div>
       </div>
     </section>
