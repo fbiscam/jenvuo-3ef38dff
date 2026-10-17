@@ -113,6 +113,7 @@
   --color-gc-on-blue: var(--gc-on-blue);
   --color-gc-panel: var(--gc-panel);
   --color-gc-navy: var(--gc-navy);
+  --color-gc-blue-deep: var(--gc-blue-deep);
   --color-auth-action: var(--auth-action);
   --color-auth-action-foreground: var(--auth-action-foreground);
 }
@@ -181,6 +182,7 @@
   --gc-on-blue: #ffffff;
   --gc-panel: #eef2f7;
   --gc-navy: #283593;
+  --gc-blue-deep: #0b57d0;
   --auth-action: oklch(0.72 0.14 255);
   --auth-action-foreground: oklch(1 0 0);
 }

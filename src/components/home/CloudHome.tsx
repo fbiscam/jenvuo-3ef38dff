@@ -369,7 +369,7 @@ export function CloudBuildWith() {
           <h2 className="text-[30px] font-normal leading-[1.25] text-gc-ink sm:text-[36px]">
             Build with the gold platform
             <br />
-            <span className="text-gc-blue">designed for traders and AI</span>
+            <span className="text-gc-blue-deep">designed for traders and AI</span>
           </h2>
           <p className="mt-5 max-w-[540px] text-[16px] leading-[1.6] text-gc-ink-muted">
             Try Jenvu with live sweeps, zones and FVGs on gold, plus new sign-ups get 14 days of Pro access free.
@@ -382,7 +382,7 @@ export function CloudBuildWith() {
             >
               Get started for free
             </Link>
-            <Link to="/pricing" className="text-[15px] font-medium text-gc-blue hover:underline">
+            <Link to="/pricing" className="text-[15px] font-medium text-gc-blue-deep hover:underline">
               See all plans and tools
             </Link>
           </div>
@@ -398,8 +398,8 @@ export function CloudBuildWith() {
                   onClick={() => toggle(b.key)}
                   className={`flex w-full items-center justify-between gap-4 py-6 text-left ${isOpen ? "border-b-2 border-gc-line" : ""}`}
                 >
-                  <span className="text-[19px] text-gc-blue">{b.title}</span>
-                  <ChevronDown className={`h-6 w-6 shrink-0 text-gc-blue transition ${isOpen ? "rotate-180" : ""}`} />
+                  <span className="text-[19px] text-gc-blue-deep">{b.title}</span>
+                  <ChevronDown className={`h-6 w-6 shrink-0 text-gc-blue-deep transition ${isOpen ? "rotate-180" : ""}`} />
                 </button>
                 {isOpen && (
                   <ul className="space-y-6 py-8">
@@ -411,7 +411,7 @@ export function CloudBuildWith() {
                             typeof p === "string" ? (
                               <React.Fragment key={j}>{p}</React.Fragment>
                             ) : (
-                              <Link key={j} to={p.to} className="text-gc-blue underline underline-offset-2 hover:text-gc-blue-hover">
+                              <Link key={j} to={p.to} className="text-gc-blue-deep underline underline-offset-2 hover:text-gc-navy">
                                 {p.link}
                               </Link>
                             ),
