@@ -36,9 +36,7 @@ import { getUsageStats, type UsageStats } from "@/lib/usage.functions";
 import { listExtensionKeys } from "@/lib/extension-keys.functions";
 import { Button } from "@/components/ui/button";
 import astraGalaxyBanner from "@/assets/astra-galaxy-banner.jpg";
-import astraParticleCardBackground from "@/assets/astra-particle-card-bg.jpg";
 import grokModelLogo from "@/assets/grok-logo-transparent.png";
-import solLogoAsset from "@/assets/sol-logo.png.asset.json";
 
 import {
   Bookmark,
@@ -89,8 +87,6 @@ import {
   CircleHelp,
   Bot,
   Boxes,
-  ScanSearch,
-  ShieldCheckIcon,
   Terminal,
   type LucideIcon,
 } from "lucide-react";
@@ -1571,7 +1567,6 @@ function DashboardLayout() {
                 onRefresh={handleRefresh}
               />
 
-              <ModelWorkspace />
 
               <div className="h-12" />
             </>
