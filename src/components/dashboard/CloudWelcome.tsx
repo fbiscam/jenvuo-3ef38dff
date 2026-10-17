@@ -70,9 +70,9 @@ export default function CloudWelcome() {
         <div className="relative mx-auto grid max-w-6xl gap-10 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
           <div className="min-w-0">
             <p className="text-[17px] text-gc-ink">Welcome, {name}</p>
-            <h1 className="mt-2 text-[28px] font-normal leading-tight text-gc-ink sm:text-[34px]">
+            <div role="heading" aria-level={1} className="mt-2 text-[28px] font-normal leading-tight text-gc-ink sm:text-[34px]">
               {eligible ? "Try Jenvu with $100 in free credits" : "Make the most of Jenvu"}
-            </h1>
+            </div>
             <ul className="mt-6 space-y-5">
               {eligible ? (
                 <>
@@ -138,7 +138,7 @@ export default function CloudWelcome() {
           ))}
         </div>
 
-        <h2 className="mt-8 text-[24px] font-normal text-gc-ink">Popular getting started resources</h2>
+        <div role="heading" aria-level={2} className="mt-8 text-[24px] font-normal text-gc-ink">Popular getting started resources</div>
         <p className="mt-4 text-[15px] text-gc-ink-muted">Filter by</p>
         <div className="mt-3 flex flex-wrap gap-2">
           {Object.keys(RESOURCES).map((k) => (
