@@ -461,11 +461,13 @@ function HomePage() {
             </div>
             <nav className="flex flex-col px-3 pb-4 pt-1 text-[15px] text-zinc-900">
               {[
+                { to: "/about", label: "Overview" },
+                { to: "/strategies/ict-gold-trading", label: "Solutions" },
+                { to: "/ai-engine", label: "Products" },
                 { to: "/pricing", label: "Pricing" },
-                { to: "/founding", label: "Founding" },
-                { to: "/insights", label: "Insights" },
-                { to: "/help", label: "Help Centre" },
-                { to: "/contact", label: "Contact" },
+                { to: "/insights", label: "Resources" },
+                { to: "/help", label: "Docs" },
+                { to: "/contact", label: "Contact us" },
               ].map((it) => (
 
                 <Link
@@ -510,17 +512,19 @@ function HomePage() {
       )}
 
 
-      <CloudAnnouncement />
-      <main>
-        <CloudHero price={xau?.[1] ?? "—"} delta={xau?.[2] ?? "…"} />
-        <CloudProducts />
-        <CloudUseCases />
-        <CloudPricing />
-        <CloudResources />
-        <CloudFinalCta />
-      </main>
+      <div className="jenvu-home-content">
+        <main>
+          <CloudHero price={xau?.[1] ?? "—"} delta={xau?.[2] ?? "…"} />
+          <CloudAudiences />
+          <CloudProducts />
+          <CloudUseCases />
+          <CloudPricing />
+          <CloudResources />
+          <CloudFinalCta />
+        </main>
 
-      <SiteFooter />
+        <SiteFooter />
+      </div>
     </div>
     </>
 
