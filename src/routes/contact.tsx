@@ -1,6 +1,5 @@
 import * as React from "react";
 import SiteHeader from "@/components/SiteHeader";
-import HeaderAuthButtons from "@/components/HeaderAuthButtons";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { z } from "zod";
@@ -50,7 +49,6 @@ export const Route = createFileRoute("/contact")({
   component: ContactPage,
 });
 
-const MONO = "font-['Google_Sans','Product_Sans','Roboto',system-ui,sans-serif] font-normal normal-case tracking-normal";
 const SANS = "font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif]";
 
 const ClientSchema = z.object({
