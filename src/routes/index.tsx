@@ -21,14 +21,9 @@ import {
   CloudAudiences,
   CloudBuildWith,
   CloudHero,
-  CloudProducts,
-  CloudUseCases,
-  CloudPricing,
-  CloudResources,
-  CloudFinalCta,
 } from "@/components/home/CloudHome";
 import { CloudFeatureVideos } from "@/components/home/CloudFeatureVideos";
-import { CloudSolutions, CloudLogoStrip } from "@/components/home/CloudSolutions";
+import { CloudSolutions, CloudLogoStrip, CloudStartBanner } from "@/components/home/CloudSolutions";
 import TailoredToDesk from "@/components/TailoredToDesk";
 
 import {
@@ -523,11 +518,7 @@ function HomePage() {
           <CloudFeatureVideos />
           <CloudSolutions />
           <CloudLogoStrip />
-          <CloudProducts />
-          <CloudUseCases />
-          <CloudPricing />
-          <CloudResources />
-          <CloudFinalCta />
+          <CloudStartBanner />
         </main>
 
         <SiteFooter />

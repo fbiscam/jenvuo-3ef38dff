@@ -32,23 +32,27 @@ function NewsletterSubscribe() {
   };
 
   return (
-    <form onSubmit={onSubmit} className="flex w-full max-w-xs flex-col gap-1.5 sm:flex-row sm:items-center">
-      <input
-        type="email"
-        required
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        placeholder="you@example.com"
-        maxLength={255}
-        className="flex-1 rounded-md border border-zinc-200 bg-white px-2.5 py-1.5 text-xs text-zinc-900 placeholder:text-zinc-500 outline-none"
-      />
-      <button
-        type="submit"
-        disabled={loading || done}
-        className="rounded-md border border-zinc-200 bg-white px-3 py-1.5 text-xs font-semibold text-zinc-950 hover:bg-zinc-100 disabled:opacity-60"
-      >
-        {done ? "Subscribed" : loading ? "…" : "Subscribe"}
-      </button>
+    <form onSubmit={onSubmit} className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:items-center">
+      <span className="text-[14px] text-gc-ink">Sign up for the Jenvu newsletter</span>
+      <div className="flex items-center gap-2">
+        <input
+          type="email"
+          required
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="you@example.com"
+          maxLength={255}
+          aria-label="Email address"
+          className="h-10 w-48 rounded-full border border-gc-line bg-background px-4 text-[13px] text-gc-ink placeholder:text-gc-ink-muted outline-none focus:border-gc-blue-deep"
+        />
+        <button
+          type="submit"
+          disabled={loading || done}
+          className="h-10 rounded-full bg-gc-blue-deep px-6 text-[14px] font-medium text-gc-on-blue hover:bg-gc-navy disabled:opacity-60"
+        >
+          {done ? "Subscribed" : loading ? "…" : "Subscribe"}
+        </button>
+      </div>
     </form>
   );
 }
@@ -57,12 +61,21 @@ function NewsletterSubscribe() {
 
 const columns = [
   {
-    label: "Platform",
+    label: "Why Jenvu",
     links: [
       { to: "/", label: "Home" },
+      { to: "/about", label: "About Jenvu" },
+      { to: "/founding", label: "Founding Program" },
       { to: "/broadcasts", label: "Broadcast" },
-      { to: "/pricing", label: "Pricing" },
+    ],
+  },
+  {
+    label: "Products and pricing",
+    links: [
+      { to: "/pricing", label: "Jenvu pricing" },
       { to: "/download", label: "Download App" },
+      { to: "/llm", label: "Language Model" },
+      { to: "/development", label: "Development" },
     ],
   },
   {
@@ -70,17 +83,16 @@ const columns = [
     links: [
       { to: "/insights", label: "Market Insights" },
       { to: "/scam-tool", label: "Scam Tool" },
-      { to: "/llm", label: "Language Model" },
-      { to: "/development", label: "Development" },
+      { to: "/leads", label: "Leads Tool" },
     ],
   },
   {
-    label: "Account",
+    label: "Resources",
     links: [
       { to: "/dashboard", label: "Dashboard" },
       { to: "/auth", label: "Sign In" },
       { to: "/help", label: "Help Center" },
-      { to: "/leads", label: "Leads Tool" },
+      { to: "/contact", label: "Contact us" },
     ],
   },
   {
@@ -92,33 +104,27 @@ const columns = [
       { to: "/disclaimer", label: "Risk Disclaimer" },
     ],
   },
-
-
 ] as const;
 
 export default function SiteFooter({ className }: { className?: string }) {
   const year = new Date().getFullYear();
   return (
-    <footer className={`hide-in-pwa relative border-t border-zinc-200 bg-white ${className || ""}`}>
-      <div className="mx-auto max-w-[1184px] px-5 py-12 sm:px-6 sm:py-14">
+    <footer className={`hide-in-pwa relative border-t border-gc-line bg-background ${className || ""}`}>
+      <div className="mx-auto max-w-[1440px] px-6 py-10 sm:py-12">
+        <a href="https://jenvu.com" className="mb-8 flex items-center gap-2.5">
+          <img src="/favicon.png" alt="Jenvu" className="h-7 w-7 object-contain" />
+          <span className="text-[17px] font-medium text-gc-ink">Jenvu AI</span>
+        </a>
         <div className="grid grid-cols-2 gap-x-8 gap-y-10 md:grid-cols-5">
-          {/* Brand */}
-          <div className="col-span-2 md:col-span-1 space-y-4">
-            <a href="https://jenvu.com" className="flex items-center gap-2.5">
-              <img src="/favicon.png" alt="Jenvu" className="h-7 w-7 rounded object-contain" />
-              <span className="text-[17px] font-semibold tracking-tight text-zinc-900">Jenvu AI</span>
-            </a>
-          </div>
-
-          {/* Link columns */}
           {columns.map((col) => (
             <div key={col.label}>
-              <ul className="space-y-2.5">
+              <h3 className="text-[16px] font-normal text-gc-ink">{col.label}</h3>
+              <ul className="mt-4 space-y-3">
                 {col.links.map((l) => (
                   <li key={`${l.to}:${l.label}`}>
                     <Link
                       to={l.to}
-                      className="text-[13px] font-normal text-zinc-800 transition-colors hover:text-zinc-950"
+                      className="text-[14px] text-gc-ink-muted transition-colors hover:text-gc-blue-deep"
                     >
                       {l.label}
                     </Link>
@@ -130,15 +136,19 @@ export default function SiteFooter({ className }: { className?: string }) {
         </div>
 
         {/* Bottom bar */}
-        <div className="mt-12 flex flex-col gap-5 border-t border-zinc-200 pt-6 md:flex-row md:items-center md:justify-between">
-          <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-[12px] text-zinc-700">
-            <span>© {year} Jenvu AI, Inc.</span>
-            <Link to="/privacy" className="hover:text-zinc-900">Privacy Policy</Link>
-            <Link to="/terms" className="hover:text-zinc-900">Terms of Use</Link>
-            <Link to="/disclaimer" className="hover:text-zinc-900">Risk Disclaimer</Link>
+        <div className="mt-12 flex flex-col gap-5 border-t border-gc-line pt-6 lg:flex-row lg:items-center lg:justify-between">
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-[14px] text-gc-ink">
+            <span>© {year} Jenvu AI</span>
+            <span className="text-gc-line">|</span>
+            <Link to="/privacy" className="hover:text-gc-blue-deep">Privacy</Link>
+            <span className="text-gc-line">|</span>
+            <Link to="/terms" className="hover:text-gc-blue-deep">Site terms</Link>
+            <span className="text-gc-line">|</span>
+            <Link to="/disclaimer" className="hover:text-gc-blue-deep">Risk Disclaimer</Link>
           </div>
 
-          <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center">
+
+          <div className="flex flex-col items-start gap-5 sm:flex-row sm:items-center">
             <div className="flex items-center gap-2">
               {[
                 {
@@ -186,7 +196,7 @@ export default function SiteFooter({ className }: { className?: string }) {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={s.label}
-                  className="flex h-8 w-8 items-center justify-center rounded-full border border-zinc-200 bg-white text-zinc-700 transition-colors hover:border-zinc-300 hover:text-zinc-900"
+                  className="flex h-9 w-9 items-center justify-center rounded-full border border-gc-line bg-background text-gc-ink-muted transition-colors hover:text-gc-blue-deep"
                 >
                   {s.icon}
                 </a>

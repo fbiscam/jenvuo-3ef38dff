@@ -120,17 +120,25 @@ export function CloudLogoStrip() {
   const row = [...BRANDS, ...BRANDS];
   return (
     <section className="jenvu-logos-zoom bg-background pb-20">
-      <div className="relative mx-auto max-w-6xl overflow-hidden px-6">
+      <div className="relative mx-auto max-w-6xl px-6">
         <div
-          className="flex w-max items-center gap-16 py-8"
-          style={{ animation: "gc-marquee 40s linear infinite", animationPlayState: playing ? "running" : "paused" }}
+          className="overflow-hidden"
+          style={{
+            maskImage: "linear-gradient(to right, transparent, black 8%, black 92%, transparent)",
+            WebkitMaskImage: "linear-gradient(to right, transparent, black 8%, black 92%, transparent)",
+          }}
         >
-          {row.map((b, i) => (
-            <div key={i} className="flex h-12 items-center gap-2 text-gc-ink" aria-hidden={i >= BRANDS.length}>
-              {b.icon ? <b.icon className="h-8 w-8" /> : <img src={b.logo} alt="" className="h-8 w-8 object-contain" />}
-              <span className="text-lg font-semibold">{b.name}</span>
-            </div>
-          ))}
+          <div
+            className="flex w-max items-center py-8"
+            style={{ animation: "gc-marquee 35s linear infinite", animationPlayState: playing ? "running" : "paused" }}
+          >
+            {row.map((b, i) => (
+              <div key={i} className="flex h-12 shrink-0 items-center gap-2 pr-16 text-gc-ink" aria-hidden={i >= BRANDS.length}>
+                {b.icon ? <b.icon className="h-8 w-8" /> : <img src={b.logo} alt="" className="h-8 w-8 object-contain" />}
+                <span className="whitespace-nowrap text-lg font-semibold">{b.name}</span>
+              </div>
+            ))}
+          </div>
         </div>
         <div className="mt-4 flex items-center justify-center">
           <Link to="/about" className="rounded-full bg-gc-blue-deep px-5 py-2.5 text-sm font-medium text-gc-on-blue hover:bg-gc-navy">
@@ -145,6 +153,43 @@ export function CloudLogoStrip() {
         >
           {playing ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
         </button>
+      </div>
+    </section>
+  );
+}
+
+export function CloudStartBanner() {
+  return (
+    <section className="jenvu-start-zoom bg-background pb-20">
+      <div className="mx-auto max-w-6xl px-6">
+        <div className="relative overflow-hidden rounded-2xl bg-gc-sky">
+          <div className="relative z-10 max-w-xl px-8 py-16 md:px-16 md:py-24">
+            <h2 className="text-3xl font-normal leading-tight text-gc-ink md:text-[40px]">
+              <span className="text-gc-blue-deep">Let's start trading</span> your gold, today
+            </h2>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Link
+                to="/auth"
+                search={{ mode: "signup" } as never}
+                className="inline-flex rounded-full bg-gc-blue-deep px-6 py-3 text-sm font-medium text-gc-on-blue hover:bg-gc-navy"
+              >
+                Get started for free
+              </Link>
+              <Link
+                to="/contact"
+                className="inline-flex rounded-full border border-gc-line bg-background px-6 py-3 text-sm font-medium text-gc-ink hover:bg-gc-surface"
+              >
+                Contact sales
+              </Link>
+            </div>
+          </div>
+          <img
+            src="/favicon.png"
+            alt=""
+            aria-hidden="true"
+            className="pointer-events-none absolute -right-24 top-1/2 hidden h-[175%] -translate-y-1/2 object-contain md:block"
+          />
+        </div>
       </div>
     </section>
   );
