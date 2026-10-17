@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { PageShell, H2, P, UL } from "@/components/PageShell";
+import { PageShell, Feature, Banner, Stats, StoryCards } from "@/components/PageShell";
+import aboutMedia from "@/assets/about-media.jpg";
 
 export const Route = createFileRoute("/about")({
   head: () => ({
@@ -9,6 +10,8 @@ export const Route = createFileRoute("/about")({
       { property: "og:title", content: "Who We Are — Jenvu" },
       { property: "og:description", content: "The mission, philosophy and team behind Jenvu's AI-powered trading terminal." },
       { property: "og:url", content: "https://jenvu.com/about" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [{ rel: "canonical", href: "https://jenvu.com/about" }],
   }),
@@ -18,42 +21,72 @@ export const Route = createFileRoute("/about")({
 function AboutPage() {
   return (
     <PageShell
+      wide
       eyebrow="\n"
-      title={"About Jenvu — the AI gold\u00a0\ntrading terminal for XAU/USD"}
-      intro="Jenvu was built on a simple thesis: institutional logic shouldn't be locked behind a Bloomberg terminal. We turned ICT and SMC playbooks into an AI trading terminal any serious trader can use directly in TradingView."
+      title="Why Jenvu"
+      intro="Jenvu was built on a simple thesis: institutional logic shouldn't be locked behind a Bloomberg terminal. We turned ICT and SMC playbooks into an AI trading terminal any serious XAU/USD trader can use directly on the chart."
     >
-      <section className="space-y-3">
-        <H2>The Mission</H2>
-        <P>
-          Give independent traders the same structural read of the market that desk
-          analysts have been using for decades explained in real time, drawn on the chart,
-          and available the moment an idea hits.
-        </P>
-      </section>
-      <section className="space-y-3">
-        <H2>What Makes Us Different</H2>
-        <UL>
-          <li><b>Chart-first</b> — analyze the active TradingView chart without changing workflows.</li>
-          <li><b>Institutional playbook</b> — ICT, SMC, killzones, liquidity, OTE.</li>
-          <li><b>XAU/USD specialist</b> — one dedicated bullion market, tuned deeply instead of spread across unrelated pairs.</li>
-          <li><b>Honest output</b> — when conditions are bad, the analysis says "wait".</li>
-        </UL>
-      </section>
-      <section className="space-y-3">
-        <H2>The Standard</H2>
-        <P>
-          Every setup must clear bias, structure, liquidity, premium/discount, killzone,
-          and news-risk checks before it ships. If even one gate fails, the engine
-          recommends standing aside. We'd rather miss a trade than print a bad one.
-        </P>
-      </section>
-      <section className="space-y-3">
-        <H2>Contact</H2>
-        <P>
-          Press, partnerships, or feedback — reach the team through the address listed in
-          the published site footer.{"\u00a0"}
-        </P>
-      </section>
+      <Feature
+        title="A new way to read gold"
+        text={
+          <p>
+            Give independent traders the same structural read of the market that desk
+            analysts have been using for decades explained in real time, drawn on the chart,
+            and available the moment an idea hits.
+          </p>
+        }
+        linkLabel="Explore the Terminal"
+        href="https://dash.jenvu.com/overview"
+        media={
+          <img src={aboutMedia} alt="Gold candlestick chart with marked zones" width={1280} height={720} className="h-auto w-full" />
+        }
+        caption="Structure, liquidity and zones drawn on one chart"
+      />
+
+      <div className="px-4 py-6 sm:px-6">
+        <Banner title="Honest output, every time">
+          When conditions are bad, the analysis says "wait". Every setup must clear bias,
+          structure, liquidity, premium/discount, killzone and news-risk checks before it ships.{" "}
+          <a href="https://jenvu.com/disclaimer">Read the risk disclaimer</a> to see how we
+          frame every result.
+        </Banner>
+      </div>
+
+      <Stats
+        title="Built for one market"
+        text={
+          <>
+            <p>
+              Jenvu is an XAU/USD specialist. Instead of spreading across unrelated pairs, every
+              engine is tuned deeply for one bullion market: chart-first analysis on the active
+              TradingView chart, the institutional ICT/SMC playbook with killzones, liquidity and
+              OTE, and clear explanations in plain language.
+            </p>
+            <p className="mt-4">
+              We'd rather miss a trade than print a bad one.
+            </p>
+          </>
+        }
+        linkLabel="See plans and pricing"
+        href="https://jenvu.com/pricing"
+        stats={[
+          { value: "7", label: "Deterministic trading engines" },
+          { value: "1", label: "Dedicated market: XAU/USD" },
+          { value: "6", label: "Checks before any setup ships" },
+          { value: "14", label: "Days of Pro access in the free trial" },
+          { value: "$100", label: "Free credit to get started" },
+        ]}
+      />
+
+      <StoryCards
+        title="Get inspired"
+        intro="Guides, product updates and help from the Jenvu team."
+        cards={[
+          { title: "How ICT and SMC concepts read gold structure", href: "https://jenvu.com/strategies/ict-gold-trading", cta: "Read the guide" },
+          { title: "Inside the AI engine behind every Jenvu answer", href: "https://jenvu.com/ai-engine", cta: "Read the story" },
+          { title: "Questions about your account, plan or the Terminal", href: "https://support.jenvu.com", cta: "Visit help center" },
+        ]}
+      />
     </PageShell>
   );
 }
