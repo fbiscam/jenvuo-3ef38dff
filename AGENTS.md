@@ -18,3 +18,4 @@
 - MCP server lives in `src/lib/mcp/` (one tool per file, OAuth via the backend issuer, caller token forwarded so RLS applies): keeps external assistants scoped to the signed-in user's own data.
 - Signup is public; the Terminal (page + chart server function) is unlocked only for admins and approved Founding Program applications via `src/lib/terminal-access.server.ts`: the UI lock alone could be bypassed by calling the server function directly.
 - Founding approval grants the requested plan immediately and starts a 2-day ID-verification window enforced in `src/lib/terminal-access.server.ts` (submitted/verified documents keep access): server-side so the Terminal chart cannot be used after the deadline by bypassing the UI.
+- Homepage sections live in `src/components/home/CloudHome.tsx` and use the `gc-*` colour tokens from `src/styles.css`; keeps the Google Cloud-style look in one place without hardcoded colours.
