@@ -82,4 +82,18 @@ describe("classifySwingSweep", () => {
     b.push(bar(13, 100.6, 100.8, 98.5, 99));
     expect(classifySwingSweep(b, 12, "high").status).toBe("none");
   });
+  test("close back above the swept level after reclaim = re-accepted fakeout", () => {
+    const b = base();
+    b.push(bar(12, 100.5, 103, 100, 100.6));
+    b.push(bar(13, 100.6, 101.8, 100.4, 101.5));
+    b.push(bar(14, 101.5, 101.6, 98.5, 99));
+    const r = classifySwingSweep(b, 12, "high");
+    expect(r.text).toBe("Sweep failed (re-accepted)");
+  });
+  test("tiny-body drift below the body is not a confirmation", () => {
+    const b = base();
+    b.push(bar(12, 100.5, 103, 100, 100.6));
+    b.push(bar(13, 100.45, 100.6, 100.2, 100.3));
+    expect(classifySwingSweep(b, 12, "high").status).toBe("pending");
+  });
 });
