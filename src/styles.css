@@ -114,6 +114,7 @@
   --color-gc-panel: var(--gc-panel);
   --color-gc-navy: var(--gc-navy);
   --color-gc-blue-deep: var(--gc-blue-deep);
+  --color-gc-sky: var(--gc-sky);
   --color-auth-action: var(--auth-action);
   --color-auth-action-foreground: var(--auth-action-foreground);
 }
@@ -183,6 +184,7 @@
   --gc-panel: #eef2f7;
   --gc-navy: #283593;
   --gc-blue-deep: #0b57d0;
+  --gc-sky: #dcefff;
   --auth-action: oklch(0.72 0.14 255);
   --auth-action-foreground: oklch(1 0 0);
 }
@@ -1231,4 +1233,4 @@ html body .dash-dark main.bg-white { background-color: oklch(0.165 0 0) !importa
 
 @keyframes gc-marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 @media (min-width: 1024px) { .jenvu-solutions-zoom { zoom: 1.265; } }
-@media (min-width: 1024px) { .jenvu-videos-zoom, .jenvu-logos-zoom { zoom: 1.1; } }
+@media (min-width: 1024px) { .jenvu-videos-zoom { zoom: 1.1; } .jenvu-logos-zoom { zoom: 1.21; } .jenvu-start-zoom { zoom: 1.1; } }
