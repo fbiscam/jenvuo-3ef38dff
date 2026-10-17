@@ -4,10 +4,9 @@ import { createFileRoute, useNavigate, Link, redirect } from "@tanstack/react-ro
 import { oauthReturnPath } from "@/lib/oauth-return-path";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { Mail, Lock, ArrowRight, User, Loader2, Eye, EyeOff, Globe } from "lucide-react";
+import { Mail, Lock, ArrowRight, User, Loader2, Eye, EyeOff } from "lucide-react";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
-import authPanel from "@/assets/auth-panel.jpg.asset.json";
 import {
   confirmRecoveryOtp,
   confirmSignupOtp,
@@ -1359,42 +1358,44 @@ function AuthPage() {
               </div>
             </div>
 
-            {/* RIGHT — orange panel */}
-            <div className="relative hidden min-h-dvh w-[54%] overflow-hidden bg-home-accent lg:flex lg:flex-col">
-              <img
-                src={authPanel.url}
-                alt=""
-                aria-hidden
-                width={1280}
-                height={1600}
-                className="pointer-events-none absolute inset-0 h-full w-full object-cover"
-              />
-              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/45 via-black/10 to-black/20" aria-hidden />
-              <div className="relative z-10 flex items-center justify-end gap-4 px-8 pt-7">
-                <span className="inline-flex items-center gap-1.5 text-[13px] font-medium text-white/95">
-                  <Globe className="h-4 w-4" /> English
-                </span>
-                <Link
-                  to="/founding"
-                  className="rounded-md bg-white px-4 py-2 text-[13px] font-semibold text-zinc-900 shadow-sm transition hover:bg-zinc-100"
-                >
-                  Apply now
-                </Link>
-              </div>
-              <div className="relative z-10 flex flex-1 flex-col justify-center px-14 pb-24">
-                <p className={`${MONO} text-[12px] font-medium tracking-wide text-white/90`}>
-                  Jenvu · Founding Trader Program
-                </p>
-                <h2 className="mt-3 max-w-[440px] text-[42px] font-semibold leading-[1.08] tracking-tight text-white">
-                  Where gold traders connect.
-                </h2>
-                <p className="mt-3 text-[15px] text-white/90">Live 24/7 · Every session, every killzone</p>
-                <Link
-                  to="/founding"
-                  className="mt-7 inline-flex w-fit items-center gap-2 rounded-md bg-white px-4 py-2.5 text-[13px] font-semibold text-zinc-900 shadow-sm transition hover:bg-zinc-100"
-                >
-                  <ArrowRight className="h-4 w-4" /> Register now
-                </Link>
+            {/* RIGHT — Google Cloud-style info panel */}
+            <div className="relative hidden min-h-dvh w-[54%] overflow-hidden border-l border-gc-line bg-background lg:flex lg:flex-col">
+              <svg className="pointer-events-none absolute right-0 top-0 h-full w-[38%]" viewBox="0 0 300 800" fill="none" aria-hidden>
+                <line x1="20" y1="0" x2="200" y2="320" className="stroke-gc-ink-muted" strokeWidth="1" strokeDasharray="1 4" />
+                <circle cx="90" cy="70" r="2.5" className="fill-gc-line" />
+                <circle cx="88" cy="195" r="5" className="fill-gc-yellow" />
+                <path d="M130 430 L175 505 L130 580 L85 505 Z" className="stroke-gc-ink-muted" strokeWidth="1" strokeDasharray="1 4" />
+                <circle cx="105" cy="545" r="8" className="fill-gc-red" />
+                <path d="M40 760 l20 -16 M50 770 l20 -16 M60 780 l20 -16" className="stroke-gc-ink-muted" strokeWidth="1" strokeDasharray="1 3" />
+              </svg>
+              <div className="relative z-10 flex flex-1 flex-col justify-center px-14 xl:px-20">
+                <div className="max-w-[300px] space-y-7">
+                  <div>
+                    <h2 className="text-[20px] font-normal text-gc-ink">Access to Jenvu tools</h2>
+                    <p className="mt-2 text-[14px] leading-[1.55] text-gc-ink-muted">
+                      Get everything you need to read gold: the Terminal, AI desk, sweeps, zones, FVGs and alerts.
+                    </p>
+                  </div>
+                  <div>
+                    <h2 className="text-[20px] font-normal text-gc-ink">$100 in free credit</h2>
+                    <p className="mt-2 text-[14px] leading-[1.55] text-gc-ink-muted">
+                      Try Jenvu with $100 in credit to spend on top-tier AI models.
+                    </p>
+                  </div>
+                  <div>
+                    <h2 className="text-[20px] font-normal text-gc-ink">14 days of Pro access</h2>
+                    <p className="mt-2 text-[14px] leading-[1.55] text-gc-ink-muted">
+                      New sign-ups get Pro free for 14 days. Upgrade only if you decide Jenvu is right for you.
+                    </p>
+                  </div>
+                </div>
+                <svg className="mt-16 h-[230px] w-[220px]" viewBox="0 0 220 230" fill="none" aria-hidden>
+                  <circle cx="58" cy="12" r="7" className="fill-gc-blue" />
+                  <path d="M46 46 H136 L182 124 H92 Z" className="stroke-gc-ink" strokeWidth="1" />
+                  <path d="M0 124 H92 L136 202 H46 Z" className="stroke-gc-ink" strokeWidth="1" />
+                  <line x1="92" y1="124" x2="136" y2="46" className="stroke-gc-ink-muted" strokeWidth="1" strokeDasharray="1 3" />
+                  <ellipse cx="156" cy="89" rx="14" ry="15" className="fill-gc-green" />
+                </svg>
               </div>
             </div>
     </div>
