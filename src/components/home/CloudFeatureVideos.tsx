@@ -148,11 +148,11 @@ function FeatureCard({ card }: { card: Card }) {
           Explore feature
         </Link>
       </div>
-      <div className="relative h-[232px] border-t border-gc-line bg-background bg-[linear-gradient(to_right,var(--gc-line)_1px,transparent_1px),linear-gradient(to_bottom,var(--gc-line)_1px,transparent_1px)] bg-[size:24px_24px]">
+      <div className="relative h-[232px] border-t border-gc-line bg-background bg-[linear-gradient(to_right,var(--gc-panel)_1px,transparent_1px),linear-gradient(to_bottom,var(--gc-panel)_1px,transparent_1px)] bg-[size:24px_24px]">
         <div className={`absolute inset-0 transition-opacity ${playing ? "opacity-100" : "opacity-60"}`}>
           <Scene t={t} />
         </div>
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
+        <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-background to-transparent" />
         <button
           type="button"
           aria-label={playing ? `Pause ${card.name}` : `Play ${card.name}`}
