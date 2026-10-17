@@ -15,6 +15,7 @@ import DashboardFooter from "@/components/DashboardFooter";
 import NotificationBell from "@/components/NotificationBell";
 import { useCredits } from "@/hooks/useCredits";
 import { useAuthUser } from "@/hooks/useAuthUser";
+import StartTrialBanner from "@/components/StartTrialBanner";
 import { useLivePriceStream } from "@/hooks/useLivePriceStream";
 import { useLivePrices } from "@/hooks/useLivePrices";
 import { getMarketSnapshot } from "@/lib/gold-analysis.functions";
@@ -1531,6 +1532,7 @@ function DashboardLayout() {
       <div
         className={`dashboard-right-col flex min-w-0 min-h-0 flex-1 flex-col bg-white ${embedMode ? "" : sidebarCollapsed ? "collapsed lg:pl-[60px]" : "lg:pl-[200px]"}`}
       >
+        {!embedMode && pathname !== "/dashboard/terminal" && <StartTrialBanner />}
         {/* Mobile menu toggle (floating) */}
         {!embedMode && pathname !== "/dashboard/terminal" && (
           <button

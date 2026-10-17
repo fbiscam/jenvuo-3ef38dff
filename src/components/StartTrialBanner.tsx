@@ -3,14 +3,14 @@ import { Link } from "@tanstack/react-router";
 import { Gift, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuthUser } from "@/hooks/useAuthUser";
 import { useCredits } from "@/hooks/useCredits";
 
 const DISMISS_KEY = "jenvu:start-trial-banner-dismissed";
 
 /** Thin top strip offering the one-time free trial ($100 credit + 14 days Pro). */
 export default function StartTrialBanner() {
-  const { user } = useAuth();
+  const { user } = useAuthUser();
   const { refresh } = useCredits();
   const [eligible, setEligible] = useState(false);
   const [dismissed, setDismissed] = useState(true);
