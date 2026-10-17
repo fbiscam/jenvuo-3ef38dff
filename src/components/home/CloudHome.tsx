@@ -26,6 +26,12 @@ import cardGold from "@/assets/home/card-gold.jpg";
 import tradeDesk from "@/assets/home/trade-desk.jpg";
 import tradeChart from "@/assets/home/trade-chart.jpg";
 import tradeGold from "@/assets/home/trade-gold.jpg";
+import devModels from "@/assets/home/dev-models.jpg";
+import devExtension from "@/assets/home/dev-extension.jpg";
+import devDocs from "@/assets/home/dev-docs.jpg";
+import progFounding from "@/assets/home/prog-founding.jpg";
+import progPlans from "@/assets/home/prog-plans.jpg";
+import progSupport from "@/assets/home/prog-support.jpg";
 
 type Tone = "blue" | "red" | "yellow" | "green";
 
@@ -228,27 +234,27 @@ const AUDIENCES: Array<{ key: string; label: string; cards: AudienceCard[] }> = 
     key: "traders",
     label: "Traders",
     cards: [
-      { tag: "NEW TRADERS", text: "New sign-ups get 14 days of Pro access to the Terminal.", to: "/auth", img: tradeDesk },
-      { tag: "PRACTICE", text: "Test your ideas on a $100,000 demo account, risk free.", to: "/pricing", img: tradeChart },
-      { tag: "LEARN", text: "Daily XAU/USD insights and trading guides for every level.", to: "/insights", img: tradeGold },
+      { tag: "NEW TRADERS", text: "New sign-ups get 14 days of Pro access to the gold Terminal, AI desk and alerts.", to: "/auth", img: tradeDesk },
+      { tag: "PRACTICE", text: "Practice your ideas on a $100,000 demo account with automatic stop loss and take profit closing.", to: "/pricing", img: tradeChart },
+      { tag: "LEARN", text: "Read daily XAU/USD insights and step-by-step guides on sweeps, zones and FVGs for every level.", to: "/insights", img: tradeGold },
     ],
   },
   {
     key: "developers",
     label: "Developers",
     cards: [
-      { tag: "API", text: "Use Jenvu models in your own tools at $3 per million tokens.", to: "/pricing", img: cardAi },
-      { tag: "EXTENSION", text: "Jenvu analysis inside TradingView with a handy side panel.", to: "/download", img: tradeChart },
-      { tag: "DOCS", text: "Step-by-step guides for the Terminal, AI desk and API.", to: "/help", logo: true },
+      { tag: "TOP-TIER MODELS", text: "We provide top-tier AI models to developers who want to build their own trading tools.", to: "/ai-engine", img: devModels },
+      { tag: "API & EXTENSION", text: "Plug Jenvu models into your apps and bots with API keys, or use our TradingView extension.", to: "/pricing", img: devExtension },
+      { tag: "DEVELOPER DOCS", text: "Clear docs and guides help you connect, test and ship your project with Jenvu fast.", to: "/help", img: devDocs },
     ],
   },
   {
     key: "programs",
     label: "Special programs",
     cards: [
-      { tag: "FOUNDING PROGRAM", text: "Apply to the invite-only Founding Program and get your plan.", to: "/founding" },
-      { tag: "PLANS", text: "Pro $10, Elite $25 and Ultra $50 a month. Pick yours.", to: "/pricing" },
-      { tag: "SUPPORT", text: "Questions about plans or the Terminal? Our team is here to help.", to: "/contact" },
+      { tag: "FOUNDING PROGRAM", text: "Apply to the invite-only Founding Program and get your chosen plan as soon as you're approved.", to: "/founding", img: progFounding },
+      { tag: "PLANS", text: "Choose Pro at $10, Elite at $25 or Ultra at $50 a month to match your trading.", to: "/pricing", img: progPlans },
+      { tag: "SUPPORT", text: "Questions about plans, billing or the Terminal? Our support team is always ready to help.", to: "/contact", img: progSupport },
     ],
   },
 ];
@@ -284,9 +290,9 @@ export function CloudAudiences() {
             >
               <div className="flex min-w-0 flex-1 flex-col justify-center px-4 py-5">
                 <div className="text-[12px] font-medium tracking-wide text-gc-ink/80">{c.tag}</div>
-                <p className="mt-1 line-clamp-2 text-[15px] font-medium leading-[1.5] text-gc-ink">{c.text}</p>
+                <p className="mt-1 line-clamp-3 text-[15px] font-medium leading-[1.5] text-gc-ink">{c.text}</p>
               </div>
-              {c.img && <img src={c.img} alt="" loading="lazy" className="w-[84px] shrink-0 object-cover" />}
+              {c.img && <img src={c.img} alt="" loading="lazy" className="w-[112px] shrink-0 object-cover" />}
               {c.logo && (
                 <div className="flex w-[84px] shrink-0 items-center justify-center">
                   <img src="/favicon.png" alt="" className="h-14 w-14 object-contain" />
