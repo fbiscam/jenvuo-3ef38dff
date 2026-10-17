@@ -17,6 +17,10 @@ import {
   LifeBuoy,
   Users,
 } from "lucide-react";
+import cardBlue from "@/assets/home/card-blue.jpg";
+import cardAi from "@/assets/home/card-ai.jpg";
+import cardWave from "@/assets/home/card-wave.jpg";
+import cardGold from "@/assets/home/card-gold.jpg";
 
 type Tone = "blue" | "red" | "yellow" | "green";
 
@@ -134,26 +138,63 @@ function HeroMockup({ price, delta }: { price: string; delta: string }) {
   );
 }
 
+const STORIES = [
+  { img: cardBlue, tag: "TOP STORY", title: "Fresh sweep detection now on 15M, 1H, 2H and 4H", to: "/help" },
+  { img: cardAi, tag: "AI ANNOUNCEMENTS", title: "What's new in the Jenvu AI desk this month", to: "/ai-engine" },
+  { img: cardWave, tag: "VOLUME", title: "RVOL spikes and buyer/seller share on every candle", to: "/help" },
+  { img: cardGold, tag: "GOLD MARKET", title: "Daily XAU/USD insights and trading guides", to: "/insights" },
+];
+
 export function CloudHero({ price, delta }: { price: string; delta: string }) {
   return (
     <section className="overflow-hidden bg-background">
-      <div className="mx-auto grid max-w-[1296px] items-center gap-14 px-5 pb-20 pt-14 sm:px-8 md:grid-cols-2 md:pb-28 md:pt-20">
-        <div>
-          <h1 className="text-[40px] font-normal leading-[1.1] tracking-[-0.5px] text-gc-ink sm:text-[52px] md:text-[56px]">
-            Trade gold smarter with an AI terminal built for XAU/USD
-          </h1>
-          <p className="mt-6 max-w-[540px] text-[18px] leading-[1.55] text-gc-ink-muted">
-            Live ICT/SMC chart analysis, liquidity sweeps, supply and demand zones, and a chart-aware AI desk — all in one terminal for gold traders.
-          </p>
-          <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-            <PrimaryButton to="/auth" search={{ mode: "signup" }}>Get started for free</PrimaryButton>
-            <OutlineButton to="/founding">Apply to Founding Program</OutlineButton>
-          </div>
-          <p className="mt-5 text-[14px] text-gc-ink-muted">
-            New customers get 14 days of Pro access. No card needed to sign up.
-          </p>
+      <div className="mx-auto max-w-[1296px] px-5 pb-14 pt-12 text-center sm:px-8 md:pt-14">
+        <img src="/favicon.png" alt="" width={64} height={64} className="mx-auto h-16 w-16 object-contain" />
+        <h1 className="mx-auto mt-7 max-w-[900px] text-[40px] font-medium leading-[1.1] tracking-[-0.5px] text-gc-ink sm:text-[56px] md:text-[60px]">
+          The new way to trade gold
+        </h1>
+        <p className="mx-auto mt-5 max-w-[820px] text-[16px] leading-[1.6] text-gc-ink-muted sm:text-[17px]">
+          Read the chart with AI. Spot sweeps, zones and FVGs live. Gold now {price} ({delta}).{" "}
+          <span className="font-medium text-gc-ink">Start now with 14 days of Pro access.</span>
+        </p>
+        <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+          <Link
+            to="/auth"
+            search={{ mode: "signup" } as never}
+            className="inline-flex h-12 items-center justify-center rounded-full bg-gc-blue px-6 text-[16px] font-medium text-gc-on-blue transition hover:bg-gc-blue-hover"
+          >
+            Get started for free
+          </Link>
+          <Link
+            to="/contact"
+            className="inline-flex h-12 items-center justify-center rounded-full border border-gc-line bg-background px-6 text-[16px] font-medium text-gc-ink transition hover:bg-gc-surface"
+          >
+            Contact sales
+          </Link>
         </div>
-        <HeroMockup price={price} delta={delta} />
+      </div>
+      <div className="flex snap-x snap-mandatory gap-6 overflow-x-auto px-5 pb-16 [scrollbar-width:none] sm:px-8 [&::-webkit-scrollbar]:hidden">
+        {STORIES.map((s, i) => (
+          <Link
+            key={s.title}
+            to={s.to}
+            className="group relative h-[300px] w-[85vw] max-w-[448px] shrink-0 snap-start overflow-hidden rounded-3xl bg-gc-ink"
+          >
+            <img
+              src={s.img}
+              alt=""
+              width={1024}
+              height={640}
+              loading={i === 0 ? "eager" : "lazy"}
+              className="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-105"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-gc-ink/80 via-gc-ink/10 to-transparent" />
+            <div className="absolute inset-x-8 bottom-8 text-left text-gc-on-blue">
+              <div className="text-[13px] font-medium tracking-wide">{s.tag}</div>
+              <div className="mt-1 text-[20px] font-medium leading-[1.4]">{s.title}</div>
+            </div>
+          </Link>
+        ))}
       </div>
     </section>
   );
