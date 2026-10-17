@@ -20,3 +20,4 @@
 - Founding approval grants the requested plan immediately and starts a 2-day ID-verification window enforced in `src/lib/terminal-access.server.ts` (submitted/verified documents keep access): server-side so the Terminal chart cannot be used after the deadline by bypassing the UI.
 - Homepage sections live in `src/components/home/CloudHome.tsx` and use the `gc-*` colour tokens from `src/styles.css`; keeps the Google Cloud-style look in one place without hardcoded colours.
 - Free trial (Pro days + credit) starts only when the user clicks "Start free" via the `claim_free_trial()` DB function, tracked once per user in `free_trial_claims`; sign-up no longer grants it: keeps the grant one-time and server-enforced.
+- Dashboard pages (except the Terminal) use the top bar in `src/components/dashboard/DashboardTopBar.tsx` and a menu that stays closed until opened from it; the Terminal keeps its own fixed sidebar so the chart keeps its full-height layout.

@@ -16,6 +16,7 @@ import NotificationBell from "@/components/NotificationBell";
 import { useCredits } from "@/hooks/useCredits";
 import { useAuthUser } from "@/hooks/useAuthUser";
 import StartTrialBanner from "@/components/StartTrialBanner";
+import DashboardTopBar from "@/components/dashboard/DashboardTopBar";
 import NotificationStrip from "@/components/dashboard/NotificationStrip";
 import CloudWelcome from "@/components/dashboard/CloudWelcome";
 import { useLivePriceStream } from "@/hooks/useLivePriceStream";
@@ -190,6 +191,7 @@ const NAV_GROUPS: Array<{ label: string; items: TabItem[] }> = [
       { to: "/dashboard/pay", label: "Payments", icon: BadgeDollarSign },
       { to: "/dashboard/documents", label: "Documents", icon: FileCheck2 },
       { to: "/dashboard/security", label: "Security", icon: LockKeyhole },
+      { to: "/dashboard/profile", label: "Settings", icon: Settings2 },
       { to: "/help", label: "Help Center", icon: CircleHelp },
     ],
   },
@@ -748,6 +750,15 @@ function DashboardLayout() {
   useEffect(() => {
     setMobileNavOpen(false);
   }, [pathname]);
+  // Close the menu with Escape
+  useEffect(() => {
+    if (!mobileNavOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setMobileNavOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [mobileNavOpen]);
 
   // Detect admin role to conditionally show admin nav items
   useEffect(() => {
@@ -1297,7 +1308,9 @@ function DashboardLayout() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authUser?.id, authLoading, refreshTick]);
 
-  const navCollapsed = sidebarCollapsed && !mobileNavOpen;
+  // Console-style pages: menu stays closed until the user opens it from the top bar.
+  const drawerMode = !embedMode && pathname !== "/dashboard/terminal";
+  const navCollapsed = drawerMode ? false : sidebarCollapsed && !mobileNavOpen;
   const themeApplies = false; // Black theme only on the Terminal page (its own switch).
   const dashDark = themeApplies && dashTheme === "dark";
 
@@ -1305,20 +1318,25 @@ function DashboardLayout() {
     <div
       className={`flex ${pathname === "/dashboard/terminal" ? "h-dvh overflow-hidden jenvu-terminal-shell bg-white" : "min-h-screen jenvu-zoom-dashboard bg-gc-canvas"} ${dashDark ? "dark dash-dark" : ""} text-zinc-900 font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif] antialiased`}
     >
-      {/* Mobile overlay */}
+      {/* Menu overlay */}
       {mobileNavOpen && !embedMode && (
         <button
           type="button"
           aria-label="Close menu"
           onClick={() => setMobileNavOpen(false)}
-          className="fixed inset-0 z-40 bg-black/30 backdrop-blur-[1px] lg:hidden"
+          className={`fixed inset-0 z-40 bg-black/30 backdrop-blur-[1px] ${drawerMode ? "" : "lg:hidden"}`}
         />
       )}
 
       {!embedMode && (
         /* Sidebar (Firebase-style) */
         <aside
-          className={`dashboard-sidebar-root ${pathname === "/dashboard/terminal" ? "dashboard-terminal-sidebar border-r border-zinc-200" : "max-lg:border-r max-lg:border-gc-line"} max-lg:fixed max-lg:inset-y-0 max-lg:left-0 max-lg:z-50 lg:fixed lg:inset-y-0 lg:left-0 flex min-h-0 shrink-0 flex-col overflow-hidden bg-gc-canvas transition-[width,transform] duration-200 ease-out ${navCollapsed ? "w-[60px]" : "w-[224px]"} ${mobileNavOpen ? "max-lg:translate-x-0" : "max-lg:-translate-x-full"}`}
+          className={`dashboard-sidebar-root ${
+            drawerMode
+              ? `fixed inset-y-0 left-0 z-50 w-[280px] rounded-r-2xl shadow-2xl ${mobileNavOpen ? "translate-x-0" : "-translate-x-full"}`
+              : `${pathname === "/dashboard/terminal" ? "dashboard-terminal-sidebar border-r border-zinc-200" : ""} max-lg:fixed max-lg:inset-y-0 max-lg:left-0 max-lg:z-50 lg:fixed lg:inset-y-0 lg:left-0 ${navCollapsed ? "w-[60px]" : "w-[224px]"} ${mobileNavOpen ? "max-lg:translate-x-0" : "max-lg:-translate-x-full"}`
+          } flex min-h-0 shrink-0 flex-col overflow-hidden bg-gc-canvas transition-[width,transform] duration-200 ease-out`}
+          aria-hidden={drawerMode && !mobileNavOpen ? true : undefined}
           style={{
             fontFamily: '"Google Sans", "Product Sans", "Roboto", system-ui, sans-serif',
             fontWeight: 400,
@@ -1327,8 +1345,18 @@ function DashboardLayout() {
           <style>{`.dashboard-sidebar-root, .dashboard-sidebar-root *:not(img):not(svg):not(.material-symbols-rounded) { font-family: "Google Sans", "Product Sans", "Roboto", system-ui, sans-serif !important; text-transform: none !important; letter-spacing: normal !important; } .dashboard-sidebar-root .material-symbols-rounded { font-family: "Material Symbols Rounded" !important; font-weight: normal !important; font-style: normal !important; text-transform: none !important; letter-spacing: normal !important; white-space: nowrap; word-wrap: normal; direction: ltr; -webkit-font-feature-settings: "liga"; -webkit-font-smoothing: antialiased; }`}</style>
           {/* Brand */}
           <div
-            className={`flex h-14 shrink-0 items-center gap-2.5 ${navCollapsed ? "justify-center px-2" : "px-4"}`}
+            className={`flex h-14 shrink-0 items-center gap-2.5 ${navCollapsed ? "justify-center px-2" : drawerMode ? "border-b border-gc-line px-3" : "px-4"}`}
           >
+            {drawerMode && (
+              <button
+                type="button"
+                aria-label="Close menu"
+                onClick={() => setMobileNavOpen(false)}
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full text-gc-ink-muted hover:bg-gc-notice"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            )}
             <a href="https://jenvu.com" className="flex items-center gap-2.5 min-w-0">
               <img
                 src="/favicon.png"
@@ -1337,9 +1365,8 @@ function DashboardLayout() {
               />
               {!navCollapsed && (
                 <span
-                  className="dashboard-sidebar-brand truncate text-[22px] tracking-tight leading-none"
+                  className="dashboard-sidebar-brand truncate text-[22px] tracking-tight leading-none text-gc-ink"
                   style={{
-                    color: "#3c4043",
                     fontFamily: '"Google Sans", "Product Sans", "DM Sans", system-ui, sans-serif',
                     fontWeight: 500,
                   }}
@@ -1348,14 +1375,16 @@ function DashboardLayout() {
                 </span>
               )}
             </a>
-            <button
-              type="button"
-              aria-label="Close menu"
-              onClick={() => setMobileNavOpen(false)}
-              className="ml-auto rounded-md p-1.5 text-zinc-500 hover:bg-zinc-100 lg:hidden"
-            >
-              <X className="h-4 w-4" />
-            </button>
+            {!drawerMode && (
+              <button
+                type="button"
+                aria-label="Close menu"
+                onClick={() => setMobileNavOpen(false)}
+                className="ml-auto rounded-md p-1.5 text-zinc-500 hover:bg-zinc-100 lg:hidden"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            )}
           </div>
 
           {/* Nav */}
@@ -1508,6 +1537,7 @@ function DashboardLayout() {
                   )}
                 </button>
               )}
+              {!drawerMode && (
               <button
                 type="button"
                 onClick={() => setSidebarCollapsed((v) => !v)}
@@ -1521,6 +1551,7 @@ function DashboardLayout() {
                   <ChevronsLeft className="h-3.5 w-3.5" />
                 )}
               </button>
+              )}
             </div>
           </div>
         </aside>
@@ -1528,34 +1559,33 @@ function DashboardLayout() {
 
       {/* Right column */}
       <div
-        className={`dashboard-right-col flex min-w-0 min-h-0 flex-1 flex-col ${pathname === "/dashboard/terminal" ? "bg-white" : "bg-gc-canvas"} ${embedMode ? "" : sidebarCollapsed ? "collapsed lg:pl-[60px]" : "lg:pl-[224px]"}`}
+        className={`dashboard-right-col flex min-w-0 min-h-0 flex-1 flex-col ${pathname === "/dashboard/terminal" ? "bg-white" : "bg-gc-canvas"} ${embedMode || drawerMode ? "" : sidebarCollapsed ? "collapsed lg:pl-[60px]" : "lg:pl-[224px]"}`}
       >
+        {drawerMode && (
+          <DashboardTopBar
+            links={TABS.map((t) => ({ to: t.to, label: t.label }))}
+            onMenu={() => setMobileNavOpen(true)}
+            avatarUrl={avatarUrl || getDefaultAvatar(email || authUser?.id)}
+            name={fullName}
+            email={email}
+            onSignOut={() => void signOut()}
+          />
+        )}
         <div
           className={
-            pathname === "/dashboard/terminal" || embedMode
+            !drawerMode
               ? "flex min-h-0 w-full flex-1 flex-col"
-              : "flex min-h-0 w-full flex-1 flex-col overflow-hidden bg-background lg:mr-2 lg:mt-2 lg:w-auto lg:rounded-t-[20px]"
+              : "flex min-h-0 w-full flex-1 flex-col overflow-hidden bg-background sm:mx-2 sm:w-auto sm:rounded-t-[20px]"
           }
         >
-        {!embedMode && pathname !== "/dashboard/terminal" && <StartTrialBanner />}
-        {!embedMode && pathname !== "/dashboard/terminal" && <NotificationStrip />}
-        {/* Mobile menu toggle (floating) */}
-        {!embedMode && pathname !== "/dashboard/terminal" && (
-          <button
-            type="button"
-            aria-label="Open menu"
-            onClick={() => setMobileNavOpen(true)}
-            className="fixed top-3 right-3 z-30 inline-flex items-center justify-center rounded-md border border-zinc-200 bg-white p-1.5 text-zinc-700 shadow-sm hover:bg-zinc-50 md:hidden"
-          >
-            <Menu className="h-4 w-4" />
-          </button>
-        )}
+        {drawerMode && <StartTrialBanner />}
+        {drawerMode && <NotificationStrip />}
 
         <main
           className={
             pathname === "/dashboard/terminal"
               ? "h-full min-h-0 w-full flex-1 overflow-hidden bg-white"
-              : "mx-auto w-full max-w-7xl flex-1 bg-white px-5 pt-14 pb-7 sm:px-8 sm:pt-7"
+              : "mx-auto w-full max-w-7xl flex-1 bg-white px-5 pt-7 pb-7 sm:px-8"
           }
           style={pathname === "/dashboard/terminal" ? undefined : { zoom: 0.9 }}
         >
