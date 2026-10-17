@@ -23,6 +23,7 @@ import {
   CloudHero,
 } from "@/components/home/CloudHome";
 import { CloudFeatureVideos } from "@/components/home/CloudFeatureVideos";
+import { JenvuWordmark } from "@/components/home/JenvuWordmark";
 import { CloudSolutions, CloudLogoStrip, CloudStartBanner } from "@/components/home/CloudSolutions";
 import TailoredToDesk from "@/components/TailoredToDesk";
 
@@ -383,8 +384,7 @@ function HomePage() {
       <header className="jenvu-home-header sticky top-0 z-50 bg-background">
         <div className="relative flex items-center gap-3 px-4 py-2.5 sm:px-4">
           <Link to="/" className="flex min-w-0 shrink-0 items-center gap-2">
-            <img src="/favicon.png" alt="Jenvu" className="h-7 w-7 shrink-0 rounded-md object-contain" />
-            <span className="truncate text-[22px] leading-none tracking-tight text-gc-ink" style={{ fontFamily: "\"Google Sans\", \"Product Sans\", \"DM Sans\", system-ui, sans-serif", fontWeight: 500 }}>Jenvu</span>
+            <JenvuWordmark className="text-[22px]" />
           </Link>
 
           <nav className="ml-6 hidden min-w-0 items-center gap-0.5 whitespace-nowrap text-[14px] text-gc-ink-muted lg:flex [&>a]:rounded-md [&>a]:px-2.5 [&>a]:py-2 [&>a:hover]:bg-gc-surface [&>a:hover]:text-gc-ink">
@@ -445,8 +445,7 @@ function HomePage() {
           <div className="absolute inset-x-0 top-0 bg-white border-b border-zinc-100 shadow-lg">
             <div className="flex items-center justify-between px-5 py-3">
               <Link to="/" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-2.5">
-                <img src="/favicon.png" alt="Jenvu" className="h-7 w-7 rounded-md object-contain" />
-                <span className="text-[20px] tracking-tight" style={{ color: "#3c4043", fontFamily: "\"Google Sans\",\"Product Sans\",\"DM Sans\",system-ui,sans-serif", fontWeight: 500 }}>Jenvu</span>
+                <JenvuWordmark className="text-[20px]" />
               </Link>
               <button
                 type="button"
