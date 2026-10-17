@@ -520,9 +520,9 @@ function HomePage() {
           <CloudLogoStrip />
           <CloudStartBanner />
         </main>
-
-        <SiteFooter />
       </div>
+
+      <SiteFooter />
     </div>
     </>
 
