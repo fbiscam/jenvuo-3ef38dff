@@ -111,6 +111,7 @@ export default function SiteFooter({ className }: { className?: string }) {
   return (
     <footer className={`hide-in-pwa relative border-t border-gc-line bg-background ${className || ""}`}>
       <div className="mx-auto max-w-[1440px] px-6 py-10 sm:py-12">
+        <div className="jenvu-footer-menu-zoom">
         <a href="https://jenvu.com" className="mb-8 flex items-center gap-2.5">
           <img src="/favicon.png" alt="Jenvu" className="h-7 w-7 object-contain" />
           <span className="text-[17px] font-medium text-gc-ink">Jenvu AI</span>
@@ -133,6 +134,7 @@ export default function SiteFooter({ className }: { className?: string }) {
               </ul>
             </div>
           ))}
+        </div>
         </div>
 
         {/* Bottom bar */}
