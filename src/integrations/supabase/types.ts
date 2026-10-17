@@ -1355,6 +1355,27 @@ export type Database = {
           },
         ]
       }
+      free_trial_claims: {
+        Row: {
+          claimed_at: string
+          credit_usd: number
+          trial_days: number
+          user_id: string
+        }
+        Insert: {
+          claimed_at?: string
+          credit_usd?: number
+          trial_days?: number
+          user_id: string
+        }
+        Update: {
+          claimed_at?: string
+          credit_usd?: number
+          trial_days?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       insight_generation_jobs: {
         Row: {
           consecutive_rate_limits: number
@@ -3474,6 +3495,7 @@ export type Database = {
         Returns: number
       }
       charge_terminal_daily_access: { Args: never; Returns: Json }
+      claim_free_trial: { Args: never; Returns: Json }
       close_chat_session: { Args: { _session_id: string }; Returns: undefined }
       community_bump_counter: {
         Args: { _col: string; _delta: number; _post_id: string }
@@ -3497,6 +3519,7 @@ export type Database = {
       expire_my_pro_trial: { Args: never; Returns: boolean }
       expire_pro_trials: { Args: never; Returns: number }
       expire_trial_account: { Args: { _user_id: string }; Returns: boolean }
+      free_trial_eligible: { Args: never; Returns: boolean }
       get_guest_messages: {
         Args: { _token: string }
         Returns: {
