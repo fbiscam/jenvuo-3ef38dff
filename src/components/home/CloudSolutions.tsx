@@ -187,7 +187,7 @@ export function CloudStartBanner() {
             src="/favicon.png"
             alt=""
             aria-hidden="true"
-            className="pointer-events-none absolute -right-16 top-1/2 hidden h-[130%] -translate-y-1/2 object-contain md:block"
+            className="pointer-events-none absolute -right-24 top-1/2 hidden h-[175%] -translate-y-1/2 object-contain md:block"
           />
         </div>
       </div>
