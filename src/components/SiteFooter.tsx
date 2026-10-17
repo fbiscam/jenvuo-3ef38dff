@@ -148,7 +148,7 @@ export default function SiteFooter({ className }: { className?: string }) {
           </div>
 
 
-          <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center">
+          <div className="flex flex-col items-start gap-5 sm:flex-row sm:items-center">
             <div className="flex items-center gap-2">
               {[
                 {
@@ -196,7 +196,7 @@ export default function SiteFooter({ className }: { className?: string }) {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={s.label}
-                  className="flex h-8 w-8 items-center justify-center rounded-full border border-zinc-200 bg-white text-zinc-700 transition-colors hover:border-zinc-300 hover:text-zinc-900"
+                  className="flex h-9 w-9 items-center justify-center rounded-full border border-gc-line bg-background text-gc-ink-muted transition-colors hover:text-gc-blue-deep"
                 >
                   {s.icon}
                 </a>
