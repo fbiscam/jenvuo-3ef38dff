@@ -1225,3 +1225,4 @@ html body .dash-dark main.bg-white { background-color: oklch(0.165 0 0) !importa
 .jenvu-zoom-dashboard.dash-dark main h4 { color: oklch(0.97 0 0) !important; }
 .dash-dark main button.bg-white,
 .dash-dark main a.bg-white { box-shadow: 0 0 0 1px oklch(0.3 0 0) !important; }
+@media (min-width: 1024px) { .jenvu-build-zoom { zoom: 1.15; } }
