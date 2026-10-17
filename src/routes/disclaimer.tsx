@@ -17,7 +17,7 @@ export const Route = createFileRoute("/disclaimer")({
 function DisclaimerPage() {
   return (
     <PageShell
-      eyebrow="Legal"
+      eyebrow="\n"
       highlight={{ title: 'Trading involves real risk', text: 'Jenvu analysis, alerts and signals are educational and not financial advice. Past results never guarantee future results, and you can lose all the money you allocate to trading.' }}
       title="Risk Disclaimer"
       intro="Trading carries substantial risk. Please read this disclosure carefully before using any analysis, alert, or signal produced by Jenvu."
