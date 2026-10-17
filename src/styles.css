@@ -111,6 +111,8 @@
   --color-gc-surface: var(--gc-surface);
   --color-gc-line: var(--gc-line);
   --color-gc-on-blue: var(--gc-on-blue);
+  --color-gc-panel: var(--gc-panel);
+  --color-gc-navy: var(--gc-navy);
   --color-auth-action: var(--auth-action);
   --color-auth-action-foreground: var(--auth-action-foreground);
 }
@@ -177,6 +179,8 @@
   --gc-surface: #f8f9fa;
   --gc-line: #dadce0;
   --gc-on-blue: #ffffff;
+  --gc-panel: #eef2f7;
+  --gc-navy: #283593;
   --auth-action: oklch(0.72 0.14 255);
   --auth-action-foreground: oklch(1 0 0);
 }
@@ -507,6 +511,11 @@
 
 
 
+/* Homepage: menu keeps the site zoom, page content renders smaller */
+@media (min-width: 1024px) { .jenvu-home-content { zoom: 0.8; } }
+@media (min-width: 1360px) { .jenvu-home-content { zoom: 0.9; } }
+@media (min-width: 1680px) { .jenvu-home-content { zoom: 1; } }
+
 @media (min-width: 1024px) { .killzones-root { zoom: 1.25; } }
 @media (min-width: 1280px) and (min-height: 800px) { .jenvu-auth-zoom { zoom: 1.21; } }
 
@@ -712,6 +721,7 @@ html[data-pwa="1"] body {
   background: #ffffff !important;
 }
 html[data-pwa="1"] .jenvu-zoom,
+html[data-pwa="1"] .jenvu-home-content,
 html[data-pwa="1"] .jenvu-zoom-dashboard {
   zoom: 1 !important;
   background: #ffffff !important;
