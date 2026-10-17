@@ -17,7 +17,7 @@ export const Route = createFileRoute("/terms")({
 function TermsPage() {
   return (
     <PageShell
-      eyebrow="Legal"
+      eyebrow="\n"
       highlight={{ title: 'Using Jenvu fairly', text: 'Jenvu provides educational market analysis tools. You are responsible for your own trading decisions, your account security and following these Terms.' }}
       title="Terms of Service"
       intro="These Terms govern your access to and use of Jenvu ('the Service'). By creating an account or using the Service you agree to them in full."
