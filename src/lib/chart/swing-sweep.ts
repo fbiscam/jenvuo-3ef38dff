@@ -26,6 +26,10 @@ export const SWEEP_LATE_BARS = 5;
 export const SWEEP_WICK_BODY_RATIO = 1.5;
 /** Wick must poke past the level by ≥ this × average lookback range, else it's noise. */
 export const SWEEP_MIN_DEPTH = 0.1;
+/** Confirming candle body must be ≥ this × avg range (real displacement, not drift). */
+export const SWEEP_MIN_CONFIRM_BODY = 0.3;
+/** Confirming close must clear the swing body edge by ≥ this × avg range. */
+export const SWEEP_MIN_CLEAR = 0.1;
 
 export function classifySwingSweep(closed: Bar[], i: number, kind: "high" | "low"): SwingSweep {
   const high = kind === "high";
@@ -61,9 +65,14 @@ export function classifySwingSweep(closed: Bar[], i: number, kind: "high" | "low
         ? { status: "pending", level, text: "Sweep – waiting move" }
         : { status: "pending", level, text: "Sweep – slow, waiting" };
     }
-    const c = closed[k].c;
+    const ck = closed[k];
+    const c = ck.c;
     if (high ? c > s.h : c < s.l) return { status: "failed", level, text: "Sweep failed" };
-    if (high ? c < bodyEdge : c > bodyEdge) {
+    // Fakeout: after the reclaim, a close back beyond the swept level = re-accepted, not rejected.
+    if (k > reclaim && !inside(c)) return { status: "failed", level, text: "Sweep failed (re-accepted)" };
+    const clear = high ? bodyEdge - c : c - bodyEdge;
+    const displaced = Math.abs(ck.c - ck.o) >= avgRange * SWEEP_MIN_CONFIRM_BODY;
+    if (clear >= avgRange * SWEEP_MIN_CLEAR && displaced) {
       return n < SWEEP_MOVE_BARS
         ? strong
           ? { status: "confirmed", level, text: "Sweep ✓ strong", strong: true }
