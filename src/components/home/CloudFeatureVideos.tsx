@@ -88,7 +88,7 @@ function SceneAi({ t }: { t: number }) {
   return (
     <div className="flex h-full flex-col justify-center gap-2 px-6 text-[12px] leading-[1.45]">
       <div className="self-end rounded-2xl rounded-br-sm bg-gc-blue px-3 py-1.5 text-gc-on-blue">{AI_Q}</div>
-      <div className="max-w-[88%] self-start rounded-2xl rounded-bl-sm bg-gc-on-blue/95 px-3 py-1.5 text-gc-ink">
+      <div className="max-w-[88%] self-start rounded-2xl rounded-bl-sm border border-gc-line bg-gc-surface px-3 py-1.5 text-gc-ink shadow-sm">
         {typed || <span className="text-gc-ink-muted">Jenvu AI is reading the chart…</span>}
         <span className="ml-0.5 inline-block h-3 w-[2px] translate-y-0.5 animate-pulse bg-gc-ink" />
       </div>
@@ -118,11 +118,11 @@ function SceneDemo({ t }: { t: number }) {
   const up = pnl >= 0;
   return (
     <div className="flex h-full flex-col items-center justify-center text-center">
-      <div className="text-[11px] tracking-wide text-gc-on-blue/70">DEMO · XAU/USD BUY 0.10</div>
+      <div className="text-[11px] tracking-wide text-gc-ink-muted">DEMO · XAU/USD BUY 0.10</div>
       <div className={`mt-1 text-[34px] font-medium tabular-nums ${up ? "text-gc-green" : "text-gc-red"}`}>
         {up ? "+" : "-"}${Math.abs(pnl).toFixed(2)}
       </div>
-      <div className="mt-1 text-[11px] text-gc-on-blue/70">Balance $100,000 · auto close on</div>
+      <div className="mt-1 text-[11px] text-gc-ink-muted">Balance $100,000 · auto close on</div>
     </div>
   );
 }
@@ -141,27 +141,27 @@ function FeatureCard({ card }: { card: Card }) {
   const t = useTick(playing);
   const { Scene } = card;
   return (
-    <div className="flex w-[85vw] max-w-[412px] shrink-0 snap-start flex-col overflow-hidden rounded-3xl bg-gc-surface">
-      <div className="flex min-h-[204px] flex-col px-8 pb-8 pt-10">
+    <div className="flex w-[85vw] max-w-[412px] shrink-0 snap-start flex-col overflow-hidden rounded-3xl border border-gc-line bg-background shadow-[0_1px_3px_rgba(60,64,67,0.15)] transition hover:shadow-[0_4px_16px_rgba(60,64,67,0.18)]">
+      <div className="flex min-h-[204px] flex-col bg-gc-surface px-8 pb-8 pt-10">
         <p className="text-[16px] leading-[1.55] text-gc-ink-muted">{card.text}</p>
         <Link to={card.to} className="mt-auto pt-6 text-[16px] font-medium text-gc-blue-deep hover:underline">
           Explore feature
         </Link>
       </div>
-      <div className="relative h-[232px] bg-gc-ink">
+      <div className="relative h-[232px] border-t border-gc-line bg-background bg-[linear-gradient(to_right,var(--gc-line)_1px,transparent_1px),linear-gradient(to_bottom,var(--gc-line)_1px,transparent_1px)] bg-[size:24px_24px]">
         <div className={`absolute inset-0 transition-opacity ${playing ? "opacity-100" : "opacity-60"}`}>
           <Scene t={t} />
         </div>
-        <div className="absolute inset-0 bg-gradient-to-t from-gc-ink/80 via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
         <button
           type="button"
           aria-label={playing ? `Pause ${card.name}` : `Play ${card.name}`}
           onClick={() => setPlaying((p) => !p)}
-          className="absolute left-1/2 top-1/2 flex h-14 w-14 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-background/95 text-gc-ink shadow transition hover:scale-105"
+          className="absolute left-1/2 top-1/2 flex h-14 w-14 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-gc-blue text-gc-on-blue shadow-[0_4px_14px_rgba(26,115,232,0.35)] transition hover:scale-105 hover:bg-gc-blue-hover"
         >
           {playing ? <Pause className="h-5 w-5" /> : <Play className="ml-0.5 h-5 w-5" />}
         </button>
-        <div className="absolute bottom-5 left-7 text-[22px] font-medium leading-[1.2] text-gc-on-blue">
+        <div className="absolute bottom-5 left-7 text-[22px] font-medium leading-[1.2] text-gc-ink">
           {card.name}
           <br />+ Jenvu
         </div>
@@ -186,7 +186,7 @@ export function CloudFeatureVideos() {
   };
   const scroll = (dir: 1 | -1) => railRef.current?.scrollBy({ left: dir * 440, behavior: "smooth" });
   return (
-    <section className="bg-background py-16 md:py-20">
+    <section className="jenvu-videos-zoom bg-background py-16 md:py-20">
       <h2 className="px-5 text-center text-[32px] font-normal leading-[1.2] text-gc-ink sm:text-[44px]">
         <span className="text-gc-green">Live features</span> happen on Jenvu
       </h2>
