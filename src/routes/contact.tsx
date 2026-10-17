@@ -189,7 +189,7 @@ function ContactPage() {
               <img src="/favicon.png" alt="Jenvu" className="h-10 w-10 rounded-lg object-contain" />
               <h2 className="mt-4 text-[20px]">Contact our team directly</h2>
               <a href="mailto:support@jenvu.com" className="mt-6 flex w-full items-center justify-center gap-2 rounded-full bg-home-accent px-5 py-3 text-[16px] font-medium text-home-accent-foreground hover:opacity-90">
-                Email support@jenvu.com
+                support@jenvu.com
               </a>
               <p className="mt-4 text-[15px] text-gc-ink-muted">Available Monday to Friday, 09:00 – 18:00 GMT</p>
             </div>
