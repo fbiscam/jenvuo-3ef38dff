@@ -16,6 +16,7 @@ import NotificationBell from "@/components/NotificationBell";
 import { useCredits } from "@/hooks/useCredits";
 import { useAuthUser } from "@/hooks/useAuthUser";
 import StartTrialBanner from "@/components/StartTrialBanner";
+import NotificationStrip from "@/components/dashboard/NotificationStrip";
 import CloudWelcome from "@/components/dashboard/CloudWelcome";
 import { useLivePriceStream } from "@/hooks/useLivePriceStream";
 import { useLivePrices } from "@/hooks/useLivePrices";
@@ -1302,7 +1303,7 @@ function DashboardLayout() {
 
   return (
     <div
-      className={`flex ${pathname === "/dashboard/terminal" ? "h-dvh overflow-hidden jenvu-terminal-shell" : "min-h-screen jenvu-zoom-dashboard"} ${dashDark ? "dark dash-dark" : ""} bg-white text-zinc-900 font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif] antialiased`}
+      className={`flex ${pathname === "/dashboard/terminal" ? "h-dvh overflow-hidden jenvu-terminal-shell bg-white" : "min-h-screen jenvu-zoom-dashboard bg-gc-canvas"} ${dashDark ? "dark dash-dark" : ""} text-zinc-900 font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif] antialiased`}
     >
       {/* Mobile overlay */}
       {mobileNavOpen && !embedMode && (
@@ -1317,7 +1318,7 @@ function DashboardLayout() {
       {!embedMode && (
         /* Sidebar (Firebase-style) */
         <aside
-          className={`dashboard-sidebar-root ${pathname === "/dashboard/terminal" ? "dashboard-terminal-sidebar" : ""} max-lg:fixed max-lg:inset-y-0 max-lg:left-0 max-lg:z-50 lg:fixed lg:inset-y-0 lg:left-0 flex min-h-0 shrink-0 flex-col overflow-hidden border-r border-zinc-200 bg-sidebar transition-[width,transform] duration-200 ease-out ${navCollapsed ? "w-[60px]" : "w-[200px]"} ${mobileNavOpen ? "max-lg:translate-x-0" : "max-lg:-translate-x-full"}`}
+          className={`dashboard-sidebar-root ${pathname === "/dashboard/terminal" ? "dashboard-terminal-sidebar border-r border-zinc-200" : "max-lg:border-r max-lg:border-gc-line"} max-lg:fixed max-lg:inset-y-0 max-lg:left-0 max-lg:z-50 lg:fixed lg:inset-y-0 lg:left-0 flex min-h-0 shrink-0 flex-col overflow-hidden bg-gc-canvas transition-[width,transform] duration-200 ease-out ${navCollapsed ? "w-[60px]" : "w-[224px]"} ${mobileNavOpen ? "max-lg:translate-x-0" : "max-lg:-translate-x-full"}`}
           style={{
             fontFamily: '"Google Sans", "Product Sans", "Roboto", system-ui, sans-serif',
             fontWeight: 400,
@@ -1326,7 +1327,7 @@ function DashboardLayout() {
           <style>{`.dashboard-sidebar-root, .dashboard-sidebar-root *:not(img):not(svg):not(.material-symbols-rounded) { font-family: "Google Sans", "Product Sans", "Roboto", system-ui, sans-serif !important; text-transform: none !important; letter-spacing: normal !important; } .dashboard-sidebar-root .material-symbols-rounded { font-family: "Material Symbols Rounded" !important; font-weight: normal !important; font-style: normal !important; text-transform: none !important; letter-spacing: normal !important; white-space: nowrap; word-wrap: normal; direction: ltr; -webkit-font-feature-settings: "liga"; -webkit-font-smoothing: antialiased; }`}</style>
           {/* Brand */}
           <div
-            className={`flex h-11 shrink-0 items-center gap-2.5 bg-sidebar ${navCollapsed ? "justify-center px-2" : "px-4"}`}
+            className={`flex h-14 shrink-0 items-center gap-2.5 ${navCollapsed ? "justify-center px-2" : "px-4"}`}
           >
             <a href="https://jenvu.com" className="flex items-center gap-2.5 min-w-0">
               <img
@@ -1359,7 +1360,7 @@ function DashboardLayout() {
 
           {/* Nav */}
 
-          <nav className="sidebar-hover-scroll flex-1 min-h-0 overflow-y-auto overflow-x-hidden bg-sidebar px-2 py-2">
+          <nav className={`sidebar-hover-scroll flex-1 min-h-0 overflow-y-auto overflow-x-hidden py-1 ${navCollapsed ? "px-2" : "pl-0 pr-3"}`}>
             {[...NAV_GROUPS].map((group, gi) => (
               <div key={group.label || `nav-group-${gi}`} className={gi > 0 ? "mt-2" : ""}>
                 {!navCollapsed && group.label && (
@@ -1370,7 +1371,7 @@ function DashboardLayout() {
                 {navCollapsed && gi > 0 && group.label && (
                   <div className="mx-3 mb-1 h-px bg-zinc-100" />
                 )}
-                <div className="flex flex-col gap-1.5">
+                <div className="flex flex-col gap-0.5">
                   {group.items.map((t) => {
                     const active = t.exact ? pathname === t.to : pathname.startsWith(t.to);
                     const Icon = t.icon;
@@ -1386,7 +1387,7 @@ function DashboardLayout() {
                           role="link"
                           aria-disabled="true"
                           title="Terminal is for approved Founding Program members only"
-                          className={`dashboard-sidebar-link relative flex cursor-not-allowed select-none items-center rounded-full text-[12.5px] font-normal text-foreground opacity-50 ${navCollapsed ? "justify-center px-2 py-1.5" : "gap-3 px-2.5 py-1.5"}`}
+                          className={`dashboard-sidebar-link relative flex cursor-not-allowed select-none items-center text-[14px] font-normal text-gc-ink opacity-50 ${navCollapsed ? "justify-center rounded-full px-2 py-2" : "gap-3.5 rounded-r-full py-2 pl-4 pr-3"}`}
                         >
                           <Icon
                             className="dashboard-sidebar-icon h-[19px] w-[19px] shrink-0 text-current"
@@ -1412,7 +1413,7 @@ function DashboardLayout() {
                           setMobileNavOpen(false);
                         }}
                         title={navCollapsed ? t.label : undefined}
-                        className={`dashboard-sidebar-link group relative flex items-center rounded-full text-[12.5px] font-normal text-foreground transition ${navCollapsed ? "justify-center px-2 py-1.5" : "gap-3 px-2.5 py-1.5"} ${active ? "bg-[#EBEBEB]" : "hover:bg-zinc-50"}`}
+                        className={`dashboard-sidebar-link group relative flex items-center text-[14px] font-normal text-gc-ink transition ${navCollapsed ? "justify-center rounded-full px-2 py-2" : "gap-3.5 rounded-r-full py-2 pl-4 pr-3"} ${active ? "bg-gc-nav-active" : "hover:bg-gc-panel"}`}
                       >
                         <Icon
                           className="dashboard-sidebar-icon h-[19px] w-[19px] shrink-0 text-current"
@@ -1478,7 +1479,7 @@ function DashboardLayout() {
 
           {/* Quick actions: Sign out (left, icon) + Theme + Collapse (right) */}
           <div
-            className={`mt-auto shrink-0 flex items-center border-t border-zinc-200 bg-sidebar py-2 ${navCollapsed ? "justify-center px-2" : "justify-between pl-3 pr-2"}`}
+            className={`mt-auto shrink-0 flex items-center border-t border-gc-line py-2 ${navCollapsed ? "justify-center px-2" : "justify-between pl-3 pr-2"}`}
           >
             {!navCollapsed && (
               <button
@@ -1527,9 +1528,17 @@ function DashboardLayout() {
 
       {/* Right column */}
       <div
-        className={`dashboard-right-col flex min-w-0 min-h-0 flex-1 flex-col bg-white ${embedMode ? "" : sidebarCollapsed ? "collapsed lg:pl-[60px]" : "lg:pl-[200px]"}`}
+        className={`dashboard-right-col flex min-w-0 min-h-0 flex-1 flex-col ${pathname === "/dashboard/terminal" ? "bg-white" : "bg-gc-canvas"} ${embedMode ? "" : sidebarCollapsed ? "collapsed lg:pl-[60px]" : "lg:pl-[224px]"}`}
       >
+        <div
+          className={
+            pathname === "/dashboard/terminal" || embedMode
+              ? "flex min-h-0 w-full flex-1 flex-col"
+              : "flex min-h-0 w-full flex-1 flex-col overflow-hidden bg-background lg:mr-2 lg:mt-2 lg:w-auto lg:rounded-t-[20px]"
+          }
+        >
         {!embedMode && pathname !== "/dashboard/terminal" && <StartTrialBanner />}
+        {!embedMode && pathname !== "/dashboard/terminal" && <NotificationStrip />}
         {/* Mobile menu toggle (floating) */}
         {!embedMode && pathname !== "/dashboard/terminal" && (
           <button
@@ -1578,6 +1587,7 @@ function DashboardLayout() {
             <Outlet />
           )}
         </main>
+        </div>
       </div>
     </div>
   );
