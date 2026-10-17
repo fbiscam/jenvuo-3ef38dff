@@ -18,7 +18,7 @@ export const Route = createFileRoute("/refund")({
 function RefundPage() {
   return (
     <PageShell
-      eyebrow="Legal"
+      eyebrow="\n"
       highlight={{ title: 'How refunds work', text: 'Credits and AI compute are delivered instantly. Once credits are used, that payment is non-refundable. The sections below explain when a refund is available.' }}
       title="Refund Policy"
       intro="Jenvu is a digital service delivered instantly through credits, AI compute and live signals. This policy explains when refunds are — and are not — available."
