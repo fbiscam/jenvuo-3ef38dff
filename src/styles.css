@@ -1230,3 +1230,4 @@ html body .dash-dark main.bg-white { background-color: oklch(0.165 0 0) !importa
 @media (min-width: 1024px) { .jenvu-build-zoom { zoom: 1.15; } }
 
 @keyframes gc-marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+@media (min-width: 1024px) { .jenvu-solutions-zoom { zoom: 1.15; } }

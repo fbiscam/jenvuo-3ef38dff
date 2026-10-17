@@ -7,12 +7,16 @@ import trading212Logo from "@/assets/trading212-logo.png.asset.json";
 import trustWalletLogo from "@/assets/trustwallet-logo.png.asset.json";
 import etoroLogo from "@/assets/etoro-logo.png.asset.json";
 import metaTraderLogo from "@/assets/metatrader-logo.png.asset.json";
-import imgChart from "@/assets/home/trade-chart.jpg";
-import imgDesk from "@/assets/home/trade-desk.jpg";
-import imgGold from "@/assets/home/trade-gold.jpg";
-import imgModels from "@/assets/home/dev-models.jpg";
-import imgFounding from "@/assets/home/prog-founding.jpg";
-import imgPractice from "@/assets/home/trade-neon-practice.jpg";
+import imgFloor from "@/assets/home/place-floor.jpg";
+import imgVault from "@/assets/home/place-vault.jpg";
+import imgHome from "@/assets/home/place-home.jpg";
+import imgOffice from "@/assets/home/place-office.jpg";
+import imgDev from "@/assets/home/place-dev.jpg";
+import imgMeeting from "@/assets/home/place-meeting.jpg";
+import imgLondon from "@/assets/home/place-london.jpg";
+import imgSouk from "@/assets/home/place-souk.jpg";
+import imgLibrary from "@/assets/home/place-library.jpg";
+import imgSupport from "@/assets/home/place-support.jpg";
 
 type Solution = {
   name: string;
@@ -26,19 +30,23 @@ type Solution = {
 };
 
 const SOLUTIONS: Solution[] = [
-  { name: "Day traders", image: imgChart, stat: "15M / 1H", statText: "fresh sweeps and swings marked live on gold", body: "Catch liquidity sweeps on fresh highs and lows as candles close.", bold: "See how the Terminal reads intraday structure.", cta: "Explore the Gold Terminal", to: "/pricing" },
-  { name: "Swing traders", image: imgGold, stat: "2H / 4H", statText: "supply, demand zones and FVGs kept on chart", body: "Higher-timeframe zones stay drawn until price truly invalidates them.", bold: "Plan swing trades with clear structure.", cta: "Explore zone tools", to: "/help" },
-  { name: "New traders", image: imgPractice, stat: "$100,000", statText: "demo balance to practice without real money", body: "Practice entries and exits on live gold prices with a demo account.", bold: "Learn safely before you risk capital.", cta: "Explore demo trading", to: "/pricing" },
-  { name: "AI-first traders", image: imgDesk, stat: "1 question", statText: "one clear answer from the AI desk, no noise", body: "Ask about the current chart and get a focused, structured reply.", bold: "Read the market with AI next to you.", cta: "Explore the AI desk", to: "/ai-engine" },
-  { name: "Developers", image: imgModels, stat: "$3 / 1M", statText: "tokens for top-tier models through API keys", body: "Plug Jenvu models into your own apps, bots and trading tools.", bold: "Build with our API and extension.", cta: "Explore developer tools", to: "/help" },
-  { name: "Founding members", image: imgFounding, stat: "2 days", statText: "to verify your ID after your plan is approved", body: "Approved Founding members get their chosen plan straight away.", bold: "Apply to the invite-only program.", cta: "Explore the Founding Program", to: "/founding" },
+  { name: "Day traders", image: imgFloor, stat: "15M / 1H", statText: "fresh sweeps and swings marked live on gold", body: "Catch liquidity sweeps on fresh highs and lows as candles close.", bold: "See how the Terminal reads intraday structure.", cta: "Explore the Gold Terminal", to: "/pricing" },
+  { name: "Swing traders", image: imgVault, stat: "2H / 4H", statText: "supply, demand zones and FVGs kept on chart", body: "Higher-timeframe zones stay drawn until price truly invalidates them.", bold: "Plan swing trades with clear structure.", cta: "Explore zone tools", to: "/help" },
+  { name: "New traders", image: imgHome, stat: "$100,000", statText: "demo balance to practice without real money", body: "Practice entries and exits on live gold prices with a demo account.", bold: "Learn safely before you risk capital.", cta: "Explore demo trading", to: "/pricing" },
+  { name: "AI-first traders", image: imgOffice, stat: "1 question", statText: "one clear answer from the AI desk, no noise", body: "Ask about the current chart and get a focused, structured reply.", bold: "Read the market with AI next to you.", cta: "Explore the AI desk", to: "/ai-engine" },
+  { name: "Developers", image: imgDev, stat: "$3 / 1M", statText: "tokens for top-tier models through API keys", body: "Plug Jenvu models into your own apps, bots and trading tools.", bold: "Build with our API and extension.", cta: "Explore developer tools", to: "/help" },
+  { name: "Founding members", image: imgMeeting, stat: "2 days", statText: "to verify your ID after your plan is approved", body: "Approved Founding members get their chosen plan straight away.", bold: "Apply to the invite-only program.", cta: "Explore the Founding Program", to: "/founding" },
+  { name: "Session traders", image: imgLondon, stat: "London / NY", statText: "killzone sessions tracked on the gold chart", body: "Know when London and New York liquidity is most active on gold.", bold: "Time your entries around the sessions.", cta: "Explore session tools", to: "/help" },
+  { name: "Gold investors", image: imgSouk, stat: "XAU/USD", statText: "one market, analysed in full depth every day", body: "Follow gold with daily insights, macro drivers and clear structure.", bold: "Stay close to the gold market.", cta: "Explore gold insights", to: "/insights" },
+  { name: "Students", image: imgLibrary, stat: "Free guides", statText: "on sweeps, zones and FVGs for every level", body: "Learn ICT and SMC ideas step by step with real gold examples.", bold: "Build your trading knowledge.", cta: "Explore learning resources", to: "/insights" },
+  { name: "Support & help", image: imgSupport, stat: "Help centre", statText: "answers on plans, billing and the Terminal", body: "Find quick answers or contact our team about your account.", bold: "Get help when you need it.", cta: "Visit the help centre", to: "/help" },
 ];
 
 export function CloudSolutions() {
   const [active, setActive] = React.useState(0);
   const s = SOLUTIONS[active];
   return (
-    <section className="bg-background py-20">
+    <section className="jenvu-solutions-zoom bg-background py-20">
       <div className="mx-auto max-w-6xl px-6">
         <div className="grid gap-8 md:grid-cols-2 md:items-start">
           <h2 className="text-3xl font-normal leading-tight text-gc-ink md:text-4xl">
@@ -73,7 +81,7 @@ export function CloudSolutions() {
           </ul>
 
           <div className="rounded-xl border border-gc-line p-3">
-            <img src={s.image} alt={s.name} loading="lazy" className="h-56 w-full rounded-lg object-cover md:h-64" />
+            <img src={s.image} alt={s.name} loading="lazy" width={1280} height={640} className="h-56 w-full rounded-lg object-cover md:h-64" />
             <div className="mt-2 grid gap-2 sm:grid-cols-2">
               <div className="rounded-lg bg-gc-ink p-5 text-gc-on-blue">
                 <div className="text-4xl font-medium">{s.stat}</div>
