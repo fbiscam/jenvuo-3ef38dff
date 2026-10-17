@@ -27,6 +27,7 @@ import {
   CloudResources,
   CloudFinalCta,
 } from "@/components/home/CloudHome";
+import { CloudFeatureVideos } from "@/components/home/CloudFeatureVideos";
 import TailoredToDesk from "@/components/TailoredToDesk";
 
 import {
@@ -518,6 +519,7 @@ function HomePage() {
           <CloudHero price={xau?.[1] ?? "—"} delta={xau?.[2] ?? "…"} />
           <CloudAudiences />
           <CloudBuildWith />
+          <CloudFeatureVideos />
           <CloudProducts />
           <CloudUseCases />
           <CloudPricing />
