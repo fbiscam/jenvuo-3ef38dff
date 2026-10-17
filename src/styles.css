@@ -1228,3 +1228,5 @@ html body .dash-dark main.bg-white { background-color: oklch(0.165 0 0) !importa
 .dash-dark main button.bg-white,
 .dash-dark main a.bg-white { box-shadow: 0 0 0 1px oklch(0.3 0 0) !important; }
 @media (min-width: 1024px) { .jenvu-build-zoom { zoom: 1.15; } }
+
+@keyframes gc-marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
