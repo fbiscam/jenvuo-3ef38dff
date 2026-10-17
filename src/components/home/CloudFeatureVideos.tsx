@@ -118,21 +118,21 @@ function SceneDemo({ t }: { t: number }) {
   const up = pnl >= 0;
   return (
     <div className="flex h-full flex-col items-center justify-center text-center">
-      <div className="text-[11px] tracking-wide text-gc-night-ink/70">DEMO · XAU/USD BUY 0.10</div>
+      <div className="text-[11px] tracking-wide text-gc-ink-muted">DEMO · XAU/USD BUY 0.10</div>
       <div className={`mt-1 text-[34px] font-medium tabular-nums ${up ? "text-gc-green" : "text-gc-red"}`}>
         {up ? "+" : "-"}${Math.abs(pnl).toFixed(2)}
       </div>
-      <div className="mt-1 text-[11px] text-gc-night-ink/70">Balance $100,000 · auto close on</div>
+      <div className="mt-1 text-[11px] text-gc-ink-muted">Balance $100,000 · auto close on</div>
     </div>
   );
 }
 
 type Card = { name: string; text: React.ReactNode; to: string; Scene: React.ComponentType<{ t: number }> };
 const CARDS: Card[] = [
-  { name: "Live candles", to: "/pricing", Scene: SceneCandles, text: <><b className="font-medium text-gc-ink">Jenvu Terminal</b> streams live XAU/USD candles with swing labels that stay fixed onces</> },
-  { name: "Fresh sweep", to: "/help", Scene: SceneSweep, text: <><b className="font-medium text-gc-ink">Fresh sweep</b> spots wicks that take prior highs or lows, then confirms only when price reverses</> },
+  { name: "Live candles", to: "/pricing", Scene: SceneCandles, text: <><b className="font-medium text-gc-ink">Jenvu Terminal</b> streams live XAU/USD candles with swing labels that stay fixed once each candle closes</> },
+  { name: "Fresh sweep", to: "/help", Scene: SceneSweep, text: <><b className="font-medium text-gc-ink">Fresh sweep</b> spots wicks that take prior highs or lows, then confirms only when price really reverses</> },
   { name: "AI desk", to: "/ai-engine", Scene: SceneAi, text: <><b className="font-medium text-gc-ink">Jenvu AI</b> reads the same chart you see and answers exactly the question you asked</> },
-  { name: "Volume RVOL", to: "/help", Scene: SceneVolume, text: <><b className="font-medium text-gc-ink">RVOL</b> colours unusual volume spikes and shows an estimated buyer and seller on every candle</> },
+  { name: "Volume RVOL", to: "/help", Scene: SceneVolume, text: <><b className="font-medium text-gc-ink">RVOL</b> colours unusual volume spikes and shows an estimated buyer and seller share on every candle</> },
   { name: "Demo trading", to: "/pricing", Scene: SceneDemo, text: <><b className="font-medium text-gc-ink">Demo trading</b> lets you practise on a $100,000 account with live profit and loss</> },
 ];
 
@@ -148,11 +148,11 @@ function FeatureCard({ card }: { card: Card }) {
           Explore feature
         </Link>
       </div>
-      <div className="relative h-[232px] border-t border-gc-line bg-gc-night bg-[linear-gradient(to_right,var(--gc-night-grid)_1px,transparent_1px),linear-gradient(to_bottom,var(--gc-night-grid)_1px,transparent_1px)] bg-[size:24px_24px]">
+      <div className="relative h-[232px] border-t border-gc-line bg-background bg-[linear-gradient(to_right,var(--gc-panel)_1px,transparent_1px),linear-gradient(to_bottom,var(--gc-panel)_1px,transparent_1px)] bg-[size:24px_24px]">
         <div className={`absolute inset-0 transition-opacity ${playing ? "opacity-100" : "opacity-60"}`}>
           <Scene t={t} />
         </div>
-        <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-gc-night to-transparent" />
+        <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-background to-transparent" />
         <button
           type="button"
           aria-label={playing ? `Pause ${card.name}` : `Play ${card.name}`}
@@ -161,9 +161,9 @@ function FeatureCard({ card }: { card: Card }) {
         >
           {playing ? <Pause className="h-5 w-5" /> : <Play className="ml-0.5 h-5 w-5" />}
         </button>
-        <div className="absolute bottom-5 left-7 text-[22px] font-medium leading-[1.2] text-gc-night-ink">
+        <div className="absolute bottom-5 left-7 text-[22px] font-medium leading-[1.2] text-gc-ink">
           {card.name}
-          <br />
+          <br />+ Jenvu
         </div>
         {playing && (
           <span className="absolute right-4 top-4 flex items-center gap-1.5 rounded-full bg-gc-red px-2 py-0.5 text-[10px] font-medium tracking-wide text-gc-on-blue">
