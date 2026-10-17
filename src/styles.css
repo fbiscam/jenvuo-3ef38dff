@@ -512,9 +512,11 @@
 
 
 /* Homepage: menu keeps the site zoom, page content renders smaller */
-@media (min-width: 1024px) { .jenvu-home-content { zoom: 0.72; } }
-@media (min-width: 1360px) { .jenvu-home-content { zoom: 0.78; } }
-@media (min-width: 1680px) { .jenvu-home-content { zoom: 0.82; } }
+@media (min-width: 1024px) { .jenvu-home-content { zoom: 0.96; } .jenvu-home-header { zoom: 0.70; } }
+@media (min-width: 1200px) { .jenvu-home-header { zoom: 0.77; } }
+@media (min-width: 1360px) { .jenvu-home-content { zoom: 1.04; } .jenvu-home-header { zoom: 0.86; } }
+@media (min-width: 1500px) { .jenvu-home-header { zoom: 0.94; } }
+@media (min-width: 1680px) { .jenvu-home-content { zoom: 1.09; } .jenvu-home-header { zoom: 1; } }
 
 @media (min-width: 1024px) { .killzones-root { zoom: 1.25; } }
 @media (min-width: 1280px) and (min-height: 800px) { .jenvu-auth-zoom { zoom: 1.21; } }
@@ -722,6 +724,7 @@ html[data-pwa="1"] body {
 }
 html[data-pwa="1"] .jenvu-zoom,
 html[data-pwa="1"] .jenvu-home-content,
+html[data-pwa="1"] .jenvu-home-header,
 html[data-pwa="1"] .jenvu-zoom-dashboard {
   zoom: 1 !important;
   background: #ffffff !important;
