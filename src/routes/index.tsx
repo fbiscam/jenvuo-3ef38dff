@@ -28,6 +28,7 @@ import {
   CloudFinalCta,
 } from "@/components/home/CloudHome";
 import { CloudFeatureVideos } from "@/components/home/CloudFeatureVideos";
+import { CloudSolutions, CloudLogoStrip } from "@/components/home/CloudSolutions";
 import TailoredToDesk from "@/components/TailoredToDesk";
 
 import {
@@ -520,6 +521,8 @@ function HomePage() {
           <CloudAudiences />
           <CloudBuildWith />
           <CloudFeatureVideos />
+          <CloudSolutions />
+          <CloudLogoStrip />
           <CloudProducts />
           <CloudUseCases />
           <CloudPricing />
