@@ -108,7 +108,7 @@ function HeroBanners() {
   );
 }
 
-import { Check, Sparkles, Zap, Crown, Minus, Menu, X, Chrome, MessageSquare, ScanLine, Database, Wifi, Box } from "lucide-react";
+import { Check, Sparkles, Zap, Crown, Minus, Menu, X, Chrome, MessageSquare, ScanLine, Database, Wifi, Box, Search } from "lucide-react";
 
 import xaiLogo from "@/assets/xai-logo.png";
 
@@ -442,7 +442,7 @@ function HomePage() {
       </header>
 
       {mobileMenuOpen && (
-        <div className="fixed inset-0 z-[60] md:hidden" role="dialog" aria-modal="true">
+        <div className="fixed inset-0 z-[60] lg:hidden" role="dialog" aria-modal="true">
           <div className="absolute inset-0 bg-zinc-900/40" onClick={() => setMobileMenuOpen(false)} />
           <div className="absolute inset-x-0 top-0 bg-white border-b border-zinc-100 shadow-lg">
             <div className="flex items-center justify-between px-5 py-3">
