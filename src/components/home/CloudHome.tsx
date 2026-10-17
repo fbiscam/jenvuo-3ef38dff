@@ -4,6 +4,8 @@ import {
   ArrowRight,
   ChevronLeft,
   ChevronRight,
+  ChevronDown,
+  Check,
   BarChart3,
   Bell,
   Bot,
@@ -26,6 +28,9 @@ import cardGold from "@/assets/home/card-gold.jpg";
 import tradeDesk from "@/assets/home/trade-desk.jpg";
 import tradeChart from "@/assets/home/trade-chart.jpg";
 import tradeGold from "@/assets/home/trade-gold.jpg";
+import tradeNeonStart from "@/assets/home/trade-neon-start.jpg";
+import tradeNeonPractice from "@/assets/home/trade-neon-practice.jpg";
+import tradeNeonLearn from "@/assets/home/trade-neon-learn.jpg";
 import devModels from "@/assets/home/dev-models.jpg";
 import devExtension from "@/assets/home/dev-extension.jpg";
 import devDocs from "@/assets/home/dev-docs.jpg";
@@ -234,9 +239,9 @@ const AUDIENCES: Array<{ key: string; label: string; cards: AudienceCard[] }> = 
     key: "traders",
     label: "Traders",
     cards: [
-      { tag: "NEW TRADERS", text: "New sign-ups get 14 days of Pro access to the gold Terminal, AI desk and alerts", to: "/auth", img: tradeDesk },
-      { tag: "PRACTICE", text: "Practice your ideas on a $100,000 demo account with automatic closing", to: "/pricing", img: tradeChart },
-      { tag: "LEARN", text: "Read daily XAU/USD insights and step-by-step guides on sweeps, zones", to: "/insights", img: tradeGold },
+      { tag: "NEW TRADERS", text: "New sign-ups get 14 days of Pro access to the gold Terminal, AI desk and alerts", to: "/auth", img: tradeNeonStart },
+      { tag: "PRACTICE", text: "Practice your ideas on a $100,000 demo account with automatic closing", to: "/pricing", img: tradeNeonPractice },
+      { tag: "LEARN", text: "Read daily XAU/USD insights and step-by-step guides on sweeps, zones", to: "/insights", img: tradeNeonLearn },
     ],
   },
   {
@@ -300,6 +305,98 @@ export function CloudAudiences() {
               )}
             </Link>
           ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ---------------- Build-with accordion (Google Cloud-style) ---------------- */
+const BUILD_ITEMS: Array<{ key: string; title: string; body: string; points: string[]; img: string; to: string; cta: string }> = [
+  {
+    key: "terminal",
+    title: "Read gold with the Jenvu Terminal",
+    body: "Live XAU/USD candles with structure, zones and fair value gaps drawn from closed candles only.",
+    points: ["HH / HL / LH / LL labels that never repaint", "Supply and demand zones with FVG", "Fresh sweep checks on 15M, 1H, 2H and 4H"],
+    img: tradeChart,
+    to: "/pricing",
+    cta: "Open the Terminal",
+  },
+  {
+    key: "ai",
+    title: "Ask the AI desk about your chart",
+    body: "Get a focused answer to exactly what you asked, with a clear WAIT when risk is unclear.",
+    points: ["Chart-aware answers in plain language", "Image and voice chat", "Top-tier models behind every reply"],
+    img: tradeDesk,
+    to: "/ai-engine",
+    cta: "Meet the AI desk",
+  },
+  {
+    key: "volume",
+    title: "Spot volume spikes and pressure",
+    body: "RVOL highlights unusual candles and shows an estimated buyer and seller share at a glance.",
+    points: ["Spike colours on every volume bar", "20-candle average line", "Estimated buy / sell split"],
+    img: tradeGold,
+    to: "/help",
+    cta: "Learn about RVOL",
+  },
+  {
+    key: "build",
+    title: "Build your own tools with Jenvu models",
+    body: "Use API keys to plug Jenvu models into your apps and bots at $3 per million tokens.",
+    points: ["Simple API keys from your dashboard", "TradingView browser extension", "Clear docs and guides"],
+    img: devModels,
+    to: "/pricing",
+    cta: "Get an API key",
+  },
+];
+
+export function CloudBuildWith() {
+  const [open, setOpen] = React.useState(BUILD_ITEMS[0].key);
+  const current = BUILD_ITEMS.find((b) => b.key === open) ?? BUILD_ITEMS[0];
+  return (
+    <section className="bg-background">
+      <div className="mx-auto max-w-[1296px] px-5 pb-20 pt-4 sm:px-8 md:pb-24">
+        <h2 className="text-[32px] font-normal leading-[1.2] text-gc-ink sm:text-[40px]">Build with the Jenvu gold platform</h2>
+        <div className="mt-10 grid items-start gap-10 md:grid-cols-2">
+          <div className="border-t border-gc-line">
+            {BUILD_ITEMS.map((b) => {
+              const isOpen = b.key === open;
+              return (
+                <div key={b.key} className="border-b border-gc-line">
+                  <button
+                    type="button"
+                    aria-expanded={isOpen}
+                    onClick={() => setOpen(b.key)}
+                    className="flex w-full items-center justify-between gap-4 py-5 text-left"
+                  >
+                    <span className={`text-[20px] leading-[1.4] ${isOpen ? "font-medium text-gc-ink" : "text-gc-ink/80"}`}>{b.title}</span>
+                    <ChevronDown className={`h-5 w-5 shrink-0 text-gc-ink-muted transition ${isOpen ? "rotate-180" : ""}`} />
+                  </button>
+                  {isOpen && (
+                    <div className="pb-6">
+                      <p className="text-[16px] leading-[1.6] text-gc-ink-muted">{b.body}</p>
+                      <ul className="mt-4 space-y-3">
+                        {b.points.map((p) => (
+                          <li key={p} className="flex items-start gap-3 text-[15px] text-gc-ink">
+                            <Check className="mt-0.5 h-5 w-5 shrink-0 text-gc-blue" />
+                            {p}
+                          </li>
+                        ))}
+                      </ul>
+                      <Link to={b.to} className="mt-5 inline-flex items-center gap-1 text-[15px] font-medium text-gc-blue hover:underline">
+                        {b.cta} <ArrowRight className="h-4 w-4" />
+                      </Link>
+                      <img src={b.img} alt="" loading="lazy" className="mt-6 aspect-[4/3] w-full rounded-2xl object-cover md:hidden" />
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+          <div className="hidden overflow-hidden rounded-3xl bg-gc-panel md:block">
+            <img key={current.key} src={current.img} alt="" loading="lazy" className="aspect-[4/3] w-full object-cover" />
+          </div>
         </div>
       </div>
     </section>
