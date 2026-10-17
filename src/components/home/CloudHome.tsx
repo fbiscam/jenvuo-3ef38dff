@@ -225,27 +225,27 @@ const AUDIENCES: Array<{ key: string; label: string; cards: AudienceCard[] }> = 
     key: "traders",
     label: "Traders",
     cards: [
-      { tag: "NEW TRADERS", text: "New sign-ups get 14 days of Pro access to the gold Terminal, AI desk and alerts.", to: "/auth" },
-      { tag: "PRACTICE", text: "Test your ideas on a $100,000 demo account with automatic stop loss and take profit.", to: "/pricing" },
-      { tag: "LEARN", text: "Read daily XAU/USD insights and step-by-step guides to sweeps, zones and FVGs.", to: "/insights" },
+      { tag: "NEW TRADERS", text: "New sign-ups get 14 days of Pro access.", to: "/auth", img: cardBlue },
+      { tag: "PRACTICE", text: "Test ideas on a $100,000 demo account.", to: "/pricing", img: cardWave },
+      { tag: "LEARN", text: "Daily XAU/USD insights and trading guides.", to: "/insights", img: cardGold },
     ],
   },
   {
     key: "developers",
     label: "Developers",
     cards: [
-      { tag: "API", text: "Use Jenvu models in your own tools with API keys at $3 per million tokens.", to: "/pricing", img: cardAi },
-      { tag: "EXTENSION", text: "Bring Jenvu analysis into TradingView with the browser side panel.", to: "/download", img: cardWave },
-      { tag: "DOCS", text: "Guides for the Terminal, AI desk, extension and API keys in the Help Centre.", to: "/help", logo: true },
+      { tag: "API", text: "Use Jenvu models via API at $3 per million tokens.", to: "/pricing", img: cardAi },
+      { tag: "EXTENSION", text: "Jenvu analysis inside TradingView.", to: "/download", img: cardWave },
+      { tag: "DOCS", text: "Guides for the Terminal, AI desk and API.", to: "/help", logo: true },
     ],
   },
   {
     key: "programs",
     label: "Special programs",
     cards: [
-      { tag: "FOUNDING PROGRAM", text: "Apply to the invite-only Founding Program and get your chosen plan once approved.", to: "/founding" },
-      { tag: "PLANS", text: "Pro $10, Elite $25 and Ultra $50 a month. Pick the plan that fits how you trade.", to: "/pricing" },
-      { tag: "SUPPORT", text: "Questions about plans or the Terminal? Our team answers through the contact page.", to: "/contact" },
+      { tag: "FOUNDING PROGRAM", text: "Apply to the invite-only Founding Program.", to: "/founding" },
+      { tag: "PLANS", text: "Pro $10, Elite $25 and Ultra $50 a month.", to: "/pricing" },
+      { tag: "SUPPORT", text: "Questions? Our team is here to help.", to: "/contact" },
     ],
   },
 ];
@@ -281,7 +281,7 @@ export function CloudAudiences() {
             >
               <div className="flex min-w-0 flex-1 flex-col justify-center px-4 py-5">
                 <div className="text-[12px] tracking-wide text-gc-ink-muted">{c.tag}</div>
-                <p className="mt-1 text-[16px] leading-[1.5] text-gc-ink">{c.text}</p>
+                <p className="mt-1 line-clamp-2 text-[16px] leading-[1.5] text-gc-ink">{c.text}</p>
               </div>
               {c.img && <img src={c.img} alt="" loading="lazy" className="w-[110px] shrink-0 object-cover" />}
               {c.logo && (
@@ -332,7 +332,7 @@ export function CloudProducts() {
                 <Icon className={`h-5 w-5 ${TONE[tone].fg}`} />
               </span>
               <h3 className="mt-5 text-[18px] font-medium text-gc-ink">{title}</h3>
-              <p className="mt-2 flex-1 text-[14px] leading-[1.6] text-gc-ink-muted">{body}</p>
+              <p className="mt-2 line-clamp-2 flex-1 text-[14px] leading-[1.6] text-gc-ink-muted">{body}</p>
               <span className="mt-5 inline-flex items-center gap-1 text-[14px] font-medium text-gc-blue">
                 Learn more <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
               </span>
