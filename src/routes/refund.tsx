@@ -19,7 +19,7 @@ function RefundPage() {
   return (
     <PageShell
       eyebrow="Legal"
-      highlight={{ title: 'How refunds work', text: 'Because credits and AI compute are delivered instantly, most purchases are final. The sections below explain the limited cases where a refund is available.' }}
+      highlight={{ title: 'How refunds work', text: 'Credits and AI compute are delivered instantly. Once credits are used, that payment is non-refundable. The sections below explain when a refund is available.' }}
       title="Refund Policy"
       intro="Jenvu is a digital service delivered instantly through credits, AI compute and live signals. This policy explains when refunds are — and are not — available."
     >
