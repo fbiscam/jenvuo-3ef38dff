@@ -52,7 +52,7 @@ export default function StartTrialBanner() {
   };
 
   return (
-    <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-gc-line bg-background px-4 py-2 sm:px-5">
+    <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-gc-line bg-background py-2 pl-4 pr-14 sm:pl-5 md:pr-5">
       <Gift className="h-5 w-5 shrink-0 text-gc-ink-muted" aria-hidden="true" />
       <p className="min-w-0 flex-1 text-[13px] text-gc-ink sm:text-[14px]">
         Start your Free Trial with $100 in credit and 14 days of Pro. Don't worry, you won't be charged when it ends.{" "}
