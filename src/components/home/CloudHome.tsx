@@ -154,7 +154,7 @@ export function CloudHero({ price, delta }: { price: string; delta: string }) {
           The new way to trade gold
         </h1>
         <p className="mx-auto mt-5 max-w-[820px] text-[16px] leading-[1.6] text-gc-ink-muted sm:text-[17px]">
-          Read the chart with AI. Spot sweeps, zones and FVGs live. Gold now {price} ({delta}).{" "}
+          Read the chart with AI. Spot sweeps, zones and FVGs live.{" "}
           <span className="font-medium text-gc-ink">Start now with 14 days of Pro access.</span>
         </p>
         <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
