@@ -109,7 +109,7 @@ const columns = [
 export default function SiteFooter({ className }: { className?: string }) {
   const year = new Date().getFullYear();
   return (
-    <footer className={`hide-in-pwa relative border-t border-gc-line bg-background ${className || ""}`}>
+    <footer className={`jenvu-site-footer hide-in-pwa relative border-t border-gc-line bg-background ${className || ""}`}>
       <div className="w-full px-6 py-10 sm:px-10 sm:py-12 lg:px-16">
         <div className="jenvu-footer-menu-zoom">
         <div className="grid grid-cols-2 gap-x-8 gap-y-10 md:grid-cols-5">
