@@ -235,7 +235,7 @@ const AUDIENCES: Array<{ key: string; label: string; cards: AudienceCard[] }> = 
     label: "Traders",
     cards: [
       { tag: "NEW TRADERS", text: "New sign-ups get 14 days of Pro access to the gold Terminal, AI desk and alerts.", to: "/auth", img: tradeDesk },
-      { tag: "PRACTICE", text: "Practice your ideas on a $100,000 demo account with automatic closing.", to: "/pricing", img: tradeChart },
+      { tag: "PRACTICE", text: "Practice your ideas on a $100,000 demo account with automatic closing", to: "/pricing", img: tradeChart },
       { tag: "LEARN", text: "Read daily XAU/USD insights and step-by-step guides on sweeps, zones", to: "/insights", img: tradeGold },
     ],
   },
