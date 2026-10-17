@@ -240,6 +240,11 @@ export function buildIndicatorSeries(id: IndicatorId): IndicatorSpec {
   return SPECS[id];
 }
 
+/** Creation and updates must use the same list: RVOL replaces plain Volume. */
+export function renderedIndicatorIds(ids: IndicatorId[]): IndicatorId[] {
+  return ids.includes("rvol") ? ids.filter((id) => id !== "volume") : ids;
+}
+
 export function isIndicatorId(v: unknown): v is IndicatorId {
   return typeof v === "string" && v in SPECS;
 }

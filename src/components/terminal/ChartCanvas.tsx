@@ -32,7 +32,7 @@ import type { ScriptResult } from "@/lib/chart/jenvu-script";
 import type { DemoPosition } from "@/lib/chart/demo-trading";
 import { DemoOrderOverlay, type DemoOrderActions } from "./DemoOrderOverlay";
 import { formatVolume } from "@/lib/chart/relative-volume";
-import { buildIndicatorSeries, type IndicatorId } from "./indicator-specs";
+import { buildIndicatorSeries, renderedIndicatorIds, type IndicatorId } from "./indicator-specs";
 
 export type ChartTheme = "light" | "dark";
 
@@ -477,10 +477,8 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
     let nextPane = 1;
     const updaters: Array<(b: OhlcvBar[]) => void> = [];
 
-    const activeIds = propsRef.current.indicators;
+    const activeIds = renderedIndicatorIds(propsRef.current.indicators);
     for (const id of activeIds) {
-      // RVOL already draws the same volume bars in the bottom strip.
-      if (id === "volume" && activeIds.includes("rvol")) continue;
       const spec = buildIndicatorSeries(id);
       const pane = spec.pane === "main" ? 0 : spec.pane === "volume" ? 0 : nextPane++;
       const created = spec.lines.map((line) => {
@@ -597,7 +595,7 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
     const { bars, scripts, indicators } = propsRef.current;
     // Script series are appended after indicator series.
     let offset = 0;
-    for (const id of indicators) offset += buildIndicatorSeries(id).lines.length;
+    for (const id of renderedIndicatorIds(indicators)) offset += buildIndicatorSeries(id).lines.length;
     for (const script of scripts) {
       script.result.plots.forEach((plot) => {
         const s = extraSeriesRef.current[offset++];
@@ -641,7 +639,7 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
     if (!chart) return;
     const { bars, indicators } = propsRef.current;
     let offset = 0;
-    for (const id of indicators) {
+    for (const id of renderedIndicatorIds(indicators)) {
       const spec = buildIndicatorSeries(id);
       const values = spec.compute(bars);
       spec.lines.forEach((line, i) => {
