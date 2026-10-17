@@ -389,7 +389,7 @@ function HomePage() {
             <span className="truncate text-[22px] leading-none tracking-tight text-gc-ink" style={{ fontFamily: "\"Google Sans\", \"Product Sans\", \"DM Sans\", system-ui, sans-serif", fontWeight: 500 }}>Jenvu</span>
           </Link>
 
-          <nav className="ml-6 hidden min-w-0 items-center gap-0.5 text-[14px] text-gc-ink-muted lg:flex [&>a]:rounded-md [&>a]:px-2.5 [&>a]:py-2 [&>a:hover]:bg-gc-surface [&>a:hover]:text-gc-ink">
+          <nav className="ml-6 hidden min-w-0 items-center gap-0.5 whitespace-nowrap text-[14px] text-gc-ink-muted lg:flex [&>a]:rounded-md [&>a]:px-2.5 [&>a]:py-2 [&>a:hover]:bg-gc-surface [&>a:hover]:text-gc-ink">
             <Link to="/about">Overview</Link>
             <Link to="/strategies/ict-gold-trading">Solutions</Link>
             <Link to="/ai-engine">Products</Link>
@@ -402,7 +402,7 @@ function HomePage() {
             <Link to="/help" aria-label="Search help" className="hidden h-10 w-10 items-center justify-center rounded-full text-gc-ink-muted hover:bg-gc-surface md:inline-flex">
               <Search className="h-5 w-5" />
             </Link>
-            <div className="hidden items-center text-[14px] md:flex [&>a]:rounded-md [&>a]:px-2.5 [&>a]:py-2 [&>a:hover]:bg-gc-surface">
+            <div className="hidden items-center whitespace-nowrap text-[14px] md:flex [&>a]:rounded-md [&>a]:px-2.5 [&>a]:py-2 [&>a:hover]:bg-gc-surface">
               <Link to="/help" className="text-gc-ink-muted hover:text-gc-ink">Docs</Link>
               <Link to="/contact" className="text-gc-ink-muted hover:text-gc-ink">Support</Link>
               <Link to="/dashboard" className="text-gc-blue">Console</Link>
@@ -416,7 +416,7 @@ function HomePage() {
               </Link>
             ) : (
               <>
-                <Link to="/auth" className="ml-1 hidden rounded-md px-2.5 py-2 text-[14px] text-gc-ink-muted hover:bg-gc-surface hover:text-gc-ink md:inline-flex">
+                <Link to="/auth" className="ml-1 hidden whitespace-nowrap rounded-md px-2.5 py-2 text-[14px] text-gc-ink-muted hover:bg-gc-surface hover:text-gc-ink xl:inline-flex">
                   Sign in
                 </Link>
                 <Link
