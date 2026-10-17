@@ -18,7 +18,7 @@ import RegionEarth from "@/components/RegionEarth";
 import TrustedDesks from "@/components/TrustedDesks";
 import { WhyJenvu } from "@/components/WhyJenvu";
 import {
-  CloudAnnouncement,
+  CloudAudiences,
   CloudHero,
   CloudProducts,
   CloudUseCases,
@@ -108,7 +108,7 @@ function HeroBanners() {
   );
 }
 
-import { Check, Sparkles, Zap, Crown, Minus, Menu, X, Chrome, MessageSquare, ScanLine, Database, Wifi, Box } from "lucide-react";
+import { Check, Sparkles, Zap, Crown, Minus, Menu, X, Chrome, MessageSquare, ScanLine, Database, Wifi, Box, Search } from "lucide-react";
 
 import xaiLogo from "@/assets/xai-logo.png";
 
@@ -380,45 +380,69 @@ function HomePage() {
   }, [mobileMenuOpen]);
   return (
     <>
-    <div className={`jenvu-zoom min-h-dvh w-full bg-background text-gc-ink ${SANS} antialiased`}>
-      {/* NAV */}
-      <header className="sticky top-0 z-50 border-b border-gc-line bg-background">
-        <div className="relative mx-auto flex max-w-[1296px] items-center justify-between gap-3 px-5 py-3 sm:px-8">
-          <Link to="/" className="flex min-w-0 items-center gap-2.5">
+    <div className={`min-h-dvh w-full bg-background text-gc-ink ${SANS} antialiased`}>
+      {/* NAV — Google Cloud style; keeps the site zoom so the menu size stays the same */}
+      <header className="jenvu-zoom sticky top-0 z-50 bg-background">
+        <div className="relative flex items-center gap-3 px-4 py-2.5 sm:px-4">
+          <Link to="/" className="flex min-w-0 shrink-0 items-center gap-2">
             <img src="/favicon.png" alt="Jenvu" className="h-7 w-7 shrink-0 rounded-md object-contain" />
-            <span className="truncate text-[22px] tracking-tight leading-none" style={{ color: "#3c4043", fontFamily: "\"Google Sans\", \"Product Sans\", \"DM Sans\", system-ui, sans-serif", fontWeight: 500 }}>Jenvu</span>
+            <span className="truncate text-[22px] leading-none tracking-tight text-gc-ink" style={{ fontFamily: "\"Google Sans\", \"Product Sans\", \"DM Sans\", system-ui, sans-serif", fontWeight: 500 }}>Jenvu</span>
           </Link>
 
-          <nav className="hidden md:flex mr-auto ml-10 items-center gap-1 text-[14px] font-medium text-gc-ink-muted [&>a]:rounded-md [&>a]:px-3 [&>a]:py-2 [&>a:hover]:bg-gc-surface [&>a:hover]:text-gc-ink">
-            <Link to="/pricing" className="hover:text-zinc-900">Pricing</Link>
-            <Link to="/founding" className="hover:text-zinc-900">Founding</Link>
-            <Link to="/insights" className="hover:text-zinc-900">Insights</Link>
-            <Link to="/help" className="hover:text-zinc-900">Help Centre</Link>
-            <Link to="/contact" className="hover:text-zinc-900">Contact</Link>
-
+          <nav className="ml-6 hidden min-w-0 items-center gap-0.5 whitespace-nowrap text-[14px] text-gc-ink-muted lg:flex [&>a]:rounded-md [&>a]:px-2.5 [&>a]:py-2 [&>a:hover]:bg-gc-surface [&>a:hover]:text-gc-ink">
+            <Link to="/about">Overview</Link>
+            <Link to="/strategies/ict-gold-trading">Solutions</Link>
+            <Link to="/ai-engine">Products</Link>
+            <Link to="/pricing">Pricing</Link>
+            <Link to="/insights">Resources</Link>
+            <Link to="/contact" className="!text-gc-blue">Contact us</Link>
           </nav>
-          <div className="flex items-center gap-2">
-            <div className={isAuthed ? "" : "hidden md:block"}>
-              <HeaderAuthButtons />
+
+          <div className="ml-auto flex shrink-0 items-center gap-1">
+            <Link to="/help" aria-label="Search help" className="hidden h-10 w-10 items-center justify-center rounded-full text-gc-ink-muted hover:bg-gc-surface md:inline-flex">
+              <Search className="h-5 w-5" />
+            </Link>
+            <div className="hidden items-center whitespace-nowrap text-[14px] md:flex [&>a]:rounded-md [&>a]:px-2.5 [&>a]:py-2 [&>a:hover]:bg-gc-surface">
+              <Link to="/help" className="text-gc-ink-muted hover:text-gc-ink">Docs</Link>
+              <Link to="/contact" className="text-gc-ink-muted hover:text-gc-ink">Support</Link>
+              <Link to="/dashboard" className="text-gc-blue">Console</Link>
             </div>
+            {isAuthed ? (
+              <Link
+                to="/dashboard"
+                className="ml-2 inline-flex h-10 items-center justify-center rounded-full bg-gc-blue px-4 text-[14px] font-medium text-gc-on-blue hover:bg-gc-blue-hover"
+              >
+                Dashboard
+              </Link>
+            ) : (
+              <>
+                <Link to="/auth" className="ml-1 hidden whitespace-nowrap rounded-md px-2.5 py-2 text-[14px] text-gc-ink-muted hover:bg-gc-surface hover:text-gc-ink xl:inline-flex">
+                  Sign in
+                </Link>
+                <Link
+                  to="/auth"
+                  search={{ mode: "signup" } as never}
+                  className="ml-2 inline-flex h-10 items-center justify-center rounded-full bg-gc-blue px-4 text-[14px] font-medium text-gc-on-blue hover:bg-gc-blue-hover"
+                >
+                  Start free
+                </Link>
+              </>
+            )}
             <button
               type="button"
               aria-label="Open menu"
               aria-expanded={mobileMenuOpen}
               onClick={() => setMobileMenuOpen(true)}
-              className="md:hidden inline-flex h-9 w-9 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-900 hover:bg-zinc-50"
+              className="ml-1 inline-flex h-10 w-10 items-center justify-center rounded-full text-gc-ink hover:bg-gc-surface lg:hidden"
             >
-              <Menu className="h-4 w-4" />
+              <Menu className="h-5 w-5" />
             </button>
           </div>
-
-
         </div>
-
       </header>
 
       {mobileMenuOpen && (
-        <div className="fixed inset-0 z-[60] md:hidden" role="dialog" aria-modal="true">
+        <div className="fixed inset-0 z-[60] lg:hidden" role="dialog" aria-modal="true">
           <div className="absolute inset-0 bg-zinc-900/40" onClick={() => setMobileMenuOpen(false)} />
           <div className="absolute inset-x-0 top-0 bg-white border-b border-zinc-100 shadow-lg">
             <div className="flex items-center justify-between px-5 py-3">
@@ -437,11 +461,13 @@ function HomePage() {
             </div>
             <nav className="flex flex-col px-3 pb-4 pt-1 text-[15px] text-zinc-900">
               {[
+                { to: "/about", label: "Overview" },
+                { to: "/strategies/ict-gold-trading", label: "Solutions" },
+                { to: "/ai-engine", label: "Products" },
                 { to: "/pricing", label: "Pricing" },
-                { to: "/founding", label: "Founding" },
-                { to: "/insights", label: "Insights" },
-                { to: "/help", label: "Help Centre" },
-                { to: "/contact", label: "Contact" },
+                { to: "/insights", label: "Resources" },
+                { to: "/help", label: "Docs" },
+                { to: "/contact", label: "Contact us" },
               ].map((it) => (
 
                 <Link
@@ -486,17 +512,19 @@ function HomePage() {
       )}
 
 
-      <CloudAnnouncement />
-      <main>
-        <CloudHero price={xau?.[1] ?? "—"} delta={xau?.[2] ?? "…"} />
-        <CloudProducts />
-        <CloudUseCases />
-        <CloudPricing />
-        <CloudResources />
-        <CloudFinalCta />
-      </main>
+      <div className="jenvu-home-content">
+        <main>
+          <CloudHero price={xau?.[1] ?? "—"} delta={xau?.[2] ?? "…"} />
+          <CloudAudiences />
+          <CloudProducts />
+          <CloudUseCases />
+          <CloudPricing />
+          <CloudResources />
+          <CloudFinalCta />
+        </main>
 
-      <SiteFooter />
+        <SiteFooter />
+      </div>
     </div>
     </>
 
