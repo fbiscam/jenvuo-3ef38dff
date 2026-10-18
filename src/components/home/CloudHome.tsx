@@ -21,13 +21,10 @@ import {
   LifeBuoy,
   Users,
 } from "lucide-react";
-import cardBlue from "@/assets/home/card-blue.jpg";
-import cardAi from "@/assets/home/card-ai.jpg";
-import cardWave from "@/assets/home/card-wave.jpg";
-import cardGold from "@/assets/home/card-gold.jpg";
 import tradeDesk from "@/assets/home/trade-desk.jpg";
 import tradeChart from "@/assets/home/trade-chart.jpg";
 import tradeGold from "@/assets/home/trade-gold.jpg";
+import { STORIES } from "@/lib/stories";
 import tradeNeonStart from "@/assets/home/trade-neon-start.jpg";
 import tradeNeonPractice from "@/assets/home/trade-neon-practice.jpg";
 import tradeNeonLearn from "@/assets/home/trade-neon-learn.jpg";
@@ -37,10 +34,6 @@ import devDocs from "@/assets/home/dev-docs.jpg";
 import progFounding from "@/assets/home/prog-founding.jpg";
 import progPlans from "@/assets/home/prog-plans.jpg";
 import progSupport from "@/assets/home/prog-support.jpg";
-import placeFloor from "@/assets/home/place-floor.jpg";
-import placeVault from "@/assets/home/place-vault.jpg";
-import placeLondon from "@/assets/home/place-london.jpg";
-import placeDev from "@/assets/home/place-dev.jpg";
 
 type Tone = "blue" | "red" | "yellow" | "green";
 
@@ -158,23 +151,38 @@ function HeroMockup({ price, delta }: { price: string; delta: string }) {
   );
 }
 
-const STORIES = [
-  { img: cardBlue, tag: "TOP STORY", title: "Fresh sweep detection now on 15M, 1H, 2H and 4H", to: "/help" },
-  { img: cardAi, tag: "AI ANNOUNCEMENTS", title: "What's new in the Jenvu AI desk this month", to: "/ai-engine" },
-  { img: cardWave, tag: "VOLUME", title: "RVOL spikes and buyer/seller share on every candle", to: "/help" },
-  { img: cardGold, tag: "GOLD MARKET", title: "Daily XAU/USD insights and trading guides", to: "/insights" },
-  { img: placeFloor, tag: "DEMO TRADING", title: "Practice on a $100,000 demo account with no risk", to: "/pricing" },
-  { img: placeVault, tag: "FOUNDING PROGRAM", title: "Apply to the invite-only Founding Program today", to: "/founding" },
-  { img: placeLondon, tag: "SESSIONS", title: "Trade the London and New York sessions with clear zones", to: "/insights" },
-  { img: placeDev, tag: "DEVELOPERS", title: "Build with Jenvu models using API keys and the extension", to: "/download" },
-];
+/** Stories rendered three times so the rail can loop endlessly in both directions. */
+const LOOP_STORIES = [0, 1, 2].flatMap((copy) => STORIES.map((s) => ({ ...s, copy })));
 
 export function CloudHero({ price: _price, delta: _delta }: { price: string; delta: string }) {
   const railRef = React.useRef<HTMLDivElement>(null);
+  // Width of one full set of stories (cards + gaps).
+  const setWidth = React.useCallback(() => {
+    const el = railRef.current;
+    if (!el) return 0;
+    const first = el.children[0] as HTMLElement | undefined;
+    const middle = el.children[STORIES.length] as HTMLElement | undefined;
+    return first && middle ? middle.offsetLeft - first.offsetLeft : 0;
+  }, []);
+  // Start on the middle copy so there's room to move either way.
+  React.useLayoutEffect(() => {
+    const el = railRef.current;
+    if (el) el.scrollLeft = setWidth();
+  }, [setWidth]);
+  // When the rail drifts into the first or last copy, jump silently by one set.
+  const onScroll = () => {
+    const el = railRef.current;
+    const w = setWidth();
+    if (!el || !w) return;
+    if (el.scrollLeft < w * 0.5) el.scrollLeft += w;
+    else if (el.scrollLeft > w * 1.5) el.scrollLeft -= w;
+  };
   const scrollRail = (dir: 1 | -1) => {
     const el = railRef.current;
     if (!el) return;
-    el.scrollBy({ left: dir * Math.max(320, el.clientWidth * 0.6), behavior: "smooth" });
+    const card = el.children[0] as HTMLElement | undefined;
+    const step = card ? card.offsetWidth + 24 : 320;
+    el.scrollBy({ left: dir * step, behavior: "smooth" });
   };
   return (
     <section className="overflow-hidden bg-background">
@@ -203,11 +211,14 @@ export function CloudHero({ price: _price, delta: _delta }: { price: string; del
           </Link>
         </div>
       </div>
-      <div ref={railRef} className="flex snap-x snap-mandatory scroll-smooth gap-6 overflow-x-auto px-5 [scrollbar-width:none] sm:px-8 [&::-webkit-scrollbar]:hidden">
-        {STORIES.map((s, i) => (
+      <div ref={railRef} onScroll={onScroll} className="flex snap-x snap-mandatory gap-6 overflow-x-auto px-5 [scrollbar-width:none] sm:px-8 [&::-webkit-scrollbar]:hidden">
+        {LOOP_STORIES.map((s, i) => (
           <Link
-            key={s.title}
-            to={s.to}
+            key={`${s.copy}-${s.slug}`}
+            to="/stories/$slug"
+            params={{ slug: s.slug }}
+            aria-hidden={s.copy !== 1 || undefined}
+            tabIndex={s.copy !== 1 ? -1 : undefined}
             className="group relative h-[300px] w-[85vw] max-w-[448px] shrink-0 snap-start overflow-hidden rounded-3xl bg-gc-ink"
           >
             <img
@@ -215,7 +226,7 @@ export function CloudHero({ price: _price, delta: _delta }: { price: string; del
               alt=""
               width={1024}
               height={640}
-              loading={i === 0 ? "eager" : "lazy"}
+              loading={i === STORIES.length ? "eager" : "lazy"}
               className="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-105"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-gc-ink/80 via-gc-ink/10 to-transparent" />
