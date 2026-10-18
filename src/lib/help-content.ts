@@ -629,7 +629,7 @@ export const collections: Collection[] = [
       },
       {
         slug: "data-privacy",
-        title: "How is my data handled?",
+        title: "How data is handled",
         summary: "See our Privacy Policy for the full breakdown.",
         updatedAt: "2026-06-30",
         body: [
@@ -663,7 +663,7 @@ export const collections: Collection[] = [
     articles: [
       {
         slug: "install",
-        title: "Install on iOS and Android",
+        title: "Install the mobile app",
         summary: "Download links are on the Download page.",
         updatedAt: "2026-06-30",
         body: [
