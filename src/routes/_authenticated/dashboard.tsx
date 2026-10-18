@@ -1309,7 +1309,7 @@ function DashboardLayout() {
   }, [authUser?.id, authLoading, refreshTick]);
 
   // Console-style pages: menu stays closed until the user opens it from the top bar.
-  const drawerMode = !embedMode && pathname !== "/dashboard/terminal";
+  const drawerMode = !embedMode;
   const navCollapsed = drawerMode ? false : sidebarCollapsed && !mobileNavOpen;
   const themeApplies = false; // Black theme only on the Terminal page (its own switch).
   const dashDark = themeApplies && dashTheme === "dark";
@@ -1578,8 +1578,8 @@ function DashboardLayout() {
               : "flex min-h-0 w-full flex-1 flex-col overflow-hidden bg-background sm:mx-2 sm:w-auto sm:rounded-t-[20px]"
           }
         >
-        {drawerMode && <StartTrialBanner />}
-        {drawerMode && <NotificationStrip />}
+        {drawerMode && pathname !== "/dashboard/terminal" && <StartTrialBanner />}
+        {drawerMode && pathname !== "/dashboard/terminal" && <NotificationStrip />}
 
         <main
           className={
