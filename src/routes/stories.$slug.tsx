@@ -46,7 +46,7 @@ function StoryPage() {
   const related = [1, 2, 3].map((n) => STORIES[(idx + n) % STORIES.length]);
 
   return (
-    <PageShell wide eyebrow={story.tag} title={story.title} intro={story.intro}>
+    <PageShell wide oneLine eyebrow={story.tag} title={story.title} intro={story.intro}>
       {/* Feature: text and picture, vertically centred */}
       <section className="mx-auto grid max-w-[1040px] items-center gap-10 px-5 py-12 sm:px-8 md:grid-cols-2">
         <div>

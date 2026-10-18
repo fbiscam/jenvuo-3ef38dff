@@ -16,8 +16,11 @@ export function PageShell({
   intro,
   highlight,
   wide = false,
+  oneLine = false,
   children,
 }: {
+  /** Story pages: title and intro on one line on tablet/desktop, wrapping on phones. */
+  oneLine?: boolean;
   eyebrow?: string;
   title: ReactNode;
   intro?: string;
@@ -33,13 +36,13 @@ export function PageShell({
 
       {/* HERO — centered */}
       <section className="bg-background">
-        <div className="mx-auto max-w-3xl px-5 pb-12 pt-14 text-center sm:px-8 sm:pb-16 sm:pt-16">
-          {showEyebrow && <p className="text-[14px] font-medium text-gc-blue-deep">{eyebrow}</p>}
-          <h1 className="mt-2 whitespace-pre-line text-[32px] font-normal leading-[1.2] tracking-tight text-gc-ink sm:text-[40px]">
+        <div className={`mx-auto ${oneLine ? "max-w-[1400px]" : "max-w-3xl"} px-5 pb-12 pt-14 text-center sm:px-8 sm:pb-16 sm:pt-16`}>
+          {showEyebrow && <p className={`text-[14px] font-medium ${oneLine ? "text-gc-ink-muted" : "text-gc-blue-deep"}`}>{eyebrow}</p>}
+          <h1 className={`mt-2 whitespace-pre-line ${oneLine ? "text-[26px] sm:whitespace-nowrap sm:text-[clamp(22px,3.2vw,40px)]" : "text-[32px] sm:text-[40px]"} font-normal leading-[1.2] tracking-tight text-gc-ink`}>
             {title}
           </h1>
           {intro && (
-            <p className="mx-auto mt-5 max-w-[680px] text-[16px] leading-[1.6] text-gc-ink-muted">{intro}</p>
+            <p className={`mx-auto mt-5 ${oneLine ? "max-w-none line-clamp-2 sm:line-clamp-none sm:whitespace-nowrap sm:text-[clamp(11px,1.25vw,16px)]" : "max-w-[680px]"} text-[16px] leading-[1.6] text-gc-ink-muted`}>{intro}</p>
           )}
           <div className="mt-7 flex justify-center">
             <a
