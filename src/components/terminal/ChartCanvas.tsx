@@ -213,8 +213,8 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
         panes: { separatorColor: themeColors.border, enableResize: true },
       },
       grid: {
-        vertLines: { color: themeColors.grid },
-        horzLines: { color: themeColors.grid },
+        vertLines: { visible: false, color: themeColors.grid },
+        horzLines: { visible: false, color: themeColors.grid },
       },
       crosshair: { mode: CrosshairMode.Normal },
       rightPriceScale: { borderColor: themeColors.border },
@@ -308,7 +308,7 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
         textColor: t.text,
         panes: { separatorColor: t.border, enableResize: true },
       },
-      grid: { vertLines: { color: t.grid }, horzLines: { color: t.grid } },
+      grid: { vertLines: { visible: false, color: t.grid }, horzLines: { visible: false, color: t.grid } },
       rightPriceScale: { borderColor: t.border },
       timeScale: { borderColor: t.border },
     });
