@@ -109,7 +109,7 @@ export default function HeaderSearch({ onClose }: { onClose: () => void }) {
         {showPanel && showAnswer && (
           <div className="border-b border-gc-line bg-gc-panel px-4 py-3">
             <div className="mb-2 flex items-center gap-2 text-[12px] font-medium text-gc-ink-muted">
-              <Sparkles className="h-3.5 w-3.5 text-gc-blue" /> Ask Jenvu
+              Ask Jenvu
             </div>
             {answer.res === null ? (
               <div className="flex items-center gap-2 text-[13px]">
