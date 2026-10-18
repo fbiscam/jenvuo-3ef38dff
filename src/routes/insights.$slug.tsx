@@ -2,6 +2,8 @@ import SiteHeader from "@/components/SiteHeader";
 import HeaderAuthButtons from "@/components/HeaderAuthButtons";
 import { createFileRoute, Link, useParams, notFound } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { Twitter, Linkedin, Facebook, Mail } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
 import ReactMarkdown from "react-markdown";
@@ -267,5 +269,42 @@ function InsightDetailPage() {
 
       <SiteFooter />
     </div>
+  );
+}
+
+function RelatedArticles({ slug }: { slug: string }) {
+  const { data } = useQuery({
+    queryKey: ["insights-related", slug],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("insights")
+        .select("id, title, slug, category, content, image_url")
+        .neq("slug", slug)
+        .order("published_at", { ascending: false })
+        .limit(4);
+      if (error) throw error;
+      return data;
+    },
+  });
+  if (!data?.length) return null;
+  return (
+    <section className="mx-auto max-w-[1200px] border-t border-gc-line px-5 py-14 sm:px-8">
+      <h2 className="text-[20px] font-medium text-gc-ink">Related articles</h2>
+      <div className="mt-8 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+        {data.map((a) => {
+          const words = (a.content || "").trim().split(/\s+/).filter(Boolean).length;
+          return (
+            <Link key={a.id} to="/insights/$slug" params={{ slug: a.slug }} className="group text-center">
+              <div className="aspect-[16/9] overflow-hidden rounded-2xl border border-gc-line bg-gc-surface">
+                <img src={insightCoverUrl(a.title, a.category, a.image_url)} alt={a.title} loading="lazy" width={1280} height={720} className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
+              </div>
+              <span className="mt-6 inline-flex rounded border border-gc-line px-2 py-1 text-[14px] leading-none text-gc-ink">{a.category}</span>
+              <h3 className="mt-3 line-clamp-3 text-[18px] leading-[1.45] text-gc-ink group-hover:text-gc-blue">{a.title}</h3>
+              <div className="mt-2 text-[14px] text-gc-ink-muted">By Jenvu Team • {Math.max(1, Math.round(words / 220))}-minute read</div>
+            </Link>
+          );
+        })}
+      </div>
+    </section>
   );
 }
