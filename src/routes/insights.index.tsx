@@ -292,7 +292,7 @@ function InsightsPage() {
           )}
 
           {/* NEWSLETTER */}
-          <section className="mt-20 rounded-3xl bg-gc-canvas px-6 py-12 text-center sm:px-12">
+          <section id="subscribe" className="mt-20 scroll-mt-24 rounded-3xl bg-gc-canvas px-6 py-12 text-center sm:px-12">
             <h2 className="text-[26px] font-normal leading-[1.25] text-gc-ink sm:text-[32px]">Get new articles by email</h2>
             <p className="mx-auto mb-8 mt-3 max-w-xl text-[15px] leading-[1.6] text-gc-ink-muted">
               One short email when a new gold briefing goes live. Unsubscribe any time.
@@ -377,5 +377,23 @@ function SubscribeForm() {
         {busy ? "…" : "Subscribe"}
       </button>
     </form>
+  );
+}
+export function readMinutes(content: string | null | undefined): number {
+  const words = (content || "").trim().split(/\s+/).filter(Boolean).length;
+  return Math.max(1, Math.round(words / 220));
+}
+
+function Chip({ children }: { children: React.ReactNode }) {
+  return (
+    <span className="inline-flex rounded border border-gc-line px-2 py-1 text-[14px] leading-none text-gc-ink">{children}</span>
+  );
+}
+
+function Byline({ item }: { item: Insight }) {
+  return (
+    <div className="mt-3 text-[14px] text-gc-ink-muted">
+      By Jenvu Team • {readMinutes(item.content)}-minute read • {fmtUTC(item.published_at, "full")}
+    </div>
   );
 }
