@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Link, useNavigate } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
 import { Menu, Search, X } from "lucide-react";
 import HeaderSearch from "@/components/HeaderSearch";
 import { useAuthUser } from "@/hooks/useAuthUser";
