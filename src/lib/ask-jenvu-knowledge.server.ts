@@ -12,6 +12,7 @@ const CORE_FACTS = `
 - Plans (per month): Pro $10, Elite $25, Ultra $50. Annual billing saves about 17%. Usage is $3 per 1,000,000 tokens; wallet top-ups start at $5 ($5, $10, $25, $50 or a custom amount). Daily token allowance resets at 00:00 UTC.
 - Free trial: new accounts can claim $100 credit plus 14 days of Pro once, by clicking "Start free" in the dashboard top banner. Sign up is free and public.
 - Terminal access: available to admins and approved Founding Program members. The Founding Program is invite-only: apply at jenvu.com/founding. Approval grants the requested plan right away, with 2 days to complete ID verification.
+- Account rules: one person, one account. Sign-up checks the device, the network (IP), VPN/proxy use, throwaway emails and email aliases (like dots or +tags in Gmail). A device or network can hold at most 2 accounts, and the free trial can be claimed only once per person and device. Accounts are verified with a 6-digit email code.
 - Support: support@jenvu.com, Monday to Friday, 09:00 – 18:00 UTC. Contact form at jenvu.com/contact.
 - Developers: create API keys in the dashboard (dash.jenvu.com/api); AI assistants can connect to Jenvu through its MCP server.
 - Jenvu gives analysis and education, not financial advice. Trading carries risk. Never promise profits or a fixed win rate.

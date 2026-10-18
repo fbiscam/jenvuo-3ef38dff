@@ -33,6 +33,33 @@ function normalizeEmail(email: string) {
   return email.trim().toLowerCase()
 }
 
+// Gmail ignores dots and "+tags", most providers ignore "+tags": one inbox
+// can otherwise open many accounts (a.b+1@gmail.com, ab+2@gmail.com, ...).
+export function canonicalEmail(email: string): string {
+  const [rawLocal = '', rawDomain = ''] = normalizeEmail(email).split('@')
+  let domain = rawDomain === 'googlemail.com' ? 'gmail.com' : rawDomain
+  let local = rawLocal.split('+')[0]
+  if (domain === 'gmail.com') local = local.replace(/\./g, '')
+  return `${local}@${domain}`
+}
+
+async function assertNoEmailAlias(email: string) {
+  const canonical = canonicalEmail(email)
+  const [local, domain] = canonical.split('@')
+  if (!local || !domain) return
+  const domains = domain === 'gmail.com' ? ['gmail.com', 'googlemail.com'] : [domain]
+  const { supabaseAdmin } = await import('@/integrations/supabase/client.server')
+  for (const d of domains) {
+    const pattern = `${local.replace(/[%_\\]/g, '').split('').join('%')}%@${d}`
+    const { data } = await (supabaseAdmin as any).from('profiles').select('email').ilike('email', pattern).limit(50)
+    for (const row of (data ?? []) as { email: string | null }[]) {
+      if (row.email && normalizeEmail(row.email) !== normalizeEmail(email) && canonicalEmail(row.email) === canonical) {
+        throw new Error('An account already exists for this email inbox. Please sign in to your existing account.')
+      }
+    }
+  }
+}
+
 function publicSignupEnabled(): boolean {
   // Public signup is open; the Terminal itself stays locked to approved
   // Founding Program members (see terminal-access.server.ts).
@@ -222,6 +249,7 @@ export async function createSignupOtp(input: { email: string; password: string; 
   }
 
   assertSignupSignals(input)
+  await assertNoEmailAlias(email)
   await assertNotVpn(input.ip)
   await assertDeviceUnderCap(input.ip, input.fingerprint)
 
@@ -334,6 +362,7 @@ export async function verifySignupOtp(input: { email: string; code: string; pass
   try {
     assertSignupSignals(input)
     await assertNotVpn(input.ip)
+    await assertNoEmailAlias(email)
     await assertDeviceUnderCap(input.ip, input.fingerprint)
   } catch (e) {
     return { ok: false, error: e instanceof Error ? e.message : 'Signup not allowed on this device.' }
