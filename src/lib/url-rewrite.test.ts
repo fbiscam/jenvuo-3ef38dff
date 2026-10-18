@@ -8,7 +8,7 @@ describe("section hosts never swallow global pages", () => {
   });
 
   it("support.jenvu.com/docs is not rewritten into the help section", () => {
-    expect(rewriteInput(new URL("https://support.jenvu.com/docs"))).toBeUndefined();
+    expect(rewriteInput(new URL("https://support.jenvu.com/docs"))).toBe(undefined);
   });
 
   it("blogs.jenvu.com/search goes to jenvu.com/search", () => {
