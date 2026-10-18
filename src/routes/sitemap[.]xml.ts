@@ -29,6 +29,7 @@ export const Route = createFileRoute("/sitemap.xml")({
           { path: "/about", changefreq: "monthly", priority: "0.7" },
           { path: "/contact", changefreq: "monthly", priority: "0.7" },
           { path: "/docs", changefreq: "monthly", priority: "0.8" },
+          ...["fresh-sweep-detection","ai-desk-updates","rvol-and-volume-direction","daily-gold-insights","demo-trading","founding-program","london-new-york-sessions","build-with-jenvu"].map((slug) => ({ path: `/stories/${slug}`, changefreq: "monthly", priority: "0.6" })),
           { path: "/ai-engine", changefreq: "monthly", priority: "0.7" },
           { path: "/strategies/ict-gold-trading", changefreq: "monthly", priority: "0.8" },
           { path: "/llm", changefreq: "monthly", priority: "0.6" },

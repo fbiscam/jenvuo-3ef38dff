@@ -21,13 +21,10 @@ import {
   LifeBuoy,
   Users,
 } from "lucide-react";
-import cardBlue from "@/assets/home/card-blue.jpg";
-import cardAi from "@/assets/home/card-ai.jpg";
-import cardWave from "@/assets/home/card-wave.jpg";
-import cardGold from "@/assets/home/card-gold.jpg";
 import tradeDesk from "@/assets/home/trade-desk.jpg";
 import tradeChart from "@/assets/home/trade-chart.jpg";
 import tradeGold from "@/assets/home/trade-gold.jpg";
+import { STORIES } from "@/lib/stories";
 import tradeNeonStart from "@/assets/home/trade-neon-start.jpg";
 import tradeNeonPractice from "@/assets/home/trade-neon-practice.jpg";
 import tradeNeonLearn from "@/assets/home/trade-neon-learn.jpg";
@@ -37,10 +34,6 @@ import devDocs from "@/assets/home/dev-docs.jpg";
 import progFounding from "@/assets/home/prog-founding.jpg";
 import progPlans from "@/assets/home/prog-plans.jpg";
 import progSupport from "@/assets/home/prog-support.jpg";
-import placeFloor from "@/assets/home/place-floor.jpg";
-import placeVault from "@/assets/home/place-vault.jpg";
-import placeLondon from "@/assets/home/place-london.jpg";
-import placeDev from "@/assets/home/place-dev.jpg";
 
 type Tone = "blue" | "red" | "yellow" | "green";
 
@@ -233,7 +226,7 @@ export function CloudHero({ price: _price, delta: _delta }: { price: string; del
               alt=""
               width={1024}
               height={640}
-              loading={i === 0 ? "eager" : "lazy"}
+              loading={i === STORIES.length ? "eager" : "lazy"}
               className="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-105"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-gc-ink/80 via-gc-ink/10 to-transparent" />
