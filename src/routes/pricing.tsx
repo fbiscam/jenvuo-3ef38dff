@@ -93,6 +93,7 @@ function PricingPage() {
   return (
     <div className={`public-cloudflare jenvu-zoom min-h-dvh w-full bg-background text-gc-ink ${SANS} antialiased`}>
       <SiteHeader />
+      <div style={{ zoom: 0.85 }}>
 
       {/* HERO */}
       <section className="mx-auto max-w-[900px] px-5 pb-14 pt-14 text-center sm:px-8 sm:pt-16">
@@ -377,6 +378,7 @@ function PricingPage() {
       </section>
 
       <NextStep />
+      </div>
       <SiteFooter />
     </div>
   );
