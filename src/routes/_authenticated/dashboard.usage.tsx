@@ -10,6 +10,10 @@ import {
   Download,
   RefreshCw,
   Settings2,
+  DollarSign,
+  Wallet,
+  Layers,
+  Activity,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -389,11 +393,21 @@ function UsagePage() {
     return Object.keys(row.metadata).some((key) => /safety|moderation|blocked/i.test(key));
   });
 
+  const summaryCards = [
+    { label: "Total spend", value: derived.hasSpend ? fmtUsd(derived.spent, 2) : "$0.00", hint: rangeLabel, icon: <DollarSign className="h-4 w-4" />, chip: "bg-gc-blue-soft text-gc-blue" },
+    { label: "Wallet balance", value: fmtUsd(data.balance, 2), hint: daysLeft != null ? `Resets in ${daysLeft} days` : "Prepaid wallet", icon: <Wallet className="h-4 w-4" />, chip: "bg-gc-green-soft text-gc-success" },
+    { label: "Total tokens", value: fmtInt(derived.totalTokens), hint: "Input and output", icon: <Layers className="h-4 w-4" />, chip: "bg-gc-yellow-soft text-gc-ink" },
+    { label: "Total requests", value: fmtInt(derived.spendRows.length), hint: runway != null ? `About ${runway} days of balance left` : "No spend yet", icon: <Activity className="h-4 w-4" />, chip: "bg-gc-red-soft text-gc-red" },
+  ];
+
   return (
-    <div className="-mx-5 -mb-7 min-h-[calc(100dvh-4rem)] overflow-hidden bg-background text-foreground sm:-mx-8">
+    <div className="-mx-5 -mb-7 min-h-[calc(100dvh-4rem)] overflow-x-clip bg-gc-surface px-3 pb-8 pt-1 text-foreground sm:-mx-8 sm:px-6">
       {/* Header */}
-      <div className="flex min-h-14 flex-col gap-3 border-b border-border px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-6">
-        <h1 className="text-lg font-medium text-foreground">  Usage</h1>
+      <div className="flex min-h-14 flex-col gap-3 py-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="min-w-0">
+          <h1 className="text-[22px] font-normal tracking-tight text-gc-ink">Usage</h1>
+          <p className="mt-0.5 text-[13px] text-gc-ink-muted">Spend, tokens and requests across your API keys.</p>
+        </div>
         <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto_auto] items-center gap-2 sm:flex">
           <Dropdown
             open={openMenu === "model"}
@@ -448,7 +462,19 @@ function UsagePage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_320px]">
+      <div className="mb-4 grid grid-cols-2 gap-3 lg:grid-cols-4">
+        {summaryCards.map((c) => (
+          <div key={c.label} className="min-w-0 rounded-2xl border border-gc-line bg-background p-4 transition-shadow hover:shadow-md">
+            <div className="flex items-center justify-between gap-2">
+              <span className="truncate text-[12.5px] text-gc-ink-muted">{c.label}</span>
+              <span className={`grid h-8 w-8 shrink-0 place-items-center rounded-full ${c.chip}`}>{c.icon}</span>
+            </div>
+            <div className="mt-2 truncate text-[22px] font-normal tabular-nums tracking-tight text-gc-ink sm:text-[26px]">{c.value}</div>
+            <div className="mt-1 truncate text-[11.5px] text-gc-ink-muted">{c.hint}</div>
+          </div>
+        ))}
+      </div>
+      <div className="grid grid-cols-1 overflow-hidden rounded-2xl border border-gc-line bg-background shadow-sm xl:grid-cols-[minmax(0,1fr)_320px]">
         <div className="min-w-0">
           <section className="border-b border-border">
             <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3 px-4 pb-2 pt-5 sm:px-7">
