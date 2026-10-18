@@ -2,7 +2,7 @@ import * as React from "react";
 import { useRouterState } from "@tanstack/react-router";
 import {
   ArrowLeft, ArrowUp, Copy, CornerDownRight, FileText, Maximize2, MoreVertical,
-  RotateCw, SearchCheck, Sparkle, ThumbsDown, ThumbsUp, X, CheckCircle2, Loader2,
+  RotateCw, SearchCheck, ThumbsDown, ThumbsUp, X, CheckCircle2, Loader2,
 } from "lucide-react";
 import { toast } from "sonner";
 import { MessageResponse } from "@/components/ai-elements/message";
@@ -107,12 +107,12 @@ export function AskJenvuWidget() {
           onClick={() => { setView("chat"); setOpen(true); }}
           aria-label="Ask Jenvu"
           className={[
-            "fixed bottom-5 right-5 z-[9998] flex h-12 items-center justify-center gap-2 rounded-2xl bg-gc-sky text-[14px] font-medium text-gc-blue-deep",
+            "fixed bottom-5 right-5 z-[9998] flex h-14 items-center justify-center gap-2.5 rounded-2xl bg-gc-sky text-[15px] font-medium text-gc-blue-deep",
             "shadow-[0_2px_6px_rgba(60,64,67,0.15),0_6px_18px_rgba(60,64,67,0.18)] transition-all duration-300 hover:brightness-95",
-            compact ? "w-12 px-0" : "px-5",
+            compact ? "w-14 px-0" : "px-6",
           ].join(" ")}
         >
-          <Sparkle className="h-4 w-4 shrink-0 fill-gc-blue text-gc-blue" />
+          <img src={askJenvuMark} alt="" className="h-5 w-auto shrink-0" />
           {!compact && <span className="whitespace-nowrap">Ask Jenvu</span>}
         </button>
       )}
@@ -121,7 +121,7 @@ export function AskJenvuWidget() {
         <div
           role="dialog"
           aria-label="Ask Jenvu"
-          className="fixed inset-x-2 bottom-2 top-16 z-[9999] flex flex-col overflow-hidden rounded-2xl bg-background text-gc-ink shadow-[0_4px_12px_rgba(60,64,67,0.2),0_16px_48px_rgba(60,64,67,0.25)] ring-1 ring-gc-line sm:inset-x-auto sm:right-4 sm:bottom-4 sm:top-auto sm:h-[min(740px,calc(100vh-6rem))] sm:w-[440px] animate-in fade-in slide-in-from-bottom-4 duration-200"
+          className="fixed inset-x-2 bottom-2 top-16 z-[9999] flex flex-col overflow-hidden rounded-2xl bg-background text-gc-ink shadow-[0_4px_12px_rgba(60,64,67,0.2),0_16px_48px_rgba(60,64,67,0.25)] ring-1 ring-gc-line sm:inset-x-auto sm:right-4 sm:bottom-4 sm:top-auto sm:h-[min(560px,calc(100vh-6rem))] sm:w-[min(640px,calc(100vw-2rem))] animate-in fade-in slide-in-from-bottom-4 duration-200"
         >
           {/* Header */}
           <div className="relative flex h-14 shrink-0 items-center gap-2 px-5">
@@ -130,7 +130,9 @@ export function AskJenvuWidget() {
                 <ArrowLeft className="h-5 w-5" /> Return to conversation
               </button>
             ) : (
-              <span className="text-[16px]"> Ask Jenvu</span>
+              <span className="flex items-center gap-2.5 text-[16px]">
+                <img src={askJenvuMark} alt="" className="h-5 w-auto" /> Ask Jenvu
+              </span>
             )}
             <div className="ml-auto flex items-center">
               {!empty && (
