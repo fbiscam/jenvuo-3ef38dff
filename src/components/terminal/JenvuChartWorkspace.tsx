@@ -566,20 +566,19 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
     </>
   );
   const popClass = cn("font-sans subpixel-antialiased", theme === "dark" && "dark terminal-dark border-border bg-popover text-popover-foreground");
-  const railBtn = "flex w-12 flex-col items-center gap-1 rounded-xl px-1 py-2 text-[10px] font-medium leading-none text-muted-foreground transition-colors hover:bg-gc-blue-soft hover:text-foreground dark:hover:bg-accent";
+  const railBtn = "relative flex h-9 w-11 items-center justify-center rounded-r-full text-gc-ink-muted transition-colors hover:bg-gc-console-rail-active/60 data-[state=open]:bg-gc-console-rail-active data-[state=open]:text-gc-ink data-[state=open]:before:absolute data-[state=open]:before:inset-y-0 data-[state=open]:before:left-0 data-[state=open]:before:w-[3px] data-[state=open]:before:rounded-full data-[state=open]:before:bg-gc-ink dark:text-muted-foreground dark:hover:bg-accent dark:data-[state=open]:bg-accent dark:data-[state=open]:before:bg-foreground";
 
 
   const rail = (
-    <nav aria-label="Chart tools" className={cn("hidden w-16 shrink-0 flex-col items-center gap-1 py-2 md:flex", theme === "dark" ? "border-r border-border bg-background" : "bg-transparent")}>
+    <nav aria-label="Chart tools" className={cn("hidden w-14 shrink-0 flex-col items-start gap-1.5 pb-3 pt-2 md:flex", theme === "dark" ? "border-r border-border bg-background" : "bg-transparent")}>
       <Popover>
         <PopoverTrigger asChild>
           <button type="button" aria-label="Timeframe" title="Timeframe" className={railBtn}>
-            <Clock3 className="h-5 w-5" />
-            <span className="font-mono text-[11px] font-semibold text-foreground">{timeframe.label}</span>
+            <Clock3 className="h-[18px] w-[18px]" />
           </button>
         </PopoverTrigger>
         <PopoverContent side="right" align="start" className={cn("w-56 p-1.5", popClass)}>
-          <p className="px-2 pb-1.5 pt-1 text-sm text-foreground">Timeframe</p>
+          <p className="px-2 pb-1.5 pt-1 text-sm text-foreground">Timeframe · <span className="font-mono font-semibold">{timeframe.label}</span></p>
           <div className="grid grid-cols-3 gap-1">
             {timeframes.map((item) => (
               <button
@@ -600,12 +599,8 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
       </Popover>
       <Popover>
         <PopoverTrigger asChild>
-          <button type="button" aria-label="Indicators" title="Indicators" className={cn(railBtn, "relative")}>
-            <Activity className="h-5 w-5" />
-            Indicators
-            {indicators.length > 0 && (
-              <span className="absolute right-1 top-1 rounded-full bg-gc-blue px-1 font-mono text-[9px] leading-[14px] text-gc-on-blue">{indicators.length}</span>
-            )}
+          <button type="button" aria-label="Indicators" title="Indicators" className={railBtn}>
+            <Activity className="h-[18px] w-[18px]" />
           </button>
         </PopoverTrigger>
         <PopoverContent side="right" align="start" className={cn("max-h-[80vh] w-80 overflow-y-auto p-2", popClass)}>
@@ -615,8 +610,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
       <Popover>
         <PopoverTrigger asChild>
           <button type="button" aria-label="Jenvu SMC" title="Jenvu SMC" className={railBtn}>
-            <Layers className="h-5 w-5" />
-            SMC
+            <Layers className="h-[18px] w-[18px]" />
           </button>
         </PopoverTrigger>
         <PopoverContent side="right" align="start" className={cn("max-h-[80vh] w-80 overflow-y-auto p-2", popClass)}>
@@ -629,19 +623,19 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
         aria-pressed={scriptPanelOpen}
         aria-label="Jenvu Script"
         title="Jenvu Script"
-        className={cn(railBtn, scriptPanelOpen && "bg-gc-blue-soft text-gc-blue dark:bg-accent dark:text-foreground")}
+        data-state={scriptPanelOpen ? "open" : "closed"}
+        className={railBtn}
       >
-        <Code className="h-5 w-5" />
-        Script
+        <Code className="h-[18px] w-[18px]" />
       </button>
-      {railSlot && <div className="mt-auto flex flex-col items-center gap-1">{railSlot}</div>}
+      {railSlot && <div className="mt-auto flex flex-col items-start gap-1">{railSlot}</div>}
     </nav>
   );
 
   return (
     <div ref={workspaceRef} className={cn("flex h-full min-h-0 w-full", theme === "dark" ? "bg-background" : "bg-gc-console-bar")}>
       {rail}
-      <div className={cn("flex min-h-0 min-w-0 flex-1 flex-col bg-background", theme !== "dark" && "overflow-hidden rounded-2xl border border-gc-line shadow-sm")}>
+      <div className={cn("flex min-h-0 min-w-0 flex-1 flex-col bg-background", theme !== "dark" && "overflow-hidden rounded-t-2xl")}>
       {/* Top bar */}
       <div className="flex h-11 shrink-0 items-center gap-1 overflow-x-auto border-b border-border px-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:overflow-x-visible">
         <div className="mr-1 flex shrink-0 items-center gap-2 pl-1 pr-2">

@@ -129,7 +129,7 @@ export default function DashboardTopBar({
             else if (hits[0]) openHit(hits[0]);
             else seeAll();
           }}
-          className={`flex h-10 items-center rounded-full border border-gc-line ${white ? "bg-gc-blue-soft" : "bg-gc-notice"} pl-4 pr-1 focus-within:bg-background focus-within:shadow-sm`}
+          className={`flex items-center rounded-full border ${white ? "h-9 border-gc-line/70 bg-gc-console-search" : "h-10 border-gc-line bg-gc-notice"} pl-4 pr-1 focus-within:bg-background focus-within:shadow-sm`}
         >
           <input
             ref={inputRef}
