@@ -60,7 +60,7 @@ import {
   Attachments,
 } from "@/components/ai-elements/attachments";
 import { Shimmer } from "@/components/ai-elements/shimmer";
-import jenvuLogo from "@/assets/jenvu-logo.png";
+import askJenvuMark from "@/assets/ask-jenvu-mark.png";
 
 export const Route = createFileRoute("/_authenticated/dashboard/terminal")({
   head: () => ({
@@ -752,7 +752,7 @@ function TerminalPage() {
                       title="Ask With AI"
                       aria-label="Ask With AI"
                     >
-                      <img src={jenvuLogo} alt="" className="h-4 w-4 shrink-0 object-contain" />
+                      <img src={askJenvuMark} alt="" className="h-3.5 w-auto shrink-0 object-contain" />
                       <span className={cn(showWatchlist && "lg:hidden 2xl:inline")}>Ask With AI</span>
                     </button>
                   )}
@@ -889,9 +889,9 @@ function TerminalPage() {
                     <div className="space-y-4">
                       <div className="flex gap-2.5 text-sm leading-6">
                         <img
-                          src={jenvuLogo}
+                          src={askJenvuMark}
                           alt=""
-                          className="mt-0.5 h-6 w-6 shrink-0 object-contain"
+                          className="mt-1 h-4 w-auto shrink-0 object-contain"
                         />
                         <p>
                           Ask about the chart you are looking at. I use live gold data for the
@@ -972,7 +972,7 @@ function TerminalPage() {
 
                   {ask.isPending && (
                     <div className="flex items-center gap-2.5 text-sm">
-                      <img src={jenvuLogo} alt="" className="h-6 w-6 shrink-0 object-contain" />
+                      <span aria-hidden className="ask-jenvu-mark-ring h-6 w-10 shrink-0" style={{ ["--mark" as string]: `url(${askJenvuMark})` }}><span className="ask-jenvu-mark-loop h-full w-full" /></span>
                       <Shimmer>{loadingLabel}</Shimmer>
                     </div>
                   )}
