@@ -6,6 +6,7 @@ import { getMyMailAddress } from "@/lib/mail.functions";
 import AvatarAdjuster from "@/components/AvatarAdjuster";
 import { writeCachedAvatar, AVATAR_TTL_SECONDS } from "@/lib/avatar-cache";
 import { useVerification } from "@/hooks/useVerification";
+import { Camera, Image as ImageIcon, Loader2, Trash2, Upload } from "lucide-react";
 
 
 export const Route = createFileRoute("/_authenticated/dashboard/profile")({
@@ -128,24 +129,44 @@ function Profile() {
         <p className="mt-2 max-w-[620px] text-[16px] leading-[1.6] text-gc-ink-muted">Your photo and name show on your dashboard, in the top menu and in messages you send to Jenvu support.</p>
       </header>
 
-      <section className="jenvu-rise [animation-delay:60ms] rounded-[28px] border border-gc-line bg-background p-6 sm:p-8">
-        <h2 className="text-[20px] font-medium">Profile photo</h2>
-        <div className="mt-5 flex flex-col gap-5 sm:flex-row sm:items-center">
-          <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-full bg-gc-blue-soft ring-4 ring-gc-surface">
-            {avatarUrl ? (
-              <img src={avatarUrl} alt="Profile" className="h-full w-full object-cover" />
-            ) : (
-              <div className="flex h-full w-full items-center justify-center text-[32px] font-medium text-gc-blue-deep">{initial}</div>
-            )}
-          </div>
-          <div className="flex flex-col gap-3">
-            <div className="flex flex-wrap gap-2">
+      <section className="jenvu-rise [animation-delay:60ms] overflow-hidden rounded-[28px] border border-gc-line bg-background">
+        <div className="h-24 bg-gradient-to-r from-gc-blue-soft via-gc-notice to-gc-blue-soft sm:h-28" aria-hidden />
+        <div className="px-6 pb-6 sm:px-8 sm:pb-8">
+          <div className="-mt-12 flex flex-col gap-5 sm:-mt-14 sm:flex-row sm:items-end">
+            <button
+              type="button"
+              onClick={onAvatarPick}
+              disabled={uploadingAvatar}
+              aria-label={avatarPath ? "Change profile photo" : "Upload profile photo"}
+              className="group relative h-28 w-28 shrink-0 overflow-hidden rounded-full bg-gc-blue-soft shadow-md ring-4 ring-background outline-none focus-visible:ring-gc-blue-deep disabled:cursor-wait"
+            >
+              {avatarUrl ? (
+                <img src={avatarUrl} alt="Profile" className="h-full w-full object-cover" />
+              ) : (
+                <span className="flex h-full w-full items-center justify-center text-[40px] font-medium text-gc-blue-deep">{initial}</span>
+              )}
+              <span className="absolute inset-0 flex flex-col items-center justify-center gap-1 bg-gc-ink/55 text-[12px] font-medium text-background opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100">
+                <Camera className="h-5 w-5" />
+                {avatarPath ? "Change" : "Upload"}
+              </span>
+              {uploadingAvatar && (
+                <span className="absolute inset-0 flex items-center justify-center bg-background/70">
+                  <Loader2 className="h-6 w-6 animate-spin text-gc-blue-deep" />
+                </span>
+              )}
+            </button>
+            <div className="min-w-0 flex-1 sm:pb-1">
+              <h2 className="truncate text-[22px] font-medium">{fullName || "Your profile photo"}</h2>
+              <p className="truncate text-[14px] text-gc-ink-muted">{email}</p>
+            </div>
+            <div className="flex flex-wrap gap-2 sm:pb-1">
               <button
                 type="button"
                 onClick={onAvatarPick}
                 disabled={uploadingAvatar}
-                className="inline-flex h-10 items-center rounded-full bg-gc-blue px-5 text-[14px] font-medium text-gc-on-blue hover:bg-gc-blue-hover disabled:opacity-50"
+                className="inline-flex h-10 items-center gap-2 rounded-full bg-gc-blue px-5 text-[14px] font-medium text-gc-on-blue hover:bg-gc-blue-hover disabled:opacity-50"
               >
+                <Upload className="h-4 w-4" />
                 {uploadingAvatar ? "Uploading…" : avatarPath ? "Change photo" : "Upload photo"}
               </button>
               {avatarPath && (
@@ -153,14 +174,18 @@ function Profile() {
                   type="button"
                   onClick={removeAvatar}
                   disabled={uploadingAvatar}
-                  className="inline-flex h-10 items-center rounded-full border border-gc-line px-5 text-[14px] font-medium text-gc-blue-deep hover:bg-gc-surface disabled:opacity-50"
+                  className="inline-flex h-10 items-center gap-2 rounded-full border border-gc-line px-5 text-[14px] font-medium text-gc-blue-deep hover:bg-gc-surface disabled:opacity-50"
                 >
+                  <Trash2 className="h-4 w-4" />
                   Remove
                 </button>
               )}
               <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={onAvatarChange} />
             </div>
-            <p className="text-[13px] text-gc-ink-muted">JPG, PNG or WebP. Max 10MB. You can crop, zoom and reposition after selecting.</p>
+          </div>
+          <div className="mt-6 flex items-start gap-3 rounded-2xl bg-gc-surface px-4 py-3 text-[13px] leading-[1.5] text-gc-ink-muted">
+            <ImageIcon className="mt-0.5 h-4 w-4 shrink-0 text-gc-blue-deep" />
+            <span>JPG, PNG or WebP, up to 10MB. After choosing a photo you can crop, zoom and move it before saving. Click your photo to change it any time.</span>
           </div>
         </div>
       </section>
