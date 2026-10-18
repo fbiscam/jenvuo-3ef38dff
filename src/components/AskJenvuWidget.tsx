@@ -24,7 +24,8 @@ export function openAskJenvu(view: "chat" | "sales" = "chat") {
   window.dispatchEvent(new CustomEvent("jenvu:ask", { detail: { view } }));
 }
 
-const HIDDEN = [/^\/dashboard/, /^\/auth/, /^\/contact/, /^\/help/, /^\/admin/, /^\/mcp/];
+// Shown on every page except the dashboard (which includes the Terminal).
+const HIDDEN = [/^\/dashboard/];
 
 export function AskJenvuWidget() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
@@ -130,9 +131,7 @@ export function AskJenvuWidget() {
                 <ArrowLeft className="h-5 w-5" /> Return to conversation
               </button>
             ) : (
-              <span className="flex items-center gap-2.5 text-[16px]">
-                <img src={askJenvuMark} alt="" className="h-5 w-auto" /> Ask Jenvu
-              </span>
+              <span className="text-[16px]">Ask Jenvu</span>
             )}
             <div className="ml-auto flex items-center">
               {!empty && (
@@ -193,7 +192,7 @@ export function AskJenvuWidget() {
                     )}
                     {busy && (
                       <div className="flex items-center gap-2.5 text-[15px]" role="status">
-                        <img src={askJenvuMark} alt="" className="h-5 w-auto shrink-0 animate-pulse" />
+                        <span aria-hidden className="ask-jenvu-mark-loop h-5 w-9 shrink-0" style={{ ["--mark" as string]: `url(${askJenvuMark})` }} />
                         <Shimmer>Thinking about your question…</Shimmer>
                       </div>
                     )}
