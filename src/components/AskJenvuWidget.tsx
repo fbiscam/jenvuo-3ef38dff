@@ -194,7 +194,7 @@ export function AskJenvuWidget() {
                     )}
                     {busy && (
                       <div className="flex items-center gap-2.5 text-[15px]" role="status">
-                        <span aria-hidden className="ask-jenvu-mark-ring inline-flex h-5 w-9 shrink-0"><span className="ask-jenvu-mark-loop h-full w-full" style={{ ["--mark" as string]: `url(${askJenvuMark})` }} /></span>
+                        <span aria-hidden className="ask-jenvu-mark-ring h-6 w-10 shrink-0" style={{ ["--mark" as string]: `url(${askJenvuMark})` }}><span className="ask-jenvu-mark-loop h-full w-full" /></span>
                         <Shimmer>Thinking about your question…</Shimmer>
                       </div>
                     )}

@@ -1321,7 +1321,6 @@ html body .dash-dark main.bg-white { background-color: oklch(0.165 0 0) !importa
 }
 @keyframes ind-kenburns { 0%,100% { transform: scale(1.02) translate(0,0); } 50% { transform: scale(1.1) translate(-1.5%,-1%); } }
 .ind-kenburns { animation: ind-kenburns 18s ease-in-out infinite; }
-/* Colour swap only (no movement), so it also runs when the device has "reduce animations" switched on. */
 /* Thinking logo: white logo with a running multi-colour line around its border
    (Gemini-style). The outer layer is a rotating four-colour conic gradient cut to
    the logo shape; the white logo sits slightly smaller on top, so only a thin
