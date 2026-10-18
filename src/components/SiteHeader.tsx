@@ -22,7 +22,7 @@ export default function SiteHeader() {
   }, [mobileMenuOpen]);
   return (
     <>
-      <header className="jenvu-home-header sticky top-0 z-50 border-b border-gc-line bg-background">
+      <header className="jenvu-home-header sticky top-0 z-50 border-0 bg-background">
         <div className="relative flex items-center gap-3 px-4 py-2.5 sm:px-4">
           <Link to="/" className="flex min-w-0 shrink-0 items-center gap-2">
             <img src="/favicon.png" alt="Jenvu" className="h-7 w-7 shrink-0 rounded-md object-contain" />
