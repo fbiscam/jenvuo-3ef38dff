@@ -50,7 +50,7 @@ export const siteSearch = createServerFn({ method: "POST" })
           const raw = (Array.isArray(j.data) ? j.data : j.data?.web ?? []) as { url?: string; title?: string; description?: string }[];
           web = raw.filter((x) => x.url).map((x) => {
             const u = new URL(x.url!);
-            return { title: x.title || u.hostname, url: x.url!, path: [u.hostname.replace(/^www\./, ""), ...u.pathname.split("/").filter(Boolean).slice(0, 2)], description: x.description || "", source: "web" as const };
+            return { title: x.title || u.hostname, url: x.url!, path: [u.hostname.replace(/^www\./, ""), ...u.pathname.split("/").filter(Boolean).slice(0, 2)], description: (x.description || "").replace(/\[([^\]]*)\]\([^)]*\)/g, "$1").replace(/[#*|_`>]+/g, " ").replace(/-{2,}/g, " ").replace(/\s+/g, " ").trim(), source: "web" as const };
           });
         }
       } catch (e) {
