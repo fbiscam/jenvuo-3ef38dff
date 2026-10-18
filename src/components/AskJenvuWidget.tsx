@@ -163,7 +163,7 @@ export function AskJenvuWidget() {
                 {empty ? (
                   <div className="flex min-h-full flex-col justify-center py-4">
                     <h2 className="mx-auto max-w-[460px] text-center text-[26px] font-normal leading-[1.3]">
-                      What would you like to know about Jenvu?
+                      What would you like to know about ?
                     </h2>
                     <div className="mt-6 space-y-2.5">
                       {STARTERS.map((s) => (
