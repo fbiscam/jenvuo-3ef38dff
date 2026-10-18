@@ -1,5 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { IndustryPage, type IndustryContent } from "@/components/industry/IndustryPage";
+import prodHero from "@/assets/industry/prod-hero.jpg";
+import prodTerminal from "@/assets/industry/prod-terminal.jpg";
+import prodAi from "@/assets/industry/prod-ai.jpg";
+import prodApi from "@/assets/industry/prod-api.jpg";
 
 export const Route = createFileRoute("/ai-engine")({
   head: () => ({
@@ -18,6 +22,8 @@ export const Route = createFileRoute("/ai-engine")({
 });
 
 const CONTENT: IndustryContent = {
+  variant: "products",
+  heroImg: prodHero,
   pill: "Jenvu products",
   title: "One platform for trading gold",
   intro:
@@ -27,18 +33,21 @@ const CONTENT: IndustryContent = {
   solutionsIntro: "Start with the Terminal and add the tools you need.",
   solutions: [
     {
+      img: prodTerminal,
       title: "Terminal",
       text: "Live XAU/USD candles with structure, zones, gaps, sweeps and sessions drawn for you.",
       link: "Explore the Terminal",
       href: "https://dash.jenvu.com/terminal",
     },
     {
+      img: prodAi,
       title: "AI engine",
       text: "Ask a question about the chart and get a short answer about only what you asked.",
       link: "Explore the AI engine",
       href: "/stories/ai-desk-updates",
     },
     {
+      img: prodApi,
       title: "Developer API",
       text: "Create API keys and bring Jenvu analysis into your own apps and bots.",
       link: "Explore the API",

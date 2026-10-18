@@ -1,5 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { IndustryPage, type IndustryContent } from "@/components/industry/IndustryPage";
+import solHero from "@/assets/industry/sol-hero.jpg";
+import solStructure from "@/assets/industry/sol-structure.jpg";
+import solLiquidity from "@/assets/industry/sol-liquidity.jpg";
+import solSessions from "@/assets/industry/sol-sessions.jpg";
 
 const URL = "https://jenvu.com/strategies/ict-gold-trading";
 const TITLE = "Solutions for Gold Traders — ICT & SMC on XAU/USD | Jenvu";
@@ -25,6 +29,8 @@ export const Route = createFileRoute("/strategies/ict-gold-trading")({
 });
 
 const CONTENT: IndustryContent = {
+  variant: "solutions",
+  heroImg: solHero,
   pill: "Solutions for gold traders",
   title: "Trade gold with clear, rule-based structure",
   intro:
@@ -34,18 +40,21 @@ const CONTENT: IndustryContent = {
   solutionsIntro: "Pick the part of your process you want help with.",
   solutions: [
     {
+      img: solStructure,
       title: "Read market structure",
       text: "Swing highs and lows, BOS and CHoCH labels on closed candles, across M15 to 4H.",
       link: "Explore structure",
       href: "https://jenvu.com/docs",
     },
     {
+      img: solLiquidity,
       title: "Track liquidity",
       text: "Fresh sweeps on 15M, 1H, 2H and 4H, shown only after a reclaim and reversal confirm.",
       link: "Explore sweeps",
       href: "/stories/fresh-sweep-detection",
     },
     {
+      img: solSessions,
       title: "Plan around sessions",
       text: "London and New York windows, weekly candle timer and weekend closure on one chart.",
       link: "Explore sessions",

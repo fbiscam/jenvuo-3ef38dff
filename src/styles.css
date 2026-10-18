@@ -1326,3 +1326,7 @@ html body .dash-dark main.bg-white { background-color: oklch(0.165 0 0) !importa
 @media (prefers-reduced-motion: reduce) {
   .ind-candle, .ind-line, .ind-pulse, .ind-rise { animation: none; stroke-dasharray: none; }
 }
+@keyframes ind-kenburns { 0%,100% { transform: scale(1.02) translate(0,0); } 50% { transform: scale(1.1) translate(-1.5%,-1%); } }
+.ind-kenburns { animation: ind-kenburns 18s ease-in-out infinite; }
+@keyframes ask-jenvu-hue { 0% { filter: hue-rotate(0deg); } 25% { filter: hue-rotate(150deg) saturate(1.4); } 50% { filter: hue-rotate(-90deg) saturate(1.6) brightness(1.1); } 75% { filter: hue-rotate(110deg) saturate(1.5) brightness(.95); } 100% { filter: hue-rotate(0deg); } }
+@media (prefers-reduced-motion: reduce) { .ind-kenburns { animation: none; } }
