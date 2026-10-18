@@ -23,6 +23,7 @@ import {
   Layers,
   Magnet,
   Maximize2,
+  PenLine,
   Minimize2,
   Minus,
   MousePointer2,
@@ -706,6 +707,19 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
       >
         <Code className="h-[18px] w-[18px]" />
       </button>
+      <Popover>
+        <PopoverTrigger asChild>
+          <button type="button" aria-label="Drawing tools" title="Drawing tools" className={cn(railBtn, "h-auto flex-col gap-0.5 py-1.5")}>
+            <PenLine className="h-[18px] w-[18px]" />
+            <span className="text-[9px] font-medium leading-none">Draw</span>
+            {tool !== "cursor" && <span className="absolute right-1.5 top-1 h-1.5 w-1.5 rounded-full bg-gc-blue" aria-hidden="true" />}
+          </button>
+        </PopoverTrigger>
+        <PopoverContent side="right" align="start" className={cn("w-[236px] p-2", popClass)}>
+          <p className="px-1 pb-1.5 text-sm text-foreground">Drawing tools</p>
+          <div className="flex flex-wrap items-center gap-0.5" role="toolbar" aria-label="Drawing tools">{renderTools(false)}</div>
+        </PopoverContent>
+      </Popover>
       <span className="my-1 ml-3 h-px w-6 bg-border" aria-hidden="true" />
       <button type="button" onClick={downloadSnapshot} aria-label="Download chart snapshot" title="Download chart snapshot" className={railBtn}>
         <Camera className="h-[18px] w-[18px]" />
@@ -746,9 +760,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
           </button>
           <span className="hidden md:inline-flex"><XauUsdLogo size={22} /></span>
         </div>
-        <div className="hidden shrink-0 items-center gap-0.5 md:flex" role="toolbar" aria-label="Drawing tools">
-          {renderTools(false)}
-        </div>
+
         <div className="flex shrink-0 items-center md:hidden" role="group" aria-label="Chart timeframe">
           {timeframes.map((item) => (
             <button
