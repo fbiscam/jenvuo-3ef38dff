@@ -1,3 +1,4 @@
+import { openAskJenvu } from "@/components/AskJenvuWidget";
 import * as React from "react";
 import { Link } from "@tanstack/react-router";
 import {
@@ -187,7 +188,7 @@ export function CloudHero({ price: _price, delta: _delta }: { price: string; del
   return (
     <section className="overflow-hidden bg-background">
       <div className="mx-auto max-w-[1296px] px-5 pb-14 pt-12 text-center sm:px-8 md:pt-14">
-        <img src="/favicon.png" alt="" width={64} height={64} className="mx-auto h-16 w-16 object-contain" />
+        <img src="/favicon.png" alt="" width={64} height={64} className="jenvu-logo-intro mx-auto h-16 w-16 object-contain" />
         <h1 className="mx-auto mt-7 max-w-[900px] text-[40px] font-medium leading-[1.1] tracking-[-0.5px] text-gc-ink sm:text-[56px] md:text-[60px]">
           The new way to trade gold
         </h1>
@@ -652,28 +653,52 @@ export function CloudResources() {
 
 /* ---------------- Final CTA ---------------- */
 export function CloudFinalCta() {
+  const logoRef = React.useRef<HTMLImageElement>(null);
+  React.useEffect(() => {
+    const el = logoRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      ([e]) => { if (e.isIntersecting) { el.classList.add("is-visible"); io.disconnect(); } },
+      { threshold: 0.35 },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
   return (
-    <section className="border-t border-gc-line bg-gc-surface">
-      <div className="mx-auto max-w-[1296px] px-5 py-16 sm:px-8 md:py-20">
-        <h2 className="text-[28px] font-normal text-gc-ink sm:text-[32px]">Take the next step</h2>
-        <div className="mt-8 grid gap-5 md:grid-cols-2">
-          <div className="rounded-xl bg-gc-blue p-8 text-gc-on-blue">
-            <h3 className="text-[22px] font-medium">Start trading gold with Jenvu</h3>
-            <p className="line-clamp-2 mt-3 text-[15px] leading-[1.6] opacity-90">Create your account and get 14 days of Pro access.</p>
-            <Link
-              to="/auth"
-              search={{ mode: "signup" } as never}
-              className="mt-6 inline-flex h-11 items-center justify-center rounded-md bg-background px-6 text-[15px] font-medium text-gc-blue transition hover:bg-gc-blue-soft"
-            >
-              Get started for free
-            </Link>
-          </div>
-          <div className="rounded-xl border border-gc-line bg-background p-8">
-            <h3 className="text-[22px] font-medium text-gc-ink">Need help getting started?</h3>
-            <p className="line-clamp-2 mt-3 text-[15px] leading-[1.6] text-gc-ink-muted">Talk to our team about plans, the Terminal or the Founding Program.</p>
-            <div className="mt-6">
-              <OutlineButton to="/contact">Contact us</OutlineButton>
+    <section className="bg-background">
+      <div className="mx-auto max-w-[1296px] px-5 py-14 sm:px-8 md:py-20">
+        <div className="relative grid items-center gap-8 overflow-hidden rounded-3xl bg-gc-blue-soft px-8 py-12 sm:px-12 md:grid-cols-[1.1fr_1fr] md:py-16">
+          <div>
+            <h2 className="max-w-[460px] text-[30px] font-normal leading-[1.2] text-gc-ink sm:text-[38px]">
+              <span className="text-gc-blue">Let's start trading</span> your tomorrow, today
+            </h2>
+            <div className="mt-8 flex flex-wrap items-center gap-3">
+              <Link
+                to="/auth"
+                search={{ mode: "signup" } as never}
+                className="inline-flex h-11 items-center justify-center rounded-full bg-gc-blue px-6 text-[15px] font-medium text-gc-on-blue transition hover:bg-gc-blue-hover"
+              >
+                Get started for free
+              </Link>
+              <button
+                type="button"
+                onClick={() => openAskJenvu("sales")}
+                className="inline-flex h-11 items-center justify-center rounded-full border border-gc-line bg-background px-6 text-[15px] font-medium text-gc-blue transition hover:bg-gc-surface"
+              >
+                Contact sales
+              </button>
             </div>
+          </div>
+          <div className="flex justify-center md:justify-end">
+            <img
+              ref={logoRef}
+              src="/favicon.png"
+              alt="Jenvu"
+              width={280}
+              height={280}
+              loading="lazy"
+              className="jenvu-logo-big h-44 w-44 object-contain sm:h-60 sm:w-60 md:h-72 md:w-72"
+            />
           </div>
         </div>
       </div>
