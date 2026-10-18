@@ -738,8 +738,9 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
     <div ref={workspaceRef} className={cn("flex h-full min-h-0 w-full", theme === "dark" ? "bg-background" : "bg-gc-console-bar")}>
       {rail}
       <div className={cn("flex min-h-0 min-w-0 flex-1 flex-col bg-background", theme !== "dark" && "overflow-hidden rounded-t-2xl")}>
-      {/* Top bar */}
-      <div className="flex h-11 shrink-0 items-center gap-1 overflow-x-auto border-b border-border px-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:overflow-x-visible">
+      {/* Top bar — phones only: on laptops and tablets every control lives in the side bar. */}
+      <div className="flex h-11 shrink-0 items-center gap-1 overflow-x-auto border-b border-border px-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:hidden">
+
         <div className="mr-1 flex shrink-0 items-center gap-2 pl-1 pr-2">
           <button
             type="button"
