@@ -116,12 +116,12 @@ export default function SiteFooter({ className }: { className?: string }) {
           {columns.map((col) => (
             <div key={col.label}>
               <h3 className="text-[16px] font-normal text-gc-ink">{col.label}</h3>
-              <ul className="mt-4 space-y-3">
+              <ul className="mt-5 space-y-[14px]">
                 {col.links.map((l) => (
                   <li key={`${l.to}:${l.label}`}>
                     <Link
                       to={l.to}
-                      className="text-[14px] text-gc-ink-muted transition-colors hover:text-gc-blue-deep"
+                      className="text-[14px] text-gc-ink transition-colors hover:text-gc-blue-deep hover:underline"
                     >
                       {l.label}
                     </Link>
@@ -136,12 +136,12 @@ export default function SiteFooter({ className }: { className?: string }) {
         {/* Bottom bar */}
         <div className="mt-12 flex flex-col gap-5 border-t border-gc-line pt-6 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-[14px] text-gc-ink">
-            <span>© {year} Jenvu AI</span>
-            <span className="text-gc-line">|</span>
+            <Link to="/about" className="hover:text-gc-blue-deep">About Jenvu</Link>
+            <span className="text-gc-ink-muted">|</span>
             <Link to="/privacy" className="hover:text-gc-blue-deep">Privacy</Link>
-            <span className="text-gc-line">|</span>
+            <span className="text-gc-ink-muted">|</span>
             <Link to="/terms" className="hover:text-gc-blue-deep">Site terms</Link>
-            <span className="text-gc-line">|</span>
+            <span className="text-gc-ink-muted">|</span>
             <Link to="/disclaimer" className="hover:text-gc-blue-deep">Risk Disclaimer</Link>
           </div>
 
