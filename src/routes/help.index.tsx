@@ -1,6 +1,6 @@
 import * as React from "react";
 import SiteHeader from "@/components/SiteHeader";
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate, useLocation } from "@tanstack/react-router";
 import { Search, ArrowRight, ChevronDown, ChevronsUpDown, Send } from "lucide-react";
 import SiteFooter from "@/components/SiteFooter";
 import { NextStep } from "@/components/PageShell";
@@ -32,6 +32,7 @@ const SANS = "font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif]
 function HelpCenterPage() {
   const [q, setQ] = React.useState("");
   const navigate = useNavigate();
+  const hash = useLocation({ select: (l) => l.hash });
 
   const results = React.useMemo(() => {
     const term = q.trim().toLowerCase();
@@ -97,8 +98,8 @@ function HelpCenterPage() {
           <p className="mt-4 line-clamp-3 max-w-[830px] text-[16px] text-gc-ink-muted">Quick answers on the main Jenvu tools.</p>
           <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
             {SUPPORT_GUIDES.map((g) => (
-              <div key={g.id} id={g.id} className="scroll-mt-28 rounded-lg border border-gc-line p-6 transition target:border-gc-blue-deep target:bg-gc-sky">
-                <h3 className="line-clamp-1 text-[20px] leading-snug">{g.title}</h3>
+              <div key={g.id} id={g.id} className={`scroll-mt-28 rounded-lg border p-6 transition ${hash === g.id ? "border-gc-blue-deep bg-gc-sky" : "border-gc-line"}`}>
+                <h3 className="line-clamp-2 text-[20px] leading-snug">{g.title}</h3>
                 <p className="mt-3 line-clamp-3 text-[16px] leading-relaxed text-gc-ink-muted">{g.text}</p>
               </div>
             ))}
@@ -169,7 +170,7 @@ function HelpCenterPage() {
                 <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
                   {c.articles.slice(0, 6).map((a) => (
                     <Link key={a.slug} to="/help/$collection/$slug" params={{ collection: c.slug, slug: a.slug }} className="rounded-lg border border-gc-line p-6 transition hover:shadow-md">
-                      <div className="line-clamp-1 text-[20px] leading-snug">{a.title}</div>
+                      <div className="line-clamp-2 text-[20px] leading-snug">{a.title}</div>
                       <div className="mt-3 text-[16px] leading-relaxed text-gc-ink-muted line-clamp-3">{a.summary}</div>
                     </Link>
                   ))}
