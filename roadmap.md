@@ -7,7 +7,11 @@
 - [x] Homepage: "Console" text → "Terminal"
 - [x] New CodeCraft key used everywhere (Ask Jenvu, API keys, Terminal) and live-tested
 - [x] Solutions & Products pages in Google Cloud industry-page style
-- [x] Leads + Scam Tool pages in dashboard look
+- [x] Scam Tool page in dashboard look
 - [x] Docs "Not found" from support.jenvu.com fixed (all public pages now open from every section site)
 - [x] Thinking logo colour loop works with "reduce animations" on
 - [x] Ask Jenvu: user message as right-side grey bubble
+- [x] Leads tools removed (leads.jenvu.com sends visitors to the homepage)
+- [x] Footer: five links in every column
+- [x] Thinking logo: white with a four-colour outline loop
+- [x] Google Analytics + Search Console linked; site audit done
