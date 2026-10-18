@@ -27,6 +27,8 @@ import {
   type JenvuChartHandle,
 } from "@/components/terminal/JenvuChartWorkspace";
 import { TerminalWatchlist } from "@/components/terminal/TerminalWatchlist";
+import { TerminalNewsPanel } from "@/components/terminal/TerminalNewsPanel";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { transcribeVoiceMessage } from "@/lib/transcription.functions";
 import { cn } from "@/lib/utils";
 import { isMarketClosed } from "@/lib/signals/qualification";
@@ -534,7 +536,6 @@ function TerminalPage() {
       } | null;
       const savedTimeframe = TIMEFRAMES.find((timeframe) => timeframe.key === settings?.timeframe);
       if (savedTimeframe) setTf(savedTimeframe);
-      if (settings?.theme === "dark" || settings?.theme === "light") setTheme(settings.theme);
       if (settings?.watchlistOpen === false) setWatchlistOpen(false);
       // The AI desk always starts closed so the chart opens exactly as left.
     } catch {
@@ -702,29 +703,59 @@ function TerminalPage() {
                 if (match) setTf(match);
               }}
               railSlot={
-                !deskOpen && (
-                  <button
-                    type="button"
-                    onClick={() => setDeskOpen(true)}
-                    aria-label="Ask With AI"
-                    title="Ask With AI"
-                    className="flex h-9 w-11 items-center justify-center rounded-r-full hover:bg-gc-console-rail-active/60 dark:hover:bg-accent"
+                <>
+                  <div
+                    className="flex w-11 flex-col items-center gap-0.5 py-1 font-mono text-[10px] font-semibold leading-none text-foreground"
+                    title={marketClosed ? "Gold market is closed for the weekend" : `Time left on the current ${tf.label} candle`}
+                    aria-label={marketClosed ? "Market closed" : `Current ${tf.label} candle closes in ${formatCountdown(secondsLeft)}`}
                   >
-                    <img src="/favicon.png" alt="" className="h-5 w-5 rounded-sm object-contain" />
-                  </button>
-                )
+                    <Timer className="h-[18px] w-[18px] text-muted-foreground" />
+                    {formatCountdown(secondsLeft)}
+                  </div>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <button
+                        type="button"
+                        aria-label="Gold news"
+                        title="Gold news"
+                        className="relative flex h-9 w-11 items-center justify-center rounded-r-full text-muted-foreground hover:bg-gc-console-rail-active/60 data-[state=open]:bg-gc-console-rail-active data-[state=open]:text-foreground dark:hover:bg-accent"
+                      >
+                        <Newspaper className="h-[18px] w-[18px]" />
+                        {nextGoldNews && (
+                          <span aria-hidden="true" className={cn("absolute right-2 top-1.5 h-1.5 w-1.5 rounded-full", nextGoldNews.impact === "High" ? "bg-destructive" : "bg-gc-yellow")} />
+                        )}
+                      </button>
+                    </PopoverTrigger>
+                    <PopoverContent side="right" align="end" className={cn("max-h-[80vh] w-80 overflow-y-auto p-2 font-sans", theme === "dark" && "dark terminal-dark border-border bg-popover text-popover-foreground")}>
+                      <TerminalNewsPanel />
+                    </PopoverContent>
+                  </Popover>
+                  {!deskOpen && (
+                    <button
+                      type="button"
+                      onClick={() => setDeskOpen(true)}
+                      aria-label="Ask With AI"
+                      title="Ask With AI"
+                      className="flex h-9 w-11 items-center justify-center rounded-r-full hover:bg-gc-console-rail-active/60 dark:hover:bg-accent"
+                    >
+                      <img src="/favicon.png" alt="" className="h-5 w-5 rounded-sm object-contain" />
+                    </button>
+                  )}
+                </>
               }
               rightSlot={
                 <>
                   {!deskOpen && (
-                    <UpcomingGoldNews
-                      event={nextGoldNews}
-                      loading={newsQuery.isPending}
-                      failed={newsQuery.isError && !newsQuery.data}
-                    />
+                    <span className="md:hidden">
+                      <UpcomingGoldNews
+                        event={nextGoldNews}
+                        loading={newsQuery.isPending}
+                        failed={newsQuery.isError && !newsQuery.data}
+                      />
+                    </span>
                   )}
                   <div
-                    className="flex h-7 items-center gap-1.5 rounded-full bg-muted px-2.5 font-mono text-xs font-semibold text-foreground"
+                    className="flex h-7 md:hidden items-center gap-1.5 rounded-full bg-muted px-2.5 font-mono text-xs font-semibold text-foreground"
                     title={marketClosed ? "Gold market is closed for the weekend" : `Time left on the current ${tf.label} candle`}
                     aria-label={marketClosed ? "Market closed" : `Current ${tf.label} candle closes in ${formatCountdown(secondsLeft)}`}
                   >
@@ -736,15 +767,6 @@ function TerminalPage() {
                       </span>
                     )}
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => setTheme((t) => (t === "dark" ? "light" : "dark"))}
-                    className="flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
-                    title={theme === "dark" ? "Switch to white theme" : "Switch to black theme"}
-                    aria-label={theme === "dark" ? "Switch to white theme" : "Switch to black theme"}
-                  >
-                    {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-                  </button>
                   {false && !deskOpen && !watchlistOpen && (
                     <button
                       type="button"
