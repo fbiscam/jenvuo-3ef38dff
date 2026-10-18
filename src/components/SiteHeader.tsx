@@ -110,7 +110,7 @@ export default function SiteHeader() {
                   to="/pricing"
                   className="ml-2 inline-flex h-10 items-center justify-center rounded-full bg-gc-blue px-4 text-[14px] font-medium text-gc-on-blue hover:bg-gc-blue-hover"
                 >
-                  Buy now
+                  Start Now
                 </Link>
               </>
             )}
