@@ -7,7 +7,6 @@ const ARTICLE_MODELS = [
   "codecraft/claude-opus-5",
   "codecraft/claude-fable-5.1",
   "codecraft/gpt-5.5",
-  "codecraft/grok-4.6",
 ];
 const ARTICLE_MODEL_LABEL = "Claude Fable 5.1 (CodeCraft)";
 
