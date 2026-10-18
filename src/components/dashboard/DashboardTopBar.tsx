@@ -1,9 +1,18 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { siteSearch, type SearchHit } from "@/lib/site-search.functions";
+import { askJenvu, type AskJenvuResult } from "@/lib/ask-jenvu.functions";
+import { MessageResponse } from "@/components/ai-elements/message";
+import { Shimmer } from "@/components/ai-elements/shimmer";
+import askJenvuMark from "@/assets/ask-jenvu-mark.png";
+import { openAskJenvu } from "@/components/AskJenvuWidget";
+import GiftBox from "@/components/dashboard/GiftBox";
 import { SITE_PAGES } from "@/lib/site-pages";
-import { Link, useNavigate } from "@tanstack/react-router";
-import { Camera, ExternalLink, FileText, Loader2, LogOut, Menu, Search, Settings, ShieldCheck } from "lucide-react";
+import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
+import {
+  BookOpen, Camera, Code, CreditCard, Download, ExternalLink, FileText, LifeBuoy, Loader2, LogOut, Mail,
+  Menu, MoreVertical, Search, Settings, ShieldCheck, Sparkles,
+} from "lucide-react";
 import NotificationBell from "@/components/NotificationBell";
 import {
   DropdownMenu,
@@ -44,6 +53,18 @@ export default function DashboardTopBar({
   const runSearch = useServerFn(siteSearch);
   const [hits, setHits] = useState<SearchHit[]>([]);
   const [loading, setLoading] = useState(false);
+  const [searched, setSearched] = useState("");
+  const runAsk = useServerFn(askJenvu);
+  const [answer, setAnswer] = useState<{ q: string; res: AskJenvuResult | null } | null>(null);
+  const pathname = useRouterState({ select: (st) => st.location.pathname });
+  const onTerminal = pathname === "/dashboard/terminal";
+  const [scriptOpen, setScriptOpen] = useState(false);
+
+  useEffect(() => {
+    const h = (e: Event) => setScriptOpen(Boolean((e as CustomEvent).detail?.open));
+    window.addEventListener("jenvu:terminal-script-state", h);
+    return () => window.removeEventListener("jenvu:terminal-script-state", h);
+  }, []);
 
   const matches = useMemo(() => {
     const t = q.trim().toLowerCase();
@@ -62,19 +83,39 @@ export default function DashboardTopBar({
   // Site-wide results (help articles, stories, web) — debounced so typing stays light.
   useEffect(() => {
     const t = q.trim();
-    if (t.length < 3) { setHits([]); setLoading(false); return; }
+    if (t.length < 3) { setHits([]); setSearched(""); setLoading(false); return; }
     let live = true;
     setLoading(true);
     const id = window.setTimeout(() => {
       runSearch({ data: { q: t.slice(0, 200) } })
-        .then((r) => { if (live) setHits(r.hits.slice(0, 8)); })
-        .catch(() => { if (live) setHits([]); })
+        .then((r) => { if (live) { setHits(r.hits.slice(0, 8)); setSearched(t); } })
+        .catch(() => { if (live) { setHits([]); setSearched(t); } })
         .finally(() => { if (live) setLoading(false); });
     }, 450);
     return () => { live = false; window.clearTimeout(id); };
   }, [q, runSearch]);
 
-  const close = () => { setQ(""); setHits([]); inputRef.current?.blur(); };
+  // Same as the homepage search: ask Jenvu on Enter, or automatically when nothing on the site matches.
+  const ask = useCallback((question: string) => {
+    const t = question.trim().slice(0, 1000);
+    if (!t) return;
+    setAnswer({ q: t, res: null });
+    runAsk({ data: { messages: [{ role: "user", content: t }] } })
+      .then((res) => setAnswer((cur) => (cur && cur.q === t ? { q: t, res } : cur)))
+      .catch(() => setAnswer((cur) => (cur && cur.q === t ? { q: t, res: { ok: false, error: "Ask Jenvu couldn't answer right now. Please try again in a moment." } } : cur)));
+  }, [runAsk]);
+
+  const jenvuHitCount = hits.filter((h) => h.source === "jenvu").length;
+  useEffect(() => {
+    const t = searched;
+    if (!t || t !== q.trim() || t.length < 6) return;
+    if (matches.length || jenvuHitCount) return;
+    if (answer?.q === t) return;
+    const id = window.setTimeout(() => ask(t), 600);
+    return () => window.clearTimeout(id);
+  }, [searched, q, matches.length, jenvuHitCount, answer?.q, ask]);
+
+  const close = () => { setQ(""); setHits([]); setAnswer(null); inputRef.current?.blur(); };
   const go = (to: string) => {
     close();
     void navigate({ to: to as "/dashboard" });
@@ -104,9 +145,7 @@ export default function DashboardTopBar({
         <form
           onSubmit={(e) => {
             e.preventDefault();
-            if (matches[0]) go(matches[0].to);
-            else if (hits[0]) openHit(hits[0]);
-            else seeAll();
+            if (q.trim()) ask(q.trim());
           }}
           className={`flex items-center rounded-full border ${white ? "h-9 border-gc-line/70 bg-gc-console-search" : "h-10 border-gc-line bg-gc-notice"} pl-4 pr-1 focus-within:bg-background focus-within:shadow-sm`}
         >
@@ -116,7 +155,7 @@ export default function DashboardTopBar({
             onChange={(e) => setQ(e.target.value)}
             onFocus={() => setFocused(true)}
             onBlur={() => window.setTimeout(() => setFocused(false), 150)}
-            placeholder="Search Jenvu, guides and the web"
+            placeholder="Search pages, guides or ask a question"
             aria-label="Search"
             className="min-w-0 flex-1 bg-transparent text-[14px] text-gc-ink outline-none placeholder:text-gc-ink-muted"
           />
@@ -133,6 +172,23 @@ export default function DashboardTopBar({
             onMouseDown={(e) => e.preventDefault()}
             className="absolute left-0 right-0 top-12 max-h-[70vh] overflow-y-auto rounded-2xl border border-gc-line bg-background py-1 shadow-lg"
           >
+            {answer && answer.q === q.trim() && (
+              <div className="border-b border-gc-line bg-gc-panel px-4 py-3">
+                <div className="mb-2 flex items-center gap-2 text-[12px] font-medium text-gc-ink-muted">
+                  <Sparkles className="h-3.5 w-3.5 text-gc-blue" /> Ask Jenvu
+                </div>
+                {answer.res === null ? (
+                  <div className="flex items-center gap-2 text-[13px]">
+                    <span aria-hidden className="ask-jenvu-mark-ring h-6 w-10 shrink-0" style={{ ["--mark" as string]: `url(${askJenvuMark})` }}><span className="ask-jenvu-mark-loop h-full w-full" /></span>
+                    <Shimmer>Thinking about your question…</Shimmer>
+                  </div>
+                ) : answer.res.ok ? (
+                  <div className="text-[14px] text-gc-ink"><MessageResponse>{answer.res.text}</MessageResponse></div>
+                ) : (
+                  <p className="text-[13px] text-gc-ink-muted">{answer.res.error}</p>
+                )}
+              </div>
+            )}
             {matches.length > 0 && (
               <div className="py-1">
                 <div className="px-4 pb-1 pt-2 text-[11px] font-medium uppercase tracking-wide text-gc-ink-muted">Pages</div>
@@ -164,20 +220,77 @@ export default function DashboardTopBar({
                 <Loader2 className="h-4 w-4 animate-spin" /> Searching the site…
               </div>
             )}
-            {!loading && matches.length === 0 && hits.length === 0 && (
+            {!loading && matches.length === 0 && hits.length === 0 && !(answer && answer.q === q.trim()) && (
               <div className="px-4 py-3 text-[13px] text-gc-ink-muted">
-                {q.trim().length < 3 ? "Keep typing to search the whole site…" : `No results for "${q.trim()}"`}
+                {q.trim().length < 3 ? "Keep typing to search the whole site…" : "No matches yet. Press Enter to ask Jenvu."}
               </div>
             )}
-            <button type="button" onClick={seeAll} className="flex w-full items-center gap-2 border-t border-gc-line px-4 py-2.5 text-left text-[13px] text-gc-blue hover:bg-gc-canvas">
-              <Search className="h-4 w-4" /> See all results for "{q.trim()}"
-            </button>
+            <div className="flex items-center justify-between gap-2 border-t border-gc-line px-4 py-2.5 text-[13px]">
+              {!(answer && answer.q === q.trim()) ? (
+                <button type="button" onClick={() => ask(q)} className="inline-flex min-w-0 items-center gap-1.5 text-gc-blue hover:underline">
+                  <Sparkles className="h-3.5 w-3.5 shrink-0" /> <span className="truncate">Ask Jenvu about “{q.trim().length > 40 ? `${q.trim().slice(0, 40)}…` : q.trim()}”</span>
+                </button>
+              ) : <span />}
+              <button type="button" onClick={seeAll} className="shrink-0 text-gc-blue hover:underline">See all results</button>
+            </div>
           </div>
         )}
       </div>
 
       <div className="ml-auto flex shrink-0 items-center gap-1 sm:ml-0">
+        {onTerminal && (
+          <button
+            type="button"
+            onClick={() => window.dispatchEvent(new CustomEvent("jenvu:terminal-script"))}
+            aria-pressed={scriptOpen}
+            aria-label="Jenvu Script"
+            title="Jenvu Script"
+            className={`hidden h-9 items-center gap-1.5 rounded-full px-3 text-[13px] font-medium md:inline-flex ${scriptOpen ? "bg-gc-nav-active text-gc-blue-deep" : "text-gc-ink hover:bg-gc-notice"}`}
+          >
+            <Code className="h-4 w-4" /> Script
+          </button>
+        )}
+        <button
+          type="button"
+          onClick={() => openAskJenvu("chat")}
+          aria-label="Ask Jenvu"
+          title="Ask Jenvu"
+          className="inline-flex h-9 items-center gap-2 rounded-full bg-gc-sky px-2.5 text-[13px] font-medium text-gc-blue-deep hover:brightness-95 sm:px-3.5"
+        >
+          <img src={askJenvuMark} alt="" className="h-3.5 w-auto shrink-0" />
+          <span className="hidden lg:inline">Ask Jenvu</span>
+        </button>
+        <GiftBox />
         <NotificationBell />
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button
+              type="button"
+              aria-label="More"
+              title="More"
+              className="inline-flex h-9 w-9 items-center justify-center rounded-full text-gc-ink-muted hover:bg-gc-notice"
+            >
+              <MoreVertical className="h-4 w-4" />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-56 rounded-2xl p-1">
+            <DropdownMenuItem asChild>
+              <Link to="/docs" className="cursor-pointer gap-2"><BookOpen className="h-4 w-4" /> Docs</Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link to="/help" className="cursor-pointer gap-2"><LifeBuoy className="h-4 w-4" /> Help center</Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link to="/pricing" className="cursor-pointer gap-2"><CreditCard className="h-4 w-4" /> Pricing</Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link to="/download" className="cursor-pointer gap-2"><Download className="h-4 w-4" /> Download extension</Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link to="/contact" className="cursor-pointer gap-2"><Mail className="h-4 w-4" /> Contact us</Link>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button
