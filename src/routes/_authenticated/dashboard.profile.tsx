@@ -124,7 +124,7 @@ function Profile() {
     <div className="mx-auto w-full max-w-[880px] space-y-6 pb-10 text-gc-ink">
       <header className="jenvu-rise pt-2">
         <span className="inline-flex rounded-full bg-gc-blue-soft px-3 py-1 text-[13px] font-medium text-gc-blue-deep">Settings</span>
-        <h1 className="mt-4 text-[32px] font-medium leading-tight tracking-[-0.3px] sm:text-[40px]">Your profile</h1>
+        <h1 className="mt-4 text-[32px] font-medium leading-tight tracking-[-0.3px] sm:text-[40px]">{"\n"}</h1>
         <p className="mt-2 max-w-[620px] text-[16px] leading-[1.6] text-gc-ink-muted">Your photo and name show on your dashboard, in the top menu and in messages you send to Jenvu support.</p>
       </header>
 
