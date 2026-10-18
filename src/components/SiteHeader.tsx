@@ -42,24 +42,6 @@ export default function SiteHeader() {
   return (
     <>
       <header className="jenvu-home-header sticky top-0 z-50 border-0 bg-background">
-        {searchOpen && (
-          <div className="absolute inset-x-0 top-0 z-[70] flex items-start gap-3 bg-background px-4 py-1.5">
-            <div className="relative mx-auto w-full max-w-[1000px]">
-              <form
-                onSubmit={(e) => { e.preventDefault(); const q = searchText.trim(); if (q) { setSearchOpen(false); navigate({ to: "/search", search: { q } }); } }}
-                className="flex h-12 items-center gap-3 rounded-lg border-2 border-gc-blue-deep bg-background px-4"
-              >
-                <Search className="h-5 w-5 text-gc-ink" />
-                <input autoFocus value={searchText} onChange={(e) => setSearchText(e.target.value)} onKeyDown={(e) => e.key === "Escape" && setSearchOpen(false)} placeholder="Search" className="flex-1 bg-transparent text-[16px] text-gc-ink outline-none" />
-                <button type="submit" aria-label="Search" className="text-gc-ink-muted hover:text-gc-ink"><SendHorizontal className="h-5 w-5" /></button>
-                <button type="button" aria-label="Close search" onClick={() => setSearchOpen(false)} className="text-gc-ink-muted hover:text-gc-ink"><X className="h-5 w-5" /></button>
-              </form>
-              <div className="absolute inset-x-0 top-full rounded-b-lg bg-gc-panel px-4 py-4 text-[13px] italic text-gc-ink-muted shadow-md">
-                Ask about Jenvu or anything else. Do not enter any sensitive, confidential, or personal information.
-              </div>
-            </div>
-          </div>
-        )}
         <div className="relative flex items-center gap-3 px-4 py-2.5 sm:px-4">
           <Link to="/" className="flex min-w-0 shrink-0 items-center gap-2">
             <img src="/favicon.png" alt="Jenvu" className="h-7 w-7 shrink-0 rounded-md object-contain" />
@@ -125,6 +107,24 @@ export default function SiteHeader() {
             </button>
           </div>
         </div>
+        {searchOpen && (
+          <div className="relative z-[70] flex items-start gap-3 bg-background px-4 pb-2">
+            <div className="relative mx-auto w-full max-w-[1000px]">
+              <form
+                onSubmit={(e) => { e.preventDefault(); const q = searchText.trim(); if (q) { setSearchOpen(false); navigate({ to: "/search", search: { q } }); } }}
+                className="flex h-12 items-center gap-3 rounded-lg border-2 border-gc-blue-deep bg-background px-4"
+              >
+                <Search className="h-5 w-5 text-gc-ink" />
+                <input autoFocus value={searchText} onChange={(e) => setSearchText(e.target.value)} onKeyDown={(e) => e.key === "Escape" && setSearchOpen(false)} placeholder="Search" className="flex-1 bg-transparent text-[16px] text-gc-ink outline-none" />
+                <button type="submit" aria-label="Search" className="text-gc-ink-muted hover:text-gc-ink"><SendHorizontal className="h-5 w-5" /></button>
+                <button type="button" aria-label="Close search" onClick={() => setSearchOpen(false)} className="text-gc-ink-muted hover:text-gc-ink"><X className="h-5 w-5" /></button>
+              </form>
+              <div className="absolute inset-x-0 top-full rounded-b-lg bg-gc-panel px-4 py-4 text-[13px] italic text-gc-ink-muted shadow-md">
+                Ask about Jenvu or anything else. Do not enter any sensitive, confidential, or personal information.
+              </div>
+            </div>
+          </div>
+        )}
       </header>
 
       {mobileMenuOpen && (
