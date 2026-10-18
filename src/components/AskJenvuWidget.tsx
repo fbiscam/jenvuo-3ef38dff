@@ -6,8 +6,10 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { MessageResponse } from "@/components/ai-elements/message";
+import { Shimmer } from "@/components/ai-elements/shimmer";
 import { askJenvu } from "@/lib/ask-jenvu.functions";
 import { submitContactMessage } from "@/lib/contact.functions";
+import askJenvuMark from "@/assets/ask-jenvu-mark.png";
 
 type Msg = { role: "user" | "assistant"; content: string; followUps?: string[]; showSales?: boolean; error?: boolean };
 
@@ -158,11 +160,11 @@ export function AskJenvuWidget() {
             <>
               <div ref={scrollRef} className="min-h-0 flex-1 overflow-y-auto px-6 pb-4">
                 {empty ? (
-                  <div className="flex min-h-full flex-col justify-center py-6">
-                    <h2 className="mx-auto max-w-[340px] text-center text-[26px] font-normal leading-[1.3]">
+                  <div className="flex min-h-full flex-col justify-center py-4">
+                    <h2 className="mx-auto max-w-[460px] text-center text-[26px] font-normal leading-[1.3]">
                       What would you like to know about Jenvu?
                     </h2>
-                    <div className="mt-8 space-y-3">
+                    <div className="mt-6 space-y-2.5">
                       {STARTERS.map((s) => (
                         <button key={s} type="button" onClick={() => send(s)} className="flex w-full items-center justify-between gap-3 rounded-full bg-gc-surface px-6 py-4 text-left text-[14px] transition hover:bg-gc-blue-soft">
                           <span>{s}</span>
@@ -188,9 +190,9 @@ export function AskJenvuWidget() {
                       ),
                     )}
                     {busy && (
-                      <div className="flex items-center gap-3 text-[15px]">
-                        <Sparkle className="h-5 w-5 animate-pulse fill-gc-blue text-gc-blue" />
-                        <span className="ask-jenvu-thinking">Thinking about your question..</span>
+                      <div className="flex items-center gap-2.5 text-[15px]" role="status">
+                        <img src={askJenvuMark} alt="" className="h-5 w-auto shrink-0 animate-pulse" />
+                        <Shimmer>Thinking about your question…</Shimmer>
                       </div>
                     )}
                   </div>
