@@ -37,7 +37,7 @@ export const getTelegramAlertLink = createServerFn({ method: 'GET' })
     }
   })
 
-/** Step 1 — store the chat id and send a 6-digit code to that Telegram chat. */
+/** Step 1 — store the chat id and return a 6-digit code the user must send to the Jenvu bot from that chat. */
 export const connectTelegramAlertLink = createServerFn({ method: 'POST' })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => z.object({ chatId: z.string().min(3).max(32) }).parse(d))
@@ -90,23 +90,9 @@ export const connectTelegramAlertLink = createServerFn({ method: 'POST' })
     )
     if (error) throw new Error(error.message)
 
-    try {
-      const { sendTelegramMessage } = await import('./telegram-alert.server')
-      await sendTelegramMessage(
-        chatId,
-        `<b>Jenvu verification code:</b> <code>${code}</code>\n\nEnter this code on the Alerts page to receive XAU/USD signals here.`,
-      )
-    } catch (e) {
-      const msg = (e as Error).message
-      await (await admin())
-        .update({ last_error: msg, updated_at: new Date().toISOString() })
-        .eq('user_id', context.userId)
-      throw new Error(
-        'Could not message that chat. Make sure you started a chat with the Jenvu bot first, then try again.',
-      )
-    }
-
-    return { ok: true, expiresAt: expires }
+    // No message is sent to the caller-chosen chat: the user proves ownership by sending
+    // this code to the Jenvu bot from that chat (checked in verifyTelegramAlertCode).
+    return { ok: true, expiresAt: expires, code }
   })
 
 /** Step 2 — verify the code. */
@@ -129,6 +115,14 @@ export const verifyTelegramAlertCode = createServerFn({ method: 'POST' })
         .update({ code_attempts: (r.code_attempts ?? 0) + 1 })
         .eq('user_id', context.userId)
       throw new Error('Incorrect code.')
+    }
+
+    // Ownership proof: the code must have been sent to the bot from the stored chat.
+    const { data: chatRow } = await (await admin()).select('chat_id').eq('user_id', context.userId).maybeSingle()
+    const { chatSentText } = await import('./telegram-alert.server')
+    const proven = chatRow?.chat_id ? await chatSentText(String(chatRow.chat_id), String(r.verification_code)) : false
+    if (!proven) {
+      throw new Error('Send this code to the Jenvu bot from your Telegram chat first, then try again.')
     }
 
     const { error } = await (await admin())

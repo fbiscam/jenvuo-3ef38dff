@@ -198,6 +198,15 @@ export const getCommunityProfile = createServerFn({ method: "GET" })
       .eq("handle", data.handle)
       .maybeSingle();
     if (!p) return null;
+    const isSelf = p.user_id === context.userId;
+    if (!isSelf) {
+      // Hide profiles across block relationships in either direction.
+      const { data: blocks } = await supabaseAdmin
+        .from("community_blocks").select("blocker_id")
+        .or(`and(blocker_id.eq.${context.userId},blocked_id.eq.${p.user_id}),and(blocker_id.eq.${p.user_id},blocked_id.eq.${context.userId})`)
+        .limit(1);
+      if (blocks && blocks.length) return null;
+    }
     const { data: prof } = await supabaseAdmin
       .from("profiles").select("full_name, avatar_url").eq("id", p.user_id).maybeSingle();
     const [{ count: followers }, { count: following }, { data: iFollow }, { data: tier }] = await Promise.all([
@@ -209,11 +218,13 @@ export const getCommunityProfile = createServerFn({ method: "GET" })
     const avatarSigned = await signAvatars(supabaseAdmin, prof?.avatar_url ? [prof.avatar_url] : []);
     return {
       user_id: p.user_id, handle: p.handle, display_name: p.display_name,
-      bio: p.bio, cover_url: p.cover_url, location: p.location, website: p.website,
+      bio: p.bio, cover_url: p.cover_url,
+      // Only public card fields for other viewers; personal details stay owner-only.
+      location: isSelf ? p.location : null, website: isSelf ? p.website : null,
       avatar_url: prof?.avatar_url ? avatarSigned.get(prof.avatar_url) ?? null : null,
       tier: (tier as CommunityTier) ?? null,
       followers: followers ?? 0, following: following ?? 0,
-      is_following: !!iFollow, is_self: p.user_id === context.userId,
+      is_following: !!iFollow, is_self: isSelf,
     };
   });
 
@@ -228,7 +239,8 @@ export const listCommunityFeed = createServerFn({ method: "GET" })
   }))
   .handler(async ({ context, data }): Promise<CommunityPostRow[]> => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    let q = supabaseAdmin
+    // Read posts as the caller so the block-aware posts_read policy applies.
+    let q = context.supabase
       .from("community_posts")
       .select("*")
       .is("deleted_at", null)
@@ -254,9 +266,9 @@ export const getCommunityPost = createServerFn({ method: "GET" })
   .inputValidator((d: { id: string }) => ({ id: String(d.id) }))
   .handler(async ({ context, data }): Promise<{ post: CommunityPostRow | null; replies: CommunityPostRow[] }> => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: post } = await supabaseAdmin.from("community_posts").select("*").eq("id", data.id).is("deleted_at", null).maybeSingle();
+    const { data: post } = await context.supabase.from("community_posts").select("*").eq("id", data.id).is("deleted_at", null).maybeSingle();
     if (!post) return { post: null, replies: [] };
-    const { data: replies } = await supabaseAdmin
+    const { data: replies } = await context.supabase
       .from("community_posts").select("*")
       .eq("parent_post_id", data.id).is("deleted_at", null)
       .order("created_at", { ascending: true }).limit(200);
