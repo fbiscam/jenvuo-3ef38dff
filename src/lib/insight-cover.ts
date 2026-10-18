@@ -1,23 +1,27 @@
-import bitcoinCover from "@/assets/insights/bitcoin-analysis-editorial.jpg";
-import globalSessionsCover from "@/assets/insights/global-sessions-editorial.jpg";
-import goldStructureCover from "@/assets/insights/gold-structure-editorial.jpg";
-import smartMoneyCover from "@/assets/insights/smart-money-editorial.jpg";
+import star from "@/assets/insights/cover-star.jpg";
+import ribbon from "@/assets/insights/cover-ribbon.jpg";
+import goldPattern from "@/assets/insights/cover-gold-pattern.jpg";
+import bluePattern from "@/assets/insights/cover-blue-pattern.jpg";
+import blueUi from "@/assets/insights/cover-blue-ui.jpg";
+import rainbow from "@/assets/insights/cover-rainbow.jpg";
 
-const BITCOIN_TERMS = /bitcoin|btc|crypto/i;
-const SESSION_TERMS = /london|frankfurt|new york|session|macro|global|forecast|outlook/i;
-const SMART_MONEY_TERMS = /smart money|smc|ict|order block|fair value|liquidity|killzone/i;
+// Every article (old and new) uses one of these Google Cloud blog-style covers,
+// picked by a stable hash of the title so each article always gets the same one.
+const COVERS = [star, goldPattern, blueUi, ribbon, bluePattern, rainbow];
 
-export function fallbackInsightCover(title: string, category = ""): string {
-  const subject = `${title} ${category}`;
-  if (BITCOIN_TERMS.test(subject)) return bitcoinCover;
-  if (SESSION_TERMS.test(subject)) return globalSessionsCover;
-  if (SMART_MONEY_TERMS.test(subject)) return smartMoneyCover;
-  return goldStructureCover;
+function hash(value: string): number {
+  let h = 2166136261;
+  for (let i = 0; i < value.length; i++) {
+    h ^= value.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return Math.abs(h);
 }
 
-export function insightCoverUrl(title: string, category: string, imageUrl?: string | null): string {
-  if (!imageUrl || /images\.unsplash\.com|source\.unsplash\.com|\/insight-image\/[^?]+\.svg(?:\?|$)/i.test(imageUrl)) {
-    return fallbackInsightCover(title, category);
-  }
-  return imageUrl;
+export function fallbackInsightCover(title: string, category = ""): string {
+  return COVERS[hash(`${title}|${category}`) % COVERS.length];
+}
+
+export function insightCoverUrl(title: string, category: string, _imageUrl?: string | null): string {
+  return fallbackInsightCover(title, category);
 }
