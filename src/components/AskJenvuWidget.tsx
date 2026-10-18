@@ -128,7 +128,7 @@ export function AskJenvuWidget() {
                 <ArrowLeft className="h-5 w-5" /> Return to conversation
               </button>
             ) : (
-              <span className="text-[16px]">Ask Jenvu</span>
+              <span className="text-[16px]"> Ask Jenvu</span>
             )}
             <div className="ml-auto flex items-center">
               {!empty && (
