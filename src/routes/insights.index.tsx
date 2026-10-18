@@ -163,90 +163,95 @@ function InsightsPage() {
 
       <div className="jenvu-home-content">
         {/* HERO */}
-        <section className="bg-gc-canvas">
-          <div className="mx-auto max-w-[1200px] px-5 py-14 sm:px-8 sm:py-16">
-            <div className="text-[14px] font-medium text-gc-blue">Jenvu Blog</div>
-            <h1 className="mt-3 max-w-[760px] text-[36px] font-normal leading-[1.15] tracking-[-0.5px] text-gc-ink sm:text-[48px]">
-              Gold market insights and product news
-            </h1>
-            <p className="mt-4 max-w-[680px] text-[16px] leading-[1.6] text-gc-ink-muted sm:text-[18px]">
-              Daily XAU/USD analysis, ICT and SMC guides, and updates from the Jenvu team.
-            </p>
-            <div className="mt-8 flex flex-wrap gap-2" role="tablist" aria-label="Filter articles">
-              {filters.map((f) => {
-                const active = filter === f.id;
-                return (
-                  <button
-                    key={f.id}
-                    type="button"
-                    role="tab"
-                    aria-selected={active}
-                    onClick={() => onFilterChange(f.id)}
-                    className={`h-9 rounded-full border px-4 text-[14px] font-medium transition-colors ${
-                      active
-                        ? "border-gc-nav-active bg-gc-nav-active text-gc-blue-deep"
-                        : "border-gc-line bg-background text-gc-ink hover:bg-gc-surface"
-                    }`}
-                  >
-                    {f.label}
-                  </button>
-                );
-              })}
-            </div>
+        <section className="mx-auto max-w-[1200px] px-5 pb-6 pt-14 text-center sm:px-8 sm:pt-16">
+          <img src="/favicon.png" alt="" width={56} height={56} className="mx-auto h-14 w-14 object-contain" />
+          <h1 className="mx-auto mt-5 max-w-[960px] text-[34px] font-medium leading-[1.15] tracking-[-0.5px] text-gc-ink sm:text-[50px]">
+            <span className="text-gc-blue">News, tips, and insights</span> to sharpen your gold trading
+          </h1>
+          <div className="mt-8 flex flex-wrap justify-center gap-2" role="tablist" aria-label="Filter articles">
+            {filters.map((f) => {
+              const active = filter === f.id;
+              return (
+                <button
+                  key={f.id}
+                  type="button"
+                  role="tab"
+                  aria-selected={active}
+                  onClick={() => onFilterChange(f.id)}
+                  className={`h-9 rounded-full border px-4 text-[14px] font-medium transition-colors ${
+                    active
+                      ? "border-gc-nav-active bg-gc-nav-active text-gc-blue-deep"
+                      : "border-gc-line bg-background text-gc-ink hover:bg-gc-surface"
+                  }`}
+                >
+                  {f.label}
+                </button>
+              );
+            })}
           </div>
         </section>
 
-        <main className="mx-auto max-w-[1200px] px-5 py-12 sm:px-8 sm:py-16">
+        <main className="mx-auto max-w-[1200px] px-5 py-10 sm:px-8 sm:py-12">
           {/* FEATURED */}
           {featured && (
             <Link
               to="/insights/$slug"
               params={{ slug: featured.slug }}
-              className="group mb-14 grid overflow-hidden rounded-3xl border border-gc-line bg-background transition hover:shadow-md lg:grid-cols-2"
+              className="group mb-14 grid items-center gap-8 lg:grid-cols-[minmax(0,5fr)_minmax(0,9fr)] lg:gap-14"
             >
-              <div className="aspect-[16/10] overflow-hidden bg-gc-surface lg:aspect-auto lg:min-h-[340px]">
-                <img {...coverProps(featured)} className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
-              </div>
-              <div className="flex flex-col justify-center p-7 sm:p-10">
-                <div className="text-[13px] font-medium text-gc-blue">Featured · {featured.category}</div>
-                <h2 className="mt-3 line-clamp-3 text-[26px] font-normal leading-[1.25] text-gc-ink sm:text-[32px]">
+              <div className="order-2 lg:order-1">
+                <Chip>{featured.category}</Chip>
+                <h2 className="mt-4 text-[26px] font-normal leading-[1.3] text-gc-ink group-hover:text-gc-blue sm:text-[30px]">
                   {featured.title}
                 </h2>
-                <p className="mt-4 line-clamp-3 text-[15px] leading-[1.65] text-gc-ink-muted">{featured.excerpt}</p>
-                <div className="mt-6 flex items-center justify-between gap-4">
-                  <span className="text-[13px] text-gc-ink-muted">{fmtUTC(featured.published_at, "full")}</span>
-                  <span className="text-[14px] font-medium text-gc-blue group-hover:underline">Read article →</span>
-                </div>
+                {featured.excerpt && (
+                  <p className="mt-4 line-clamp-3 text-[16px] leading-[1.7] text-gc-ink-muted">{featured.excerpt}</p>
+                )}
+                <Byline item={featured} />
+              </div>
+              <div className="order-1 aspect-[16/10] overflow-hidden rounded-[28px] bg-gc-ink lg:order-2">
+                <img {...coverProps(featured)} className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]" />
               </div>
             </Link>
           )}
 
-          <h2 className="mb-6 text-[22px] font-normal text-gc-ink sm:text-[26px]">
-            {filter === "latest" ? "Latest articles" : filter === "gold" ? "Gold analysis" : "Macro and education"}
+          {/* NEWS IN SHORT */}
+          <section className="mb-16 rounded-3xl bg-gc-canvas px-6 py-10 sm:px-12">
+            <h2 className="text-[22px] font-medium text-gc-ink">News in short</h2>
+            <p className="mt-2 max-w-[720px] text-[16px] leading-[1.6] text-gc-ink-muted">
+              A quick take on gold briefings, product updates and trading guides from Jenvu in one handy place. Updated daily.
+            </p>
+            <a href="#subscribe" className="mt-6 inline-flex h-11 items-center rounded-full border border-gc-ink-muted px-6 text-[15px] font-medium text-gc-blue hover:bg-background">
+              Click here
+            </a>
+          </section>
+
+          <h2 className="border-b border-gc-line pb-6 text-[26px] font-normal text-gc-ink sm:text-[30px]">
+            {filter === "latest" ? "All stories" : filter === "gold" ? "Gold analysis" : "Macro and education"}
           </h2>
 
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div>
             {remaining.map((item) => (
               <Link
                 key={item.id}
                 to="/insights/$slug"
                 params={{ slug: item.slug }}
-                className="group flex flex-col overflow-hidden rounded-2xl border border-gc-line bg-background transition hover:shadow-md"
+                className="group flex items-center gap-6 border-b border-gc-line py-8"
               >
-                <div className="aspect-video overflow-hidden bg-gc-surface">
-                  <img {...coverProps(item)} loading="lazy" className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
-                </div>
-                <div className="flex flex-1 flex-col p-6">
-                  <div className="text-[13px] font-medium text-gc-blue">{item.category}</div>
-                  <h3 className="mt-2 line-clamp-2 min-h-[3.2rem] text-[18px] font-medium leading-[1.4] text-gc-ink">
+                <div className="min-w-0 flex-1">
+                  <Chip>{item.category}</Chip>
+                  <h3 className="mt-3 text-[20px] font-normal leading-[1.35] text-gc-ink group-hover:text-gc-blue sm:text-[26px]">
                     {item.title}
                   </h3>
-                  <p className="mt-2 line-clamp-3 text-[14px] leading-[1.6] text-gc-ink-muted">{item.excerpt}</p>
-                  <div className="mt-auto pt-5 text-[13px] text-gc-ink-muted">{fmtUTC(item.published_at, "full")}</div>
+                  <Byline item={item} />
+                </div>
+                <div className="hidden aspect-[16/9] w-[246px] shrink-0 overflow-hidden rounded-2xl bg-gc-surface sm:block">
+                  <img {...coverProps(item)} loading="lazy" className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
                 </div>
               </Link>
             ))}
           </div>
+
 
           {remaining.length === 0 && !featured && (
             <div className="py-16 text-center text-[15px] text-gc-ink-muted">No articles in this category yet.</div>
