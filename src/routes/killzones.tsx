@@ -1,7 +1,9 @@
 import { getIpGeo } from "@/lib/ip-geo";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { ArrowLeft, Search, Clock, MapPin, Radar, Lock } from "lucide-react";
+import { Search, Clock, MapPin, Lock } from "lucide-react";
+import SiteHeader from "@/components/SiteHeader";
+import SiteFooter from "@/components/SiteFooter";
 import { PAIR_PROFILES, type PairProfile } from "@/lib/analysis/engine";
 
 export const Route = createFileRoute("/killzones")({
@@ -217,74 +219,37 @@ function KillzonesPage() {
 
   return (
     <div className="public-cloudflare killzones-root min-h-dvh w-full bg-background text-foreground font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif] antialiased">
-      <header className="sticky top-0 z-40 border-b border-zinc-100 bg-white">
-        <div className="relative mx-auto flex max-w-[1600px] items-center justify-between gap-3 px-5 py-3 sm:px-6 sm:py-4">
-          <button
-            onClick={() => {
-              if (typeof window !== "undefined" && window.history.length > 1) {
-                window.history.back();
-              } else {
-                navigate({ to: "/app" });
-              }
-            }}
-            className="h-8 inline-flex items-center gap-1.5 px-3 rounded-lg border border-zinc-200 bg-white text-[12px] text-zinc-700 hover:bg-zinc-50 transition"
-          >
-            <ArrowLeft className="h-3.5 w-3.5" /> Back
-          </button>
-          <div className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 hidden sm:flex items-center gap-2.5">
-            <Link
-              to="/"
-              aria-label="Jenvu home"
-              className="pointer-events-auto shrink-0 inline-flex items-center justify-center rounded-md hover:opacity-80 transition"
-            >
-              <img src="/favicon.png" alt="Jenvu" className="h-6 w-6 rounded-md" />
-            </Link>
-            <span className="truncate text-[22px] tracking-tight leading-none select-none" style={{ color: "#3c4043", fontFamily: "\"Google Sans\", \"Product Sans\", \"DM Sans\", system-ui, sans-serif", fontWeight: 500 }}>Jenvu</span>
-          </div>
-          <Link
-            to="/app"
-            className="h-8 inline-flex items-center gap-1.5 px-3 rounded-lg bg-home-accent text-[12px] font-medium text-home-accent-foreground hover:opacity-90 transition"
-          >
-            <Radar className="h-3.5 w-3.5" /> Open Desk
-          </Link>
-        </div>
-      </header>
-
-      <main className="mx-auto max-w-[1600px] px-5 py-6 sm:px-6 sm:py-10" style={{ fontFamily: '"Google Sans", "Product Sans", "DM Sans", system-ui, sans-serif' }}>
-        {/* Hero */}
-        <div className="mb-6 sm:mb-8">
-          <div className={`${MONO} text-[10px] tracking-[0.2em] uppercase text-zinc-500 mb-2`} aria-hidden="true">
-            &nbsp;
-          </div>
-          <h1 className="text-[19px] sm:text-4xl font-semibold tracking-tight whitespace-nowrap sm:whitespace-normal">
-            Every pair. Every killzone. Live.
-          </h1>
-          <p className="text-sm sm:text-[13px] lg:text-[14px] xl:text-[15px] text-zinc-600 mt-2 max-w-2xl sm:max-w-none sm:whitespace-nowrap">
-            ICT / SMC session windows for every instrument Jenvu analyzes — shown in UTC and your local time, with a live IN/OUT status.
+      <SiteHeader />
+      <main className="jenvu-home-content mx-auto max-w-[1296px] px-5 pb-16 sm:px-8">
+        <div className="pb-10 pt-12 text-center md:pt-14">
+          <span className="jenvu-rise inline-flex rounded-full bg-gc-blue-soft px-3 py-1 text-[13px] font-medium text-gc-blue-deep">Free tool · XAU/USD</span>
+          <h1 className="jenvu-rise mt-5 text-[40px] font-medium leading-[1.1] tracking-[-0.5px] sm:text-[56px]">Gold killzones, live</h1>
+          <p className="jenvu-rise [animation-delay:80ms] mx-auto mt-5 max-w-[720px] text-[17px] leading-[1.6] text-gc-ink-muted">
+            ICT / SMC session windows for XAU/USD — shown in UTC and your local time, with a live in/out status.
           </p>
         </div>
 
         {/* Live clock strip */}
         <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-3">
-          <div className="rounded-xl border border-zinc-200 bg-white p-4 ring-1 ring-white/60">
-            <div className={`${MONO} text-[10px] uppercase tracking-widest text-zinc-500`}>UTC</div>
+          <div className="rounded-3xl border border-gc-line bg-background p-5 ">
+            <div className={`${MONO} text-[10px] uppercase tracking-widest text-gc-ink-muted`}>UTC</div>
             <div className={`${MONO} text-xl sm:text-2xl font-semibold mt-1`}>{utcNow}</div>
           </div>
-          <div className="rounded-xl border border-zinc-200 bg-white p-4 ring-1 ring-white/60">
-            <div className={`${MONO} text-[10px] uppercase tracking-widest text-zinc-500`}>
+          <div className="rounded-3xl border border-gc-line bg-background p-5 ">
+            <div className={`${MONO} text-[10px] uppercase tracking-widest text-gc-ink-muted`}>
               Local · {tzShort}
             </div>
             <div className={`${MONO} text-xl sm:text-2xl font-semibold mt-1`}>{localNow}</div>
           </div>
-          <div className="col-span-2 sm:col-span-1 rounded-xl border border-zinc-200 bg-white p-4 ring-1 ring-white/60">
-            <div className={`${MONO} text-[10px] uppercase tracking-widest text-zinc-500`}>
+          <div className="col-span-2 sm:col-span-1 rounded-3xl border border-gc-line bg-background p-5 ">
+            <div className={`${MONO} text-[10px] uppercase tracking-widest text-gc-ink-muted`}>
               {ipCity ? "Detected location" : "Timezone"}
             </div>
             <div className="text-sm font-medium mt-1 flex items-center gap-1.5">
-              <MapPin className="h-3.5 w-3.5 text-zinc-400" />
+              <MapPin className="h-3.5 w-3.5 text-gc-ink-muted" />
               <span className="truncate">{ipCity ?? tz}</span>
             </div>
-            <div className={`${MONO} mt-1 text-[10px] text-zinc-500 truncate`}>
+            <div className={`${MONO} mt-1 text-[10px] text-gc-ink-muted truncate`}>
               {tz}
               {ipTZ ? " · via IP" : ""}
             </div>
@@ -294,12 +259,12 @@ function KillzonesPage() {
         {/* Search + tabs */}
         <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="relative w-full sm:max-w-xs">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gc-ink-muted" />
             <input
               value={query}
               onChange={e => setQuery(e.target.value)}
               placeholder="Search symbol, name or region…"
-              className="w-full h-10 rounded-lg border border-zinc-200 bg-white pl-9 pr-3 text-sm outline-none focus:border-zinc-400 transition"
+              className="w-full h-11 rounded-full border border-gc-line bg-background pl-9 pr-3 text-sm outline-none focus:border-gc-ink-muted transition"
             />
           </div>
           <div className="flex flex-wrap gap-1.5">
@@ -307,7 +272,7 @@ function KillzonesPage() {
               <button
                 key={c}
                 onClick={() => setCat(c)}
-                className={`h-8 px-3 rounded-lg border text-[12px] font-medium transition ${ cat === c ? "border-home-accent bg-home-accent text-home-accent-foreground" : "border-border bg-background text-muted-foreground hover:border-home-accent/50" }`}
+                className={`h-9 px-4 rounded-full border text-[12px] font-medium transition ${ cat === c ? "border-gc-blue bg-gc-blue text-gc-on-blue" : "border-border bg-background text-muted-foreground hover:border-home-accent/50" }`}
               >
                 {c}
               </button>
@@ -323,11 +288,11 @@ function KillzonesPage() {
             return (
               <section key={section}>
                 <div className="mb-3 flex items-center gap-2">
-                  <h2 className={`${MONO} text-[11px] font-normal uppercase tracking-[0.2em] text-zinc-500`}>
+                  <h2 className={`${MONO} text-[11px] font-normal uppercase tracking-[0.2em] text-gc-ink-muted`}>
                     {section}
                   </h2>
-                  <div className="h-px flex-1 bg-zinc-200" />
-                  <div className={`${MONO} text-[10px] text-zinc-400`}>{items.length}</div>
+                  <div className="h-px flex-1 bg-gc-line" />
+                  <div className={`${MONO} text-[10px] text-gc-ink-muted`}>{items.length}</div>
                 </div>
 
                 <div className="grid grid-cols-1 gap-2.5 md:grid-cols-2">
@@ -343,37 +308,37 @@ function KillzonesPage() {
                         onClick={() => {
                           navigate({ to: "/app" });
                         }}
-                        className={`group text-left rounded-xl border p-4 ring-1 ring-white/60 transition-all duration-300 hover:-translate-y-1 ${ locked ? "border-zinc-200 bg-zinc-50/60 hover:border-zinc-300/70" : "border-zinc-200 bg-white hover:border-zinc-300/70 " }`}
+                        className={`group text-left rounded-3xl p-5  border p-4  transition-all duration-300 hover:-translate-y-1 ${ locked ? "border-gc-line bg-gc-surface hover:border-gc-line" : "border-gc-line bg-background hover:border-gc-line " }`}
                       >
                         <div className="flex items-start justify-between gap-3">
                           <div className="min-w-0">
                             <div className="flex items-center gap-2">
                               <span className="text-lg leading-none">{meta.flag}</span>
-                              <span className={`${MONO} text-sm font-semibold ${locked ? "text-zinc-500" : ""}`}>
+                              <span className={`${MONO} text-sm font-semibold ${locked ? "text-gc-ink-muted" : ""}`}>
                                 {profile.key}
                               </span>
                               {locked && (
-                                <span className={`${MONO} inline-flex items-center gap-1 rounded-md border border-zinc-300 bg-white px-1.5 py-0.5 text-[9px] uppercase tracking-wider text-zinc-600`}>
+                                <span className={`${MONO} inline-flex items-center gap-1 rounded-md border border-gc-line bg-background px-1.5 py-0.5 text-[9px] uppercase tracking-wider text-gc-ink-muted`}>
                                   <Lock className="h-2.5 w-2.5" /> Pro
                                 </span>
                               )}
-                              <span className="text-xs text-zinc-500 truncate">{meta.name}</span>
+                              <span className="text-xs text-gc-ink-muted truncate">{meta.name}</span>
                             </div>
-                            <div className="mt-1 flex items-center gap-1 text-[11px] text-zinc-500">
+                            <div className="mt-1 flex items-center gap-1 text-[11px] text-gc-ink-muted">
                               <MapPin className="h-3 w-3" />
                               {meta.region}
                             </div>
                           </div>
                           <div
-                            className={`shrink-0 inline-flex items-center gap-1.5 px-2 py-1 rounded-md ${MONO} text-[10px] uppercase tracking-wider ${ !marketOpen ? "bg-amber-50 text-amber-700 border border-amber-200" : st.inKillzone ? "bg-emerald-50 text-emerald-700 border border-emerald-200" : "bg-zinc-50 text-zinc-600 border border-zinc-200" }`}
+                            className={`shrink-0 inline-flex items-center gap-1.5 px-2 py-1 rounded-md ${MONO} text-[10px] uppercase tracking-wider ${ !marketOpen ? "bg-gc-yellow-soft text-gc-ink border border-gc-yellow-soft" : st.inKillzone ? "bg-gc-green-soft text-gc-green border border-gc-green-soft" : "bg-gc-surface text-gc-ink-muted border border-gc-line" }`}
                           >
                             <span
                               className={`h-1.5 w-1.5 rounded-full ${
                                 !marketOpen
-                                  ? "bg-amber-500"
+                                  ? "bg-gc-yellow"
                                   : st.inKillzone
-                                    ? "bg-emerald-500 animate-pulse"
-                                    : "bg-zinc-400"
+                                    ? "bg-gc-green animate-pulse"
+                                    : "bg-gc-ink-muted"
                               }`}
                             />
                             {!marketOpen ? "Market Closed" : st.inKillzone ? "In Killzone" : "Outside"}
@@ -387,18 +352,18 @@ function KillzonesPage() {
                             return (
                               <div
                                 key={kz.name}
-                                className={`flex items-center justify-between gap-2 rounded-md px-2.5 py-1.5 text-[11px] ${ active ? "bg-emerald-50/60 border border-emerald-100" : "bg-zinc-50/70 border border-zinc-100" }`}
+                                className={`flex items-center justify-between gap-2 rounded-md px-2.5 py-1.5 text-[11px] ${ active ? "bg-gc-green-soft border border-gc-green-soft" : "bg-gc-surface border border-gc-line" }`}
                               >
                                 <div className="flex items-center gap-1.5 min-w-0">
-                                  <Clock className="h-3 w-3 text-zinc-400 shrink-0" />
-                                  <span className="text-zinc-700 truncate">{kz.name}</span>
+                                  <Clock className="h-3 w-3 text-gc-ink-muted shrink-0" />
+                                  <span className="text-gc-ink truncate">{kz.name}</span>
                                 </div>
-                                <div className={`${MONO} text-[10.5px] text-zinc-600 text-right`}>
+                                <div className={`${MONO} text-[10.5px] text-gc-ink-muted text-right`}>
                                   <span>
                                     {fmtUTC(kz.startUTC)}–{fmtUTC(kz.endUTC)} UTC
                                   </span>
-                                  <span className="mx-1 text-zinc-300">·</span>
-                                  <span className="text-zinc-500">
+                                  <span className="mx-1 text-gc-line">·</span>
+                                  <span className="text-gc-ink-muted">
                                     {utcHourToLocal(kz.startUTC, tz)}–{utcHourToLocal(kz.endUTC, tz)}{" "}
                                     {tzShort}
                                   </span>
@@ -409,14 +374,14 @@ function KillzonesPage() {
                         </div>
 
                         <div className="mt-3 flex items-center justify-between">
-                          <div className={`${MONO} text-[10.5px] text-zinc-500`}>
+                          <div className={`${MONO} text-[10.5px] text-gc-ink-muted`}>
                             Prime: {profile.primeSession.name} ·{" "}
                             {fmtUTC(profile.primeSession.startUTC)}–
                             {fmtUTC(profile.primeSession.endUTC)} UTC
                           </div>
                           <div
                             className={`${MONO} text-[10.5px] ${
-                              st.inKillzone ? "text-emerald-700" : "text-zinc-500"
+                              st.inKillzone ? "text-gc-green" : "text-gc-ink-muted"
                             }`}
                           >
                             {st.countdown}
@@ -430,17 +395,17 @@ function KillzonesPage() {
             );
           })}
           {rows.length === 0 && (
-            <div className="rounded-xl border border-dashed border-zinc-200 bg-white p-10 text-center text-sm text-zinc-500">
+            <div className="rounded-xl border border-dashed border-gc-line bg-background p-10 text-center text-sm text-gc-ink-muted">
               No instruments match your search.
             </div>
           )}
         </div>
 
-        <p className="mt-10 text-center text-[11px] text-zinc-500">
-          Local times auto-converted from UTC using your device timezone. Trade during killzones for
-          highest A+ setup probability.
+        <p className="mt-10 text-center text-[13px] text-gc-ink-muted">
+          Local times are converted from UTC using your device timezone. Killzones show when gold is usually most active — they don't guarantee a setup.
         </p>
       </main>
+      <div className="hide-in-pwa"><SiteFooter /></div>
     </div>
   );
 }
