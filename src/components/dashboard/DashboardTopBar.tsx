@@ -60,9 +60,14 @@ export default function DashboardTopBar({
   const matches = useMemo(() => {
     const t = q.trim().toLowerCase();
     if (!t) return [];
+    const words = t.split(/\s+/).filter((w) => w.length >= 3);
     const seen = new Set<string>();
     return [...links, ...SITE_PAGES]
-      .filter((l) => l.label.toLowerCase().includes(t) && !seen.has(l.to) && seen.add(l.to))
+      .filter((l) => {
+        const label = l.label.toLowerCase();
+        const hit = label.includes(t) || words.some((w) => label.includes(w));
+        return hit && !seen.has(l.to) && seen.add(l.to);
+      })
       .slice(0, 5);
   }, [q, links]);
 
