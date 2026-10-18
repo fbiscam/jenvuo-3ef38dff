@@ -25,3 +25,7 @@
 - [x] Founder, Scam Check, Killzones pages in homepage style
 - [x] Founding offer copy updated to current rules everywhere
 - [x] Thinking logo: blue inside, thinner smoother border
+- [x] Contact page: separate live chat button removed; Ask Jenvu hands over to live chat in the same window when a person is requested
+- [x] Terminal page top bar pure white
+- [x] Signed-in public header: profile picture next to Dashboard, opens settings
+- [x] Dashboard home: "Log a trade" shortcut removed

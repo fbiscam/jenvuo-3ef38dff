@@ -14,7 +14,7 @@ const Input = z.object({
 });
 
 export type AskJenvuResult =
-  | { ok: true; text: string; followUps: string[]; showSales: boolean }
+  | { ok: true; text: string; followUps: string[]; showSales: boolean; agent: boolean }
   | { ok: false; error: string };
 
 const SYSTEM = (knowledge: string) => `You are "Ask Jenvu", the friendly assistant on the Jenvu website.
@@ -26,6 +26,7 @@ Rules:
 - For a greeting like "hi", welcome the user to Jenvu, introduce yourself as the Jenvu assistant and list 3 things you can help with.
 After your answer, on new lines, output exactly:
 <<FOLLOWUPS>> question one | question two | question three
+<<AGENT>> no   (write yes only if the user asks to talk to a real person, a human, an agent, support staff or live chat)
 <<SALES>> yes   (only if the user greets you, asks about pricing, plans, buying, business use, the Founding Program, or talking to a person; otherwise write no)
 
 KNOWLEDGE:
@@ -72,12 +73,14 @@ function parse(raw: string): AskJenvuResult {
   let text = raw;
   let followUps: string[] = [];
   let showSales = false;
+  const a = text.match(/<<AGENT>>\s*(\w+)/i);
+  const agent = !!a && a[1].toLowerCase().startsWith("y");
   const f = text.match(/<<FOLLOWUPS>>([^\n]*)/i);
   if (f) {
     followUps = f[1].split("|").map((s) => s.trim().replace(/^[-*\d.\s]+/, "")).filter((s) => s.length > 2).slice(0, 3);
   }
   const s = text.match(/<<SALES>>\s*(\w+)/i);
   if (s) showSales = s[1].toLowerCase().startsWith("y");
-  text = text.replace(/<<FOLLOWUPS>>[^\n]*/gi, "").replace(/<<SALES>>[^\n]*/gi, "").trim();
-  return { ok: true, text, followUps, showSales };
+  text = text.replace(/<<FOLLOWUPS>>[^\n]*/gi, "").replace(/<<SALES>>[^\n]*/gi, "").replace(/<<AGENT>>[^\n]*/gi, "").trim();
+  return { ok: true, text, followUps, showSales, agent };
 }

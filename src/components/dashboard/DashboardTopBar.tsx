@@ -21,6 +21,7 @@ export default function DashboardTopBar({
   name,
   email,
   onSignOut,
+  white = false,
 }: {
   links: NavLink[];
   onMenu: () => void;
@@ -28,6 +29,8 @@ export default function DashboardTopBar({
   name: string;
   email: string;
   onSignOut: () => void;
+  /** Pure white bar (used on the Terminal page). */
+  white?: boolean;
 }) {
   const navigate = useNavigate();
   const [q, setQ] = useState("");
@@ -47,7 +50,7 @@ export default function DashboardTopBar({
   };
 
   return (
-    <header className="sticky top-0 z-30 flex h-14 shrink-0 items-center gap-2 bg-gc-canvas px-2 sm:gap-3 sm:px-3">
+    <header className={`sticky top-0 z-30 flex h-14 shrink-0 items-center gap-2 ${white ? "bg-background" : "bg-gc-canvas"} px-2 sm:gap-3 sm:px-3`}>
       <button
         type="button"
         onClick={onMenu}
