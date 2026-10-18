@@ -1277,7 +1277,7 @@ html body .dash-dark main.bg-white { background-color: oklch(0.165 0 0) !importa
   0%, 100% { transform: translateY(0) rotate(0deg); }
   50% { transform: translateY(-4px) rotate(-4deg); }
 }
-.jenvu-logo-intro { animation: jenvu-logo-intro 1s cubic-bezier(.2,.8,.2,1) both, jenvu-logo-float 4s ease-in-out 1.1s infinite; }
+.jenvu-logo-intro { animation: jenvu-logo-intro 0.6s cubic-bezier(.2,.8,.2,1) both, jenvu-logo-float 4s ease-in-out 1.1s infinite; }
 @keyframes jenvu-logo-reveal {
   0% { opacity: 0; transform: translateX(60px) scale(0.55) rotate(-30deg); }
   70% { opacity: 1; transform: translateX(-6px) scale(1.04) rotate(4deg); }
@@ -1288,7 +1288,7 @@ html body .dash-dark main.bg-white { background-color: oklch(0.165 0 0) !importa
   50% { transform: translateY(-10px) rotate(3deg) scale(1.02); }
 }
 .jenvu-logo-big { opacity: 0; }
-.jenvu-logo-big.is-visible { animation: jenvu-logo-reveal 1.2s cubic-bezier(.2,.8,.2,1) both, jenvu-logo-drift 6s ease-in-out 1.3s infinite; }
+.jenvu-logo-big.is-visible { animation: jenvu-logo-reveal 0.7s cubic-bezier(.2,.8,.2,1) both, jenvu-logo-drift 6s ease-in-out 0.8s infinite; }
 @keyframes ask-jenvu-shine { from { background-position: 200% 0; } to { background-position: -200% 0; } }
 .ask-jenvu-thinking {
   background: linear-gradient(90deg, var(--gc-ink) 30%, var(--gc-blue) 50%, var(--gc-ink) 70%);
@@ -1296,7 +1296,12 @@ html body .dash-dark main.bg-white { background-color: oklch(0.165 0 0) !importa
   -webkit-background-clip: text; background-clip: text; color: transparent;
   animation: ask-jenvu-shine 2s linear infinite;
 }
+@keyframes jenvu-story-in { from { opacity: 0; transform: translateX(120px); } to { opacity: 1; transform: translateX(0); } }
+.jenvu-story-in { animation: jenvu-story-in 0.5s cubic-bezier(.2,.8,.2,1) both; }
+@keyframes jenvu-rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+.jenvu-rise { animation: jenvu-rise 0.45s ease-out both; }
 @media (prefers-reduced-motion: reduce) {
+  .jenvu-story-in, .jenvu-rise,
   .jenvu-logo-intro, .jenvu-logo-big.is-visible, .ask-jenvu-thinking { animation: none; }
   .jenvu-logo-big { opacity: 1; }
 }

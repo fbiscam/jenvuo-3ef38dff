@@ -105,8 +105,8 @@ export function AskJenvuWidget() {
           onClick={() => { setView("chat"); setOpen(true); }}
           aria-label="Ask Jenvu"
           className={[
-            "fixed bottom-5 right-5 z-[9998] flex h-12 items-center justify-center gap-2 rounded-full bg-background text-[14px] font-medium text-gc-ink",
-            "shadow-[0_2px_6px_rgba(60,64,67,0.15),0_6px_18px_rgba(60,64,67,0.18)] ring-1 ring-gc-line transition-all duration-300 hover:bg-gc-surface",
+            "fixed bottom-5 right-5 z-[9998] flex h-12 items-center justify-center gap-2 rounded-2xl bg-gc-sky text-[14px] font-medium text-gc-blue-deep",
+            "shadow-[0_2px_6px_rgba(60,64,67,0.15),0_6px_18px_rgba(60,64,67,0.18)] transition-all duration-300 hover:brightness-95",
             compact ? "w-12 px-0" : "px-5",
           ].join(" ")}
         >
