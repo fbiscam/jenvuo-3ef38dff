@@ -28,9 +28,6 @@ import { Route as FoundingRouteImport } from './routes/founding'
 import { Route as InsightsRouteImport } from './routes/insights'
 import { Route as JenvuOpsX9k2RouteImport } from './routes/jenvu-ops-x9k2'
 import { Route as KillzonesRouteImport } from './routes/killzones'
-import { Route as LeadsRouteImport } from './routes/leads'
-import { Route as LeadsSigninRouteImport } from './routes/leads-signin'
-import { Route as LeadsSignupRouteImport } from './routes/leads-signup'
 import { Route as LlmRouteImport } from './routes/llm'
 import { Route as McpRouteImport } from './routes/mcp'
 import { Route as OpsX9k27m4nRouteImport } from './routes/ops-x9k2-7m4n'
@@ -52,17 +49,8 @@ import { Route as InsightsIndexRouteImport } from './routes/insights.index'
 import { Route as InsightsSlugRouteImport } from './routes/insights.$slug'
 import { Route as JenvuOpsX9k2IndexRouteImport } from './routes/jenvu-ops-x9k2.index'
 import { Route as JenvuOpsX9k2InboxRouteImport } from './routes/jenvu-ops-x9k2.inbox'
-import { Route as LeadsIndexRouteImport } from './routes/leads.index'
-import { Route as LeadsAccountRouteImport } from './routes/leads.account'
-import { Route as LeadsActivityRouteImport } from './routes/leads.activity'
-import { Route as LeadsEnrichRouteImport } from './routes/leads.enrich'
-import { Route as LeadsImportRouteImport } from './routes/leads.import'
-import { Route as LeadsListsRouteImport } from './routes/leads.lists'
-import { Route as LeadsMapsRouteImport } from './routes/leads.maps'
-import { Route as LeadsPeopleRouteImport } from './routes/leads.people'
 import { Route as OpsX9k27m4nIndexRouteImport } from './routes/ops-x9k2-7m4n.index'
 import { Route as OpsX9k27m4nHubRouteImport } from './routes/ops-x9k2-7m4n.hub'
-import { Route as OpsX9k27m4nLeadsCreditsRouteImport } from './routes/ops-x9k2-7m4n.leads-credits'
 import { Route as OpsX9k27m4nPaymentsRouteImport } from './routes/ops-x9k2-7m4n.payments'
 import { Route as StoriesSlugRouteImport } from './routes/stories.$slug'
 import { Route as StrategiesIctGoldTradingRouteImport } from './routes/strategies.ict-gold-trading'
@@ -87,7 +75,6 @@ import { Route as AuthenticatedDashboardWorkspaceRouteImport } from './routes/_a
 import { Route as ApiPublicGoldRouteImport } from './routes/api/public/gold'
 import { Route as HelpCollectionIndexRouteImport } from './routes/help.$collection.index'
 import { Route as HelpCollectionSlugRouteImport } from './routes/help.$collection.$slug'
-import { Route as LeadsAdminUsersRouteImport } from './routes/leads.admin.users'
 import { Route as LovableEmailEventsRouteImport } from './routes/lovable/email/events'
 import { Route as AuthenticatedDashboardAdminAccuracyRouteImport } from './routes/_authenticated/dashboard.admin.accuracy'
 import { Route as AuthenticatedDashboardAdminBugsRouteImport } from './routes/_authenticated/dashboard.admin.bugs'
@@ -212,21 +199,6 @@ const KillzonesRoute = KillzonesRouteImport.update({
   path: '/killzones',
   getParentRoute: () => rootRouteImport,
 } as any)
-const LeadsRoute = LeadsRouteImport.update({
-  id: '/leads',
-  path: '/leads',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LeadsSigninRoute = LeadsSigninRouteImport.update({
-  id: '/leads-signin',
-  path: '/leads-signin',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LeadsSignupRoute = LeadsSignupRouteImport.update({
-  id: '/leads-signup',
-  path: '/leads-signup',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const LlmRoute = LlmRouteImport.update({
   id: '/llm',
   path: '/llm',
@@ -333,46 +305,6 @@ const JenvuOpsX9k2InboxRoute = JenvuOpsX9k2InboxRouteImport.update({
   path: '/inbox',
   getParentRoute: () => JenvuOpsX9k2Route,
 } as any)
-const LeadsIndexRoute = LeadsIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => LeadsRoute,
-} as any)
-const LeadsAccountRoute = LeadsAccountRouteImport.update({
-  id: '/account',
-  path: '/account',
-  getParentRoute: () => LeadsRoute,
-} as any)
-const LeadsActivityRoute = LeadsActivityRouteImport.update({
-  id: '/activity',
-  path: '/activity',
-  getParentRoute: () => LeadsRoute,
-} as any)
-const LeadsEnrichRoute = LeadsEnrichRouteImport.update({
-  id: '/enrich',
-  path: '/enrich',
-  getParentRoute: () => LeadsRoute,
-} as any)
-const LeadsImportRoute = LeadsImportRouteImport.update({
-  id: '/import',
-  path: '/import',
-  getParentRoute: () => LeadsRoute,
-} as any)
-const LeadsListsRoute = LeadsListsRouteImport.update({
-  id: '/lists',
-  path: '/lists',
-  getParentRoute: () => LeadsRoute,
-} as any)
-const LeadsMapsRoute = LeadsMapsRouteImport.update({
-  id: '/maps',
-  path: '/maps',
-  getParentRoute: () => LeadsRoute,
-} as any)
-const LeadsPeopleRoute = LeadsPeopleRouteImport.update({
-  id: '/people',
-  path: '/people',
-  getParentRoute: () => LeadsRoute,
-} as any)
 const OpsX9k27m4nIndexRoute = OpsX9k27m4nIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -381,11 +313,6 @@ const OpsX9k27m4nIndexRoute = OpsX9k27m4nIndexRouteImport.update({
 const OpsX9k27m4nHubRoute = OpsX9k27m4nHubRouteImport.update({
   id: '/hub',
   path: '/hub',
-  getParentRoute: () => OpsX9k27m4nRoute,
-} as any)
-const OpsX9k27m4nLeadsCreditsRoute = OpsX9k27m4nLeadsCreditsRouteImport.update({
-  id: '/leads-credits',
-  path: '/leads-credits',
   getParentRoute: () => OpsX9k27m4nRoute,
 } as any)
 const OpsX9k27m4nPaymentsRoute = OpsX9k27m4nPaymentsRouteImport.update({
@@ -525,11 +452,6 @@ const HelpCollectionSlugRoute = HelpCollectionSlugRouteImport.update({
   id: '/help/$collection/$slug',
   path: '/help/$collection/$slug',
   getParentRoute: () => rootRouteImport,
-} as any)
-const LeadsAdminUsersRoute = LeadsAdminUsersRouteImport.update({
-  id: '/admin/users',
-  path: '/admin/users',
-  getParentRoute: () => LeadsRoute,
 } as any)
 const LovableEmailEventsRoute = LovableEmailEventsRouteImport.update({
   id: '/lovable/email/events',
@@ -720,9 +642,6 @@ export interface FileRoutesByFullPath {
   '/insights': typeof InsightsRouteWithChildren
   '/jenvu-ops-x9k2': typeof JenvuOpsX9k2RouteWithChildren
   '/killzones': typeof KillzonesRoute
-  '/leads': typeof LeadsRouteWithChildren
-  '/leads-signin': typeof LeadsSigninRoute
-  '/leads-signup': typeof LeadsSignupRoute
   '/llm': typeof LlmRoute
   '/mcp': typeof McpRoute
   '/ops-x9k2-7m4n': typeof OpsX9k27m4nRouteWithChildren
@@ -741,22 +660,13 @@ export interface FileRoutesByFullPath {
   '/terminal': typeof AuthenticatedTerminalRoute
   '/insights/$slug': typeof InsightsSlugRoute
   '/jenvu-ops-x9k2/inbox': typeof JenvuOpsX9k2InboxRoute
-  '/leads/account': typeof LeadsAccountRoute
-  '/leads/activity': typeof LeadsActivityRoute
-  '/leads/enrich': typeof LeadsEnrichRoute
-  '/leads/import': typeof LeadsImportRoute
-  '/leads/lists': typeof LeadsListsRoute
-  '/leads/maps': typeof LeadsMapsRoute
-  '/leads/people': typeof LeadsPeopleRoute
   '/ops-x9k2-7m4n/hub': typeof OpsX9k27m4nHubRoute
-  '/ops-x9k2-7m4n/leads-credits': typeof OpsX9k27m4nLeadsCreditsRoute
   '/ops-x9k2-7m4n/payments': typeof OpsX9k27m4nPaymentsRoute
   '/stories/$slug': typeof StoriesSlugRoute
   '/strategies/ict-gold-trading': typeof StrategiesIctGoldTradingRoute
   '/help/': typeof HelpIndexRoute
   '/insights/': typeof InsightsIndexRoute
   '/jenvu-ops-x9k2/': typeof JenvuOpsX9k2IndexRoute
-  '/leads/': typeof LeadsIndexRoute
   '/ops-x9k2-7m4n/': typeof OpsX9k27m4nIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
@@ -777,7 +687,6 @@ export interface FileRoutesByFullPath {
   '/dashboard/workspace': typeof AuthenticatedDashboardWorkspaceRoute
   '/api/public/gold': typeof ApiPublicGoldRoute
   '/help/$collection/$slug': typeof HelpCollectionSlugRoute
-  '/leads/admin/users': typeof LeadsAdminUsersRoute
   '/lovable/email/events': typeof LovableEmailEventsRoute
   '/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/help/$collection/': typeof HelpCollectionIndexRoute
@@ -827,8 +736,6 @@ export interface FileRoutesByTo {
   '/founder': typeof FounderRoute
   '/founding': typeof FoundingRoute
   '/killzones': typeof KillzonesRoute
-  '/leads-signin': typeof LeadsSigninRoute
-  '/leads-signup': typeof LeadsSignupRoute
   '/llm': typeof LlmRoute
   '/mcp': typeof McpRoute
   '/pricing': typeof PricingRoute
@@ -845,22 +752,13 @@ export interface FileRoutesByTo {
   '/terminal': typeof AuthenticatedTerminalRoute
   '/insights/$slug': typeof InsightsSlugRoute
   '/jenvu-ops-x9k2/inbox': typeof JenvuOpsX9k2InboxRoute
-  '/leads/account': typeof LeadsAccountRoute
-  '/leads/activity': typeof LeadsActivityRoute
-  '/leads/enrich': typeof LeadsEnrichRoute
-  '/leads/import': typeof LeadsImportRoute
-  '/leads/lists': typeof LeadsListsRoute
-  '/leads/maps': typeof LeadsMapsRoute
-  '/leads/people': typeof LeadsPeopleRoute
   '/ops-x9k2-7m4n/hub': typeof OpsX9k27m4nHubRoute
-  '/ops-x9k2-7m4n/leads-credits': typeof OpsX9k27m4nLeadsCreditsRoute
   '/ops-x9k2-7m4n/payments': typeof OpsX9k27m4nPaymentsRoute
   '/stories/$slug': typeof StoriesSlugRoute
   '/strategies/ict-gold-trading': typeof StrategiesIctGoldTradingRoute
   '/help': typeof HelpIndexRoute
   '/insights': typeof InsightsIndexRoute
   '/jenvu-ops-x9k2': typeof JenvuOpsX9k2IndexRoute
-  '/leads': typeof LeadsIndexRoute
   '/ops-x9k2-7m4n': typeof OpsX9k27m4nIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
@@ -881,7 +779,6 @@ export interface FileRoutesByTo {
   '/dashboard/workspace': typeof AuthenticatedDashboardWorkspaceRoute
   '/api/public/gold': typeof ApiPublicGoldRoute
   '/help/$collection/$slug': typeof HelpCollectionSlugRoute
-  '/leads/admin/users': typeof LeadsAdminUsersRoute
   '/lovable/email/events': typeof LovableEmailEventsRoute
   '/dashboard': typeof AuthenticatedDashboardIndexRoute
   '/help/$collection': typeof HelpCollectionIndexRoute
@@ -935,9 +832,6 @@ export interface FileRoutesById {
   '/insights': typeof InsightsRouteWithChildren
   '/jenvu-ops-x9k2': typeof JenvuOpsX9k2RouteWithChildren
   '/killzones': typeof KillzonesRoute
-  '/leads': typeof LeadsRouteWithChildren
-  '/leads-signin': typeof LeadsSigninRoute
-  '/leads-signup': typeof LeadsSignupRoute
   '/llm': typeof LlmRoute
   '/mcp': typeof McpRoute
   '/ops-x9k2-7m4n': typeof OpsX9k27m4nRouteWithChildren
@@ -956,22 +850,13 @@ export interface FileRoutesById {
   '/_authenticated/terminal': typeof AuthenticatedTerminalRoute
   '/insights/$slug': typeof InsightsSlugRoute
   '/jenvu-ops-x9k2/inbox': typeof JenvuOpsX9k2InboxRoute
-  '/leads/account': typeof LeadsAccountRoute
-  '/leads/activity': typeof LeadsActivityRoute
-  '/leads/enrich': typeof LeadsEnrichRoute
-  '/leads/import': typeof LeadsImportRoute
-  '/leads/lists': typeof LeadsListsRoute
-  '/leads/maps': typeof LeadsMapsRoute
-  '/leads/people': typeof LeadsPeopleRoute
   '/ops-x9k2-7m4n/hub': typeof OpsX9k27m4nHubRoute
-  '/ops-x9k2-7m4n/leads-credits': typeof OpsX9k27m4nLeadsCreditsRoute
   '/ops-x9k2-7m4n/payments': typeof OpsX9k27m4nPaymentsRoute
   '/stories/$slug': typeof StoriesSlugRoute
   '/strategies/ict-gold-trading': typeof StrategiesIctGoldTradingRoute
   '/help/': typeof HelpIndexRoute
   '/insights/': typeof InsightsIndexRoute
   '/jenvu-ops-x9k2/': typeof JenvuOpsX9k2IndexRoute
-  '/leads/': typeof LeadsIndexRoute
   '/ops-x9k2-7m4n/': typeof OpsX9k27m4nIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/_authenticated/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
@@ -992,7 +877,6 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/workspace': typeof AuthenticatedDashboardWorkspaceRoute
   '/api/public/gold': typeof ApiPublicGoldRoute
   '/help/$collection/$slug': typeof HelpCollectionSlugRoute
-  '/leads/admin/users': typeof LeadsAdminUsersRoute
   '/lovable/email/events': typeof LovableEmailEventsRoute
   '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/help/$collection/': typeof HelpCollectionIndexRoute
@@ -1046,9 +930,6 @@ export interface FileRouteTypes {
     | '/insights'
     | '/jenvu-ops-x9k2'
     | '/killzones'
-    | '/leads'
-    | '/leads-signin'
-    | '/leads-signup'
     | '/llm'
     | '/mcp'
     | '/ops-x9k2-7m4n'
@@ -1067,22 +948,13 @@ export interface FileRouteTypes {
     | '/terminal'
     | '/insights/$slug'
     | '/jenvu-ops-x9k2/inbox'
-    | '/leads/account'
-    | '/leads/activity'
-    | '/leads/enrich'
-    | '/leads/import'
-    | '/leads/lists'
-    | '/leads/maps'
-    | '/leads/people'
     | '/ops-x9k2-7m4n/hub'
-    | '/ops-x9k2-7m4n/leads-credits'
     | '/ops-x9k2-7m4n/payments'
     | '/stories/$slug'
     | '/strategies/ict-gold-trading'
     | '/help/'
     | '/insights/'
     | '/jenvu-ops-x9k2/'
-    | '/leads/'
     | '/ops-x9k2-7m4n/'
     | '/.lovable/oauth/consent'
     | '/dashboard/analytics'
@@ -1103,7 +975,6 @@ export interface FileRouteTypes {
     | '/dashboard/workspace'
     | '/api/public/gold'
     | '/help/$collection/$slug'
-    | '/leads/admin/users'
     | '/lovable/email/events'
     | '/dashboard/'
     | '/help/$collection/'
@@ -1153,8 +1024,6 @@ export interface FileRouteTypes {
     | '/founder'
     | '/founding'
     | '/killzones'
-    | '/leads-signin'
-    | '/leads-signup'
     | '/llm'
     | '/mcp'
     | '/pricing'
@@ -1171,22 +1040,13 @@ export interface FileRouteTypes {
     | '/terminal'
     | '/insights/$slug'
     | '/jenvu-ops-x9k2/inbox'
-    | '/leads/account'
-    | '/leads/activity'
-    | '/leads/enrich'
-    | '/leads/import'
-    | '/leads/lists'
-    | '/leads/maps'
-    | '/leads/people'
     | '/ops-x9k2-7m4n/hub'
-    | '/ops-x9k2-7m4n/leads-credits'
     | '/ops-x9k2-7m4n/payments'
     | '/stories/$slug'
     | '/strategies/ict-gold-trading'
     | '/help'
     | '/insights'
     | '/jenvu-ops-x9k2'
-    | '/leads'
     | '/ops-x9k2-7m4n'
     | '/.lovable/oauth/consent'
     | '/dashboard/analytics'
@@ -1207,7 +1067,6 @@ export interface FileRouteTypes {
     | '/dashboard/workspace'
     | '/api/public/gold'
     | '/help/$collection/$slug'
-    | '/leads/admin/users'
     | '/lovable/email/events'
     | '/dashboard'
     | '/help/$collection'
@@ -1260,9 +1119,6 @@ export interface FileRouteTypes {
     | '/insights'
     | '/jenvu-ops-x9k2'
     | '/killzones'
-    | '/leads'
-    | '/leads-signin'
-    | '/leads-signup'
     | '/llm'
     | '/mcp'
     | '/ops-x9k2-7m4n'
@@ -1281,22 +1137,13 @@ export interface FileRouteTypes {
     | '/_authenticated/terminal'
     | '/insights/$slug'
     | '/jenvu-ops-x9k2/inbox'
-    | '/leads/account'
-    | '/leads/activity'
-    | '/leads/enrich'
-    | '/leads/import'
-    | '/leads/lists'
-    | '/leads/maps'
-    | '/leads/people'
     | '/ops-x9k2-7m4n/hub'
-    | '/ops-x9k2-7m4n/leads-credits'
     | '/ops-x9k2-7m4n/payments'
     | '/stories/$slug'
     | '/strategies/ict-gold-trading'
     | '/help/'
     | '/insights/'
     | '/jenvu-ops-x9k2/'
-    | '/leads/'
     | '/ops-x9k2-7m4n/'
     | '/.lovable/oauth/consent'
     | '/_authenticated/dashboard/analytics'
@@ -1317,7 +1164,6 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/workspace'
     | '/api/public/gold'
     | '/help/$collection/$slug'
-    | '/leads/admin/users'
     | '/lovable/email/events'
     | '/_authenticated/dashboard/'
     | '/help/$collection/'
@@ -1371,9 +1217,6 @@ export interface RootRouteChildren {
   InsightsRoute: typeof InsightsRouteWithChildren
   JenvuOpsX9k2Route: typeof JenvuOpsX9k2RouteWithChildren
   KillzonesRoute: typeof KillzonesRoute
-  LeadsRoute: typeof LeadsRouteWithChildren
-  LeadsSigninRoute: typeof LeadsSigninRoute
-  LeadsSignupRoute: typeof LeadsSignupRoute
   LlmRoute: typeof LlmRoute
   McpRoute: typeof McpRoute
   OpsX9k27m4nRoute: typeof OpsX9k27m4nRouteWithChildren
@@ -1550,27 +1393,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof KillzonesRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/leads': {
-      id: '/leads'
-      path: '/leads'
-      fullPath: '/leads'
-      preLoaderRoute: typeof LeadsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/leads-signin': {
-      id: '/leads-signin'
-      path: '/leads-signin'
-      fullPath: '/leads-signin'
-      preLoaderRoute: typeof LeadsSigninRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/leads-signup': {
-      id: '/leads-signup'
-      path: '/leads-signup'
-      fullPath: '/leads-signup'
-      preLoaderRoute: typeof LeadsSignupRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/llm': {
       id: '/llm'
       path: '/llm'
@@ -1718,62 +1540,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof JenvuOpsX9k2InboxRouteImport
       parentRoute: typeof JenvuOpsX9k2Route
     }
-    '/leads/': {
-      id: '/leads/'
-      path: '/'
-      fullPath: '/leads/'
-      preLoaderRoute: typeof LeadsIndexRouteImport
-      parentRoute: typeof LeadsRoute
-    }
-    '/leads/account': {
-      id: '/leads/account'
-      path: '/account'
-      fullPath: '/leads/account'
-      preLoaderRoute: typeof LeadsAccountRouteImport
-      parentRoute: typeof LeadsRoute
-    }
-    '/leads/activity': {
-      id: '/leads/activity'
-      path: '/activity'
-      fullPath: '/leads/activity'
-      preLoaderRoute: typeof LeadsActivityRouteImport
-      parentRoute: typeof LeadsRoute
-    }
-    '/leads/enrich': {
-      id: '/leads/enrich'
-      path: '/enrich'
-      fullPath: '/leads/enrich'
-      preLoaderRoute: typeof LeadsEnrichRouteImport
-      parentRoute: typeof LeadsRoute
-    }
-    '/leads/import': {
-      id: '/leads/import'
-      path: '/import'
-      fullPath: '/leads/import'
-      preLoaderRoute: typeof LeadsImportRouteImport
-      parentRoute: typeof LeadsRoute
-    }
-    '/leads/lists': {
-      id: '/leads/lists'
-      path: '/lists'
-      fullPath: '/leads/lists'
-      preLoaderRoute: typeof LeadsListsRouteImport
-      parentRoute: typeof LeadsRoute
-    }
-    '/leads/maps': {
-      id: '/leads/maps'
-      path: '/maps'
-      fullPath: '/leads/maps'
-      preLoaderRoute: typeof LeadsMapsRouteImport
-      parentRoute: typeof LeadsRoute
-    }
-    '/leads/people': {
-      id: '/leads/people'
-      path: '/people'
-      fullPath: '/leads/people'
-      preLoaderRoute: typeof LeadsPeopleRouteImport
-      parentRoute: typeof LeadsRoute
-    }
     '/ops-x9k2-7m4n/': {
       id: '/ops-x9k2-7m4n/'
       path: '/'
@@ -1786,13 +1552,6 @@ declare module '@tanstack/react-router' {
       path: '/hub'
       fullPath: '/ops-x9k2-7m4n/hub'
       preLoaderRoute: typeof OpsX9k27m4nHubRouteImport
-      parentRoute: typeof OpsX9k27m4nRoute
-    }
-    '/ops-x9k2-7m4n/leads-credits': {
-      id: '/ops-x9k2-7m4n/leads-credits'
-      path: '/leads-credits'
-      fullPath: '/ops-x9k2-7m4n/leads-credits'
-      preLoaderRoute: typeof OpsX9k27m4nLeadsCreditsRouteImport
       parentRoute: typeof OpsX9k27m4nRoute
     }
     '/ops-x9k2-7m4n/payments': {
@@ -1962,13 +1721,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/help/$collection/$slug'
       preLoaderRoute: typeof HelpCollectionSlugRouteImport
       parentRoute: typeof rootRouteImport
-    }
-    '/leads/admin/users': {
-      id: '/leads/admin/users'
-      path: '/admin/users'
-      fullPath: '/leads/admin/users'
-      preLoaderRoute: typeof LeadsAdminUsersRouteImport
-      parentRoute: typeof LeadsRoute
     }
     '/lovable/email/events': {
       id: '/lovable/email/events'
@@ -2295,42 +2047,14 @@ const JenvuOpsX9k2RouteWithChildren = JenvuOpsX9k2Route._addFileChildren(
   JenvuOpsX9k2RouteChildren,
 )
 
-interface LeadsRouteChildren {
-  LeadsAccountRoute: typeof LeadsAccountRoute
-  LeadsActivityRoute: typeof LeadsActivityRoute
-  LeadsEnrichRoute: typeof LeadsEnrichRoute
-  LeadsImportRoute: typeof LeadsImportRoute
-  LeadsListsRoute: typeof LeadsListsRoute
-  LeadsMapsRoute: typeof LeadsMapsRoute
-  LeadsPeopleRoute: typeof LeadsPeopleRoute
-  LeadsIndexRoute: typeof LeadsIndexRoute
-  LeadsAdminUsersRoute: typeof LeadsAdminUsersRoute
-}
-
-const LeadsRouteChildren: LeadsRouteChildren = {
-  LeadsAccountRoute: LeadsAccountRoute,
-  LeadsActivityRoute: LeadsActivityRoute,
-  LeadsEnrichRoute: LeadsEnrichRoute,
-  LeadsImportRoute: LeadsImportRoute,
-  LeadsListsRoute: LeadsListsRoute,
-  LeadsMapsRoute: LeadsMapsRoute,
-  LeadsPeopleRoute: LeadsPeopleRoute,
-  LeadsIndexRoute: LeadsIndexRoute,
-  LeadsAdminUsersRoute: LeadsAdminUsersRoute,
-}
-
-const LeadsRouteWithChildren = LeadsRoute._addFileChildren(LeadsRouteChildren)
-
 interface OpsX9k27m4nRouteChildren {
   OpsX9k27m4nHubRoute: typeof OpsX9k27m4nHubRoute
-  OpsX9k27m4nLeadsCreditsRoute: typeof OpsX9k27m4nLeadsCreditsRoute
   OpsX9k27m4nPaymentsRoute: typeof OpsX9k27m4nPaymentsRoute
   OpsX9k27m4nIndexRoute: typeof OpsX9k27m4nIndexRoute
 }
 
 const OpsX9k27m4nRouteChildren: OpsX9k27m4nRouteChildren = {
   OpsX9k27m4nHubRoute: OpsX9k27m4nHubRoute,
-  OpsX9k27m4nLeadsCreditsRoute: OpsX9k27m4nLeadsCreditsRoute,
   OpsX9k27m4nPaymentsRoute: OpsX9k27m4nPaymentsRoute,
   OpsX9k27m4nIndexRoute: OpsX9k27m4nIndexRoute,
 }
@@ -2359,9 +2083,6 @@ const rootRouteChildren: RootRouteChildren = {
   InsightsRoute: InsightsRouteWithChildren,
   JenvuOpsX9k2Route: JenvuOpsX9k2RouteWithChildren,
   KillzonesRoute: KillzonesRoute,
-  LeadsRoute: LeadsRouteWithChildren,
-  LeadsSigninRoute: LeadsSigninRoute,
-  LeadsSignupRoute: LeadsSignupRoute,
   LlmRoute: LlmRoute,
   McpRoute: McpRoute,
   OpsX9k27m4nRoute: OpsX9k27m4nRouteWithChildren,

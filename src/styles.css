@@ -494,9 +494,9 @@
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  *:not(.animate-ticker):not(.gc-logo-marquee):not(.ask-jenvu-mark-loop), *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
+  *:not(.animate-ticker):not(.gc-logo-marquee):not(.ask-jenvu-mark-ring), *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
   .animate-ticker { animation: ticker-marquee 60s linear infinite !important; }
-  .ask-jenvu-mark-loop { animation: ask-jenvu-colors 2s linear infinite !important; }
+  .ask-jenvu-mark-ring { animation: ask-jenvu-ring 2s linear infinite !important; }
 }
 
 
@@ -555,14 +555,6 @@
 @media (min-width: 1024px) { .killzones-root { zoom: 1.25; } }
 @media (min-width: 1280px) and (min-height: 800px) { .jenvu-auth-zoom { zoom: 1.21; } }
 
-/* Jenvu Leads: fixed desktop zoom across all laptop / desktop widths */
-@media (min-width: 1024px) { .leads-shell-zoom { zoom: 1.1; } }
-@media (min-width: 1280px) { .leads-shell-zoom { zoom: 1.1; } }
-@media (min-width: 1360px) { .leads-shell-zoom { zoom: 1.1; } }
-@media (min-width: 1500px) { .leads-shell-zoom { zoom: 1.1; } }
-@media (min-width: 1600px) { .leads-shell-zoom { zoom: 1.1; } }
-@media (min-width: 1680px) { .leads-shell-zoom { zoom: 1.1; } }
-@media (min-width: 1920px) { .leads-shell-zoom { zoom: 1.1; } }
 
 /* Founding page: no zoom on mobile/tablet; progressive zoom on desktop */
 @media (min-width: 1024px) { .founding-zoom { zoom: 1.15; } }
@@ -1330,6 +1322,14 @@ html body .dash-dark main.bg-white { background-color: oklch(0.165 0 0) !importa
 @keyframes ind-kenburns { 0%,100% { transform: scale(1.02) translate(0,0); } 50% { transform: scale(1.1) translate(-1.5%,-1%); } }
 .ind-kenburns { animation: ind-kenburns 18s ease-in-out infinite; }
 /* Colour swap only (no movement), so it also runs when the device has "reduce animations" switched on. */
-@keyframes ask-jenvu-colors { 0%,24% { background-color: var(--gc-blue); } 25%,49% { background-color: var(--gc-red); } 50%,74% { background-color: var(--gc-yellow); } 75%,100% { background-color: var(--gc-green); } }
-.ask-jenvu-mark-loop { display: inline-block; background-color: var(--gc-blue); -webkit-mask: var(--mark) center / contain no-repeat; mask: var(--mark) center / contain no-repeat; animation: ask-jenvu-colors 2s linear infinite !important; }
+/* Thinking logo: white logo whose outline cycles through four colours (Gemini-style).
+   Colour swap only, so it also runs with "reduce animations" switched on. */
+.ask-jenvu-mark-loop { display: inline-block; background-color: var(--background); -webkit-mask: var(--mark) center / contain no-repeat; mask: var(--mark) center / contain no-repeat; }
+@keyframes ask-jenvu-ring {
+  0%,24% { filter: drop-shadow(1.5px 0 0 var(--gc-blue)) drop-shadow(-1.5px 0 0 var(--gc-blue)) drop-shadow(0 1.5px 0 var(--gc-blue)) drop-shadow(0 -1.5px 0 var(--gc-blue)); }
+  25%,49% { filter: drop-shadow(1.5px 0 0 var(--gc-red)) drop-shadow(-1.5px 0 0 var(--gc-red)) drop-shadow(0 1.5px 0 var(--gc-red)) drop-shadow(0 -1.5px 0 var(--gc-red)); }
+  50%,74% { filter: drop-shadow(1.5px 0 0 var(--gc-yellow)) drop-shadow(-1.5px 0 0 var(--gc-yellow)) drop-shadow(0 1.5px 0 var(--gc-yellow)) drop-shadow(0 -1.5px 0 var(--gc-yellow)); }
+  75%,100% { filter: drop-shadow(1.5px 0 0 var(--gc-green)) drop-shadow(-1.5px 0 0 var(--gc-green)) drop-shadow(0 1.5px 0 var(--gc-green)) drop-shadow(0 -1.5px 0 var(--gc-green)); }
+}
+.ask-jenvu-mark-ring { animation: ask-jenvu-ring 2s linear infinite !important; }
 @media (prefers-reduced-motion: reduce) { .ind-kenburns { animation: none; } }
