@@ -101,6 +101,8 @@
   --color-gc-blue-hover: var(--gc-blue-hover);
   --color-gc-blue-soft: var(--gc-blue-soft);
   --color-gc-console-bar: var(--gc-console-bar);
+  --color-gc-console-search: var(--gc-console-search);
+  --color-gc-console-rail-active: var(--gc-console-rail-active);
   --color-gc-red: var(--gc-red);
   --color-gc-red-soft: var(--gc-red-soft);
   --color-gc-yellow: var(--gc-yellow);
@@ -180,6 +182,8 @@
   --gc-blue-hover: #1765cc;
   --gc-blue-soft: #e8f0fe;
   --gc-console-bar: #f0f5fe;
+  --gc-console-search: #e1e6ef;
+  --gc-console-rail-active: #d3e3fd;
   --gc-red: #ea4335;
   --gc-red-soft: #fce8e6;
   --gc-yellow: #fbbc04;

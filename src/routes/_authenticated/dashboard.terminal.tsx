@@ -681,7 +681,7 @@ function TerminalPage() {
           theme === "dark" ? "dark terminal-dark bg-background" : "bg-gc-console-bar",
         )}
       >
-        <div className={cn("flex min-h-0 flex-1 flex-col lg:flex-row", theme !== "dark" && "gap-2 pb-2 pr-2 pt-1")}>
+        <div className={cn("flex min-h-0 flex-1 flex-col lg:flex-row", theme !== "dark" && "gap-2 pr-2")}>
           {/* Chart */}
           <section
             aria-label="XAU/USD chart"
@@ -708,10 +708,9 @@ function TerminalPage() {
                     onClick={() => setDeskOpen(true)}
                     aria-label="Ask With AI"
                     title="Ask With AI"
-                    className="flex w-12 flex-col items-center gap-1 rounded-xl bg-background px-1 py-2 text-[10px] font-medium leading-tight text-foreground shadow-sm ring-1 ring-gc-line hover:bg-gc-blue-soft dark:bg-accent dark:ring-border"
+                    className="flex h-9 w-11 items-center justify-center rounded-r-full hover:bg-gc-console-rail-active/60 dark:hover:bg-accent"
                   >
                     <img src="/favicon.png" alt="" className="h-5 w-5 rounded-sm object-contain" />
-                    Ask AI
                   </button>
                 )
               }
