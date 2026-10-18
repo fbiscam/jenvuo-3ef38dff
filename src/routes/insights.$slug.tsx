@@ -143,34 +143,40 @@ function InsightDetailPage() {
   }, [slug]);
 
   return (
-    <>
-      <div className={`jenvu-zoom min-h-dvh w-full bg-[#FAFAFA] text-zinc-900 ${SANS} antialiased selection:bg-zinc-900 selection:text-white`}>
-        {/* NAV */}
-        <SiteHeader />
+    <div className={`min-h-dvh w-full bg-background text-gc-ink ${SANS} antialiased`}>
+      <div aria-hidden="true" className="fixed inset-x-0 top-0 z-[60] h-[3px] bg-transparent">
+        <div className="h-full bg-gc-blue transition-[width] duration-150" style={{ width: `${progress}%` }} />
+      </div>
+      <SiteHeader />
 
-        <main className="mx-auto max-w-4xl px-5 sm:px-6 py-12 sm:py-20">
-          <Link
-            to="/insights"
-            className={`${MONO} text-[10px] uppercase tracking-widest text-zinc-500 hover:text-zinc-900 mb-8 inline-flex items-center gap-2`}
-          >
-            ← Back to insights
-          </Link>
-
-          <header className="mb-10 sm:mb-16">
-            <div className={`${MONO} text-[10px] uppercase tracking-[0.2em] text-zinc-500 mb-4`}>
-              {insight.category} // REPORT_{insight.id.slice(0, 8).toUpperCase()}
-            </div>
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-semibold tracking-tight leading-tight text-zinc-900">
+      <div className="jenvu-home-content">
+        <section className="bg-gc-canvas">
+          <div className="mx-auto max-w-[860px] px-5 pb-12 pt-10 sm:px-8 sm:pt-12">
+            <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-2 text-[14px] text-gc-ink-muted">
+              <Link to="/insights" className="font-medium text-gc-blue hover:underline">Blog</Link>
+              <span aria-hidden="true">›</span>
+              <span>{insight.category}</span>
+            </nav>
+            <h1 className="mt-5 text-[32px] font-normal leading-[1.2] tracking-[-0.5px] text-gc-ink sm:text-[44px]">
               {insight.title}
             </h1>
-            <div className="mt-8 flex items-center gap-4 text-xs text-zinc-400">
-              <span>{fmtUTCLong(insight.published_at)}</span>
-              <span className="h-1 w-1 rounded-full bg-zinc-200" />
-              <span>Institutional Grade</span>
+            {insight.excerpt && (
+              <p className="mt-5 text-[17px] leading-[1.65] text-gc-ink-muted sm:text-[19px]">{insight.excerpt}</p>
+            )}
+            <div className="mt-8 flex items-center gap-3">
+              <div className="flex h-11 w-11 items-center justify-center overflow-hidden rounded-full border border-gc-line bg-background">
+                <img src="/favicon.png" alt="" className="h-7 w-7 object-contain" />
+              </div>
+              <div>
+                <div className="text-[15px] font-medium text-gc-ink">Jenvu Team</div>
+                <div className="text-[13px] text-gc-ink-muted">{fmtUTCLong(insight.published_at)}</div>
+              </div>
             </div>
-          </header>
+          </div>
+        </section>
 
-          <div className="aspect-[21/9] rounded-2xl overflow-hidden mb-12 border border-zinc-100 shadow-xl bg-zinc-100">
+        <main className="mx-auto max-w-[860px] px-5 py-10 sm:px-8 sm:py-14">
+          <div className="mb-12 aspect-[16/9] overflow-hidden rounded-3xl border border-gc-line bg-gc-surface">
             <img
               src={insightCoverUrl(insight.title, insight.category, insight.image_url)}
               alt={insight.title}
@@ -181,122 +187,74 @@ function InsightDetailPage() {
                 t.onerror = null;
                 t.src = insightCoverUrl(insight.title, insight.category);
               }}
-              className="w-full h-full object-cover"
+              className="h-full w-full object-cover"
             />
           </div>
 
-          {insight.excerpt && (
-            <p className="text-xl sm:text-2xl leading-relaxed text-zinc-700 font-light mb-12 pb-12 border-b border-zinc-100">
-              {insight.excerpt}
-            </p>
-          )}
-
-          <article className="article-body text-[17px] leading-[1.85] text-zinc-800">
+          <article className="article-body text-[17px] leading-[1.8] text-gc-ink">
             <ReactMarkdown
               remarkPlugins={[remarkGfm]}
               components={{
-                h1: ({ children }) => (
-                  <h2 className="mt-16 mb-6 text-3xl sm:text-4xl font-semibold tracking-tight text-zinc-900 leading-tight">{children}</h2>
-                ),
-                h2: ({ children }) => (
-                  <h2 className="mt-16 mb-6 text-2xl sm:text-3xl font-semibold tracking-tight text-zinc-900 leading-tight">{children}</h2>
-                ),
-                h3: ({ children }) => (
-                  <h3 className="mt-12 mb-4 text-xl sm:text-2xl font-semibold tracking-tight text-zinc-900">{children}</h3>
-                ),
-                h4: ({ children }) => (
-                  <h4 className={`${MONO} mt-10 mb-3 text-[11px] uppercase tracking-[0.2em] text-zinc-500`}>{children}</h4>
-                ),
-                p: ({ children }) => (
-                  <p className="mb-7 text-zinc-700">{children}</p>
-                ),
-                strong: ({ children }) => (
-                  <strong className="font-semibold text-zinc-900 bg-yellow-50 px-1 rounded-sm">{children}</strong>
-                ),
-                em: ({ children }) => (
-                  <em className="italic text-zinc-900">{children}</em>
-                ),
+                h1: ({ children }) => <h2 className="mb-5 mt-14 text-[30px] font-normal leading-[1.25] text-gc-ink">{children}</h2>,
+                h2: ({ children }) => <h2 className="mb-5 mt-14 text-[26px] font-normal leading-[1.3] text-gc-ink">{children}</h2>,
+                h3: ({ children }) => <h3 className="mb-4 mt-10 text-[21px] font-medium text-gc-ink">{children}</h3>,
+                h4: ({ children }) => <h4 className="mb-3 mt-8 text-[17px] font-medium text-gc-ink">{children}</h4>,
+                p: ({ children }) => <p className="mb-6 text-gc-ink">{children}</p>,
+                strong: ({ children }) => <strong className="font-medium text-gc-ink">{children}</strong>,
+                em: ({ children }) => <em className="italic">{children}</em>,
                 a: ({ href, children }) => (
-                  <a href={href} className="text-zinc-900 underline decoration-zinc-300 underline-offset-4 hover:decoration-zinc-900 transition-colors">{children}</a>
+                  <a href={href} className="text-gc-blue underline-offset-4 hover:underline">{children}</a>
                 ),
-                ul: ({ children }) => (
-                  <ul className="my-7 space-y-3 pl-0 list-none">{children}</ul>
-                ),
-                ol: ({ children }) => (
-                  <ol className="my-7 space-y-3 pl-0 list-none counter-reset-[item]">{children}</ol>
-                ),
-                li: ({ children }) => (
-                  <li className="relative pl-7 text-zinc-700 before:content-[''] before:absolute before:left-0 before:top-[0.7em] before:h-1.5 before:w-1.5 before:rounded-full before:bg-zinc-900">
-                    {children}
-                  </li>
-                ),
+                ul: ({ children }) => <ul className="my-6 list-disc space-y-2 pl-6 marker:text-gc-blue">{children}</ul>,
+                ol: ({ children }) => <ol className="my-6 list-decimal space-y-2 pl-6 marker:text-gc-ink-muted">{children}</ol>,
+                li: ({ children }) => <li className="pl-1 text-gc-ink">{children}</li>,
                 blockquote: ({ children }) => (
-                  <blockquote className="my-10 border-l-4 border-zinc-900 bg-zinc-50 pl-6 pr-5 py-5 rounded-r-lg italic text-zinc-800 text-lg">
-                    {children}
-                  </blockquote>
+                  <blockquote className="my-8 rounded-r-2xl border-l-4 border-gc-blue bg-gc-canvas px-6 py-5 text-gc-ink">{children}</blockquote>
                 ),
-                hr: () => <hr className="my-12 border-zinc-200" />,
+                hr: () => <hr className="my-12 border-gc-line" />,
                 code: ({ children, className }) => {
                   const isBlock = className?.includes("language-");
                   if (isBlock) {
                     return (
-                      <code className={`${MONO} block bg-zinc-950 text-zinc-100 p-5 rounded-xl text-sm overflow-x-auto my-7`}>
-                        {children}
-                      </code>
+                      <code className={`${MONO} my-6 block overflow-x-auto rounded-2xl bg-gc-surface p-5 text-[14px] text-gc-ink`}>{children}</code>
                     );
                   }
-                  return (
-                    <code className={`${MONO} bg-zinc-100 text-zinc-900 px-1.5 py-0.5 rounded text-[0.9em]`}>
-                      {children}
-                    </code>
-                  );
+                  return <code className={`${MONO} rounded bg-gc-surface px-1.5 py-0.5 text-[0.9em] text-gc-ink`}>{children}</code>;
                 },
-                pre: ({ children }) => <pre className="my-7">{children}</pre>,
+                pre: ({ children }) => <pre className="my-6">{children}</pre>,
                 table: ({ children }) => (
-                  <div className="my-10 overflow-x-auto rounded-xl border border-zinc-200">
-                    <table className="w-full text-sm">{children}</table>
+                  <div className="my-8 overflow-x-auto rounded-2xl border border-gc-line">
+                    <table className="w-full text-[15px]">{children}</table>
                   </div>
                 ),
-                thead: ({ children }) => <thead className="bg-zinc-50">{children}</thead>,
-                th: ({ children }) => (
-                  <th className={`${MONO} px-4 py-3 text-left text-[11px] uppercase tracking-widest text-zinc-600 border-b border-zinc-200`}>{children}</th>
-                ),
-                td: ({ children }) => (
-                  <td className="px-4 py-3 border-b border-zinc-100 text-zinc-700">{children}</td>
-                ),
-                img: ({ src, alt }) => (
-                  <img src={src} alt={alt} className="my-10 rounded-2xl w-full border border-zinc-100" />
-                ),
+                thead: ({ children }) => <thead className="bg-gc-surface">{children}</thead>,
+                th: ({ children }) => <th className="border-b border-gc-line px-4 py-3 text-left font-medium text-gc-ink">{children}</th>,
+                td: ({ children }) => <td className="border-b border-gc-line px-4 py-3 text-gc-ink">{children}</td>,
+                img: ({ src, alt }) => <img src={src} alt={alt} className="my-8 w-full rounded-2xl border border-gc-line" />,
               }}
             >
               {insight.content}
             </ReactMarkdown>
           </article>
 
-          <div className="mt-20 pt-10 border-t border-zinc-100 flex flex-col sm:flex-row items-start justify-between gap-6">
-            <div className="flex items-center gap-4">
-              <div className="h-10 w-10 rounded-full bg-zinc-100 flex items-center justify-center overflow-hidden">
-                <img src="/favicon.png" alt="JENVU AI" className="h-7 w-7 object-contain" />
-              </div>
-              <div>
-                <div className="text-sm font-semibold text-zinc-900">Jenvu Terminal Engine</div>
-                <div className={`${MONO} text-[10px] uppercase text-zinc-400`}>Automated Insight Synthesis</div>
-              </div>
-            </div>
-            <div className="flex gap-4">
-              <button type="button" aria-label="Share this insight" title="Share this insight" className="p-2 rounded-full border border-zinc-200 hover:bg-zinc-50 transition-colors">
-                <svg aria-hidden="true" focusable="false" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
-              </button>
-              <button type="button" aria-label="Follow Jenvu on Instagram" title="Follow Jenvu on Instagram" className="p-2 rounded-full border border-zinc-200 hover:bg-zinc-50 transition-colors">
-                <svg aria-hidden="true" focusable="false" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
-              </button>
-
-            </div>
+          <div className="mt-16 flex flex-col items-start justify-between gap-6 border-t border-gc-line pt-8 sm:flex-row sm:items-center">
+            <Link to="/insights" className="text-[15px] font-medium text-gc-blue hover:underline">← Back to all articles</Link>
+            <button
+              type="button"
+              onClick={() => {
+                const url = typeof window !== "undefined" ? window.location.href : "";
+                if (navigator.share) void navigator.share({ title: insight.title, url }).catch(() => {});
+                else void navigator.clipboard?.writeText(url);
+              }}
+              className="inline-flex h-10 items-center gap-2 rounded-full border border-gc-line px-5 text-[14px] font-medium text-gc-ink hover:bg-gc-surface"
+            >
+              Share article
+            </button>
           </div>
         </main>
-
-        <SiteFooter />
       </div>
-    </>
+
+      <SiteFooter />
+    </div>
   );
 }

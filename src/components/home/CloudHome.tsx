@@ -211,7 +211,7 @@ export function CloudHero({ price: _price, delta: _delta }: { price: string; del
           </Link>
         </div>
       </div>
-      <div ref={railRef} onScroll={onScroll} className="flex snap-x snap-mandatory gap-6 overflow-x-auto px-5 [scrollbar-width:none] sm:px-8 [&::-webkit-scrollbar]:hidden">
+      <div ref={railRef} onScroll={onScroll} className="flex gap-6 overflow-x-auto px-5 [overscroll-behavior-x:contain] [scrollbar-width:none] sm:px-8 [&::-webkit-scrollbar]:hidden">
         {LOOP_STORIES.map((s, i) => (
           <Link
             key={`${s.copy}-${s.slug}`}
@@ -219,7 +219,7 @@ export function CloudHero({ price: _price, delta: _delta }: { price: string; del
             params={{ slug: s.slug }}
             aria-hidden={s.copy !== 1 || undefined}
             tabIndex={s.copy !== 1 ? -1 : undefined}
-            className="group relative h-[300px] w-[85vw] max-w-[448px] shrink-0 snap-start overflow-hidden rounded-3xl bg-gc-ink"
+            className="group relative h-[300px] w-[85vw] max-w-[448px] shrink-0 overflow-hidden rounded-3xl bg-gc-ink"
           >
             <img
               src={s.img}
