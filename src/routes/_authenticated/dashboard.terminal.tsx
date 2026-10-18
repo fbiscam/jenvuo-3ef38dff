@@ -678,16 +678,16 @@ function TerminalPage() {
       <div
         className={cn(
           "flex h-full min-h-0 w-full flex-col overflow-hidden text-foreground",
-          theme === "dark" ? "dark terminal-dark bg-background" : "bg-background",
+          theme === "dark" ? "dark terminal-dark bg-background" : "bg-gc-console-bar",
         )}
       >
-        <div className={cn("flex min-h-0 flex-1 flex-col lg:flex-row", theme !== "dark" && "gap-2 p-1.5 sm:p-2")}>
+        <div className={cn("flex min-h-0 flex-1 flex-col lg:flex-row", theme !== "dark" && "gap-2 pb-2 pr-2 pt-1")}>
           {/* Chart */}
           <section
             aria-label="XAU/USD chart"
             className={cn(
-              "relative min-h-0 min-w-0 flex-1 bg-background",
-              theme !== "dark" && "overflow-hidden rounded-2xl border border-gc-line shadow-sm",
+              "relative min-h-0 min-w-0 flex-1",
+              theme === "dark" && "bg-background",
             )}
           >
             <JenvuChartWorkspace
@@ -701,6 +701,20 @@ function TerminalPage() {
                 const match = TIMEFRAMES.find((item) => item.key === next.key);
                 if (match) setTf(match);
               }}
+              railSlot={
+                !deskOpen && (
+                  <button
+                    type="button"
+                    onClick={() => setDeskOpen(true)}
+                    aria-label="Ask With AI"
+                    title="Ask With AI"
+                    className="flex w-12 flex-col items-center gap-1 rounded-xl bg-background px-1 py-2 text-[10px] font-medium leading-tight text-foreground shadow-sm ring-1 ring-gc-line hover:bg-gc-blue-soft dark:bg-accent dark:ring-border"
+                  >
+                    <img src="/favicon.png" alt="" className="h-5 w-5 rounded-sm object-contain" />
+                    Ask AI
+                  </button>
+                )
+              }
               rightSlot={
                 <>
                   {!deskOpen && (
@@ -748,7 +762,7 @@ function TerminalPage() {
                     <button
                       type="button"
                       onClick={() => setDeskOpen(true)}
-                      className="flex h-7 items-center gap-1.5 rounded-full border border-gc-line bg-background px-3 text-xs font-medium text-foreground transition-colors hover:bg-muted dark:bg-accent dark:text-foreground"
+                      className="flex h-7 md:hidden items-center gap-1.5 rounded-full border border-gc-line bg-background px-3 text-xs font-medium text-foreground transition-colors hover:bg-muted dark:bg-accent dark:text-foreground"
                       title="Ask With AI"
                       aria-label="Ask With AI"
                     >

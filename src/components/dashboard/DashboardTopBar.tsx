@@ -107,7 +107,7 @@ export default function DashboardTopBar({
   const seeAll = () => { const t = q.trim(); if (!t) return; close(); void navigate({ to: "/search", search: { q: t } }); };
 
   return (
-    <header className={`sticky top-0 z-30 flex h-14 shrink-0 items-center gap-2 ${white ? "bg-background" : "bg-gc-canvas"} px-2 sm:gap-3 sm:px-3`}>
+    <header className={`sticky top-0 z-30 flex h-14 shrink-0 items-center gap-2 ${white ? "bg-gc-console-bar" : "bg-gc-canvas"} px-2 sm:gap-3 sm:px-3`}>
       <button
         type="button"
         onClick={onMenu}
@@ -129,7 +129,7 @@ export default function DashboardTopBar({
             else if (hits[0]) openHit(hits[0]);
             else seeAll();
           }}
-          className={`flex h-10 items-center rounded-full border border-gc-line ${white ? "bg-background" : "bg-gc-notice"} pl-4 pr-1 focus-within:bg-background focus-within:shadow-sm`}
+          className={`flex h-10 items-center rounded-full border border-gc-line ${white ? "bg-gc-blue-soft" : "bg-gc-notice"} pl-4 pr-1 focus-within:bg-background focus-within:shadow-sm`}
         >
           <input
             ref={inputRef}
