@@ -178,7 +178,9 @@ export function AskJenvuWidget() {
                   <div className="space-y-5 pt-2">
                     {msgs.map((m, i) =>
                       m.role === "user" ? (
-                        <p key={i} className="whitespace-pre-wrap break-words text-[18px] leading-snug">{m.content}</p>
+                        <div key={i} className="flex justify-end">
+                          <p className="max-w-[80%] whitespace-pre-wrap break-words rounded-2xl rounded-tr-md bg-gc-surface px-4 py-2.5 text-[15px] leading-snug text-gc-ink">{m.content}</p>
+                        </div>
                       ) : (
                         <AssistantTurn
                           key={i}
