@@ -129,7 +129,7 @@ export const STORIES: Story[] = [
   {
     slug: "daily-gold-insights",
     img: cardGold,
-    tag: "GOLD MARKET",
+    tag: "\n",
     title: "Daily XAU/USD insights and trading guides",
     intro:
       "Short daily reads on gold, plus longer guides that explain ICT and SMC ideas in simple language.",
