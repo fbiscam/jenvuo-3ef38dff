@@ -67,6 +67,7 @@ const columns = [
       { to: "/about", label: "About Jenvu" },
       { to: "/founding", label: "Founding Program" },
       { to: "/broadcasts", label: "Broadcast" },
+      { to: "/founder", label: "Our Founder" },
     ],
   },
   {
@@ -76,6 +77,7 @@ const columns = [
       { to: "/download", label: "Download App" },
       { to: "/llm", label: "Language Model" },
       { to: "/development", label: "Development" },
+      { to: "/ai-engine", label: "Products" },
     ],
   },
   {
@@ -83,7 +85,9 @@ const columns = [
     links: [
       { to: "/insights", label: "Market Insights" },
       { to: "/scam-tool", label: "Scam Tool" },
-      { to: "/leads", label: "Leads Tool" },
+      { to: "/scam-check", label: "Scam Check" },
+      { to: "/killzones", label: "Killzones" },
+      { to: "/strategies/ict-gold-trading", label: "Solutions" },
     ],
   },
   {
@@ -93,6 +97,7 @@ const columns = [
       { to: "/auth", label: "Sign In" },
       { to: "/help", label: "Help Center" },
       { to: "/contact", label: "Contact us" },
+      { to: "/docs", label: "Documentation" },
     ],
   },
   {
@@ -102,6 +107,7 @@ const columns = [
       { to: "/privacy", label: "Privacy Policy" },
       { to: "/refund", label: "Refund Policy" },
       { to: "/disclaimer", label: "Risk Disclaimer" },
+      { to: "/cancellation", label: "Cancellation Policy" },
     ],
   },
 ] as const;
