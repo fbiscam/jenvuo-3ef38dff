@@ -28,3 +28,4 @@
 - Every top-level public page must be listed in GLOBAL_PATHS in `src/lib/url-rewrite.ts` (tested in `url-rewrite.test.ts`): otherwise section hosts like support.jenvu.com prefix it into their section and show Not found.
 - Ask Jenvu sets an opt-in per-model `attemptTimeoutMs` in its gateway call (other callers keep no timer): a stalled public-chat model must hand over to the next one instead of hanging the widget.
 - Top-bar Gifts box lists positive credit-ledger rows whose reason is in `GIFT_REASONS` (`src/lib/gifts.ts`, tested), with the seen time kept per user in the browser: gifts need no extra table and only gift-type credit shows.
+- The Terminal stays unzoomed but its top bar and menu drawer use `.jenvu-zoom-chrome` (same breakpoints as `.jenvu-zoom-dashboard`): keeps header/menu the same size on every dashboard page.
