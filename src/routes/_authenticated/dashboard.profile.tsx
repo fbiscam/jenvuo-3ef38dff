@@ -133,12 +133,13 @@ function Profile() {
         <div className="h-24 bg-gradient-to-r from-gc-blue-soft via-gc-notice to-gc-blue-soft sm:h-28" aria-hidden />
         <div className="px-6 pb-6 sm:px-8 sm:pb-8">
           <div className="-mt-12 flex flex-col gap-5 sm:-mt-14 sm:flex-row sm:items-end">
-            <button
-              type="button"
-              onClick={onAvatarPick}
-              disabled={uploadingAvatar}
+            <div
+              role="button"
+              tabIndex={0}
+              onClick={() => { if (!uploadingAvatar) onAvatarPick(); }}
+              onKeyDown={(e) => { if ((e.key === "Enter" || e.key === " ") && !uploadingAvatar) { e.preventDefault(); onAvatarPick(); } }}
               aria-label={avatarPath ? "Change profile photo" : "Upload profile photo"}
-              className="group relative h-28 w-28 shrink-0 overflow-hidden rounded-full bg-gc-blue-soft shadow-md ring-4 ring-background outline-none focus-visible:ring-gc-blue-deep disabled:cursor-wait"
+              className="group relative h-28 w-28 cursor-pointer shrink-0 overflow-hidden rounded-full bg-gc-blue-soft shadow-md ring-4 ring-background outline-none focus-visible:ring-gc-blue-deep"
             >
               {avatarUrl ? (
                 <img src={avatarUrl} alt="Profile" className="h-full w-full object-cover" />
@@ -154,9 +155,9 @@ function Profile() {
                   <Loader2 className="h-6 w-6 animate-spin text-gc-blue-deep" />
                 </span>
               )}
-            </button>
+            </div>
             <div className="min-w-0 flex-1 sm:pb-1">
-              <h2 className="truncate text-[22px] font-medium">{fullName || "Your profile photo"}</h2>
+              <p className="truncate text-[22px] font-medium leading-tight">{fullName || "Your profile photo"}</p>
               <p className="truncate text-[14px] text-gc-ink-muted">{email}</p>
             </div>
             <div className="flex flex-wrap gap-2 sm:pb-1">
