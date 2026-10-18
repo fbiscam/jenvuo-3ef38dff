@@ -1,4 +1,5 @@
-import { describe, expect, it } from "vitest";
+import { describe, it } from "node:test";
+import { expect } from "./chart/test-expect";
 import { apexRedirectTarget, rewriteInput } from "./url-rewrite";
 
 describe("section hosts never swallow global pages", () => {
