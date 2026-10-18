@@ -1336,7 +1336,7 @@ html body .dash-dark main.bg-white { background-color: oklch(0.165 0 0) !importa
   background: conic-gradient(from var(--jv-ring-angle), var(--gc-blue), var(--gc-red), var(--gc-yellow), var(--gc-green), var(--gc-blue));
   -webkit-mask: var(--mark) center / contain no-repeat; mask: var(--mark) center / contain no-repeat;
 }
-.ask-jenvu-mark-loop { display: inline-block; background-color: var(--gc-blue); -webkit-mask: var(--mark) center / contain no-repeat; mask: var(--mark) center / contain no-repeat; transform: scale(0.86); }
+.ask-jenvu-mark-loop { display: inline-block; background-color: var(--gc-on-blue); -webkit-mask: var(--mark) center / contain no-repeat; mask: var(--mark) center / contain no-repeat; transform: scale(0.86); }
 @keyframes ask-jenvu-ring { to { --jv-ring-angle: 360deg; } }
 .ask-jenvu-mark-ring { animation: ask-jenvu-ring 2.4s linear infinite !important; }
 @media (prefers-reduced-motion: reduce) { .ind-kenburns { animation: none; } }

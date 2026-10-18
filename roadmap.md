@@ -29,3 +29,5 @@
 - [x] Terminal page top bar pure white
 - [x] Signed-in public header: profile picture next to Dashboard, opens settings
 - [x] Dashboard home: "Log a trade" shortcut removed
+- [x] Thinking logo: white inside
+- [x] Usage page: summary cards + framed layout; Terminal: framed white chart card
