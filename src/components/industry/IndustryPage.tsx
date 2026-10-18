@@ -1,5 +1,5 @@
 import { useEffect, useState, type ReactNode } from "react";
-import { ChevronDown, ArrowRight } from "lucide-react";
+import { ChevronDown, ArrowRight, CandlestickChart, Sparkles, BellRing, Code2 } from "lucide-react";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 import { NextStep } from "@/components/PageShell";
@@ -34,6 +34,10 @@ export type IndustryContent = {
   storySlugs: string[];
   productsTitle: string;
   products: { title: string; text: string; href: string }[];
+  /** Products page only: white "what you get" section with four icon cards. */
+  highlightsTitle?: string;
+  highlightsIntro?: string;
+  highlights?: { title: string; text: string }[];
 };
 
 const SECTIONS = [
@@ -54,6 +58,7 @@ export function IndustryPage({ c }: { c: IndustryContent }) {
         {p ? <ProductsHero c={c} /> : <SolutionsHero c={c} />}
         <SectionBar />
         {p ? <ProductsZigzag c={c} /> : <SolutionsCards c={c} />}
+        {p && <ProductsHighlights c={c} />}
         {p ? <TopicsTabs c={c} /> : <TopicsList c={c} />}
         {p ? <WhyNight c={c} /> : <WhyAccordion c={c} />}
         {p ? <StoriesRows c={c} /> : <StoriesCards c={c} />}
@@ -313,7 +318,12 @@ function ProductsHero({ c }: { c: IndustryContent }) {
           <p className="mx-auto mt-5 max-w-[620px] text-[17px] leading-[1.6] text-gc-ink-muted">{c.intro}</p>
           <Buttons center />
         </div>
-        <ImageCard img={c.heroImg} caption={c.heroCaption} tag="Jenvu platform" eager className="mt-12 aspect-[16/9] text-left sm:aspect-[2/1]" />
+        <figure className="ind-rise mt-12">
+          <div className="aspect-[2/1] overflow-hidden rounded-[28px] bg-gc-night">
+            <img src={c.heroImg} alt="" width={1600} height={800} loading="eager" className="ind-kenburns h-full w-full object-cover" />
+          </div>
+          <figcaption className="mt-4 text-[14px] text-gc-ink-muted">{c.heroCaption}</figcaption>
+        </figure>
       </div>
     </section>
   );
@@ -325,11 +335,11 @@ function ProductsZigzag({ c }: { c: IndustryContent }) {
       <SectionHead title={c.solutionsTitle} intro={c.solutionsIntro} center />
       <div className="mt-12 space-y-14 md:space-y-20">
         {c.solutions.map((s, n) => (
-          <div key={s.title} className={`grid items-center gap-8 md:grid-cols-2 md:gap-14 ${n % 2 ? "md:[&>*:first-child]:order-2" : ""}`}>
+          <div key={s.title} className={`grid items-center gap-8 md:grid-cols-2 md:gap-16 ${n % 2 ? "md:[&>*:first-child]:order-2" : ""}`}>
             <div className="aspect-[16/10] overflow-hidden rounded-[28px] bg-gc-night">
               <img src={s.img} alt="" width={1280} height={800} loading="lazy" className="ind-kenburns h-full w-full object-cover" />
             </div>
-            <div>
+            <div className={`max-w-[460px] ${n % 2 ? "md:justify-self-end" : ""}`}>
               <p className="text-[13px] font-medium text-gc-blue-deep">0{n + 1}</p>
               <h3 className="mt-2 text-[28px] font-normal leading-tight">{s.title}</h3>
               <p className="mt-4 text-[16px] leading-[1.6] text-gc-ink-muted">{s.text}</p>
@@ -341,6 +351,37 @@ function ProductsZigzag({ c }: { c: IndustryContent }) {
         ))}
       </div>
     </Wrap>
+  );
+}
+
+const HIGHLIGHT_ICONS = [
+  { Icon: CandlestickChart, bg: "bg-gc-blue-soft", fg: "text-gc-blue" },
+  { Icon: Sparkles, bg: "bg-gc-red-soft", fg: "text-gc-red" },
+  { Icon: BellRing, bg: "bg-gc-yellow-soft", fg: "text-gc-yellow" },
+  { Icon: Code2, bg: "bg-gc-green-soft", fg: "text-gc-green" },
+];
+
+/** Products page: plain white section with four homepage-style icon cards. */
+function ProductsHighlights({ c }: { c: IndustryContent }) {
+  if (!c.highlights?.length) return null;
+  return (
+    <section className="bg-background">
+      <div className="mx-auto max-w-[1240px] px-5 py-14 sm:px-8 md:py-20">
+        <SectionHead title={c.highlightsTitle ?? ""} intro={c.highlightsIntro} center />
+        <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          {c.highlights.map((h, n) => {
+            const { Icon, bg, fg } = HIGHLIGHT_ICONS[n % HIGHLIGHT_ICONS.length];
+            return (
+              <div key={h.title} className="ind-rise rounded-[24px] border border-gc-line bg-background p-7 text-left transition hover:shadow-[0_1px_3px_rgba(60,64,67,0.15),0_4px_12px_rgba(60,64,67,0.12)]" style={{ animationDelay: `${n * 0.08}s` }}>
+                <span className={`flex h-12 w-12 items-center justify-center rounded-full ${bg}`}><Icon className={`h-6 w-6 ${fg}`} /></span>
+                <h3 className="mt-5 text-[18px] font-medium">{h.title}</h3>
+                <p className="mt-2 text-[15px] leading-[1.6] text-gc-ink-muted">{h.text}</p>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </section>
   );
 }
 
@@ -391,7 +432,7 @@ function WhyNight({ c }: { c: IndustryContent }) {
 function StoriesRows({ c }: { c: IndustryContent }) {
   return (
     <Wrap id="stories">
-      <SectionHead title={c.storiesTitle} />
+      <SectionHead title={c.storiesTitle} center />
       <div className="mt-10 divide-y divide-gc-line border-y border-gc-line">
         {storyList(c).map((s) => (
           <a key={s.slug} href={`/stories/${s.slug}`} className="group grid items-center gap-5 py-6 sm:grid-cols-[220px_1fr_auto]">
@@ -420,7 +461,7 @@ function Products({ c }: { c: IndustryContent }) {
   const p = c.variant === "products";
   return (
     <Wrap id="products" tint={p}>
-      <SectionHead title={c.productsTitle} />
+      <SectionHead title={c.productsTitle} center={p} />
       <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {shown.map((x) => (
           <div key={x.title} className={`ind-rise flex flex-col rounded-[20px] p-6 ${p ? "bg-background border-l-4 border-gc-blue" : "border border-gc-line"}`}>
