@@ -145,88 +145,47 @@ function InsightsPage() {
     setPage(1);
   };
 
+  const coverProps = (item: Insight) => ({
+    src: insightCoverUrl(item.title, item.category, item.image_url),
+    alt: item.title,
+    width: 1280,
+    height: 720,
+    onError: (e: React.SyntheticEvent<HTMLImageElement>) => {
+      const t = e.currentTarget;
+      t.onerror = null;
+      t.src = insightCoverUrl(item.title, item.category);
+    },
+  });
+
   return (
-    <>
-      <div className={`public-cloudflare jenvu-zoom min-h-dvh w-full bg-background text-foreground ${SANS} antialiased selection:bg-home-accent selection:text-home-accent-foreground`}>
-        {/* NAV */}
-        <SiteHeader />
+    <div className={`min-h-dvh w-full bg-background text-gc-ink ${SANS} antialiased`}>
+      <SiteHeader />
 
-        {/* HERO SECTION - FEATURED ARTICLE */}
-        {featured ? (
-          <section className="public-page-hero border-b border-border">
-            <div className="mx-auto max-w-6xl px-5 sm:px-6 py-12 sm:py-16">
-              <div className="grid lg:grid-cols-12 gap-8 lg:items-center">
-                <div className="lg:col-span-7">
-                  <div className={`${MONO} text-[10px] uppercase tracking-[0.28em] text-red-600 font-bold mb-4`}>
-                    FEATURED REPORT // {featured.category}
-                  </div>
-                  <h1 className="text-3xl sm:text-4xl lg:text-5xl font-semibold tracking-tight leading-tight">
-                    {featured.title}
-                  </h1>
-                  <p className="mt-5 text-base sm:text-lg text-zinc-600 leading-relaxed max-w-2xl">
-                    {featured.excerpt}
-                  </p>
-                  <div className="mt-8 flex items-center gap-4">
-                    <span className={`${MONO} text-[11px] text-zinc-400`}>
-                      {fmtUTC(featured.published_at, "full")}
-                    </span>
-                    <Link
-                      to="/insights/$slug"
-                      params={{ slug: featured.slug }}
-                      className="inline-flex items-center gap-2 text-sm font-semibold text-zinc-900 hover:gap-3 transition-all"
-                    >
-                      Read full briefing <span>→</span>
-                    </Link>
-                  </div>
-                </div>
-                <div className="lg:col-span-5">
-                  <div className="aspect-[4/3] rounded-2xl overflow-hidden bg-zinc-200 border border-zinc-200 shadow-2xl relative group">
-                    <img
-                      src={insightCoverUrl(featured.title, featured.category, featured.image_url)}
-                      alt={featured.title}
-                      width={1280}
-                      height={720}
-                      onError={(e) => {
-                        const t = e.currentTarget;
-                        t.onerror = null;
-                        t.src = insightCoverUrl(featured.title, featured.category);
-                      }}
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-zinc-900/40 to-transparent" />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </section>
-        ) : (
-          <section className="border-b border-zinc-100 bg-zinc-50/50">
-            <div className="mx-auto max-w-6xl px-5 sm:px-6 py-10 sm:py-14">
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-semibold tracking-tight leading-tight">
-                Market Insights
-              </h1>
-              <p className="mt-4 text-base sm:text-lg text-zinc-600 leading-relaxed max-w-2xl">
-                Daily gold analysis, ICT and SMC briefings, and institutional market updates from the Jenvu desk.
-              </p>
-            </div>
-          </section>
-        )}
-
-        {/* MAIN FEED */}
-        <main className="mx-auto max-w-6xl px-5 sm:px-6 py-12 sm:py-20">
-          <div className="flex flex-col gap-4 border-b border-zinc-100 pb-6 mb-10 sm:flex-row sm:items-start sm:justify-between">
-            <h2 className={`text-xl font-bold ${MONO} uppercase tracking-[0.2em]`}>Terminal Briefings</h2>
-            <div className="inline-flex items-center gap-1 rounded-full border border-zinc-200 bg-zinc-50 p-1 text-xs font-medium">
+      <div className="jenvu-home-content">
+        {/* HERO */}
+        <section className="bg-gc-canvas">
+          <div className="mx-auto max-w-[1200px] px-5 py-14 sm:px-8 sm:py-16">
+            <div className="text-[14px] font-medium text-gc-blue">Jenvu Blog</div>
+            <h1 className="mt-3 max-w-[760px] text-[36px] font-normal leading-[1.15] tracking-[-0.5px] text-gc-ink sm:text-[48px]">
+              Gold market insights and product news
+            </h1>
+            <p className="mt-4 max-w-[680px] text-[16px] leading-[1.6] text-gc-ink-muted sm:text-[18px]">
+              Daily XAU/USD analysis, ICT and SMC guides, and updates from the Jenvu team.
+            </p>
+            <div className="mt-8 flex flex-wrap gap-2" role="tablist" aria-label="Filter articles">
               {filters.map((f) => {
                 const active = filter === f.id;
                 return (
                   <button
                     key={f.id}
+                    type="button"
+                    role="tab"
+                    aria-selected={active}
                     onClick={() => onFilterChange(f.id)}
-                    className={`px-4 py-1.5 rounded-full transition-colors ${
+                    className={`h-9 rounded-full border px-4 text-[14px] font-medium transition-colors ${
                       active
-                        ? "bg-home-accent text-home-accent-foreground shadow-sm"
-                        : "text-zinc-500 hover:text-zinc-900"
+                        ? "border-gc-nav-active bg-gc-nav-active text-gc-blue-deep"
+                        : "border-gc-line bg-background text-gc-ink hover:bg-gc-surface"
                     }`}
                   >
                     {f.label}
@@ -235,105 +194,111 @@ function InsightsPage() {
               })}
             </div>
           </div>
+        </section>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8 sm:gap-10">
+        <main className="mx-auto max-w-[1200px] px-5 py-12 sm:px-8 sm:py-16">
+          {/* FEATURED */}
+          {featured && (
+            <Link
+              to="/insights/$slug"
+              params={{ slug: featured.slug }}
+              className="group mb-14 grid overflow-hidden rounded-3xl border border-gc-line bg-background transition hover:shadow-md lg:grid-cols-2"
+            >
+              <div className="aspect-[16/10] overflow-hidden bg-gc-surface lg:aspect-auto lg:min-h-[340px]">
+                <img {...coverProps(featured)} className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
+              </div>
+              <div className="flex flex-col justify-center p-7 sm:p-10">
+                <div className="text-[13px] font-medium text-gc-blue">Featured · {featured.category}</div>
+                <h2 className="mt-3 line-clamp-3 text-[26px] font-normal leading-[1.25] text-gc-ink sm:text-[32px]">
+                  {featured.title}
+                </h2>
+                <p className="mt-4 line-clamp-3 text-[15px] leading-[1.65] text-gc-ink-muted">{featured.excerpt}</p>
+                <div className="mt-6 flex items-center justify-between gap-4">
+                  <span className="text-[13px] text-gc-ink-muted">{fmtUTC(featured.published_at, "full")}</span>
+                  <span className="text-[14px] font-medium text-gc-blue group-hover:underline">Read article →</span>
+                </div>
+              </div>
+            </Link>
+          )}
+
+          <h2 className="mb-6 text-[22px] font-normal text-gc-ink sm:text-[26px]">
+            {filter === "latest" ? "Latest articles" : filter === "gold" ? "Gold analysis" : "Macro and education"}
+          </h2>
+
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {remaining.map((item) => (
-              <article key={item.id} className="group cursor-pointer">
-                <Link to="/insights/$slug" params={{ slug: item.slug }} className="block">
-                  <div className="aspect-video rounded-xl overflow-hidden bg-zinc-100 border border-zinc-100 mb-5">
-                    <img
-                        src={insightCoverUrl(item.title, item.category, item.image_url)}
-                        alt={item.title}
-                        loading="lazy"
-                        width={1280}
-                        height={720}
-                        onError={(e) => {
-                          const t = e.currentTarget;
-                          t.onerror = null;
-                          t.src = insightCoverUrl(item.title, item.category);
-                        }}
-                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                      />
-                  </div>
-                  <div className={`${MONO} text-[10px] uppercase tracking-widest text-zinc-500 mb-2`}>
-                    {item.category}
-                  </div>
-                  <h3 className="text-xl font-semibold tracking-tight text-zinc-900 group-hover:text-zinc-700 transition-colors line-clamp-2 min-h-[3.5rem]">
+              <Link
+                key={item.id}
+                to="/insights/$slug"
+                params={{ slug: item.slug }}
+                className="group flex flex-col overflow-hidden rounded-2xl border border-gc-line bg-background transition hover:shadow-md"
+              >
+                <div className="aspect-video overflow-hidden bg-gc-surface">
+                  <img {...coverProps(item)} loading="lazy" className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
+                </div>
+                <div className="flex flex-1 flex-col p-6">
+                  <div className="text-[13px] font-medium text-gc-blue">{item.category}</div>
+                  <h3 className="mt-2 line-clamp-2 min-h-[3.2rem] text-[18px] font-medium leading-[1.4] text-gc-ink">
                     {item.title}
                   </h3>
-                  <p className="mt-3 text-sm text-zinc-600 line-clamp-2 leading-relaxed">
-                    {item.excerpt}
-                  </p>
-                  <div className="mt-4 flex items-center justify-between">
-                    <span className={`${MONO} text-[10px] text-zinc-400`}>
-                      {fmtUTC(item.published_at, "compact")}
-                    </span>
-                    <span className="text-[10px] font-bold text-zinc-900 group-hover:translate-x-1 transition-transform">
-                      VIEW REPORT ↗
-                    </span>
-                  </div>
-                </Link>
-              </article>
+                  <p className="mt-2 line-clamp-3 text-[14px] leading-[1.6] text-gc-ink-muted">{item.excerpt}</p>
+                  <div className="mt-auto pt-5 text-[13px] text-gc-ink-muted">{fmtUTC(item.published_at, "full")}</div>
+                </div>
+              </Link>
             ))}
           </div>
 
           {remaining.length === 0 && !featured && (
-            <div className="text-center py-16 text-sm text-zinc-500">
-              No briefings in this category yet.
-            </div>
+            <div className="py-16 text-center text-[15px] text-gc-ink-muted">No articles in this category yet.</div>
           )}
 
           {totalPages > 1 && (
-            <nav aria-label="Insights pagination" className="mt-14 flex items-center justify-center gap-2">
+            <nav aria-label="Blog pagination" className="mt-14 flex flex-wrap items-center justify-center gap-2">
               <button
+                type="button"
                 onClick={() => goToPage(currentPage - 1)}
                 disabled={currentPage === 1}
-                className="rounded-lg border border-zinc-200 bg-white px-3.5 py-2 text-xs font-semibold text-zinc-700 hover:bg-zinc-50 disabled:opacity-40 disabled:cursor-not-allowed"
+                className="h-10 rounded-full border border-gc-line bg-background px-4 text-[14px] font-medium text-gc-ink hover:bg-gc-surface disabled:cursor-not-allowed disabled:opacity-40"
               >
-                ← Prev
+                ← Previous
               </button>
               {Array.from({ length: totalPages }, (_, i) => i + 1).map((n) => (
                 <button
                   key={n}
+                  type="button"
                   onClick={() => goToPage(n)}
                   aria-current={n === currentPage ? "page" : undefined}
-                  className={`min-w-[36px] rounded-lg px-3 py-2 text-xs font-semibold transition-colors ${ n === currentPage ? "bg-zinc-900 text-white" : "border border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-50" }`}
+                  className={`h-10 min-w-10 rounded-full px-3 text-[14px] font-medium transition-colors ${
+                    n === currentPage ? "bg-gc-blue text-gc-on-blue" : "text-gc-ink hover:bg-gc-surface"
+                  }`}
                 >
                   {n}
                 </button>
               ))}
               <button
+                type="button"
                 onClick={() => goToPage(currentPage + 1)}
                 disabled={currentPage === totalPages}
-                className="rounded-lg border border-zinc-200 bg-white px-3.5 py-2 text-xs font-semibold text-zinc-700 hover:bg-zinc-50 disabled:opacity-40 disabled:cursor-not-allowed"
+                className="h-10 rounded-full border border-gc-line bg-background px-4 text-[14px] font-medium text-gc-ink hover:bg-gc-surface disabled:cursor-not-allowed disabled:opacity-40"
               >
                 Next →
               </button>
             </nav>
           )}
 
-
-          {/* LOAD MORE / NEWSLETTER */}
-          <div className="public-orange-cta relative mt-20 overflow-hidden rounded-lg border border-home-accent bg-home-accent p-8 text-center text-home-accent-foreground sm:p-12">
-            <div className="absolute inset-0 opacity-[0.07]" style={{
-              backgroundImage: "radial-gradient(#000 0.5px, transparent 0.5px)",
-              backgroundSize: "20px 20px"
-            }} />
-            <div className="relative z-10">
-              <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight mb-4">
-                Institutional briefings, delivered live.
-              </h2>
-              <p className="mx-auto mb-8 max-w-xl text-sm text-home-accent-foreground/85 sm:text-base">
-                Join 5,000+ traders receiving Jenvu terminal insights directly in their inbox before the New York open.
-              </p>
-              <SubscribeForm />
-            </div>
-          </div>
+          {/* NEWSLETTER */}
+          <section className="mt-20 rounded-3xl bg-gc-canvas px-6 py-12 text-center sm:px-12">
+            <h2 className="text-[26px] font-normal leading-[1.25] text-gc-ink sm:text-[32px]">Get new articles by email</h2>
+            <p className="mx-auto mb-8 mt-3 max-w-xl text-[15px] leading-[1.6] text-gc-ink-muted">
+              One short email when a new gold briefing goes live. Unsubscribe any time.
+            </p>
+            <SubscribeForm />
+          </section>
         </main>
-
-        <SiteFooter />
       </div>
-    </>
+
+      <SiteFooter />
+    </div>
   );
 }
 
@@ -382,7 +347,7 @@ function SubscribeForm() {
 
   if (done) {
     return (
-      <div className="max-w-md mx-auto rounded-xl border border-zinc-200 bg-white px-5 py-4 text-sm text-zinc-700">
+      <div className="mx-auto max-w-md rounded-2xl border border-gc-line bg-background px-5 py-4 text-[14px] text-gc-ink">
         ✓ You're on the list. Next briefing lands directly in your inbox.
       </div>
     );
@@ -397,14 +362,14 @@ function SubscribeForm() {
         required
         maxLength={255}
         placeholder="Enter email for daily briefings"
-        className="flex-1 bg-white border border-zinc-200 text-zinc-900 placeholder:text-zinc-400 rounded-xl px-4 py-3 text-sm outline-none focus:border-zinc-900 transition-all"
+        className="h-12 flex-1 rounded-full border border-gc-line bg-background px-5 text-[15px] text-gc-ink outline-none transition placeholder:text-gc-ink-muted focus:border-gc-blue"
       />
       <button
         type="submit"
         disabled={busy}
-        className="border border-zinc-200 bg-white px-6 py-3 text-sm font-bold text-zinc-950 hover:bg-zinc-100 transition-colors whitespace-nowrap disabled:opacity-60 rounded-xl"
+        className="h-12 whitespace-nowrap rounded-full bg-gc-blue px-6 text-[15px] font-medium text-gc-on-blue transition hover:bg-gc-blue-hover disabled:opacity-60"
       >
-        {busy ? "…" : "SUBSCRIBE"}
+        {busy ? "…" : "Subscribe"}
       </button>
     </form>
   );
