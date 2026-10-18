@@ -1001,6 +1001,19 @@ export const registerDocumentFile = createServerFn({ method: "POST" })
     }
     // Users can resubmit at any time after rejection or needs_info — no waiting window.
     const admin = await getServiceClient();
+    // Server-side check: the file must actually exist in storage at that path, with a matching size.
+    const slash = data.storage_path.lastIndexOf("/");
+    const folder = data.storage_path.slice(0, slash);
+    const fileName = data.storage_path.slice(slash + 1);
+    if (!fileName || data.storage_path.includes("..")) throw new Error("Invalid storage path");
+    const { data: listed, error: listErr } = await admin.storage.from(BUCKET).list(folder, { search: fileName, limit: 10 });
+    const obj = (listed ?? []).find((o: any) => o.name === fileName);
+    const realSize = Number((obj as any)?.metadata?.size ?? 0);
+    if (listErr || !obj || !realSize) throw new Error("Upload not found. Please upload the document again.");
+    if (!/^(image\/(jpeg|png|webp|heic|heif)|application\/pdf)$/i.test(String((obj as any)?.metadata?.mimetype ?? data.mime_type))) {
+      throw new Error("Unsupported document type.");
+    }
+    data.file_size = realSize;
     const { error } = await admin.from("founding_documents" as any).insert({
       application_id: app.id,
       user_id: context.userId,

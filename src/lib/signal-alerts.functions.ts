@@ -75,6 +75,11 @@ export const subscribeToAlerts = createServerFn({ method: 'POST' })
     if (existing?.user_id && existing.user_id !== context.userId) {
       return { ok: false, error: 'This email is already subscribed by another account.' }
     }
+    // An existing unowned row can only be claimed with the caller's own verified account email.
+    const ownEmail = (context.claims?.email as string | undefined)?.toLowerCase()
+    if (existing && !existing.user_id && ownEmail !== data.email) {
+      return { ok: false, error: 'This email is already subscribed. Sign in with that email to manage it.' }
+    }
     // Upsert by email; attach user_id so this account stays remembered
     // across browsers even if a different email is entered later.
     const { error } = await supabaseAdmin

@@ -10,7 +10,9 @@ export type LiveScannerStatus = {
 
 export const getLiveScannerStatus = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .handler(async (): Promise<LiveScannerStatus> => {
+  .handler(async ({ context }): Promise<LiveScannerStatus> => {
+    const { data: isAdmin } = await context.supabase.rpc("has_role", { _user_id: context.userId, _role: "admin" });
+    if (!isAdmin) throw new Error("Forbidden");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const [{ data: setting }, { data: run }] = await Promise.all([
       supabaseAdmin
