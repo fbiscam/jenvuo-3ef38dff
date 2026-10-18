@@ -156,16 +156,35 @@ function ScamToolPage() {
   const ui = result ? VERDICT_UI[result.verdict] : null;
 
   return (
-    <div className={`min-h-screen bg-background text-foreground ${SANS}`}>
-      <div className="mx-auto w-full max-w-5xl px-5 py-8 sm:px-8 lg:py-12">
+    <div className={`flex min-h-screen flex-col bg-gc-canvas text-gc-ink ${SANS}`}>
+      <header className="sticky top-0 z-30 flex h-14 shrink-0 items-center gap-2 bg-gc-canvas px-3 sm:gap-3 sm:px-4">
         <Link
           to="/"
-          className="mb-7 inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
+          aria-label="Back to home"
+          className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-gc-ink-muted hover:bg-gc-notice"
         >
-          <ArrowLeft className="w-4 h-4" />
-          Back to home
+          <ArrowLeft className="h-5 w-5" />
         </Link>
-
+        <Link to="/" className="flex shrink-0 items-center gap-2 pr-2">
+          <img src="/favicon.png" alt="" className="h-6 w-6 rounded-md object-contain" />
+          <span className="text-[20px] font-medium tracking-tight">
+            Jenvu <span className="text-gc-ink-muted">Scam Tool</span>
+          </span>
+        </Link>
+        <nav className="ml-auto flex items-center gap-1 text-[14px]">
+          <Link to="/scam-check" className="hidden rounded-full px-3 py-2 hover:bg-gc-notice sm:inline-flex">
+            Scam Check
+          </Link>
+          <Link to="/help" className="hidden rounded-full px-3 py-2 hover:bg-gc-notice sm:inline-flex">
+            Help
+          </Link>
+          <Button asChild size="sm" className="rounded-full">
+            <Link to="/auth">Sign in</Link>
+          </Button>
+        </nav>
+      </header>
+      <div className="flex w-full flex-1 flex-col bg-background sm:mx-2 sm:w-auto sm:rounded-t-[20px]">
+      <div className="mx-auto w-full max-w-5xl px-5 py-8 sm:px-8 lg:py-10" style={{ zoom: 0.9 }}>
         <div className="mb-7 border-b border-border pb-6">
           <h1 className="text-[28px] font-medium text-foreground sm:text-[32px]">
             Scam Tool
@@ -199,7 +218,7 @@ function ScamToolPage() {
         </div>
 
         {/* Input form */}
-        <form onSubmit={onSubmit} className="rounded-xl border border-border bg-card p-5 ring-1 ring-background/60 sm:p-6">
+        <form onSubmit={onSubmit} className="rounded-2xl border border-gc-line bg-card p-5 sm:p-6">
           <div className="relative">
             <activeTab.icon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-400" />
             <input
@@ -309,7 +328,7 @@ function ScamToolPage() {
         )}
 
         {/* Red flags checklist */}
-        <div className="mt-6 rounded-xl border border-border bg-muted/45 p-5 sm:p-6">
+        <div className="mt-6 rounded-2xl border border-gc-line bg-gc-surface p-5 sm:p-6">
           <h3 className="text-base font-medium text-black mb-3">
             Common trading scam red flags
           </h3>
@@ -327,7 +346,7 @@ function ScamToolPage() {
         </div>
 
         {/* Full scam check link */}
-        <div className="mt-5 flex flex-col gap-3 rounded-xl border border-border bg-card p-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mt-5 flex flex-col gap-3 rounded-2xl border border-gc-line bg-gc-blue-soft p-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="text-sm font-medium text-black">
               Need a deeper link/email/text analysis?
@@ -343,6 +362,7 @@ function ScamToolPage() {
             Open Scam Check <ExternalLink className="w-4 h-4" />
           </Link>
         </div>
+      </div>
       </div>
     </div>
   );
