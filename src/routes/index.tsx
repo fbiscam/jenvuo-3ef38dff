@@ -22,8 +22,6 @@ import {
   CloudAudiences,
   CloudBuildWith,
   CloudHero,
-  CloudProducts,
-  CloudUseCases,
 } from "@/components/home/CloudHome";
 import { CloudFeatureVideos } from "@/components/home/CloudFeatureVideos";
 import { CloudSolutions, CloudLogoStrip, CloudStartBanner } from "@/components/home/CloudSolutions";
@@ -392,9 +390,7 @@ function HomePage() {
           <CloudAudiences />
           <CloudBuildWith />
           <CloudFeatureVideos />
-          <CloudProducts />
           <CloudSolutions />
-          <CloudUseCases />
           <CloudLogoStrip />
           <CloudStartBanner />
         </main>

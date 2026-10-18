@@ -8,7 +8,6 @@
 - [x] New CodeCraft key used everywhere (Ask Jenvu, API keys, Terminal) and live-tested
 - [x] Solutions & Products pages in Google Cloud industry-page style
 - [x] Leads + Scam Tool pages in dashboard look
-- [x] Homepage: added product grid + use-case sections
 - [x] Docs "Not found" from support.jenvu.com fixed (all public pages now open from every section site)
 - [x] Thinking logo colour loop works with "reduce animations" on
 - [x] Ask Jenvu: user message as right-side grey bubble
