@@ -230,7 +230,7 @@ function InsightsPage() {
             <section key={cat} className="border-t border-gc-line pt-10 pb-12">
               <h2 className="text-[26px] font-normal text-gc-ink sm:text-[30px]">{cat}</h2>
               <div className="mt-8 grid gap-x-16 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
-                {items.map((item, idx) => (
+                {items.map((item) => (
                   <Link
                     key={item.id}
                     to="/insights/$slug"
@@ -239,7 +239,7 @@ function InsightsPage() {
                   >
                     <div className="relative aspect-[16/9] w-full overflow-hidden rounded-2xl border border-gc-line bg-gc-surface">
                       <img {...coverProps(item)} loading="lazy" className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
-                      {idx % 2 === 0 && (
+                      {isDarkCover(item) && (
                         <span className="pointer-events-none absolute inset-x-3 bottom-4 line-clamp-3 text-left text-[22px] font-medium leading-[1.2] text-gc-on-blue [text-shadow:0_2px_12px_rgb(0_0_0/0.55)]">
                           {item.title}
                         </span>
@@ -390,15 +390,28 @@ export function readMinutes(content: string | null | undefined): number {
   return Math.max(1, Math.round(words / 220));
 }
 
+const TOPIC_GROUPS: { label: string; cats: string[] }[] = [
+  { label: "Gold and markets", cats: ["gold", "analysis", "market news", "institutional"] },
+  { label: "Strategy and education", cats: ["smc", "ict", "strategy", "education", "risk"] },
+  { label: "AI and tools", cats: ["ai"] },
+];
+
 function groupByCategory(items: Insight[]): [string, Insight[]][] {
   const map = new Map<string, Insight[]>();
   for (const it of items) {
-    const key = (it.category || "Gold").trim() || "Gold";
-    const label = key.charAt(0).toUpperCase() + key.slice(1);
+    const cat = (it.category || "").toLowerCase();
+    const label = TOPIC_GROUPS.find((g) => g.cats.includes(cat))?.label ?? "More stories";
     if (!map.has(label)) map.set(label, []);
     map.get(label)!.push(it);
   }
-  return [...map.entries()];
+  const order = [...TOPIC_GROUPS.map((g) => g.label), "More stories"];
+  return order.filter((l) => map.has(l)).map((l) => [l, map.get(l)!]);
+}
+
+const DARK_COVERS = ["cover-star", "cover-ribbon", "cover-rainbow"];
+function isDarkCover(item: Insight) {
+  const src = insightCoverUrl(item.title, item.category, item.image_url);
+  return DARK_COVERS.some((k) => src.includes(k));
 }
 
 function Chip({ children }: { children: React.ReactNode }) {
