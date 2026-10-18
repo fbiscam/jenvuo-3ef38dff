@@ -1,7 +1,7 @@
 import * as React from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { ExternalLink, FileText, Loader2, Search, Sparkles, X } from "lucide-react";
+import { ExternalLink, FileText, Loader2, Search, SendHorizontal, Sparkles } from "lucide-react";
 import { siteSearch, type SearchHit } from "@/lib/site-search.functions";
 import { askJenvu, type AskJenvuResult } from "@/lib/ask-jenvu.functions";
 import { SITE_PAGES, matchSitePages } from "@/lib/site-pages";
@@ -91,18 +91,19 @@ export default function HeaderSearch({ onClose }: { onClose: () => void }) {
           value={q}
           onChange={(e) => setQ(e.target.value)}
           onKeyDown={(e) => e.key === "Escape" && onClose()}
-          placeholder="Search pages, guides or ask a question"
+          placeholder="Search"
           aria-label="Search Jenvu"
           className="min-w-0 flex-1 bg-transparent text-[15px] text-gc-ink outline-none placeholder:text-gc-ink-muted"
         />
-        {loading && <Loader2 className="h-4 w-4 shrink-0 animate-spin text-gc-ink-muted" />}
-        <button type="button" aria-label="Close search" onClick={onClose} className="shrink-0 text-gc-ink-muted hover:text-gc-ink"><X className="h-5 w-5" /></button>
+        <button type="submit" aria-label="Send" className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-gc-ink hover:bg-gc-notice">
+          {loading ? <Loader2 className="h-4 w-4 animate-spin text-gc-ink-muted" /> : <SendHorizontal className="h-5 w-5" />}
+        </button>
       </form>
 
-      <div className="absolute inset-x-0 top-full z-[80] mt-1 max-h-[70vh] overflow-y-auto rounded-lg border border-gc-line bg-background shadow-lg">
+      <div className={`absolute inset-x-0 top-full z-[80] mt-1 max-h-[70vh] overflow-y-auto rounded-lg border border-gc-line shadow-lg ${showPanel ? "bg-background" : "bg-gc-panel"}`}>
         {!showPanel && (
           <p className="px-4 py-4 text-[13px] italic text-gc-ink-muted">
-            Search pages, help guides and stories, or ask Jenvu a question. Do not enter any sensitive, confidential, or personal information.
+            Do not enter any sensitive, confidential, or personal information.
           </p>
         )}
 
