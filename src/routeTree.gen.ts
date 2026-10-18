@@ -40,6 +40,7 @@ import { Route as RefundRouteImport } from './routes/refund'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as ScamCheckRouteImport } from './routes/scam-check'
 import { Route as ScamToolRouteImport } from './routes/scam-tool'
+import { Route as SearchRouteImport } from './routes/search'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
@@ -269,6 +270,11 @@ const ScamCheckRoute = ScamCheckRouteImport.update({
 const ScamToolRoute = ScamToolRouteImport.update({
   id: '/scam-tool',
   path: '/scam-tool',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SearchRoute = SearchRouteImport.update({
+  id: '/search',
+  path: '/search',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
@@ -726,6 +732,7 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/scam-check': typeof ScamCheckRoute
   '/scam-tool': typeof ScamToolRoute
+  '/search': typeof SearchRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
@@ -830,6 +837,7 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/scam-check': typeof ScamCheckRoute
   '/scam-tool': typeof ScamToolRoute
+  '/search': typeof SearchRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
@@ -939,6 +947,7 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/scam-check': typeof ScamCheckRoute
   '/scam-tool': typeof ScamToolRoute
+  '/search': typeof SearchRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
@@ -1049,6 +1058,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/scam-check'
     | '/scam-tool'
+    | '/search'
     | '/sitemap.xml'
     | '/terms'
     | '/.well-known/oauth-protected-resource'
@@ -1153,6 +1163,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/scam-check'
     | '/scam-tool'
+    | '/search'
     | '/sitemap.xml'
     | '/terms'
     | '/.well-known/oauth-protected-resource'
@@ -1261,6 +1272,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/scam-check'
     | '/scam-tool'
+    | '/search'
     | '/sitemap.xml'
     | '/terms'
     | '/.well-known/oauth-protected-resource'
@@ -1371,6 +1383,7 @@ export interface RootRouteChildren {
   ResetPasswordRoute: typeof ResetPasswordRoute
   ScamCheckRoute: typeof ScamCheckRoute
   ScamToolRoute: typeof ScamToolRoute
+  SearchRoute: typeof SearchRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
   Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
@@ -1619,6 +1632,13 @@ declare module '@tanstack/react-router' {
       path: '/scam-tool'
       fullPath: '/scam-tool'
       preLoaderRoute: typeof ScamToolRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/search': {
+      id: '/search'
+      path: '/search'
+      fullPath: '/search'
+      preLoaderRoute: typeof SearchRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/sitemap.xml': {
@@ -2351,6 +2371,7 @@ const rootRouteChildren: RootRouteChildren = {
   ResetPasswordRoute: ResetPasswordRoute,
   ScamCheckRoute: ScamCheckRoute,
   ScamToolRoute: ScamToolRoute,
+  SearchRoute: SearchRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermsRoute: TermsRoute,
   Char91DotwellKnownChar93OauthProtectedResourceRoute:
