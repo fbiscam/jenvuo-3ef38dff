@@ -75,7 +75,7 @@ export const collections: Collection[] = [
       },
       {
         slug: "create-account",
-        title: "How do I create an account?",
+        title: "Create your account",
         summary: "Jenvu access is invite-only through the Founding Trader Program.",
         updatedAt: "2026-09-22",
         body: [
@@ -133,7 +133,7 @@ export const collections: Collection[] = [
       },
       {
         slug: "supported-assets",
-        title: "Which asset does Jenvu support?",
+        title: "Supported asset",
         summary: "Gold only — XAU/USD, nothing else.",
         updatedAt: "2026-06-30",
         body: [
@@ -158,7 +158,7 @@ export const collections: Collection[] = [
     articles: [
       {
         slug: "how-to-chat",
-        title: "How do I use AI chat?",
+        title: "Using AI chat",
         summary: "Ask general questions or request a chart analysis.",
         updatedAt: "2026-06-30",
         body: [
@@ -183,7 +183,7 @@ export const collections: Collection[] = [
       },
       {
         slug: "extension-troubleshooting",
-        title: "Terminal isn't responding — what to check",
+        title: "Terminal not responding",
         summary: "Chart loading, plan status and wallet balance.",
         updatedAt: "2026-06-30",
         body: [
@@ -270,7 +270,7 @@ export const collections: Collection[] = [
       },
       {
         slug: "a-plus-grading",
-        title: "What makes a setup A+?",
+        title: "What makes A+ setups",
         summary: "The grade is reserved for high-confluence trades that pass every gate.",
         updatedAt: "2026-06-30",
         body: [
@@ -294,7 +294,7 @@ export const collections: Collection[] = [
       },
       {
         slug: "market-closed",
-        title: "What happens when markets are closed?",
+        title: "When markets close",
         summary: "You'll see a MARKET CLOSED badge — no live entries are issued.",
         updatedAt: "2026-06-30",
         body: [
@@ -444,7 +444,7 @@ export const collections: Collection[] = [
       },
       {
         slug: "api-keys",
-        title: "API keys and quota limits",
+        title: "API keys and limits",
         summary: "Create a Jenvu API key, use it anywhere, and track its daily token quota.",
         updatedAt: "2026-09-18",
         body: [
@@ -485,7 +485,7 @@ export const collections: Collection[] = [
       },
       {
         slug: "api-endpoint",
-        title: "Using the Jenvu API endpoint",
+        title: "Jenvu API endpoint",
         summary: "OpenAI-compatible chat completions endpoint you can call from any client.",
         updatedAt: "2026-09-18",
         body: [
@@ -525,7 +525,7 @@ export const collections: Collection[] = [
 
       {
         slug: "upgrade-cancel",
-        title: "How do I upgrade or cancel?",
+        title: "Upgrade or cancel",
         summary: "Manage your plan from the Dashboard → Billing tab.",
         updatedAt: "2026-06-30",
         body: [
