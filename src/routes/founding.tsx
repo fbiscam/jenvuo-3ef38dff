@@ -14,12 +14,12 @@ export const Route = createFileRoute("/founding")({
       {
         name: "description",
         content:
-          "50 traders per month get free Elite access. Pay only after your first $100 profit. Institutional-grade XAU intelligence, aligned incentives.",
+          "Invite-only program for 50 gold traders a month. Approved traders get their chosen plan straight away and verify their ID within 2 days.",
       },
       { property: "og:title", content: "Founding Trader Program" },
       {
         property: "og:description",
-        content: "Free Elite plan for 30 days. Pay only after you profit $100.",
+        content: "Approval unlocks your chosen plan immediately. Verify your ID within 2 days to keep access.",
       },
       { property: "og:url", content: "https://jenvu.com/founding" },
       { property: "og:type", content: "website" },
@@ -119,7 +119,7 @@ function FoundingPage() {
                 Founding Trader Program
               </h1>
               <p className="jenvu-rise [animation-delay:80ms] mx-auto mt-5 max-w-[760px] text-[16px] leading-[1.6] text-gc-ink-muted sm:text-[17px]">
-                Get <span className="font-medium text-gc-ink">Elite free for 30 days</span> — pay only after your <span className="font-medium text-gc-ink">first $100 in verified profit</span>. No profit, no payment.
+                Once approved, your <span className="font-medium text-gc-ink">chosen plan is unlocked straight away</span>. You then have <span className="font-medium text-gc-ink">2 days to verify your ID</span> to keep access.
               </p>
               <div className="jenvu-rise [animation-delay:160ms] mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
                 <a href="#apply" className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-gc-blue px-6 text-[16px] font-medium text-gc-on-blue transition hover:bg-gc-blue-hover">
@@ -149,8 +149,8 @@ function FoundingPage() {
               <div className="grid gap-5 md:grid-cols-3">
                 {([
                   { icon: Users, tone: "blue", title: "Curated cohort", body: "Only 50 traders each month. Serious applicants, real capital, no tire-kickers." },
-                  { icon: DollarSign, tone: "green", title: "Pay after profit", body: "First month Elite is free. Billing activates only after $100 verified profit." },
-                  { icon: Shield, tone: "yellow", title: "Aligned incentives", body: "We win when you win. Our job is to make you stable, not to milk subscriptions." },
+                  { icon: DollarSign, tone: "green", title: "Instant access", body: "Approval unlocks the plan you picked right away, with no waiting." },
+                  { icon: Shield, tone: "yellow", title: "Verified traders", body: "Every member verifies their ID within 2 days, so the cohort stays real." },
                 ] as const).map((b, i) => (
                   <div key={b.title} className="ind-rise rounded-3xl border border-gc-line bg-background p-7 transition hover:shadow-[0_1px_3px_rgba(60,64,67,0.15),0_4px_12px_rgba(60,64,67,0.12)]" style={{ animationDelay: `${i * 80}ms` }}>
                     <span className={`flex h-12 w-12 items-center justify-center rounded-full ${TONE[b.tone].bg}`}>
@@ -169,14 +169,14 @@ function FoundingPage() {
             <div className="mx-auto grid max-w-[1296px] gap-10 px-5 py-16 sm:px-8 lg:grid-cols-[0.8fr_1.2fr] lg:py-20">
               <div>
                 <h2 className="text-[32px] font-medium leading-[1.2] text-gc-ink sm:text-[40px]">How it works</h2>
-                <p className="mt-4 max-w-[420px] text-[16px] leading-[1.6] text-gc-ink-muted">Four simple steps from application to your first scan.</p>
+                <p className="mt-4 max-w-[420px] text-[16px] leading-[1.6] text-gc-ink-muted">Four simple steps from application to your first chart.</p>
               </div>
               <ol className="space-y-4">
                 {[
                   ["Apply", "Fill the short form below. We review every application manually."],
-                  ["Get approved", "If accepted, we activate your Elite plan free for 30 days — full access to terminal analysis, signals, alerts and killzones."],
-                  ["Reach $100 in 30 days", "You have 30 days to hit $100 in verified profit. After that, billing activates on your account and you pay per scan."],
-                  ["Verify & pay to continue scanning", "Once 30 days end, a 'Submit documents' notification appears on your account. Click it, upload your broker statement / MyFxBook, and we verify. After verification, billing goes live and credits are added to your account so you can keep scanning."],
+                  ["Get approved", "If accepted, the plan you picked is unlocked on your account straight away, including the Terminal."],
+                  ["Verify your ID in 2 days", "Upload your ID documents from your account within 2 days of approval."],
+                  ["Keep trading", "Once your documents are submitted, your access continues. If they're not sent in time, the Terminal is locked until you verify."],
                 ].map(([t, d], i) => (
                   <li key={t} className="flex gap-5 rounded-3xl bg-background p-6">
                     <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gc-blue text-[15px] font-medium text-gc-on-blue">{i + 1}</span>
@@ -244,7 +244,7 @@ function FoundingPage() {
                           );
                         })}
                       </div>
-                      <p className="mt-1.5 text-[12px] text-gc-ink-muted">Approved applicants get this plan free for 30 days.</p>
+                      <p className="mt-1.5 text-[12px] text-gc-ink-muted">Approved applicants get this plan straight away.</p>
                     </div>
                     <div className="grid gap-5 sm:grid-cols-2">
                       <Field name="country" label="Country" placeholder="Pakistan" />

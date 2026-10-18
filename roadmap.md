@@ -21,3 +21,7 @@
 - [x] Thinking logo: running multi-colour line around the border
 - [x] Ask Jenvu replies: Grok 4.6 then DeepSeek V4 Pro
 - [x] Products page: alignment fixed, new colourful images, new white section
+- [x] Full system check, fix errors/bugs
+- [x] Founder, Scam Check, Killzones pages in homepage style
+- [x] Founding offer copy updated to current rules everywhere
+- [x] Thinking logo: blue inside, thinner smoother border

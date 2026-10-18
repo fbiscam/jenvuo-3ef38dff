@@ -130,11 +130,11 @@ function renderApplicantEmail(kind: ApplicantEmailKind, name: string, plan: stri
           `<p style="margin:0 0 12px">We got your application for the <strong>${escapeHtml(meta.label)}</strong> tier. Every application is reviewed manually within <strong>48 hours</strong>.</p>
            <p style="margin:0 0 12px">If approved, you'll get:</p>
            <ul style="margin:0 0 12px;padding-left:20px">
-             <li style="margin:4px 0"><strong>${escapeHtml(meta.label)}</strong> plan free for 30 days</li>
+             <li style="margin:4px 0"><strong>${escapeHtml(meta.label)}</strong> plan unlocked straight away</li>
              <li style="margin:4px 0">${escapeHtml(meta.wallet)} on your account</li>
              <li style="margin:4px 0">Full access — extension analysis, signals, alerts and killzones</li>
            </ul>
-           <p style="margin:0">You only start paying once you cross <strong>$100 in verified profit</strong>. If you don't profit, you don't pay.</p>`,
+           <p style="margin:0">After approval you have <strong>2 days to verify your ID</strong> from your account to keep access.</p>`,
           { label: "Explore the platform", href: `${APP_URL}/` },
         ),
       };

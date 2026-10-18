@@ -3,10 +3,12 @@ import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import {
   ShieldCheck, ShieldAlert, ShieldX, Link2, Mail, MessageSquareText,
-  Loader2, Copy, Check, ArrowLeft, Sparkles,
+  Loader2, Copy, Check, Sparkles,
 } from "lucide-react";
 import { scamCheck, type ScamCheckResult } from "@/lib/scam-check/scam-check.functions";
 import { Button } from "@/components/ui/button";
+import SiteHeader from "@/components/SiteHeader";
+import SiteFooter from "@/components/SiteFooter";
 
 export const Route = createFileRoute("/scam-check")({
   head: () => ({
@@ -64,34 +66,34 @@ const VERDICT_UI = {
   safe: {
     title: "Looks safe",
     icon: ShieldCheck,
-    ring: "ring-emerald-200",
-    bg: "bg-emerald-50",
-    text: "text-emerald-700",
-    bar: "bg-emerald-500",
+    ring: "ring-gc-green-soft",
+    bg: "bg-gc-green-soft",
+    text: "text-gc-green",
+    bar: "bg-gc-green",
   },
   suspicious: {
     title: "Suspicious",
     icon: ShieldAlert,
-    ring: "ring-amber-200",
-    bg: "bg-amber-50",
-    text: "text-amber-700",
-    bar: "bg-amber-500",
+    ring: "ring-gc-yellow-soft",
+    bg: "bg-gc-yellow-soft",
+    text: "text-gc-ink",
+    bar: "bg-gc-yellow",
   },
   scam: {
     title: "Likely scam",
     icon: ShieldX,
-    ring: "ring-red-200",
-    bg: "bg-red-50",
-    text: "text-red-700",
-    bar: "bg-red-500",
+    ring: "ring-gc-red-soft",
+    bg: "bg-gc-red-soft",
+    text: "text-gc-red",
+    bar: "bg-gc-red",
   },
 } as const;
 
 const SEV_UI: Record<string, string> = {
-  high: "bg-red-50 text-red-700 border-red-200",
-  medium: "bg-amber-50 text-amber-700 border-amber-200",
-  low: "bg-slate-50 text-slate-600 border-slate-200",
-  info: "bg-emerald-50 text-emerald-700 border-emerald-200",
+  high: "bg-gc-red-soft text-gc-red border-gc-red-soft",
+  medium: "bg-gc-yellow-soft text-gc-ink border-gc-yellow-soft",
+  low: "bg-gc-surface text-gc-ink-muted border-gc-line",
+  info: "bg-gc-green-soft text-gc-green border-gc-green-soft",
 };
 
 function ScamCheckPage() {
@@ -157,48 +159,42 @@ function ScamCheckPage() {
   const VIcon = v?.icon ?? ShieldCheck;
 
   return (
-    <div className={`min-h-screen bg-background text-foreground ${SANS}`}>
-      <div className="mx-auto w-full max-w-5xl px-5 py-8 sm:px-8 lg:py-12">
-        <Link to="/" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
-          <ArrowLeft className="h-4 w-4" />
-          Back to home
-        </Link>
-
-        <header className="mt-7 border-b border-border pb-6">
-          <div className="inline-flex items-center gap-2 rounded-full border border-border bg-muted px-3 py-1 text-xs text-muted-foreground">
-            <Sparkles className="h-3.5 w-3.5" />
-            Free tool · No sign-up · Nothing is stored
-          </div>
-          <h1 className="mt-4 text-[28px] font-medium sm:text-[32px]">Scam Check</h1>
-          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground">
-            Paste a link, an email address or a message. We run it through a rule engine of known
-            phishing and spam patterns, then a second AI review, and show you exactly which warning
-            signs fired.
+    <div className={`min-h-dvh w-full bg-background text-gc-ink ${SANS} antialiased`}>
+      <SiteHeader />
+      <div className="jenvu-home-content">
+      <section className="bg-background">
+        <div className="mx-auto max-w-[1296px] px-5 pb-6 pt-12 text-center sm:px-8 md:pt-14">
+          <span className="jenvu-rise inline-flex items-center gap-2 rounded-full bg-gc-blue-soft px-3 py-1 text-[13px] font-medium text-gc-blue-deep">
+            <Sparkles className="h-3.5 w-3.5" /> Free tool · No sign-up · Nothing is stored
+          </span>
+          <h1 className="jenvu-rise mt-5 text-[40px] font-medium leading-[1.1] tracking-[-0.5px] sm:text-[56px]">Scam Check</h1>
+          <p className="jenvu-rise [animation-delay:80ms] mx-auto mt-5 max-w-[720px] text-[17px] leading-[1.6] text-gc-ink-muted">
+            Paste a link, an email address or a message. We check it against known phishing and spam patterns, add an AI review, and show you exactly which warning signs fired.
           </p>
-        </header>
-
+        </div>
+      </section>
+      <div className="mx-auto w-full max-w-4xl px-5 pb-16 sm:px-8">
         {/* Tabs */}
         <div className="mt-6 grid grid-cols-3 gap-2">
           {TABS.map((t) => {
             const Icon = t.icon;
             const active = t.kind === kind;
             return (
-              <Button
+              <button
                 key={t.kind}
                 type="button"
                 onClick={() => switchTab(t.kind)}
-                variant={active ? "default" : "outline"}
-                className="w-full text-[13px]"
+                className={`inline-flex h-11 w-full items-center justify-center gap-2 rounded-full text-[14px] font-medium transition ${active ? "bg-gc-blue text-gc-on-blue" : "border border-gc-line bg-background text-gc-ink hover:bg-gc-surface"}`}
               >
                 <Icon className="h-4 w-4" />
                 {t.label}
-              </Button>
+              </button>
             );
           })}
         </div>
 
         {/* Input */}
-        <form onSubmit={onSubmit} className="mt-5 rounded-xl border border-border bg-card p-5 ring-1 ring-background/60 sm:p-6">
+        <form onSubmit={onSubmit} className="mt-5 rounded-3xl border border-gc-line bg-background p-5  sm:p-6">
           {kind === "text" ? (
             <textarea
               value={value}
@@ -227,6 +223,7 @@ function ScamCheckPage() {
             <Button
               type="submit"
               disabled={loading || !value.trim()}
+              className="h-11 rounded-full bg-gc-blue px-6 text-gc-on-blue hover:bg-gc-blue-hover"
             >
               {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ShieldCheck className="h-4 w-4" />}
               {loading ? "Analysing…" : "Check now"}
@@ -235,12 +232,12 @@ function ScamCheckPage() {
         </form>
 
         {error && (
-          <div className="mt-4 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">{error}</div>
+          <div className="mt-4 rounded-xl border border-gc-red-soft bg-gc-red-soft p-4 text-sm text-gc-red">{error}</div>
         )}
 
         {/* Result */}
         {result && v && (
-          <section className={`mt-6 rounded-xl border border-slate-200 bg-white p-5 shadow-sm ring-1 ${v.ring}`}>
+          <section className={`mt-6 rounded-3xl border border-gc-line bg-background p-6 shadow-sm ring-1 ${v.ring}`}>
             <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
               <div className="flex items-start gap-3">
                 <div className={`rounded-xl ${v.bg} p-2.5`}>
@@ -248,13 +245,13 @@ function ScamCheckPage() {
                 </div>
                 <div>
                   <h2 className={`text-xl font-semibold ${v.text}`}>{v.title}</h2>
-                  <p className="mt-0.5 break-all text-xs text-slate-500">{result.subject}</p>
+                  <p className="mt-0.5 break-all text-xs text-gc-ink-muted">{result.subject}</p>
                 </div>
               </div>
               <button
                 type="button"
                 onClick={copyResult}
-                className="inline-flex items-center gap-2 self-start rounded-full border border-slate-200 px-3 py-1.5 text-xs text-slate-600 hover:border-slate-300 hover:text-slate-900"
+                className="inline-flex items-center gap-2 self-start rounded-full border border-gc-line px-3 py-1.5 text-xs text-gc-ink-muted hover:border-gc-line hover:text-gc-ink"
               >
                 {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
                 {copied ? "Copied" : "Copy result"}
@@ -263,40 +260,40 @@ function ScamCheckPage() {
 
             {/* Score bar */}
             <div className="mt-5">
-              <div className="flex items-center justify-between text-xs text-slate-500">
+              <div className="flex items-center justify-between text-xs text-gc-ink-muted">
                 <span>Risk score</span>
                 <span className="tabular-nums">{result.score}/100</span>
               </div>
-              <div className="mt-1.5 h-2 w-full overflow-hidden rounded-full bg-slate-100">
+              <div className="mt-1.5 h-2 w-full overflow-hidden rounded-full bg-gc-surface">
                 <div className={`h-full rounded-full ${v.bar} transition-all`} style={{ width: `${result.score}%` }} />
               </div>
             </div>
 
-            <p className="mt-5 text-sm leading-relaxed text-slate-700">{result.summary}</p>
+            <p className="mt-5 text-sm leading-relaxed text-gc-ink">{result.summary}</p>
 
             <div className={`mt-4 rounded-xl ${v.bg} p-4`}>
-              <p className="text-xs uppercase tracking-wide text-slate-500">What you should do</p>
+              <p className="text-xs uppercase tracking-wide text-gc-ink-muted">What you should do</p>
               <p className={`mt-1 text-sm ${v.text}`}>{result.recommendation}</p>
             </div>
 
             <div className="mt-5">
-              <p className="text-xs uppercase tracking-wide text-slate-500">Signals detected</p>
+              <p className="text-xs uppercase tracking-wide text-gc-ink-muted">Signals detected</p>
               <ul className="mt-2 space-y-2">
                 {result.signals.map((s, i) => (
-                  <li key={`${s.label}-${i}`} className="rounded-xl border border-slate-100 bg-slate-50/60 p-3">
+                  <li key={`${s.label}-${i}`} className="rounded-xl border border-gc-surface bg-gc-surface p-3">
                     <div className="flex flex-wrap items-center gap-2">
                       <span className={`rounded-full border px-2 py-0.5 text-[11px] ${SEV_UI[s.severity] ?? SEV_UI.low}`}>
                         {s.severity}
                       </span>
-                      <span className="text-sm text-slate-900">{s.label}</span>
+                      <span className="text-sm text-gc-ink">{s.label}</span>
                     </div>
-                    <p className="mt-1 text-xs leading-relaxed text-slate-600">{s.detail}</p>
+                    <p className="mt-1 text-xs leading-relaxed text-gc-ink-muted">{s.detail}</p>
                   </li>
                 ))}
               </ul>
             </div>
 
-            <p className="mt-5 text-[11px] leading-relaxed text-slate-400">
+            <p className="mt-5 text-[11px] leading-relaxed text-gc-ink-muted">
               {result.note
                 ? result.note
                 : result.aiUsed
@@ -307,15 +304,17 @@ function ScamCheckPage() {
         )}
 
         {/* Safety tips */}
-        <section className="mt-6 rounded-xl border border-border bg-muted/45 p-5 sm:p-6">
-          <h2 className="text-sm font-semibold text-slate-900">Three rules that stop most scams</h2>
-          <ul className="mt-3 space-y-2 text-sm text-slate-600">
+        <section className="mt-6 rounded-3xl bg-gc-surface p-5 sm:p-6">
+          <h2 className="text-sm font-semibold text-gc-ink">Three rules that stop most scams</h2>
+          <ul className="mt-3 space-y-2 text-sm text-gc-ink-muted">
             <li>• Never share an OTP, password, CVV or wallet recovery phrase — nobody legitimate asks.</li>
             <li>• Urgency is the tell. Real companies do not close your account in ten minutes.</li>
             <li>• Do not use the link you were sent. Open the official app or type the address yourself.</li>
           </ul>
         </section>
       </div>
+      </div>
+      <div className="hide-in-pwa"><SiteFooter /></div>
     </div>
   );
 }

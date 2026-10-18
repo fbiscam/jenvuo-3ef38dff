@@ -31,6 +31,9 @@ export type CallChatOptions = {
   // Retained for caller compatibility. Provider generations are not aborted
   // by an artificial timer; only an explicit caller cancellation may abort.
   timeoutMs?: number;
+  // Opt-in per-attempt cap for fast public chat (Ask Jenvu): a model that
+  // stalls past this is abandoned and the next model in the chain is tried.
+  attemptTimeoutMs?: number;
   // Retained for caller compatibility. No artificial chain deadline is used.
   deadlineMs?: number;
 
@@ -97,7 +100,21 @@ async function singleAttempt(
   // Never discard a paid generation with an artificial timer. Cancellation is
   // reserved for an explicit caller abort, which this server helper can accept
   // when its public API is extended with a request signal.
-  return singleAttemptInner(model, opts);
+  const cap = opts.attemptTimeoutMs;
+  if (!cap) return singleAttemptInner(model, opts);
+  const ctrl = new AbortController();
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const stalled = new Promise<never>((_, reject) => {
+    timer = setTimeout(() => {
+      ctrl.abort();
+      reject(new AiGatewayError(`${model} took too long to answer.`, 504, false));
+    }, cap);
+  });
+  try {
+    return await Promise.race([singleAttemptInner(model, opts, ctrl.signal), stalled]);
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
 async function singleAttemptInner(
