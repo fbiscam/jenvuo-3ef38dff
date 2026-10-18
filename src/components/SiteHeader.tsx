@@ -3,6 +3,9 @@ import { Link } from "@tanstack/react-router";
 import { Menu, Search, X } from "lucide-react";
 import { useAuthUser } from "@/hooks/useAuthUser";
 
+/** Current page in the top menu: dark text with a blue line along the bottom of the header. */
+const ACTIVE = { className: "relative !text-gc-ink after:pointer-events-none after:absolute after:inset-x-1 after:-bottom-[13px] after:h-[3px] after:rounded-t-sm after:bg-gc-blue" };
+
 const MONO = "font-['JetBrains_Mono',ui-monospace,monospace]";
 
 /** The homepage header, shared by every public page so the menu is identical everywhere. */
@@ -19,7 +22,7 @@ export default function SiteHeader() {
   }, [mobileMenuOpen]);
   return (
     <>
-      <header className="jenvu-home-header sticky top-0 z-50 bg-background">
+      <header className="jenvu-home-header sticky top-0 z-50 border-b border-gc-line bg-background">
         <div className="relative flex items-center gap-3 px-4 py-2.5 sm:px-4">
           <Link to="/" className="flex min-w-0 shrink-0 items-center gap-2">
             <img src="/favicon.png" alt="Jenvu" className="h-7 w-7 shrink-0 rounded-md object-contain" />
@@ -27,12 +30,12 @@ export default function SiteHeader() {
           </Link>
 
           <nav className="ml-6 hidden min-w-0 items-center gap-0.5 whitespace-nowrap text-[14px] text-gc-ink-muted lg:flex [&>a]:rounded-md [&>a]:px-2.5 [&>a]:py-2 [&>a:hover]:bg-gc-surface [&>a:hover]:text-gc-ink">
-            <Link to="/about">Overview</Link>
-            <Link to="/strategies/ict-gold-trading">Solutions</Link>
-            <Link to="/ai-engine">Products</Link>
-            <Link to="/pricing">Pricing</Link>
-            <Link to="/insights">Resources</Link>
-            <Link to="/contact" className="!text-gc-blue">Contact us</Link>
+            <Link to="/about" activeProps={ACTIVE}>Overview</Link>
+            <Link to="/strategies/ict-gold-trading" activeProps={ACTIVE}>Solutions</Link>
+            <Link to="/ai-engine" activeProps={ACTIVE}>Products</Link>
+            <Link to="/pricing" activeProps={ACTIVE}>Pricing</Link>
+            <Link to="/insights" activeProps={ACTIVE}>Resources</Link>
+            <Link to="/contact" className="!text-gc-blue" activeProps={ACTIVE}>Contact us</Link>
           </nav>
 
           <div className="ml-auto flex shrink-0 items-center gap-1">
