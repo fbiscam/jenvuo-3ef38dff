@@ -11,7 +11,7 @@ import { SITE_PAGES } from "@/lib/site-pages";
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import {
   BookOpen, Camera, Code, CreditCard, Download, ExternalLink, FileText, LifeBuoy, Loader2, LogOut, Mail,
-  Menu, MoreVertical, Search, Settings, ShieldCheck, Sparkles,
+  Menu, MoreVertical, Search, SendHorizontal, Settings, ShieldCheck, Sparkles,
 } from "lucide-react";
 import NotificationBell from "@/components/NotificationBell";
 import {
@@ -64,6 +64,19 @@ export default function DashboardTopBar({
     const h = (e: Event) => setScriptOpen(Boolean((e as CustomEvent).detail?.open));
     window.addEventListener("jenvu:terminal-script-state", h);
     return () => window.removeEventListener("jenvu:terminal-script-state", h);
+  }, []);
+
+  // "/" focuses the search box (as on Google Cloud), unless the user is already typing somewhere.
+  useEffect(() => {
+    const h = (e: KeyboardEvent) => {
+      if (e.key !== "/" || e.metaKey || e.ctrlKey || e.altKey) return;
+      const el = e.target as HTMLElement | null;
+      if (el && (el.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName))) return;
+      e.preventDefault();
+      inputRef.current?.focus();
+    };
+    window.addEventListener("keydown", h);
+    return () => window.removeEventListener("keydown", h);
   }, []);
 
   const matches = useMemo(() => {
@@ -142,35 +155,50 @@ export default function DashboardTopBar({
       </Link>
 
       <div className="relative mx-auto hidden w-full max-w-[720px] sm:block">
+        {/* Google Cloud style: grey pill at rest, white box with a blue outline while typing. */}
         <form
           onSubmit={(e) => {
             e.preventDefault();
             if (q.trim()) ask(q.trim());
           }}
-          className={`flex items-center rounded-full border ${white ? "h-9 border-gc-line/70 bg-gc-console-search" : "h-10 border-gc-line bg-gc-notice"} pl-4 pr-1 focus-within:bg-background focus-within:shadow-sm`}
+          className={
+            focused
+              ? "flex h-11 items-center gap-3 rounded-lg border-2 border-gc-blue-deep bg-background px-3"
+              : `flex h-10 items-center rounded-full border border-gc-line/70 ${white ? "bg-gc-console-search" : "bg-gc-notice"} pl-4 pr-1`
+          }
         >
+          {focused && <Search className="h-5 w-5 shrink-0 text-gc-ink" />}
           <input
             ref={inputRef}
             value={q}
             onChange={(e) => setQ(e.target.value)}
             onFocus={() => setFocused(true)}
             onBlur={() => window.setTimeout(() => setFocused(false), 150)}
-            placeholder="Search pages, guides or ask a question"
+            onKeyDown={(e) => { if (e.key === "Escape") close(); }}
+            placeholder={focused ? "Search" : "Search (/) for pages, guides, help and more"}
             aria-label="Search"
             className="min-w-0 flex-1 bg-transparent text-[14px] text-gc-ink outline-none placeholder:text-gc-ink-muted"
           />
-          <button
-            type="submit"
-            className="inline-flex h-8 items-center gap-1.5 rounded-full px-3 text-[14px] text-gc-ink hover:bg-gc-line/50"
-          >
-            <Search className="h-4 w-4" />
-            Search
-          </button>
+          {focused ? (
+            <button type="submit" aria-label="Send" className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-gc-ink hover:bg-gc-notice">
+              {loading ? <Loader2 className="h-4 w-4 animate-spin text-gc-ink-muted" /> : <SendHorizontal className="h-5 w-5" />}
+            </button>
+          ) : (
+            <button type="submit" className="inline-flex h-8 items-center gap-1.5 rounded-full px-3 text-[14px] text-gc-ink hover:bg-gc-line/50">
+              <Search className="h-4 w-4" />
+              Search
+            </button>
+          )}
         </form>
+        {focused && !q.trim() && (
+          <div onMouseDown={(e) => e.preventDefault()} className="absolute left-0 right-0 top-12 rounded-lg border border-gc-line bg-gc-panel shadow-lg">
+            <p className="px-4 py-4 text-[13px] italic text-gc-ink-muted">Do not enter any sensitive, confidential, or personal information.</p>
+          </div>
+        )}
         {focused && q.trim() && (
           <div
             onMouseDown={(e) => e.preventDefault()}
-            className="absolute left-0 right-0 top-12 max-h-[70vh] overflow-y-auto rounded-2xl border border-gc-line bg-background py-1 shadow-lg"
+            className="absolute left-0 right-0 top-12 max-h-[70vh] overflow-y-auto rounded-lg border border-gc-line bg-background py-1 shadow-lg"
           >
             {answer && answer.q === q.trim() && (
               <div className="border-b border-gc-line bg-gc-panel px-4 py-3">
