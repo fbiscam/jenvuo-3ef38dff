@@ -71,7 +71,7 @@ const columns = [
     ],
   },
   {
-    label: "Products and pricing",
+    label: "Production",
     links: [
       { to: "/pricing", label: "Jenvu pricing" },
       { to: "/download", label: "Download App" },
