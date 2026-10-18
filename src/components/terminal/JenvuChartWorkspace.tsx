@@ -39,7 +39,7 @@ import { getTerminalChart } from "@/lib/gold-analysis.functions";
 import { cn } from "@/lib/utils";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { XauUsdLogo } from "./XauUsdLogo";
-import { Menu, PanelLeftClose, PanelLeftOpen } from "lucide-react";
+import { Clock3, Menu, PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
@@ -130,6 +130,8 @@ type Props = {
   asset?: "XAUUSD" | "BTCUSD";
   onAssetChange?: (asset: "XAUUSD" | "BTCUSD") => void;
   theme?: "light" | "dark";
+  /** Extra buttons placed at the bottom of the left side bar (e.g. Ask With AI). */
+  railSlot?: ReactNode;
 };
 
 const TOOLS: Array<{ id: DrawingTool; icon: LucideIcon; label: string }> = [
@@ -213,7 +215,7 @@ function ToolButton({
 }
 
 export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function JenvuChartWorkspace(
-  { timeframes, timeframe, onTimeframeChange, rightSlot, mobileNewsRow, asset = "XAUUSD", onAssetChange, theme = "light" },
+  { timeframes, timeframe, onTimeframeChange, rightSlot, mobileNewsRow, asset = "XAUUSD", onAssetChange, theme = "light", railSlot },
   ref,
 ) {
   const fetchChart = useServerFn(getTerminalChart);
@@ -508,8 +510,138 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
 
   const selected = drawings.find((d) => d.id === selectedId) ?? null;
 
+  const indicatorMenu = (
+    <>
+      <p className="px-2 pb-2 pt-1 text-sm font-normal text-foreground">Indicators</p>
+      {INDICATOR_LIST.map((spec) => {
+        const on = indicators.includes(spec.id);
+        return (
+          <label
+            key={spec.id}
+            className="flex cursor-pointer items-start gap-2.5 rounded-md px-2 py-2 hover:bg-accent"
+          >
+            <Checkbox
+              checked={on}
+              onCheckedChange={(v) =>
+                setIndicators((cur) => (v ? [...cur.filter((x) => x !== spec.id), spec.id] : cur.filter((x) => x !== spec.id)))
+              }
+              className="mt-0.5 data-[state=checked]:border-home-accent data-[state=checked]:bg-home-accent data-[state=checked]:text-home-accent-foreground dark:data-[state=checked]:border-white dark:data-[state=checked]:bg-white dark:data-[state=checked]:text-black"
+            />
+            <span className="min-w-0">
+              <span className="block text-[15px] font-normal leading-5 text-foreground">{spec.name}</span>
+              <span className="block text-xs font-normal leading-4 text-muted-foreground">{spec.description}</span>
+            </span>
+          </label>
+        );
+      })}
+    </>
+  );
+  const smcMenu = (
+    <>
+      <p className="px-2 pb-1 pt-1 text-sm font-normal text-foreground">Smart-money overlays</p>
+      <p className="px-2 pb-2 text-xs font-normal leading-4 text-muted-foreground">
+        Same 10-bar structure engine the AI desk
+      </p>
+      {SMC_LABELS.filter(
+        (item) =>
+          (item.key !== "sdStrategy" || SD_ZONE_TIMEFRAMES.has(timeframe.key)) &&
+          (item.key !== "sdHistory" || SD_HISTORY_TIMEFRAMES.has(timeframe.key)) &&
+          (item.key !== "swingSweep" || SWING_SWEEP_TIMEFRAMES.has(timeframe.key)),
+      ).map((item) => (
+        <label
+          key={item.key}
+          className="flex cursor-pointer items-center justify-between gap-3 rounded-md px-2 py-2 hover:bg-accent"
+        >
+          <span>
+            <span className="block text-[15px] font-normal leading-5 text-foreground">{item.label}</span>
+            <span className="block text-xs font-normal leading-4 text-muted-foreground">{item.hint}</span>
+          </span>
+          <Switch
+            checked={smcToggles[item.key] ?? DEFAULT_SMC[item.key]}
+            onCheckedChange={(v) => setSmcToggles((cur) => ({ ...cur, [item.key]: v }))}
+            className="data-[state=checked]:bg-home-accent dark:data-[state=checked]:bg-white"
+          />
+        </label>
+      ))}
+    </>
+  );
+  const popClass = cn("font-sans subpixel-antialiased", theme === "dark" && "dark terminal-dark border-border bg-popover text-popover-foreground");
+  const railBtn = "flex w-12 flex-col items-center gap-1 rounded-xl px-1 py-2 text-[10px] font-medium leading-none text-muted-foreground transition-colors hover:bg-gc-blue-soft hover:text-foreground dark:hover:bg-accent";
+
+
+  const rail = (
+    <nav aria-label="Chart tools" className={cn("hidden w-16 shrink-0 flex-col items-center gap-1 py-2 md:flex", theme === "dark" ? "border-r border-border bg-background" : "bg-transparent")}>
+      <Popover>
+        <PopoverTrigger asChild>
+          <button type="button" aria-label="Timeframe" title="Timeframe" className={railBtn}>
+            <Clock3 className="h-5 w-5" />
+            <span className="font-mono text-[11px] font-semibold text-foreground">{timeframe.label}</span>
+          </button>
+        </PopoverTrigger>
+        <PopoverContent side="right" align="start" className={cn("w-56 p-1.5", popClass)}>
+          <p className="px-2 pb-1.5 pt-1 text-sm text-foreground">Timeframe</p>
+          <div className="grid grid-cols-3 gap-1">
+            {timeframes.map((item) => (
+              <button
+                type="button"
+                key={item.key}
+                onClick={() => onTimeframeChange(item)}
+                aria-pressed={item.key === timeframe.key}
+                className={cn(
+                  "h-9 rounded-lg font-mono text-xs font-semibold text-muted-foreground hover:bg-accent hover:text-foreground",
+                  item.key === timeframe.key && "bg-gc-blue-soft text-gc-blue dark:bg-accent dark:text-foreground",
+                )}
+              >
+                {item.label}
+              </button>
+            ))}
+          </div>
+        </PopoverContent>
+      </Popover>
+      <Popover>
+        <PopoverTrigger asChild>
+          <button type="button" aria-label="Indicators" title="Indicators" className={cn(railBtn, "relative")}>
+            <Activity className="h-5 w-5" />
+            Indicators
+            {indicators.length > 0 && (
+              <span className="absolute right-1 top-1 rounded-full bg-gc-blue px-1 font-mono text-[9px] leading-[14px] text-gc-on-blue">{indicators.length}</span>
+            )}
+          </button>
+        </PopoverTrigger>
+        <PopoverContent side="right" align="start" className={cn("max-h-[80vh] w-80 overflow-y-auto p-2", popClass)}>
+          {indicatorMenu}
+        </PopoverContent>
+      </Popover>
+      <Popover>
+        <PopoverTrigger asChild>
+          <button type="button" aria-label="Jenvu SMC" title="Jenvu SMC" className={railBtn}>
+            <Layers className="h-5 w-5" />
+            SMC
+          </button>
+        </PopoverTrigger>
+        <PopoverContent side="right" align="start" className={cn("max-h-[80vh] w-80 overflow-y-auto p-2", popClass)}>
+          {smcMenu}
+        </PopoverContent>
+      </Popover>
+      <button
+        type="button"
+        onClick={() => setScriptPanelOpen((v) => !v)}
+        aria-pressed={scriptPanelOpen}
+        aria-label="Jenvu Script"
+        title="Jenvu Script"
+        className={cn(railBtn, scriptPanelOpen && "bg-gc-blue-soft text-gc-blue dark:bg-accent dark:text-foreground")}
+      >
+        <Code className="h-5 w-5" />
+        Script
+      </button>
+      {railSlot && <div className="mt-auto flex flex-col items-center gap-1">{railSlot}</div>}
+    </nav>
+  );
+
   return (
-    <div ref={workspaceRef} className="flex h-full min-h-0 w-full flex-col bg-background">
+    <div ref={workspaceRef} className={cn("flex h-full min-h-0 w-full", theme === "dark" ? "bg-background" : "bg-gc-console-bar")}>
+      {rail}
+      <div className={cn("flex min-h-0 min-w-0 flex-1 flex-col bg-background", theme !== "dark" && "overflow-hidden rounded-2xl border border-gc-line shadow-sm")}>
       {/* Top bar */}
       <div className="flex h-11 shrink-0 items-center gap-1 overflow-x-auto border-b border-border px-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:overflow-x-visible">
         <div className="mr-1 flex shrink-0 items-center gap-2 pl-1 pr-2">
@@ -532,7 +664,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
           </button>
           <span className="hidden md:inline-flex"><XauUsdLogo size={22} /></span>
         </div>
-        <div className="flex shrink-0 items-center" role="group" aria-label="Chart timeframe">
+        <div className="flex shrink-0 items-center md:hidden" role="group" aria-label="Chart timeframe">
           {timeframes.map((item) => (
             <button
               type="button"
@@ -549,7 +681,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
             </button>
           ))}
         </div>
-        <span className="mx-1 h-5 w-px shrink-0 bg-border" aria-hidden="true" />
+        <span className="mx-1 h-5 w-px shrink-0 bg-border md:hidden" aria-hidden="true" />
 
         <Popover>
           <PopoverTrigger asChild>
@@ -557,7 +689,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
               type="button"
               aria-label="Indicators"
               title="Indicators"
-              className="flex h-7 shrink-0 items-center gap-1.5 rounded-md px-2 text-xs font-medium text-muted-foreground hover:bg-accent hover:text-foreground"
+              className="flex h-7 md:hidden shrink-0 items-center gap-1.5 rounded-md px-2 text-xs font-medium text-muted-foreground hover:bg-accent hover:text-foreground"
             >
               <Activity className="h-3.5 w-3.5" />
               <span className="hidden 2xl:inline">Indicators</span>
@@ -567,28 +699,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
             </button>
           </PopoverTrigger>
           <PopoverContent align="start" className={cn("w-80 p-2 font-sans subpixel-antialiased", theme === "dark" && "dark terminal-dark border-border bg-popover text-popover-foreground")}>
-            <p className="px-2 pb-2 pt-1 text-sm font-normal text-foreground">Indicators</p>
-            {INDICATOR_LIST.map((spec) => {
-              const on = indicators.includes(spec.id);
-              return (
-                <label
-                  key={spec.id}
-                  className="flex cursor-pointer items-start gap-2.5 rounded-md px-2 py-2 hover:bg-accent"
-                >
-                  <Checkbox
-                    checked={on}
-                    onCheckedChange={(v) =>
-                      setIndicators((cur) => (v ? [...cur.filter((x) => x !== spec.id), spec.id] : cur.filter((x) => x !== spec.id)))
-                    }
-                    className="mt-0.5 data-[state=checked]:border-home-accent data-[state=checked]:bg-home-accent data-[state=checked]:text-home-accent-foreground dark:data-[state=checked]:border-white dark:data-[state=checked]:bg-white dark:data-[state=checked]:text-black"
-                  />
-                  <span className="min-w-0">
-                    <span className="block text-[15px] font-normal leading-5 text-foreground">{spec.name}</span>
-                    <span className="block text-xs font-normal leading-4 text-muted-foreground">{spec.description}</span>
-                  </span>
-                </label>
-              );
-            })}
+            {indicatorMenu}
           </PopoverContent>
         </Popover>
 
@@ -598,38 +709,14 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
               type="button"
               aria-label="Jenvu SMC"
               title="Jenvu SMC"
-              className="flex h-7 shrink-0 items-center gap-1.5 rounded-md px-2 text-xs font-medium text-muted-foreground hover:bg-accent hover:text-foreground"
+              className="flex h-7 md:hidden shrink-0 items-center gap-1.5 rounded-md px-2 text-xs font-medium text-muted-foreground hover:bg-accent hover:text-foreground"
             >
               <Layers className="h-3.5 w-3.5" />
               <span className="hidden 2xl:inline">Jenvu SMC</span>
             </button>
           </PopoverTrigger>
           <PopoverContent align="start" className={cn("w-80 p-2 font-sans subpixel-antialiased", theme === "dark" && "dark terminal-dark border-border bg-popover text-popover-foreground")}>
-            <p className="px-2 pb-1 pt-1 text-sm font-normal text-foreground">Smart-money overlays</p>
-            <p className="px-2 pb-2 text-xs font-normal leading-4 text-muted-foreground">
-              Same 10-bar structure engine the AI desk
-            </p>
-            {SMC_LABELS.filter(
-              (item) =>
-                (item.key !== "sdStrategy" || SD_ZONE_TIMEFRAMES.has(timeframe.key)) &&
-                (item.key !== "sdHistory" || SD_HISTORY_TIMEFRAMES.has(timeframe.key)) &&
-                (item.key !== "swingSweep" || SWING_SWEEP_TIMEFRAMES.has(timeframe.key)),
-            ).map((item) => (
-              <label
-                key={item.key}
-                className="flex cursor-pointer items-center justify-between gap-3 rounded-md px-2 py-2 hover:bg-accent"
-              >
-                <span>
-                  <span className="block text-[15px] font-normal leading-5 text-foreground">{item.label}</span>
-                  <span className="block text-xs font-normal leading-4 text-muted-foreground">{item.hint}</span>
-                </span>
-                <Switch
-                  checked={smcToggles[item.key] ?? DEFAULT_SMC[item.key]}
-                  onCheckedChange={(v) => setSmcToggles((cur) => ({ ...cur, [item.key]: v }))}
-                  className="data-[state=checked]:bg-home-accent dark:data-[state=checked]:bg-white"
-                />
-              </label>
-            ))}
+            {smcMenu}
           </PopoverContent>
         </Popover>
 
@@ -640,7 +727,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
           aria-label="Jenvu Script"
           title="Jenvu Script"
           className={cn(
-            "hidden h-7 shrink-0 items-center gap-1.5 rounded-md px-2 text-xs font-medium text-muted-foreground hover:bg-accent hover:text-foreground md:flex",
+            "hidden",
             scriptPanelOpen && "bg-accent text-foreground",
           )}
         >
@@ -963,6 +1050,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
           )}
         </div>
       </div>
+    </div>
     </div>
   );
 });
