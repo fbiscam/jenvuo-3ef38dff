@@ -31,7 +31,7 @@
 - [x] Dashboard home: "Log a trade" shortcut removed
 - [x] Thinking logo: white inside
 - [x] Usage page: summary cards + framed layout; Terminal: framed white chart card
-- [ ] Terminal: remove chart grid lines
-- [ ] Terminal: drawing tools moved to chart top bar; fullscreen/refresh/snapshot etc. moved to side bar under Script
-- [ ] Homepage search opens from left after logo; site results + AI answer when nothing matches
-- [ ] Docs and Settings pages restyled to homepage look
+- [x] Terminal: remove chart grid lines
+- [x] Terminal: drawing tools moved to chart top bar; fullscreen/refresh/snapshot etc. moved to side bar under Script
+- [x] Homepage search opens from left after logo; site results + AI answer when nothing matches
+- [x] Docs and Settings pages restyled to homepage look
