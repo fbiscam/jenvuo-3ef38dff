@@ -139,3 +139,31 @@ export async function sendSignalAlertTelegram(a: TelegramSignal): Promise<{ sent
   }
   return { sent }
 }
+
+
+/** True when the given private chat sent a message containing `text` to the bot recently. */
+export async function chatSentText(chatId: string, text: string): Promise<boolean> {
+  const botToken = process.env['TELEGRAM_BOT_TOKEN']
+  const lovableKey = process.env['LOVABLE_API_KEY']
+  const telegramKey = process.env['TELEGRAM_API_KEY']
+  let res: Response
+  if (botToken) {
+    res = await fetch(`https://api.telegram.org/bot${botToken}/getUpdates`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ allowed_updates: ['message'], limit: 100 }),
+    })
+  } else if (lovableKey && telegramKey) {
+    res = await fetch(`${GATEWAY_URL}/getUpdates`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${lovableKey}`, 'X-Connection-Api-Key': telegramKey, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ allowed_updates: ['message'], limit: 100 }),
+    })
+  } else return false
+  if (!res.ok) return false
+  const json: any = await res.json().catch(() => null)
+  const updates: any[] = Array.isArray(json?.result) ? json.result : []
+  return updates.some((u) => {
+    const m = u?.message
+    return m && String(m.chat?.id) === chatId && m.chat?.type === 'private' && typeof m.text === 'string' && m.text.includes(text)
+  })
+}
