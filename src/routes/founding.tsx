@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { Check, Users, DollarSign, Shield, Sparkles, ArrowRight } from "lucide-react";
 import SiteFooter from "@/components/SiteFooter";
-import HeaderAuthButtons from "@/components/HeaderAuthButtons";
+import SiteHeader from "@/components/SiteHeader";
 import { submitFoundingApplication, foundingStats } from "@/lib/founding.functions";
 
 export const Route = createFileRoute("/founding")({
@@ -105,213 +105,203 @@ function FoundingPage() {
   }
 
   return (
-    <div className="public-cloudflare min-h-screen bg-background text-foreground founding-zoom" style={{ fontFamily: "'Google Sans', 'Urbanist', system-ui, sans-serif" }}>
-      <header className="sticky top-0 z-30 border-b border-zinc-100 bg-white backdrop-blur">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-3.5">
-          <Link to="/" className="inline-flex items-center gap-2 text-[15px] font-semibold tracking-tight">
-            <img src="/favicon.png" alt="Jenvu" className="h-7 w-7 shrink-0 rounded-md object-contain" />
-            Jenvu
-          </Link>
-          <HeaderAuthButtons signInOnly />
-        </div>
-      </header>
+    <div className={`min-h-dvh w-full bg-background text-gc-ink ${SANS} antialiased`}>
+      <SiteHeader />
 
-      <section className="mx-auto max-w-4xl px-5 pt-10 pb-8 text-center sm:pt-14 sm:pb-10">
-        <h1 className="mt-2 text-[28px] leading-tight font-semibold tracking-tight sm:mt-5 sm:text-5xl">
-          Founding Trader Program
-        </h1>
-        <p className="mx-auto mt-4 max-w-2xl text-[14px] leading-relaxed text-zinc-600 sm:text-[15px]">
-          Get <span className="font-semibold text-zinc-900">Elite free for 30 days</span> — pay only after your <span className="font-semibold text-zinc-900">first $100 in verified profit</span>. No profit, no payment. Built for traders who want institutional grade signals without upfront risk commitment.
-        </p>
-
-
-
-        <div className="mx-auto mt-8 max-w-md rounded-xl border border-zinc-200 bg-white p-5">
-          <div className="flex items-center justify-between text-xs text-zinc-500">
-            <span>Seats claimed this month</span>
-            <span className="font-medium text-zinc-900">{seats.filled} / {seats.total}</span>
-          </div>
-          <div className="mt-2 h-2 overflow-hidden rounded-full bg-home-accent-soft">
-            <div
-              className="relative h-full overflow-hidden rounded-full bg-home-accent transition-all duration-700 ease-out"
-              style={{ width: `${pct}%` }}
-            >
-              <div className="absolute inset-y-0 -left-1/3 w-1/3 bg-gradient-to-r from-transparent via-white/70 to-transparent animate-[shimmer_1.8s_linear_infinite]" />
-            </div>
-          </div>
-          <div className="mt-2 text-[11px] text-zinc-500">{remaining} spots remaining</div>
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-5xl px-5 pb-14">
-        <div className="grid gap-3 sm:grid-cols-3">
-          {[
-            { icon: Users, title: "Curated cohort", body: "Only 50 traders each month. Serious applicants, real capital, no tire-kickers." },
-            { icon: DollarSign, title: "Pay after profit", body: "First month Elite is free. Billing activates only after $100 verified profit." },
-            { icon: Shield, title: "Aligned incentives", body: "We win when you win. Our job is to make you stable, not to milk subscriptions." },
-          ].map((b) => (
-            <div key={b.title} className="rounded-xl border border-zinc-200 bg-white p-5">
-              <b.icon className="h-5 w-5 text-zinc-700" />
-              <div className="mt-3 text-sm font-semibold">{b.title}</div>
-              <div className="mt-1.5 text-[13px] leading-relaxed text-zinc-600">{b.body}</div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-4xl px-5 pb-10 sm:pb-14">
-        <div className="rounded-xl border border-zinc-200 bg-white p-5 sm:p-7">
-
-          <h2 className="text-xl font-semibold">How it works</h2>
-          <ol className="mt-5 space-y-4 text-[14px]">
-            {[
-              ["Apply", "Fill the short form below. We review every application manually."],
-              ["Get approved", "If accepted, we activate your Elite plan free for 30 days — full access to terminal analysis, signals, alerts and killzones."],
-              ["Reach $100 in 30 days", "You have 30 days to hit $100 in verified profit. After that, billing activates on your account and you pay per scan."],
-              ["Verify & pay to continue scanning", "Once 30 days end, a 'Submit documents' notification appears on your account. Click it, upload your broker statement / MyFxBook, and we verify. After verification, billing goes live pay, and credits are added to your account so you can keep scanning."],
-
-            ].map(([t, d], i, arr) => (
-              <li key={t} className="flex gap-4">
-                <div className="flex flex-col items-center shrink-0">
-                  <div className="flex h-7 w-7 items-center justify-center rounded-full bg-home-accent text-xs font-semibold text-home-accent-foreground">{i + 1}</div>
-                  {i < arr.length - 1 && (
-                    <div className="mt-1 w-px flex-1 bg-home-accent/30" />
-                  )}
-                </div>
-                <div className="pb-2">
-                  <div className="font-semibold text-zinc-900">{t}</div>
-                  <div className="mt-0.5 text-[13px] text-zinc-600">{d}</div>
-                </div>
-              </li>
-            ))}
-          </ol>
-        </div>
-      </section>
-
-      <section id="apply" className="mx-auto max-w-2xl px-5 pb-16 sm:pb-24">
-        <div className="rounded-xl border border-zinc-200 bg-white p-5 sm:p-7">
-
-          <h2 className="text-xl font-semibold">Apply for a founding seat</h2>
-          <p className="mt-1.5 text-[13px] text-zinc-500">
-            Applications reviewed within 48 hours. Only serious traders — please be honest.
-          </p>
-
-
-
-
-          {submitted ? (
-            <div className="mt-6 border-t border-zinc-100 pt-8 pb-3 text-center" role="status" aria-live="polite">
-              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-emerald-100">
-                <Check className="h-7 w-7 text-emerald-600" />
-              </div>
-              <h3 className="mt-5 text-2xl font-semibold text-zinc-900">Application received</h3>
-              <p className="mx-auto mt-3 max-w-lg text-[15px] leading-relaxed text-zinc-600">
-                Thank you — we've got your application. Our team will personally review it and email you a decision within <strong className="text-zinc-900">48 hours</strong>.
+      <div className="jenvu-home-content">
+        <main>
+          {/* Hero — homepage style */}
+          <section className="bg-background">
+            <div className="mx-auto max-w-[1296px] px-5 pb-12 pt-12 text-center sm:px-8 md:pt-14">
+              <img src="/favicon.png" alt="" width={64} height={64} className="jenvu-logo-intro mx-auto h-16 w-16 object-contain" />
+              <span className="jenvu-rise mt-6 inline-flex rounded-full bg-gc-blue-soft px-3 py-1 text-[13px] font-medium text-gc-blue-deep">Invite-only · {remaining} seats left this month</span>
+              <h1 className="jenvu-rise mx-auto mt-5 max-w-[900px] text-[40px] font-medium leading-[1.1] tracking-[-0.5px] text-gc-ink sm:text-[56px] md:text-[60px]">
+                Founding Trader Program
+              </h1>
+              <p className="jenvu-rise [animation-delay:80ms] mx-auto mt-5 max-w-[760px] text-[16px] leading-[1.6] text-gc-ink-muted sm:text-[17px]">
+                Get <span className="font-medium text-gc-ink">Elite free for 30 days</span> — pay only after your <span className="font-medium text-gc-ink">first $100 in verified profit</span>. No profit, no payment.
               </p>
-              <p className="mt-2 text-[13px] text-zinc-500">Please keep an eye on your inbox (and spam folder).</p>
-              <Link
-                to="/"
-                className="mt-6 inline-flex items-center justify-center rounded-xl bg-zinc-900 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-zinc-800"
-              >
-                Back to home
-              </Link>
-            </div>
-          ) : (
-            <form onSubmit={onSubmit} className="mt-6 space-y-4">
-              <Field name="full_name" label="Full name" required placeholder="Your full name" />
-              <Field name="email" label="Email" type="email" required placeholder="you@example.com" />
-              <Field
-                name="whatsapp_number"
-                label="WhatsApp number"
-                type="tel"
-                required
-                placeholder="+92 300 1234567"
-              />
+              <div className="jenvu-rise [animation-delay:160ms] mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+                <a href="#apply" className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-gc-blue px-6 text-[16px] font-medium text-gc-on-blue transition hover:bg-gc-blue-hover">
+                  Apply for a seat <ArrowRight className="h-4 w-4" />
+                </a>
+                <Link to="/pricing" className="inline-flex h-12 items-center justify-center rounded-full border border-gc-line bg-background px-6 text-[16px] font-medium text-gc-ink transition hover:bg-gc-surface">
+                  Buy now
+                </Link>
+              </div>
 
-
-              <div>
-                <label className="text-[13px] font-medium text-zinc-800">
-                  Which plan do you want? <span className="text-rose-500">*</span>
-                </label>
-                <div className="mt-2 grid grid-cols-3 gap-1.5 sm:gap-2">
-                  {([
-                    { id: "pro", label: "Pro", desc: "$10 wallet" },
-                    { id: "elite", label: "Elite", desc: "$25 wallet" },
-                    { id: "ultra", label: "Ultra", desc: "$50 wallet" },
-                  ] as const).map((p) => {
-                    const active = plan === p.id;
-                    return (
-                      <button
-                        key={p.id}
-                        type="button"
-                        onClick={() => setPlan(p.id)}
-                        className={`rounded-xl border px-3 py-2.5 text-left transition ${ active ? "border-home-accent bg-home-accent-soft text-foreground shadow-sm" : "border-border bg-background text-foreground hover:border-home-accent/50" }`}
-                      >
-                        <div className="text-[13px] font-semibold">{p.label}</div>
-                        <div className={`text-[11px] ${active ? "text-zinc-600" : "text-zinc-500"}`}>{p.desc}</div>
-                      </button>
-                    );
-                  })}
+              <div className="jenvu-rise [animation-delay:220ms] mx-auto mt-10 max-w-md rounded-3xl bg-gc-surface p-6 text-left">
+                <div className="flex items-center justify-between text-[13px] text-gc-ink-muted">
+                  <span>Seats claimed this month</span>
+                  <span className="font-medium text-gc-ink">{seats.filled} / {seats.total}</span>
                 </div>
-                <p className="mt-1.5 text-[11px] text-zinc-500">Approved applicants get this plan free for 30 days.</p>
+                <div className="mt-3 h-2 overflow-hidden rounded-full bg-gc-blue-soft">
+                  <div className="h-full rounded-full bg-gc-blue transition-all duration-700 ease-out" style={{ width: `${pct}%` }} />
+                </div>
+                <div className="mt-2 text-[12px] text-gc-ink-muted">{remaining} spots remaining</div>
               </div>
-              <div className="grid gap-4 sm:grid-cols-2">
-                <Field name="country" label="Country" placeholder="Pakistan" />
-                <Field name="broker" label="Broker" placeholder="IC Markets, Exness…" />
+            </div>
+          </section>
+
+          {/* Benefits — homepage card style with tone icons */}
+          <section className="bg-background">
+            <div className="mx-auto max-w-[1296px] px-5 pb-16 sm:px-8">
+              <div className="grid gap-5 md:grid-cols-3">
+                {([
+                  { icon: Users, tone: "blue", title: "Curated cohort", body: "Only 50 traders each month. Serious applicants, real capital, no tire-kickers." },
+                  { icon: DollarSign, tone: "green", title: "Pay after profit", body: "First month Elite is free. Billing activates only after $100 verified profit." },
+                  { icon: Shield, tone: "yellow", title: "Aligned incentives", body: "We win when you win. Our job is to make you stable, not to milk subscriptions." },
+                ] as const).map((b, i) => (
+                  <div key={b.title} className="ind-rise rounded-3xl border border-gc-line bg-background p-7 transition hover:shadow-[0_1px_3px_rgba(60,64,67,0.15),0_4px_12px_rgba(60,64,67,0.12)]" style={{ animationDelay: `${i * 80}ms` }}>
+                    <span className={`flex h-12 w-12 items-center justify-center rounded-full ${TONE[b.tone].bg}`}>
+                      <b.icon className={`h-6 w-6 ${TONE[b.tone].fg}`} />
+                    </span>
+                    <h3 className="mt-5 text-[20px] font-medium text-gc-ink">{b.title}</h3>
+                    <p className="mt-2 text-[15px] leading-[1.6] text-gc-ink-muted">{b.body}</p>
+                  </div>
+                ))}
               </div>
-              <div className="grid gap-4 sm:grid-cols-2">
-                <Field name="experience_years" label="Experience (years)" type="number" placeholder="3" />
-                <Field
-                  key={`ref-${refEmail}`}
-                  name="referrer_email"
-                  label="Referred by (optional)"
-                  type="email"
-                  placeholder="friend@email.com"
-                  defaultValue={refEmail}
-                />
-              </div>
-              <Field
-                name="myfxbook_url"
-                label="MyFxBook / verified track record (optional)"
-                placeholder="https://myfxbook.com/…"
-              />
+            </div>
+          </section>
+
+          {/* How it works */}
+          <section className="bg-gc-surface">
+            <div className="mx-auto grid max-w-[1296px] gap-10 px-5 py-16 sm:px-8 lg:grid-cols-[0.8fr_1.2fr] lg:py-20">
               <div>
-                <label className="text-[13px] font-medium text-zinc-800">
-                  Why do you want in? <span className="text-rose-500">*</span>
-                </label>
-                <textarea
-                  name="why_joining"
-                  required
-                  minLength={10}
-                  maxLength={1500}
-                  rows={4}
-                  placeholder="Tell us about your trading journey and what stability would mean for you…"
-                  className="mt-1.5 w-full rounded-xl border border-zinc-200 bg-white px-3.5 py-2.5 text-[14px] outline-none placeholder:text-zinc-400 focus:border-zinc-900"
-                />
+                <h2 className="text-[32px] font-medium leading-[1.2] text-gc-ink sm:text-[40px]">How it works</h2>
+                <p className="mt-4 max-w-[420px] text-[16px] leading-[1.6] text-gc-ink-muted">Four simple steps from application to your first scan.</p>
+              </div>
+              <ol className="space-y-4">
+                {[
+                  ["Apply", "Fill the short form below. We review every application manually."],
+                  ["Get approved", "If accepted, we activate your Elite plan free for 30 days — full access to terminal analysis, signals, alerts and killzones."],
+                  ["Reach $100 in 30 days", "You have 30 days to hit $100 in verified profit. After that, billing activates on your account and you pay per scan."],
+                  ["Verify & pay to continue scanning", "Once 30 days end, a 'Submit documents' notification appears on your account. Click it, upload your broker statement / MyFxBook, and we verify. After verification, billing goes live and credits are added to your account so you can keep scanning."],
+                ].map(([t, d], i) => (
+                  <li key={t} className="flex gap-5 rounded-3xl bg-background p-6">
+                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gc-blue text-[15px] font-medium text-gc-on-blue">{i + 1}</span>
+                    <div>
+                      <div className="text-[17px] font-medium text-gc-ink">{t}</div>
+                      <div className="mt-1 text-[15px] leading-[1.6] text-gc-ink-muted">{d}</div>
+                    </div>
+                  </li>
+                ))}
+              </ol>
+            </div>
+          </section>
+
+          {/* Application form */}
+          <section id="apply" className="scroll-mt-24 bg-background">
+            <div className="mx-auto max-w-[760px] px-5 py-16 sm:px-8 lg:py-20">
+              <div className="text-center">
+                <span className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-gc-red-soft"><Sparkles className="h-6 w-6 text-gc-red" /></span>
+                <h2 className="mt-5 text-[32px] font-medium leading-[1.2] text-gc-ink sm:text-[40px]">Apply for a founding seat</h2>
+                <p className="mt-3 text-[16px] text-gc-ink-muted">Applications reviewed within 48 hours. Only serious traders — please be honest.</p>
               </div>
 
-              <button
-                type="submit"
-                disabled={submitting || remaining === 0}
-                className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-home-accent px-4 py-3 text-sm font-semibold text-home-accent-foreground transition-opacity hover:opacity-90 disabled:opacity-60"
-              >
-                {submitting ? "Submitting…" : remaining === 0 ? "This month is full — join waitlist" : "Submit application"}
-                <ArrowRight className="h-4 w-4" />
-              </button>
+              <div className="mt-10 rounded-3xl border border-gc-line bg-background p-6 sm:p-9">
+                {submitted ? (
+                  <div className="py-6 text-center" role="status" aria-live="polite">
+                    <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-gc-green-soft">
+                      <Check className="h-7 w-7 text-gc-green" />
+                    </div>
+                    <h3 className="mt-5 text-[24px] font-medium text-gc-ink">Application received</h3>
+                    <p className="mx-auto mt-3 max-w-lg text-[15px] leading-relaxed text-gc-ink-muted">
+                      Thank you — we've got your application. Our team will personally review it and email you a decision within <strong className="text-gc-ink">48 hours</strong>.
+                    </p>
+                    <p className="mt-2 text-[13px] text-gc-ink-muted">Please keep an eye on your inbox (and spam folder).</p>
+                    <Link to="/" className="mt-6 inline-flex h-11 items-center justify-center rounded-full bg-gc-blue px-6 text-[15px] font-medium text-gc-on-blue hover:bg-gc-blue-hover">
+                      Back to home
+                    </Link>
+                  </div>
+                ) : (
+                  <form onSubmit={onSubmit} className="space-y-5">
+                    <Field name="full_name" label="Full name" required placeholder="Your full name" />
+                    <Field name="email" label="Email" type="email" required placeholder="you@example.com" />
+                    <Field name="whatsapp_number" label="WhatsApp number" type="tel" required placeholder="+92 300 1234567" />
 
-              <p className="text-[11px] leading-relaxed text-zinc-500">
-                By applying you agree to our <Link to="/terms" className="underline">Terms</Link> and <Link to="/disclaimer" className="underline">Risk Disclaimer</Link>. Future trading involves significant risk.
-              </p>
+                    <div>
+                      <label className="text-[14px] font-medium text-gc-ink">
+                        Which plan do you want? <span className="text-gc-red">*</span>
+                      </label>
+                      <div className="mt-2 grid grid-cols-3 gap-2">
+                        {([
+                          { id: "pro", label: "Pro", desc: "$10 wallet" },
+                          { id: "elite", label: "Elite", desc: "$25 wallet" },
+                          { id: "ultra", label: "Ultra", desc: "$50 wallet" },
+                        ] as const).map((p) => {
+                          const active = plan === p.id;
+                          return (
+                            <button
+                              key={p.id}
+                              type="button"
+                              onClick={() => setPlan(p.id)}
+                              className={`rounded-2xl border px-4 py-3 text-left transition ${active ? "border-gc-blue bg-gc-blue-soft" : "border-gc-line bg-background hover:bg-gc-surface"}`}
+                            >
+                              <div className={`text-[14px] font-medium ${active ? "text-gc-blue-deep" : "text-gc-ink"}`}>{p.label}</div>
+                              <div className="text-[12px] text-gc-ink-muted">{p.desc}</div>
+                            </button>
+                          );
+                        })}
+                      </div>
+                      <p className="mt-1.5 text-[12px] text-gc-ink-muted">Approved applicants get this plan free for 30 days.</p>
+                    </div>
+                    <div className="grid gap-5 sm:grid-cols-2">
+                      <Field name="country" label="Country" placeholder="Pakistan" />
+                      <Field name="broker" label="Broker" placeholder="IC Markets, Exness…" />
+                    </div>
+                    <div className="grid gap-5 sm:grid-cols-2">
+                      <Field name="experience_years" label="Experience (years)" type="number" placeholder="3" />
+                      <Field key={`ref-${refEmail}`} name="referrer_email" label="Referred by (optional)" type="email" placeholder="friend@email.com" defaultValue={refEmail} />
+                    </div>
+                    <Field name="myfxbook_url" label="MyFxBook / verified track record (optional)" placeholder="https://myfxbook.com/…" />
+                    <div>
+                      <label className="text-[14px] font-medium text-gc-ink">
+                        Why do you want in? <span className="text-gc-red">*</span>
+                      </label>
+                      <textarea
+                        name="why_joining"
+                        required
+                        minLength={10}
+                        maxLength={1500}
+                        rows={4}
+                        placeholder="Tell us about your trading journey and what stability would mean for you…"
+                        className={INPUT}
+                      />
+                    </div>
 
-            </form>
-          )}
-        </div>
-      </section>
+                    <button
+                      type="submit"
+                      disabled={submitting || remaining === 0}
+                      className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-gc-blue px-6 text-[16px] font-medium text-gc-on-blue transition hover:bg-gc-blue-hover disabled:opacity-60"
+                    >
+                      {submitting ? "Submitting…" : remaining === 0 ? "This month is full — join waitlist" : "Submit application"}
+                      <ArrowRight className="h-4 w-4" />
+                    </button>
+
+                    <p className="text-[12px] leading-relaxed text-gc-ink-muted">
+                      By applying you agree to our <Link to="/terms" className="text-gc-blue underline">Terms</Link> and <Link to="/disclaimer" className="text-gc-blue underline">Risk Disclaimer</Link>. Futures trading involves significant risk.
+                    </p>
+                  </form>
+                )}
+              </div>
+            </div>
+          </section>
+        </main>
+      </div>
 
       <SiteFooter />
     </div>
   );
 }
+
+const SANS = "font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif]";
+const INPUT = "mt-1.5 w-full rounded-xl border border-gc-line bg-background px-4 py-3 text-[15px] text-gc-ink outline-none placeholder:text-gc-ink-muted focus:border-gc-blue focus:ring-1 focus:ring-gc-blue";
+const TONE = {
+  blue: { bg: "bg-gc-blue-soft", fg: "text-gc-blue" },
+  green: { bg: "bg-gc-green-soft", fg: "text-gc-green" },
+  yellow: { bg: "bg-gc-yellow-soft", fg: "text-gc-yellow" },
+} as const;
 
 function Field(props: {
   name: string;
@@ -323,9 +313,9 @@ function Field(props: {
 }) {
   return (
     <div>
-      <label className="text-[13px] font-medium text-zinc-800">
+      <label className="text-[14px] font-medium text-gc-ink">
         {props.label}
-        {props.required && <span className="text-rose-500"> *</span>}
+        {props.required && <span className="text-gc-red"> *</span>}
       </label>
       <input
         name={props.name}
@@ -333,7 +323,7 @@ function Field(props: {
         required={props.required}
         placeholder={props.placeholder}
         defaultValue={props.defaultValue}
-        className="mt-1.5 w-full rounded-xl border border-zinc-200 bg-white px-3.5 py-2.5 text-[14px] outline-none placeholder:text-zinc-400 focus:border-zinc-900"
+        className={INPUT}
       />
     </div>
   );
