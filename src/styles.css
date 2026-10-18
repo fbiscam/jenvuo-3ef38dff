@@ -100,6 +100,7 @@
   --color-gc-blue: var(--gc-blue);
   --color-gc-blue-hover: var(--gc-blue-hover);
   --color-gc-blue-soft: var(--gc-blue-soft);
+  --color-gc-console-bar: var(--gc-console-bar);
   --color-gc-red: var(--gc-red);
   --color-gc-red-soft: var(--gc-red-soft);
   --color-gc-yellow: var(--gc-yellow);
@@ -178,6 +179,7 @@
   --gc-blue: #1a73e8;
   --gc-blue-hover: #1765cc;
   --gc-blue-soft: #e8f0fe;
+  --gc-console-bar: #f0f5fe;
   --gc-red: #ea4335;
   --gc-red-soft: #fce8e6;
   --gc-yellow: #fbbc04;

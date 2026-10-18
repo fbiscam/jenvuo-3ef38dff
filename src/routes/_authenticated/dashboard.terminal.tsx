@@ -752,7 +752,7 @@ function TerminalPage() {
                       title="Ask With AI"
                       aria-label="Ask With AI"
                     >
-                      <img src={askJenvuMark} alt="" className="h-3.5 w-auto shrink-0 object-contain" />
+                      <img src="/favicon.png" alt="" className="h-4 w-4 shrink-0 rounded-sm object-contain" />
                       <span className={cn(showWatchlist && "lg:hidden 2xl:inline")}>Ask With AI</span>
                     </button>
                   )}
