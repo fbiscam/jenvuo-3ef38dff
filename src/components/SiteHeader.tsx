@@ -2,6 +2,9 @@ import * as React from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { Menu, Search, SendHorizontal, X } from "lucide-react";
 import { useAuthUser } from "@/hooks/useAuthUser";
+import { supabase } from "@/integrations/supabase/client";
+import { readCachedAvatar, writeCachedAvatar, AVATAR_TTL_SECONDS } from "@/lib/avatar-cache";
+import { getDefaultAvatar } from "@/lib/default-avatar";
 
 /** Current page in the top menu: dark text with a blue line along the bottom of the header. */
 const ACTIVE = { className: "relative !text-gc-ink after:pointer-events-none after:absolute after:inset-x-1 after:-bottom-[13px] after:h-[3px] after:rounded-t-sm after:bg-gc-blue" };
@@ -16,6 +19,19 @@ export default function SiteHeader() {
   const [searchOpen, setSearchOpen] = React.useState(false);
   const [searchText, setSearchText] = React.useState("");
   const navigate = useNavigate();
+  const [avatarUrl, setAvatarUrl] = React.useState<string | null>(null);
+  React.useEffect(() => {
+    if (!authUser) { setAvatarUrl(null); return; }
+    let cancelled = false;
+    setAvatarUrl(readCachedAvatar() || getDefaultAvatar(authUser.email || authUser.id));
+    void supabase.from("profiles").select("avatar_url").eq("id", authUser.id).maybeSingle().then(async ({ data }) => {
+      const path = (data as { avatar_url?: string | null } | null)?.avatar_url;
+      if (cancelled || !path) return;
+      const { data: signed } = await supabase.storage.from("avatars").createSignedUrl(path, AVATAR_TTL_SECONDS);
+      if (!cancelled && signed?.signedUrl) { setAvatarUrl(signed.signedUrl); writeCachedAvatar(signed.signedUrl); }
+    });
+    return () => { cancelled = true; };
+  }, [authUser]);
   React.useEffect(() => {
     if (mobileMenuOpen) {
       const prev = document.body.style.overflow;
@@ -69,12 +85,22 @@ export default function SiteHeader() {
               <Link to="/dashboard/terminal" className="text-gc-blue">Terminal</Link>
             </div>
             {isAuthed ? (
+              <>
+              <Link
+                to="/dashboard/profile"
+                aria-label="Account settings"
+                title="Account settings"
+                className="ml-2 inline-flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full ring-1 ring-gc-line hover:ring-2 hover:ring-gc-blue-soft"
+              >
+                {avatarUrl && <img src={avatarUrl} alt="" className="h-full w-full object-cover" />}
+              </Link>
               <Link
                 to="/dashboard"
                 className="ml-2 inline-flex h-10 items-center justify-center rounded-full bg-gc-blue px-4 text-[14px] font-medium text-gc-on-blue hover:bg-gc-blue-hover"
               >
                 Dashboard
               </Link>
+              </>
             ) : (
               <>
                 <Link to="/auth" className="ml-1 hidden whitespace-nowrap rounded-md px-2.5 py-2 text-[14px] text-gc-ink-muted hover:bg-gc-surface hover:text-gc-ink xl:inline-flex">

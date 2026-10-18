@@ -1569,6 +1569,7 @@ function DashboardLayout() {
             name={fullName}
             email={email}
             onSignOut={() => void signOut()}
+            white={pathname === "/dashboard/terminal"}
           />
         )}
         <div
