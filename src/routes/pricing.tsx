@@ -211,7 +211,7 @@ function PricingPage() {
             const trialPro = trial.active && plan.key === "pro";
             const isCurrent = currentPlan === plan.key && !trialPro;
             const disabled = currentPlan !== null && !isCurrent && !trialPro && upgradeLock.locked;
-            const destination = currentPlan !== null ? "/dashboard/pay" : "/founding";
+            const destination = currentPlan !== null ? "/dashboard/pay" : "/auth";
             return (
               <article key={plan.key} className={`flex min-h-[280px] flex-col rounded-lg border p-7 ${plan.key === "pro" ? "border-gc-blue-deep" : "border-gc-line"}`}>
                 <div className="flex items-center justify-between gap-3">
@@ -234,7 +234,7 @@ function PricingPage() {
                       to={destination}
                       className={`flex h-11 items-center justify-center rounded-full text-[15px] font-medium transition ${plan.key === "pro" ? "bg-gc-blue-deep text-gc-on-blue hover:bg-gc-navy" : "border border-gc-line text-gc-blue-deep hover:bg-gc-surface"}`}
                     >
-                      {trialPro ? "Upgrade to Pro" : currentPlan !== null ? "Upgrade" : "Apply now"}
+                      {trialPro ? "Upgrade to Pro" : currentPlan !== null ? "Upgrade" : "Buy now"}
                     </Link>
                   )}
                 </div>
@@ -319,11 +319,11 @@ function PricingPage() {
               </div>
               <p className="mt-2 text-[14px] text-gc-ink-muted">One-time · about {Math.floor(p.price / 0.03)} primary AI requests</p>
               <Link
-                to={signedOut ? "/founding" : "/dashboard/pay"}
+                to={signedOut ? "/auth" : "/dashboard/pay"}
                 search={signedOut ? undefined : ({ amount: p.price } as never)}
                 className="mt-6 inline-flex h-10 items-center justify-center rounded-full border border-gc-line text-[14px] font-medium text-gc-blue-deep hover:bg-gc-surface"
               >
-                {signedOut ? "Apply now" : "Buy now"}
+                Buy now
               </Link>
             </div>
           ))}
@@ -415,11 +415,11 @@ function CustomTopUp({ signedOut }: { signedOut: boolean }) {
             <div className="mt-1 text-[12px] text-gc-ink-muted">about {primaryRequests} primary requests</div>
           </div>
           <Link
-            to={signedOut ? "/founding" : "/dashboard/pay"}
+            to={signedOut ? "/auth" : "/dashboard/pay"}
             search={signedOut ? undefined : ({ amount: safe } as never)}
             className="inline-flex h-11 items-center justify-center whitespace-nowrap rounded-full bg-gc-blue-deep px-6 text-[15px] font-medium text-gc-on-blue hover:bg-gc-navy"
           >
-            {signedOut ? "Apply now" : "Buy now"}
+            Buy now
           </Link>
         </div>
       </div>

@@ -159,11 +159,11 @@ export default function SiteHeader() {
                     Sign In
                   </Link>
                   <Link
-                    to="/founding"
+                    to="/pricing"
                     onClick={() => setMobileMenuOpen(false)}
                     className="inline-flex items-center justify-center rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm font-medium text-zinc-950 hover:bg-zinc-50"
                   >
-                    Apply now
+                    Buy now
                   </Link>
                 </div>
               )}
