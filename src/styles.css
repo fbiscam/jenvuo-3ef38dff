@@ -777,6 +777,17 @@ html[data-pwa="1"] .jenvu-terminal-shell {
   overflow: hidden;
 }
 
+/* Terminal page: the chart stays unzoomed, but the top bar and menu drawer get
+   the same responsive scale as every other dashboard page so they don't shrink. */
+@media (min-width: 1024px) { .jenvu-zoom-chrome { zoom: 0.878; } }
+@media (min-width: 1200px) { .jenvu-zoom-chrome { zoom: 0.970; } }
+@media (min-width: 1360px) { .jenvu-zoom-chrome { zoom: 1.063; } }
+@media (min-width: 1500px) { .jenvu-zoom-chrome { zoom: 1.155; } }
+@media (min-width: 1600px) { .jenvu-zoom-chrome { zoom: 1.271; } }
+@media (min-width: 1680px) { .jenvu-zoom-chrome { zoom: 1.342; } }
+@media (min-width: 1920px) { .jenvu-zoom-chrome { zoom: 1.432; } }
+html[data-pwa="1"] .jenvu-zoom-chrome { zoom: 1 !important; }
+
 /* Terminal page: sidebar is pure white. */
 .dashboard-terminal-sidebar,
 .dashboard-terminal-sidebar .bg-sidebar {

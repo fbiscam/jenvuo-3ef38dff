@@ -57,6 +57,13 @@
       "when": 1792257092836,
       "tag": "0007_contact_phone",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1792337957207,
+      "tag": "0008_allow_profile_plan_check",
+      "breakpoints": true
     }
   ]
 }
