@@ -1,14 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 
-export type NewsEvent = {
-  title: string;
-  country: string;
-  date: string; // ISO
-  impact: "High" | "Medium" | "Low";
-  forecast?: string;
-  previous?: string;
-  minutesUntil: number;
-};
+import type { NewsEvent } from "./news-split";
+export type { NewsEvent } from "./news-split";
 
 type FFEvent = {
   title: string;
@@ -50,8 +43,28 @@ async function loadCalendar(): Promise<FFEvent[]> {
   }
 }
 
-/** Every news list in the product shows at most this many events. */
-export const MAX_NEWS = 4;
+import { MAX_NEWS, splitNews } from "./news-split";
+export { MAX_NEWS, PREVIOUS_NEWS } from "./news-split";
+
+function toNewsEvents(raw: FFEvent[], now: number): NewsEvent[] {
+  return raw
+    .filter(movesGold)
+    .map((e) => {
+      const t = new Date(e.date).getTime();
+      const impact = /high/i.test(e.impact) ? "High" : /medium/i.test(e.impact) ? "Medium" : "Low";
+      return {
+        title: e.title,
+        country: e.country,
+        date: new Date(t).toISOString(),
+        impact: impact as NewsEvent["impact"],
+        forecast: e.forecast || undefined,
+        previous: e.previous || undefined,
+        minutesUntil: Math.round((t - now) / 60000),
+      };
+    })
+    .filter((e) => Number.isFinite(new Date(e.date).getTime()))
+    .sort((a, b) => +new Date(a.date) - +new Date(b.date));
+}
 
 export const getGoldNews = createServerFn({ method: "GET" }).handler(
   async (): Promise<NewsEvent[]> => {
@@ -60,26 +73,20 @@ export const getGoldNews = createServerFn({ method: "GET" }).handler(
     const raw = await loadCalendar();
     const now = Date.now();
     const horizon = now + 1000 * 60 * 60 * 24 * 8;
-    return raw
-      .filter(movesGold)
-      .map((e) => {
-        const t = new Date(e.date).getTime();
-        const impact = /high/i.test(e.impact) ? "High" : /medium/i.test(e.impact) ? "Medium" : "Low";
-        return {
-          title: e.title,
-          country: e.country,
-          date: new Date(t).toISOString(),
-          impact: impact as NewsEvent["impact"],
-          forecast: e.forecast || undefined,
-          previous: e.previous || undefined,
-          minutesUntil: Math.round((t - now) / 60000),
-        };
-      })
+    return toNewsEvents(raw, now)
       .filter((e) => {
         const t = new Date(e.date).getTime();
-        return Number.isFinite(t) && t >= now - 1000 * 60 * 60 && t <= horizon;
+        return t >= now - 1000 * 60 * 60 && t <= horizon;
       })
-      .sort((a, b) => +new Date(a.date) - +new Date(b.date))
       .slice(0, MAX_NEWS);
+  },
+);
+
+/** Upcoming events plus the last released ones from this week's calendar. */
+export const getGoldNewsBoard = createServerFn({ method: "GET" }).handler(
+  async (): Promise<{ upcoming: NewsEvent[]; previous: NewsEvent[] }> => {
+    const raw = await loadCalendar();
+    const now = Date.now();
+    return splitNews(toNewsEvents(raw, now), now);
   },
 );
