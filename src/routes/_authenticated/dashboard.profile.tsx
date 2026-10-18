@@ -117,29 +117,34 @@ function Profile() {
     }
   };
 
-  return (
-    <div className="max-w-2xl space-y-8">
-      <section>
-        <h2 className="pl-1 text-base font-semibold">Profile</h2>
+  const initial = (fullName || email || "?").trim().charAt(0).toUpperCase();
+  const field = "mt-1.5 block h-11 w-full rounded-xl border border-gc-line bg-background px-4 text-[15px] text-gc-ink outline-none focus:border-gc-blue-deep focus:ring-2 focus:ring-gc-blue-soft";
 
-        {/* Profile photo */}
-        <div className="mt-5 flex items-center gap-5">
-          <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-full border border-zinc-200 bg-zinc-100">
+  return (
+    <div className="mx-auto w-full max-w-[880px] space-y-6 pb-10 text-gc-ink">
+      <header className="jenvu-rise pt-2">
+        <span className="inline-flex rounded-full bg-gc-blue-soft px-3 py-1 text-[13px] font-medium text-gc-blue-deep">Settings</span>
+        <h1 className="mt-4 text-[32px] font-medium leading-tight tracking-[-0.3px] sm:text-[40px]">Your profile</h1>
+        <p className="mt-2 max-w-[620px] text-[16px] leading-[1.6] text-gc-ink-muted">Your photo and name show on your dashboard, in the top menu and in messages you send to Jenvu support.</p>
+      </header>
+
+      <section className="jenvu-rise [animation-delay:60ms] rounded-[28px] border border-gc-line bg-background p-6 sm:p-8">
+        <h2 className="text-[20px] font-medium">Profile photo</h2>
+        <div className="mt-5 flex flex-col gap-5 sm:flex-row sm:items-center">
+          <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-full bg-gc-blue-soft ring-4 ring-gc-surface">
             {avatarUrl ? (
               <img src={avatarUrl} alt="Profile" className="h-full w-full object-cover" />
             ) : (
-              <div className="flex h-full w-full items-center justify-center text-xl font-semibold text-zinc-400">
-                {(fullName || email || "?").trim().charAt(0).toUpperCase()}
-              </div>
+              <div className="flex h-full w-full items-center justify-center text-[32px] font-medium text-gc-blue-deep">{initial}</div>
             )}
           </div>
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-3">
             <div className="flex flex-wrap gap-2">
               <button
                 type="button"
                 onClick={onAvatarPick}
                 disabled={uploadingAvatar}
-                className="rounded-lg border border-zinc-300 bg-white px-3 py-1.5 text-xs font-medium text-zinc-800 hover:bg-zinc-50 disabled:opacity-50"
+                className="inline-flex h-10 items-center rounded-full bg-gc-blue px-5 text-[14px] font-medium text-gc-on-blue hover:bg-gc-blue-hover disabled:opacity-50"
               >
                 {uploadingAvatar ? "Uploading…" : avatarPath ? "Change photo" : "Upload photo"}
               </button>
@@ -148,55 +153,50 @@ function Profile() {
                   type="button"
                   onClick={removeAvatar}
                   disabled={uploadingAvatar}
-                  className="rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-xs font-medium text-zinc-600 hover:bg-zinc-50 disabled:opacity-50"
+                  className="inline-flex h-10 items-center rounded-full border border-gc-line px-5 text-[14px] font-medium text-gc-blue-deep hover:bg-gc-surface disabled:opacity-50"
                 >
                   Remove
                 </button>
               )}
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                className="hidden"
-                onChange={onAvatarChange}
-              />
+              <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={onAvatarChange} />
             </div>
-            <p className="text-[11px] text-zinc-500">JPG, PNG or WebP. Max 10MB. You can crop, zoom and reposition after selecting.</p>
+            <p className="text-[13px] text-gc-ink-muted">JPG, PNG or WebP. Max 10MB. You can crop, zoom and reposition after selecting.</p>
           </div>
         </div>
+      </section>
 
-        <div className="mt-5 space-y-4">
-          <label className="block text-xs font-medium text-zinc-600">
+      <section className="jenvu-rise [animation-delay:120ms] rounded-[28px] border border-gc-line bg-background p-6 sm:p-8">
+        <h2 className="text-[20px] font-medium">Account details</h2>
+        <div className="mt-5 grid gap-5 sm:grid-cols-2">
+          <label className="block text-[13px] font-medium text-gc-ink-muted">
             Full name
             <input
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
               disabled={nameLocked}
-              className={[
-                "mt-1 block w-full rounded-lg border border-zinc-200 px-3 py-2 text-sm",
-                nameLocked ? "cursor-not-allowed bg-zinc-50 text-zinc-500" : "",
-              ].join(" ")}
+              className={`${field} ${nameLocked ? "cursor-not-allowed bg-gc-surface text-gc-ink-muted" : ""}`}
               placeholder="Your name"
             />
             {nameLocked && (
-              <span className="mt-1 block text-[11px] font-normal text-zinc-500">
+              <span className="mt-1.5 block text-[12px] font-normal text-gc-ink-muted">
                 Locked — your name is verified against your identity documents. Contact support to change it.
               </span>
             )}
           </label>
-          <label className="block text-xs font-medium text-zinc-600">
+          <label className="block text-[13px] font-medium text-gc-ink-muted">
             Email
-            <input
-              value={email}
-              disabled
-              className="mt-1 block w-full cursor-not-allowed rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm text-zinc-500"
-            />
+            <input value={email} disabled className={`${field} cursor-not-allowed bg-gc-surface text-gc-ink-muted`} />
           </label>
-          <button onClick={saveProfile} disabled={saving || nameLocked} className="rounded-lg bg-zinc-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-zinc-800 disabled:opacity-50">
+        </div>
+        <div className="mt-6 flex justify-end border-t border-gc-line pt-5">
+          <button
+            onClick={saveProfile}
+            disabled={saving || nameLocked}
+            className="inline-flex h-11 items-center rounded-full bg-gc-blue px-6 text-[14px] font-medium text-gc-on-blue hover:bg-gc-blue-hover disabled:opacity-50"
+          >
             {saving ? "Saving…" : "Save changes"}
           </button>
         </div>
-
       </section>
 
       {pendingFile && (

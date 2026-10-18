@@ -104,26 +104,24 @@ function DocsPage() {
   );
 
   return (
-    <div className={`public-cloudflare jenvu-zoom min-h-dvh w-full bg-background text-gc-ink ${SANS} antialiased`}>
+    <div className={`min-h-dvh w-full bg-background text-gc-ink ${SANS} antialiased`}>
       <SiteHeader />
 
-      {/* Docs hero band */}
-      <section className="border-b border-gc-line bg-gc-canvas">
-        <div className="mx-auto max-w-[1440px] px-5 py-10 sm:px-8 lg:py-12">
-          <p className="flex items-center gap-1 text-[13px] text-gc-ink-muted">
-            <Link to="/" className="hover:text-gc-blue-deep">Jenvu</Link>
-            <ChevronRight className="h-3.5 w-3.5" />
-            <span>Documentation</span>
-          </p>
-          <h1 className="mt-3 text-[32px] font-normal leading-tight tracking-tight sm:text-[40px]">Jenvu documentation</h1>
-          <p className="mt-3 max-w-[760px] text-[16px] leading-[1.6] text-gc-ink-muted">
+      {/* Docs hero — homepage style */}
+      <section className="bg-background">
+        <div className="mx-auto max-w-[1296px] px-5 pb-10 pt-12 text-center sm:px-8 md:pt-14">
+          <span className="jenvu-rise inline-flex rounded-full bg-gc-blue-soft px-3 py-1 text-[13px] font-medium text-gc-blue-deep">Documentation</span>
+          <h1 className="jenvu-rise mx-auto mt-5 max-w-[900px] text-[40px] font-medium leading-[1.1] tracking-[-0.5px] sm:text-[56px]">Jenvu documentation</h1>
+          <p className="jenvu-rise [animation-delay:80ms] mx-auto mt-5 max-w-[720px] text-[17px] leading-[1.6] text-gc-ink-muted">
             The complete A to Z guide to Jenvu — your account, the free trial, the Terminal chart and every marking on it, AI chat,
             plans, the API and a glossary of every term we use.
           </p>
-          <div className="mt-6 flex flex-wrap gap-3">
+          <div className="jenvu-rise [animation-delay:140ms] mx-auto mt-8 grid max-w-[1100px] gap-3 text-left sm:grid-cols-2 lg:grid-cols-5">
             {DOC_GROUPS.slice(0, 5).map((g) => (
-              <a key={g.title} href={`#${g.sections[0].id}`} className="rounded-full border border-gc-line bg-background px-4 py-2 text-[14px] text-gc-blue-deep hover:bg-gc-nav-active">
-                {g.title}
+              <a key={g.title} href={`#${g.sections[0].id}`} className="group rounded-3xl border border-gc-line bg-background p-5 transition-shadow hover:shadow-md">
+                <p className="text-[16px] font-medium text-gc-ink">{g.title}</p>
+                <p className="mt-1 text-[13px] text-gc-ink-muted">{g.sections.length} topics</p>
+                <span className="mt-3 inline-flex items-center gap-1 text-[14px] text-gc-blue">Read <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" /></span>
               </a>
             ))}
           </div>
@@ -139,19 +137,19 @@ function DocsPage() {
       </div>
       {navOpen && <div className="border-b border-gc-line bg-background px-5 py-5 lg:hidden">{nav}</div>}
 
-      <div className="mx-auto grid max-w-[1440px] grid-cols-1 gap-8 px-5 sm:px-8 lg:grid-cols-[260px_minmax(0,1fr)] xl:grid-cols-[260px_minmax(0,1fr)_220px]">
+      <div className="mx-auto grid max-w-[1440px] grid-cols-1 gap-8 border-t border-gc-line px-5 sm:px-8 lg:grid-cols-[260px_minmax(0,1fr)] xl:grid-cols-[260px_minmax(0,1fr)_220px]">
         <aside className="hidden lg:block">
           <div className="sticky top-4 max-h-[calc(100vh-2rem)] overflow-y-auto py-8 pr-2">{nav}</div>
         </aside>
 
         <main className="min-w-0 py-8 lg:py-10">
-          <div className="max-w-[800px] space-y-14">
+          <div className="max-w-[820px] space-y-12">
             {DOC_GROUPS.map((g) => (
-              <div key={g.title} className="space-y-10">
-                <p className="text-[13px] font-medium uppercase tracking-wide text-gc-blue-deep">{g.title}</p>
+              <div key={g.title} className="space-y-5">
+                <h2 className="text-[13px] font-medium uppercase tracking-wide text-gc-ink-muted">{g.title}</h2>
                 {g.sections.map((s) => (
-                  <article key={s.id} id={s.id} className="scroll-mt-20 border-b border-gc-line pb-10 last:border-b-0">
-                    <h2 className="text-[26px] font-normal leading-tight text-gc-ink">{s.title}</h2>
+                  <article key={s.id} id={s.id} className="scroll-mt-20 rounded-[28px] border border-gc-line bg-background p-6 sm:p-8">
+                    <h2 className="text-[26px] font-medium leading-tight tracking-[-0.2px] text-gc-ink">{s.title}</h2>
                     <div className="doc-body mt-4 space-y-4 text-[15px] leading-[1.7] text-gc-ink-muted [&_a]:text-gc-blue-deep [&_a]:underline [&_h3]:pt-2 [&_h3]:text-[18px] [&_h3]:font-normal [&_h3]:text-gc-ink [&_li]:pl-1 [&_ol]:list-decimal [&_ol]:space-y-2 [&_ol]:pl-5 [&_strong]:font-medium [&_strong]:text-gc-ink [&_ul]:list-disc [&_ul]:space-y-2 [&_ul]:pl-5">
                       {s.body}
                     </div>

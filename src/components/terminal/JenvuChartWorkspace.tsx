@@ -565,6 +565,84 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
       ))}
     </>
   );
+  function renderTools(vertical: boolean) {
+    return (
+      <>
+          {TOOLS.map((t) => (
+            <ToolButton key={t.id} label={t.label} active={tool === t.id} onClick={() => setTool(t.id)}>
+              <t.icon className="h-4 w-4" />
+            </ToolButton>
+          ))}
+          <ToolButton label={TOOL_LABELS.long} active={tool === "long"} onClick={() => setTool("long")}>
+            <PositionToolIcon side="long" />
+          </ToolButton>
+          <ToolButton label={TOOL_LABELS.short} active={tool === "short"} onClick={() => setTool("short")}>
+            <PositionToolIcon side="short" />
+          </ToolButton>
+          <span className={vertical ? "my-1 h-px w-6 bg-border" : "mx-1 h-5 w-px shrink-0 bg-border"} aria-hidden="true" />
+          <Popover>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <PopoverTrigger asChild>
+                  <button
+                    type="button"
+                    aria-label="Drawing color"
+                    className="flex h-8 w-8 items-center justify-center rounded-md hover:bg-accent"
+                  >
+                    <span className="h-4 w-4 rounded-full ring-2 ring-background" style={{ background: selected?.color ?? color }} />
+                  </button>
+                </PopoverTrigger>
+              </TooltipTrigger>
+              <TooltipContent side={vertical ? "right" : "bottom"}>Drawing color</TooltipContent>
+            </Tooltip>
+            <PopoverContent side={vertical ? "right" : "bottom"} className={cn("flex w-auto gap-1.5 p-2", theme === "dark" && "dark terminal-dark")}>
+              {DRAWING_COLORS.map((c) => (
+                <button
+                  type="button"
+                  key={c}
+                  aria-label={`Use color ${c}`}
+                  onClick={() => {
+                    setColor(c);
+                    if (selectedId)
+                      setDrawings((cur) => cur.map((d) => (d.id === selectedId ? { ...d, color: c } : d)));
+                  }}
+                  className={cn(
+                    "h-6 w-6 rounded-full ring-offset-2 ring-offset-background",
+                    (selected?.color ?? color) === c && "ring-2 ring-ring",
+                  )}
+                  style={{ background: c }}
+                />
+              ))}
+            </PopoverContent>
+          </Popover>
+          <ToolButton label={magnet ? "Magnet on (snaps to OHLC)" : "Magnet off"} active={magnet} onClick={() => setMagnet((m) => !m)}>
+            <Magnet className="h-4 w-4" />
+          </ToolButton>
+          <ToolButton
+            label={drawingsVisible ? "Hide drawings" : "Show drawings"}
+            active={!drawingsVisible}
+            onClick={() => setDrawingsVisible((v) => !v)}
+          >
+            {drawingsVisible ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
+          </ToolButton>
+          <ToolButton
+            label={selected ? "Delete selected drawing (Del)" : "Remove all drawings"}
+            disabled={!drawings.length}
+            onClick={() => {
+              if (selected) {
+                setDrawings((cur) => cur.filter((d) => d.id !== selected.id));
+                setSelectedId(null);
+              } else if (window.confirm("Remove all drawings from the chart?")) {
+                setDrawings([]);
+              }
+            }}
+          >
+            <Trash2 className="h-4 w-4" />
+          </ToolButton>
+      </>
+    );
+  }
+
   const popClass = cn("font-sans subpixel-antialiased", theme === "dark" && "dark terminal-dark border-border bg-popover text-popover-foreground");
   const railBtn = "relative flex h-9 w-11 items-center justify-center rounded-r-full text-gc-ink-muted transition-colors hover:bg-gc-console-rail-active/60 data-[state=open]:bg-gc-console-rail-active data-[state=open]:text-gc-ink data-[state=open]:before:absolute data-[state=open]:before:inset-y-0 data-[state=open]:before:left-0 data-[state=open]:before:w-[3px] data-[state=open]:before:rounded-full data-[state=open]:before:bg-gc-ink dark:text-muted-foreground dark:hover:bg-accent dark:data-[state=open]:bg-accent dark:data-[state=open]:before:bg-foreground";
 
@@ -628,6 +706,16 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
       >
         <Code className="h-[18px] w-[18px]" />
       </button>
+      <span className="my-1 ml-3 h-px w-6 bg-border" aria-hidden="true" />
+      <button type="button" onClick={downloadSnapshot} aria-label="Download chart snapshot" title="Download chart snapshot" className={railBtn}>
+        <Camera className="h-[18px] w-[18px]" />
+      </button>
+      <button type="button" onClick={() => chartRef.current?.fit()} aria-label="Reset chart view" title="Reset view" className={railBtn}>
+        <RotateCcw className="h-[18px] w-[18px]" />
+      </button>
+      <button type="button" onClick={() => void toggleFullscreen()} aria-label={fullscreen ? "Exit fullscreen chart" : "Fullscreen chart"} title={fullscreen ? "Exit fullscreen" : "Fullscreen chart"} className={railBtn}>
+        {fullscreen ? <Minimize2 className="h-[18px] w-[18px]" /> : <Maximize2 className="h-[18px] w-[18px]" />}
+      </button>
       {railSlot && <div className="mt-auto flex flex-col items-start gap-1">{railSlot}</div>}
     </nav>
   );
@@ -657,6 +745,9 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
             {mobileToolsOpen ? <PanelLeftClose className="h-4 w-4" /> : <PanelLeftOpen className="h-4 w-4" />}
           </button>
           <span className="hidden md:inline-flex"><XauUsdLogo size={22} /></span>
+        </div>
+        <div className="hidden shrink-0 items-center gap-0.5 md:flex" role="toolbar" aria-label="Drawing tools">
+          {renderTools(false)}
         </div>
         <div className="flex shrink-0 items-center md:hidden" role="group" aria-label="Chart timeframe">
           {timeframes.map((item) => (
@@ -735,7 +826,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
               type="button"
               onClick={downloadSnapshot}
               aria-label="Download chart snapshot"
-              className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground"
+              className="flex md:hidden h-7 w-7 shrink-0 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground"
             >
               <Camera className="h-3.5 w-3.5" />
             </button>
@@ -748,7 +839,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
               type="button"
               onClick={() => chartRef.current?.fit()}
               aria-label="Reset chart view"
-              className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground"
+              className="flex md:hidden h-7 w-7 shrink-0 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground"
             >
               <RotateCcw className="h-3.5 w-3.5" />
             </button>
@@ -761,7 +852,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
               type="button"
               onClick={() => void toggleFullscreen()}
               aria-label={fullscreen ? "Exit fullscreen chart" : "Fullscreen chart"}
-              className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground"
+              className="flex md:hidden h-7 w-7 shrink-0 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground"
             >
               {fullscreen ? <Minimize2 className="h-3.5 w-3.5" /> : <Maximize2 className="h-3.5 w-3.5" />}
             </button>
@@ -787,7 +878,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
         <nav
           aria-label="Drawing tools"
           className={cn(
-            "w-11 shrink-0 flex-col items-center gap-0.5 overflow-y-auto border-r border-border py-1.5 md:flex",
+            "w-11 shrink-0 flex-col items-center gap-0.5 overflow-y-auto border-r border-border py-1.5 md:hidden",
             mobileToolsOpen ? "flex" : "hidden",
           )}
         >
@@ -800,77 +891,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
           >
             <PanelLeftClose className="h-4 w-4" />
           </button>
-          {TOOLS.map((t) => (
-            <ToolButton key={t.id} label={t.label} active={tool === t.id} onClick={() => setTool(t.id)}>
-              <t.icon className="h-4 w-4" />
-            </ToolButton>
-          ))}
-          <ToolButton label={TOOL_LABELS.long} active={tool === "long"} onClick={() => setTool("long")}>
-            <PositionToolIcon side="long" />
-          </ToolButton>
-          <ToolButton label={TOOL_LABELS.short} active={tool === "short"} onClick={() => setTool("short")}>
-            <PositionToolIcon side="short" />
-          </ToolButton>
-          <span className="my-1 h-px w-6 bg-border" aria-hidden="true" />
-          <Popover>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <PopoverTrigger asChild>
-                  <button
-                    type="button"
-                    aria-label="Drawing color"
-                    className="flex h-8 w-8 items-center justify-center rounded-md hover:bg-accent"
-                  >
-                    <span className="h-4 w-4 rounded-full ring-2 ring-background" style={{ background: selected?.color ?? color }} />
-                  </button>
-                </PopoverTrigger>
-              </TooltipTrigger>
-              <TooltipContent side="right">Drawing color</TooltipContent>
-            </Tooltip>
-            <PopoverContent side="right" className={cn("flex w-auto gap-1.5 p-2", theme === "dark" && "dark terminal-dark")}>
-              {DRAWING_COLORS.map((c) => (
-                <button
-                  type="button"
-                  key={c}
-                  aria-label={`Use color ${c}`}
-                  onClick={() => {
-                    setColor(c);
-                    if (selectedId)
-                      setDrawings((cur) => cur.map((d) => (d.id === selectedId ? { ...d, color: c } : d)));
-                  }}
-                  className={cn(
-                    "h-6 w-6 rounded-full ring-offset-2 ring-offset-background",
-                    (selected?.color ?? color) === c && "ring-2 ring-ring",
-                  )}
-                  style={{ background: c }}
-                />
-              ))}
-            </PopoverContent>
-          </Popover>
-          <ToolButton label={magnet ? "Magnet on (snaps to OHLC)" : "Magnet off"} active={magnet} onClick={() => setMagnet((m) => !m)}>
-            <Magnet className="h-4 w-4" />
-          </ToolButton>
-          <ToolButton
-            label={drawingsVisible ? "Hide drawings" : "Show drawings"}
-            active={!drawingsVisible}
-            onClick={() => setDrawingsVisible((v) => !v)}
-          >
-            {drawingsVisible ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
-          </ToolButton>
-          <ToolButton
-            label={selected ? "Delete selected drawing (Del)" : "Remove all drawings"}
-            disabled={!drawings.length}
-            onClick={() => {
-              if (selected) {
-                setDrawings((cur) => cur.filter((d) => d.id !== selected.id));
-                setSelectedId(null);
-              } else if (window.confirm("Remove all drawings from the chart?")) {
-                setDrawings([]);
-              }
-            }}
-          >
-            <Trash2 className="h-4 w-4" />
-          </ToolButton>
+          {renderTools(true)}
         </nav>
 
         <div className="flex min-h-0 min-w-0 flex-1 flex-col">
