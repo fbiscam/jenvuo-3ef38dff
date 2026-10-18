@@ -11,7 +11,7 @@ export type PublicApiModelId = (typeof PUBLIC_API_MODEL_IDS)[number];
 const GATEWAY_BY_ID: Record<PublicApiModelId, readonly string[]> = {
   "claude-opus-5": ["codecraft/claude-opus-5", "codecraft/claude-fable-5.1"],
   "claude-fable-5.1": ["codecraft/claude-fable-5.1", "codecraft/claude-opus-5.5"],
-  "gpt-5.5": ["codecraft/gpt-5.5", "codecraft/grok-4.6"],
+  "gpt-5.5": ["codecraft/gpt-5.5", "codecraft/claude-opus-5"],
 };
 
 // Legacy / convenience aliases so older integrations keep working.

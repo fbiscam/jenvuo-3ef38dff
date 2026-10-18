@@ -119,6 +119,10 @@
   --color-gc-success: var(--gc-success);
   --color-gc-nav-active: var(--gc-nav-active);
   --color-gc-notice: var(--gc-notice);
+  --color-gc-night: var(--gc-night);
+  --color-gc-night-soft: var(--gc-night-soft);
+  --color-gc-on-night: var(--gc-on-night);
+  --color-gc-on-night-muted: var(--gc-on-night-muted);
   --color-auth-action: var(--auth-action);
   --color-auth-action-foreground: var(--auth-action-foreground);
 }
@@ -194,6 +198,10 @@
   --gc-success: #188038;
   --gc-nav-active: #dbedfc;
   --gc-notice: #e9eef6;
+  --gc-night: #0b1424;
+  --gc-night-soft: #17233b;
+  --gc-on-night: #eef3ff;
+  --gc-on-night-muted: #9fb0cf;
   --auth-action: oklch(0.72 0.14 255);
   --auth-action-foreground: oklch(1 0 0);
 }
@@ -257,7 +265,7 @@
 
   html, body {
     min-height: 100%;
-    overflow-x: hidden;
+    overflow-x: clip;
     max-width: 100%;
   }
 
@@ -1304,4 +1312,17 @@ html body .dash-dark main.bg-white { background-color: oklch(0.165 0 0) !importa
   .jenvu-story-in, .jenvu-rise,
   .jenvu-logo-intro, .jenvu-logo-big.is-visible, .ask-jenvu-thinking { animation: none; }
   .jenvu-logo-big { opacity: 1; }
+}
+
+/* Industry pages (Solutions / Products): animated dark cards */
+@keyframes ind-candle { 0%,100% { transform: scaleY(1); } 50% { transform: scaleY(0.55); } }
+@keyframes ind-line { from { stroke-dashoffset: 600; } to { stroke-dashoffset: 0; } }
+@keyframes ind-pulse { 0%,100% { opacity: .35; } 50% { opacity: 1; } }
+@keyframes ind-rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+.ind-candle { transform-box: fill-box; transform-origin: center; animation: ind-candle 2.6s ease-in-out infinite; }
+.ind-line { stroke-dasharray: 600; animation: ind-line 2.2s ease-out forwards; }
+.ind-pulse { animation: ind-pulse 1.8s ease-in-out infinite; }
+.ind-rise { animation: ind-rise .45s ease-out both; }
+@media (prefers-reduced-motion: reduce) {
+  .ind-candle, .ind-line, .ind-pulse, .ind-rise { animation: none; stroke-dasharray: none; }
 }

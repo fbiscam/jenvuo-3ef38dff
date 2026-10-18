@@ -368,12 +368,12 @@ export function setCachedPlan<T>(key: string, value: T, ttlMs: number = PLAN_CAC
 // Sonnet 5 is advertised by /models but currently rejects live requests, so it
 // is intentionally excluded until the upstream active catalog supports it.
 // AI Analysis: CodeCraft top models only (all live-tested OK).
+// Grok 4.6 excluded — returns empty content on the current key.
 // Claude Sonnet 5 is excluded — advertised but rejects live requests.
 const PRIMARY_ANALYSIS_CHAIN = [
   "codecraft/claude-opus-5",
   "codecraft/claude-fable-5.1",
   "codecraft/claude-opus-5.5",
-  "codecraft/grok-4.6",
   "codecraft/gpt-5.5",
 ] as const;
 
@@ -381,8 +381,8 @@ const SENIOR_REVIEW_MODELS = PRIMARY_ANALYSIS_CHAIN;
 
 const FAST_CHAT_CHAIN = [
   "codecraft/claude-fable-5.1",
-  "codecraft/grok-4.6",
   "codecraft/gpt-5.5",
+  "codecraft/claude-opus-5",
 ] as const;
 
 // Vision: Grok/GPT excluded — Claude models verified for image content.
