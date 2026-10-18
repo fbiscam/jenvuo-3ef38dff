@@ -63,6 +63,7 @@ import { Route as OpsX9k27m4nIndexRouteImport } from './routes/ops-x9k2-7m4n.ind
 import { Route as OpsX9k27m4nHubRouteImport } from './routes/ops-x9k2-7m4n.hub'
 import { Route as OpsX9k27m4nLeadsCreditsRouteImport } from './routes/ops-x9k2-7m4n.leads-credits'
 import { Route as OpsX9k27m4nPaymentsRouteImport } from './routes/ops-x9k2-7m4n.payments'
+import { Route as StoriesSlugRouteImport } from './routes/stories.$slug'
 import { Route as StrategiesIctGoldTradingRouteImport } from './routes/strategies.ict-gold-trading'
 import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
 import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated/dashboard.index'
@@ -385,6 +386,11 @@ const OpsX9k27m4nPaymentsRoute = OpsX9k27m4nPaymentsRouteImport.update({
   id: '/payments',
   path: '/payments',
   getParentRoute: () => OpsX9k27m4nRoute,
+} as any)
+const StoriesSlugRoute = StoriesSlugRouteImport.update({
+  id: '/stories/$slug',
+  path: '/stories/$slug',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const StrategiesIctGoldTradingRoute =
   StrategiesIctGoldTradingRouteImport.update({
@@ -738,6 +744,7 @@ export interface FileRoutesByFullPath {
   '/ops-x9k2-7m4n/hub': typeof OpsX9k27m4nHubRoute
   '/ops-x9k2-7m4n/leads-credits': typeof OpsX9k27m4nLeadsCreditsRoute
   '/ops-x9k2-7m4n/payments': typeof OpsX9k27m4nPaymentsRoute
+  '/stories/$slug': typeof StoriesSlugRoute
   '/strategies/ict-gold-trading': typeof StrategiesIctGoldTradingRoute
   '/help/': typeof HelpIndexRoute
   '/insights/': typeof InsightsIndexRoute
@@ -840,6 +847,7 @@ export interface FileRoutesByTo {
   '/ops-x9k2-7m4n/hub': typeof OpsX9k27m4nHubRoute
   '/ops-x9k2-7m4n/leads-credits': typeof OpsX9k27m4nLeadsCreditsRoute
   '/ops-x9k2-7m4n/payments': typeof OpsX9k27m4nPaymentsRoute
+  '/stories/$slug': typeof StoriesSlugRoute
   '/strategies/ict-gold-trading': typeof StrategiesIctGoldTradingRoute
   '/help': typeof HelpIndexRoute
   '/insights': typeof InsightsIndexRoute
@@ -949,6 +957,7 @@ export interface FileRoutesById {
   '/ops-x9k2-7m4n/hub': typeof OpsX9k27m4nHubRoute
   '/ops-x9k2-7m4n/leads-credits': typeof OpsX9k27m4nLeadsCreditsRoute
   '/ops-x9k2-7m4n/payments': typeof OpsX9k27m4nPaymentsRoute
+  '/stories/$slug': typeof StoriesSlugRoute
   '/strategies/ict-gold-trading': typeof StrategiesIctGoldTradingRoute
   '/help/': typeof HelpIndexRoute
   '/insights/': typeof InsightsIndexRoute
@@ -1058,6 +1067,7 @@ export interface FileRouteTypes {
     | '/ops-x9k2-7m4n/hub'
     | '/ops-x9k2-7m4n/leads-credits'
     | '/ops-x9k2-7m4n/payments'
+    | '/stories/$slug'
     | '/strategies/ict-gold-trading'
     | '/help/'
     | '/insights/'
@@ -1160,6 +1170,7 @@ export interface FileRouteTypes {
     | '/ops-x9k2-7m4n/hub'
     | '/ops-x9k2-7m4n/leads-credits'
     | '/ops-x9k2-7m4n/payments'
+    | '/stories/$slug'
     | '/strategies/ict-gold-trading'
     | '/help'
     | '/insights'
@@ -1268,6 +1279,7 @@ export interface FileRouteTypes {
     | '/ops-x9k2-7m4n/hub'
     | '/ops-x9k2-7m4n/leads-credits'
     | '/ops-x9k2-7m4n/payments'
+    | '/stories/$slug'
     | '/strategies/ict-gold-trading'
     | '/help/'
     | '/insights/'
@@ -1362,6 +1374,7 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
   Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
+  StoriesSlugRoute: typeof StoriesSlugRoute
   StrategiesIctGoldTradingRoute: typeof StrategiesIctGoldTradingRoute
   HelpIndexRoute: typeof HelpIndexRoute
   DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
@@ -1768,6 +1781,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/ops-x9k2-7m4n/payments'
       preLoaderRoute: typeof OpsX9k27m4nPaymentsRouteImport
       parentRoute: typeof OpsX9k27m4nRoute
+    }
+    '/stories/$slug': {
+      id: '/stories/$slug'
+      path: '/stories/$slug'
+      fullPath: '/stories/$slug'
+      preLoaderRoute: typeof StoriesSlugRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/strategies/ict-gold-trading': {
       id: '/strategies/ict-gold-trading'
@@ -2335,6 +2355,7 @@ const rootRouteChildren: RootRouteChildren = {
   TermsRoute: TermsRoute,
   Char91DotwellKnownChar93OauthProtectedResourceRoute:
     Char91DotwellKnownChar93OauthProtectedResourceRoute,
+  StoriesSlugRoute: StoriesSlugRoute,
   StrategiesIctGoldTradingRoute: StrategiesIctGoldTradingRoute,
   HelpIndexRoute: HelpIndexRoute,
   DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,

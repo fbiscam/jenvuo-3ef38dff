@@ -1,5 +1,5 @@
 import { createFileRoute, notFound, Link } from "@tanstack/react-router";
-import { PageShell, Feature, Banner, Stats, StoryCards, H2, UL } from "@/components/PageShell";
+import { PageShell, Feature, Banner, Stats, StoryCards, UL } from "@/components/PageShell";
 import { STORIES, getStory } from "@/lib/stories";
 
 export const Route = createFileRoute("/stories/$slug")({
@@ -77,10 +77,6 @@ function StoryPage() {
         }
         stats={story.stats}
       />
-
-      <div className="mx-auto max-w-[1040px] px-5 sm:px-8">
-        <H2>{""}</H2>
-      </div>
 
       <StoryCards
         title="More stories"
