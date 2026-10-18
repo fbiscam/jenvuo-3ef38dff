@@ -56,7 +56,8 @@ export const askJenvu = createServerFn({ method: "POST" })
         // which used to cut answers off halfway.
         maxTokens: 4000,
         rejectTruncated: true,
-        retriesPerModel: 2,
+        retriesPerModel: 1,
+        attemptTimeoutMs: 20000,
         stage: "ask-jenvu",
       });
       return parse(content);
