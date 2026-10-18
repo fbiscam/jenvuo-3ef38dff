@@ -748,7 +748,7 @@ function TerminalPage() {
                     <button
                       type="button"
                       onClick={() => setDeskOpen(true)}
-                      className="flex h-7 items-center gap-1.5 rounded-full bg-gc-blue-soft px-3 text-xs font-medium text-gc-blue transition-colors hover:bg-gc-nav-active dark:bg-accent dark:text-foreground"
+                      className="flex h-7 items-center gap-1.5 rounded-full border border-gc-line bg-background px-3 text-xs font-medium text-foreground transition-colors hover:bg-muted dark:bg-accent dark:text-foreground"
                       title="Ask With AI"
                       aria-label="Ask With AI"
                     >
@@ -889,9 +889,9 @@ function TerminalPage() {
                     <div className="space-y-4">
                       <div className="flex gap-2.5 text-sm leading-6">
                         <img
-                          src={askJenvuMark}
+                          src="/favicon.png"
                           alt=""
-                          className="mt-1 h-4 w-auto shrink-0 object-contain"
+                          className="mt-0.5 h-6 w-6 shrink-0 rounded-md object-contain"
                         />
                         <p>
                           Ask about the chart you are looking at. I use live gold data for the
