@@ -394,7 +394,7 @@ function CustomTopUp({ signedOut }: { signedOut: boolean }) {
         <div className="max-w-[720px]">
           <h3 className="text-[22px] font-normal">Pick your own amount</h3>
           <p className="mt-2 text-[15px] leading-[1.6] text-gc-ink-muted">
-            Minimum $5. $1 top-up = $1 wallet. Primary requests cost $0.03; completed seniorreviewed analysis costs $0.20. Every $3 of balance unlocks 1,000,000 tokens
+            Minimum $5. $1 top-up = $1 wallet. Primary requests cost $0.03; completed senior reviewed analysis costs $0.20. Every $3 of balance unlocks 1,000,000 tokens
           </p>
         </div>
         <div className="flex shrink-0 flex-wrap items-center gap-4 lg:flex-nowrap">
