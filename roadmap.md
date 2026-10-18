@@ -35,3 +35,6 @@
 - [x] Terminal: drawing tools moved to chart top bar; fullscreen/refresh/snapshot etc. moved to side bar under Script
 - [x] Homepage search opens from left after logo; site results + AI answer when nothing matches
 - [x] Docs and Settings pages restyled to homepage look
+- [x] Terminal: theme, market-closed and news buttons removed from chart top bar
+- [x] Terminal: drawing tools (incl. long/short) moved into a "Draw" side-bar button under Script
+- [x] Terminal: candle timer and News (upcoming + previous 5) in the side bar above Ask AI
