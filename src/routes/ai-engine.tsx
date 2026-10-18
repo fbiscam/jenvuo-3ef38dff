@@ -1,12 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { PageShell, Feature, Banner, Stats, StoryCards } from "@/components/PageShell";
-import brain from "@/assets/feat-brain.jpg";
+import { IndustryPage, type IndustryContent } from "@/components/industry/IndustryPage";
 
 export const Route = createFileRoute("/ai-engine")({
   head: () => ({
     meta: [
-      { title: "Products — Jenvu AI Engine & Terminal" },
-      { name: "description", content: "Jenvu products: the gold Terminal, the AI engine, rule-based analysis engines, alerts and the developer API." },
+      { title: "Products — Jenvu Terminal, AI Engine & API" },
+      { name: "description", content: "Jenvu products: the gold Terminal, the AI engine, rule-based analysis engines, alerts, demo trading and the developer API." },
       { property: "og:title", content: "Products — Jenvu" },
       { property: "og:description", content: "The Jenvu Terminal, AI engine, analysis engines, alerts and API for XAU/USD traders." },
       { property: "og:url", content: "https://jenvu.com/ai-engine" },
@@ -15,68 +14,101 @@ export const Route = createFileRoute("/ai-engine")({
     ],
     links: [{ rel: "canonical", href: "https://jenvu.com/ai-engine" }],
   }),
-  component: AIPage,
+  component: () => <IndustryPage c={CONTENT} />,
 });
 
-function AIPage() {
-  return (
-    <PageShell
-      wide
-      eyebrow="\n"
-      title="Jenvu products"
-      intro="One platform for gold: a live Terminal, an AI engine that explains the chart, rule-based analysis engines, alerts and an API for developers."
-    >
-      <Feature
-        title="The AI engine"
-        text={
-          <p>
-            A multi-stage pipeline reads the live XAU/USD chart, maps structure, liquidity, zones and
-            sessions, then explains what it sees in plain language. Levels are drawn on the chart only
-            when you ask for analysis.
-          </p>
-        }
-        linkLabel="Open the Terminal"
-        href="https://dash.jenvu.com/terminal"
-        media={<img src={brain} alt="Jenvu AI engine" width={1280} height={720} className="h-auto w-full" />}
-        caption="Perception, market context, reasoning and output"
-      />
-
-      <div className="px-4 py-6 sm:px-6">
-        <Banner title="Rules first, AI second">
-          Swings, BOS/CHoCH, zones, fair value gaps and sweeps come from fixed rules, so the same
-          candles always give the same marks. The AI explains them; it never invents them.{" "}
-          <a href="https://jenvu.com/docs">Read the docs</a>.
-        </Banner>
-      </div>
-
-      <Stats
-        title="What's included"
-        text={
-          <p>
-            The Terminal with live gold candles and ICT/SMC overlays, AI chat about the chart, seven
-            deterministic engines, price alerts, a $100,000 demo account, the browser extension and API
-            keys for your own tools.
-          </p>
-        }
-        linkLabel="See plans and pricing"
-        href="https://jenvu.com/pricing"
-        stats={[
-          { value: "7", label: "Rule-based analysis engines" },
-          { value: "4", label: "Sweep timeframes: 15M to 4H" },
-          { value: "$100K", label: "Demo trading balance" },
-          { value: "1", label: "Market: XAU/USD" },
-        ]}
-      />
-
-      <StoryCards
-        title="Learn more"
-        intro="Guides and help for every Jenvu product."
-        cards={[
-          { title: "ICT and SMC concepts on gold", href: "https://jenvu.com/strategies/ict-gold-trading", cta: "Read the guide" },
-          { title: "Everything about Jenvu, A to Z", href: "https://jenvu.com/docs", cta: "Open docs" },
-          { title: "Questions about plans or the Terminal", href: "https://support.jenvu.com", cta: "Visit help center" },
-        ]}
-      />
-    </PageShell>
-  );
-}
+const CONTENT: IndustryContent = {
+  pill: "Jenvu products",
+  title: "One platform for trading gold",
+  intro:
+    "A live Terminal, an AI engine that explains the chart, rule-based analysis engines, alerts and an API, all built for XAU/USD.",
+  heroCaption: "The Terminal, AI engine and API working on one live gold chart.",
+  solutionsTitle: "Everything you need in one place",
+  solutionsIntro: "Start with the Terminal and add the tools you need.",
+  solutions: [
+    {
+      title: "Terminal",
+      text: "Live XAU/USD candles with structure, zones, gaps, sweeps and sessions drawn for you.",
+      link: "Explore the Terminal",
+      href: "https://dash.jenvu.com/terminal",
+    },
+    {
+      title: "AI engine",
+      text: "Ask a question about the chart and get a short answer about only what you asked.",
+      link: "Explore the AI engine",
+      href: "/stories/ai-desk-updates",
+    },
+    {
+      title: "Developer API",
+      text: "Create API keys and bring Jenvu analysis into your own apps and bots.",
+      link: "Explore the API",
+      href: "/stories/build-with-jenvu",
+    },
+  ],
+  topicsTitle: "How the products work",
+  topics: [
+    {
+      label: "Analysis engines",
+      title: "Seven rule-based engines",
+      text: "Each engine handles one job, like structure, zones or sessions, using fixed rules.",
+      points: ["Same candles always give the same marks", "Closed candles only, no repainting", "Results feed the Terminal and the AI"],
+      link: "Read the docs",
+      href: "https://jenvu.com/docs",
+    },
+    {
+      label: "AI chat",
+      title: "AI chat on the chart",
+      text: "The AI reads what the engines found and explains it in plain language.",
+      points: ["Answers only the question asked", "Levels drawn only when you ask for analysis", "No fixed win-rate claims"],
+      link: "See what's new",
+      href: "/stories/ai-desk-updates",
+    },
+    {
+      label: "Alerts",
+      title: "Price alerts",
+      text: "Set the level you care about and get notified when gold reaches it.",
+      points: ["Alerts in the dashboard", "Works while you are away", "Manage alerts any time"],
+      link: "Read the docs",
+      href: "https://jenvu.com/docs",
+    },
+    {
+      label: "Demo trading",
+      title: "Demo trading",
+      text: "Practise on live prices with a $100,000 demo balance before you risk real money.",
+      points: ["Live gold prices", "Track open and closed trades", "Reset when you want a fresh start"],
+      link: "Learn about demo trading",
+      href: "/stories/demo-trading",
+    },
+    {
+      label: "Billing and credits",
+      title: "Plans and credits",
+      text: "Pick Pro, Elite or Ultra and top up your wallet when you need more AI usage.",
+      points: ["Free trial with $100 credit", "Clear usage in your dashboard", "Top up from $5"],
+      link: "See pricing",
+      href: "https://jenvu.com/pricing",
+    },
+  ],
+  whyTitle: "Why build on Jenvu",
+  why: [
+    { title: "Made only for gold", text: "Every product is tuned for XAU/USD, from sessions to weekend closure." },
+    { title: "Rules you can check", text: "Analysis comes from fixed rules, so results can be repeated and reviewed." },
+    { title: "Honest AI", text: "The AI explains the chart. It never claims human experience or promises results." },
+    { title: "Your data stays yours", text: "API keys and connected tools see only your own account's data." },
+  ],
+  whyCardTitle: "Built for XAU/USD from the ground up.",
+  whyCardText: "Jenvu does not promise profits or fixed win rates. Trading gold carries real risk.",
+  storiesTitle: "Latest product stories",
+  storySlugs: ["ai-desk-updates", "rvol-and-volume-direction", "build-with-jenvu"],
+  productsTitle: "Explore all products",
+  products: [
+    { title: "Jenvu Terminal", text: "Live gold chart with ICT/SMC overlays.", href: "https://dash.jenvu.com/terminal" },
+    { title: "AI engine", text: "Plain-language answers about the chart.", href: "/stories/ai-desk-updates" },
+    { title: "Fresh sweep detection", text: "Confirmed sweeps on 15M, 1H, 2H and 4H.", href: "/stories/fresh-sweep-detection" },
+    { title: "Volume and RVOL", text: "Volume spikes and buyer/seller share.", href: "/stories/rvol-and-volume-direction" },
+    { title: "Demo trading", text: "$100,000 demo account on live prices.", href: "/stories/demo-trading" },
+    { title: "Developer API", text: "API keys for your own tools.", href: "/stories/build-with-jenvu" },
+    { title: "Daily gold insights", text: "A short daily read on gold.", href: "/stories/daily-gold-insights" },
+    { title: "Session tools", text: "London and New York windows on the chart.", href: "/stories/london-new-york-sessions" },
+    { title: "Ask Jenvu", text: "Ask anything about Jenvu from any page.", href: "https://support.jenvu.com" },
+  ],
+};
