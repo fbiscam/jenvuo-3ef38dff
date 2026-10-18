@@ -1,27 +1,35 @@
 import SiteHeader from "@/components/SiteHeader";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import * as React from "react";
+import { ChevronDown, ChevronsUpDown } from "lucide-react";
 import SiteFooter from "@/components/SiteFooter";
-import HeaderAuthButtons from "@/components/HeaderAuthButtons";
+import { NextStep } from "@/components/PageShell";
 import { useCurrentPlan } from "@/hooks/useCurrentPlan";
 import { useUpgradeLock } from "@/hooks/useUpgradeLock";
 import { useTrial } from "@/hooks/useTrial";
-
-import { Zap, Crown } from "lucide-react";
 import xaiLogo from "@/assets/xai-logo.png";
 import openAiLogo from "@/assets/openai-logo.png";
 import claudeLogo from "@/assets/claude-logo.png";
+import estimateImg from "@/assets/pricing/estimate.jpg";
+import spendingImg from "@/assets/pricing/spending.jpg";
 
-const MONO = "font-['Google_Sans','Product_Sans','Roboto',system-ui,sans-serif] font-normal normal-case tracking-normal";
 const SANS = "font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif]";
+const LINK = "text-gc-blue-deep underline underline-offset-2 hover:text-gc-navy";
+
+export const FAQ = [
+  ["Is this financial advice?", "No. Jenvu is an analysis tool. Every setup is for educational purposes and you remain responsible for your own trades."],
+  ["How does the free trial work?", "After signing up, click “Start free” in your dashboard. You get $100 credit and 14 days of Pro access, once per account."],
+  ["Can I cancel anytime?", "Yes. Plans are month-to-month with no lock-in. You keep access until the end of the period you already paid for."],
+  ["What markets are covered?", "Gold only. Jenvu focuses on XAU/USD."],
+];
 
 export const Route = createFileRoute("/pricing")({
   head: () => ({
     meta: [
-      { title: "Pricing Plans — Jenvu" },
-      { name: "description", content: "Compare Jenvu plans, API key limits, monthly AI wallets, and senior-reviewed GPT/Claude market analysis." },
-      { property: "og:title", content: "Jenvu Pricing — Pro & Elite Plans" },
-      { property: "og:description", content: "Compare Jenvu plans with API keys, AI wallets, and senior-reviewed GPT/Claude market analysis." },
+      { title: "Jenvu Pricing — Pro, Elite and Ultra Plans" },
+      { name: "description", content: "Transparent Jenvu pricing: Pro $10, Elite $25 and Ultra $50 a month, $3 per million tokens, plus $100 free credit and 14 days of Pro for new users." },
+      { property: "og:title", content: "Jenvu pricing" },
+      { property: "og:description", content: "Pro, Elite and Ultra plans for the Jenvu gold Terminal, with $100 free credit to start." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { property: "og:url", content: "https://jenvu.com/pricing" },
@@ -33,11 +41,7 @@ export const Route = createFileRoute("/pricing")({
         children: JSON.stringify({
           "@context": "https://schema.org",
           "@type": "FAQPage",
-          mainEntity: FAQ.map(([q, a]) => ({
-            "@type": "Question",
-            name: q,
-            acceptedAnswer: { "@type": "Answer", text: a },
-          })),
+          mainEntity: FAQ.map(([q, a]) => ({ "@type": "Question", name: q, acceptedAnswer: { "@type": "Answer", text: a } })),
         }),
       },
     ],
@@ -45,81 +49,25 @@ export const Route = createFileRoute("/pricing")({
   component: PricingPage,
 });
 
-
-const TIERS = [
-  {
-    id: "pro",
-    name: "Pro",
-    price: 10,
-    icon: Zap,
-    bestFor: "Active trader",
-    tagline: "For serious gold traders.",
-    cta: "Notify me when live",
-    ctaTo: "/contact",
-    credits: 10,
-    features: [
-
-      "AI terminal chat",
-      "A+ / A institutional signals",
-      "Institutional-grade signal engine",
-      "Deterministic 1H reversal pressure",
-      "Full ICT / SMC breakdown",
-      "Trade journal & analytics",
-      "Multi-timeframe bias engine",
-      "2 API keys · $10 AI wallet",
-      "ChatGPT 5.5 Pro primary analysis",
-    ],
-
-    highlight: true,
-  },
-  {
-    id: "elite",
-    name: "Elite",
-    price: 25,
-    icon: Crown,
-    bestFor: "Desk / fund",
-    tagline: "For prop desks & funds.",
-    cta: "Talk to sales",
-    ctaTo: "/contact",
-    credits: 25,
-    features: [
-
-      "AI terminal chat",
-      "Everything in Pro",
-      "Institutional-grade signal engine",
-      "Confirmed body-break + retest workflow",
-      "1H XAU/USD & BTC/USD pressure engine",
-      "API access & webhooks",
-      "3 API keys · $25 AI wallet",
-      "Claude Fable 5.1 senior review",
-      "API usage controls & request logs",
-      "Dedicated onboarding & SLA",
-    ],
-
-    highlight: false,
-  },
-] as const;
-
 type Mark = boolean | string;
-const MATRIX: Array<{ feature: string; free: Mark; pro: Mark; elite: Mark }> = [
-  { feature: "AI terminal chat", free: "Limited", pro: "$10 wallet", elite: "$25 wallet" },
-  { feature: "A+ signal access", free: true, pro: true, elite: true },
-  { feature: "AI models", free: "ChatGPT", pro: "ChatGPT + Claude + Grok", elite: "ChatGPT + Claude + Grok" },
-  { feature: "Chart-aware analysis", free: true, pro: true, elite: true },
-  { feature: "ICT / SMC breakdown", free: true, pro: true, elite: true },
-  { feature: "Multi-timeframe bias", free: true, pro: true, elite: true },
-  { feature: "Trade journal", free: true, pro: true, elite: true },
-  { feature: "1H XAU/USD & BTC/USD pressure", free: false, pro: true, elite: true },
-  { feature: "API keys", free: false, pro: "2", elite: "3" },
-  { feature: "API access & webhooks", free: false, pro: false, elite: true },
-  { feature: "Dedicated onboarding", free: false, pro: false, elite: true },
-];
-
-export const FAQ = [
-  ["Is this financial advice?", "No. Jenvu is an institutional-grade analysis tool. Every setup is for educational purposes. You remain responsible for your trades."],
-  ["When does billing go live?", "We're finalising our payment infrastructure. Join the waitlist via the CTA above — you'll be notified the moment Pro is purchasable."],
-  ["Can I cancel anytime?", "Yes. Subscriptions are month-to-month with no lock-in. You'll keep access until the end of the billing cycle."],
-  ["What markets are covered?", "Gold only. Jenvu trades XAU/USD exclusively — with DXY overlay for confluence."],
+const COMPARE: ReadonlyArray<{ f: string; b: Mark; c: Mark; d: Mark }> = [
+  { f: "Monthly AI wallet", b: "$10", c: "$25", d: "$50" },
+  { f: "Daily token limit", b: "1.5M", c: "5M", d: "10M" },
+  { f: "Balance-based quota ($3 = 1M tokens)", b: true, c: true, d: true },
+  { f: "Active API keys", b: "2", c: "3", d: "5" },
+  { f: "AI models", b: "__MODELS__", c: "__MODELS__", d: "__MODELS__" },
+  { f: "ChatGPT 5.5 Pro primary analysis", b: true, c: true, d: true },
+  { f: "Claude Fable 5.1 senior review", b: false, c: true, d: true },
+  { f: "Chat / primary request", b: "$0.03", c: "$0.03", d: "$0.03" },
+  { f: "Senior-reviewed analysis", b: false, c: "$0.20", d: "$0.20" },
+  { f: "Live chart analysis", b: "Realtime", c: "Realtime", d: "Realtime" },
+  { f: "ICT / SMC breakdown", b: true, c: true, d: true },
+  { f: "Multi-timeframe bias", b: true, c: true, d: true },
+  { f: "Trade journal", b: true, c: true, d: true },
+  { f: "1H XAU/USD reversal pressure", b: true, c: true, d: true },
+  { f: "API access & webhooks", b: false, c: true, d: true },
+  { f: "API usage controls & request logs", b: false, c: true, d: true },
+  { f: "Priority desk support", b: false, c: false, d: true },
 ];
 
 function PricingPage() {
@@ -128,256 +76,307 @@ function PricingPage() {
   const trial = useTrial();
   const signedOut = currentPlan === null;
   const [billing, setBilling] = React.useState<"monthly" | "annual">("monthly");
-  const priceOf = (t: { id: string; price: number }) => {
-    const base = signedOut && t.id === "pro" ? 5 : t.price;
+  const priceOf = (id: string, price: number) => {
+    const base = signedOut && id === "pro" ? 5 : price;
     return billing === "annual" && base > 0 ? Math.round((base * 12 * 0.83) / 10) * 10 : base;
   };
   const suffix = billing === "annual" ? "/yr" : "/mo";
-  return (
-    <div className={`public-cloudflare min-h-dvh w-full bg-background text-foreground ${SANS} antialiased pricing-zoom md:[zoom:1.375] origin-top`}>
+  const [open, setOpen] = React.useState<number[]>([]);
+  const allOpen = open.length === FAQ.length;
 
-      {/* HEADER */}
+  const plans = [
+    { key: "pro" as const, name: "Pro", price: priceOf("pro", 10), description: "For active traders who need precise primary analysis.", wallet: "$10 AI wallet" },
+    { key: "elite" as const, name: "Elite", price: priceOf("elite", 25), description: "For trading desks that want a senior-reviewed signal.", wallet: "$25 AI wallet" },
+    { key: "ultra" as const, name: "Ultra", price: priceOf("ultra", 50), description: "For high-volume desks needing maximum review capacity.", wallet: "$50 AI wallet" },
+  ];
+
+  return (
+    <div className={`public-cloudflare jenvu-zoom min-h-dvh w-full bg-background text-gc-ink ${SANS} antialiased`}>
       <SiteHeader />
 
       {/* HERO */}
-      <section className="border-b border-border bg-background">
-        <div className="mx-auto max-w-5xl px-5 pb-20 pt-20 text-center sm:px-6 sm:pb-24 sm:pt-28">
-          <h1 className="text-4xl font-semibold leading-tight sm:text-5xl">
-            Jenvu pricing plans for the XAU/USD trading terminal
-          </h1>
-          <p className="mx-auto mt-3 max-w-2xl text-sm leading-relaxed text-muted-foreground sm:text-base">
-            Start with the plan that fits your trading desk. Every paid plan includes a monthly AI wallet billed by actual token use.
-          </p>
-          <div className="mx-auto mt-8 inline-flex items-center rounded-full border border-border bg-background p-1 shadow-sm" aria-label="Billing cycle">
-            <button type="button" onClick={() => setBilling("monthly")} className={`rounded-full px-5 py-2 text-sm font-medium transition ${billing === "monthly" ? "bg-home-accent text-home-accent-foreground" : "text-muted-foreground hover:text-foreground"}`}>Monthly</button>
-            <button type="button" onClick={() => setBilling("annual")} className={`rounded-full px-5 py-2 text-sm font-medium transition ${billing === "annual" ? "bg-home-accent text-home-accent-foreground" : "text-muted-foreground hover:text-foreground"}`}>Annual · save 17%</button>
-          </div>
+      <section className="mx-auto max-w-[900px] px-5 pb-14 pt-14 text-center sm:px-8 sm:pt-16">
+        <h1 className="text-[34px] font-normal leading-tight tracking-tight sm:text-[42px]">Jenvu pricing</h1>
+        <p className="mx-auto mt-5 max-w-[820px] text-[17px] leading-[1.65] text-gc-ink-muted">
+          Save money with Jenvu's simple, transparent pricing. Compare every feature in the{" "}
+          <a href="#compare" className={LINK}>plan comparison</a> or contact us to get a quote for your trading desk.
+        </p>
+        <div className="mt-8 flex flex-wrap justify-center gap-3">
+          <Link to="/contact" className="inline-flex h-12 items-center rounded-full bg-gc-blue-deep px-6 text-[16px] font-medium text-gc-on-blue hover:bg-gc-navy">
+            Request a quote
+          </Link>
+          <Link to="/auth" search={{ mode: "signup" } as never} className="inline-flex h-12 items-center rounded-full border border-gc-line bg-background px-6 text-[16px] font-medium text-gc-ink hover:bg-gc-surface">
+            Get started for free
+          </Link>
         </div>
       </section>
 
-
-      {/* PLAN CARDS + COMPARISON MATRIX */}
-      <section className="bg-background">
-        <div className="mx-auto max-w-7xl px-5 py-10 sm:px-8 sm:py-14">
-        <div className="grid overflow-hidden border border-border bg-background sm:grid-cols-3">
+      {/* START FOR FREE + STATS */}
+      <section className="mx-auto grid max-w-[1296px] items-center gap-10 px-5 py-10 sm:px-8 md:grid-cols-2 md:gap-14 lg:px-[72px]">
+        <div>
+          <h2 className="text-[28px] font-normal leading-tight">Start trading gold for free</h2>
+          <p className="mt-5 text-[17px] leading-[1.65] text-gc-ink-muted">
+            Create an account to see how Jenvu reads the gold market in real time. New users get{" "}
+            <Link to="/auth" search={{ mode: "signup" } as never} className={LINK}>$100 in free credit</Link> to run the AI desk, plus{" "}
+            <a href="#plans" className={LINK}>14 days of Pro access</a>, started with one click from the dashboard.
+          </p>
+        </div>
+        <div className="grid grid-cols-2 gap-8">
           {[
-            { name: "Pro", price: signedOut ? priceOf({ id: "pro", price: 10 }) : priceOf({ id: "pro", price: 10 }), description: "For active traders who need precise primary analysis.", wallet: "$10 AI wallet", key: "pro" as const },
-            { name: "Elite", price: priceOf({ id: "elite", price: 25 }), description: "For trading desks that require a senior-reviewed signal.", wallet: "$25 AI wallet", key: "elite" as const },
-            { name: "Ultra", price: priceOf({ id: "ultra", price: 50 }), description: "For high-volume desks needing maximum review capacity.", wallet: "$50 AI wallet", key: "ultra" as const },
-          ].map((plan) => {
+            { value: "$100", label: "in free credit" },
+            { value: "14", label: "days of Pro access" },
+          ].map((s) => (
+            <div key={s.label} className="text-center">
+              <p className="text-[56px] font-normal leading-none text-gc-success sm:text-[72px]">{s.value}</p>
+              <div className="mx-auto my-6 h-px w-1/2 bg-gc-line" />
+              <p className="text-[16px] text-gc-ink">{s.label}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* TWO COLUMNS */}
+      <section className="mx-auto grid max-w-[1296px] gap-10 px-5 py-14 sm:px-8 md:grid-cols-2 md:gap-14 lg:px-[72px]">
+        <div>
+          <h2 className="text-[28px] font-normal leading-tight">Only pay for what you use</h2>
+          <p className="mt-5 text-[17px] leading-[1.65] text-gc-ink-muted">
+            Every plan includes a monthly AI wallet billed by actual token use, at $3 per million tokens. No up-front fees and no termination charges —{" "}
+            <a href="#compare" className={LINK}>view the full comparison.</a>
+          </p>
+        </div>
+        <div>
+          <h2 className="text-[28px] font-normal leading-tight">Save 17% with annual billing</h2>
+          <p className="mt-5 text-[17px] leading-[1.65] text-gc-ink-muted">
+            Pay once a year instead of monthly and keep the same features for less. Switch the toggle in the{" "}
+            <a href="#plans" className={LINK}>plans section</a> to see annual prices for Pro, Elite and Ultra.
+          </p>
+        </div>
+      </section>
+
+      {/* ESTIMATE YOUR COSTS */}
+      <section className="mx-auto grid max-w-[1296px] items-start gap-10 px-5 py-14 sm:px-8 md:grid-cols-2 md:gap-14 lg:px-[72px]">
+        <div>
+          <h2 className="text-[28px] font-normal leading-tight">Estimate your costs</h2>
+          <p className="mt-5 text-[17px] leading-[1.65] text-gc-ink-muted">
+            Understand how your costs change with the number of AI requests and reviews you run. Use the{" "}
+            <a href="#top-up" className={LINK}>custom amount tool</a>, or get a custom quote by talking to our{" "}
+            <Link to="/contact" className={LINK}>team</Link>.
+          </p>
+        </div>
+        <figure className="overflow-hidden rounded-2xl border border-gc-line">
+          <img src={estimateImg} alt="Jenvu cost estimate tool" width={1280} height={720} loading="lazy" className="h-auto w-full" />
+        </figure>
+      </section>
+
+      {/* STAY IN CONTROL */}
+      <section className="mx-auto grid max-w-[1296px] items-start gap-10 px-5 py-14 sm:px-8 md:grid-cols-2 md:gap-14 lg:px-[72px]">
+        <figure className="order-2 md:order-1">
+          <div className="overflow-hidden rounded-2xl border border-gc-line">
+            <img src={spendingImg} alt="Jenvu usage dashboard" width={1280} height={720} loading="lazy" className="h-auto w-full" />
+          </div>
+          <figcaption className="mt-3 text-[13px] text-gc-ink-muted">See your current usage and spending at a glance</figcaption>
+        </figure>
+        <div className="order-1 md:order-2">
+          <h2 className="text-[28px] font-normal leading-tight">Stay in control of your spending</h2>
+          <p className="mt-5 text-[17px] leading-[1.65] text-gc-ink-muted">
+            <a href="https://dash.jenvu.com/usage" className={LINK}>Track your usage</a> with daily token limits, wallet balances and request logs.{" "}
+            <a href="https://dash.jenvu.com/billing" className={LINK}>Manage billing</a> and top up only when you need to.
+          </p>
+          <p className="mt-5 text-[17px] leading-[1.65] text-gc-ink-muted">
+            We're here to help with <a href="https://support.jenvu.com" className={LINK}>billing support</a>.
+          </p>
+        </div>
+      </section>
+
+      {/* PLANS */}
+      <section id="plans" className="scroll-mt-24 mx-auto max-w-[1296px] px-5 py-14 sm:px-8 lg:px-[72px]">
+        <div className="text-center">
+          <h2 className="text-[34px] font-normal leading-tight sm:text-[38px]">Choose your plan</h2>
+          <div className="mx-auto mt-6 inline-flex items-center rounded-full border border-gc-line p-1" aria-label="Billing cycle">
+            {(["monthly", "annual"] as const).map((b) => (
+              <button
+                key={b}
+                type="button"
+                onClick={() => setBilling(b)}
+                className={`rounded-full px-5 py-2 text-[14px] font-medium transition ${billing === b ? "bg-gc-blue-deep text-gc-on-blue" : "text-gc-ink-muted hover:text-gc-ink"}`}
+              >
+                {b === "monthly" ? "Monthly" : "Annual · save 17%"}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div className="mt-10 grid gap-6 md:grid-cols-3">
+          {plans.map((plan) => {
             const trialPro = trial.active && plan.key === "pro";
             const isCurrent = currentPlan === plan.key && !trialPro;
             const disabled = currentPlan !== null && !isCurrent && !trialPro && upgradeLock.locked;
             const destination = currentPlan !== null ? "/dashboard/pay" : "/founding";
             return (
-              <article key={plan.name} className="flex min-h-64 flex-col border-b border-border p-6 last:border-b-0 sm:border-b-0 sm:border-r sm:last:border-r-0">
+              <article key={plan.key} className={`flex min-h-[280px] flex-col rounded-lg border p-7 ${plan.key === "pro" ? "border-gc-blue-deep" : "border-gc-line"}`}>
                 <div className="flex items-center justify-between gap-3">
-                  <h2 className="text-base font-medium">{plan.name}</h2>
-                  {plan.key === "pro" && <span className="rounded-sm bg-home-accent px-2 py-1 text-[10px] font-semibold text-home-accent-foreground">Popular</span>}
+                  <h3 className="text-[22px] font-normal">{plan.name}</h3>
+                  {plan.key === "pro" && <span className="rounded-full bg-gc-sky px-3 py-1 text-[12px] font-medium text-gc-blue-deep">Popular</span>}
                 </div>
-                <p className="mt-2 min-h-10 text-sm leading-5 text-muted-foreground">{plan.description}</p>
-                <div className="mt-5 flex items-baseline gap-1">
-                  <span className="price-font text-3xl tracking-normal">${plan.price}</span>
-                  <span className="text-xs text-muted-foreground">{suffix}</span>
+                <p className="mt-3 text-[15px] leading-[1.6] text-gc-ink-muted">{plan.description}</p>
+                <div className="mt-6 flex items-baseline gap-1">
+                  <span className="text-[44px] font-normal leading-none text-gc-success">${plan.price}</span>
+                  <span className="text-[14px] text-gc-ink-muted">{suffix}</span>
                 </div>
-                <p className="mt-1 text-xs text-muted-foreground">{plan.wallet} included</p>
-                {isCurrent ? (
-                  <div className="mt-auto flex h-10 items-center justify-center rounded-full border border-border bg-muted text-sm font-medium">Current plan</div>
-                ) : disabled ? (
-                  <button type="button" disabled className="mt-auto h-10 cursor-not-allowed rounded-full border border-border bg-muted text-sm text-muted-foreground">Locked in trial</button>
-                ) : (
-                  <Link to={destination} className={`mt-auto flex h-10 items-center justify-center rounded-full border text-sm font-medium transition ${plan.key === "pro" ? "border-home-accent bg-home-accent text-home-accent-foreground hover:opacity-90" : "border-border bg-background hover:border-home-accent"}`}>
-                    {trialPro ? "Upgrade to Pro" : currentPlan !== null ? "Upgrade" : "Apply now"}
-                  </Link>
-                )}
+                <p className="mt-2 text-[14px] text-gc-ink-muted">{plan.wallet} included</p>
+                <div className="mt-auto pt-7">
+                  {isCurrent ? (
+                    <div className="flex h-11 items-center justify-center rounded-full border border-gc-line bg-gc-surface text-[15px] font-medium">Current plan</div>
+                  ) : disabled ? (
+                    <button type="button" disabled className="h-11 w-full cursor-not-allowed rounded-full border border-gc-line bg-gc-surface text-[15px] text-gc-ink-muted">Locked in trial</button>
+                  ) : (
+                    <Link
+                      to={destination}
+                      className={`flex h-11 items-center justify-center rounded-full text-[15px] font-medium transition ${plan.key === "pro" ? "bg-gc-blue-deep text-gc-on-blue hover:bg-gc-navy" : "border border-gc-line text-gc-blue-deep hover:bg-gc-surface"}`}
+                    >
+                      {trialPro ? "Upgrade to Pro" : currentPlan !== null ? "Upgrade" : "Apply now"}
+                    </Link>
+                  )}
+                </div>
               </article>
             );
           })}
         </div>
+      </section>
 
-        <div className="mt-8 overflow-hidden border border-border bg-background">
-          <div className="flex items-center justify-between border-b border-border px-5 py-4">
-            <h2 className="text-sm font-medium">Compare all features</h2>
-            <span className="text-xs text-muted-foreground">All plans include live market data</span>
-          </div>
-
-          <table className="w-full min-w-[760px] text-sm border-collapse">
-            <colgroup>
-              <col className="w-[28%]" />
-              <col className={`w-[24%] ${currentPlan === "pro" ? "bg-home-accent-soft" : "bg-home-accent-soft/40"}`} />
-              <col className={`w-[24%] ${currentPlan === "elite" ? "bg-emerald-50/50" : ""}`} />
-              <col className={`w-[24%] ${currentPlan === "ultra" ? "bg-emerald-50/50" : ""}`} />
-            </colgroup>
-
+      {/* COMPARE */}
+      <section id="compare" className="scroll-mt-24 mx-auto max-w-[1296px] px-5 py-14 sm:px-8 lg:px-[72px]">
+        <h2 className="text-[28px] font-normal leading-tight">Compare all features</h2>
+        <p className="mt-3 text-[16px] text-gc-ink-muted">All plans include live market data.</p>
+        <div className="mt-8 overflow-x-auto rounded-lg border border-gc-line">
+          <table className="w-full min-w-[760px] border-collapse text-[15px]">
             <thead>
-              <tr className="border-b border-border bg-muted/30">
-                <th className="px-5 py-4 text-left text-xs font-medium text-muted-foreground">Core features</th>
-                {(["Pro", "Elite", "Ultra"] as const).map((name) => (
-                  <th key={name} className="border-l border-border px-5 py-4 text-center text-xs font-medium">{name}</th>
+              <tr className="bg-gc-canvas">
+                <th className="px-6 py-4 text-left text-[14px] font-medium text-gc-ink-muted">Feature</th>
+                {(["pro", "elite", "ultra"] as const).map((k) => (
+                  <th key={k} className={`border-l border-gc-line px-5 py-4 text-center text-[15px] font-medium ${currentPlan === k ? "text-gc-blue-deep" : ""}`}>
+                    {k[0].toUpperCase() + k.slice(1)}
+                  </th>
                 ))}
               </tr>
             </thead>
-
             <tbody>
-              {([
-                { f: "Monthly AI wallet", b: "$10", c: "$25", d: "$50" },
-                { f: "Daily token limit", b: "1.5M", c: "5M", d: "10M" },
-                { f: "Balance-based quota ($3 = 1M)", b: true, c: true, d: true },
-                { f: "Active API keys", b: "2", c: "3", d: "5" },
-                { f: "ChatGPT 5.5 Pro primary analysis", b: true, c: true, d: true },
-                { f: "Claude Fable 5.1 senior review", b: false, c: true, d: true },
-                { f: "Chat / primary request", b: "$0.03", c: "$0.03", d: "$0.03" },
-                { f: "Senior-reviewed analysis", b: false, c: "$0.20", d: "$0.20" },
-
-                { f: "AI terminal chat", b: "$10 wallet", c: "$25 wallet", d: "$50 wallet" },
-
-                { f: "Live chart analysis", b: "Realtime", c: "Realtime", d: "Realtime" },
-                { f: "AI models", b: "__MODELS_PLUS__", c: "__MODELS_PLUS__", d: "__MODELS_PLUS__" },
-                { f: "A+ signal access", b: true, c: true, d: true },
-                { f: "ICT / SMC breakdown", b: true, c: true, d: true },
-                { f: "Multi-timeframe bias", b: true, c: true, d: true },
-                { f: "Trade journal", b: true, c: true, d: true },
-                { f: "Chart-aware AI context", b: true, c: true, d: true },
-                { f: "1H XAU/USD reversal pressure", b: true, c: true, d: true, badge: "new" },
-                { f: "Body-break + retest confirmation", b: true, c: true, d: true },
-                { f: "Pressure-gated entry, SL & TP levels", b: true, c: true, d: true },
-                { f: "API access & webhooks", b: false, c: true, d: true },
-                { f: "API usage controls & request logs", b: false, c: true, d: true },
-
-                { f: "Priority desk support", b: false, c: false, d: true },
-              ] as ReadonlyArray<{ f: string; b: Mark; c: Mark; d: Mark; isHeading?: boolean; badge?: string }>).map((row, idx) => (
-                <tr
-                  key={row.f}
-                  className={`border-t border-zinc-200 ${idx % 2 === 1 ? "bg-zinc-50/40" : ""} hover:bg-amber-50/20 transition`}
-                >
-                  <td className="px-6 py-3.5 text-zinc-800">
-                    <div className="flex items-center gap-2">
-                      {"badge" in row && row.badge && (
-                        <span className={`${MONO} text-[8px] uppercase tracking-wider px-1.5 py-0.5 rounded-sm bg-amber-400 text-zinc-900 font-bold`}>
-                          {row.badge}
-                        </span>
-                      )}
-                      <span className={row.isHeading ? "text-[11px] uppercase tracking-wider font-semibold text-zinc-500" : ""}>
-                        {row.f}
-                      </span>
-                    </div>
-                  </td>
-                  {[row.b, row.c, row.d].map((v, i) => {
-                    const colKey = (["pro", "elite", "ultra"] as const)[i];
-                    const isCurrentCol = currentPlan === colKey;
-                    return (
-                    <td
-                      key={i}
-                      className={`px-2 py-3.5 text-center border-l border-zinc-200 min-w-[120px] ${isCurrentCol ? "bg-home-accent-soft/60" : i === 0 ? "bg-home-accent-soft/40" : ""}`}
-                    >
+              {COMPARE.map((row) => (
+                <tr key={row.f} className="border-t border-gc-line">
+                  <td className="px-6 py-4 text-gc-ink">{row.f}</td>
+                  {[row.b, row.c, row.d].map((v, i) => (
+                    <td key={i} className="border-l border-gc-line px-3 py-4 text-center text-gc-ink-muted">
                       {v === true ? (
-                        <span className={`inline-block h-1.5 w-1.5 rounded-full ${isCurrentCol ? "bg-emerald-600" : "bg-zinc-900"}`} />
+                        <span className="text-[18px] text-gc-success">✓</span>
                       ) : v === false ? (
-                        <span className="inline-block h-px w-4 bg-zinc-200" />
-                      ) : v === "__MODELS__" || v === "__GPT_ONLY__" || v === "__MODELS_PLUS__" ? (
-                          <span className="inline-flex flex-col items-center justify-center gap-1">
-                            <span className="inline-flex items-center gap-1.5 rounded-md border border-zinc-200 bg-white px-1.5 py-0.5">
-                              <img src={openAiLogo} alt="OpenAI" className="h-3.5 w-3.5 object-contain" />
-                              <span className="whitespace-nowrap text-[10px] font-medium text-zinc-800">ChatGPT 5.5 Pro</span>
+                        <span className="inline-block h-px w-4 bg-gc-line align-middle" />
+                      ) : v === "__MODELS__" ? (
+                        <span className="inline-flex flex-col items-center gap-1">
+                          {[
+                            { src: openAiLogo, alt: "OpenAI", label: "ChatGPT 5.5 Pro" },
+                            { src: claudeLogo, alt: "Anthropic", label: "Claude Fable 5.1" },
+                            { src: xaiLogo, alt: "xAI", label: "Grok 4.6 chat" },
+                          ].map((m) => (
+                            <span key={m.label} className="inline-flex items-center gap-1.5 rounded-md border border-gc-line px-2 py-0.5">
+                              <img src={m.src} alt={m.alt} className="h-3.5 w-3.5 object-contain" />
+                              <span className="whitespace-nowrap text-[12px] text-gc-ink">{m.label}</span>
                             </span>
-                            {(v === "__MODELS__" || v === "__MODELS_PLUS__") && (
-                              <>
-                                <span className="inline-flex items-center gap-1.5 rounded-md border border-zinc-200 bg-white px-1.5 py-0.5">
-                                  <img src={claudeLogo} alt="Anthropic" className="h-3.5 w-3.5 object-contain" />
-                                  <span className="whitespace-nowrap text-[10px] font-medium text-zinc-800">Claude Fable 5.1</span>
-                                </span>
-                                <span className="inline-flex items-center gap-1.5 rounded-md border border-zinc-200 bg-white px-1.5 py-0.5">
-                                  <img src={xaiLogo} alt="xAI" className="h-3.5 w-3.5 object-contain" />
-                                  <span className="whitespace-nowrap text-[10px] font-medium text-zinc-800">Normal Chat · Grok 4.6</span>
-                                </span>
-                              </>
-                            )}
-                          </span>
-                      ) : (
-                        <span className={`${MONO} text-[11px] tracking-wider ${row.isHeading ? "text-zinc-900 font-semibold" : isCurrentCol ? "text-home-accent font-semibold" : "text-zinc-700"}`}>
-                          {v}
+                          ))}
                         </span>
+                      ) : (
+                        <span className="text-gc-ink">{v}</span>
                       )}
                     </td>
-                    );
-                  })}
+                  ))}
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
-        </div>
       </section>
 
-      {/* TOP-UP PACKS */}
-      <section className="mx-auto max-w-7xl px-5 sm:px-8 py-12 sm:py-16">
-        <div className="mb-8 flex items-end justify-between gap-4">
-          <div>
-            
-            <h2 className="mt-2 text-2xl sm:text-3xl font-semibold tracking-tight">Need more wallet balance?</h2>
-             <p className="mt-2 max-w-xl text-sm text-zinc-600 lg:max-w-none lg:whitespace-nowrap">Live market data is free. ChatGPT 5.5 Pro handles primary analysis, Claude Fable 5.1 reviews eligible plans, and Grok 4.6 powers normal chat.</p>
-          </div>
-        </div>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      {/* TOP-UPS */}
+      <section id="top-up" className="scroll-mt-24 mx-auto max-w-[1296px] px-5 py-14 sm:px-8 lg:px-[72px]">
+        <h2 className="text-[28px] font-normal leading-tight">Need more wallet balance?</h2>
+        <p className="mt-3 max-w-[820px] text-[16px] leading-[1.65] text-gc-ink-muted">
+          Live market data is free. ChatGPT 5.5 Pro handles primary analysis, Claude Fable 5.1 reviews eligible plans and Grok 4.6 powers normal chat.
+        </p>
+        <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {[
             { price: 5, sub: "Starter" },
             { price: 10, sub: "Boost" },
             { price: 25, sub: "Trader", accent: true },
             { price: 50, sub: "Power" },
           ].map((p) => (
-            <div key={p.price} className={`rounded-lg border ${p.accent ? "border-home-accent bg-home-accent-soft" : "border-border bg-background"} p-5`}>
+            <div key={p.price} className={`flex flex-col rounded-lg border p-6 ${p.accent ? "border-gc-blue-deep" : "border-gc-line"}`}>
               <div className="flex items-center justify-between">
-                <span className={`${MONO} text-[10px] uppercase tracking-wider text-zinc-500`}>{p.sub}</span>
-                {p.accent && (
-                  <span className={`${MONO} rounded-sm bg-home-accent px-1.5 py-0.5 text-[9px] font-bold text-home-accent-foreground`}>Best value</span>
-                )}
+                <span className="text-[13px] font-medium uppercase tracking-wide text-gc-ink-muted">{p.sub}</span>
+                {p.accent && <span className="rounded-full bg-gc-sky px-2.5 py-0.5 text-[12px] font-medium text-gc-blue-deep">Best value</span>}
               </div>
               <div className="mt-4 flex items-baseline gap-1">
-                <span className="text-3xl tabular-nums price-font">${p.price}</span>
-                <span className="text-xs text-zinc-500">wallet</span>
+                <span className="text-[36px] font-normal leading-none text-gc-success">${p.price}</span>
+                <span className="text-[14px] text-gc-ink-muted">wallet</span>
               </div>
-               <div className="mt-1 text-sm text-zinc-700">${p.price} one-time · about {Math.floor(p.price / 0.03)} primary AI requests</div>
-              {signedOut ? (
-                <Link to="/founding" className="mt-5 inline-flex w-full items-center justify-center rounded-md bg-home-accent px-3 py-2 text-xs font-medium text-home-accent-foreground hover:opacity-90">
-                  Apply now
-                </Link>
-              ) : (
-                <Link to="/dashboard/pay" search={{ amount: p.price }} className="mt-5 inline-flex w-full items-center justify-center rounded-md bg-home-accent px-3 py-2 text-xs font-medium text-home-accent-foreground hover:opacity-90">
-                  Buy Now
-                </Link>
-              )}
+              <p className="mt-2 text-[14px] text-gc-ink-muted">One-time · about {Math.floor(p.price / 0.03)} primary AI requests</p>
+              <Link
+                to={signedOut ? "/founding" : "/dashboard/pay"}
+                search={signedOut ? undefined : ({ amount: p.price } as never)}
+                className="mt-6 inline-flex h-10 items-center justify-center rounded-full border border-gc-line text-[14px] font-medium text-gc-blue-deep hover:bg-gc-surface"
+              >
+                {signedOut ? "Apply now" : "Buy now"}
+              </Link>
             </div>
           ))}
         </div>
-
-        {/* CUSTOM AMOUNT */}
         <CustomTopUp signedOut={signedOut} />
-
-        
       </section>
 
-
-      {/* FAQ */}
-      <section className="border-t border-zinc-100 bg-zinc-50/50">
-        <div className="mx-auto max-w-3xl px-5 sm:px-6 py-16 sm:py-20">
-          <div className="text-left sm:text-center mb-10">
-            
-            <h3 className="mt-3 text-3xl font-semibold tracking-tight">Frequently asked</h3>
-          </div>
-          <div className="divide-y divide-zinc-200 rounded-xl border border-zinc-200 bg-white overflow-hidden">
-            {FAQ.map(([q, a]) => (
-              <details key={q} className="group p-5 hover:bg-zinc-50/50 transition">
-                <summary className="cursor-pointer list-none flex items-center justify-between gap-4 text-sm font-medium text-zinc-900">
-                  <span>{q}</span>
-                  <span className={`${MONO} text-[10px] text-zinc-400 group-open:rotate-45 transition`}>+</span>
-                </summary>
-                <p className="mt-3 text-sm text-zinc-600 leading-relaxed">{a}</p>
-              </details>
-            ))}
-          </div>
+      {/* GUIDANCE */}
+      <section className="mx-auto max-w-[1296px] px-5 py-16 sm:px-8 lg:px-[72px]">
+        <h2 className="text-center text-[34px] font-normal leading-tight sm:text-[38px]">Want more guidance? We've got you covered.</h2>
+        <div className="mt-10 grid gap-6 md:grid-cols-3">
+          {[
+            { text: "Talk to our team about a custom plan or quote for your trading desk.", cta: "Request a quote", href: "/contact" },
+            { text: "Read the docs to learn how credits, wallets and token limits work.", cta: "Read the docs", href: "/docs" },
+            { text: "Join the invite-only Founding Program and get your chosen plan straight away.", cta: "Apply to the program", href: "/founding" },
+          ].map((c) => (
+            <a key={c.cta} href={c.href} className="flex min-h-[200px] flex-col justify-between rounded-lg border border-gc-line p-6 transition hover:shadow-md">
+              <p className="text-[20px] leading-[1.45] text-gc-ink">{c.text}</p>
+              <span className="mt-6 text-[16px] text-gc-blue-deep">{c.cta}</span>
+            </a>
+          ))}
         </div>
       </section>
 
+      {/* FAQ */}
+      <section className="mx-auto max-w-[1296px] px-5 pb-20 sm:px-8 lg:px-[72px]">
+        <h2 className="text-[28px] font-normal leading-tight">Frequently asked questions</h2>
+        <div className="mt-6 flex justify-end">
+          <button type="button" onClick={() => setOpen(allOpen ? [] : FAQ.map((_, i) => i))} className="flex items-center gap-2 text-[16px] text-gc-blue-deep">
+            {allOpen ? "Collapse all" : "Expand all"} <ChevronsUpDown className="h-4 w-4" />
+          </button>
+        </div>
+        <div className="mt-4 border-t-2 border-gc-line">
+          {FAQ.map(([q, a], i) => {
+            const isOpen = open.includes(i);
+            return (
+              <div key={q} className="border-b-2 border-gc-line">
+                <button
+                  type="button"
+                  aria-expanded={isOpen}
+                  onClick={() => setOpen((o) => (isOpen ? o.filter((x) => x !== i) : [...o, i]))}
+                  className="flex w-full items-center justify-between py-6 text-left text-[19px] text-gc-blue-deep"
+                >
+                  {q}
+                  <ChevronDown className={`h-6 w-6 shrink-0 transition ${isOpen ? "rotate-180" : ""}`} />
+                </button>
+                {isOpen && <p className="border-t-2 border-gc-line py-7 text-[16px] leading-relaxed text-gc-ink-muted">{a}</p>}
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
+      <NextStep />
       <SiteFooter />
     </div>
   );
@@ -388,51 +387,41 @@ function CustomTopUp({ signedOut }: { signedOut: boolean }) {
   const safe = Math.max(5, Math.min(1000, Number.isFinite(amount) ? amount : 5));
   const primaryRequests = Math.floor(safe / 0.03);
   return (
-    <div className="mt-8 rounded-lg border border-border bg-background p-6 sm:p-7">
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-5">
-        <div>
-          
-          <h3 className="mt-2 text-lg font-semibold tracking-tight">Pick your own amount</h3>
-          <p className="mt-1 text-sm text-zinc-600">Minimum $5. $1 top-up = $1 wallet. Primary requests cost $0.03; completed senior-reviewed analysis costs $0.20.</p>
-          <p className="mt-1 text-sm text-zinc-600">Every $3 of balance — from a top-up or a promo code — unlocks 1,000,000 tokens of daily usage, up to your plan's ceiling. Balances under $3 scale proportionally, and the allowance resets at 00:00 UTC.</p>
+    <div className="mt-8 rounded-2xl bg-gc-sky p-7 sm:p-8">
+      <div className="flex flex-col justify-between gap-6 lg:flex-row lg:items-center">
+        <div className="max-w-[720px]">
+          <h3 className="text-[22px] font-normal">Pick your own amount</h3>
+          <p className="mt-2 text-[15px] leading-[1.6] text-gc-ink-muted">
+            Minimum $5. $1 top-up = $1 wallet. Primary requests cost $0.03; completed senior-reviewed analysis costs $0.20. Every $3 of balance unlocks 1,000,000 tokens of daily usage, up to your plan's limit. The allowance resets at 00:00 UTC.
+          </p>
         </div>
-        <div className="flex items-center gap-3">
-          <div className="flex items-center overflow-hidden rounded-md border border-border bg-background focus-within:ring-2 focus-within:ring-home-accent/40">
-            <span className="px-3 text-sm text-zinc-500 border-r border-zinc-200 bg-white">$</span>
+        <div className="flex flex-wrap items-center gap-4">
+          <div className="flex items-center overflow-hidden rounded-md border border-gc-line bg-background focus-within:border-gc-blue-deep">
+            <span className="border-r border-gc-line px-3 py-2 text-[15px] text-gc-ink-muted">$</span>
             <input
               type="number"
               min={5}
               step={1}
+              aria-label="Top-up amount in dollars"
               value={Number.isFinite(amount) ? amount : ""}
               onChange={(e) => setAmount(parseInt(e.target.value || "0", 10))}
-              className={`w-24 px-3 py-2 text-sm tabular-nums outline-none ${MONO}`}
+              className="w-24 bg-background px-3 py-2 text-[15px] tabular-nums outline-none"
             />
           </div>
           <div className="text-right">
-            <div className={`text-2xl font-bold tabular-nums ${MONO}`}>${safe}</div>
-            <div className="text-[11px] text-zinc-500">wallet · about {primaryRequests} primary requests</div>
+            <div className="text-[26px] leading-none text-gc-success">${safe}</div>
+            <div className="mt-1 text-[12px] text-gc-ink-muted">about {primaryRequests} primary requests</div>
           </div>
-          {signedOut ? (
-            <Link
-              to="/founding"
-              className="inline-flex items-center justify-center whitespace-nowrap rounded-md bg-home-accent px-4 py-2 text-xs font-medium text-home-accent-foreground hover:opacity-90"
-            >
-              Apply now
-            </Link>
-          ) : (
-            <Link
-              to="/dashboard/pay"
-              search={{ amount: safe }}
-              className="inline-flex items-center justify-center whitespace-nowrap rounded-md bg-home-accent px-4 py-2 text-xs font-medium text-home-accent-foreground hover:opacity-90"
-            >
-              Buy Now
-            </Link>
-          )}
+          <Link
+            to={signedOut ? "/founding" : "/dashboard/pay"}
+            search={signedOut ? undefined : ({ amount: safe } as never)}
+            className="inline-flex h-11 items-center justify-center whitespace-nowrap rounded-full bg-gc-blue-deep px-6 text-[15px] font-medium text-gc-on-blue hover:bg-gc-navy"
+          >
+            {signedOut ? "Apply now" : "Buy now"}
+          </Link>
         </div>
       </div>
-      {amount < 5 && (
-        <p className="mt-3 text-[12px] text-rose-600">Minimum top-up is $5.</p>
-      )}
+      {amount < 5 && <p className="mt-3 text-[13px] text-destructive">Minimum top-up is $5.</p>}
     </div>
   );
 }
