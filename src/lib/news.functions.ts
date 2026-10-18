@@ -1,6 +1,9 @@
 import { createServerFn } from "@tanstack/react-start";
 
-export type NewsEvent = {
+import type { NewsEvent } from "./news-split";
+export type { NewsEvent } from "./news-split";
+
+type _Unused = {
   title: string;
   country: string;
   date: string; // ISO
@@ -50,8 +53,8 @@ async function loadCalendar(): Promise<FFEvent[]> {
   }
 }
 
-/** Every news list in the product shows at most this many events. */
-export const MAX_NEWS = 4;
+import { MAX_NEWS, splitNews } from "./news-split";
+export { MAX_NEWS, PREVIOUS_NEWS } from "./news-split";
 
 function toNewsEvents(raw: FFEvent[], now: number): NewsEvent[] {
   return raw
@@ -71,16 +74,6 @@ function toNewsEvents(raw: FFEvent[], now: number): NewsEvent[] {
     })
     .filter((e) => Number.isFinite(new Date(e.date).getTime()))
     .sort((a, b) => +new Date(a.date) - +new Date(b.date));
-}
-
-/** How many already-released events the Terminal news panel lists. */
-export const PREVIOUS_NEWS = 5;
-
-/** Upcoming / released split used by the Terminal news panel. */
-export function splitNews(events: NewsEvent[], now: number): { upcoming: NewsEvent[]; previous: NewsEvent[] } {
-  const upcoming = events.filter((e) => new Date(e.date).getTime() > now).slice(0, MAX_NEWS);
-  const previous = events.filter((e) => new Date(e.date).getTime() <= now).slice(-PREVIOUS_NEWS).reverse();
-  return { upcoming, previous };
 }
 
 export const getGoldNews = createServerFn({ method: "GET" }).handler(
