@@ -678,7 +678,7 @@ function TerminalPage() {
       <div
         className={cn(
           "flex h-full min-h-0 w-full flex-col overflow-hidden text-foreground",
-          theme === "dark" ? "dark terminal-dark bg-background" : "bg-gc-surface",
+          theme === "dark" ? "dark terminal-dark bg-background" : "bg-background",
         )}
       >
         <div className={cn("flex min-h-0 flex-1 flex-col lg:flex-row", theme !== "dark" && "gap-2 p-1.5 sm:p-2")}>
