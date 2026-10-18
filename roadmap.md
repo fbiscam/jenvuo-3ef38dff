@@ -15,3 +15,9 @@
 - [x] Footer: five links in every column
 - [x] Thinking logo: white with a four-colour outline loop
 - [x] Google Analytics + Search Console linked; site audit done
+- [x] Blog pages 25% larger
+- [x] "Buy now" instead of "Apply now" on pricing, header and product page
+- [x] Founding page in homepage style
+- [x] Thinking logo: running multi-colour line around the border
+- [x] Ask Jenvu replies: Grok 4.6 then DeepSeek V4 Pro
+- [x] Products page: alignment fixed, new colourful images, new white section
