@@ -26,7 +26,8 @@ export function openAskJenvu(view: "chat" | "sales" | "live" = "chat") {
   window.dispatchEvent(new CustomEvent("jenvu:ask", { detail: { view } }));
 }
 
-// Shown on every page except the dashboard (which includes the Terminal).
+// Floating button shows on every page except the dashboard (which includes the Terminal);
+// there it opens from the Ask Jenvu button in the top bar.
 const HIDDEN = [/^\/dashboard/];
 
 export function AskJenvuWidget() {
@@ -74,7 +75,8 @@ export function AskJenvuWidget() {
     return () => window.removeEventListener("keydown", k);
   }, [open]);
 
-  if (HIDDEN.some((r) => r.test(pathname))) return null;
+  const buttonHidden = HIDDEN.some((r) => r.test(pathname));
+  if (buttonHidden && !open) return null;
 
   const send = async (text: string, base: Msg[] = msgs) => {
     const q = text.trim();
@@ -118,7 +120,7 @@ export function AskJenvuWidget() {
 
   return (
     <>
-      {!open && (
+      {!open && !buttonHidden && (
         <button
           type="button"
           onClick={() => { setView("chat"); setOpen(true); }}
