@@ -1010,7 +1010,7 @@ export const registerDocumentFile = createServerFn({ method: "POST" })
     const obj = (listed ?? []).find((o: any) => o.name === fileName);
     const realSize = Number((obj as any)?.metadata?.size ?? 0);
     if (listErr || !obj || !realSize) throw new Error("Upload not found. Please upload the document again.");
-    if (!/^(image\/(jpeg|png|webp|heic|heif)|application\/pdf)$/i.test(String((obj as any)?.metadata?.mimetype ?? data.mime_type))) {
+    if (!/^(image\/|video\/|application\/pdf$)/i.test(String((obj as any)?.metadata?.mimetype ?? data.mime_type))) {
       throw new Error("Unsupported document type.");
     }
     data.file_size = realSize;
