@@ -210,7 +210,7 @@ export function CloudHero({ price: _price, delta: _delta }: { price: string; del
             className="inline-flex h-12 items-center justify-center rounded-full border border-gc-line bg-background px-6 text-[16px] font-medium text-gc-ink transition hover:bg-gc-surface"
           >
             Contact sales
-          </Link>
+          </button>
         </div>
       </div>
       <div ref={railRef} onScroll={onScroll} className="flex gap-6 overflow-x-auto px-5 [overscroll-behavior-x:contain] [scrollbar-width:none] sm:px-8 [&::-webkit-scrollbar]:hidden">
