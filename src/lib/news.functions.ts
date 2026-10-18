@@ -53,6 +53,36 @@ async function loadCalendar(): Promise<FFEvent[]> {
 /** Every news list in the product shows at most this many events. */
 export const MAX_NEWS = 4;
 
+function toNewsEvents(raw: FFEvent[], now: number): NewsEvent[] {
+  return raw
+    .filter(movesGold)
+    .map((e) => {
+      const t = new Date(e.date).getTime();
+      const impact = /high/i.test(e.impact) ? "High" : /medium/i.test(e.impact) ? "Medium" : "Low";
+      return {
+        title: e.title,
+        country: e.country,
+        date: new Date(t).toISOString(),
+        impact: impact as NewsEvent["impact"],
+        forecast: e.forecast || undefined,
+        previous: e.previous || undefined,
+        minutesUntil: Math.round((t - now) / 60000),
+      };
+    })
+    .filter((e) => Number.isFinite(new Date(e.date).getTime()))
+    .sort((a, b) => +new Date(a.date) - +new Date(b.date));
+}
+
+/** How many already-released events the Terminal news panel lists. */
+export const PREVIOUS_NEWS = 5;
+
+/** Upcoming / released split used by the Terminal news panel. */
+export function splitNews(events: NewsEvent[], now: number): { upcoming: NewsEvent[]; previous: NewsEvent[] } {
+  const upcoming = events.filter((e) => new Date(e.date).getTime() > now).slice(0, MAX_NEWS);
+  const previous = events.filter((e) => new Date(e.date).getTime() <= now).slice(-PREVIOUS_NEWS).reverse();
+  return { upcoming, previous };
+}
+
 export const getGoldNews = createServerFn({ method: "GET" }).handler(
   async (): Promise<NewsEvent[]> => {
     // Throwing (instead of returning []) lets the terminal say the feed is
@@ -60,26 +90,20 @@ export const getGoldNews = createServerFn({ method: "GET" }).handler(
     const raw = await loadCalendar();
     const now = Date.now();
     const horizon = now + 1000 * 60 * 60 * 24 * 8;
-    return raw
-      .filter(movesGold)
-      .map((e) => {
-        const t = new Date(e.date).getTime();
-        const impact = /high/i.test(e.impact) ? "High" : /medium/i.test(e.impact) ? "Medium" : "Low";
-        return {
-          title: e.title,
-          country: e.country,
-          date: new Date(t).toISOString(),
-          impact: impact as NewsEvent["impact"],
-          forecast: e.forecast || undefined,
-          previous: e.previous || undefined,
-          minutesUntil: Math.round((t - now) / 60000),
-        };
-      })
+    return toNewsEvents(raw, now)
       .filter((e) => {
         const t = new Date(e.date).getTime();
-        return Number.isFinite(t) && t >= now - 1000 * 60 * 60 && t <= horizon;
+        return t >= now - 1000 * 60 * 60 && t <= horizon;
       })
-      .sort((a, b) => +new Date(a.date) - +new Date(b.date))
       .slice(0, MAX_NEWS);
+  },
+);
+
+/** Upcoming events plus the last released ones from this week's calendar. */
+export const getGoldNewsBoard = createServerFn({ method: "GET" }).handler(
+  async (): Promise<{ upcoming: NewsEvent[]; previous: NewsEvent[] }> => {
+    const raw = await loadCalendar();
+    const now = Date.now();
+    return splitNews(toNewsEvents(raw, now), now);
   },
 );
