@@ -7,7 +7,6 @@ const QUICK_ACTIONS = [
   { label: "Create API key", to: "/dashboard/api" },
   { label: "Open gold Terminal", to: "/dashboard/terminal" },
   { label: "Manage billing", to: "/dashboard/billing" },
-  { label: "Log a trade", to: "/dashboard/journal" },
   { label: "Security settings", to: "/dashboard/security" },
   { label: "View usage", to: "/dashboard/usage" },
 ] as const;

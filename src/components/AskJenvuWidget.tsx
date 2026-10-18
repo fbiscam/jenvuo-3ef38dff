@@ -10,6 +10,8 @@ import { Shimmer } from "@/components/ai-elements/shimmer";
 import { askJenvu } from "@/lib/ask-jenvu.functions";
 import { submitContactMessage } from "@/lib/contact.functions";
 import askJenvuMark from "@/assets/ask-jenvu-mark.png";
+import { LiveChatPanel } from "@/components/LiveChatWidget";
+import { wantsLiveAgent } from "@/lib/live-agent-intent";
 
 type Msg = { role: "user" | "assistant"; content: string; followUps?: string[]; showSales?: boolean; error?: boolean };
 
@@ -20,7 +22,7 @@ const STARTERS = [
 ];
 
 /** Opens the Ask Jenvu panel from anywhere: window.dispatchEvent(new CustomEvent("jenvu:ask", { detail: { view: "sales" } })) */
-export function openAskJenvu(view: "chat" | "sales" = "chat") {
+export function openAskJenvu(view: "chat" | "sales" | "live" = "chat") {
   window.dispatchEvent(new CustomEvent("jenvu:ask", { detail: { view } }));
 }
 
@@ -30,7 +32,8 @@ const HIDDEN = [/^\/dashboard/];
 export function AskJenvuWidget() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [open, setOpen] = React.useState(false);
-  const [view, setView] = React.useState<"chat" | "sales">("chat");
+  const [view, setView] = React.useState<"chat" | "sales" | "live">("chat");
+  const [handoff, setHandoff] = React.useState("");
   const [msgs, setMsgs] = React.useState<Msg[]>([]);
   const [input, setInput] = React.useState("");
   const [busy, setBusy] = React.useState(false);
@@ -42,7 +45,7 @@ export function AskJenvuWidget() {
   React.useEffect(() => {
     const h = (e: Event) => {
       const v = (e as CustomEvent).detail?.view;
-      setView(v === "sales" ? "sales" : "chat");
+      setView(v === "sales" ? "sales" : v === "live" ? "live" : "chat");
       setOpen(true);
     };
     window.addEventListener("jenvu:ask", h);
@@ -79,17 +82,30 @@ export function AskJenvuWidget() {
     const next: Msg[] = [...base, { role: "user", content: q.slice(0, 4000) }];
     setMsgs(next);
     setInput("");
+    if (wantsLiveAgent(q)) {
+      goLive(next);
+      return;
+    }
     setBusy(true);
     try {
       const history = next.filter((m) => !m.error).map((m) => ({ role: m.role, content: m.content }));
       const res = await askJenvu({ data: { messages: history } });
-      if (res.ok) setMsgs([...next, { role: "assistant", content: res.text, followUps: res.followUps, showSales: res.showSales }]);
+      if (res.ok && res.agent) goLive(next);
+      else if (res.ok) setMsgs([...next, { role: "assistant", content: res.text, followUps: res.followUps, showSales: res.showSales }]);
       else setMsgs([...next, { role: "assistant", content: res.error, error: true }]);
     } catch {
       setMsgs([...next, { role: "assistant", content: "Ask Jenvu couldn't answer right now. Please try again.", error: true }]);
     } finally {
       setBusy(false);
     }
+  };
+
+  /** Hand the conversation to a person: live chat opens in this same window. */
+  const goLive = (base: Msg[]) => {
+    const asked = base.filter((m) => m.role === "user").slice(-5).map((m) => `- ${m.content}`);
+    setHandoff(asked.length ? `Handed over from Ask Jenvu. Earlier questions:\n${asked.join("\n")}` : "");
+    setMsgs([...base, { role: "assistant", content: "Sure — I'm connecting you to our support team. A real person will reply in this window." }]);
+    setView("live");
   };
 
   const retry = (i: number) => {
@@ -126,7 +142,7 @@ export function AskJenvuWidget() {
         >
           {/* Header */}
           <div className="relative flex h-14 shrink-0 items-center gap-2 px-5">
-            {view === "sales" ? (
+            {view !== "chat" ? (
               <button type="button" onClick={() => setView("chat")} className="-ml-2 flex items-center gap-3 rounded-full py-1.5 pl-2 pr-3 text-[15px] hover:bg-gc-surface">
                 <ArrowLeft className="h-5 w-5" /> Return to conversation
               </button>
@@ -151,11 +167,16 @@ export function AskJenvuWidget() {
                 <button type="button" className="w-full px-4 py-2 text-left text-[14px] hover:bg-gc-surface" onClick={() => { setView("sales"); setMenu(false); }}>
                   Contact sales
                 </button>
+                <button type="button" className="w-full px-4 py-2 text-left text-[14px] hover:bg-gc-surface" onClick={() => { goLive(msgs); setMenu(false); }}>
+                  Chat with a person
+                </button>
               </div>
             )}
           </div>
 
-          {view === "sales" ? (
+          {view === "live" ? (
+            <LiveChatPanel handoff={handoff} />
+          ) : view === "sales" ? (
             <SalesForm onDone={() => setView("chat")} />
           ) : (
             <>

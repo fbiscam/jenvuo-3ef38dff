@@ -47,7 +47,7 @@ export default function DashboardTopBar({
   };
 
   return (
-    <header className="sticky top-0 z-30 flex h-14 shrink-0 items-center gap-2 bg-gc-canvas px-2 sm:gap-3 sm:px-3">
+    <header className="sticky top-0 z-30 flex h-14 shrink-0 items-center gap-2 ${white ? "bg-background" : "bg-gc-canvas"} px-2 sm:gap-3 sm:px-3">
       <button
         type="button"
         onClick={onMenu}

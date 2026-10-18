@@ -9,7 +9,6 @@ import {
 } from "@tanstack/react-router";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Toaster as SonnerToaster } from "sonner";
-import { LiveChatWidget } from "@/components/LiveChatWidget";
 import { AskJenvuWidget } from "@/components/AskJenvuWidget";
 import { PwaTabBar } from "@/components/PwaTabBar";
 
@@ -434,7 +433,6 @@ function RootComponent() {
       <Outlet />
       {/* <PwaTabBar /> disabled */}
       <div className="hide-in-pwa">
-        <LiveChatWidget />
         <AskJenvuWidget />
       </div>
 
