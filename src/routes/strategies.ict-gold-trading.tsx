@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { PageShell, H2, P, UL } from "@/components/PageShell";
+import { PageShell, H2, P, UL, Feature, Banner, StoryCards } from "@/components/PageShell";
+import sig from "@/assets/feat-signal.jpg";
 
 const URL = "https://jenvu.com/strategies/ict-gold-trading";
 const TITLE = "ICT & SMC Gold Trading Guide (XAU/USD) — Jenvu";
@@ -40,10 +41,25 @@ export const Route = createFileRoute("/strategies/ict-gold-trading")({
 function GuidePage() {
   return (
     <PageShell
+      wide
       eyebrow="Strategy guide"
       title="ICT & SMC Gold Trading"
       intro="How institutional ICT and Smart Money Concepts apply to XAU/USD, and how the Jenvu terminal marks each idea on the chart with fixed, rule-based logic."
     >
+      <Feature
+        title="Solutions for gold traders"
+        text={<p>Structure, liquidity, zones and sessions on one chart, with the same marks every time the same candles print.</p>}
+        linkLabel="Open the Terminal"
+        href="https://dash.jenvu.com/terminal"
+        media={<img src={sig} alt="Gold setup marked on a chart" width={1280} height={720} className="h-auto w-full" />}
+        caption="ICT and SMC concepts drawn by fixed rules"
+      />
+      <div className="px-4 py-6 sm:px-6">
+        <Banner title="A guide, not a promise">
+          Concepts describe probabilities, not certainties. <a href="https://jenvu.com/disclaimer">Read the risk disclaimer</a>.
+        </Banner>
+      </div>
+      <div className="mx-auto max-w-[860px] space-y-8 px-4 pb-10 sm:px-6">
       <section className="space-y-3">
         <H2>Why gold suits ICT and SMC</H2>
         <P>
@@ -139,6 +155,16 @@ function GuidePage() {
           <Link to="/pricing" className="underline">see plans</Link> to use the terminal.
         </P>
       </section>
+      </div>
+      <StoryCards
+        title="Keep learning"
+        intro="More from Jenvu."
+        cards={[
+          { title: "Inside the Jenvu products", href: "https://jenvu.com/ai-engine", cta: "See products" },
+          { title: "Everything about Jenvu, A to Z", href: "https://jenvu.com/docs", cta: "Open docs" },
+          { title: "Plans from $10 a month", href: "https://jenvu.com/pricing", cta: "See pricing" },
+        ]}
+      />
     </PageShell>
   );
 }
