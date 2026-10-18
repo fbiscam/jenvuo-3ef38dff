@@ -116,7 +116,7 @@ function ContactPage() {
     <div className={`public-cloudflare jenvu-zoom min-h-dvh w-full bg-background text-gc-ink ${SANS} antialiased`}>
       <SiteHeader />
 
-      <main className="grid w-full grid-cols-1 lg:grid-cols-[1fr_minmax(360px,30%)]">
+      <main className="grid w-full grid-cols-1 lg:grid-cols-[1fr_minmax(360px,30%)]" style={{ zoom: 0.8 }}>
         {/* LEFT — form */}
         <section className="px-5 py-12 sm:px-10 lg:py-14 lg:pl-[12%] lg:pr-16">
           <div className="max-w-[710px]">

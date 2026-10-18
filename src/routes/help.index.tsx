@@ -69,7 +69,7 @@ function HelpCenterPage() {
     <div className={`public-cloudflare jenvu-zoom min-h-dvh bg-background text-gc-ink ${SANS} antialiased`}>
       <SiteHeader />
 
-      <div className="mx-auto max-w-[1300px] px-5 sm:px-8">
+      <div className="mx-auto max-w-[1300px] px-5 sm:px-8" style={{ zoom: 0.8 }}>
         {/* HERO */}
         <section className="grid gap-8 py-12 sm:py-16 lg:grid-cols-[1fr_416px] lg:items-start">
           <div>
