@@ -494,8 +494,9 @@
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  *:not(.animate-ticker):not(.gc-logo-marquee), *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
+  *:not(.animate-ticker):not(.gc-logo-marquee):not(.ask-jenvu-mark-loop), *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
   .animate-ticker { animation: ticker-marquee 60s linear infinite !important; }
+  .ask-jenvu-mark-loop { animation: ask-jenvu-colors 2s linear infinite !important; }
 }
 
 
