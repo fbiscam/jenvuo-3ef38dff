@@ -56,11 +56,11 @@ export function IndustryPage({ c }: { c: IndustryContent }) {
       <SiteHeader />
       <div style={{ zoom: PAGE_ZOOM }}>
         {p ? <ProductsHero c={c} /> : <SolutionsHero c={c} />}
-        <SectionBar />
+        <SectionBar hide={p ? ["why"] : []} />
         {p ? <ProductsZigzag c={c} /> : <SolutionsCards c={c} />}
         {p && <ProductsHighlights c={c} />}
         {p ? <TopicsTabs c={c} /> : <TopicsList c={c} />}
-        {p ? <WhyNight c={c} /> : <WhyAccordion c={c} />}
+        {!p && <WhyAccordion c={c} />}
         {p ? <StoriesRows c={c} /> : <StoriesCards c={c} />}
         <Products c={c} />
         <NextStep />
@@ -109,10 +109,10 @@ function ImageCard({ img, caption, tag, className = "", eager = false }: { img: 
   );
 }
 
-function SectionBar() {
+function SectionBar({ hide = [] }: { hide?: string[] }) {
   const [active, setActive] = useState("overview");
   useEffect(() => {
-    const els = SECTIONS.map((s) => document.getElementById(s.id)).filter((e): e is HTMLElement => !!e);
+    const els = SECTIONS.filter((s) => !hide.includes(s.id)).map((s) => document.getElementById(s.id)).filter((e): e is HTMLElement => !!e);
     const io = new IntersectionObserver(
       (entries) => {
         const vis = entries.filter((e) => e.isIntersecting).sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)[0];
@@ -127,7 +127,7 @@ function SectionBar() {
     // Inside the zoomed wrapper, so the offset is divided to stay under the header.
     <div className="sticky z-30 px-4 sm:px-6" style={{ top: `calc(4rem / ${PAGE_ZOOM})` }}>
       <nav aria-label="Page sections" className="mx-auto flex max-w-[1240px] gap-1 overflow-x-auto rounded-full border border-gc-line bg-background px-2 py-1.5 shadow-sm">
-        {SECTIONS.map((s) => (
+        {SECTIONS.filter((s) => !hide.includes(s.id)).map((s) => (
           <a
             key={s.id}
             href={`#${s.id}`}
