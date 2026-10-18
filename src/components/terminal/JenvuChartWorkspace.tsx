@@ -151,7 +151,7 @@ const TOOLS: Array<{ id: DrawingTool; icon: LucideIcon; label: string }> = [
 const SMC_LABELS: Array<{ key: keyof SmcToggles; label: string; hint: string }> = [
   { key: "structure", label: "Swing structure", hint: "HH / HL / LH / LL labels" },
   { key: "pressure", label: "Buyer / seller pressure", hint: "Percentages and confirmed trade levels" },
-  { key: "priceAction", label: "Swing price action", hint: "Pattern + buyers / sellers at each high / low" },
+  { key: "priceAction", label: "Swing price action", hint: "Pattern + buyers / sellers each high / low" },
   { key: "swingSweep", label: "Fresh sweep (15M / 1H / 2H / 4H)", hint: "Did the fresh high / low sweep \n" },
   { key: "breaks", label: "BOS / CHoCH", hint: "Confirmed close-through breaks" },
   { key: "sdStrategy", label: "Zone + FVG strategy", hint: "Supply / demand zones, their FVG" },
