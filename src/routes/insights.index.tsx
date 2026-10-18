@@ -7,7 +7,7 @@ import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
 import type { Tables } from "@/integrations/supabase/types";
-import SiteFooter from "@/components/SiteFooter";
+import BlogFooter from "@/components/BlogFooter";
 import { insightCoverUrl } from "@/lib/insight-cover";
 
 type Insight = Tables<"insights">;
@@ -302,7 +302,7 @@ function InsightsPage() {
         </main>
       </div>
 
-      <SiteFooter />
+      <BlogFooter />
     </div>
   );
 }
