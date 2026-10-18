@@ -81,11 +81,10 @@ export default function SiteHeader() {
                   Sign in
                 </Link>
                 <Link
-                  to="/auth"
-                  search={{ mode: "signup" } as never}
+                  to="/pricing"
                   className="ml-2 inline-flex h-10 items-center justify-center rounded-full bg-gc-blue px-4 text-[14px] font-medium text-gc-on-blue hover:bg-gc-blue-hover"
                 >
-                  Start free
+                  Buy now
                 </Link>
               </>
             )}
@@ -159,11 +158,11 @@ export default function SiteHeader() {
                     Sign In
                   </Link>
                   <Link
-                    to="/founding"
+                    to="/pricing"
                     onClick={() => setMobileMenuOpen(false)}
                     className="inline-flex items-center justify-center rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm font-medium text-zinc-950 hover:bg-zinc-50"
                   >
-                    Apply now
+                    Buy now
                   </Link>
                 </div>
               )}

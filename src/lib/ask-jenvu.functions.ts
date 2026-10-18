@@ -34,7 +34,7 @@ ${knowledge}`;
 export const askJenvu = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => Input.parse(data))
   .handler(async ({ data }): Promise<AskJenvuResult> => {
-    const { callChatCompletion, checkAnalyzeRateLimit, MODEL_CHAIN, AiGatewayError } = await import("@/lib/ai-gateway");
+    const { callChatCompletion, checkAnalyzeRateLimit, ASK_JENVU_CHAIN, AiGatewayError } = await import("@/lib/ai-gateway");
     const { getRelevantJenvuKnowledge } = await import("@/lib/ask-jenvu-knowledge.server");
     const { getRequestHeader } = await import("@tanstack/react-start/server");
 
@@ -50,7 +50,7 @@ export const askJenvu = createServerFn({ method: "POST" })
 
     try {
       const { content } = await callChatCompletion({
-        models: [...MODEL_CHAIN.intent],
+        models: [...ASK_JENVU_CHAIN],
         messages: [{ role: "system", content: SYSTEM(getRelevantJenvuKnowledge(history.slice(-3).filter((m) => m.role === "user").map((m) => m.content).join(" "))) }, ...history],
         // Generous ceiling: some models count hidden reasoning against it,
         // which used to cut answers off halfway.

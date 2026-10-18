@@ -395,6 +395,15 @@ const FAST_CHAT_CHAIN = [
   "codecraft/gpt-5.5",
 ] as const;
 
+// Ask Jenvu (public assistant): Grok 4.6 then DeepSeek V4 Pro, as chosen by the
+// owner. Both live-tested OK on the CodeCraft key; Fable 5.1 stays as the
+// safety net if both return empty or cut-off answers.
+export const ASK_JENVU_CHAIN = [
+  "codecraft/grok-4.6",
+  "codecraft/deepseek-v4-pro-0813",
+  "codecraft/claude-fable-5.1",
+] as const;
+
 // Vision: Grok/GPT excluded — Claude models verified for image content.
 const VISION_CHAIN = [
   "codecraft/claude-opus-5",

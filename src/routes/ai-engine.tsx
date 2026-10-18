@@ -108,6 +108,14 @@ const CONTENT: IndustryContent = {
   whyCardText: "Jenvu does not promise profits or fixed win rates. Trading gold carries real risk.",
   storiesTitle: "Latest product stories",
   storySlugs: ["ai-desk-updates", "rvol-and-volume-direction", "build-with-jenvu"],
+  highlightsTitle: "What you get with every plan",
+  highlightsIntro: "Four tools that work together on one live gold chart.",
+  highlights: [
+    { title: "Live gold chart", text: "XAU/USD candles with structure, zones and sweeps marked for you." },
+    { title: "AI answers", text: "Ask about the chart and get a short, plain-language reply." },
+    { title: "Price alerts", text: "Pick a level and get told when gold reaches it." },
+    { title: "API keys", text: "Use Jenvu analysis in your own apps and bots." },
+  ],
   productsTitle: "Explore all products",
   products: [
     { title: "Jenvu Terminal", text: "Live gold chart with ICT/SMC overlays.", href: "https://dash.jenvu.com/terminal" },

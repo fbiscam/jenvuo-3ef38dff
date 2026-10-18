@@ -496,7 +496,7 @@
 @media (prefers-reduced-motion: reduce) {
   *:not(.animate-ticker):not(.gc-logo-marquee):not(.ask-jenvu-mark-ring), *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
   .animate-ticker { animation: ticker-marquee 60s linear infinite !important; }
-  .ask-jenvu-mark-ring { animation: ask-jenvu-ring 2s linear infinite !important; }
+  .ask-jenvu-mark-ring { animation: ask-jenvu-ring 1.6s linear infinite !important; }
 }
 
 
@@ -541,6 +541,10 @@
 @media (min-width: 1360px) { .jenvu-home-content { zoom: 0.927; } .jenvu-home-header { zoom: 0.945; } }
 @media (min-width: 1500px) { .jenvu-home-header { zoom: 1.04; } }
 @media (min-width: 1680px) { .jenvu-home-content { zoom: 0.972; } .jenvu-home-header { zoom: 1.103; } }
+/* Blog (list + article): content 25% larger than the homepage content */
+@media (min-width: 1024px) { .jenvu-blog-content { zoom: 1.069; } }
+@media (min-width: 1360px) { .jenvu-blog-content { zoom: 1.159; } }
+@media (min-width: 1680px) { .jenvu-blog-content { zoom: 1.215; } }
 /* Footer menu columns: 30% larger on laptop / desktop */
 @media (min-width: 1024px) { .jenvu-footer-menu-zoom { zoom: 1.3; } }
 /* Footer looks the same size on every page: undo the page-level zoom */
@@ -750,6 +754,7 @@ html[data-pwa="1"] body {
 }
 html[data-pwa="1"] .jenvu-zoom,
 html[data-pwa="1"] .jenvu-home-content,
+html[data-pwa="1"] .jenvu-blog-content,
 html[data-pwa="1"] .jenvu-home-header,
 html[data-pwa="1"] .jenvu-zoom-dashboard {
   zoom: 1 !important;
@@ -1321,15 +1326,17 @@ html body .dash-dark main.bg-white { background-color: oklch(0.165 0 0) !importa
 }
 @keyframes ind-kenburns { 0%,100% { transform: scale(1.02) translate(0,0); } 50% { transform: scale(1.1) translate(-1.5%,-1%); } }
 .ind-kenburns { animation: ind-kenburns 18s ease-in-out infinite; }
-/* Colour swap only (no movement), so it also runs when the device has "reduce animations" switched on. */
-/* Thinking logo: white logo whose outline cycles through four colours (Gemini-style).
-   Colour swap only, so it also runs with "reduce animations" switched on. */
-.ask-jenvu-mark-loop { display: inline-block; background-color: var(--background); -webkit-mask: var(--mark) center / contain no-repeat; mask: var(--mark) center / contain no-repeat; }
-@keyframes ask-jenvu-ring {
-  0%,24% { filter: drop-shadow(1.5px 0 0 var(--gc-blue)) drop-shadow(-1.5px 0 0 var(--gc-blue)) drop-shadow(0 1.5px 0 var(--gc-blue)) drop-shadow(0 -1.5px 0 var(--gc-blue)); }
-  25%,49% { filter: drop-shadow(1.5px 0 0 var(--gc-red)) drop-shadow(-1.5px 0 0 var(--gc-red)) drop-shadow(0 1.5px 0 var(--gc-red)) drop-shadow(0 -1.5px 0 var(--gc-red)); }
-  50%,74% { filter: drop-shadow(1.5px 0 0 var(--gc-yellow)) drop-shadow(-1.5px 0 0 var(--gc-yellow)) drop-shadow(0 1.5px 0 var(--gc-yellow)) drop-shadow(0 -1.5px 0 var(--gc-yellow)); }
-  75%,100% { filter: drop-shadow(1.5px 0 0 var(--gc-green)) drop-shadow(-1.5px 0 0 var(--gc-green)) drop-shadow(0 1.5px 0 var(--gc-green)) drop-shadow(0 -1.5px 0 var(--gc-green)); }
+/* Thinking logo: white logo with a running multi-colour line around its border
+   (Gemini-style). The outer layer is a rotating four-colour conic gradient cut to
+   the logo shape; the white logo sits slightly smaller on top, so only a thin
+   coloured outline shows and its colours flow around the edge. */
+@property --jv-ring-angle { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
+.ask-jenvu-mark-ring {
+  position: relative; display: inline-flex; align-items: center; justify-content: center;
+  background: conic-gradient(from var(--jv-ring-angle), var(--gc-blue), var(--gc-red), var(--gc-yellow), var(--gc-green), var(--gc-blue));
+  -webkit-mask: var(--mark) center / contain no-repeat; mask: var(--mark) center / contain no-repeat;
 }
-.ask-jenvu-mark-ring { animation: ask-jenvu-ring 2s linear infinite !important; }
+.ask-jenvu-mark-loop { display: inline-block; background-color: var(--background); -webkit-mask: var(--mark) center / contain no-repeat; mask: var(--mark) center / contain no-repeat; transform: scale(0.74); }
+@keyframes ask-jenvu-ring { to { --jv-ring-angle: 360deg; } }
+.ask-jenvu-mark-ring { animation: ask-jenvu-ring 1.6s linear infinite !important; }
 @media (prefers-reduced-motion: reduce) { .ind-kenburns { animation: none; } }
