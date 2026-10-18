@@ -8,7 +8,6 @@ export const SITE_NAV_LINKS = [
   { to: "/pricing", label: "Pricing" },
   { to: "/insights", label: "Insights" },
   { to: "/help", label: "Help Centre" },
-  { to: "/leads", label: "Leads Tool" },
   { to: "/contact", label: "Contact" },
 ] as const;
 

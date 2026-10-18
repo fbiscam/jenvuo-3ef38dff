@@ -4,7 +4,7 @@
  * Goals:
  *  - Dashboard home at dash.jenvu.com/overview; child pages at dash.jenvu.com/<page> (payment at /payment).
  *  - Serve sign-in at auth.jenvu.com/sign-in.
- *  - Mount blog, leads, and support route trees on their section hosts.
+ *  - Mount blog and support route trees on their section hosts.
  *  - Send global public pages such as Contact and Download to jenvu.com.
  *
  * Server redirects canonicalize incoming addresses; router rewrites retain the
@@ -15,7 +15,6 @@ const ROOT_DOMAIN = "jenvu.com";
 const AUTH_HOST = `auth.${ROOT_DOMAIN}`;
 
 const SUBDOMAIN_SECTIONS: Record<string, string> = {
-  leads: "/leads",
   dash: "/dashboard",
   blogs: "/insights",
   support: "/help",
@@ -87,11 +86,9 @@ function isDash(host: string): boolean {
 
 // Subdomains that host a section directly:
 //   blogs.jenvu.com   -> /insights (blog)
-//   leads.jenvu.com   -> /leads
 //   support.jenvu.com -> /help (help centre)
 const SECTION_HOSTS: Record<string, string> = {
   [`blogs.${ROOT_DOMAIN}`]: "/insights",
-  [`leads.${ROOT_DOMAIN}`]: "/leads",
   [`support.${ROOT_DOMAIN}`]: "/help",
 };
 
@@ -100,7 +97,6 @@ const SECTION_HOSTS: Record<string, string> = {
 const PATH_HOSTS: Array<[prefix: string, host: string]> = [
   ["/dashboard", `dash.${ROOT_DOMAIN}`],
   ["/help", `support.${ROOT_DOMAIN}`],
-  ["/leads", `leads.${ROOT_DOMAIN}`],
   ["/insights", `blogs.${ROOT_DOMAIN}`],
 ];
 
@@ -150,8 +146,6 @@ export const GLOBAL_PATHS = new Set([
   "strategies",
   "terms",
   "reset-password",
-  "leads-signin",
-  "leads-signup",
   "jenvu-ops-x9k2",
   "ops-x9k2-7m4n",
 ]);
@@ -199,6 +193,8 @@ export function apexRedirectTarget(url: URL): string | null {
   if (host !== ROOT_DOMAIN && host.endsWith(`.${ROOT_DOMAIN}`)) {
     const sub = host.slice(0, host.length - `.${ROOT_DOMAIN}`.length);
     if (sub.includes(".")) return null;
+    // The Leads tool was removed: its old subdomain goes to the homepage.
+    if (sub === "leads") return `https://${ROOT_DOMAIN}/`;
     // dash/blogs/leads/support subdomains host their sections directly —
     // but a path belonging to another section goes to that section's host
     // (e.g. dash.jenvu.com/help -> support.jenvu.com/).
