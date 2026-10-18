@@ -677,13 +677,19 @@ function TerminalPage() {
     <TooltipProvider>
       <div
         className={cn(
-          "flex h-full min-h-0 w-full flex-col overflow-hidden bg-background text-foreground",
-          theme === "dark" && "dark terminal-dark",
+          "flex h-full min-h-0 w-full flex-col overflow-hidden text-foreground",
+          theme === "dark" ? "dark terminal-dark bg-background" : "bg-gc-surface",
         )}
       >
-        <div className="flex min-h-0 flex-1 flex-col lg:flex-row">
+        <div className={cn("flex min-h-0 flex-1 flex-col lg:flex-row", theme !== "dark" && "gap-2 p-1.5 sm:p-2")}>
           {/* Chart */}
-          <section aria-label="XAU/USD chart" className="relative min-h-0 min-w-0 flex-1 bg-background">
+          <section
+            aria-label="XAU/USD chart"
+            className={cn(
+              "relative min-h-0 min-w-0 flex-1 bg-background",
+              theme !== "dark" && "overflow-hidden rounded-2xl border border-gc-line shadow-sm",
+            )}
+          >
             <JenvuChartWorkspace
               ref={chartRef}
               timeframes={TIMEFRAMES}
@@ -705,7 +711,7 @@ function TerminalPage() {
                     />
                   )}
                   <div
-                    className="flex h-7 items-center gap-1.5 rounded-md px-2 font-mono text-xs font-semibold text-foreground"
+                    className="flex h-7 items-center gap-1.5 rounded-full bg-muted px-2.5 font-mono text-xs font-semibold text-foreground"
                     title={marketClosed ? "Gold market is closed for the weekend" : `Time left on the current ${tf.label} candle`}
                     aria-label={marketClosed ? "Market closed" : `Current ${tf.label} candle closes in ${formatCountdown(secondsLeft)}`}
                   >
@@ -742,7 +748,7 @@ function TerminalPage() {
                     <button
                       type="button"
                       onClick={() => setDeskOpen(true)}
-                      className="flex h-7 items-center gap-1.5 rounded-md px-2 text-xs font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                      className="flex h-7 items-center gap-1.5 rounded-full bg-gc-blue-soft px-3 text-xs font-medium text-gc-blue transition-colors hover:bg-gc-nav-active dark:bg-accent dark:text-foreground"
                       title="Ask With AI"
                       aria-label="Ask With AI"
                     >
@@ -771,7 +777,14 @@ function TerminalPage() {
 
           {/* AI desk */}
           {deskOpen && (
-            <aside className="relative flex h-[45%] min-h-0 w-full shrink-0 flex-col border-t border-border bg-card text-card-foreground lg:h-full lg:w-[380px] lg:border-l lg:border-t-0">
+            <aside
+              className={cn(
+                "relative flex h-[45%] min-h-0 w-full shrink-0 flex-col bg-card text-card-foreground lg:h-full lg:w-[380px]",
+                theme === "dark"
+                  ? "border-t border-border lg:border-l lg:border-t-0"
+                  : "overflow-hidden rounded-2xl border border-gc-line shadow-sm",
+              )}
+            >
               <div className="flex min-h-17 items-center justify-end gap-2.5 border-b border-border px-4 py-3">
                 <Button
                   type="button"
