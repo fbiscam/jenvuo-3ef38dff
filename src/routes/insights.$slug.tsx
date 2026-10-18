@@ -9,7 +9,7 @@ import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import type { Tables } from "@/integrations/supabase/types";
-import SiteFooter from "@/components/SiteFooter";
+import BlogFooter from "@/components/BlogFooter";
 import { insightCoverUrl } from "@/lib/insight-cover";
 
 type Insight = Tables<"insights">;
@@ -44,7 +44,7 @@ export const Route = createFileRoute("/insights/$slug")({
     const title = data ? `${data.title} — Jenvu` : "Market Insight — Jenvu";
     const desc = data?.excerpt || "Institutional market analysis from Jenvu.";
     const imagePath = data ? insightCoverUrl(data.title, data.category, data.image_url) : null;
-    const img = imagePath?.startsWith("http") ? imagePath : imagePath ? `https://blogs.jenvu.com${imagePath}` : null;
+    const img = data?.image_url?.startsWith("http") ? data.image_url : null; void imagePath;
     return {
       meta: [
         { title },
@@ -267,7 +267,7 @@ function InsightDetailPage() {
         <RelatedArticles slug={insight.slug} />
       </div>
 
-      <SiteFooter />
+      <BlogFooter />
     </div>
   );
 }
