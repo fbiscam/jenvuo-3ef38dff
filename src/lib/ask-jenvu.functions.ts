@@ -52,7 +52,10 @@ export const askJenvu = createServerFn({ method: "POST" })
       const { content } = await callChatCompletion({
         models: [...MODEL_CHAIN.intent],
         messages: [{ role: "system", content: SYSTEM(getJenvuKnowledge()) }, ...history],
-        maxTokens: 1200,
+        // Generous ceiling: some models count hidden reasoning against it,
+        // which used to cut answers off halfway.
+        maxTokens: 4000,
+        rejectTruncated: true,
         retriesPerModel: 2,
         stage: "ask-jenvu",
       });

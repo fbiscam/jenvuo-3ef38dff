@@ -25,6 +25,9 @@ export type CallChatOptions = {
   // Force JSON response mode (uses response_format: json_object).
   jsonMode?: boolean;
   maxTokens?: number;
+  // Reject answers the provider cut off at the token limit (finish_reason
+  // "length") and move to the next model, so users never see half answers.
+  rejectTruncated?: boolean;
   // Retained for caller compatibility. Provider generations are not aborted
   // by an artificial timer; only an explicit caller cancellation may abort.
   timeoutMs?: number;
@@ -180,6 +183,10 @@ async function singleAttemptInner(
   const content = json?.choices?.[0]?.message?.content;
   if (typeof content !== "string" || !content.trim()) {
     throw new AiGatewayError("OmniRoute returned an empty response.", 0, false);
+  }
+  if (opts.rejectTruncated && json?.choices?.[0]?.finish_reason === "length") {
+    // Terminal for this model: skip straight to the next one in the chain.
+    throw new AiGatewayError("The answer was cut off before it finished.", 0, true);
   }
   const usageRaw = json?.usage ?? {};
   let promptTokens = Number(usageRaw.prompt_tokens ?? usageRaw.promptTokens ?? 0) || 0;
@@ -379,10 +386,13 @@ const PRIMARY_ANALYSIS_CHAIN = [
 
 const SENIOR_REVIEW_MODELS = PRIMARY_ANALYSIS_CHAIN;
 
+// Ordered by measured response time on the CodeCraft key (fable-5.1 ≈ 5s).
+// gpt-5.5 is last: it spends hidden reasoning tokens and often stops mid-answer.
 const FAST_CHAT_CHAIN = [
   "codecraft/claude-fable-5.1",
-  "codecraft/gpt-5.5",
   "codecraft/claude-opus-5",
+  "codecraft/deepseek-v4-flash-0731",
+  "codecraft/gpt-5.5",
 ] as const;
 
 // Vision: Grok/GPT excluded — Claude models verified for image content.
