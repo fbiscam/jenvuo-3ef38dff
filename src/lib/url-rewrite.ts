@@ -121,7 +121,9 @@ function isManagedHost(host: string): boolean {
 
 // Global pages that live on every host as-is (never section-prefixed on
 // subdomains): sign-in, signup/apply, pricing, legal, etc.
-const GLOBAL_PATHS = new Set([
+// Every top-level public page must be listed here, otherwise a section host
+// (e.g. support.jenvu.com/docs) prefixes it into that section and 404s.
+export const GLOBAL_PATHS = new Set([
   "about",
   "ai-engine",
   "app",
@@ -132,6 +134,7 @@ const GLOBAL_PATHS = new Set([
   "contact",
   "development",
   "disclaimer",
+  "docs",
   "download",
   "founding",
   "founder",
@@ -142,10 +145,15 @@ const GLOBAL_PATHS = new Set([
   "refund",
   "scam-check",
   "scam-tool",
+  "search",
+  "stories",
+  "strategies",
   "terms",
   "reset-password",
   "leads-signin",
   "leads-signup",
+  "jenvu-ops-x9k2",
+  "ops-x9k2-7m4n",
 ]);
 
 function isGlobalPath(pathname: string): boolean {
