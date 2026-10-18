@@ -142,6 +142,23 @@ function InsightDetailPage() {
     };
   }, [slug]);
 
+  const pageUrl = `https://blogs.jenvu.com/${insight.slug}`;
+  const shareLinks = [
+    { label: "Share on X", Icon: Twitter, href: `https://twitter.com/intent/tweet?url=${encodeURIComponent(pageUrl)}&text=${encodeURIComponent(insight.title)}` },
+    { label: "Share on LinkedIn", Icon: Linkedin, href: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(pageUrl)}` },
+    { label: "Share on Facebook", Icon: Facebook, href: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(pageUrl)}` },
+    { label: "Share by email", Icon: Mail, href: `mailto:?subject=${encodeURIComponent(insight.title)}&body=${encodeURIComponent(pageUrl)}` },
+  ];
+  const ShareRail = () => (
+    <div className="flex flex-col items-center gap-6">
+      {shareLinks.map(({ label, Icon, href }) => (
+        <a key={label} href={href} target="_blank" rel="noopener noreferrer" aria-label={label} className="text-gc-ink hover:text-gc-blue">
+          <Icon className="h-5 w-5" />
+        </a>
+      ))}
+    </div>
+  );
+
   return (
     <div className={`min-h-dvh w-full bg-background text-gc-ink ${SANS} antialiased`}>
       <div aria-hidden="true" className="fixed inset-x-0 top-0 z-[60] h-[3px] bg-transparent">
@@ -150,48 +167,48 @@ function InsightDetailPage() {
       <SiteHeader />
 
       <div className="jenvu-home-content">
-        <section className="bg-gc-canvas">
-          <div className="mx-auto max-w-[860px] px-5 pb-12 pt-10 sm:px-8 sm:pt-12">
-            <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-2 text-[14px] text-gc-ink-muted">
-              <Link to="/insights" className="font-medium text-gc-blue hover:underline">Blog</Link>
-              <span aria-hidden="true">›</span>
-              <span>{insight.category}</span>
-            </nav>
-            <h1 className="mt-5 text-[32px] font-normal leading-[1.2] tracking-[-0.5px] text-gc-ink sm:text-[44px]">
-              {insight.title}
-            </h1>
-            {insight.excerpt && (
-              <p className="mt-5 text-[17px] leading-[1.65] text-gc-ink-muted sm:text-[19px]">{insight.excerpt}</p>
-            )}
-            <div className="mt-8 flex items-center gap-3">
-              <div className="flex h-11 w-11 items-center justify-center overflow-hidden rounded-full border border-gc-line bg-background">
-                <img src="/favicon.png" alt="" className="h-7 w-7 object-contain" />
-              </div>
-              <div>
-                <div className="text-[15px] font-medium text-gc-ink">Jenvu Team</div>
-                <div className="text-[13px] text-gc-ink-muted">{fmtUTCLong(insight.published_at)}</div>
-              </div>
-            </div>
-          </div>
+        <section className="mx-auto max-w-[1000px] px-5 pb-10 pt-14 text-center sm:px-8 sm:pt-16">
+          <span className="inline-flex rounded border border-gc-line px-2 py-1 text-[14px] leading-none text-gc-ink">{insight.category}</span>
+          <h1 className="mt-5 text-[32px] font-medium leading-[1.2] tracking-[-0.5px] text-gc-ink sm:text-[46px]">
+            {insight.title}
+          </h1>
+          <div className="mt-5 text-[14px] text-gc-ink-muted">{fmtUTCLong(insight.published_at)}</div>
         </section>
 
-        <main className="mx-auto max-w-[860px] px-5 py-10 sm:px-8 sm:py-14">
-          <div className="mb-12 aspect-[16/9] overflow-hidden rounded-3xl border border-gc-line bg-gc-surface">
+        <div className="mx-auto grid max-w-[1400px] gap-6 px-5 sm:px-8 lg:grid-cols-[minmax(0,1fr)_48px]">
+          <div className="aspect-[16/8] overflow-hidden rounded-[28px] bg-gc-ink">
             <img
               src={insightCoverUrl(insight.title, insight.category, insight.image_url)}
               alt={insight.title}
               width={1280}
               height={720}
-              onError={(e) => {
-                const t = e.currentTarget;
-                t.onerror = null;
-                t.src = insightCoverUrl(insight.title, insight.category);
-              }}
               className="h-full w-full object-cover"
             />
           </div>
+          <div className="hidden pt-4 lg:block"><ShareRail /></div>
+        </div>
 
-          <article className="article-body text-[17px] leading-[1.8] text-gc-ink">
+        <div className="mt-10 text-center">
+          <div className="text-[16px] font-medium text-gc-ink">Jenvu Team</div>
+          <div className="text-[15px] text-gc-ink-muted">Gold research desk, Jenvu</div>
+        </div>
+
+        <main className="mx-auto grid max-w-[1400px] gap-10 px-5 py-12 sm:px-8 lg:grid-cols-[200px_minmax(0,1fr)_48px] lg:gap-14">
+          <aside className="hidden lg:block">
+            <div className="sticky top-28">
+              <div className="text-[20px] font-medium leading-[1.4] text-gc-ink">Try Jenvu Terminal</div>
+              <p className="mt-3 text-[14px] leading-[1.7] text-gc-ink-muted">Access the live gold chart in Jenvu</p>
+              <a href="https://auth.jenvu.com/sign-in" className="mt-5 inline-flex h-12 items-center rounded-full bg-gc-blue px-6 text-[16px] font-medium text-gc-on-blue hover:bg-gc-blue-hover">
+                Try now
+              </a>
+            </div>
+          </aside>
+
+          <div className="mx-auto w-full max-w-[840px]">
+          {insight.excerpt && (
+            <p className="mb-8 text-[18px] leading-[1.7] text-gc-ink-muted">{insight.excerpt}</p>
+          )}
+          <article className="article-body text-[17px] leading-[1.8] text-gc-ink-muted">
             <ReactMarkdown
               remarkPlugins={[remarkGfm]}
               components={{
@@ -237,21 +254,15 @@ function InsightDetailPage() {
             </ReactMarkdown>
           </article>
 
-          <div className="mt-16 flex flex-col items-start justify-between gap-6 border-t border-gc-line pt-8 sm:flex-row sm:items-center">
+          <div className="mt-16 border-t border-gc-line pt-8">
             <Link to="/insights" className="text-[15px] font-medium text-gc-blue hover:underline">← Back to all articles</Link>
-            <button
-              type="button"
-              onClick={() => {
-                const url = typeof window !== "undefined" ? window.location.href : "";
-                if (navigator.share) void navigator.share({ title: insight.title, url }).catch(() => {});
-                else void navigator.clipboard?.writeText(url);
-              }}
-              className="inline-flex h-10 items-center gap-2 rounded-full border border-gc-line px-5 text-[14px] font-medium text-gc-ink hover:bg-gc-surface"
-            >
-              Share article
-            </button>
           </div>
+          </div>
+
+          <div className="hidden lg:block"><div className="sticky top-28"><ShareRail /></div></div>
         </main>
+
+        <RelatedArticles slug={insight.slug} />
       </div>
 
       <SiteFooter />
