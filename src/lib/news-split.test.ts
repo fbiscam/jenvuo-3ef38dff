@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import { expect } from "./chart/test-expect";
-import { splitNews, PREVIOUS_NEWS, MAX_NEWS, type NewsEvent } from "./news.functions";
+import { splitNews, PREVIOUS_NEWS, MAX_NEWS, type NewsEvent } from "./news-split";
 
 const ev = (h: number): NewsEvent => ({ title: `E${h}`, country: "USD", date: new Date(Date.UTC(2026, 9, 20, h)).toISOString(), impact: "High", minutesUntil: 0 });
 

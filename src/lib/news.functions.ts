@@ -3,16 +3,6 @@ import { createServerFn } from "@tanstack/react-start";
 import type { NewsEvent } from "./news-split";
 export type { NewsEvent } from "./news-split";
 
-type _Unused = {
-  title: string;
-  country: string;
-  date: string; // ISO
-  impact: "High" | "Medium" | "Low";
-  forecast?: string;
-  previous?: string;
-  minutesUntil: number;
-};
-
 type FFEvent = {
   title: string;
   country: string;
