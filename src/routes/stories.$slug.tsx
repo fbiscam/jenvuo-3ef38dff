@@ -1,5 +1,5 @@
 import { createFileRoute, notFound, Link } from "@tanstack/react-router";
-import { PageShell, Feature, Banner, Stats, StoryCards, UL } from "@/components/PageShell";
+import { PageShell, Banner, StoryCards, UL } from "@/components/PageShell";
 import { STORIES, getStory } from "@/lib/stories";
 
 export const Route = createFileRoute("/stories/$slug")({
@@ -47,36 +47,53 @@ function StoryPage() {
 
   return (
     <PageShell wide eyebrow={story.tag} title={story.title} intro={story.intro}>
-      <Feature
-        title={story.feature.title}
-        text={
-          <>
+      {/* Feature: text and picture, vertically centred */}
+      <section className="mx-auto grid max-w-[1040px] items-center gap-10 px-5 py-12 sm:px-8 md:grid-cols-2">
+        <div>
+          <h2 className="text-[26px] font-normal leading-tight text-gc-ink">{story.feature.title}</h2>
+          <div className="mt-4 space-y-4 text-[16px] leading-[1.65] text-gc-ink-muted">
             {story.feature.text.map((t, i) => (
-              <p key={i} className={i ? "mt-4" : ""}>{t}</p>
+              <p key={i}>{t}</p>
             ))}
-          </>
-        }
-        linkLabel={story.cta.label}
-        href={story.cta.href}
-        media={<img src={story.img} alt="" width={1024} height={640} className="h-auto w-full" />}
-        caption={story.feature.caption}
-      />
+          </div>
+          <a href={story.cta.href} className="mt-6 inline-flex h-10 items-center rounded-full border border-gc-line px-5 text-[14px] font-medium text-gc-blue-deep hover:bg-gc-surface">
+            {story.cta.label}
+          </a>
+        </div>
+        <figure>
+          <div className="overflow-hidden rounded-2xl bg-gc-ink">
+            <img src={story.img} alt="" width={1024} height={640} className="aspect-[16/10] h-auto w-full object-cover" />
+          </div>
+          <figcaption className="mt-3 text-center text-[13px] text-gc-ink-muted">{story.feature.caption}</figcaption>
+        </figure>
+      </section>
 
-      <div className="px-4 py-6 sm:px-6">
+      <div className="mx-auto max-w-[1040px] px-5 py-6 sm:px-8">
         <Banner title={story.banner.title}>{story.banner.text}</Banner>
       </div>
 
-      <Stats
-        title={story.steps.title}
-        text={
-          <UL>
-            {story.steps.points.map((p) => (
-              <li key={p}>{p}</li>
-            ))}
-          </UL>
-        }
-        stats={story.stats}
-      />
+      {/* Key points + numbers */}
+      <section className="mx-auto grid max-w-[1040px] items-center gap-10 px-5 py-14 sm:px-8 md:grid-cols-2">
+        <div>
+          <h2 className="text-[26px] font-normal leading-tight text-gc-ink">{story.steps.title}</h2>
+          <div className="mt-5">
+            <UL>
+              {story.steps.points.map((pt) => (
+                <li key={pt}>{pt}</li>
+              ))}
+            </UL>
+          </div>
+        </div>
+        <div className="grid grid-cols-3 gap-4">
+          {story.stats.map((st) => (
+            <div key={st.label} className="flex flex-col items-center text-center">
+              <p className="text-[40px] font-normal leading-none text-gc-success sm:text-[48px]">{st.value}</p>
+              <div className="my-4 h-px w-3/4 bg-gc-line" />
+              <p className="text-[14px] leading-snug text-gc-ink">{st.label}</p>
+            </div>
+          ))}
+        </div>
+      </section>
 
       <StoryCards
         title="More stories"

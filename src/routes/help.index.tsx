@@ -1,10 +1,11 @@
 import * as React from "react";
 import SiteHeader from "@/components/SiteHeader";
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate, useLocation } from "@tanstack/react-router";
 import { Search, ArrowRight, ChevronDown, ChevronsUpDown, Send } from "lucide-react";
 import SiteFooter from "@/components/SiteFooter";
 import { NextStep } from "@/components/PageShell";
 import { collections, allArticles } from "@/lib/help-content";
+import { SUPPORT_GUIDES } from "@/lib/support-guides";
 
 export const Route = createFileRoute("/help/")({
   head: () => ({
@@ -31,6 +32,7 @@ const SANS = "font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif]
 function HelpCenterPage() {
   const [q, setQ] = React.useState("");
   const navigate = useNavigate();
+  const hash = useLocation({ select: (l) => l.hash });
 
   const results = React.useMemo(() => {
     const term = q.trim().toLowerCase();
@@ -87,6 +89,20 @@ function HelpCenterPage() {
               Talk directly with our team about partnerships, press or anything else on the{" "}
               <Link to="/contact" className="text-gc-blue-deep underline">Contact page</Link>.
             </p>
+          </div>
+        </section>
+
+        {/* PLATFORM GUIDES — homepage links jump to these by #id */}
+        <section className="border-t border-gc-line py-14">
+          <h2 className="text-[34px] tracking-tight">Platform guides</h2>
+          <p className="mt-4 line-clamp-3 max-w-[830px] text-[16px] text-gc-ink-muted">Quick answers on the main Jenvu tools.</p>
+          <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
+            {SUPPORT_GUIDES.map((g) => (
+              <div key={g.id} id={g.id} className={`scroll-mt-28 rounded-lg border p-6 transition ${hash === g.id ? "border-gc-blue-deep bg-gc-sky" : "border-gc-line"}`}>
+                <h3 className="line-clamp-2 text-[20px] leading-snug">{g.title}</h3>
+                <p className="mt-3 line-clamp-3 text-[16px] leading-relaxed text-gc-ink-muted">{g.text}</p>
+              </div>
+            ))}
           </div>
         </section>
 
@@ -147,15 +163,15 @@ function HelpCenterPage() {
             {shown.map((c) => (
               <div key={c.slug} className="mt-14 border-b border-gc-line pb-12 last:border-b-0">
                 <h2 className="text-[34px] tracking-tight">{c.title}</h2>
-                <p className="mt-4 text-[16px] text-gc-ink-muted">
+                <p className="mt-4 line-clamp-3 text-[16px] text-gc-ink-muted">
                   {c.description}{" "}
                   <Link to="/help/$collection" params={{ collection: c.slug }} className="text-gc-blue-deep underline">See all {c.articles.length} articles</Link>.
                 </p>
                 <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
                   {c.articles.slice(0, 6).map((a) => (
                     <Link key={a.slug} to="/help/$collection/$slug" params={{ collection: c.slug, slug: a.slug }} className="rounded-lg border border-gc-line p-6 transition hover:shadow-md">
-                      <div className="text-[20px] leading-snug">{a.title}</div>
-                      <div className="mt-3 text-[16px] leading-relaxed text-gc-ink-muted line-clamp-4">{a.summary}</div>
+                      <div className="line-clamp-2 text-[20px] leading-snug">{a.title}</div>
+                      <div className="mt-3 text-[16px] leading-relaxed text-gc-ink-muted line-clamp-3">{a.summary}</div>
                     </Link>
                   ))}
                 </div>

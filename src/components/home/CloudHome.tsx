@@ -307,10 +307,9 @@ export function CloudAudiences() {
         </div>
         <div className="mt-9 grid gap-6 md:grid-cols-3">
           {current.cards.map((c) => (
-            <Link
+            <div
               key={c.tag}
-              to={c.to}
-              className="group flex min-h-[124px] overflow-hidden rounded-lg border border-gc-line bg-background transition hover:shadow-[0_1px_2px_rgba(60,64,67,0.3),0_2px_6px_2px_rgba(60,64,67,0.15)]"
+              className="flex min-h-[124px] overflow-hidden rounded-lg border border-gc-line bg-background"
             >
               <div className="flex min-w-0 flex-1 flex-col justify-center px-4 py-5">
                 <div className="text-[12px] font-medium tracking-wide text-gc-ink/80">{c.tag}</div>
@@ -322,7 +321,7 @@ export function CloudAudiences() {
                   <img src="/favicon.png" alt="" className="h-14 w-14 object-contain" />
                 </div>
               )}
-            </Link>
+            </div>
           ))}
         </div>
       </div>
@@ -331,23 +330,24 @@ export function CloudAudiences() {
 }
 
 /* ---------------- Build-with accordion (Google Cloud-style) ---------------- */
-type BuildPart = string | { link: string; to: string };
+/** Highlighted links jump to the matching guide on the Support page. */
+type BuildPart = string | { link: string; hash: string };
 const BUILD_ITEMS: Array<{ key: string; title: string; points: BuildPart[][] }> = [
   {
     key: "terminal",
     title: "Gold Terminal and chart analysis",
     points: [
-      ["Read live XAU/USD candles with HH, HL, LH and LL labels on our ", { link: "non-repainting gold Terminal", to: "/pricing" }, ", plus BOS and CHoCH breaks that stay fixed once a candle closes"],
-      ["Spot supply and demand zones paired with ", { link: "fair value gaps", to: "/help" }, ", drawn only when they score strong and kept until a clear invalidation"],
-      ["Check fresh liquidity sweeps on 15M, 1H, 2H and 4H with ", { link: "fakeout filters", to: "/help" }, " that flag weak pokes and re-accepted levels"],
+      ["Read live XAU/USD candles with HH, HL, LH and LL labels on our ", { link: "non-repainting gold Terminal", hash: "gold-terminal" }, ", plus BOS and CHoCH breaks that stay fixed once a candle closes"],
+      ["Spot supply and demand zones paired with ", { link: "fair value gaps", hash: "fair-value-gaps" }, ", drawn only when they score strong and kept until a clear invalidation"],
+      ["Check fresh liquidity sweeps on 15M, 1H, 2H and 4H with ", { link: "fakeout filters", hash: "fakeout-filters" }, " that flag weak pokes and re-accepted levels"],
     ],
   },
   {
     key: "ai",
     title: "AI desk and copilot",
     points: [
-      ["Ask about the chart in plain language with the ", { link: "Jenvu AI desk", to: "/ai-engine" }, " and get a focused answer to exactly what you asked"],
-      ["Chat with screenshots and voice, backed by ", { link: "top-tier AI models", to: "/ai-engine" }, " that read the same chart data you see"],
+      ["Ask about the chart in plain language with the ", { link: "Jenvu AI desk", hash: "ai-desk" }, " and get a focused answer to exactly what you asked"],
+      ["Chat with screenshots and voice, backed by ", { link: "top-tier AI models", hash: "ai-models" }, " that read the same chart data you see"],
       ["Get a clear WAIT when the evidence or risk isn't there, instead of a forced trade idea"],
     ],
   },
@@ -355,7 +355,7 @@ const BUILD_ITEMS: Array<{ key: string; title: string; points: BuildPart[][] }> 
     key: "volume",
     title: "Volume and market pressure",
     points: [
-      ["See ", { link: "RVOL spike colours", to: "/help" }, " on every volume bar with a 20-candle average line fixed at the bottom of the chart"],
+      ["See ", { link: "RVOL spike colours", hash: "rvol" }, " on every volume bar with a 20-candle average line fixed at the bottom of the chart"],
       ["Read an estimated buyer and seller share for each candle, so pressure shifts are easy to notice"],
     ],
   },
@@ -363,7 +363,7 @@ const BUILD_ITEMS: Array<{ key: string; title: string; points: BuildPart[][] }> 
     key: "practice",
     title: "Demo trading and practice",
     points: [
-      ["Practice your ideas on a ", { link: "$100,000 demo account", to: "/pricing" }, " with automatic closing at your stop loss and take profit"],
+      ["Practice your ideas on a ", { link: "$100,000 demo account", hash: "demo-account" }, " with automatic closing at your stop loss and take profit"],
       ["Use TradingView-style order tickets and review every result in your full trade history"],
     ],
   },
@@ -371,8 +371,8 @@ const BUILD_ITEMS: Array<{ key: string; title: string; points: BuildPart[][] }> 
     key: "developers",
     title: "API keys and browser extension",
     points: [
-      ["Plug Jenvu models into your apps and bots with ", { link: "API keys", to: "/pricing" }, " at $3 per million tokens"],
-      ["Bring Jenvu analysis into TradingView with the ", { link: "browser extension", to: "/download" }, " side panel that reads your chart"],
+      ["Plug Jenvu models into your apps and bots with ", { link: "API keys", hash: "api-keys" }, " at $3 per million tokens"],
+      ["Bring Jenvu analysis into TradingView with the ", { link: "browser extension", hash: "browser-extension" }, " side panel that reads your chart"],
     ],
   },
 ];
@@ -430,7 +430,7 @@ export function CloudBuildWith() {
                             typeof p === "string" ? (
                               <React.Fragment key={j}>{p}</React.Fragment>
                             ) : (
-                              <Link key={j} to={p.to} className="text-gc-blue-deep underline underline-offset-2 hover:text-gc-navy">
+                              <Link key={j} to="/help" hash={p.hash} className="text-gc-blue-deep underline underline-offset-2 hover:text-gc-navy">
                                 {p.link}
                               </Link>
                             ),
