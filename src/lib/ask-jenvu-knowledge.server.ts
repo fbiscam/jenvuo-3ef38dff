@@ -42,3 +42,58 @@ export function getJenvuKnowledge(): string {
   cached = parts.join("\n").slice(0, 60000);
   return cached;
 }
+
+// ---- Question-focused knowledge --------------------------------------------
+// Sending all ~26k characters with every question made answers slow (the
+// model reads the whole prompt first). Instead send the core facts plus only
+// the few sections that match the question's words.
+
+type Section = { text: string; words: Set<string> };
+let sections: Section[] | null = null;
+
+const STOP = new Set(
+  "the a an and or of to in on for is are what how do does can i you my me it with about this that jenvu be at by from as your".split(" "),
+);
+const tokenize = (s: string) =>
+  s.toLowerCase().replace(/[^a-z0-9$+\s/-]/g, " ").split(/[\s/-]+/).filter((w) => w.length > 1 && !STOP.has(w));
+
+function getSections(): Section[] {
+  if (sections) return sections;
+  const out: string[] = [];
+  for (const c of collections) {
+    for (const a of c.articles) {
+      const body = a.body.map(blockText).filter(Boolean).join("\n");
+      out.push(`### ${c.title} — ${a.title}\n${a.summary}\n${body}`);
+    }
+  }
+  for (const g of SUPPORT_GUIDES) out.push(`### Guide — ${g.title}\n${g.text}`);
+  for (const s of STORIES) out.push(`### Story — ${s.title}\n${s.intro}`);
+  sections = out.map((text) => ({ text, words: new Set(tokenize(text)) }));
+  return sections;
+}
+
+/** Core facts + the best-matching sections for the latest question (bounded size). */
+export function getRelevantJenvuKnowledge(question: string, maxChars = 7000): string {
+  const q = tokenize(question);
+  const scored = getSections()
+    .map((s) => {
+      const title = s.text.split("\n", 1)[0].toLowerCase();
+      let score = 0;
+      for (const w of q) {
+        if (s.words.has(w)) score += 1;
+        if (title.includes(w)) score += 2;
+      }
+      return { s, score };
+    })
+    .filter((x) => x.score > 0)
+    .sort((a, b) => b.score - a.score);
+  const parts = [CORE_FACTS.trim()];
+  let size = parts[0].length;
+  for (const { s } of scored) {
+    if (size + s.text.length > maxChars) continue;
+    parts.push(s.text);
+    size += s.text.length;
+    if (parts.length > 6) break;
+  }
+  return parts.join("\n\n");
+}

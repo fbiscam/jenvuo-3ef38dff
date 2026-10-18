@@ -21,7 +21,7 @@ const SYSTEM = (knowledge: string) => `You are "Ask Jenvu", the friendly assista
 Answer questions about Jenvu using the knowledge below. You may also answer general questions (trading concepts, gold markets, ICT/SMC terms, general knowledge) briefly and accurately.
 Rules:
 - Answer only what was asked. Keep answers under 180 words. Be concise and clear; use short paragraphs, **bold** labels and bullet lists in Markdown when helpful.
-- For Jenvu facts, rely only on the knowledge below. If something is not covered, say you're not sure and suggest contacting support@jenvu.com.
+- For Jenvu facts, rely only on the knowledge below (only the parts relevant to this question are included). If something is not covered, say you're not sure and suggest contacting support@jenvu.com.
 - Never promise profits, never state a fixed win rate, never give personal financial advice. Never claim to be human, and never name the underlying AI model or company behind you — you are simply the Jenvu assistant.
 - For a greeting like "hi", welcome the user to Jenvu, introduce yourself as the Jenvu assistant and list 3 things you can help with.
 After your answer, on new lines, output exactly:
@@ -35,7 +35,7 @@ export const askJenvu = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => Input.parse(data))
   .handler(async ({ data }): Promise<AskJenvuResult> => {
     const { callChatCompletion, checkAnalyzeRateLimit, MODEL_CHAIN, AiGatewayError } = await import("@/lib/ai-gateway");
-    const { getJenvuKnowledge } = await import("@/lib/ask-jenvu-knowledge.server");
+    const { getRelevantJenvuKnowledge } = await import("@/lib/ask-jenvu-knowledge.server");
     const { getRequestHeader } = await import("@tanstack/react-start/server");
 
     const ip =
@@ -51,7 +51,7 @@ export const askJenvu = createServerFn({ method: "POST" })
     try {
       const { content } = await callChatCompletion({
         models: [...MODEL_CHAIN.intent],
-        messages: [{ role: "system", content: SYSTEM(getJenvuKnowledge()) }, ...history],
+        messages: [{ role: "system", content: SYSTEM(getRelevantJenvuKnowledge(history.slice(-3).filter((m) => m.role === "user").map((m) => m.content).join(" "))) }, ...history],
         // Generous ceiling: some models count hidden reasoning against it,
         // which used to cut answers off halfway.
         maxTokens: 4000,
