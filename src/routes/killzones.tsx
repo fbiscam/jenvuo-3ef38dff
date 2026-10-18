@@ -308,7 +308,7 @@ function KillzonesPage() {
                         onClick={() => {
                           navigate({ to: "/app" });
                         }}
-                        className={`group text-left rounded-3xl p-5  border p-4  transition-all duration-300 hover:-translate-y-1 ${ locked ? "border-gc-line bg-gc-surface hover:border-gc-line" : "border-gc-line bg-background hover:border-gc-line " }`}
+                        className={`group text-left rounded-3xl border p-5 transition-all duration-300 hover:-translate-y-1 ${ locked ? "border-gc-line bg-gc-surface hover:border-gc-line" : "border-gc-line bg-background hover:border-gc-line " }`}
                       >
                         <div className="flex items-start justify-between gap-3">
                           <div className="min-w-0">
