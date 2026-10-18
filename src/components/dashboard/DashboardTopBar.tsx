@@ -70,7 +70,7 @@ export default function DashboardTopBar({
             e.preventDefault();
             if (matches[0]) go(matches[0].to);
           }}
-          className="flex h-10 items-center rounded-full border border-gc-line bg-gc-notice pl-4 pr-1 focus-within:bg-background focus-within:shadow-sm"
+          className={`flex h-10 items-center rounded-full border border-gc-line ${white ? "bg-background" : "bg-gc-notice"} pl-4 pr-1 focus-within:bg-background focus-within:shadow-sm`}
         >
           <input
             ref={inputRef}
