@@ -1328,5 +1328,7 @@ html body .dash-dark main.bg-white { background-color: oklch(0.165 0 0) !importa
 }
 @keyframes ind-kenburns { 0%,100% { transform: scale(1.02) translate(0,0); } 50% { transform: scale(1.1) translate(-1.5%,-1%); } }
 .ind-kenburns { animation: ind-kenburns 18s ease-in-out infinite; }
-@keyframes ask-jenvu-hue { 0% { filter: hue-rotate(0deg); } 25% { filter: hue-rotate(150deg) saturate(1.4); } 50% { filter: hue-rotate(-90deg) saturate(1.6) brightness(1.1); } 75% { filter: hue-rotate(110deg) saturate(1.5) brightness(.95); } 100% { filter: hue-rotate(0deg); } }
+@keyframes ask-jenvu-colors { 0%,100% { background-color: var(--gc-blue); } 25% { background-color: var(--gc-red); } 50% { background-color: var(--gc-yellow); } 75% { background-color: var(--gc-green); } }
+.ask-jenvu-mark-loop { display: inline-block; background-color: var(--gc-blue); -webkit-mask: var(--mark) center / contain no-repeat; mask: var(--mark) center / contain no-repeat; animation: ask-jenvu-colors 2.4s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) { .ask-jenvu-mark-loop { animation: none; } }
 @media (prefers-reduced-motion: reduce) { .ind-kenburns { animation: none; } }
