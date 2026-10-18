@@ -308,7 +308,7 @@ function PricingPage() {
             { price: 50, sub: "Power" },
           ].map((p) => (
             <div key={p.price} className={`flex flex-col rounded-lg border p-6 ${p.accent ? "border-gc-blue-deep" : "border-gc-line"}`}>
-              <div className="flex items-center justify-between">
+              <div className="flex h-6 items-center justify-between">
                 <span className="text-[13px] font-medium uppercase tracking-wide text-gc-ink-muted">{p.sub}</span>
                 {p.accent && <span className="rounded-full bg-gc-sky px-2.5 py-0.5 text-[12px] font-medium text-gc-blue-deep">Best value</span>}
               </div>
@@ -395,7 +395,7 @@ function CustomTopUp({ signedOut }: { signedOut: boolean }) {
             Minimum $5. $1 top-up = $1 wallet. Primary requests cost $0.03; completed senior-reviewed analysis costs $0.20. Every $3 of balance unlocks 1,000,000 tokens of daily usage, up to your plan's limit. The allowance resets at 00:00 UTC.
           </p>
         </div>
-        <div className="flex flex-wrap items-center gap-4">
+        <div className="flex shrink-0 flex-wrap items-center gap-4 lg:flex-nowrap">
           <div className="flex items-center overflow-hidden rounded-md border border-gc-line bg-background focus-within:border-gc-blue-deep">
             <span className="border-r border-gc-line px-3 py-2 text-[15px] text-gc-ink-muted">$</span>
             <input
