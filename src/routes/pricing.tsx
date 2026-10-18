@@ -180,7 +180,7 @@ function PricingPage() {
           <h2 className="text-[28px] font-normal leading-tight">Stay in control of your spending</h2>
           <p className="mt-5 text-[17px] leading-[1.65] text-gc-ink-muted">
             <a href="https://dash.jenvu.com/usage" className={LINK}>Track your usage</a> with daily token limits, wallet balances and request logs.{" "}
-            <a href="https://dash.jenvu.com/billing" className={LINK}>Manage billing</a> and top up only when you need to.
+            <a href="https://dash.jenvu.com/billing" className={LINK}>Manage billing</a> and top up only when need to.
           </p>
           <p className="mt-5 text-[17px] leading-[1.65] text-gc-ink-muted">
             We're here to help with <a href="https://support.jenvu.com" className={LINK}>billing support</a>.
