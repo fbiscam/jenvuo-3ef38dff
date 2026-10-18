@@ -168,7 +168,7 @@ function InsightDetailPage() {
       </div>
       <SiteHeader />
 
-      <div className="jenvu-home-content">
+      <div className="jenvu-blog-content">
         <section className="mx-auto max-w-[1000px] px-5 pb-10 pt-14 text-center sm:px-8 sm:pt-16">
           <span className="inline-flex rounded border border-gc-line px-2 py-1 text-[14px] leading-none text-gc-ink">{insight.category}</span>
           <h1 className="mt-5 text-[32px] font-medium leading-[1.2] tracking-[-0.5px] text-gc-ink sm:text-[46px]">

@@ -161,7 +161,7 @@ function InsightsPage() {
     <div className={`min-h-dvh w-full bg-background text-gc-ink ${SANS} antialiased`}>
       <SiteHeader />
 
-      <div className="jenvu-home-content">
+      <div className="jenvu-blog-content">
         {/* HERO */}
         <section className="mx-auto max-w-[1200px] px-5 pb-6 pt-14 text-center sm:px-8 sm:pt-16">
           <img src="/favicon.png" alt="" width={56} height={56} className="mx-auto h-14 w-14 object-contain" />

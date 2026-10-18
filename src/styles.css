@@ -541,6 +541,10 @@
 @media (min-width: 1360px) { .jenvu-home-content { zoom: 0.927; } .jenvu-home-header { zoom: 0.945; } }
 @media (min-width: 1500px) { .jenvu-home-header { zoom: 1.04; } }
 @media (min-width: 1680px) { .jenvu-home-content { zoom: 0.972; } .jenvu-home-header { zoom: 1.103; } }
+/* Blog (list + article): content 25% larger than the homepage content */
+@media (min-width: 1024px) { .jenvu-blog-content { zoom: 1.069; } }
+@media (min-width: 1360px) { .jenvu-blog-content { zoom: 1.159; } }
+@media (min-width: 1680px) { .jenvu-blog-content { zoom: 1.215; } }
 /* Footer menu columns: 30% larger on laptop / desktop */
 @media (min-width: 1024px) { .jenvu-footer-menu-zoom { zoom: 1.3; } }
 /* Footer looks the same size on every page: undo the page-level zoom */
@@ -750,6 +754,7 @@ html[data-pwa="1"] body {
 }
 html[data-pwa="1"] .jenvu-zoom,
 html[data-pwa="1"] .jenvu-home-content,
+html[data-pwa="1"] .jenvu-blog-content,
 html[data-pwa="1"] .jenvu-home-header,
 html[data-pwa="1"] .jenvu-zoom-dashboard {
   zoom: 1 !important;
