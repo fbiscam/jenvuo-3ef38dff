@@ -38,3 +38,4 @@
 - [x] Terminal: theme, market-closed and news buttons removed from chart top bar
 - [x] Terminal: drawing tools (incl. long/short) moved into a "Draw" side-bar button under Script
 - [x] Terminal: candle timer and News (upcoming + previous 5) in the side bar above Ask AI
+- [x] Terminal: strip above the chart removed on laptops/tablets (chart starts right under the search bar)
