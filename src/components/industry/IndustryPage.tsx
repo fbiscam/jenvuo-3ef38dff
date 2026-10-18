@@ -73,8 +73,8 @@ function Buttons({ center = false }: { center?: boolean }) {
       <a href="https://jenvu.com/contact" className="inline-flex h-11 items-center rounded-full bg-gc-blue-deep px-6 text-[14px] font-medium text-gc-on-blue hover:bg-gc-blue">
         Talk to an expert
       </a>
-      <a href="https://auth.jenvu.com/sign-in" className="inline-flex h-11 items-center rounded-full border border-gc-line px-6 text-[14px] font-medium text-gc-blue-deep hover:bg-gc-blue-soft">
-        Start free
+      <a href="https://jenvu.com/pricing" className="inline-flex h-11 items-center rounded-full border border-gc-line px-6 text-[14px] font-medium text-gc-blue-deep hover:bg-gc-blue-soft">
+        Buy now
       </a>
     </div>
   );
