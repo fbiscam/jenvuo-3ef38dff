@@ -178,7 +178,7 @@ function ScamToolPage() {
           <Link to="/help" className="hidden rounded-full px-3 py-2 hover:bg-gc-notice sm:inline-flex">
             Help
           </Link>
-          <Button asChild size="sm" className="rounded-full">
+          <Button asChild size="sm" className="rounded-full bg-gc-blue text-gc-on-blue hover:bg-gc-blue-hover">
             <Link to="/auth">Sign in</Link>
           </Button>
         </nav>
@@ -207,8 +207,8 @@ function ScamToolPage() {
                   setValue("");
                   setResult(null);
                 }}
-                variant={active ? "default" : "outline"}
-                className="h-10 w-full text-[13px]"
+                variant="outline"
+                className={`h-10 w-full rounded-full text-[13px] ${active ? "border-transparent bg-gc-nav-active text-gc-ink hover:bg-gc-nav-active" : "border-gc-line"}`}
               >
                 <Icon className="w-4 h-4" />
                 {t.label}
@@ -226,7 +226,7 @@ function ScamToolPage() {
               value={value}
               onChange={(e) => setValue(e.target.value)}
               placeholder={activeTab.placeholder}
-              className="w-full rounded-md border border-input bg-background py-3 pl-11 pr-4 text-sm text-foreground outline-hidden placeholder:text-muted-foreground focus:border-ring focus:ring-1 focus:ring-ring"
+              className="w-full rounded-full border border-gc-line bg-gc-notice py-3 pl-11 pr-4 text-sm text-foreground outline-hidden placeholder:text-muted-foreground focus:border-ring focus:ring-1 focus:ring-ring"
             />
           </div>
           <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -234,6 +234,7 @@ function ScamToolPage() {
           <Button
             type="submit"
             disabled={!value.trim() || loading}
+            className="rounded-full bg-gc-blue text-gc-on-blue hover:bg-gc-blue-hover"
           >
             {loading ? (
               <Loader2 className="w-4 h-4 animate-spin" />
