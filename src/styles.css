@@ -1328,7 +1328,7 @@ html body .dash-dark main.bg-white { background-color: oklch(0.165 0 0) !importa
 }
 @keyframes ind-kenburns { 0%,100% { transform: scale(1.02) translate(0,0); } 50% { transform: scale(1.1) translate(-1.5%,-1%); } }
 .ind-kenburns { animation: ind-kenburns 18s ease-in-out infinite; }
-@keyframes ask-jenvu-colors { 0%,100% { background-color: var(--gc-blue); } 25% { background-color: var(--gc-red); } 50% { background-color: var(--gc-yellow); } 75% { background-color: var(--gc-green); } }
-.ask-jenvu-mark-loop { display: inline-block; background-color: var(--gc-blue); -webkit-mask: var(--mark) center / contain no-repeat; mask: var(--mark) center / contain no-repeat; animation: ask-jenvu-colors 2.4s ease-in-out infinite; }
-@media (prefers-reduced-motion: reduce) { .ask-jenvu-mark-loop { animation: none; } }
+/* Colour swap only (no movement), so it also runs when the device has "reduce animations" switched on. */
+@keyframes ask-jenvu-colors { 0%,24% { background-color: var(--gc-blue); } 25%,49% { background-color: var(--gc-red); } 50%,74% { background-color: var(--gc-yellow); } 75%,100% { background-color: var(--gc-green); } }
+.ask-jenvu-mark-loop { display: inline-block; background-color: var(--gc-blue); -webkit-mask: var(--mark) center / contain no-repeat; mask: var(--mark) center / contain no-repeat; animation: ask-jenvu-colors 2s linear infinite !important; }
 @media (prefers-reduced-motion: reduce) { .ind-kenburns { animation: none; } }
