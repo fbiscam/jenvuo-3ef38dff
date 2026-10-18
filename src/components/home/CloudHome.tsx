@@ -204,8 +204,9 @@ export function CloudHero({ price: _price, delta: _delta }: { price: string; del
           >
             Get started for free
           </Link>
-          <Link
-            to="/contact"
+          <button
+            type="button"
+            onClick={() => openAskJenvu("sales")}
             className="inline-flex h-12 items-center justify-center rounded-full border border-gc-line bg-background px-6 text-[16px] font-medium text-gc-ink transition hover:bg-gc-surface"
           >
             Contact sales
