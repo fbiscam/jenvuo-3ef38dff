@@ -1,6 +1,8 @@
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
+import { siteSearch, type SearchHit } from "@/lib/site-search.functions";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { Camera, LogOut, Menu, Search, Settings, ShieldCheck } from "lucide-react";
+import { Camera, ExternalLink, FileText, Loader2, LogOut, Menu, Search, Settings, ShieldCheck } from "lucide-react";
 import NotificationBell from "@/components/NotificationBell";
 import {
   DropdownMenu,
@@ -12,6 +14,20 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 type NavLink = { to: string; label: string };
+
+/** Public site pages the dashboard search can jump to, alongside the dashboard pages. */
+const SITE_PAGES: NavLink[] = [
+  { to: "/", label: "Home" },
+  { to: "/about", label: "Overview" },
+  { to: "/strategies/ict-gold-trading", label: "Solutions" },
+  { to: "/ai-engine", label: "Products" },
+  { to: "/pricing", label: "Pricing" },
+  { to: "/insights", label: "Blog" },
+  { to: "/founding", label: "Founding Program" },
+  { to: "/killzones", label: "Killzones" },
+  { to: "/help", label: "Help Center" },
+  { to: "/contact", label: "Contact us" },
+];
 
 /** Google Cloud console-style top bar: menu button, logo, page search, bell and profile menu. */
 export default function DashboardTopBar({
@@ -37,17 +53,49 @@ export default function DashboardTopBar({
   const [focused, setFocused] = useState(false);
   const inputRef = useRef<HTMLInputElement | null>(null);
 
+  const runSearch = useServerFn(siteSearch);
+  const [hits, setHits] = useState<SearchHit[]>([]);
+  const [loading, setLoading] = useState(false);
+
   const matches = useMemo(() => {
     const t = q.trim().toLowerCase();
     if (!t) return [];
-    return links.filter((l) => l.label.toLowerCase().includes(t)).slice(0, 6);
+    const words = t.split(/\s+/).filter((w) => w.length >= 3);
+    const seen = new Set<string>();
+    return [...links, ...SITE_PAGES]
+      .filter((l) => {
+        const label = l.label.toLowerCase();
+        const hit = label.includes(t) || words.some((w) => label.includes(w));
+        return hit && !seen.has(l.to) && seen.add(l.to);
+      })
+      .slice(0, 5);
   }, [q, links]);
 
+  // Site-wide results (help articles, stories, web) — debounced so typing stays light.
+  useEffect(() => {
+    const t = q.trim();
+    if (t.length < 3) { setHits([]); setLoading(false); return; }
+    let live = true;
+    setLoading(true);
+    const id = window.setTimeout(() => {
+      runSearch({ data: { q: t.slice(0, 200) } })
+        .then((r) => { if (live) setHits(r.hits.slice(0, 8)); })
+        .catch(() => { if (live) setHits([]); })
+        .finally(() => { if (live) setLoading(false); });
+    }, 450);
+    return () => { live = false; window.clearTimeout(id); };
+  }, [q, runSearch]);
+
+  const close = () => { setQ(""); setHits([]); inputRef.current?.blur(); };
   const go = (to: string) => {
-    setQ("");
-    inputRef.current?.blur();
+    close();
     void navigate({ to: to as "/dashboard" });
   };
+  const openHit = (h: SearchHit) => {
+    if (h.source === "web") { window.open(h.url, "_blank", "noopener,noreferrer"); close(); }
+    else go(h.url);
+  };
+  const seeAll = () => { const t = q.trim(); if (!t) return; close(); void navigate({ to: "/search", search: { q: t } }); };
 
   return (
     <header className={`sticky top-0 z-30 flex h-14 shrink-0 items-center gap-2 ${white ? "bg-background" : "bg-gc-canvas"} px-2 sm:gap-3 sm:px-3`}>
@@ -69,6 +117,8 @@ export default function DashboardTopBar({
           onSubmit={(e) => {
             e.preventDefault();
             if (matches[0]) go(matches[0].to);
+            else if (hits[0]) openHit(hits[0]);
+            else seeAll();
           }}
           className={`flex h-10 items-center rounded-full border border-gc-line ${white ? "bg-background" : "bg-gc-notice"} pl-4 pr-1 focus-within:bg-background focus-within:shadow-sm`}
         >
@@ -78,7 +128,7 @@ export default function DashboardTopBar({
             onChange={(e) => setQ(e.target.value)}
             onFocus={() => setFocused(true)}
             onBlur={() => window.setTimeout(() => setFocused(false), 150)}
-            placeholder="Search pages, settings and tools"
+            placeholder="Search Jenvu, guides and the web"
             aria-label="Search"
             className="min-w-0 flex-1 bg-transparent text-[14px] text-gc-ink outline-none placeholder:text-gc-ink-muted"
           />
@@ -91,22 +141,49 @@ export default function DashboardTopBar({
           </button>
         </form>
         {focused && q.trim() && (
-          <div className="absolute left-0 right-0 top-12 overflow-hidden rounded-2xl border border-gc-line bg-background py-1 shadow-lg">
-            {matches.length === 0 ? (
-              <div className="px-4 py-3 text-[13px] text-gc-ink-muted">No pages match "{q}"</div>
-            ) : (
-              matches.map((m) => (
-                <button
-                  key={m.to}
-                  type="button"
-                  onMouseDown={(e) => e.preventDefault()}
-                  onClick={() => go(m.to)}
-                  className="block w-full px-4 py-2 text-left text-[14px] text-gc-ink hover:bg-gc-canvas"
-                >
-                  {m.label}
-                </button>
-              ))
+          <div
+            onMouseDown={(e) => e.preventDefault()}
+            className="absolute left-0 right-0 top-12 max-h-[70vh] overflow-y-auto rounded-2xl border border-gc-line bg-background py-1 shadow-lg"
+          >
+            {matches.length > 0 && (
+              <div className="py-1">
+                <div className="px-4 pb-1 pt-2 text-[11px] font-medium uppercase tracking-wide text-gc-ink-muted">Pages</div>
+                {matches.map((m) => (
+                  <button key={m.to} type="button" onClick={() => go(m.to)} className="flex w-full items-center gap-3 px-4 py-2 text-left text-[14px] text-gc-ink hover:bg-gc-canvas">
+                    <FileText className="h-4 w-4 shrink-0 text-gc-ink-muted" />
+                    <span className="truncate">{m.label}</span>
+                  </button>
+                ))}
+              </div>
             )}
+            {hits.length > 0 && (
+              <div className="border-t border-gc-line py-1 first:border-t-0">
+                <div className="px-4 pb-1 pt-2 text-[11px] font-medium uppercase tracking-wide text-gc-ink-muted">Results</div>
+                {hits.map((h) => (
+                  <button key={h.url} type="button" onClick={() => openHit(h)} className="block w-full px-4 py-2 text-left hover:bg-gc-canvas">
+                    <span className="flex items-center gap-1.5 text-[11px] text-gc-ink-muted">
+                      <span className="truncate">{h.path.join(" › ")}</span>
+                      {h.source === "web" && <ExternalLink className="h-3 w-3 shrink-0" />}
+                    </span>
+                    <span className="block truncate text-[14px] font-medium text-gc-blue">{h.title}</span>
+                    {h.description && <span className="line-clamp-2 text-[12px] text-gc-ink-muted">{h.description}</span>}
+                  </button>
+                ))}
+              </div>
+            )}
+            {loading && (
+              <div className="flex items-center gap-2 px-4 py-3 text-[13px] text-gc-ink-muted">
+                <Loader2 className="h-4 w-4 animate-spin" /> Searching the site…
+              </div>
+            )}
+            {!loading && matches.length === 0 && hits.length === 0 && (
+              <div className="px-4 py-3 text-[13px] text-gc-ink-muted">
+                {q.trim().length < 3 ? "Keep typing to search the whole site…" : `No results for "${q.trim()}"`}
+              </div>
+            )}
+            <button type="button" onClick={seeAll} className="flex w-full items-center gap-2 border-t border-gc-line px-4 py-2.5 text-left text-[13px] text-gc-blue hover:bg-gc-canvas">
+              <Search className="h-4 w-4" /> See all results for "{q.trim()}"
+            </button>
           </div>
         )}
       </div>
