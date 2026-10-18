@@ -231,6 +231,15 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
   const [drawingsVisible, setDrawingsVisible] = useState(true);
   const [scripts, setScripts] = useState<SavedScript[]>([]);
   const [scriptPanelOpen, setScriptPanelOpen] = useState(false);
+  // Script now opens from the Jenvu Script button in the dashboard top bar.
+  useEffect(() => {
+    const toggle = () => setScriptPanelOpen((v) => !v);
+    window.addEventListener("jenvu:terminal-script", toggle);
+    return () => window.removeEventListener("jenvu:terminal-script", toggle);
+  }, []);
+  useEffect(() => {
+    window.dispatchEvent(new CustomEvent("jenvu:terminal-script-state", { detail: { open: scriptPanelOpen } }));
+  }, [scriptPanelOpen]);
   const [tool, setTool] = useState<DrawingTool>("cursor");
   const [color, setColor] = useState(DRAWING_COLORS[0]);
   const [magnet, setMagnet] = useState(false);
@@ -696,17 +705,6 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
           {smcMenu}
         </PopoverContent>
       </Popover>
-      <button
-        type="button"
-        onClick={() => setScriptPanelOpen((v) => !v)}
-        aria-pressed={scriptPanelOpen}
-        aria-label="Jenvu Script"
-        title="Jenvu Script"
-        data-state={scriptPanelOpen ? "open" : "closed"}
-        className={railBtn}
-      >
-        <Code className="h-[18px] w-[18px]" />
-      </button>
       <Popover>
         <PopoverTrigger asChild>
           <button type="button" aria-label="Drawing tools" title="Drawing tools" className={cn(railBtn, "h-auto flex-col gap-0.5 py-1.5")}>
