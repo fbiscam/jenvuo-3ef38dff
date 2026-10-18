@@ -1,4 +1,5 @@
-import { describe, expect, it } from "vitest";
+import { describe, it } from "node:test";
+import { expect } from "./chart/test-expect";
 import { wantsLiveAgent } from "./live-agent-intent";
 
 describe("wantsLiveAgent", () => {
