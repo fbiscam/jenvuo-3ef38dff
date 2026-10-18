@@ -5,6 +5,7 @@ import { Search, ArrowRight, ChevronDown, ChevronsUpDown, Send } from "lucide-re
 import SiteFooter from "@/components/SiteFooter";
 import { NextStep } from "@/components/PageShell";
 import { collections, allArticles } from "@/lib/help-content";
+import { SUPPORT_GUIDES } from "@/lib/support-guides";
 
 export const Route = createFileRoute("/help/")({
   head: () => ({
@@ -90,6 +91,20 @@ function HelpCenterPage() {
           </div>
         </section>
 
+        {/* PLATFORM GUIDES — homepage links jump to these by #id */}
+        <section className="border-t border-gc-line py-14">
+          <h2 className="text-[34px] tracking-tight">Platform guides</h2>
+          <p className="mt-4 line-clamp-3 max-w-[830px] text-[16px] text-gc-ink-muted">Quick answers on the main Jenvu tools.</p>
+          <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
+            {SUPPORT_GUIDES.map((g) => (
+              <div key={g.id} id={g.id} className="scroll-mt-28 rounded-lg border border-gc-line p-6 transition target:border-gc-blue-deep target:bg-gc-sky">
+                <h3 className="line-clamp-1 text-[20px] leading-snug">{g.title}</h3>
+                <p className="mt-3 line-clamp-3 text-[16px] leading-relaxed text-gc-ink-muted">{g.text}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
         {/* FILTER + CONTENT */}
         <section className="grid gap-6 pb-16 lg:grid-cols-[307px_1fr]">
           <aside className="h-fit rounded-lg border border-gc-line bg-background shadow-sm lg:sticky lg:top-24">
@@ -147,15 +162,15 @@ function HelpCenterPage() {
             {shown.map((c) => (
               <div key={c.slug} className="mt-14 border-b border-gc-line pb-12 last:border-b-0">
                 <h2 className="text-[34px] tracking-tight">{c.title}</h2>
-                <p className="mt-4 text-[16px] text-gc-ink-muted">
+                <p className="mt-4 line-clamp-3 text-[16px] text-gc-ink-muted">
                   {c.description}{" "}
                   <Link to="/help/$collection" params={{ collection: c.slug }} className="text-gc-blue-deep underline">See all {c.articles.length} articles</Link>.
                 </p>
                 <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
                   {c.articles.slice(0, 6).map((a) => (
                     <Link key={a.slug} to="/help/$collection/$slug" params={{ collection: c.slug, slug: a.slug }} className="rounded-lg border border-gc-line p-6 transition hover:shadow-md">
-                      <div className="text-[20px] leading-snug">{a.title}</div>
-                      <div className="mt-3 text-[16px] leading-relaxed text-gc-ink-muted line-clamp-4">{a.summary}</div>
+                      <div className="line-clamp-1 text-[20px] leading-snug">{a.title}</div>
+                      <div className="mt-3 text-[16px] leading-relaxed text-gc-ink-muted line-clamp-3">{a.summary}</div>
                     </Link>
                   ))}
                 </div>
