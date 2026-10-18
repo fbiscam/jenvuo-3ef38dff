@@ -1,5 +1,6 @@
 import * as React from "react";
 import { Link } from "@tanstack/react-router";
+import { openAskJenvu } from "@/components/AskJenvuWidget";
 import { Pause, Play } from "lucide-react";
 import { SiBinance, SiCoinbase, SiRevolut, SiRobinhood, SiTradingview } from "react-icons/si";
 import webullLogo from "@/assets/webull-logo.png.asset.json";
@@ -159,6 +160,17 @@ export function CloudLogoStrip() {
 }
 
 export function CloudStartBanner() {
+  const logoRef = React.useRef<HTMLImageElement>(null);
+  React.useEffect(() => {
+    const el = logoRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      ([e]) => { if (e.isIntersecting) { el.classList.add("is-visible"); io.disconnect(); } },
+      { threshold: 0.3 },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
   return (
     <section className="jenvu-start-zoom bg-background pb-20">
       <div className="mx-auto max-w-[80rem] px-4">
@@ -175,19 +187,21 @@ export function CloudStartBanner() {
               >
                 Get started for free
               </Link>
-              <Link
-                to="/contact"
+              <button
+                type="button"
+                onClick={() => openAskJenvu("sales")}
                 className="inline-flex rounded-full border border-gc-line bg-background px-6 py-3 text-sm font-medium text-gc-ink hover:bg-gc-surface"
               >
                 Contact sales
-              </Link>
+              </button>
             </div>
           </div>
           <img
+            ref={logoRef}
             src="/favicon.png"
             alt=""
             aria-hidden="true"
-            className="pointer-events-none absolute -right-24 top-1/2 hidden h-[175%] -translate-y-1/2 object-contain md:block"
+            className="jenvu-logo-big pointer-events-none absolute -right-24 top-1/2 hidden h-[175%] -translate-y-1/2 object-contain md:block"
           />
         </div>
       </div>
