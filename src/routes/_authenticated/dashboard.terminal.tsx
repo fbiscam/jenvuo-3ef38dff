@@ -729,11 +729,12 @@ function TerminalPage() {
               railSlot={
                 <>
                   <div
-                    className={cn(TERMINAL_RAIL_BTN, "hover:bg-transparent")}
+                    className={cn(TERMINAL_RAIL_BTN, "h-auto w-11 flex-col gap-0.5 py-1.5 hover:bg-transparent")}
                     title={marketClosed ? "Gold market is closed for the weekend" : `Time left on the current ${tf.label} candle`}
                     aria-label={marketClosed ? "Market closed" : `Current ${tf.label} candle closes in ${formatCountdown(secondsLeft)}`}
                   >
-                    <Timer className="h-[19px] w-[19px] shrink-0" />
+                    <Timer className="h-[17px] w-[17px] shrink-0" />
+                    <span className="font-mono text-[9px] font-semibold tabular-nums text-gc-ink">{formatCountdown(secondsLeft)}</span>
                   </div>
                   <Popover>
                     <PopoverTrigger asChild>
