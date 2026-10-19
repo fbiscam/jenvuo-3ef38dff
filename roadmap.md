@@ -42,3 +42,11 @@
 - [x] Dashboard top bar: Gifts box (dot for new gifts), three-dot menu (Docs, Help, Pricing, Download, Contact), Ask Jenvu button opening the chat, Script button moved here from the Terminal side bar
 - [x] Dashboard menu drawer: grey icons, blue active item (Google Cloud style)
 - [x] Dashboard/Terminal search works like homepage search (AI answer on Enter or when nothing matches)
+- [x] Dashboard search: keeps new layout, grey-blue background at rest (white + blue outline while typing)
+- [x] Terminal side bar slightly wider
+- [x] Top-bar menus no longer shift the page when opened
+- [x] Ask Jenvu: "contact with agent" style requests hand over; signed-in visitors can start live chat
+- [x] Dashboard welcome uses the profile name
+- [x] "Try the AI desk" opens the Terminal
+- [x] Founding members see "You have joined the Founding Program" on the dashboard
+- [x] Google Search Console, Google Analytics and Firecrawl linked in this workspace
