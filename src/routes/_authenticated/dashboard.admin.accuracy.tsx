@@ -73,7 +73,7 @@ function AccuracyPage() {
         </div>
         <div className="flex items-center gap-2">
           <select
-            className="border rounded-md px-3 py-1.5 text-sm bg-white"
+            className="border rounded-xl px-3 py-1.5 text-sm bg-background"
             value={days}
             onChange={(e) => {
               const d = Number(e.target.value);
@@ -89,7 +89,7 @@ function AccuracyPage() {
           <button
             onClick={() => load(days)}
             disabled={loading}
-            className="inline-flex items-center gap-1.5 rounded-md border bg-white px-3 py-1.5 text-sm hover:bg-gray-50 disabled:opacity-50"
+            className="inline-flex items-center gap-1.5 rounded-xl border bg-background px-3 py-1.5 text-sm hover:bg-gray-50 disabled:opacity-50"
           >
             <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
             Refresh
@@ -98,7 +98,7 @@ function AccuracyPage() {
       </div>
 
       {report?.drift_warning && (
-        <div className="rounded-lg border border-amber-300 bg-amber-50 p-4 flex items-start gap-3">
+        <div className="rounded-xl border border-amber-300 bg-amber-50 p-4 flex items-start gap-3">
           <AlertTriangle className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
           <div className="text-sm text-amber-900">
             <div className="font-medium">Model drift detected</div>
@@ -139,7 +139,7 @@ function AccuracyPage() {
                 <button
                   onClick={() => runReplay(Math.min(days, 180))}
                   disabled={replayLoading}
-                  className="inline-flex items-center gap-1.5 rounded-md border bg-white px-3 py-1.5 text-sm hover:bg-gray-50 disabled:opacity-50"
+                  className="inline-flex items-center gap-1.5 rounded-xl border bg-background px-3 py-1.5 text-sm hover:bg-gray-50 disabled:opacity-50"
                 >
                   <RefreshCw className={`h-4 w-4 ${replayLoading ? "animate-spin" : ""}`} />
                   Replay last {Math.min(days, 180)}d through current gates
@@ -243,7 +243,7 @@ function Kpi({
   const color =
     accent === "good" ? "text-emerald-600" : accent === "bad" ? "text-red-600" : "text-black";
   return (
-    <div className="rounded-lg border bg-white p-4">
+    <div className="rounded-xl border bg-background p-4">
       <div className="text-xs text-gray-500 uppercase tracking-wide">{label}</div>
       <div className={`text-2xl font-semibold mt-1 ${color}`}>{value}</div>
       {hint && <div className="text-xs text-gray-400 mt-1">{hint}</div>}
@@ -253,7 +253,7 @@ function Kpi({
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="rounded-lg border bg-white overflow-hidden">
+    <div className="rounded-xl border bg-background overflow-hidden">
       <div className="px-4 py-2.5 border-b bg-gray-50 text-sm font-medium text-black">
         {title}
       </div>

@@ -74,13 +74,13 @@ function AdminSubscribersPage() {
   };
 
   if (loading) {
-    return <div className="p-8 text-sm text-zinc-500">Loading…</div>;
+    return <div className="p-8 text-sm text-gc-ink-muted">Loading…</div>;
   }
   if (!allowed) {
     return (
       <div className="p-8">
         <h1 className="text-lg font-semibold">Forbidden</h1>
-        <p className="text-sm text-zinc-500 mt-2">Admin access required.</p>
+        <p className="text-sm text-gc-ink-muted mt-2">Admin access required.</p>
       </div>
     );
   }
@@ -92,32 +92,32 @@ function AdminSubscribersPage() {
           <h1 className="pl-1 text-xl font-semibold flex items-center gap-2">
             <Users className="h-5 w-5" /> Newsletter subscribers
           </h1>
-          <p className="text-sm text-zinc-500 mt-1">
+          <p className="text-sm text-gc-ink-muted mt-1">
             {active} active · {rows.length} total
           </p>
         </div>
         <button
           onClick={exportCsv}
           disabled={filtered.length === 0}
-          className="inline-flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm font-medium hover:bg-zinc-50 disabled:opacity-50"
+          className="inline-flex items-center gap-2 rounded-xl border border-gc-line bg-background px-3 py-2 text-sm font-medium hover:bg-gc-panel disabled:opacity-50"
         >
           <Download className="h-4 w-4" /> Export CSV
         </button>
       </div>
 
       <div className="mt-5 relative">
-        <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" />
+        <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gc-ink-muted" />
         <input
           value={q}
           onChange={(e) => setQ(e.target.value)}
           placeholder="Search by email…"
-          className="w-full rounded-lg border border-zinc-200 bg-white pl-9 pr-3 py-2 text-sm"
+          className="w-full rounded-xl border border-gc-line bg-background pl-9 pr-3 py-2 text-sm"
         />
       </div>
 
-      <div className="mt-4 overflow-x-auto rounded-xl border border-zinc-200 bg-white">
+      <div className="mt-4 overflow-x-auto rounded-xl border border-gc-line bg-background">
         <table className="min-w-[540px] w-full text-sm">
-          <thead className="bg-zinc-50 text-left text-xs uppercase tracking-wide text-zinc-500">
+          <thead className="bg-gc-panel text-left text-xs uppercase tracking-wide text-gc-ink-muted">
             <tr>
               <th className="whitespace-nowrap px-4 py-3">Email</th>
               <th className="whitespace-nowrap px-4 py-3">Status</th>
@@ -127,14 +127,14 @@ function AdminSubscribersPage() {
           <tbody>
             {filtered.length === 0 && (
               <tr>
-                <td colSpan={3} className="px-4 py-8 text-center text-zinc-500">
+                <td colSpan={3} className="px-4 py-8 text-center text-gc-ink-muted">
                   No subscribers yet.
                 </td>
               </tr>
             )}
             {filtered.map((r) => (
-              <tr key={r.id} className="border-t border-zinc-100">
-                <td className="whitespace-nowrap px-4 py-3 font-medium text-zinc-900">
+              <tr key={r.id} className="border-t border-gc-line">
+                <td className="whitespace-nowrap px-4 py-3 font-medium text-gc-ink">
                   {r.email}
                 </td>
                 <td className="whitespace-nowrap px-4 py-3">
@@ -142,13 +142,13 @@ function AdminSubscribersPage() {
                     className={`inline-flex rounded-full px-2 py-0.5 text-[11px] font-medium ${
                       r.status === "active"
                         ? "bg-emerald-50 text-emerald-700"
-                        : "bg-zinc-100 text-zinc-600"
+                        : "bg-gc-panel text-gc-ink-muted"
                     }`}
                   >
                     {r.status}
                   </span>
                 </td>
-                <td className="whitespace-nowrap px-4 py-3 text-zinc-600">
+                <td className="whitespace-nowrap px-4 py-3 text-gc-ink-muted">
                   {new Date(r.subscribed_at).toLocaleString()}
                 </td>
               </tr>

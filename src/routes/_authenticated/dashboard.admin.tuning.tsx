@@ -188,13 +188,13 @@ function TuningPage() {
         <div className="flex items-center gap-2">
           <button
             onClick={reload}
-            className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm text-slate-700 hover:bg-slate-50"
+            className="inline-flex items-center gap-1 rounded-xl border border-slate-200 bg-background px-3 py-1.5 text-sm text-slate-700 hover:bg-slate-50"
           >
             <RefreshCw className="h-3.5 w-3.5" /> Refresh
           </button>
           <button
             onClick={doRollback}
-            className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm text-slate-700 hover:bg-slate-50"
+            className="inline-flex items-center gap-1 rounded-xl border border-slate-200 bg-background px-3 py-1.5 text-sm text-slate-700 hover:bg-slate-50"
           >
             <RotateCcw className="h-3.5 w-3.5" /> Rollback
           </button>
@@ -214,7 +214,7 @@ function TuningPage() {
         </div>
       )}
 
-      <section className="rounded-xl border border-slate-200 bg-white p-4">
+      <section className="rounded-xl border border-slate-200 bg-background p-4">
         <h2 className="pl-1 mb-3 text-lg font-semibold text-slate-900">Run grid search</h2>
         <div className="flex flex-wrap items-end gap-3">
           <label className="flex flex-col gap-1 text-xs text-slate-600">
@@ -222,7 +222,7 @@ function TuningPage() {
             <select
               value={symbol}
               onChange={(e) => setSymbol(e.target.value)}
-              className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm text-slate-900"
+              className="rounded-xl border border-slate-200 bg-background px-3 py-1.5 text-sm text-slate-900"
             >
               {["XAUUSD"].map((s) => (
                 <option key={s} value={s}>{s}</option>
@@ -232,7 +232,7 @@ function TuningPage() {
           <button
             onClick={startGrid}
             disabled={busy}
-            className="inline-flex items-center gap-1 rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-50"
+            className="inline-flex items-center gap-1 rounded-xl bg-slate-900 px-4 py-2 text-sm font-medium text-gc-on-blue hover:bg-slate-800 disabled:opacity-50"
           >
             <Play className="h-3.5 w-3.5" /> {busy ? "Running…" : "Run grid search"}
           </button>
@@ -245,7 +245,7 @@ function TuningPage() {
         </p>
       </section>
 
-      <section className="rounded-xl border border-slate-200 bg-white">
+      <section className="rounded-xl border border-slate-200 bg-background">
         <h2 className="pl-1 border-b border-slate-100 p-4 text-lg font-semibold text-slate-900">Tuning runs</h2>
         <div className="overflow-x-auto">
           <table className="min-w-full text-sm">
@@ -285,7 +285,7 @@ function TuningPage() {
         </div>
       </section>
 
-      <section className="rounded-xl border border-slate-200 bg-white">
+      <section className="rounded-xl border border-slate-200 bg-background">
         <h2 className="pl-1 border-b border-slate-100 p-4 text-lg font-semibold text-slate-900">Weight configurations</h2>
         <div className="overflow-x-auto">
           <table className="min-w-full text-sm">
@@ -354,7 +354,7 @@ function TuningPage() {
                             <button
                               onClick={() => doValidate(c.id, c.version)}
                               disabled={validatingId === c.id}
-                              className="rounded-lg border border-slate-200 bg-white px-3 py-1 text-xs text-slate-700 hover:bg-slate-50 disabled:opacity-50"
+                              className="rounded-xl border border-slate-200 bg-background px-3 py-1 text-xs text-slate-700 hover:bg-slate-50 disabled:opacity-50"
                             >
                               {validatingId === c.id ? "Validating…" : "Validate"}
                             </button>
@@ -364,8 +364,8 @@ function TuningPage() {
                               onClick={() => doActivate(c.id, c.version, c.validated)}
                               className={
                                 c.validated
-                                  ? "rounded-lg bg-slate-900 px-3 py-1 text-xs font-medium text-white hover:bg-slate-800"
-                                  : "rounded-lg border border-rose-200 bg-white px-3 py-1 text-xs text-rose-700 hover:bg-rose-50"
+                                  ? "rounded-xl bg-slate-900 px-3 py-1 text-xs font-medium text-gc-on-blue hover:bg-slate-800"
+                                  : "rounded-xl border border-rose-200 bg-background px-3 py-1 text-xs text-rose-700 hover:bg-rose-50"
                               }
                             >
                               {c.validated ? "Activate" : "Force activate"}

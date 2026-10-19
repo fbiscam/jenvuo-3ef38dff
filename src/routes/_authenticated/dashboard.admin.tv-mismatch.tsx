@@ -89,7 +89,7 @@ function TvMismatchPage() {
   }
 
   return (
-    <div className="min-h-full bg-[#FAFAFA] p-6" style={{ fontFamily: '"Google Sans Flex", "Google Sans", "Google Sans Text", system-ui, sans-serif' }}>
+    <div className="min-h-full bg-gc-canvas p-6" style={{ fontFamily: '"Google Sans Flex", "Google Sans", "Google Sans Text", system-ui, sans-serif' }}>
       <div className="mx-auto max-w-5xl">
         <div className="mb-6 flex items-center justify-between">
           <div>
@@ -102,20 +102,20 @@ function TvMismatchPage() {
           <button
             onClick={load}
             disabled={loading}
-            className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 disabled:opacity-50"
+            className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-background px-3 py-1.5 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 disabled:opacity-50"
           >
             <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} /> Re-run
           </button>
         </div>
 
         {report && (
-          <div className="mb-4 rounded-lg border border-slate-200 bg-slate-50 p-3 text-xs text-slate-600">
+          <div className="mb-4 rounded-xl border border-slate-200 bg-slate-50 p-3 text-xs text-slate-600">
             Generated: {new Date(report.generatedAt).toLocaleString()} · Warn ≥ {report.thresholds.warnPct}% ·
             Fail ≥ {report.thresholds.failPct}%
           </div>
         )}
 
-        <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+        <div className="overflow-hidden rounded-xl border border-slate-200 bg-background shadow-sm">
           <table className="w-full text-sm">
             <thead className="bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500">
               <tr>
