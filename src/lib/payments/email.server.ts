@@ -29,7 +29,7 @@ async function resolveEmail(order: OrderLike): Promise<string | null> {
 }
 
 function shell(title: string, lines: string[], accent: string): string {
-  return `<!doctype html><html><body style="margin:0;background:#f6f7f9;padding:28px 12px;font-family:'Google Sans Flex', 'Google Sans',Roboto,Helvetica,Arial,sans-serif;color:#18181b">
+  return `<!doctype html><html><body style="margin:0;background:#f6f7f9;padding:28px 12px;font-family:'Google Sans',Roboto,Helvetica,Arial,sans-serif;color:#18181b">
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td align="center">
   <table role="presentation" width="100%" style="max-width:520px;background:#fff;border-radius:18px;padding:28px" cellpadding="0" cellspacing="0">
     <tr><td style="font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:#71717a">Jenvu · Billing</td></tr>

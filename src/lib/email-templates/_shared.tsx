@@ -10,7 +10,7 @@ export const LOGO_URL = `${SITE_URL}/favicon.png`
  * matching the Jenvu product UI.
  */
 export const INTER =
-  "'Google Sans Normal', 'Google Sans Flex', 'Google Sans', 'Product Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"
+  "'Google Sans Normal', 'Google Sans', 'Product Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"
 
 // Legacy aliases so existing templates keep compiling without edits.
 export const URBANIST = INTER
@@ -87,7 +87,7 @@ const logoWrap = {
 
 const logoWord = {
   margin: 0,
-  fontFamily: '"Google Sans Flex", "Google Sans","Google Sans Normal",-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif',
+  fontFamily: '"Google Sans","Google Sans Normal",-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif',
   fontSize: '22px',
   fontWeight: 400 as const,
   letterSpacing: '-0.005em',

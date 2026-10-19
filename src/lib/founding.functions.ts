@@ -95,14 +95,14 @@ type ApplicantEmailExtras = {
 
 function renderApplicantEmail(kind: ApplicantEmailKind, name: string, plan: string, extras: ApplicantEmailExtras = {}) {
   const meta = PLAN_META[plan] || PLAN_META.elite;
-  const FONT = "'Google Sans Flex', 'Google Sans','Google Sans Normal',-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif";
+  const FONT = "'Google Sans','Google Sans Normal',-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif";
   const wrap = (title: string, tag: string, body: string, cta?: { label: string; href: string }, cta2?: { label: string; href: string }) => `<!doctype html><html><body style="margin:0;background:#f7f7f8;font-family:${FONT};color:#18181b;padding:32px 12px">
 
     <div style="max-width:560px;margin:0 auto 18px;text-align:center">
       <table role="presentation" cellpadding="0" cellspacing="0" align="center" style="margin:0 auto;border-collapse:collapse">
         <tr>
           <td style="vertical-align:middle"><img src="${APP_URL}/favicon.png" width="32" height="32" alt="Jenvu" style="display:block;border-radius:7px" /></td>
-          <td style="vertical-align:middle;padding-left:12px;font-family:'Google Sans Flex', 'Google Sans','Google Sans Normal',-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:22px;font-weight:400;letter-spacing:-0.005em;color:#09090b;line-height:1">Jenvu</td>
+          <td style="vertical-align:middle;padding-left:12px;font-family:'Google Sans','Google Sans Normal',-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:22px;font-weight:400;letter-spacing:-0.005em;color:#09090b;line-height:1">Jenvu</td>
         </tr>
       </table>
     </div>
@@ -389,7 +389,7 @@ export const submitFoundingApplication = createServerFn({ method: "POST" })
           w: escapeHtml(data.why_joining).replace(/\n/g, "<br/>"),
           m: escapeHtml(data.myfxbook_url || "—"),
         };
-        const html = `<!doctype html><html><body style="font-family:'Google Sans Flex', 'Google Sans','Google Sans Normal',-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;background:#fff;color:#111;padding:24px">
+        const html = `<!doctype html><html><body style="font-family:'Google Sans','Google Sans Normal',-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;background:#fff;color:#111;padding:24px">
           <div style="max-width:600px;margin:0 auto;border:1px solid #e5e7eb;border-radius:12px;padding:24px">
             <div style="font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#6b7280">New founding application</div>
             <h1 style="font-size:20px;margin:8px 0 16px">${safe.n}</h1>

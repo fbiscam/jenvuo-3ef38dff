@@ -10,7 +10,7 @@ import { STORIES } from "@/lib/stories";
  * pages. Both share the header, section bar and tokens, but each page uses its
  * own layout variant so the two pages never look the same.
  */
-const SANS = "font-['Google_Sans_Flex','Google_Sans','Product_Sans','Poppins',system-ui,sans-serif]";
+const SANS = "font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif]";
 /** Page content is rendered 18% smaller than the rest of the site. */
 const PAGE_ZOOM = 0.82;
 

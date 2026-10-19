@@ -167,7 +167,7 @@ function Billing() {
   ];
 
   return (
-    <div className="mx-auto max-w-5xl space-y-8" style={{ fontFamily: '"Google Sans Flex", "Google Sans", "Product Sans", "Roboto", system-ui, sans-serif' }}>
+    <div className="mx-auto max-w-5xl space-y-8" style={{ fontFamily: '"Google Sans", "Product Sans", "Roboto", system-ui, sans-serif' }}>
       {/* Page header */}
       <h1 className="text-2xl font-semibold tracking-tight text-zinc-900">&nbsp;Billing</h1>
 

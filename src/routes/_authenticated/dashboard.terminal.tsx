@@ -705,11 +705,11 @@ function TerminalPage() {
               railSlot={
                 <>
                   <div
-                    className="flex w-[52px] flex-col items-center gap-0.5 py-1 font-mono text-[10px] font-semibold leading-none text-gc-ink"
+                    className="flex w-[60px] flex-col items-center gap-0.5 py-1 font-mono text-[10px] font-semibold leading-none text-foreground"
                     title={marketClosed ? "Gold market is closed for the weekend" : `Time left on the current ${tf.label} candle`}
                     aria-label={marketClosed ? "Market closed" : `Current ${tf.label} candle closes in ${formatCountdown(secondsLeft)}`}
                   >
-                    <Timer className="h-[17px] w-[17px] text-gc-ink" />
+                    <Timer className="h-[18px] w-[18px] text-muted-foreground" />
                     {formatCountdown(secondsLeft)}
                   </div>
                   <Popover>
@@ -718,9 +718,9 @@ function TerminalPage() {
                         type="button"
                         aria-label="Gold news"
                         title="Gold news"
-                        className="relative flex h-9 w-[52px] items-center justify-center rounded-r-full text-gc-ink hover:bg-gc-console-rail-active/60 data-[state=open]:bg-gc-console-rail-active data-[state=open]:text-foreground dark:hover:bg-accent"
+                        className="relative flex h-9 w-[60px] items-center justify-center rounded-r-full text-muted-foreground hover:bg-gc-console-rail-active/60 data-[state=open]:bg-gc-console-rail-active data-[state=open]:text-foreground dark:hover:bg-accent"
                       >
-                        <Newspaper className="h-[17px] w-[17px]" />
+                        <Newspaper className="h-[18px] w-[18px]" />
                         {nextGoldNews && (
                           <span aria-hidden="true" className={cn("absolute right-2 top-1.5 h-1.5 w-1.5 rounded-full", nextGoldNews.impact === "High" ? "bg-destructive" : "bg-gc-yellow")} />
                         )}
@@ -736,7 +736,7 @@ function TerminalPage() {
                       onClick={() => setDeskOpen(true)}
                       aria-label="Ask With AI"
                       title="Ask With AI"
-                      className="flex h-9 w-[52px] items-center justify-center rounded-r-full hover:bg-gc-console-rail-active/60 dark:hover:bg-accent"
+                      className="flex h-9 w-[60px] items-center justify-center rounded-r-full hover:bg-gc-console-rail-active/60 dark:hover:bg-accent"
                     >
                       <img src="/favicon.png" alt="" className="h-5 w-5 rounded-sm object-contain" />
                     </button>
