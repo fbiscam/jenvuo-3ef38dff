@@ -115,6 +115,7 @@ export function TerminalSymbolHeader({
             {now && ` · As of today at ${String(now.getUTCHours()).padStart(2, "0")}:${String(now.getUTCMinutes()).padStart(2, "0")} UTC`}
           </p>
         </div>
+        <HeaderSidePanel quotes={quotes.data} now={now} />
       </div>
       <nav aria-label="Gold sections" className="flex gap-7 border-b-2 border-gc-line px-5">
         {TABS.map((t) => (
@@ -430,6 +431,65 @@ function SeasonalsTab() {
         </div>
       )}
       <div className="h-6" />
+    </div>
+  );
+}
+
+const SESSIONS = [
+  { id: "asia", label: "Asia", start: 0, end: 9 },
+  { id: "london", label: "London", start: 7, end: 16 },
+  { id: "ny", label: "New York", start: 12, end: 21 },
+];
+
+const MOVERS = [
+  { symbol: "DXY", label: "DXY", decimals: 3 },
+  { symbol: "US10Y", label: "US 10Y", decimals: 3 },
+  { symbol: "XAGUSD", label: "Silver", decimals: 3 },
+  { symbol: "EURUSD", label: "EUR/USD", decimals: 5 },
+];
+
+/** Right side of the symbol header: markets that move gold plus today's trading sessions (UTC). */
+function HeaderSidePanel({ quotes, now }: { quotes?: Record<string, { price: number; changePct: number | null }>; now: Date | null }) {
+  const hour = now ? now.getUTCHours() + now.getUTCMinutes() / 60 : null;
+  return (
+    <div className="ml-auto hidden shrink-0 items-stretch gap-6 xl:flex">
+      <div>
+        <p className="mb-2 text-[11.5px] font-medium uppercase tracking-wide text-gc-ink-muted">Moves gold</p>
+        <div className="grid grid-cols-2 gap-x-6 gap-y-2">
+          {MOVERS.map((m) => {
+            const q = quotes?.[m.symbol];
+            return (
+              <div key={m.symbol} className="flex min-w-[150px] items-baseline justify-between gap-3">
+                <span className="text-[13px] text-gc-ink">{m.label}</span>
+                <span className="text-[13px] tabular-nums text-gc-ink">
+                  {q ? num(q.price, m.decimals) : "—"}
+                  <span className={cn("ml-2 text-[12px]", pctTone(q?.changePct))}>{pct(q?.changePct)}</span>
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+      <div className="border-l border-gc-line pl-6">
+        <p className="mb-2 text-[11.5px] font-medium uppercase tracking-wide text-gc-ink-muted">Sessions · UTC</p>
+        <div className="space-y-1.5">
+          {SESSIONS.map((s) => {
+            const active = hour != null && hour >= s.start && hour < s.end;
+            const progress = active && hour != null ? ((hour - s.start) / (s.end - s.start)) * 100 : 0;
+            return (
+              <div key={s.id} className="flex items-center gap-3">
+                <span className={cn("w-16 text-[13px]", active ? "font-medium text-gc-ink" : "text-gc-ink-muted")}>{s.label}</span>
+                <span className="relative h-1.5 w-28 overflow-hidden rounded-full bg-gc-console-search">
+                  {active && <span className="absolute inset-y-0 left-0 rounded-full bg-gc-blue" style={{ width: `${progress}%` }} />}
+                </span>
+                <span className="text-[12px] tabular-nums text-gc-ink-muted">
+                  {String(s.start).padStart(2, "0")}–{String(s.end).padStart(2, "0")}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
     </div>
   );
 }
