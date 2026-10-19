@@ -1317,7 +1317,7 @@ function DashboardLayout() {
 
   return (
     <div
-      className={`flex ${pathname === "/dashboard/terminal" ? "h-dvh overflow-hidden jenvu-terminal-shell bg-gc-console-bar" : "min-h-screen jenvu-zoom-dashboard bg-gc-canvas"} ${dashDark ? "dark dash-dark" : ""} text-zinc-900 font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif] antialiased`}
+      className={`flex ${pathname === "/dashboard/terminal" ? "h-dvh overflow-hidden jenvu-terminal-shell bg-background" : "min-h-screen jenvu-zoom-dashboard bg-gc-canvas"} ${dashDark ? "dark dash-dark" : ""} text-zinc-900 font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif] antialiased`}
     >
       {/* Menu overlay */}
       {mobileNavOpen && !embedMode && (

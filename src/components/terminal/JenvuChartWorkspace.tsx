@@ -41,7 +41,7 @@ import { getTerminalChart } from "@/lib/gold-analysis.functions";
 import { cn } from "@/lib/utils";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { XauUsdLogo } from "./XauUsdLogo";
-import { Clock3, Menu, PanelLeftClose, PanelLeftOpen } from "lucide-react";
+import { ChevronDown, Clock3, Menu, PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
@@ -761,7 +761,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
         <div className="absolute inset-x-0 top-0 z-[5] hidden h-11 items-center border-b border-gc-line bg-background px-2 md:flex">{rail}</div>
       )}
       {sidePanelOpen && <TerminalOrderPanel trading={demo} price={currentPrice} />}
-      <div className={cn("flex min-h-0 min-w-0 flex-1 flex-col bg-background", theme !== "dark" && "overflow-hidden rounded-t-2xl", theme !== "dark" && sidePanelOpen && "lg:mb-2 lg:rounded-2xl lg:border lg:border-gc-line")}>
+      <div className={cn("flex min-h-0 min-w-0 flex-1 flex-col bg-background", theme !== "dark" && "overflow-hidden md:mb-2 md:rounded-2xl md:border md:border-gc-line")}>
       {/* Top bar — phones only: on laptops and tablets every control lives in the side bar. */}
       <div className="flex h-11 shrink-0 items-center gap-1 overflow-x-auto border-b border-border px-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:hidden">
 
