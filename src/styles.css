@@ -1146,6 +1146,36 @@ html:not(.ms-icons-ready) .material-symbols-rounded {
   --input: oklch(0.29 0 0);
 }
 
+/* Black terminal: the whole page (top bar, live prices, menu, rail) goes dark, not just the chart. */
+body:has(.terminal-dark) .jenvu-terminal-shell {
+  color-scheme: dark;
+  --background: oklch(0.165 0 0);
+  --foreground: oklch(0.98 0 0);
+  --card: oklch(0.165 0 0);
+  --popover: oklch(0.22 0 0);
+  --muted: oklch(0.23 0 0);
+  --muted-foreground: oklch(0.78 0 0);
+  --accent: oklch(0.27 0 0);
+  --border: oklch(0.27 0 0);
+  --gc-console-bar: oklch(0.13 0 0);
+  --gc-console-search: oklch(0.22 0 0);
+  --gc-console-rail-active: oklch(0.3 0.04 255);
+  --gc-canvas: oklch(0.13 0 0);
+  --gc-ink: oklch(0.96 0 0);
+  --gc-ink-muted: oklch(0.72 0 0);
+  --gc-line: oklch(0.28 0 0);
+  --gc-panel: oklch(0.2 0 0);
+  --gc-notice: oklch(0.24 0 0);
+  --gc-surface: oklch(0.2 0 0);
+  --gc-nav-active: oklch(0.3 0.04 255);
+  --gc-sky: oklch(0.3 0.05 255);
+  --gc-blue-deep: oklch(0.78 0.11 255);
+  --gc-blue: oklch(0.72 0.14 255);
+  --gc-blue-soft: oklch(0.3 0.05 255);
+  background-color: oklch(0.13 0 0) !important;
+  color: oklch(0.96 0 0);
+}
+
 /* Black terminal: the left app menu turns near-black with white icons too. */
 body:has(.terminal-dark) .dashboard-terminal-sidebar,
 body:has(.terminal-dark) .dashboard-terminal-sidebar .bg-sidebar {
