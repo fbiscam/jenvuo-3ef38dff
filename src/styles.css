@@ -1396,7 +1396,7 @@ html body .dash-dark main.bg-white { background-color: oklch(0.165 0 0) !importa
   color: var(--gc-ink);
 }
 .terminal-modern .terminal-glass {
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.97);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
 }
