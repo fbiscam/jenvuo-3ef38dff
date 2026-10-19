@@ -10,6 +10,7 @@ import {
   type ReactNode,
 } from "react";
 import { useQuery } from "@tanstack/react-query";
+import type { MarketSnapshot } from "@/components/terminal/TerminalProPanels";
 import { useServerFn } from "@tanstack/react-start";
 import {
   Activity,
