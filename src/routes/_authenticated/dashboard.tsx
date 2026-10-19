@@ -3,7 +3,7 @@ import { getIpGeo } from "@/lib/ip-geo";
 import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
 import { useVerification, isVerificationAllowedPath } from "@/hooks/useVerification";
 import { VerificationBanner, VerificationLocked } from "@/components/VerificationGate";
-import { TerminalLocked, TerminalChecking, useTerminalAccess, IdVerificationDeadlineNotice } from "@/components/TerminalLockGate";
+import { TerminalLocked, TerminalChecking, useTerminalAccess, IdVerificationDeadlineNotice, TerminalTrialNotice } from "@/components/TerminalLockGate";
 import { Lock as TerminalLockIcon } from "lucide-react";
 import xaiLogo from "@/assets/xai-logo.png";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -1415,7 +1415,7 @@ function DashboardLayout() {
                           key={t.to}
                           role="link"
                           aria-disabled="true"
-                          title="Terminal is for approved Founding Program members only"
+                          title="Terminal is locked: your free 14-day trial has ended. Upgrade to unlock it."
                           className={`dashboard-sidebar-link relative flex cursor-not-allowed select-none items-center text-[14px] font-normal text-gc-ink opacity-50 ${navCollapsed ? "justify-center rounded-full px-2 py-2" : "gap-3.5 rounded-r-full py-2 pl-4 pr-3"}`}
                         >
                           <Icon
@@ -1592,6 +1592,7 @@ function DashboardLayout() {
           style={pathname === "/dashboard/terminal" ? undefined : { zoom: 0.9 }}
         >
           <IdVerificationDeadlineNotice access={terminalAccess} />
+          <TerminalTrialNotice access={terminalAccess} />
           {pathname !== "/dashboard/terminal" && <VerificationBanner isAdmin={isAdminUser} />}
 
           {pathname === "/dashboard" ? (

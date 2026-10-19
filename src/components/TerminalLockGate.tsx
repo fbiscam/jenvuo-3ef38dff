@@ -10,11 +10,12 @@ export type TerminalAccessState = {
   reason: string | null;
   idDeadline: string | null;
   idSubmitted: boolean;
+  trialEndsAt: string | null;
 };
 
-const INITIAL: TerminalAccessState = { loading: true, allowed: false, reason: null, idDeadline: null, idSubmitted: false };
+const INITIAL: TerminalAccessState = { loading: true, allowed: false, reason: null, idDeadline: null, idSubmitted: false, trialEndsAt: null };
 
-/** Terminal is unlocked only for approved Founding Program members (and admins). */
+/** Terminal access for the signed-in user (paid plans, 14-day trial, Founding, admins). */
 export function useTerminalAccess(userId: string | null | undefined): TerminalAccessState {
   const fetchAccess = useServerFn(getTerminalAccess);
   const [state, setState] = useState<TerminalAccessState>(INITIAL);
@@ -35,6 +36,7 @@ export function useTerminalAccess(userId: string | null | undefined): TerminalAc
               reason: r?.reason ?? null,
               idDeadline: r?.idDeadline ?? null,
               idSubmitted: Boolean(r?.idSubmitted),
+              trialEndsAt: r?.trialEndsAt ?? null,
             }),
         )
         // A failed poll (network blip, slow reply) must not lock out a user who
@@ -90,8 +92,25 @@ export function IdVerificationDeadlineNotice({ access }: { access: TerminalAcces
   );
 }
 
+/** Small banner while the free 14-day Terminal trial is running. */
+export function TerminalTrialNotice({ access }: { access: TerminalAccessState }) {
+  if (access.loading || !access.allowed || access.reason !== "trial" || !access.trialEndsAt) return null;
+  const left = Date.parse(access.trialEndsAt) - Date.now();
+  return (
+    <div className="mb-3 flex flex-col gap-3 rounded-2xl border border-gc-line bg-gc-blue-soft px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+      <span className="text-sm text-gc-ink">
+        <strong>Free Terminal trial:</strong> {formatLeft(left)} left (until {new Date(access.trialEndsAt).toLocaleDateString()}). Upgrade to keep using the Terminal after that.
+      </span>
+      <Link to="/pricing" className="inline-flex shrink-0 items-center justify-center rounded-full bg-gc-blue px-4 py-2 text-xs font-semibold text-gc-on-blue hover:bg-gc-blue-hover">
+        Upgrade
+      </Link>
+    </div>
+  );
+}
+
 export function TerminalLocked({ reason }: { reason?: string | null }) {
   const overdue = reason === "id_overdue";
+  const trialEnded = reason === "trial_ended";
   return (
     <div className="flex h-full w-full items-center justify-center bg-white px-4 py-16">
       <div className="w-full max-w-md rounded-2xl border border-zinc-200 bg-white p-8 text-center">
@@ -102,14 +121,16 @@ export function TerminalLocked({ reason }: { reason?: string | null }) {
         <p className="mt-2 text-sm text-zinc-600">
           {overdue
             ? "Your 2-day window to complete ID verification has ended. Submit your ID verification and the Terminal unlocks again automatically."
-            : "The Terminal is only available to approved Founding Program members. Apply to the program — once your application is approved, the Terminal unlocks automatically."}
+            : trialEnded
+              ? "Your 14-day free Terminal trial has ended. Upgrade to Pro, Elite or Ultra and the Terminal unlocks again straight away."
+              : "The Terminal is not available on this account right now. Upgrade your plan to unlock it."}
         </p>
         <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
           <Link
-            to={overdue ? "/dashboard/documents" : "/founding"}
+            to={overdue ? "/dashboard/documents" : "/pricing"}
             className="inline-flex items-center gap-2 rounded-xl bg-zinc-900 px-4 py-2 text-sm font-semibold text-white hover:bg-zinc-800"
           >
-            {overdue ? "Verify ID now" : "Apply to the Founding Program"}
+            {overdue ? "Verify ID now" : "Upgrade plan"}
           </Link>
           <Link
             to="/dashboard"
