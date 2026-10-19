@@ -1,3 +1,4 @@
+import { FOUNDING_CREDIT_USD, FOUNDING_MONTHS } from "@/lib/founding-offer";
 import { createServerFn } from "@tanstack/react-start";
 import { createClient } from "@supabase/supabase-js";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
@@ -130,8 +131,8 @@ function renderApplicantEmail(kind: ApplicantEmailKind, name: string, plan: stri
           `<p style="margin:0 0 12px">We got your application for the <strong>${escapeHtml(meta.label)}</strong> tier. Every application is reviewed manually within <strong>48 hours</strong>.</p>
            <p style="margin:0 0 12px">If approved, you'll get:</p>
            <ul style="margin:0 0 12px;padding-left:20px">
-             <li style="margin:4px 0"><strong>${escapeHtml(meta.label)}</strong> plan unlocked straight away</li>
-             <li style="margin:4px 0">${escapeHtml(meta.wallet)} on your account</li>
+             <li style="margin:4px 0"><strong>${escapeHtml(meta.label)}</strong> plan for <strong>${FOUNDING_MONTHS} months</strong>, unlocked straight away</li>
+             <li style="margin:4px 0">$${FOUNDING_CREDIT_USD} credit on your account</li>
              <li style="margin:4px 0">Full access — extension analysis, signals, alerts and killzones</li>
            </ul>
            <p style="margin:0">After approval you have <strong>2 days to verify your ID</strong> from your account to keep access.</p>`,
@@ -146,7 +147,7 @@ function renderApplicantEmail(kind: ApplicantEmailKind, name: string, plan: stri
           `Congratulations, ${n} — you're approved.`,
           "Approved · Founding Trader",
           `<p style="margin:0 0 14px;line-height:1.6">Your Founding Trader application has been <strong>approved</strong>. Welcome to Jenvu — a small, hand-picked cohort of traders.</p>
-           <p style="margin:0 0 18px;line-height:1.6">Your seat is reserved on the <strong>${escapeHtml(meta.label)}</strong> plan (${escapeHtml(meta.wallet)}).</p>
+           <p style="margin:0 0 18px;line-height:1.6">Your seat is reserved on the <strong>${escapeHtml(meta.label)}</strong> plan for ${FOUNDING_MONTHS} months, with $${FOUNDING_CREDIT_USD} credit.</p>
            <p style="margin:0 0 10px;font-weight:600">What you get inside Jenvu</p>
            <ul style="margin:0 0 18px;padding-left:20px;line-height:1.5">
              <li style="margin:6px 0">Institutional XAU/USD signal engine</li>
@@ -181,7 +182,7 @@ function renderApplicantEmail(kind: ApplicantEmailKind, name: string, plan: stri
         html: wrap(
           `Congratulations, ${n} — you're funded.`,
           "Funded · Founding Trader",
-          `<p style="margin:0 0 14px;line-height:1.6">Great news — your Jenvu account has just been funded with <strong>${escapeHtml(meta.amount)}</strong> of wallet credit on the <strong>${escapeHtml(meta.label)}</strong> plan.</p>
+          `<p style="margin:0 0 14px;line-height:1.6">Great news — your Jenvu account has just been funded with <strong>$${FOUNDING_CREDIT_USD}</strong> of wallet credit on the <strong>${escapeHtml(meta.label)}</strong> plan.</p>
            <p style="margin:0 0 14px;line-height:1.6">The credit is live in your wallet right now. You can start scanning XAU/USD, use full trade management and enable realtime alerts straight from the dashboard.</p>
            <p style="margin:0 0 4px;line-height:1.6;color:#52525b"><em>Your full transaction history is always available on the Billing page.</em></p>`,
           { label: "Open my dashboard", href: `${APP_URL}/dashboard` },
@@ -550,7 +551,7 @@ export const updateFoundingApplication = createServerFn({ method: "POST" })
           }
           approvedResetUrl = (linkData as any)?.properties?.action_link || null;
           // Approved members get their selected plan right away (Terminal
-          // unlocks too; ID verification must follow within 2 days).
+          // unlocks too; 3 months + $250 credit; ID verification within 2 days).
           const planUserId = existingUserId || (linkData as any)?.user?.id || null;
           if (planUserId) {
             const { error: planErr } = await admin.rpc("activate_founding_trial" as any, {

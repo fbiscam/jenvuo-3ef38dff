@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Link } from "@tanstack/react-router";
 import { Check, Loader2, Plus, ArrowRight } from "lucide-react";
 import { useFreeTrial } from "@/hooks/useFreeTrial";
+import { FOUNDING_CREDIT_USD, FOUNDING_MONTHS } from "@/lib/founding-offer";
 
 const QUICK_ACTIONS = [
   { label: "Create API key", to: "/dashboard/api" },

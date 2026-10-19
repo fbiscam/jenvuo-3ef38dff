@@ -1,17 +1,18 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { foundingTrialEnd } from "@/lib/founding-offer";
 
 /**
  * Founding-program trial lock.
- * While a user is in the 30-day founding trial (or documents aren't verified),
- * cross-plan "Upgrade" CTAs are disabled. After 30 days AND documents verified,
+ * While a user is in the 3-month founding trial (or documents aren't verified),
+ * cross-plan "Upgrade" CTAs are disabled. After the trial AND documents verified,
  * upgrades unlock.
  */
 export type UpgradeLock = {
   loading: boolean;
   locked: boolean;
   reason: "trial_active" | "docs_pending" | null;
-  unlocksAt: string | null; // ISO date when 30-day trial ends
+  unlocksAt: string | null; // ISO date when the 3-month trial ends
   daysLeft: number | null;
   documentStatus: string | null;
 };
@@ -54,14 +55,14 @@ export function useUpgradeLock(): UpgradeLock {
       const approvedAt = (data.approved_at as string | null) ?? null;
       const trialStart = approvedAt ? new Date(approvedAt) : null;
       const trialEnd = trialStart
-        ? new Date(trialStart.getTime() + 30 * 24 * 60 * 60 * 1000)
+        ? foundingTrialEnd(trialStart)
         : null;
       const now = new Date();
       const trialActive = !!trialEnd && now < trialEnd;
       const docsVerified = docStatus === "verified";
 
       // Unlocks as soon as identity documents are verified — no need to wait
-      // for the full 30-day trial to elapse.
+      // for the full 3-month trial to elapse.
       const locked = !docsVerified;
       const reason: UpgradeLock["reason"] = !docsVerified ? "docs_pending" : null;
 

@@ -14,12 +14,12 @@ export const Route = createFileRoute("/founding")({
       {
         name: "description",
         content:
-          "Invite-only program for 50 gold traders a month. Approved traders get their chosen plan straight away and verify their ID within 2 days.",
+          "Invite-only program for 50 gold traders a month. Approved traders get 3 months of their chosen plan with $250 credit and verify their ID within 2 days.",
       },
       { property: "og:title", content: "Founding Trader Program" },
       {
         property: "og:description",
-        content: "Approval unlocks your chosen plan immediately. Verify your ID within 2 days to keep access.",
+        content: "Approval unlocks 3 months of your chosen plan with $250 credit. Verify your ID within 2 days to keep access.",
       },
       { property: "og:url", content: "https://jenvu.com/founding" },
       { property: "og:type", content: "website" },
@@ -119,7 +119,7 @@ function FoundingPage() {
                 Founding Trader Program
               </h1>
               <p className="jenvu-rise [animation-delay:80ms] mx-auto mt-5 max-w-[760px] text-[16px] leading-[1.6] text-gc-ink-muted sm:text-[17px]">
-                Once approved, your <span className="font-medium text-gc-ink">chosen plan is unlocked straight away</span>. You then have <span className="font-medium text-gc-ink">2 days to verify your ID</span> to keep access.
+                Once approved, you get <span className="font-medium text-gc-ink">3 months of your chosen plan with $250 credit</span>, unlocked straight away. You then have <span className="font-medium text-gc-ink">2 days to verify your ID</span> to keep access.
               </p>
               <div className="jenvu-rise [animation-delay:160ms] mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
                 <a href="#apply" className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-gc-blue px-6 text-[16px] font-medium text-gc-on-blue transition hover:bg-gc-blue-hover">
@@ -149,7 +149,7 @@ function FoundingPage() {
               <div className="grid gap-5 md:grid-cols-3">
                 {([
                   { icon: Users, tone: "blue", title: "Curated cohort", body: "Only 50 traders each month. Serious applicants, real capital, no tire-kickers." },
-                  { icon: DollarSign, tone: "green", title: "Instant access", body: "Approval unlocks the plan you picked right away, with no waiting." },
+                  { icon: DollarSign, tone: "green", title: "Instant access", body: "Approval unlocks 3 months of the plan you picked plus $250 credit, with no waiting." },
                   { icon: Shield, tone: "yellow", title: "Verified traders", body: "Every member verifies their ID within 2 days, so the cohort stays real." },
                 ] as const).map((b, i) => (
                   <div key={b.title} className="ind-rise rounded-3xl border border-gc-line bg-background p-7 transition hover:shadow-[0_1px_3px_rgba(60,64,67,0.15),0_4px_12px_rgba(60,64,67,0.12)]" style={{ animationDelay: `${i * 80}ms` }}>
@@ -174,7 +174,7 @@ function FoundingPage() {
               <ol className="space-y-4">
                 {[
                   ["Apply", "Fill the short form below. We review every application manually."],
-                  ["Get approved", "If accepted, the plan you picked is unlocked on your account straight away, including the Terminal."],
+                  ["Get approved", "If accepted, you get 3 months of the plan you picked and $250 credit straight away, including the Terminal."],
                   ["Verify your ID in 2 days", "Upload your ID documents from your account within 2 days of approval."],
                   ["Keep trading", "Once your documents are submitted, your access continues. If they're not sent in time, the Terminal is locked until you verify."],
                 ].map(([t, d], i) => (
@@ -243,7 +243,7 @@ function FoundingPage() {
                           );
                         })}
                       </div>
-                      <p className="mt-1.5 text-[12px] text-gc-ink-muted">Approved applicants get this plan straight away.</p>
+                      <p className="mt-1.5 text-[12px] text-gc-ink-muted">Approved applicants get this plan for 3 months with $250 credit.</p>
                     </div>
                     <div className="grid gap-5 sm:grid-cols-2">
                       <Field name="country" label="Country" placeholder="Pakistan" />
