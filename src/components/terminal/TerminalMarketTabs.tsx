@@ -266,7 +266,10 @@ function ago(iso: string) {
 function NewsTab() {
   const fetchNews = useServerFn(getGoldHeadlines);
   const query = useQuery({ queryKey: ["terminal-gold-headlines"], queryFn: () => fetchNews(), staleTime: 5 * 60_000, refetchInterval: 5 * 60_000, refetchIntervalInBackground: false });
-  const items = query.data?.items ?? [];
+  // Latest 15 headlines only, newest first.
+  const items = [...(query.data?.items ?? [])]
+    .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime())
+    .slice(0, 15);
   return (
     <div>
       <h3 className="mb-5 text-[24px] font-medium text-gc-ink">Headlines</h3>
