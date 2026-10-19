@@ -659,6 +659,9 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
 
   const rail = (
     <nav aria-label="Chart tools" className={cn("hidden w-[60px] shrink-0 flex-col items-start gap-1 pb-3 pt-1 md:flex", theme === "dark" ? "border-r border-border bg-background" : "bg-transparent")}>
+      <button type="button" onClick={() => window.dispatchEvent(new Event("jenvu:open-mobile-nav"))} aria-label="Open menu" title="Menu" className={railBtn}>
+        <Menu className="h-[18px] w-[18px]" />
+      </button>
       <Popover>
         <PopoverTrigger asChild>
           <button type="button" aria-label="Timeframe" title="Timeframe" className={railBtn}>
@@ -735,7 +738,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
   return (
     <div ref={workspaceRef} className={cn("flex h-full min-h-0 w-full", theme === "dark" ? "bg-background" : "bg-gc-console-bar")}>
       {rail}
-      <div className={cn("flex min-h-0 min-w-0 flex-1 flex-col bg-background", theme !== "dark" && "overflow-hidden rounded-t-2xl")}>
+      <div className={cn("flex min-h-0 min-w-0 flex-1 flex-col bg-background", theme !== "dark" && "overflow-hidden rounded-t-2xl md:mr-3 md:border md:border-b-0 md:border-gc-line/70")}>
       {/* Top bar — phones only: on laptops and tablets every control lives in the side bar. */}
       <div className="flex h-11 shrink-0 items-center gap-1 overflow-x-auto border-b border-border px-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:hidden">
 
