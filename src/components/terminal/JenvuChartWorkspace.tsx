@@ -58,6 +58,7 @@ import { buildChartContext } from "./chart-context";
 import { TerminalSidePanel } from "./TerminalSidePanel";
 import { TerminalOrderPanel } from "./TerminalOrderPanel";
 import { TerminalPositionsTable } from "./TerminalPositionsTable";
+import { TerminalOverviewRow } from "./TerminalOverviewRow";
 import { DemoTradingPanel, OrderTicket, PaperTradingPanel, QuickTradeButtons, useDemoTrading } from "./DemoTradingPanel";
 import { positionPnl, type DemoSide } from "@/lib/chart/demo-trading";
 import { buildLiveBars } from "@/lib/chart/live-candle";
@@ -760,8 +761,19 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
       ) : (
         <div className="absolute inset-x-0 top-0 z-[5] hidden h-11 items-center border-b border-gc-line bg-background px-2 md:flex">{rail}</div>
       )}
-      {sidePanelOpen && <TerminalOrderPanel trading={demo} price={currentPrice} />}
-      <div className={cn("flex min-h-0 min-w-0 flex-1 flex-col bg-background", theme !== "dark" && "overflow-hidden md:mb-2 md:rounded-2xl md:border md:border-gc-line")}>
+      <div className={cn("flex min-h-0 min-w-0 flex-1 flex-col", sidePanelOpen && "lg:gap-3 lg:overflow-y-auto lg:p-3 lg:[scrollbar-width:thin]")}>
+      {sidePanelOpen && (
+        <TerminalOverviewRow bars={bars} price={currentPrice} timeframeKey={timeframe.key} timeframeLabel={timeframe.label} />
+      )}
+      <div className={cn("flex min-h-0 min-w-0 flex-1", sidePanelOpen && "lg:flex-none lg:gap-3")}>
+      <div
+        className={cn(
+          "flex min-h-0 min-w-0 flex-1 flex-col bg-background",
+          sidePanelOpen
+            ? "lg:h-[560px] lg:flex-none lg:overflow-hidden lg:rounded-2xl lg:border lg:border-gc-line"
+            : theme !== "dark" && "overflow-hidden md:mb-2 md:rounded-2xl md:border md:border-gc-line",
+        )}
+      >
       {/* Top bar — phones only: on laptops and tablets every control lives in the side bar. */}
       <div className="flex h-11 shrink-0 items-center gap-1 overflow-x-auto border-b border-border px-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:hidden">
 
@@ -1090,7 +1102,6 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
             )}
           </div>
 
-          {sidePanelOpen && <TerminalPositionsTable trading={demo} price={currentPrice} />}
           {demoTradingEnabled && paperOpen && <PaperTradingPanel trading={demo} price={currentPrice} onClose={() => setPaperOpen(false)} />}
 
           {scriptPanelOpen && (
@@ -1105,14 +1116,12 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
       </div>
     </div>
       {sidePanelOpen && rightPanelOpen && (
-        <TerminalSidePanel
-          trading={demo}
-          price={currentPrice}
-          bars={bars}
-          timeframeKey={timeframe.key}
-          onClose={() => onSidePanelOpenChange?.(false)}
-        />
+        <TerminalSidePanel trading={demo} price={currentPrice} onClose={() => onSidePanelOpenChange?.(false)} />
       )}
+      </div>
+      {sidePanelOpen && <TerminalPositionsTable trading={demo} price={currentPrice} />}
+      </div>
+      {sidePanelOpen && <TerminalOrderPanel trading={demo} price={currentPrice} />}
     </div>
   );
 });
