@@ -35,13 +35,14 @@ export const Route = createFileRoute("/_authenticated/dashboard/pay")({
       { name: "robots", content: "noindex,nofollow" },
     ],
   }),
-  validateSearch: (search: Record<string, unknown>): { amount?: number; purchase?: "credits" | "plan" } => {
+  validateSearch: (search: Record<string, unknown>): { amount?: number; purchase?: "credits" | "plan"; renew?: string } => {
     const raw = Number(search['amount']);
     const purchase = search['purchase'] === "credits" ? "credits" : search['purchase'] === "plan" ? "plan" : undefined;
     const amount = Number.isFinite(raw) && raw > 0
       ? Math.min(1000, Math.round(raw * 100) / 100)
       : undefined;
-    return { amount, purchase };
+    const renew = ["pro", "elite", "ultra"].includes(String(search['renew'])) ? String(search['renew']) : undefined;
+    return { amount, purchase, renew };
   },
   component: PayPage,
 });
@@ -68,12 +69,12 @@ function PayPage() {
   const cancelFn = useServerFn(cancelOrder);
   const redeemFn = useServerFn(redeemFreeCode);
 
-  const { amount: presetFromUrl, purchase } = Route.useSearch();
+  const { amount: presetFromUrl, purchase, renew } = Route.useSearch();
   const credits = useCredits();
   const currentPlan = credits.plan && typeof credits.plan === 'object' ? (credits.plan as any).id : credits.plan;
   const trial = useTrial();
   const [mode, setMode] = useState<"topup" | "upgrade">(purchase === "credits" ? "topup" : "upgrade");
-  const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null);
+  const [selectedPlanId, setSelectedPlanId] = useState<string | null>(renew ?? null);
 
 
   const [amount, setAmount] = useState<number>(
@@ -267,7 +268,8 @@ function PayPage() {
           {mode === "upgrade" ? (
             <div className="grid gap-4 sm:grid-cols-3">
               {PLANS.map((p) => {
-                const isCurrent = !trial.active && currentPlan === p.id;
+                // Renewing: the current plan stays selectable so it can be paid again.
+                const isCurrent = !renew && !trial.active && currentPlan === p.id;
                 const isCurrentInActiveOrder = order?.status === "approved" && order.target_plan_id === p.id;
                 const isLower = false;
 

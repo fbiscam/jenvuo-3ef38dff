@@ -196,6 +196,27 @@ export async function applyPlanForPayment(userId: string, paidUsd: number, targe
     earned = tiers.filter((p: any) => paidUsd + 0.01 >= Number(p.price_usd)).pop() as any;
   }
 
+  // Founding members renew on the 1st of each month: a plan payment (including
+  // paying back a plan that lapsed to Free) runs the plan until the next 1st.
+  {
+    const { data: founding } = await (supabaseAdmin as any).rpc("is_founding_member", { _user_id: userId });
+    if (founding) {
+      const { data: s } = await (supabaseAdmin as any)
+        .from("user_subscriptions")
+        .select("plan_id, lapsed_plan_id")
+        .eq("user_id", userId)
+        .maybeSingle();
+      const priceOf = (id?: string | null) => Number(tiers.find((p: any) => p.id === id)?.price_usd ?? Infinity);
+      const wanted = targetPlanId || s?.lapsed_plan_id || (s?.plan_id !== "free" ? s?.plan_id : null);
+      const planId = wanted && paidUsd + 0.01 >= priceOf(wanted) ? wanted : earned?.id;
+      if (planId) {
+        const { error } = await (supabaseAdmin as any).rpc("renew_founding_plan", { _user_id: userId, _plan_id: planId });
+        if (error) throw new Error(`renewal: ${error.message}`);
+        return planId as string;
+      }
+    }
+  }
+
   if (!earned) return null;
 
   const { data: sub } = await supabaseAdmin
