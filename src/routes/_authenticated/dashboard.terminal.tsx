@@ -537,6 +537,7 @@ function TerminalPage() {
       const savedTimeframe = TIMEFRAMES.find((timeframe) => timeframe.key === settings?.timeframe);
       if (savedTimeframe) setTf(savedTimeframe);
       if (settings?.watchlistOpen === false) setWatchlistOpen(false);
+      if (settings?.theme === "dark") setTheme("dark");
       // The AI desk always starts closed so the chart opens exactly as left.
     } catch {
       // Keep a clean workspace if saved browser data is unavailable or malformed.
@@ -704,6 +705,15 @@ function TerminalPage() {
               }}
               railSlot={
                 <>
+                  <button
+                    type="button"
+                    onClick={() => setTheme((t) => (t === "dark" ? "light" : "dark"))}
+                    aria-label={theme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
+                    title={theme === "dark" ? "Light theme" : "Dark theme"}
+                    className="flex h-9 w-[60px] items-center justify-center rounded-r-full text-muted-foreground hover:bg-gc-console-rail-active/60 hover:text-foreground dark:hover:bg-accent"
+                  >
+                    {theme === "dark" ? <Sun className="h-[18px] w-[18px]" /> : <Moon className="h-[18px] w-[18px]" />}
+                  </button>
                   <div
                     className="flex w-[60px] flex-col items-center gap-0.5 py-1 font-mono text-[10px] font-semibold leading-none text-foreground"
                     title={marketClosed ? "Gold market is closed for the weekend" : `Time left on the current ${tf.label} candle`}
