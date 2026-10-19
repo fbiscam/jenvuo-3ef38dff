@@ -81,42 +81,42 @@ export function TerminalSymbolHeader({
 
   return (
     <section aria-label="Gold Spot / U.S. Dollar" className="hidden shrink-0 bg-card font-sans lg:block">
-      <div className="flex items-center gap-6 px-6 pb-4 pt-6">
-        <XauUsdLogo size={104} />
+      <div className="flex items-center gap-5 px-5 pb-3 pt-4">
+        <XauUsdLogo size={80} />
         <div className="min-w-0">
-          <h1 className="text-[34px] font-semibold leading-tight tracking-tight text-gc-ink 2xl:text-[40px]">Gold Spot / U.S. Dollar</h1>
-          <div className="mt-2 flex items-center gap-2">
-            <span className="inline-flex h-8 items-center gap-1.5 rounded-md border border-gc-line px-2.5 text-[13px] text-gc-ink">
+          <h1 className="text-[28px] font-semibold leading-tight tracking-tight text-gc-ink 2xl:text-[34px]">Gold Spot / U.S. Dollar</h1>
+          <div className="mt-1.5 flex items-center gap-2">
+            <span className="inline-flex h-7 items-center gap-1.5 rounded-md border border-gc-line px-2.5 text-[12.5px] text-gc-ink">
               XAUUSD <span className="text-gc-ink-muted">·</span> Jenvu feed
             </span>
             <span
-              className={cn("inline-flex h-8 w-8 items-center justify-center rounded-md", marketOpen ? "bg-gc-green-soft" : "bg-gc-console-search")}
+              className={cn("inline-flex h-7 w-7 items-center justify-center rounded-md", marketOpen ? "bg-gc-green-soft" : "bg-gc-console-search")}
               title={marketOpen ? "Market open" : "Market closed"}
               aria-label={marketOpen ? "Market open" : "Market closed"}
             >
               <span className={cn("h-2 w-2 rounded-full", marketOpen ? "bg-gc-green" : "bg-gc-ink-muted")} />
             </span>
           </div>
-          <div className="mt-3 flex flex-wrap items-baseline gap-x-3 gap-y-1">
-            <p className="text-[44px] font-semibold leading-none tabular-nums tracking-tight text-gc-ink 2xl:text-[52px]">
+          <div className="mt-2 flex flex-wrap items-baseline gap-x-3 gap-y-1">
+            <p className="text-[36px] font-semibold leading-none tabular-nums tracking-tight text-gc-ink 2xl:text-[44px]">
               {head}
               <span className={abs == null ? "" : abs >= 0 ? "text-gc-green" : "text-gc-red"}>{tail}</span>
-              <span className="ml-1 text-[14px] font-normal text-gc-ink-muted">USD</span>
+              <span className="ml-1 text-[13px] font-normal text-gc-ink-muted">USD</span>
             </p>
             {abs != null && (
-              <p className={cn("text-[22px] font-medium tabular-nums", pctTone(abs))}>
+              <p className={cn("text-[18px] font-medium tabular-nums", pctTone(abs))}>
                 {abs >= 0 ? "+" : "−"}
                 {num(Math.abs(abs))} <span className="ml-1">{abs >= 0 ? "+" : ""}{pct(ch)}</span>
               </p>
             )}
           </div>
-          <p className="mt-2 text-[13px] text-gc-ink-muted">
+          <p className="mt-1.5 text-[12.5px] text-gc-ink-muted">
             {marketOpen ? "Live" : "Market closed"}
             {now && ` · As of today at ${String(now.getUTCHours()).padStart(2, "0")}:${String(now.getUTCMinutes()).padStart(2, "0")} UTC`}
           </p>
         </div>
       </div>
-      <nav aria-label="Gold sections" className="flex gap-7 border-b-2 border-gc-line px-6">
+      <nav aria-label="Gold sections" className="flex gap-7 border-b-2 border-gc-line px-5">
         {TABS.map((t) => (
           <button
             key={t.id}
@@ -124,7 +124,7 @@ export function TerminalSymbolHeader({
             onClick={() => onTabChange(t.id)}
             aria-pressed={tab === t.id}
             className={cn(
-              "-mb-[2px] border-b-[3px] pb-2.5 pt-2 text-[15px] font-medium transition-colors",
+              "-mb-[2px] border-b-[3px] pb-2 pt-1.5 text-[14.5px] font-medium transition-colors",
               tab === t.id ? "border-gc-ink text-gc-ink" : "border-transparent text-gc-ink-muted hover:text-gc-ink",
             )}
           >
