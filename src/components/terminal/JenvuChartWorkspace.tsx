@@ -54,6 +54,7 @@ import { ChartCanvas, type ChartCanvasHandle } from "./ChartCanvas";
 import { INDICATOR_LIST, buildIndicatorSeries, isIndicatorId, type IndicatorId } from "./indicator-specs";
 import { ScriptPanel, type SavedScript } from "./ScriptPanel";
 import { buildChartContext } from "./chart-context";
+import { TerminalSidePanel } from "./TerminalSidePanel";
 import { DemoTradingPanel, OrderTicket, PaperTradingPanel, QuickTradeButtons, useDemoTrading } from "./DemoTradingPanel";
 import { positionPnl, type DemoSide } from "@/lib/chart/demo-trading";
 import { buildLiveBars } from "@/lib/chart/live-candle";
@@ -133,6 +134,9 @@ type Props = {
   theme?: "light" | "dark";
   /** Extra buttons placed at the bottom of the left side bar (e.g. Ask With AI). */
   railSlot?: ReactNode;
+  /** Right trading column (desktop): trade buttons, demo account, market watch, technicals, risk. */
+  sidePanelOpen?: boolean;
+  onSidePanelOpenChange?: (open: boolean) => void;
 };
 
 const TOOLS: Array<{ id: DrawingTool; icon: LucideIcon; label: string }> = [
@@ -216,7 +220,7 @@ function ToolButton({
 }
 
 export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function JenvuChartWorkspace(
-  { timeframes, timeframe, onTimeframeChange, rightSlot, mobileNewsRow, asset = "XAUUSD", onAssetChange, theme = "light", railSlot },
+  { timeframes, timeframe, onTimeframeChange, rightSlot, mobileNewsRow, asset = "XAUUSD", onAssetChange, theme = "light", railSlot, sidePanelOpen = false, onSidePanelOpenChange },
   ref,
 ) {
   const fetchChart = useServerFn(getTerminalChart);
@@ -248,8 +252,10 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
   const [fullscreen, setFullscreen] = useState(false);
   const [ticketSide, setTicketSide] = useState<DemoSide | null>(null);
   const [paperOpen, setPaperOpen] = useState(false);
-  // Demo trading is temporarily disabled. Set to true to re-enable buy/sell buttons, order ticket and paper trading panel.
-  const demoTradingEnabled = false;
+  // Demo trading: order ticket, positions on the chart and the paper panel. Opened from the side panel.
+  const demoTradingEnabled = true;
+  // On-chart quick BUY/SELL buttons stay off; trading starts from the side panel.
+  const chartQuickButtons = false as boolean;
 
   useEffect(() => {
     const syncFullscreen = () => setFullscreen(document.fullscreenElement === workspaceRef.current);
@@ -966,7 +972,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
                   </>
                 )}
               </div>
-              {demoTradingEnabled && (
+              {demoTradingEnabled && chartQuickButtons && (
                 <div className="mb-1.5">
                   <QuickTradeButtons price={currentPrice} onPick={setTicketSide} />
                 </div>
@@ -1077,6 +1083,17 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
         </div>
       </div>
     </div>
+      {sidePanelOpen && (
+        <TerminalSidePanel
+          trading={demo}
+          price={currentPrice}
+          bars={bars}
+          timeframeLabel={timeframe.label}
+          onPick={setTicketSide}
+          onOpenTrades={() => setPaperOpen((v) => !v)}
+          onClose={() => onSidePanelOpenChange?.(false)}
+        />
+      )}
     </div>
   );
 });
