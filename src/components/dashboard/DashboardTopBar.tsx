@@ -161,13 +161,9 @@ export default function DashboardTopBar({
             e.preventDefault();
             if (q.trim()) ask(q.trim());
           }}
-          className={
-            focused
-              ? "flex h-11 items-center gap-3 rounded-lg border-2 border-gc-blue-deep bg-background px-3"
-              : `flex h-10 items-center rounded-full border border-gc-line/70 ${white ? "bg-gc-console-search" : "bg-gc-notice"} pl-4 pr-1`
-          }
+          className="flex h-11 items-center gap-3 rounded-lg border-2 border-gc-blue-deep bg-background px-3"
         >
-          {focused && <Search className="h-5 w-5 shrink-0 text-gc-ink" />}
+          <Search className="h-5 w-5 shrink-0 text-gc-ink" />
           <input
             ref={inputRef}
             value={q}
@@ -179,16 +175,9 @@ export default function DashboardTopBar({
             aria-label="Search"
             className="min-w-0 flex-1 bg-transparent text-[14px] text-gc-ink outline-none placeholder:text-gc-ink-muted"
           />
-          {focused ? (
-            <button type="submit" aria-label="Send" className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-gc-ink hover:bg-gc-notice">
+                      <button type="submit" aria-label="Send" className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-gc-ink hover:bg-gc-notice">
               {loading ? <Loader2 className="h-4 w-4 animate-spin text-gc-ink-muted" /> : <SendHorizontal className="h-5 w-5" />}
             </button>
-          ) : (
-            <button type="submit" className="inline-flex h-8 items-center gap-1.5 rounded-full px-3 text-[14px] text-gc-ink hover:bg-gc-line/50">
-              <Search className="h-4 w-4" />
-              Search
-            </button>
-          )}
         </form>
         {focused && !q.trim() && (
           <div onMouseDown={(e) => e.preventDefault()} className="absolute left-0 right-0 top-12 rounded-lg border border-gc-line bg-gc-panel shadow-lg">
