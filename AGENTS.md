@@ -30,3 +30,4 @@
 - Top-bar Gifts box lists positive credit-ledger rows whose reason is in `GIFT_REASONS` (`src/lib/gifts.ts`, tested), with the seen time kept per user in the browser: gifts need no extra table and only gift-type credit shows.
 - The Terminal stays unzoomed but its top bar and menu drawer use `.jenvu-zoom-chrome` (same breakpoints as `.jenvu-zoom-dashboard`): keeps header/menu the same size on every dashboard page.
 - Blog articles reach Google by resubmitting `https://jenvu.com/sitemap.xml` through the Search Console connector (`submitToGoogle` in `generate-insight.ts`), once per run: the per-URL Indexing API returns 404 through the connector.
+- Terminal dashboard cards share live quotes and technicals through `src/components/terminal/terminal-market.tsx`: one cache, so the top cards and Market Watch never show different prices.
