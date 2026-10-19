@@ -63,3 +63,4 @@
 - [x] Mobile Terminal: "No trades" button hidden
 - [x] Dashboard top bar: Ask Jenvu button only on the Terminal
 - [x] Terminal: TradingView XAUUSD page layout (big header, Overview/News/Technicals/Seasonals tabs, range returns under the chart, TradingView-style line)
+- [x] Settings page: sectioned layout with side menu; Security merged in; Preferences and Active sessions added

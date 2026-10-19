@@ -191,7 +191,6 @@ const NAV_GROUPS: Array<{ label: string; items: TabItem[] }> = [
       { to: "/dashboard/billing", label: "Billing", icon: Wallet },
       { to: "/dashboard/pay", label: "Payments", icon: BadgeDollarSign },
       { to: "/dashboard/documents", label: "Documents", icon: FileCheck2 },
-      { to: "/dashboard/security", label: "Security", icon: LockKeyhole },
       { to: "/dashboard/profile", label: "Settings", icon: Settings2 },
       { to: "/help", label: "Help Center", icon: CircleHelp },
     ],
@@ -1578,7 +1577,7 @@ function DashboardLayout() {
           className={
             !drawerMode
               ? "flex min-h-0 w-full flex-1 flex-col"
-              : "flex min-h-0 w-full flex-1 flex-col overflow-hidden bg-background sm:mx-2 sm:w-auto sm:rounded-t-[20px]"
+              : "flex min-h-0 w-full flex-1 flex-col overflow-clip bg-background sm:mx-2 sm:w-auto sm:rounded-t-[20px]"
           }
         >
         {drawerMode && pathname !== "/dashboard/terminal" && <StartTrialBanner />}
