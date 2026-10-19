@@ -996,7 +996,30 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
                   </p>
                 </div>
               )}
-              <div className="ml-auto hidden items-center gap-1 lg:flex">
+              <div className="flex items-center gap-1 lg:ml-auto">
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <button type="button" className="hidden h-8 items-center gap-2 rounded-lg px-3 text-[14px] text-gc-ink hover:bg-gc-panel data-[state=open]:bg-gc-blue-soft data-[state=open]:text-gc-blue-deep lg:flex">
+                      <Activity className="h-4 w-4" /> Indicators
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent align="end" className={cn("max-h-[70vh] w-80 overflow-y-auto p-2", popClass)}>
+                    {indicatorMenu}
+                  </PopoverContent>
+                </Popover>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <button type="button" className="hidden h-8 items-center gap-2 rounded-lg px-3 text-[14px] text-gc-ink hover:bg-gc-panel data-[state=open]:bg-gc-blue-soft data-[state=open]:text-gc-blue-deep lg:flex">
+                      <Layers className="h-4 w-4" /> SMC
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent align="end" className={cn("max-h-[70vh] w-80 overflow-y-auto p-2", popClass)}>
+                    {smcMenu}
+                  </PopoverContent>
+                </Popover>
+                <button type="button" onClick={downloadSnapshot} aria-label="Download chart snapshot" title="Download chart snapshot" className="grid h-8 w-8 place-items-center rounded-lg text-gc-ink-muted hover:bg-gc-panel hover:text-gc-ink">
+                  <Camera className="h-4 w-4" />
+                </button>
                 <button type="button" onClick={() => void toggleFullscreen()} aria-label={fullscreen ? "Exit fullscreen chart" : "Fullscreen chart"} title={fullscreen ? "Exit fullscreen" : "Fullscreen chart"} className="grid h-8 w-8 place-items-center rounded-lg text-gc-ink-muted hover:bg-gc-panel hover:text-gc-ink">
                   {fullscreen ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
                 </button>
