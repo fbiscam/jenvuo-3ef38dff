@@ -65,7 +65,7 @@ export function SecuritySettings({ email }: { email: string }) {
         <SettingsRow
           wide
           label="Change email"
-          hint="We'll send a confirmation link to your current email. Your email changes only after you click that link."
+          hint="We'll send a confirmation link to your current email. Your email changes after you click that link."
         >
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
             <input
