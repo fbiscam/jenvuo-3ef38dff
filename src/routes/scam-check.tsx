@@ -34,7 +34,7 @@ export const Route = createFileRoute("/scam-check")({
   component: ScamCheckPage,
 });
 
-const SANS = "font-['Google_Sans','Product_Sans','Roboto',system-ui,sans-serif] font-normal normal-case tracking-normal";
+const SANS = "font-['Google_Sans_Flex','Google_Sans','Product_Sans','Roboto',system-ui,sans-serif] font-normal normal-case tracking-normal";
 
 type Kind = "link" | "email" | "text";
 

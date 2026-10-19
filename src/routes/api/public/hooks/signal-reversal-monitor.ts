@@ -443,7 +443,7 @@ export const Route = createFileRoute(
                   ``,
                   `Open dashboard: https://jenvu.com/dashboard/notifications`,
                 ].join("\n");
-                const html = `<div style="font-family:'Google Sans','Segoe UI',Arial,sans-serif;color:#111;line-height:1.5;padding:16px">
+                const html = `<div style="font-family:'Google Sans Flex', 'Google Sans','Segoe UI',Arial,sans-serif;color:#111;line-height:1.5;padding:16px">
                   <h2 style="margin:0 0 12px">${reason === "sl_hit" ? "⚠️ Signal invalidated" : "🔄 Signal reversed"}</h2>
                   <p style="margin:0 0 8px">${
                     reason === "sl_hit"

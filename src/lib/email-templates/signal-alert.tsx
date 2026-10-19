@@ -238,7 +238,7 @@ export const template = {
 // ===== Styles =====
 const main: React.CSSProperties = {
   backgroundColor: '#ffffff',
-  fontFamily: "'Google Sans','Google Sans Normal',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif",
+  fontFamily: "'Google Sans Flex', 'Google Sans','Google Sans Normal',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif",
   margin: 0,
   padding: '24px 0',
   color: '#18181b',
@@ -268,7 +268,7 @@ const brandWordmark: React.CSSProperties = {
   color: '#09090b',
 }
 const headerMeta: React.CSSProperties = {
-  fontFamily: "'Google Sans','Google Sans Normal',ui-monospace,monospace",
+  fontFamily: "'Google Sans Flex', 'Google Sans','Google Sans Normal',ui-monospace,monospace",
   fontSize: 10,
   letterSpacing: '0.22em',
   color: '#71717a',
@@ -281,7 +281,7 @@ const liveBar: React.CSSProperties = {
 }
 const liveDot: React.CSSProperties = { fontSize: 10, marginRight: 8, color: '#dc2626' }
 const liveText: React.CSSProperties = {
-  fontFamily: "'Google Sans','Google Sans Normal',ui-monospace,monospace",
+  fontFamily: "'Google Sans Flex', 'Google Sans','Google Sans Normal',ui-monospace,monospace",
   fontSize: 11,
   letterSpacing: '0.2em',
   fontWeight: 700,
@@ -289,7 +289,7 @@ const liveText: React.CSSProperties = {
 }
 const bodySection: React.CSSProperties = { padding: '24px 32px 8px' }
 const categoryLabel: React.CSSProperties = {
-  fontFamily: "'Google Sans','Google Sans Normal',ui-monospace,monospace",
+  fontFamily: "'Google Sans Flex', 'Google Sans','Google Sans Normal',ui-monospace,monospace",
   fontSize: 10,
   letterSpacing: '0.22em',
   color: '#71717a',
@@ -331,7 +331,7 @@ const sizeBox: React.CSSProperties = {
   backgroundColor: '#fafafa',
 }
 const sizeHeader: React.CSSProperties = {
-  fontFamily: "'Google Sans','Google Sans Normal',ui-monospace,monospace",
+  fontFamily: "'Google Sans Flex', 'Google Sans','Google Sans Normal',ui-monospace,monospace",
   fontSize: 10,
   letterSpacing: '0.22em',
   color: '#71717a',
@@ -348,7 +348,7 @@ const sizeCell: React.CSSProperties = {
 }
 const sizeCellLast: React.CSSProperties = { ...sizeCell, borderRight: 'none' }
 const tradeLabel: React.CSSProperties = {
-  fontFamily: "'Google Sans','Google Sans Normal',ui-monospace,monospace",
+  fontFamily: "'Google Sans Flex', 'Google Sans','Google Sans Normal',ui-monospace,monospace",
   fontSize: 10,
   letterSpacing: '0.22em',
   color: '#000000',
@@ -367,7 +367,7 @@ const unsubLink: React.CSSProperties = {
 }
 const tradeFooter: React.CSSProperties = {
   padding: '10px 12px',
-  fontFamily: "'Google Sans','Google Sans Normal',ui-monospace,monospace",
+  fontFamily: "'Google Sans Flex', 'Google Sans','Google Sans Normal',ui-monospace,monospace",
   fontSize: 11,
   textAlign: 'center',
   color: '#52525b',
@@ -397,7 +397,7 @@ const fineprint: React.CSSProperties = {
 const divider: React.CSSProperties = { borderTop: '1px solid #e4e4e7', margin: '24px 0 0 0' }
 const footer: React.CSSProperties = { padding: '20px 32px 28px', textAlign: 'center' }
 const footerBrand: React.CSSProperties = {
-  fontFamily: "'Google Sans','Google Sans Normal',ui-monospace,monospace",
+  fontFamily: "'Google Sans Flex', 'Google Sans','Google Sans Normal',ui-monospace,monospace",
   fontSize: 10,
   letterSpacing: '0.28em',
   color: '#09090b',

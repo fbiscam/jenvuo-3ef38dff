@@ -49,7 +49,7 @@ export function CookieBanner() {
       role="dialog"
       aria-label="Cookie preferences"
       className="fixed bottom-4 left-1/2 z-[9999] w-[min(92vw,720px)] -translate-x-1/2 rounded-xl border border-zinc-200 bg-white p-4 shadow-lg sm:p-5"
-      style={{ fontFamily: "'Google Sans', 'Urbanist', system-ui, sans-serif" }}
+      style={{ fontFamily: "'Google Sans Flex', 'Google Sans', 'Urbanist', system-ui, sans-serif" }}
     >
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="max-w-[480px] text-[13px] leading-snug text-zinc-900 line-clamp-2">

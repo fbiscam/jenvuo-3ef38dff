@@ -298,7 +298,7 @@ function AdminInbox() {
   ];
 
   return (
-    <div className="relative flex h-screen flex-col bg-gc-canvas text-[13px] text-gc-ink antialiased [font-family:'Google_Sans','Product_Sans','Poppins',system-ui,-apple-system,sans-serif] [font-feature-settings:'cv11','ss01','ss03'] [font-optical-sizing:auto]">
+    <div className="relative flex h-screen flex-col bg-gc-canvas text-[13px] text-gc-ink antialiased [font-family:'Google_Sans_Flex','Google_Sans','Product_Sans','Poppins',system-ui,-apple-system,sans-serif] [font-feature-settings:'cv11','ss01','ss03'] [font-optical-sizing:auto]">
       {/* Top bar */}
       <header className="relative z-10 flex h-14 shrink-0 items-center justify-between border-b border-neutral-200 bg-gc-canvas px-5">
         <div className="flex items-center gap-3">
