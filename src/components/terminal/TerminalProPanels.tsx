@@ -242,7 +242,7 @@ export function MarketOverlayCard({ market, onClose }: { market: MarketSnapshot 
   if (!market) return null;
   const up = market.diff >= 0;
   return (
-    <div className="terminal-glass w-[264px] rounded-xl border border-gc-line p-3.5 shadow-2xl">
+    <div className="terminal-glass w-[264px] rounded-xl border border-gc-line p-3.5 shadow-lg">
       <div className="flex items-center gap-2">
         <p className="text-[12.5px] font-medium text-gc-ink">Market summary</p>
         <button type="button" onClick={onClose} aria-label="Hide market summary" className="ml-auto grid h-6 w-6 place-items-center rounded-md text-gc-ink-muted hover:bg-gc-panel hover:text-gc-ink">
