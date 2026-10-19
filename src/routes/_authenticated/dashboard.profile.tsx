@@ -188,7 +188,7 @@ function Profile() {
         </nav>
 
         <div className="min-w-0 space-y-6">
-          <SettingsCard id="profile" title="Profile" description="Your photo and name show on your dashboard, in the top menu and in messages you send to Jenvu support.">
+          <SettingsCard id="profile" title="Profile" description="Your photo and name show on your dashboard, in the top menu ">
             <div className="flex flex-col gap-5 px-6 py-5 sm:flex-row sm:items-center sm:px-7">
               <div
                 role="button"
