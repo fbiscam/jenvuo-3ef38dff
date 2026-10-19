@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "bun:test";
 import { FOUNDING_CREDIT_USD, FOUNDING_MONTHS, foundingTrialEnd } from "./founding-offer";
 
 describe("Founding offer", () => {
