@@ -85,18 +85,6 @@ export function TerminalSymbolHeader({
         <XauUsdLogo size={80} />
         <div className="min-w-0">
           <h1 className="text-[28px] font-semibold leading-tight tracking-tight text-gc-ink 2xl:text-[34px]">Gold Spot / U.S. Dollar</h1>
-          <div className="mt-1.5 flex items-center gap-2">
-            <span className="inline-flex h-7 items-center gap-1.5 rounded-md border border-gc-line px-2.5 text-[12.5px] text-gc-ink">
-              XAUUSD <span className="text-gc-ink-muted">·</span> Jenvu feed
-            </span>
-            <span
-              className={cn("inline-flex h-7 w-7 items-center justify-center rounded-md", marketOpen ? "bg-gc-green-soft" : "bg-gc-console-search")}
-              title={marketOpen ? "Market open" : "Market closed"}
-              aria-label={marketOpen ? "Market open" : "Market closed"}
-            >
-              <span className={cn("h-2 w-2 rounded-full", marketOpen ? "bg-gc-green" : "bg-gc-ink-muted")} />
-            </span>
-          </div>
           <div className="mt-2 flex flex-wrap items-baseline gap-x-3 gap-y-1">
             <p className="text-[36px] font-semibold leading-none tabular-nums tracking-tight text-gc-ink 2xl:text-[44px]">
               {head}
@@ -446,6 +434,8 @@ const MOVERS = [
   { symbol: "US10Y", label: "US 10Y", decimals: 3 },
   { symbol: "XAGUSD", label: "Silver", decimals: 3 },
   { symbol: "EURUSD", label: "EUR/USD", decimals: 5 },
+  { symbol: "USDJPY", label: "USD/JPY", decimals: 3 },
+  { symbol: "SPX", label: "S&P 500", decimals: 2 },
 ];
 
 /** Right side of the symbol header: markets that move gold plus today's trading sessions (UTC). */
