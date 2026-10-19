@@ -30,6 +30,7 @@ import {
 import { TerminalWatchlist } from "@/components/terminal/TerminalWatchlist";
 import { TERMINAL_RAIL_BTN } from "@/components/terminal/rail-style";
 import { TerminalNewsPanel } from "@/components/terminal/TerminalNewsPanel";
+import { GoldScreenerTable, GoldWatchlistCard, MiniCandles, useGoldFrames, type FrameKey } from "@/components/terminal/TerminalMultiFrame";
 import {
   AiInsightCard,
   AssetDetailCard,
@@ -330,6 +331,11 @@ function TerminalPage() {
   const [deskOpen, setDeskOpen] = useState(false);
   const [market, setMarket] = useState<MarketSnapshot | null>(null);
   const [summaryOpen, setSummaryOpen] = useState(true);
+  const frames = useGoldFrames();
+  const pickFrame = (key: FrameKey) => {
+    const match = TIMEFRAMES.find((item) => item.key === key);
+    if (match) setTf(match);
+  };
   const [theme, setTheme] = useState<"light" | "dark">("light");
   const [watchlistOpen, setWatchlistOpen] = useState(true);
   // The watchlist fills the right side whenever the AI desk is closed.
@@ -713,14 +719,22 @@ function TerminalPage() {
               asset={asset}
               onAssetChange={changeAsset}
               theme={theme}
-              canvasTheme="light"
+              canvasTheme="dark"
               popoverClassName="terminal-modern"
               onMarketUpdate={setMarket}
               overlaySlot={
-                summaryOpen && !deskOpen ? <MarketOverlayCard market={market} onClose={() => setSummaryOpen(false)} /> : null
+                summaryOpen && !deskOpen ? (
+                  <MarketOverlayCard market={market} onClose={() => setSummaryOpen(false)}>
+                    <MiniCandles row={frames.rows[tf.key === "4h" ? 5 : 4]} />
+                  </MarketOverlayCard>
+                ) : null
               }
               footerSlot={
-                <TerminalBottomTabs news={relevantNews.slice(0, 5)} onAsk={() => setDeskOpen(true)} />
+                <TerminalBottomTabs
+                  news={relevantNews.slice(0, 5)}
+                  onAsk={() => setDeskOpen(true)}
+                  screener={<GoldScreenerTable rows={frames.rows} loading={frames.loading} onPick={pickFrame} />}
+                />
               }
               onTimeframeChange={(next) => {
                 const match = TIMEFRAMES.find((item) => item.key === next.key);
@@ -819,6 +833,7 @@ function TerminalPage() {
               <AssetDetailCard market={market} nextNews={nextGoldNews} marketClosed={marketClosed} />
               <PerformanceCard market={market} />
               <TechnicalsCard market={market} />
+              <GoldWatchlistCard rows={frames.rows} loading={frames.loading} active={tf.key} onPick={pickFrame} />
               <LiquidityZonesCard market={market} />
               <MarketSessionsCard marketClosed={marketClosed} />
               <AiInsightCard
