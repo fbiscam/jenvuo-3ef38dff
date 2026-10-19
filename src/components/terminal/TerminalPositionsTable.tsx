@@ -25,7 +25,7 @@ export function TerminalPositionsTable({ trading, price }: { trading: DemoTradin
   };
 
   const th = "whitespace-nowrap px-3 py-2 text-left text-[11px] font-medium text-gc-ink-muted";
-  const td = "whitespace-nowrap px-3 py-2 text-left font-mono text-[12px] tabular-nums text-gc-ink";
+  const td = "whitespace-nowrap px-3 py-2 text-left text-[12px] tabular-nums text-gc-ink";
   const tabs: [Tab, string][] = [
     ["open", `Open Positions (${positions.length})`],
     ["pending", `Pending Orders (${orders.length})`],

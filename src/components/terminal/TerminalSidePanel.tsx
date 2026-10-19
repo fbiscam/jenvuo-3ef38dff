@@ -174,10 +174,10 @@ export function TerminalSidePanel({
                   <span className="text-[12px] font-medium text-gc-ink">{w.label}</span>
                 </span>
                 <span className="flex items-center gap-3">
-                  <span className="font-mono text-[12px] tabular-nums text-gc-ink">
+                  <span className="text-[12px] tabular-nums text-gc-ink">
                     {x ? x.price.toLocaleString("en-US", { minimumFractionDigits: x.decimals, maximumFractionDigits: x.decimals }) : "—"}
                   </span>
-                  <span className={cn("w-12 text-right font-mono text-[11px] tabular-nums", ch == null ? "text-gc-ink-muted" : tone(ch))}>
+                  <span className={cn("w-12 text-right text-[11px] tabular-nums", ch == null ? "text-gc-ink-muted" : tone(ch))}>
                     {ch == null ? "" : `${ch >= 0 ? "+" : ""}${ch.toFixed(2)}%`}
                   </span>
                 </span>
@@ -214,7 +214,7 @@ export function TerminalSidePanel({
                 <div key={r.name} className="flex items-center justify-between">
                   <dt className="text-gc-ink">{r.name}</dt>
                   <dd className="flex items-center gap-3">
-                    <span className="font-mono tabular-nums text-gc-ink-muted">{num(r.value)}</span>
+                    <span className="tabular-nums text-gc-ink-muted">{num(r.value)}</span>
                     <span className={cn("w-12 text-right font-medium capitalize", verdictTone[r.verdict])}>{r.verdict}</span>
                   </dd>
                 </div>
@@ -279,17 +279,17 @@ export function TerminalSidePanel({
                   onKeyDown={(e) => {
                     if (e.key === "Enter") (e.target as HTMLInputElement).blur();
                   }}
-                  className="h-7 w-24 rounded-lg border border-gc-line bg-background px-2 text-right font-mono text-[12px] text-gc-ink outline-none focus:border-gc-blue"
+                  className="h-7 w-24 rounded-lg border border-gc-line bg-background px-2 text-right text-[12px] text-gc-ink outline-none focus:border-gc-blue"
                 />
               ) : (
-                <span className="font-mono font-semibold tabular-nums text-gc-ink">${num(limit)}</span>
+                <span className="font-semibold tabular-nums text-gc-ink">${num(limit)}</span>
               )}
             </dd>
           </div>
           <div>
             <div className="flex justify-between">
               <dt className="text-gc-ink-muted">Loss used today</dt>
-              <dd className="font-mono tabular-nums text-gc-ink">${num(lossUsed)}</dd>
+              <dd className="tabular-nums text-gc-ink">${num(lossUsed)}</dd>
             </div>
             <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-gc-console-search">
               <div className={cn("h-full rounded-full", lossPct >= 100 ? "bg-gc-red" : lossPct >= 70 ? "bg-gc-yellow" : "bg-gc-green")} style={{ width: `${lossPct}%` }} />
@@ -300,7 +300,7 @@ export function TerminalSidePanel({
             <dt className="flex items-center gap-1 text-gc-ink-muted" title="Equity change from the $100,000 starting balance">
               Current drawdown <Info className="h-3 w-3" />
             </dt>
-            <dd className={cn("font-mono font-semibold tabular-nums", tone(drawdown))}>{`${drawdown >= 0 ? "+" : ""}${drawdown.toFixed(2)}%`}</dd>
+            <dd className={cn("font-semibold tabular-nums", tone(drawdown))}>{`${drawdown >= 0 ? "+" : ""}${drawdown.toFixed(2)}%`}</dd>
           </div>
         </dl>
       </Card>

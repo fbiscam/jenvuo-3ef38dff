@@ -34,7 +34,7 @@ function useHideBalance() {
 }
 
 const input =
-  "h-10 w-full rounded-xl border border-gc-line bg-background px-3 font-mono text-sm text-gc-ink outline-none placeholder:text-gc-ink-muted/70 focus:border-gc-blue focus:ring-1 focus:ring-gc-blue";
+  "h-10 w-full rounded-xl border border-gc-line bg-background px-3 text-sm text-gc-ink outline-none placeholder:text-gc-ink-muted/70 focus:border-gc-blue focus:ring-1 focus:ring-gc-blue";
 
 /** Left Terminal column: XAU/USD order form and the demo account (balance can be hidden). */
 export function TerminalOrderPanel({ trading, price }: { trading: DemoTrading; price: number | null }) {
@@ -88,17 +88,17 @@ export function TerminalOrderPanel({ trading, price }: { trading: DemoTrading; p
         </div>
         <div className="mt-3 flex items-center justify-between text-[12px]">
           <span className="text-gc-ink-muted">Balance (Demo)</span>
-          <span className="font-mono font-semibold tabular-nums text-gc-ink">{hidden ? MASK : `$${num(account.balance)}`}</span>
+          <span className="font-semibold tabular-nums text-gc-ink">{hidden ? MASK : `$${num(account.balance)}`}</span>
         </div>
 
         <div className="mt-3 grid grid-cols-2 gap-2">
           <div className="rounded-xl bg-gc-red-soft px-2.5 py-2">
             <p className="text-[10px] font-medium text-gc-red">BID</p>
-            <p className="font-mono text-[17px] font-semibold tabular-nums text-gc-red">{q ? num(q.bid) : "—"}</p>
+            <p className="text-[17px] font-semibold tabular-nums text-gc-red">{q ? num(q.bid) : "—"}</p>
           </div>
           <div className="rounded-xl bg-gc-green-soft px-2.5 py-2">
             <p className="text-[10px] font-medium text-gc-green">ASK</p>
-            <p className="font-mono text-[17px] font-semibold tabular-nums text-gc-green">{q ? num(q.ask) : "—"}</p>
+            <p className="text-[17px] font-semibold tabular-nums text-gc-green">{q ? num(q.ask) : "—"}</p>
           </div>
         </div>
 
@@ -152,7 +152,7 @@ export function TerminalOrderPanel({ trading, price }: { trading: DemoTrading; p
             step="0.01"
             value={lots}
             onChange={(e) => setLots(e.target.value)}
-            className="h-full min-w-0 flex-1 border-x border-gc-line bg-transparent text-center font-mono text-sm text-gc-ink outline-none"
+            className="h-full min-w-0 flex-1 border-x border-gc-line bg-transparent text-center text-sm text-gc-ink outline-none"
           />
           <button type="button" onClick={() => stepLots(0.01)} aria-label="Bigger position" className="flex h-full w-9 items-center justify-center text-gc-ink-muted hover:text-gc-ink">
             <Plus className="h-3.5 w-3.5" />
@@ -174,11 +174,11 @@ export function TerminalOrderPanel({ trading, price }: { trading: DemoTrading; p
         <div className="mt-3.5 grid grid-cols-2 gap-2">
           <button type="button" onClick={() => submit("buy")} className="rounded-xl bg-gc-green py-2 text-gc-on-blue shadow-sm transition-opacity hover:opacity-90">
             <span className="block text-[13px] font-semibold">BUY</span>
-            <span className="block font-mono text-[11px] opacity-90">@ {q ? num(type === "market" ? q.ask : Number(orderPrice) || 0) : "—"}</span>
+            <span className="block text-[11px] opacity-90">@ {q ? num(type === "market" ? q.ask : Number(orderPrice) || 0) : "—"}</span>
           </button>
           <button type="button" onClick={() => submit("sell")} className="rounded-xl bg-gc-red py-2 text-gc-on-blue shadow-sm transition-opacity hover:opacity-90">
             <span className="block text-[13px] font-semibold">SELL</span>
-            <span className="block font-mono text-[11px] opacity-90">@ {q ? num(type === "market" ? q.bid : Number(orderPrice) || 0) : "—"}</span>
+            <span className="block text-[11px] opacity-90">@ {q ? num(type === "market" ? q.bid : Number(orderPrice) || 0) : "—"}</span>
           </button>
         </div>
         {msg && (
@@ -221,7 +221,7 @@ export function TerminalOrderPanel({ trading, price }: { trading: DemoTrading; p
           <dl className="mt-2 space-y-1.5 text-[12px]">
             <div className="flex items-baseline justify-between">
               <dt className="text-gc-ink-muted">Equity</dt>
-              <dd className="font-mono text-[18px] font-semibold tabular-nums text-gc-blue">${num(metrics.equity)}</dd>
+              <dd className="text-[18px] font-semibold tabular-nums text-gc-blue">${num(metrics.equity)}</dd>
             </div>
             {[
               ["Balance", `$${num(account.balance)}`],
@@ -231,7 +231,7 @@ export function TerminalOrderPanel({ trading, price }: { trading: DemoTrading; p
             ].map(([k, v]) => (
               <div key={k} className="flex justify-between">
                 <dt className="text-gc-ink-muted">{k}</dt>
-                <dd className="font-mono tabular-nums text-gc-ink">{v}</dd>
+                <dd className="tabular-nums text-gc-ink">{v}</dd>
               </div>
             ))}
             <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-gc-console-search">
