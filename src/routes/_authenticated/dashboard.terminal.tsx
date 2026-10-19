@@ -28,6 +28,7 @@ import {
   type JenvuChartHandle,
 } from "@/components/terminal/JenvuChartWorkspace";
 import { TerminalWatchlist } from "@/components/terminal/TerminalWatchlist";
+import { TERMINAL_RAIL_BTN } from "@/components/terminal/rail-style";
 import { TerminalNewsPanel } from "@/components/terminal/TerminalNewsPanel";
 import {
   AiInsightCard,
