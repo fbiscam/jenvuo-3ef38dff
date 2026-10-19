@@ -56,3 +56,4 @@
 - [x] Terminal: light/dark switch in the side rail; dark covers the whole page (top bar, prices, menu, rail, chart)
 - [x] Terminal trading layout like the mockup: left order + demo account (eye hides balance), positions table under the chart (Close Wins/Losses/All), right Market Watch, Technicals (15m/1H/4H/1D), Risk Management; one side-bar button shows/hides it
 - [x] Terminal: price slider removed; chart tools (timeframe, indicators, SMC, draw, snapshot, reset, fullscreen, timer, news, theme, panels, Ask AI) moved into the top bar; whole page white
+- [x] Terminal: black dashboard layout like the Selimor picture (4 market cards, technicals + volume bars, chart with Market Watch/Account, trades table, order + risk column); black is the default look

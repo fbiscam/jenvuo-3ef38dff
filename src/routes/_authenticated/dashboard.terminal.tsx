@@ -316,7 +316,7 @@ function TerminalPage() {
     }
   };
   const [deskOpen, setDeskOpen] = useState(false);
-  const [theme, setTheme] = useState<"light" | "dark">("light");
+  const [theme, setTheme] = useState<"light" | "dark">("dark");
   const [watchlistOpen, setWatchlistOpen] = useState(true);
   // Trading layout (order panel, positions, market watch, technicals, risk) — on by default.
   const [panelsOpen, setPanelsOpen] = useState(true);
@@ -534,6 +534,7 @@ function TerminalPage() {
       const settings = JSON.parse(window.localStorage.getItem(TERMINAL_SETTINGS_KEY) || "null") as {
         timeframe?: string;
         theme?: "light" | "dark";
+        look?: "light" | "dark";
         deskOpen?: boolean;
         watchlistOpen?: boolean;
         tradingPanels?: boolean;
@@ -542,7 +543,8 @@ function TerminalPage() {
       if (savedTimeframe) setTf(savedTimeframe);
       if (settings?.watchlistOpen === false) setWatchlistOpen(false);
       if (settings?.tradingPanels === false) setPanelsOpen(false);
-      if (settings?.theme === "dark") setTheme("dark");
+      // Black dashboard is the default; only an explicit pick from the switch turns it light.
+      if (settings?.look === "light") setTheme("light");
       // The AI desk always starts closed so the chart opens exactly as left.
     } catch {
       // Keep a clean workspace if saved browser data is unavailable or malformed.
@@ -564,7 +566,7 @@ function TerminalPage() {
     if (!hydratedRef.current) return;
     window.localStorage.setItem(
       TERMINAL_SETTINGS_KEY,
-      JSON.stringify({ timeframe: tf.key, deskOpen, theme, watchlistOpen, tradingPanels: panelsOpen }),
+      JSON.stringify({ timeframe: tf.key, deskOpen, theme, look: theme, watchlistOpen, tradingPanels: panelsOpen }),
     );
   }, [tf.key, deskOpen, theme, watchlistOpen, panelsOpen]);
 

@@ -49,10 +49,10 @@ export const CHART_THEMES: Record<ChartTheme, { bg: string; text: string; grid: 
   },
   // TradingView-style dark palette
   dark: {
-    bg: "#0f0f0f",
+    bg: "#16161b",
     text: "#f2f2f2",
-    grid: "#1f1f1f",
-    border: "#2e2e2e",
+    grid: "#1f1f26",
+    border: "#26262e",
     up: "#089981",
     down: "#f23645",
     insideBar: "#38bdf8",
