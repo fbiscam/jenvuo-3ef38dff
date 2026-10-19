@@ -786,7 +786,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
       ) : (
         <div className="terminal-toolbar absolute inset-x-0 top-0 z-[5] hidden h-11 items-center border-b border-gc-line bg-background px-2 md:flex">{rail}</div>
       )}
-      <div className={cn("flex min-h-0 min-w-0 flex-1 flex-col", sidePanelOpen && "lg:gap-3 lg:overflow-y-auto lg:p-3 lg:[scrollbar-width:thin]")}>
+      <div className={cn("flex min-h-0 min-w-0 flex-1 flex-col", sidePanelOpen && "terminal-page-scroll lg:gap-3 lg:overflow-y-auto lg:p-3")}>
       {sidePanelOpen && (
         <div className="hidden lg:block">
           <TerminalSymbolHeader price={currentPrice} tab={marketTab} onTabChange={setMarketTab} marketOpen={!goldClosed} />
