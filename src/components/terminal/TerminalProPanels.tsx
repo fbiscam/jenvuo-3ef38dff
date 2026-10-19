@@ -120,7 +120,7 @@ export function TerminalStatCards({
             {market ? `${signed(market.pct)}%` : "—"}
           </p>
           <p className="mt-0.5 text-[12px] tabular-nums text-gc-ink-muted">
-            {market ? `H ${fmt(market.high)} · L ${fmt(market.low)}` : "Last 24 hours"}
+            {market ? `${signed(market.diff)} · 24h` : "Last 24 hours"}
           </p>
         </div>
         <Sparkline values={market?.spark ?? []} tone={up ? "up" : "down"} />
@@ -236,7 +236,7 @@ export function LiquidityZonesCard({ market }: { market: MarketSnapshot | null }
         <ul className="mt-1">
           {zones.map((z) => (
             <li key={`${z.type}-${z.top}-${z.bottom}`} className="grid grid-cols-[1fr_auto_auto] items-center gap-x-4 py-2">
-              <span className="text-[14px] tabular-nums text-gc-ink">
+              <span className="whitespace-nowrap text-[13px] tabular-nums text-gc-ink">
                 {fmt(z.bottom)} – {fmt(z.top)}
               </span>
               <span
