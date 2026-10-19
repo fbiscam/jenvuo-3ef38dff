@@ -66,7 +66,7 @@ function AccuracyPage() {
     <div className="mx-auto max-w-6xl px-4 py-6 space-y-6" style={{ fontFamily: "'Google Sans Flex', 'Google Sans','Urbanist',sans-serif" }}>
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="pl-1 text-2xl font-semibold text-black">Signal Accuracy</h1>
+          <h1 className="pl-1 text-[28px] font-normal leading-tight sm:text-[32px] text-gc-ink text-gc-ink">Signal Accuracy</h1>
           <p className="text-sm text-gray-500 mt-1">
             Objective win-rate and R-expectancy from the paper-trading log (auto-resolved via 5m candles).
           </p>
@@ -241,7 +241,7 @@ function Kpi({
   accent?: "good" | "bad" | "neutral";
 }) {
   const color =
-    accent === "good" ? "text-emerald-600" : accent === "bad" ? "text-red-600" : "text-black";
+    accent === "good" ? "text-emerald-600" : accent === "bad" ? "text-red-600" : "text-gc-ink";
   return (
     <div className="rounded-xl border bg-background p-4">
       <div className="text-xs text-gray-500 uppercase tracking-wide">{label}</div>
@@ -254,7 +254,7 @@ function Kpi({
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="rounded-xl border bg-background overflow-hidden">
-      <div className="px-4 py-2.5 border-b bg-gray-50 text-sm font-medium text-black">
+      <div className="px-4 py-2.5 border-b bg-gray-50 text-sm font-medium text-gc-ink">
         {title}
       </div>
       <div className="p-4">{children}</div>
@@ -286,7 +286,7 @@ function Table({ cols, rows }: { cols: string[]; rows: (string | number)[][] }) 
           {rows.map((row, i) => (
             <tr key={i} className="border-t">
               {row.map((cell, j) => (
-                <td key={j} className="py-2 pr-4 text-black">
+                <td key={j} className="py-2 pr-4 text-gc-ink">
                   {cell}
                 </td>
               ))}

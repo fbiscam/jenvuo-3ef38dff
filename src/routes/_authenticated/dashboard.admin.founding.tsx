@@ -225,7 +225,7 @@ function AdminFoundingPage() {
             <div className="inline-flex items-center gap-2 rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-[11px] uppercase tracking-widest text-amber-700">
               <Crown className="h-3.5 w-3.5" /> Founding program · Admin
             </div>
-            <h1 className="pl-1 mt-3 text-2xl font-semibold text-gc-ink">Founding applications</h1>
+            <h1 className="pl-1 mt-3 text-[28px] font-normal leading-tight sm:text-[32px] text-gc-ink text-gc-ink">Founding applications</h1>
             <p className="mt-1 text-sm text-gc-ink-muted">
               Review, approve, waitlist, or reject candidates. Approving activates their plan and sends an invite.
             </p>

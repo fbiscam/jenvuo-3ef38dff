@@ -41,7 +41,7 @@ function StatusBadge({ status }: { status: "ok" | "warn" | "fail" | "no-data" })
       </span>
     );
   return (
-    <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600">
+    <span className="inline-flex items-center gap-1 rounded-full bg-gc-panel px-2 py-0.5 text-xs font-medium text-gc-ink-muted">
       No data
     </span>
   );
@@ -93,8 +93,8 @@ function TvMismatchPage() {
       <div className="mx-auto max-w-5xl">
         <div className="mb-6 flex items-center justify-between">
           <div>
-            <h1 className="pl-1 text-2xl font-semibold text-slate-900">TradingView Mismatch Checker</h1>
-            <p className="mt-1 text-sm text-slate-500">
+            <h1 className="pl-1 text-[28px] font-normal leading-tight sm:text-[32px] text-gc-ink text-gc-ink">TradingView Mismatch Checker</h1>
+            <p className="mt-1 text-sm text-gc-ink-muted">
               Compares our Yahoo-computed XAU/USD candles (used in signal chart images) against an
               independent live reference (gold-api spot × ECB FX) and reports drift.
             </p>
@@ -102,22 +102,22 @@ function TvMismatchPage() {
           <button
             onClick={load}
             disabled={loading}
-            className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-background px-3 py-1.5 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 disabled:opacity-50"
+            className="inline-flex items-center gap-2 rounded-xl border border-gc-line bg-background px-3 py-1.5 text-sm font-medium text-gc-ink shadow-sm hover:bg-gc-panel disabled:opacity-50"
           >
             <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} /> Re-run
           </button>
         </div>
 
         {report && (
-          <div className="mb-4 rounded-xl border border-slate-200 bg-slate-50 p-3 text-xs text-slate-600">
+          <div className="mb-4 rounded-xl border border-gc-line bg-gc-panel p-3 text-xs text-gc-ink-muted">
             Generated: {new Date(report.generatedAt).toLocaleString()} · Warn ≥ {report.thresholds.warnPct}% ·
             Fail ≥ {report.thresholds.failPct}%
           </div>
         )}
 
-        <div className="overflow-hidden rounded-xl border border-slate-200 bg-background shadow-sm">
+        <div className="overflow-hidden rounded-xl border border-gc-line bg-background shadow-sm">
           <table className="w-full text-sm">
-            <thead className="bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500">
+            <thead className="bg-gc-panel text-left text-xs uppercase tracking-wide text-gc-ink-muted">
               <tr>
                 <th className="px-4 py-3">Pair</th>
                 <th className="px-4 py-3">Status</th>
@@ -131,7 +131,7 @@ function TvMismatchPage() {
             <tbody className="divide-y divide-slate-100">
               {loading && !report && (
                 <tr>
-                  <td colSpan={7} className="px-4 py-8 text-center text-slate-400">
+                  <td colSpan={7} className="px-4 py-8 text-center text-gc-ink-muted">
                     Running check…
                   </td>
                 </tr>
@@ -139,7 +139,7 @@ function TvMismatchPage() {
               {report?.pairs.map((p) => {
                 const dec = p.pair.endsWith("JPY") ? 3 : 2;
                 return (
-                  <tr key={p.pair} className="text-slate-800">
+                  <tr key={p.pair} className="text-gc-ink">
                     <td className="px-4 py-3 font-medium">{p.pair}</td>
                     <td className="px-4 py-3"><StatusBadge status={p.status} /></td>
                     <td className="px-4 py-3 tabular-nums">{fmt(p.yahooLast, dec)}</td>
@@ -150,12 +150,12 @@ function TvMismatchPage() {
                     }`}>
                       {p.driftPct == null ? "—" : `${p.driftPct >= 0 ? "+" : ""}${p.driftPct.toFixed(3)}%`}
                     </td>
-                    <td className="px-4 py-3 text-xs text-slate-500">
+                    <td className="px-4 py-3 text-xs text-gc-ink-muted">
                       {p.candleAlignment
                         ? `${p.candleAlignment.aligned}/${p.candleAlignment.total} · max gap ${p.candleAlignment.maxGapMinutes}m`
                         : p.pair === "XAUUSD" ? `${p.yahooCandles} candles` : "—"}
                     </td>
-                    <td className="px-4 py-3 text-xs text-slate-500">{p.note || "—"}</td>
+                    <td className="px-4 py-3 text-xs text-gc-ink-muted">{p.note || "—"}</td>
                   </tr>
                 );
               })}
@@ -163,7 +163,7 @@ function TvMismatchPage() {
           </table>
         </div>
 
-        <p className="mt-4 text-xs text-slate-400">
+        <p className="mt-4 text-xs text-gc-ink-muted">
           Reference sources: gold-api.com (XAU spot) and open.er-api.com (ECB FX rates). Small drift &lt; 0.25% is
           normal (spot vs futures basis). Drift ≥ 0.75% indicates our chart may not match TradingView.
         </p>

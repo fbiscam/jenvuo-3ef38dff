@@ -179,7 +179,7 @@ function AdminInsightsPage() {
   return (
     <div className="p-6 space-y-8">
       <header>
-        <h1 className="text-xl font-semibold">Insights Writing Desk</h1>
+        <h1 className="text-[28px] font-normal leading-tight sm:text-[32px] text-gc-ink">Insights Writing Desk</h1>
         <p className="text-sm text-muted-foreground mt-1">
           AI writing assistant powered by BluesMind, with an AI-generated cover image for every article.
         </p>

@@ -131,7 +131,7 @@ function AdminDocumentsPage() {
     <div className="mx-auto max-w-7xl px-4 py-6 font-['Google_Sans_Flex','Google_Sans',_'Inter',_system-ui,_sans-serif] sm:px-6 sm:py-8">
       <div className="mb-6 flex flex-wrap items-start justify-between gap-4 pb-5">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-gc-ink">Documents</h1>
+          <h1 className="text-[28px] font-normal leading-tight sm:text-[32px] text-gc-ink text-gc-ink">Documents</h1>
           <p className="text-sm text-gc-ink-muted mt-1">Review ID and driving license uploads and approve or reject users.</p>
         </div>
         <div className="flex gap-2 flex-wrap">

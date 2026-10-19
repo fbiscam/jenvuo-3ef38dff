@@ -89,7 +89,7 @@ function AdminSubscribersPage() {
     <div className="max-w-5xl">
       <div className="flex items-center justify-between gap-3 flex-wrap">
         <div>
-          <h1 className="pl-1 text-xl font-semibold flex items-center gap-2">
+          <h1 className="pl-1 text-[28px] font-normal leading-tight sm:text-[32px] text-gc-ink flex items-center gap-2">
             <Users className="h-5 w-5" /> Newsletter subscribers
           </h1>
           <p className="text-sm text-gc-ink-muted mt-1">
