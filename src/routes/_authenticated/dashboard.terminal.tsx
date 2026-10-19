@@ -11,7 +11,6 @@ import {
   Moon,
   Newspaper,
   PanelRightClose,
-  PanelRightOpen,
   Square,
   SquarePen,
   Sun,
@@ -28,8 +27,6 @@ import {
   type JenvuChartHandle,
 } from "@/components/terminal/JenvuChartWorkspace";
 import { TerminalWatchlist } from "@/components/terminal/TerminalWatchlist";
-import { TerminalNewsPanel } from "@/components/terminal/TerminalNewsPanel";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { transcribeVoiceMessage } from "@/lib/transcription.functions";
 import { cn } from "@/lib/utils";
 import { isMarketClosed } from "@/lib/signals/qualification";
@@ -547,7 +544,6 @@ function TerminalPage() {
       const savedTimeframe = TIMEFRAMES.find((timeframe) => timeframe.key === settings?.timeframe);
       if (savedTimeframe) setTf(savedTimeframe);
       if (settings?.watchlistOpen === false) setWatchlistOpen(false);
-      if (settings?.tradingPanels === false) setPanelsOpen(false);
       // Black dashboard is the default; only an explicit pick from the switch turns it light.
       if (settings?.look === "light") setTheme("light");
       // The AI desk always starts closed so the chart opens exactly as left.
