@@ -40,7 +40,7 @@ function useHideBalance() {
 }
 
 const input =
-  "h-10 w-full rounded-xl border border-gc-line bg-background px-3 text-sm text-gc-ink outline-none placeholder:text-gc-ink-muted/70 focus:border-gc-blue focus:ring-1 focus:ring-gc-blue";
+  "h-10 w-full rounded-xl border border-gc-line bg-card px-3 text-sm text-gc-ink outline-none placeholder:text-gc-ink-muted/70 focus:border-gc-blue focus:ring-1 focus:ring-gc-blue";
 
 /** Left Terminal column: XAU/USD order form and the demo account (balance can be hidden). */
 export function TerminalOrderPanel({ trading, price }: { trading: DemoTrading; price: number | null }) {
@@ -83,7 +83,7 @@ export function TerminalOrderPanel({ trading, price }: { trading: DemoTrading; p
 
   return (
     <aside aria-label="Order panel" className="hidden w-[256px] shrink-0 flex-col gap-3 overflow-y-auto py-3 pr-3 font-sans [scrollbar-width:thin] lg:flex xl:w-[276px] 2xl:w-[300px]">
-      <section className="rounded-2xl border border-gc-line bg-background p-3.5">
+      <section className="rounded-2xl border border-gc-line bg-card p-3.5">
         <div className="flex items-center gap-2.5">
           <XauUsdLogo size={30} />
           <div className="min-w-0">
@@ -203,7 +203,7 @@ export function DemoAccountCard({ trading }: { trading: DemoTrading }) {
   const { account, metrics } = trading;
   const marginLevel = metrics.margin > 0 ? (metrics.equity / metrics.margin) * 100 : null;
   return (
-    <section className="rounded-2xl border border-gc-line bg-background p-3.5">
+    <section className="rounded-2xl border border-gc-line bg-card p-3.5">
       <div className="flex items-center justify-between">
         <h3 className="text-[14px] font-semibold text-gc-ink">Account (Demo)</h3>
         <span className="flex items-center gap-0.5">

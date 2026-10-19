@@ -11,7 +11,7 @@ const LOSS_LIMIT_KEY = "jenvu:terminal:daily-loss-limit:v1";
 
 function Card({ title, action, children }: { title: string; action?: React.ReactNode; children: React.ReactNode }) {
   return (
-    <section className="rounded-2xl border border-gc-line bg-background p-3.5">
+    <section className="rounded-2xl border border-gc-line bg-card p-3.5">
       <div className="mb-2.5 flex items-center justify-between gap-2">
         <h3 className="text-[14px] font-semibold text-gc-ink">{title}</h3>
         {action}
@@ -129,7 +129,7 @@ export function TerminalSidePanel({
                   onKeyDown={(e) => {
                     if (e.key === "Enter") (e.target as HTMLInputElement).blur();
                   }}
-                  className="h-7 w-24 rounded-lg border border-gc-line bg-background px-2 text-right text-[12px] text-gc-ink outline-none focus:border-gc-blue"
+                  className="h-7 w-24 rounded-lg border border-gc-line bg-card px-2 text-right text-[12px] text-gc-ink outline-none focus:border-gc-blue"
                 />
               ) : (
                 <span className="font-semibold tabular-nums text-gc-ink">${num(limit)}</span>

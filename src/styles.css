@@ -1128,59 +1128,61 @@ html:not(.ms-icons-ready) .material-symbols-rounded {
 
 /* Terminal black theme — TradingView-style near-black surfaces, scoped to the terminal. */
 .dark.terminal-dark {
-  --background: oklch(0.165 0 0);
-  --foreground: oklch(1 0 0);
-  --card: oklch(0.165 0 0);
+  --background: oklch(0.125 0.006 275);
+  --foreground: oklch(0.98 0 0);
+  --card: oklch(0.175 0.008 275);
   --card-foreground: oklch(0.98 0 0);
-  --popover: oklch(0.22 0 0);
+  --popover: oklch(0.2 0.01 275);
   --popover-foreground: oklch(0.98 0 0);
   --primary: oklch(0.99 0 0);
   --primary-foreground: oklch(0.17 0 0);
-  --secondary: oklch(0.25 0 0);
+  --secondary: oklch(0.24 0.01 275);
   --secondary-foreground: oklch(0.98 0 0);
-  --muted: oklch(0.23 0 0);
-  --muted-foreground: oklch(1 0 0);
-  --accent: oklch(0.27 0 0);
+  --muted: oklch(0.22 0.01 275);
+  --muted-foreground: oklch(0.72 0.01 275);
+  --accent: oklch(0.25 0.012 275);
   --accent-foreground: oklch(1 0 0);
-  --border: oklch(0.27 0 0);
-  --input: oklch(0.29 0 0);
+  --border: oklch(0.25 0.01 275);
+  --input: oklch(0.27 0.01 275);
 }
 
 /* Black terminal: the whole page (top bar, live prices, menu, rail) goes dark, not just the chart. */
 body:has(.terminal-dark) .jenvu-terminal-shell {
   color-scheme: dark;
-  --background: oklch(0.165 0 0);
+  --background: oklch(0.125 0.006 275);
   --foreground: oklch(0.98 0 0);
-  --card: oklch(0.165 0 0);
-  --popover: oklch(0.22 0 0);
-  --muted: oklch(0.23 0 0);
-  --muted-foreground: oklch(0.78 0 0);
-  --accent: oklch(0.27 0 0);
-  --border: oklch(0.27 0 0);
-  --gc-console-bar: oklch(0.13 0 0);
-  --gc-console-search: oklch(0.22 0 0);
-  --gc-console-rail-active: oklch(0.3 0.04 255);
-  --gc-canvas: oklch(0.13 0 0);
-  --gc-ink: oklch(0.96 0 0);
-  --gc-ink-muted: oklch(0.72 0 0);
-  --gc-line: oklch(0.28 0 0);
-  --gc-panel: oklch(0.2 0 0);
-  --gc-notice: oklch(0.24 0 0);
-  --gc-surface: oklch(0.2 0 0);
-  --gc-nav-active: oklch(0.3 0.04 255);
-  --gc-sky: oklch(0.3 0.05 255);
-  --gc-blue-deep: oklch(0.78 0.11 255);
-  --gc-blue: oklch(0.72 0.14 255);
-  --gc-blue-soft: oklch(0.3 0.05 255);
-  background-color: oklch(0.13 0 0) !important;
-  color: oklch(0.96 0 0);
+  --card: oklch(0.175 0.008 275);
+  --popover: oklch(0.2 0.01 275);
+  --muted: oklch(0.22 0.01 275);
+  --muted-foreground: oklch(0.72 0.01 275);
+  --accent: oklch(0.25 0.012 275);
+  --border: oklch(0.25 0.01 275);
+  --gc-console-bar: oklch(0.125 0.006 275);
+  --gc-console-search: oklch(0.22 0.012 275);
+  --gc-console-rail-active: oklch(0.3 0.08 275);
+  --gc-canvas: oklch(0.125 0.006 275);
+  --gc-ink: oklch(0.97 0 0);
+  --gc-ink-muted: oklch(0.7 0.012 275);
+  --gc-line: oklch(0.25 0.01 275);
+  --gc-panel: oklch(0.175 0.008 275);
+  --gc-notice: oklch(0.22 0.01 275);
+  --gc-surface: oklch(0.175 0.008 275);
+  --gc-nav-active: oklch(0.3 0.08 275);
+  --gc-sky: oklch(0.3 0.08 275);
+  --gc-blue-deep: oklch(0.78 0.12 275);
+  --gc-blue: oklch(0.62 0.19 275);
+  --gc-blue-soft: oklch(0.3 0.08 275);
+  --gc-green-soft: oklch(0.3 0.06 160);
+  --gc-red-soft: oklch(0.3 0.07 25);
+  background-color: oklch(0.125 0.006 275) !important;
+  color: oklch(0.97 0 0);
 }
 
 /* Black terminal: the left app menu turns near-black with white icons too. */
 body:has(.terminal-dark) .dashboard-terminal-sidebar,
 body:has(.terminal-dark) .dashboard-terminal-sidebar .bg-sidebar {
-  background-color: oklch(0.165 0 0) !important;
-  border-color: oklch(0.27 0 0) !important;
+  background-color: oklch(0.125 0.006 275) !important;
+  border-color: oklch(0.25 0.01 275) !important;
 }
 body:has(.terminal-dark) .dashboard-terminal-sidebar .dashboard-sidebar-link,
 body:has(.terminal-dark) .dashboard-terminal-sidebar .dashboard-sidebar-brand,
