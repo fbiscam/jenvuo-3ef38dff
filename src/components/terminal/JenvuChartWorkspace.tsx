@@ -480,6 +480,16 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
   const prevBar = hovered ? bars[bars.indexOf(hovered) - 1] : undefined;
   const change = hovered && prevBar ? ((hovered.close - prevBar.close) / prevBar.close) * 100 : null;
   const hoveredIdx = hovered ? bars.indexOf(hovered) : -1;
+  // Rolling 24h stats for the price header (gold-only feed, not a central exchange).
+  const dayStats = useMemo(() => {
+    const last = bars.at(-1);
+    if (!last) return null;
+    const win = bars.filter((b) => b.time >= last.time - 86400);
+    const open = win[0]?.open ?? last.open;
+    let high = -Infinity, low = Infinity;
+    for (const b of win) { if (b.high > high) high = b.high; if (b.low < low) low = b.low; }
+    return { price: last.close, diff: last.close - open, pct: open ? ((last.close - open) / open) * 100 : 0, high, low };
+  }, [bars]);
 
   const legendIndicators = useMemo(
     () =>
@@ -909,6 +919,48 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
         </nav>
 
         <div className="flex min-h-0 min-w-0 flex-1 flex-col">
+          {theme !== "dark" && (
+            <div className="hidden shrink-0 items-center gap-6 border-b border-gc-line/70 px-5 py-3 md:flex">
+              <div className="flex min-w-0 items-center gap-3">
+                <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-gc-yellow-soft text-[13px] font-semibold text-gc-ink">{asset === "XAUUSD" ? "Au" : "₿"}</span>
+                <div className="min-w-0 leading-tight">
+                  <p className="text-[18px] font-medium text-gc-ink">{asset === "XAUUSD" ? "XAU/USD" : "BTC/USD"}</p>
+                  <p className="truncate text-[12px] text-gc-ink-muted">{asset === "XAUUSD" ? "Gold spot / U.S. dollar" : "Bitcoin / U.S. dollar"}</p>
+                </div>
+              </div>
+              {dayStats && (
+                <div className="leading-tight">
+                  <p className="text-[22px] font-medium tabular-nums text-gc-ink">{dayStats.price.toFixed(2)}</p>
+                  <p className={cn("text-[12px] font-medium tabular-nums", dayStats.diff >= 0 ? "text-gc-success" : "text-gc-red")}>
+                    {dayStats.diff >= 0 ? "+" : ""}{dayStats.diff.toFixed(2)} ({dayStats.diff >= 0 ? "+" : ""}{dayStats.pct.toFixed(2)}%) · 24h
+                  </p>
+                </div>
+              )}
+              <div className="mx-auto hidden items-center gap-0.5 rounded-full bg-gc-panel p-1 lg:flex" role="group" aria-label="Timeframe">
+                {timeframes.map((item) => (
+                  <button
+                    key={item.key}
+                    type="button"
+                    onClick={() => onTimeframeChange(item)}
+                    aria-pressed={item.key === timeframe.key}
+                    className={cn(
+                      "h-7 rounded-full px-3 text-[12px] font-medium text-gc-ink-muted transition hover:text-gc-ink",
+                      item.key === timeframe.key && "bg-gc-blue-soft text-gc-blue-deep",
+                    )}
+                  >
+                    {item.label}
+                  </button>
+                ))}
+              </div>
+              {dayStats && (
+                <dl className="ml-auto flex items-center gap-6 text-[12px] lg:ml-0">
+                  <div><dt className="text-gc-ink-muted">24h high</dt><dd className="mt-0.5 text-[14px] font-medium tabular-nums text-gc-ink">{dayStats.high.toFixed(2)}</dd></div>
+                  <div><dt className="text-gc-ink-muted">24h low</dt><dd className="mt-0.5 text-[14px] font-medium tabular-nums text-gc-ink">{dayStats.low.toFixed(2)}</dd></div>
+                  <div className="hidden xl:block"><dt className="text-gc-ink-muted">Candle</dt><dd className="mt-0.5 text-[14px] font-medium text-gc-ink">{timeframe.label}</dd></div>
+                </dl>
+              )}
+            </div>
+          )}
           <div className="relative min-h-0 flex-1">
             <MemoChart
               key={`${asset}:${timeframe.key}`}
