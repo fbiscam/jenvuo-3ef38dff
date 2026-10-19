@@ -711,7 +711,6 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
           <button type="button" aria-label="Timeframe" title="Timeframe" className={railBtn}>
             <Clock3 className="h-[19px] w-[19px] shrink-0" />
             {label("Timeframe")}
-            <span className="ml-auto hidden font-mono text-[11px] text-gc-ink-muted xl:inline">{timeframe.label}</span>
           </button>
         </PopoverTrigger>
         <PopoverContent side="right" align="start" className={cn("w-56 p-1.5", popClass)}>
