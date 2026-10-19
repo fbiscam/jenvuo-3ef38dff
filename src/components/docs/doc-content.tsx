@@ -173,7 +173,7 @@ export const DOC_GROUPS: DocGroup[] = [
           <>
             <p>The Terminal is available to approved <strong>Founding Program</strong> members and to the Jenvu team.</p>
             <ul>
-              <li>When your Founding application is approved, your chosen plan starts immediately.</li>
+              <li>When your Founding application is approved, you get 3 months of your chosen plan and $250 credit straight away.</li>
               <li>You then have <strong>2 days</strong> to upload an identity document. Once submitted, access continues.</li>
               <li>If no document is submitted in time, the Terminal locks until you upload one.</li>
             </ul>
@@ -403,7 +403,7 @@ export const DOC_GROUPS: DocGroup[] = [
         keywords: "founding apply early access",
         body: (
           <p>
-            The Founding Program gives early traders access to the Terminal. Apply at{" "}
+            The Founding Program gives early traders 3 months of their chosen plan, $250 credit and access to the Terminal. Apply at{" "}
             <a href="https://jenvu.com/founding">jenvu.com/founding</a>, choose a plan and wait for approval. See{" "}
             <a href="#terminal-access">Who can use the Terminal</a> for the verification step.
           </p>

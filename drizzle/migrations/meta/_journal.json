@@ -71,6 +71,13 @@
       "when": 1792386964971,
       "tag": "0009_allow_signed_in_live_chat",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1792423985654,
+      "tag": "0010_founding_three_months_250_credit",
+      "breakpoints": true
     }
   ]
 }

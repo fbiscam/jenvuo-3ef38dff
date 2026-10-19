@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Link } from "@tanstack/react-router";
 import { Check, Loader2, Plus, ArrowRight } from "lucide-react";
 import { useFreeTrial } from "@/hooks/useFreeTrial";
+import { FOUNDING_CREDIT_USD, FOUNDING_MONTHS } from "@/lib/founding-offer";
 
 const QUICK_ACTIONS = [
   { label: "Create API key", to: "/dashboard/api" },
@@ -32,7 +33,7 @@ const RESOURCES: Record<string, Resource[]> = {
   "Billing and plans": [
     { title: "Plans and pricing", text: "Pro $10, Elite $25 and Ultra $50 per month.", to: "/pricing" },
     { title: "Manage billing", text: "Change plan, top up credit and see your invoices.", to: "/dashboard/billing" },
-    { title: "Founding Program", text: "Apply to the invite-only program for Terminal access.", to: "/founding" },
+    { title: "Founding Program", text: "3 months of your plan with $250 credit and Terminal access.", to: "/founding" },
   ],
   General: [
     { title: "Help Center", text: "Answers about accounts, security, billing and the Terminal.", to: "/help" },
@@ -145,7 +146,7 @@ export default function CloudWelcome({ name: profileName }: { name?: string }) {
               <>
                 <p className="mt-6 flex items-center gap-2 text-[16px] leading-relaxed text-gc-ink">
                   <Check className="h-5 w-5 shrink-0 text-gc-green" strokeWidth={2.25} aria-hidden="true" />
-                  You have joined the Founding Program
+                  You are already in a program
                 </p>
                 <Link to="/dashboard/terminal" className="mt-4 inline-block text-[14px] font-medium text-gc-blue-deep hover:text-gc-navy">
                   Open the Terminal
@@ -154,10 +155,10 @@ export default function CloudWelcome({ name: profileName }: { name?: string }) {
             ) : (
               <>
                 <p className="mt-6 text-[16px] leading-relaxed text-gc-ink">
-                  Join the invite-only Founding Program for full gold Terminal access.
+                  {FOUNDING_MONTHS} months of your chosen plan with ${FOUNDING_CREDIT_USD} credit and full Terminal access.
                 </p>
                 <Link to="/founding" className="mt-4 inline-block text-[14px] font-medium text-gc-blue-deep hover:text-gc-navy">
-                  Founding Program
+                  Apply for founding program
                 </Link>
               </>
             )}
