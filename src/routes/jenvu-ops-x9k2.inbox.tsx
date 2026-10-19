@@ -284,8 +284,8 @@ function AdminInbox() {
 
   if (!ready) {
     return (
-      <div className="grid min-h-screen place-items-center bg-zinc-50">
-        <Loader2 className="h-5 w-5 animate-spin text-zinc-400" />
+      <div className="grid min-h-screen place-items-center bg-gc-panel">
+        <Loader2 className="h-5 w-5 animate-spin text-gc-ink-muted" />
       </div>
     );
   }
@@ -298,14 +298,14 @@ function AdminInbox() {
   ];
 
   return (
-    <div className="relative flex h-screen flex-col bg-[#F5F5F3] text-[13px] text-zinc-900 antialiased [font-family:'Google_Sans','Product_Sans','Poppins',system-ui,-apple-system,sans-serif] [font-feature-settings:'cv11','ss01','ss03'] [font-optical-sizing:auto]">
+    <div className="relative flex h-screen flex-col bg-gc-canvas text-[13px] text-gc-ink antialiased [font-family:'Google_Sans','Product_Sans','Poppins',system-ui,-apple-system,sans-serif] [font-feature-settings:'cv11','ss01','ss03'] [font-optical-sizing:auto]">
       {/* Top bar */}
-      <header className="relative z-10 flex h-14 shrink-0 items-center justify-between border-b border-neutral-200 bg-[#FDFDFB] px-5">
+      <header className="relative z-10 flex h-14 shrink-0 items-center justify-between border-b border-neutral-200 bg-gc-canvas px-5">
         <div className="flex items-center gap-3">
           <span className="grid h-8 w-8 place-items-center">
             <img src="/favicon.png" alt="Jenvu" className="h-8 w-8 object-contain" />
           </span>
-          <span className="text-[17px] font-semibold tracking-tight text-zinc-900">Jenvu</span>
+          <span className="text-[17px] font-semibold tracking-tight text-gc-ink">Jenvu</span>
           <span className="text-neutral-300">/</span>
           <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-neutral-400">Support Inbox</span>
         </div>
@@ -313,7 +313,7 @@ function AdminInbox() {
           <span className="hidden font-mono text-[10px] uppercase tracking-[0.18em] text-neutral-400 sm:inline">{username}</span>
           <button
             onClick={handleLogout}
-            className="grid h-8 w-8 place-items-center rounded-sm text-neutral-500 transition hover:bg-black hover:text-white"
+            className="grid h-8 w-8 place-items-center rounded-xl text-neutral-500 transition hover:bg-black hover:text-white"
             title="Sign out"
           >
             <LogOut className="h-3.5 w-3.5" />
@@ -323,15 +323,15 @@ function AdminInbox() {
 
       <div className="relative z-10 bg-white px-5 py-5 sm:px-6">
         <div className="mx-auto max-w-7xl">
-          <h1 className="text-2xl font-semibold tracking-tight text-zinc-900">Support inbox</h1>
-          <p className="mt-1 text-sm text-zinc-500">Review conversations and reply to customer support requests.</p>
+          <h1 className="text-2xl font-semibold tracking-tight text-gc-ink">Support inbox</h1>
+          <p className="mt-1 text-sm text-gc-ink-muted">Review conversations and reply to customer support requests.</p>
         </div>
       </div>
 
       <div className="relative z-10 flex min-h-0 flex-1 overflow-hidden">
         {/* Left rail — filters/nav */}
-        <nav className="hidden w-60 shrink-0 flex-col border-r border-neutral-200 bg-[#FDFDFB] p-4 md:flex">
-          <div className="mb-3 px-2 font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-900 font-semibold">
+        <nav className="hidden w-60 shrink-0 flex-col border-r border-neutral-200 bg-gc-canvas p-4 md:flex">
+          <div className="mb-3 px-2 font-mono text-[10px] uppercase tracking-[0.2em] text-gc-ink font-semibold">
             Inbox
           </div>
           <ul className="space-y-0.5">
@@ -341,17 +341,17 @@ function AdminInbox() {
                 <li key={f.key}>
                   <button
                     onClick={() => setFilter(f.key)}
-                    className={`group flex w-full items-center justify-between rounded-sm px-3 py-2 text-[13px] font-semibold transition ${
+                    className={`group flex w-full items-center justify-between rounded-xl px-3 py-2 text-[13px] font-semibold transition ${
                       active
                         ? "bg-neutral-100 text-black"
-                        : "text-zinc-900 hover:bg-neutral-50"
+                        : "text-gc-ink hover:bg-neutral-50"
                     }`}
                   >
                     <span className="flex items-center gap-2.5">
-                      <span className={`h-1.5 w-1.5 rounded-full ${active ? "bg-emerald-500" : "border border-zinc-500"}`} />
+                      <span className={`h-1.5 w-1.5 rounded-full ${active ? "bg-emerald-500" : "border border-gc-line"}`} />
                       {f.label}
                     </span>
-                    <span className={`font-mono text-[10px] tabular-nums ${active ? "text-zinc-800" : "text-zinc-700"}`}>
+                    <span className={`font-mono text-[10px] tabular-nums ${active ? "text-gc-ink" : "text-gc-ink"}`}>
                       {f.count}
                     </span>
                   </button>
@@ -388,10 +388,10 @@ function AdminInbox() {
           <div className="flex-1 overflow-y-auto">
             {filtered.length === 0 ? (
               <div className="flex h-full flex-col items-center justify-center px-6 py-10 text-center">
-                <div className="grid h-12 w-12 place-items-center rounded-sm border border-neutral-200 bg-[#FDFDFB]">
+                <div className="grid h-12 w-12 place-items-center rounded-xl border border-neutral-200 bg-gc-canvas">
                   <Inbox className="h-4 w-4 text-neutral-400" />
                 </div>
-                <p className="mt-3 text-[13px] font-semibold text-zinc-800">No conversations</p>
+                <p className="mt-3 text-[13px] font-semibold text-gc-ink">No conversations</p>
                 <p className="mt-1 text-[11.5px] text-neutral-500">
                   {filter === "open" ? "You're all caught up." : "Nothing matches this filter."}
                 </p>
@@ -414,7 +414,7 @@ function AdminInbox() {
                       >
                         {/* Active accent bar */}
                         <span
-                          className={`absolute left-0 top-1/2 h-8 w-[3px] -translate-y-1/2 rounded-r-full bg-zinc-900 transition-all duration-200 ${
+                          className={`absolute left-0 top-1/2 h-8 w-[3px] -translate-y-1/2 rounded-r-full bg-gc-blue transition-all duration-200 ${
                             isActive ? "opacity-100" : "opacity-0 group-hover:opacity-30"
                           }`}
                         />
@@ -428,7 +428,7 @@ function AdminInbox() {
                           </div>
                           <span
                             className={`absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full ring-2 ring-white ${
-                              s.status === "open" ? "bg-emerald-500" : "bg-zinc-300"
+                              s.status === "open" ? "bg-emerald-500" : "bg-gc-line"
                             }`}
                           />
                         </div>
@@ -436,17 +436,17 @@ function AdminInbox() {
                           <div className="flex items-baseline justify-between gap-2">
                             <span
                               className={`truncate text-[13.5px] tracking-tight ${
-                                hasUnread ? "font-semibold text-zinc-900" : "font-medium text-zinc-800"
+                                hasUnread ? "font-semibold text-gc-ink" : "font-medium text-gc-ink"
                               }`}
                             >
                               {name}
                             </span>
-                            <span className="shrink-0 font-mono text-[10px] tabular-nums text-zinc-400">
+                            <span className="shrink-0 font-mono text-[10px] tabular-nums text-gc-ink-muted">
                               {timeAgo(s.last_message_at)}
                             </span>
                           </div>
                           <div className="mt-0.5 flex items-center justify-between gap-2">
-                            <span className="truncate text-[11.5px] text-zinc-500">
+                            <span className="truncate text-[11.5px] text-gc-ink-muted">
                               {s.guest_email || "No email provided"}
                             </span>
                             {hasUnread && (
@@ -478,13 +478,13 @@ function AdminInbox() {
         </aside>
 
         {/* Right — conversation */}
-        <section className={`flex flex-1 flex-col bg-[#FDFDFB] ${activeId ? "flex" : "hidden md:flex"}`}>
+        <section className={`flex flex-1 flex-col bg-gc-canvas ${activeId ? "flex" : "hidden md:flex"}`}>
           {!activeSession ? (
             <div className="flex flex-1 flex-col items-center justify-center gap-3 p-8 text-center">
-              <div className="grid h-16 w-16 place-items-center rounded-sm border border-neutral-200 bg-white">
+              <div className="grid h-16 w-16 place-items-center rounded-xl border border-neutral-200 bg-white">
                 <Inbox className="h-6 w-6 text-neutral-400" />
               </div>
-              <p className="text-[14px] font-semibold tracking-tight text-zinc-900">Select a conversation</p>
+              <p className="text-[14px] font-semibold tracking-tight text-gc-ink">Select a conversation</p>
               <p className="max-w-xs text-[12px] leading-relaxed text-neutral-500">
                 Use <Kbd>J</Kbd> / <Kbd>K</Kbd> to navigate, <Kbd>R</Kbd> to reply, <Kbd>E</Kbd> to close.
               </p>
@@ -492,18 +492,18 @@ function AdminInbox() {
           ) : (
             <>
               {/* Thread header */}
-              <div className="flex h-16 shrink-0 items-center gap-3 border-b border-neutral-200 bg-[#FDFDFB] px-6">
+              <div className="flex h-16 shrink-0 items-center gap-3 border-b border-neutral-200 bg-gc-canvas px-6">
 
                 <button
                   onClick={() => setActiveId(null)}
-                  className="grid h-8 w-8 place-items-center rounded-lg text-zinc-600 hover:bg-zinc-100 md:hidden"
+                  className="grid h-8 w-8 place-items-center rounded-xl text-gc-ink-muted hover:bg-gc-panel md:hidden"
                   aria-label="Back"
                 >
                   <ChevronLeft className="h-4 w-4" />
                 </button>
                 <div className={`relative grid h-9 w-9 place-items-center rounded-xl ${avatarColor(activeSession.guest_name, activeSession.guest_email)} text-[11px] font-semibold text-white shadow-[0_2px_6px_-2px_rgba(0,0,0,0.4)] ring-1 ring-black/10`}>
                   {initials(activeSession.guest_name, activeSession.guest_email)}
-                  <span className={`absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full ring-2 ring-white ${activeSession.status === "open" ? "bg-emerald-500" : "bg-zinc-300"}`} />
+                  <span className={`absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full ring-2 ring-white ${activeSession.status === "open" ? "bg-emerald-500" : "bg-gc-line"}`} />
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-1.5">
@@ -517,11 +517,11 @@ function AdminInbox() {
                       {activeSession.status}
                     </Chip>
                   </div>
-                  <div className="mt-0.5 flex items-center gap-2 text-[11px] text-zinc-500">
+                  <div className="mt-0.5 flex items-center gap-2 text-[11px] text-gc-ink-muted">
                     {activeSession.guest_email ? (
                       <button
                         onClick={() => copyEmail(activeSession.guest_email!)}
-                        className="group flex items-center gap-1 truncate transition hover:text-zinc-900"
+                        className="group flex items-center gap-1 truncate transition hover:text-gc-ink"
                         title="Copy email"
                       >
                         <Mail className="h-3 w-3" />
@@ -533,11 +533,11 @@ function AdminInbox() {
                         )}
                       </button>
                     ) : (
-                      <span className="flex items-center gap-1 text-zinc-400">
+                      <span className="flex items-center gap-1 text-gc-ink-muted">
                         <Mail className="h-3 w-3" /> No email
                       </span>
                     )}
-                    <span className="text-zinc-300">·</span>
+                    <span className="text-gc-ink-muted">·</span>
                     <span className="flex items-center gap-1">
                       <Calendar className="h-3 w-3" /> {new Date(activeSession.created_at).toLocaleDateString()}
                     </span>
@@ -547,13 +547,13 @@ function AdminInbox() {
                   {activeSession.status === "open" ? (
                     <button
                       onClick={handleClose}
-                      className="inline-flex items-center gap-1.5 rounded-sm border border-neutral-200 bg-white px-3 py-1.5 font-mono text-[10px] font-medium uppercase tracking-[0.18em] text-neutral-700 transition hover:border-black hover:bg-black hover:text-white"
+                      className="inline-flex items-center gap-1.5 rounded-xl border border-neutral-200 bg-white px-3 py-1.5 font-mono text-[10px] font-medium uppercase tracking-[0.18em] text-neutral-700 transition hover:border-black hover:bg-black hover:text-white"
                       title="Close (E)"
                     >
                       <Archive className="h-3 w-3" /> Close
                     </button>
                   ) : (
-                    <span className="inline-flex items-center gap-1 rounded-sm bg-neutral-100 px-3 py-1.5 font-mono text-[10px] font-medium uppercase tracking-[0.18em] text-neutral-500">
+                    <span className="inline-flex items-center gap-1 rounded-xl bg-neutral-100 px-3 py-1.5 font-mono text-[10px] font-medium uppercase tracking-[0.18em] text-neutral-500">
                       <CheckCircle2 className="h-3 w-3" /> Closed
                     </span>
                   )}
@@ -561,7 +561,7 @@ function AdminInbox() {
               </div>
 
               {/* Messages */}
-              <div ref={scrollRef} className="flex-1 overflow-y-auto bg-[#FDFDFB]">
+              <div ref={scrollRef} className="flex-1 overflow-y-auto bg-gc-canvas">
                 <div className="mx-auto max-w-3xl space-y-1 p-8">
                   {messages.length === 0 && (
                     <div className="py-8 text-center font-mono text-[10px] uppercase tracking-[0.2em] text-neutral-400">No messages yet</div>
@@ -585,7 +585,7 @@ function AdminInbox() {
                         )}
                         <div className={`flex ${isAdminMsg ? "justify-end" : "justify-start"}`}>
                           <div
-                            className={`max-w-[78%] whitespace-pre-wrap break-words rounded-sm px-4 py-3 text-[13.5px] leading-relaxed ${ isAdminMsg ? "bg-neutral-100 text-zinc-900" : "border border-neutral-200 bg-white text-zinc-900" }`}
+                            className={`max-w-[78%] whitespace-pre-wrap break-words rounded-xl px-4 py-3 text-[13.5px] leading-relaxed ${ isAdminMsg ? "bg-neutral-100 text-gc-ink" : "border border-neutral-200 bg-white text-gc-ink" }`}
                           >
                             {m.content}
                           </div>
@@ -597,14 +597,14 @@ function AdminInbox() {
               </div>
 
               {/* Composer */}
-              <form onSubmit={handleReply} className="shrink-0 border-t border-neutral-200 bg-[#FDFDFB] p-5">
+              <form onSubmit={handleReply} className="shrink-0 border-t border-neutral-200 bg-gc-canvas p-5">
                 {activeSession.status === "closed" ? (
-                  <div className="flex items-center justify-center gap-2 rounded-sm border border-neutral-200 bg-white py-3 font-mono text-[10px] uppercase tracking-[0.18em] text-neutral-500">
+                  <div className="flex items-center justify-center gap-2 rounded-xl border border-neutral-200 bg-white py-3 font-mono text-[10px] uppercase tracking-[0.18em] text-neutral-500">
                     <CheckCircle2 className="h-3.5 w-3.5" /> This conversation is closed
                   </div>
                 ) : (
                   <div className="mx-auto max-w-3xl">
-                    <div className="relative rounded-sm border border-neutral-200 bg-white transition focus-within:border-black">
+                    <div className="relative rounded-xl border border-neutral-200 bg-white transition focus-within:border-black">
 
                       <textarea
                         ref={inputRef}
@@ -619,14 +619,14 @@ function AdminInbox() {
                         placeholder="Reply to visitor…  (Enter to send, Shift+Enter for newline)"
                         rows={2}
                         maxLength={4000}
-                        className="max-h-48 min-h-[60px] w-full resize-none bg-transparent px-4 py-3 text-[13.5px] leading-relaxed outline-none placeholder:text-zinc-400"
+                        className="max-h-48 min-h-[60px] w-full resize-none bg-transparent px-4 py-3 text-[13.5px] leading-relaxed outline-none placeholder:text-gc-ink-muted"
                       />
-                      <div className="flex items-center justify-between gap-2 border-t border-zinc-900/[0.05] px-2.5 py-2">
+                      <div className="flex items-center justify-between gap-2 border-t border-gc-blue/[0.05] px-2.5 py-2">
                         <div className="relative">
                           <button
                             type="button"
                             onClick={() => setShowCanned((v) => !v)}
-                            className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[12px] font-medium text-zinc-600 transition hover:bg-zinc-900/5 hover:text-zinc-900"
+                            className="inline-flex items-center gap-1.5 rounded-xl px-2.5 py-1.5 text-[12px] font-medium text-gc-ink-muted transition hover:bg-gc-blue/5 hover:text-gc-ink"
                           >
                             <Zap className="h-3 w-3" /> Canned
                           </button>
@@ -638,8 +638,8 @@ function AdminInbox() {
                                 className="fixed inset-0 z-10 cursor-default"
                                 aria-label="Close"
                               />
-                              <div className="absolute bottom-full left-0 z-20 mb-1.5 w-80 overflow-hidden rounded-xl border border-zinc-200 bg-white ring-1 ring-black/5">
-                                <div className="border-b border-zinc-100 bg-zinc-50/60 px-3 py-2 text-[10px] font-bold uppercase tracking-[0.16em] text-zinc-500">
+                              <div className="absolute bottom-full left-0 z-20 mb-1.5 w-80 overflow-hidden rounded-xl border border-gc-line bg-white ring-1 ring-black/5">
+                                <div className="border-b border-gc-line bg-gc-panel/60 px-3 py-2 text-[10px] font-bold uppercase tracking-[0.16em] text-gc-ink-muted">
                                   Quick replies
                                 </div>
                                 <ul className="max-h-64 overflow-y-auto py-1">
@@ -652,10 +652,10 @@ function AdminInbox() {
                                           setShowCanned(false);
                                           inputRef.current?.focus();
                                         }}
-                                        className="block w-full px-3 py-2 text-left transition hover:bg-zinc-50"
+                                        className="block w-full px-3 py-2 text-left transition hover:bg-gc-panel"
                                       >
-                                        <div className="text-[12.5px] font-semibold text-zinc-800">{c.label}</div>
-                                        <div className="mt-0.5 line-clamp-2 text-[11px] text-zinc-500">{c.text}</div>
+                                        <div className="text-[12.5px] font-semibold text-gc-ink">{c.label}</div>
+                                        <div className="mt-0.5 line-clamp-2 text-[11px] text-gc-ink-muted">{c.text}</div>
                                       </button>
                                     </li>
                                   ))}
@@ -665,7 +665,7 @@ function AdminInbox() {
                           )}
                         </div>
                         <div className="flex items-center gap-2">
-                          <span className="hidden font-mono text-[10.5px] text-zinc-400 sm:inline">
+                          <span className="hidden font-mono text-[10.5px] text-gc-ink-muted sm:inline">
                             {input.length}/4000
                           </span>
                           <button
@@ -673,7 +673,7 @@ function AdminInbox() {
                             disabled={sending || !input.trim()}
                             aria-label="Send"
                             title="Send (Enter)"
-                            className="grid h-10 w-10 place-items-center rounded-sm bg-black text-white transition hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-40"
+                            className="grid h-10 w-10 place-items-center rounded-xl bg-black text-white transition hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-40"
                           >
                             {sending ? (
                               <Loader2 className="h-4 w-4 animate-spin" />
@@ -694,8 +694,8 @@ function AdminInbox() {
 
         {/* Details rail */}
         {activeSession && (
-          <aside className="hidden w-64 shrink-0 flex-col border-l border-zinc-900/[0.06] bg-white p-4 xl:flex">
-            <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-zinc-500">
+          <aside className="hidden w-64 shrink-0 flex-col border-l border-gc-blue/[0.06] bg-white p-4 xl:flex">
+            <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-gc-ink-muted">
               Visitor
             </div>
             <div className="mt-3 flex items-center gap-3 rounded-xl border border-black/5 bg-white p-3">
@@ -706,7 +706,7 @@ function AdminInbox() {
                 <div className="truncate text-[13.5px] font-semibold tracking-tight">
                   {activeSession.guest_name || "Anonymous"}
                 </div>
-                <div className="truncate text-[11px] text-zinc-500">
+                <div className="truncate text-[11px] text-gc-ink-muted">
                   {activeSession.guest_email || "No email"}
                 </div>
               </div>
@@ -730,19 +730,19 @@ function AdminInbox() {
               </DetailRow>
             </div>
 
-            <div className="mt-6 text-[10px] font-bold uppercase tracking-[0.18em] text-zinc-500">
+            <div className="mt-6 text-[10px] font-bold uppercase tracking-[0.18em] text-gc-ink-muted">
               Activity
             </div>
             <div className="mt-2 rounded-xl border border-black/5 bg-white p-3 text-[12px]">
               <div className="flex items-center justify-between">
-                <span className="text-zinc-500">Messages</span>
-                <span className="font-mono tabular-nums font-semibold text-zinc-900">
+                <span className="text-gc-ink-muted">Messages</span>
+                <span className="font-mono tabular-nums font-semibold text-gc-ink">
                   {messages.length}
                 </span>
               </div>
               <div className="mt-2 flex items-center justify-between">
-                <span className="text-zinc-500">Last reply</span>
-                <span className="font-mono tabular-nums text-zinc-700">
+                <span className="text-gc-ink-muted">Last reply</span>
+                <span className="font-mono tabular-nums text-gc-ink">
                   {timeAgo(activeSession.last_message_at)} ago
                 </span>
               </div>
@@ -766,7 +766,7 @@ function Shortcut({ k, label }: { k: string; label: string }) {
 function Kbd({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return (
     <kbd
-      className={`inline-flex h-4 min-w-[16px] items-center justify-center rounded border border-zinc-200 bg-white px-1 font-mono text-[10px] font-medium text-zinc-600 ${className}`}
+      className={`inline-flex h-4 min-w-[16px] items-center justify-center rounded border border-gc-line bg-white px-1 font-mono text-[10px] font-medium text-gc-ink-muted ${className}`}
     >
       {children}
     </kbd>
@@ -784,7 +784,7 @@ function Chip({
 }) {
   const map: Record<string, string> = {
     emerald: "bg-emerald-50 text-emerald-700 ring-emerald-200/60",
-    zinc: "bg-zinc-100 text-zinc-600 ring-zinc-200/60",
+    zinc: "bg-gc-panel text-gc-ink-muted ring-zinc-200/60",
     blue: "bg-blue-50 text-blue-700 ring-blue-200/60",
     amber: "bg-amber-50 text-amber-700 ring-amber-200/60",
   };
@@ -809,11 +809,11 @@ function DetailRow({
 }) {
   return (
     <div className="flex items-start justify-between gap-2">
-      <span className="flex items-center gap-1.5 text-zinc-500">
+      <span className="flex items-center gap-1.5 text-gc-ink-muted">
         {icon}
         {label}
       </span>
-      <span className="min-w-0 truncate text-right font-medium text-zinc-800">{children}</span>
+      <span className="min-w-0 truncate text-right font-medium text-gc-ink">{children}</span>
     </div>
   );
 }
