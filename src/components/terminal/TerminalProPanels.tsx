@@ -94,7 +94,7 @@ export function TerminalStatCards({
   const up = (market?.diff ?? 0) >= 0;
   const minsToNews = nextNews && now != null ? Math.round((new Date(nextNews.date).getTime() - now) / 60_000) : null;
   const newsLabel =
-    minsToNews == null ? "—" : minsToNews <= 0 ? "Now" : minsToNews >= 60 ? `${Math.floor(minsToNews / 60)}h ${minsToNews % 60}m` : `${minsToNews}m`;
+    minsToNews == null ? "—" : minsToNews <= 0 ? "Now" : minsToNews >= 1440 ? `${Math.floor(minsToNews / 1440)}d ${Math.floor((minsToNews % 1440) / 60)}h` : minsToNews >= 60 ? `${Math.floor(minsToNews / 60)}h ${minsToNews % 60}m` : `${minsToNews}m`;
   const card = "flex min-w-0 items-center justify-between gap-3 rounded-2xl border border-gc-line/70 bg-background px-5 py-4";
   return (
     <div className="hidden shrink-0 grid-cols-4 gap-3 lg:grid">
@@ -136,7 +136,7 @@ export function TerminalStatCards({
       <div className={card}>
         <div className="min-w-0">
           <p className="text-[13px] text-gc-ink-muted">Next news in</p>
-          <p className="mt-1 text-[24px] font-medium leading-tight tabular-nums text-gc-ink">{newsLabel}</p>
+          <p className="mt-1 whitespace-nowrap text-[24px] font-medium leading-tight tabular-nums text-gc-ink">{newsLabel}</p>
           <p className="mt-0.5 truncate text-[12px] text-gc-ink-muted" title={nextNews?.title}>
             {nextNews ? `${nextNews.country} ${nextNews.title}` : "No important news ahead"}
           </p>
