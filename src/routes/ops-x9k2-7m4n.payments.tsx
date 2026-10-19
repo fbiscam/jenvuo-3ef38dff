@@ -172,28 +172,28 @@ function OpsPayments() {
           .some((v) => String(v).toLowerCase().includes(q)),
   );
 
-  const input = "rounded-xl border border-gc-line px-3 py-2 text-sm outline-none focus:border-gc-line";
+  const input = "rounded-lg border border-zinc-200 px-3 py-2 text-sm outline-none focus:border-zinc-400";
 
 
   return (
-    <div className={`min-h-dvh w-full bg-white text-gc-ink ${SANS}`}>
+    <div className={`min-h-dvh w-full bg-white text-zinc-900 ${SANS}`}>
       <div className="mx-auto max-w-6xl px-5 py-6">
         <div className="flex flex-wrap items-center gap-2">
           {(["orders", "promos", "config"] as const).map((t) => (
             <button
               key={t}
               onClick={() => setTab(t)}
-              className={`rounded-xl px-3.5 py-2 text-sm capitalize transition ${ tab === t ? "bg-gc-blue text-white" : "border border-gc-line text-gc-ink hover:bg-gc-panel" }`}
+              className={`rounded-lg px-3.5 py-2 text-sm capitalize transition ${ tab === t ? "bg-zinc-900 text-white" : "border border-zinc-200 text-zinc-700 hover:bg-zinc-50" }`}
             >
               {t === "config" ? "Deposit addresses" : t}
             </button>
           ))}
-          <button onClick={() => void load()} className="ml-auto rounded-xl border border-gc-line px-3 py-2 text-sm hover:bg-gc-panel">
+          <button onClick={() => void load()} className="ml-auto rounded-lg border border-zinc-200 px-3 py-2 text-sm hover:bg-zinc-50">
             Refresh
           </button>
         </div>
 
-        {error && <div className="mt-4 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>}
+        {error && <div className="mt-4 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>}
 
         {tab === "orders" && (
           <>
@@ -202,7 +202,7 @@ function OpsPayments() {
                 <button
                   key={f.id}
                   onClick={() => setFilter(f.id)}
-                  className={`rounded-full px-3 py-1.5 text-[13px] transition ${ filter === f.id ? "bg-gc-blue text-white" : "border border-gc-line text-gc-ink-muted hover:bg-gc-panel" }`}
+                  className={`rounded-full px-3 py-1.5 text-[13px] transition ${ filter === f.id ? "bg-zinc-900 text-white" : "border border-zinc-200 text-zinc-600 hover:bg-zinc-50" }`}
                 >
                   {f.label}
                 </button>
@@ -223,9 +223,9 @@ function OpsPayments() {
                   { k: "Credit total", v: `$${visible.reduce((s, r) => s + Number(r.credit_usd || 0), 0).toFixed(2)}` },
                   { k: "Awaiting action", v: String(visible.filter((r) => !["approved", "rejected"].includes(String(r.status))).length) },
                 ].map((s) => (
-                  <div key={s.k} className="rounded-xl border border-gc-line px-4 py-3">
-                    <div className="text-[11px] uppercase tracking-[0.14em] text-gc-ink-muted">{s.k}</div>
-                    <div className="mt-1 text-lg font-medium text-gc-ink">{s.v}</div>
+                  <div key={s.k} className="rounded-xl border border-zinc-200 px-4 py-3">
+                    <div className="text-[11px] uppercase tracking-[0.14em] text-zinc-400">{s.k}</div>
+                    <div className="mt-1 text-lg font-medium text-zinc-900">{s.v}</div>
                   </div>
                 ))}
               </div>
@@ -241,29 +241,29 @@ function OpsPayments() {
                     : status === "rejected"
                       ? "bg-red-50 text-red-600"
                       : status === "expired"
-                        ? "bg-gc-panel text-gc-ink-muted"
+                        ? "bg-zinc-100 text-zinc-500"
                         : "bg-amber-50 text-amber-700";
                 return (
-                  <div key={r.id} className="rounded-2xl border border-gc-line p-4">
+                  <div key={r.id} className="rounded-2xl border border-zinc-200 p-4">
                     <div className="flex flex-wrap items-start gap-3">
                       <div className="min-w-0 flex-1">
                         <div className="flex flex-wrap items-center gap-2">
                           <span className={`rounded-full px-2.5 py-1 text-[11px] uppercase tracking-[0.1em] ${pill}`}>
                             {status.replace("_", " ") || "unknown"}
                           </span>
-                          <span className="text-[13px] font-medium text-gc-ink break-all">
+                          <span className="text-[13px] font-medium text-zinc-900 break-all">
                             {r.email ?? r.user_email ?? String(r.user_id ?? "").slice(0, 8)}
                           </span>
-                          <span className="text-[12px] text-gc-ink-muted">{new Date(r.created_at).toLocaleString()}</span>
+                          <span className="text-[12px] text-zinc-400">{new Date(r.created_at).toLocaleString()}</span>
                         </div>
-                        <div className="mt-1 text-[12px] text-gc-ink-muted">
+                        <div className="mt-1 text-[12px] text-zinc-500">
                           {net.label} · order <span className="font-mono">{String(r.id).slice(0, 8)}</span>
                           {r.user_id && <> · user <span className="font-mono">{String(r.user_id)}</span></>}
                         </div>
                       </div>
                       <div className="text-right">
-                        <div className="text-lg font-medium text-gc-ink">${Number(r.pay_amount_usd || 0).toFixed(2)}</div>
-                        <div className="text-[12px] text-gc-ink-muted">
+                        <div className="text-lg font-medium text-zinc-900">${Number(r.pay_amount_usd || 0).toFixed(2)}</div>
+                        <div className="text-[12px] text-zinc-500">
                           {r.is_upgrade ? (
                             <span className="font-semibold text-indigo-600 uppercase">Upgrade: {r.target_plan_id}</span>
                           ) : (
@@ -277,44 +277,44 @@ function OpsPayments() {
 
                     </div>
 
-                    <div className="mt-3 rounded-xl bg-gc-panel px-3 py-2.5">
-                      <div className="text-[11px] uppercase tracking-[0.14em] text-gc-ink-muted">Transaction ID</div>
+                    <div className="mt-3 rounded-xl bg-zinc-50 px-3 py-2.5">
+                      <div className="text-[11px] uppercase tracking-[0.14em] text-zinc-400">Transaction ID</div>
                       {r.tx_hash ? (
                         <div className="mt-1 flex flex-wrap items-center gap-2">
-                          <code className="min-w-0 flex-1 break-all font-mono text-[12.5px] text-gc-ink">{String(r.tx_hash)}</code>
-                          <button onClick={() => void copy(String(r.tx_hash))} className="rounded-xl border border-gc-line bg-white px-2.5 py-1 text-[12px] hover:bg-gc-panel">
+                          <code className="min-w-0 flex-1 break-all font-mono text-[12.5px] text-zinc-900">{String(r.tx_hash)}</code>
+                          <button onClick={() => void copy(String(r.tx_hash))} className="rounded-lg border border-zinc-200 bg-white px-2.5 py-1 text-[12px] hover:bg-zinc-50">
                             Copy
                           </button>
-                          <a href={net.explorerTx(String(r.tx_hash))} target="_blank" rel="noreferrer" className="rounded-xl border border-gc-line bg-white px-2.5 py-1 text-[12px] hover:bg-gc-panel">
+                          <a href={net.explorerTx(String(r.tx_hash))} target="_blank" rel="noreferrer" className="rounded-lg border border-zinc-200 bg-white px-2.5 py-1 text-[12px] hover:bg-zinc-50">
                             Explorer
                           </a>
                         </div>
                       ) : (
-                        <div className="mt-1 text-[12.5px] text-gc-ink-muted">Not submitted yet</div>
+                        <div className="mt-1 text-[12.5px] text-zinc-400">Not submitted yet</div>
                       )}
                     </div>
 
                     <div className="mt-3 grid gap-2 text-[12.5px] sm:grid-cols-2 lg:grid-cols-4">
                       <div>
-                        <div className="text-[11px] uppercase tracking-[0.14em] text-gc-ink-muted">Deposit address</div>
-                        <div className="break-all font-mono text-gc-ink">{r.deposit_address ?? "—"}</div>
+                        <div className="text-[11px] uppercase tracking-[0.14em] text-zinc-400">Deposit address</div>
+                        <div className="break-all font-mono text-zinc-700">{r.deposit_address ?? "—"}</div>
                       </div>
                       <div>
-                        <div className="text-[11px] uppercase tracking-[0.14em] text-gc-ink-muted">Promo</div>
-                        <div className="text-gc-ink">{r.promo_code ?? "—"}</div>
+                        <div className="text-[11px] uppercase tracking-[0.14em] text-zinc-400">Promo</div>
+                        <div className="text-zinc-700">{r.promo_code ?? "—"}</div>
                       </div>
                       <div>
-                        <div className="text-[11px] uppercase tracking-[0.14em] text-gc-ink-muted">Expires</div>
-                        <div className="text-gc-ink">{r.expires_at ? new Date(r.expires_at).toLocaleString() : "—"}</div>
+                        <div className="text-[11px] uppercase tracking-[0.14em] text-zinc-400">Expires</div>
+                        <div className="text-zinc-700">{r.expires_at ? new Date(r.expires_at).toLocaleString() : "—"}</div>
                       </div>
                       <div>
-                        <div className="text-[11px] uppercase tracking-[0.14em] text-gc-ink-muted">Auto check</div>
-                        <div className="text-gc-ink">{r.auto_result?.reason ?? "—"}</div>
+                        <div className="text-[11px] uppercase tracking-[0.14em] text-zinc-400">Auto check</div>
+                        <div className="text-zinc-700">{r.auto_result?.reason ?? "—"}</div>
                       </div>
                     </div>
 
                     {r.reject_reason && (
-                      <div className="mt-3 rounded-xl bg-red-50 px-3 py-2 text-[12.5px] text-red-700">Rejected: {r.reject_reason}</div>
+                      <div className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-[12.5px] text-red-700">Rejected: {r.reject_reason}</div>
                     )}
 
                     {status !== "approved" && (
@@ -322,7 +322,7 @@ function OpsPayments() {
                         <button
                           disabled={busy === r.id}
                           onClick={() => void decide(r.id, "approve")}
-                          className="rounded-xl bg-emerald-600 px-3.5 py-2 text-[13px] text-white hover:bg-emerald-700 disabled:opacity-50"
+                          className="rounded-lg bg-emerald-600 px-3.5 py-2 text-[13px] text-white hover:bg-emerald-700 disabled:opacity-50"
                         >
                           Approve & credit
                         </button>
@@ -330,7 +330,7 @@ function OpsPayments() {
                           <button
                             disabled={busy === r.id}
                             onClick={() => void decide(r.id, "reject")}
-                            className="rounded-xl border border-gc-line px-3.5 py-2 text-[13px] text-gc-ink hover:bg-gc-panel disabled:opacity-50"
+                            className="rounded-lg border border-zinc-200 px-3.5 py-2 text-[13px] text-zinc-700 hover:bg-zinc-50 disabled:opacity-50"
                           >
                             Reject
                           </button>
@@ -340,8 +340,8 @@ function OpsPayments() {
                   </div>
                 );
               })}
-              {rows && visible.length === 0 && <p className="py-8 text-center text-sm text-gc-ink-muted">No payments in this view.</p>}
-              {!rows && <p className="py-8 text-center text-sm text-gc-ink-muted">Loading…</p>}
+              {rows && visible.length === 0 && <p className="py-8 text-center text-sm text-zinc-400">No payments in this view.</p>}
+              {!rows && <p className="py-8 text-center text-sm text-zinc-400">Loading…</p>}
             </div>
           </>
         )}
@@ -349,8 +349,8 @@ function OpsPayments() {
 
         {tab === "promos" && (
           <>
-            <div className="mt-5 rounded-2xl border border-gc-line p-4">
-              <div className="text-[13px] font-medium text-gc-ink">Create / update code</div>
+            <div className="mt-5 rounded-2xl border border-zinc-200 p-4">
+              <div className="text-[13px] font-medium text-zinc-900">Create / update code</div>
               <div className="mt-3 grid gap-2 sm:grid-cols-4">
                 <input className={input} placeholder="CODE" value={form.code} onChange={(e) => setForm({ ...form, code: e.target.value.toUpperCase() })} />
                 <select className={input} value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value as any })}>
@@ -366,7 +366,7 @@ function OpsPayments() {
                 <input className={input} placeholder="Per user limit" value={form.perUserLimit} onChange={(e) => setForm({ ...form, perUserLimit: e.target.value })} />
                 <input className={input} type="date" value={form.expiresAt} onChange={(e) => setForm({ ...form, expiresAt: e.target.value })} />
                 <input className={`${input} sm:col-span-3`} placeholder="Note" value={form.note} onChange={(e) => setForm({ ...form, note: e.target.value })} />
-                <button onClick={() => void savePromo()} disabled={busy === "promo"} className="rounded-xl bg-gc-blue px-4 py-2 text-sm text-white hover:bg-gc-blue-hover disabled:opacity-50">
+                <button onClick={() => void savePromo()} disabled={busy === "promo"} className="rounded-lg bg-zinc-900 px-4 py-2 text-sm text-white hover:bg-zinc-800 disabled:opacity-50">
                   Save code
                 </button>
               </div>
@@ -374,7 +374,7 @@ function OpsPayments() {
 
             <div className="mt-4 overflow-x-auto">
               <table className="w-full text-left text-[13px]">
-                <thead className="text-gc-ink-muted">
+                <thead className="text-zinc-400">
                   <tr>
                     <th className="py-2 pr-3 font-normal">Code</th>
                     <th className="py-2 pr-3 font-normal">Type</th>
@@ -388,7 +388,7 @@ function OpsPayments() {
                 </thead>
                 <tbody>
                   {(promos ?? []).map((p) => (
-                    <tr key={p.code} className="border-t border-gc-line">
+                    <tr key={p.code} className="border-t border-zinc-100">
                       <td className="py-2.5 pr-3 font-medium">{p.code}</td>
                       <td className="py-2.5 pr-3">{p.type}</td>
                       <td className="py-2.5 pr-3">{Number(p.value)}{p.type === "percent" || p.type === "discount" ? "%" : "$"}</td>
@@ -402,7 +402,7 @@ function OpsPayments() {
                             await togglePromoFn({ data: { code: p.code, active: !p.active, token: opsToken() } });
                             await load();
                           }}
-                          className={`rounded-full px-2.5 py-1 text-[12px] ${p.active ? "bg-emerald-50 text-emerald-700" : "bg-gc-panel text-gc-ink-muted"}`}
+                          className={`rounded-full px-2.5 py-1 text-[12px] ${p.active ? "bg-emerald-50 text-emerald-700" : "bg-zinc-100 text-zinc-500"}`}
                         >
                           {p.active ? "Active" : "Disabled"}
                         </button>
@@ -416,13 +416,13 @@ function OpsPayments() {
         )}
 
         {tab === "config" && (
-          <div className="mt-5 max-w-2xl rounded-2xl border border-gc-line p-4">
-            <div className="text-[13px] font-medium text-gc-ink">Deposit addresses</div>
-            <p className="mt-1 text-[12px] text-gc-ink-muted">Users see these on the payment page and auto-verification checks them.</p>
+          <div className="mt-5 max-w-2xl rounded-2xl border border-zinc-200 p-4">
+            <div className="text-[13px] font-medium text-zinc-900">Deposit addresses</div>
+            <p className="mt-1 text-[12px] text-zinc-500">Users see these on the payment page and auto-verification checks them.</p>
             <div className="mt-4 space-y-3">
               {(["trc20", "bep20", "erc20"] as const).map((k) => (
                 <div key={k}>
-                  <div className="text-[12px] uppercase tracking-[0.14em] text-gc-ink-muted">{networkMeta(k).chain}</div>
+                  <div className="text-[12px] uppercase tracking-[0.14em] text-zinc-400">{networkMeta(k).chain}</div>
                   <input
                     className={`${input} mt-1 w-full`}
                     value={cfg[k]}
@@ -431,7 +431,7 @@ function OpsPayments() {
                   />
                 </div>
               ))}
-              <button onClick={() => void saveCfg()} disabled={busy === "cfg"} className="rounded-xl bg-gc-blue px-4 py-2 text-sm text-white hover:bg-gc-blue-hover disabled:opacity-50">
+              <button onClick={() => void saveCfg()} disabled={busy === "cfg"} className="rounded-lg bg-zinc-900 px-4 py-2 text-sm text-white hover:bg-zinc-800 disabled:opacity-50">
                 Save addresses
               </button>
             </div>
