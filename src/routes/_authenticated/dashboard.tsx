@@ -1317,7 +1317,7 @@ function DashboardLayout() {
 
   return (
     <div
-      className={`flex ${pathname === "/dashboard/terminal" ? "h-dvh overflow-hidden jenvu-terminal-shell bg-gc-console-bar" : "min-h-screen jenvu-zoom-dashboard bg-gc-canvas"} ${dashDark ? "dark dash-dark" : ""} text-zinc-900 font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif] antialiased`}
+      className={`flex ${pathname === "/dashboard/terminal" ? "h-dvh overflow-hidden jenvu-terminal-shell bg-background" : "min-h-screen jenvu-zoom-dashboard bg-gc-canvas"} ${dashDark ? "dark dash-dark" : ""} text-zinc-900 font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif] antialiased`}
     >
       {/* Menu overlay */}
       {mobileNavOpen && !embedMode && (
@@ -1559,7 +1559,7 @@ function DashboardLayout() {
 
       {/* Right column */}
       <div
-        className={`dashboard-right-col flex min-w-0 min-h-0 flex-1 flex-col ${pathname === "/dashboard/terminal" ? "bg-gc-console-bar" : "bg-gc-canvas"} ${embedMode || drawerMode ? "" : sidebarCollapsed ? "collapsed lg:pl-[60px]" : "lg:pl-[224px]"}`}
+        className={`dashboard-right-col flex min-w-0 min-h-0 flex-1 flex-col ${pathname === "/dashboard/terminal" ? "bg-background" : "bg-gc-canvas"} ${embedMode || drawerMode ? "" : sidebarCollapsed ? "collapsed lg:pl-[60px]" : "lg:pl-[224px]"}`}
       >
         {drawerMode && (
           <div className={pathname === "/dashboard/terminal" ? "jenvu-zoom-chrome relative z-30 shrink-0" : "contents"}>
@@ -1587,7 +1587,7 @@ function DashboardLayout() {
         <main
           className={
             pathname === "/dashboard/terminal"
-              ? "h-full min-h-0 w-full flex-1 overflow-hidden bg-gc-console-bar"
+              ? "h-full min-h-0 w-full flex-1 overflow-hidden bg-background"
               : "mx-auto w-full max-w-7xl flex-1 bg-white px-5 pt-7 pb-7 sm:px-8"
           }
           style={pathname === "/dashboard/terminal" ? undefined : { zoom: 0.9 }}

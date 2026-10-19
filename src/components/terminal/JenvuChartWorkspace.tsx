@@ -1,3 +1,4 @@
+import { createPortal } from "react-dom";
 import {
   forwardRef,
   memo,
@@ -40,7 +41,7 @@ import { getTerminalChart } from "@/lib/gold-analysis.functions";
 import { cn } from "@/lib/utils";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { XauUsdLogo } from "./XauUsdLogo";
-import { Clock3, Menu, PanelLeftClose, PanelLeftOpen } from "lucide-react";
+import { ChevronDown, Clock3, Menu, PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
@@ -256,6 +257,11 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
   const [fullscreen, setFullscreen] = useState(false);
   const [ticketSide, setTicketSide] = useState<DemoSide | null>(null);
   const [paperOpen, setPaperOpen] = useState(false);
+  // Desktop chart toolbar is rendered into the dashboard top bar (in place of the old price strip).
+  const [toolbarHost, setToolbarHost] = useState<HTMLElement | null>(null);
+  useEffect(() => {
+    setToolbarHost(document.getElementById("terminal-toolbar-slot"));
+  }, []);
   // Demo trading: order ticket, positions on the chart and the paper panel. Opened from the side panel.
   const demoTradingEnabled = true;
   // On-chart quick BUY/SELL buttons stay off; trading starts from the side panel.
@@ -664,18 +670,21 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
   }
 
   const popClass = cn("font-sans subpixel-antialiased", theme === "dark" && "dark terminal-dark border-border bg-popover text-popover-foreground");
-  const railBtn = "relative flex h-9 w-[60px] items-center justify-center rounded-r-full text-gc-ink-muted transition-colors hover:bg-gc-console-rail-active/60 data-[state=open]:bg-gc-console-rail-active data-[state=open]:text-gc-ink data-[state=open]:before:absolute data-[state=open]:before:inset-y-0 data-[state=open]:before:left-0 data-[state=open]:before:w-[3px] data-[state=open]:before:rounded-full data-[state=open]:before:bg-gc-ink dark:text-muted-foreground dark:hover:bg-accent dark:data-[state=open]:bg-accent dark:data-[state=open]:before:bg-foreground";
+  // Google-style pill buttons; the toolbar sits in the dashboard top bar where the price strip was.
+  const railBtn = "relative inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full px-2.5 text-[13px] font-medium text-gc-ink-muted transition-colors hover:bg-gc-console-search hover:text-gc-ink data-[state=open]:bg-gc-blue-soft data-[state=open]:text-gc-blue dark:text-muted-foreground dark:hover:bg-accent dark:data-[state=open]:bg-accent dark:data-[state=open]:text-foreground";
 
 
   const rail = (
-    <nav aria-label="Chart tools" className={cn("hidden w-[72px] shrink-0 flex-col items-start gap-1.5 pb-3 pt-2 md:flex", theme === "dark" ? "border-r border-border bg-background" : "bg-transparent")}>
+    <nav aria-label="Chart tools" className="flex min-w-0 flex-1 items-center gap-0.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
       <Popover>
         <PopoverTrigger asChild>
-          <button type="button" aria-label="Timeframe" title="Timeframe" className={railBtn}>
-            <Clock3 className="h-[18px] w-[18px]" />
+          <button type="button" aria-label="Timeframe" title="Timeframe" className={cn(railBtn, "text-gc-ink")}>
+            <Clock3 className="h-4 w-4" />
+            <span className="tabular-nums">{timeframe.label}</span>
+            <ChevronDown className="h-3.5 w-3.5 opacity-60" />
           </button>
         </PopoverTrigger>
-        <PopoverContent side="right" align="start" className={cn("w-56 p-1.5", popClass)}>
+        <PopoverContent side="bottom" align="start" className={cn("w-56 p-1.5", popClass)}>
           <p className="px-2 pb-1.5 pt-1 text-sm text-foreground">Timeframe · <span className="font-mono font-semibold">{timeframe.label}</span></p>
           <div className="grid grid-cols-3 gap-1">
             {timeframes.map((item) => (
@@ -698,55 +707,61 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
       <Popover>
         <PopoverTrigger asChild>
           <button type="button" aria-label="Indicators" title="Indicators" className={railBtn}>
-            <Activity className="h-[18px] w-[18px]" />
+            <Activity className="h-4 w-4" />
+            <span className="hidden xl:inline">Indicators</span>
           </button>
         </PopoverTrigger>
-        <PopoverContent side="right" align="start" className={cn("max-h-[80vh] w-80 overflow-y-auto p-2", popClass)}>
+        <PopoverContent side="bottom" align="start" className={cn("max-h-[80vh] w-80 overflow-y-auto p-2", popClass)}>
           {indicatorMenu}
         </PopoverContent>
       </Popover>
       <Popover>
         <PopoverTrigger asChild>
           <button type="button" aria-label="Jenvu SMC" title="Jenvu SMC" className={railBtn}>
-            <Layers className="h-[18px] w-[18px]" />
+            <Layers className="h-4 w-4" />
+            <span className="hidden xl:inline">SMC</span>
           </button>
         </PopoverTrigger>
-        <PopoverContent side="right" align="start" className={cn("max-h-[80vh] w-80 overflow-y-auto p-2", popClass)}>
+        <PopoverContent side="bottom" align="start" className={cn("max-h-[80vh] w-80 overflow-y-auto p-2", popClass)}>
           {smcMenu}
         </PopoverContent>
       </Popover>
       <Popover>
         <PopoverTrigger asChild>
-          <button type="button" aria-label="Drawing tools" title="Drawing tools" className={cn(railBtn, "h-auto flex-col gap-0.5 py-1.5")}>
-            <PenLine className="h-[18px] w-[18px]" />
-            <span className="text-[9px] font-medium leading-none">Draw</span>
+          <button type="button" aria-label="Drawing tools" title="Drawing tools" className={railBtn}>
+            <PenLine className="h-4 w-4" />
+            <span className="hidden xl:inline">Draw</span>
             {tool !== "cursor" && <span className="absolute right-1.5 top-1 h-1.5 w-1.5 rounded-full bg-gc-blue" aria-hidden="true" />}
           </button>
         </PopoverTrigger>
-        <PopoverContent side="right" align="start" className={cn("w-[236px] p-2", popClass)}>
+        <PopoverContent side="bottom" align="start" className={cn("w-[236px] p-2", popClass)}>
           <p className="px-1 pb-1.5 text-sm text-foreground">Drawing tools</p>
           <div className="flex flex-wrap items-center gap-0.5" role="toolbar" aria-label="Drawing tools">{renderTools(false)}</div>
         </PopoverContent>
       </Popover>
-      <span className="my-1 ml-3 h-px w-6 bg-border" aria-hidden="true" />
+      <span className="mx-1 h-5 w-px shrink-0 bg-gc-line" aria-hidden="true" />
       <button type="button" onClick={downloadSnapshot} aria-label="Download chart snapshot" title="Download chart snapshot" className={railBtn}>
-        <Camera className="h-[18px] w-[18px]" />
+        <Camera className="h-4 w-4" />
       </button>
       <button type="button" onClick={() => chartRef.current?.fit()} aria-label="Reset chart view" title="Reset view" className={railBtn}>
-        <RotateCcw className="h-[18px] w-[18px]" />
+        <RotateCcw className="h-4 w-4" />
       </button>
       <button type="button" onClick={() => void toggleFullscreen()} aria-label={fullscreen ? "Exit fullscreen chart" : "Fullscreen chart"} title={fullscreen ? "Exit fullscreen" : "Fullscreen chart"} className={railBtn}>
-        {fullscreen ? <Minimize2 className="h-[18px] w-[18px]" /> : <Maximize2 className="h-[18px] w-[18px]" />}
+        {fullscreen ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
       </button>
-      {railSlot && <div className="mt-auto flex flex-col items-start gap-1">{railSlot}</div>}
+      {railSlot && <div className="ml-auto flex shrink-0 items-center gap-0.5 pl-2">{railSlot}</div>}
     </nav>
   );
 
   return (
-    <div ref={workspaceRef} className={cn("flex h-full min-h-0 w-full", theme === "dark" ? "bg-background" : "bg-gc-console-bar")}>
-      {rail}
+    <div ref={workspaceRef} className={cn("relative flex h-full min-h-0 w-full bg-background", toolbarHost && !fullscreen ? "" : "md:pt-11")}>
+      {toolbarHost && !fullscreen ? (
+        createPortal(rail, toolbarHost)
+      ) : (
+        <div className="absolute inset-x-0 top-0 z-[5] hidden h-11 items-center border-b border-gc-line bg-background px-2 md:flex">{rail}</div>
+      )}
       {sidePanelOpen && <TerminalOrderPanel trading={demo} price={currentPrice} />}
-      <div className={cn("flex min-h-0 min-w-0 flex-1 flex-col bg-background", theme !== "dark" && "overflow-hidden rounded-t-2xl", theme !== "dark" && sidePanelOpen && "lg:mb-2 lg:rounded-2xl lg:border lg:border-gc-line")}>
+      <div className={cn("flex min-h-0 min-w-0 flex-1 flex-col bg-background", theme !== "dark" && "overflow-hidden md:mb-2 md:rounded-2xl md:border md:border-gc-line")}>
       {/* Top bar — phones only: on laptops and tablets every control lives in the side bar. */}
       <div className="flex h-11 shrink-0 items-center gap-1 overflow-x-auto border-b border-border px-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:hidden">
 

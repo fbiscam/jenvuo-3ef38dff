@@ -7,7 +7,6 @@ import { Shimmer } from "@/components/ai-elements/shimmer";
 import askJenvuMark from "@/assets/ask-jenvu-mark.png";
 import { openAskJenvu } from "@/components/AskJenvuWidget";
 import GiftBox from "@/components/dashboard/GiftBox";
-import TerminalMarketStrip from "@/components/terminal/TerminalMarketStrip";
 import { SITE_PAGES } from "@/lib/site-pages";
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import {
@@ -141,7 +140,7 @@ export default function DashboardTopBar({
   const seeAll = () => { const t = q.trim(); if (!t) return; close(); void navigate({ to: "/search", search: { q: t } }); };
 
   return (
-    <header className={`sticky top-0 z-30 flex ${white ? "h-[52px]" : "h-14"} shrink-0 items-center gap-2 ${white ? "bg-gc-console-bar" : "bg-gc-canvas"} px-2 sm:gap-3 sm:px-3`}>
+    <header className={`sticky top-0 z-30 flex ${white ? "h-[52px]" : "h-14"} shrink-0 items-center gap-2 ${white ? "border-b border-gc-line bg-background" : "bg-gc-canvas"} px-2 sm:gap-3 sm:px-3`}>
       <button
         type="button"
         onClick={onMenu}
@@ -156,9 +155,8 @@ export default function DashboardTopBar({
       </Link>
 
       {onTerminal ? (
-        <div className="mx-auto hidden min-w-0 max-w-[900px] flex-1 sm:block">
-          <TerminalMarketStrip />
-        </div>
+        // The Terminal's chart toolbar (timeframe, indicators, SMC, draw, news, Ask AI) is placed here.
+        <div id="terminal-toolbar-slot" className="hidden min-w-0 flex-1 items-center md:flex" />
       ) : (
       <div className={`relative mx-auto hidden w-full ${white ? "max-w-[700px]" : "max-w-[720px]"} sm:block`}>
         {/* Google Cloud style: grey pill at rest, white box with a blue outline while typing. */}

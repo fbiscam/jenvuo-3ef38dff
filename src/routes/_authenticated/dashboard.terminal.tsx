@@ -685,10 +685,10 @@ function TerminalPage() {
       <div
         className={cn(
           "flex h-full min-h-0 w-full flex-col overflow-hidden text-foreground",
-          theme === "dark" ? "dark terminal-dark bg-background" : "bg-gc-console-bar",
+          theme === "dark" ? "dark terminal-dark bg-background" : "bg-background",
         )}
       >
-        <div className={cn("flex min-h-0 flex-1 flex-col lg:flex-row", theme !== "dark" && "gap-2 pr-2")}>
+        <div className={cn("flex min-h-0 flex-1 flex-col lg:flex-row", theme !== "dark" && "gap-2 px-2 pt-2")}>
           {/* Chart */}
           <section
             aria-label="XAU/USD chart"
@@ -718,17 +718,18 @@ function TerminalPage() {
                     onClick={() => setTheme((t) => (t === "dark" ? "light" : "dark"))}
                     aria-label={theme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
                     title={theme === "dark" ? "Light theme" : "Dark theme"}
-                    className="flex h-9 w-[60px] items-center justify-center rounded-r-full text-muted-foreground hover:bg-gc-console-rail-active/60 hover:text-foreground dark:hover:bg-accent"
+                    className="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full px-2.5 text-[13px] font-medium text-gc-ink-muted transition-colors hover:bg-gc-console-search hover:text-gc-ink dark:text-muted-foreground dark:hover:bg-accent w-8 justify-center px-0"
                   >
-                    {theme === "dark" ? <Sun className="h-[18px] w-[18px]" /> : <Moon className="h-[18px] w-[18px]" />}
+                    {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
                   </button>
                   <div
-                    className="flex w-[60px] flex-col items-center gap-0.5 py-1 font-mono text-[10px] font-semibold leading-none text-foreground"
+                    className="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full bg-gc-console-search px-2.5 text-[12px] font-semibold tabular-nums text-gc-ink dark:bg-accent dark:text-foreground"
                     title={marketClosed ? "Gold market is closed for the weekend" : `Time left on the current ${tf.label} candle`}
                     aria-label={marketClosed ? "Market closed" : `Current ${tf.label} candle closes in ${formatCountdown(secondsLeft)}`}
                   >
-                    <Timer className="h-[18px] w-[18px] text-muted-foreground" />
+                    <Timer className="h-4 w-4 text-muted-foreground" />
                     {formatCountdown(secondsLeft)}
+                    {marketClosed && <span className="hidden font-normal text-gc-ink-muted xl:inline">Market closed</span>}
                   </div>
                   <Popover>
                     <PopoverTrigger asChild>
@@ -736,15 +737,16 @@ function TerminalPage() {
                         type="button"
                         aria-label="Gold news"
                         title="Gold news"
-                        className="relative flex h-9 w-[60px] items-center justify-center rounded-r-full text-muted-foreground hover:bg-gc-console-rail-active/60 data-[state=open]:bg-gc-console-rail-active data-[state=open]:text-foreground dark:hover:bg-accent"
+                        className="relative inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full px-2.5 text-[13px] font-medium text-gc-ink-muted transition-colors hover:bg-gc-console-search hover:text-gc-ink dark:text-muted-foreground dark:hover:bg-accent data-[state=open]:bg-gc-blue-soft data-[state=open]:text-gc-blue"
                       >
-                        <Newspaper className="h-[18px] w-[18px]" />
+                        <Newspaper className="h-4 w-4" />
+                        <span className="hidden xl:inline">News</span>
                         {nextGoldNews && (
                           <span aria-hidden="true" className={cn("absolute right-2 top-1.5 h-1.5 w-1.5 rounded-full", nextGoldNews.impact === "High" ? "bg-destructive" : "bg-gc-yellow")} />
                         )}
                       </button>
                     </PopoverTrigger>
-                    <PopoverContent side="right" align="end" className={cn("max-h-[80vh] w-80 overflow-y-auto p-2 font-sans", theme === "dark" && "dark terminal-dark border-border bg-popover text-popover-foreground")}>
+                    <PopoverContent side="bottom" align="end" className={cn("max-h-[80vh] w-80 overflow-y-auto p-2 font-sans", theme === "dark" && "dark terminal-dark border-border bg-popover text-popover-foreground")}>
                       <TerminalNewsPanel />
                     </PopoverContent>
                   </Popover>
@@ -756,11 +758,11 @@ function TerminalPage() {
                       aria-pressed={panelsOpen}
                       title={panelsOpen ? "Hide trading panels" : "Show trading panels"}
                       className={cn(
-                        "hidden h-9 w-[60px] items-center justify-center rounded-r-full text-muted-foreground hover:bg-gc-console-rail-active/60 hover:text-foreground dark:hover:bg-accent lg:flex",
-                        panelsOpen && "bg-gc-console-rail-active text-foreground dark:bg-accent",
+                        "inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full px-2.5 text-[13px] font-medium text-gc-ink-muted transition-colors hover:bg-gc-console-search hover:text-gc-ink dark:text-muted-foreground dark:hover:bg-accent hidden w-8 justify-center px-0 lg:inline-flex",
+                        panelsOpen && "bg-gc-blue-soft text-gc-blue dark:bg-accent dark:text-foreground",
                       )}
                     >
-                      {panelsOpen ? <PanelRightClose className="h-[18px] w-[18px]" /> : <PanelRightOpen className="h-[18px] w-[18px]" />}
+                      {panelsOpen ? <PanelRightClose className="h-4 w-4" /> : <PanelRightOpen className="h-4 w-4" />}
                     </button>
                   )}
                   {!deskOpen && (
@@ -769,9 +771,10 @@ function TerminalPage() {
                       onClick={() => setDeskOpen(true)}
                       aria-label="Ask With AI"
                       title="Ask With AI"
-                      className="flex h-9 w-[60px] items-center justify-center rounded-r-full hover:bg-gc-console-rail-active/60 dark:hover:bg-accent"
+                      className="ml-1 inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full border border-gc-line bg-background px-3 text-[13px] font-medium text-gc-ink transition-colors hover:bg-gc-console-search dark:bg-accent dark:text-foreground"
                     >
-                      <img src="/favicon.png" alt="" className="h-5 w-5 rounded-sm object-contain" />
+                      <img src="/favicon.png" alt="" className="h-4 w-4 rounded-sm object-contain" />
+                      Ask AI
                     </button>
                   )}
                 </>
