@@ -1358,3 +1358,7 @@ html body .dash-dark main.bg-white { background-color: oklch(0.165 0 0) !importa
 @keyframes ask-jenvu-ring { to { --jv-ring-angle: 360deg; } }
 .ask-jenvu-mark-ring { animation: ask-jenvu-ring 2.4s linear infinite !important; }
 @media (prefers-reduced-motion: reduce) { .ind-kenburns { animation: none; } }
+
+/* Terminal top-bar market prices: endless loop, pauses while pointed at. */
+.terminal-strip-track { animation: gc-marquee 40s linear infinite; }
+.terminal-strip:hover .terminal-strip-track { animation-play-state: paused; }
