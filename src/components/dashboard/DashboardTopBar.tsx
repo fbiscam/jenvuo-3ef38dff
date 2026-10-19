@@ -140,12 +140,12 @@ export default function DashboardTopBar({
   const seeAll = () => { const t = q.trim(); if (!t) return; close(); void navigate({ to: "/search", search: { q: t } }); };
 
   return (
-    <header className={`sticky top-0 z-30 flex h-14 shrink-0 items-center gap-2 ${white ? "bg-gc-console-bar" : "bg-gc-canvas"} px-2 sm:gap-3 sm:px-3`}>
+    <header className={`sticky top-0 z-30 flex h-14 shrink-0 items-center gap-2 ${white ? "bg-background" : "bg-gc-canvas"} px-2 sm:gap-3 sm:px-3`}>
       <button
         type="button"
         onClick={onMenu}
         aria-label="Open menu"
-        className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-gc-ink-muted hover:bg-gc-notice"
+        className={`${onTerminal ? "hidden md:inline-flex" : "inline-flex"} h-10 w-10 shrink-0 items-center justify-center rounded-full text-gc-ink-muted hover:bg-gc-notice`}
       >
         <Menu className="h-5 w-5" />
       </button>
