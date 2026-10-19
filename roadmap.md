@@ -60,3 +60,6 @@
 - [x] Terminal: Market Watch and Demo Account cards removed (balance eye + reset in the order form); square corners; Google Sans in the chart; TradingView-style section under the trades table with Overview (area chart + 1 day…All time), News headlines, Technicals gauges and Seasonals
 - [x] Terminal: section borders; News, hide-panels and Ask AI header buttons removed; blue Ask Jenvu opens Terminal AI chat; open positions table removed
 - [x] Terminal: borders removed again; dark-theme header icons white; Headlines = latest 15
+- [x] Mobile Terminal: "No trades" button hidden
+- [x] Dashboard top bar: Ask Jenvu button only on the Terminal
+- [ ] Terminal: all chart options on one Overview chart like the user's picture (needs the picture re-sent)
