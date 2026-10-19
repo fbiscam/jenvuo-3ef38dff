@@ -11,6 +11,7 @@ import {
   Moon,
   Newspaper,
   PanelRightClose,
+  PanelRightOpen,
   Square,
   SquarePen,
   Sun,
@@ -699,6 +700,8 @@ function TerminalPage() {
               asset={asset}
               onAssetChange={changeAsset}
               theme={theme}
+              sidePanelOpen={watchlistOpen && !deskOpen}
+              onSidePanelOpenChange={setWatchlistOpen}
               onTimeframeChange={(next) => {
                 const match = TIMEFRAMES.find((item) => item.key === next.key);
                 if (match) setTf(match);
@@ -740,6 +743,21 @@ function TerminalPage() {
                       <TerminalNewsPanel />
                     </PopoverContent>
                   </Popover>
+                  {!deskOpen && (
+                    <button
+                      type="button"
+                      onClick={() => setWatchlistOpen((v) => !v)}
+                      aria-label={watchlistOpen ? "Hide trading panel" : "Show trading panel"}
+                      aria-pressed={watchlistOpen}
+                      title={watchlistOpen ? "Hide trading panel" : "Show trading panel"}
+                      className={cn(
+                        "hidden h-9 w-[60px] items-center justify-center rounded-r-full text-muted-foreground hover:bg-gc-console-rail-active/60 hover:text-foreground dark:hover:bg-accent xl:flex",
+                        watchlistOpen && "bg-gc-console-rail-active text-foreground dark:bg-accent",
+                      )}
+                    >
+                      {watchlistOpen ? <PanelRightClose className="h-[18px] w-[18px]" /> : <PanelRightOpen className="h-[18px] w-[18px]" />}
+                    </button>
+                  )}
                   {!deskOpen && (
                     <button
                       type="button"
