@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { ExternalLink } from "lucide-react";
@@ -10,8 +10,9 @@ import { cn } from "@/lib/utils";
 import { XauUsdLogo } from "./XauUsdLogo";
 import { num, useTechnicals, useWatchQuotes } from "./terminal-market";
 
-type Tab = "overview" | "news" | "technicals" | "seasonals";
-const TABS: Array<{ id: Tab; label: string }> = [
+export type MarketTab = "overview" | "news" | "technicals" | "seasonals";
+const TABS: Array<{ id: MarketTab; label: string }> = [
+  { id: "overview", label: "Overview" },
   { id: "news", label: "News" },
   { id: "technicals", label: "Technicals" },
   { id: "seasonals", label: "Seasonals" },
@@ -31,41 +32,99 @@ const TECH_TABS = [
 const pct = (v: number | null | undefined, d = 2) => (v == null ? "—" : `${v >= 0 ? "" : "−"}${Math.abs(v).toFixed(d)}%`);
 const pctTone = (v: number | null | undefined) => (v == null ? "text-gc-ink-muted" : v >= 0 ? "text-gc-green" : "text-gc-red");
 
-/** TradingView-style symbol section under the chart: Overview, News, Technicals, Seasonals. */
-export function TerminalMarketTabs({ bars, price, timeframeKey }: { bars: OhlcvBar[]; price: number | null; timeframeKey: string }) {
-  const [tab, setTab] = useState<Tab>("news");
+/** Chart timeframe used when a range button under the chart is picked. */
+export const PERIOD_TIMEFRAME: Record<PeriodKey, string> = {
+  "1d": "5m",
+  "5d": "30m",
+  "1m": "4h",
+  "3m": "1d",
+  "6m": "1d",
+  ytd: "1d",
+  "1y": "1d",
+  "5y": "1d",
+  "10y": "1d",
+  all: "1d",
+};
+
+function useClock() {
+  const [now, setNow] = useState<Date | null>(null);
+  useEffect(() => {
+    setNow(new Date());
+    const id = window.setInterval(() => setNow(new Date()), 30_000);
+    return () => window.clearInterval(id);
+  }, []);
+  return now;
+}
+
+/** TradingView-style symbol header: big name, live price, change and the section tabs. */
+export function TerminalSymbolHeader({
+  price,
+  tab,
+  onTabChange,
+  marketOpen = true,
+}: {
+  price: number | null;
+  tab: MarketTab;
+  onTabChange: (tab: MarketTab) => void;
+  marketOpen?: boolean;
+}) {
   const quotes = useWatchQuotes();
   const q = quotes.data?.XAUUSD;
   const live = price ?? q?.price ?? null;
   const ch = q?.changePct ?? null;
   const prev = live != null && ch != null ? live / (1 + ch / 100) : null;
   const abs = live != null && prev != null ? live - prev : null;
+  const now = useClock();
+  const priceText = live != null ? num(live) : "—";
+  const head = priceText.length > 5 ? priceText.slice(0, -5) : "";
+  const tail = priceText.length > 5 ? priceText.slice(-5) : priceText;
 
   return (
-    <section aria-label="XAU/USD overview" className="hidden shrink-0 bg-card font-sans lg:block">
-      <header className="flex flex-wrap items-center gap-x-3 gap-y-1 px-5 py-3.5">
-        <XauUsdLogo size={22} />
-        <span className="text-[16px] font-medium text-gc-ink">XAUUSD</span>
-        <span className="text-[16px] font-medium tabular-nums text-gc-ink">
-          {live != null ? num(live) : "—"}
-          <span className="ml-0.5 text-[10px] font-normal text-gc-ink-muted">USD</span>
-        </span>
-        {abs != null && (
-          <span className={cn("text-[14px] font-normal tabular-nums", pctTone(abs))}>
-            {abs >= 0 ? "+" : "−"}
-            {num(Math.abs(abs))} &nbsp;{pct(ch)}
-          </span>
-        )}
-      </header>
-      <nav aria-label="Gold sections" className="flex gap-6 border-b border-gc-line px-5">
+    <section aria-label="Gold Spot / U.S. Dollar" className="hidden shrink-0 bg-card font-sans lg:block">
+      <div className="flex items-center gap-6 px-6 pb-4 pt-6">
+        <XauUsdLogo size={104} />
+        <div className="min-w-0">
+          <h1 className="text-[34px] font-semibold leading-tight tracking-tight text-gc-ink 2xl:text-[40px]">Gold Spot / U.S. Dollar</h1>
+          <div className="mt-2 flex items-center gap-2">
+            <span className="inline-flex h-8 items-center gap-1.5 rounded-md border border-gc-line px-2.5 text-[13px] text-gc-ink">
+              XAUUSD <span className="text-gc-ink-muted">·</span> Jenvu feed
+            </span>
+            <span
+              className={cn("inline-flex h-8 w-8 items-center justify-center rounded-md", marketOpen ? "bg-gc-green-soft" : "bg-gc-console-search")}
+              title={marketOpen ? "Market open" : "Market closed"}
+              aria-label={marketOpen ? "Market open" : "Market closed"}
+            >
+              <span className={cn("h-2 w-2 rounded-full", marketOpen ? "bg-gc-green" : "bg-gc-ink-muted")} />
+            </span>
+          </div>
+          <div className="mt-3 flex flex-wrap items-baseline gap-x-3 gap-y-1">
+            <p className="text-[44px] font-semibold leading-none tabular-nums tracking-tight text-gc-ink 2xl:text-[52px]">
+              {head}
+              <span className={abs == null ? "" : abs >= 0 ? "text-gc-green" : "text-gc-red"}>{tail}</span>
+              <span className="ml-1 text-[14px] font-normal text-gc-ink-muted">USD</span>
+            </p>
+            {abs != null && (
+              <p className={cn("text-[22px] font-medium tabular-nums", pctTone(abs))}>
+                {abs >= 0 ? "+" : "−"}
+                {num(Math.abs(abs))} <span className="ml-1">{abs >= 0 ? "+" : ""}{pct(ch)}</span>
+              </p>
+            )}
+          </div>
+          <p className="mt-2 text-[13px] text-gc-ink-muted">
+            {marketOpen ? "Live" : "Market closed"}
+            {now && ` · As of today at ${String(now.getUTCHours()).padStart(2, "0")}:${String(now.getUTCMinutes()).padStart(2, "0")} UTC`}
+          </p>
+        </div>
+      </div>
+      <nav aria-label="Gold sections" className="flex gap-7 border-b-2 border-gc-line px-6">
         {TABS.map((t) => (
           <button
             key={t.id}
             type="button"
-            onClick={() => setTab(t.id)}
+            onClick={() => onTabChange(t.id)}
             aria-pressed={tab === t.id}
             className={cn(
-              "-mb-px border-b-2 py-3 text-[14px] font-medium transition-colors",
+              "-mb-[2px] border-b-[3px] pb-2.5 pt-2 text-[15px] font-medium transition-colors",
               tab === t.id ? "border-gc-ink text-gc-ink" : "border-transparent text-gc-ink-muted hover:text-gc-ink",
             )}
           >
@@ -73,184 +132,61 @@ export function TerminalMarketTabs({ bars, price, timeframeKey }: { bars: OhlcvB
           </button>
         ))}
       </nav>
-      <div className="px-5 py-5">
-        {tab === "news" && <NewsTab />}
-        {tab === "technicals" && <TechnicalsTab bars={bars} timeframeKey={timeframeKey} />}
-        {tab === "seasonals" && <SeasonalsTab />}
-      </div>
     </section>
   );
 }
 
-/* ---------------- Overview ---------------- */
-
-function fmtAxisTime(t: number, period: PeriodKey) {
-  const d = new Date(t);
-  if (period === "1d") return `${String(d.getUTCHours()).padStart(2, "0")}:${String(d.getUTCMinutes()).padStart(2, "0")}`;
-  if (period === "5d" || period === "1m") return d.toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" });
-  if (period === "5y" || period === "10y" || period === "all") return String(d.getUTCFullYear());
-  return d.toLocaleDateString("en-US", { month: "short", year: "2-digit", timeZone: "UTC" });
-}
-
-function OverviewTab() {
-  const [period, setPeriod] = useState<PeriodKey>("1d");
+/** Range returns under the Overview chart (1 day … All time); picking one switches the chart timeframe. */
+export function TerminalPeriodReturns({ timeframeKey, onPick }: { timeframeKey: string; onPick: (period: PeriodKey) => void }) {
   const fetchOverview = useServerFn(getGoldOverview);
   const query = useQuery({
-    queryKey: ["terminal-gold-overview", period],
-    queryFn: () => fetchOverview({ data: { period } }),
+    queryKey: ["terminal-gold-overview", "1d"],
+    queryFn: () => fetchOverview({ data: { period: "1d" } }),
     staleTime: 60_000,
-    refetchInterval: period === "1d" ? 60_000 : false,
+    refetchInterval: 60_000,
     refetchIntervalInBackground: false,
-    placeholderData: (prev) => prev,
   });
+  const [picked, setPicked] = useState<PeriodKey | null>(null);
+  const active = picked && PERIOD_TIMEFRAME[picked] === timeframeKey ? picked : PERIODS.find((p) => PERIOD_TIMEFRAME[p.key] === timeframeKey)?.key ?? null;
   const perf = query.data?.performance ?? null;
-  const [lastPerf, setLastPerf] = useState<typeof perf>(null);
-  if (perf && perf !== lastPerf) setLastPerf(perf);
-  const shownPerf = perf ?? lastPerf;
-
   return (
-    <div>
-      <AreaChart points={query.data?.period === period ? query.data.points : []} prevClose={query.data?.prevClose ?? null} period={period} loading={query.isFetching} error={query.data?.error ?? null} />
-      <div className="mt-10 grid grid-cols-5 gap-1 xl:grid-cols-10">
+    <div className="hidden shrink-0 bg-card px-3 pb-4 pt-2 font-sans lg:block">
+      <div className="grid grid-cols-5 gap-1 xl:grid-cols-10">
         {PERIODS.map((p) => {
-          const v = shownPerf?.[p.key] ?? null;
+          const v = perf?.[p.key] ?? null;
           return (
             <button
               key={p.key}
               type="button"
-              onClick={() => setPeriod(p.key)}
-              aria-pressed={period === p.key}
-              className={cn("px-2 py-2.5 text-center transition-colors", period === p.key ? "bg-gc-console-search" : "hover:bg-gc-console-search/60")}
+              onClick={() => {
+                setPicked(p.key);
+                onPick(p.key);
+              }}
+              aria-pressed={active === p.key}
+              className={cn(
+                "rounded-lg px-2 py-3 text-center transition-colors",
+                active === p.key ? "bg-gc-console-search dark:bg-accent" : "hover:bg-gc-console-search/60 dark:hover:bg-accent/60",
+              )}
             >
-              <span className="block text-[13px] font-normal text-gc-ink">{p.label}</span>
-              <span className={cn("block text-[13px] font-normal tabular-nums", pctTone(v))}>{pct(v)}</span>
+              <span className="block text-[14px] font-normal text-gc-ink">{p.label}</span>
+              <span className={cn("block text-[14px] font-normal tabular-nums", pctTone(v))}>{pct(v)}</span>
             </button>
           );
         })}
       </div>
-      <p className="mt-3 text-[11px] text-gc-ink-muted">Gold history from COMEX gold futures; the chart above uses the Terminal's live gold feed.</p>
     </div>
   );
 }
 
-function niceTicks(min: number, max: number, count = 6) {
-  const span = max - min || 1;
-  const raw = span / count;
-  const mag = 10 ** Math.floor(Math.log10(raw));
-  const step = [1, 2, 2.5, 5, 10].map((m) => m * mag).find((s) => s >= raw) ?? raw;
-  const out: number[] = [];
-  for (let v = Math.ceil(min / step) * step; v <= max; v += step) out.push(v);
-  return out;
-}
-
-function AreaChart({
-  points,
-  prevClose,
-  period,
-  loading,
-  error,
-}: {
-  points: Array<[number, number]>;
-  prevClose: number | null;
-  period: PeriodKey;
-  loading: boolean;
-  error: string | null;
-}) {
-  const W = 1000;
-  const H = 300;
-  const boxRef = useRef<HTMLDivElement>(null);
-  const [hover, setHover] = useState<number | null>(null);
-  const geo = useMemo(() => {
-    if (points.length < 2) return null;
-    const vals = points.map((p) => p[1]);
-    if (prevClose) vals.push(prevClose);
-    let min = Math.min(...vals);
-    let max = Math.max(...vals);
-    const pad = (max - min) * 0.08 || 1;
-    min -= pad;
-    max += pad;
-    const t0 = points[0][0];
-    const t1 = points[points.length - 1][0];
-    const x = (t: number) => ((t - t0) / (t1 - t0 || 1)) * W;
-    const y = (v: number) => H - ((v - min) / (max - min)) * H;
-    const line = points.map((p, i) => `${i ? "L" : "M"}${x(p[0]).toFixed(1)},${y(p[1]).toFixed(1)}`).join("");
-    const area = `${line}L${W},${H}L0,${H}Z`;
-    const ticks = niceTicks(min, max);
-    const xTicks = Array.from({ length: 7 }, (_, i) => t0 + ((t1 - t0) * i) / 6);
-    return { x, y, line, area, ticks, xTicks, min, max };
-  }, [points, prevClose]);
-
-  const last = points.length ? points[points.length - 1][1] : null;
-  const up = last != null && (prevClose ?? points[0]?.[1]) != null ? last >= (prevClose ?? points[0][1]) : true;
-  const toneText = up ? "text-gc-green" : "text-gc-red";
-  const hp = hover != null ? points[hover] : null;
-
+/** Body of the News, Technicals and Seasonals tabs. */
+export function TerminalTabBody({ tab, bars, timeframeKey }: { tab: MarketTab; bars: OhlcvBar[]; timeframeKey: string }) {
+  if (tab === "overview") return null;
   return (
-    <div className="flex gap-3">
-      <div
-        ref={boxRef}
-        className={cn("relative h-[300px] min-w-0 flex-1", toneText)}
-        onMouseMove={(e) => {
-          if (!geo || !boxRef.current) return;
-          const r = boxRef.current.getBoundingClientRect();
-          const f = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width));
-          setHover(Math.round(f * (points.length - 1)));
-        }}
-        onMouseLeave={() => setHover(null)}
-      >
-        {geo ? (
-          <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" className="absolute inset-0 h-full w-full" role="img" aria-label={`Gold price, ${period}`}>
-            <defs>
-              <linearGradient id="gold-area-fill" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="currentColor" stopOpacity="0.28" />
-                <stop offset="100%" stopColor="currentColor" stopOpacity="0" />
-              </linearGradient>
-            </defs>
-            <path d={geo.area} fill="url(#gold-area-fill)" />
-            <path d={geo.line} fill="none" stroke="currentColor" strokeWidth="1.8" vectorEffect="non-scaling-stroke" />
-            {prevClose && (
-              <line x1="0" x2={W} y1={geo.y(prevClose)} y2={geo.y(prevClose)} strokeDasharray="2 4" strokeWidth="1" vectorEffect="non-scaling-stroke" className="stroke-gc-ink-muted" />
-            )}
-            {hp && <line x1={geo.x(hp[0])} x2={geo.x(hp[0])} y1="0" y2={H} strokeWidth="1" vectorEffect="non-scaling-stroke" className="stroke-gc-ink-muted" strokeDasharray="3 3" />}
-          </svg>
-        ) : (
-          <div className="flex h-full items-center justify-center text-[13px] text-gc-ink-muted">{error ?? (loading ? "Loading gold history…" : "No data")}</div>
-        )}
-        {geo && hp && (
-          <div
-            className="pointer-events-none absolute top-2 z-10 -translate-x-1/2 whitespace-nowrap border border-gc-line bg-popover px-2 py-1 text-[11px] text-gc-ink shadow-sm"
-            style={{ left: `${(geo.x(hp[0]) / W) * 100}%` }}
-          >
-            <span className="tabular-nums">{num(hp[1])}</span>
-            <span className="ml-2 text-gc-ink-muted">{new Date(hp[0]).toLocaleString("en-US", { month: "short", day: "numeric", hour: period === "1d" || period === "5d" ? "2-digit" : undefined, minute: period === "1d" || period === "5d" ? "2-digit" : undefined, year: ["5y", "10y", "all"].includes(period) ? "numeric" : undefined, timeZone: "UTC" })}</span>
-          </div>
-        )}
-        {geo && (
-          <div className="pointer-events-none absolute -bottom-6 left-0 right-0 flex justify-between text-[11px] tabular-nums text-gc-ink-muted">
-            {geo.xTicks.map((t) => (
-              <span key={t}>{fmtAxisTime(t, period)}</span>
-            ))}
-          </div>
-        )}
-      </div>
-      <div className="relative h-[300px] w-[84px] shrink-0 text-[11px] tabular-nums text-gc-ink-muted">
-        {geo?.ticks.map((v) => (
-          <span key={v} className="absolute right-0 -translate-y-1/2" style={{ top: `${(geo.y(v) / H) * 100}%` }}>
-            {num(v, 0)}
-          </span>
-        ))}
-        {geo && prevClose && (last == null || Math.abs(geo.y(prevClose) - geo.y(last)) > 16) && (
-          <span className="absolute right-0 -translate-y-1/2 bg-gc-ink-muted px-1 text-background" style={{ top: `${(geo.y(prevClose) / H) * 100}%` }} title="Previous close">
-            {num(prevClose)}
-          </span>
-        )}
-        {geo && last != null && (
-          <span className={cn("absolute right-0 -translate-y-1/2 px-1 text-gc-on-blue", up ? "bg-gc-green" : "bg-gc-red")} style={{ top: `${(geo.y(last) / H) * 100}%` }}>
-            {num(last)}
-          </span>
-        )}
-      </div>
-    </div>
+    <section aria-label="Gold details" className="hidden min-h-[540px] shrink-0 bg-card px-6 py-6 font-sans lg:block">
+      {tab === "news" && <NewsTab />}
+      {tab === "technicals" && <TechnicalsTab bars={bars} timeframeKey={timeframeKey} />}
+      {tab === "seasonals" && <SeasonalsTab />}
+    </section>
   );
 }
 
