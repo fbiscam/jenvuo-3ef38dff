@@ -685,18 +685,30 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
   }
 
   const popClass = cn("font-sans subpixel-antialiased", theme === "dark" && "dark terminal-dark border-border bg-popover text-popover-foreground");
-  const railBtn = "relative flex h-9 w-[52px] items-center justify-center rounded-r-full text-gc-ink transition-colors hover:bg-gc-console-rail-active/60 data-[state=open]:bg-gc-console-rail-active data-[state=open]:text-gc-ink data-[state=open]:before:absolute data-[state=open]:before:inset-y-0 data-[state=open]:before:left-0 data-[state=open]:before:w-[3px] data-[state=open]:before:rounded-full data-[state=open]:before:bg-gc-ink dark:text-muted-foreground dark:hover:bg-accent dark:data-[state=open]:bg-accent dark:data-[state=open]:before:bg-foreground";
-
+  const railBtn = TERMINAL_RAIL_BTN;
+  const label = (text: string) => <span className="hidden truncate xl:inline">{text}</span>;
 
   const rail = (
-    <nav aria-label="Chart tools" className={cn("hidden w-[60px] shrink-0 flex-col items-start gap-1 pb-3 pt-1 md:flex", theme === "dark" ? "border-r border-border bg-background" : "bg-transparent")}>
+    <nav aria-label="Chart tools" className={cn("hidden w-[64px] shrink-0 flex-col items-center gap-1 overflow-y-auto px-1.5 pb-3 pt-3 [scrollbar-width:none] md:flex xl:w-[176px] xl:items-stretch xl:px-3", theme === "dark" ? "border-r border-border bg-background" : "bg-transparent")}>
       <button type="button" onClick={() => window.dispatchEvent(new Event("jenvu:open-mobile-nav"))} aria-label="Open menu" title="Menu" className={railBtn}>
-        <Menu className="h-[18px] w-[18px]" />
+        <Menu className="h-[19px] w-[19px] shrink-0" />
+        {label("Menu")}
       </button>
+      <Link to="/dashboard" aria-label="Home" title="Home" className={railBtn}>
+        <Home className="h-[19px] w-[19px] shrink-0" />
+        {label("Home")}
+      </Link>
+      <span aria-current="page" title="Terminal" className={cn(railBtn, "bg-gc-blue-soft font-medium text-gc-blue-deep hover:bg-gc-blue-soft")}>
+        <CandlestickChart className="h-[19px] w-[19px] shrink-0" />
+        {label("Terminal")}
+      </span>
+      <span className="my-1.5 h-px w-8 self-center bg-gc-line xl:w-full" aria-hidden="true" />
       <Popover>
         <PopoverTrigger asChild>
           <button type="button" aria-label="Timeframe" title="Timeframe" className={railBtn}>
-            <Clock3 className="h-[17px] w-[17px]" />
+            <Clock3 className="h-[19px] w-[19px] shrink-0" />
+            {label("Timeframe")}
+            <span className="ml-auto hidden font-mono text-[11px] text-gc-ink-muted xl:inline">{timeframe.label}</span>
           </button>
         </PopoverTrigger>
         <PopoverContent side="right" align="start" className={cn("w-56 p-1.5", popClass)}>
@@ -722,7 +734,8 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
       <Popover>
         <PopoverTrigger asChild>
           <button type="button" aria-label="Indicators" title="Indicators" className={railBtn}>
-            <Activity className="h-[17px] w-[17px]" />
+            <Activity className="h-[19px] w-[19px] shrink-0" />
+            {label("Indicators")}
           </button>
         </PopoverTrigger>
         <PopoverContent side="right" align="start" className={cn("max-h-[80vh] w-80 overflow-y-auto p-2", popClass)}>
@@ -732,7 +745,8 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
       <Popover>
         <PopoverTrigger asChild>
           <button type="button" aria-label="Jenvu SMC" title="Jenvu SMC" className={railBtn}>
-            <Layers className="h-[17px] w-[17px]" />
+            <Layers className="h-[19px] w-[19px] shrink-0" />
+            {label("Jenvu SMC")}
           </button>
         </PopoverTrigger>
         <PopoverContent side="right" align="start" className={cn("max-h-[80vh] w-80 overflow-y-auto p-2", popClass)}>
@@ -741,10 +755,10 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
       </Popover>
       <Popover>
         <PopoverTrigger asChild>
-          <button type="button" aria-label="Drawing tools" title="Drawing tools" className={cn(railBtn, "h-auto flex-col gap-0.5 py-1.5")}>
-            <PenLine className="h-[17px] w-[17px]" />
-            <span className="text-[9px] font-medium leading-none">Draw</span>
-            {tool !== "cursor" && <span className="absolute right-1.5 top-1 h-1.5 w-1.5 rounded-full bg-gc-blue" aria-hidden="true" />}
+          <button type="button" aria-label="Drawing tools" title="Drawing tools" className={railBtn}>
+            <PenLine className="h-[19px] w-[19px] shrink-0" />
+            {label("Draw")}
+            {tool !== "cursor" && <span className="absolute right-2 top-2 h-1.5 w-1.5 rounded-full bg-gc-blue" aria-hidden="true" />}
           </button>
         </PopoverTrigger>
         <PopoverContent side="right" align="start" className={cn("w-[236px] p-2", popClass)}>
@@ -752,17 +766,19 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
           <div className="flex flex-wrap items-center gap-0.5" role="toolbar" aria-label="Drawing tools">{renderTools(false)}</div>
         </PopoverContent>
       </Popover>
-      <span className="my-1 ml-3.5 h-px w-6 bg-gc-line" aria-hidden="true" />
       <button type="button" onClick={downloadSnapshot} aria-label="Download chart snapshot" title="Download chart snapshot" className={railBtn}>
-        <Camera className="h-[17px] w-[17px]" />
+        <Camera className="h-[19px] w-[19px] shrink-0" />
+        {label("Snapshot")}
       </button>
       <button type="button" onClick={() => chartRef.current?.fit()} aria-label="Reset chart view" title="Reset view" className={railBtn}>
-        <RotateCcw className="h-[17px] w-[17px]" />
+        <RotateCcw className="h-[19px] w-[19px] shrink-0" />
+        {label("Reset view")}
       </button>
-      <button type="button" onClick={() => void toggleFullscreen()} aria-label={fullscreen ? "Exit fullscreen chart" : "Fullscreen chart"} title={fullscreen ? "Exit fullscreen" : "Fullscreen chart"} className={railBtn}>
-        {fullscreen ? <Minimize2 className="h-[17px] w-[17px]" /> : <Maximize2 className="h-[17px] w-[17px]" />}
-      </button>
-      {railSlot && <div className="mt-auto flex flex-col items-start gap-1">{railSlot}</div>}
+      {railSlot && <div className="flex flex-col gap-1">{railSlot}</div>}
+      <Link to="/dashboard/profile" aria-label="Settings" title="Settings" className={cn(railBtn, "mt-auto")}>
+        <Settings className="h-[19px] w-[19px] shrink-0" />
+        {label("Settings")}
+      </Link>
     </nav>
   );
 
