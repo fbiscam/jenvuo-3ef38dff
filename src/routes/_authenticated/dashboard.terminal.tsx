@@ -318,6 +318,8 @@ function TerminalPage() {
   const [deskOpen, setDeskOpen] = useState(false);
   const [theme, setTheme] = useState<"light" | "dark">("light");
   const [watchlistOpen, setWatchlistOpen] = useState(true);
+  // Trading layout (order panel, positions, market watch, technicals, risk) — on by default.
+  const [panelsOpen, setPanelsOpen] = useState(true);
   // The watchlist fills the right side whenever the AI desk is closed.
   // Watchlist removed at user request; chart uses the full width.
   const showWatchlist = false as boolean;
@@ -534,10 +536,12 @@ function TerminalPage() {
         theme?: "light" | "dark";
         deskOpen?: boolean;
         watchlistOpen?: boolean;
+        tradingPanels?: boolean;
       } | null;
       const savedTimeframe = TIMEFRAMES.find((timeframe) => timeframe.key === settings?.timeframe);
       if (savedTimeframe) setTf(savedTimeframe);
       if (settings?.watchlistOpen === false) setWatchlistOpen(false);
+      if (settings?.tradingPanels === false) setPanelsOpen(false);
       if (settings?.theme === "dark") setTheme("dark");
       // The AI desk always starts closed so the chart opens exactly as left.
     } catch {
@@ -560,9 +564,9 @@ function TerminalPage() {
     if (!hydratedRef.current) return;
     window.localStorage.setItem(
       TERMINAL_SETTINGS_KEY,
-      JSON.stringify({ timeframe: tf.key, deskOpen, theme, watchlistOpen }),
+      JSON.stringify({ timeframe: tf.key, deskOpen, theme, watchlistOpen, tradingPanels: panelsOpen }),
     );
-  }, [tf.key, deskOpen, theme, watchlistOpen]);
+  }, [tf.key, deskOpen, theme, watchlistOpen, panelsOpen]);
 
   useEffect(() => {
     // Gold weekend (Fri 21:00 → Sun 22:00 UTC): the last candle has closed, so
@@ -700,8 +704,9 @@ function TerminalPage() {
               asset={asset}
               onAssetChange={changeAsset}
               theme={theme}
-              sidePanelOpen={watchlistOpen && !deskOpen}
-              onSidePanelOpenChange={setWatchlistOpen}
+              sidePanelOpen={panelsOpen}
+              rightPanelOpen={panelsOpen && !deskOpen}
+              onSidePanelOpenChange={setPanelsOpen}
               onTimeframeChange={(next) => {
                 const match = TIMEFRAMES.find((item) => item.key === next.key);
                 if (match) setTf(match);
@@ -743,19 +748,19 @@ function TerminalPage() {
                       <TerminalNewsPanel />
                     </PopoverContent>
                   </Popover>
-                  {!deskOpen && (
+                  {(
                     <button
                       type="button"
-                      onClick={() => setWatchlistOpen((v) => !v)}
-                      aria-label={watchlistOpen ? "Hide trading panel" : "Show trading panel"}
-                      aria-pressed={watchlistOpen}
-                      title={watchlistOpen ? "Hide trading panel" : "Show trading panel"}
+                      onClick={() => setPanelsOpen((v) => !v)}
+                      aria-label={panelsOpen ? "Hide trading panels" : "Show trading panels"}
+                      aria-pressed={panelsOpen}
+                      title={panelsOpen ? "Hide trading panels" : "Show trading panels"}
                       className={cn(
-                        "hidden h-9 w-[60px] items-center justify-center rounded-r-full text-muted-foreground hover:bg-gc-console-rail-active/60 hover:text-foreground dark:hover:bg-accent xl:flex",
-                        watchlistOpen && "bg-gc-console-rail-active text-foreground dark:bg-accent",
+                        "hidden h-9 w-[60px] items-center justify-center rounded-r-full text-muted-foreground hover:bg-gc-console-rail-active/60 hover:text-foreground dark:hover:bg-accent lg:flex",
+                        panelsOpen && "bg-gc-console-rail-active text-foreground dark:bg-accent",
                       )}
                     >
-                      {watchlistOpen ? <PanelRightClose className="h-[18px] w-[18px]" /> : <PanelRightOpen className="h-[18px] w-[18px]" />}
+                      {panelsOpen ? <PanelRightClose className="h-[18px] w-[18px]" /> : <PanelRightOpen className="h-[18px] w-[18px]" />}
                     </button>
                   )}
                   {!deskOpen && (

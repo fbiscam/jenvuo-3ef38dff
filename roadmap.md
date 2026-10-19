@@ -54,4 +54,4 @@
 - [x] Daily articles (1–2/day, CodeCraft) unpaused; new top-keyword topics added
 - [x] Google re-indexing: sitemap resubmitted; article jobs resubmit it each run
 - [x] Terminal: light/dark switch in the side rail; dark covers the whole page (top bar, prices, menu, rail, chart)
-- [x] Terminal: right trading panel (Buy/Sell, demo account with hide/show eye, Market watch, Technicals, Risk) with a show/hide button in the side bar
+- [x] Terminal trading layout like the mockup: left order + demo account (eye hides balance), positions table under the chart (Close Wins/Losses/All), right Market Watch, Technicals (15m/1H/4H/1D), Risk Management; one side-bar button shows/hides it
