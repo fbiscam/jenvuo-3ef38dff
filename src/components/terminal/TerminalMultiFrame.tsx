@@ -18,7 +18,6 @@ export type FrameRow = {
   pct: number;
   low: number;
   high: number;
-  volume: number;
   rating: TechnicalRating;
   closes: number[];
   candles: TerminalChartPayload["bars"];
@@ -38,7 +37,6 @@ function toRow(key: FrameKey, payload: TerminalChartPayload | undefined): FrameR
     pct: prev.close ? ((last.close - prev.close) / prev.close) * 100 : 0,
     low: Math.min(...recent.map((b) => b.low)),
     high: Math.max(...recent.map((b) => b.high)),
-    volume: last.volume,
     rating: technicals(bars, "").rating,
     closes: bars.slice(-30).map((b) => b.close),
     candles: bars.slice(-36),
@@ -67,7 +65,6 @@ export function useGoldFrames(enabled = true) {
 
 const fmt = (n: number) => n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const signed = (n: number) => `${n >= 0 ? "+" : ""}${n.toFixed(2)}`;
-const fmtVol = (v: number) => (v >= 1e6 ? `${(v / 1e6).toFixed(2)}M` : v >= 1e3 ? `${(v / 1e3).toFixed(1)}K` : v.toFixed(0));
 
 function Spark({ values, up }: { values: number[]; up: boolean }) {
   if (values.length < 2) return <span className="h-6 w-16" />;
@@ -154,7 +151,7 @@ export function GoldScreenerTable({ rows, loading, onPick }: { rows: Array<Frame
         <tr className="border-b border-gc-line">
           <th className={th}>Asset</th>
           <th className={th}>Last</th>
-          <th className={th}>Volume</th>
+          <th className={th}>Range (20)</th>
           <th className={th}>Low (20)</th>
           <th className={th}>High (20)</th>
           <th className={th}>Change</th>
@@ -174,7 +171,7 @@ export function GoldScreenerTable({ rows, loading, onPick }: { rows: Array<Frame
                 </span>
               </td>
               <td className={td}>{fmt(r.last)}</td>
-              <td className={td}>{fmtVol(r.volume)}</td>
+              <td className={td}>{fmt(r.high - r.low)}</td>
               <td className={cn(td, "text-gc-red")}>{fmt(r.low)}</td>
               <td className={cn(td, "text-gc-success")}>{fmt(r.high)}</td>
               <td className={cn(td, up ? "text-gc-success" : "text-gc-red")}>{signed(r.change)} ({signed(r.pct)}%)</td>

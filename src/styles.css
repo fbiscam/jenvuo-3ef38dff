@@ -1408,7 +1408,7 @@ html body .dash-dark main.bg-white { background-color: oklch(0.165 0 0) !importa
   color-scheme: dark;
 }
 .terminal-modern .terminal-glass {
-  background: rgba(29, 31, 34, 0.94);
+  background: #1d1f22;
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
 }
