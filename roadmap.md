@@ -66,3 +66,4 @@
 - [x] Settings page: sectioned layout with side menu; Security merged in; Preferences and Active sessions added
 - [x] Founding: dashboard shows "You are already in a program" / "Apply for founding program"; offer is 3 months + $250 credit everywhere
 - [x] Terminal on every plan: 14-day free trial, auto-lock after, unlocks on upgrade
+- [x] Billing: full transaction history with receipts; Founding plans renew on the 1st, 3-day notice, then Free until paid
