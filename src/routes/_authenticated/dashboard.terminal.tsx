@@ -11,7 +11,6 @@ import {
   Moon,
   Newspaper,
   PanelRightClose,
-  PanelRightOpen,
   Square,
   SquarePen,
   Sun,
@@ -28,8 +27,6 @@ import {
   type JenvuChartHandle,
 } from "@/components/terminal/JenvuChartWorkspace";
 import { TerminalWatchlist } from "@/components/terminal/TerminalWatchlist";
-import { TerminalNewsPanel } from "@/components/terminal/TerminalNewsPanel";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { transcribeVoiceMessage } from "@/lib/transcription.functions";
 import { cn } from "@/lib/utils";
 import { isMarketClosed } from "@/lib/signals/qualification";
@@ -316,6 +313,11 @@ function TerminalPage() {
     }
   };
   const [deskOpen, setDeskOpen] = useState(false);
+  useEffect(() => {
+    const open = () => setDeskOpen(true);
+    window.addEventListener("jenvu:terminal-ask-ai", open);
+    return () => window.removeEventListener("jenvu:terminal-ask-ai", open);
+  }, []);
   const [theme, setTheme] = useState<"light" | "dark">("dark");
   const [watchlistOpen, setWatchlistOpen] = useState(true);
   // Trading layout (order panel, positions, market watch, technicals, risk) — on by default.
@@ -542,7 +544,6 @@ function TerminalPage() {
       const savedTimeframe = TIMEFRAMES.find((timeframe) => timeframe.key === settings?.timeframe);
       if (savedTimeframe) setTf(savedTimeframe);
       if (settings?.watchlistOpen === false) setWatchlistOpen(false);
-      if (settings?.tradingPanels === false) setPanelsOpen(false);
       // Black dashboard is the default; only an explicit pick from the switch turns it light.
       if (settings?.look === "light") setTheme("light");
       // The AI desk always starts closed so the chart opens exactly as left.
@@ -733,65 +734,10 @@ function TerminalPage() {
                     {formatCountdown(secondsLeft)}
                     {marketClosed && <span className="hidden font-normal text-gc-ink-muted xl:inline">Market closed</span>}
                   </div>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <button
-                        type="button"
-                        aria-label="Gold news"
-                        title="Gold news"
-                        className="relative inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full px-2.5 text-[13px] font-medium text-gc-ink-muted transition-colors hover:bg-gc-console-search hover:text-gc-ink dark:text-muted-foreground dark:hover:bg-accent data-[state=open]:bg-gc-blue-soft data-[state=open]:text-gc-blue"
-                      >
-                        <Newspaper className="h-4 w-4" />
-                        <span className="hidden xl:inline">News</span>
-                        {nextGoldNews && (
-                          <span aria-hidden="true" className={cn("absolute right-2 top-1.5 h-1.5 w-1.5 rounded-full", nextGoldNews.impact === "High" ? "bg-destructive" : "bg-gc-yellow")} />
-                        )}
-                      </button>
-                    </PopoverTrigger>
-                    <PopoverContent side="bottom" align="end" className={cn("max-h-[80vh] w-80 overflow-y-auto p-2 font-sans", theme === "dark" && "dark terminal-dark border-border bg-popover text-popover-foreground")}>
-                      <TerminalNewsPanel />
-                    </PopoverContent>
-                  </Popover>
-                  {(
-                    <button
-                      type="button"
-                      onClick={() => setPanelsOpen((v) => !v)}
-                      aria-label={panelsOpen ? "Hide trading panels" : "Show trading panels"}
-                      aria-pressed={panelsOpen}
-                      title={panelsOpen ? "Hide trading panels" : "Show trading panels"}
-                      className={cn(
-                        "inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full px-2.5 text-[13px] font-medium text-gc-ink-muted transition-colors hover:bg-gc-console-search hover:text-gc-ink dark:text-muted-foreground dark:hover:bg-accent hidden w-8 justify-center px-0 lg:inline-flex",
-                        panelsOpen && "bg-gc-blue-soft text-gc-blue dark:bg-accent dark:text-foreground",
-                      )}
-                    >
-                      {panelsOpen ? <PanelRightClose className="h-4 w-4" /> : <PanelRightOpen className="h-4 w-4" />}
-                    </button>
-                  )}
-                  {!deskOpen && (
-                    <button
-                      type="button"
-                      onClick={() => setDeskOpen(true)}
-                      aria-label="Ask With AI"
-                      title="Ask With AI"
-                      className="ml-1 inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full border border-gc-line bg-background px-3 text-[13px] font-medium text-gc-ink transition-colors hover:bg-gc-console-search dark:bg-accent dark:text-foreground"
-                    >
-                      <img src="/favicon.png" alt="" className="h-4 w-4 rounded-sm object-contain" />
-                      Ask AI
-                    </button>
-                  )}
                 </>
               }
               rightSlot={
                 <>
-                  {!deskOpen && (
-                    <span className="md:hidden">
-                      <UpcomingGoldNews
-                        event={nextGoldNews}
-                        loading={newsQuery.isPending}
-                        failed={newsQuery.isError && !newsQuery.data}
-                      />
-                    </span>
-                  )}
                   <div
                     className="flex h-7 md:hidden items-center gap-1.5 rounded-full bg-muted px-2.5 font-mono text-xs font-semibold text-foreground"
                     title={marketClosed ? "Gold market is closed for the weekend" : `Time left on the current ${tf.label} candle`}
@@ -815,18 +761,6 @@ function TerminalPage() {
                     >
                       <ListChecks className="h-4 w-4" />
                       Watchlist
-                    </button>
-                  )}
-                  {!deskOpen && (
-                    <button
-                      type="button"
-                      onClick={() => setDeskOpen(true)}
-                      className="flex h-7 md:hidden items-center gap-1.5 rounded-full border border-gc-line bg-background px-3 text-xs font-medium text-foreground transition-colors hover:bg-muted dark:bg-accent dark:text-foreground"
-                      title="Ask With AI"
-                      aria-label="Ask With AI"
-                    >
-                      <img src="/favicon.png" alt="" className="h-4 w-4 shrink-0 rounded-sm object-contain" />
-                      <span className={cn(showWatchlist && "lg:hidden 2xl:inline")}>Ask With AI</span>
                     </button>
                   )}
                 </>
