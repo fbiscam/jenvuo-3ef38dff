@@ -46,7 +46,7 @@ export const Route = createFileRoute("/_authenticated/dashboard/pay")({
   component: PayPage,
 });
 
-const SANS = { fontFamily: '"Google Sans", "Product Sans", "Roboto", system-ui, sans-serif', fontWeight: 400 } as const;
+const SANS = { fontFamily: '"Google Sans Flex", "Google Sans", "Product Sans", "Roboto", system-ui, sans-serif', fontWeight: 400 } as const;
 
 function useCountdown(iso: string | null | undefined) {
   const [left, setLeft] = useState(0);

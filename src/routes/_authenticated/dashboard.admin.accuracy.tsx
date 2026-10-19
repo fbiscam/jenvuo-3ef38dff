@@ -63,7 +63,7 @@ function AccuracyPage() {
   }, []);
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-6 space-y-6" style={{ fontFamily: "'Google Sans','Urbanist',sans-serif" }}>
+    <div className="mx-auto max-w-6xl px-4 py-6 space-y-6" style={{ fontFamily: "'Google Sans Flex', 'Google Sans','Urbanist',sans-serif" }}>
       <div className="flex items-center justify-between">
         <div>
           <h1 className="pl-1 text-2xl font-semibold text-black">Signal Accuracy</h1>

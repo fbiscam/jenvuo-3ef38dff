@@ -3,7 +3,7 @@ import SiteFooter from "@/components/SiteFooter";
 import HeaderAuthButtons from "@/components/HeaderAuthButtons";
 import SiteHeader from "@/components/SiteHeader";
 
-const SANS = "font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif]";
+const SANS = "font-['Google_Sans_Flex','Google_Sans','Product_Sans','Poppins',system-ui,sans-serif]";
 
 /**
  * Shared public page layout in the Google Cloud "Why Google Cloud" style:

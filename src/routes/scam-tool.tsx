@@ -45,7 +45,7 @@ export const Route = createFileRoute("/scam-tool")({
 });
 
 const SANS =
-  "font-['Google_Sans','Product_Sans','Roboto',system-ui,sans-serif] font-normal normal-case tracking-normal";
+  "font-['Google_Sans_Flex','Google_Sans','Product_Sans','Roboto',system-ui,sans-serif] font-normal normal-case tracking-normal";
 
 type Kind = "broker" | "link" | "seller" | "payment";
 

@@ -1317,7 +1317,7 @@ function DashboardLayout() {
 
   return (
     <div
-      className={`flex ${pathname === "/dashboard/terminal" ? "h-dvh overflow-hidden jenvu-terminal-shell bg-gc-console-bar" : "min-h-screen jenvu-zoom-dashboard bg-gc-canvas"} ${dashDark ? "dark dash-dark" : ""} text-zinc-900 font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif] antialiased`}
+      className={`flex ${pathname === "/dashboard/terminal" ? "h-dvh overflow-hidden jenvu-terminal-shell bg-gc-console-bar" : "min-h-screen jenvu-zoom-dashboard bg-gc-canvas"} ${dashDark ? "dark dash-dark" : ""} text-zinc-900 font-['Google_Sans_Flex','Google_Sans','Product_Sans','Poppins',system-ui,sans-serif] antialiased`}
     >
       {/* Menu overlay */}
       {mobileNavOpen && !embedMode && (
@@ -1339,11 +1339,11 @@ function DashboardLayout() {
           } flex min-h-0 shrink-0 flex-col overflow-hidden bg-gc-canvas transition-[width,transform] duration-200 ease-out`}
           aria-hidden={drawerMode && !mobileNavOpen ? true : undefined}
           style={{
-            fontFamily: '"Google Sans", "Product Sans", "Roboto", system-ui, sans-serif',
+            fontFamily: '"Google Sans Flex", "Google Sans", "Product Sans", "Roboto", system-ui, sans-serif',
             fontWeight: 400,
           }}
         >
-          <style>{`.dashboard-sidebar-root, .dashboard-sidebar-root *:not(img):not(svg):not(.material-symbols-rounded) { font-family: "Google Sans", "Product Sans", "Roboto", system-ui, sans-serif !important; text-transform: none !important; letter-spacing: normal !important; } .dashboard-sidebar-root .material-symbols-rounded { font-family: "Material Symbols Rounded" !important; font-weight: normal !important; font-style: normal !important; text-transform: none !important; letter-spacing: normal !important; white-space: nowrap; word-wrap: normal; direction: ltr; -webkit-font-feature-settings: "liga"; -webkit-font-smoothing: antialiased; }`}</style>
+          <style>{`.dashboard-sidebar-root, .dashboard-sidebar-root *:not(img):not(svg):not(.material-symbols-rounded) { font-family: "Google Sans Flex", "Google Sans", "Product Sans", "Roboto", system-ui, sans-serif !important; text-transform: none !important; letter-spacing: normal !important; } .dashboard-sidebar-root .material-symbols-rounded { font-family: "Material Symbols Rounded" !important; font-weight: normal !important; font-style: normal !important; text-transform: none !important; letter-spacing: normal !important; white-space: nowrap; word-wrap: normal; direction: ltr; -webkit-font-feature-settings: "liga"; -webkit-font-smoothing: antialiased; }`}</style>
           {/* Brand */}
           <div
             className={`flex h-14 shrink-0 items-center gap-2.5 ${navCollapsed ? "justify-center px-2" : drawerMode ? "border-b border-gc-line px-3" : "px-4"}`}
@@ -1368,7 +1368,7 @@ function DashboardLayout() {
                 <span
                   className="dashboard-sidebar-brand truncate text-[22px] tracking-tight leading-none text-gc-ink"
                   style={{
-                    fontFamily: '"Google Sans", "Product Sans", "DM Sans", system-ui, sans-serif',
+                    fontFamily: '"Google Sans Flex", "Google Sans", "Product Sans", "DM Sans", system-ui, sans-serif',
                     fontWeight: 500,
                   }}
                 >
@@ -2507,7 +2507,7 @@ function ReferralSnapshot() {
     <div
       className="flex flex-1 flex-col gap-3 px-5 py-5"
       style={{
-        fontFamily: '"Google Sans", "Product Sans", "Roboto", system-ui, sans-serif',
+        fontFamily: '"Google Sans Flex", "Google Sans", "Product Sans", "Roboto", system-ui, sans-serif',
         fontWeight: 400,
       }}
     >
