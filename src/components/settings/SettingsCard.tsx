@@ -18,7 +18,7 @@ export function SettingsCard({
   return (
     <section id={id} className="scroll-mt-24 rounded-[24px] border border-gc-line bg-background">
       <div className="px-6 pt-6 sm:px-7">
-        <h2 className={cn("text-[20px] font-medium leading-tight", tone === "danger" ? "text-destructive" : "text-gc-ink")}>{title}</h2>
+        <p role="heading" aria-level={2} className={cn("text-[20px] font-medium leading-tight", tone === "danger" ? "text-destructive" : "text-gc-ink")}>{title}</p>
         {description && <p className="mt-1.5 max-w-[620px] text-[14px] leading-[1.55] text-gc-ink-muted">{description}</p>}
       </div>
       <div className="mt-4 divide-y divide-gc-line">{children}</div>
