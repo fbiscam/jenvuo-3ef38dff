@@ -44,7 +44,7 @@ const input =
 
 /** Left Terminal column: XAU/USD order form and the demo account (balance can be hidden). */
 export function TerminalOrderPanel({ trading, price }: { trading: DemoTrading; price: number | null }) {
-  const [hidden, toggleHidden] = useHideBalance();
+  const [hidden] = useHideBalance();
   const [side, setSide] = useState<DemoSide>("buy");
   const [type, setType] = useState<DemoOrderType>("market");
   const [lots, setLots] = useState("0.10");
