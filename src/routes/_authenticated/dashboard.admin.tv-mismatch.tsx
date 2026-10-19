@@ -93,7 +93,7 @@ function TvMismatchPage() {
       <div className="mx-auto max-w-5xl">
         <div className="mb-6 flex items-center justify-between">
           <div>
-            <h1 className="pl-1 text-[28px] font-normal leading-tight sm:text-[32px] text-gc-ink text-gc-ink">TradingView Mismatch Checker</h1>
+            <h1 className="pl-1 text-[28px] font-normal leading-tight sm:text-[32px] text-gc-ink">TradingView Mismatch Checker</h1>
             <p className="mt-1 text-sm text-gc-ink-muted">
               Compares our Yahoo-computed XAU/USD candles (used in signal chart images) against an
               independent live reference (gold-api spot × ECB FX) and reports drift.

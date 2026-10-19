@@ -182,7 +182,7 @@ function TuningPage() {
     <div className="mx-auto max-w-6xl space-y-6 p-4 md:p-8">
       <header className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="pl-1 text-[28px] font-normal leading-tight sm:text-[32px] text-gc-ink text-gc-ink">Signal Weight Tuning</h1>
+          <h1 className="pl-1 text-[28px] font-normal leading-tight sm:text-[32px] text-gc-ink">Signal Weight Tuning</h1>
           <p className="text-sm text-gc-ink-muted">Grid search on backtest history · Phase 1</p>
         </div>
         <div className="flex items-center gap-2">
