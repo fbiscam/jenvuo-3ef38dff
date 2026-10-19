@@ -140,7 +140,7 @@ export default function DashboardTopBar({
   const seeAll = () => { const t = q.trim(); if (!t) return; close(); void navigate({ to: "/search", search: { q: t } }); };
 
   return (
-    <header className={`sticky top-0 z-30 flex h-14 shrink-0 items-center gap-2 ${white ? "bg-gc-console-bar" : "bg-gc-canvas"} px-2 sm:gap-3 sm:px-3`}>
+    <header className={`sticky top-0 z-30 flex ${white ? "h-[52px]" : "h-14"} shrink-0 items-center gap-2 ${white ? "bg-gc-console-bar" : "bg-gc-canvas"} px-2 sm:gap-3 sm:px-3`}>
       <button
         type="button"
         onClick={onMenu}
@@ -154,7 +154,7 @@ export default function DashboardTopBar({
         <span className="text-[20px] font-medium tracking-tight text-gc-ink">Jenvu</span>
       </Link>
 
-      <div className="relative mx-auto hidden w-full max-w-[720px] sm:block">
+      <div className={`relative mx-auto hidden w-full ${white ? "max-w-[700px]" : "max-w-[720px]"} sm:block`}>
         {/* Google Cloud style: grey pill at rest, white box with a blue outline while typing. */}
         <form
           onSubmit={(e) => {
@@ -163,11 +163,13 @@ export default function DashboardTopBar({
           }}
           className={
             focused
-              ? "flex h-11 items-center gap-3 rounded-full border-2 border-gc-blue-deep bg-background px-3"
-              : `flex h-11 items-center gap-3 rounded-full border border-gc-line/70 ${white ? "bg-gc-console-search" : "bg-gc-notice"} px-3`
+              ? `flex ${white ? "h-9 rounded-lg" : "h-11 rounded-full"} items-center gap-3 border-2 border-gc-blue-deep bg-background px-3`
+              : white
+                ? "flex h-9 items-center gap-3 rounded-lg border border-gc-line/70 bg-gc-console-search pl-4 pr-2 shadow-sm transition hover:bg-gc-line/60"
+                : "flex h-11 items-center gap-3 rounded-full border border-gc-line/70 bg-gc-notice px-3"
           }
         >
-          <Search className="h-5 w-5 shrink-0 text-gc-ink" />
+          {!(white && !focused) && <Search className={`${white ? "h-4 w-4" : "h-5 w-5"} shrink-0 text-gc-ink`} />}
           <input
             ref={inputRef}
             value={q}
@@ -179,19 +181,25 @@ export default function DashboardTopBar({
             aria-label="Search"
             className="min-w-0 flex-1 bg-transparent text-[14px] text-gc-ink outline-none placeholder:text-gc-ink-muted"
           />
-                      <button type="submit" aria-label="Send" className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-gc-ink hover:bg-gc-notice">
+          {white && !focused ? (
+            <button type="submit" aria-label="Search" className="inline-flex h-7 shrink-0 items-center gap-1.5 rounded-md px-2 text-[13px] text-gc-ink hover:bg-gc-notice">
+              <Search className="h-4 w-4" /> Search
+            </button>
+          ) : (
+            <button type="submit" aria-label="Send" className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-gc-ink hover:bg-gc-notice">
               {loading ? <Loader2 className="h-4 w-4 animate-spin text-gc-ink-muted" /> : <SendHorizontal className="h-5 w-5" />}
             </button>
+          )}
         </form>
         {focused && !q.trim() && (
-          <div onMouseDown={(e) => e.preventDefault()} className="absolute left-0 right-0 top-12 rounded-2xl border border-gc-line bg-gc-panel shadow-lg">
+          <div onMouseDown={(e) => e.preventDefault()} className="absolute left-0 right-0 top-11 rounded-2xl border border-gc-line bg-gc-panel shadow-lg">
             <p className="px-4 py-4 text-[13px] italic text-gc-ink-muted">Do not enter any sensitive, confidential, or personal information.</p>
           </div>
         )}
         {focused && q.trim() && (
           <div
             onMouseDown={(e) => e.preventDefault()}
-            className="absolute left-0 right-0 top-12 max-h-[70vh] overflow-y-auto rounded-2xl border border-gc-line bg-background py-1 shadow-lg"
+            className="absolute left-0 right-0 top-11 max-h-[70vh] overflow-y-auto rounded-2xl border border-gc-line bg-background py-1 shadow-lg"
           >
             {answer && answer.q === q.trim() && (
               <div className="border-b border-gc-line bg-gc-panel px-4 py-3">
