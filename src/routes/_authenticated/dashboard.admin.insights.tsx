@@ -161,25 +161,25 @@ function AdminInsightsPage() {
     }
   };
 
-  if (loading) return <div className="p-8 text-sm text-gc-ink-muted">Loading…</div>;
+  if (loading) return <div className="p-8 text-sm text-zinc-500">Loading…</div>;
   if (!allowed) {
     return (
       <div className="p-8">
         <h1 className="text-lg font-semibold">Forbidden</h1>
-        <p className="text-sm text-gc-ink-muted mt-2">Admin access required.</p>
+        <p className="text-sm text-zinc-500 mt-2">Admin access required.</p>
       </div>
     );
   }
 
   const inputCls =
-    "w-full rounded-xl border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary";
+    "w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary";
   const btnCls =
-    "inline-flex items-center gap-2 rounded-xl border border-border px-3 py-2 text-xs font-medium hover:bg-muted disabled:opacity-50";
+    "inline-flex items-center gap-2 rounded-lg border border-border px-3 py-2 text-xs font-medium hover:bg-muted disabled:opacity-50";
 
   return (
     <div className="p-6 space-y-8">
       <header>
-        <h1 className="text-[28px] font-normal leading-tight sm:text-[32px] text-gc-ink">Insights Writing Desk</h1>
+        <h1 className="text-xl font-semibold">Insights Writing Desk</h1>
         <p className="text-sm text-muted-foreground mt-1">
           AI writing assistant powered by BluesMind, with an AI-generated cover image for every article.
         </p>
@@ -227,7 +227,7 @@ function AdminInsightsPage() {
         </div>
 
         {assistOut && (
-          <pre className="whitespace-pre-wrap rounded-xl border border-border bg-muted/40 p-3 text-xs">{assistOut}</pre>
+          <pre className="whitespace-pre-wrap rounded-lg border border-border bg-muted/40 p-3 text-xs">{assistOut}</pre>
         )}
 
         <div className="flex flex-wrap items-center gap-3">
@@ -240,7 +240,7 @@ function AdminInsightsPage() {
             Publish
           </button>
           {imageUrl && (
-            <img src={imageUrl} alt="Generated cover" className="h-16 w-28 rounded-xl object-cover" loading="lazy" />
+            <img src={imageUrl} alt="Generated cover" className="h-16 w-28 rounded-md object-cover" loading="lazy" />
           )}
         </div>
       </section>

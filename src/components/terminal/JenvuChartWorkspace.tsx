@@ -10,7 +10,6 @@ import {
   type ReactNode,
 } from "react";
 import { useQuery } from "@tanstack/react-query";
-import type { MarketSnapshot } from "@/components/terminal/TerminalProPanels";
 import { useServerFn } from "@tanstack/react-start";
 import {
   Activity,
@@ -41,10 +40,7 @@ import { getTerminalChart } from "@/lib/gold-analysis.functions";
 import { cn } from "@/lib/utils";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { XauUsdLogo } from "./XauUsdLogo";
-import { CandlestickChart, Clock3, Home, Menu, PanelLeftClose, PanelLeftOpen, Settings } from "lucide-react";
-import { Link } from "@tanstack/react-router";
-
-import { TERMINAL_RAIL_BTN } from "@/components/terminal/rail-style";
+import { Clock3, Menu, PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
@@ -64,7 +60,6 @@ import { buildLiveBars } from "@/lib/chart/live-candle";
 import { sessionBucketMs } from "@/lib/chart/session-buckets";
 import { useLivePriceStream } from "@/hooks/useLivePriceStream";
 import { isMarketClosed } from "@/lib/signals/qualification";
-import { performance as perfWindows, technicals as readTechnicals } from "@/lib/chart/market-stats";
 
 
 // Buyer/seller pressure is shown on every chart timeframe.
@@ -138,17 +133,6 @@ type Props = {
   theme?: "light" | "dark";
   /** Extra buttons placed at the bottom of the left side bar (e.g. Ask With AI). */
   railSlot?: ReactNode;
-  /** Cards shown above / below the chart card (desktop dashboard layout). */
-  headerSlot?: ReactNode;
-  footerSlot?: ReactNode;
-  /** Receives live price, 24h stats and fresh zones for the side panels. */
-  onMarketUpdate?: (market: MarketSnapshot) => void;
-  /** Chart canvas colours, independent of the surrounding layout theme. */
-  canvasTheme?: "light" | "dark";
-  /** Floating card drawn over the chart (desktop). */
-  overlaySlot?: ReactNode;
-  /** Extra class for every popover the chart opens (scoped theme tokens). */
-  popoverClassName?: string;
 };
 
 const TOOLS: Array<{ id: DrawingTool; icon: LucideIcon; label: string }> = [
@@ -232,7 +216,7 @@ function ToolButton({
 }
 
 export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function JenvuChartWorkspace(
-  { timeframes, timeframe, onTimeframeChange, rightSlot, mobileNewsRow, asset = "XAUUSD", onAssetChange, theme = "light", railSlot, headerSlot, footerSlot, onMarketUpdate, canvasTheme, overlaySlot, popoverClassName },
+  { timeframes, timeframe, onTimeframeChange, rightSlot, mobileNewsRow, asset = "XAUUSD", onAssetChange, theme = "light", railSlot },
   ref,
 ) {
   const fetchChart = useServerFn(getTerminalChart);
@@ -241,7 +225,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
   const [ready, setReady] = useState(false);
   // Phones only: drawing tools stay hidden until opened from the top bar.
   const [mobileToolsOpen, setMobileToolsOpen] = useState(false);
-  const [indicators, setIndicators] = useState<IndicatorId[]>(["volume", "rvol", "ema20", "ema50", "macd", "rsi"]);
+  const [indicators, setIndicators] = useState<IndicatorId[]>(["volume", "rvol", "ema20", "ema50"]);
   const [smcToggles, setSmcToggles] = useState<SmcToggles>(DEFAULT_SMC);
   const [drawings, setDrawings] = useState<Drawing[]>([]);
   const [drawingsVisible, setDrawingsVisible] = useState(true);
@@ -300,12 +284,6 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
       if (!readJson<boolean>(RVOL_INTRO_KEY, false)) {
         writeJson(RVOL_INTRO_KEY, true);
         if (!list.includes("rvol")) list.push("rvol");
-      }
-      // One-time: the trading-desk layout shows MACD and RSI panes under the chart.
-      const OSC_INTRO_KEY = "jenvu:terminal:osc-intro:v1";
-      if (!readJson<boolean>(OSC_INTRO_KEY, false)) {
-        writeJson(OSC_INTRO_KEY, true);
-        for (const id of ["macd", "rsi"] as const) if (!list.includes(id)) list.push(id);
       }
       setIndicators(list);
     }
@@ -502,38 +480,6 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
   const prevBar = hovered ? bars[bars.indexOf(hovered) - 1] : undefined;
   const change = hovered && prevBar ? ((hovered.close - prevBar.close) / prevBar.close) * 100 : null;
   const hoveredIdx = hovered ? bars.indexOf(hovered) : -1;
-  // Rolling 24h stats for the price header (gold-only feed, not a central exchange).
-  const dayStats = useMemo(() => {
-    const last = bars.at(-1);
-    if (!last) return null;
-    const win = bars.filter((b) => b.time >= last.time - 86400);
-    const open = win[0]?.open ?? last.open;
-    let high = -Infinity, low = Infinity;
-    for (const b of win) { if (b.high > high) high = b.high; if (b.low < low) low = b.low; }
-    const step = Math.max(1, Math.floor(win.length / 40));
-    const spark = win.filter((_, i) => i % step === 0).map((b) => b.close);
-    if (spark.at(-1) !== last.close) spark.push(last.close);
-    return { price: last.close, diff: last.close - open, pct: open ? ((last.close - open) / open) * 100 : 0, high, low, spark };
-  }, [bars]);
-
-  // Share live price, 24h stats and fresh supply/demand zones with the Terminal side panels.
-  useEffect(() => {
-    if (!onMarketUpdate || !dayStats) return;
-    const zones = (smc?.sdZones ?? []).map((z) => ({
-      type: z.type,
-      top: z.top,
-      bottom: z.bottom,
-      strength: Math.max(1, Math.min(5, Math.round(Math.min(3, z.displacementAtr)) + (z.fresh ? 1 : 0) + (z.extreme ? 1 : 0))),
-    }));
-    const trend = smc?.trend ?? "undecided";
-    onMarketUpdate({
-      ...dayStats,
-      trend,
-      zones,
-      perf: perfWindows(bars, stepSeconds),
-      technicals: readTechnicals(bars, trend),
-    });
-  }, [onMarketUpdate, dayStats, smc, bars, stepSeconds]);
 
   const legendIndicators = useMemo(
     () =>
@@ -659,7 +605,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
               </TooltipTrigger>
               <TooltipContent side={vertical ? "right" : "bottom"}>Drawing color</TooltipContent>
             </Tooltip>
-            <PopoverContent side={vertical ? "right" : "bottom"} className={cn("flex w-auto gap-1.5 p-2", theme === "dark" && "dark terminal-dark", popoverClassName)}>
+            <PopoverContent side={vertical ? "right" : "bottom"} className={cn("flex w-auto gap-1.5 p-2", theme === "dark" && "dark terminal-dark")}>
               {DRAWING_COLORS.map((c) => (
                 <button
                   type="button"
@@ -707,30 +653,16 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
     );
   }
 
-  const popClass = cn("font-sans subpixel-antialiased", theme === "dark" && "dark terminal-dark border-border bg-popover text-popover-foreground", popoverClassName);
-  const railBtn = TERMINAL_RAIL_BTN;
-  const label = (_text: string) => null;
+  const popClass = cn("font-sans subpixel-antialiased", theme === "dark" && "dark terminal-dark border-border bg-popover text-popover-foreground");
+  const railBtn = "relative flex h-9 w-[52px] items-center justify-center rounded-r-full text-gc-ink transition-colors hover:bg-gc-console-rail-active/60 data-[state=open]:bg-gc-console-rail-active data-[state=open]:text-gc-ink data-[state=open]:before:absolute data-[state=open]:before:inset-y-0 data-[state=open]:before:left-0 data-[state=open]:before:w-[3px] data-[state=open]:before:rounded-full data-[state=open]:before:bg-gc-ink dark:text-muted-foreground dark:hover:bg-accent dark:data-[state=open]:bg-accent dark:data-[state=open]:before:bg-foreground";
+
 
   const rail = (
-    <nav aria-label="Chart tools" className={cn("hidden w-[60px] shrink-0 flex-col items-center gap-1 overflow-y-auto px-1.5 pb-3 pt-3 [scrollbar-width:none] md:flex", theme === "dark" ? "border-r border-border bg-background" : "bg-transparent")}>
-      <button type="button" onClick={() => window.dispatchEvent(new Event("jenvu:open-mobile-nav"))} aria-label="Open menu" title="Menu" className={railBtn}>
-        <Menu className="h-[19px] w-[19px] shrink-0" />
-        {label("Menu")}
-      </button>
-      <Link to="/dashboard" aria-label="Home" title="Home" className={railBtn}>
-        <Home className="h-[19px] w-[19px] shrink-0" />
-        {label("Home")}
-      </Link>
-      <span aria-current="page" title="Terminal" className={cn(railBtn, "bg-gc-blue-soft font-medium text-gc-blue-deep hover:bg-gc-blue-soft")}>
-        <CandlestickChart className="h-[19px] w-[19px] shrink-0" />
-        {label("Terminal")}
-      </span>
-      <span className="my-1.5 h-px w-8 self-center bg-gc-line" aria-hidden="true" />
+    <nav aria-label="Chart tools" className={cn("hidden w-[60px] shrink-0 flex-col items-start gap-1 pb-3 pt-1 md:flex", theme === "dark" ? "border-r border-border bg-background" : "bg-transparent")}>
       <Popover>
         <PopoverTrigger asChild>
           <button type="button" aria-label="Timeframe" title="Timeframe" className={railBtn}>
-            <Clock3 className="h-[19px] w-[19px] shrink-0" />
-            {label("Timeframe")}
+            <Clock3 className="h-[17px] w-[17px]" />
           </button>
         </PopoverTrigger>
         <PopoverContent side="right" align="start" className={cn("w-56 p-1.5", popClass)}>
@@ -756,8 +688,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
       <Popover>
         <PopoverTrigger asChild>
           <button type="button" aria-label="Indicators" title="Indicators" className={railBtn}>
-            <Activity className="h-[19px] w-[19px] shrink-0" />
-            {label("Indicators")}
+            <Activity className="h-[17px] w-[17px]" />
           </button>
         </PopoverTrigger>
         <PopoverContent side="right" align="start" className={cn("max-h-[80vh] w-80 overflow-y-auto p-2", popClass)}>
@@ -767,8 +698,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
       <Popover>
         <PopoverTrigger asChild>
           <button type="button" aria-label="Jenvu SMC" title="Jenvu SMC" className={railBtn}>
-            <Layers className="h-[19px] w-[19px] shrink-0" />
-            {label("Jenvu SMC")}
+            <Layers className="h-[17px] w-[17px]" />
           </button>
         </PopoverTrigger>
         <PopoverContent side="right" align="start" className={cn("max-h-[80vh] w-80 overflow-y-auto p-2", popClass)}>
@@ -777,10 +707,10 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
       </Popover>
       <Popover>
         <PopoverTrigger asChild>
-          <button type="button" aria-label="Drawing tools" title="Drawing tools" className={railBtn}>
-            <PenLine className="h-[19px] w-[19px] shrink-0" />
-            {label("Draw")}
-            {tool !== "cursor" && <span className="absolute right-2 top-2 h-1.5 w-1.5 rounded-full bg-gc-blue" aria-hidden="true" />}
+          <button type="button" aria-label="Drawing tools" title="Drawing tools" className={cn(railBtn, "h-auto flex-col gap-0.5 py-1.5")}>
+            <PenLine className="h-[17px] w-[17px]" />
+            <span className="text-[9px] font-medium leading-none">Draw</span>
+            {tool !== "cursor" && <span className="absolute right-1.5 top-1 h-1.5 w-1.5 rounded-full bg-gc-blue" aria-hidden="true" />}
           </button>
         </PopoverTrigger>
         <PopoverContent side="right" align="start" className={cn("w-[236px] p-2", popClass)}>
@@ -788,28 +718,24 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
           <div className="flex flex-wrap items-center gap-0.5" role="toolbar" aria-label="Drawing tools">{renderTools(false)}</div>
         </PopoverContent>
       </Popover>
+      <span className="my-1 ml-3.5 h-px w-6 bg-gc-line" aria-hidden="true" />
       <button type="button" onClick={downloadSnapshot} aria-label="Download chart snapshot" title="Download chart snapshot" className={railBtn}>
-        <Camera className="h-[19px] w-[19px] shrink-0" />
-        {label("Snapshot")}
+        <Camera className="h-[17px] w-[17px]" />
       </button>
       <button type="button" onClick={() => chartRef.current?.fit()} aria-label="Reset chart view" title="Reset view" className={railBtn}>
-        <RotateCcw className="h-[19px] w-[19px] shrink-0" />
-        {label("Reset view")}
+        <RotateCcw className="h-[17px] w-[17px]" />
       </button>
-      {railSlot && <div className="flex flex-col gap-1">{railSlot}</div>}
-      <Link to="/dashboard/profile" aria-label="Settings" title="Settings" className={cn(railBtn, "mt-auto")}>
-        <Settings className="h-[19px] w-[19px] shrink-0" />
-        {label("Settings")}
-      </Link>
+      <button type="button" onClick={() => void toggleFullscreen()} aria-label={fullscreen ? "Exit fullscreen chart" : "Fullscreen chart"} title={fullscreen ? "Exit fullscreen" : "Fullscreen chart"} className={railBtn}>
+        {fullscreen ? <Minimize2 className="h-[17px] w-[17px]" /> : <Maximize2 className="h-[17px] w-[17px]" />}
+      </button>
+      {railSlot && <div className="mt-auto flex flex-col items-start gap-1">{railSlot}</div>}
     </nav>
   );
 
   return (
     <div ref={workspaceRef} className={cn("flex h-full min-h-0 w-full", theme === "dark" ? "bg-background" : "bg-gc-console-bar")}>
       {rail}
-      <div className={cn("flex min-h-0 min-w-0 flex-1 flex-col", (headerSlot || footerSlot) && !fullscreen && "md:gap-3 md:pb-3", theme !== "dark" && "md:mr-3")}>
-      {!fullscreen && headerSlot}
-      <div className={cn("flex min-h-0 min-w-0 flex-1 flex-col bg-background", theme !== "dark" && "overflow-hidden md:rounded-2xl md:border md:border-gc-line/70")}>
+      <div className={cn("flex min-h-0 min-w-0 flex-1 flex-col bg-background", theme !== "dark" && "overflow-hidden rounded-t-2xl")}>
       {/* Top bar — phones only: on laptops and tablets every control lives in the side bar. */}
       <div className="flex h-11 shrink-0 items-center gap-1 overflow-x-auto border-b border-border px-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:hidden">
 
@@ -868,7 +794,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
               )}
             </button>
           </PopoverTrigger>
-          <PopoverContent align="start" className={cn("w-80 p-2 font-sans subpixel-antialiased", theme === "dark" && "dark terminal-dark border-border bg-popover text-popover-foreground", popoverClassName)}>
+          <PopoverContent align="start" className={cn("w-80 p-2 font-sans subpixel-antialiased", theme === "dark" && "dark terminal-dark border-border bg-popover text-popover-foreground")}>
             {indicatorMenu}
           </PopoverContent>
         </Popover>
@@ -885,7 +811,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
               <span className="hidden 2xl:inline">Jenvu SMC</span>
             </button>
           </PopoverTrigger>
-          <PopoverContent align="start" className={cn("w-80 p-2 font-sans subpixel-antialiased", theme === "dark" && "dark terminal-dark border-border bg-popover text-popover-foreground", popoverClassName)}>
+          <PopoverContent align="start" className={cn("w-80 p-2 font-sans subpixel-antialiased", theme === "dark" && "dark terminal-dark border-border bg-popover text-popover-foreground")}>
             {smcMenu}
           </PopoverContent>
         </Popover>
@@ -980,69 +906,6 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
         </nav>
 
         <div className="flex min-h-0 min-w-0 flex-1 flex-col">
-          {theme !== "dark" && (
-            <div className="hidden shrink-0 items-center gap-6 border-b border-gc-line/70 px-5 py-3 md:flex">
-              <div className="flex min-w-0 items-center gap-3">
-                <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-gc-yellow-soft text-[13px] font-semibold text-gc-ink">{asset === "XAUUSD" ? "Au" : "₿"}</span>
-                <div className="min-w-0 leading-tight">
-                  <p className="text-[18px] font-medium text-gc-ink">{asset === "XAUUSD" ? "XAU/USD" : "BTC/USD"}</p>
-                  <p className="truncate text-[12px] text-gc-ink-muted">{asset === "XAUUSD" ? "Gold spot / U.S. dollar" : "Bitcoin / U.S. dollar"}</p>
-                </div>
-              </div>
-              <div className="hidden items-center gap-0.5 lg:flex" role="group" aria-label="Timeframe">
-                {timeframes.map((item) => (
-                  <button
-                    key={item.key}
-                    type="button"
-                    onClick={() => onTimeframeChange(item)}
-                    aria-pressed={item.key === timeframe.key}
-                    className={cn(
-                      "h-8 rounded-lg px-3 text-[13px] font-medium text-gc-ink-muted transition hover:bg-gc-panel hover:text-gc-ink",
-                      item.key === timeframe.key && "bg-gc-blue-soft text-gc-blue-deep hover:bg-gc-blue-soft",
-                    )}
-                  >
-                    {item.label}
-                  </button>
-                ))}
-              </div>
-              {dayStats && (
-                <div className="ml-auto text-right leading-tight lg:hidden">
-                  <p className="text-[18px] font-medium tabular-nums text-gc-ink">{dayStats.price.toFixed(2)}</p>
-                  <p className={cn("text-[12px] font-medium tabular-nums", dayStats.diff >= 0 ? "text-gc-success" : "text-gc-red")}>
-                    {dayStats.diff >= 0 ? "+" : ""}{dayStats.pct.toFixed(2)}% · 24h
-                  </p>
-                </div>
-              )}
-              <div className="flex items-center gap-1 lg:ml-auto">
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <button type="button" className="hidden h-8 items-center gap-2 rounded-lg px-3 text-[14px] text-gc-ink hover:bg-gc-panel data-[state=open]:bg-gc-blue-soft data-[state=open]:text-gc-blue-deep lg:flex">
-                      <Activity className="h-4 w-4" /> Indicators
-                    </button>
-                  </PopoverTrigger>
-                  <PopoverContent align="end" className={cn("max-h-[70vh] w-80 overflow-y-auto p-2", popClass)}>
-                    {indicatorMenu}
-                  </PopoverContent>
-                </Popover>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <button type="button" className="hidden h-8 items-center gap-2 rounded-lg px-3 text-[14px] text-gc-ink hover:bg-gc-panel data-[state=open]:bg-gc-blue-soft data-[state=open]:text-gc-blue-deep lg:flex">
-                      <Layers className="h-4 w-4" /> SMC
-                    </button>
-                  </PopoverTrigger>
-                  <PopoverContent align="end" className={cn("max-h-[70vh] w-80 overflow-y-auto p-2", popClass)}>
-                    {smcMenu}
-                  </PopoverContent>
-                </Popover>
-                <button type="button" onClick={downloadSnapshot} aria-label="Download chart snapshot" title="Download chart snapshot" className="grid h-8 w-8 place-items-center rounded-lg text-gc-ink-muted hover:bg-gc-panel hover:text-gc-ink">
-                  <Camera className="h-4 w-4" />
-                </button>
-                <button type="button" onClick={() => void toggleFullscreen()} aria-label={fullscreen ? "Exit fullscreen chart" : "Fullscreen chart"} title={fullscreen ? "Exit fullscreen" : "Fullscreen chart"} className="grid h-8 w-8 place-items-center rounded-lg text-gc-ink-muted hover:bg-gc-panel hover:text-gc-ink">
-                  {fullscreen ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
-                </button>
-              </div>
-            </div>
-          )}
           <div className="relative min-h-0 flex-1">
             <MemoChart
               key={`${asset}:${timeframe.key}`}
@@ -1069,14 +932,8 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
               onToolDone={onToolDone}
               onHoverBar={onHoverBar}
               resetKey={`${asset}:${timeframe.key}:${payload ? "ready" : "loading"}`}
-              theme={canvasTheme ?? theme}
+              theme={theme}
             />
-
-            {overlaySlot && !fullscreen && (
-              <div className="pointer-events-none absolute right-[76px] top-2 z-[5] hidden lg:block">
-                <div className="pointer-events-auto">{overlaySlot}</div>
-              </div>
-            )}
 
             {/* Legend */}
             <div
@@ -1219,8 +1076,6 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
           )}
         </div>
       </div>
-    </div>
-      {footerSlot}
     </div>
     </div>
   );

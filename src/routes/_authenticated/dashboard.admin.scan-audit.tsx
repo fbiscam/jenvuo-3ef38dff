@@ -68,7 +68,7 @@ function ScanAuditPage() {
     <div className="p-4 sm:p-6 space-y-6 max-w-7xl mx-auto">
       <header className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="pl-1 text-[28px] font-normal leading-tight sm:text-[32px] text-gc-ink flex items-center gap-2">
+          <h1 className="pl-1 text-xl font-semibold flex items-center gap-2">
             <ShieldCheck className="h-5 w-5" /> Scan Charge Audit
           </h1>
           <p className="text-xs text-muted-foreground mt-1">
@@ -77,14 +77,14 @@ function ScanAuditPage() {
         </div>
         <button
           onClick={load}
-          className="text-xs inline-flex items-center gap-1.5 border rounded-xl px-3 py-1.5 hover:bg-muted"
+          className="text-xs inline-flex items-center gap-1.5 border rounded-md px-3 py-1.5 hover:bg-muted"
         >
           <RefreshCw className="h-3.5 w-3.5" /> Refresh
         </button>
       </header>
 
       {/* Mismatches */}
-      <section className="border rounded-xl p-4 bg-card">
+      <section className="border rounded-lg p-4 bg-card">
         <h2 className="pl-1 text-sm font-semibold flex items-center gap-2 mb-3">
           <AlertTriangle className="h-4 w-4 text-amber-500" />
           Mismatched scans ({mismatches.length})
@@ -138,7 +138,7 @@ function ScanAuditPage() {
         <select
           value={reasonFilter}
           onChange={(e) => setReasonFilter(e.target.value)}
-          className="text-xs border rounded-xl px-2 py-1.5 bg-background"
+          className="text-xs border rounded-md px-2 py-1.5 bg-background"
         >
           <option value="">All reasons</option>
           <option value="signal">signal</option>
@@ -150,11 +150,11 @@ function ScanAuditPage() {
           value={scanFilter}
           onChange={(e) => setScanFilter(e.target.value)}
           placeholder="Filter by scan_id"
-          className="text-xs border rounded-xl px-2 py-1.5 bg-background font-mono w-64"
+          className="text-xs border rounded-md px-2 py-1.5 bg-background font-mono w-64"
         />
         <button
           onClick={load}
-          className="text-xs border rounded-xl px-3 py-1.5 hover:bg-muted"
+          className="text-xs border rounded-md px-3 py-1.5 hover:bg-muted"
         >
           Apply
         </button>
@@ -169,7 +169,7 @@ function ScanAuditPage() {
       </section>
 
       {/* Full audit log */}
-      <section className="border rounded-xl bg-card">
+      <section className="border rounded-lg bg-card">
         <div className="p-3 text-sm font-semibold border-b">
           Charge log ({rows.length})
         </div>

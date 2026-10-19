@@ -36,6 +36,8 @@ const TILES: Tile[] = [
 
 ];
 
+const TONES = ["bg-gc-sky text-gc-blue-deep", "bg-gc-green-soft text-gc-success", "bg-gc-yellow-soft text-gc-ink", "bg-gc-red-soft text-gc-red"];
+
 function OpsHub() {
   const router = useRouter();
   const lock = useServerFn(opsLock);
@@ -70,79 +72,56 @@ function OpsHub() {
   const SANS = "font-['Google_Sans_Flex','Google_Sans','Product_Sans','Poppins',system-ui,sans-serif]";
 
   if (!ready) {
-    return <div className="min-h-dvh w-full bg-[#FAFAFA]" />;
+    return <div className="min-h-dvh w-full bg-gc-canvas" />;
   }
 
   return (
-    <div className={`min-h-dvh w-full bg-[#FAFAFA] text-zinc-900 ${SANS} antialiased`}>
-      <main className="mx-auto max-w-7xl px-5 py-8 sm:px-6 sm:py-10">
-        <div className="rounded-[24px] border border-zinc-200/70 bg-white p-5 shadow-[0_1px_2px_rgba(16,24,40,0.04),0_12px_28px_-12px_rgba(16,24,40,0.10),0_32px_64px_-24px_rgba(16,24,40,0.08)] ring-1 ring-white/60 sm:p-6">
-          <div className="flex items-center gap-1.5">
-            <span className="h-2.5 w-2.5 rounded-full bg-zinc-200" />
-            <span className="h-2.5 w-2.5 rounded-full bg-zinc-200" />
-            <span className="h-2.5 w-2.5 rounded-full bg-zinc-200" />
-            <span className={`ml-3 ${MONO} text-[10px] uppercase tracking-[0.22em] text-zinc-500`}>
-              ops · restricted
-            </span>
-            <span className={`ml-auto flex items-center gap-1.5 ${MONO} text-[10px] uppercase tracking-[0.22em] text-emerald-600`}>
-              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
-              live
-            </span>
-          </div>
-
-          <div className="mt-5 flex items-end justify-between gap-4">
-            <div className="flex items-center gap-2.5">
-              <img src="/favicon.png" alt="Jenvu" className="h-8 w-8 rounded-md object-contain" />
-              <div>
-                <span className="block text-[22px] font-medium leading-none text-zinc-700">Jenvu</span>
-                <span className={`${MONO} mt-1 block text-[10px] uppercase tracking-[0.22em] text-zinc-500`}>
-                  ops console
-                </span>
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              {active && (
-                <button onClick={() => setActive(null)} className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-3.5 py-2 text-sm text-zinc-700 transition hover:border-zinc-300 hover:bg-zinc-50">
-                  Back
-                </button>
-              )}
-              <button onClick={onLock} className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-3.5 py-2 text-sm text-zinc-700 transition hover:border-zinc-300 hover:bg-zinc-50">
-                Lock
-              </button>
-            </div>
-          </div>
-
-          <h1 className="mt-5 text-2xl font-semibold tracking-tight text-zinc-900">{active ? active.title : "Operations Hub"}</h1>
-          <p className="mt-2 text-sm text-zinc-600">{active ? active.desc : "Internal tools · authorized personnel only."}</p>
-        </div>
+    <div className={`min-h-dvh w-full bg-gc-canvas text-gc-ink ${SANS} antialiased`}>
+      <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-gc-line bg-background px-4 sm:px-6">
+        <img src="/favicon.png" alt="Jenvu" className="h-6 w-6 rounded-md object-contain" />
+        <span className="text-[20px] font-medium tracking-tight text-gc-ink">Jenvu</span>
+        <span className="rounded-full bg-gc-sky px-2.5 py-0.5 text-[12px] font-medium text-gc-blue-deep">Ops console</span>
+        <span className="ml-auto hidden items-center gap-1.5 text-[12px] text-gc-success sm:flex">
+          <span className="h-2 w-2 animate-pulse rounded-full bg-gc-green" /> Live
+        </span>
+        <button onClick={onLock} className="inline-flex h-9 items-center gap-1.5 rounded-full border border-gc-line bg-background px-4 text-[13px] font-medium text-gc-blue-deep transition hover:bg-gc-sky">
+          Lock
+        </button>
+      </header>
+      <main className="mx-auto max-w-6xl px-5 py-10 sm:px-6">
+        <p className="text-[13px] font-medium text-gc-ink-muted">Restricted · authorized team only</p>
+        <h1 className="mt-2 text-[32px] font-normal leading-tight text-gc-ink sm:text-[40px]">Operations hub</h1>
+        <p className="mt-2 max-w-2xl text-[15px] text-gc-ink-muted">Every internal tool in one place. Pick a section to open it full screen.</p>
 
         {!active ? (
-          <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {TILES.map((t) => (
-              <button
-                key={t.key}
-                type="button"
-                onClick={() => setActive(t)}
-                className="group flex flex-col rounded-[22px] border border-zinc-200/70 bg-white p-5 text-left shadow-[0_1px_2px_rgba(16,24,40,0.04),0_10px_24px_-12px_rgba(16,24,40,0.10)] ring-1 ring-white/60 transition-all duration-300 hover:-translate-y-1 hover:border-zinc-300/70 hover:shadow-[0_2px_4px_rgba(16,24,40,0.05),0_18px_40px_-16px_rgba(16,24,40,0.14),0_32px_64px_-24px_rgba(16,24,40,0.10)]"
-              >
-                <div className="flex w-full items-center justify-between gap-3">
-                  <div className="text-[15px] font-semibold text-zinc-900">{t.title}</div>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 text-zinc-400 transition group-hover:translate-x-0.5 group-hover:text-zinc-900">
-                    <line x1="5" y1="12" x2="19" y2="12" />
-                    <polyline points="12 5 19 12 12 19" />
-                  </svg>
-                </div>
-                <div className="mt-1 text-[13px] text-zinc-500">{t.desc}</div>
-              </button>
-            ))}
+          <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {TILES.map((t, i) => {
+              const tone = TONES[i % TONES.length];
+              return (
+                <button
+                  key={t.key}
+                  type="button"
+                  onClick={() => setActive(t)}
+                  className="group flex flex-col rounded-2xl border border-gc-line bg-background p-5 text-left transition-all duration-300 hover:-translate-y-0.5 hover:border-gc-blue-soft hover:shadow-lg"
+                >
+                  <span className={`grid h-10 w-10 place-items-center rounded-full text-[15px] font-medium ${tone}`}>{t.title.charAt(0)}</span>
+                  <div className="mt-4 text-[16px] font-medium text-gc-ink">{t.title}</div>
+                  <div className="mt-1 text-[13px] text-gc-ink-muted">{t.desc}</div>
+                  <span className="mt-4 inline-flex items-center gap-1 text-[13px] font-medium text-gc-blue-deep">
+                    Open
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="transition group-hover:translate-x-0.5"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>
+                  </span>
+                </button>
+              );
+            })}
           </div>
         ) : (
           /* Fullscreen embedded section */
-          <div className="fixed inset-0 z-50 flex flex-col bg-white">
-            <div className="flex items-center gap-3 border-b border-zinc-200 bg-white px-4 py-2.5">
+          <div className="fixed inset-0 z-50 flex flex-col bg-background">
+            <div className="flex items-center gap-3 border-b border-gc-line bg-background px-4 py-2.5">
               <button
                 onClick={() => setActive(null)}
-                className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-sm text-zinc-700 transition hover:border-zinc-300 hover:bg-zinc-50"
+                className="inline-flex items-center gap-1.5 rounded-full border border-gc-line bg-background px-3 py-1.5 text-sm text-gc-blue-deep transition hover:bg-gc-sky"
               >
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <polyline points="15 18 9 12 15 6" />
@@ -151,21 +130,21 @@ function OpsHub() {
               </button>
               <img src="/favicon.png" alt="Jenvu" className="h-6 w-6 rounded-md object-contain" />
               <div className="flex flex-col leading-tight">
-                <span className="text-[13px] font-semibold text-zinc-900">{active.title}</span>
-                <span className={`${MONO} text-[9px] uppercase tracking-[0.22em] text-zinc-400`}>{active.to}</span>
+                <span className="text-[13px] font-semibold text-gc-ink">{active.title}</span>
+                <span className={`${MONO} text-[9px] uppercase tracking-[0.22em] text-gc-ink-muted`}>{active.to}</span>
               </div>
               <div className="ml-auto flex items-center gap-2">
                 <a
                   href={active.to}
                   target="_blank"
                   rel="noreferrer"
-                  className={`${MONO} text-[10px] uppercase tracking-[0.22em] text-zinc-500 hover:text-zinc-900`}
+                  className={`${MONO} text-[10px] uppercase tracking-[0.22em] text-gc-ink-muted hover:text-gc-ink`}
                 >
                   open in new tab ↗
                 </a>
                 <button
                   onClick={onLock}
-                  className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-sm text-zinc-700 transition hover:border-zinc-300 hover:bg-zinc-50"
+                  className="inline-flex items-center gap-1.5 rounded-full border border-gc-line bg-background px-3 py-1.5 text-sm text-gc-blue-deep transition hover:bg-gc-sky"
                 >
                   Lock
                 </button>
@@ -179,16 +158,11 @@ function OpsHub() {
                   : ""
               }`}
               title={active.title}
-              className="h-full w-full flex-1 bg-white"
+              className="h-full w-full flex-1 bg-background"
             />
           </div>
         )}
 
-        {!active && (
-          <p className={`${MONO} mt-8 text-center text-[10px] uppercase tracking-[0.22em] text-zinc-400`}>
-            Sections open fullscreen inside the hub
-          </p>
-        )}
       </main>
     </div>
   );

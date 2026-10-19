@@ -47,14 +47,14 @@ export const CHART_THEMES: Record<ChartTheme, { bg: string; text: string; grid: 
     insideBar: "#38bdf8",
     insideBarCandle: "#eab308",
   },
-  // Obsidian terminal palette (matches the dark Terminal cards)
+  // TradingView-style dark palette
   dark: {
-    bg: "#17181b",
-    text: "#c4c7cc",
-    grid: "#202226",
-    border: "#26282c",
-    up: "#34c759",
-    down: "#ff3b30",
+    bg: "#0f0f0f",
+    text: "#f2f2f2",
+    grid: "#1f1f1f",
+    border: "#2e2e2e",
+    up: "#089981",
+    down: "#f23645",
     insideBar: "#38bdf8",
     insideBarCandle: "#eab308",
   },

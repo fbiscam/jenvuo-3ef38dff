@@ -17,7 +17,6 @@ import {
   Timer,
   Trash2,
   X,
-  Sparkles,
 } from "lucide-react";
 import type { FileUIPart } from "ai";
 import { analyzeGold, type GoldSignal } from "@/lib/gold-analysis.functions";
@@ -28,20 +27,7 @@ import {
   type JenvuChartHandle,
 } from "@/components/terminal/JenvuChartWorkspace";
 import { TerminalWatchlist } from "@/components/terminal/TerminalWatchlist";
-import { TERMINAL_RAIL_BTN } from "@/components/terminal/rail-style";
 import { TerminalNewsPanel } from "@/components/terminal/TerminalNewsPanel";
-import { GoldScreenerTable, GoldWatchlistCard, MiniCandles, useGoldFrames, type FrameKey } from "@/components/terminal/TerminalMultiFrame";
-import {
-  AiInsightCard,
-  AssetDetailCard,
-  LiquidityZonesCard,
-  MarketOverlayCard,
-  MarketSessionsCard,
-  PerformanceCard,
-  TechnicalsCard,
-  TerminalBottomTabs,
-  type MarketSnapshot,
-} from "@/components/terminal/TerminalProPanels";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { transcribeVoiceMessage } from "@/lib/transcription.functions";
 import { cn } from "@/lib/utils";
@@ -329,13 +315,6 @@ function TerminalPage() {
     }
   };
   const [deskOpen, setDeskOpen] = useState(false);
-  const [market, setMarket] = useState<MarketSnapshot | null>(null);
-  const [summaryOpen, setSummaryOpen] = useState(true);
-  const frames = useGoldFrames();
-  const pickFrame = (key: FrameKey) => {
-    const match = TIMEFRAMES.find((item) => item.key === key);
-    if (match) setTf(match);
-  };
   const [theme, setTheme] = useState<"light" | "dark">("light");
   const [watchlistOpen, setWatchlistOpen] = useState(true);
   // The watchlist fills the right side whenever the AI desk is closed.
@@ -700,10 +679,10 @@ function TerminalPage() {
       <div
         className={cn(
           "flex h-full min-h-0 w-full flex-col overflow-hidden text-foreground",
-          "terminal-modern bg-gc-console-bar",
+          theme === "dark" ? "dark terminal-dark bg-background" : "bg-background",
         )}
       >
-        <div className="flex min-h-0 flex-1 flex-col gap-3 lg:flex-row lg:pr-3 lg:pt-3">
+        <div className={cn("flex min-h-0 flex-1 flex-col lg:flex-row", theme !== "dark" && "gap-2 pr-2")}>
           {/* Chart */}
           <section
             aria-label="XAU/USD chart"
@@ -719,23 +698,6 @@ function TerminalPage() {
               asset={asset}
               onAssetChange={changeAsset}
               theme={theme}
-              canvasTheme="dark"
-              popoverClassName="terminal-modern"
-              onMarketUpdate={setMarket}
-              overlaySlot={
-                summaryOpen && !deskOpen ? (
-                  <MarketOverlayCard market={market} onClose={() => setSummaryOpen(false)}>
-                    <MiniCandles row={frames.rows[tf.key === "4h" ? 5 : 4]} />
-                  </MarketOverlayCard>
-                ) : null
-              }
-              footerSlot={
-                <TerminalBottomTabs
-                  news={relevantNews.slice(0, 5)}
-                  onAsk={() => setDeskOpen(true)}
-                  screener={<GoldScreenerTable rows={frames.rows} loading={frames.loading} onPick={pickFrame} />}
-                />
-              }
               onTimeframeChange={(next) => {
                 const match = TIMEFRAMES.find((item) => item.key === next.key);
                 if (match) setTf(match);
@@ -743,35 +705,42 @@ function TerminalPage() {
               railSlot={
                 <>
                   <div
-                    className={cn(TERMINAL_RAIL_BTN, "h-auto w-11 flex-col gap-0.5 py-1.5 hover:bg-transparent")}
+                    className="flex w-[52px] flex-col items-center gap-0.5 py-1 font-mono text-[10px] font-semibold leading-none text-gc-ink"
                     title={marketClosed ? "Gold market is closed for the weekend" : `Time left on the current ${tf.label} candle`}
                     aria-label={marketClosed ? "Market closed" : `Current ${tf.label} candle closes in ${formatCountdown(secondsLeft)}`}
                   >
-                    <Timer className="h-[17px] w-[17px] shrink-0" />
-                    <span className="font-mono text-[9px] font-semibold tabular-nums text-gc-ink">{formatCountdown(secondsLeft)}</span>
+                    <Timer className="h-[17px] w-[17px] text-gc-ink" />
+                    {formatCountdown(secondsLeft)}
                   </div>
                   <Popover>
                     <PopoverTrigger asChild>
-                      <button type="button" aria-label="Gold news" title="Gold news" className={TERMINAL_RAIL_BTN}>
-                        <Newspaper className="h-[19px] w-[19px] shrink-0" />
+                      <button
+                        type="button"
+                        aria-label="Gold news"
+                        title="Gold news"
+                        className="relative flex h-9 w-[52px] items-center justify-center rounded-r-full text-gc-ink hover:bg-gc-console-rail-active/60 data-[state=open]:bg-gc-console-rail-active data-[state=open]:text-foreground dark:hover:bg-accent"
+                      >
+                        <Newspaper className="h-[17px] w-[17px]" />
                         {nextGoldNews && (
-                          <span aria-hidden="true" className={cn("absolute right-2 top-2 h-1.5 w-1.5 rounded-full", nextGoldNews.impact === "High" ? "bg-destructive" : "bg-gc-yellow")} />
+                          <span aria-hidden="true" className={cn("absolute right-2 top-1.5 h-1.5 w-1.5 rounded-full", nextGoldNews.impact === "High" ? "bg-destructive" : "bg-gc-yellow")} />
                         )}
                       </button>
                     </PopoverTrigger>
-                    <PopoverContent side="right" align="end" className="terminal-modern max-h-[80vh] w-80 overflow-y-auto border-gc-line bg-popover p-2 font-sans text-popover-foreground">
+                    <PopoverContent side="right" align="end" className={cn("max-h-[80vh] w-80 overflow-y-auto p-2 font-sans", theme === "dark" && "dark terminal-dark border-border bg-popover text-popover-foreground")}>
                       <TerminalNewsPanel />
                     </PopoverContent>
                   </Popover>
-                  <button
-                    type="button"
-                    onClick={() => setDeskOpen((open) => !open)}
-                    aria-label="Ask With AI"
-                    title="Ask With AI"
-                    className={cn(TERMINAL_RAIL_BTN, deskOpen && "bg-gc-blue-soft text-gc-blue-deep")}
-                  >
-                    <img src="/favicon.png" alt="" className="h-5 w-5 shrink-0 rounded-sm object-contain" />
-                  </button>
+                  {!deskOpen && (
+                    <button
+                      type="button"
+                      onClick={() => setDeskOpen(true)}
+                      aria-label="Ask With AI"
+                      title="Ask With AI"
+                      className="flex h-9 w-[52px] items-center justify-center rounded-r-full hover:bg-gc-console-rail-active/60 dark:hover:bg-accent"
+                    >
+                      <img src="/favicon.png" alt="" className="h-5 w-5 rounded-sm object-contain" />
+                    </button>
+                  )}
                 </>
               }
               rightSlot={
@@ -827,25 +796,6 @@ function TerminalPage() {
             />
           </section>
 
-          {/* Market panels (wide screens) — replaced by the AI desk while it is open */}
-          {!deskOpen && (
-            <aside className="hidden min-h-0 w-[316px] shrink-0 flex-col gap-3 overflow-y-auto pb-3 [scrollbar-width:thin] xl:flex" aria-label="Market overview">
-              <AssetDetailCard market={market} nextNews={nextGoldNews} marketClosed={marketClosed} />
-              <PerformanceCard market={market} />
-              <TechnicalsCard market={market} />
-              <GoldWatchlistCard rows={frames.rows} loading={frames.loading} active={tf.key} onPick={pickFrame} />
-              <LiquidityZonesCard market={market} />
-              <MarketSessionsCard marketClosed={marketClosed} />
-              <AiInsightCard
-                market={market}
-                onAsk={() => {
-                  setDeskOpen(true);
-                  void send({ text: "Analyse the current chart" });
-                }}
-              />
-            </aside>
-          )}
-
           {/* Watchlist (desktop) — replaced by the AI desk while it is open */}
           {showWatchlist && (
             <TerminalWatchlist
@@ -867,14 +817,10 @@ function TerminalPage() {
                 "relative flex h-[45%] min-h-0 w-full shrink-0 flex-col bg-card text-card-foreground lg:h-full lg:w-[380px]",
                 theme === "dark"
                   ? "border-t border-border lg:border-l lg:border-t-0"
-                  : "overflow-hidden rounded-xl border border-gc-line lg:mb-3",
+                  : "overflow-hidden rounded-2xl border border-gc-line shadow-sm",
               )}
             >
               <div className="flex min-h-17 items-center justify-end gap-2.5 border-b border-border px-4 py-3">
-                <div className="flex items-center gap-2.5">
-                  <span className="grid h-9 w-9 place-items-center rounded-full bg-gc-sky"><Sparkles className="h-[18px] w-[18px] text-gc-blue" /></span>
-                  <span className="text-[18px] font-medium text-gc-ink">Ask AI</span>
-                </div>
                 <Button
                   type="button"
                   variant="ghost"
