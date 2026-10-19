@@ -117,10 +117,10 @@ export function AssetDetailCard({
         </span>
       </div>
       <div className="mt-4 flex items-baseline gap-2">
-        <span className="font-mono text-[30px] font-semibold leading-none tabular-nums text-gc-ink">{market ? fmt(market.price) : "—"}</span>
+        <span className="text-[30px] font-semibold leading-none tabular-nums text-gc-ink">{market ? fmt(market.price) : "—"}</span>
         <span className="text-[11px] text-gc-ink-muted">USD</span>
       </div>
-      <p className={cn("mt-1.5 font-mono text-[12px] font-medium tabular-nums", up ? "text-gc-success" : "text-gc-red")}>
+      <p className={cn("mt-1.5 text-[12px] font-medium tabular-nums", up ? "text-gc-success" : "text-gc-red")}>
         {market ? `${signed(market.diff)} (${signed(market.pct)}%) · 24h` : "Waiting for live candles…"}
       </p>
       <div className="mt-3 grid grid-cols-3 gap-2 border-t border-gc-line pt-3 text-[11px]">
@@ -131,7 +131,7 @@ export function AssetDetailCard({
         ].map(([k, v]) => (
           <div key={k} className="min-w-0">
             <p className="text-gc-ink-muted">{k}</p>
-            <p className="mt-0.5 truncate font-mono text-[12px] tabular-nums text-gc-ink">{v}</p>
+            <p className="mt-0.5 truncate text-[12px] tabular-nums text-gc-ink">{v}</p>
           </div>
         ))}
       </div>
@@ -143,7 +143,7 @@ export function AssetDetailCard({
         <span className="min-w-0 flex-1 truncate text-gc-ink" title={nextNews?.title}>
           {nextNews ? `${nextNews.country} ${nextNews.title}` : "No important news ahead"}
         </span>
-        {countdown && <span className="shrink-0 font-mono tabular-nums text-gc-ink-muted">{countdown}</span>}
+        {countdown && <span className="shrink-0 tabular-nums text-gc-ink-muted">{countdown}</span>}
       </div>
     </section>
   );
@@ -166,7 +166,7 @@ export function PerformanceCard({ market }: { market: MarketSnapshot | null }) {
             const h = Math.max(6, (Math.abs(p.pct) / max) * 100);
             return (
               <div key={p.label} className="flex min-w-0 flex-1 flex-col items-center gap-1" title={`${p.label}: ${signed(p.pct)}%`}>
-                <span className={cn("font-mono text-[9.5px] tabular-nums", up ? "text-gc-success" : "text-gc-red")}>{signed(p.pct)}%</span>
+                <span className={cn("text-[9.5px] tabular-nums", up ? "text-gc-success" : "text-gc-red")}>{signed(p.pct)}%</span>
                 <div className="flex w-full flex-1 items-end">
                   <span
                     className={cn("w-full rounded-t-[3px]", up ? "bg-gc-success" : "bg-gc-red")}
@@ -227,7 +227,7 @@ export function TechnicalsCard({ market }: { market: MarketSnapshot | null }) {
         ].map(([k, v]) => (
           <div key={k} className="min-w-0">
             <p className="text-gc-ink-muted">{k}</p>
-            <p className="mt-0.5 truncate font-mono text-[12px] tabular-nums text-gc-ink">{v}</p>
+            <p className="mt-0.5 truncate text-[12px] tabular-nums text-gc-ink">{v}</p>
           </div>
         ))}
       </div>
@@ -250,11 +250,11 @@ export function MarketOverlayCard({ market, onClose }: { market: MarketSnapshot 
         </button>
       </div>
       <dl className="mt-2.5 space-y-1.5 text-[11.5px]">
-        <div className="flex justify-between gap-3"><dt className="text-gc-ink-muted">Last price</dt><dd className="font-mono tabular-nums text-gc-ink">{fmt(market.price)}</dd></div>
-        <div className="flex justify-between gap-3"><dt className="text-gc-ink-muted">24h high / low</dt><dd className="font-mono tabular-nums text-gc-ink">{fmt(market.high)} / {fmt(market.low)}</dd></div>
+        <div className="flex justify-between gap-3"><dt className="text-gc-ink-muted">Last price</dt><dd className="tabular-nums text-gc-ink">{fmt(market.price)}</dd></div>
+        <div className="flex justify-between gap-3"><dt className="text-gc-ink-muted">24h high / low</dt><dd className="tabular-nums text-gc-ink">{fmt(market.high)} / {fmt(market.low)}</dd></div>
         <div className="flex justify-between gap-3 border-t border-gc-line pt-1.5">
           <dt className="text-gc-ink-muted">24h change</dt>
-          <dd className={cn("rounded-md px-1.5 font-mono tabular-nums", up ? "bg-gc-green-soft text-gc-success" : "bg-gc-red-soft text-gc-red")}>
+          <dd className={cn("rounded-md px-1.5 tabular-nums", up ? "bg-gc-green-soft text-gc-success" : "bg-gc-red-soft text-gc-red")}>
             {signed(market.diff)} ({signed(market.pct)}%)
           </dd>
         </div>
@@ -336,7 +336,7 @@ export function LiquidityZonesCard({ market }: { market: MarketSnapshot | null }
                   {supply ? "S" : "D"}
                 </span>
                 <div className="min-w-0 flex-1 leading-tight">
-                  <p className="truncate font-mono text-[12px] tabular-nums text-gc-ink">{fmt(z.bottom)} – {fmt(z.top)}</p>
+                  <p className="truncate text-[12px] tabular-nums text-gc-ink">{fmt(z.bottom)} – {fmt(z.top)}</p>
                   <p className="text-[10px] text-gc-ink-muted">{supply ? "Supply" : "Demand"}</p>
                 </div>
                 <span className="flex w-12 gap-0.5" aria-label={`Strength ${z.strength} of 5`}>
@@ -344,7 +344,7 @@ export function LiquidityZonesCard({ market }: { market: MarketSnapshot | null }
                     <span key={n} className={cn("h-1.5 flex-1 rounded-sm", n <= z.strength ? (supply ? "bg-gc-red" : "bg-gc-success") : "bg-gc-panel")} />
                   ))}
                 </span>
-                <span className={cn("w-14 text-right font-mono text-[11px] tabular-nums", dist >= 0 ? "text-gc-success" : "text-gc-red")}>
+                <span className={cn("w-14 text-right text-[11px] tabular-nums", dist >= 0 ? "text-gc-success" : "text-gc-red")}>
                   {signed(dist)}%
                 </span>
               </li>

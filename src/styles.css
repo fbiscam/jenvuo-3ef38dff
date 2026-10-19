@@ -1408,7 +1408,7 @@ html body .dash-dark main.bg-white { background-color: oklch(0.165 0 0) !importa
   color-scheme: dark;
 }
 .terminal-obsidian .terminal-glass {
-  background: rgba(22, 24, 27, 0.78);
+  background: rgba(22, 24, 27, 0.95);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
 }
