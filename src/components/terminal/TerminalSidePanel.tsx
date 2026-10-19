@@ -1,71 +1,21 @@
 import { useEffect, useState } from "react";
-import { Info, PanelRightClose, Settings2 } from "lucide-react";
+import { Info, Settings2 } from "lucide-react";
 import { DEMO_STARTING_BALANCE, positionPnl } from "@/lib/chart/demo-trading";
 import { cn } from "@/lib/utils";
 import type { DemoTrading } from "./DemoTradingPanel";
-import { DemoAccountCard } from "./TerminalOrderPanel";
-import { XauUsdLogo } from "./XauUsdLogo";
-import { WATCH, num, tone, useWatchQuotes } from "./terminal-market";
+import { num, tone } from "./terminal-market";
 
 const LOSS_LIMIT_KEY = "jenvu:terminal:daily-loss-limit:v1";
 
 function Card({ title, action, children }: { title: string; action?: React.ReactNode; children: React.ReactNode }) {
   return (
-    <section className="rounded-2xl border border-gc-line bg-card p-3.5">
+    <section className="rounded-none border border-gc-line bg-card p-3.5">
       <div className="mb-2.5 flex items-center justify-between gap-2">
-        <h3 className="text-[14px] font-semibold text-gc-ink">{title}</h3>
+        <h3 className="text-[14px] font-medium text-gc-ink">{title}</h3>
         {action}
       </div>
       {children}
     </section>
-  );
-}
-
-/** Right Terminal column: market watch, technicals and risk management. */
-export function TerminalSidePanel({ trading, onClose }: { trading: DemoTrading; onClose: () => void }) {
-  const quotes = useWatchQuotes();
-
-  return (
-    <aside aria-label="Market watch and balance" className="hidden w-[256px] shrink-0 flex-col gap-3 overflow-y-auto font-sans [scrollbar-width:thin] lg:flex xl:w-[280px] 2xl:w-[320px]">
-      <Card
-        title="Market Watch"
-        action={
-          <button type="button" onClick={onClose} aria-label="Hide side panels" title="Hide side panels" className="flex h-7 w-7 items-center justify-center rounded-full text-gc-ink-muted hover:bg-gc-console-search hover:text-gc-ink">
-            <PanelRightClose className="h-4 w-4" />
-          </button>
-        }
-      >
-        <div className="mb-1 flex justify-between px-1 text-[10px] font-medium text-gc-ink-muted">
-          <span>Symbol</span>
-          <span className="flex gap-6"><span>Price</span><span className="w-12 text-right">Change</span></span>
-        </div>
-        <ul className="-mx-1">
-          {WATCH.map((w) => {
-            const x = quotes.data?.[w.symbol];
-            const ch = x?.changePct ?? null;
-            return (
-              <li key={w.symbol} className={cn("flex items-center justify-between rounded-lg px-1.5 py-1.5", w.symbol === "XAUUSD" ? "bg-gc-console-search" : "hover:bg-gc-console-search")}>
-                <span className="flex items-center gap-2">
-                  {w.icon ? <img src={w.icon} alt="" className="h-5 w-5 rounded-full" /> : <XauUsdLogo size={20} />}
-                  <span className="text-[12px] font-medium text-gc-ink">{w.label}</span>
-                </span>
-                <span className="flex items-center gap-3">
-                  <span className="text-[12px] tabular-nums text-gc-ink">
-                    {x ? x.price.toLocaleString("en-US", { minimumFractionDigits: x.decimals, maximumFractionDigits: x.decimals }) : "—"}
-                  </span>
-                  <span className={cn("w-12 text-right text-[11px] tabular-nums", ch == null ? "text-gc-ink-muted" : tone(ch))}>
-                    {ch == null ? "" : `${ch >= 0 ? "+" : ""}${ch.toFixed(2)}%`}
-                  </span>
-                </span>
-              </li>
-            );
-          })}
-        </ul>
-      </Card>
-
-      <DemoAccountCard trading={trading} />
-
-    </aside>
   );
 }
 
@@ -131,7 +81,7 @@ export function RiskCard({ trading, price }: { trading: DemoTrading; price: numb
                 className="h-7 w-24 rounded-lg border border-gc-line bg-card px-2 text-right text-[12px] text-gc-ink outline-none focus:border-gc-blue"
               />
             ) : (
-              <span className="font-semibold tabular-nums text-gc-ink">${num(limit)}</span>
+              <span className="font-medium tabular-nums text-gc-ink">${num(limit)}</span>
             )}
           </dd>
         </div>
@@ -149,7 +99,7 @@ export function RiskCard({ trading, price }: { trading: DemoTrading; price: numb
           <dt className="flex items-center gap-1 text-gc-ink-muted" title="Equity change from the $100,000 starting balance">
             Current drawdown <Info className="h-3 w-3" />
           </dt>
-          <dd className={cn("font-semibold tabular-nums", tone(drawdown))}>{`${drawdown >= 0 ? "+" : ""}${drawdown.toFixed(2)}%`}</dd>
+          <dd className={cn("font-medium tabular-nums", tone(drawdown))}>{`${drawdown >= 0 ? "+" : ""}${drawdown.toFixed(2)}%`}</dd>
         </div>
       </dl>
     </Card>
