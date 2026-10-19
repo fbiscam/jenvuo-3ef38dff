@@ -784,7 +784,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
       {toolbarHost && !fullscreen ? (
         createPortal(rail, toolbarHost)
       ) : (
-        <div className="absolute inset-x-0 top-0 z-[5] hidden h-11 items-center border-b border-gc-line bg-background px-2 md:flex">{rail}</div>
+        <div className="terminal-toolbar absolute inset-x-0 top-0 z-[5] hidden h-11 items-center border-b border-gc-line bg-background px-2 md:flex">{rail}</div>
       )}
       <div className={cn("flex min-h-0 min-w-0 flex-1 flex-col", sidePanelOpen && "lg:gap-3 lg:overflow-y-auto lg:p-3 lg:[scrollbar-width:thin]")}>
       {sidePanelOpen && (
@@ -795,7 +795,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
         className={cn(
           "flex min-h-0 min-w-0 flex-1 flex-col bg-background",
           sidePanelOpen
-            ? "lg:h-full lg:overflow-hidden lg:rounded-none lg:border lg:border-gc-line lg:bg-card dark:lg:border-border"
+            ? "lg:h-full lg:overflow-hidden lg:rounded-none lg:bg-card"
             : theme !== "dark" && "overflow-hidden md:mb-2 md:rounded-2xl md:border md:border-gc-line",
         )}
       >

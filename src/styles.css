@@ -1188,6 +1188,15 @@ body:has(.terminal-dark) .jenvu-terminal-shell {
   color: oklch(0.97 0 0);
 }
 
+/* Black terminal: every header and chart-toolbar icon/label is white. */
+body:has(.terminal-dark) .jenvu-terminal-shell header :is(button, a),
+body:has(.terminal-dark) .jenvu-terminal-shell .terminal-toolbar :is(button, [role="button"], div) {
+  color: oklch(1 0 0) !important;
+}
+body:has(.terminal-dark) .jenvu-terminal-shell :is(header, .terminal-toolbar) svg {
+  color: oklch(1 0 0) !important;
+}
+
 /* Black terminal: the left app menu turns near-black with white icons too. */
 body:has(.terminal-dark) .dashboard-terminal-sidebar,
 body:has(.terminal-dark) .dashboard-terminal-sidebar .bg-sidebar {

@@ -42,7 +42,7 @@ export function TerminalMarketTabs({ bars, price, timeframeKey }: { bars: OhlcvB
   const abs = live != null && prev != null ? live - prev : null;
 
   return (
-    <section aria-label="XAU/USD overview" className="hidden shrink-0 border border-gc-line dark:border-border bg-card font-sans lg:block">
+    <section aria-label="XAU/USD overview" className="hidden shrink-0 bg-card font-sans lg:block">
       <header className="flex flex-wrap items-center gap-x-3 gap-y-1 px-5 py-3.5">
         <XauUsdLogo size={22} />
         <span className="text-[16px] font-medium text-gc-ink">XAUUSD</span>
@@ -266,7 +266,10 @@ function ago(iso: string) {
 function NewsTab() {
   const fetchNews = useServerFn(getGoldHeadlines);
   const query = useQuery({ queryKey: ["terminal-gold-headlines"], queryFn: () => fetchNews(), staleTime: 5 * 60_000, refetchInterval: 5 * 60_000, refetchIntervalInBackground: false });
-  const items = query.data?.items ?? [];
+  // Latest 15 headlines only, newest first.
+  const items = [...(query.data?.items ?? [])]
+    .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime())
+    .slice(0, 15);
   return (
     <div>
       <h3 className="mb-5 text-[24px] font-medium text-gc-ink">Headlines</h3>

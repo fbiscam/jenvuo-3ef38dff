@@ -59,3 +59,4 @@
 - [x] Terminal: black dashboard layout like the Selimor picture (4 market cards, technicals + volume bars, chart with Market Watch/Account, trades table, order + risk column); black is the default look
 - [x] Terminal: Market Watch and Demo Account cards removed (balance eye + reset in the order form); square corners; Google Sans in the chart; TradingView-style section under the trades table with Overview (area chart + 1 day…All time), News headlines, Technicals gauges and Seasonals
 - [x] Terminal: section borders; News, hide-panels and Ask AI header buttons removed; blue Ask Jenvu opens Terminal AI chat; open positions table removed
+- [x] Terminal: borders removed again; dark-theme header icons white; Headlines = latest 15
