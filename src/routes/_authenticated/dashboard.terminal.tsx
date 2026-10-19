@@ -679,10 +679,10 @@ function TerminalPage() {
       <div
         className={cn(
           "flex h-full min-h-0 w-full flex-col overflow-hidden text-foreground",
-          theme === "dark" ? "dark terminal-dark bg-background" : "bg-background",
+          theme === "dark" ? "dark terminal-dark bg-background" : "bg-gc-console-bar",
         )}
       >
-        <div className={cn("flex min-h-0 flex-1 flex-col lg:flex-row", theme !== "dark" && "gap-2 pr-2")}>
+        <div className={cn("flex min-h-0 flex-1 flex-col lg:flex-row", theme !== "dark" && "gap-3 lg:pr-3")}>
           {/* Chart */}
           <section
             aria-label="XAU/USD chart"
@@ -821,6 +821,10 @@ function TerminalPage() {
               )}
             >
               <div className="flex min-h-17 items-center justify-end gap-2.5 border-b border-border px-4 py-3">
+                <div className="flex items-center gap-2.5">
+                  <span className="grid h-9 w-9 place-items-center rounded-full bg-gc-sky"><Sparkles className="h-[18px] w-[18px] text-gc-blue" /></span>
+                  <span className="text-[18px] font-medium text-gc-ink">Ask AI</span>
+                </div>
                 <Button
                   type="button"
                   variant="ghost"
