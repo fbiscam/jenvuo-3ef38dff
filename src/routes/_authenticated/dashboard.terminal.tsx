@@ -29,6 +29,14 @@ import {
 } from "@/components/terminal/JenvuChartWorkspace";
 import { TerminalWatchlist } from "@/components/terminal/TerminalWatchlist";
 import { TerminalNewsPanel } from "@/components/terminal/TerminalNewsPanel";
+import {
+  AiInsightCard,
+  LiquidityZonesCard,
+  MarketSessionsCard,
+  TerminalBottomTabs,
+  TerminalStatCards,
+  type MarketSnapshot,
+} from "@/components/terminal/TerminalProPanels";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { transcribeVoiceMessage } from "@/lib/transcription.functions";
 import { cn } from "@/lib/utils";
@@ -316,6 +324,7 @@ function TerminalPage() {
     }
   };
   const [deskOpen, setDeskOpen] = useState(false);
+  const [market, setMarket] = useState<MarketSnapshot | null>(null);
   const [theme, setTheme] = useState<"light" | "dark">("light");
   const [watchlistOpen, setWatchlistOpen] = useState(true);
   // The watchlist fills the right side whenever the AI desk is closed.
@@ -683,7 +692,7 @@ function TerminalPage() {
           theme === "dark" ? "dark terminal-dark bg-background" : "bg-gc-console-bar",
         )}
       >
-        <div className={cn("flex min-h-0 flex-1 flex-col lg:flex-row", theme !== "dark" && "gap-3 lg:pr-3")}>
+        <div className={cn("flex min-h-0 flex-1 flex-col lg:flex-row", theme !== "dark" && "gap-3 lg:pr-3 lg:pt-3")}>
           {/* Chart */}
           <section
             aria-label="XAU/USD chart"
@@ -699,6 +708,13 @@ function TerminalPage() {
               asset={asset}
               onAssetChange={changeAsset}
               theme={theme}
+              onMarketUpdate={setMarket}
+              headerSlot={
+                <TerminalStatCards market={market} nextNews={nextGoldNews} marketClosed={marketClosed} />
+              }
+              footerSlot={
+                <TerminalBottomTabs news={relevantNews.slice(0, 5)} onAsk={() => setDeskOpen(true)} />
+              }
               onTimeframeChange={(next) => {
                 const match = TIMEFRAMES.find((item) => item.key === next.key);
                 if (match) setTf(match);
@@ -796,6 +812,21 @@ function TerminalPage() {
               }
             />
           </section>
+
+          {/* Market panels (wide screens) — replaced by the AI desk while it is open */}
+          {!deskOpen && theme !== "dark" && (
+            <aside className="hidden min-h-0 w-[340px] shrink-0 flex-col gap-3 overflow-y-auto pb-3 xl:flex" aria-label="Market overview">
+              <MarketSessionsCard marketClosed={marketClosed} />
+              <LiquidityZonesCard market={market} />
+              <AiInsightCard
+                market={market}
+                onAsk={() => {
+                  setDeskOpen(true);
+                  void send({ text: "Analyse the current chart" });
+                }}
+              />
+            </aside>
+          )}
 
           {/* Watchlist (desktop) — replaced by the AI desk while it is open */}
           {showWatchlist && (
