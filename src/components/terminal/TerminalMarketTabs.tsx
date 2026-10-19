@@ -115,6 +115,7 @@ export function TerminalSymbolHeader({
             {now && ` · As of today at ${String(now.getUTCHours()).padStart(2, "0")}:${String(now.getUTCMinutes()).padStart(2, "0")} UTC`}
           </p>
         </div>
+        <HeaderSidePanel quotes={quotes.data} now={now} />
       </div>
       <nav aria-label="Gold sections" className="flex gap-7 border-b-2 border-gc-line px-5">
         {TABS.map((t) => (
