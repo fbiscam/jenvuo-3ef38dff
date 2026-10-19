@@ -1,35 +1,47 @@
 import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Eye, EyeOff, PanelRightClose, RotateCcw, Wallet } from "lucide-react";
-import { getMarketSnapshotsBatch } from "@/lib/gold-analysis.functions";
-import { bidAsk, DEMO_SPREAD, DEMO_STARTING_BALANCE, positionPnl, type DemoSide } from "@/lib/chart/demo-trading";
+import { Info, PanelRightClose, Settings2 } from "lucide-react";
+import { getMarketSnapshotsBatch, getTerminalChart } from "@/lib/gold-analysis.functions";
+import { DEMO_STARTING_BALANCE, positionPnl } from "@/lib/chart/demo-trading";
 import type { OhlcvBar } from "@/lib/chart/indicators";
-import { technicalSummary, type TechReading, type TechVerdict } from "@/lib/chart/technicals";
+import { technicalSummary, type TechVerdict } from "@/lib/chart/technicals";
 import { cn } from "@/lib/utils";
 import type { DemoTrading } from "./DemoTradingPanel";
+import { XauUsdLogo } from "./XauUsdLogo";
+import xagIcon from "@/assets/watchlist/xag.svg";
+import dxyIcon from "@/assets/watchlist/dxy.svg";
+import usIcon from "@/assets/watchlist/flag-us.svg";
+import euIcon from "@/assets/watchlist/flag-eu.svg";
+import spxIcon from "@/assets/watchlist/spx.svg";
 
-const HIDE_BALANCE_KEY = "jenvu:terminal:hide-balance:v1";
+const LOSS_LIMIT_KEY = "jenvu:terminal:daily-loss-limit:v1";
 
-const WATCH: Array<{ symbol: string; label: string; name: string }> = [
-  { symbol: "XAUUSD", label: "XAU/USD", name: "Gold" },
-  { symbol: "XAGUSD", label: "XAG/USD", name: "Silver" },
-  { symbol: "DXY", label: "DXY", name: "Dollar index" },
-  { symbol: "US10Y", label: "US10Y", name: "10-year yield" },
-  { symbol: "EURUSD", label: "EUR/USD", name: "Euro" },
-  { symbol: "SPX", label: "S&P 500", name: "U.S. stocks" },
+const WATCH: Array<{ symbol: string; label: string; icon?: string }> = [
+  { symbol: "XAUUSD", label: "XAU/USD" },
+  { symbol: "XAGUSD", label: "XAG/USD", icon: xagIcon },
+  { symbol: "DXY", label: "DXY", icon: dxyIcon },
+  { symbol: "US10Y", label: "US10Y", icon: usIcon },
+  { symbol: "EURUSD", label: "EUR/USD", icon: euIcon },
+  { symbol: "SPX", label: "S&P 500", icon: spxIcon },
+];
+
+const TECH_TFS = [
+  { key: "15m", label: "15m" },
+  { key: "1h", label: "1H" },
+  { key: "4h", label: "4H" },
+  { key: "1d", label: "1D" },
 ];
 
 const num = (v: number, d = 2) => v.toLocaleString("en-US", { minimumFractionDigits: d, maximumFractionDigits: d });
-const signed = (v: number) => `${v > 0 ? "+" : v < 0 ? "−" : ""}${num(Math.abs(v))}`;
 const tone = (v: number) => (v > 0 ? "text-gc-green" : v < 0 ? "text-gc-red" : "text-gc-ink");
-const verdictTone: Record<TechVerdict, string> = { buy: "text-gc-blue", sell: "text-gc-red", neutral: "text-gc-ink-muted" };
+const verdictTone: Record<TechVerdict, string> = { buy: "text-gc-green", sell: "text-gc-red", neutral: "text-gc-ink-muted" };
 
 function Card({ title, action, children }: { title: string; action?: React.ReactNode; children: React.ReactNode }) {
   return (
     <section className="rounded-2xl border border-gc-line bg-background p-3.5">
       <div className="mb-2.5 flex items-center justify-between gap-2">
-        <h3 className="text-[11px] font-semibold uppercase tracking-[0.08em] text-gc-ink-muted">{title}</h3>
+        <h3 className="text-[14px] font-semibold text-gc-ink">{title}</h3>
         {action}
       </div>
       {children}
@@ -38,70 +50,36 @@ function Card({ title, action, children }: { title: string; action?: React.React
 }
 
 function Gauge({ score }: { score: number }) {
-  // Needle from -90° (strong sell) to +90° (strong buy).
   const angle = Math.max(-1, Math.min(1, score)) * 90;
   return (
-    <svg viewBox="0 0 120 68" className="mx-auto h-[68px] w-[120px]" aria-hidden="true">
-      <path d="M10 60 A50 50 0 0 1 43 13" fill="none" strokeWidth="8" strokeLinecap="round" className="stroke-gc-red" />
-      <path d="M47 11.5 A50 50 0 0 1 73 11.5" fill="none" strokeWidth="8" strokeLinecap="round" className="stroke-gc-line" />
-      <path d="M77 13 A50 50 0 0 1 110 60" fill="none" strokeWidth="8" strokeLinecap="round" className="stroke-gc-blue" />
-      <g style={{ transform: `rotate(${angle}deg)`, transformOrigin: "60px 60px", transition: "transform 600ms ease" }}>
-        <line x1="60" y1="60" x2="60" y2="20" strokeWidth="3" strokeLinecap="round" className="stroke-gc-ink" />
+    <svg viewBox="0 0 140 84" className="mx-auto h-[84px] w-[140px]" aria-hidden="true">
+      <path d="M14 74 A56 56 0 0 1 48 23" fill="none" strokeWidth="7" strokeLinecap="round" className="stroke-gc-red" />
+      <path d="M54 20 A56 56 0 0 1 86 20" fill="none" strokeWidth="7" strokeLinecap="round" className="stroke-gc-line" />
+      <path d="M92 23 A56 56 0 0 1 126 74" fill="none" strokeWidth="7" strokeLinecap="round" className="stroke-gc-green" />
+      <g style={{ transform: `rotate(${angle}deg)`, transformOrigin: "70px 74px", transition: "transform 600ms ease" }}>
+        <line x1="70" y1="74" x2="70" y2="30" strokeWidth="3" strokeLinecap="round" className="stroke-gc-ink" />
       </g>
-      <circle cx="60" cy="60" r="5" className="fill-gc-ink" />
+      <circle cx="70" cy="74" r="5" className="fill-gc-ink" />
     </svg>
   );
 }
 
-function ReadingRow({ r }: { r: TechReading }) {
-  return (
-    <li className="flex items-center justify-between py-1 text-[12px]">
-      <span className="text-gc-ink">{r.name}</span>
-      <span className="flex items-center gap-2">
-        <span className="tabular-nums text-gc-ink-muted">{num(r.value)}</span>
-        <span className={cn("w-12 text-right font-medium capitalize", verdictTone[r.verdict])}>{r.verdict}</span>
-      </span>
-    </li>
-  );
-}
-
-/** Right-hand Terminal column: trade buttons, demo account (hideable), market watch, technicals and risk. */
+/** Right Terminal column: market watch, technicals and risk management. */
 export function TerminalSidePanel({
   trading,
   price,
   bars,
-  timeframeLabel,
-  onPick,
-  onOpenTrades,
+  timeframeKey,
   onClose,
 }: {
   trading: DemoTrading;
   price: number | null;
   bars: OhlcvBar[];
-  timeframeLabel: string;
-  onPick: (side: DemoSide) => void;
-  onOpenTrades: () => void;
+  timeframeKey: string;
   onClose: () => void;
 }) {
-  const [hideBalance, setHideBalance] = useState(false);
-  useEffect(() => {
-    try {
-      setHideBalance(window.localStorage.getItem(HIDE_BALANCE_KEY) === "1");
-    } catch {
-      /* storage unavailable */
-    }
-  }, []);
-  const toggleBalance = () =>
-    setHideBalance((v) => {
-      try {
-        window.localStorage.setItem(HIDE_BALANCE_KEY, v ? "0" : "1");
-      } catch {
-        /* storage unavailable */
-      }
-      return !v;
-    });
-
   const fetchBatch = useServerFn(getMarketSnapshotsBatch);
+  const fetchChart = useServerFn(getTerminalChart);
   const quotes = useQuery({
     queryKey: ["terminal-side-watch", WATCH.map((w) => w.symbol).join(",")],
     queryFn: async () => {
@@ -116,150 +94,90 @@ export function TerminalSidePanel({
     placeholderData: (prev) => prev,
   });
 
-  // Closed candles only, so readings don't flicker with every tick.
-  const closedKey = bars.length > 1 ? `${bars.length}:${bars[bars.length - 2].time}:${bars[bars.length - 2].close}` : "";
+  // Technicals timeframe: follows the chart until a chip is picked.
+  const [techTf, setTechTf] = useState<string | null>(null);
+  const activeTf = techTf ?? (TECH_TFS.some((t) => t.key === timeframeKey) ? timeframeKey : "15m");
+  const usesChartBars = activeTf === timeframeKey;
+  const otherTf = useQuery({
+    queryKey: ["terminal-technicals", activeTf],
+    queryFn: () => fetchChart({ data: { timeframe: activeTf, asset: "XAUUSD" } }),
+    enabled: !usesChartBars,
+    staleTime: 60_000,
+    refetchInterval: 60_000,
+    refetchIntervalInBackground: false,
+  });
+  const sourceBars: OhlcvBar[] = usesChartBars ? bars : ((otherTf.data?.bars as OhlcvBar[] | undefined) ?? []);
+  const closedKey = sourceBars.length > 1 ? `${activeTf}:${sourceBars.length}:${sourceBars[sourceBars.length - 2].time}:${sourceBars[sourceBars.length - 2].close}` : activeTf;
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const tech = useMemo(() => technicalSummary(bars.slice(0, -1)), [closedKey]);
+  const tech = useMemo(() => technicalSummary(sourceBars.slice(0, -1)), [closedKey]);
+
+  // Daily loss limit (demo), saved in this browser.
+  const [limit, setLimit] = useState(5000);
+  const [editing, setEditing] = useState(false);
+  useEffect(() => {
+    try {
+      const v = Number(window.localStorage.getItem(LOSS_LIMIT_KEY));
+      if (Number.isFinite(v) && v > 0) setLimit(v);
+    } catch {
+      /* storage unavailable */
+    }
+  }, []);
+  const saveLimit = (v: number) => {
+    if (!Number.isFinite(v) || v <= 0) return;
+    setLimit(v);
+    try {
+      window.localStorage.setItem(LOSS_LIMIT_KEY, String(v));
+    } catch {
+      /* storage unavailable */
+    }
+  };
 
   const { account, metrics } = trading;
-  const q = price ? bidAsk(price) : null;
+  const dayStart = new Date();
+  dayStart.setUTCHours(0, 0, 0, 0);
+  const todayRealized = (account.history ?? []).filter((t) => t.closedAt >= dayStart.getTime()).reduce((s, t) => s + t.pnl, 0);
   const unrealized = price ? account.positions.reduce((s, p) => s + positionPnl(p, price), 0) : 0;
-  const drawdown = Math.max(0, ((DEMO_STARTING_BALANCE - metrics.equity) / DEMO_STARTING_BALANCE) * 100);
-  const marginUsed = metrics.equity > 0 ? ((metrics.margin + metrics.ordersMargin) / metrics.equity) * 100 : 0;
-  const history = account.history ?? [];
-  const winRate = history.length ? (history.filter((t) => t.pnl > 0).length / history.length) * 100 : null;
-  const mask = "••••••";
+  const todayPnl = todayRealized + unrealized;
+  const lossUsed = Math.max(0, -todayPnl);
+  const lossPct = Math.min(100, (lossUsed / limit) * 100);
+  const drawdown = ((metrics.equity - DEMO_STARTING_BALANCE) / DEMO_STARTING_BALANCE) * 100;
+
+  const ratingTone = tech ? (tech.score > 0.1 ? "text-gc-green" : tech.score < -0.1 ? "text-gc-red" : "text-gc-ink") : "";
+  const group = (list: { verdict: TechVerdict }[]) => {
+    const c = { buy: 0, neutral: 0, sell: 0 };
+    for (const x of list) c[x.verdict]++;
+    return c;
+  };
 
   return (
-    <aside
-      aria-label="Trading side panel"
-      className="hidden w-[300px] shrink-0 flex-col gap-2 overflow-y-auto pb-2 pl-2 font-sans [scrollbar-width:thin] xl:flex"
-    >
-      {/* Trade */}
-      <section className="rounded-2xl border border-gc-line bg-background p-3.5">
-        <div className="mb-3 flex items-center justify-between">
-          <div>
-            <p className="text-sm font-semibold text-gc-ink">XAU/USD</p>
-            <p className="text-[11px] text-gc-ink-muted">Gold spot · demo trading</p>
-          </div>
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label="Hide side panel"
-            title="Hide side panel"
-            className="flex h-8 w-8 items-center justify-center rounded-full text-gc-ink-muted hover:bg-gc-console-search hover:text-gc-ink"
-          >
+    <aside aria-label="Market watch, technicals and risk" className="hidden w-[264px] shrink-0 flex-col gap-2 overflow-y-auto pb-2 pl-2 font-sans [scrollbar-width:thin] lg:flex 2xl:w-[300px]">
+      <Card
+        title="Market Watch"
+        action={
+          <button type="button" onClick={onClose} aria-label="Hide side panels" title="Hide side panels" className="flex h-7 w-7 items-center justify-center rounded-full text-gc-ink-muted hover:bg-gc-console-search hover:text-gc-ink">
             <PanelRightClose className="h-4 w-4" />
           </button>
-        </div>
-        <div className="relative grid grid-cols-2 gap-2">
-          <button
-            type="button"
-            onClick={() => onPick("sell")}
-            className="flex flex-col items-start rounded-xl bg-gc-red px-3 py-2 text-left text-primary-foreground transition-opacity hover:opacity-90"
-          >
-            <span className="text-[11px] font-medium opacity-90">SELL</span>
-            <span className="font-mono text-[15px] font-semibold tabular-nums">{q ? num(q.bid) : "—"}</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => onPick("buy")}
-            className="flex flex-col items-end rounded-xl bg-gc-blue px-3 py-2 text-right text-primary-foreground transition-opacity hover:opacity-90"
-          >
-            <span className="text-[11px] font-medium opacity-90">BUY</span>
-            <span className="font-mono text-[15px] font-semibold tabular-nums">{q ? num(q.ask) : "—"}</span>
-          </button>
-          <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border border-gc-line bg-background px-1.5 font-mono text-[10px] text-gc-ink-muted">
-            {(DEMO_SPREAD * 100).toFixed(0)}
-          </span>
-        </div>
-        <p className="mt-2 text-[11px] text-gc-ink-muted">Market, Limit or Stop with Stop Loss and Take Profit open in the order ticket.</p>
-      </section>
-
-      {/* Demo account — hide/show */}
-      <Card
-        title="Demo account"
-        action={
-          <span className="flex items-center gap-0.5">
-            <button
-              type="button"
-              onClick={toggleBalance}
-              aria-label={hideBalance ? "Show demo balance" : "Hide demo balance"}
-              aria-pressed={hideBalance}
-              title={hideBalance ? "Show demo balance" : "Hide demo balance"}
-              className="flex h-7 w-7 items-center justify-center rounded-full text-gc-ink-muted hover:bg-gc-console-search hover:text-gc-ink"
-            >
-              {hideBalance ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                if (window.confirm(`Reset the demo account to ${num(DEMO_STARTING_BALANCE)} USD?`)) trading.reset();
-              }}
-              aria-label="Reset demo account"
-              title="Reset demo account"
-              className="flex h-7 w-7 items-center justify-center rounded-full text-gc-ink-muted hover:bg-gc-console-search hover:text-gc-ink"
-            >
-              <RotateCcw className="h-3.5 w-3.5" />
-            </button>
-          </span>
         }
       >
-        {hideBalance ? (
-          <p className="flex items-center gap-2 text-[12px] text-gc-ink-muted">
-            <Wallet className="h-4 w-4" />
-            Balance hidden — tap the eye to show it.
-          </p>
-        ) : (
-          <>
-            <p className="text-[11px] text-gc-ink-muted">Balance</p>
-            <p className="font-mono text-xl font-semibold tabular-nums text-gc-ink">${num(account.balance)}</p>
-            <dl className="mt-2 grid grid-cols-2 gap-x-3 gap-y-1.5 text-[12px]">
-              <div>
-                <dt className="text-gc-ink-muted">Equity</dt>
-                <dd className="font-mono tabular-nums text-gc-ink">{num(metrics.equity)}</dd>
-              </div>
-              <div>
-                <dt className="text-gc-ink-muted">Open P&amp;L</dt>
-                <dd className={cn("font-mono tabular-nums", tone(unrealized))}>{signed(unrealized)}</dd>
-              </div>
-              <div>
-                <dt className="text-gc-ink-muted">Margin</dt>
-                <dd className="font-mono tabular-nums text-gc-ink">{num(metrics.margin)}</dd>
-              </div>
-              <div>
-                <dt className="text-gc-ink-muted">Available</dt>
-                <dd className="font-mono tabular-nums text-gc-ink">{num(metrics.available)}</dd>
-              </div>
-            </dl>
-          </>
-        )}
-        <button
-          type="button"
-          onClick={onOpenTrades}
-          className="mt-3 w-full rounded-full border border-gc-line py-1.5 text-[12px] font-medium text-gc-ink hover:bg-gc-console-search"
-        >
-          Positions & history{account.positions.length ? ` · ${account.positions.length} open` : ""}
-        </button>
-      </Card>
-
-      {/* Market watch */}
-      <Card title="Market watch">
+        <div className="mb-1 flex justify-between px-1 text-[10px] font-medium text-gc-ink-muted">
+          <span>Symbol</span>
+          <span className="flex gap-6"><span>Price</span><span className="w-12 text-right">Change</span></span>
+        </div>
         <ul className="-mx-1">
           {WATCH.map((w) => {
             const x = quotes.data?.[w.symbol];
             const ch = x?.changePct ?? null;
             return (
-              <li key={w.symbol} className="flex items-center justify-between rounded-lg px-1 py-1.5 hover:bg-gc-console-search">
-                <span>
-                  <span className="block text-[12px] font-medium text-gc-ink">{w.label}</span>
-                  <span className="block text-[10px] text-gc-ink-muted">{w.name}</span>
+              <li key={w.symbol} className={cn("flex items-center justify-between rounded-lg px-1.5 py-1.5", w.symbol === "XAUUSD" ? "bg-gc-console-search" : "hover:bg-gc-console-search")}>
+                <span className="flex items-center gap-2">
+                  {w.icon ? <img src={w.icon} alt="" className="h-5 w-5 rounded-full" /> : <XauUsdLogo size={20} />}
+                  <span className="text-[12px] font-medium text-gc-ink">{w.label}</span>
                 </span>
-                <span className="text-right">
-                  <span className="block font-mono text-[12px] tabular-nums text-gc-ink">
+                <span className="flex items-center gap-3">
+                  <span className="font-mono text-[12px] tabular-nums text-gc-ink">
                     {x ? x.price.toLocaleString("en-US", { minimumFractionDigits: x.decimals, maximumFractionDigits: x.decimals }) : "—"}
                   </span>
-                  <span className={cn("block font-mono text-[10px] tabular-nums", ch == null ? "text-gc-ink-muted" : tone(ch))}>
+                  <span className={cn("w-12 text-right font-mono text-[11px] tabular-nums", ch == null ? "text-gc-ink-muted" : tone(ch))}>
                     {ch == null ? "" : `${ch >= 0 ? "+" : ""}${ch.toFixed(2)}%`}
                   </span>
                 </span>
@@ -269,49 +187,120 @@ export function TerminalSidePanel({
         </ul>
       </Card>
 
-      {/* Technicals */}
-      <Card title={`Technicals · ${timeframeLabel}`}>
+      <Card title="Technicals – XAU/USD">
+        <div className="mb-2 grid grid-cols-4 gap-1">
+          {TECH_TFS.map((t) => (
+            <button
+              key={t.key}
+              type="button"
+              onClick={() => setTechTf(t.key)}
+              aria-pressed={activeTf === t.key}
+              className={cn("rounded-full py-1 text-[11px] font-medium", activeTf === t.key ? "bg-gc-blue text-gc-on-blue" : "bg-gc-console-search text-gc-ink-muted hover:text-gc-ink")}
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
         {tech ? (
           <>
-            <Gauge score={tech.score} />
-            <p className={cn("text-center text-sm font-semibold", tech.score > 0.1 ? "text-gc-blue" : tech.score < -0.1 ? "text-gc-red" : "text-gc-ink")}>
-              {tech.rating}
-            </p>
-            <p className="mb-2 text-center text-[11px] text-gc-ink-muted">
-              Buy {tech.counts.buy} · Neutral {tech.counts.neutral} · Sell {tech.counts.sell}
-            </p>
-            <p className="mt-1 text-[10px] font-semibold uppercase tracking-wider text-gc-ink-muted">Oscillators</p>
-            <ul className="divide-y divide-gc-line/60">{tech.oscillators.map((r) => <ReadingRow key={r.name} r={r} />)}</ul>
-            <p className="mt-2 text-[10px] font-semibold uppercase tracking-wider text-gc-ink-muted">Moving averages</p>
-            <ul className="divide-y divide-gc-line/60">{tech.movingAverages.map((r) => <ReadingRow key={r.name} r={r} />)}</ul>
+            <div className="relative">
+              <Gauge score={tech.score} />
+              <span className="absolute left-0 top-12 text-[10px] text-gc-ink-muted">Sell</span>
+              <span className="absolute right-0 top-12 text-[10px] text-gc-ink-muted">Buy</span>
+            </div>
+            <p className={cn("text-center text-[16px] font-semibold", ratingTone)}>{tech.rating}</p>
+            <dl className="mt-2 space-y-1 text-[12px]">
+              {tech.oscillators.map((r) => (
+                <div key={r.name} className="flex items-center justify-between">
+                  <dt className="text-gc-ink">{r.name}</dt>
+                  <dd className="flex items-center gap-3">
+                    <span className="font-mono tabular-nums text-gc-ink-muted">{num(r.value)}</span>
+                    <span className={cn("w-12 text-right font-medium capitalize", verdictTone[r.verdict])}>{r.verdict}</span>
+                  </dd>
+                </div>
+              ))}
+              {(() => {
+                const e20 = tech.movingAverages.find((m) => m.name === "EMA (20)");
+                const e50 = tech.movingAverages.find((m) => m.name === "EMA (50)");
+                if (!e20 || !e50) return null;
+                const v: TechVerdict = e20.value > e50.value ? "buy" : e20.value < e50.value ? "sell" : "neutral";
+                return (
+                  <div className="flex items-center justify-between">
+                    <dt className="text-gc-ink">EMA (20, 50)</dt>
+                    <dd className={cn("w-12 text-right font-medium capitalize", verdictTone[v])}>{v}</dd>
+                  </div>
+                );
+              })()}
+              {(
+                [
+                  ["Moving Averages", group(tech.movingAverages)],
+                  ["Oscillators", group(tech.oscillators)],
+                ] as const
+              ).map(([label, c]) => (
+                <div key={label} className="flex items-center justify-between border-t border-gc-line/60 pt-1">
+                  <dt className="text-gc-ink">{label}</dt>
+                  <dd className="flex gap-2 text-[11px]">
+                    <span className="text-gc-green">Buy {c.buy}</span>
+                    <span className="text-gc-ink-muted">Neutral {c.neutral}</span>
+                    <span className="text-gc-red">Sell {c.sell}</span>
+                  </dd>
+                </div>
+              ))}
+            </dl>
             <p className="mt-2 text-[10px] text-gc-ink-muted">Indicator readings on closed candles. Not trade advice.</p>
           </>
         ) : (
-          <p className="text-[12px] text-gc-ink-muted">Waiting for candles…</p>
+          <p className="py-6 text-center text-[12px] text-gc-ink-muted">{otherTf.isError ? "Candles unavailable right now." : "Loading candles…"}</p>
         )}
       </Card>
 
-      {/* Risk */}
-      <Card title="Risk management">
-        <dl className="space-y-1.5 text-[12px]">
-          <div className="flex justify-between">
-            <dt className="text-gc-ink-muted">Margin used</dt>
-            <dd className="font-mono tabular-nums text-gc-ink">{marginUsed.toFixed(1)}%</dd>
+      <Card
+        title="Risk Management"
+        action={
+          <button type="button" onClick={() => setEditing((v) => !v)} aria-label="Edit daily loss limit" title="Edit daily loss limit" className="flex h-7 w-7 items-center justify-center rounded-full text-gc-ink-muted hover:bg-gc-console-search hover:text-gc-ink">
+            <Settings2 className="h-4 w-4" />
+          </button>
+        }
+      >
+        <dl className="space-y-2 text-[12px]">
+          <div className="flex items-center justify-between">
+            <dt className="text-gc-ink-muted">Daily loss limit (USD)</dt>
+            <dd>
+              {editing ? (
+                <input
+                  type="number"
+                  min="1"
+                  defaultValue={limit}
+                  autoFocus
+                  onBlur={(e) => {
+                    saveLimit(Number(e.target.value));
+                    setEditing(false);
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") (e.target as HTMLInputElement).blur();
+                  }}
+                  className="h-7 w-24 rounded-lg border border-gc-line bg-background px-2 text-right font-mono text-[12px] text-gc-ink outline-none focus:border-gc-blue"
+                />
+              ) : (
+                <span className="font-mono font-semibold tabular-nums text-gc-ink">${num(limit)}</span>
+              )}
+            </dd>
           </div>
-          <div className="h-1.5 overflow-hidden rounded-full bg-gc-console-search">
-            <div className={cn("h-full rounded-full", marginUsed > 50 ? "bg-gc-red" : "bg-gc-blue")} style={{ width: `${Math.min(100, marginUsed)}%` }} />
+          <div>
+            <div className="flex justify-between">
+              <dt className="text-gc-ink-muted">Loss used today</dt>
+              <dd className="font-mono tabular-nums text-gc-ink">${num(lossUsed)}</dd>
+            </div>
+            <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-gc-console-search">
+              <div className={cn("h-full rounded-full", lossPct >= 100 ? "bg-gc-red" : lossPct >= 70 ? "bg-gc-yellow" : "bg-gc-green")} style={{ width: `${lossPct}%` }} />
+            </div>
+            {lossPct >= 100 && <p className="mt-1 text-[11px] font-medium text-gc-red">Daily loss limit reached. Consider stopping for today.</p>}
           </div>
-          <div className="flex justify-between">
-            <dt className="text-gc-ink-muted">Drawdown from start</dt>
-            <dd className={cn("font-mono tabular-nums", drawdown > 0 ? "text-gc-red" : "text-gc-ink")}>{hideBalance ? mask : `${drawdown.toFixed(2)}%`}</dd>
-          </div>
-          <div className="flex justify-between">
-            <dt className="text-gc-ink-muted">Pending orders</dt>
-            <dd className="font-mono tabular-nums text-gc-ink">{(account.orders ?? []).length}</dd>
-          </div>
-          <div className="flex justify-between">
-            <dt className="text-gc-ink-muted">Demo win rate</dt>
-            <dd className="font-mono tabular-nums text-gc-ink">{winRate == null ? "—" : `${winRate.toFixed(0)}% of ${history.length}`}</dd>
+          <div className="flex items-center justify-between">
+            <dt className="flex items-center gap-1 text-gc-ink-muted" title="Equity change from the $100,000 starting balance">
+              Current drawdown <Info className="h-3 w-3" />
+            </dt>
+            <dd className={cn("font-mono font-semibold tabular-nums", tone(drawdown))}>{`${drawdown >= 0 ? "+" : ""}${drawdown.toFixed(2)}%`}</dd>
           </div>
         </dl>
       </Card>

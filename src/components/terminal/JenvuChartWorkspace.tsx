@@ -55,6 +55,8 @@ import { INDICATOR_LIST, buildIndicatorSeries, isIndicatorId, type IndicatorId }
 import { ScriptPanel, type SavedScript } from "./ScriptPanel";
 import { buildChartContext } from "./chart-context";
 import { TerminalSidePanel } from "./TerminalSidePanel";
+import { TerminalOrderPanel } from "./TerminalOrderPanel";
+import { TerminalPositionsTable } from "./TerminalPositionsTable";
 import { DemoTradingPanel, OrderTicket, PaperTradingPanel, QuickTradeButtons, useDemoTrading } from "./DemoTradingPanel";
 import { positionPnl, type DemoSide } from "@/lib/chart/demo-trading";
 import { buildLiveBars } from "@/lib/chart/live-candle";
@@ -134,8 +136,10 @@ type Props = {
   theme?: "light" | "dark";
   /** Extra buttons placed at the bottom of the left side bar (e.g. Ask With AI). */
   railSlot?: ReactNode;
-  /** Right trading column (desktop): trade buttons, demo account, market watch, technicals, risk. */
+  /** Desktop trading layout: left order + account panel, positions under the chart. */
   sidePanelOpen?: boolean;
+  /** Right column (market watch, technicals, risk); hidden while the AI desk is open. */
+  rightPanelOpen?: boolean;
   onSidePanelOpenChange?: (open: boolean) => void;
 };
 
@@ -220,7 +224,7 @@ function ToolButton({
 }
 
 export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function JenvuChartWorkspace(
-  { timeframes, timeframe, onTimeframeChange, rightSlot, mobileNewsRow, asset = "XAUUSD", onAssetChange, theme = "light", railSlot, sidePanelOpen = false, onSidePanelOpenChange },
+  { timeframes, timeframe, onTimeframeChange, rightSlot, mobileNewsRow, asset = "XAUUSD", onAssetChange, theme = "light", railSlot, sidePanelOpen = false, rightPanelOpen = sidePanelOpen, onSidePanelOpenChange },
   ref,
 ) {
   const fetchChart = useServerFn(getTerminalChart);
@@ -741,7 +745,8 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
   return (
     <div ref={workspaceRef} className={cn("flex h-full min-h-0 w-full", theme === "dark" ? "bg-background" : "bg-gc-console-bar")}>
       {rail}
-      <div className={cn("flex min-h-0 min-w-0 flex-1 flex-col bg-background", theme !== "dark" && "overflow-hidden rounded-t-2xl")}>
+      {sidePanelOpen && <TerminalOrderPanel trading={demo} price={currentPrice} />}
+      <div className={cn("flex min-h-0 min-w-0 flex-1 flex-col bg-background", theme !== "dark" && "overflow-hidden rounded-t-2xl", theme !== "dark" && sidePanelOpen && "lg:mb-2 lg:rounded-2xl lg:border lg:border-gc-line")}>
       {/* Top bar — phones only: on laptops and tablets every control lives in the side bar. */}
       <div className="flex h-11 shrink-0 items-center gap-1 overflow-x-auto border-b border-border px-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:hidden">
 
@@ -1070,6 +1075,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
             )}
           </div>
 
+          {sidePanelOpen && <TerminalPositionsTable trading={demo} price={currentPrice} />}
           {demoTradingEnabled && paperOpen && <PaperTradingPanel trading={demo} price={currentPrice} onClose={() => setPaperOpen(false)} />}
 
           {scriptPanelOpen && (
@@ -1083,14 +1089,12 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
         </div>
       </div>
     </div>
-      {sidePanelOpen && (
+      {sidePanelOpen && rightPanelOpen && (
         <TerminalSidePanel
           trading={demo}
           price={currentPrice}
           bars={bars}
-          timeframeLabel={timeframe.label}
-          onPick={setTicketSide}
-          onOpenTrades={() => setPaperOpen((v) => !v)}
+          timeframeKey={timeframe.key}
           onClose={() => onSidePanelOpenChange?.(false)}
         />
       )}
