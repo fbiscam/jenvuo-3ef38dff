@@ -32,10 +32,13 @@ import { TERMINAL_RAIL_BTN } from "@/components/terminal/rail-style";
 import { TerminalNewsPanel } from "@/components/terminal/TerminalNewsPanel";
 import {
   AiInsightCard,
+  AssetDetailCard,
   LiquidityZonesCard,
+  MarketOverlayCard,
   MarketSessionsCard,
+  PerformanceCard,
+  TechnicalsCard,
   TerminalBottomTabs,
-  TerminalStatCards,
   type MarketSnapshot,
 } from "@/components/terminal/TerminalProPanels";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -326,6 +329,7 @@ function TerminalPage() {
   };
   const [deskOpen, setDeskOpen] = useState(false);
   const [market, setMarket] = useState<MarketSnapshot | null>(null);
+  const [summaryOpen, setSummaryOpen] = useState(true);
   const [theme, setTheme] = useState<"light" | "dark">("light");
   const [watchlistOpen, setWatchlistOpen] = useState(true);
   // The watchlist fills the right side whenever the AI desk is closed.
@@ -690,10 +694,10 @@ function TerminalPage() {
       <div
         className={cn(
           "flex h-full min-h-0 w-full flex-col overflow-hidden text-foreground",
-          theme === "dark" ? "dark terminal-dark bg-background" : "bg-gc-console-bar",
+          "terminal-obsidian bg-gc-console-bar",
         )}
       >
-        <div className={cn("flex min-h-0 flex-1 flex-col lg:flex-row", theme !== "dark" && "gap-3 lg:pr-3 lg:pt-3")}>
+        <div className="flex min-h-0 flex-1 flex-col gap-3 lg:flex-row lg:pr-3 lg:pt-3">
           {/* Chart */}
           <section
             aria-label="XAU/USD chart"
@@ -709,9 +713,11 @@ function TerminalPage() {
               asset={asset}
               onAssetChange={changeAsset}
               theme={theme}
+              canvasTheme="dark"
+              popoverClassName="terminal-obsidian"
               onMarketUpdate={setMarket}
-              headerSlot={
-                <TerminalStatCards market={market} nextNews={nextGoldNews} marketClosed={marketClosed} />
+              overlaySlot={
+                summaryOpen && !deskOpen ? <MarketOverlayCard market={market} onClose={() => setSummaryOpen(false)} /> : null
               }
               footerSlot={
                 <TerminalBottomTabs news={relevantNews.slice(0, 5)} onAsk={() => setDeskOpen(true)} />
@@ -723,25 +729,23 @@ function TerminalPage() {
               railSlot={
                 <>
                   <div
-                    className={cn(TERMINAL_RAIL_BTN, "hover:bg-transparent")}
+                    className={cn(TERMINAL_RAIL_BTN, "h-auto w-11 flex-col gap-0.5 py-1.5 hover:bg-transparent")}
                     title={marketClosed ? "Gold market is closed for the weekend" : `Time left on the current ${tf.label} candle`}
                     aria-label={marketClosed ? "Market closed" : `Current ${tf.label} candle closes in ${formatCountdown(secondsLeft)}`}
                   >
-                    <Timer className="h-[19px] w-[19px] shrink-0" />
-                    <span className="hidden xl:inline">Candle</span>
-                    <span className="ml-auto hidden font-mono text-[11px] font-semibold tabular-nums xl:inline">{formatCountdown(secondsLeft)}</span>
+                    <Timer className="h-[17px] w-[17px] shrink-0" />
+                    <span className="font-mono text-[9px] font-semibold tabular-nums text-gc-ink">{formatCountdown(secondsLeft)}</span>
                   </div>
                   <Popover>
                     <PopoverTrigger asChild>
                       <button type="button" aria-label="Gold news" title="Gold news" className={TERMINAL_RAIL_BTN}>
                         <Newspaper className="h-[19px] w-[19px] shrink-0" />
-                        <span className="hidden xl:inline">News</span>
                         {nextGoldNews && (
                           <span aria-hidden="true" className={cn("absolute right-2 top-2 h-1.5 w-1.5 rounded-full", nextGoldNews.impact === "High" ? "bg-destructive" : "bg-gc-yellow")} />
                         )}
                       </button>
                     </PopoverTrigger>
-                    <PopoverContent side="right" align="end" className={cn("max-h-[80vh] w-80 overflow-y-auto p-2 font-sans", theme === "dark" && "dark terminal-dark border-border bg-popover text-popover-foreground")}>
+                    <PopoverContent side="right" align="end" className="terminal-obsidian max-h-[80vh] w-80 overflow-y-auto border-gc-line bg-popover p-2 font-sans text-popover-foreground">
                       <TerminalNewsPanel />
                     </PopoverContent>
                   </Popover>
@@ -753,7 +757,6 @@ function TerminalPage() {
                     className={cn(TERMINAL_RAIL_BTN, deskOpen && "bg-gc-blue-soft text-gc-blue-deep")}
                   >
                     <img src="/favicon.png" alt="" className="h-5 w-5 shrink-0 rounded-sm object-contain" />
-                    <span className="hidden xl:inline">AI Insights</span>
                   </button>
                 </>
               }
@@ -811,10 +814,13 @@ function TerminalPage() {
           </section>
 
           {/* Market panels (wide screens) — replaced by the AI desk while it is open */}
-          {!deskOpen && theme !== "dark" && (
-            <aside className="hidden min-h-0 w-[340px] shrink-0 flex-col gap-3 overflow-y-auto pb-3 xl:flex" aria-label="Market overview">
-              <MarketSessionsCard marketClosed={marketClosed} />
+          {!deskOpen && (
+            <aside className="hidden min-h-0 w-[316px] shrink-0 flex-col gap-3 overflow-y-auto pb-3 [scrollbar-width:thin] xl:flex" aria-label="Market overview">
+              <AssetDetailCard market={market} nextNews={nextGoldNews} marketClosed={marketClosed} />
+              <PerformanceCard market={market} />
+              <TechnicalsCard market={market} />
               <LiquidityZonesCard market={market} />
+              <MarketSessionsCard marketClosed={marketClosed} />
               <AiInsightCard
                 market={market}
                 onAsk={() => {
@@ -846,7 +852,7 @@ function TerminalPage() {
                 "relative flex h-[45%] min-h-0 w-full shrink-0 flex-col bg-card text-card-foreground lg:h-full lg:w-[380px]",
                 theme === "dark"
                   ? "border-t border-border lg:border-l lg:border-t-0"
-                  : "overflow-hidden rounded-2xl border border-gc-line shadow-sm",
+                  : "overflow-hidden rounded-xl border border-gc-line lg:mb-3",
               )}
             >
               <div className="flex min-h-17 items-center justify-end gap-2.5 border-b border-border px-4 py-3">
