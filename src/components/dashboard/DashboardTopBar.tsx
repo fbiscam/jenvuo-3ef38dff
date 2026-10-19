@@ -10,8 +10,8 @@ import GiftBox from "@/components/dashboard/GiftBox";
 import { SITE_PAGES } from "@/lib/site-pages";
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import {
-  BookOpen, Camera, Code, CreditCard, Download, ExternalLink, FileText, LifeBuoy, Loader2, LogOut, Mail,
-  Menu, MoreVertical, Search, SendHorizontal, Settings, ShieldCheck, Sparkles,, SquareTerminal, Sparkle } from "lucide-react";
+  BookOpen, Camera, CreditCard, Download, ExternalLink, FileText, LifeBuoy, Loader2, LogOut, Mail,
+  Menu, MoreVertical, Search, SendHorizontal, Settings, ShieldCheck, Sparkles, SquareTerminal, Sparkle } from "lucide-react";
 import NotificationBell from "@/components/NotificationBell";
 import {
   DropdownMenu,
