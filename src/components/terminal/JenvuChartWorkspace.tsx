@@ -55,7 +55,7 @@ import { ChartCanvas, type ChartCanvasHandle } from "./ChartCanvas";
 import { INDICATOR_LIST, buildIndicatorSeries, isIndicatorId, type IndicatorId } from "./indicator-specs";
 import { ScriptPanel, type SavedScript } from "./ScriptPanel";
 import { buildChartContext } from "./chart-context";
-import { TerminalSidePanel } from "./TerminalSidePanel";
+import { RiskCard, TerminalSidePanel } from "./TerminalSidePanel";
 import { TerminalOrderPanel } from "./TerminalOrderPanel";
 import { TerminalPositionsTable } from "./TerminalPositionsTable";
 import { TerminalOverviewRow } from "./TerminalOverviewRow";
@@ -1116,12 +1116,12 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
       </div>
     </div>
       {sidePanelOpen && rightPanelOpen && (
-        <TerminalSidePanel trading={demo} price={currentPrice} onClose={() => onSidePanelOpenChange?.(false)} />
+        <TerminalSidePanel trading={demo} onClose={() => onSidePanelOpenChange?.(false)} />
       )}
       </div>
       {sidePanelOpen && <TerminalPositionsTable trading={demo} price={currentPrice} />}
       </div>
-      {sidePanelOpen && <TerminalOrderPanel trading={demo} price={currentPrice} />}
+      {sidePanelOpen && <TerminalOrderPanel trading={demo} price={currentPrice} footer={<RiskCard trading={demo} price={currentPrice} />} />}
     </div>
   );
 });

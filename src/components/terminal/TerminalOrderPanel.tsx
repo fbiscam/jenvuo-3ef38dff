@@ -43,7 +43,7 @@ const input =
   "h-10 w-full rounded-xl border border-gc-line bg-card px-3 text-sm text-gc-ink outline-none placeholder:text-gc-ink-muted/70 focus:border-gc-blue focus:ring-1 focus:ring-gc-blue";
 
 /** Left Terminal column: XAU/USD order form and the demo account (balance can be hidden). */
-export function TerminalOrderPanel({ trading, price }: { trading: DemoTrading; price: number | null }) {
+export function TerminalOrderPanel({ trading, price, footer }: { trading: DemoTrading; price: number | null; footer?: React.ReactNode }) {
   const [hidden] = useHideBalance();
   const [side, setSide] = useState<DemoSide>("buy");
   const [type, setType] = useState<DemoOrderType>("market");
@@ -193,6 +193,7 @@ export function TerminalOrderPanel({ trading, price }: { trading: DemoTrading; p
         )}
       </section>
 
+      {footer}
     </aside>
   );
 }
