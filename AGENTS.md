@@ -12,9 +12,7 @@
 - Keep canonical section addresses stable: dashboard home at dash.jenvu.com/overview with child pages at dash.jenvu.com/<page> (usage, api, billing, payment), sign-in at auth.jenvu.com/sign-in, blog at blogs.jenvu.com, help at support.jenvu.com, and global public pages on jenvu.com to avoid section-slug collisions.
 - Centralize sign-out through the cross-domain session helper so local tokens and the shared `.jenvu.com` cookie are cleared before redirecting to `auth.jenvu.com/sign-in`; this prevents session restoration races and blank auth pages.
 - Build authenticator 2FA setup from the auth service's returned QR/URI and remove incomplete factors before retrying; this avoids mismatched secrets and duplicate enrollment failures.
-- Chart, pressure, zone, FVG and sweep rules live in `src/lib/chart/AGENTS.md`.
-- Chart series creation, live updates and script offsets use the shared rendered indicator list; this prevents hidden duplicate Volume slots from shifting RVOL, EMA and script data.
-- Gold terminal candles use Gate XAU_USDT gold contract as the primary feed (PAXG token was too thin, candle colours differed from TradingView) (Binance only as fallback): Binance blocks the live server region, so Binance-first made preview and live draw different candles and zones.
+- Subdirectories have their own `AGENTS.md` (chart rules incl. series and gold feed in `src/lib/chart/`, Terminal UI in `src/components/terminal/`); read them before changing files there.
 - MCP server lives in `src/lib/mcp/` (one tool per file, OAuth via the backend issuer, caller token forwarded so RLS applies): keeps external assistants scoped to the signed-in user's own data.
 - Signup is public; the Terminal (page + chart server function) is unlocked only for admins and approved Founding Program applications via `src/lib/terminal-access.server.ts`: the UI lock alone could be bypassed by calling the server function directly.
 - Founding approval grants the requested plan immediately and starts a 2-day ID-verification window enforced in `src/lib/terminal-access.server.ts` (submitted/verified documents keep access): server-side so the Terminal chart cannot be used after the deadline by bypassing the UI.
@@ -30,4 +28,3 @@
 - Top-bar Gifts box lists positive credit-ledger rows whose reason is in `GIFT_REASONS` (`src/lib/gifts.ts`, tested), with the seen time kept per user in the browser: gifts need no extra table and only gift-type credit shows.
 - The Terminal stays unzoomed but its top bar and menu drawer use `.jenvu-zoom-chrome` (same breakpoints as `.jenvu-zoom-dashboard`): keeps header/menu the same size on every dashboard page.
 - Blog articles reach Google by resubmitting `https://jenvu.com/sitemap.xml` through the Search Console connector (`submitToGoogle` in `generate-insight.ts`), once per run: the per-URL Indexing API returns 404 through the connector.
-- Terminal dashboard cards share live quotes and technicals through `src/components/terminal/terminal-market.tsx`: one cache, so the top cards and Market Watch never show different prices.
