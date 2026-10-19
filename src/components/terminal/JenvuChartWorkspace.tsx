@@ -55,7 +55,8 @@ import { ChartCanvas, type ChartCanvasHandle } from "./ChartCanvas";
 import { INDICATOR_LIST, buildIndicatorSeries, isIndicatorId, type IndicatorId } from "./indicator-specs";
 import { ScriptPanel, type SavedScript } from "./ScriptPanel";
 import { buildChartContext } from "./chart-context";
-import { RiskCard, TerminalSidePanel } from "./TerminalSidePanel";
+import { RiskCard } from "./TerminalSidePanel";
+import { TerminalMarketTabs } from "./TerminalMarketTabs";
 import { TerminalOrderPanel } from "./TerminalOrderPanel";
 import { TerminalPositionsTable } from "./TerminalPositionsTable";
 import { TerminalOverviewRow } from "./TerminalOverviewRow";
@@ -770,7 +771,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
         className={cn(
           "flex min-h-0 min-w-0 flex-1 flex-col bg-background",
           sidePanelOpen
-            ? "lg:h-full lg:overflow-hidden lg:rounded-2xl lg:border lg:border-gc-line lg:bg-card"
+            ? "lg:h-full lg:overflow-hidden lg:rounded-none lg:border lg:border-gc-line lg:bg-card"
             : theme !== "dark" && "overflow-hidden md:mb-2 md:rounded-2xl md:border md:border-gc-line",
         )}
       >
@@ -976,7 +977,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
             {/* Legend */}
             <div
               className={cn(
-                "pointer-events-none absolute left-2 top-1.5 z-[3] max-w-[70%] space-y-0.5 font-mono text-[11px] leading-4",
+                "pointer-events-none absolute left-2 top-1.5 z-[3] max-w-[70%] space-y-0.5 font-sans text-[11px] font-normal leading-4",
                 "text-foreground",
               )}
             >
@@ -1115,11 +1116,9 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
         </div>
       </div>
     </div>
-      {sidePanelOpen && rightPanelOpen && (
-        <TerminalSidePanel trading={demo} onClose={() => onSidePanelOpenChange?.(false)} />
-      )}
       </div>
       {sidePanelOpen && <TerminalPositionsTable trading={demo} price={currentPrice} />}
+      {sidePanelOpen && <TerminalMarketTabs bars={bars} price={currentPrice} timeframeKey={timeframe.key} />}
       </div>
       {sidePanelOpen && <TerminalOrderPanel trading={demo} price={currentPrice} footer={<RiskCard trading={demo} price={currentPrice} />} />}
     </div>

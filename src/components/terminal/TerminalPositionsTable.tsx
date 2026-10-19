@@ -33,7 +33,7 @@ export function TerminalPositionsTable({ trading, price }: { trading: DemoTradin
   ];
 
   return (
-    <section aria-label="Demo positions" className="hidden h-[240px] shrink-0 flex-col overflow-hidden rounded-2xl border border-gc-line bg-card font-sans lg:flex">
+    <section aria-label="Demo positions" className="hidden h-[240px] shrink-0 flex-col overflow-hidden rounded-none border border-gc-line bg-card font-sans lg:flex">
       <div className="flex items-center gap-1 border-b border-gc-line px-3">
         {tabs.map(([id, label]) => (
           <button
@@ -75,7 +75,7 @@ export function TerminalPositionsTable({ trading, price }: { trading: DemoTradin
                   const pct = (pnl / (p.entryPrice * p.quantity)) * 100;
                   return (
                     <tr key={p.id} className="border-t border-gc-line/60">
-                      <td className={td}><span className="rounded-md bg-gc-console-search px-1.5 py-0.5 font-sans text-[11px] font-semibold">XAUUSD</span></td>
+                      <td className={td}><span className="rounded-md bg-gc-console-search px-1.5 py-0.5 font-sans text-[11px] font-medium">XAUUSD</span></td>
                       <td className={cn(td, "font-sans font-medium", p.side === "buy" ? "text-gc-green" : "text-gc-red")}>{p.side === "buy" ? "Buy" : "Sell"}</td>
                       <td className={td}>{lots(p.quantity)}</td>
                       <td className={td}>{num(p.entryPrice)}</td>
@@ -136,7 +136,7 @@ export function TerminalPositionsTable({ trading, price }: { trading: DemoTradin
                 {history.map((t) => (
                   <tr key={t.id + t.closedAt} className="border-t border-gc-line/60">
                     <td className={td}>
-                      <span className={cn("rounded-md px-1.5 py-0.5 font-sans text-[10px] font-semibold", t.pnl >= 0 ? "bg-gc-green-soft text-gc-green" : "bg-gc-red-soft text-gc-red")}>{t.pnl >= 0 ? "WIN" : "LOSS"}</span>
+                      <span className={cn("rounded-md px-1.5 py-0.5 font-sans text-[10px] font-medium", t.pnl >= 0 ? "bg-gc-green-soft text-gc-green" : "bg-gc-red-soft text-gc-red")}>{t.pnl >= 0 ? "WIN" : "LOSS"}</span>
                     </td>
                     <td className={cn(td, "font-sans font-medium", t.side === "buy" ? "text-gc-green" : "text-gc-red")}>{t.side === "buy" ? "Buy" : "Sell"}</td>
                     <td className={td}>{lots(t.quantity)}</td>

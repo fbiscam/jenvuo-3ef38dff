@@ -43,22 +43,22 @@ export function TerminalOverviewRow({
           const d = q?.decimals ?? 2;
           const ch = q?.changePct ?? null;
           return (
-            <section key={symbol} className="flex flex-col justify-between rounded-2xl border border-gc-line bg-card p-3.5">
+            <section key={symbol} className="flex flex-col justify-between rounded-none border border-gc-line bg-card p-3.5">
               <div className="flex items-center gap-2.5">
                 {w.icon ? <img src={w.icon} alt="" className="h-8 w-8 rounded-full" /> : <XauUsdLogo size={32} />}
                 <div className="min-w-0">
-                  <p className="truncate text-[13px] font-semibold leading-tight text-gc-ink">{w.label}</p>
+                  <p className="truncate text-[13px] font-medium leading-tight text-gc-ink">{w.label}</p>
                   <p className="truncate text-[11px] text-gc-ink-muted">{w.name}</p>
                 </div>
               </div>
               <div className="mt-3 flex items-end justify-between gap-2">
-                <p className="truncate text-[20px] font-semibold tabular-nums leading-none text-gc-ink 2xl:text-[22px]">
+                <p className="truncate text-[20px] font-medium tabular-nums leading-none text-gc-ink 2xl:text-[22px]">
                   {p != null ? num(p, d) : "—"}
                 </p>
                 {ch != null && (
                   <span
                     className={cn(
-                      "shrink-0 rounded-full px-1.5 py-0.5 text-[11px] font-medium tabular-nums",
+                      "shrink-0 rounded-sm px-1.5 py-0.5 text-[11px] font-medium tabular-nums",
                       ch >= 0 ? "bg-gc-green-soft text-gc-green" : "bg-gc-red-soft text-gc-red",
                     )}
                   >
@@ -71,9 +71,9 @@ export function TerminalOverviewRow({
         })}
       </div>
 
-      <section className="flex min-w-0 gap-4 rounded-2xl border border-gc-line bg-card p-3.5">
+      <section className="flex min-w-0 gap-4 rounded-none border border-gc-line bg-card p-3.5">
         <div className="flex w-[200px] shrink-0 flex-col 2xl:w-[230px]">
-          <h3 className="text-[14px] font-semibold text-gc-ink">Technicals</h3>
+          <h3 className="text-[14px] font-medium text-gc-ink">Technicals</h3>
           <div className="mt-2 grid grid-cols-4 gap-1">
             {TECH_TFS.map((t) => (
               <button
@@ -82,7 +82,7 @@ export function TerminalOverviewRow({
                 onClick={() => setTechTf(t.key)}
                 aria-pressed={activeTf === t.key}
                 className={cn(
-                  "rounded-full py-1 text-[11px] font-medium",
+                  "rounded-md py-1 text-[11px] font-medium",
                   activeTf === t.key ? "bg-gc-blue text-gc-on-blue" : "bg-gc-console-search text-gc-ink-muted hover:text-gc-ink",
                 )}
               >
@@ -94,7 +94,7 @@ export function TerminalOverviewRow({
             <>
               <p
                 className={cn(
-                  "mt-3 text-[18px] font-semibold",
+                  "mt-3 text-[18px] font-medium",
                   tech.score > 0.1 ? "text-gc-green" : tech.score < -0.1 ? "text-gc-red" : "text-gc-ink",
                 )}
               >
@@ -129,7 +129,7 @@ export function TerminalOverviewRow({
 
         <div className="flex min-w-0 flex-1 flex-col">
           <div className="flex items-center justify-between gap-2">
-            <h3 className="text-[14px] font-semibold text-gc-ink">
+            <h3 className="text-[14px] font-medium text-gc-ink">
               Gold {useVolume ? "volume" : "range"} <span className="font-normal text-gc-ink-muted">· {timeframeLabel}</span>
             </h3>
             <span className="text-[11px] text-gc-ink-muted">Last {recent.length} candles</span>

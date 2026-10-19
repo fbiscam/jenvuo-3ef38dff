@@ -105,6 +105,11 @@
   --color-gc-console-rail-active: var(--gc-console-rail-active);
   --color-gc-red: var(--gc-red);
   --color-gc-red-soft: var(--gc-red-soft);
+  --color-season-1: var(--season-1);
+  --color-season-2: var(--season-2);
+  --color-season-3: var(--season-3);
+  --color-season-4: var(--season-4);
+  --color-season-5: var(--season-5);
   --color-gc-yellow: var(--gc-yellow);
   --color-gc-yellow-soft: var(--gc-yellow-soft);
   --color-gc-green: var(--gc-green);
@@ -186,6 +191,11 @@
   --gc-console-rail-active: #d3e3fd;
   --gc-red: #ea4335;
   --gc-red-soft: #fce8e6;
+  --season-1: oklch(0.8 0.15 85);
+  --season-2: oklch(0.6 0.2 0);
+  --season-3: oklch(0.75 0.12 200);
+  --season-4: oklch(0.75 0.16 60);
+  --season-5: oklch(0.7 0.17 150);
   --gc-yellow: #fbbc04;
   --gc-yellow-soft: #fef7e0;
   --gc-green: #34a853;

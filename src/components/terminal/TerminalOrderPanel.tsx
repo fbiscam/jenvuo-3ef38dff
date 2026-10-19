@@ -40,11 +40,11 @@ function useHideBalance() {
 }
 
 const input =
-  "h-10 w-full rounded-xl border border-gc-line bg-card px-3 text-sm text-gc-ink outline-none placeholder:text-gc-ink-muted/70 focus:border-gc-blue focus:ring-1 focus:ring-gc-blue";
+  "h-10 w-full rounded-md border border-gc-line bg-card px-3 text-sm text-gc-ink outline-none placeholder:text-gc-ink-muted/70 focus:border-gc-blue focus:ring-1 focus:ring-gc-blue";
 
 /** Left Terminal column: XAU/USD order form and the demo account (balance can be hidden). */
 export function TerminalOrderPanel({ trading, price, footer }: { trading: DemoTrading; price: number | null; footer?: React.ReactNode }) {
-  const [hidden] = useHideBalance();
+  const [hidden, toggleHidden] = useHideBalance();
   const [side, setSide] = useState<DemoSide>("buy");
   const [type, setType] = useState<DemoOrderType>("market");
   const [lots, setLots] = useState("0.10");
@@ -83,31 +83,54 @@ export function TerminalOrderPanel({ trading, price, footer }: { trading: DemoTr
 
   return (
     <aside aria-label="Order panel" className="hidden w-[256px] shrink-0 flex-col gap-3 overflow-y-auto py-3 pr-3 font-sans [scrollbar-width:thin] lg:flex xl:w-[276px] 2xl:w-[300px]">
-      <section className="rounded-2xl border border-gc-line bg-card p-3.5">
+      <section className="rounded-none border border-gc-line bg-card p-3.5">
         <div className="flex items-center gap-2.5">
           <XauUsdLogo size={30} />
           <div className="min-w-0">
-            <p className="text-[15px] font-semibold leading-tight text-gc-ink">Place order</p>
+            <p className="text-[15px] font-medium leading-tight text-gc-ink">Place order</p>
             <p className="text-[11px] text-gc-ink-muted">XAU/USD · Gold Spot / US Dollar</p>
           </div>
         </div>
         <div className="mt-3 flex items-center justify-between text-[12px]">
           <span className="text-gc-ink-muted">Balance (Demo)</span>
-          <span className="font-semibold tabular-nums text-gc-ink">{hidden ? MASK : `$${num(account.balance)}`}</span>
+          <span className="flex items-center gap-1">
+            <span className="font-medium tabular-nums text-gc-ink">{hidden ? MASK : `$${num(account.balance)}`}</span>
+            <button
+              type="button"
+              onClick={toggleHidden}
+              aria-label={hidden ? "Show demo balance" : "Hide demo balance"}
+              aria-pressed={hidden}
+              title={hidden ? "Show demo balance" : "Hide demo balance"}
+              className="flex h-6 w-6 items-center justify-center rounded-md text-gc-ink-muted hover:bg-gc-console-search hover:text-gc-ink"
+            >
+              {hidden ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                if (window.confirm(`Reset the demo account to $${num(DEMO_STARTING_BALANCE)}?`)) trading.reset();
+              }}
+              aria-label="Reset demo account"
+              title="Reset demo account"
+              className="flex h-6 w-6 items-center justify-center rounded-md text-gc-ink-muted hover:bg-gc-console-search hover:text-gc-ink"
+            >
+              <RotateCcw className="h-3 w-3" />
+            </button>
+          </span>
         </div>
 
         <div className="mt-3 grid grid-cols-2 gap-2">
-          <div className="rounded-xl bg-gc-red-soft px-2.5 py-2">
+          <div className="rounded-md bg-gc-red-soft px-2.5 py-2">
             <p className="text-[10px] font-medium text-gc-red">BID</p>
-            <p className="text-[17px] font-semibold tabular-nums text-gc-red">{q ? num(q.bid) : "—"}</p>
+            <p className="text-[17px] font-medium tabular-nums text-gc-red">{q ? num(q.bid) : "—"}</p>
           </div>
-          <div className="rounded-xl bg-gc-green-soft px-2.5 py-2">
+          <div className="rounded-md bg-gc-green-soft px-2.5 py-2">
             <p className="text-[10px] font-medium text-gc-green">ASK</p>
-            <p className="text-[17px] font-semibold tabular-nums text-gc-green">{q ? num(q.ask) : "—"}</p>
+            <p className="text-[17px] font-medium tabular-nums text-gc-green">{q ? num(q.ask) : "—"}</p>
           </div>
         </div>
 
-        <div className="mt-3 grid grid-cols-2 overflow-hidden rounded-xl border border-gc-line text-[12px] font-semibold">
+        <div className="mt-3 grid grid-cols-2 overflow-hidden rounded-md border border-gc-line text-[12px] font-medium">
           {(["buy", "sell"] as const).map((s) => (
             <button
               key={s}
@@ -124,7 +147,7 @@ export function TerminalOrderPanel({ trading, price, footer }: { trading: DemoTr
           ))}
         </div>
 
-        <div className="mt-2 grid grid-cols-3 rounded-xl bg-gc-console-search p-0.5 text-[11px] font-medium">
+        <div className="mt-2 grid grid-cols-3 rounded-md bg-gc-console-search p-0.5 text-[11px] font-medium">
           {(["market", "limit", "stop"] as const).map((t) => (
             <button
               key={t}
@@ -146,7 +169,7 @@ export function TerminalOrderPanel({ trading, price, footer }: { trading: DemoTr
         )}
 
         <p className="mt-3 text-[12px] text-gc-ink-muted">Position size (lots)</p>
-        <div className="mt-1 flex h-10 items-center rounded-xl border border-gc-line">
+        <div className="mt-1 flex h-10 items-center rounded-md border border-gc-line">
           <button type="button" onClick={() => stepLots(-0.01)} aria-label="Smaller position" className="flex h-full w-9 items-center justify-center text-gc-ink-muted hover:text-gc-ink">
             <Minus className="h-3.5 w-3.5" />
           </button>
@@ -177,12 +200,12 @@ export function TerminalOrderPanel({ trading, price, footer }: { trading: DemoTr
         </label>
 
         <div className="mt-3.5 grid grid-cols-2 gap-2">
-          <button type="button" onClick={() => submit("buy")} className="rounded-xl bg-gc-green py-2 text-gc-on-blue shadow-sm transition-opacity hover:opacity-90">
-            <span className="block text-[13px] font-semibold">BUY</span>
+          <button type="button" onClick={() => submit("buy")} className="rounded-md bg-gc-green py-2 text-gc-on-blue shadow-sm transition-opacity hover:opacity-90">
+            <span className="block text-[13px] font-medium">BUY</span>
             <span className="block text-[11px] opacity-90">@ {q ? num(type === "market" ? q.ask : Number(orderPrice) || 0) : "—"}</span>
           </button>
-          <button type="button" onClick={() => submit("sell")} className="rounded-xl bg-gc-red py-2 text-gc-on-blue shadow-sm transition-opacity hover:opacity-90">
-            <span className="block text-[13px] font-semibold">SELL</span>
+          <button type="button" onClick={() => submit("sell")} className="rounded-md bg-gc-red py-2 text-gc-on-blue shadow-sm transition-opacity hover:opacity-90">
+            <span className="block text-[13px] font-medium">SELL</span>
             <span className="block text-[11px] opacity-90">@ {q ? num(type === "market" ? q.bid : Number(orderPrice) || 0) : "—"}</span>
           </button>
         </div>
@@ -195,66 +218,5 @@ export function TerminalOrderPanel({ trading, price, footer }: { trading: DemoTr
 
       {footer}
     </aside>
-  );
-}
-
-/** Demo account card: equity, balance, margin; eye hides the balance, reset restores the start balance. */
-export function DemoAccountCard({ trading }: { trading: DemoTrading }) {
-  const [hidden, toggleHidden] = useHideBalance();
-  const { account, metrics } = trading;
-  const marginLevel = metrics.margin > 0 ? (metrics.equity / metrics.margin) * 100 : null;
-  return (
-    <section className="rounded-2xl border border-gc-line bg-card p-3.5">
-      <div className="flex items-center justify-between">
-        <h3 className="text-[14px] font-semibold text-gc-ink">Account (Demo)</h3>
-        <span className="flex items-center gap-0.5">
-          <button
-            type="button"
-            onClick={toggleHidden}
-            aria-label={hidden ? "Show demo balance" : "Hide demo balance"}
-            aria-pressed={hidden}
-            title={hidden ? "Show demo balance" : "Hide demo balance"}
-            className="flex h-7 w-7 items-center justify-center rounded-full text-gc-ink-muted hover:bg-gc-console-search hover:text-gc-ink"
-          >
-            {hidden ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              if (window.confirm(`Reset the demo account to $${num(DEMO_STARTING_BALANCE)}?`)) trading.reset();
-            }}
-            aria-label="Reset demo account"
-            title="Reset demo account"
-            className="flex h-7 w-7 items-center justify-center rounded-full text-gc-ink-muted hover:bg-gc-console-search hover:text-gc-ink"
-          >
-            <RotateCcw className="h-3.5 w-3.5" />
-          </button>
-        </span>
-      </div>
-      {hidden ? (
-        <p className="mt-2 text-[12px] text-gc-ink-muted">Balance hidden. Tap the eye to show it.</p>
-      ) : (
-        <dl className="mt-2 space-y-1.5 text-[12px]">
-          <div className="flex items-baseline justify-between">
-            <dt className="text-gc-ink-muted">Equity</dt>
-            <dd className="text-[18px] font-semibold tabular-nums text-gc-blue">${num(metrics.equity)}</dd>
-          </div>
-          {[
-            ["Balance", `$${num(account.balance)}`],
-            ["Margin", `$${num(metrics.margin)}`],
-            ["Free margin", `$${num(metrics.available)}`],
-            ["Margin level", marginLevel == null ? "—" : `${num(marginLevel, 1)}%`],
-          ].map(([k, v]) => (
-            <div key={k} className="flex justify-between">
-              <dt className="text-gc-ink-muted">{k}</dt>
-              <dd className="tabular-nums text-gc-ink">{v}</dd>
-            </div>
-          ))}
-          <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-gc-console-search">
-            <div className="h-full rounded-full bg-gc-blue" style={{ width: `${Math.max(2, Math.min(100, metrics.equity > 0 ? (metrics.available / metrics.equity) * 100 : 0))}%` }} />
-          </div>
-        </dl>
-      )}
-    </section>
   );
 }

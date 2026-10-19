@@ -53,10 +53,10 @@ export function useWatchQuotes() {
 }
 
 /** Indicator readings on closed candles; follows the chart timeframe until a chip is picked. */
-export function useTechnicals(bars: OhlcvBar[], timeframeKey: string) {
+export function useTechnicals(bars: OhlcvBar[], timeframeKey: string, allowed: Array<{ key: string }> = TECH_TFS) {
   const fetchChart = useServerFn(getTerminalChart);
   const [techTf, setTechTf] = useState<string | null>(null);
-  const activeTf = techTf ?? (TECH_TFS.some((t) => t.key === timeframeKey) ? timeframeKey : "15m");
+  const activeTf = techTf ?? (allowed.some((t) => t.key === timeframeKey) ? timeframeKey : "15m");
   const usesChartBars = activeTf === timeframeKey;
   const otherTf = useQuery({
     queryKey: ["terminal-technicals", activeTf],
