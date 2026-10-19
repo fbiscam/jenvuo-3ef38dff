@@ -55,7 +55,7 @@ import { ChartCanvas, type ChartCanvasHandle } from "./ChartCanvas";
 import { INDICATOR_LIST, buildIndicatorSeries, isIndicatorId, type IndicatorId } from "./indicator-specs";
 import { ScriptPanel, type SavedScript } from "./ScriptPanel";
 import { buildChartContext } from "./chart-context";
-import { TerminalMarketTabs } from "./TerminalMarketTabs";
+import { PERIOD_TIMEFRAME, TerminalPeriodReturns, TerminalSymbolHeader, TerminalTabBody, type MarketTab } from "./TerminalMarketTabs";
 import { TerminalOverviewRow } from "./TerminalOverviewRow";
 import { DemoTradingPanel, OrderTicket, PaperTradingPanel, QuickTradeButtons, useDemoTrading } from "./DemoTradingPanel";
 import { positionPnl, type DemoSide } from "@/lib/chart/demo-trading";
@@ -258,6 +258,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
   const [paperOpen, setPaperOpen] = useState(false);
   // Main chart look: TradingView-style area line by default, candles on demand. Remembered per browser.
   const [chartStyle, setChartStyle] = useState<"candles" | "area">("area");
+  const [marketTab, setMarketTab] = useState<MarketTab>("overview");
   useEffect(() => {
     setChartStyle(readJson<"candles" | "area">("jenvu:terminal-chart-style", "area") === "candles" ? "candles" : "area");
   }, []);
@@ -788,9 +789,12 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
       )}
       <div className={cn("flex min-h-0 min-w-0 flex-1 flex-col", sidePanelOpen && "lg:gap-3 lg:overflow-y-auto lg:p-3 lg:[scrollbar-width:thin]")}>
       {sidePanelOpen && (
-        <TerminalOverviewRow bars={bars} price={currentPrice} timeframeKey={timeframe.key} timeframeLabel={timeframe.label} />
+        <div className="hidden lg:block">
+          <TerminalSymbolHeader price={currentPrice} tab={marketTab} onTabChange={setMarketTab} marketOpen={!goldClosed} />
+        </div>
       )}
-      <div className={cn("flex min-h-0 min-w-0 flex-1", sidePanelOpen && "lg:h-[540px] lg:flex-none lg:gap-3 2xl:h-[600px]")}>
+      {sidePanelOpen && <TerminalTabBody tab={marketTab} bars={bars} timeframeKey={timeframe.key} />}
+      <div className={cn("flex min-h-0 min-w-0 flex-1", sidePanelOpen && "lg:h-[540px] lg:flex-none lg:gap-3 2xl:h-[600px]", sidePanelOpen && marketTab !== "overview" && "lg:hidden")}>
       <div
         className={cn(
           "flex min-h-0 min-w-0 flex-1 flex-col bg-background",
@@ -1144,7 +1148,19 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
       </div>
     </div>
       </div>
-      {sidePanelOpen && <TerminalMarketTabs bars={bars} price={currentPrice} timeframeKey={timeframe.key} />}
+      {sidePanelOpen && marketTab === "overview" && (
+        <>
+          <TerminalPeriodReturns
+            timeframeKey={timeframe.key}
+            onPick={(period) => {
+              const next = timeframes.find((t) => t.key === PERIOD_TIMEFRAME[period]);
+              if (next && next.key !== timeframe.key) onTimeframeChange(next);
+              else chartRef.current?.fit();
+            }}
+          />
+          <TerminalOverviewRow bars={bars} price={currentPrice} timeframeKey={timeframe.key} timeframeLabel={timeframe.label} />
+        </>
+      )}
       </div>
     </div>
   );
