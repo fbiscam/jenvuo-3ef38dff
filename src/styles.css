@@ -1359,44 +1359,57 @@ html body .dash-dark main.bg-white { background-color: oklch(0.165 0 0) !importa
 .ask-jenvu-mark-ring { animation: ask-jenvu-ring 2.4s linear infinite !important; }
 @media (prefers-reduced-motion: reduce) { .ind-kenburns { animation: none; } }
 
-/* Terminal modern theme — white, high-density trading desk, scoped to the Terminal page
-   (shell, chart card, side panels and the chart popovers). */
+/* Terminal modern theme — dark, high-density trading desk (charcoal surfaces, neon red/green),
+   scoped to the Terminal page (shell, chart card, side panels and the chart popovers). */
 .terminal-modern {
-  --background: #ffffff;
-  --foreground: #0f1419;
-  --card: #ffffff;
-  --card-foreground: #0f1419;
-  --popover: #ffffff;
-  --popover-foreground: #0f1419;
-  --border: #e6e8ee;
-  --input: #e1e4ea;
-  --muted: #f3f5f8;
-  --muted-foreground: #6b7280;
-  --accent: #f1f4f9;
-  --gc-blue: #2962ff;
-  --gc-blue-hover: #1e53e5;
-  --gc-blue-soft: #eaf0ff;
-  --gc-blue-deep: #1e4fd8;
-  --gc-console-bar: #f4f6f9;
-  --gc-console-search: #eef1f5;
-  --gc-console-rail-active: #e3eaff;
-  --gc-red: #f23645;
-  --gc-red-soft: #fdecee;
-  --gc-yellow: #f5a623;
-  --gc-yellow-soft: #fff4dd;
-  --gc-green: #089981;
-  --gc-green-soft: #e3f6f2;
-  --gc-success: #089981;
-  --gc-ink: #0f1419;
-  --gc-ink-muted: #6b7280;
-  --gc-line: #e6e8ee;
-  --gc-panel: #f3f5f8;
-  --gc-canvas: #f4f6f9;
-  --gc-notice: #f3f5f8;
+  --background: #17181b;
+  --foreground: #e8eaed;
+  --card: #17181b;
+  --card-foreground: #e8eaed;
+  --popover: #1d1f22;
+  --popover-foreground: #e8eaed;
+  --primary: #e8eaed;
+  --primary-foreground: #0d0e10;
+  --secondary: #222428;
+  --secondary-foreground: #e8eaed;
+  --muted: #1f2124;
+  --muted-foreground: #9aa0a6;
+  --accent: #26292d;
+  --accent-foreground: #ffffff;
+  --border: rgba(255, 255, 255, 0.09);
+  --input: rgba(255, 255, 255, 0.12);
+  --ring: #4c8dff;
+  --gc-blue: #3b82f6;
+  --gc-blue-hover: #2f72e4;
+  --gc-blue-soft: rgba(59, 130, 246, 0.16);
+  --gc-blue-deep: #8ab4f8;
+  --gc-console-bar: #0d0e10;
+  --gc-console-search: #1d1f22;
+  --gc-console-rail-active: rgba(59, 130, 246, 0.24);
+  --gc-red: #ff3b30;
+  --gc-red-soft: rgba(255, 59, 48, 0.15);
+  --gc-yellow: #ffcc00;
+  --gc-yellow-soft: rgba(255, 204, 0, 0.14);
+  --gc-green: #34c759;
+  --gc-green-soft: rgba(52, 199, 89, 0.15);
+  --gc-success: #34c759;
+  --gc-ink: #e8eaed;
+  --gc-ink-muted: #8e939a;
+  --gc-surface: #1a1c1f;
+  --gc-line: rgba(255, 255, 255, 0.09);
+  --gc-on-blue: #ffffff;
+  --gc-panel: #212327;
+  --gc-navy: #a78bfa;
+  --gc-sky: rgba(59, 130, 246, 0.16);
+  --gc-canvas: #0d0e10;
+  --gc-nav-active: rgba(59, 130, 246, 0.2);
+  --gc-notice: #1f2124;
   color: var(--gc-ink);
+  color-scheme: dark;
 }
 .terminal-modern .terminal-glass {
-  background: rgba(255, 255, 255, 0.97);
+  background: rgba(29, 31, 34, 0.94);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
 }
+.terminal-modern ::-webkit-scrollbar-thumb { background-color: rgba(255, 255, 255, 0.14); }

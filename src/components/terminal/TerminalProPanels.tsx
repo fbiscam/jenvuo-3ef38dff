@@ -238,7 +238,7 @@ export function TechnicalsCard({ market }: { market: MarketSnapshot | null }) {
 
 /* ---------------- Floating market summary (over the chart) ---------------- */
 
-export function MarketOverlayCard({ market, onClose }: { market: MarketSnapshot | null; onClose: () => void }) {
+export function MarketOverlayCard({ market, onClose, children }: { market: MarketSnapshot | null; onClose: () => void; children?: ReactNode }) {
   if (!market) return null;
   const up = market.diff >= 0;
   return (
@@ -260,6 +260,7 @@ export function MarketOverlayCard({ market, onClose }: { market: MarketSnapshot 
         </div>
         <div className="flex justify-between gap-3"><dt className="text-gc-ink-muted">Technicals</dt><dd className="text-gc-ink">{market.technicals.rating}</dd></div>
       </dl>
+      {children}
     </div>
   );
 }
@@ -403,8 +404,8 @@ function nyTime(iso: string) {
   }).format(new Date(iso));
 }
 
-export function TerminalBottomTabs({ news, onAsk }: { news: NewsEvent[]; onAsk: () => void }) {
-  const [tab, setTab] = useState<"news" | "alerts">("news");
+export function TerminalBottomTabs({ news, onAsk, screener }: { news: NewsEvent[]; onAsk: () => void; screener?: ReactNode }) {
+  const [tab, setTab] = useState<"screener" | "news" | "alerts">(screener ? "screener" : "news");
   const fetchNotifications = useServerFn(listNotifications);
   const alertsQuery = useQuery({
     queryKey: ["terminal-signal-alerts"],
@@ -413,7 +414,7 @@ export function TerminalBottomTabs({ news, onAsk }: { news: NewsEvent[]; onAsk: 
     refetchInterval: 120_000,
   });
   const alerts: NotificationRow[] = (alertsQuery.data?.items ?? []).filter((n) => n.type === "signal_alert").slice(0, 5);
-  const tabBtn = (key: "news" | "alerts", label: string) => (
+  const tabBtn = (key: "screener" | "news" | "alerts", label: string) => (
     <button
       type="button"
       onClick={() => setTab(key)}
@@ -429,9 +430,10 @@ export function TerminalBottomTabs({ news, onAsk }: { news: NewsEvent[]; onAsk: 
   const th = "sticky top-0 bg-background px-4 py-1.5 text-left text-[11px] font-normal text-gc-ink-muted";
   const td = "px-4 py-2 text-[12px] text-gc-ink";
   return (
-    <section className="hidden h-[200px] shrink-0 flex-col overflow-hidden rounded-xl border border-gc-line bg-background lg:flex" aria-label="News and alerts">
+    <section className="hidden h-[218px] shrink-0 flex-col overflow-hidden rounded-xl border border-gc-line bg-background lg:flex" aria-label="News and alerts">
       <div className="flex items-center gap-6 border-b border-gc-line px-4">
         <span className="mr-2 text-[13px] font-medium text-gc-ink">Market desk</span>
+        {screener && tabBtn("screener", "Screener")}
         {tabBtn("news", `News (${news.length})`)}
         {tabBtn("alerts", `Alerts (${alerts.length})`)}
         <button
@@ -444,7 +446,9 @@ export function TerminalBottomTabs({ news, onAsk }: { news: NewsEvent[]; onAsk: 
         </button>
       </div>
       <div className="min-h-0 flex-1 overflow-y-auto">
-        {tab === "news" ? (
+        {tab === "screener" && screener ? (
+          screener
+        ) : tab === "news" ? (
           news.length === 0 ? (
             <p className="px-5 py-8 text-center text-[13px] text-gc-ink-muted">No important gold news ahead.</p>
           ) : (

@@ -49,9 +49,9 @@ export const CHART_THEMES: Record<ChartTheme, { bg: string; text: string; grid: 
   },
   // Obsidian terminal palette (matches the dark Terminal cards)
   dark: {
-    bg: "#121315",
+    bg: "#17181b",
     text: "#c4c7cc",
-    grid: "#1c1e21",
+    grid: "#202226",
     border: "#26282c",
     up: "#34c759",
     down: "#ff3b30",
