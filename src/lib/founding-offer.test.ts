@@ -1,4 +1,5 @@
-import { describe, expect, it } from "bun:test";
+import { describe, it } from "node:test";
+import { expect } from "./chart/test-expect";
 import { FOUNDING_CREDIT_USD, FOUNDING_MONTHS, foundingTrialEnd } from "./founding-offer";
 
 describe("Founding offer", () => {
