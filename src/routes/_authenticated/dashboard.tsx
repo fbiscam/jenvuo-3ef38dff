@@ -75,6 +75,7 @@ import {
   Sparkles,
   LayoutGrid,
   LifeBuoy,
+  Settings as SettingsIcon,
   Lightbulb,
   ChevronLeft,
   ChevronRight,
@@ -1506,20 +1507,19 @@ function DashboardLayout() {
             ))}
           </nav>
 
-          {/* Quick actions: Sign out (left, icon) + Theme + Collapse (right) */}
+          {/* Quick actions: Help + Settings (left) + Theme + Collapse (right) */}
           <div
             className={`mt-auto shrink-0 flex items-center border-t border-gc-line py-2 ${navCollapsed ? "justify-center px-2" : "justify-between pl-3 pr-2"}`}
           >
             {!navCollapsed && (
-              <button
-                type="button"
-                onClick={signOut}
-                title="Sign out"
-                aria-label="Sign out"
-                className="sidebar-quick-btn inline-flex h-7 w-7 items-center justify-center rounded-md text-zinc-900"
-              >
-                <Power className="h-3.5 w-3.5" strokeWidth={2.25} />
-              </button>
+              <div className="flex items-center gap-1">
+                <Link to="/help" title="Help center" aria-label="Help center" className="sidebar-quick-btn inline-flex h-7 w-7 items-center justify-center rounded-md text-zinc-600">
+                  <LifeBuoy className="h-3.5 w-3.5" strokeWidth={2.25} />
+                </Link>
+                <Link to="/dashboard/profile" title="Settings" aria-label="Settings" className="sidebar-quick-btn inline-flex h-7 w-7 items-center justify-center rounded-md text-zinc-600">
+                  <SettingsIcon className="h-3.5 w-3.5" strokeWidth={2.25} />
+                </Link>
+              </div>
             )}
             <div className={`flex items-center gap-1 ${navCollapsed ? "flex-col" : ""}`}>
               {themeApplies && (

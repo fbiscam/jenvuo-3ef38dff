@@ -1280,6 +1280,7 @@ html body .dash-dark main.bg-white { background-color: oklch(0.165 0 0) !importa
 @media (prefers-reduced-motion: reduce) {
   .gc-logo-marquee { animation: gc-marquee 35s linear infinite !important; }
 }
+.gc-logo-marquee.is-paused { animation-play-state: paused !important; }
 @media (min-width: 1024px) { .jenvu-solutions-zoom { zoom: 1.265; } }
 @media (min-width: 1024px) { .jenvu-videos-zoom { zoom: 1.1; } .jenvu-logos-zoom { zoom: 1.21; } .jenvu-start-zoom { zoom: 1.1; } }
 

@@ -130,8 +130,7 @@ export function CloudLogoStrip() {
           }}
         >
           <div
-            className="gc-logo-marquee flex w-max items-center py-8"
-            style={{ animationPlayState: playing ? "running" : "paused" }}
+            className={`gc-logo-marquee flex w-max items-center py-8 ${playing ? "" : "is-paused"}`}
           >
             {row.map((b, i) => (
               <div key={i} className="flex h-12 shrink-0 items-center gap-2 pr-16 text-gc-ink" aria-hidden={i >= BRANDS.length}>
@@ -150,7 +149,7 @@ export function CloudLogoStrip() {
           type="button"
           onClick={() => setPlaying((p) => !p)}
           aria-label={playing ? "Pause logos" : "Play logos"}
-          className="absolute bottom-0 right-6 flex h-9 w-9 items-center justify-center rounded-full border border-gc-line text-gc-ink hover:bg-gc-surface"
+          className="absolute bottom-0 right-6 z-10 flex h-9 w-9 items-center justify-center rounded-full border border-gc-line text-gc-ink hover:bg-gc-surface"
         >
           {playing ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
         </button>
