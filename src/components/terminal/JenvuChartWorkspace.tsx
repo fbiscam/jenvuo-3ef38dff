@@ -654,11 +654,11 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
   }
 
   const popClass = cn("font-sans subpixel-antialiased", theme === "dark" && "dark terminal-dark border-border bg-popover text-popover-foreground");
-  const railBtn = "relative flex h-9 w-11 items-center justify-center rounded-r-full text-gc-ink-muted transition-colors hover:bg-gc-console-rail-active/60 data-[state=open]:bg-gc-console-rail-active data-[state=open]:text-gc-ink data-[state=open]:before:absolute data-[state=open]:before:inset-y-0 data-[state=open]:before:left-0 data-[state=open]:before:w-[3px] data-[state=open]:before:rounded-full data-[state=open]:before:bg-gc-ink dark:text-muted-foreground dark:hover:bg-accent dark:data-[state=open]:bg-accent dark:data-[state=open]:before:bg-foreground";
+  const railBtn = "relative flex h-9 w-[60px] items-center justify-center rounded-r-full text-gc-ink-muted transition-colors hover:bg-gc-console-rail-active/60 data-[state=open]:bg-gc-console-rail-active data-[state=open]:text-gc-ink data-[state=open]:before:absolute data-[state=open]:before:inset-y-0 data-[state=open]:before:left-0 data-[state=open]:before:w-[3px] data-[state=open]:before:rounded-full data-[state=open]:before:bg-gc-ink dark:text-muted-foreground dark:hover:bg-accent dark:data-[state=open]:bg-accent dark:data-[state=open]:before:bg-foreground";
 
 
   const rail = (
-    <nav aria-label="Chart tools" className={cn("hidden w-14 shrink-0 flex-col items-start gap-1.5 pb-3 pt-2 md:flex", theme === "dark" ? "border-r border-border bg-background" : "bg-transparent")}>
+    <nav aria-label="Chart tools" className={cn("hidden w-[72px] shrink-0 flex-col items-start gap-1.5 pb-3 pt-2 md:flex", theme === "dark" ? "border-r border-border bg-background" : "bg-transparent")}>
       <Popover>
         <PopoverTrigger asChild>
           <button type="button" aria-label="Timeframe" title="Timeframe" className={railBtn}>

@@ -1597,7 +1597,7 @@ function DashboardLayout() {
 
           {pathname === "/dashboard" ? (
             <>
-              <CloudWelcome />
+              <CloudWelcome name={fullName} />
 
               {/* Extension usage analytics — Cloudflare-style */}
               <UsageAnalytics
