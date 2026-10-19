@@ -765,12 +765,12 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
       {sidePanelOpen && (
         <TerminalOverviewRow bars={bars} price={currentPrice} timeframeKey={timeframe.key} timeframeLabel={timeframe.label} />
       )}
-      <div className={cn("flex min-h-0 min-w-0 flex-1", sidePanelOpen && "lg:flex-none lg:gap-3")}>
+      <div className={cn("flex min-h-0 min-w-0 flex-1", sidePanelOpen && "lg:h-[540px] lg:flex-none lg:gap-3 2xl:h-[600px]")}>
       <div
         className={cn(
           "flex min-h-0 min-w-0 flex-1 flex-col bg-background",
           sidePanelOpen
-            ? "lg:h-[560px] lg:flex-none lg:overflow-hidden lg:rounded-2xl lg:border lg:border-gc-line lg:bg-card"
+            ? "lg:h-full lg:overflow-hidden lg:rounded-2xl lg:border lg:border-gc-line lg:bg-card"
             : theme !== "dark" && "overflow-hidden md:mb-2 md:rounded-2xl md:border md:border-gc-line",
         )}
       >
