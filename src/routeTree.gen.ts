@@ -40,6 +40,7 @@ import { Route as ScamToolRouteImport } from './routes/scam-tool'
 import { Route as SearchRouteImport } from './routes/search'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as TermsRouteImport } from './routes/terms'
+import { Route as ZzTerminalPreviewRouteImport } from './routes/zz-terminal-preview'
 import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedInboxRouteImport } from './routes/_authenticated/inbox'
@@ -257,6 +258,11 @@ const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
   path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ZzTerminalPreviewRoute = ZzTerminalPreviewRouteImport.update({
+  id: '/zz-terminal-preview',
+  path: '/zz-terminal-preview',
   getParentRoute: () => rootRouteImport,
 } as any)
 const Char91DotwellKnownChar93OauthProtectedResourceRoute =
@@ -654,6 +660,7 @@ export interface FileRoutesByFullPath {
   '/search': typeof SearchRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
+  '/zz-terminal-preview': typeof ZzTerminalPreviewRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/dashboard': typeof AuthenticatedDashboardRouteWithChildren
   '/inbox': typeof AuthenticatedInboxRoute
@@ -747,6 +754,7 @@ export interface FileRoutesByTo {
   '/search': typeof SearchRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
+  '/zz-terminal-preview': typeof ZzTerminalPreviewRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/inbox': typeof AuthenticatedInboxRoute
   '/terminal': typeof AuthenticatedTerminalRoute
@@ -844,6 +852,7 @@ export interface FileRoutesById {
   '/search': typeof SearchRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
+  '/zz-terminal-preview': typeof ZzTerminalPreviewRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRouteWithChildren
   '/_authenticated/inbox': typeof AuthenticatedInboxRoute
@@ -942,6 +951,7 @@ export interface FileRouteTypes {
     | '/search'
     | '/sitemap.xml'
     | '/terms'
+    | '/zz-terminal-preview'
     | '/.well-known/oauth-protected-resource'
     | '/dashboard'
     | '/inbox'
@@ -1035,6 +1045,7 @@ export interface FileRouteTypes {
     | '/search'
     | '/sitemap.xml'
     | '/terms'
+    | '/zz-terminal-preview'
     | '/.well-known/oauth-protected-resource'
     | '/inbox'
     | '/terminal'
@@ -1131,6 +1142,7 @@ export interface FileRouteTypes {
     | '/search'
     | '/sitemap.xml'
     | '/terms'
+    | '/zz-terminal-preview'
     | '/.well-known/oauth-protected-resource'
     | '/_authenticated/dashboard'
     | '/_authenticated/inbox'
@@ -1229,6 +1241,7 @@ export interface RootRouteChildren {
   SearchRoute: typeof SearchRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
+  ZzTerminalPreviewRoute: typeof ZzTerminalPreviewRoute
   Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   StoriesSlugRoute: typeof StoriesSlugRoute
   StrategiesIctGoldTradingRoute: typeof StrategiesIctGoldTradingRoute
@@ -1475,6 +1488,13 @@ declare module '@tanstack/react-router' {
       path: '/terms'
       fullPath: '/terms'
       preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/zz-terminal-preview': {
+      id: '/zz-terminal-preview'
+      path: '/zz-terminal-preview'
+      fullPath: '/zz-terminal-preview'
+      preLoaderRoute: typeof ZzTerminalPreviewRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/.well-known/oauth-protected-resource': {
@@ -2095,6 +2115,7 @@ const rootRouteChildren: RootRouteChildren = {
   SearchRoute: SearchRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermsRoute: TermsRoute,
+  ZzTerminalPreviewRoute: ZzTerminalPreviewRoute,
   Char91DotwellKnownChar93OauthProtectedResourceRoute:
     Char91DotwellKnownChar93OauthProtectedResourceRoute,
   StoriesSlugRoute: StoriesSlugRoute,
