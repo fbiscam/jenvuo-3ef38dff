@@ -50,3 +50,6 @@
 - [x] "Try the AI desk" opens the Terminal
 - [x] Founding members see "You have joined the Founding Program" on the dashboard
 - [x] Google Search Console, Google Analytics and Firecrawl linked in this workspace
+- [x] Terminal: no white strip on the right under the profile picture
+- [x] Daily articles (1–2/day, CodeCraft) unpaused; new top-keyword topics added
+- [x] Google re-indexing: sitemap resubmitted; article jobs resubmit it each run
