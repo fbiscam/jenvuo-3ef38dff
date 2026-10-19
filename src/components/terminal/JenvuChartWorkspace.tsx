@@ -64,6 +64,7 @@ import { buildLiveBars } from "@/lib/chart/live-candle";
 import { sessionBucketMs } from "@/lib/chart/session-buckets";
 import { useLivePriceStream } from "@/hooks/useLivePriceStream";
 import { isMarketClosed } from "@/lib/signals/qualification";
+import { performance as perfWindows, technicals as readTechnicals } from "@/lib/chart/market-stats";
 
 
 // Buyer/seller pressure is shown on every chart timeframe.
@@ -142,6 +143,12 @@ type Props = {
   footerSlot?: ReactNode;
   /** Receives live price, 24h stats and fresh zones for the side panels. */
   onMarketUpdate?: (market: MarketSnapshot) => void;
+  /** Chart canvas colours, independent of the surrounding layout theme. */
+  canvasTheme?: "light" | "dark";
+  /** Floating card drawn over the chart (desktop). */
+  overlaySlot?: ReactNode;
+  /** Extra class for every popover the chart opens (scoped theme tokens). */
+  popoverClassName?: string;
 };
 
 const TOOLS: Array<{ id: DrawingTool; icon: LucideIcon; label: string }> = [
@@ -225,7 +232,7 @@ function ToolButton({
 }
 
 export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function JenvuChartWorkspace(
-  { timeframes, timeframe, onTimeframeChange, rightSlot, mobileNewsRow, asset = "XAUUSD", onAssetChange, theme = "light", railSlot, headerSlot, footerSlot, onMarketUpdate },
+  { timeframes, timeframe, onTimeframeChange, rightSlot, mobileNewsRow, asset = "XAUUSD", onAssetChange, theme = "light", railSlot, headerSlot, footerSlot, onMarketUpdate, canvasTheme, overlaySlot, popoverClassName },
   ref,
 ) {
   const fetchChart = useServerFn(getTerminalChart);
@@ -512,8 +519,15 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
       bottom: z.bottom,
       strength: Math.max(1, Math.min(5, Math.round(Math.min(3, z.displacementAtr)) + (z.fresh ? 1 : 0) + (z.extreme ? 1 : 0))),
     }));
-    onMarketUpdate({ ...dayStats, trend: smc?.trend ?? "undecided", zones });
-  }, [onMarketUpdate, dayStats, smc]);
+    const trend = smc?.trend ?? "undecided";
+    onMarketUpdate({
+      ...dayStats,
+      trend,
+      zones,
+      perf: perfWindows(bars, stepSeconds),
+      technicals: readTechnicals(bars, trend),
+    });
+  }, [onMarketUpdate, dayStats, smc, bars, stepSeconds]);
 
   const legendIndicators = useMemo(
     () =>
@@ -639,7 +653,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
               </TooltipTrigger>
               <TooltipContent side={vertical ? "right" : "bottom"}>Drawing color</TooltipContent>
             </Tooltip>
-            <PopoverContent side={vertical ? "right" : "bottom"} className={cn("flex w-auto gap-1.5 p-2", theme === "dark" && "dark terminal-dark")}>
+            <PopoverContent side={vertical ? "right" : "bottom"} className={cn("flex w-auto gap-1.5 p-2", theme === "dark" && "dark terminal-dark", popoverClassName)}>
               {DRAWING_COLORS.map((c) => (
                 <button
                   type="button"
@@ -687,12 +701,12 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
     );
   }
 
-  const popClass = cn("font-sans subpixel-antialiased", theme === "dark" && "dark terminal-dark border-border bg-popover text-popover-foreground");
+  const popClass = cn("font-sans subpixel-antialiased", theme === "dark" && "dark terminal-dark border-border bg-popover text-popover-foreground", popoverClassName);
   const railBtn = TERMINAL_RAIL_BTN;
-  const label = (text: string) => <span className="hidden truncate xl:inline">{text}</span>;
+  const label = (_text: string) => null;
 
   const rail = (
-    <nav aria-label="Chart tools" className={cn("hidden w-[64px] shrink-0 flex-col items-center gap-1 overflow-y-auto px-1.5 pb-3 pt-3 [scrollbar-width:none] md:flex xl:w-[176px] xl:items-stretch xl:px-3", theme === "dark" ? "border-r border-border bg-background" : "bg-transparent")}>
+    <nav aria-label="Chart tools" className={cn("hidden w-[60px] shrink-0 flex-col items-center gap-1 overflow-y-auto px-1.5 pb-3 pt-3 [scrollbar-width:none] md:flex", theme === "dark" ? "border-r border-border bg-background" : "bg-transparent")}>
       <button type="button" onClick={() => window.dispatchEvent(new Event("jenvu:open-mobile-nav"))} aria-label="Open menu" title="Menu" className={railBtn}>
         <Menu className="h-[19px] w-[19px] shrink-0" />
         {label("Menu")}
@@ -705,7 +719,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
         <CandlestickChart className="h-[19px] w-[19px] shrink-0" />
         {label("Terminal")}
       </span>
-      <span className="my-1.5 h-px w-8 self-center bg-gc-line xl:w-full" aria-hidden="true" />
+      <span className="my-1.5 h-px w-8 self-center bg-gc-line" aria-hidden="true" />
       <Popover>
         <PopoverTrigger asChild>
           <button type="button" aria-label="Timeframe" title="Timeframe" className={railBtn}>
@@ -848,7 +862,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
               )}
             </button>
           </PopoverTrigger>
-          <PopoverContent align="start" className={cn("w-80 p-2 font-sans subpixel-antialiased", theme === "dark" && "dark terminal-dark border-border bg-popover text-popover-foreground")}>
+          <PopoverContent align="start" className={cn("w-80 p-2 font-sans subpixel-antialiased", theme === "dark" && "dark terminal-dark border-border bg-popover text-popover-foreground", popoverClassName)}>
             {indicatorMenu}
           </PopoverContent>
         </Popover>
@@ -865,7 +879,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
               <span className="hidden 2xl:inline">Jenvu SMC</span>
             </button>
           </PopoverTrigger>
-          <PopoverContent align="start" className={cn("w-80 p-2 font-sans subpixel-antialiased", theme === "dark" && "dark terminal-dark border-border bg-popover text-popover-foreground")}>
+          <PopoverContent align="start" className={cn("w-80 p-2 font-sans subpixel-antialiased", theme === "dark" && "dark terminal-dark border-border bg-popover text-popover-foreground", popoverClassName)}>
             {smcMenu}
           </PopoverContent>
         </Popover>
@@ -1049,8 +1063,14 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
               onToolDone={onToolDone}
               onHoverBar={onHoverBar}
               resetKey={`${asset}:${timeframe.key}:${payload ? "ready" : "loading"}`}
-              theme={theme}
+              theme={canvasTheme ?? theme}
             />
+
+            {overlaySlot && !fullscreen && (
+              <div className="pointer-events-none absolute right-[76px] top-2 z-[5] hidden lg:block">
+                <div className="pointer-events-auto">{overlaySlot}</div>
+              </div>
+            )}
 
             {/* Legend */}
             <div
