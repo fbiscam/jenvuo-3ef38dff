@@ -3,7 +3,7 @@ import type { OhlcvBar } from "@/lib/chart/indicators";
 import type { TechVerdict } from "@/lib/chart/technicals";
 import { cn } from "@/lib/utils";
 import { XauUsdLogo } from "./XauUsdLogo";
-import { TECH_TFS, WATCH, num, tone, useTechnicals, useWatchQuotes } from "./terminal-market";
+import { TECH_TFS, WATCH, num, useTechnicals, useWatchQuotes } from "./terminal-market";
 
 const CARDS = ["XAUUSD", "XAGUSD", "DXY", "EURUSD"];
 const verdictTone: Record<TechVerdict, string> = { buy: "text-gc-green", sell: "text-gc-red", neutral: "text-gc-ink-muted" };
@@ -165,4 +165,3 @@ export function TerminalOverviewRow({
   );
 }
 
-export { tone };
