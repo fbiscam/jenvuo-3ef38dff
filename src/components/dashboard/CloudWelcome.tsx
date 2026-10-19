@@ -1,4 +1,5 @@
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import { Link } from "@tanstack/react-router";
 import { Check, Loader2, Plus, ArrowRight } from "lucide-react";
 import { useFreeTrial } from "@/hooks/useFreeTrial";
@@ -19,7 +20,7 @@ const RESOURCES: Record<string, Resource[]> = {
     { title: "Volume and pressure", text: "See how RVOL spikes and buyer and seller estimates are shown on every candle.", to: "/help" },
   ],
   "AI desk and models": [
-    { title: "Ask the AI desk", text: "Get clear chart reads from top-tier AI models, answered only to your question.", to: "/ai-engine" },
+    { title: "Ask the AI desk", text: "Get clear chart reads from top-tier AI models, answered only to your question.", to: "/dashboard/terminal" },
     { title: "Model access by plan", text: "Compare which models and limits come with Pro, Elite and Ultra.", to: "/pricing" },
     { title: "Token pricing", text: "Usage is charged at $3 per million tokens from your credit wallet.", to: "/pricing" },
   ],
@@ -50,11 +51,31 @@ function Tick({ children }: { children: ReactNode }) {
 }
 
 /** Google Cloud console-style welcome panel for the dashboard home. */
-export default function CloudWelcome() {
+const FOUNDING_MEMBER_STATUSES = ["approved", "active", "graduated", "verified"];
+
+export default function CloudWelcome({ name: profileName }: { name?: string }) {
   const { user, eligible, starting, start } = useFreeTrial();
   const [filter, setFilter] = useState<string>(Object.keys(RESOURCES)[0]);
+  const [foundingMember, setFoundingMember] = useState(false);
   const meta = (user?.user_metadata ?? {}) as Record<string, unknown>;
-  const name = String(meta.full_name || meta.name || user?.email?.split("@")[0] || "trader");
+  const name = String(profileName?.trim() || meta.full_name || meta.name || user?.email?.split("@")[0] || "trader");
+
+  useEffect(() => {
+    const email = user?.email;
+    if (!email) return;
+    let live = true;
+    void supabase
+      .from("founding_applications")
+      .select("status")
+      .ilike("email", email)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (live) setFoundingMember(FOUNDING_MEMBER_STATUSES.includes(String(data?.status ?? "")));
+      });
+    return () => { live = false; };
+  }, [user?.email]);
 
   return (
     <section className="dashboard-cloud-welcome -mx-5 -mt-14 mb-10 sm:-mx-8 sm:-mt-7">
@@ -117,15 +138,29 @@ export default function CloudWelcome() {
           <div className="min-w-0 border-gc-line lg:border-l lg:pl-6">
             <p className="text-[14px] text-gc-ink-muted">Other options</p>
             <p className="mt-4 text-[16px] text-gc-ink">Try the latest top-tier AI models</p>
-            <Link to="/ai-engine" className="mt-4 inline-block text-[14px] font-medium text-gc-blue-deep hover:text-gc-navy">
+            <Link to="/dashboard/terminal" className="mt-4 inline-block text-[14px] font-medium text-gc-blue-deep hover:text-gc-navy">
               Try the AI desk
             </Link>
-            <p className="mt-6 text-[16px] leading-relaxed text-gc-ink">
-              Join the invite-only Founding Program for full gold Terminal access.
-            </p>
-            <Link to="/founding" className="mt-4 inline-block text-[14px] font-medium text-gc-blue-deep hover:text-gc-navy">
-              Founding Program
-            </Link>
+            {foundingMember ? (
+              <>
+                <p className="mt-6 flex items-center gap-2 text-[16px] leading-relaxed text-gc-ink">
+                  <Check className="h-5 w-5 shrink-0 text-gc-green" strokeWidth={2.25} aria-hidden="true" />
+                  You have joined the Founding Program
+                </p>
+                <Link to="/dashboard/terminal" className="mt-4 inline-block text-[14px] font-medium text-gc-blue-deep hover:text-gc-navy">
+                  Open the Terminal
+                </Link>
+              </>
+            ) : (
+              <>
+                <p className="mt-6 text-[16px] leading-relaxed text-gc-ink">
+                  Join the invite-only Founding Program for full gold Terminal access.
+                </p>
+                <Link to="/founding" className="mt-4 inline-block text-[14px] font-medium text-gc-blue-deep hover:text-gc-navy">
+                  Founding Program
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </div>

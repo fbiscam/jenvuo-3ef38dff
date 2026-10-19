@@ -64,6 +64,13 @@
       "when": 1792337957207,
       "tag": "0008_allow_profile_plan_check",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1792386964971,
+      "tag": "0009_allow_signed_in_live_chat",
+      "breakpoints": true
     }
   ]
 }

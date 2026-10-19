@@ -161,7 +161,11 @@ export default function DashboardTopBar({
             e.preventDefault();
             if (q.trim()) ask(q.trim());
           }}
-          className="flex h-11 items-center gap-3 rounded-lg border-2 border-gc-blue-deep bg-background px-3"
+          className={
+            focused
+              ? "flex h-11 items-center gap-3 rounded-lg border-2 border-gc-blue-deep bg-background px-3"
+              : `flex h-11 items-center gap-3 rounded-lg border border-gc-line/70 ${white ? "bg-gc-console-search" : "bg-gc-notice"} px-3`
+          }
         >
           <Search className="h-5 w-5 shrink-0 text-gc-ink" />
           <input
@@ -279,7 +283,7 @@ export default function DashboardTopBar({
         </button>
         <GiftBox />
         <NotificationBell />
-        <DropdownMenu>
+        <DropdownMenu modal={false}>
           <DropdownMenuTrigger asChild>
             <button
               type="button"
@@ -308,7 +312,7 @@ export default function DashboardTopBar({
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-        <DropdownMenu>
+        <DropdownMenu modal={false}>
           <DropdownMenuTrigger asChild>
             <button
               type="button"
