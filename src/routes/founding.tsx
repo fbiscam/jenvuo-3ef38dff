@@ -2,7 +2,7 @@ import * as React from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { Check, Users, DollarSign, Shield, Sparkles, ArrowRight } from "lucide-react";
+import { Check, Users, DollarSign, Shield, ArrowRight } from "lucide-react";
 import SiteFooter from "@/components/SiteFooter";
 import SiteHeader from "@/components/SiteHeader";
 import { submitFoundingApplication, foundingStats } from "@/lib/founding.functions";
@@ -194,7 +194,6 @@ function FoundingPage() {
           <section id="apply" className="scroll-mt-24 bg-background">
             <div className="mx-auto max-w-[760px] px-5 py-16 sm:px-8 lg:py-20">
               <div className="text-center">
-                <span className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-gc-red-soft"><Sparkles className="h-6 w-6 text-gc-red" /></span>
                 <h2 className="mt-5 text-[32px] font-medium leading-[1.2] text-gc-ink sm:text-[40px]">Apply for a founding seat</h2>
                 <p className="mt-3 text-[16px] text-gc-ink-muted">Applications reviewed within 48 hours. Only serious traders — please be honest.</p>
               </div>
