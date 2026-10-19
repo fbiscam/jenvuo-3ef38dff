@@ -654,15 +654,15 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
   }
 
   const popClass = cn("font-sans subpixel-antialiased", theme === "dark" && "dark terminal-dark border-border bg-popover text-popover-foreground");
-  const railBtn = "relative flex h-9 w-[60px] items-center justify-center rounded-r-full text-gc-ink-muted transition-colors hover:bg-gc-console-rail-active/60 data-[state=open]:bg-gc-console-rail-active data-[state=open]:text-gc-ink data-[state=open]:before:absolute data-[state=open]:before:inset-y-0 data-[state=open]:before:left-0 data-[state=open]:before:w-[3px] data-[state=open]:before:rounded-full data-[state=open]:before:bg-gc-ink dark:text-muted-foreground dark:hover:bg-accent dark:data-[state=open]:bg-accent dark:data-[state=open]:before:bg-foreground";
+  const railBtn = "relative flex h-9 w-[52px] items-center justify-center rounded-r-full text-gc-ink transition-colors hover:bg-gc-console-rail-active/60 data-[state=open]:bg-gc-console-rail-active data-[state=open]:text-gc-ink data-[state=open]:before:absolute data-[state=open]:before:inset-y-0 data-[state=open]:before:left-0 data-[state=open]:before:w-[3px] data-[state=open]:before:rounded-full data-[state=open]:before:bg-gc-ink dark:text-muted-foreground dark:hover:bg-accent dark:data-[state=open]:bg-accent dark:data-[state=open]:before:bg-foreground";
 
 
   const rail = (
-    <nav aria-label="Chart tools" className={cn("hidden w-[72px] shrink-0 flex-col items-start gap-1.5 pb-3 pt-2 md:flex", theme === "dark" ? "border-r border-border bg-background" : "bg-transparent")}>
+    <nav aria-label="Chart tools" className={cn("hidden w-[60px] shrink-0 flex-col items-start gap-1 pb-3 pt-1 md:flex", theme === "dark" ? "border-r border-border bg-background" : "bg-transparent")}>
       <Popover>
         <PopoverTrigger asChild>
           <button type="button" aria-label="Timeframe" title="Timeframe" className={railBtn}>
-            <Clock3 className="h-[18px] w-[18px]" />
+            <Clock3 className="h-[17px] w-[17px]" />
           </button>
         </PopoverTrigger>
         <PopoverContent side="right" align="start" className={cn("w-56 p-1.5", popClass)}>
@@ -688,7 +688,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
       <Popover>
         <PopoverTrigger asChild>
           <button type="button" aria-label="Indicators" title="Indicators" className={railBtn}>
-            <Activity className="h-[18px] w-[18px]" />
+            <Activity className="h-[17px] w-[17px]" />
           </button>
         </PopoverTrigger>
         <PopoverContent side="right" align="start" className={cn("max-h-[80vh] w-80 overflow-y-auto p-2", popClass)}>
@@ -698,7 +698,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
       <Popover>
         <PopoverTrigger asChild>
           <button type="button" aria-label="Jenvu SMC" title="Jenvu SMC" className={railBtn}>
-            <Layers className="h-[18px] w-[18px]" />
+            <Layers className="h-[17px] w-[17px]" />
           </button>
         </PopoverTrigger>
         <PopoverContent side="right" align="start" className={cn("max-h-[80vh] w-80 overflow-y-auto p-2", popClass)}>
@@ -708,7 +708,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
       <Popover>
         <PopoverTrigger asChild>
           <button type="button" aria-label="Drawing tools" title="Drawing tools" className={cn(railBtn, "h-auto flex-col gap-0.5 py-1.5")}>
-            <PenLine className="h-[18px] w-[18px]" />
+            <PenLine className="h-[17px] w-[17px]" />
             <span className="text-[9px] font-medium leading-none">Draw</span>
             {tool !== "cursor" && <span className="absolute right-1.5 top-1 h-1.5 w-1.5 rounded-full bg-gc-blue" aria-hidden="true" />}
           </button>
@@ -718,15 +718,15 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
           <div className="flex flex-wrap items-center gap-0.5" role="toolbar" aria-label="Drawing tools">{renderTools(false)}</div>
         </PopoverContent>
       </Popover>
-      <span className="my-1 ml-3 h-px w-6 bg-border" aria-hidden="true" />
+      <span className="my-1 ml-3.5 h-px w-6 bg-gc-line" aria-hidden="true" />
       <button type="button" onClick={downloadSnapshot} aria-label="Download chart snapshot" title="Download chart snapshot" className={railBtn}>
-        <Camera className="h-[18px] w-[18px]" />
+        <Camera className="h-[17px] w-[17px]" />
       </button>
       <button type="button" onClick={() => chartRef.current?.fit()} aria-label="Reset chart view" title="Reset view" className={railBtn}>
-        <RotateCcw className="h-[18px] w-[18px]" />
+        <RotateCcw className="h-[17px] w-[17px]" />
       </button>
       <button type="button" onClick={() => void toggleFullscreen()} aria-label={fullscreen ? "Exit fullscreen chart" : "Fullscreen chart"} title={fullscreen ? "Exit fullscreen" : "Fullscreen chart"} className={railBtn}>
-        {fullscreen ? <Minimize2 className="h-[18px] w-[18px]" /> : <Maximize2 className="h-[18px] w-[18px]" />}
+        {fullscreen ? <Minimize2 className="h-[17px] w-[17px]" /> : <Maximize2 className="h-[17px] w-[17px]" />}
       </button>
       {railSlot && <div className="mt-auto flex flex-col items-start gap-1">{railSlot}</div>}
     </nav>
