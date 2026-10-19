@@ -62,4 +62,4 @@
 - [x] Terminal: borders removed again; dark-theme header icons white; Headlines = latest 15
 - [x] Mobile Terminal: "No trades" button hidden
 - [x] Dashboard top bar: Ask Jenvu button only on the Terminal
-- [ ] Terminal: all chart options on one Overview chart like the user's picture (needs the picture re-sent)
+- [x] Terminal: TradingView XAUUSD page layout (big header, Overview/News/Technicals/Seasonals tabs, range returns under the chart, TradingView-style line)
