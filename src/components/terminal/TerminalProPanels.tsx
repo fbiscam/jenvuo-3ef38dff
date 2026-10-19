@@ -64,7 +64,7 @@ const pad = (h: number) => `${String(h).padStart(2, "0")}:00`;
 
 /* ---------------- Shared card bits ---------------- */
 
-const panel = "rounded-xl border border-gc-line bg-background p-4";
+const panel = "rounded-xl border border-gc-line bg-background p-4 shadow-sm";
 
 function CardTitle({ children, right }: { children: ReactNode; right?: ReactNode }) {
   return (
