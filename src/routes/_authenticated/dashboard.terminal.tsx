@@ -722,24 +722,21 @@ function TerminalPage() {
               railSlot={
                 <>
                   <div
-                    className="flex w-[52px] flex-col items-center gap-0.5 py-1 font-mono text-[10px] font-semibold leading-none text-gc-ink"
+                    className={cn(TERMINAL_RAIL_BTN, "hover:bg-transparent")}
                     title={marketClosed ? "Gold market is closed for the weekend" : `Time left on the current ${tf.label} candle`}
                     aria-label={marketClosed ? "Market closed" : `Current ${tf.label} candle closes in ${formatCountdown(secondsLeft)}`}
                   >
-                    <Timer className="h-[17px] w-[17px] text-gc-ink" />
-                    {formatCountdown(secondsLeft)}
+                    <Timer className="h-[19px] w-[19px] shrink-0" />
+                    <span className="hidden xl:inline">Candle</span>
+                    <span className="ml-auto hidden font-mono text-[11px] font-semibold tabular-nums xl:inline">{formatCountdown(secondsLeft)}</span>
                   </div>
                   <Popover>
                     <PopoverTrigger asChild>
-                      <button
-                        type="button"
-                        aria-label="Gold news"
-                        title="Gold news"
-                        className="relative flex h-9 w-[52px] items-center justify-center rounded-r-full text-gc-ink hover:bg-gc-console-rail-active/60 data-[state=open]:bg-gc-console-rail-active data-[state=open]:text-foreground dark:hover:bg-accent"
-                      >
-                        <Newspaper className="h-[17px] w-[17px]" />
+                      <button type="button" aria-label="Gold news" title="Gold news" className={TERMINAL_RAIL_BTN}>
+                        <Newspaper className="h-[19px] w-[19px] shrink-0" />
+                        <span className="hidden xl:inline">News</span>
                         {nextGoldNews && (
-                          <span aria-hidden="true" className={cn("absolute right-2 top-1.5 h-1.5 w-1.5 rounded-full", nextGoldNews.impact === "High" ? "bg-destructive" : "bg-gc-yellow")} />
+                          <span aria-hidden="true" className={cn("absolute right-2 top-2 h-1.5 w-1.5 rounded-full", nextGoldNews.impact === "High" ? "bg-destructive" : "bg-gc-yellow")} />
                         )}
                       </button>
                     </PopoverTrigger>
@@ -747,17 +744,16 @@ function TerminalPage() {
                       <TerminalNewsPanel />
                     </PopoverContent>
                   </Popover>
-                  {!deskOpen && (
-                    <button
-                      type="button"
-                      onClick={() => setDeskOpen(true)}
-                      aria-label="Ask With AI"
-                      title="Ask With AI"
-                      className="flex h-9 w-[52px] items-center justify-center rounded-r-full hover:bg-gc-console-rail-active/60 dark:hover:bg-accent"
-                    >
-                      <img src="/favicon.png" alt="" className="h-5 w-5 rounded-sm object-contain" />
-                    </button>
-                  )}
+                  <button
+                    type="button"
+                    onClick={() => setDeskOpen((open) => !open)}
+                    aria-label="Ask With AI"
+                    title="Ask With AI"
+                    className={cn(TERMINAL_RAIL_BTN, deskOpen && "bg-gc-blue-soft text-gc-blue-deep")}
+                  >
+                    <img src="/favicon.png" alt="" className="h-5 w-5 shrink-0 rounded-sm object-contain" />
+                    <span className="hidden xl:inline">AI Insights</span>
+                  </button>
                 </>
               }
               rightSlot={
