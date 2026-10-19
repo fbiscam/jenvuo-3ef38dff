@@ -9,7 +9,7 @@ import GiftBox from "@/components/dashboard/GiftBox";
 import { SITE_PAGES } from "@/lib/site-pages";
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import {
-  BookOpen, Camera, Code, CreditCard, Download, ExternalLink, FileText, LifeBuoy, Loader2, LogOut, Mail,
+  BookOpen, Camera, CreditCard, Download, ExternalLink, FileText, LifeBuoy, Loader2, LogOut, Mail,
   Menu, MoreVertical, Search, SendHorizontal, Settings, ShieldCheck, Sparkles,
 } from "lucide-react";
 import NotificationBell from "@/components/NotificationBell";
@@ -57,13 +57,6 @@ export default function DashboardTopBar({
   const [answer, setAnswer] = useState<{ q: string; res: AskJenvuResult | null } | null>(null);
   const pathname = useRouterState({ select: (st) => st.location.pathname });
   const onTerminal = pathname === "/dashboard/terminal";
-  const [scriptOpen, setScriptOpen] = useState(false);
-
-  useEffect(() => {
-    const h = (e: Event) => setScriptOpen(Boolean((e as CustomEvent).detail?.open));
-    window.addEventListener("jenvu:terminal-script-state", h);
-    return () => window.removeEventListener("jenvu:terminal-script-state", h);
-  }, []);
 
   // "/" focuses the search box (as on Google Cloud), unless the user is already typing somewhere.
   useEffect(() => {
@@ -271,18 +264,6 @@ export default function DashboardTopBar({
       )}
 
       <div className="ml-auto flex shrink-0 items-center gap-1 sm:ml-0">
-        {onTerminal && (
-          <button
-            type="button"
-            onClick={() => window.dispatchEvent(new CustomEvent("jenvu:terminal-script"))}
-            aria-pressed={scriptOpen}
-            aria-label="Jenvu Script"
-            title="Jenvu Script"
-            className={`hidden h-9 items-center gap-1.5 rounded-full px-3 text-[13px] font-medium md:inline-flex ${scriptOpen ? "bg-gc-nav-active text-gc-blue-deep" : "text-gc-ink hover:bg-gc-notice"}`}
-          >
-            <Code className="h-4 w-4" /> Script
-          </button>
-        )}
         {onTerminal && (
           <button
             type="button"

@@ -1217,6 +1217,15 @@ body:has(.terminal-dark) .dashboard-terminal-sidebar .h-px {
   background-color: oklch(0.27 0 0) !important;
 }
 
+/* Terminal page scrollbar: hidden until the mouse is over the page. */
+.terminal-page-scroll { scrollbar-width: none; }
+.terminal-page-scroll::-webkit-scrollbar { width: 0; height: 0; background: transparent; }
+.terminal-page-scroll:hover { scrollbar-width: thin; scrollbar-color: rgba(0, 0, 0, 0.25) transparent; }
+.terminal-page-scroll:hover::-webkit-scrollbar { width: 8px; }
+.terminal-page-scroll:hover::-webkit-scrollbar-thumb { background-color: rgba(0, 0, 0, 0.25); border-radius: 4px; }
+.terminal-dark .terminal-page-scroll:hover { scrollbar-color: rgba(255, 255, 255, 0.25) transparent; }
+.terminal-dark .terminal-page-scroll:hover::-webkit-scrollbar-thumb { background-color: rgba(255, 255, 255, 0.25); }
+
 /* Watchlist scrollbar: hidden until hover; light thumb on the black theme. */
 .terminal-dark .watchlist-scroll:hover {
   scrollbar-color: rgba(255, 255, 255, 0.25) transparent;
