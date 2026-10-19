@@ -51,6 +51,25 @@ function Profile() {
   const [pendingFile, setPendingFile] = useState<File | null>(null);
   const [mailAddress, setMailAddress] = useState<string | null>(null);
 
+  // Open the section named in the link (e.g. #security) and keep the side menu in step while scrolling.
+  useEffect(() => {
+    const hash = window.location.hash.replace("#", "");
+    if (hash) {
+      const target = hash === "change-email" ? "security" : hash;
+      if (SECTIONS.some((s) => s.id === target)) setActive(target);
+      setTimeout(() => document.getElementById(hash)?.scrollIntoView({ block: "start" }), 300);
+    }
+    const obs = new IntersectionObserver(
+      (entries) => {
+        const hit = entries.filter((e) => e.isIntersecting).sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)[0];
+        if (hit) setActive(hit.target.id);
+      },
+      { rootMargin: "-20% 0px -65% 0px" },
+    );
+    const t = setTimeout(() => SECTIONS.forEach((s) => { const el = document.getElementById(s.id); if (el) obs.observe(el); }), 200);
+    return () => { clearTimeout(t); obs.disconnect(); };
+  }, []);
+
   const refreshAvatarUrl = async (path: string | null) => {
     if (!path) { setAvatarUrl(null); writeCachedAvatar(null); return; }
     const { data } = await supabase.storage.from("avatars").createSignedUrl(path, AVATAR_TTL_SECONDS);
