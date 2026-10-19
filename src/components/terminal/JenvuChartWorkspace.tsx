@@ -241,7 +241,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
   const [ready, setReady] = useState(false);
   // Phones only: drawing tools stay hidden until opened from the top bar.
   const [mobileToolsOpen, setMobileToolsOpen] = useState(false);
-  const [indicators, setIndicators] = useState<IndicatorId[]>(["volume", "rvol", "ema20", "ema50"]);
+  const [indicators, setIndicators] = useState<IndicatorId[]>(["volume", "rvol", "ema20", "ema50", "macd", "rsi"]);
   const [smcToggles, setSmcToggles] = useState<SmcToggles>(DEFAULT_SMC);
   const [drawings, setDrawings] = useState<Drawing[]>([]);
   const [drawingsVisible, setDrawingsVisible] = useState(true);
@@ -300,6 +300,12 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
       if (!readJson<boolean>(RVOL_INTRO_KEY, false)) {
         writeJson(RVOL_INTRO_KEY, true);
         if (!list.includes("rvol")) list.push("rvol");
+      }
+      // One-time: the trading-desk layout shows MACD and RSI panes under the chart.
+      const OSC_INTRO_KEY = "jenvu:terminal:osc-intro:v1";
+      if (!readJson<boolean>(OSC_INTRO_KEY, false)) {
+        writeJson(OSC_INTRO_KEY, true);
+        for (const id of ["macd", "rsi"] as const) if (!list.includes(id)) list.push(id);
       }
       setIndicators(list);
     }

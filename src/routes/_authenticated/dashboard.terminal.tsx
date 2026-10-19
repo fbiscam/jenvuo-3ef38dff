@@ -694,7 +694,7 @@ function TerminalPage() {
       <div
         className={cn(
           "flex h-full min-h-0 w-full flex-col overflow-hidden text-foreground",
-          "terminal-obsidian bg-gc-console-bar",
+          "terminal-modern bg-gc-console-bar",
         )}
       >
         <div className="flex min-h-0 flex-1 flex-col gap-3 lg:flex-row lg:pr-3 lg:pt-3">
@@ -713,8 +713,8 @@ function TerminalPage() {
               asset={asset}
               onAssetChange={changeAsset}
               theme={theme}
-              canvasTheme="dark"
-              popoverClassName="terminal-obsidian"
+              canvasTheme="light"
+              popoverClassName="terminal-modern"
               onMarketUpdate={setMarket}
               overlaySlot={
                 summaryOpen && !deskOpen ? <MarketOverlayCard market={market} onClose={() => setSummaryOpen(false)} /> : null
@@ -745,7 +745,7 @@ function TerminalPage() {
                         )}
                       </button>
                     </PopoverTrigger>
-                    <PopoverContent side="right" align="end" className="terminal-obsidian max-h-[80vh] w-80 overflow-y-auto border-gc-line bg-popover p-2 font-sans text-popover-foreground">
+                    <PopoverContent side="right" align="end" className="terminal-modern max-h-[80vh] w-80 overflow-y-auto border-gc-line bg-popover p-2 font-sans text-popover-foreground">
                       <TerminalNewsPanel />
                     </PopoverContent>
                   </Popover>

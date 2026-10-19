@@ -1359,57 +1359,44 @@ html body .dash-dark main.bg-white { background-color: oklch(0.165 0 0) !importa
 .ask-jenvu-mark-ring { animation: ask-jenvu-ring 2.4s linear infinite !important; }
 @media (prefers-reduced-motion: reduce) { .ind-kenburns { animation: none; } }
 
-/* Terminal obsidian theme — dark, high-density trading desk, scoped to the Terminal page
+/* Terminal modern theme — white, high-density trading desk, scoped to the Terminal page
    (shell, chart card, side panels and the chart popovers). */
-.terminal-obsidian {
-  --background: #121315;
-  --foreground: #e8eaed;
-  --card: #121315;
-  --card-foreground: #e8eaed;
-  --popover: #1a1c1f;
-  --popover-foreground: #e8eaed;
-  --primary: #e8eaed;
-  --primary-foreground: #0a0b0d;
-  --secondary: #1f2124;
-  --secondary-foreground: #e8eaed;
-  --muted: #1c1e21;
-  --muted-foreground: #9aa0a6;
-  --accent: #24272b;
-  --accent-foreground: #ffffff;
-  --border: rgba(255, 255, 255, 0.1);
-  --input: rgba(255, 255, 255, 0.12);
-  --ring: #4c8dff;
-  --gc-blue: #4c8dff;
-  --gc-blue-hover: #3b7cf0;
-  --gc-blue-soft: rgba(76, 141, 255, 0.16);
-  --gc-console-bar: #0a0b0d;
-  --gc-console-search: #1a1c1f;
-  --gc-console-rail-active: rgba(76, 141, 255, 0.24);
-  --gc-red: #ff3b30;
-  --gc-red-soft: rgba(255, 59, 48, 0.15);
-  --gc-yellow: #ffcc00;
-  --gc-yellow-soft: rgba(255, 204, 0, 0.14);
-  --gc-green: #34c759;
-  --gc-green-soft: rgba(52, 199, 89, 0.15);
-  --gc-ink: #e8eaed;
-  --gc-ink-muted: #8e939a;
-  --gc-surface: #16181b;
-  --gc-line: rgba(255, 255, 255, 0.1);
-  --gc-on-blue: #ffffff;
-  --gc-panel: #1c1e21;
-  --gc-navy: #a78bfa;
-  --gc-blue-deep: #8ab4f8;
-  --gc-sky: rgba(76, 141, 255, 0.16);
-  --gc-canvas: #0a0b0d;
-  --gc-success: #34c759;
-  --gc-nav-active: rgba(76, 141, 255, 0.2);
-  --gc-notice: #1c1e21;
+.terminal-modern {
+  --background: #ffffff;
+  --foreground: #0f1419;
+  --card: #ffffff;
+  --card-foreground: #0f1419;
+  --popover: #ffffff;
+  --popover-foreground: #0f1419;
+  --border: #e6e8ee;
+  --input: #e1e4ea;
+  --muted: #f3f5f8;
+  --muted-foreground: #6b7280;
+  --accent: #f1f4f9;
+  --gc-blue: #2962ff;
+  --gc-blue-hover: #1e53e5;
+  --gc-blue-soft: #eaf0ff;
+  --gc-blue-deep: #1e4fd8;
+  --gc-console-bar: #f4f6f9;
+  --gc-console-search: #eef1f5;
+  --gc-console-rail-active: #e3eaff;
+  --gc-red: #f23645;
+  --gc-red-soft: #fdecee;
+  --gc-yellow: #f5a623;
+  --gc-yellow-soft: #fff4dd;
+  --gc-green: #089981;
+  --gc-green-soft: #e3f6f2;
+  --gc-success: #089981;
+  --gc-ink: #0f1419;
+  --gc-ink-muted: #6b7280;
+  --gc-line: #e6e8ee;
+  --gc-panel: #f3f5f8;
+  --gc-canvas: #f4f6f9;
+  --gc-notice: #f3f5f8;
   color: var(--gc-ink);
-  color-scheme: dark;
 }
-.terminal-obsidian .terminal-glass {
-  background: rgba(22, 24, 27, 0.95);
+.terminal-modern .terminal-glass {
+  background: rgba(255, 255, 255, 0.97);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
 }
-.terminal-obsidian ::-webkit-scrollbar-thumb { background-color: rgba(255, 255, 255, 0.14); }
