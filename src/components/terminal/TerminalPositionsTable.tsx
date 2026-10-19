@@ -33,7 +33,7 @@ export function TerminalPositionsTable({ trading, price }: { trading: DemoTradin
   ];
 
   return (
-    <section aria-label="Demo positions" className="hidden h-[240px] shrink-0 flex-col overflow-hidden rounded-none border border-gc-line bg-card font-sans lg:flex">
+    <section aria-label="Demo positions" className="hidden h-[240px] shrink-0 flex-col overflow-hidden rounded-none bg-card font-sans lg:flex">
       <div className="flex items-center gap-1 border-b border-gc-line px-3">
         {tabs.map(([id, label]) => (
           <button
@@ -95,7 +95,7 @@ export function TerminalPositionsTable({ trading, price }: { trading: DemoTradin
               </tbody>
             </table>
           ) : (
-            <Empty text="No open positions. Use BUY or SELL in the order panel." />
+            <Empty text="No open positions." />
           ))}
         {tab === "pending" &&
           (orders.length ? (

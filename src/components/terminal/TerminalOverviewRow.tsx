@@ -43,7 +43,7 @@ export function TerminalOverviewRow({
           const d = q?.decimals ?? 2;
           const ch = q?.changePct ?? null;
           return (
-            <section key={symbol} className="flex flex-col justify-between rounded-none border border-gc-line bg-card p-3.5">
+            <section key={symbol} className="flex flex-col justify-between rounded-none bg-card p-3.5">
               <div className="flex items-center gap-2.5">
                 {w.icon ? <img src={w.icon} alt="" className="h-8 w-8 rounded-full" /> : <XauUsdLogo size={32} />}
                 <div className="min-w-0">
@@ -71,7 +71,7 @@ export function TerminalOverviewRow({
         })}
       </div>
 
-      <section className="flex min-w-0 gap-4 rounded-none border border-gc-line bg-card p-3.5">
+      <section className="flex min-w-0 gap-4 rounded-none bg-card p-3.5">
         <div className="flex w-[200px] shrink-0 flex-col 2xl:w-[230px]">
           <h3 className="text-[14px] font-medium text-gc-ink">Technicals</h3>
           <div className="mt-2 grid grid-cols-4 gap-1">

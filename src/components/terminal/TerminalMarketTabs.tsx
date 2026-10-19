@@ -12,7 +12,6 @@ import { num, useTechnicals, useWatchQuotes } from "./terminal-market";
 
 type Tab = "overview" | "news" | "technicals" | "seasonals";
 const TABS: Array<{ id: Tab; label: string }> = [
-  { id: "overview", label: "Overview" },
   { id: "news", label: "News" },
   { id: "technicals", label: "Technicals" },
   { id: "seasonals", label: "Seasonals" },
@@ -34,7 +33,7 @@ const pctTone = (v: number | null | undefined) => (v == null ? "text-gc-ink-mute
 
 /** TradingView-style symbol section under the chart: Overview, News, Technicals, Seasonals. */
 export function TerminalMarketTabs({ bars, price, timeframeKey }: { bars: OhlcvBar[]; price: number | null; timeframeKey: string }) {
-  const [tab, setTab] = useState<Tab>("overview");
+  const [tab, setTab] = useState<Tab>("news");
   const quotes = useWatchQuotes();
   const q = quotes.data?.XAUUSD;
   const live = price ?? q?.price ?? null;
@@ -43,8 +42,8 @@ export function TerminalMarketTabs({ bars, price, timeframeKey }: { bars: OhlcvB
   const abs = live != null && prev != null ? live - prev : null;
 
   return (
-    <section aria-label="XAU/USD overview" className="hidden shrink-0 border border-gc-line bg-card font-sans lg:block">
-      <header className="flex flex-wrap items-center gap-x-3 gap-y-1 border-b border-gc-line px-5 py-3.5">
+    <section aria-label="XAU/USD overview" className="hidden shrink-0 bg-card font-sans lg:block">
+      <header className="flex flex-wrap items-center gap-x-3 gap-y-1 px-5 py-3.5">
         <XauUsdLogo size={22} />
         <span className="text-[16px] font-medium text-gc-ink">XAUUSD</span>
         <span className="text-[16px] font-medium tabular-nums text-gc-ink">
@@ -75,7 +74,6 @@ export function TerminalMarketTabs({ bars, price, timeframeKey }: { bars: OhlcvB
         ))}
       </nav>
       <div className="px-5 py-5">
-        {tab === "overview" && <OverviewTab />}
         {tab === "news" && <NewsTab />}
         {tab === "technicals" && <TechnicalsTab bars={bars} timeframeKey={timeframeKey} />}
         {tab === "seasonals" && <SeasonalsTab />}

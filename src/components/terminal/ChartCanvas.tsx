@@ -1,5 +1,6 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
 import {
+  AreaSeries,
   CandlestickSeries,
   ColorType,
   CrosshairMode,
@@ -95,6 +96,8 @@ type Props = {
   onHoverBar: (index: number | null) => void;
   resetKey: string;
   theme?: ChartTheme;
+  /** "area" draws a TradingView-style line/area of closes; candles stay underneath for overlays. */
+  chartStyle?: "candles" | "area";
 };
 
 const uid = () => `d-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`;
@@ -108,6 +111,7 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
   const candleRef = useRef<ISeriesApi<"Candlestick"> | null>(null);
   const markersRef = useRef<ISeriesMarkersPluginApi<Time> | null>(null);
   const ghostRef = useRef<ISeriesApi<"Candlestick"> | null>(null);
+  const areaRef = useRef<ISeriesApi<"Area"> | null>(null);
   const ghostMarkersRef = useRef<ISeriesMarkersPluginApi<Time> | null>(null);
   const extraSeriesRef = useRef<ISeriesApi<"Line" | "Histogram">[]>([]);
   const candlePriceLinesRef = useRef<IPriceLine[]>([]);
@@ -269,6 +273,13 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
     });
     ghostRef.current = ghost;
     ghostMarkersRef.current = createSeriesMarkers(ghost, []);
+    areaRef.current = chart.addSeries(AreaSeries, {
+      visible: false,
+      lineWidth: 2,
+      priceLineVisible: false,
+      crosshairMarkerVisible: true,
+      priceFormat: { type: "price", precision: 2, minMove: 0.01 },
+    });
 
     const bump = () => (dirtyRef.current += 1);
     chart.timeScale().subscribeVisibleLogicalRangeChange(bump);
@@ -289,6 +300,7 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
       candleRef.current = null;
       markersRef.current = null;
       ghostRef.current = null;
+      areaRef.current = null;
       ghostMarkersRef.current = null;
       extraSeriesRef.current = [];
       demoPriceLinesRef.current = [];
@@ -408,6 +420,35 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
     prevBarsRef.current = bars.length ? bars : null;
     dirtyRef.current += 1;
   }, [props.bars, insideBarKey]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ------------------------------------------------------------ area style
+  useEffect(() => {
+    const area = areaRef.current;
+    const candles = candleRef.current;
+    if (!area || !candles) return;
+    const isArea = props.chartStyle === "area";
+    const bars = props.bars;
+    if (isArea && bars.length) {
+      const up = bars[bars.length - 1].close >= bars[0].close;
+      const line = up ? CHART_COLORS.up : CHART_COLORS.down;
+      area.applyOptions({
+        visible: true,
+        lineColor: line,
+        topColor: up ? "rgba(8,153,129,0.28)" : "rgba(242,54,69,0.28)",
+        bottomColor: up ? "rgba(8,153,129,0.02)" : "rgba(242,54,69,0.02)",
+      });
+      area.setData(bars.map((b) => ({ time: b.time as UTCTimestamp, value: b.close })));
+    } else {
+      area.applyOptions({ visible: false });
+    }
+    // Candles stay on the price scale (transparent) so SMC zones and markers keep their anchor.
+    candles.applyOptions(
+      isArea
+        ? { upColor: "rgba(0,0,0,0)", downColor: "rgba(0,0,0,0)", borderVisible: false, wickVisible: false, lastValueVisible: false, priceLineVisible: false }
+        : { upColor: CHART_COLORS.up, downColor: CHART_COLORS.down, borderVisible: true, wickVisible: true, lastValueVisible: true, priceLineVisible: true },
+    );
+    dirtyRef.current += 1;
+  }, [props.chartStyle, props.bars]);
 
   // ------------------------------------------------- scenario ghost candles
   useEffect(() => {
