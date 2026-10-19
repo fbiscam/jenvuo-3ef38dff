@@ -56,7 +56,6 @@ import { INDICATOR_LIST, buildIndicatorSeries, isIndicatorId, type IndicatorId }
 import { ScriptPanel, type SavedScript } from "./ScriptPanel";
 import { buildChartContext } from "./chart-context";
 import { PERIOD_TIMEFRAME, TerminalPeriodReturns, TerminalSymbolHeader, TerminalTabBody, type MarketTab } from "./TerminalMarketTabs";
-import { TerminalOverviewRow } from "./TerminalOverviewRow";
 import { DemoTradingPanel, OrderTicket, PaperTradingPanel, QuickTradeButtons, useDemoTrading } from "./DemoTradingPanel";
 import { positionPnl, type DemoSide } from "@/lib/chart/demo-trading";
 import { buildLiveBars } from "@/lib/chart/live-candle";
@@ -1149,17 +1148,14 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
     </div>
       </div>
       {sidePanelOpen && marketTab === "overview" && (
-        <>
-          <TerminalPeriodReturns
-            timeframeKey={timeframe.key}
-            onPick={(period) => {
-              const next = timeframes.find((t) => t.key === PERIOD_TIMEFRAME[period]);
-              if (next && next.key !== timeframe.key) onTimeframeChange(next);
-              else chartRef.current?.fit();
-            }}
-          />
-          <TerminalOverviewRow bars={bars} price={currentPrice} timeframeKey={timeframe.key} timeframeLabel={timeframe.label} />
-        </>
+        <TerminalPeriodReturns
+          timeframeKey={timeframe.key}
+          onPick={(period) => {
+            const next = timeframes.find((t) => t.key === PERIOD_TIMEFRAME[period]);
+            if (next && next.key !== timeframe.key) onTimeframeChange(next);
+            else chartRef.current?.fit();
+          }}
+        />
       )}
       </div>
     </div>
