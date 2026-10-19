@@ -10,8 +10,9 @@ import GiftBox from "@/components/dashboard/GiftBox";
 import { SITE_PAGES } from "@/lib/site-pages";
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import {
-  BookOpen, Camera, CreditCard, Download, ExternalLink, FileText, LifeBuoy, Loader2, LogOut, Mail,
-  Menu, MoreVertical, Search, SendHorizontal, Settings, ShieldCheck, Sparkles, SquareTerminal, Sparkle } from "lucide-react";
+  BookOpen, Camera, Code, CreditCard, Download, ExternalLink, FileText, LifeBuoy, Loader2, LogOut, Mail,
+  Menu, MoreVertical, Search, SendHorizontal, Settings, ShieldCheck, Sparkles,
+} from "lucide-react";
 import NotificationBell from "@/components/NotificationBell";
 import {
   DropdownMenu,
@@ -144,7 +145,7 @@ export default function DashboardTopBar({
         type="button"
         onClick={onMenu}
         aria-label="Open menu"
-        className={`${onTerminal ? "hidden md:inline-flex" : "inline-flex"} h-10 w-10 shrink-0 items-center justify-center rounded-full text-gc-ink-muted hover:bg-gc-notice`}
+        className={`${onTerminal ? "hidden" : "inline-flex"} h-10 w-10 shrink-0 items-center justify-center rounded-full text-gc-ink-muted hover:bg-gc-notice`}
       >
         <Menu className="h-5 w-5" />
       </button>
@@ -273,9 +274,9 @@ export default function DashboardTopBar({
             aria-pressed={scriptOpen}
             aria-label="Jenvu Script"
             title="Jenvu Script"
-            className={`hidden h-9 w-9 items-center justify-center rounded-full md:inline-flex ${scriptOpen ? "bg-gc-nav-active text-gc-blue-deep" : "text-gc-ink hover:bg-gc-notice"}`}
+            className={`hidden h-9 items-center gap-1.5 rounded-full px-3 text-[13px] font-medium md:inline-flex ${scriptOpen ? "bg-gc-nav-active text-gc-blue-deep" : "text-gc-ink hover:bg-gc-notice"}`}
           >
-            <SquareTerminal className="h-5 w-5" />
+            <Code className="h-4 w-4" /> Script
           </button>
         )}
         <button
@@ -283,11 +284,10 @@ export default function DashboardTopBar({
           onClick={() => openAskJenvu("chat")}
           aria-label="Ask Jenvu"
           title="Ask Jenvu"
-          className={white
-            ? "inline-flex h-9 w-9 items-center justify-center rounded-full text-gc-ink hover:bg-gc-notice"
-            : "inline-flex h-9 items-center gap-2 rounded-full bg-gc-sky px-2.5 text-[13px] font-medium text-gc-blue-deep hover:brightness-95 sm:px-3.5"}
+          className="inline-flex h-9 items-center gap-2 rounded-full bg-gc-sky px-2.5 text-[13px] font-medium text-gc-blue-deep hover:brightness-95 sm:px-3.5"
         >
-          {white ? <Sparkle className="h-5 w-5 fill-current" /> : <><img src={askJenvuMark} alt="" className="h-3.5 w-auto shrink-0" /><span className="hidden lg:inline">Ask Jenvu</span></>}
+          <img src={askJenvuMark} alt="" className="h-3.5 w-auto shrink-0" />
+          <span className="hidden lg:inline">Ask Jenvu</span>
         </button>
         <GiftBox />
         <NotificationBell />
@@ -297,9 +297,9 @@ export default function DashboardTopBar({
               type="button"
               aria-label="More"
               title="More"
-              className={`inline-flex h-9 w-9 items-center justify-center rounded-full ${white ? "text-gc-ink" : "text-gc-ink-muted"} hover:bg-gc-notice`}
+              className="inline-flex h-9 w-9 items-center justify-center rounded-full text-gc-ink-muted hover:bg-gc-notice"
             >
-              <MoreVertical className={white ? "h-5 w-5" : "h-4 w-4"} />
+              <MoreVertical className="h-4 w-4" />
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56 rounded-2xl p-1">
