@@ -42,7 +42,7 @@ export function TerminalMarketTabs({ bars, price, timeframeKey }: { bars: OhlcvB
   const abs = live != null && prev != null ? live - prev : null;
 
   return (
-    <section aria-label="XAU/USD overview" className="hidden shrink-0 border border-gc-line dark:border-border bg-card font-sans lg:block">
+    <section aria-label="XAU/USD overview" className="hidden shrink-0 bg-card font-sans lg:block">
       <header className="flex flex-wrap items-center gap-x-3 gap-y-1 px-5 py-3.5">
         <XauUsdLogo size={22} />
         <span className="text-[16px] font-medium text-gc-ink">XAUUSD</span>

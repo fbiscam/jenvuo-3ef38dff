@@ -795,7 +795,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
         className={cn(
           "flex min-h-0 min-w-0 flex-1 flex-col bg-background",
           sidePanelOpen
-            ? "lg:h-full lg:overflow-hidden lg:rounded-none lg:border lg:border-gc-line lg:bg-card dark:lg:border-border"
+            ? "lg:h-full lg:overflow-hidden lg:rounded-none lg:bg-card"
             : theme !== "dark" && "overflow-hidden md:mb-2 md:rounded-2xl md:border md:border-gc-line",
         )}
       >
