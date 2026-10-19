@@ -75,6 +75,7 @@ import {
   Sparkles,
   LayoutGrid,
   LifeBuoy,
+  Settings as SettingsIcon,
   Lightbulb,
   ChevronLeft,
   ChevronRight,
@@ -1516,7 +1517,7 @@ function DashboardLayout() {
                   <LifeBuoy className="h-3.5 w-3.5" strokeWidth={2.25} />
                 </Link>
                 <Link to="/dashboard/profile" title="Settings" aria-label="Settings" className="sidebar-quick-btn inline-flex h-7 w-7 items-center justify-center rounded-md text-zinc-600">
-                  <Settings className="h-3.5 w-3.5" strokeWidth={2.25} />
+                  <SettingsIcon className="h-3.5 w-3.5" strokeWidth={2.25} />
                 </Link>
               </div>
             )}
