@@ -190,6 +190,16 @@ export function TerminalTabBody({ tab, bars, timeframeKey }: { tab: MarketTab; b
   );
 }
 
+function niceTicks(min: number, max: number, count = 6) {
+  const span = max - min || 1;
+  const raw = span / count;
+  const mag = 10 ** Math.floor(Math.log10(raw));
+  const step = [1, 2, 2.5, 5, 10].map((m) => m * mag).find((s) => s >= raw) ?? raw;
+  const out: number[] = [];
+  for (let v = Math.ceil(min / step) * step; v <= max; v += step) out.push(v);
+  return out;
+}
+
 /* ---------------- News ---------------- */
 
 function ago(iso: string) {
