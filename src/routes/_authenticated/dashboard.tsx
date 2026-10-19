@@ -191,7 +191,6 @@ const NAV_GROUPS: Array<{ label: string; items: TabItem[] }> = [
       { to: "/dashboard/billing", label: "Billing", icon: Wallet },
       { to: "/dashboard/pay", label: "Payments", icon: BadgeDollarSign },
       { to: "/dashboard/documents", label: "Documents", icon: FileCheck2 },
-      { to: "/dashboard/security", label: "Security", icon: LockKeyhole },
       { to: "/dashboard/profile", label: "Settings", icon: Settings2 },
       { to: "/help", label: "Help Center", icon: CircleHelp },
     ],
