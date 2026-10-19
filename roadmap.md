@@ -65,3 +65,4 @@
 - [x] Terminal: TradingView XAUUSD page layout (big header, Overview/News/Technicals/Seasonals tabs, range returns under the chart, TradingView-style line)
 - [x] Settings page: sectioned layout with side menu; Security merged in; Preferences and Active sessions added
 - [x] Founding: dashboard shows "You are already in a program" / "Apply for founding program"; offer is 3 months + $250 credit everywhere
+- [x] Terminal on every plan: 14-day free trial, auto-lock after, unlocks on upgrade
