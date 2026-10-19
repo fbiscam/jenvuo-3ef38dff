@@ -55,9 +55,7 @@ import { ChartCanvas, type ChartCanvasHandle } from "./ChartCanvas";
 import { INDICATOR_LIST, buildIndicatorSeries, isIndicatorId, type IndicatorId } from "./indicator-specs";
 import { ScriptPanel, type SavedScript } from "./ScriptPanel";
 import { buildChartContext } from "./chart-context";
-import { RiskCard } from "./TerminalSidePanel";
 import { TerminalMarketTabs } from "./TerminalMarketTabs";
-import { TerminalOrderPanel } from "./TerminalOrderPanel";
 import { TerminalPositionsTable } from "./TerminalPositionsTable";
 import { TerminalOverviewRow } from "./TerminalOverviewRow";
 import { DemoTradingPanel, OrderTicket, PaperTradingPanel, QuickTradeButtons, useDemoTrading } from "./DemoTradingPanel";
@@ -259,6 +257,15 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
   const [fullscreen, setFullscreen] = useState(false);
   const [ticketSide, setTicketSide] = useState<DemoSide | null>(null);
   const [paperOpen, setPaperOpen] = useState(false);
+  // Main chart look: TradingView-style area line by default, candles on demand. Remembered per browser.
+  const [chartStyle, setChartStyle] = useState<"candles" | "area">("area");
+  useEffect(() => {
+    setChartStyle(readJson<"candles" | "area">("jenvu:terminal-chart-style", "area") === "candles" ? "candles" : "area");
+  }, []);
+  const pickChartStyle = (next: "candles" | "area") => {
+    setChartStyle(next);
+    writeJson("jenvu:terminal-chart-style", next);
+  };
   // Desktop chart toolbar is rendered into the dashboard top bar (in place of the old price strip).
   const [toolbarHost, setToolbarHost] = useState<HTMLElement | null>(null);
   useEffect(() => {
@@ -706,6 +713,24 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
           </div>
         </PopoverContent>
       </Popover>
+      <div role="group" aria-label="Chart style" className="mx-1 flex shrink-0 items-center rounded-full bg-gc-console-search p-0.5 dark:bg-accent">
+        {([["area", "Line", ChartArea], ["candles", "Candles", ChartCandlestick]] as const).map(([key, label, Icon]) => (
+          <button
+            key={key}
+            type="button"
+            onClick={() => pickChartStyle(key)}
+            aria-pressed={chartStyle === key}
+            title={`${label} chart`}
+            className={cn(
+              "inline-flex h-7 items-center gap-1.5 rounded-full px-2.5 text-[12px] font-medium text-gc-ink-muted transition-colors hover:text-gc-ink dark:text-muted-foreground",
+              chartStyle === key && "bg-card text-gc-ink shadow-sm dark:bg-background dark:text-foreground",
+            )}
+          >
+            <Icon className="h-3.5 w-3.5" />
+            <span className="hidden xl:inline">{label}</span>
+          </button>
+        ))}
+      </div>
       <Popover>
         <PopoverTrigger asChild>
           <button type="button" aria-label="Indicators" title="Indicators" className={railBtn}>
@@ -771,7 +796,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
         className={cn(
           "flex min-h-0 min-w-0 flex-1 flex-col bg-background",
           sidePanelOpen
-            ? "lg:h-full lg:overflow-hidden lg:rounded-none lg:border lg:border-gc-line lg:bg-card"
+            ? "lg:h-full lg:overflow-hidden lg:rounded-none lg:bg-card"
             : theme !== "dark" && "overflow-hidden md:mb-2 md:rounded-2xl md:border md:border-gc-line",
         )}
       >
@@ -972,6 +997,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
               onHoverBar={onHoverBar}
               resetKey={`${asset}:${timeframe.key}:${payload ? "ready" : "loading"}`}
               theme={theme}
+              chartStyle={chartStyle}
             />
 
             {/* Legend */}
@@ -1120,7 +1146,6 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
       {sidePanelOpen && <TerminalPositionsTable trading={demo} price={currentPrice} />}
       {sidePanelOpen && <TerminalMarketTabs bars={bars} price={currentPrice} timeframeKey={timeframe.key} />}
       </div>
-      {sidePanelOpen && <TerminalOrderPanel trading={demo} price={currentPrice} footer={<RiskCard trading={demo} price={currentPrice} />} />}
     </div>
   );
 });
