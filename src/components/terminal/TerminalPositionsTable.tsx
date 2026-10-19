@@ -95,7 +95,7 @@ export function TerminalPositionsTable({ trading, price }: { trading: DemoTradin
               </tbody>
             </table>
           ) : (
-            <Empty text="No open positions. Use BUY or SELL in the order panel." />
+            <Empty text="No open positions." />
           ))}
         {tab === "pending" &&
           (orders.length ? (
