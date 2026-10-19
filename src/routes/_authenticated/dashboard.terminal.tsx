@@ -17,6 +17,7 @@ import {
   Timer,
   Trash2,
   X,
+  Sparkles,
 } from "lucide-react";
 import type { FileUIPart } from "ai";
 import { analyzeGold, type GoldSignal } from "@/lib/gold-analysis.functions";
