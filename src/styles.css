@@ -500,7 +500,7 @@
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  *:not(.animate-ticker):not(.gc-logo-marquee):not(.ask-jenvu-mark-ring), *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
+  *:not(.animate-ticker):not(.gc-logo-marquee):not(.ask-jenvu-mark-ring):not(.terminal-strip-track), *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
   .animate-ticker { animation: ticker-marquee 60s linear infinite !important; }
   .ask-jenvu-mark-ring { animation: ask-jenvu-ring 2.4s linear infinite !important; }
 }

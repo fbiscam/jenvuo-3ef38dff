@@ -39,28 +39,34 @@ export default function TerminalMarketStrip() {
   return (
     <div
       aria-label="Top pairs and stocks that affect gold"
-      className="no-scrollbar flex h-9 min-w-0 items-center gap-1 overflow-x-auto rounded-full border border-gc-line/70 bg-gc-console-search px-1.5"
+      className="terminal-strip relative flex h-9 min-w-0 items-center overflow-hidden rounded-full border border-gc-line/70 bg-background px-1.5"
     >
-      {MARKETS.map((m) => {
-        const q = quotes.data?.[m.symbol];
-        const ch = q?.changePct ?? null;
-        const tone = ch == null ? "text-gc-ink-muted" : ch >= 0 ? "text-gc-green" : "text-gc-red";
-        return (
-          <div
-            key={m.symbol}
-            title={m.hint}
-            className="flex shrink-0 items-baseline gap-1.5 rounded-full px-2.5 py-1 text-[12px] hover:bg-background"
-          >
-            <span className="font-medium text-gc-ink">{m.label}</span>
-            <span className="tabular-nums text-gc-ink">
-              {q ? q.price.toLocaleString("en-US", { minimumFractionDigits: q.decimals, maximumFractionDigits: q.decimals }) : "—"}
-            </span>
-            <span className={`tabular-nums text-[11px] ${tone}`}>
-              {ch == null ? "" : `${ch >= 0 ? "+" : ""}${ch.toFixed(2)}%`}
-            </span>
+      <div className="terminal-strip-track flex w-max items-center">
+        {[0, 1].map((copy) => (
+          <div key={copy} aria-hidden={copy === 1} className="flex shrink-0 items-center gap-1 pr-1">
+            {MARKETS.map((m) => {
+              const q = quotes.data?.[m.symbol];
+              const ch = q?.changePct ?? null;
+              const tone = ch == null ? "text-gc-ink-muted" : ch >= 0 ? "text-gc-green" : "text-gc-red";
+              return (
+                <div
+                  key={m.symbol}
+                  title={m.hint}
+                  className="flex shrink-0 items-baseline gap-1.5 rounded-full px-2.5 py-1 text-[12px] hover:bg-gc-console-search"
+                >
+                  <span className="font-medium text-gc-ink">{m.label}</span>
+                  <span className="tabular-nums text-gc-ink">
+                    {q ? q.price.toLocaleString("en-US", { minimumFractionDigits: q.decimals, maximumFractionDigits: q.decimals }) : "—"}
+                  </span>
+                  <span className={`tabular-nums text-[11px] ${tone}`}>
+                    {ch == null ? "" : `${ch >= 0 ? "+" : ""}${ch.toFixed(2)}%`}
+                  </span>
+                </div>
+              );
+            })}
           </div>
-        );
-      })}
+        ))}
+      </div>
     </div>
   );
 }
