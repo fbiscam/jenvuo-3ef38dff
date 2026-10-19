@@ -316,6 +316,11 @@ function TerminalPage() {
     }
   };
   const [deskOpen, setDeskOpen] = useState(false);
+  useEffect(() => {
+    const open = () => setDeskOpen(true);
+    window.addEventListener("jenvu:terminal-ask-ai", open);
+    return () => window.removeEventListener("jenvu:terminal-ask-ai", open);
+  }, []);
   const [theme, setTheme] = useState<"light" | "dark">("dark");
   const [watchlistOpen, setWatchlistOpen] = useState(true);
   // Trading layout (order panel, positions, market watch, technicals, risk) — on by default.
@@ -736,7 +741,7 @@ function TerminalPage() {
                 </>
               }
               rightSlot={
-                  )}
+                <>
                   <div
                     className="flex h-7 md:hidden items-center gap-1.5 rounded-full bg-muted px-2.5 font-mono text-xs font-semibold text-foreground"
                     title={marketClosed ? "Gold market is closed for the weekend" : `Time left on the current ${tf.label} candle`}

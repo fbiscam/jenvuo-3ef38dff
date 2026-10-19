@@ -286,7 +286,7 @@ export default function DashboardTopBar({
         )}
         <button
           type="button"
-          onClick={() => openAskJenvu("chat")}
+          onClick={() => (onTerminal ? window.dispatchEvent(new CustomEvent("jenvu:terminal-ask-ai")) : openAskJenvu("chat"))}
           aria-label="Ask Jenvu"
           title="Ask Jenvu"
           className="inline-flex h-9 items-center gap-2 rounded-full bg-gc-sky px-2.5 text-[13px] font-medium text-gc-blue-deep hover:brightness-95 sm:px-3.5"
