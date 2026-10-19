@@ -171,7 +171,7 @@ export const DOC_GROUPS: DocGroup[] = [
         keywords: "access locked founding program id verification",
         body: (
           <>
-            <p>The Terminal is available to approved <strong>Founding Program</strong> members and to the Jenvu team.</p>
+            <p>Every account, including Free, can use the Terminal for <strong>14 days</strong> after sign-up. After that it locks on Free and unlocks again as soon as you upgrade to Pro, Elite or Ultra. Approved <strong>Founding Program</strong> members also have access.</p>
             <ul>
               <li>When your Founding application is approved, you get 3 months of your chosen plan and $250 credit straight away.</li>
               <li>You then have <strong>2 days</strong> to upload an identity document. Once submitted, access continues.</li>

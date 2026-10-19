@@ -61,7 +61,7 @@ function HelpCenterPage() {
   const faqs = [
     { q: "How do I cancel my Jenvu subscription?", a: "Open Dashboard → Billing and choose Cancel plan. You keep access until the end of the period you already paid for. See the Cancellation policy for details." },
     { q: "How do I start the free trial?", a: "After signing up, click “Start free” in the banner at the top of your dashboard. It adds $100 credit and 14 days of Pro, once per account." },
-    { q: "How do I get access to the Terminal?", a: "The Terminal is open to approved Founding Program members. Apply on the Founding page; we review every application." },
+    { q: "How do I get access to the Terminal?", a: "Every account gets the Terminal free for 14 days after sign-up. After that it locks on the Free plan and unlocks again as soon as you upgrade to Pro, Elite or Ultra." },
     { q: "How do I contact Jenvu support?", a: "Email support@jenvu.com or use the Contact page. We reply within one business day, Monday to Friday." },
   ];
   const [open, setOpen] = React.useState<number[]>([]);
