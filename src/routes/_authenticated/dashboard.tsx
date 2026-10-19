@@ -1587,7 +1587,7 @@ function DashboardLayout() {
         <main
           className={
             pathname === "/dashboard/terminal"
-              ? "h-full min-h-0 w-full flex-1 overflow-hidden bg-background"
+              ? "h-full min-h-0 w-full flex-1 overflow-hidden bg-gc-console-bar"
               : "mx-auto w-full max-w-7xl flex-1 bg-white px-5 pt-7 pb-7 sm:px-8"
           }
           style={pathname === "/dashboard/terminal" ? undefined : { zoom: 0.9 }}

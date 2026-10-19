@@ -28,21 +28,13 @@ async function handle(request: Request) {
   const urls = items.map((r) => `${BASE_URL}/${r.slug}`);
   const indexnow = await submitToIndexNow(urls);
 
-  const google: Record<string, unknown> = {};
-  await Promise.all(
-    items.map(async (r) => {
-      const u = `${BASE_URL}/${r.slug}`;
-      const res = await submitToGoogle(u);
-      google[r.slug] = res;
-      await supabaseAdmin
-        .from("insights")
-        .update({
-          indexed_at: new Date().toISOString(),
-          index_status: { google: res, indexnow },
-        })
-        .eq("id", r.id);
-    }),
-  );
+  // One sitemap resubmission covers every article (the sitemap lists them all).
+  const google = await submitToGoogle();
+  const now = new Date().toISOString();
+  await supabaseAdmin
+    .from("insights")
+    .update({ indexed_at: now, index_status: { google, indexnow } })
+    .in("id", items.map((r) => r.id));
 
   return Response.json({ ok: true, count: items.length, indexnow, google });
 }

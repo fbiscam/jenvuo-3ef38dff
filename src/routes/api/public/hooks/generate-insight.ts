@@ -18,24 +18,32 @@ function slugify(s: string) {
     .slice(0, 90);
 }
 
-export async function submitToGoogle(url: string) {
+const GSC_GATEWAY = "https://connector-gateway.lovable.dev/google_search_console";
+const SITEMAP_URL = "https://jenvu.com/sitemap.xml";
+
+/**
+ * Ask Google to re-read the sitemap (which lists every blog article).
+ * Google's per-URL Indexing API is not available through the connector, so
+ * resubmitting the sitemap once per run is how new articles reach Google.
+ */
+export async function submitToGoogle(_url?: string) {
   const lovableKey = process.env.LOVABLE_API_KEY;
   const gscKey = process.env.GOOGLE_SEARCH_CONSOLE_API_KEY;
   if (!lovableKey || !gscKey) return { ok: false, skipped: true };
+  const headers = { Authorization: `Bearer ${lovableKey}`, "X-Connection-Api-Key": gscKey };
   try {
+    const list = await fetch(`${GSC_GATEWAY}/webmasters/v3/sites`, { headers });
+    if (!list.ok) return { ok: false, status: list.status, error: (await list.text()).slice(0, 300) };
+    const { siteEntry = [] } = (await list.json()) as { siteEntry?: Array<{ siteUrl: string; permissionLevel?: string }> };
+    const verified = siteEntry.filter((e) => e.permissionLevel !== "siteUnverifiedUser").map((e) => e.siteUrl);
+    // Domain property covers jenvu.com and blogs.jenvu.com; fall back to the root URL-prefix property.
+    const siteUrl = verified.find((u) => u === "sc-domain:jenvu.com") ?? verified.find((u) => u === "https://jenvu.com/");
+    if (!siteUrl) return { ok: false, error: "no-verified-property" };
     const res = await fetch(
-      "https://connector-gateway.lovable.dev/google_search_console/indexing/v3/urlNotifications:publish",
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${lovableKey}`,
-          "X-Connection-Api-Key": gscKey,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ url, type: "URL_UPDATED" }),
-      },
+      `${GSC_GATEWAY}/webmasters/v3/sites/${encodeURIComponent(siteUrl)}/sitemaps/${encodeURIComponent(SITEMAP_URL)}`,
+      { method: "PUT", headers },
     );
-    return { ok: res.ok, status: res.status };
+    return { ok: res.ok, status: res.status, sitemap: SITEMAP_URL, property: siteUrl };
   } catch (e) {
     return { ok: false, error: String(e) };
   }
@@ -79,12 +87,12 @@ export const Route = createFileRoute("/api/public/hooks/generate-insight")({
         if (currentJob?.status === "paused") {
           try {
             const { callChatCompletion } = await import("@/lib/ai-gateway");
-            await callChatCompletion({ models: ARTICLE_MODELS, messages: [{ role: "user", content: "Reply exactly READY" }], maxTokens: 16, retriesPerModel: 1, stage: "insight-health-probe" });
+            await callChatCompletion({ models: ARTICLE_MODELS, messages: [{ role: "user", content: "Reply exactly READY" }], maxTokens: 800, retriesPerModel: 1, stage: "insight-health-probe" });
             await supabaseAdmin
               .from("insight_generation_jobs")
               .update({ status: "idle", pause_reason: null, last_error: null, updated_at: new Date().toISOString() })
               .eq("job_key", JOB_KEY);
-            return Response.json({ recovered: true, note: "Generation will resume on the next daily run." });
+            // Recovered: carry on and write today's article in this same run.
           } catch (error) {
             return Response.json({ paused: true, reason: currentJob.pause_reason, probe: String(error) });
           }
