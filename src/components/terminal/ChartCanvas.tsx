@@ -6,7 +6,9 @@ import {
   CrosshairMode,
   HistogramSeries,
   LineSeries,
+  LastPriceAnimationMode,
   LineStyle,
+  LineType,
   createChart,
   createSeriesMarkers,
   type IChartApi,
@@ -112,6 +114,7 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
   const markersRef = useRef<ISeriesMarkersPluginApi<Time> | null>(null);
   const ghostRef = useRef<ISeriesApi<"Candlestick"> | null>(null);
   const areaRef = useRef<ISeriesApi<"Area"> | null>(null);
+  const prevCloseLineRef = useRef<IPriceLine | null>(null);
   const ghostMarkersRef = useRef<ISeriesMarkersPluginApi<Time> | null>(null);
   const extraSeriesRef = useRef<ISeriesApi<"Line" | "Histogram">[]>([]);
   const candlePriceLinesRef = useRef<IPriceLine[]>([]);
@@ -276,8 +279,14 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
     areaRef.current = chart.addSeries(AreaSeries, {
       visible: false,
       lineWidth: 2,
-      priceLineVisible: false,
+      lineType: LineType.Simple,
+      priceLineVisible: true,
+      priceLineStyle: LineStyle.Dotted,
+      priceLineWidth: 1,
+      lastPriceAnimation: LastPriceAnimationMode.Continuous,
       crosshairMarkerVisible: true,
+      crosshairMarkerRadius: 4,
+      crosshairMarkerBorderWidth: 2,
       priceFormat: { type: "price", precision: 2, minMove: 0.01 },
     });
 
@@ -301,6 +310,7 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
       markersRef.current = null;
       ghostRef.current = null;
       areaRef.current = null;
+      prevCloseLineRef.current = null;
       ghostMarkersRef.current = null;
       extraSeriesRef.current = [];
       demoPriceLinesRef.current = [];
@@ -429,17 +439,42 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
     const isArea = props.chartStyle === "area";
     const bars = props.bars;
     if (isArea && bars.length) {
-      const up = bars[bars.length - 1].close >= bars[0].close;
+      // TradingView-style: colour follows the move since the previous UTC day's close.
+      const last = bars[bars.length - 1];
+      const dayStart = Math.floor(last.time / 86400) * 86400;
+      let prevIdx = -1;
+      for (let i = bars.length - 1; i >= 0; i -= 1) if (bars[i].time < dayStart) { prevIdx = i; break; }
+      const prevClose = prevIdx >= 0 ? bars[prevIdx].close : bars[0].close;
+      const up = last.close >= prevClose;
       const line = up ? CHART_COLORS.up : CHART_COLORS.down;
+      const dark = props.theme === "dark";
       area.applyOptions({
         visible: true,
         lineColor: line,
-        topColor: up ? "rgba(8,153,129,0.28)" : "rgba(242,54,69,0.28)",
-        bottomColor: up ? "rgba(8,153,129,0.02)" : "rgba(242,54,69,0.02)",
+        topColor: up ? `rgba(8,153,129,${dark ? 0.32 : 0.24})` : `rgba(242,54,69,${dark ? 0.32 : 0.24})`,
+        bottomColor: up ? "rgba(8,153,129,0)" : "rgba(242,54,69,0)",
+        crosshairMarkerBorderColor: dark ? "#131722" : "#ffffff",
+        crosshairMarkerBackgroundColor: line,
+        priceLineColor: line,
       });
       area.setData(bars.map((b) => ({ time: b.time as UTCTimestamp, value: b.close })));
+      if (prevCloseLineRef.current) area.removePriceLine(prevCloseLineRef.current);
+      prevCloseLineRef.current = area.createPriceLine({
+        price: prevClose,
+        color: dark ? "#787b86" : "#9598a1",
+        lineWidth: 1,
+        lineStyle: LineStyle.SparseDotted,
+        axisLabelVisible: true,
+        axisLabelColor: dark ? "#363a45" : "#787b86",
+        axisLabelTextColor: "#ffffff",
+        title: "Prev close",
+      });
     } else {
       area.applyOptions({ visible: false });
+      if (prevCloseLineRef.current) {
+        area.removePriceLine(prevCloseLineRef.current);
+        prevCloseLineRef.current = null;
+      }
     }
     // Candles stay on the price scale (transparent) so SMC zones and markers keep their anchor.
     candles.applyOptions(
@@ -448,7 +483,7 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
         : { upColor: CHART_COLORS.up, downColor: CHART_COLORS.down, borderVisible: true, wickVisible: true, lastValueVisible: true, priceLineVisible: true },
     );
     dirtyRef.current += 1;
-  }, [props.chartStyle, props.bars]);
+  }, [props.chartStyle, props.bars, props.theme]);
 
   // ------------------------------------------------- scenario ghost candles
   useEffect(() => {
