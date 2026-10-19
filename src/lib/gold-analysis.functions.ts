@@ -417,6 +417,12 @@ export function resolveInstrument(input: string): ResolvedInstrument {
     };
   }
 
+  // U.S. 10-year yield: price context only (the "CTX:" key keeps it out of analysis).
+  if (cleaned === "US10Y" || cleaned === "TNX") {
+    const y = GOLD_CORRELATED.US10Y;
+    return { raw: raw || "US10Y", key: "CTX:US10Y", display: y.display, kind: y.kind, decimals: y.decimals, yahooSymbols: y.yahooSymbols, quote: "USD", needsUsdNews: false };
+  }
+
   const xauKey = XAU_ALIASES[cleaned] ?? (XAU_PAIRS[cleaned] ? cleaned : null);
   if (xauKey) {
     const p = XAU_PAIRS[xauKey];

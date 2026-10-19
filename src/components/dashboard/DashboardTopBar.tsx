@@ -7,6 +7,7 @@ import { Shimmer } from "@/components/ai-elements/shimmer";
 import askJenvuMark from "@/assets/ask-jenvu-mark.png";
 import { openAskJenvu } from "@/components/AskJenvuWidget";
 import GiftBox from "@/components/dashboard/GiftBox";
+import TerminalMarketStrip from "@/components/terminal/TerminalMarketStrip";
 import { SITE_PAGES } from "@/lib/site-pages";
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import {
@@ -154,6 +155,11 @@ export default function DashboardTopBar({
         <span className="text-[20px] font-medium tracking-tight text-gc-ink">Jenvu</span>
       </Link>
 
+      {onTerminal ? (
+        <div className="mx-auto hidden min-w-0 max-w-[900px] flex-1 sm:block">
+          <TerminalMarketStrip />
+        </div>
+      ) : (
       <div className={`relative mx-auto hidden w-full ${white ? "max-w-[700px]" : "max-w-[720px]"} sm:block`}>
         {/* Google Cloud style: grey pill at rest, white box with a blue outline while typing. */}
         <form
@@ -265,6 +271,7 @@ export default function DashboardTopBar({
           </div>
         )}
       </div>
+      )}
 
       <div className="ml-auto flex shrink-0 items-center gap-1 sm:ml-0">
         {onTerminal && (
