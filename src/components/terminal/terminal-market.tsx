@@ -20,6 +20,7 @@ export const WATCH: WatchItem[] = [
   { symbol: "US10Y", label: "US10Y", name: "US 10Y Yield", icon: usIcon },
   { symbol: "EURUSD", label: "EUR/USD", name: "Euro / Dollar", icon: euIcon },
   { symbol: "SPX", label: "S&P 500", name: "US Stocks", icon: spxIcon },
+  { symbol: "USDJPY", label: "USD/JPY", name: "Dollar / Yen" },
 ];
 
 export const TECH_TFS = [
