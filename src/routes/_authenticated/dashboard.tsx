@@ -16,6 +16,7 @@ import NotificationBell from "@/components/NotificationBell";
 import { useCredits } from "@/hooks/useCredits";
 import { useAuthUser } from "@/hooks/useAuthUser";
 import StartTrialBanner from "@/components/StartTrialBanner";
+import RenewalNotice from "@/components/billing/RenewalNotice";
 import DashboardTopBar from "@/components/dashboard/DashboardTopBar";
 import NotificationStrip from "@/components/dashboard/NotificationStrip";
 import CloudWelcome from "@/components/dashboard/CloudWelcome";
@@ -1580,6 +1581,7 @@ function DashboardLayout() {
               : "flex min-h-0 w-full flex-1 flex-col overflow-clip bg-background sm:mx-2 sm:w-auto sm:rounded-t-[20px]"
           }
         >
+        {drawerMode && <RenewalNotice />}
         {drawerMode && pathname !== "/dashboard/terminal" && <StartTrialBanner />}
         {drawerMode && pathname !== "/dashboard/terminal" && <NotificationStrip />}
 

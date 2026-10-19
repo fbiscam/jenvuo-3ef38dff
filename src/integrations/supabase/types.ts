@@ -3279,7 +3279,11 @@ export type Database = {
           current_period_start: string
           id: string
           is_trial: boolean
+          lapsed_at: string | null
+          lapsed_plan_id: string | null
           plan_id: string
+          renewal_due_at: string | null
+          renewal_notice_at: string | null
           status: string
           trial_ends_at: string | null
           updated_at: string
@@ -3292,7 +3296,11 @@ export type Database = {
           current_period_start?: string
           id?: string
           is_trial?: boolean
+          lapsed_at?: string | null
+          lapsed_plan_id?: string | null
           plan_id: string
+          renewal_due_at?: string | null
+          renewal_notice_at?: string | null
           status?: string
           trial_ends_at?: string | null
           updated_at?: string
@@ -3305,7 +3313,11 @@ export type Database = {
           current_period_start?: string
           id?: string
           is_trial?: boolean
+          lapsed_at?: string | null
+          lapsed_plan_id?: string | null
           plan_id?: string
+          renewal_due_at?: string | null
+          renewal_notice_at?: string | null
           status?: string
           trial_ends_at?: string | null
           updated_at?: string
@@ -3562,6 +3574,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_founding_member: { Args: { _user_id: string }; Returns: boolean }
       journal_stats: { Args: { _from?: string; _to?: string }; Returns: Json }
       lg_charge_credits: {
         Args: {
@@ -3653,6 +3666,7 @@ export type Database = {
         Returns: string
       }
       mark_chat_read: { Args: { _session_id: string }; Returns: undefined }
+      next_first_of_month: { Args: { _t: string }; Returns: string }
       post_admin_message: {
         Args: { _content: string; _session_id: string }
         Returns: string
@@ -3660,6 +3674,11 @@ export type Database = {
       post_guest_message: {
         Args: { _content: string; _token: string }
         Returns: string
+      }
+      process_founding_renewals: { Args: never; Returns: number }
+      renew_founding_plan: {
+        Args: { _plan_id: string; _user_id: string }
+        Returns: undefined
       }
       resync_all_credit_lots: { Args: never; Returns: number }
       revoke_pro_trial: {

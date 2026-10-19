@@ -78,6 +78,13 @@
       "when": 1792423985654,
       "tag": "0010_founding_three_months_250_credit",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1792424719087,
+      "tag": "0011_founding_monthly_renewal",
+      "breakpoints": true
     }
   ]
 }
