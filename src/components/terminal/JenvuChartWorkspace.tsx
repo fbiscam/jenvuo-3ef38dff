@@ -133,6 +133,11 @@ type Props = {
   theme?: "light" | "dark";
   /** Extra buttons placed at the bottom of the left side bar (e.g. Ask With AI). */
   railSlot?: ReactNode;
+  /** Cards shown above / below the chart card (desktop dashboard layout). */
+  headerSlot?: ReactNode;
+  footerSlot?: ReactNode;
+  /** Receives live price, 24h stats and fresh zones for the side panels. */
+  onMarketUpdate?: (market: MarketSnapshot) => void;
 };
 
 const TOOLS: Array<{ id: DrawingTool; icon: LucideIcon; label: string }> = [
@@ -216,7 +221,7 @@ function ToolButton({
 }
 
 export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function JenvuChartWorkspace(
-  { timeframes, timeframe, onTimeframeChange, rightSlot, mobileNewsRow, asset = "XAUUSD", onAssetChange, theme = "light", railSlot },
+  { timeframes, timeframe, onTimeframeChange, rightSlot, mobileNewsRow, asset = "XAUUSD", onAssetChange, theme = "light", railSlot, headerSlot, footerSlot, onMarketUpdate },
   ref,
 ) {
   const fetchChart = useServerFn(getTerminalChart);
@@ -488,8 +493,23 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
     const open = win[0]?.open ?? last.open;
     let high = -Infinity, low = Infinity;
     for (const b of win) { if (b.high > high) high = b.high; if (b.low < low) low = b.low; }
-    return { price: last.close, diff: last.close - open, pct: open ? ((last.close - open) / open) * 100 : 0, high, low };
+    const step = Math.max(1, Math.floor(win.length / 40));
+    const spark = win.filter((_, i) => i % step === 0).map((b) => b.close);
+    if (spark.at(-1) !== last.close) spark.push(last.close);
+    return { price: last.close, diff: last.close - open, pct: open ? ((last.close - open) / open) * 100 : 0, high, low, spark };
   }, [bars]);
+
+  // Share live price, 24h stats and fresh supply/demand zones with the Terminal side panels.
+  useEffect(() => {
+    if (!onMarketUpdate || !dayStats) return;
+    const zones = (smc?.sdZones ?? []).map((z) => ({
+      type: z.type,
+      top: z.top,
+      bottom: z.bottom,
+      strength: Math.max(1, Math.min(5, Math.round(Math.min(3, z.displacementAtr)) + (z.fresh ? 1 : 0) + (z.extreme ? 1 : 0))),
+    }));
+    onMarketUpdate({ ...dayStats, trend: smc?.trend ?? "undecided", zones });
+  }, [onMarketUpdate, dayStats, smc]);
 
   const legendIndicators = useMemo(
     () =>
@@ -748,7 +768,9 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
   return (
     <div ref={workspaceRef} className={cn("flex h-full min-h-0 w-full", theme === "dark" ? "bg-background" : "bg-gc-console-bar")}>
       {rail}
-      <div className={cn("flex min-h-0 min-w-0 flex-1 flex-col bg-background", theme !== "dark" && "overflow-hidden rounded-t-2xl md:mr-3 md:border md:border-b-0 md:border-gc-line/70")}>
+      <div className={cn("flex min-h-0 min-w-0 flex-1 flex-col", (headerSlot || footerSlot) && !fullscreen && "md:gap-3 md:pb-3", theme !== "dark" && "md:mr-3")}>
+      {!fullscreen && headerSlot}
+      <div className={cn("flex min-h-0 min-w-0 flex-1 flex-col bg-background", theme !== "dark" && "overflow-hidden md:rounded-2xl md:border md:border-gc-line/70")}>
       {/* Top bar — phones only: on laptops and tablets every control lives in the side bar. */}
       <div className="flex h-11 shrink-0 items-center gap-1 overflow-x-auto border-b border-border px-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:hidden">
 
@@ -928,15 +950,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
                   <p className="truncate text-[12px] text-gc-ink-muted">{asset === "XAUUSD" ? "Gold spot / U.S. dollar" : "Bitcoin / U.S. dollar"}</p>
                 </div>
               </div>
-              {dayStats && (
-                <div className="leading-tight">
-                  <p className="text-[22px] font-medium tabular-nums text-gc-ink">{dayStats.price.toFixed(2)}</p>
-                  <p className={cn("text-[12px] font-medium tabular-nums", dayStats.diff >= 0 ? "text-gc-success" : "text-gc-red")}>
-                    {dayStats.diff >= 0 ? "+" : ""}{dayStats.diff.toFixed(2)} ({dayStats.diff >= 0 ? "+" : ""}{dayStats.pct.toFixed(2)}%) · 24h
-                  </p>
-                </div>
-              )}
-              <div className="mx-auto hidden items-center gap-0.5 rounded-full bg-gc-panel p-1 lg:flex" role="group" aria-label="Timeframe">
+              <div className="hidden items-center gap-0.5 lg:flex" role="group" aria-label="Timeframe">
                 {timeframes.map((item) => (
                   <button
                     key={item.key}
@@ -944,8 +958,8 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
                     onClick={() => onTimeframeChange(item)}
                     aria-pressed={item.key === timeframe.key}
                     className={cn(
-                      "h-7 rounded-full px-3 text-[12px] font-medium text-gc-ink-muted transition hover:text-gc-ink",
-                      item.key === timeframe.key && "bg-gc-blue-soft text-gc-blue-deep",
+                      "h-8 rounded-lg px-3 text-[13px] font-medium text-gc-ink-muted transition hover:bg-gc-panel hover:text-gc-ink",
+                      item.key === timeframe.key && "bg-gc-blue-soft text-gc-blue-deep hover:bg-gc-blue-soft",
                     )}
                   >
                     {item.label}
@@ -953,12 +967,18 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
                 ))}
               </div>
               {dayStats && (
-                <dl className="ml-auto flex items-center gap-6 text-[12px] lg:ml-0">
-                  <div><dt className="text-gc-ink-muted">24h high</dt><dd className="mt-0.5 text-[14px] font-medium tabular-nums text-gc-ink">{dayStats.high.toFixed(2)}</dd></div>
-                  <div><dt className="text-gc-ink-muted">24h low</dt><dd className="mt-0.5 text-[14px] font-medium tabular-nums text-gc-ink">{dayStats.low.toFixed(2)}</dd></div>
-                  <div className="hidden xl:block"><dt className="text-gc-ink-muted">Candle</dt><dd className="mt-0.5 text-[14px] font-medium text-gc-ink">{timeframe.label}</dd></div>
-                </dl>
+                <div className="ml-auto text-right leading-tight lg:hidden">
+                  <p className="text-[18px] font-medium tabular-nums text-gc-ink">{dayStats.price.toFixed(2)}</p>
+                  <p className={cn("text-[12px] font-medium tabular-nums", dayStats.diff >= 0 ? "text-gc-success" : "text-gc-red")}>
+                    {dayStats.diff >= 0 ? "+" : ""}{dayStats.pct.toFixed(2)}% · 24h
+                  </p>
+                </div>
               )}
+              <div className="ml-auto hidden items-center gap-1 lg:flex">
+                <button type="button" onClick={() => void toggleFullscreen()} aria-label={fullscreen ? "Exit fullscreen chart" : "Fullscreen chart"} title={fullscreen ? "Exit fullscreen" : "Fullscreen chart"} className="grid h-8 w-8 place-items-center rounded-lg text-gc-ink-muted hover:bg-gc-panel hover:text-gc-ink">
+                  {fullscreen ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
+                </button>
+              </div>
             </div>
           )}
           <div className="relative min-h-0 flex-1">
@@ -1131,6 +1151,8 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
           )}
         </div>
       </div>
+    </div>
+      {footerSlot}
     </div>
     </div>
   );
