@@ -6,17 +6,39 @@ import { getMyMailAddress } from "@/lib/mail.functions";
 import AvatarAdjuster from "@/components/AvatarAdjuster";
 import { writeCachedAvatar, AVATAR_TTL_SECONDS } from "@/lib/avatar-cache";
 import { useVerification } from "@/hooks/useVerification";
-import { Camera, Image as ImageIcon, Loader2, Trash2, Upload } from "lucide-react";
-
+import { Camera, Loader2, MonitorSmartphone, ShieldAlert, ShieldCheck, SlidersHorizontal, Trash2, Upload, UserRound } from "lucide-react";
+import { SettingsCard, settingsBtn, settingsBtnPrimary, settingsField } from "@/components/settings/SettingsCard";
+import { DangerZoneSettings, SecuritySettings } from "@/components/settings/SecuritySettings";
+import { PreferencesSettings } from "@/components/settings/PreferencesSettings";
+import { ActiveSessionsSettings } from "@/components/settings/ActiveSessionsSettings";
 
 export const Route = createFileRoute("/_authenticated/dashboard/profile")({
+  head: () => ({
+    meta: [
+      { title: "Settings — Jenvu" },
+      { name: "description", content: "Manage your Jenvu profile, security, preferences and active sessions." },
+      { property: "og:title", content: "Settings — Jenvu" },
+      { property: "og:description", content: "Manage your Jenvu profile, security, preferences and active sessions." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+      { name: "robots", content: "noindex" },
+    ],
+  }),
   component: Profile,
 });
 
+const SECTIONS = [
+  { id: "profile", label: "Profile", icon: UserRound },
+  { id: "security", label: "Security", icon: ShieldCheck },
+  { id: "preferences", label: "Preferences", icon: SlidersHorizontal },
+  { id: "sessions", label: "Active sessions", icon: MonitorSmartphone },
+  { id: "danger", label: "Danger zone", icon: ShieldAlert },
+] as const;
 
 function Profile() {
   const { verified } = useVerification();
   const nameLocked = verified;
+  const [active, setActive] = useState<string>("profile");
   const [userId, setUserId] = useState<string | null>(null);
 
   const [email, setEmail] = useState("");
@@ -119,111 +141,112 @@ function Profile() {
   };
 
   const initial = (fullName || email || "?").trim().charAt(0).toUpperCase();
-  const field = "mt-1.5 block h-11 w-full rounded-xl border border-gc-line bg-background px-4 text-[15px] text-gc-ink outline-none focus:border-gc-blue-deep focus:ring-2 focus:ring-gc-blue-soft";
 
   return (
-    <div className="mx-auto w-full max-w-[880px] space-y-6 pb-10 text-gc-ink">
+    <div className="mx-auto w-full max-w-[1080px] pb-10 text-gc-ink">
       <header className="jenvu-rise pt-2">
-        <span className="inline-flex rounded-full bg-gc-blue-soft px-3 py-1 text-[13px] font-medium text-gc-blue-deep">Settings</span>
-        <h1 className="mt-4 text-[32px] font-medium leading-tight tracking-[-0.3px] sm:text-[40px]">{"\n"}</h1>
-        <p className="mt-2 max-w-[620px] text-[16px] leading-[1.6] text-gc-ink-muted">Your photo and name show on your dashboard, in the top menu and in messages you send to Jenvu support.</p>
+        <h1 className="text-[32px] font-medium leading-tight tracking-[-0.3px] sm:text-[36px]">Settings</h1>
+        <p className="mt-2 max-w-[620px] text-[15px] leading-[1.6] text-gc-ink-muted">Manage your profile, security, preferences and where you're signed in.</p>
       </header>
 
-      <section className="jenvu-rise [animation-delay:60ms] overflow-hidden rounded-[28px] border border-gc-line bg-background">
-        <div className="h-24 bg-gradient-to-r from-gc-blue-soft via-gc-notice to-gc-blue-soft sm:h-28" aria-hidden />
-        <div className="px-6 pb-6 sm:px-8 sm:pb-8">
-          <div className="-mt-12 flex flex-col gap-5 sm:-mt-14 sm:flex-row sm:items-end">
-            <div
-              role="button"
-              tabIndex={0}
-              onClick={() => { if (!uploadingAvatar) onAvatarPick(); }}
-              onKeyDown={(e) => { if ((e.key === "Enter" || e.key === " ") && !uploadingAvatar) { e.preventDefault(); onAvatarPick(); } }}
-              aria-label={avatarPath ? "Change profile photo" : "Upload profile photo"}
-              className="group relative h-28 w-28 cursor-pointer shrink-0 overflow-hidden rounded-full bg-gc-blue-soft shadow-md ring-4 ring-background outline-none focus-visible:ring-gc-blue-deep"
-            >
-              {avatarUrl ? (
-                <img src={avatarUrl} alt="Profile" className="h-full w-full object-cover" />
-              ) : (
-                <span className="flex h-full w-full items-center justify-center text-[40px] font-medium text-gc-blue-deep">{initial}</span>
-              )}
-              <span className="absolute inset-0 flex flex-col items-center justify-center gap-1 bg-gc-ink/55 text-[12px] font-medium text-background opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100">
-                <Camera className="h-5 w-5" />
-                {avatarPath ? "Change" : "Upload"}
-              </span>
-              {uploadingAvatar && (
-                <span className="absolute inset-0 flex items-center justify-center bg-background/70">
-                  <Loader2 className="h-6 w-6 animate-spin text-gc-blue-deep" />
-                </span>
-              )}
-            </div>
-            <div className="min-w-0 flex-1 sm:pb-1">
-              <p className="truncate text-[22px] font-medium leading-tight">{fullName || "Your profile photo"}</p>
-              <p className="truncate text-[14px] text-gc-ink-muted">{email}</p>
-            </div>
-            <div className="flex flex-wrap gap-2 sm:pb-1">
-              <button
-                type="button"
-                onClick={onAvatarPick}
-                disabled={uploadingAvatar}
-                className="inline-flex h-10 items-center gap-2 rounded-full bg-gc-blue px-5 text-[14px] font-medium text-gc-on-blue hover:bg-gc-blue-hover disabled:opacity-50"
-              >
-                <Upload className="h-4 w-4" />
-                {uploadingAvatar ? "Uploading…" : avatarPath ? "Change photo" : "Upload photo"}
-              </button>
-              {avatarPath && (
-                <button
-                  type="button"
-                  onClick={removeAvatar}
-                  disabled={uploadingAvatar}
-                  className="inline-flex h-10 items-center gap-2 rounded-full border border-gc-line px-5 text-[14px] font-medium text-gc-blue-deep hover:bg-gc-surface disabled:opacity-50"
+      <div className="mt-6 grid gap-8 lg:grid-cols-[200px_minmax(0,1fr)]">
+        <nav aria-label="Settings sections" className="lg:sticky lg:top-24 lg:self-start">
+          <ul className="flex gap-1 overflow-x-auto pb-1 lg:flex-col lg:overflow-visible lg:pb-0">
+            {SECTIONS.map((s) => (
+              <li key={s.id} className="shrink-0">
+                <a
+                  href={`#${s.id}`}
+                  onClick={(e) => { e.preventDefault(); setActive(s.id); document.getElementById(s.id)?.scrollIntoView({ behavior: "smooth", block: "start" }); }}
+                  aria-current={active === s.id ? "true" : undefined}
+                  className={`flex h-10 items-center gap-3 rounded-full px-4 text-[14px] font-medium transition-colors ${active === s.id ? "bg-gc-blue-soft text-gc-blue-deep" : "text-gc-ink-muted hover:bg-gc-surface hover:text-gc-ink"}`}
                 >
-                  <Trash2 className="h-4 w-4" />
-                  Remove
-                </button>
-              )}
-              <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={onAvatarChange} />
-            </div>
-          </div>
-          <div className="mt-6 flex items-start gap-3 rounded-2xl bg-gc-surface px-4 py-3 text-[13px] leading-[1.5] text-gc-ink-muted">
-            <ImageIcon className="mt-0.5 h-4 w-4 shrink-0 text-gc-blue-deep" />
-            <span>JPG, PNG or WebP, up to 10MB. After choosing a photo you can crop, zoom and move it before saving. Click your photo to change it any time.</span>
-          </div>
-        </div>
-      </section>
+                  <s.icon className="h-4 w-4 shrink-0" />
+                  {s.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
 
-      <section className="jenvu-rise [animation-delay:120ms] rounded-[28px] border border-gc-line bg-background p-6 sm:p-8">
-        <h2 className="text-[20px] font-medium">Account details</h2>
-        <div className="mt-5 grid gap-5 sm:grid-cols-2">
-          <label className="block text-[13px] font-medium text-gc-ink-muted">
-            Full name
-            <input
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
-              disabled={nameLocked}
-              className={`${field} ${nameLocked ? "cursor-not-allowed bg-gc-surface text-gc-ink-muted" : ""}`}
-              placeholder="Your name"
-            />
-            {nameLocked && (
-              <span className="mt-1.5 block text-[12px] font-normal text-gc-ink-muted">
-                Locked — your name is verified against your identity documents. Contact support to change it.
-              </span>
-            )}
-          </label>
-          <label className="block text-[13px] font-medium text-gc-ink-muted">
-            Email
-            <input value={email} disabled className={`${field} cursor-not-allowed bg-gc-surface text-gc-ink-muted`} />
-          </label>
+        <div className="min-w-0 space-y-6">
+          <SettingsCard id="profile" title="Profile" description="Your photo and name show on your dashboard, in the top menu and in messages you send to Jenvu support.">
+            <div className="flex flex-col gap-5 px-6 py-5 sm:flex-row sm:items-center sm:px-7">
+              <div
+                role="button"
+                tabIndex={0}
+                onClick={() => { if (!uploadingAvatar) onAvatarPick(); }}
+                onKeyDown={(e) => { if ((e.key === "Enter" || e.key === " ") && !uploadingAvatar) { e.preventDefault(); onAvatarPick(); } }}
+                aria-label={avatarPath ? "Change profile photo" : "Upload profile photo"}
+                className="group relative h-20 w-20 shrink-0 cursor-pointer overflow-hidden rounded-full bg-gc-blue-soft outline-none focus-visible:ring-2 focus-visible:ring-gc-blue-deep"
+              >
+                {avatarUrl ? (
+                  <img src={avatarUrl} alt="Profile" className="h-full w-full object-cover" />
+                ) : (
+                  <span className="flex h-full w-full items-center justify-center text-[30px] font-medium text-gc-blue-deep">{initial}</span>
+                )}
+                <span className="absolute inset-0 flex items-center justify-center bg-gc-ink/55 text-background opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100">
+                  <Camera className="h-5 w-5" />
+                </span>
+                {uploadingAvatar && (
+                  <span className="absolute inset-0 flex items-center justify-center bg-background/70">
+                    <Loader2 className="h-6 w-6 animate-spin text-gc-blue-deep" />
+                  </span>
+                )}
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-[18px] font-medium leading-tight">{fullName || "Your name"}</p>
+                <p className="truncate text-[14px] text-gc-ink-muted">{email}</p>
+                <p className="mt-1 text-[12px] text-gc-ink-muted">JPG, PNG or WebP, up to 10MB. You can crop and zoom before saving.</p>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <button type="button" onClick={onAvatarPick} disabled={uploadingAvatar} className={settingsBtnPrimary}>
+                  <Upload className="h-4 w-4" />
+                  {uploadingAvatar ? "Uploading…" : avatarPath ? "Change photo" : "Upload photo"}
+                </button>
+                {avatarPath && (
+                  <button type="button" onClick={removeAvatar} disabled={uploadingAvatar} className={settingsBtn}>
+                    <Trash2 className="h-4 w-4" />
+                    Remove
+                  </button>
+                )}
+                <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={onAvatarChange} />
+              </div>
+            </div>
+
+            <div className="grid gap-5 px-6 py-5 sm:grid-cols-2 sm:px-7">
+              <label className="block text-[13px] font-medium text-gc-ink-muted">
+                Full name
+                <input
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  disabled={nameLocked}
+                  className={`mt-1.5 ${settingsField} ${nameLocked ? "cursor-not-allowed bg-gc-surface text-gc-ink-muted" : ""}`}
+                  placeholder="Your name"
+                />
+                {nameLocked && (
+                  <span className="mt-1.5 block text-[12px] font-normal text-gc-ink-muted">
+                    Locked — your name is verified against your identity documents. Contact support to change it.
+                  </span>
+                )}
+              </label>
+              <label className="block text-[13px] font-medium text-gc-ink-muted">
+                Email
+                <input value={email} disabled className={`mt-1.5 ${settingsField} cursor-not-allowed bg-gc-surface text-gc-ink-muted`} />
+              </label>
+            </div>
+            <div className="flex justify-end px-6 py-4 sm:px-7">
+              <button onClick={saveProfile} disabled={saving || nameLocked} className={settingsBtnPrimary}>
+                {saving ? "Saving…" : "Save changes"}
+              </button>
+            </div>
+          </SettingsCard>
+
+          <SecuritySettings email={email} />
+          <PreferencesSettings />
+          <ActiveSessionsSettings />
+          <DangerZoneSettings />
         </div>
-        <div className="mt-6 flex justify-end border-t border-gc-line pt-5">
-          <button
-            onClick={saveProfile}
-            disabled={saving || nameLocked}
-            className="inline-flex h-11 items-center rounded-full bg-gc-blue px-6 text-[14px] font-medium text-gc-on-blue hover:bg-gc-blue-hover disabled:opacity-50"
-          >
-            {saving ? "Saving…" : "Save changes"}
-          </button>
-        </div>
-      </section>
+      </div>
 
       {pendingFile && (
         <AvatarAdjuster
