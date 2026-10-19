@@ -450,7 +450,7 @@ function AdminInbox() {
                               {s.guest_email || "No email provided"}
                             </span>
                             {hasUnread && (
-                              <span className="grid h-[18px] min-w-[18px] shrink-0 place-items-center rounded-full bg-gradient-to-br from-zinc-900 to-zinc-700 px-1.5 text-[10px] font-semibold text-white tabular-nums shadow-[0_2px_6px_-1px_rgba(0,0,0,0.3)]">
+                              <span className="grid h-[18px] min-w-[18px] shrink-0 place-items-center rounded-full bg-gc-blue px-1.5 text-[10px] font-semibold text-gc-on-blue tabular-nums shadow-[0_2px_6px_-1px_rgba(0,0,0,0.3)]">
                                 {s.unread_admin}
                               </span>
                             )}
@@ -784,7 +784,7 @@ function Chip({
 }) {
   const map: Record<string, string> = {
     emerald: "bg-emerald-50 text-emerald-700 ring-emerald-200/60",
-    zinc: "bg-gc-panel text-gc-ink-muted ring-zinc-200/60",
+    zinc: "bg-gc-panel text-gc-ink-muted ring-gc-line",
     blue: "bg-blue-50 text-blue-700 ring-blue-200/60",
     amber: "bg-amber-50 text-amber-700 ring-amber-200/60",
   };
