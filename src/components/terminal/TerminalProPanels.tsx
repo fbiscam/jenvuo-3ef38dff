@@ -28,27 +28,6 @@ export type MarketSnapshot = {
 const fmt = (n: number) => n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const signed = (n: number, digits = 2) => `${n >= 0 ? "+" : ""}${n.toFixed(digits)}`;
 
-function Sparkline({ values, tone }: { values: number[]; tone: "up" | "down" | "blue" | "violet" }) {
-  const path = useMemo(() => {
-    if (values.length < 2) return "";
-    const min = Math.min(...values);
-    const max = Math.max(...values);
-    const span = max - min || 1;
-    return values
-      .map((v, i) => `${i === 0 ? "M" : "L"}${((i / (values.length - 1)) * 96 + 2).toFixed(1)},${(34 - ((v - min) / span) * 30).toFixed(1)}`)
-      .join(" ");
-  }, [values]);
-  const stroke =
-    tone === "up" ? "text-gc-success" : tone === "down" ? "text-gc-red" : tone === "violet" ? "text-gc-navy" : "text-gc-blue";
-  if (!path) return <span className="h-9 w-24" />;
-  return (
-    <svg viewBox="0 0 100 38" className={cn("h-9 w-24 shrink-0", stroke)} aria-hidden="true">
-      <path d={`${path} L98,38 L2,38 Z`} fill="currentColor" opacity="0.1" />
-      <path d={path} fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" strokeLinecap="round" />
-    </svg>
-  );
-}
-
 /* ---------------- Sessions (UTC) ---------------- */
 
 const SESSIONS = [
