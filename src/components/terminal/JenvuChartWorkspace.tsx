@@ -935,7 +935,9 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
         </Tooltip>
 
         {demoTradingEnabled && (
-          <DemoTradingPanel open={paperOpen} onToggle={() => setPaperOpen((v) => !v)} count={demoPositions.length} pnl={currentPrice ? demoPositions.reduce((s, p) => s + positionPnl(p, currentPrice), 0) : 0} />
+          <div className="hidden md:contents">
+            <DemoTradingPanel open={paperOpen} onToggle={() => setPaperOpen((v) => !v)} count={demoPositions.length} pnl={currentPrice ? demoPositions.reduce((s, p) => s + positionPnl(p, currentPrice), 0) : 0} />
+          </div>
         )}
 
         <div className="ml-auto flex shrink-0 items-center gap-2">{rightSlot}</div>

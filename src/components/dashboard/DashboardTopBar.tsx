@@ -5,7 +5,6 @@ import { askJenvu, type AskJenvuResult } from "@/lib/ask-jenvu.functions";
 import { MessageResponse } from "@/components/ai-elements/message";
 import { Shimmer } from "@/components/ai-elements/shimmer";
 import askJenvuMark from "@/assets/ask-jenvu-mark.png";
-import { openAskJenvu } from "@/components/AskJenvuWidget";
 import GiftBox from "@/components/dashboard/GiftBox";
 import { SITE_PAGES } from "@/lib/site-pages";
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
@@ -284,16 +283,18 @@ export default function DashboardTopBar({
             <Code className="h-4 w-4" /> Script
           </button>
         )}
-        <button
-          type="button"
-          onClick={() => (onTerminal ? window.dispatchEvent(new CustomEvent("jenvu:terminal-ask-ai")) : openAskJenvu("chat"))}
-          aria-label="Ask Jenvu"
-          title="Ask Jenvu"
-          className="inline-flex h-9 items-center gap-2 rounded-full bg-gc-sky px-2.5 text-[13px] font-medium text-gc-blue-deep hover:brightness-95 sm:px-3.5"
-        >
-          <img src={askJenvuMark} alt="" className="h-3.5 w-auto shrink-0" />
-          <span className="hidden lg:inline">Ask Jenvu</span>
-        </button>
+        {onTerminal && (
+          <button
+            type="button"
+            onClick={() => window.dispatchEvent(new CustomEvent("jenvu:terminal-ask-ai"))}
+            aria-label="Ask Jenvu"
+            title="Ask Jenvu"
+            className="inline-flex h-9 items-center gap-2 rounded-full bg-gc-sky px-2.5 text-[13px] font-medium text-gc-blue-deep hover:brightness-95 sm:px-3.5"
+          >
+            <img src={askJenvuMark} alt="" className="h-3.5 w-auto shrink-0" />
+            <span className="hidden lg:inline">Ask Jenvu</span>
+          </button>
+        )}
         <GiftBox />
         <NotificationBell />
         <DropdownMenu modal={false}>
