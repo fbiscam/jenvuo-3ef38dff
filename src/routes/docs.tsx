@@ -128,7 +128,7 @@ function DocsPage() {
       </section>
 
       {/* Mobile nav toggle */}
-      <div className="sticky top-[var(--docs-header-h,52px)] z-20 flex items-center gap-2 border-b border-gc-line bg-background px-5 py-2.5 lg:hidden">
+      <div className="sticky top-[60px] z-20 flex items-center gap-2 border-b border-gc-line bg-background px-5 py-2.5 lg:hidden">
         <button type="button" onClick={() => setNavOpen((v) => !v)} className="inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-[14px] text-gc-ink hover:bg-gc-surface" aria-expanded={navOpen}>
           {navOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
           {activeGroup.title}
