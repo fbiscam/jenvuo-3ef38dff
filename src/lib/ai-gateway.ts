@@ -46,6 +46,9 @@ export type CallChatOptions = {
   // Optional semantic guard. Returning a message rejects this model's output
   // and continues to the next configured model instead of exposing bad text.
   validateContent?: (content: string, model: string) => true | string;
+  // User-facing chat only: answer through the backup provider when every
+  // model in `models` fails, so the person still gets a reply.
+  backupFallback?: boolean;
 };
 
 export class AiGatewayError extends Error {
@@ -221,9 +224,139 @@ async function singleAttemptInner(
   return { content: content.trim(), usage: { promptTokens, completionTokens, totalTokens } };
 }
 
+// -------- Backup provider for user-facing chat ------------------------------
+// Only chat surfaces people talk to (Ask Jenvu, Terminal AI, voice chat) opt in
+// via `backupFallback`. When every CodeCraft model fails (e.g. 402 quota), the
+// question is answered through the Lovable AI Gateway so users are never left
+// without a reply. Analysis/review chains never use it.
+const BACKUP_CHAT_MODEL = "openai/gpt-6-astra";
+
+function toResponsesInput(messages: ChatMessage[]) {
+  return messages.map((m) => {
+    if (typeof m.content === "string") return { role: m.role, content: m.content };
+    const textType = m.role === "assistant" ? "output_text" : "input_text";
+    return {
+      role: m.role,
+      content: m.content.map((p) =>
+        p.type === "text"
+          ? { type: textType, text: p.text }
+          : { type: "input_image", image_url: p.image_url.url },
+      ),
+    };
+  });
+}
+
+async function callBackupChat(
+  opts: CallChatOptions,
+): Promise<{ content: string; model: string; usage: UsageInfo }> {
+  const key = process.env.LOVABLE_API_KEY;
+  if (!key) throw new AiGatewayError("Backup AI is not configured.", 0, true);
+  const wantsJson =
+    opts.jsonMode &&
+    opts.messages.some((m) => JSON.stringify(m.content).toLowerCase().includes("json"));
+  const body: Record<string, unknown> = {
+    model: BACKUP_CHAT_MODEL,
+    input: toResponsesInput(opts.messages),
+    reasoning: { effort: "low" },
+    store: false,
+    stream: true,
+  };
+  if (wantsJson) body.text = { format: { type: "json_object" } };
+  if (opts.maxTokens) body.max_output_tokens = Math.max(opts.maxTokens, 2000);
+
+  const res = await fetch("https://ai.gateway.lovable.dev/v1/responses", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Lovable-API-Key": key,
+      "X-Lovable-AIG-SDK": "fetch",
+    },
+    body: JSON.stringify(body),
+  });
+  if (!res.ok || !res.body) {
+    const status = res.status;
+    await res.text().catch(() => "");
+    throw new AiGatewayError(
+      status === 402 ? "AI credits are exhausted. Please contact support." : "Backup AI request failed.",
+      status,
+      true,
+    );
+  }
+
+  const reader = res.body.getReader();
+  const decoder = new TextDecoder();
+  let buf = "";
+  let text = "";
+  let usage: UsageInfo | null = null;
+  let incomplete = false;
+  for (;;) {
+    const { value, done } = await reader.read();
+    if (done) break;
+    buf += decoder.decode(value, { stream: true });
+    let idx: number;
+    while ((idx = buf.indexOf("\n")) >= 0) {
+      const line = buf.slice(0, idx).trim();
+      buf = buf.slice(idx + 1);
+      if (!line.startsWith("data:")) continue;
+      const payload = line.slice(5).trim();
+      if (!payload || payload === "[DONE]") continue;
+      let evt: any;
+      try {
+        evt = JSON.parse(payload);
+      } catch {
+        continue;
+      }
+      if (evt.type === "response.output_text.delta" && typeof evt.delta === "string") text += evt.delta;
+      else if (evt.type === "response.completed" || evt.type === "response.incomplete") {
+        if (evt.type === "response.incomplete") incomplete = true;
+        const u = evt.response?.usage ?? {};
+        usage = {
+          promptTokens: Number(u.input_tokens ?? 0) || 0,
+          completionTokens: Number(u.output_tokens ?? 0) || 0,
+          totalTokens: Number(u.total_tokens ?? 0) || 0,
+        };
+      } else if (evt.type === "error" || evt.type === "response.failed") {
+        throw new AiGatewayError("Backup AI request failed.", 0, true);
+      }
+    }
+  }
+  const content = text.trim();
+  if (!content) throw new AiGatewayError("Backup AI returned an empty response.", 0, true);
+  if (incomplete && opts.rejectTruncated) {
+    throw new AiGatewayError("The answer was cut off before it finished.", 0, true);
+  }
+  const promptChars = opts.messages.reduce((n, m) => n + JSON.stringify(m.content).length, 0);
+  const u = usage ?? { promptTokens: 0, completionTokens: 0, totalTokens: 0 };
+  if (!u.promptTokens && !u.completionTokens) {
+    u.promptTokens = Math.max(1, Math.round(promptChars / 4));
+    u.completionTokens = Math.max(1, Math.round(content.length / 4));
+  }
+  if (!u.totalTokens) u.totalTokens = u.promptTokens + u.completionTokens;
+  const validation = opts.validateContent?.(content, BACKUP_CHAT_MODEL) ?? true;
+  if (validation !== true) throw new AiGatewayError(validation, 422, true);
+  return { content, model: BACKUP_CHAT_MODEL, usage: u };
+}
+
 // Main entrypoint. Returns raw assistant content string plus model/usage.
 // Throws AiGatewayError with `terminal` flag on final failure.
 export async function callChatCompletion(
+  opts: CallChatOptions,
+): Promise<{ content: string; model: string; usage: UsageInfo }> {
+  if (!opts.backupFallback) return callChatChain(opts);
+  try {
+    return await callChatChain(opts);
+  } catch (primaryErr) {
+    console.warn(`[ai] ${opts.stage ?? "chat"}: primary chain failed, using backup`, (primaryErr as Error)?.message);
+    try {
+      return await callBackupChat(opts);
+    } catch (backupErr) {
+      console.error(`[ai] ${opts.stage ?? "chat"}: backup failed`, (backupErr as Error)?.message);
+      throw primaryErr;
+    }
+  }
+}
+
+async function callChatChain(
   opts: CallChatOptions,
 ): Promise<{ content: string; model: string; usage: UsageInfo }> {
   const retriesPerModel = Math.max(1, opts.retriesPerModel ?? 3);
