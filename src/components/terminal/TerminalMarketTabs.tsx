@@ -3,6 +3,8 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { ExternalLink } from "lucide-react";
 import { getGoldHeadlines, getGoldOverview, getGoldSeasonals } from "@/lib/terminal-overview.functions";
+import { getGoldNewsBoard } from "@/lib/news.functions";
+import type { NewsEvent } from "@/lib/news-split";
 import { PERIODS, type PeriodKey } from "@/lib/chart/gold-history";
 import type { OhlcvBar } from "@/lib/chart/indicators";
 import { ratingFor, type TechReading, type TechVerdict } from "@/lib/chart/technicals";
@@ -191,6 +193,63 @@ function niceTicks(min: number, max: number, count = 6) {
 
 /* ---------------- News ---------------- */
 
+function nyStamp(iso: string) {
+  const d = new Date(iso);
+  const date = new Intl.DateTimeFormat("en-US", { timeZone: "America/New_York", weekday: "short", month: "short", day: "numeric" }).format(d);
+  const time = new Intl.DateTimeFormat("en-US", { timeZone: "America/New_York", hour: "numeric", minute: "2-digit", hour12: true }).format(d);
+  return `${date}, ${time} NY`;
+}
+
+/** Gold-moving economic calendar: next events plus the last released ones. */
+function EventsTable() {
+  const fetchBoard = useServerFn(getGoldNewsBoard);
+  const q = useQuery({ queryKey: ["terminal-news-board"], queryFn: () => fetchBoard(), staleTime: 5 * 60_000, refetchInterval: 5 * 60_000, refetchIntervalInBackground: false, retry: 2 });
+  const rows: { e: NewsEvent; released: boolean }[] = [
+    ...(q.data?.upcoming ?? []).map((e) => ({ e, released: false })),
+    ...(q.data?.previous ?? []).map((e) => ({ e, released: true })),
+  ];
+  return (
+    <div className="mb-10">
+      <h3 className="mb-5 text-[24px] font-medium text-gc-ink">Economic events</h3>
+      {q.isPending ? (
+        <p className="py-6 text-center text-[13px] text-gc-ink-muted">Loading events…</p>
+      ) : q.isError || !q.data ? (
+        <p className="py-6 text-center text-[13px] text-gc-ink-muted">Events feed unavailable right now. Please try again shortly.</p>
+      ) : !rows.length ? (
+        <p className="py-6 text-center text-[13px] text-gc-ink-muted">No gold-moving events this week.</p>
+      ) : (
+        <table className="w-full text-left text-[13px]">
+          <thead>
+            <tr className="border-b border-gc-line text-[12px] text-gc-ink-muted">
+              <th className="w-[190px] py-2.5 font-normal">Time</th>
+              <th className="w-[96px] py-2.5 font-normal">Status</th>
+              <th className="py-2.5 font-normal">Event</th>
+              <th className="py-2.5 font-normal">Impact</th>
+              <th className="py-2.5 text-right font-normal">Forecast / Previous</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map(({ e, released }) => (
+              <tr key={e.date + e.title} className="border-b border-gc-line/70 hover:bg-gc-console-search/50">
+                <td className="py-3 text-gc-ink-muted">{nyStamp(e.date)}</td>
+                <td className={cn("py-3", released ? "text-gc-ink-muted" : "text-gc-blue")}>{released ? "Released" : "Upcoming"}</td>
+                <td className="py-3 pr-4 text-gc-ink">{e.country} · {e.title}</td>
+                <td className="py-3">
+                  <span className="inline-flex items-center gap-1.5 text-gc-ink-muted">
+                    <span aria-hidden="true" className={cn("h-2 w-2 rounded-full", e.impact === "High" ? "bg-destructive" : "bg-gc-yellow")} />
+                    {e.impact}
+                  </span>
+                </td>
+                <td className="py-3 text-right text-gc-ink-muted">{e.forecast || "—"} / {e.previous || "—"}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+    </div>
+  );
+}
+
 function ago(iso: string) {
   const s = Math.max(0, (Date.now() - new Date(iso).getTime()) / 1000);
   if (s < 3600) return `${Math.max(1, Math.round(s / 60))} minutes ago`;
@@ -207,6 +266,7 @@ function NewsTab() {
     .slice(0, 15);
   return (
     <div>
+      <EventsTable />
       <h3 className="mb-5 text-[24px] font-medium text-gc-ink">Headlines</h3>
       {query.isPending ? (
         <p className="py-8 text-center text-[13px] text-gc-ink-muted">Loading headlines…</p>
