@@ -973,9 +973,9 @@ html[data-pwa="1"] .pwa-tabbar {
   border-color: rgba(0,0,0,0.06) !important;
 }
 
-/* ====== Dashboard Sidebar: plain full-height ====== */
+/* ====== Dashboard Sidebar: plain full-height, pure white ====== */
 .dashboard-sidebar-root:not(.dashboard-terminal-sidebar) {
-  background-color: var(--gc-canvas) !important;
+  background-color: #ffffff !important;
 }
 
 /* The Terminal itself stays unzoomed so it fits the viewport. Match only its
