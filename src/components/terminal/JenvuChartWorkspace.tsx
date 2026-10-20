@@ -805,7 +805,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
       {/* Top bar — phones only: on laptops and tablets every control lives in the side bar. */}
       <div className="flex h-11 shrink-0 items-center gap-1 overflow-x-auto border-b border-border px-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:hidden">
 
-        <div className="sticky left-0 z-10 -ml-2 mr-1 flex shrink-0 items-center gap-2 bg-card pl-3 pr-2">
+        <div className="sticky left-0 z-10 -ml-2 mr-1 flex shrink-0 items-center gap-2 bg-background pl-3 pr-2">
           <button
             type="button"
             aria-label="Open menu"
