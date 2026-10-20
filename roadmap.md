@@ -69,3 +69,4 @@
 - [x] Billing: full transaction history with receipts; Founding plans renew on the 1st, 3-day notice, then Free until paid
 - [x] Mobile Terminal: menu buttons stay pinned on the left of the chart bar; smaller SMC/Indicators, Gifts and Notifications boxes; "10-bar" and VWAP descriptions fixed
 - [x] Mobile Terminal: move the sidebar icon and its neighbour left (they sit too far right/low; align them above the price row)
+- [x] Ask Jenvu, Terminal AI and voice chat answer through a backup AI when the main AI provider is out of credit
