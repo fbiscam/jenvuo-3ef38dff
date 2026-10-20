@@ -28,6 +28,14 @@
   background-color: rgba(0, 0, 0, 0.2);
   border-radius: 9999px;
 }
+.dark .sidebar-hover-scroll:hover,
+.dark.sidebar-hover-scroll:hover {
+  scrollbar-color: rgba(255, 255, 255, 0.25) transparent;
+}
+.dark .sidebar-hover-scroll:hover::-webkit-scrollbar-thumb,
+.dark.sidebar-hover-scroll:hover::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.25);
+}
 
 @custom-variant dark (&:is(.dark *));
 
