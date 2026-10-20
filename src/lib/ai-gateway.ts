@@ -363,6 +363,50 @@ export async function callChatCompletion(
   }
 }
 
+// Ask all healthy models at once; first valid answer wins and the others are
+// aborted. Rejects when every model fails or the budget runs out.
+async function callChatRace(
+  opts: CallChatOptions,
+): Promise<{ content: string; model: string; usage: UsageInfo }> {
+  const configured = opts.models.filter(Boolean).filter(providerConfigured);
+  if (!configured.length)
+    throw new AiGatewayError(`No configured AI provider for ${opts.stage ?? "AI call"}`, 0, true);
+  const healthy = configured.filter((m) => !isModelUnhealthy(m));
+  const models = healthy.length ? healthy : configured;
+  const ctrl = new AbortController();
+  const budget = opts.raceBudgetMs ?? opts.attemptTimeoutMs ?? 15000;
+
+  return await new Promise((resolve, reject) => {
+    let pending = models.length;
+    let lastErr: AiGatewayError | null = null;
+    let settled = false;
+    const finish = (fn: () => void) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      ctrl.abort();
+      fn();
+    };
+    const timer = setTimeout(
+      () => finish(() => reject(new AiGatewayError("The AI took too long to answer.", 504, false))),
+      budget,
+    );
+    for (const model of models) {
+      singleAttemptInner(model, opts, ctrl.signal)
+        .then(({ content, usage }) => {
+          const validation = opts.validateContent?.(content, model) ?? true;
+          if (validation !== true) throw new AiGatewayError(validation, 422, true);
+          finish(() => resolve({ content, model, usage }));
+        })
+        .catch((err) => {
+          lastErr = err instanceof AiGatewayError ? err : new AiGatewayError(String(err?.message ?? err), 0, false);
+          pending -= 1;
+          if (pending === 0) finish(() => reject(lastErr));
+        });
+    }
+  });
+}
+
 async function callChatChain(
   opts: CallChatOptions,
 ): Promise<{ content: string; model: string; usage: UsageInfo }> {

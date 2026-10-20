@@ -110,8 +110,7 @@ function DocsPage() {
       {/* Docs hero — homepage style */}
       <section className="bg-background">
         <div className="mx-auto max-w-[1296px] px-5 pb-10 pt-12 text-center sm:px-8 md:pt-14">
-          <span className="jenvu-rise inline-flex rounded-full bg-gc-blue-soft px-3 py-1 text-[13px] font-medium text-gc-blue-deep">Documentation</span>
-          <h1 className="jenvu-rise mx-auto mt-5 max-w-[900px] text-[40px] font-medium leading-[1.1] tracking-[-0.5px] sm:text-[56px]">Jenvu documentation</h1>
+          <h1 className="jenvu-rise mx-auto max-w-[900px] text-[40px] font-medium leading-[1.1] tracking-[-0.5px] sm:text-[56px]">Jenvu documentation</h1>
           <p className="jenvu-rise [animation-delay:80ms] mx-auto mt-5 max-w-[720px] text-[17px] leading-[1.6] text-gc-ink-muted">
             The complete A to Z guide to Jenvu — your account, the free trial, the Terminal chart and every marking on it, AI chat,
             plans, the API and a glossary of every term we use.
@@ -129,7 +128,7 @@ function DocsPage() {
       </section>
 
       {/* Mobile nav toggle */}
-      <div className="sticky top-0 z-20 flex items-center gap-2 border-b border-gc-line bg-background px-5 py-2.5 lg:hidden">
+      <div className="sticky top-[var(--docs-header-h,52px)] z-20 flex items-center gap-2 border-b border-gc-line bg-background px-5 py-2.5 lg:hidden">
         <button type="button" onClick={() => setNavOpen((v) => !v)} className="inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-[14px] text-gc-ink hover:bg-gc-surface" aria-expanded={navOpen}>
           {navOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
           {activeGroup.title}
@@ -139,7 +138,7 @@ function DocsPage() {
 
       <div className="mx-auto grid max-w-[1440px] grid-cols-1 gap-8 border-t border-gc-line px-5 sm:px-8 lg:grid-cols-[260px_minmax(0,1fr)] xl:grid-cols-[260px_minmax(0,1fr)_220px]">
         <aside className="hidden lg:block">
-          <div className="sticky top-4 max-h-[calc(100vh-2rem)] overflow-y-auto py-8 pr-2">{nav}</div>
+          <div className="sticky top-[calc(var(--docs-header-h,52px)+16px)] max-h-[calc(100vh-var(--docs-header-h,52px)-32px)] overflow-y-auto py-6 pr-2">{nav}</div>
         </aside>
 
         <main className="min-w-0 py-8 lg:py-10">
@@ -164,7 +163,7 @@ function DocsPage() {
         </main>
 
         <aside className="hidden xl:block">
-          <div className="sticky top-4 py-10">
+          <div className="sticky top-[calc(var(--docs-header-h,52px)+16px)] py-6">
             <p className="text-[13px] font-medium text-gc-ink">On this page</p>
             <ul className="mt-3 space-y-1 border-l border-gc-line">
               {activeGroup.sections.map((s) => (
