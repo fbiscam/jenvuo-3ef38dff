@@ -60,6 +60,7 @@ export const askJenvu = createServerFn({ method: "POST" })
         retriesPerModel: 1,
         attemptTimeoutMs: 20000,
         stage: "ask-jenvu",
+        backupFallback: true,
       });
       return parse(content);
     } catch (e) {

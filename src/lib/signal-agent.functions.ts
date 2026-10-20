@@ -192,6 +192,7 @@ Use the LIVE prices and levels from the context. Be specific, decisive, pro. No 
         priority: true,
         timeoutMs: 20000,
         stage: "voice-chat",
+        backupFallback: true,
       });
       import("@/lib/ai-cost-log.server").then((m) => m.logAiCost({ userId: context.userId, stage: "voice-chat", model: __aiModel, usage: __aiUsage })).catch(() => {});
       reply = content.trim() || "No response.";
