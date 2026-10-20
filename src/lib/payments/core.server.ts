@@ -208,7 +208,11 @@ export async function applyPlanForPayment(userId: string, paidUsd: number, targe
         .maybeSingle();
       const priceOf = (id?: string | null) => Number(tiers.find((p: any) => p.id === id)?.price_usd ?? Infinity);
       const wanted = targetPlanId || s?.lapsed_plan_id || (s?.plan_id !== "free" ? s?.plan_id : null);
-      const planId = wanted && paidUsd + 0.01 >= priceOf(wanted) ? wanted : earned?.id;
+      const coversWanted = !!wanted && paidUsd + 0.01 >= priceOf(wanted);
+      // An untargeted top-up that doesn't cover the member's current plan is just
+      // credit: never swap an active (or trial) Founding plan for a lower tier.
+      const onPaidPlan = !!s?.plan_id && s.plan_id !== "free";
+      const planId = coversWanted ? wanted : !targetPlanId && onPaidPlan ? null : earned?.id;
       if (planId) {
         const { error } = await (supabaseAdmin as any).rpc("renew_founding_plan", { _user_id: userId, _plan_id: planId });
         if (error) throw new Error(`renewal: ${error.message}`);
