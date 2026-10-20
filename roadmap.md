@@ -68,3 +68,4 @@
 - [x] Terminal on every plan: 14-day free trial, auto-lock after, unlocks on upgrade
 - [x] Billing: full transaction history with receipts; Founding plans renew on the 1st, 3-day notice, then Free until paid
 - [x] Mobile Terminal: menu buttons stay pinned on the left of the chart bar; smaller SMC/Indicators, Gifts and Notifications boxes; "10-bar" and VWAP descriptions fixed
+- [ ] Mobile Terminal: move the sidebar icon and its neighbour left (they sit too far right/low; align them above the price row)
