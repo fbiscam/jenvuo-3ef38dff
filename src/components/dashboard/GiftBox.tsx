@@ -85,9 +85,9 @@ export default function GiftBox() {
       </button>
 
       {open && (
-        <div className="fixed left-2 right-2 top-14 z-50 overflow-hidden rounded-2xl bg-gc-canvas shadow-[0_4px_16px_rgba(60,64,67,0.18),0_1px_3px_rgba(60,64,67,0.12)] sm:absolute sm:left-auto sm:right-0 sm:top-11 sm:w-[360px]">
-          <div className="border-b border-gc-blue-deep/25 px-4 py-3.5 text-center text-[14px] text-gc-ink">Gifts</div>
-          <div className="max-h-[min(420px,70vh)] overflow-y-auto overscroll-contain py-1">
+        <div className="fixed right-2 top-14 z-50 w-[min(20rem,calc(100vw-1rem))] overflow-hidden rounded-2xl bg-gc-canvas shadow-[0_4px_16px_rgba(60,64,67,0.18),0_1px_3px_rgba(60,64,67,0.12)] sm:absolute sm:left-auto sm:right-0 sm:top-11 sm:w-[360px]">
+          <div className="border-b border-gc-blue-deep/25 px-3 py-2.5 text-center sm:px-4 sm:py-3.5 text-[14px] text-gc-ink">Gifts</div>
+          <div className="max-h-[min(55vh,360px)] sm:max-h-[min(420px,70vh)] overflow-y-auto overscroll-contain py-1">
             {items.length === 0 ? (
               <div className="px-4 py-8 text-center">
                 <p className="text-[13px] text-gc-ink">No gifts yet</p>
@@ -95,15 +95,15 @@ export default function GiftBox() {
               </div>
             ) : (
               items.map((g) => (
-                <div key={g.id} className="flex items-start gap-3 px-4 py-3 hover:bg-gc-nav-active">
-                  <span className="mt-0.5 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gc-nav-active text-gc-blue-deep">
+                <div key={g.id} className="flex items-start gap-2.5 px-3 py-2 hover:bg-gc-nav-active sm:gap-3 sm:px-4 sm:py-3">
+                  <span className="mt-0.5 inline-flex h-7 w-7 shrink-0 sm:h-8 sm:w-8 items-center justify-center rounded-full bg-gc-nav-active text-gc-blue-deep">
                     <Gift className="h-4 w-4" />
                   </span>
                   <div className="min-w-0 flex-1">
-                    <p className="text-[14px] text-gc-ink">{giftTitle(g.reason)}</p>
-                    <p className="mt-0.5 text-[13px] text-gc-ink-muted">+${Number(g.delta).toFixed(2)} credit added to your wallet</p>
+                    <p className="text-[13px] text-gc-ink sm:text-[14px]">{giftTitle(g.reason)}</p>
+                    <p className="mt-0.5 text-[12px] text-gc-ink-muted sm:text-[13px]">+${Number(g.delta).toFixed(2)} credit added to your wallet</p>
                   </div>
-                  <span className="shrink-0 text-[12px] text-gc-ink-muted">{timeAgo(g.created_at)}</span>
+                  <span className="shrink-0 text-[11px] text-gc-ink-muted sm:text-[12px]">{timeAgo(g.created_at)}</span>
                 </div>
               ))
             )}

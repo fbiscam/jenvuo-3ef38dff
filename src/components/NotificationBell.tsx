@@ -198,12 +198,12 @@ export default function NotificationBell() {
       </button>
 
       {open && (
-        <div className="fixed left-2 right-2 top-14 z-50 w-auto overflow-hidden rounded-2xl bg-gc-canvas shadow-[0_4px_16px_rgba(60,64,67,0.18),0_1px_3px_rgba(60,64,67,0.12)] sm:absolute sm:left-auto sm:right-0 sm:top-11 sm:w-[400px]">
-          <div className="border-b border-gc-blue-deep/25 px-4 py-3.5 text-center">
+        <div className="fixed right-2 top-14 z-50 w-[min(20rem,calc(100vw-1rem))] overflow-hidden rounded-2xl bg-gc-canvas shadow-[0_4px_16px_rgba(60,64,67,0.18),0_1px_3px_rgba(60,64,67,0.12)] sm:absolute sm:left-auto sm:right-0 sm:top-11 sm:w-[400px]">
+          <div className="border-b border-gc-blue-deep/25 px-3 py-2.5 text-center sm:px-4 sm:py-3.5">
             <span className="text-[14px] font-normal text-gc-ink">Notifications</span>
           </div>
 
-          <div className="max-h-[min(460px,70vh)] overflow-y-auto overscroll-contain py-1">
+          <div className="max-h-[min(55vh,380px)] sm:max-h-[min(460px,70vh)] overflow-y-auto overscroll-contain py-1">
             {items.length === 0 ? (
               <div className="px-4 py-8 text-center">
                 <p className="text-[13px] text-gc-ink">You're all caught up</p>
@@ -222,16 +222,16 @@ export default function NotificationBell() {
                       if (!n.read_at) markOne(n.id);
                     }}
                     className={cn(
-                      "flex items-start gap-3 px-4 py-3 transition-colors hover:bg-gc-nav-active",
+                      "flex items-start gap-2.5 px-3 py-2 transition-colors sm:gap-3 sm:px-4 sm:py-3 hover:bg-gc-nav-active",
                       !n.read_at && "bg-gc-nav-active/60",
                     )}
                   >
                     <Icon className={cn("mt-0.5 h-[18px] w-[18px] shrink-0", v.tone)} />
                     <div className="min-w-0 flex-1">
-                      <p className="text-[14px] text-gc-ink">{n.title}</p>
-                      {n.body && <p className="mt-0.5 text-[13px] leading-snug text-gc-ink-muted">{n.body}</p>}
+                      <p className="text-[13px] text-gc-ink sm:text-[14px]">{n.title}</p>
+                      {n.body && <p className="mt-0.5 line-clamp-3 text-[12px] leading-snug text-gc-ink-muted sm:line-clamp-none sm:text-[13px]">{n.body}</p>}
                     </div>
-                    <span className="shrink-0 text-[12px] text-gc-ink-muted">
+                    <span className="shrink-0 text-[11px] text-gc-ink-muted sm:text-[12px]">
                       {timeAgo(n.created_at)}
                     </span>
                   </div>
