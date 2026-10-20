@@ -737,7 +737,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
             <span className="hidden xl:inline">Indicators</span>
           </button>
         </PopoverTrigger>
-        <PopoverContent side="bottom" align="start" className={cn("max-h-[80vh] w-80 overflow-y-auto p-2", popClass)}>
+        <PopoverContent side="bottom" align="start" className={cn("max-h-[80vh] w-80 overflow-y-auto sidebar-hover-scroll p-2", popClass)}>
           {indicatorMenu}
         </PopoverContent>
       </Popover>
@@ -748,7 +748,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
             <span className="hidden xl:inline">SMC</span>
           </button>
         </PopoverTrigger>
-        <PopoverContent side="bottom" align="start" className={cn("max-h-[80vh] w-80 overflow-y-auto p-2", popClass)}>
+        <PopoverContent side="bottom" align="start" className={cn("max-h-[80vh] w-80 overflow-y-auto sidebar-hover-scroll p-2", popClass)}>
           {smcMenu}
         </PopoverContent>
       </Popover>
@@ -860,7 +860,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
               )}
             </button>
           </PopoverTrigger>
-          <PopoverContent align="start" collisionPadding={8} className={cn("max-h-[min(62vh,480px)] w-[min(17rem,calc(100vw-1rem))] overflow-y-auto overscroll-contain p-1.5 sm:max-h-[min(75vh,640px)] sm:w-80 sm:p-2 font-sans subpixel-antialiased", theme === "dark" && "dark terminal-dark border-border bg-popover text-popover-foreground")}>
+          <PopoverContent align="start" collisionPadding={8} className={cn("max-h-[min(62vh,480px)] w-[min(17rem,calc(100vw-1rem))] overflow-y-auto sidebar-hover-scroll overscroll-contain p-1.5 sm:max-h-[min(75vh,640px)] sm:w-80 sm:p-2 font-sans subpixel-antialiased", theme === "dark" && "dark terminal-dark border-border bg-popover text-popover-foreground")}>
             {indicatorMenu}
           </PopoverContent>
         </Popover>
@@ -877,7 +877,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
               <span className="hidden 2xl:inline">Jenvu SMC</span>
             </button>
           </PopoverTrigger>
-          <PopoverContent align="start" collisionPadding={8} className={cn("max-h-[min(62vh,480px)] w-[min(17rem,calc(100vw-1rem))] overflow-y-auto overscroll-contain p-1.5 sm:max-h-[min(75vh,640px)] sm:w-80 sm:p-2 font-sans subpixel-antialiased", theme === "dark" && "dark terminal-dark border-border bg-popover text-popover-foreground")}>
+          <PopoverContent align="start" collisionPadding={8} className={cn("max-h-[min(62vh,480px)] w-[min(17rem,calc(100vw-1rem))] overflow-y-auto sidebar-hover-scroll overscroll-contain p-1.5 sm:max-h-[min(75vh,640px)] sm:w-80 sm:p-2 font-sans subpixel-antialiased", theme === "dark" && "dark terminal-dark border-border bg-popover text-popover-foreground")}>
             {smcMenu}
           </PopoverContent>
         </Popover>
