@@ -140,7 +140,7 @@ const SPECS: Record<IndicatorId, IndicatorSpec> = {
   vwap: {
     id: "vwap",
     name: "VWAP",
-    description: "Volume-weighted average price,",
+    description: "Volume-weighted average price",
     pane: "main",
     lines: [{ title: "VWAP", color: "#e040fb", kind: "line", width: 2 }],
     compute: (bars) => [vwap(bars)],
@@ -181,7 +181,7 @@ const SPECS: Record<IndicatorId, IndicatorSpec> = {
   sr: {
     id: "sr",
     name: "Support & Resistance",
-    description: "0-bar swing resistance and support",
+    description: "10-bar swing resistance and support",
     pane: "main",
     lines: [
       { title: "Resistance", color: "#f23645", kind: "line", width: 2, dashed: true },

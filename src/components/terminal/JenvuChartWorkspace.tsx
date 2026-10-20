@@ -546,13 +546,13 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
 
   const indicatorMenu = (
     <>
-      <p className="px-2 pb-2 pt-1 text-sm font-normal text-foreground">Indicators</p>
+      <p className="px-2 pb-1.5 pt-1 text-[13px] font-normal text-foreground sm:pb-2 sm:text-sm">Indicators</p>
       {INDICATOR_LIST.map((spec) => {
         const on = indicators.includes(spec.id);
         return (
           <label
             key={spec.id}
-            className="flex cursor-pointer items-start gap-2.5 rounded-md px-2 py-2 hover:bg-accent"
+            className="flex cursor-pointer items-start gap-2 rounded-md px-2 py-1.5 hover:bg-accent sm:gap-2.5 sm:py-2"
           >
             <Checkbox
               checked={on}
@@ -562,8 +562,8 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
               className="mt-0.5 data-[state=checked]:border-home-accent data-[state=checked]:bg-home-accent data-[state=checked]:text-home-accent-foreground dark:data-[state=checked]:border-white dark:data-[state=checked]:bg-white dark:data-[state=checked]:text-black"
             />
             <span className="min-w-0">
-              <span className="block text-[15px] font-normal leading-5 text-foreground">{spec.name}</span>
-              <span className="block text-xs font-normal leading-4 text-muted-foreground">{spec.description}</span>
+              <span className="block text-[13px] font-normal leading-4 text-foreground sm:text-[15px] sm:leading-5">{spec.name}</span>
+              <span className="block text-[11px] font-normal leading-4 text-muted-foreground sm:text-xs">{spec.description}</span>
             </span>
           </label>
         );
@@ -572,9 +572,9 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
   );
   const smcMenu = (
     <>
-      <p className="px-2 pb-1 pt-1 text-sm font-normal text-foreground">Smart-money overlays</p>
-      <p className="px-2 pb-2 text-xs font-normal leading-4 text-muted-foreground">
-        Same 10-bar structure engine the AI desk
+      <p className="px-2 pb-1 pt-1 text-[13px] font-normal text-foreground sm:text-sm">Smart-money overlays</p>
+      <p className="px-2 pb-1.5 text-[11px] font-normal leading-4 text-muted-foreground sm:pb-2 sm:text-xs">
+        Same 10-bar structure engine as the AI desk
       </p>
       {SMC_LABELS.filter(
         (item) =>
@@ -584,16 +584,16 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
       ).map((item) => (
         <label
           key={item.key}
-          className="flex cursor-pointer items-center justify-between gap-3 rounded-md px-2 py-2 hover:bg-accent"
+          className="flex cursor-pointer items-center justify-between gap-3 rounded-md px-2 py-1.5 hover:bg-accent sm:py-2"
         >
-          <span>
-            <span className="block text-[15px] font-normal leading-5 text-foreground">{item.label}</span>
-            <span className="block text-xs font-normal leading-4 text-muted-foreground">{item.hint}</span>
+          <span className="min-w-0">
+            <span className="block text-[13px] font-normal leading-4 text-foreground sm:text-[15px] sm:leading-5">{item.label}</span>
+            <span className="block text-[11px] font-normal leading-4 text-muted-foreground sm:text-xs">{item.hint}</span>
           </span>
           <Switch
             checked={smcToggles[item.key] ?? DEFAULT_SMC[item.key]}
             onCheckedChange={(v) => setSmcToggles((cur) => ({ ...cur, [item.key]: v }))}
-            className="data-[state=checked]:bg-home-accent dark:data-[state=checked]:bg-white"
+            className="shrink-0 scale-90 data-[state=checked]:bg-home-accent sm:scale-100 dark:data-[state=checked]:bg-white"
           />
         </label>
       ))}
@@ -805,7 +805,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
       {/* Top bar — phones only: on laptops and tablets every control lives in the side bar. */}
       <div className="flex h-11 shrink-0 items-center gap-1 overflow-x-auto border-b border-border px-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:hidden">
 
-        <div className="mr-1 flex shrink-0 items-center gap-2 pl-1 pr-2">
+        <div className="sticky left-0 z-10 -ml-2 mr-1 flex shrink-0 items-center gap-2 bg-card pl-3 pr-2">
           <button
             type="button"
             aria-label="Open menu"
@@ -860,7 +860,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
               )}
             </button>
           </PopoverTrigger>
-          <PopoverContent align="start" className={cn("w-80 p-2 font-sans subpixel-antialiased", theme === "dark" && "dark terminal-dark border-border bg-popover text-popover-foreground")}>
+          <PopoverContent align="start" collisionPadding={8} className={cn("max-h-[min(62vh,480px)] w-[min(17rem,calc(100vw-1rem))] overflow-y-auto overscroll-contain p-1.5 font-sans subpixel-antialiased", theme === "dark" && "dark terminal-dark border-border bg-popover text-popover-foreground")}>
             {indicatorMenu}
           </PopoverContent>
         </Popover>
@@ -877,7 +877,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
               <span className="hidden 2xl:inline">Jenvu SMC</span>
             </button>
           </PopoverTrigger>
-          <PopoverContent align="start" className={cn("w-80 p-2 font-sans subpixel-antialiased", theme === "dark" && "dark terminal-dark border-border bg-popover text-popover-foreground")}>
+          <PopoverContent align="start" collisionPadding={8} className={cn("max-h-[min(62vh,480px)] w-[min(17rem,calc(100vw-1rem))] overflow-y-auto overscroll-contain p-1.5 font-sans subpixel-antialiased", theme === "dark" && "dark terminal-dark border-border bg-popover text-popover-foreground")}>
             {smcMenu}
           </PopoverContent>
         </Popover>
