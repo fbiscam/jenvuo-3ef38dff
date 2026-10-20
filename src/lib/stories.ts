@@ -25,7 +25,7 @@ export const STORIES: Story[] = [
     slug: "fresh-sweep-detection",
     img: cardTopStory,
     tag: "TOP STORY",
-    title: "Fresh sweep detection now on 15M, 1H, 2H and 4H",
+    title: "Fresh sweep detection now on 5M, 15M, 1H, 2H and 4H",
     intro:
       "The Terminal now marks fresh liquidity sweeps on five timeframes, so you can see when price takes a recent high or low and turns back.",
     feature: {
@@ -51,7 +51,7 @@ export const STORIES: Story[] = [
       ],
     },
     stats: [
-      { value: "4", label: "Timeframes: 15M, 1H, 2H, 4H" },
+      { value: "5", label: "Timeframes: 5M, 15M, 1H, 2H, 4H" },
       { value: "10", label: "Candles checked for liquidity" },
       { value: "2", label: "Candles to confirm the reversal" },
     ],

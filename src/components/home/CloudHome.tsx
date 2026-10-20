@@ -342,7 +342,7 @@ const BUILD_ITEMS: Array<{ key: string; title: string; points: BuildPart[][] }> 
     points: [
       ["Read live XAU/USD candles with HH, HL, LH and LL labels on our ", { link: "non-repainting gold Terminal", hash: "gold-terminal" }, ", plus BOS and CHoCH breaks that stay fixed once a candle closes"],
       ["Spot supply and demand zones paired with ", { link: "fair value gaps", hash: "fair-value-gaps" }, ", drawn only when they score strong and kept until a clear invalidation"],
-      ["Check fresh liquidity sweeps on 15M, 1H, 2H and 4H with ", { link: "fakeout filters", hash: "fakeout-filters" }, " that flag weak pokes and re-accepted levels"],
+      ["Check fresh liquidity sweeps on 5M, 15M, 1H, 2H and 4H with ", { link: "fakeout filters", hash: "fakeout-filters" }, " that flag weak pokes and re-accepted levels"],
     ],
   },
   {
@@ -456,7 +456,7 @@ export function CloudBuildWith() {
 const PRODUCTS: Array<{ Icon: typeof Bot; tone: Tone; title: string; body: string; to: string }> = [
   { Icon: LineChart, tone: "blue", title: "Gold Terminal", body: "Live XAU/USD candles with HH/HL/LH/LL structure, BOS and CHoCH that never repaint.", to: "/pricing" },
   { Icon: Bot, tone: "red", title: "AI Desk", body: "Ask about the chart in plain language and get a focused answer to exactly what you asked.", to: "/ai-engine" },
-  { Icon: Waves, tone: "yellow", title: "Liquidity sweeps", body: "Fresh high/low sweep detection on 15M, 1H, 2H and 4H with fakeout filters.", to: "/help" },
+  { Icon: Waves, tone: "yellow", title: "Liquidity sweeps", body: "Fresh high/low sweep detection on 5M, 15M, 1H, 2H and 4H with fakeout filters.", to: "/help" },
   { Icon: Layers, tone: "green", title: "Zones + FVG", body: "Supply and demand zones paired with fair value gaps, drawn only when they score strong.", to: "/help" },
   { Icon: Chrome, tone: "blue", title: "Browser extension", body: "Bring Jenvu analysis into TradingView with a side panel that reads your chart.", to: "/download" },
   { Icon: Bell, tone: "red", title: "Signals & alerts", body: "Reviewed gold setups and alerts, with WAIT when the evidence isn't there.", to: "/pricing" },

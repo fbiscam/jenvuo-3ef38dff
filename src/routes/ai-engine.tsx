@@ -120,7 +120,7 @@ const CONTENT: IndustryContent = {
   products: [
     { title: "Jenvu Terminal", text: "Live gold chart with ICT/SMC overlays.", href: "https://dash.jenvu.com/terminal" },
     { title: "AI engine", text: "Plain-language answers about the chart.", href: "/stories/ai-desk-updates" },
-    { title: "Fresh sweep detection", text: "Confirmed sweeps on 15M, 1H, 2H and 4H.", href: "/stories/fresh-sweep-detection" },
+    { title: "Fresh sweep detection", text: "Confirmed sweeps on 5M, 15M, 1H, 2H and 4H.", href: "/stories/fresh-sweep-detection" },
     { title: "Volume and RVOL", text: "Volume spikes and buyer/seller share.", href: "/stories/rvol-and-volume-direction" },
     { title: "Demo trading", text: "$100,000 demo account on live prices.", href: "/stories/demo-trading" },
     { title: "Developer API", text: "API keys for your own tools.", href: "/stories/build-with-jenvu" },
