@@ -27,7 +27,7 @@ export const STORIES: Story[] = [
     tag: "TOP STORY",
     title: "Fresh sweep detection now on 15M, 1H, 2H and 4H",
     intro:
-      "The Terminal now marks fresh liquidity sweeps on four timeframes, so you can see when price takes a recent high or low and turns back.",
+      "The Terminal now marks fresh liquidity sweeps on five timeframes, so you can see when price takes a recent high or low and turns back.",
     feature: {
       title: "See the sweep, then the reaction",
       text: [
