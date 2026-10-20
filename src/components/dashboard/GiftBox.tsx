@@ -95,7 +95,7 @@ export default function GiftBox() {
               </div>
             ) : (
               items.map((g) => (
-                <div key={g.id} className="flex items-start gap-2.5 px-3 py-2 hover:bg-gc-nav-active">
+                <div key={g.id} className="flex items-start gap-2.5 px-3 py-2 hover:bg-gc-nav-active sm:gap-3 sm:px-4 sm:py-3">
                   <span className="mt-0.5 inline-flex h-7 w-7 shrink-0 sm:h-8 sm:w-8 items-center justify-center rounded-full bg-gc-nav-active text-gc-blue-deep">
                     <Gift className="h-4 w-4" />
                   </span>

@@ -222,7 +222,7 @@ export default function NotificationBell() {
                       if (!n.read_at) markOne(n.id);
                     }}
                     className={cn(
-                      "flex items-start gap-2.5 px-3 py-2 transition-colors sm:gap-3 sm:px-4 sm:py-3 transition-colors hover:bg-gc-nav-active",
+                      "flex items-start gap-2.5 px-3 py-2 transition-colors sm:gap-3 sm:px-4 sm:py-3 hover:bg-gc-nav-active",
                       !n.read_at && "bg-gc-nav-active/60",
                     )}
                   >
