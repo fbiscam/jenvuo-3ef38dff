@@ -58,10 +58,10 @@ export const askJenvu = createServerFn({ method: "POST" })
         maxTokens: 4000,
         rejectTruncated: true,
         retriesPerModel: 1,
-        // Ask the models at once and keep the fastest good answer; after 15s
+        // Ask the models at once and keep the fastest good answer; after 12s
         // the quick backup answers instead, so nobody waits long.
         raceModels: true,
-        raceBudgetMs: 15000,
+        raceBudgetMs: 12000,
         stage: "ask-jenvu",
         backupFallback: true,
       });
