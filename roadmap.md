@@ -70,3 +70,5 @@
 - [x] Mobile Terminal: menu buttons stay pinned on the left of the chart bar; smaller SMC/Indicators, Gifts and Notifications boxes; "10-bar" and VWAP descriptions fixed
 - [x] Mobile Terminal: move the sidebar icon and its neighbour left (they sit too far right/low; align them above the price row)
 - [x] Ask Jenvu, Terminal AI and voice chat answer through a backup AI when the main AI provider is out of credit
+- [x] Docs page: blue "Documentation" label removed; topic filter no longer slides under the top menu when scrolling
+- [x] Ask Jenvu faster: main AIs asked at once, quick backup answers after 12s
