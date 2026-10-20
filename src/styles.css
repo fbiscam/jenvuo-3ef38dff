@@ -973,9 +973,36 @@ html[data-pwa="1"] .pwa-tabbar {
   border-color: rgba(0,0,0,0.06) !important;
 }
 
-/* ====== Dashboard Sidebar: plain full-height ====== */
+/* ====== Dashboard Sidebar: plain full-height, always light ====== */
+/* The drawer sits inside .jenvu-terminal-shell, so on the Terminal's black
+   theme it would inherit the dark --gc-* tokens and render white-on-white.
+   Re-pin the light tokens here so the menu stays readable on white. */
+.dashboard-sidebar-root {
+  --gc-canvas: #f0f5fe;
+  --gc-ink: #202124;
+  --gc-ink-muted: #5f6368;
+  --gc-line: #dadce0;
+  --gc-surface: #f8f9fa;
+  --gc-panel: #eef2f7;
+  --gc-notice: #e9eef6;
+  --gc-nav-active: #dbedfc;
+  --gc-sky: #dcefff;
+  --gc-blue: #1a73e8;
+  --gc-blue-deep: #0b57d0;
+  --gc-console-search: #e1e6ef;
+  --foreground: #202124;
+  --muted-foreground: #5f6368;
+  --border: #dadce0;
+  --muted: #f1f3f4;
+  --accent: #e9eef6;
+  --accent-foreground: #202124;
+  --popover: #ffffff;
+  --popover-foreground: #202124;
+  background-color: #ffffff !important;
+  color: #202124;
+}
 .dashboard-sidebar-root:not(.dashboard-terminal-sidebar) {
-  background-color: var(--gc-canvas) !important;
+  background-color: #ffffff !important;
 }
 
 /* The Terminal itself stays unzoomed so it fits the viewport. Match only its
