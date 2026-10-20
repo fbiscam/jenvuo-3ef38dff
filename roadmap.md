@@ -72,3 +72,4 @@
 - [x] Ask Jenvu, Terminal AI and voice chat answer through a backup AI when the main AI provider is out of credit
 - [x] Docs page: blue "Documentation" label removed; topic filter no longer slides under the top menu when scrolling
 - [x] Ask Jenvu faster: main AIs asked at once, quick backup answers after 12s
+- [x] Terminal dark theme pure black; new black neon pictures on Products and Solutions pages
