@@ -49,6 +49,12 @@ export type CallChatOptions = {
   // User-facing chat only: answer through the backup provider when every
   // model in `models` fails, so the person still gets a reply.
   backupFallback?: boolean;
+  // Fast chat only: ask every model in `models` at once and keep the first
+  // good answer; the rest are cancelled. Bounded by `raceBudgetMs`.
+  raceModels?: boolean;
+  // With `raceModels`: give up on the primary models after this long and go
+  // straight to the backup (when `backupFallback` is set).
+  raceBudgetMs?: number;
 };
 
 export class AiGatewayError extends Error {
@@ -342,9 +348,10 @@ async function callBackupChat(
 export async function callChatCompletion(
   opts: CallChatOptions,
 ): Promise<{ content: string; model: string; usage: UsageInfo }> {
-  if (!opts.backupFallback) return callChatChain(opts);
+  const primary = opts.raceModels ? callChatRace : callChatChain;
+  if (!opts.backupFallback) return primary(opts);
   try {
-    return await callChatChain(opts);
+    return await primary(opts);
   } catch (primaryErr) {
     console.warn(`[ai] ${opts.stage ?? "chat"}: primary chain failed, using backup`, (primaryErr as Error)?.message);
     try {
