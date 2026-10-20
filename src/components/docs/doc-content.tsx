@@ -265,7 +265,7 @@ export const DOC_GROUPS: DocGroup[] = [
               <li>Jenvu checks the previous 10 closed candles for the level that was swept.</li>
               <li>Tiny pokes beyond the level are ignored to avoid fakeouts.</li>
               <li>A sweep is confirmed only when price closes back inside and reverses within 2 candles.</li>
-              <li>Results show as confirmed, failed, late or no move. Works on 15M, 1H, 2H and 4H.</li>
+              <li>Results show as confirmed, failed, late or no move. Works on 5M, 15M, 1H, 2H and 4H.</li>
               <li>Sweep and liquidity lines never overlap supply/demand zones.</li>
             </ul>
             <p>Turn <strong>Fresh sweep</strong> labels on or off from the chart menu. Sweeps are for reading only — they never set trade levels.</p>

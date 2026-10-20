@@ -49,7 +49,7 @@ const CONTENT: IndustryContent = {
     {
       img: solLiquidity,
       title: "Track liquidity",
-      text: "Fresh sweeps on 15M, 1H, 2H and 4H, shown only after a reclaim and reversal confirm.",
+      text: "Fresh sweeps on 5M, 15M, 1H, 2H and 4H, shown only after a reclaim and reversal confirm.",
       link: "Explore sweeps",
       href: "/stories/fresh-sweep-detection",
     },
