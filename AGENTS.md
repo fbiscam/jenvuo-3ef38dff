@@ -21,7 +21,7 @@
 - Free trial (Pro days + credit) starts only when the user clicks "Start free" via the `claim_free_trial()` DB function, tracked once per user in `free_trial_claims`; sign-up no longer grants it: keeps the grant one-time and server-enforced.
 - All dashboard pages, including the Terminal, use the top bar in `src/components/dashboard/DashboardTopBar.tsx` and a menu drawer that stays closed until opened from it: one consistent console look everywhere.
 - Ask Jenvu: matched knowledge from `ask-jenvu-knowledge.server.ts` via `ask-jenvu.functions.ts`; contact-sales reuses `submitContactMessage`: one fact source, one inbox.
-- User-facing chat only (Ask Jenvu, Terminal, voice) sets `backupFallback` in `ai-gateway.ts` (Lovable AI if CodeCraft fails): analysis stays off Lovable credits.
+- Only user chat (Ask Jenvu, Terminal, voice) sets `backupFallback` in `ai-gateway.ts` (Lovable AI if CodeCraft fails): analysis stays off Lovable credits.
 - Site search is built in `src/lib/site-search.functions.ts` (help/story matches plus Firecrawl web results) with the page list in `src/lib/site-pages.ts`; the public header search (`src/components/HeaderSearch.tsx`), dashboard top bar and `/search` all use them, and the header falls back to Ask Jenvu when nothing on the site matches: one search source everywhere.
 - Every top-level public page must be listed in GLOBAL_PATHS in `src/lib/url-rewrite.ts` (tested in `url-rewrite.test.ts`): otherwise section hosts like support.jenvu.com prefix it into their section and show Not found.
 - Top-bar Gifts box lists positive credit-ledger rows whose reason is in `GIFT_REASONS` (`src/lib/gifts.ts`, tested), with the seen time kept per user in the browser: gifts need no extra table and only gift-type credit shows.
