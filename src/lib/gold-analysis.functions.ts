@@ -2713,6 +2713,7 @@ ${isTradingIntent ? `${hasLivePrice ? `VERIFIED LIVE XAU/USD PRICE: ${currentPri
     timeoutMs: 25000,
     priority: true,
     stage: "chat-signal",
+    backupFallback: true,
   }).catch((err: unknown) => {
     if (err instanceof AiGatewayError) throw new Error(err.message);
     throw err;
