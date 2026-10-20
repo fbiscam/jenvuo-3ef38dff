@@ -95,7 +95,7 @@ export const DOC_GROUPS: DocGroup[] = [
     ],
   },
   {
-    title: "Account and dashboard",
+    title: "Accounts",
     sections: [
       {
         id: "dashboard",
