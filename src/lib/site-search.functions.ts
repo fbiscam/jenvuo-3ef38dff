@@ -34,7 +34,10 @@ export const siteSearch = createServerFn({ method: "POST" })
     let webError: string | undefined;
     const lk = process.env["LOVABLE_API_KEY"];
     const fk = process.env["FIRECRAWL_API_KEY"];
-    if (!lk || !fk) webError = "Web results are not configured.";
+    const { getOptionalUserId } = await import("@/lib/optional-auth.server");
+    const signedIn = !!(await getOptionalUserId());
+    if (!signedIn) webError = "Sign in to see web results.";
+    else if (!lk || !fk) webError = "Web results are not configured.";
     else {
       try {
         const r = await fetch("https://connector-gateway.lovable.dev/firecrawl/v2/search", {
