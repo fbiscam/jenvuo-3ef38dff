@@ -45,6 +45,7 @@ function SearchPage() {
     <div className="min-h-screen bg-background">
       <SiteHeader />
       <main className="mx-auto max-w-[1080px] px-4 py-8 sm:px-6">
+        <h1 className="mb-4 text-[28px] font-normal text-gc-ink">{q ? `Search results for “${q}”` : "Search Jenvu"}</h1>
         <form
           onSubmit={(e) => { e.preventDefault(); if (text.trim()) navigate({ to: ".", search: { q: text.trim() } }); }}
           className="flex h-14 items-center gap-3 rounded-md border border-gc-ink-muted/60 px-4"
