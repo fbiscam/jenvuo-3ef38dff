@@ -73,3 +73,4 @@
 - [x] Docs page: blue "Documentation" label removed; topic filter no longer slides under the top menu when scrolling
 - [x] Ask Jenvu faster: main AIs asked at once, quick backup answers after 12s
 - [x] Terminal dark theme pure black; new black neon pictures on Products and Solutions pages
+- [x] Terminal AI credits: balance + rate under the chat box, clearer low-balance replies; Help Centre article and Ask Jenvu knowledge on what uses credits
