@@ -443,6 +443,42 @@ export const collections: Collection[] = [
         ],
       },
       {
+        slug: "terminal-credits",
+        title: "Terminal: what's included and what uses credits",
+        summary: "Charts and tools are included with Terminal access; only AI replies use credits.",
+        updatedAt: "2026-10-21",
+        body: [
+          { type: "p", content: "Terminal access lets you use the chart as much as you like. Only AI features use credits, because each AI reply has a real processing cost. Every charge is checked and deducted on Jenvu's servers before an answer is returned, so it cannot be skipped from the browser." },
+          { type: "h2", content: "Included with Terminal access (no credits)" },
+          { type: "ul", items: [
+            "Live gold price, candles and all timeframes.",
+            "Indicators (RSI, MACD, EMA, Bollinger Bands, ATR, VWAP and more).",
+            "SMC tools: swings, BOS/CHoCH, supply and demand zones, fair value gaps and liquidity sweeps.",
+            "Drawing tools, candle timer, news and economic events, demo trading.",
+          ]},
+          { type: "h2", content: "Uses credits" },
+          { type: "ul", items: [
+            "Ask AI / AI desk chat about the chart, including chart images you attach.",
+            "Voice questions answered by the AI.",
+            "Signal scans that return BUY or SELL (WAIT results are free).",
+          ]},
+          { type: "h2", content: "How much it costs" },
+          { type: "ul", items: [
+            "AI replies are charged only for the tokens actually used: $3 per 1,000,000 tokens. There is no fixed fee per question, and failed requests are free.",
+            "Your balance and the rate are shown under the Terminal chat box.",
+            "Daily AI allowance by plan: Free 100K, Pro 1.5M, Elite 5M, Ultra 10M tokens. It resets at 00:00 UTC and is also limited by your balance ($3 = 1M tokens).",
+            "AI chat is included with Pro, Elite and Ultra (including the 14-day Pro free trial).",
+          ]},
+          { type: "h2", content: "When credits run out" },
+          { type: "ul", items: [
+            "The AI desk tells you your balance is too low and stops answering until you add credits.",
+            "Charts, indicators, zones and other tools keep working.",
+            "Add credits from Dashboard → Payments (top-ups from $5). Your plan also adds credit on each billing date.",
+          ]},
+          { type: "note", tone: "tip", content: "See exactly what each reply cost on Dashboard → Usage." },
+        ],
+      },
+      {
         slug: "api-keys",
         title: "API keys and limits",
         summary: "Create a Jenvu API key, use it anywhere, and track its daily token quota.",
