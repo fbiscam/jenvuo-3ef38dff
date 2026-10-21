@@ -1346,7 +1346,7 @@ function DashboardLayout() {
           <style>{`.dashboard-sidebar-root, .dashboard-sidebar-root *:not(img):not(svg):not(.material-symbols-rounded) { font-family: "Google Sans", "Product Sans", "Roboto", system-ui, sans-serif !important; text-transform: none !important; letter-spacing: normal !important; } .dashboard-sidebar-root .material-symbols-rounded { font-family: "Material Symbols Rounded" !important; font-weight: normal !important; font-style: normal !important; text-transform: none !important; letter-spacing: normal !important; white-space: nowrap; word-wrap: normal; direction: ltr; -webkit-font-feature-settings: "liga"; -webkit-font-smoothing: antialiased; }`}</style>
           {/* Brand */}
           <div
-            className={`flex h-14 shrink-0 items-center gap-2.5 ${navCollapsed ? "justify-center px-2" : drawerMode ? "border-b border-gc-line px-3" : "px-4"}`}
+            className={`flex h-14 shrink-0 items-center gap-2.5 ${navCollapsed ? "justify-center px-2" : drawerMode ? "border-b border-gc-line pl-[6px] pr-3" : "px-4"}`}
           >
             {drawerMode && (
               <button
