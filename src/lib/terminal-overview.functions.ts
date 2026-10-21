@@ -130,23 +130,40 @@ export const getGoldSeasonals = createServerFn({ method: "POST" })
     }
   });
 
-/** Latest gold headlines (Google News RSS). */
+/** Headline feeds tried in order; the first one that returns items wins. */
+const HEADLINE_FEEDS = [
+  "https://news.google.com/rss/search?q=gold+price+OR+XAUUSD+when:2d&hl=en-US&gl=US&ceid=US:en",
+  "https://feeds.finance.yahoo.com/rss/2.0/headline?s=GC%3DF&region=US&lang=en-US",
+  "https://www.bing.com/news/search?q=gold+price+XAUUSD&format=rss",
+  "https://news.google.com/rss/search?q=gold+price&hl=en-GB&gl=GB&ceid=GB:en",
+];
+let lastGoodHeadlines: Headline[] = [];
+
+async function loadHeadlines(): Promise<Headline[]> {
+  for (const url of HEADLINE_FEEDS) {
+    try {
+      const res = await fetchTimeout(url, 6000, { Accept: "application/rss+xml, application/xml, text/xml" });
+      if (!res.ok) { await res.body?.cancel().catch(() => {}); continue; }
+      const items = parseRssHeadlines(await res.text(), 20);
+      if (items.length) return items;
+    } catch (e) {
+      console.error("terminal-overview: headline feed failed", url, e);
+    }
+  }
+  throw new Error("all headline feeds failed");
+}
+
+/** Latest gold headlines (several RSS feeds with fallback; keeps the last good list). */
 export const getGoldHeadlines = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async () => {
     try {
-      const items = await cached<Headline[]>("headlines", 5 * 60_000, async () => {
-        const res = await fetchTimeout(
-          "https://news.google.com/rss/search?q=gold+price+OR+XAUUSD+when:2d&hl=en-US&gl=US&ceid=US:en",
-          8000,
-          { Accept: "application/rss+xml, application/xml, text/xml" },
-        );
-        if (!res.ok) throw new Error(`status ${res.status}`);
-        return parseRssHeadlines(await res.text(), 20);
-      });
+      const items = await cached<Headline[]>("headlines", 5 * 60_000, loadHeadlines);
+      lastGoodHeadlines = items;
       return { items, error: null as string | null };
     } catch (e) {
       console.error("terminal-overview: headlines unavailable", e);
+      if (lastGoodHeadlines.length) return { items: lastGoodHeadlines, error: null as string | null };
       return { items: [] as Headline[], error: "Headlines are unavailable right now." };
     }
   });
