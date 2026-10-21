@@ -1,6 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCredits } from "@/hooks/useCredits";
-import { TOKEN_RATE_USD_PER_MILLION } from "@/lib/plan-entitlements";
 import { useEffect, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -1076,25 +1075,6 @@ function TerminalPage() {
                     />
                   </PromptInputFooter>
                 </PromptInput>
-                <p className="mt-1.5 flex flex-wrap items-center gap-x-1.5 px-1 text-[11px] text-muted-foreground">
-                  <span>AI replies use credits · ${TOKEN_RATE_USD_PER_MILLION} per 1M tokens</span>
-                  {!credits.isLoading && (
-                    <span>
-                      · Balance{" "}
-                      <span className={cn("font-medium", credits.balance < 0.3 ? "text-destructive" : "text-foreground")}>
-                        ${credits.balance.toFixed(2)}
-                      </span>
-                    </span>
-                  )}
-                  <span>·</span>
-                  <Link to="/dashboard/pay" className="font-medium text-primary hover:underline">
-                    Add credits
-                  </Link>
-                  <span>·</span>
-                  <a href="/help/plans-credits-billing/terminal-credits" className="hover:underline">
-                    How it works
-                  </a>
-                </p>
               </div>
             </aside>
           )}
