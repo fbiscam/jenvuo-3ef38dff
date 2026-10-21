@@ -1374,7 +1374,7 @@ function AuthPage() {
                   <div>
                     <h2 className="text-[20px] font-normal text-gc-ink">Access to Jenvu tools</h2>
                     <p className="mt-2 text-[14px] leading-[1.55] text-gc-ink-muted">
-                      Get everything you need to read gold: the Terminal, AI desk, sweeps, zones, FVGs and alerts.
+                      Get everything you need to read gold: the Terminal, AI desk, sweeps, zones, FVGs and alerts
                     </p>
                   </div>
                   <div>
