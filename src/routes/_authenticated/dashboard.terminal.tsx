@@ -1,6 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCredits } from "@/hooks/useCredits";
-import { TOKEN_RATE_USD_PER_MILLION } from "@/lib/plan-entitlements";
 import { useEffect, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery } from "@tanstack/react-query";
