@@ -1,4 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useCredits } from "@/hooks/useCredits";
+import { TOKEN_RATE_USD_PER_MILLION } from "@/lib/plan-entitlements";
 import { useEffect, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -469,6 +471,7 @@ function TerminalPage() {
     if (activeThreadIdRef.current === id) startNewChat();
   }
 
+  const credits = useCredits();
   const ask = useMutation({
     mutationFn: async ({
       query,
@@ -490,17 +493,18 @@ function TerminalPage() {
         text: signal.fullAnalysis || signal.spokenSummary || "No read available.",
         signal,
       });
+      credits.refresh();
     },
     onError: (err: unknown) => {
       const message = err instanceof Error ? err.message : "";
       addMessage({
         role: "assistant",
         text: /INSUFFICIENT_CREDITS|Low balance/i.test(message)
-          ? "You are out of balance. Top up and try again."
+          ? "Your credit balance is too low for AI replies. Add credits from Payments and try again. Charts, indicators and zones keep working without credits."
           : /Daily token limit/i.test(message)
             ? message
             : /not included|Upgrade to/i.test(message)
-              ? message
+              ? "AI chat is included with Pro, Elite and Ultra. Upgrade to keep asking the desk; charts and tools stay available during your Terminal access."
               : "The desk could not answer just now. Please try again in a moment.",
       });
     },
