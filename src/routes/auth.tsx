@@ -1380,7 +1380,7 @@ function AuthPage() {
                   <div>
                     <h2 className="text-[20px] font-normal text-gc-ink">$100 in free credit</h2>
                     <p className="mt-2 text-[14px] leading-[1.55] text-gc-ink-muted">
-                      Try Jenvu with $100 in credit to spend on top-tier AI models.
+                      Try Jenvu with $100 in credit to spend on top-tier AI models & pro access to use other features
                     </p>
                   </div>
                   <div>
