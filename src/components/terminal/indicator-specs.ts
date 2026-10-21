@@ -125,7 +125,7 @@ const SPECS: Record<IndicatorId, IndicatorSpec> = {
   bb: {
     id: "bb",
     name: "Bollinger Bands",
-    description: "20-bar basis with 2 standard-deviation bands",
+    description: "20-bar basis with 2 standard-deviation\u00a0",
     pane: "main",
     lines: [
       { title: "BB basis", color: "#787b86", kind: "line", width: 1 },
