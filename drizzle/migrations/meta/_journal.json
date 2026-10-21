@@ -85,6 +85,13 @@
       "when": 1792424719087,
       "tag": "0011_founding_monthly_renewal",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1792561510274,
+      "tag": "0012_restrict_post_counter_updates",
+      "breakpoints": true
     }
   ]
 }
