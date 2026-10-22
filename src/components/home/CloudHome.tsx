@@ -192,7 +192,7 @@ export function CloudHero({ price: _price, delta: _delta }: { price: string; del
         <h1 className="jenvu-rise mx-auto mt-7 max-w-[900px] text-[40px] font-medium leading-[1.1] tracking-[-0.5px] text-gc-ink sm:text-[56px] md:text-[60px]">
           The new way to trade gold
         </h1>
-        <p className="jenvu-rise [animation-delay:80ms] line-clamp-2 max-sm:line-clamp-none mx-auto mt-5 max-w-[820px] text-[16px] leading-[1.6] text-gc-ink-muted sm:text-[17px]">
+        <p className="jenvu-rise [animation-delay:80ms] mx-auto mt-5 max-w-[820px] text-balance text-[13.5px] leading-[1.55] text-gc-ink-muted min-[400px]:text-[14.5px] sm:line-clamp-2 sm:text-[17px] sm:leading-[1.6]">
           Read the chart with AI. Spot sweeps, zones and FVGs live.{" "}
           <span className="font-medium text-gc-ink">Start with $100 credits or a Pro access.</span>
         </p>
@@ -388,12 +388,12 @@ export function CloudBuildWith() {
     <section className="jenvu-build-zoom bg-background">
       <div className="mx-auto grid max-w-[1296px] items-start gap-10 px-5 pb-20 pt-8 sm:px-8 md:grid-cols-2 md:gap-20 md:pb-24">
         <div className="md:sticky md:top-24">
-          <h2 className="text-[30px] font-normal leading-[1.25] text-gc-ink sm:text-[36px]">
-            Build with the gold platform
+          <h2 className="text-[22px] font-normal leading-[1.3] text-gc-ink min-[400px]:text-[24px] sm:text-[36px] sm:leading-[1.25]">
+            <span className="whitespace-nowrap">Build with the gold platform</span>
             <br />
-            <span className="text-gc-blue-deep">designed for traders and AI</span>
+            <span className="whitespace-nowrap text-gc-blue-deep">designed for traders and AI</span>
           </h2>
-          <p className="mt-5 max-w-[540px] text-[16px] leading-[1.6] text-gc-ink-muted">
+          <p className="mt-4 max-w-[540px] text-[14px] leading-[1.55] text-gc-ink-muted sm:mt-5 sm:text-[16px] sm:leading-[1.6]">
             Try Jenvu with live sweeps, zones and FVGs on gold, plus new sign-ups get $100 free credits for top tier models 14 days of Pro access free.
           </p>
           <div className="mt-7 flex flex-wrap items-center gap-7">
