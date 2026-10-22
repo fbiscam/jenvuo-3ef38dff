@@ -50,12 +50,12 @@ export const CHART_THEMES: Record<ChartTheme, { bg: string; text: string; grid: 
     insideBar: "#38bdf8",
     insideBarCandle: "#eab308",
   },
-  // TradingView-style dark palette
+  // Pure black dark palette (user request: chart background fully black)
   dark: {
-    bg: "#16161b",
+    bg: "#000000",
     text: "#f2f2f2",
-    grid: "#1f1f26",
-    border: "#26262e",
+    grid: "#141414",
+    border: "#1f1f1f",
     up: "#089981",
     down: "#f23645",
     insideBar: "#38bdf8",

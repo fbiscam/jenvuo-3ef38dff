@@ -1,5 +1,6 @@
 // Static Help Center content. Edit this file to add/update articles.
 // Structure mirrors OpenAI Help (Collections → Articles).
+import { INDICATOR_GUIDES, SMC_TOOL_GUIDES, TOOLS_HOW_TO_OPEN, TOOLS_WORKFLOW } from "@/lib/chart-tools-guide";
 
 export type Block =
   | { type: "h2"; content: string }
@@ -317,6 +318,24 @@ export const collections: Collection[] = [
           ]},
 
           { type: "note", tone: "info", content: "If you want to plan the next session in advance, ask Jenvu for 'tomorrow's London bias on XAU/USD' — it'll build a HTF read without issuing a live signal." },
+        ],
+      },
+      {
+        slug: "smc-tools-indicators",
+        title: "How to use SMC tools and indicators",
+        summary: "What each Jenvu SMC tool and chart indicator shows, where to switch it on, and a simple workflow.",
+        updatedAt: "2026-10-22",
+        body: [
+          { type: "p", content: "The Terminal chart has two menus in its left rail: Jenvu SMC (structure, sweeps, zones, FVGs, order blocks) and Indicators (volume, moving averages, RSI, MACD and more). This guide explains what each one shows and how to use it. You can also ask Ask Jenvu or the Terminal AI, for example “How do I use the Zone + FVG strategy?”." },
+          { type: "h2", content: "Where to find them" },
+          { type: "ol", items: TOOLS_HOW_TO_OPEN },
+          { type: "h2", content: "Jenvu SMC tools" },
+          { type: "ul", items: SMC_TOOL_GUIDES.map((t) => `${t.name}: ${t.what} How to use: ${t.how}`) },
+          { type: "h2", content: "Indicators" },
+          { type: "ul", items: INDICATOR_GUIDES.map((t) => `${t.name}: ${t.what} How to use: ${t.how}`) },
+          { type: "h2", content: "A simple workflow" },
+          { type: "ol", items: TOOLS_WORKFLOW },
+          { type: "note", tone: "info", content: "Signals are filtered strictly to cut fakeouts, so you will see fewer marks than on other charts. That is expected. No tool guarantees a win — test on the demo account first." },
         ],
       },
     ],

@@ -71,6 +71,7 @@ import {
   type ThreeStocksEvidence,
 } from "@/lib/analysis/three-stocks-evidence";
 import { detectCandlestickPatterns } from "@/lib/analysis/candlestick-pattern-evidence";
+import { CHART_TOOLS_GUIDE_TEXT } from "@/lib/chart-tools-guide";
 
 async function _spendUserCredits(
   userId: string,
@@ -2572,6 +2573,8 @@ Perform an evidence-first review of only what the question needs: swing structur
 First identify the user's intent:
 - For greetings, casual conversation, or any non-trading question, reply as a normal helpful assistant. Do not mention charts, gold, trading, ICT, SMC, risk, or your trading expertise unless the user asks about them.
 - Only for trading-related questions, apply advanced ICT/SMC knowledge plus professional candlestick reading: single-, double-, and three-candle formations; body/wick anatomy; rejection versus acceptance; compression/inside bars; expansion/outside bars; engulfing patterns; doji variants; hammer, hanging man, shooting star and inverted hammer; piercing/dark-cloud patterns; morning/evening stars; and three-candle momentum sequences. Always interpret them through structure, location, liquidity, displacement and confirmation.
+- When the user asks how to use a Terminal SMC tool or indicator, answer step by step from this guide (where to switch it on, what it shows, how to use it):
+${CHART_TOOLS_GUIDE_TEXT}
 
 Conversation memory and context rules:
 - Earlier turns of this same conversation are supplied before the latest user message. Use them: resolve "yeh", "wohi", "is level", "phir", "aur batao" and other follow-ups against what was already discussed, and never ask the user to repeat something they already told you.
