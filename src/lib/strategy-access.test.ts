@@ -1,4 +1,5 @@
-import { describe, expect, test } from "bun:test";
+import { describe, it as test } from "node:test";
+import { expect } from "./chart/test-expect";
 import { STRATEGY_HOURLY_FEE_USD, evaluateStrategyAccess, strategyHourKey } from "./strategy-access";
 
 const NOW = Date.parse("2026-10-22T06:30:00Z");
