@@ -1,8 +1,8 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Link } from "@tanstack/react-router";
-import { Check, Loader2, Plus, ArrowRight } from "lucide-react";
-import { useFreeTrial } from "@/hooks/useFreeTrial";
+import { Check, Plus, ArrowRight } from "lucide-react";
+import { useAuthUser } from "@/hooks/useAuthUser";
 import { FOUNDING_CREDIT_USD, FOUNDING_MONTHS } from "@/lib/founding-offer";
 
 const QUICK_ACTIONS = [
@@ -55,7 +55,7 @@ function Tick({ children }: { children: ReactNode }) {
 const FOUNDING_MEMBER_STATUSES = ["approved", "active", "graduated", "verified"];
 
 export default function CloudWelcome({ name: profileName }: { name?: string }) {
-  const { user, eligible, starting, start } = useFreeTrial();
+  const { user } = useAuthUser();
   const [filter, setFilter] = useState<string>(Object.keys(RESOURCES)[0]);
   const [foundingMember, setFoundingMember] = useState(false);
   const meta = (user?.user_metadata ?? {}) as Record<string, unknown>;
