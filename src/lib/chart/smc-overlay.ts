@@ -24,7 +24,6 @@ import {
   isHighProbabilityPriceAction,
   isHighProbabilitySweep,
 } from "./high-probability";
-import { evaluateSwingSetup, type SwingSetup } from "./swing-setup";
 
 /** Zone + FVG strategy: only the single latest zone (with its own displacement FVG and plan) is shown. */
 export const SD_VISIBLE_ZONES = 1;
@@ -142,8 +141,6 @@ export type SmcOverlay = {
   liquidityMap?: LiquidityMap;
   /** Fresh bullish / bearish FVGs from closed candles (newest few). */
   freshFvgs?: FreshFvg[];
-  /** Fresh-swing setup gate (opposing FVG check + Entry/SL/TP), keyed by swing time. */
-  swingSetups?: Record<number, SwingSetup>;
   /** Price action verdict at each swing (pattern + who controls), keyed by pivot time. */
   priceAction?: Record<number, SwingPriceAction>;
   /** Fresh-swing liquidity sweep verdict (previous 10 candles), keyed by pivot time. */
@@ -942,21 +939,7 @@ export function computeSmcOverlay(
   for (const p of [...pivotsLabelled, ...livePivots]) {
     swingSweeps[p.t] = classifySwingSweep(fractalBars, closedIdx.get(p.t) ?? -1, p.kind);
   }
-  const swingSetups: Record<number, SwingSetup> = {};
-  const allSwings = [...pivotsLabelled, ...livePivots].sort((a, b) => a.t - b.t);
-  for (const p of allSwings) {
-    const idx = closedIdx.get(p.t) ?? -1;
-    if (idx < 0) continue;
-    // Immediate previous opposite swing = start of the leg that must be cleaned.
-    let prevOpp: number | undefined;
-    for (const q of allSwings) {
-      if (q.t >= p.t) break;
-      if (q.kind !== p.kind) prevOpp = closedIdx.get(q.t) ?? prevOpp;
-    }
-    swingSetups[p.t] = evaluateSwingSetup(fractalBars, idx, p.kind, prevOpp);
-  }
   return {
-    swingSetups,
     swingSweeps,
     priceAction,
     freshFvgs,
@@ -1431,7 +1414,6 @@ export function renderSmcOverlay(
     if (!toggles.swingSweep) return;
     const sw = smc.swingSweeps?.[t];
     if (!sw || !isHighProbabilitySweep(sw)) return;
-    if (smc.swingSetups?.[t]?.status !== "valid") return;
     ctx.save();
     ctx.font = "700 11px 'JetBrains Mono', ui-monospace, monospace";
     const w = ctx.measureText(sw.text).width;
@@ -1450,30 +1432,7 @@ export function renderSmcOverlay(
     const baseline = up ? (hasBadge ? yy - 32 : yy - 6) : (hasBadge ? yy + 60 : yy + 34);
     const rawPa = toggles.priceAction === false ? undefined : smc.priceAction?.[t];
     // High-probability only: a confirmed (✓) reversal pattern, else no tag.
-    const setup = smc.swingSetups?.[t];
-    const setupValid = setup?.status === "valid";
-    // Only when the path past opposing unmitigated FVGs is clear.
-    const pa = setupValid && isHighProbabilityPriceAction(rawPa) ? rawPa : undefined;
-    const sweepOk = toggles.swingSweep && isHighProbabilitySweep(smc.swingSweeps?.[t]);
-    if (setupValid && (pa || sweepOk) && setup.entry != null && setup.stop != null && setup.target != null) {
-      const f = (v: number) => v.toFixed(2);
-      const sideTxt = setup.side === "buy" ? "BUY" : "SELL";
-      const head = setup.grade === "weak" ? `WEAK ${sideTxt} (small TP)` : `BEST ${sideTxt} @50% FVG`;
-      const tp2 = setup.target2 != null ? ` · TP2 ${f(setup.target2)}` : "";
-      const txt = `${head} ${f(setup.entry)} · SL ${f(setup.stop)} · TP ${f(setup.target)}${tp2} (${setup.rr}R)`;
-      const planY = up ? baseline - 36 : baseline + 36;
-      ctx.save();
-      ctx.font = "700 11px 'JetBrains Mono', ui-monospace, monospace";
-      const pw = ctx.measureText(txt).width;
-      ctx.fillStyle = plate(ctx, 0.95);
-      ctx.beginPath();
-      ctx.roundRect?.(xx - pw / 2 - 5, planY - 12, pw + 10, 16, 4);
-      if (!ctx.roundRect) ctx.rect(xx - pw / 2 - 5, planY - 12, pw + 10, 16);
-      ctx.fill();
-      ctx.fillStyle = setup.grade === "weak" ? "#f59e0b" : setup.side === "buy" ? "#089981" : "#f23645";
-      ctx.fillText(txt, xx - pw / 2, planY);
-      ctx.restore();
-    }
+    const pa = isHighProbabilityPriceAction(rawPa) ? rawPa : undefined;
     // Sweep is independent: with price action off/absent it takes the same slot.
     if (!pa) {
       sweepTag(t, xx, baseline);
