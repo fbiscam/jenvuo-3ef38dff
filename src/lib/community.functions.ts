@@ -98,8 +98,10 @@ async function hydratePosts(admin: any, rows: any[], viewerId: string): Promise<
   const profMap = new Map<string, { name: string | null; avatar: string | null }>();
   for (const p of profs ?? []) profMap.set(p.id, { name: p.full_name ?? null, avatar: p.avatar_url ?? null });
 
-  const avatarPaths = Array.from(new Set(Array.from(profMap.values()).map((p) => p.avatar).filter((x): x is string => !!x)));
-  const avatarSigned = await signAvatars(admin, avatarPaths);
+  const avatarSigned = await signAvatars(
+    admin,
+    Array.from(profMap.entries()).filter(([, p]) => !!p.avatar).map(([id, p]) => ({ path: p.avatar as string, ownerId: id })),
+  );
 
   // Only sign storage paths inside the post author's own folder.
   const allMedia = Array.from(
@@ -222,7 +224,7 @@ export const getCommunityProfile = createServerFn({ method: "GET" })
       supabaseAdmin.from("community_follows").select("follower_id").eq("follower_id", context.userId).eq("followee_id", p.user_id).maybeSingle(),
       supabaseAdmin.rpc("community_get_tier", { _user_id: p.user_id }),
     ]);
-    const avatarSigned = await signAvatars(supabaseAdmin, prof?.avatar_url ? [prof.avatar_url] : []);
+    const avatarSigned = await signAvatars(supabaseAdmin, prof?.avatar_url ? [{ path: prof.avatar_url, ownerId: p.user_id }] : []);
     return {
       user_id: p.user_id, handle: p.handle, display_name: p.display_name,
       bio: p.bio, cover_url: p.cover_url,
