@@ -1,4 +1,5 @@
 # Roadmap
+- [x] Restore signed-out Ask Jenvu answers; retain existing request limiter and untrusted-history protections; verified with a live visitor pricing question and regression tests
 - [x] Same homepage header menu on every public page
 - [x] Dashboard + site link only to pages that exist; remove old ones
 - [x] Notification bell: no "View all"; all notifications in a scrollable panel
