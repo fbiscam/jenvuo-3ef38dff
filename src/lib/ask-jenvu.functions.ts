@@ -32,6 +32,9 @@ After your answer, on new lines, output exactly:
 KNOWLEDGE:
 ${knowledge}`;
 
+const ANON_DAILY_PER_IP = 20;
+const ANON_DAILY_GLOBAL = 1500;
+
 export const askJenvu = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => Input.parse(data))
   .handler(async ({ data }): Promise<AskJenvuResult> => {
@@ -49,16 +52,40 @@ export const askJenvu = createServerFn({ method: "POST" })
     const rl = checkAnalyzeRateLimit(`ask-jenvu:${userId ?? "anon"}:${ip}`);
     if (!rl.allowed) return { ok: false, error: `You're asking quickly. Please wait ${rl.retryInSec}s and try again.` };
 
+    // Visitors without an account get a persistent daily allowance (per IP and
+    // site-wide) so the metered AI can't be drained anonymously.
+    if (!userId) {
+      try {
+        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+        const bump = async (bucket: string) => {
+          const { data: n, error } = await supabaseAdmin.rpc("bump_ask_jenvu_anon" as never, { _bucket: bucket } as never);
+          if (error) throw error;
+          return Number(n ?? 0);
+        };
+        const perIp = await bump(`ip:${ip}`.slice(0, 120));
+        if (perIp > ANON_DAILY_PER_IP) {
+          return { ok: false, error: "You've reached today's free question limit. Sign in to keep chatting with Ask Jenvu." };
+        }
+        const total = await bump("global");
+        if (total > ANON_DAILY_GLOBAL) {
+          return { ok: false, error: "Ask Jenvu is busy for visitors right now. Sign in to keep chatting." };
+        }
+      } catch (e) {
+        console.error("[ask-jenvu] anon quota check failed", (e as Error)?.message);
+        return { ok: false, error: "Ask Jenvu couldn't answer right now. Please sign in or try again later." };
+      }
+    }
+
     const history = data.messages.slice(-12);
     if (history[history.length - 1].role !== "user") return { ok: false, error: "Please type a question." };
 
     try {
       const { content } = await callChatCompletion({
         models: [...ASK_JENVU_CHAIN],
-        messages: [{ role: "system", content: SYSTEM(getRelevantJenvuKnowledge(history.slice(-3).filter((m) => m.role === "user").map((m) => m.content).join(" "))) }, toServerOwnedMessage(history)],
+        messages: [{ role: "system", content: SYSTEM(getRelevantJenvuKnowledge(history.slice(-3).filter((m) => m.role === "user").map((m) => m.content).join(" "))) }, toServerOwnedMessage(userId ? history : history.slice(-6))],
         // Generous ceiling: some models count hidden reasoning against it,
         // which used to cut answers off halfway.
-        maxTokens: 4000,
+        maxTokens: userId ? 4000 : 2000,
         rejectTruncated: true,
         retriesPerModel: 1,
         // Ask the models at once and keep the fastest good answer; after 12s
