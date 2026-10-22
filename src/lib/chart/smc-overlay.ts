@@ -943,9 +943,17 @@ export function computeSmcOverlay(
     swingSweeps[p.t] = classifySwingSweep(fractalBars, closedIdx.get(p.t) ?? -1, p.kind);
   }
   const swingSetups: Record<number, SwingSetup> = {};
-  for (const p of [...pivotsLabelled, ...livePivots]) {
+  const allSwings = [...pivotsLabelled, ...livePivots].sort((a, b) => a.t - b.t);
+  for (const p of allSwings) {
     const idx = closedIdx.get(p.t) ?? -1;
-    if (idx >= 0) swingSetups[p.t] = evaluateSwingSetup(fractalBars, idx, p.kind);
+    if (idx < 0) continue;
+    // Immediate previous opposite swing = start of the leg that must be cleaned.
+    let prevOpp: number | undefined;
+    for (const q of allSwings) {
+      if (q.t >= p.t) break;
+      if (q.kind !== p.kind) prevOpp = closedIdx.get(q.t) ?? prevOpp;
+    }
+    swingSetups[p.t] = evaluateSwingSetup(fractalBars, idx, p.kind, prevOpp);
   }
   return {
     swingSetups,
@@ -1449,7 +1457,10 @@ export function renderSmcOverlay(
     const sweepOk = toggles.swingSweep && isHighProbabilitySweep(smc.swingSweeps?.[t]);
     if (setupValid && (pa || sweepOk) && setup.entry != null && setup.stop != null && setup.target != null) {
       const f = (v: number) => v.toFixed(2);
-      const txt = `${setup.side === "buy" ? "BUY" : "SELL"} ${f(setup.entry)} · SL ${f(setup.stop)} · TP ${f(setup.target)} (${setup.rr}R)`;
+      const sideTxt = setup.side === "buy" ? "BUY" : "SELL";
+      const head = setup.grade === "weak" ? `WEAK ${sideTxt} (small TP)` : `BEST ${sideTxt} @50% FVG`;
+      const tp2 = setup.target2 != null ? ` · TP2 ${f(setup.target2)}` : "";
+      const txt = `${head} ${f(setup.entry)} · SL ${f(setup.stop)} · TP ${f(setup.target)}${tp2} (${setup.rr}R)`;
       const planY = up ? baseline - 36 : baseline + 36;
       ctx.save();
       ctx.font = "700 11px 'JetBrains Mono', ui-monospace, monospace";
@@ -1459,7 +1470,7 @@ export function renderSmcOverlay(
       ctx.roundRect?.(xx - pw / 2 - 5, planY - 12, pw + 10, 16, 4);
       if (!ctx.roundRect) ctx.rect(xx - pw / 2 - 5, planY - 12, pw + 10, 16);
       ctx.fill();
-      ctx.fillStyle = setup.side === "buy" ? "#089981" : "#f23645";
+      ctx.fillStyle = setup.grade === "weak" ? "#f59e0b" : setup.side === "buy" ? "#089981" : "#f23645";
       ctx.fillText(txt, xx - pw / 2, planY);
       ctx.restore();
     }
