@@ -56,7 +56,8 @@ export default function InvoiceHistory() {
   const { data } = useQuery({
     queryKey: ["my-payment-orders"],
     queryFn: () => listFn({} as never),
-    refetchInterval: 30_000,
+    refetchInterval: 120_000,
+    refetchIntervalInBackground: false,
   });
 
   const invoices = useMemo(

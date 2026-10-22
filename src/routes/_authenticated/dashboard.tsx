@@ -1296,7 +1296,8 @@ function DashboardLayout() {
         () => void loadUsage(),
       )
       .subscribe();
-    const pollId = window.setInterval(() => void loadUsage(), 15_000);
+    // Realtime covers live changes; this slow poll is only a visible-tab safety net.
+    const pollId = window.setInterval(() => { if (document.visibilityState === "visible") void loadUsage(); }, 120_000);
     const refreshWhenVisible = () => {
       if (document.visibilityState === "visible") void loadUsage();
     };

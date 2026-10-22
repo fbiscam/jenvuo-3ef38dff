@@ -44,7 +44,7 @@ export default function GiftBox() {
 
   useEffect(() => {
     void load();
-    const t = window.setInterval(load, 60_000);
+    const t = window.setInterval(() => { if (document.visibilityState === "visible") void load(); }, 300_000);
     const onFocus = () => void load();
     window.addEventListener("focus", onFocus);
     return () => { window.clearInterval(t); window.removeEventListener("focus", onFocus); };
