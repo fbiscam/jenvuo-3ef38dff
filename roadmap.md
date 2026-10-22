@@ -78,3 +78,4 @@
 - [x] Chart: only high-probability price action, fresh sweep and liquidity sweep marks shown, on every timeframe
 - [x] Stricter fakeout filtering (zones, price action, sweeps) and white compact desktop Gifts/Notifications
 - [x] Sweeps only on 1H/2H/4H/1D with stricter fakeout filter
+- [x] Swing price action only on 1H/2H/4H/1D with a held follow-through (fakeout) check
