@@ -128,6 +128,24 @@ export type Database = {
         }
         Relationships: []
       }
+      ask_jenvu_anon_usage: {
+        Row: {
+          bucket: string
+          count: number
+          day: string
+        }
+        Insert: {
+          bucket: string
+          count?: number
+          day?: string
+        }
+        Update: {
+          bucket?: string
+          count?: number
+          day?: string
+        }
+        Relationships: []
+      }
       auto_scan_pool_ledger: {
         Row: {
           ai_cost_usd: number | null
@@ -3538,6 +3556,7 @@ export type Database = {
         Args: { _fingerprint: string; _kind: string; _occurrences: number }
         Returns: undefined
       }
+      bump_ask_jenvu_anon: { Args: { _bucket: string }; Returns: number }
       cancel_user_plan: { Args: { _user_id: string }; Returns: Json }
       charge_extension_usage: {
         Args: {
