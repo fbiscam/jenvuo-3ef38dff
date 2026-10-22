@@ -291,7 +291,7 @@ export const DEFAULT_SMC: SmcToggles = {
   projection: true,
   sdZones: true,
   sdStrategy: true,
-  sdHistory: false,
+  sdHistory: true,
   sdPlan: true,
   sweeps: true,
   freshFvg: true,
