@@ -470,6 +470,13 @@ export function resolveInstrument(input: string): ResolvedInstrument {
   throw new Error(`Unsupported symbol: ${raw || "empty"}`);
 }
 
+/** Snapshot endpoints are public: only server-defined instruments, never arbitrary stock tickers. */
+function resolveSnapshotInstrument(input: string): ResolvedInstrument {
+  const inst = resolveInstrument(input);
+  if (inst.key.startsWith("STOCK:")) throw new Error("Unsupported symbol");
+  return inst;
+}
+
 export function isSupportedTradeableSymbol(input: string): boolean {
   try {
     const inst = resolveInstrument(input);
@@ -4006,7 +4013,7 @@ export const getMarketSnapshot = createServerFn({ method: "POST" })
   })
   .handler(async ({ data }) => {
     try {
-      const inst = resolveInstrument(data.symbol);
+      const inst = resolveSnapshotInstrument(data.symbol);
       const quote = await resolveLiveTick(inst).catch(() => null);
       // Use daily candles for a stable 24h reference price.
       const daily = await fetchInstrumentCandles(inst, "1d").catch(() => [] as Candle[]);
@@ -4075,7 +4082,7 @@ export const getMarketSnapshotsBatch = createServerFn({ method: "POST" })
     for (const symbol of data.symbols) {
       const result = await (async () => {
         try {
-          const inst = resolveInstrument(symbol);
+          const inst = resolveSnapshotInstrument(symbol);
           const [quote, dayStats] = await Promise.all([
             resolveLiveTick(inst).catch(() => null),
             inst.yahooSymbols?.length
