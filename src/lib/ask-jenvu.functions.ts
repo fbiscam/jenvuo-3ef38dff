@@ -52,28 +52,9 @@ export const askJenvu = createServerFn({ method: "POST" })
     const rl = checkAnalyzeRateLimit(`ask-jenvu:${userId ?? "anon"}:${ip}`);
     if (!rl.allowed) return { ok: false, error: `You're asking quickly. Please wait ${rl.retryInSec}s and try again.` };
 
-    // Visitors without an account get a persistent daily allowance (per IP and
-    // site-wide) so the metered AI can't be drained anonymously.
+    // The AI is metered: only signed-in users may use it.
     if (!userId) {
-      try {
-        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-        const bump = async (bucket: string) => {
-          const { data: n, error } = await supabaseAdmin.rpc("bump_ask_jenvu_anon" as never, { _bucket: bucket } as never);
-          if (error) throw error;
-          return Number(n ?? 0);
-        };
-        const perIp = await bump(`ip:${ip}`.slice(0, 120));
-        if (perIp > ANON_DAILY_PER_IP) {
-          return { ok: false, error: "You've reached today's free question limit. Sign in to keep chatting with Ask Jenvu." };
-        }
-        const total = await bump("global");
-        if (total > ANON_DAILY_GLOBAL) {
-          return { ok: false, error: "Ask Jenvu is busy for visitors right now. Sign in to keep chatting." };
-        }
-      } catch (e) {
-        console.error("[ask-jenvu] anon quota check failed", (e as Error)?.message);
-        return { ok: false, error: "Ask Jenvu couldn't answer right now. Please sign in or try again later." };
-      }
+      return { ok: false, error: "Please sign in to chat with Ask Jenvu — it's free to create an account." };
     }
 
     const history = data.messages.slice(-12);
