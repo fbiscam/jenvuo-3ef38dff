@@ -88,7 +88,7 @@ export const SD_SUPERSEDE_ATR = 1;
 export const SD_EXTREME_LOOKBACK = 50;
 export const SD_SL_BUFFER_ATR = 0.15;
 /** Zones below this strength are not shown (weak zones tend to fail). */
-export const SD_MIN_STRENGTH = 65;
+export const SD_MIN_STRENGTH = 70;
 /** An opposing FVG within this many ATR of the zone's proximal edge rejects it. */
 export const SD_COUNTER_FVG_ATR = 3;
 /** Strategy mode: the departure FVG's displacement candle must be within this many candles of the swing. */

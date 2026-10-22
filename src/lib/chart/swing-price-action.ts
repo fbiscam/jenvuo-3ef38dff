@@ -18,6 +18,10 @@ export type SwingPriceAction = {
   text: string;
   /** Follow-through held: a reaction candle closed past the swing candle's body and none closed back beyond the swing extreme. */
   held?: boolean;
+  /** All PA_REACTION_BARS reaction candles have closed, so the verdict can no longer change. */
+  settled?: boolean;
+  /** Reversal-side control share (0-100): sellers % at a high, buyers % at a low. */
+  reversalShare?: number | null;
 };
 
 const PATTERN_TEXT: Record<SwingPattern, string> = {
@@ -119,10 +123,12 @@ export function classifySwingPriceAction(
     if (high ? c.c < Math.min(s.o, s.c) : c.c > Math.max(s.o, s.c)) followed = true;
   }
   const held = followed && !retaken;
+  const settled = after >= i + PA_REACTION_BARS;
+  const reversalShare = share == null ? null : high ? 100 - share : share;
 
   const strong = pattern === "pin" || pattern === "engulfing" || pattern === "displacement";
   const reacted = strong && reversalControl;
   const who = control === "buyers" ? "Buyers" : control === "sellers" ? "Sellers" : "Balanced";
   const mark = reacted ? "✓ " : strong ? "~ " : "";
-  return { pattern, reacted, control, text: `${mark}${PATTERN_TEXT[pattern]} · ${who}`, held };
+  return { pattern, reacted, control, text: `${mark}${PATTERN_TEXT[pattern]} · ${who}`, held, settled, reversalShare };
 }
