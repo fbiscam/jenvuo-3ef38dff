@@ -82,4 +82,5 @@
 - [x] Gifts/Notifications: titles max 3 words, descriptions max 3 lines
 - [x] Terminal opens white by default
 - [x] Fresh sweep, price action and Zone + FVG locked for Free / no-credit accounts; $0.10 per hour while on
+- [x] Terminal + chart strategies only with a plan (30-day paid period) or Pro trial; credit only for API/Terminal AI; help, docs, pricing and Ask Jenvu updated
 - [x] Phones: public page text wraps fully (no cut-off lines) and breaks evenly
