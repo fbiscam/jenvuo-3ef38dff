@@ -76,3 +76,4 @@
 - [x] Terminal dark theme pure black; new black neon pictures on Products and Solutions pages
 - [x] Terminal AI credits: balance + rate under the chat box, clearer low-balance replies; Help Centre article and Ask Jenvu knowledge on what uses credits
 - [x] Chart: only high-probability price action, fresh sweep and liquidity sweep marks shown, on every timeframe
+- [x] Stricter fakeout filtering (zones, price action, sweeps) and white compact desktop Gifts/Notifications
