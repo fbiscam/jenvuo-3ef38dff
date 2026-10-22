@@ -65,6 +65,7 @@ import { Route as AuthenticatedDashboardExtensionRouteImport } from './routes/_a
 import { Route as AuthenticatedDashboardJournalRouteImport } from './routes/_authenticated/dashboard.journal'
 import { Route as AuthenticatedDashboardNotificationsRouteImport } from './routes/_authenticated/dashboard.notifications'
 import { Route as AuthenticatedDashboardPayRouteImport } from './routes/_authenticated/dashboard.pay'
+import { Route as AuthenticatedDashboardPaymentRouteImport } from './routes/_authenticated/dashboard.payment'
 import { Route as AuthenticatedDashboardProfileRouteImport } from './routes/_authenticated/dashboard.profile'
 import { Route as AuthenticatedDashboardReferralsRouteImport } from './routes/_authenticated/dashboard.referrals'
 import { Route as AuthenticatedDashboardRiskRouteImport } from './routes/_authenticated/dashboard.risk'
@@ -396,6 +397,12 @@ const AuthenticatedDashboardPayRoute =
     path: '/pay',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
+const AuthenticatedDashboardPaymentRoute =
+  AuthenticatedDashboardPaymentRouteImport.update({
+    id: '/payment',
+    path: '/payment',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
 const AuthenticatedDashboardProfileRoute =
   AuthenticatedDashboardProfileRouteImport.update({
     id: '/profile',
@@ -678,6 +685,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/journal': typeof AuthenticatedDashboardJournalRoute
   '/dashboard/notifications': typeof AuthenticatedDashboardNotificationsRoute
   '/dashboard/pay': typeof AuthenticatedDashboardPayRoute
+  '/dashboard/payment': typeof AuthenticatedDashboardPaymentRoute
   '/dashboard/profile': typeof AuthenticatedDashboardProfileRoute
   '/dashboard/referrals': typeof AuthenticatedDashboardReferralsRoute
   '/dashboard/risk': typeof AuthenticatedDashboardRiskRoute
@@ -770,6 +778,7 @@ export interface FileRoutesByTo {
   '/dashboard/journal': typeof AuthenticatedDashboardJournalRoute
   '/dashboard/notifications': typeof AuthenticatedDashboardNotificationsRoute
   '/dashboard/pay': typeof AuthenticatedDashboardPayRoute
+  '/dashboard/payment': typeof AuthenticatedDashboardPaymentRoute
   '/dashboard/profile': typeof AuthenticatedDashboardProfileRoute
   '/dashboard/referrals': typeof AuthenticatedDashboardReferralsRoute
   '/dashboard/risk': typeof AuthenticatedDashboardRiskRoute
@@ -868,6 +877,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/journal': typeof AuthenticatedDashboardJournalRoute
   '/_authenticated/dashboard/notifications': typeof AuthenticatedDashboardNotificationsRoute
   '/_authenticated/dashboard/pay': typeof AuthenticatedDashboardPayRoute
+  '/_authenticated/dashboard/payment': typeof AuthenticatedDashboardPaymentRoute
   '/_authenticated/dashboard/profile': typeof AuthenticatedDashboardProfileRoute
   '/_authenticated/dashboard/referrals': typeof AuthenticatedDashboardReferralsRoute
   '/_authenticated/dashboard/risk': typeof AuthenticatedDashboardRiskRoute
@@ -966,6 +976,7 @@ export interface FileRouteTypes {
     | '/dashboard/journal'
     | '/dashboard/notifications'
     | '/dashboard/pay'
+    | '/dashboard/payment'
     | '/dashboard/profile'
     | '/dashboard/referrals'
     | '/dashboard/risk'
@@ -1058,6 +1069,7 @@ export interface FileRouteTypes {
     | '/dashboard/journal'
     | '/dashboard/notifications'
     | '/dashboard/pay'
+    | '/dashboard/payment'
     | '/dashboard/profile'
     | '/dashboard/referrals'
     | '/dashboard/risk'
@@ -1155,6 +1167,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/journal'
     | '/_authenticated/dashboard/notifications'
     | '/_authenticated/dashboard/pay'
+    | '/_authenticated/dashboard/payment'
     | '/_authenticated/dashboard/profile'
     | '/_authenticated/dashboard/referrals'
     | '/_authenticated/dashboard/risk'
@@ -1652,6 +1665,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardPayRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
+    '/_authenticated/dashboard/payment': {
+      id: '/_authenticated/dashboard/payment'
+      path: '/payment'
+      fullPath: '/dashboard/payment'
+      preLoaderRoute: typeof AuthenticatedDashboardPaymentRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
     '/_authenticated/dashboard/profile': {
       id: '/_authenticated/dashboard/profile'
       path: '/profile'
@@ -1938,6 +1958,7 @@ interface AuthenticatedDashboardRouteChildren {
   AuthenticatedDashboardJournalRoute: typeof AuthenticatedDashboardJournalRoute
   AuthenticatedDashboardNotificationsRoute: typeof AuthenticatedDashboardNotificationsRoute
   AuthenticatedDashboardPayRoute: typeof AuthenticatedDashboardPayRoute
+  AuthenticatedDashboardPaymentRoute: typeof AuthenticatedDashboardPaymentRoute
   AuthenticatedDashboardProfileRoute: typeof AuthenticatedDashboardProfileRoute
   AuthenticatedDashboardReferralsRoute: typeof AuthenticatedDashboardReferralsRoute
   AuthenticatedDashboardRiskRoute: typeof AuthenticatedDashboardRiskRoute
@@ -1970,6 +1991,7 @@ const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
     AuthenticatedDashboardNotificationsRoute:
       AuthenticatedDashboardNotificationsRoute,
     AuthenticatedDashboardPayRoute: AuthenticatedDashboardPayRoute,
+    AuthenticatedDashboardPaymentRoute: AuthenticatedDashboardPaymentRoute,
     AuthenticatedDashboardProfileRoute: AuthenticatedDashboardProfileRoute,
     AuthenticatedDashboardReferralsRoute: AuthenticatedDashboardReferralsRoute,
     AuthenticatedDashboardRiskRoute: AuthenticatedDashboardRiskRoute,
