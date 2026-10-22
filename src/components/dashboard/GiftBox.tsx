@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Gift } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { GIFT_REASONS, countUnseenGifts, giftTitle } from "@/lib/gifts";
+import { shortTitle } from "@/lib/notice-text";
 
 type GiftRow = { id: string; delta: number; reason: string; created_at: string };
 
@@ -100,8 +101,8 @@ export default function GiftBox() {
                     <Gift className="h-4 w-4" />
                   </span>
                   <div className="min-w-0 flex-1">
-                    <p className="text-[13px] text-gc-ink sm:text-[14px]">{giftTitle(g.reason)}</p>
-                    <p className="mt-0.5 text-[12px] text-gc-ink-muted sm:text-[13px]">+${Number(g.delta).toFixed(2)} credit </p>
+                    <p className="truncate text-[13px] text-gc-ink sm:text-[14px]">{shortTitle(giftTitle(g.reason))}</p>
+                    <p className="mt-0.5 line-clamp-3 text-[12px] text-gc-ink-muted sm:text-[13px]">+${Number(g.delta).toFixed(2)} credit </p>
                   </div>
                   <span className="shrink-0 text-[11px] text-gc-ink-muted sm:text-[12px]">{timeAgo(g.created_at)}</span>
                 </div>

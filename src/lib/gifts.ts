@@ -16,7 +16,7 @@ export function isGiftReason(reason: string): reason is GiftReason {
 export function giftTitle(reason: string): string {
   switch (reason) {
     case "admin_grant":
-      return "Gift from Jenvu team";
+      return "Jenvu team gift";
     case "promo_bonus":
       return "Bonus credit";
     case "pro_trial_grant":
