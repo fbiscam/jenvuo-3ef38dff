@@ -27,21 +27,21 @@ export default function TwoFactorReminder() {
   };
 
   return (
-    <section className="mb-6 flex items-start gap-4 rounded-lg border border-gc-border bg-gc-surface p-5">
+    <section className="mb-6 flex items-start gap-4 rounded-lg border border-gc-line bg-gc-blue-soft p-5">
       <ShieldCheck className="mt-0.5 h-6 w-6 shrink-0 text-gc-blue" aria-hidden="true" />
       <div className="min-w-0 flex-1">
         <h2 className="text-[17px] font-medium text-gc-ink">Protect your account with 2FA</h2>
-        <p className="mt-1 text-[14px] text-gc-muted">
+        <p className="mt-1 text-[14px] text-gc-ink-muted">
           Turn on two-factor sign-in with an authenticator app. Even if someone gets your password, they can't sign in without your phone.
         </p>
         <Link
           to="/dashboard/profile"
-          className="mt-3 inline-flex items-center rounded-md bg-gc-blue px-4 py-2 text-[14px] font-medium text-primary-foreground hover:opacity-90"
+          className="mt-3 inline-flex items-center rounded-md bg-gc-blue px-4 py-2 text-[14px] font-medium text-gc-on-blue hover:bg-gc-blue-hover"
         >
           Turn on 2FA
         </Link>
       </div>
-      <button type="button" onClick={dismiss} aria-label="Remind me tomorrow" className="rounded p-1 text-gc-muted hover:bg-gc-border/40">
+      <button type="button" onClick={dismiss} aria-label="Remind me tomorrow" className="rounded p-1 text-gc-ink-muted hover:bg-gc-canvas">
         <X className="h-4 w-4" />
       </button>
     </section>
