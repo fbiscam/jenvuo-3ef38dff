@@ -18,6 +18,7 @@ export type Database = {
         Row: {
           created_at: string
           fingerprint: string | null
+          hw_fingerprint: string | null
           id: string
           ip: string | null
           user_agent: string | null
@@ -26,6 +27,7 @@ export type Database = {
         Insert: {
           created_at?: string
           fingerprint?: string | null
+          hw_fingerprint?: string | null
           id?: string
           ip?: string | null
           user_agent?: string | null
@@ -34,6 +36,7 @@ export type Database = {
         Update: {
           created_at?: string
           fingerprint?: string | null
+          hw_fingerprint?: string | null
           id?: string
           ip?: string | null
           user_agent?: string | null
@@ -1842,6 +1845,42 @@ export type Database = {
           created_at?: string
           id?: string
           role?: Database["public"]["Enums"]["lg_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
+      login_events: {
+        Row: {
+          city: string | null
+          country: string | null
+          created_at: string
+          fingerprint: string | null
+          id: string
+          ip: string | null
+          is_new: boolean
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          fingerprint?: string | null
+          id?: string
+          ip?: string | null
+          is_new?: boolean
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          fingerprint?: string | null
+          id?: string
+          ip?: string | null
+          is_new?: boolean
+          user_agent?: string | null
           user_id?: string
         }
         Relationships: []
