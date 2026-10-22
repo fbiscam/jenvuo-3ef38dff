@@ -77,3 +77,4 @@
 - [x] Terminal AI credits: balance + rate under the chat box, clearer low-balance replies; Help Centre article and Ask Jenvu knowledge on what uses credits
 - [x] Chart: only high-probability price action, fresh sweep and liquidity sweep marks shown, on every timeframe
 - [x] Stricter fakeout filtering (zones, price action, sweeps) and white compact desktop Gifts/Notifications
+- [x] Sweeps only on 1H/2H/4H/1D with stricter fakeout filter
