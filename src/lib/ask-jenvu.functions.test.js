@@ -1,23 +1,22 @@
-/// <reference types="bun" />
 import { beforeEach, describe, expect, mock, test } from "bun:test";
 
 // Exercise the real handler without making provider requests or requiring a session.
 mock.module("@tanstack/react-start", () => ({
   createServerFn: () => ({
-    inputValidator: (validate: (data: unknown) => unknown) => ({
-      handler: (handler: (input: { data: unknown }) => unknown) =>
-        (input: { data: unknown }) => handler({ data: validate(input.data) }),
+    inputValidator: (validate) => ({
+      handler: (handler) =>
+        (input) => handler({ data: validate(input.data) }),
     }),
   }),
 }));
-const optionalUser = mock(async (): Promise<string | null> => null);
-const limit = mock((_key: string) => ({ allowed: true, retryInSec: 0 }));
-const completion = mock(async (_input: unknown) => ({
+const optionalUser = mock(async () => null);
+const limit = mock((_key) => ({ allowed: true, retryInSec: 0 }));
+const completion = mock(async (_input) => ({
   content: "Available plans.\n<<FOLLOWUPS>> Plans | Trial | Founding\n<<AGENT>> no\n<<SALES>> yes",
 }));
 mock.module("@/lib/optional-auth.server", () => ({ getOptionalUserId: optionalUser }));
 mock.module("@tanstack/react-start/server", () => ({
-  getRequestHeader: (name: string) => name === "cf-connecting-ip" ? "192.0.2.10" : undefined,
+  getRequestHeader: (name) => name === "cf-connecting-ip" ? "192.0.2.10" : undefined,
 }));
 mock.module("@/lib/ask-jenvu-knowledge.server", () => ({ getRelevantJenvuKnowledge: () => "Public Jenvu knowledge" }));
 mock.module("@/lib/ai-gateway", () => ({
@@ -27,7 +26,7 @@ mock.module("@/lib/ai-gateway", () => ({
   AiGatewayError: class extends Error {},
 }));
 const { askJenvu } = await import("./ask-jenvu.functions");
-const question = { data: { messages: [{ role: "user" as const, content: "What are the plans?" }] } };
+const question = { data: { messages: [{ role: "user", content: "What are the plans?" }] } };
 
 beforeEach(() => {
   optionalUser.mockClear();
