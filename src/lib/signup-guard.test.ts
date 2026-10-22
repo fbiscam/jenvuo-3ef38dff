@@ -1,4 +1,5 @@
-import { describe, expect, test } from 'bun:test'
+import { describe, it as test } from 'node:test'
+import { expect } from './chart/test-expect'
 import { companyDomainVerdict, ipSubnet, isDisposableMx, splitFingerprint } from './signup-guard'
 import { isDisposableEmail } from './disposable-email-domains'
 
