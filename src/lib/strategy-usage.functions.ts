@@ -16,3 +16,17 @@ export const getStrategyAccess = createServerFn({ method: "GET" })
     const terminal = await checkTerminalAccess(context.supabase as any, context.userId, email);
     return evaluateStrategyAccess(terminal);
   });
+
+/**
+ * Kept for Terminal tabs still running the previous version: same access
+ * answer, never charges (the hourly fee was removed).
+ */
+export const tickStrategyUsage = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: { charge?: boolean } | undefined) => ({ charge: Boolean(input?.charge) }))
+  .handler(async ({ context }) => {
+    const email = (context.claims as { email?: string } | undefined)?.email ?? null;
+    const { checkTerminalAccess } = await import("@/lib/terminal-access.server");
+    const terminal = await checkTerminalAccess(context.supabase as any, context.userId, email);
+    return { ...evaluateStrategyAccess(terminal), balance: 0, fee: 0, charged: false };
+  });
