@@ -192,7 +192,7 @@ export function CloudHero({ price: _price, delta: _delta }: { price: string; del
         <h1 className="jenvu-rise mx-auto mt-7 max-w-[900px] text-[40px] font-medium leading-[1.1] tracking-[-0.5px] text-gc-ink sm:text-[56px] md:text-[60px]">
           The new way to trade gold
         </h1>
-        <p className="jenvu-rise [animation-delay:80ms] max-sm:line-clamp-none line-clamp-2 max-sm:line-clamp-none mx-auto mt-5 max-w-[820px] text-[16px] leading-[1.6] text-gc-ink-muted sm:text-[17px]">
+        <p className="jenvu-rise [animation-delay:80ms] line-clamp-2 max-sm:line-clamp-none mx-auto mt-5 max-w-[820px] text-[16px] leading-[1.6] text-gc-ink-muted sm:text-[17px]">
           Read the chart with AI. Spot sweeps, zones and FVGs live.{" "}
           <span className="font-medium text-gc-ink">Start with $100 credits or a Pro access.</span>
         </p>
@@ -487,7 +487,7 @@ export function CloudProducts() {
                 <Icon className={`h-5 w-5 ${TONE[tone].fg}`} />
               </span>
               <h3 className="mt-5 text-[18px] font-medium text-gc-ink">{title}</h3>
-              <p className="mt-2 max-sm:line-clamp-none line-clamp-2 max-sm:line-clamp-none flex-1 text-[14px] leading-[1.6] text-gc-ink-muted">{body}</p>
+              <p className="mt-2 line-clamp-2 max-sm:line-clamp-none flex-1 text-[14px] leading-[1.6] text-gc-ink-muted">{body}</p>
               <span className="mt-5 inline-flex items-center gap-1 text-[14px] font-medium text-gc-blue">
                 Learn more <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
               </span>
