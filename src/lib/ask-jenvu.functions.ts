@@ -32,8 +32,6 @@ After your answer, on new lines, output exactly:
 KNOWLEDGE:
 ${knowledge}`;
 
-const ANON_DAILY_PER_IP = 20;
-const ANON_DAILY_GLOBAL = 1500;
 
 export const askJenvu = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => Input.parse(data))
