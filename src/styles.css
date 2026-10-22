@@ -293,6 +293,18 @@
     max-width: 100%;
   }
 
+  /* Phones: long words wrap inside their box and headings/paragraphs break
+     evenly, so no section text runs off-screen or leaves one-word lines. */
+  @media (max-width: 639px) {
+    h1, h2, h3, h4, p, li, blockquote, figcaption {
+      overflow-wrap: break-word;
+      text-wrap: pretty;
+    }
+    h1, h2, h3 {
+      text-wrap: balance;
+    }
+  }
+
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
