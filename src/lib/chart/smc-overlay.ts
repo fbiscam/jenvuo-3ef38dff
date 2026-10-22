@@ -90,8 +90,6 @@ export function resolveZoneOverlaps(
   };
 }
 
-/** Sweeps below this strength are not drawn. */
-const LIQ_MIN_DRAWN_SWEEP = 40;
 
 export const SMC_WINDOW = 150;
 /** HH/HL/LH/LL chart labels use a Fractals-style swing length of 10 bars each side. */

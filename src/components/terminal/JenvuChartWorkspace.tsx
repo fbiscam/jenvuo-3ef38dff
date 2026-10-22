@@ -70,7 +70,8 @@ const PRESSURE_TIMEFRAMES = { has: (_key: string) => true };
 const SD_ZONE_TIMEFRAMES = new Set(["1m", "5m", "15m", "30m", "45m", "1h", "2h", "4h", "1d"]);
 /** "Previous zones & FVG" (last 10 strategy zones) and its switch: 15m and higher only. */
 const SD_HISTORY_TIMEFRAMES = new Set(["15m", "30m", "45m", "1h", "2h", "4h", "1d"]);
-const SWING_SWEEP_TIMEFRAMES = new Set(["5m", "15m", "1h", "2h", "4h"]);
+/** Fresh swing sweep runs on every timeframe (high-probability tags only). */
+const SWING_SWEEP_TIMEFRAMES = { has: (_key: string) => true };
 
 const MemoChart = memo(ChartCanvas);
 
