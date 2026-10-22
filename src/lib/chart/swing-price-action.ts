@@ -16,6 +16,8 @@ export type SwingPriceAction = {
   reacted: boolean;
   control: SwingControl;
   text: string;
+  /** Follow-through held: a reaction candle closed past the swing candle's body and none closed back beyond the swing extreme. */
+  held?: boolean;
 };
 
 const PATTERN_TEXT: Record<SwingPattern, string> = {
@@ -107,9 +109,20 @@ export function classifySwingPriceAction(
   if (pattern === "none" && after < i + PA_REACTION_BARS) pattern = "pending";
   if (pattern === "none" && range > 0 && body <= 0.1 * range) pattern = "indecision";
 
+  // Fakeout guard: within the reaction window a closed candle must move past
+  // the swing candle's body (away from the swing) and no close may re-take the extreme.
+  let followed = pattern === "engulfing" || pattern === "displacement";
+  let retaken = false;
+  for (let k = i + 1; k <= after; k++) {
+    const c = closed[k];
+    if (high ? c.c > s.h : c.c < s.l) { retaken = true; break; }
+    if (high ? c.c < Math.min(s.o, s.c) : c.c > Math.max(s.o, s.c)) followed = true;
+  }
+  const held = followed && !retaken;
+
   const strong = pattern === "pin" || pattern === "engulfing" || pattern === "displacement";
   const reacted = strong && reversalControl;
   const who = control === "buyers" ? "Buyers" : control === "sellers" ? "Sellers" : "Balanced";
   const mark = reacted ? "✓ " : strong ? "~ " : "";
-  return { pattern, reacted, control, text: `${mark}${PATTERN_TEXT[pattern]} · ${who}` };
+  return { pattern, reacted, control, text: `${mark}${PATTERN_TEXT[pattern]} · ${who}`, held };
 }

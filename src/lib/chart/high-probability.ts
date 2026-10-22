@@ -11,9 +11,9 @@ import { LIQ_STRONG_SWEEP } from "./liquidity-sweeps";
 /** Strict cut for drawn liquidity sweeps (above the "strong" grade) to drop fakeouts. */
 export const LIQ_HIGH_CONFIDENCE = Math.max(LIQ_STRONG_SWEEP, 75);
 
-/** Reversal pattern printed AND the reversal side controls the swing (✓). */
+/** Reversal pattern printed, the reversal side controls the swing (✓) and the move held (no fakeout). */
 export function isHighProbabilityPriceAction(pa: SwingPriceAction | undefined | null): boolean {
-  return !!pa && pa.reacted && pa.pattern !== "indecision" && pa.control !== "balanced";
+  return !!pa && pa.reacted && pa.held === true && pa.pattern !== "indecision" && pa.control !== "balanced";
 }
 
 /** Fresh-swing sweep confirmed with a displacement move within 2 candles. */

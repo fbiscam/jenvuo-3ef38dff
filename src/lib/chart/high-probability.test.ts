@@ -14,7 +14,9 @@ const sweep = (strength: number, confirmed: boolean): LiquiditySweep => ({
 
 describe("high-probability filter", () => {
   test("price action shows only when the reversal pattern and control agree", () => {
-    expect(isHighProbabilityPriceAction({ pattern: "pin", reacted: true, control: "sellers", text: "" })).toBe(true);
+    expect(isHighProbabilityPriceAction({ pattern: "pin", reacted: true, control: "sellers", text: "", held: true })).toBe(true);
+    expect(isHighProbabilityPriceAction({ pattern: "pin", reacted: true, control: "sellers", text: "", held: false })).toBe(false);
+    expect(isHighProbabilityPriceAction({ pattern: "pin", reacted: true, control: "sellers", text: "" })).toBe(false);
     expect(isHighProbabilityPriceAction({ pattern: "pin", reacted: false, control: "buyers", text: "" })).toBe(false);
     expect(isHighProbabilityPriceAction({ pattern: "indecision", reacted: false, control: "balanced", text: "" })).toBe(false);
   });

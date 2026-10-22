@@ -70,7 +70,7 @@ const PRESSURE_TIMEFRAMES = { has: (_key: string) => true };
 const SD_ZONE_TIMEFRAMES = new Set(["1m", "5m", "15m", "30m", "45m", "1h", "2h", "4h", "1d"]);
 /** "Previous zones & FVG" (last 10 strategy zones) and its switch: 15m and higher only. */
 const SD_HISTORY_TIMEFRAMES = new Set(["15m", "30m", "45m", "1h", "2h", "4h", "1d"]);
-/** Fresh swing sweep and liquidity sweeps: 1H, 2H, 4H and 1D only (lower timeframes are too noisy). */
+/** Swing price action, fresh swing sweep and liquidity sweeps: 1H, 2H, 4H and 1D only (lower timeframes are too noisy). */
 const SWING_SWEEP_TIMEFRAMES = new Set(["1h", "2h", "4h", "1d"]);
 
 const MemoChart = memo(ChartCanvas);
@@ -377,7 +377,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
   const chartSmcToggles = useMemo<SmcToggles>(() => {
     const zonesOn = (smcToggles.sdStrategy ?? true) && SD_ZONE_TIMEFRAMES.has(timeframe.key);
     const historyOn = (smcToggles.sdHistory ?? false) && SD_HISTORY_TIMEFRAMES.has(timeframe.key);
-    return { ...smcToggles, sdZones: zonesOn, sdStrategy: zonesOn, sdHistory: historyOn, sdPlan: true, swingSweep: (smcToggles.swingSweep ?? true) && SWING_SWEEP_TIMEFRAMES.has(timeframe.key), sweeps: (smcToggles.sweeps ?? true) && SWING_SWEEP_TIMEFRAMES.has(timeframe.key) };
+    return { ...smcToggles, sdZones: zonesOn, sdStrategy: zonesOn, sdHistory: historyOn, sdPlan: true, swingSweep: (smcToggles.swingSweep ?? true) && SWING_SWEEP_TIMEFRAMES.has(timeframe.key), sweeps: (smcToggles.sweeps ?? true) && SWING_SWEEP_TIMEFRAMES.has(timeframe.key), priceAction: (smcToggles.priceAction ?? true) && SWING_SWEEP_TIMEFRAMES.has(timeframe.key) };
   }, [smcToggles, timeframe.key]);
   // Keep the last non-empty history for this pair/timeframe so a failed or
   // empty poll never blanks the chart.
@@ -581,7 +581,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
         (item) =>
           (item.key !== "sdStrategy" || SD_ZONE_TIMEFRAMES.has(timeframe.key)) &&
           (item.key !== "sdHistory" || SD_HISTORY_TIMEFRAMES.has(timeframe.key)) &&
-          ((item.key !== "swingSweep" && item.key !== "sweeps") || SWING_SWEEP_TIMEFRAMES.has(timeframe.key)),
+          ((item.key !== "swingSweep" && item.key !== "sweeps" && item.key !== "priceAction") || SWING_SWEEP_TIMEFRAMES.has(timeframe.key)),
       ).map((item) => (
         <label
           key={item.key}
