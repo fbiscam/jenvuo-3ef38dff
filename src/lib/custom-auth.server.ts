@@ -294,6 +294,9 @@ export async function createSignupOtp(input: { email: string; password: string; 
 
   assertSignupSignals(input)
   await assertNoEmailAlias(email)
+  const signupDomain = email.split('@')[1]?.toLowerCase().trim() || ''
+  await assertRealMailDomain(signupDomain)
+  await assertCompanyDomainCap(signupDomain)
   await assertNotVpn(input.ip)
   await assertDeviceUnderCap(input.ip, input.fingerprint)
 
@@ -407,6 +410,11 @@ export async function verifySignupOtp(input: { email: string; code: string; pass
     assertSignupSignals(input)
     await assertNotVpn(input.ip)
     await assertNoEmailAlias(email)
+    const { isDisposableEmail } = await import('./disposable-email-domains')
+    if (isDisposableEmail(email)) throw new Error('Disposable email addresses are not allowed. Please use a permanent email.')
+    const d = email.split('@')[1]?.toLowerCase().trim() || ''
+    await assertRealMailDomain(d)
+    await assertCompanyDomainCap(d)
     await assertDeviceUnderCap(input.ip, input.fingerprint)
   } catch (e) {
     return { ok: false, error: e instanceof Error ? e.message : 'Signup not allowed on this device.' }
@@ -438,7 +446,8 @@ export async function verifySignupOtp(input: { email: string; code: string; pass
       await (supabaseAdmin as any).from('account_devices').insert({
         user_id: uid,
         ip: (input.ip || '').slice(0, 100) || null,
-        fingerprint: (input.fingerprint || '').slice(0, 128) || null,
+        fingerprint: (input.fingerprint || '').split('_')[0].slice(0, 128) || null,
+        hw_fingerprint: (input.fingerprint || '').split('_')[1]?.slice(0, 64) || null,
         user_agent: (input.userAgent || '').slice(0, 300) || null,
       })
     }
@@ -446,7 +455,7 @@ export async function verifySignupOtp(input: { email: string; code: string; pass
 
   // 14-day Pro trial abuse guard: one trial per device fingerprint / IP.
   try {
-    if (uid) await claimProTrial(uid, input.fingerprint, input.ip)
+    if (uid) await claimProTrial(uid, (input.fingerprint || '').split('_')[0], input.ip)
   } catch { /* never block signup on trial bookkeeping */ }
 
   await consumeOtp(verified.row.id)
