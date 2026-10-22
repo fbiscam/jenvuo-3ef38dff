@@ -70,8 +70,8 @@ import { isMarketClosed } from "@/lib/signals/qualification";
 const PRESSURE_TIMEFRAMES = { has: (_key: string) => true };
 /** Zone + FVG strategy (zones, their FVG, Entry/SL/TP) and its menu switch exist only on these timeframes. */
 const SD_ZONE_TIMEFRAMES = new Set(["1m", "5m", "15m", "30m", "45m", "1h", "2h", "4h", "1d"]);
-/** "Previous zones & FVG" (last 10 strategy zones) and its switch: 15m and higher only. */
-const SD_HISTORY_TIMEFRAMES = new Set(["15m", "30m", "45m", "1h", "2h", "4h", "1d"]);
+/** "Previous zones & FVG" (last 10 swings' zones + FVG) and its switch: every zone timeframe. */
+const SD_HISTORY_TIMEFRAMES = SD_ZONE_TIMEFRAMES;
 /** Swing price action, fresh swing sweep and liquidity sweeps: 1H, 2H, 4H and 1D only (lower timeframes are too noisy). */
 const SWING_SWEEP_TIMEFRAMES = new Set(["1h", "2h", "4h", "1d"]);
 const LOCKED_TOGGLE_KEYS = new Set<string>(LOCKED_STRATEGY_KEYS);
@@ -386,7 +386,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
   const strategiesUnlocked = strategyAccess.allowed;
   const chartSmcToggles = useMemo<SmcToggles>(() => {
     const zonesOn = wantsZones && strategiesUnlocked;
-    const historyOn = (smcToggles.sdHistory ?? false) && SD_HISTORY_TIMEFRAMES.has(timeframe.key) && strategiesUnlocked;
+    const historyOn = (smcToggles.sdHistory ?? true) && SD_HISTORY_TIMEFRAMES.has(timeframe.key) && strategiesUnlocked;
     return { ...smcToggles, sdZones: zonesOn, sdStrategy: zonesOn, sdHistory: historyOn, sdPlan: true, swingSweep: wantsSwingSweep && strategiesUnlocked, sweeps: (smcToggles.sweeps ?? true) && SWING_SWEEP_TIMEFRAMES.has(timeframe.key), priceAction: wantsPriceAction && strategiesUnlocked };
   }, [smcToggles, timeframe.key, wantsZones, wantsSwingSweep, wantsPriceAction, strategiesUnlocked]);
   // Keep the last non-empty history for this pair/timeframe so a failed or
