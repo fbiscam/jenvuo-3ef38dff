@@ -42,13 +42,20 @@ export type CommunityPostRow = {
 };
 
 // ---------- helpers ----------
-async function signAvatars(admin: any, paths: string[]): Promise<Map<string, string>> {
+// Signed links are short-lived so access ends soon after a block.
+const SIGNED_URL_TTL_SEC = 5 * 60;
+
+/** Signs avatar paths only when each path sits in its profile owner's folder. */
+async function signAvatars(admin: any, entries: { path: string; ownerId: string }[]): Promise<Map<string, string>> {
   const map = new Map<string, string>();
-  const priv = paths.filter((p) => p && !/^https?:\/\//i.test(p));
-  const pub = paths.filter((p) => p && /^https?:\/\//i.test(p));
-  for (const p of pub) map.set(p, p);
+  const priv: string[] = [];
+  for (const { path, ownerId } of entries) {
+    if (!path) continue;
+    if (/^https?:\/\//i.test(path)) map.set(path, path);
+    else if (isOwnedMediaRef(path, ownerId)) priv.push(path);
+  }
   if (priv.length) {
-    const { data } = await admin.storage.from("avatars").createSignedUrls(priv, 60 * 60);
+    const { data } = await admin.storage.from("avatars").createSignedUrls(Array.from(new Set(priv)), SIGNED_URL_TTL_SEC);
     for (const it of data ?? []) if (it.path && it.signedUrl) map.set(it.path, it.signedUrl);
   }
   return map;
@@ -67,7 +74,7 @@ async function signCommunityMedia(admin: any, paths: string[]): Promise<Map<stri
   const pub = paths.filter((p) => p && /^https?:\/\//i.test(p));
   for (const p of pub) map.set(p, p);
   if (priv.length) {
-    const { data } = await admin.storage.from("community-media").createSignedUrls(priv, 60 * 60);
+    const { data } = await admin.storage.from("community-media").createSignedUrls(priv, SIGNED_URL_TTL_SEC);
     for (const it of data ?? []) if (it.path && it.signedUrl) map.set(it.path, it.signedUrl);
   }
   return map;
@@ -91,8 +98,10 @@ async function hydratePosts(admin: any, rows: any[], viewerId: string): Promise<
   const profMap = new Map<string, { name: string | null; avatar: string | null }>();
   for (const p of profs ?? []) profMap.set(p.id, { name: p.full_name ?? null, avatar: p.avatar_url ?? null });
 
-  const avatarPaths = Array.from(new Set(Array.from(profMap.values()).map((p) => p.avatar).filter((x): x is string => !!x)));
-  const avatarSigned = await signAvatars(admin, avatarPaths);
+  const avatarSigned = await signAvatars(
+    admin,
+    Array.from(profMap.entries()).filter(([, p]) => !!p.avatar).map(([id, p]) => ({ path: p.avatar as string, ownerId: id })),
+  );
 
   // Only sign storage paths inside the post author's own folder.
   const allMedia = Array.from(
@@ -215,7 +224,7 @@ export const getCommunityProfile = createServerFn({ method: "GET" })
       supabaseAdmin.from("community_follows").select("follower_id").eq("follower_id", context.userId).eq("followee_id", p.user_id).maybeSingle(),
       supabaseAdmin.rpc("community_get_tier", { _user_id: p.user_id }),
     ]);
-    const avatarSigned = await signAvatars(supabaseAdmin, prof?.avatar_url ? [prof.avatar_url] : []);
+    const avatarSigned = await signAvatars(supabaseAdmin, prof?.avatar_url ? [{ path: prof.avatar_url, ownerId: p.user_id }] : []);
     return {
       user_id: p.user_id, handle: p.handle, display_name: p.display_name,
       bio: p.bio, cover_url: p.cover_url,

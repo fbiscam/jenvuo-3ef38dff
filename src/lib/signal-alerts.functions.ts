@@ -65,6 +65,11 @@ export const subscribeToAlerts = createServerFn({ method: 'POST' })
     return { email }
   })
   .handler(async ({ data, context }) => {
+    // Alerts can only go to the signed-in account's own (verified) email.
+    const verifiedEmail = (context.claims?.email as string | undefined)?.toLowerCase()
+    if (!verifiedEmail || verifiedEmail !== data.email) {
+      return { ok: false, error: 'Alerts can only be sent to your account email.' }
+    }
     const { supabaseAdmin } = await import('@/integrations/supabase/client.server')
     // Never let a caller take over a subscription owned by another account.
     const { data: existing } = await supabaseAdmin
