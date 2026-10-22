@@ -374,11 +374,19 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
   const showSmcPressure = smcToggles.pressure && PRESSURE_TIMEFRAMES.has(timeframe.key) && (asset === "XAUUSD" || asset === "BTCUSD");
   // One "Zone + FVG strategy" switch drives zones, their FVGs and Entry/SL/TP
   // together (15m/30m only); the saved switch stays as the user set it.
+  // Paid strategies (Fresh sweep, Swing price action, Zone + FVG) stay locked
+  // unless the server says the plan/trial and credit allow them; $0.10/hour while on.
+  const wantsZones = (smcToggles.sdStrategy ?? true) && SD_ZONE_TIMEFRAMES.has(timeframe.key);
+  const wantsSwingSweep = (smcToggles.swingSweep ?? true) && SWING_SWEEP_TIMEFRAMES.has(timeframe.key);
+  const wantsPriceAction = (smcToggles.priceAction ?? true) && SWING_SWEEP_TIMEFRAMES.has(timeframe.key);
+  const strategyInUse = wantsZones || wantsSwingSweep || wantsPriceAction;
+  const strategyAccess = useStrategyAccess(strategyInUse);
+  const strategiesUnlocked = strategyAccess.allowed;
   const chartSmcToggles = useMemo<SmcToggles>(() => {
-    const zonesOn = (smcToggles.sdStrategy ?? true) && SD_ZONE_TIMEFRAMES.has(timeframe.key);
-    const historyOn = (smcToggles.sdHistory ?? false) && SD_HISTORY_TIMEFRAMES.has(timeframe.key);
-    return { ...smcToggles, sdZones: zonesOn, sdStrategy: zonesOn, sdHistory: historyOn, sdPlan: true, swingSweep: (smcToggles.swingSweep ?? true) && SWING_SWEEP_TIMEFRAMES.has(timeframe.key), sweeps: (smcToggles.sweeps ?? true) && SWING_SWEEP_TIMEFRAMES.has(timeframe.key), priceAction: (smcToggles.priceAction ?? true) && SWING_SWEEP_TIMEFRAMES.has(timeframe.key) };
-  }, [smcToggles, timeframe.key]);
+    const zonesOn = wantsZones && strategiesUnlocked;
+    const historyOn = (smcToggles.sdHistory ?? false) && SD_HISTORY_TIMEFRAMES.has(timeframe.key) && strategiesUnlocked;
+    return { ...smcToggles, sdZones: zonesOn, sdStrategy: zonesOn, sdHistory: historyOn, sdPlan: true, swingSweep: wantsSwingSweep && strategiesUnlocked, sweeps: (smcToggles.sweeps ?? true) && SWING_SWEEP_TIMEFRAMES.has(timeframe.key), priceAction: wantsPriceAction && strategiesUnlocked };
+  }, [smcToggles, timeframe.key, wantsZones, wantsSwingSweep, wantsPriceAction, strategiesUnlocked]);
   // Keep the last non-empty history for this pair/timeframe so a failed or
   // empty poll never blanks the chart.
   const lastGoodBarsRef = useRef<{ key: string; bars: OhlcvBar[] } | null>(null);
@@ -577,6 +585,16 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
       <p className="px-2 pb-1.5 text-[11px] font-normal leading-4 text-muted-foreground sm:pb-2 sm:text-xs">
         Same 10-bar structure engine as the AI desk
       </p>
+      {!strategyAccess.loading && !strategiesUnlocked && (
+        <p className="mx-2 mb-1.5 flex items-start gap-1.5 rounded-md bg-accent px-2 py-1.5 text-[11px] leading-4 text-muted-foreground sm:text-xs">
+          <Lock className="mt-0.5 h-3 w-3 shrink-0" aria-hidden="true" />
+          <span>
+            {strategyAccess.reason === "no_credit"
+              ? "Fresh sweep, price action and Zone + FVG need credit. Add credit to unlock them ($0.10 per hour while on)."
+              : "Fresh sweep, price action and Zone + FVG unlock with a paid plan or the free trial ($0.10 per hour while on)."}
+          </span>
+        </p>
+      )}
       {SMC_LABELS.filter(
         (item) =>
           (item.key !== "sdStrategy" || SD_ZONE_TIMEFRAMES.has(timeframe.key)) &&
