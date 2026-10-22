@@ -88,7 +88,7 @@ export const SD_SUPERSEDE_ATR = 1;
 export const SD_EXTREME_LOOKBACK = 50;
 export const SD_SL_BUFFER_ATR = 0.15;
 /** Zones below this strength are not shown (weak zones tend to fail). */
-export const SD_MIN_STRENGTH = 55;
+export const SD_MIN_STRENGTH = 65;
 /** An opposing FVG within this many ATR of the zone's proximal edge rejects it. */
 export const SD_COUNTER_FVG_ATR = 3;
 /** Strategy mode: the departure FVG's displacement candle must be within this many candles of the swing. */
@@ -178,6 +178,8 @@ export function computeFreshZones(
     const displacementAtr = Math.max(0, (supply ? bodyEdge - far : far - bodyEdge) / atr);
     const live = !!p.live;
     if (!live && displacementAtr < SD_MIN_DISPLACEMENT_ATR) continue;
+    // Strategy mode: only confirmed swings form a zone (no live, unconfirmed fakeouts).
+    if (requireFvg && live) continue;
 
     // Zone: swing candle body edge -> wick extreme, sized between 0.25 and 1 ATR.
     let depth = Math.abs(p.price - bodyEdge);
