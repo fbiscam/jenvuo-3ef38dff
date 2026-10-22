@@ -41,13 +41,12 @@ export const askJenvu = createServerFn({ method: "POST" })
 
     const { getOptionalUserId } = await import("@/lib/optional-auth.server");
     const userId = await getOptionalUserId();
-    if (!userId) return { ok: false, error: "Please sign in to chat with Ask Jenvu." };
 
     const ip =
       getRequestHeader("cf-connecting-ip") ||
       getRequestHeader("x-forwarded-for")?.split(",")[0]?.trim() ||
       "anon";
-    const rl = checkAnalyzeRateLimit(`ask-jenvu:${userId}:${ip}`);
+    const rl = checkAnalyzeRateLimit(`ask-jenvu:${userId ?? "anon"}:${ip}`);
     if (!rl.allowed) return { ok: false, error: `You're asking quickly. Please wait ${rl.retryInSec}s and try again.` };
 
     const history = data.messages.slice(-12);
