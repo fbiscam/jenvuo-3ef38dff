@@ -41,7 +41,9 @@ import { getTerminalChart } from "@/lib/gold-analysis.functions";
 import { cn } from "@/lib/utils";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { XauUsdLogo } from "./XauUsdLogo";
-import { ChartArea, ChartCandlestick, ChevronDown, Clock3, Menu, PanelLeftClose, PanelLeftOpen } from "lucide-react";
+import { ChartArea, ChartCandlestick, ChevronDown, Clock3, Lock, Menu, PanelLeftClose, PanelLeftOpen } from "lucide-react";
+import { useStrategyAccess } from "./useStrategyAccess";
+import { LOCKED_STRATEGY_KEYS } from "@/lib/strategy-access";
 import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
@@ -72,6 +74,7 @@ const SD_ZONE_TIMEFRAMES = new Set(["1m", "5m", "15m", "30m", "45m", "1h", "2h",
 const SD_HISTORY_TIMEFRAMES = new Set(["15m", "30m", "45m", "1h", "2h", "4h", "1d"]);
 /** Swing price action, fresh swing sweep and liquidity sweeps: 1H, 2H, 4H and 1D only (lower timeframes are too noisy). */
 const SWING_SWEEP_TIMEFRAMES = new Set(["1h", "2h", "4h", "1d"]);
+const LOCKED_TOGGLE_KEYS = new Set<string>(LOCKED_STRATEGY_KEYS);
 
 const MemoChart = memo(ChartCanvas);
 
@@ -600,22 +603,29 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
           (item.key !== "sdStrategy" || SD_ZONE_TIMEFRAMES.has(timeframe.key)) &&
           (item.key !== "sdHistory" || SD_HISTORY_TIMEFRAMES.has(timeframe.key)) &&
           ((item.key !== "swingSweep" && item.key !== "sweeps" && item.key !== "priceAction") || SWING_SWEEP_TIMEFRAMES.has(timeframe.key)),
-      ).map((item) => (
+      ).map((item) => {
+        const locked = !strategiesUnlocked && (LOCKED_TOGGLE_KEYS.has(item.key) || item.key === "sdHistory");
+        return (
         <label
           key={item.key}
-          className="flex cursor-pointer items-center justify-between gap-3 rounded-md px-2 py-1.5 hover:bg-accent sm:py-2"
+          className={cn("flex items-center justify-between gap-3 rounded-md px-2 py-1.5 sm:py-2", locked ? "cursor-not-allowed opacity-60" : "cursor-pointer hover:bg-accent")}
         >
           <span className="min-w-0">
-            <span className="block text-[13px] font-normal leading-4 text-foreground sm:text-[15px] sm:leading-5">{item.label}</span>
+            <span className="flex items-center gap-1.5 text-[13px] font-normal leading-4 text-foreground sm:text-[15px] sm:leading-5">
+              {item.label}
+              {locked && <Lock className="h-3 w-3 shrink-0 text-muted-foreground" aria-label="Locked" />}
+            </span>
             <span className="block text-[11px] font-normal leading-4 text-muted-foreground sm:text-xs">{item.hint}</span>
           </span>
           <Switch
-            checked={smcToggles[item.key] ?? DEFAULT_SMC[item.key]}
+            disabled={locked}
+            checked={locked ? false : (smcToggles[item.key] ?? DEFAULT_SMC[item.key])}
             onCheckedChange={(v) => setSmcToggles((cur) => ({ ...cur, [item.key]: v }))}
             className="shrink-0 scale-90 data-[state=checked]:bg-home-accent sm:scale-100 dark:data-[state=checked]:bg-white"
           />
         </label>
-      ))}
+        );
+      })}
     </>
   );
   function renderTools(vertical: boolean) {
