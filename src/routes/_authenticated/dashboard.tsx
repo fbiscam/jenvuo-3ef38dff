@@ -1582,7 +1582,7 @@ function DashboardLayout() {
           }
         >
         {drawerMode && <RenewalNotice />}
-        {drawerMode && pathname !== "/dashboard/terminal" && <StartTrialBanner />}
+        {drawerMode && pathname === "/dashboard" && <StartTrialBanner />}
         {drawerMode && pathname !== "/dashboard/terminal" && <NotificationStrip />}
 
         <main
@@ -1594,7 +1594,6 @@ function DashboardLayout() {
           style={pathname === "/dashboard/terminal" ? undefined : { zoom: 0.9 }}
         >
           <IdVerificationDeadlineNotice access={terminalAccess} />
-          <TerminalTrialNotice access={terminalAccess} />
           {pathname !== "/dashboard/terminal" && <VerificationBanner isAdmin={isAdminUser} />}
 
           {pathname === "/dashboard" ? (
