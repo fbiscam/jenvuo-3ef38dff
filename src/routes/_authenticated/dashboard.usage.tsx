@@ -140,7 +140,8 @@ function UsagePage() {
     queryKey: ["usage-stats"],
     queryFn: () => fetchStats(),
     staleTime: 10_000,
-    refetchInterval: 30_000,
+    refetchInterval: 120_000,
+    refetchIntervalInBackground: false,
     refetchOnWindowFocus: true,
   });
   const [tab, setTab] = useState<"capabilities" | "categories" | "caching" | "safety">(
