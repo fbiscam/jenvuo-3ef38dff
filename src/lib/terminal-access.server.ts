@@ -11,17 +11,15 @@ const ID_DONE_STATUSES = ["received", "pending", "verified"];
 
 export type TerminalAccess = {
   allowed: boolean;
-  reason: "admin" | "founding" | "paid" | "trial" | "trial_ended" | "not_founding" | "id_overdue";
+  reason: "admin" | "founding" | "paid" | "trial" | "trial_ended" | "no_plan" | "not_founding" | "id_overdue";
   /** ISO deadline for ID verification, only while it is still outstanding. */
   idDeadline: string | null;
   /** True when documents are submitted but not yet approved. */
   idSubmitted: boolean;
-  /** ISO end of the free 14-day Terminal trial, only while it is running. */
+  /** ISO end of the Pro free trial, only while it is running. */
   trialEndsAt?: string | null;
 };
 
-/** Every account gets the Terminal free for this long after sign-up. */
-export const TERMINAL_TRIAL_MS = 14 * 24 * 60 * 60 * 1000;
 export const PAID_PLANS = ["pro", "elite", "ultra"] as const;
 
 type Sub = {
@@ -33,26 +31,26 @@ type Sub = {
 };
 
 /**
- * Plan rule: a paid plan (Pro/Elite/Ultra) always unlocks the Terminal.
- * Everyone else (Free) gets it for 14 days after sign-up, or while a Pro
- * trial is running; after that it locks until they upgrade.
+ * Plan rule: the Terminal (and its chart strategies) needs a plan. A paid
+ * plan (Pro/Elite/Ultra) unlocks it for its billing period (about 30 days);
+ * a running Pro free trial ("Start free") unlocks it until the trial ends.
+ * Free accounts stay locked, even when they hold credit; credit only pays
+ * for API and Terminal AI usage.
  */
-export function evaluatePlanAccess(sub: Sub | null, signupAt: string | null, now = Date.now()): TerminalAccess {
+export function evaluatePlanAccess(sub: Sub | null, now = Date.now()): TerminalAccess {
   const base = { idDeadline: null, idSubmitted: false };
-  const active = (sub?.status || "").toLowerCase() === "active";
+  const status = (sub?.status || "").toLowerCase();
+  const active = status === "active" || status === "trialing";
   const periodOk = !sub?.current_period_end || Date.parse(sub.current_period_end) > now;
-  const paid = active && periodOk && !sub?.is_trial && (PAID_PLANS as readonly string[]).includes(String(sub?.plan_id || "").toLowerCase());
+  const plan = String(sub?.plan_id || "").toLowerCase();
+  const paid = active && periodOk && !sub?.is_trial && (PAID_PLANS as readonly string[]).includes(plan);
   if (paid) return { ...base, allowed: true, reason: "paid", trialEndsAt: null };
-  const ends: number[] = [];
-  const signup = Date.parse(signupAt || "");
-  if (Number.isFinite(signup)) ends.push(signup + TERMINAL_TRIAL_MS);
-  if (active && sub?.is_trial && sub.trial_ends_at) {
-    const t = Date.parse(sub.trial_ends_at);
-    if (Number.isFinite(t)) ends.push(t);
+  const trialEnd = Date.parse(sub?.trial_ends_at || "");
+  if (active && sub?.is_trial && Number.isFinite(trialEnd)) {
+    if (trialEnd > now) return { ...base, allowed: true, reason: "trial", trialEndsAt: new Date(trialEnd).toISOString() };
+    return { ...base, allowed: false, reason: "trial_ended", trialEndsAt: null };
   }
-  const end = ends.length ? Math.max(...ends) : 0;
-  if (end > now) return { ...base, allowed: true, reason: "trial", trialEndsAt: new Date(end).toISOString() };
-  return { ...base, allowed: false, reason: "trial_ended", trialEndsAt: null };
+  return { ...base, allowed: false, reason: "no_plan", trialEndsAt: null };
 }
 
 function escapeLike(v: string) {
@@ -74,7 +72,7 @@ export function evaluateFoundingRow(row: Row, now = Date.now()): TerminalAccess 
 
 /**
  * Terminal access: admins, approved Founding members (2-day ID rule),
- * paid plans, and every account's first 14 days (see evaluatePlanAccess).
+ * paid plans and a running Pro free trial (see evaluatePlanAccess).
  */
 export async function checkTerminalAccess(
   supabase: SupabaseClient<any>,
@@ -113,15 +111,12 @@ export async function checkTerminalAccess(
     if (founding.allowed || founding.reason === "id_overdue") return founding;
   }
 
-  const [{ data: sub }, { data: authUser }] = await Promise.all([
-    (supabaseAdmin as any)
-      .from("user_subscriptions")
-      .select("plan_id, status, is_trial, current_period_end, trial_ends_at")
-      .eq("user_id", userId)
-      .order("updated_at", { ascending: false })
-      .limit(1)
-      .maybeSingle(),
-    (supabaseAdmin as any).auth.admin.getUserById(userId),
-  ]);
-  return evaluatePlanAccess(sub ?? null, authUser?.user?.created_at ?? null);
+  const { data: sub } = await (supabaseAdmin as any)
+    .from("user_subscriptions")
+    .select("plan_id, status, is_trial, current_period_end, trial_ends_at")
+    .eq("user_id", userId)
+    .order("updated_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  return evaluatePlanAccess(sub ?? null);
 }
