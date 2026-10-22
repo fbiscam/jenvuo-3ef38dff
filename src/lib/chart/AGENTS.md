@@ -26,3 +26,4 @@
 
 - Chart series creation, live updates and script offsets use the shared rendered indicator list; this prevents hidden duplicate Volume slots from shifting RVOL, EMA and script data.
 - Gold terminal candles use Gate XAU_USDT gold contract as the primary feed (PAXG token was too thin, candle colours differed from TradingView) (Binance only as fallback): Binance blocks the live server region, so Binance-first made preview and live draw different candles and zones.
+- High-probability only (`high-probability.ts`, tested): on every timeframe the chart draws a swing's price-action tag only when it is ✓ (pattern + reversal-side control agree), a fresh-sweep tag only when "confirmed", and pool liquidity sweeps only when held and strength ≥ LIQ_STRONG_SWEEP; this overrides the per-tool timeframe and ≥40 limits above. Why: user wants only the high-probability highs/lows marked, not every reading.
