@@ -15,7 +15,7 @@ export type TerminalAccessState = {
 
 const INITIAL: TerminalAccessState = { loading: true, allowed: false, reason: null, idDeadline: null, idSubmitted: false, trialEndsAt: null };
 
-/** Terminal access for the signed-in user (paid plans, 14-day trial, Founding, admins). */
+/** Terminal access for the signed-in user (paid plans, Pro trial, Founding, admins). */
 export function useTerminalAccess(userId: string | null | undefined): TerminalAccessState {
   const fetchAccess = useServerFn(getTerminalAccess);
   const [state, setState] = useState<TerminalAccessState>(INITIAL);
@@ -92,7 +92,7 @@ export function IdVerificationDeadlineNotice({ access }: { access: TerminalAcces
   );
 }
 
-/** Small banner while the free 14-day Terminal trial is running. */
+/** Small banner while the Pro free trial is running. */
 export function TerminalTrialNotice({ access }: { access: TerminalAccessState }) {
   if (access.loading || !access.allowed || access.reason !== "trial" || !access.trialEndsAt) return null;
   const left = Date.parse(access.trialEndsAt) - Date.now();
@@ -122,8 +122,8 @@ export function TerminalLocked({ reason }: { reason?: string | null }) {
           {overdue
             ? "Your 2-day window to complete ID verification has ended. Submit your ID verification and the Terminal unlocks again automatically."
             : trialEnded
-              ? "Your 14-day free Terminal trial has ended. Upgrade to Pro, Elite or Ultra and the Terminal unlocks again straight away."
-              : "The Terminal is not available on this account right now. Upgrade your plan to unlock it."}
+              ? "Your Pro free trial has ended. Choose Pro, Elite or Ultra and the Terminal unlocks again straight away."
+              : "The Terminal comes with a plan. Choose Pro, Elite or Ultra, or start your free trial from the dashboard, to unlock it. Credit alone pays for API and AI use, and every other page stays open."}
         </p>
         <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
           <Link

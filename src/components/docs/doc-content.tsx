@@ -171,7 +171,7 @@ export const DOC_GROUPS: DocGroup[] = [
         keywords: "access locked founding program id verification",
         body: (
           <>
-            <p>Every account, including Free, can use the Terminal for <strong>14 days</strong> after sign-up. After that it locks on Free and unlocks again as soon as you upgrade to Pro, Elite or Ultra. Approved <strong>Founding Program</strong> members also have access.</p>
+            <p>The Terminal comes with a plan. <strong>Pro, Elite or Ultra</strong> unlock it, including Fresh sweep, Swing price action and Zone + FVG, for each paid <strong>30-day</strong> period. The <strong>Pro free trial</strong> started with “Start free” unlocks it until the trial ends. Accounts without a plan have the Terminal locked, even with credit: credit pays only for the API and Terminal AI, and every other page stays open. Approved <strong>Founding Program</strong> members also have access.</p>
             <ul>
               <li>When your Founding application is approved, you get 3 months of your chosen plan and $250 credit straight away.</li>
               <li>You then have <strong>2 days</strong> to upload an identity document. Once submitted, access continues.</li>

@@ -416,7 +416,6 @@ export const collections: Collection[] = [
             "Signal analysis returning BUY or SELL — deducted from wallet at real cost.",
             "Signal returning WAIT (dead market) — free.",
             "AI terminal chat or analysis — actual prompt and reply tokens at $3 per 1,000,000 tokens.",
-            "Fresh sweep, Swing price action and Zone + FVG strategy on the chart — $0.10 per hour while any of them is switched on (one charge per clock hour). They unlock with Pro, Elite, Ultra, Founding or the free trial, and lock when the balance is empty.",
             "Senior review — its actual tokens are added at the same token rate, with no fixed fee.",
             "A+ broadcast alert delivered to you — free.",
           ]},
@@ -449,12 +448,14 @@ export const collections: Collection[] = [
         summary: "Charts and tools are included with Terminal access; only AI replies use credits.",
         updatedAt: "2026-10-21",
         body: [
-          { type: "p", content: "Terminal access lets you use the chart as much as you like. Only AI features use credits, because each AI reply has a real processing cost. Every charge is checked and deducted on Jenvu's servers before an answer is returned, so it cannot be skipped from the browser." },
+          { type: "p", content: "The Terminal comes with a plan: Pro, Elite or Ultra unlock it for each paid 30-day period, and the Pro free trial (\"Start free\") unlocks it until the trial ends. Accounts without a plan have the Terminal locked, even with credit — credit is only for the API and Terminal AI, and every other page stays open." },
+          { type: "p", content: "With Terminal access you can use the chart as much as you like. Only AI features use credits, because each AI reply has a real processing cost. Every charge is checked and deducted on Jenvu's servers before an answer is returned, so it cannot be skipped from the browser." },
           { type: "h2", content: "Included with Terminal access (no credits)" },
           { type: "ul", items: [
             "Live gold price, candles and all timeframes.",
             "Indicators (RSI, MACD, EMA, Bollinger Bands, ATR, VWAP and more).",
             "SMC tools: swings, BOS/CHoCH, supply and demand zones, fair value gaps and liquidity sweeps.",
+            "Fresh sweep, Swing price action and the Zone + FVG (supply/demand) strategy.",
             "Drawing tools, candle timer, news and economic events, demo trading.",
           ]},
           { type: "h2", content: "Uses credits" },
