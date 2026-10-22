@@ -1,4 +1,5 @@
-import { describe, expect, it } from "bun:test";
+import { describe, it } from "node:test";
+import { expect } from "./test-expect";
 import { evaluateSwingSetup } from "./swing-setup";
 
 type C = { t: number; o: number; h: number; l: number; c: number };
