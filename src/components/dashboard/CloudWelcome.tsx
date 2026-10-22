@@ -1,8 +1,8 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Link } from "@tanstack/react-router";
-import { Check, Loader2, Plus, ArrowRight } from "lucide-react";
-import { useFreeTrial } from "@/hooks/useFreeTrial";
+import { Check, Plus, ArrowRight } from "lucide-react";
+import { useAuthUser } from "@/hooks/useAuthUser";
 import { FOUNDING_CREDIT_USD, FOUNDING_MONTHS } from "@/lib/founding-offer";
 
 const QUICK_ACTIONS = [
@@ -55,7 +55,7 @@ function Tick({ children }: { children: ReactNode }) {
 const FOUNDING_MEMBER_STATUSES = ["approved", "active", "graduated", "verified"];
 
 export default function CloudWelcome({ name: profileName }: { name?: string }) {
-  const { user, eligible, starting, start } = useFreeTrial();
+  const { user } = useAuthUser();
   const [filter, setFilter] = useState<string>(Object.keys(RESOURCES)[0]);
   const [foundingMember, setFoundingMember] = useState(false);
   const meta = (user?.user_metadata ?? {}) as Record<string, unknown>;
@@ -99,41 +99,19 @@ export default function CloudWelcome({ name: profileName }: { name?: string }) {
           <div className="min-w-0">
             <p className="text-[17px] text-gc-ink">Welcome, {name}</p>
             <div role="heading" aria-level={1} className="mt-2 text-[28px] font-normal leading-tight text-gc-ink sm:text-[34px]">
-              {eligible ? "Try Jenvu with $100 in free credits" : "Make the most of Jenvu"}
+              Make the most of Jenvu
             </div>
             <ul className="mt-6 space-y-5">
-              {eligible ? (
-                <>
-                  <Tick>Access to the gold Terminal, AI desk and alerts</Tick>
-                  <Tick>14 days of Pro to spend your credits</Tick>
-                  <Tick>No billing during trial</Tick>
-                </>
-              ) : (
-                <>
-                  <Tick>Read live sweeps, zones and FVGs on XAU/USD</Tick>
-                  <Tick>Ask the AI desk about any chart</Tick>
-                  <Tick>Track usage, billing and API keys in one place</Tick>
-                </>
-              )}
+              <Tick>Read live sweeps, zones and FVGs on XAU/USD</Tick>
+              <Tick>Ask the AI desk about any chart</Tick>
+              <Tick>Track usage, billing and API keys in one place</Tick>
             </ul>
-            {eligible ? (
-              <button
-                type="button"
-                onClick={() => void start()}
-                disabled={starting}
-                className="mt-7 inline-flex h-9 items-center gap-1.5 rounded bg-gc-blue-deep px-4 text-[14px] font-medium text-gc-on-blue hover:bg-gc-navy disabled:opacity-60"
-              >
-                {starting && <Loader2 className="h-4 w-4 animate-spin" />}
-                Try for free
-              </button>
-            ) : (
-              <Link
-                to="/dashboard/billing"
-                className="mt-7 inline-flex h-9 items-center rounded bg-gc-blue-deep px-4 text-[14px] font-medium text-gc-on-blue hover:bg-gc-navy"
-              >
-                View my plan
-              </Link>
-            )}
+            <Link
+              to="/dashboard/billing"
+              className="mt-7 inline-flex h-9 items-center rounded bg-gc-blue-deep px-4 text-[14px] font-medium text-gc-on-blue hover:bg-gc-navy"
+            >
+              View my plan
+            </Link>
           </div>
 
           <div className="min-w-0 border-gc-line lg:border-l lg:pl-6">
