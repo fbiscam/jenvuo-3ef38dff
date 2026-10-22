@@ -5,11 +5,11 @@ import { isDisposableEmail } from './disposable-email-domains'
 
 describe('signup guard', () => {
   test('company domain allows 4 existing accounts, blocks the 6th', () => {
-    expect(companyDomainVerdict(4, 0)).toBeNull()
-    expect(companyDomainVerdict(5, 0)).not.toBeNull()
+    expect(companyDomainVerdict(4, 0)).toBe(null)
+    expect(companyDomainVerdict(5, 0) === null).toBe(false)
   })
   test('company domain burst of 2 in an hour blocks', () => {
-    expect(companyDomainVerdict(1, 2)).not.toBeNull()
+    expect(companyDomainVerdict(1, 2) === null).toBe(false)
   })
   test('temp-mail providers the user named are blocked', () => {
     for (const d of ['temp-mail.org', 'temp-mail.io', 'tempail.com', 'yopmail.com', 'mail.tm', 'mailinator.com', 'guerrillamail.com', 'burnermail.io', 'emailondeck.com']) {
