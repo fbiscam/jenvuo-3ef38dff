@@ -319,7 +319,9 @@ function TerminalPage() {
     window.addEventListener("jenvu:terminal-ask-ai", open);
     return () => window.removeEventListener("jenvu:terminal-ask-ai", open);
   }, []);
-  const [theme, setTheme] = useState<"light" | "dark">("dark");
+  const [theme, setTheme] = useState<"light" | "dark">("light");
+  // Only an explicit pick (side-rail switch or Settings) turns the Terminal dark.
+  const pickedLookRef = useRef<"light" | "dark" | null>(null);
   const [watchlistOpen, setWatchlistOpen] = useState(true);
   // Trading layout (order panel, positions, market watch, technicals, risk) — on by default.
   const [panelsOpen, setPanelsOpen] = useState(true);
@@ -540,6 +542,7 @@ function TerminalPage() {
         timeframe?: string;
         theme?: "light" | "dark";
         look?: "light" | "dark";
+        pickedLook?: "light" | "dark";
         deskOpen?: boolean;
         watchlistOpen?: boolean;
         tradingPanels?: boolean;
@@ -547,8 +550,11 @@ function TerminalPage() {
       const savedTimeframe = TIMEFRAMES.find((timeframe) => timeframe.key === settings?.timeframe);
       if (savedTimeframe) setTf(savedTimeframe);
       if (settings?.watchlistOpen === false) setWatchlistOpen(false);
-      // Black dashboard is the default; only an explicit pick from the switch turns it light.
-      if (settings?.look === "light") setTheme("light");
+      // White is the default; only an explicit pick turns the Terminal dark.
+      if (settings?.pickedLook === "dark" || settings?.pickedLook === "light") {
+        pickedLookRef.current = settings.pickedLook;
+        setTheme(settings.pickedLook);
+      }
       // The AI desk always starts closed so the chart opens exactly as left.
     } catch {
       // Keep a clean workspace if saved browser data is unavailable or malformed.
@@ -570,7 +576,7 @@ function TerminalPage() {
     if (!hydratedRef.current) return;
     window.localStorage.setItem(
       TERMINAL_SETTINGS_KEY,
-      JSON.stringify({ timeframe: tf.key, deskOpen, theme, look: theme, watchlistOpen, tradingPanels: panelsOpen }),
+      JSON.stringify({ timeframe: tf.key, deskOpen, theme, look: theme, pickedLook: pickedLookRef.current, watchlistOpen, tradingPanels: panelsOpen }),
     );
   }, [tf.key, deskOpen, theme, watchlistOpen, panelsOpen]);
 
@@ -721,7 +727,13 @@ function TerminalPage() {
                 <>
                   <button
                     type="button"
-                    onClick={() => setTheme((t) => (t === "dark" ? "light" : "dark"))}
+                    onClick={() =>
+                      setTheme((t) => {
+                        const next = t === "dark" ? "light" : "dark";
+                        pickedLookRef.current = next;
+                        return next;
+                      })
+                    }
                     aria-label={theme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
                     title={theme === "dark" ? "Light theme" : "Dark theme"}
                     className="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full px-2.5 text-[13px] font-medium text-gc-ink-muted transition-colors hover:bg-gc-console-search hover:text-gc-ink dark:text-muted-foreground dark:hover:bg-accent w-8 justify-center px-0"
