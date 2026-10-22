@@ -294,7 +294,7 @@ function StoriesCards({ c }: { c: IndustryContent }) {
             <div className="absolute inset-0 bg-gradient-to-t from-gc-night via-gc-night/20 to-transparent" />
             <div className="absolute inset-x-0 bottom-0 p-6">
               <p className="text-[12px] font-medium uppercase tracking-wider text-gc-on-night-muted">{s.tag}</p>
-              <h3 className="mt-2 line-clamp-2 text-[20px] font-normal leading-snug">{s.title}</h3>
+              <h3 className="mt-2 line-clamp-2 max-sm:line-clamp-none text-[20px] font-normal leading-snug">{s.title}</h3>
               <span className="mt-4 inline-flex items-center gap-1 text-[14px] font-medium">
                 Read now <ArrowRight className="h-4 w-4" />
               </span>

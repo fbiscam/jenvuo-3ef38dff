@@ -416,6 +416,7 @@ export const collections: Collection[] = [
             "Signal analysis returning BUY or SELL — deducted from wallet at real cost.",
             "Signal returning WAIT (dead market) — free.",
             "AI terminal chat or analysis — actual prompt and reply tokens at $3 per 1,000,000 tokens.",
+            "Fresh sweep, Swing price action and Zone + FVG strategy on the chart — $0.10 per hour while any of them is switched on (one charge per clock hour). They unlock with Pro, Elite, Ultra, Founding or the free trial, and lock when the balance is empty.",
             "Senior review — its actual tokens are added at the same token rate, with no fixed fee.",
             "A+ broadcast alert delivered to you — free.",
           ]},

@@ -192,7 +192,7 @@ export function CloudHero({ price: _price, delta: _delta }: { price: string; del
         <h1 className="jenvu-rise mx-auto mt-7 max-w-[900px] text-[40px] font-medium leading-[1.1] tracking-[-0.5px] text-gc-ink sm:text-[56px] md:text-[60px]">
           The new way to trade gold
         </h1>
-        <p className="jenvu-rise [animation-delay:80ms] line-clamp-2 mx-auto mt-5 max-w-[820px] text-[16px] leading-[1.6] text-gc-ink-muted sm:text-[17px]">
+        <p className="jenvu-rise [animation-delay:80ms] line-clamp-2 max-sm:line-clamp-none mx-auto mt-5 max-w-[820px] text-[16px] leading-[1.6] text-gc-ink-muted sm:text-[17px]">
           Read the chart with AI. Spot sweeps, zones and FVGs live.{" "}
           <span className="font-medium text-gc-ink">Start with $100 credits or a Pro access.</span>
         </p>
@@ -472,7 +472,7 @@ export function CloudProducts() {
           <h2 className="text-[32px] font-normal leading-[1.2] text-gc-ink sm:text-[40px]">
             Everything you need to read the gold market
           </h2>
-          <p className="line-clamp-2 mt-4 text-[17px] leading-[1.6] text-gc-ink-muted">
+          <p className="line-clamp-2 max-sm:line-clamp-none mt-4 text-[17px] leading-[1.6] text-gc-ink-muted">
             Tools that work together across the Terminal, the AI desk and your browser.
           </p>
         </div>
@@ -487,7 +487,7 @@ export function CloudProducts() {
                 <Icon className={`h-5 w-5 ${TONE[tone].fg}`} />
               </span>
               <h3 className="mt-5 text-[18px] font-medium text-gc-ink">{title}</h3>
-              <p className="mt-2 line-clamp-2 flex-1 text-[14px] leading-[1.6] text-gc-ink-muted">{body}</p>
+              <p className="mt-2 line-clamp-2 max-sm:line-clamp-none flex-1 text-[14px] leading-[1.6] text-gc-ink-muted">{body}</p>
               <span className="mt-5 inline-flex items-center gap-1 text-[14px] font-medium text-gc-blue">
                 Learn more <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
               </span>
@@ -557,7 +557,7 @@ export function CloudUseCases() {
         <div className="mt-12 grid items-center gap-10 md:grid-cols-2">
           <div>
             <h3 className="text-[28px] font-normal leading-[1.25] text-gc-ink">{current.title}</h3>
-            <p className="line-clamp-2 mt-4 text-[17px] leading-[1.6] text-gc-ink-muted">{current.body}</p>
+            <p className="line-clamp-2 max-sm:line-clamp-none mt-4 text-[17px] leading-[1.6] text-gc-ink-muted">{current.body}</p>
             <ul className="mt-6 space-y-3">
               {current.points.map((p) => (
                 <li key={p} className="flex items-center gap-3 text-[15px] text-gc-ink">
@@ -595,7 +595,7 @@ export function CloudPricing() {
         <div className="grid gap-10 md:grid-cols-[1fr_2fr] md:items-start">
           <div>
             <h2 className="text-[32px] font-normal leading-[1.2] text-gc-ink sm:text-[40px]">Simple, monthly pricing</h2>
-            <p className="line-clamp-2 mt-4 text-[17px] leading-[1.6] text-gc-ink-muted">
+            <p className="line-clamp-2 max-sm:line-clamp-none mt-4 text-[17px] leading-[1.6] text-gc-ink-muted">
               Every plan includes an AI wallet equal to the plan price. Extra AI usage is $3 per million tokens.
             </p>
             <div className="mt-8">
@@ -611,7 +611,7 @@ export function CloudPricing() {
                   <span className="text-[36px] font-normal text-gc-ink">{p.price}</span>
                   <span className="text-[14px] text-gc-ink-muted">/ month</span>
                 </div>
-                <p className="line-clamp-2 mt-3 flex-1 text-[14px] leading-[1.6] text-gc-ink-muted">{p.note}</p>
+                <p className="line-clamp-2 max-sm:line-clamp-none mt-3 flex-1 text-[14px] leading-[1.6] text-gc-ink-muted">{p.note}</p>
                 <Link to="/pricing" className="mt-6 inline-flex items-center gap-1 text-[14px] font-medium text-gc-blue hover:underline">
                   Details <ArrowRight className="h-4 w-4" />
                 </Link>
@@ -641,7 +641,7 @@ export function CloudResources() {
             <Link key={title} to={to} className="group rounded-xl border border-gc-line p-7 transition hover:border-gc-blue">
               <Icon className={`h-8 w-8 ${TONE[tone].fg}`} strokeWidth={1.75} />
               <h3 className="mt-5 text-[20px] font-medium text-gc-ink">{title}</h3>
-              <p className="line-clamp-2 mt-2 text-[15px] leading-[1.6] text-gc-ink-muted">{body}</p>
+              <p className="line-clamp-2 max-sm:line-clamp-none mt-2 text-[15px] leading-[1.6] text-gc-ink-muted">{body}</p>
               <span className="mt-6 inline-flex items-center gap-1 text-[14px] font-medium text-gc-blue">
                 {cta} <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
               </span>
