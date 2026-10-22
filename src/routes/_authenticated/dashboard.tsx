@@ -21,6 +21,7 @@ import DashboardTopBar from "@/components/dashboard/DashboardTopBar";
 import NotificationStrip from "@/components/dashboard/NotificationStrip";
 import CloudWelcome from "@/components/dashboard/CloudWelcome";
 import TwoFactorReminder from "@/components/dashboard/TwoFactorReminder";
+import WelcomeOnboarding from "@/components/dashboard/WelcomeOnboarding";
 import { useLivePriceStream } from "@/hooks/useLivePriceStream";
 import { useLivePrices } from "@/hooks/useLivePrices";
 import { getMarketSnapshot } from "@/lib/gold-analysis.functions";
@@ -1599,6 +1600,7 @@ function DashboardLayout() {
 
           {pathname === "/dashboard" ? (
             <>
+              <WelcomeOnboarding />
               <TwoFactorReminder />
               <CloudWelcome name={fullName} />
 
