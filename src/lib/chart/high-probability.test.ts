@@ -30,7 +30,7 @@ describe("high-probability filter", () => {
     expect(isHighProbabilitySweep({ status: "failed", level: 1, text: "" })).toBe(false);
     expect(isHighProbabilitySweep({ status: "pending", level: 1, text: "" })).toBe(false);
   });
-  test("liquidity sweep needs strength 75+ and a held next candle", () => {
+  test("liquidity sweep needs strength 80+ and a held next candle", () => {
     expect(isHighProbabilityLiquiditySweep(sweep(80, true))).toBe(true);
     expect(isHighProbabilityLiquiditySweep(sweep(79, true))).toBe(false);
     expect(isHighProbabilityLiquiditySweep(sweep(90, false))).toBe(false);
