@@ -20,6 +20,7 @@ import RenewalNotice from "@/components/billing/RenewalNotice";
 import DashboardTopBar from "@/components/dashboard/DashboardTopBar";
 import NotificationStrip from "@/components/dashboard/NotificationStrip";
 import CloudWelcome from "@/components/dashboard/CloudWelcome";
+import TwoFactorReminder from "@/components/dashboard/TwoFactorReminder";
 import { useLivePriceStream } from "@/hooks/useLivePriceStream";
 import { useLivePrices } from "@/hooks/useLivePrices";
 import { getMarketSnapshot } from "@/lib/gold-analysis.functions";
@@ -1598,6 +1599,7 @@ function DashboardLayout() {
 
           {pathname === "/dashboard" ? (
             <>
+              <TwoFactorReminder />
               <CloudWelcome name={fullName} />
 
               {/* Extension usage analytics — Cloudflare-style */}

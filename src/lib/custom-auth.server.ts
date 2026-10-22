@@ -218,23 +218,67 @@ async function assertNotVpn(ip: string | undefined) {
   }
 }
 
-async function assertDeviceUnderCap(ip: string | undefined, fingerprint: string) {
+async function assertDeviceUnderCap(ip: string | undefined, rawFingerprint: string) {
   const { supabaseAdmin } = await import('@/integrations/supabase/client.server')
+  const { splitFingerprint, ipSubnet, MAX_ACCOUNTS_PER_SUBNET_DAY } = await import('./signup-guard')
   const admin = supabaseAdmin as any
-  const { data: deviceRows } = await admin
-    .from('account_devices')
-    .select('user_id')
-    .eq('fingerprint', fingerprint)
-  const deviceAccounts = new Set((deviceRows ?? []).map((row: { user_id: string }) => row.user_id)).size
-  if (deviceAccounts >= MAX_ACCOUNTS_PER_DEVICE) {
-    throw new Error('This device already has the maximum number of accounts. Please sign in to your existing account.')
+  const { browser, hardware } = splitFingerprint(rawFingerprint)
+  const tooMany = 'An account is already linked to this device. Please sign in to your existing account.'
+  const countUsers = (rows: { user_id: string }[] | null) => new Set((rows ?? []).map((r) => r.user_id)).size
+  for (const fp of [browser, rawFingerprint]) {
+    const { data } = await admin.from('account_devices').select('user_id').eq('fingerprint', fp)
+    if (countUsers(data) >= MAX_ACCOUNTS_PER_DEVICE) throw new Error(tooMany)
+  }
+  if (hardware) {
+    const { data } = await admin.from('account_devices').select('user_id').eq('hw_fingerprint', hardware)
+    if (countUsers(data) >= MAX_ACCOUNTS_PER_DEVICE) throw new Error(tooMany)
   }
   const normalizedIp = (ip || '').trim().slice(0, 100)
   if (normalizedIp) {
     const { data: ipRows } = await admin.from('account_devices').select('user_id').eq('ip', normalizedIp)
-    const ipAccounts = new Set((ipRows ?? []).map((row: { user_id: string }) => row.user_id)).size
-    if (ipAccounts >= MAX_ACCOUNTS_PER_IP) throw new Error('This network already has the maximum number of accounts. Please sign in to an existing account.')
+    if (countUsers(ipRows) >= MAX_ACCOUNTS_PER_IP) throw new Error('An account is already linked to this network. Please sign in to your existing account.')
+    const subnet = ipSubnet(normalizedIp)
+    if (subnet) {
+      const since = new Date(Date.now() - 24 * 60 * 60_000).toISOString()
+      const { data: netRows } = await admin.from('account_devices').select('user_id').like('ip', `${subnet}%`).gte('created_at', since)
+      if (countUsers(netRows) >= MAX_ACCOUNTS_PER_SUBNET_DAY) throw new Error('Too many new accounts from this network today. Please try again tomorrow.')
+    }
   }
+}
+
+// Looks up the domain's mail servers (DNS over HTTPS). Blocks domains with no
+// mail server or whose mail goes to a temp-mail service. Fails open on errors.
+async function assertRealMailDomain(domain: string) {
+  if (!domain || PUBLIC_EMAIL_PROVIDERS.has(domain)) return
+  const { isDisposableMx } = await import('./signup-guard')
+  try {
+    const res = await fetch(`https://cloudflare-dns.com/dns-query?name=${encodeURIComponent(domain)}&type=MX`, {
+      headers: { accept: 'application/dns-json' },
+      signal: AbortSignal.timeout(3000),
+    })
+    if (!res.ok) return
+    const json: any = await res.json()
+    if (json?.Status === 3) throw new Error('NO_DOMAIN')
+    const hosts: string[] = (json?.Answer ?? []).filter((a: any) => a.type === 15).map((a: any) => String(a.data).split(' ').pop() || '')
+    if (json?.Status === 0 && hosts.length === 0) throw new Error('NO_MX')
+    if (hosts.some(isDisposableMx)) throw new Error('DISPOSABLE')
+  } catch (e) {
+    const m = (e as Error)?.message
+    if (m === 'NO_DOMAIN' || m === 'NO_MX') throw new Error('This email domain cannot receive mail. Please use a real email address.')
+    if (m === 'DISPOSABLE') throw new Error('Disposable email addresses are not allowed. Please use a permanent email.')
+  }
+}
+
+async function assertCompanyDomainCap(domain: string) {
+  if (!domain || PUBLIC_EMAIL_PROVIDERS.has(domain)) return
+  const { supabaseAdmin } = await import('@/integrations/supabase/client.server')
+  const { companyDomainVerdict } = await import('./signup-guard')
+  const admin = supabaseAdmin as any
+  const { count: total } = await admin.from('profiles').select('id', { count: 'exact', head: true }).ilike('email', `%@${domain}`)
+  const since = new Date(Date.now() - 60 * 60_000).toISOString()
+  const { data: recent } = await admin.from('profiles').select('id').ilike('email', `%@${domain}`).gte('created_at', since)
+  const verdict = companyDomainVerdict(total ?? 0, (recent ?? []).length)
+  if (verdict) throw new Error(verdict)
 }
 
 export async function createSignupOtp(input: { email: string; password: string; fullName: string; siteUrl?: string; ip?: string; country?: string; fingerprint: string; userAgent?: string }) {
@@ -250,6 +294,9 @@ export async function createSignupOtp(input: { email: string; password: string; 
 
   assertSignupSignals(input)
   await assertNoEmailAlias(email)
+  const signupDomain = email.split('@')[1]?.toLowerCase().trim() || ''
+  await assertRealMailDomain(signupDomain)
+  await assertCompanyDomainCap(signupDomain)
   await assertNotVpn(input.ip)
   await assertDeviceUnderCap(input.ip, input.fingerprint)
 
@@ -363,6 +410,11 @@ export async function verifySignupOtp(input: { email: string; code: string; pass
     assertSignupSignals(input)
     await assertNotVpn(input.ip)
     await assertNoEmailAlias(email)
+    const { isDisposableEmail } = await import('./disposable-email-domains')
+    if (isDisposableEmail(email)) throw new Error('Disposable email addresses are not allowed. Please use a permanent email.')
+    const d = email.split('@')[1]?.toLowerCase().trim() || ''
+    await assertRealMailDomain(d)
+    await assertCompanyDomainCap(d)
     await assertDeviceUnderCap(input.ip, input.fingerprint)
   } catch (e) {
     return { ok: false, error: e instanceof Error ? e.message : 'Signup not allowed on this device.' }
@@ -394,7 +446,8 @@ export async function verifySignupOtp(input: { email: string; code: string; pass
       await (supabaseAdmin as any).from('account_devices').insert({
         user_id: uid,
         ip: (input.ip || '').slice(0, 100) || null,
-        fingerprint: (input.fingerprint || '').slice(0, 128) || null,
+        fingerprint: (input.fingerprint || '').split('_')[0].slice(0, 128) || null,
+        hw_fingerprint: (input.fingerprint || '').split('_')[1]?.slice(0, 64) || null,
         user_agent: (input.userAgent || '').slice(0, 300) || null,
       })
     }
@@ -402,7 +455,7 @@ export async function verifySignupOtp(input: { email: string; code: string; pass
 
   // 14-day Pro trial abuse guard: one trial per device fingerprint / IP.
   try {
-    if (uid) await claimProTrial(uid, input.fingerprint, input.ip)
+    if (uid) await claimProTrial(uid, (input.fingerprint || '').split('_')[0], input.ip)
   } catch { /* never block signup on trial bookkeeping */ }
 
   await consumeOtp(verified.row.id)

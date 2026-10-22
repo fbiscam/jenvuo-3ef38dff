@@ -1,3 +1,6 @@
+import { useEffect } from "react";
+import { useServerFn } from "@tanstack/react-start";
+import { recordLogin } from "@/lib/login-alert.functions";
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { useAutoCloseTrades } from "@/hooks/useAutoCloseTrades";
@@ -32,7 +35,23 @@ async function hasValidTrustedDevice(uid: string): Promise<boolean> {
   return false;
 }
 
+function useLoginAlert() {
+  const record = useServerFn(recordLogin);
+  useEffect(() => {
+    const key = "jenvu_login_recorded";
+    if (sessionStorage.getItem(key)) return;
+    sessionStorage.setItem(key, "1");
+    void (async () => {
+      try {
+        const { getDeviceFingerprint } = await import("@/lib/device-fingerprint");
+        await record({ data: { fingerprint: await getDeviceFingerprint() } });
+      } catch { /* never block the dashboard */ }
+    })();
+  }, [record]);
+}
+
 function AuthenticatedLayout() {
+  useLoginAlert();
   useAutoCloseTrades();
   useGlobalNotificationToasts();
   return <Outlet />;

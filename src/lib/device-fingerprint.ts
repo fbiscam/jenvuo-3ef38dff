@@ -26,6 +26,24 @@ function canvasSignal(): string {
   } catch { return ""; }
 }
 
+function webglSignal(): string {
+  try {
+    const c = document.createElement("canvas");
+    const gl = (c.getContext("webgl") || c.getContext("experimental-webgl")) as WebGLRenderingContext | null;
+    if (!gl) return "";
+    const ext = gl.getExtension("WEBGL_debug_renderer_info");
+    const vendor = ext ? gl.getParameter(ext.UNMASKED_VENDOR_WEBGL) : gl.getParameter(gl.VENDOR);
+    const renderer = ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER);
+    return `${vendor}~${renderer}~${gl.getParameter(gl.MAX_TEXTURE_SIZE)}`;
+  } catch { return ""; }
+}
+
+/**
+ * Returns `<browserHash>_<hardwareHash>`. The first part is the original
+ * per-browser hash (kept so existing device records still match); the second
+ * uses only hardware signals (GPU, screen, cores, memory, timezone) so it stays
+ * the same when someone switches browser or uses private mode on one device.
+ */
 export async function getDeviceFingerprint(): Promise<string> {
   if (typeof window === "undefined") return "";
   try {
@@ -43,7 +61,18 @@ export async function getDeviceFingerprint(): Promise<string> {
       nav.platform || "",
       canvasSignal(),
     ];
-    return await sha256Hex(parts.join("|"));
+    const browser = await sha256Hex(parts.join("|"));
+    const hw = [
+      webglSignal(),
+      `${scr.width}x${scr.height}x${scr.colorDepth}`,
+      String(window.devicePixelRatio ?? ""),
+      String(nav.hardwareConcurrency ?? ""),
+      String((nav as any).deviceMemory ?? ""),
+      String(nav.maxTouchPoints ?? ""),
+      Intl.DateTimeFormat().resolvedOptions().timeZone || "",
+    ];
+    const hardware = (await sha256Hex(hw.join("|"))).slice(0, 40);
+    return `${browser}_${hardware}`;
   } catch {
     return "";
   }
