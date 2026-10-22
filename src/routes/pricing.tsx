@@ -19,6 +19,7 @@ const LINK = "text-gc-blue-deep underline underline-offset-2 hover:text-gc-navy"
 export const FAQ = [
   ["Is this financial advice?", "No. Jenvu is an analysis tool. Every setup is for educational purposes and you remain responsible for your own trades."],
   ["How does the free trial work?", "After signing up, click “Start free” in your dashboard. You get $100 credit and 14 days of Pro access, once per account."],
+  ["Do I need a plan for the Terminal?", "Yes. Pro, Elite or Ultra unlock the Terminal for each 30-day period, and the Pro free trial unlocks it until it ends. Credit alone pays for the API and Terminal AI; without a plan the Terminal stays locked but every other page works."],
   ["Can I cancel anytime?", "Yes. Plans are month-to-month with no lock-in. You keep access until the end of the period you already paid for."],
   ["What markets are covered?", "Gold only. Jenvu focuses on XAU/USD."],
 ];
@@ -51,6 +52,8 @@ export const Route = createFileRoute("/pricing")({
 
 type Mark = boolean | string;
 const COMPARE: ReadonlyArray<{ f: string; b: Mark; c: Mark; d: Mark }> = [
+  { f: "Terminal access (each 30-day period)", b: true, c: true, d: true },
+  { f: "Fresh sweep, price action & Zone + FVG", b: true, c: true, d: true },
   { f: "Monthly AI wallet", b: "$10", c: "$25", d: "$50" },
   { f: "Daily token limit", b: "1.5M", c: "5M", d: "10M" },
   { f: "Balance-based quota ($3 = 1M tokens)", b: true, c: true, d: true },

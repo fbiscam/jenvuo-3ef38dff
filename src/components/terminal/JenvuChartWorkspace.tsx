@@ -377,13 +377,12 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
   const showSmcPressure = smcToggles.pressure && PRESSURE_TIMEFRAMES.has(timeframe.key) && (asset === "XAUUSD" || asset === "BTCUSD");
   // One "Zone + FVG strategy" switch drives zones, their FVGs and Entry/SL/TP
   // together (15m/30m only); the saved switch stays as the user set it.
-  // Paid strategies (Fresh sweep, Swing price action, Zone + FVG) stay locked
-  // unless the server says the plan/trial and credit allow them; $0.10/hour while on.
+  // Plan strategies (Fresh sweep, Swing price action, Zone + FVG) stay locked
+  // unless the server says the account has a plan or a running Pro trial.
   const wantsZones = (smcToggles.sdStrategy ?? true) && SD_ZONE_TIMEFRAMES.has(timeframe.key);
   const wantsSwingSweep = (smcToggles.swingSweep ?? true) && SWING_SWEEP_TIMEFRAMES.has(timeframe.key);
   const wantsPriceAction = (smcToggles.priceAction ?? true) && SWING_SWEEP_TIMEFRAMES.has(timeframe.key);
-  const strategyInUse = wantsZones || wantsSwingSweep || wantsPriceAction;
-  const strategyAccess = useStrategyAccess(strategyInUse);
+  const strategyAccess = useStrategyAccess();
   const strategiesUnlocked = strategyAccess.allowed;
   const chartSmcToggles = useMemo<SmcToggles>(() => {
     const zonesOn = wantsZones && strategiesUnlocked;
@@ -592,9 +591,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
         <p className="mx-2 mb-1.5 flex items-start gap-1.5 rounded-md bg-accent px-2 py-1.5 text-[11px] leading-4 text-muted-foreground sm:text-xs">
           <Lock className="mt-0.5 h-3 w-3 shrink-0" aria-hidden="true" />
           <span>
-            {strategyAccess.reason === "no_credit"
-              ? "Fresh sweep, price action and Zone + FVG need credit. Add credit to unlock them ($0.10 per hour while on)."
-              : "Fresh sweep, price action and Zone + FVG unlock with a paid plan or the free trial ($0.10 per hour while on)."}
+            Fresh sweep, price action and Zone + FVG come with a plan or the Pro free trial.
           </span>
         </p>
       )}
