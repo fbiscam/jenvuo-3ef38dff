@@ -31,14 +31,14 @@ function Segmented<T extends string>({ value, options, onChange, label }: { valu
 
 /** Choices this browser remembers: Terminal theme, chart style and alert sound. */
 export function PreferencesSettings() {
-  const [theme, setTheme] = useState<"dark" | "light">("dark");
+  const [theme, setTheme] = useState<"dark" | "light">("light");
   const [chartStyle, setChartStyle] = useState<"area" | "candles">("area");
   const [sound, setSound] = useState<AlertSoundKey>("chime");
 
   useEffect(() => {
     try {
       const s = JSON.parse(localStorage.getItem(TERMINAL_SETTINGS_KEY) || "null");
-      if (s?.look === "light") setTheme("light");
+      if (s?.pickedLook === "dark" || s?.pickedLook === "light") setTheme(s.pickedLook);
       if (JSON.parse(localStorage.getItem(CHART_STYLE_KEY) || "null") === "candles") setChartStyle("candles");
     } catch { /* keep defaults */ }
     setSound(getAlertSoundPref());
@@ -48,7 +48,7 @@ export function PreferencesSettings() {
     setTheme(next);
     try {
       const s = JSON.parse(localStorage.getItem(TERMINAL_SETTINGS_KEY) || "null") ?? {};
-      localStorage.setItem(TERMINAL_SETTINGS_KEY, JSON.stringify({ ...s, theme: next, look: next }));
+      localStorage.setItem(TERMINAL_SETTINGS_KEY, JSON.stringify({ ...s, theme: next, look: next, pickedLook: next }));
       toast.success("Terminal theme saved");
     } catch { /* ignore */ }
   };
