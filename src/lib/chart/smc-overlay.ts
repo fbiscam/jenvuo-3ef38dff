@@ -19,6 +19,11 @@ import { computeLiquidityMap, type LiquidityMap } from "./liquidity-sweeps";
 import { computeFreshFvgs, FVG_MAX_TOTAL, type FreshFvg } from "./fresh-fvgs";
 import { classifySwingSweep, type SwingSweep } from "./swing-sweep";
 import { classifySwingPriceAction, type SwingPriceAction } from "./swing-price-action";
+import {
+  isHighProbabilityLiquiditySweep,
+  isHighProbabilityPriceAction,
+  isHighProbabilitySweep,
+} from "./high-probability";
 
 /** Zone + FVG strategy: only the single latest zone (with its own displacement FVG and plan) is shown. */
 export const SD_VISIBLE_ZONES = 1;
@@ -85,8 +90,6 @@ export function resolveZoneOverlaps(
   };
 }
 
-/** Sweeps below this strength are not drawn. */
-const LIQ_MIN_DRAWN_SWEEP = 40;
 
 export const SMC_WINDOW = 150;
 /** HH/HL/LH/LL chart labels use a Fractals-style swing length of 10 bars each side. */
@@ -1410,7 +1413,7 @@ export function renderSmcOverlay(
   const sweepTag = (t: number, xx: number, baseline: number) => {
     if (!toggles.swingSweep) return;
     const sw = smc.swingSweeps?.[t];
-    if (!sw || sw.status === "none") return;
+    if (!sw || !isHighProbabilitySweep(sw)) return;
     ctx.save();
     ctx.font = "700 11px 'JetBrains Mono', ui-monospace, monospace";
     const w = ctx.measureText(sw.text).width;
@@ -1427,7 +1430,9 @@ export function renderSmcOverlay(
   const priceActionTag = (t: number, xx: number, yy: number, up: boolean) => {
     const hasBadge = showPressure && smc.pressure?.[t] != null;
     const baseline = up ? (hasBadge ? yy - 32 : yy - 6) : (hasBadge ? yy + 60 : yy + 34);
-    const pa = toggles.priceAction === false ? undefined : smc.priceAction?.[t];
+    const rawPa = toggles.priceAction === false ? undefined : smc.priceAction?.[t];
+    // High-probability only: a confirmed (✓) reversal pattern, else no tag.
+    const pa = isHighProbabilityPriceAction(rawPa) ? rawPa : undefined;
     // Sweep is independent: with price action off/absent it takes the same slot.
     if (!pa) {
       sweepTag(t, xx, baseline);
@@ -1562,7 +1567,7 @@ function renderLiquidityMap(ctx: CanvasRenderingContext2D, map: LiquidityMap, pr
   // Only a small cross on the candle that grabbed liquidity — no lines or labels.
   ctx.save();
   ctx.lineWidth = 2;
-  for (const s of map.sweeps.filter((x) => x.strength >= LIQ_MIN_DRAWN_SWEEP).slice(-4)) {
+  for (const s of map.sweeps.filter(isHighProbabilityLiquiditySweep).slice(-4)) {
     const x = pr.x(s.t / 1000);
     const yx = pr.y(s.extreme);
     if (x == null || yx == null || x < 0 || x > pr.width) continue;
