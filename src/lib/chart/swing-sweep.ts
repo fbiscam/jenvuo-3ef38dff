@@ -17,7 +17,9 @@
 type Bar = { t: number; o: number; h: number; l: number; c: number };
 
 export type SwingSweepStatus = "confirmed" | "late" | "failed" | "none" | "pending";
-export type SwingSweep = { status: SwingSweepStatus; level: number | null; text: string; strong?: boolean };
+export type SwingSweep = { status: SwingSweepStatus; level: number | null; text: string; strong?: boolean;
+  /** After confirming, every candle up to SWEEP_LATE_BARS closed and none re-took the swept level. */
+  held?: boolean };
 
 export const SWEEP_LOOKBACK = 10;
 export const SWEEP_MOVE_BARS = 2;
@@ -73,6 +75,15 @@ export function classifySwingSweep(closed: Bar[], i: number, kind: "high" | "low
     const clear = high ? bodyEdge - c : c - bodyEdge;
     const displaced = Math.abs(ck.c - ck.o) >= avgRange * SWEEP_MIN_CONFIRM_BODY;
     if (clear >= avgRange * SWEEP_MIN_CLEAR && displaced) {
+      // Hold check: the rest of the window must close and stay rejected.
+      const windowEnd = first + SWEEP_LATE_BARS - 1;
+      let held = windowEnd < closed.length;
+      for (let m = k + 1; held && m <= windowEnd; m++) {
+        if (!inside(closed[m].c)) held = false;
+      }
+      if (n < SWEEP_MOVE_BARS && strong) {
+        return { status: "confirmed", level, text: "Sweep ✓ strong", strong: true, held };
+      }
       return n < SWEEP_MOVE_BARS
         ? strong
           ? { status: "confirmed", level, text: "Sweep ✓ strong", strong: true }
