@@ -119,7 +119,7 @@ export function evaluateSwingSetup(
 
   // 2. Demand zone + same-direction FVG from the swing.
   const fvgEnd = bars[Math.min(bars.length - 1, i + SETUP_FVG_BARS)].t;
-  const ownFvg = live
+  const ownFvg = detectLiveFvgs(bars.slice(0, Math.min(bars.length, i + SETUP_FVG_BARS + 1)))
     .filter((f) => f.type === (buy ? "BULLISH" : "BEARISH") && f.t >= piv.t && f.t <= fvgEnd)
     .sort((a, b) => a.t - b.t)[0];
   const buffer = Math.max(SETUP_SL_MIN_BUFFER, atr * SETUP_SL_BUFFER_ATR);
