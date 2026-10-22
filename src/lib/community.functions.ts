@@ -42,13 +42,20 @@ export type CommunityPostRow = {
 };
 
 // ---------- helpers ----------
-async function signAvatars(admin: any, paths: string[]): Promise<Map<string, string>> {
+// Signed links are short-lived so access ends soon after a block.
+const SIGNED_URL_TTL_SEC = 5 * 60;
+
+/** Signs avatar paths only when each path sits in its profile owner's folder. */
+async function signAvatars(admin: any, entries: { path: string; ownerId: string }[]): Promise<Map<string, string>> {
   const map = new Map<string, string>();
-  const priv = paths.filter((p) => p && !/^https?:\/\//i.test(p));
-  const pub = paths.filter((p) => p && /^https?:\/\//i.test(p));
-  for (const p of pub) map.set(p, p);
+  const priv: string[] = [];
+  for (const { path, ownerId } of entries) {
+    if (!path) continue;
+    if (/^https?:\/\//i.test(path)) map.set(path, path);
+    else if (isOwnedMediaRef(path, ownerId)) priv.push(path);
+  }
   if (priv.length) {
-    const { data } = await admin.storage.from("avatars").createSignedUrls(priv, 60 * 60);
+    const { data } = await admin.storage.from("avatars").createSignedUrls(Array.from(new Set(priv)), SIGNED_URL_TTL_SEC);
     for (const it of data ?? []) if (it.path && it.signedUrl) map.set(it.path, it.signedUrl);
   }
   return map;
@@ -67,7 +74,7 @@ async function signCommunityMedia(admin: any, paths: string[]): Promise<Map<stri
   const pub = paths.filter((p) => p && /^https?:\/\//i.test(p));
   for (const p of pub) map.set(p, p);
   if (priv.length) {
-    const { data } = await admin.storage.from("community-media").createSignedUrls(priv, 60 * 60);
+    const { data } = await admin.storage.from("community-media").createSignedUrls(priv, SIGNED_URL_TTL_SEC);
     for (const it of data ?? []) if (it.path && it.signedUrl) map.set(it.path, it.signedUrl);
   }
   return map;
