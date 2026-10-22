@@ -79,3 +79,7 @@
 - [x] Stricter fakeout filtering (zones, price action, sweeps) and white compact desktop Gifts/Notifications
 - [x] Sweeps only on 1H/2H/4H/1D with stricter fakeout filter
 - [x] Swing price action only on 1H/2H/4H/1D with a held follow-through (fakeout) check
+- [x] Gifts/Notifications: titles max 3 words, descriptions max 3 lines
+- [x] Terminal opens white by default
+- [x] Fresh sweep, price action and Zone + FVG locked for Free / no-credit accounts; $0.10 per hour while on
+- [x] Phones: public page text wraps fully (no cut-off lines) and breaks evenly
