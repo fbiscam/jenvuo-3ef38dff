@@ -393,7 +393,7 @@ export function CloudBuildWith() {
             <br />
             <span className="whitespace-nowrap text-gc-blue-deep">designed for traders and AI</span>
           </h2>
-          <p className="mt-4 max-w-[540px] text-[12px] leading-[1.55] min-[390px]:text-[12.5px] min-[420px]:text-[13.5px] text-gc-ink-muted sm:mt-5 sm:text-[16px] sm:leading-[1.6]">
+          <p className="mt-4 max-w-[540px] text-[14px] leading-[1.55] text-gc-ink-muted sm:mt-5 sm:text-[16px] sm:leading-[1.6]">
             Try Jenvu with live sweeps, zones and FVGs on gold, plus new sign-ups get $100 free credits for top tier models 14 days of Pro access free.
           </p>
           <div className="mt-7 flex flex-wrap items-center gap-7">
