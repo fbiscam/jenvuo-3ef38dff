@@ -1,5 +1,5 @@
 import * as React from "react";
-import { goAfterSignIn } from "@/lib/cross-domain-session";
+import { goAfterSignIn, restoreSharedSession } from "@/lib/cross-domain-session";
 import { createFileRoute, useNavigate, Link, redirect } from "@tanstack/react-router";
 import { oauthReturnPath } from "@/lib/oauth-return-path";
 import { useServerFn } from "@tanstack/react-start";
@@ -68,7 +68,8 @@ export const Route = createFileRoute("/auth")({
       if (search.mfa === "1") return;
     }
 
-    const { data } = await supabase.auth.getUser();
+    let { data } = await supabase.auth.getUser();
+    if (!data.user && (await restoreSharedSession())) data = (await supabase.auth.getUser()).data;
     if (data.user) {
       // If MFA elevation is required but not yet completed, stay on /auth so
       // the user can enter their 6-digit code — do NOT redirect to /dashboard,
@@ -889,7 +890,7 @@ function AuthPage() {
                       <button
                         type="submit"
                         disabled={loading || mfaCode.length !== 6}
-                        className="group w-full rounded-lg bg-zinc-900 px-5 py-3 text-sm font-medium text-white hover:bg-zinc-800 transition inline-flex items-center justify-center gap-2 disabled:opacity-60"
+                        className="group w-full rounded-lg bg-gc-blue px-5 py-3 text-sm font-medium text-gc-on-blue hover:bg-gc-blue-hover transition inline-flex items-center justify-center gap-2 disabled:opacity-60"
                       >
                         {loading ? btnLoading("Verifying...") : (<>Verify <ArrowRight className={`w-4 h-4 group-hover:translate-x-0.5 transition ${MONO}`} /></>)}
                       </button>
@@ -958,7 +959,7 @@ function AuthPage() {
                         <button
                           type="submit"
                           disabled={loading}
-                          className="group w-full rounded-lg bg-zinc-900 px-5 py-3 text-sm font-medium text-white hover:bg-zinc-800 transition inline-flex items-center justify-center gap-2 disabled:opacity-60"
+                          className="group w-full rounded-lg bg-gc-blue px-5 py-3 text-sm font-medium text-gc-on-blue hover:bg-gc-blue-hover transition inline-flex items-center justify-center gap-2 disabled:opacity-60"
                         >
                           {loading ? btnLoading("Verifying...") : (<>Verify & Continue <ArrowRight className={`w-4 h-4 group-hover:translate-x-0.5 transition ${MONO}`} /></>)}
                         </button>
@@ -1044,9 +1045,9 @@ function AuthPage() {
                         </div>
 
                         <p className="text-[12px] leading-snug text-zinc-500">
-                          The Terminal approved Founding Program members.{" "}
-                          <Link to="/founding" className="font-medium text-zinc-900 underline underline-offset-2">
-                            Apply here
+                          Founding Program: Get 3 Months Access with $250 Credits.{" "}
+                          <Link to="/founding" className="font-medium text-gc-blue-deep underline underline-offset-2">
+                            Apply now
                           </Link>
                         </p>
 
@@ -1103,7 +1104,7 @@ function AuthPage() {
                         <button
                           type="submit"
                           disabled={loading}
-                          className="group w-full rounded-lg bg-zinc-900 px-5 py-3 text-sm font-medium text-white hover:bg-zinc-800 transition inline-flex items-center justify-center gap-2 disabled:opacity-60"
+                          className="group w-full rounded-lg bg-gc-blue px-5 py-3 text-sm font-medium text-gc-on-blue hover:bg-gc-blue-hover transition inline-flex items-center justify-center gap-2 disabled:opacity-60"
                         >
                           {loading ? btnLoading("Sending...") : (<>Send Reset <ArrowRight className={`w-4 h-4 group-hover:translate-x-0.5 transition ${MONO}`} /></>)}
                         </button>
@@ -1156,7 +1157,7 @@ function AuthPage() {
                         <button
                           type="submit"
                           disabled={loading}
-                          className="group w-full rounded-lg bg-zinc-900 px-5 py-3 text-sm font-medium text-white hover:bg-zinc-800 transition inline-flex items-center justify-center gap-2 disabled:opacity-60"
+                          className="group w-full rounded-lg bg-gc-blue px-5 py-3 text-sm font-medium text-gc-on-blue hover:bg-gc-blue-hover transition inline-flex items-center justify-center gap-2 disabled:opacity-60"
                         >
                           {loading ? btnLoading("Verifying...") : (<>Verify Code <ArrowRight className={`w-4 h-4 group-hover:translate-x-0.5 transition ${MONO}`} /></>)}
                         </button>
@@ -1228,7 +1229,7 @@ function AuthPage() {
                         <button
                           type="submit"
                           disabled={loading}
-                          className="group w-full rounded-lg bg-zinc-900 px-5 py-3 text-sm font-medium text-white hover:bg-zinc-800 transition inline-flex items-center justify-center gap-2 disabled:opacity-60"
+                          className="group w-full rounded-lg bg-gc-blue px-5 py-3 text-sm font-medium text-gc-on-blue hover:bg-gc-blue-hover transition inline-flex items-center justify-center gap-2 disabled:opacity-60"
                         >
                           {loading ? btnLoading("Updating...") : (<>Update Password <ArrowRight className={`w-4 h-4 group-hover:translate-x-0.5 transition ${MONO}`} /></>)}
                         </button>
@@ -1320,8 +1321,8 @@ function AuthPage() {
                       </p>
                       <p>
                         Founding member?{" "}
-                        <Link to="/founding" className="font-medium text-zinc-900 underline underline-offset-2">
-                          Apply to the Founding Program →
+                        <Link to="/founding" className="font-medium text-gc-blue-deep underline underline-offset-2">
+                          Get 3 Months Access with $250 Credits →
                         </Link>
                       </p>
                       <p>
