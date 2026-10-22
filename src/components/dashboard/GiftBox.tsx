@@ -101,7 +101,7 @@ export default function GiftBox() {
                   </span>
                   <div className="min-w-0 flex-1">
                     <p className="text-[13px] text-gc-ink sm:text-[14px]">{giftTitle(g.reason)}</p>
-                    <p className="mt-0.5 text-[12px] text-gc-ink-muted sm:text-[13px]">+${Number(g.delta).toFixed(2)} credit added to your wallet</p>
+                    <p className="mt-0.5 text-[12px] text-gc-ink-muted sm:text-[13px]">+${Number(g.delta).toFixed(2)} credit </p>
                   </div>
                   <span className="shrink-0 text-[11px] text-gc-ink-muted sm:text-[12px]">{timeAgo(g.created_at)}</span>
                 </div>
