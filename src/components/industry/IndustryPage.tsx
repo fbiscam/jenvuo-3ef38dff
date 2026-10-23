@@ -56,13 +56,13 @@ export function IndustryPage({ c }: { c: IndustryContent }) {
       <SiteHeader />
       <div style={{ zoom: PAGE_ZOOM }}>
         {p ? <ProductsHero c={c} /> : <SolutionsHero c={c} />}
-        <SectionBar hide={p ? ["why"] : []} />
+        <SectionBar hide={p ? ["why", "products"] : []} />
         {p ? <ProductsZigzag c={c} /> : <SolutionsCards c={c} />}
         {p && <ProductsHighlights c={c} />}
         {p ? <TopicsTabs c={c} /> : <TopicsList c={c} />}
         {!p && <WhyAccordion c={c} />}
         {p ? <StoriesRows c={c} /> : <StoriesCards c={c} />}
-        <Products c={c} />
+        {!p && <Products c={c} />}
         <NextStep />
       </div>
       <div className="hide-in-pwa"><SiteFooter /></div>
