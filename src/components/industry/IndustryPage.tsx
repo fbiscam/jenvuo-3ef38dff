@@ -56,10 +56,10 @@ export function IndustryPage({ c }: { c: IndustryContent }) {
       <SiteHeader />
       <div style={{ zoom: PAGE_ZOOM }}>
         {p ? <ProductsHero c={c} /> : <SolutionsHero c={c} />}
-        <SectionBar hide={p ? ["why", "products"] : []} />
+        <SectionBar hide={p ? ["why", "products", "topics"] : []} />
         {p ? <ProductsZigzag c={c} /> : <SolutionsCards c={c} />}
         {p && <ProductsHighlights c={c} />}
-        {p ? <TopicsTabs c={c} /> : <TopicsList c={c} />}
+        {!p && <TopicsList c={c} />}
         {!p && <WhyAccordion c={c} />}
         {p ? <StoriesRows c={c} /> : <StoriesCards c={c} />}
         {!p && <Products c={c} />}
@@ -385,7 +385,8 @@ function ProductsHighlights({ c }: { c: IndustryContent }) {
   );
 }
 
-function TopicsTabs({ c }: { c: IndustryContent }) {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export function TopicsTabs({ c }: { c: IndustryContent }) {
   const [i, setI] = useState(0);
   const t = c.topics[i];
   return (
