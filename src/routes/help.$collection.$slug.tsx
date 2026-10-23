@@ -1,7 +1,7 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { ArrowLeft, ArrowRight, ChevronRight } from "lucide-react";
 import SiteFooter from "@/components/SiteFooter";
-import HeaderAuthButtons from "@/components/HeaderAuthButtons";
+import SiteHeader from "@/components/SiteHeader";
 import { findArticle, findCollection, type Article, type Block } from "@/lib/help-content";
 
 export const Route = createFileRoute("/help/$collection/$slug")({
@@ -78,38 +78,30 @@ function ArticlePage() {
 
   return (
     <>
-      <div className={`jenvu-zoom min-h-dvh bg-[#FAFAFA] text-zinc-900 ${SANS} antialiased`}>
-        <header className="sticky top-0 z-50 border-b border-zinc-100 bg-white">
-          <div className="relative mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-5 py-3 sm:px-6 sm:py-4 md:flex md:justify-between">
-            <Link to="/" className="flex min-w-0 items-center gap-2.5">
-              <img src="/favicon.png" alt="Jenvu" className="h-7 w-7 shrink-0 rounded-md object-contain" />
-              <span className="truncate text-[22px] tracking-tight leading-none" style={{ color: "#3c4043", fontFamily: "\"Google Sans\", \"Product Sans\", \"DM Sans\", system-ui, sans-serif", fontWeight: 500 }}>Jenvu</span>
-            </Link>
-            <HeaderAuthButtons />
-          </div>
-        </header>
+      <div className="public-cloudflare jenvu-zoom min-h-dvh bg-background text-gc-ink antialiased">
+        <SiteHeader />
 
         <main className="mx-auto max-w-3xl px-5 sm:px-6 py-12 sm:py-16">
-          <nav className={`${MONO} text-[10px] uppercase tracking-[0.22em] text-zinc-500 flex items-center gap-1.5 flex-wrap`}>
-            <Link to="/help" className="hover:text-zinc-900">Help</Link>
+          <nav className={`${MONO} text-[10px] uppercase tracking-[0.22em] text-gc-muted flex items-center gap-1.5 flex-wrap`}>
+            <Link to="/help" className="hover:text-gc-blue">Help</Link>
             <ChevronRight className="h-3 w-3" />
-            <Link to="/help/$collection" params={{ collection: collection.slug }} className="hover:text-zinc-900">
+            <Link to="/help/$collection" params={{ collection: collection.slug }} className="hover:text-gc-blue">
               {collection.title}
             </Link>
             <ChevronRight className="h-3 w-3" />
-            <span className="text-zinc-900 truncate">{article.title}</span>
+            <span className="text-gc-ink truncate">{article.title}</span>
           </nav>
 
           <h1 className="mt-5 text-3xl sm:text-4xl font-semibold tracking-tight">{article.title}</h1>
-          <p className="mt-3 text-zinc-600 text-base sm:text-lg">{article.summary}</p>
-          <div className={`${MONO} mt-4 text-[10px] uppercase tracking-[0.22em] text-zinc-500`}>
+          <p className="mt-3 text-gc-muted text-base sm:text-lg">{article.summary}</p>
+          <div className={`${MONO} mt-4 text-[10px] uppercase tracking-[0.22em] text-gc-muted`}>
             Updated {new Date(article.updatedAt).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
           </div>
 
-          <article className="mt-10 space-y-6 text-zinc-800 leading-relaxed">
+          <article className="mt-10 space-y-6 text-gc-ink leading-relaxed">
             {article.body.map((b: Block, i: number) => {
-              if (b.type === "h2") return <h2 key={i} className="text-xl sm:text-2xl font-semibold tracking-tight pt-2 text-zinc-900">{b.content}</h2>;
-              if (b.type === "h3") return <h3 key={i} className="text-base sm:text-lg font-semibold tracking-tight text-zinc-900">{b.content}</h3>;
+              if (b.type === "h2") return <h2 key={i} className="text-xl sm:text-2xl font-semibold tracking-tight pt-2 text-gc-ink">{b.content}</h2>;
+              if (b.type === "h3") return <h3 key={i} className="text-base sm:text-lg font-semibold tracking-tight text-gc-ink">{b.content}</h3>;
               if (b.type === "p") return <p key={i}>{b.content}</p>;
               if (b.type === "ul") return (
                 <ul key={i} className="list-disc pl-5 space-y-2 marker:text-zinc-400">
@@ -122,14 +114,14 @@ function ArticlePage() {
                 </ol>
               );
               if (b.type === "code") return (
-                <pre key={i} className={`${MONO} rounded-xl border border-zinc-200 bg-zinc-50 p-4 text-[12px] sm:text-[13px] text-zinc-800 whitespace-pre-wrap`}>{b.content}</pre>
+                <pre key={i} className={`${MONO} rounded-xl border border-gc-line bg-gc-panel p-4 text-[12px] sm:text-[13px] text-gc-ink whitespace-pre-wrap`}>{b.content}</pre>
               );
               // note
               const tone = b.tone ?? "info";
               const styles =
                 tone === "warn" ? "border-amber-200 bg-amber-50 text-amber-900" :
                 tone === "tip"  ? "border-emerald-200 bg-emerald-50 text-emerald-900" :
-                                  "border-zinc-200 bg-zinc-50 text-zinc-800";
+                                  "border-gc-line bg-gc-panel text-gc-ink";
               const label = tone === "warn" ? "Heads up" : tone === "tip" ? "Tip" : "Note";
               return (
                 <div key={i} className={`rounded-xl border ${styles} p-4`}>
@@ -141,10 +133,10 @@ function ArticlePage() {
           </article>
 
           {/* Feedback */}
-          <div className="mt-12 rounded-xl border border-zinc-200 bg-zinc-50 p-6 flex items-center justify-between gap-4 flex-wrap">
+          <div className="mt-12 rounded-xl border border-gc-line bg-gc-panel p-6 flex items-center justify-between gap-4 flex-wrap">
             <div>
-              <div className="text-sm font-medium text-zinc-900">Was this article helpful?</div>
-              <div className="text-xs text-zinc-600">Your feedback helps us improve.</div>
+              <div className="text-sm font-medium text-gc-ink">Was this article helpful?</div>
+              <div className="text-xs text-gc-muted">Your feedback helps us improve.</div>
             </div>
             <div className="flex items-center gap-2">
               <FeedbackButton label="Yes" />
@@ -155,22 +147,22 @@ function ArticlePage() {
           {/* Related */}
           {related.length > 0 && (
             <section className="mt-12">
-              <div className={`${MONO} text-[10px] uppercase tracking-[0.22em] text-zinc-500`}>
+              <div className={`${MONO} text-[10px] uppercase tracking-[0.22em] text-gc-muted`}>
                 Related articles
               </div>
-              <ul className="mt-4 divide-y divide-zinc-100 rounded-xl border border-zinc-200 bg-white">
+              <ul className="mt-4 divide-y divide-gc-line rounded-xl border border-gc-line bg-background">
                 {related.map((a) => (
                   <li key={a.slug}>
                     <Link
                       to="/help/$collection/$slug"
                       params={{ collection: collection.slug, slug: a.slug }}
-                      className="group flex items-start justify-between gap-4 px-5 py-4 hover:bg-zinc-50 transition"
+                      className="group flex items-start justify-between gap-4 px-5 py-4 hover:bg-gc-panel transition"
                     >
                       <div>
-                        <div className="text-sm font-medium text-zinc-900">{a.title}</div>
-                        <div className="mt-0.5 text-xs text-zinc-600">{a.summary}</div>
+                        <div className="text-sm font-medium text-gc-ink">{a.title}</div>
+                        <div className="mt-0.5 text-xs text-gc-muted">{a.summary}</div>
                       </div>
-                      <ArrowRight className="mt-1 h-4 w-4 shrink-0 text-zinc-400 group-hover:text-zinc-900 transition" />
+                      <ArrowRight className="mt-1 h-4 w-4 shrink-0 text-zinc-400 group-hover:text-gc-blue transition" />
                     </Link>
                   </li>
                 ))}
@@ -181,7 +173,7 @@ function ArticlePage() {
           <Link
             to="/help/$collection"
             params={{ collection: collection.slug }}
-            className={`${MONO} mt-10 inline-flex items-center gap-1.5 text-[10px] uppercase tracking-[0.22em] text-zinc-500 hover:text-zinc-900`}
+            className={`${MONO} mt-10 inline-flex items-center gap-1.5 text-[10px] uppercase tracking-[0.22em] text-gc-muted hover:text-gc-blue`}
           >
             <ArrowLeft className="h-3 w-3" /> Back to {collection.title}
           </Link>
@@ -202,7 +194,7 @@ function FeedbackButton({ label }: { label: string }) {
         btn.textContent = "Thanks!";
         btn.setAttribute("disabled", "true");
       }}
-      className="rounded-full border border-zinc-300 bg-white px-4 py-1.5 text-xs font-medium hover:border-zinc-900 transition disabled:opacity-60"
+      className="rounded-full border border-zinc-300 bg-background px-4 py-1.5 text-xs font-medium hover:border-zinc-900 transition disabled:opacity-60"
     >
       {label}
     </button>
