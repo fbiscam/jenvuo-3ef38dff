@@ -261,27 +261,27 @@ const AUDIENCES: Array<{ key: string; label: string; cards: AudienceCard[] }> = 
     key: "traders",
     label: "Traders",
     cards: [
-      { tag: "NEW TRADERS", text: "New sign-ups get 14 days of Pro access to the gold Terminal, AI desk and alerts", to: "/auth", img: tradeNeonStart },
-      { tag: "PRACTICE", text: "Practice your ideas on a $100,000 demo account with automatic closing", to: "/pricing", img: tradeNeonPractice },
-      { tag: "LEARN", text: "Read daily XAU/USD insights and step-by-step guides on sweeps, zones", to: "/insights", img: tradeNeonLearn },
+      { tag: "NEW TRADERS", text: "New sign-ups get 14 days of Pro access to the Terminal", to: "/auth", img: tradeNeonStart },
+      { tag: "PRACTICE", text: "Practice on a $100,000 demo account with automatic closing", to: "/pricing", img: tradeNeonPractice },
+      { tag: "LEARN", text: "Read daily XAU/USD insights and guides on sweeps and zones", to: "/insights", img: tradeNeonLearn },
     ],
   },
   {
     key: "developers",
     label: "Developers",
     cards: [
-      { tag: "TOP-TIER MODELS", text: "We provide top-tier AI models to developers who wants to build", to: "/ai-engine", img: devModels },
-      { tag: "API & EXTENSION", text: "Plug Jenvu models into your apps and bots with API keys, with top models", to: "/pricing", img: devExtension },
-      { tag: "DEVELOPER DOCS", text: "Clear docs and guides help you connect, test and ship your project", to: "/help", img: devDocs },
+      { tag: "TOP-TIER MODELS", text: "Top-tier AI models for developers who want to build", to: "/ai-engine", img: devModels },
+      { tag: "API & EXTENSION", text: "Plug Jenvu models into your apps and bots with API keys", to: "/pricing", img: devExtension },
+      { tag: "DEVELOPER DOCS", text: "Clear docs and guides to connect, test and ship projects", to: "/help", img: devDocs },
     ],
   },
   {
     key: "programs",
     label: "Special programs",
     cards: [
-      { tag: "FOUNDING PROGRAM", text: "Apply to the invite-only Founding Program and get your chosen plan", to: "/founding", img: progFounding },
-      { tag: "PLANS", text: "Choose Pro at $10, Elite at $25 or Ultra at $50 a month to match your trading.", to: "/pricing", img: progPlans },
-      { tag: "SUPPORT", text: "Questions about plans, billing or the Terminal? Our support team is active", to: "/contact", img: progSupport },
+      { tag: "FOUNDING PROGRAM", text: "Apply to the invite-only Founding Program for your chosen plan", to: "/founding", img: progFounding },
+      { tag: "PLANS", text: "Choose Pro at $10, Elite at $25 or Ultra at $50 monthly", to: "/pricing", img: progPlans },
+      { tag: "SUPPORT", text: "Questions about plans, billing or the Terminal? Ask our support team", to: "/contact", img: progSupport },
     ],
   },
 ];
@@ -300,8 +300,8 @@ export function CloudAudiences() {
               role="tab"
               aria-selected={a.key === active}
               onClick={() => setActive(a.key)}
-              className={`-mb-0.5 shrink-0 border-b-[3px] px-4 py-3 text-[16px] transition ${
-                a.key === active ? "border-gc-navy text-gc-ink" : "border-transparent text-gc-ink/80 hover:text-gc-ink"
+              className={`-mb-0.5 shrink-0 border-b-[3px] px-4 py-3 text-[15px] transition ${
+                a.key === active ? "border-gc-navy font-medium text-gc-ink" : "border-transparent text-gc-ink/80 hover:text-gc-ink"
               }`}
             >
               {a.label}
@@ -312,13 +312,13 @@ export function CloudAudiences() {
           {current.cards.map((c) => (
             <div
               key={c.tag}
-              className="flex min-h-[124px] overflow-hidden rounded-lg border border-gc-line bg-background"
+              className="flex min-h-[112px] overflow-hidden rounded-lg border border-gc-line bg-background"
             >
               <div className="flex min-w-0 flex-1 flex-col justify-center px-4 py-5">
-                <div className="text-[12px] font-medium tracking-wide text-gc-ink/80">{c.tag}</div>
-                <p className="mt-1 text-[15px] font-medium leading-[1.5] text-gc-ink">{c.text}</p>
+                <div className="text-[12px] font-medium tracking-wide text-gc-ink-muted">{c.tag}</div>
+                <p className="mt-1 text-[15px] font-normal leading-[1.6] text-gc-ink">{c.text}</p>
               </div>
-              {c.img && <img src={c.img} alt="" loading="lazy" className="w-[100px] shrink-0 object-cover" />}
+              {c.img && <img src={c.img} alt="" loading="lazy" className="w-[112px] shrink-0 object-cover" />}
               {c.logo && (
                 <div className="flex w-[84px] shrink-0 items-center justify-center">
                   <img src="/favicon.png" alt="" className="h-14 w-14 object-contain" />
