@@ -69,7 +69,7 @@ function OpsHub() {
   }
 
   const MONO = "font-['Google_Sans','Product_Sans','Roboto',system-ui,sans-serif] font-normal normal-case tracking-normal";
-  const SANS = "font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif]";
+  const SANS = "font-['Google_Sans','Product_Sans','Google Sans',system-ui,sans-serif]";
 
   if (!ready) {
     return <div className="min-h-dvh w-full bg-gc-canvas" />;

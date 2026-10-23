@@ -121,7 +121,7 @@ export const Route = createFileRoute("/insights/$slug")({
 
 
 const MONO = "font-['JetBrains_Mono',ui-monospace,monospace]";
-const SANS = "font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif]";
+const SANS = "font-['Google_Sans','Product_Sans','Google Sans',system-ui,sans-serif]";
 
 function InsightDetailPage() {
   const { slug } = useParams({ from: "/insights/$slug" });

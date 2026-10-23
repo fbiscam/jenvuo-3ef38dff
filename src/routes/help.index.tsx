@@ -26,7 +26,7 @@ export const Route = createFileRoute("/help/")({
   component: HelpCenterPage,
 });
 
-const SANS = "font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif]";
+const SANS = "font-['Google_Sans','Product_Sans','Google Sans',system-ui,sans-serif]";
 
 
 function HelpCenterPage() {
