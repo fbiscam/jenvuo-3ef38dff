@@ -261,7 +261,7 @@ const AUDIENCES: Array<{ key: string; label: string; cards: AudienceCard[] }> = 
     key: "traders",
     label: "Traders",
     cards: [
-      { tag: "NEW TRADERS", text: "New sign-ups get 14 days of free Pro access & $100 for the API Keys", to: "/auth", img: tradeNeonStart },
+      { tag: "NEW TRADERS", text: "New sign-ups get 14 days of free Pro access & $100 for the top AI Models ", to: "/auth", img: tradeNeonStart },
       { tag: "PRACTICE", text: "Practice on a $100,000 demo account with automatic closing at your stop loss", to: "/pricing", img: tradeNeonPractice },
       { tag: "LEARN", text: "Read daily XAU/USD insights and guides on sweeps, zones and order blocks", to: "/insights", img: tradeNeonLearn },
     ],
