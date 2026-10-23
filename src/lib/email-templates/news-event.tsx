@@ -96,7 +96,7 @@ const rowLabel = {
 const rowValue = {
   fontFamily: MONO,
   fontSize: '15px',
-  fontWeight: 700 as const,
+  fontWeight: 500 as const,
   color: COLORS.ink,
   margin: '0 0 14px',
 }

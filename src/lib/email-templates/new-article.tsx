@@ -178,7 +178,7 @@ const brandWordmark: React.CSSProperties = {
   display: 'inline-block',
   marginLeft: 10,
   verticalAlign: 'middle',
-  fontWeight: 700,
+  fontWeight: 500,
   letterSpacing: '0.02em',
   fontSize: 14,
   color: '#09090b',
@@ -204,7 +204,7 @@ const liveText: React.CSSProperties = {
   fontFamily: "'Google Sans','Google Sans Normal',ui-monospace,monospace",
   fontSize: 11,
   letterSpacing: '0.2em',
-  fontWeight: 700,
+  fontWeight: 500,
   color: '#09090b',
 }
 const heroImg: React.CSSProperties = {
@@ -227,7 +227,7 @@ const categoryLabel: React.CSSProperties = {
 const h1: React.CSSProperties = {
   fontSize: 26,
   lineHeight: 1.2,
-  fontWeight: 700,
+  fontWeight: 500,
   letterSpacing: '-0.01em',
   color: '#09090b',
   margin: '0 0 14px 0',
@@ -249,7 +249,7 @@ const cta: React.CSSProperties = {
   fontWeight: 600,
   textDecoration: 'none',
   letterSpacing: '0.01em',
-  boxShadow: '0 1px 2px rgba(9,9,11,0.08)',
+
 }
 const fineprint: React.CSSProperties = {
   fontSize: 12,
@@ -275,7 +275,7 @@ const footerBrand: React.CSSProperties = {
   fontSize: 10,
   letterSpacing: '0.28em',
   color: '#09090b',
-  fontWeight: 700,
+  fontWeight: 500,
   margin: '0 0 8px 0',
 }
 const footerMeta: React.CSSProperties = {
