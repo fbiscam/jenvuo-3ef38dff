@@ -4,7 +4,7 @@ import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 import founderPhoto from "@/assets/haseeb-ijaz-founder.png.asset.json";
 
-const SANS = "font-['Google_Sans','Product_Sans','Google Sans',system-ui,sans-serif]";
+const SANS = "font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif]";
 
 export const Route = createFileRoute("/founder")({
   head: () => ({

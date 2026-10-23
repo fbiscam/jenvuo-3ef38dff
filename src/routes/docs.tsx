@@ -29,7 +29,7 @@ export const Route = createFileRoute("/docs")({
   component: DocsPage,
 });
 
-const SANS = "font-['Google_Sans','Product_Sans','Google Sans',system-ui,sans-serif]";
+const SANS = "font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif]";
 
 function sectionText(s: DocSection) {
   return `${s.title} ${s.keywords ?? ""}`.toLowerCase();

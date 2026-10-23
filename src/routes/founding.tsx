@@ -294,7 +294,7 @@ function FoundingPage() {
   );
 }
 
-const SANS = "font-['Google_Sans','Product_Sans','Google Sans',system-ui,sans-serif]";
+const SANS = "font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif]";
 const INPUT = "mt-1.5 w-full rounded-xl border border-gc-line bg-background px-4 py-3 text-[15px] text-gc-ink outline-none placeholder:text-gc-ink-muted focus:border-gc-blue focus:ring-1 focus:ring-gc-blue";
 const TONE = {
   blue: { bg: "bg-gc-blue-soft", fg: "text-gc-blue" },

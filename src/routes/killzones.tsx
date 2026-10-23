@@ -218,7 +218,7 @@ function KillzonesPage() {
 
 
   return (
-    <div className="public-cloudflare killzones-root min-h-dvh w-full bg-background text-foreground font-['Google_Sans','Product_Sans','Google Sans',system-ui,sans-serif] antialiased">
+    <div className="public-cloudflare killzones-root min-h-dvh w-full bg-background text-foreground font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif] antialiased">
       <SiteHeader />
       <main className="jenvu-home-content mx-auto max-w-[1296px] px-5 pb-16 sm:px-8">
         <div className="pb-10 pt-12 text-center md:pt-14">

@@ -13,7 +13,7 @@ import claudeLogo from "@/assets/claude-logo.png";
 import estimateImg from "@/assets/pricing/estimate.jpg";
 import spendingImg from "@/assets/pricing/spending.jpg";
 
-const SANS = "font-['Google_Sans','Product_Sans','Google Sans',system-ui,sans-serif]";
+const SANS = "font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif]";
 const LINK = "text-gc-blue-deep underline underline-offset-2 hover:text-gc-navy";
 
 export const FAQ = [

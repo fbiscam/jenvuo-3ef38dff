@@ -165,7 +165,7 @@ function DocumentsPage() {
 
   return (
     <div
-      className="mx-auto max-w-3xl px-4 py-8 font-['Google_Sans',_'Google Sans',_system-ui,_sans-serif]"
+      className="mx-auto max-w-3xl px-4 py-8 font-['Google_Sans',_'Inter',_system-ui,_sans-serif]"
     >
       <div className="mb-6">
         <h1 className="pl-1 text-2xl font-semibold text-zinc-900 mt-1">Identity verification</h1>

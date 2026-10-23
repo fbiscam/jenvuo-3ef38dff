@@ -45,7 +45,7 @@ export default function SiteHeader() {
         <div className="relative flex items-center gap-3 px-4 py-2.5 sm:px-4">
           <Link to="/" className="flex min-w-0 shrink-0 items-center gap-2">
             <img src="/favicon.png" alt="Jenvu" className="h-7 w-7 shrink-0 rounded-md object-contain" />
-            <span className="truncate text-[22px] leading-none tracking-tight text-gc-ink" style={{ fontFamily: "\"Google Sans\", \"Product Sans\", \"Roboto\", system-ui, sans-serif", fontWeight: 500 }}>Jenvu</span>
+            <span className="truncate text-[22px] leading-none tracking-tight text-gc-ink" style={{ fontFamily: "\"Google Sans\", \"Product Sans\", \"DM Sans\", system-ui, sans-serif", fontWeight: 500 }}>Jenvu</span>
           </Link>
 
           {searchOpen ? (
@@ -120,7 +120,7 @@ export default function SiteHeader() {
             <div className="flex items-center justify-between px-5 py-3">
               <Link to="/" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-2.5">
                 <img src="/favicon.png" alt="Jenvu" className="h-7 w-7 rounded-md object-contain" />
-                <span className="text-[20px] tracking-tight" style={{ color: "#3c4043", fontFamily: "\"Google Sans\",\"Product Sans\",\"Roboto\", system-ui,sans-serif", fontWeight: 500 }}>Jenvu</span>
+                <span className="text-[20px] tracking-tight" style={{ color: "#3c4043", fontFamily: "\"Google Sans\",\"Product Sans\",\"DM Sans\",system-ui,sans-serif", fontWeight: 500 }}>Jenvu</span>
               </Link>
               <button
                 type="button"

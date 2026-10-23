@@ -1320,7 +1320,7 @@ function DashboardLayout() {
 
   return (
     <div
-      className={`flex ${pathname === "/dashboard/terminal" ? "h-dvh overflow-hidden jenvu-terminal-shell bg-background" : "min-h-screen jenvu-zoom-dashboard bg-gc-canvas"} ${dashDark ? "dark dash-dark" : ""} text-zinc-900 font-['Google_Sans','Product_Sans','Google Sans',system-ui,sans-serif] antialiased`}
+      className={`flex ${pathname === "/dashboard/terminal" ? "h-dvh overflow-hidden jenvu-terminal-shell bg-background" : "min-h-screen jenvu-zoom-dashboard bg-gc-canvas"} ${dashDark ? "dark dash-dark" : ""} text-zinc-900 font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif] antialiased`}
     >
       {/* Menu overlay */}
       {mobileNavOpen && !embedMode && (
@@ -1371,7 +1371,7 @@ function DashboardLayout() {
                 <span
                   className="dashboard-sidebar-brand truncate text-[22px] tracking-tight leading-none text-gc-ink"
                   style={{
-                    fontFamily: '"Google Sans", "Product Sans", "Google Sans", system-ui, sans-serif',
+                    fontFamily: '"Google Sans", "Product Sans", "DM Sans", system-ui, sans-serif',
                     fontWeight: 500,
                   }}
                 >
@@ -1462,7 +1462,7 @@ function DashboardLayout() {
                               paddingLeft: 6,
                               paddingRight: 6,
                               fontSize: 9,
-                              fontFamily: "'Google Sans', system-ui, sans-serif",
+                              fontFamily: "'Inter', system-ui, sans-serif",
                               fontWeight: 700,
                               letterSpacing: 0.3,
                             }}
@@ -1478,7 +1478,7 @@ function DashboardLayout() {
                               paddingLeft: 6,
                               paddingRight: 6,
                               fontSize: 9,
-                              fontFamily: "'Google Sans', system-ui, sans-serif",
+                              fontFamily: "'Inter', system-ui, sans-serif",
                               fontWeight: 700,
                               letterSpacing: 0.3,
                             }}

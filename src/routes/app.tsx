@@ -24,7 +24,7 @@ import { authSignInUrl, signOutAndRedirect } from "@/lib/cross-domain-session";
 import { cn } from "@/lib/utils";
 
 const MONO = "font-['JetBrains_Mono',ui-monospace,monospace]";
-const SANS = "font-['Google_Sans','Product_Sans','Google Sans',system-ui,sans-serif]";
+const SANS = "font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif]";
 
 /* ---------- ticker (matches homepage) ---------- */
 import { useLiveTicker, type TickerRow } from "@/hooks/useLiveTicker";
@@ -430,7 +430,7 @@ function Home() {
         <div className="relative mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-5 py-3 sm:px-6 sm:py-4 md:flex md:justify-between">
           <Link to="/" className="flex min-w-0 items-center gap-2.5">
             <img src="/favicon.png" alt="Jenvu" className="h-7 w-7 shrink-0 rounded-md object-contain" />
-            <span className="truncate text-[22px] tracking-tight leading-none" style={{ color: "#3c4043", fontFamily: "\"Google Sans\", \"Product Sans\", \"Roboto\", system-ui, sans-serif", fontWeight: 500 }}>Jenvu</span>
+            <span className="truncate text-[22px] tracking-tight leading-none" style={{ color: "#3c4043", fontFamily: "\"Google Sans\", \"Product Sans\", \"DM Sans\", system-ui, sans-serif", fontWeight: 500 }}>Jenvu</span>
           </Link>
           <div className="hidden md:flex pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
             <div className="pointer-events-auto">

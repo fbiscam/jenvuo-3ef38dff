@@ -226,7 +226,7 @@ export function renderDrawing(
     }
     case "text": {
       const text = d.text || "Text";
-      ctx.font = "600 12px 'Google Sans', system-ui, sans-serif";
+      ctx.font = "600 12px 'DM Sans', system-ui, sans-serif";
       const w = ctx.measureText(text).width + 10;
       ctx.fillStyle = withAlpha(d.color, 0.14);
       ctx.fillRect(a.x - 2, a.y - 14, w, 20);

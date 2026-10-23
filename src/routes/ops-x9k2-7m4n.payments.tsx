@@ -23,7 +23,7 @@ export const Route = createFileRoute("/ops-x9k2-7m4n/payments")({
   component: OpsPayments,
 });
 
-const SANS = "font-['Google_Sans','Product_Sans','Google Sans',system-ui,sans-serif]";
+const SANS = "font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif]";
 
 function opsToken(): string | undefined {
   if (typeof window === "undefined") return undefined;

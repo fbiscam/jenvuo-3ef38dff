@@ -49,7 +49,7 @@ export const Route = createFileRoute("/contact")({
   component: ContactPage,
 });
 
-const SANS = "font-['Google_Sans','Product_Sans','Google Sans',system-ui,sans-serif]";
+const SANS = "font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif]";
 
 const ClientSchema = z.object({
   name: z.string().trim().min(1, "Enter your name").max(100),
