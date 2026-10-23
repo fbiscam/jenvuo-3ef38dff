@@ -4,7 +4,7 @@
 @import "@fontsource-variable/inter";
 
 @utility price-font {
-  font-family: "Inter Variable", "Inter", system-ui, sans-serif;
+  font-family: "Google Sans", system-ui, sans-serif;
   font-weight: 700;
   font-variation-settings: "wght" 700;
 }
@@ -55,8 +55,8 @@
  */
 
 @theme inline {
-  --font-display: "Google Sans", "Product Sans", "Poppins", system-ui, sans-serif;
-  --font-sans: "Google Sans", "Product Sans", "Poppins", system-ui, sans-serif;
+  --font-display: "Google Sans", "Product Sans", "Google Sans", system-ui, sans-serif;
+  --font-sans: "Google Sans", "Product Sans", "Google Sans", system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
@@ -308,7 +308,7 @@
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
-    font-family: "Google Sans", "Product Sans", "Poppins", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+    font-family: "Google Sans", "Product Sans", "Google Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
   }
 
 }

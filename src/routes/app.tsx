@@ -24,7 +24,7 @@ import { authSignInUrl, signOutAndRedirect } from "@/lib/cross-domain-session";
 import { cn } from "@/lib/utils";
 
 const MONO = "font-['JetBrains_Mono',ui-monospace,monospace]";
-const SANS = "font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif]";
+const SANS = "font-['Google_Sans','Product_Sans','Google Sans',system-ui,sans-serif]";
 
 /* ---------- ticker (matches homepage) ---------- */
 import { useLiveTicker, type TickerRow } from "@/hooks/useLiveTicker";

@@ -215,7 +215,7 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
       layout: {
         background: { type: ColorType.Solid, color: themeColors.bg },
         textColor: themeColors.text,
-        fontFamily: "'Google Sans', 'Poppins', system-ui, sans-serif",
+        fontFamily: "'Google Sans', 'Google Sans', system-ui, sans-serif",
         fontSize: 11,
         panes: { separatorColor: themeColors.border, enableResize: true },
       },
@@ -780,7 +780,7 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
       // when a caller omits the flag.
       if (p.smc) renderSmcOverlay(ctx, p.smc, p.smcToggles, pr, p.showSmcPressure ?? false);
       ctx.save();
-      ctx.font = "600 10px 'DM Sans', system-ui, sans-serif";
+      ctx.font = "600 10px 'Google Sans', system-ui, sans-serif";
       ctx.textAlign = "center";
       ctx.restore();
       const list = visibleDrawings();
@@ -981,7 +981,7 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
       ctx.fillStyle = "#ffffff";
       ctx.fillRect(0, 0, shot.width, shot.height + headerH);
       ctx.fillStyle = "#131722";
-      ctx.font = `600 ${Math.round(headerH * 0.5)}px 'DM Sans', sans-serif`;
+      ctx.font = `600 ${Math.round(headerH * 0.5)}px 'Google Sans', sans-serif`;
       ctx.fillText(header, Math.round(headerH * 0.4), Math.round(headerH * 0.68));
       ctx.drawImage(shot, 0, headerH);
       if (overlay) ctx.drawImage(overlay, 0, headerH, shot.width, shot.height);
