@@ -52,21 +52,104 @@ const SECTIONS = [
 export function IndustryPage({ c }: { c: IndustryContent }) {
   const p = c.variant === "products";
   return (
-    <div className={`public-cloudflare jenvu-zoom min-h-dvh w-full bg-background text-gc-ink ${SANS} antialiased`}>
+    <div className={`public-cloudflare jenvu-zoom pricing-zoom min-h-dvh w-full bg-background text-gc-ink ${SANS} antialiased`}>
       <SiteHeader />
-      <div style={{ zoom: PAGE_ZOOM }}>
-        {p ? <ProductsHero c={c} /> : <SolutionsHero c={c} />}
-        <SectionBar hide={p ? ["why"] : []} />
-        {p ? <ProductsZigzag c={c} /> : <SolutionsCards c={c} />}
-        {p && <ProductsHighlights c={c} />}
-        {p ? <TopicsTabs c={c} /> : <TopicsList c={c} />}
-        {!p && <WhyAccordion c={c} />}
-        {p ? <StoriesRows c={c} /> : <StoriesCards c={c} />}
-        <Products c={c} />
+      <div style={{ zoom: 0.85 }}>
+        <SimpleHero c={c} />
+        <SimpleCards id="solutions" title={c.solutionsTitle} intro={c.solutionsIntro} items={c.solutions.map((s) => ({ title: s.title, text: s.text, href: s.href, link: s.link }))} />
+        {p && c.highlights && c.highlightsTitle && (
+          <SimpleCards id="highlights" title={c.highlightsTitle} intro={c.highlightsIntro} items={c.highlights} tint />
+        )}
+        <SimpleTopics c={c} tint={!p} />
+        <SimpleWhy c={c} />
+        <SimpleCards id="products" title={c.productsTitle} items={c.products.map((x) => ({ ...x, link: "Learn more" }))} tint />
         <NextStep />
       </div>
       <div className="hide-in-pwa"><SiteFooter /></div>
     </div>
+  );
+}
+
+/* ---------- Simple pricing-style layout ---------- */
+
+function SimpleHero({ c }: { c: IndustryContent }) {
+  return (
+    <section id="overview" className="mx-auto max-w-[900px] px-5 pb-14 pt-14 text-center sm:px-8 sm:pt-16">
+      <span className="inline-flex rounded-full bg-gc-blue-soft px-3 py-1 text-[13px] font-medium text-gc-blue-deep">{c.pill}</span>
+      <h1 className="mt-5 text-[34px] font-normal leading-tight tracking-tight sm:text-[42px]">{c.title}</h1>
+      <p className="mx-auto mt-5 max-w-[760px] text-[17px] leading-[1.65] text-gc-ink-muted">{c.intro}</p>
+      <Buttons center />
+    </section>
+  );
+}
+
+function SimpleCards({ id, title, intro, items, tint = false }: { id: string; title: string; intro?: string; items: { title: string; text: string; href?: string; link?: string }[]; tint?: boolean }) {
+  return (
+    <section id={id} className={tint ? "bg-gc-surface" : ""}>
+      <div className="mx-auto max-w-[1200px] px-5 py-14 sm:px-8 md:py-16">
+        <SectionHead title={title} intro={intro} center />
+        <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {items.map((x) => (
+            <div key={x.title} className="flex flex-col rounded-[16px] border border-gc-line bg-background p-6">
+              <h3 className="text-[18px] font-medium">{x.title}</h3>
+              <p className="mt-2 flex-1 text-[15px] leading-[1.6] text-gc-ink-muted">{x.text}</p>
+              {x.href && (
+                <a href={x.href} className="mt-4 inline-flex items-center gap-1 text-[14px] font-medium text-gc-blue-deep hover:underline">
+                  {x.link ?? "Learn more"} <ArrowRight className="h-4 w-4" />
+                </a>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function SimpleTopics({ c, tint }: { c: IndustryContent; tint: boolean }) {
+  return (
+    <section id="topics" className={tint ? "bg-gc-surface" : ""}>
+      <div className="mx-auto max-w-[1000px] px-5 py-14 sm:px-8 md:py-16">
+        <SectionHead title={c.topicsTitle} center />
+        <div className="mt-10 overflow-hidden rounded-[16px] border border-gc-line bg-background">
+          {c.topics.map((t, i) => (
+            <div key={t.title} className={`grid gap-4 p-6 md:grid-cols-[220px_1fr] ${i ? "border-t border-gc-line" : ""}`}>
+              <p className="text-[14px] font-medium text-gc-blue-deep">{t.label}</p>
+              <div>
+                <h3 className="text-[18px] font-medium">{t.title}</h3>
+                <p className="mt-2 text-[15px] leading-[1.6] text-gc-ink-muted">{t.text}</p>
+                <ul className="mt-3 space-y-1.5 text-[15px] text-gc-ink">
+                  {t.points.map((pt) => <li key={pt}>• {pt}</li>)}
+                </ul>
+                <a href={t.href} className="mt-3 inline-flex items-center gap-1 text-[14px] font-medium text-gc-blue-deep hover:underline">{t.link} <ArrowRight className="h-4 w-4" /></a>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function SimpleWhy({ c }: { c: IndustryContent }) {
+  const [open, setOpen] = useState<number | null>(0);
+  return (
+    <section id="why">
+      <div className="mx-auto max-w-[900px] px-5 py-14 sm:px-8 md:py-16">
+        <SectionHead title={c.whyTitle} center />
+        <div className="mt-8 divide-y divide-gc-line border-y border-gc-line">
+          {c.why.map((w, i) => (
+            <div key={w.title}>
+              <button type="button" onClick={() => setOpen(open === i ? null : i)} className="flex w-full items-center justify-between gap-4 py-5 text-left text-[17px]">
+                {w.title}
+                <ChevronDown className={`h-5 w-5 shrink-0 text-gc-ink-muted transition-transform ${open === i ? "rotate-180" : ""}`} />
+              </button>
+              {open === i && <p className="pb-5 text-[15px] leading-[1.6] text-gc-ink-muted">{w.text}</p>}
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
   );
 }
 
