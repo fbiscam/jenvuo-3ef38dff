@@ -11,6 +11,7 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Toaster as SonnerToaster } from "sonner";
 import { AskJenvuWidget } from "@/components/AskJenvuWidget";
 import { PwaTabBar } from "@/components/PwaTabBar";
+import { PagePreloader } from "@/components/PagePreloader";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -430,6 +431,7 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+      <PagePreloader />
       <Outlet />
       {/* <PwaTabBar /> disabled */}
       <div className="hide-in-pwa">
