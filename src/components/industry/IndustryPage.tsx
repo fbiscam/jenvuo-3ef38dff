@@ -385,7 +385,8 @@ function ProductsHighlights({ c }: { c: IndustryContent }) {
   );
 }
 
-function TopicsTabs({ c }: { c: IndustryContent }) {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export function TopicsTabs({ c }: { c: IndustryContent }) {
   const [i, setI] = useState(0);
   const t = c.topics[i];
   return (
