@@ -464,7 +464,7 @@ export const Route = createFileRoute(
                 for (const email of uniqueEmails) {
                   const ok = await sendManagedEmailLogged(supabaseAdmin, {
                     to: email,
-                    from: "Jenvu Signal Desk <signals@notify.jenvu.com>",
+                    from: "Jenvu Signal Desk <signals@notify.jenvu.net>",
                     subject,
                     html,
                     text: textBody,
