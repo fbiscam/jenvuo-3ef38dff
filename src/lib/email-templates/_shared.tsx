@@ -17,15 +17,15 @@ export const URBANIST = INTER
 export const MONO = INTER
 
 export const COLORS = {
-  bg: '#f4f5f7',
+  bg: '#ffffff',
   card: '#ffffff',
-  ink: '#111827',
-  body: '#4b5563',
-  muted: '#6b7280',
-  soft: '#9ca3af',
-  border: '#e5e7eb',
-  hairline: '#f1f2f4',
-  accent: '#111827',
+  ink: '#202124',
+  body: '#3c4043',
+  muted: '#5f6368',
+  soft: '#70757a',
+  border: '#dadce0',
+  hairline: '#dadce0',
+  accent: '#1a73e8',
 }
 
 /** Load Google Sans inside <Head>. Falls back to system sans-serif when web fonts are blocked. */
@@ -79,8 +79,7 @@ export const LogoHeader = (_props: { tagline?: string } = {}) => (
 )
 
 const logoWrap = {
-  padding: '26px 28px 22px',
-  borderBottom: `1px solid ${COLORS.hairline}`,
+  padding: '32px 28px 0',
   backgroundColor: '#ffffff',
   textAlign: 'center' as const,
 }
@@ -100,18 +99,18 @@ export const shellStyles = {
   main: {
     backgroundColor: COLORS.bg,
     fontFamily: INTER,
-    padding: '32px 12px',
+    padding: '40px 12px',
     margin: 0,
   },
   container: {
     maxWidth: '560px',
     margin: '0 auto',
     backgroundColor: COLORS.card,
-    borderRadius: '16px',
+    borderRadius: '8px',
     border: `1px solid ${COLORS.border}`,
     overflow: 'hidden' as const,
   },
-  card: { padding: '32px 32px 28px' },
+  card: { padding: '20px 40px 32px' },
   eyebrow: {
     fontFamily: INTER,
     fontSize: '12px',
@@ -123,17 +122,20 @@ export const shellStyles = {
   h1: {
     fontFamily: INTER,
     fontSize: '24px',
-    fontWeight: 600 as const,
+    fontWeight: 400 as const,
     color: COLORS.ink,
-    letterSpacing: '-0.02em',
-    margin: '0 0 14px',
-    lineHeight: '1.25',
+    letterSpacing: '0',
+    margin: '0 0 24px',
+    padding: '0 0 20px',
+    borderBottom: `1px solid ${COLORS.hairline}`,
+    textAlign: 'center' as const,
+    lineHeight: '1.33',
   },
   text: {
     fontFamily: INTER,
-    fontSize: '15px',
+    fontSize: '14px',
     color: COLORS.body,
-    lineHeight: '1.6',
+    lineHeight: '1.7',
     margin: '0 0 16px',
     fontWeight: 400 as const,
   },
@@ -144,17 +146,17 @@ export const shellStyles = {
   },
   button: {
     display: 'inline-block',
-    backgroundColor: '#ffffff',
-    color: COLORS.ink,
-    border: `1px solid ${COLORS.border}`,
+    backgroundColor: '#1a73e8',
+    color: '#ffffff',
+    border: '1px solid #1a73e8',
     fontFamily: INTER,
     fontSize: '14px',
-    fontWeight: 600 as const,
-    borderRadius: '10px',
-    padding: '12px 22px',
+    fontWeight: 500 as const,
+    borderRadius: '4px',
+    padding: '10px 24px',
     textDecoration: 'none',
     margin: '4px 0 0',
-    boxShadow: '0 1px 2px rgba(17,24,39,0.08)',
+
   },
 
   actionWrap: {
@@ -164,7 +166,7 @@ export const shellStyles = {
 
   footer: {
     fontFamily: INTER,
-    fontSize: '13px',
+    fontSize: '12px',
     color: COLORS.muted,
     lineHeight: '1.6',
     margin: '0 0 10px',
@@ -180,12 +182,13 @@ export const shellStyles = {
     fontSize: '12px',
     color: COLORS.soft,
     letterSpacing: '0',
-    margin: '18px 0 0',
+    margin: '24px 0 0',
+    textAlign: 'center' as const,
     fontWeight: 400 as const,
   },
   codeBox: {
-    backgroundColor: '#ffffff',
-    borderRadius: '10px',
+    backgroundColor: '#f8f9fa',
+    borderRadius: '8px',
     padding: '20px 20px',
     margin: '18px 0 22px',
     textAlign: 'center' as const,
@@ -201,8 +204,8 @@ export const shellStyles = {
   },
   codeValue: {
     fontFamily: INTER,
-    fontSize: '34px',
-    fontWeight: 700 as const,
+    fontSize: '32px',
+    fontWeight: 500 as const,
     color: COLORS.ink,
     letterSpacing: '0.18em',
     margin: '0 0 10px',
