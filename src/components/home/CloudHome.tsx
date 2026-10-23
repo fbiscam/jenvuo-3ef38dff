@@ -289,6 +289,12 @@ const AUDIENCES: Array<{ key: string; label: string; cards: AudienceCard[] }> = 
 export function CloudAudiences() {
   const [active, setActive] = React.useState(AUDIENCES[0].key);
   const current = AUDIENCES.find((a) => a.key === active) ?? AUDIENCES[0];
+  // Warm every tab's images up front so switching tabs shows them instantly.
+  React.useEffect(() => {
+    AUDIENCES.forEach((a) => a.cards.forEach((c) => {
+      if (c.img) { const im = new Image(); im.decoding = "async"; im.src = c.img; }
+    }));
+  }, []);
   return (
     <section className="bg-background px-3 pb-16 sm:px-4">
       <div className="rounded-[28px] bg-gc-panel px-5 py-8 sm:px-10 md:px-12 md:py-10 xl:px-[96px]">
@@ -318,7 +324,7 @@ export function CloudAudiences() {
                 <div className="text-[12px] font-medium tracking-wide text-gc-ink-muted">{c.tag}</div>
                 <p className="mt-1 text-[16px] font-semibold leading-[1.55] text-gc-ink">{c.text}</p>
               </div>
-              {c.img && <img src={c.img} alt="" loading="lazy" className="w-[112px] shrink-0 object-cover" />}
+              {c.img && <img src={c.img} alt="" loading="eager" decoding="async" className="w-[112px] shrink-0 object-cover" />}
               {c.logo && (
                 <div className="flex w-[84px] shrink-0 items-center justify-center">
                   <img src="/favicon.png" alt="" className="h-14 w-14 object-contain" />
