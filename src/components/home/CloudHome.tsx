@@ -316,7 +316,7 @@ export function CloudAudiences() {
             >
               <div className="flex min-w-0 flex-1 flex-col justify-center px-4 py-5">
                 <div className="text-[12px] font-medium tracking-wide text-gc-ink-muted">{c.tag}</div>
-                <p className="mt-1 text-[15px] font-normal leading-[1.6] text-gc-ink">{c.text}</p>
+                <p className="mt-1 text-[15px] font-semibold leading-[1.6] text-gc-ink">{c.text}</p>
               </div>
               {c.img && <img src={c.img} alt="" loading="lazy" className="w-[112px] shrink-0 object-cover" />}
               {c.logo && (
