@@ -111,7 +111,7 @@ const CONTENT: IndustryContent = {
   highlightsTitle: "What you get with every plan",
   highlightsIntro: "Four tools that work together on one live gold chart.",
   highlights: [
-    { title: "Live gold chart", text: "XAU/USD candles with structure, zones and sweeps marked for you." },
+    { title: "Live gold chart", text: "XAU/USD candles with structure, zones, sweeps marked for you." },
     { title: "AI answers", text: "Ask about the chart and get a short, plain-language reply." },
     { title: "Price alerts", text: "Pick a level and get told when gold reaches it." },
     { title: "API keys", text: "Use Jenvu analysis in your own apps and bots." },
