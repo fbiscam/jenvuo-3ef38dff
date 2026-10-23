@@ -81,7 +81,7 @@ function ArticlePage() {
         <SiteHeader />
 
         <main className="mx-auto max-w-3xl px-5 sm:px-6 py-12 sm:py-16">
-          <nav className={`${MONO} text-[10px] uppercase tracking-[0.22em] text-gc-muted flex items-center gap-1.5 flex-wrap`}>
+          <nav className={`${MONO} text-[10px] uppercase tracking-[0.22em] text-gc-ink-muted flex items-center gap-1.5 flex-wrap`}>
             <Link to="/help" className="hover:text-gc-blue">Help</Link>
             <ChevronRight className="h-3 w-3" />
             <Link to="/help/$collection" params={{ collection: collection.slug }} className="hover:text-gc-blue">
@@ -92,8 +92,8 @@ function ArticlePage() {
           </nav>
 
           <h1 className="mt-5 text-3xl sm:text-4xl font-semibold tracking-tight">{article.title}</h1>
-          <p className="mt-3 text-gc-muted text-base sm:text-lg">{article.summary}</p>
-          <div className={`${MONO} mt-4 text-[10px] uppercase tracking-[0.22em] text-gc-muted`}>
+          <p className="mt-3 text-gc-ink-muted text-base sm:text-lg">{article.summary}</p>
+          <div className={`${MONO} mt-4 text-[10px] uppercase tracking-[0.22em] text-gc-ink-muted`}>
             Updated {new Date(article.updatedAt).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
           </div>
 
@@ -135,7 +135,7 @@ function ArticlePage() {
           <div className="mt-12 rounded-xl border border-gc-line bg-gc-panel p-6 flex items-center justify-between gap-4 flex-wrap">
             <div>
               <div className="text-sm font-medium text-gc-ink">Was this article helpful?</div>
-              <div className="text-xs text-gc-muted">Your feedback helps us improve.</div>
+              <div className="text-xs text-gc-ink-muted">Your feedback helps us improve.</div>
             </div>
             <div className="flex items-center gap-2">
               <FeedbackButton label="Yes" />
@@ -146,7 +146,7 @@ function ArticlePage() {
           {/* Related */}
           {related.length > 0 && (
             <section className="mt-12">
-              <div className={`${MONO} text-[10px] uppercase tracking-[0.22em] text-gc-muted`}>
+              <div className={`${MONO} text-[10px] uppercase tracking-[0.22em] text-gc-ink-muted`}>
                 Related articles
               </div>
               <ul className="mt-4 divide-y divide-gc-line rounded-xl border border-gc-line bg-background">
@@ -159,7 +159,7 @@ function ArticlePage() {
                     >
                       <div>
                         <div className="text-sm font-medium text-gc-ink">{a.title}</div>
-                        <div className="mt-0.5 text-xs text-gc-muted">{a.summary}</div>
+                        <div className="mt-0.5 text-xs text-gc-ink-muted">{a.summary}</div>
                       </div>
                       <ArrowRight className="mt-1 h-4 w-4 shrink-0 text-zinc-400 group-hover:text-gc-blue transition" />
                     </Link>
@@ -172,7 +172,7 @@ function ArticlePage() {
           <Link
             to="/help/$collection"
             params={{ collection: collection.slug }}
-            className={`${MONO} mt-10 inline-flex items-center gap-1.5 text-[10px] uppercase tracking-[0.22em] text-gc-muted hover:text-gc-blue`}
+            className={`${MONO} mt-10 inline-flex items-center gap-1.5 text-[10px] uppercase tracking-[0.22em] text-gc-ink-muted hover:text-gc-blue`}
           >
             <ArrowLeft className="h-3 w-3" /> Back to {collection.title}
           </Link>
