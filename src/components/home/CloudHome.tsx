@@ -261,27 +261,27 @@ const AUDIENCES: Array<{ key: string; label: string; cards: AudienceCard[] }> = 
     key: "traders",
     label: "Traders",
     cards: [
-      { tag: "NEW TRADERS", text: "New sign-ups get 14 days of Pro access to the Terminal", to: "/auth", img: tradeNeonStart },
-      { tag: "PRACTICE", text: "Practice on a $100,000 demo account with automatic closing", to: "/pricing", img: tradeNeonPractice },
-      { tag: "LEARN", text: "Read daily XAU/USD insights and guides on sweeps and zones", to: "/insights", img: tradeNeonLearn },
+      { tag: "NEW TRADERS", text: "New sign-ups get 14 days of free Pro access to the gold Terminal", to: "/auth", img: tradeNeonStart },
+      { tag: "PRACTICE", text: "Practice on a $100,000 demo account with automatic closing at your stop loss", to: "/pricing", img: tradeNeonPractice },
+      { tag: "LEARN", text: "Read daily XAU/USD insights and guides on sweeps, zones and order blocks", to: "/insights", img: tradeNeonLearn },
     ],
   },
   {
     key: "developers",
     label: "Developers",
     cards: [
-      { tag: "TOP-TIER MODELS", text: "Top-tier AI models for developers who want to build", to: "/ai-engine", img: devModels },
-      { tag: "API & EXTENSION", text: "Plug Jenvu models into your apps and bots with API keys", to: "/pricing", img: devExtension },
-      { tag: "DEVELOPER DOCS", text: "Clear docs and guides to connect, test and ship projects", to: "/help", img: devDocs },
+      { tag: "TOP-TIER MODELS", text: "Top-tier AI models for developers who want to build serious trading tools", to: "/ai-engine", img: devModels },
+      { tag: "API & EXTENSION", text: "Plug Jenvu models into your apps and bots with API keys in minutes", to: "/pricing", img: devExtension },
+      { tag: "DEVELOPER DOCS", text: "Clear docs and guides to connect, test and ship your projects faster", to: "/help", img: devDocs },
     ],
   },
   {
     key: "programs",
     label: "Special programs",
     cards: [
-      { tag: "FOUNDING PROGRAM", text: "Apply to the invite-only Founding Program for your chosen plan", to: "/founding", img: progFounding },
-      { tag: "PLANS", text: "Choose Pro at $10, Elite at $25 or Ultra at $50 monthly", to: "/pricing", img: progPlans },
-      { tag: "SUPPORT", text: "Questions about plans, billing or the Terminal? Ask our support team", to: "/contact", img: progSupport },
+      { tag: "FOUNDING PROGRAM", text: "Apply to the invite-only Founding Program for your chosen plan and $250 credit", to: "/founding", img: progFounding },
+      { tag: "PLANS", text: "Choose Pro at $10, Elite at $25 or Ultra at $50, billed every month", to: "/pricing", img: progPlans },
+      { tag: "SUPPORT", text: "Questions about plans, billing or the Terminal? Ask our support team and we'll help", to: "/contact", img: progSupport },
     ],
   },
 ];
@@ -316,7 +316,7 @@ export function CloudAudiences() {
             >
               <div className="flex min-w-0 flex-1 flex-col justify-center px-4 py-5">
                 <div className="text-[12px] font-medium tracking-wide text-gc-ink-muted">{c.tag}</div>
-                <p className="mt-1 text-[15px] font-semibold leading-[1.6] text-gc-ink">{c.text}</p>
+                <p className="mt-1 text-[16px] font-semibold leading-[1.55] text-gc-ink">{c.text}</p>
               </div>
               {c.img && <img src={c.img} alt="" loading="lazy" className="w-[112px] shrink-0 object-cover" />}
               {c.logo && (
