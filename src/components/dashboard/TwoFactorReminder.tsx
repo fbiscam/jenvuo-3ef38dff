@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { ShieldCheck, X } from "lucide-react";
+import { ShieldCheck } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 const DISMISS_KEY = "jenvu_2fa_reminder_day";
