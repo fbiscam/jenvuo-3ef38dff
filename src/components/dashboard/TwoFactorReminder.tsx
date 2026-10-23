@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { ShieldCheck, X } from "lucide-react";
+import { ShieldCheck } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 const DISMISS_KEY = "jenvu_2fa_reminder_day";
@@ -27,23 +27,27 @@ export default function TwoFactorReminder() {
   };
 
   return (
-    <section className="mb-6 flex items-start gap-4 rounded-lg border border-gc-line bg-gc-blue-soft p-5">
-      <ShieldCheck className="mt-0.5 h-6 w-6 shrink-0 text-gc-blue" aria-hidden="true" />
-      <div className="min-w-0 flex-1">
-        <h2 className="text-[17px] font-medium text-gc-ink">Protect your account with 2FA</h2>
-        <p className="mt-1 text-[14px] text-gc-ink-muted">
-          Turn on two-factor sign-in with an authenticator app. Even if someone gets your password, they can't sign in without your phone.
-        </p>
+    <section className="mb-6 flex flex-wrap items-center gap-x-4 gap-y-2 rounded-2xl bg-gc-notice px-5 py-3">
+      <ShieldCheck className="h-[18px] w-[18px] shrink-0 text-gc-blue-deep" aria-hidden="true" />
+      <p className="min-w-0 flex-1 text-[14px] text-gc-ink">
+        <span className="font-medium">Protect your account with 2FA</span>
+        <span className="text-gc-ink-muted"> — Turn on sign-in with an authenticator app so only your phone can sign in.</span>
+      </p>
+      <div className="flex shrink-0 items-center gap-2">
+        <button
+          type="button"
+          onClick={dismiss}
+          className="h-8 rounded-full px-3 text-[13px] font-medium text-gc-blue-deep hover:bg-gc-blue-soft"
+        >
+          Dismiss
+        </button>
         <Link
           to="/dashboard/profile"
-          className="mt-3 inline-flex items-center rounded-md bg-gc-blue px-4 py-2 text-[14px] font-medium text-gc-on-blue hover:bg-gc-blue-hover"
+          className="inline-flex h-8 items-center rounded-full px-3 text-[13px] font-medium text-gc-blue-deep hover:bg-gc-blue-soft"
         >
           Turn on 2FA
         </Link>
       </div>
-      <button type="button" onClick={dismiss} aria-label="Remind me tomorrow" className="rounded p-1 text-gc-ink-muted hover:bg-gc-canvas">
-        <X className="h-4 w-4" />
-      </button>
     </section>
   );
 }
