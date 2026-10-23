@@ -67,8 +67,7 @@ export const Route = createFileRoute("/help/$collection/$slug")({
   component: ArticlePage,
 });
 
-const MONO = "font-['JetBrains_Mono',ui-monospace,monospace]";
-const SANS = "font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif]";
+const MONO = "font-medium";
 
 function ArticlePage() {
   const { collection, article } = Route.useLoaderData();
