@@ -281,7 +281,7 @@ const AUDIENCES: Array<{ key: string; label: string; cards: AudienceCard[] }> = 
     cards: [
       { tag: "FOUNDING PROGRAM", text: "Apply to the invite-only Founding Program for your chosen plan and $250 credit", to: "/founding", img: progFounding },
       { tag: "PLANS", text: "Choose Pro at $10, Elite at $25 or Ultra at $50, billed every month", to: "/pricing", img: progPlans },
-      { tag: "SUPPORT", text: "Questions about plans, billing or the Terminal? Ask our support team and we'll help", to: "/contact", img: progSupport },
+      { tag: "SUPPORT", text: "Questions about plans, billing or the Terminal? Ask our support team", to: "/contact", img: progSupport },
     ],
   },
 ];
