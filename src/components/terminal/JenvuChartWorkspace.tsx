@@ -205,8 +205,6 @@ function ToolButton({
   disabled?: boolean;
 }) {
   return (
-    <Tooltip>
-      <TooltipTrigger asChild>
         <button
           type="button"
           aria-label={label}
@@ -220,9 +218,6 @@ function ToolButton({
         >
           {children}
         </button>
-      </TooltipTrigger>
-      <TooltipContent side="right">{label}</TooltipContent>
-    </Tooltip>
   );
 }
 

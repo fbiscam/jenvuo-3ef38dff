@@ -157,7 +157,7 @@ export default function AvatarAdjuster({ file, onCancel, onDone }: Props) {
               step={0.01}
               value={zoom}
               onChange={(e) => setZoom(parseFloat(e.target.value))}
-              className="flex-1 accent-zinc-900"
+              className="flex-1 accent-emerald-600"
             />
           </label>
           <p className="mt-2 text-[11px] text-zinc-500">
@@ -168,18 +168,11 @@ export default function AvatarAdjuster({ file, onCancel, onDone }: Props) {
         <div className="mt-5 flex justify-end gap-2">
           <button
             type="button"
-            onClick={onCancel}
-            className="rounded-lg border border-zinc-300 bg-white px-3 py-1.5 text-xs font-medium text-zinc-800 hover:bg-zinc-50"
-          >
-            Cancel
-          </button>
-          <button
-            type="button"
             onClick={doExport}
             disabled={!img || saving}
-            className="rounded-lg bg-zinc-900 px-4 py-1.5 text-xs font-medium text-white hover:bg-zinc-800 disabled:opacity-50"
+            className="w-full rounded-full bg-emerald-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-emerald-700 disabled:opacity-50"
           >
-            {saving ? "Saving…" : "Save photo"}
+            {saving ? "Saving…" : "Set new profile picture"}
           </button>
         </div>
       </div>
