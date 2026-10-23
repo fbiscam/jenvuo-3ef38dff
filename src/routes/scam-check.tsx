@@ -202,7 +202,7 @@ function ScamCheckPage() {
               placeholder={tab.placeholder}
               rows={6}
               maxLength={4000}
-              className="w-full resize-y rounded-md border border-input bg-background p-3 text-sm text-foreground outline-hidden placeholder:text-muted-foreground focus:border-ring focus:ring-1 focus:ring-ring"
+              className="w-full resize-y rounded-md border border-input bg-background p-3 text-[15px] text-foreground outline-hidden placeholder:text-muted-foreground focus:border-ring focus:ring-1 focus:ring-ring"
             />
           ) : (
             <input
@@ -214,12 +214,12 @@ function ScamCheckPage() {
               autoCapitalize="off"
               autoCorrect="off"
               spellCheck={false}
-              className="w-full rounded-md border border-input bg-background p-3 text-sm text-foreground outline-hidden placeholder:text-muted-foreground focus:border-ring focus:ring-1 focus:ring-ring"
+              className="w-full rounded-md border border-input bg-background p-3 text-[15px] text-foreground outline-hidden placeholder:text-muted-foreground focus:border-ring focus:ring-1 focus:ring-ring"
             />
           )}
 
           <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <p className="text-xs text-muted-foreground">{tab.hint}</p>
+            <p className="text-[13px] text-muted-foreground">{tab.hint}</p>
             <Button
               type="submit"
               disabled={loading || !value.trim()}
@@ -232,7 +232,7 @@ function ScamCheckPage() {
         </form>
 
         {error && (
-          <div className="mt-4 rounded-xl border border-gc-red-soft bg-gc-red-soft p-4 text-sm text-gc-red">{error}</div>
+          <div className="mt-4 rounded-xl border border-gc-red-soft bg-gc-red-soft p-4 text-[15px] text-gc-red">{error}</div>
         )}
 
         {/* Result */}
@@ -245,13 +245,13 @@ function ScamCheckPage() {
                 </div>
                 <div>
                   <h2 className={`text-xl font-semibold ${v.text}`}>{v.title}</h2>
-                  <p className="mt-0.5 break-all text-xs text-gc-ink-muted">{result.subject}</p>
+                  <p className="mt-0.5 break-all text-[13px] text-gc-ink-muted">{result.subject}</p>
                 </div>
               </div>
               <button
                 type="button"
                 onClick={copyResult}
-                className="inline-flex items-center gap-2 self-start rounded-full border border-gc-line px-3 py-1.5 text-xs text-gc-ink-muted hover:border-gc-line hover:text-gc-ink"
+                className="inline-flex items-center gap-2 self-start rounded-full border border-gc-line px-3 py-1.5 text-[13px] text-gc-ink-muted hover:border-gc-line hover:text-gc-ink"
               >
                 {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
                 {copied ? "Copied" : "Copy result"}
@@ -260,7 +260,7 @@ function ScamCheckPage() {
 
             {/* Score bar */}
             <div className="mt-5">
-              <div className="flex items-center justify-between text-xs text-gc-ink-muted">
+              <div className="flex items-center justify-between text-[13px] text-gc-ink-muted">
                 <span>Risk score</span>
                 <span className="tabular-nums">{result.score}/100</span>
               </div>
@@ -269,15 +269,15 @@ function ScamCheckPage() {
               </div>
             </div>
 
-            <p className="mt-5 text-sm leading-relaxed text-gc-ink">{result.summary}</p>
+            <p className="mt-5 text-[15px] leading-relaxed text-gc-ink">{result.summary}</p>
 
             <div className={`mt-4 rounded-xl ${v.bg} p-4`}>
-              <p className="text-xs uppercase tracking-wide text-gc-ink-muted">What you should do</p>
-              <p className={`mt-1 text-sm ${v.text}`}>{result.recommendation}</p>
+              <p className="text-[13px] uppercase tracking-wide text-gc-ink-muted">What you should do</p>
+              <p className={`mt-1 text-[15px] ${v.text}`}>{result.recommendation}</p>
             </div>
 
             <div className="mt-5">
-              <p className="text-xs uppercase tracking-wide text-gc-ink-muted">Signals detected</p>
+              <p className="text-[13px] uppercase tracking-wide text-gc-ink-muted">Signals detected</p>
               <ul className="mt-2 space-y-2">
                 {result.signals.map((s, i) => (
                   <li key={`${s.label}-${i}`} className="rounded-xl border border-gc-surface bg-gc-surface p-3">
@@ -285,9 +285,9 @@ function ScamCheckPage() {
                       <span className={`rounded-full border px-2 py-0.5 text-[11px] ${SEV_UI[s.severity] ?? SEV_UI.low}`}>
                         {s.severity}
                       </span>
-                      <span className="text-sm text-gc-ink">{s.label}</span>
+                      <span className="text-[15px] text-gc-ink">{s.label}</span>
                     </div>
-                    <p className="mt-1 text-xs leading-relaxed text-gc-ink-muted">{s.detail}</p>
+                    <p className="mt-1 text-[13px] leading-relaxed text-gc-ink-muted">{s.detail}</p>
                   </li>
                 ))}
               </ul>
@@ -305,8 +305,8 @@ function ScamCheckPage() {
 
         {/* Safety tips */}
         <section className="mt-6 rounded-3xl bg-gc-surface p-5 sm:p-6">
-          <h2 className="text-sm font-semibold text-gc-ink">Three rules that stop most scams</h2>
-          <ul className="mt-3 space-y-2 text-sm text-gc-ink-muted">
+          <h2 className="text-[15px] font-semibold text-gc-ink">Three rules that stop most scams</h2>
+          <ul className="mt-3 space-y-2 text-[15px] text-gc-ink-muted">
             <li>• Never share an OTP, password, CVV or wallet recovery phrase — nobody legitimate asks.</li>
             <li>• Urgency is the tell. Real companies do not close your account in ten minutes.</li>
             <li>• Do not use the link you were sent. Open the official app or type the address yourself.</li>
