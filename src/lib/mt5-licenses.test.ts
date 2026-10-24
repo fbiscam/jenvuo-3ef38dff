@@ -1,4 +1,5 @@
-import { describe, expect, it } from "vitest";
+import { describe, it } from "node:test";
+import { expect } from "./chart/test-expect";
 import { dailyTarget, evaluateLicense, licenseLimit, newLicenseKey, LICENSE_KEY_RE } from "./mt5-licenses";
 
 const key = "JENV-ABCD-EFGH-JKLM-NPQR";
