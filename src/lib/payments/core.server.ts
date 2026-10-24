@@ -294,6 +294,7 @@ export async function approveOrder(orderId: string, by: string) {
   // Paid amount (excluding promo bonus) decides the plan tier.
   try {
     await applyPlanForPayment(order.user_id, Number(order.pay_amount_usd ?? credit), order.target_plan_id);
+    await ensureMt5License(order.user_id);
   } catch (e) {
     console.error("plan upgrade on approval failed", (e as Error)?.message);
   }
