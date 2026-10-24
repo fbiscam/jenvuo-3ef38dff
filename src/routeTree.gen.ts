@@ -63,6 +63,7 @@ import { Route as AuthenticatedDashboardCourseRouteImport } from './routes/_auth
 import { Route as AuthenticatedDashboardDocumentsRouteImport } from './routes/_authenticated/dashboard.documents'
 import { Route as AuthenticatedDashboardExtensionRouteImport } from './routes/_authenticated/dashboard.extension'
 import { Route as AuthenticatedDashboardJournalRouteImport } from './routes/_authenticated/dashboard.journal'
+import { Route as AuthenticatedDashboardJxBotRouteImport } from './routes/_authenticated/dashboard.jx-bot'
 import { Route as AuthenticatedDashboardNotificationsRouteImport } from './routes/_authenticated/dashboard.notifications'
 import { Route as AuthenticatedDashboardPayRouteImport } from './routes/_authenticated/dashboard.pay'
 import { Route as AuthenticatedDashboardPaymentRouteImport } from './routes/_authenticated/dashboard.payment'
@@ -386,6 +387,12 @@ const AuthenticatedDashboardJournalRoute =
     path: '/journal',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
+const AuthenticatedDashboardJxBotRoute =
+  AuthenticatedDashboardJxBotRouteImport.update({
+    id: '/jx-bot',
+    path: '/jx-bot',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
 const AuthenticatedDashboardNotificationsRoute =
   AuthenticatedDashboardNotificationsRouteImport.update({
     id: '/notifications',
@@ -690,6 +697,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/documents': typeof AuthenticatedDashboardDocumentsRoute
   '/dashboard/extension': typeof AuthenticatedDashboardExtensionRoute
   '/dashboard/journal': typeof AuthenticatedDashboardJournalRoute
+  '/dashboard/jx-bot': typeof AuthenticatedDashboardJxBotRoute
   '/dashboard/notifications': typeof AuthenticatedDashboardNotificationsRoute
   '/dashboard/pay': typeof AuthenticatedDashboardPayRoute
   '/dashboard/payment': typeof AuthenticatedDashboardPaymentRoute
@@ -784,6 +792,7 @@ export interface FileRoutesByTo {
   '/dashboard/documents': typeof AuthenticatedDashboardDocumentsRoute
   '/dashboard/extension': typeof AuthenticatedDashboardExtensionRoute
   '/dashboard/journal': typeof AuthenticatedDashboardJournalRoute
+  '/dashboard/jx-bot': typeof AuthenticatedDashboardJxBotRoute
   '/dashboard/notifications': typeof AuthenticatedDashboardNotificationsRoute
   '/dashboard/pay': typeof AuthenticatedDashboardPayRoute
   '/dashboard/payment': typeof AuthenticatedDashboardPaymentRoute
@@ -884,6 +893,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/documents': typeof AuthenticatedDashboardDocumentsRoute
   '/_authenticated/dashboard/extension': typeof AuthenticatedDashboardExtensionRoute
   '/_authenticated/dashboard/journal': typeof AuthenticatedDashboardJournalRoute
+  '/_authenticated/dashboard/jx-bot': typeof AuthenticatedDashboardJxBotRoute
   '/_authenticated/dashboard/notifications': typeof AuthenticatedDashboardNotificationsRoute
   '/_authenticated/dashboard/pay': typeof AuthenticatedDashboardPayRoute
   '/_authenticated/dashboard/payment': typeof AuthenticatedDashboardPaymentRoute
@@ -984,6 +994,7 @@ export interface FileRouteTypes {
     | '/dashboard/documents'
     | '/dashboard/extension'
     | '/dashboard/journal'
+    | '/dashboard/jx-bot'
     | '/dashboard/notifications'
     | '/dashboard/pay'
     | '/dashboard/payment'
@@ -1078,6 +1089,7 @@ export interface FileRouteTypes {
     | '/dashboard/documents'
     | '/dashboard/extension'
     | '/dashboard/journal'
+    | '/dashboard/jx-bot'
     | '/dashboard/notifications'
     | '/dashboard/pay'
     | '/dashboard/payment'
@@ -1177,6 +1189,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/documents'
     | '/_authenticated/dashboard/extension'
     | '/_authenticated/dashboard/journal'
+    | '/_authenticated/dashboard/jx-bot'
     | '/_authenticated/dashboard/notifications'
     | '/_authenticated/dashboard/pay'
     | '/_authenticated/dashboard/payment'
@@ -1665,6 +1678,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardJournalRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
+    '/_authenticated/dashboard/jx-bot': {
+      id: '/_authenticated/dashboard/jx-bot'
+      path: '/jx-bot'
+      fullPath: '/dashboard/jx-bot'
+      preLoaderRoute: typeof AuthenticatedDashboardJxBotRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
     '/_authenticated/dashboard/notifications': {
       id: '/_authenticated/dashboard/notifications'
       path: '/notifications'
@@ -1977,6 +1997,7 @@ interface AuthenticatedDashboardRouteChildren {
   AuthenticatedDashboardDocumentsRoute: typeof AuthenticatedDashboardDocumentsRoute
   AuthenticatedDashboardExtensionRoute: typeof AuthenticatedDashboardExtensionRoute
   AuthenticatedDashboardJournalRoute: typeof AuthenticatedDashboardJournalRoute
+  AuthenticatedDashboardJxBotRoute: typeof AuthenticatedDashboardJxBotRoute
   AuthenticatedDashboardNotificationsRoute: typeof AuthenticatedDashboardNotificationsRoute
   AuthenticatedDashboardPayRoute: typeof AuthenticatedDashboardPayRoute
   AuthenticatedDashboardPaymentRoute: typeof AuthenticatedDashboardPaymentRoute
@@ -2009,6 +2030,7 @@ const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
     AuthenticatedDashboardDocumentsRoute: AuthenticatedDashboardDocumentsRoute,
     AuthenticatedDashboardExtensionRoute: AuthenticatedDashboardExtensionRoute,
     AuthenticatedDashboardJournalRoute: AuthenticatedDashboardJournalRoute,
+    AuthenticatedDashboardJxBotRoute: AuthenticatedDashboardJxBotRoute,
     AuthenticatedDashboardNotificationsRoute:
       AuthenticatedDashboardNotificationsRoute,
     AuthenticatedDashboardPayRoute: AuthenticatedDashboardPayRoute,

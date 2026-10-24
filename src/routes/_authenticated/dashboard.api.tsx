@@ -12,6 +12,7 @@ import {
   type ExtensionKeyAccess,
 } from "@/lib/extension-keys.functions";
 import { getPlanCapabilities } from "@/lib/plan-entitlements";
+import { Mt5Licenses } from "@/components/dashboard/Mt5Licenses";
 
 const MONO = "font-['JetBrains_Mono',ui-monospace,monospace]";
 const API_BASE = "https://jenvu.com/api/public/v1";
@@ -585,6 +586,10 @@ function ExtensionPage() {
           </div>
         </div>
       )}
+      <div className="mt-8">
+        <h2 className="mb-3 text-[20px] font-normal text-gc-ink">JX Bot licenses</h2>
+        <Mt5Licenses />
+      </div>
     </div>
   );
 }

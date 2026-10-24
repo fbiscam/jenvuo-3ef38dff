@@ -80,7 +80,7 @@ function PricingPage() {
   const signedOut = currentPlan === null;
   const [billing, setBilling] = React.useState<"monthly" | "annual">("monthly");
   const priceOf = (id: string, price: number) => {
-    const base = signedOut && id === "pro" ? 5 : price;
+    const base = price;
     return billing === "annual" && base > 0 ? Math.round((base * 12 * 0.83) / 10) * 10 : base;
   };
   const suffix = billing === "annual" ? "/yr" : "/mo";
