@@ -27,9 +27,9 @@ export default function TwoFactorReminder() {
   };
 
   return (
-    <section className="mb-6 flex flex-wrap items-center gap-x-4 gap-y-2 rounded-2xl bg-gc-notice px-5 py-3">
-      <ShieldCheck className="h-[18px] w-[18px] shrink-0 text-gc-blue-deep" aria-hidden="true" />
-      <p className="min-w-0 flex-1 text-[14px] text-gc-ink">
+    <section className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-gc-line bg-background py-2 pl-4 pr-4 sm:pl-5 md:pr-5">
+      <ShieldCheck className="h-5 w-5 shrink-0 text-gc-ink-muted" aria-hidden="true" />
+      <p className="min-w-0 flex-1 text-[13px] text-gc-ink sm:text-[14px]">
         <span className="font-medium">Protect your account with 2FA</span>
         <span className="text-gc-ink-muted"> — Turn on sign-in with an authenticator app so only your phone can sign in.</span>
       </p>
@@ -37,13 +37,13 @@ export default function TwoFactorReminder() {
         <button
           type="button"
           onClick={dismiss}
-          className="h-8 rounded-full px-3 text-[13px] font-medium text-gc-blue-deep hover:bg-gc-blue-soft"
+          className="h-8 rounded-full border border-gc-line bg-background px-4 text-[13px] font-medium text-gc-ink hover:bg-gc-surface"
         >
           Dismiss
         </button>
         <Link
           to="/dashboard/profile"
-          className="inline-flex h-8 items-center rounded-full px-3 text-[13px] font-medium text-gc-blue-deep hover:bg-gc-blue-soft"
+          className="inline-flex h-8 items-center rounded-full bg-gc-blue-deep px-4 text-[13px] font-medium text-gc-on-blue hover:bg-gc-navy"
         >
           Turn on 2FA
         </Link>
