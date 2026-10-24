@@ -4,13 +4,13 @@ import welcomeImg from "@/assets/onboarding/welcome.jpg";
 import signalsImg from "@/assets/onboarding/signals.jpg";
 import aiImg from "@/assets/onboarding/ai-desk.jpg";
 import extImg from "@/assets/onboarding/extension-api.jpg";
-import demoImg from "@/assets/onboarding/demo.jpg";
+import botImg from "@/assets/onboarding/jx-bot.jpg";
 
 const OPTIONS = [
   { id: "signals", title: "Trade XAU/USD with live SMC & ICT signals", desc: "Sweeps, supply & demand zones and fair value gaps on gold.", img: signalsImg },
   { id: "ai_desk", title: "Use the AI trading desk", desc: "Ask the chart copilot about structure, levels and news.", img: aiImg },
   { id: "extension_api", title: "Connect the extension & API", desc: "Bring Jenvu analysis into your browser and your own apps.", img: extImg },
-  { id: "demo", title: "Practice on a demo account", desc: "Trade a $100,000 practice balance with no real money.", img: demoImg },
+  { id: "jx_bot", title: "Automate gold with JX Bot on MT5", desc: "Run Jenvu's Expert Advisor on your MetaTrader 5 account.", img: botImg },
 ] as const;
 
 const FONT = { fontFamily: "'Google Sans Flex','Google Sans',sans-serif" };
