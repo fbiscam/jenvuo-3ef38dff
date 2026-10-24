@@ -29,7 +29,7 @@ export const Route = createFileRoute("/pricing")({
   head: () => ({
     meta: [
       { title: "Jenvu Pricing — Pro, Elite and Ultra Plans" },
-      { name: "description", content: "Transparent Jenvu pricing: Pro $10, Elite $25 and Ultra $50 a month, $3 per million tokens, plus $100 free credit and 14 days of Pro for new users." },
+      { name: "description", content: "Transparent Jenvu pricing: Pro $49, Elite $99 and Ultra $169 a month, $3 per million tokens, plus $100 free credit and 14 days of Pro for new users." },
       { property: "og:title", content: "Jenvu pricing" },
       { property: "og:description", content: "Pro, Elite and Ultra plans for JX Bot on MT5 and the Top AI Models, with $100 free credit to start." },
       { property: "og:type", content: "website" },

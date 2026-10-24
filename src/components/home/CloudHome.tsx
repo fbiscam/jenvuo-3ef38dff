@@ -590,7 +590,7 @@ export function CloudUseCases() {
 /* ---------------- Pricing band ---------------- */
 const PLANS = [
   { name: "Pro", price: "$49", note: "For traders getting started with the Terminal and AI desk.", tone: "blue" as Tone },
-  { name: "Elite", price: "$25", note: "More AI usage and daily tokens for active intraday trading.", tone: "green" as Tone },
+  { name: "Elite", price: "$99", note: "More AI usage and daily tokens for active intraday trading.", tone: "green" as Tone },
   { name: "Ultra", price: "$169", note: "The highest limits for full-time desks and API use.", tone: "red" as Tone },
 ];
 
