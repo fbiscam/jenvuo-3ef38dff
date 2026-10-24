@@ -324,7 +324,7 @@ function PricingPage() {
                 <span className="text-[36px] font-normal leading-none text-gc-success">${p.price}</span>
                 <span className="text-[14px] text-gc-ink-muted">wallet</span>
               </div>
-              <p className="mt-2 text-[14px] text-gc-ink-muted">One-time · {Math.floor(p.price / 0.03)} primary AI requests</p>
+              <p className="mt-2 text-[14px] text-gc-ink-muted">One-time · ~{(Math.floor((p.price / 3) * 10) / 10).toFixed(1)}M tokens</p>
               <Link
                 to={signedOut ? "/auth" : "/dashboard/pay"}
                 search={signedOut ? undefined : ({ amount: p.price } as never)}
