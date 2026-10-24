@@ -86,7 +86,19 @@ function JxBotPage() {
     setDownloading(true);
     try {
       const r = await getUrl();
-      if (r.ok) window.location.href = r.url;
+      if (r.ok) {
+        const res = await fetch(r.url);
+        if (!res.ok) throw new Error("fetch failed");
+        const blob = await res.blob();
+        const href = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = href;
+        a.download = "JX-Bot-MT5.zip";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(href), 30_000);
+      }
       else toast.error(r.error);
     } catch {
       toast.error("Download failed. Please try again.");
