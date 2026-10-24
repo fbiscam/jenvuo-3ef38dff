@@ -15,7 +15,7 @@ export type TerminalAccessState = {
 
 const INITIAL: TerminalAccessState = { loading: true, allowed: false, reason: null, idDeadline: null, idSubmitted: false, trialEndsAt: null };
 
-/** Terminal access for the signed-in user (paid plans, Pro trial, Founding, admins). */
+/** Terminal access for the signed-in user (approved Founding members and admins). */
 export function useTerminalAccess(userId: string | null | undefined): TerminalAccessState {
   const fetchAccess = useServerFn(getTerminalAccess);
   const [state, setState] = useState<TerminalAccessState>(INITIAL);
@@ -110,7 +110,6 @@ export function TerminalTrialNotice({ access }: { access: TerminalAccessState })
 
 export function TerminalLocked({ reason }: { reason?: string | null }) {
   const overdue = reason === "id_overdue";
-  const trialEnded = reason === "trial_ended";
   return (
     <div className="flex h-full w-full items-center justify-center bg-white px-4 py-16">
       <div className="w-full max-w-md rounded-2xl border border-zinc-200 bg-white p-8 text-center">
@@ -121,16 +120,14 @@ export function TerminalLocked({ reason }: { reason?: string | null }) {
         <p className="mt-2 text-sm text-zinc-600">
           {overdue
             ? "Your 2-day window to complete ID verification has ended. Submit your ID verification and the Terminal unlocks again automatically."
-            : trialEnded
-              ? "Your Pro free trial has ended. Choose Pro, Elite or Ultra and the Terminal unlocks again straight away."
-              : "The Terminal comes with a plan. Choose Pro, Elite or Ultra, or start your free trial from the dashboard, to unlock it. Credit alone pays for API and AI use, and every other page stays open."}
+            : "The Terminal is reserved for approved Founding Program members, free of cost. Plans and credit cover JX Bot for MT5 and the Top AI Models; every other page stays open."}
         </p>
         <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
           <Link
-            to={overdue ? "/dashboard/documents" : "/pricing"}
+            to={overdue ? "/dashboard/documents" : "/founding"}
             className="inline-flex items-center gap-2 rounded-xl bg-zinc-900 px-4 py-2 text-sm font-semibold text-white hover:bg-zinc-800"
           >
-            {overdue ? "Verify ID now" : "Upgrade plan"}
+            {overdue ? "Verify ID now" : "Apply for Founding"}
           </Link>
           <Link
             to="/dashboard"
