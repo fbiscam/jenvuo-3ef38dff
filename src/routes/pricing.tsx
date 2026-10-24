@@ -19,7 +19,8 @@ const LINK = "text-gc-blue-deep underline underline-offset-2 hover:text-gc-navy"
 export const FAQ = [
   ["Is this financial advice?", "No. Jenvu is an analysis tool. Every setup is for educational purposes and you remain responsible for your own trades."],
   ["How does the free trial work?", "After signing up, click “Start free” in your dashboard. You get $100 credit and 14 days of Pro access, once per account."],
-  ["Do I need a plan for the Terminal?", "Yes. Pro, Elite or Ultra unlock the Terminal for each 30-day period, and the Pro free trial unlocks it until it ends. Credit alone pays for the API and Terminal AI; without a plan the Terminal stays locked but every other page works."],
+  ["What do the plans include?", "Every plan includes JX Bot for MetaTrader 5 (1, 2 or 5 licenses) and the Top AI Models with a monthly AI wallet. Credit alone never unlocks JX Bot; it pays for API and AI use."],
+  ["Who can use the Terminal?", "The Terminal is reserved for approved Founding Program members, free of cost. Pro, Elite and Ultra cover JX Bot and the Top AI Models."],
   ["Can I cancel anytime?", "Yes. Plans are month-to-month with no lock-in. You keep access until the end of the period you already paid for."],
   ["What markets are covered?", "Gold only. Jenvu focuses on XAU/USD."],
 ];
@@ -30,7 +31,7 @@ export const Route = createFileRoute("/pricing")({
       { title: "Jenvu Pricing — Pro, Elite and Ultra Plans" },
       { name: "description", content: "Transparent Jenvu pricing: Pro $10, Elite $25 and Ultra $50 a month, $3 per million tokens, plus $100 free credit and 14 days of Pro for new users." },
       { property: "og:title", content: "Jenvu pricing" },
-      { property: "og:description", content: "Pro, Elite and Ultra plans for the Jenvu gold Terminal, with $100 free credit to start." },
+      { property: "og:description", content: "Pro, Elite and Ultra plans for JX Bot on MT5 and the Top AI Models, with $100 free credit to start." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { property: "og:url", content: "https://jenvu.com/pricing" },
@@ -52,25 +53,20 @@ export const Route = createFileRoute("/pricing")({
 
 type Mark = boolean | string;
 const COMPARE: ReadonlyArray<{ f: string; b: Mark; c: Mark; d: Mark }> = [
-  { f: "Terminal access (each 30-day period)", b: true, c: true, d: true },
-  { f: "Fresh sweep, price action & Zone + FVG", b: true, c: true, d: true },
+  { f: "JX Bot MT5 licenses", b: "1", c: "2", d: "5" },
+  { f: "JX Bot monthly profit target", b: "$1,000", c: "$3,000", d: "$6,000" },
+  { f: "JX Bot daily target (monthly / 20)", b: "$50", c: "$150", d: "$300" },
+  { f: "Daily auto-stop at target", b: true, c: true, d: true },
+  { f: "JX Bot download, presets & updates", b: true, c: true, d: true },
   { f: "Monthly AI wallet", b: "$10", c: "$25", d: "$50" },
   { f: "Daily token limit", b: "1.5M", c: "5M", d: "10M" },
   { f: "Balance-based quota ($3 = 1M tokens)", b: true, c: true, d: true },
   { f: "Active API keys", b: "2", c: "3", d: "5" },
-  { f: "JX Bot MT5 licenses", b: "1", c: "2", d: "5" },
-  { f: "JX Bot monthly profit target", b: "$1,000", c: "$3,000", d: "$6,000" },
-  { f: "JX Bot daily target (monthly / 20)", b: "$50", c: "$150", d: "$300" },
   { f: "AI models", b: "__MODELS__", c: "__MODELS__", d: "__MODELS__" },
   { f: "ChatGPT 5.5 Pro primary analysis", b: true, c: true, d: true },
   { f: "Claude Fable 5.1 senior review", b: false, c: true, d: true },
   { f: "Chat / primary request", b: "$0.03", c: "$0.03", d: "$0.03" },
   { f: "Senior-reviewed analysis", b: false, c: "$0.20", d: "$0.20" },
-  { f: "Live chart analysis", b: "Realtime", c: "Realtime", d: "Realtime" },
-  { f: "ICT / SMC breakdown", b: true, c: true, d: true },
-  { f: "Multi-timeframe bias", b: true, c: true, d: true },
-  { f: "Trade journal", b: true, c: true, d: true },
-  { f: "1H XAU/USD reversal pressure", b: true, c: true, d: true },
   { f: "API access & webhooks", b: false, c: true, d: true },
   { f: "API usage controls & request logs", b: false, c: true, d: true },
   { f: "Priority desk support", b: false, c: false, d: true },
@@ -91,9 +87,9 @@ function PricingPage() {
   const allOpen = open.length === FAQ.length;
 
   const plans = [
-    { key: "pro" as const, name: "Pro", price: priceOf("pro", 10), description: "For active traders who need precise primary analysis.", wallet: "$10 AI wallet" },
-    { key: "elite" as const, name: "Elite", price: priceOf("elite", 25), description: "For trading desks that want a senior-reviewed signal.", wallet: "$25 AI wallet" },
-    { key: "ultra" as const, name: "Ultra", price: priceOf("ultra", 50), description: "For high-volume desks needing maximum review capacity.", wallet: "$50 AI wallet" },
+    { key: "pro" as const, name: "Pro", price: priceOf("pro", 10), description: "JX Bot on 1 MT5 account with a $1,000 monthly target.", wallet: "$10 AI wallet", bot: ["1 JX Bot license", "$50 daily auto-stop", "Top AI Models"] },
+    { key: "elite" as const, name: "Elite", price: priceOf("elite", 25), description: "JX Bot on 2 MT5 accounts with a $3,000 monthly target.", wallet: "$25 AI wallet", bot: ["2 JX Bot licenses", "$150 daily auto-stop", "Top AI Models + senior review"] },
+    { key: "ultra" as const, name: "Ultra", price: priceOf("ultra", 50), description: "JX Bot on 5 MT5 accounts with a $6,000 monthly target.", wallet: "$50 AI wallet", bot: ["5 JX Bot licenses", "$300 daily auto-stop", "Top AI Models + priority support"] },
   ];
 
   return (
@@ -230,6 +226,11 @@ function PricingPage() {
                   <span className="text-[14px] text-gc-ink-muted">{suffix}</span>
                 </div>
                 <p className="mt-2 text-[14px] text-gc-ink-muted">{plan.wallet} included</p>
+                <ul className="mt-5 space-y-2 text-[14px] text-gc-ink">
+                  {plan.bot.map((b) => (
+                    <li key={b} className="flex items-start gap-2"><span aria-hidden className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-gc-blue-deep" />{b}</li>
+                  ))}
+                </ul>
                 <div className="mt-auto pt-7">
                   {isCurrent ? (
                     <div className="flex h-11 items-center justify-center rounded-full border border-gc-line bg-gc-surface text-[15px] font-medium">Current plan</div>
