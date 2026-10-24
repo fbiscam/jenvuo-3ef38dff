@@ -1478,3 +1478,6 @@ ul.overflow-x-auto::-webkit-scrollbar {
 .scroll-on-hover::-webkit-scrollbar-track { background: transparent; }
 .scroll-on-hover::-webkit-scrollbar-thumb { background: transparent; border-radius: 999px; }
 .scroll-on-hover:hover::-webkit-scrollbar-thumb { background: var(--gc-line); }
+
+/* Pages with product names (JX Bot, MT5, M15) keep their headings' own casing. */
+.jenvu-zoom-dashboard main .keep-case :is(h1, h2, h3, h4) { text-transform: none !important; }

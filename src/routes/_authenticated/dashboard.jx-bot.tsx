@@ -178,7 +178,7 @@ function JxBotPage() {
   const daysLeft = access?.expiresAt ? Math.max(0, Math.ceil((Date.parse(access.expiresAt) - Date.now()) / 86_400_000)) : null;
 
   return (
-    <div className="w-full px-1 py-2 sm:px-2 sm:py-4">
+    <div className="keep-case w-full px-1 py-2 sm:px-2 sm:py-4">
       {/* Hero */}
       <section className="relative overflow-hidden rounded-xl border border-gc-line bg-card">
         <span aria-hidden className="absolute inset-x-0 top-0 h-1 bg-gc-blue" />
