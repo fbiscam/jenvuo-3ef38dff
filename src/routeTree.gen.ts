@@ -100,6 +100,7 @@ import { Route as ApiPublicHooksReindexInsightsRouteImport } from './routes/api/
 import { Route as ApiPublicHooksScanSignalsRouteImport } from './routes/api/public/hooks/scan-signals'
 import { Route as ApiPublicHooksSignalReversalMonitorRouteImport } from './routes/api/public/hooks/signal-reversal-monitor'
 import { Route as ApiPublicInsightImageSplatRouteImport } from './routes/api/public/insight-image.$'
+import { Route as ApiPublicLicensesValidateRouteImport } from './routes/api/public/licenses/validate'
 import { Route as ApiPublicV1ModelsRouteImport } from './routes/api/public/v1/models'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
 import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
@@ -602,6 +603,12 @@ const ApiPublicInsightImageSplatRoute =
     path: '/api/public/insight-image/$',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicLicensesValidateRoute =
+  ApiPublicLicensesValidateRouteImport.update({
+    id: '/api/public/licenses/validate',
+    path: '/api/public/licenses/validate',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicV1ModelsRoute = ApiPublicV1ModelsRouteImport.update({
   id: '/api/public/v1/models',
   path: '/api/public/v1/models',
@@ -721,6 +728,7 @@ export interface FileRoutesByFullPath {
   '/api/public/hooks/scan-signals': typeof ApiPublicHooksScanSignalsRoute
   '/api/public/hooks/signal-reversal-monitor': typeof ApiPublicHooksSignalReversalMonitorRoute
   '/api/public/insight-image/$': typeof ApiPublicInsightImageSplatRoute
+  '/api/public/licenses/validate': typeof ApiPublicLicensesValidateRoute
   '/api/public/v1/models': typeof ApiPublicV1ModelsRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -814,6 +822,7 @@ export interface FileRoutesByTo {
   '/api/public/hooks/scan-signals': typeof ApiPublicHooksScanSignalsRoute
   '/api/public/hooks/signal-reversal-monitor': typeof ApiPublicHooksSignalReversalMonitorRoute
   '/api/public/insight-image/$': typeof ApiPublicInsightImageSplatRoute
+  '/api/public/licenses/validate': typeof ApiPublicLicensesValidateRoute
   '/api/public/v1/models': typeof ApiPublicV1ModelsRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -913,6 +922,7 @@ export interface FileRoutesById {
   '/api/public/hooks/scan-signals': typeof ApiPublicHooksScanSignalsRoute
   '/api/public/hooks/signal-reversal-monitor': typeof ApiPublicHooksSignalReversalMonitorRoute
   '/api/public/insight-image/$': typeof ApiPublicInsightImageSplatRoute
+  '/api/public/licenses/validate': typeof ApiPublicLicensesValidateRoute
   '/api/public/v1/models': typeof ApiPublicV1ModelsRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -1012,6 +1022,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/scan-signals'
     | '/api/public/hooks/signal-reversal-monitor'
     | '/api/public/insight-image/$'
+    | '/api/public/licenses/validate'
     | '/api/public/v1/models'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -1105,6 +1116,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/scan-signals'
     | '/api/public/hooks/signal-reversal-monitor'
     | '/api/public/insight-image/$'
+    | '/api/public/licenses/validate'
     | '/api/public/v1/models'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -1203,6 +1215,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/scan-signals'
     | '/api/public/hooks/signal-reversal-monitor'
     | '/api/public/insight-image/$'
+    | '/api/public/licenses/validate'
     | '/api/public/v1/models'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -1264,6 +1277,7 @@ export interface RootRouteChildren {
   ApiPublicHooksScanSignalsRoute: typeof ApiPublicHooksScanSignalsRoute
   ApiPublicHooksSignalReversalMonitorRoute: typeof ApiPublicHooksSignalReversalMonitorRoute
   ApiPublicInsightImageSplatRoute: typeof ApiPublicInsightImageSplatRoute
+  ApiPublicLicensesValidateRoute: typeof ApiPublicLicensesValidateRoute
   ApiPublicV1ModelsRoute: typeof ApiPublicV1ModelsRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
   LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
@@ -1910,6 +1924,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicInsightImageSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/licenses/validate': {
+      id: '/api/public/licenses/validate'
+      path: '/api/public/licenses/validate'
+      fullPath: '/api/public/licenses/validate'
+      preLoaderRoute: typeof ApiPublicLicensesValidateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/v1/models': {
       id: '/api/public/v1/models'
       path: '/api/public/v1/models'
@@ -2142,6 +2163,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicHooksSignalReversalMonitorRoute:
     ApiPublicHooksSignalReversalMonitorRoute,
   ApiPublicInsightImageSplatRoute: ApiPublicInsightImageSplatRoute,
+  ApiPublicLicensesValidateRoute: ApiPublicLicensesValidateRoute,
   ApiPublicV1ModelsRoute: ApiPublicV1ModelsRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
   LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,
