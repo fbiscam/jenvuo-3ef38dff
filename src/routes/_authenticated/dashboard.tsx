@@ -1587,6 +1587,7 @@ function DashboardLayout() {
         >
         {drawerMode && <RenewalNotice />}
         {drawerMode && pathname === "/dashboard" && <StartTrialBanner />}
+        {drawerMode && pathname === "/dashboard" && <TwoFactorReminder />}
         {drawerMode && pathname !== "/dashboard/terminal" && <NotificationStrip />}
 
         <main
@@ -1603,7 +1604,6 @@ function DashboardLayout() {
           {pathname === "/dashboard" ? (
             <>
               <WelcomeOnboarding />
-              <TwoFactorReminder />
               <CloudWelcome name={fullName} />
 
               {/* Extension usage analytics — Cloudflare-style */}

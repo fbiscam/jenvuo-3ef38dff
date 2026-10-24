@@ -141,7 +141,7 @@ function FeatureCard({ card }: { card: Card }) {
   const t = useTick(playing);
   const { Scene } = card;
   return (
-    <div className="flex w-[85vw] max-w-[412px] shrink-0 snap-start flex-col overflow-hidden rounded-3xl bg-gc-surface">
+    <div className="flex w-full max-w-[412px] shrink-0 snap-center flex-col overflow-hidden rounded-3xl bg-gc-surface sm:w-[85vw] sm:snap-start">
       <div className="flex min-h-[204px] flex-col px-8 pb-8 pt-10">
         <p className="text-[16px] leading-[1.55] text-gc-ink-muted">{card.text}</p>
         <Link to={card.to} className="mt-auto pt-6 text-[16px] font-medium text-gc-blue-deep hover:underline">

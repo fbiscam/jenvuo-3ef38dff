@@ -1465,3 +1465,15 @@ html body .dash-dark main.bg-white { background-color: oklch(0.165 0 0) !importa
 /* Terminal top-bar market prices: endless loop, pauses while pointed at. */
 .terminal-strip-track { animation: gc-marquee 40s linear infinite; }
 .terminal-strip:hover .terminal-strip-track { animation-play-state: paused; }
+
+/* Swipeable tab rails never show a scrollbar (still scroll by touch/trackpad). */
+[role="tablist"],
+nav.overflow-x-auto,
+ul.overflow-x-auto {
+  scrollbar-width: none;
+}
+[role="tablist"]::-webkit-scrollbar,
+nav.overflow-x-auto::-webkit-scrollbar,
+ul.overflow-x-auto::-webkit-scrollbar {
+  display: none;
+}

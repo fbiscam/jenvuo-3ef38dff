@@ -56,7 +56,9 @@ export function CloudSolutions() {
           <div>
             <p className="text-gc-ink-muted">
               From spotting <Link to="/help" className="text-gc-blue-deep underline">liquidity sweeps</Link> to managing{" "}
-              <Link to="/help" className="text-gc-blue-deep underline">trade risk</Link>, Jenvu tools fit the way you trade gold.
+              <Link to="/help" className="text-gc-blue-deep underline">trade risk</Link>, Jenvu tools fit{" "}
+              <span className="hidden sm:inline">the way you trade gold.</span>
+              <span className="sm:hidden">how you trade.</span>
             </p>
             <Link to="/auth" className="mt-5 inline-flex rounded-full bg-gc-blue-deep px-5 py-2.5 text-sm font-medium text-gc-on-blue hover:bg-gc-navy">
               Start for free
@@ -65,7 +67,7 @@ export function CloudSolutions() {
         </div>
 
         <div className="mt-12 grid gap-6 md:grid-cols-[300px_1fr]">
-          <ul className="flex gap-1 overflow-x-auto md:flex-col">
+          <ul className="flex gap-1 overflow-x-auto [scrollbar-width:none] md:flex-col [&::-webkit-scrollbar]:hidden">
             {SOLUTIONS.map((x, i) => (
               <li key={x.name}>
                 <button
