@@ -253,7 +253,7 @@ function JxBotPage() {
       <div className="mt-5">
         <div className="mb-4 flex items-end justify-between gap-3">
           <div>
-            <h2 className="text-[16px] font-medium text-zinc-900">Recent licenses</h2>
+            <h2 className="text-[16px] font-medium text-zinc-900">  Recent licenses</h2>
             <p className="mt-1 text-[12px] text-zinc-500">Each key works only on the one MT5 account it is linked to.</p>
           </div>
           <span className="shrink-0 text-[12px] tabular-nums text-zinc-500">{licenses.length} shown</span>
