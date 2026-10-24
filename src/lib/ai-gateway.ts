@@ -353,13 +353,54 @@ export async function callChatCompletion(
   try {
     return await primary(opts);
   } catch (primaryErr) {
-    console.warn(`[ai] ${opts.stage ?? "chat"}: primary chain failed, using backup`, (primaryErr as Error)?.message);
+    console.warn(`[ai] ${opts.stage ?? "chat"}: primary chain failed, trying fallback API`, (primaryErr as Error)?.message);
+    try {
+      return await callFallbackApi(opts);
+    } catch (fbErr) {
+      console.warn(`[ai] ${opts.stage ?? "chat"}: fallback API failed, using backup`, (fbErr as Error)?.message);
+    }
     try {
       return await callBackupChat(opts);
     } catch (backupErr) {
       console.error(`[ai] ${opts.stage ?? "chat"}: backup failed`, (backupErr as Error)?.message);
       throw primaryErr;
     }
+  }
+}
+
+// Second provider (user-supplied OpenAI-compatible API) tried before Lovable AI.
+async function callFallbackApi(
+  opts: CallChatOptions,
+): Promise<{ content: string; model: string; usage: UsageInfo }> {
+  const key = process.env.FALLBACK_AI_API_KEY;
+  const base = process.env.FALLBACK_AI_BASE_URL;
+  if (!key || !base) throw new AiGatewayError("Fallback AI is not configured.", 0, true);
+  const model = process.env.FALLBACK_AI_MODEL || "claude-sonnet-4";
+  const url = base.replace(/\/+$/, "").replace(/\/chat\/completions$/, "") + "/chat/completions";
+  const ctrl = new AbortController();
+  const t = setTimeout(() => ctrl.abort(), 30000);
+  try {
+    const res = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${key}` },
+      body: JSON.stringify({ model, messages: opts.messages, max_tokens: opts.maxTokens ?? 2000 }),
+      signal: ctrl.signal,
+    });
+    if (!res.ok) {
+      await res.text().catch(() => "");
+      throw new AiGatewayError(`Fallback AI failed (${res.status}).`, res.status, true);
+    }
+    const j: any = await res.json();
+    const content = String(j?.choices?.[0]?.message?.content ?? "").trim();
+    if (!content) throw new AiGatewayError("Fallback AI returned an empty response.", 0, true);
+    const validation = opts.validateContent?.(content, model) ?? true;
+    if (validation !== true) throw new AiGatewayError(validation, 422, true);
+    const u = j?.usage ?? {};
+    const promptTokens = Number(u.prompt_tokens ?? 0) || 0;
+    const completionTokens = Number(u.completion_tokens ?? 0) || 0;
+    return { content, model, usage: { promptTokens, completionTokens, totalTokens: Number(u.total_tokens ?? 0) || promptTokens + completionTokens } };
+  } finally {
+    clearTimeout(t);
   }
 }
 

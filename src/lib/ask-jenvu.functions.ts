@@ -50,10 +50,8 @@ export const askJenvu = createServerFn({ method: "POST" })
     const rl = checkAnalyzeRateLimit(`ask-jenvu:${userId ?? "anon"}:${ip}`);
     if (!rl.allowed) return { ok: false, error: `You're asking quickly. Please wait ${rl.retryInSec}s and try again.` };
 
-    // The AI is metered: only signed-in users may use it.
-    if (!userId) {
-      return { ok: false, error: "Please sign in to chat with Ask Jenvu — it's free to create an account." };
-    }
+    // Visitors may chat without signing in; they are rate-limited per IP and
+    // get a shorter history/answer budget below.
 
     const history = data.messages.slice(-12);
     if (history[history.length - 1].role !== "user") return { ok: false, error: "Please type a question." };
