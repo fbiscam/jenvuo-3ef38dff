@@ -41,7 +41,7 @@ export const TOOLS_WORKFLOW = [
   "1H–4H: look for a Fresh sweep or Liquidity sweep at a high/low.",
   "15M: find the Zone + FVG zone in the bias direction.",
   "5M / 15M: wait for price to return to the zone and react (price action, CHoCH) before entering.",
-  "Size the stop with ATR and test on the demo account first. No tool guarantees a result.",
+  "Size the stop with ATR and start with a small position. No tool guarantees a result.",
 ];
 
 function lines(list: ToolGuide[]): string {
