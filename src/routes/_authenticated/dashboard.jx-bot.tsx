@@ -361,7 +361,7 @@ function JxBotPage() {
       {/* How it works + plans */}
       <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_360px]">
         <div>
-          <h2 className="text-[16px] font-medium text-zinc-900">How JX Bot works</h2>
+          <h2 className="text-[16px] font-medium text-zinc-900"> How JX Bot works</h2>
           <div className="mt-3 divide-y divide-zinc-100 border-y border-zinc-200">
             {HOW.map(([t, d]) => (
               <div key={t} className="grid gap-1 py-3 sm:grid-cols-[180px_1fr] sm:gap-4">
