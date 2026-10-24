@@ -400,7 +400,7 @@ export const collections: Collection[] = [
             "Realtime email & push alerts.",
           ]},
 
-          { type: "h2", content: "Pro — $10 / month" },
+          { type: "h2", content: "Pro — $49 / month" },
           { type: "ul", items: [
             "1,500,000 tokens per day.",
             "$10 wallet per month.",
@@ -412,7 +412,7 @@ export const collections: Collection[] = [
             "Multi-timeframe bias engine.",
           ]},
 
-          { type: "h2", content: "Elite — $25 / month" },
+          { type: "h2", content: "Elite — $99 / month" },
           { type: "ul", items: [
             "5,000,000 tokens per day.",
             "$25 wallet per month.",
@@ -423,7 +423,7 @@ export const collections: Collection[] = [
             "Dedicated onboarding & SLA.",
           ]},
 
-          { type: "h2", content: "Ultra — $50 / month" },
+          { type: "h2", content: "Ultra — $169 / month" },
           { type: "ul", items: [
             "10,000,000 tokens per day.",
             "$50 wallet per month.",
