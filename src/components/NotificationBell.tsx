@@ -204,7 +204,7 @@ export default function NotificationBell() {
             <span className="text-[14px] font-normal text-gc-ink">Notifications</span>
           </div>
 
-          <div className="max-h-[min(55vh,380px)] sm:max-h-[min(460px,70vh)] overflow-y-auto overscroll-contain py-1">
+          <div className="max-h-[min(55vh,380px)] sm:max-h-[min(460px,70vh)] scroll-on-hover overflow-y-auto overscroll-contain py-1">
             {items.length === 0 ? (
               <div className="px-4 py-8 text-center">
                 <p className="text-[13px] text-gc-ink">You're all caught up</p>

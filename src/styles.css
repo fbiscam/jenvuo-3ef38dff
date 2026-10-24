@@ -1470,3 +1470,11 @@ nav.overflow-x-auto::-webkit-scrollbar,
 ul.overflow-x-auto::-webkit-scrollbar {
   display: none;
 }
+
+/* Lists (Gifts, Notifications) whose scrollbar only shows while the pointer is over them. */
+.scroll-on-hover { scrollbar-width: thin; scrollbar-color: transparent transparent; }
+.scroll-on-hover:hover { scrollbar-color: var(--gc-ink-muted) transparent; }
+.scroll-on-hover::-webkit-scrollbar { width: 6px; }
+.scroll-on-hover::-webkit-scrollbar-track { background: transparent; }
+.scroll-on-hover::-webkit-scrollbar-thumb { background: transparent; border-radius: 999px; }
+.scroll-on-hover:hover::-webkit-scrollbar-thumb { background: var(--gc-line); }
