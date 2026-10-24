@@ -9,7 +9,7 @@ export const Route = createFileRoute("/ai-engine")({
   head: () => ({
     meta: [
       { title: "Products — Jenvu Terminal, AI Engine & API" },
-      { name: "description", content: "Jenvu products: the gold Terminal, the AI engine, rule-based analysis engines, alerts, demo trading and the developer API." },
+      { name: "description", content: "Jenvu products: JX Bot for MetaTrader 5, the Top AI Models, rule-based analysis engines, alerts and the developer API." },
       { property: "og:title", content: "Products — Jenvu" },
       { property: "og:description", content: "The Jenvu Terminal, AI engine, analysis engines, alerts and API for XAU/USD traders." },
       { property: "og:url", content: "https://jenvu.com/ai-engine" },
@@ -81,12 +81,12 @@ const CONTENT: IndustryContent = {
       href: "https://jenvu.com/docs",
     },
     {
-      label: "Demo trading",
-      title: "Demo trading",
-      text: "Practise on live prices with a $100,000 demo balance before you risk real money.",
-      points: ["Live gold prices", "Track open and closed trades", "Reset when you want a fresh start"],
-      link: "Learn about demo trading",
-      href: "/stories/demo-trading",
+      label: "JX Bot",
+      title: "JX Bot for MT5",
+      text: "Jenvu's Expert Advisor trades XAU/USD on MetaTrader 5 and stops at your plan's targets.",
+      points: ["1, 2 or 5 MT5 licenses", "Daily auto-stop at target", "Download and setup in the dashboard"],
+      link: "Learn about JX Bot",
+      href: "/stories/jx-bot",
     },
     {
       label: "Billing and credits",
@@ -122,7 +122,7 @@ const CONTENT: IndustryContent = {
     { title: "AI engine", text: "Plain-language answers about the chart.", href: "/stories/ai-desk-updates" },
     { title: "Fresh sweep detection", text: "Confirmed sweeps on 5M, 15M, 1H, 2H and 4H.", href: "/stories/fresh-sweep-detection" },
     { title: "Volume and RVOL", text: "Volume spikes and buyer/seller share.", href: "/stories/rvol-and-volume-direction" },
-    { title: "Demo trading", text: "$100,000 demo account on live prices.", href: "/stories/demo-trading" },
+    { title: "JX Bot for MT5", text: "Automated XAU/USD trading on MetaTrader 5.", href: "/stories/jx-bot" },
     { title: "Developer API", text: "API keys for your own tools.", href: "/stories/build-with-jenvu" },
     { title: "Daily gold insights", text: "A short daily read on gold.", href: "/stories/daily-gold-insights" },
     { title: "Session tools", text: "London and New York windows on the chart.", href: "/stories/london-new-york-sessions" },

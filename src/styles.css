@@ -1400,22 +1400,15 @@ html body .dash-dark main.bg-white { background-color: oklch(0.165 0 0) !importa
   60% { opacity: 1; transform: scale(1.12) rotate(12deg); }
   100% { opacity: 1; transform: scale(1) rotate(0deg); }
 }
-@keyframes jenvu-logo-float {
-  0%, 100% { transform: translateY(0) rotate(0deg); }
-  50% { transform: translateY(-4px) rotate(-4deg); }
-}
-.jenvu-logo-intro { animation: jenvu-logo-intro 0.6s cubic-bezier(.2,.8,.2,1) both, jenvu-logo-float 4s ease-in-out 1.1s infinite; }
+/* Plays once each time the page opens, then the logo stays still. */
+.jenvu-logo-intro { animation: jenvu-logo-intro 0.6s cubic-bezier(.2,.8,.2,1) both; }
 @keyframes jenvu-logo-reveal {
   0% { opacity: 0; transform: translateX(60px) scale(0.55) rotate(-30deg); }
   70% { opacity: 1; transform: translateX(-6px) scale(1.04) rotate(4deg); }
   100% { opacity: 1; transform: translateX(0) scale(1) rotate(0deg); }
 }
-@keyframes jenvu-logo-drift {
-  0%, 100% { transform: translateY(0) rotate(0deg) scale(1); }
-  50% { transform: translateY(-10px) rotate(3deg) scale(1.02); }
-}
 .jenvu-logo-big { opacity: 0; }
-.jenvu-logo-big.is-visible { animation: jenvu-logo-reveal 0.7s cubic-bezier(.2,.8,.2,1) both, jenvu-logo-drift 6s ease-in-out 0.8s infinite; }
+.jenvu-logo-big.is-visible { animation: jenvu-logo-reveal 0.7s cubic-bezier(.2,.8,.2,1) both; }
 @keyframes ask-jenvu-shine { from { background-position: 200% 0; } to { background-position: -200% 0; } }
 .ask-jenvu-thinking {
   background: linear-gradient(90deg, var(--gc-ink) 30%, var(--gc-blue) 50%, var(--gc-ink) 70%);
@@ -1477,3 +1470,14 @@ nav.overflow-x-auto::-webkit-scrollbar,
 ul.overflow-x-auto::-webkit-scrollbar {
   display: none;
 }
+
+/* Lists (Gifts, Notifications) whose scrollbar only shows while the pointer is over them. */
+.scroll-on-hover { scrollbar-width: thin; scrollbar-color: transparent transparent; }
+.scroll-on-hover:hover { scrollbar-color: var(--gc-ink-muted) transparent; }
+.scroll-on-hover::-webkit-scrollbar { width: 6px; }
+.scroll-on-hover::-webkit-scrollbar-track { background: transparent; }
+.scroll-on-hover::-webkit-scrollbar-thumb { background: transparent; border-radius: 999px; }
+.scroll-on-hover:hover::-webkit-scrollbar-thumb { background: var(--gc-line); }
+
+/* Pages with product names (JX Bot, MT5, M15) keep their headings' own casing. */
+.jenvu-zoom-dashboard main .keep-case :is(h1, h2, h3, h4) { text-transform: none !important; }

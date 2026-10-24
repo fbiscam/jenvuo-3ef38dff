@@ -335,7 +335,7 @@ export const collections: Collection[] = [
           { type: "ul", items: INDICATOR_GUIDES.map((t) => `${t.name}: ${t.what} How to use: ${t.how}`) },
           { type: "h2", content: "A simple workflow" },
           { type: "ol", items: TOOLS_WORKFLOW },
-          { type: "note", tone: "info", content: "Signals are filtered strictly to cut fakeouts, so you will see fewer marks than on other charts. That is expected. No tool guarantees a win — test on the demo account first." },
+          { type: "note", tone: "info", content: "Signals are filtered strictly to cut fakeouts, so you will see fewer marks than on other charts. That is expected. No tool guarantees a win — start small and use a stop on every trade." },
         ],
       },
       {
@@ -344,12 +344,12 @@ export const collections: Collection[] = [
         summary: "Who can use the JX Bot, how to create a license and how to install it in MetaTrader 5.",
         updatedAt: "2026-10-24",
         body: [
-          { type: "p", content: "The JX Bot is Jenvu's XAU/USD Expert Advisor for MetaTrader 5. It is available only on a paid Pro, Elite or Ultra monthly plan — credit or the free trial does not unlock it. Open Dashboard → JX Bot to download it." },
+          { type: "p", content: "The JX Bot is Jenvu's XAU/USD Expert Advisor for MetaTrader 5. It is available only on a paid Pro, Elite or Ultra monthly plan — credit or the free trial does not unlock it. Open Dashboard → JX Bot to download it. How the bot decides its trades is proprietary and not published." },
           { type: "h2", content: "Plans" },
           { type: "ul", items: ["Pro: $1,000 monthly profit target, $50 daily, 1 MT5 license.", "Elite: $3,000 monthly, $150 daily, 2 licenses.", "Ultra: $6,000 monthly, $300 daily, 5 licenses.", "Daily target = monthly target / 20. When reached, the bot closes trades and pauses until the next day."] },
           { type: "h2", content: "Setup" },
-          { type: "ol", items: ["Dashboard → JX Bot (or API Keys → JX Bot licenses): enter your MT5 account number (digits only) and create a license.", "In MT5: File → Open Data Folder → MQL5 → Experts, paste the Jenvu EA file; put the .set files in MQL5 → Presets; refresh the Navigator.", "Tools → Options → Expert Advisors: tick Allow WebRequest and add https://jenvu.com.", "Turn on Algo Trading, open XAUUSD M15, drag Jenvu EA on the chart, load the preset and paste your key into LicenseKey."] },
-          { type: "note", tone: "info", content: "Each key works only on one MT5 account. Targets are stop limits, not promised profit. Test on a demo account first." },
+          { type: "ol", items: ["Dashboard → JX Bot: enter your MT5 account number (digits only) and create a license.", "In MT5: File → Open Data Folder → MQL5 → Experts, paste the Jenvu EA file; put the .set files in MQL5 → Presets; refresh the Navigator.", "Tools → Options → Expert Advisors: tick Allow WebRequest and add https://jenvu.com.", "Turn on Algo Trading, open XAUUSD M15, drag Jenvu EA on the chart, load the preset and paste your key into LicenseKey."] },
+          { type: "note", tone: "info", content: "Each key works only on one MT5 account. Targets are stop limits, not promised profit. Start with a small lot size." },
         ],
       },
     ],
@@ -481,7 +481,7 @@ export const collections: Collection[] = [
         summary: "Charts and tools are included with Terminal access; only AI replies use credits.",
         updatedAt: "2026-10-21",
         body: [
-          { type: "p", content: "The Terminal comes with a plan: Pro, Elite or Ultra unlock it for each paid 30-day period, and the Pro free trial (\"Start free\") unlocks it until the trial ends. Accounts without a plan have the Terminal locked, even with credit — credit is only for the API and Terminal AI, and every other page stays open." },
+          { type: "p", content: "The Terminal is reserved for approved Founding Program members, free of cost. Pro, Elite and Ultra plans, the free trial and credit do not unlock it; plans cover JX Bot and the Top AI Models, and every other page stays open. Apply at jenvu.com/founding." },
           { type: "p", content: "With Terminal access you can use the chart as much as you like. Only AI features use credits, because each AI reply has a real processing cost. Every charge is checked and deducted on Jenvu's servers before an answer is returned, so it cannot be skipped from the browser." },
           { type: "h2", content: "Included with Terminal access (no credits)" },
           { type: "ul", items: [
@@ -489,7 +489,7 @@ export const collections: Collection[] = [
             "Indicators (RSI, MACD, EMA, Bollinger Bands, ATR, VWAP and more).",
             "SMC tools: swings, BOS/CHoCH, supply and demand zones, fair value gaps and liquidity sweeps.",
             "Fresh sweep, Swing price action and the Zone + FVG (supply/demand) strategy.",
-            "Drawing tools, candle timer, news and economic events, demo trading.",
+            "Drawing tools, candle timer, news and economic events.",
           ]},
           { type: "h2", content: "Uses credits" },
           { type: "ul", items: [

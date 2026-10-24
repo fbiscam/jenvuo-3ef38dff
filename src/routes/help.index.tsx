@@ -61,7 +61,8 @@ function HelpCenterPage() {
   const faqs = [
     { q: "How do I cancel my Jenvu subscription?", a: "Open Dashboard → Billing and choose Cancel plan. You keep access until the end of the period you already paid for. See the Cancellation policy for details." },
     { q: "How do I start the free trial?", a: "After signing up, click “Start free” in the banner at the top of your dashboard. It adds $100 credit and 14 days of Pro, once per account." },
-    { q: "How do I get access to the Terminal?", a: "The Terminal comes with a plan. Pro, Elite or Ultra unlock it for each paid 30-day period, and the Pro free trial unlocks it until the trial ends. Without a plan it stays locked, even with credit — credit is for the API and Terminal AI, and all other pages stay open." },
+    { q: "Who can use the Terminal?", a: "The Terminal is reserved for approved Founding Program members, free of cost. Pro, Elite and Ultra plans cover JX Bot for MT5 and the Top AI Models; credit pays for API and AI use, and all other pages stay open." },
+    { q: "How do I get JX Bot?", a: "Choose Pro, Elite or Ultra, then open Dashboard → JX Bot to download it, create a license for your MT5 account and follow the install steps." },
     { q: "How do I contact Jenvu support?", a: "Email support@jenvu.com or use the Contact page. We reply within one business day, Monday to Friday." },
   ];
   const [open, setOpen] = React.useState<number[]>([]);

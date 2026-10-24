@@ -84,3 +84,10 @@
 - [x] Fresh sweep, price action and Zone + FVG locked for Free / no-credit accounts; $0.10 per hour while on
 - [x] Terminal + chart strategies only with a plan (30-day paid period) or Pro trial; credit only for API/Terminal AI; help, docs, pricing and Ask Jenvu updated
 - [x] Phones: public page text wraps fully (no cut-off lines) and breaks evenly
+- [x] Homepage top logo + footer big logo animate once per page load, then stay still
+- [x] Gifts/Notifications lists: scrollbar only on hover
+- [x] Demo account removed everywhere (site, AI knowledge); replaced with JX Bot / Top AI Models
+- [x] Terminal only for approved Founding members (free); paid plans = JX Bot + Top AI Models
+- [x] Pricing: plans list JX Bot features, no Terminal
+- [x] JX Bot page heavier look + "how it works" (no strategy internals)
+- [x] JX Bot content on homepage and other pages

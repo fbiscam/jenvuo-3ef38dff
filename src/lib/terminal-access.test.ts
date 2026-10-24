@@ -1,39 +1,31 @@
 import { describe, it } from "node:test";
 import { expect } from "./chart/test-expect";
-import { evaluatePlanAccess } from "./terminal-access.server";
+import { evaluateFoundingRow, evaluateTerminalAccess } from "./terminal-access.server";
 
 const now = Date.parse("2026-10-22T12:00:00Z");
 const day = 86_400_000;
 const iso = (ms: number) => new Date(ms).toISOString();
-const free = { plan_id: "free", status: "active", is_trial: false, current_period_end: null, trial_ends_at: null };
 
-describe("Terminal plan access", () => {
-  it("Free account without a plan is locked, even on day one", () => {
-    const r = evaluatePlanAccess(free, now);
+describe("Terminal access (Founding members only)", () => {
+  it("no Founding row is locked, whatever plan or credit the user has", () => {
+    const r = evaluateTerminalAccess(null);
     expect(r.allowed).toBe(false);
-    expect(r.reason).toBe("no_plan");
+    expect(r.reason).toBe("not_founding");
   });
-  it("no subscription row is locked", () => {
-    expect(evaluatePlanAccess(null, now).allowed).toBe(false);
-  });
-  it("paid plan unlocks it for its 30-day period", () => {
-    const pro = { ...free, plan_id: "pro", current_period_end: iso(now + 29 * day) };
-    expect(evaluatePlanAccess(pro, now).allowed).toBe(true);
-  });
-  it("paid plan locks once its period has ended", () => {
-    const pro = { ...free, plan_id: "pro", current_period_end: iso(now - day) };
-    expect(evaluatePlanAccess(pro, now).allowed).toBe(false);
-  });
-  it("running Pro free trial unlocks it", () => {
-    const trial = { ...free, plan_id: "pro", is_trial: true, trial_ends_at: iso(now + 5 * day) };
-    const r = evaluatePlanAccess(trial, now);
+  it("approved Founding member with verified ID is allowed", () => {
+    const row = { id: "a", approved_at: iso(now - 10 * day), created_at: null, document_status: "verified" };
+    const r = evaluateTerminalAccess(evaluateFoundingRow(row, now));
     expect(r.allowed).toBe(true);
-    expect(r.reason).toBe("trial");
+    expect(r.reason).toBe("founding");
   });
-  it("ended Pro trial locks it", () => {
-    const trial = { ...free, plan_id: "pro", is_trial: true, trial_ends_at: iso(now - day) };
-    const r = evaluatePlanAccess(trial, now);
+  it("approved Founding member inside the 2-day ID window is allowed", () => {
+    const row = { id: "a", approved_at: iso(now - day), created_at: null, document_status: null };
+    expect(evaluateTerminalAccess(evaluateFoundingRow(row, now)).allowed).toBe(true);
+  });
+  it("Founding member past the 2-day ID window is locked as id_overdue", () => {
+    const row = { id: "a", approved_at: iso(now - 3 * day), created_at: null, document_status: null };
+    const r = evaluateTerminalAccess(evaluateFoundingRow(row, now));
     expect(r.allowed).toBe(false);
-    expect(r.reason).toBe("trial_ended");
+    expect(r.reason).toBe("id_overdue");
   });
 });

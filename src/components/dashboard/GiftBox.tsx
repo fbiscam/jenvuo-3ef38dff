@@ -88,7 +88,7 @@ export default function GiftBox() {
       {open && (
         <div className="fixed right-2 top-14 z-50 w-[min(20rem,calc(100vw-1rem))] overflow-hidden rounded-xl bg-background shadow-[0_4px_16px_rgba(60,64,67,0.18),0_1px_3px_rgba(60,64,67,0.12)] sm:absolute sm:left-auto sm:right-0 sm:top-11 sm:w-[300px]">
           <div className="border-b border-gc-blue-deep/25 px-3 py-2.5 text-center sm:px-4 sm:py-3.5 text-[14px] text-gc-ink">Gifts</div>
-          <div className="max-h-[min(55vh,360px)] sm:max-h-[min(420px,70vh)] overflow-y-auto overscroll-contain py-1">
+          <div className="max-h-[min(55vh,360px)] sm:max-h-[min(420px,70vh)] scroll-on-hover overflow-y-auto overscroll-contain py-1">
             {items.length === 0 ? (
               <div className="px-4 py-8 text-center">
                 <p className="text-[13px] text-gc-ink">No gifts yet</p>
