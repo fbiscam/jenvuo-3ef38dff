@@ -63,6 +63,7 @@ import { Route as AuthenticatedDashboardCourseRouteImport } from './routes/_auth
 import { Route as AuthenticatedDashboardDocumentsRouteImport } from './routes/_authenticated/dashboard.documents'
 import { Route as AuthenticatedDashboardExtensionRouteImport } from './routes/_authenticated/dashboard.extension'
 import { Route as AuthenticatedDashboardJournalRouteImport } from './routes/_authenticated/dashboard.journal'
+import { Route as AuthenticatedDashboardJxBotRouteImport } from './routes/_authenticated/dashboard.jx-bot'
 import { Route as AuthenticatedDashboardNotificationsRouteImport } from './routes/_authenticated/dashboard.notifications'
 import { Route as AuthenticatedDashboardPayRouteImport } from './routes/_authenticated/dashboard.pay'
 import { Route as AuthenticatedDashboardPaymentRouteImport } from './routes/_authenticated/dashboard.payment'
@@ -100,6 +101,7 @@ import { Route as ApiPublicHooksReindexInsightsRouteImport } from './routes/api/
 import { Route as ApiPublicHooksScanSignalsRouteImport } from './routes/api/public/hooks/scan-signals'
 import { Route as ApiPublicHooksSignalReversalMonitorRouteImport } from './routes/api/public/hooks/signal-reversal-monitor'
 import { Route as ApiPublicInsightImageSplatRouteImport } from './routes/api/public/insight-image.$'
+import { Route as ApiPublicLicensesValidateRouteImport } from './routes/api/public/licenses/validate'
 import { Route as ApiPublicV1ModelsRouteImport } from './routes/api/public/v1/models'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
 import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
@@ -385,6 +387,12 @@ const AuthenticatedDashboardJournalRoute =
     path: '/journal',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
+const AuthenticatedDashboardJxBotRoute =
+  AuthenticatedDashboardJxBotRouteImport.update({
+    id: '/jx-bot',
+    path: '/jx-bot',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
 const AuthenticatedDashboardNotificationsRoute =
   AuthenticatedDashboardNotificationsRouteImport.update({
     id: '/notifications',
@@ -602,6 +610,12 @@ const ApiPublicInsightImageSplatRoute =
     path: '/api/public/insight-image/$',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicLicensesValidateRoute =
+  ApiPublicLicensesValidateRouteImport.update({
+    id: '/api/public/licenses/validate',
+    path: '/api/public/licenses/validate',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicV1ModelsRoute = ApiPublicV1ModelsRouteImport.update({
   id: '/api/public/v1/models',
   path: '/api/public/v1/models',
@@ -683,6 +697,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/documents': typeof AuthenticatedDashboardDocumentsRoute
   '/dashboard/extension': typeof AuthenticatedDashboardExtensionRoute
   '/dashboard/journal': typeof AuthenticatedDashboardJournalRoute
+  '/dashboard/jx-bot': typeof AuthenticatedDashboardJxBotRoute
   '/dashboard/notifications': typeof AuthenticatedDashboardNotificationsRoute
   '/dashboard/pay': typeof AuthenticatedDashboardPayRoute
   '/dashboard/payment': typeof AuthenticatedDashboardPaymentRoute
@@ -721,6 +736,7 @@ export interface FileRoutesByFullPath {
   '/api/public/hooks/scan-signals': typeof ApiPublicHooksScanSignalsRoute
   '/api/public/hooks/signal-reversal-monitor': typeof ApiPublicHooksSignalReversalMonitorRoute
   '/api/public/insight-image/$': typeof ApiPublicInsightImageSplatRoute
+  '/api/public/licenses/validate': typeof ApiPublicLicensesValidateRoute
   '/api/public/v1/models': typeof ApiPublicV1ModelsRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -776,6 +792,7 @@ export interface FileRoutesByTo {
   '/dashboard/documents': typeof AuthenticatedDashboardDocumentsRoute
   '/dashboard/extension': typeof AuthenticatedDashboardExtensionRoute
   '/dashboard/journal': typeof AuthenticatedDashboardJournalRoute
+  '/dashboard/jx-bot': typeof AuthenticatedDashboardJxBotRoute
   '/dashboard/notifications': typeof AuthenticatedDashboardNotificationsRoute
   '/dashboard/pay': typeof AuthenticatedDashboardPayRoute
   '/dashboard/payment': typeof AuthenticatedDashboardPaymentRoute
@@ -814,6 +831,7 @@ export interface FileRoutesByTo {
   '/api/public/hooks/scan-signals': typeof ApiPublicHooksScanSignalsRoute
   '/api/public/hooks/signal-reversal-monitor': typeof ApiPublicHooksSignalReversalMonitorRoute
   '/api/public/insight-image/$': typeof ApiPublicInsightImageSplatRoute
+  '/api/public/licenses/validate': typeof ApiPublicLicensesValidateRoute
   '/api/public/v1/models': typeof ApiPublicV1ModelsRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -875,6 +893,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/documents': typeof AuthenticatedDashboardDocumentsRoute
   '/_authenticated/dashboard/extension': typeof AuthenticatedDashboardExtensionRoute
   '/_authenticated/dashboard/journal': typeof AuthenticatedDashboardJournalRoute
+  '/_authenticated/dashboard/jx-bot': typeof AuthenticatedDashboardJxBotRoute
   '/_authenticated/dashboard/notifications': typeof AuthenticatedDashboardNotificationsRoute
   '/_authenticated/dashboard/pay': typeof AuthenticatedDashboardPayRoute
   '/_authenticated/dashboard/payment': typeof AuthenticatedDashboardPaymentRoute
@@ -913,6 +932,7 @@ export interface FileRoutesById {
   '/api/public/hooks/scan-signals': typeof ApiPublicHooksScanSignalsRoute
   '/api/public/hooks/signal-reversal-monitor': typeof ApiPublicHooksSignalReversalMonitorRoute
   '/api/public/insight-image/$': typeof ApiPublicInsightImageSplatRoute
+  '/api/public/licenses/validate': typeof ApiPublicLicensesValidateRoute
   '/api/public/v1/models': typeof ApiPublicV1ModelsRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -974,6 +994,7 @@ export interface FileRouteTypes {
     | '/dashboard/documents'
     | '/dashboard/extension'
     | '/dashboard/journal'
+    | '/dashboard/jx-bot'
     | '/dashboard/notifications'
     | '/dashboard/pay'
     | '/dashboard/payment'
@@ -1012,6 +1033,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/scan-signals'
     | '/api/public/hooks/signal-reversal-monitor'
     | '/api/public/insight-image/$'
+    | '/api/public/licenses/validate'
     | '/api/public/v1/models'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -1067,6 +1089,7 @@ export interface FileRouteTypes {
     | '/dashboard/documents'
     | '/dashboard/extension'
     | '/dashboard/journal'
+    | '/dashboard/jx-bot'
     | '/dashboard/notifications'
     | '/dashboard/pay'
     | '/dashboard/payment'
@@ -1105,6 +1128,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/scan-signals'
     | '/api/public/hooks/signal-reversal-monitor'
     | '/api/public/insight-image/$'
+    | '/api/public/licenses/validate'
     | '/api/public/v1/models'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -1165,6 +1189,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/documents'
     | '/_authenticated/dashboard/extension'
     | '/_authenticated/dashboard/journal'
+    | '/_authenticated/dashboard/jx-bot'
     | '/_authenticated/dashboard/notifications'
     | '/_authenticated/dashboard/pay'
     | '/_authenticated/dashboard/payment'
@@ -1203,6 +1228,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/scan-signals'
     | '/api/public/hooks/signal-reversal-monitor'
     | '/api/public/insight-image/$'
+    | '/api/public/licenses/validate'
     | '/api/public/v1/models'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -1264,6 +1290,7 @@ export interface RootRouteChildren {
   ApiPublicHooksScanSignalsRoute: typeof ApiPublicHooksScanSignalsRoute
   ApiPublicHooksSignalReversalMonitorRoute: typeof ApiPublicHooksSignalReversalMonitorRoute
   ApiPublicInsightImageSplatRoute: typeof ApiPublicInsightImageSplatRoute
+  ApiPublicLicensesValidateRoute: typeof ApiPublicLicensesValidateRoute
   ApiPublicV1ModelsRoute: typeof ApiPublicV1ModelsRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
   LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
@@ -1651,6 +1678,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardJournalRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
+    '/_authenticated/dashboard/jx-bot': {
+      id: '/_authenticated/dashboard/jx-bot'
+      path: '/jx-bot'
+      fullPath: '/dashboard/jx-bot'
+      preLoaderRoute: typeof AuthenticatedDashboardJxBotRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
     '/_authenticated/dashboard/notifications': {
       id: '/_authenticated/dashboard/notifications'
       path: '/notifications'
@@ -1910,6 +1944,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicInsightImageSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/licenses/validate': {
+      id: '/api/public/licenses/validate'
+      path: '/api/public/licenses/validate'
+      fullPath: '/api/public/licenses/validate'
+      preLoaderRoute: typeof ApiPublicLicensesValidateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/v1/models': {
       id: '/api/public/v1/models'
       path: '/api/public/v1/models'
@@ -1956,6 +1997,7 @@ interface AuthenticatedDashboardRouteChildren {
   AuthenticatedDashboardDocumentsRoute: typeof AuthenticatedDashboardDocumentsRoute
   AuthenticatedDashboardExtensionRoute: typeof AuthenticatedDashboardExtensionRoute
   AuthenticatedDashboardJournalRoute: typeof AuthenticatedDashboardJournalRoute
+  AuthenticatedDashboardJxBotRoute: typeof AuthenticatedDashboardJxBotRoute
   AuthenticatedDashboardNotificationsRoute: typeof AuthenticatedDashboardNotificationsRoute
   AuthenticatedDashboardPayRoute: typeof AuthenticatedDashboardPayRoute
   AuthenticatedDashboardPaymentRoute: typeof AuthenticatedDashboardPaymentRoute
@@ -1988,6 +2030,7 @@ const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
     AuthenticatedDashboardDocumentsRoute: AuthenticatedDashboardDocumentsRoute,
     AuthenticatedDashboardExtensionRoute: AuthenticatedDashboardExtensionRoute,
     AuthenticatedDashboardJournalRoute: AuthenticatedDashboardJournalRoute,
+    AuthenticatedDashboardJxBotRoute: AuthenticatedDashboardJxBotRoute,
     AuthenticatedDashboardNotificationsRoute:
       AuthenticatedDashboardNotificationsRoute,
     AuthenticatedDashboardPayRoute: AuthenticatedDashboardPayRoute,
@@ -2142,6 +2185,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicHooksSignalReversalMonitorRoute:
     ApiPublicHooksSignalReversalMonitorRoute,
   ApiPublicInsightImageSplatRoute: ApiPublicInsightImageSplatRoute,
+  ApiPublicLicensesValidateRoute: ApiPublicLicensesValidateRoute,
   ApiPublicV1ModelsRoute: ApiPublicV1ModelsRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
   LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,

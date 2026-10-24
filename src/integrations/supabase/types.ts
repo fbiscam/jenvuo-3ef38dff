@@ -1998,6 +1998,39 @@ export type Database = {
         }
         Relationships: []
       }
+      mt5_licenses: {
+        Row: {
+          created_at: string
+          id: string
+          last_validated_at: string | null
+          license_key: string
+          mt5_account: string | null
+          plan_id: string
+          revoked_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          last_validated_at?: string | null
+          license_key: string
+          mt5_account?: string | null
+          plan_id?: string
+          revoked_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          last_validated_at?: string | null
+          license_key?: string
+          mt5_account?: string | null
+          plan_id?: string
+          revoked_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       news_event_notifications: {
         Row: {
           country: string | null

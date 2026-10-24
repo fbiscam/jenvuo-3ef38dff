@@ -58,6 +58,9 @@ const COMPARE: ReadonlyArray<{ f: string; b: Mark; c: Mark; d: Mark }> = [
   { f: "Daily token limit", b: "1.5M", c: "5M", d: "10M" },
   { f: "Balance-based quota ($3 = 1M tokens)", b: true, c: true, d: true },
   { f: "Active API keys", b: "2", c: "3", d: "5" },
+  { f: "JX Bot MT5 licenses", b: "1", c: "2", d: "5" },
+  { f: "JX Bot monthly profit target", b: "$1,000", c: "$3,000", d: "$6,000" },
+  { f: "JX Bot daily target (monthly / 20)", b: "$50", c: "$150", d: "$300" },
   { f: "AI models", b: "__MODELS__", c: "__MODELS__", d: "__MODELS__" },
   { f: "ChatGPT 5.5 Pro primary analysis", b: true, c: true, d: true },
   { f: "Claude Fable 5.1 senior review", b: false, c: true, d: true },
@@ -80,7 +83,7 @@ function PricingPage() {
   const signedOut = currentPlan === null;
   const [billing, setBilling] = React.useState<"monthly" | "annual">("monthly");
   const priceOf = (id: string, price: number) => {
-    const base = signedOut && id === "pro" ? 5 : price;
+    const base = price;
     return billing === "annual" && base > 0 ? Math.round((base * 12 * 0.83) / 10) * 10 : base;
   };
   const suffix = billing === "annual" ? "/yr" : "/mo";

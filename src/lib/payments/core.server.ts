@@ -294,6 +294,7 @@ export async function approveOrder(orderId: string, by: string) {
   // Paid amount (excluding promo bonus) decides the plan tier.
   try {
     await applyPlanForPayment(order.user_id, Number(order.pay_amount_usd ?? credit), order.target_plan_id);
+    await ensureMt5License(order.user_id);
   } catch (e) {
     console.error("plan upgrade on approval failed", (e as Error)?.message);
   }
@@ -346,4 +347,15 @@ export async function rejectOrder(orderId: string, reason: string, by: string) {
     console.error("payment reject email failed", (e as Error)?.message);
   }
   return { ok: true as const };
+}
+
+/** After a plan payment, create one JX Bot license (bound to an MT5 account later) if the user has none. */
+export async function ensureMt5License(userId: string) {
+  const { isMt5Plan, newLicenseKey } = await import("@/lib/mt5-licenses");
+  const db = supabaseAdmin as any;
+  const { data: sub } = await db.from("user_subscriptions").select("plan_id,is_trial").eq("user_id", userId).maybeSingle();
+  if (!sub || sub.is_trial || !isMt5Plan(sub.plan_id)) return;
+  const { count } = await db.from("mt5_licenses").select("id", { count: "exact", head: true }).eq("user_id", userId).is("revoked_at", null);
+  if ((count ?? 0) > 0) return;
+  await db.from("mt5_licenses").insert({ user_id: userId, license_key: newLicenseKey(), plan_id: sub.plan_id });
 }
