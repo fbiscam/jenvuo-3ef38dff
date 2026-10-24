@@ -20,7 +20,7 @@ describe("mt5 licenses", () => {
   });
   it("valid key on paid plan returns targets", () => {
     const r = evaluateLicense(key, "12345678", lic, paid("elite"));
-    expect(r).toMatchObject({ valid: true, plan: "elite", daily_target: 150, monthly_target: 3000 });
+    expect(r.valid && [r.plan, r.daily_target, r.monthly_target]).toEqual(["elite", 150, 3000]);
   });
   it("rejects a different MT5 account", () => {
     expect(evaluateLicense(key, "999", lic, paid("pro"))).toEqual({ valid: false, reason: "mt5_mismatch" });
