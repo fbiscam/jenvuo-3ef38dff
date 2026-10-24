@@ -280,7 +280,7 @@ const AUDIENCES: Array<{ key: string; label: string; cards: AudienceCard[] }> = 
     label: "Special programs",
     cards: [
       { tag: "FOUNDING PROGRAM", text: "Apply to the invite-only Founding Program for your chosen plan and $250 credit", to: "/founding", img: progFounding },
-      { tag: "PLANS", text: "Choose Pro at $10, Elite at $25 or Ultra at $50, billed every month", to: "/pricing", img: progPlans },
+      { tag: "PLANS", text: "Choose Pro at $49, Elite at $99 or Ultra at $169, billed every month", to: "/pricing", img: progPlans },
       { tag: "SUPPORT", text: "Questions about plans, billing or JX Bot? Ask our support team", to: "/contact", img: progSupport },
     ],
   },
@@ -589,9 +589,9 @@ export function CloudUseCases() {
 
 /* ---------------- Pricing band ---------------- */
 const PLANS = [
-  { name: "Pro", price: "$10", note: "For traders getting started with the Terminal and AI desk.", tone: "blue" as Tone },
+  { name: "Pro", price: "$49", note: "For traders getting started with the Terminal and AI desk.", tone: "blue" as Tone },
   { name: "Elite", price: "$25", note: "More AI usage and daily tokens for active intraday trading.", tone: "green" as Tone },
-  { name: "Ultra", price: "$50", note: "The highest limits for full-time desks and API use.", tone: "red" as Tone },
+  { name: "Ultra", price: "$169", note: "The highest limits for full-time desks and API use.", tone: "red" as Tone },
 ];
 
 export function CloudPricing() {

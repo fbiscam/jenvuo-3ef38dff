@@ -31,7 +31,7 @@ const RESOURCES: Record<string, Resource[]> = {
     { title: "Developer docs", text: "Clear guides help you connect, test and ship your project.", to: "/help" },
   ],
   "Billing and plans": [
-    { title: "Plans and pricing", text: "Pro $10, Elite $25 and Ultra $50 per month.", to: "/pricing" },
+    { title: "Plans and pricing", text: "Pro $49, Elite $99 and Ultra $169 per month.", to: "/pricing" },
     { title: "Manage billing", text: "Change plan, top up credit and see your invoices.", to: "/dashboard/billing" },
     { title: "Founding Program", text: "3 months of your plan with $250 credit and Terminal access.", to: "/founding" },
   ],

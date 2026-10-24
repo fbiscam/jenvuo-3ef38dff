@@ -382,9 +382,9 @@ export const DOC_GROUPS: DocGroup[] = [
         body: (
           <>
             <ul>
-              <li><strong>Pro</strong> — $10 per month.</li>
-              <li><strong>Elite</strong> — $25 per month.</li>
-              <li><strong>Ultra</strong> — $50 per month.</li>
+              <li><strong>Pro</strong> — $49 per month.</li>
+              <li><strong>Elite</strong> — $99 per month.</li>
+              <li><strong>Ultra</strong> — $169 per month.</li>
             </ul>
             <p>
               Each paid plan includes a monthly AI wallet. AI use is charged by actual tokens at $3 per million. See{" "}
