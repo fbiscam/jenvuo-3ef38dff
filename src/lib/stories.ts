@@ -171,7 +171,7 @@ export const STORIES: Story[] = [
     feature: {
       title: "Automated EUR/USD trading with clear limits",
       text: [
-        "Download the bot from your dashboard, create a license for your MT5 account and attach it to the XAUUSD M15 chart.",
+        "Download the bot from your dashboard, create a license for your MT5 account and attach it to the EURUSD M15 chart.",
         "The bot checks its license with Jenvu, pauses for the day at your daily target and stops at your monthly target.",
       ],
       caption: "JX Bot running on the EURUSD M15 chart in MetaTrader 5",
