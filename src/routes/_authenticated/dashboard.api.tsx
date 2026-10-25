@@ -87,7 +87,7 @@ function ExtensionPage() {
       setFreshKey(res.key);
       setName("");
       setShowCreate(false);
-      toast.success("API key created — copy it now, it is shown only once.");
+      toast.success("API key created — you can copy it anytime from the list.");
       await refresh();
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Could not create the key");
@@ -243,7 +243,7 @@ function ExtensionPage() {
       {freshKey && (
         <div className="mt-5 rounded-lg border border-amber-300 bg-amber-50 p-3">
           <div className="text-[12px] font-medium text-amber-800">
-            Copy this key now — it will not be shown again.
+            Your new API key — you can copy it again later from the list below.
           </div>
           <div className="mt-2 flex items-center gap-2">
             <code
