@@ -23,7 +23,7 @@ function AboutPage() {
     <PageShell
       wide
       eyebrow="\n"
-      title="Why Jenvu"
+      title="About Jenvu, the AI Fiber trading terminal"
       intro="Jenvu was built on a simple thesis: institutional logic shouldn't be locked behind a Bloomberg terminal. We turned ICT and SMC playbooks into an AI trading terminal any serious Fiber trader can use directly on the chart."
     >
       <Feature
