@@ -41,13 +41,13 @@ describe("mt5 licenses", () => {
 });
 
 import { sharedTargetStatus } from "./mt5-licenses";
-describe("shared daily target", () => {
-  it("5 Ultra accounts stop together when their total reaches $150", () => {
-    expect(sharedTargetStatus(150, [30, 30, 30, 30, 29])).toEqual({ combined: 149, stop: false });
-    expect(sharedTargetStatus(150, [30, 30, 30, 30, 30]).stop).toBe(true);
+describe("daily target per license", () => {
+  it("an Ultra account stops at its own $150, not before", () => {
+    expect(sharedTargetStatus(150, [149]).stop).toBe(false);
+    expect(sharedTargetStatus(150, [150]).stop).toBe(true);
   });
-  it("stays stopped for the day once hit, even if a later total dips", () => {
-    expect(sharedTargetStatus(150, [100, 20], true).stop).toBe(true);
+  it("stays stopped for the day once hit, even if profit dips", () => {
+    expect(sharedTargetStatus(150, [120], true).stop).toBe(true);
   });
 });
 
