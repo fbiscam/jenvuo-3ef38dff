@@ -56,7 +56,7 @@ export function WhyJenvu() {
           </span>
 
           <h3 className="mt-6 max-w-[15ch] text-[34px] font-semibold leading-[1.05] tracking-tight text-zinc-900 sm:text-[40px]">
-            Trading gold with the noisy way engine
+            Trading EUR/USD with the noisy way engine
           </h3>
 
           {/* dotted chart */}

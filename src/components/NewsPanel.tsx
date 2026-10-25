@@ -23,7 +23,7 @@ export function NewsPanel({ events }: { events: NewsEvent[] }) {
         <div className="flex items-center gap-2">
           <AlertTriangle className="h-4 w-4 text-amber-400" />
           <h3 className="text-sm font-semibold text-white tracking-wide">
-            High-Impact News (USD / Gold)
+            High-Impact News (USD / EUR)
           </h3>
         </div>
         <span className="text-[10px] uppercase tracking-[0.2em] text-neutral-500">

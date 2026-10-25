@@ -228,7 +228,7 @@ export const collections: Collection[] = [
           { type: "code", content: "“Is it safe to trade NFP today?”\n“Any high-impact news in the next hour?”\n“What killzone are we in?”" },
 
           { type: "h2", content: "ICT & SMC concepts" },
-          { type: "code", content: "“Show me the daily order block on Gold.”\n“Where is liquidity resting above price?”\n“Is this a manipulation move or a real BOS?”" },
+          { type: "code", content: "“Show me the daily order block on EUR/USD.”\n“Where is liquidity resting above price?”\n“Is this a manipulation move or a real BOS?”" },
 
           { type: "h2", content: "Account & app" },
           { type: "code", content: "“How many credits do I have left?”\n“Open my saved signals.”\n“Take me to billing.”" },

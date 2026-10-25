@@ -258,7 +258,7 @@ export default function TrustedDesks() {
   return (
     <div className="mx-auto max-w-6xl px-5 py-16 sm:px-6 sm:py-24">
       <h2 className="mx-auto max-w-3xl text-center text-3xl font-semibold tracking-tight text-zinc-900 sm:text-4xl md:text-[44px] md:leading-[1.1]">
-        JENVU powers desks trading in gold
+        JENVU powers desks trading EUR/USD
       </h2>
       <p className="mt-4 text-center text-[15px] leading-relaxed text-zinc-500 sm:text-base">
         Trusted by the traders you trust.

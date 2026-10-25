@@ -188,7 +188,7 @@ export const DOC_GROUPS: DocGroup[] = [
         body: (
           <>
             <p>
-              Candles come from a gold contract price feed that closely follows XAU/USD, with a backup source if the main one is
+              Candles come from a live price feed, with a backup source if the main one is
               unavailable. Small differences from your broker's chart are normal because every provider's prices differ slightly.
             </p>
             <ul>
@@ -491,7 +491,7 @@ export const DOC_GROUPS: DocGroup[] = [
         keywords: "disclaimer risk advice",
         body: (
           <p>
-            Trading gold carries a high level of risk and can lose you money. Jenvu provides analysis and education only — not
+            Trading EUR/USD carries a high level of risk and can lose you money. Jenvu provides analysis and education only — not
             financial advice. Read the full <a href="https://jenvu.com/disclaimer">Risk Disclaimer</a>.
           </p>
         ),

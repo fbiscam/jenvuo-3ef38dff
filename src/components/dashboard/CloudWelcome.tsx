@@ -17,7 +17,7 @@ type Resource = { title: string; text: string; to: string };
 const RESOURCES: Record<string, Resource[]> = {
   "Terminal and charts": [
     { title: "Read sweeps and zones", text: "Learn how fresh sweeps, supply and demand zones and FVGs show on the chart.", to: "/help" },
-    { title: "Daily XAU/USD insights", text: "Follow EUR/USD sessions with short daily notes and step-by-step guides.", to: "/insights" },
+    { title: "Daily EUR/USD insights", text: "Follow EUR/USD sessions with short daily notes and step-by-step guides.", to: "/insights" },
     { title: "Volume and pressure", text: "See how RVOL spikes and buyer and seller estimates are shown on every candle.", to: "/help" },
   ],
   "AI desk and models": [
@@ -102,7 +102,7 @@ export default function CloudWelcome({ name: profileName }: { name?: string }) {
               Make the most of Jenvu
             </div>
             <ul className="mt-6 space-y-5">
-              <Tick>Read live sweeps, zones and FVGs on XAU/USD</Tick>
+              <Tick>Read live sweeps, zones and FVGs on EUR/USD</Tick>
               <Tick>Ask the AI desk about any chart</Tick>
               <Tick>Track usage, billing and API keys in one place</Tick>
             </ul>

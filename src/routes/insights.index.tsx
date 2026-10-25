@@ -115,7 +115,7 @@ function InsightsPage() {
   const [page, setPage] = useState(1);
   const filters: { id: typeof filter; label: string }[] = [
     { id: "latest", label: "Latest" },
-    { id: "gold", label: "Gold" },
+    { id: "gold", label: "EUR/USD" },
     { id: "macro", label: "Macro" },
   ];
 
@@ -295,7 +295,7 @@ function InsightsPage() {
           <section id="subscribe" className="mt-20 scroll-mt-24 rounded-3xl bg-gc-canvas px-6 py-12 text-center sm:px-12">
             <h2 className="text-[26px] font-normal leading-[1.25] text-gc-ink sm:text-[32px]">Get new articles by email</h2>
             <p className="mx-auto mb-8 mt-3 max-w-xl text-[15px] leading-[1.6] text-gc-ink-muted">
-              One short email when a new gold briefing goes live. Unsubscribe any time.
+              One short email when a new EUR/USD briefing goes live. Unsubscribe any time.
             </p>
             <SubscribeForm />
           </section>

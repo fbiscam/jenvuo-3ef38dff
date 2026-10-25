@@ -42,7 +42,7 @@ function DevPage() {
         <H2>Server Functions</H2>
         <P>
           Market data fetching, news aggregation, and LLM orchestration run as TanStack
-          server functions on a serverless edge runtime. XAU/USD routes through dedicated
+          server functions on a serverless edge runtime. EUR/USD routes through dedicated
           bullion feeds with automatic fallbacks for resilience.
         </P>
       </section>
