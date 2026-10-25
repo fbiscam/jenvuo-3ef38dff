@@ -190,7 +190,7 @@ export const STORIES: Story[] = [
     },
     stats: [
       { value: "1–5", label: "MT5 licenses per plan" },
-      { value: "$300", label: "Daily target on Ultra" },
+      { value: "$150", label: "Daily target on Ultra" },
       { value: "M15", label: "Fiber chart" },
     ],
     cta: { label: "See plans", href: "https://jenvu.com/pricing" },
