@@ -10,9 +10,9 @@ export const Route = createFileRoute("/founder")({
   head: () => ({
     meta: [
       { title: "Haseeb Ijaz — Founder of Jenvu" },
-      { name: "description", content: "Meet Haseeb Ijaz, founder of Jenvu. At 21, he built an AI EUR/USD trading platform powered by ICT, SMC and rule-based chart analysis." },
+      { name: "description", content: "Meet Haseeb Ijaz, founder of Jenvu. At 21, he built an AI Fiber trading platform powered by ICT, SMC and rule-based chart analysis." },
       { property: "og:title", content: "Haseeb Ijaz — Founder of Jenvu" },
-      { property: "og:description", content: "At 21, Haseeb Ijaz founded Jenvu to bring structured EUR/USD trading analysis into every serious trader's chart workflow." },
+      { property: "og:description", content: "At 21, Haseeb Ijaz founded Jenvu to bring structured Fiber trading analysis into every serious trader's chart workflow." },
       { property: "og:url", content: "https://jenvu.com/founder" },
       { property: "og:type", content: "profile" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -23,14 +23,14 @@ export const Route = createFileRoute("/founder")({
 });
 
 const BIO = [
-  "Haseeb Ijaz started Jenvu at age 21 with a single conviction: structured EUR/USD analysis should not be locked behind an expensive terminal or a Wall Street desk.",
-  "He spent years studying ICT, SMC, liquidity and market structure on EUR/USD. The patterns were repeatable, but the tools were scattered. So he built the platform he wished he had at 18 — AI-assisted and honest about risk.",
+  "Haseeb Ijaz started Jenvu at age 21 with a single conviction: structured Fiber analysis should not be locked behind an expensive terminal or a Wall Street desk.",
+  "He spent years studying ICT, SMC, liquidity and market structure on Fiber. The patterns were repeatable, but the tools were scattered. So he built the platform he wished he had at 18 — AI-assisted and honest about risk.",
   "Beyond the Terminal, Haseeb has sharpened 25 skills spanning market research, product marketing, community building and AI-driven growth.",
-  "Today Jenvu brings those disciplines into one platform that reads the EUR/USD chart live, marks the structure, and tells traders when there is no clear setup.",
+  "Today Jenvu brings those disciplines into one platform that reads the Fiber chart live, marks the structure, and tells traders when there is no clear setup.",
 ];
 
 const IDEAS = [
-  "Analyze EUR/USD through deeply specialized, rule-based engines",
+  "Analyze Fiber through deeply specialized, rule-based engines",
   "Explain the setup in plain language so traders can check it",
   "Only highlight setups when bias, structure, liquidity and timing align",
   "Say so clearly when the market offers no clear edge",
@@ -51,7 +51,7 @@ function FounderPage() {
                 The founder behind Jenvu
               </h1>
               <p className="jenvu-rise [animation-delay:80ms] mx-auto mt-5 max-w-[720px] text-[17px] leading-[1.6] text-gc-ink-muted">
-                Haseeb Ijaz started Jenvu at 21 to give independent EUR/USD traders the same structured view of the market that big desks use.
+                Haseeb Ijaz started Jenvu at 21 to give independent Fiber traders the same structured view of the market that big desks use.
               </p>
             </div>
           </section>

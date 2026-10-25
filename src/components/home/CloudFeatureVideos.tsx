@@ -79,7 +79,7 @@ function SceneSweep({ t }: { t: number }) {
   );
 }
 
-const AI_Q = "Is EUR/USD bullish on 2H?";
+const AI_Q = "Is Fiber bullish on 2H?";
 const AI_A = "Structure is HH/HL with a fresh demand zone + bullish FVG. Wait for a 2H close above 4,180 before buying.";
 function SceneAi({ t }: { t: number }) {
   const total = AI_A.length + 18;
@@ -129,11 +129,11 @@ function SceneBot({ t }: { t: number }) {
 
 type Card = { name: string; text: React.ReactNode; to: string; Scene: React.ComponentType<{ t: number }> };
 const CARDS: Card[] = [
-  { name: "Live candles", to: "/pricing", Scene: SceneCandles, text: <><b className="font-medium text-gc-ink">Jenvu Terminal</b> streams live EUR/USD candles with swing labels that stay fixed once</> },
+  { name: "Live candles", to: "/pricing", Scene: SceneCandles, text: <><b className="font-medium text-gc-ink">Jenvu Terminal</b> streams live Fiber candles with swing labels that stay fixed once</> },
   { name: "Fresh sweep", to: "/help", Scene: SceneSweep, text: <><b className="font-medium text-gc-ink">Fresh sweep</b> spots wicks that take prior highs or lows, then confirms only when price reverses</> },
   { name: "AI desk", to: "/ai-engine", Scene: SceneAi, text: <><b className="font-medium text-gc-ink">Jenvu AI</b> reads the same chart you see and answers exactly the question you asked</> },
   { name: "Volume RVOL", to: "/help", Scene: SceneVolume, text: <><b className="font-medium text-gc-ink">RVOL</b> colours unusual volume spikes and shows an estimated buyer and seller on every candle</> },
-  { name: "JX Bot", to: "/pricing", Scene: SceneBot, text: <><b className="font-medium text-gc-ink">JX Bot</b> trades EUR/USD on MetaTrader 5 and pauses for the day at your daily target</> },
+  { name: "JX Bot", to: "/pricing", Scene: SceneBot, text: <><b className="font-medium text-gc-ink">JX Bot</b> trades Fiber on MetaTrader 5 and pauses for the day at your daily target</> },
 ];
 
 function FeatureCard({ card }: { card: Card }) {

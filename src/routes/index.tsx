@@ -38,7 +38,7 @@ const CORR_PLACEHOLDER: CorrelatedMarket[] = [
   { symbol: "DXY", display: "DXY", note: "USD strength — inverse driver" },
   { symbol: "US10Y", display: "US10Y", note: "Real yields — inverse driver" },
   { symbol: "XAGUSD", display: "XAG/USD", note: "Silver beta — confirms metals" },
-  { symbol: "EURUSD", display: "EUR/USD", note: "USD leg — positive driver" },
+  { symbol: "EURUSD", display: "Fiber", note: "USD leg — positive driver" },
   { symbol: "USDJPY", display: "USD/JPY", note: "Carry / risk — inverse driver" },
   { symbol: "SPX", display: "S&P 500", note: "Risk appetite — rotation cue" },
   { symbol: "WTI", display: "WTI Oil", note: "Inflation impulse — positive" },
@@ -115,16 +115,16 @@ import xaiLogo from "@/assets/xai-logo.png";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "AI EUR/USD Trading — Jenvu" },
+      { title: "AI Fiber Trading — Jenvu" },
       {
         name: "description",
         content:
-          "Jenvu is an AI trading terminal for live ICT/SMC EUR/USD analysis with precise entries, stops, targets and mandatory senior review on eligible plans.",
+          "Jenvu is an AI trading terminal for live ICT/SMC Fiber analysis with precise entries, stops, targets and mandatory senior review on eligible plans.",
       },
-      { property: "og:title", content: "AI EUR/USD Trading — Jenvu" },
+      { property: "og:title", content: "AI Fiber Trading — Jenvu" },
       {
         property: "og:description",
-        content: "Analyze EUR/USD charts in TradingView with institutional ICT/SMC logic, chart-aware AI and reviewed trade signals.",
+        content: "Analyze Fiber charts in TradingView with institutional ICT/SMC logic, chart-aware AI and reviewed trade signals.",
       },
       { property: "og:url", content: "https://jenvu.com/" },
       { property: "og:type", content: "website" },
@@ -140,7 +140,7 @@ export const Route = createFileRoute("/")({
           applicationCategory: "FinanceApplication",
           operatingSystem: "Web",
           description:
-            "AI trading terminal with institutional ICT/SMC analysis and reviewed signals for EUR/USD.",
+            "AI trading terminal with institutional ICT/SMC analysis and reviewed signals for Fiber.",
           offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
         }),
       },
@@ -177,7 +177,7 @@ const INITIAL_TICKER: TickerRow[] = [
   ["DXY", "—", "…"],
   ["US10Y", "—", "…"],
   ["XAG/USD", "—", "…"],
-  ["EUR/USD", "—", "…"],
+  ["Fiber", "—", "…"],
   ["USD/JPY", "—", "…"],
   ["S&P 500", "—", "…"],
   ["WTI Oil", "—", "…"],
@@ -190,7 +190,7 @@ const SYMBOL_MAP: Record<string, string> = {
   "DXY": "DXY",
   "US10Y": "US10Y",
   "XAG/USD": "XAGUSD",
-  "EUR/USD": "EURUSD",
+  "Fiber": "EURUSD",
   "USD/JPY": "USDJPY",
   "S&P 500": "SPX",
   "WTI Oil": "WTI",
@@ -361,7 +361,7 @@ function Sparkline({ series, up }: { series: number[]; up: boolean }) {
 function HomePage() {
   const ticker = useLiveTicker();
   
-  const xau = ticker.find((r) => r[0] === "EUR/USD");
+  const xau = ticker.find((r) => r[0] === "Fiber");
   const currentPlan = useCurrentPlan();
   const upgradeLock = useUpgradeLock();
   const trial = useTrial();

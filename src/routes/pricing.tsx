@@ -22,7 +22,7 @@ export const FAQ = [
   ["What do the plans include?", "Every plan includes JX Bot for MetaTrader 5 (1, 2 or 5 licenses) and the Top AI Models with a monthly AI wallet. Credit alone never unlocks JX Bot; it pays for API and AI use."],
   ["Who can use the Terminal?", "The Terminal is reserved for approved Founding Program members, free of cost. Pro, Elite and Ultra cover JX Bot and the Top AI Models."],
   ["Can I cancel anytime?", "Yes. Plans are month-to-month with no lock-in. You keep access until the end of the period you already paid for."],
-  ["What markets are covered?", "EUR/USD only. Jenvu focuses on EUR/USD."],
+  ["What markets are covered?", "Fiber only. Jenvu focuses on Fiber."],
 ];
 
 export const Route = createFileRoute("/pricing")({
@@ -117,9 +117,9 @@ function PricingPage() {
       {/* START FOR FREE + STATS */}
       <section className="mx-auto grid max-w-[1296px] items-center gap-10 px-5 py-10 sm:px-8 md:grid-cols-2 md:gap-14 lg:px-[72px]">
         <div>
-          <h2 className="text-[28px] font-normal leading-tight">Start trading EUR/USD for free</h2>
+          <h2 className="text-[28px] font-normal leading-tight">Start trading Fiber for free</h2>
           <p className="mt-5 text-[17px] leading-[1.65] text-gc-ink-muted">
-            Create an account to see how Jenvu reads the EUR/USD market in real time. New users get{" "}
+            Create an account to see how Jenvu reads the Fiber market in real time. New users get{" "}
             <Link to="/auth" search={{ mode: "signup" } as never} className={LINK}>$100 in free credit</Link> to run the AI desk, plus{" "}
             <a href="#plans" className={LINK}>14 days of Pro access</a>, started with one click from the dashboard.
           </p>
