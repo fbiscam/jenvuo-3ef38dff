@@ -35,7 +35,7 @@ const MONO = "font-['Google_Sans','Product_Sans','Roboto',system-ui,sans-serif] 
 type Category = "FX";
 
 const META: Record<string, { name: string; category: Category; region: string; flag: string }> = {
-  EURUSD: { name: "Euro / US Dollar", category: "FX", region: "London / New York", flag: "🇪🇺" },
+  XAUUSD: { name: "Euro / US Dollar", category: "FX", region: "London / New York", flag: "🇪🇺" },
 };
 
 const CATEGORIES: (Category | "All")[] = ["All", "FX"];
@@ -181,7 +181,7 @@ function KillzonesPage() {
   const rows = useMemo(() => {
     const q = query.trim().toUpperCase();
     return Object.values(PAIR_PROFILES)
-      .map(p => ({ profile: p, meta: META[p.key] }))
+      .map(p => ({ profile: p, meta: META[p.key], label: "EURUSD" }))
       .filter(r => r.meta)
       .filter(r => (cat === "All" ? true : r.meta.category === cat))
       .filter(
