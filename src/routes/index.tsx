@@ -174,7 +174,6 @@ const SIGNALS = [
 
 type TickerRow = [string, string, string];
 const INITIAL_TICKER: TickerRow[] = [
-  ["EUR/USD", "—", "…"],
   ["DXY", "—", "…"],
   ["US10Y", "—", "…"],
   ["XAG/USD", "—", "…"],
@@ -188,7 +187,6 @@ const INITIAL_TICKER: TickerRow[] = [
 // Server-fn symbol map — routes through getMarketSnapshot to bypass browser
 // CORS restrictions on Yahoo Finance and return authoritative live prices.
 const SYMBOL_MAP: Record<string, string> = {
-  "EUR/USD": "EURUSD",
   "DXY": "DXY",
   "US10Y": "US10Y",
   "XAG/USD": "XAGUSD",
@@ -363,7 +361,7 @@ function Sparkline({ series, up }: { series: number[]; up: boolean }) {
 function HomePage() {
   const ticker = useLiveTicker();
   
-  const xau = ticker.find((r) => r[0] === "XAU/USD");
+  const xau = ticker.find((r) => r[0] === "EUR/USD");
   const currentPlan = useCurrentPlan();
   const upgradeLock = useUpgradeLock();
   const trial = useTrial();
