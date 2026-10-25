@@ -121,9 +121,9 @@ function InsightsPage() {
 
   const filtered = useMemo(() => {
     if (filter === "latest") return insights;
-    const goldCats = ["EUR/USD", "analysis", "ict", "smc", "strategy", "institutional"];
+    const goldCats = ["gold", "eur/usd", "forex", "analysis", "ict", "smc", "strategy", "institutional"];
     const macroCats = ["market news", "education", "ai"];
-    const match = filter === "EUR/USD" ? goldCats : macroCats;
+    const match = filter === "gold" ? goldCats : macroCats;
     return insights.filter((i) => match.includes((i.category || "").toLowerCase()));
   }, [insights, filter]);
 
@@ -227,7 +227,7 @@ function InsightsPage() {
           </section>
 
           <h2 className="border-b border-gc-line pb-6 text-[26px] font-normal text-gc-ink sm:text-[30px]">
-            {filter === "latest" ? "All stories" : filter === "EUR/USD" ? "EUR/USD analysis" : "Macro and education"}
+            {filter === "latest" ? "All stories" : filter === "gold" ? "EUR/USD analysis" : "Macro and education"}
           </h2>
 
           <div>
