@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { evaluateLicense, sharedTargetStatus } from "@/lib/mt5-licenses";
+import { evaluateLicense, sessionStep, sharedTargetStatus } from "@/lib/mt5-licenses";
 
 // Always HTTP 200: the MT5 bot reads the JSON body only.
 // The bot posts its account numbers about once a minute; the license key is the caller's proof.
@@ -36,6 +36,19 @@ export const Route = createFileRoute("/api/public/licenses/report")({
           const r = evaluateLicense(key, account, lic ?? null, sub);
           if (!r.valid) return ok(r);
           if (r.bind) return ok({ valid: false, reason: "not_found" }); // must be validated (bound) first
+
+          // ON/OFF history: extend the open session or start a new one; "stop" closes it with MT5's reason.
+          const nowIso = new Date().toISOString();
+          const event = body?.event === "start" || body?.event === "stop" ? body.event : undefined;
+          const reason = String(body?.reason ?? "").toLowerCase().replace(/[^a-z]/g, "").slice(0, 20) || null;
+          const { data: last } = await db.from("mt5_bot_sessions").select("id,last_seen_at,ended_at").eq("license_id", lic.id).order("started_at", { ascending: false }).limit(1).maybeSingle();
+          if (sessionStep(last ?? null, Date.now(), event) === "new") {
+            if (last && !last.ended_at) await db.from("mt5_bot_sessions").update({ ended_at: last.last_seen_at, end_reason: "lost" }).eq("id", last.id);
+            await db.from("mt5_bot_sessions").insert({ license_id: lic.id, user_id: lic.user_id, mt5_account: account, started_at: nowIso, last_seen_at: nowIso, ...(event === "stop" ? { ended_at: nowIso, end_reason: reason } : {}) });
+          } else {
+            await db.from("mt5_bot_sessions").update({ last_seen_at: nowIso, ...(event === "stop" ? { ended_at: nowIso, end_reason: reason } : {}) }).eq("id", last.id);
+          }
+          if (event === "stop") return ok({ valid: true, recorded: true });
 
           const day = new Date().toISOString().slice(0, 10);
           await db.from("mt5_bot_reports").upsert(
