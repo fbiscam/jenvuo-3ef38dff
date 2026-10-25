@@ -10,11 +10,13 @@ function binanceStreamFor(symbol: string): string | null {
   const s = symbol.toUpperCase().replace("/", "");
   if (s === "XAUUSD") return "wss://fstream.binance.com/ws/xauusdt@bookTicker";
   if (s === "BTCUSD") return "wss://stream.binance.com:9443/ws/btcusdt@bookTicker";
+  if (s === "EURUSD") return "wss://stream.binance.com:9443/ws/eurusdt@bookTicker";
   return null;
 }
 /** Streams already quoted on the chart's own scale need no spot basis. */
-const NO_BASIS = new Set(["BTCUSD"]);
+const NO_BASIS = new Set(["BTCUSD", "EURUSD"]);
 const BACKUP_STREAMS: Record<string, string[]> = {
+  EURUSD: ["wss://data-stream.binance.vision/ws/eurusdt@bookTicker", "wss://stream.binance.com:443/ws/eurusdt@bookTicker"],
   BTCUSD: ["wss://data-stream.binance.vision/ws/btcusdt@bookTicker", "wss://stream.binance.com:443/ws/btcusdt@bookTicker"],
 };
 

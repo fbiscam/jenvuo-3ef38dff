@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 
-/** XAU/USD badge: orange disc with three stacked white gold bars. */
+/** EUR/USD badge: orange disc with three stacked white gold bars. */
 export function XauUsdLogo({ size = 22, className }: { size?: number; className?: string }) {
   return (
     <svg
@@ -9,7 +9,7 @@ export function XauUsdLogo({ size = 22, className }: { size?: number; className?
       viewBox="0 0 447 447"
       className={cn("shrink-0", className)}
       role="img"
-      aria-label="XAU/USD"
+      aria-label="EUR/USD"
     >
       <circle cx="223.5" cy="223.5" r="223.5" fill="#FFAD00" />
       <g fill="#FFFFFF">

@@ -42,7 +42,7 @@ function useHideBalance() {
 const input =
   "h-10 w-full rounded-md border border-gc-line bg-card px-3 text-sm text-gc-ink outline-none placeholder:text-gc-ink-muted/70 focus:border-gc-blue focus:ring-1 focus:ring-gc-blue";
 
-/** Left Terminal column: XAU/USD order form and the demo account (balance can be hidden). */
+/** Left Terminal column: EUR/USD order form and the demo account (balance can be hidden). */
 export function TerminalOrderPanel({ trading, price, footer }: { trading: DemoTrading; price: number | null; footer?: React.ReactNode }) {
   const [hidden, toggleHidden] = useHideBalance();
   const [side, setSide] = useState<DemoSide>("buy");
@@ -88,7 +88,7 @@ export function TerminalOrderPanel({ trading, price, footer }: { trading: DemoTr
           <XauUsdLogo size={30} />
           <div className="min-w-0">
             <p className="text-[15px] font-medium leading-tight text-gc-ink">Place order</p>
-            <p className="text-[11px] text-gc-ink-muted">XAU/USD · Gold Spot / US Dollar</p>
+            <p className="text-[11px] text-gc-ink-muted">EUR/USD · Gold Spot / US Dollar</p>
           </div>
         </div>
         <div className="mt-3 flex items-center justify-between text-[12px]">

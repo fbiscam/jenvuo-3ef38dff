@@ -17,7 +17,7 @@ import flagGb from "@/assets/watchlist/flag-gb.svg";
 import flagUs from "@/assets/watchlist/flag-us.svg";
 import flagJp from "@/assets/watchlist/flag-jp.svg";
 
-type ChartAsset = "XAUUSD" | "BTCUSD";
+type ChartAsset = "EURUSD" | "BTCUSD";
 
 type WatchItem = {
   symbol: string;
@@ -31,7 +31,7 @@ const GROUPS: Array<{ label: string; items: WatchItem[] }> = [
   {
     label: "Metals",
     items: [
-      { symbol: "XAUUSD", name: "Gold Spot / U.S. Dollar", logo: "xau", chartable: "XAUUSD" },
+      { symbol: "EURUSD", name: "Gold Spot / U.S. Dollar", logo: "xau", chartable: "EURUSD" },
       { symbol: "XAGUSD", name: "Silver / U.S. Dollar", logo: xagLogo },
     ],
   },

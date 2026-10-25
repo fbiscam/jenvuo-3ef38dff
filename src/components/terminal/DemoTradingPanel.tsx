@@ -170,12 +170,12 @@ export function QuickTradeButtons({ price, onPick }: { price: number | null; onP
   const q = price ? bidAsk(price) : null;
   return (
     <div className="pointer-events-auto flex items-center gap-1.5 font-sans">
-      <button type="button" onClick={() => onPick("sell")} aria-label="Sell XAU/USD" className="flex min-w-[76px] flex-col items-center rounded-md px-2 py-1 leading-tight text-primary-foreground shadow-sm hover:opacity-90" style={{ background: SELL }}>
+      <button type="button" onClick={() => onPick("sell")} aria-label="Sell EUR/USD" className="flex min-w-[76px] flex-col items-center rounded-md px-2 py-1 leading-tight text-primary-foreground shadow-sm hover:opacity-90" style={{ background: SELL }}>
         <span className="font-mono text-[13px] font-semibold">{q ? num(q.bid) : "—"}</span>
         <span className="text-[10px] font-medium tracking-wide">SELL</span>
       </button>
       <span className="font-mono text-[10px] text-muted-foreground">{(DEMO_SPREAD * 100).toFixed(1)}</span>
-      <button type="button" onClick={() => onPick("buy")} aria-label="Buy XAU/USD" className="flex min-w-[76px] flex-col items-center rounded-md px-2 py-1 leading-tight text-primary-foreground shadow-sm hover:opacity-90" style={{ background: BUY }}>
+      <button type="button" onClick={() => onPick("buy")} aria-label="Buy EUR/USD" className="flex min-w-[76px] flex-col items-center rounded-md px-2 py-1 leading-tight text-primary-foreground shadow-sm hover:opacity-90" style={{ background: BUY }}>
         <span className="font-mono text-[13px] font-semibold">{q ? num(q.ask) : "—"}</span>
         <span className="text-[10px] font-medium tracking-wide">BUY</span>
       </button>

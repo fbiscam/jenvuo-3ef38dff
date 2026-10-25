@@ -14,7 +14,7 @@ export type WatchItem = { symbol: string; label: string; name: string; icon?: st
 
 /** Markets that move gold, shown in Market Watch and the top cards. */
 export const WATCH: WatchItem[] = [
-  { symbol: "XAUUSD", label: "XAU/USD", name: "Gold Spot" },
+  { symbol: "EURUSD", label: "EUR/USD", name: "Gold Spot" },
   { symbol: "XAGUSD", label: "XAG/USD", name: "Silver", icon: xagIcon },
   { symbol: "DXY", label: "DXY", name: "Dollar Index", icon: dxyIcon },
   { symbol: "US10Y", label: "US10Y", name: "US 10Y Yield", icon: usIcon },
@@ -61,7 +61,7 @@ export function useTechnicals(bars: OhlcvBar[], timeframeKey: string, allowed: A
   const usesChartBars = activeTf === timeframeKey;
   const otherTf = useQuery({
     queryKey: ["terminal-technicals", activeTf],
-    queryFn: () => fetchChart({ data: { timeframe: activeTf, asset: "XAUUSD" } }),
+    queryFn: () => fetchChart({ data: { timeframe: activeTf, asset: "EURUSD" } }),
     enabled: !usesChartBars,
     staleTime: 60_000,
     refetchInterval: 60_000,

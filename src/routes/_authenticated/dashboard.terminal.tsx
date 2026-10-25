@@ -66,13 +66,13 @@ import askJenvuMark from "@/assets/ask-jenvu-mark.png";
 export const Route = createFileRoute("/_authenticated/dashboard/terminal")({
   head: () => ({
     meta: [
-      { title: "Jenvu Terminal — Live XAU/USD Chart & AI Desk" },
+      { title: "Jenvu Terminal — Live EUR/USD Chart & AI Desk" },
       {
         name: "description",
         content:
           "Full-screen gold charting terminal with drawing tools, multiple timeframes and a built-in AI desk that reads the chart with you.",
       },
-      { property: "og:title", content: "Jenvu Terminal — Live XAU/USD Chart & AI Desk" },
+      { property: "og:title", content: "Jenvu Terminal — Live EUR/USD Chart & AI Desk" },
       {
         property: "og:description",
         content: "Chart gold like a pro and ask the Jenvu AI desk about the setup in one screen.",
@@ -287,7 +287,7 @@ async function blobToDataUrl(blob: Blob): Promise<string> {
 
 function TerminalPage() {
   const [tf, setTf] = useState(TIMEFRAMES[3]);
-  const [asset, setAsset] = useState<"XAUUSD" | "BTCUSD">("XAUUSD");
+  const [asset, setAsset] = useState<"EURUSD" | "BTCUSD">("EURUSD");
   // Daily terminal access fee ($0.30 per UTC day, charged once server-side).
   useEffect(() => {
     void import("@/integrations/supabase/client").then(({ supabase }) =>
@@ -299,13 +299,13 @@ function TerminalPage() {
   useEffect(() => {
     try {
       window.localStorage.removeItem("jenvu-terminal-asset");
-      setAsset("XAUUSD");
+      setAsset("EURUSD");
     } catch {
       /* storage unavailable */
     }
   }, []);
-  const changeAsset = (_next: "XAUUSD" | "BTCUSD") => {
-    const next = "XAUUSD" as const;
+  const changeAsset = (_next: "EURUSD" | "BTCUSD") => {
+    const next = "EURUSD" as const;
     setAsset(next);
     try {
       window.localStorage.setItem("jenvu-terminal-asset", next);
@@ -584,7 +584,7 @@ function TerminalPage() {
     // Gold weekend (Fri 21:00 → Sun 22:00 UTC): the last candle has closed, so
     // the timer stops at 00:00 like TradingView instead of counting new candles.
     const tick = () => {
-      const closed = asset === "XAUUSD" && isMarketClosed(new Date());
+      const closed = asset === "EURUSD" && isMarketClosed(new Date());
       setMarketClosed(closed);
       setSecondsLeft(closed ? 0 : candleSecondsLeft(tf.tv));
     };
@@ -609,7 +609,7 @@ function TerminalPage() {
 
   async function send(message: { text: string; files?: FileUIPart[] }) {
     const image = message.files?.find((file) => file.mediaType?.startsWith("image/") && file.url);
-    const query = message.text.trim() || (image ? "Analyze this XAU/USD chart screenshot." : "");
+    const query = message.text.trim() || (image ? "Analyze this EUR/USD chart screenshot." : "");
     if (!query || sendLockedRef.current || ask.isPending) return;
     sendLockedRef.current = true;
     // The AI desk always reads the exact chart state (drawings, indicators,
@@ -703,7 +703,7 @@ function TerminalPage() {
         <div className={cn("flex min-h-0 flex-1 flex-col lg:flex-row", theme !== "dark" && "gap-2 px-2 pt-2")}>
           {/* Chart */}
           <section
-            aria-label="XAU/USD chart"
+            aria-label="EUR/USD chart"
             className={cn(
               "relative min-h-0 min-w-0 flex-1",
               theme === "dark" && "bg-background",
