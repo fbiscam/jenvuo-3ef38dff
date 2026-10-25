@@ -63,6 +63,8 @@ export const getBotDownloadUrl = createServerFn({ method: "POST" })
 
 export type BotReportRow = { license_id: string; day: string; mt5_account: string; symbol: string; balance: number; equity: number; today_profit: number; trades_today: number; open_trades: number; open_lots: number; target_hit: boolean; updated_at: string };
 
+export type BotSessionRow = { id: string; mt5_account: string; started_at: string; last_seen_at: string; ended_at: string | null; end_reason: string | null };
+
 /** Bot Usage page: last 30 days of reports for the signed-in user's bots (RLS: own rows only). */
 export const getBotUsage = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -75,5 +77,12 @@ export const getBotUsage = createServerFn({ method: "POST" })
       .gte("day", since)
       .order("day", { ascending: true });
     const rows = ((data ?? []) as any[]).map((r) => ({ ...r, balance: Number(r.balance), equity: Number(r.equity), today_profit: Number(r.today_profit), open_lots: Number(r.open_lots) })) as BotReportRow[];
-    return { plan: access.plan, allowed: access.allowed, limit: access.limit, rows };
+    const since3 = new Date(Date.now() - 3 * 86400000).toISOString();
+    const { data: ses } = await (context.supabase as any)
+      .from("mt5_bot_sessions")
+      .select("id,mt5_account,started_at,last_seen_at,ended_at,end_reason")
+      .or(`started_at.gte.${since3},last_seen_at.gte.${since3}`)
+      .order("started_at", { ascending: false })
+      .limit(200);
+    return { plan: access.plan, allowed: access.allowed, limit: access.limit, rows, sessions: (ses ?? []) as BotSessionRow[] };
   });

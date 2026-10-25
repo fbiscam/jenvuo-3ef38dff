@@ -50,3 +50,20 @@ describe("shared daily target", () => {
     expect(sharedTargetStatus(150, [100, 20], true).stop).toBe(true);
   });
 });
+
+import { sessionStep, sessionEndCause } from "./mt5-licenses";
+describe("bot on/off sessions", () => {
+  const t = Date.parse("2026-10-26T10:00:00Z");
+  const seen = (ms: number) => ({ last_seen_at: new Date(t - ms).toISOString(), ended_at: null, end_reason: null });
+  it("a report within 3 minutes extends the session, a later one starts a new one", () => {
+    expect(sessionStep(seen(60_000), t)).toBe("extend");
+    expect(sessionStep(seen(4 * 60_000), t)).toBe("new");
+    expect(sessionStep(seen(10_000), t, "start")).toBe("new");
+  });
+  it("silent stop = PC/internet, removed from chart = user, bad license = bot", () => {
+    expect(sessionEndCause(seen(10 * 60_000), t).by).toBe("pc");
+    expect(sessionEndCause({ ...seen(0), ended_at: new Date(t).toISOString(), end_reason: "remove" }, t).by).toBe("you");
+    expect(sessionEndCause({ ...seen(0), ended_at: new Date(t).toISOString(), end_reason: "license" }, t).by).toBe("bot");
+    expect(sessionEndCause(seen(30_000), t).label).toBe("Running");
+  });
+});

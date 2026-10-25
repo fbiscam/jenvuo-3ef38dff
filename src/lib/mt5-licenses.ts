@@ -62,3 +62,31 @@ export function sharedTargetStatus(dailyTarget: number, todayProfits: number[], 
   const combined = Math.round(todayProfits.reduce((a, b) => a + (Number.isFinite(b) ? b : 0), 0) * 100) / 100;
   return { combined, stop: anyHit || (dailyTarget > 0 && combined >= dailyTarget) };
 }
+
+/** A bot that has not reported for this long is treated as off (it reports once a minute). */
+export const SESSION_GAP_MS = 3 * 60 * 1000;
+
+type SessionLike = { last_seen_at: string; ended_at: string | null } | null;
+
+/** Should a bot report extend the open ON session or start a new one? */
+export function sessionStep(last: SessionLike, now: number, event?: string): "extend" | "new" {
+  if (event === "start" || !last || last.ended_at) return "new";
+  return now - Date.parse(last.last_seen_at) > SESSION_GAP_MS ? "new" : "extend";
+}
+
+export type OffCause = { label: string; by: "you" | "pc" | "bot" | "none" };
+
+/** Why a bot session ended, in plain words, and who caused it. */
+export function sessionEndCause(s: { last_seen_at: string; ended_at: string | null; end_reason: string | null }, now: number): OffCause {
+  if (!s.ended_at && now - Date.parse(s.last_seen_at) <= SESSION_GAP_MS) return { label: "Running", by: "none" };
+  switch (s.end_reason) {
+    case "remove": return { label: "You removed the bot from the chart", by: "you" };
+    case "close": return { label: "MT5 was closed", by: "you" };
+    case "chartclose": return { label: "The chart was closed", by: "you" };
+    case "account": return { label: "MT5 account was changed", by: "you" };
+    case "parameters": case "recompile": case "template": case "chartchange": return { label: "Bot settings or chart changed (bot restarted)", by: "you" };
+    case "license": return { label: "Bot stopped: license not valid", by: "bot" };
+    case "initfailed": return { label: "Bot could not start", by: "bot" };
+    default: return { label: "Connection lost: PC off, asleep or no internet", by: "pc" };
+  }
+}

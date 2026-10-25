@@ -5,8 +5,8 @@ import { useMemo, useState } from "react";
 import { Bot, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { Area, CartesianGrid, ComposedChart, ResponsiveContainer, Tooltip as RTooltip, XAxis, YAxis } from "recharts";
-import { getBotUsage, type BotReportRow } from "@/lib/mt5-licenses.functions";
-import { dailyTarget, isMt5Plan, sharedTargetStatus } from "@/lib/mt5-licenses";
+import { getBotUsage, type BotReportRow, type BotSessionRow } from "@/lib/mt5-licenses.functions";
+import { dailyTarget, isMt5Plan, sessionEndCause, sharedTargetStatus } from "@/lib/mt5-licenses";
 import { Button } from "@/components/ui/button";
 import { UsageTabs } from "@/components/dashboard/UsageTabs";
 
@@ -155,7 +155,8 @@ function BotUsagePage() {
                   </thead>
                   <tbody>
                     {view.latestList.map((r) => {
-                      const online = Date.now() - Date.parse(r.updated_at) < ONLINE_MS;
+                      const lastSession = (data?.sessions ?? []).find((x) => x.mt5_account === r.mt5_account);
+                      const online = Date.now() - Date.parse(r.updated_at) < ONLINE_MS && !lastSession?.ended_at;
                       return (
                         <tr key={r.license_id} className="border-b border-border last:border-0">
                           <td className="py-2.5">{r.mt5_account}<span className="ml-2 text-muted-foreground">{r.symbol}</span></td>
@@ -179,7 +180,8 @@ function BotUsagePage() {
             </section>
           </div>
 
-          <aside className="border-t border-border p-5 xl:border-l xl:border-t-0">
+          <aside className="border-t border-border xl:border-l xl:border-t-0">
+            <div className="border-b border-border p-5">
             <h2 className="text-[13px] text-foreground">Shared daily target</h2>
             <div className="mt-3 text-xl font-medium tabular-nums">
               {usd(view.shared.combined)} <span className="text-[13px] font-normal text-muted-foreground">/ {usd(view.target)}</span>
@@ -192,6 +194,8 @@ function BotUsagePage() {
                 ? "Target reached. All your bots closed their trades and start again tomorrow."
                 : "Your plan target is shared by all your MT5 accounts. When their total profit today reaches it, every bot closes its trades and starts again the next day."}
             </p>
+            </div>
+            <OnOffLog sessions={(data?.sessions ?? []).filter((x) => account === "all" || x.mt5_account === account)} />
           </aside>
         </div>
       )}
@@ -215,6 +219,57 @@ function Empty({ text, action }: { text: string; action: React.ReactNode }) {
       <Bot className="h-6 w-6 text-muted-foreground" />
       <p className="mt-3 max-w-md text-[13px] text-muted-foreground">{text}</p>
       <div className="mt-3">{action}</div>
+    </div>
+  );
+}
+
+const utc = (iso: string) => {
+  const d = new Date(iso);
+  return `${d.toISOString().slice(5, 10).replace("-", "/")} ${d.toISOString().slice(11, 16)}`;
+};
+const dur = (a: string, b: string) => {
+  const m = Math.max(0, Math.round((Date.parse(b) - Date.parse(a)) / 60000));
+  return m >= 60 ? `${Math.floor(m / 60)}h ${m % 60}m` : `${m}m`;
+};
+const WHO: Record<string, string> = { you: "By you", pc: "PC / internet", bot: "By the bot", none: "" };
+
+/** Bot ON/OFF times (UTC) for the last 3 days and why each stop happened. */
+function OnOffLog({ sessions }: { sessions: BotSessionRow[] }) {
+  const now = Date.now();
+  return (
+    <div className="p-5">
+      <h2 className="keep-case text-[13px] text-foreground">Bot ON / OFF · last 3 days (UTC)</h2>
+      {sessions.length === 0 ? (
+        <p className="mt-3 text-[12px] text-muted-foreground">No ON/OFF records yet. They appear once the latest bot is running.</p>
+      ) : (
+        <ul className="mt-3 max-h-[480px] divide-y divide-border overflow-y-auto">
+          {sessions.map((x) => {
+            const cause = sessionEndCause(x, now);
+            const running = cause.by === "none";
+            const end = x.ended_at ?? x.last_seen_at;
+            return (
+              <li key={x.id} className="py-2.5 text-[12px]">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-foreground">MT5 {x.mt5_account}</span>
+                  <span className={`inline-flex items-center gap-1.5 ${running ? "text-foreground" : "text-muted-foreground"}`}>
+                    <span className={`h-1.5 w-1.5 rounded-full ${running ? "bg-primary" : "bg-muted-foreground"}`} />
+                    {running ? "ON" : "OFF"}
+                  </span>
+                </div>
+                <div className="mt-1 tabular-nums text-muted-foreground">
+                  ON {utc(x.started_at)} → {running ? "now" : `OFF ${utc(end)}`} · {dur(x.started_at, running ? new Date(now).toISOString() : end)}
+                </div>
+                {!running && (
+                  <div className="mt-1 text-foreground">
+                    {cause.label}
+                    <span className="ml-1.5 rounded bg-secondary px-1.5 py-0.5 text-[11px] text-muted-foreground">{WHO[cause.by]}</span>
+                  </div>
+                )}
+              </li>
+            );
+          })}
+        </ul>
+      )}
     </div>
   );
 }
