@@ -107,7 +107,7 @@ export function TailoredToDesk() {
 
             <div className="tailored-console absolute bottom-0 right-0 top-[56px] w-[52%] overflow-hidden rounded-tl-lg border-l border-t border-border bg-background shadow-sm">
               <div className="p-4">
-                <p className="text-[11px] text-muted-foreground">Launching agents to analyze EUR/USD…</p>
+                <p className="text-[11px] text-muted-foreground">Launching agents to analyze Fiber…</p>
                 <p className="mt-2 flex items-center gap-2 text-[11px] text-home-accent">
                   <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-home-accent" />
                   3 background agents launched

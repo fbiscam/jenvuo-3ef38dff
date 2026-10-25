@@ -89,16 +89,16 @@ export const Route = createFileRoute("/auth")({
       {
         name: "description",
         content:
-          "Sign in to your Jenvu account to access the AI-powered trading terminal, live ICT/SMC analysis and reviewed EUR/USD signals.",
+          "Sign in to your Jenvu account to access the AI-powered trading terminal, live ICT/SMC analysis and reviewed Fiber signals.",
       },
       { name: "robots", content: "noindex, follow" },
       { property: "og:title", content: "Sign in to your Desk" },
-      { property: "og:description", content: "Access your AI-powered EUR/USD trading terminal and account dashboard." },
+      { property: "og:description", content: "Access your AI-powered Fiber trading terminal and account dashboard." },
       { property: "og:url", content: "https://auth.jenvu.com/sign-in" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:title", content: "Sign in to your Desk" },
-      { name: "twitter:description", content: "Access your AI-powered EUR/USD trading terminal and account dashboard." },
+      { name: "twitter:description", content: "Access your AI-powered Fiber trading terminal and account dashboard." },
     ],
     links: [{ rel: "canonical", href: "https://auth.jenvu.com/sign-in" }],
   }),
@@ -1375,7 +1375,7 @@ function AuthPage() {
                   <div>
                     <h2 className="text-[20px] font-normal text-gc-ink">Access to Jenvu tools</h2>
                     <p className="mt-2 text-[14px] leading-[1.55] text-gc-ink-muted">
-                      Get everything you need to read EUR/USD: the Terminal, AI desk, sweeps, zones, FVGs and alerts
+                      Get everything you need to read Fiber: the Terminal, AI desk, sweeps, zones, FVGs and alerts
                     </p>
                   </div>
                   <div>

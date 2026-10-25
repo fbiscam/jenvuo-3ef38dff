@@ -30,7 +30,7 @@ export function CommandInput({
         value={text}
         onChange={(e) => setText(e.target.value)}
         onKeyDown={(e) => e.key === "Enter" && submit()}
-        placeholder='Try: "Analyze EUR/USD 15m" or "Give me A+ setup on 1H"'
+        placeholder='Try: "Analyze Fiber 15m" or "Give me A+ setup on 1H"'
         disabled={disabled}
         className="flex-1 min-w-0 bg-transparent text-sm text-[color:var(--gold)] placeholder:text-[color:var(--gold)]/40 focus:outline-none px-3 font-mono"
       />
