@@ -8,6 +8,7 @@ import {
   createExtensionKey,
   revokeExtensionKey,
   deleteExtensionKey,
+  revealExtensionKey,
   type ExtensionKeyRow,
   type ExtensionKeyAccess,
 } from "@/lib/extension-keys.functions";
@@ -36,6 +37,7 @@ function ExtensionPage() {
   const create = useServerFn(createExtensionKey);
   const revoke = useServerFn(revokeExtensionKey);
   const remove = useServerFn(deleteExtensionKey);
+  const reveal = useServerFn(revealExtensionKey);
 
   const [keys, setKeys] = useState<ExtensionKeyRow[]>([]);
   const [access, setAccess] = useState<ExtensionKeyAccess | null>(null);
@@ -155,10 +157,16 @@ function ExtensionPage() {
       await copyValue(freshKey, key.id);
       return;
     }
-
-    toast.error(
-      "For security, older full keys cannot be shown again. Create a new key to copy it.",
-    );
+    try {
+      const res = await reveal({ data: { id: key.id } });
+      if (!res.ok) {
+        toast.error(res.error);
+        return;
+      }
+      await copyValue(res.key, key.id);
+    } catch {
+      toast.error("Copy failed");
+    }
   };
 
   const activeKeys = keys.filter((k) => !k.revoked_at);
