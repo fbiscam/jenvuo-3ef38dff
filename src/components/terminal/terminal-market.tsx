@@ -15,7 +15,6 @@ export type WatchItem = { symbol: string; label: string; name: string; icon?: st
 /** Markets that move EUR/USD, shown in Market Watch and the top cards. */
 export const WATCH: WatchItem[] = [
   { symbol: "EURUSD", label: "EUR/USD", name: "Euro / Dollar", icon: euIcon },
-  { symbol: "XAUUSD", label: "XAU/USD", name: "Gold Spot" },
   { symbol: "XAGUSD", label: "XAG/USD", name: "Silver", icon: xagIcon },
   { symbol: "DXY", label: "DXY", name: "Dollar Index", icon: dxyIcon },
   { symbol: "US10Y", label: "US10Y", name: "US 10Y Yield", icon: usIcon },
