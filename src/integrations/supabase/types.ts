@@ -2049,6 +2049,39 @@ export type Database = {
         }
         Relationships: []
       }
+      mt5_bot_sessions: {
+        Row: {
+          end_reason: string | null
+          ended_at: string | null
+          id: string
+          last_seen_at: string
+          license_id: string
+          mt5_account: string
+          started_at: string
+          user_id: string
+        }
+        Insert: {
+          end_reason?: string | null
+          ended_at?: string | null
+          id?: string
+          last_seen_at?: string
+          license_id: string
+          mt5_account: string
+          started_at?: string
+          user_id: string
+        }
+        Update: {
+          end_reason?: string | null
+          ended_at?: string | null
+          id?: string
+          last_seen_at?: string
+          license_id?: string
+          mt5_account?: string
+          started_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       mt5_licenses: {
         Row: {
           created_at: string

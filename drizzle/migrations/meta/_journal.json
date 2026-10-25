@@ -127,6 +127,13 @@
       "when": 1792929050018,
       "tag": "0017_mt5_bot_reports",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1792929372341,
+      "tag": "0018_mt5_bot_sessions",
+      "breakpoints": true
     }
   ]
 }
