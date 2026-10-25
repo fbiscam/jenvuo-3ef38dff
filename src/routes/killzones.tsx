@@ -181,13 +181,13 @@ function KillzonesPage() {
   const rows = useMemo(() => {
     const q = query.trim().toUpperCase();
     return Object.values(PAIR_PROFILES)
-      .map(p => ({ profile: p, meta: META[p.key], label: "EURUSD" }))
+      .map(p => ({ profile: p, meta: META[p.key] }))
       .filter(r => r.meta)
       .filter(r => (cat === "All" ? true : r.meta.category === cat))
       .filter(
         r =>
           !q ||
-          r.profile.key.includes(q) ||
+          "EURUSD".includes(q) ||
           r.meta.name.toUpperCase().includes(q) ||
           r.meta.region.toUpperCase().includes(q),
       );
@@ -315,7 +315,7 @@ function KillzonesPage() {
                             <div className="flex items-center gap-2">
                               
                               <span className={`${MONO} text-sm font-semibold ${locked ? "text-gc-ink-muted" : ""}`}>
-                                {profile.key}
+                                {"EURUSD"}
                               </span>
                               {locked && (
                                 <span className={`${MONO} inline-flex items-center gap-1 rounded-md border border-gc-line bg-background px-1.5 py-0.5 text-[9px] uppercase tracking-wider text-gc-ink-muted`}>
