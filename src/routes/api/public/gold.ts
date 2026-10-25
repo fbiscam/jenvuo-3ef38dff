@@ -811,7 +811,7 @@ async function handle({ request }: { request: Request }) {
             {
               ok: false,
               code: "PRIMARY_REVIEW_UNAVAILABLE",
-              error: "OmniRoute analysis could not complete. Please retry in a moment.",
+              error: "Jenvu analysis could not complete. Please try again later.",
             },
             503,
           );
@@ -826,9 +826,7 @@ async function handle({ request }: { request: Request }) {
           {
             ok: false,
             code: "PRIMARY_REVIEW_UNAVAILABLE",
-            error: /rejected|blocked|key|model is unavailable|missing on server|No configured AI provider/i.test(message)
-              ? message
-              : "OmniRoute analysis is temporarily unavailable after trying the primary and fallback models. Please retry in a moment.",
+            error: "Jenvu analysis is temporarily unavailable. Please try again later.",
           },
           503,
         );
