@@ -57,7 +57,7 @@ export function TerminalOrderPanel({ trading, price, footer }: { trading: DemoTr
   const lotValue = Number(lots) || 0;
 
   useEffect(() => {
-    if (type !== "market" && price && !orderPrice) setOrderPrice(price.toFixed(2));
+    if (type !== "market" && price && !orderPrice) setOrderPrice(price.toFixed(5));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [type]);
 
@@ -192,11 +192,11 @@ export function TerminalOrderPanel({ trading, price, footer }: { trading: DemoTr
 
         <label className="mt-3 block text-[12px] text-gc-ink-muted">
           Stop Loss (Optional)
-          <input type="number" step="0.01" value={sl} onChange={(e) => setSl(e.target.value)} placeholder={price ? `e.g. ${(price - (side === "buy" ? 10 : -10)).toFixed(2)}` : "Price"} className={cn(input, "mt-1")} />
+          <input type="number" step="0.00001" value={sl} onChange={(e) => setSl(e.target.value)} placeholder={price ? `e.g. ${(price - (side === "buy" ? 0.001 : -0.001)).toFixed(5)}` : "Price"} className={cn(input, "mt-1")} />
         </label>
         <label className="mt-2.5 block text-[12px] text-gc-ink-muted">
           Take Profit (Optional)
-          <input type="number" step="0.01" value={tp} onChange={(e) => setTp(e.target.value)} placeholder={price ? `e.g. ${(price + (side === "buy" ? 20 : -20)).toFixed(2)}` : "Price"} className={cn(input, "mt-1")} />
+          <input type="number" step="0.00001" value={tp} onChange={(e) => setTp(e.target.value)} placeholder={price ? `e.g. ${(price + (side === "buy" ? 0.002 : -0.002)).toFixed(5)}` : "Price"} className={cn(input, "mt-1")} />
         </label>
 
         <div className="mt-3.5 grid grid-cols-2 gap-2">

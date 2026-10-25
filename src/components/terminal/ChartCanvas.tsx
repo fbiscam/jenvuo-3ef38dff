@@ -234,7 +234,7 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
       },
       // Fixed locale: some browsers report tags like "en-US@posix" that make
       // Intl throw and stop the chart from drawing candles.
-      localization: { locale: "en-US", priceFormatter: (p: number) => p.toFixed(2) },
+      localization: { locale: "en-US", priceFormatter: (p: number) => p.toFixed(5) },
     });
     const candles = chart.addSeries(CandlestickSeries, {
       upColor: CHART_COLORS.up,
@@ -243,7 +243,7 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
       borderDownColor: CHART_COLORS.down,
       wickUpColor: CHART_COLORS.up,
       wickDownColor: CHART_COLORS.down,
-      priceFormat: { type: "price", precision: 2, minMove: 0.01 },
+      priceFormat: { type: "price", precision: 5, minMove: 0.00001 },
       // Sticky autoscale: a live spike may widen the range, but the range never
       // shrinks/bounces back on every tick. It re-fits only when a candle closes
       // or the user scrolls/zooms, so old candles and SMC markings stay put.
@@ -272,7 +272,7 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
     const ghost = chart.addSeries(CandlestickSeries, {
       lastValueVisible: false,
       priceLineVisible: false,
-      priceFormat: { type: "price", precision: 2, minMove: 0.01 },
+      priceFormat: { type: "price", precision: 5, minMove: 0.00001 },
     });
     ghostRef.current = ghost;
     ghostMarkersRef.current = createSeriesMarkers(ghost, []);
@@ -287,7 +287,7 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
       crosshairMarkerVisible: true,
       crosshairMarkerRadius: 4,
       crosshairMarkerBorderWidth: 2,
-      priceFormat: { type: "price", precision: 2, minMove: 0.01 },
+      priceFormat: { type: "price", precision: 5, minMove: 0.00001 },
     });
 
     const bump = () => (dirtyRef.current += 1);

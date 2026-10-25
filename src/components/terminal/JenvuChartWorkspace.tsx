@@ -1036,16 +1036,16 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
                 {hovered && (
                   <>
                     <span>
-                      O <b className={hovered.close >= hovered.open ? "text-[#089981]" : "text-[#f23645]"}>{hovered.open.toFixed(2)}</b>
+                      O <b className={hovered.close >= hovered.open ? "text-[#089981]" : "text-[#f23645]"}>{hovered.open.toFixed(5)}</b>
                     </span>
                     <span>
-                      H <b className={hovered.close >= hovered.open ? "text-[#089981]" : "text-[#f23645]"}>{hovered.high.toFixed(2)}</b>
+                      H <b className={hovered.close >= hovered.open ? "text-[#089981]" : "text-[#f23645]"}>{hovered.high.toFixed(5)}</b>
                     </span>
                     <span>
-                      L <b className={hovered.close >= hovered.open ? "text-[#089981]" : "text-[#f23645]"}>{hovered.low.toFixed(2)}</b>
+                      L <b className={hovered.close >= hovered.open ? "text-[#089981]" : "text-[#f23645]"}>{hovered.low.toFixed(5)}</b>
                     </span>
                     <span>
-                      C <b className={hovered.close >= hovered.open ? "text-[#089981]" : "text-[#f23645]"}>{hovered.close.toFixed(2)}</b>
+                      C <b className={hovered.close >= hovered.open ? "text-[#089981]" : "text-[#f23645]"}>{hovered.close.toFixed(5)}</b>
                     </span>
                     {change != null && (
                       <span className={change >= 0 ? "text-[#089981]" : "text-[#f23645]"}>
