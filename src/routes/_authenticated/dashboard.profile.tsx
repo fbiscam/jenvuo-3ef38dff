@@ -1,10 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { getMyMailAddress } from "@/lib/mail.functions";
 import AvatarAdjuster from "@/components/AvatarAdjuster";
-import { writeCachedAvatar, AVATAR_TTL_SECONDS } from "@/lib/avatar-cache";
+import { readCachedAvatar, writeCachedAvatar, AVATAR_TTL_SECONDS } from "@/lib/avatar-cache";
+
+const PROFILE_CACHE_KEY = "jenvu:profile:basics";
 import { useVerification } from "@/hooks/useVerification";
 import { Camera, Loader2, MonitorSmartphone, ShieldAlert, ShieldCheck, SlidersHorizontal, Trash2, Upload, UserRound } from "lucide-react";
 import { SettingsCard, settingsBtn, settingsBtnPrimary, settingsField } from "@/components/settings/SettingsCard";
@@ -78,22 +80,38 @@ function Profile() {
   };
 
 
+  // Paint the last known photo/name/email before the first frame, then refresh in the background.
+  useLayoutEffect(() => {
+    try {
+      const c = JSON.parse(localStorage.getItem(PROFILE_CACHE_KEY) || "null");
+      if (c?.email) setEmail(c.email);
+      if (c?.fullName) setFullName(c.fullName);
+      if (c?.avatarPath) setAvatarPath(c.avatarPath);
+    } catch {}
+    const cachedUrl = readCachedAvatar();
+    if (cachedUrl) setAvatarUrl(cachedUrl);
+  }, []);
+
   useEffect(() => {
     (async () => {
-      const { data: user } = await supabase.auth.getUser();
-      if (!user.user) return;
-      setUserId(user.user.id);
-      setEmail(user.user.email ?? "");
-      const { data } = await supabase.from("profiles").select("full_name, avatar_url").eq("id", user.user.id).maybeSingle();
+      // getSession reads the local session (no network), so email shows at once.
+      const { data: s } = await supabase.auth.getSession();
+      const u = s.session?.user;
+      if (!u) return;
+      setUserId(u.id);
+      setEmail(u.email ?? "");
+      const [{ data }] = await Promise.all([
+        supabase.from("profiles").select("full_name, avatar_url").eq("id", u.id).maybeSingle(),
+        getMyMailAddress().then((addr) => { if (addr?.address) setMailAddress(addr.address); }).catch(() => {}),
+      ]);
       if (data?.full_name) setFullName(data.full_name);
-      if (data?.avatar_url) {
-        setAvatarPath(data.avatar_url);
-        await refreshAvatarUrl(data.avatar_url);
-      }
+      setAvatarPath(data?.avatar_url ?? null);
       try {
-        const addr = await getMyMailAddress();
-        if (addr?.address) setMailAddress(addr.address);
+        localStorage.setItem(PROFILE_CACHE_KEY, JSON.stringify({ email: u.email ?? "", fullName: data?.full_name ?? "", avatarPath: data?.avatar_url ?? null }));
       } catch {}
+      if (data?.avatar_url) {
+        if (!readCachedAvatar()) await refreshAvatarUrl(data.avatar_url);
+      } else { setAvatarUrl(null); writeCachedAvatar(null); }
     })();
   }, []);
 
