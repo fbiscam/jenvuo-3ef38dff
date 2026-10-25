@@ -7,7 +7,7 @@ import { XauUsdLogo } from "./XauUsdLogo";
 
 const HIDE_BALANCE_KEY = "jenvu:terminal:hide-balance:v1";
 /** One standard gold lot = 100 troy ounces. */
-export const OZ_PER_LOT = 100;
+export const OZ_PER_LOT = 100_000;
 
 const num = (v: number, d = 2) => v.toLocaleString("en-US", { minimumFractionDigits: d, maximumFractionDigits: d });
 const MASK = "••••••";
@@ -42,7 +42,7 @@ function useHideBalance() {
 const input =
   "h-10 w-full rounded-md border border-gc-line bg-card px-3 text-sm text-gc-ink outline-none placeholder:text-gc-ink-muted/70 focus:border-gc-blue focus:ring-1 focus:ring-gc-blue";
 
-/** Left Terminal column: XAU/USD order form and the demo account (balance can be hidden). */
+/** Left Terminal column: EUR/USD order form and the demo account (balance can be hidden). */
 export function TerminalOrderPanel({ trading, price, footer }: { trading: DemoTrading; price: number | null; footer?: React.ReactNode }) {
   const [hidden, toggleHidden] = useHideBalance();
   const [side, setSide] = useState<DemoSide>("buy");
@@ -57,7 +57,7 @@ export function TerminalOrderPanel({ trading, price, footer }: { trading: DemoTr
   const lotValue = Number(lots) || 0;
 
   useEffect(() => {
-    if (type !== "market" && price && !orderPrice) setOrderPrice(price.toFixed(2));
+    if (type !== "market" && price && !orderPrice) setOrderPrice(price.toFixed(5));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [type]);
 
@@ -88,7 +88,7 @@ export function TerminalOrderPanel({ trading, price, footer }: { trading: DemoTr
           <XauUsdLogo size={30} />
           <div className="min-w-0">
             <p className="text-[15px] font-medium leading-tight text-gc-ink">Place order</p>
-            <p className="text-[11px] text-gc-ink-muted">XAU/USD · Gold Spot / US Dollar</p>
+            <p className="text-[11px] text-gc-ink-muted">EUR/USD · Euro / US Dollar</p>
           </div>
         </div>
         <div className="mt-3 flex items-center justify-between text-[12px]">
@@ -187,16 +187,16 @@ export function TerminalOrderPanel({ trading, price, footer }: { trading: DemoTr
           </button>
         </div>
         <p className="mt-1 text-[10px] text-gc-ink-muted">
-          {(lotValue * OZ_PER_LOT).toFixed(0)} oz · margin {price ? `$${num((lotValue * OZ_PER_LOT * price) / DEMO_LEVERAGE)}` : "—"} ({DEMO_LEVERAGE}x)
+          {(lotValue * OZ_PER_LOT).toFixed(0)} units · margin {price ? `$${num((lotValue * OZ_PER_LOT * price) / DEMO_LEVERAGE)}` : "—"} ({DEMO_LEVERAGE}x)
         </p>
 
         <label className="mt-3 block text-[12px] text-gc-ink-muted">
           Stop Loss (Optional)
-          <input type="number" step="0.01" value={sl} onChange={(e) => setSl(e.target.value)} placeholder={price ? `e.g. ${(price - (side === "buy" ? 10 : -10)).toFixed(2)}` : "Price"} className={cn(input, "mt-1")} />
+          <input type="number" step="0.00001" value={sl} onChange={(e) => setSl(e.target.value)} placeholder={price ? `e.g. ${(price - (side === "buy" ? 0.001 : -0.001)).toFixed(5)}` : "Price"} className={cn(input, "mt-1")} />
         </label>
         <label className="mt-2.5 block text-[12px] text-gc-ink-muted">
           Take Profit (Optional)
-          <input type="number" step="0.01" value={tp} onChange={(e) => setTp(e.target.value)} placeholder={price ? `e.g. ${(price + (side === "buy" ? 20 : -20)).toFixed(2)}` : "Price"} className={cn(input, "mt-1")} />
+          <input type="number" step="0.00001" value={tp} onChange={(e) => setTp(e.target.value)} placeholder={price ? `e.g. ${(price + (side === "buy" ? 0.002 : -0.002)).toFixed(5)}` : "Price"} className={cn(input, "mt-1")} />
         </label>
 
         <div className="mt-3.5 grid grid-cols-2 gap-2">

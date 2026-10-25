@@ -34,7 +34,7 @@ export function buildChartContext(input: {
   const forming = (last.time + input.stepSeconds) * 1000 > (input.now ?? Date.now());
   const lines: string[] = [];
   lines.push(
-    `Chart: ${input.pairLabel ?? "XAU/USD"} ${input.timeframeLabel} on the Jenvu chart (${bars.length} bars loaded, feed: ${input.source}).`,
+    `Chart: ${input.pairLabel ?? "EUR/USD"} ${input.timeframeLabel} on the Jenvu chart (${bars.length} bars loaded, feed: ${input.source}).`,
   );
   lines.push(
     `Latest candle ${fmt(last.time)}${forming ? " (still forming)" : ""}: O ${last.open.toFixed(2)} H ${last.high.toFixed(2)} L ${last.low.toFixed(2)} C ${last.close.toFixed(2)}.`,
@@ -96,10 +96,10 @@ export function buildChartContext(input: {
         .filter((value): value is string => value != null)
         .join("; ");
       lines.push(
-        `${input.timeframeLabel ?? "1H"} reversal pressure for this ${input.pairLabel ?? "XAU/USD"} chart (deterministic confluence score, not win probability): ${confirmedPressure || "no confirmed readings"}${livePressure ? `; fresh: ${livePressure}` : ""}.`,
+        `${input.timeframeLabel ?? "1H"} reversal pressure for this ${input.pairLabel ?? "EUR/USD"} chart (deterministic confluence score, not win probability): ${confirmedPressure || "no confirmed readings"}${livePressure ? `; fresh: ${livePressure}` : ""}.`,
       );
     } else {
-      lines.push("Buyer/seller reversal pressure is intentionally unavailable outside the XAU/USD and BTC/USD charts.");
+      lines.push("Buyer/seller reversal pressure is intentionally unavailable outside the EUR/USD and BTC/USD charts.");
     }
     const live = (input.smc.livePivots ?? [])
       .map(

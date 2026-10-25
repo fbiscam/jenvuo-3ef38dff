@@ -12,13 +12,12 @@ import spxIcon from "@/assets/watchlist/spx.svg";
 
 export type WatchItem = { symbol: string; label: string; name: string; icon?: string };
 
-/** Markets that move gold, shown in Market Watch and the top cards. */
+/** Markets that move EUR/USD, shown in Market Watch and the top cards. */
 export const WATCH: WatchItem[] = [
-  { symbol: "XAUUSD", label: "XAU/USD", name: "Gold Spot" },
+  { symbol: "EURUSD", label: "EUR/USD", name: "Euro / Dollar", icon: euIcon },
   { symbol: "XAGUSD", label: "XAG/USD", name: "Silver", icon: xagIcon },
   { symbol: "DXY", label: "DXY", name: "Dollar Index", icon: dxyIcon },
   { symbol: "US10Y", label: "US10Y", name: "US 10Y Yield", icon: usIcon },
-  { symbol: "EURUSD", label: "EUR/USD", name: "Euro / Dollar", icon: euIcon },
   { symbol: "SPX", label: "S&P 500", name: "US Stocks", icon: spxIcon },
   { symbol: "USDJPY", label: "USD/JPY", name: "Dollar / Yen" },
 ];
@@ -61,7 +60,7 @@ export function useTechnicals(bars: OhlcvBar[], timeframeKey: string, allowed: A
   const usesChartBars = activeTf === timeframeKey;
   const otherTf = useQuery({
     queryKey: ["terminal-technicals", activeTf],
-    queryFn: () => fetchChart({ data: { timeframe: activeTf, asset: "XAUUSD" } }),
+    queryFn: () => fetchChart({ data: { timeframe: activeTf, asset: "EURUSD" } }),
     enabled: !usesChartBars,
     staleTime: 60_000,
     refetchInterval: 60_000,
