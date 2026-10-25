@@ -8,7 +8,7 @@ export const SUPPORT_GUIDES: SupportGuide[] = [
   { id: "ai-desk", title: "Jenvu AI desk", text: "Ask about the chart in plain words. The AI answers only that question and says WAIT when the evidence is weak." },
   { id: "ai-models", title: "Top-tier AI models", text: "Chat with text, screenshots or voice. The models read the same chart data you see in the Terminal." },
   { id: "rvol", title: "RVOL spike colours", text: "Each volume bar is compared with the 20-candle average. Bright colours mark spikes; the buy/sell split is an estimate." },
-  { id: "jx-bot", title: "JX Bot for MT5", text: "Jenvu's XAU/USD Expert Advisor for MetaTrader 5. One license per MT5 account; it pauses at your daily target." },
+  { id: "jx-bot", title: "JX Bot for MT5", text: "Jenvu's EUR/USD Expert Advisor for MetaTrader 5. One license per MT5 account; it pauses at your daily target." },
   { id: "api-keys", title: "API keys", text: "Create a key in your dashboard and use Jenvu models in your own apps and bots at $3 per million tokens." },
   { id: "browser-extension", title: "Browser extension", text: "Add the Jenvu side panel to TradingView so it can read your chart. Install it from the Download page." },
 ];

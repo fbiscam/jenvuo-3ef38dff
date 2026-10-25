@@ -122,7 +122,7 @@ const CONTENT: IndustryContent = {
     { title: "AI engine", text: "Plain-language answers about the chart.", href: "/stories/ai-desk-updates" },
     { title: "Fresh sweep detection", text: "Confirmed sweeps on 5M, 15M, 1H, 2H and 4H.", href: "/stories/fresh-sweep-detection" },
     { title: "Volume and RVOL", text: "Volume spikes and buyer/seller share.", href: "/stories/rvol-and-volume-direction" },
-    { title: "JX Bot for MT5", text: "Automated XAU/USD trading on MetaTrader 5.", href: "/stories/jx-bot" },
+    { title: "JX Bot for MT5", text: "Automated EUR/USD trading on MetaTrader 5.", href: "/stories/jx-bot" },
     { title: "Developer API", text: "API keys for your own tools.", href: "/stories/build-with-jenvu" },
     { title: "Daily gold insights", text: "A short daily read on gold.", href: "/stories/daily-gold-insights" },
     { title: "Session tools", text: "London and New York windows on the chart.", href: "/stories/london-new-york-sessions" },
