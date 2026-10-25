@@ -54,8 +54,8 @@ export const Route = createFileRoute("/pricing")({
 type Mark = boolean | string;
 const COMPARE: ReadonlyArray<{ f: string; b: Mark; c: Mark; d: Mark }> = [
   { f: "JX Bot MT5 licenses", b: "1", c: "2", d: "5" },
-  { f: "JX Bot monthly profit target", b: "$1,000", c: "$3,000", d: "$6,000" },
-  { f: "JX Bot daily target (monthly / 20)", b: "$50", c: "$150", d: "$300" },
+  { f: "JX Bot monthly profit target", b: "$600", c: "$1,500", d: "$3,000" },
+  { f: "JX Bot daily target (monthly / 20)", b: "$30", c: "$75", d: "$150" },
   { f: "Daily auto-stop at target", b: true, c: true, d: true },
   { f: "JX Bot download, presets & updates", b: true, c: true, d: true },
   { f: "Monthly AI wallet", b: "$10", c: "$25", d: "$50" },
@@ -87,9 +87,9 @@ function PricingPage() {
   const allOpen = open.length === FAQ.length;
 
   const plans = [
-    { key: "pro" as const, name: "Pro", price: priceOf("pro", 49), description: "JX Bot on 1 MT5 account with a $1,000 monthly target.", wallet: "$10 AI wallet", bot: ["1 JX Bot license", "$50 daily auto-stop", "Top AI Models"] },
-    { key: "elite" as const, name: "Elite", price: priceOf("elite", 99), description: "JX Bot on 2 MT5 accounts with a $3,000 monthly target.", wallet: "$25 AI wallet", bot: ["2 JX Bot licenses", "$150 daily auto-stop", "Top AI Models + senior review"] },
-    { key: "ultra" as const, name: "Ultra", price: priceOf("ultra", 169), description: "JX Bot on 5 MT5 accounts with a $6,000 monthly target.", wallet: "$50 AI wallet", bot: ["5 JX Bot licenses", "$300 daily auto-stop", "Top AI Models + priority support"] },
+    { key: "pro" as const, name: "Pro", price: priceOf("pro", 49), description: "JX Bot on 1 MT5 account with a $600 monthly target.", wallet: "$10 AI wallet", bot: ["1 JX Bot license", "$30 daily auto-stop", "Top AI Models"] },
+    { key: "elite" as const, name: "Elite", price: priceOf("elite", 99), description: "JX Bot on 2 MT5 accounts with a $1,500 monthly target.", wallet: "$25 AI wallet", bot: ["2 JX Bot licenses", "$75 daily auto-stop", "Top AI Models + senior review"] },
+    { key: "ultra" as const, name: "Ultra", price: priceOf("ultra", 169), description: "JX Bot on 5 MT5 accounts with a $3,000 monthly target.", wallet: "$50 AI wallet", bot: ["5 JX Bot licenses", "$150 daily auto-stop", "Top AI Models + priority support"] },
   ];
 
   return (
