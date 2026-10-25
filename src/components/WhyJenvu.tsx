@@ -42,7 +42,7 @@ export function WhyJenvu() {
           Why choose Jenvu
         </h2>
         <p className="mt-4 text-[15px] leading-relaxed text-zinc-500 sm:text-base">
-          Everything needed to trade gold with clarity, speed, and confidence
+          Everything needed to trade EUR/USD with clarity, speed, and confidence
         </p>
       </div>
 

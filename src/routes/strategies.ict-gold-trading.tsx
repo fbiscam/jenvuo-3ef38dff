@@ -117,14 +117,14 @@ const CONTENT: IndustryContent = {
   storySlugs: ["fresh-sweep-detection", "london-new-york-sessions", "jx-bot"],
   productsTitle: "Products that power these solutions",
   products: [
-    { title: "Jenvu Terminal", text: "Live gold candles with ICT/SMC overlays and AI chat.", href: "https://dash.jenvu.com/terminal" },
+    { title: "Jenvu Terminal", text: "Live EUR/USD candles with ICT/SMC overlays and AI chat.", href: "https://dash.jenvu.com/terminal" },
     { title: "AI engine", text: "Ask about the chart and get short, on-topic answers.", href: "/ai-engine" },
     { title: "JX Bot for MT5", text: "Jenvu's Expert Advisor for EUR/USD on MetaTrader 5.", href: "/stories/jx-bot" },
     { title: "Price alerts", text: "Get told when gold reaches the level you care about.", href: "https://jenvu.com/docs" },
-    { title: "Daily gold insights", text: "A short daily read on what moved gold and why.", href: "/stories/daily-gold-insights" },
+    { title: "Daily EUR/USD insights", text: "A short daily read on what moved gold and why.", href: "/stories/daily-gold-insights" },
     { title: "Developer API", text: "Use Jenvu analysis in your own tools with API keys.", href: "/stories/build-with-jenvu" },
     { title: "Volume and RVOL", text: "Spot volume spikes and buyer/seller share per candle.", href: "/stories/rvol-and-volume-direction" },
-    { title: "Founding Program", text: "Invite-only early access for committed gold traders.", href: "https://jenvu.com/founding" },
+    { title: "Founding Program", text: "Invite-only early access for committed EUR/USD traders.", href: "https://jenvu.com/founding" },
     { title: "Help and support", text: "Guides and answers for every part of Jenvu.", href: "https://support.jenvu.com" },
   ],
 };

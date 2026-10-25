@@ -40,7 +40,7 @@ const META: Record<string, { name: string; category: Category; region: string; f
 
 const CATEGORIES: (Category | "All")[] = ["All", "FX"];
 
-// Gold market: closed Fri 22:00 UTC → Sun 22:00 UTC
+// EUR/USD market: closed Fri 22:00 UTC → Sun 22:00 UTC
 function isMarketOpen(d: Date): boolean {
   const day = d.getUTCDay();
   const h = d.getUTCHours();

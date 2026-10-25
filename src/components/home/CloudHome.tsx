@@ -190,7 +190,7 @@ export function CloudHero({ price: _price, delta: _delta }: { price: string; del
       <div className="mx-auto max-w-[1296px] px-5 pb-14 pt-12 text-center sm:px-8 md:pt-14">
         <img src="/favicon.png" alt="" width={64} height={64} className="jenvu-logo-intro mx-auto h-16 w-16 object-contain" />
         <h1 className="jenvu-rise mx-auto mt-7 max-w-[900px] text-[40px] font-medium leading-[1.1] tracking-[-0.5px] text-gc-ink sm:text-[56px] md:text-[60px]">
-          The new way to trade gold
+          The new way to trade EUR/USD
         </h1>
         <p className="jenvu-rise [animation-delay:80ms] mx-auto mt-5 max-w-[820px] text-balance text-[13.5px] leading-[1.55] text-gc-ink-muted min-[400px]:text-[14.5px] sm:line-clamp-2 sm:text-[17px] sm:leading-[1.6]">
           Read the chart with AI. Spot sweeps, zones and FVGs live.{" "}
@@ -476,7 +476,7 @@ export function CloudProducts() {
       <div className="mx-auto max-w-[1296px] px-5 py-20 sm:px-8 md:py-24">
         <div className="max-w-[720px]">
           <h2 className="text-[32px] font-normal leading-[1.2] text-gc-ink sm:text-[40px]">
-            Everything you need to read the gold market
+            Everything you need to read the EUR/USD market
           </h2>
           <p className="line-clamp-2 max-sm:line-clamp-none mt-4 text-[17px] leading-[1.6] text-gc-ink-muted">
             Tools that work together across the Terminal, the AI desk and your browser.
@@ -541,7 +541,7 @@ export function CloudUseCases() {
     <section className="bg-background">
       <div className="mx-auto max-w-[1296px] px-5 py-20 sm:px-8 md:py-24">
         <h2 className="text-center text-[32px] font-normal leading-[1.2] text-gc-ink sm:text-[40px]">
-          Built for how gold traders work
+          Built for how EUR/USD traders work
         </h2>
         <div className="mt-10 flex justify-center">
           <div role="tablist" className="inline-flex flex-wrap justify-center gap-1 border-b border-gc-line">

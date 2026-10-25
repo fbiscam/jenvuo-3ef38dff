@@ -38,7 +38,7 @@ function AboutPage() {
         linkLabel="Explore the Terminal"
         href="https://dash.jenvu.com/overview"
         media={
-          <img src={aboutMedia} alt="Gold candlestick chart with marked zones" width={1280} height={720} className="h-auto w-full" />
+          <img src={aboutMedia} alt="EUR/USD candlestick chart with marked zones" width={1280} height={720} className="h-auto w-full" />
         }
         caption="Structure, liquidity and zones drawn on one chart"
       />
@@ -57,7 +57,7 @@ function AboutPage() {
         text={
           <>
             <p>
-              Jenvu is an XAU/USD specialist. Instead of spreading across unrelated pairs, every
+              Jenvu is a EUR/USD specialist. Instead of spreading across unrelated pairs, every
               engine is tuned deeply for one bullion market: chart-first analysis on the active
               TradingView chart, the institutional ICT/SMC playbook with killzones, liquidity and
               OTE, and clear explanations in plain language.
@@ -82,7 +82,7 @@ function AboutPage() {
         title="Get inspired"
         intro="Guides, product updates and help from the Jenvu team."
         cards={[
-          { title: "How ICT and SMC concepts read gold structure", href: "https://jenvu.com/strategies/ict-gold-trading", cta: "Read the guide" },
+          { title: "How ICT and SMC concepts read EUR/USD structure", href: "https://jenvu.com/strategies/ict-gold-trading", cta: "Read the guide" },
           { title: "Inside the AI engine behind every Jenvu answer", href: "https://jenvu.com/ai-engine", cta: "Read the story" },
           { title: "Questions about your account, plan or the Terminal", href: "https://support.jenvu.com", cta: "Visit help center" },
         ]}

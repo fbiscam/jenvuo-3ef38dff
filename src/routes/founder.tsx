@@ -51,7 +51,7 @@ function FounderPage() {
                 The founder behind Jenvu
               </h1>
               <p className="jenvu-rise [animation-delay:80ms] mx-auto mt-5 max-w-[720px] text-[17px] leading-[1.6] text-gc-ink-muted">
-                Haseeb Ijaz started Jenvu at 21 to give independent gold traders the same structured view of the market that big desks use.
+                Haseeb Ijaz started Jenvu at 21 to give independent EUR/USD traders the same structured view of the market that big desks use.
               </p>
             </div>
           </section>

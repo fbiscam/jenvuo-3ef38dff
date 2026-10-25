@@ -117,7 +117,7 @@ function PricingPage() {
       {/* START FOR FREE + STATS */}
       <section className="mx-auto grid max-w-[1296px] items-center gap-10 px-5 py-10 sm:px-8 md:grid-cols-2 md:gap-14 lg:px-[72px]">
         <div>
-          <h2 className="text-[28px] font-normal leading-tight">Start trading gold for free</h2>
+          <h2 className="text-[28px] font-normal leading-tight">Start trading EUR/USD for free</h2>
           <p className="mt-5 text-[17px] leading-[1.65] text-gc-ink-muted">
             Create an account to see how Jenvu reads the EUR/USD market in real time. New users get{" "}
             <Link to="/auth" search={{ mode: "signup" } as never} className={LINK}>$100 in free credit</Link> to run the AI desk, plus{" "}

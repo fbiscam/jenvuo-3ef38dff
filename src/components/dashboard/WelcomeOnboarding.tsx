@@ -7,7 +7,7 @@ import extImg from "@/assets/onboarding/extension-api.jpg";
 import botImg from "@/assets/onboarding/jx-bot.jpg";
 
 const OPTIONS = [
-  { id: "signals", title: "Trade XAU/USD with live SMC & ICT signals", desc: "Sweeps, supply & demand zones and fair value gaps on gold.", img: signalsImg },
+  { id: "signals", title: "Trade XAU/USD with live SMC & ICT signals", desc: "Sweeps, supply & demand zones and fair value gaps on EUR/USD.", img: signalsImg },
   { id: "ai_desk", title: "Use the AI trading desk", desc: "Ask the chart copilot about structure, levels and news.", img: aiImg },
   { id: "extension_api", title: "Connect the extension & API", desc: "Bring Jenvu analysis into your browser and your own apps.", img: extImg },
   { id: "jx_bot", title: "Automate EUR/USD with JX Bot on MT5", desc: "Run Jenvu's Expert Advisor on your MetaTrader 5 account.", img: botImg },
@@ -66,7 +66,7 @@ export default function WelcomeOnboarding() {
             <div className="max-w-md">
               <h1 className="text-3xl font-normal sm:text-4xl">Welcome to Jenvu</h1>
               <p className="mt-4 text-base text-muted-foreground">
-                Your desk for gold: live XAU/USD charts, SMC & ICT tools, an AI copilot and a practice account — all in one place.
+                Your desk for EUR/USD: live XAU/USD charts, SMC & ICT tools, an AI copilot and a practice account — all in one place.
               </p>
               <label className="mt-8 flex cursor-pointer items-start gap-3 text-sm">
                 <input type="checkbox" checked={adult} onChange={(e) => setAdult(e.target.checked)} className="mt-0.5 h-4 w-4 accent-primary" />

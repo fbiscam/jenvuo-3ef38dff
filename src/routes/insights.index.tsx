@@ -166,7 +166,7 @@ function InsightsPage() {
         <section className="mx-auto max-w-[1200px] px-5 pb-6 pt-14 text-center sm:px-8 sm:pt-16">
           <img src="/favicon.png" alt="" width={56} height={56} className="mx-auto h-14 w-14 object-contain" />
           <h1 className="mx-auto mt-5 max-w-[960px] text-[34px] font-medium leading-[1.15] tracking-[-0.5px] text-gc-ink sm:text-[50px]">
-            <span className="text-gc-blue">News, tips, and insights</span> to sharpen your gold trading
+            <span className="text-gc-blue">News, tips, and insights</span> to sharpen your EUR/USD trading
           </h1>
           <div className="mt-8 flex flex-wrap justify-center gap-2" role="tablist" aria-label="Filter articles">
             {filters.map((f) => {
@@ -219,7 +219,7 @@ function InsightsPage() {
           <section className="mb-16 rounded-3xl bg-gc-canvas px-6 py-10 sm:px-12">
             <h2 className="text-[22px] font-medium text-gc-ink">News in short</h2>
             <p className="mt-2 max-w-[720px] text-[16px] leading-[1.6] text-gc-ink-muted">
-              A quick take on gold briefings, product updates and trading guides from Jenvu in one handy place. Updated daily.
+              A quick take on EUR/USD briefings, product updates and trading guides from Jenvu in one handy place. Updated daily.
             </p>
             <a href="#subscribe" className="mt-6 inline-flex h-11 items-center rounded-full border border-gc-ink-muted px-6 text-[15px] font-medium text-gc-blue hover:bg-background">
               Click here

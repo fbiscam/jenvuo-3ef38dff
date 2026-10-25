@@ -37,7 +37,7 @@ const SOLUTIONS: Solution[] = [
   { name: "AI-first traders", image: imgOffice, stat: "1 question", statText: "one clear answer from the AI desk, no noise", body: "Ask about the current chart and get a focused, structured reply.", bold: "Read the market with AI next to you.", cta: "Explore the AI desk", to: "/ai-engine" },
   { name: "Developers", image: imgDev, stat: "$3 / 1M", statText: "tokens for top-tier models through API keys", body: "Plug Jenvu models into your own apps, bots and trading tools.", bold: "Build with our API and extension.", cta: "Explore developer tools", to: "/help" },
   { name: "Founding members", image: imgMeeting, stat: "2 days", statText: "to verify your ID after your plan is approved", body: "Approved Founding members get 3 months of their chosen plan with $250 credit.", bold: "Apply to the invite-only program.", cta: "Explore the Founding Program", to: "/founding" },
-  { name: "Session traders", image: imgLondon, stat: "London / NY", statText: "killzone sessions tracked on the EUR/USD chart", body: "Know when London and New York liquidity is most active on gold.", bold: "Time your entries around the sessions.", cta: "Explore session tools", to: "/help" },
+  { name: "Session traders", image: imgLondon, stat: "London / NY", statText: "killzone sessions tracked on the EUR/USD chart", body: "Know when London and New York liquidity is most active on EUR/USD.", bold: "Time your entries around the sessions.", cta: "Explore session tools", to: "/help" },
   { name: "EUR/USD investors", image: imgSouk, stat: "EUR/USD", statText: "one market, analysed in full depth every day", body: "Follow EUR/USD with daily insights, macro drivers and clear structure.", bold: "Stay close to the EUR/USD market.", cta: "Explore EUR/USD insights", to: "/insights" },
   { name: "Students", image: imgLibrary, stat: "Free guides", statText: "on sweeps, zones and FVGs for every level", body: "Learn ICT and SMC ideas step by step with real EUR/USD examples.", bold: "Build your trading knowledge.", cta: "Explore learning resources", to: "/insights" },
   { name: "Support & help", image: imgSupport, stat: "Help centre", statText: "answers on plans, billing and JX Bot", body: "Find quick answers or contact our team about your account.", bold: "Get help when you need it.", cta: "Visit the help centre", to: "/help" },
@@ -57,7 +57,7 @@ export function CloudSolutions() {
             <p className="text-gc-ink-muted">
               From spotting <Link to="/help" className="text-gc-blue-deep underline">liquidity sweeps</Link> to managing{" "}
               <Link to="/help" className="text-gc-blue-deep underline">trade risk</Link>, Jenvu tools fit{" "}
-              <span className="hidden sm:inline">the way you trade gold.</span>
+              <span className="hidden sm:inline">the way you trade EUR/USD.</span>
               <span className="sm:hidden">how you trade.</span>
             </p>
             <Link to="/auth" className="mt-5 inline-flex rounded-full bg-gc-blue-deep px-5 py-2.5 text-sm font-medium text-gc-on-blue hover:bg-gc-navy">

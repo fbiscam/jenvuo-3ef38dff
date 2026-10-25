@@ -222,7 +222,7 @@ export const collections: Collection[] = [
           { type: "p", content: "Jenvu understands natural language — you don't need fixed phrases. These examples are a good starting point and cover the most common workflows." },
 
           { type: "h2", content: "Analysis & setups" },
-          { type: "code", content: "“Analyze EUR/USD.”\n“Give me an A+ setup on gold.”\n“What's the EUR/USD bias right now?”\n“Walk me through the 15-minute EUR/USD structure.”" },
+          { type: "code", content: "“Analyze EUR/USD.”\n“Give me an A+ setup on EUR/USD.”\n“What's the EUR/USD bias right now?”\n“Walk me through the 15-minute EUR/USD structure.”" },
 
           { type: "h2", content: "Risk & news" },
           { type: "code", content: "“Is it safe to trade NFP today?”\n“Any high-impact news in the next hour?”\n“What killzone are we in?”" },

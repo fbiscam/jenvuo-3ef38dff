@@ -323,7 +323,7 @@ export const DOC_GROUPS: DocGroup[] = [
         body: (
           <>
             <p>
-              Ask the AI about the gold chart in plain language — for example “Is there a sweep on 1H?” or “What is the current
+              Ask the AI about the EUR/USD chart in plain language — for example “Is there a sweep on 1H?” or “What is the current
               structure on 4H?”. It answers only the question you ask, in short and clear words.
             </p>
             <ul>
