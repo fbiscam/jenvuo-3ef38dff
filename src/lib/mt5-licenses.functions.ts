@@ -60,3 +60,20 @@ export const getBotDownloadUrl = createServerFn({ method: "POST" })
     const { data, error } = await db.storage.from("bot-files").createSignedUrl("JX-Bot-MT5.zip", 300, { download: true });
     return error || !data ? { ok: false as const, error: "Download unavailable." } : { ok: true as const, url: data.signedUrl as string };
   });
+
+export type BotReportRow = { license_id: string; day: string; mt5_account: string; symbol: string; balance: number; equity: number; today_profit: number; trades_today: number; open_trades: number; open_lots: number; target_hit: boolean; updated_at: string };
+
+/** Bot Usage page: last 30 days of reports for the signed-in user's bots (RLS: own rows only). */
+export const getBotUsage = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { db: _db, ...access } = await readPlan(context.userId);
+    const since = new Date(Date.now() - 30 * 86400000).toISOString().slice(0, 10);
+    const { data } = await (context.supabase as any)
+      .from("mt5_bot_reports")
+      .select("license_id,day,mt5_account,symbol,balance,equity,today_profit,trades_today,open_trades,open_lots,target_hit,updated_at")
+      .gte("day", since)
+      .order("day", { ascending: true });
+    const rows = ((data ?? []) as any[]).map((r) => ({ ...r, balance: Number(r.balance), equity: Number(r.equity), today_profit: Number(r.today_profit), open_lots: Number(r.open_lots) })) as BotReportRow[];
+    return { plan: access.plan, allowed: access.allowed, limit: access.limit, rows };
+  });
