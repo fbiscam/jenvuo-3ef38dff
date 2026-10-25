@@ -99,7 +99,7 @@ function ImageCard({ img, caption, tag, className = "", eager = false }: { img: 
       />
       <div className="absolute inset-0 bg-gradient-to-t from-gc-night via-gc-night/30 to-transparent" />
       <div className="absolute left-6 top-5 flex items-center gap-2 text-[12px] text-gc-on-night-muted">
-        <span className="ind-pulse h-2 w-2 rounded-full bg-gc-green" />XAU/USD · live
+        <span className="ind-pulse h-2 w-2 rounded-full bg-gc-green" />EUR/USD · live
       </div>
       <div className="absolute inset-x-0 bottom-0 p-6 sm:p-8">
         {tag && <p className="text-[12px] font-medium uppercase tracking-wider text-gc-on-night-muted">{tag}</p>}

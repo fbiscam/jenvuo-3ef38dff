@@ -107,11 +107,11 @@ function HeroMockup({ price, delta }: { price: string; delta: string }) {
             <span className="h-2.5 w-2.5 rounded-full bg-gc-green" />
             <span className="ml-3 text-[13px] font-medium text-gc-ink">Jenvu Terminal</span>
           </div>
-          <span className="rounded-full bg-gc-blue-soft px-2.5 py-0.5 text-[11px] font-medium text-gc-blue">XAU/USD · 2H</span>
+          <span className="rounded-full bg-gc-blue-soft px-2.5 py-0.5 text-[11px] font-medium text-gc-blue">EUR/USD · 2H</span>
         </div>
         <div className="grid grid-cols-[1fr_auto] gap-4 px-5 pt-4">
           <div>
-            <div className="text-[12px] text-gc-ink-muted">Gold spot</div>
+            <div className="text-[12px] text-gc-ink-muted">EUR/USD spot</div>
             <div className="mt-0.5 text-[28px] font-medium leading-none text-gc-ink">{price}</div>
           </div>
           <span className={`self-start rounded-full px-2.5 py-1 text-[12px] font-medium ${up ? "bg-gc-green-soft text-gc-green" : "bg-gc-red-soft text-gc-red"}`}>
@@ -263,7 +263,7 @@ const AUDIENCES: Array<{ key: string; label: string; cards: AudienceCard[] }> = 
     cards: [
       { tag: "NEW TRADERS", text: "New sign-ups get 14 days of free Pro access & $100 for the top AI Models for 30 days ", to: "/auth", img: tradeNeonStart },
       { tag: "JX BOT", text: "Run JX Bot on MetaTrader 5 with a daily auto-stop at your plan's target", to: "/pricing", img: tradeNeonPractice },
-      { tag: "LEARN", text: "Read daily XAU/USD insights and guides on sweeps, zones and order blocks", to: "/insights", img: tradeNeonLearn },
+      { tag: "LEARN", text: "Read daily EUR/USD insights and guides on sweeps, zones and order blocks", to: "/insights", img: tradeNeonLearn },
     ],
   },
   {
@@ -395,7 +395,7 @@ export function CloudBuildWith() {
       <div className="mx-auto grid max-w-[1296px] items-start gap-10 px-5 pb-20 pt-8 sm:px-8 md:grid-cols-2 md:gap-20 md:pb-24">
         <div className="md:sticky md:top-24">
           <h2 className="text-[22px] font-normal leading-[1.3] text-gc-ink min-[400px]:text-[24px] sm:text-[36px] sm:leading-[1.25]">
-            <span className="whitespace-nowrap">Build with the gold platform</span>
+            <span className="whitespace-nowrap">Build with the EUR/USD platform</span>
             <br />
             <span className="whitespace-nowrap text-gc-blue-deep">designed for traders and AI</span>
           </h2>
@@ -460,12 +460,12 @@ export function CloudBuildWith() {
 
 /* ---------------- Product grid ---------------- */
 const PRODUCTS: Array<{ Icon: typeof Bot; tone: Tone; title: string; body: string; to: string }> = [
-  { Icon: LineChart, tone: "blue", title: "Gold Terminal", body: "Live XAU/USD candles with HH/HL/LH/LL structure, BOS and CHoCH that never repaint.", to: "/pricing" },
+  { Icon: LineChart, tone: "blue", title: "EUR/USD Terminal", body: "Live EUR/USD candles with HH/HL/LH/LL structure, BOS and CHoCH that never repaint.", to: "/pricing" },
   { Icon: Bot, tone: "red", title: "AI Desk", body: "Ask about the chart in plain language and get a focused answer to exactly what you asked.", to: "/ai-engine" },
   { Icon: Waves, tone: "yellow", title: "Liquidity sweeps", body: "Fresh high/low sweep detection on 5M, 15M, 1H, 2H and 4H with fakeout filters.", to: "/help" },
   { Icon: Layers, tone: "green", title: "Zones + FVG", body: "Supply and demand zones paired with fair value gaps, drawn only when they score strong.", to: "/help" },
   { Icon: Chrome, tone: "blue", title: "Browser extension", body: "Bring Jenvu analysis into TradingView with a side panel that reads your chart.", to: "/download" },
-  { Icon: Bell, tone: "red", title: "Signals & alerts", body: "Reviewed gold setups and alerts, with WAIT when the evidence isn't there.", to: "/pricing" },
+  { Icon: Bell, tone: "red", title: "Signals & alerts", body: "Reviewed EUR/USD setups and alerts, with WAIT when the evidence isn't there.", to: "/pricing" },
   { Icon: BarChart3, tone: "yellow", title: "Volume RVOL", body: "Relative volume spikes and buyer/seller share for every candle at a glance.", to: "/help" },
   { Icon: KeyRound, tone: "green", title: "API keys", body: "Use Jenvu models in your own tools at $3 per million tokens.", to: "/pricing" },
 ];
@@ -632,7 +632,7 @@ export function CloudPricing() {
 
 /* ---------------- Resources ---------------- */
 const RESOURCES: Array<{ Icon: typeof Bot; tone: Tone; title: string; body: string; to: string; cta: string }> = [
-  { Icon: BookOpen, tone: "yellow", title: "Insights", body: "Daily articles on gold, ICT and smart money concepts.", to: "/insights", cta: "Read articles" },
+  { Icon: BookOpen, tone: "yellow", title: "Insights", body: "Daily articles on EUR/USD, ICT and smart money concepts.", to: "/insights", cta: "Read articles" },
   { Icon: LifeBuoy, tone: "blue", title: "Help Centre", body: "Guides for the Terminal, extension, billing and your account.", to: "/help", cta: "Browse help" },
   { Icon: Users, tone: "green", title: "Founding Program", body: "Apply for early access to the full Terminal as a founding member.", to: "/founding", cta: "Apply now" },
 ];

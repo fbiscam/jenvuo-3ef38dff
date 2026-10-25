@@ -363,7 +363,7 @@ function Sparkline({ series, up }: { series: number[]; up: boolean }) {
 function HomePage() {
   const ticker = useLiveTicker();
   
-  const xau = ticker.find((r) => r[0] === "EUR/USD");
+  const xau = ticker.find((r) => r[0] === "XAU/USD");
   const currentPlan = useCurrentPlan();
   const upgradeLock = useUpgradeLock();
   const trial = useTrial();

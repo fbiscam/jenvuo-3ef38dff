@@ -31,15 +31,15 @@ type Solution = {
 };
 
 const SOLUTIONS: Solution[] = [
-  { name: "Day traders", image: imgFloor, stat: "15M / 1H", statText: "fresh sweeps and swings marked live on gold", body: "Catch liquidity sweeps on fresh highs and lows as candles close.", bold: "See how the Terminal reads intraday structure.", cta: "Explore the Gold Terminal", to: "/pricing" },
+  { name: "Day traders", image: imgFloor, stat: "15M / 1H", statText: "fresh sweeps and swings marked live on EUR/USD", body: "Catch liquidity sweeps on fresh highs and lows as candles close.", bold: "See how the Terminal reads intraday structure.", cta: "Explore the EUR/USD Terminal", to: "/pricing" },
   { name: "Swing traders", image: imgVault, stat: "2H / 4H", statText: "supply, demand zones and FVGs kept on chart", body: "Higher-timeframe zones stay drawn until price truly invalidates them.", bold: "Plan swing trades with clear structure.", cta: "Explore zone tools", to: "/help" },
   { name: "Automated traders", image: imgHome, stat: "MT5", statText: "JX Bot trades EUR/USD on your own account", body: "Licensed to your MT5 account, with a daily auto-stop at your target.", bold: "Let JX Bot handle the execution.", cta: "Explore JX Bot", to: "/pricing" },
   { name: "AI-first traders", image: imgOffice, stat: "1 question", statText: "one clear answer from the AI desk, no noise", body: "Ask about the current chart and get a focused, structured reply.", bold: "Read the market with AI next to you.", cta: "Explore the AI desk", to: "/ai-engine" },
   { name: "Developers", image: imgDev, stat: "$3 / 1M", statText: "tokens for top-tier models through API keys", body: "Plug Jenvu models into your own apps, bots and trading tools.", bold: "Build with our API and extension.", cta: "Explore developer tools", to: "/help" },
   { name: "Founding members", image: imgMeeting, stat: "2 days", statText: "to verify your ID after your plan is approved", body: "Approved Founding members get 3 months of their chosen plan with $250 credit.", bold: "Apply to the invite-only program.", cta: "Explore the Founding Program", to: "/founding" },
-  { name: "Session traders", image: imgLondon, stat: "London / NY", statText: "killzone sessions tracked on the gold chart", body: "Know when London and New York liquidity is most active on gold.", bold: "Time your entries around the sessions.", cta: "Explore session tools", to: "/help" },
-  { name: "Gold investors", image: imgSouk, stat: "XAU/USD", statText: "one market, analysed in full depth every day", body: "Follow gold with daily insights, macro drivers and clear structure.", bold: "Stay close to the gold market.", cta: "Explore gold insights", to: "/insights" },
-  { name: "Students", image: imgLibrary, stat: "Free guides", statText: "on sweeps, zones and FVGs for every level", body: "Learn ICT and SMC ideas step by step with real gold examples.", bold: "Build your trading knowledge.", cta: "Explore learning resources", to: "/insights" },
+  { name: "Session traders", image: imgLondon, stat: "London / NY", statText: "killzone sessions tracked on the EUR/USD chart", body: "Know when London and New York liquidity is most active on gold.", bold: "Time your entries around the sessions.", cta: "Explore session tools", to: "/help" },
+  { name: "EUR/USD investors", image: imgSouk, stat: "EUR/USD", statText: "one market, analysed in full depth every day", body: "Follow EUR/USD with daily insights, macro drivers and clear structure.", bold: "Stay close to the EUR/USD market.", cta: "Explore EUR/USD insights", to: "/insights" },
+  { name: "Students", image: imgLibrary, stat: "Free guides", statText: "on sweeps, zones and FVGs for every level", body: "Learn ICT and SMC ideas step by step with real EUR/USD examples.", bold: "Build your trading knowledge.", cta: "Explore learning resources", to: "/insights" },
   { name: "Support & help", image: imgSupport, stat: "Help centre", statText: "answers on plans, billing and JX Bot", body: "Find quick answers or contact our team about your account.", bold: "Get help when you need it.", cta: "Visit the help centre", to: "/help" },
 ];
 
@@ -51,7 +51,7 @@ export function CloudSolutions() {
       <div className="mx-auto max-w-6xl px-6">
         <div className="grid gap-8 md:grid-cols-2 md:items-start">
           <h2 className="text-3xl font-normal leading-tight text-gc-ink md:text-4xl">
-            Solve your trading problems with <span className="text-gc-yellow">gold solutions</span>
+            Solve your trading problems with <span className="text-gc-yellow">EUR/USD solutions</span>
           </h2>
           <div>
             <p className="text-gc-ink-muted">
@@ -178,7 +178,7 @@ export function CloudStartBanner() {
         <div className="relative overflow-hidden rounded-2xl bg-gc-sky">
           <div className="relative z-10 max-w-xl px-8 py-16 md:px-16 md:py-24">
             <h2 className="text-3xl font-normal leading-tight text-gc-ink md:text-[40px]">
-              <span className="text-gc-blue-deep">Let's start trading</span> your gold, today
+              <span className="text-gc-blue-deep">Let's start trading</span> your EUR/USD, today
             </h2>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link
