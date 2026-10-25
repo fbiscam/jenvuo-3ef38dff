@@ -52,6 +52,9 @@ export function useGlobalNotificationToasts() {
               const ts = new Date(n.created_at).getTime();
               if (ts < mountedAt - 5_000) return;
             }
+            // Security alerts (e.g. suspicious sign-ins) stay in the bell list
+            // only — never shown as a popup toast.
+            if (n.type === "security") return;
             beep();
             const title = n.title || "New notification";
             const body = n.body || "";
