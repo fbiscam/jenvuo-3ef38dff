@@ -344,11 +344,11 @@ export const collections: Collection[] = [
         summary: "Who can use the JX Bot, how to create a license and how to install it in MetaTrader 5.",
         updatedAt: "2026-10-24",
         body: [
-          { type: "p", content: "The JX Bot is Jenvu's XAU/USD Expert Advisor for MetaTrader 5. It is available only on a paid Pro, Elite or Ultra monthly plan — credit or the free trial does not unlock it. Open Dashboard → JX Bot to download it. How the bot decides its trades is proprietary and not published." },
+          { type: "p", content: "The JX Bot is Jenvu's EUR/USD Expert Advisor for MetaTrader 5. It is available only on a paid Pro, Elite or Ultra monthly plan — credit or the free trial does not unlock it. Open Dashboard → JX Bot to download it. How the bot decides its trades is proprietary and not published." },
           { type: "h2", content: "Plans" },
           { type: "ul", items: ["Pro: $1,000 monthly profit target, $50 daily, 1 MT5 license.", "Elite: $3,000 monthly, $150 daily, 2 licenses.", "Ultra: $6,000 monthly, $300 daily, 5 licenses.", "Daily target = monthly target / 20. When reached, the bot closes trades and pauses until the next day."] },
           { type: "h2", content: "Setup" },
-          { type: "ol", items: ["Dashboard → JX Bot: enter your MT5 account number (digits only) and create a license.", "In MT5: File → Open Data Folder → MQL5 → Experts, paste the Jenvu EA file; put the .set files in MQL5 → Presets; refresh the Navigator.", "Tools → Options → Expert Advisors: tick Allow WebRequest and add https://jenvu.com.", "Turn on Algo Trading, open XAUUSD M15, drag Jenvu EA on the chart, load the preset and paste your key into LicenseKey."] },
+          { type: "ol", items: ["Dashboard → JX Bot: enter your MT5 account number (digits only) and create a license.", "In MT5: File → Open Data Folder → MQL5 → Experts, paste the Jenvu EA file; put the .set files in MQL5 → Presets; refresh the Navigator.", "Tools → Options → Expert Advisors: tick Allow WebRequest and add https://jenvu.com.", "Turn on Algo Trading, open EURUSD M15, drag Jenvu EA on the chart, load the Jenvu EURUSD 15M preset and paste your key into LicenseKey."] },
           { type: "note", tone: "info", content: "Each key works only on one MT5 account. Targets are stop limits, not promised profit. Start with a small lot size." },
         ],
       },

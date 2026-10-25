@@ -165,16 +165,16 @@ export const STORIES: Story[] = [
     slug: "jx-bot",
     img: placeFloor,
     tag: "JX BOT FOR MT5",
-    title: "Let JX Bot trade gold for you on MetaTrader 5",
+    title: "Let JX Bot trade EUR/USD for you on MetaTrader 5",
     intro:
-      "JX Bot is Jenvu's Expert Advisor for XAU/USD on MT5. It runs on your own account and stops at the targets your plan sets.",
+      "JX Bot is Jenvu's Expert Advisor for EUR/USD on MT5. It runs on your own account and stops at the targets your plan sets.",
     feature: {
-      title: "Automated gold trading with clear limits",
+      title: "Automated EUR/USD trading with clear limits",
       text: [
-        "Download the bot from your dashboard, create a license for your MT5 account and attach it to the XAUUSD M15 chart.",
+        "Download the bot from your dashboard, create a license for your MT5 account and attach it to the EURUSD M15 chart.",
         "The bot checks its license with Jenvu, pauses for the day at your daily target and stops at your monthly target.",
       ],
-      caption: "JX Bot running on the XAUUSD M15 chart in MetaTrader 5",
+      caption: "JX Bot running on the EURUSD M15 chart in MetaTrader 5",
     },
     banner: {
       title: "Targets are limits, not promises",

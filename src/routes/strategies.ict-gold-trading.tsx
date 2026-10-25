@@ -119,7 +119,7 @@ const CONTENT: IndustryContent = {
   products: [
     { title: "Jenvu Terminal", text: "Live gold candles with ICT/SMC overlays and AI chat.", href: "https://dash.jenvu.com/terminal" },
     { title: "AI engine", text: "Ask about the chart and get short, on-topic answers.", href: "/ai-engine" },
-    { title: "JX Bot for MT5", text: "Jenvu's Expert Advisor for XAU/USD on MetaTrader 5.", href: "/stories/jx-bot" },
+    { title: "JX Bot for MT5", text: "Jenvu's Expert Advisor for EUR/USD on MetaTrader 5.", href: "/stories/jx-bot" },
     { title: "Price alerts", text: "Get told when gold reaches the level you care about.", href: "https://jenvu.com/docs" },
     { title: "Daily gold insights", text: "A short daily read on what moved gold and why.", href: "/stories/daily-gold-insights" },
     { title: "Developer API", text: "Use Jenvu analysis in your own tools with API keys.", href: "/stories/build-with-jenvu" },

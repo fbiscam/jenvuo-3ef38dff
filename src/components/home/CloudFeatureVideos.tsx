@@ -117,7 +117,7 @@ function SceneBot({ t }: { t: number }) {
   const pct = Math.min(100, (t * 4) % 120);
   return (
     <div className="flex h-full flex-col items-center justify-center px-8 text-center">
-      <div className="text-[11px] tracking-wide text-gc-on-blue/70">JX BOT · MT5 · XAUUSD M15</div>
+      <div className="text-[11px] tracking-wide text-gc-on-blue/70">JX BOT · MT5 · EURUSD M15</div>
       <div className="mt-1 text-[22px] font-medium text-gc-green">License VALID</div>
       <div className="mt-3 h-1.5 w-full max-w-[200px] overflow-hidden rounded-full bg-gc-on-blue/20">
         <div className="h-full rounded-full bg-gc-green transition-[width] duration-500" style={{ width: `${pct}%` }} />
@@ -133,7 +133,7 @@ const CARDS: Card[] = [
   { name: "Fresh sweep", to: "/help", Scene: SceneSweep, text: <><b className="font-medium text-gc-ink">Fresh sweep</b> spots wicks that take prior highs or lows, then confirms only when price reverses</> },
   { name: "AI desk", to: "/ai-engine", Scene: SceneAi, text: <><b className="font-medium text-gc-ink">Jenvu AI</b> reads the same chart you see and answers exactly the question you asked</> },
   { name: "Volume RVOL", to: "/help", Scene: SceneVolume, text: <><b className="font-medium text-gc-ink">RVOL</b> colours unusual volume spikes and shows an estimated buyer and seller on every candle</> },
-  { name: "JX Bot", to: "/pricing", Scene: SceneBot, text: <><b className="font-medium text-gc-ink">JX Bot</b> trades XAU/USD on MetaTrader 5 and pauses for the day at your daily target</> },
+  { name: "JX Bot", to: "/pricing", Scene: SceneBot, text: <><b className="font-medium text-gc-ink">JX Bot</b> trades EUR/USD on MetaTrader 5 and pauses for the day at your daily target</> },
 ];
 
 function FeatureCard({ card }: { card: Card }) {

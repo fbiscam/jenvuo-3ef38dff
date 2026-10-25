@@ -74,7 +74,7 @@ export function CloudAnnouncement() {
     <div className="border-b border-gc-line bg-gc-blue-soft">
       <div className="mx-auto flex max-w-[1296px] flex-wrap items-center justify-center gap-x-2 gap-y-1 px-5 py-2.5 text-center text-[13px] text-gc-ink sm:text-sm">
         <span className="rounded bg-gc-blue px-1.5 py-0.5 text-[11px] font-medium text-gc-on-blue">New</span>
-        <span>JX Bot for MetaTrader 5 is here: automated XAU/USD trading with a daily auto-stop.</span>
+        <span>JX Bot for MetaTrader 5 is here: automated EUR/USD trading with a daily auto-stop.</span>
         <Link to="/pricing" className="inline-flex items-center gap-1 font-medium text-gc-blue hover:underline">
           See plans <ArrowRight className="h-3.5 w-3.5" />
         </Link>
@@ -372,7 +372,7 @@ const BUILD_ITEMS: Array<{ key: string; title: string; points: BuildPart[][] }> 
     key: "jx-bot",
     title: "JX Bot for MetaTrader 5",
     points: [
-      ["Automate XAU/USD on MT5 with ", { link: "JX Bot", hash: "jx-bot" }, ", licensed to your own account and installed in a few steps"],
+      ["Automate EUR/USD on MT5 with ", { link: "JX Bot", hash: "jx-bot" }, ", licensed to your own account and installed in a few steps"],
       ["The bot pauses for the day at your daily target and stops at your plan's monthly target"],
     ],
   },

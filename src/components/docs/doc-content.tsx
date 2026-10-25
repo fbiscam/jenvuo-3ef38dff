@@ -299,7 +299,7 @@ export const DOC_GROUPS: DocGroup[] = [
         body: (
           <>
             <p>
-              JX Bot is Jenvu's Expert Advisor for <strong>XAU/USD on MetaTrader 5</strong> (M15 chart). It comes with every paid plan:
+              JX Bot is Jenvu's Expert Advisor for <strong>EUR/USD on MetaTrader 5</strong> (M15 chart). It comes with every paid plan:
               Pro 1 license, Elite 2, Ultra 5. Each license key works on one MT5 account.
             </p>
             <ul>

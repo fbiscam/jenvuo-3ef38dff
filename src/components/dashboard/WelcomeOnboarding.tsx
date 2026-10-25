@@ -10,7 +10,7 @@ const OPTIONS = [
   { id: "signals", title: "Trade XAU/USD with live SMC & ICT signals", desc: "Sweeps, supply & demand zones and fair value gaps on gold.", img: signalsImg },
   { id: "ai_desk", title: "Use the AI trading desk", desc: "Ask the chart copilot about structure, levels and news.", img: aiImg },
   { id: "extension_api", title: "Connect the extension & API", desc: "Bring Jenvu analysis into your browser and your own apps.", img: extImg },
-  { id: "jx_bot", title: "Automate gold with JX Bot on MT5", desc: "Run Jenvu's Expert Advisor on your MetaTrader 5 account.", img: botImg },
+  { id: "jx_bot", title: "Automate EUR/USD with JX Bot on MT5", desc: "Run Jenvu's Expert Advisor on your MetaTrader 5 account.", img: botImg },
 ] as const;
 
 const FONT = { fontFamily: "'Google Sans Flex','Google Sans',sans-serif" };
