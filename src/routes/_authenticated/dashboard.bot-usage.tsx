@@ -194,7 +194,7 @@ function BotUsagePage() {
               </div>
             ))}
             <p className="mt-3 text-[12px] leading-5 text-muted-foreground">
-              Every license has its own daily target. When one account reaches it, that bot closes its trades and starts again the next day; your other accounts keep running & make profits.
+              Every license has its own daily target. When one account reaches it, that bot closes its trades and starts again next day. bot only trade EURUSD.
             </p>
             </div>
             <OnOffLog sessions={(data?.sessions ?? []).filter((x) => account === "all" || x.mt5_account === account)} />
