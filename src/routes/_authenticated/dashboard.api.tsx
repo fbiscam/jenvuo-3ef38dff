@@ -8,6 +8,7 @@ import {
   createExtensionKey,
   revokeExtensionKey,
   deleteExtensionKey,
+  revealExtensionKey,
   type ExtensionKeyRow,
   type ExtensionKeyAccess,
 } from "@/lib/extension-keys.functions";
@@ -36,6 +37,7 @@ function ExtensionPage() {
   const create = useServerFn(createExtensionKey);
   const revoke = useServerFn(revokeExtensionKey);
   const remove = useServerFn(deleteExtensionKey);
+  const reveal = useServerFn(revealExtensionKey);
 
   const [keys, setKeys] = useState<ExtensionKeyRow[]>([]);
   const [access, setAccess] = useState<ExtensionKeyAccess | null>(null);
@@ -85,7 +87,7 @@ function ExtensionPage() {
       setFreshKey(res.key);
       setName("");
       setShowCreate(false);
-      toast.success("API key created — copy it now, it is shown only once.");
+      toast.success("API key created — you can copy it anytime from the list.");
       await refresh();
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Could not create the key");
@@ -155,10 +157,16 @@ function ExtensionPage() {
       await copyValue(freshKey, key.id);
       return;
     }
-
-    toast.error(
-      "For security, older full keys cannot be shown again. Create a new key to copy it.",
-    );
+    try {
+      const res = await reveal({ data: { id: key.id } });
+      if (!res.ok) {
+        toast.error(res.error);
+        return;
+      }
+      await copyValue(res.key, key.id);
+    } catch {
+      toast.error("Copy failed");
+    }
   };
 
   const activeKeys = keys.filter((k) => !k.revoked_at);
@@ -235,7 +243,7 @@ function ExtensionPage() {
       {freshKey && (
         <div className="mt-5 rounded-lg border border-amber-300 bg-amber-50 p-3">
           <div className="text-[12px] font-medium text-amber-800">
-            Copy this key now — it will not be shown again.
+            Your new API key — you can copy it again later from the list below.
           </div>
           <div className="mt-2 flex items-center gap-2">
             <code
