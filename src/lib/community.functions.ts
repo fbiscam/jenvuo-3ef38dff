@@ -86,17 +86,19 @@ async function hydratePosts(admin: any, rows: any[], viewerId: string): Promise<
   const postIds = rows.map((r) => r.id);
 
   const [{ data: cps }, { data: profs }, { data: likes }, { data: reposts }, { data: bmks }] = await Promise.all([
-    admin.from("community_profiles").select("user_id, handle").in("user_id", authorIds),
-    admin.from("profiles").select("id, full_name, avatar_url").in("id", authorIds),
+    admin.from("community_profiles").select("user_id, handle, display_name").in("user_id", authorIds),
+    // Private account names are never read for other members; only the public community display name is shown.
+    admin.from("profiles").select("id, avatar_url").in("id", authorIds),
     admin.from("community_likes").select("post_id").eq("user_id", viewerId).in("post_id", postIds),
     admin.from("community_reposts").select("post_id").eq("user_id", viewerId).in("post_id", postIds),
     admin.from("community_bookmarks").select("post_id").eq("user_id", viewerId).in("post_id", postIds),
   ]);
 
   const handleMap = new Map<string, string>();
-  for (const c of cps ?? []) handleMap.set(c.user_id, c.handle);
+  const displayMap = new Map<string, string | null>();
+  for (const c of cps ?? []) { handleMap.set(c.user_id, c.handle); displayMap.set(c.user_id, c.display_name ?? null); }
   const profMap = new Map<string, { name: string | null; avatar: string | null }>();
-  for (const p of profs ?? []) profMap.set(p.id, { name: p.full_name ?? null, avatar: p.avatar_url ?? null });
+  for (const p of profs ?? []) profMap.set(p.id, { name: displayMap.get(p.id) ?? null, avatar: p.avatar_url ?? null });
 
   const avatarSigned = await signAvatars(
     admin,

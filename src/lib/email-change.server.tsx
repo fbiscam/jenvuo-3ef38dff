@@ -128,7 +128,7 @@ export async function createEmailChangeRequest(input: {
   const confirmationUrl = `${origin}/confirm-email-change?token=${token}`
 
   try {
-    await sendEmailChangeEmail({ to: oldEmail, oldEmail, newEmail, confirmationUrl })
+    await sendEmailChangeEmail({ to: newEmail, oldEmail, newEmail, confirmationUrl })
   } catch (err) {
     await writeAudit({ ...ctx, event: 'failed_request', requestId, errorReason: err instanceof Error ? err.message : 'send_failed' })
     throw err
@@ -153,7 +153,7 @@ async function sendEmailChangeEmail(args: {
     <EmailChangeEmail
       siteName={SITE_NAME}
       oldEmail={args.oldEmail}
-      email={args.oldEmail}
+      email={args.to}
       newEmail={args.newEmail}
       confirmationUrl={args.confirmationUrl}
     />
