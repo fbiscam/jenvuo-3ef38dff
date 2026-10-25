@@ -1276,7 +1276,7 @@ export function renderSmcOverlay(
       ctx.moveTo(x, y);
       ctx.lineTo(pr.width, y);
       ctx.stroke();
-      const text = `${name} ${price.toFixed(2)}`;
+      const text = `${name} ${price.toFixed(price < 10 ? 5 : 2)}`;
       const tw = ctx.measureText(text).width;
       const lx = pr.width - tw - 14;
       ctx.fillStyle = color;
@@ -1343,7 +1343,7 @@ export function renderSmcOverlay(
       ctx.lineTo(pr.width, y);
       ctx.stroke();
       ctx.fillStyle = color;
-      ctx.fillText(`${label} ${price.toFixed(2)}`, pr.width * 0.55 + 4, above ? y - 5 : y + 15);
+      ctx.fillText(`${label} ${price.toFixed(price < 10 ? 5 : 2)}`, pr.width * 0.55 + 4, above ? y - 5 : y + 15);
     };
     // The sweep indicator already draws every pool — never draw them twice.
     if (!toggles.sweeps) {
@@ -1543,9 +1543,9 @@ export function renderSmcOverlay(
       ctx.fillText(head, tx + 6, ty + 12);
       ctx.font = "600 10px 'JetBrains Mono', ui-monospace, monospace";
       ctx.fillStyle = "#475569";
-      ctx.fillText(`${up ? "Cancel above" : "Cancel below"} ${p.price.toFixed(2)}`, tx + 6, ty + 23);
+      ctx.fillText(`${up ? "Cancel above" : "Cancel below"} ${p.price.toFixed(p.price < 10 ? 5 : 2)}`, tx + 6, ty + 23);
       if (p.earlyLevel != null)
-        ctx.fillText(`Early: close ${up ? "below" : "above"} ${p.earlyLevel.toFixed(2)}`, tx + 6, ty + 34);
+        ctx.fillText(`Early: close ${up ? "below" : "above"} ${p.earlyLevel.toFixed(p.earlyLevel < 10 ? 5 : 2)}`, tx + 6, ty + 34);
       const eta = p.confirmAt ? new Date(p.confirmAt).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" }) : "—";
       ctx.fillStyle = color;
       ctx.fillText(`Hold ${p.confirmChance ?? 0}% · ETA ${eta}`, tx + 6, ty + 45);

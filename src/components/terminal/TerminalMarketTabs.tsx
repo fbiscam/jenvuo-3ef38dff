@@ -504,7 +504,7 @@ function HeaderSidePanel({ quotes, now }: { quotes?: Record<string, { price: num
   return (
     <div className="ml-auto hidden shrink-0 items-stretch gap-6 xl:flex">
       <div>
-        <p className="mb-2 text-[11.5px] font-medium uppercase tracking-wide text-gc-ink-muted">Moves gold</p>
+        <p className="mb-2 text-[11.5px] font-medium uppercase tracking-wide text-gc-ink-muted">Moves EUR/USD</p>
         <div className="grid grid-cols-2 gap-x-6 gap-y-2">
           {MOVERS.map((m) => {
             const q = quotes?.[m.symbol];

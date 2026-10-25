@@ -1100,7 +1100,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
                     const v = hoveredIdx >= 0 ? values[i][hoveredIdx] : NaN;
                     return (
                       <span key={l.title} style={{ color: l.kind === "histogram" ? undefined : l.color }}>
-                        {Number.isFinite(v) ? v.toFixed(2) : "—"}
+                        {Number.isFinite(v) ? v.toFixed(Math.abs(v) < 10 ? 5 : 2) : "—"}
                       </span>
                     );
                   })}
@@ -1113,7 +1113,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
                     const v = hoveredIdx >= 0 ? p.values[hoveredIdx] : NaN;
                     return (
                       <span key={p.title} style={{ color: p.color }}>
-                        {Number.isFinite(v) ? v.toFixed(2) : "—"}
+                        {Number.isFinite(v) ? v.toFixed(Math.abs(v) < 10 ? 5 : 2) : "—"}
                       </span>
                     );
                   })}
