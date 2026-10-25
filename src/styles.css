@@ -1481,3 +1481,14 @@ ul.overflow-x-auto::-webkit-scrollbar {
 
 /* Pages with product names (JX Bot, MT5, M15) keep their headings' own casing. */
 .jenvu-zoom-dashboard main .keep-case :is(h1, h2, h3, h4) { text-transform: none !important; }
+
+/* Every dropdown: own chevron with space from the right edge (native arrow sat flush against the border). */
+select:not([multiple]):not([size]) {
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2371717a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.7rem center;
+  background-size: 14px 14px;
+  padding-right: 2.25rem;
+}

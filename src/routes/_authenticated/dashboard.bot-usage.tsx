@@ -47,14 +47,13 @@ function BotUsagePage() {
     for (const r of picked) if (days.has(r.day)) days.set(r.day, (days.get(r.day) ?? 0) + r.today_profit);
     const chart = Array.from(days, ([day, profit]) => ({ day: day.slice(5), profit: Math.round(profit * 100) / 100 }));
     const target = data && isMt5Plan(data.plan) ? dailyTarget(data.plan) : 0;
-    const allToday = rows.filter((r) => r.day === today);
-    const shared = sharedTargetStatus(target, allToday.map((r) => r.today_profit), allToday.some((r) => r.target_hit));
+    const perAccount = latestList.filter((r) => r.day === today).map((r) => ({ account: r.mt5_account, ...sharedTargetStatus(target, [r.today_profit], r.target_hit) }));
     return {
       accounts,
       latestList,
       chart,
       target,
-      shared,
+      perAccount,
       todayProfit: todayRows.reduce((a, r) => a + r.today_profit, 0),
       monthProfit: chart.reduce((a, r) => a + r.profit, 0),
       balance: latestList.reduce((a, r) => a + r.balance, 0),
@@ -64,7 +63,6 @@ function BotUsagePage() {
     };
   }, [data, account]);
 
-  const pct = view.target > 0 ? Math.min(100, Math.max(0, (view.shared.combined / view.target) * 100)) : 0;
 
   return (
     <div className="-mx-5 -mb-7 min-h-[calc(100dvh-4rem)] overflow-hidden bg-background text-foreground sm:-mx-8">
@@ -99,14 +97,16 @@ function BotUsagePage() {
         </div>
       </div>
 
-      {data && !data.allowed && view.latestList.length === 0 ? (
-        <Empty text="JX Bot needs a paid Pro, Elite or Ultra plan." action={<Link to="/dashboard/billing" className="text-[13px] font-medium text-primary">See plans</Link>} />
-      ) : data && view.latestList.length === 0 ? (
-        <Empty
-          text="No bot data yet. Install the latest JX Bot, add your license key and allow https://jenvu.com in MT5 WebRequest. Data appears within a minute."
-          action={<Link to="/dashboard/jx-bot" className="text-[13px] font-medium text-primary">Open JX Bot</Link>}
-        />
-      ) : (
+      {data && view.latestList.length === 0 && (
+        <div className="flex flex-wrap items-center gap-2 border-b border-border px-4 py-2.5 text-[12px] text-muted-foreground sm:px-7">
+          <Bot className="h-4 w-4" />
+          {data.allowed
+            ? "No bot data yet. Run the latest JX Bot with your license key and allow https://jenvu.com in MT5 WebRequest. Data appears within a minute."
+            : "JX Bot needs a paid Pro, Elite or Ultra plan."}
+          <Link to={data.allowed ? "/dashboard/jx-bot" : "/dashboard/billing"} className="font-medium text-primary">{data.allowed ? "Open JX Bot" : "See plans"}</Link>
+        </div>
+      )}
+      {(
         <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_320px]">
           <div className="min-w-0">
             <section className="border-b border-border px-4 pb-4 pt-5 sm:px-7">
@@ -182,17 +182,19 @@ function BotUsagePage() {
 
           <aside className="border-t border-border xl:border-l xl:border-t-0">
             <div className="border-b border-border p-5">
-            <h2 className="text-[13px] text-foreground">Shared daily target</h2>
-            <div className="mt-3 text-xl font-medium tabular-nums">
-              {usd(view.shared.combined)} <span className="text-[13px] font-normal text-muted-foreground">/ {usd(view.target)}</span>
-            </div>
-            <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-secondary">
-              <div className="h-full rounded-full bg-primary" style={{ width: `${pct}%` }} />
-            </div>
+            <h2 className="text-[13px] text-foreground">Daily target per account</h2>
+            <div className="mt-2 text-xl font-medium tabular-nums">{usd(view.target)} <span className="text-[13px] font-normal text-muted-foreground">each</span></div>
+            {view.perAccount.length === 0 && <div className="mt-3 h-1.5 rounded-full bg-secondary" />}
+            {view.perAccount.map((a) => (
+              <div key={a.account} className="mt-3">
+                <div className="flex justify-between text-[12px]"><span>MT5 {a.account}</span><span className="tabular-nums text-muted-foreground">{usd(a.combined)} / {usd(view.target)}</span></div>
+                <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-secondary">
+                  <div className="h-full rounded-full bg-primary" style={{ width: `${view.target > 0 ? Math.min(100, Math.max(0, (a.combined / view.target) * 100)) : 0}%` }} />
+                </div>
+              </div>
+            ))}
             <p className="mt-3 text-[12px] leading-5 text-muted-foreground">
-              {view.shared.stop
-                ? "Target reached. All your bots closed their trades and start again tomorrow."
-                : "Your plan target is shared by all your MT5 accounts. When their total profit today reaches it, every bot closes its trades and starts again the next day."}
+              Every license has its own daily target. When one account reaches it, that bot closes its trades and starts again the next day; your other accounts keep running.
             </p>
             </div>
             <OnOffLog sessions={(data?.sessions ?? []).filter((x) => account === "all" || x.mt5_account === account)} />
@@ -238,7 +240,7 @@ function OnOffLog({ sessions }: { sessions: BotSessionRow[] }) {
   const now = Date.now();
   return (
     <div className="p-5">
-      <h2 className="keep-case text-[13px] text-foreground">Bot ON / OFF · last 3 days (UTC)</h2>
+      <div className="text-[13px] font-semibold text-foreground">Bot ON / OFF · last 3 days (UTC)</div>
       {sessions.length === 0 ? (
         <p className="mt-3 text-[12px] text-muted-foreground">No ON/OFF records yet. They appear once the latest bot is running.</p>
       ) : (
