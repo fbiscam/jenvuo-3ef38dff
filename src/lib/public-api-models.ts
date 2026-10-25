@@ -1,18 +1,20 @@
 // The only models exposed through the public Jenvu API (/api/public/v1).
-// Claude Opus 5, Claude Fable 5.1 and GPT 5.5 — nothing else.
+// Catalog verified against the configured service on 2026-10-25.
 export const PUBLIC_API_MODEL_IDS = [
   "claude-opus-5",
   "claude-fable-5.1",
   "gpt-5.5",
+  "seed-2.1-turbo", "glm-5.3", "qwen3.8-27b", "gpt-5.6-terra",
+  "gpt-5.6-luna", "qwen3.8-max", "gemma-2-2b", "claude-mythos-preview",
+  "deepseek-v4-pro-0813", "deepseek-v4-flash-0731", "kimi-k2.6",
+  "gemini-3.1-pro", "claude-fable-5", "claude-opus-4.8", "seed-2.1-pro",
+  "glm-5.2", "qwen3.7-max", "claude-opus-5.5", "gpt-5.5-pro",
+  "muse-spark-1.1", "gpt-5.6-sol", "deepseek-v4-pro-max", "kimi-k3",
+  "claude-sonnet-5", "grok-4.6", "gemini-3.6-flash", "claude-opus-4.7",
+  "gemini-3.7-flash", "grok-4.5", "claude-opus-4.6",
 ] as const;
 
 export type PublicApiModelId = (typeof PUBLIC_API_MODEL_IDS)[number];
-
-const GATEWAY_BY_ID: Record<PublicApiModelId, readonly string[]> = {
-  "claude-opus-5": ["codecraft/claude-opus-5", "codecraft/claude-fable-5.1"],
-  "claude-fable-5.1": ["codecraft/claude-fable-5.1", "codecraft/claude-opus-5.5"],
-  "gpt-5.5": ["codecraft/gpt-5.5", "codecraft/claude-opus-5"],
-};
 
 // Legacy / convenience aliases so older integrations keep working.
 const ALIASES: Record<string, PublicApiModelId> = {
@@ -38,5 +40,6 @@ export function resolvePublicModel(model: unknown): PublicApiModelId | null {
 }
 
 export function gatewayChainFor(id: PublicApiModelId): string[] {
-  return [...GATEWAY_BY_ID[id]];
+  // Never silently substitute a different model or provider for API callers.
+  return [`codecraft/${id}`];
 }

@@ -1,4 +1,6 @@
-// Shared OmniRoute AI helper used by every server-side analyzer call.
+import { jenvuServiceError } from './jenvu-api-errors';
+
+// Shared AI helper used by every server-side analyzer call.
 //
 // Purpose:
 //   1. One place to switch models (25-year-veteran quality tier).
@@ -116,7 +118,7 @@ async function singleAttempt(
   const stalled = new Promise<never>((_, reject) => {
     timer = setTimeout(() => {
       ctrl.abort();
-      reject(new AiGatewayError(`${model} took too long to answer.`, 504, false));
+      reject(new AiGatewayError(jenvuServiceError(504), 504, false));
     }, cap);
   });
   try {
@@ -133,7 +135,7 @@ async function singleAttemptInner(
 ): Promise<{ content: string; usage: UsageInfo }> {
   const isCodeCraft = model.startsWith("codecraft/");
   if (!isCodeCraft && !model.startsWith("omniroute/")) {
-    throw new AiGatewayError(`Unsupported model provider: ${model}`, 400, true);
+    throw new AiGatewayError(jenvuServiceError(400), 400, true);
   }
 
   const omniRouteKey = isCodeCraft ? process.env.CODECRAFT_API_KEY : process.env.CUSTOM_AI_API_KEY;
@@ -141,10 +143,10 @@ async function singleAttemptInner(
     ? "https://codecraftapi.com/v1"
     : (process.env.CUSTOM_AI_BASE_URL || "").replace(/\/+$/, "");
   if (!omniRouteKey) {
-    throw new AiGatewayError("OmniRoute API key is missing on the published server.", 0, true);
+    throw new AiGatewayError(jenvuServiceError(401), 503, true);
   }
   if (!/^https:\/\//i.test(omniRouteBase)) {
-    throw new AiGatewayError("OmniRoute server address is missing on the published server.", 0, true);
+    throw new AiGatewayError(jenvuServiceError(401), 503, true);
   }
 
   const endpoint = /\/chat\/completions$/i.test(omniRouteBase)
@@ -171,20 +173,13 @@ async function singleAttemptInner(
       body: JSON.stringify(body),
     });
   } catch {
-    throw new AiGatewayError("OmniRoute could not be reached. Please retry in a moment.", 0, false);
+    throw new AiGatewayError(jenvuServiceError(503), 503, false);
   }
 
   if (!res.ok) {
     const txt = await res.text().catch(() => "");
     const terminal = !(res.status === 429 || res.status >= 500);
-    let msg: string;
-    if (res.status === 429 || res.status >= 500) msg = "OmniRoute is busy. Please retry in a moment.";
-    else if (res.status === 402) msg = "OmniRoute credits are exhausted. Please contact support.";
-    else if (res.status === 401) msg = "OmniRoute API key was rejected. Please contact support.";
-    else if (res.status === 403) msg = "OmniRoute access is blocked. Please contact support.";
-    else if (res.status === 400) msg = "OmniRoute rejected the analysis request. Please contact support.";
-    else if (res.status === 404) msg = "The selected OmniRoute model is unavailable.";
-    else msg = "OmniRoute request failed. Please retry in a moment.";
+    const msg = jenvuServiceError(res.status);
 
     const retryAfter = res.headers.get("retry-after");
     const retryAfterMs = retryAfter
@@ -208,7 +203,7 @@ async function singleAttemptInner(
   const json: any = await res.json();
   const content = json?.choices?.[0]?.message?.content;
   if (typeof content !== "string" || !content.trim()) {
-    throw new AiGatewayError("OmniRoute returned an empty response.", 0, false);
+    throw new AiGatewayError(jenvuServiceError(502), 502, false);
   }
   if (opts.rejectTruncated && json?.choices?.[0]?.finish_reason === "length") {
     // Terminal for this model: skip straight to the next one in the chain.
@@ -489,7 +484,6 @@ async function callChatChain(
         if (lastErr.terminal) {
           const isAuthOrBilling =
             lastErr.status === 401 || lastErr.status === 402 || lastErr.status === 403;
-          if (isAuthOrBilling && !isLastModel) break;
           if (isAuthOrBilling) throw lastErr;
           // Other terminal model failures also continue with the next model.
           break;
