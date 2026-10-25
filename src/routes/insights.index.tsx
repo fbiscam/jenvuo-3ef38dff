@@ -111,7 +111,7 @@ function InsightsPage() {
     }).slice(0, 10);
   })();
 
-  const [filter, setFilter] = useState<"latest" | "EUR/USD" | "macro">("latest");
+  const [filter, setFilter] = useState<"latest" | "gold" | "macro">("latest");
   const [page, setPage] = useState(1);
   const filters: { id: typeof filter; label: string }[] = [
     { id: "latest", label: "Latest" },
