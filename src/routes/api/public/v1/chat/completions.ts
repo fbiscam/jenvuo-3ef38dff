@@ -11,6 +11,7 @@ import {
 } from "@/lib/extension-auth.server";
 import { callChatCompletion, AiGatewayError } from "@/lib/ai-gateway";
 import type { ChatMessage } from "@/lib/ai-gateway";
+import { jenvuServiceError } from "@/lib/jenvu-api-errors";
 import {
   PUBLIC_API_MODEL_IDS,
   gatewayChainFor,
@@ -115,7 +116,7 @@ export const Route = createFileRoute("/api/public/v1/chat/completions")({
           return extJson(
             {
               error: {
-                message: `Unknown model "${String(body?.model)}". Available models: ${PUBLIC_API_MODEL_IDS.join(", ")}.`,
+                message: `Unknown Jenvu API model. Available models: ${PUBLIC_API_MODEL_IDS.join(", ")}.`,
                 type: "invalid_request_error",
                 code: "model_not_found",
                 param: "model",
@@ -183,10 +184,7 @@ export const Route = createFileRoute("/api/public/v1/chat/completions")({
           return extJson(
             {
               error: {
-                message:
-                  err instanceof AiGatewayError
-                    ? err.message
-                    : "AI is temporarily unavailable. Please retry.",
+                message: jenvuServiceError(status),
                 type: "api_error",
               },
             },

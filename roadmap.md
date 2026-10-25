@@ -1,4 +1,5 @@
 # Roadmap
+- [ ] Use CodeCraft for every public API model and verify Jenvu-only service errors.
 - [x] Restore signed-out Ask Jenvu answers; retain existing request limiter and untrusted-history protections; verified with a live visitor pricing question and regression tests
 - [x] Same homepage header menu on every public page
 - [x] Dashboard + site link only to pages that exist; remove old ones
