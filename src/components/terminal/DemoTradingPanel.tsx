@@ -128,7 +128,7 @@ export function useDemoTrading(currentPrice: number | null, currentRange?: DemoP
 
   const place = useCallback((req: OrderRequest): string | null => {
     const px = priceRef.current;
-    if (!px) return "Live gold price is not available yet.";
+    if (!px) return "Live EUR/USD price is not available yet.";
     if (!Number.isFinite(req.quantity) || req.quantity <= 0) return "Enter a quantity greater than zero.";
     const { bid, ask } = bidAsk(px);
     const fill = req.type === "market" ? (req.side === "buy" ? ask : bid) : req.price ?? NaN;

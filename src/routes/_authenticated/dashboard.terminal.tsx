@@ -70,12 +70,12 @@ export const Route = createFileRoute("/_authenticated/dashboard/terminal")({
       {
         name: "description",
         content:
-          "Full-screen gold charting terminal with drawing tools, multiple timeframes and a built-in AI desk that reads the chart with you.",
+          "Full-screen EUR/USD charting terminal with drawing tools, multiple timeframes and a built-in AI desk that reads the chart with you.",
       },
       { property: "og:title", content: "Jenvu Terminal — Live EUR/USD Chart & AI Desk" },
       {
         property: "og:description",
-        content: "Chart gold like a pro and ask the Jenvu AI desk about the setup in one screen.",
+        content: "Chart EUR/USD like a pro and ask the Jenvu AI desk about the setup in one screen.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -213,10 +213,10 @@ const MAX_IMAGE_BYTES = 3 * 1024 * 1024;
 function pendingLabel(query: string, hasImage: boolean): string {
   if (hasImage) return "Reviewing your chart…";
   const tradingQuery =
-    /\b(gold|xau|chart|trade|trading|setup|signal|entry|buy|sell|long|short|analysis|analyze|bias|price|trend|level|zone|liquidity|fvg|order\s*block|bos|choch|smc|ict|killzone|scalp|swing)\b/i.test(
+    /\b(eur|eurusd|euro|gold|xau|chart|trade|trading|setup|signal|entry|buy|sell|long|short|analysis|analyze|bias|price|trend|level|zone|liquidity|fvg|order\s*block|bos|choch|smc|ict|killzone|scalp|swing)\b/i.test(
       query,
     );
-  return tradingQuery ? "Reviewing gold structure…" : "Preparing your answer…";
+  return tradingQuery ? "Reviewing EUR/USD structure…" : "Preparing your answer…";
 }
 
 function ComposerAttachments() {
@@ -742,7 +742,7 @@ function TerminalPage() {
                   </button>
                   <div
                     className="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full bg-gc-console-search px-2.5 text-[12px] font-semibold tabular-nums text-gc-ink dark:bg-accent dark:text-foreground"
-                    title={marketClosed ? "Gold market is closed for the weekend" : `Time left on the current ${tf.label} candle`}
+                    title={marketClosed ? "EUR/USD market is closed for the weekend" : `Time left on the current ${tf.label} candle`}
                     aria-label={marketClosed ? "Market closed" : `Current ${tf.label} candle closes in ${formatCountdown(secondsLeft)}`}
                   >
                     <Timer className="h-4 w-4 text-muted-foreground" />
@@ -755,7 +755,7 @@ function TerminalPage() {
                 <>
                   <div
                     className="flex h-7 md:hidden items-center gap-1.5 rounded-full bg-muted px-2.5 font-mono text-xs font-semibold text-foreground"
-                    title={marketClosed ? "Gold market is closed for the weekend" : `Time left on the current ${tf.label} candle`}
+                    title={marketClosed ? "EUR/USD market is closed for the weekend" : `Time left on the current ${tf.label} candle`}
                     aria-label={marketClosed ? "Market closed" : `Current ${tf.label} candle closes in ${formatCountdown(secondsLeft)}`}
                   >
                     <Timer className="h-3.5 w-3.5 text-muted-foreground" />
@@ -916,7 +916,7 @@ function TerminalPage() {
                           className="mt-0.5 h-6 w-6 shrink-0 rounded-md object-contain"
                         />
                         <p>
-                          Ask about the chart you are looking at. I use live gold data for the
+                          Ask about the chart you are looking at. I use live EUR/USD data for the
                           selected timeframe.
                         </p>
                       </div>

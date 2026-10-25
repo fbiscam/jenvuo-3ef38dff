@@ -88,7 +88,7 @@ export function TerminalOrderPanel({ trading, price, footer }: { trading: DemoTr
           <XauUsdLogo size={30} />
           <div className="min-w-0">
             <p className="text-[15px] font-medium leading-tight text-gc-ink">Place order</p>
-            <p className="text-[11px] text-gc-ink-muted">EUR/USD · Gold Spot / US Dollar</p>
+            <p className="text-[11px] text-gc-ink-muted">EUR/USD · Euro / US Dollar</p>
           </div>
         </div>
         <div className="mt-3 flex items-center justify-between text-[12px]">
