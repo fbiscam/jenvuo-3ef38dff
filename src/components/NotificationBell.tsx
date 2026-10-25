@@ -229,12 +229,14 @@ export default function NotificationBell() {
                   >
                     <Icon className={cn("mt-0.5 h-[18px] w-[18px] shrink-0", v.tone)} />
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-[13px] text-gc-ink sm:text-[14px]" title={n.title}>{shortTitle(n.title)}</p>
-                      {n.body && <p className="mt-0.5 line-clamp-3 text-[12px] leading-snug text-gc-ink-muted sm:text-[13px]">{n.body}</p>}
+                      <div className="flex items-baseline justify-between gap-2">
+                        <p className="min-w-0 truncate text-[13px] text-gc-ink sm:text-[14px]" title={n.title}>{shortTitle(n.title)}</p>
+                        <span className="shrink-0 text-[11px] text-gc-ink-muted sm:text-[12px]">
+                          {timeAgo(n.created_at)}
+                        </span>
+                      </div>
+                      {n.body && <p className="mt-0.5 line-clamp-2 text-[12px] leading-snug text-gc-ink-muted sm:text-[13px]">{n.body}</p>}
                     </div>
-                    <span className="shrink-0 text-[11px] text-gc-ink-muted sm:text-[12px]">
-                      {timeAgo(n.created_at)}
-                    </span>
                   </div>
                 );
               })
