@@ -155,7 +155,8 @@ function BotUsagePage() {
                   </thead>
                   <tbody>
                     {view.latestList.map((r) => {
-                      const online = Date.now() - Date.parse(r.updated_at) < ONLINE_MS;
+                      const lastSession = (data?.sessions ?? []).find((x) => x.mt5_account === r.mt5_account);
+                      const online = Date.now() - Date.parse(r.updated_at) < ONLINE_MS && !lastSession?.ended_at;
                       return (
                         <tr key={r.license_id} className="border-b border-border last:border-0">
                           <td className="py-2.5">{r.mt5_account}<span className="ml-2 text-muted-foreground">{r.symbol}</span></td>
@@ -237,7 +238,7 @@ function OnOffLog({ sessions }: { sessions: BotSessionRow[] }) {
   const now = Date.now();
   return (
     <div className="p-5">
-      <h2 className="text-[13px] text-foreground">Bot ON / OFF · last 3 days (UTC)</h2>
+      <h2 className="keep-case text-[13px] text-foreground">Bot ON / OFF · last 3 days (UTC)</h2>
       {sessions.length === 0 ? (
         <p className="mt-3 text-[12px] text-muted-foreground">No ON/OFF records yet. They appear once the latest bot is running.</p>
       ) : (
