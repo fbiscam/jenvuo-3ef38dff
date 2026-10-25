@@ -32,13 +32,13 @@ export const Route = createFileRoute("/killzones")({
 
 const MONO = "font-['Google_Sans','Product_Sans','Roboto',system-ui,sans-serif] font-normal normal-case tracking-normal";
 
-type Category = "XAU";
+type Category = "FX";
 
 const META: Record<string, { name: string; category: Category; region: string; flag: string }> = {
   EURUSD: { name: "Euro / US Dollar", category: "FX", region: "London / New York", flag: "🇪🇺" },
 };
 
-const CATEGORIES: (Category | "All")[] = ["All", "XAU"];
+const CATEGORIES: (Category | "All")[] = ["All", "FX"];
 
 // Gold market: closed Fri 22:00 UTC → Sun 22:00 UTC
 function isMarketOpen(d: Date): boolean {
