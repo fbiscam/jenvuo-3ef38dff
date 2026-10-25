@@ -1136,7 +1136,7 @@ async function fetchGoldCandles(tf: string): Promise<Candle[]> {
 // Terminal chart evidence must stay on the spot-Gold scale shown by the
 // OANDA:XAUUSD embed. Never fall through to GC futures or tokenized Gold here:
 // their premium/discount can make otherwise valid pivots look incorrect.
-export type TerminalAsset = "XAUUSD" | "BTCUSD";
+export type TerminalAsset = "EURUSD" | "XAUUSD" | "BTCUSD";
 async function fetchTerminalGoldEvidenceCandles(tf: string, asset: TerminalAsset = "XAUUSD"): Promise<Candle[]> {
   // Reuse the exact chart loader: same provider priority, same spot scale,
   // real 45m aggregation from 15m bars, and last-good-chart fallback when
@@ -1558,8 +1558,56 @@ async function loadBtcTerminalChart(tf: string): Promise<TerminalChartPayload> {
   return data;
 }
 
-async function loadTerminalChart(tf: string, asset: TerminalAsset = "XAUUSD"): Promise<TerminalChartPayload> {
+async function loadEurTerminalChart(tf: string): Promise<TerminalChartPayload> {
+  const key = `EURUSD:${tf}`;
+  const hit = terminalChartCache.get(key);
+  if (hit && Date.now() - hit.at < 4000) return { ...hit.data, serverTime: Date.now() };
+  // Same session-anchored buckets as gold: 45m/2H/4H/1D built from smaller candles.
+  const fetchTf = tf === "45m" ? "15m" : tf === "2h" || tf === "4h" || tf === "1d" ? "1h" : tf;
+  const limit = tf === "45m" ? 3000 : tf === "2h" ? 2000 : tf === "4h" || tf === "1d" ? 4000 : 1000;
+  let candles: Candle[];
+  try {
+    candles = await Promise.any([
+      fetchBinanceHostDeep("data-api.binance.vision", "EURUSDT", fetchTf, limit),
+      fetchBinanceHostDeep("api.binance.com", "EURUSDT", fetchTf, limit),
+    ]);
+  } catch {
+    if (hit && Date.now() - hit.at < TERMINAL_STALE_MAX) return { ...hit.data, serverTime: Date.now() };
+    throw new Error("EUR/USD chart feed unavailable");
+  }
+  const step = TF_MS[tf] ?? TF_MS["30m"];
+  const byBucket = new Map<number, Candle>();
+  for (const c of candles) {
+    if (![c.t, c.o, c.h, c.l, c.c].every(Number.isFinite)) continue;
+    const bucket = sessionBucketMs(c.t, step);
+    const prev = byBucket.get(bucket);
+    byBucket.set(bucket, prev && fetchTf !== tf
+      ? { ...prev, h: Math.max(prev.h, c.h), l: Math.min(prev.l, c.l), c: c.c, v: (prev.v || 0) + (c.v || 0) }
+      : c);
+  }
+  const data: TerminalChartPayload = {
+    timeframe: tf,
+    asset: "EURUSD",
+    source: "binance",
+    provider: "Binance",
+    serverTime: Date.now(),
+    stepSeconds: step / 1000,
+    bars: [...byBucket.entries()].sort((a, b) => a[0] - b[0]).map(([bucket, c]) => ({
+      time: Math.floor(bucket / 1000),
+      open: c.o,
+      high: Math.max(c.h, c.o, c.c),
+      low: Math.min(c.l, c.o, c.c),
+      close: c.c,
+      volume: Number.isFinite(c.v) ? c.v : 0,
+    })),
+  };
+  terminalChartCache.set(key, { at: Date.now(), data });
+  return data;
+}
+
+async function loadTerminalChart(tf: string, asset: TerminalAsset = "EURUSD"): Promise<TerminalChartPayload> {
   if (asset === "BTCUSD") return loadBtcTerminalChart(tf);
+  if (asset === "EURUSD") return loadEurTerminalChart(tf);
   const cached = terminalChartCache.get(tf);
   // Never restore a spot-token fallback whose thin book produced giant wicks.
   const hit = cached && isTerminalGoldProvider(cached.data.provider) ? cached : undefined;
@@ -1655,7 +1703,7 @@ export const getTerminalChart = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: { timeframe: string; asset?: string }) => {
     const tf = String(d?.timeframe || "30m").toLowerCase();
-    const asset: TerminalAsset = d?.asset === "BTCUSD" ? "BTCUSD" : "XAUUSD";
+    const asset: TerminalAsset = d?.asset === "BTCUSD" ? "BTCUSD" : d?.asset === "XAUUSD" ? "XAUUSD" : "EURUSD";
     return { timeframe: TF_MS[tf] ? tf : "30m", asset };
   })
   .handler(async ({ data, context }) => {
@@ -2823,10 +2871,12 @@ export const analyzeGold = createServerFn({ method: "POST" })
       asset?: string;
     }) => ({
       timeframe: String(d?.timeframe || "15m").toLowerCase(),
-      asset: (d?.asset === "BTCUSD" ? "BTCUSD" : "XAUUSD") as TerminalAsset,
+      asset: (d?.asset === "BTCUSD" ? "BTCUSD" : d?.asset === "XAUUSD" ? "XAUUSD" : "EURUSD") as TerminalAsset,
       chartContext: (() => {
         const ctx = typeof d?.chartContext === "string" && d.chartContext.trim() ? d.chartContext.slice(0, 8000) : "";
-        if (d?.asset !== "BTCUSD") return ctx || undefined;
+        if (d?.asset === "XAUUSD") return ctx || undefined;
+        if (d?.asset !== "BTCUSD")
+          return `ACTIVE INSTRUMENT: EUR/USD (Euro / US Dollar, forex, 5-decimal prices). Every price, level, candle and plan in this conversation is EUR/USD — never quote gold prices. Gold-only rules (LBMA fix, gold correlation, gold pip buffers) do not apply; use the same SMC/ICT structure logic on EUR/USD candles with ATR-based buffers, London/New York sessions and USD/EUR news.\n${ctx}`;
         return `ACTIVE INSTRUMENT: BTC/USD (Bitcoin, 24/7 crypto). Every price, level, candle and plan in this conversation is BTC/USD — never quote gold prices. Gold-only rules (LBMA fix, gold killzone lock, DXY gold correlation, pip buffers) do not apply; use the same SMC/ICT structure logic on BTC candles with ATR-based buffers.\n${ctx}`;
       })(),
       query: String(d?.query || "Give me the best A+ setup right now"),
