@@ -42,6 +42,7 @@ export const askJenvu = createServerFn({ method: "POST" })
 
     const { getOptionalUserId } = await import("@/lib/optional-auth.server");
     const userId = await getOptionalUserId();
+    if (!userId) return { ok: false, error: "Please sign in to chat with Ask Jenvu." };
 
     const ip =
       getRequestHeader("cf-connecting-ip") ||
