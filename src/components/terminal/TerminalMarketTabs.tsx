@@ -77,7 +77,7 @@ export function TerminalSymbolHeader({
   const prev = live != null && ch != null ? live / (1 + ch / 100) : null;
   const abs = live != null && prev != null ? live - prev : null;
   const now = useClock();
-  const priceText = live != null ? num(live) : "—";
+  const priceText = live != null ? num(live, 5) : "—";
   const head = priceText.length > 5 ? priceText.slice(0, -5) : "";
   const tail = priceText.length > 5 ? priceText.slice(-5) : priceText;
 
@@ -96,7 +96,7 @@ export function TerminalSymbolHeader({
             {abs != null && (
               <p className={cn("text-[18px] font-medium tabular-nums", pctTone(abs))}>
                 {abs >= 0 ? "+" : "−"}
-                {num(Math.abs(abs))} <span className="ml-1">{abs >= 0 ? "+" : ""}{pct(ch)}</span>
+                {num(Math.abs(abs), 5)} <span className="ml-1">{abs >= 0 ? "+" : ""}{pct(ch)}</span>
               </p>
             )}
           </div>
