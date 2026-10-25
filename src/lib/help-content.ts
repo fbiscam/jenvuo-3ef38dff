@@ -46,16 +46,16 @@ export const collections: Collection[] = [
         slug: "what-is-jenvu",
         title: "What is Jenvu AI?",
         summary:
-          "Jenvu is an AI-powered trading terminal focused on XAU/USD and built on ICT and SMC playbooks.",
+          "Jenvu is an AI-powered trading terminal focused on EUR/USD and built on ICT and SMC playbooks.",
         updatedAt: "2026-06-30",
         body: [
           { type: "p", content: "Jenvu AI is a chart-aware built-in trading terminal. It analyses market structure, liquidity and bias using institutional ICT (Inner Circle Trader) and SMC (Smart Money Concepts) frameworks, then returns a clear answer with marked zones so you can see exactly what it sees." },
-          { type: "p", content: "Think of it as having a senior bullion-desk analyst on call 24/7: ask for a setup on XAU/USD and Jenvu walks the chart aloud, points out the structure shifts, marks the liquidity it's hunting, and only delivers an entry when the confluence meets its A+ bar." },
+          { type: "p", content: "Think of it as having a senior bullion-desk analyst on call 24/7: ask for a setup on EUR/USD and Jenvu walks the chart aloud, points out the structure shifts, marks the liquidity it's hunting, and only delivers an entry when the confluence meets its A+ bar." },
 
           { type: "h2", content: "What you can do with Jenvu" },
           { type: "ul", items: [
             "Chat with the terminal like a desk analyst directly from your TradingView chart.",
-            "Generate A+ setups on demand for XAU/USD.",
+            "Generate A+ setups on demand for EUR/USD.",
             "Watch the AI mark structure, FVGs, order blocks and liquidity directly on the chart.",
             "Save signals to your dashboard and receive alerts when new A+ setups are detected.",
             "Get news context, killzone awareness and bias confirmation before risking capital.",
@@ -70,7 +70,7 @@ export const collections: Collection[] = [
           { type: "ul", items: [
             "Read 'How do I create an account?' to set up your profile.",
             "Open 'Generate your first signal' for a 3-click walkthrough.",
-            "Read 'Which asset does Jenvu support?' for details about its XAU/USD-only focus.",
+            "Read 'Which asset does Jenvu support?' for details about its EUR/USD-only focus.",
           ]},
         ],
       },
@@ -111,7 +111,7 @@ export const collections: Collection[] = [
           { type: "h2", content: "Step by step" },
           { type: "ol", items: [
             "Open the Jenvu desk from your dashboard.",
-            "Confirm the instrument — XAU/USD (the only pair Jenvu trades).",
+            "Confirm the instrument — EUR/USD (the only pair Jenvu trades).",
             "Hit 'Analyze'. The terminal reads the active chart and starts building the setup.",
             "Wait while the 7-stage pipeline runs — usually 10–25 seconds.",
             "If the final score is 85+, the setup is graded A+ and entry, stop and targets appear.",
@@ -135,18 +135,18 @@ export const collections: Collection[] = [
       {
         slug: "supported-assets",
         title: "Supported asset",
-        summary: "Gold only — XAU/USD, nothing else.",
+        summary: "EUR/USD only — EUR/USD, nothing else.",
         updatedAt: "2026-06-30",
         body: [
-          { type: "p", content: "Jenvu is a dedicated XAU/USD desk. The analysis engine is tuned specifically for Gold versus U.S. Dollar — including London fix mechanics, DXY correlation, COMEX/COT positioning and central-bank buying flows — and it refuses to analyze any other pair." },
+          { type: "p", content: "Jenvu is a dedicated EUR/USD desk. The analysis engine is tuned specifically for EUR/USD versus U.S. Dollar — including London fix mechanics, DXY correlation, COMEX/COT positioning and central-bank buying flows — and it refuses to analyze any other pair." },
 
           { type: "h2", content: "Supported instruments" },
-          { type: "h3", content: "Gold" },
+          { type: "h3", content: "EUR/USD" },
           { type: "ul", items: [
-            "XAU/USD — primary bullion benchmark.",
+            "EUR/USD — primary bullion benchmark.",
           ]},
 
-          { type: "note", tone: "info", content: "Ask for BTC, EUR/USD, NAS100 or any other asset and Jenvu will politely decline and redirect you to XAU/USD." },
+          { type: "note", tone: "info", content: "Ask for BTC, EUR/USD, NAS100 or any other asset and Jenvu will politely decline and redirect you to EUR/USD." },
         ],
       },
     ],
@@ -154,7 +154,7 @@ export const collections: Collection[] = [
   {
     slug: "tradingview-extension",
     title: "Built-in Trading Terminal",
-    description: "Open the terminal, chat with AI and analyze live gold charts.",
+    description: "Open the terminal, chat with AI and analyze live EUR/USD charts.",
     icon: "Puzzle",
     articles: [
       {
@@ -163,23 +163,23 @@ export const collections: Collection[] = [
         summary: "Ask general questions or request a chart analysis.",
         updatedAt: "2026-06-30",
         body: [
-          { type: "p", content: "Jenvu works like a familiar AI chat next to your gold chart. It answers normal questions conversationally and only runs the ICT/SMC engine when you ask it to analyze a chart or trading setup." },
+          { type: "p", content: "Jenvu works like a familiar AI chat next to your EUR/USD chart. It answers normal questions conversationally and only runs the ICT/SMC engine when you ask it to analyze a chart or trading setup." },
 
           { type: "h2", content: "Open the terminal" },
           { type: "ol", items: [
             "Sign in and open Dashboard → Terminal.",
-            "The live XAU/USD chart loads automatically — no install needed.",
+            "The live EUR/USD chart loads automatically — no install needed.",
             "Click 'Ask With AI' to open the AI panel.",
             "Type a question or ask Jenvu to analyze the current structure.",
           ]},
 
           { type: "h2", content: "Chat mode and analysis mode" },
-          { type: "p", content: "Greetings and general questions stay in chat mode. Requests for a setup, bias or chart review switch Jenvu into ICT/SMC mentor mode and use the live gold data as context." },
+          { type: "p", content: "Greetings and general questions stay in chat mode. Requests for a setup, bias or chart review switch Jenvu into ICT/SMC mentor mode and use the live EUR/USD data as context." },
 
           { type: "h2", content: "Ask naturally" },
           { type: "p", content: "Type into the composer and send your message. You can also attach a chart screenshot or use voice input, and ask follow-up questions in the same conversation without repeating context." },
 
-          { type: "note", tone: "tip", content: "Keep analysis requests specific — 'Review this XAU/USD structure' or 'What is the 30-minute bias?' produces the clearest result." },
+          { type: "note", tone: "tip", content: "Keep analysis requests specific — 'Review this EUR/USD structure' or 'What is the 30-minute bias?' produces the clearest result." },
         ],
       },
       {
@@ -205,7 +205,7 @@ export const collections: Collection[] = [
           ]},
 
           { type: "h2", content: "3. Supported market" },
-          { type: "p", content: "Jenvu is tuned for XAU/USD on the 30-minute timeframe. Requests about other markets stay in general chat mode." },
+          { type: "p", content: "Jenvu is tuned for EUR/USD on the 30-minute timeframe. Requests about other markets stay in general chat mode." },
 
           { type: "h2", content: "4. Still stuck" },
           { type: "p", content: "Start a new chat from the History menu in the AI panel, then retry your question. If the issue continues, contact support from the Help Center." },
@@ -222,13 +222,13 @@ export const collections: Collection[] = [
           { type: "p", content: "Jenvu understands natural language — you don't need fixed phrases. These examples are a good starting point and cover the most common workflows." },
 
           { type: "h2", content: "Analysis & setups" },
-          { type: "code", content: "“Analyze XAU/USD.”\n“Give me an A+ setup on gold.”\n“What's the XAU/USD bias right now?”\n“Walk me through the 15-minute XAU/USD structure.”" },
+          { type: "code", content: "“Analyze EUR/USD.”\n“Give me an A+ setup on EUR/USD.”\n“What's the EUR/USD bias right now?”\n“Walk me through the 15-minute EUR/USD structure.”" },
 
           { type: "h2", content: "Risk & news" },
           { type: "code", content: "“Is it safe to trade NFP today?”\n“Any high-impact news in the next hour?”\n“What killzone are we in?”" },
 
           { type: "h2", content: "ICT & SMC concepts" },
-          { type: "code", content: "“Show me the daily order block on Gold.”\n“Where is liquidity resting above price?”\n“Is this a manipulation move or a real BOS?”" },
+          { type: "code", content: "“Show me the daily order block on EUR/USD.”\n“Where is liquidity resting above price?”\n“Is this a manipulation move or a real BOS?”" },
 
           { type: "h2", content: "Account & app" },
           { type: "code", content: "“How many credits do I have left?”\n“Open my saved signals.”\n“Take me to billing.”" },
@@ -266,7 +266,7 @@ export const collections: Collection[] = [
           { type: "h2", content: "Why deterministic + LLM" },
           { type: "p", content: "Pure LLM signals hallucinate. Pure rule-based signals can't explain themselves. Jenvu's hybrid keeps the analysis grounded in measurable price action while letting the agent speak to you like a human analyst." },
 
-          { type: "note", tone: "info", content: "Scoring weights are tuned specifically for XAU/USD — DXY correlation, real yields and LBMA London fix flows carry the most weight." },
+          { type: "note", tone: "info", content: "Scoring weights are tuned specifically for EUR/USD — DXY correlation, real yields and LBMA London fix flows carry the most weight." },
         ],
       },
       {
@@ -299,7 +299,7 @@ export const collections: Collection[] = [
         summary: "You'll see a MARKET CLOSED badge — no live entries are issued.",
         updatedAt: "2026-06-30",
         body: [
-          { type: "p", content: "XAU/USD follows the OTC bullion week — Sunday open in Sydney through Friday New York close, with a daily 60-minute settlement break. When you request analysis outside its trading window, Jenvu detects it and adapts." },
+          { type: "p", content: "EUR/USD follows the OTC bullion week — Sunday open in Sydney through Friday New York close, with a daily 60-minute settlement break. When you request analysis outside its trading window, Jenvu detects it and adapts." },
 
           { type: "h2", content: "What you'll see" },
           { type: "ul", items: [
@@ -311,13 +311,13 @@ export const collections: Collection[] = [
 
           { type: "h2", content: "Sessions reference" },
           { type: "ul", items: [
-            "Spot gold: Sunday 22:00 UTC → Friday 22:00 UTC.",
-            "LBMA London gold fix: 10:30 & 15:00 GMT (highest liquidity).",
+            "Spot EUR/USD: Sunday 22:00 UTC → Friday 22:00 UTC.",
+            "LBMA London EUR/USD fix: 10:30 & 15:00 GMT (highest liquidity).",
             "COMEX open (NY AM): 12:30 – 15:00 GMT.",
             "Daily settlement break: 21:00 – 22:00 UTC.",
           ]},
 
-          { type: "note", tone: "info", content: "If you want to plan the next session in advance, ask Jenvu for 'tomorrow's London bias on XAU/USD' — it'll build a HTF read without issuing a live signal." },
+          { type: "note", tone: "info", content: "If you want to plan the next session in advance, ask Jenvu for 'tomorrow's London bias on EUR/USD' — it'll build a HTF read without issuing a live signal." },
         ],
       },
       {
@@ -406,7 +406,7 @@ export const collections: Collection[] = [
             "$10 wallet per month.",
             "AI terminal chat billed from the included wallet.",
             "Personal API keys for the Jenvu API endpoint.",
-            "Full XAU/USD signal engine.",
+            "Full EUR/USD signal engine.",
             "Realtime A+ email & push alerts (no delay).",
             "Full ICT / SMC narration, trade journal & analytics.",
             "Multi-timeframe bias engine.",
@@ -418,7 +418,7 @@ export const collections: Collection[] = [
             "$25 wallet per month.",
             "Everything in Pro, plus senior review on analysis.",
             "Priority A+ alerts (< 30 seconds).",
-            "Dedicated XAU/USD scanner with DXY overlay.",
+            "Dedicated EUR/USD scanner with DXY overlay.",
             "API access, webhooks and custom alert rules.",
             "Dedicated onboarding & SLA.",
           ]},
@@ -485,7 +485,7 @@ export const collections: Collection[] = [
           { type: "p", content: "With Terminal access you can use the chart as much as you like. Only AI features use credits, because each AI reply has a real processing cost. Every charge is checked and deducted on Jenvu's servers before an answer is returned, so it cannot be skipped from the browser." },
           { type: "h2", content: "Included with Terminal access (no credits)" },
           { type: "ul", items: [
-            "Live gold price, candles and all timeframes.",
+            "Live EUR/USD price, candles and all timeframes.",
             "Indicators (RSI, MACD, EMA, Bollinger Bands, ATR, VWAP and more).",
             "SMC tools: swings, BOS/CHoCH, supply and demand zones, fair value gaps and liquidity sweeps.",
             "Fresh sweep, Swing price action and the Zone + FVG (supply/demand) strategy.",
@@ -566,7 +566,7 @@ export const collections: Collection[] = [
           { type: "code", content: "https://jenvu.com/api/public/v1" },
 
           { type: "h2", content: "Example request" },
-          { type: "code", content: "curl https://jenvu.com/api/public/v1/chat/completions \\\n  -H \"Authorization: Bearer YOUR_JENVU_KEY\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"model\": \"claude-sonnet-4.5\",\n    \"messages\": [{\"role\": \"user\", \"content\": \"Give me the XAU/USD bias\"}]\n  }'" },
+          { type: "code", content: "curl https://jenvu.com/api/public/v1/chat/completions \\\n  -H \"Authorization: Bearer YOUR_JENVU_KEY\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"model\": \"claude-sonnet-4.5\",\n    \"messages\": [{\"role\": \"user\", \"content\": \"Give me the EUR/USD bias\"}]\n  }'" },
 
           { type: "h2", content: "Available models" },
           { type: "ul", items: [

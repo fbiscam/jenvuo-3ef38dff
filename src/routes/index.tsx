@@ -115,16 +115,16 @@ import xaiLogo from "@/assets/xai-logo.png";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "AI Gold Trading — Jenvu" },
+      { title: "AI EUR/USD Trading — Jenvu" },
       {
         name: "description",
         content:
-          "Jenvu is an AI trading terminal for live ICT/SMC gold analysis with precise entries, stops, targets and mandatory senior review on eligible plans.",
+          "Jenvu is an AI trading terminal for live ICT/SMC EUR/USD analysis with precise entries, stops, targets and mandatory senior review on eligible plans.",
       },
-      { property: "og:title", content: "AI Gold Trading — Jenvu" },
+      { property: "og:title", content: "AI EUR/USD Trading — Jenvu" },
       {
         property: "og:description",
-        content: "Analyze XAU/USD charts in TradingView with institutional ICT/SMC logic, chart-aware AI and reviewed trade signals.",
+        content: "Analyze EUR/USD charts in TradingView with institutional ICT/SMC logic, chart-aware AI and reviewed trade signals.",
       },
       { property: "og:url", content: "https://jenvu.com/" },
       { property: "og:type", content: "website" },
@@ -140,7 +140,7 @@ export const Route = createFileRoute("/")({
           applicationCategory: "FinanceApplication",
           operatingSystem: "Web",
           description:
-            "AI trading terminal with institutional ICT/SMC analysis and reviewed signals for XAU/USD.",
+            "AI trading terminal with institutional ICT/SMC analysis and reviewed signals for EUR/USD.",
           offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
         }),
       },
@@ -166,15 +166,14 @@ const SANS = "font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif]
 
 /* ---------- mock data ---------- */
 const SIGNALS = [
-  { pair: "XAUUSD", t: "14:20:02", tag: "SWEEP", note: "Liquidity grab on London high", tone: "ink" },
-  { pair: "XAUUSD", t: "14:18:45", tag: "FVG", note: "Fair Value Gap mitigated", tone: "green" },
-  { pair: "XAUUSD", t: "14:15:10", tag: "BOS", note: "Break of structure confirmed", tone: "muted" },
-  { pair: "XAUUSD", t: "14:11:32", tag: "OB", note: "Bullish order block tap", tone: "ink" },
+  { pair: "EURUSD", t: "14:20:02", tag: "SWEEP", note: "Liquidity grab on London high", tone: "ink" },
+  { pair: "EURUSD", t: "14:18:45", tag: "FVG", note: "Fair Value Gap mitigated", tone: "green" },
+  { pair: "EURUSD", t: "14:15:10", tag: "BOS", note: "Break of structure confirmed", tone: "muted" },
+  { pair: "EURUSD", t: "14:11:32", tag: "OB", note: "Bullish order block tap", tone: "ink" },
 ] as const;
 
 type TickerRow = [string, string, string];
 const INITIAL_TICKER: TickerRow[] = [
-  ["XAU/USD", "—", "…"],
   ["DXY", "—", "…"],
   ["US10Y", "—", "…"],
   ["XAG/USD", "—", "…"],
@@ -188,7 +187,6 @@ const INITIAL_TICKER: TickerRow[] = [
 // Server-fn symbol map — routes through getMarketSnapshot to bypass browser
 // CORS restrictions on Yahoo Finance and return authoritative live prices.
 const SYMBOL_MAP: Record<string, string> = {
-  "XAU/USD": "XAUUSD",
   "DXY": "DXY",
   "US10Y": "US10Y",
   "XAG/USD": "XAGUSD",
@@ -363,7 +361,7 @@ function Sparkline({ series, up }: { series: number[]; up: boolean }) {
 function HomePage() {
   const ticker = useLiveTicker();
   
-  const xau = ticker.find((r) => r[0] === "XAU/USD");
+  const xau = ticker.find((r) => r[0] === "EUR/USD");
   const currentPlan = useCurrentPlan();
   const upgradeLock = useUpgradeLock();
   const trial = useTrial();

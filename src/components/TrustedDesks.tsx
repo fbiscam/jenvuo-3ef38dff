@@ -65,7 +65,7 @@ const DESKS: Desk[] = [
     brandClass: "td-brand-webull",
     avatar: face3,
     quote:
-      "London and New York killzones are covered without a single missed sweep. It's like having a senior gold analyst on the mic all session.",
+      "London and New York killzones are covered without a single missed sweep. It's like having a senior EUR/USD analyst on the mic all session.",
     author: "Marcus Feld",
     role: "Senior Trader, Webull",
     performance: [21, 25, 23, 30, 36, 41, 48, 55, 53, 64, 73, 84],
@@ -123,7 +123,7 @@ const DESKS: Desk[] = [
     icon: SiRevolut,
     brandClass: "td-brand-revolut",
     avatar: face2,
-    quote: "JENVU turns a crowded gold chart into a clear sequence of structure, liquidity and risk decisions.",
+    quote: "JENVU turns a crowded EUR/USD chart into a clear sequence of structure, liquidity and risk decisions.",
     author: "Maya Foster",
     role: "Markets Product, Revolut",
     performance: [14, 18, 24, 30, 28, 37, 43, 51, 60, 67, 74, 83],
@@ -258,7 +258,7 @@ export default function TrustedDesks() {
   return (
     <div className="mx-auto max-w-6xl px-5 py-16 sm:px-6 sm:py-24">
       <h2 className="mx-auto max-w-3xl text-center text-3xl font-semibold tracking-tight text-zinc-900 sm:text-4xl md:text-[44px] md:leading-[1.1]">
-        JENVU powers desks trading in gold
+        JENVU powers desks trading EUR/USD
       </h2>
       <p className="mt-4 text-center text-[15px] leading-relaxed text-zinc-500 sm:text-base">
         Trusted by the traders you trust.

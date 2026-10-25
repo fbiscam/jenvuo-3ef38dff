@@ -46,18 +46,18 @@ export const Route = createFileRoute("/insights/")({
       {
         name: "description",
         content:
-          "Our insights — daily gold analysis, ICT and SMC briefings, and institutional market updates narrated by the Jenvu terminal engine.",
+          "Our insights — daily EUR/USD analysis, ICT and SMC briefings, and institutional market updates narrated by the Jenvu terminal engine.",
       },
       { property: "og:title", content: "Our Insights — Jenvu" },
       {
         property: "og:description",
-        content: "Daily gold analysis, ICT and SMC briefings, and institutional market updates from the Jenvu desk.",
+        content: "Daily EUR/USD analysis, ICT and SMC briefings, and institutional market updates from the Jenvu desk.",
       },
       { property: "og:url", content: "https://blogs.jenvu.com/" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "Our Insights — Jenvu" },
-      { name: "twitter:description", content: "Daily gold analysis, ICT and SMC briefings from the Jenvu desk." },
+      { name: "twitter:description", content: "Daily EUR/USD analysis, ICT and SMC briefings from the Jenvu desk." },
     ],
     links: [{ rel: "canonical", href: "https://blogs.jenvu.com/" }],
     scripts: [
@@ -68,7 +68,7 @@ export const Route = createFileRoute("/insights/")({
           "@type": "CollectionPage",
           name: "Market Insights",
           description:
-            "Daily gold analysis, ICT and SMC briefings, and institutional market updates from the Jenvu desk.",
+            "Daily EUR/USD analysis, ICT and SMC briefings, and institutional market updates from the Jenvu desk.",
           url: "https://blogs.jenvu.com/",
           isPartOf: { "@type": "WebSite", name: "Jenvu", url: "https://jenvu.com/" },
         }),
@@ -115,13 +115,13 @@ function InsightsPage() {
   const [page, setPage] = useState(1);
   const filters: { id: typeof filter; label: string }[] = [
     { id: "latest", label: "Latest" },
-    { id: "gold", label: "Gold" },
+    { id: "gold", label: "EUR/USD" },
     { id: "macro", label: "Macro" },
   ];
 
   const filtered = useMemo(() => {
     if (filter === "latest") return insights;
-    const goldCats = ["gold", "analysis", "ict", "smc", "strategy", "institutional"];
+    const goldCats = ["gold", "eur/usd", "forex", "analysis", "ict", "smc", "strategy", "institutional"];
     const macroCats = ["market news", "education", "ai"];
     const match = filter === "gold" ? goldCats : macroCats;
     return insights.filter((i) => match.includes((i.category || "").toLowerCase()));
@@ -166,7 +166,7 @@ function InsightsPage() {
         <section className="mx-auto max-w-[1200px] px-5 pb-6 pt-14 text-center sm:px-8 sm:pt-16">
           <img src="/favicon.png" alt="" width={56} height={56} className="mx-auto h-14 w-14 object-contain" />
           <h1 className="mx-auto mt-5 max-w-[960px] text-[34px] font-medium leading-[1.15] tracking-[-0.5px] text-gc-ink sm:text-[50px]">
-            <span className="text-gc-blue">News, tips, and insights</span> to sharpen your gold trading
+            <span className="text-gc-blue">News, tips, and insights</span> to sharpen your EUR/USD trading
           </h1>
           <div className="mt-8 flex flex-wrap justify-center gap-2" role="tablist" aria-label="Filter articles">
             {filters.map((f) => {
@@ -219,7 +219,7 @@ function InsightsPage() {
           <section className="mb-16 rounded-3xl bg-gc-canvas px-6 py-10 sm:px-12">
             <h2 className="text-[22px] font-medium text-gc-ink">News in short</h2>
             <p className="mt-2 max-w-[720px] text-[16px] leading-[1.6] text-gc-ink-muted">
-              A quick take on gold briefings, product updates and trading guides from Jenvu in one handy place. Updated daily.
+              A quick take on EUR/USD briefings, product updates and trading guides from Jenvu in one handy place. Updated daily.
             </p>
             <a href="#subscribe" className="mt-6 inline-flex h-11 items-center rounded-full border border-gc-ink-muted px-6 text-[15px] font-medium text-gc-blue hover:bg-background">
               Click here
@@ -227,7 +227,7 @@ function InsightsPage() {
           </section>
 
           <h2 className="border-b border-gc-line pb-6 text-[26px] font-normal text-gc-ink sm:text-[30px]">
-            {filter === "latest" ? "All stories" : filter === "gold" ? "Gold analysis" : "Macro and education"}
+            {filter === "latest" ? "All stories" : filter === "gold" ? "EUR/USD analysis" : "Macro and education"}
           </h2>
 
           <div>
@@ -295,7 +295,7 @@ function InsightsPage() {
           <section id="subscribe" className="mt-20 scroll-mt-24 rounded-3xl bg-gc-canvas px-6 py-12 text-center sm:px-12">
             <h2 className="text-[26px] font-normal leading-[1.25] text-gc-ink sm:text-[32px]">Get new articles by email</h2>
             <p className="mx-auto mb-8 mt-3 max-w-xl text-[15px] leading-[1.6] text-gc-ink-muted">
-              One short email when a new gold briefing goes live. Unsubscribe any time.
+              One short email when a new EUR/USD briefing goes live. Unsubscribe any time.
             </p>
             <SubscribeForm />
           </section>
