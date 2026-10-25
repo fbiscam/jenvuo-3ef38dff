@@ -56,3 +56,9 @@ export function evaluateLicense(key: string, account: string, lic: Lic | null, s
     bind: !lic.mt5_account,
   };
 }
+
+/** Plan daily target is shared by every account on the plan: stop all bots once their combined profit today reaches it. */
+export function sharedTargetStatus(dailyTarget: number, todayProfits: number[], anyHit = false) {
+  const combined = Math.round(todayProfits.reduce((a, b) => a + (Number.isFinite(b) ? b : 0), 0) * 100) / 100;
+  return { combined, stop: anyHit || (dailyTarget > 0 && combined >= dailyTarget) };
+}

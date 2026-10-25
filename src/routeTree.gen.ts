@@ -59,6 +59,7 @@ import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authe
 import { Route as AuthenticatedDashboardAnalyticsRouteImport } from './routes/_authenticated/dashboard.analytics'
 import { Route as AuthenticatedDashboardApiRouteImport } from './routes/_authenticated/dashboard.api'
 import { Route as AuthenticatedDashboardBillingRouteImport } from './routes/_authenticated/dashboard.billing'
+import { Route as AuthenticatedDashboardBotUsageRouteImport } from './routes/_authenticated/dashboard.bot-usage'
 import { Route as AuthenticatedDashboardCourseRouteImport } from './routes/_authenticated/dashboard.course'
 import { Route as AuthenticatedDashboardDocumentsRouteImport } from './routes/_authenticated/dashboard.documents'
 import { Route as AuthenticatedDashboardExtensionRouteImport } from './routes/_authenticated/dashboard.extension'
@@ -101,6 +102,7 @@ import { Route as ApiPublicHooksReindexInsightsRouteImport } from './routes/api/
 import { Route as ApiPublicHooksScanSignalsRouteImport } from './routes/api/public/hooks/scan-signals'
 import { Route as ApiPublicHooksSignalReversalMonitorRouteImport } from './routes/api/public/hooks/signal-reversal-monitor'
 import { Route as ApiPublicInsightImageSplatRouteImport } from './routes/api/public/insight-image.$'
+import { Route as ApiPublicLicensesReportRouteImport } from './routes/api/public/licenses/report'
 import { Route as ApiPublicLicensesValidateRouteImport } from './routes/api/public/licenses/validate'
 import { Route as ApiPublicV1ModelsRouteImport } from './routes/api/public/v1/models'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
@@ -363,6 +365,12 @@ const AuthenticatedDashboardBillingRoute =
     path: '/billing',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
+const AuthenticatedDashboardBotUsageRoute =
+  AuthenticatedDashboardBotUsageRouteImport.update({
+    id: '/bot-usage',
+    path: '/bot-usage',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
 const AuthenticatedDashboardCourseRoute =
   AuthenticatedDashboardCourseRouteImport.update({
     id: '/course',
@@ -610,6 +618,11 @@ const ApiPublicInsightImageSplatRoute =
     path: '/api/public/insight-image/$',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicLicensesReportRoute = ApiPublicLicensesReportRouteImport.update({
+  id: '/api/public/licenses/report',
+  path: '/api/public/licenses/report',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicLicensesValidateRoute =
   ApiPublicLicensesValidateRouteImport.update({
     id: '/api/public/licenses/validate',
@@ -693,6 +706,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
   '/dashboard/api': typeof AuthenticatedDashboardApiRoute
   '/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
+  '/dashboard/bot-usage': typeof AuthenticatedDashboardBotUsageRoute
   '/dashboard/course': typeof AuthenticatedDashboardCourseRoute
   '/dashboard/documents': typeof AuthenticatedDashboardDocumentsRoute
   '/dashboard/extension': typeof AuthenticatedDashboardExtensionRoute
@@ -736,6 +750,7 @@ export interface FileRoutesByFullPath {
   '/api/public/hooks/scan-signals': typeof ApiPublicHooksScanSignalsRoute
   '/api/public/hooks/signal-reversal-monitor': typeof ApiPublicHooksSignalReversalMonitorRoute
   '/api/public/insight-image/$': typeof ApiPublicInsightImageSplatRoute
+  '/api/public/licenses/report': typeof ApiPublicLicensesReportRoute
   '/api/public/licenses/validate': typeof ApiPublicLicensesValidateRoute
   '/api/public/v1/models': typeof ApiPublicV1ModelsRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
@@ -788,6 +803,7 @@ export interface FileRoutesByTo {
   '/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
   '/dashboard/api': typeof AuthenticatedDashboardApiRoute
   '/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
+  '/dashboard/bot-usage': typeof AuthenticatedDashboardBotUsageRoute
   '/dashboard/course': typeof AuthenticatedDashboardCourseRoute
   '/dashboard/documents': typeof AuthenticatedDashboardDocumentsRoute
   '/dashboard/extension': typeof AuthenticatedDashboardExtensionRoute
@@ -831,6 +847,7 @@ export interface FileRoutesByTo {
   '/api/public/hooks/scan-signals': typeof ApiPublicHooksScanSignalsRoute
   '/api/public/hooks/signal-reversal-monitor': typeof ApiPublicHooksSignalReversalMonitorRoute
   '/api/public/insight-image/$': typeof ApiPublicInsightImageSplatRoute
+  '/api/public/licenses/report': typeof ApiPublicLicensesReportRoute
   '/api/public/licenses/validate': typeof ApiPublicLicensesValidateRoute
   '/api/public/v1/models': typeof ApiPublicV1ModelsRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
@@ -889,6 +906,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
   '/_authenticated/dashboard/api': typeof AuthenticatedDashboardApiRoute
   '/_authenticated/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
+  '/_authenticated/dashboard/bot-usage': typeof AuthenticatedDashboardBotUsageRoute
   '/_authenticated/dashboard/course': typeof AuthenticatedDashboardCourseRoute
   '/_authenticated/dashboard/documents': typeof AuthenticatedDashboardDocumentsRoute
   '/_authenticated/dashboard/extension': typeof AuthenticatedDashboardExtensionRoute
@@ -932,6 +950,7 @@ export interface FileRoutesById {
   '/api/public/hooks/scan-signals': typeof ApiPublicHooksScanSignalsRoute
   '/api/public/hooks/signal-reversal-monitor': typeof ApiPublicHooksSignalReversalMonitorRoute
   '/api/public/insight-image/$': typeof ApiPublicInsightImageSplatRoute
+  '/api/public/licenses/report': typeof ApiPublicLicensesReportRoute
   '/api/public/licenses/validate': typeof ApiPublicLicensesValidateRoute
   '/api/public/v1/models': typeof ApiPublicV1ModelsRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
@@ -990,6 +1009,7 @@ export interface FileRouteTypes {
     | '/dashboard/analytics'
     | '/dashboard/api'
     | '/dashboard/billing'
+    | '/dashboard/bot-usage'
     | '/dashboard/course'
     | '/dashboard/documents'
     | '/dashboard/extension'
@@ -1033,6 +1053,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/scan-signals'
     | '/api/public/hooks/signal-reversal-monitor'
     | '/api/public/insight-image/$'
+    | '/api/public/licenses/report'
     | '/api/public/licenses/validate'
     | '/api/public/v1/models'
     | '/lovable/email/auth/preview'
@@ -1085,6 +1106,7 @@ export interface FileRouteTypes {
     | '/dashboard/analytics'
     | '/dashboard/api'
     | '/dashboard/billing'
+    | '/dashboard/bot-usage'
     | '/dashboard/course'
     | '/dashboard/documents'
     | '/dashboard/extension'
@@ -1128,6 +1150,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/scan-signals'
     | '/api/public/hooks/signal-reversal-monitor'
     | '/api/public/insight-image/$'
+    | '/api/public/licenses/report'
     | '/api/public/licenses/validate'
     | '/api/public/v1/models'
     | '/lovable/email/auth/preview'
@@ -1185,6 +1208,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/analytics'
     | '/_authenticated/dashboard/api'
     | '/_authenticated/dashboard/billing'
+    | '/_authenticated/dashboard/bot-usage'
     | '/_authenticated/dashboard/course'
     | '/_authenticated/dashboard/documents'
     | '/_authenticated/dashboard/extension'
@@ -1228,6 +1252,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/scan-signals'
     | '/api/public/hooks/signal-reversal-monitor'
     | '/api/public/insight-image/$'
+    | '/api/public/licenses/report'
     | '/api/public/licenses/validate'
     | '/api/public/v1/models'
     | '/lovable/email/auth/preview'
@@ -1290,6 +1315,7 @@ export interface RootRouteChildren {
   ApiPublicHooksScanSignalsRoute: typeof ApiPublicHooksScanSignalsRoute
   ApiPublicHooksSignalReversalMonitorRoute: typeof ApiPublicHooksSignalReversalMonitorRoute
   ApiPublicInsightImageSplatRoute: typeof ApiPublicInsightImageSplatRoute
+  ApiPublicLicensesReportRoute: typeof ApiPublicLicensesReportRoute
   ApiPublicLicensesValidateRoute: typeof ApiPublicLicensesValidateRoute
   ApiPublicV1ModelsRoute: typeof ApiPublicV1ModelsRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
@@ -1650,6 +1676,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardBillingRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
+    '/_authenticated/dashboard/bot-usage': {
+      id: '/_authenticated/dashboard/bot-usage'
+      path: '/bot-usage'
+      fullPath: '/dashboard/bot-usage'
+      preLoaderRoute: typeof AuthenticatedDashboardBotUsageRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
     '/_authenticated/dashboard/course': {
       id: '/_authenticated/dashboard/course'
       path: '/course'
@@ -1944,6 +1977,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicInsightImageSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/licenses/report': {
+      id: '/api/public/licenses/report'
+      path: '/api/public/licenses/report'
+      fullPath: '/api/public/licenses/report'
+      preLoaderRoute: typeof ApiPublicLicensesReportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/licenses/validate': {
       id: '/api/public/licenses/validate'
       path: '/api/public/licenses/validate'
@@ -1993,6 +2033,7 @@ interface AuthenticatedDashboardRouteChildren {
   AuthenticatedDashboardAnalyticsRoute: typeof AuthenticatedDashboardAnalyticsRoute
   AuthenticatedDashboardApiRoute: typeof AuthenticatedDashboardApiRoute
   AuthenticatedDashboardBillingRoute: typeof AuthenticatedDashboardBillingRoute
+  AuthenticatedDashboardBotUsageRoute: typeof AuthenticatedDashboardBotUsageRoute
   AuthenticatedDashboardCourseRoute: typeof AuthenticatedDashboardCourseRoute
   AuthenticatedDashboardDocumentsRoute: typeof AuthenticatedDashboardDocumentsRoute
   AuthenticatedDashboardExtensionRoute: typeof AuthenticatedDashboardExtensionRoute
@@ -2026,6 +2067,7 @@ const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
     AuthenticatedDashboardAnalyticsRoute: AuthenticatedDashboardAnalyticsRoute,
     AuthenticatedDashboardApiRoute: AuthenticatedDashboardApiRoute,
     AuthenticatedDashboardBillingRoute: AuthenticatedDashboardBillingRoute,
+    AuthenticatedDashboardBotUsageRoute: AuthenticatedDashboardBotUsageRoute,
     AuthenticatedDashboardCourseRoute: AuthenticatedDashboardCourseRoute,
     AuthenticatedDashboardDocumentsRoute: AuthenticatedDashboardDocumentsRoute,
     AuthenticatedDashboardExtensionRoute: AuthenticatedDashboardExtensionRoute,
@@ -2185,6 +2227,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicHooksSignalReversalMonitorRoute:
     ApiPublicHooksSignalReversalMonitorRoute,
   ApiPublicInsightImageSplatRoute: ApiPublicInsightImageSplatRoute,
+  ApiPublicLicensesReportRoute: ApiPublicLicensesReportRoute,
   ApiPublicLicensesValidateRoute: ApiPublicLicensesValidateRoute,
   ApiPublicV1ModelsRoute: ApiPublicV1ModelsRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,

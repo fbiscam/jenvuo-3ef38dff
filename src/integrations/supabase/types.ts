@@ -2001,6 +2001,54 @@ export type Database = {
         }
         Relationships: []
       }
+      mt5_bot_reports: {
+        Row: {
+          balance: number
+          day: string
+          equity: number
+          license_id: string
+          mt5_account: string
+          open_lots: number
+          open_trades: number
+          symbol: string
+          target_hit: boolean
+          today_profit: number
+          trades_today: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          balance?: number
+          day: string
+          equity?: number
+          license_id: string
+          mt5_account: string
+          open_lots?: number
+          open_trades?: number
+          symbol?: string
+          target_hit?: boolean
+          today_profit?: number
+          trades_today?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          balance?: number
+          day?: string
+          equity?: number
+          license_id?: string
+          mt5_account?: string
+          open_lots?: number
+          open_trades?: number
+          symbol?: string
+          target_hit?: boolean
+          today_profit?: number
+          trades_today?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       mt5_licenses: {
         Row: {
           created_at: string

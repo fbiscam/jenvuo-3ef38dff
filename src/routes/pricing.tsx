@@ -55,7 +55,7 @@ type Mark = boolean | string;
 const COMPARE: ReadonlyArray<{ f: string; b: Mark; c: Mark; d: Mark }> = [
   { f: "JX Bot MT5 licenses", b: "1", c: "2", d: "5" },
   { f: "JX Bot monthly profit target", b: "$600", c: "$1,500", d: "$3,000" },
-  { f: "JX Bot daily target (monthly / 20)", b: "$30", c: "$75", d: "$150" },
+  { f: "JX Bot daily target, shared by all licenses", b: "$30", c: "$75", d: "$150" },
   { f: "Daily auto-stop at target", b: true, c: true, d: true },
   { f: "JX Bot download, presets & updates", b: true, c: true, d: true },
   { f: "Monthly AI wallet", b: "$10", c: "$25", d: "$50" },
