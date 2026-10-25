@@ -70,14 +70,9 @@ export const Route = createFileRoute("/api/public/licenses/report")({
             { onConflict: "license_id,day" },
           );
 
-          // Combined profit across this user's active licenses today.
-          const { data: active } = await db.from("mt5_licenses").select("id").eq("user_id", lic.user_id).is("revoked_at", null);
-          const ids = (active ?? []).map((x: any) => x.id);
-          const { data: rows } = await db.from("mt5_bot_reports").select("today_profit,target_hit").eq("user_id", lic.user_id).eq("day", day).in("license_id", ids);
-          const list = rows ?? [];
-          const s = sharedTargetStatus(r.daily_target, list.map((x: any) => Number(x.today_profit)), list.some((x: any) => x.target_hit));
-          if (s.stop) await db.from("mt5_bot_reports").update({ target_hit: true }).eq("user_id", lic.user_id).eq("day", day);
-          return ok({ valid: true, daily_target: r.daily_target, combined_profit: s.combined, stop: s.stop });
+          // Each license has its own daily target: only this account's profit today counts.
+          const s = sharedTargetStatus(r.daily_target, [num(body?.today_profit)], body?.target_hit === true);
+          return ok({ valid: true, daily_target: r.daily_target, profit: s.combined, stop: s.stop });
         } catch {
           return ok({ valid: false, reason: "server_error" });
         }
