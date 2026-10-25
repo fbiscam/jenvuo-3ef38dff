@@ -240,7 +240,7 @@ function OnOffLog({ sessions }: { sessions: BotSessionRow[] }) {
   const now = Date.now();
   return (
     <div className="p-5">
-      <h2 className="keep-case text-[13px] text-foreground">Bot ON / OFF · last 3 days (UTC)</h2>
+      <div className="text-[13px] font-semibold text-foreground">Bot ON / OFF · last 3 days (UTC)</div>
       {sessions.length === 0 ? (
         <p className="mt-3 text-[12px] text-muted-foreground">No ON/OFF records yet. They appear once the latest bot is running.</p>
       ) : (
