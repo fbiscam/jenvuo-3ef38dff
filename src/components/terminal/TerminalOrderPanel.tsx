@@ -7,7 +7,7 @@ import { XauUsdLogo } from "./XauUsdLogo";
 
 const HIDE_BALANCE_KEY = "jenvu:terminal:hide-balance:v1";
 /** One standard gold lot = 100 troy ounces. */
-export const OZ_PER_LOT = 100;
+export const OZ_PER_LOT = 100_000;
 
 const num = (v: number, d = 2) => v.toLocaleString("en-US", { minimumFractionDigits: d, maximumFractionDigits: d });
 const MASK = "••••••";
@@ -187,7 +187,7 @@ export function TerminalOrderPanel({ trading, price, footer }: { trading: DemoTr
           </button>
         </div>
         <p className="mt-1 text-[10px] text-gc-ink-muted">
-          {(lotValue * OZ_PER_LOT).toFixed(0)} oz · margin {price ? `$${num((lotValue * OZ_PER_LOT * price) / DEMO_LEVERAGE)}` : "—"} ({DEMO_LEVERAGE}x)
+          {(lotValue * OZ_PER_LOT).toFixed(0)} units · margin {price ? `$${num((lotValue * OZ_PER_LOT * price) / DEMO_LEVERAGE)}` : "—"} ({DEMO_LEVERAGE}x)
         </p>
 
         <label className="mt-3 block text-[12px] text-gc-ink-muted">

@@ -213,7 +213,7 @@ export function OrderTicket({ side, onSideChange, onClose, price, trading, onPla
     const base = side === "buy" ? price + DEMO_SPREAD / 2 : price - DEMO_SPREAD / 2;
     setTp((base + dir * base * 0.003).toFixed(5));
     setSl((base - dir * base * 0.0015).toFixed(5));
-    if (type !== "market") setLimitPrice((base + (type === "limit" ? -dir : dir) * 2).toFixed(2));
+    if (type !== "market") setLimitPrice((base + (type === "limit" ? -dir : dir) * 0.002).toFixed(5));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [side, type]);
 
