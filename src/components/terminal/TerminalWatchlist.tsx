@@ -29,9 +29,14 @@ type WatchItem = {
 
 const GROUPS: Array<{ label: string; items: WatchItem[] }> = [
   {
+    label: "Forex",
+    items: [
+      { symbol: "EURUSD", name: "Euro / U.S. Dollar", logo: "xau", chartable: "EURUSD" },
+    ],
+  },
+  {
     label: "Metals",
     items: [
-      { symbol: "EURUSD", name: "Gold Spot / U.S. Dollar", logo: "xau", chartable: "EURUSD" },
       { symbol: "XAGUSD", name: "Silver / U.S. Dollar", logo: xagLogo },
     ],
   },
