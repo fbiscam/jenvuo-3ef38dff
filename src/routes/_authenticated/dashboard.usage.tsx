@@ -24,6 +24,7 @@ import {
 } from "recharts";
 import { getUsageStats } from "@/lib/usage.functions";
 import { Button } from "@/components/ui/button";
+import { UsageTabs } from "@/components/dashboard/UsageTabs";
 import chatGptLogoAsset from "@/assets/chatgpt-logo.png.asset.json";
 import solLogoAsset from "@/assets/sol-logo.png.asset.json";
 
@@ -1506,13 +1507,3 @@ function MiniLine({
   );
 }
 
-export function UsageTabs({ active }: { active: "usage" | "bot" }) {
-  const cls = (on: boolean) =>
-    `rounded-full px-3 py-1.5 text-[14px] font-medium transition-colors ${on ? "bg-secondary text-foreground" : "text-muted-foreground hover:text-foreground"}`;
-  return (
-    <nav className="flex items-center gap-1" aria-label="Usage sections">
-      <Link to="/dashboard/usage" className={cls(active === "usage")}>Usage</Link>
-      <Link to="/dashboard/bot-usage" className={cls(active === "bot")}>Bot Usage</Link>
-    </nav>
-  );
-}
