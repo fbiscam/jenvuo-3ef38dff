@@ -20,6 +20,29 @@ export function generateExtensionKey(): string {
   return `${EXT_KEY_PREFIX}${body}`
 }
 
+async function cipherKey(): Promise<CryptoKey> {
+  const secret = process.env['API_KEY_ENCRYPTION_SECRET']
+  if (!secret) throw new Error('Key encryption is not configured.')
+  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(secret))
+  return crypto.subtle.importKey('raw', digest, 'AES-GCM', false, ['encrypt', 'decrypt'])
+}
+
+const toB64 = (b: Uint8Array) => btoa(String.fromCharCode(...b))
+const fromB64 = (s: string) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0))
+
+/** Encrypts a raw API key (AES-GCM) so its owner can copy it again later. */
+export async function encryptExtensionKey(raw: string): Promise<string> {
+  const iv = crypto.getRandomValues(new Uint8Array(12))
+  const ct = new Uint8Array(await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, await cipherKey(), new TextEncoder().encode(raw)))
+  return `${toB64(iv)}.${toB64(ct)}`
+}
+
+export async function decryptExtensionKey(payload: string): Promise<string> {
+  const [iv, ct] = payload.split('.')
+  const pt = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: fromB64(iv) }, await cipherKey(), fromB64(ct))
+  return new TextDecoder().decode(pt)
+}
+
 export type ExtensionAuthResult =
   | { ok: true; userId: string; keyId: string; name: string }
   | { ok: false; status: number; error: string }

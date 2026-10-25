@@ -46,7 +46,7 @@ export const createExtensionKey = createServerFn({ method: 'POST' })
     return { name: name || 'Extension key' }
   })
   .handler(async ({ data, context }) => {
-    const { generateExtensionKey, hashExtensionKey } = await import('./extension-auth.server')
+    const { generateExtensionKey, hashExtensionKey, encryptExtensionKey } = await import('./extension-auth.server')
     const client = context.supabase as any
     const access = await readAccess(client, context.userId)
     if (!access.active || access.plan === 'free' || access.keyLimit < 1) return { ok: false as const, error: 'Upgrade to Pro, Elite, or Ultra to create an extension API key.' }
@@ -62,17 +62,44 @@ export const createExtensionKey = createServerFn({ method: 'POST' })
 
     const raw = generateExtensionKey()
     const key_hash = await hashExtensionKey(raw)
+    const key_ciphertext = await encryptExtensionKey(raw)
 
     const { error } = await client.from('extension_api_keys').insert({
       user_id: context.userId,
       name: data.name,
       key_prefix: raw.slice(0, 18),
       key_hash,
+      key_ciphertext,
     })
     if (error) return { ok: false as const, error: error.message }
 
-    // The raw key is returned exactly once and never stored in plain text.
+    // Stored hashed for auth and AES-encrypted so only the owner can copy it again.
     return { ok: true as const, key: raw }
+  })
+
+export const revealExtensionKey = createServerFn({ method: 'POST' })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => {
+    const obj = (d ?? {}) as { id?: string }
+    if (!obj.id || typeof obj.id !== 'string') throw new Error('Key id is required.')
+    return { id: obj.id }
+  })
+  .handler(async ({ data, context }) => {
+    const { data: row } = await (context.supabase as any)
+      .from('extension_api_keys')
+      .select('key_ciphertext,revoked_at')
+      .eq('id', data.id)
+      .eq('user_id', context.userId)
+      .maybeSingle()
+    if (!row) return { ok: false as const, error: 'API key not found.' }
+    if (row.revoked_at) return { ok: false as const, error: 'This key is revoked.' }
+    if (!row.key_ciphertext) return { ok: false as const, error: 'This older key cannot be copied again. Create a new key.' }
+    try {
+      const { decryptExtensionKey } = await import('./extension-auth.server')
+      return { ok: true as const, key: await decryptExtensionKey(row.key_ciphertext) }
+    } catch {
+      return { ok: false as const, error: 'Could not read this key. Create a new key.' }
+    }
   })
 
 export const revokeExtensionKey = createServerFn({ method: 'POST' })
