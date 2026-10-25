@@ -39,3 +39,14 @@ describe("mt5 licenses", () => {
     expect(LICENSE_KEY_RE.test(newLicenseKey())).toBe(true);
   });
 });
+
+import { sharedTargetStatus } from "./mt5-licenses";
+describe("shared daily target", () => {
+  it("5 Ultra accounts stop together when their total reaches $150", () => {
+    expect(sharedTargetStatus(150, [30, 30, 30, 30, 29])).toEqual({ combined: 149, stop: false });
+    expect(sharedTargetStatus(150, [30, 30, 30, 30, 30]).stop).toBe(true);
+  });
+  it("stays stopped for the day once hit, even if a later total dips", () => {
+    expect(sharedTargetStatus(150, [100, 20], true).stop).toBe(true);
+  });
+});
