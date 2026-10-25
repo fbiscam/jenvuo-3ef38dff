@@ -21,17 +21,17 @@ export const DOC_GROUPS: DocGroup[] = [
       {
         id: "what-is-jenvu",
         title: "What is Jenvu",
-        keywords: "overview introduction gold xauusd platform",
+        keywords: "overview introduction EUR/USD xauusd platform",
         body: (
           <>
             <p>
-              Jenvu is an analysis platform built for one market: <strong>gold (XAU/USD)</strong>. It combines a live chart (the
+              Jenvu is an analysis platform built for one market: <strong>EUR/USD</strong>. It combines a live chart (the
               Terminal), chart markings based on ICT and Smart Money Concepts, an AI chat that explains what it sees, alerts, a demo
               trading account and a browser extension.
             </p>
             <p>The main parts of Jenvu are:</p>
             <ul>
-              <li><strong>Terminal</strong> — the live gold chart with structure, zones, fair value gaps, sweeps and volume.</li>
+              <li><strong>Terminal</strong> — the live EUR/USD chart with structure, zones, fair value gaps, sweeps and volume.</li>
               <li><strong>AI chat</strong> — ask questions about the chart and get a short, direct answer.</li>
               <li><strong>Dashboard</strong> — your account, usage, billing, API keys, notifications and settings.</li>
               <li><strong>Browser extension</strong> — Jenvu analysis next to the charts you already use.</li>
@@ -111,7 +111,7 @@ export const DOC_GROUPS: DocGroup[] = [
             <h3>Main pages</h3>
             <ul>
               <li><strong>Overview</strong> — welcome panel, shortcuts and your usage at a glance.</li>
-              <li><strong>Terminal</strong> — the live gold chart and AI chat.</li>
+              <li><strong>Terminal</strong> — the live EUR/USD chart and AI chat.</li>
               <li><strong>Usage</strong> — how much AI credit you have used.</li>
               <li><strong>API</strong> — create and manage API keys.</li>
               <li><strong>Billing</strong> — your plan, invoices and payment.</li>
@@ -283,7 +283,7 @@ export const DOC_GROUPS: DocGroup[] = [
               <li><strong>RVOL</strong> compares a candle's volume with the average of the last 20 candles.</li>
               <li>The buy/sell split is an <strong>estimate</strong> based on where the candle closed in its range.</li>
             </ul>
-            <Note>Gold trades across many venues, so volume here is not the total market's real order flow. Use it as a guide only.</Note>
+            <Note>EUR/USD trades across many venues, so volume here is not the total market's real order flow. Use it as a guide only.</Note>
           </>
         ),
       },
@@ -481,7 +481,7 @@ export const DOC_GROUPS: DocGroup[] = [
             <Term t="Sweep">Price takes a liquidity level and then comes back.</Term>
             <Term t="Swing">A turning point in price — a local high or low.</Term>
             <Term t="WAIT">The AI's answer when there isn't enough evidence for a view.</Term>
-            <Term t="XAU/USD">Gold priced in US dollars.</Term>
+            <Term t="EUR/USD">EUR/USD priced in US dollars.</Term>
           </dl>
         ),
       },

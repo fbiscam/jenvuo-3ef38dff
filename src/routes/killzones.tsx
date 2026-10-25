@@ -13,13 +13,13 @@ export const Route = createFileRoute("/killzones")({
       {
         name: "description",
         content:
-          "Live ICT/SMC killzone times for XAU/USD gold — shown in UTC and your local timezone with real-time IN/OUT status.",
+          "Live ICT/SMC killzone times for EUR/USD EUR/USD — shown in UTC and your local timezone with real-time IN/OUT status.",
       },
-      { property: "og:title", content: "Gold Killzone Times Tracker" },
+      { property: "og:title", content: "EUR/USD Killzone Times Tracker" },
       {
         property: "og:description",
         content:
-          "Live ICT/SMC killzone times for XAU/USD gold — shown in UTC and your local timezone with real-time IN/OUT status.",
+          "Live ICT/SMC killzone times for EUR/USD EUR/USD — shown in UTC and your local timezone with real-time IN/OUT status.",
       },
       { property: "og:url", content: "https://jenvu.com/killzones" },
       { property: "og:type", content: "website" },
@@ -35,7 +35,7 @@ const MONO = "font-['Google_Sans','Product_Sans','Roboto',system-ui,sans-serif] 
 type Category = "XAU";
 
 const META: Record<string, { name: string; category: Category; region: string; flag: string }> = {
-  XAUUSD: { name: "Gold / US Dollar", category: "XAU", region: "London / New York", flag: "🥇" },
+  EURUSD: { name: "EUR/USD / US Dollar", category: "XAU", region: "London / New York", flag: "🥇" },
 };
 
 const CATEGORIES: (Category | "All")[] = ["All", "XAU"];
@@ -402,7 +402,7 @@ function KillzonesPage() {
         </div>
 
         <p className="mt-10 text-center text-[13px] text-gc-ink-muted">
-          Local times are converted from UTC using your device timezone. Killzones show when gold is usually most active — they don't guarantee a setup.
+          Local times are converted from UTC using your device timezone. Killzones show when EUR/USD is usually most active — they don't guarantee a setup.
         </p>
       </main>
       <div className="hide-in-pwa"><SiteFooter /></div>

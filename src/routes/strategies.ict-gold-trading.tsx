@@ -6,9 +6,9 @@ import solLiquidity from "@/assets/industry/sol-liquidity.jpg";
 import solSessions from "@/assets/industry/sol-sessions.jpg";
 
 const URL = "https://jenvu.com/strategies/ict-gold-trading";
-const TITLE = "Solutions for Gold Traders — ICT & SMC on XAU/USD | Jenvu";
+const TITLE = "Solutions for EUR/USD Traders — ICT & SMC on EUR/USD | Jenvu";
 const DESC =
-  "Jenvu solutions for gold traders: ICT and Smart Money Concepts on XAU/USD with rule-based structure, liquidity sweeps, fair value gaps, zones and sessions.";
+  "Jenvu solutions for EUR/USD traders: ICT and Smart Money Concepts on EUR/USD with rule-based structure, liquidity sweeps, fair value gaps, zones and sessions.";
 
 export const Route = createFileRoute("/strategies/ict-gold-trading")({
   head: () => ({
@@ -31,12 +31,12 @@ export const Route = createFileRoute("/strategies/ict-gold-trading")({
 const CONTENT: IndustryContent = {
   variant: "solutions",
   heroImg: solHero,
-  pill: "Solutions for gold traders",
-  title: "Trade gold with clear, rule-based structure",
+  pill: "Solutions for EUR/USD traders",
+  title: "Trade EUR/USD with clear, rule-based structure",
   intro:
-    "Jenvu marks ICT and Smart Money Concepts on live XAU/USD candles with fixed rules, so the same chart always shows the same levels.",
+    "Jenvu marks ICT and Smart Money Concepts on live EUR/USD candles with fixed rules, so the same chart always shows the same levels.",
   heroCaption: "Structure, liquidity and zones drawn the same way every time.",
-  solutionsTitle: "Solutions for every gold trader",
+  solutionsTitle: "Solutions for every EUR/USD trader",
   solutionsIntro: "Pick the part of your process you want help with.",
   solutions: [
     {
@@ -107,13 +107,13 @@ const CONTENT: IndustryContent = {
   whyTitle: "Why traders choose Jenvu",
   why: [
     { title: "Same candles, same marks", text: "Every level comes from fixed rules, so you can trust what you see and test it again later." },
-    { title: "Built only for gold", text: "Sessions, volatility and weekend closure are tuned for XAU/USD instead of a generic market." },
+    { title: "Built only for EUR/USD", text: "Sessions, volatility and weekend closure are tuned for EUR/USD instead of a generic market." },
     { title: "AI that explains, not invents", text: "The AI reads the marks the rules draw and explains them in plain language. It does not create levels." },
     { title: "Automate with clear limits", text: "JX Bot runs on your MT5 account and pauses for the day once your daily target is reached." },
   ],
   whyCardTitle: "Rules first, AI second.",
-  whyCardText: "Jenvu does not promise profits or fixed win rates. Trading gold carries real risk.",
-  storiesTitle: "Stories from the gold desk",
+  whyCardText: "Jenvu does not promise profits or fixed win rates. Trading EUR/USD carries real risk.",
+  storiesTitle: "Stories from the EUR/USD desk",
   storySlugs: ["fresh-sweep-detection", "london-new-york-sessions", "jx-bot"],
   productsTitle: "Products that power these solutions",
   products: [

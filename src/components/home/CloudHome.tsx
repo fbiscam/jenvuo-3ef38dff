@@ -344,9 +344,9 @@ type BuildPart = string | { link: string; hash: string };
 const BUILD_ITEMS: Array<{ key: string; title: string; points: BuildPart[][] }> = [
   {
     key: "terminal",
-    title: "Gold Terminal and chart analysis",
+    title: "EUR/USD Terminal and chart analysis",
     points: [
-      ["Read live XAU/USD candles with HH, HL, LH and LL labels on our ", { link: "non-repainting gold Terminal", hash: "gold-terminal" }, ", plus BOS and CHoCH breaks that stay fixed once a candle closes"],
+      ["Read live EUR/USD candles with HH, HL, LH and LL labels on our ", { link: "non-repainting EUR/USD Terminal", hash: "gold-terminal" }, ", plus BOS and CHoCH breaks that stay fixed once a candle closes"],
       ["Spot supply and demand zones paired with ", { link: "fair value gaps", hash: "fair-value-gaps" }, ", drawn only when they score strong and kept until a clear invalidation"],
       ["Check fresh liquidity sweeps on 5M, 15M, 1H, 2H and 4H with ", { link: "fakeout filters", hash: "fakeout-filters" }, " that flag weak pokes and re-accepted levels"],
     ],
@@ -526,7 +526,7 @@ const USE_CASES: Array<{ key: string; title: string; body: string; points: strin
   {
     key: "jx-bot",
     title: "JX Bot",
-    body: "Jenvu's Expert Advisor trades XAU/USD on MetaTrader 5 and stops at the daily and monthly targets of your plan.",
+    body: "Jenvu's Expert Advisor trades EUR/USD on MetaTrader 5 and stops at the daily and monthly targets of your plan.",
     points: ["1, 2 or 5 MT5 licenses", "Daily auto-stop at target", "One-click download and setup guide"],
     Icon: Bot,
     tone: "green",

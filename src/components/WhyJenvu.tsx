@@ -84,7 +84,7 @@ export function WhyJenvu() {
             <div className="absolute bottom-8 right-6 flex max-w-[240px] items-start gap-2 rounded-xl border border-zinc-200/80 bg-white px-3.5 py-2.5 shadow-[0_6px_20px_rgba(24,24,27,0.06)]">
               <MessageSquare className="mt-0.5 h-3.5 w-3.5 shrink-0 text-zinc-400" />
               <p className="text-[11.5px] leading-snug text-zinc-500">
-                "Six tabs open, three timeframes — still no idea where gold is headed."
+                "Six tabs open, three timeframes — still no idea where EUR/USD is headed."
               </p>
             </div>
           </div>

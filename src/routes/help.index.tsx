@@ -12,7 +12,7 @@ export const Route = createFileRoute("/help/")({
     meta: [
       { title: "Help Center — Guides, FAQs & Support | Jenvu AI" },
       { name: "description", content: "Jenvu AI Help Center — guides and troubleshooting for the built-in trading terminal, ICT/SMC signal engine, billing and account security." },
-      { name: "keywords", content: "Jenvu help, Jenvu terminal support, ICT SMC signals help, gold trading AI FAQ, Jenvu billing" },
+      { name: "keywords", content: "Jenvu help, Jenvu terminal support, ICT SMC signals help, EUR/USD trading AI FAQ, Jenvu billing" },
       { property: "og:title", content: "Help Center — Jenvu AI" },
       { property: "og:description", content: "Guides, FAQs and troubleshooting for Jenvu's built-in trading terminal, signal engine and billing." },
       { property: "og:url", content: "https://support.jenvu.com/" },

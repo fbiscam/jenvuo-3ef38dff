@@ -44,7 +44,7 @@ export function DeskStatsStrip() {
 
   const items = [
     { icon: Activity, label: "Signals · 24h", value: String(last24.length) },
-    { icon: Layers, label: "Market focus", value: "XAU/USD" },
+    { icon: Layers, label: "Market focus", value: "EUR/USD" },
     {
       icon: Target,
       label: "Avg confidence",

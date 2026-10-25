@@ -30,7 +30,7 @@ function DisclaimerPage() {
       <section className="space-y-3">
         <H2>2. Trading involves substantial risk</H2>
         <UL>
-          <li>Leveraged trading in gold (XAU/USD), CFDs and futures can result in losses exceeding your initial deposit.</li>
+          <li>Leveraged trading in EUR/USD, CFDs and futures can result in losses exceeding your initial deposit.</li>
           <li>Past performance — whether of Jenvu setups, model backtests, or other traders — does not guarantee future results.</li>
           <li>You can lose all the money you allocate to trading. Never trade with capital you cannot afford to lose.</li>
         </UL>
@@ -53,7 +53,7 @@ function DisclaimerPage() {
 
       <section className="space-y-3">
         <H2>6. Regulatory notice</H2>
-        <P>Some products discussed on Jenvu (spot gold, XAU CFDs, gold futures) may be restricted or prohibited in your jurisdiction. It is your responsibility to ensure trading complies with all applicable laws and regulations.</P>
+        <P>Some products discussed on Jenvu (spot EUR/USD, XAU CFDs, EUR/USD futures) may be restricted or prohibited in your jurisdiction. It is your responsibility to ensure trading complies with all applicable laws and regulations.</P>
       </section>
 
       <section className="space-y-3">

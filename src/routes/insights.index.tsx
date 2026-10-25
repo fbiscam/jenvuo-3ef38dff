@@ -46,18 +46,18 @@ export const Route = createFileRoute("/insights/")({
       {
         name: "description",
         content:
-          "Our insights — daily gold analysis, ICT and SMC briefings, and institutional market updates narrated by the Jenvu terminal engine.",
+          "Our insights — daily EUR/USD analysis, ICT and SMC briefings, and institutional market updates narrated by the Jenvu terminal engine.",
       },
       { property: "og:title", content: "Our Insights — Jenvu" },
       {
         property: "og:description",
-        content: "Daily gold analysis, ICT and SMC briefings, and institutional market updates from the Jenvu desk.",
+        content: "Daily EUR/USD analysis, ICT and SMC briefings, and institutional market updates from the Jenvu desk.",
       },
       { property: "og:url", content: "https://blogs.jenvu.com/" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "Our Insights — Jenvu" },
-      { name: "twitter:description", content: "Daily gold analysis, ICT and SMC briefings from the Jenvu desk." },
+      { name: "twitter:description", content: "Daily EUR/USD analysis, ICT and SMC briefings from the Jenvu desk." },
     ],
     links: [{ rel: "canonical", href: "https://blogs.jenvu.com/" }],
     scripts: [
@@ -68,7 +68,7 @@ export const Route = createFileRoute("/insights/")({
           "@type": "CollectionPage",
           name: "Market Insights",
           description:
-            "Daily gold analysis, ICT and SMC briefings, and institutional market updates from the Jenvu desk.",
+            "Daily EUR/USD analysis, ICT and SMC briefings, and institutional market updates from the Jenvu desk.",
           url: "https://blogs.jenvu.com/",
           isPartOf: { "@type": "WebSite", name: "Jenvu", url: "https://jenvu.com/" },
         }),
@@ -111,7 +111,7 @@ function InsightsPage() {
     }).slice(0, 10);
   })();
 
-  const [filter, setFilter] = useState<"latest" | "gold" | "macro">("latest");
+  const [filter, setFilter] = useState<"latest" | "EUR/USD" | "macro">("latest");
   const [page, setPage] = useState(1);
   const filters: { id: typeof filter; label: string }[] = [
     { id: "latest", label: "Latest" },
@@ -121,9 +121,9 @@ function InsightsPage() {
 
   const filtered = useMemo(() => {
     if (filter === "latest") return insights;
-    const goldCats = ["gold", "analysis", "ict", "smc", "strategy", "institutional"];
+    const goldCats = ["EUR/USD", "analysis", "ict", "smc", "strategy", "institutional"];
     const macroCats = ["market news", "education", "ai"];
-    const match = filter === "gold" ? goldCats : macroCats;
+    const match = filter === "EUR/USD" ? goldCats : macroCats;
     return insights.filter((i) => match.includes((i.category || "").toLowerCase()));
   }, [insights, filter]);
 
@@ -227,7 +227,7 @@ function InsightsPage() {
           </section>
 
           <h2 className="border-b border-gc-line pb-6 text-[26px] font-normal text-gc-ink sm:text-[30px]">
-            {filter === "latest" ? "All stories" : filter === "gold" ? "Gold analysis" : "Macro and education"}
+            {filter === "latest" ? "All stories" : filter === "EUR/USD" ? "EUR/USD analysis" : "Macro and education"}
           </h2>
 
           <div>

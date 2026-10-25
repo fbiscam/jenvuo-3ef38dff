@@ -6,7 +6,7 @@ export const Route = createFileRoute("/about")({
   head: () => ({
     meta: [
       { title: "About Jenvu — Our Mission" },
-      { name: "description", content: "Meet Jenvu — the mission, philosophy and team behind the AI gold trading terminal for XAU/USD." },
+      { name: "description", content: "Meet Jenvu — the mission, philosophy and team behind the AI EUR/USD trading terminal for EUR/USD." },
       { property: "og:title", content: "Who We Are — Jenvu" },
       { property: "og:description", content: "The mission, philosophy and team behind Jenvu's AI-powered trading terminal." },
       { property: "og:url", content: "https://jenvu.com/about" },
@@ -24,10 +24,10 @@ function AboutPage() {
       wide
       eyebrow="\n"
       title="Why Jenvu"
-      intro="Jenvu was built on a simple thesis: institutional logic shouldn't be locked behind a Bloomberg terminal. We turned ICT and SMC playbooks into an AI trading terminal any serious XAU/USD trader can use directly on the chart."
+      intro="Jenvu was built on a simple thesis: institutional logic shouldn't be locked behind a Bloomberg terminal. We turned ICT and SMC playbooks into an AI trading terminal any serious EUR/USD trader can use directly on the chart."
     >
       <Feature
-        title="A new way to read gold"
+        title="A new way to read EUR/USD"
         text={
           <p>
             Give independent traders the same structural read of the market that desk
@@ -71,7 +71,7 @@ function AboutPage() {
         href="https://jenvu.com/pricing"
         stats={[
           { value: "7", label: "Deterministic trading engines" },
-          { value: "1", label: "Dedicated market: XAU/USD" },
+          { value: "1", label: "Dedicated market: EUR/USD" },
           { value: "6", label: "Checks before any setup ships" },
           { value: "14", label: "Days of Pro access in the free trial" },
           { value: "$100", label: "Free credit to get started" },

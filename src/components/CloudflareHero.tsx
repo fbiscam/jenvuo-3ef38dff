@@ -11,7 +11,7 @@ export default function CloudflareHero() {
           <div className="mx-auto inline-flex max-w-full flex-nowrap items-center justify-center gap-x-1 whitespace-nowrap rounded-md border border-primary-foreground/50 px-2 py-2.5 text-center text-[10px] leading-none text-home-accent-foreground sm:gap-x-1.5 sm:px-3 sm:py-2 sm:text-[11px]">
             <span className="font-medium">Jenvu</span>
             <span className="text-home-accent-foreground">·</span>
-            <span>AI trading terminal for XAU/USD</span>
+            <span>AI trading terminal for EUR/USD</span>
             <span className="text-home-accent-foreground">·</span>
             <span>Live 24/7</span>
             <span className="text-home-accent-foreground">·</span>

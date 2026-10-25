@@ -79,7 +79,7 @@ function SceneSweep({ t }: { t: number }) {
   );
 }
 
-const AI_Q = "Is gold bullish on 2H?";
+const AI_Q = "Is EUR/USD bullish on 2H?";
 const AI_A = "Structure is HH/HL with a fresh demand zone + bullish FVG. Wait for a 2H close above 4,180 before buying.";
 function SceneAi({ t }: { t: number }) {
   const total = AI_A.length + 18;

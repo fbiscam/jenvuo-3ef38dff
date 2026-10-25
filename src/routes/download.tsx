@@ -10,7 +10,7 @@ export const Route = createFileRoute("/download")({
       {
         name: "description",
         content:
-          "Get Jenvu on your device. Use the AI-powered gold analysis terminal with ICT/SMC chart context, reviewed signals and live alerts.",
+          "Get Jenvu on your device. Use the AI-powered EUR/USD analysis terminal with ICT/SMC chart context, reviewed signals and live alerts.",
       },
       { property: "og:title", content: "Download our app" },
       {
@@ -32,7 +32,7 @@ export const Route = createFileRoute("/download")({
           applicationCategory: "FinanceApplication",
           operatingSystem: "iOS, Android, Web",
           description:
-            "AI-powered gold chart analysis terminal with institutional ICT/SMC logic, reviewed signals and live alerts.",
+            "AI-powered EUR/USD chart analysis terminal with institutional ICT/SMC logic, reviewed signals and live alerts.",
           offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
         }),
       },

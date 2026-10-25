@@ -65,7 +65,7 @@ const DESKS: Desk[] = [
     brandClass: "td-brand-webull",
     avatar: face3,
     quote:
-      "London and New York killzones are covered without a single missed sweep. It's like having a senior gold analyst on the mic all session.",
+      "London and New York killzones are covered without a single missed sweep. It's like having a senior EUR/USD analyst on the mic all session.",
     author: "Marcus Feld",
     role: "Senior Trader, Webull",
     performance: [21, 25, 23, 30, 36, 41, 48, 55, 53, 64, 73, 84],
@@ -123,7 +123,7 @@ const DESKS: Desk[] = [
     icon: SiRevolut,
     brandClass: "td-brand-revolut",
     avatar: face2,
-    quote: "JENVU turns a crowded gold chart into a clear sequence of structure, liquidity and risk decisions.",
+    quote: "JENVU turns a crowded EUR/USD chart into a clear sequence of structure, liquidity and risk decisions.",
     author: "Maya Foster",
     role: "Markets Product, Revolut",
     performance: [14, 18, 24, 30, 28, 37, 43, 51, 60, 67, 74, 83],

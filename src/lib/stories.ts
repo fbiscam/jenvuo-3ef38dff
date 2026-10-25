@@ -87,7 +87,7 @@ export const STORIES: Story[] = [
     },
     stats: [
       { value: "7", label: "Rule-based engines behind each answer" },
-      { value: "1", label: "Market in focus: XAU/USD" },
+      { value: "1", label: "Market in focus: EUR/USD" },
       { value: "6", label: "Checks before any setup is shown" },
     ],
     cta: { label: "Learn about the AI engine", href: "https://jenvu.com/ai-engine" },
@@ -109,7 +109,7 @@ export const STORIES: Story[] = [
     },
     banner: {
       title: "An estimate, clearly labelled",
-      text: "Gold trades across many venues, so no single feed shows the whole market. Jenvu labels the buy/sell split as an estimate and uses volume for display only.",
+      text: "EUR/USD trades across many venues, so no single feed shows the whole market. Jenvu labels the buy/sell split as an estimate and uses volume for display only.",
     },
     steps: {
       title: "How to use it",
@@ -130,13 +130,13 @@ export const STORIES: Story[] = [
     slug: "daily-gold-insights",
     img: cardGold,
     tag: "\n",
-    title: "Daily XAU/USD insights and trading guides",
+    title: "Daily EUR/USD insights and trading guides",
     intro:
-      "Short daily reads on gold, plus longer guides that explain ICT and SMC ideas in simple language.",
+      "Short daily reads on EUR/USD, plus longer guides that explain ICT and SMC ideas in simple language.",
     feature: {
       title: "Learn the market one day at a time",
       text: [
-        "Each insight covers what moved gold, which levels matter, and what to watch in the next session.",
+        "Each insight covers what moved EUR/USD, which levels matter, and what to watch in the next session.",
         "Guides walk through structure, zones, fair value gaps and liquidity with clear chart examples.",
       ],
       caption: "Daily notes and guides from the Jenvu team",
@@ -148,14 +148,14 @@ export const STORIES: Story[] = [
     steps: {
       title: "What you'll find",
       points: [
-        "Daily gold market notes.",
+        "Daily EUR/USD market notes.",
         "Step-by-step ICT and SMC guides.",
         "Session and killzone explainers.",
         "A glossary of every term used on the chart.",
       ],
     },
     stats: [
-      { value: "1", label: "Market covered: XAU/USD" },
+      { value: "1", label: "Market covered: EUR/USD" },
       { value: "A–Z", label: "Glossary of chart terms" },
       { value: "Free", label: "To read for everyone" },
     ],
@@ -191,7 +191,7 @@ export const STORIES: Story[] = [
     stats: [
       { value: "1–5", label: "MT5 licenses per plan" },
       { value: "$300", label: "Daily target on Ultra" },
-      { value: "M15", label: "XAU/USD chart" },
+      { value: "M15", label: "EUR/USD chart" },
     ],
     cta: { label: "See plans", href: "https://jenvu.com/pricing" },
   },
@@ -203,7 +203,7 @@ export const STORIES: Story[] = [
     intro:
       "Founding members get early access to the Terminal and help shape what we build next.",
     feature: {
-      title: "Early access for serious gold traders",
+      title: "Early access for serious EUR/USD traders",
       text: [
         "Approved members get 3 months of their chosen plan, $250 credit and full access to the Terminal.",
         "You'll have two days to verify your ID after approval. Once your documents are in, your access continues.",
@@ -218,7 +218,7 @@ export const STORIES: Story[] = [
       title: "How to apply",
       points: [
         "Fill in the short application form.",
-        "Tell us how you trade gold today.",
+        "Tell us how you trade EUR/USD today.",
         "Wait for our review email.",
         "Verify your ID within two days of approval.",
       ],
@@ -236,18 +236,18 @@ export const STORIES: Story[] = [
     tag: "SESSIONS",
     title: "Trade the London and New York sessions with clear zones",
     intro:
-      "Gold moves most during the London and New York sessions. Jenvu marks those windows and the zones that matter inside them.",
+      "EUR/USD moves most during the London and New York sessions. Jenvu marks those windows and the zones that matter inside them.",
     feature: {
       title: "Know when the market is awake",
       text: [
         "Killzones highlight the busiest hours of each session so you can focus your attention.",
         "Supply and demand zones stay on the chart until price clearly breaks them, so you always see the latest area of interest.",
       ],
-      caption: "Session windows and active zones on the gold chart",
+      caption: "Session windows and active zones on the EUR/USD chart",
     },
     banner: {
       title: "Weekend closure handled for you",
-      text: "When the gold market is closed at the weekend, the chart shows it, and the closed-candle timer counts down to the next open.",
+      text: "When the EUR/USD market is closed at the weekend, the chart shows it, and the closed-candle timer counts down to the next open.",
     },
     steps: {
       title: "What you'll see",
@@ -261,7 +261,7 @@ export const STORIES: Story[] = [
     stats: [
       { value: "2", label: "Main sessions: London and New York" },
       { value: "4H", label: "Session-aligned candles" },
-      { value: "24/5", label: "Gold market hours" },
+      { value: "24/5", label: "EUR/USD market hours" },
     ],
     cta: { label: "Learn about killzones", href: "https://jenvu.com/killzones" },
   },
@@ -271,7 +271,7 @@ export const STORIES: Story[] = [
     tag: "DEVELOPERS",
     title: "Build with Jenvu models using API keys and the extension",
     intro:
-      "Use your own API keys to bring Jenvu's analysis into your tools, or add the browser extension to read gold charts you already use.",
+      "Use your own API keys to bring Jenvu's analysis into your tools, or add the browser extension to read EUR/USD charts you already use.",
     feature: {
       title: "Jenvu, wherever you work",
       text: [
