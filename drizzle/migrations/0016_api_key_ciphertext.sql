@@ -1,0 +1,1 @@
+ALTER TABLE public.extension_api_keys ADD COLUMN IF NOT EXISTS key_ciphertext text;
