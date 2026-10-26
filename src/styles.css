@@ -1492,3 +1492,12 @@ select:not([multiple]):not([size]) {
   background-size: 14px 14px;
   padding-right: 2.25rem;
 }
+
+/* Bot ON/OFF log: custom scroll arrows instead of the native scrollbar buttons. */
+.no-scrollbar-arrows::-webkit-scrollbar-button { display: none; height: 0; width: 0; }
+.no-scrollbar-arrows::-webkit-scrollbar { width: 8px; }
+.no-scrollbar-arrows::-webkit-scrollbar-track { background: transparent; }
+.no-scrollbar-arrows::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, 0.18); border-radius: 999px; }
+.no-scrollbar-arrows:hover::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, 0.3); }
+.dark .no-scrollbar-arrows::-webkit-scrollbar-thumb,
+.dark .no-scrollbar-arrows:hover::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); }
