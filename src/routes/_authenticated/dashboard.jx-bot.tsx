@@ -332,17 +332,15 @@ function JxBotPage() {
                 )}
               </div>
               <div className="flex items-center justify-end gap-1 md:w-16">
-                {!l.revoked_at && (
-                  <button
-                    type="button"
-                    title="Revoke license"
-                    aria-label="Revoke license"
-                    onClick={() => setRevokeTarget(l)}
-                    className="rounded-full p-2 text-zinc-500 hover:bg-rose-50 hover:text-rose-600"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </button>
-                )}
+                <button
+                  type="button"
+                  title="Delete license"
+                  aria-label="Delete license"
+                  onClick={() => setRevokeTarget(l)}
+                  className="rounded-full p-2 text-zinc-500 hover:bg-rose-50 hover:text-rose-600"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </button>
               </div>
             </div>
           ))

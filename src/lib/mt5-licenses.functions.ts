@@ -48,8 +48,10 @@ export const revokeMt5License = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ context, data }) => {
+    // Permanent delete: the row is removed, so the key stops validating at the next check.
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    await (supabaseAdmin as any).from("mt5_licenses").update({ revoked_at: new Date().toISOString() }).eq("id", data.id).eq("user_id", context.userId);
+    const { error } = await (supabaseAdmin as any).from("mt5_licenses").delete().eq("id", data.id).eq("user_id", context.userId);
+    if (error) throw new Error("Could not delete the license.");
     return { ok: true as const };
   });
 
