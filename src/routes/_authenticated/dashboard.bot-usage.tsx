@@ -326,21 +326,21 @@ function LiveTrades({ rows, sessions }: { rows: BotReportRow[]; sessions: BotSes
   const td = "px-3 py-2.5 whitespace-nowrap";
   return (
     <section className="border-b border-border">
-      <div className="flex items-end justify-between border-b border-border px-2 sm:px-4">
-        <div className="flex">
+      <div className="flex items-center justify-between border-b border-border px-4 sm:px-7">
+        <div className="flex items-center gap-7">
           {([["open", "Open", totalOpen], ["closed", "Closed today", null]] as const).map(([k, label, n]) => (
             <button
               key={k}
               type="button"
               onClick={() => setTab(k)}
-              className={`-mb-px flex items-center gap-1.5 border-b-2 px-3 py-3 text-[13px] ${tab === k ? "border-foreground text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`}
+              className={`relative flex shrink-0 items-center gap-1.5 py-3 text-[13px] ${tab === k ? "text-foreground after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 after:bg-foreground" : "text-muted-foreground hover:text-foreground"}`}
             >
               {label}
-              {n !== null && <span className="rounded-full bg-secondary px-1.5 text-[11px] tabular-nums text-foreground">{n}</span>}
+              {n !== null && <span className="rounded-full bg-secondary px-1.5 text-[11px] leading-4 tabular-nums text-foreground">{n}</span>}
             </button>
           ))}
         </div>
-        <div className="hidden pb-3 text-[12px] text-muted-foreground sm:block">
+        <div className="hidden text-[12px] text-muted-foreground sm:block">
           Floating <span className={`font-medium tabular-nums ${pnlClass(totalFloat)}`}>{usd(totalFloat)}</span>
         </div>
       </div>
