@@ -201,7 +201,7 @@ function JxBotPage() {
 
       {access && !access.allowed && (
         <div className="mt-5 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-amber-200 bg-amber-50 p-4 text-[13px] text-amber-900">
-          <span>JX Bot is included only with a paid Pro, Elite or Ultra monthly plan. Credit or a free trial does not unlock it.</span>
+          <span>JX Bot is included with Pro, Elite or Ultra, and free for 14 days with the free trial. Credit alone does not unlock it.</span>
           <Link to="/dashboard/billing" className="rounded-full border border-amber-300 bg-white px-4 py-1.5 text-[12px] font-medium text-amber-900 hover:bg-amber-100">
             Buy now
           </Link>

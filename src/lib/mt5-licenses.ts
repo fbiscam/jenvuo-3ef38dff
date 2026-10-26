@@ -37,14 +37,14 @@ export type ValidateResult =
   | { valid: true; plan: Mt5PlanId; daily_target: number; monthly_target: number; expires_at: string | null; bind: boolean }
   | { valid: false; reason: "malformed" | "not_found" | "revoked" | "mt5_mismatch" | "expired" | "no_plan" };
 
-/** Pure license check. Only a paid, active plan (not a trial, not credit) makes a key valid. */
+/** Pure license check. An active paid plan or the 14-day free trial (Pro, until it ends) makes a key valid; credit never does. */
 export function evaluateLicense(key: string, account: string, lic: Lic | null, sub: Sub, now = Date.now()): ValidateResult {
   if (!LICENSE_KEY_RE.test(key) || !MT5_ACCOUNT_RE.test(account)) return { valid: false, reason: "malformed" };
   if (!lic) return { valid: false, reason: "not_found" };
   if (lic.revoked_at) return { valid: false, reason: "revoked" };
   if (lic.mt5_account && lic.mt5_account !== account) return { valid: false, reason: "mt5_mismatch" };
   const plan = String(sub?.plan_id || "").toLowerCase();
-  const active = sub && (sub.status === "active" || sub.status === "trialing") && !sub.is_trial;
+  const active = sub && (sub.status === "active" || sub.status === "trialing");
   if (!active || !isMt5Plan(plan)) return { valid: false, reason: sub?.plan_id && plan !== "free" ? "expired" : "no_plan" };
   if (sub.current_period_end && Date.parse(sub.current_period_end) <= now) return { valid: false, reason: "expired" };
   return {

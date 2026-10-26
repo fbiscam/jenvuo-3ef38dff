@@ -25,8 +25,9 @@ describe("mt5 licenses", () => {
   it("rejects a different MT5 account", () => {
     expect(evaluateLicense(key, "999", lic, paid("pro"))).toEqual({ valid: false, reason: "mt5_mismatch" });
   });
-  it("trial does not unlock the bot", () => {
-    expect(evaluateLicense(key, "12345678", lic, { ...paid("pro"), is_trial: true }).valid).toBe(false);
+  it("14-day free trial unlocks the bot until it ends", () => {
+    expect(evaluateLicense(key, "12345678", lic, { ...paid("pro"), is_trial: true }).valid).toBe(true);
+    expect(evaluateLicense(key, "12345678", lic, { ...paid("pro"), is_trial: true, current_period_end: "2020-01-01T00:00:00Z" }).valid).toBe(false);
   });
   it("expired period is rejected", () => {
     expect(evaluateLicense(key, "12345678", lic, { ...paid("pro"), current_period_end: "2000-01-01T00:00:00Z" })).toEqual({ valid: false, reason: "expired" });

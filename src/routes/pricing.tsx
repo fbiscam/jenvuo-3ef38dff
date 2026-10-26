@@ -18,7 +18,7 @@ const LINK = "text-gc-blue-deep underline underline-offset-2 hover:text-gc-navy"
 
 export const FAQ = [
   ["Is this financial advice?", "No. Jenvu is an analysis tool. Every setup is for educational purposes and you remain responsible for your own trades."],
-  ["How does the free trial work?", "After signing up, click “Start free” in your dashboard. You get $100 credit and 14 days of Pro access, once per account."],
+  ["How does the free trial work?", "After signing up, click “Start free” in your dashboard. You get $100 credit and 14 days of Pro access, including JX Bot, once per account. When it ends, JX Bot stops until you buy a plan."],
   ["What do the plans include?", "Every plan includes JX Bot for MetaTrader 5 (1, 2 or 5 licenses) and the Top AI Models with a monthly AI wallet. Credit alone never unlocks JX Bot; it pays for API and AI use."],
   ["Who can use the Terminal?", "The Terminal is reserved for approved Founding Program members, free of cost. Pro, Elite and Ultra cover JX Bot and the Top AI Models."],
   ["Can I cancel anytime?", "Yes. Plans are month-to-month with no lock-in. You keep access until the end of the period you already paid for."],

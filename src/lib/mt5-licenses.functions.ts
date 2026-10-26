@@ -10,7 +10,7 @@ async function readPlan(userId: string) {
   const db = supabaseAdmin as any;
   const { data: sub } = await db.from("user_subscriptions").select("plan_id,status,is_trial,current_period_end").eq("user_id", userId).maybeSingle();
   const plan = String(sub?.plan_id || "free").toLowerCase();
-  const active = !!sub && (sub.status === "active" || sub.status === "trialing") && !sub.is_trial && (!sub.current_period_end || Date.parse(sub.current_period_end) > Date.now());
+  const active = !!sub && (sub.status === "active" || sub.status === "trialing") && (!sub.current_period_end || Date.parse(sub.current_period_end) > Date.now());
   const ok = active && isMt5Plan(plan);
   return { db, plan: ok ? plan : "free", allowed: ok, limit: ok ? licenseLimit(plan) : 0, expiresAt: ok ? (sub.current_period_end as string | null) : null };
 }
