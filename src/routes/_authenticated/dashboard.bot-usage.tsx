@@ -9,6 +9,7 @@ import { getBotUsage, type BotReportRow, type BotSessionRow } from "@/lib/mt5-li
 import { dailyTarget, isMt5Plan, sessionEndCause, sharedTargetStatus } from "@/lib/mt5-licenses";
 import { Button } from "@/components/ui/button";
 import { UsageTabs } from "@/components/dashboard/UsageTabs";
+import euFlag from "@/assets/watchlist/flag-eu.svg";
 
 export const Route = createFileRoute("/_authenticated/dashboard/bot-usage")({
   head: () => ({
@@ -31,7 +32,7 @@ const ONLINE_MS = 3 * 60 * 1000;
 function BotUsagePage() {
   const load = useServerFn(getBotUsage);
   const [account, setAccount] = useState("all");
-  const { data, isFetching, refetch } = useQuery({ queryKey: ["bot-usage"], queryFn: () => load(), refetchInterval: 30_000 });
+  const { data, isFetching, refetch } = useQuery({ queryKey: ["bot-usage"], queryFn: () => load(), refetchInterval: 5_000, refetchOnWindowFocus: true });
 
   const view = useMemo(() => {
     const rows: BotReportRow[] = data?.rows ?? [];
@@ -263,7 +264,7 @@ function OnOffLog({ sessions }: { sessions: BotSessionRow[] }) {
       {sessions.length === 0 ? (
         <p className="mt-3 text-[12px] text-muted-foreground">No ON/OFF records yet. They appear once the latest bot is running.</p>
       ) : (
-        <ul className="no-scrollbar-arrows mt-3 max-h-[480px] divide-y divide-border overflow-y-auto pr-2">
+        <ul className="no-scrollbar-arrows mt-3 max-h-[480px] divide-y divide-border overflow-y-auto">
           {sessions.map((x) => {
             const cause = sessionEndCause(x, now);
             const running = cause.by === "none";
@@ -272,10 +273,7 @@ function OnOffLog({ sessions }: { sessions: BotSessionRow[] }) {
               <li key={x.id} className="py-2.5 text-[12px]">
                 <div className="flex items-center justify-between gap-2">
                   <span className="text-foreground">MT5 {x.mt5_account}</span>
-                  <span className={`inline-flex items-center gap-1.5 ${running ? "text-foreground" : "text-muted-foreground"}`}>
-                    <span className={`h-1.5 w-1.5 rounded-full ${running ? "bg-primary" : "bg-muted-foreground"}`} />
-                    {running ? "ON" : "OFF"}
-                  </span>
+                  <OnOffBadge on={running} />
                 </div>
                 <div className="mt-1 tabular-nums text-muted-foreground">
                   ON {utc(x.started_at)} → {running ? "now" : `OFF ${utc(end)}`} · {dur(x.started_at, running ? new Date(now).toISOString() : end)}
@@ -295,53 +293,136 @@ function OnOffLog({ sessions }: { sessions: BotSessionRow[] }) {
   );
 }
 
-/** Live open trades per account: floating P&L is equity minus balance from the latest bot report. */
+function OnOffBadge({ on }: { on: boolean }) {
+  return on ? (
+    <span className="inline-flex items-center gap-1.5 rounded-full border border-gc-success/30 bg-gc-success/10 px-2 py-0.5 text-[11px] font-semibold text-gc-success">
+      <span className="relative flex h-1.5 w-1.5">
+        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-gc-success opacity-70" />
+        <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-gc-success" />
+      </span>
+      ON
+    </span>
+  ) : (
+    <span className="inline-flex items-center gap-1.5 rounded-full border border-destructive/30 bg-destructive/10 px-2 py-0.5 text-[11px] font-semibold text-destructive">
+      <span className="h-1.5 w-1.5 rounded-full bg-destructive" />
+      OFF
+    </span>
+  );
+}
+
+const localTime = (iso: string) =>
+  new Date(iso).toLocaleString(undefined, { month: "short", day: "numeric", hour: "numeric", minute: "2-digit", second: "2-digit" });
+const symbolLabel = (s: string) => (/EURUSD/i.test(s) || !s ? "EUR/USD" : s);
+
+/** Exness-style live positions table, one row per account (the bot reports account totals, not single trades). */
 function LiveTrades({ rows, sessions }: { rows: BotReportRow[]; sessions: BotSessionRow[] }) {
+  const [tab, setTab] = useState<"open" | "closed">("open");
   const today = new Date().toISOString().slice(0, 10);
   const live = rows.filter((r) => r.day === today);
-  const totalFloat = live.reduce((a, r) => a + (r.equity - r.balance), 0);
-  const totalOpen = live.reduce((a, r) => a + r.open_trades, 0);
+  const open = live.filter((r) => r.open_trades > 0);
+  const totalOpen = open.reduce((a, r) => a + r.open_trades, 0);
+  const totalFloat = open.reduce((a, r) => a + (r.equity - r.balance), 0);
+  const th = "px-3 py-2 font-normal whitespace-nowrap";
+  const td = "px-3 py-2.5 whitespace-nowrap";
   return (
-    <section className="border-b border-border px-4 py-5 sm:px-7">
-      <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <h2 className="flex items-center gap-2 text-[13px] text-foreground">
-          <span className={`h-1.5 w-1.5 rounded-full ${totalOpen > 0 ? "animate-pulse bg-gc-success" : "bg-muted-foreground"}`} />
-          Live trades
-        </h2>
-        <div className="text-[12px] text-muted-foreground">
-          {totalOpen} open · floating <span className={`font-medium tabular-nums ${pnlClass(totalFloat)}`}>{usd(totalFloat)}</span>
+    <section className="border-b border-border">
+      <div className="flex items-end justify-between border-b border-border px-2 sm:px-4">
+        <div className="flex">
+          {([["open", "Open", totalOpen], ["closed", "Closed today", null]] as const).map(([k, label, n]) => (
+            <button
+              key={k}
+              type="button"
+              onClick={() => setTab(k)}
+              className={`-mb-px flex items-center gap-1.5 border-b-2 px-3 py-3 text-[13px] ${tab === k ? "border-foreground text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`}
+            >
+              {label}
+              {n !== null && <span className="rounded-full bg-secondary px-1.5 text-[11px] tabular-nums text-foreground">{n}</span>}
+            </button>
+          ))}
+        </div>
+        <div className="hidden pb-3 text-[12px] text-muted-foreground sm:block">
+          Floating <span className={`font-medium tabular-nums ${pnlClass(totalFloat)}`}>{usd(totalFloat)}</span>
         </div>
       </div>
-      {live.length === 0 ? (
-        <p className="mt-3 text-[12px] text-muted-foreground">No live trades right now. Open trades appear here while the bot is running.</p>
-      ) : (
-        <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {live.map((r) => {
-            const floating = r.equity - r.balance;
-            const lastSession = sessions.find((x) => x.mt5_account === r.mt5_account);
-            const online = Date.now() - Date.parse(r.updated_at) < ONLINE_MS && !lastSession?.ended_at;
-            return (
-              <div key={r.license_id} className="rounded-lg border border-border bg-card p-4">
-                <div className="flex items-center justify-between gap-2 text-[12px]">
-                  <span className="text-foreground">MT5 {r.mt5_account}<span className="ml-1.5 text-muted-foreground">{r.symbol}</span></span>
-                  <span className={`inline-flex items-center gap-1.5 ${online ? "text-foreground" : "text-muted-foreground"}`}>
-                    <span className={`h-1.5 w-1.5 rounded-full ${online ? "bg-primary" : "bg-muted-foreground"}`} />
-                    {online ? "Live" : "Offline"}
-                  </span>
-                </div>
-                <div className="mt-2 text-[11px] text-muted-foreground">Floating P&L</div>
-                <div className={`text-lg font-medium tabular-nums ${pnlClass(floating)}`}>{usd(floating)}</div>
-                <div className="mt-2 grid grid-cols-3 gap-2 text-[11px]">
-                  <div><div className="text-muted-foreground">Open</div><div className="tabular-nums text-foreground">{r.open_trades}</div></div>
-                  <div><div className="text-muted-foreground">Lots</div><div className="tabular-nums text-foreground">{r.open_lots.toFixed(2)}</div></div>
-                  <div><div className="text-muted-foreground">Today</div><div className={`tabular-nums ${pnlClass(r.today_profit) || "text-foreground"}`}>{usd(r.today_profit)}</div></div>
-                </div>
-                <div className="mt-2 text-[11px] text-muted-foreground">Updated {utc(r.updated_at)} UTC</div>
-              </div>
-            );
-          })}
-        </div>
-      )}
+      <div className="overflow-x-auto">
+        {tab === "open" ? (
+          <table className="w-full min-w-[760px] text-[13px]">
+            <thead className="text-left text-[12px] text-muted-foreground">
+              <tr className="border-b border-border">
+                <th className={th}>Symbol</th>
+                <th className={th}>Account</th>
+                <th className={`${th} text-right`}>Volume, lot</th>
+                <th className={`${th} text-right`}>Balance</th>
+                <th className={`${th} text-right`}>Equity</th>
+                <th className={th}>Status</th>
+                <th className={th}>Updated</th>
+                <th className={`${th} text-right`}>P/L, USD</th>
+              </tr>
+            </thead>
+            <tbody>
+              {open.length === 0 ? (
+                <tr><td colSpan={8} className="px-3 py-8 text-center text-[12px] text-muted-foreground">No open trades right now. They appear here while the bot is trading.</td></tr>
+              ) : (
+                open.map((r) => {
+                  const floating = r.equity - r.balance;
+                  const lastSession = sessions.find((x) => x.mt5_account === r.mt5_account);
+                  const online = Date.now() - Date.parse(r.updated_at) < ONLINE_MS && !lastSession?.ended_at;
+                  return (
+                    <tr key={r.license_id} className="border-b border-border last:border-0">
+                      <td className={td}>
+                        <span className="inline-flex items-center gap-2">
+                          <img src={euFlag} alt="" className="h-4 w-4 rounded-full object-cover" />
+                          <span className="text-foreground">{symbolLabel(r.symbol)}</span>
+                          <span className="rounded-full bg-secondary px-1.5 text-[11px] tabular-nums">{r.open_trades}</span>
+                        </span>
+                      </td>
+                      <td className={`${td} tabular-nums`}>{r.mt5_account}</td>
+                      <td className={`${td} text-right tabular-nums`}>{r.open_lots.toFixed(2)}</td>
+                      <td className={`${td} text-right tabular-nums`}>{usd(r.balance)}</td>
+                      <td className={`${td} text-right tabular-nums`}>{usd(r.equity)}</td>
+                      <td className={td}><OnOffBadge on={online} /></td>
+                      <td className={`${td} text-muted-foreground`}>{localTime(r.updated_at)}</td>
+                      <td className={`${td} text-right font-medium tabular-nums ${pnlClass(floating)}`}>{floating.toFixed(2)}</td>
+                    </tr>
+                  );
+                })
+              )}
+            </tbody>
+          </table>
+        ) : (
+          <table className="w-full min-w-[560px] text-[13px]">
+            <thead className="text-left text-[12px] text-muted-foreground">
+              <tr className="border-b border-border">
+                <th className={th}>Symbol</th>
+                <th className={th}>Account</th>
+                <th className={`${th} text-right`}>Trades today</th>
+                <th className={th}>Updated</th>
+                <th className={`${th} text-right`}>P/L today, USD</th>
+              </tr>
+            </thead>
+            <tbody>
+              {live.length === 0 ? (
+                <tr><td colSpan={5} className="px-3 py-8 text-center text-[12px] text-muted-foreground">No trades closed today yet.</td></tr>
+              ) : (
+                live.map((r) => (
+                  <tr key={r.license_id} className="border-b border-border last:border-0">
+                    <td className={td}>
+                      <span className="inline-flex items-center gap-2">
+                        <img src={euFlag} alt="" className="h-4 w-4 rounded-full object-cover" />
+                        <span className="text-foreground">{symbolLabel(r.symbol)}</span>
+                      </span>
+                    </td>
+                    <td className={`${td} tabular-nums`}>{r.mt5_account}</td>
+                    <td className={`${td} text-right tabular-nums`}>{r.trades_today}</td>
+                    <td className={`${td} text-muted-foreground`}>{localTime(r.updated_at)}</td>
+                    <td className={`${td} text-right font-medium tabular-nums ${pnlClass(r.today_profit)}`}>{r.today_profit.toFixed(2)}</td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        )}
+      </div>
     </section>
   );
 }
