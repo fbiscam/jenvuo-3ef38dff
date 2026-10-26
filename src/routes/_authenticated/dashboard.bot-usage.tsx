@@ -1,8 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Bot, ChevronDown, ChevronUp, RefreshCw } from "lucide-react";
+import { useMemo, useState } from "react";
+import { Bot, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { Area, CartesianGrid, ComposedChart, ResponsiveContainer, Tooltip as RTooltip, XAxis, YAxis } from "recharts";
 import { getBotUsage, type BotReportRow, type BotSessionRow } from "@/lib/mt5-licenses.functions";
@@ -31,7 +31,7 @@ const ONLINE_MS = 3 * 60 * 1000;
 function BotUsagePage() {
   const load = useServerFn(getBotUsage);
   const [account, setAccount] = useState("all");
-  const { data, isFetching, refetch } = useQuery({ queryKey: ["bot-usage"], queryFn: () => load(), refetchInterval: 60_000 });
+  const { data, isFetching, refetch } = useQuery({ queryKey: ["bot-usage"], queryFn: () => load(), refetchInterval: 30_000 });
 
   const view = useMemo(() => {
     const rows: BotReportRow[] = data?.rows ?? [];
@@ -151,6 +151,8 @@ function BotUsagePage() {
               <Stat label="Trades today" value={`${view.tradesToday}`} sub={`${view.openTrades} open`} />
             </section>
 
+            <LiveTrades rows={view.latestList} sessions={data?.sessions ?? []} />
+
             <section className="px-4 py-5 sm:px-7">
               <h2 className="text-[13px] text-foreground">Accounts</h2>
               <div className="mt-3 overflow-x-auto">
@@ -255,85 +257,91 @@ const WHO: Record<string, string> = { you: "By you", pc: "PC / internet", bot: "
 /** Bot ON/OFF times (UTC) for the last 3 days and why each stop happened. */
 function OnOffLog({ sessions }: { sessions: BotSessionRow[] }) {
   const now = Date.now();
-  const listRef = useRef<HTMLUListElement>(null);
-  const [atTop, setAtTop] = useState(true);
-  const [atBottom, setAtBottom] = useState(true);
-  const [canScroll, setCanScroll] = useState(false);
-
-  const updateEdges = useCallback(() => {
-    const el = listRef.current;
-    if (!el) return;
-    setAtTop(el.scrollTop <= 4);
-    setAtBottom(el.scrollTop + el.clientHeight >= el.scrollHeight - 4);
-    setCanScroll(el.scrollHeight > el.clientHeight + 4);
-  }, []);
-
-  useEffect(() => {
-    updateEdges();
-  }, [sessions.length, updateEdges]);
-
-  const scrollTo = (dir: "top" | "bottom") => {
-    const el = listRef.current;
-    if (!el) return;
-    el.scrollTo({ top: dir === "top" ? 0 : el.scrollHeight, behavior: "smooth" });
-  };
-
   return (
     <div className="p-5">
       <div className="text-[13px] font-semibold text-foreground">Bot ON / OFF · last 3 days (UTC)</div>
       {sessions.length === 0 ? (
         <p className="mt-3 text-[12px] text-muted-foreground">No ON/OFF records yet. They appear once the latest bot is running.</p>
       ) : (
-        <div className="group/log relative mt-3">
-          <button
-            type="button"
-            aria-label="Scroll to top"
-            onClick={() => scrollTo("top")}
-            className={`group/btn absolute right-1 top-1 z-10 flex h-6 w-6 items-center justify-center rounded-md border border-border bg-background/90 text-muted-foreground shadow-sm transition-opacity hover:bg-secondary hover:text-foreground ${
-              atTop || !canScroll ? "pointer-events-none opacity-0" : "pointer-events-none opacity-0 group-hover/log:pointer-events-auto group-hover/log:opacity-100 group-focus-within/log:pointer-events-auto group-focus-within/log:opacity-100"
-            }`}
-          >
-            <ChevronUp className="h-3.5 w-3.5 transition-transform duration-150 group-hover/btn:-translate-y-0.5" />
-          </button>
-          <button
-            type="button"
-            aria-label="Scroll to bottom"
-            onClick={() => scrollTo("bottom")}
-            className={`group/btn absolute bottom-1 right-1 z-10 flex h-6 w-6 items-center justify-center rounded-md border border-border bg-background/90 text-muted-foreground shadow-sm transition-opacity hover:bg-secondary hover:text-foreground ${
-              atBottom || !canScroll ? "pointer-events-none opacity-0" : "pointer-events-none opacity-0 group-hover/log:pointer-events-auto group-hover/log:opacity-100 group-focus-within/log:pointer-events-auto group-focus-within/log:opacity-100"
-            }`}
-          >
-            <ChevronDown className="h-3.5 w-3.5 transition-transform duration-150 group-hover/btn:translate-y-0.5" />
-          </button>
-          <ul ref={listRef} onScroll={updateEdges} className="no-scrollbar-arrows max-h-[480px] divide-y divide-border overflow-y-auto pr-8">
-            {sessions.map((x) => {
-              const cause = sessionEndCause(x, now);
-              const running = cause.by === "none";
-              const end = x.ended_at ?? x.last_seen_at;
-              return (
-                <li key={x.id} className="py-2.5 text-[12px]">
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="text-foreground">MT5 {x.mt5_account}</span>
-                    <span className={`inline-flex items-center gap-1.5 ${running ? "text-foreground" : "text-muted-foreground"}`}>
-                      <span className={`h-1.5 w-1.5 rounded-full ${running ? "bg-primary" : "bg-muted-foreground"}`} />
-                      {running ? "ON" : "OFF"}
-                    </span>
+        <ul className="no-scrollbar-arrows mt-3 max-h-[480px] divide-y divide-border overflow-y-auto pr-2">
+          {sessions.map((x) => {
+            const cause = sessionEndCause(x, now);
+            const running = cause.by === "none";
+            const end = x.ended_at ?? x.last_seen_at;
+            return (
+              <li key={x.id} className="py-2.5 text-[12px]">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-foreground">MT5 {x.mt5_account}</span>
+                  <span className={`inline-flex items-center gap-1.5 ${running ? "text-foreground" : "text-muted-foreground"}`}>
+                    <span className={`h-1.5 w-1.5 rounded-full ${running ? "bg-primary" : "bg-muted-foreground"}`} />
+                    {running ? "ON" : "OFF"}
+                  </span>
+                </div>
+                <div className="mt-1 tabular-nums text-muted-foreground">
+                  ON {utc(x.started_at)} → {running ? "now" : `OFF ${utc(end)}`} · {dur(x.started_at, running ? new Date(now).toISOString() : end)}
+                </div>
+                {!running && (
+                  <div className="mt-1 text-foreground">
+                    {cause.label}
+                    <span className="ml-1.5 rounded bg-secondary px-1.5 py-0.5 text-[11px] text-muted-foreground">{WHO[cause.by]}</span>
                   </div>
-                  <div className="mt-1 tabular-nums text-muted-foreground">
-                    ON {utc(x.started_at)} → {running ? "now" : `OFF ${utc(end)}`} · {dur(x.started_at, running ? new Date(now).toISOString() : end)}
-                  </div>
-                  {!running && (
-                    <div className="mt-1 text-foreground">
-                      {cause.label}
-                      <span className="ml-1.5 rounded bg-secondary px-1.5 py-0.5 text-[11px] text-muted-foreground">{WHO[cause.by]}</span>
-                    </div>
-                  )}
-                </li>
-              );
-            })}
-          </ul>
-        </div>
+                )}
+              </li>
+            );
+          })}
+        </ul>
       )}
     </div>
+  );
+}
+
+/** Live open trades per account: floating P&L is equity minus balance from the latest bot report. */
+function LiveTrades({ rows, sessions }: { rows: BotReportRow[]; sessions: BotSessionRow[] }) {
+  const today = new Date().toISOString().slice(0, 10);
+  const live = rows.filter((r) => r.day === today);
+  const totalFloat = live.reduce((a, r) => a + (r.equity - r.balance), 0);
+  const totalOpen = live.reduce((a, r) => a + r.open_trades, 0);
+  return (
+    <section className="border-b border-border px-4 py-5 sm:px-7">
+      <div className="flex flex-wrap items-baseline justify-between gap-2">
+        <h2 className="flex items-center gap-2 text-[13px] text-foreground">
+          <span className={`h-1.5 w-1.5 rounded-full ${totalOpen > 0 ? "animate-pulse bg-gc-success" : "bg-muted-foreground"}`} />
+          Live trades
+        </h2>
+        <div className="text-[12px] text-muted-foreground">
+          {totalOpen} open · floating <span className={`font-medium tabular-nums ${pnlClass(totalFloat)}`}>{usd(totalFloat)}</span>
+        </div>
+      </div>
+      {live.length === 0 ? (
+        <p className="mt-3 text-[12px] text-muted-foreground">No live trades right now. Open trades appear here while the bot is running.</p>
+      ) : (
+        <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {live.map((r) => {
+            const floating = r.equity - r.balance;
+            const lastSession = sessions.find((x) => x.mt5_account === r.mt5_account);
+            const online = Date.now() - Date.parse(r.updated_at) < ONLINE_MS && !lastSession?.ended_at;
+            return (
+              <div key={r.license_id} className="rounded-lg border border-border bg-card p-4">
+                <div className="flex items-center justify-between gap-2 text-[12px]">
+                  <span className="text-foreground">MT5 {r.mt5_account}<span className="ml-1.5 text-muted-foreground">{r.symbol}</span></span>
+                  <span className={`inline-flex items-center gap-1.5 ${online ? "text-foreground" : "text-muted-foreground"}`}>
+                    <span className={`h-1.5 w-1.5 rounded-full ${online ? "bg-primary" : "bg-muted-foreground"}`} />
+                    {online ? "Live" : "Offline"}
+                  </span>
+                </div>
+                <div className="mt-2 text-[11px] text-muted-foreground">Floating P&L</div>
+                <div className={`text-lg font-medium tabular-nums ${pnlClass(floating)}`}>{usd(floating)}</div>
+                <div className="mt-2 grid grid-cols-3 gap-2 text-[11px]">
+                  <div><div className="text-muted-foreground">Open</div><div className="tabular-nums text-foreground">{r.open_trades}</div></div>
+                  <div><div className="text-muted-foreground">Lots</div><div className="tabular-nums text-foreground">{r.open_lots.toFixed(2)}</div></div>
+                  <div><div className="text-muted-foreground">Today</div><div className={`tabular-nums ${pnlClass(r.today_profit) || "text-foreground"}`}>{usd(r.today_profit)}</div></div>
+                </div>
+                <div className="mt-2 text-[11px] text-muted-foreground">Updated {utc(r.updated_at)} UTC</div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </section>
   );
 }
