@@ -5,7 +5,7 @@ import { EmailAPIError, sendLovableEmail } from '@lovable.dev/email-js'
 
 export const SITE_NAME = 'Jenvu'
 // Selected delegated sender subdomain; sending requires DNS verification.
-export const SENDER_DOMAIN = 'notify.jenvu.com'
+export const SENDER_DOMAIN = 'notify.jenvu.net'
 // Visible From: domain.
 export const FROM_DOMAIN = 'jenvu.com'
 
