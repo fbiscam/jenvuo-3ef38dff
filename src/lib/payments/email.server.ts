@@ -2,7 +2,7 @@
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { networkMeta } from "./shared";
 
-const FROM = "Jenvu Billing <billing@notify.jenvu.net>";
+const FROM = "Jenvu Billing <billing@jenvu.com>";
 
 type OrderLike = {
   id: string;
