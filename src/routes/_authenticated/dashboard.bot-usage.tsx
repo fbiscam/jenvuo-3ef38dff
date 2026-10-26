@@ -324,23 +324,24 @@ function LiveTrades({ rows, sessions }: { rows: BotReportRow[]; sessions: BotSes
   const totalFloat = open.reduce((a, r) => a + (r.equity - r.balance), 0);
   const th = "px-3 py-2 font-normal whitespace-nowrap";
   const td = "px-3 py-2.5 whitespace-nowrap";
+  const first = "pl-4 sm:pl-7";
   return (
     <section className="border-b border-border">
-      <div className="flex items-end justify-between border-b border-border px-2 sm:px-4">
-        <div className="flex">
+      <div className="flex items-center justify-between border-b border-border px-4 sm:px-7">
+        <div className="flex items-center gap-7">
           {([["open", "Open", totalOpen], ["closed", "Closed today", null]] as const).map(([k, label, n]) => (
             <button
               key={k}
               type="button"
               onClick={() => setTab(k)}
-              className={`-mb-px flex items-center gap-1.5 border-b-2 px-3 py-3 text-[13px] ${tab === k ? "border-foreground text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`}
+              className={`relative flex shrink-0 items-center gap-1.5 py-3 text-[13px] ${tab === k ? "text-foreground after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 after:bg-foreground" : "text-muted-foreground hover:text-foreground"}`}
             >
               {label}
-              {n !== null && <span className="rounded-full bg-secondary px-1.5 text-[11px] tabular-nums text-foreground">{n}</span>}
+              {n !== null && <span className="rounded-full bg-secondary px-1.5 text-[11px] leading-4 tabular-nums text-foreground">{n}</span>}
             </button>
           ))}
         </div>
-        <div className="hidden pb-3 text-[12px] text-muted-foreground sm:block">
+        <div className="hidden text-[12px] text-muted-foreground sm:block">
           Floating <span className={`font-medium tabular-nums ${pnlClass(totalFloat)}`}>{usd(totalFloat)}</span>
         </div>
       </div>
@@ -349,7 +350,7 @@ function LiveTrades({ rows, sessions }: { rows: BotReportRow[]; sessions: BotSes
           <table className="w-full min-w-[760px] text-[13px]">
             <thead className="text-left text-[12px] text-muted-foreground">
               <tr className="border-b border-border">
-                <th className={th}>   Symbol</th>
+                <th className={`${th} ${first}`}>Symbol</th>
                 <th className={th}>Account</th>
                 <th className={`${th} text-right`}>Volume, lot</th>
                 <th className={`${th} text-right`}>Balance</th>
@@ -369,7 +370,7 @@ function LiveTrades({ rows, sessions }: { rows: BotReportRow[]; sessions: BotSes
                   const online = Date.now() - Date.parse(r.updated_at) < ONLINE_MS && !lastSession?.ended_at;
                   return (
                     <tr key={r.license_id} className="border-b border-border last:border-0">
-                      <td className={td}>
+                      <td className={`${td} ${first}`}>
                         <span className="inline-flex items-center gap-2">
                           <img src={euFlag} alt="" className="h-4 w-4 rounded-full object-cover" />
                           <span className="text-foreground">{symbolLabel(r.symbol)}</span>
@@ -393,7 +394,7 @@ function LiveTrades({ rows, sessions }: { rows: BotReportRow[]; sessions: BotSes
           <table className="w-full min-w-[560px] text-[13px]">
             <thead className="text-left text-[12px] text-muted-foreground">
               <tr className="border-b border-border">
-                <th className={th}>Symbol</th>
+                <th className={`${th} ${first}`}>Symbol</th>
                 <th className={th}>Account</th>
                 <th className={`${th} text-right`}>Trades today</th>
                 <th className={th}>Updated</th>
@@ -406,7 +407,7 @@ function LiveTrades({ rows, sessions }: { rows: BotReportRow[]; sessions: BotSes
               ) : (
                 live.map((r) => (
                   <tr key={r.license_id} className="border-b border-border last:border-0">
-                    <td className={td}>
+                    <td className={`${td} ${first}`}>
                       <span className="inline-flex items-center gap-2">
                         <img src={euFlag} alt="" className="h-4 w-4 rounded-full object-cover" />
                         <span className="text-foreground">{symbolLabel(r.symbol)}</span>
