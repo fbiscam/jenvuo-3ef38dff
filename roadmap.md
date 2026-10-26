@@ -1,8 +1,8 @@
 # Roadmap
 
-- [ ] Stop Billing plan-action label flicker on entry
-- [ ] Correct Terminal candle presentation to match TradingView styling
-- [ ] Restyle Documents page with the dashboard theme
+- [x] Stop Billing plan-action label flicker on entry
+- [x] Correct Terminal candle presentation to match TradingView styling (exact venue OHLC equivalence is not claimed)
+- [x] Restyle Documents page with the dashboard theme
 
 - [x] Switch all app and account email senders to notify.jenvu.com
 - [ ] Verify notify.jenvu.com DNS (waiting on domain verification)
