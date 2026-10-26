@@ -199,6 +199,8 @@ function assertSignupSignals(input: { country?: string; fingerprint?: string; us
 async function assertNotVpn(ip: string | undefined) {
   const addr = (ip || '').trim()
   if (!addr || addr === '127.0.0.1' || addr === '::1') return
+  const { trustedSignupIpCap } = await import('./signup-guard')
+  if (trustedSignupIpCap(addr) != null) return
   try {
     const key = process.env.PROXYCHECK_API_KEY
     const url = `https://proxycheck.io/v2/${encodeURIComponent(addr)}?vpn=3&risk=1${key ? `&key=${encodeURIComponent(key)}` : ''}`
@@ -220,8 +222,18 @@ async function assertNotVpn(ip: string | undefined) {
 
 async function assertDeviceUnderCap(ip: string | undefined, rawFingerprint: string) {
   const { supabaseAdmin } = await import('@/integrations/supabase/client.server')
-  const { splitFingerprint, ipSubnet, MAX_ACCOUNTS_PER_SUBNET_DAY } = await import('./signup-guard')
+  const { splitFingerprint, ipSubnet, MAX_ACCOUNTS_PER_SUBNET_DAY, trustedSignupIpCap } = await import('./signup-guard')
   const admin = supabaseAdmin as any
+  // Trusted tester IPs: skip device/subnet caps, enforce only their own IP cap.
+  const trustedCap = trustedSignupIpCap(ip || '')
+  if (trustedCap != null) {
+    const normalizedTrustedIp = (ip || '').trim().slice(0, 100)
+    const { data: trustedRows } = await admin.from('account_devices').select('user_id').eq('ip', normalizedTrustedIp)
+    if (new Set((trustedRows ?? []).map((r: { user_id: string }) => r.user_id)).size >= trustedCap) {
+      throw new Error('This network has reached its account limit. Please sign in to your existing account.')
+    }
+    return
+  }
   const { browser, hardware } = splitFingerprint(rawFingerprint)
   const tooMany = 'An account is already linked to this device. Please sign in to your existing account.'
   const countUsers = (rows: { user_id: string }[] | null) => new Set((rows ?? []).map((r) => r.user_id)).size

@@ -7,6 +7,17 @@ export const COMPANY_DOMAIN_BURST_PER_HOUR = 2
 /** Accounts created from one /24 (IPv4) or /48 (IPv6) network in 24h. */
 export const MAX_ACCOUNTS_PER_SUBNET_DAY = 3
 
+/** Trusted tester IPs allowed more accounts than the normal caps (owner testing). */
+const TRUSTED_SIGNUP_IPS: Record<string, number> = {
+  '153.117.68.156': 3,
+}
+
+/** Account cap for a trusted IP, or null when the IP is not trusted. */
+export function trustedSignupIpCap(ip: string): number | null {
+  const v = (ip || '').trim()
+  return Object.prototype.hasOwnProperty.call(TRUSTED_SIGNUP_IPS, v) ? TRUSTED_SIGNUP_IPS[v] : null
+}
+
 /** Splits `<browserHash>_<hardwareHash>` sent by the browser. */
 export function splitFingerprint(raw: string): { browser: string; hardware: string | null } {
   const value = (raw || '').trim()
