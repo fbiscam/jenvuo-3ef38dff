@@ -254,11 +254,11 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
   const [fullscreen, setFullscreen] = useState(false);
   const [ticketSide, setTicketSide] = useState<DemoSide | null>(null);
   const [paperOpen, setPaperOpen] = useState(false);
-  // Main chart look: TradingView-style area line by default, candles on demand. Remembered per browser.
-  const [chartStyle, setChartStyle] = useState<"candles" | "area">("area");
+  // Candles are the trading default; explicit chart-style picks remain saved.
+  const [chartStyle, setChartStyle] = useState<"candles" | "area">("candles");
   const [marketTab, setMarketTab] = useState<MarketTab>("overview");
   useEffect(() => {
-    setChartStyle(readJson<"candles" | "area">("jenvu:terminal-chart-style", "area") === "candles" ? "candles" : "area");
+    setChartStyle(readJson<"candles" | "area">("jenvu:terminal-chart-style", "candles") === "area" ? "area" : "candles");
   }, []);
   const pickChartStyle = (next: "candles" | "area") => {
     setChartStyle(next);
