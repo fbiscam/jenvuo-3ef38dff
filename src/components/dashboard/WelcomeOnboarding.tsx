@@ -125,7 +125,7 @@ export default function WelcomeOnboarding() {
               alt=""
               width={1024}
               height={1024}
-              className="aspect-square w-full rounded-3xl object-cover shadow-xl animate-in fade-in duration-300"
+              className="jenvu-onboard-float aspect-square w-full object-contain animate-in fade-in zoom-in-95 duration-500"
             />
           </div>
         </div>
