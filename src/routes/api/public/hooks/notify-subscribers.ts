@@ -96,7 +96,7 @@ export const Route = createFileRoute('/api/public/hooks/notify-subscribers')({
             ? template.subject(templateData)
             : template.subject
 
-        const FROM = `Jenvu Briefings <noreply@notify.jenvu.net>`
+        const FROM = `Jenvu Briefings <noreply@notify.jenvu.com>`
 
         let enqueued = 0
         const failures: string[] = []

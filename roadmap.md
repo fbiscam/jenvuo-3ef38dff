@@ -1,6 +1,7 @@
 # Roadmap
 
-- [x] Configure verified notify.jenvu.net for app and account emails
+- [x] Switch all app and account email senders to notify.jenvu.com
+- [ ] Verify notify.jenvu.com DNS (waiting on domain verification)
 - [x] Upgrade the vulnerable sanitizer dependency and verify the security finding is resolved
 
 - [x] Bot Usage page: move Usage tabs and the profit chart slightly left
