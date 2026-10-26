@@ -357,7 +357,7 @@ export async function callChatCompletion(
     if (extra.length) {
       console.warn(`[ai] ${opts.stage ?? "chat"}: primary chain failed, trying other CodeCraft models`, (primaryErr as Error)?.message);
       try {
-        return await callChatChain({ ...opts, models: extra, raceModels: false, perAttemptTimeoutMs: opts.perAttemptTimeoutMs ?? 15000 });
+        return await callChatChain({ ...opts, models: extra, raceModels: false, attemptTimeoutMs: opts.attemptTimeoutMs ?? 15000 });
       } catch (chainErr) {
         console.warn(`[ai] ${opts.stage ?? "chat"}: other CodeCraft models failed`, (chainErr as Error)?.message);
       }
