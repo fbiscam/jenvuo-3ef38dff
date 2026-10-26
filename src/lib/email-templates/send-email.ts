@@ -9,10 +9,10 @@ import { TEMPLATES } from './registry'
 const SITE_NAME = "Jenvu"
 // SENDER_DOMAIN is the verified sender subdomain FQDN (e.g., "notify.example.com").
 // It MUST match the subdomain delegated to Lovable's nameservers. NEVER use the root domain.
-const SENDER_DOMAIN = "notify.jenvu.net"
+const SENDER_DOMAIN = "notify.jenvu.com"
 // FROM_DOMAIN is the domain shown in the From: header (e.g., "example.com").
 // Can be the root domain when display_from_root is enabled — this is cosmetic only.
-const FROM_DOMAIN = "jenvu.net"
+const FROM_DOMAIN = "jenvu.com"
 
 export type SendTemplateEmailResult =
   | { sent: true }
@@ -69,7 +69,7 @@ export async function sendTemplateEmail(
     await sendLovableEmail(
       {
         to: recipient,
-        from: `${SITE_NAME} <noreply@${FROM_DOMAIN}>`,
+        from: { name: SITE_NAME, address: `noreply@${FROM_DOMAIN}` },
         sender_domain: SENDER_DOMAIN,
         subject,
         html,
@@ -77,7 +77,7 @@ export async function sendTemplateEmail(
         purpose: 'transactional',
         label: templateName,
         idempotency_key: options.idempotencyKey || crypto.randomUUID(),
-        reply_to: options.replyTo,
+        ...(options.replyTo ? { reply_to: options.replyTo } : {}),
       },
       { apiKey, sendUrl: process.env['LOVABLE_SEND_URL'] }
     )
