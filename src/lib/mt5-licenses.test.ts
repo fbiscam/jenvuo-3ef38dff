@@ -70,7 +70,7 @@ describe("bot on/off sessions", () => {
 });
 
 describe('owner bot target', () => {
-  test('imgakhar@gmail.com gets $1,000 daily, others keep plan targets', async () => {
+  it('imgakhar@gmail.com gets $1,000 daily, others keep plan targets', async () => {
     const { targetsFor, evaluateLicense } = await import('./mt5-licenses')
     expect(targetsFor('ultra', '5af751fb-de3b-4a24-aefd-aed53ef44378').daily).toBe(1000)
     expect(targetsFor('ultra', 'someone-else').daily).toBe(150)
