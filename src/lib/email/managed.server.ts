@@ -20,7 +20,7 @@ export interface ManagedSendArgs {
   text?: string
   label: string
   idempotencyKey?: string
-  /** Defaults to `Jenvu <noreply@jenvu.com>`. */
+  /** Defaults to `Jenvu <noreply@notify.jenvu.net>`. */
   from?: string
   replyTo?: string
 }
