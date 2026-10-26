@@ -37,11 +37,11 @@ beforeEach(() => {
 });
 
 describe("Ask Jenvu public access", () => {
-  test("answers visitors without a session using the anonymous IP bucket", async () => {
+  test("asks visitors without a session to sign in before chatting", async () => {
     const result = await askJenvu(question);
-    expect(result.ok).toBe(true);
-    expect(completion).toHaveBeenCalledTimes(1);
-    expect(limit).toHaveBeenCalledWith("ask-jenvu:anon:192.0.2.10");
+    expect(result.ok).toBe(false);
+    expect(result.error).toBe("Please sign in to chat with Ask Jenvu.");
+    expect(completion).not.toHaveBeenCalled();
   });
   test("retains the signed-in user's existing bucket", async () => {
     optionalUser.mockResolvedValue("user-123");
