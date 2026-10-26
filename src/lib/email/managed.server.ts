@@ -5,9 +5,9 @@ import { EmailAPIError, sendLovableEmail } from '@lovable.dev/email-js'
 
 export const SITE_NAME = 'Jenvu'
 // Verified delegated sender subdomain (API lookup).
-export const SENDER_DOMAIN = 'notify.jenvu.com'
+export const SENDER_DOMAIN = 'notify.jenvu.net'
 // Visible From: domain.
-export const FROM_DOMAIN = 'jenvu.com'
+export const FROM_DOMAIN = 'jenvu.net'
 
 export type ManagedSendResult =
   | { sent: true }
@@ -20,7 +20,7 @@ export interface ManagedSendArgs {
   text?: string
   label: string
   idempotencyKey?: string
-  /** Defaults to `Jenvu <noreply@jenvu.com>`. */
+  /** Defaults to `Jenvu <noreply@jenvu.net>`. */
   from?: string
   replyTo?: string
 }

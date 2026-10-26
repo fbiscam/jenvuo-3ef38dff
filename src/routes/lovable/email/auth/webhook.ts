@@ -10,9 +10,9 @@ import { ReauthenticationEmail } from '@/lib/email-templates/reauthentication'
 
 // Configuration
 const SITE_NAME = "Jenvu"
-const SENDER_DOMAIN = "notify.jenvu.com"
+const SENDER_DOMAIN = "notify.jenvu.net"
 const ROOT_DOMAIN = "jenvu.com"
-const FROM_DOMAIN = "jenvu.com"
+const FROM_DOMAIN = "jenvu.net"
 const SITE_URL = `https://${ROOT_DOMAIN}`
 
 // The SDK handler owns verification, dispatch, and retry semantics; this file
