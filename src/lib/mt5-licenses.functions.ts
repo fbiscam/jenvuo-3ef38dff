@@ -39,7 +39,7 @@ export const createMt5License = createServerFn({ method: "POST" })
       await db.from("mt5_licenses").update({ mt5_account: data.mt5_account, plan_id: plan }).eq("id", free.id);
       return { ok: true as const };
     }
-    if (list.length >= limit) return { ok: false as const, error: `Your plan allows ${limit} license${limit > 1 ? "s" : ""}. Revoke one or upgrade.` };
+    if (list.length >= limit) return { ok: false as const, error: `Your plan allows ${limit} license${limit > 1 ? "s" : ""}. Delete one or upgrade.` };
     const { error } = await db.from("mt5_licenses").insert({ user_id: context.userId, license_key: newLicenseKey(), mt5_account: data.mt5_account, plan_id: plan });
     return error ? { ok: false as const, error: "Could not create the license." } : { ok: true as const };
   });
