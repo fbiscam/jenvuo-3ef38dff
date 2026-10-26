@@ -344,7 +344,7 @@ export const collections: Collection[] = [
         summary: "Who can use the JX Bot, how to create a license and how to install it in MetaTrader 5.",
         updatedAt: "2026-10-24",
         body: [
-          { type: "p", content: "The JX Bot is Jenvu's Fiber Expert Advisor for MetaTrader 5. It is available only on a paid Pro, Elite or Ultra monthly plan — credit or the free trial does not unlock it. Open Dashboard → JX Bot to download it. How the bot decides its trades is proprietary and not published." },
+          { type: "p", content: "The JX Bot is Jenvu's Fiber Expert Advisor for MetaTrader 5. It is available on a Pro, Elite or Ultra monthly plan, and free for 14 days with the free trial (it stops when the trial ends unless a plan is bought). Credit alone does not unlock it. Open Dashboard → JX Bot to download it. How the bot decides its trades is proprietary and not published." },
           { type: "h2", content: "Plans" },
           { type: "ul", items: ["Pro: $600 monthly profit target, $30 daily, 1 MT5 license.", "Elite: $1,500 monthly, $75 daily, 2 licenses.", "Ultra: $3,000 monthly, $150 daily, 5 licenses.", "Daily target = monthly target / 20, per license: each MT5 account has its own target, and when one reaches it that bot closes its trades and starts again the next day.", "See profit, balance, equity and trades for each account at Dashboard → Usage → Bot Usage."] },
           { type: "h2", content: "Setup" },
