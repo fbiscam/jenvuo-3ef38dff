@@ -46,7 +46,7 @@ function BotUsagePage() {
     for (let i = 29; i >= 0; i--) days.set(new Date(Date.now() - i * 86400000).toISOString().slice(0, 10), 0);
     for (const r of picked) if (days.has(r.day)) days.set(r.day, (days.get(r.day) ?? 0) + r.today_profit);
     const chart = Array.from(days, ([day, profit]) => ({ day: day.slice(5), profit: Math.round(profit * 100) / 100 }));
-    const target = data && isMt5Plan(data.plan) ? dailyTarget(data.plan) : 0;
+    const target = data && isMt5Plan(data.plan) ? (data.dailyTarget || dailyTarget(data.plan)) : 0;
     const perAccount = latestList.filter((r) => r.day === today).map((r) => ({ account: r.mt5_account, ...sharedTargetStatus(target, [r.today_profit], r.target_hit) }));
     return {
       accounts,

@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { isMt5Plan, licenseLimit, MT5_ACCOUNT_RE, newLicenseKey } from "./mt5-licenses";
+import { isMt5Plan, licenseLimit, MT5_ACCOUNT_RE, newLicenseKey, targetsFor } from "./mt5-licenses";
 
 export type Mt5LicenseRow = { id: string; license_key: string; mt5_account: string | null; plan_id: string; revoked_at: string | null; last_validated_at: string | null; created_at: string };
 
@@ -12,7 +12,8 @@ async function readPlan(userId: string) {
   const plan = String(sub?.plan_id || "free").toLowerCase();
   const active = !!sub && (sub.status === "active" || sub.status === "trialing") && (!sub.current_period_end || Date.parse(sub.current_period_end) > Date.now());
   const ok = active && isMt5Plan(plan);
-  return { db, plan: ok ? plan : "free", allowed: ok, limit: ok ? licenseLimit(plan) : 0, expiresAt: ok ? (sub.current_period_end as string | null) : null };
+  const t = ok ? targetsFor(plan as any, userId) : { daily: 0, monthly: 0 };
+  return { db, plan: ok ? plan : "free", allowed: ok, limit: ok ? licenseLimit(plan) : 0, expiresAt: ok ? (sub.current_period_end as string | null) : null, dailyTarget: t.daily, monthlyTarget: t.monthly };
 }
 
 export const getMt5Access = createServerFn({ method: "POST" })
@@ -84,5 +85,5 @@ export const getBotUsage = createServerFn({ method: "POST" })
       .or(`started_at.gte.${since3},last_seen_at.gte.${since3}`)
       .order("started_at", { ascending: false })
       .limit(200);
-    return { plan: access.plan, allowed: access.allowed, limit: access.limit, rows, sessions: (ses ?? []) as BotSessionRow[] };
+    return { plan: access.plan, allowed: access.allowed, limit: access.limit, dailyTarget: access.dailyTarget, rows, sessions: (ses ?? []) as BotSessionRow[] };
   });

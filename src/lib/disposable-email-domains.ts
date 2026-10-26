@@ -115,7 +115,18 @@ export const DISPOSABLE_EMAIL_DOMAINS: ReadonlySet<string> = new Set([
   'dropmail.me','10mail.org','emltmp.com','zetmail.com','vomoto.com','tafmail.com','cyclelove.cc',
   'generator.email','inboxes.com','mail.tm','mail.gw','minuteinbox.com',
   'temp-mail.org','tempmail.plus','tempmail.dev','throwawaymail.com','yopmail.guru',
+  // Priyo temp-mail family (domains from its picker).
+  'priyo.edu.pl','priyomail.org','auth2fa.com','priyomail.nl','yandex.bd','outlook.bd',
+  'priyomail.ovh','priyotv.net','priyoapk.com','priyodown.com','bpl-tv.com','bpltv.com',
 ]);
+
+/** Name patterns for temp-mail families that keep adding new domains. */
+const DISPOSABLE_DOMAIN_PATTERNS: RegExp[] = [
+  /^priyo/i, /^priomail\./i, /^bpl-?tv\./i, /^auth2fa\./i,
+];
+
+/** Big-provider names on a TLD the provider doesn't use (e.g. outlook.bd, yandex.bd) are fake. */
+const LOOKALIKE_PROVIDER = /^(gmail|googlemail|outlook|hotmail|live|yahoo|yandex|icloud|protonmail|aol|msn)\.(bd|pk|in|ng|xyz|top|site|online|store|shop|click|ovh|tk|ml|ga|cf|gq)$/i;
 
 /** Returns true when the email's domain looks like a throwaway provider. */
 export function isDisposableEmail(email: string): boolean {
@@ -124,6 +135,8 @@ export function isDisposableEmail(email: string): boolean {
   const domain = email.slice(at + 1).toLowerCase().trim();
   if (!domain) return false;
   if (DISPOSABLE_EMAIL_DOMAINS.has(domain)) return true;
+  if (DISPOSABLE_DOMAIN_PATTERNS.some((re) => re.test(domain))) return true;
+  if (LOOKALIKE_PROVIDER.test(domain)) return true;
   // Also block subdomains of disposable providers (e.g. sub.mailinator.com).
   const parts = domain.split('.');
   for (let i = 1; i < parts.length - 1; i++) {

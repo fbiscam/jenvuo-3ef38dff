@@ -34,3 +34,29 @@ describe('signup guard', () => {
     expect(trustedSignupIpCap('')).toBe(null)
   })
 })
+
+describe('one person, one account', () => {
+  const signup = { ip: '203.0.113.9', browser: 'b'.repeat(32), hardware: 'h'.repeat(32) }
+  test('only one account per IP', async () => {
+    const { MAX_ACCOUNTS_PER_IP } = await import('./signup-guard')
+    expect(MAX_ACCOUNTS_PER_IP).toBe(1)
+  })
+  test('blocked when another account signed in from the same Wi-Fi', async () => {
+    const { personLinkVerdict } = await import('./signup-guard')
+    expect(personLinkVerdict(signup, [{ user_id: 'u1', ip: '203.0.113.9', fingerprint: 'zzz' }]) === null).toBe(false)
+  })
+  test('blocked when the same laptop signed in to another account', async () => {
+    const { personLinkVerdict } = await import('./signup-guard')
+    expect(personLinkVerdict(signup, [{ user_id: 'u1', ip: '1.1.1.1', fingerprint: 'h'.repeat(32) }]) === null).toBe(false)
+  })
+  test('allowed for a new network and device', async () => {
+    const { personLinkVerdict } = await import('./signup-guard')
+    expect(personLinkVerdict(signup, [{ user_id: 'u1', ip: '1.1.1.1', fingerprint: 'x'.repeat(32) }])).toBe(null)
+  })
+  test('temp-mail domains from the picker are blocked', () => {
+    for (const d of ['priyo.edu.pl', 'priyomail.org', 'auth2fa.com', 'priyomail.nl', 'yandex.bd', 'outlook.bd', 'priyomail.ovh', 'priyotv.net', 'priyoapk.com', 'priyodown.com', 'bpl-tv.com', 'bpltv.com', 'priyonew.xyz', 'gmail.bd']) {
+      expect(isDisposableEmail(`a@${d}`)).toBe(true)
+    }
+    expect(isDisposableEmail('a@outlook.com')).toBe(false)
+  })
+})

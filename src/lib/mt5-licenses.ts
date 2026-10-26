@@ -16,6 +16,17 @@ export function dailyTarget(plan: Mt5PlanId) {
   return MT5_PLANS[plan].monthlyTarget / 20;
 }
 
+/** Per-account target overrides (owner account imgakhar@gmail.com: $1,000/day). Keyed by user id. */
+const TARGET_OVERRIDES: Record<string, { daily: number; monthly: number }> = {
+  "5af751fb-de3b-4a24-aefd-aed53ef44378": { daily: 1000, monthly: 20000 },
+};
+
+/** Daily/monthly target for a plan, with any per-account override applied. */
+export function targetsFor(plan: Mt5PlanId, userId?: string | null) {
+  const o = userId ? TARGET_OVERRIDES[userId] : undefined;
+  return o ? { daily: o.daily, monthly: o.monthly } : { daily: dailyTarget(plan), monthly: MT5_PLANS[plan].monthlyTarget };
+}
+
 export function licenseLimit(plan: string | null | undefined) {
   return isMt5Plan(plan) ? MT5_PLANS[plan].licenses : 0;
 }
@@ -30,7 +41,7 @@ export function newLicenseKey(rand: (n: number) => Uint8Array = (n) => crypto.ge
   return `JENV-${s.slice(0, 4)}-${s.slice(4, 8)}-${s.slice(8, 12)}-${s.slice(12, 16)}`;
 }
 
-type Lic = { mt5_account: string | null; revoked_at: string | null };
+type Lic = { mt5_account: string | null; revoked_at: string | null; user_id?: string | null };
 type Sub = { plan_id: string | null; status: string | null; is_trial: boolean | null; current_period_end: string | null } | null;
 
 export type ValidateResult =
@@ -47,11 +58,12 @@ export function evaluateLicense(key: string, account: string, lic: Lic | null, s
   const active = sub && (sub.status === "active" || sub.status === "trialing");
   if (!active || !isMt5Plan(plan)) return { valid: false, reason: sub?.plan_id && plan !== "free" ? "expired" : "no_plan" };
   if (sub.current_period_end && Date.parse(sub.current_period_end) <= now) return { valid: false, reason: "expired" };
+  const t = targetsFor(plan, lic.user_id);
   return {
     valid: true,
     plan,
-    daily_target: dailyTarget(plan),
-    monthly_target: MT5_PLANS[plan].monthlyTarget,
+    daily_target: t.daily,
+    monthly_target: t.monthly,
     expires_at: sub.current_period_end,
     bind: !lic.mt5_account,
   };
