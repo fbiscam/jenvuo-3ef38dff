@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, mock, test } from "bun:test";
+import { afterAll, beforeEach, describe, expect, mock, test } from "bun:test";
 
 // Exercise the real handler without making provider requests or requiring a session.
 mock.module("@tanstack/react-start", () => ({
