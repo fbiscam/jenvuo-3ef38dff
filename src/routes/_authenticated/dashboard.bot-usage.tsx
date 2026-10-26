@@ -349,7 +349,7 @@ function LiveTrades({ rows, sessions }: { rows: BotReportRow[]; sessions: BotSes
           <table className="w-full min-w-[760px] text-[13px]">
             <thead className="text-left text-[12px] text-muted-foreground">
               <tr className="border-b border-border">
-                <th className={th}>Symbol</th>
+                <th className={th}>   Symbol</th>
                 <th className={th}>Account</th>
                 <th className={`${th} text-right`}>Volume, lot</th>
                 <th className={`${th} text-right`}>Balance</th>
