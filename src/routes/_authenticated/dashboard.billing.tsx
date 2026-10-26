@@ -3,7 +3,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { useCredits } from "@/hooks/useCredits";
-import { useCurrentPlan } from "@/hooks/useCurrentPlan";
+import { Button } from "@/components/ui/button";
 import { useTrial } from "@/hooks/useTrial";
 import { cancelMyPlan } from "@/lib/subscription.functions";
 import { redeemFreeCode } from "@/lib/payments.functions";
@@ -53,7 +53,6 @@ type BillingRow = {
 const TABS = ["Overview", "Payment methods", "Billing history", "Credit grants", "Preferences", "Promotions"] as const;
 
 function Billing() {
-  const currentPlan = useCurrentPlan();
   const credits = useCredits();
   const trial = useTrial();
   const cancelPlan = useServerFn(cancelMyPlan);
@@ -147,7 +146,9 @@ function Billing() {
     );
   }
 
-  const plan = currentPlan;
+  // Use the same resolved, cached response as the balance. An independent
+  // subscription request started at null on every visit and flashed the CTA.
+  const plan = credits.plan && credits.plan.id !== "free" ? credits.plan.id : null;
   const planLabel = trial.active ? "Pay as you go" : plan ? "Pay as you go" : "Pay as you go";
   const remaining = credits.balance;
 
@@ -221,20 +222,22 @@ function Billing() {
           Buy credits
         </Link>
         {plan ? (
-          <button
+          <Button
             type="button"
+            variant="secondary"
             onClick={() => setCancelDialogOpen(true)}
-            className="rounded-lg border border-zinc-200 bg-zinc-100 px-5 py-2.5 text-sm font-medium text-zinc-900 hover:bg-zinc-200 transition-colors"
+            className="h-10 min-w-36 border border-border px-5"
           >
             Cancel plan
-          </button>
+          </Button>
         ) : (
+          <Button asChild variant="secondary" className="h-10 min-w-36 border border-border px-5">
           <Link
             to="/pricing"
-            className="rounded-lg border border-zinc-200 bg-zinc-100 px-5 py-2.5 text-sm font-medium text-zinc-900 hover:bg-zinc-200 transition-colors"
           >
             Choose a plan
           </Link>
+          </Button>
         )}
       </section>
 

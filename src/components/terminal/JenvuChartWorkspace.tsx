@@ -60,7 +60,7 @@ import { buildChartContext } from "./chart-context";
 import { PERIOD_TIMEFRAME, TerminalPeriodReturns, TerminalSymbolHeader, TerminalTabBody, type MarketTab } from "./TerminalMarketTabs";
 import { DemoTradingPanel, OrderTicket, PaperTradingPanel, QuickTradeButtons, useDemoTrading } from "./DemoTradingPanel";
 import { positionPnl, type DemoSide } from "@/lib/chart/demo-trading";
-import { buildLiveBars } from "@/lib/chart/live-candle";
+import { buildLiveBars, liveStreamMatchesHistory } from "@/lib/chart/live-candle";
 import { sessionBucketMs } from "@/lib/chart/session-buckets";
 import { useLivePriceStream } from "@/hooks/useLivePriceStream";
 import { isMarketClosed } from "@/lib/signals/qualification";
@@ -254,11 +254,11 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
   const [fullscreen, setFullscreen] = useState(false);
   const [ticketSide, setTicketSide] = useState<DemoSide | null>(null);
   const [paperOpen, setPaperOpen] = useState(false);
-  // Main chart look: TradingView-style area line by default, candles on demand. Remembered per browser.
-  const [chartStyle, setChartStyle] = useState<"candles" | "area">("area");
+  // Candles are the trading default; explicit chart-style picks remain saved.
+  const [chartStyle, setChartStyle] = useState<"candles" | "area">("candles");
   const [marketTab, setMarketTab] = useState<MarketTab>("overview");
   useEffect(() => {
-    setChartStyle(readJson<"candles" | "area">("jenvu:terminal-chart-style", "area") === "candles" ? "candles" : "area");
+    setChartStyle(readJson<"candles" | "area">("jenvu:terminal-chart-style", "candles") === "area" ? "area" : "candles");
   }, []);
   const pickChartStyle = (next: "candles" | "area") => {
     setChartStyle(next);
@@ -399,16 +399,19 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
     }
     return lastGoodBarsRef.current?.key === key ? lastGoodBarsRef.current.bars : next;
   }, [payload, asset, timeframe.key]);
-  const livePrice = useLivePriceStream(goldClosed ? undefined : asset, rawBars.at(-1)?.close ?? null, undefined, { intervalMs: 3000 });
+  // Never draw EURUSDT ticks into interbank EUR/USD candles: that creates
+  // artificial jumps/wicks. Forex candles update with their own 15s payload.
+  const streamMatchesHistory = liveStreamMatchesHistory(asset, payload?.provider);
+  const livePrice = useLivePriceStream(goldClosed || !streamMatchesHistory ? undefined : asset, rawBars.at(-1)?.close ?? null, undefined, { intervalMs: 3000 });
   const stepSeconds = payload?.stepSeconds ?? 1800;
   const bars = useMemo(() => {
-    if (goldClosed) return rawBars;
+    if (goldClosed || !streamMatchesHistory) return rawBars;
     const liveBucket =
       asset === "EURUSD"
         ? Math.floor(sessionBucketMs(Date.now(), stepSeconds * 1000) / 1000)
         : Math.floor(Date.now() / (stepSeconds * 1000)) * stepSeconds;
     return buildLiveBars(rawBars, livePrice, liveBucket);
-  }, [rawBars, livePrice, stepSeconds, goldClosed, asset]);
+  }, [rawBars, livePrice, stepSeconds, goldClosed, asset, streamMatchesHistory]);
   const activeBar = bars.at(-1);
   const currentPrice = activeBar?.close ?? null;
   const demo = useDemoTrading(currentPrice, activeBar ? {
