@@ -9,6 +9,7 @@ import { getBotUsage, type BotReportRow, type BotSessionRow } from "@/lib/mt5-li
 import { dailyTarget, isMt5Plan, sessionEndCause, sharedTargetStatus } from "@/lib/mt5-licenses";
 import { Button } from "@/components/ui/button";
 import { UsageTabs } from "@/components/dashboard/UsageTabs";
+import euFlag from "@/assets/watchlist/flag-eu.svg";
 
 export const Route = createFileRoute("/_authenticated/dashboard/bot-usage")({
   head: () => ({
