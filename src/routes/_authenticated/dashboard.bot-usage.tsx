@@ -111,28 +111,34 @@ function BotUsagePage() {
           <div className="min-w-0">
             <section className="border-b border-border px-4 pb-4 pt-5 sm:px-7">
               <div className="text-[13px] text-foreground">Profit, last 30 days</div>
-              <div className="mt-2 text-xl font-medium tabular-nums">{data ? usd(view.monthProfit) : "…"}</div>
+              <div className={`mt-2 text-xl font-medium tabular-nums ${data ? pnlClass(view.monthProfit) : ""}`}>{data ? usd(view.monthProfit) : "…"}</div>
               <div className="mt-4 h-56">
                 <ResponsiveContainer width="100%" height="100%">
                   <ComposedChart data={view.chart} margin={{ top: 4, right: 4, left: -2, bottom: 0 }}>
                     <defs>
                       <linearGradient id="botProfit" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="var(--chart-1)" stopOpacity={0.25} />
-                        <stop offset="100%" stopColor="var(--chart-1)" stopOpacity={0} />
+                        <stop offset="0%" stopColor="var(--gc-success)" stopOpacity={0.28} />
+                        <stop offset={zeroAt} stopColor="var(--gc-success)" stopOpacity={0.04} />
+                        <stop offset={zeroAt} stopColor="var(--destructive)" stopOpacity={0.04} />
+                        <stop offset="100%" stopColor="var(--destructive)" stopOpacity={0.28} />
+                      </linearGradient>
+                      <linearGradient id="botProfitLine" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset={zeroAt} stopColor="var(--gc-success)" />
+                        <stop offset={zeroAt} stopColor="var(--destructive)" />
                       </linearGradient>
                     </defs>
                     <CartesianGrid stroke="var(--border)" strokeDasharray="4 6" vertical={false} />
                     <XAxis dataKey="day" tick={{ fontSize: 11, fill: "var(--muted-foreground)" }} tickLine={false} axisLine={false} minTickGap={24} />
                     <YAxis tick={{ fontSize: 11, fill: "var(--muted-foreground)" }} tickLine={false} axisLine={false} width={28} tickFormatter={(v) => `$${v}`} />
                     <RTooltip formatter={(v: number) => [usd(v), "Profit"]} contentStyle={{ fontSize: 12, borderRadius: 8 }} />
-                    <Area type="monotone" dataKey="profit" stroke="var(--chart-1)" strokeWidth={1.6} fill="url(#botProfit)" />
+                    <Area type="monotone" dataKey="profit" stroke="url(#botProfitLine)" strokeWidth={1.8} fill="url(#botProfit)" baseValue={0} />
                   </ComposedChart>
                 </ResponsiveContainer>
               </div>
             </section>
 
             <section className="grid grid-cols-2 gap-px border-b border-border bg-border lg:grid-cols-4">
-              <Stat label="Profit today" value={usd(view.todayProfit)} />
+              <Stat label="Profit today" value={usd(view.todayProfit)} tone={pnlClass(view.todayProfit)} />
               <Stat label="Balance" value={usd(view.balance)} />
               <Stat label="Equity" value={usd(view.equity)} />
               <Stat label="Trades today" value={`${view.tradesToday}`} sub={`${view.openTrades} open`} />
@@ -168,7 +174,7 @@ function BotUsagePage() {
                           </td>
                           <td className="py-2.5 text-right tabular-nums">{usd(r.balance)}</td>
                           <td className="py-2.5 text-right tabular-nums">{usd(r.equity)}</td>
-                          <td className="py-2.5 text-right tabular-nums">{usd(r.today_profit)}</td>
+                          <td className={`py-2.5 text-right tabular-nums ${pnlClass(r.today_profit)}`}>{usd(r.today_profit)}</td>
                           <td className="py-2.5 text-right tabular-nums">{r.trades_today}</td>
                           <td className="py-2.5 text-right tabular-nums">{r.open_lots.toFixed(2)}</td>
                         </tr>
@@ -205,11 +211,15 @@ function BotUsagePage() {
   );
 }
 
-function Stat({ label, value, sub }: { label: string; value: string; sub?: string }) {
+function pnlClass(v: number) {
+  return v > 0 ? "text-gc-success" : v < 0 ? "text-destructive" : "";
+}
+
+function Stat({ label, value, sub, tone = "" }: { label: string; value: string; sub?: string; tone?: string }) {
   return (
     <div className="bg-background px-4 py-4 sm:px-7">
       <div className="text-[12px] text-muted-foreground">{label}</div>
-      <div className="mt-1.5 text-lg font-medium tabular-nums">{value}</div>
+      <div className={`mt-1.5 text-lg font-medium tabular-nums ${tone}`}>{value}</div>
       {sub && <div className="text-[12px] text-muted-foreground">{sub}</div>}
     </div>
   );
@@ -267,13 +277,13 @@ function OnOffLog({ sessions }: { sessions: BotSessionRow[] }) {
       {sessions.length === 0 ? (
         <p className="mt-3 text-[12px] text-muted-foreground">No ON/OFF records yet. They appear once the latest bot is running.</p>
       ) : (
-        <div className="relative mt-3">
+        <div className="group/log relative mt-3">
           <button
             type="button"
             aria-label="Scroll to top"
             onClick={() => scrollTo("top")}
-            className={`absolute right-1 top-1 z-10 flex h-6 w-6 items-center justify-center rounded-md border border-border bg-background/90 text-muted-foreground shadow-sm transition-opacity hover:bg-secondary hover:text-foreground ${
-              atTop || !canScroll ? "pointer-events-none opacity-0" : "opacity-100"
+            className={`group/btn absolute right-1 top-1 z-10 flex h-6 w-6 items-center justify-center rounded-md border border-border bg-background/90 text-muted-foreground shadow-sm transition-opacity hover:bg-secondary hover:text-foreground ${
+              atTop || !canScroll ? "pointer-events-none opacity-0" : "pointer-events-none opacity-0 group-hover/log:pointer-events-auto group-hover/log:opacity-100 group-focus-within/log:pointer-events-auto group-focus-within/log:opacity-100"
             }`}
           >
             <ChevronUp className="h-3.5 w-3.5 transition-transform duration-150 group-hover/btn:-translate-y-0.5" />
@@ -283,7 +293,7 @@ function OnOffLog({ sessions }: { sessions: BotSessionRow[] }) {
             aria-label="Scroll to bottom"
             onClick={() => scrollTo("bottom")}
             className={`group/btn absolute bottom-1 right-1 z-10 flex h-6 w-6 items-center justify-center rounded-md border border-border bg-background/90 text-muted-foreground shadow-sm transition-opacity hover:bg-secondary hover:text-foreground ${
-              atBottom || !canScroll ? "pointer-events-none opacity-0" : "opacity-100"
+              atBottom || !canScroll ? "pointer-events-none opacity-0" : "pointer-events-none opacity-0 group-hover/log:pointer-events-auto group-hover/log:opacity-100 group-focus-within/log:pointer-events-auto group-focus-within/log:opacity-100"
             }`}
           >
             <ChevronDown className="h-3.5 w-3.5 transition-transform duration-150 group-hover/btn:translate-y-0.5" />
