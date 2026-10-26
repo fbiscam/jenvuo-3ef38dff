@@ -40,11 +40,11 @@ beforeEach(() => {
 });
 
 describe("Ask Jenvu public access", () => {
-  test("asks visitors without a session to sign in before chatting", async () => {
-    const result = await askJenvu(question);
-    expect(result.ok).toBe(false);
-    expect(result.error).toBe("Please sign in to chat with Ask Jenvu.");
-    expect(completion).not.toHaveBeenCalled();
+  test("lets visitors without a session chat", async () => {
+    completion.mockResolvedValueOnce({ content: "Hello" });
+    await askJenvu(question);
+    expect(completion).toHaveBeenCalled();
+    expect(limit.mock.calls[0][0]).toContain("ask-jenvu:anon:");
   });
   test("retains the signed-in user's existing bucket", async () => {
     optionalUser.mockResolvedValue("user-123");
