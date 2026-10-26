@@ -1,8 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
-import { Bot, RefreshCw } from "lucide-react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Bot, ChevronDown, ChevronUp, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { Area, CartesianGrid, ComposedChart, ResponsiveContainer, Tooltip as RTooltip, XAxis, YAxis } from "recharts";
 import { getBotUsage, type BotReportRow, type BotSessionRow } from "@/lib/mt5-licenses.functions";
@@ -238,39 +238,84 @@ const WHO: Record<string, string> = { you: "By you", pc: "PC / internet", bot: "
 /** Bot ON/OFF times (UTC) for the last 3 days and why each stop happened. */
 function OnOffLog({ sessions }: { sessions: BotSessionRow[] }) {
   const now = Date.now();
+  const listRef = useRef<HTMLUListElement>(null);
+  const [atTop, setAtTop] = useState(true);
+  const [atBottom, setAtBottom] = useState(true);
+  const [canScroll, setCanScroll] = useState(false);
+
+  const updateEdges = useCallback(() => {
+    const el = listRef.current;
+    if (!el) return;
+    setAtTop(el.scrollTop <= 4);
+    setAtBottom(el.scrollTop + el.clientHeight >= el.scrollHeight - 4);
+    setCanScroll(el.scrollHeight > el.clientHeight + 4);
+  }, []);
+
+  useEffect(() => {
+    updateEdges();
+  }, [sessions.length, updateEdges]);
+
+  const scrollTo = (dir: "top" | "bottom") => {
+    const el = listRef.current;
+    if (!el) return;
+    el.scrollTo({ top: dir === "top" ? 0 : el.scrollHeight, behavior: "smooth" });
+  };
+
   return (
     <div className="p-5">
       <div className="text-[13px] font-semibold text-foreground">Bot ON / OFF · last 3 days (UTC)</div>
       {sessions.length === 0 ? (
         <p className="mt-3 text-[12px] text-muted-foreground">No ON/OFF records yet. They appear once the latest bot is running.</p>
       ) : (
-        <ul className="mt-3 max-h-[480px] divide-y divide-border overflow-y-auto">
-          {sessions.map((x) => {
-            const cause = sessionEndCause(x, now);
-            const running = cause.by === "none";
-            const end = x.ended_at ?? x.last_seen_at;
-            return (
-              <li key={x.id} className="py-2.5 text-[12px]">
-                <div className="flex items-center justify-between gap-2">
-                  <span className="text-foreground">MT5 {x.mt5_account}</span>
-                  <span className={`inline-flex items-center gap-1.5 ${running ? "text-foreground" : "text-muted-foreground"}`}>
-                    <span className={`h-1.5 w-1.5 rounded-full ${running ? "bg-primary" : "bg-muted-foreground"}`} />
-                    {running ? "ON" : "OFF"}
-                  </span>
-                </div>
-                <div className="mt-1 tabular-nums text-muted-foreground">
-                  ON {utc(x.started_at)} → {running ? "now" : `OFF ${utc(end)}`} · {dur(x.started_at, running ? new Date(now).toISOString() : end)}
-                </div>
-                {!running && (
-                  <div className="mt-1 text-foreground">
-                    {cause.label}
-                    <span className="ml-1.5 rounded bg-secondary px-1.5 py-0.5 text-[11px] text-muted-foreground">{WHO[cause.by]}</span>
+        <div className="relative mt-3">
+          <button
+            type="button"
+            aria-label="Scroll to top"
+            onClick={() => scrollTo("top")}
+            className={`absolute right-1 top-1 z-10 flex h-6 w-6 items-center justify-center rounded-md border border-border bg-background/90 text-muted-foreground shadow-sm transition-opacity hover:bg-secondary hover:text-foreground ${
+              atTop || !canScroll ? "pointer-events-none opacity-0" : "opacity-100"
+            }`}
+          >
+            <ChevronUp className="h-3.5 w-3.5 transition-transform duration-150 group-hover/btn:-translate-y-0.5" />
+          </button>
+          <button
+            type="button"
+            aria-label="Scroll to bottom"
+            onClick={() => scrollTo("bottom")}
+            className={`group/btn absolute bottom-1 right-1 z-10 flex h-6 w-6 items-center justify-center rounded-md border border-border bg-background/90 text-muted-foreground shadow-sm transition-opacity hover:bg-secondary hover:text-foreground ${
+              atBottom || !canScroll ? "pointer-events-none opacity-0" : "opacity-100"
+            }`}
+          >
+            <ChevronDown className="h-3.5 w-3.5 transition-transform duration-150 group-hover/btn:translate-y-0.5" />
+          </button>
+          <ul ref={listRef} onScroll={updateEdges} className="no-scrollbar-arrows max-h-[480px] divide-y divide-border overflow-y-auto pr-8">
+            {sessions.map((x) => {
+              const cause = sessionEndCause(x, now);
+              const running = cause.by === "none";
+              const end = x.ended_at ?? x.last_seen_at;
+              return (
+                <li key={x.id} className="py-2.5 text-[12px]">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-foreground">MT5 {x.mt5_account}</span>
+                    <span className={`inline-flex items-center gap-1.5 ${running ? "text-foreground" : "text-muted-foreground"}`}>
+                      <span className={`h-1.5 w-1.5 rounded-full ${running ? "bg-primary" : "bg-muted-foreground"}`} />
+                      {running ? "ON" : "OFF"}
+                    </span>
                   </div>
-                )}
-              </li>
-            );
-          })}
-        </ul>
+                  <div className="mt-1 tabular-nums text-muted-foreground">
+                    ON {utc(x.started_at)} → {running ? "now" : `OFF ${utc(end)}`} · {dur(x.started_at, running ? new Date(now).toISOString() : end)}
+                  </div>
+                  {!running && (
+                    <div className="mt-1 text-foreground">
+                      {cause.label}
+                      <span className="ml-1.5 rounded bg-secondary px-1.5 py-0.5 text-[11px] text-muted-foreground">{WHO[cause.by]}</span>
+                    </div>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+        </div>
       )}
     </div>
   );
