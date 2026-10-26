@@ -188,12 +188,12 @@ function JxBotPage() {
           </div>
           <div>
             <div className="text-[11px] text-zinc-500">Daily target</div>
-            <div className="mt-1 text-sm font-medium tabular-nums text-zinc-900">{access.allowed ? `$${dailyTarget(plan)}` : "—"}</div>
+            <div className="mt-1 text-sm font-medium tabular-nums text-zinc-900">{access.allowed ? `$${(access.dailyTarget || dailyTarget(plan)).toLocaleString()}` : "—"}</div>
           </div>
           <div>
             <div className="text-[11px] text-zinc-500">Monthly target</div>
             <div className="mt-1 text-sm font-medium tabular-nums text-zinc-900">
-              {access.allowed ? `$${MT5_PLANS[plan].monthlyTarget.toLocaleString()}` : "—"}
+              {access.allowed ? `$${(access.monthlyTarget || MT5_PLANS[plan].monthlyTarget).toLocaleString()}` : "—"}
             </div>
           </div>
         </div>

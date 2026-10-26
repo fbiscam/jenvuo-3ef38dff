@@ -6,7 +6,7 @@ import { Check, Copy, KeyRound, Lock, Trash2 } from "lucide-react";
 import { createMt5License, getMt5Access, revokeMt5License, type Mt5LicenseRow } from "@/lib/mt5-licenses.functions";
 import { MT5_PLANS, dailyTarget, isMt5Plan } from "@/lib/mt5-licenses";
 
-export type Mt5Access = { plan: string; allowed: boolean; limit: number; expiresAt: string | null; licenses: Mt5LicenseRow[] };
+export type Mt5Access = { plan: string; allowed: boolean; limit: number; expiresAt: string | null; dailyTarget?: number; monthlyTarget?: number; licenses: Mt5LicenseRow[] };
 
 export function useMt5Access() {
   const load = useServerFn(getMt5Access);
@@ -73,7 +73,7 @@ export function Mt5Licenses() {
         <div>
           <h3 className="text-[16px] font-medium text-gc-ink">MT5 licenses</h3>
           <p className="text-[12px] text-gc-ink-muted">
-            {MT5_PLANS[plan].name} plan · {bound}/{access.limit} used · daily target ${dailyTarget(plan)} · monthly ${MT5_PLANS[plan].monthlyTarget.toLocaleString()}
+            {MT5_PLANS[plan].name} plan · {bound}/{access.limit} used · daily target ${(access.dailyTarget || dailyTarget(plan)).toLocaleString()} · monthly ${(access.monthlyTarget || MT5_PLANS[plan].monthlyTarget).toLocaleString()}
           </p>
         </div>
       </div>
