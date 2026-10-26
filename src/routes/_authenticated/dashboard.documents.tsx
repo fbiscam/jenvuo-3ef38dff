@@ -165,7 +165,7 @@ function DocumentsPage() {
       className="mx-auto max-w-5xl space-y-8 py-2 font-sans"
     >
       <div className="border-b border-border pb-6">
-        <h1 className="text-2xl font-semibold text-foreground">Identity verification</h1>
+        <h1 className="text-2xl font-semibold text-foreground"> Identity verification</h1>
         <p className={`max-w-2xl text-sm leading-relaxed text-muted-foreground mt-2`}>
           Submit your ID verification and driving license. Signals, alerts and account changes unlock as soon as our team approves your documents.
         </p>
