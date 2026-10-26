@@ -5,3 +5,4 @@
 - Terminal opens in the light (white) look; only an explicit pick (side-rail switch or Settings → Preferences, saved as `pickedLook`) turns it dark: the old auto-saved `look` value is ignored so every account starts white.
 - Dark chart palette is pure black (`#000000` background in `CHART_THEMES.dark`): user wants the chart fully black.
 - Main Terminal instrument is EUR/USD (`EURUSD`, Binance EURUSDT candles with session-anchored buckets via `loadEurTerminalChart`, 5-decimal prices, 100,000 units per lot, forex weekend closure); gold code paths stay for the server/AI but the UI defaults to EUR/USD. Why: user moved the whole product from gold to EUR/USD.
+- Only apply browser live ticks when their provider matches candle history; interbank EUR/USD history uses its own refreshed candles, not EURUSDT stream prices, to prevent artificial wicks from mixing forex and stablecoin feeds.

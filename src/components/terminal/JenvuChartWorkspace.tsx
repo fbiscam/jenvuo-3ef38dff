@@ -399,16 +399,19 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
     }
     return lastGoodBarsRef.current?.key === key ? lastGoodBarsRef.current.bars : next;
   }, [payload, asset, timeframe.key]);
-  const livePrice = useLivePriceStream(goldClosed ? undefined : asset, rawBars.at(-1)?.close ?? null, undefined, { intervalMs: 3000 });
+  // Never draw EURUSDT ticks into interbank EUR/USD candles: that creates
+  // artificial jumps/wicks. Forex candles update with their own 15s payload.
+  const streamMatchesHistory = asset !== "EURUSD" || payload?.provider === "Binance";
+  const livePrice = useLivePriceStream(goldClosed || !streamMatchesHistory ? undefined : asset, rawBars.at(-1)?.close ?? null, undefined, { intervalMs: 3000 });
   const stepSeconds = payload?.stepSeconds ?? 1800;
   const bars = useMemo(() => {
-    if (goldClosed) return rawBars;
+    if (goldClosed || !streamMatchesHistory) return rawBars;
     const liveBucket =
       asset === "EURUSD"
         ? Math.floor(sessionBucketMs(Date.now(), stepSeconds * 1000) / 1000)
         : Math.floor(Date.now() / (stepSeconds * 1000)) * stepSeconds;
     return buildLiveBars(rawBars, livePrice, liveBucket);
-  }, [rawBars, livePrice, stepSeconds, goldClosed, asset]);
+  }, [rawBars, livePrice, stepSeconds, goldClosed, asset, streamMatchesHistory]);
   const activeBar = bars.at(-1);
   const currentPrice = activeBar?.close ?? null;
   const demo = useDemoTrading(currentPrice, activeBar ? {
