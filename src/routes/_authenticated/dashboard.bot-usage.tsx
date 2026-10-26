@@ -324,6 +324,7 @@ function LiveTrades({ rows, sessions }: { rows: BotReportRow[]; sessions: BotSes
   const totalFloat = open.reduce((a, r) => a + (r.equity - r.balance), 0);
   const th = "px-3 py-2 font-normal whitespace-nowrap";
   const td = "px-3 py-2.5 whitespace-nowrap";
+  const first = "pl-4 sm:pl-7";
   return (
     <section className="border-b border-border">
       <div className="flex items-center justify-between border-b border-border px-4 sm:px-7">
@@ -349,7 +350,7 @@ function LiveTrades({ rows, sessions }: { rows: BotReportRow[]; sessions: BotSes
           <table className="w-full min-w-[760px] text-[13px]">
             <thead className="text-left text-[12px] text-muted-foreground">
               <tr className="border-b border-border">
-                <th className={th}>   Symbol</th>
+                <th className={`${th} ${first}`}>Symbol</th>
                 <th className={th}>Account</th>
                 <th className={`${th} text-right`}>Volume, lot</th>
                 <th className={`${th} text-right`}>Balance</th>
@@ -369,7 +370,7 @@ function LiveTrades({ rows, sessions }: { rows: BotReportRow[]; sessions: BotSes
                   const online = Date.now() - Date.parse(r.updated_at) < ONLINE_MS && !lastSession?.ended_at;
                   return (
                     <tr key={r.license_id} className="border-b border-border last:border-0">
-                      <td className={td}>
+                      <td className={`${td} ${first}`}>
                         <span className="inline-flex items-center gap-2">
                           <img src={euFlag} alt="" className="h-4 w-4 rounded-full object-cover" />
                           <span className="text-foreground">{symbolLabel(r.symbol)}</span>
@@ -393,7 +394,7 @@ function LiveTrades({ rows, sessions }: { rows: BotReportRow[]; sessions: BotSes
           <table className="w-full min-w-[560px] text-[13px]">
             <thead className="text-left text-[12px] text-muted-foreground">
               <tr className="border-b border-border">
-                <th className={th}>Symbol</th>
+                <th className={`${th} ${first}`}>Symbol</th>
                 <th className={th}>Account</th>
                 <th className={`${th} text-right`}>Trades today</th>
                 <th className={th}>Updated</th>
@@ -406,7 +407,7 @@ function LiveTrades({ rows, sessions }: { rows: BotReportRow[]; sessions: BotSes
               ) : (
                 live.map((r) => (
                   <tr key={r.license_id} className="border-b border-border last:border-0">
-                    <td className={td}>
+                    <td className={`${td} ${first}`}>
                       <span className="inline-flex items-center gap-2">
                         <img src={euFlag} alt="" className="h-4 w-4 rounded-full object-cover" />
                         <span className="text-foreground">{symbolLabel(r.symbol)}</span>
