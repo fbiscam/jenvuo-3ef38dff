@@ -320,7 +320,7 @@ function LiveTrades({ rows, sessions }: { rows: BotReportRow[]; sessions: BotSes
   const today = new Date().toISOString().slice(0, 10);
   const live = rows.filter((r) => r.day === today);
   const isOnline = (r: BotReportRow) => {
-    const s = sessions.filter((x) => x.license_id === r.license_id).at(-1);
+    const s = sessions.find((x) => x.mt5_account === r.mt5_account);
     return Date.now() - Date.parse(r.updated_at) < ONLINE_MS && !s?.ended_at;
   };
   const open = live.filter((r) => r.open_trades > 0 && isOnline(r));
