@@ -60,7 +60,9 @@ function BotUsagePage() {
       balance: latestList.reduce((a, r) => a + r.balance, 0),
       equity: latestList.reduce((a, r) => a + r.equity, 0),
       tradesToday: todayRows.reduce((a, r) => a + r.trades_today, 0),
-      openTrades: latestList.filter((r) => r.day === today).reduce((a, r) => a + r.open_trades, 0),
+      openTrades: latestList
+        .filter((r) => r.day === today && Date.now() - Date.parse(r.updated_at) < ONLINE_MS && !(data?.sessions ?? []).find((x) => x.mt5_account === r.mt5_account)?.ended_at)
+        .reduce((a, r) => a + r.open_trades, 0),
     };
   }, [data, account]);
   const zeroAt = useMemo(() => {
@@ -319,7 +321,11 @@ function LiveTrades({ rows, sessions }: { rows: BotReportRow[]; sessions: BotSes
   const [tab, setTab] = useState<"open" | "closed">("open");
   const today = new Date().toISOString().slice(0, 10);
   const live = rows.filter((r) => r.day === today);
-  const open = live.filter((r) => r.open_trades > 0);
+  const isOnline = (r: BotReportRow) => {
+    const s = sessions.find((x) => x.mt5_account === r.mt5_account);
+    return Date.now() - Date.parse(r.updated_at) < ONLINE_MS && !s?.ended_at;
+  };
+  const open = live.filter((r) => r.open_trades > 0 && isOnline(r));
   const totalOpen = open.reduce((a, r) => a + r.open_trades, 0);
   const totalFloat = open.reduce((a, r) => a + (r.equity - r.balance), 0);
   const th = "px-3 py-2 font-normal whitespace-nowrap";
