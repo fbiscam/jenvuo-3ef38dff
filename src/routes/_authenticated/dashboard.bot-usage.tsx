@@ -57,8 +57,13 @@ function BotUsagePage() {
       perAccount,
       todayProfit: todayRows.reduce((a, r) => a + r.today_profit, 0),
       monthProfit: chart.reduce((a, r) => a + r.profit, 0),
-      balance: latestList.reduce((a, r) => a + r.balance, 0),
-      equity: latestList.reduce((a, r) => a + r.equity, 0),
+      ...(() => {
+        // Only running accounts count; if none is running, show the most recently reported account.
+        const running = latestList.filter((r) => Date.now() - Date.parse(r.updated_at) < ONLINE_MS && !(data?.sessions ?? []).find((x) => x.mt5_account === r.mt5_account)?.ended_at);
+        const newest = [...latestList].sort((a, b) => Date.parse(b.updated_at) - Date.parse(a.updated_at)).slice(0, 1);
+        const src = running.length ? running : newest;
+        return { balance: src.reduce((a, r) => a + r.balance, 0), equity: src.reduce((a, r) => a + r.equity, 0), runningCount: running.length };
+      })(),
       tradesToday: todayRows.reduce((a, r) => a + r.trades_today, 0),
       openTrades: latestList
         .filter((r) => r.day === today && Date.now() - Date.parse(r.updated_at) < ONLINE_MS && !(data?.sessions ?? []).find((x) => x.mt5_account === r.mt5_account)?.ended_at)
@@ -149,8 +154,8 @@ function BotUsagePage() {
 
             <section className="grid grid-cols-2 gap-px border-b border-border bg-border lg:grid-cols-4">
               <Stat label="Profit today" value={usd(view.todayProfit)} tone={pnlClass(view.todayProfit)} />
-              <Stat label="Balance" value={usd(view.balance)} />
-              <Stat label="Equity" value={usd(view.equity)} />
+              <Stat label="Balance" value={usd(view.balance)} sub={view.runningCount ? `${view.runningCount} running` : "Last account"} />
+              <Stat label="Equity" value={usd(view.equity)} sub={view.runningCount ? `${view.runningCount} running` : "Last account"} />
               <Stat label="Trades today" value={`${view.tradesToday}`} sub={`${view.openTrades} open`} />
             </section>
 
