@@ -68,3 +68,13 @@ describe("bot on/off sessions", () => {
     expect(sessionEndCause(seen(30_000), t).label).toBe("Running");
   });
 });
+
+describe('owner bot target', () => {
+  test('imgakhar@gmail.com gets $1,000 daily, others keep plan targets', async () => {
+    const { targetsFor, evaluateLicense } = await import('./mt5-licenses')
+    expect(targetsFor('ultra', '5af751fb-de3b-4a24-aefd-aed53ef44378').daily).toBe(1000)
+    expect(targetsFor('ultra', 'someone-else').daily).toBe(150)
+    const r = evaluateLicense('JENV-AAAA-BBBB-CCCC-DDDD', '12345', { mt5_account: '12345', revoked_at: null, user_id: '5af751fb-de3b-4a24-aefd-aed53ef44378' }, { plan_id: 'ultra', status: 'active', is_trial: false, current_period_end: null })
+    expect(r.valid && r.daily_target).toBe(1000)
+  })
+})

@@ -23,8 +23,9 @@ export function personLinkVerdict(
   for (const h of history) {
     if (!h.user_id) continue
     if (signup.ip && h.ip === signup.ip) return 'An account is already linked to this network. Please sign in to your existing account.'
-    const fp = (h.fingerprint || '').split('_')[0]
-    if (fp && (fp === signup.browser || (signup.hardware && h.fingerprint?.endsWith('_' + signup.hardware)))) {
+    // Sign-in history stores the hardware hash when known, else the browser hash.
+    const fp = h.fingerprint || ''
+    if (fp && (fp === signup.browser || fp === signup.hardware)) {
       return 'An account is already linked to this device. Please sign in to your existing account.'
     }
   }

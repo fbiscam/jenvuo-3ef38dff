@@ -262,12 +262,9 @@ async function assertDeviceUnderCap(ip: string | undefined, rawFingerprint: stri
     const { data } = await admin.from('login_events').select('user_id,ip,fingerprint').eq('ip', normalizedIp).gte('created_at', sinceLink).limit(5)
     history.push(...(data ?? []))
   }
-  if (browser) {
-    const { data } = await admin.from('login_events').select('user_id,ip,fingerprint').like('fingerprint', `${browser.replace(/[%_\\]/g, '')}%`).gte('created_at', sinceLink).limit(5)
-    history.push(...(data ?? []))
-  }
-  if (hardware) {
-    const { data } = await admin.from('login_events').select('user_id,ip,fingerprint').like('fingerprint', `%\\_${hardware}`).gte('created_at', sinceLink).limit(5)
+  const fps = [browser, hardware].filter((v): v is string => !!v)
+  if (fps.length) {
+    const { data } = await admin.from('login_events').select('user_id,ip,fingerprint').in('fingerprint', fps).gte('created_at', sinceLink).limit(5)
     history.push(...(data ?? []))
   }
   const verdict = personLinkVerdict({ ip: normalizedIp || null, browser: browser || null, hardware }, history)
