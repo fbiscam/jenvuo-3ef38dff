@@ -1,9 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { toast } from "sonner";
-import { UploadCloud, Trash2, FileVideo, FileImage, FileText, Check } from "lucide-react";
+import { UploadCloud, Trash2, FileVideo, FileImage, FileText, Check, ShieldCheck } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import {
   getMyDocumentStatus,
@@ -15,7 +16,15 @@ import {
 } from "@/lib/founding.functions";
 
 export const Route = createFileRoute("/_authenticated/dashboard/documents")({
-  head: () => ({ meta: [{ title: "Identity verification — Jenvu" }] }),
+  head: () => ({ meta: [
+    { title: "Identity verification — Jenvu" },
+    { name: "description", content: "Submit and track your Founding identity documents securely in Jenvu." },
+    { property: "og:title", content: "Identity verification — Jenvu" },
+    { property: "og:description", content: "Submit and track your Founding identity documents securely in Jenvu." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+    { name: "robots", content: "noindex,nofollow" },
+  ] }),
   component: DocumentsPage,
 });
 
@@ -47,9 +56,9 @@ function fmtSize(n: number) {
 }
 
 function FileIcon({ mime }: { mime: string }) {
-  if (mime.startsWith("image/")) return <FileImage className="h-4 w-4 text-blue-600" />;
-  if (mime.startsWith("video/")) return <FileVideo className="h-4 w-4 text-purple-600" />;
-  return <FileText className="h-4 w-4 text-zinc-500" />;
+  if (mime.startsWith("image/")) return <FileImage className="h-4 w-4 text-gc-blue" />;
+  if (mime.startsWith("video/")) return <FileVideo className="h-4 w-4 text-gc-blue" />;
+  return <FileText className="h-4 w-4 text-muted-foreground" />;
 }
 
 function DocumentsPage() {
@@ -79,18 +88,6 @@ function DocumentsPage() {
   const needsInfo = row?.document_status === "needs_info";
   const currentIdx = rejected || needsInfo ? 0 : statusIndex(row?.document_status);
   const canUpload = !!row && row.document_status !== "verified";
-
-  useEffect(() => {
-    if (row?.document_status !== "verified") return;
-    const previousHtmlOverflow = document.documentElement.style.overflowY;
-    const previousBodyOverflow = document.body.style.overflowY;
-    document.documentElement.style.overflowY = "hidden";
-    document.body.style.overflowY = "hidden";
-    return () => {
-      document.documentElement.style.overflowY = previousHtmlOverflow;
-      document.body.style.overflowY = previousBodyOverflow;
-    };
-  }, [row?.document_status]);
 
   const removeMut = useMutation({
     mutationFn: (id: string) => remove({ data: { id } } as any),
@@ -165,25 +162,25 @@ function DocumentsPage() {
 
   return (
     <div
-      className="mx-auto max-w-3xl px-4 py-8 font-['Google_Sans',_'Inter',_system-ui,_sans-serif]"
+      className="mx-auto max-w-5xl space-y-8 py-2 font-sans"
     >
-      <div className="mb-6">
-        <h1 className="pl-1 text-2xl font-semibold text-zinc-900 mt-1">Identity verification</h1>
-        <p className={`text-sm text-zinc-600 mt-2`}>
+      <div className="border-b border-border pb-6">
+        <h1 className="text-2xl font-semibold text-foreground">Identity verification</h1>
+        <p className={`max-w-2xl text-sm leading-relaxed text-muted-foreground mt-2`}>
           Submit your ID verification and driving license. Signals, alerts and account changes unlock as soon as our team approves your documents.
         </p>
       </div>
 
       {isLoading ? (
-        <div className="rounded-xl border border-zinc-200 bg-white p-6 text-sm text-zinc-500">Loading…</div>
+        <div className="border-b border-border pb-6 text-sm text-muted-foreground">Loading…</div>
       ) : !row ? (
-        <div className="rounded-xl border border-zinc-200 bg-white p-6">
-          <div className="text-sm text-zinc-700">
+        <div className="border-b border-border pb-6">
+          <div className="text-sm text-foreground">
             We couldn't find a Founding application linked to your account email. Please apply first.
           </div>
           <a
             href="/founding"
-            className="inline-block mt-4 rounded-xl bg-zinc-900 px-4 py-2 text-sm font-semibold text-white hover:bg-zinc-800"
+            className="inline-block mt-4 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
           >
             Apply now
           </a>
@@ -191,12 +188,12 @@ function DocumentsPage() {
       ) : (
         <>
           {/* Stepper */}
-          <div className={`rounded-xl border border-zinc-200 bg-white p-6`}>
-            <ol className="space-y-4">
+          <div className={`border-b border-border pb-6`}>
+            <ol className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
               {STEPS.map((step, i) => {
                 const done = i < currentIdx || (i === currentIdx && row?.document_status === "verified");
                 const active = i === currentIdx && !rejected && !needsInfo && row?.document_status !== "verified";
-                const isLast = i === STEPS.length - 1;
+                
                 return (
                   <li key={step.key} className="flex items-start gap-3">
                     <div className="flex flex-col items-center self-stretch">
@@ -204,28 +201,25 @@ function DocumentsPage() {
                         className={[
                           "jenvu-proof-step-circle mt-0.5 h-7 w-7 shrink-0 rounded-full flex items-center justify-center text-xs font-semibold border-2",
                           done
-                            ? "border-emerald-500 bg-emerald-500 text-white"
+                            ? "border-gc-success bg-gc-success text-gc-on-blue"
                             : active
-                            ? "border-blue-600 bg-blue-600 text-white ring-4 ring-blue-100"
-                            : "border-zinc-300 bg-white text-zinc-500",
+                            ? "border-gc-blue bg-gc-blue text-gc-on-blue ring-4 ring-gc-blue-soft"
+                            : "border-border bg-background text-muted-foreground",
                         ].join(" ")}
                       >
                         {done ? <Check className="h-4 w-4" strokeWidth={3} /> : i + 1}
                       </div>
-                      {!isLast && (
-                        <div className={["w-px flex-1 mt-1", done ? "bg-emerald-500" : "bg-zinc-300"].join(" ")} />
-                      )}
                     </div>
-                    <div className={`flex-1 pb-4`}>
-                      <div className="text-sm font-semibold text-zinc-900">{step.label}</div>
-                      <div className="text-xs text-zinc-600">{step.desc}</div>
+                    <div className="min-w-0 flex-1">
+                      <div className="text-sm font-semibold text-foreground">{step.label}</div>
+                      <div className="text-xs text-muted-foreground">{step.desc}</div>
                       {active && step.key === "received" && row.documents_submitted_at && (
-                        <div className="text-[11px] text-zinc-500 mt-1">
+                        <div className="text-[11px] text-muted-foreground mt-1">
                           Submitted {new Date(row.documents_submitted_at).toLocaleString()}
                         </div>
                       )}
                       {step.key === "verified" && row.documents_verified_at && (
-                        <div className="text-[11px] text-emerald-700 mt-1">
+                        <div className="text-[11px] text-gc-success mt-1">
                           Verified {new Date(row.documents_verified_at).toLocaleString()}
                         </div>
                       )}
@@ -237,69 +231,79 @@ function DocumentsPage() {
           </div>
 
           {needsInfo && (
-            <div className="mt-4 rounded-2xl border border-violet-200 bg-violet-50 p-5">
-              <div className="text-sm font-semibold text-violet-900">Reviewer needs more info</div>
-              <div className="text-sm text-violet-800 mt-1 whitespace-pre-line">
+            <div className="mt-4 rounded-lg border border-gc-blue/20 bg-gc-blue-soft p-5">
+              <div className="text-sm font-semibold text-foreground">Reviewer needs more info</div>
+              <div className="text-sm text-muted-foreground mt-1 whitespace-pre-line">
                 {row.documents_info_request || "Our team asked for a small update. Please upload the missing item below."}
               </div>
               {row.documents_info_requested_at && (
-                <div className="text-[11px] text-violet-700 mt-2">
+                <div className="text-[11px] text-gc-blue mt-2">
                   Requested {new Date(row.documents_info_requested_at).toLocaleString()}
                 </div>
               )}
-              <div className="text-xs text-violet-800 mt-3">
+              <div className="text-xs text-muted-foreground mt-3">
                 Upload the requested file below — your submission will go straight back to review.
               </div>
             </div>
           )}
 
           {rejected && (
-            <div className="mt-4 rounded-xl border border-red-200 bg-white p-5" style={{ fontFamily: '"Google Sans", "Google Sans Text", "Product Sans", Roboto, Arial, sans-serif' }}>
-              <div className="text-sm font-semibold text-red-800">Documents rejected</div>
-              <div className="text-sm text-yellow-600 mt-1">
+            <div className="mt-4 rounded-lg border border-destructive/30 bg-background p-5">
+              <div className="text-sm font-semibold text-destructive">Documents rejected</div>
+              <div className="text-sm text-muted-foreground mt-1">
                 {row.documents_rejected_reason || "Please re-upload clearer or more recent ID and driving license."}
               </div>
               {row.documents_rejected_at && (
-                <div className="text-[11px] text-black mt-2">
+                <div className="text-[11px] text-foreground mt-2">
                   {new Date(row.documents_rejected_at).toLocaleString()}
                 </div>
               )}
-              <div className="text-xs mt-3 font-medium text-black">
+              <div className="text-xs mt-3 font-medium text-foreground">
                 You can re-submit right away — just upload updated ID and driving license below.
+              </div>
+            </div>
+          )}
+
+          {row.document_status === "verified" && (
+            <div className="flex items-start gap-4 rounded-lg border border-gc-success/20 bg-gc-green-soft p-5">
+              <ShieldCheck className="h-6 w-6 shrink-0 text-gc-success" />
+              <div>
+                <h2 className="text-base font-semibold text-foreground">Identity verified</h2>
+                <p className="mt-1 text-sm text-muted-foreground">Your documents have been approved.</p>
               </div>
             </div>
           )}
 
           {/* Uploader */}
           {canUpload && (
-            <div className="mt-6 rounded-xl border border-zinc-200 bg-white p-6">
-              <div className="text-sm font-semibold text-zinc-900">Upload documents</div>
-              <p className="text-xs text-zinc-600 mt-1">
+            <div className="mt-6 border-b border-border pb-6">
+              <div className="text-sm font-semibold text-foreground">Upload documents</div>
+              <p className="text-xs text-muted-foreground mt-1">
                 Images (JPG, PNG), videos (MP4, MOV) or PDFs — up to 100 MB each.
               </p>
               <div className="mt-3 flex flex-wrap gap-2">
                 {DOC_KINDS.map((k) => {
                   const uploaded = files.some((f) => f.doc_kind === k.key);
                   return (
-                    <button
+                    <Button
                       key={k.key}
                       type="button"
                       onClick={() => setDocKind(k.key)}
                       className={[
-                        "rounded-xl border px-3 py-2 text-xs font-semibold transition",
+                        "rounded-md border px-3 py-2 text-xs font-medium transition",
                         docKind === k.key
-                          ? "border-zinc-900 bg-zinc-900 text-white"
-                          : "border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-50",
+                          ? "border-gc-blue bg-gc-blue-soft text-gc-blue"
+                          : "border-border bg-background text-foreground hover:bg-muted",
                       ].join(" ")}
                     >
                       {k.label}
                       {k.required && !uploaded ? " *" : ""}
                       {uploaded ? " ✓" : ""}
-                    </button>
+                    </Button>
                   );
                 })}
               </div>
-              <p className="mt-2 text-xs text-zinc-600">
+              <p className="mt-2 text-xs text-muted-foreground">
                 {DOC_KINDS.find((k) => k.key === docKind)?.desc}
               </p>
               <div
@@ -310,21 +314,21 @@ function DocumentsPage() {
                   e.preventDefault();
                   handleFiles(e.dataTransfer.files);
                 }}
-                className="mt-3 rounded-xl border-2 border-dashed border-zinc-300 bg-zinc-50 p-6 text-center"
+                className="mt-4 rounded-lg border-2 border-dashed border-border bg-muted/40 p-8 text-center transition-colors hover:border-gc-blue"
               >
-                <UploadCloud className="mx-auto h-8 w-8 text-zinc-400" />
-                <div className="mt-2 text-sm text-zinc-700">
+                <UploadCloud className="mx-auto h-8 w-8 text-muted-foreground" />
+                <div className="mt-2 text-sm text-foreground">
                   Drag & drop files here, or{" "}
-                  <button
+                  <Button
                     type="button"
                     onClick={() => inputRef.current?.click()}
-                    className="text-blue-600 font-semibold hover:underline"
+                    variant="link" className="h-auto p-0 text-gc-blue"
                     disabled={uploading}
                   >
                     browse
-                  </button>
+                  </Button>
                 </div>
-                {uploading && <div className="mt-2 text-xs text-zinc-500">{progress || "Uploading…"}</div>}
+                {uploading && <div className="mt-2 text-xs text-muted-foreground">{progress || "Uploading…"}</div>}
                 <input
                   ref={inputRef}
                   type="file"
@@ -336,27 +340,27 @@ function DocumentsPage() {
               </div>
 
               {pending.length > 0 && (
-                <div className="mt-4 rounded-xl border border-zinc-200 bg-white">
-                  <div className="px-4 py-2 text-xs font-semibold text-zinc-700 border-b border-zinc-100">
+                <div className="mt-4 rounded-lg border border-border bg-background">
+                  <div className="px-4 py-2 text-xs font-semibold text-foreground border-b border-border">
                     Ready to submit ({pending.length})
                   </div>
-                  <ul className="divide-y divide-zinc-100">
+                  <ul className="divide-y divide-border">
                     {pending.map((f, i) => (
                       <li key={`${f.name}-${i}`} className="flex items-center gap-3 px-4 py-2 text-sm">
                         <FileIcon mime={f.type || ""} />
                         <div className="flex-1 min-w-0">
-                          <div className="truncate text-zinc-900">{f.name}</div>
-                          <div className="text-xs text-zinc-500">{fmtSize(f.size)}</div>
+                          <div className="truncate text-foreground">{f.name}</div>
+                          <div className="text-xs text-muted-foreground">{fmtSize(f.size)}</div>
                         </div>
-                        <button
+                        <Button
                           type="button"
                           onClick={() => removePending(i)}
                           disabled={uploading}
-                          className="text-zinc-400 hover:text-red-600 disabled:opacity-40"
+                          variant="ghost" size="icon-sm" className="text-muted-foreground hover:text-destructive"
                           aria-label="Remove"
                         >
                           <Trash2 className="h-4 w-4" />
-                        </button>
+                        </Button>
                       </li>
                     ))}
                   </ul>
@@ -364,34 +368,34 @@ function DocumentsPage() {
               )}
 
               <div className="mt-4 flex items-center justify-end gap-3">
-                {uploading && <div className="text-xs text-zinc-500">{progress}</div>}
-                <button
+                {uploading && <div className="text-xs text-muted-foreground">{progress}</div>}
+                <Button
                   type="button"
                   onClick={submitPending}
                   disabled={pending.length === 0 || uploading}
-                  className="rounded-xl bg-zinc-900 px-4 py-2 text-sm font-semibold text-white hover:bg-zinc-800 disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="bg-gc-blue text-gc-on-blue hover:bg-gc-blue-hover"
                 >
                   {uploading ? "Submitting…" : `Submit${pending.length ? ` (${pending.length})` : ""}`}
-                </button>
+                </Button>
               </div>
             </div>
           )}
 
           {/* Uploaded files list */}
           {canUpload && files.length > 0 && (
-            <div className="mt-6 rounded-xl border border-zinc-200 bg-white p-6">
-              <div className="text-sm font-semibold text-zinc-900 mb-3">
+            <div className="mt-6 border-b border-border pb-6">
+              <div className="text-sm font-semibold text-foreground mb-3">
                 Uploaded files ({files.length})
               </div>
-              <ul className="divide-y divide-zinc-100">
+              <ul className="divide-y divide-border">
                 {files.map((f) => (
                   <li key={f.id} className="flex items-center gap-3 py-3">
                     <FileIcon mime={f.mime_type} />
                     <div className="flex-1 min-w-0">
-                      <div className="text-sm text-zinc-900 truncate">
+                      <div className="text-sm text-foreground truncate">
                         {f.original_name || f.storage_path.split("/").pop()}
                       </div>
-                      <div className="text-[11px] text-zinc-500">
+                      <div className="text-[11px] text-muted-foreground">
                         {fmtSize(f.file_size)} · {new Date(f.created_at).toLocaleString()}
                       </div>
                     </div>
@@ -400,20 +404,20 @@ function DocumentsPage() {
                         href={f.signed_url}
                         target="_blank"
                         rel="noreferrer"
-                        className="text-xs text-blue-600 hover:underline"
+                        className="text-xs text-gc-blue hover:underline"
                       >
                         View
                       </a>
                     )}
                     {canUpload && (
-                      <button
+                      <Button
                         onClick={() => removeMut.mutate(f.id)}
                         disabled={removeMut.isPending}
-                        className="text-zinc-400 hover:text-red-600"
+                        variant="ghost" size="icon-sm" className="text-muted-foreground hover:text-destructive"
                         aria-label="Remove"
                       >
                         <Trash2 className="h-4 w-4" />
-                      </button>
+                      </Button>
                     )}
                   </li>
                 ))}
