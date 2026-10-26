@@ -1496,3 +1496,10 @@ select:not([multiple]):not([size]) {
 /* Bot ON/OFF log: scrolls with wheel/touch, no visible scrollbar or arrows. */
 .no-scrollbar-arrows { scrollbar-width: none; -ms-overflow-style: none; }
 .no-scrollbar-arrows::-webkit-scrollbar { display: none; width: 0; height: 0; }
+
+@keyframes jenvu-onboard-float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-12px) rotate(1.5deg); }
+}
+.jenvu-onboard-float { animation: jenvu-onboard-float 5s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) { .jenvu-onboard-float { animation: none; } }

@@ -1585,6 +1585,7 @@ function DashboardLayout() {
               : "flex min-h-0 w-full flex-1 flex-col overflow-clip bg-background sm:mx-2 sm:w-auto sm:rounded-t-[20px]"
           }
         >
+        <WelcomeOnboarding />
         {drawerMode && <RenewalNotice />}
         {drawerMode && pathname === "/dashboard" && <StartTrialBanner />}
         {drawerMode && pathname === "/dashboard" && <TwoFactorReminder />}
@@ -1603,7 +1604,6 @@ function DashboardLayout() {
 
           {pathname === "/dashboard" ? (
             <>
-              <WelcomeOnboarding />
               <CloudWelcome name={fullName} />
 
               {/* Extension usage analytics — Cloudflare-style */}

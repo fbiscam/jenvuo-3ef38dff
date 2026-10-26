@@ -868,7 +868,7 @@ function AuthPage() {
                           placeholder="••••••"
                         />
                         {mfaError && (
-                          <p className={`mt-2 text-[12px] text-red-600 md:whitespace-nowrap ${MONO}`} role="alert" aria-live="polite">
+                          <p className={`mt-2 text-[13px] text-red-600 md:whitespace-nowrap`} role="alert" aria-live="polite">
                             {mfaError}
                           </p>
                         )}
@@ -949,7 +949,7 @@ function AuthPage() {
                             placeholder="••••••"
                           />
                           {otpError && (
-                            <p id="otp-error" className={`mt-2 text-[12px] text-red-600 ${MONO}`} role="alert" aria-live="polite">
+                            <p id="otp-error" className={`mt-2 text-[13px] text-red-600`} role="alert" aria-live="polite">
                               {otpError}
                             </p>
                           )}
@@ -1052,7 +1052,7 @@ function AuthPage() {
                         </p>
 
                         {errorMsg && (
-                          <div className={`flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[12px] text-red-700 ${MONO}`}>
+                          <div className={`flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[13px] text-red-700`}>
                             <span className="mt-[2px] inline-block h-1.5 w-1.5 rounded-full bg-red-500 shrink-0" />
                             <span className="leading-snug">{errorMsg}</span>
                           </div>
@@ -1095,7 +1095,7 @@ function AuthPage() {
                         </div>
 
                         {errorMsg && (
-                          <div className={`flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[12px] text-red-700 ${MONO}`}>
+                          <div className={`flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[13px] text-red-700`}>
                             <span className="mt-[2px] inline-block h-1.5 w-1.5 rounded-full bg-red-500 shrink-0" />
                             <span className="leading-snug">{errorMsg}</span>
                           </div>
@@ -1147,7 +1147,7 @@ function AuthPage() {
                             placeholder="••••••"
                           />
                           {otpError && (
-                            <p id="otp-error-recovery" className={`mt-2 text-[12px] text-red-600 ${MONO}`} role="alert" aria-live="polite">
+                            <p id="otp-error-recovery" className={`mt-2 text-[13px] text-red-600`} role="alert" aria-live="polite">
                               {otpError}
                             </p>
                           )}
@@ -1220,7 +1220,7 @@ function AuthPage() {
 
 
                         {errorMsg && (
-                          <div className={`flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[12px] text-red-700 ${MONO}`}>
+                          <div className={`flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[13px] text-red-700`}>
                             <span className="mt-[2px] inline-block h-1.5 w-1.5 rounded-full bg-red-500 shrink-0" />
                             <span className="leading-snug">{errorMsg}</span>
                           </div>
@@ -1287,7 +1287,7 @@ function AuthPage() {
 
 
                         {errorMsg && (
-                          <div className={`flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[12px] text-red-700 ${MONO}`}>
+                          <div className={`flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[13px] text-red-700`}>
                             <span className="mt-[2px] inline-block h-1.5 w-1.5 rounded-full bg-red-500 shrink-0" />
                             <span className="leading-snug">{errorMsg}</span>
                           </div>

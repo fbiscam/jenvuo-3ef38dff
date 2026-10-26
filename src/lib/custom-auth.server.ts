@@ -317,6 +317,7 @@ export async function createSignupOtp(input: { email: string; password: string; 
     throw new Error('Disposable email addresses are not allowed. Please use a permanent email.')
   }
 
+  await assertPasswordNotLeaked(input.password)
   assertSignupSignals(input)
   await assertNoEmailAlias(email)
   const signupDomain = email.split('@')[1]?.toLowerCase().trim() || ''
@@ -553,4 +554,23 @@ export async function verifyRecoveryOtp(input: { email: string; code: string; si
 
   await consumeOtp(verified.row.id)
   return { ok: true, session: data.session }
+}
+
+/** Reject passwords found in known breaches (same check the auth service runs at account creation), so the user hears it on the sign-up form instead of after entering the code. */
+async function assertPasswordNotLeaked(password: string) {
+  try {
+    const buf = await crypto.subtle.digest('SHA-1', new TextEncoder().encode(password))
+    const hex = Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, '0')).join('').toUpperCase()
+    const res = await fetch(`https://api.pwnedpasswords.com/range/${hex.slice(0, 5)}`, { headers: { 'Add-Padding': 'true' } })
+    if (!res.ok) return
+    const body = await res.text()
+    const suffix = hex.slice(5)
+    const hit = body.split('\n').some((line) => {
+      const [s, c] = line.trim().split(':')
+      return s === suffix && Number(c) > 0
+    })
+    if (hit) throw new Error('This password is weak or has appeared in a data leak. Please choose a stronger password.')
+  } catch (e) {
+    if (e instanceof Error && e.message.startsWith('This password')) throw e
+  }
 }

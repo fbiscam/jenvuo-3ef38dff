@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 
 const DISMISS_KEY = "jenvu_2fa_reminder_day";
 const today = () => new Date().toISOString().slice(0, 10);
+const FIRST_SHOW_AFTER_MS = 5 * 60 * 60 * 1000;
 
 /** Daily card asking accounts without an authenticator app to turn on 2FA. */
 export default function TwoFactorReminder() {
@@ -13,10 +14,15 @@ export default function TwoFactorReminder() {
   useEffect(() => {
     if (localStorage.getItem(DISMISS_KEY) === today()) return;
     let live = true;
-    void supabase.auth.mfa.listFactors().then(({ data }) => {
+    void (async () => {
+      const { data: u } = await supabase.auth.getUser();
+      const created = u.user?.created_at ? new Date(u.user.created_at).getTime() : 0;
+      // New accounts see the reminder only 5 hours after sign-up.
+      if (!created || Date.now() - created < FIRST_SHOW_AFTER_MS) return;
+      const { data } = await supabase.auth.mfa.listFactors();
       const hasVerified = (data?.all ?? []).some((f) => f.status === "verified");
       if (live && !hasVerified) setShow(true);
-    });
+    })();
     return () => { live = false; };
   }, []);
 
