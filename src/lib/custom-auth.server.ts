@@ -172,7 +172,6 @@ async function findUserByEmail(email: string): Promise<User | null> {
 const SIGNUP_IP_LIMIT_PER_HOUR = 5
 const SIGNUP_DOMAIN_LIMIT_PER_HOUR = 20
 const MAX_ACCOUNTS_PER_DEVICE = 1
-const MAX_ACCOUNTS_PER_IP = 2
 
 // Public email providers — skip domain-level rate limit (millions of legit users share these).
 // Abuse from these is caught by device fingerprint + IP caps instead.
@@ -222,7 +221,7 @@ async function assertNotVpn(ip: string | undefined) {
 
 async function assertDeviceUnderCap(ip: string | undefined, rawFingerprint: string) {
   const { supabaseAdmin } = await import('@/integrations/supabase/client.server')
-  const { splitFingerprint, ipSubnet, MAX_ACCOUNTS_PER_SUBNET_DAY, trustedSignupIpCap } = await import('./signup-guard')
+  const { splitFingerprint, ipSubnet, MAX_ACCOUNTS_PER_SUBNET_DAY, MAX_ACCOUNTS_PER_IP, PERSON_LINK_WINDOW_DAYS, personLinkVerdict, trustedSignupIpCap } = await import('./signup-guard')
   const admin = supabaseAdmin as any
   // Trusted tester IPs: skip device/subnet caps, enforce only their own IP cap.
   const trustedCap = trustedSignupIpCap(ip || '')
@@ -256,6 +255,23 @@ async function assertDeviceUnderCap(ip: string | undefined, rawFingerprint: stri
       if (countUsers(netRows) >= MAX_ACCOUNTS_PER_SUBNET_DAY) throw new Error('Too many new accounts from this network today. Please try again tomorrow.')
     }
   }
+  // Person link: same IP / device already used to sign in to another account.
+  const sinceLink = new Date(Date.now() - PERSON_LINK_WINDOW_DAYS * 86400000).toISOString()
+  const history: { user_id: string; ip: string | null; fingerprint: string | null }[] = []
+  if (normalizedIp) {
+    const { data } = await admin.from('login_events').select('user_id,ip,fingerprint').eq('ip', normalizedIp).gte('created_at', sinceLink).limit(5)
+    history.push(...(data ?? []))
+  }
+  if (browser) {
+    const { data } = await admin.from('login_events').select('user_id,ip,fingerprint').like('fingerprint', `${browser.replace(/[%_\\]/g, '')}%`).gte('created_at', sinceLink).limit(5)
+    history.push(...(data ?? []))
+  }
+  if (hardware) {
+    const { data } = await admin.from('login_events').select('user_id,ip,fingerprint').like('fingerprint', `%\\_${hardware}`).gte('created_at', sinceLink).limit(5)
+    history.push(...(data ?? []))
+  }
+  const verdict = personLinkVerdict({ ip: normalizedIp || null, browser: browser || null, hardware }, history)
+  if (verdict) throw new Error(verdict)
 }
 
 // Looks up the domain's mail servers (DNS over HTTPS). Blocks domains with no
