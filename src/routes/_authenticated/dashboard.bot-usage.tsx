@@ -60,7 +60,9 @@ function BotUsagePage() {
       balance: latestList.reduce((a, r) => a + r.balance, 0),
       equity: latestList.reduce((a, r) => a + r.equity, 0),
       tradesToday: todayRows.reduce((a, r) => a + r.trades_today, 0),
-      openTrades: latestList.filter((r) => r.day === today).reduce((a, r) => a + r.open_trades, 0),
+      openTrades: latestList
+        .filter((r) => r.day === today && Date.now() - Date.parse(r.updated_at) < ONLINE_MS && !(data?.sessions ?? []).find((x) => x.mt5_account === r.mt5_account)?.ended_at)
+        .reduce((a, r) => a + r.open_trades, 0),
     };
   }, [data, account]);
   const zeroAt = useMemo(() => {
