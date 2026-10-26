@@ -185,7 +185,7 @@ function BotUsagePage() {
                           <td className="py-2.5">{r.mt5_account}<span className="ml-2 text-muted-foreground">{r.symbol}</span></td>
                           <td className="py-2.5">
                             <span className={`inline-flex items-center gap-1.5 ${online ? "text-foreground" : "text-muted-foreground"}`}>
-                              <span className={`h-1.5 w-1.5 rounded-full ${online ? "bg-primary" : "bg-muted-foreground"}`} />
+                              <span className={`h-1.5 w-1.5 rounded-full ${online ? "bg-emerald-600" : "bg-muted-foreground"}`} />
                               {r.target_hit && r.day === new Date().toISOString().slice(0, 10) ? "Target reached" : online ? "Running" : "Offline"}
                             </span>
                           </td>
