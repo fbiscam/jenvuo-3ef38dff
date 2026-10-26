@@ -319,7 +319,11 @@ function LiveTrades({ rows, sessions }: { rows: BotReportRow[]; sessions: BotSes
   const [tab, setTab] = useState<"open" | "closed">("open");
   const today = new Date().toISOString().slice(0, 10);
   const live = rows.filter((r) => r.day === today);
-  const open = live.filter((r) => r.open_trades > 0);
+  const isOnline = (r: BotReportRow) => {
+    const s = sessions.filter((x) => x.license_id === r.license_id).at(-1);
+    return Date.now() - Date.parse(r.updated_at) < ONLINE_MS && !s?.ended_at;
+  };
+  const open = live.filter((r) => r.open_trades > 0 && isOnline(r));
   const totalOpen = open.reduce((a, r) => a + r.open_trades, 0);
   const totalFloat = open.reduce((a, r) => a + (r.equity - r.balance), 0);
   const th = "px-3 py-2 font-normal whitespace-nowrap";
