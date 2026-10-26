@@ -199,12 +199,12 @@ export default function NotificationBell() {
       </button>
 
       {open && (
-        <div className="fixed right-2 top-14 z-50 w-[min(20rem,calc(100vw-1rem))] overflow-hidden rounded-xl bg-background shadow-[0_4px_16px_rgba(60,64,67,0.18),0_1px_3px_rgba(60,64,67,0.12)] sm:absolute sm:left-auto sm:right-0 sm:top-11 sm:w-[320px]">
+        <div className="fixed right-2 top-14 z-50 w-[min(17rem,calc(100vw-1rem))] overflow-hidden rounded-xl bg-background shadow-[0_4px_16px_rgba(60,64,67,0.18),0_1px_3px_rgba(60,64,67,0.12)] sm:absolute sm:left-auto sm:right-0 sm:top-11 sm:w-[272px]">
           <div className="border-b border-gc-blue-deep/25 px-3 py-2.5 text-center sm:px-4 sm:py-3.5">
             <span className="text-[14px] font-normal text-gc-ink">Notifications</span>
           </div>
 
-          <div className="max-h-[min(55vh,380px)] sm:max-h-[min(460px,70vh)] scroll-on-hover overflow-y-auto overscroll-contain py-1">
+          <div className="max-h-[min(45vh,300px)] sm:max-h-[min(340px,60vh)] scroll-on-hover overflow-y-auto overscroll-contain py-1">
             {items.length === 0 ? (
               <div className="px-4 py-8 text-center">
                 <p className="text-[13px] text-gc-ink">You're all caught up</p>
@@ -230,7 +230,7 @@ export default function NotificationBell() {
                     <Icon className={cn("mt-0.5 h-[18px] w-[18px] shrink-0", v.tone)} />
                     <div className="min-w-0 flex-1">
                       <div className="flex items-baseline justify-between gap-2">
-                        <p className="min-w-0 truncate text-[13px] text-gc-ink sm:text-[14px]" title={n.title}>{shortTitle(n.title)}</p>
+                        <p className="min-w-0 truncate text-[12.5px] text-gc-ink sm:text-[13px]" title={n.title}>{shortTitle(n.title)}</p>
                         <span className="shrink-0 text-[11px] text-gc-ink-muted sm:text-[12px]">
                           {timeAgo(n.created_at)}
                         </span>

@@ -289,7 +289,7 @@ export default function DashboardTopBar({
               <MoreVertical className="h-[19px] w-[19px] shrink-0 text-gc-ink-muted" strokeWidth={1.75} />
             </button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-60 rounded-2xl py-2 pl-0 pr-2">
+          <DropdownMenuContent align="end" className="w-60 rounded-2xl bg-background py-2 pl-0 pr-2">
             <DropdownMenuItem asChild>
               <Link to="/docs" className="cursor-pointer gap-3.5 rounded-r-full py-2 pl-4 pr-3 text-[14px] font-normal text-gc-ink focus:bg-gc-notice"><BookOpen className="h-[19px] w-[19px] shrink-0 text-gc-ink-muted" strokeWidth={1.75} /> Docs</Link>
             </DropdownMenuItem>
@@ -317,7 +317,7 @@ export default function DashboardTopBar({
               <img src={avatarUrl} alt="" className="h-full w-full object-cover" />
             </button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-64 rounded-2xl py-2 pl-0 pr-2">
+          <DropdownMenuContent align="end" className="w-64 rounded-2xl bg-background py-2 pl-0 pr-2">
             <DropdownMenuLabel className="flex items-center gap-3 px-3 py-3 font-normal">
               <img src={avatarUrl} alt="" className="h-10 w-10 rounded-full object-cover" />
               <div className="min-w-0">
