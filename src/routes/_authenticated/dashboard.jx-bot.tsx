@@ -219,8 +219,10 @@ function JxBotPage() {
           </div>
           <ol className="mt-3 space-y-4 text-[13px] leading-relaxed text-zinc-700">
             {STEPS.map((s, i) => (
-              <li key={s.title}>
-                <div className="font-medium text-zinc-900">{i + 1}. {s.title}</div>
+              <li key={s.title} className="flex gap-3">
+                <span className="mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-zinc-900 text-[11px] font-medium text-white">{i + 1}</span>
+                <div className="min-w-0 flex-1">
+                <div className="font-medium text-zinc-900">{s.title}</div>
                 <div className="mt-0.5">{s.text}</div>
                 {s.code && (
                   <div className="mt-2 flex items-center gap-2">
@@ -234,6 +236,7 @@ function JxBotPage() {
                     </button>
                   </div>
                 )}
+                </div>
               </li>
             ))}
           </ol>
