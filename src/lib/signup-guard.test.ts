@@ -27,4 +27,10 @@ describe('signup guard', () => {
     expect(fp.browser).toBe('a'.repeat(64))
     expect(fp.hardware).toBe('b'.repeat(40))
   })
+  test('trusted tester IP gets its own cap of 3, others get none', () => {
+    expect(trustedSignupIpCap('153.117.68.156')).toBe(3)
+    expect(trustedSignupIpCap(' 153.117.68.156 ')).toBe(3)
+    expect(trustedSignupIpCap('153.117.68.157')).toBe(null)
+    expect(trustedSignupIpCap('')).toBe(null)
+  })
 })
