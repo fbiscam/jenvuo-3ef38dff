@@ -268,7 +268,7 @@ function DocumentsPage() {
             <div className="flex items-start gap-4 rounded-lg border border-gc-success/20 bg-gc-green-soft p-5">
               <ShieldCheck className="h-6 w-6 shrink-0 text-gc-success" />
               <div>
-                <h2 className="text-base font-semibold text-foreground">Identity verified</h2>
+                <div className="pb-2 text-sm font-semibold text-foreground">Identity verified</div>
                 <p className="mt-1 text-sm text-muted-foreground">Your documents have been approved.</p>
               </div>
             </div>
