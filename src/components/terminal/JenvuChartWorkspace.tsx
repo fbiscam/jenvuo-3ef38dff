@@ -481,7 +481,9 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
         bars: s.bars,
         stepSeconds: s.stepSeconds,
         source:
-          s.payload?.source === "binance"
+          s.payload?.asset === "EURUSD"
+            ? `EUR/USD ${s.payload?.provider === "Binance" ? "Binance EURUSDT proxy" : "forex"} candles`
+            : s.payload?.source === "binance"
             ? "Binance BTC/USDT live candles"
             : s.payload?.source === "spot"
             ? `spot ${pairLabel}`

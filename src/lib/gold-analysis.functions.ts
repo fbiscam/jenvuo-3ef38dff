@@ -1558,6 +1558,46 @@ async function loadBtcTerminalChart(tf: string): Promise<TerminalChartPayload> {
   return data;
 }
 
+const EUR_YAHOO: Record<string, { interval: string; range: string }> = {
+  "1m": { interval: "1m", range: "5d" },
+  "5m": { interval: "5m", range: "1mo" },
+  "15m": { interval: "15m", range: "1mo" },
+  "30m": { interval: "30m", range: "1mo" },
+  "1h": { interval: "60m", range: "1y" },
+};
+
+async function fetchYahooEurCandles(fetchTf: string): Promise<Candle[]> {
+  const cfg = EUR_YAHOO[fetchTf] ?? EUR_YAHOO["15m"];
+  let lastErr: unknown = null;
+  for (const host of ["query1.finance.yahoo.com", "query2.finance.yahoo.com"]) {
+    try {
+      const ctrl = new AbortController();
+      const timer = setTimeout(() => ctrl.abort(), 8000);
+      const res = await fetch(`https://${host}/v8/finance/chart/EURUSD%3DX?interval=${cfg.interval}&range=${cfg.range}`, {
+        signal: ctrl.signal,
+        headers: { "User-Agent": "Mozilla/5.0" },
+      }).finally(() => clearTimeout(timer));
+      if (!res.ok) { await res.body?.cancel().catch(() => {}); throw new Error(`status ${res.status}`); }
+      const json: any = await res.json();
+      const r = json?.chart?.result?.[0];
+      const ts: number[] = r?.timestamp ?? [];
+      const q = r?.indicators?.quote?.[0] ?? {};
+      const r5 = (n: number) => Math.round(n * 1e5) / 1e5;
+      const out: Candle[] = [];
+      for (let i = 0; i < ts.length; i++) {
+        const o = q.open?.[i], h = q.high?.[i], l = q.low?.[i], c = q.close?.[i];
+        if (![o, h, l, c].every((x) => typeof x === "number" && Number.isFinite(x) && x > 0)) continue;
+        out.push({ t: ts[i] * 1000, o: r5(o), h: r5(h), l: r5(l), c: r5(c), v: 0 });
+      }
+      if (out.length < 50) throw new Error("too few candles");
+      return out;
+    } catch (e) {
+      lastErr = e;
+    }
+  }
+  throw lastErr ?? new Error("EUR/USD forex feed unavailable");
+}
+
 async function loadEurTerminalChart(tf: string): Promise<TerminalChartPayload> {
   const key = `EURUSD:${tf}`;
   const hit = terminalChartCache.get(key);
@@ -1566,14 +1606,22 @@ async function loadEurTerminalChart(tf: string): Promise<TerminalChartPayload> {
   const fetchTf = tf === "45m" ? "15m" : tf === "2h" || tf === "4h" || tf === "1d" ? "1h" : tf;
   const limit = tf === "45m" ? 3000 : tf === "2h" ? 2000 : tf === "4h" || tf === "1d" ? 4000 : 1000;
   let candles: Candle[];
+  let provider = "Forex";
   try {
-    candles = await Promise.any([
-      fetchBinanceHostDeep("data-api.binance.vision", "EURUSDT", fetchTf, limit),
-      fetchBinanceHostDeep("api.binance.com", "EURUSDT", fetchTf, limit),
-    ]);
+    // Real interbank EUR/USD first (5 decimals, no weekend prints); Binance EURUSDT
+    // is a thin 4-decimal crypto proxy that made blocky candles and weekend bars.
+    candles = await fetchYahooEurCandles(fetchTf);
   } catch {
-    if (hit && Date.now() - hit.at < TERMINAL_STALE_MAX) return { ...hit.data, serverTime: Date.now() };
-    throw new Error("EUR/USD chart feed unavailable");
+    try {
+      candles = await Promise.any([
+        fetchBinanceHostDeep("data-api.binance.vision", "EURUSDT", fetchTf, limit),
+        fetchBinanceHostDeep("api.binance.com", "EURUSDT", fetchTf, limit),
+      ]);
+      provider = "Binance";
+    } catch {
+      if (hit && Date.now() - hit.at < TERMINAL_STALE_MAX) return { ...hit.data, serverTime: Date.now() };
+      throw new Error("EUR/USD chart feed unavailable");
+    }
   }
   const step = TF_MS[tf] ?? TF_MS["30m"];
   const byBucket = new Map<number, Candle>();
@@ -1589,7 +1637,7 @@ async function loadEurTerminalChart(tf: string): Promise<TerminalChartPayload> {
     timeframe: tf,
     asset: "EURUSD",
     source: "binance",
-    provider: "Binance",
+    provider,
     serverTime: Date.now(),
     stepSeconds: step / 1000,
     bars: [...byBucket.entries()].sort((a, b) => a[0] - b[0]).map(([bucket, c]) => ({
