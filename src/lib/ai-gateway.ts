@@ -348,16 +348,24 @@ export async function callChatCompletion(
   try {
     return await primary(opts);
   } catch (primaryErr) {
-    console.warn(`[ai] ${opts.stage ?? "chat"}: primary chain failed, trying fallback API`, (primaryErr as Error)?.message);
+    // Keep user chat on CodeCraft: try every other configured CodeCraft model
+    // one by one before the user's own fallback API. Lovable AI is not used.
+    const tried = new Set(opts.models);
+    const extra = Array.from(
+      new Set<string>([...FAST_CHAT_CHAIN, ...ASK_JENVU_CHAIN, ...PRIMARY_ANALYSIS_CHAIN, ...VISION_CHAIN]),
+    ).filter((m) => !tried.has(m));
+    if (extra.length) {
+      console.warn(`[ai] ${opts.stage ?? "chat"}: primary chain failed, trying other CodeCraft models`, (primaryErr as Error)?.message);
+      try {
+        return await callChatChain({ ...opts, models: extra, raceModels: false, perAttemptTimeoutMs: opts.perAttemptTimeoutMs ?? 15000 });
+      } catch (chainErr) {
+        console.warn(`[ai] ${opts.stage ?? "chat"}: other CodeCraft models failed`, (chainErr as Error)?.message);
+      }
+    }
     try {
       return await callFallbackApi(opts);
     } catch (fbErr) {
-      console.warn(`[ai] ${opts.stage ?? "chat"}: fallback API failed, using backup`, (fbErr as Error)?.message);
-    }
-    try {
-      return await callBackupChat(opts);
-    } catch (backupErr) {
-      console.error(`[ai] ${opts.stage ?? "chat"}: backup failed`, (backupErr as Error)?.message);
+      console.error(`[ai] ${opts.stage ?? "chat"}: fallback API failed`, (fbErr as Error)?.message);
       throw primaryErr;
     }
   }
