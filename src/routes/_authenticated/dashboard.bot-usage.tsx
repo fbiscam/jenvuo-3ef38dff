@@ -62,6 +62,13 @@ function BotUsagePage() {
       openTrades: latestList.filter((r) => r.day === today).reduce((a, r) => a + r.open_trades, 0),
     };
   }, [data, account]);
+  const zeroAt = useMemo(() => {
+    const vals = view.chart.map((r) => r.profit);
+    const max = Math.max(0, ...vals);
+    const min = Math.min(0, ...vals);
+    if (max === min) return 1;
+    return Math.min(1, Math.max(0, max / (max - min)));
+  }, [view.chart]);
 
 
   return (
