@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, test } from 'bun:test';
-import { callChatCompletion, AiGatewayError } from './ai-gateway';
+// Query suffix bypasses module mocks registered by other test files in the same process.
+const { callChatCompletion, AiGatewayError } = await import('./ai-gateway?real');
 import { jenvuServiceError } from './jenvu-api-errors';
 
 const originalFetch = globalThis.fetch;
