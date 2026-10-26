@@ -39,7 +39,7 @@ export const createMt5License = createServerFn({ method: "POST" })
       await db.from("mt5_licenses").update({ mt5_account: data.mt5_account, plan_id: plan }).eq("id", free.id);
       return { ok: true as const };
     }
-    if (list.length >= limit) return { ok: false as const, error: `Your plan allows ${limit} license${limit > 1 ? "s" : ""}. Revoke one or upgrade.` };
+    if (list.length >= limit) return { ok: false as const, error: `Your plan allows ${limit} license${limit > 1 ? "s" : ""}. Delete one or upgrade.` };
     const { error } = await db.from("mt5_licenses").insert({ user_id: context.userId, license_key: newLicenseKey(), mt5_account: data.mt5_account, plan_id: plan });
     return error ? { ok: false as const, error: "Could not create the license." } : { ok: true as const };
   });
@@ -48,8 +48,10 @@ export const revokeMt5License = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ context, data }) => {
+    // Permanent delete: the row is removed, so the key stops validating at the next check.
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    await (supabaseAdmin as any).from("mt5_licenses").update({ revoked_at: new Date().toISOString() }).eq("id", data.id).eq("user_id", context.userId);
+    const { error } = await (supabaseAdmin as any).from("mt5_licenses").delete().eq("id", data.id).eq("user_id", context.userId);
+    if (error) throw new Error("Could not delete the license.");
     return { ok: true as const };
   });
 

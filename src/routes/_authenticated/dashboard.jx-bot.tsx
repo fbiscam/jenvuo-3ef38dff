@@ -131,11 +131,11 @@ function JxBotPage() {
     setRevoking(true);
     try {
       await revoke({ data: { id: revokeTarget.id } });
-      toast.success("License revoked");
+      toast.success("License deleted");
       setRevokeTarget(null);
       await refresh();
     } catch {
-      toast.error("Could not revoke the license");
+      toast.error("Could not delete the license");
     } finally {
       setRevoking(false);
     }
@@ -332,17 +332,15 @@ function JxBotPage() {
                 )}
               </div>
               <div className="flex items-center justify-end gap-1 md:w-16">
-                {!l.revoked_at && (
-                  <button
-                    type="button"
-                    title="Revoke license"
-                    aria-label="Revoke license"
-                    onClick={() => setRevokeTarget(l)}
-                    className="rounded-full p-2 text-zinc-500 hover:bg-rose-50 hover:text-rose-600"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </button>
-                )}
+                <button
+                  type="button"
+                  title="Delete license"
+                  aria-label="Delete license"
+                  onClick={() => setRevokeTarget(l)}
+                  className="rounded-full p-2 text-zinc-500 hover:bg-rose-50 hover:text-rose-600"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </button>
               </div>
             </div>
           ))
@@ -448,13 +446,13 @@ function JxBotPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-900/30 p-4">
           <div role="dialog" aria-modal="true" className="w-full max-w-md rounded-xl border border-zinc-200 bg-white p-5 shadow-xl">
             <div className="flex items-start justify-between gap-3">
-              <div className="text-[15px] font-medium text-zinc-900">Revoke this license?</div>
+              <div className="text-[15px] font-medium text-zinc-900">Delete this license permanently?</div>
               <button onClick={() => setRevokeTarget(null)} className="rounded-full p-1 text-zinc-500 hover:bg-zinc-100">
                 <X className="h-4 w-4" />
               </button>
             </div>
             <p className="mt-2 text-[13px] leading-relaxed text-zinc-500">
-              The bot on <span className="font-medium text-zinc-800">{revokeTarget.mt5_account ? `MT5 ${revokeTarget.mt5_account}` : "this key"}</span> will stop trading at its next license check.
+              The bot on <span className="font-medium text-zinc-800">{revokeTarget.mt5_account ? `MT5 ${revokeTarget.mt5_account}` : "this key"}</span> will stop trading at its next license check. This cannot be undone.
             </p>
             <div className="mt-5 flex justify-end gap-2">
               <button onClick={() => setRevokeTarget(null)} disabled={revoking} className="rounded-full px-4 py-2 text-[13px] text-zinc-700 hover:bg-zinc-100 disabled:opacity-60">
@@ -465,7 +463,7 @@ function JxBotPage() {
                 disabled={revoking}
                 className="rounded-full bg-rose-600 px-4 py-2 text-[13px] font-medium text-white hover:bg-rose-700 disabled:opacity-60"
               >
-                {revoking ? "Revoking…" : "Revoke"}
+                {revoking ? "Deleting…" : "Delete"}
               </button>
             </div>
           </div>
