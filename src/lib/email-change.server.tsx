@@ -5,7 +5,7 @@ import { EmailChangeEmail } from '@/lib/email-templates/email-change'
 
 const SITE_NAME = 'Jenvu'
 const ROOT_DOMAIN = 'jenvu.com'
-const FROM_DOMAIN = 'jenvu.com'
+const FROM_DOMAIN = 'notify.jenvu.net'
 const SENDER_DOMAIN = 'notify.jenvu.net'
 const TOKEN_TTL_MINUTES = 60
 

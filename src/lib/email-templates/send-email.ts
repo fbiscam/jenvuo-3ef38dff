@@ -12,7 +12,7 @@ const SITE_NAME = "Jenvu"
 const SENDER_DOMAIN = "notify.jenvu.net"
 // FROM_DOMAIN is the domain shown in the From: header (e.g., "example.com").
 // Can be the root domain when display_from_root is enabled — this is cosmetic only.
-const FROM_DOMAIN = "jenvu.com"
+const FROM_DOMAIN = "notify.jenvu.net"
 
 export type SendTemplateEmailResult =
   | { sent: true }
