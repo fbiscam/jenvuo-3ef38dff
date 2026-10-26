@@ -1,5 +1,9 @@
 # Roadmap
 
+- [ ] Stop Billing plan-action label flicker on entry
+- [ ] Correct Terminal candle presentation to match TradingView styling
+- [ ] Restyle Documents page with the dashboard theme
+
 - [x] Switch all app and account email senders to notify.jenvu.com
 - [ ] Verify notify.jenvu.com DNS (waiting on domain verification)
 - [x] Upgrade the vulnerable sanitizer dependency and verify the security finding is resolved
