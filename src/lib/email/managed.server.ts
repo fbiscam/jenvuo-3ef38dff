@@ -7,7 +7,7 @@ export const SITE_NAME = 'Jenvu'
 // Selected delegated sender subdomain; sending requires DNS verification.
 export const SENDER_DOMAIN = 'notify.jenvu.net'
 // Visible From: domain.
-export const FROM_DOMAIN = 'jenvu.com'
+export const FROM_DOMAIN = 'notify.jenvu.net'
 
 export type ManagedSendResult =
   | { sent: true }
