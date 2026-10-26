@@ -60,7 +60,7 @@ import { buildChartContext } from "./chart-context";
 import { PERIOD_TIMEFRAME, TerminalPeriodReturns, TerminalSymbolHeader, TerminalTabBody, type MarketTab } from "./TerminalMarketTabs";
 import { DemoTradingPanel, OrderTicket, PaperTradingPanel, QuickTradeButtons, useDemoTrading } from "./DemoTradingPanel";
 import { positionPnl, type DemoSide } from "@/lib/chart/demo-trading";
-import { buildLiveBars } from "@/lib/chart/live-candle";
+import { buildLiveBars, liveStreamMatchesHistory } from "@/lib/chart/live-candle";
 import { sessionBucketMs } from "@/lib/chart/session-buckets";
 import { useLivePriceStream } from "@/hooks/useLivePriceStream";
 import { isMarketClosed } from "@/lib/signals/qualification";
@@ -401,7 +401,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
   }, [payload, asset, timeframe.key]);
   // Never draw EURUSDT ticks into interbank EUR/USD candles: that creates
   // artificial jumps/wicks. Forex candles update with their own 15s payload.
-  const streamMatchesHistory = asset !== "EURUSD" || payload?.provider === "Binance";
+  const streamMatchesHistory = liveStreamMatchesHistory(asset, payload?.provider);
   const livePrice = useLivePriceStream(goldClosed || !streamMatchesHistory ? undefined : asset, rawBars.at(-1)?.close ?? null, undefined, { intervalMs: 3000 });
   const stepSeconds = payload?.stepSeconds ?? 1800;
   const bars = useMemo(() => {

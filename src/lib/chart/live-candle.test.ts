@@ -1,6 +1,6 @@
 import { describe, it } from "node:test";
 import { expect } from "./test-expect";
-import { buildLiveBars } from "./live-candle";
+import { buildLiveBars, liveStreamMatchesHistory } from "./live-candle";
 import type { OhlcvBar } from "./indicators";
 
 const bars: OhlcvBar[] = Array.from({ length: 24 }, (_, index) => ({
@@ -13,6 +13,12 @@ const bars: OhlcvBar[] = Array.from({ length: 24 }, (_, index) => ({
 }));
 
 describe("live candle normalization", () => {
+  it("does not mix the EURUSDT stream into Yahoo forex history", () => {
+    expect(liveStreamMatchesHistory("EURUSD", "Yahoo Finance")).toBe(false);
+    expect(liveStreamMatchesHistory("EURUSD", undefined)).toBe(false);
+    expect(liveStreamMatchesHistory("EURUSD", "Binance")).toBe(true);
+    expect(liveStreamMatchesHistory("BTCUSD", "Binance")).toBe(true);
+  });
   it("updates a valid active candle without changing its open", () => {
     const result = buildLiveBars(bars, 4265, bars.at(-1)?.time ?? 0);
     expect(result.at(-1)?.open).toBe(bars.at(-1)?.open);

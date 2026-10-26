@@ -1,5 +1,10 @@
 import type { OhlcvBar } from "./indicators";
 
+/** The EUR/USD browser stream is EURUSDT, not an interbank forex quote. */
+export function liveStreamMatchesHistory(asset: string, provider: string | undefined): boolean {
+  return asset !== "EURUSD" || provider === "Binance";
+}
+
 const finiteBar = (bar: OhlcvBar) =>
   Number.isFinite(bar.time) &&
   Number.isFinite(bar.open) &&
