@@ -286,24 +286,24 @@ export default function DashboardTopBar({
               title="More"
               className="inline-flex h-9 w-9 items-center justify-center rounded-full text-gc-ink-muted hover:bg-gc-notice"
             >
-              <MoreVertical className="h-4 w-4" />
+              <MoreVertical className="h-[19px] w-[19px] shrink-0 text-gc-ink-muted" strokeWidth={1.75} />
             </button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56 rounded-2xl p-1">
+          <DropdownMenuContent align="end" className="w-60 rounded-2xl py-2 pl-0 pr-2">
             <DropdownMenuItem asChild>
-              <Link to="/docs" className="cursor-pointer gap-2"><BookOpen className="h-4 w-4" /> Docs</Link>
+              <Link to="/docs" className="cursor-pointer gap-3.5 rounded-r-full py-2 pl-4 pr-3 text-[14px] font-normal text-gc-ink focus:bg-gc-notice"><BookOpen className="h-[19px] w-[19px] shrink-0 text-gc-ink-muted" strokeWidth={1.75} /> Docs</Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
-              <Link to="/help" className="cursor-pointer gap-2"><LifeBuoy className="h-4 w-4" /> Help center</Link>
+              <Link to="/help" className="cursor-pointer gap-3.5 rounded-r-full py-2 pl-4 pr-3 text-[14px] font-normal text-gc-ink focus:bg-gc-notice"><LifeBuoy className="h-[19px] w-[19px] shrink-0 text-gc-ink-muted" strokeWidth={1.75} /> Help center</Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
-              <Link to="/pricing" className="cursor-pointer gap-2"><CreditCard className="h-4 w-4" /> Pricing</Link>
+              <Link to="/pricing" className="cursor-pointer gap-3.5 rounded-r-full py-2 pl-4 pr-3 text-[14px] font-normal text-gc-ink focus:bg-gc-notice"><CreditCard className="h-[19px] w-[19px] shrink-0 text-gc-ink-muted" strokeWidth={1.75} /> Pricing</Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
-              <Link to="/download" className="cursor-pointer gap-2"><Download className="h-4 w-4" /> Download extension</Link>
+              <Link to="/download" className="cursor-pointer gap-3.5 rounded-r-full py-2 pl-4 pr-3 text-[14px] font-normal text-gc-ink focus:bg-gc-notice"><Download className="h-[19px] w-[19px] shrink-0 text-gc-ink-muted" strokeWidth={1.75} /> Download extension</Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
-              <Link to="/contact" className="cursor-pointer gap-2"><Mail className="h-4 w-4" /> Contact us</Link>
+              <Link to="/contact" className="cursor-pointer gap-3.5 rounded-r-full py-2 pl-4 pr-3 text-[14px] font-normal text-gc-ink focus:bg-gc-notice"><Mail className="h-[19px] w-[19px] shrink-0 text-gc-ink-muted" strokeWidth={1.75} /> Contact us</Link>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -317,7 +317,7 @@ export default function DashboardTopBar({
               <img src={avatarUrl} alt="" className="h-full w-full object-cover" />
             </button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-64 rounded-2xl p-1">
+          <DropdownMenuContent align="end" className="w-64 rounded-2xl py-2 pl-0 pr-2">
             <DropdownMenuLabel className="flex items-center gap-3 px-3 py-3 font-normal">
               <img src={avatarUrl} alt="" className="h-10 w-10 rounded-full object-cover" />
               <div className="min-w-0">
@@ -327,23 +327,23 @@ export default function DashboardTopBar({
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
-              <Link to="/dashboard/profile" className="cursor-pointer gap-2">
-                <Camera className="h-4 w-4" /> Change profile photo
+              <Link to="/dashboard/profile" className="cursor-pointer gap-3.5 rounded-r-full py-2 pl-4 pr-3 text-[14px] font-normal text-gc-ink focus:bg-gc-notice">
+                <Camera className="h-[19px] w-[19px] shrink-0 text-gc-ink-muted" strokeWidth={1.75} /> Change profile photo
               </Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
-              <Link to="/dashboard/profile" className="cursor-pointer gap-2">
-                <Settings className="h-4 w-4" /> Settings
+              <Link to="/dashboard/profile" className="cursor-pointer gap-3.5 rounded-r-full py-2 pl-4 pr-3 text-[14px] font-normal text-gc-ink focus:bg-gc-notice">
+                <Settings className="h-[19px] w-[19px] shrink-0 text-gc-ink-muted" strokeWidth={1.75} /> Settings
               </Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
-              <Link to="/dashboard/security" className="cursor-pointer gap-2">
-                <ShieldCheck className="h-4 w-4" /> Security
+              <Link to="/dashboard/security" className="cursor-pointer gap-3.5 rounded-r-full py-2 pl-4 pr-3 text-[14px] font-normal text-gc-ink focus:bg-gc-notice">
+                <ShieldCheck className="h-[19px] w-[19px] shrink-0 text-gc-ink-muted" strokeWidth={1.75} /> Security
               </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onSelect={() => onSignOut()} className="cursor-pointer gap-2">
-              <LogOut className="h-4 w-4" /> Sign out
+            <DropdownMenuItem onSelect={() => onSignOut()} className="cursor-pointer gap-3.5 rounded-r-full py-2 pl-4 pr-3 text-[14px] font-normal text-gc-ink focus:bg-gc-notice">
+              <LogOut className="h-[19px] w-[19px] shrink-0 text-gc-ink-muted" strokeWidth={1.75} /> Sign out
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
