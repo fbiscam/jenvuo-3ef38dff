@@ -26,6 +26,9 @@ mock.module("@/lib/ai-gateway", () => ({
   AiGatewayError: class extends Error {},
 }));
 const { askJenvu } = await import("./ask-jenvu.functions");
+
+// Module mocks leak into other test files in the same process; restore them.
+afterAll(() => mock.restore());
 const question = { data: { messages: [{ role: "user", content: "What are the plans?" }] } };
 
 beforeEach(() => {
