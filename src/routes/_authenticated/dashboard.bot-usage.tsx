@@ -155,7 +155,7 @@ function BotUsagePage() {
             <LiveTrades rows={view.latestList} sessions={data?.sessions ?? []} />
 
             <section className="px-4 py-5 sm:px-7">
-              <h2 className="text-[13px] text-foreground">Accounts</h2>
+              <h2 className="text-[13px] text-foreground"> Accounts</h2>
               <div className="mt-3 overflow-x-auto">
                 <table className="w-full min-w-[640px] text-[13px]">
                   <thead className="text-left text-muted-foreground">
