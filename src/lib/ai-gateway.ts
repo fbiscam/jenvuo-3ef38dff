@@ -230,7 +230,11 @@ async function singleAttemptInner(
 // via `backupFallback`. When every CodeCraft model fails (e.g. 402 quota), the
 // question is answered through the Lovable AI Gateway so users are never left
 // without a reply. Analysis/review chains never use it.
-const BACKUP_CHAT_MODEL = "openai/gpt-6-astra";
+// Cheapest + fastest Lovable chat model (reasoning off for speed).
+const BACKUP_CHAT_MODEL = "openai/gpt-6-luna";
+// Temporary: CodeCraft keys have no balance, so user chat answers through
+// Lovable AI first. Set to false once CodeCraft is topped up again.
+const LOVABLE_CHAT_FIRST = true;
 
 function toResponsesInput(messages: ChatMessage[]) {
   return messages.map((m) => {
@@ -258,7 +262,6 @@ async function callBackupChat(
   const body: Record<string, unknown> = {
     model: BACKUP_CHAT_MODEL,
     input: toResponsesInput(opts.messages),
-    reasoning: { effort: "low" },
     store: false,
     stream: true,
   };
@@ -345,6 +348,13 @@ export async function callChatCompletion(
 ): Promise<{ content: string; model: string; usage: UsageInfo }> {
   const primary = opts.raceModels ? callChatRace : callChatChain;
   if (!opts.backupFallback) return primary(opts);
+  if (LOVABLE_CHAT_FIRST) {
+    try {
+      return await callBackupChat(opts);
+    } catch (lovErr) {
+      console.warn(`[ai] ${opts.stage ?? "chat"}: Lovable AI failed, trying CodeCraft`, (lovErr as Error)?.message);
+    }
+  }
   try {
     return await primary(opts);
   } catch (primaryErr) {
