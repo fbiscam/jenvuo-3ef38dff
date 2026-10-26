@@ -60,10 +60,6 @@ export default function InvoiceHistory() {
     refetchIntervalInBackground: false,
   });
 
-  const invoices = useMemo(
-    () => (data ?? []).filter((o) => o.status === "approved"),
-    [data],
-  );
 
   // Every payment, newest first — successful, waiting, rejected or expired.
   const history = useMemo(
@@ -223,53 +219,8 @@ export default function InvoiceHistory() {
 
   return (
     <section className="rounded-2xl border border-zinc-200 bg-white p-5">
-      <div className="flex items-center justify-between gap-3">
-        <div>
-          <h2 className="text-sm font-semibold text-zinc-900">&nbsp; Invoices</h2>
-          <p className="mt-0.5 text-xs text-zinc-500">Successful payments with downloadable PDF receipts.</p>
-        </div>
-      </div>
-
-      {invoices.length === 0 ? (
-        <p className="mt-5 text-xs text-zinc-500">No successful payments yet. Approved top-ups will appear here.</p>
-      ) : (
-        <div className="mt-4 divide-y divide-zinc-100">
-          {invoices.map((o) => {
-            const net = networkMeta(o.network);
-            return (
-              <div key={o.id} className="flex flex-wrap items-center justify-between gap-3 py-3">
-                <div className="min-w-0">
-                  <div className={`${MONO} text-[11px] tracking-wider text-zinc-900`}>{invoiceNo(o)}</div>
-                  <div className="mt-0.5 text-[11px] text-zinc-500">
-                    {fmtDate(o.decided_at ?? o.created_at)} · {net.label}
-                  </div>
-                </div>
-                <div className="flex items-center gap-4">
-                  <div className="text-right">
-                    <div className={`${MONO} text-[12px] font-semibold text-zinc-900`}>
-                      ${Number(o.pay_amount_usd).toFixed(2)}
-                    </div>
-                    <div className="text-[10px] text-emerald-600">
-                      +${Number(o.credit_usd).toFixed(2)} credited
-                    </div>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => download(o)}
-                    disabled={busy === o.id}
-                    className="rounded-lg border border-black/10 bg-white px-3 py-1.5 text-[11px] font-medium text-black transition hover:bg-zinc-50 disabled:opacity-50"
-                  >
-                    {busy === o.id ? "Preparing…" : "Download PDF"}
-                  </button>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      )}
-
-      <div className="mt-8 border-t border-zinc-100 pt-5">
-        <h3 className="text-sm font-semibold text-zinc-900">Transaction history</h3>
+      <div>
+        <h2 className="text-sm font-semibold text-zinc-900">&nbsp; Transaction history</h2>
         <p className="mt-0.5 text-xs text-zinc-500">Every payment you start shows here. Successful ones have a receipt.</p>
         {history.length === 0 ? (
           <p className="mt-4 text-xs text-zinc-500">No transactions yet.</p>

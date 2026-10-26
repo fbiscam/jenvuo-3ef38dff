@@ -161,7 +161,7 @@ function Billing() {
     { icon: CreditCard, title: "Payment methods", desc: "Manage your deposit addresses and crypto networks", tab: "Payment methods" },
     { icon: Settings, title: "Manage plan", desc: "Upgrade, downgrade or cancel your current plan", to: "/pricing" },
     { icon: BarChart3, title: "Usage", desc: "See your token, request and credit spend over time", to: "/dashboard/usage" },
-    { icon: FileText, title: "Invoices", desc: "Download PDF receipts for approved top-up payments", tab: "Billing history" },
+    { icon: FileText, title: "Transaction history", desc: "Every payment you started, with receipts for approved ones", tab: "Billing history" },
     { icon: SlidersHorizontal, title: "Preferences", desc: "Auto-reload thresholds and billing notifications", tab: "Preferences" },
     { icon: ArrowRight, title: "Promotions", desc: "Redeem promo codes and view your bonus credit history", tab: "Promotions" },
   ];
@@ -324,15 +324,7 @@ function Billing() {
         </div>
       )}
 
-      {activeTab === "Billing history" && (
-        <div>
-          {allRows.length === 0 ? (
-            <p className="text-sm text-zinc-900">No invoices found</p>
-          ) : (
-            <InvoiceHistory />
-          )}
-        </div>
-      )}
+      {activeTab === "Billing history" && <InvoiceHistory />}
 
       {activeTab === "Credit grants" && (
         <div className="space-y-4">
