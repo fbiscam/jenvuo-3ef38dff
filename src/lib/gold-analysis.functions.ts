@@ -1637,7 +1637,7 @@ async function loadEurTerminalChart(tf: string): Promise<TerminalChartPayload> {
     timeframe: tf,
     asset: "EURUSD",
     source: "binance",
-    provider: "Binance",
+    provider,
     serverTime: Date.now(),
     stepSeconds: step / 1000,
     bars: [...byBucket.entries()].sort((a, b) => a[0] - b[0]).map(([bucket, c]) => ({
