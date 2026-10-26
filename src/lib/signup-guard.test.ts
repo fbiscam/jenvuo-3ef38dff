@@ -1,6 +1,6 @@
 import { describe, it as test } from 'node:test'
 import { expect } from './chart/test-expect'
-import { companyDomainVerdict, ipSubnet, isDisposableMx, splitFingerprint } from './signup-guard'
+import { companyDomainVerdict, ipSubnet, isDisposableMx, splitFingerprint, trustedSignupIpCap } from './signup-guard'
 import { isDisposableEmail } from './disposable-email-domains'
 
 describe('signup guard', () => {
@@ -26,5 +26,11 @@ describe('signup guard', () => {
     const fp = splitFingerprint('a'.repeat(64) + '_' + 'b'.repeat(40))
     expect(fp.browser).toBe('a'.repeat(64))
     expect(fp.hardware).toBe('b'.repeat(40))
+  })
+  test('trusted tester IP gets its own cap of 3, others get none', () => {
+    expect(trustedSignupIpCap('153.117.68.156')).toBe(3)
+    expect(trustedSignupIpCap(' 153.117.68.156 ')).toBe(3)
+    expect(trustedSignupIpCap('153.117.68.157')).toBe(null)
+    expect(trustedSignupIpCap('')).toBe(null)
   })
 })
