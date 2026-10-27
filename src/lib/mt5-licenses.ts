@@ -19,6 +19,8 @@ export function dailyTarget(plan: Mt5PlanId) {
 /** Per-account target overrides (owner account imgakhar@gmail.com: $1,000/day). Keyed by user id. */
 const TARGET_OVERRIDES: Record<string, { daily: number; monthly: number }> = {
   "5af751fb-de3b-4a24-aefd-aed53ef44378": { daily: 1000, monthly: 20000 },
+  // malik00902@dawntv.co.uk (test account): $500/day
+  "3281e6c3-39f0-4a13-9085-ab5a595fc91b": { daily: 500, monthly: 10000 },
 };
 
 /** Daily/monthly target for a plan, with any per-account override applied. */
