@@ -24,7 +24,7 @@ import {
   Layers,
   Magnet,
   Maximize2,
-  PenLine,
+
   Minimize2,
   Minus,
   MousePointer2,
