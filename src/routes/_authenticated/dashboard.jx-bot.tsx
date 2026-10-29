@@ -15,7 +15,7 @@ export const Route = createFileRoute("/_authenticated/dashboard/jx-bot")({
       { title: "JX Bot for MT5 — Jenvu" },
       { name: "description", content: "Download the Jenvu JX Bot for MetaTrader 5, create your license and follow the install steps." },
       { property: "og:title", content: "JX Bot for MT5 — Jenvu" },
-      { property: "og:description", content: "Download the JX Bot, link your MT5 account and start trading EUR/USD." },
+      { property: "og:description", content: "Download the JX Bot, register your PC or RDP IP address and start trading EUR/USD." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "robots", content: "noindex" },
@@ -25,22 +25,23 @@ export const Route = createFileRoute("/_authenticated/dashboard/jx-bot")({
 });
 
 const STEPS: { title: string; text: string; code?: string }[] = [
-  { title: "Create a license", text: "Click Create license, enter your MT5 account number (digits only) and copy the key.", code: "JENV-XXXX-XXXX-XXXX-XXXX" },
+  { title: "Add your IP", text: "On the PC or RDP that runs MT5, open whatismyip.com, then click Add IP here and enter that IP address.", code: "203.0.113.25" },
   { title: "Install the bot", text: "In MT5: File → Open Data Folder. Put Jenvu EA.ex5 in MQL5 → Experts and the .set files in MQL5 → Presets, then refresh the Navigator.", code: "MQL5/Experts/Jenvu EA.ex5" },
   { title: "Allow the license check", text: "Tools → Options → Expert Advisors → tick “Allow WebRequest for listed URL” and add this address.", code: "https://jenvu.com" },
-  { title: "Run the bot", text: "Turn on Algo Trading, open EURUSD M15, drag Jenvu EA onto the chart, load “Jenvu EURUSD 15M.set” and paste your key into LicenseKey.", code: "Jenvu license: VALID" },
+  { title: "Run the bot", text: "Turn on Algo Trading, open EURUSD M15, drag Jenvu EA onto the chart, load “Jenvu EURUSD 15M.set” and type the same IP into MyIP.", code: "Jenvu license: VALID" },
 ];
 
 const ERRORS = [
   ["server not reachable", "add https://jenvu.com to the WebRequest list"],
-  ["different MT5 account", "create a license for the account you're logged in to"],
+  ["different MT5 account", "each IP works with one MT5 account only (the first one that ran on it)"],
+  ["IP does not match", "the IP in MyIP must match this PC/RDP's real IP and the one added here"],
   ["expired", "renew your plan in Billing"],
-  ["not recognised", "copy the key again, with no spaces"],
+  ["not recognised", "add the IP on this page first, then type it in MyIP with no spaces"],
 ];
 
 const HOW = [
-  ["License check", "On start the bot checks its key with jenvu.com and trades only while the key and plan are valid."],
-  ["EUR/USD on M15", "Runs on the EURUSD M15 chart of the MT5 account the key is linked to."],
+  ["License check", "On start the bot checks your IP with jenvu.com and trades only while the IP matches and the plan is valid."],
+  ["EUR/USD on M15", "Runs on the EURUSD M15 chart; one IP works with one MT5 account."],
   ["Daily auto-stop", "Pauses for the rest of the day once your plan's daily target is reached."],
   ["Monthly limit", "Stops at your plan's monthly target until the next period."],
 ];
@@ -110,17 +111,17 @@ function JxBotPage() {
   const onCreate = async () => {
     setCreating(true);
     try {
-      const r = await create({ data: { mt5_account: account.trim() } });
+      const r = await create({ data: { ip: account.trim() } });
       if (!r.ok) {
         toast.error(r.error);
         return;
       }
-      toast.success("License created");
+      toast.success("IP added");
       setAccount("");
       setShowCreate(false);
       await refresh();
     } catch {
-      toast.error("Enter your MT5 account number (digits only).");
+      toast.error("Enter a valid IP address, e.g. 203.0.113.25");
     } finally {
       setCreating(false);
     }
@@ -131,7 +132,7 @@ function JxBotPage() {
     setRevoking(true);
     try {
       await revoke({ data: { id: revokeTarget.id } });
-      toast.success("License deleted");
+      toast.success("IP deleted");
       setRevokeTarget(null);
       await refresh();
     } catch {
@@ -171,7 +172,7 @@ function JxBotPage() {
             disabled={!canCreate}
             className="inline-flex items-center gap-2 rounded-full border border-zinc-300 px-4 py-2 text-[13px] font-medium text-zinc-900 hover:bg-zinc-50 disabled:cursor-not-allowed disabled:opacity-45"
           >
-            <KeyRound className="h-4 w-4" /> Create license
+            <KeyRound className="h-4 w-4" /> Add IP
           </button>
         </div>
       </div>
@@ -268,13 +269,13 @@ function JxBotPage() {
       <div className="mt-5">
         <div className="mb-4 flex items-end justify-between gap-3">
           <div>
-            <h2 className="text-[16px] font-medium text-zinc-900">  Recent licenses</h2>
-            <p className="mt-1 text-[12px] text-zinc-500">Each key works only on the one MT5 account it is linked to.</p>
+            <h2 className="text-[16px] font-medium text-zinc-900">  Your IP addresses</h2>
+            <p className="mt-1 text-[12px] text-zinc-500">Each IP works with one MT5 account only.</p>
           </div>
           <span className="shrink-0 text-[12px] tabular-nums text-zinc-500">{licenses.length} shown</span>
         </div>
         <div className="hidden grid-cols-[1.6fr_1fr_0.8fr_1fr_auto] items-center gap-4 border-b border-zinc-200 pb-3 text-[13px] text-zinc-700 md:grid">
-          <div>License key</div>
+          <div>IP address</div>
           <div>MT5 account</div>
           <div>Created</div>
           <div>Status</div>
@@ -288,18 +289,18 @@ function JxBotPage() {
             <div key={l.id} className="grid gap-3 border-b border-zinc-100 py-4 md:grid-cols-[1.6fr_1fr_0.8fr_1fr_auto] md:items-center md:gap-4">
               <div className="min-w-0">
                 <div className="mb-1 flex items-center gap-2">
-                  <span className="text-[11px] text-zinc-500 md:hidden">License key</span>
+                  <span className="text-[11px] text-zinc-500 md:hidden">IP address</span>
                   {l.id === licenses[0]?.id && (
                     <span className="rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-medium text-blue-700">Newest</span>
                   )}
                 </div>
                 <div className="flex min-w-0 items-center gap-1 rounded-md border border-zinc-200 bg-zinc-50 px-2.5 py-2">
-                  <code className={`${MONO} min-w-0 flex-1 truncate text-[12px] text-zinc-900`}>{l.license_key}</code>
+                  <code className={`${MONO} min-w-0 flex-1 truncate text-[12px] text-zinc-900`}>{parseBinding(l.mt5_account).ip ?? "No IP yet"}</code>
                   {!l.revoked_at && (
                     <button
                       type="button"
-                      aria-label="Copy license key"
-                      onClick={() => copyValue(l.license_key, l.id)}
+                      aria-label="Copy IP address"
+                      onClick={() => copyValue(parseBinding(l.mt5_account).ip ?? "", l.id)}
                       className="shrink-0 rounded p-1 text-zinc-500 hover:bg-white hover:text-zinc-900"
                     >
                       {copied === l.id ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
@@ -310,10 +311,10 @@ function JxBotPage() {
               </div>
               <div className="min-w-0">
                 <div className="mb-1 text-[11px] text-zinc-500 md:hidden">MT5 account</div>
-                {l.mt5_account ? (
-                  <div className={`${MONO} truncate text-[13px] text-blue-700`}>{l.mt5_account}</div>
+                {parseBinding(l.mt5_account).account ? (
+                  <div className={`${MONO} truncate text-[13px] text-blue-700`}>{parseBinding(l.mt5_account).account}</div>
                 ) : (
-                  <div className="text-[13px] text-zinc-500">Not linked yet</div>
+                  <div className="text-[13px] text-zinc-500">Locks to the first account</div>
                 )}
                 <div className="truncate text-[12px] text-zinc-500">EURUSD · M15</div>
               </div>
@@ -337,8 +338,8 @@ function JxBotPage() {
               <div className="flex items-center justify-end gap-1 md:w-16">
                 <button
                   type="button"
-                  title="Delete license"
-                  aria-label="Delete license"
+                  title="Delete IP"
+                  aria-label="Delete IP"
                   onClick={() => setRevokeTarget(l)}
                   className="rounded-full p-2 text-zinc-500 hover:bg-rose-50 hover:text-rose-600"
                 >
@@ -354,20 +355,20 @@ function JxBotPage() {
             <Bot className="h-12 w-12 text-zinc-300" strokeWidth={1} />
             <div className="mt-6 text-[15px] font-medium text-zinc-900">No licenses yet</div>
             <p className="mt-2 max-w-md text-[13px] leading-relaxed text-zinc-500">
-              Create a license for your MT5 account, download the bot and paste the key into LicenseKey.
+              Add the IP of your PC or RDP, download the bot and type the same IP into MyIP.
             </p>
             <button
               onClick={() => setShowCreate(true)}
               disabled={!canCreate}
               className="mt-6 rounded-full border border-zinc-300 px-4 py-2 text-[13px] text-zinc-900 hover:bg-zinc-50 disabled:cursor-not-allowed disabled:opacity-45"
             >
-              Create license
+              Add IP
             </button>
           </div>
         )}
 
         {!loading && licenses.length > 0 && (
-          <div className="mt-3 text-[12px] text-zinc-500">{active.length} active · {bound} of {limit} accounts linked.</div>
+          <div className="mt-3 text-[12px] text-zinc-500">{active.length} active · {bound} of {limit} IPs used.</div>
         )}
       </div>
 
@@ -415,17 +416,16 @@ function JxBotPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-900/30 p-4">
           <div className="w-full max-w-md rounded-xl border border-zinc-200 bg-white p-5 shadow-xl">
             <div className="flex items-start justify-between gap-3">
-              <div className="text-[15px] font-medium text-zinc-900">Create license</div>
+              <div className="text-[15px] font-medium text-zinc-900">Add IP</div>
               <button onClick={() => setShowCreate(false)} className="rounded-full p-1 text-zinc-500 hover:bg-zinc-100">
                 <X className="h-4 w-4" />
               </button>
             </div>
-            <p className="mt-1 text-[13px] text-zinc-500">Enter the MT5 account number this key will work on. Never enter your MT5 password.</p>
+            <p className="mt-1 text-[13px] text-zinc-500">Enter the public IP of the PC or RDP that runs MT5 (open whatismyip.com there). The first MT5 account that runs on it is locked in.</p>
             <input
-              inputMode="numeric"
               value={account}
-              onChange={(e) => setAccount(e.target.value.replace(/\D/g, ""))}
-              placeholder="MT5 account number, e.g. 12345678"
+              onChange={(e) => setAccount(e.target.value.replace(/[^0-9a-fA-F.:]/g, ""))}
+              placeholder="IP address, e.g. 203.0.113.25"
               className="mt-4 w-full rounded-lg border border-zinc-300 px-3 py-2 text-[13px] outline-none focus:border-zinc-500"
             />
             <div className="mt-5 flex justify-end gap-2">
@@ -434,10 +434,10 @@ function JxBotPage() {
               </button>
               <button
                 onClick={onCreate}
-                disabled={creating || account.length < 3}
+                disabled={creating || account.length < 7}
                 className="rounded-full bg-zinc-900 px-4 py-2 text-[13px] font-medium text-white hover:bg-zinc-800 disabled:opacity-60"
               >
-                {creating ? "Creating…" : "Create license"}
+                {creating ? "Creating…" : "Add IP"}
               </button>
             </div>
           </div>
@@ -455,7 +455,7 @@ function JxBotPage() {
               </button>
             </div>
             <p className="mt-2 text-[13px] leading-relaxed text-zinc-500">
-              The bot on <span className="font-medium text-zinc-800">{revokeTarget.mt5_account ? `MT5 ${revokeTarget.mt5_account}` : "this key"}</span> will stop trading at its next license check. This cannot be undone.
+              The bot on <span className="font-medium text-zinc-800">{parseBinding(revokeTarget.mt5_account).ip ? `IP ${parseBinding(revokeTarget.mt5_account).ip}` : "this IP"}</span> will stop trading at its next license check. This cannot be undone.
             </p>
             <div className="mt-5 flex justify-end gap-2">
               <button onClick={() => setRevokeTarget(null)} disabled={revoking} className="rounded-full px-4 py-2 text-[13px] text-zinc-700 hover:bg-zinc-100 disabled:opacity-60">

@@ -99,9 +99,9 @@ export function Mt5Licenses() {
         {access.licenses.map((l) => (
           <li key={l.id} className="flex flex-wrap items-center justify-between gap-2 py-2.5">
             <div className="min-w-0">
-              <p className="break-all font-mono text-[13px] text-gc-ink">{l.license_key}</p>
+              <p className="break-all font-mono text-[13px] text-gc-ink">{parseBinding(l.mt5_account).ip ?? "No IP yet"}</p>
               <p className="text-[11px] text-gc-ink-muted">
-                {l.revoked_at ? "Revoked" : l.mt5_account ? (/^\d+$/.test(l.mt5_account) ? "Locks to the first IP that runs it" : `IP ${l.mt5_account}`) : "Locks to the first IP that runs it"}
+                {l.revoked_at ? "Revoked" : parseBinding(l.mt5_account).ip ? `IP ${parseBinding(l.mt5_account).ip}${parseBinding(l.mt5_account).account ? ` · MT5 ${parseBinding(l.mt5_account).account}` : ""}` : "No IP yet"}
                 {l.last_validated_at ? ` · last check ${new Date(l.last_validated_at).toLocaleString()}` : ""}
               </p>
             </div>
