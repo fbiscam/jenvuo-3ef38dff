@@ -11,7 +11,7 @@ export default function CloudflareHero() {
           <div className="mx-auto inline-flex max-w-full flex-nowrap items-center justify-center gap-x-1 whitespace-nowrap rounded-md border border-primary-foreground/50 px-2 py-2.5 text-center text-[10px] leading-none text-home-accent-foreground sm:gap-x-1.5 sm:px-3 sm:py-2 sm:text-[11px]">
             <span className="font-medium">Jenvu</span>
             <span className="text-home-accent-foreground">·</span>
-            <span>AI trading terminal for Fiber</span>
+            <span>AI trading terminal for Gold</span>
             <span className="text-home-accent-foreground">·</span>
             <span>Live 24/7</span>
             <span className="text-home-accent-foreground">·</span>
@@ -21,8 +21,8 @@ export default function CloudflareHero() {
           </div>
 
           <h1 className="mx-auto mt-8 max-w-[330px] text-center text-[34px] font-semibold leading-[1.05] tracking-normal text-home-accent-foreground sm:max-w-[740px] sm:text-[44px] sm:leading-[0.98] md:text-[48px]">
-             <span className="sm:hidden">AI Fiber trading terminal for Fiber</span>
-             <span className="hidden sm:inline">AI Fiber trading terminal for Fiber chart analysis</span>
+             <span className="sm:hidden">AI Gold trading terminal for Gold</span>
+             <span className="hidden sm:inline">AI Gold trading terminal for Gold chart analysis</span>
           </h1>
 
           <p className="mx-auto mt-8 max-w-[320px] text-center text-[13px] leading-[1.45] text-home-accent-foreground sm:max-w-xl sm:text-sm sm:leading-[1.25]">

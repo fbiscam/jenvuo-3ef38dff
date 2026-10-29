@@ -6,7 +6,7 @@ export const Route = createFileRoute("/about")({
   head: () => ({
     meta: [
       { title: "About Jenvu — Our Mission" },
-      { name: "description", content: "Meet Jenvu — the mission, philosophy and team behind the AI Fiber trading terminal for Fiber." },
+      { name: "description", content: "Meet Jenvu — the mission, philosophy and team behind the AI Gold trading terminal for Gold." },
       { property: "og:title", content: "Who We Are — Jenvu" },
       { property: "og:description", content: "The mission, philosophy and team behind Jenvu's AI-powered trading terminal." },
       { property: "og:url", content: "https://jenvu.com/about" },
@@ -23,11 +23,11 @@ function AboutPage() {
     <PageShell
       wide
       eyebrow="\n"
-      title="About Jenvu, the AI Fiber trading terminal"
-      intro="Jenvu was built on a simple thesis: institutional logic shouldn't be locked behind a Bloomberg terminal. We turned ICT and SMC playbooks into an AI trading terminal any serious Fiber trader can use directly on the chart."
+      title="About Jenvu, the AI Gold trading terminal"
+      intro="Jenvu was built on a simple thesis: institutional logic shouldn't be locked behind a Bloomberg terminal. We turned ICT and SMC playbooks into an AI trading terminal any serious Gold trader can use directly on the chart."
     >
       <Feature
-        title="A new way to read Fiber"
+        title="A new way to read Gold"
         text={
           <p>
             Give independent traders the same structural read of the market that desk
@@ -38,7 +38,7 @@ function AboutPage() {
         linkLabel="Explore the Terminal"
         href="https://dash.jenvu.com/overview"
         media={
-          <img src={aboutMedia} alt="Fiber candlestick chart with marked zones" width={1280} height={720} className="h-auto w-full" />
+          <img src={aboutMedia} alt="Gold candlestick chart with marked zones" width={1280} height={720} className="h-auto w-full" />
         }
         caption="Structure, liquidity and zones drawn on one chart"
       />
@@ -57,7 +57,7 @@ function AboutPage() {
         text={
           <>
             <p>
-              Jenvu is a Fiber specialist. Instead of spreading across unrelated pairs, every
+              Jenvu is a Gold specialist. Instead of spreading across unrelated pairs, every
               engine is tuned deeply for one bullion market: chart-first analysis on the active
               TradingView chart, the institutional ICT/SMC playbook with killzones, liquidity and
               OTE, and clear explanations in plain language.
@@ -71,7 +71,7 @@ function AboutPage() {
         href="https://jenvu.com/pricing"
         stats={[
           { value: "7", label: "Deterministic trading engines" },
-          { value: "1", label: "Dedicated market: Fiber" },
+          { value: "1", label: "Dedicated market: Gold" },
           { value: "6", label: "Checks before any setup ships" },
           { value: "14", label: "Days of Pro access in the free trial" },
           { value: "$100", label: "Free credit to get started" },
@@ -82,7 +82,7 @@ function AboutPage() {
         title="Get inspired"
         intro="Guides, product updates and help from the Jenvu team."
         cards={[
-          { title: "How ICT and SMC concepts read Fiber structure", href: "https://jenvu.com/strategies/ict-gold-trading", cta: "Read the guide" },
+          { title: "How ICT and SMC concepts read Gold structure", href: "https://jenvu.com/strategies/ict-gold-trading", cta: "Read the guide" },
           { title: "Inside the AI engine behind every Jenvu answer", href: "https://jenvu.com/ai-engine", cta: "Read the story" },
           { title: "Questions about your account, plan or the Terminal", href: "https://support.jenvu.com", cta: "Visit help center" },
         ]}

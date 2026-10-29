@@ -46,16 +46,16 @@ export const collections: Collection[] = [
         slug: "what-is-jenvu",
         title: "What is Jenvu AI?",
         summary:
-          "Jenvu is an AI-powered trading terminal focused on Fiber and built on ICT and SMC playbooks.",
+          "Jenvu is an AI-powered trading terminal focused on Gold and built on ICT and SMC playbooks.",
         updatedAt: "2026-06-30",
         body: [
           { type: "p", content: "Jenvu AI is a chart-aware built-in trading terminal. It analyses market structure, liquidity and bias using institutional ICT (Inner Circle Trader) and SMC (Smart Money Concepts) frameworks, then returns a clear answer with marked zones so you can see exactly what it sees." },
-          { type: "p", content: "Think of it as having a senior bullion-desk analyst on call 24/7: ask for a setup on Fiber and Jenvu walks the chart aloud, points out the structure shifts, marks the liquidity it's hunting, and only delivers an entry when the confluence meets its A+ bar." },
+          { type: "p", content: "Think of it as having a senior bullion-desk analyst on call 24/7: ask for a setup on Gold and Jenvu walks the chart aloud, points out the structure shifts, marks the liquidity it's hunting, and only delivers an entry when the confluence meets its A+ bar." },
 
           { type: "h2", content: "What you can do with Jenvu" },
           { type: "ul", items: [
             "Chat with the terminal like a desk analyst directly from your TradingView chart.",
-            "Generate A+ setups on demand for Fiber.",
+            "Generate A+ setups on demand for Gold.",
             "Watch the AI mark structure, FVGs, order blocks and liquidity directly on the chart.",
             "Save signals to your dashboard and receive alerts when new A+ setups are detected.",
             "Get news context, killzone awareness and bias confirmation before risking capital.",
@@ -70,7 +70,7 @@ export const collections: Collection[] = [
           { type: "ul", items: [
             "Read 'How do I create an account?' to set up your profile.",
             "Open 'Generate your first signal' for a 3-click walkthrough.",
-            "Read 'Which asset does Jenvu support?' for details about its Fiber-only focus.",
+            "Read 'Which asset does Jenvu support?' for details about its Gold-only focus.",
           ]},
         ],
       },
@@ -111,7 +111,7 @@ export const collections: Collection[] = [
           { type: "h2", content: "Step by step" },
           { type: "ol", items: [
             "Open the Jenvu desk from your dashboard.",
-            "Confirm the instrument — Fiber (the only pair Jenvu trades).",
+            "Confirm the instrument — Gold (the only pair Jenvu trades).",
             "Hit 'Analyze'. The terminal reads the active chart and starts building the setup.",
             "Wait while the 7-stage pipeline runs — usually 10–25 seconds.",
             "If the final score is 85+, the setup is graded A+ and entry, stop and targets appear.",
@@ -135,18 +135,18 @@ export const collections: Collection[] = [
       {
         slug: "supported-assets",
         title: "Supported asset",
-        summary: "Fiber only — Fiber, nothing else.",
+        summary: "Gold only — Gold, nothing else.",
         updatedAt: "2026-06-30",
         body: [
-          { type: "p", content: "Jenvu is a dedicated Fiber desk. The analysis engine is tuned specifically for Fiber versus U.S. Dollar — including London fix mechanics, DXY correlation, COMEX/COT positioning and central-bank buying flows — and it refuses to analyze any other pair." },
+          { type: "p", content: "Jenvu is a dedicated Gold desk. The analysis engine is tuned specifically for Gold versus U.S. Dollar — including London fix mechanics, DXY correlation, COMEX/COT positioning and central-bank buying flows — and it refuses to analyze any other pair." },
 
           { type: "h2", content: "Supported instruments" },
-          { type: "h3", content: "Fiber" },
+          { type: "h3", content: "Gold" },
           { type: "ul", items: [
-            "Fiber — primary bullion benchmark.",
+            "Gold — primary bullion benchmark.",
           ]},
 
-          { type: "note", tone: "info", content: "Ask for BTC, Fiber, NAS100 or any other asset and Jenvu will politely decline and redirect you to Fiber." },
+          { type: "note", tone: "info", content: "Ask for BTC, Gold, NAS100 or any other asset and Jenvu will politely decline and redirect you to Gold." },
         ],
       },
     ],
@@ -154,7 +154,7 @@ export const collections: Collection[] = [
   {
     slug: "tradingview-extension",
     title: "Built-in Trading Terminal",
-    description: "Open the terminal, chat with AI and analyze live Fiber charts.",
+    description: "Open the terminal, chat with AI and analyze live Gold charts.",
     icon: "Puzzle",
     articles: [
       {
@@ -163,23 +163,23 @@ export const collections: Collection[] = [
         summary: "Ask general questions or request a chart analysis.",
         updatedAt: "2026-06-30",
         body: [
-          { type: "p", content: "Jenvu works like a familiar AI chat next to your Fiber chart. It answers normal questions conversationally and only runs the ICT/SMC engine when you ask it to analyze a chart or trading setup." },
+          { type: "p", content: "Jenvu works like a familiar AI chat next to your Gold chart. It answers normal questions conversationally and only runs the ICT/SMC engine when you ask it to analyze a chart or trading setup." },
 
           { type: "h2", content: "Open the terminal" },
           { type: "ol", items: [
             "Sign in and open Dashboard → Terminal.",
-            "The live Fiber chart loads automatically — no install needed.",
+            "The live Gold chart loads automatically — no install needed.",
             "Click 'Ask With AI' to open the AI panel.",
             "Type a question or ask Jenvu to analyze the current structure.",
           ]},
 
           { type: "h2", content: "Chat mode and analysis mode" },
-          { type: "p", content: "Greetings and general questions stay in chat mode. Requests for a setup, bias or chart review switch Jenvu into ICT/SMC mentor mode and use the live Fiber data as context." },
+          { type: "p", content: "Greetings and general questions stay in chat mode. Requests for a setup, bias or chart review switch Jenvu into ICT/SMC mentor mode and use the live Gold data as context." },
 
           { type: "h2", content: "Ask naturally" },
           { type: "p", content: "Type into the composer and send your message. You can also attach a chart screenshot or use voice input, and ask follow-up questions in the same conversation without repeating context." },
 
-          { type: "note", tone: "tip", content: "Keep analysis requests specific — 'Review this Fiber structure' or 'What is the 30-minute bias?' produces the clearest result." },
+          { type: "note", tone: "tip", content: "Keep analysis requests specific — 'Review this Gold structure' or 'What is the 30-minute bias?' produces the clearest result." },
         ],
       },
       {
@@ -205,7 +205,7 @@ export const collections: Collection[] = [
           ]},
 
           { type: "h2", content: "3. Supported market" },
-          { type: "p", content: "Jenvu is tuned for Fiber on the 30-minute timeframe. Requests about other markets stay in general chat mode." },
+          { type: "p", content: "Jenvu is tuned for Gold on the 30-minute timeframe. Requests about other markets stay in general chat mode." },
 
           { type: "h2", content: "4. Still stuck" },
           { type: "p", content: "Start a new chat from the History menu in the AI panel, then retry your question. If the issue continues, contact support from the Help Center." },
@@ -222,13 +222,13 @@ export const collections: Collection[] = [
           { type: "p", content: "Jenvu understands natural language — you don't need fixed phrases. These examples are a good starting point and cover the most common workflows." },
 
           { type: "h2", content: "Analysis & setups" },
-          { type: "code", content: "“Analyze Fiber.”\n“Give me an A+ setup on Fiber.”\n“What's the Fiber bias right now?”\n“Walk me through the 15-minute Fiber structure.”" },
+          { type: "code", content: "“Analyze Gold.”\n“Give me an A+ setup on Gold.”\n“What's the Gold bias right now?”\n“Walk me through the 15-minute Gold structure.”" },
 
           { type: "h2", content: "Risk & news" },
           { type: "code", content: "“Is it safe to trade NFP today?”\n“Any high-impact news in the next hour?”\n“What killzone are we in?”" },
 
           { type: "h2", content: "ICT & SMC concepts" },
-          { type: "code", content: "“Show me the daily order block on Fiber.”\n“Where is liquidity resting above price?”\n“Is this a manipulation move or a real BOS?”" },
+          { type: "code", content: "“Show me the daily order block on Gold.”\n“Where is liquidity resting above price?”\n“Is this a manipulation move or a real BOS?”" },
 
           { type: "h2", content: "Account & app" },
           { type: "code", content: "“How many credits do I have left?”\n“Open my saved signals.”\n“Take me to billing.”" },
@@ -266,7 +266,7 @@ export const collections: Collection[] = [
           { type: "h2", content: "Why deterministic + LLM" },
           { type: "p", content: "Pure LLM signals hallucinate. Pure rule-based signals can't explain themselves. Jenvu's hybrid keeps the analysis grounded in measurable price action while letting the agent speak to you like a human analyst." },
 
-          { type: "note", tone: "info", content: "Scoring weights are tuned specifically for Fiber — DXY correlation, real yields and LBMA London fix flows carry the most weight." },
+          { type: "note", tone: "info", content: "Scoring weights are tuned specifically for Gold — DXY correlation, real yields and LBMA London fix flows carry the most weight." },
         ],
       },
       {
@@ -299,7 +299,7 @@ export const collections: Collection[] = [
         summary: "You'll see a MARKET CLOSED badge — no live entries are issued.",
         updatedAt: "2026-06-30",
         body: [
-          { type: "p", content: "Fiber follows the OTC bullion week — Sunday open in Sydney through Friday New York close, with a daily 60-minute settlement break. When you request analysis outside its trading window, Jenvu detects it and adapts." },
+          { type: "p", content: "Gold follows the OTC bullion week — Sunday open in Sydney through Friday New York close, with a daily 60-minute settlement break. When you request analysis outside its trading window, Jenvu detects it and adapts." },
 
           { type: "h2", content: "What you'll see" },
           { type: "ul", items: [
@@ -311,13 +311,13 @@ export const collections: Collection[] = [
 
           { type: "h2", content: "Sessions reference" },
           { type: "ul", items: [
-            "Spot Fiber: Sunday 22:00 UTC → Friday 22:00 UTC.",
-            "LBMA London Fiber fix: 10:30 & 15:00 GMT (highest liquidity).",
+            "Spot Gold: Sunday 22:00 UTC → Friday 22:00 UTC.",
+            "LBMA London Gold fix: 10:30 & 15:00 GMT (highest liquidity).",
             "COMEX open (NY AM): 12:30 – 15:00 GMT.",
             "Daily settlement break: 21:00 – 22:00 UTC.",
           ]},
 
-          { type: "note", tone: "info", content: "If you want to plan the next session in advance, ask Jenvu for 'tomorrow's London bias on Fiber' — it'll build a HTF read without issuing a live signal." },
+          { type: "note", tone: "info", content: "If you want to plan the next session in advance, ask Jenvu for 'tomorrow's London bias on Gold' — it'll build a HTF read without issuing a live signal." },
         ],
       },
       {
@@ -344,11 +344,11 @@ export const collections: Collection[] = [
         summary: "Who can use the JX Bot, how to create a license and how to install it in MetaTrader 5.",
         updatedAt: "2026-10-24",
         body: [
-          { type: "p", content: "The JX Bot is Jenvu's Fiber Expert Advisor for MetaTrader 5. It is available on a Pro, Elite or Ultra monthly plan, and free for 14 days with the free trial (it stops when the trial ends unless a plan is bought). Credit alone does not unlock it. Open Dashboard → JX Bot to download it. How the bot decides its trades is proprietary and not published." },
+          { type: "p", content: "The JX Bot is Jenvu's Gold Expert Advisor for MetaTrader 5. It is available on a Pro, Elite or Ultra monthly plan, and free for 14 days with the free trial (it stops when the trial ends unless a plan is bought). Credit alone does not unlock it. Open Dashboard → JX Bot to download it. How the bot decides its trades is proprietary and not published." },
           { type: "h2", content: "Plans" },
           { type: "ul", items: ["Pro: $600 monthly profit target, $30 daily, 1 MT5 license.", "Elite: $1,500 monthly, $75 daily, 2 licenses.", "Ultra: $3,000 monthly, $150 daily, 5 licenses.", "Daily target = monthly target / 20, per license: each MT5 account has its own target, and when one reaches it that bot closes its trades and starts again the next day.", "See profit, balance, equity and trades for each account at Dashboard → Usage → Bot Usage."] },
           { type: "h2", content: "Setup" },
-          { type: "ol", items: ["Dashboard → JX Bot: enter your MT5 account number (digits only) and create a license.", "In MT5: File → Open Data Folder → MQL5 → Experts, paste the Jenvu EA file; put the .set files in MQL5 → Presets; refresh the Navigator.", "Tools → Options → Expert Advisors: tick Allow WebRequest and add https://jenvu.com.", "Turn on Algo Trading, open EURUSD M15, drag Jenvu EA on the chart, load the Jenvu EURUSD 15M preset and paste your key into LicenseKey."] },
+          { type: "ol", items: ["Dashboard → JX Bot: enter your MT5 account number (digits only) and create a license.", "In MT5: File → Open Data Folder → MQL5 → Experts, paste the Jenvu EA file; put the .set files in MQL5 → Presets; refresh the Navigator.", "Tools → Options → Expert Advisors: tick Allow WebRequest and add https://jenvu.com.", "Turn on Algo Trading, open XAUUSD M15, drag Jenvu EA on the chart, load the Jenvu XAUUSD 15M preset and paste your key into LicenseKey."] },
           { type: "note", tone: "info", content: "Each key works only on one MT5 account. Targets are stop limits, not promised profit. Start with a small lot size." },
         ],
       },
@@ -406,7 +406,7 @@ export const collections: Collection[] = [
             "$10 wallet per month.",
             "AI terminal chat billed from the included wallet.",
             "Personal API keys for the Jenvu API endpoint.",
-            "Full Fiber signal engine.",
+            "Full Gold signal engine.",
             "Realtime A+ email & push alerts (no delay).",
             "Full ICT / SMC narration, trade journal & analytics.",
             "Multi-timeframe bias engine.",
@@ -418,7 +418,7 @@ export const collections: Collection[] = [
             "$25 wallet per month.",
             "Everything in Pro, plus senior review on analysis.",
             "Priority A+ alerts (< 30 seconds).",
-            "Dedicated Fiber scanner with DXY overlay.",
+            "Dedicated Gold scanner with DXY overlay.",
             "API access, webhooks and custom alert rules.",
             "Dedicated onboarding & SLA.",
           ]},
@@ -485,7 +485,7 @@ export const collections: Collection[] = [
           { type: "p", content: "With Terminal access you can use the chart as much as you like. Only AI features use credits, because each AI reply has a real processing cost. Every charge is checked and deducted on Jenvu's servers before an answer is returned, so it cannot be skipped from the browser." },
           { type: "h2", content: "Included with Terminal access (no credits)" },
           { type: "ul", items: [
-            "Live Fiber price, candles and all timeframes.",
+            "Live Gold price, candles and all timeframes.",
             "Indicators (RSI, MACD, EMA, Bollinger Bands, ATR, VWAP and more).",
             "SMC tools: swings, BOS/CHoCH, supply and demand zones, fair value gaps and liquidity sweeps.",
             "Fresh sweep, Swing price action and the Zone + FVG (supply/demand) strategy.",
@@ -566,7 +566,7 @@ export const collections: Collection[] = [
           { type: "code", content: "https://jenvu.com/api/public/v1" },
 
           { type: "h2", content: "Example request" },
-          { type: "code", content: "curl https://jenvu.com/api/public/v1/chat/completions \\\n  -H \"Authorization: Bearer YOUR_JENVU_KEY\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"model\": \"claude-sonnet-4.5\",\n    \"messages\": [{\"role\": \"user\", \"content\": \"Give me the Fiber bias\"}]\n  }'" },
+          { type: "code", content: "curl https://jenvu.com/api/public/v1/chat/completions \\\n  -H \"Authorization: Bearer YOUR_JENVU_KEY\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"model\": \"claude-sonnet-4.5\",\n    \"messages\": [{\"role\": \"user\", \"content\": \"Give me the Gold bias\"}]\n  }'" },
 
           { type: "h2", content: "Available models" },
           { type: "ul", items: [
