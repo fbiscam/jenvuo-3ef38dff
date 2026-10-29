@@ -76,6 +76,19 @@ const SD_HISTORY_TIMEFRAMES = new Set(["15m", "30m", "45m", "1h", "2h", "4h", "1
 const SWING_SWEEP_TIMEFRAMES = new Set(["1h", "2h", "4h", "1d"]);
 const LOCKED_TOGGLE_KEYS = new Set<string>(LOCKED_STRATEGY_KEYS);
 
+/** TradingView bottom-bar date ranges; each picks a chart timeframe via PERIOD_TIMEFRAME. */
+const BOTTOM_RANGES = [
+  { key: "1d", label: "1D", title: "1 day" },
+  { key: "5d", label: "5D", title: "5 days" },
+  { key: "1m", label: "1M", title: "1 month" },
+  { key: "3m", label: "3M", title: "3 months" },
+  { key: "6m", label: "6M", title: "6 months" },
+  { key: "ytd", label: "YTD", title: "year to date" },
+  { key: "1y", label: "1Y", title: "1 year" },
+  { key: "5y", label: "5Y", title: "5 years" },
+  { key: "all", label: "All", title: "all history" },
+] as const;
+
 const MemoChart = memo(ChartCanvas);
 
 const DRAWINGS_KEY = "jenvu:terminal:drawings:v1";
@@ -272,7 +285,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
   // Demo trading: order ticket, positions on the chart and the paper panel. Opened from the side panel.
   const demoTradingEnabled = true;
   // On-chart quick BUY/SELL buttons stay off; trading starts from the side panel.
-  const chartQuickButtons = false as boolean;
+  const chartQuickButtons = true as boolean;
 
   useEffect(() => {
     const syncFullscreen = () => setFullscreen(document.fullscreenElement === workspaceRef.current);
@@ -710,6 +723,11 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
 
   const rail = (
     <nav aria-label="Chart tools" className="flex min-w-0 flex-1 items-center gap-0.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      <span className="mr-1 inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full pl-1 pr-2.5 text-[13px] font-semibold text-gc-ink dark:text-foreground" title="Gold Spot / U.S. Dollar">
+        <XauUsdLogo size={20} />
+        XAUUSD
+      </span>
+      <span className="mx-0.5 h-5 w-px shrink-0 bg-gc-line" aria-hidden="true" />
       <Popover>
         <PopoverTrigger asChild>
           <button type="button" aria-label="Timeframe" title="Timeframe" className={cn(railBtn, "text-gc-ink")}>
@@ -812,7 +830,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
           "flex min-h-0 min-w-0 flex-1 flex-col bg-background",
           sidePanelOpen
             ? "lg:h-full lg:overflow-hidden lg:rounded-none lg:bg-card"
-            : theme !== "dark" && "overflow-hidden md:mb-2 md:rounded-2xl md:border md:border-gc-line",
+            : theme !== "dark" && "overflow-hidden md:max-lg:mb-2 md:max-lg:rounded-2xl md:max-lg:border md:max-lg:border-gc-line",
         )}
       >
       {/* Top bar — phones only: on laptops and tablets every control lives in the side bar. */}
@@ -1049,7 +1067,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
                 )}
               </div>
               {demoTradingEnabled && chartQuickButtons && (
-                <div className="mb-1.5">
+                <div className="mb-1.5 hidden md:block">
                   <QuickTradeButtons price={currentPrice} onPick={setTicketSide} />
                 </div>
               )}
@@ -1146,22 +1164,46 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
             )}
           </div>
 
-          {/* TradingView-style bottom bar */}
-          <div className="hidden h-8 shrink-0 items-center gap-0.5 border-t border-border px-2 text-[12px] md:flex" role="group" aria-label="Quick timeframe">
-            {timeframes.map((item) => (
-              <button
-                type="button"
-                key={item.key}
-                onClick={() => onTimeframeChange(item)}
-                aria-pressed={item.key === timeframe.key}
-                className={cn(
-                  "h-6 rounded px-2 font-medium tabular-nums text-muted-foreground hover:bg-accent hover:text-foreground",
-                  item.key === timeframe.key && "bg-accent text-foreground",
-                )}
-              >
-                {item.label}
-              </button>
-            ))}
+          {/* TradingView-style bottom bar: date ranges, paper trading, UTC clock */}
+          <div className="hidden h-9 shrink-0 items-center gap-0.5 border-t border-border px-2 text-[12px] md:flex" role="group" aria-label="Date range">
+            {BOTTOM_RANGES.map((range) => {
+              const tfKey = PERIOD_TIMEFRAME[range.key];
+              return (
+                <button
+                  type="button"
+                  key={range.key}
+                  title={`Show ${range.title}`}
+                  onClick={() => {
+                    const next = timeframes.find((t) => t.key === tfKey);
+                    if (next && next.key !== timeframe.key) onTimeframeChange(next);
+                    else chartRef.current?.fit();
+                  }}
+                  className="h-6 rounded px-2 font-medium tabular-nums text-muted-foreground hover:bg-accent hover:text-foreground"
+                >
+                  {range.label}
+                </button>
+              );
+            })}
+            {demoTradingEnabled && (
+              <>
+                <span className="mx-1.5 h-4 w-px bg-border" aria-hidden="true" />
+                <button
+                  type="button"
+                  onClick={() => setPaperOpen((v) => !v)}
+                  aria-pressed={paperOpen}
+                  className={cn(
+                    "inline-flex h-6 items-center gap-1 rounded px-2 font-medium text-muted-foreground hover:bg-accent hover:text-foreground",
+                    paperOpen && "bg-accent text-foreground",
+                  )}
+                >
+                  Paper Trading
+                  {demoPositions.length > 0 && (
+                    <span className="rounded bg-secondary px-1 font-mono text-[10px] text-foreground">{demoPositions.length}</span>
+                  )}
+                  <ChevronDown className={cn("h-3.5 w-3.5 transition-transform", paperOpen && "rotate-180")} />
+                </button>
+              </>
+            )}
             <UtcClock />
           </div>
 
