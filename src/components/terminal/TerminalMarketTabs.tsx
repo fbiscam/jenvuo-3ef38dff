@@ -107,7 +107,7 @@ export function TerminalSymbolHeader({
         </div>
         <HeaderSidePanel quotes={quotes.data} now={now} />
       </div>
-      <nav aria-label="EUR/USD sections" className="flex gap-7 border-b-2 border-gc-line px-5">
+      <nav aria-label="XAU/USD sections" className="flex gap-7 border-b-2 border-gc-line px-5">
         {TABS.map((t) => (
           <button
             key={t.id}
@@ -173,7 +173,7 @@ export function TerminalPeriodReturns({ timeframeKey, onPick }: { timeframeKey: 
 export function TerminalTabBody({ tab, bars, timeframeKey }: { tab: MarketTab; bars: OhlcvBar[]; timeframeKey: string }) {
   if (tab === "overview") return null;
   return (
-    <section aria-label="EUR/USD details" className="hidden min-h-[540px] shrink-0 bg-card px-6 py-6 font-sans lg:block">
+    <section aria-label="XAU/USD details" className="hidden min-h-[540px] shrink-0 bg-card px-6 py-6 font-sans lg:block">
       {tab === "news" && <NewsTab />}
       {tab === "technicals" && <TechnicalsTab bars={bars} timeframeKey={timeframeKey} />}
       {tab === "seasonals" && <SeasonalsTab />}
@@ -216,7 +216,7 @@ function EventsTable() {
       ) : q.isError || !q.data ? (
         <p className="py-6 text-center text-[13px] text-gc-ink-muted">Events feed unavailable right now. Please try again shortly.</p>
       ) : !rows.length ? (
-        <p className="py-6 text-center text-[13px] text-gc-ink-muted">No EUR/USD-moving events this week.</p>
+        <p className="py-6 text-center text-[13px] text-gc-ink-muted">No gold-moving events this week.</p>
       ) : (
         <table className="w-full text-left text-[13px]">
           <thead>
@@ -504,7 +504,7 @@ function HeaderSidePanel({ quotes, now }: { quotes?: Record<string, { price: num
   return (
     <div className="ml-auto hidden shrink-0 items-stretch gap-6 xl:flex">
       <div>
-        <p className="mb-2 text-[11.5px] font-medium uppercase tracking-wide text-gc-ink-muted">Moves EUR/USD</p>
+        <p className="mb-2 text-[11.5px] font-medium uppercase tracking-wide text-gc-ink-muted">Moves gold</p>
         <div className="grid grid-cols-2 gap-x-6 gap-y-2">
           {MOVERS.map((m) => {
             const q = quotes?.[m.symbol];
