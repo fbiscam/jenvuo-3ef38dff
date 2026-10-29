@@ -806,7 +806,7 @@ function TerminalPage() {
                 "relative flex h-[45%] min-h-0 w-full shrink-0 flex-col bg-card text-card-foreground lg:h-full lg:w-[380px]",
                 theme === "dark"
                   ? "border-t border-border lg:border-l lg:border-t-0"
-                  : "overflow-hidden rounded-2xl border border-gc-line shadow-sm",
+                  : "overflow-hidden rounded-2xl border border-gc-line shadow-sm lg:rounded-none lg:border-y-0 lg:border-r-0 lg:border-l-border lg:shadow-none",
               )}
             >
               <div className="flex min-h-17 items-center justify-end gap-2.5 border-b border-border px-4 py-3">

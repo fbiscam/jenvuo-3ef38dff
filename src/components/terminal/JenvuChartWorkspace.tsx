@@ -830,7 +830,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
           "flex min-h-0 min-w-0 flex-1 flex-col bg-background",
           sidePanelOpen
             ? "lg:h-full lg:overflow-hidden lg:rounded-none lg:bg-card"
-            : theme !== "dark" && "overflow-hidden md:mb-2 md:rounded-2xl md:border md:border-gc-line",
+            : theme !== "dark" && "overflow-hidden md:max-lg:mb-2 md:max-lg:rounded-2xl md:max-lg:border md:max-lg:border-gc-line",
         )}
       >
       {/* Top bar — phones only: on laptops and tablets every control lives in the side bar. */}
