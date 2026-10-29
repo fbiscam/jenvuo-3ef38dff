@@ -12,8 +12,9 @@ import spxIcon from "@/assets/watchlist/spx.svg";
 
 export type WatchItem = { symbol: string; label: string; name: string; icon?: string };
 
-/** Markets that move EUR/USD, shown in Market Watch and the top cards. */
+/** Markets that move gold, shown in Market Watch and the top cards. */
 export const WATCH: WatchItem[] = [
+  { symbol: "XAUUSD", label: "XAU/USD", name: "Gold Spot", icon: xagIcon },
   { symbol: "EURUSD", label: "EUR/USD", name: "Euro / Dollar", icon: euIcon },
   { symbol: "XAGUSD", label: "XAG/USD", name: "Silver", icon: xagIcon },
   { symbol: "DXY", label: "DXY", name: "Dollar Index", icon: dxyIcon },
@@ -60,7 +61,7 @@ export function useTechnicals(bars: OhlcvBar[], timeframeKey: string, allowed: A
   const usesChartBars = activeTf === timeframeKey;
   const otherTf = useQuery({
     queryKey: ["terminal-technicals", activeTf],
-    queryFn: () => fetchChart({ data: { timeframe: activeTf, asset: "EURUSD" } }),
+    queryFn: () => fetchChart({ data: { timeframe: activeTf, asset: "XAUUSD" } }),
     enabled: !usesChartBars,
     staleTime: 60_000,
     refetchInterval: 60_000,

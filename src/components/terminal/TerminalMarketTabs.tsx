@@ -82,11 +82,11 @@ export function TerminalSymbolHeader({
   const tail = priceText.length > 5 ? priceText.slice(-5) : priceText;
 
   return (
-    <section aria-label="Euro / U.S. Dollar" className="hidden shrink-0 bg-card font-sans lg:block">
+    <section aria-label="Gold Spot / U.S. Dollar" className="hidden shrink-0 bg-card font-sans lg:block">
       <div className="flex items-center gap-5 px-5 pb-3 pt-4">
         <XauUsdLogo size={80} />
         <div className="min-w-0">
-          <h1 className="text-[28px] font-semibold leading-tight tracking-tight text-gc-ink 2xl:text-[34px]">Euro / U.S. Dollar</h1>
+          <h1 className="text-[28px] font-semibold leading-tight tracking-tight text-gc-ink 2xl:text-[34px]">Gold Spot / U.S. Dollar</h1>
           <div className="mt-2 flex flex-wrap items-baseline gap-x-3 gap-y-1">
             <p className="text-[36px] font-semibold leading-none tabular-nums tracking-tight text-gc-ink 2xl:text-[44px]">
               {head}
