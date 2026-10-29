@@ -119,13 +119,13 @@ function PricingPage() {
           <p className="mt-5 text-[17px] leading-[1.65] text-gc-ink-muted">
             Create an account to see how Jenvu reads the Gold market in real time. New users get{" "}
             <Link to="/auth" search={{ mode: "signup" } as never} className={LINK}>$100 in free credit</Link> to run the AI desk, plus{" "}
-            <a href="#plans" className={LINK}>14 days of Pro access</a>, started with one click from the dashboard.
+            <a href="#plans" className={LINK}>14 days of Starter access</a>, started with one click from the dashboard.
           </p>
         </div>
         <div className="grid grid-cols-2 gap-8">
           {[
             { value: "$100", label: "in free credit" },
-            { value: "14", label: "days of Pro access" },
+            { value: "14", label: "days of Starter access" },
           ].map((s) => (
             <div key={s.label} className="text-center">
               <p className="text-[56px] font-normal leading-none text-gc-success sm:text-[72px]">{s.value}</p>
@@ -141,15 +141,15 @@ function PricingPage() {
         <div>
           <h2 className="text-[28px] font-normal leading-tight">Only pay for what you use</h2>
           <p className="mt-5 text-[17px] leading-[1.65] text-gc-ink-muted">
-            Every plan includes a monthly AI wallet billed by actual token use, at $3 per million tokens. No up-front fees and no termination charges —{" "}
+            Every plan includes an AI wallet billed by actual token use, at $3 per million tokens. No up-front fees and no termination charges —{" "}
             <a href="#compare" className={LINK}>view the full comparison.</a>
           </p>
         </div>
         <div>
-          <h2 className="text-[28px] font-normal leading-tight">Save 17% with annual billing</h2>
+          <h2 className="text-[28px] font-normal leading-tight">Short plans, no license key</h2>
           <p className="mt-5 text-[17px] leading-[1.65] text-gc-ink-muted">
-            Pay once a year instead of monthly and keep the same features for less. Switch the toggle in the{" "}
-            <a href="#plans" className={LINK}>plans section</a> to see annual prices for Pro, Elite and Ultra.
+            Pick 14 or 30 days of the Gold Terminal and renew only when you want. See the{" "}
+            <a href="#plans" className={LINK}>plans section</a> for Starter, Pro and Elite.
           </p>
         </div>
       </section>
@@ -193,18 +193,6 @@ function PricingPage() {
       <section id="plans" className="scroll-mt-24 mx-auto max-w-[1296px] px-5 py-14 sm:px-8 lg:px-[72px]">
         <div className="text-center">
           <h2 className="text-[34px] font-normal leading-tight sm:text-[38px]">Choose your plan</h2>
-          <div className="mx-auto mt-6 inline-flex items-center rounded-full border border-gc-line p-1" aria-label="Billing cycle">
-            {(["monthly", "annual"] as const).map((b) => (
-              <button
-                key={b}
-                type="button"
-                onClick={() => setBilling(b)}
-                className={`rounded-full px-5 py-2 text-[14px] font-medium transition ${billing === b ? "bg-gc-blue-deep text-gc-on-blue" : "text-gc-ink-muted hover:text-gc-ink"}`}
-              >
-                {b === "monthly" ? "Monthly" : "Annual · save 17%"}
-              </button>
-            ))}
-          </div>
         </div>
         <div className="mt-10 grid gap-6 md:grid-cols-3">
           {plans.map((plan) => {
@@ -221,7 +209,7 @@ function PricingPage() {
                 <p className="mt-3 text-[15px] leading-[1.6] text-gc-ink-muted">{plan.description}</p>
                 <div className="mt-6 flex items-baseline gap-1">
                   <span className="text-[44px] font-normal leading-none text-gc-success">${plan.price}</span>
-                  <span className="text-[14px] text-gc-ink-muted">{suffix}</span>
+                  <span className="text-[14px] text-gc-ink-muted">{plan.key === "pro" ? "/14 days" : "/30 days"}</span>
                 </div>
                 <p className="mt-2 text-[14px] text-gc-ink-muted">{plan.wallet} included</p>
                 <ul className="mt-5 space-y-2 text-[14px] text-gc-ink">
