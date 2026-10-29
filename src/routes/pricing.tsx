@@ -75,12 +75,11 @@ function PricingPage() {
   const upgradeLock = useUpgradeLock();
   const trial = useTrial();
   const signedOut = currentPlan === null;
-  const [billing, setBilling] = React.useState<"monthly" | "annual">("monthly");
+  const billing = "monthly" as "monthly" | "annual";
   const priceOf = (id: string, price: number) => {
     const base = price;
     return billing === "annual" && base > 0 ? Math.round((base * 12 * 0.83) / 10) * 10 : base;
   };
-  const suffix = billing === "annual" ? "/yr" : "/mo";
   const [open, setOpen] = React.useState<number[]>([]);
   const allOpen = open.length === FAQ.length;
 
@@ -227,7 +226,7 @@ function PricingPage() {
                       to={destination}
                       className={`flex h-11 items-center justify-center rounded-full text-[15px] font-medium transition ${plan.key === "pro" ? "bg-gc-blue-deep text-gc-on-blue hover:bg-gc-navy" : "border border-gc-line text-gc-blue-deep hover:bg-gc-surface"}`}
                     >
-                      {trialPro ? "Upgrade to Pro" : currentPlan !== null ? "Upgrade" : "Buy now"}
+                      {trialPro ? "Upgrade to Starter" : currentPlan !== null ? "Upgrade" : "Buy now"}
                     </Link>
                   )}
                 </div>
