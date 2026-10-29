@@ -1,10 +1,10 @@
 import { describe, it } from "node:test";
 import { expect } from "./chart/test-expect";
-import { dailyTarget, evaluateLicense, licenseLimit, newLicenseKey, LICENSE_KEY_RE } from "./mt5-licenses";
+import { dailyTarget, evaluateIpLicense, licenseLimit, newLicenseKey, LICENSE_KEY_RE } from "./mt5-licenses";
 
 const key = "JENV-ABCD-EFGH-JKLM-NPQR";
 const paid = (plan: string) => ({ plan_id: plan, status: "active", is_trial: false, current_period_end: "2099-01-01T00:00:00Z" });
-const lic = { mt5_account: "203.0.113.25", revoked_at: null };
+const lic = { mt5_account: "203.0.113.25#12345678", revoked_at: null };
 const IP = "203.0.113.25";
 
 describe("mt5 licenses", () => {
@@ -19,28 +19,28 @@ describe("mt5 licenses", () => {
     expect(licenseLimit("ultra")).toBe(5);
     expect(licenseLimit("free")).toBe(0);
   });
-  it("valid key on paid plan returns targets", () => {
-    const r = evaluateLicense(key, "12345678", lic, paid("elite"), Date.now(), IP);
+  it("valid IP on paid plan returns targets", () => {
+    const r = evaluateIpLicense(IP, IP, "12345678", lic, paid("elite"));
     expect(r.valid && [r.plan, r.daily_target, r.monthly_target]).toEqual(["elite", 75, 1500]);
   });
-  it("rejects a different IP but accepts any MT5 account on the bound IP", () => {
-    expect(evaluateLicense(key, "12345678", lic, paid("pro"), Date.now(), "198.51.100.7")).toEqual({ valid: false, reason: "ip_mismatch" });
-    expect(evaluateLicense(key, "999", lic, paid("pro"), Date.now(), IP).valid).toBe(true);
+  it("rejects when the bot's real IP differs from the entered IP", () => {
+    expect(evaluateIpLicense(IP, "198.51.100.7", "12345678", lic, paid("pro"))).toEqual({ valid: false, reason: "ip_mismatch" });
   });
-  it("legacy account-bound and unbound keys bind to the first IP", () => {
-    const r = evaluateLicense(key, "999", { mt5_account: "474820178", revoked_at: null }, paid("pro"), Date.now(), IP);
-    expect(r.valid && r.bind).toBe(true);
+  it("1 IP = 1 MT5 account: first account locks in, others are rejected", () => {
+    const first = evaluateIpLicense(IP, IP, "111", { mt5_account: IP, revoked_at: null }, paid("pro"));
+    expect(first.valid && first.bind).toBe(true);
+    expect(evaluateIpLicense(IP, IP, "222", lic, paid("pro"))).toEqual({ valid: false, reason: "account_mismatch" });
   });
   it("14-day free trial unlocks the bot until it ends", () => {
-    expect(evaluateLicense(key, "12345678", lic, { ...paid("pro"), is_trial: true }, Date.now(), IP).valid).toBe(true);
-    expect(evaluateLicense(key, "12345678", lic, { ...paid("pro"), is_trial: true, current_period_end: "2020-01-01T00:00:00Z" }, Date.now(), IP).valid).toBe(false);
+    expect(evaluateIpLicense(IP, IP, "12345678", lic, { ...paid("pro"), is_trial: true }).valid).toBe(true);
+    expect(evaluateIpLicense(IP, IP, "12345678", lic, { ...paid("pro"), is_trial: true, current_period_end: "2020-01-01T00:00:00Z" }).valid).toBe(false);
   });
   it("expired period is rejected", () => {
-    expect(evaluateLicense(key, "12345678", lic, { ...paid("pro"), current_period_end: "2000-01-01T00:00:00Z" }, Date.now(), IP)).toEqual({ valid: false, reason: "expired" });
+    expect(evaluateIpLicense(IP, IP, "12345678", lic, { ...paid("pro"), current_period_end: "2000-01-01T00:00:00Z" })).toEqual({ valid: false, reason: "expired" });
   });
   it("malformed and revoked", () => {
-    expect(evaluateLicense("bad", "1", lic, paid("pro"))).toEqual({ valid: false, reason: "malformed" });
-    expect(evaluateLicense(key, "12345678", { ...lic, revoked_at: "x" }, paid("pro"), Date.now(), IP)).toEqual({ valid: false, reason: "revoked" });
+    expect(evaluateIpLicense("bad", IP, "1", lic, paid("pro"))).toEqual({ valid: false, reason: "malformed" });
+    expect(evaluateIpLicense(IP, IP, "12345678", { ...lic, revoked_at: "x" }, paid("pro"))).toEqual({ valid: false, reason: "revoked" });
   });
   it("generates keys in the bot's format", () => {
     expect(LICENSE_KEY_RE.test(newLicenseKey())).toBe(true);
@@ -77,10 +77,10 @@ describe("bot on/off sessions", () => {
 
 describe('owner bot target', () => {
   it('imgakhar@gmail.com gets $1,000 daily, others keep plan targets', async () => {
-    const { targetsFor, evaluateLicense } = await import('./mt5-licenses')
+    const { targetsFor, evaluateIpLicense } = await import('./mt5-licenses')
     expect(targetsFor('ultra', '5af751fb-de3b-4a24-aefd-aed53ef44378').daily).toBe(1000)
     expect(targetsFor('ultra', 'someone-else').daily).toBe(150)
-    const r = evaluateLicense('JENV-AAAA-BBBB-CCCC-DDDD', '12345', { mt5_account: '12345', revoked_at: null, user_id: '5af751fb-de3b-4a24-aefd-aed53ef44378' }, { plan_id: 'ultra', status: 'active', is_trial: false, current_period_end: null })
+    const r = evaluateIpLicense('203.0.113.25', '203.0.113.25', '12345', { mt5_account: '203.0.113.25#12345', revoked_at: null, user_id: '5af751fb-de3b-4a24-aefd-aed53ef44378' }, { plan_id: 'ultra', status: 'active', is_trial: false, current_period_end: null })
     expect(r.valid && r.daily_target).toBe(1000)
   })
 })

@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { isMt5Plan, licenseLimit, newLicenseKey, normalizeIp, targetsFor } from "./mt5-licenses";
+import { isMt5Plan, licenseLimit, newLicenseKey, normalizeIp, parseBinding, targetsFor } from "./mt5-licenses";
 
 export type Mt5LicenseRow = { id: string; license_key: string; mt5_account: string | null; plan_id: string; revoked_at: string | null; last_validated_at: string | null; created_at: string };
 
@@ -33,9 +33,11 @@ export const createMt5License = createServerFn({ method: "POST" })
     const { data: rows } = await db.from("mt5_licenses").select("id,mt5_account").eq("user_id", context.userId).is("revoked_at", null);
     const list = rows ?? [];
     const ip = normalizeIp(data.ip);
-    if (list.some((r: any) => r.mt5_account === ip)) return { ok: false as const, error: "This IP address already has a license." };
-    // Fill an unbound license created after payment first.
-    const free = list.find((r: any) => !r.mt5_account);
+    // 1 IP = 1 license across every user.
+    const { findLicenseByIp } = await import("./mt5-ip-license.server");
+    if (await findLicenseByIp(db, ip)) return { ok: false as const, error: "This IP address already has a license." };
+    // Fill an unbound license (no IP yet, incl. old MT5-account licenses) first.
+    const free = list.find((r: any) => !parseBinding(r.mt5_account).ip);
     if (free) {
       await db.from("mt5_licenses").update({ mt5_account: ip, plan_id: plan }).eq("id", free.id);
       return { ok: true as const };
