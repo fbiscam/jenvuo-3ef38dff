@@ -133,7 +133,6 @@ const CARDS: Card[] = [
   { name: "Fresh sweep", to: "/help", Scene: SceneSweep, text: <><b className="font-medium text-gc-ink">Fresh sweep</b> spots wicks that take prior highs or lows, then confirms only when price reverses</> },
   { name: "AI desk", to: "/ai-engine", Scene: SceneAi, text: <><b className="font-medium text-gc-ink">Jenvu AI</b> reads the same chart you see and answers exactly the question you asked</> },
   { name: "Volume RVOL", to: "/help", Scene: SceneVolume, text: <><b className="font-medium text-gc-ink">RVOL</b> colours unusual volume spikes and shows an estimated buyer and seller on every candle</> },
-  { name: "JX Bot", to: "/pricing", Scene: SceneBot, text: <><b className="font-medium text-gc-ink">JX Bot</b> trades Gold on MetaTrader 5 and pauses for the day at your daily target</> },
 ];
 
 function FeatureCard({ card }: { card: Card }) {

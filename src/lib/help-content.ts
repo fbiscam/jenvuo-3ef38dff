@@ -338,20 +338,6 @@ export const collections: Collection[] = [
           { type: "note", tone: "info", content: "Signals are filtered strictly to cut fakeouts, so you will see fewer marks than on other charts. That is expected. No tool guarantees a win — start small and use a stop on every trade." },
         ],
       },
-      {
-        slug: "jx-bot-mt5-setup",
-        title: "Install the JX Bot on MT5",
-        summary: "Who can use the JX Bot, how to create a license and how to install it in MetaTrader 5.",
-        updatedAt: "2026-10-24",
-        body: [
-          { type: "p", content: "The JX Bot is Jenvu's Gold Expert Advisor for MetaTrader 5. It is available on a Pro, Elite or Ultra monthly plan, and free for 14 days with the free trial (it stops when the trial ends unless a plan is bought). Credit alone does not unlock it. Open Dashboard → JX Bot to download it. How the bot decides its trades is proprietary and not published." },
-          { type: "h2", content: "Plans" },
-          { type: "ul", items: ["Pro: $600 monthly profit target, $30 daily, 1 MT5 license.", "Elite: $1,500 monthly, $75 daily, 2 licenses.", "Ultra: $3,000 monthly, $150 daily, 5 licenses.", "Daily target = monthly target / 20, per license: each MT5 account has its own target, and when one reaches it that bot closes its trades and starts again the next day.", "See profit, balance, equity and trades for each account at Dashboard → Usage → Bot Usage."] },
-          { type: "h2", content: "Setup" },
-          { type: "ol", items: ["Dashboard → JX Bot: enter your MT5 account number (digits only) and create a license.", "In MT5: File → Open Data Folder → MQL5 → Experts, paste the Jenvu EA file; put the .set files in MQL5 → Presets; refresh the Navigator.", "Tools → Options → Expert Advisors: tick Allow WebRequest and add https://jenvu.com.", "Turn on Algo Trading, open XAUUSD M15, drag Jenvu EA on the chart, load the Jenvu XAUUSD 15M preset and paste your key into LicenseKey."] },
-          { type: "note", tone: "info", content: "Each key works only on one MT5 account. Targets are stop limits, not promised profit. Start with a small lot size." },
-        ],
-      },
     ],
   },
   {
@@ -481,7 +467,7 @@ export const collections: Collection[] = [
         summary: "Charts and tools are included with Terminal access; only AI replies use credits.",
         updatedAt: "2026-10-21",
         body: [
-          { type: "p", content: "The Terminal is reserved for approved Founding Program members, free of cost. Pro, Elite and Ultra plans, the free trial and credit do not unlock it; plans cover JX Bot and the Top AI Models, and every other page stays open. Apply at jenvu.com/founding." },
+          { type: "p", content: "The Terminal opens with any active plan (Starter $19 / 14 days, Pro $49 / 30 days, Elite $89 / 30 days), the free trial, or an approved Founding membership. Credit alone does not unlock it, and every other page stays open. Apply at jenvu.com/founding." },
           { type: "p", content: "With Terminal access you can use the chart as much as you like. Only AI features use credits, because each AI reply has a real processing cost. Every charge is checked and deducted on Jenvu's servers before an answer is returned, so it cannot be skipped from the browser." },
           { type: "h2", content: "Included with Terminal access (no credits)" },
           { type: "ul", items: [
