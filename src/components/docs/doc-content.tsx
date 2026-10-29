@@ -171,7 +171,7 @@ export const DOC_GROUPS: DocGroup[] = [
         keywords: "access locked founding program id verification",
         body: (
           <>
-            <p>The Terminal is reserved for approved <strong>Founding Program</strong> members, free of cost. <strong>Pro, Elite and Ultra</strong> plans, the free trial and credit do not unlock it: plans cover <strong>JX Bot</strong> for MT5 and the <strong>Top AI Models</strong>, and every other page stays open.</p>
+            <p>The Terminal opens with any active plan (<strong>Starter</strong> $19 / 14 days, <strong>Pro</strong> $49 / 30 days, <strong>Elite</strong> $89 / 30 days), the free trial, or an approved <strong>Founding Program</strong> membership. Credit alone does not unlock it, and every other page stays open.</p>
             <ul>
               <li>When your Founding application is approved, you get 3 months of your chosen plan and $250 credit straight away.</li>
               <li>You then have <strong>2 days</strong> to upload an identity document. Once submitted, access continues.</li>
@@ -284,30 +284,6 @@ export const DOC_GROUPS: DocGroup[] = [
               <li>The buy/sell split is an <strong>estimate</strong> based on where the candle closed in its range.</li>
             </ul>
             <Note>Gold trades across many venues, so volume here is not the total market's real order flow. Use it as a guide only.</Note>
-          </>
-        ),
-      },
-    ],
-  },
-  {
-    title: "JX Bot for MT5",
-    sections: [
-      {
-        id: "jx-bot",
-        title: "JX Bot",
-        keywords: "mt5 metatrader expert advisor ea bot license automated",
-        body: (
-          <>
-            <p>
-              JX Bot is Jenvu's Expert Advisor for <strong>Gold on MetaTrader 5</strong> (M15 chart). It comes with every paid plan:
-              Pro 1 license, Elite 2, Ultra 5. Each license key works on one MT5 account.
-            </p>
-            <ul>
-              <li>Download it from Dashboard → JX Bot and follow the install steps there.</li>
-              <li>The bot checks its license with jenvu.com before it trades.</li>
-              <li>It pauses for the day at your daily target (monthly target / 20) and stops at the monthly target.</li>
-            </ul>
-            <Note>Targets are stop limits, not promised profit. Credit or the free trial does not unlock JX Bot.</Note>
           </>
         ),
       },

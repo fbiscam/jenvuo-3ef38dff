@@ -74,7 +74,7 @@ export function CloudAnnouncement() {
     <div className="border-b border-gc-line bg-gc-blue-soft">
       <div className="mx-auto flex max-w-[1296px] flex-wrap items-center justify-center gap-x-2 gap-y-1 px-5 py-2.5 text-center text-[13px] text-gc-ink sm:text-sm">
         <span className="rounded bg-gc-blue px-1.5 py-0.5 text-[11px] font-medium text-gc-on-blue">New</span>
-        <span>JX Bot for MetaTrader 5 is here: automated Gold trading with a daily auto-stop.</span>
+        <span>The Gold Terminal now comes with every plan: Starter, Pro and Elite, no license needed.</span>
         <Link to="/pricing" className="inline-flex items-center gap-1 font-medium text-gc-blue hover:underline">
           See plans <ArrowRight className="h-3.5 w-3.5" />
         </Link>
@@ -262,7 +262,7 @@ const AUDIENCES: Array<{ key: string; label: string; cards: AudienceCard[] }> = 
     label: "Traders",
     cards: [
       { tag: "NEW TRADERS", text: "New sign-ups get 14 days of free Pro access & $100 for the top AI Models for 30 days ", to: "/auth", img: tradeNeonStart },
-      { tag: "JX BOT", text: "Run JX Bot on MetaTrader 5 with a daily auto-stop at your plan's target", to: "/pricing", img: tradeNeonPractice },
+      { tag: "TERMINAL", text: "Open the Gold Terminal with any plan, from $19 for 14 days", to: "/pricing", img: tradeNeonPractice },
       { tag: "LEARN", text: "Read daily Gold insights and guides on sweeps, zones and order blocks", to: "/insights", img: tradeNeonLearn },
     ],
   },
@@ -281,7 +281,7 @@ const AUDIENCES: Array<{ key: string; label: string; cards: AudienceCard[] }> = 
     cards: [
       { tag: "FOUNDING PROGRAM", text: "Apply to the invite-only Founding Program for your chosen plan and $250 credit", to: "/founding", img: progFounding },
       { tag: "PLANS", text: "Choose Pro at $49, Elite at $99 or Ultra at $169, billed every month", to: "/pricing", img: progPlans },
-      { tag: "SUPPORT", text: "Questions about plans, billing or JX Bot? Ask our support team", to: "/contact", img: progSupport },
+      { tag: "SUPPORT", text: "Questions about plans, billing or the Terminal? Ask our support team", to: "/contact", img: progSupport },
     ],
   },
 ];
@@ -372,14 +372,6 @@ const BUILD_ITEMS: Array<{ key: string; title: string; points: BuildPart[][] }> 
     ],
   },
   {
-    key: "jx-bot",
-    title: "JX Bot for MetaTrader 5",
-    points: [
-      ["Automate Gold on MT5 with ", { link: "JX Bot", hash: "jx-bot" }, ", licensed to your own account and installed in a few steps"],
-      ["The bot pauses for the day at your daily target and stops at your plan's monthly target"],
-    ],
-  },
-  {
     key: "developers",
     title: "API keys and browser extension",
     points: [
@@ -403,7 +395,7 @@ export function CloudBuildWith() {
             <span className="whitespace-nowrap text-gc-blue-deep">designed for traders and AI</span>
           </h2>
           <p className="mt-4 max-w-[540px] text-[14px] leading-[1.55] text-gc-ink-muted sm:mt-5 sm:text-[16px] sm:leading-[1.6]">
-            Try Jenvu with JX Bot on MetaTrader 5 and the top AI models, plus new sign-ups get $100 free credits and 14 days of Pro access free.
+            Try Jenvu with the Gold Terminal and the top AI models, plus new sign-ups get $100 free credits and 14 days of Pro access free.
           </p>
           <div className="mt-7 flex flex-wrap items-center gap-7">
             <Link
@@ -525,14 +517,6 @@ const USE_CASES: Array<{ key: string; title: string; body: string; points: strin
     points: ["Chart-aware answers", "Image and voice chat", "Clear WAIT when risk is unclear"],
     Icon: Sparkles,
     tone: "red",
-  },
-  {
-    key: "jx-bot",
-    title: "JX Bot",
-    body: "Jenvu's Expert Advisor trades Gold on MetaTrader 5 and stops at the daily and monthly targets of your plan.",
-    points: ["1, 2 or 5 MT5 licenses", "Daily auto-stop at target", "One-click download and setup guide"],
-    Icon: Bot,
-    tone: "green",
   },
 ];
 

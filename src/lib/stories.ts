@@ -162,40 +162,6 @@ export const STORIES: Story[] = [
     cta: { label: "Read the insights", href: "https://jenvu.com/insights" },
   },
   {
-    slug: "jx-bot",
-    img: placeFloor,
-    tag: "JX BOT FOR MT5",
-    title: "Let JX Bot trade Gold for you on MetaTrader 5",
-    intro:
-      "JX Bot is Jenvu's Expert Advisor for Gold on MT5. It runs on your own account and stops at the targets your plan sets.",
-    feature: {
-      title: "Automated Gold trading with clear limits",
-      text: [
-        "Download the bot from your dashboard, create a license for your MT5 account and attach it to the XAUUSD M15 chart.",
-        "The bot checks its license with Jenvu, pauses for the day at your daily target and stops at your monthly target.",
-      ],
-      caption: "JX Bot running on the XAUUSD M15 chart in MetaTrader 5",
-    },
-    banner: {
-      title: "Targets are limits, not promises",
-      text: "Trading carries risk. The daily and monthly targets are where the bot stops, not results it guarantees. Start with a small lot size.",
-    },
-    steps: {
-      title: "How to start",
-      points: [
-        "Choose Pro, Elite or Ultra on the pricing page.",
-        "Open JX Bot in your dashboard and download the bot.",
-        "Create a license for your MT5 account and follow the install steps.",
-      ],
-    },
-    stats: [
-      { value: "1–5", label: "MT5 licenses per plan" },
-      { value: "$150", label: "Daily target on Ultra" },
-      { value: "M15", label: "Gold chart" },
-    ],
-    cta: { label: "See plans", href: "https://jenvu.com/pricing" },
-  },
-  {
     slug: "founding-program",
     img: placeVault,
     tag: "FOUNDING PROGRAM",
