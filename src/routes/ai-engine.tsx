@@ -84,7 +84,7 @@ const CONTENT: IndustryContent = {
       label: "JX Bot",
       title: "JX Bot for MT5",
       text: "Jenvu's Expert Advisor trades Fiber on MetaTrader 5 and stops at your plan's targets.",
-      points: ["1, 2 or 5 MT5 licenses", "Daily auto-stop at target", "Download and setup in the dashboard"],
+      points: ["1, 2 or 5 IPs, no license key", "Daily auto-stop at target", "Download and setup in the dashboard"],
       link: "Learn about JX Bot",
       href: "/stories/jx-bot",
     },
