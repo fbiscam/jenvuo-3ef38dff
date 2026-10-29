@@ -13,7 +13,7 @@ export const Route = createFileRoute("/_authenticated/dashboard/jx-bot")({
   head: () => ({
     meta: [
       { title: "JX Bot for MT5 — Jenvu" },
-      { name: "description", content: "Download the Jenvu JX Bot for MetaTrader 5, create your license and follow the install steps." },
+      { name: "description", content: "Download the Jenvu JX Bot for MetaTrader 5, add your IP and follow the install steps." },
       { property: "og:title", content: "JX Bot for MT5 — Jenvu" },
       { property: "og:description", content: "Download the JX Bot, register your PC or RDP IP address and start trading EUR/USD." },
       { property: "og:type", content: "website" },
@@ -27,7 +27,7 @@ export const Route = createFileRoute("/_authenticated/dashboard/jx-bot")({
 const STEPS: { title: string; text: string; code?: string }[] = [
   { title: "Add your IP", text: "On the PC or RDP that runs MT5, open whatismyip.com, then click Add IP here and enter that IP address.", code: "203.0.113.25" },
   { title: "Install the bot", text: "In MT5: File → Open Data Folder. Put Jenvu EA.ex5 in MQL5 → Experts and the .set files in MQL5 → Presets, then refresh the Navigator.", code: "MQL5/Experts/Jenvu EA.ex5" },
-  { title: "Allow the license check", text: "Tools → Options → Expert Advisors → tick “Allow WebRequest for listed URL” and add this address.", code: "https://jenvu.com" },
+  { title: "Allow the IP check", text: "Tools → Options → Expert Advisors → tick “Allow WebRequest for listed URL” and add this address.", code: "https://jenvu.com" },
   { title: "Run the bot", text: "Turn on Algo Trading, open EURUSD M15, drag Jenvu EA onto the chart, load “Jenvu EURUSD 15M.set” and type the same IP into MyIP.", code: "Jenvu license: VALID" },
 ];
 
@@ -40,7 +40,7 @@ const ERRORS = [
 ];
 
 const HOW = [
-  ["License check", "On start the bot checks your IP with jenvu.com and trades only while the IP matches and the plan is valid."],
+  ["IP check", "On start the bot checks your IP with jenvu.com and trades only while the IP matches and the plan is valid."],
   ["EUR/USD on M15", "Runs on the EURUSD M15 chart; one IP works with one MT5 account."],
   ["Daily auto-stop", "Pauses for the rest of the day once your plan's daily target is reached."],
   ["Monthly limit", "Stops at your plan's monthly target until the next period."],
@@ -248,7 +248,7 @@ function JxBotPage() {
       {showFix && (
         <div className="mt-6 rounded-xl border border-zinc-200 bg-zinc-50 p-5">
           <div className="flex items-start justify-between gap-3">
-            <div className="text-[13px] font-medium text-zinc-900">If the license shows invalid</div>
+            <div className="text-[13px] font-medium text-zinc-900">If the IP check fails</div>
             <button onClick={() => setShowFix(false)} className="rounded-full p-1 text-zinc-500 hover:bg-zinc-200">
               <X className="h-4 w-4" />
             </button>

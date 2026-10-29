@@ -171,8 +171,8 @@ export const STORIES: Story[] = [
     feature: {
       title: "Automated Fiber trading with clear limits",
       text: [
-        "Download the bot from your dashboard, create a license for your MT5 account and attach it to the EURUSD M15 chart.",
-        "The bot checks its license with Jenvu, pauses for the day at your daily target and stops at your monthly target.",
+        "Download the bot from your dashboard, add the IP of the PC or RDP that runs MT5 and attach it to the EURUSD M15 chart.",
+        "The bot checks with Jenvu that it runs from your IP, pauses for the day at your daily target and stops at your monthly target.",
       ],
       caption: "JX Bot running on the EURUSD M15 chart in MetaTrader 5",
     },
@@ -185,11 +185,11 @@ export const STORIES: Story[] = [
       points: [
         "Choose Pro, Elite or Ultra on the pricing page.",
         "Open JX Bot in your dashboard and download the bot.",
-        "Create a license for your MT5 account and follow the install steps.",
+        "Add your PC or RDP IP, type it into the bot and follow the install steps.",
       ],
     },
     stats: [
-      { value: "1–5", label: "MT5 licenses per plan" },
+      { value: "1–5", label: "IPs per plan" },
       { value: "$150", label: "Daily target on Ultra" },
       { value: "M15", label: "Fiber chart" },
     ],

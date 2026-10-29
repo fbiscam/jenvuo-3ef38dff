@@ -19,7 +19,7 @@ const LINK = "text-gc-blue-deep underline underline-offset-2 hover:text-gc-navy"
 export const FAQ = [
   ["Is this financial advice?", "No. Jenvu is an analysis tool. Every setup is for educational purposes and you remain responsible for your own trades."],
   ["How does the free trial work?", "After signing up, click “Start free” in your dashboard. You get $100 credit and 14 days of Pro access, including JX Bot, once per account. When it ends, JX Bot stops until you buy a plan."],
-  ["What do the plans include?", "Every plan includes JX Bot for MetaTrader 5 (1, 2 or 5 licenses) and the Top AI Models with a monthly AI wallet. Credit alone never unlocks JX Bot; it pays for API and AI use."],
+  ["What do the plans include?", "Every plan includes JX Bot for MetaTrader 5 (1, 2 or 5 IPs, verified by IP address, no license key) and the Top AI Models with a monthly AI wallet. Credit alone never unlocks JX Bot; it pays for API and AI use."],
   ["Who can use the Terminal?", "The Terminal is reserved for approved Founding Program members, free of cost. Pro, Elite and Ultra cover JX Bot and the Top AI Models."],
   ["Can I cancel anytime?", "Yes. Plans are month-to-month with no lock-in. You keep access until the end of the period you already paid for."],
   ["What markets are covered?", "Fiber only. Jenvu focuses on Fiber."],
@@ -53,9 +53,9 @@ export const Route = createFileRoute("/pricing")({
 
 type Mark = boolean | string;
 const COMPARE: ReadonlyArray<{ f: string; b: Mark; c: Mark; d: Mark }> = [
-  { f: "JX Bot MT5 licenses", b: "1", c: "2", d: "5" },
+  { f: "JX Bot IPs (PC or RDP)", b: "1", c: "2", d: "5" },
   { f: "JX Bot monthly profit target", b: "$600", c: "$1,500", d: "$3,000" },
-  { f: "JX Bot daily target per license", b: "$30", c: "$75", d: "$150" },
+  { f: "JX Bot daily target per IP", b: "$30", c: "$75", d: "$150" },
   { f: "Daily auto-stop at target", b: true, c: true, d: true },
   { f: "JX Bot download, presets & updates", b: true, c: true, d: true },
   { f: "Monthly AI wallet", b: "$10", c: "$25", d: "$50" },
@@ -87,9 +87,9 @@ function PricingPage() {
   const allOpen = open.length === FAQ.length;
 
   const plans = [
-    { key: "pro" as const, name: "Pro", price: priceOf("pro", 49), description: "JX Bot on 1 MT5 account with a $600 monthly target.", wallet: "$10 AI wallet", bot: ["1 JX Bot license", "$30 daily auto-stop", "Top AI Models"] },
-    { key: "elite" as const, name: "Elite", price: priceOf("elite", 99), description: "JX Bot on 2 MT5 accounts with a $1,500 monthly target.", wallet: "$25 AI wallet", bot: ["2 JX Bot licenses", "$75 daily auto-stop", "Top AI Models + senior review"] },
-    { key: "ultra" as const, name: "Ultra", price: priceOf("ultra", 169), description: "JX Bot on 5 MT5 accounts with a $3,000 monthly target.", wallet: "$50 AI wallet", bot: ["5 JX Bot licenses", "$150 daily auto-stop", "Top AI Models + priority support"] },
+    { key: "pro" as const, name: "Pro", price: priceOf("pro", 49), description: "JX Bot on 1 MT5 account with a $600 monthly target.", wallet: "$10 AI wallet", bot: ["JX Bot on 1 IP", "$30 daily auto-stop", "Top AI Models"] },
+    { key: "elite" as const, name: "Elite", price: priceOf("elite", 99), description: "JX Bot on 2 MT5 accounts with a $1,500 monthly target.", wallet: "$25 AI wallet", bot: ["JX Bot on 2 IPs", "$75 daily auto-stop", "Top AI Models + senior review"] },
+    { key: "ultra" as const, name: "Ultra", price: priceOf("ultra", 169), description: "JX Bot on 5 MT5 accounts with a $3,000 monthly target.", wallet: "$50 AI wallet", bot: ["JX Bot on 5 IPs", "$150 daily auto-stop", "Top AI Models + priority support"] },
   ];
 
   return (

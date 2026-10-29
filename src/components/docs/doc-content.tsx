@@ -295,19 +295,19 @@ export const DOC_GROUPS: DocGroup[] = [
       {
         id: "jx-bot",
         title: "JX Bot",
-        keywords: "mt5 metatrader expert advisor ea bot license automated",
+        keywords: "mt5 metatrader expert advisor ea bot ip address verification license automated",
         body: (
           <>
             <p>
               JX Bot is Jenvu's Expert Advisor for <strong>Fiber on MetaTrader 5</strong> (M15 chart). It comes with every paid plan:
-              Pro 1 license, Elite 2, Ultra 5. Each license key works on one MT5 account.
+              Pro 1 IP, Elite 2, Ultra 5. There is no license key: you add the IP of the PC or RDP that runs MT5, and one IP works with one MT5 account.
             </p>
             <ul>
               <li>Download it from Dashboard → JX Bot and follow the install steps there.</li>
-              <li>The bot checks its license with jenvu.com before it trades.</li>
+              <li>Type the same IP into the bot's MyIP input; the bot checks with jenvu.com that it runs from that IP before it trades.</li>
               <li>It pauses for the day at your daily target (monthly target / 20) and stops at the monthly target.</li>
             </ul>
-            <Note>Targets are stop limits, not promised profit. Credit or the free trial does not unlock JX Bot.</Note>
+            <Note>Targets are stop limits, not promised profit. Credit alone does not unlock JX Bot; a paid plan or the 14-day free trial does.</Note>
           </>
         ),
       },

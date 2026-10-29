@@ -116,7 +116,7 @@ function BotUsagePage() {
         <div className="flex flex-wrap items-center gap-2 border-b border-border px-4 py-2.5 text-[12px] text-muted-foreground sm:px-7">
           <Bot className="h-4 w-4" />
           {data.allowed
-            ? "No bot data yet. Run the latest JX Bot with your license key and allow https://jenvu.com in MT5 WebRequest. Data appears within a minute."
+            ? "No bot data yet. Add your IP on the JX Bot page, type it into MyIP in the latest JX Bot and allow https://jenvu.com in MT5 WebRequest. Data appears within a minute."
             : "JX Bot needs a paid Pro, Elite or Ultra plan."}
           <Link to={data.allowed ? "/dashboard/jx-bot" : "/dashboard/billing"} className="font-medium text-primary">{data.allowed ? "Open JX Bot" : "See plans"}</Link>
         </div>
@@ -217,7 +217,7 @@ function BotUsagePage() {
               </div>
             ))}
             <p className="mt-3 text-[12px] leading-5 text-muted-foreground">
-              Every license has its own daily target. When one account reaches it, that bot closes its trades and starts again next day. bot only trade EURUSD
+              Every IP has its own daily target. When one account reaches it, that bot closes its trades and starts again next day. bot only trade EURUSD
             </p>
             </div>
             <OnOffLog sessions={(data?.sessions ?? []).filter((x) => account === "all" || x.mt5_account === account)} />

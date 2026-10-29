@@ -375,7 +375,7 @@ const BUILD_ITEMS: Array<{ key: string; title: string; points: BuildPart[][] }> 
     key: "jx-bot",
     title: "JX Bot for MetaTrader 5",
     points: [
-      ["Automate Fiber on MT5 with ", { link: "JX Bot", hash: "jx-bot" }, ", licensed to your own account and installed in a few steps"],
+      ["Automate Fiber on MT5 with ", { link: "JX Bot", hash: "jx-bot" }, ", verified by your own IP and installed in a few steps"],
       ["The bot pauses for the day at your daily target and stops at your plan's monthly target"],
     ],
   },
@@ -530,7 +530,7 @@ const USE_CASES: Array<{ key: string; title: string; body: string; points: strin
     key: "jx-bot",
     title: "JX Bot",
     body: "Jenvu's Expert Advisor trades Fiber on MetaTrader 5 and stops at the daily and monthly targets of your plan.",
-    points: ["1, 2 or 5 MT5 licenses", "Daily auto-stop at target", "One-click download and setup guide"],
+    points: ["1, 2 or 5 IPs, no license key", "Daily auto-stop at target", "One-click download and setup guide"],
     Icon: Bot,
     tone: "green",
   },
