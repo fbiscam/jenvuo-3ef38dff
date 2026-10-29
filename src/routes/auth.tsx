@@ -1,5 +1,5 @@
 import * as React from "react";
-import { goAfterSignIn, restoreSharedSession } from "@/lib/cross-domain-session";
+import { clearStoredAuthSessions, goAfterSignIn, restoreSharedSession } from "@/lib/cross-domain-session";
 import { createFileRoute, useNavigate, Link, redirect } from "@tanstack/react-router";
 import { oauthReturnPath } from "@/lib/oauth-return-path";
 import { useServerFn } from "@tanstack/react-start";
