@@ -1503,3 +1503,9 @@ select:not([multiple]):not([size]) {
 }
 .jenvu-onboard-float { animation: jenvu-onboard-float 5s ease-in-out infinite; }
 @media (prefers-reduced-motion: reduce) { .jenvu-onboard-float { animation: none; } }
+
+/* Hide the browser's built-in password reveal so only our eye button shows. */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+  display: none;
+}
