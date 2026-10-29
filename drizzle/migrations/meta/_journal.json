@@ -141,6 +141,13 @@
       "when": 1793260067162,
       "tag": "0019_bind_founding_status_to_caller",
       "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1793260723453,
+      "tag": "0020_terminal_plans_new_prices",
+      "breakpoints": true
     }
   ]
 }

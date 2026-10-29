@@ -93,9 +93,9 @@ function PayPage() {
   const qSeq = useRef(0);
 
   const PLANS = [
-    { id: "pro", name: "Pro", price: 49, features: ["Realtime Alerts", "Journal Access", "Multi-Timeframe Bias"] },
-    { id: "elite", name: "Elite", price: 99, features: ["XAU/USD Senior Review", "Custom Alert Rules", "AI Model Analysis"] },
-    { id: "ultra", name: "Ultra", price: 169, features: ["Priority Support", "Advanced Signals", "Full ICT Narration"] },
+    { id: "pro", name: "Starter", price: 19, features: ["Gold Terminal · 14 days", "$15 AI wallet", "No license key"] },
+    { id: "elite", name: "Pro", price: 49, features: ["Gold Terminal · 30 days", "$35 AI wallet", "Senior review"] },
+    { id: "ultra", name: "Elite", price: 89, features: ["Gold Terminal · 30 days", "$65 AI wallet", "Priority support"] },
   ];
 
   const currentPrice = useMemo(() => {

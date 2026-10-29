@@ -18,20 +18,20 @@ const LINK = "text-gc-blue-deep underline underline-offset-2 hover:text-gc-navy"
 
 export const FAQ = [
   ["Is this financial advice?", "No. Jenvu is an analysis tool. Every setup is for educational purposes and you remain responsible for your own trades."],
-  ["How does the free trial work?", "After signing up, click “Start free” in your dashboard. You get $100 credit and 14 days of Pro access, including JX Bot, once per account. When it ends, JX Bot stops until you buy a plan."],
-  ["What do the plans include?", "Every plan includes JX Bot for MetaTrader 5 (1, 2 or 5 licenses) and the Top AI Models with a monthly AI wallet. Credit alone never unlocks JX Bot; it pays for API and AI use."],
-  ["Who can use the Terminal?", "The Terminal is reserved for approved Founding Program members, free of cost. Pro, Elite and Ultra cover JX Bot and the Top AI Models."],
-  ["Can I cancel anytime?", "Yes. Plans are month-to-month with no lock-in. You keep access until the end of the period you already paid for."],
+  ["How does the free trial work?", "After signing up, click “Start free” in your dashboard. You get $100 credit and 14 days of Starter access, including the Gold Terminal, once per account. When it ends, the Terminal locks until you buy a plan."],
+  ["What do the plans include?", "Every plan includes full Gold Terminal access (no license key) and the Top AI Models with an AI wallet: $15 on Starter, $35 on Pro and $65 on Elite. Credit alone never unlocks the Terminal; it pays for API and AI use."],
+  ["Who can use the Terminal?", "Anyone with an active plan: Starter ($19, 14 days), Pro ($49, 30 days) or Elite ($89, 30 days). Approved Founding members keep free access."],
+  ["Can I cancel anytime?", "Yes. Plans run for 14 or 30 days with no lock-in. You keep access until the end of the period you already paid for."],
   ["What markets are covered?", "Gold only. Jenvu focuses on Gold."],
 ];
 
 export const Route = createFileRoute("/pricing")({
   head: () => ({
     meta: [
-      { title: "Jenvu Pricing — Pro, Elite and Ultra Plans" },
-      { name: "description", content: "Transparent Jenvu pricing: Pro $49, Elite $99 and Ultra $169 a month, $3 per million tokens, plus $100 free credit and 14 days of Pro for new users." },
+      { title: "Jenvu Pricing — Starter, Pro and Elite Gold Terminal Plans" },
+      { name: "description", content: "Jenvu Gold Terminal plans: Starter $19 for 14 days, Pro $49 and Elite $89 for 30 days, with AI credit included and $3 per million tokens." },
       { property: "og:title", content: "Jenvu pricing" },
-      { property: "og:description", content: "Pro, Elite and Ultra plans for JX Bot on MT5 and the Top AI Models, with $100 free credit to start." },
+      { property: "og:description", content: "Starter, Pro and Elite plans for the Gold Terminal and the Top AI Models." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { property: "og:url", content: "https://jenvu.com/pricing" },
@@ -53,12 +53,10 @@ export const Route = createFileRoute("/pricing")({
 
 type Mark = boolean | string;
 const COMPARE: ReadonlyArray<{ f: string; b: Mark; c: Mark; d: Mark }> = [
-  { f: "JX Bot MT5 licenses", b: "1", c: "2", d: "5" },
-  { f: "JX Bot monthly profit target", b: "$600", c: "$1,500", d: "$3,000" },
-  { f: "JX Bot daily target per license", b: "$30", c: "$75", d: "$150" },
-  { f: "Daily auto-stop at target", b: true, c: true, d: true },
-  { f: "JX Bot download, presets & updates", b: true, c: true, d: true },
-  { f: "Monthly AI wallet", b: "$10", c: "$25", d: "$50" },
+  { f: "Plan length", b: "14 days", c: "30 days", d: "30 days" },
+  { f: "Gold Terminal access (no license key)", b: true, c: true, d: true },
+  { f: "Fresh sweeps, swings & price action", b: true, c: true, d: true },
+  { f: "AI wallet", b: "$15", c: "$35", d: "$65" },
   { f: "Daily token limit", b: "1.5M", c: "5M", d: "10M" },
   { f: "Balance-based quota ($3 = 1M tokens)", b: true, c: true, d: true },
   { f: "Active API keys", b: "2", c: "3", d: "5" },
@@ -77,19 +75,18 @@ function PricingPage() {
   const upgradeLock = useUpgradeLock();
   const trial = useTrial();
   const signedOut = currentPlan === null;
-  const [billing, setBilling] = React.useState<"monthly" | "annual">("monthly");
+  const billing = "monthly" as "monthly" | "annual";
   const priceOf = (id: string, price: number) => {
     const base = price;
     return billing === "annual" && base > 0 ? Math.round((base * 12 * 0.83) / 10) * 10 : base;
   };
-  const suffix = billing === "annual" ? "/yr" : "/mo";
   const [open, setOpen] = React.useState<number[]>([]);
   const allOpen = open.length === FAQ.length;
 
   const plans = [
-    { key: "pro" as const, name: "Pro", price: priceOf("pro", 49), description: "JX Bot on 1 MT5 account with a $600 monthly target.", wallet: "$10 AI wallet", bot: ["1 JX Bot license", "$30 daily auto-stop", "Top AI Models"] },
-    { key: "elite" as const, name: "Elite", price: priceOf("elite", 99), description: "JX Bot on 2 MT5 accounts with a $1,500 monthly target.", wallet: "$25 AI wallet", bot: ["2 JX Bot licenses", "$75 daily auto-stop", "Top AI Models + senior review"] },
-    { key: "ultra" as const, name: "Ultra", price: priceOf("ultra", 169), description: "JX Bot on 5 MT5 accounts with a $3,000 monthly target.", wallet: "$50 AI wallet", bot: ["5 JX Bot licenses", "$150 daily auto-stop", "Top AI Models + priority support"] },
+    { key: "pro" as const, name: "Starter", price: priceOf("pro", 19), description: "14 days of full Gold Terminal access.", wallet: "$15 AI wallet", bot: ["Gold Terminal, 14 days", "No license key", "Top AI Models"] },
+    { key: "elite" as const, name: "Pro", price: priceOf("elite", 49), description: "30 days of full Gold Terminal access.", wallet: "$35 AI wallet", bot: ["Gold Terminal, 30 days", "No license key", "Top AI Models + senior review"] },
+    { key: "ultra" as const, name: "Elite", price: priceOf("ultra", 89), description: "30 days of Gold Terminal with the most AI credit.", wallet: "$65 AI wallet", bot: ["Gold Terminal, 30 days", "No license key", "Top AI Models + priority support"] },
   ];
 
   return (
@@ -121,13 +118,13 @@ function PricingPage() {
           <p className="mt-5 text-[17px] leading-[1.65] text-gc-ink-muted">
             Create an account to see how Jenvu reads the Gold market in real time. New users get{" "}
             <Link to="/auth" search={{ mode: "signup" } as never} className={LINK}>$100 in free credit</Link> to run the AI desk, plus{" "}
-            <a href="#plans" className={LINK}>14 days of Pro access</a>, started with one click from the dashboard.
+            <a href="#plans" className={LINK}>14 days of Starter access</a>, started with one click from the dashboard.
           </p>
         </div>
         <div className="grid grid-cols-2 gap-8">
           {[
             { value: "$100", label: "in free credit" },
-            { value: "14", label: "days of Pro access" },
+            { value: "14", label: "days of Starter access" },
           ].map((s) => (
             <div key={s.label} className="text-center">
               <p className="text-[56px] font-normal leading-none text-gc-success sm:text-[72px]">{s.value}</p>
@@ -143,15 +140,15 @@ function PricingPage() {
         <div>
           <h2 className="text-[28px] font-normal leading-tight">Only pay for what you use</h2>
           <p className="mt-5 text-[17px] leading-[1.65] text-gc-ink-muted">
-            Every plan includes a monthly AI wallet billed by actual token use, at $3 per million tokens. No up-front fees and no termination charges —{" "}
+            Every plan includes an AI wallet billed by actual token use, at $3 per million tokens. No up-front fees and no termination charges —{" "}
             <a href="#compare" className={LINK}>view the full comparison.</a>
           </p>
         </div>
         <div>
-          <h2 className="text-[28px] font-normal leading-tight">Save 17% with annual billing</h2>
+          <h2 className="text-[28px] font-normal leading-tight">Short plans, no license key</h2>
           <p className="mt-5 text-[17px] leading-[1.65] text-gc-ink-muted">
-            Pay once a year instead of monthly and keep the same features for less. Switch the toggle in the{" "}
-            <a href="#plans" className={LINK}>plans section</a> to see annual prices for Pro, Elite and Ultra.
+            Pick 14 or 30 days of the Gold Terminal and renew only when you want. See the{" "}
+            <a href="#plans" className={LINK}>plans section</a> for Starter, Pro and Elite.
           </p>
         </div>
       </section>
@@ -195,18 +192,6 @@ function PricingPage() {
       <section id="plans" className="scroll-mt-24 mx-auto max-w-[1296px] px-5 py-14 sm:px-8 lg:px-[72px]">
         <div className="text-center">
           <h2 className="text-[34px] font-normal leading-tight sm:text-[38px]">Choose your plan</h2>
-          <div className="mx-auto mt-6 inline-flex items-center rounded-full border border-gc-line p-1" aria-label="Billing cycle">
-            {(["monthly", "annual"] as const).map((b) => (
-              <button
-                key={b}
-                type="button"
-                onClick={() => setBilling(b)}
-                className={`rounded-full px-5 py-2 text-[14px] font-medium transition ${billing === b ? "bg-gc-blue-deep text-gc-on-blue" : "text-gc-ink-muted hover:text-gc-ink"}`}
-              >
-                {b === "monthly" ? "Monthly" : "Annual · save 17%"}
-              </button>
-            ))}
-          </div>
         </div>
         <div className="mt-10 grid gap-6 md:grid-cols-3">
           {plans.map((plan) => {
@@ -223,7 +208,7 @@ function PricingPage() {
                 <p className="mt-3 text-[15px] leading-[1.6] text-gc-ink-muted">{plan.description}</p>
                 <div className="mt-6 flex items-baseline gap-1">
                   <span className="text-[44px] font-normal leading-none text-gc-success">${plan.price}</span>
-                  <span className="text-[14px] text-gc-ink-muted">{suffix}</span>
+                  <span className="text-[14px] text-gc-ink-muted">{plan.key === "pro" ? "/14 days" : "/30 days"}</span>
                 </div>
                 <p className="mt-2 text-[14px] text-gc-ink-muted">{plan.wallet} included</p>
                 <ul className="mt-5 space-y-2 text-[14px] text-gc-ink">
@@ -241,7 +226,7 @@ function PricingPage() {
                       to={destination}
                       className={`flex h-11 items-center justify-center rounded-full text-[15px] font-medium transition ${plan.key === "pro" ? "bg-gc-blue-deep text-gc-on-blue hover:bg-gc-navy" : "border border-gc-line text-gc-blue-deep hover:bg-gc-surface"}`}
                     >
-                      {trialPro ? "Upgrade to Pro" : currentPlan !== null ? "Upgrade" : "Buy now"}
+                      {trialPro ? "Upgrade to Starter" : currentPlan !== null ? "Upgrade" : "Buy now"}
                     </Link>
                   )}
                 </div>

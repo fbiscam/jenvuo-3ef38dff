@@ -59,12 +59,10 @@ import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authe
 import { Route as AuthenticatedDashboardAnalyticsRouteImport } from './routes/_authenticated/dashboard.analytics'
 import { Route as AuthenticatedDashboardApiRouteImport } from './routes/_authenticated/dashboard.api'
 import { Route as AuthenticatedDashboardBillingRouteImport } from './routes/_authenticated/dashboard.billing'
-import { Route as AuthenticatedDashboardBotUsageRouteImport } from './routes/_authenticated/dashboard.bot-usage'
 import { Route as AuthenticatedDashboardCourseRouteImport } from './routes/_authenticated/dashboard.course'
 import { Route as AuthenticatedDashboardDocumentsRouteImport } from './routes/_authenticated/dashboard.documents'
 import { Route as AuthenticatedDashboardExtensionRouteImport } from './routes/_authenticated/dashboard.extension'
 import { Route as AuthenticatedDashboardJournalRouteImport } from './routes/_authenticated/dashboard.journal'
-import { Route as AuthenticatedDashboardJxBotRouteImport } from './routes/_authenticated/dashboard.jx-bot'
 import { Route as AuthenticatedDashboardNotificationsRouteImport } from './routes/_authenticated/dashboard.notifications'
 import { Route as AuthenticatedDashboardPayRouteImport } from './routes/_authenticated/dashboard.pay'
 import { Route as AuthenticatedDashboardPaymentRouteImport } from './routes/_authenticated/dashboard.payment'
@@ -365,12 +363,6 @@ const AuthenticatedDashboardBillingRoute =
     path: '/billing',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
-const AuthenticatedDashboardBotUsageRoute =
-  AuthenticatedDashboardBotUsageRouteImport.update({
-    id: '/bot-usage',
-    path: '/bot-usage',
-    getParentRoute: () => AuthenticatedDashboardRoute,
-  } as any)
 const AuthenticatedDashboardCourseRoute =
   AuthenticatedDashboardCourseRouteImport.update({
     id: '/course',
@@ -393,12 +385,6 @@ const AuthenticatedDashboardJournalRoute =
   AuthenticatedDashboardJournalRouteImport.update({
     id: '/journal',
     path: '/journal',
-    getParentRoute: () => AuthenticatedDashboardRoute,
-  } as any)
-const AuthenticatedDashboardJxBotRoute =
-  AuthenticatedDashboardJxBotRouteImport.update({
-    id: '/jx-bot',
-    path: '/jx-bot',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
 const AuthenticatedDashboardNotificationsRoute =
@@ -706,12 +692,10 @@ export interface FileRoutesByFullPath {
   '/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
   '/dashboard/api': typeof AuthenticatedDashboardApiRoute
   '/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
-  '/dashboard/bot-usage': typeof AuthenticatedDashboardBotUsageRoute
   '/dashboard/course': typeof AuthenticatedDashboardCourseRoute
   '/dashboard/documents': typeof AuthenticatedDashboardDocumentsRoute
   '/dashboard/extension': typeof AuthenticatedDashboardExtensionRoute
   '/dashboard/journal': typeof AuthenticatedDashboardJournalRoute
-  '/dashboard/jx-bot': typeof AuthenticatedDashboardJxBotRoute
   '/dashboard/notifications': typeof AuthenticatedDashboardNotificationsRoute
   '/dashboard/pay': typeof AuthenticatedDashboardPayRoute
   '/dashboard/payment': typeof AuthenticatedDashboardPaymentRoute
@@ -803,12 +787,10 @@ export interface FileRoutesByTo {
   '/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
   '/dashboard/api': typeof AuthenticatedDashboardApiRoute
   '/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
-  '/dashboard/bot-usage': typeof AuthenticatedDashboardBotUsageRoute
   '/dashboard/course': typeof AuthenticatedDashboardCourseRoute
   '/dashboard/documents': typeof AuthenticatedDashboardDocumentsRoute
   '/dashboard/extension': typeof AuthenticatedDashboardExtensionRoute
   '/dashboard/journal': typeof AuthenticatedDashboardJournalRoute
-  '/dashboard/jx-bot': typeof AuthenticatedDashboardJxBotRoute
   '/dashboard/notifications': typeof AuthenticatedDashboardNotificationsRoute
   '/dashboard/pay': typeof AuthenticatedDashboardPayRoute
   '/dashboard/payment': typeof AuthenticatedDashboardPaymentRoute
@@ -906,12 +888,10 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
   '/_authenticated/dashboard/api': typeof AuthenticatedDashboardApiRoute
   '/_authenticated/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
-  '/_authenticated/dashboard/bot-usage': typeof AuthenticatedDashboardBotUsageRoute
   '/_authenticated/dashboard/course': typeof AuthenticatedDashboardCourseRoute
   '/_authenticated/dashboard/documents': typeof AuthenticatedDashboardDocumentsRoute
   '/_authenticated/dashboard/extension': typeof AuthenticatedDashboardExtensionRoute
   '/_authenticated/dashboard/journal': typeof AuthenticatedDashboardJournalRoute
-  '/_authenticated/dashboard/jx-bot': typeof AuthenticatedDashboardJxBotRoute
   '/_authenticated/dashboard/notifications': typeof AuthenticatedDashboardNotificationsRoute
   '/_authenticated/dashboard/pay': typeof AuthenticatedDashboardPayRoute
   '/_authenticated/dashboard/payment': typeof AuthenticatedDashboardPaymentRoute
@@ -1009,12 +989,10 @@ export interface FileRouteTypes {
     | '/dashboard/analytics'
     | '/dashboard/api'
     | '/dashboard/billing'
-    | '/dashboard/bot-usage'
     | '/dashboard/course'
     | '/dashboard/documents'
     | '/dashboard/extension'
     | '/dashboard/journal'
-    | '/dashboard/jx-bot'
     | '/dashboard/notifications'
     | '/dashboard/pay'
     | '/dashboard/payment'
@@ -1106,12 +1084,10 @@ export interface FileRouteTypes {
     | '/dashboard/analytics'
     | '/dashboard/api'
     | '/dashboard/billing'
-    | '/dashboard/bot-usage'
     | '/dashboard/course'
     | '/dashboard/documents'
     | '/dashboard/extension'
     | '/dashboard/journal'
-    | '/dashboard/jx-bot'
     | '/dashboard/notifications'
     | '/dashboard/pay'
     | '/dashboard/payment'
@@ -1208,12 +1184,10 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/analytics'
     | '/_authenticated/dashboard/api'
     | '/_authenticated/dashboard/billing'
-    | '/_authenticated/dashboard/bot-usage'
     | '/_authenticated/dashboard/course'
     | '/_authenticated/dashboard/documents'
     | '/_authenticated/dashboard/extension'
     | '/_authenticated/dashboard/journal'
-    | '/_authenticated/dashboard/jx-bot'
     | '/_authenticated/dashboard/notifications'
     | '/_authenticated/dashboard/pay'
     | '/_authenticated/dashboard/payment'
@@ -1676,13 +1650,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardBillingRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
-    '/_authenticated/dashboard/bot-usage': {
-      id: '/_authenticated/dashboard/bot-usage'
-      path: '/bot-usage'
-      fullPath: '/dashboard/bot-usage'
-      preLoaderRoute: typeof AuthenticatedDashboardBotUsageRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
-    }
     '/_authenticated/dashboard/course': {
       id: '/_authenticated/dashboard/course'
       path: '/course'
@@ -1709,13 +1676,6 @@ declare module '@tanstack/react-router' {
       path: '/journal'
       fullPath: '/dashboard/journal'
       preLoaderRoute: typeof AuthenticatedDashboardJournalRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
-    }
-    '/_authenticated/dashboard/jx-bot': {
-      id: '/_authenticated/dashboard/jx-bot'
-      path: '/jx-bot'
-      fullPath: '/dashboard/jx-bot'
-      preLoaderRoute: typeof AuthenticatedDashboardJxBotRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
     '/_authenticated/dashboard/notifications': {
@@ -2033,12 +1993,10 @@ interface AuthenticatedDashboardRouteChildren {
   AuthenticatedDashboardAnalyticsRoute: typeof AuthenticatedDashboardAnalyticsRoute
   AuthenticatedDashboardApiRoute: typeof AuthenticatedDashboardApiRoute
   AuthenticatedDashboardBillingRoute: typeof AuthenticatedDashboardBillingRoute
-  AuthenticatedDashboardBotUsageRoute: typeof AuthenticatedDashboardBotUsageRoute
   AuthenticatedDashboardCourseRoute: typeof AuthenticatedDashboardCourseRoute
   AuthenticatedDashboardDocumentsRoute: typeof AuthenticatedDashboardDocumentsRoute
   AuthenticatedDashboardExtensionRoute: typeof AuthenticatedDashboardExtensionRoute
   AuthenticatedDashboardJournalRoute: typeof AuthenticatedDashboardJournalRoute
-  AuthenticatedDashboardJxBotRoute: typeof AuthenticatedDashboardJxBotRoute
   AuthenticatedDashboardNotificationsRoute: typeof AuthenticatedDashboardNotificationsRoute
   AuthenticatedDashboardPayRoute: typeof AuthenticatedDashboardPayRoute
   AuthenticatedDashboardPaymentRoute: typeof AuthenticatedDashboardPaymentRoute
@@ -2067,12 +2025,10 @@ const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
     AuthenticatedDashboardAnalyticsRoute: AuthenticatedDashboardAnalyticsRoute,
     AuthenticatedDashboardApiRoute: AuthenticatedDashboardApiRoute,
     AuthenticatedDashboardBillingRoute: AuthenticatedDashboardBillingRoute,
-    AuthenticatedDashboardBotUsageRoute: AuthenticatedDashboardBotUsageRoute,
     AuthenticatedDashboardCourseRoute: AuthenticatedDashboardCourseRoute,
     AuthenticatedDashboardDocumentsRoute: AuthenticatedDashboardDocumentsRoute,
     AuthenticatedDashboardExtensionRoute: AuthenticatedDashboardExtensionRoute,
     AuthenticatedDashboardJournalRoute: AuthenticatedDashboardJournalRoute,
-    AuthenticatedDashboardJxBotRoute: AuthenticatedDashboardJxBotRoute,
     AuthenticatedDashboardNotificationsRoute:
       AuthenticatedDashboardNotificationsRoute,
     AuthenticatedDashboardPayRoute: AuthenticatedDashboardPayRoute,
