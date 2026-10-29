@@ -388,7 +388,7 @@ async function callFallbackApi(
   const key = process.env.FALLBACK_AI_API_KEY;
   const base = process.env.FALLBACK_AI_BASE_URL;
   if (!key || !base) throw new AiGatewayError("Fallback AI is not configured.", 0, true);
-  const model = process.env.FALLBACK_AI_MODEL || "anthropic/claude-sonnet-4";
+  const model = process.env.FALLBACK_AI_MODEL || "claude-sonnet-4";
   const url = base.replace(/\/+$/, "").replace(/\/chat\/completions$/, "") + "/chat/completions";
   const ctrl = new AbortController();
   const t = setTimeout(() => ctrl.abort(), 30000);
