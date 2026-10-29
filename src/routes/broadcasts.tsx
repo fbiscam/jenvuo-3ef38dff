@@ -8,9 +8,9 @@ export const Route = createFileRoute("/broadcasts")({
   head: () => ({
     meta: [
       { title: "Signal Broadcasts — Jenvu" },
-      { name: "description", content: "Recent A+ / A / B grade EURUSD signal broadcasts sent to Jenvu subscribers." },
+      { name: "description", content: "Recent A+ / A / B grade XAU/USD signal broadcasts sent to Jenvu subscribers." },
       { property: "og:title", content: "Signal Broadcasts — Jenvu" },
-      { property: "og:description", content: "Recent A+ / A / B grade EURUSD signal broadcasts sent to Jenvu subscribers." },
+      { property: "og:description", content: "Recent A+ / A / B grade XAU/USD signal broadcasts sent to Jenvu subscribers." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],

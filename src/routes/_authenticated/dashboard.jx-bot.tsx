@@ -15,7 +15,7 @@ export const Route = createFileRoute("/_authenticated/dashboard/jx-bot")({
       { title: "JX Bot for MT5 — Jenvu" },
       { name: "description", content: "Download the Jenvu JX Bot for MetaTrader 5, create your license and follow the install steps." },
       { property: "og:title", content: "JX Bot for MT5 — Jenvu" },
-      { property: "og:description", content: "Download the JX Bot, link your MT5 account and start trading EUR/USD." },
+      { property: "og:description", content: "Download the JX Bot, link your MT5 account and start trading XAU/USD." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "robots", content: "noindex" },
@@ -28,7 +28,7 @@ const STEPS: { title: string; text: string; code?: string }[] = [
   { title: "Create a license", text: "Click Create license, enter your MT5 account number (digits only) and copy the key.", code: "JENV-XXXX-XXXX-XXXX-XXXX" },
   { title: "Install the bot", text: "In MT5: File → Open Data Folder. Put Jenvu EA.ex5 in MQL5 → Experts and the .set files in MQL5 → Presets, then refresh the Navigator.", code: "MQL5/Experts/Jenvu EA.ex5" },
   { title: "Allow the license check", text: "Tools → Options → Expert Advisors → tick “Allow WebRequest for listed URL” and add this address.", code: "https://jenvu.com" },
-  { title: "Run the bot", text: "Turn on Algo Trading, open EURUSD M15, drag Jenvu EA onto the chart, load “Jenvu EURUSD 15M.set” and paste your key into LicenseKey.", code: "Jenvu license: VALID" },
+  { title: "Run the bot", text: "Turn on Algo Trading, open XAUUSD M15, drag Jenvu EA onto the chart, load “Jenvu XAUUSD 15M.set” and paste your key into LicenseKey.", code: "Jenvu license: VALID" },
 ];
 
 const ERRORS = [
@@ -40,7 +40,7 @@ const ERRORS = [
 
 const HOW = [
   ["License check", "On start the bot checks its key with jenvu.com and trades only while the key and plan are valid."],
-  ["EUR/USD on M15", "Runs on the EURUSD M15 chart of the MT5 account the key is linked to."],
+  ["XAU/USD on M15", "Runs on the XAUUSD M15 chart of the MT5 account the key is linked to."],
   ["Daily auto-stop", "Pauses for the rest of the day once your plan's daily target is reached."],
   ["Monthly limit", "Stops at your plan's monthly target until the next period."],
 ];
@@ -315,7 +315,7 @@ function JxBotPage() {
                 ) : (
                   <div className="text-[13px] text-zinc-500">Not linked yet</div>
                 )}
-                <div className="truncate text-[12px] text-zinc-500">EURUSD · M15</div>
+                <div className="truncate text-[12px] text-zinc-500">XAUUSD · M15</div>
               </div>
               <div className="text-[13px] text-zinc-800">
                 <div className="mb-1 text-[11px] text-zinc-500 md:hidden">Created</div>

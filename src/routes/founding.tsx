@@ -14,7 +14,7 @@ export const Route = createFileRoute("/founding")({
       {
         name: "description",
         content:
-          "Invite-only program for 50 Fiber traders a month. Approved traders get 3 months of their chosen plan with $250 credit and verify their ID within 2 days.",
+          "Invite-only program for 50 Gold traders a month. Approved traders get 3 months of their chosen plan with $250 credit and verify their ID within 2 days.",
       },
       { property: "og:title", content: "Founding Trader Program" },
       {

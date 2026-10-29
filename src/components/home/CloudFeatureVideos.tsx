@@ -79,7 +79,7 @@ function SceneSweep({ t }: { t: number }) {
   );
 }
 
-const AI_Q = "Is Fiber bullish on 2H?";
+const AI_Q = "Is Gold bullish on 2H?";
 const AI_A = "Structure is HH/HL with a fresh demand zone + bullish FVG. Wait for a 2H close above 4,180 before buying.";
 function SceneAi({ t }: { t: number }) {
   const total = AI_A.length + 18;
@@ -117,7 +117,7 @@ function SceneBot({ t }: { t: number }) {
   const pct = Math.min(100, (t * 4) % 120);
   return (
     <div className="flex h-full flex-col items-center justify-center px-8 text-center">
-      <div className="text-[11px] tracking-wide text-gc-on-blue/70">JX BOT · MT5 · EURUSD M15</div>
+      <div className="text-[11px] tracking-wide text-gc-on-blue/70">JX BOT · MT5 · XAUUSD M15</div>
       <div className="mt-1 text-[22px] font-medium text-gc-green">License VALID</div>
       <div className="mt-3 h-1.5 w-full max-w-[200px] overflow-hidden rounded-full bg-gc-on-blue/20">
         <div className="h-full rounded-full bg-gc-green transition-[width] duration-500" style={{ width: `${pct}%` }} />
@@ -129,11 +129,11 @@ function SceneBot({ t }: { t: number }) {
 
 type Card = { name: string; text: React.ReactNode; to: string; Scene: React.ComponentType<{ t: number }> };
 const CARDS: Card[] = [
-  { name: "Live candles", to: "/pricing", Scene: SceneCandles, text: <><b className="font-medium text-gc-ink">Jenvu Terminal</b> streams live Fiber candles with swing labels that stay fixed once</> },
+  { name: "Live candles", to: "/pricing", Scene: SceneCandles, text: <><b className="font-medium text-gc-ink">Jenvu Terminal</b> streams live Gold candles with swing labels that stay fixed once</> },
   { name: "Fresh sweep", to: "/help", Scene: SceneSweep, text: <><b className="font-medium text-gc-ink">Fresh sweep</b> spots wicks that take prior highs or lows, then confirms only when price reverses</> },
   { name: "AI desk", to: "/ai-engine", Scene: SceneAi, text: <><b className="font-medium text-gc-ink">Jenvu AI</b> reads the same chart you see and answers exactly the question you asked</> },
   { name: "Volume RVOL", to: "/help", Scene: SceneVolume, text: <><b className="font-medium text-gc-ink">RVOL</b> colours unusual volume spikes and shows an estimated buyer and seller on every candle</> },
-  { name: "JX Bot", to: "/pricing", Scene: SceneBot, text: <><b className="font-medium text-gc-ink">JX Bot</b> trades Fiber on MetaTrader 5 and pauses for the day at your daily target</> },
+  { name: "JX Bot", to: "/pricing", Scene: SceneBot, text: <><b className="font-medium text-gc-ink">JX Bot</b> trades Gold on MetaTrader 5 and pauses for the day at your daily target</> },
 ];
 
 function FeatureCard({ card }: { card: Card }) {

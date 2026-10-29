@@ -87,7 +87,7 @@ export const STORIES: Story[] = [
     },
     stats: [
       { value: "7", label: "Rule-based engines behind each answer" },
-      { value: "1", label: "Market in focus: Fiber" },
+      { value: "1", label: "Market in focus: Gold" },
       { value: "6", label: "Checks before any setup is shown" },
     ],
     cta: { label: "Learn about the AI engine", href: "https://jenvu.com/ai-engine" },
@@ -109,7 +109,7 @@ export const STORIES: Story[] = [
     },
     banner: {
       title: "An estimate, clearly labelled",
-      text: "Fiber trades across many venues, so no single feed shows the whole market. Jenvu labels the buy/sell split as an estimate and uses volume for display only.",
+      text: "Gold trades across many venues, so no single feed shows the whole market. Jenvu labels the buy/sell split as an estimate and uses volume for display only.",
     },
     steps: {
       title: "How to use it",
@@ -130,13 +130,13 @@ export const STORIES: Story[] = [
     slug: "daily-gold-insights",
     img: cardGold,
     tag: "\n",
-    title: "Daily Fiber insights and trading guides",
+    title: "Daily Gold insights and trading guides",
     intro:
-      "Short daily reads on Fiber, plus longer guides that explain ICT and SMC ideas in simple language.",
+      "Short daily reads on Gold, plus longer guides that explain ICT and SMC ideas in simple language.",
     feature: {
       title: "Learn the market one day at a time",
       text: [
-        "Each insight covers what moved Fiber, which levels matter, and what to watch in the next session.",
+        "Each insight covers what moved Gold, which levels matter, and what to watch in the next session.",
         "Guides walk through structure, zones, fair value gaps and liquidity with clear chart examples.",
       ],
       caption: "Daily notes and guides from the Jenvu team",
@@ -148,14 +148,14 @@ export const STORIES: Story[] = [
     steps: {
       title: "What you'll find",
       points: [
-        "Daily Fiber market notes.",
+        "Daily Gold market notes.",
         "Step-by-step ICT and SMC guides.",
         "Session and killzone explainers.",
         "A glossary of every term used on the chart.",
       ],
     },
     stats: [
-      { value: "1", label: "Market covered: Fiber" },
+      { value: "1", label: "Market covered: Gold" },
       { value: "A–Z", label: "Glossary of chart terms" },
       { value: "Free", label: "To read for everyone" },
     ],
@@ -165,16 +165,16 @@ export const STORIES: Story[] = [
     slug: "jx-bot",
     img: placeFloor,
     tag: "JX BOT FOR MT5",
-    title: "Let JX Bot trade Fiber for you on MetaTrader 5",
+    title: "Let JX Bot trade Gold for you on MetaTrader 5",
     intro:
-      "JX Bot is Jenvu's Expert Advisor for Fiber on MT5. It runs on your own account and stops at the targets your plan sets.",
+      "JX Bot is Jenvu's Expert Advisor for Gold on MT5. It runs on your own account and stops at the targets your plan sets.",
     feature: {
-      title: "Automated Fiber trading with clear limits",
+      title: "Automated Gold trading with clear limits",
       text: [
-        "Download the bot from your dashboard, create a license for your MT5 account and attach it to the EURUSD M15 chart.",
+        "Download the bot from your dashboard, create a license for your MT5 account and attach it to the XAUUSD M15 chart.",
         "The bot checks its license with Jenvu, pauses for the day at your daily target and stops at your monthly target.",
       ],
-      caption: "JX Bot running on the EURUSD M15 chart in MetaTrader 5",
+      caption: "JX Bot running on the XAUUSD M15 chart in MetaTrader 5",
     },
     banner: {
       title: "Targets are limits, not promises",
@@ -191,7 +191,7 @@ export const STORIES: Story[] = [
     stats: [
       { value: "1–5", label: "MT5 licenses per plan" },
       { value: "$150", label: "Daily target on Ultra" },
-      { value: "M15", label: "Fiber chart" },
+      { value: "M15", label: "Gold chart" },
     ],
     cta: { label: "See plans", href: "https://jenvu.com/pricing" },
   },
@@ -203,7 +203,7 @@ export const STORIES: Story[] = [
     intro:
       "Founding members get early access to the Terminal and help shape what we build next.",
     feature: {
-      title: "Early access for serious Fiber traders",
+      title: "Early access for serious Gold traders",
       text: [
         "Approved members get 3 months of their chosen plan, $250 credit and full access to the Terminal.",
         "You'll have two days to verify your ID after approval. Once your documents are in, your access continues.",
@@ -218,7 +218,7 @@ export const STORIES: Story[] = [
       title: "How to apply",
       points: [
         "Fill in the short application form.",
-        "Tell us how you trade Fiber today.",
+        "Tell us how you trade Gold today.",
         "Wait for our review email.",
         "Verify your ID within two days of approval.",
       ],
@@ -236,18 +236,18 @@ export const STORIES: Story[] = [
     tag: "SESSIONS",
     title: "Trade the London and New York sessions with clear zones",
     intro:
-      "Fiber moves most during the London and New York sessions. Jenvu marks those windows and the zones that matter inside them.",
+      "Gold moves most during the London and New York sessions. Jenvu marks those windows and the zones that matter inside them.",
     feature: {
       title: "Know when the market is awake",
       text: [
         "Killzones highlight the busiest hours of each session so you can focus your attention.",
         "Supply and demand zones stay on the chart until price clearly breaks them, so you always see the latest area of interest.",
       ],
-      caption: "Session windows and active zones on the Fiber chart",
+      caption: "Session windows and active zones on the Gold chart",
     },
     banner: {
       title: "Weekend closure handled for you",
-      text: "When the Fiber market is closed at the weekend, the chart shows it, and the closed-candle timer counts down to the next open.",
+      text: "When the Gold market is closed at the weekend, the chart shows it, and the closed-candle timer counts down to the next open.",
     },
     steps: {
       title: "What you'll see",
@@ -261,7 +261,7 @@ export const STORIES: Story[] = [
     stats: [
       { value: "2", label: "Main sessions: London and New York" },
       { value: "4H", label: "Session-aligned candles" },
-      { value: "24/5", label: "Fiber market hours" },
+      { value: "24/5", label: "Gold market hours" },
     ],
     cta: { label: "Learn about killzones", href: "https://jenvu.com/killzones" },
   },
@@ -271,7 +271,7 @@ export const STORIES: Story[] = [
     tag: "DEVELOPERS",
     title: "Build with Jenvu models using API keys and the extension",
     intro:
-      "Use your own API keys to bring Jenvu's analysis into your tools, or add the browser extension to read Fiber charts you already use.",
+      "Use your own API keys to bring Jenvu's analysis into your tools, or add the browser extension to read Gold charts you already use.",
     feature: {
       title: "Jenvu, wherever you work",
       text: [
