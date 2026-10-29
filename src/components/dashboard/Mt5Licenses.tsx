@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { Check, Copy, KeyRound, Lock, Trash2 } from "lucide-react";
 import { createMt5License, getMt5Access, revokeMt5License, type Mt5LicenseRow } from "@/lib/mt5-licenses.functions";
-import { MT5_PLANS, dailyTarget, isMt5Plan } from "@/lib/mt5-licenses";
+import { MT5_PLANS, dailyTarget, isMt5Plan, parseBinding } from "@/lib/mt5-licenses";
 
 export type Mt5Access = { plan: string; allowed: boolean; limit: number; expiresAt: string | null; dailyTarget?: number; monthlyTarget?: number; licenses: Mt5LicenseRow[] };
 

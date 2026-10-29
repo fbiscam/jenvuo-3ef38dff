@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { Bot, Check, Copy, Download, FileText, KeyRound, Trash2, Wrench, X } from "lucide-react";
 import { useMt5Access } from "@/components/dashboard/Mt5Licenses";
 import { createMt5License, getBotDownloadUrl, revokeMt5License, type Mt5LicenseRow } from "@/lib/mt5-licenses.functions";
-import { MT5_PLANS, dailyTarget, isMt5Plan } from "@/lib/mt5-licenses";
+import { MT5_PLANS, dailyTarget, isMt5Plan, parseBinding } from "@/lib/mt5-licenses";
 
 const MONO = "font-['JetBrains_Mono',ui-monospace,monospace]";
 
