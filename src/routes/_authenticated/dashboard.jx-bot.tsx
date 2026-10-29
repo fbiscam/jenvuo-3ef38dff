@@ -315,7 +315,7 @@ function JxBotPage() {
                 ) : (
                   <div className="text-[13px] text-zinc-500">Not linked yet</div>
                 )}
-                <div className="truncate text-[12px] text-zinc-500">EURUSD · M15</div>
+                <div className="truncate text-[12px] text-zinc-500">XAUUSD · M15</div>
               </div>
               <div className="text-[13px] text-zinc-800">
                 <div className="mb-1 text-[11px] text-zinc-500 md:hidden">Created</div>

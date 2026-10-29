@@ -319,7 +319,7 @@ function OnOffBadge({ on }: { on: boolean }) {
 
 const localTime = (iso: string) =>
   new Date(iso).toLocaleString(undefined, { month: "short", day: "numeric", hour: "numeric", minute: "2-digit", second: "2-digit" });
-const symbolLabel = (s: string) => (/EURUSD/i.test(s) || !s ? "XAU/USD" : s);
+const symbolLabel = (s: string) => (/XAUUSD|GOLD/i.test(s) || !s ? "XAU/USD" : s);
 
 /** Exness-style live positions table, one row per account (the bot reports account totals, not single trades). */
 function LiveTrades({ rows, sessions }: { rows: BotReportRow[]; sessions: BotSessionRow[] }) {

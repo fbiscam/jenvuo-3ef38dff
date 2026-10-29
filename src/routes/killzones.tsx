@@ -187,7 +187,7 @@ function KillzonesPage() {
       .filter(
         r =>
           !q ||
-          "EURUSD".includes(q) ||
+          "XAUUSD".includes(q) ||
           r.meta.name.toUpperCase().includes(q) ||
           r.meta.region.toUpperCase().includes(q),
       );
@@ -315,7 +315,7 @@ function KillzonesPage() {
                             <div className="flex items-center gap-2">
                               
                               <span className={`${MONO} text-sm font-semibold ${locked ? "text-gc-ink-muted" : ""}`}>
-                                {"EURUSD"}
+                                {"XAUUSD"}
                               </span>
                               {locked && (
                                 <span className={`${MONO} inline-flex items-center gap-1 rounded-md border border-gc-line bg-background px-1.5 py-0.5 text-[9px] uppercase tracking-wider text-gc-ink-muted`}>

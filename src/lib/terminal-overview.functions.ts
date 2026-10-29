@@ -132,10 +132,10 @@ export const getGoldSeasonals = createServerFn({ method: "POST" })
 
 /** Headline feeds tried in order; the first one that returns items wins. */
 const HEADLINE_FEEDS = [
-  "https://news.google.com/rss/search?q=EURUSD+OR+%22EUR%2FUSD%22+when:2d&hl=en-US&gl=US&ceid=US:en",
-  "https://feeds.finance.yahoo.com/rss/2.0/headline?s=EURUSD%3DX&region=US&lang=en-US",
-  "https://www.bing.com/news/search?q=EURUSD+euro+dollar&format=rss",
-  "https://news.google.com/rss/search?q=EURUSD&hl=en-GB&gl=GB&ceid=GB:en",
+  "https://news.google.com/rss/search?q=XAUUSD+OR+gold+price+when:2d&hl=en-US&gl=US&ceid=US:en",
+  "https://feeds.finance.yahoo.com/rss/2.0/headline?s=GC%3DF&region=US&lang=en-US",
+  "https://www.bing.com/news/search?q=gold+price+XAUUSD&format=rss",
+  "https://news.google.com/rss/search?q=gold+price&hl=en-GB&gl=GB&ceid=GB:en",
 ];
 let lastGoodHeadlines: Headline[] = [];
 

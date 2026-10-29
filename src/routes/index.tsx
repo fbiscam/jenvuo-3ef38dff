@@ -38,7 +38,7 @@ const CORR_PLACEHOLDER: CorrelatedMarket[] = [
   { symbol: "DXY", display: "DXY", note: "USD strength — inverse driver" },
   { symbol: "US10Y", display: "US10Y", note: "Real yields — inverse driver" },
   { symbol: "XAGUSD", display: "XAG/USD", note: "Silver beta — confirms metals" },
-  { symbol: "EURUSD", display: "Gold", note: "USD leg — positive driver" },
+  { symbol: "XAUUSD", display: "Gold", note: "USD leg — positive driver" },
   { symbol: "USDJPY", display: "USD/JPY", note: "Carry / risk — inverse driver" },
   { symbol: "SPX", display: "S&P 500", note: "Risk appetite — rotation cue" },
   { symbol: "WTI", display: "WTI Oil", note: "Inflation impulse — positive" },
@@ -166,10 +166,10 @@ const SANS = "font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif]
 
 /* ---------- mock data ---------- */
 const SIGNALS = [
-  { pair: "EURUSD", t: "14:20:02", tag: "SWEEP", note: "Liquidity grab on London high", tone: "ink" },
-  { pair: "EURUSD", t: "14:18:45", tag: "FVG", note: "Fair Value Gap mitigated", tone: "green" },
-  { pair: "EURUSD", t: "14:15:10", tag: "BOS", note: "Break of structure confirmed", tone: "muted" },
-  { pair: "EURUSD", t: "14:11:32", tag: "OB", note: "Bullish order block tap", tone: "ink" },
+  { pair: "XAUUSD", t: "14:20:02", tag: "SWEEP", note: "Liquidity grab on London high", tone: "ink" },
+  { pair: "XAUUSD", t: "14:18:45", tag: "FVG", note: "Fair Value Gap mitigated", tone: "green" },
+  { pair: "XAUUSD", t: "14:15:10", tag: "BOS", note: "Break of structure confirmed", tone: "muted" },
+  { pair: "XAUUSD", t: "14:11:32", tag: "OB", note: "Bullish order block tap", tone: "ink" },
 ] as const;
 
 type TickerRow = [string, string, string];
@@ -190,7 +190,7 @@ const SYMBOL_MAP: Record<string, string> = {
   "DXY": "DXY",
   "US10Y": "US10Y",
   "XAG/USD": "XAGUSD",
-  "Gold": "EURUSD",
+  "Gold": "XAUUSD",
   "USD/JPY": "USDJPY",
   "S&P 500": "SPX",
   "WTI Oil": "WTI",
