@@ -118,7 +118,7 @@ function SceneBot({ t }: { t: number }) {
   return (
     <div className="flex h-full flex-col items-center justify-center px-8 text-center">
       <div className="text-[11px] tracking-wide text-gc-on-blue/70">JX BOT · MT5 · EURUSD M15</div>
-      <div className="mt-1 text-[22px] font-medium text-gc-green">License VALID</div>
+      <div className="mt-1 text-[22px] font-medium text-gc-green">IP VERIFIED</div>
       <div className="mt-3 h-1.5 w-full max-w-[200px] overflow-hidden rounded-full bg-gc-on-blue/20">
         <div className="h-full rounded-full bg-gc-green transition-[width] duration-500" style={{ width: `${pct}%` }} />
       </div>
