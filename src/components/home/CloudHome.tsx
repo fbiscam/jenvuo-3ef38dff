@@ -306,11 +306,14 @@ export function CloudAudiences() {
               role="tab"
               aria-selected={a.key === active}
               onClick={() => setActive(a.key)}
-              className={`-mb-0.5 shrink-0 border-b-[3px] px-4 py-3 text-[15px] transition ${
-                a.key === active ? "border-gc-navy font-medium text-gc-ink" : "border-transparent text-gc-ink/80 hover:text-gc-ink"
+              className={`relative -mb-0.5 shrink-0 px-4 py-3 text-[15px] transition ${
+                a.key === active ? "font-medium text-gc-ink" : "text-gc-ink/80 hover:text-gc-ink"
               }`}
             >
               {a.label}
+              {a.key === active && (
+                <span aria-hidden className="absolute inset-x-0 bottom-0 h-[3px] rounded-t-full bg-gc-ink" />
+              )}
             </button>
           ))}
         </div>

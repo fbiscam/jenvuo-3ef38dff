@@ -31,7 +31,7 @@ type Solution = {
 };
 
 const SOLUTIONS: Solution[] = [
-  { name: "Day traders", image: imgFloor, stat: "15M / 1H", statText: "fresh sweeps and swings marked live on Fiber", body: "Catch liquidity sweeps on fresh highs and lows as candles close.", bold: "See how the Terminal reads intraday structure.", cta: "Explore the Fiber Terminal", to: "/pricing" },
+  { name: "Day traders", image: imgFloor, stat: "15M / 1H", statText: "fresh sweeps & swings marked live on Fiber", body: "Catch liquidity sweeps on fresh highs and lows as candles close.", bold: "See how the Terminal reads intraday structure.", cta: "Explore the Fiber Terminal", to: "/pricing" },
   { name: "Swing traders", image: imgVault, stat: "2H / 4H", statText: "supply, demand zones and FVGs kept on chart", body: "Higher-timeframe zones stay drawn until price truly invalidates them.", bold: "Plan swing trades with clear structure.", cta: "Explore zone tools", to: "/help" },
   { name: "Automated traders", image: imgHome, stat: "MT5", statText: "JX Bot trades Fiber on your own account", body: "Licensed to your MT5 account, with a daily auto-stop at your target.", bold: "Let JX Bot handle the execution.", cta: "Explore JX Bot", to: "/pricing" },
   { name: "AI-first traders", image: imgOffice, stat: "1 question", statText: "one clear answer from the AI desk, no noise", body: "Ask about the current chart and get a focused, structured reply.", bold: "Read the market with AI next to you.", cta: "Explore the AI desk", to: "/ai-engine" },
