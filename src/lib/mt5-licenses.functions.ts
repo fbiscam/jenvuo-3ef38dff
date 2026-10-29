@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { isMt5Plan, licenseLimit, MT5_ACCOUNT_RE, newLicenseKey, targetsFor } from "./mt5-licenses";
+import { isMt5Plan, licenseLimit, newLicenseKey, normalizeIp, targetsFor } from "./mt5-licenses";
 
 export type Mt5LicenseRow = { id: string; license_key: string; mt5_account: string | null; plan_id: string; revoked_at: string | null; last_validated_at: string | null; created_at: string };
 
