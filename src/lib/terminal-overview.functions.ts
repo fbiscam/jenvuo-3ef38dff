@@ -4,7 +4,7 @@ import { parseRssHeadlines, periodPerformance, seasonalSeries, type DailyClose, 
 
 const UA = "Mozilla/5.0";
 const HOSTS = ["query1.finance.yahoo.com", "query2.finance.yahoo.com"];
-const SYMBOL = "EURUSD=X";
+const SYMBOL = "GC=F";
 
 /** Chart interval/range used for the overview line per period. */
 const RANGE: Record<PeriodKey, { interval: string; range: string }> = {
@@ -74,7 +74,7 @@ async function yahooSeriesRaw(interval: string, range: string): Promise<YahooSer
       lastErr = e;
     }
   }
-  console.error("terminal-overview: EUR/USD history unavailable", lastErr);
+  console.error("terminal-overview: gold history unavailable", lastErr);
   throw new Error("Gold history is unavailable right now.");
 }
 
