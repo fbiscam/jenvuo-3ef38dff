@@ -7,7 +7,9 @@ import {
   Camera,
   History,
   ImagePlus,
+  LayoutGrid,
   ListChecks,
+  Sparkles,
   Mic,
   Moon,
   Newspaper,
@@ -323,11 +325,11 @@ function TerminalPage() {
   // Only an explicit pick (side-rail switch or Settings) turns the Terminal dark.
   const pickedLookRef = useRef<"light" | "dark" | null>(null);
   const [watchlistOpen, setWatchlistOpen] = useState(true);
-  // Trading layout (order panel, positions, market watch, technicals, risk) — on by default.
-  const [panelsOpen, setPanelsOpen] = useState(true);
-  // The watchlist fills the right side whenever the AI desk is closed.
-  // Watchlist removed at user request; chart uses the full width.
-  const showWatchlist = false as boolean;
+  // Symbol overview page (big header, tabs, market cards) — off by default so the
+  // chart fills the screen like TradingView; opened from the right dock.
+  const [panelsOpen, setPanelsOpen] = useState(false);
+  // TradingView-style right panel: the watchlist shows whenever the AI desk is closed.
+  const showWatchlist = watchlistOpen && !deskOpen;
   const chartRef = useRef<JenvuChartHandle | null>(null);
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<ChatMsg[]>([]);
@@ -1090,6 +1092,59 @@ function TerminalPage() {
               </div>
             </aside>
           )}
+
+          {/* TradingView-style right icon dock (desktop) */}
+          <nav
+            aria-label="Terminal panels"
+            className="hidden w-12 shrink-0 flex-col items-center gap-1 border-l border-border bg-background py-2 lg:flex"
+          >
+            {(
+              [
+                {
+                  key: "watchlist",
+                  label: "Watchlist",
+                  Icon: ListChecks,
+                  active: showWatchlist,
+                  onClick: () => {
+                    if (showWatchlist) setWatchlistOpen(false);
+                    else {
+                      setDeskOpen(false);
+                      setWatchlistOpen(true);
+                    }
+                  },
+                },
+                {
+                  key: "ai",
+                  label: "Ask Jenvu AI",
+                  Icon: Sparkles,
+                  active: deskOpen,
+                  onClick: () => setDeskOpen((open) => !open),
+                },
+                {
+                  key: "overview",
+                  label: "Symbol overview",
+                  Icon: LayoutGrid,
+                  active: panelsOpen,
+                  onClick: () => setPanelsOpen((open) => !open),
+                },
+              ] as const
+            ).map(({ key, label, Icon, active, onClick }) => (
+              <button
+                key={key}
+                type="button"
+                onClick={onClick}
+                aria-pressed={active}
+                aria-label={label}
+                title={label}
+                className={cn(
+                  "inline-flex h-10 w-10 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground",
+                  active && "bg-accent text-foreground",
+                )}
+              >
+                <Icon className="h-5 w-5" />
+              </button>
+            ))}
+          </nav>
         </div>
       </div>
     </TooltipProvider>
