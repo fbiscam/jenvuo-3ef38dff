@@ -76,6 +76,19 @@ const SD_HISTORY_TIMEFRAMES = new Set(["15m", "30m", "45m", "1h", "2h", "4h", "1
 const SWING_SWEEP_TIMEFRAMES = new Set(["1h", "2h", "4h", "1d"]);
 const LOCKED_TOGGLE_KEYS = new Set<string>(LOCKED_STRATEGY_KEYS);
 
+/** TradingView bottom-bar date ranges; each picks a chart timeframe via PERIOD_TIMEFRAME. */
+const BOTTOM_RANGES = [
+  { key: "1d", label: "1D", title: "1 day" },
+  { key: "5d", label: "5D", title: "5 days" },
+  { key: "1m", label: "1M", title: "1 month" },
+  { key: "3m", label: "3M", title: "3 months" },
+  { key: "6m", label: "6M", title: "6 months" },
+  { key: "ytd", label: "YTD", title: "year to date" },
+  { key: "1y", label: "1Y", title: "1 year" },
+  { key: "5y", label: "5Y", title: "5 years" },
+  { key: "all", label: "All", title: "all history" },
+] as const;
+
 const MemoChart = memo(ChartCanvas);
 
 const DRAWINGS_KEY = "jenvu:terminal:drawings:v1";
@@ -272,7 +285,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
   // Demo trading: order ticket, positions on the chart and the paper panel. Opened from the side panel.
   const demoTradingEnabled = true;
   // On-chart quick BUY/SELL buttons stay off; trading starts from the side panel.
-  const chartQuickButtons = false as boolean;
+  const chartQuickButtons = true as boolean;
 
   useEffect(() => {
     const syncFullscreen = () => setFullscreen(document.fullscreenElement === workspaceRef.current);
