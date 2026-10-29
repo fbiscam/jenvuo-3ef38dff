@@ -1194,3 +1194,18 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
     </div>
   );
 });
+
+/** Live UTC clock for the bottom bar, rendered after hydration only. */
+function UtcClock() {
+  const [now, setNow] = useState<Date | null>(null);
+  useEffect(() => {
+    setNow(new Date());
+    const id = window.setInterval(() => setNow(new Date()), 1000);
+    return () => window.clearInterval(id);
+  }, []);
+  return (
+    <span className="ml-auto font-medium tabular-nums text-muted-foreground" aria-label="Current UTC time">
+      {now ? now.toISOString().slice(11, 19) : "--:--:--"} UTC
+    </span>
+  );
+}
