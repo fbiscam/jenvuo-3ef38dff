@@ -22,7 +22,7 @@ const RESOURCES: Record<string, Resource[]> = {
   ],
   "AI desk and models": [
     { title: "Ask the AI desk", text: "Get clear chart reads from top-tier AI models, answered only to your question.", to: "/dashboard/terminal" },
-    { title: "Model access by plan", text: "Compare which models and limits come with Pro, Elite and Ultra.", to: "/pricing" },
+    { title: "Model access by plan", text: "Compare which models and limits come with Starter, Pro and Elite.", to: "/pricing" },
     { title: "Token pricing", text: "Usage is charged at $3 per million tokens from your credit wallet.", to: "/pricing" },
   ],
   "API and developers": [
@@ -31,7 +31,7 @@ const RESOURCES: Record<string, Resource[]> = {
     { title: "Developer docs", text: "Clear guides help you connect, test and ship your project.", to: "/help" },
   ],
   "Billing and plans": [
-    { title: "Plans and pricing", text: "Pro $49, Elite $99 and Ultra $169 per month.", to: "/pricing" },
+    { title: "Plans and pricing", text: "Starter $19 (14 days), Pro $49 and Elite $89 (30 days), all with the Gold Terminal.", to: "/pricing" },
     { title: "Manage billing", text: "Change plan, top up credit and see your invoices.", to: "/dashboard/billing" },
     { title: "Founding Program", text: "3 months of your plan with $250 credit and Terminal access.", to: "/founding" },
   ],
