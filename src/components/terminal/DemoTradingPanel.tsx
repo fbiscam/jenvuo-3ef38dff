@@ -128,7 +128,7 @@ export function useDemoTrading(currentPrice: number | null, currentRange?: DemoP
 
   const place = useCallback((req: OrderRequest): string | null => {
     const px = priceRef.current;
-    if (!px) return "Live XAU/USD price is not available yet.";
+    if (!px) return "Live EUR/USD price is not available yet.";
     if (!Number.isFinite(req.quantity) || req.quantity <= 0) return "Enter a quantity greater than zero.";
     const { bid, ask } = bidAsk(px);
     const fill = req.type === "market" ? (req.side === "buy" ? ask : bid) : req.price ?? NaN;
@@ -170,12 +170,12 @@ export function QuickTradeButtons({ price, onPick }: { price: number | null; onP
   const q = price ? bidAsk(price) : null;
   return (
     <div className="pointer-events-auto flex items-center gap-1.5 font-sans">
-      <button type="button" onClick={() => onPick("sell")} aria-label="Sell XAU/USD" className="flex min-w-[76px] flex-col items-center rounded-md px-2 py-1 leading-tight text-primary-foreground shadow-sm hover:opacity-90" style={{ background: SELL }}>
+      <button type="button" onClick={() => onPick("sell")} aria-label="Sell EUR/USD" className="flex min-w-[76px] flex-col items-center rounded-md px-2 py-1 leading-tight text-primary-foreground shadow-sm hover:opacity-90" style={{ background: SELL }}>
         <span className="font-mono text-[13px] font-semibold">{q ? num(q.bid) : "—"}</span>
         <span className="text-[10px] font-medium tracking-wide">SELL</span>
       </button>
       <span className="font-mono text-[10px] text-muted-foreground">{(DEMO_SPREAD * 100).toFixed(1)}</span>
-      <button type="button" onClick={() => onPick("buy")} aria-label="Buy XAU/USD" className="flex min-w-[76px] flex-col items-center rounded-md px-2 py-1 leading-tight text-primary-foreground shadow-sm hover:opacity-90" style={{ background: BUY }}>
+      <button type="button" onClick={() => onPick("buy")} aria-label="Buy EUR/USD" className="flex min-w-[76px] flex-col items-center rounded-md px-2 py-1 leading-tight text-primary-foreground shadow-sm hover:opacity-90" style={{ background: BUY }}>
         <span className="font-mono text-[13px] font-semibold">{q ? num(q.ask) : "—"}</span>
         <span className="text-[10px] font-medium tracking-wide">BUY</span>
       </button>
@@ -211,9 +211,9 @@ export function OrderTicket({ side, onSideChange, onClose, price, trading, onPla
     if (!price) return;
     const dir = side === "buy" ? 1 : -1;
     const base = side === "buy" ? price + DEMO_SPREAD / 2 : price - DEMO_SPREAD / 2;
-    setTp((base + dir * base * 0.003).toFixed(2));
-    setSl((base - dir * base * 0.0015).toFixed(2));
-    if (type !== "market") setLimitPrice((base + (type === "limit" ? -dir : dir) * base * 0.002).toFixed(2));
+    setTp((base + dir * base * 0.003).toFixed(5));
+    setSl((base - dir * base * 0.0015).toFixed(5));
+    if (type !== "market") setLimitPrice((base + (type === "limit" ? -dir : dir) * 0.002).toFixed(5));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [side, type]);
 

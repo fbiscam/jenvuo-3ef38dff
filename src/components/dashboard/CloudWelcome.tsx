@@ -7,7 +7,7 @@ import { FOUNDING_CREDIT_USD, FOUNDING_MONTHS } from "@/lib/founding-offer";
 
 const QUICK_ACTIONS = [
   { label: "Create API key", to: "/dashboard/api" },
-  { label: "Open Gold Terminal", to: "/dashboard/terminal" },
+  { label: "Open Fiber Terminal", to: "/dashboard/terminal" },
   { label: "Manage billing", to: "/dashboard/billing" },
   { label: "Security settings", to: "/dashboard/profile" },
   { label: "View usage", to: "/dashboard/usage" },
@@ -17,12 +17,12 @@ type Resource = { title: string; text: string; to: string };
 const RESOURCES: Record<string, Resource[]> = {
   "Terminal and charts": [
     { title: "Read sweeps and zones", text: "Learn how fresh sweeps, supply and demand zones and FVGs show on the chart.", to: "/help" },
-    { title: "Daily Gold insights", text: "Follow Gold sessions with short daily notes and step-by-step guides.", to: "/insights" },
+    { title: "Daily Fiber insights", text: "Follow Fiber sessions with short daily notes and step-by-step guides.", to: "/insights" },
     { title: "Volume and pressure", text: "See how RVOL spikes and buyer and seller estimates are shown on every candle.", to: "/help" },
   ],
   "AI desk and models": [
     { title: "Ask the AI desk", text: "Get clear chart reads from top-tier AI models, answered only to your question.", to: "/dashboard/terminal" },
-    { title: "Model access by plan", text: "Compare which models and limits come with Starter, Pro and Elite.", to: "/pricing" },
+    { title: "Model access by plan", text: "Compare which models and limits come with Pro, Elite and Ultra.", to: "/pricing" },
     { title: "Token pricing", text: "Usage is charged at $3 per million tokens from your credit wallet.", to: "/pricing" },
   ],
   "API and developers": [
@@ -31,7 +31,7 @@ const RESOURCES: Record<string, Resource[]> = {
     { title: "Developer docs", text: "Clear guides help you connect, test and ship your project.", to: "/help" },
   ],
   "Billing and plans": [
-    { title: "Plans and pricing", text: "Starter $19 (14 days), Pro $49 and Elite $89 (30 days), all with the Gold Terminal.", to: "/pricing" },
+    { title: "Plans and pricing", text: "Pro $49, Elite $99 and Ultra $169 per month.", to: "/pricing" },
     { title: "Manage billing", text: "Change plan, top up credit and see your invoices.", to: "/dashboard/billing" },
     { title: "Founding Program", text: "3 months of your plan with $250 credit and Terminal access.", to: "/founding" },
   ],
@@ -102,7 +102,7 @@ export default function CloudWelcome({ name: profileName }: { name?: string }) {
               Make the most of Jenvu
             </div>
             <ul className="mt-6 space-y-5">
-              <Tick>Read live sweeps, zones and FVGs on Gold</Tick>
+              <Tick>Read live sweeps, zones and FVGs on Fiber</Tick>
               <Tick>Ask the AI desk about any chart</Tick>
               <Tick>Track usage, billing and API keys in one place</Tick>
             </ul>

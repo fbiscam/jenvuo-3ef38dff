@@ -1653,7 +1653,7 @@ async function loadEurTerminalChart(tf: string): Promise<TerminalChartPayload> {
   return data;
 }
 
-async function loadTerminalChart(tf: string, asset: TerminalAsset = "XAUUSD"): Promise<TerminalChartPayload> {
+async function loadTerminalChart(tf: string, asset: TerminalAsset = "EURUSD"): Promise<TerminalChartPayload> {
   if (asset === "BTCUSD") return loadBtcTerminalChart(tf);
   if (asset === "EURUSD") return loadEurTerminalChart(tf);
   const cached = terminalChartCache.get(tf);
@@ -1751,7 +1751,7 @@ export const getTerminalChart = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: { timeframe: string; asset?: string }) => {
     const tf = String(d?.timeframe || "30m").toLowerCase();
-    const asset: TerminalAsset = d?.asset === "BTCUSD" ? "BTCUSD" : d?.asset === "EURUSD" ? "EURUSD" : "XAUUSD";
+    const asset: TerminalAsset = d?.asset === "BTCUSD" ? "BTCUSD" : d?.asset === "XAUUSD" ? "XAUUSD" : "EURUSD";
     return { timeframe: TF_MS[tf] ? tf : "30m", asset };
   })
   .handler(async ({ data, context }) => {
@@ -2919,10 +2919,10 @@ export const analyzeGold = createServerFn({ method: "POST" })
       asset?: string;
     }) => ({
       timeframe: String(d?.timeframe || "15m").toLowerCase(),
-      asset: (d?.asset === "BTCUSD" ? "BTCUSD" : d?.asset === "EURUSD" ? "EURUSD" : "XAUUSD") as TerminalAsset,
+      asset: (d?.asset === "BTCUSD" ? "BTCUSD" : d?.asset === "XAUUSD" ? "XAUUSD" : "EURUSD") as TerminalAsset,
       chartContext: (() => {
         const ctx = typeof d?.chartContext === "string" && d.chartContext.trim() ? d.chartContext.slice(0, 8000) : "";
-        if (d?.asset !== "EURUSD" && d?.asset !== "BTCUSD") return ctx || undefined;
+        if (d?.asset === "XAUUSD") return ctx || undefined;
         if (d?.asset !== "BTCUSD")
           return `ACTIVE INSTRUMENT: EUR/USD (Euro / US Dollar, forex, 5-decimal prices). Every price, level, candle and plan in this conversation is EUR/USD — never quote gold prices. Gold-only rules (LBMA fix, gold correlation, gold pip buffers) do not apply; use the same SMC/ICT structure logic on EUR/USD candles with ATR-based buffers, London/New York sessions and USD/EUR news.\n${ctx}`;
         return `ACTIVE INSTRUMENT: BTC/USD (Bitcoin, 24/7 crypto). Every price, level, candle and plan in this conversation is BTC/USD — never quote gold prices. Gold-only rules (LBMA fix, gold killzone lock, DXY gold correlation, pip buffers) do not apply; use the same SMC/ICT structure logic on BTC candles with ATR-based buffers.\n${ctx}`;

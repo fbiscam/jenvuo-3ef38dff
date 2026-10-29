@@ -31,16 +31,16 @@ type Solution = {
 };
 
 const SOLUTIONS: Solution[] = [
-  { name: "Day traders", image: imgFloor, stat: "15M / 1H", statText: "fresh sweeps & swings marked live on Gold", body: "Catch liquidity sweeps on fresh highs and lows as candles close.", bold: "See how the Terminal reads intraday structure.", cta: "Explore the Gold Terminal", to: "/pricing" },
+  { name: "Day traders", image: imgFloor, stat: "15M / 1H", statText: "fresh sweeps & swings marked live on Fiber", body: "Catch liquidity sweeps on fresh highs and lows as candles close.", bold: "See how the Terminal reads intraday structure.", cta: "Explore the Fiber Terminal", to: "/pricing" },
   { name: "Swing traders", image: imgVault, stat: "2H / 4H", statText: "supply, demand zones and FVGs kept on chart", body: "Higher-timeframe zones stay drawn until price truly invalidates them.", bold: "Plan swing trades with clear structure.", cta: "Explore zone tools", to: "/help" },
-  { name: "Gold traders", image: imgHome, stat: "XAU/USD", statText: "the Gold Terminal with every plan", body: "Live Gold candles, fresh sweeps and swings, no license key needed.", bold: "Trade Gold with clear setups.", cta: "See plans", to: "/pricing" },
+  { name: "Automated traders", image: imgHome, stat: "MT5", statText: "JX Bot trades Fiber on your own account", body: "Licensed to your MT5 account, with a daily auto-stop at your target.", bold: "Let JX Bot handle the execution.", cta: "Explore JX Bot", to: "/pricing" },
   { name: "AI-first traders", image: imgOffice, stat: "1 question", statText: "one clear answer from the AI desk, no noise", body: "Ask about the current chart and get a focused, structured reply.", bold: "Read the market with AI next to you.", cta: "Explore the AI desk", to: "/ai-engine" },
   { name: "Developers", image: imgDev, stat: "$3 / 1M", statText: "tokens for top-tier models through API keys", body: "Plug Jenvu models into your own apps, bots and trading tools.", bold: "Build with our API and extension.", cta: "Explore developer tools", to: "/help" },
   { name: "Founding members", image: imgMeeting, stat: "2 days", statText: "to verify your ID after your plan is approved", body: "Approved Founding members get 3 months of their chosen plan with $250 credit.", bold: "Apply to the invite-only program.", cta: "Explore the Founding Program", to: "/founding" },
-  { name: "Session traders", image: imgLondon, stat: "London / NY", statText: "killzone sessions tracked on the Gold chart", body: "Know when London and New York liquidity is most active on Gold.", bold: "Time your entries around the sessions.", cta: "Explore session tools", to: "/help" },
-  { name: "Gold investors", image: imgSouk, stat: "Gold", statText: "one market, analysed in full depth every day", body: "Follow Gold with daily insights, macro drivers and clear structure.", bold: "Stay close to the Gold market.", cta: "Explore Gold insights", to: "/insights" },
-  { name: "Students", image: imgLibrary, stat: "Free guides", statText: "on sweeps, zones and FVGs for every level", body: "Learn ICT and SMC ideas step by step with real Gold examples.", bold: "Build your trading knowledge.", cta: "Explore learning resources", to: "/insights" },
-  { name: "Support & help", image: imgSupport, stat: "Help centre", statText: "answers on plans, billing and the Terminal", body: "Find quick answers or contact our team about your account.", bold: "Get help when you need it.", cta: "Visit the help centre", to: "/help" },
+  { name: "Session traders", image: imgLondon, stat: "London / NY", statText: "killzone sessions tracked on the Fiber chart", body: "Know when London and New York liquidity is most active on Fiber.", bold: "Time your entries around the sessions.", cta: "Explore session tools", to: "/help" },
+  { name: "Fiber investors", image: imgSouk, stat: "Fiber", statText: "one market, analysed in full depth every day", body: "Follow Fiber with daily insights, macro drivers and clear structure.", bold: "Stay close to the Fiber market.", cta: "Explore Fiber insights", to: "/insights" },
+  { name: "Students", image: imgLibrary, stat: "Free guides", statText: "on sweeps, zones and FVGs for every level", body: "Learn ICT and SMC ideas step by step with real Fiber examples.", bold: "Build your trading knowledge.", cta: "Explore learning resources", to: "/insights" },
+  { name: "Support & help", image: imgSupport, stat: "Help centre", statText: "answers on plans, billing and JX Bot", body: "Find quick answers or contact our team about your account.", bold: "Get help when you need it.", cta: "Visit the help centre", to: "/help" },
 ];
 
 export function CloudSolutions() {
@@ -51,13 +51,13 @@ export function CloudSolutions() {
       <div className="mx-auto max-w-6xl px-6">
         <div className="grid gap-8 md:grid-cols-2 md:items-start">
           <h2 className="text-3xl font-normal leading-tight text-gc-ink md:text-4xl">
-            Solve your trading problems with <span className="text-gc-yellow">Gold solutions</span>
+            Solve your trading problems with <span className="text-gc-yellow">Fiber solutions</span>
           </h2>
           <div>
             <p className="text-gc-ink-muted">
               From spotting <Link to="/help" className="text-gc-blue-deep underline">liquidity sweeps</Link> to managing{" "}
               <Link to="/help" className="text-gc-blue-deep underline">trade risk</Link>, Jenvu tools fit{" "}
-              <span className="hidden sm:inline">the way you trade Gold.</span>
+              <span className="hidden sm:inline">the way you trade Fiber.</span>
               <span className="sm:hidden">how you trade.</span>
             </p>
             <Link to="/auth" className="mt-5 inline-flex rounded-full bg-gc-blue-deep px-5 py-2.5 text-sm font-medium text-gc-on-blue hover:bg-gc-navy">
@@ -178,7 +178,7 @@ export function CloudStartBanner() {
         <div className="relative overflow-hidden rounded-2xl bg-gc-sky">
           <div className="relative z-10 max-w-xl px-8 py-16 md:px-16 md:py-24">
             <h2 className="text-3xl font-normal leading-tight text-gc-ink md:text-[40px]">
-              <span className="text-gc-blue-deep">Let's start trading</span> your Gold, today
+              <span className="text-gc-blue-deep">Let's start trading</span> your Fiber, today
             </h2>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link

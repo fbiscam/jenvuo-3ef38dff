@@ -21,25 +21,13 @@ export type TerminalAccess = {
 };
 
 /**
- * Terminal rule: admins, approved Founding members and any active paid plan
- * (Starter 14 days, Pro 30 days, Elite 30 days, or the free trial) unlock it.
- * Credit alone never does.
+ * Terminal rule: the Terminal is reserved for approved Founding members
+ * (free of cost) and admins. Paid plans, the Pro trial and credit never
+ * unlock it; they cover JX Bot licenses and Top AI Models instead.
  * `founding` is the evaluated Founding row, or null when there is none.
  */
-export type PlanRow = { planId: string | null; status: string | null; periodEnd: string | null };
-
-/** Paid plans (Starter/Pro/Elite, including the free trial) unlock the Terminal until their period ends. */
-export function planUnlocksTerminal(plan: PlanRow | null, now = Date.now()): boolean {
-  if (!plan?.planId || plan.planId === "free") return false;
-  if (plan.status && !["active", "trialing"].includes(plan.status)) return false;
-  const end = Date.parse(plan.periodEnd || "");
-  return Number.isFinite(end) && end > now;
-}
-
-export function evaluateTerminalAccess(founding: TerminalAccess | null, plan: PlanRow | null = null, now = Date.now()): TerminalAccess {
-  if (founding?.allowed) return founding;
-  if (planUnlocksTerminal(plan, now)) return { allowed: true, reason: "paid", idDeadline: null, idSubmitted: false };
-  if (founding && founding.reason === "id_overdue") return founding;
+export function evaluateTerminalAccess(founding: TerminalAccess | null): TerminalAccess {
+  if (founding && (founding.allowed || founding.reason === "id_overdue")) return founding;
   return { allowed: false, reason: "not_founding", idDeadline: null, idSubmitted: false, trialEndsAt: null };
 }
 
@@ -60,7 +48,7 @@ export function evaluateFoundingRow(row: Row, now = Date.now()): TerminalAccess 
   return { allowed: true, reason: "founding", idDeadline: iso, idSubmitted: false };
 }
 
-/** Terminal access: admins, approved Founding members (2-day ID rule) or an active paid plan. */
+/** Terminal access: admins and approved Founding members only (2-day ID rule). */
 export async function checkTerminalAccess(
   supabase: SupabaseClient<any>,
   userId: string,
@@ -92,11 +80,5 @@ export async function checkTerminalAccess(
       .limit(1);
     row = byEmail.data?.[0];
   }
-  const { data: sub } = await (supabaseAdmin as any)
-    .from("user_subscriptions")
-    .select("plan_id, status, current_period_end")
-    .eq("user_id", userId)
-    .maybeSingle();
-  const plan = sub ? { planId: sub.plan_id, status: sub.status, periodEnd: sub.current_period_end } : null;
-  return evaluateTerminalAccess(row ? evaluateFoundingRow(row) : null, plan);
+  return evaluateTerminalAccess(row ? evaluateFoundingRow(row) : null);
 }

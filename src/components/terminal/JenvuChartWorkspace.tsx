@@ -24,7 +24,7 @@ import {
   Layers,
   Magnet,
   Maximize2,
-
+  PenLine,
   Minimize2,
   Minus,
   MousePointer2,
@@ -75,19 +75,6 @@ const SD_HISTORY_TIMEFRAMES = new Set(["15m", "30m", "45m", "1h", "2h", "4h", "1
 /** Swing price action, fresh swing sweep and liquidity sweeps: 1H, 2H, 4H and 1D only (lower timeframes are too noisy). */
 const SWING_SWEEP_TIMEFRAMES = new Set(["1h", "2h", "4h", "1d"]);
 const LOCKED_TOGGLE_KEYS = new Set<string>(LOCKED_STRATEGY_KEYS);
-
-/** TradingView bottom-bar date ranges; each picks a chart timeframe via PERIOD_TIMEFRAME. */
-const BOTTOM_RANGES = [
-  { key: "1d", label: "1D", title: "1 day" },
-  { key: "5d", label: "5D", title: "5 days" },
-  { key: "1m", label: "1M", title: "1 month" },
-  { key: "3m", label: "3M", title: "3 months" },
-  { key: "6m", label: "6M", title: "6 months" },
-  { key: "ytd", label: "YTD", title: "year to date" },
-  { key: "1y", label: "1Y", title: "1 year" },
-  { key: "5y", label: "5Y", title: "5 years" },
-  { key: "all", label: "All", title: "all history" },
-] as const;
 
 const MemoChart = memo(ChartCanvas);
 
@@ -147,8 +134,8 @@ type Props = {
   onTimeframeChange: (tf: TimeframeOption) => void;
   rightSlot?: ReactNode;
   mobileNewsRow?: ReactNode;
-  asset?: "XAUUSD" | "BTCUSD";
-  onAssetChange?: (asset: "XAUUSD" | "BTCUSD") => void;
+  asset?: "EURUSD" | "BTCUSD";
+  onAssetChange?: (asset: "EURUSD" | "BTCUSD") => void;
   theme?: "light" | "dark";
   /** Extra buttons placed at the bottom of the left side bar (e.g. Ask With AI). */
   railSlot?: ReactNode;
@@ -235,7 +222,7 @@ function ToolButton({
 }
 
 export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function JenvuChartWorkspace(
-  { timeframes, timeframe, onTimeframeChange, rightSlot, mobileNewsRow, asset = "XAUUSD", onAssetChange, theme = "light", railSlot, sidePanelOpen = false, rightPanelOpen = sidePanelOpen, onSidePanelOpenChange },
+  { timeframes, timeframe, onTimeframeChange, rightSlot, mobileNewsRow, asset = "EURUSD", onAssetChange, theme = "light", railSlot, sidePanelOpen = false, rightPanelOpen = sidePanelOpen, onSidePanelOpenChange },
   ref,
 ) {
   const fetchChart = useServerFn(getTerminalChart);
@@ -285,7 +272,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
   // Demo trading: order ticket, positions on the chart and the paper panel. Opened from the side panel.
   const demoTradingEnabled = true;
   // On-chart quick BUY/SELL buttons stay off; trading starts from the side panel.
-  const chartQuickButtons = true as boolean;
+  const chartQuickButtons = false as boolean;
 
   useEffect(() => {
     const syncFullscreen = () => setFullscreen(document.fullscreenElement === workspaceRef.current);
@@ -360,7 +347,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
 
   // Gold is closed Fri 21:00 → Sun 22:00 UTC. The candles already printed stay
   // on the chart, but nothing moves: no history polling and no live price.
-  const goldClosed = asset === "XAUUSD" && isMarketClosed(new Date());
+  const goldClosed = asset === "EURUSD" && isMarketClosed(new Date());
   const chartQuery = useQuery({
     queryKey: ["terminal-chart", "trusted-gold-v2", asset, timeframe.key],
     // The authenticated route already guarantees a session. The server-function
@@ -373,7 +360,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
     // Only reuse the previous payload for the SAME pair and timeframe; showing
     // another timeframe's candles while switching made the chart look broken.
     placeholderData: (prev) =>
-      prev && prev.timeframe === timeframe.key && (prev.asset === asset || (!prev.asset && asset === "XAUUSD")) ? prev : undefined,
+      prev && prev.timeframe === timeframe.key && (prev.asset === asset || (!prev.asset && asset === "EURUSD")) ? prev : undefined,
     refetchIntervalInBackground: false,
     staleTime: 1000,
     retry: 4,
@@ -381,8 +368,8 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
   });
 
   const payload = chartQuery.data;
-  const pairLabel = asset === "BTCUSD" ? "BTC/USD" : "XAU/USD";
-  const showSmcPressure = smcToggles.pressure && PRESSURE_TIMEFRAMES.has(timeframe.key) && (asset === "XAUUSD" || asset === "BTCUSD");
+  const pairLabel = asset === "BTCUSD" ? "BTC/USD" : "EUR/USD";
+  const showSmcPressure = smcToggles.pressure && PRESSURE_TIMEFRAMES.has(timeframe.key) && (asset === "EURUSD" || asset === "BTCUSD");
   // One "Zone + FVG strategy" switch drives zones, their FVGs and Entry/SL/TP
   // together (15m/30m only); the saved switch stays as the user set it.
   // Plan strategies (Fresh sweep, Swing price action, Zone + FVG) stay locked
@@ -405,14 +392,14 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
     // Gold feed trades 24/7, but real gold is shut Fri 21:00 → Sun 22:00 UTC.
     // Drop candles that open inside that window so the chart matches TradingView.
     const fed = payload?.bars ?? [];
-    const next = asset === "XAUUSD" ? fed.filter((b) => !isMarketClosed(new Date(Number(b.time) * 1000))) : fed;
+    const next = asset === "EURUSD" ? fed.filter((b) => !isMarketClosed(new Date(Number(b.time) * 1000))) : fed;
     if (next.length) {
       lastGoodBarsRef.current = { key, bars: next };
       return next;
     }
     return lastGoodBarsRef.current?.key === key ? lastGoodBarsRef.current.bars : next;
   }, [payload, asset, timeframe.key]);
-  // Never draw EURUSDT ticks into interbank XAU/USD candles: that creates
+  // Never draw EURUSDT ticks into interbank EUR/USD candles: that creates
   // artificial jumps/wicks. Forex candles update with their own 15s payload.
   const streamMatchesHistory = liveStreamMatchesHistory(asset, payload?.provider);
   const livePrice = useLivePriceStream(goldClosed || !streamMatchesHistory ? undefined : asset, rawBars.at(-1)?.close ?? null, undefined, { intervalMs: 3000 });
@@ -420,7 +407,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
   const bars = useMemo(() => {
     if (goldClosed || !streamMatchesHistory) return rawBars;
     const liveBucket =
-      asset === "XAUUSD"
+      asset === "EURUSD"
         ? Math.floor(sessionBucketMs(Date.now(), stepSeconds * 1000) / 1000)
         : Math.floor(Date.now() / (stepSeconds * 1000)) * stepSeconds;
     return buildLiveBars(rawBars, livePrice, liveBucket);
@@ -493,24 +480,24 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
       const s = stateRef.current;
       return buildChartContext({
         timeframeLabel: s.timeframe.label,
-        pairLabel: s.payload?.asset === "BTCUSD" ? "BTC/USD" : "XAU/USD",
+        pairLabel: s.payload?.asset === "BTCUSD" ? "BTC/USD" : "EUR/USD",
         bars: s.bars,
         stepSeconds: s.stepSeconds,
         source:
-          s.payload?.asset === "XAUUSD"
-            ? `XAU/USD ${s.payload?.provider === "Binance" ? "Binance proxy" : "forex"} candles`
+          s.payload?.asset === "EURUSD"
+            ? `EUR/USD ${s.payload?.provider === "Binance" ? "Binance EURUSDT proxy" : "forex"} candles`
             : s.payload?.source === "binance"
             ? "Binance BTC/USDT live candles"
             : s.payload?.source === "spot"
             ? `spot ${pairLabel}`
-            : `PAXG candles (${s.payload?.provider ?? "exchange"}) scaled to live XAU/USD spot`,
+            : `PAXG candles (${s.payload?.provider ?? "exchange"}) scaled to live EUR/USD spot`,
         indicators: s.indicators,
         smc: s.smc,
         smcToggles: s.smcToggles,
         // Use the selected chart state, just like the visible overlay. The Gold
         // payload historically omitted its asset echo, which made the chart
         // show pressure while telling the AI that pressure was unavailable.
-        includePressure: smcToggles.pressure && PRESSURE_TIMEFRAMES.has(s.timeframe.key) && (asset === "XAUUSD" || asset === "BTCUSD"),
+        includePressure: smcToggles.pressure && PRESSURE_TIMEFRAMES.has(s.timeframe.key) && (asset === "EURUSD" || asset === "BTCUSD"),
         drawings: s.drawings,
         drawingsVisible: s.drawingsVisible,
         selectedId: s.selectedId,
@@ -723,11 +710,6 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
 
   const rail = (
     <nav aria-label="Chart tools" className="flex min-w-0 flex-1 items-center gap-0.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-      <span className="mr-1 inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full pl-1 pr-2.5 text-[13px] font-semibold text-gc-ink dark:text-foreground" title="Gold Spot / U.S. Dollar">
-        <XauUsdLogo size={20} />
-        XAUUSD
-      </span>
-      <span className="mx-0.5 h-5 w-px shrink-0 bg-gc-line" aria-hidden="true" />
       <Popover>
         <PopoverTrigger asChild>
           <button type="button" aria-label="Timeframe" title="Timeframe" className={cn(railBtn, "text-gc-ink")}>
@@ -796,6 +778,19 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
           {smcMenu}
         </PopoverContent>
       </Popover>
+      <Popover>
+        <PopoverTrigger asChild>
+          <button type="button" aria-label="Drawing tools" title="Drawing tools" className={railBtn}>
+            <PenLine className="h-4 w-4" />
+            <span className="hidden xl:inline">Draw</span>
+            {tool !== "cursor" && <span className="absolute right-1.5 top-1 h-1.5 w-1.5 rounded-full bg-gc-blue" aria-hidden="true" />}
+          </button>
+        </PopoverTrigger>
+        <PopoverContent side="bottom" align="start" className={cn("w-[236px] p-2", popClass)}>
+          <p className="px-1 pb-1.5 text-sm text-foreground">Drawing tools</p>
+          <div className="flex flex-wrap items-center gap-0.5" role="toolbar" aria-label="Drawing tools">{renderTools(false)}</div>
+        </PopoverContent>
+      </Popover>
       <span className="mx-1 h-5 w-px shrink-0 bg-gc-line" aria-hidden="true" />
       <button type="button" onClick={downloadSnapshot} aria-label="Download chart snapshot" title="Download chart snapshot" className={railBtn}>
         <Camera className="h-4 w-4" />
@@ -830,7 +825,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
           "flex min-h-0 min-w-0 flex-1 flex-col bg-background",
           sidePanelOpen
             ? "lg:h-full lg:overflow-hidden lg:rounded-none lg:bg-card"
-            : theme !== "dark" && "overflow-hidden md:max-lg:mb-2 md:max-lg:rounded-2xl md:max-lg:border md:max-lg:border-gc-line",
+            : theme !== "dark" && "overflow-hidden md:mb-2 md:rounded-2xl md:border md:border-gc-line",
         )}
       >
       {/* Top bar — phones only: on laptops and tablets every control lives in the side bar. */}
@@ -984,11 +979,11 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
       )}
 
       <div className="flex min-h-0 flex-1">
-        {/* Drawing toolbar: always on the left on desktop (TradingView style), toggled on phones */}
+        {/* Drawing toolbar */}
         <nav
           aria-label="Drawing tools"
           className={cn(
-            "w-11 shrink-0 flex-col items-center gap-0.5 overflow-y-auto border-r border-border py-1.5 md:flex",
+            "w-11 shrink-0 flex-col items-center gap-0.5 overflow-y-auto border-r border-border py-1.5 md:hidden",
             mobileToolsOpen ? "flex" : "hidden",
           )}
         >
@@ -1046,16 +1041,16 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
                 {hovered && (
                   <>
                     <span>
-                      O <b className={hovered.close >= hovered.open ? "text-[#089981]" : "text-[#f23645]"}>{hovered.open.toFixed(2)}</b>
+                      O <b className={hovered.close >= hovered.open ? "text-[#089981]" : "text-[#f23645]"}>{hovered.open.toFixed(5)}</b>
                     </span>
                     <span>
-                      H <b className={hovered.close >= hovered.open ? "text-[#089981]" : "text-[#f23645]"}>{hovered.high.toFixed(2)}</b>
+                      H <b className={hovered.close >= hovered.open ? "text-[#089981]" : "text-[#f23645]"}>{hovered.high.toFixed(5)}</b>
                     </span>
                     <span>
-                      L <b className={hovered.close >= hovered.open ? "text-[#089981]" : "text-[#f23645]"}>{hovered.low.toFixed(2)}</b>
+                      L <b className={hovered.close >= hovered.open ? "text-[#089981]" : "text-[#f23645]"}>{hovered.low.toFixed(5)}</b>
                     </span>
                     <span>
-                      C <b className={hovered.close >= hovered.open ? "text-[#089981]" : "text-[#f23645]"}>{hovered.close.toFixed(2)}</b>
+                      C <b className={hovered.close >= hovered.open ? "text-[#089981]" : "text-[#f23645]"}>{hovered.close.toFixed(5)}</b>
                     </span>
                     {change != null && (
                       <span className={change >= 0 ? "text-[#089981]" : "text-[#f23645]"}>
@@ -1067,7 +1062,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
                 )}
               </div>
               {demoTradingEnabled && chartQuickButtons && (
-                <div className="mb-1.5 hidden md:block">
+                <div className="mb-1.5">
                   <QuickTradeButtons price={currentPrice} onPick={setTicketSide} />
                 </div>
               )}
@@ -1164,50 +1159,6 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
             )}
           </div>
 
-          {/* TradingView-style bottom bar: date ranges, paper trading, UTC clock */}
-          <div className="hidden h-9 shrink-0 items-center gap-0.5 border-t border-border px-2 text-[12px] md:flex" role="group" aria-label="Date range">
-            {BOTTOM_RANGES.map((range) => {
-              const tfKey = PERIOD_TIMEFRAME[range.key];
-              return (
-                <button
-                  type="button"
-                  key={range.key}
-                  title={`Show ${range.title}`}
-                  onClick={() => {
-                    const next = timeframes.find((t) => t.key === tfKey);
-                    if (next && next.key !== timeframe.key) onTimeframeChange(next);
-                    else chartRef.current?.fit();
-                  }}
-                  className="h-6 rounded px-2 font-medium tabular-nums text-muted-foreground hover:bg-accent hover:text-foreground"
-                >
-                  {range.label}
-                </button>
-              );
-            })}
-            {demoTradingEnabled && (
-              <>
-                <span className="mx-1.5 h-4 w-px bg-border" aria-hidden="true" />
-                <button
-                  type="button"
-                  onClick={() => setPaperOpen((v) => !v)}
-                  aria-pressed={paperOpen}
-                  className={cn(
-                    "inline-flex h-6 items-center gap-1 rounded px-2 font-medium text-muted-foreground hover:bg-accent hover:text-foreground",
-                    paperOpen && "bg-accent text-foreground",
-                  )}
-                >
-                  Paper Trading
-                  {demoPositions.length > 0 && (
-                    <span className="rounded bg-secondary px-1 font-mono text-[10px] text-foreground">{demoPositions.length}</span>
-                  )}
-                  <ChevronDown className={cn("h-3.5 w-3.5 transition-transform", paperOpen && "rotate-180")} />
-                </button>
-              </>
-            )}
-            <UtcClock />
-          </div>
-
-
           {demoTradingEnabled && paperOpen && <PaperTradingPanel trading={demo} price={currentPrice} onClose={() => setPaperOpen(false)} />}
 
           {scriptPanelOpen && (
@@ -1236,18 +1187,3 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
     </div>
   );
 });
-
-/** Live UTC clock for the bottom bar, rendered after hydration only. */
-function UtcClock() {
-  const [now, setNow] = useState<Date | null>(null);
-  useEffect(() => {
-    setNow(new Date());
-    const id = window.setInterval(() => setNow(new Date()), 1000);
-    return () => window.clearInterval(id);
-  }, []);
-  return (
-    <span className="ml-auto font-medium tabular-nums text-muted-foreground" aria-label="Current UTC time">
-      {now ? now.toISOString().slice(11, 19) : "--:--:--"} UTC
-    </span>
-  );
-}

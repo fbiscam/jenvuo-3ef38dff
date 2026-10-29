@@ -145,20 +145,20 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "google-adsense-account", content: "ca-pub-9179643691974639" },
       { name: "google-adsense-account", content: "ca-pub-8708842688547386" },
       { name: "google-adsense-account", content: "ca-pub-6031688799547633" },
-      { title: "Jenvu — AI Gold Trading" },
+      { title: "Jenvu — AI Fiber Trading" },
       {
         name: "description",
         content:
-          "AI-powered TradingView extension for Gold with live ICT/SMC analysis, chart context, A+ setups and reviewed trade signals.",
+          "AI-powered TradingView extension for Fiber with live ICT/SMC analysis, chart context, A+ setups and reviewed trade signals.",
       },
       { name: "author", content: "Jenvu AI" },
       { name: "theme-color", content: "#000000" },
       { property: "og:site_name", content: "Jenvu AI" },
-      { property: "og:title", content: "Jenvu AI — Institutional Gold Trading Desk" },
+      { property: "og:title", content: "Jenvu AI — Institutional Fiber Trading Desk" },
       {
         property: "og:description",
         content:
-          "Analyze Gold charts directly in TradingView with institutional ICT/SMC logic, reviewed signals and clear risk context.",
+          "Analyze Fiber charts directly in TradingView with institutional ICT/SMC logic, reviewed signals and clear risk context.",
       },
       { property: "og:type", content: "website" },
       { property: "og:locale", content: "en_US" },
@@ -168,11 +168,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/afb81f86-c6e3-4892-b81f-eb551ed99e17/id-preview-cf5425ce--06cd4260-299b-4286-8096-c43f2f596dee.lovable.app-1782731006346.png",
       },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "Jenvu AI — Institutional Gold Trading Desk" },
+      { name: "twitter:title", content: "Jenvu AI — Institutional Fiber Trading Desk" },
       {
         name: "twitter:description",
         content:
-          "AI TradingView extension for Gold with ICT/SMC analysis and reviewed trade signals.",
+          "AI TradingView extension for Fiber with ICT/SMC analysis and reviewed trade signals.",
       },
       {
         name: "twitter:image",

@@ -6,9 +6,9 @@ import solLiquidity from "@/assets/industry/sol-liquidity.jpg";
 import solSessions from "@/assets/industry/sol-sessions.jpg";
 
 const URL = "https://jenvu.com/strategies/ict-gold-trading";
-const TITLE = "Solutions for Gold Traders — ICT & SMC on Gold | Jenvu";
+const TITLE = "Solutions for Fiber Traders — ICT & SMC on Fiber | Jenvu";
 const DESC =
-  "Jenvu solutions for Gold traders: ICT and Smart Money Concepts on Gold with rule-based structure, liquidity sweeps, fair value gaps, zones and sessions.";
+  "Jenvu solutions for Fiber traders: ICT and Smart Money Concepts on Fiber with rule-based structure, liquidity sweeps, fair value gaps, zones and sessions.";
 
 export const Route = createFileRoute("/strategies/ict-gold-trading")({
   head: () => ({
@@ -31,12 +31,12 @@ export const Route = createFileRoute("/strategies/ict-gold-trading")({
 const CONTENT: IndustryContent = {
   variant: "solutions",
   heroImg: solHero,
-  pill: "Solutions for Gold traders",
-  title: "Trade Gold with clear, rule-based structure",
+  pill: "Solutions for Fiber traders",
+  title: "Trade Fiber with clear, rule-based structure",
   intro:
-    "Jenvu marks ICT and Smart Money Concepts on live Gold candles with fixed rules, so the same chart always shows the same levels.",
+    "Jenvu marks ICT and Smart Money Concepts on live Fiber candles with fixed rules, so the same chart always shows the same levels.",
   heroCaption: "Structure, liquidity and zones drawn the same way every time.",
-  solutionsTitle: "Solutions for every Gold trader",
+  solutionsTitle: "Solutions for every Fiber trader",
   solutionsIntro: "Pick the part of your process you want help with.",
   solutions: [
     {
@@ -107,23 +107,24 @@ const CONTENT: IndustryContent = {
   whyTitle: "Why traders choose Jenvu",
   why: [
     { title: "Same candles, same marks", text: "Every level comes from fixed rules, so you can trust what you see and test it again later." },
-    { title: "Built only for Gold", text: "Sessions, volatility and weekend closure are tuned for Gold instead of a generic market." },
+    { title: "Built only for Fiber", text: "Sessions, volatility and weekend closure are tuned for Fiber instead of a generic market." },
     { title: "AI that explains, not invents", text: "The AI reads the marks the rules draw and explains them in plain language. It does not create levels." },
-    { title: "Trade with clear limits", text: "Set your stop behind the swing before you enter and size every trade to your account." },
+    { title: "Automate with clear limits", text: "JX Bot runs on your MT5 account and pauses for the day once your daily target is reached." },
   ],
   whyCardTitle: "Rules first, AI second.",
-  whyCardText: "Jenvu does not promise profits or fixed win rates. Trading Gold carries real risk.",
-  storiesTitle: "Stories from the Gold desk",
-  storySlugs: ["fresh-sweep-detection", "london-new-york-sessions", "daily-gold-insights"],
+  whyCardText: "Jenvu does not promise profits or fixed win rates. Trading Fiber carries real risk.",
+  storiesTitle: "Stories from the Fiber desk",
+  storySlugs: ["fresh-sweep-detection", "london-new-york-sessions", "jx-bot"],
   productsTitle: "Products that power these solutions",
   products: [
-    { title: "Jenvu Terminal", text: "Live Gold candles with ICT/SMC overlays and AI chat.", href: "https://dash.jenvu.com/terminal" },
+    { title: "Jenvu Terminal", text: "Live Fiber candles with ICT/SMC overlays and AI chat.", href: "https://dash.jenvu.com/terminal" },
     { title: "AI engine", text: "Ask about the chart and get short, on-topic answers.", href: "/ai-engine" },
+    { title: "JX Bot for MT5", text: "Jenvu's Expert Advisor for Fiber on MetaTrader 5.", href: "/stories/jx-bot" },
     { title: "Price alerts", text: "Get told when gold reaches the level you care about.", href: "https://jenvu.com/docs" },
-    { title: "Daily Gold insights", text: "A short daily read on what moved gold and why.", href: "/stories/daily-gold-insights" },
+    { title: "Daily Fiber insights", text: "A short daily read on what moved gold and why.", href: "/stories/daily-gold-insights" },
     { title: "Developer API", text: "Use Jenvu analysis in your own tools with API keys.", href: "/stories/build-with-jenvu" },
     { title: "Volume and RVOL", text: "Spot volume spikes and buyer/seller share per candle.", href: "/stories/rvol-and-volume-direction" },
-    { title: "Founding Program", text: "Invite-only early access for committed Gold traders.", href: "https://jenvu.com/founding" },
+    { title: "Founding Program", text: "Invite-only early access for committed Fiber traders.", href: "https://jenvu.com/founding" },
     { title: "Help and support", text: "Guides and answers for every part of Jenvu.", href: "https://support.jenvu.com" },
   ],
 };

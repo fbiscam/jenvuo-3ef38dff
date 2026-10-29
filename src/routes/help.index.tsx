@@ -12,7 +12,7 @@ export const Route = createFileRoute("/help/")({
     meta: [
       { title: "Help Center — Guides, FAQs & Support | Jenvu AI" },
       { name: "description", content: "Jenvu AI Help Center — guides and troubleshooting for the built-in trading terminal, ICT/SMC signal engine, billing and account security." },
-      { name: "keywords", content: "Jenvu help, Jenvu terminal support, ICT SMC signals help, Gold trading AI FAQ, Jenvu billing" },
+      { name: "keywords", content: "Jenvu help, Jenvu terminal support, ICT SMC signals help, Fiber trading AI FAQ, Jenvu billing" },
       { property: "og:title", content: "Help Center — Jenvu AI" },
       { property: "og:description", content: "Guides, FAQs and troubleshooting for Jenvu's built-in trading terminal, signal engine and billing." },
       { property: "og:url", content: "https://support.jenvu.com/" },
@@ -61,7 +61,8 @@ function HelpCenterPage() {
   const faqs = [
     { q: "How do I cancel my Jenvu subscription?", a: "Open Dashboard → Billing and choose Cancel plan. You keep access until the end of the period you already paid for. See the Cancellation policy for details." },
     { q: "How do I start the free trial?", a: "After signing up, click “Start free” in the banner at the top of your dashboard. It adds $100 credit and 14 days of Pro, once per account." },
-    { q: "Who can use the Terminal?", a: "Any active plan (Starter $19 / 14 days, Pro $49 / 30 days, Elite $89 / 30 days), the free trial, or an approved Founding membership opens the Terminal. Credit alone does not unlock it; it pays for API and AI use." },
+    { q: "Who can use the Terminal?", a: "The Terminal is reserved for approved Founding Program members, free of cost. Pro, Elite and Ultra plans cover JX Bot for MT5 and the Top AI Models; credit pays for API and AI use, and all other pages stay open." },
+    { q: "How do I get JX Bot?", a: "Choose Pro, Elite or Ultra, then open Dashboard → JX Bot to download it, create a license for your MT5 account and follow the install steps." },
     { q: "How do I contact Jenvu support?", a: "Email support@jenvu.com or use the Contact page. We reply within one business day, Monday to Friday." },
   ];
   const [open, setOpen] = React.useState<number[]>([]);

@@ -7,9 +7,7 @@ import {
   Camera,
   History,
   ImagePlus,
-  LayoutGrid,
   ListChecks,
-  Sparkles,
   Mic,
   Moon,
   Newspaper,
@@ -68,16 +66,16 @@ import askJenvuMark from "@/assets/ask-jenvu-mark.png";
 export const Route = createFileRoute("/_authenticated/dashboard/terminal")({
   head: () => ({
     meta: [
-      { title: "Jenvu Terminal — Live XAU/USD Chart & AI Desk" },
+      { title: "Jenvu Terminal — Live EUR/USD Chart & AI Desk" },
       {
         name: "description",
         content:
-          "Full-screen XAU/USD charting terminal with drawing tools, multiple timeframes and a built-in AI desk that reads the chart with you.",
+          "Full-screen EUR/USD charting terminal with drawing tools, multiple timeframes and a built-in AI desk that reads the chart with you.",
       },
-      { property: "og:title", content: "Jenvu Terminal — Live XAU/USD Chart & AI Desk" },
+      { property: "og:title", content: "Jenvu Terminal — Live EUR/USD Chart & AI Desk" },
       {
         property: "og:description",
-        content: "Chart XAU/USD like a pro and ask the Jenvu AI desk about the setup in one screen.",
+        content: "Chart EUR/USD like a pro and ask the Jenvu AI desk about the setup in one screen.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -218,7 +216,7 @@ function pendingLabel(query: string, hasImage: boolean): string {
     /\b(eur|eurusd|euro|gold|xau|chart|trade|trading|setup|signal|entry|buy|sell|long|short|analysis|analyze|bias|price|trend|level|zone|liquidity|fvg|order\s*block|bos|choch|smc|ict|killzone|scalp|swing)\b/i.test(
       query,
     );
-  return tradingQuery ? "Reviewing XAU/USD structure…" : "Preparing your answer…";
+  return tradingQuery ? "Reviewing EUR/USD structure…" : "Preparing your answer…";
 }
 
 function ComposerAttachments() {
@@ -289,7 +287,7 @@ async function blobToDataUrl(blob: Blob): Promise<string> {
 
 function TerminalPage() {
   const [tf, setTf] = useState(TIMEFRAMES[3]);
-  const [asset, setAsset] = useState<"XAUUSD" | "BTCUSD">("XAUUSD");
+  const [asset, setAsset] = useState<"EURUSD" | "BTCUSD">("EURUSD");
   // Daily terminal access fee ($0.30 per UTC day, charged once server-side).
   useEffect(() => {
     void import("@/integrations/supabase/client").then(({ supabase }) =>
@@ -301,13 +299,13 @@ function TerminalPage() {
   useEffect(() => {
     try {
       window.localStorage.removeItem("jenvu-terminal-asset");
-      setAsset("XAUUSD");
+      setAsset("EURUSD");
     } catch {
       /* storage unavailable */
     }
   }, []);
-  const changeAsset = (_next: "XAUUSD" | "BTCUSD") => {
-    const next = "XAUUSD" as const;
+  const changeAsset = (_next: "EURUSD" | "BTCUSD") => {
+    const next = "EURUSD" as const;
     setAsset(next);
     try {
       window.localStorage.setItem("jenvu-terminal-asset", next);
@@ -325,11 +323,11 @@ function TerminalPage() {
   // Only an explicit pick (side-rail switch or Settings) turns the Terminal dark.
   const pickedLookRef = useRef<"light" | "dark" | null>(null);
   const [watchlistOpen, setWatchlistOpen] = useState(true);
-  // Symbol overview page (big header, tabs, market cards) — off by default so the
-  // chart fills the screen like TradingView; opened from the right dock.
-  const [panelsOpen, setPanelsOpen] = useState(false);
-  // TradingView-style right panel: the watchlist shows whenever the AI desk is closed.
-  const showWatchlist = watchlistOpen && !deskOpen;
+  // Trading layout (order panel, positions, market watch, technicals, risk) — on by default.
+  const [panelsOpen, setPanelsOpen] = useState(true);
+  // The watchlist fills the right side whenever the AI desk is closed.
+  // Watchlist removed at user request; chart uses the full width.
+  const showWatchlist = false as boolean;
   const chartRef = useRef<JenvuChartHandle | null>(null);
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<ChatMsg[]>([]);
@@ -586,7 +584,7 @@ function TerminalPage() {
     // Gold weekend (Fri 21:00 → Sun 22:00 UTC): the last candle has closed, so
     // the timer stops at 00:00 like TradingView instead of counting new candles.
     const tick = () => {
-      const closed = asset === "XAUUSD" && isMarketClosed(new Date());
+      const closed = asset === "EURUSD" && isMarketClosed(new Date());
       setMarketClosed(closed);
       setSecondsLeft(closed ? 0 : candleSecondsLeft(tf.tv));
     };
@@ -611,7 +609,7 @@ function TerminalPage() {
 
   async function send(message: { text: string; files?: FileUIPart[] }) {
     const image = message.files?.find((file) => file.mediaType?.startsWith("image/") && file.url);
-    const query = message.text.trim() || (image ? "Analyze this XAU/USD chart screenshot." : "");
+    const query = message.text.trim() || (image ? "Analyze this EUR/USD chart screenshot." : "");
     if (!query || sendLockedRef.current || ask.isPending) return;
     sendLockedRef.current = true;
     // The AI desk always reads the exact chart state (drawings, indicators,
@@ -705,7 +703,7 @@ function TerminalPage() {
         <div className={cn("flex min-h-0 flex-1 flex-col lg:flex-row", theme !== "dark" && "gap-2 px-2 pt-2")}>
           {/* Chart */}
           <section
-            aria-label="XAU/USD chart"
+            aria-label="EUR/USD chart"
             className={cn(
               "relative min-h-0 min-w-0 flex-1",
               theme === "dark" && "bg-background",
@@ -744,7 +742,7 @@ function TerminalPage() {
                   </button>
                   <div
                     className="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full bg-gc-console-search px-2.5 text-[12px] font-semibold tabular-nums text-gc-ink dark:bg-accent dark:text-foreground"
-                    title={marketClosed ? "XAU/USD market is closed for the weekend" : `Time left on the current ${tf.label} candle`}
+                    title={marketClosed ? "EUR/USD market is closed for the weekend" : `Time left on the current ${tf.label} candle`}
                     aria-label={marketClosed ? "Market closed" : `Current ${tf.label} candle closes in ${formatCountdown(secondsLeft)}`}
                   >
                     <Timer className="h-4 w-4 text-muted-foreground" />
@@ -757,7 +755,7 @@ function TerminalPage() {
                 <>
                   <div
                     className="flex h-7 md:hidden items-center gap-1.5 rounded-full bg-muted px-2.5 font-mono text-xs font-semibold text-foreground"
-                    title={marketClosed ? "XAU/USD market is closed for the weekend" : `Time left on the current ${tf.label} candle`}
+                    title={marketClosed ? "EUR/USD market is closed for the weekend" : `Time left on the current ${tf.label} candle`}
                     aria-label={marketClosed ? "Market closed" : `Current ${tf.label} candle closes in ${formatCountdown(secondsLeft)}`}
                   >
                     <Timer className="h-3.5 w-3.5 text-muted-foreground" />
@@ -806,7 +804,7 @@ function TerminalPage() {
                 "relative flex h-[45%] min-h-0 w-full shrink-0 flex-col bg-card text-card-foreground lg:h-full lg:w-[380px]",
                 theme === "dark"
                   ? "border-t border-border lg:border-l lg:border-t-0"
-                  : "overflow-hidden rounded-2xl border border-gc-line shadow-sm lg:rounded-none lg:border-y-0 lg:border-r-0 lg:border-l-border lg:shadow-none",
+                  : "overflow-hidden rounded-2xl border border-gc-line shadow-sm",
               )}
             >
               <div className="flex min-h-17 items-center justify-end gap-2.5 border-b border-border px-4 py-3">
@@ -918,7 +916,7 @@ function TerminalPage() {
                           className="mt-0.5 h-6 w-6 shrink-0 rounded-md object-contain"
                         />
                         <p>
-                          Ask about the chart you are looking at. I use live XAU/USD data for the
+                          Ask about the chart you are looking at. I use live EUR/USD data for the
                           selected timeframe.
                         </p>
                       </div>
@@ -1092,59 +1090,6 @@ function TerminalPage() {
               </div>
             </aside>
           )}
-
-          {/* TradingView-style right icon dock (desktop) */}
-          <nav
-            aria-label="Terminal panels"
-            className="hidden w-12 shrink-0 flex-col items-center gap-1 border-l border-border bg-background py-2 lg:flex"
-          >
-            {(
-              [
-                {
-                  key: "watchlist",
-                  label: "Watchlist",
-                  Icon: ListChecks,
-                  active: showWatchlist,
-                  onClick: () => {
-                    if (showWatchlist) setWatchlistOpen(false);
-                    else {
-                      setDeskOpen(false);
-                      setWatchlistOpen(true);
-                    }
-                  },
-                },
-                {
-                  key: "ai",
-                  label: "Ask Jenvu AI",
-                  Icon: Sparkles,
-                  active: deskOpen,
-                  onClick: () => setDeskOpen((open) => !open),
-                },
-                {
-                  key: "overview",
-                  label: "Symbol overview",
-                  Icon: LayoutGrid,
-                  active: panelsOpen,
-                  onClick: () => setPanelsOpen((open) => !open),
-                },
-              ] as const
-            ).map(({ key, label, Icon, active, onClick }) => (
-              <button
-                key={key}
-                type="button"
-                onClick={onClick}
-                aria-pressed={active}
-                aria-label={label}
-                title={label}
-                className={cn(
-                  "inline-flex h-10 w-10 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground",
-                  active && "bg-accent text-foreground",
-                )}
-              >
-                <Icon className="h-5 w-5" />
-              </button>
-            ))}
-          </nav>
         </div>
       </div>
     </TooltipProvider>

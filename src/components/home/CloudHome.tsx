@@ -74,7 +74,7 @@ export function CloudAnnouncement() {
     <div className="border-b border-gc-line bg-gc-blue-soft">
       <div className="mx-auto flex max-w-[1296px] flex-wrap items-center justify-center gap-x-2 gap-y-1 px-5 py-2.5 text-center text-[13px] text-gc-ink sm:text-sm">
         <span className="rounded bg-gc-blue px-1.5 py-0.5 text-[11px] font-medium text-gc-on-blue">New</span>
-        <span>The Gold Terminal now comes with every plan: Starter, Pro and Elite, no license needed.</span>
+        <span>JX Bot for MetaTrader 5 is here: automated Fiber trading with a daily auto-stop.</span>
         <Link to="/pricing" className="inline-flex items-center gap-1 font-medium text-gc-blue hover:underline">
           See plans <ArrowRight className="h-3.5 w-3.5" />
         </Link>
@@ -107,11 +107,11 @@ function HeroMockup({ price, delta }: { price: string; delta: string }) {
             <span className="h-2.5 w-2.5 rounded-full bg-gc-green" />
             <span className="ml-3 text-[13px] font-medium text-gc-ink">Jenvu Terminal</span>
           </div>
-          <span className="rounded-full bg-gc-blue-soft px-2.5 py-0.5 text-[11px] font-medium text-gc-blue">Gold · 2H</span>
+          <span className="rounded-full bg-gc-blue-soft px-2.5 py-0.5 text-[11px] font-medium text-gc-blue">Fiber · 2H</span>
         </div>
         <div className="grid grid-cols-[1fr_auto] gap-4 px-5 pt-4">
           <div>
-            <div className="text-[12px] text-gc-ink-muted">Gold spot</div>
+            <div className="text-[12px] text-gc-ink-muted">Fiber spot</div>
             <div className="mt-0.5 text-[28px] font-medium leading-none text-gc-ink">{price}</div>
           </div>
           <span className={`self-start rounded-full px-2.5 py-1 text-[12px] font-medium ${up ? "bg-gc-green-soft text-gc-green" : "bg-gc-red-soft text-gc-red"}`}>
@@ -190,7 +190,7 @@ export function CloudHero({ price: _price, delta: _delta }: { price: string; del
       <div className="mx-auto max-w-[1296px] px-5 pb-14 pt-12 text-center sm:px-8 md:pt-14">
         <img src="/favicon.png" alt="" width={64} height={64} className="jenvu-logo-intro mx-auto h-16 w-16 object-contain" />
         <h1 className="jenvu-rise mx-auto mt-7 max-w-[900px] text-[40px] font-medium leading-[1.1] tracking-[-0.5px] text-gc-ink sm:text-[56px] md:text-[60px]">
-          AI trading analysis for Gold
+          AI trading analysis for Fiber
         </h1>
         <p className="jenvu-rise [animation-delay:80ms] mx-auto mt-5 max-w-[820px] text-balance text-[13.5px] leading-[1.55] text-gc-ink-muted min-[400px]:text-[14.5px] sm:line-clamp-2 sm:text-[17px] sm:leading-[1.6]">
           Read the chart with AI. Spot sweeps, zones and FVGs live.{" "}
@@ -262,8 +262,8 @@ const AUDIENCES: Array<{ key: string; label: string; cards: AudienceCard[] }> = 
     label: "Traders",
     cards: [
       { tag: "NEW TRADERS", text: "New sign-ups get 14 days of free Pro access & $100 for the top AI Models for 30 days ", to: "/auth", img: tradeNeonStart },
-      { tag: "TERMINAL", text: "Open the Gold Terminal with any plan, from $19 for 14 days", to: "/pricing", img: tradeNeonPractice },
-      { tag: "LEARN", text: "Read daily Gold insights and guides on sweeps, zones and order blocks", to: "/insights", img: tradeNeonLearn },
+      { tag: "JX BOT", text: "Run JX Bot on MetaTrader 5 with a daily auto-stop at your plan's target", to: "/pricing", img: tradeNeonPractice },
+      { tag: "LEARN", text: "Read daily Fiber insights and guides on sweeps, zones and order blocks", to: "/insights", img: tradeNeonLearn },
     ],
   },
   {
@@ -281,7 +281,7 @@ const AUDIENCES: Array<{ key: string; label: string; cards: AudienceCard[] }> = 
     cards: [
       { tag: "FOUNDING PROGRAM", text: "Apply to the invite-only Founding Program for your chosen plan and $250 credit", to: "/founding", img: progFounding },
       { tag: "PLANS", text: "Choose Pro at $49, Elite at $99 or Ultra at $169, billed every month", to: "/pricing", img: progPlans },
-      { tag: "SUPPORT", text: "Questions about plans, billing or the Terminal? Ask our support team", to: "/contact", img: progSupport },
+      { tag: "SUPPORT", text: "Questions about plans, billing or JX Bot? Ask our support team", to: "/contact", img: progSupport },
     ],
   },
 ];
@@ -347,9 +347,9 @@ type BuildPart = string | { link: string; hash: string };
 const BUILD_ITEMS: Array<{ key: string; title: string; points: BuildPart[][] }> = [
   {
     key: "terminal",
-    title: "Gold Terminal and chart analysis",
+    title: "Fiber Terminal and chart analysis",
     points: [
-      ["Read live Gold candles with HH, HL, LH and LL labels on our ", { link: "non-repainting Gold Terminal", hash: "gold-terminal" }, ", plus BOS and CHoCH breaks that stay fixed once a candle closes"],
+      ["Read live Fiber candles with HH, HL, LH and LL labels on our ", { link: "non-repainting Fiber Terminal", hash: "gold-terminal" }, ", plus BOS and CHoCH breaks that stay fixed once a candle closes"],
       ["Spot supply and demand zones paired with ", { link: "fair value gaps", hash: "fair-value-gaps" }, ", drawn only when they score strong and kept until a clear invalidation"],
       ["Check fresh liquidity sweeps on 5M, 15M, 1H, 2H and 4H with ", { link: "fakeout filters", hash: "fakeout-filters" }, " that flag weak pokes and re-accepted levels"],
     ],
@@ -372,6 +372,14 @@ const BUILD_ITEMS: Array<{ key: string; title: string; points: BuildPart[][] }> 
     ],
   },
   {
+    key: "jx-bot",
+    title: "JX Bot for MetaTrader 5",
+    points: [
+      ["Automate Fiber on MT5 with ", { link: "JX Bot", hash: "jx-bot" }, ", licensed to your own account and installed in a few steps"],
+      ["The bot pauses for the day at your daily target and stops at your plan's monthly target"],
+    ],
+  },
+  {
     key: "developers",
     title: "API keys and browser extension",
     points: [
@@ -390,12 +398,12 @@ export function CloudBuildWith() {
       <div className="mx-auto grid max-w-[1296px] items-start gap-10 px-5 pb-20 pt-8 sm:px-8 md:grid-cols-2 md:gap-20 md:pb-24">
         <div className="md:sticky md:top-24">
           <h2 className="text-[22px] font-normal leading-[1.3] text-gc-ink min-[400px]:text-[24px] sm:text-[36px] sm:leading-[1.25]">
-            <span className="whitespace-nowrap">Build with the Gold platform</span>
+            <span className="whitespace-nowrap">Build with the Fiber platform</span>
             <br />
             <span className="whitespace-nowrap text-gc-blue-deep">designed for traders and AI</span>
           </h2>
           <p className="mt-4 max-w-[540px] text-[14px] leading-[1.55] text-gc-ink-muted sm:mt-5 sm:text-[16px] sm:leading-[1.6]">
-            Try Jenvu with the Gold Terminal and the top AI models, plus new sign-ups get $100 free credits and 14 days of Pro access free.
+            Try Jenvu with JX Bot on MetaTrader 5 and the top AI models, plus new sign-ups get $100 free credits and 14 days of Pro access free.
           </p>
           <div className="mt-7 flex flex-wrap items-center gap-7">
             <Link
@@ -455,12 +463,12 @@ export function CloudBuildWith() {
 
 /* ---------------- Product grid ---------------- */
 const PRODUCTS: Array<{ Icon: typeof Bot; tone: Tone; title: string; body: string; to: string }> = [
-  { Icon: LineChart, tone: "blue", title: "Gold Terminal", body: "Live Gold candles with HH/HL/LH/LL structure, BOS and CHoCH that never repaint.", to: "/pricing" },
+  { Icon: LineChart, tone: "blue", title: "Fiber Terminal", body: "Live Fiber candles with HH/HL/LH/LL structure, BOS and CHoCH that never repaint.", to: "/pricing" },
   { Icon: Bot, tone: "red", title: "AI Desk", body: "Ask about the chart in plain language and get a focused answer to exactly what you asked.", to: "/ai-engine" },
   { Icon: Waves, tone: "yellow", title: "Liquidity sweeps", body: "Fresh high/low sweep detection on 5M, 15M, 1H, 2H and 4H with fakeout filters.", to: "/help" },
   { Icon: Layers, tone: "green", title: "Zones + FVG", body: "Supply and demand zones paired with fair value gaps, drawn only when they score strong.", to: "/help" },
   { Icon: Chrome, tone: "blue", title: "Browser extension", body: "Bring Jenvu analysis into TradingView with a side panel that reads your chart.", to: "/download" },
-  { Icon: Bell, tone: "red", title: "Signals & alerts", body: "Reviewed Gold setups and alerts, with WAIT when the evidence isn't there.", to: "/pricing" },
+  { Icon: Bell, tone: "red", title: "Signals & alerts", body: "Reviewed Fiber setups and alerts, with WAIT when the evidence isn't there.", to: "/pricing" },
   { Icon: BarChart3, tone: "yellow", title: "Volume RVOL", body: "Relative volume spikes and buyer/seller share for every candle at a glance.", to: "/help" },
   { Icon: KeyRound, tone: "green", title: "API keys", body: "Use Jenvu models in your own tools at $3 per million tokens.", to: "/pricing" },
 ];
@@ -471,7 +479,7 @@ export function CloudProducts() {
       <div className="mx-auto max-w-[1296px] px-5 py-20 sm:px-8 md:py-24">
         <div className="max-w-[720px]">
           <h2 className="text-[32px] font-normal leading-[1.2] text-gc-ink sm:text-[40px]">
-            Everything you need to read the Gold market
+            Everything you need to read the Fiber market
           </h2>
           <p className="line-clamp-2 max-sm:line-clamp-none mt-4 text-[17px] leading-[1.6] text-gc-ink-muted">
             Tools that work together across the Terminal, the AI desk and your browser.
@@ -518,6 +526,14 @@ const USE_CASES: Array<{ key: string; title: string; body: string; points: strin
     Icon: Sparkles,
     tone: "red",
   },
+  {
+    key: "jx-bot",
+    title: "JX Bot",
+    body: "Jenvu's Expert Advisor trades Fiber on MetaTrader 5 and stops at the daily and monthly targets of your plan.",
+    points: ["1, 2 or 5 MT5 licenses", "Daily auto-stop at target", "One-click download and setup guide"],
+    Icon: Bot,
+    tone: "green",
+  },
 ];
 
 export function CloudUseCases() {
@@ -528,7 +544,7 @@ export function CloudUseCases() {
     <section className="bg-background">
       <div className="mx-auto max-w-[1296px] px-5 py-20 sm:px-8 md:py-24">
         <h2 className="text-center text-[32px] font-normal leading-[1.2] text-gc-ink sm:text-[40px]">
-          Built for how Gold traders work
+          Built for how Fiber traders work
         </h2>
         <div className="mt-10 flex justify-center">
           <div role="tablist" className="inline-flex flex-wrap justify-center gap-1 border-b border-gc-line">
@@ -619,7 +635,7 @@ export function CloudPricing() {
 
 /* ---------------- Resources ---------------- */
 const RESOURCES: Array<{ Icon: typeof Bot; tone: Tone; title: string; body: string; to: string; cta: string }> = [
-  { Icon: BookOpen, tone: "yellow", title: "Insights", body: "Daily articles on Gold, ICT and smart money concepts.", to: "/insights", cta: "Read articles" },
+  { Icon: BookOpen, tone: "yellow", title: "Insights", body: "Daily articles on Fiber, ICT and smart money concepts.", to: "/insights", cta: "Read articles" },
   { Icon: LifeBuoy, tone: "blue", title: "Help Centre", body: "Guides for the Terminal, extension, billing and your account.", to: "/help", cta: "Browse help" },
   { Icon: Users, tone: "green", title: "Founding Program", body: "Apply for early access to the full Terminal as a founding member.", to: "/founding", cta: "Apply now" },
 ];

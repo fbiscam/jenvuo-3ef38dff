@@ -28,15 +28,4 @@ describe("Terminal access (Founding members only)", () => {
     expect(r.allowed).toBe(false);
     expect(r.reason).toBe("id_overdue");
   });
-  it("active paid plan unlocks the Terminal without Founding", () => {
-    const r = evaluateTerminalAccess(null, { planId: "pro", status: "active", periodEnd: iso(now + day) }, now);
-    expect(r.allowed).toBe(true);
-    expect(r.reason).toBe("paid");
-  });
-  it("expired plan does not unlock the Terminal", () => {
-    expect(evaluateTerminalAccess(null, { planId: "elite", status: "active", periodEnd: iso(now - day) }, now).allowed).toBe(false);
-  });
-  it("free plan does not unlock the Terminal", () => {
-    expect(evaluateTerminalAccess(null, { planId: "free", status: "active", periodEnd: iso(now + day) }, now).allowed).toBe(false);
-  });
 });

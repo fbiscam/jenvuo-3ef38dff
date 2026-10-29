@@ -21,17 +21,17 @@ export const DOC_GROUPS: DocGroup[] = [
       {
         id: "what-is-jenvu",
         title: "What is Jenvu",
-        keywords: "overview introduction Gold xauusd platform",
+        keywords: "overview introduction Fiber xauusd platform",
         body: (
           <>
             <p>
-              Jenvu is an analysis platform built for one market: <strong>Gold</strong>. It combines a live chart (the
+              Jenvu is an analysis platform built for one market: <strong>Fiber</strong>. It combines a live chart (the
               Terminal), chart markings based on ICT and Smart Money Concepts, an AI chat that explains what it sees, alerts, a demo
               trading account and a browser extension.
             </p>
             <p>The main parts of Jenvu are:</p>
             <ul>
-              <li><strong>Terminal</strong> — the live Gold chart with structure, zones, fair value gaps, sweeps and volume.</li>
+              <li><strong>Terminal</strong> — the live Fiber chart with structure, zones, fair value gaps, sweeps and volume.</li>
               <li><strong>AI chat</strong> — ask questions about the chart and get a short, direct answer.</li>
               <li><strong>Dashboard</strong> — your account, usage, billing, API keys, notifications and settings.</li>
               <li><strong>Browser extension</strong> — Jenvu analysis next to the charts you already use.</li>
@@ -111,7 +111,7 @@ export const DOC_GROUPS: DocGroup[] = [
             <h3>Main pages</h3>
             <ul>
               <li><strong>Overview</strong> — welcome panel, shortcuts and your usage at a glance.</li>
-              <li><strong>Terminal</strong> — the live Gold chart and AI chat.</li>
+              <li><strong>Terminal</strong> — the live Fiber chart and AI chat.</li>
               <li><strong>Usage</strong> — how much AI credit you have used.</li>
               <li><strong>API</strong> — create and manage API keys.</li>
               <li><strong>Billing</strong> — your plan, invoices and payment.</li>
@@ -171,7 +171,7 @@ export const DOC_GROUPS: DocGroup[] = [
         keywords: "access locked founding program id verification",
         body: (
           <>
-            <p>The Terminal opens with any active plan (<strong>Starter</strong> $19 / 14 days, <strong>Pro</strong> $49 / 30 days, <strong>Elite</strong> $89 / 30 days), the free trial, or an approved <strong>Founding Program</strong> membership. Credit alone does not unlock it, and every other page stays open.</p>
+            <p>The Terminal is reserved for approved <strong>Founding Program</strong> members, free of cost. <strong>Pro, Elite and Ultra</strong> plans, the free trial and credit do not unlock it: plans cover <strong>JX Bot</strong> for MT5 and the <strong>Top AI Models</strong>, and every other page stays open.</p>
             <ul>
               <li>When your Founding application is approved, you get 3 months of your chosen plan and $250 credit straight away.</li>
               <li>You then have <strong>2 days</strong> to upload an identity document. Once submitted, access continues.</li>
@@ -283,7 +283,31 @@ export const DOC_GROUPS: DocGroup[] = [
               <li><strong>RVOL</strong> compares a candle's volume with the average of the last 20 candles.</li>
               <li>The buy/sell split is an <strong>estimate</strong> based on where the candle closed in its range.</li>
             </ul>
-            <Note>Gold trades across many venues, so volume here is not the total market's real order flow. Use it as a guide only.</Note>
+            <Note>Fiber trades across many venues, so volume here is not the total market's real order flow. Use it as a guide only.</Note>
+          </>
+        ),
+      },
+    ],
+  },
+  {
+    title: "JX Bot for MT5",
+    sections: [
+      {
+        id: "jx-bot",
+        title: "JX Bot",
+        keywords: "mt5 metatrader expert advisor ea bot license automated",
+        body: (
+          <>
+            <p>
+              JX Bot is Jenvu's Expert Advisor for <strong>Fiber on MetaTrader 5</strong> (M15 chart). It comes with every paid plan:
+              Pro 1 license, Elite 2, Ultra 5. Each license key works on one MT5 account.
+            </p>
+            <ul>
+              <li>Download it from Dashboard → JX Bot and follow the install steps there.</li>
+              <li>The bot checks its license with jenvu.com before it trades.</li>
+              <li>It pauses for the day at your daily target (monthly target / 20) and stops at the monthly target.</li>
+            </ul>
+            <Note>Targets are stop limits, not promised profit. Credit or the free trial does not unlock JX Bot.</Note>
           </>
         ),
       },
@@ -299,7 +323,7 @@ export const DOC_GROUPS: DocGroup[] = [
         body: (
           <>
             <p>
-              Ask the AI about the Gold chart in plain language — for example “Is there a sweep on 1H?” or “What is the current
+              Ask the AI about the Fiber chart in plain language — for example “Is there a sweep on 1H?” or “What is the current
               structure on 4H?”. It answers only the question you ask, in short and clear words.
             </p>
             <ul>
@@ -457,7 +481,7 @@ export const DOC_GROUPS: DocGroup[] = [
             <Term t="Sweep">Price takes a liquidity level and then comes back.</Term>
             <Term t="Swing">A turning point in price — a local high or low.</Term>
             <Term t="WAIT">The AI's answer when there isn't enough evidence for a view.</Term>
-            <Term t="Gold">Gold priced in US dollars.</Term>
+            <Term t="Fiber">Fiber priced in US dollars.</Term>
           </dl>
         ),
       },
@@ -467,7 +491,7 @@ export const DOC_GROUPS: DocGroup[] = [
         keywords: "disclaimer risk advice",
         body: (
           <p>
-            Trading Gold carries a high level of risk and can lose you money. Jenvu provides analysis and education only — not
+            Trading Fiber carries a high level of risk and can lose you money. Jenvu provides analysis and education only — not
             financial advice. Read the full <a href="https://jenvu.com/disclaimer">Risk Disclaimer</a>.
           </p>
         ),

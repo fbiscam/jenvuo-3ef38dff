@@ -17,7 +17,7 @@ import flagGb from "@/assets/watchlist/flag-gb.svg";
 import flagUs from "@/assets/watchlist/flag-us.svg";
 import flagJp from "@/assets/watchlist/flag-jp.svg";
 
-type ChartAsset = "XAUUSD" | "BTCUSD";
+type ChartAsset = "EURUSD" | "BTCUSD";
 
 type WatchItem = {
   symbol: string;
@@ -31,7 +31,7 @@ const GROUPS: Array<{ label: string; items: WatchItem[] }> = [
   {
     label: "Forex",
     items: [
-      { symbol: "XAUUSD", name: "Euro / U.S. Dollar", logo: "xau", chartable: "XAUUSD" },
+      { symbol: "EURUSD", name: "Euro / U.S. Dollar", logo: "xau", chartable: "EURUSD" },
     ],
   },
   {
@@ -49,7 +49,7 @@ const GROUPS: Array<{ label: string; items: WatchItem[] }> = [
   {
     label: "Forex",
     items: [
-      { symbol: "XAUUSD", name: "Euro / U.S. Dollar", logo: [flagEu, flagUs] },
+      { symbol: "EURUSD", name: "Euro / U.S. Dollar", logo: [flagEu, flagUs] },
       { symbol: "GBPUSD", name: "British Pound / U.S. Dollar", logo: [flagGb, flagUs] },
       { symbol: "USDJPY", name: "U.S. Dollar / Japanese Yen", logo: [flagUs, flagJp] },
     ],

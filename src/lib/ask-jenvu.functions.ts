@@ -32,8 +32,6 @@ After your answer, on new lines, output exactly:
 KNOWLEDGE:
 ${knowledge}`;
 
-const ANON_DAILY_PER_IP = 15;
-const ANON_DAILY_GLOBAL = 400;
 
 export const askJenvu = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => Input.parse(data))
@@ -52,25 +50,8 @@ export const askJenvu = createServerFn({ method: "POST" })
     const rl = checkAnalyzeRateLimit(`ask-jenvu:${userId ?? "anon"}:${ip}`);
     if (!rl.allowed) return { ok: false, error: `You're asking quickly. Please wait ${rl.retryInSec}s and try again.` };
 
-    // Visitors may chat without signing in, but only within a durable daily
-    // quota (per IP and site-wide) so anonymous traffic can't run up AI costs.
-    if (!userId) {
-      try {
-        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-        const { data: perIp, error: e1 } = await supabaseAdmin.rpc("bump_ask_jenvu_anon", { _bucket: `ip:${ip}` });
-        if (e1) throw e1;
-        if ((perIp ?? 0) > ANON_DAILY_PER_IP) {
-          return { ok: false, error: "You've reached today's free question limit. Sign in to keep asking Jenvu." };
-        }
-        const { data: total, error: e2 } = await supabaseAdmin.rpc("bump_ask_jenvu_anon", { _bucket: "global" });
-        if (e2) throw e2;
-        if ((total ?? 0) > ANON_DAILY_GLOBAL) {
-          return { ok: false, error: "Ask Jenvu is busy for visitors right now. Sign in to keep asking." };
-        }
-      } catch {
-        return { ok: false, error: "Please sign in to use Ask Jenvu." };
-      }
-    }
+    // Visitors may chat without signing in; they are rate-limited per IP and
+    // get a shorter history/answer budget below.
 
     const history = data.messages.slice(-12);
     if (history[history.length - 1].role !== "user") return { ok: false, error: "Please type a question." };

@@ -6,6 +6,7 @@ export function UsageTabs({ active }: { active: "usage" | "bot" }) {
   return (
     <nav className="-ml-3 flex items-center gap-1" aria-label="Usage sections">
       <Link to="/dashboard/usage" className={cls(active === "usage")}>Usage</Link>
+      <Link to="/dashboard/bot-usage" className={cls(active === "bot")}>Bot Usage</Link>
     </nav>
   );
 }
