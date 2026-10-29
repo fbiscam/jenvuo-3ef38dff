@@ -18,20 +18,20 @@ const LINK = "text-gc-blue-deep underline underline-offset-2 hover:text-gc-navy"
 
 export const FAQ = [
   ["Is this financial advice?", "No. Jenvu is an analysis tool. Every setup is for educational purposes and you remain responsible for your own trades."],
-  ["How does the free trial work?", "After signing up, click “Start free” in your dashboard. You get $100 credit and 14 days of Pro access, including JX Bot, once per account. When it ends, JX Bot stops until you buy a plan."],
-  ["What do the plans include?", "Every plan includes JX Bot for MetaTrader 5 (1, 2 or 5 licenses) and the Top AI Models with a monthly AI wallet. Credit alone never unlocks JX Bot; it pays for API and AI use."],
-  ["Who can use the Terminal?", "The Terminal is reserved for approved Founding Program members, free of cost. Pro, Elite and Ultra cover JX Bot and the Top AI Models."],
-  ["Can I cancel anytime?", "Yes. Plans are month-to-month with no lock-in. You keep access until the end of the period you already paid for."],
+  ["How does the free trial work?", "After signing up, click “Start free” in your dashboard. You get $100 credit and 14 days of Starter access, including the Gold Terminal, once per account. When it ends, the Terminal locks until you buy a plan."],
+  ["What do the plans include?", "Every plan includes full Gold Terminal access (no license key) and the Top AI Models with an AI wallet: $15 on Starter, $35 on Pro and $65 on Elite. Credit alone never unlocks the Terminal; it pays for API and AI use."],
+  ["Who can use the Terminal?", "Anyone with an active plan: Starter ($19, 14 days), Pro ($49, 30 days) or Elite ($89, 30 days). Approved Founding members keep free access."],
+  ["Can I cancel anytime?", "Yes. Plans run for 14 or 30 days with no lock-in. You keep access until the end of the period you already paid for."],
   ["What markets are covered?", "Gold only. Jenvu focuses on Gold."],
 ];
 
 export const Route = createFileRoute("/pricing")({
   head: () => ({
     meta: [
-      { title: "Jenvu Pricing — Pro, Elite and Ultra Plans" },
-      { name: "description", content: "Transparent Jenvu pricing: Pro $49, Elite $99 and Ultra $169 a month, $3 per million tokens, plus $100 free credit and 14 days of Pro for new users." },
+      { title: "Jenvu Pricing — Starter, Pro and Elite Gold Terminal Plans" },
+      { name: "description", content: "Jenvu Gold Terminal plans: Starter $19 for 14 days, Pro $49 and Elite $89 for 30 days, with AI credit included and $3 per million tokens." },
       { property: "og:title", content: "Jenvu pricing" },
-      { property: "og:description", content: "Pro, Elite and Ultra plans for JX Bot on MT5 and the Top AI Models, with $100 free credit to start." },
+      { property: "og:description", content: "Starter, Pro and Elite plans for the Gold Terminal and the Top AI Models." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { property: "og:url", content: "https://jenvu.com/pricing" },
@@ -53,12 +53,10 @@ export const Route = createFileRoute("/pricing")({
 
 type Mark = boolean | string;
 const COMPARE: ReadonlyArray<{ f: string; b: Mark; c: Mark; d: Mark }> = [
-  { f: "JX Bot MT5 licenses", b: "1", c: "2", d: "5" },
-  { f: "JX Bot monthly profit target", b: "$600", c: "$1,500", d: "$3,000" },
-  { f: "JX Bot daily target per license", b: "$30", c: "$75", d: "$150" },
-  { f: "Daily auto-stop at target", b: true, c: true, d: true },
-  { f: "JX Bot download, presets & updates", b: true, c: true, d: true },
-  { f: "Monthly AI wallet", b: "$10", c: "$25", d: "$50" },
+  { f: "Plan length", b: "14 days", c: "30 days", d: "30 days" },
+  { f: "Gold Terminal access (no license key)", b: true, c: true, d: true },
+  { f: "Fresh sweeps, swings & price action", b: true, c: true, d: true },
+  { f: "AI wallet", b: "$15", c: "$35", d: "$65" },
   { f: "Daily token limit", b: "1.5M", c: "5M", d: "10M" },
   { f: "Balance-based quota ($3 = 1M tokens)", b: true, c: true, d: true },
   { f: "Active API keys", b: "2", c: "3", d: "5" },
@@ -87,9 +85,9 @@ function PricingPage() {
   const allOpen = open.length === FAQ.length;
 
   const plans = [
-    { key: "pro" as const, name: "Pro", price: priceOf("pro", 49), description: "JX Bot on 1 MT5 account with a $600 monthly target.", wallet: "$10 AI wallet", bot: ["1 JX Bot license", "$30 daily auto-stop", "Top AI Models"] },
-    { key: "elite" as const, name: "Elite", price: priceOf("elite", 99), description: "JX Bot on 2 MT5 accounts with a $1,500 monthly target.", wallet: "$25 AI wallet", bot: ["2 JX Bot licenses", "$75 daily auto-stop", "Top AI Models + senior review"] },
-    { key: "ultra" as const, name: "Ultra", price: priceOf("ultra", 169), description: "JX Bot on 5 MT5 accounts with a $3,000 monthly target.", wallet: "$50 AI wallet", bot: ["5 JX Bot licenses", "$150 daily auto-stop", "Top AI Models + priority support"] },
+    { key: "pro" as const, name: "Starter", price: priceOf("pro", 19), description: "14 days of full Gold Terminal access.", wallet: "$15 AI wallet", bot: ["Gold Terminal, 14 days", "No license key", "Top AI Models"] },
+    { key: "elite" as const, name: "Pro", price: priceOf("elite", 49), description: "30 days of full Gold Terminal access.", wallet: "$35 AI wallet", bot: ["Gold Terminal, 30 days", "No license key", "Top AI Models + senior review"] },
+    { key: "ultra" as const, name: "Elite", price: priceOf("ultra", 89), description: "30 days of Gold Terminal with the most AI credit.", wallet: "$65 AI wallet", bot: ["Gold Terminal, 30 days", "No license key", "Top AI Models + priority support"] },
   ];
 
   return (

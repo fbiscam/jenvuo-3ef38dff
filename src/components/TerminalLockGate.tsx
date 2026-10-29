@@ -120,14 +120,14 @@ export function TerminalLocked({ reason }: { reason?: string | null }) {
         <p className="mt-2 text-sm text-zinc-600">
           {overdue
             ? "Your 2-day window to complete ID verification has ended. Submit your ID verification and the Terminal unlocks again automatically."
-            : "The Terminal is reserved for approved Founding Program members, free of cost. Plans and credit cover JX Bot for MT5 and the Top AI Models; every other page stays open."}
+            : "Get a plan to open the Gold Terminal: Starter $19 for 14 days, Pro $49 or Elite $89 for 30 days. Credit alone does not unlock it."}
         </p>
         <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
           <Link
-            to={overdue ? "/dashboard/documents" : "/founding"}
+            to={overdue ? "/dashboard/documents" : "/pricing"}
             className="inline-flex items-center gap-2 rounded-xl bg-zinc-900 px-4 py-2 text-sm font-semibold text-white hover:bg-zinc-800"
           >
-            {overdue ? "Verify ID now" : "Apply for Founding"}
+            {overdue ? "Verify ID now" : "See plans"}
           </Link>
           <Link
             to="/dashboard"
