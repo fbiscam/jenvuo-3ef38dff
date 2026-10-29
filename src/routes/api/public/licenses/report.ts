@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { evaluateLicense, sessionStep, sharedTargetStatus } from "@/lib/mt5-licenses";
+import { evaluateLicense, requestIp, sessionStep, sharedTargetStatus } from "@/lib/mt5-licenses";
 
 // Always HTTP 200: the MT5 bot reads the JSON body only.
 // The bot posts its account numbers about once a minute; the license key is the caller's proof.
@@ -33,9 +33,10 @@ export const Route = createFileRoute("/api/public/licenses/report")({
             const { data } = await db.from("user_subscriptions").select("plan_id,status,is_trial,current_period_end").eq("user_id", lic.user_id).maybeSingle();
             sub = data ?? null;
           }
-          const r = evaluateLicense(key, account, lic ?? null, sub);
+          const ip = requestIp(request.headers);
+          const r = evaluateLicense(key, account, lic ?? null, sub, Date.now(), ip);
           if (!r.valid) return ok(r);
-          if (r.bind) return ok({ valid: false, reason: "not_found" }); // must be validated (bound) first
+          if (r.bind) await db.from("mt5_licenses").update({ mt5_account: ip }).eq("id", lic.id);
 
           // ON/OFF history: extend the open session or start a new one; "stop" closes it with MT5's reason.
           const nowIso = new Date().toISOString();

@@ -43,19 +43,30 @@ export function newLicenseKey(rand: (n: number) => Uint8Array = (n) => crypto.ge
   return `JENV-${s.slice(0, 4)}-${s.slice(4, 8)}-${s.slice(8, 12)}-${s.slice(12, 16)}`;
 }
 
+// `mt5_account` on a license row now stores the bound IP address (licenses are IP-locked, any MT5 account works).
 type Lic = { mt5_account: string | null; revoked_at: string | null; user_id?: string | null };
 type Sub = { plan_id: string | null; status: string | null; is_trial: boolean | null; current_period_end: string | null } | null;
 
+export const IPV4_RE = /^(25[0-5]|2[0-4]\d|1?\d?\d)(\.(25[0-5]|2[0-4]\d|1?\d?\d)){3}$/;
+export const IPV6_RE = /^[0-9a-f:]{2,39}$/i;
+export function normalizeIp(v: string | null | undefined) {
+  const s = String(v ?? "").split(",")[0].trim().toLowerCase().replace(/^::ffff:/, "");
+  return IPV4_RE.test(s) || (s.includes(":") && IPV6_RE.test(s)) ? s : "";
+}
+/** Legacy rows hold an MT5 account number instead of an IP: they re-bind to the first IP that validates. */
+const isLegacyBinding = (v: string | null) => !!v && /^\d{3,15}$/.test(v);
+
 export type ValidateResult =
   | { valid: true; plan: Mt5PlanId; daily_target: number; monthly_target: number; expires_at: string | null; bind: boolean }
-  | { valid: false; reason: "malformed" | "not_found" | "revoked" | "mt5_mismatch" | "expired" | "no_plan" };
+  | { valid: false; reason: "malformed" | "not_found" | "revoked" | "ip_mismatch" | "expired" | "no_plan" };
 
-/** Pure license check. An active paid plan or the 14-day free trial (Pro, until it ends) makes a key valid; credit never does. */
-export function evaluateLicense(key: string, account: string, lic: Lic | null, sub: Sub, now = Date.now()): ValidateResult {
+/** Pure license check. Key is locked to one IP (any MT5 account); an active paid plan or the 14-day free trial makes it valid; credit never does. */
+export function evaluateLicense(key: string, account: string, lic: Lic | null, sub: Sub, now = Date.now(), ip = ""): ValidateResult {
   if (!LICENSE_KEY_RE.test(key) || !MT5_ACCOUNT_RE.test(account)) return { valid: false, reason: "malformed" };
   if (!lic) return { valid: false, reason: "not_found" };
   if (lic.revoked_at) return { valid: false, reason: "revoked" };
-  if (lic.mt5_account && lic.mt5_account !== account) return { valid: false, reason: "mt5_mismatch" };
+  const boundIp = lic.mt5_account && !isLegacyBinding(lic.mt5_account) ? lic.mt5_account : null;
+  if (boundIp && normalizeIp(ip) !== boundIp) return { valid: false, reason: "ip_mismatch" };
   const plan = String(sub?.plan_id || "").toLowerCase();
   const active = sub && (sub.status === "active" || sub.status === "trialing");
   if (!active || !isMt5Plan(plan)) return { valid: false, reason: sub?.plan_id && plan !== "free" ? "expired" : "no_plan" };
@@ -67,8 +78,13 @@ export function evaluateLicense(key: string, account: string, lic: Lic | null, s
     daily_target: t.daily,
     monthly_target: t.monthly,
     expires_at: sub.current_period_end,
-    bind: !lic.mt5_account,
+    bind: !boundIp && !!normalizeIp(ip),
   };
+}
+
+/** Caller IP as seen by the server (Cloudflare first). */
+export function requestIp(headers: Headers) {
+  return normalizeIp(headers.get("cf-connecting-ip") || headers.get("x-forwarded-for") || headers.get("x-real-ip"));
 }
 
 /** Plan daily target is shared by every account on the plan: stop all bots once their combined profit today reaches it. */

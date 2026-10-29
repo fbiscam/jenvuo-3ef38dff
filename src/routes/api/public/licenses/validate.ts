@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { evaluateLicense } from "@/lib/mt5-licenses";
+import { evaluateLicense, requestIp } from "@/lib/mt5-licenses";
 
 // Always HTTP 200: the MT5 bot reads the JSON body only.
 const ok = (body: unknown) => Response.json(body, { status: 200 });
@@ -28,9 +28,10 @@ export const Route = createFileRoute("/api/public/licenses/validate")({
             const { data } = await db.from("user_subscriptions").select("plan_id,status,is_trial,current_period_end").eq("user_id", lic.user_id).maybeSingle();
             sub = data ?? null;
           }
-          const r = evaluateLicense(key, account, lic ?? null, sub);
+          const ip = requestIp(request.headers);
+          const r = evaluateLicense(key, account, lic ?? null, sub, Date.now(), ip);
           if (!r.valid) return ok(r);
-          await db.from("mt5_licenses").update({ last_validated_at: new Date().toISOString(), ...(r.bind ? { mt5_account: account } : {}) }).eq("id", lic.id);
+          await db.from("mt5_licenses").update({ last_validated_at: new Date().toISOString(), ...(r.bind ? { mt5_account: ip } : {}) }).eq("id", lic.id);
           const { bind: _b, ...out } = r;
           return ok(out);
         } catch {
