@@ -24,7 +24,7 @@ import {
   Layers,
   Magnet,
   Maximize2,
-  PenLine,
+
   Minimize2,
   Minus,
   MousePointer2,
@@ -778,19 +778,6 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
           {smcMenu}
         </PopoverContent>
       </Popover>
-      <Popover>
-        <PopoverTrigger asChild>
-          <button type="button" aria-label="Drawing tools" title="Drawing tools" className={railBtn}>
-            <PenLine className="h-4 w-4" />
-            <span className="hidden xl:inline">Draw</span>
-            {tool !== "cursor" && <span className="absolute right-1.5 top-1 h-1.5 w-1.5 rounded-full bg-gc-blue" aria-hidden="true" />}
-          </button>
-        </PopoverTrigger>
-        <PopoverContent side="bottom" align="start" className={cn("w-[236px] p-2", popClass)}>
-          <p className="px-1 pb-1.5 text-sm text-foreground">Drawing tools</p>
-          <div className="flex flex-wrap items-center gap-0.5" role="toolbar" aria-label="Drawing tools">{renderTools(false)}</div>
-        </PopoverContent>
-      </Popover>
       <span className="mx-1 h-5 w-px shrink-0 bg-gc-line" aria-hidden="true" />
       <button type="button" onClick={downloadSnapshot} aria-label="Download chart snapshot" title="Download chart snapshot" className={railBtn}>
         <Camera className="h-4 w-4" />
@@ -979,11 +966,11 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
       )}
 
       <div className="flex min-h-0 flex-1">
-        {/* Drawing toolbar */}
+        {/* Drawing toolbar: always on the left on desktop (TradingView style), toggled on phones */}
         <nav
           aria-label="Drawing tools"
           className={cn(
-            "w-11 shrink-0 flex-col items-center gap-0.5 overflow-y-auto border-r border-border py-1.5 md:hidden",
+            "w-11 shrink-0 flex-col items-center gap-0.5 overflow-y-auto border-r border-border py-1.5 md:flex",
             mobileToolsOpen ? "flex" : "hidden",
           )}
         >
@@ -1159,6 +1146,26 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
             )}
           </div>
 
+          {/* TradingView-style bottom bar */}
+          <div className="hidden h-8 shrink-0 items-center gap-0.5 border-t border-border px-2 text-[12px] md:flex" role="group" aria-label="Quick timeframe">
+            {timeframes.map((item) => (
+              <button
+                type="button"
+                key={item.key}
+                onClick={() => onTimeframeChange(item)}
+                aria-pressed={item.key === timeframe.key}
+                className={cn(
+                  "h-6 rounded px-2 font-medium tabular-nums text-muted-foreground hover:bg-accent hover:text-foreground",
+                  item.key === timeframe.key && "bg-accent text-foreground",
+                )}
+              >
+                {item.label}
+              </button>
+            ))}
+            <UtcClock />
+          </div>
+
+
           {demoTradingEnabled && paperOpen && <PaperTradingPanel trading={demo} price={currentPrice} onClose={() => setPaperOpen(false)} />}
 
           {scriptPanelOpen && (
@@ -1187,3 +1194,18 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
     </div>
   );
 });
+
+/** Live UTC clock for the bottom bar, rendered after hydration only. */
+function UtcClock() {
+  const [now, setNow] = useState<Date | null>(null);
+  useEffect(() => {
+    setNow(new Date());
+    const id = window.setInterval(() => setNow(new Date()), 1000);
+    return () => window.clearInterval(id);
+  }, []);
+  return (
+    <span className="ml-auto font-medium tabular-nums text-muted-foreground" aria-label="Current UTC time">
+      {now ? now.toISOString().slice(11, 19) : "--:--:--"} UTC
+    </span>
+  );
+}
