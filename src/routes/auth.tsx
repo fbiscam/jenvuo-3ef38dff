@@ -1,5 +1,5 @@
 import * as React from "react";
-import { goAfterSignIn, restoreSharedSession } from "@/lib/cross-domain-session";
+import { clearStoredAuthSessions, goAfterSignIn, restoreSharedSession } from "@/lib/cross-domain-session";
 import { createFileRoute, useNavigate, Link, redirect } from "@tanstack/react-router";
 import { oauthReturnPath } from "@/lib/oauth-return-path";
 import { useServerFn } from "@tanstack/react-start";
@@ -66,6 +66,12 @@ export const Route = createFileRoute("/auth")({
       if (hash.includes("type=recovery") || hash.includes("error")) return;
       if (search.emailChanged === "1") return;
       if (search.mfa === "1") return;
+      if (new URLSearchParams(window.location.search).get("signed_out") === "1") {
+        clearStoredAuthSessions();
+        await supabase.auth.signOut({ scope: "local" }).catch(() => undefined);
+        clearStoredAuthSessions();
+        return;
+      }
     }
 
     let { data } = await supabase.auth.getUser();

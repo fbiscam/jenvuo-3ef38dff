@@ -107,7 +107,10 @@ export async function signOutAndRedirect(redirectPath = "/dashboard") {
     new Promise<void>((resolve) => window.setTimeout(resolve, 1_500)),
   ]);
   clearStoredAuthSessions();
-  window.location.replace(destination);
+  // Each subdomain keeps its own local session, so tell the sign-in page to
+  // drop any copy it still holds instead of bouncing back to the dashboard.
+  const sep = destination.includes("?") ? "&" : "?";
+  window.location.replace(`${destination}${sep}signed_out=1`);
 }
 
 let initialized = false;
