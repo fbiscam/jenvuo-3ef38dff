@@ -35,7 +35,7 @@ export function PlanLock({ title }: { title: string }) {
   );
 }
 
-/** MT5 license manager: one key per MT5 account, limit enforced by the server. */
+/** MT5 license manager: one key per IP address, limit enforced by the server. */
 export function Mt5Licenses() {
   const { access, refresh } = useMt5Access();
   const create = useServerFn(createMt5License);
@@ -54,14 +54,14 @@ export function Mt5Licenses() {
   const onCreate = async () => {
     setBusy(true);
     try {
-      const r = await create({ data: { mt5_account: account.trim() } });
+      const r = await create({ data: { ip: account.trim() } });
       if (r.ok) {
         toast.success("License created");
         setAccount("");
         await refresh();
       } else toast.error(r.error);
     } catch {
-      toast.error("Enter your MT5 account number (digits only).");
+      toast.error("Enter a valid IP address, e.g. 203.0.113.25");
     } finally {
       setBusy(false);
     }
@@ -79,22 +79,21 @@ export function Mt5Licenses() {
       </div>
       <div className="mt-4 flex flex-col gap-2 sm:flex-row">
         <input
-          inputMode="numeric"
-          value={account}
-          onChange={(e) => setAccount(e.target.value.replace(/\D/g, ""))}
-          placeholder="MT5 account number, e.g. 12345678"
+                    value={account}
+          onChange={(e) => setAccount(e.target.value.replace(/[^0-9a-fA-F.:]/g, ""))}
+          placeholder="IP address of your PC / RDP, e.g. 203.0.113.25"
           className="h-10 flex-1 rounded-lg border border-gc-line bg-card px-3 text-[13px] text-gc-ink outline-none focus:border-gc-blue"
         />
         <button
           type="button"
           onClick={onCreate}
-          disabled={busy || account.length < 3 || bound >= access.limit}
+          disabled={busy || account.length < 7 || bound >= access.limit}
           className="inline-flex h-10 items-center justify-center gap-2 rounded-full bg-gc-blue px-4 text-[13px] font-medium text-gc-on-blue disabled:opacity-45"
         >
           <KeyRound className="h-4 w-4" /> {busy ? "Creating…" : "Create license"}
         </button>
       </div>
-      <p className="mt-1.5 text-[11px] text-gc-ink-muted">Digits only. Never enter your MT5 password. Each key works only on that one account.</p>
+      <p className="mt-1.5 text-[11px] text-gc-ink-muted">Enter the public IP of the PC or RDP that runs MT5 (open whatismyip.com there). Any MT5 account works on that IP.</p>
       <ul className="mt-4 divide-y divide-gc-line">
         {access.licenses.length === 0 && <li className="py-4 text-center text-[12px] text-gc-ink-muted">No licenses yet.</li>}
         {access.licenses.map((l) => (
@@ -102,7 +101,7 @@ export function Mt5Licenses() {
             <div className="min-w-0">
               <p className="break-all font-mono text-[13px] text-gc-ink">{l.license_key}</p>
               <p className="text-[11px] text-gc-ink-muted">
-                {l.revoked_at ? "Revoked" : l.mt5_account ? `MT5 ${l.mt5_account}` : "Not linked yet — enter an MT5 account above"}
+                {l.revoked_at ? "Revoked" : l.mt5_account ? (/^\d+$/.test(l.mt5_account) ? "Locks to the first IP that runs it" : `IP ${l.mt5_account}`) : "Locks to the first IP that runs it"}
                 {l.last_validated_at ? ` · last check ${new Date(l.last_validated_at).toLocaleString()}` : ""}
               </p>
             </div>

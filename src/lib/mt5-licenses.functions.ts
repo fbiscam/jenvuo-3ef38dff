@@ -26,21 +26,22 @@ export const getMt5Access = createServerFn({ method: "POST" })
 
 export const createMt5License = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => z.object({ mt5_account: z.string().trim().regex(MT5_ACCOUNT_RE, "Enter digits only") }).parse(d))
+  .inputValidator((d: unknown) => z.object({ ip: z.string().trim().refine((v) => !!normalizeIp(v), "Enter a valid IP address") }).parse(d))
   .handler(async ({ context, data }) => {
     const { db, allowed, limit, plan } = await readPlan(context.userId);
     if (!allowed) return { ok: false as const, error: "A Pro, Elite or Ultra plan is required." };
     const { data: rows } = await db.from("mt5_licenses").select("id,mt5_account").eq("user_id", context.userId).is("revoked_at", null);
     const list = rows ?? [];
-    if (list.some((r: any) => r.mt5_account === data.mt5_account)) return { ok: false as const, error: "This MT5 account already has a license." };
+    const ip = normalizeIp(data.ip);
+    if (list.some((r: any) => r.mt5_account === ip)) return { ok: false as const, error: "This IP address already has a license." };
     // Fill an unbound license created after payment first.
     const free = list.find((r: any) => !r.mt5_account);
     if (free) {
-      await db.from("mt5_licenses").update({ mt5_account: data.mt5_account, plan_id: plan }).eq("id", free.id);
+      await db.from("mt5_licenses").update({ mt5_account: ip, plan_id: plan }).eq("id", free.id);
       return { ok: true as const };
     }
     if (list.length >= limit) return { ok: false as const, error: `Your plan allows ${limit} license${limit > 1 ? "s" : ""}. Delete one or upgrade.` };
-    const { error } = await db.from("mt5_licenses").insert({ user_id: context.userId, license_key: newLicenseKey(), mt5_account: data.mt5_account, plan_id: plan });
+    const { error } = await db.from("mt5_licenses").insert({ user_id: context.userId, license_key: newLicenseKey(), mt5_account: ip, plan_id: plan });
     return error ? { ok: false as const, error: "Could not create the license." } : { ok: true as const };
   });
 
