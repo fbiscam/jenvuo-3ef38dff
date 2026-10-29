@@ -134,6 +134,13 @@
       "when": 1792929372341,
       "tag": "0018_mt5_bot_sessions",
       "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1793260067162,
+      "tag": "0019_bind_founding_status_to_caller",
+      "breakpoints": true
     }
   ]
 }
