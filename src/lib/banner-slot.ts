@@ -9,10 +9,7 @@ const listeners = new Set<() => void>();
 let snapshot = "";
 
 function emit() {
-  let best: string | null = null;
-  let bestP = Infinity;
-  for (const [id, p] of wanting) if (p < bestP) { best = id; bestP = p; }
-  snapshot = best ?? "";
+  snapshot = pickBanner([...wanting.entries()]) ?? "";
   listeners.forEach((l) => l());
 }
 
