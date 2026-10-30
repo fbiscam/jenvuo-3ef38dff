@@ -120,13 +120,8 @@ export const confirmRecoveryOtp = createServerFn({ method: 'POST' })
 export const signInFailureHint = createServerFn({ method: 'POST' })
   .inputValidator((d: unknown) => z.object({ email: z.string().trim().email().max(255) }).parse(d))
   .handler(async ({ data }) => {
-    const { supabaseAdmin } = await import('@/integrations/supabase/client.server')
-    const pattern = data.email.toLowerCase().replace(/[\\%_]/g, (c) => `\\${c}`)
-    const { data: rows } = await (supabaseAdmin as any)
-      .from('profiles')
-      .select('id')
-      .ilike('email', pattern)
-      .limit(1)
-    const exists = Array.isArray(rows) && rows.length > 0
+    const { findUserByEmail } = await import('./custom-auth.server')
+    const user = await findUserByEmail(data.email.toLowerCase())
+    const exists = !!user
     return { hint: exists ? ('wrong_password' as const) : ('no_account' as const) }
   })

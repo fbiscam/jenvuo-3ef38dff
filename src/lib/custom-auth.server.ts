@@ -157,7 +157,7 @@ async function consumeOtp(id: string) {
     .eq('id', id)
 }
 
-async function findUserByEmail(email: string): Promise<User | null> {
+export async function findUserByEmail(email: string): Promise<User | null> {
   const { supabaseAdmin } = await import('@/integrations/supabase/client.server')
   for (let page = 1; page <= 10; page += 1) {
     const { data, error } = await supabaseAdmin.auth.admin.listUsers({ page, perPage: 1000 })
