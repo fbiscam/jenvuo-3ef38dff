@@ -83,7 +83,7 @@ export default function HeaderSearch({ onClose }: { onClose: () => void }) {
     <div ref={boxRef} className="relative ml-4 min-w-0 flex-1">
       <form
         onSubmit={(e) => { e.preventDefault(); if (t) ask(t); }}
-        className="flex h-11 items-center gap-3 rounded-lg border-2 border-gc-blue-deep bg-background px-3"
+        className="flex h-10 items-center gap-3 rounded-lg border-2 border-gc-blue-deep bg-background px-3"
       >
         <Search className="h-5 w-5 shrink-0 text-gc-ink" />
         <input

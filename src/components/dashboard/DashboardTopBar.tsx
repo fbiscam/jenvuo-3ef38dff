@@ -161,8 +161,8 @@ export default function DashboardTopBar({
             focused
               ? `flex ${white ? "h-9 rounded-lg" : "h-11 rounded-full"} items-center gap-3 border-2 border-gc-blue-deep bg-background px-3`
               : white
-                ? "flex h-9 items-center gap-3 rounded-lg border border-gc-line/70 bg-gc-console-search pl-4 pr-2 shadow-sm transition hover:bg-gc-line/60"
-                : "flex h-11 items-center gap-3 rounded-full border border-gc-line/70 bg-gc-notice px-3"
+                ? "flex h-9 items-center gap-3 rounded-lg border border-gc-line bg-background pl-4 pr-2 shadow-sm transition hover:border-gc-ink-muted/40"
+                : "flex h-11 items-center gap-3 rounded-full border border-gc-line bg-background px-3"
           }
         >
           {!(white && !focused) && <Search className={`${white ? "h-4 w-4" : "h-5 w-5"} shrink-0 text-gc-ink`} />}
