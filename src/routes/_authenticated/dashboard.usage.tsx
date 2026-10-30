@@ -426,7 +426,7 @@ function UsagePage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_320px]">
+      <div className="grid min-h-[calc(100dvh-8rem)] grid-cols-1 xl:grid-cols-[minmax(0,1fr)_320px]">
         <div className="min-w-0">
           <section className="border-b border-border">
             <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3 px-4 pb-2 pt-5 sm:px-7">
