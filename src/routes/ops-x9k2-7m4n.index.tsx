@@ -57,9 +57,9 @@ function OpsLogin() {
   }
 
   return (
-    <div className={`min-h-dvh w-full bg-gc-canvas text-gc-ink ${SANS} antialiased`}>
+    <div className={`min-h-dvh w-full bg-muted/40 text-gc-ink ${SANS} antialiased`}>
       <main className="mx-auto flex min-h-dvh max-w-md items-center justify-center px-5 py-16 sm:px-6">
-        <form onSubmit={onSubmit} className="w-full rounded-3xl border border-gc-line bg-background p-7 sm:p-10">
+        <form onSubmit={onSubmit} className="w-full rounded-2xl border border-border bg-background p-7 shadow-sm sm:p-10">
           <div className="flex items-center gap-2.5">
             <img src="/favicon.png" alt="Jenvu" className="h-7 w-7 rounded-md object-contain" />
             <span className="text-[22px] font-medium leading-none tracking-tight text-gc-ink">Jenvu</span>
@@ -77,7 +77,7 @@ function OpsLogin() {
               <input id="ops-pw" type="password" value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="current-password" className={`mt-1.5 ${inputCls}`} placeholder="••••••••" />
             </div>
             {err && <div className="rounded-xl bg-gc-red-soft px-4 py-3 text-[13px] text-gc-red">{err}</div>}
-            <button type="submit" disabled={loading} className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-full bg-gc-blue px-5 text-[14px] font-medium text-gc-on-blue transition hover:bg-gc-blue-hover disabled:cursor-not-allowed disabled:opacity-60">
+            <button type="submit" disabled={loading} className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-gc-blue px-5 text-[14px] font-medium text-gc-on-blue transition hover:bg-gc-blue-hover disabled:cursor-not-allowed disabled:opacity-60">
               {loading ? "Verifying…" : "Enter console"}
             </button>
           </div>
