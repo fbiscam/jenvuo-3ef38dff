@@ -109,7 +109,7 @@ const CHANGELOG = [
 function DownloadPage() {
   return (
     <>
-      <div className={`public-cloudflare jenvu-zoom min-h-dvh w-full bg-background text-foreground ${SANS} antialiased selection:bg-home-accent selection:text-home-accent-foreground`}>
+      <div className={`public-cloudflare download-white jenvu-zoom min-h-dvh w-full bg-background text-foreground ${SANS} antialiased selection:bg-home-accent selection:text-home-accent-foreground`}>
         {/* NAV — matches homepage */}
         <SiteHeader />
 

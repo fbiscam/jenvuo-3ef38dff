@@ -461,6 +461,13 @@
   position: relative;
 }
 
+/* Download page: fully white, including the header and hero at the top. */
+.public-cloudflare.download-white,
+.download-white .public-page-hero,
+.public-cloudflare.download-white header {
+  background-color: #ffffff;
+}
+
 .public-cloudflare header {
   border-color: var(--border);
   background-color: color-mix(in oklab, var(--background) 94%, transparent);
