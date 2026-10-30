@@ -910,8 +910,10 @@ html[data-pwa="1"] .pwa-tabbar {
 }
 .jenvu-zoom-dashboard main .bg-white {
   background-color: #ffffff !important;
-  border: 1px solid rgba(0,0,0,0.09) !important;
-  box-shadow: none !important;
+  border: 1px solid rgba(0,0,0,0.06) !important;
+  box-shadow:
+    0 1px 2px rgba(60,64,67,0.06),
+    0 1px 3px rgba(60,64,67,0.08) !important;
 }
 .jenvu-zoom-dashboard main .border,
 .jenvu-zoom-dashboard main .border-zinc-100,
@@ -919,8 +921,10 @@ html[data-pwa="1"] .pwa-tabbar {
   border-color: rgba(0,0,0,0.08) !important;
 }
 
-/* Analytics section: keep the same light hairline border as other blocks */
+/* Analytics section: borderless, no shadow — flush on the page */
+.jenvu-zoom-dashboard main .analytics-section,
 .jenvu-zoom-dashboard main .analytics-section .bg-white {
+  border: none !important;
   box-shadow: none !important;
 }
 
