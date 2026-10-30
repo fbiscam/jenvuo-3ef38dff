@@ -63,17 +63,14 @@ function AccuracyPage() {
   }, []);
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-6 space-y-6" style={{ fontFamily: "'Google Sans','Urbanist',sans-serif" }}>
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="pl-1 text-2xl font-semibold text-foreground">Signal Accuracy</h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            Objective win-rate and R-expectancy from the paper-trading log (auto-resolved via 5m candles).
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
+    <OpsPage
+      title="Signal accuracy"
+      description="Win rate and R-expectancy from the paper-trading log, auto-resolved on 5m candles"
+      icon={<Target />}
+      actions={
+        <>
           <select
-            className="border rounded-md px-3 py-1.5 text-sm bg-background"
+            className={`${ops.input} w-auto`}
             value={days}
             onChange={(e) => {
               const d = Number(e.target.value);
@@ -86,19 +83,16 @@ function AccuracyPage() {
             <option value={90}>Last 90d</option>
             <option value={180}>Last 180d</option>
           </select>
-          <button
-            onClick={() => load(days)}
-            disabled={loading}
-            className="inline-flex items-center gap-1.5 rounded-md border bg-background px-3 py-1.5 text-sm hover:bg-muted disabled:opacity-50"
-          >
+          <button onClick={() => load(days)} disabled={loading} className={ops.btn}>
             <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
             Refresh
           </button>
-        </div>
-      </div>
-
+        </>
+      }
+    >
+      <div className="space-y-6 px-4 py-5 sm:px-6">
       {report?.drift_warning && (
-        <div className="rounded-lg border border-gc-yellow bg-gc-yellow-soft p-4 flex items-start gap-3">
+        <div className="rounded-xl border border-gc-yellow bg-gc-yellow-soft p-4 flex items-start gap-3">
           <AlertTriangle className="h-5 w-5 text-gc-amber shrink-0 mt-0.5" />
           <div className="text-sm text-gc-amber">
             <div className="font-medium">Model drift detected</div>
@@ -225,7 +219,8 @@ function AccuracyPage() {
           </div>
         </>
       )}
-    </div>
+      </div>
+    </OpsPage>
   );
 }
 
@@ -243,18 +238,18 @@ function Kpi({
   const color =
     accent === "good" ? "text-gc-success" : accent === "bad" ? "text-gc-red" : "text-foreground";
   return (
-    <div className="rounded-lg border bg-background p-4">
-      <div className="text-xs text-muted-foreground uppercase tracking-wide">{label}</div>
-      <div className={`text-2xl font-semibold mt-1 ${color}`}>{value}</div>
-      {hint && <div className="text-xs text-muted-foreground mt-1">{hint}</div>}
+    <div className="rounded-xl border border-border bg-background p-4">
+      <div className="text-[13px] text-muted-foreground">{label}</div>
+      <div className={`mt-2 text-xl font-medium tabular-nums ${color}`}>{value}</div>
+      {hint && <div className="mt-1 text-[12px] text-muted-foreground">{hint}</div>}
     </div>
   );
 }
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="rounded-lg border bg-background overflow-hidden">
-      <div className="px-4 py-2.5 border-b bg-muted/50 text-sm font-medium text-foreground">
+    <div className="overflow-hidden rounded-xl border border-border bg-background">
+      <div className="border-b border-border px-4 py-3 text-[13px] font-medium text-foreground">
         {title}
       </div>
       <div className="p-4">{children}</div>
@@ -265,11 +260,11 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 function Table({ cols, rows }: { cols: string[]; rows: (string | number)[][] }) {
   return (
     <div className="overflow-x-auto">
-      <table className="w-full text-sm">
+      <table className="w-full text-[13px]">
         <thead>
-          <tr className="text-left text-xs text-muted-foreground uppercase">
+          <tr className="text-left text-[12px] text-muted-foreground">
             {cols.map((c) => (
-              <th key={c} className="py-2 pr-4 font-medium">
+              <th key={c} className="whitespace-nowrap py-2 pr-4 font-normal">
                 {c}
               </th>
             ))}
@@ -284,7 +279,7 @@ function Table({ cols, rows }: { cols: string[]; rows: (string | number)[][] }) 
             </tr>
           )}
           {rows.map((row, i) => (
-            <tr key={i} className="border-t">
+            <tr key={i} className="border-t border-border">
               {row.map((cell, j) => (
                 <td key={j} className="py-2 pr-4 text-foreground">
                   {cell}
