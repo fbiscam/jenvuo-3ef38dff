@@ -57,6 +57,9 @@ export type CallChatOptions = {
   // With `raceModels`: give up on the primary models after this long and go
   // straight to the backup (when `backupFallback` is set).
   raceBudgetMs?: number;
+  // Use exactly the listed models (no Lovable-first). The public developer
+  // API sets this so a customer's chosen model maps to one upstream model.
+  exactModels?: boolean;
 };
 
 export class AiGatewayError extends Error {
@@ -347,14 +350,16 @@ export async function callChatCompletion(
   opts: CallChatOptions,
 ): Promise<{ content: string; model: string; usage: UsageInfo }> {
   const primary = opts.raceModels ? callChatRace : callChatChain;
-  if (!opts.backupFallback) return primary(opts);
-  if (LOVABLE_CHAT_FIRST) {
+  // Every AI job (chat, articles, analysis, reviews) answers through the
+  // cheapest Lovable model first while LOVABLE_CHAT_FIRST is on.
+  if (LOVABLE_CHAT_FIRST && !opts.exactModels) {
     try {
       return await callBackupChat(opts);
     } catch (lovErr) {
       console.warn(`[ai] ${opts.stage ?? "chat"}: Lovable AI failed, trying CodeCraft`, (lovErr as Error)?.message);
     }
   }
+  if (!opts.backupFallback) return primary(opts);
   try {
     return await primary(opts);
   } catch (primaryErr) {
