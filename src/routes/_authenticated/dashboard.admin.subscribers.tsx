@@ -8,6 +8,7 @@ import {
   listNewsletterSubscribers,
   type NewsletterSubscriber,
 } from "@/lib/admin-subscribers.functions";
+import { OpsBadge, OpsPage, OpsState, OpsStats, ops } from "@/components/ops/OpsPage";
 
 export const Route = createFileRoute("/_authenticated/dashboard/admin/subscribers")({
   head: () => ({
@@ -73,89 +74,63 @@ function AdminSubscribersPage() {
     URL.revokeObjectURL(url);
   };
 
-  if (loading) {
-    return <div className="p-8 text-sm text-muted-foreground">Loading…</div>;
-  }
-  if (!allowed) {
-    return (
-      <div className="p-8">
-        <h1 className="text-lg font-semibold">Forbidden</h1>
-        <p className="text-sm text-muted-foreground mt-2">Admin access required.</p>
-      </div>
-    );
-  }
+  if (loading) return <OpsState title="Loading subscribers…" />;
+  if (!allowed) return <OpsState title="Admin access required" description="Sign in with an admin account to view this page." />;
 
   return (
-    <div className="max-w-5xl">
-      <div className="flex items-center justify-between gap-3 flex-wrap">
-        <div>
-          <h1 className="pl-1 text-xl font-semibold flex items-center gap-2">
-            <Users className="h-5 w-5" /> Newsletter subscribers
-          </h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            {active} active · {rows.length} total
-          </p>
-        </div>
-        <button
-          onClick={exportCsv}
-          disabled={filtered.length === 0}
-          className="inline-flex items-center gap-2 rounded-lg border border-border bg-background px-3 py-2 text-sm font-medium hover:bg-muted disabled:opacity-50"
-        >
+    <OpsPage
+      title="Newsletter subscribers"
+      description="Email list and signal opt-ins"
+      icon={<Users />}
+      actions={
+        <button onClick={exportCsv} disabled={filtered.length === 0} className={ops.btn}>
           <Download className="h-4 w-4" /> Export CSV
         </button>
+      }
+    >
+      <OpsStats
+        items={[
+          { label: "Total subscribers", value: rows.length },
+          { label: "Active", value: active, tone: "success" },
+          { label: "Unsubscribed", value: rows.length - active },
+          { label: "Showing", value: filtered.length },
+        ]}
+      />
+      <div className="border-b border-border px-4 py-3 sm:px-6">
+        <div className="relative max-w-md">
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search by email…" className={`${ops.input} pl-9`} />
+        </div>
       </div>
-
-      <div className="mt-5 relative">
-        <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        <input
-          value={q}
-          onChange={(e) => setQ(e.target.value)}
-          placeholder="Search by email…"
-          className="w-full rounded-lg border border-border bg-background pl-9 pr-3 py-2 text-sm"
-        />
-      </div>
-
-      <div className="mt-4 overflow-x-auto rounded-xl border border-border bg-background">
-        <table className="min-w-[540px] w-full text-sm">
-          <thead className="bg-muted/50 text-left text-xs uppercase tracking-wide text-muted-foreground">
+      <div className={ops.tableWrap}>
+        <table className={`min-w-[540px] ${ops.table}`}>
+          <thead className={ops.thead}>
             <tr>
-              <th className="whitespace-nowrap px-4 py-3">Email</th>
-              <th className="whitespace-nowrap px-4 py-3">Status</th>
-              <th className="whitespace-nowrap px-4 py-3">Subscribed</th>
+              <th className={ops.th}>Email</th>
+              <th className={ops.th}>Status</th>
+              <th className={ops.th}>Subscribed</th>
             </tr>
           </thead>
           <tbody>
             {filtered.length === 0 && (
               <tr>
-                <td colSpan={3} className="px-4 py-8 text-center text-muted-foreground">
+                <td colSpan={3} className="px-4 py-12 text-center text-[13px] text-muted-foreground">
                   No subscribers yet.
                 </td>
               </tr>
             )}
             {filtered.map((r) => (
-              <tr key={r.id} className="border-t border-border">
-                <td className="whitespace-nowrap px-4 py-3 font-medium text-foreground">
-                  {r.email}
+              <tr key={r.id} className={ops.tr}>
+                <td className={`${ops.td} font-medium text-foreground`}>{r.email}</td>
+                <td className={ops.td}>
+                  <OpsBadge tone={r.status === "active" ? "success" : "neutral"}>{r.status}</OpsBadge>
                 </td>
-                <td className="whitespace-nowrap px-4 py-3">
-                  <span
-                    className={`inline-flex rounded-full px-2 py-0.5 text-[11px] font-medium ${
-                      r.status === "active"
-                        ? "bg-gc-green-soft text-gc-success"
-                        : "bg-muted text-muted-foreground"
-                    }`}
-                  >
-                    {r.status}
-                  </span>
-                </td>
-                <td className="whitespace-nowrap px-4 py-3 text-muted-foreground">
-                  {new Date(r.subscribed_at).toLocaleString()}
-                </td>
+                <td className={`${ops.td} text-muted-foreground`}>{new Date(r.subscribed_at).toLocaleString()}</td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
-    </div>
+    </OpsPage>
   );
 }
