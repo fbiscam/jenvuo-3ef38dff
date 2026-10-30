@@ -12,6 +12,7 @@ import {
   confirmSignupOtp,
   requestRecoveryOtp,
   requestSignupOtp,
+  signInFailureHint,
 } from "@/lib/custom-auth.functions";
 import { applyReferralCode } from "@/lib/referrals.functions";
 import { registerTrustedDevice, verifyTrustedDevice } from "@/lib/trusted-devices.functions";
@@ -121,6 +122,7 @@ function AuthPage() {
   const verifySignupCode = useServerFn(confirmSignupOtp);
   const sendRecoveryOtp = useServerFn(requestRecoveryOtp);
   const verifyRecoveryCode = useServerFn(confirmRecoveryOtp);
+  const signInHint = useServerFn(signInFailureHint);
   const search = Route.useSearch();
   const redirectTo = sanitizeRedirect(search.redirect);
   const [mode, setMode] = React.useState<"signin" | "signup" | "forgot">(
@@ -425,12 +427,23 @@ function AuthPage() {
         /confirm/i.test(msg) || /verify/i.test(msg) || /not.*confirmed/i.test(msg);
       if (notConfirmed) {
         // User exists but hasn't verified — do NOT auto-resend a code.
-        // Treat as invalid until they complete signup properly.
-        setErrorMsg("Invalid credentials. Please sign up.");
+        setErrorMsg("This email isn't verified yet. Please sign up again to get a new code.");
         return;
       }
       if (/invalid.*(login|credential)/i.test(msg)) {
-        setErrorMsg("Invalid credentials. Please sign up.");
+        let hint: "wrong_password" | "no_account" | null = null;
+        try {
+          hint = (await signInHint({ data: { email: parsed.data.email } })).hint;
+        } catch {
+          hint = null;
+        }
+        if (hint === "wrong_password") {
+          setErrorMsg("Wrong password. Please try again or reset it with \"Forgot password\".");
+        } else if (hint === "no_account") {
+          setErrorMsg("No account found with this email. Please sign up.");
+        } else {
+          setErrorMsg("Email or password is incorrect.");
+        }
         return;
       }
       setErrorMsg(msg);
