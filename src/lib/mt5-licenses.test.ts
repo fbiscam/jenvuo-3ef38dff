@@ -84,3 +84,28 @@ describe('owner bot target', () => {
     expect(r.valid && r.daily_target).toBe(1000)
   })
 })
+
+describe("delete bot account", () => {
+  it("blocks accounts live on a JX Bot license or running, allows old ones", async () => {
+    const { botAccountDeleteBlock } = await import("./mt5-licenses");
+    const now = Date.parse("2026-10-30T05:00:00Z");
+    const old = new Date(now - 60 * 60_000).toISOString();
+    const lic = [
+      { id: "a", mt5_account: "203.0.113.25#111", revoked_at: null },
+      { id: "b", mt5_account: "203.0.113.26", revoked_at: null },
+      { id: "c", mt5_account: "203.0.113.27#333", revoked_at: "2026-10-01T00:00:00Z" },
+    ];
+    const rep = [
+      { license_id: "a", mt5_account: "111", updated_at: old },
+      { license_id: "b", mt5_account: "222", updated_at: old },
+      { license_id: "gone", mt5_account: "444", updated_at: old },
+      { license_id: "gone", mt5_account: "555", updated_at: new Date(now - 30_000).toISOString() },
+    ];
+    expect(botAccountDeleteBlock("111", lic, rep, [], now)).toBe("live_license");
+    expect(botAccountDeleteBlock("222", lic, rep, [], now)).toBe("live_license");
+    expect(botAccountDeleteBlock("333", lic, rep, [], now)).toBe(null);
+    expect(botAccountDeleteBlock("444", lic, rep, [], now)).toBe(null);
+    expect(botAccountDeleteBlock("555", lic, rep, [], now)).toBe("running");
+    expect(botAccountDeleteBlock("444", lic, rep, [{ mt5_account: "444", last_seen_at: new Date(now - 10_000).toISOString(), ended_at: null }], now)).toBe("running");
+  });
+});
