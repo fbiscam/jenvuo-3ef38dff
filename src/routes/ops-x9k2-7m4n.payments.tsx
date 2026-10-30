@@ -176,14 +176,14 @@ function OpsPayments() {
 
 
   return (
-    <div className={`min-h-dvh w-full bg-white text-gc-ink ${SANS}`}>
+    <div className={`min-h-dvh w-full bg-background text-gc-ink ${SANS}`}>
       <div className="mx-auto max-w-6xl px-5 py-6">
         <div className="flex flex-wrap items-center gap-2">
           {(["orders", "promos", "config"] as const).map((t) => (
             <button
               key={t}
               onClick={() => setTab(t)}
-              className={`rounded-xl px-3.5 py-2 text-sm capitalize transition ${ tab === t ? "bg-gc-blue text-white" : "border border-gc-line text-gc-ink hover:bg-gc-panel" }`}
+              className={`rounded-xl px-3.5 py-2 text-sm capitalize transition ${ tab === t ? "bg-gc-blue text-gc-on-blue" : "border border-gc-line text-gc-ink hover:bg-gc-panel" }`}
             >
               {t === "config" ? "Deposit addresses" : t}
             </button>
@@ -193,7 +193,7 @@ function OpsPayments() {
           </button>
         </div>
 
-        {error && <div className="mt-4 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>}
+        {error && <div className="mt-4 rounded-xl bg-gc-red-soft px-4 py-3 text-sm text-gc-red">{error}</div>}
 
         {tab === "orders" && (
           <>
@@ -202,7 +202,7 @@ function OpsPayments() {
                 <button
                   key={f.id}
                   onClick={() => setFilter(f.id)}
-                  className={`rounded-full px-3 py-1.5 text-[13px] transition ${ filter === f.id ? "bg-gc-blue text-white" : "border border-gc-line text-gc-ink-muted hover:bg-gc-panel" }`}
+                  className={`rounded-full px-3 py-1.5 text-[13px] transition ${ filter === f.id ? "bg-gc-blue text-gc-on-blue" : "border border-gc-line text-gc-ink-muted hover:bg-gc-panel" }`}
                 >
                   {f.label}
                 </button>
@@ -237,12 +237,12 @@ function OpsPayments() {
                 const status = String(r.status ?? "");
                 const pill =
                   status === "approved"
-                    ? "bg-emerald-50 text-emerald-700"
+                    ? "bg-gc-green-soft text-gc-success"
                     : status === "rejected"
-                      ? "bg-red-50 text-red-600"
+                      ? "bg-gc-red-soft text-gc-red"
                       : status === "expired"
                         ? "bg-gc-panel text-gc-ink-muted"
-                        : "bg-amber-50 text-amber-700";
+                        : "bg-gc-yellow-soft text-gc-amber";
                 return (
                   <div key={r.id} className="rounded-2xl border border-gc-line p-4">
                     <div className="flex flex-wrap items-start gap-3">
@@ -265,11 +265,11 @@ function OpsPayments() {
                         <div className="text-lg font-medium text-gc-ink">${Number(r.pay_amount_usd || 0).toFixed(2)}</div>
                         <div className="text-[12px] text-gc-ink-muted">
                           {r.is_upgrade ? (
-                            <span className="font-semibold text-indigo-600 uppercase">Upgrade: {r.target_plan_id}</span>
+                            <span className="font-semibold text-gc-blue-deep uppercase">Upgrade: {r.target_plan_id}</span>
                           ) : (
                             <>
                               credit ${Number(r.credit_usd || 0).toFixed(2)}
-                              {Number(r.bonus_usd) > 0 && <span className="text-emerald-700"> (+${Number(r.bonus_usd).toFixed(2)})</span>}
+                              {Number(r.bonus_usd) > 0 && <span className="text-gc-success"> (+${Number(r.bonus_usd).toFixed(2)})</span>}
                             </>
                           )}
                         </div>
@@ -282,10 +282,10 @@ function OpsPayments() {
                       {r.tx_hash ? (
                         <div className="mt-1 flex flex-wrap items-center gap-2">
                           <code className="min-w-0 flex-1 break-all font-mono text-[12.5px] text-gc-ink">{String(r.tx_hash)}</code>
-                          <button onClick={() => void copy(String(r.tx_hash))} className="rounded-xl border border-gc-line bg-white px-2.5 py-1 text-[12px] hover:bg-gc-panel">
+                          <button onClick={() => void copy(String(r.tx_hash))} className="rounded-xl border border-gc-line bg-background px-2.5 py-1 text-[12px] hover:bg-gc-panel">
                             Copy
                           </button>
-                          <a href={net.explorerTx(String(r.tx_hash))} target="_blank" rel="noreferrer" className="rounded-xl border border-gc-line bg-white px-2.5 py-1 text-[12px] hover:bg-gc-panel">
+                          <a href={net.explorerTx(String(r.tx_hash))} target="_blank" rel="noreferrer" className="rounded-xl border border-gc-line bg-background px-2.5 py-1 text-[12px] hover:bg-gc-panel">
                             Explorer
                           </a>
                         </div>
@@ -314,7 +314,7 @@ function OpsPayments() {
                     </div>
 
                     {r.reject_reason && (
-                      <div className="mt-3 rounded-xl bg-red-50 px-3 py-2 text-[12.5px] text-red-700">Rejected: {r.reject_reason}</div>
+                      <div className="mt-3 rounded-xl bg-gc-red-soft px-3 py-2 text-[12.5px] text-gc-red">Rejected: {r.reject_reason}</div>
                     )}
 
                     {status !== "approved" && (
@@ -322,7 +322,7 @@ function OpsPayments() {
                         <button
                           disabled={busy === r.id}
                           onClick={() => void decide(r.id, "approve")}
-                          className="rounded-xl bg-emerald-600 px-3.5 py-2 text-[13px] text-white hover:bg-emerald-700 disabled:opacity-50"
+                          className="rounded-xl bg-gc-success px-3.5 py-2 text-[13px] text-gc-on-blue hover:bg-gc-success/90 disabled:opacity-50"
                         >
                           Approve & credit
                         </button>
@@ -366,7 +366,7 @@ function OpsPayments() {
                 <input className={input} placeholder="Per user limit" value={form.perUserLimit} onChange={(e) => setForm({ ...form, perUserLimit: e.target.value })} />
                 <input className={input} type="date" value={form.expiresAt} onChange={(e) => setForm({ ...form, expiresAt: e.target.value })} />
                 <input className={`${input} sm:col-span-3`} placeholder="Note" value={form.note} onChange={(e) => setForm({ ...form, note: e.target.value })} />
-                <button onClick={() => void savePromo()} disabled={busy === "promo"} className="rounded-xl bg-gc-blue px-4 py-2 text-sm text-white hover:bg-gc-blue-hover disabled:opacity-50">
+                <button onClick={() => void savePromo()} disabled={busy === "promo"} className="rounded-xl bg-gc-blue px-4 py-2 text-sm text-gc-on-blue hover:bg-gc-blue-hover disabled:opacity-50">
                   Save code
                 </button>
               </div>
@@ -402,7 +402,7 @@ function OpsPayments() {
                             await togglePromoFn({ data: { code: p.code, active: !p.active, token: opsToken() } });
                             await load();
                           }}
-                          className={`rounded-full px-2.5 py-1 text-[12px] ${p.active ? "bg-emerald-50 text-emerald-700" : "bg-gc-panel text-gc-ink-muted"}`}
+                          className={`rounded-full px-2.5 py-1 text-[12px] ${p.active ? "bg-gc-green-soft text-gc-success" : "bg-gc-panel text-gc-ink-muted"}`}
                         >
                           {p.active ? "Active" : "Disabled"}
                         </button>
@@ -431,7 +431,7 @@ function OpsPayments() {
                   />
                 </div>
               ))}
-              <button onClick={() => void saveCfg()} disabled={busy === "cfg"} className="rounded-xl bg-gc-blue px-4 py-2 text-sm text-white hover:bg-gc-blue-hover disabled:opacity-50">
+              <button onClick={() => void saveCfg()} disabled={busy === "cfg"} className="rounded-xl bg-gc-blue px-4 py-2 text-sm text-gc-on-blue hover:bg-gc-blue-hover disabled:opacity-50">
                 Save addresses
               </button>
             </div>

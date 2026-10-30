@@ -66,14 +66,14 @@ function AccuracyPage() {
     <div className="mx-auto max-w-6xl px-4 py-6 space-y-6" style={{ fontFamily: "'Google Sans','Urbanist',sans-serif" }}>
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="pl-1 text-2xl font-semibold text-black">Signal Accuracy</h1>
-          <p className="text-sm text-gray-500 mt-1">
+          <h1 className="pl-1 text-2xl font-semibold text-foreground">Signal Accuracy</h1>
+          <p className="text-sm text-muted-foreground mt-1">
             Objective win-rate and R-expectancy from the paper-trading log (auto-resolved via 5m candles).
           </p>
         </div>
         <div className="flex items-center gap-2">
           <select
-            className="border rounded-md px-3 py-1.5 text-sm bg-white"
+            className="border rounded-md px-3 py-1.5 text-sm bg-background"
             value={days}
             onChange={(e) => {
               const d = Number(e.target.value);
@@ -89,7 +89,7 @@ function AccuracyPage() {
           <button
             onClick={() => load(days)}
             disabled={loading}
-            className="inline-flex items-center gap-1.5 rounded-md border bg-white px-3 py-1.5 text-sm hover:bg-gray-50 disabled:opacity-50"
+            className="inline-flex items-center gap-1.5 rounded-md border bg-background px-3 py-1.5 text-sm hover:bg-muted disabled:opacity-50"
           >
             <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
             Refresh
@@ -98,9 +98,9 @@ function AccuracyPage() {
       </div>
 
       {report?.drift_warning && (
-        <div className="rounded-lg border border-amber-300 bg-amber-50 p-4 flex items-start gap-3">
-          <AlertTriangle className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
-          <div className="text-sm text-amber-900">
+        <div className="rounded-lg border border-gc-yellow bg-gc-yellow-soft p-4 flex items-start gap-3">
+          <AlertTriangle className="h-5 w-5 text-gc-amber shrink-0 mt-0.5" />
+          <div className="text-sm text-gc-amber">
             <div className="font-medium">Model drift detected</div>
             <div>{report.drift_warning}</div>
           </div>
@@ -139,7 +139,7 @@ function AccuracyPage() {
                 <button
                   onClick={() => runReplay(Math.min(days, 180))}
                   disabled={replayLoading}
-                  className="inline-flex items-center gap-1.5 rounded-md border bg-white px-3 py-1.5 text-sm hover:bg-gray-50 disabled:opacity-50"
+                  className="inline-flex items-center gap-1.5 rounded-md border bg-background px-3 py-1.5 text-sm hover:bg-muted disabled:opacity-50"
                 >
                   <RefreshCw className={`h-4 w-4 ${replayLoading ? "animate-spin" : ""}`} />
                   Replay last {Math.min(days, 180)}d through current gates
@@ -181,7 +181,7 @@ function AccuracyPage() {
                       ])}
                     />
                   )}
-                  <p className="text-xs text-gray-500">{replay.note}</p>
+                  <p className="text-xs text-muted-foreground">{replay.note}</p>
                 </>
               )}
             </div>
@@ -219,7 +219,7 @@ function AccuracyPage() {
             />
           </Section>
 
-          <div className="text-xs text-gray-400 flex items-center gap-1.5">
+          <div className="text-xs text-muted-foreground flex items-center gap-1.5">
             <TrendingUp className="h-3.5 w-3.5" />
             Window: {report.window_days}d · Resolver runs every 30 minutes.
           </div>
@@ -241,20 +241,20 @@ function Kpi({
   accent?: "good" | "bad" | "neutral";
 }) {
   const color =
-    accent === "good" ? "text-emerald-600" : accent === "bad" ? "text-red-600" : "text-black";
+    accent === "good" ? "text-gc-success" : accent === "bad" ? "text-gc-red" : "text-foreground";
   return (
-    <div className="rounded-lg border bg-white p-4">
-      <div className="text-xs text-gray-500 uppercase tracking-wide">{label}</div>
+    <div className="rounded-lg border bg-background p-4">
+      <div className="text-xs text-muted-foreground uppercase tracking-wide">{label}</div>
       <div className={`text-2xl font-semibold mt-1 ${color}`}>{value}</div>
-      {hint && <div className="text-xs text-gray-400 mt-1">{hint}</div>}
+      {hint && <div className="text-xs text-muted-foreground mt-1">{hint}</div>}
     </div>
   );
 }
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="rounded-lg border bg-white overflow-hidden">
-      <div className="px-4 py-2.5 border-b bg-gray-50 text-sm font-medium text-black">
+    <div className="rounded-lg border bg-background overflow-hidden">
+      <div className="px-4 py-2.5 border-b bg-muted/50 text-sm font-medium text-foreground">
         {title}
       </div>
       <div className="p-4">{children}</div>
@@ -267,7 +267,7 @@ function Table({ cols, rows }: { cols: string[]; rows: (string | number)[][] }) 
     <div className="overflow-x-auto">
       <table className="w-full text-sm">
         <thead>
-          <tr className="text-left text-xs text-gray-500 uppercase">
+          <tr className="text-left text-xs text-muted-foreground uppercase">
             {cols.map((c) => (
               <th key={c} className="py-2 pr-4 font-medium">
                 {c}
@@ -278,7 +278,7 @@ function Table({ cols, rows }: { cols: string[]; rows: (string | number)[][] }) 
         <tbody>
           {rows.length === 0 && (
             <tr>
-              <td colSpan={cols.length} className="text-gray-400 py-4">
+              <td colSpan={cols.length} className="text-muted-foreground py-4">
                 No data yet.
               </td>
             </tr>
@@ -286,7 +286,7 @@ function Table({ cols, rows }: { cols: string[]; rows: (string | number)[][] }) 
           {rows.map((row, i) => (
             <tr key={i} className="border-t">
               {row.map((cell, j) => (
-                <td key={j} className="py-2 pr-4 text-black">
+                <td key={j} className="py-2 pr-4 text-foreground">
                   {cell}
                 </td>
               ))}

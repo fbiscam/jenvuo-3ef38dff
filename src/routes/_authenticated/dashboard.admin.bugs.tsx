@@ -76,20 +76,20 @@ function BugTriagePage() {
   const groups = (data?.rows ?? []) as Group[]
 
   return (
-    <div className={`min-h-dvh w-full bg-[#FAFAFA] text-zinc-900 ${SANS} antialiased`}>
+    <div className={`min-h-dvh w-full bg-[#FAFAFA] text-foreground ${SANS} antialiased`}>
       <main className="mx-auto max-w-6xl px-5 py-8 sm:px-6">
-        <div className="rounded-xl border border-zinc-200 bg-white p-5 sm:p-6">
+        <div className="rounded-xl border border-border bg-background p-5 sm:p-6">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
               <h1 className="pl-1 text-xl font-semibold tracking-tight sm:text-2xl">Bug Triage</h1>
-              <p className="mt-1 text-sm text-zinc-500">
+              <p className="mt-1 text-sm text-muted-foreground">
                 Grouped runtime errors from the app. Analyze with AI to get root cause + suggested fix.
               </p>
             </div>
             <button
               onClick={() => refetch()}
               disabled={isFetching}
-              className="rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-sm text-zinc-700 hover:bg-zinc-50 disabled:opacity-50"
+              className="rounded-lg border border-border bg-background px-3 py-1.5 text-sm text-foreground hover:bg-muted disabled:opacity-50"
             >
               {isFetching ? 'Refreshing…' : 'Refresh'}
             </button>
@@ -100,7 +100,7 @@ function BugTriagePage() {
               <button
                 key={s}
                 onClick={() => setStatusFilter(s)}
-                className={`rounded-full px-3 py-1 text-xs capitalize transition ${ statusFilter === s ? 'bg-zinc-900 text-white' : 'border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-50' }`}
+                className={`rounded-full px-3 py-1 text-xs capitalize transition ${ statusFilter === s ? 'bg-gc-blue text-gc-on-blue' : 'border border-border bg-background text-muted-foreground hover:bg-muted' }`}
               >
                 {s}
               </button>
@@ -109,9 +109,9 @@ function BugTriagePage() {
         </div>
 
         <div className="mt-4 space-y-3">
-          {isLoading && <div className="text-sm text-zinc-500">Loading…</div>}
+          {isLoading && <div className="text-sm text-muted-foreground">Loading…</div>}
           {!isLoading && groups.length === 0 && (
-            <div className="rounded-xl border border-zinc-200 bg-white p-8 text-center text-sm text-zinc-500">
+            <div className="rounded-xl border border-border bg-background p-8 text-center text-sm text-muted-foreground">
               No errors in this bucket. 🎉
             </div>
           )}
@@ -119,7 +119,7 @@ function BugTriagePage() {
           {groups.map((g) => {
             const isOpen = expanded === g.fingerprint
             return (
-              <div key={g.fingerprint} className="rounded-xl border border-zinc-200 bg-white p-4 sm:p-5">
+              <div key={g.fingerprint} className="rounded-xl border border-border bg-background p-4 sm:p-5">
                 <button
                   onClick={() => setExpanded(isOpen ? null : g.fingerprint)}
                   className="flex w-full items-start justify-between gap-3 text-left"
@@ -127,56 +127,56 @@ function BugTriagePage() {
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
                       <span className={`rounded-full px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide ${
-                        g.status === 'resolved' ? 'bg-emerald-100 text-emerald-700' :
-                        g.status === 'investigating' ? 'bg-amber-100 text-amber-700' :
-                        g.status === 'ignored' ? 'bg-zinc-100 text-zinc-500' :
-                        'bg-rose-100 text-rose-700'
+                        g.status === 'resolved' ? 'bg-gc-green-soft text-gc-success' :
+                        g.status === 'investigating' ? 'bg-gc-yellow-soft text-gc-amber' :
+                        g.status === 'ignored' ? 'bg-muted text-muted-foreground' :
+                        'bg-gc-red-soft text-gc-red'
                       }`}>{g.status}</span>
-                      <span className="rounded-full bg-zinc-100 px-2 py-0.5 text-[10px] font-medium text-zinc-600">
+                      <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
                         ×{g.occurrences}
                       </span>
                       {g.sample_route && (
-                        <span className="truncate rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-medium text-blue-700">
+                        <span className="truncate rounded-full bg-gc-sky px-2 py-0.5 text-[10px] font-medium text-gc-blue-deep">
                           {g.sample_route}
                         </span>
                       )}
-                      <span className="text-[11px] text-zinc-400">last: {fmtTime(g.last_seen)}</span>
+                      <span className="text-[11px] text-muted-foreground">last: {fmtTime(g.last_seen)}</span>
                     </div>
-                    <div className="mt-1.5 truncate text-sm font-medium text-zinc-900">{g.sample_message}</div>
+                    <div className="mt-1.5 truncate text-sm font-medium text-foreground">{g.sample_message}</div>
                     {g.ai_root_cause && (
-                      <div className="mt-1 text-xs text-zinc-500 line-clamp-2">
-                        <span className="font-semibold text-zinc-700">AI:</span> {g.ai_root_cause}
+                      <div className="mt-1 text-xs text-muted-foreground line-clamp-2">
+                        <span className="font-semibold text-foreground">AI:</span> {g.ai_root_cause}
                       </div>
                     )}
                   </div>
-                  <span className="mt-1 shrink-0 text-xs text-zinc-400">{isOpen ? '▲' : '▼'}</span>
+                  <span className="mt-1 shrink-0 text-xs text-muted-foreground">{isOpen ? '▲' : '▼'}</span>
                 </button>
 
                 {isOpen && (
-                  <div className="mt-4 space-y-3 border-t border-zinc-100 pt-4">
+                  <div className="mt-4 space-y-3 border-t border-border pt-4">
                     <OccurrencesList fp={g.fingerprint} />
 
                     {g.ai_root_cause ? (
-                      <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-3 text-xs">
-                        <div className="mb-1 font-semibold text-zinc-700">Root cause ({g.ai_model})</div>
-                        <div className="text-zinc-700">{g.ai_root_cause}</div>
+                      <div className="rounded-lg border border-border bg-muted/50 p-3 text-xs">
+                        <div className="mb-1 font-semibold text-foreground">Root cause ({g.ai_model})</div>
+                        <div className="text-foreground">{g.ai_root_cause}</div>
                         {g.ai_suggested_fix && (
                           <>
-                            <div className="mt-2 mb-1 font-semibold text-zinc-700">Suggested fix</div>
-                            <pre className="whitespace-pre-wrap font-sans text-zinc-700">{g.ai_suggested_fix}</pre>
+                            <div className="mt-2 mb-1 font-semibold text-foreground">Suggested fix</div>
+                            <pre className="whitespace-pre-wrap font-sans text-foreground">{g.ai_suggested_fix}</pre>
                           </>
                         )}
-                        <div className="mt-2 text-[10px] text-zinc-400">
+                        <div className="mt-2 text-[10px] text-muted-foreground">
                           Analyzed {g.ai_analyzed_at ? fmtTime(g.ai_analyzed_at) : ''}
                         </div>
                       </div>
                     ) : (
-                      <div className="text-xs text-zinc-500">Not analyzed yet.</div>
+                      <div className="text-xs text-muted-foreground">Not analyzed yet.</div>
                     )}
 
-                    <details className="rounded-lg border border-zinc-200 bg-zinc-50 p-3 text-xs">
-                      <summary className="cursor-pointer font-semibold text-zinc-700">Stack sample</summary>
-                      <pre className="mt-2 overflow-x-auto whitespace-pre-wrap text-[11px] text-zinc-600">
+                    <details className="rounded-lg border border-border bg-muted/50 p-3 text-xs">
+                      <summary className="cursor-pointer font-semibold text-foreground">Stack sample</summary>
+                      <pre className="mt-2 overflow-x-auto whitespace-pre-wrap text-[11px] text-muted-foreground">
                         {g.sample_stack ?? '(no stack)'}
                       </pre>
                     </details>
@@ -185,7 +185,7 @@ function BugTriagePage() {
                       <button
                         onClick={() => analyzeMut.mutate(g.fingerprint)}
                         disabled={analyzeMut.isPending}
-                        className="rounded-lg bg-zinc-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-zinc-800 disabled:opacity-50"
+                        className="rounded-lg bg-gc-blue px-3 py-1.5 text-xs font-medium text-gc-on-blue hover:bg-gc-blue-hover disabled:opacity-50"
                       >
                         {analyzeMut.isPending ? 'Analyzing…' : g.ai_root_cause ? 'Re-analyze' : 'Analyze with AI'}
                       </button>
@@ -195,7 +195,7 @@ function BugTriagePage() {
                             const prompt = `Fix this bug in the codebase:\n\nRoot cause: ${g.ai_root_cause}\n\nSuggested fix:\n${g.ai_suggested_fix}\n\nSample error: ${g.sample_message}\nRoute: ${g.sample_route ?? 'n/a'}`
                             navigator.clipboard.writeText(prompt).then(() => toast.success('Prompt copied — paste into Lovable chat'))
                           }}
-                          className="rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-xs text-zinc-700 hover:bg-zinc-50"
+                          className="rounded-lg border border-border bg-background px-3 py-1.5 text-xs text-foreground hover:bg-muted"
                         >
                           Copy fix prompt
                         </button>
@@ -203,7 +203,7 @@ function BugTriagePage() {
                       {g.status !== 'investigating' && (
                         <button
                           onClick={() => statusMut.mutate({ fp: g.fingerprint, status: 'investigating' })}
-                          className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-1.5 text-xs text-amber-800 hover:bg-amber-100"
+                          className="rounded-lg border border-gc-yellow bg-gc-yellow-soft px-3 py-1.5 text-xs text-gc-amber hover:bg-gc-yellow-soft"
                         >
                           Mark investigating
                         </button>
@@ -211,7 +211,7 @@ function BugTriagePage() {
                       {g.status !== 'resolved' && (
                         <button
                           onClick={() => statusMut.mutate({ fp: g.fingerprint, status: 'resolved' })}
-                          className="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-xs text-emerald-800 hover:bg-emerald-100"
+                          className="rounded-lg border border-gc-success/30 bg-gc-green-soft px-3 py-1.5 text-xs text-gc-success hover:bg-gc-green-soft"
                         >
                           Mark resolved
                         </button>
@@ -219,7 +219,7 @@ function BugTriagePage() {
                       {g.status !== 'ignored' && (
                         <button
                           onClick={() => statusMut.mutate({ fp: g.fingerprint, status: 'ignored' })}
-                          className="rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-xs text-zinc-600 hover:bg-zinc-50"
+                          className="rounded-lg border border-border bg-background px-3 py-1.5 text-xs text-muted-foreground hover:bg-muted"
                         >
                           Ignore
                         </button>
@@ -242,19 +242,19 @@ function OccurrencesList({ fp }: { fp: string }) {
     queryKey: ['bug-occurrences', fp],
     queryFn: () => fn({ data: { fingerprint: fp } }),
   })
-  if (isLoading) return <div className="text-xs text-zinc-500">Loading occurrences…</div>
+  if (isLoading) return <div className="text-xs text-muted-foreground">Loading occurrences…</div>
   const rows = (data?.rows ?? []) as any[]
   if (rows.length === 0) return null
   return (
-    <div className="rounded-lg border border-zinc-200 bg-white p-3 text-xs">
-      <div className="mb-2 font-semibold text-zinc-700">Recent occurrences ({rows.length})</div>
+    <div className="rounded-lg border border-border bg-background p-3 text-xs">
+      <div className="mb-2 font-semibold text-foreground">Recent occurrences ({rows.length})</div>
       <div className="space-y-1.5">
         {rows.slice(0, 8).map((r) => (
-          <div key={r.id} className="flex flex-wrap items-center gap-2 border-t border-zinc-100 pt-1.5 first:border-t-0 first:pt-0">
-            <span className="text-[10px] text-zinc-400">{fmtTime(r.created_at)}</span>
-            <span className="rounded bg-zinc-100 px-1.5 py-0.5 text-[10px] text-zinc-600">{r.source}/{r.mechanism ?? '—'}</span>
-            {r.route && <span className="text-[10px] text-blue-700">{r.route}</span>}
-            {r.user_email && <span className="text-[10px] text-zinc-500">{r.user_email}</span>}
+          <div key={r.id} className="flex flex-wrap items-center gap-2 border-t border-border pt-1.5 first:border-t-0 first:pt-0">
+            <span className="text-[10px] text-muted-foreground">{fmtTime(r.created_at)}</span>
+            <span className="rounded bg-muted px-1.5 py-0.5 text-[10px] text-muted-foreground">{r.source}/{r.mechanism ?? '—'}</span>
+            {r.route && <span className="text-[10px] text-gc-blue-deep">{r.route}</span>}
+            {r.user_email && <span className="text-[10px] text-muted-foreground">{r.user_email}</span>}
           </div>
         ))}
       </div>

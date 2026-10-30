@@ -86,7 +86,7 @@ function ScanAuditPage() {
       {/* Mismatches */}
       <section className="border rounded-lg p-4 bg-card">
         <h2 className="pl-1 text-sm font-semibold flex items-center gap-2 mb-3">
-          <AlertTriangle className="h-4 w-4 text-amber-500" />
+          <AlertTriangle className="h-4 w-4 text-gc-amber" />
           Mismatched scans ({mismatches.length})
           <span className="text-[10px] font-normal text-muted-foreground">— any scan_id with more than 1 deduction</span>
         </h2>
@@ -119,7 +119,7 @@ function ScanAuditPage() {
                       </button>
                     </td>
                     <td className="py-1.5 pr-3">{m.user_email ?? m.user_id.slice(0, 8)}</td>
-                    <td className="py-1.5 pr-3 font-semibold text-red-600">{m.charge_count}</td>
+                    <td className="py-1.5 pr-3 font-semibold text-gc-red">{m.charge_count}</td>
                     <td className="py-1.5 pr-3">-{m.total_amount}</td>
                     <td className="py-1.5 pr-3">{m.reasons.join(", ")}</td>
                     <td className="py-1.5 pr-3">{m.sources.join(", ")}</td>
@@ -198,9 +198,9 @@ function ScanAuditPage() {
                   <td className="py-1.5 px-3">{r.balance_after ?? "—"}</td>
                   <td className="py-1.5 px-3">
                     <span className={
-                      r.source.includes("failed") ? "text-red-600" :
-                      r.source === "server_spend" ? "text-emerald-600" :
-                      "text-amber-600"
+                      r.source.includes("failed") ? "text-gc-red" :
+                      r.source === "server_spend" ? "text-gc-success" :
+                      "text-gc-amber"
                     }>{r.source}</span>
                   </td>
                   <td className="py-1.5 px-3 font-mono text-[10px]">{r.caller ?? "—"}</td>
