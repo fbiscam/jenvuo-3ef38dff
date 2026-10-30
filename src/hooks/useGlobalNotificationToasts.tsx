@@ -61,37 +61,31 @@ export function useGlobalNotificationToasts() {
             const isSignal = n.type === "signal_alert";
             const href = "/dashboard/notifications";
             const Icon = isSignal ? TrendingUp : Bell;
-            const accent = isSignal ? "text-emerald-600" : "text-zinc-900";
-            const dot = isSignal ? "bg-emerald-500" : "bg-zinc-900";
+            const tile = isSignal ? "bg-gc-green-soft text-gc-success" : "bg-gc-blue-soft text-gc-blue-deep";
 
             toast.custom(
               (t) => (
-                <div className="w-[360px] max-w-[calc(100vw-2rem)] overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-[0_12px_40px_-12px_rgba(0,0,0,0.18)]">
+                <div className="w-[360px] max-w-[calc(100vw-2rem)] overflow-hidden rounded-xl border border-gc-line bg-background shadow-lg">
                   <div className="flex items-start gap-3 p-4">
-                    <div className="relative shrink-0">
-                      <div className="grid h-10 w-10 place-items-center rounded-full bg-zinc-100">
-                        <Icon className={`h-5 w-5 ${accent}`} />
-                      </div>
-                      <span
-                        className={`absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full ring-2 ring-white ${dot}`}
-                      />
+                    <div className={`grid h-9 w-9 shrink-0 place-items-center rounded-lg ${tile}`}>
+                      <Icon className="h-[18px] w-[18px]" />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <div className="truncate text-[13px] font-semibold text-zinc-900">
+                      <div className="truncate text-[13px] font-semibold text-gc-ink">
                         {title}
                       </div>
                       {body && (
-                        <div className="mt-0.5 line-clamp-2 text-[12px] leading-snug text-zinc-600">
+                        <div className="mt-0.5 line-clamp-2 text-[12px] leading-snug text-gc-ink-muted">
                           {body}
                         </div>
                       )}
                     </div>
                   </div>
-                  <div className="flex items-center justify-end gap-1 border-t border-zinc-100 bg-zinc-50/60 px-2 py-1.5">
+                  <div className="flex items-center justify-end gap-1 border-t border-gc-line bg-gc-surface px-2 py-1.5">
                     <button
                       type="button"
                       onClick={() => toast.dismiss(t)}
-                      className="rounded-lg px-2.5 py-1 text-[12px] font-medium text-zinc-600 transition hover:bg-zinc-100 hover:text-zinc-900"
+                      className="rounded-lg px-2.5 py-1 text-[12px] font-medium text-gc-ink-muted transition hover:bg-gc-panel hover:text-gc-ink"
                     >
                       Dismiss
                     </button>
@@ -101,7 +95,7 @@ export function useGlobalNotificationToasts() {
                         toast.dismiss(t);
                         window.location.href = href;
                       }}
-                      className="rounded-lg bg-zinc-900 px-3 py-1 text-[12px] font-medium text-white transition hover:bg-zinc-800"
+                      className="rounded-full bg-gc-blue-deep px-3 py-1 text-[12px] font-medium text-gc-on-blue transition hover:bg-gc-navy"
                     >
                       {isSignal ? "View alert" : "View"}
                     </button>

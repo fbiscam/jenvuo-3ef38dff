@@ -68,37 +68,51 @@ export default function NotificationStrip() {
   const Icon = isSecurity ? ShieldAlert : Bell;
 
   return (
-    <section className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-gc-line bg-background py-2 pl-4 pr-4 sm:pl-5 md:pr-5">
-      <Icon className="h-5 w-5 shrink-0 text-gc-ink-muted" aria-hidden="true" />
-      <p className="min-w-0 flex-1 text-[13px] text-gc-ink sm:text-[14px]">
-        <span className="font-medium">{notice.title}</span>
-        {notice.body ? <span className="text-gc-ink-muted"> — {notice.body}</span> : null}
-      </p>
-      <div className="flex shrink-0 items-center gap-2">
-        <button
-          type="button"
-          onClick={() => void dismiss()}
-          className="h-8 rounded-full border border-gc-line bg-background px-4 text-[13px] font-medium text-gc-ink hover:bg-gc-surface"
+    <section className="border-b border-gc-line bg-gc-canvas px-3 py-2 sm:px-5">
+      <div
+        className={`flex flex-wrap items-center gap-x-3 gap-y-2 rounded-xl border bg-background py-2 pl-2 pr-2 shadow-sm sm:flex-nowrap ${
+          isSecurity ? "border-gc-red/30" : "border-gc-blue/25"
+        }`}
+      >
+        <span
+          className={`grid h-9 w-9 shrink-0 place-items-center rounded-lg ${
+            isSecurity ? "bg-gc-red-soft text-gc-red" : "bg-gc-blue-soft text-gc-blue-deep"
+          }`}
         >
-          Dismiss
-        </button>
-        {isSecurity ? (
-          <Link
-            to="/dashboard/profile"
-            hash="security"
+          <Icon className="h-[18px] w-[18px]" aria-hidden="true" />
+        </span>
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-[13px] font-semibold text-gc-ink sm:text-[14px]">{notice.title}</p>
+          {notice.body ? (
+            <p className="line-clamp-2 text-[12px] leading-snug text-gc-ink-muted sm:line-clamp-1 sm:text-[13px]">{notice.body}</p>
+          ) : null}
+        </div>
+        <div className="ml-auto flex shrink-0 items-center gap-2">
+          <button
+            type="button"
             onClick={() => void dismiss()}
-            className="inline-flex h-8 items-center rounded-full bg-gc-blue-deep px-4 text-[13px] font-medium text-gc-on-blue hover:bg-gc-navy"
+            className="h-8 rounded-full px-3 text-[13px] font-medium text-gc-ink-muted hover:bg-gc-surface hover:text-gc-ink"
           >
-            Change password
-          </Link>
-        ) : (
-          <Link
-            to="/dashboard/notifications"
-            className="inline-flex h-8 items-center rounded-full bg-gc-blue-deep px-4 text-[13px] font-medium text-gc-on-blue hover:bg-gc-navy"
-          >
-            View
-          </Link>
-        )}
+            Dismiss
+          </button>
+          {isSecurity ? (
+            <Link
+              to="/dashboard/profile"
+              hash="security"
+              onClick={() => void dismiss()}
+              className="inline-flex h-8 items-center rounded-full bg-gc-red px-4 text-[13px] font-medium text-gc-on-blue hover:opacity-90"
+            >
+              Change password
+            </Link>
+          ) : (
+            <Link
+              to="/dashboard/notifications"
+              className="inline-flex h-8 items-center rounded-full bg-gc-blue-deep px-4 text-[13px] font-medium text-gc-on-blue hover:bg-gc-navy"
+            >
+              View
+            </Link>
+          )}
+        </div>
       </div>
     </section>
   );
