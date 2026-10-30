@@ -109,26 +109,6 @@ function modelDisplay(raw: string) {
   return { provider, model };
 }
 
-function metadataEntries(metadata: unknown) {
-  if (!metadata || typeof metadata !== "object" || Array.isArray(metadata))
-    return [] as [string, unknown][];
-  return Object.entries(metadata as Record<string, unknown>);
-}
-
-function metadataNumber(metadata: unknown, pattern: RegExp) {
-  return metadataEntries(metadata).reduce((sum, [key, value]) => {
-    if (!pattern.test(key)) return sum;
-    const amount = typeof value === "number" ? value : Number(value);
-    return sum + (Number.isFinite(amount) ? amount : 0);
-  }, 0);
-}
-
-function metadataFlag(metadata: unknown, pattern: RegExp) {
-  return metadataEntries(metadata).some(
-    ([key, value]) => pattern.test(key) && value !== false && value !== 0 && value !== "false",
-  );
-}
-
 const RANGES = [
   { days: 7, label: "Last 7 days" },
   { days: 14, label: "Last 14 days" },
