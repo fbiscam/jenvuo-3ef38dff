@@ -2,8 +2,9 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { RefreshCw, Play, CheckCircle2, RotateCcw, ShieldCheck, ShieldAlert, ChevronDown, ChevronRight } from "lucide-react";
+import { RefreshCw, Play, CheckCircle2, RotateCcw, ShieldCheck, ShieldAlert, ChevronDown, ChevronRight, SlidersHorizontal } from "lucide-react";
 import { isAdmin } from "@/lib/admin-messages.functions";
+import { OpsPage, OpsState } from "@/components/ops/OpsPage";
 import {
   listWeightConfigs, listTuningRuns, activateWeightConfig, rollbackWeightConfig,
   listFoldResultsForConfig,
@@ -89,10 +90,10 @@ function TuningPage() {
   }, []);
 
   if (loading && !allowed) {
-    return <div className="p-8 text-sm text-slate-500">Loading…</div>;
+    return <OpsState title="Loading tuning…" />;
   }
   if (!allowed) {
-    return <div className="p-8 text-sm text-rose-600">Admins only.</div>;
+    return <OpsState title="Admin access required" description="Sign in with an admin account to view this page." />;
   }
 
   const active = configs.find((c) => c.status === "active");
@@ -179,50 +180,51 @@ function TuningPage() {
   };
 
   return (
-    <div className="mx-auto max-w-6xl space-y-6 p-4 md:p-8">
-      <header className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h1 className="pl-1 text-2xl font-semibold text-slate-900">Signal Weight Tuning</h1>
-          <p className="text-sm text-slate-500">Grid search on backtest history · Phase 1</p>
-        </div>
-        <div className="flex items-center gap-2">
+    <OpsPage
+      title="Signal weight tuning"
+      description="Grid search on backtest history · Phase 1"
+      icon={<SlidersHorizontal />}
+      actions={
+        <>
           <button
             onClick={reload}
-            className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm text-slate-700 hover:bg-slate-50"
+            className="inline-flex items-center gap-1 rounded-lg border border-border bg-background px-3 py-1.5 text-sm text-foreground hover:bg-muted"
           >
             <RefreshCw className="h-3.5 w-3.5" /> Refresh
           </button>
           <button
             onClick={doRollback}
-            className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm text-slate-700 hover:bg-slate-50"
+            className="inline-flex items-center gap-1 rounded-lg border border-border bg-background px-3 py-1.5 text-sm text-foreground hover:bg-muted"
           >
             <RotateCcw className="h-3.5 w-3.5" /> Rollback
           </button>
-        </div>
-      </header>
+        </>
+      }
+    >
+      <div className="space-y-6 px-4 py-5 sm:px-6">
 
       {active && (
-        <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm">
-          <div className="font-medium text-emerald-900">
+        <div className="rounded-xl border border-gc-success/30 bg-gc-green-soft p-4 text-sm">
+          <div className="font-medium text-gc-success">
             Active configuration: v{active.version}{" "}
-            <span className="text-emerald-700">({active.created_by})</span>
+            <span className="text-gc-success">({active.created_by})</span>
           </div>
-          <div className="text-emerald-800">
+          <div className="text-gc-success">
             Activated {timeAgo(active.activated_at)}
             {active.notes ? ` · ${active.notes}` : ""}
           </div>
         </div>
       )}
 
-      <section className="rounded-xl border border-slate-200 bg-white p-4">
-        <h2 className="pl-1 mb-3 text-lg font-semibold text-slate-900">Run grid search</h2>
+      <section className="rounded-xl border border-border bg-background p-4">
+        <h2 className="mb-3 text-[13px] font-medium text-foreground">Run grid search</h2>
         <div className="flex flex-wrap items-end gap-3">
-          <label className="flex flex-col gap-1 text-xs text-slate-600">
+          <label className="flex flex-col gap-1 text-xs text-muted-foreground">
             Symbol
             <select
               value={symbol}
               onChange={(e) => setSymbol(e.target.value)}
-              className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm text-slate-900"
+              className="rounded-lg border border-border bg-background px-3 py-1.5 text-sm text-foreground"
             >
               {["XAUUSD"].map((s) => (
                 <option key={s} value={s}>{s}</option>
@@ -232,12 +234,12 @@ function TuningPage() {
           <button
             onClick={startGrid}
             disabled={busy}
-            className="inline-flex items-center gap-1 rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-50"
+            className="inline-flex items-center gap-1 rounded-lg bg-gc-blue px-4 py-2 text-sm font-medium text-gc-on-blue hover:bg-gc-blue-hover disabled:opacity-50"
           >
             <Play className="h-3.5 w-3.5" /> {busy ? "Running…" : "Run grid search"}
           </button>
         </div>
-        <p className="mt-3 text-xs text-slate-500">
+        <p className="mt-3 text-xs text-muted-foreground">
           27 combinations · scores each on ~900 15m candles + 600 1h candles ·
           objective = expectancy × √sample. Best candidate is saved but NOT
           auto-activated. Activate manually with a confirm, or wait for Phase 2
@@ -245,38 +247,38 @@ function TuningPage() {
         </p>
       </section>
 
-      <section className="rounded-xl border border-slate-200 bg-white">
-        <h2 className="pl-1 border-b border-slate-100 p-4 text-lg font-semibold text-slate-900">Tuning runs</h2>
+      <section className="rounded-xl border border-border bg-background">
+        <h2 className="border-b border-border px-4 py-3 text-[13px] font-medium text-foreground">Tuning runs</h2>
         <div className="overflow-x-auto">
           <table className="min-w-full text-sm">
-            <thead className="bg-slate-50 text-xs uppercase text-slate-500">
+            <thead className="text-[12px] text-muted-foreground">
               <tr>
-                <th className="px-3 py-2 text-left">Started</th>
-                <th className="px-3 py-2 text-left">Mode</th>
-                <th className="px-3 py-2 text-left">Symbol</th>
-                <th className="px-3 py-2 text-right">Combos</th>
-                <th className="px-3 py-2 text-right">Best win %</th>
-                <th className="px-3 py-2 text-right">Best avg R</th>
-                <th className="px-3 py-2 text-right">Sample</th>
-                <th className="px-3 py-2 text-left">Status</th>
+                <th className="whitespace-nowrap px-3 py-2.5 font-normal text-left">Started</th>
+                <th className="whitespace-nowrap px-3 py-2.5 font-normal text-left">Mode</th>
+                <th className="whitespace-nowrap px-3 py-2.5 font-normal text-left">Symbol</th>
+                <th className="whitespace-nowrap px-3 py-2.5 font-normal text-right">Combos</th>
+                <th className="whitespace-nowrap px-3 py-2.5 font-normal text-right">Best win %</th>
+                <th className="whitespace-nowrap px-3 py-2.5 font-normal text-right">Best avg R</th>
+                <th className="whitespace-nowrap px-3 py-2.5 font-normal text-right">Sample</th>
+                <th className="whitespace-nowrap px-3 py-2.5 font-normal text-left">Status</th>
               </tr>
             </thead>
             <tbody>
               {runs.length === 0 && (
-                <tr><td colSpan={8} className="px-3 py-6 text-center text-slate-500">No runs yet.</td></tr>
+                <tr><td colSpan={8} className="px-3 py-6 text-center text-muted-foreground">No runs yet.</td></tr>
               )}
               {runs.map((r) => {
                 const m = (r.metrics ?? {}) as Record<string, any>;
                 return (
-                  <tr key={r.id} className="border-t border-slate-100">
-                    <td className="px-3 py-2 text-slate-700">{timeAgo(r.started_at)}</td>
-                    <td className="px-3 py-2 text-slate-700">{r.mode}</td>
-                    <td className="px-3 py-2 text-slate-700">{r.symbol}</td>
-                    <td className="px-3 py-2 text-right text-slate-700">{r.combinations_tested}</td>
-                    <td className="px-3 py-2 text-right text-slate-700">{pct(m.winRate)}</td>
-                    <td className="px-3 py-2 text-right text-slate-700">{num(m.avgR)}</td>
-                    <td className="px-3 py-2 text-right text-slate-700">{m.sample ?? "—"}</td>
-                    <td className="px-3 py-2 text-slate-700">{r.status}</td>
+                  <tr key={r.id} className="border-t border-border">
+                    <td className="px-3 py-2 text-foreground">{timeAgo(r.started_at)}</td>
+                    <td className="px-3 py-2 text-foreground">{r.mode}</td>
+                    <td className="px-3 py-2 text-foreground">{r.symbol}</td>
+                    <td className="px-3 py-2 text-right text-foreground">{r.combinations_tested}</td>
+                    <td className="px-3 py-2 text-right text-foreground">{pct(m.winRate)}</td>
+                    <td className="px-3 py-2 text-right text-foreground">{num(m.avgR)}</td>
+                    <td className="px-3 py-2 text-right text-foreground">{m.sample ?? "—"}</td>
+                    <td className="px-3 py-2 text-foreground">{r.status}</td>
                   </tr>
                 );
               })}
@@ -285,19 +287,19 @@ function TuningPage() {
         </div>
       </section>
 
-      <section className="rounded-xl border border-slate-200 bg-white">
-        <h2 className="pl-1 border-b border-slate-100 p-4 text-lg font-semibold text-slate-900">Weight configurations</h2>
+      <section className="rounded-xl border border-border bg-background">
+        <h2 className="border-b border-border px-4 py-3 text-[13px] font-medium text-foreground">Weight configurations</h2>
         <div className="overflow-x-auto">
           <table className="min-w-full text-sm">
-            <thead className="bg-slate-50 text-xs uppercase text-slate-500">
+            <thead className="text-[12px] text-muted-foreground">
               <tr>
-                <th className="px-3 py-2 text-left"></th>
-                <th className="px-3 py-2 text-left">Version</th>
-                <th className="px-3 py-2 text-left">Source</th>
-                <th className="px-3 py-2 text-left">Status</th>
-                <th className="px-3 py-2 text-left">Validation</th>
-                <th className="px-3 py-2 text-left">Notes</th>
-                <th className="px-3 py-2 text-right">Actions</th>
+                <th className="whitespace-nowrap px-3 py-2.5 font-normal text-left"></th>
+                <th className="whitespace-nowrap px-3 py-2.5 font-normal text-left">Version</th>
+                <th className="whitespace-nowrap px-3 py-2.5 font-normal text-left">Source</th>
+                <th className="whitespace-nowrap px-3 py-2.5 font-normal text-left">Status</th>
+                <th className="whitespace-nowrap px-3 py-2.5 font-normal text-left">Validation</th>
+                <th className="whitespace-nowrap px-3 py-2.5 font-normal text-left">Notes</th>
+                <th className="whitespace-nowrap px-3 py-2.5 font-normal text-right">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -307,54 +309,54 @@ function TuningPage() {
                 const folds = foldsByConfig[c.id] ?? [];
                 return (
                   <>
-                    <tr key={c.id} className="border-t border-slate-100 align-top">
+                    <tr key={c.id} className="border-t border-border align-top">
                       <td className="px-3 py-2">
-                        <button onClick={() => toggleFolds(c.id)} className="text-slate-400 hover:text-slate-700">
+                        <button onClick={() => toggleFolds(c.id)} className="text-muted-foreground hover:text-foreground">
                           {isOpen ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
                         </button>
                       </td>
-                      <td className="px-3 py-2 font-medium text-slate-900">v{c.version}</td>
-                      <td className="px-3 py-2 text-slate-700">{c.created_by}</td>
+                      <td className="px-3 py-2 font-medium text-foreground">v{c.version}</td>
+                      <td className="px-3 py-2 text-foreground">{c.created_by}</td>
                       <td className="px-3 py-2">
                         {c.status === "active" ? (
-                          <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700">
+                          <span className="inline-flex items-center gap-1 rounded-full bg-gc-green-soft px-2 py-0.5 text-xs font-medium text-gc-success">
                             <CheckCircle2 className="h-3 w-3" /> Active
                           </span>
                         ) : c.status === "candidate" ? (
-                          <span className="rounded-full bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-700">
+                          <span className="rounded-full bg-gc-yellow-soft px-2 py-0.5 text-xs font-medium text-gc-amber">
                             Candidate
                           </span>
                         ) : (
-                          <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600">
+                          <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
                             Retired
                           </span>
                         )}
                       </td>
                       <td className="px-3 py-2 text-xs">
                         {c.validated ? (
-                          <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 font-medium text-emerald-700">
+                          <span className="inline-flex items-center gap-1 rounded-full bg-gc-green-soft px-2 py-0.5 font-medium text-gc-success">
                             <ShieldCheck className="h-3 w-3" /> Passed
                             {s.foldWinsForCandidate != null ? ` ${s.foldWinsForCandidate}/${s.folds ?? 5}` : ""}
                           </span>
                         ) : c.validation_summary ? (
-                          <span className="inline-flex items-center gap-1 rounded-full bg-rose-50 px-2 py-0.5 font-medium text-rose-700">
+                          <span className="inline-flex items-center gap-1 rounded-full bg-gc-red-soft px-2 py-0.5 font-medium text-gc-red">
                             <ShieldAlert className="h-3 w-3" /> Failed
                             {s.foldWinsForCandidate != null ? ` ${s.foldWinsForCandidate}/${s.folds ?? 5}` : ""}
                           </span>
                         ) : (
-                          <span className="rounded-full bg-slate-100 px-2 py-0.5 font-medium text-slate-500">
+                          <span className="rounded-full bg-muted px-2 py-0.5 font-medium text-muted-foreground">
                             Not run
                           </span>
                         )}
                       </td>
-                      <td className="px-3 py-2 text-slate-600">{c.notes ?? "—"}</td>
+                      <td className="px-3 py-2 text-muted-foreground">{c.notes ?? "—"}</td>
                       <td className="px-3 py-2 text-right">
                         <div className="flex justify-end gap-1">
                           {c.status !== "active" && c.status !== "retired" && (
                             <button
                               onClick={() => doValidate(c.id, c.version)}
                               disabled={validatingId === c.id}
-                              className="rounded-lg border border-slate-200 bg-white px-3 py-1 text-xs text-slate-700 hover:bg-slate-50 disabled:opacity-50"
+                              className="rounded-lg border border-border bg-background px-3 py-1 text-xs text-foreground hover:bg-muted disabled:opacity-50"
                             >
                               {validatingId === c.id ? "Validating…" : "Validate"}
                             </button>
@@ -364,8 +366,8 @@ function TuningPage() {
                               onClick={() => doActivate(c.id, c.version, c.validated)}
                               className={
                                 c.validated
-                                  ? "rounded-lg bg-slate-900 px-3 py-1 text-xs font-medium text-white hover:bg-slate-800"
-                                  : "rounded-lg border border-rose-200 bg-white px-3 py-1 text-xs text-rose-700 hover:bg-rose-50"
+                                  ? "rounded-lg bg-gc-blue px-3 py-1 text-xs font-medium text-gc-on-blue hover:bg-gc-blue-hover"
+                                  : "rounded-lg border border-gc-red/30 bg-background px-3 py-1 text-xs text-gc-red hover:bg-gc-red-soft"
                               }
                             >
                               {c.validated ? "Activate" : "Force activate"}
@@ -375,13 +377,13 @@ function TuningPage() {
                       </td>
                     </tr>
                     {isOpen && (
-                      <tr className="border-t border-slate-100 bg-slate-50/60">
+                      <tr className="border-t border-border bg-muted/50">
                         <td colSpan={7} className="px-4 py-3">
                           {folds.length === 0 ? (
-                            <div className="text-xs text-slate-500">No walk-forward folds recorded for this config yet.</div>
+                            <div className="text-xs text-muted-foreground">No walk-forward folds recorded for this config yet.</div>
                           ) : (
                             <table className="min-w-full text-xs">
-                              <thead className="text-slate-500">
+                              <thead className="text-muted-foreground">
                                 <tr>
                                   <th className="px-2 py-1 text-left">Fold</th>
                                   <th className="px-2 py-1 text-left">OOS window</th>
@@ -398,21 +400,21 @@ function TuningPage() {
                                   const cm = (f.metrics ?? {}) as any;
                                   const b = cm.baseline ?? {};
                                   return (
-                                    <tr key={f.id} className="border-t border-slate-200/70">
-                                      <td className="px-2 py-1 text-slate-700">#{f.fold_index}</td>
-                                      <td className="px-2 py-1 text-slate-600">
+                                    <tr key={f.id} className="border-t border-border">
+                                      <td className="px-2 py-1 text-foreground">#{f.fold_index}</td>
+                                      <td className="px-2 py-1 text-muted-foreground">
                                         {new Date(f.oos_start).toLocaleDateString()} → {new Date(f.oos_end).toLocaleDateString()}
                                       </td>
-                                      <td className="px-2 py-1 text-right text-slate-700">{pct(f.win_rate)}</td>
-                                      <td className="px-2 py-1 text-right text-slate-700">{num(f.expectancy_r)}</td>
-                                      <td className="px-2 py-1 text-right text-slate-700">{f.sample_size}</td>
-                                      <td className="px-2 py-1 text-right text-slate-500">{pct(b.winRate)}</td>
-                                      <td className="px-2 py-1 text-right text-slate-500">{num(b.avgR)}</td>
+                                      <td className="px-2 py-1 text-right text-foreground">{pct(f.win_rate)}</td>
+                                      <td className="px-2 py-1 text-right text-foreground">{num(f.expectancy_r)}</td>
+                                      <td className="px-2 py-1 text-right text-foreground">{f.sample_size}</td>
+                                      <td className="px-2 py-1 text-right text-muted-foreground">{pct(b.winRate)}</td>
+                                      <td className="px-2 py-1 text-right text-muted-foreground">{num(b.avgR)}</td>
                                       <td className="px-2 py-1">
                                         {f.passed ? (
-                                          <span className="text-emerald-700">✓</span>
+                                          <span className="text-gc-success">✓</span>
                                         ) : (
-                                          <span className="text-rose-700">✗</span>
+                                          <span className="text-gc-red">✗</span>
                                         )}
                                       </td>
                                     </tr>
@@ -431,6 +433,7 @@ function TuningPage() {
           </table>
         </div>
       </section>
-    </div>
+      </div>
+    </OpsPage>
   );
 }

@@ -120,6 +120,7 @@
   --color-season-5: var(--season-5);
   --color-gc-yellow: var(--gc-yellow);
   --color-gc-yellow-soft: var(--gc-yellow-soft);
+  --color-gc-amber: var(--gc-amber);
   --color-gc-green: var(--gc-green);
   --color-gc-green-soft: var(--gc-green-soft);
   --color-gc-ink: var(--gc-ink);
@@ -206,6 +207,7 @@
   --season-5: oklch(0.7 0.17 150);
   --gc-yellow: #fbbc04;
   --gc-yellow-soft: #fef7e0;
+  --gc-amber: #b06000;
   --gc-green: #34a853;
   --gc-green-soft: #e6f4ea;
   --gc-ink: #202124;

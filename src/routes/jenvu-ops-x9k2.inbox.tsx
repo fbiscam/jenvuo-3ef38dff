@@ -284,7 +284,7 @@ function AdminInbox() {
 
   if (!ready) {
     return (
-      <div className="grid min-h-screen place-items-center bg-gc-panel">
+      <div className="grid min-h-screen place-items-center bg-background">
         <Loader2 className="h-5 w-5 animate-spin text-gc-ink-muted" />
       </div>
     );
@@ -298,22 +298,23 @@ function AdminInbox() {
   ];
 
   return (
-    <div className="relative flex h-screen flex-col bg-gc-canvas text-[13px] text-gc-ink antialiased [font-family:'Google_Sans','Product_Sans','Poppins',system-ui,-apple-system,sans-serif] [font-feature-settings:'cv11','ss01','ss03'] [font-optical-sizing:auto]">
+    <div className="relative flex h-screen flex-col bg-background text-[13px] text-gc-ink antialiased [font-family:'Google_Sans','Product_Sans','Poppins',system-ui,-apple-system,sans-serif] [font-feature-settings:'cv11','ss01','ss03'] [font-optical-sizing:auto]">
       {/* Top bar */}
-      <header className="relative z-10 flex h-14 shrink-0 items-center justify-between border-b border-neutral-200 bg-gc-canvas px-5">
+      <header className="relative z-10 flex min-h-14 shrink-0 items-center justify-between gap-3 border-b border-border bg-background px-4 py-2 sm:px-6">
         <div className="flex items-center gap-3">
-          <span className="grid h-8 w-8 place-items-center">
-            <img src="/favicon.png" alt="Jenvu" className="h-8 w-8 object-contain" />
+          <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-gc-sky text-gc-blue-deep">
+            <Inbox className="h-4 w-4" />
           </span>
-          <span className="text-[17px] font-semibold tracking-tight text-gc-ink">Jenvu</span>
-          <span className="text-neutral-300">/</span>
-          <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-neutral-400">Support Inbox</span>
+          <div className="min-w-0">
+            <h1 className="truncate text-[15px] font-medium text-foreground">Support inbox</h1>
+            <p className="hidden text-[13px] text-muted-foreground sm:block">Review conversations and reply to customer support requests</p>
+          </div>
         </div>
         <div className="flex items-center gap-3">
-          <span className="hidden font-mono text-[10px] uppercase tracking-[0.18em] text-neutral-400 sm:inline">{username}</span>
+          <span className="hidden text-[13px] text-muted-foreground sm:inline">{username}</span>
           <button
             onClick={handleLogout}
-            className="grid h-8 w-8 place-items-center rounded-xl text-neutral-500 transition hover:bg-black hover:text-white"
+            className="grid h-8 w-8 place-items-center rounded-xl text-muted-foreground transition hover:bg-muted hover:text-foreground"
             title="Sign out"
           >
             <LogOut className="h-3.5 w-3.5" />
@@ -321,17 +322,11 @@ function AdminInbox() {
         </div>
       </header>
 
-      <div className="relative z-10 bg-white px-5 py-5 sm:px-6">
-        <div className="mx-auto max-w-7xl">
-          <h1 className="text-2xl font-semibold tracking-tight text-gc-ink">Support inbox</h1>
-          <p className="mt-1 text-sm text-gc-ink-muted">Review conversations and reply to customer support requests.</p>
-        </div>
-      </div>
 
       <div className="relative z-10 flex min-h-0 flex-1 overflow-hidden">
         {/* Left rail — filters/nav */}
-        <nav className="hidden w-60 shrink-0 flex-col border-r border-neutral-200 bg-gc-canvas p-4 md:flex">
-          <div className="mb-3 px-2 font-mono text-[10px] uppercase tracking-[0.2em] text-gc-ink font-semibold">
+        <nav className="hidden w-60 shrink-0 flex-col border-r border-border bg-background p-4 md:flex">
+          <div className="mb-3 px-2 text-[13px] font-medium text-foreground">
             Inbox
           </div>
           <ul className="space-y-0.5">
@@ -341,17 +336,17 @@ function AdminInbox() {
                 <li key={f.key}>
                   <button
                     onClick={() => setFilter(f.key)}
-                    className={`group flex w-full items-center justify-between rounded-xl px-3 py-2 text-[13px] font-semibold transition ${
+                    className={`group flex w-full items-center justify-between rounded-lg px-3 py-2 text-[13px] transition ${
                       active
-                        ? "bg-neutral-100 text-black"
-                        : "text-gc-ink hover:bg-neutral-50"
+                        ? "bg-muted font-medium text-foreground"
+                        : "text-muted-foreground hover:bg-muted hover:text-foreground"
                     }`}
                   >
                     <span className="flex items-center gap-2.5">
-                      <span className={`h-1.5 w-1.5 rounded-full ${active ? "bg-emerald-500" : "border border-gc-line"}`} />
+                      <span className={`h-1.5 w-1.5 rounded-full ${active ? "bg-gc-blue" : "border border-gc-line"}`} />
                       {f.label}
                     </span>
-                    <span className={`font-mono text-[10px] tabular-nums ${active ? "text-gc-ink" : "text-gc-ink"}`}>
+                    <span className="text-[12px] tabular-nums text-muted-foreground">
                       {f.count}
                     </span>
                   </button>
@@ -364,22 +359,22 @@ function AdminInbox() {
 
         {/* Middle — conversation list */}
         <aside
-          className={`flex w-full shrink-0 flex-col border-r border-neutral-200 bg-white md:w-[360px] ${ activeId ? "hidden md:flex" : "flex" }`}
+          className={`flex w-full shrink-0 flex-col border-r border-border bg-background md:w-[360px] ${ activeId ? "hidden md:flex" : "flex" }`}
         >
-          <div className="flex h-14 items-center gap-3 border-b border-neutral-200 px-5">
-            <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-neutral-400 capitalize">{filter}</span>
-            <span className="font-mono text-[10px] tabular-nums text-neutral-400">
+          <div className="flex h-14 items-center gap-3 border-b border-border px-5">
+            <span className="text-[13px] font-medium capitalize text-foreground">{filter}</span>
+            <span className="text-[12px] tabular-nums text-muted-foreground">
               {filtered.length}
             </span>
             <div className="ml-auto flex items-center">
               <div className="relative">
-                <Search className="pointer-events-none absolute left-0 top-1/2 h-3 w-3 -translate-y-1/2 text-neutral-300" />
+                <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3 w-3 -translate-y-1/2 text-muted-foreground" />
                 <input
                   ref={searchRef}
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   placeholder="Search…"
-                  className="h-7 w-40 border-b border-neutral-200 bg-transparent pl-5 pr-1 font-mono text-[11px] placeholder:text-neutral-300 focus:border-black focus:outline-none"
+                  className="h-8 w-44 rounded-lg border border-border bg-background pl-7 pr-2 text-[12px] placeholder:text-muted-foreground focus:border-gc-blue focus:outline-none focus:ring-2 focus:ring-gc-blue-soft"
                 />
               </div>
             </div>
@@ -388,11 +383,11 @@ function AdminInbox() {
           <div className="flex-1 overflow-y-auto">
             {filtered.length === 0 ? (
               <div className="flex h-full flex-col items-center justify-center px-6 py-10 text-center">
-                <div className="grid h-12 w-12 place-items-center rounded-xl border border-neutral-200 bg-gc-canvas">
-                  <Inbox className="h-4 w-4 text-neutral-400" />
+                <div className="grid h-12 w-12 place-items-center rounded-xl border border-border bg-background">
+                  <Inbox className="h-4 w-4 text-muted-foreground" />
                 </div>
                 <p className="mt-3 text-[13px] font-semibold text-gc-ink">No conversations</p>
-                <p className="mt-1 text-[11.5px] text-neutral-500">
+                <p className="mt-1 text-[11.5px] text-muted-foreground">
                   {filter === "open" ? "You're all caught up." : "Nothing matches this filter."}
                 </p>
               </div>
@@ -406,10 +401,10 @@ function AdminInbox() {
                     <li key={s.id}>
                       <button
                         onClick={() => setActiveId(s.id)}
-                        className={`group relative flex w-full items-start gap-3.5 border-b border-neutral-100 px-5 py-3.5 text-left transition-all duration-200 ${
+                        className={`group relative flex w-full items-start gap-3.5 border-b border-border px-5 py-3.5 text-left transition-all duration-200 ${
                           isActive
-                            ? "bg-gradient-to-r from-neutral-50 to-transparent"
-                            : "hover:bg-neutral-50/70"
+                            ? "bg-gc-sky/50"
+                            : "hover:bg-muted"
                         }`}
                       >
                         {/* Active accent bar */}
@@ -420,15 +415,15 @@ function AdminInbox() {
                         />
                         {/* Unread dot */}
                         {hasUnread && !isActive && (
-                          <span className="absolute left-1.5 top-1/2 h-1.5 w-1.5 -translate-y-1/2 rounded-full bg-emerald-500 shadow-[0_0_0_3px_rgba(16,185,129,0.15)]" />
+                          <span className="absolute left-1.5 top-1/2 h-1.5 w-1.5 -translate-y-1/2 rounded-full bg-gc-success shadow-[0_0_0_3px_rgba(16,185,129,0.15)]" />
                         )}
                         <div className="relative mt-0.5 shrink-0">
-                          <div className={`grid h-10 w-10 place-items-center rounded-xl ${avatarColor(s.guest_name, s.guest_email)} text-[12px] font-semibold text-white shadow-[0_4px_12px_-4px_rgba(0,0,0,0.35)] ring-1 ring-white/40 transition-transform duration-200 group-hover:scale-105`}>
+                          <div className={`grid h-10 w-10 place-items-center rounded-xl ${avatarColor(s.guest_name, s.guest_email)} text-[12px] font-semibold text-gc-on-blue shadow-[0_4px_12px_-4px_rgba(0,0,0,0.35)] ring-1 ring-background transition-transform duration-200 group-hover:scale-105`}>
                             {initials(s.guest_name, s.guest_email)}
                           </div>
                           <span
-                            className={`absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full ring-2 ring-white ${
-                              s.status === "open" ? "bg-emerald-500" : "bg-gc-line"
+                            className={`absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full ring-2 ring-background ${
+                              s.status === "open" ? "bg-gc-success" : "bg-gc-line"
                             }`}
                           />
                         </div>
@@ -478,21 +473,21 @@ function AdminInbox() {
         </aside>
 
         {/* Right — conversation */}
-        <section className={`flex flex-1 flex-col bg-gc-canvas ${activeId ? "flex" : "hidden md:flex"}`}>
+        <section className={`flex flex-1 flex-col bg-background ${activeId ? "flex" : "hidden md:flex"}`}>
           {!activeSession ? (
             <div className="flex flex-1 flex-col items-center justify-center gap-3 p-8 text-center">
-              <div className="grid h-16 w-16 place-items-center rounded-xl border border-neutral-200 bg-white">
-                <Inbox className="h-6 w-6 text-neutral-400" />
+              <div className="grid h-16 w-16 place-items-center rounded-xl border border-border bg-background">
+                <Inbox className="h-6 w-6 text-muted-foreground" />
               </div>
               <p className="text-[14px] font-semibold tracking-tight text-gc-ink">Select a conversation</p>
-              <p className="max-w-xs text-[12px] leading-relaxed text-neutral-500">
+              <p className="max-w-xs text-[12px] leading-relaxed text-muted-foreground">
                 Use <Kbd>J</Kbd> / <Kbd>K</Kbd> to navigate, <Kbd>R</Kbd> to reply, <Kbd>E</Kbd> to close.
               </p>
             </div>
           ) : (
             <>
               {/* Thread header */}
-              <div className="flex h-16 shrink-0 items-center gap-3 border-b border-neutral-200 bg-gc-canvas px-6">
+              <div className="flex h-16 shrink-0 items-center gap-3 border-b border-border bg-background px-6">
 
                 <button
                   onClick={() => setActiveId(null)}
@@ -501,9 +496,9 @@ function AdminInbox() {
                 >
                   <ChevronLeft className="h-4 w-4" />
                 </button>
-                <div className={`relative grid h-9 w-9 place-items-center rounded-xl ${avatarColor(activeSession.guest_name, activeSession.guest_email)} text-[11px] font-semibold text-white shadow-[0_2px_6px_-2px_rgba(0,0,0,0.4)] ring-1 ring-black/10`}>
+                <div className={`relative grid h-9 w-9 place-items-center rounded-xl ${avatarColor(activeSession.guest_name, activeSession.guest_email)} text-[11px] font-semibold text-gc-on-blue shadow-[0_2px_6px_-2px_rgba(0,0,0,0.4)] ring-1 ring-border`}>
                   {initials(activeSession.guest_name, activeSession.guest_email)}
-                  <span className={`absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full ring-2 ring-white ${activeSession.status === "open" ? "bg-emerald-500" : "bg-gc-line"}`} />
+                  <span className={`absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full ring-2 ring-background ${activeSession.status === "open" ? "bg-gc-success" : "bg-gc-line"}`} />
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-1.5">
@@ -527,7 +522,7 @@ function AdminInbox() {
                         <Mail className="h-3 w-3" />
                         <span className="truncate">{activeSession.guest_email}</span>
                         {copied ? (
-                          <CheckCircle2 className="h-3 w-3 text-emerald-600" />
+                          <CheckCircle2 className="h-3 w-3 text-gc-success" />
                         ) : (
                           <Copy className="h-3 w-3 opacity-0 transition group-hover:opacity-100" />
                         )}
@@ -547,13 +542,13 @@ function AdminInbox() {
                   {activeSession.status === "open" ? (
                     <button
                       onClick={handleClose}
-                      className="inline-flex items-center gap-1.5 rounded-xl border border-neutral-200 bg-white px-3 py-1.5 font-mono text-[10px] font-medium uppercase tracking-[0.18em] text-neutral-700 transition hover:border-black hover:bg-black hover:text-white"
+                      className="inline-flex items-center gap-1.5 rounded-xl border border-border bg-background px-3 py-1.5 text-[12px] font-medium text-foreground transition hover:bg-muted"
                       title="Close (E)"
                     >
                       <Archive className="h-3 w-3" /> Close
                     </button>
                   ) : (
-                    <span className="inline-flex items-center gap-1 rounded-xl bg-neutral-100 px-3 py-1.5 font-mono text-[10px] font-medium uppercase tracking-[0.18em] text-neutral-500">
+                    <span className="inline-flex items-center gap-1 rounded-xl bg-muted px-3 py-1.5 text-[12px] font-medium text-muted-foreground">
                       <CheckCircle2 className="h-3 w-3" /> Closed
                     </span>
                   )}
@@ -561,10 +556,10 @@ function AdminInbox() {
               </div>
 
               {/* Messages */}
-              <div ref={scrollRef} className="flex-1 overflow-y-auto bg-gc-canvas">
+              <div ref={scrollRef} className="flex-1 overflow-y-auto bg-muted/30">
                 <div className="mx-auto max-w-3xl space-y-1 p-8">
                   {messages.length === 0 && (
-                    <div className="py-8 text-center font-mono text-[10px] uppercase tracking-[0.2em] text-neutral-400">No messages yet</div>
+                    <div className="py-8 text-center text-[12px] text-muted-foreground">No messages yet</div>
                   )}
                   {messages.map((m, i) => {
                     const isAdminMsg = m.sender === "admin";
@@ -574,8 +569,8 @@ function AdminInbox() {
                     return (
                       <div key={m.id} className={showHeader ? "pt-6" : "pt-1"}>
                         {showHeader && (
-                          <div className={`mb-2 flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.18em] text-neutral-400 ${isAdminMsg ? "justify-end" : ""}`}>
-                            <span className="font-medium text-neutral-600">
+                          <div className={`mb-2 flex items-center gap-2 text-[12px] text-muted-foreground ${isAdminMsg ? "justify-end" : ""}`}>
+                            <span className="font-medium text-muted-foreground">
                               {isAdminMsg ? username || "You" : activeSession.guest_name || "Visitor"}
                             </span>
                             <span>
@@ -585,7 +580,7 @@ function AdminInbox() {
                         )}
                         <div className={`flex ${isAdminMsg ? "justify-end" : "justify-start"}`}>
                           <div
-                            className={`max-w-[78%] whitespace-pre-wrap break-words rounded-xl px-4 py-3 text-[13.5px] leading-relaxed ${ isAdminMsg ? "bg-neutral-100 text-gc-ink" : "border border-neutral-200 bg-white text-gc-ink" }`}
+                            className={`max-w-[78%] whitespace-pre-wrap break-words rounded-xl px-4 py-3 text-[13.5px] leading-relaxed ${ isAdminMsg ? "bg-muted text-gc-ink" : "border border-border bg-background text-gc-ink" }`}
                           >
                             {m.content}
                           </div>
@@ -597,14 +592,14 @@ function AdminInbox() {
               </div>
 
               {/* Composer */}
-              <form onSubmit={handleReply} className="shrink-0 border-t border-neutral-200 bg-gc-canvas p-5">
+              <form onSubmit={handleReply} className="shrink-0 border-t border-border bg-background p-5">
                 {activeSession.status === "closed" ? (
-                  <div className="flex items-center justify-center gap-2 rounded-xl border border-neutral-200 bg-white py-3 font-mono text-[10px] uppercase tracking-[0.18em] text-neutral-500">
+                  <div className="flex items-center justify-center gap-2 rounded-xl border border-border bg-background py-3 text-[12px] text-muted-foreground">
                     <CheckCircle2 className="h-3.5 w-3.5" /> This conversation is closed
                   </div>
                 ) : (
                   <div className="mx-auto max-w-3xl">
-                    <div className="relative rounded-xl border border-neutral-200 bg-white transition focus-within:border-black">
+                    <div className="relative rounded-xl border border-border bg-background transition focus-within:border-foreground">
 
                       <textarea
                         ref={inputRef}
@@ -638,8 +633,8 @@ function AdminInbox() {
                                 className="fixed inset-0 z-10 cursor-default"
                                 aria-label="Close"
                               />
-                              <div className="absolute bottom-full left-0 z-20 mb-1.5 w-80 overflow-hidden rounded-xl border border-gc-line bg-white ring-1 ring-black/5">
-                                <div className="border-b border-gc-line bg-gc-panel/60 px-3 py-2 text-[10px] font-bold uppercase tracking-[0.16em] text-gc-ink-muted">
+                              <div className="absolute bottom-full left-0 z-20 mb-1.5 w-80 overflow-hidden rounded-xl border border-gc-line bg-background ring-1 ring-border">
+                                <div className="border-b border-gc-line bg-gc-panel/60 px-3 py-2 text-[12px] font-medium text-muted-foreground">
                                   Quick replies
                                 </div>
                                 <ul className="max-h-64 overflow-y-auto py-1">
@@ -673,7 +668,7 @@ function AdminInbox() {
                             disabled={sending || !input.trim()}
                             aria-label="Send"
                             title="Send (Enter)"
-                            className="grid h-10 w-10 place-items-center rounded-xl bg-black text-white transition hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-40"
+                            className="grid h-10 w-10 place-items-center rounded-xl bg-gc-blue text-gc-on-blue transition hover:bg-gc-blue-hover disabled:cursor-not-allowed disabled:opacity-40"
                           >
                             {sending ? (
                               <Loader2 className="h-4 w-4 animate-spin" />
@@ -694,12 +689,12 @@ function AdminInbox() {
 
         {/* Details rail */}
         {activeSession && (
-          <aside className="hidden w-64 shrink-0 flex-col border-l border-gc-blue/[0.06] bg-white p-4 xl:flex">
-            <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-gc-ink-muted">
+          <aside className="hidden w-64 shrink-0 flex-col border-l border-border bg-background p-4 xl:flex">
+            <div className="text-[13px] font-medium text-foreground">
               Visitor
             </div>
-            <div className="mt-3 flex items-center gap-3 rounded-xl border border-black/5 bg-white p-3">
-              <div className={`relative grid h-11 w-11 place-items-center rounded-xl ${avatarColor(activeSession.guest_name, activeSession.guest_email)} text-[13px] font-semibold text-white shadow-[0_2px_8px_-2px_rgba(0,0,0,0.4)] ring-1 ring-black/10`}>
+            <div className="mt-3 flex items-center gap-3 rounded-xl border border-border bg-background p-3">
+              <div className={`relative grid h-11 w-11 place-items-center rounded-xl ${avatarColor(activeSession.guest_name, activeSession.guest_email)} text-[13px] font-semibold text-gc-on-blue shadow-[0_2px_8px_-2px_rgba(0,0,0,0.4)] ring-1 ring-border`}>
                 {initials(activeSession.guest_name, activeSession.guest_email)}
               </div>
               <div className="min-w-0">
@@ -730,10 +725,10 @@ function AdminInbox() {
               </DetailRow>
             </div>
 
-            <div className="mt-6 text-[10px] font-bold uppercase tracking-[0.18em] text-gc-ink-muted">
+            <div className="mt-6 text-[13px] font-medium text-foreground">
               Activity
             </div>
-            <div className="mt-2 rounded-xl border border-black/5 bg-white p-3 text-[12px]">
+            <div className="mt-2 rounded-xl border border-border bg-background p-3 text-[12px]">
               <div className="flex items-center justify-between">
                 <span className="text-gc-ink-muted">Messages</span>
                 <span className="font-mono tabular-nums font-semibold text-gc-ink">
@@ -766,7 +761,7 @@ function Shortcut({ k, label }: { k: string; label: string }) {
 function Kbd({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return (
     <kbd
-      className={`inline-flex h-4 min-w-[16px] items-center justify-center rounded border border-gc-line bg-white px-1 font-mono text-[10px] font-medium text-gc-ink-muted ${className}`}
+      className={`inline-flex h-4 min-w-[16px] items-center justify-center rounded border border-gc-line bg-background px-1 font-mono text-[10px] font-medium text-gc-ink-muted ${className}`}
     >
       {children}
     </kbd>
@@ -783,10 +778,10 @@ function Chip({
   icon?: React.ReactNode;
 }) {
   const map: Record<string, string> = {
-    emerald: "bg-emerald-50 text-emerald-700 ring-emerald-200/60",
+    emerald: "bg-gc-green-soft text-gc-success ring-gc-success/30",
     zinc: "bg-gc-panel text-gc-ink-muted ring-gc-line",
-    blue: "bg-blue-50 text-blue-700 ring-blue-200/60",
-    amber: "bg-amber-50 text-amber-700 ring-amber-200/60",
+    blue: "bg-gc-sky text-gc-blue-deep ring-gc-blue-soft",
+    amber: "bg-gc-yellow-soft text-gc-amber ring-gc-yellow",
   };
   return (
     <span

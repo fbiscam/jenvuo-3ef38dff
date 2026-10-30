@@ -10,6 +10,7 @@ import {
   type ChargeAuditRow,
   type MismatchRow,
 } from "@/lib/admin-charge-audit.functions";
+import { OpsBadge, OpsPage, OpsSection, OpsState, OpsStats, ops } from "@/components/ops/OpsPage";
 
 export const Route = createFileRoute("/_authenticated/dashboard/admin/scan-audit")({
   head: () => ({
@@ -61,85 +62,78 @@ function ScanAuditPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  if (loading) return <div className="p-6 text-sm text-muted-foreground">Loading…</div>;
-  if (!allowed) return <div className="p-6 text-sm">Not authorized.</div>;
+  if (loading) return <OpsState title="Loading charge audit…" />;
+  if (!allowed) return <OpsState title="Admin access required" description="Sign in with an admin account to view this page." />;
+
+  const totalCharged = rows.reduce((sum, r) => sum + Number(r.amount || 0), 0);
+  const failed = rows.filter((r) => r.source.includes("failed")).length;
 
   return (
-    <div className="p-4 sm:p-6 space-y-6 max-w-7xl mx-auto">
-      <header className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h1 className="pl-1 text-xl font-semibold flex items-center gap-2">
-            <ShieldCheck className="h-5 w-5" /> Scan Charge Audit
-          </h1>
-          <p className="text-xs text-muted-foreground mt-1">
-            Every credit deduction with source, caller, and scan correlation. Mismatches are flagged automatically.
-          </p>
-        </div>
-        <button
-          onClick={load}
-          className="text-xs inline-flex items-center gap-1.5 border rounded-md px-3 py-1.5 hover:bg-muted"
-        >
+    <OpsPage
+      title="Scan charge audit"
+      description="Every credit deduction with source, caller and scan link. Mismatches are flagged automatically."
+      icon={<ShieldCheck />}
+      actions={
+        <button onClick={load} className={ops.btn}>
           <RefreshCw className="h-3.5 w-3.5" /> Refresh
         </button>
-      </header>
+      }
+    >
+      <OpsStats
+        items={[
+          { label: "Charges shown", value: rows.length },
+          { label: "Total charged", value: totalCharged.toFixed(2) },
+          { label: "Mismatched scans", value: mismatches.length, tone: mismatches.length ? "danger" : "success" },
+          { label: "Failed sources", value: failed, tone: failed ? "warning" : undefined },
+        ]}
+      />
 
-      {/* Mismatches */}
-      <section className="border rounded-lg p-4 bg-card">
-        <h2 className="pl-1 text-sm font-semibold flex items-center gap-2 mb-3">
-          <AlertTriangle className="h-4 w-4 text-amber-500" />
-          Mismatched scans ({mismatches.length})
-          <span className="text-[10px] font-normal text-muted-foreground">— any scan_id with more than 1 deduction</span>
-        </h2>
+      <OpsSection
+        title={
+          <span className="inline-flex items-center gap-2">
+            <AlertTriangle className="h-4 w-4 text-gc-amber" /> Mismatched scans
+            <span className="font-normal text-muted-foreground">· any scan with more than 1 deduction</span>
+          </span>
+        }
+        flush
+      >
         {mismatches.length === 0 ? (
-          <p className="text-xs text-muted-foreground">✅ No mismatches. Every scan deducted exactly once.</p>
+          <p className="px-4 pb-5 text-[13px] text-muted-foreground sm:px-6">No mismatches. Every scan deducted exactly once.</p>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-xs">
-              <thead className="text-left text-muted-foreground">
+          <div className={ops.tableWrap}>
+            <table className={ops.table}>
+              <thead className={ops.thead}>
                 <tr>
-                  <th className="py-2 pr-3">Scan ID</th>
-                  <th className="py-2 pr-3">User</th>
-                  <th className="py-2 pr-3">#</th>
-                  <th className="py-2 pr-3">Total</th>
-                  <th className="py-2 pr-3">Reasons</th>
-                  <th className="py-2 pr-3">Sources</th>
-                  <th className="py-2 pr-3">Callers</th>
-                  <th className="py-2 pr-3">Last</th>
+                  {["Scan ID", "User", "#", "Total", "Reasons", "Sources", "Callers", "Last"].map((h) => (
+                    <th key={h} className={ops.th}>{h}</th>
+                  ))}
                 </tr>
               </thead>
               <tbody>
                 {mismatches.map((m) => (
-                  <tr key={m.scan_id} className="border-t">
-                    <td className="py-1.5 pr-3 font-mono text-[10px]">
-                      <button
-                        className="underline hover:text-primary"
-                        onClick={() => setScanFilter(m.scan_id)}
-                      >
+                  <tr key={m.scan_id} className={ops.tr}>
+                    <td className={`${ops.td} font-mono text-[11px]`}>
+                      <button className="text-gc-blue hover:underline" onClick={() => setScanFilter(m.scan_id)}>
                         {m.scan_id.slice(0, 8)}…
                       </button>
                     </td>
-                    <td className="py-1.5 pr-3">{m.user_email ?? m.user_id.slice(0, 8)}</td>
-                    <td className="py-1.5 pr-3 font-semibold text-red-600">{m.charge_count}</td>
-                    <td className="py-1.5 pr-3">-{m.total_amount}</td>
-                    <td className="py-1.5 pr-3">{m.reasons.join(", ")}</td>
-                    <td className="py-1.5 pr-3">{m.sources.join(", ")}</td>
-                    <td className="py-1.5 pr-3">{(m.callers ?? []).filter(Boolean).join(", ")}</td>
-                    <td className="py-1.5 pr-3">{new Date(m.last_at).toLocaleString()}</td>
+                    <td className={ops.td}>{m.user_email ?? m.user_id.slice(0, 8)}</td>
+                    <td className={`${ops.td} font-semibold text-gc-red`}>{m.charge_count}</td>
+                    <td className={`${ops.td} tabular-nums`}>-{m.total_amount}</td>
+                    <td className={ops.td}>{m.reasons.join(", ")}</td>
+                    <td className={ops.td}>{m.sources.join(", ")}</td>
+                    <td className={ops.td}>{(m.callers ?? []).filter(Boolean).join(", ")}</td>
+                    <td className={`${ops.td} text-muted-foreground`}>{new Date(m.last_at).toLocaleString()}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
         )}
-      </section>
+      </OpsSection>
 
-      {/* Filters */}
-      <section className="flex flex-wrap items-center gap-2">
-        <select
-          value={reasonFilter}
-          onChange={(e) => setReasonFilter(e.target.value)}
-          className="text-xs border rounded-md px-2 py-1.5 bg-background"
-        >
+      <div className="flex flex-wrap items-center gap-2 border-b border-border px-4 py-3 sm:px-6">
+        <select value={reasonFilter} onChange={(e) => setReasonFilter(e.target.value)} className={`${ops.input} w-auto`}>
           <option value="">All reasons</option>
           <option value="signal">signal</option>
           <option value="ict_narration">ict_narration</option>
@@ -150,77 +144,60 @@ function ScanAuditPage() {
           value={scanFilter}
           onChange={(e) => setScanFilter(e.target.value)}
           placeholder="Filter by scan_id"
-          className="text-xs border rounded-md px-2 py-1.5 bg-background font-mono w-64"
+          className={`${ops.input} w-64 max-w-full font-mono`}
         />
-        <button
-          onClick={load}
-          className="text-xs border rounded-md px-3 py-1.5 hover:bg-muted"
-        >
-          Apply
-        </button>
+        <button onClick={load} className={ops.btnPrimary}>Apply</button>
         {(reasonFilter || scanFilter) && (
           <button
             onClick={() => { setReasonFilter(""); setScanFilter(""); setTimeout(load, 0); }}
-            className="text-xs text-muted-foreground hover:text-foreground"
+            className="text-[13px] text-muted-foreground hover:text-foreground"
           >
             Clear
           </button>
         )}
-      </section>
+      </div>
 
-      {/* Full audit log */}
-      <section className="border rounded-lg bg-card">
-        <div className="p-3 text-sm font-semibold border-b">
-          Charge log ({rows.length})
-        </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-xs">
-            <thead className="text-left text-muted-foreground bg-muted/40">
+      <OpsSection title={`Charge log · ${rows.length}`} flush>
+        <div className={ops.tableWrap}>
+          <table className={ops.table}>
+            <thead className={ops.thead}>
               <tr>
-                <th className="py-2 px-3">When</th>
-                <th className="py-2 px-3">User</th>
-                <th className="py-2 px-3">Reason</th>
-                <th className="py-2 px-3">Δ</th>
-                <th className="py-2 px-3">Bal</th>
-                <th className="py-2 px-3">Source</th>
-                <th className="py-2 px-3">Caller</th>
-                <th className="py-2 px-3">Scan ID</th>
-                <th className="py-2 px-3">Symbol</th>
+                {["When", "User", "Reason", "Δ", "Balance", "Source", "Caller", "Scan ID", "Symbol"].map((h) => (
+                  <th key={h} className={ops.th}>{h}</th>
+                ))}
               </tr>
             </thead>
             <tbody>
               {rows.map((r) => (
-                <tr key={r.id} className="border-t hover:bg-muted/20">
-                  <td className="py-1.5 px-3 whitespace-nowrap">{new Date(r.created_at).toLocaleString()}</td>
-                  <td className="py-1.5 px-3">{r.user_email ?? r.user_id.slice(0, 8)}</td>
-                  <td className="py-1.5 px-3 font-medium">{r.reason}</td>
-                  <td className="py-1.5 px-3">-{r.amount}</td>
-                  <td className="py-1.5 px-3">{r.balance_after ?? "—"}</td>
-                  <td className="py-1.5 px-3">
-                    <span className={
-                      r.source.includes("failed") ? "text-red-600" :
-                      r.source === "server_spend" ? "text-emerald-600" :
-                      "text-amber-600"
-                    }>{r.source}</span>
+                <tr key={r.id} className={ops.tr}>
+                  <td className={`${ops.td} text-muted-foreground`}>{new Date(r.created_at).toLocaleString()}</td>
+                  <td className={ops.td}>{r.user_email ?? r.user_id.slice(0, 8)}</td>
+                  <td className={`${ops.td} font-medium`}>{r.reason}</td>
+                  <td className={`${ops.td} tabular-nums`}>-{r.amount}</td>
+                  <td className={`${ops.td} tabular-nums`}>{r.balance_after ?? "—"}</td>
+                  <td className={ops.td}>
+                    <OpsBadge tone={r.source.includes("failed") ? "danger" : r.source === "server_spend" ? "success" : "warning"}>
+                      {r.source}
+                    </OpsBadge>
                   </td>
-                  <td className="py-1.5 px-3 font-mono text-[10px]">{r.caller ?? "—"}</td>
-                  <td className="py-1.5 px-3 font-mono text-[10px]">
+                  <td className={`${ops.td} font-mono text-[11px]`}>{r.caller ?? "—"}</td>
+                  <td className={`${ops.td} font-mono text-[11px]`}>
                     {r.scan_id ? (
-                      <button className="underline" onClick={() => setScanFilter(r.scan_id!)}>
+                      <button className="text-gc-blue hover:underline" onClick={() => setScanFilter(r.scan_id!)}>
                         {r.scan_id.slice(0, 8)}…
                       </button>
                     ) : "—"}
                   </td>
-                  <td className="py-1.5 px-3">{r.symbol ?? "—"}</td>
+                  <td className={ops.td}>{r.symbol ?? "—"}</td>
                 </tr>
               ))}
               {rows.length === 0 && (
-                <tr><td colSpan={9} className="py-6 text-center text-muted-foreground">No entries.</td></tr>
+                <tr><td colSpan={9} className="py-12 text-center text-[13px] text-muted-foreground">No entries.</td></tr>
               )}
             </tbody>
           </table>
         </div>
-      </section>
-    </div>
+      </OpsSection>
+    </OpsPage>
   );
 }
