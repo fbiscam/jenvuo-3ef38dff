@@ -90,5 +90,34 @@ export const getBotUsage = createServerFn({ method: "POST" })
       .or(`started_at.gte.${since3},last_seen_at.gte.${since3}`)
       .order("started_at", { ascending: false })
       .limit(200);
-    return { plan: access.plan, allowed: access.allowed, limit: access.limit, dailyTarget: access.dailyTarget, rows, sessions: (ses ?? []) as BotSessionRow[] };
+    const { botAccountDeleteBlock } = await import("./mt5-licenses");
+    const { data: lic } = await _db.from("mt5_licenses").select("id,mt5_account,revoked_at").eq("user_id", context.userId);
+    const sessions = (ses ?? []) as BotSessionRow[];
+    const deleteBlock: Record<string, "live_license" | "running" | null> = {};
+    for (const acc of new Set([...rows.map((r) => r.mt5_account), ...sessions.map((s) => s.mt5_account)])) deleteBlock[acc] = botAccountDeleteBlock(acc, lic ?? [], rows, sessions);
+    return { plan: access.plan, allowed: access.allowed, limit: access.limit, dailyTarget: access.dailyTarget, rows, sessions, deleteBlock };
+  });
+
+/** Bot Usage: remove an MT5 account's history. Refused while it is live on a JX Bot license or running. */
+export const deleteBotAccount = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ account: z.string().trim().regex(/^\d{3,20}$/) }).parse(d))
+  .handler(async ({ context, data }) => {
+    const { botAccountDeleteBlock } = await import("./mt5-licenses");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const db = supabaseAdmin as any;
+    const uid = context.userId;
+    const [{ data: lic }, { data: rep }, { data: ses }] = await Promise.all([
+      db.from("mt5_licenses").select("id,mt5_account,revoked_at").eq("user_id", uid),
+      db.from("mt5_bot_reports").select("license_id,mt5_account,updated_at").eq("user_id", uid).eq("mt5_account", data.account),
+      db.from("mt5_bot_sessions").select("mt5_account,last_seen_at,ended_at").eq("user_id", uid).eq("mt5_account", data.account),
+    ]);
+    if (!(rep ?? []).length && !(ses ?? []).length) return { ok: false as const, error: "Account not found." };
+    const block = botAccountDeleteBlock(data.account, lic ?? [], rep ?? [], ses ?? []);
+    if (block === "live_license") return { ok: false as const, error: "This account is live on your JX Bot plan. Delete its IP on the JX Bot page first." };
+    if (block === "running") return { ok: false as const, error: "This account's bot is running. Remove the bot from the chart first." };
+    const r1 = await db.from("mt5_bot_reports").delete().eq("user_id", uid).eq("mt5_account", data.account);
+    const r2 = await db.from("mt5_bot_sessions").delete().eq("user_id", uid).eq("mt5_account", data.account);
+    if (r1.error || r2.error) return { ok: false as const, error: "Could not delete the account." };
+    return { ok: true as const };
   });

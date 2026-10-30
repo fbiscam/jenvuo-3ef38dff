@@ -1,11 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import { Bot, RefreshCw } from "lucide-react";
+import { Bot, Lock, RefreshCw, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Area, CartesianGrid, ComposedChart, ResponsiveContainer, Tooltip as RTooltip, XAxis, YAxis } from "recharts";
-import { getBotUsage, type BotReportRow, type BotSessionRow } from "@/lib/mt5-licenses.functions";
+import { deleteBotAccount, getBotUsage, type BotReportRow, type BotSessionRow } from "@/lib/mt5-licenses.functions";
 import { dailyTarget, isMt5Plan, sessionEndCause, sharedTargetStatus } from "@/lib/mt5-licenses";
 import { Button } from "@/components/ui/button";
 import { UsageTabs } from "@/components/dashboard/UsageTabs";
@@ -32,6 +32,26 @@ const ONLINE_MS = 3 * 60 * 1000;
 function BotUsagePage() {
   const load = useServerFn(getBotUsage);
   const [account, setAccount] = useState("all");
+  const removeAccount = useServerFn(deleteBotAccount);
+  const qc = useQueryClient();
+  const [deleting, setDeleting] = useState<string | null>(null);
+  const onDelete = async (acc: string) => {
+    if (!window.confirm(`Delete MT5 ${acc} from Bot Usage? Its profit history and ON/OFF log will be removed.`)) return;
+    setDeleting(acc);
+    try {
+      const r = await removeAccount({ data: { account: acc } });
+      if (!r.ok) toast.error(r.error);
+      else {
+        toast.success(`MT5 ${acc} deleted`);
+        if (account === acc) setAccount("all");
+        await qc.invalidateQueries({ queryKey: ["bot-usage"] });
+      }
+    } catch {
+      toast.error("Could not delete the account.");
+    } finally {
+      setDeleting(null);
+    }
+  };
   const { data, isFetching, refetch } = useQuery({ queryKey: ["bot-usage"], queryFn: () => load(), refetchInterval: 5_000, refetchOnWindowFocus: true });
 
   const view = useMemo(() => {
@@ -163,8 +183,9 @@ function BotUsagePage() {
 
             <section className="px-4 py-5 sm:px-7">
               <h2 className="text-[13px] text-foreground"> Accounts</h2>
+              <p className="mt-1 text-[12px] text-muted-foreground">Old accounts can be deleted. Accounts live on your JX Bot plan or running now are locked.</p>
               <div className="mt-3 overflow-x-auto">
-                <table className="w-full min-w-[640px] text-[13px]">
+                <table className="w-full min-w-[680px] text-[13px]">
                   <thead className="text-left text-muted-foreground">
                     <tr className="border-b border-border">
                       <th className="py-2 font-normal">MT5 account</th>
@@ -174,6 +195,7 @@ function BotUsagePage() {
                       <th className="py-2 text-right font-normal">Today</th>
                       <th className="py-2 text-right font-normal">Trades</th>
                       <th className="py-2 text-right font-normal">Open lots</th>
+                      <th className="py-2 text-right font-normal"><span className="sr-only">Delete</span></th>
                     </tr>
                   </thead>
                   <tbody>
@@ -194,6 +216,35 @@ function BotUsagePage() {
                           <td className={`py-2.5 text-right tabular-nums ${pnlClass(r.today_profit)}`}>{usd(r.today_profit)}</td>
                           <td className="py-2.5 text-right tabular-nums">{r.trades_today}</td>
                           <td className="py-2.5 text-right tabular-nums">{r.open_lots.toFixed(2)}</td>
+                          <td className="py-2.5 pl-2 text-right">
+                            {(() => {
+                              const block = data?.deleteBlock?.[r.mt5_account] ?? "live_license";
+                              if (block) {
+                                return (
+                                  <span
+                                    className="inline-flex h-8 w-8 items-center justify-center text-muted-foreground"
+                                    title={block === "running" ? "Running now, can't delete" : "Live on your JX Bot plan, can't delete"}
+                                    aria-label={block === "running" ? "Running now, can't delete" : "Live on your JX Bot plan, can't delete"}
+                                  >
+                                    <Lock className="h-3.5 w-3.5" />
+                                  </span>
+                                );
+                              }
+                              return (
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                                  aria-label={`Delete MT5 ${r.mt5_account}`}
+                                  disabled={deleting === r.mt5_account}
+                                  onClick={() => onDelete(r.mt5_account)}
+                                >
+                                  <Trash2 className="h-3.5 w-3.5" />
+                                </Button>
+                              );
+                            })()}
+                          </td>
                         </tr>
                       );
                     })}

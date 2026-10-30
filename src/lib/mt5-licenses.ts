@@ -133,3 +133,26 @@ export function sessionEndCause(s: { last_seen_at: string; ended_at: string | nu
     default: return { label: "Connection lost: PC off, asleep or no internet", by: "pc" };
   }
 }
+
+/**
+ * Bot Usage "Delete account": an MT5 account can be removed from the history only when
+ * it is NOT live on a JX Bot license (bound on an active IP license, or the account
+ * an unbound active license is about to lock in) and is not running right now.
+ */
+export const BOT_ONLINE_MS = 3 * 60 * 1000;
+export function botAccountDeleteBlock(
+  account: string,
+  licenses: { id: string; mt5_account: string | null; revoked_at: string | null }[],
+  reports: { license_id: string; mt5_account: string; updated_at: string }[],
+  sessions: { mt5_account: string; last_seen_at: string; ended_at: string | null }[],
+  now = Date.now(),
+): null | "live_license" | "running" {
+  const active = licenses.filter((l) => !l.revoked_at);
+  if (active.some((l) => parseBinding(l.mt5_account).account === account)) return "live_license";
+  const unbound = new Set(active.filter((l) => !parseBinding(l.mt5_account).account).map((l) => l.id));
+  if (reports.some((r) => r.mt5_account === account && unbound.has(r.license_id))) return "live_license";
+  const lastReport = reports.filter((r) => r.mt5_account === account).reduce((m, r) => Math.max(m, Date.parse(r.updated_at) || 0), 0);
+  const open = sessions.some((s) => s.mt5_account === account && !s.ended_at && now - (Date.parse(s.last_seen_at) || 0) < BOT_ONLINE_MS);
+  if (open || now - lastReport < BOT_ONLINE_MS) return "running";
+  return null;
+}
