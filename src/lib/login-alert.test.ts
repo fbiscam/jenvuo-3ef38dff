@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it } from 'bun:test'
 import { shouldAlertLogin } from './login-alert'
 
 const now = Date.parse('2026-10-30T06:00:00Z')
