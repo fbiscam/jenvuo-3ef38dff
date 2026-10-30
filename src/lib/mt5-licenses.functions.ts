@@ -90,7 +90,12 @@ export const getBotUsage = createServerFn({ method: "POST" })
       .or(`started_at.gte.${since3},last_seen_at.gte.${since3}`)
       .order("started_at", { ascending: false })
       .limit(200);
-    return { plan: access.plan, allowed: access.allowed, limit: access.limit, dailyTarget: access.dailyTarget, rows, sessions: (ses ?? []) as BotSessionRow[] };
+    const { botAccountDeleteBlock } = await import("./mt5-licenses");
+    const { data: lic } = await (context.supabase as any).from("mt5_licenses").select("id,mt5_account,revoked_at");
+    const sessions = (ses ?? []) as BotSessionRow[];
+    const deleteBlock: Record<string, "live_license" | "running" | null> = {};
+    for (const acc of new Set([...rows.map((r) => r.mt5_account), ...sessions.map((s) => s.mt5_account)])) deleteBlock[acc] = botAccountDeleteBlock(acc, lic ?? [], rows, sessions);
+    return { plan: access.plan, allowed: access.allowed, limit: access.limit, dailyTarget: access.dailyTarget, rows, sessions, deleteBlock };
   });
 
 /** Bot Usage: remove an MT5 account's history. Refused while it is live on a JX Bot license or running. */
