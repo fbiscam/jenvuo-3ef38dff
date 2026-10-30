@@ -150,7 +150,14 @@ export function botAccountDeleteBlock(
   const active = licenses.filter((l) => !l.revoked_at);
   if (active.some((l) => parseBinding(l.mt5_account).account === account)) return "live_license";
   const unbound = new Set(active.filter((l) => !parseBinding(l.mt5_account).account).map((l) => l.id));
-  if (reports.some((r) => r.mt5_account === account && unbound.has(r.license_id))) return "live_license";
+  // An unbound (IP-only) license is live only for the account that reported on it most recently.
+  for (const id of unbound) {
+    const last = reports.filter((r) => r.license_id === id).reduce<{ a: string; t: number } | null>((m, r) => {
+      const t = Date.parse(r.updated_at) || 0;
+      return !m || t > m.t ? { a: r.mt5_account, t } : m;
+    }, null);
+    if (last?.a === account) return "live_license";
+  }
   const lastReport = reports.filter((r) => r.mt5_account === account).reduce((m, r) => Math.max(m, Date.parse(r.updated_at) || 0), 0);
   const open = sessions.some((s) => s.mt5_account === account && !s.ended_at && now - (Date.parse(s.last_seen_at) || 0) < BOT_ONLINE_MS);
   if (open || now - lastReport < BOT_ONLINE_MS) return "running";
