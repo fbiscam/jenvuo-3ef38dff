@@ -124,3 +124,13 @@ describe("delete bot account", () => {
     for (const a of ["472966321", "474790077", "474800884", "474820178", "474821288"]) expect(botAccountDeleteBlock(a, lic, rep, [], now)).toBe(null);
   });
 });
+
+import { botAccountDeleteBlock as _bdb } from "./mt5-licenses";
+test("IP-only license locks only its most recent account", () => {
+  const lic = [{ id: "L1", mt5_account: "1.2.3.4", revoked_at: null }];
+  const old = new Date(Date.now() - 86400000).toISOString();
+  const newer = new Date(Date.now() - 3600000).toISOString();
+  const reps = [{ license_id: "L1", mt5_account: "111", updated_at: old }, { license_id: "L1", mt5_account: "222", updated_at: newer }];
+  expect(_bdb("222", lic, reps, [])).toBe("live_license");
+  expect(_bdb("111", lic, reps, [])).toBe(null);
+});
