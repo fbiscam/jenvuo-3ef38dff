@@ -282,7 +282,7 @@ function BotUsagePage() {
       <ConfirmDialog
         open={!!confirmAcc}
         title={`Delete MT5 ${confirmAcc ?? ""}?`}
-        description="Its profit history and ON/OFF log will be removed."
+        description="Profit history and ON/OFF log will be removed."
         onCancel={() => setConfirmAcc(null)}
         onConfirm={() => confirmAcc && doDelete(confirmAcc)}
       />
