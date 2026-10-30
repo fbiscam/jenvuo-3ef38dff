@@ -109,7 +109,7 @@ export const getUsageStats = createServerFn({ method: "GET" })
       completion_tokens: r.completion_tokens ?? null,
       raw_cost_usd: r.raw_cost_usd == null ? null : Number(r.raw_cost_usd),
       metadata: r.metadata ?? null,
-    }));
+    })).filter((r) => !isNonUsageDeduction(r));
 
     // Period window
     const start = periodStart ? new Date(periodStart).getTime() : 0;
