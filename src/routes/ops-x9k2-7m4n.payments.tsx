@@ -12,6 +12,8 @@ import {
   opsSetPaymentConfig,
 } from "@/lib/ops-payments.functions";
 import { networkMeta } from "@/lib/payments/shared";
+import { RefreshCw, Wallet } from "lucide-react";
+import { OpsPage, OpsStats, OpsTab, ops } from "@/components/ops/OpsPage";
 
 export const Route = createFileRoute("/ops-x9k2-7m4n/payments")({
   head: () => ({
@@ -23,7 +25,6 @@ export const Route = createFileRoute("/ops-x9k2-7m4n/payments")({
   component: OpsPayments,
 });
 
-const SANS = "font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif]";
 
 function opsToken(): string | undefined {
   if (typeof window === "undefined") return undefined;
@@ -172,37 +173,46 @@ function OpsPayments() {
           .some((v) => String(v).toLowerCase().includes(q)),
   );
 
-  const input = "rounded-xl border border-gc-line px-3 py-2 text-sm outline-none focus:border-gc-line";
+  const input = ops.input;
 
 
   return (
-    <div className={`min-h-dvh w-full bg-background text-gc-ink ${SANS}`}>
-      <div className="mx-auto max-w-6xl px-5 py-6">
-        <div className="flex flex-wrap items-center gap-2">
-          {(["orders", "promos", "config"] as const).map((t) => (
-            <button
-              key={t}
-              onClick={() => setTab(t)}
-              className={`rounded-xl px-3.5 py-2 text-sm capitalize transition ${ tab === t ? "bg-gc-blue text-gc-on-blue" : "border border-gc-line text-gc-ink hover:bg-gc-panel" }`}
-            >
-              {t === "config" ? "Deposit addresses" : t}
-            </button>
-          ))}
-          <button onClick={() => void load()} className="ml-auto rounded-xl border border-gc-line px-3 py-2 text-sm hover:bg-gc-panel">
-            Refresh
-          </button>
-        </div>
-
-        {error && <div className="mt-4 rounded-xl bg-gc-red-soft px-4 py-3 text-sm text-gc-red">{error}</div>}
+    <OpsPage
+      standalone
+      title="Payments & promos"
+      description="Crypto top-ups, approvals, promo codes and deposit addresses"
+      icon={<Wallet />}
+      actions={
+        <button onClick={() => void load()} className={ops.btn}>
+          <RefreshCw className="h-3.5 w-3.5" /> Refresh
+        </button>
+      }
+      tabs={(["orders", "promos", "config"] as const).map((t) => (
+        <OpsTab key={t} active={tab === t} onClick={() => setTab(t)}>
+          <span className="capitalize">{t === "config" ? "Deposit addresses" : t}</span>
+        </OpsTab>
+      ))}
+    >
+        {error && <div className="mx-4 mt-4 rounded-xl bg-gc-red-soft px-4 py-3 text-sm text-gc-red sm:mx-6">{error}</div>}
 
         {tab === "orders" && (
           <>
-            <div className="mt-4 flex flex-wrap items-center gap-2">
+            {rows && rows.length > 0 && (
+              <OpsStats
+                items={[
+                  { label: "Orders", value: visible.length },
+                  { label: "Paid total", value: `$${visible.reduce((s, r) => s + Number(r.pay_amount_usd || 0), 0).toFixed(2)}` },
+                  { label: "Credit total", value: `$${visible.reduce((s, r) => s + Number(r.credit_usd || 0), 0).toFixed(2)}` },
+                  { label: "Awaiting action", value: visible.filter((r) => !["approved", "rejected"].includes(String(r.status))).length, tone: "warning" },
+                ]}
+              />
+            )}
+            <div className="flex flex-wrap items-center gap-2 border-b border-border px-4 py-3 sm:px-6">
               {FILTERS.map((f) => (
                 <button
                   key={f.id}
                   onClick={() => setFilter(f.id)}
-                  className={`rounded-full px-3 py-1.5 text-[13px] transition ${ filter === f.id ? "bg-gc-blue text-gc-on-blue" : "border border-gc-line text-gc-ink-muted hover:bg-gc-panel" }`}
+                  className={`h-8 rounded-full px-3 text-[13px] transition ${ filter === f.id ? "bg-foreground text-background" : "border border-border text-muted-foreground hover:bg-muted" }`}
                 >
                   {f.label}
                 </button>
@@ -211,27 +221,11 @@ function OpsPayments() {
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Search email, TX ID, order ID, promo…"
-                className={`${input} ml-auto w-full sm:w-80`}
+                className={`${ops.input} ml-auto sm:w-80`}
               />
             </div>
 
-            {rows && rows.length > 0 && (
-              <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
-                {[
-                  { k: "Orders", v: String(visible.length) },
-                  { k: "Paid total", v: `$${visible.reduce((s, r) => s + Number(r.pay_amount_usd || 0), 0).toFixed(2)}` },
-                  { k: "Credit total", v: `$${visible.reduce((s, r) => s + Number(r.credit_usd || 0), 0).toFixed(2)}` },
-                  { k: "Awaiting action", v: String(visible.filter((r) => !["approved", "rejected"].includes(String(r.status))).length) },
-                ].map((s) => (
-                  <div key={s.k} className="rounded-xl border border-gc-line px-4 py-3">
-                    <div className="text-[11px] uppercase tracking-[0.14em] text-gc-ink-muted">{s.k}</div>
-                    <div className="mt-1 text-lg font-medium text-gc-ink">{s.v}</div>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            <div className="mt-4 space-y-3">
+            <div className="space-y-3 px-4 py-5 sm:px-6">
               {visible.map((r) => {
                 const net = networkMeta(String(r.network));
                 const status = String(r.status ?? "");
@@ -244,11 +238,11 @@ function OpsPayments() {
                         ? "bg-gc-panel text-gc-ink-muted"
                         : "bg-gc-yellow-soft text-gc-amber";
                 return (
-                  <div key={r.id} className="rounded-2xl border border-gc-line p-4">
+                  <div key={r.id} className="rounded-xl border border-border bg-background p-4 transition hover:border-gc-blue-soft hover:shadow-sm">
                     <div className="flex flex-wrap items-start gap-3">
                       <div className="min-w-0 flex-1">
                         <div className="flex flex-wrap items-center gap-2">
-                          <span className={`rounded-full px-2.5 py-1 text-[11px] uppercase tracking-[0.1em] ${pill}`}>
+                          <span className={`rounded-full px-2 py-0.5 text-[11px] font-medium capitalize ${pill}`}>
                             {status.replace("_", " ") || "unknown"}
                           </span>
                           <span className="text-[13px] font-medium text-gc-ink break-all">
@@ -277,8 +271,8 @@ function OpsPayments() {
 
                     </div>
 
-                    <div className="mt-3 rounded-xl bg-gc-panel px-3 py-2.5">
-                      <div className="text-[11px] uppercase tracking-[0.14em] text-gc-ink-muted">Transaction ID</div>
+                    <div className="mt-3 rounded-lg bg-muted/50 px-3 py-2.5">
+                      <div className="text-[12px] text-muted-foreground">Transaction ID</div>
                       {r.tx_hash ? (
                         <div className="mt-1 flex flex-wrap items-center gap-2">
                           <code className="min-w-0 flex-1 break-all font-mono text-[12.5px] text-gc-ink">{String(r.tx_hash)}</code>
@@ -296,19 +290,19 @@ function OpsPayments() {
 
                     <div className="mt-3 grid gap-2 text-[12.5px] sm:grid-cols-2 lg:grid-cols-4">
                       <div>
-                        <div className="text-[11px] uppercase tracking-[0.14em] text-gc-ink-muted">Deposit address</div>
+                        <div className="text-[12px] text-muted-foreground">Deposit address</div>
                         <div className="break-all font-mono text-gc-ink">{r.deposit_address ?? "—"}</div>
                       </div>
                       <div>
-                        <div className="text-[11px] uppercase tracking-[0.14em] text-gc-ink-muted">Promo</div>
+                        <div className="text-[12px] text-muted-foreground">Promo</div>
                         <div className="text-gc-ink">{r.promo_code ?? "—"}</div>
                       </div>
                       <div>
-                        <div className="text-[11px] uppercase tracking-[0.14em] text-gc-ink-muted">Expires</div>
+                        <div className="text-[12px] text-muted-foreground">Expires</div>
                         <div className="text-gc-ink">{r.expires_at ? new Date(r.expires_at).toLocaleString() : "—"}</div>
                       </div>
                       <div>
-                        <div className="text-[11px] uppercase tracking-[0.14em] text-gc-ink-muted">Auto check</div>
+                        <div className="text-[12px] text-muted-foreground">Auto check</div>
                         <div className="text-gc-ink">{r.auto_result?.reason ?? "—"}</div>
                       </div>
                     </div>
@@ -349,7 +343,7 @@ function OpsPayments() {
 
         {tab === "promos" && (
           <>
-            <div className="mt-5 rounded-2xl border border-gc-line p-4">
+            <div className="mx-4 mt-5 rounded-xl border border-border p-4 sm:mx-6">
               <div className="text-[13px] font-medium text-gc-ink">Create / update code</div>
               <div className="mt-3 grid gap-2 sm:grid-cols-4">
                 <input className={input} placeholder="CODE" value={form.code} onChange={(e) => setForm({ ...form, code: e.target.value.toUpperCase() })} />
@@ -372,7 +366,7 @@ function OpsPayments() {
               </div>
             </div>
 
-            <div className="mt-4 overflow-x-auto">
+            <div className="mt-5 overflow-x-auto px-4 sm:px-6">
               <table className="w-full text-left text-[13px]">
                 <thead className="text-gc-ink-muted">
                   <tr>
@@ -416,13 +410,13 @@ function OpsPayments() {
         )}
 
         {tab === "config" && (
-          <div className="mt-5 max-w-2xl rounded-2xl border border-gc-line p-4">
+          <div className="mx-4 my-5 max-w-2xl rounded-xl border border-border p-4 sm:mx-6">
             <div className="text-[13px] font-medium text-gc-ink">Deposit addresses</div>
             <p className="mt-1 text-[12px] text-gc-ink-muted">Users see these on the payment page and auto-verification checks them.</p>
             <div className="mt-4 space-y-3">
               {(["trc20", "bep20", "erc20"] as const).map((k) => (
                 <div key={k}>
-                  <div className="text-[12px] uppercase tracking-[0.14em] text-gc-ink-muted">{networkMeta(k).chain}</div>
+                  <div className="text-[12px] text-muted-foreground">{networkMeta(k).chain}</div>
                   <input
                     className={`${input} mt-1 w-full`}
                     value={cfg[k]}
@@ -437,7 +431,6 @@ function OpsPayments() {
             </div>
           </div>
         )}
-      </div>
-    </div>
+    </OpsPage>
   );
 }
