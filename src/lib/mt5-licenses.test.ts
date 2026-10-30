@@ -107,5 +107,20 @@ describe("delete bot account", () => {
     expect(botAccountDeleteBlock("444", lic, rep, [], now)).toBe(null);
     expect(botAccountDeleteBlock("555", lic, rep, [], now)).toBe("running");
     expect(botAccountDeleteBlock("444", lic, rep, [{ mt5_account: "444", last_seen_at: new Date(now - 10_000).toISOString(), ended_at: null }], now)).toBe("running");
+    // A stale session left open (PC turned off) does not lock the account.
+    expect(botAccountDeleteBlock("444", lic, rep, [{ mt5_account: "444", last_seen_at: old, ended_at: null }], now)).toBe(null);
+  });
+
+  it("only the IP-linked account is locked when 2 IPs share one account", async () => {
+    const { botAccountDeleteBlock } = await import("./mt5-licenses");
+    const now = Date.parse("2026-10-30T05:00:00Z");
+    const old = new Date(now - 24 * 60 * 60_000).toISOString();
+    const lic = [
+      { id: "x", mt5_account: "18.116.15.28#474818470", revoked_at: null },
+      { id: "y", mt5_account: "153.117.68.156#474818470", revoked_at: null },
+    ];
+    const rep = ["472966321", "474790077", "474800884", "474820178", "474821288"].map((a, i) => ({ license_id: `old${i}`, mt5_account: a, updated_at: old }));
+    expect(botAccountDeleteBlock("474818470", lic, rep, [], now)).toBe("live_license");
+    for (const a of ["472966321", "474790077", "474800884", "474820178", "474821288"]) expect(botAccountDeleteBlock(a, lic, rep, [], now)).toBe(null);
   });
 });
