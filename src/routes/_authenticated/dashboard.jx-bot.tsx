@@ -356,7 +356,7 @@ function JxBotPage() {
             <Bot className="h-12 w-12 text-zinc-300" strokeWidth={1} />
             <div className="mt-6 text-[15px] font-medium text-zinc-900">No licenses yet</div>
             <p className="mt-2 max-w-md text-[13px] leading-relaxed text-zinc-500">
-              Add the IP of your PC or RDP, download the bot and type the same IP into MyIP.
+              Add the IP of your PC or RDP, download the bot and type the same IP
             </p>
             <button
               onClick={() => setShowCreate(true)}
