@@ -2,6 +2,7 @@ import { createServerFn } from '@tanstack/react-start'
 import { getRequest } from '@tanstack/react-start/server'
 import { z } from 'zod'
 import { requireSupabaseAuth } from '@/integrations/supabase/auth-middleware'
+import { ALERT_REPEAT_WINDOW_MS, shouldAlertLogin } from './login-alert'
 
 function describeAgent(ua: string) {
   const browser = /Edg\//.test(ua) ? 'Edge' : /OPR\//.test(ua) ? 'Opera' : /Firefox\//.test(ua) ? 'Firefox' : /Chrome\//.test(ua) ? 'Chrome' : /Safari\//.test(ua) ? 'Safari' : 'Browser'
@@ -37,16 +38,23 @@ export const recordLogin = createServerFn({ method: 'POST' })
     const rows = (past ?? []) as { ip: string | null; fingerprint: string | null; country: string | null }[]
     const knownDevice = !!fp && rows.some((r) => r.fingerprint === fp)
     const knownIp = !!ip && rows.some((r) => r.ip === ip)
-    if (rows.length > 0 && (knownDevice || knownIp)) {
-      // Seen before: only log once per new IP/device combo to keep the table small.
-      if (!(knownDevice && knownIp)) {
-        await admin.from('login_events').insert({ user_id: context.userId, ip, country, city, user_agent: ua, fingerprint: fp || null })
-      }
-      return { alerted: false }
+    const { data: alerts } = await admin
+      .from('user_notifications')
+      .select('data,created_at')
+      .eq('user_id', context.userId)
+      .eq('type', 'security')
+      .gte('created_at', new Date(Date.now() - ALERT_REPEAT_WINDOW_MS).toISOString())
+      .limit(50)
+    const recentAlerts = ((alerts ?? []) as { data: { ip?: string } | null; created_at: string }[]).map((a) => ({
+      ip: a.data?.ip ?? null,
+      created_at: a.created_at,
+    }))
+    const alert = shouldAlertLogin({ ip, fingerprint: fp, pastLogins: rows, recentAlerts, now: Date.now() })
+    // Seen before on both IP and device: no need to log again.
+    if (!(knownDevice && knownIp)) {
+      await admin.from('login_events').insert({ user_id: context.userId, ip, country, city, user_agent: ua, fingerprint: fp || null, is_new: alert })
     }
-    const isNew = rows.length > 0
-    await admin.from('login_events').insert({ user_id: context.userId, ip, country, city, user_agent: ua, fingerprint: fp || null, is_new: isNew })
-    if (!isNew) return { alerted: false }
+    if (!alert) return { alerted: false }
 
     const location = [city, country].filter(Boolean).join(', ') || 'Unknown location'
     const agent = describeAgent(ua)
