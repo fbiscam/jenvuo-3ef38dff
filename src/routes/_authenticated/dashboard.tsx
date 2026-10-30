@@ -1597,7 +1597,9 @@ function DashboardLayout() {
               ? "h-full min-h-0 w-full flex-1 overflow-hidden bg-background"
               : embedMode
                 ? "w-full flex-1 bg-background px-5 pt-7 pb-7 sm:px-8"
-                : "mx-auto w-full max-w-7xl flex-1 bg-white px-5 pt-7 pb-7 sm:px-8"
+                : pathname === "/dashboard/usage"
+                  ? "w-full flex-1 bg-white px-5 pt-0 pb-7 sm:px-8"
+                  : "mx-auto w-full max-w-7xl flex-1 bg-white px-5 pt-7 pb-7 sm:px-8"
           }
           style={pathname === "/dashboard/terminal" ? undefined : { zoom: 0.9 }}
         >
