@@ -8,7 +8,7 @@ const ARTICLE_MODELS = [
   "codecraft/claude-fable-5.1",
   "codecraft/gpt-5.5",
 ];
-const ARTICLE_MODEL_LABEL = "Claude Fable 5.1 (CodeCraft)";
+const ARTICLE_MODEL_LABEL = "GPT-6 Luna (Lovable AI)";
 
 function slugify(s: string) {
   return s
