@@ -383,7 +383,7 @@ function AdminInbox() {
           <div className="flex-1 overflow-y-auto">
             {filtered.length === 0 ? (
               <div className="flex h-full flex-col items-center justify-center px-6 py-10 text-center">
-                <div className="grid h-12 w-12 place-items-center rounded-xl border border-border bg-gc-canvas">
+                <div className="grid h-12 w-12 place-items-center rounded-xl border border-border bg-background">
                   <Inbox className="h-4 w-4 text-muted-foreground" />
                 </div>
                 <p className="mt-3 text-[13px] font-semibold text-gc-ink">No conversations</p>
@@ -473,7 +473,7 @@ function AdminInbox() {
         </aside>
 
         {/* Right — conversation */}
-        <section className={`flex flex-1 flex-col bg-gc-canvas ${activeId ? "flex" : "hidden md:flex"}`}>
+        <section className={`flex flex-1 flex-col bg-background ${activeId ? "flex" : "hidden md:flex"}`}>
           {!activeSession ? (
             <div className="flex flex-1 flex-col items-center justify-center gap-3 p-8 text-center">
               <div className="grid h-16 w-16 place-items-center rounded-xl border border-border bg-background">
@@ -487,7 +487,7 @@ function AdminInbox() {
           ) : (
             <>
               {/* Thread header */}
-              <div className="flex h-16 shrink-0 items-center gap-3 border-b border-border bg-gc-canvas px-6">
+              <div className="flex h-16 shrink-0 items-center gap-3 border-b border-border bg-background px-6">
 
                 <button
                   onClick={() => setActiveId(null)}
@@ -542,13 +542,13 @@ function AdminInbox() {
                   {activeSession.status === "open" ? (
                     <button
                       onClick={handleClose}
-                      className="inline-flex items-center gap-1.5 rounded-xl border border-border bg-background px-3 py-1.5 font-mono text-[10px] font-medium uppercase tracking-[0.18em] text-foreground transition hover:border-gc-blue hover:bg-gc-blue-hover hover:text-gc-on-blue"
+                      className="inline-flex items-center gap-1.5 rounded-xl border border-border bg-background px-3 py-1.5 text-[12px] font-medium text-foreground transition hover:bg-muted"
                       title="Close (E)"
                     >
                       <Archive className="h-3 w-3" /> Close
                     </button>
                   ) : (
-                    <span className="inline-flex items-center gap-1 rounded-xl bg-muted px-3 py-1.5 font-mono text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
+                    <span className="inline-flex items-center gap-1 rounded-xl bg-muted px-3 py-1.5 text-[12px] font-medium text-muted-foreground">
                       <CheckCircle2 className="h-3 w-3" /> Closed
                     </span>
                   )}
@@ -556,10 +556,10 @@ function AdminInbox() {
               </div>
 
               {/* Messages */}
-              <div ref={scrollRef} className="flex-1 overflow-y-auto bg-gc-canvas">
+              <div ref={scrollRef} className="flex-1 overflow-y-auto bg-muted/30">
                 <div className="mx-auto max-w-3xl space-y-1 p-8">
                   {messages.length === 0 && (
-                    <div className="py-8 text-center font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">No messages yet</div>
+                    <div className="py-8 text-center text-[12px] text-muted-foreground">No messages yet</div>
                   )}
                   {messages.map((m, i) => {
                     const isAdminMsg = m.sender === "admin";
@@ -569,7 +569,7 @@ function AdminInbox() {
                     return (
                       <div key={m.id} className={showHeader ? "pt-6" : "pt-1"}>
                         {showHeader && (
-                          <div className={`mb-2 flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground ${isAdminMsg ? "justify-end" : ""}`}>
+                          <div className={`mb-2 flex items-center gap-2 text-[12px] text-muted-foreground ${isAdminMsg ? "justify-end" : ""}`}>
                             <span className="font-medium text-muted-foreground">
                               {isAdminMsg ? username || "You" : activeSession.guest_name || "Visitor"}
                             </span>
@@ -592,9 +592,9 @@ function AdminInbox() {
               </div>
 
               {/* Composer */}
-              <form onSubmit={handleReply} className="shrink-0 border-t border-border bg-gc-canvas p-5">
+              <form onSubmit={handleReply} className="shrink-0 border-t border-border bg-background p-5">
                 {activeSession.status === "closed" ? (
-                  <div className="flex items-center justify-center gap-2 rounded-xl border border-border bg-background py-3 font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+                  <div className="flex items-center justify-center gap-2 rounded-xl border border-border bg-background py-3 text-[12px] text-muted-foreground">
                     <CheckCircle2 className="h-3.5 w-3.5" /> This conversation is closed
                   </div>
                 ) : (
@@ -634,7 +634,7 @@ function AdminInbox() {
                                 aria-label="Close"
                               />
                               <div className="absolute bottom-full left-0 z-20 mb-1.5 w-80 overflow-hidden rounded-xl border border-gc-line bg-background ring-1 ring-border">
-                                <div className="border-b border-gc-line bg-gc-panel/60 px-3 py-2 text-[10px] font-bold uppercase tracking-[0.16em] text-gc-ink-muted">
+                                <div className="border-b border-gc-line bg-gc-panel/60 px-3 py-2 text-[12px] font-medium text-muted-foreground">
                                   Quick replies
                                 </div>
                                 <ul className="max-h-64 overflow-y-auto py-1">
@@ -689,8 +689,8 @@ function AdminInbox() {
 
         {/* Details rail */}
         {activeSession && (
-          <aside className="hidden w-64 shrink-0 flex-col border-l border-gc-blue/[0.06] bg-background p-4 xl:flex">
-            <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-gc-ink-muted">
+          <aside className="hidden w-64 shrink-0 flex-col border-l border-border bg-background p-4 xl:flex">
+            <div className="text-[13px] font-medium text-foreground">
               Visitor
             </div>
             <div className="mt-3 flex items-center gap-3 rounded-xl border border-border bg-background p-3">
@@ -725,7 +725,7 @@ function AdminInbox() {
               </DetailRow>
             </div>
 
-            <div className="mt-6 text-[10px] font-bold uppercase tracking-[0.18em] text-gc-ink-muted">
+            <div className="mt-6 text-[13px] font-medium text-foreground">
               Activity
             </div>
             <div className="mt-2 rounded-xl border border-border bg-background p-3 text-[12px]">
