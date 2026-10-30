@@ -111,7 +111,7 @@ export function Mt5Licenses() {
                   {copied === l.id ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
                 </button>
                 <button type="button" aria-label="Revoke license" onClick={async () => { await revoke({ data: { id: l.id } }); await refresh(); }} className="rounded-md p-1.5 text-gc-ink-muted hover:bg-gc-console-search hover:text-gc-red">
-                  <Trash2 className="h-4 w-4" />
+                  <Trash2 className="h-4 w-4 text-destructive" />
                 </button>
               </span>
             )}
