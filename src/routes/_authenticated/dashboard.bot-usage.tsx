@@ -218,7 +218,8 @@ function BotUsagePage() {
                           <td className="py-2.5 text-right tabular-nums">{r.open_lots.toFixed(2)}</td>
                           <td className="py-2.5 pl-2 text-right">
                             {(() => {
-                              const block = data?.deleteBlock?.[r.mt5_account] ?? "live_license";
+                              // Missing status = not locked; the server still refuses deleting live/running accounts.
+                              const block = data?.deleteBlock?.[r.mt5_account] ?? null;
                               if (block) {
                                 return (
                                   <span
