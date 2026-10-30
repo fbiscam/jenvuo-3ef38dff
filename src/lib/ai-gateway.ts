@@ -57,6 +57,9 @@ export type CallChatOptions = {
   // With `raceModels`: give up on the primary models after this long and go
   // straight to the backup (when `backupFallback` is set).
   raceBudgetMs?: number;
+  // Use exactly the listed models (no Lovable-first). The public developer
+  // API sets this so a customer's chosen model maps to one upstream model.
+  exactModels?: boolean;
 };
 
 export class AiGatewayError extends Error {
@@ -349,7 +352,7 @@ export async function callChatCompletion(
   const primary = opts.raceModels ? callChatRace : callChatChain;
   // Every AI job (chat, articles, analysis, reviews) answers through the
   // cheapest Lovable model first while LOVABLE_CHAT_FIRST is on.
-  if (LOVABLE_CHAT_FIRST) {
+  if (LOVABLE_CHAT_FIRST && !opts.exactModels) {
     try {
       return await callBackupChat(opts);
     } catch (lovErr) {

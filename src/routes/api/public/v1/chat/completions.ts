@@ -135,6 +135,7 @@ export const Route = createFileRoute("/api/public/v1/chat/completions")({
             messages,
             maxTokens,
             stage: "public-api-chat",
+            exactModels: true,
             jsonMode: body?.response_format?.type === "json_object",
           });
 
