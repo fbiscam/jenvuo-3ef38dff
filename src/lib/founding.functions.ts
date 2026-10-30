@@ -463,10 +463,16 @@ export const updateFoundingApplication = createServerFn({ method: "POST" })
       status: z.enum(["pending", "approved", "rejected", "waitlisted", "active", "graduated"]).optional(),
       admin_notes: z.string().max(2000).optional(),
       first_profit_reached: z.boolean().optional(),
+      // Plan chosen by the reviewing admin. The applicant's requested_plan is
+      // only a hint and is never used to grant a tier.
+      plan: z.enum(["pro", "elite", "ultra"]).optional(),
     }).parse(d),
   )
   .handler(async ({ data, context }) => {
     await assertAdmin(context.supabase, context.userId);
+    if ((data.status === "approved" || data.status === "active") && !data.plan) {
+      throw new Error("Choose the plan to grant before approving or activating.");
+    }
 
     // Fetch prior row so we only email on real status transitions
     const { data: prior } = await context.supabase
@@ -505,7 +511,7 @@ export const updateFoundingApplication = createServerFn({ method: "POST" })
           auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
         });
         const targetEmail = String(p.email).toLowerCase();
-        const planId = String(p.requested_plan || "elite");
+        const planId = data.plan as string;
         // Check if the user already has an account
         let existingUserId: string | null = null;
         for (let page = 1; page <= 20 && !existingUserId; page++) {
@@ -577,7 +583,7 @@ export const updateFoundingApplication = createServerFn({ method: "POST" })
         const admin = createClient<Database>(url, service, {
           auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
         });
-        const planId = String(p.requested_plan || "elite");
+        const planId = data.plan as string;
         const targetEmail = String(p.email).toLowerCase();
         let matchedUserId: string | null = null;
         for (let page = 1; page <= 20 && !matchedUserId; page++) {
