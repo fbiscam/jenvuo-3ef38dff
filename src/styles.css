@@ -1516,13 +1516,3 @@ input[type="password"]::-ms-clear {
    cancel the extra margin the dialog scroll-lock adds. */
 html { scrollbar-gutter: stable; }
 body[data-scroll-locked] { margin-right: 0 !important; padding-right: 0 !important; }
-
-/* Dashboard canvas: neutral soft gray (no blue tint) so white cards stand out.
-   Scoped to the dashboard shell + menu; dark mode keeps its own tokens. */
-.jenvu-zoom-dashboard:not(.dash-dark),
-.dashboard-sidebar-root {
-  --gc-canvas: #f6f7f9;
-  --gc-console-bar: #f6f7f9;
-  --gc-notice: #eef0f3;
-  --gc-panel: #f1f3f4;
-}
