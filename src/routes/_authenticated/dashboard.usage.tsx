@@ -145,7 +145,7 @@ function UsagePage() {
     refetchIntervalInBackground: false,
     refetchOnWindowFocus: true,
   });
-  const [tab, setTab] = useState<"capabilities" | "categories" | "caching" | "safety">(
+  const [tab, setTab] = useState<"capabilities" | "categories" | "terminal" | "forecast">(
     "capabilities",
   );
   const [sideTab, setSideTab] = useState<"users" | "services" | "keys">("keys");
@@ -196,11 +196,10 @@ function UsagePage() {
       extensionRequests: number;
       additions: number;
       addedUsd: number;
-      cacheReads: number;
-      cacheWrites: number;
-      cacheHits: number;
-      safetyChecks: number;
-      blockedRequests: number;
+      terminalScans: number;
+      terminalScanUsd: number;
+      terminalDays: number;
+      terminalDailyUsd: number;
     }[] = [];
     const idx = new Map<string, number>();
     for (let i = rangeDays - 1; i >= 0; i--) {
@@ -222,11 +221,10 @@ function UsagePage() {
         extensionRequests: 0,
         additions: 0,
         addedUsd: 0,
-        cacheReads: 0,
-        cacheWrites: 0,
-        cacheHits: 0,
-        safetyChecks: 0,
-        blockedRequests: 0,
+        terminalScans: 0,
+        terminalScanUsd: 0,
+        terminalDays: 0,
+        terminalDailyUsd: 0,
       });
     }
     for (const r of rows) {
@@ -244,11 +242,14 @@ function UsagePage() {
           b.seniorTokens += r.completion_tokens ?? 0;
         }
         if (r.reason === "extension_api") b.extensionRequests += 1;
-        b.cacheReads += metadataNumber(r.metadata, /cache.*(?:read|input).*token|cached.*token/i);
-        b.cacheWrites += metadataNumber(r.metadata, /cache.*(?:write|creation).*token/i);
-        if (metadataFlag(r.metadata, /cache.*hit/i)) b.cacheHits += 1;
-        if (metadataFlag(r.metadata, /safety|moderation|screened/i)) b.safetyChecks += 1;
-        if (metadataFlag(r.metadata, /blocked|flagged|rejected/i)) b.blockedRequests += 1;
+        if (r.reason === "terminal_scan") {
+          b.terminalScans += 1;
+          b.terminalScanUsd += Math.abs(r.delta);
+        }
+        if (r.reason === "terminal_daily") {
+          b.terminalDays += 1;
+          b.terminalDailyUsd += Math.abs(r.delta);
+        }
       } else {
         b.earned += r.delta;
         b.additions += 1;
@@ -291,11 +292,10 @@ function UsagePage() {
       tokenSeries: days.map((d) => d.tokens),
       requestSeries: days.map((d) => d.requests),
       keySpend,
-      cacheReads: days.reduce((sum, day) => sum + day.cacheReads, 0),
-      cacheWrites: days.reduce((sum, day) => sum + day.cacheWrites, 0),
-      cacheHits: days.reduce((sum, day) => sum + day.cacheHits, 0),
-      safetyChecks: days.reduce((sum, day) => sum + day.safetyChecks, 0),
-      blockedRequests: days.reduce((sum, day) => sum + day.blockedRequests, 0),
+      terminalScans: days.reduce((sum, day) => sum + day.terminalScans, 0),
+      terminalScanUsd: days.reduce((sum, day) => sum + day.terminalScanUsd, 0),
+      terminalDays: days.reduce((sum, day) => sum + day.terminalDays, 0),
+      terminalDailyUsd: days.reduce((sum, day) => sum + day.terminalDailyUsd, 0),
     };
   }, [data, rangeDays, model]);
 
@@ -380,17 +380,16 @@ function UsagePage() {
           }
           return groups;
         }, []);
-  const cachingRows = derived.spendRows.filter((row) => {
-    if (!row.metadata || typeof row.metadata !== "object" || Array.isArray(row.metadata))
-      return false;
-    return Object.keys(row.metadata).some((key) => key.toLowerCase().includes("cache"));
-  });
-  const safetyRows = derived.spendRows.filter((row) => {
-    if (!row.metadata || typeof row.metadata !== "object" || Array.isArray(row.metadata))
-      return false;
-    return Object.keys(row.metadata).some((key) => /safety|moderation|blocked/i.test(key));
-  });
-
+  const activeDays = derived.days.filter((day) => day.spent > 0);
+  const topDay = derived.days.reduce<(typeof derived.days)[number] | null>(
+    (best, day) => (day.spent > (best?.spent ?? 0) ? day : best),
+    null,
+  );
+  const last7 = derived.days.slice(-7).reduce((sum, day) => sum + day.spent, 0);
+  const prev7 = derived.days.slice(-14, -7).reduce((sum, day) => sum + day.spent, 0);
+  const weekChange = prev7 > 0 ? ((last7 - prev7) / prev7) * 100 : null;
+  const terminalTotal = derived.terminalScanUsd + derived.terminalDailyUsd;
+  const terminalShare = derived.spent > 0 ? (terminalTotal / derived.spent) * 100 : 0;
 
   return (
     <div className="-mx-5 -mb-7 min-h-[calc(100dvh-4rem)] overflow-hidden bg-background text-foreground sm:-mx-8">
@@ -584,11 +583,11 @@ function UsagePage() {
             <TabButton active={tab === "categories"} onClick={() => setTab("categories")}>
               Spend categories
             </TabButton>
-            <TabButton active={tab === "caching"} onClick={() => setTab("caching")}>
-              Prompt caching
+            <TabButton active={tab === "terminal"} onClick={() => setTab("terminal")}>
+              Terminal usage
             </TabButton>
-            <TabButton active={tab === "safety"} onClick={() => setTab("safety")}>
-              Safety usage
+            <TabButton active={tab === "forecast"} onClick={() => setTab("forecast")}>
+              Spend forecast
             </TabButton>
           </div>
 
@@ -669,87 +668,84 @@ function UsagePage() {
                 <ModelBreakdown rows={derived.spendRows} />
               </div>
             </div>
-          ) : tab === "caching" ? (
+          ) : tab === "terminal" ? (
             <div className="grid grid-cols-1 gap-4 p-4 sm:grid-cols-2">
               <CapabilityCard
-                title="Cached input tokens"
+                title="Terminal chart scans"
                 start={rangeStartLabel(rangeDays)}
                 end={rangeEndLabel()}
                 items={[
                   {
                     color: "bg-chart-1",
-                    label: `${fmtInt(derived.cacheReads)} tokens reused`,
-                    data: derived.days.map((day) => day.cacheReads),
+                    label: `${fmtInt(derived.terminalScans)} scans`,
+                    data: derived.days.map((day) => day.terminalScans),
                   },
                   {
                     color: "bg-chart-2",
-                    label: `${fmtInt(derived.cacheHits)} cache hits`,
-                    data: derived.days.map((day) => day.cacheHits),
+                    label: `${fmtUsd(derived.terminalScanUsd, 2)} spent`,
+                    data: derived.days.map((day) => day.terminalScanUsd),
                   },
                 ]}
               />
               <CapabilityCard
-                title="Cache writes"
+                title="Terminal daily fee"
                 start={rangeStartLabel(rangeDays)}
                 end={rangeEndLabel()}
                 items={[
                   {
                     color: "bg-chart-1",
-                    label: `${fmtInt(derived.cacheWrites)} tokens stored`,
-                    data: derived.days.map((day) => day.cacheWrites),
+                    label: `${fmtInt(derived.terminalDays)} days charged`,
+                    data: derived.days.map((day) => day.terminalDays),
+                  },
+                  {
+                    color: "bg-chart-2",
+                    label: `${fmtUsd(derived.terminalDailyUsd, 2)} spent`,
+                    data: derived.days.map((day) => day.terminalDailyUsd),
                   },
                 ]}
               />
               <UsageFeature
-                title="Prompt caching activity"
-                description="Requests with reusable prompt context are tracked here when the model provider reports cache usage."
-                value={`${cachingRows.length} tracked requests`}
+                title="Terminal total"
+                description="Chart scans plus the daily Terminal fee in the selected range."
+                value={fmtUsd(terminalTotal, 2)}
               />
               <UsageFeature
-                title="Estimated efficiency"
-                description="Token reuse lowers repeated input processing while keeping the complete conversation context available."
-                value={
-                  derived.cacheReads > 0
-                    ? `${fmtInt(derived.cacheReads)} tokens reused`
-                    : "Ready to track"
-                }
+                title="Share of your spend"
+                description="How much of everything you spent in this range went to the Terminal."
+                value={derived.spent > 0 ? `${terminalShare.toFixed(0)}%` : "No spend yet"}
               />
             </div>
           ) : (
             <div className="grid grid-cols-1 gap-4 p-4 sm:grid-cols-2">
-              <CapabilityCard
-                title="Safety checks"
-                start={rangeStartLabel(rangeDays)}
-                end={rangeEndLabel()}
-                items={[
-                  {
-                    color: "bg-chart-1",
-                    label: `${fmtInt(derived.safetyChecks)} checks`,
-                    data: derived.days.map((day) => day.safetyChecks),
-                  },
-                ]}
-              />
-              <CapabilityCard
-                title="Blocked requests"
-                start={rangeStartLabel(rangeDays)}
-                end={rangeEndLabel()}
-                items={[
-                  {
-                    color: "bg-chart-2",
-                    label: `${fmtInt(derived.blockedRequests)} blocked`,
-                    data: derived.days.map((day) => day.blockedRequests),
-                  },
-                ]}
+              <UsageFeature
+                title="Average per day"
+                description={`Your spend in the selected range divided by ${rangeDays} days.`}
+                value={fmtUsd(burnPerDay, 2)}
               />
               <UsageFeature
-                title="Moderation events"
-                description="Safety and moderation results reported by the analysis pipeline appear in this view."
-                value={`${safetyRows.length} recorded events`}
+                title="Balance lasts"
+                description={`At your current pace, your ${fmtUsd(data.balance, 2)} balance runs out in about this many days.`}
+                value={runway != null ? `${fmtInt(runway)} days` : "No spend yet"}
               />
               <UsageFeature
-                title="Protection status"
-                description="Chart uploads and prompts continue through the configured validation and review safeguards."
-                value="Active"
+                title="Next 30 days"
+                description="Expected spend over the next 30 days if you keep the same pace."
+                value={fmtUsd(burnPerDay * 30, 2)}
+              />
+              <UsageFeature
+                title="This week vs last week"
+                description={`Last 7 days ${fmtUsd(last7, 2)}, the 7 days before ${fmtUsd(prev7, 2)}.`}
+                value={weekChange != null ? `${weekChange >= 0 ? "+" : ""}${weekChange.toFixed(0)}%` : fmtUsd(last7, 2)}
+              />
+              <UsageFeature
+                title="Busiest day"
+                description="The day you spent the most in the selected range."
+                value={topDay ? `${topDay.date.slice(5)} · ${fmtUsd(topDay.spent, 2)}` : "No spend yet"}
+              />
+              <UsageFeature
+                title="Active days"
+                description="Days in the selected range with any spend."
+                value={`${fmtInt(activeDays.length)} / ${rangeDays}`}
               />
             </div>
           )}
