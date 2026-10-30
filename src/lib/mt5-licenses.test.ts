@@ -126,7 +126,7 @@ describe("delete bot account", () => {
 });
 
 import { botAccountDeleteBlock as _bdb } from "./mt5-licenses";
-test("IP-only license locks only its most recent account", () => {
+it("IP-only license locks only its most recent account", () => {
   const lic = [{ id: "L1", mt5_account: "1.2.3.4", revoked_at: null }];
   const old = new Date(Date.now() - 86400000).toISOString();
   const newer = new Date(Date.now() - 3600000).toISOString();
