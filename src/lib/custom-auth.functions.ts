@@ -113,3 +113,20 @@ export const confirmRecoveryOtp = createServerFn({ method: 'POST' })
       .parse(data),
   )
   .handler(async ({ data }) => verifyRecoveryOtp(data))
+/**
+ * After a failed password sign-in, tells the page whether the email has an
+ * account (so it can say "wrong password") or not (so it can say "sign up").
+ */
+export const signInFailureHint = createServerFn({ method: 'POST' })
+  .inputValidator((d: unknown) => z.object({ email: z.string().trim().email().max(255) }).parse(d))
+  .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import('@/integrations/supabase/client.server')
+    const pattern = data.email.toLowerCase().replace(/[\\%_]/g, (c) => `\\${c}`)
+    const { data: rows } = await (supabaseAdmin as any)
+      .from('profiles')
+      .select('id')
+      .ilike('email', pattern)
+      .limit(1)
+    const exists = Array.isArray(rows) && rows.length > 0
+    return { hint: exists ? ('wrong_password' as const) : ('no_account' as const) }
+  })
