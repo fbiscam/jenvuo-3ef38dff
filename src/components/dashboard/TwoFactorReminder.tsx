@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { ShieldCheck } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { BANNER_PRIORITY, useBannerSlot } from "@/lib/banner-slot";
 
 const DISMISS_KEY = "jenvu_2fa_reminder_day";
 const today = () => new Date().toISOString().slice(0, 10);
@@ -10,6 +11,7 @@ const FIRST_SHOW_AFTER_MS = 5 * 60 * 60 * 1000;
 /** Daily card asking accounts without an authenticator app to turn on 2FA. */
 export default function TwoFactorReminder() {
   const [show, setShow] = useState(false);
+  const active = useBannerSlot("twoFactor", BANNER_PRIORITY.twoFactor, show);
 
   useEffect(() => {
     if (localStorage.getItem(DISMISS_KEY) === today()) return;
@@ -26,7 +28,7 @@ export default function TwoFactorReminder() {
     return () => { live = false; };
   }, []);
 
-  if (!show) return null;
+  if (!show || !active) return null;
   const dismiss = () => {
     localStorage.setItem(DISMISS_KEY, today());
     setShow(false);

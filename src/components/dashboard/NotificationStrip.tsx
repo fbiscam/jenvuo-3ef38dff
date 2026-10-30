@@ -1,21 +1,23 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { Info } from "lucide-react";
+import { Bell, ShieldAlert } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuthUser } from "@/hooks/useAuthUser";
 import { markNotificationRead } from "@/lib/notifications.functions";
+import { BANNER_PRIORITY, useBannerSlot } from "@/lib/banner-slot";
 
-type Notice = { id: string; title: string; body: string | null };
+type Notice = { id: string; title: string; body: string | null; type: string | null };
 
 /**
- * Google Cloud console-style notice strip: shows the newest unread
- * notification at the top of the dashboard with Dismiss / View actions.
+ * Top-of-dashboard notice (same white strip as the 2FA reminder): shows the
+ * newest unread notification. Only one dashboard notice shows at a time.
  */
 export default function NotificationStrip() {
   const { user } = useAuthUser();
   const markRead = useServerFn(markNotificationRead);
   const [notice, setNotice] = useState<Notice | null>(null);
+  const active = useBannerSlot("notice", BANNER_PRIORITY.notice, !!notice);
 
   const load = useCallback(async () => {
     if (!user) {
@@ -24,7 +26,7 @@ export default function NotificationStrip() {
     }
     const { data } = await supabase
       .from("user_notifications")
-      .select("id,title,body")
+      .select("id,title,body,type")
       .eq("user_id", user.id)
       .is("read_at", null)
       .order("created_at", { ascending: false })
@@ -49,7 +51,7 @@ export default function NotificationStrip() {
     };
   }, [user, load]);
 
-  if (!notice) return null;
+  if (!notice || !active) return null;
 
   const dismiss = async () => {
     const id = notice.id;
@@ -62,10 +64,13 @@ export default function NotificationStrip() {
     void load();
   };
 
+  const isSecurity = notice.type === "security" || notice.type === "device";
+  const Icon = isSecurity ? ShieldAlert : Bell;
+
   return (
-    <div className="mx-4 mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 rounded-2xl bg-gc-notice px-5 py-3 sm:mx-6">
-      <Info className="h-[18px] w-[18px] shrink-0 fill-gc-blue-deep text-gc-notice" aria-hidden="true" />
-      <p className="min-w-0 flex-1 text-[14px] text-gc-ink">
+    <section className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-gc-line bg-background py-2 pl-4 pr-4 sm:pl-5 md:pr-5">
+      <Icon className="h-5 w-5 shrink-0 text-gc-ink-muted" aria-hidden="true" />
+      <p className="min-w-0 flex-1 text-[13px] text-gc-ink sm:text-[14px]">
         <span className="font-medium">{notice.title}</span>
         {notice.body ? <span className="text-gc-ink-muted"> — {notice.body}</span> : null}
       </p>
@@ -73,11 +78,28 @@ export default function NotificationStrip() {
         <button
           type="button"
           onClick={() => void dismiss()}
-          className="h-8 rounded-full px-3 text-[13px] font-medium text-gc-blue-deep hover:bg-gc-blue-soft"
+          className="h-8 rounded-full border border-gc-line bg-background px-4 text-[13px] font-medium text-gc-ink hover:bg-gc-surface"
         >
           Dismiss
         </button>
+        {isSecurity ? (
+          <Link
+            to="/dashboard/profile"
+            hash="security"
+            onClick={() => void dismiss()}
+            className="inline-flex h-8 items-center rounded-full bg-gc-blue-deep px-4 text-[13px] font-medium text-gc-on-blue hover:bg-gc-navy"
+          >
+            Change password
+          </Link>
+        ) : (
+          <Link
+            to="/dashboard/notifications"
+            className="inline-flex h-8 items-center rounded-full bg-gc-blue-deep px-4 text-[13px] font-medium text-gc-on-blue hover:bg-gc-navy"
+          >
+            View
+          </Link>
+        )}
       </div>
-    </div>
+    </section>
   );
 }

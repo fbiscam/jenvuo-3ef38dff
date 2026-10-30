@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Gift, Loader2 } from "lucide-react";
 import { useFreeTrial } from "@/hooks/useFreeTrial";
+import { BANNER_PRIORITY, useBannerSlot } from "@/lib/banner-slot";
 
 const DISMISS_KEY = "jenvu:start-trial-banner-dismissed";
 
@@ -14,7 +15,8 @@ export default function StartTrialBanner() {
     setDismissed(window.localStorage.getItem(`${DISMISS_KEY}:${user?.id ?? ""}`) === "1");
   }, [user?.id]);
 
-  if (!user || !eligible || dismissed) return null;
+  const active = useBannerSlot("trial", BANNER_PRIORITY.trial, !!user && eligible && !dismissed);
+  if (!user || !eligible || dismissed || !active) return null;
 
   const dismiss = () => {
     window.localStorage.setItem(`${DISMISS_KEY}:${user.id}`, "1");
