@@ -68,7 +68,7 @@ export default function NotificationStrip() {
   const Icon = isSecurity ? ShieldAlert : Bell;
 
   return (
-    <section className="border-b border-gc-line bg-gc-canvas px-3 py-2 sm:px-5">
+    <section className="border-b border-gc-line bg-background px-3 py-2 sm:px-5">
       <div
         className={`flex flex-wrap items-center gap-x-3 gap-y-2 rounded-xl border bg-background py-2 pl-2 pr-2 shadow-sm sm:flex-nowrap ${
           isSecurity ? "border-gc-red/30" : "border-gc-blue/25"
