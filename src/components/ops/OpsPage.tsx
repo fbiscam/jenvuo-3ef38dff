@@ -24,7 +24,7 @@ export function OpsPage({ title, description, icon, actions, tabs, standalone, c
       className={
         standalone
           ? "min-h-dvh w-full bg-background text-foreground"
-          : "-mx-5 -mb-7 min-h-[calc(100dvh-4rem)] overflow-hidden bg-background text-foreground sm:-mx-8"
+          : "-mx-5 -mt-7 -mb-7 min-h-[calc(100dvh-4rem)] overflow-hidden bg-background text-foreground sm:-mx-8"
       }
     >
       <header className="flex min-h-14 flex-col gap-3 border-b border-border px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-6">
@@ -123,7 +123,7 @@ export function OpsState({ title, description, standalone }: { title: string; de
   return (
     <div
       className={`flex flex-col items-center justify-center bg-background px-6 text-center ${
-        standalone ? "min-h-dvh" : "-mx-5 -mb-7 min-h-[calc(100dvh-4rem)] sm:-mx-8"
+        standalone ? "min-h-dvh" : "-mx-5 -mt-7 -mb-7 min-h-[calc(100dvh-4rem)] sm:-mx-8"
       }`}
     >
       <p className="text-sm font-medium text-foreground">{title}</p>
