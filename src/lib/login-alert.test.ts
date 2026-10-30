@@ -1,4 +1,5 @@
-import { describe, expect, it } from 'bun:test'
+import { describe, it } from 'node:test'
+import { expect } from './chart/test-expect'
 import { shouldAlertLogin } from './login-alert'
 
 const now = Date.parse('2026-10-30T06:00:00Z')
