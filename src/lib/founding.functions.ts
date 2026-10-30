@@ -442,9 +442,6 @@ export const listFoundingApplications = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }): Promise<FoundingApplication[]> => {
     await assertAdmin(context.supabase, context.userId);
-    if ((data.status === "approved" || data.status === "active") && !data.plan) {
-      throw new Error("Choose the plan to grant before approving or activating.");
-    }
     // Internal review columns (admin_notes, ip_address, user_agent) are not
     // readable by the `authenticated` role — admins read them via service role
     // after the explicit admin check above.
@@ -473,6 +470,9 @@ export const updateFoundingApplication = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     await assertAdmin(context.supabase, context.userId);
+    if ((data.status === "approved" || data.status === "active") && !data.plan) {
+      throw new Error("Choose the plan to grant before approving or activating.");
+    }
 
     // Fetch prior row so we only email on real status transitions
     const { data: prior } = await context.supabase
