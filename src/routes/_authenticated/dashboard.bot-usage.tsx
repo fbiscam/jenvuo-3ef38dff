@@ -183,6 +183,7 @@ function BotUsagePage() {
 
             <section className="px-4 py-5 sm:px-7">
               <h2 className="text-[13px] text-foreground"> Accounts</h2>
+              <p className="mt-1 text-[12px] text-muted-foreground">Old accounts can be deleted. Accounts live on your JX Bot plan or running now are locked.</p>
               <div className="mt-3 overflow-x-auto">
                 <table className="w-full min-w-[680px] text-[13px]">
                   <thead className="text-left text-muted-foreground">
