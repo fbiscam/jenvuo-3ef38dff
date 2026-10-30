@@ -790,70 +790,94 @@ function UsagePage() {
                 There is no usage data for this period and group.
               </p>
             ) : (
-              <div className="space-y-4">
-                <div className="rounded-lg border border-border p-3">
-                  <div className="flex items-center justify-between text-[11.5px]">
-                    <span className="text-muted-foreground">Daily token limit</span>
-                    <span className="tabular-nums text-foreground">
-                      {fmtInt(data.tokensUsedToday)} /{" "}
-                      {data.dailyTokenLimit > 0 ? fmtInt(data.dailyTokenLimit) : "—"}
-                    </span>
-                  </div>
-                  <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-muted">
-                    <div
-                      className="h-full rounded-full bg-primary"
-                      style={{
-                        width: `${data.dailyTokenLimit > 0 ? Math.min(100, (data.tokensUsedToday / data.dailyTokenLimit) * 100) : 0}%`,
-                      }}
-                    />
-                  </div>
-                  <div className="mt-2 text-[10px] text-muted-foreground">
-                    Balance based · ${data.tokenRateUsdPerMillion} per 1M tokens · resets 00:00 UTC
-                  </div>
-                </div>
-                <div className="divide-y divide-border">
+              <div className="space-y-3">
+                {(() => {
+                  const pct =
+                    data.dailyTokenLimit > 0
+                      ? Math.min(100, (data.tokensUsedToday / data.dailyTokenLimit) * 100)
+                      : 0;
+                  return (
+                    <div className="relative overflow-hidden rounded-2xl border border-border bg-gradient-to-br from-primary/10 via-background to-background p-4 shadow-sm">
+                      <div className="flex items-start justify-between gap-3">
+                        <div>
+                          <div className="text-[10.5px] font-medium uppercase tracking-wider text-muted-foreground">
+                            Daily token limit
+                          </div>
+                          <div className="mt-1 text-[22px] font-semibold leading-none tabular-nums text-foreground">
+                            {fmtInt(data.tokensUsedToday)}
+                            <span className="ml-1 text-[12px] font-normal text-muted-foreground">
+                              / {data.dailyTokenLimit > 0 ? fmtInt(data.dailyTokenLimit) : "—"}
+                            </span>
+                          </div>
+                        </div>
+                        <span className="rounded-full bg-primary/15 px-2 py-0.5 text-[10.5px] font-semibold tabular-nums text-primary">
+                          {pct.toFixed(pct > 0 && pct < 1 ? 1 : 0)}%
+                        </span>
+                      </div>
+                      <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-muted">
+                        <div
+                          className="h-full rounded-full bg-gradient-to-r from-primary/70 to-primary transition-all"
+                          style={{ width: `${pct}%` }}
+                        />
+                      </div>
+                      <div className="mt-3 flex flex-wrap gap-1.5 text-[10px] text-muted-foreground">
+                        <span className="rounded-full border border-border bg-background px-2 py-0.5">Balance based</span>
+                        <span className="rounded-full border border-border bg-background px-2 py-0.5">
+                          ${data.tokenRateUsdPerMillion} / 1M tokens
+                        </span>
+                        <span className="rounded-full border border-border bg-background px-2 py-0.5">Resets 00:00 UTC</span>
+                      </div>
+                    </div>
+                  );
+                })()}
+                <div className="space-y-2">
                   {data.recentExtensionKeys.map((key, index) => {
                     const usage = derived.keySpend.get(key.id) ?? { spend: 0, requests: 0 };
                     const pctToday =
                       data.dailyTokenLimit > 0
                         ? Math.min(100, (key.tokensToday / data.dailyTokenLimit) * 100)
                         : 0;
+                    const active = !key.revokedAt;
                     return (
-                      <div key={key.id} className="py-3">
-                        <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
+                      <div
+                        key={key.id}
+                        className="rounded-2xl border border-border bg-background p-3.5 shadow-sm transition-shadow hover:shadow-md"
+                      >
+                        <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
                           <div className="min-w-0">
                             <div className="flex items-center gap-2">
-                              <code className="truncate font-mono text-[11.5px] text-foreground">
-                                {key.keyPrefix}••••••••••
+                              <code className="truncate rounded-md bg-muted px-1.5 py-0.5 font-mono text-[11px] text-foreground">
+                                {key.keyPrefix}••••••
                               </code>
                               {index === 0 && (
-                                <span className="rounded-full bg-muted px-1.5 py-0.5 text-[9px] font-medium text-foreground">
+                                <span className="shrink-0 rounded-full bg-primary/15 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-primary">
                                   Newest
                                 </span>
                               )}
                             </div>
-                            <div className="mt-1 truncate text-[10.5px] text-muted-foreground">
-                              {key.name} · {usage.requests} request{usage.requests === 1 ? "" : "s"}{" "}
-                              · {key.revokedAt ? "Revoked" : "Active"}
+                            <div className="mt-1.5 flex items-center gap-1.5 truncate text-[10.5px] text-muted-foreground">
+                              <span
+                                className={`inline-block h-1.5 w-1.5 shrink-0 rounded-full ${active ? "bg-primary" : "bg-destructive"}`}
+                              />
+                              {active ? "Active" : "Revoked"} · {key.name} · {usage.requests} request
+                              {usage.requests === 1 ? "" : "s"}
                             </div>
                           </div>
                           <div className="shrink-0 text-right">
-                            <div className="text-[12px] font-medium tabular-nums text-foreground">
+                            <div className="text-[15px] font-semibold tabular-nums text-foreground">
                               {fmtUsd(usage.spend, 2)}
                             </div>
-                            <div className="mt-0.5 text-[10px] text-muted-foreground">Spend</div>
+                            <div className="text-[9.5px] uppercase tracking-wider text-muted-foreground">Spend</div>
                           </div>
                         </div>
-                        <div className="mt-2 h-1 w-full overflow-hidden rounded-full bg-muted">
+                        <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-muted">
                           <div
-                            className="h-full rounded-full bg-primary/70"
+                            className="h-full rounded-full bg-gradient-to-r from-primary/60 to-primary"
                             style={{ width: `${pctToday}%` }}
                           />
                         </div>
-                        <div className="mt-1 flex items-center justify-between text-[10px] text-muted-foreground">
-                          <span className="tabular-nums">
-                            {fmtInt(key.tokensToday)} tokens today
-                          </span>
+                        <div className="mt-1.5 flex items-center justify-between text-[10px] text-muted-foreground">
+                          <span className="tabular-nums">{fmtInt(key.tokensToday)} tokens today</span>
                           <span className="tabular-nums">{fmtUsd(key.costTodayUsd, 4)}</span>
                         </div>
                       </div>
