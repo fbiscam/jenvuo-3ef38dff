@@ -45,7 +45,7 @@ export type FoundingApplication = {
 };
 
 const SUPPORT_INBOX = "support@jenvu.com";
-const FROM_ADDRESS = "Jenvu Founding <founding@notify.jenvu.com>";
+const FROM_ADDRESS = "Jenvu Founding <founding@notify.jenvu.net>";
 const APP_URL = "https://jenvu.com";
 
 function escapeHtml(s: string) {

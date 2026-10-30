@@ -20,7 +20,7 @@ const ContactInput = z.object({
 export type ContactInputType = z.infer<typeof ContactInput>;
 
 const SUPPORT_INBOX = "support@jenvu.com";
-const FROM_ADDRESS = "Jenvu Contact <contact@notify.jenvu.com>";
+const FROM_ADDRESS = "Jenvu Contact <contact@notify.jenvu.net>";
 
 function escapeHtml(s: string): string {
   return s
