@@ -2,8 +2,9 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { RefreshCw, Play, CheckCircle2, RotateCcw, ShieldCheck, ShieldAlert, ChevronDown, ChevronRight } from "lucide-react";
+import { RefreshCw, Play, CheckCircle2, RotateCcw, ShieldCheck, ShieldAlert, ChevronDown, ChevronRight, SlidersHorizontal } from "lucide-react";
 import { isAdmin } from "@/lib/admin-messages.functions";
+import { OpsPage, OpsState } from "@/components/ops/OpsPage";
 import {
   listWeightConfigs, listTuningRuns, activateWeightConfig, rollbackWeightConfig,
   listFoldResultsForConfig,
@@ -89,10 +90,10 @@ function TuningPage() {
   }, []);
 
   if (loading && !allowed) {
-    return <div className="p-8 text-sm text-muted-foreground">Loading…</div>;
+    return <OpsState title="Loading tuning…" />;
   }
   if (!allowed) {
-    return <div className="p-8 text-sm text-gc-red">Admins only.</div>;
+    return <OpsState title="Admin access required" description="Sign in with an admin account to view this page." />;
   }
 
   const active = configs.find((c) => c.status === "active");
@@ -179,13 +180,12 @@ function TuningPage() {
   };
 
   return (
-    <div className="mx-auto max-w-6xl space-y-6 p-4 md:p-8">
-      <header className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h1 className="pl-1 text-2xl font-semibold text-foreground">Signal Weight Tuning</h1>
-          <p className="text-sm text-muted-foreground">Grid search on backtest history · Phase 1</p>
-        </div>
-        <div className="flex items-center gap-2">
+    <OpsPage
+      title="Signal weight tuning"
+      description="Grid search on backtest history · Phase 1"
+      icon={<SlidersHorizontal />}
+      actions={
+        <>
           <button
             onClick={reload}
             className="inline-flex items-center gap-1 rounded-lg border border-border bg-background px-3 py-1.5 text-sm text-foreground hover:bg-muted"
@@ -198,8 +198,10 @@ function TuningPage() {
           >
             <RotateCcw className="h-3.5 w-3.5" /> Rollback
           </button>
-        </div>
-      </header>
+        </>
+      }
+    >
+      <div className="space-y-6 px-4 py-5 sm:px-6">
 
       {active && (
         <div className="rounded-xl border border-gc-success/30 bg-gc-green-soft p-4 text-sm">
@@ -215,7 +217,7 @@ function TuningPage() {
       )}
 
       <section className="rounded-xl border border-border bg-background p-4">
-        <h2 className="pl-1 mb-3 text-lg font-semibold text-foreground">Run grid search</h2>
+        <h2 className="mb-3 text-[13px] font-medium text-foreground">Run grid search</h2>
         <div className="flex flex-wrap items-end gap-3">
           <label className="flex flex-col gap-1 text-xs text-muted-foreground">
             Symbol
@@ -246,19 +248,19 @@ function TuningPage() {
       </section>
 
       <section className="rounded-xl border border-border bg-background">
-        <h2 className="pl-1 border-b border-border p-4 text-lg font-semibold text-foreground">Tuning runs</h2>
+        <h2 className="border-b border-border px-4 py-3 text-[13px] font-medium text-foreground">Tuning runs</h2>
         <div className="overflow-x-auto">
           <table className="min-w-full text-sm">
-            <thead className="bg-muted/50 text-xs uppercase text-muted-foreground">
+            <thead className="text-[12px] text-muted-foreground">
               <tr>
-                <th className="px-3 py-2 text-left">Started</th>
-                <th className="px-3 py-2 text-left">Mode</th>
-                <th className="px-3 py-2 text-left">Symbol</th>
-                <th className="px-3 py-2 text-right">Combos</th>
-                <th className="px-3 py-2 text-right">Best win %</th>
-                <th className="px-3 py-2 text-right">Best avg R</th>
-                <th className="px-3 py-2 text-right">Sample</th>
-                <th className="px-3 py-2 text-left">Status</th>
+                <th className="whitespace-nowrap px-3 py-2.5 font-normal text-left">Started</th>
+                <th className="whitespace-nowrap px-3 py-2.5 font-normal text-left">Mode</th>
+                <th className="whitespace-nowrap px-3 py-2.5 font-normal text-left">Symbol</th>
+                <th className="whitespace-nowrap px-3 py-2.5 font-normal text-right">Combos</th>
+                <th className="whitespace-nowrap px-3 py-2.5 font-normal text-right">Best win %</th>
+                <th className="whitespace-nowrap px-3 py-2.5 font-normal text-right">Best avg R</th>
+                <th className="whitespace-nowrap px-3 py-2.5 font-normal text-right">Sample</th>
+                <th className="whitespace-nowrap px-3 py-2.5 font-normal text-left">Status</th>
               </tr>
             </thead>
             <tbody>
@@ -286,18 +288,18 @@ function TuningPage() {
       </section>
 
       <section className="rounded-xl border border-border bg-background">
-        <h2 className="pl-1 border-b border-border p-4 text-lg font-semibold text-foreground">Weight configurations</h2>
+        <h2 className="border-b border-border px-4 py-3 text-[13px] font-medium text-foreground">Weight configurations</h2>
         <div className="overflow-x-auto">
           <table className="min-w-full text-sm">
-            <thead className="bg-muted/50 text-xs uppercase text-muted-foreground">
+            <thead className="text-[12px] text-muted-foreground">
               <tr>
-                <th className="px-3 py-2 text-left"></th>
-                <th className="px-3 py-2 text-left">Version</th>
-                <th className="px-3 py-2 text-left">Source</th>
-                <th className="px-3 py-2 text-left">Status</th>
-                <th className="px-3 py-2 text-left">Validation</th>
-                <th className="px-3 py-2 text-left">Notes</th>
-                <th className="px-3 py-2 text-right">Actions</th>
+                <th className="whitespace-nowrap px-3 py-2.5 font-normal text-left"></th>
+                <th className="whitespace-nowrap px-3 py-2.5 font-normal text-left">Version</th>
+                <th className="whitespace-nowrap px-3 py-2.5 font-normal text-left">Source</th>
+                <th className="whitespace-nowrap px-3 py-2.5 font-normal text-left">Status</th>
+                <th className="whitespace-nowrap px-3 py-2.5 font-normal text-left">Validation</th>
+                <th className="whitespace-nowrap px-3 py-2.5 font-normal text-left">Notes</th>
+                <th className="whitespace-nowrap px-3 py-2.5 font-normal text-right">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -431,6 +433,7 @@ function TuningPage() {
           </table>
         </div>
       </section>
-    </div>
+      </div>
+    </OpsPage>
   );
 }
