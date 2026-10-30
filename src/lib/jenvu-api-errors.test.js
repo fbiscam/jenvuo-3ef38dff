@@ -21,7 +21,7 @@ describe('Jenvu service privacy', () => {
         return new Response('CodeCraft OmniRoute secret internal credit diagnostic', { status });
       });
       try {
-        await callChatCompletion({ models: ['codecraft/gpt-5.5'], messages: [{ role: 'user', content: 'Hello' }], retriesPerModel: 1 });
+        await callChatCompletion({ models: ['codecraft/gpt-5.5'], messages: [{ role: 'user', content: 'Hello' }], exactModels: true, retriesPerModel: 1 });
         throw new Error('Expected upstream failure');
       } catch (error) {
         expect(error).toBeInstanceOf(AiGatewayError);
@@ -37,7 +37,7 @@ describe('Jenvu service privacy', () => {
     process.env.CODECRAFT_API_KEY = 'test-only-credential';
     let requests = 0;
     globalThis.fetch = (async () => { requests++; return new Response('', { status: 402 }); });
-    await expect(callChatCompletion({ models: ['codecraft/claude-opus-5', 'codecraft/gpt-5.5'], messages: [{ role: 'user', content: 'Hello' }] })).rejects.toMatchObject({ status: 402 });
+    await expect(callChatCompletion({ models: ['codecraft/claude-opus-5', 'codecraft/gpt-5.5'], messages: [{ role: 'user', content: 'Hello' }], exactModels: true })).rejects.toMatchObject({ status: 402 });
     expect(requests).toBe(1);
   });
 });
