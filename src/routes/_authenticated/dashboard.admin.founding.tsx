@@ -60,6 +60,11 @@ function AdminFoundingPage() {
   const [loading, setLoading] = useState(true);
   const [allowed, setAllowed] = useState(false);
   const [rows, setRows] = useState<FoundingApplication[]>([]);
+  const [planChoice, setPlanChoice] = useState<Record<string, "pro" | "elite" | "ultra">>({});
+  const planFor = (r: FoundingApplication) => {
+    const req = String(r.requested_plan || "").toLowerCase();
+    return planChoice[r.id] ?? (req === "pro" || req === "ultra" ? req : "elite");
+  };
   const [q, setQ] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [sort, setSort] = useState<SortKey>("newest");
@@ -120,7 +125,9 @@ function AdminFoundingPage() {
   async function changeStatus(id: string, status: string) {
     setBusy(id + status);
     try {
-      await update({ data: { id, status: status as any } });
+      const row = rows.find((r) => r.id === id);
+      const plan = row && (status === "approved" || status === "active") ? planFor(row) : undefined;
+      await update({ data: { id, status: status as any, plan } });
       setRows((prev) => prev.map((r) => (r.id === id ? { ...r, status } : r)));
       toast.success(`Marked ${status}`);
     } catch (e) {
@@ -133,7 +140,8 @@ function AdminFoundingPage() {
   async function markProfit(id: string) {
     setBusy(id + "profit");
     try {
-      await update({ data: { id, status: "active", first_profit_reached: true } });
+      const row = rows.find((r) => r.id === id);
+      await update({ data: { id, status: "active", first_profit_reached: true, plan: row ? planFor(row) : "elite" } });
       setRows((prev) =>
         prev.map((r) => (r.id === id ? { ...r, status: "active", first_profit_at: new Date().toISOString() } : r)),
       );
@@ -323,6 +331,19 @@ function AdminFoundingPage() {
                           Wants: {r.requested_plan}
                         </span>
                       )}
+                      <label className="inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wide text-zinc-600">
+                        Grant
+                        <select
+                          aria-label="Plan to grant"
+                          value={planFor(r)}
+                          onChange={(e) => setPlanChoice((prev) => ({ ...prev, [r.id]: e.target.value as "pro" | "elite" | "ultra" }))}
+                          className="rounded-full border border-zinc-200 bg-white px-2 py-0.5 text-[10px] uppercase"
+                        >
+                          <option value="pro">Pro</option>
+                          <option value="elite">Elite</option>
+                          <option value="ultra">Ultra</option>
+                        </select>
+                      </label>
                       <span
                         className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide ${
                           STATUS_STYLES[r.status] || "bg-zinc-100 text-zinc-700"
