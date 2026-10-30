@@ -34,3 +34,4 @@
 - Public API model IDs map to exactly one configured upstream model; service errors use the allowlist in `jenvu-api-errors.ts` with original HTTP status, never raw diagnostics: preserves model choice and keeps provider configuration private.
 - JX Bot reports (`/api/public/licenses/report`, once a minute from the EA) feed Bot Usage and its ON/OFF log; the plan daily target applies to each license separately (user choice), checked from that account's own profit only.
 - Billing renders its plan action from the cached credit-state response, not a separate subscription hook, so the balance and plan action resolve together without a false Free-state flash.
+- Bot Usage account delete is decided server-side by `botAccountDeleteBlock` in `src/lib/mt5-licenses.ts` (tested): accounts live on an active IP license or reporting in the last 3 minutes can never be removed.
