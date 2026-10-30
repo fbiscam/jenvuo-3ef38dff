@@ -547,52 +547,19 @@ function ExtensionPage() {
         </div>
       )}
 
-      {deleteTarget && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-900/30 p-4">
-          <div
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="delete-key-title"
-            className="w-full max-w-md rounded-xl border border-zinc-200 bg-white p-5 shadow-xl"
-          >
-            <div className="flex items-start justify-between gap-3">
-              <div id="delete-key-title" className="text-[15px] font-medium text-zinc-900">
-                Delete API key permanently?
-              </div>
-              <button
-                type="button"
-                aria-label="Close delete confirmation"
-                onClick={() => setDeleteTarget(null)}
-                className="rounded-full p-1 text-zinc-500 hover:bg-zinc-100"
-              >
-                <X className="h-4 w-4" />
-              </button>
-            </div>
-            <p className="mt-2 text-[13px] leading-relaxed text-zinc-500">
-              <span className="font-medium text-zinc-800">{deleteTarget.name}</span> will be removed
-              from your account and database. This cannot be undone.
-            </p>
-            <div className="mt-5 flex justify-end gap-2">
-              <button
-                type="button"
-                onClick={() => setDeleteTarget(null)}
-                disabled={deleting}
-                className="rounded-full px-4 py-2 text-[13px] text-zinc-700 hover:bg-zinc-100 disabled:opacity-60"
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                onClick={onDelete}
-                disabled={deleting}
-                className="rounded-full bg-rose-600 px-4 py-2 text-[13px] font-medium text-white hover:bg-rose-700 disabled:opacity-60"
-              >
-                {deleting ? "Deleting…" : "Delete permanently"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <ConfirmDialog
+        open={!!deleteTarget}
+        busy={deleting}
+        title="Delete API key?"
+        description={
+          <>
+            <span className="font-medium text-foreground">{deleteTarget?.name}</span> will be removed
+            permanently. This can't be undone.
+          </>
+        }
+        onCancel={() => setDeleteTarget(null)}
+        onConfirm={onDelete}
+      />
     </div>
   );
 }
