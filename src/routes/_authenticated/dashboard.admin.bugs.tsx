@@ -3,6 +3,8 @@ import { useServerFn } from '@tanstack/react-start'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import { toast } from 'sonner'
+import { Bug } from 'lucide-react'
+import { OpsPage, OpsTab, ops } from '@/components/ops/OpsPage'
 import { listBugGroups, listBugOccurrences, analyzeBugGroup, updateBugStatus } from '@/lib/bug-triage.functions'
 
 export const Route = createFileRoute('/_authenticated/dashboard/admin/bugs')({
@@ -76,39 +78,22 @@ function BugTriagePage() {
   const groups = (data?.rows ?? []) as Group[]
 
   return (
-    <div className={`min-h-dvh w-full bg-[#FAFAFA] text-foreground ${SANS} antialiased`}>
-      <main className="mx-auto max-w-6xl px-5 py-8 sm:px-6">
-        <div className="rounded-xl border border-border bg-background p-5 sm:p-6">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div>
-              <h1 className="pl-1 text-xl font-semibold tracking-tight sm:text-2xl">Bug Triage</h1>
-              <p className="mt-1 text-sm text-muted-foreground">
-                Grouped runtime errors from the app. Analyze with AI to get root cause + suggested fix.
-              </p>
-            </div>
-            <button
-              onClick={() => refetch()}
-              disabled={isFetching}
-              className="rounded-lg border border-border bg-background px-3 py-1.5 text-sm text-foreground hover:bg-muted disabled:opacity-50"
-            >
-              {isFetching ? 'Refreshing…' : 'Refresh'}
-            </button>
-          </div>
-
-          <div className="mt-4 flex flex-wrap gap-1.5">
-            {STATUSES.map((s) => (
-              <button
-                key={s}
-                onClick={() => setStatusFilter(s)}
-                className={`rounded-full px-3 py-1 text-xs capitalize transition ${ statusFilter === s ? 'bg-gc-blue text-gc-on-blue' : 'border border-border bg-background text-muted-foreground hover:bg-muted' }`}
-              >
-                {s}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div className="mt-4 space-y-3">
+    <OpsPage
+      title="Bug triage"
+      description="Grouped runtime errors from the app. Analyze with AI for root cause and a suggested fix."
+      icon={<Bug />}
+      actions={
+        <button onClick={() => refetch()} disabled={isFetching} className={ops.btn}>
+          {isFetching ? 'Refreshing…' : 'Refresh'}
+        </button>
+      }
+      tabs={STATUSES.map((s) => (
+        <OpsTab key={s} active={statusFilter === s} onClick={() => setStatusFilter(s)}>
+          <span className="capitalize">{s}</span>
+        </OpsTab>
+      ))}
+    >
+        <div className="space-y-3 px-4 py-5 sm:px-6">
           {isLoading && <div className="text-sm text-muted-foreground">Loading…</div>}
           {!isLoading && groups.length === 0 && (
             <div className="rounded-xl border border-border bg-background p-8 text-center text-sm text-muted-foreground">
@@ -231,8 +216,7 @@ function BugTriagePage() {
             )
           })}
         </div>
-      </main>
-    </div>
+    </OpsPage>
   )
 }
 

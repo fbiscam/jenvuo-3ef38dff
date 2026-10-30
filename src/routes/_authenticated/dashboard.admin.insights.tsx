@@ -4,6 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { Sparkles, Image as ImageIcon, Send, Loader2, RefreshCw } from "lucide-react";
 import { isAdmin } from "@/lib/admin-messages.functions";
+import { OpsPage, OpsState } from "@/components/ops/OpsPage";
 import {
   draftInsight,
   assistInsightWriting,
@@ -161,29 +162,21 @@ function AdminInsightsPage() {
     }
   };
 
-  if (loading) return <div className="p-8 text-sm text-muted-foreground">Loading…</div>;
-  if (!allowed) {
-    return (
-      <div className="p-8">
-        <h1 className="text-lg font-semibold">Forbidden</h1>
-        <p className="text-sm text-muted-foreground mt-2">Admin access required.</p>
-      </div>
-    );
-  }
+  if (loading) return <OpsState title="Loading insights…" />;
+  if (!allowed) return <OpsState title="Admin access required" description="Sign in with an admin account to view this page." />;
 
   const inputCls =
-    "w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary";
+    "w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-gc-blue focus:ring-2 focus:ring-gc-blue-soft";
   const btnCls =
     "inline-flex items-center gap-2 rounded-lg border border-border px-3 py-2 text-xs font-medium hover:bg-muted disabled:opacity-50";
 
   return (
-    <div className="p-6 space-y-8">
-      <header>
-        <h1 className="text-xl font-semibold">Insights Writing Desk</h1>
-        <p className="text-sm text-muted-foreground mt-1">
-          AI writing assistant powered by BluesMind, with an AI-generated cover image for every article.
-        </p>
-      </header>
+    <OpsPage
+      title="Insights writing desk"
+      description="AI writing assistant with an AI-generated cover image for every article"
+      icon={<Sparkles />}
+    >
+      <div className="space-y-6 px-4 py-5 sm:px-6">
 
       <section className="space-y-4 rounded-xl border border-border p-5">
         <div className="grid gap-3 sm:grid-cols-[1fr_220px]">
@@ -276,6 +269,7 @@ function AdminInsightsPage() {
           {rows.length === 0 && <p className="p-4 text-sm text-muted-foreground">No insights yet.</p>}
         </div>
       </section>
-    </div>
+      </div>
+    </OpsPage>
   );
 }
