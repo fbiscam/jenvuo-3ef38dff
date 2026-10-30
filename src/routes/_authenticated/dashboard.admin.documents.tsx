@@ -9,6 +9,7 @@ import {
   adminUpdateDocumentStatus,
   type AdminDocSubmission,
 } from "@/lib/founding.functions";
+import { OpsPage, OpsStats, OpsTab } from "@/components/ops/OpsPage";
 
 export const Route = createFileRoute("/_authenticated/dashboard/admin/documents")({
   head: () => ({
@@ -48,7 +49,7 @@ function FilePreview({ file }: { file: AdminDocSubmission["files"][number] }) {
       <video
         src={url}
         controls
-        className="h-40 w-full object-cover rounded-lg border border-border bg-gc-blue"
+        className="h-40 w-full object-cover rounded-lg border border-border bg-muted"
         preload="metadata"
       />
     );
@@ -128,30 +129,31 @@ function AdminDocumentsPage() {
   const filtered = filter === "all" ? rows : rows.filter((r) => r.document_status === filter);
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-6 font-['Google_Sans',_'Inter',_system-ui,_sans-serif] sm:px-6 sm:py-8">
-      <div className="mb-6 flex flex-wrap items-start justify-between gap-4 pb-5">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-foreground">Documents</h1>
-          <p className="text-sm text-muted-foreground mt-1">Review ID and driving license uploads and approve or reject users.</p>
-        </div>
-        <div className="flex gap-2 flex-wrap">
-          {["all", "received", "pending", "needs_info", "verified", "rejected"].map((s) => (
-            <button
-              key={s}
-              onClick={() => setFilter(s)}
-              className={[
-                "text-xs px-3 py-1.5 rounded-full border capitalize",
-                filter === s
-                  ? "bg-gc-blue text-gc-on-blue border-foreground"
-                  : "bg-background text-foreground border-border hover:bg-muted",
-              ].join(" ")}
-            >
-              {s.replace("_", " ")}
-            </button>
-          ))}
-        </div>
-      </div>
-
+    <OpsPage
+      title="Document submissions"
+      description="Review ID and driving license uploads, then approve or reject"
+      icon={<FileText />}
+      tabs={["all", "received", "pending", "needs_info", "verified", "rejected"].map((s) => (
+        <OpsTab key={s} active={filter === s} onClick={() => setFilter(s)}>
+          <span className="capitalize">{s.replace("_", " ")}</span>
+          {s !== "all" && (
+            <span className="ml-1.5 tabular-nums text-muted-foreground">
+              {rows.filter((r) => r.document_status === s).length}
+            </span>
+          )}
+        </OpsTab>
+      ))}
+    >
+      <OpsStats
+        items={[
+          { label: "Submissions", value: rows.length },
+          { label: "Awaiting review", value: rows.filter((r) => r.document_status === "received" || r.document_status === "pending").length, tone: "warning" },
+          { label: "Need info", value: rows.filter((r) => r.document_status === "needs_info").length, tone: "info" },
+          { label: "Verified", value: rows.filter((r) => r.document_status === "verified").length, tone: "success" },
+          { label: "Rejected", value: rows.filter((r) => r.document_status === "rejected").length, tone: "danger" },
+        ]}
+      />
+      <div className="px-4 py-5 sm:px-6">
       {isLoading ? (
         <div className="rounded-xl border border-border bg-background p-6 text-sm text-muted-foreground">Loading…</div>
       ) : error ? (
@@ -165,7 +167,7 @@ function AdminDocumentsPage() {
       ) : (
         <div className="space-y-4">
           {filtered.map((row) => (
-            <div key={row.application_id} className="rounded-lg border border-border bg-background p-5">
+            <div key={row.application_id} className="rounded-xl border border-border bg-background p-5 transition hover:border-gc-blue-soft hover:shadow-sm">
               <div className="flex items-start justify-between gap-4 flex-wrap">
                 <div>
                   <div className="text-sm font-semibold text-foreground">{row.full_name}</div>
@@ -347,6 +349,7 @@ function AdminDocumentsPage() {
           ))}
         </div>
       )}
-    </div>
+      </div>
+    </OpsPage>
   );
 }
