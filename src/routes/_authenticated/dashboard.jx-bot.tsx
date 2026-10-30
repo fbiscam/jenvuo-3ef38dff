@@ -422,7 +422,7 @@ function JxBotPage() {
                 <X className="h-4 w-4" />
               </button>
             </div>
-            <p className="mt-1 text-[13px] text-zinc-500">Enter the public IP of the PC or RDP that runs MT5 (open whatismyip.com there). The first MT5 account that runs on it is locked in.</p>
+            <p className="mt-1 text-[13px] text-zinc-500">Enter the public IP of the PC or RDP that runs MT5. The first MT5 account that runs on it is locked in &amp; cannot be changed</p>
             <input
               value={account}
               onChange={(e) => setAccount(e.target.value.replace(/[^0-9a-fA-F.:]/g, ""))}
