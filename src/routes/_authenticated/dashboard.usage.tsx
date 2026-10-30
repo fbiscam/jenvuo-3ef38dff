@@ -9,7 +9,6 @@ import {
   ChevronRight,
   Download,
   RefreshCw,
-  Settings2,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -303,12 +302,7 @@ function UsagePage() {
 
   const remaining = Math.max(0, Math.min(data.balance, data.allowance));
   const pct = data.allowance > 0 ? Math.min(100, (remaining / data.allowance) * 100) : 0;
-  const spendPct =
-    data.allowance > 0 ? Math.min(100, (data.spentThisPeriod / data.allowance) * 100) : 0;
   const maxDaily = Math.max(0.0001, ...derived.days.map((d) => d.spent + d.earned));
-  const daysLeft = data.periodResetsAt
-    ? Math.max(0, Math.ceil((new Date(data.periodResetsAt).getTime() - Date.now()) / 86_400_000))
-    : null;
   const burnPerDay = derived.spent / rangeDays;
   const runway = burnPerDay > 0 ? Math.floor(data.balance / burnPerDay) : null;
 
