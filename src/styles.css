@@ -1509,3 +1509,8 @@ input[type="password"]::-ms-reveal,
 input[type="password"]::-ms-clear {
   display: none;
 }
+
+/* Popups must never make the page behind jump: keep the scrollbar space and
+   cancel the extra margin the dialog scroll-lock adds. */
+html { scrollbar-gutter: stable; }
+body[data-scroll-locked] { margin-right: 0 !important; padding-right: 0 !important; }
