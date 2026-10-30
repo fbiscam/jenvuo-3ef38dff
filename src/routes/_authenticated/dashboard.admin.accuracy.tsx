@@ -2,7 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { AlertTriangle, TrendingUp, RefreshCw } from "lucide-react";
+import { AlertTriangle, TrendingUp, RefreshCw, Target } from "lucide-react";
+import { OpsPage, ops } from "@/components/ops/OpsPage";
 import { getAccuracyReport } from "@/lib/tuning/accuracy.functions";
 import { replayGateVerification, type ReplayResult } from "@/lib/tuning/replay.functions";
 
