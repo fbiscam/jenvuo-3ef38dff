@@ -8,7 +8,7 @@ import { Area, CartesianGrid, ComposedChart, ResponsiveContainer, Tooltip as RTo
 import { deleteBotAccount, getBotUsage, type BotReportRow, type BotSessionRow } from "@/lib/mt5-licenses.functions";
 import { dailyTarget, isMt5Plan, sessionEndCause, sharedTargetStatus } from "@/lib/mt5-licenses";
 import { Button } from "@/components/ui/button";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { ConfirmDialog } from "@/components/ConfirmDialog";
 import { UsageTabs } from "@/components/dashboard/UsageTabs";
 import euFlag from "@/assets/watchlist/flag-eu.svg";
 
@@ -279,18 +279,13 @@ function BotUsagePage() {
           </aside>
         </div>
       )}
-      <AlertDialog open={!!confirmAcc} onOpenChange={(o) => !o && setConfirmAcc(null)}>
-        <AlertDialogContent className="rounded-2xl">
-          <AlertDialogHeader>
-            <AlertDialogTitle>Delete MT5 {confirmAcc}?</AlertDialogTitle>
-            <AlertDialogDescription>Its profit history and ON/OFF log will be removed from Bot Usage.</AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel className="rounded-full">Cancel</AlertDialogCancel>
-            <AlertDialogAction className="rounded-full bg-destructive text-destructive-foreground hover:bg-destructive/90" onClick={() => confirmAcc && doDelete(confirmAcc)}>Delete</AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <ConfirmDialog
+        open={!!confirmAcc}
+        title={`Delete MT5 ${confirmAcc ?? ""}?`}
+        description="Its profit history and ON/OFF log will be removed."
+        onCancel={() => setConfirmAcc(null)}
+        onConfirm={() => confirmAcc && doDelete(confirmAcc)}
+      />
     </div>
   );
 }
