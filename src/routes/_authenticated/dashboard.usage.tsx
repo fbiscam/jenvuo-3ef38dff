@@ -9,7 +9,6 @@ import {
   ChevronRight,
   Download,
   RefreshCw,
-  Settings2,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -303,12 +302,7 @@ function UsagePage() {
 
   const remaining = Math.max(0, Math.min(data.balance, data.allowance));
   const pct = data.allowance > 0 ? Math.min(100, (remaining / data.allowance) * 100) : 0;
-  const spendPct =
-    data.allowance > 0 ? Math.min(100, (data.spentThisPeriod / data.allowance) * 100) : 0;
   const maxDaily = Math.max(0.0001, ...derived.days.map((d) => d.spent + d.earned));
-  const daysLeft = data.periodResetsAt
-    ? Math.max(0, Math.ceil((new Date(data.periodResetsAt).getTime() - Date.now()) / 86_400_000))
-    : null;
   const burnPerDay = derived.spent / rangeDays;
   const runway = burnPerDay > 0 ? Math.floor(data.balance / burnPerDay) : null;
 
@@ -734,50 +728,6 @@ function UsagePage() {
         </div>
 
         <aside className="border-t border-border xl:border-l xl:border-t-0">
-          <section className="border-b border-border px-4 py-5">
-            <div className="flex items-center justify-between text-[13px] text-foreground">
-              <span>Monthly spend</span>
-              <Button
-                asChild
-                type="button"
-                variant="ghost"
-                size="icon"
-                className="h-7 w-7 text-muted-foreground"
-              >
-                <Link to="/dashboard/billing" aria-label="Manage monthly spend">
-                  <Settings2 className="h-4 w-4" />
-                </Link>
-              </Button>
-            </div>
-            <div className="mt-5 flex items-center justify-between text-[13px]">
-              <span className="text-foreground">Personal</span>
-              <span className="tabular-nums text-foreground">
-                {fmtUsd(data.spentThisPeriod, 2)} / {fmtUsd(data.allowance, 2)}
-              </span>
-            </div>
-            <div className="relative mt-3 h-4 w-full rounded-md bg-muted">
-              <div
-                className="h-full rounded-md bg-foreground transition-all"
-                style={{ width: `${spendPct}%` }}
-              />
-            </div>
-            <div className="mt-3 flex items-center justify-between text-[11.5px] text-muted-foreground">
-              <span>Wallet balance</span>
-              <span className="tabular-nums text-foreground">{fmtUsd(data.balance, 2)}</span>
-            </div>
-            <div className="mt-1.5 flex items-center justify-between text-[11.5px] text-muted-foreground">
-              <span>Added this period</span>
-              <span className="tabular-nums text-foreground">
-                {fmtUsd(data.earnedThisPeriod, 2)}
-              </span>
-            </div>
-            {daysLeft != null && (
-              <div className="mt-2 text-[11.5px] text-muted-foreground">
-                Resets in {daysLeft} day{daysLeft === 1 ? "" : "s"}
-              </div>
-            )}
-          </section>
-
           <section className="border-b border-border px-4 py-5">
             <div className="text-[13px] text-foreground">Total tokens</div>
             <div className="mt-1 text-xl font-medium tabular-nums text-foreground">
