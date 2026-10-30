@@ -34,7 +34,6 @@ type Group = {
   resolution_note: string | null
 }
 
-const SANS = 'font-["Google_Sans","Product_Sans","Roboto",system-ui,sans-serif]'
 const STATUSES = ['all', 'open', 'investigating', 'resolved', 'ignored'] as const
 
 function fmtTime(iso: string): string {
