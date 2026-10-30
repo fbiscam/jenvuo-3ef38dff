@@ -25,6 +25,7 @@ import {
 const PLAN_AMOUNT: Record<string, string> = { pro: "$10", elite: "$25", ultra: "$50", free: "$2" };
 
 import { isAdmin } from "@/lib/admin-messages.functions";
+import { OpsPage, OpsState, OpsStats, OpsTab, ops } from "@/components/ops/OpsPage";
 import {
   listFoundingApplications,
   updateFoundingApplication,
@@ -204,112 +205,57 @@ function AdminFoundingPage() {
     URL.revokeObjectURL(url);
   }
 
-  if (loading) return <div className="p-8 text-sm text-muted-foreground">Loading…</div>;
-  if (!allowed) {
-    return (
-      <div className="p-8">
-        <h1 className="text-lg font-semibold">Forbidden</h1>
-        <p className="mt-2 text-sm text-muted-foreground">Admin access required.</p>
-      </div>
-    );
-  }
-
-  const stat = (label: string, value: number, Icon: any, tone: string) => (
-    <div className="rounded-xl border border-border bg-background p-4">
-      <div className="flex items-center justify-between">
-        <span className="text-[11px] uppercase tracking-widest text-muted-foreground">{label}</span>
-        <Icon className={`h-4 w-4 ${tone}`} />
-      </div>
-      <div className="mt-2 text-2xl font-semibold text-foreground tabular-nums">{value}</div>
-    </div>
-  );
+  if (loading) return <OpsState title="Loading applications…" />;
+  if (!allowed) return <OpsState title="Admin access required" description="Sign in with an admin account to view this page." />;
 
   return (
-    <div className="-m-6 min-h-[calc(100vh-4rem)] bg-[#FAFAFA] p-6 text-foreground">
-      {/* Header */}
-      <div className="mx-auto max-w-6xl">
-        <div className="flex items-center justify-between gap-3 flex-wrap">
-          <div>
-            <div className="inline-flex items-center gap-2 rounded-full border border-gc-yellow bg-gc-yellow-soft px-3 py-1 text-[11px] uppercase tracking-widest text-gc-amber">
-              <Crown className="h-3.5 w-3.5" /> Founding program · Admin
-            </div>
-            <h1 className="pl-1 mt-3 text-2xl font-semibold text-foreground">Founding applications</h1>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Review, approve, waitlist, or reject candidates. Approving activates their plan and sends an invite.
-            </p>
-          </div>
-          <button
-            onClick={exportCsv}
-            className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-background px-3 py-2 text-[13px] font-medium text-foreground hover:bg-muted"
-          >
-            <Download className="h-4 w-4" /> Export CSV
-          </button>
+    <OpsPage
+      title="Founding applications"
+      description="Review, approve, waitlist or reject. Approving activates the plan and sends an invite."
+      icon={<Crown />}
+      actions={
+        <button onClick={exportCsv} className={ops.btn}>
+          <Download className="h-4 w-4" /> Export CSV
+        </button>
+      }
+    >
+      <OpsStats
+        items={[
+          { label: "Total", value: rows.length },
+          { label: "Pending", value: counts.pending || 0, tone: "warning" },
+          { label: "Approved", value: counts.approved || 0, tone: "success" },
+          { label: "Active", value: counts.active || 0, tone: "info" },
+          { label: "Waitlist", value: counts.waitlisted || 0 },
+          { label: "Rejected", value: counts.rejected || 0, tone: "danger" },
+        ]}
+      />
+      <div className="flex max-w-full items-center gap-7 overflow-x-auto border-b border-border px-4 text-[13px] sm:px-6">
+        {(["all", "pending", "waitlisted", "approved", "active", "rejected", "graduated"] as const).map((s) => (
+          <OpsTab key={s} active={statusFilter === s} onClick={() => setStatusFilter(s)}>
+            <span className="capitalize">{s}</span>
+            {s !== "all" && counts[s] ? <span className="ml-1.5 tabular-nums text-muted-foreground">{counts[s]}</span> : null}
+          </OpsTab>
+        ))}
+      </div>
+      <div className="flex flex-wrap items-center gap-2 border-b border-border px-4 py-3 sm:px-6">
+        <div className="relative min-w-[220px] flex-1">
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <input
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            placeholder="Search name, email, WhatsApp, country, broker…"
+            className={`${ops.input} pl-9`}
+          />
         </div>
-
-        {/* Stats */}
-        <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-          {stat("Total", rows.length, Users, "text-muted-foreground")}
-          {stat("Pending", counts.pending || 0, Hourglass, "text-gc-amber")}
-          {stat("Approved", counts.approved || 0, CheckCircle2, "text-gc-success")}
-          {stat("Active", counts.active || 0, TrendingUp, "text-gc-blue-deep")}
-          {stat("Waitlist", counts.waitlisted || 0, ListChecks, "text-muted-foreground")}
-          {stat("Rejected", counts.rejected || 0, XCircle, "text-gc-red")}
-        </div>
-
-        {/* Filters */}
-        <div className="mt-5 flex flex-wrap items-center gap-2">
-          <div className="relative flex-1 min-w-[220px]">
-            <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <input
-              value={q}
-              onChange={(e) => setQ(e.target.value)}
-              placeholder="Search name, email, WhatsApp, country, broker…"
-              className="w-full rounded-lg border border-border bg-background pl-9 pr-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-gc-blue focus:outline-none"
-            />
-          </div>
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground"
-          >
-            <option value="all">All statuses</option>
-            <option value="pending">Pending</option>
-            <option value="approved">Approved</option>
-            <option value="active">Active</option>
-            <option value="waitlisted">Waitlisted</option>
-            <option value="rejected">Rejected</option>
-            <option value="graduated">Graduated</option>
-          </select>
-          <select
-            value={sort}
-            onChange={(e) => setSort(e.target.value as SortKey)}
-            className="rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground"
-          >
-            <option value="newest">Newest first</option>
-            <option value="oldest">Oldest first</option>
-            <option value="name">Name (A–Z)</option>
-          </select>
-        </div>
-
-        {/* Quick status tabs */}
-        <div className="mt-3 flex flex-wrap gap-1.5">
-          {(["all", "pending", "waitlisted", "approved", "active", "rejected", "graduated"] as const).map((s) => (
-            <button
-              key={s}
-              onClick={() => setStatusFilter(s)}
-              className={`rounded-full px-3 py-1 text-[11px] font-medium uppercase tracking-wide transition ${
-                statusFilter === s
-                  ? "bg-gc-yellow-soft text-gc-amber ring-1 ring-gc-yellow"
-                  : "bg-muted text-muted-foreground hover:bg-muted"
-              }`}
-            >
-              {s} {s !== "all" && counts[s] ? `· ${counts[s]}` : ""}
-            </button>
-          ))}
-        </div>
+        <select value={sort} onChange={(e) => setSort(e.target.value as SortKey)} className={`${ops.input} w-auto`}>
+          <option value="newest">Newest first</option>
+          <option value="oldest">Oldest first</option>
+          <option value="name">Name (A–Z)</option>
+        </select>
+      </div>
 
         {/* List */}
-        <div className="mt-5 space-y-3">
+        <div className="space-y-3 px-4 py-5 sm:px-6">
           {filtered.length === 0 && (
             <div className="rounded-xl border border-border bg-background p-10 text-center text-sm text-muted-foreground">
               No applications match your filters.
@@ -320,7 +266,7 @@ function AdminFoundingPage() {
             return (
               <div
                 key={r.id}
-                className="rounded-xl border border-border bg-background p-4 transition hover:border-gc-blue"
+                className="rounded-xl border border-border bg-background p-4 transition hover:border-gc-blue-soft hover:shadow-sm"
               >
                 <div className="flex items-start justify-between gap-4 flex-wrap">
                   <div className="min-w-0 flex-1">
@@ -518,7 +464,6 @@ function AdminFoundingPage() {
             );
           })}
         </div>
-      </div>
-    </div>
+    </OpsPage>
   );
 }
