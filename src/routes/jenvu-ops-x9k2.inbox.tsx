@@ -284,7 +284,7 @@ function AdminInbox() {
 
   if (!ready) {
     return (
-      <div className="grid min-h-screen place-items-center bg-gc-panel">
+      <div className="grid min-h-screen place-items-center bg-background">
         <Loader2 className="h-5 w-5 animate-spin text-gc-ink-muted" />
       </div>
     );
@@ -298,22 +298,23 @@ function AdminInbox() {
   ];
 
   return (
-    <div className="relative flex h-screen flex-col bg-gc-canvas text-[13px] text-gc-ink antialiased [font-family:'Google_Sans','Product_Sans','Poppins',system-ui,-apple-system,sans-serif] [font-feature-settings:'cv11','ss01','ss03'] [font-optical-sizing:auto]">
+    <div className="relative flex h-screen flex-col bg-background text-[13px] text-gc-ink antialiased [font-family:'Google_Sans','Product_Sans','Poppins',system-ui,-apple-system,sans-serif] [font-feature-settings:'cv11','ss01','ss03'] [font-optical-sizing:auto]">
       {/* Top bar */}
-      <header className="relative z-10 flex h-14 shrink-0 items-center justify-between border-b border-border bg-gc-canvas px-5">
+      <header className="relative z-10 flex min-h-14 shrink-0 items-center justify-between gap-3 border-b border-border bg-background px-4 py-2 sm:px-6">
         <div className="flex items-center gap-3">
-          <span className="grid h-8 w-8 place-items-center">
-            <img src="/favicon.png" alt="Jenvu" className="h-8 w-8 object-contain" />
+          <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-gc-sky text-gc-blue-deep">
+            <Inbox className="h-4 w-4" />
           </span>
-          <span className="text-[17px] font-semibold tracking-tight text-gc-ink">Jenvu</span>
-          <span className="text-muted-foreground">/</span>
-          <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">Support Inbox</span>
+          <div className="min-w-0">
+            <h1 className="truncate text-[15px] font-medium text-foreground">Support inbox</h1>
+            <p className="hidden text-[13px] text-muted-foreground sm:block">Review conversations and reply to customer support requests</p>
+          </div>
         </div>
         <div className="flex items-center gap-3">
-          <span className="hidden font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground sm:inline">{username}</span>
+          <span className="hidden text-[13px] text-muted-foreground sm:inline">{username}</span>
           <button
             onClick={handleLogout}
-            className="grid h-8 w-8 place-items-center rounded-xl text-muted-foreground transition hover:bg-gc-blue-hover hover:text-gc-on-blue"
+            className="grid h-8 w-8 place-items-center rounded-xl text-muted-foreground transition hover:bg-muted hover:text-foreground"
             title="Sign out"
           >
             <LogOut className="h-3.5 w-3.5" />
@@ -321,17 +322,11 @@ function AdminInbox() {
         </div>
       </header>
 
-      <div className="relative z-10 bg-background px-5 py-5 sm:px-6">
-        <div className="mx-auto max-w-7xl">
-          <h1 className="text-2xl font-semibold tracking-tight text-gc-ink">Support inbox</h1>
-          <p className="mt-1 text-sm text-gc-ink-muted">Review conversations and reply to customer support requests.</p>
-        </div>
-      </div>
 
       <div className="relative z-10 flex min-h-0 flex-1 overflow-hidden">
         {/* Left rail — filters/nav */}
-        <nav className="hidden w-60 shrink-0 flex-col border-r border-border bg-gc-canvas p-4 md:flex">
-          <div className="mb-3 px-2 font-mono text-[10px] uppercase tracking-[0.2em] text-gc-ink font-semibold">
+        <nav className="hidden w-60 shrink-0 flex-col border-r border-border bg-background p-4 md:flex">
+          <div className="mb-3 px-2 text-[13px] font-medium text-foreground">
             Inbox
           </div>
           <ul className="space-y-0.5">
@@ -341,17 +336,17 @@ function AdminInbox() {
                 <li key={f.key}>
                   <button
                     onClick={() => setFilter(f.key)}
-                    className={`group flex w-full items-center justify-between rounded-xl px-3 py-2 text-[13px] font-semibold transition ${
+                    className={`group flex w-full items-center justify-between rounded-lg px-3 py-2 text-[13px] transition ${
                       active
-                        ? "bg-muted text-foreground"
-                        : "text-gc-ink hover:bg-muted"
+                        ? "bg-muted font-medium text-foreground"
+                        : "text-muted-foreground hover:bg-muted hover:text-foreground"
                     }`}
                   >
                     <span className="flex items-center gap-2.5">
-                      <span className={`h-1.5 w-1.5 rounded-full ${active ? "bg-gc-success" : "border border-gc-line"}`} />
+                      <span className={`h-1.5 w-1.5 rounded-full ${active ? "bg-gc-blue" : "border border-gc-line"}`} />
                       {f.label}
                     </span>
-                    <span className={`font-mono text-[10px] tabular-nums ${active ? "text-gc-ink" : "text-gc-ink"}`}>
+                    <span className="text-[12px] tabular-nums text-muted-foreground">
                       {f.count}
                     </span>
                   </button>
@@ -367,19 +362,19 @@ function AdminInbox() {
           className={`flex w-full shrink-0 flex-col border-r border-border bg-background md:w-[360px] ${ activeId ? "hidden md:flex" : "flex" }`}
         >
           <div className="flex h-14 items-center gap-3 border-b border-border px-5">
-            <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground capitalize">{filter}</span>
-            <span className="font-mono text-[10px] tabular-nums text-muted-foreground">
+            <span className="text-[13px] font-medium capitalize text-foreground">{filter}</span>
+            <span className="text-[12px] tabular-nums text-muted-foreground">
               {filtered.length}
             </span>
             <div className="ml-auto flex items-center">
               <div className="relative">
-                <Search className="pointer-events-none absolute left-0 top-1/2 h-3 w-3 -translate-y-1/2 text-muted-foreground" />
+                <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3 w-3 -translate-y-1/2 text-muted-foreground" />
                 <input
                   ref={searchRef}
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   placeholder="Search…"
-                  className="h-7 w-40 border-b border-border bg-transparent pl-5 pr-1 font-mono text-[11px] placeholder:text-muted-foreground focus:border-gc-blue focus:outline-none"
+                  className="h-8 w-44 rounded-lg border border-border bg-background pl-7 pr-2 text-[12px] placeholder:text-muted-foreground focus:border-gc-blue focus:outline-none focus:ring-2 focus:ring-gc-blue-soft"
                 />
               </div>
             </div>
@@ -408,7 +403,7 @@ function AdminInbox() {
                         onClick={() => setActiveId(s.id)}
                         className={`group relative flex w-full items-start gap-3.5 border-b border-border px-5 py-3.5 text-left transition-all duration-200 ${
                           isActive
-                            ? "bg-gradient-to-r from-muted to-transparent"
+                            ? "bg-gc-sky/50"
                             : "hover:bg-muted"
                         }`}
                       >
