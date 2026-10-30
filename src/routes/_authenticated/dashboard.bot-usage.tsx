@@ -8,6 +8,7 @@ import { Area, CartesianGrid, ComposedChart, ResponsiveContainer, Tooltip as RTo
 import { deleteBotAccount, getBotUsage, type BotReportRow, type BotSessionRow } from "@/lib/mt5-licenses.functions";
 import { dailyTarget, isMt5Plan, sessionEndCause, sharedTargetStatus } from "@/lib/mt5-licenses";
 import { Button } from "@/components/ui/button";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { UsageTabs } from "@/components/dashboard/UsageTabs";
 import euFlag from "@/assets/watchlist/flag-eu.svg";
 
@@ -35,8 +36,10 @@ function BotUsagePage() {
   const removeAccount = useServerFn(deleteBotAccount);
   const qc = useQueryClient();
   const [deleting, setDeleting] = useState<string | null>(null);
-  const onDelete = async (acc: string) => {
-    if (!window.confirm(`Delete MT5 ${acc} from Bot Usage? Its profit history and ON/OFF log will be removed.`)) return;
+  const [confirmAcc, setConfirmAcc] = useState<string | null>(null);
+  const onDelete = (acc: string) => setConfirmAcc(acc);
+  const doDelete = async (acc: string) => {
+    setConfirmAcc(null);
     setDeleting(acc);
     try {
       const r = await removeAccount({ data: { account: acc } });
@@ -61,7 +64,7 @@ function BotUsagePage() {
     const today = new Date().toISOString().slice(0, 10);
     const todayRows = picked.filter((r) => r.day === today);
     const latest = new Map<string, BotReportRow>();
-    for (const r of picked) latest.set(r.license_id, r); // rows ordered by day
+    for (const r of picked) latest.set(r.mt5_account, r); // one row per account, rows ordered by day
     const latestList = Array.from(latest.values());
     const days = new Map<string, number>();
     for (let i = 29; i >= 0; i--) days.set(new Date(Date.now() - i * 86400000).toISOString().slice(0, 10), 0);
@@ -276,6 +279,18 @@ function BotUsagePage() {
           </aside>
         </div>
       )}
+      <AlertDialog open={!!confirmAcc} onOpenChange={(o) => !o && setConfirmAcc(null)}>
+        <AlertDialogContent className="rounded-2xl">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete MT5 {confirmAcc}?</AlertDialogTitle>
+            <AlertDialogDescription>Its profit history and ON/OFF log will be removed from Bot Usage.</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="rounded-full">Cancel</AlertDialogCancel>
+            <AlertDialogAction className="rounded-full bg-destructive text-destructive-foreground hover:bg-destructive/90" onClick={() => confirmAcc && doDelete(confirmAcc)}>Delete</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

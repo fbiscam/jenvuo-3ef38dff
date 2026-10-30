@@ -438,6 +438,14 @@ function RootComponent() {
 
       <SonnerToaster
         theme="light"
+        duration={2000}
+        icons={{
+          success: (
+            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500 text-white">
+              <svg viewBox="0 0 24 24" className="h-3 w-3" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12l5 5L20 7" /></svg>
+            </span>
+          ),
+        }}
         position={isMobile ? "bottom-center" : "top-right"}
         offset={isMobile ? 24 : 96}
         toastOptions={{
@@ -445,6 +453,8 @@ function RootComponent() {
             background: "#ffffff",
             color: "#000000",
             border: "1px solid #e4e4e7",
+            borderRadius: "16px",
+            boxShadow: "0 8px 24px rgba(0,0,0,0.08)",
             whiteSpace: "nowrap",
             width: "max-content",
             maxWidth: "min(92vw, 640px)",
