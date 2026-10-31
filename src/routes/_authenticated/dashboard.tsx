@@ -1590,22 +1590,7 @@ function DashboardLayout() {
           {pathname !== "/dashboard/terminal" && <VerificationBanner isAdmin={isAdminUser} />}
 
           {pathname === "/dashboard" ? (
-            <>
-              <ConsoleWelcome name={fullName} keysCount={extKeyCount} />
-
-              {/* Extension usage analytics — Cloudflare-style */}
-              <UsageAnalytics
-                stats={usageStats}
-                keysCount={extKeyCount}
-                loading={usageLoading}
-                range={usageRange}
-                onRangeChange={setUsageRange}
-                onRefresh={handleRefresh}
-              />
-
-
-              <div className="h-12" />
-            </>
+            <ConsoleWelcome name={fullName} keysCount={extKeyCount} />
           ) : pathname === "/dashboard/terminal" && !terminalAccess.allowed ? (
             terminalAccess.loading ? <TerminalChecking /> : <TerminalLocked reason={terminalAccess.reason} />
           ) : verificationLocked && pathname !== "/dashboard/terminal" ? (
