@@ -78,7 +78,7 @@ export default function ConsoleWelcome({ name: profileName, keysCount }: { name?
                 loading="lazy"
                 className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.04]"
               />
-              {p.badge && <span className="console-badge absolute left-3 top-3">{p.badge}</span>}
+              {p.badge && <span className="absolute left-3 top-3 rounded-full bg-background px-2.5 py-0.5 text-[12px] font-medium text-foreground">{p.badge}</span>}
             </div>
             <div className="flex flex-1 flex-col p-5">
               <p className="flex items-center justify-between text-[16px] font-medium text-foreground">
