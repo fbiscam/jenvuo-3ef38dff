@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { ArrowUpRight, BellRing, Bot, CandlestickChart, Code2, LineChart, ShieldCheck, Sparkles, type LucideIcon } from "lucide-react";
 import { PageShell, Feature, Banner, Stats, StoryCards } from "@/components/PageShell";
-import aboutMedia from "@/assets/about-media.jpg";
+import { AuroraTile } from "@/components/AuroraTile";
 
 export const Route = createFileRoute("/about")({
   head: () => ({
@@ -18,11 +19,35 @@ export const Route = createFileRoute("/about")({
   component: AboutPage,
 });
 
+const BUILD: { title: string; text: string; href: string; link: string; icons: LucideIcon[] }[] = [
+  {
+    title: "Terminal",
+    text: "Structure, liquidity, zones and sweeps drawn live on one chart.",
+    href: "https://dash.jenvu.com/overview",
+    link: "Open the Terminal",
+    icons: [CandlestickChart, LineChart, BellRing],
+  },
+  {
+    title: "AI desk",
+    text: "Ask in plain language and get a clear read with the reasons behind it.",
+    href: "https://jenvu.com/ai-engine",
+    link: "See the AI engine",
+    icons: [Sparkles, ShieldCheck],
+  },
+  {
+    title: "Developers",
+    text: "One API key for leading models, plus JX Bot for MetaTrader 5.",
+    href: "https://jenvu.com/platform",
+    link: "Explore the platform",
+    icons: [Code2, Bot],
+  },
+];
+
 function AboutPage() {
   return (
     <PageShell
       wide
-      eyebrow="\n"
+      eyebrow="Overview"
       title="About Jenvu, the AI Fiber trading terminal"
       intro="Jenvu was built on a simple thesis: institutional logic shouldn't be locked behind a Bloomberg terminal. We turned ICT and SMC playbooks into an AI trading terminal any serious Fiber trader can use directly on the chart."
     >
@@ -37,13 +62,31 @@ function AboutPage() {
         }
         linkLabel="Explore the Terminal"
         href="https://dash.jenvu.com/overview"
-        media={
-          <img src={aboutMedia} alt="Fiber candlestick chart with marked zones" width={1280} height={720} className="h-auto w-full" />
-        }
+        media={<AuroraTile n={0} icons={[CandlestickChart, LineChart, BellRing]} className="aspect-[16/10] w-full" />}
         caption="Structure, liquidity and zones drawn on one chart"
       />
 
-      <div className="px-4 py-6 sm:px-6">
+      {/* WHAT WE BUILD */}
+      <section className="mx-auto max-w-[1200px] px-5 py-14 text-center sm:px-8">
+        <h2 className="text-[30px] font-medium tracking-tight text-gc-ink sm:text-[40px]">What we build</h2>
+        <p className="mt-4 text-[16px] text-gc-ink-muted">Three products, one focus: reading Fiber clearly.</p>
+        <div className="mt-10 grid gap-5 text-left md:grid-cols-3">
+          {BUILD.map((b, i) => (
+            <a key={b.title} href={b.href} className="group flex flex-col overflow-hidden rounded-md border border-gc-line bg-background transition-shadow hover:shadow-md">
+              <AuroraTile n={i} icons={b.icons} small className="h-40 w-full rounded-none" />
+              <div className="flex flex-1 flex-col p-6">
+                <h3 className="text-[22px] font-medium tracking-tight text-gc-ink">{b.title}</h3>
+                <p className="mt-2 text-[15px] leading-[1.6] text-gc-ink-muted">{b.text}</p>
+                <span className="mt-6 inline-flex items-center gap-1 text-[15px] font-medium text-gc-blue">
+                  {b.link} <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+                </span>
+              </div>
+            </a>
+          ))}
+        </div>
+      </section>
+
+      <div className="px-5 py-6 sm:px-8">
         <Banner title="Honest output, every time">
           When conditions are bad, the analysis says "wait". Every setup must clear bias,
           structure, liquidity, premium/discount, killzone and news-risk checks before it ships.{" "}
