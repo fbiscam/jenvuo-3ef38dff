@@ -188,9 +188,10 @@ export function CloudFeatureVideos() {
   const scroll = (dir: 1 | -1) => railRef.current?.scrollBy({ left: dir * 440, behavior: "smooth" });
   return (
     <section className="jenvu-videos-zoom bg-background py-16 md:py-20">
-      <h2 className="px-5 text-center text-[32px] font-normal leading-[1.2] text-gc-ink sm:text-[44px]">
-        <span className="text-gc-green">Live features</span> happen on Jenvu
-      </h2>
+      <div className="px-5 text-center">
+        <h2 className="text-balance text-[30px] font-medium leading-[1.15] tracking-tight text-gc-ink sm:text-[42px] md:text-5xl">Live features happen on Jenvu</h2>
+        <p className="mx-auto mt-4 max-w-[640px] text-balance text-[15px] leading-relaxed text-gc-ink sm:text-[17px]">Watch the Terminal, AI desk and JX Bot at work, the same way they run in your account.</p>
+      </div>
       <div className="mx-auto mt-10 max-w-[1296px]">
         <div ref={railRef} onScroll={onScroll} className="flex snap-x snap-mandatory gap-7 overflow-x-auto px-5 [scrollbar-width:none] sm:px-8 [&::-webkit-scrollbar]:hidden">
           {CARDS.map((c) => (
