@@ -24,6 +24,7 @@ import {
   CloudHero,
 } from "@/components/home/CloudHome";
 import { CloudFeatureVideos } from "@/components/home/CloudFeatureVideos";
+import { HomeStats, HomeReadAskAutomate, HomeTrust, HomeGetStarted } from "@/components/home/HomePlatformSections";
 import { CloudSolutions, CloudLogoStrip, CloudStartBanner } from "@/components/home/CloudSolutions";
 import TailoredToDesk from "@/components/TailoredToDesk";
 
@@ -385,11 +386,15 @@ function HomePage() {
       <div className="jenvu-home-content">
         <main>
           <CloudHero price={xau?.[1] ?? "—"} delta={xau?.[2] ?? "…"} />
+          <HomeStats />
           <CloudAudiences />
+          <HomeReadAskAutomate />
           <CloudBuildWith />
           <CloudFeatureVideos />
           <CloudSolutions />
           <CloudLogoStrip />
+          <HomeTrust />
+          <HomeGetStarted />
           <CloudStartBanner />
         </main>
       </div>
