@@ -84,7 +84,7 @@ function CodePage() {
         </div>
       </div>
 
-      <h2 className="mt-12 text-[18px] font-medium text-foreground">API usage examples</h2>
+      <h2 className="mt-12 text-[18px] font-medium text-foreground">  API usage examples</h2>
       <div className="mt-4 flex flex-wrap items-center gap-1" role="tablist">
         {(Object.keys(EXAMPLES) as Tab[]).map((t) => (
           <button
