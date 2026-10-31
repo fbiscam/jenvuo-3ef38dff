@@ -162,7 +162,7 @@ function Models() {
         {MODELS.map((m) => (
           <div
             key={m.id}
-            className="flex aspect-[3/4] flex-col justify-end overflow-hidden rounded-md p-6 text-left text-gc-on-night"
+            className="flex min-h-[300px] flex-col justify-end sm:aspect-[3/4] overflow-hidden rounded-md p-6 text-left text-gc-on-night"
             style={{ backgroundImage: "var(--platform-stars)" }}
           >
             <h3 className="text-[1.65rem] font-medium tracking-tight">{m.name}</h3>
