@@ -87,7 +87,7 @@ export function EntHero() {
         <br />
         for everything you <RotatingWord />
       </h1>
-      <p className="mx-auto mt-6 max-w-2xl text-[18px] text-foreground/80 sm:text-[21px]">
+      <p className="mx-auto mt-6 max-w-2xl text-[18px] text-foreground/80 sm:max-w-none sm:whitespace-nowrap sm:text-[19px] lg:text-[21px]">
         Reasoning, code, signals, execution, and risk. Tuned for precision market intelligence.
       </p>
       <div className="mt-9 flex flex-wrap items-center justify-center gap-3">

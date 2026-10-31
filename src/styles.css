@@ -1902,3 +1902,8 @@ html[data-dash-theme="dark"] .ask-jenvu-root {
   --gc-ink-muted: #a1a1aa;
   --gc-line: rgba(255, 255, 255, 0.12);
 }
+
+/* Frontier-heading type everywhere + theme-based Ask Jenvu button */
+h1, h2, h3, h4 { font-family: var(--font-display); letter-spacing: -0.025em; }
+.ask-jenvu-launcher { background: #F4F4F4; color: #000; border: 1px solid rgb(0 0 0 / 0.06); }
+.dark .ask-jenvu-launcher { background: #fff; color: #000; border-color: transparent; }
