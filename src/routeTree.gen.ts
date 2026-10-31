@@ -27,6 +27,7 @@ import { Route as FounderRouteImport } from './routes/founder'
 import { Route as FoundingRouteImport } from './routes/founding'
 import { Route as InsightsRouteImport } from './routes/insights'
 import { Route as JenvuOpsX9k2RouteImport } from './routes/jenvu-ops-x9k2'
+import { Route as JxBotRouteImport } from './routes/jx-bot'
 import { Route as KillzonesRouteImport } from './routes/killzones'
 import { Route as LlmRouteImport } from './routes/llm'
 import { Route as McpRouteImport } from './routes/mcp'
@@ -203,6 +204,11 @@ const InsightsRoute = InsightsRouteImport.update({
 const JenvuOpsX9k2Route = JenvuOpsX9k2RouteImport.update({
   id: '/jenvu-ops-x9k2',
   path: '/jenvu-ops-x9k2',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const JxBotRoute = JxBotRouteImport.update({
+  id: '/jx-bot',
+  path: '/jx-bot',
   getParentRoute: () => rootRouteImport,
 } as any)
 const KillzonesRoute = KillzonesRouteImport.update({
@@ -715,6 +721,7 @@ export interface FileRoutesByFullPath {
   '/founding': typeof FoundingRoute
   '/insights': typeof InsightsRouteWithChildren
   '/jenvu-ops-x9k2': typeof JenvuOpsX9k2RouteWithChildren
+  '/jx-bot': typeof JxBotRoute
   '/killzones': typeof KillzonesRoute
   '/llm': typeof LlmRoute
   '/mcp': typeof McpRoute
@@ -820,6 +827,7 @@ export interface FileRoutesByTo {
   '/download': typeof DownloadRoute
   '/founder': typeof FounderRoute
   '/founding': typeof FoundingRoute
+  '/jx-bot': typeof JxBotRoute
   '/killzones': typeof KillzonesRoute
   '/llm': typeof LlmRoute
   '/mcp': typeof McpRoute
@@ -927,6 +935,7 @@ export interface FileRoutesById {
   '/founding': typeof FoundingRoute
   '/insights': typeof InsightsRouteWithChildren
   '/jenvu-ops-x9k2': typeof JenvuOpsX9k2RouteWithChildren
+  '/jx-bot': typeof JxBotRoute
   '/killzones': typeof KillzonesRoute
   '/llm': typeof LlmRoute
   '/mcp': typeof McpRoute
@@ -1036,6 +1045,7 @@ export interface FileRouteTypes {
     | '/founding'
     | '/insights'
     | '/jenvu-ops-x9k2'
+    | '/jx-bot'
     | '/killzones'
     | '/llm'
     | '/mcp'
@@ -1141,6 +1151,7 @@ export interface FileRouteTypes {
     | '/download'
     | '/founder'
     | '/founding'
+    | '/jx-bot'
     | '/killzones'
     | '/llm'
     | '/mcp'
@@ -1247,6 +1258,7 @@ export interface FileRouteTypes {
     | '/founding'
     | '/insights'
     | '/jenvu-ops-x9k2'
+    | '/jx-bot'
     | '/killzones'
     | '/llm'
     | '/mcp'
@@ -1356,6 +1368,7 @@ export interface RootRouteChildren {
   FoundingRoute: typeof FoundingRoute
   InsightsRoute: typeof InsightsRouteWithChildren
   JenvuOpsX9k2Route: typeof JenvuOpsX9k2RouteWithChildren
+  JxBotRoute: typeof JxBotRoute
   KillzonesRoute: typeof KillzonesRoute
   LlmRoute: typeof LlmRoute
   McpRoute: typeof McpRoute
@@ -1528,6 +1541,13 @@ declare module '@tanstack/react-router' {
       path: '/jenvu-ops-x9k2'
       fullPath: '/jenvu-ops-x9k2'
       preLoaderRoute: typeof JenvuOpsX9k2RouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/jx-bot': {
+      id: '/jx-bot'
+      path: '/jx-bot'
+      fullPath: '/jx-bot'
+      preLoaderRoute: typeof JxBotRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/killzones': {
@@ -2318,6 +2338,7 @@ const rootRouteChildren: RootRouteChildren = {
   FoundingRoute: FoundingRoute,
   InsightsRoute: InsightsRouteWithChildren,
   JenvuOpsX9k2Route: JenvuOpsX9k2RouteWithChildren,
+  JxBotRoute: JxBotRoute,
   KillzonesRoute: KillzonesRoute,
   LlmRoute: LlmRoute,
   McpRoute: McpRoute,
