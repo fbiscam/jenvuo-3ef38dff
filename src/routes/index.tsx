@@ -387,8 +387,8 @@ function HomePage() {
       <div className="jenvu-home-content">
         <main>
           <CloudHero price={xau?.[1] ?? "—"} delta={xau?.[2] ?? "…"} />
-          <CloudAudiences />
           <CloudBuildWith />
+          <CloudAudiences />
           <CloudFeatureVideos />
           <CloudSolutions />
           <CloudLogoStrip />
