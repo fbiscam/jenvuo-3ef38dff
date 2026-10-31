@@ -1,5 +1,16 @@
-import type { ReactNode } from "react";
+import { createContext, useContext, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
+
+/**
+ * Flat look: no card border, section title above a full-width list split by
+ * thin lines (label left in grey, value/control right). Wrap a page in
+ * <SettingsFlat> to switch every SettingsCard/SettingsRow inside it.
+ */
+const FlatContext = createContext(false);
+
+export function SettingsFlat({ children }: { children: ReactNode }) {
+  return <FlatContext.Provider value={true}>{children}</FlatContext.Provider>;
+}
 
 /** One Settings section: title + short description, then rows split by thin lines. */
 export function SettingsCard({
@@ -7,19 +18,39 @@ export function SettingsCard({
   title,
   description,
   children,
+  action,
   tone = "default",
 }: {
   id: string;
   title: string;
   description?: string;
   children: ReactNode;
+  action?: ReactNode;
   tone?: "default" | "danger";
 }) {
+  const flat = useContext(FlatContext);
+  if (flat) {
+    return (
+      <section id={id} className="scroll-mt-24">
+        <div className="flex min-h-[52px] items-center justify-between gap-4 px-1 pb-3 sm:px-2">
+          <div className="min-w-0">
+            <p role="heading" aria-level={2} className="text-[17px] font-medium leading-tight text-gc-ink">{title}</p>
+            {description && <p className="mt-1 max-w-[620px] text-[13px] leading-[1.55] text-gc-ink-muted">{description}</p>}
+          </div>
+          {action && <div className="shrink-0">{action}</div>}
+        </div>
+        <div className="divide-y divide-gc-line border-t border-gc-line">{children}</div>
+      </section>
+    );
+  }
   return (
     <section id={id} className="scroll-mt-24 rounded-md border border-gc-line bg-background">
-      <div className="px-6 pt-6 sm:px-7">
-        <p role="heading" aria-level={2} className={cn("text-[20px] font-medium leading-tight", tone === "danger" ? "text-destructive" : "text-gc-ink")}>{title}</p>
-        {description && <p className="mt-1.5 max-w-[620px] text-[14px] leading-[1.55] text-gc-ink-muted">{description}</p>}
+      <div className="flex items-start justify-between gap-4 px-6 pt-6 sm:px-7">
+        <div className="min-w-0">
+          <p role="heading" aria-level={2} className={cn("text-[20px] font-medium leading-tight", tone === "danger" ? "text-destructive" : "text-gc-ink")}>{title}</p>
+          {description && <p className="mt-1.5 max-w-[620px] text-[14px] leading-[1.55] text-gc-ink-muted">{description}</p>}
+        </div>
+        {action && <div className="shrink-0">{action}</div>}
       </div>
       <div className="mt-4 divide-y divide-gc-line">{children}</div>
     </section>
@@ -27,11 +58,23 @@ export function SettingsCard({
 }
 
 /** Row: label and help text on the left, control on the right (stacks on phones). */
-export function SettingsRow({ label, hint, children, wide = false }: { label: string; hint?: ReactNode; children?: ReactNode; wide?: boolean }) {
+export function SettingsRow({ label, hint, children, wide = false }: { label: ReactNode; hint?: ReactNode; children?: ReactNode; wide?: boolean }) {
+  const flat = useContext(FlatContext);
+  if (flat) {
+    return (
+      <div className={cn("flex min-h-[64px] flex-col gap-2 px-1 py-4 sm:px-2", !wide && "sm:flex-row sm:items-center sm:justify-between sm:gap-8")}>
+        <div className="min-w-0">
+          <div className="text-[14px] text-gc-ink-muted">{label}</div>
+          {hint && <div className="mt-1 max-w-[560px] text-[13px] leading-[1.55] text-gc-ink-muted/80">{hint}</div>}
+        </div>
+        {children && <div className={cn("min-w-0 text-[14px] text-gc-ink sm:text-right", !wide && "sm:shrink-0")}>{children}</div>}
+      </div>
+    );
+  }
   return (
     <div className={cn("flex flex-col gap-3 px-6 py-5 sm:px-7", !wide && "sm:flex-row sm:items-center sm:justify-between sm:gap-8")}>
       <div className="min-w-0">
-        <p className="text-[15px] font-medium text-gc-ink">{label}</p>
+        <div className="text-[15px] font-medium text-gc-ink">{label}</div>
         {hint && <div className="mt-1 max-w-[560px] text-[13px] leading-[1.55] text-gc-ink-muted">{hint}</div>}
       </div>
       {children && <div className={cn("min-w-0", !wide && "shrink-0")}>{children}</div>}
