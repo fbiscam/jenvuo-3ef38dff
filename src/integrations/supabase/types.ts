@@ -128,6 +128,32 @@ export type Database = {
         }
         Relationships: []
       }
+      announcement_dismissals: {
+        Row: {
+          announcement_id: string
+          dismissed_at: string
+          user_id: string
+        }
+        Insert: {
+          announcement_id: string
+          dismissed_at?: string
+          user_id: string
+        }
+        Update: {
+          announcement_id?: string
+          dismissed_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "announcement_dismissals_announcement_id_fkey"
+            columns: ["announcement_id"]
+            isOneToOne: false
+            referencedRelation: "site_announcements"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ask_jenvu_anon_usage: {
         Row: {
           bucket: string
@@ -2958,6 +2984,42 @@ export type Database = {
           email?: string | null
           id?: string
           ip?: string
+        }
+        Relationships: []
+      }
+      site_announcements: {
+        Row: {
+          active: boolean
+          body: string | null
+          created_at: string
+          created_by: string | null
+          id: string
+          kind: string
+          link_label: string | null
+          link_url: string | null
+          title: string
+        }
+        Insert: {
+          active?: boolean
+          body?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          kind?: string
+          link_label?: string | null
+          link_url?: string | null
+          title: string
+        }
+        Update: {
+          active?: boolean
+          body?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          kind?: string
+          link_label?: string | null
+          link_url?: string | null
+          title?: string
         }
         Relationships: []
       }
