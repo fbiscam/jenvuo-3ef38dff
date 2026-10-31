@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { Bot, Check, Copy, Download, FileText, KeyRound, Trash2, Wrench, X } from "lucide-react";
 import { useMt5Access } from "@/components/dashboard/Mt5Licenses";
 import { createMt5License, getBotDownloadUrl, revokeMt5License, type Mt5LicenseRow } from "@/lib/mt5-licenses.functions";
-import { MT5_PLANS, dailyTarget, isMt5Plan, parseBinding } from "@/lib/mt5-licenses";
+import { MT5_PLANS, countIpLicenses, dailyTarget, isMt5Plan, parseBinding } from "@/lib/mt5-licenses";
 
 const MONO = "font-['JetBrains_Mono',ui-monospace,monospace]";
 
@@ -71,7 +71,7 @@ function JxBotPage() {
   const plan = access && isMt5Plan(access.plan) ? access.plan : "pro";
   const licenses = [...(access?.licenses ?? [])].sort((a, b) => Date.parse(b.created_at) - Date.parse(a.created_at));
   const active = licenses.filter((l) => !l.revoked_at);
-  const bound = active.filter((l) => l.mt5_account).length;
+  const bound = countIpLicenses(licenses);
   const limit = access?.limit ?? 0;
   const canCreate = Boolean(access?.allowed && bound < limit);
 
