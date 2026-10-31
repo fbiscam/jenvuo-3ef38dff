@@ -450,7 +450,7 @@ function UsagePage() {
         })();
   const seriesDays =
     groupBy === "type"
-      ? (typedDays as ({ date: string } & Record<string, number>)[])
+      ? (typedDays as unknown as ({ date: string } & Record<string, number>)[])
       : (() => {
           const ids = new Map(series.map((x) => [x.label, x.id]));
           const out = chartDays.map((day) => {
