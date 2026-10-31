@@ -2034,7 +2034,7 @@ html body .jenvu-zoom-dashboard main :is(.console-icon-chip, .console-card > svg
 .console-row { box-shadow: inset 0 1px 0 color-mix(in oklab, var(--foreground) 8%, transparent); }
 
 /* Dark theme: any button/pill with a white background keeps black text. */
-.dark :is(button, a, [role="button"]):is(.bg-white, .bg-background.text-foreground, [class*="bg-white"], .console-pill-light),
+.dark :is(button, a, [role="button"]):is(.bg-white, [class*="bg-white"], .console-pill-light),
 .dark :is(button, a, [role="button"]):is(.bg-white, [class*="bg-white"]) * ,
 .dash-dark :is(button, a, [role="button"]):is(.bg-white, [class*="bg-white"]),
 .dash-dark :is(button, a, [role="button"]):is(.bg-white, [class*="bg-white"]) * {
