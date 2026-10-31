@@ -106,7 +106,7 @@ const CONTENT: IndustryContent = {
   ],
   whyTitle: "Why traders choose Jenvu",
   why: [
-    { title: "Same candles, same marks", text: "Every level comes from fixed rules, so you can trust what you see and test it again later." },
+    { title: "Same candles, same marks", text: "Every level comes from fixed rules, so you can trust what you see." },
     { title: "Built only for Fiber", text: "Sessions, volatility and weekend closure are tuned for Fiber instead of a generic market." },
     { title: "AI that explains, not invents", text: "The AI reads the marks the rules draw and explains them in plain language. It does not create levels." },
     { title: "Automate with clear limits", text: "JX Bot runs on your MT5 account and pauses for the day once your daily target is reached." },
