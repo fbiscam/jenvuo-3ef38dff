@@ -2012,3 +2012,9 @@ html body .jenvu-zoom-dashboard main a[role="button"] { border-radius: 9999px !i
 }
 .dash-dark .console-pill-solid,
 .dash-dark .console-pill-solid * { color: #000000 !important; }
+/* Solid white buttons/chips on the black theme keep black text */
+html.dark body :is(.bg-foreground, .bg-gc-ink, .console-pill-solid):not(.terminal-dark *),
+html.dark body :is(.bg-foreground, .bg-gc-ink, .console-pill-solid):not(.terminal-dark *) *,
+.dash-dark :is(.bg-foreground, .bg-gc-ink, .console-pill-solid),
+.dash-dark :is(.bg-foreground, .bg-gc-ink, .console-pill-solid) * { color: #000000 !important; }
+.dash-dark :is(.bg-foreground, .bg-gc-ink, .console-pill-solid) svg { color: #000000 !important; }
