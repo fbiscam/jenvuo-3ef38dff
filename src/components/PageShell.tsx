@@ -31,7 +31,7 @@ export function PageShell({
 }) {
   const showEyebrow = !!eyebrow && eyebrow.replace(/\\n/g, "").trim().length > 0;
   return (
-    <div className={`public-cloudflare jenvu-zoom min-h-dvh w-full bg-background text-foreground ${SANS} antialiased selection:bg-home-accent selection:text-home-accent-foreground`}>
+    <div className={`public-cloudflare min-h-dvh w-full bg-background text-foreground ${SANS} antialiased selection:bg-home-accent selection:text-home-accent-foreground`}>
       <SiteHeader />
 
       {/* HERO — centered */}

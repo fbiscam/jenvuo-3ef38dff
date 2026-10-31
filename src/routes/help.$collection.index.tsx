@@ -1,6 +1,6 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { ArrowLeft, ArrowRight, ChevronRight } from "lucide-react";
-import SiteFooter from "@/components/SiteFooter";
+import BlogFooter from "@/components/BlogFooter";
 import HeaderAuthButtons from "@/components/HeaderAuthButtons";
 import { findCollection, type Article } from "@/lib/help-content";
 
@@ -99,7 +99,7 @@ function CollectionPage() {
           </Link>
         </main>
 
-        <SiteFooter />
+        <BlogFooter />
       </div>
     </>
   );

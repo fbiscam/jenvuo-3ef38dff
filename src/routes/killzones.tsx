@@ -3,7 +3,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { Search, Clock, MapPin, Lock } from "lucide-react";
 import SiteHeader from "@/components/SiteHeader";
-import SiteFooter from "@/components/SiteFooter";
+import BlogFooter from "@/components/BlogFooter";
 import { PAIR_PROFILES, type PairProfile } from "@/lib/analysis/engine";
 
 export const Route = createFileRoute("/killzones")({
@@ -405,7 +405,7 @@ function KillzonesPage() {
           Local times are converted from UTC using your device timezone. Killzones show when Fiber is usually most active — they don't guarantee a setup.
         </p>
       </main>
-      <div className="hide-in-pwa"><SiteFooter /></div>
+      <div className="hide-in-pwa"><BlogFooter /></div>
     </div>
   );
 }

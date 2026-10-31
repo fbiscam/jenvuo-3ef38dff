@@ -2,7 +2,7 @@ import * as React from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Search, ChevronRight, Menu, X } from "lucide-react";
 import SiteHeader from "@/components/SiteHeader";
-import SiteFooter from "@/components/SiteFooter";
+import BlogFooter from "@/components/BlogFooter";
 import { NextStep } from "@/components/PageShell";
 import { DOC_GROUPS, type DocSection } from "@/components/docs/doc-content";
 
@@ -184,7 +184,7 @@ function DocsPage() {
       </div>
 
       <NextStep />
-      <div className="hide-in-pwa"><SiteFooter /></div>
+      <div className="hide-in-pwa"><BlogFooter /></div>
     </div>
   );
 }

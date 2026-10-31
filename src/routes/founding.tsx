@@ -3,7 +3,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { Check, Users, DollarSign, Shield, ArrowRight } from "lucide-react";
-import SiteFooter from "@/components/SiteFooter";
+import BlogFooter from "@/components/BlogFooter";
 import SiteHeader from "@/components/SiteHeader";
 import { submitFoundingApplication, foundingStats } from "@/lib/founding.functions";
 
@@ -289,7 +289,7 @@ function FoundingPage() {
         </main>
       </div>
 
-      <SiteFooter />
+      <BlogFooter />
     </div>
   );
 }

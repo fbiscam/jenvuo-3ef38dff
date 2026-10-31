@@ -1,6 +1,6 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { ArrowLeft, ArrowRight, ChevronRight } from "lucide-react";
-import SiteFooter from "@/components/SiteFooter";
+import BlogFooter from "@/components/BlogFooter";
 import SiteHeader from "@/components/SiteHeader";
 import { findArticle, findCollection, type Article, type Block } from "@/lib/help-content";
 
@@ -77,7 +77,7 @@ function ArticlePage() {
 
   return (
     <>
-      <div className="public-cloudflare jenvu-zoom min-h-dvh bg-background text-gc-ink antialiased">
+      <div className="public-cloudflare min-h-dvh bg-background text-gc-ink antialiased">
         <SiteHeader />
 
         <main className="mx-auto max-w-3xl px-5 sm:px-6 py-12 sm:py-16">
@@ -178,7 +178,7 @@ function ArticlePage() {
           </Link>
         </main>
 
-        <SiteFooter />
+        <BlogFooter />
       </div>
     </>
   );
