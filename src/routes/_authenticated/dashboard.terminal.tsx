@@ -61,7 +61,7 @@ import {
   Attachments,
 } from "@/components/ai-elements/attachments";
 import { Shimmer } from "@/components/ai-elements/shimmer";
-import askJenvuMark from "@/assets/ask-jenvu-mark.png";
+import { JENVU_MARK_URL as askJenvuMark } from "@/components/JenvuMark";
 
 export const Route = createFileRoute("/_authenticated/dashboard/terminal")({
   head: () => ({

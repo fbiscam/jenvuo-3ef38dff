@@ -1,3 +1,4 @@
+import JenvuMark from "@/components/JenvuMark";
 import * as React from "react";
 import { clearStoredAuthSessions, goAfterSignIn, restoreSharedSession } from "@/lib/cross-domain-session";
 import { createFileRoute, useNavigate, Link, redirect } from "@tanstack/react-router";
@@ -824,7 +825,7 @@ function AuthPage() {
       <div className="flex min-h-dvh w-full flex-col lg:w-1/2 lg:items-end">
         <div className="mx-auto w-full max-w-[384px] px-6 pt-8 sm:pt-12 lg:mx-0 lg:mr-16 lg:px-0 xl:mr-24">
           <Link to="/" aria-label="Jenvu home" className="inline-flex items-center gap-2.5">
-            <img src="/favicon.png" alt="Jenvu" className="h-7 w-7 object-contain" />
+            <JenvuMark className="h-7 w-7 text-foreground" />
             <span className="text-[15px] text-gc-ink-muted">Try Jenvu for free</span>
           </Link>
         </div>
