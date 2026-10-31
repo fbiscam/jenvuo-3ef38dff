@@ -1,11 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { Check, ChevronRight, Copy } from "lucide-react";
+import { ArrowUpRight, Check, Copy } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { SettingsCard, SettingsRow, settingsBtn } from "@/components/settings/SettingsCard";
+import { SettingsCard, SettingsFlat, SettingsRow } from "@/components/settings/SettingsCard";
 import { PreferencesSettings } from "@/components/settings/PreferencesSettings";
-import { SETTINGS_PAGES, SettingsPageHeader } from "@/components/settings/SettingsNav";
+import { DangerZoneSettings } from "@/components/settings/SecuritySettings";
+import { SETTINGS_PAGES } from "@/components/settings/SettingsNav";
 
 export const Route = createFileRoute("/_authenticated/dashboard/settings")({
   head: () => ({
@@ -27,8 +28,13 @@ const fmtDate = (d?: string | null) => {
   try { return new Date(d).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" }); } catch { return d; }
 };
 
+const pillBtn =
+  "inline-flex h-9 items-center justify-center gap-1.5 rounded-full border border-gc-line bg-background px-4 text-[14px] text-gc-ink hover:bg-gc-surface";
+
+type GeneralUser = { id: string; email: string; name: string; created: string | null; provider: string };
+
 function GeneralSettings() {
-  const [user, setUser] = useState<{ id: string; email: string; created: string | null; provider: string } | null>(null);
+  const [user, setUser] = useState<GeneralUser | null>(null);
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
@@ -36,7 +42,8 @@ function GeneralSettings() {
       const u = data.session?.user;
       if (!u) return;
       const provider = (u.app_metadata?.provider as string | undefined) ?? "email";
-      setUser({ id: u.id, email: u.email ?? "", created: u.created_at ?? null, provider });
+      const meta = (u.user_metadata ?? {}) as { full_name?: string; name?: string };
+      setUser({ id: u.id, email: u.email ?? "", name: meta.full_name || meta.name || "", created: u.created_at ?? null, provider });
     });
   }, []);
 
@@ -50,39 +57,54 @@ function GeneralSettings() {
     } catch { toast.error("Copy failed"); }
   };
 
+  const method = user ? (user.provider === "email" ? "Email and password" : user.provider.charAt(0).toUpperCase() + user.provider.slice(1)) : "—";
   const shortcuts = SETTINGS_PAGES.filter((p) => p.to !== "/dashboard/settings");
 
   return (
-    <div className="mx-auto w-full max-w-[1100px] pb-10 text-foreground">
-      <SettingsPageHeader title="General" description="Your account details and the choices this browser remembers." />
+    <SettingsFlat>
+      <div className="mx-auto w-full max-w-[930px] pb-10 pt-2 text-foreground">
+        <h1 className="px-1 text-[28px] font-normal leading-tight tracking-tight text-gc-ink sm:px-2 sm:text-[32px]">General</h1>
 
-      <div className="mt-6 space-y-6">
-        <SettingsCard id="account" title="Account" description="Basic details of the account you're signed in with.">
-          <SettingsRow label="Email" hint={user?.email || "—"} />
-          <SettingsRow label="Sign-in method" hint={user ? (user.provider === "email" ? "Email and password" : user.provider.charAt(0).toUpperCase() + user.provider.slice(1)) : "—"} />
-          <SettingsRow label="Member since" hint={fmtDate(user?.created)} />
-          <SettingsRow label="Account ID" hint={<code className="break-all font-sans text-[13px]">{user?.id ?? "—"}</code>}>
-            <button type="button" onClick={() => void copyId()} disabled={!user} className={settingsBtn}>
-              {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />} Copy
-            </button>
-          </SettingsRow>
-        </SettingsCard>
-
-        <PreferencesSettings />
-
-        <section className="console-card overflow-hidden">
-          <p role="heading" aria-level={2} className="px-6 pt-6 text-[20px] font-medium leading-tight text-foreground sm:px-7">More settings</p>
-          <div className="mt-3 divide-y divide-gc-line">
+        <div className="mt-8 space-y-10">
+          <SettingsCard
+            id="account"
+            title="Main"
+            action={<Link to="/dashboard/profile" className={pillBtn}>Edit profile</Link>}
+          >
+            <SettingsRow label="Account owner">
+              <p className="truncate text-gc-ink">{user?.name || user?.email.split("@")[0] || "—"}</p>
+              <p className="truncate text-[13px] text-gc-ink-muted">{user?.email || "—"}</p>
+            </SettingsRow>
+            <SettingsRow label="Sign-in method">{method}</SettingsRow>
+            <SettingsRow label="Created">{fmtDate(user?.created)}</SettingsRow>
+            <SettingsRow label="Account ID">
+              <span className="inline-flex max-w-full items-center gap-3">
+                <code className="break-all font-sans text-[13px] text-gc-ink">{user?.id ?? "—"}</code>
+                <button
+                  type="button"
+                  onClick={() => void copyId()}
+                  disabled={!user}
+                  aria-label="Copy account ID"
+                  className="shrink-0 text-gc-ink-muted hover:text-gc-ink disabled:opacity-50"
+                >
+                  {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+                </button>
+              </span>
+            </SettingsRow>
             {shortcuts.map((p) => (
-              <Link key={p.to} to={p.to as "/dashboard"} className="flex items-center gap-3 px-6 py-4 text-[15px] text-foreground hover:bg-gc-notice sm:px-7">
-                <p.icon className="h-[18px] w-[18px] shrink-0" strokeWidth={1.75} aria-hidden="true" />
-                <span className="flex-1">{p.label}</span>
-                <ChevronRight className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
-              </Link>
+              <SettingsRow key={p.to} label={p.label}>
+                <Link to={p.to as "/dashboard"} className="inline-flex items-center gap-1.5 text-gc-ink hover:underline">
+                  Manage <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
+                </Link>
+              </SettingsRow>
             ))}
-          </div>
-        </section>
+          </SettingsCard>
+
+          <PreferencesSettings />
+
+          <DangerZoneSettings />
+        </div>
       </div>
-    </div>
+    </SettingsFlat>
   );
 }
