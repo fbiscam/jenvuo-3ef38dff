@@ -2053,6 +2053,6 @@ html body .jenvu-zoom-dashboard main :is(.console-icon-chip, .console-card > svg
 /* Desktop: the page heading sits on the same line as the sidebar's first item (Overview). */
 @media (min-width: 1024px) {
   .jenvu-zoom-dashboard main.dash-page {
-    padding-top: 59px;
+    padding-top: 62px;
   }
 }
