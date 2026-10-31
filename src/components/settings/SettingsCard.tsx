@@ -62,12 +62,12 @@ export function SettingsRow({ label, hint, children, wide = false }: { label: Re
   const flat = useContext(FlatContext);
   if (flat) {
     return (
-      <div className={cn("flex min-h-[64px] flex-col gap-2 px-1 py-4 sm:px-2", !wide && "sm:flex-row sm:items-center sm:justify-between sm:gap-8")}>
-        <div className="min-w-0">
+      <div className={cn("flex min-h-[64px] px-1 py-4 sm:px-2", wide ? "flex-col gap-2" : "flex-wrap items-center justify-between gap-x-6 gap-y-2")}>
+        <div className="min-w-0 flex-1 basis-[160px]">
           <div className="text-[14px] text-gc-ink-muted">{label}</div>
           {hint && <div className="mt-1 max-w-[560px] text-[13px] leading-[1.55] text-gc-ink-muted/80">{hint}</div>}
         </div>
-        {children && <div className={cn("min-w-0 text-[14px] text-gc-ink sm:text-right", !wide && "sm:shrink-0")}>{children}</div>}
+        {children && <div className={cn("min-w-0 max-w-full text-[14px] text-gc-ink", !wide && "ml-auto text-right")}>{children}</div>}
       </div>
     );
   }
