@@ -180,7 +180,7 @@ function Hero() {
         <ContactSales />
         <StartMenu />
       </div>
-      <p className="mt-24 text-xs uppercase tracking-[0.2em] text-gc-ink-muted">Works with the tools you already use</p>
+      <p className="mt-24 text-xs uppercase tracking-[0.2em] text-gc-ink-muted">{"\n"}</p>
       <div className="mx-auto mt-8 flex max-w-4xl flex-wrap items-center justify-center gap-x-8 gap-y-6 sm:gap-x-12">
         {WORKS_WITH.map((w) => (
           <span key={w.name} className="inline-flex items-center gap-2.5 text-lg font-semibold tracking-tight text-gc-ink sm:text-2xl">
