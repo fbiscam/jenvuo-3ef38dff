@@ -220,7 +220,7 @@ function StopCard() {
           Daily target reached on this account. No new trades.
         </div>
         <div className="jx-in max-w-[440px] rounded-2xl bg-muted px-4 py-3 text-[14px] text-foreground" style={{ animationDelay: "0.3s" }}>
-          Drawdown guard is on at 4.7%. Open trades keep their stop loss.
+          Drawdown guard is on at 4.7%. Depends on balance.
         </div>
         <div className="pt-3 text-center text-[13px] text-muted-foreground md:max-w-[440px]">
           Status for <span className="rounded-full bg-muted px-2 py-0.5 font-medium text-foreground">Paused · target hit</span>
