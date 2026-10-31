@@ -4,7 +4,7 @@ import { useAuthUser } from "@/hooks/useAuthUser";
 import CreditsPill from "@/components/CreditsPill";
 
 
-const MONO = "font-['JetBrains_Mono',ui-monospace,monospace]";
+const MONO = "font-sans";
 
 export default function HeaderAuthButtons({ signInOnly = false }: { signInOnly?: boolean } = {}) {
   const { user } = useAuthUser();

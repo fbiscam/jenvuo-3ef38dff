@@ -5,7 +5,7 @@ import { listMyOrders } from "@/lib/payments.functions";
 import { networkMeta, type PaymentOrder } from "@/lib/payments/shared";
 import { supabase } from "@/integrations/supabase/client";
 
-const MONO = "font-['JetBrains_Mono',ui-monospace,monospace]";
+const MONO = "font-sans";
 
 function invoiceNo(o: PaymentOrder) {
   return `JV-${new Date(o.created_at).getFullYear()}-${o.id.slice(0, 8).toUpperCase()}`;

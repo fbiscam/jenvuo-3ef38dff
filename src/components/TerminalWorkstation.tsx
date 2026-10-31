@@ -13,7 +13,7 @@ import { ema } from "@/lib/candle/indicators";
 
 
 
-const MONO = "font-['JetBrains_Mono',ui-monospace,monospace]";
+const MONO = "font-sans";
 
 function useXauProjection(
   initial: XauProjection | null,

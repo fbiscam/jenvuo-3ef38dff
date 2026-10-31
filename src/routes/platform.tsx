@@ -681,7 +681,7 @@ function Enterprise() {
 
 function GetStarted() {
   return (
-    <section className="bg-gc-surface py-20 text-center">
+    <section className="bg-background py-20 text-center">
       <div className="mx-auto max-w-6xl px-5">
         <h2 className="text-4xl font-medium tracking-tight sm:text-5xl">Get started</h2>
         <div className="mt-10 grid gap-6 text-left md:grid-cols-2">

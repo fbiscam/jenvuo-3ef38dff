@@ -7,7 +7,7 @@ import UpgradeOverlay from "@/components/UpgradeOverlay";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, LineChart, Line, CartesianGrid } from "recharts";
 import { TrendingUp, TrendingDown, Target, Activity, Award, AlertTriangle } from "lucide-react";
 
-const MONO = "font-['JetBrains_Mono',ui-monospace,monospace]";
+const MONO = "font-sans";
 
 export const Route = createFileRoute("/_authenticated/dashboard/analytics")({
   component: Analytics,

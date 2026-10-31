@@ -2,7 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { Sparkles } from "lucide-react";
 import { useTrial } from "@/hooks/useTrial";
 
-const MONO = "font-['JetBrains_Mono',ui-monospace,monospace]";
+const MONO = "font-sans";
 
 export default function TrialBanner({ className = "" }: { className?: string }) {
   const trial = useTrial();

@@ -161,7 +161,7 @@ export const Route = createFileRoute("/")({
   component: HomePage,
 });
 
-const MONO = "font-['JetBrains_Mono',ui-monospace,monospace]";
+const MONO = "font-sans";
 const SANS = "font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif]";
 
 /* ---------- mock data ---------- */

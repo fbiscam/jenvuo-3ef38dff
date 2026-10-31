@@ -2,7 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { Zap } from "lucide-react";
 import { useCredits } from "@/hooks/useCredits";
 
-const MONO = "font-['JetBrains_Mono',ui-monospace,monospace]";
+const MONO = "font-sans";
 
 export default function CreditsPill() {
   const { state, balance, allowance, plan } = useCredits();

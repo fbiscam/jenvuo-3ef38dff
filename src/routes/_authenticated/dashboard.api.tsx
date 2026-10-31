@@ -15,7 +15,7 @@ import {
 } from "@/lib/extension-keys.functions";
 import { getPlanCapabilities } from "@/lib/plan-entitlements";
 
-const MONO = "font-['JetBrains_Mono',ui-monospace,monospace]";
+const MONO = "font-sans";
 const API_BASE = "https://jenvu.com/api/public/v1";
 
 export const Route = createFileRoute("/_authenticated/dashboard/api")({

@@ -10,7 +10,7 @@ import { getDefaultAvatar } from "@/lib/default-avatar";
 /** Current page in the top menu: dark text with a blue line along the bottom of the header. */
 const ACTIVE = { className: "relative !text-gc-ink after:pointer-events-none after:absolute after:inset-x-1 after:-bottom-[13px] after:h-[3px] after:rounded-t-sm after:bg-gc-blue" };
 
-const MONO = "font-['JetBrains_Mono',ui-monospace,monospace]";
+const MONO = "font-sans";
 
 /** The homepage header, shared by every public page so the menu is identical everywhere. */
 export default function SiteHeader() {

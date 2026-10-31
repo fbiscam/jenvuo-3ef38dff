@@ -2,7 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { Lock } from "lucide-react";
 import * as React from "react";
 
-const MONO = "font-['JetBrains_Mono',ui-monospace,monospace]";
+const MONO = "font-sans";
 
 type Props = {
   show: boolean;

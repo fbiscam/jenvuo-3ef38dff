@@ -1,12 +1,10 @@
 @import "tailwindcss" source(none);
 @source "../src";
 @import "tw-animate-css";
-@import "@fontsource-variable/inter";
 
 @utility price-font {
-  font-family: "Inter Variable", "Inter", system-ui, sans-serif;
+  font-family: var(--font-sans);
   font-weight: 700;
-  font-variation-settings: "wght" 700;
 }
 
 /* Sidebar: hide scrollbar until hover */
@@ -57,7 +55,8 @@
 @theme inline {
   --font-display: "Google Sans", "Product Sans", "Poppins", system-ui, sans-serif;
   --font-sans: "Google Sans", "Product Sans", "Poppins", system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  --font-mono: "Google Sans", "Product Sans", system-ui, sans-serif;
+  --font-code: "JetBrains Mono", ui-monospace, monospace;
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -625,9 +624,9 @@
 
 /* Instrument Serif display accent — used only for hero headline emphasis */
 @utility font-serif-display {
-  font-family: "Instrument Serif", "Cormorant Garamond", ui-serif, Georgia, serif;
-  font-weight: 400;
-  letter-spacing: -0.01em;
+  font-family: var(--font-sans);
+  font-weight: 500;
+  letter-spacing: -0.02em;
 }
 
 /* Premium hover-lift for CTAs / cards — subtle scale + soft shadow */
@@ -785,7 +784,7 @@ html[data-pwa="1"] .pwa-tabbar {
   background: #ffffff;
   border-top: 1px solid rgb(228 228 231);
   padding: 6px 6px calc(6px + env(safe-area-inset-bottom));
-  font-family: "Google Sans", "Product Sans", "Roboto", system-ui, sans-serif;
+  font-family: "Google Sans", "Product Sans", system-ui, sans-serif;
 }
 .pwa-tabbar a {
   display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -1565,4 +1564,10 @@ body[data-scroll-locked] { margin-right: 0 !important; padding-right: 0 !importa
 .plat-wave { animation: plat-wave .8s ease-in-out infinite; }
 @media (prefers-reduced-motion: reduce) {
   .plat-msg-in, .plat-dot, .plat-scan, .plat-candle-in, .plat-box, .plat-wave { animation: none; }
+}
+
+/* One site-wide type style (the Platform page look): Google Sans everywhere;
+   only real code keeps a monospace face. Unlayered so it beats utilities. */
+pre, pre *, code, kbd, samp {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
 }

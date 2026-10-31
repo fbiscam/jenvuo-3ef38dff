@@ -36,7 +36,7 @@ export const Route = createFileRoute("/help/$collection/")({
   component: CollectionPage,
 });
 
-const MONO = "font-['JetBrains_Mono',ui-monospace,monospace]";
+const MONO = "font-sans";
 const SANS = "font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif]";
 
 function CollectionPage() {
