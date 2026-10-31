@@ -103,14 +103,21 @@ function BotUsagePage() {
 
 
   return (
-    <div className="-mx-5 -mb-7 min-h-[calc(100dvh-4rem)] overflow-hidden bg-background text-foreground sm:-mx-8">
-      <div className="flex min-h-14 flex-col gap-3 border-b border-border px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+    <div className="mx-auto w-full max-w-[1180px] pb-10 text-foreground">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <h1 className="text-[28px] font-medium tracking-tight text-foreground">Bot Usage</h1>
+          <p className="mt-1 text-[14px] text-muted-foreground">
+            Profit, trades and ON/OFF activity across your MT5 accounts.
+          </p>
+        </div>
         <UsageTabs active="bot" />
-        <div className="flex items-center gap-2">
+      </div>
+      <div className="mt-6 mb-4 flex flex-wrap items-center gap-2">
           <select
             value={account}
             onChange={(e) => setAccount(e.target.value)}
-            className="h-9 rounded-lg border border-border bg-card px-3 text-[13px] text-foreground outline-none"
+            className="h-9 rounded-full border border-border bg-transparent px-4 text-[13px] text-foreground outline-none"
             aria-label="MT5 account"
           >
             <option value="all">All MT5 accounts</option>
