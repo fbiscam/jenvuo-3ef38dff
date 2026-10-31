@@ -149,3 +149,62 @@ export const deleteExtensionKey = createServerFn({ method: 'POST' })
     if (error) return { ok: false as const, error: error.message }
     return { ok: true as const }
   })
+
+export const renameExtensionKey = createServerFn({ method: 'POST' })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => {
+    const obj = (d ?? {}) as { id?: string; name?: string }
+    if (!obj.id || typeof obj.id !== 'string') throw new Error('Key id is required.')
+    const name = typeof obj.name === 'string' ? obj.name.trim().slice(0, 60) : ''
+    if (!name) throw new Error('Key name is required.')
+    return { id: obj.id, name }
+  })
+  .handler(async ({ data, context }) => {
+    const { error } = await (context.supabase as any)
+      .from('extension_api_keys')
+      .update({ name: data.name })
+      .eq('id', data.id)
+      .eq('user_id', context.userId)
+    if (error) return { ok: false as const, error: error.message }
+    return { ok: true as const }
+  })
+
+// Rotate = issue a fresh secret under the same name, then revoke the old one.
+export const rotateExtensionKey = createServerFn({ method: 'POST' })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => {
+    const obj = (d ?? {}) as { id?: string }
+    if (!obj.id || typeof obj.id !== 'string') throw new Error('Key id is required.')
+    return { id: obj.id }
+  })
+  .handler(async ({ data, context }) => {
+    const client = context.supabase as any
+    const access = await readAccess(client, context.userId)
+    if (!access.active || access.plan === 'free' || access.keyLimit < 1) return { ok: false as const, error: 'Upgrade to Pro, Elite, or Ultra to rotate API keys.' }
+    const { data: old } = await client
+      .from('extension_api_keys')
+      .select('id,name,revoked_at')
+      .eq('id', data.id)
+      .eq('user_id', context.userId)
+      .maybeSingle()
+    if (!old) return { ok: false as const, error: 'API key not found.' }
+    if (old.revoked_at) return { ok: false as const, error: 'This key is already disabled.' }
+
+    const { generateExtensionKey, hashExtensionKey, encryptExtensionKey } = await import('./extension-auth.server')
+    const raw = generateExtensionKey()
+    const { error: insertError } = await client.from('extension_api_keys').insert({
+      user_id: context.userId,
+      name: old.name,
+      key_prefix: raw.slice(0, 18),
+      key_hash: await hashExtensionKey(raw),
+      key_ciphertext: await encryptExtensionKey(raw),
+    })
+    if (insertError) return { ok: false as const, error: insertError.message }
+    const { error } = await client
+      .from('extension_api_keys')
+      .update({ revoked_at: new Date().toISOString() })
+      .eq('id', old.id)
+      .eq('user_id', context.userId)
+    if (error) return { ok: false as const, error: error.message }
+    return { ok: true as const, key: raw }
+  })

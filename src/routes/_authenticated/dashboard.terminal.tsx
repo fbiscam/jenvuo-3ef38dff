@@ -701,7 +701,7 @@ function TerminalPage() {
           theme === "dark" ? "dark terminal-dark bg-background" : "bg-background",
         )}
       >
-        <div className={cn("flex min-h-0 flex-1 flex-col lg:flex-row", theme !== "dark" && "gap-2 px-2 pt-2")}>
+        <div className="flex min-h-0 flex-1 flex-col lg:flex-row">
           {/* Chart */}
           <section
             aria-label="EUR/USD chart"
@@ -802,10 +802,7 @@ function TerminalPage() {
           {deskOpen && (
             <aside
               className={cn(
-                "relative flex h-[45%] min-h-0 w-full shrink-0 flex-col bg-card text-card-foreground lg:h-full lg:w-[380px]",
-                theme === "dark"
-                  ? "border-t border-border lg:border-l lg:border-t-0"
-                  : "overflow-hidden rounded-2xl border border-gc-line shadow-sm",
+                "relative flex h-[45%] min-h-0 w-full shrink-0 flex-col overflow-hidden border-t border-border bg-card text-card-foreground lg:h-full lg:w-[380px] lg:border-l lg:border-t-0",
               )}
             >
               <div className="flex min-h-17 items-center justify-end gap-2.5 border-b border-border px-4 py-3">

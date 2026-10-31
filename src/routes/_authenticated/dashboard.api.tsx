@@ -1,15 +1,18 @@
 import { ConfirmDialog } from "@/components/ConfirmDialog";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { Copy, Check, Plus, Search, Trash2, FileText, X, Terminal } from "lucide-react";
+import { Copy, Check, Plus, Search, FileText, X, Terminal } from "lucide-react";
+import { KeyActionsMenu } from "@/components/dashboard/KeyActionsMenu";
 import {
   listExtensionKeys,
   createExtensionKey,
   revokeExtensionKey,
   deleteExtensionKey,
   revealExtensionKey,
+  renameExtensionKey,
+  rotateExtensionKey,
   type ExtensionKeyRow,
   type ExtensionKeyAccess,
 } from "@/lib/extension-keys.functions";
@@ -54,6 +57,13 @@ function ExtensionPage() {
   const [deleteTarget, setDeleteTarget] = useState<ExtensionKeyRow | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [query, setQuery] = useState("");
+  const [editTarget, setEditTarget] = useState<ExtensionKeyRow | null>(null);
+  const [editName, setEditName] = useState("");
+  const [rotateTarget, setRotateTarget] = useState<ExtensionKeyRow | null>(null);
+  const [saving, setSaving] = useState(false);
+  const rename = useServerFn(renameExtensionKey);
+  const rotate = useServerFn(rotateExtensionKey);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (typeof window !== "undefined") setOrigin(window.location.origin);
@@ -116,6 +126,14 @@ function ExtensionPage() {
     if (!deleteTarget) return;
     setDeleting(true);
     try {
+      // Active keys are disabled first, then removed.
+      if (!deleteTarget.revoked_at) {
+        const r = await revoke({ data: { id: deleteTarget.id } });
+        if (!r.ok) {
+          toast.error(r.error);
+          return;
+        }
+      }
       const res = await remove({ data: { id: deleteTarget.id } });
       if (!res.ok) {
         toast.error(res.error);
@@ -128,6 +146,54 @@ function ExtensionPage() {
       toast.error(e instanceof Error ? e.message : "Could not delete the key");
     } finally {
       setDeleting(false);
+    }
+  };
+
+  const onRename = async () => {
+    if (!editTarget || !editName.trim()) return;
+    setSaving(true);
+    try {
+      const res = await rename({ data: { id: editTarget.id, name: editName } });
+      if (!res.ok) {
+        toast.error(res.error);
+        return;
+      }
+      setEditTarget(null);
+      toast.success("Key name saved");
+      await refresh();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Could not save the name");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const onRotate = async () => {
+    if (!rotateTarget) return;
+    setSaving(true);
+    try {
+      const res = await rotate({ data: { id: rotateTarget.id } });
+      if (!res.ok) {
+        toast.error(res.error);
+        return;
+      }
+      setRotateTarget(null);
+      setFreshKey(res.key);
+      toast.success("Key rotated — the old key no longer works.");
+      await refresh();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Could not rotate the key");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const copyText = async (value: string, message: string) => {
+    try {
+      await navigator.clipboard.writeText(value);
+      toast.success(message);
+    } catch {
+      toast.error("Copy failed");
     }
   };
 
@@ -361,18 +427,22 @@ function ExtensionPage() {
                       {k.last_used_at ? new Date(k.last_used_at).toLocaleDateString() : "Never"}
                     </td>
                     <td className="py-3.5 pr-4">
-                      <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[12px] font-medium ${k.revoked_at ? "bg-red-500/10 text-red-600 dark:text-red-400" : "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"}`}><span className={`h-1.5 w-1.5 rounded-full ${k.revoked_at ? "bg-red-500" : "bg-emerald-500"}`} />{k.revoked_at ? "Revoked" : "Active"}</span>
+                      <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[12px] font-medium ${k.revoked_at ? "bg-red-500/10 text-red-600 dark:text-red-400" : "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"}`}><span className={`h-1.5 w-1.5 rounded-full ${k.revoked_at ? "bg-red-500" : "bg-emerald-500"}`} />{k.revoked_at ? "Disabled" : "Active"}</span>
                     </td>
                     <td className="py-3.5 text-right">
-                      <button
-                        type="button"
-                        title={k.revoked_at ? "Delete permanently" : "Revoke key"}
-                        aria-label={k.revoked_at ? `Permanently delete ${k.name}` : `Revoke ${k.name}`}
-                        onClick={() => (k.revoked_at ? setDeleteTarget(k) : void onRevoke(k.id))}
-                        className="rounded-full p-2 text-muted-foreground hover:text-rose-600"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
+                      <KeyActionsMenu
+                        keyName={k.name || "Untitled key"}
+                        revoked={Boolean(k.revoked_at)}
+                        onCopyId={() => void copyText(k.id, "Key ID copied")}
+                        onViewUsage={() => void navigate({ to: "/dashboard/usage" })}
+                        onEdit={() => {
+                          setEditTarget(k);
+                          setEditName(k.name);
+                        }}
+                        onDisable={() => void onRevoke(k.id)}
+                        onRotate={() => setRotateTarget(k)}
+                        onDelete={() => setDeleteTarget(k)}
+                      />
                     </td>
                   </tr>
                 ))
@@ -474,6 +544,62 @@ function ExtensionPage() {
         onCancel={() => setDeleteTarget(null)}
         onConfirm={onDelete}
       />
+
+      <ConfirmDialog
+        open={!!rotateTarget}
+        busy={saving}
+        title="Rotate API key?"
+        confirmLabel="Rotate key"
+        busyLabel="Rotating…"
+        description={
+          <>
+            A new secret is created for{" "}
+            <span className="font-medium text-foreground">{rotateTarget?.name}</span> and the old one stops
+            working right away. Update every app that uses it.
+          </>
+        }
+        onCancel={() => setRotateTarget(null)}
+        onConfirm={onRotate}
+      />
+
+      {editTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4" onClick={() => setEditTarget(null)}>
+          <form
+            onClick={(e) => e.stopPropagation()}
+            onSubmit={(e) => {
+              e.preventDefault();
+              void onRename();
+            }}
+            className="w-full max-w-md rounded-2xl border border-border bg-popover p-5 text-popover-foreground shadow-xl"
+          >
+            <div className="flex items-start justify-between gap-3">
+              <div className="text-[16px] font-medium text-foreground">Edit key</div>
+              <button type="button" onClick={() => setEditTarget(null)} aria-label="Close" className="rounded-full p-1 text-muted-foreground hover:bg-[var(--console-card)]">
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+            <label className="mt-4 block text-[13px] text-muted-foreground" htmlFor="edit-key-name">Name</label>
+            <input
+              id="edit-key-name"
+              autoFocus
+              value={editName}
+              maxLength={60}
+              onChange={(e) => setEditName(e.target.value)}
+              className="mt-1.5 w-full rounded-xl border border-border bg-background px-3 py-2 text-[14px] text-foreground outline-none focus:border-foreground/40"
+            />
+            <p className="mt-2 text-[12px] text-muted-foreground">
+              Key ID <code className="font-mono">{editTarget.id.slice(0, 8)}…</code> · created{" "}
+              {new Date(editTarget.created_at).toLocaleDateString()}
+            </p>
+            <div className="mt-5 flex justify-end gap-2">
+              <button type="button" onClick={() => setEditTarget(null)} className="console-pill">Cancel</button>
+              <button type="submit" disabled={saving || !editName.trim()} className="console-pill console-pill-solid disabled:opacity-50">
+                {saving ? "Saving…" : "Save"}
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
     </div>
   );
 }
