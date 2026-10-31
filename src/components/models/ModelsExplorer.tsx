@@ -1,7 +1,7 @@
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState, type ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import {
-  ArrowRight, Braces, Brain, Check, Copy, Eye, Filter, Info, Radio, Search, Wrench,
+  ArrowRight, Braces, Brain, Check, Copy, Eye, Info, Radio, Search, Wrench, X,
 } from "lucide-react";
 import { toast } from "sonner";
 import claudeLogo from "@/assets/model-logos/claude-color.svg";
@@ -15,7 +15,7 @@ import bytedanceLogo from "@/assets/model-logos/bytedance-color.svg";
 import grokLogo from "@/assets/model-logos/grok.svg";
 import metaLogo from "@/assets/model-logos/meta-color.svg";
 import {
-  MODEL_CATALOG, PRICE_PER_MILLION, PROVIDERS, formatContext, getCatalogModel,
+  MIXED_CATALOG, MODEL_CATALOG, PRICE_PER_MILLION, PROVIDERS, formatContext, getCatalogModel, mixByProvider,
   type Capability, type CatalogModel, type ProviderKey,
 } from "@/lib/model-catalog";
 import { cn } from "@/lib/utils";
@@ -57,9 +57,11 @@ function ModelLogo({ m, size = "md" }: { m: CatalogModel; size?: "sm" | "md" | "
 const byIds = (ids: string[]) => ids.map((id) => getCatalogModel(id)).filter(Boolean) as CatalogModel[];
 
 const FLAGSHIPS = byIds(["claude-opus-5.5", "gpt-5.5-pro", "gemini-3.1-pro", "qwen3.8-max", "grok-4.6"]);
-const FAST = MODEL_CATALOG.filter((m) => m.tags.includes("fast")).slice(0, 5);
-const OPEN = MODEL_CATALOG.filter((m) => m.tags.includes("open")).slice(0, 5);
-const CODING = MODEL_CATALOG.filter((m) => m.tags.includes("coding")).slice(0, 5);
+const FAST = mixByProvider(MODEL_CATALOG.filter((m) => m.tags.includes("fast"))).slice(0, 5);
+const OPEN = mixByProvider(MODEL_CATALOG.filter((m) => m.tags.includes("open"))).slice(0, 5);
+const CODING = mixByProvider(MODEL_CATALOG.filter((m) => m.tags.includes("coding"))).slice(0, 5);
+const PROVIDER_KEYS = [...new Set(MIXED_CATALOG.map((m) => m.provider))];
+const CAP_FILTERS: Capability[] = ["reasoning", "vision", "tools", "json"];
 const LONG = [...MODEL_CATALOG].sort((a, b) => b.context - a.context).filter((m, i, a) => a.findIndex((x) => x.provider === m.provider) === i).slice(0, 5);
 const MAX_CONTEXT = Math.max(...MODEL_CATALOG.map((m) => m.context));
 const FAMILY_KEYS: ProviderKey[] = ["anthropic", "openai", "google", "deepseek", "qwen"];
@@ -102,8 +104,8 @@ function MiniTable({ title, sub, rows, cols, onPick }: {
         <table className="w-full min-w-[420px] text-sm">
           <thead>
             <tr className="border-b border-gc-line text-left text-gc-ink-muted">
-              <th className="w-8 py-2 font-normal" />
-              <th className="py-2 font-normal">Model</th>
+              <th className="w-8 py-2 text-left font-normal">#</th>
+              <th className="py-2 pl-[38px] font-normal">Model</th>
               {cols.map((c) => <th key={c.head} className="whitespace-nowrap py-2 pl-4 text-right font-normal">{c.head}</th>)}
             </tr>
           </thead>
@@ -121,6 +123,18 @@ function MiniTable({ title, sub, rows, cols, onPick }: {
         </table>
       </div>
     </section>
+  );
+}
+
+function FilterChip({ active, onClick, children }: { active: boolean; onClick: () => void; children: ReactNode }) {
+  return (
+    <button type="button" onClick={onClick} aria-pressed={active}
+      className={cn(
+        "inline-flex h-8 items-center gap-1.5 rounded-full border px-3 text-xs font-medium transition-colors",
+        active ? "border-gc-blue bg-gc-blue-soft text-gc-blue-deep" : "border-gc-line bg-background text-gc-ink hover:border-gc-blue hover:text-gc-blue-deep",
+      )}>
+      {children}
+    </button>
   );
 }
 
@@ -144,7 +158,7 @@ export default function ModelsExplorer({ apiHref = "/dashboard/api" }: { apiHref
 
   const list = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return MODEL_CATALOG.filter((m) =>
+    return MIXED_CATALOG.filter((m) =>
       (provider === "all" || m.provider === provider) &&
       (cap === "all" || m.capabilities.includes(cap)) &&
       (!q || m.name.toLowerCase().includes(q) || m.id.includes(q) || PROVIDERS[m.provider].label.toLowerCase().includes(q)),
@@ -207,8 +221,11 @@ export default function ModelsExplorer({ apiHref = "/dashboard/api" }: { apiHref
           <p className="text-sm text-gc-ink-muted">Flagship models</p>
           <h2 className="mt-1 text-xl font-medium tracking-tight text-gc-ink sm:text-2xl">The top model from each lab, one key</h2>
           <p className="mt-1.5 text-sm text-gc-ink-muted">Switch between Anthropic, OpenAI, Google, Qwen and xAI by changing a single model ID.</p>
-          <div className="mt-5 flex justify-between border-b border-gc-line pb-2 text-sm text-gc-ink-muted">
-            <span>Model</span><span>Context window</span>
+          <div className="mt-5 flex items-center gap-3 border-b border-gc-line pb-2 text-sm text-gc-ink-muted">
+            <span className="w-5 text-center">#</span>
+            <span className="w-9 shrink-0" aria-hidden />
+            <span className="flex-1">Model</span>
+            <span className="text-right">Context window</span>
           </div>
           <ul>
             {FLAGSHIPS.map((m, i) => (
@@ -300,31 +317,53 @@ export default function ModelsExplorer({ apiHref = "/dashboard/api" }: { apiHref
       {/* Catalogue browser */}
       <section ref={catalogRef} className="scroll-mt-24">
         <SectionHead title="All models" sub="Search, filter and open any model to see its price, specs and capabilities." />
-        <div className="grid overflow-hidden border border-gc-line bg-background md:grid-cols-[300px_1fr]">
+        <div className="grid overflow-hidden border border-gc-line bg-background md:grid-cols-[340px_1fr]">
           <div className="flex min-h-0 flex-col border-b border-gc-line bg-background md:border-b-0 md:border-r">
-            <div className="flex items-center gap-2 p-3">
-              <label className="flex flex-1 items-center gap-2 rounded-lg border border-gc-line bg-background px-3 py-2">
-                <Search className="h-4 w-4 text-gc-ink-muted" aria-hidden />
-                <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search models..." aria-label="Search models"
+            <div className="space-y-4 border-b border-gc-line p-4">
+              <label className="flex h-10 items-center gap-2 rounded-lg border border-gc-line bg-background px-3 transition-colors focus-within:border-gc-blue">
+                <Search className="h-4 w-4 shrink-0 text-gc-ink-muted" aria-hidden />
+                <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search models or companies" aria-label="Search models"
                   className="w-full bg-transparent text-sm text-gc-ink outline-none placeholder:text-gc-ink-muted" />
+                {query && (
+                  <button type="button" onClick={() => setQuery("")} aria-label="Clear search" className="text-gc-ink-muted hover:text-gc-ink"><X className="h-4 w-4" /></button>
+                )}
               </label>
-              <label className="relative grid h-9 w-9 place-items-center rounded-lg border border-gc-line bg-background" title="Filter by provider">
-                <Filter className="h-4 w-4 text-gc-ink-muted" aria-hidden />
-                <select value={provider} onChange={(e) => setProvider(e.target.value as ProviderKey | "all")} aria-label="Filter by provider"
-                  className="absolute inset-0 cursor-pointer opacity-0">
-                  <option value="all">All providers</option>
-                  {(Object.keys(PROVIDERS) as ProviderKey[]).map((k) => <option key={k} value={k}>{PROVIDERS[k].label}</option>)}
-                </select>
-              </label>
-            </div>
-            {(provider !== "all" || cap !== "all") && (
-              <div className="flex flex-wrap items-center gap-1.5 px-3 pb-2 text-xs">
-                {provider !== "all" && <span className="rounded-full bg-gc-blue-soft px-2 py-0.5 text-gc-blue-deep">{PROVIDERS[provider].label}</span>}
-                {cap !== "all" && <span className="rounded-full bg-gc-blue-soft px-2 py-0.5 text-gc-blue-deep">{CAP_META[cap].label}</span>}
-                <button type="button" onClick={() => { setProvider("all"); setCap("all"); }} className="text-gc-ink-muted underline">Clear</button>
+
+              <div>
+                <p className="mb-2 text-xs font-medium uppercase tracking-wider text-gc-ink-muted">Company</p>
+                <div className="flex flex-wrap gap-1.5">
+                  <FilterChip active={provider === "all"} onClick={() => setProvider("all")}>All</FilterChip>
+                  {PROVIDER_KEYS.map((k) => (
+                    <FilterChip key={k} active={provider === k} onClick={() => setProvider(provider === k ? "all" : k)}>
+                      <img src={LOGOS[k]} alt="" className="h-3.5 w-3.5 object-contain" aria-hidden /> {PROVIDERS[k].label}
+                    </FilterChip>
+                  ))}
+                </div>
               </div>
-            )}
-            <ul className="max-h-[420px] overflow-y-auto px-2 pb-2 md:max-h-[520px]">
+
+              <div>
+                <p className="mb-2 text-xs font-medium uppercase tracking-wider text-gc-ink-muted">Capability</p>
+                <div className="flex flex-wrap gap-1.5">
+                  <FilterChip active={cap === "all"} onClick={() => setCap("all")}>Any</FilterChip>
+                  {CAP_FILTERS.map((c) => {
+                    const Icon = CAP_META[c].icon;
+                    return (
+                      <FilterChip key={c} active={cap === c} onClick={() => setCap(cap === c ? "all" : c)}>
+                        <Icon className="h-3.5 w-3.5" aria-hidden /> {CAP_META[c].label}
+                      </FilterChip>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between text-xs text-gc-ink-muted">
+                <span className="tabular-nums">{list.length} of {MODEL_CATALOG.length} models</span>
+                {(provider !== "all" || cap !== "all" || query) && (
+                  <button type="button" onClick={() => { setProvider("all"); setCap("all"); setQuery(""); }} className="font-medium text-gc-blue-deep hover:underline">Reset filters</button>
+                )}
+              </div>
+            </div>
+            <ul className="max-h-[420px] overflow-y-auto p-2 md:max-h-[560px]">
               {list.length === 0 && <li className="px-3 py-6 text-center text-sm text-gc-ink-muted">No models match.</li>}
               {list.map((m) => (
                 <li key={m.id}>
@@ -333,7 +372,7 @@ export default function ModelsExplorer({ apiHref = "/dashboard/api" }: { apiHref
                     <ModelLogo m={m} size="sm" />
                     <span className="min-w-0 flex-1">
                       <span className="block truncate text-sm font-semibold text-gc-ink">{m.name}</span>
-                      <span className="block truncate font-mono text-xs text-gc-ink-muted">{m.id}</span>
+                      <span className="block truncate text-xs text-gc-ink-muted">{PROVIDERS[m.provider].label} · {m.id}</span>
                     </span>
                     {m.id === "claude-opus-5" && <span className="h-1.5 w-1.5 rounded-full bg-gc-blue" aria-label="Default" />}
                   </button>
@@ -347,7 +386,7 @@ export default function ModelsExplorer({ apiHref = "/dashboard/api" }: { apiHref
               <ModelLogo m={current} size="lg" />
               <div className="min-w-0">
                 <h3 className="truncate text-lg font-semibold text-gc-ink">{current.name}</h3>
-                <p className="font-mono text-sm text-gc-ink-muted">{current.id}</p>
+                <p className="text-sm text-gc-ink-muted">{PROVIDERS[current.provider].label} · {current.id}</p>
               </div>
             </div>
             <p className="mt-3 text-sm text-gc-ink">{current.description}</p>
