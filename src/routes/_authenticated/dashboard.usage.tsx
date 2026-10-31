@@ -114,7 +114,15 @@ const RANGES = [
   { days: 7, label: "Last 7 days" },
   { days: 14, label: "Last 14 days" },
   { days: 30, label: "Last 30 days" },
+  { days: 90, label: "Last 90 days" },
 ] as const;
+
+const SERIES_COLORS = ["#f4a261", "#2a9d8f", "#3d5a6c", "#e76f51", "#8d99ae", "#e9c46a"];
+
+function apiKeyIdOf(row: { metadata?: unknown }) {
+  const meta = row.metadata as { api_key_id?: unknown } | null | undefined;
+  return typeof meta?.api_key_id === "string" ? meta.api_key_id : "";
+}
 
 function UsagePage() {
   const fetchStats = useServerFn(getUsageStats);
@@ -417,6 +425,60 @@ function UsagePage() {
   const requestBars = chartDays.map((day) => day.requests);
   const shortRange = `${rangeDays}d`;
 
+  // Spend chart series follow "Group by": API type, API key or model.
+  const keyNames = new Map((data?.recentExtensionKeys ?? []).map((k) => [k.id, k.name]));
+  const seriesNameOf = (row: (typeof derived.spendRows)[number]) => {
+    if (groupBy === "key") {
+      const id = apiKeyIdOf(row);
+      return id ? (keyNames.get(id) ?? "Other key") : "No API key";
+    }
+    return row.model ? modelDisplay(row.model).model : "No model";
+  };
+  const series =
+    groupBy === "type"
+      ? API_TYPES.map((t) => ({ id: t.id as string, label: t.label, color: t.color, total: typeTotals[t.id] }))
+      : (() => {
+          const totals = new Map<string, number>();
+          for (const row of derived.spendRows) {
+            const name = seriesNameOf(row);
+            totals.set(name, (totals.get(name) ?? 0) + Math.abs(row.delta));
+          }
+          return [...totals.entries()]
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, SERIES_COLORS.length)
+            .map(([name, total], i) => ({ id: `s${i}`, label: name, color: SERIES_COLORS[i]!, total }));
+        })();
+  const seriesDays =
+    groupBy === "type"
+      ? (typedDays as ({ date: string } & Record<string, number>)[])
+      : (() => {
+          const ids = new Map(series.map((x) => [x.label, x.id]));
+          const out = chartDays.map((day) => {
+            const row: { date: string } & Record<string, number> = { date: day.date } as never;
+            for (const x of series) row[x.id] = 0;
+            return row;
+          });
+          for (const row of derived.spendRows) {
+            const id = ids.get(seriesNameOf(row));
+            if (!id) continue;
+            const date = row.created_at.slice(0, 10);
+            let index = typedIndex.get(date) ?? -1;
+            if (index < 0) for (let i = 0; i < sortedDates.length; i++) if (sortedDates[i]! <= date) index = i;
+            if (index < 0) continue;
+            out[index]![id] = (out[index]![id] ?? 0) + Math.abs(row.delta);
+          }
+          return out;
+        })();
+  const keyOptions = (() => {
+    const used = new Set<string>();
+    for (const row of data?.ledger ?? []) {
+      const id = apiKeyIdOf(row);
+      if (id) used.add(id);
+    }
+    return [...used].map((id) => ({ value: id, label: keyNames.get(id) ?? `Key ${id.slice(0, 6)}` }));
+  })();
+  const granularityLabel = groupDays === 1 ? "Day" : groupDays === 7 ? "Week" : "Month";
+
   return (
     <div className="mx-auto w-full max-w-[1100px] pb-10 text-foreground">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -425,25 +487,46 @@ function UsagePage() {
       </div>
 
       {/* Filter bar */}
-      <div className="mt-6 flex flex-wrap items-center gap-2">
+      <div className="mt-5 flex flex-wrap items-center gap-x-6 gap-y-2">
         <ConsoleSelect
+          plain
           open={openMenu === "type"}
           onToggle={() => setOpenMenu(openMenu === "type" ? null : "type")}
           label="Group by"
-          valueLabel="API Type"
-          options={[{ value: "type", label: "API Type" }]}
-          value="type"
-          onSelect={() => setOpenMenu(null)}
+          valueLabel={groupBy === "type" ? "API Type" : groupBy === "key" ? "API Key" : "Model"}
+          options={[
+            { value: "type", label: "API Type" },
+            { value: "key", label: "API Key" },
+            { value: "model", label: "Model" },
+          ]}
+          value={groupBy}
+          onSelect={(v) => {
+            setGroupBy(v as "type" | "key" | "model");
+            setOpenMenu(null);
+          }}
         />
         <ConsoleSelect
+          plain
+          open={openMenu === "key"}
+          onToggle={() => setOpenMenu(openMenu === "key" ? null : "key")}
+          label="API Key"
+          valueLabel={apiKey === "all" ? "All" : (keyOptions.find((k) => k.value === apiKey)?.label ?? "All")}
+          options={[{ value: "all", label: "All" }, ...keyOptions]}
+          emptyText={keyOptions.length === 0 ? "No usage in this period" : undefined}
+          value={apiKey}
+          onSelect={(v) => {
+            setApiKey(v);
+            setOpenMenu(null);
+          }}
+        />
+        <ConsoleSelect
+          plain
           open={openMenu === "model"}
           onToggle={() => setOpenMenu(openMenu === "model" ? null : "model")}
           label="Model"
           valueLabel={model === "all" ? "All" : modelDisplay(model).model}
-          options={[
-            { value: "all", label: "All models" },
-            ...models.map((m) => ({ value: m, label: modelDisplay(m).model })),
-          ]}
+          options={[{ value: "all", label: "All" }, ...models.map((m) => ({ value: m, label: modelDisplay(m).model }))]}
+          emptyText={models.length === 0 ? "No usage in this period" : undefined}
           value={model}
           onSelect={(v) => {
             setModel(v);
@@ -451,58 +534,68 @@ function UsagePage() {
           }}
         />
         <ConsoleSelect
+          plain
           open={openMenu === "group"}
           onToggle={() => setOpenMenu(openMenu === "group" ? null : "group")}
           label="Granularity"
-          valueLabel={groupDays === 1 ? "Day" : `${groupDays} days`}
-          options={[1, 7, 14]
-            .filter((days) => days < rangeDays || days === 1)
-            .map((days) => ({ value: String(days), label: days === 1 ? "Day" : `${days} days` }))}
+          valueLabel={granularityLabel}
+          options={[
+            { value: "30", label: "Month" },
+            { value: "7", label: "Week" },
+            { value: "1", label: "Day" },
+          ]}
           value={String(groupDays)}
           onSelect={(value) => {
-            setGroupDays(Number(value));
-            setOpenMenu(null);
-          }}
-        />
-        <ConsoleSelect
-          open={openMenu === "range"}
-          onToggle={() => setOpenMenu(openMenu === "range" ? null : "range")}
-          valueLabel={`${rangeStartLabel(rangeDays)} – ${rangeEndLabel()}`}
-          icon={<Calendar className="h-3.5 w-3.5 text-muted-foreground" />}
-          options={RANGES.map((r) => ({ value: String(r.days), label: r.label }))}
-          value={String(rangeDays)}
-          onSelect={(v) => {
-            const next = Number(v);
-            setRangeDays(next);
-            if (groupDays >= next) setGroupDays(1);
+            const next = Number(value);
+            setGroupDays(next);
+            if (next >= rangeDays) setRangeDays(next === 7 ? 30 : 90);
             setOpenMenu(null);
           }}
         />
         <div className="ml-auto flex items-center gap-1">
-          <Button
+          <button
             type="button"
-            variant="ghost"
-            size="icon"
-            onClick={async () => {
-              const result = await refetch();
-              if (result.isError) toast.error("Usage could not be refreshed");
-              else toast.success("Usage refreshed");
-            }}
-            aria-label="Refresh usage"
-            className="h-9 w-9 shrink-0 rounded-full text-muted-foreground"
+            onClick={() => setShift((v) => v + 1)}
+            aria-label="Previous period"
+            className="grid h-8 w-8 place-items-center rounded-md text-foreground transition-colors hover:bg-foreground/[0.06]"
           >
-            <RefreshCw className={`h-4 w-4 ${isFetching ? "animate-spin" : ""}`} />
-          </Button>
-          <Button
+            <ChevronLeft className="h-4 w-4" />
+          </button>
+          <ConsoleSelect
+            plain
+            align="right"
+            open={openMenu === "range"}
+            onToggle={() => setOpenMenu(openMenu === "range" ? null : "range")}
+            valueLabel={`${rangeStartLabel(rangeDays, offsetDays)} - ${rangeEndLabel(offsetDays)}`}
+            icon={<Calendar className="h-4 w-4 text-foreground" />}
+            hideArrows
+            options={RANGES.map((r) => ({ value: String(r.days), label: r.label }))}
+            value={String(rangeDays)}
+            onSelect={(v) => {
+              const next = Number(v);
+              setRangeDays(next);
+              setShift(0);
+              if (groupDays >= next) setGroupDays(1);
+              setOpenMenu(null);
+            }}
+          />
+          <button
             type="button"
-            variant="ghost"
-            size="icon"
+            onClick={() => setShift((v) => Math.max(0, v - 1))}
+            disabled={shift === 0}
+            aria-label="Next period"
+            className="grid h-8 w-8 place-items-center rounded-md text-foreground transition-colors hover:bg-foreground/[0.06] disabled:text-muted-foreground/50 disabled:hover:bg-transparent"
+          >
+            <ChevronRight className="h-4 w-4" />
+          </button>
+          <button
+            type="button"
             onClick={exportCsv}
             aria-label="Download usage CSV"
-            className="h-9 w-9 shrink-0 rounded-full text-muted-foreground"
+            className="ml-1 grid h-8 w-8 place-items-center rounded-md text-foreground transition-colors hover:bg-foreground/[0.06]"
           >
             <Download className="h-4 w-4" />
-          </Button>
+          </button>
         </div>
       </div>
 
@@ -515,17 +608,17 @@ function UsagePage() {
           </div>
           <StackedBars
             className="mt-4 flex-1"
-            days={typedDays}
-            keys={API_TYPES.map((t) => t.id)}
-            colors={API_TYPES.map((t) => t.color)}
+            days={seriesDays}
+            keys={series.map((t) => t.id)}
+            colors={series.map((t) => t.color)}
             format={(v) => fmtUsd(v, 2)}
           />
           <div className="mt-4 flex flex-wrap items-center justify-center gap-x-5 gap-y-1.5 text-[12px]">
-            {API_TYPES.map((t) => (
+            {series.map((t) => (
               <span key={t.id} className="inline-flex items-center gap-1.5 text-foreground">
                 <span className="h-2 w-2 rounded-[2px]" style={{ background: t.color }} />
                 {t.label}
-                <span className="text-muted-foreground">({fmtUsd(typeTotals[t.id], 2)})</span>
+                <span className="text-muted-foreground">({fmtUsd(t.total, 2)})</span>
               </span>
             ))}
           </div>
@@ -728,14 +821,16 @@ function dateLabel(date: Date) {
   return date.toLocaleDateString(undefined, { month: "short", day: "2-digit" });
 }
 
-function rangeStartLabel(days: number) {
+function rangeStartLabel(days: number, offset = 0) {
   const start = new Date();
-  start.setDate(start.getDate() - (days - 1));
-  return dateLabel(start);
+  start.setDate(start.getDate() - (days - 1) - offset);
+  return start.toLocaleDateString(undefined, { month: "short", day: "numeric" });
 }
 
-function rangeEndLabel() {
-  return dateLabel(new Date());
+function rangeEndLabel(offset = 0) {
+  const end = new Date();
+  end.setDate(end.getDate() - offset);
+  return end.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
 }
 
 function TabButton({
