@@ -3,36 +3,49 @@ import { useEffect, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import {
   ArrowUp,
-  BookOpen,
+  Braces,
   Check,
   ChevronDown,
   Code2,
   Copy,
   FileText,
+  ImageIcon,
   Languages,
+  Lightbulb,
   LineChart,
   Loader2,
   Mail,
+  Newspaper,
+  Paperclip,
+  Plus,
   RotateCcw,
   SlidersHorizontal,
-  Sparkles,
-  Table2,
   Wallet,
+  X,
+  type LucideIcon,
 } from "lucide-react";
+import { toast } from "sonner";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { MessageResponse } from "@/components/ai-elements/message";
 import { highlight } from "@/components/dashboard/CodeHighlight";
 import { MIXED_CATALOG, PROVIDERS, PRICE_PER_MILLION, formatContext, getCatalogModel } from "@/lib/model-catalog";
 import { playgroundChat } from "@/lib/playground.functions";
-import { PLAYGROUND_MAX_TOKENS, type PlaygroundTurn } from "@/lib/playground";
+import { PLAYGROUND_DEFAULT_MODEL, PLAYGROUND_MAX_IMAGES, PLAYGROUND_MAX_TOKENS, type PlaygroundTurn } from "@/lib/playground";
+import { DOC_ACCEPT, IMAGE_ACCEPT, composeMessage, readAttachment, type ChatAttachment } from "@/components/dashboard/chat-attachments";
 
 export const Route = createFileRoute("/_authenticated/dashboard/chat")({
   head: () => ({
     meta: [
-      { title: "Chat Playground · Jenvu Console" },
+      { title: "Chat API · Jenvu Console" },
       { name: "description", content: "Try every Jenvu API model in a chat before you build with it." },
-      { property: "og:title", content: "Chat Playground · Jenvu Console" },
+      { property: "og:title", content: "Chat API · Jenvu Console" },
       { property: "og:description", content: "Try every Jenvu API model in a chat before you build with it." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -44,6 +57,9 @@ export const Route = createFileRoute("/_authenticated/dashboard/chat")({
 
 type Turn = PlaygroundTurn & {
   id: string;
+  /** What the user typed (content also carries attached document text). */
+  display?: string;
+  files?: { name: string; kind: "image" | "doc"; url?: string }[];
   model?: string;
   tokens?: number;
   cost?: number;
@@ -52,22 +68,94 @@ type Turn = PlaygroundTurn & {
 };
 
 const API_BASE = "https://jenvu.com/api/public/v1";
-const DEFAULT_MODEL = "claude-opus-5";
 
-const EXAMPLES = [
-  { icon: LineChart, title: "Market idea", text: "Explain a liquidity sweep on Gold in two sentences.", prompt: "Explain a liquidity sweep on Gold (XAU/USD) in two sentences." },
-  { icon: Code2, title: "Write code", text: "A Python function for a simple moving average.", prompt: "Write a Python function that returns a simple moving average for a list of prices." },
-  { icon: BookOpen, title: "Explain a concept", text: "FVG vs order block, in plain words.", prompt: "Summarise the difference between a fair value gap and an order block in plain words." },
-  { icon: Mail, title: "Draft an email", text: "A polite note asking for an invoice.", prompt: "Draft a short, polite email asking a supplier to send last month's invoice." },
-  { icon: FileText, title: "Summarise text", text: "Turn a long paragraph into 3 bullet points.", prompt: "Summarise this into 3 bullet points: Gold often reacts to US dollar strength, interest-rate expectations and risk sentiment, so traders watch economic news, yields and session opens before planning entries." },
-  { icon: Table2, title: "Make a table", text: "Compare London and New York sessions.", prompt: "Make a small markdown table comparing the London and New York trading sessions (hours in UTC, typical behaviour)." },
-  { icon: Languages, title: "Translate", text: "Translate a short message to Spanish.", prompt: "Translate to Spanish: \"Your account is ready. Sign in to start testing models.\"" },
-  { icon: Sparkles, title: "Brainstorm", text: "Five names for a trading journal app.", prompt: "Give me five short, memorable names for a trading journal app, each with a one-line reason." },
+type Example = {
+  icon: LucideIcon;
+  tone: string;
+  title: string;
+  text: string;
+  tags: string[];
+  prompt: string;
+  instructions?: string;
+};
+
+// Colored icon chips, one tone per card (light and dark variants).
+const EXAMPLES: Example[] = [
+  {
+    icon: Lightbulb,
+    tone: "bg-amber-100 text-amber-600 dark:bg-amber-500/15 dark:text-amber-400",
+    title: "Brainstorm product names",
+    text: "Generate punchy, memorable names for a new product.",
+    tags: ["System prompt"],
+    instructions: "You are a naming expert. Give short, punchy names with a one-line reason each.",
+    prompt: "Suggest 8 names for a trading journal app for Gold traders.",
+  },
+  {
+    icon: Newspaper,
+    tone: "bg-violet-100 text-violet-600 dark:bg-violet-500/15 dark:text-violet-400",
+    title: "Summarize an article",
+    text: "Condense long-form text into a tight, faithful summary.",
+    tags: ["System prompt", "Documents"],
+    instructions: "Summarize faithfully in 3 to 5 bullet points. Do not add facts that aren't in the text.",
+    prompt: "Summarize this: Gold often reacts to US dollar strength, interest-rate expectations and risk sentiment, so traders watch economic news, yields and session opens before planning entries.",
+  },
+  {
+    icon: Braces,
+    tone: "bg-emerald-100 text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-400",
+    title: "Extract structured data",
+    text: "Pull fields from unstructured text into JSON.",
+    tags: ["Structured outputs"],
+    instructions: "Reply with valid JSON only, no extra text.",
+    prompt: 'Extract {"name","email","company","budget_usd"} from: "Hi, I\'m Sara Khan from Northwind, sara@northwind.io — our budget is about $4,500."',
+  },
+  {
+    icon: Code2,
+    tone: "bg-pink-100 text-pink-600 dark:bg-pink-500/15 dark:text-pink-400",
+    title: "Review a code snippet",
+    text: "Get a focused review with concrete, actionable fixes.",
+    tags: ["System prompt", "Reasoning"],
+    instructions: "You are a senior engineer. List bugs first, then improvements, each with a short fix.",
+    prompt: "Review this Python:\n\ndef sma(prices, n):\n    return sum(prices[-n:]) / n",
+  },
+  {
+    icon: ImageIcon,
+    tone: "bg-sky-100 text-sky-600 dark:bg-sky-500/15 dark:text-sky-400",
+    title: "Describe an image",
+    text: "Attach a screenshot or photo and ask about it.",
+    tags: ["Image input"],
+    prompt: "Describe what you see in the attached image in 3 short points.",
+  },
+  {
+    icon: LineChart,
+    tone: "bg-zinc-200 text-zinc-800 dark:bg-zinc-500/20 dark:text-zinc-200",
+    title: "Explain a market idea",
+    text: "Plain-words explanation of a trading concept.",
+    tags: ["System prompt"],
+    instructions: "Explain simply, no financial advice, no guaranteed outcomes.",
+    prompt: "Explain a liquidity sweep on Gold (XAU/USD) in two sentences.",
+  },
+  {
+    icon: Mail,
+    tone: "bg-indigo-100 text-indigo-600 dark:bg-indigo-500/15 dark:text-indigo-400",
+    title: "Draft an email",
+    text: "Turn a one-line brief into a polite, clear email.",
+    tags: ["System prompt"],
+    instructions: "Write short, polite, professional emails.",
+    prompt: "Ask a supplier to send last month's invoice by Friday.",
+  },
+  {
+    icon: Languages,
+    tone: "bg-fuchsia-100 text-fuchsia-600 dark:bg-fuchsia-500/15 dark:text-fuchsia-400",
+    title: "Translate text",
+    text: "Translate a message while keeping its tone.",
+    tags: ["Multilingual"],
+    prompt: 'Translate to Spanish and Urdu: "Your account is ready. Sign in to start testing models."',
+  },
 ];
 
 function ChatPlayground() {
   const send = useServerFn(playgroundChat);
-  const [model, setModel] = useState<string>(DEFAULT_MODEL);
+  const [model, setModel] = useState<string>(PLAYGROUND_DEFAULT_MODEL);
   const [modelOpen, setModelOpen] = useState(false);
   const [turns, setTurns] = useState<Turn[]>([]);
   const [input, setInput] = useState("");
@@ -76,8 +164,12 @@ function ChatPlayground() {
   const [maxTokens, setMaxTokens] = useState(1200);
   const [copied, setCopied] = useState<string | null>(null);
   const [codeOpen, setCodeOpen] = useState(false);
+  const [files, setFiles] = useState<ChatAttachment[]>([]);
+  const [reading, setReading] = useState(false);
   const scroller = useRef<HTMLDivElement>(null);
   const box = useRef<HTMLTextAreaElement>(null);
+  const imageInput = useRef<HTMLInputElement>(null);
+  const docInput = useRef<HTMLInputElement>(null);
 
   const info = getCatalogModel(model);
   const last = [...turns].reverse().find((t) => t.role === "assistant" && !t.error);
@@ -86,13 +178,45 @@ function ChatPlayground() {
     scroller.current?.scrollTo({ top: scroller.current.scrollHeight, behavior: "smooth" });
   }, [turns, busy]);
 
-  const submit = async (text?: string) => {
-    const content = (text ?? input).trim();
-    if (!content || busy) return;
-    const userTurn: Turn = { id: crypto.randomUUID(), role: "user", content };
+  const addFiles = async (list: FileList | null, kind: "image" | "doc") => {
+    if (!list?.length) return;
+    setReading(true);
+    try {
+      for (const file of Array.from(list)) {
+        if (kind === "image" && files.filter((f) => f.kind === "image").length >= PLAYGROUND_MAX_IMAGES) {
+          toast.error(`Up to ${PLAYGROUND_MAX_IMAGES} images per message.`);
+          break;
+        }
+        try {
+          const a = await readAttachment(file, kind);
+          setFiles((cur) => [...cur, a]);
+          if (a.kind === "doc" && a.truncated) toast.message(`${a.name} is long — only the first part is sent.`);
+        } catch (e) {
+          toast.error(e instanceof Error ? e.message : `Couldn't read ${file.name}.`);
+        }
+      }
+    } finally {
+      setReading(false);
+    }
+  };
+
+  const submit = async () => {
+    const typed = input.trim();
+    if ((!typed && !files.length) || busy || reading) return;
+    const attached = files;
+    const content = composeMessage(typed || "Please look at the attached file.", attached);
+    const images = attached.flatMap((f) => (f.kind === "image" ? [f.url] : []));
+    const userTurn: Turn = {
+      id: crypto.randomUUID(),
+      role: "user",
+      content,
+      display: typed,
+      files: attached.map((f) => ({ name: f.name, kind: f.kind, url: f.kind === "image" ? f.url : undefined })),
+    };
     const history = [...turns.filter((t) => !t.error), userTurn];
     setTurns((t) => [...t, userTurn]);
     setInput("");
+    setFiles([]);
     setBusy(true);
     try {
       const res = await send({
@@ -100,6 +224,7 @@ function ChatPlayground() {
           model,
           instructions,
           maxTokens,
+          images,
           turns: history.map(({ role, content: c }) => ({ role, content: c })),
         },
       });
@@ -126,6 +251,13 @@ function ChatPlayground() {
       setBusy(false);
       box.current?.focus();
     }
+  };
+
+  const useExample = (ex: Example) => {
+    setInstructions(ex.instructions ?? "");
+    setInput(ex.prompt);
+    if (ex.tags.includes("Image input")) imageInput.current?.click();
+    requestAnimationFrame(() => box.current?.focus());
   };
 
   const copyText = async (id: string, text: string) => {
@@ -193,37 +325,48 @@ function ChatPlayground() {
   );
 
   return (
-    <section className="mx-auto flex h-[calc(100dvh-150px)] min-h-[560px] w-full max-w-[1000px] flex-col">
+    <section className="mx-auto flex h-[calc(100dvh-96px)] min-h-[600px] w-full max-w-[1060px] flex-col">
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-[28px] font-medium tracking-tight text-foreground">Chat</h1>
+        <h1 className="text-[28px] font-medium tracking-tight text-foreground">Chat API</h1>
         <div className="flex items-center gap-2">
           {turns.length > 0 && (
             <button type="button" onClick={() => setTurns([])} disabled={busy} className="console-pill disabled:opacity-45">
               <RotateCcw className="h-4 w-4" /> New chat
             </button>
           )}
-          <button type="button" onClick={() => setCodeOpen(true)} className="console-pill">
-            <Code2 className="h-4 w-4" /> View code
+          <button type="button" onClick={() => setCodeOpen(true)} className="inline-flex items-center gap-1.5 text-[14px] text-muted-foreground hover:text-foreground">
+            <Code2 className="h-4 w-4" /> View Code
           </button>
         </div>
       </div>
 
       {/* Conversation / examples */}
-      <div ref={scroller} className="mt-5 min-h-0 flex-1 overflow-y-auto pr-1">
+      <div ref={scroller} className="mt-3 min-h-0 flex-1 overflow-y-auto pr-1">
         {turns.length === 0 ? (
-          <div className="flex min-h-full flex-col justify-center pb-4">
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="flex min-h-full flex-col justify-center py-2">
+            <div className="text-center">
+              <h2 className="text-[17px] font-medium text-foreground">Start a chat with examples</h2>
+              <p className="mt-1 text-[14px] text-muted-foreground">Pick a use case to see the exact prompt and settings, then make it your own.</p>
+            </div>
+            <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
               {EXAMPLES.map((ex) => (
                 <button
                   key={ex.title}
                   type="button"
-                  onClick={() => void submit(ex.prompt)}
-                  className="group flex min-h-[132px] flex-col rounded-2xl border border-border p-4 text-left transition-colors hover:bg-[var(--console-card)]"
+                  onClick={() => useExample(ex)}
+                  className="flex flex-col rounded-2xl border border-border bg-background p-4 text-left transition-colors hover:bg-[var(--console-card)]"
                 >
-                  <ex.icon className="h-5 w-5 text-muted-foreground group-hover:text-foreground" aria-hidden="true" />
-                  <span className="mt-auto pt-6 text-[15px] font-medium text-foreground">{ex.title}</span>
+                  <span className={`grid h-7 w-7 place-items-center rounded-full ${ex.tone}`}>
+                    <ex.icon className="h-4 w-4" aria-hidden="true" />
+                  </span>
+                  <span className="mt-3 text-[15px] font-medium text-foreground">{ex.title}</span>
                   <span className="mt-1 text-[13px] leading-snug text-muted-foreground">{ex.text}</span>
+                  <span className="mt-3 flex flex-wrap gap-1.5">
+                    {ex.tags.map((t) => (
+                      <span key={t} className="rounded-md bg-[var(--console-card)] px-2 py-0.5 text-[12px] text-foreground">{t}</span>
+                    ))}
+                  </span>
                 </button>
               ))}
             </div>
@@ -232,10 +375,25 @@ function ChatPlayground() {
           <div className="space-y-6 pb-4">
             {turns.map((t) =>
               t.role === "user" ? (
-                <div key={t.id} className="flex justify-end">
-                  <div className="max-w-[80%] whitespace-pre-wrap rounded-2xl bg-[var(--console-card)] px-4 py-2.5 text-[15px] text-foreground">
-                    {t.content}
-                  </div>
+                <div key={t.id} className="flex flex-col items-end gap-2">
+                  {!!t.files?.length && (
+                    <div className="flex max-w-[80%] flex-wrap justify-end gap-2">
+                      {t.files.map((f, i) =>
+                        f.kind === "image" && f.url ? (
+                          <img key={i} src={f.url} alt={f.name} className="h-20 w-20 rounded-xl object-cover" />
+                        ) : (
+                          <span key={i} className="inline-flex items-center gap-1.5 rounded-xl bg-[var(--console-card)] px-3 py-2 text-[13px] text-foreground">
+                            <FileText className="h-4 w-4 text-muted-foreground" /> {f.name}
+                          </span>
+                        ),
+                      )}
+                    </div>
+                  )}
+                  {(t.display ?? t.content) && (
+                    <div className="max-w-[80%] whitespace-pre-wrap rounded-2xl bg-[var(--console-card)] px-4 py-2.5 text-[15px] text-foreground">
+                      {t.display ?? t.content}
+                    </div>
+                  )}
                 </div>
               ) : (
                 <div key={t.id} className="group">
@@ -271,94 +429,150 @@ function ChatPlayground() {
         )}
       </div>
 
-      {/* Credits notice */}
-      <div className="mt-3 flex flex-wrap items-center justify-between gap-2 rounded-2xl bg-[var(--console-card)] px-4 py-2.5 text-[13px] text-muted-foreground">
-        <span className="inline-flex items-center gap-2">
-          <Wallet className="h-4 w-4 shrink-0" aria-hidden="true" />
-          Replies use your AI wallet at ${PRICE_PER_MILLION} / 1M tokens, the same as the API.
-        </span>
-        <Link to="/dashboard/billing" className="font-medium text-foreground underline underline-offset-2">
-          Add credit
-        </Link>
-      </div>
-
-      {/* Composer */}
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          void submit();
-        }}
-        className="mt-3 rounded-3xl border border-border bg-background px-4 pb-3 pt-3 focus-within:border-foreground/30"
-      >
-        <textarea
-          ref={box}
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" && !e.shiftKey) {
-              e.preventDefault();
-              void submit();
-            }
-          }}
-          rows={2}
-          placeholder="Ask anything…"
-          aria-label="Message"
-          className="max-h-40 min-h-[48px] w-full resize-none bg-transparent text-[15px] text-foreground outline-none placeholder:text-muted-foreground"
-        />
-        <div className="mt-2 flex items-center justify-between gap-2">
-          <div className="flex min-w-0 items-center gap-1.5">
-            <Popover>
-              <PopoverTrigger asChild>
-                <button type="button" aria-label="Chat settings" className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-muted-foreground hover:bg-[var(--console-card)] hover:text-foreground">
-                  <SlidersHorizontal className="h-4 w-4" />
-                </button>
-              </PopoverTrigger>
-              <PopoverContent align="start" side="top" className="w-[min(340px,90vw)] rounded-2xl p-4">
-                <div className="mb-4 text-[14px] font-medium text-foreground">System prompt &amp; parameters</div>
-                {settings}
-              </PopoverContent>
-            </Popover>
-
-            <Popover open={modelOpen} onOpenChange={setModelOpen}>
-              <PopoverTrigger asChild>
-                <button type="button" aria-label="Choose a model" className="inline-flex min-w-0 items-center gap-1.5 rounded-full px-3 py-2 text-[14px] text-foreground hover:bg-[var(--console-card)]">
-                  <span className="truncate">{info?.name ?? model}</span>
-                  <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground" />
-                </button>
-              </PopoverTrigger>
-              <PopoverContent align="start" side="top" className="max-h-[360px] w-[min(320px,90vw)] overflow-y-auto rounded-2xl p-1.5">
-                {MIXED_CATALOG.map((m) => (
-                  <button
-                    key={m.id}
-                    type="button"
-                    onClick={() => {
-                      setModel(m.id);
-                      setModelOpen(false);
-                    }}
-                    className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-left hover:bg-[var(--console-card)]"
-                  >
-                    <span className="min-w-0 flex-1">
-                      <span className="block truncate text-[14px] text-foreground">{m.name}</span>
-                      <span className="block text-[12px] text-muted-foreground">
-                        {PROVIDERS[m.provider].label} · {formatContext(m.context)}
-                      </span>
-                    </span>
-                    {m.id === model && <Check className="h-4 w-4 shrink-0 text-foreground" />}
-                  </button>
-                ))}
-              </PopoverContent>
-            </Popover>
-          </div>
-          <button
-            type="submit"
-            disabled={!input.trim() || busy}
-            aria-label="Send"
-            className="console-pill-solid flex h-9 w-9 shrink-0 items-center justify-center rounded-full disabled:opacity-40"
-          >
-            {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <ArrowUp className="h-4 w-4" />}
-          </button>
+      <div className="mx-auto w-full max-w-[640px]">
+        {/* Credits notice */}
+        <div className="mt-3 flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-[var(--console-card)] px-4 py-3">
+          <span className="inline-flex items-start gap-3">
+            <Wallet className="mt-0.5 h-4 w-4 shrink-0 text-orange-500" aria-hidden="true" />
+            <span>
+              <span className="block text-[14px] font-medium text-foreground">Replies use your AI wallet.</span>
+              <span className="block text-[12px] text-muted-foreground">${PRICE_PER_MILLION} / 1M tokens, the same as the API.</span>
+            </span>
+          </span>
+          <Link to="/dashboard/billing" className="console-pill-solid rounded-full px-4 py-2 text-[13px] font-medium">
+            Add credit
+          </Link>
         </div>
-      </form>
+
+        {/* Composer */}
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            void submit();
+          }}
+          className="mt-2 rounded-2xl bg-[var(--console-card)] px-4 pb-2.5 pt-3"
+        >
+          {!!files.length && (
+            <div className="mb-2 flex flex-wrap gap-2">
+              {files.map((f) => (
+                <span key={f.id} className="relative inline-flex items-center gap-1.5 rounded-xl bg-background py-1 pl-1 pr-7 text-[12px] text-foreground">
+                  {f.kind === "image" ? (
+                    <img src={f.url} alt="" className="h-8 w-8 rounded-lg object-cover" />
+                  ) : (
+                    <span className="grid h-8 w-8 place-items-center rounded-lg bg-[var(--console-card)]"><FileText className="h-4 w-4 text-muted-foreground" /></span>
+                  )}
+                  <span className="max-w-[140px] truncate">{f.name}</span>
+                  <button
+                    type="button"
+                    aria-label={`Remove ${f.name}`}
+                    onClick={() => setFiles((cur) => cur.filter((x) => x.id !== f.id))}
+                    className="absolute right-1.5 top-1/2 -translate-y-1/2 rounded-full p-0.5 text-muted-foreground hover:text-foreground"
+                  >
+                    <X className="h-3.5 w-3.5" />
+                  </button>
+                </span>
+              ))}
+            </div>
+          )}
+          <textarea
+            ref={box}
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                void submit();
+              }
+            }}
+            onPaste={(e) => {
+              const imgs = Array.from(e.clipboardData.files).filter((f) => f.type.startsWith("image/"));
+              if (imgs.length) {
+                e.preventDefault();
+                const dt = new DataTransfer();
+                imgs.forEach((f) => dt.items.add(f));
+                void addFiles(dt.files, "image");
+              }
+            }}
+            rows={1}
+            placeholder="Ask anything"
+            aria-label="Message"
+            className="max-h-40 min-h-[28px] w-full resize-none bg-transparent text-[15px] text-foreground outline-none placeholder:text-muted-foreground"
+          />
+          <input ref={imageInput} type="file" accept={IMAGE_ACCEPT} multiple hidden onChange={(e) => { void addFiles(e.target.files, "image"); e.target.value = ""; }} />
+          <input ref={docInput} type="file" accept={DOC_ACCEPT} multiple hidden onChange={(e) => { void addFiles(e.target.files, "doc"); e.target.value = ""; }} />
+          <div className="mt-1.5 flex items-center justify-between gap-2">
+            <div className="flex min-w-0 items-center gap-1">
+              <DropdownMenu modal={false}>
+                <DropdownMenuTrigger asChild>
+                  <button type="button" aria-label="Attach files" className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-border text-foreground hover:bg-background">
+                    {reading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" side="top" className="w-56 rounded-xl">
+                  <DropdownMenuItem onSelect={() => imageInput.current?.click()}>
+                    <ImageIcon className="h-4 w-4" /> Upload image
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onSelect={() => docInput.current?.click()}>
+                    <Paperclip className="h-4 w-4" /> Upload document
+                    <span className="ml-auto text-[11px] text-muted-foreground">PDF, TXT, code</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <button type="button" aria-label="Chat settings" className="inline-flex h-8 items-center gap-1.5 rounded-full px-2.5 text-[13px] text-foreground hover:bg-background">
+                    <SlidersHorizontal className="h-4 w-4" />
+                    <span className="hidden sm:inline">{maxTokens.toLocaleString()} tokens · Text</span>
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent align="start" side="top" className="w-[min(340px,90vw)] rounded-2xl p-4">
+                  <div className="mb-4 text-[14px] font-medium text-foreground">System prompt &amp; parameters</div>
+                  {settings}
+                </PopoverContent>
+              </Popover>
+            </div>
+            <div className="flex min-w-0 items-center gap-1">
+              <Popover open={modelOpen} onOpenChange={setModelOpen}>
+                <PopoverTrigger asChild>
+                  <button type="button" aria-label="Choose a model" className="inline-flex min-w-0 items-center gap-1 rounded-full px-2.5 py-1.5 text-[14px] text-foreground hover:bg-background">
+                    <span className="truncate">{info?.name ?? model}</span>
+                    <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground" />
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent align="end" side="top" className="max-h-[360px] w-[min(320px,90vw)] overflow-y-auto rounded-2xl p-1.5">
+                  {MIXED_CATALOG.map((m) => (
+                    <button
+                      key={m.id}
+                      type="button"
+                      onClick={() => {
+                        setModel(m.id);
+                        setModelOpen(false);
+                      }}
+                      className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-left hover:bg-[var(--console-card)]"
+                    >
+                      <span className="min-w-0 flex-1">
+                        <span className="block truncate text-[14px] text-foreground">{m.name}</span>
+                        <span className="block text-[12px] text-muted-foreground">
+                          {PROVIDERS[m.provider].label} · {formatContext(m.context)}
+                        </span>
+                      </span>
+                      {m.id === model && <Check className="h-4 w-4 shrink-0 text-foreground" />}
+                    </button>
+                  ))}
+                </PopoverContent>
+              </Popover>
+              <button
+                type="submit"
+                disabled={(!input.trim() && !files.length) || busy || reading}
+                aria-label="Send"
+                className="console-pill-solid flex h-8 w-8 shrink-0 items-center justify-center rounded-full disabled:opacity-40"
+              >
+                {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <ArrowUp className="h-4 w-4" />}
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
 
       {/* View code */}
       <Dialog open={codeOpen} onOpenChange={setCodeOpen}>
