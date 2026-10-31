@@ -1,12 +1,29 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
-import { ArrowUpRight, Check, ChevronDown, CandlestickChart, Sparkles, BellRing, Code2 } from "lucide-react";
+import {
+  ArrowUpRight,
+  Check,
+  ChevronDown,
+  CandlestickChart,
+  Sparkles,
+  BellRing,
+  Code2,
+  Bot,
+  TrendingUp,
+  ShieldCheck,
+  Newspaper,
+  BookOpen,
+  MessageSquare,
+  FileText,
+  Image as ImageIcon,
+  Globe,
+  Zap,
+  type LucideIcon,
+} from "lucide-react";
 import SiteHeader from "@/components/SiteHeader";
 import BlogFooter from "@/components/BlogFooter";
 import { useAuthUser } from "@/hooks/useAuthUser";
 import { STORIES } from "@/lib/stories";
-import starsNebula from "@/assets/platform/stars-nebula.jpg";
-import starsPlain from "@/assets/platform/stars-plain.jpg";
 
 /**
  * Solutions and Products pages, styled like the API Platform page: big centred
@@ -51,11 +68,16 @@ const SECTIONS = [
 ];
 
 const SIGN_IN = "https://auth.jenvu.com/sign-in";
-/** Same starfield art as the Platform model cards, varied by flipping. */
-const STARS = [starsNebula, starsPlain, starsPlain, starsPlain];
-const STAR_TX = ["none", "none", "rotate(180deg)", "scaleX(-1)"];
 
+/** Same aurora gradients as the Platform page tiles. */
 const AURORAS = ["var(--platform-aurora-1)", "var(--platform-aurora-2)", "var(--platform-aurora-3)"];
+const SOLUTION_ICONS: LucideIcon[] = [CandlestickChart, Bot, BellRing, Code2, TrendingUp, ShieldCheck];
+const STORY_ICONS: LucideIcon[] = [Newspaper, BookOpen, TrendingUp];
+const ICON_SETS: LucideIcon[][] = [
+  [CandlestickChart, Sparkles, BellRing],
+  [MessageSquare, FileText, ImageIcon],
+  [ShieldCheck, Globe, Zap, Bot],
+];
 
 const pillDark =
   "inline-flex items-center gap-1.5 rounded-full bg-gc-ink px-5 py-2.5 text-sm font-medium text-background transition-opacity hover:opacity-85";
@@ -113,39 +135,75 @@ function Ticks({ items }: { items: string[] }) {
   );
 }
 
-/** Dark image card with left-aligned text near the bottom (Platform model-card style). */
-function NightCard({
-  n = 0,
-  tag,
-  title,
-  children,
-  className = "",
-  eager = false,
-}: {
-  n?: number;
-  tag?: string;
-  title: string;
-  children?: ReactNode;
-  className?: string;
-  eager?: boolean;
-}) {
+/** Aurora gradient tile with white icon chips (Platform Build/Ground/Act and use-case style). */
+function AuroraArt({ n = 0, icons, className = "" }: { n?: number; icons: LucideIcon[]; className?: string }) {
+  const cols = icons.length > 4 ? "grid-cols-3" : icons.length > 1 ? "grid-cols-2" : "";
   return (
-    <div className={`group relative flex flex-col justify-end overflow-hidden rounded-md bg-gc-night text-left text-gc-on-night ${className}`}>
-      <img
-        src={STARS[n % STARS.length]}
-        alt=""
-        width={768}
-        height={1056}
-        loading={eager ? "eager" : "lazy"}
-        className="absolute inset-0 h-full w-full object-cover"
-        style={{ transform: STAR_TX[n % STAR_TX.length] }}
-      />
-      <div className="relative px-7 pb-10 pt-24 sm:pb-12">
-        {tag && <p className="text-xs font-medium uppercase tracking-[0.18em] text-gc-on-night-muted">{tag}</p>}
-        <h3 className="mt-2 text-[1.6rem] font-medium leading-tight tracking-tight">{title}</h3>
-        {children}
+    <div
+      className={`flex items-center justify-center overflow-hidden rounded-md ${className}`}
+      style={{ backgroundImage: AURORAS[n % AURORAS.length] }}
+    >
+      <div className={`grid gap-3 sm:gap-4 ${cols}`}>
+        {icons.map((Icon, k) => (
+          <span
+            key={k}
+            className="flex h-14 w-14 items-center justify-center rounded-2xl bg-background/90 text-gc-ink shadow-sm sm:h-16 sm:w-16"
+          >
+            <Icon className="h-6 w-6 sm:h-7 sm:w-7" />
+          </span>
+        ))}
       </div>
     </div>
+  );
+}
+
+/** Wide hero tile with its caption underneath. */
+function HeroArt({ tag, caption, n }: { tag: string; caption: string; n: number }) {
+  return (
+    <div className="mt-14 text-left sm:mt-16">
+      <AuroraArt n={n} icons={ICON_SETS[0].concat(ICON_SETS[1]).slice(0, 6)} className="min-h-[260px] sm:aspect-[16/6] sm:min-h-0" />
+      <Kicker>
+        <span className="mt-6 block">{tag}</span>
+      </Kicker>
+      <h3 className="mt-2 text-2xl font-medium leading-tight tracking-tight sm:text-[1.75rem]">{caption}</h3>
+    </div>
+  );
+}
+
+/** Card with an aurora tile on top and text below (Platform use-case card). */
+function AuroraCard({
+  n,
+  icon,
+  tag,
+  title,
+  text,
+  link,
+  href,
+}: {
+  n: number;
+  icon: LucideIcon;
+  tag?: string;
+  title: string;
+  text?: string;
+  link: string;
+  href: string;
+}) {
+  return (
+    <a href={href} className="group flex flex-col rounded-md bg-gc-surface p-2 text-left">
+      <AuroraArt n={n} icons={[icon]} className="aspect-[16/9]" />
+      <div className="flex flex-1 flex-col px-3 pb-4 pt-5">
+        {tag && (
+          <Kicker>
+            <span className="mb-2 block">{tag}</span>
+          </Kicker>
+        )}
+        <h3 className="text-xl font-medium leading-snug">{title}</h3>
+        {text && <p className="mt-2 flex-1 text-[15px] leading-relaxed text-gc-ink-muted">{text}</p>}
+        <span className="mt-5 inline-flex w-fit items-center gap-1 border-b border-gc-ink pb-0.5 text-sm font-medium group-hover:opacity-70">
+          {link} <ArrowUpRight className="h-3.5 w-3.5" />
+        </span>
+      </div>
+    </a>
   );
 }
 
@@ -223,7 +281,7 @@ function SolutionsHero({ c }: { c: IndustryContent }) {
         <h1 className="mx-auto mt-5 max-w-3xl text-[2.6rem] font-medium leading-[1.08] tracking-tight sm:text-6xl">{c.title}</h1>
         <p className="mx-auto mt-6 max-w-2xl text-[17px] leading-relaxed text-gc-ink">{c.intro}</p>
         <Buttons />
-        <NightCard n={0} tag="Top story" title={c.heroCaption} eager className="mt-14 min-h-[260px] sm:mt-16 sm:aspect-[16/6] sm:min-h-0" />
+        <HeroArt tag="Top story" caption={c.heroCaption} n={0} />
       </div>
     </section>
   );
@@ -235,14 +293,15 @@ function SolutionsCards({ c }: { c: IndustryContent }) {
       <SectionHead title={c.solutionsTitle} intro={c.solutionsIntro} />
       <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {c.solutions.map((s, n) => (
-          <a key={s.title} href={s.href} className="block">
-            <NightCard n={n} title={s.title} className="aspect-[4/5] sm:aspect-[5/7]">
-              <p className="mt-3 text-sm font-medium leading-relaxed text-gc-on-night">{s.text}</p>
-              <span className="mt-5 inline-flex items-center gap-1 border-b border-gc-on-night pb-0.5 text-sm font-medium">
-                {s.link} <ArrowUpRight className="h-3.5 w-3.5" />
-              </span>
-            </NightCard>
-          </a>
+          <AuroraCard
+            key={s.title}
+            n={n}
+            icon={SOLUTION_ICONS[n % SOLUTION_ICONS.length]}
+            title={s.title}
+            text={s.text}
+            link={s.link}
+            href={s.href}
+          />
         ))}
       </div>
     </Wrap>
@@ -319,8 +378,9 @@ function WhyList({ c }: { c: IndustryContent }) {
           </div>
         </div>
         <div>
-          <NightCard n={1} title={c.whyCardTitle} className="min-h-[280px] sm:aspect-[4/3] sm:min-h-0" />
-          <p className="mt-4 text-sm leading-relaxed text-gc-ink-muted">{c.whyCardText}</p>
+          <AuroraArt n={2} icons={ICON_SETS[2]} className="min-h-[280px] sm:aspect-[4/3] sm:min-h-0" />
+          <h3 className="mt-5 text-xl font-medium">{c.whyCardTitle}</h3>
+          <p className="mt-2 text-[15px] leading-relaxed text-gc-ink-muted">{c.whyCardText}</p>
         </div>
       </div>
     </Wrap>
@@ -333,13 +393,15 @@ function StoriesCards({ c }: { c: IndustryContent }) {
       <SectionHead title={c.storiesTitle} />
       <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {storyList(c).map((s, n) => (
-          <a key={s.slug} href={`/stories/${s.slug}`} className="block">
-            <NightCard n={n + 1} tag={s.tag} title={s.title} className="aspect-[4/5] sm:aspect-[5/7]">
-              <span className="mt-5 inline-flex items-center gap-1 border-b border-gc-on-night pb-0.5 text-sm font-medium">
-                Read now <ArrowUpRight className="h-3.5 w-3.5" />
-              </span>
-            </NightCard>
-          </a>
+          <AuroraCard
+            key={s.slug}
+            n={n + 1}
+            icon={STORY_ICONS[n % STORY_ICONS.length]}
+            tag={s.tag}
+            title={s.title}
+            link="Read now"
+            href={`/stories/${s.slug}`}
+          />
         ))}
       </div>
     </Wrap>
@@ -356,7 +418,7 @@ function ProductsHero({ c }: { c: IndustryContent }) {
         <h1 className="mx-auto mt-5 max-w-3xl text-[2.6rem] font-medium leading-[1.08] tracking-tight sm:text-6xl">{c.title}</h1>
         <p className="mx-auto mt-6 max-w-2xl text-[17px] leading-relaxed text-gc-ink">{c.intro}</p>
         <Buttons />
-        <NightCard n={0} tag="Overview" title={c.heroCaption} eager className="mt-14 min-h-[260px] sm:mt-16 sm:aspect-[16/6] sm:min-h-0" />
+        <HeroArt tag="Overview" caption={c.heroCaption} n={1} />
       </div>
     </section>
   );
@@ -372,17 +434,7 @@ function ProductsZigzag({ c }: { c: IndustryContent }) {
             key={s.title}
             className={`grid items-center gap-8 text-left md:grid-cols-2 md:gap-16 ${n % 2 ? "md:[&>*:first-child]:order-2" : ""}`}
           >
-            <div className="relative aspect-[4/3] overflow-hidden rounded-md bg-gc-night sm:aspect-[5/4]">
-              <img
-                src={STARS[(n + 1) % STARS.length]}
-                alt=""
-                width={768}
-                height={1056}
-                loading="lazy"
-                className="absolute inset-0 h-full w-full object-cover"
-                style={{ transform: STAR_TX[(n + 1) % STAR_TX.length] }}
-              />
-            </div>
+            <AuroraArt n={n} icons={ICON_SETS[n % ICON_SETS.length]} className="aspect-[4/3] sm:aspect-[5/4]" />
             <div className={`max-w-[460px] ${n % 2 ? "md:justify-self-end" : ""}`}>
               <Kicker>0{n + 1}</Kicker>
               <h3 className="mt-3 text-3xl font-medium leading-tight tracking-tight sm:text-4xl">{s.title}</h3>
@@ -438,9 +490,7 @@ function StoriesRows({ c }: { c: IndustryContent }) {
       <div className="mt-12 divide-y divide-gc-line border-y border-gc-line text-left">
         {storyList(c).map((s, n) => (
           <a key={s.slug} href={`/stories/${s.slug}`} className="group grid items-center gap-5 py-7 sm:grid-cols-[240px_1fr_auto]">
-            <div className="aspect-[16/10] overflow-hidden rounded-md bg-gc-night">
-              <img src={STARS[(n + 1) % STARS.length]} alt="" loading="lazy" className="h-full w-full object-cover" style={{ transform: STAR_TX[(n + 1) % STAR_TX.length] }} />
-            </div>
+            <AuroraArt n={n} icons={[STORY_ICONS[n % STORY_ICONS.length]]} className="aspect-[16/10]" />
             <div>
               <Kicker>{s.tag}</Kicker>
               <h3 className="mt-2 text-2xl font-medium leading-snug tracking-tight">{s.title}</h3>
