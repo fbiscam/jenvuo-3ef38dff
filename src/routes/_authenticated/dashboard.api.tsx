@@ -3,7 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { Copy, Check, KeyRound, Trash2, FileText, X, Sparkles, Terminal } from "lucide-react";
+import { Copy, Check, Plus, Search, Trash2, FileText, X, Terminal } from "lucide-react";
 import {
   listExtensionKeys,
   createExtensionKey,
@@ -53,6 +53,7 @@ function ExtensionPage() {
   const [origin, setOrigin] = useState("https://jenvu.com");
   const [deleteTarget, setDeleteTarget] = useState<ExtensionKeyRow | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [query, setQuery] = useState("");
 
   useEffect(() => {
     if (typeof window !== "undefined") setOrigin(window.location.origin);
@@ -171,9 +172,10 @@ function ExtensionPage() {
   };
 
   const activeKeys = keys.filter((k) => !k.revoked_at);
+  const q = query.trim().toLowerCase();
   const displayedKeys = [...keys]
     .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
-    .slice(0, 4);
+    .filter((k) => !q || k.name.toLowerCase().includes(q) || k.key_prefix.toLowerCase().includes(q));
   const canCreate = Boolean(
     access?.active && access.plan !== "free" && activeKeys.length < access.keyLimit,
   );
@@ -182,20 +184,14 @@ function ExtensionPage() {
   return (
     <div className="mx-auto w-full max-w-[1100px] px-1 py-2 sm:px-2 sm:py-6">
       {/* Header row */}
-      <div className="grid grid-cols-1 items-center gap-2 sm:flex sm:flex-wrap sm:justify-between sm:gap-3">
-        <div className="min-w-0"><h1 className="text-[28px] font-medium tracking-tight text-foreground">API Keys</h1><p className="mt-1 text-[14px] text-muted-foreground">Create and manage keys for the Jenvu API and extension.</p></div>
-        <div className="flex min-w-0 items-center gap-3">
-          <button
-            onClick={() => setShowGuide((v) => !v)}
-            className="hidden items-center gap-2 rounded-full px-3 py-2 text-[13px] text-zinc-700 hover:bg-zinc-100 sm:inline-flex"
-          >
-            <FileText className="h-4 w-4" /> API quickstart
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h1 className="text-[28px] font-medium tracking-tight text-foreground sm:text-[32px]">API keys</h1>
+        <div className="flex flex-wrap items-center gap-2">
+          <button onClick={() => setShowGuide((v) => !v)} className="console-pill hidden sm:inline-flex">
+            <FileText className="h-4 w-4" /> Quickstart
           </button>
-          <button
-            onClick={() => setShowEndpoint((v) => !v)}
-            className="hidden items-center gap-2 rounded-full px-3 py-2 text-[13px] text-zinc-700 hover:bg-zinc-100 sm:inline-flex"
-          >
-            <Terminal className="h-4 w-4" /> API endpoint
+          <button onClick={() => setShowEndpoint((v) => !v)} className="console-pill hidden sm:inline-flex">
+            <Terminal className="h-4 w-4" /> Endpoint
           </button>
           <button
             onClick={() => {
@@ -205,32 +201,15 @@ function ExtensionPage() {
             disabled={!canCreate}
             className="console-pill console-pill-solid disabled:cursor-not-allowed disabled:opacity-45"
           >
-            <KeyRound className="h-4 w-4" /> Create API key
+            <Plus className="h-4 w-4" /> Create API key
           </button>
         </div>
       </div>
-
       {access && (
-        <div className="mt-6 grid gap-3 sm:grid-cols-3">
-          <div className="console-card p-5">
-            <div className="text-[13px] text-muted-foreground">Plan</div>
-            <div className="mt-2 text-[22px] font-medium text-zinc-900">{access.planName}</div>
-          </div>
-          <div className="console-card p-5">
-            <div className="text-[13px] text-muted-foreground">Active API keys</div>
-            <div className="mt-2 text-[22px] font-medium tabular-nums text-zinc-900">
-              {activeKeys.length} / {access.keyLimit}
-            </div>
-          </div>
-          <div className="console-card p-5">
-            <div className="text-[13px] text-muted-foreground">AI wallet</div>
-            <div
-              className={`mt-1 text-sm font-medium tabular-nums ${access.balance < 0.02 ? "text-rose-600" : "text-zinc-900"}`}
-            >
-              ${access.balance.toFixed(2)} / ${access.wallet.toFixed(2)}
-            </div>
-          </div>
-        </div>
+        <p className="mt-2 text-[14px] text-muted-foreground">
+          {access.planName} plan · {activeKeys.length} of {access.keyLimit} keys active · AI wallet $
+          {access.balance.toFixed(2)}
+        </p>
       )}
 
       {!loading && access && !capabilities.extensionAi && (
@@ -321,153 +300,87 @@ function ExtensionPage() {
         </div>
       )}
 
-      {/* API key list */}
-      {
-        <div className="console-card mt-6 p-5">
-          <div className="mb-4 flex items-end justify-between gap-3">
-            <div>
-              <h2 className="text-[16px] font-medium text-foreground">Recent API keys</h2>
-              <p className="mt-1 text-[12px] text-zinc-500">
-                Your four newest extension keys, newest first.
-              </p>
-            </div>
-            <span className="shrink-0 text-[12px] tabular-nums text-zinc-500">
-              {displayedKeys.length} shown
-            </span>
-          </div>
-          <div className="hidden grid-cols-[1.5fr_1.4fr_0.8fr_0.9fr_auto] items-center gap-4 border-b border-zinc-200 pb-3 text-[13px] text-zinc-700 md:grid">
-            <div>API key</div>
-            <div>Extension</div>
-            <div>Created</div>
-            <div>Status</div>
-            <div className="w-24" />
-          </div>
+      {/* API key search + table (xAI console style) */}
+      <div className="mt-6">
+        <label className="console-card flex items-center gap-2 px-4 py-2.5">
+          <Search className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+          <input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search API keys"
+            aria-label="Search API keys"
+            className="min-w-0 flex-1 bg-transparent text-[14px] text-foreground outline-none placeholder:text-muted-foreground"
+          />
+        </label>
 
-          {loading ? (
-            <div className="py-6 text-[13px] text-zinc-500">Loading…</div>
-          ) : (
-            displayedKeys.map((k) => (
-              <div
-                key={k.id}
-                className="grid gap-3 border-b border-zinc-100 py-4 md:grid-cols-[1.5fr_1.4fr_0.8fr_0.9fr_auto] md:items-center md:gap-4"
-              >
-                <div className="min-w-0">
-                  <div className="mb-1 flex items-center gap-2">
-                    <span className="text-[11px] text-zinc-500 md:hidden">API key</span>
-                    {k.id === displayedKeys[0]?.id && (
-                      <span className="rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-medium text-blue-700">
-                        Newest
+        <div className="mt-4 overflow-x-auto">
+          <table className="w-full min-w-[720px] text-left text-[14px]">
+            <thead>
+              <tr className="text-[13px] text-muted-foreground">
+                <th className="py-3 pr-4 font-normal">Name</th>
+                <th className="py-3 pr-4 font-normal">Key</th>
+                <th className="py-3 pr-4 font-normal">Created</th>
+                <th className="py-3 pr-4 font-normal">Last used</th>
+                <th className="py-3 pr-4 font-normal">Status</th>
+                <th className="w-12 py-3" />
+              </tr>
+            </thead>
+            <tbody>
+              {loading ? (
+                <tr>
+                  <td colSpan={6} className="py-10 text-center text-muted-foreground">Loading…</td>
+                </tr>
+              ) : displayedKeys.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="py-16 text-center text-muted-foreground">
+                    No API keys found.
+                  </td>
+                </tr>
+              ) : (
+                displayedKeys.map((k) => (
+                  <tr key={k.id} className="console-row">
+                    <td className="py-3.5 pr-4 font-medium text-foreground">{k.name || "Untitled key"}</td>
+                    <td className="py-3.5 pr-4">
+                      <span className="inline-flex items-center gap-1.5">
+                        <code className={`${MONO} text-[13px] text-foreground`}>{k.key_prefix}••••••••</code>
+                        <button
+                          type="button"
+                          title="Copy full API key"
+                          aria-label={`Copy full API key for ${k.name}`}
+                          onClick={() => void copyListedKey(k)}
+                          className="rounded p-1 text-muted-foreground hover:text-foreground"
+                        >
+                          {copied === k.id ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+                        </button>
                       </span>
-                    )}
-                  </div>
-                  <div className="flex min-w-0 items-center gap-1 rounded-md border border-zinc-200 bg-zinc-50 px-2.5 py-2">
-                    <code className={`${MONO} min-w-0 flex-1 truncate text-[12px] text-zinc-900`}>
-                      {k.key_prefix}••••••••••
-                    </code>
-                    <button
-                      type="button"
-                      title={
-                        freshKey?.startsWith(k.key_prefix)
-                          ? "Copy full API key"
-                          : "Full key is no longer available"
-                      }
-                      aria-label={`Copy full API key for ${k.name}`}
-                      onClick={() => void copyListedKey(k)}
-                      className="shrink-0 rounded p-1 text-zinc-500 hover:bg-white hover:text-zinc-900"
-                    >
-                      {copied === k.id ? (
-                        <Check className="h-3.5 w-3.5" />
-                      ) : (
-                        <Copy className="h-3.5 w-3.5" />
-                      )}
-                    </button>
-                  </div>
-                  <div className="mt-1.5 truncate text-[12px] text-zinc-500">{k.name}</div>
-                </div>
-                <div className="min-w-0">
-                  <div className="mb-1 text-[11px] text-zinc-500 md:hidden">Extension</div>
-                  <div className="truncate text-[13px] text-blue-700">Jenvu XAU/USD Extension</div>
-                  <div className={`${MONO} truncate text-[12px] text-zinc-500`}>v1.9.34</div>
-                </div>
-                <div className="text-[13px] text-zinc-800">
-                  <div className="mb-1 text-[11px] text-zinc-500 md:hidden">Created</div>
-                  {new Date(k.created_at).toLocaleDateString(undefined, {
-                    month: "short",
-                    day: "numeric",
-                    year: "numeric",
-                  })}
-                </div>
-                <div>
-                  <div className="mb-1 text-[11px] text-zinc-500 md:hidden">Status</div>
-                  {k.revoked_at ? (
-                    <div className="text-[13px] text-zinc-500">Revoked</div>
-                  ) : (
-                    <>
-                      <div className="text-[13px] text-emerald-700">Active</div>
-                      <div className="text-[12px] text-zinc-500">
-                        {k.last_used_at
-                          ? `Used ${new Date(k.last_used_at).toLocaleDateString()}`
-                          : "Never used"}
-                      </div>
-                    </>
-                  )}
-                </div>
-                <div className="flex items-center justify-end gap-1 md:w-24">
-                  {!k.revoked_at && (
-                    <button
-                      type="button"
-                      title="Revoke key"
-                      aria-label={`Revoke ${k.name}`}
-                      onClick={() => onRevoke(k.id)}
-                      className="rounded-full p-2 text-zinc-500 hover:bg-rose-50 hover:text-rose-600"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </button>
-                  )}
-                  {k.revoked_at && (
-                    <button
-                      type="button"
-                      title="Delete permanently"
-                      aria-label={`Permanently delete ${k.name}`}
-                      onClick={() => setDeleteTarget(k)}
-                      className="rounded-full p-2 text-rose-600 hover:bg-rose-50 hover:text-rose-700"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </button>
-                  )}
-                </div>
-              </div>
-            ))
-          )}
-
-          {!loading && keys.length === 0 && (
-            <div className="flex flex-col items-center justify-center py-16 text-center">
-              <Sparkles className="h-12 w-12 text-zinc-300" strokeWidth={1} />
-              <div className="mt-6 text-[15px] font-medium text-zinc-900">
-                Can&apos;t find your API keys here?
-              </div>
-              <p className="mt-2 max-w-md text-[13px] leading-relaxed text-zinc-500">
-                This list only shows keys created for the Jenvu extension. Create a new API key
-                above, paste it into the extension and it signs in instantly.
-              </p>
-              <button
-                onClick={() => setShowCreate(true)}
-                disabled={!canCreate}
-                className="mt-6 rounded-full border border-zinc-300 px-4 py-2 text-[13px] text-zinc-900 hover:bg-zinc-50 disabled:cursor-not-allowed disabled:opacity-45"
-              >
-                Create API key
-              </button>
-            </div>
-          )}
-
-          {!loading && keys.length > 0 && (
-            <div className="mt-3 text-[12px] text-zinc-500">
-              Showing {displayedKeys.length} of {keys.length} key(s) · {activeKeys.length} of{" "}
-              {access?.keyLimit ?? 0} active.
-            </div>
-          )}
+                    </td>
+                    <td className="py-3.5 pr-4 text-foreground">
+                      {new Date(k.created_at).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}
+                    </td>
+                    <td className="py-3.5 pr-4 text-muted-foreground">
+                      {k.last_used_at ? new Date(k.last_used_at).toLocaleDateString() : "Never"}
+                    </td>
+                    <td className="py-3.5 pr-4">
+                      <span className="console-badge">{k.revoked_at ? "Revoked" : "Active"}</span>
+                    </td>
+                    <td className="py-3.5 text-right">
+                      <button
+                        type="button"
+                        title={k.revoked_at ? "Delete permanently" : "Revoke key"}
+                        aria-label={k.revoked_at ? `Permanently delete ${k.name}` : `Revoke ${k.name}`}
+                        onClick={() => (k.revoked_at ? setDeleteTarget(k) : void onRevoke(k.id))}
+                        className="rounded-full p-2 text-muted-foreground hover:text-rose-600"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
         </div>
-      }
+      </div>
 
       {/* Quickstart drawer */}
       {showGuide && (

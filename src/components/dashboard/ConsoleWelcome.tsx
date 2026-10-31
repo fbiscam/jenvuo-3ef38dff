@@ -1,82 +1,94 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowUpRight, BrainCircuit, Cpu, KeyRound, MessageSquareText, Plus, Terminal } from "lucide-react";
+import { ArrowUpRight, Plus } from "lucide-react";
 import { useAuthUser } from "@/hooks/useAuthUser";
 import { useCredits } from "@/hooks/useCredits";
-import type { LucideIcon } from "lucide-react";
+import chatImg from "@/assets/home/hero-ai-1.jpg";
+import modelsImg from "@/assets/home/hero-ai-2.jpg";
+import botImg from "@/assets/home/hero-ai-3.jpg";
+import terminalImg from "@/assets/home/hero-ai-4.jpg";
 
-type Product = { title: string; text: string; to: string; icon: LucideIcon; badge?: string };
+type Product = { title: string; text: string; to: string; img: string; badge?: string };
 
 const PRODUCTS: Product[] = [
-  { title: "Chat API", text: "Call Jenvu models from your own apps with a compatible Chat Completions API.", to: "/dashboard/api", icon: MessageSquareText },
-  { title: "Models", text: "Compare every model we serve, with context size and price per million tokens.", to: "/dashboard/models", icon: BrainCircuit, badge: "New" },
-  { title: "JX Bot", text: "Run the Gold M15 Expert Advisor on MT5 with a stop loss on every trade.", to: "/dashboard/jx-bot", icon: Cpu },
-  { title: "Terminal", text: "Read sweeps, zones and FVGs on XAU/USD and ask the AI desk about any chart.", to: "/dashboard/terminal", icon: Terminal },
+  { title: "Chat API", text: "Build with Jenvu models through one compatible API.", to: "/dashboard/api", img: chatImg },
+  { title: "Models", text: "Compare context size and price per million tokens.", to: "/dashboard/models", img: modelsImg, badge: "New" },
+  { title: "JX Bot", text: "Gold M15 Expert Advisor for MT5 with a stop loss.", to: "/dashboard/jx-bot", img: botImg },
+  { title: "Terminal", text: "Sweeps, zones and FVGs on XAU/USD with an AI desk.", to: "/dashboard/terminal", img: terminalImg },
 ];
 
-/** xAI console-style dashboard home: welcome line, balance and keys cards, product grid. */
+/** xAI console-style dashboard home: welcome line, two start cards, product grid. */
 export default function ConsoleWelcome({ name: profileName, keysCount }: { name?: string; keysCount: number | null }) {
   const { user } = useAuthUser();
   const credits = useCredits();
   const meta = (user?.user_metadata ?? {}) as Record<string, unknown>;
-  const name = String(profileName?.trim() || meta.full_name || meta.name || user?.email?.split("@")[0] || "trader");
-  const plan = (credits.plan as { name?: string; tier?: string } | null | undefined);
-  const planName = String(plan?.name ?? plan?.tier ?? "Free");
+  const name = String(profileName?.trim() || meta.full_name || meta.name || user?.email?.split("@")[0] || "trader").split(" ")[0];
+  const balance = credits.balance || 0;
+  const hasKeys = (keysCount ?? 0) > 0;
 
   return (
-    <section className="console-home mb-10">
+    <section className="console-home mx-auto mb-10 w-full max-w-[1100px]">
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <h1 className="console-title text-[28px] font-medium tracking-tight text-foreground sm:text-[32px]">Welcome, {name}</h1>
+        <h1 className="text-[28px] font-medium tracking-tight text-foreground sm:text-[32px]">Welcome, {name}</h1>
         <Link to="/dashboard/api" className="console-pill console-pill-solid">
           <Plus className="h-4 w-4" aria-hidden="true" /> Create API key
         </Link>
       </div>
 
       <div className="mt-8 grid gap-4 md:grid-cols-2">
-        <div className="console-card flex flex-col justify-between p-6">
-          <div>
-            <p className="text-[14px] text-muted-foreground">Credit balance</p>
-            <p className="mt-2 text-[40px] font-medium leading-none tracking-tight text-foreground">
-              {credits.isLoading ? "—" : `$${(credits.balance || 0).toFixed(2)}`}
+        <div className="console-card flex min-h-[184px] flex-col justify-between p-6">
+          <p className="text-[16px] font-medium text-foreground">
+            {balance > 0 ? "Your API credit balance." : "Add credits to start using the API."}
+          </p>
+          <div className="mt-6 flex flex-wrap items-end justify-between gap-4">
+            <p className="text-[40px] font-medium leading-none tracking-tight tabular-nums text-foreground">
+              {credits.isLoading ? "—" : `$${balance.toFixed(2)}`}
             </p>
-            <p className="mt-3 text-[14px] text-muted-foreground">Plan: <span className="text-foreground">{planName}</span> · Usage is billed at $3 per million tokens.</p>
-          </div>
-          <div className="mt-6 flex flex-wrap gap-2">
             <Link to="/dashboard/billing" className="console-pill console-pill-solid">Add credits</Link>
-            <Link to="/dashboard/usage" className="console-pill">View usage</Link>
           </div>
         </div>
 
-        <div className="console-card flex flex-col justify-between p-6">
+        <div className="console-card flex min-h-[184px] flex-col justify-between p-6">
           <div>
-            <p className="flex items-center gap-2 text-[14px] text-muted-foreground"><KeyRound className="h-4 w-4" aria-hidden="true" /> API keys</p>
-            <p className="mt-2 text-[40px] font-medium leading-none tracking-tight text-foreground">{keysCount ?? "—"}</p>
-            <p className="mt-3 text-[14px] text-muted-foreground">Use a key to send requests to Jenvu models from your code.</p>
+            <p className="text-[16px] font-medium text-foreground">
+              {hasKeys ? `You have ${keysCount} API key${keysCount === 1 ? "" : "s"}` : "Create your first API Key"}
+            </p>
+            <p className="mt-2 text-[14px] text-muted-foreground">
+              Use a key to send requests to Jenvu models from your code.
+            </p>
           </div>
           <div className="mt-6 flex flex-wrap gap-2">
-            <Link to="/dashboard/api" className="console-pill console-pill-solid">Create API key</Link>
-            <Link to="/docs" className="console-pill">Read the docs <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" /></Link>
+            <Link to="/dashboard/api" className="console-pill">
+              {hasKeys ? "Manage API keys" : "Create API key"}
+            </Link>
+            <Link to="/docs" className="console-pill">
+              Read the docs <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
+            </Link>
           </div>
         </div>
       </div>
 
-      <h2 className="console-section-title mt-12 text-[18px] font-medium text-foreground">Explore our products</h2>
+      <h2 className="mt-12 text-[18px] font-medium text-foreground">Explore our products</h2>
       <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {PRODUCTS.map((p) => {
-          const Icon = p.icon;
-          return (
-            <Link key={p.title} to={p.to} className="console-card group flex flex-col p-5 transition hover:brightness-[0.98]">
-              <div className="flex items-center justify-between">
-                <span className="console-icon-chip"><Icon className="h-[18px] w-[18px]" strokeWidth={1.75} aria-hidden="true" /></span>
-                {p.badge && <span className="console-badge">{p.badge}</span>}
-              </div>
-              <p className="mt-5 text-[16px] font-medium text-foreground">{p.title}</p>
+        {PRODUCTS.map((p) => (
+          <Link key={p.title} to={p.to} className="console-card group flex flex-col overflow-hidden">
+            <div className="relative aspect-[16/10] overflow-hidden">
+              <img
+                src={p.img}
+                alt=""
+                loading="lazy"
+                className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.04]"
+              />
+              {p.badge && <span className="absolute left-3 top-3 rounded-full bg-background px-2.5 py-0.5 text-[12px] font-medium text-foreground">{p.badge}</span>}
+            </div>
+            <div className="flex flex-1 flex-col p-5">
+              <p className="flex items-center justify-between text-[16px] font-medium text-foreground">
+                {p.title}
+                <ArrowUpRight className="h-4 w-4 opacity-60 transition group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:opacity-100" aria-hidden="true" />
+              </p>
               <p className="mt-1.5 text-[14px] leading-relaxed text-muted-foreground">{p.text}</p>
-              <span className="mt-auto inline-flex items-center gap-1 pt-5 text-[14px] font-medium text-foreground">
-                Open <ArrowUpRight className="h-4 w-4 transition group-hover:-translate-y-0.5 group-hover:translate-x-0.5" aria-hidden="true" />
-              </span>
-            </Link>
-          );
-        })}
+            </div>
+          </Link>
+        ))}
       </div>
     </section>
   );
