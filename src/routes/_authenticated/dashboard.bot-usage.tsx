@@ -142,7 +142,7 @@ function BotUsagePage() {
             setAccountMenuOpen((v) => !v);
             setRangeOpen(false);
           }}
-          label="Account"
+          label=" Account"
           valueLabel={account === "all" ? "All" : `MT5 ${account}`}
           ariaLabel="MT5 account"
           options={[{ value: "all", label: "All MT5 accounts" }, ...view.accounts.map((a) => ({ value: a, label: `MT5 ${a}` }))]}
