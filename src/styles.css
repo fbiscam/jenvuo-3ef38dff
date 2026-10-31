@@ -2146,3 +2146,18 @@ html body .dark .code-box .tok-number { color: #b5cea8 !important; }
 html body .dark .code-box .tok-func { color: #dcdcaa !important; }
 html body .dark .code-box .tok-type { color: #4ec9b0 !important; }
 html body .dark .code-box .tok-var { color: #9cdcfe !important; }
+
+/* JX Bot page coding scene: always a pure white canvas with editor colors. */
+.jx-code-scene { background: #ffffff; }
+.jx-code-scene .jxc-comment { color: #6e7781; font-style: italic; }
+.jx-code-scene .jxc-macro { color: #8250df; }
+.jx-code-scene .jxc-string { color: #0a3069; }
+.jx-code-scene .jxc-keyword { color: #cf222e; }
+.jx-code-scene .jxc-const { color: #0550ae; }
+.jx-code-scene .jxc-number { color: #0969da; }
+.jx-code-scene .jxc-func { color: #8250df; }
+.jx-code-scene .jxc-type { color: #953800; }
+@keyframes jx-caret-blink { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
+.jx-caret { animation: jx-caret-blink 1s steps(1) infinite; }
+.jx-code-scene .jx-pulse { animation: sc-dot 1.6s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) { .jx-caret, .jx-code-scene .jx-pulse { animation: none; } }

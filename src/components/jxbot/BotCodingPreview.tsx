@@ -9,7 +9,7 @@ import { Check } from "lucide-react";
 const CODE = `// JX Bot — Gold (XAU/USD) M15 swing EA
 #property strict
 input double LotPer1000 = 0.02;   // lot per $1,000
-input int    StopPips   = 90;     // stop loss on every trade
+input bool   UseStopLoss = true;  // stop loss on every trade
 
 void OnTick()
 {
@@ -25,8 +25,8 @@ void OnTick()
 void OpenTrade(int type, double swing)
 {
    double lot = LotPer1000 * AccountBalance() / 1000.0;
-   double sl  = StopFrom(swing, StopPips);   // never without SL
-   double tp  = TakeProfitFrom(sl, 2.0);
+   double sl  = StopFrom(swing);   // never without SL
+   double tp  = TakeProfitFrom(sl);
    Trade.PositionOpen(_Symbol, type, lot, Ask(), sl, tp);
 }`;
 
