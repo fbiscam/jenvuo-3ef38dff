@@ -28,6 +28,9 @@ import pythonLogo from "@/assets/platform-logos/python.svg";
 import nodeLogo from "@/assets/platform-logos/nodejs.svg";
 import curlLogo from "@/assets/platform-logos/curl.svg";
 import langchainLogo from "@/assets/platform-logos/langchain.svg";
+import starsNebula from "@/assets/platform/stars-nebula.jpg";
+import starsPlain from "@/assets/platform/stars-plain.jpg";
+import avatarUser from "@/assets/platform/avatar-user.jpg";
 
 export const Route = createFileRoute("/platform")({
   head: () => ({
@@ -183,7 +186,7 @@ function Models() {
               height={1056}
               loading="lazy"
               className="absolute inset-0 h-full w-full object-cover"
-              style={i > 0 ? { transform: `scale(${1 + i * 0.08}) rotate(${i * 90}deg)` } : undefined}
+              style={{ transform: ["none", "none", "rotate(180deg)", "scaleX(-1)"][i] }}
             />
             <div className="relative">
               <h3 className="text-[1.75rem] font-medium leading-tight tracking-tight">{m.name}</h3>
