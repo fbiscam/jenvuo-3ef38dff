@@ -56,6 +56,7 @@ export default function SiteHeader() {
             <Link to="/platform" activeProps={ACTIVE}>Platform</Link>
             <Link to="/strategies/ict-gold-trading" activeProps={ACTIVE}>Solutions</Link>
             <Link to="/ai-engine" activeProps={ACTIVE}>Products</Link>
+            <Link to="/models" activeProps={ACTIVE}>Models</Link>
             <Link to="/pricing" activeProps={ACTIVE}>Pricing</Link>
             <Link to="/insights" activeProps={ACTIVE}>Blog</Link>
             <Link to="/contact" className="!text-gc-blue" activeProps={ACTIVE}>Contact us</Link>
@@ -138,6 +139,7 @@ export default function SiteHeader() {
                 { to: "/platform", label: "Platform" },
                 { to: "/strategies/ict-gold-trading", label: "Solutions" },
                 { to: "/ai-engine", label: "Products" },
+                { to: "/models", label: "Models" },
                 { to: "/pricing", label: "Pricing" },
                 { to: "/insights", label: "Resources" },
                 { to: "/docs", label: "Docs" },
