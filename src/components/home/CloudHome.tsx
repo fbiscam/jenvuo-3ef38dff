@@ -298,7 +298,7 @@ export function CloudAudiences() {
   return (
     <section className="bg-background px-3 pb-16 sm:px-4">
       <div className="rounded-[28px] bg-gc-panel px-5 py-8 sm:px-10 md:px-12 md:py-10 xl:px-[96px]">
-        <div role="tablist" className="flex gap-1 overflow-x-auto border-b-2 border-gc-line [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <div role="tablist" className="inline-flex max-w-full gap-1 overflow-x-auto rounded-full bg-background p-1 ring-1 ring-gc-line/70 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {AUDIENCES.map((a) => (
             <button
               key={a.key}
@@ -306,34 +306,36 @@ export function CloudAudiences() {
               role="tab"
               aria-selected={a.key === active}
               onClick={() => setActive(a.key)}
-              className={`relative -mb-0.5 shrink-0 px-4 py-3 text-[15px] transition ${
-                a.key === active ? "font-medium text-gc-ink" : "text-gc-ink/80 hover:text-gc-ink"
+              className={`shrink-0 rounded-full px-4 py-2 text-[14px] font-medium transition sm:px-5 sm:text-[15px] ${
+                a.key === active ? "bg-gc-blue text-gc-on-blue shadow-sm" : "text-gc-ink/80 hover:bg-gc-blue-soft hover:text-gc-ink"
               }`}
             >
               {a.label}
-              {a.key === active && (
-                <span aria-hidden className="absolute inset-x-0 bottom-0 h-[3px] rounded-t-full bg-gc-ink" />
-              )}
             </button>
           ))}
         </div>
         <div className="mt-9 grid gap-6 md:grid-cols-3">
           {current.cards.map((c) => (
-            <div
+            <Link
               key={c.tag}
-              className="flex min-h-[112px] overflow-hidden rounded-lg border border-gc-line bg-background"
+              to={c.to}
+              className="group flex min-h-[112px] overflow-hidden rounded-2xl border border-gc-line/70 bg-background shadow-[0_1px_2px_rgba(0,0,0,0.04)] transition hover:-translate-y-0.5 hover:border-gc-blue/40 hover:shadow-md"
             >
               <div className="flex min-w-0 flex-1 flex-col justify-center px-4 py-5">
-                <div className="text-[12px] font-medium tracking-wide text-gc-ink-muted">{c.tag}</div>
-                <p className="mt-1 text-[14px] font-medium leading-[1.5] text-gc-ink sm:text-[16px] sm:leading-[1.55]">{c.text}</p>
+                <span className="w-fit rounded-full bg-gc-blue-soft px-2.5 py-0.5 text-[11px] font-medium tracking-wide text-gc-blue">{c.tag}</span>
+                <p className="mt-2 text-[14px] font-medium leading-[1.5] text-gc-ink sm:text-[16px] sm:leading-[1.55]">{c.text}</p>
               </div>
-              {c.img && <img src={c.img} alt="" loading="eager" decoding="async" className="w-[112px] shrink-0 object-cover" />}
+              {c.img && (
+                <div className="w-[112px] shrink-0 p-2 pl-0">
+                  <img src={c.img} alt="" loading="eager" decoding="async" className="h-full w-full rounded-xl object-cover" />
+                </div>
+              )}
               {c.logo && (
                 <div className="flex w-[84px] shrink-0 items-center justify-center">
                   <img src="/favicon.png" alt="" className="h-14 w-14 object-contain" />
                 </div>
               )}
-            </div>
+            </Link>
           ))}
         </div>
       </div>
