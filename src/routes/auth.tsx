@@ -11,10 +11,13 @@ import { supabase } from "@/integrations/supabase/client";
 import {
   confirmRecoveryOtp,
   confirmSignupOtp,
+  getTurnstileSiteKey,
   requestRecoveryOtp,
   requestSignupOtp,
   signInFailureHint,
+  signInWithTurnstile,
 } from "@/lib/custom-auth.functions";
+import { TurnstileWidget } from "@/components/auth/TurnstileWidget";
 import { applyReferralCode } from "@/lib/referrals.functions";
 import { registerTrustedDevice, verifyTrustedDevice } from "@/lib/trusted-devices.functions";
 import { sendWelcomeEmail } from "@/lib/email/welcome.functions";
@@ -124,6 +127,18 @@ function AuthPage() {
   const sendRecoveryOtp = useServerFn(requestRecoveryOtp);
   const verifyRecoveryCode = useServerFn(confirmRecoveryOtp);
   const signInHint = useServerFn(signInFailureHint);
+  const serverSignIn = useServerFn(signInWithTurnstile);
+  const loadSiteKey = useServerFn(getTurnstileSiteKey);
+  const [turnstileSiteKey, setTurnstileSiteKey] = React.useState<string | null>(null);
+  const [turnstileToken, setTurnstileToken] = React.useState<string | null>(null);
+  const [turnstileReset, setTurnstileReset] = React.useState(0);
+  React.useEffect(() => {
+    loadSiteKey()
+      .then((r) => setTurnstileSiteKey(r.siteKey))
+      .catch(() => setTurnstileSiteKey(null));
+  }, [loadSiteKey]);
+  const needsTurnstile = !!turnstileSiteKey && !turnstileToken;
+  const freshTurnstile = () => setTurnstileReset((n) => n + 1);
   const search = Route.useSearch();
   const redirectTo = sanitizeRedirect(search.redirect);
   const [mode, setMode] = React.useState<"signin" | "signup" | "forgot">(
