@@ -1,4 +1,5 @@
-import { describe, expect, test } from "bun:test";
+import { describe, it as test } from "node:test";
+import { expect } from "./chart/test-expect";
 import { MODEL_CATALOG, PRICE_PER_MILLION, missingCatalogIds } from "./model-catalog";
 import { PUBLIC_API_MODEL_IDS } from "./public-api-models";
 
