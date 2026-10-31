@@ -237,7 +237,7 @@ export function EntBuilt() {
             </div>
           </div>
         </Card>
-        <Card title="Guidance from setup to scale" body="Work directly with Jenvu to plan alerts, set up JX Bot, and launch AI safely across your trading.">
+        <Card title="Guidance from setup to scale" body="Work directly with Jenvu to plan alerts, set up JX Bot, and launch AI safely across trading.">
           {/* Document */}
           <div className="absolute -right-6 bottom-0 left-16 top-2 rounded-t-xl border border-border bg-background px-11 pt-12 shadow-sm">
             <p className="whitespace-nowrap text-[20px] text-foreground/90">Reviewing setup and risk</p>
