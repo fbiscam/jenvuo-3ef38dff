@@ -25,6 +25,7 @@ import {
 } from "@/components/home/CloudHome";
 import { CloudFeatureVideos } from "@/components/home/CloudFeatureVideos";
 import { HomeStats, HomeReadAskAutomate, HomeTrust, HomeGetStarted } from "@/components/home/HomePlatformSections";
+import { HomeProductCards, HomeExperiences, HomeUseCases } from "@/components/home/HomeShowcaseSections";
 import { CloudSolutions, CloudLogoStrip, CloudStartBanner } from "@/components/home/CloudSolutions";
 import TailoredToDesk from "@/components/TailoredToDesk";
 
@@ -389,9 +390,12 @@ function HomePage() {
           <HomeStats />
           <CloudAudiences />
           <HomeReadAskAutomate />
+          <HomeProductCards />
           <CloudBuildWith />
           <CloudFeatureVideos />
+          <HomeExperiences />
           <CloudSolutions />
+          <HomeUseCases />
           <CloudLogoStrip />
           <HomeTrust />
           <HomeGetStarted />
