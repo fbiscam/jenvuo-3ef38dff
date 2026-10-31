@@ -52,55 +52,69 @@ export default function SiteHeader() {
             <div className="hidden min-w-0 flex-1 md:flex"><HeaderSearch onClose={closeSearch} /></div>
           ) : (
           <nav className="ml-6 hidden min-w-0 items-center gap-0.5 whitespace-nowrap text-[14px] text-gc-ink-muted lg:flex [&>a]:rounded-md [&>a]:px-2.5 [&>a]:py-2 [&>a:hover]:bg-gc-surface [&>a:hover]:text-gc-ink">
-            <Link to="/about" activeProps={ACTIVE}>Overview</Link>
-            <Link to="/platform" activeProps={ACTIVE}>Platform</Link>
-            <Link to="/strategies/ict-gold-trading" activeProps={ACTIVE}>Solutions</Link>
+            <Link to="/about" activeProps={ACTIVE}>Why Jenvu</Link>
             <Link to="/ai-engine" activeProps={ACTIVE}>Products</Link>
+            <Link to="/strategies/ict-gold-trading" activeProps={ACTIVE}>Solutions</Link>
+            <Link to="/insights" activeProps={ACTIVE}>Resources</Link>
+            <Link to="/platform" activeProps={ACTIVE}>Platform</Link>
             <Link to="/pricing" activeProps={ACTIVE}>Pricing</Link>
-            <Link to="/insights" activeProps={ACTIVE}>Blog</Link>
-            <Link to="/contact" className="!text-gc-blue" activeProps={ACTIVE}>Contact us</Link>
           </nav>
           )}
 
-          <div className="ml-auto flex shrink-0 items-center gap-1">
-            <button type="button" onClick={() => setSearchOpen(true)} aria-label="Search" tabIndex={searchOpen ? -1 : 0} aria-hidden={searchOpen} className={`hidden h-10 w-10 items-center justify-center rounded-full text-gc-ink-muted hover:bg-gc-surface md:inline-flex ${searchOpen ? "invisible" : ""}`}>
+          <div className="ml-auto flex shrink-0 items-center gap-1.5">
+            <button type="button" onClick={() => setSearchOpen(true)} aria-label="Search" tabIndex={searchOpen ? -1 : 0} aria-hidden={searchOpen} className={`hidden h-10 w-10 items-center justify-center rounded-full text-gc-ink hover:bg-gc-surface md:inline-flex ${searchOpen ? "invisible" : ""}`}>
               <Search className="h-5 w-5" />
             </button>
-            <div className="hidden items-center whitespace-nowrap text-[14px] md:flex [&>a]:rounded-md [&>a]:px-2.5 [&>a]:py-2 [&>a:hover]:bg-gc-surface">
-              <Link to="/docs" className="text-gc-ink-muted hover:text-gc-ink">Docs</Link>
-              <a href="https://support.jenvu.com" className="text-gc-ink-muted hover:text-gc-ink">Support</a>
-              <Link to="/dashboard/terminal" className="text-gc-blue">Terminal</Link>
-            </div>
             {isAuthed ? (
-              <>
               <Link
                 to="/dashboard/profile"
                 aria-label="Account settings"
                 title="Account settings"
-                className="ml-2 inline-flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full ring-1 ring-gc-line hover:ring-2 hover:ring-gc-blue-soft"
+                className="ml-1 inline-flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full ring-1 ring-gc-line hover:ring-2 hover:ring-gc-blue-soft"
               >
                 {avatarUrl && <img src={avatarUrl} alt="" className="h-full w-full object-cover" />}
               </Link>
-              <Link
-                to="/dashboard"
-                className="ml-2 inline-flex h-10 items-center justify-center rounded-full bg-gc-blue px-4 text-[14px] font-medium text-gc-on-blue hover:bg-gc-blue-hover"
-              >
-                Dashboard
-              </Link>
-              </>
             ) : (
-              <>
-                <Link to="/auth" className="ml-1 hidden whitespace-nowrap rounded-md px-2.5 py-2 text-[14px] text-gc-ink-muted hover:bg-gc-surface hover:text-gc-ink xl:inline-flex">
-                  Sign in
-                </Link>
-                <Link
-                  to="/pricing"
-                  className="ml-2 inline-flex h-10 items-center justify-center rounded-full bg-gc-blue px-4 text-[14px] font-medium text-gc-on-blue hover:bg-gc-blue-hover"
-                >
-                  Start Now
-                </Link>
-              </>
+              <Link to="/auth" className="hidden whitespace-nowrap rounded-md px-2.5 py-2 text-[14px] text-gc-ink-muted hover:bg-gc-surface hover:text-gc-ink xl:inline-flex">
+                Log in
+              </Link>
             )}
+            <div className="relative hidden sm:block" onMouseLeave={() => setTryOpen(false)}>
+              <button
+                type="button"
+                aria-expanded={tryOpen}
+                aria-haspopup="menu"
+                onClick={() => setTryOpen((v) => !v)}
+                onMouseEnter={() => setTryOpen(true)}
+                className="inline-flex h-10 items-center gap-1 rounded-full border border-foreground/20 bg-background px-4 text-[14px] font-medium text-foreground hover:bg-gc-surface"
+              >
+                Try Jenvu <ChevronDown className={`h-4 w-4 transition-transform ${tryOpen ? "rotate-180" : ""}`} />
+              </button>
+              {tryOpen && (
+                <div role="menu" className="absolute right-0 top-full z-50 pt-2">
+                  <div className="w-56 rounded-2xl border border-gc-line bg-background p-2 text-[14px] shadow-lg">
+                    {[
+                      { to: isAuthed ? "/dashboard" : "/auth", label: "Dashboard" },
+                      { to: "/dashboard/terminal", label: "Fiber Terminal" },
+                      { to: "/models", label: "AI models" },
+                      { to: "/platform", label: "API Platform" },
+                      { to: "/download", label: "Download app" },
+                    ].map((it) => (
+                      <Link key={it.label} to={it.to} role="menuitem" onClick={() => setTryOpen(false)} className="flex items-center justify-between rounded-lg px-3 py-2.5 text-foreground hover:bg-gc-surface">
+                        {it.label} <span className="text-[11px] text-muted-foreground">↗</span>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+            <button
+              type="button"
+              onClick={() => openAskJenvu("sales")}
+              className="inline-flex h-10 items-center justify-center whitespace-nowrap rounded-full bg-foreground px-4 text-[14px] font-medium text-background hover:opacity-85"
+            >
+              Contact sales
+            </button>
             <button
               type="button"
               aria-label="Open menu"
