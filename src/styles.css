@@ -1865,3 +1865,40 @@ h1.font-medium, h2.font-medium { letter-spacing: -0.025em; }
 .dash-dark .text-gc-ink,
 .dash-dark .text-gc-ink-muted { color: #ffffff; }
 .dark .text-gc-ink, .dark .text-gc-ink-muted { color: #ffffff; }
+
+/* ====== Ask Jenvu: follows the white / black theme ======
+   The widget mounts outside the dashboard wrapper, so the dashboard sets
+   data-dash-theme on <html>; public pages use .dark on <html>. */
+.ask-jenvu-root {
+  --ask-bg: #ffffff;
+  --gc-blue: #111111;
+  --gc-blue-hover: #333333;
+  --gc-blue-deep: #111111;
+  --gc-on-blue: #ffffff;
+  --gc-blue-soft: #f4f4f4;
+  --gc-sky: #f4f4f4;
+  --gc-surface: #f4f4f4;
+  --gc-ink: #111111;
+  --gc-ink-muted: #52525b;
+  --gc-line: rgba(0, 0, 0, 0.1);
+}
+.dark .ask-jenvu-root,
+html[data-dash-theme="dark"] .ask-jenvu-root {
+  color-scheme: dark;
+  --ask-bg: #0a0a0a;
+  --background: #0a0a0a;
+  --foreground: #ffffff;
+  --muted: #17171a;
+  --muted-foreground: #a1a1aa;
+  --border: rgba(255, 255, 255, 0.12);
+  --gc-blue: #ffffff;
+  --gc-blue-hover: #d4d4d8;
+  --gc-blue-deep: #ffffff;
+  --gc-on-blue: #000000;
+  --gc-blue-soft: #17171a;
+  --gc-sky: #17171a;
+  --gc-surface: #17171a;
+  --gc-ink: #ffffff;
+  --gc-ink-muted: #a1a1aa;
+  --gc-line: rgba(255, 255, 255, 0.12);
+}

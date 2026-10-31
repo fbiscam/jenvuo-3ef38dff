@@ -1320,7 +1320,7 @@ function DashboardLayout() {
   const themeApplies = pathname !== "/dashboard/terminal";
   const dashDark = themeApplies && dashTheme === "dark";
   // Ask Jenvu lives outside this wrapper; tell it which dashboard theme is on.
-  React.useEffect(() => {
+  useEffect(() => {
     document.documentElement.dataset.dashTheme = dashDark ? "dark" : "light";
     return () => { delete document.documentElement.dataset.dashTheme; };
   }, [dashDark]);
