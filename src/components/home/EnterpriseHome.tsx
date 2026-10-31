@@ -354,35 +354,46 @@ export function EntFacts() {
   );
 }
 
-/* 6 — Read more: latest real articles (titles max 6 words) */
+/* 6 — Latest news: 4 newest real articles (titles max 6 words) */
+const newsDate = (iso: string) =>
+  new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" });
+
 export function EntStories({ articles: items }: { articles: HomeArticle[] }) {
   if (items.length === 0) return null;
   return (
     <section className="px-5 py-24">
       <div className="mx-auto max-w-7xl">
         <div className="flex items-end justify-between gap-4">
-          <h2 className={h2}>Read more</h2>
-          <Link to="/insights" className="inline-flex items-center gap-1 text-[15px] font-medium text-foreground/80 hover:text-foreground">
-            All articles <ChevronRight className="h-4 w-4" />
+          <h2 className="text-[28px] font-medium tracking-tight text-foreground sm:text-[32px]">Latest news</h2>
+          <Link to="/insights" className="inline-flex items-center gap-0.5 text-[15px] font-medium text-foreground/80 hover:text-foreground">
+            All posts <ChevronRight className="h-4 w-4" />
           </Link>
         </div>
-        <div className="mt-10 grid grid-cols-2 gap-4 md:grid-cols-5">
+        <div className="mt-8 grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
           {items.map((a) => (
-            <Link key={a.id} to="/insights/$slug" params={{ slug: a.slug }} className="group">
-              <div className="aspect-square overflow-hidden rounded-[20px] bg-muted">
+            <Link key={a.id} to="/insights/$slug" params={{ slug: a.slug }} className="group block">
+              <div className="aspect-[16/9] overflow-hidden rounded-[14px] border border-border bg-muted">
                 <img
-                  src={insightCoverUrl(a.title, a.category ?? undefined, a.image_url)}
+                  src={a.image_url || insightCoverUrl(a.title, a.category ?? undefined)}
                   alt={a.title}
+                  width={1280}
+                  height={720}
                   loading="lazy"
                   onError={(e) => {
                     const t = e.currentTarget;
                     t.onerror = null;
                     t.src = insightCoverUrl(a.title, a.category ?? undefined);
                   }}
-                  className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                  className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]"
                 />
               </div>
-              <p className="mt-3 text-[15px] font-medium text-foreground">{shortTitle(a.title)}</p>
+              <p className="mt-4 text-[13px] text-muted-foreground">
+                {a.category ? `${a.category} · ` : ""}{newsDate(a.published_at)}
+              </p>
+              <p className="mt-1.5 inline-flex items-start gap-1 text-[17px] font-medium leading-snug tracking-tight text-foreground">
+                <span>{shortTitle(a.title)}</span>
+                <ChevronRight className="mt-[3px] h-4 w-4 shrink-0 transition-transform group-hover:translate-x-0.5" />
+              </p>
             </Link>
           ))}
         </div>

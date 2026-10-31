@@ -1,7 +1,7 @@
 import { queryOptions } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
-export const HOME_ARTICLE_COUNT = 5;
+export const HOME_ARTICLE_COUNT = 4;
 export { shortTitle, HOME_TITLE_MAX_WORDS } from "./short-title";
 
 export type HomeArticle = {
@@ -10,6 +10,7 @@ export type HomeArticle = {
   slug: string;
   category: string | null;
   image_url: string | null;
+  published_at: string;
 };
 
 export const homeArticlesQueryOptions = queryOptions({
@@ -17,7 +18,7 @@ export const homeArticlesQueryOptions = queryOptions({
   queryFn: async (): Promise<HomeArticle[]> => {
     const { data, error } = await supabase
       .from("insights")
-      .select("id, title, slug, category, image_url")
+      .select("id, title, slug, category, image_url, published_at")
       .order("published_at", { ascending: false })
       .limit(HOME_ARTICLE_COUNT);
     if (error) throw error;
