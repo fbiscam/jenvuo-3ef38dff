@@ -67,12 +67,12 @@ export function EntShowcase() {
 /* 3 — Built for business: 3 cards */
 function Card({ title, body, children }: { title: string; body: string; children: React.ReactNode }) {
   return (
-    <div className="flex flex-col overflow-hidden rounded-[24px] bg-muted/60">
-      <div className="flex h-64 items-center justify-center p-6">{children}</div>
-      <div className="p-7 pt-2">
-        <h3 className="text-[21px] font-medium tracking-tight text-foreground">{title}</h3>
+    <div className="flex min-h-[460px] flex-col overflow-hidden rounded-[24px] bg-muted/50">
+      <div className="p-8 pb-4">
+        <h3 className="text-[22px] font-medium tracking-tight text-foreground">{title}</h3>
         <p className="mt-2 text-[15px] leading-relaxed text-muted-foreground">{body}</p>
       </div>
+      <div className="mt-auto flex items-end justify-center px-8 pb-8">{children}</div>
     </div>
   );
 }
@@ -100,12 +100,23 @@ export function EntBuilt() {
           </div>
         </Card>
         <Card title="Built to deliver value" body="Simple plans and clear token pricing, so you always know what you pay.">
-          <svg viewBox="0 0 200 110" className="w-full" aria-hidden="true">
-            <polyline fill="none" stroke="var(--gc-blue)" strokeWidth="3" points="0,95 30,82 60,86 90,60 120,52 150,34 200,14" />
-            <polyline fill="none" stroke="currentColor" className="text-muted-foreground/40" strokeWidth="2" points="0,100 40,96 80,90 120,84 160,80 200,74" />
-            <rect x="120" y="4" width="76" height="22" rx="11" fill="var(--foreground)" />
-            <text x="158" y="19" textAnchor="middle" fontSize="10" fill="var(--background)">$3 / 1M tokens</text>
-          </svg>
+          <div className="relative w-full rounded-2xl border border-border bg-background p-4 shadow-sm">
+            <div className="text-[12px] font-medium text-foreground">Cost per signal check</div>
+            <svg viewBox="0 0 220 120" className="mt-2 w-full" aria-hidden="true">
+              {[0, 1, 2, 3, 4].map((i) => (
+                <g key={i}>
+                  <line x1="28" x2="220" y1={10 + i * 24} y2={10 + i * 24} stroke="var(--border)" strokeWidth="1" />
+                  <text x="0" y={14 + i * 24} fontSize="9" fill="var(--muted-foreground)">{100 - i * 10}%</text>
+                </g>
+              ))}
+              <path d="M28,100 C70,80 100,50 140,36 S200,18 220,14" fill="none" stroke="var(--gc-blue)" strokeWidth="3" />
+              <circle cx="220" cy="14" r="4" fill="var(--gc-blue)" />
+            </svg>
+            <div className="absolute -top-4 right-4 rounded-xl bg-foreground px-3 py-2 text-left text-background shadow-lg">
+              <div className="text-[12px] font-medium">$3 / 1M tokens</div>
+              <div className="text-[10px] opacity-70">Same price on every model</div>
+            </div>
+          </div>
         </Card>
       </div>
     </section>
