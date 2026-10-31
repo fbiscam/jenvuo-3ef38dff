@@ -133,7 +133,6 @@
   --color-gc-blue-deep: var(--gc-blue-deep);
   --color-gc-sky: var(--gc-sky);
   --color-gc-canvas: var(--gc-canvas);
-  --color-gc-section: var(--gc-section);
   --color-gc-success: var(--gc-success);
   --color-gc-nav-active: var(--gc-nav-active);
   --color-gc-notice: var(--gc-notice);
@@ -222,7 +221,6 @@
   --gc-sky: #dcefff;
   /* Dashboard console shell (Google Cloud console-style) */
   --gc-canvas: #f0f5fe;
-  --gc-section: #fafafa;
   --gc-success: #188038;
   --gc-nav-active: #dbedfc;
   --gc-notice: #e9eef6;
@@ -1003,7 +1001,6 @@ html[data-pwa="1"] .pwa-tabbar {
    Re-pin the light tokens here so the menu stays readable on white. */
 .dashboard-sidebar-root {
   --gc-canvas: #f0f5fe;
-  --gc-section: #fafafa;
   --gc-ink: #202124;
   --gc-ink-muted: #5f6368;
   --gc-line: #dadce0;
@@ -1231,7 +1228,6 @@ body:has(.terminal-dark) .jenvu-terminal-shell {
   --gc-console-search: oklch(0.22 0.012 275);
   --gc-console-rail-active: oklch(0.3 0.08 275);
   --gc-canvas: oklch(0 0 0);
-  --gc-section: oklch(0.12 0 0);
   --gc-ink: oklch(0.97 0 0);
   --gc-ink-muted: oklch(0.7 0.012 275);
   --gc-line: oklch(0.25 0.01 275);

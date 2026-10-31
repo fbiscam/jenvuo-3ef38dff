@@ -6,7 +6,6 @@ export const SITE_PAGES: SitePage[] = [
   { to: "/about", label: "Overview", keywords: "about company story team" },
   { to: "/strategies/ict-gold-trading", label: "Solutions", keywords: "ict smc strategy gold trading" },
   { to: "/ai-engine", label: "Products", keywords: "ai engine features terminal api" },
-  { to: "/models", label: "Models", keywords: "ai models claude gpt gemini grok deepseek qwen llm api catalog" },
   { to: "/pricing", label: "Pricing", keywords: "plans price pro elite ultra buy upgrade cost" },
   { to: "/insights", label: "Blog", keywords: "articles insights news posts" },
   { to: "/help", label: "Support", keywords: "help center support guides faq questions" },

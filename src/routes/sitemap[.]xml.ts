@@ -24,7 +24,6 @@ export const Route = createFileRoute("/sitemap.xml")({
           // shell to crawlers, which Google reports as Soft 404. Excluded on purpose.
 
           { path: "/download", changefreq: "weekly", priority: "0.8" },
-          { path: "/models", changefreq: "weekly", priority: "0.8" },
           { path: "/pricing", changefreq: "weekly", priority: "0.9" },
           { path: "/", origin: BLOG_URL, changefreq: "daily", priority: "0.9" },
           { path: "/about", changefreq: "monthly", priority: "0.7" },

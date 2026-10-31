@@ -39,7 +39,6 @@ const DASHBOARD_CHILDREN = new Set([
   "bot-usage",
   "workspace",
   "extension",
-  "models",
 ]);
 
 /** Internal dashboard path -> clean dash.jenvu.com path. */
@@ -138,7 +137,6 @@ export const GLOBAL_PATHS = new Set([
   "founder",
   "killzones",
   "llm",
-  "models",
   "pricing",
   "privacy",
   "refund",

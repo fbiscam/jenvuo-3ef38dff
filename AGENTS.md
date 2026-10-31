@@ -37,4 +37,3 @@
 - Bot Usage account delete is decided server-side by `botAccountDeleteBlock` in `src/lib/mt5-licenses.ts` (tested): accounts live on an active IP license or reporting in the last 3 minutes can never be removed.
 - Site-wide dashboard notices (updates, new bot, issues) come from `site_announcements` (admins post at `/dashboard/admin/announcements`), dismissed per user in `announcement_dismissals`; which one shows is `pickAnnouncement` in `src/lib/announcements.ts` (tested): one notice source, stays until each user dismisses it.
 - Both JX Bot IP managers use `countIpLicenses` from `mt5-licenses.ts` for slot counts: legacy account-only rows have no IP and the server reuses them when an IP is added.
-- The Models page (`/models` and `/dashboard/models`) renders `src/components/models/ModelsExplorer.tsx` from `src/lib/model-catalog.ts`, which must hold one entry per `PUBLIC_API_MODEL_IDS` id (tested): the page can never list a model the API doesn't serve.

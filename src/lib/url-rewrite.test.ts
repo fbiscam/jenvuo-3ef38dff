@@ -19,12 +19,3 @@ describe("section hosts never swallow global pages", () => {
     expect(rewriteInput(new URL("https://support.jenvu.com/getting-started"))?.pathname).toBe("/help/getting-started");
   });
 });
-
-describe("models page addresses", () => {
-  it("support.jenvu.com/models goes to the public jenvu.com/models page", () => {
-    expect(apexRedirectTarget(new URL("https://support.jenvu.com/models"))).toBe("https://jenvu.com/models");
-  });
-  it("dash.jenvu.com/models opens the dashboard Models page", () => {
-    expect(rewriteInput(new URL("https://dash.jenvu.com/models"))?.pathname).toBe("/dashboard/models");
-  });
-});

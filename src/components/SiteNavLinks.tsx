@@ -5,7 +5,6 @@ import { Menu, X } from "lucide-react";
 /** Canonical top-navigation links, shared by every public page. */
 export const SITE_NAV_LINKS = [
   { to: "/", label: "Home", external: true },
-  { to: "/models", label: "Models" },
   { to: "/pricing", label: "Pricing" },
   { to: "/insights", label: "Insights" },
   { to: "/help", label: "Help Centre" },
