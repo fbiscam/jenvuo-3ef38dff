@@ -353,7 +353,7 @@ function ExtensionPage() {
             </button>
           </div>
           <pre
-            className={`${MONO} mt-3 overflow-x-auto rounded-md border border-zinc-200 bg-zinc-50 p-3 text-[11.5px] leading-relaxed text-zinc-700`}
+            className={`${MONO} code-box mt-3 overflow-x-auto rounded-md p-3 text-[11.5px] leading-relaxed`}
           >{`curl ${API_BASE}/chat/completions \\
   -H "Authorization: Bearer YOUR_JENVU_KEY" \\
   -H "Content-Type: application/json" \\
