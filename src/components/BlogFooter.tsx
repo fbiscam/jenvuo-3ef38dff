@@ -1,3 +1,4 @@
+import JenvuMark from "@/components/JenvuMark";
 import { Link } from "@tanstack/react-router";
 import { HelpCircle } from "lucide-react";
 
@@ -27,7 +28,7 @@ export default function BlogFooter() {
 
         <div className="mt-8 flex flex-col gap-5 border-t border-gc-line pt-8 md:flex-row md:items-center md:justify-between">
           <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
-            <img src="/favicon.png" alt="Jenvu" width={36} height={36} className="h-9 w-9 shrink-0" />
+            <JenvuMark className="h-9 w-9 shrink-0 text-foreground" />
             <a href="https://jenvu.com/" className="text-[15px] text-gc-ink-muted hover:text-gc-ink">Jenvu</a>
             <Link to="/pricing" className="text-[15px] text-gc-ink-muted hover:text-gc-ink">Jenvu Products</Link>
             <Link to="/privacy" className="text-[15px] text-gc-ink-muted hover:text-gc-ink">Privacy</Link>

@@ -1,3 +1,4 @@
+import JenvuMark from "@/components/JenvuMark";
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
@@ -100,7 +101,7 @@ function OpsHub() {
   return (
     <div className={`min-h-dvh w-full bg-background text-foreground ${SANS} antialiased`}>
       <header className="sticky top-0 z-30 flex min-h-14 items-center gap-3 border-b border-border bg-background px-4 py-2 sm:px-6">
-        <img src="/favicon.png" alt="Jenvu" className="h-7 w-7 rounded-md object-contain" />
+        <JenvuMark className="h-7 w-7 text-foreground" />
         <div className="min-w-0">
           <div className="truncate text-[15px] font-medium text-foreground">Operations hub</div>
           <div className="hidden text-[13px] text-muted-foreground sm:block">Restricted · authorized team only</div>
@@ -163,7 +164,7 @@ function OpsHub() {
                 </svg>
                 Back
               </button>
-              <img src="/favicon.png" alt="Jenvu" className="h-6 w-6 rounded-md object-contain" />
+              <JenvuMark className="h-6 w-6 text-foreground" />
               <div className="flex min-w-0 flex-col leading-tight">
                 <span className="truncate text-[14px] font-medium text-foreground">{active.title}</span>
                 <span className="truncate text-[12px] text-muted-foreground">{active.desc}</span>

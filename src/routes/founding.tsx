@@ -1,3 +1,4 @@
+import JenvuMark from "@/components/JenvuMark";
 import * as React from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
@@ -113,7 +114,7 @@ function FoundingPage() {
           {/* Hero — homepage style */}
           <section className="bg-background">
             <div className="mx-auto max-w-[1296px] px-5 pb-12 pt-12 text-center sm:px-8 md:pt-14">
-              <img src="/favicon.png" alt="" width={64} height={64} className="jenvu-logo-intro mx-auto h-16 w-16 object-contain" />
+              <JenvuMark className="jenvu-logo-intro mx-auto h-16 w-16 text-foreground" />
               <span className="jenvu-rise mt-6 inline-flex rounded-full bg-gc-blue-soft px-3 py-1 text-[13px] font-medium text-gc-blue-deep">Invite-only · {remaining} seats left this month</span>
               <h1 className="jenvu-rise mx-auto mt-5 max-w-[900px] text-[40px] font-medium leading-[1.1] tracking-[-0.5px] text-gc-ink sm:text-[56px] md:text-[60px]">
                 Founding Trader Program

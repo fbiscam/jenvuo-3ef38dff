@@ -1,3 +1,4 @@
+import JenvuMark from "@/components/JenvuMark";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import * as React from "react";
 import {
@@ -480,7 +481,7 @@ function ExperiencesSection() {
             {tab === "chat" ? <ChatDemo key="chat" /> : <VisionDemo key="vision" />}
           </div>
           <div className="absolute inset-x-0 bottom-4 flex items-center justify-center gap-1.5">
-            <img src="/favicon.png" alt="" width={20} height={20} className="h-5 w-5 rounded" />
+            <JenvuMark className="h-5 w-5 text-foreground" />
             <span className="text-base font-semibold tracking-tight">Jenvu</span>
           </div>
           <p className="absolute bottom-2 right-3 text-[9px] text-gc-ink-muted">Illustrative example. Results may vary.</p>

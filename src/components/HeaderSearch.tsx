@@ -7,7 +7,7 @@ import { askJenvu, type AskJenvuResult } from "@/lib/ask-jenvu.functions";
 import { SITE_PAGES, matchSitePages } from "@/lib/site-pages";
 import { MessageResponse } from "@/components/ai-elements/message";
 import { Shimmer } from "@/components/ai-elements/shimmer";
-import askJenvuMark from "@/assets/ask-jenvu-mark.png";
+import { JENVU_MARK_URL as askJenvuMark } from "@/components/JenvuMark";
 
 /**
  * Header search that opens in place of the top menu (Google Cloud style).

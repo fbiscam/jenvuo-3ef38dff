@@ -4,7 +4,7 @@ import { siteSearch, type SearchHit } from "@/lib/site-search.functions";
 import { askJenvu, type AskJenvuResult } from "@/lib/ask-jenvu.functions";
 import { MessageResponse } from "@/components/ai-elements/message";
 import { Shimmer } from "@/components/ai-elements/shimmer";
-import askJenvuMark from "@/assets/ask-jenvu-mark.png";
+import { JENVU_MARK_URL as askJenvuMark } from "@/components/JenvuMark";
 import GiftBox from "@/components/dashboard/GiftBox";
 import { SITE_PAGES } from "@/lib/site-pages";
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
@@ -35,6 +35,7 @@ export default function DashboardTopBar({
   email,
   onSignOut,
   white = false,
+  pinned = false,
 }: {
   links: NavLink[];
   onMenu: () => void;
@@ -44,6 +45,8 @@ export default function DashboardTopBar({
   onSignOut: () => void;
   /** Pure white bar (used on the Terminal page). */
   white?: boolean;
+  /** Sidebar is pinned on desktop: hide the menu button and logo there. */
+  pinned?: boolean;
 }) {
   const navigate = useNavigate();
   const [q, setQ] = useState("");
@@ -133,16 +136,16 @@ export default function DashboardTopBar({
   const seeAll = () => { const t = q.trim(); if (!t) return; close(); void navigate({ to: "/search", search: { q: t } }); };
 
   return (
-    <header className={`sticky top-0 z-30 flex ${white ? "h-[52px]" : "h-14"} shrink-0 items-center gap-2 ${white ? "border-b border-gc-line bg-background" : "bg-gc-canvas"} px-2 sm:gap-3 sm:px-3`}>
+    <header className={`sticky top-0 z-30 flex ${white ? "h-[52px]" : "h-14"} shrink-0 items-center gap-2 ${white ? "border-b border-gc-line bg-background" : "console-topbar border-b border-gc-line bg-background"} px-2 sm:gap-3 sm:px-3`}>
       <button
         type="button"
         onClick={onMenu}
         aria-label="Open menu"
-        className={`${onTerminal ? "hidden md:inline-flex" : "inline-flex"} h-10 w-10 shrink-0 items-center justify-center rounded-full text-gc-ink-muted hover:bg-gc-notice`}
+        className={`${onTerminal ? "hidden md:inline-flex" : pinned ? "inline-flex lg:hidden" : "inline-flex"} h-10 w-10 shrink-0 items-center justify-center rounded-full text-gc-ink-muted hover:bg-gc-notice`}
       >
         <Menu className="h-5 w-5" />
       </button>
-      <Link to="/dashboard" className="flex shrink-0 items-center gap-2 pr-2">
+      <Link to="/dashboard" className={`${pinned ? "flex lg:hidden" : "flex"} shrink-0 items-center gap-2 pr-2`}>
         <JenvuMark className="h-5 w-5 text-foreground" />
         <span className="text-[20px] font-medium tracking-tight text-foreground">Jenvu</span>
       </Link>
@@ -273,7 +276,7 @@ export default function DashboardTopBar({
             title="Ask Jenvu"
             className="inline-flex h-9 items-center gap-2 rounded-full bg-gc-sky px-2.5 text-[13px] font-medium text-gc-blue-deep hover:brightness-95 sm:px-3.5"
           >
-            <img src={askJenvuMark} alt="" className="h-3.5 w-auto shrink-0" />
+            <JenvuMark className="h-3.5 w-3.5 shrink-0" />
             <span className="hidden lg:inline">Ask Jenvu</span>
           </button>
         )}

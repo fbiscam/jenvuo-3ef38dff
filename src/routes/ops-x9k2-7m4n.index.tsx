@@ -1,3 +1,4 @@
+import JenvuMark from "@/components/JenvuMark";
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
@@ -61,7 +62,7 @@ function OpsLogin() {
       <main className="mx-auto flex min-h-dvh max-w-md items-center justify-center px-5 py-16 sm:px-6">
         <form onSubmit={onSubmit} className="w-full rounded-2xl border border-border bg-background p-7 shadow-sm sm:p-10">
           <div className="flex items-center gap-2.5">
-            <img src="/favicon.png" alt="Jenvu" className="h-7 w-7 rounded-md object-contain" />
+            <JenvuMark className="h-7 w-7 text-foreground" />
             <span className="text-[22px] font-medium leading-none tracking-tight text-gc-ink">Jenvu</span>
             <span className="ml-auto rounded-full bg-gc-sky px-2.5 py-0.5 text-[12px] font-medium text-gc-blue-deep">Ops console</span>
           </div>

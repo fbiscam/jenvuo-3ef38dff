@@ -1,3 +1,4 @@
+import JenvuMark from "@/components/JenvuMark";
 import * as React from "react";
 import SiteHeader from "@/components/SiteHeader";
 import { createFileRoute, Link } from "@tanstack/react-router";
@@ -195,7 +196,7 @@ function ContactPage() {
           <div aria-hidden className="pointer-events-none absolute inset-0 opacity-60" style={{ backgroundImage: "var(--platform-aurora-1)" }} />
           <div className="relative max-w-[370px] space-y-4">
             <div className="rounded-md border border-gc-line bg-background p-6 shadow-sm">
-              <img src="/favicon.png" alt="Jenvu" className="h-10 w-10 rounded-lg object-contain" />
+              <JenvuMark className="h-10 w-10 text-foreground" />
               <h2 className="mt-4 text-[22px] font-medium tracking-tight">Contact our team direct</h2>
               <a href="mailto:support@jenvu.com" className="mt-6 flex w-full items-center justify-center gap-2 rounded-full bg-gc-blue px-5 py-3 text-[15px] font-medium text-gc-on-blue transition-colors hover:bg-gc-blue-hover">
                 support@jenvu.com

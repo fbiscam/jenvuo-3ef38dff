@@ -1,3 +1,4 @@
+import JenvuMark from "@/components/JenvuMark";
 import SiteHeader from "@/components/SiteHeader";
 import HeaderAuthButtons from "@/components/HeaderAuthButtons";
 import { createFileRoute, Link } from "@tanstack/react-router";
@@ -164,7 +165,7 @@ function InsightsPage() {
       <div className="jenvu-blog-content">
         {/* HERO */}
         <section className="mx-auto max-w-[1200px] px-5 pb-6 pt-14 text-center sm:px-8 sm:pt-16">
-          <img src="/favicon.png" alt="" width={56} height={56} className="mx-auto h-14 w-14 object-contain" />
+          <JenvuMark className="mx-auto h-14 w-14 text-foreground" />
           <h1 className="mx-auto mt-5 max-w-[960px] text-[34px] font-medium leading-[1.15] tracking-[-0.5px] text-gc-ink sm:text-[50px]">
             <span className="text-gc-blue">News, tips, and insights</span> to sharpen your Fiber trading
           </h1>
