@@ -282,7 +282,6 @@ function StartSection() {
 }
 
 /* ---------- 4. All-in-one platform (shared component) ---------- */
-}
 
 /* ---------- 5. Bring AI experiences to life ---------- */
 
