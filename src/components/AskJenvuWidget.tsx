@@ -9,7 +9,7 @@ import { MessageResponse } from "@/components/ai-elements/message";
 import { Shimmer } from "@/components/ai-elements/shimmer";
 import { askJenvu } from "@/lib/ask-jenvu.functions";
 import { submitContactMessage } from "@/lib/contact.functions";
-import askJenvuMark from "@/assets/ask-jenvu-mark.png";
+import JenvuMark from "@/components/JenvuMark";
 import { LiveChatPanel } from "@/components/LiveChatWidget";
 import { wantsLiveAgent } from "@/lib/live-agent-intent";
 
@@ -148,7 +148,7 @@ export function AskJenvuWidget() {
             compact ? "w-12 sm:w-14 px-0" : "px-4 sm:px-6",
           ].join(" ")}
         >
-          <span aria-hidden className="h-5 w-9 shrink-0 bg-current" style={{ WebkitMask: `url(${askJenvuMark}) center / contain no-repeat`, mask: `url(${askJenvuMark}) center / contain no-repeat` }} />
+          <JenvuMark className="h-5 w-5 shrink-0" />
           {!compact && <span className="whitespace-nowrap">Ask Jenvu</span>}
         </button>
       )}
@@ -240,7 +240,7 @@ export function AskJenvuWidget() {
                     )}
                     {busy && (
                       <div className="flex items-center gap-2.5 text-[15px]" role="status">
-                        <span aria-hidden className="ask-jenvu-mark-ring h-6 w-10 shrink-0" style={{ ["--mark" as string]: `url(${askJenvuMark})` }}><span className="ask-jenvu-mark-loop h-full w-full" /></span>
+                        <JenvuMark className="h-5 w-5 shrink-0 animate-pulse" />
                         <Shimmer>Thinking about your question…</Shimmer>
                       </div>
                     )}
