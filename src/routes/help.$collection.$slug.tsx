@@ -113,7 +113,7 @@ function ArticlePage() {
                 </ol>
               );
               if (b.type === "code") return (
-                <pre key={i} className={`${MONO} rounded-md border border-gc-line bg-gc-panel p-4 text-[12px] sm:text-[13px] text-gc-ink whitespace-pre-wrap`}>{b.content}</pre>
+                <pre key={i} className={`${MONO} code-box rounded-md p-4 text-[12px] sm:text-[13px] whitespace-pre-wrap`}>{b.content}</pre>
               );
               // note
               const tone = b.tone ?? "info";

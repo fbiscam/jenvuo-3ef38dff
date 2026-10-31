@@ -109,6 +109,16 @@ function publicAuthClient() {
   })
 }
 
+/** Email + password sign-in done on the server (after the Cloudflare check). */
+export async function passwordSignIn(email: string, password: string) {
+  const { data, error } = await publicAuthClient().auth.signInWithPassword({ email, password })
+  if (error || !data.session) return { ok: false as const, error: error?.message || 'Sign-in failed.' }
+  return {
+    ok: true as const,
+    session: { access_token: data.session.access_token, refresh_token: data.session.refresh_token },
+  }
+}
+
 function generateSixDigitCode() {
   const bytes = crypto.getRandomValues(new Uint32Array(1))
   return String(bytes[0] % 1_000_000).padStart(6, '0')

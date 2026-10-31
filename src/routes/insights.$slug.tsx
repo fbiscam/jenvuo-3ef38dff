@@ -240,7 +240,7 @@ function InsightDetailPage() {
                   }
                   return <code className={`${MONO} rounded bg-gc-surface px-1.5 py-0.5 text-[0.9em] text-gc-ink`}>{children}</code>;
                 },
-                pre: ({ children }) => <pre className="my-6">{children}</pre>,
+                pre: ({ children }) => <pre className="code-box my-6 overflow-x-auto rounded-xl p-4 text-[13px] leading-relaxed">{children}</pre>,
                 table: ({ children }) => (
                   <div className="my-8 overflow-x-auto rounded-md border border-gc-line">
                     <table className="w-full text-[15px]">{children}</table>
