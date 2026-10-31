@@ -85,6 +85,41 @@ export function getCatalogModel(id: string): CatalogModel | undefined {
   return MODEL_CATALOG.find((m) => m.id === id);
 }
 
+/**
+ * Reorders models so companies are mixed: never two of the same provider in a
+ * row while another provider still has models left. Keeps each provider's own order.
+ */
+export function mixByProvider(models: CatalogModel[]): CatalogModel[] {
+  const queues = new Map<ProviderKey, CatalogModel[]>();
+  for (const m of models) {
+    if (!queues.has(m.provider)) queues.set(m.provider, []);
+    queues.get(m.provider)!.push(m);
+  }
+  const order = [...queues.keys()];
+  const out: CatalogModel[] = [];
+  let last: ProviderKey | null = null;
+  let turn = 0;
+  while (out.length < models.length) {
+    const remaining = models.length - out.length;
+    // A company that would otherwise run out of gaps must go now.
+    let pick: ProviderKey | null = order.find((p) => p !== last && queues.get(p)!.length * 2 > remaining) ?? null;
+    if (!pick) {
+      // Otherwise take companies in turn, one model each.
+      for (let i = 0; i < order.length; i++) {
+        const p = order[(turn + i) % order.length];
+        if (queues.get(p)!.length && p !== last) { pick = p; turn = (turn + i + 1) % order.length; break; }
+      }
+    }
+    if (!pick) pick = last!; // only one company left
+    out.push(queues.get(pick)!.shift()!);
+    last = pick;
+  }
+  return out;
+}
+
+/** Every model, companies mixed, for lists on the Models page. */
+export const MIXED_CATALOG = mixByProvider(MODEL_CATALOG);
+
 export function formatContext(tokens: number): string {
   if (tokens >= MIL) return `${tokens / MIL}M`;
   return `${Math.round(tokens / K)}K`;
