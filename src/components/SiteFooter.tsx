@@ -166,26 +166,30 @@ export default function SiteFooter({ className }: { className?: string }) {
             </div>
           </div>
 
-          {/* Link columns */}
-          <div className="grid flex-1 grid-cols-2 gap-x-8 gap-y-10 sm:grid-cols-3 lg:grid-cols-5 lg:pl-12">
-            {columns.map((groups, ci) => (
-              <div key={ci} className="space-y-9">
-                {groups.map((g) => (
-                  <div key={g.label}>
-                    <h3 className="text-[14px] font-medium text-foreground">{g.label}</h3>
-                    <ul className="mt-4 space-y-2.5">
-                      {g.links.map((l) => (
-                        <li key={`${l.href ?? l.to}:${l.label}`}>
-                          {l.href ? (
-                            <a href={l.href} target="_blank" rel="noopener noreferrer" className={linkCls}>{l.label}</a>
-                          ) : (
-                            <Link to={l.to} className={linkCls}>{l.label}</Link>
-                          )}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                ))}
+          {/* Link columns: two rows so every title in a row sits on the same line */}
+          <div className="flex flex-1 flex-col gap-10 lg:pl-12">
+            {[0, 1].map((row) => (
+              <div key={row} className="grid grid-cols-2 gap-x-8 gap-y-10 sm:grid-cols-3 lg:grid-cols-5">
+                {columns.map((groups) => {
+                  const g = groups[row];
+                  if (!g) return null;
+                  return (
+                    <div key={g.label}>
+                      <h3 className="text-[14px] font-medium text-foreground">{g.label}</h3>
+                      <ul className="mt-4 space-y-2.5">
+                        {g.links.map((l) => (
+                          <li key={`${l.href ?? l.to}:${l.label}`}>
+                            {l.href ? (
+                              <a href={l.href} target="_blank" rel="noopener noreferrer" className={linkCls}>{l.label}</a>
+                            ) : (
+                              <Link to={l.to} className={linkCls}>{l.label}</Link>
+                            )}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  );
+                })}
               </div>
             ))}
           </div>
