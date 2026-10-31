@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -8,10 +8,10 @@ import { readCachedAvatar, writeCachedAvatar, AVATAR_TTL_SECONDS } from "@/lib/a
 
 const PROFILE_CACHE_KEY = "jenvu:profile:basics";
 import { useVerification } from "@/hooks/useVerification";
-import { Camera, Loader2, Trash2, Upload } from "lucide-react";
-import { SettingsCard, settingsBtn, settingsBtnPrimary, settingsField } from "@/components/settings/SettingsCard";
-import { DangerZoneSettings } from "@/components/settings/SecuritySettings";
-import { SettingsPageHeader } from "@/components/settings/SettingsNav";
+import { ArrowUpRight, Camera, Check, Copy, FileText, Loader2, LogOut, Mail, Moon, ShieldCheck, Sun, Trash2, UserRound, UserSquare2 } from "lucide-react";
+import { readSiteTheme, saveSiteTheme, SITE_THEME_EVENT, type SiteTheme } from "@/lib/site-theme";
+import { signOutAndRedirect } from "@/lib/cross-domain-session";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/dashboard/profile")({
   head: () => ({
@@ -34,6 +34,7 @@ const LEGACY_HASH_PAGES: Record<string, "/dashboard/security" | "/dashboard/sett
   "change-email": "/dashboard/security",
   sessions: "/dashboard/security",
   preferences: "/dashboard/settings",
+  danger: "/dashboard/settings",
 };
 
 function Profile() {
@@ -51,6 +52,37 @@ function Profile() {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [pendingFile, setPendingFile] = useState<File | null>(null);
   const [, setMailAddress] = useState<string | null>(null);
+  const [theme, setTheme] = useState<SiteTheme>("light");
+  const [copied, setCopied] = useState(false);
+  const [signingOut, setSigningOut] = useState(false);
+
+  useEffect(() => {
+    const stored = readSiteTheme() ?? window.localStorage.getItem("jenvu:dash:theme");
+    if (stored === "light" || stored === "dark") setTheme(stored);
+    const onChange = (e: Event) => {
+      const t = (e as CustomEvent<SiteTheme>).detail;
+      if (t === "light" || t === "dark") setTheme(t);
+    };
+    window.addEventListener(SITE_THEME_EVENT, onChange);
+    return () => window.removeEventListener(SITE_THEME_EVENT, onChange);
+  }, []);
+
+  const pickTheme = (t: SiteTheme) => { setTheme(t); saveSiteTheme(t); };
+
+  const copyId = async () => {
+    if (!userId) return;
+    try {
+      await navigator.clipboard.writeText(userId);
+      setCopied(true);
+      toast.success("Copied");
+      setTimeout(() => setCopied(false), 1800);
+    } catch { toast.error("Copy failed"); }
+  };
+
+  const logOut = async () => {
+    setSigningOut(true);
+    try { await signOutAndRedirect("/dashboard"); } catch { setSigningOut(false); }
+  };
 
   useEffect(() => {
     const hash = window.location.hash.replace("#", "");
@@ -165,87 +197,130 @@ function Profile() {
   };
 
   const initial = (fullName || email || "?").trim().charAt(0).toUpperCase();
+  const pill =
+    "inline-flex h-9 items-center justify-center gap-1.5 rounded-full border border-gc-line bg-background px-4 text-[14px] text-gc-ink transition-colors hover:bg-gc-surface disabled:opacity-50";
+  const row = "flex flex-wrap items-center justify-between gap-x-6 gap-y-2 py-3";
+  const rowLabel = "flex min-w-0 items-center gap-3 text-[15px] text-gc-ink";
+  const themes: { key: SiteTheme; label: string; icon: typeof Sun }[] = [
+    { key: "light", label: "Light", icon: Sun },
+    { key: "dark", label: "Dark", icon: Moon },
+  ];
 
   return (
-    <div className="mx-auto w-full max-w-[1100px] pb-10 text-foreground">
-      <SettingsPageHeader title="Personal" description="Your photo, name and email address." />
+    <div className="mx-auto w-full max-w-[880px] pb-10 pt-2 text-foreground">
+      <h1 className="text-[28px] font-normal leading-tight tracking-tight text-gc-ink sm:text-[32px]">Personal</h1>
 
-      <div className="mt-6">
-        <div className="min-w-0 space-y-6">
-          <SettingsCard id="profile" title="Profile" description="Your photo and name show on your dashboard, in the top menu ">
-            <div className="flex flex-col gap-5 px-6 py-5 sm:flex-row sm:items-center sm:px-7">
-              <div
-                role="button"
-                tabIndex={0}
-                onClick={() => { if (!uploadingAvatar) onAvatarPick(); }}
-                onKeyDown={(e) => { if ((e.key === "Enter" || e.key === " ") && !uploadingAvatar) { e.preventDefault(); onAvatarPick(); } }}
-                aria-label={avatarPath ? "Change profile photo" : "Upload profile photo"}
-                className="group relative h-20 w-20 shrink-0 cursor-pointer overflow-hidden rounded-full bg-gc-blue-soft outline-none focus-visible:ring-2 focus-visible:ring-gc-blue-deep"
-              >
-                {avatarUrl ? (
-                  <img src={avatarUrl} alt="Profile" className="h-full w-full object-cover" />
-                ) : (
-                  <span className="flex h-full w-full items-center justify-center text-[30px] font-medium text-gc-blue-deep">{initial}</span>
-                )}
-                <span className="absolute inset-0 flex items-center justify-center bg-gc-ink/55 text-background opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100">
-                  <Camera className="h-5 w-5" />
-                </span>
-                {uploadingAvatar && (
-                  <span className="absolute inset-0 flex items-center justify-center bg-background/70">
-                    <Loader2 className="h-6 w-6 animate-spin text-gc-blue-deep" />
-                  </span>
-                )}
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className="truncate text-[18px] font-medium leading-tight">{fullName || "Your name"}</p>
-                <p className="truncate text-[14px] text-gc-ink-muted">{email}</p>
-                <p className="mt-1 text-[12px] text-gc-ink-muted">JPG, PNG or WebP, up to 10MB. You can crop before saving.</p>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                <button type="button" onClick={onAvatarPick} disabled={uploadingAvatar} className={settingsBtnPrimary}>
-                  <Upload className="h-4 w-4" />
-                  {uploadingAvatar ? "Uploading…" : avatarPath ? "Change photo" : "Upload photo"}
-                </button>
-                {avatarPath && (
-                  <button type="button" onClick={removeAvatar} disabled={uploadingAvatar} className={settingsBtn}>
-                    <Trash2 className="h-4 w-4" />
-                    Remove
-                  </button>
-                )}
-                <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={onAvatarChange} />
-              </div>
-            </div>
-
-            <div className="grid gap-5 px-6 py-5 sm:grid-cols-2 sm:px-7">
-              <label className="block text-[13px] font-medium text-gc-ink-muted">
-                Full name
-                <input
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  disabled={nameLocked}
-                  className={`mt-1.5 ${settingsField} ${nameLocked ? "cursor-not-allowed bg-gc-surface text-gc-ink-muted" : ""}`}
-                  placeholder="Your name"
-                />
-                {nameLocked && (
-                  <span className="mt-1.5 block text-[12px] font-normal text-gc-ink-muted">
-                    Locked — your name is verified against your identity documents. Contact support to change it.
-                  </span>
-                )}
-              </label>
-              <label className="block text-[13px] font-medium text-gc-ink-muted">
-                Email
-                <input value={email} disabled className={`mt-1.5 ${settingsField} cursor-not-allowed bg-gc-surface text-gc-ink-muted`} />
-              </label>
-            </div>
-            <div className="flex justify-end px-6 py-4 sm:px-7">
-              <button onClick={saveProfile} disabled={saving || nameLocked} className={settingsBtnPrimary}>
-                {saving ? "Saving…" : "Save changes"}
-              </button>
-            </div>
-          </SettingsCard>
-
-          <DangerZoneSettings />
+      {/* Photo, name and email */}
+      <div className="mt-7 flex flex-wrap items-center justify-between gap-4">
+        <div className="flex min-w-0 items-center gap-3">
+          <div
+            role="button"
+            tabIndex={0}
+            onClick={() => { if (!uploadingAvatar) onAvatarPick(); }}
+            onKeyDown={(e) => { if ((e.key === "Enter" || e.key === " ") && !uploadingAvatar) { e.preventDefault(); onAvatarPick(); } }}
+            aria-label={avatarPath ? "Change profile photo" : "Upload profile photo"}
+            className="group relative h-11 w-11 shrink-0 cursor-pointer overflow-hidden rounded-full bg-gc-surface outline-none focus-visible:ring-2 focus-visible:ring-gc-ink-muted"
+          >
+            {avatarUrl ? (
+              <img src={avatarUrl} alt="Profile" className="h-full w-full object-cover" />
+            ) : (
+              <span className="flex h-full w-full items-center justify-center text-[17px] font-medium text-gc-ink">{initial}</span>
+            )}
+            <span className="absolute inset-0 flex items-center justify-center bg-gc-ink/55 text-background opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100">
+              <Camera className="h-4 w-4" />
+            </span>
+            {uploadingAvatar && (
+              <span className="absolute inset-0 flex items-center justify-center bg-background/70">
+                <Loader2 className="h-4 w-4 animate-spin text-gc-ink" />
+              </span>
+            )}
+          </div>
+          <div className="min-w-0">
+            <p className="truncate text-[15px] font-medium text-gc-ink">{fullName || "Your name"}</p>
+            <p className="truncate text-[14px] text-gc-ink-muted">{email}</p>
+          </div>
         </div>
+        <div className="flex flex-wrap gap-2">
+          {avatarPath && (
+            <button type="button" onClick={removeAvatar} disabled={uploadingAvatar} className={pill}>
+              <Trash2 className="h-4 w-4" /> Remove
+            </button>
+          )}
+          <button type="button" onClick={onAvatarPick} disabled={uploadingAvatar} className={pill}>
+            <Camera className="h-4 w-4" />
+            {uploadingAvatar ? "Uploading…" : avatarPath ? "Change photo" : "Upload photo"}
+          </button>
+          <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={onAvatarChange} />
+        </div>
+      </div>
+
+      {/* Theme */}
+      <div role="radiogroup" aria-label="Theme" className="mt-6 grid grid-cols-2 gap-2">
+        {themes.map((t) => (
+          <button
+            key={t.key}
+            type="button"
+            role="radio"
+            aria-checked={theme === t.key}
+            onClick={() => pickTheme(t.key)}
+            className={cn(
+              "flex h-[70px] flex-col items-center justify-center gap-1.5 rounded-xl border text-[14px] transition-colors",
+              theme === t.key ? "border-gc-line bg-gc-surface text-gc-ink" : "border-gc-line bg-background text-gc-ink-muted hover:text-gc-ink",
+            )}
+          >
+            <t.icon className="h-[18px] w-[18px]" strokeWidth={1.75} />
+            {t.label}
+          </button>
+        ))}
+      </div>
+
+      <div className="mt-6 border-t border-gc-line py-3">
+        <div className={row}>
+          <span className={rowLabel}><UserRound className="h-[18px] w-[18px] shrink-0" strokeWidth={1.75} /> Full name</span>
+          <div className="ml-auto flex min-w-0 items-center gap-2">
+            <input
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+              disabled={nameLocked}
+              placeholder="Your name"
+              aria-label="Full name"
+              className="h-9 w-[200px] max-w-full rounded-lg border border-gc-line bg-background px-3 text-[14px] text-gc-ink outline-none focus:border-gc-ink-muted disabled:cursor-not-allowed disabled:text-gc-ink-muted"
+            />
+            {!nameLocked && (
+              <button type="button" onClick={saveProfile} disabled={saving} className={pill}>{saving ? "Saving…" : "Save"}</button>
+            )}
+          </div>
+        </div>
+        {nameLocked && (
+          <p className="-mt-1 pb-2 pl-[30px] text-[12px] text-gc-ink-muted">Locked — your name is verified against your identity documents. Contact support to change it.</p>
+        )}
+        <div className={row}>
+          <span className={rowLabel}><Mail className="h-[18px] w-[18px] shrink-0" strokeWidth={1.75} /> Email</span>
+          <span className="ml-auto truncate text-[14px] text-gc-ink-muted">{email || "—"}</span>
+        </div>
+        <div className={row}>
+          <span className={rowLabel}><ShieldCheck className="h-[18px] w-[18px] shrink-0" strokeWidth={1.75} /> Password and security</span>
+          <Link to="/dashboard/security" className={cn(pill, "ml-auto")}>Manage <ArrowUpRight className="h-3.5 w-3.5" /></Link>
+        </div>
+        <div className={row}>
+          <span className={rowLabel}><FileText className="h-[18px] w-[18px] shrink-0" strokeWidth={1.75} /> Terms and policies</span>
+          <Link to="/terms" className={cn(pill, "ml-auto")}>View terms <ArrowUpRight className="h-3.5 w-3.5" /></Link>
+        </div>
+      </div>
+
+      <div className="border-t border-gc-line py-3">
+        <div className={row}>
+          <span className={rowLabel}><UserSquare2 className="h-[18px] w-[18px] shrink-0" strokeWidth={1.75} /> User ID</span>
+          <button type="button" onClick={() => void copyId()} disabled={!userId} className={cn(pill, "ml-auto")}>
+            {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />} Copy ID
+          </button>
+        </div>
+      </div>
+
+      <div className="flex justify-end border-t border-gc-line py-6">
+        <button type="button" onClick={() => void logOut()} disabled={signingOut} className={pill}>
+          <LogOut className="h-4 w-4" /> {signingOut ? "Logging out…" : "Log out"}
+        </button>
       </div>
 
       {pendingFile && (

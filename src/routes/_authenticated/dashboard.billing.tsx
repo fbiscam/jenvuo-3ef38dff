@@ -3,7 +3,6 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { useCredits } from "@/hooks/useCredits";
-import { Button } from "@/components/ui/button";
 import { useTrial } from "@/hooks/useTrial";
 import { cancelMyPlan } from "@/lib/subscription.functions";
 import { redeemFreeCode } from "@/lib/payments.functions";
@@ -18,7 +17,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Info, CreditCard, Settings, BarChart3, FileText, SlidersHorizontal, ArrowRight, Tag } from "lucide-react";
+import { Info } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/dashboard/billing")({
   head: () => ({
@@ -50,7 +49,12 @@ type BillingRow = {
   metadata: Record<string, unknown> | null;
 };
 
-const TABS = ["Overview", "Payment methods", "Billing history", "Credit grants", "Preferences", "Promotions"] as const;
+const pill =
+  "inline-flex h-9 items-center justify-center gap-1.5 rounded-full border border-gc-line bg-background px-4 text-[14px] text-gc-ink transition-colors hover:bg-gc-surface disabled:opacity-50";
+const pillSolid =
+  "inline-flex h-9 items-center justify-center gap-1.5 rounded-full bg-gc-blue px-4 text-[14px] font-medium text-gc-on-blue transition-colors hover:bg-gc-blue-hover disabled:opacity-50";
+const field =
+  "h-10 w-full rounded-lg border border-gc-line bg-background px-3 text-[14px] text-gc-ink outline-none focus:border-gc-ink-muted";
 
 function Billing() {
   const credits = useCredits();
@@ -58,7 +62,8 @@ function Billing() {
   const cancelPlan = useServerFn(cancelMyPlan);
   const redeemPromotion = useServerFn(redeemFreeCode);
 
-  const [activeTab, setActiveTab] = useState<(typeof TABS)[number]>("Overview");
+  const [promoOpen, setPromoOpen] = useState(false);
+  const [detailsOpen, setDetailsOpen] = useState(false);
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
   const [cancellingPlan, setCancellingPlan] = useState(false);
   const [promoCode, setPromoCode] = useState("");
@@ -138,10 +143,10 @@ function Billing() {
 
   if (isLoading) {
     return (
-      <div className="space-y-8">
-        <div className="h-9 w-28 animate-pulse rounded bg-zinc-100" />
-        <div className="h-8 w-full animate-pulse rounded bg-zinc-100" />
-        <div className="h-40 w-full animate-pulse rounded-xl bg-zinc-100" />
+      <div className="mx-auto w-full max-w-[930px] space-y-8 pt-2">
+        <div className="h-9 w-28 animate-pulse rounded bg-gc-surface" />
+        <div className="h-8 w-full animate-pulse rounded bg-gc-surface" />
+        <div className="h-40 w-full animate-pulse rounded-xl bg-gc-surface" />
       </div>
     );
   }
@@ -152,70 +157,83 @@ function Billing() {
   const planLabel = trial.active ? "Pay as you go" : plan ? "Pay as you go" : "Pay as you go";
   const remaining = credits.balance;
 
-  const shortcuts: Array<{
-    icon: typeof CreditCard;
-    title: string;
-    desc: string;
-    tab?: (typeof TABS)[number];
-    to?: string;
-  }> = [
-    { icon: CreditCard, title: "Payment methods", desc: "Manage your deposit addresses and crypto networks", tab: "Payment methods" },
-    { icon: Settings, title: "Manage plan", desc: "Upgrade, downgrade or cancel your current plan", to: "/pricing" },
-    { icon: BarChart3, title: "Usage", desc: "See your token, request and credit spend over time", to: "/dashboard/usage" },
-    { icon: FileText, title: "Transaction history", desc: "Every payment you started, with receipts for approved ones", tab: "Billing history" },
-    { icon: SlidersHorizontal, title: "Preferences", desc: "Auto-reload thresholds and billing notifications", tab: "Preferences" },
-    { icon: ArrowRight, title: "Promotions", desc: "Redeem promo codes and view your bonus credit history", tab: "Promotions" },
-  ];
+  void allRows;
+  const grants = credits.state?.grants ?? [];
+  const promotions = credits.state?.promotions ?? [];
+  const hasCredit = Number(remaining) > 0;
+  const fmtDay = (iso: string) => new Date(iso).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
+  const prefField = (key: string, placeholder: string, type = "text") => (
+    <input type={type} placeholder={placeholder} value={prefs[key] ?? ""} onChange={(e) => updatePref(key, e.target.value)} className={field} />
+  );
 
   return (
-    <div className="mx-auto max-w-5xl space-y-8" style={{ fontFamily: '"Google Sans Flex", "Google Sans", "Product Sans", "Roboto", system-ui, sans-serif' }}>
-      {/* Page header */}
-      <div><h1 className="text-[28px] font-medium tracking-tight text-foreground">Billing</h1><p className="mt-1 text-[14px] text-muted-foreground">Your plan, credit balance, payments and invoices.</p></div>
+    <div className="mx-auto w-full max-w-[930px] pb-10 pt-2 text-foreground">
+      <h1 className="text-[28px] font-normal leading-tight tracking-tight text-gc-ink sm:text-[32px]">Billing</h1>
 
-      {/* Tab nav */}
-      <nav className="flex flex-wrap gap-2">
-        {TABS.map((t) => (
-          <button
-            key={t}
-            type="button"
-            onClick={() => setActiveTab(t)}
-            className={`console-pill h-8 px-4 text-[13px] ${activeTab === t ? "console-pill-solid font-medium" : "text-muted-foreground"}`}
-          >
-            {t}
-          </button>
-        ))}
-      </nav>
-
-      {activeTab === "Overview" && (
-      <div className="space-y-8">
-      {/* Balance card */}
-      <section className="console-card flex flex-col gap-6 p-6 sm:flex-row sm:items-end sm:justify-between">
-        <div className="space-y-1">
-          <p className="text-[13px] text-muted-foreground">{planLabel} · API credit balance</p>
-          <span className="block text-4xl font-medium tabular-nums tracking-tight text-foreground">${Number(remaining).toFixed(2)}</span>
-          <p className="flex items-center gap-1.5 pt-1 text-xs text-muted-foreground">
-            <Info className="h-3.5 w-3.5" />
-            Chat and primary-only analysis cost $0.03; completed senior-reviewed analysis costs $0.20.
-          </p>
-          {trial.active && (
-            <p className="pt-1 text-xs text-amber-600">
-              14-day Pro access ends {trial.endsAtLabel} · {trial.daysLeft > 1 ? `${trial.daysLeft}d left` : trial.hoursLeft > 1 ? `${trial.hoursLeft}h left` : "ends today"} · remaining trial credit becomes $0.00
-            </p>
-          )}
-        </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <Link to="/dashboard/pay" search={{ purchase: "credits" }} className="console-pill console-pill-solid inline-flex h-9 items-center px-5 text-sm font-medium">
-            Add credits
-          </Link>
-          {plan ? (
-            <button type="button" onClick={() => setCancelDialogOpen(true)} className="console-pill inline-flex h-9 items-center px-5 text-sm font-medium">
-              Cancel plan
+      {/* Spend management */}
+      <section className="mt-8">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h2 className="text-[20px] font-normal text-gc-ink">Spend management</h2>
+          <div className="flex flex-wrap gap-2">
+            <button type="button" onClick={() => setPromoOpen((v) => !v)} className={pill} aria-expanded={promoOpen}>
+              Redeem promo code
             </button>
-          ) : (
-            <Link to="/pricing" className="console-pill inline-flex h-9 items-center px-5 text-sm font-medium">
-              Choose a plan
-            </Link>
+            <Link to="/dashboard/usage" className={pill}>View usage</Link>
+          </div>
+        </div>
+
+        <div className="mt-5 overflow-hidden rounded-xl bg-gc-surface">
+          <div className="flex flex-col gap-5 p-5 sm:flex-row sm:items-start sm:justify-between">
+            <div className="min-w-0">
+              <p className="text-[14px] font-medium text-gc-ink">Credits</p>
+              <p className="mt-2 text-[14px] text-gc-ink-muted">Your total credit balance, including free credits granted to your account.</p>
+              <p className="mt-5 text-[24px] tabular-nums text-gc-ink">${Number(remaining).toFixed(2)}</p>
+            </div>
+            <div className="flex shrink-0 flex-wrap gap-2">
+              {plan ? (
+                <button type="button" onClick={() => setCancelDialogOpen(true)} className={pill}>Cancel plan</button>
+              ) : (
+                <Link to="/pricing" className={pill}>Choose a plan</Link>
+              )}
+              <Link to="/dashboard/pay" search={{ purchase: "credits" }} className={pillSolid}>Add credits</Link>
+            </div>
+          </div>
+
+          {promoOpen && (
+            <div className="flex flex-col gap-2 border-t border-gc-line px-5 py-4 sm:flex-row sm:items-center">
+              <input
+                placeholder="Enter promo code"
+                value={promoCode}
+                onChange={(e) => setPromoCode(e.target.value)}
+                onKeyDown={(e) => { if (e.key === "Enter") void handleRedeemPromotion(); }}
+                className={`${field} sm:max-w-sm`}
+                autoFocus
+              />
+              <button type="button" disabled={!promoCode.trim() || redeemingPromo} onClick={() => void handleRedeemPromotion()} className={pillSolid}>
+                {redeemingPromo ? "Applying…" : "Apply"}
+              </button>
+            </div>
           )}
+
+          <div className="space-y-1.5 border-t border-gc-line px-5 py-4 text-[14px] text-gc-ink-muted">
+            <p className="flex items-center gap-2.5">
+              <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${hasCredit ? "bg-gc-success" : "bg-destructive"}`} aria-hidden="true" />
+              {hasCredit ? (
+                <span>You have <span className="text-gc-ink">${Number(remaining).toFixed(2)} credits</span> remaining</span>
+              ) : (
+                <span>You have <span className="text-gc-ink">no credits</span> remaining</span>
+              )}
+            </p>
+            {trial.active && (
+              <p className="pl-4 text-[13px]">
+                14-day Pro access ends {trial.endsAtLabel} · {trial.daysLeft > 1 ? `${trial.daysLeft}d left` : trial.hoursLeft > 1 ? `${trial.hoursLeft}h left` : "ends today"} · remaining trial credit becomes $0.00
+              </p>
+            )}
+            <p className="flex items-center gap-2 pl-4 text-[13px]">
+              <Info className="h-3.5 w-3.5 shrink-0" />
+              Chat and primary-only analysis cost $0.03; completed senior-reviewed analysis costs $0.20.
+            </p>
+          </div>
         </div>
       </section>
 
@@ -245,237 +263,90 @@ function Billing() {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Shortcut grid */}
-      <section className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {shortcuts.map((s) => {
-          const inner = (
-            <>
-              <span className="console-icon-chip flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-background">
-                <s.icon className="h-4 w-4" />
-              </span>
-              <span className="min-w-0 text-left">
-                <span className="block text-sm font-medium text-foreground">{s.title}</span>
-                <span className="mt-0.5 block text-xs leading-relaxed text-muted-foreground">{s.desc}</span>
-              </span>
-            </>
-          );
-          const cls = "console-card flex items-start gap-3 p-5 text-left transition-opacity hover:opacity-90";
-          if (s.tab) {
-            return (
-              <button
-                key={s.title}
-                type="button"
-                onClick={() => setActiveTab(s.tab!)}
-                className={cls}
-              >
-                {inner}
-              </button>
-            );
-          }
-          return (
-            <Link key={s.title} to={s.to!} className={cls}>
-              {inner}
-            </Link>
-          );
-        })}
-      </section>
-      </div>
-      )}
-
-      {activeTab === "Payment methods" && (
-        <div className="space-y-4">
-          <div className="w-full max-w-xs rounded-xl border border-zinc-200 p-4">
-            <div className="flex items-start justify-between">
-              <div className="flex items-center gap-3">
-                <span className="flex h-7 w-11 items-center justify-center rounded bg-[#1A1F71] text-[9px] font-bold italic tracking-wide text-white">VISA</span>
-                <div>
-                  <p className="text-sm font-medium text-zinc-900">••••7151</p>
-                  <p className="text-xs text-zinc-500">Expires 06/2031</p>
-                </div>
-              </div>
-              <span className="rounded-md bg-zinc-100 px-2 py-0.5 text-xs text-zinc-600">Default</span>
-            </div>
-            <button type="button" className="mt-3 text-sm font-medium text-rose-600 hover:text-rose-700">Delete</button>
+      {/* Payment details */}
+      <section className="mt-12">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h2 className="text-[20px] font-normal text-gc-ink">Payment details</h2>
+          <div className="flex flex-wrap gap-2">
+            <button type="button" onClick={() => setDetailsOpen((v) => !v)} className={pill} aria-expanded={detailsOpen}>
+              {detailsOpen ? "Hide billing details" : "Add billing details"}
+            </button>
+            <Link to="/dashboard/pay" className={pillSolid}>Add payment method</Link>
           </div>
-          <Link
-            to="/dashboard/pay"
-            className="inline-flex rounded-lg bg-zinc-100 px-4 py-2 text-sm font-medium text-zinc-900 hover:bg-zinc-200 transition-colors"
-          >
-            Add payment method
-          </Link>
         </div>
-      )}
+        <p className="mt-4 text-[14px] text-gc-ink-muted">Add billing details to appear on your invoices.</p>
 
-      {activeTab === "Billing history" && <InvoiceHistory />}
-
-      {activeTab === "Credit grants" && (
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-sm font-semibold text-zinc-900">  Credit grants</h2>
-            <span className="text-sm text-zinc-500">USD</span>
-          </div>
-          {(credits.state?.grants ?? []).length === 0 ? (
-            <p className="text-sm text-zinc-900">No credit grants found.</p>
-          ) : (
-            <div className="divide-y divide-zinc-200 border-y border-zinc-200">
-              {(credits.state?.grants ?? []).map((grant) => (
-                <div key={grant.id} className="flex items-center justify-between gap-4 py-3">
-                  <div className="min-w-0">
-                    <p className="truncate text-sm font-medium text-zinc-900">
-                      {grant.reason.split("_").map((part) => part.charAt(0).toUpperCase() + part.slice(1)).join(" ")}
-                    </p>
-                    <p className="text-xs text-zinc-500">
-                      {new Date(grant.createdAt).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" })}
-                    </p>
-                  </div>
-                  <span className="shrink-0 text-sm font-medium tabular-nums text-emerald-700">+${grant.amount.toFixed(2)}</span>
-                </div>
+        {detailsOpen && (
+          <div className="mt-5 grid gap-3 rounded-xl bg-gc-surface p-5 sm:grid-cols-2">
+            {prefField("companyName", "Company name")}
+            {prefField("billingEmail", "Billing email", "email")}
+            {prefField("poNumber", "Purchase order (PO) number")}
+            <select value={prefs.country ?? ""} onChange={(e) => updatePref("country", e.target.value)} className={field}>
+              <option value="">Select country</option>
+              {["Pakistan", "United States", "United Kingdom", "United Arab Emirates", "Saudi Arabia", "India", "Germany", "Canada", "Australia"].map((c) => (
+                <option key={c} value={c}>{c}</option>
               ))}
-            </div>
-          )}
-        </div>
-      )}
+            </select>
+            {prefField("address1", "Address line 1")}
+            {prefField("address2", "Address line 2")}
+            {prefField("city", "City")}
+            {prefField("postalCode", "Postal code")}
+            <div className="sm:col-span-2">{prefField("region", "State, county, province, or region")}</div>
+            <p className="text-[12px] text-gc-ink-muted sm:col-span-2">Saved on this browser and used for future invoices only.</p>
+          </div>
+        )}
 
-      {activeTab === "Preferences" && (
-        <div className="max-w-md space-y-6">
-          <p className="text-sm text-zinc-700">
-            Changes to these preferences will apply to future invoices only. If you need a past invoice reissued, please contact support.
-          </p>
-          <div className="space-y-1.5">
-            <label className="block text-sm font-semibold text-zinc-900">Company name</label>
-            <p className="text-xs text-zinc-500">If specified, this name will appear on invoices instead of your organization name.</p>
-            <input
-              value={prefs.companyName ?? ""}
-              onChange={(e) => updatePref("companyName", e.target.value)}
-              className="w-full rounded-lg border border-zinc-200 px-3 py-2 text-sm text-zinc-900 outline-none focus:border-zinc-400"
-            />
+        <div className="mt-5">
+          <div className="flex justify-between border-b border-gc-line px-2 py-3 text-[12px] text-gc-ink-muted">
+            <span>Card</span>
+            <span>Expiry</span>
           </div>
-          <div className="space-y-1.5">
-            <label className="block text-sm font-semibold text-zinc-900">Purchase order (PO) number</label>
-            <p className="text-xs text-zinc-500">Your PO number will be displayed on future invoices.</p>
-            <input
-              value={prefs.poNumber ?? ""}
-              onChange={(e) => updatePref("poNumber", e.target.value)}
-              className="w-full rounded-lg border border-zinc-200 px-3 py-2 text-sm text-zinc-900 outline-none focus:border-zinc-400"
-            />
-          </div>
-          <div className="space-y-1.5">
-            <label className="block text-sm font-semibold text-zinc-900">Billing email</label>
-            <p className="text-xs text-zinc-500">Invoices and other billing notifications will be sent here (in addition to being sent to the owners of your organization).</p>
-            <input
-              type="email"
-              value={prefs.billingEmail ?? ""}
-              onChange={(e) => updatePref("billingEmail", e.target.value)}
-              className="w-full rounded-lg border border-zinc-200 px-3 py-2 text-sm text-zinc-900 outline-none focus:border-zinc-400"
-            />
-          </div>
-          <div className="space-y-1.5">
-            <label className="block text-sm font-semibold text-zinc-900">Primary business address</label>
-            <p className="text-xs text-zinc-500">This is the physical address of the company purchasing Jenvu services and is used to calculate any applicable sales tax.</p>
-            <div className="space-y-2">
-              <select
-                value={prefs.country ?? ""}
-                onChange={(e) => updatePref("country", e.target.value)}
-                className="w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 outline-none focus:border-zinc-400"
-              >
-                <option value="">Select country</option>
-                <option value="Pakistan">Pakistan</option>
-                <option value="United States">United States</option>
-                <option value="United Kingdom">United Kingdom</option>
-                <option value="United Arab Emirates">United Arab Emirates</option>
-                <option value="Saudi Arabia">Saudi Arabia</option>
-                <option value="India">India</option>
-                <option value="Germany">Germany</option>
-                <option value="Canada">Canada</option>
-                <option value="Australia">Australia</option>
-              </select>
-              <input
-                placeholder="Address line 1"
-                value={prefs.address1 ?? ""}
-                onChange={(e) => updatePref("address1", e.target.value)}
-                className="w-full rounded-lg border border-zinc-200 px-3 py-2 text-sm text-zinc-900 outline-none focus:border-zinc-400"
-              />
-              <input
-                placeholder="Address line 2"
-                value={prefs.address2 ?? ""}
-                onChange={(e) => updatePref("address2", e.target.value)}
-                className="w-full rounded-lg border border-zinc-200 px-3 py-2 text-sm text-zinc-900 outline-none focus:border-zinc-400"
-              />
-              <div className="grid grid-cols-2 gap-2">
-                <input
-                  placeholder="City"
-                  value={prefs.city ?? ""}
-                  onChange={(e) => updatePref("city", e.target.value)}
-                  className="w-full rounded-lg border border-zinc-200 px-3 py-2 text-sm text-zinc-900 outline-none focus:border-zinc-400"
-                />
-                <input
-                  placeholder="Postal code"
-                  value={prefs.postalCode ?? ""}
-                  onChange={(e) => updatePref("postalCode", e.target.value)}
-                  className="w-full rounded-lg border border-zinc-200 px-3 py-2 text-sm text-zinc-900 outline-none focus:border-zinc-400"
-                />
-              </div>
-              <input
-                placeholder="State, county, province, or region"
-                value={prefs.region ?? ""}
-                onChange={(e) => updatePref("region", e.target.value)}
-                className="w-full rounded-lg border border-zinc-200 px-3 py-2 text-sm text-zinc-900 outline-none focus:border-zinc-400"
-              />
-            </div>
-          </div>
+          <p className="px-2 py-4 text-center text-[14px] text-gc-ink-muted">No payment methods. Payments are made in crypto from the Payments page.</p>
         </div>
-      )}
+      </section>
 
-      {activeTab === "Promotions" && (
-        <div className="space-y-10">
-          <div className="space-y-2">
-            <h2 className="text-base font-semibold text-zinc-900">  Add a promotional credit</h2>
-            <p className="text-sm text-zinc-500">Enter a promotional code to receive credits on your account.</p>
-            <div className="flex max-w-2xl items-center gap-3 pt-2">
-              <input
-                placeholder="Enter code"
-                value={promoCode}
-                onChange={(e) => setPromoCode(e.target.value)}
-                className="w-full rounded-lg border border-zinc-200 px-3 py-2 text-sm text-zinc-900 outline-none focus:border-zinc-400"
-              />
-              <button
-                type="button"
-                disabled={!promoCode.trim() || redeemingPromo}
-                onClick={() => void handleRedeemPromotion()}
-                className="shrink-0 rounded-lg bg-zinc-100 px-4 py-2 text-sm font-medium text-zinc-900 hover:bg-zinc-200 transition-colors disabled:cursor-not-allowed disabled:text-zinc-400"
-              >
-                {redeemingPromo ? "Applying…" : "Apply"}
-              </button>
-            </div>
-          </div>
-          <div className="space-y-2">
-            <h2 className="text-base font-semibold text-zinc-900">  Applied promotions</h2>
-            {(credits.state?.promotions ?? []).length === 0 ? (
-              <div className="flex flex-col items-center gap-2 py-10 text-center">
-                <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-zinc-100 text-zinc-500">
-                  <Tag className="h-4 w-4" />
-                </span>
-                <p className="text-sm font-medium text-zinc-900">You haven't applied any promotions yet</p>
-                <p className="text-xs text-zinc-500">Applied promotions will appear here</p>
-              </div>
-            ) : (
-              <div className="divide-y divide-zinc-200 border-y border-zinc-200">
-                {(credits.state?.promotions ?? []).map((promotion) => (
-                  <div key={promotion.id} className="flex items-center justify-between gap-4 py-3">
-                    <div className="min-w-0">
-                      <p className={`${MONO} truncate text-sm font-medium text-zinc-900`}>{promotion.code}</p>
-                      <p className="text-xs text-zinc-500">
-                        Redeemed {new Date(promotion.createdAt).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" })}
-                      </p>
-                    </div>
-                    <span className="shrink-0 text-sm font-medium tabular-nums text-emerald-700">+${promotion.bonusUsd.toFixed(2)}</span>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+      {/* Credit grants */}
+      <section className="mt-12">
+        <h2 className="text-[20px] font-normal text-gc-ink">Credit grants</h2>
+        <div className="mt-4 overflow-x-auto">
+          <table className="w-full min-w-[420px] text-left text-[14px]">
+            <thead>
+              <tr className="border-b border-gc-line text-[12px] text-gc-ink-muted">
+                <th className="px-2 py-3 font-normal">Grant</th>
+                <th className="px-2 py-3 font-normal">Date</th>
+                <th className="px-2 py-3 text-right font-normal">Amount</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gc-line">
+              {grants.length === 0 && promotions.length === 0 ? (
+                <tr><td colSpan={3} className="px-2 py-4 text-center text-gc-ink-muted">No credit grants found.</td></tr>
+              ) : (
+                <>
+                  {grants.map((g) => (
+                    <tr key={g.id}>
+                      <td className="px-2 py-3 text-gc-ink">{g.reason.split("_").map((part) => part.charAt(0).toUpperCase() + part.slice(1)).join(" ")}</td>
+                      <td className="px-2 py-3 text-gc-ink-muted">{fmtDay(g.createdAt)}</td>
+                      <td className="px-2 py-3 text-right tabular-nums text-gc-success">+${g.amount.toFixed(2)}</td>
+                    </tr>
+                  ))}
+                  {promotions.map((pr) => (
+                    <tr key={pr.id}>
+                      <td className={`${MONO} px-2 py-3 text-gc-ink`}>Promo code {pr.code}</td>
+                      <td className="px-2 py-3 text-gc-ink-muted">{fmtDay(pr.createdAt)}</td>
+                      <td className="px-2 py-3 text-right tabular-nums text-gc-success">+${pr.bonusUsd.toFixed(2)}</td>
+                    </tr>
+                  ))}
+                </>
+              )}
+            </tbody>
+          </table>
         </div>
-      )}
+      </section>
+
+      {/* Invoices */}
+      <div className="mt-12">
+        <InvoiceHistory variant="table" />
+      </div>
     </div>
   );
 }
