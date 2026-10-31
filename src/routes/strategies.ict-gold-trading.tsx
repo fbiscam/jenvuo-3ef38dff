@@ -104,7 +104,7 @@ const CONTENT: IndustryContent = {
       href: "https://jenvu.com/disclaimer",
     },
   ],
-  whyTitle: "Why traders choose Jenvu",
+  whyTitle: "traders choose Jenvu",
   why: [
     { title: "Same candles, same marks", text: "Every level comes from fixed rules, so you can trust what you see." },
     { title: "Built only for Fiber", text: "Sessions, volatility and weekend closure are tuned for Fiber instead of a generic market." },
