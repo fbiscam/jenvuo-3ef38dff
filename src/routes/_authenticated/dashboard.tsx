@@ -690,8 +690,8 @@ function DashboardLayout() {
   const [refreshTick, setRefreshTick] = useState(0);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
-  // Dashboard page theme (black by default). Overview and Terminal keep their own look.
-  const [dashTheme, setDashTheme] = useState<"light" | "dark">("dark");
+  // Dashboard page theme (white by default, same choice as the public site). Terminal keeps its own look.
+  const [dashTheme, setDashTheme] = useState<"light" | "dark">("light");
   useEffect(() => {
     // Same choice as the public site's Sun/Moon switch.
     const stored = readSiteTheme() ?? window.localStorage.getItem("jenvu:dash:theme");
@@ -1316,7 +1316,8 @@ function DashboardLayout() {
   // Console-style pages: menu stays closed until the user opens it from the top bar.
   const drawerMode = !embedMode;
   const navCollapsed = drawerMode ? false : sidebarCollapsed && !mobileNavOpen;
-  const themeApplies = false; // Black theme only on the Terminal page (its own switch).
+  // White/black switch covers every dashboard page; the Terminal keeps its own switch.
+  const themeApplies = pathname !== "/dashboard/terminal";
   const dashDark = themeApplies && dashTheme === "dark";
 
   return (
@@ -2100,15 +2101,15 @@ function UsageAnalytics({
               $3 = 1M tokens · resets 00:00 UTC
             </div>
           </div>
-          <div className={metricClass} style={{ backgroundColor: "#FFFBED" }}>
-            <span className="text-sm text-black">Credit balance</span>
-            <strong className="mt-1 text-xl font-semibold tabular-nums text-black">
+          <div className={`${metricClass} bg-muted`}>
+            <span className="text-sm text-foreground">Credit balance</span>
+            <strong className="mt-1 text-xl font-semibold tabular-nums text-foreground">
               {stats ? fmtUsd2(balance) : "—"}
             </strong>
             <Button
               asChild
               size="sm"
-              className="mt-3 w-fit bg-[#A8830B] text-white hover:bg-[#8E6E09]"
+              className="mt-3 w-fit bg-foreground text-background hover:bg-foreground/85"
             >
               <Link to="/dashboard/pay">
                 <CreditCard className="h-3.5 w-3.5" /> Add credits
