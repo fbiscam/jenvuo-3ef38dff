@@ -71,7 +71,7 @@ const SIGN_IN = "https://auth.jenvu.com/sign-in";
 
 /** Same aurora gradients as the Platform page tiles. */
 const AURORAS = ["var(--platform-aurora-1)", "var(--platform-aurora-2)", "var(--platform-aurora-3)"];
-const SOLUTION_ICONS: LucideIcon[] = [CandlestickChart, Bot, BellRing, Code2, TrendingUp, ShieldCheck];
+const SOLUTION_ICONS: LucideIcon[] = [CandlestickChart, TrendingUp, BellRing, Code2, Bot, ShieldCheck];
 const STORY_ICONS: LucideIcon[] = [Newspaper, BookOpen, TrendingUp];
 const ICON_SETS: LucideIcon[][] = [
   [CandlestickChart, Sparkles, BellRing],
@@ -137,7 +137,7 @@ function Ticks({ items }: { items: string[] }) {
 
 /** Aurora gradient tile with white icon chips (Platform Build/Ground/Act and use-case style). */
 function AuroraArt({ n = 0, icons, className = "" }: { n?: number; icons: LucideIcon[]; className?: string }) {
-  const cols = icons.length > 4 ? "grid-cols-3" : icons.length > 1 ? "grid-cols-2" : "";
+  const cols = icons.length === 3 || icons.length > 4 ? "grid-cols-3" : icons.length > 1 ? "grid-cols-2" : "";
   return (
     <div
       className={`flex items-center justify-center overflow-hidden rounded-md ${className}`}
