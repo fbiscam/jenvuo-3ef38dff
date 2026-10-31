@@ -75,7 +75,7 @@ export function EntHero() {
           Get started <ChevronRight className="h-4 w-4" />
         </Link>
       </div>
-      <div className="mx-auto mt-20 grid max-w-5xl grid-cols-2 items-center justify-items-center gap-x-8 gap-y-6 text-[20px] font-semibold tracking-tight text-foreground/80 sm:grid-cols-5">
+      <div className="mx-auto mt-20 grid max-w-5xl grid-cols-2 items-center justify-items-center gap-x-6 gap-y-6 whitespace-nowrap text-[16px] sm:text-[20px] font-semibold tracking-tight text-foreground/80 sm:grid-cols-5">
         <span className="flex items-center gap-2.5">
           <img src={mt5Logo.url} alt="" width={32} height={32} className="h-8 w-8 rounded-md object-contain" />
           MetaTrader 5
