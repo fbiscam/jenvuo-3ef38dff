@@ -371,26 +371,6 @@ function pnlClass(v: number) {
   return v > 0 ? "text-gc-success" : v < 0 ? "text-destructive" : "";
 }
 
-function Stat({ label, value, sub, tone = "" }: { label: string; value: string; sub?: string; tone?: string }) {
-  return (
-    <div className="bg-background px-4 py-4 sm:px-7">
-      <div className="text-[12px] text-muted-foreground">{label}</div>
-      <div className={`mt-1.5 text-lg font-medium tabular-nums ${tone}`}>{value}</div>
-      {sub && <div className="text-[12px] text-muted-foreground">{sub}</div>}
-    </div>
-  );
-}
-
-function Empty({ text, action }: { text: string; action: React.ReactNode }) {
-  return (
-    <div className="flex min-h-80 flex-col items-center justify-center px-6 text-center">
-      <Bot className="h-6 w-6 text-muted-foreground" />
-      <p className="mt-3 max-w-md text-[13px] text-muted-foreground">{text}</p>
-      <div className="mt-3">{action}</div>
-    </div>
-  );
-}
-
 const utc = (iso: string) => {
   const d = new Date(iso);
   return `${d.toISOString().slice(5, 10).replace("-", "/")} ${d.toISOString().slice(11, 16)}`;
