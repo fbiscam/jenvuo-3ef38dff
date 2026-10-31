@@ -2018,3 +2018,5 @@ html.dark body :is(.bg-foreground, .bg-gc-ink, .console-pill-solid):not(.termina
 .dash-dark :is(.bg-foreground, .bg-gc-ink, .console-pill-solid),
 .dash-dark :is(.bg-foreground, .bg-gc-ink, .console-pill-solid) * { color: #000000 !important; }
 .dash-dark :is(.bg-foreground, .bg-gc-ink, .console-pill-solid) svg { color: #000000 !important; }
+html.dark body .ask-jenvu-launcher, html.dark body .ask-jenvu-launcher *,
+.dash-dark .ask-jenvu-launcher, .dash-dark .ask-jenvu-launcher * { color: #000000 !important; }
