@@ -1444,6 +1444,9 @@ function DashboardLayout() {
                           aria-hidden="true"
                         />
                         {!navCollapsed && <span className="truncate">{t.label}</span>}
+                        {!navCollapsed && t.to === "/dashboard/settings" && (
+                          <ChevronRight className="ml-auto h-4 w-4 shrink-0 text-gc-ink-muted" strokeWidth={1.75} aria-hidden="true" />
+                        )}
                         {!navCollapsed && typeof count === "number" && count > 0 && !active && (
                           <span
                             className="ml-auto inline-flex shrink-0 items-center justify-center rounded-full bg-rose-600 text-white ring-2 ring-white"
