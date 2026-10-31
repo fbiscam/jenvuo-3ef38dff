@@ -51,14 +51,16 @@ export function HeroVideoFan() {
       {CARDS.map((c, i) => (
         <div
           key={c.label}
-          className={`jenvu-rise relative -mx-5 shrink-0 overflow-hidden rounded-[22px] border-[5px] border-background bg-gc-ink shadow-2xl sm:-mx-4 ${
+          className={`relative -mx-5 shrink-0 overflow-hidden rounded-[22px] border-[5px] border-background bg-gc-ink shadow-2xl sm:-mx-4 ${
             c.main
               ? "z-10 h-[290px] w-[320px] sm:h-[380px] sm:w-[480px] md:h-[440px] md:w-[560px] lg:w-[620px]"
               : "h-[250px] w-[200px] sm:h-[330px] sm:w-[260px] md:h-[390px] md:w-[320px] lg:w-[360px]"
           } ${i === 0 || i === 4 ? "hidden md:block" : i === 1 || i === 3 ? "hidden sm:block" : ""}`}
-          style={{ transform: `rotate(${c.rot}deg) translateY(${c.y}px)`, animationDelay: `${120 + i * 70}ms` }}
+          style={{ transform: `rotate(${c.rot}deg) translateY(${c.y}px)` }}
         >
-          <FanVideo card={c} />
+          <div className="jenvu-rise h-full w-full" style={{ animationDelay: `${120 + i * 70}ms` }}>
+            <FanVideo card={c} />
+          </div>
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-gc-ink/70 via-gc-ink/10 to-transparent" />
           <span
             className={`pointer-events-none absolute inset-x-0 text-center font-semibold tracking-tight text-gc-on-blue ${
