@@ -71,7 +71,7 @@ export function ActiveSessionsSettings() {
           Sign out
         </button>
       </div>
-      <SettingsRow label="Sign out everywhere else" hint="Ends your session on every other browser, phone and the extension. You stay signed in here.">
+      <SettingsRow label="Sign out everywhere else" hint="Ends session on every other browser, phone and the extension. You stay signed in here.">
         <button type="button" onClick={signOutOthers} disabled={busy} className={settingsBtn}>
           {busy ? "Signing out…" : "Sign out other sessions"}
         </button>
