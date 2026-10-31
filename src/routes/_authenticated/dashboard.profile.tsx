@@ -233,7 +233,7 @@ function Profile() {
               <div className="min-w-0 flex-1">
                 <p className="truncate text-[18px] font-medium leading-tight">{fullName || "Your name"}</p>
                 <p className="truncate text-[14px] text-gc-ink-muted">{email}</p>
-                <p className="mt-1 text-[12px] text-gc-ink-muted">JPG, PNG or WebP, up to 10MB. You can crop and zoom before saving.</p>
+                <p className="mt-1 text-[12px] text-gc-ink-muted">JPG, PNG or WebP, up to 10MB. You can crop before saving.</p>
               </div>
               <div className="flex flex-wrap gap-2">
                 <button type="button" onClick={onAvatarPick} disabled={uploadingAvatar} className={settingsBtnPrimary}>
