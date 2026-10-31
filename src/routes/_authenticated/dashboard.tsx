@@ -2101,15 +2101,15 @@ function UsageAnalytics({
               $3 = 1M tokens · resets 00:00 UTC
             </div>
           </div>
-          <div className={metricClass} style={{ backgroundColor: "#FFFBED" }}>
-            <span className="text-sm text-black">Credit balance</span>
-            <strong className="mt-1 text-xl font-semibold tabular-nums text-black">
+          <div className={`${metricClass} bg-muted`}>
+            <span className="text-sm text-foreground">Credit balance</span>
+            <strong className="mt-1 text-xl font-semibold tabular-nums text-foreground">
               {stats ? fmtUsd2(balance) : "—"}
             </strong>
             <Button
               asChild
               size="sm"
-              className="mt-3 w-fit bg-[#A8830B] text-white hover:bg-[#8E6E09]"
+              className="mt-3 w-fit bg-foreground text-background hover:bg-foreground/85"
             >
               <Link to="/dashboard/pay">
                 <CreditCard className="h-3.5 w-3.5" /> Add credits

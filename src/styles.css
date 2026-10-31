@@ -1731,6 +1731,9 @@ pre, pre *, code, kbd, samp {
   --gc-green-soft: #f4f4f5;
   --gc-yellow-soft: #f4f4f5;
   --gc-surface: #fafafa;
+  --secondary: #f4f4f5;
+  --accent: #f4f4f5;
+  --muted: #f4f4f5;
   background-color: #ffffff;
 }
 .jenvu-zoom-dashboard.dash-dark {
