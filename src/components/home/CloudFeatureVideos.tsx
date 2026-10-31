@@ -147,7 +147,7 @@ function FeatureCard({ card }: { card: Card }) {
     <div className="flex w-full max-w-[412px] shrink-0 snap-center flex-col overflow-hidden rounded-md border border-gc-line bg-background sm:w-[85vw] sm:snap-start">
       <div className="flex min-h-[196px] flex-col px-7 pb-7 pt-8">
         <p className="text-[16px] leading-[1.55] text-gc-ink">{card.text}</p>
-        <Link to={card.to} className="mt-auto inline-flex w-fit items-center gap-1 border-b border-gc-ink pb-0.5 pt-6 text-[15px] font-medium text-gc-ink hover:opacity-70">
+        <Link to={card.to} className="mt-auto inline-flex w-fit items-center gap-1 border-b border-gc-blue pb-0.5 pt-6 text-[15px] font-medium text-gc-blue hover:text-gc-blue-hover">
           Explore feature <ArrowUpRight className="h-3.5 w-3.5" />
         </Link>
       </div>

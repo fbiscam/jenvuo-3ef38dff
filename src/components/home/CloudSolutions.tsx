@@ -78,7 +78,7 @@ export function CloudSolutions() {
                   type="button"
                   onClick={() => setActive(i)}
                   className={`w-full whitespace-nowrap rounded-full px-4 py-2 text-left text-sm transition-colors ${
-                    i === active ? "bg-gc-ink font-medium text-background" : "text-gc-ink hover:bg-gc-surface"
+                    i === active ? "bg-gc-blue font-medium text-gc-on-blue" : "text-gc-ink hover:bg-gc-surface"
                   }`}
                 >
                   {x.name}
@@ -99,7 +99,7 @@ export function CloudSolutions() {
               </div>
             </div>
             <div className="py-4 text-center">
-              <Link to={s.to} className="inline-flex items-center gap-1 border-b border-gc-ink pb-0.5 text-sm font-medium text-gc-ink hover:opacity-70">{s.cta} <ArrowUpRight className="h-3.5 w-3.5" /></Link>
+              <Link to={s.to} className="inline-flex items-center gap-1 border-b border-gc-blue pb-0.5 text-sm font-medium text-gc-blue hover:text-gc-blue-hover">{s.cta} <ArrowUpRight className="h-3.5 w-3.5" /></Link>
             </div>
           </div>
         </div>
