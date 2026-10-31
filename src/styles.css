@@ -2084,3 +2084,24 @@ html body .jenvu-zoom-dashboard main :is(.console-icon-chip, .console-card > svg
 
 /* Dashboard side menu: no dividing lines on any side (right edge, footer row). */
 .jenvu-zoom-dashboard .dashboard-sidebar-root.console-sidebar { border: 0 !important; box-shadow: none !important; }
+
+/* JX Bot landing page animations */
+@keyframes jx-blink { 0%, 92%, 100% { transform: scaleY(1) rotate(28deg); } 95% { transform: scaleY(0.12) rotate(28deg); } }
+@keyframes jx-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+@keyframes jx-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@keyframes jx-bar { 0%, 100% { transform: scaleY(1); } 50% { transform: scaleY(0.7); } }
+@keyframes jx-hop { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+@keyframes jx-draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+.jx-eye { animation: jx-blink 4.5s infinite; transform: rotate(28deg); }
+.jx-float { animation: jx-float 5s ease-in-out infinite; }
+.jx-in { animation: jx-in 0.45s ease-out both; }
+.jx-bar { transform-origin: bottom; animation: jx-bar 2.4s ease-in-out infinite; }
+.jx-hop { animation: jx-hop 1.6s ease-in-out infinite; }
+.jx-hop:nth-child(2) { animation-delay: 0.2s; } .jx-hop:nth-child(3) { animation-delay: 0.4s; } .jx-hop:nth-child(4) { animation-delay: 0.6s; }
+.jx-pulse-text { animation: sc-dot 1.6s ease-in-out infinite; }
+.jx-undrawn path, .jx-draw path { stroke-dasharray: 1; stroke-dashoffset: 1; }
+.jx-draw path { animation: jx-draw 2.2s ease-out forwards; }
+@media (prefers-reduced-motion: reduce) {
+  .jx-eye, .jx-float, .jx-in, .jx-bar, .jx-hop, .jx-pulse-text { animation: none; }
+  .jx-undrawn path, .jx-draw path { stroke-dashoffset: 0; animation: none; }
+}

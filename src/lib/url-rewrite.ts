@@ -137,6 +137,7 @@ export const GLOBAL_PATHS = new Set([
   "download",
   "founding",
   "founder",
+  "jx-bot",
   "killzones",
   "llm",
   "models",
