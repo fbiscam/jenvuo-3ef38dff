@@ -47,16 +47,6 @@ function JxFace({ className = "", eyes = "bg-background" }: { className?: string
   );
 }
 
-function useLoopStep(count: number, ms: number) {
-  const [step, setStep] = React.useState(count);
-  React.useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    setStep(0);
-    const t = window.setInterval(() => setStep((s) => (s + 1) % (count + 3)), ms);
-    return () => window.clearInterval(t);
-  }, [count, ms]);
-  return step;
-}
 
 function useInView<T extends HTMLElement>() {
   const ref = React.useRef<T>(null);
