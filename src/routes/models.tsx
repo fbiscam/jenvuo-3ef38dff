@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import SiteHeader from "@/components/SiteHeader";
-import SiteFooter from "@/components/SiteFooter";
+import BlogFooter from "@/components/BlogFooter";
 import ModelsExplorer from "@/components/models/ModelsExplorer";
 
 export const Route = createFileRoute("/models")({
@@ -26,7 +26,7 @@ function ModelsPage() {
       <main>
         <ModelsExplorer apiHref="/dashboard/api" />
       </main>
-      <SiteFooter />
+      <BlogFooter />
     </div>
   );
 }
