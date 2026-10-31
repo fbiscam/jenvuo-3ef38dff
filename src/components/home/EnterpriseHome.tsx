@@ -374,7 +374,7 @@ export function EntStories({ articles: items }: { articles: HomeArticle[] }) {
             <Link key={a.id} to="/insights/$slug" params={{ slug: a.slug }} className="group block">
               <div className="aspect-[16/9] overflow-hidden rounded-[14px] border border-border bg-muted">
                 <img
-                  src={insightCoverUrl(a.title, a.category ?? undefined, a.image_url)}
+                  src={a.image_url || insightCoverUrl(a.title, a.category ?? undefined)}
                   alt={a.title}
                   width={1280}
                   height={720}
