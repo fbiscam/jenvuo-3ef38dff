@@ -1,27 +1,30 @@
 import * as React from "react";
 import { Link } from "@tanstack/react-router";
 import { openAskJenvu } from "@/components/AskJenvuWidget";
-import { Pause, Play } from "lucide-react";
+import { Pause, Play, CandlestickChart, Waves, Clock, Layers, TrendingUp, Target, Bot, ShieldCheck, Gauge, Sparkles, MessageSquare, Brain, Code2, KeyRound, Terminal, Crown, BadgeCheck, Gift, Globe, LineChart, Newspaper, BookOpen, GraduationCap, Lightbulb, LifeBuoy, HelpCircle, type LucideIcon } from "lucide-react";
+import { AuroraTile } from "@/components/AuroraTile";
 import { SiBinance, SiCoinbase, SiRevolut, SiRobinhood, SiTradingview } from "react-icons/si";
 import webullLogo from "@/assets/webull-logo.png.asset.json";
 import trading212Logo from "@/assets/trading212-logo.png.asset.json";
 import trustWalletLogo from "@/assets/trustwallet-logo.png.asset.json";
 import etoroLogo from "@/assets/etoro-logo.png.asset.json";
 import metaTraderLogo from "@/assets/metatrader-logo.png.asset.json";
-import imgFloor from "@/assets/home/place-floor.jpg";
-import imgVault from "@/assets/home/place-vault.jpg";
-import imgHome from "@/assets/home/place-home.jpg";
-import imgOffice from "@/assets/home/place-office.jpg";
-import imgDev from "@/assets/home/place-dev.jpg";
-import imgMeeting from "@/assets/home/place-meeting.jpg";
-import imgLondon from "@/assets/home/place-london.jpg";
-import imgSouk from "@/assets/home/place-souk.jpg";
-import imgLibrary from "@/assets/home/place-library.jpg";
-import imgSupport from "@/assets/home/place-support.jpg";
+
+const SOL_ICONS: LucideIcon[][] = [
+  [CandlestickChart, Waves, Clock],
+  [Layers, TrendingUp, Target],
+  [Bot, ShieldCheck, Gauge],
+  [Sparkles, MessageSquare, Brain],
+  [Code2, KeyRound, Terminal],
+  [Crown, BadgeCheck, Gift],
+  [Clock, Globe, CandlestickChart],
+  [LineChart, Newspaper, TrendingUp],
+  [BookOpen, GraduationCap, Lightbulb],
+  [LifeBuoy, MessageSquare, HelpCircle],
+];
 
 type Solution = {
   name: string;
-  image: string;
   stat: string;
   statText: string;
   body: string;
@@ -31,16 +34,16 @@ type Solution = {
 };
 
 const SOLUTIONS: Solution[] = [
-  { name: "Day traders", image: imgFloor, stat: "15M / 1H", statText: "fresh sweeps & swings marked live on Fiber", body: "Catch liquidity sweeps on fresh highs and lows as candles close.", bold: "See how the Terminal reads intraday structure.", cta: "Explore the Fiber Terminal", to: "/pricing" },
-  { name: "Swing traders", image: imgVault, stat: "2H / 4H", statText: "supply, demand zones and FVGs kept on chart", body: "Higher-timeframe zones stay drawn until price truly invalidates them.", bold: "Plan swing trades with clear structure.", cta: "Explore zone tools", to: "/help" },
-  { name: "Automated traders", image: imgHome, stat: "MT5", statText: "JX Bot trades Fiber on your own account", body: "Verified by your PC or RDP IP, with a daily auto-stop at your target.", bold: "Let JX Bot handle the execution.", cta: "Explore JX Bot", to: "/pricing" },
-  { name: "AI-first traders", image: imgOffice, stat: "1 question", statText: "one clear answer from the AI desk, no noise", body: "Ask about the current chart and get a focused, structured reply.", bold: "Read the market with AI next to you.", cta: "Explore the AI desk", to: "/ai-engine" },
-  { name: "Developers", image: imgDev, stat: "$3 / 1M", statText: "tokens for top-tier models through API keys", body: "Plug Jenvu models into your own apps, bots and trading tools.", bold: "Build with our API and extension.", cta: "Explore developer tools", to: "/help" },
-  { name: "Founding members", image: imgMeeting, stat: "2 days", statText: "to verify your ID after your plan is approved", body: "Approved Founding members get 3 months of their chosen plan with $250 credit.", bold: "Apply to the invite-only program.", cta: "Explore the Founding Program", to: "/founding" },
-  { name: "Session traders", image: imgLondon, stat: "London / NY", statText: "killzone sessions tracked on the Fiber chart", body: "Know when London and New York liquidity is most active on Fiber.", bold: "Time your entries around the sessions.", cta: "Explore session tools", to: "/help" },
-  { name: "Fiber investors", image: imgSouk, stat: "Fiber", statText: "one market, analysed in full depth every day", body: "Follow Fiber with daily insights, macro drivers and clear structure.", bold: "Stay close to the Fiber market.", cta: "Explore Fiber insights", to: "/insights" },
-  { name: "Students", image: imgLibrary, stat: "Free guides", statText: "on sweeps, zones and FVGs for every level", body: "Learn ICT and SMC ideas step by step with real Fiber examples.", bold: "Build your trading knowledge.", cta: "Explore learning resources", to: "/insights" },
-  { name: "Support & help", image: imgSupport, stat: "Help centre", statText: "answers on plans, billing and JX Bot", body: "Find quick answers or contact our team about your account.", bold: "Get help when you need it.", cta: "Visit the help centre", to: "/help" },
+  { name: "Day traders", stat: "15M / 1H", statText: "fresh sweeps & swings marked live on Fiber", body: "Catch liquidity sweeps on fresh highs and lows as candles close.", bold: "See how the Terminal reads intraday structure.", cta: "Explore the Fiber Terminal", to: "/pricing" },
+  { name: "Swing traders", stat: "2H / 4H", statText: "supply, demand zones and FVGs kept on chart", body: "Higher-timeframe zones stay drawn until price truly invalidates them.", bold: "Plan swing trades with clear structure.", cta: "Explore zone tools", to: "/help" },
+  { name: "Automated traders", stat: "MT5", statText: "JX Bot trades Fiber on your own account", body: "Verified by your PC or RDP IP, with a daily auto-stop at your target.", bold: "Let JX Bot handle the execution.", cta: "Explore JX Bot", to: "/pricing" },
+  { name: "AI-first traders", stat: "1 question", statText: "one clear answer from the AI desk, no noise", body: "Ask about the current chart and get a focused, structured reply.", bold: "Read the market with AI next to you.", cta: "Explore the AI desk", to: "/ai-engine" },
+  { name: "Developers", stat: "$3 / 1M", statText: "tokens for top-tier models through API keys", body: "Plug Jenvu models into your own apps, bots and trading tools.", bold: "Build with our API and extension.", cta: "Explore developer tools", to: "/help" },
+  { name: "Founding members", stat: "2 days", statText: "to verify your ID after your plan is approved", body: "Approved Founding members get 3 months of their chosen plan with $250 credit.", bold: "Apply to the invite-only program.", cta: "Explore the Founding Program", to: "/founding" },
+  { name: "Session traders", stat: "London / NY", statText: "killzone sessions tracked on the Fiber chart", body: "Know when London and New York liquidity is most active on Fiber.", bold: "Time your entries around the sessions.", cta: "Explore session tools", to: "/help" },
+  { name: "Fiber investors", stat: "Fiber", statText: "one market, analysed in full depth every day", body: "Follow Fiber with daily insights, macro drivers and clear structure.", bold: "Stay close to the Fiber market.", cta: "Explore Fiber insights", to: "/insights" },
+  { name: "Students", stat: "Free guides", statText: "on sweeps, zones and FVGs for every level", body: "Learn ICT and SMC ideas step by step with real Fiber examples.", bold: "Build your trading knowledge.", cta: "Explore learning resources", to: "/insights" },
+  { name: "Support & help", stat: "Help centre", statText: "answers on plans, billing and JX Bot", body: "Find quick answers or contact our team about your account.", bold: "Get help when you need it.", cta: "Visit the help centre", to: "/help" },
 ];
 
 export function CloudSolutions() {
@@ -84,7 +87,7 @@ export function CloudSolutions() {
           </ul>
 
           <div className="rounded-md border border-gc-line p-3">
-            <img src={s.image} alt={s.name} loading="lazy" width={1280} height={640} className="h-56 w-full rounded-lg object-cover md:h-64" />
+            <AuroraTile n={active} icons={SOL_ICONS[active % SOL_ICONS.length]} className="h-56 w-full rounded-lg md:h-64" />
             <div className="mt-2 grid gap-2 sm:grid-cols-2">
               <div className="rounded-lg bg-gc-ink p-5 text-gc-on-blue">
                 <div className="text-4xl font-medium">{s.stat}</div>

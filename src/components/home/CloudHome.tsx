@@ -21,20 +21,16 @@ import {
   BookOpen,
   LifeBuoy,
   Users,
+  Cpu,
+  FileText,
+  Crown,
+  type LucideIcon,
 } from "lucide-react";
+import { AuroraTile } from "@/components/AuroraTile";
 import tradeDesk from "@/assets/home/trade-desk.jpg";
 import tradeChart from "@/assets/home/trade-chart.jpg";
 import tradeGold from "@/assets/home/trade-gold.jpg";
 import { STORIES } from "@/lib/stories";
-import tradeNeonStart from "@/assets/home/trade-neon-start.jpg";
-import tradeNeonPractice from "@/assets/home/trade-neon-practice.jpg";
-import tradeNeonLearn from "@/assets/home/trade-neon-learn.jpg";
-import devModels from "@/assets/home/dev-models.jpg";
-import devExtension from "@/assets/home/dev-extension.jpg";
-import devDocs from "@/assets/home/dev-docs.jpg";
-import progFounding from "@/assets/home/prog-founding.jpg";
-import progPlans from "@/assets/home/prog-plans.jpg";
-import progSupport from "@/assets/home/prog-support.jpg";
 
 type Tone = "blue" | "red" | "yellow" | "green";
 
@@ -255,33 +251,33 @@ export function CloudHero({ price: _price, delta: _delta }: { price: string; del
 }
 
 /* ---------------- Audience tabs (Google Cloud-style panel) ---------------- */
-type AudienceCard = { tag: string; text: string; to: string; img?: string; logo?: boolean };
+type AudienceCard = { tag: string; text: string; to: string; img?: string; logo?: boolean; icon?: LucideIcon };
 const AUDIENCES: Array<{ key: string; label: string; cards: AudienceCard[] }> = [
   {
     key: "traders",
     label: "Traders",
     cards: [
-      { tag: "NEW TRADERS", text: "New sign-ups get 14 days of free Pro access & $100 for the top AI Models for 30 days ", to: "/auth", img: tradeNeonStart },
-      { tag: "JX BOT", text: "Run JX Bot on MetaTrader 5 with a daily auto-stop at your plan's target", to: "/pricing", img: tradeNeonPractice },
-      { tag: "LEARN", text: "Read daily Fiber insights and guides on sweeps, zones and order blocks", to: "/insights", img: tradeNeonLearn },
+      { tag: "NEW TRADERS", text: "New sign-ups get 14 days of free Pro access & $100 for the top AI Models for 30 days ", to: "/auth", icon: Sparkles },
+      { tag: "JX BOT", text: "Run JX Bot on MetaTrader 5 with a daily auto-stop at your plan's target", to: "/pricing", icon: Bot },
+      { tag: "LEARN", text: "Read daily Fiber insights and guides on sweeps, zones and order blocks", to: "/insights", icon: BookOpen },
     ],
   },
   {
     key: "developers",
     label: "Developers",
     cards: [
-      { tag: "TOP-TIER MODELS", text: "Top-tier AI models for developers who want to build serious trading tools", to: "/ai-engine", img: devModels },
-      { tag: "API & EXTENSION", text: "Plug Jenvu models into your apps and bots with API keys in minutes", to: "/pricing", img: devExtension },
-      { tag: "DEVELOPER DOCS", text: "Clear docs and guides to connect, test and ship your projects faster", to: "/help", img: devDocs },
+      { tag: "TOP-TIER MODELS", text: "Top-tier AI models for developers who want to build serious trading tools", to: "/ai-engine", icon: Cpu },
+      { tag: "API & EXTENSION", text: "Plug Jenvu models into your apps and bots with API keys in minutes", to: "/pricing", icon: KeyRound },
+      { tag: "DEVELOPER DOCS", text: "Clear docs and guides to connect, test and ship your projects faster", to: "/help", icon: FileText },
     ],
   },
   {
     key: "programs",
     label: "Special programs",
     cards: [
-      { tag: "FOUNDING PROGRAM", text: "Apply to the invite-only Founding Program for your chosen plan and $250 credit", to: "/founding", img: progFounding },
-      { tag: "PLANS", text: "Choose Pro at $49, Elite at $99 or Ultra at $169, billed every month", to: "/pricing", img: progPlans },
-      { tag: "SUPPORT", text: "Questions about plans, billing or JX Bot? Ask our support team", to: "/contact", img: progSupport },
+      { tag: "FOUNDING PROGRAM", text: "Apply to the invite-only Founding Program for your chosen plan and $250 credit", to: "/founding", icon: Crown },
+      { tag: "PLANS", text: "Choose Pro at $49, Elite at $99 or Ultra at $169, billed every month", to: "/pricing", icon: Wallet },
+      { tag: "SUPPORT", text: "Questions about plans, billing or JX Bot? Ask our support team", to: "/contact", icon: LifeBuoy },
     ],
   },
 ];
@@ -289,12 +285,6 @@ const AUDIENCES: Array<{ key: string; label: string; cards: AudienceCard[] }> = 
 export function CloudAudiences() {
   const [active, setActive] = React.useState(AUDIENCES[0].key);
   const current = AUDIENCES.find((a) => a.key === active) ?? AUDIENCES[0];
-  // Warm every tab's images up front so switching tabs shows them instantly.
-  React.useEffect(() => {
-    AUDIENCES.forEach((a) => a.cards.forEach((c) => {
-      if (c.img) { const im = new Image(); im.decoding = "async"; im.src = c.img; }
-    }));
-  }, []);
   return (
     <section className="bg-background px-3 pb-16 sm:px-4">
       <div className="rounded-[28px] bg-gc-panel px-5 py-8 sm:px-10 md:px-12 md:py-10 xl:px-[96px]">
@@ -318,7 +308,7 @@ export function CloudAudiences() {
           ))}
         </div>
         <div className="mt-9 grid gap-6 md:grid-cols-3">
-          {current.cards.map((c) => (
+          {current.cards.map((c, i) => (
             <div
               key={c.tag}
               className="flex min-h-[112px] overflow-hidden rounded-lg border border-gc-line bg-background"
@@ -327,7 +317,7 @@ export function CloudAudiences() {
                 <div className="text-[12px] font-medium tracking-wide text-gc-ink-muted">{c.tag}</div>
                 <p className="mt-1 text-[14px] font-medium leading-[1.5] text-gc-ink sm:text-[16px] sm:leading-[1.55]">{c.text}</p>
               </div>
-              {c.img && <img src={c.img} alt="" loading="eager" decoding="async" className="w-[112px] shrink-0 object-cover" />}
+              {c.icon && <AuroraTile n={i} icons={[c.icon]} small className="m-2 w-[96px] shrink-0 sm:w-[112px]" />}
               {c.logo && (
                 <div className="flex w-[84px] shrink-0 items-center justify-center">
                   <img src="/favicon.png" alt="" className="h-14 w-14 object-contain" />
