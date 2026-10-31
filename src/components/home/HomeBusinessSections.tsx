@@ -54,7 +54,7 @@ export function BizHero() {
   return (
     <section className="relative overflow-hidden bg-gradient-to-b from-gc-blue-soft/50 to-background pt-16 sm:pt-24">
       <div className="mx-auto max-w-5xl px-5 text-center">
-        <h1 className="text-[44px] font-normal leading-[1.05] tracking-tight text-gc-ink sm:text-[64px] md:text-[76px]">
+        <h1 className="text-[36px] font-normal leading-[1.08] tracking-tight text-gc-ink sm:text-[64px] md:text-[76px]">
           <span className="inline-block rounded-xl border border-gc-line bg-background px-4 pb-1 text-gc-blue shadow-sm sm:px-6">
             Gold intelligence
           </span>
@@ -307,12 +307,12 @@ function WindowCenter({ k }: { k: ProductKey }) {
       <div className="flex h-full items-center justify-center p-6">
         <pre className="w-full max-w-md overflow-x-auto rounded-xl bg-gc-night p-5 text-[12.5px] leading-relaxed text-gc-on-night">
 {`const client = new OpenAI({
-  baseURL: "https://jenvu.com/api/v1",
+  baseURL: "https://jenvu.com/api/public/v1",
   apiKey: process.env.JENVU_API_KEY,
 });
 
 await client.chat.completions.create({
-  model: "jenvu-pro",
+  model: "gpt-5.5",
   messages: [{ role: "user", content: "Hi" }],
 });`}
         </pre>
@@ -350,7 +350,7 @@ export function BizPlatform() {
     <section className="bg-background px-5 py-16 sm:py-24">
       <div className="mx-auto max-w-6xl text-center">
         <h2 className={h2}>A complete AI desk for Fiber traders</h2>
-        <div className="mx-auto mt-8 inline-flex max-w-full flex-wrap justify-center gap-1 rounded-full border border-gc-line p-1">
+        <div className="mx-auto mt-8 inline-flex max-w-full flex-wrap justify-center gap-1 rounded-3xl border sm:rounded-full border-gc-line p-1">
           {PRODUCTS.map(({ key, label, Icon }) => (
             <button
               key={key}
