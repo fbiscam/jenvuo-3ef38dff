@@ -52,24 +52,43 @@ const pill =
 const h2 = "text-[34px] font-medium leading-[1.1] tracking-tight text-foreground sm:text-[48px]";
 const sub = "mx-auto mt-5 max-w-2xl text-[18px] sm:text-[19px] leading-relaxed text-muted-foreground";
 
+/* Rotating last word of the hero heading; a colourful line sweeps under it and the word changes as it passes. */
+const ROTATING = ["trade.", "analyze.", "backtest.", "execute.", "automate."];
+function RotatingWord() {
+  const [i, setI] = React.useState(0);
+  const [still, setStill] = React.useState(false);
+  React.useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) { setStill(true); return; }
+    const t = window.setInterval(() => setI((n) => (n + 1) % ROTATING.length), 2600);
+    return () => window.clearInterval(t);
+  }, []);
+  return (
+    <span className="relative inline-block whitespace-nowrap pb-2">
+      <span key={i} className={still ? "" : "ent-word-in inline-block"}>{ROTATING[i]}</span>
+      <span aria-hidden="true" className="absolute inset-x-0 bottom-0 h-[4px] overflow-hidden rounded-full">
+        <span key={`l${i}`} className={`block h-full w-full rounded-full ${still ? "" : "ent-sweep"}`} style={{ background: "var(--ent-rainbow)" }} />
+      </span>
+    </span>
+  );
+}
+
 /* 1 — Hero (xAI style): badge, headline, two pills */
 export function EntHero() {
   return (
     <section className="bg-[image:var(--ent-hero-wash)] px-5 pb-14 pt-16 text-center sm:pt-20">
-      <Link to="/models" className="inline-flex items-center gap-2 rounded-full border border-border bg-background py-1.5 pl-1.5 pr-2 text-[13px] shadow-sm transition hover:bg-muted/40">
+      <Link to="/models" className="inline-flex items-center gap-2 rounded-full border border-foreground/[0.07] bg-background py-1.5 pl-1.5 pr-2 text-[13px] transition hover:bg-muted/40">
         <span className="rounded-full bg-ent-orange/10 px-2 py-0.5 text-[11px] font-medium text-ent-orange">New</span>
         <span className="font-medium text-foreground">Meet Jenvu AI</span>
         <span className="text-muted-foreground">Our new models</span>
         <span className="flex h-5 w-5 items-center justify-center rounded-full bg-muted"><ArrowUpRight className="h-3 w-3" /></span>
       </Link>
-      <h1 className="mx-auto mt-8 max-w-4xl text-[42px] font-medium leading-[1.06] tracking-tight text-foreground sm:text-[68px]">
+      <h1 className="mx-auto mt-8 max-w-4xl text-[42px] font-medium leading-[1.08] tracking-tight text-foreground sm:text-[68px]">
         Frontier AI models
         <br />
-        for every chart you{" "}
-        <span className="underline decoration-muted-foreground/40 decoration-[3px] underline-offset-[10px]">see</span>.
+        for everything you <RotatingWord />
       </h1>
       <p className="mx-auto mt-6 max-w-2xl text-[18px] text-foreground/80 sm:text-[21px]">
-        Reasoning, code, alerts, charts, and automation. Built for gold traders.
+        Reasoning, code, signals, execution, and risk. Tuned for precision market intelligence.
       </p>
       <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
         <Link to="/platform" className="inline-flex items-center gap-1.5 rounded-full bg-foreground px-6 py-3 text-[15px] font-medium text-background transition hover:opacity-85">

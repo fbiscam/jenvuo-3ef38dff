@@ -1833,3 +1833,35 @@ html body .jenvu-zoom-dashboard.dash-dark main .bg-white {
   color: #ffffff !important;
   box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.14) !important;
 }
+
+/* ---- Hero rotating word + colourful sweeping underline ---- */
+:root { --ent-rainbow: linear-gradient(90deg, #22d3ee, #6366f1, #a855f7, #ec4899, #f97316); }
+@keyframes ent-sweep {
+  0% { transform: translateX(-101%); }
+  35% { transform: translateX(0); }
+  80% { transform: translateX(0); }
+  100% { transform: translateX(101%); }
+}
+.ent-sweep { animation: ent-sweep 2.6s cubic-bezier(.65,0,.35,1) both; }
+@keyframes ent-word-in {
+  0% { opacity: 0; transform: translateY(0.25em); filter: blur(4px); }
+  100% { opacity: 1; transform: translateY(0); filter: blur(0); }
+}
+.ent-word-in { animation: ent-word-in 0.5s cubic-bezier(.2,.8,.2,1) both; }
+
+/* ---- xAI-style type: lighter weight and tighter tracking on medium headings, site-wide ---- */
+h1.font-medium, h2.font-medium, h3.font-medium { font-weight: 450; }
+h1.font-medium, h2.font-medium { letter-spacing: -0.025em; }
+
+/* ---- Black theme: every text reads white (website + dashboard) ---- */
+.dark { --muted-foreground: #e4e4e7; }
+.dark.dash-dark { --muted-foreground: #e4e4e7; }
+.dash-dark .text-zinc-700,
+.dash-dark .text-zinc-600,
+.dash-dark .hover\:text-zinc-700:hover,
+.dash-dark .text-zinc-500,
+.dash-dark .text-zinc-400,
+.dash-dark .text-black\/60,
+.dash-dark .text-gc-ink,
+.dash-dark .text-gc-ink-muted { color: #ffffff; }
+.dark .text-gc-ink, .dark .text-gc-ink-muted { color: #ffffff; }

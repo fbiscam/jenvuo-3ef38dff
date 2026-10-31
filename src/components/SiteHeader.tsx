@@ -3,13 +3,14 @@ import { Link } from "@tanstack/react-router";
 import { ChevronDown, Menu, Search, X } from "lucide-react";
 import { openAskJenvu } from "@/components/AskJenvuWidget";
 import HeaderSearch from "@/components/HeaderSearch";
+import JenvuMark from "@/components/JenvuMark";
 import { useAuthUser } from "@/hooks/useAuthUser";
 import { supabase } from "@/integrations/supabase/client";
 import { readCachedAvatar, writeCachedAvatar, AVATAR_TTL_SECONDS } from "@/lib/avatar-cache";
 import { getDefaultAvatar } from "@/lib/default-avatar";
 
 /** Current page in the top menu: dark text with a blue line along the bottom of the header. */
-const ACTIVE = { className: "relative !text-gc-ink after:pointer-events-none after:absolute after:inset-x-1 after:-bottom-[13px] after:h-[3px] after:rounded-t-sm after:bg-gc-blue" };
+const ACTIVE = { className: "!bg-muted !text-foreground" };
 
 const MONO = "font-sans";
 
@@ -44,16 +45,16 @@ export default function SiteHeader() {
   return (
     <>
       <header className="jenvu-home-header sticky top-0 z-50 border-0 bg-background">
-        <div className="relative flex h-[60px] items-center gap-3 px-4 sm:px-4">
-          <Link to="/" className="flex min-w-0 shrink-0 items-center gap-2">
-            <img src="/favicon.png" alt="Jenvu" className="h-7 w-7 shrink-0 rounded-md object-contain" />
-            <span className="truncate text-[22px] leading-none tracking-tight text-gc-ink" style={{ fontFamily: "\"Google Sans\", \"Product Sans\", \"DM Sans\", system-ui, sans-serif", fontWeight: 500 }}>Jenvu</span>
+        <div className="relative mx-auto flex h-[60px] max-w-[1280px] items-center gap-3 px-5 lg:grid lg:grid-cols-[1fr_auto_1fr]">
+          <Link to="/" className="flex min-w-0 shrink-0 items-center gap-2 justify-self-start">
+            <JenvuMark className="h-6 w-6 shrink-0 text-foreground" />
+            <span className="truncate text-[22px] leading-none tracking-tight text-foreground" style={{ fontFamily: "\"Google Sans\", \"Product Sans\", \"DM Sans\", system-ui, sans-serif", fontWeight: 500 }}>Jenvu</span>
           </Link>
 
           {searchOpen ? (
-            <div className="hidden min-w-0 flex-1 md:flex"><HeaderSearch onClose={closeSearch} /></div>
+            <div className="hidden min-w-0 md:flex lg:w-[520px]"><HeaderSearch onClose={closeSearch} /></div>
           ) : (
-          <nav className="ml-6 hidden min-w-0 items-center gap-0.5 whitespace-nowrap text-[14px] text-gc-ink-muted lg:flex [&>a]:rounded-md [&>a]:px-2.5 [&>a]:py-2 [&>a:hover]:bg-gc-surface [&>a:hover]:text-gc-ink">
+          <nav className="hidden min-w-0 items-center justify-center gap-0.5 whitespace-nowrap text-[14px] text-muted-foreground lg:flex [&>a]:rounded-full [&>a]:px-3 [&>a]:py-2 [&>a:hover]:bg-muted [&>a:hover]:text-foreground">
             <Link to="/about" activeProps={ACTIVE}>Why Jenvu</Link>
             <Link to="/ai-engine" activeProps={ACTIVE}>Products</Link>
             <Link to="/strategies/ict-gold-trading" activeProps={ACTIVE}>Solutions</Link>
@@ -63,8 +64,8 @@ export default function SiteHeader() {
           </nav>
           )}
 
-          <div className="ml-auto flex shrink-0 items-center gap-1.5">
-            <button type="button" onClick={() => setSearchOpen(true)} aria-label="Search" tabIndex={searchOpen ? -1 : 0} aria-hidden={searchOpen} className={`hidden h-10 w-10 items-center justify-center rounded-full text-gc-ink hover:bg-gc-surface md:inline-flex ${searchOpen ? "invisible" : ""}`}>
+          <div className="ml-auto flex shrink-0 items-center gap-1.5 justify-self-end">
+            <button type="button" onClick={() => setSearchOpen(true)} aria-label="Search" tabIndex={searchOpen ? -1 : 0} aria-hidden={searchOpen} className={`hidden h-10 w-10 items-center justify-center rounded-full text-foreground hover:bg-muted md:inline-flex ${searchOpen ? "invisible" : ""}`}>
               <Search className="h-5 w-5" />
             </button>
             {isAuthed ? (
@@ -72,12 +73,12 @@ export default function SiteHeader() {
                 to="/dashboard/profile"
                 aria-label="Account settings"
                 title="Account settings"
-                className="ml-1 inline-flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full ring-1 ring-gc-line hover:ring-2 hover:ring-gc-blue-soft"
+                className="ml-1 inline-flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full ring-1 ring-border hover:ring-2 hover:ring-foreground/30"
               >
                 {avatarUrl && <img src={avatarUrl} alt="" className="h-full w-full object-cover" />}
               </Link>
             ) : (
-              <Link to="/auth" className="hidden whitespace-nowrap rounded-md px-2.5 py-2 text-[14px] text-gc-ink-muted hover:bg-gc-surface hover:text-gc-ink xl:inline-flex">
+              <Link to="/auth" className="hidden whitespace-nowrap rounded-md px-2.5 py-2 text-[14px] text-muted-foreground hover:bg-muted hover:text-foreground xl:inline-flex">
                 Log in
               </Link>
             )}
@@ -88,13 +89,13 @@ export default function SiteHeader() {
                 aria-haspopup="menu"
                 onClick={() => setTryOpen((v) => !v)}
                 onMouseEnter={() => setTryOpen(true)}
-                className="inline-flex h-10 items-center gap-1 rounded-full border border-foreground/20 bg-background px-4 text-[14px] font-medium text-foreground hover:bg-gc-surface"
+                className="inline-flex h-10 items-center gap-1 rounded-full border border-foreground/20 bg-background px-4 text-[14px] font-medium text-foreground hover:bg-muted"
               >
                 Try Jenvu <ChevronDown className={`h-4 w-4 transition-transform ${tryOpen ? "rotate-180" : ""}`} />
               </button>
               {tryOpen && (
                 <div role="menu" className="absolute right-0 top-full z-50 pt-2">
-                  <div className="w-56 rounded-2xl border border-gc-line bg-background p-2 text-[14px] shadow-lg">
+                  <div className="w-56 rounded-2xl border border-border bg-background p-2 text-[14px] shadow-lg">
                     {[
                       { to: isAuthed ? "/dashboard" : "/auth", label: "Dashboard" },
                       { to: "/dashboard/terminal", label: "Fiber Terminal" },
@@ -102,7 +103,7 @@ export default function SiteHeader() {
                       { to: "/platform", label: "API Platform" },
                       { to: "/download", label: "Download app" },
                     ].map((it) => (
-                      <Link key={it.label} to={it.to} role="menuitem" onClick={() => setTryOpen(false)} className="flex items-center justify-between rounded-lg px-3 py-2.5 text-foreground hover:bg-gc-surface">
+                      <Link key={it.label} to={it.to} role="menuitem" onClick={() => setTryOpen(false)} className="flex items-center justify-between rounded-lg px-3 py-2.5 text-foreground hover:bg-muted">
                         {it.label} <span className="text-[11px] text-muted-foreground">↗</span>
                       </Link>
                     ))}
@@ -122,7 +123,7 @@ export default function SiteHeader() {
               aria-label="Open menu"
               aria-expanded={mobileMenuOpen}
               onClick={() => setMobileMenuOpen(true)}
-              className="ml-1 inline-flex h-10 w-10 items-center justify-center rounded-full text-gc-ink hover:bg-gc-surface lg:hidden"
+              className="ml-1 inline-flex h-10 w-10 items-center justify-center rounded-full text-foreground hover:bg-muted lg:hidden"
             >
               <Menu className="h-5 w-5" />
             </button>
@@ -132,23 +133,23 @@ export default function SiteHeader() {
 
       {mobileMenuOpen && (
         <div className="fixed inset-0 z-[60] lg:hidden" role="dialog" aria-modal="true">
-          <div className="absolute inset-0 bg-zinc-900/40" onClick={() => setMobileMenuOpen(false)} />
-          <div className="absolute inset-x-0 top-0 bg-white border-b border-zinc-100 shadow-lg">
+          <div className="absolute inset-0 bg-foreground/40" onClick={() => setMobileMenuOpen(false)} />
+          <div className="absolute inset-x-0 top-0 bg-background border-b border-border shadow-lg">
             <div className="flex items-center justify-between px-5 py-3">
               <Link to="/" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-2.5">
-                <img src="/favicon.png" alt="Jenvu" className="h-7 w-7 rounded-md object-contain" />
-                <span className="text-[20px] tracking-tight" style={{ color: "#3c4043", fontFamily: "\"Google Sans\",\"Product Sans\",\"DM Sans\",system-ui,sans-serif", fontWeight: 500 }}>Jenvu</span>
+                <JenvuMark className="h-6 w-6 text-foreground" />
+                <span className="text-[20px] tracking-tight text-foreground" style={{ fontFamily: "\"Google Sans\",\"Product Sans\",\"DM Sans\",system-ui,sans-serif", fontWeight: 500 }}>Jenvu</span>
               </Link>
               <button
                 type="button"
                 aria-label="Close menu"
                 onClick={() => setMobileMenuOpen(false)}
-                className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-900 hover:bg-zinc-50"
+                className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-background text-foreground hover:bg-muted"
               >
                 <X className="h-4 w-4" />
               </button>
             </div>
-            <nav className="flex flex-col px-3 pb-4 pt-1 text-[15px] text-zinc-900">
+            <nav className="flex flex-col px-3 pb-4 pt-1 text-[15px] text-foreground">
               {[
                 { to: "/about", label: "Why Jenvu" },
                 { to: "/ai-engine", label: "Products" },
@@ -164,7 +165,7 @@ export default function SiteHeader() {
                   key={it.to}
                   to={it.to}
                   onClick={() => setMobileMenuOpen(false)}
-                  className="rounded-lg px-3 py-3 hover:bg-zinc-50"
+                  className="rounded-lg px-3 py-3 hover:bg-muted"
                 >
                   {it.label}
                 </Link>
@@ -173,7 +174,7 @@ export default function SiteHeader() {
                 <Link
                   to="/dashboard"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="mx-3 mt-3 inline-flex items-center justify-center rounded-lg border border-zinc-200 bg-white px-3 py-2.5 text-sm font-medium text-zinc-950 hover:bg-zinc-50"
+                  className="mx-3 mt-3 inline-flex items-center justify-center rounded-lg border border-border bg-background px-3 py-2.5 text-sm font-medium text-foreground hover:bg-muted"
                 >
                   Dashboard
                   <span className={`${MONO} text-[10px] opacity-70 ml-1.5`}>↗</span>
@@ -183,14 +184,14 @@ export default function SiteHeader() {
                   <Link
                     to="/auth"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="inline-flex items-center justify-center rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 hover:bg-zinc-50"
+                    className="inline-flex items-center justify-center rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground hover:bg-muted"
                   >
                     Sign In
                   </Link>
                   <Link
                     to="/pricing"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="inline-flex items-center justify-center rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm font-medium text-zinc-950 hover:bg-zinc-50"
+                    className="inline-flex items-center justify-center rounded-lg border border-border bg-background px-3 py-2 text-sm font-medium text-foreground hover:bg-muted"
                   >
                     Buy now
                   </Link>
