@@ -187,10 +187,10 @@ export default function ModelsExplorer({ apiHref = "/dashboard/api" }: { apiHref
     <div className="mx-auto w-full max-w-[1250px] space-y-14 px-4 py-8 font-sans text-gc-ink sm:px-6 sm:py-10">
       {/* Discover — same look as the Platform page hero */}
       <header className="pb-4 pt-12 text-center sm:pt-20">
-        <h1 className="mx-auto max-w-3xl text-[2.6rem] font-medium leading-[1.08] tracking-tight sm:text-6xl">
+        <h1 className="mx-auto max-w-3xl text-balance text-center text-[2.6rem] font-medium leading-[1.08] tracking-tight sm:text-6xl">
           Discover models on Jenvu
         </h1>
-        <p className="mx-auto mt-6 max-w-2xl text-[17px] text-gc-ink">
+        <p className="mx-auto mt-6 max-w-2xl text-balance text-center text-[17px] text-gc-ink">
           Every model you can call with one Jenvu API key, at one flat price of {price} per million tokens.
         </p>
         <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
@@ -236,9 +236,11 @@ export default function ModelsExplorer({ apiHref = "/dashboard/api" }: { apiHref
 
       <div className="grid gap-3 lg:grid-cols-[1.25fr_1fr]">
         <section className="rounded-md border border-gc-line bg-background p-4 sm:p-6">
+          <div className="text-center">
           <p className="text-sm text-gc-ink-muted">Flagship models</p>
-          <h2 className="mt-1 text-xl font-medium tracking-tight text-gc-ink sm:text-2xl">The top model from each lab, one key</h2>
+          <h2 className="mt-1 text-balance text-xl font-medium tracking-tight text-gc-ink sm:text-2xl">The top model from each lab, one key</h2>
           <p className="mt-1.5 text-sm text-gc-ink-muted">Switch between Anthropic, OpenAI, Google, Qwen and xAI by changing a single model ID.</p>
+          </div>
           <div className="mt-5 flex items-center gap-3 border-b border-gc-line pb-2 text-sm text-gc-ink-muted">
             <span className="w-5 text-center">#</span>
             <span className="w-9 shrink-0" aria-hidden />
