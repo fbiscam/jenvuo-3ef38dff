@@ -8,7 +8,7 @@ import { useMt5Access } from "@/components/dashboard/Mt5Licenses";
 import { createMt5License, getBotDownloadUrl, revokeMt5License, type Mt5LicenseRow } from "@/lib/mt5-licenses.functions";
 import { MT5_PLANS, countIpLicenses, dailyTarget, isMt5Plan, parseBinding } from "@/lib/mt5-licenses";
 
-const MONO = "font-['JetBrains_Mono',ui-monospace,monospace]";
+const MONO = "font-sans";
 
 export const Route = createFileRoute("/_authenticated/dashboard/jx-bot")({
   head: () => ({

@@ -35,7 +35,7 @@ export const Route = createFileRoute("/_authenticated/dashboard/billing")({
   component: Billing,
 });
 
-const MONO = "font-['JetBrains_Mono',ui-monospace,monospace]";
+const MONO = "font-sans";
 
 type BillingRow = {
   id: string;

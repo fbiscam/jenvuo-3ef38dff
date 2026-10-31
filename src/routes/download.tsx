@@ -41,7 +41,7 @@ export const Route = createFileRoute("/download")({
   component: DownloadPage,
 });
 
-const MONO = "font-['JetBrains_Mono',ui-monospace,monospace]";
+const MONO = "font-sans";
 const SANS = "font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif]";
 
 // Placeholder download URLs — wire real links here when builds are ready.

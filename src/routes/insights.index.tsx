@@ -91,7 +91,7 @@ export const Route = createFileRoute("/insights/")({
   ),
 });
 
-const MONO = "font-['JetBrains_Mono',ui-monospace,monospace]";
+const MONO = "font-sans";
 const SANS = "font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif]";
 
 const PAGE_SIZE = 9;

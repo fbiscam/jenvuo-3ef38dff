@@ -23,7 +23,7 @@ import { authSignInUrl, signOutAndRedirect } from "@/lib/cross-domain-session";
 
 import { cn } from "@/lib/utils";
 
-const MONO = "font-['JetBrains_Mono',ui-monospace,monospace]";
+const MONO = "font-sans";
 const SANS = "font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif]";
 
 /* ---------- ticker (matches homepage) ---------- */

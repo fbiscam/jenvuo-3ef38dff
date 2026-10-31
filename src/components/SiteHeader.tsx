@@ -10,7 +10,7 @@ import { getDefaultAvatar } from "@/lib/default-avatar";
 /** Current page in the top menu: dark text with a blue line along the bottom of the header. */
 const ACTIVE = { className: "relative !text-gc-ink after:pointer-events-none after:absolute after:inset-x-1 after:-bottom-[13px] after:h-[3px] after:rounded-t-sm after:bg-gc-blue" };
 
-const MONO = "font-['JetBrains_Mono',ui-monospace,monospace]";
+const MONO = "font-sans";
 
 /** The homepage header, shared by every public page so the menu is identical everywhere. */
 export default function SiteHeader() {
@@ -56,6 +56,7 @@ export default function SiteHeader() {
             <Link to="/platform" activeProps={ACTIVE}>Platform</Link>
             <Link to="/strategies/ict-gold-trading" activeProps={ACTIVE}>Solutions</Link>
             <Link to="/ai-engine" activeProps={ACTIVE}>Products</Link>
+            <Link to="/models" activeProps={ACTIVE}>Models</Link>
             <Link to="/pricing" activeProps={ACTIVE}>Pricing</Link>
             <Link to="/insights" activeProps={ACTIVE}>Blog</Link>
             <Link to="/contact" className="!text-gc-blue" activeProps={ACTIVE}>Contact us</Link>
@@ -138,6 +139,7 @@ export default function SiteHeader() {
                 { to: "/platform", label: "Platform" },
                 { to: "/strategies/ict-gold-trading", label: "Solutions" },
                 { to: "/ai-engine", label: "Products" },
+                { to: "/models", label: "Models" },
                 { to: "/pricing", label: "Pricing" },
                 { to: "/insights", label: "Resources" },
                 { to: "/docs", label: "Docs" },
