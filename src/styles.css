@@ -1715,3 +1715,118 @@ pre, pre *, code, kbd, samp {
   --ent-bubble: #1c1c1f;
   --ent-ide: #0a0a0b;
 }
+
+/* ====== Dashboard: plain white / plain black only ======
+   White theme: white canvas, soft grey tints. Black theme: pure black canvas,
+   near-black tints, white text. Coloured tint backgrounds are neutralised. */
+.jenvu-zoom-dashboard {
+  --gc-canvas: #ffffff;
+  --gc-section: #ffffff;
+  --gc-sky: #f4f4f5;
+  --gc-nav-active: #f4f4f5;
+  --gc-notice: #f4f4f5;
+  --gc-panel: #f4f4f5;
+  --gc-blue-soft: #f4f4f5;
+  --gc-red-soft: #f4f4f5;
+  --gc-green-soft: #f4f4f5;
+  --gc-yellow-soft: #f4f4f5;
+  --gc-surface: #fafafa;
+  background-color: #ffffff;
+}
+.jenvu-zoom-dashboard.dash-dark {
+  --gc-canvas: #000000;
+  --gc-section: #000000;
+  --gc-sky: #141416;
+  --gc-nav-active: #1c1c1f;
+  --gc-notice: #141416;
+  --gc-panel: #141416;
+  --gc-blue-soft: #141416;
+  --gc-red-soft: #141416;
+  --gc-green-soft: #141416;
+  --gc-yellow-soft: #141416;
+  --gc-surface: #0e0e10;
+  --gc-ink: #ffffff;
+  --gc-ink-muted: #a1a1aa;
+  --gc-line: rgba(255, 255, 255, 0.1);
+  --gc-console-search: #17171a;
+  background-color: #000000;
+  color: #ffffff;
+}
+.jenvu-zoom-dashboard main :is(
+  .bg-emerald-50, .bg-emerald-100, .bg-emerald-50\/50, .bg-amber-50, .bg-amber-100,
+  .bg-rose-50, .bg-rose-50\/50, .bg-blue-50, .bg-blue-100, .bg-sky-50, .bg-sky-100,
+  .bg-violet-50, .bg-indigo-50, .bg-gray-50, .bg-slate-50, .bg-neutral-50,
+  .bg-red-50, .bg-green-50, .bg-yellow-50, .bg-orange-50, .bg-purple-50, .bg-pink-50, .bg-teal-50, .bg-cyan-50
+) { background-color: #f4f4f5 !important; }
+.jenvu-zoom-dashboard.dash-dark main :is(
+  .bg-emerald-50, .bg-emerald-100, .bg-emerald-50\/50, .bg-amber-50, .bg-amber-100,
+  .bg-rose-50, .bg-rose-50\/50, .bg-blue-50, .bg-blue-100, .bg-sky-50, .bg-sky-100,
+  .bg-violet-50, .bg-indigo-50, .bg-gray-50, .bg-slate-50, .bg-neutral-50,
+  .bg-red-50, .bg-green-50, .bg-yellow-50, .bg-orange-50, .bg-purple-50, .bg-pink-50, .bg-teal-50, .bg-cyan-50
+) { background-color: #141416 !important; }
+
+/* Black theme: every heading and body text readable (white / soft grey) */
+.jenvu-zoom-dashboard.dash-dark main :is(h1, h2, h3, h4, h5, h6) { color: #ffffff !important; }
+.jenvu-zoom-dashboard.dash-dark :is(
+  .text-zinc-950, .text-gray-900, .text-gray-800, .text-slate-900, .text-slate-800,
+  .text-neutral-900, .text-neutral-800, .text-stone-900, .text-black\/80, .text-black\/70,
+  .text-foreground, .text-gc-ink
+) { color: #ffffff !important; }
+.jenvu-zoom-dashboard.dash-dark :is(
+  .text-gray-700, .text-gray-600, .text-slate-700, .text-slate-600, .text-neutral-700,
+  .text-neutral-600, .text-gc-ink-muted, .text-black\/50, .text-muted-foreground
+) { color: #d4d4d8 !important; }
+.jenvu-zoom-dashboard.dash-dark :is(
+  .text-gray-500, .text-gray-400, .text-slate-500, .text-slate-400, .text-neutral-500,
+  .text-neutral-400, .text-black\/40
+) { color: #a1a1aa !important; }
+.jenvu-zoom-dashboard.dash-dark main :is(p, li, td, th, label, dt, dd):not([class*="text-"]) { color: #e4e4e7; }
+.jenvu-zoom-dashboard.dash-dark main :is(input, select, textarea) {
+  background-color: #0e0e10;
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.14);
+}
+.jenvu-zoom-dashboard.dash-dark main :is(input, textarea)::placeholder { color: #71717a; }
+
+/* Black theme: borders and cards */
+.jenvu-zoom-dashboard.dash-dark main :is(.border, .border-zinc-100, .border-zinc-200, .border-gc-line) {
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+.jenvu-zoom-dashboard.dash-dark main .divide-y > * + * { border-color: rgba(255, 255, 255, 0.08) !important; }
+html body .jenvu-zoom-dashboard.dash-dark main .bg-white {
+  background-color: #0e0e10 !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  box-shadow: none !important;
+}
+
+/* Black theme: menu drawer and top bar */
+.jenvu-zoom-dashboard.dash-dark .dashboard-sidebar-root {
+  --gc-canvas: #000000;
+  --gc-section: #000000;
+  --gc-ink: #ffffff;
+  --gc-ink-muted: #a1a1aa;
+  --gc-line: rgba(255, 255, 255, 0.1);
+  --gc-surface: #0e0e10;
+  --gc-panel: #141416;
+  --gc-notice: #141416;
+  --gc-nav-active: #1c1c1f;
+  --gc-sky: #141416;
+  --gc-blue: #ffffff;
+  --gc-blue-deep: #ffffff;
+  --gc-console-search: #17171a;
+  --foreground: #ffffff;
+  --muted-foreground: #a1a1aa;
+  --border: rgba(255, 255, 255, 0.1);
+  --muted: #141416;
+  --accent: #1c1c1f;
+  --accent-foreground: #ffffff;
+  --popover: #121214;
+  --popover-foreground: #ffffff;
+  background-color: #000000 !important;
+  color: #ffffff;
+}
+.jenvu-zoom-dashboard.dash-dark .dashboard-sidebar-root .sidebar-quick-btn:hover {
+  background-color: #1c1c1f !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.14) !important;
+}
