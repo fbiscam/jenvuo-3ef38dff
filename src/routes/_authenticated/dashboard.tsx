@@ -690,8 +690,8 @@ function DashboardLayout() {
   const [refreshTick, setRefreshTick] = useState(0);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
-  // Dashboard page theme (black by default). Overview and Terminal keep their own look.
-  const [dashTheme, setDashTheme] = useState<"light" | "dark">("dark");
+  // Dashboard page theme (white by default, same choice as the public site). Terminal keeps its own look.
+  const [dashTheme, setDashTheme] = useState<"light" | "dark">("light");
   useEffect(() => {
     // Same choice as the public site's Sun/Moon switch.
     const stored = readSiteTheme() ?? window.localStorage.getItem("jenvu:dash:theme");
