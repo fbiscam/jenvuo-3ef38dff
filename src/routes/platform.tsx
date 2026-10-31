@@ -150,7 +150,7 @@ const MODELS = [
   { id: "claude-opus-5", name: "Claude Opus 5", note: "Deep reasoning, long documents and code" },
   { id: "gpt-5.5", name: "GPT-5.5", note: "Fast, all-round chat and automation" },
   { id: "gemini-3.1-pro", name: "Gemini 3.1 Pro", note: "Text and image understanding" },
-  { id: "deepseek-v4-flash-0731", name: "DeepSeek V4 Flash", note: "Quick, low-cost everyday tasks" },
+  { id: "deepseek-v4-flash-0731", name: "DeepSeek V4", note: "Quick, low-cost everyday tasks" },
 ];
 
 function Models() {
@@ -169,7 +169,7 @@ function Models() {
             <p className="mt-3 text-sm">Input: $3.00 per 1M tokens</p>
             <p className="text-sm">Output: $3.00 per 1M tokens</p>
             <p className="mt-4 text-sm text-gc-on-night-muted">{m.note}</p>
-            <code className="mt-4 font-mono text-xs text-gc-on-night-muted">model: “{m.id}”</code>
+            <code className="mt-4 font-mono text-xs text-gc-on-night-muted">{m.id}</code>
           </div>
         ))}
       </div>
