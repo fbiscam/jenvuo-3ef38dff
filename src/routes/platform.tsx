@@ -23,6 +23,11 @@ import {
 } from "lucide-react";
 import SiteHeader from "@/components/SiteHeader";
 import BlogFooter from "@/components/BlogFooter";
+import openaiLogo from "@/assets/platform-logos/openai.svg";
+import pythonLogo from "@/assets/platform-logos/python.svg";
+import nodeLogo from "@/assets/platform-logos/nodejs.svg";
+import curlLogo from "@/assets/platform-logos/curl.svg";
+import langchainLogo from "@/assets/platform-logos/langchain.svg";
 
 export const Route = createFileRoute("/platform")({
   head: () => ({
@@ -120,7 +125,13 @@ function StartMenu() {
   );
 }
 
-const WORKS_WITH = ["OpenAI SDK", "Python", "Node.js", "cURL", "LangChain"];
+const WORKS_WITH = [
+  { name: "OpenAI SDK", logo: openaiLogo },
+  { name: "Python", logo: pythonLogo },
+  { name: "Node.js", logo: nodeLogo },
+  { name: "cURL", logo: curlLogo },
+  { name: "LangChain", logo: langchainLogo },
+];
 
 function Hero() {
   return (
@@ -133,10 +144,11 @@ function Hero() {
         <StartMenu />
       </div>
       <p className="mt-24 text-xs uppercase tracking-[0.2em] text-gc-ink-muted">Works with the tools you already use</p>
-      <div className="mt-8 grid grid-cols-2 items-center gap-y-8 sm:grid-cols-5">
+      <div className="mx-auto mt-8 flex max-w-4xl flex-wrap items-center justify-center gap-x-8 gap-y-6 sm:gap-x-12">
         {WORKS_WITH.map((w) => (
-          <span key={w} className="text-xl font-semibold tracking-tight text-gc-ink sm:text-2xl">
-            {w}
+          <span key={w.name} className="inline-flex items-center gap-2.5 text-lg font-semibold tracking-tight text-gc-ink sm:text-2xl">
+            <img src={w.logo} alt="" aria-hidden="true" className="h-7 w-7 object-contain sm:h-8 sm:w-8" loading="lazy" />
+            {w.name}
           </span>
         ))}
       </div>
@@ -341,75 +353,176 @@ const CHAT = [
   { me: false, t: "Sure — here’s the Asia range and whether London took it out." },
 ];
 
+function useTypewriter(text: string, active: boolean, speed = 22) {
+  const [n, setN] = React.useState(0);
+  React.useEffect(() => {
+    if (!active) { setN(0); return; }
+    setN(0);
+    const id = window.setInterval(() => setN((v) => (v >= text.length ? v : v + 1)), speed);
+    return () => window.clearInterval(id);
+  }, [text, active, speed]);
+  return text.slice(0, n);
+}
+
+/** Chat timeline: each assistant reply shows a typing indicator first. */
+const CHAT_STEPS = CHAT.flatMap((c, i) => (c.me ? [{ i, typing: false }] : [{ i, typing: true }, { i, typing: false }]));
+
+function TypingDots() {
+  return (
+    <span className="inline-flex items-center gap-1 py-1">
+      {[0, 1, 2].map((d) => (
+        <span key={d} className="plat-dot h-1.5 w-1.5 rounded-full bg-gc-ink-muted" style={{ animationDelay: `${d * 0.15}s` }} />
+      ))}
+    </span>
+  );
+}
+
+function AssistantText({ text }: { text: string }) {
+  const typed = useTypewriter(text, true);
+  return <>{typed}</>;
+}
+
+function ChatDemo() {
+  const [step, setStep] = React.useState(0);
+  React.useEffect(() => {
+    const last = step >= CHAT_STEPS.length - 1;
+    const t = window.setTimeout(() => setStep(last ? 0 : step + 1), last ? 3200 : CHAT_STEPS[step].typing ? 1100 : 1500);
+    return () => window.clearTimeout(t);
+  }, [step]);
+  const cur = CHAT_STEPS[step];
+  const visible = CHAT.slice(0, cur.i + 1);
+  return (
+    <div className="flex min-h-[300px] flex-col justify-end space-y-3 sm:min-h-[340px] sm:space-y-4">
+      {visible.map((c, i) => {
+        const isCur = i === cur.i;
+        return (
+          <div key={`${i}-${step === 0 ? "a" : "b"}`} className={`plat-msg-in flex ${c.me ? "justify-start" : "justify-end"}`}>
+            <div className="flex max-w-[88%] items-center gap-2.5 rounded-2xl bg-background px-3 py-2.5 text-left shadow-[0_4px_24px_-6px] shadow-gc-ink/15 sm:max-w-[80%] sm:gap-3 sm:px-4 sm:py-3">
+              {c.me && (
+                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-gc-blue-soft text-gc-blue sm:h-8 sm:w-8">
+                  <UserRound className="h-4 w-4" />
+                </span>
+              )}
+              <span className="text-[13px] font-medium sm:text-sm">
+                {!c.me && isCur && cur.typing ? <TypingDots /> : !c.me && isCur ? <AssistantText text={c.t} /> : c.t}
+              </span>
+              {!c.me && (
+                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-gc-blue text-gc-on-blue sm:h-8 sm:w-8">
+                  <Sparkles className="h-4 w-4" />
+                </span>
+              )}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+const CANDLES = [
+  { o: 30, c: 44 }, { o: 44, c: 38 }, { o: 38, c: 52 }, { o: 52, c: 60 }, { o: 60, c: 54 },
+  { o: 54, c: 66 }, { o: 66, c: 61 }, { o: 61, c: 74 }, { o: 74, c: 70 }, { o: 70, c: 84 },
+];
+const VISION_REPLY = "Higher highs and higher lows — an uptrend, with one pullback candle before the last push up.";
+
+function VisionDemo() {
+  const [phase, setPhase] = React.useState(0); // 0 draw, 1 scan, 2 marks, 3 reply
+  const [round, setRound] = React.useState(0);
+  React.useEffect(() => {
+    const d = [1300, 2600, 900, 4200][phase];
+    const t = window.setTimeout(() => {
+      if (phase === 3) { setPhase(0); setRound((r) => r + 1); } else setPhase(phase + 1);
+    }, d);
+    return () => window.clearTimeout(t);
+  }, [phase]);
+  const typed = useTypewriter(VISION_REPLY, phase === 3, 18);
+  return (
+    <div key={round} className="grid items-center gap-4 text-left sm:min-h-[340px] sm:grid-cols-[1.2fr_1fr] sm:gap-6">
+      <div className="relative aspect-[4/3] overflow-hidden rounded-xl bg-gc-night p-4">
+        <div className="relative flex h-full items-end gap-1.5">
+          {CANDLES.map((k, i) => {
+            const up = k.c >= k.o;
+            const lo = Math.min(k.o, k.c);
+            const hi = Math.max(k.o, k.c);
+            const isMark = i === 4 || i === 9;
+            return (
+              <div key={i} className="relative h-full flex-1">
+                <span className="absolute left-1/2 w-px -translate-x-1/2 bg-gc-ink-muted/60" style={{ bottom: `${lo - 4}%`, height: `${hi - lo + 8}%` }} />
+                <span
+                  className={`plat-candle-in absolute inset-x-0 rounded-sm ${up ? "bg-gc-green" : "bg-gc-red"}`}
+                  style={{ bottom: `${lo}%`, height: `${Math.max(hi - lo, 3)}%`, animationDelay: `${i * 0.1}s` }}
+                />
+                {phase >= 2 && isMark && (
+                  <span
+                    className="plat-box absolute -inset-x-1.5 rounded-md border-2 border-gc-blue"
+                    style={{ bottom: `${lo - 6}%`, height: `${hi - lo + 12}%`, animationDelay: i === 9 ? ".2s" : "0s" }}
+                  />
+                )}
+              </div>
+            );
+          })}
+          {phase === 1 && (
+            <span className="plat-scan pointer-events-none absolute inset-y-0 w-0.5 bg-gc-blue shadow-[0_0_18px_4px] shadow-gc-blue/60" />
+          )}
+        </div>
+        <span className="absolute left-3 top-3 rounded-full bg-background/10 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-gc-on-blue">
+          {phase === 0 ? "Uploading image" : phase === 1 ? "Reading chart" : "Analysed"}
+        </span>
+      </div>
+      <div className={`rounded-2xl px-4 py-3 shadow-[0_4px_24px_-6px] shadow-gc-ink/15 transition-opacity ${phase >= 2 ? "opacity-100" : "opacity-40"}`}>
+        <p className="flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-wider text-gc-ink-muted">
+          <Sparkles className="h-3 w-3" /> Assistant
+        </p>
+        <p className="mt-2 min-h-[4.5rem] text-[13px] leading-relaxed sm:text-sm">
+          {phase < 3 ? <TypingDots /> : typed}
+        </p>
+      </div>
+    </div>
+  );
+}
+
 function ExperiencesSection() {
   const [tab, setTab] = React.useState<"chat" | "vision">("chat");
   return (
-    <section className="bg-gc-surface py-16 text-center">
-      <div className="mx-auto max-w-4xl px-5">
-        <h2 className="text-3xl font-medium tracking-tight">Bring AI experiences to life</h2>
+    <section className="bg-gc-surface py-16 text-center sm:py-20">
+      <div className="mx-auto max-w-4xl px-4 sm:px-5">
+        <h2 className="text-3xl font-medium tracking-tight sm:text-4xl">Bring AI experiences to life</h2>
         <div className="mt-6 inline-flex rounded-full bg-background p-1 ring-1 ring-gc-line">
           {(["chat", "vision"] as const).map((k) => (
             <button
               key={k}
               type="button"
               onClick={() => setTab(k)}
-              className={`rounded-full px-4 py-1.5 text-xs font-medium ${
+              className={`inline-flex items-center gap-1.5 rounded-full px-5 py-2 text-sm font-medium ${
                 tab === k ? "bg-gc-panel text-gc-ink" : "text-gc-ink-muted hover:text-gc-ink"
               }`}
             >
+              {k === "chat" ? <MessageSquare className="h-4 w-4" /> : <ImageIcon className="h-4 w-4" />}
               {k === "chat" ? "Chat" : "Vision"}
             </button>
           ))}
         </div>
-        <p className="mt-6 text-sm">
+        <p className="mx-auto mt-6 max-w-md text-[15px] text-gc-ink-muted">
           {tab === "chat"
             ? "Build chat experiences that answer naturally, with streaming responses."
             : "Build experiences that read charts, screenshots and documents from an image."}
         </p>
 
-        <div className="mx-auto mt-8 max-w-2xl bg-background px-5 py-10 sm:px-12">
-          {tab === "chat" ? (
-            <div className="space-y-5">
-              {CHAT.map((c, i) => (
-                <div key={i} className={`flex ${c.me ? "justify-start" : "justify-end"}`}>
-                  <div className="flex max-w-[80%] items-center gap-3 rounded-2xl bg-background px-4 py-3 text-left shadow-[0_4px_24px_-6px] shadow-gc-ink/15">
-                    {c.me && (
-                      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gc-blue-soft text-gc-blue">
-                        <UserRound className="h-4 w-4" />
-                      </span>
-                    )}
-                    <span className="text-[13px] font-medium">{c.t}</span>
-                    {!c.me && (
-                      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gc-blue text-gc-on-blue">
-                        <Sparkles className="h-4 w-4" />
-                      </span>
-                    )}
-                  </div>
-                </div>
-              ))}
+        <div className="mx-auto mt-8 max-w-3xl overflow-hidden rounded-2xl bg-background text-left shadow-[0_20px_60px_-24px] shadow-gc-ink/30 ring-1 ring-gc-line">
+          <div className="flex items-center gap-2 border-b border-gc-line px-4 py-2.5">
+            <span className="h-2.5 w-2.5 rounded-full bg-gc-red/70" />
+            <span className="h-2.5 w-2.5 rounded-full bg-gc-yellow/80" />
+            <span className="h-2.5 w-2.5 rounded-full bg-gc-green/70" />
+            <span className="ml-auto inline-flex items-center gap-1.5 text-[10px] font-medium uppercase tracking-wider text-gc-ink-muted">
+              <span className="plat-dot h-1.5 w-1.5 rounded-full bg-gc-red" /> Live demo
+            </span>
+          </div>
+          <div className="px-4 py-6 sm:px-10 sm:py-10" style={{ backgroundImage: "var(--platform-aurora-1)", backgroundSize: "cover" }}>
+            <div className="rounded-xl bg-background/85 p-4 backdrop-blur sm:p-6">
+              {tab === "chat" ? <ChatDemo key="chat" /> : <VisionDemo key="vision" />}
             </div>
-          ) : (
-            <div className="grid items-center gap-5 text-left sm:grid-cols-2">
-              <div className="flex aspect-[4/3] items-end gap-1.5 rounded-xl bg-gc-night p-4">
-                {[40, 55, 48, 62, 58, 74, 66, 80, 72, 88].map((h, i) => (
-                  <span
-                    key={i}
-                    className={`flex-1 rounded-sm ${i % 3 === 1 ? "bg-gc-red" : "bg-gc-green"}`}
-                    style={{ height: `${h}%` }}
-                  />
-                ))}
-              </div>
-              <div className="rounded-2xl px-4 py-3 shadow-[0_4px_24px_-6px] shadow-gc-ink/15">
-                <p className="flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-wider text-gc-ink-muted">
-                  <Sparkles className="h-3 w-3" /> Assistant
-                </p>
-                <p className="mt-2 text-[13px] leading-relaxed">
-                  The chart shows higher highs and higher lows, with one pullback candle before the last push up.
-                </p>
-              </div>
-            </div>
-          )}
-          <p className="mt-8 text-right text-[10px] text-gc-ink-muted">Illustrative example</p>
+          </div>
+          <p className="px-4 py-2 text-right text-[10px] text-gc-ink-muted">Illustrative example</p>
         </div>
       </div>
     </section>

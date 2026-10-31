@@ -78,6 +78,7 @@ const columns = [
       { to: "/llm", label: "Language Model" },
       { to: "/development", label: "Development" },
       { to: "/ai-engine", label: "Products" },
+      { to: "/platform", label: "API Platform" },
     ],
   },
   {
@@ -85,7 +86,6 @@ const columns = [
     links: [
       { to: "/insights", label: "Market Insights" },
       { to: "/scam-tool", label: "Scam Tool" },
-      { to: "/scam-check", label: "Scam Check" },
       { to: "/killzones", label: "Killzones" },
       { to: "/strategies/ict-gold-trading", label: "Solutions" },
     ],
