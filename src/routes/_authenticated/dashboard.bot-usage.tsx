@@ -3,9 +3,9 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import { Bot, Lock, RefreshCw, Trash2 } from "lucide-react";
+import { Bot, Calendar, Download, Lock, RefreshCw, Trash2 } from "lucide-react";
 import { toast } from "sonner";
-import { Area, CartesianGrid, ComposedChart, ResponsiveContainer, Tooltip as RTooltip, XAxis, YAxis } from "recharts";
+import { ProfitBars, StackedBars } from "@/components/dashboard/ConsoleBars";
 import { deleteBotAccount, getBotUsage, type BotReportRow, type BotSessionRow } from "@/lib/mt5-licenses.functions";
 import { dailyTarget, isMt5Plan, sessionEndCause, sharedTargetStatus } from "@/lib/mt5-licenses";
 import { Button } from "@/components/ui/button";
@@ -58,6 +58,8 @@ function BotUsagePage() {
     }
   };
   const { data, isFetching, refetch } = useQuery({ queryKey: ["bot-usage"], queryFn: () => load(), refetchInterval: 5_000, refetchOnWindowFocus: true });
+  const [rangeDays, setRangeDays] = useState(30);
+  const [rangeOpen, setRangeOpen] = useState(false);
 
   const view = useMemo(() => {
     const rows: BotReportRow[] = data?.rows ?? [];
@@ -68,10 +70,16 @@ function BotUsagePage() {
     const latest = new Map<string, BotReportRow>();
     for (const r of picked) latest.set(r.mt5_account, r); // one row per account, rows ordered by day
     const latestList = Array.from(latest.values());
-    const days = new Map<string, number>();
-    for (let i = 29; i >= 0; i--) days.set(new Date(Date.now() - i * 86400000).toISOString().slice(0, 10), 0);
-    for (const r of picked) if (days.has(r.day)) days.set(r.day, (days.get(r.day) ?? 0) + r.today_profit);
-    const chart = Array.from(days, ([day, profit]) => ({ day: day.slice(5), profit: Math.round(profit * 100) / 100 }));
+    const days = new Map<string, { profit: number; trades: number }>();
+    for (let i = rangeDays - 1; i >= 0; i--) days.set(new Date(Date.now() - i * 86400000).toISOString().slice(0, 10), { profit: 0, trades: 0 });
+    for (const r of picked) {
+      const d = days.get(r.day);
+      if (d) {
+        d.profit += r.today_profit;
+        d.trades += r.trades_today;
+      }
+    }
+    const chart = Array.from(days, ([date, d]) => ({ date, v: Math.round(d.profit * 100) / 100, trades: d.trades }));
     const target = data && isMt5Plan(data.plan) ? (data.dailyTarget || dailyTarget(data.plan)) : 0;
     const perAccount = latestList.filter((r) => r.day === today).map((r) => ({ account: r.mt5_account, ...sharedTargetStatus(target, [r.today_profit], r.target_hit) }));
     return {
@@ -81,7 +89,10 @@ function BotUsagePage() {
       target,
       perAccount,
       todayProfit: todayRows.reduce((a, r) => a + r.today_profit, 0),
-      monthProfit: chart.reduce((a, r) => a + r.profit, 0),
+      rangeProfit: chart.reduce((a, r) => a + r.v, 0),
+      gains: chart.reduce((a, r) => a + Math.max(0, r.v), 0),
+      losses: chart.reduce((a, r) => a + Math.min(0, r.v), 0),
+      rangeTrades: chart.reduce((a, r) => a + r.trades, 0),
       ...(() => {
         // Only running accounts count; if none is running, show the most recently reported account.
         const running = latestList.filter((r) => Date.now() - Date.parse(r.updated_at) < ONLINE_MS && !(data?.sessions ?? []).find((x) => x.mt5_account === r.mt5_account)?.ended_at);
@@ -94,15 +105,26 @@ function BotUsagePage() {
         .filter((r) => r.day === today && Date.now() - Date.parse(r.updated_at) < ONLINE_MS && !(data?.sessions ?? []).find((x) => x.mt5_account === r.mt5_account)?.ended_at)
         .reduce((a, r) => a + r.open_trades, 0),
     };
-  }, [data, account]);
-  const zeroAt = useMemo(() => {
-    const vals = view.chart.map((r) => r.profit);
-    const max = Math.max(0, ...vals);
-    const min = Math.min(0, ...vals);
-    if (max === min) return 1;
-    return Math.min(1, Math.max(0, max / (max - min)));
-  }, [view.chart]);
+  }, [data, account, rangeDays]);
 
+  const rangeLabel = (() => {
+    const start = new Date(Date.now() - (rangeDays - 1) * 86400000);
+    const end = new Date();
+    return `${start.toLocaleDateString(undefined, { month: "short", day: "numeric" })} - ${end.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}`;
+  })();
+
+  const exportCsv = () => {
+    const lines = [["Day", "Profit (USD)", "Trades"], ...view.chart.map((d) => [d.date, d.v.toFixed(2), String(d.trades)])];
+    const blob = new Blob([lines.map((l) => l.join(",")).join("\n")], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `jenvu-bot-usage-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const iconBtn = "grid h-8 w-8 place-items-center rounded-md text-foreground transition-colors hover:bg-foreground/[0.06]";
 
   return (
     <div className="mx-auto w-full max-w-[1100px] pb-10 text-foreground">
@@ -110,27 +132,53 @@ function BotUsagePage() {
         <h1 className="text-[30px] font-normal tracking-tight text-foreground sm:text-[34px]">Bot Usage</h1>
         <UsageTabs active="bot" />
       </div>
-      <div className="mt-5 mb-4 flex flex-wrap items-center gap-2">
+
+      {/* Filter bar */}
+      <div className="mt-5 flex flex-wrap items-center gap-x-6 gap-y-2">
+        <ConsoleSelect
+          plain
+          open={accountMenuOpen}
+          onToggle={() => {
+            setAccountMenuOpen((v) => !v);
+            setRangeOpen(false);
+          }}
+          label="Account"
+          valueLabel={account === "all" ? "All" : `MT5 ${account}`}
+          ariaLabel="MT5 account"
+          options={[{ value: "all", label: "All MT5 accounts" }, ...view.accounts.map((a) => ({ value: a, label: `MT5 ${a}` }))]}
+          value={account}
+          onSelect={(v) => {
+            setAccount(v);
+            setAccountMenuOpen(false);
+          }}
+        />
+        <div className="ml-auto flex items-center gap-1">
           <ConsoleSelect
             plain
-            open={accountMenuOpen}
-            onToggle={() => setAccountMenuOpen((v) => !v)}
-            label="Account"
-            valueLabel={account === "all" ? "All" : `MT5 ${account}`}
-            ariaLabel="MT5 account"
-            options={[{ value: "all", label: "All MT5 accounts" }, ...view.accounts.map((a) => ({ value: a, label: `MT5 ${a}` }))]}
-            value={account}
-            onSelect={(v) => {
-              setAccount(v);
+            align="right"
+            open={rangeOpen}
+            onToggle={() => {
+              setRangeOpen((v) => !v);
               setAccountMenuOpen(false);
             }}
+            valueLabel={rangeLabel}
+            icon={<Calendar className="h-4 w-4 text-foreground" />}
+            hideArrows
+            options={[
+              { value: "7", label: "Last 7 days" },
+              { value: "14", label: "Last 14 days" },
+              { value: "30", label: "Last 30 days" },
+            ]}
+            value={String(rangeDays)}
+            onSelect={(v) => {
+              setRangeDays(Number(v));
+              setRangeOpen(false);
+            }}
           />
-          <Button
+          <button
             type="button"
-            variant="ghost"
-            size="icon"
             aria-label="Refresh bot usage"
-            className="ml-auto h-9 w-9 rounded-full text-muted-foreground"
+            className={`ml-1 ${iconBtn}`}
             onClick={async () => {
               const r = await refetch();
               if (r.isError) toast.error("Bot usage could not be refreshed");
@@ -138,153 +186,176 @@ function BotUsagePage() {
             }}
           >
             <RefreshCw className={`h-4 w-4 ${isFetching ? "animate-spin" : ""}`} />
-          </Button>
+          </button>
+          <button type="button" onClick={exportCsv} aria-label="Download bot usage CSV" className={iconBtn}>
+            <Download className="h-4 w-4" />
+          </button>
+        </div>
       </div>
 
       {data && view.latestList.length === 0 && (
-        <div className="flex flex-wrap items-center gap-2 border-b border-border px-4 py-2.5 text-[12px] text-muted-foreground sm:px-7">
+        <div className="console-card mt-4 flex flex-wrap items-center gap-2 px-4 py-3 text-[13px] text-muted-foreground">
           <Bot className="h-4 w-4" />
           {data.allowed
             ? "No bot data yet. Add your IP on the JX Bot page, type it into MyIP in the latest JX Bot and allow https://jenvu.com in MT5 WebRequest. Data appears within a minute."
             : "JX Bot needs a paid Pro, Elite or Ultra plan."}
-          <Link to={data.allowed ? "/dashboard/jx-bot" : "/dashboard/billing"} className="font-medium text-primary">{data.allowed ? "Open JX Bot" : "See plans"}</Link>
+          <Link to={data.allowed ? "/dashboard/jx-bot" : "/dashboard/billing"} className="font-medium text-foreground underline underline-offset-2">{data.allowed ? "Open JX Bot" : "See plans"}</Link>
         </div>
       )}
-      {(
-        <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_320px]">
-          <div className="min-w-0">
-            <section className="border-b border-border px-4 pb-4 pt-5 sm:px-7">
-              <div className="text-[13px] text-foreground">Profit, last 30 days</div>
-              <div className={`mt-2 text-xl font-medium tabular-nums ${data ? pnlClass(view.monthProfit) : ""}`}>{data ? usd(view.monthProfit) : "…"}</div>
-              <div className="mt-4 h-56">
-                <ResponsiveContainer width="100%" height="100%">
-                  <ComposedChart data={view.chart} margin={{ top: 4, right: 4, left: -2, bottom: 0 }}>
-                    <defs>
-                      <linearGradient id="botProfit" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="var(--gc-success)" stopOpacity={0.28} />
-                        <stop offset={zeroAt} stopColor="var(--gc-success)" stopOpacity={0.04} />
-                        <stop offset={zeroAt} stopColor="var(--destructive)" stopOpacity={0.04} />
-                        <stop offset="100%" stopColor="var(--destructive)" stopOpacity={0.28} />
-                      </linearGradient>
-                      <linearGradient id="botProfitLine" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset={zeroAt} stopColor="var(--gc-success)" />
-                        <stop offset={zeroAt} stopColor="var(--destructive)" />
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid stroke="var(--border)" strokeDasharray="4 6" vertical={false} />
-                    <XAxis dataKey="day" tick={{ fontSize: 11, fill: "var(--muted-foreground)" }} tickLine={false} axisLine={false} minTickGap={24} />
-                    <YAxis tick={{ fontSize: 11, fill: "var(--muted-foreground)" }} tickLine={false} axisLine={false} width={28} tickFormatter={(v) => `$${v}`} />
-                    <RTooltip formatter={(v: number) => [usd(v), "Profit"]} contentStyle={{ fontSize: 12, borderRadius: 8 }} />
-                    <Area type="monotone" dataKey="profit" stroke="url(#botProfitLine)" strokeWidth={1.8} fill="url(#botProfit)" baseValue={0} />
-                  </ComposedChart>
-                </ResponsiveContainer>
-              </div>
-            </section>
 
-            <section className="grid grid-cols-2 gap-px border-b border-border bg-border lg:grid-cols-4">
-              <Stat label="Profit today" value={usd(view.todayProfit)} tone={pnlClass(view.todayProfit)} />
-              <Stat label="Balance" value={usd(view.balance)} sub={view.runningCount ? `${view.runningCount} running` : "Last account"} />
-              <Stat label="Equity" value={usd(view.equity)} sub={view.runningCount ? `${view.runningCount} running` : "Last account"} />
-              <Stat label="Trades today" value={`${view.tradesToday}`} sub={`${view.openTrades} open`} />
-            </section>
-
-            <LiveTrades rows={view.latestList} sessions={data?.sessions ?? []} />
-
-            <section className="px-4 py-5 sm:px-7">
-              <h2 className="text-[13px] text-foreground"> Accounts</h2>
-              <p className="mt-1 text-[12px] text-muted-foreground">Old accounts can be deleted. Accounts live on your JX Bot plan or running now are locked.</p>
-              <div className="mt-3 overflow-x-auto">
-                <table className="w-full min-w-[680px] text-[13px]">
-                  <thead className="text-left text-muted-foreground">
-                    <tr className="border-b border-border">
-                      <th className="py-2 font-normal">MT5 account</th>
-                      <th className="py-2 font-normal">Status</th>
-                      <th className="py-2 text-right font-normal">Balance</th>
-                      <th className="py-2 text-right font-normal">Equity</th>
-                      <th className="py-2 text-right font-normal">Today</th>
-                      <th className="py-2 text-right font-normal">Trades</th>
-                      <th className="py-2 text-right font-normal">Open lots</th>
-                      <th className="py-2 text-right font-normal"><span className="sr-only">Delete</span></th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {view.latestList.map((r) => {
-                      const lastSession = (data?.sessions ?? []).find((x) => x.mt5_account === r.mt5_account);
-                      const online = Date.now() - Date.parse(r.updated_at) < ONLINE_MS && !lastSession?.ended_at;
-                      return (
-                        <tr key={r.license_id} className="border-b border-border last:border-0">
-                          <td className="py-2.5">{r.mt5_account}<span className="ml-2 text-muted-foreground">{r.symbol}</span></td>
-                          <td className="py-2.5">
-                            <span className={`inline-flex items-center gap-1.5 ${online ? "text-foreground" : "text-muted-foreground"}`}>
-                              <span className={`h-1.5 w-1.5 rounded-full ${online ? "bg-emerald-600" : "bg-muted-foreground"}`} />
-                              {r.target_hit && r.day === new Date().toISOString().slice(0, 10) ? "Target reached" : online ? "Running" : "Offline"}
-                            </span>
-                          </td>
-                          <td className="py-2.5 text-right tabular-nums">{usd(r.balance)}</td>
-                          <td className="py-2.5 text-right tabular-nums">{usd(r.equity)}</td>
-                          <td className={`py-2.5 text-right tabular-nums ${pnlClass(r.today_profit)}`}>{usd(r.today_profit)}</td>
-                          <td className="py-2.5 text-right tabular-nums">{r.trades_today}</td>
-                          <td className="py-2.5 text-right tabular-nums">{r.open_lots.toFixed(2)}</td>
-                          <td className="py-2.5 pl-2 text-right">
-                            {(() => {
-                              // Missing status = not locked; the server still refuses deleting live/running accounts.
-                              const block = data?.deleteBlock?.[r.mt5_account] ?? null;
-                              if (block) {
-                                return (
-                                  <span
-                                    className="inline-flex h-8 w-8 items-center justify-center text-muted-foreground"
-                                    title={block === "running" ? "Running now, can't delete" : "Live on your JX Bot plan, can't delete"}
-                                    aria-label={block === "running" ? "Running now, can't delete" : "Live on your JX Bot plan, can't delete"}
-                                  >
-                                    <Lock className="h-3.5 w-3.5" />
-                                  </span>
-                                );
-                              }
-                              return (
-                                <Button
-                                  type="button"
-                                  variant="ghost"
-                                  size="icon"
-                                  className="h-8 w-8 text-muted-foreground hover:text-destructive"
-                                  aria-label={`Delete MT5 ${r.mt5_account}`}
-                                  disabled={deleting === r.mt5_account}
-                                  onClick={() => onDelete(r.mt5_account)}
-                                >
-                                  <Trash2 className="h-3.5 w-3.5 text-destructive" />
-                                </Button>
-                              );
-                            })()}
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            </section>
+      {/* Profit + Balance / Trades */}
+      <div className="mt-4 grid grid-cols-1 gap-2 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
+        <section className="console-card flex min-h-[420px] min-w-0 flex-col p-4 sm:p-5">
+          <div className="text-[13px] text-muted-foreground">Profit</div>
+          <div className={`mt-1 text-[22px] font-medium tabular-nums ${data ? pnlClass(view.rangeProfit) : ""}`}>{data ? usd(view.rangeProfit) : "…"}</div>
+          <ProfitBars className="mt-4 flex-1" days={view.chart} format={usd} />
+          <div className="mt-4 flex flex-wrap items-center justify-center gap-x-5 gap-y-1.5 text-[12px]">
+            <span className="inline-flex items-center gap-1.5 text-foreground">
+              <span className="h-2 w-2 rounded-[2px]" style={{ background: "#2a9d8f" }} />
+              Gains <span className="text-muted-foreground">({usd(view.gains)})</span>
+            </span>
+            <span className="inline-flex items-center gap-1.5 text-foreground">
+              <span className="h-2 w-2 rounded-[2px]" style={{ background: "#e76f51" }} />
+              Losses <span className="text-muted-foreground">({usd(view.losses)})</span>
+            </span>
           </div>
-
-          <aside className="border-t border-border xl:border-l xl:border-t-0">
-            <div className="border-b border-border p-5">
-            <h2 className="text-[13px] text-foreground">Daily target per account</h2>
-            <div className="mt-2 text-xl font-medium tabular-nums">{usd(view.target)} <span className="text-[13px] font-normal text-muted-foreground">each</span></div>
-            {view.perAccount.length === 0 && <div className="mt-3 h-1.5 rounded-full bg-secondary" />}
-            {view.perAccount.map((a) => (
-              <div key={a.account} className="mt-3">
-                <div className="flex justify-between text-[12px]"><span>MT5 {a.account}</span><span className="tabular-nums text-muted-foreground">{usd(a.combined)} / {usd(view.target)}</span></div>
-                <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-secondary">
-                  <div className="h-full rounded-full bg-primary" style={{ width: `${view.target > 0 ? Math.min(100, Math.max(0, (a.combined / view.target) * 100)) : 0}%` }} />
-                </div>
+        </section>
+        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-1">
+          <section className="console-card flex min-h-[200px] flex-col p-4">
+            <div className="text-[13px] text-muted-foreground">Trades</div>
+            <div className="mt-1 text-[20px] font-medium tabular-nums text-foreground">{view.rangeTrades.toLocaleString()}</div>
+            <StackedBars
+              className="mt-3 flex-1"
+              days={view.chart.map((d) => ({ date: d.date, v: d.trades }))}
+              keys={["v"]}
+              colors={["#a1a1aa"]}
+              baseline="var(--border)"
+              format={(v) => `${v} trades`}
+              compact
+            />
+          </section>
+          <section className="console-card flex min-h-[200px] flex-col p-4">
+            <div className="text-[13px] text-muted-foreground">Balance</div>
+            <div className="mt-1 text-[20px] font-medium tabular-nums text-foreground">{usd(view.balance)}</div>
+            <dl className="mt-auto grid grid-cols-2 gap-x-4 gap-y-3 pt-4 text-[13px]">
+              <div>
+                <dt className="text-muted-foreground">Equity</dt>
+                <dd className="mt-0.5 tabular-nums text-foreground">{usd(view.equity)}</dd>
               </div>
-            ))}
-            <p className="mt-3 text-[12px] leading-5 text-muted-foreground">
-              Every IP has its own daily target. When one account reaches it, that bot closes its trades and starts again next day. bot only trade EURUSD
-            </p>
-            </div>
-            <OnOffLog sessions={(data?.sessions ?? []).filter((x) => account === "all" || x.mt5_account === account)} />
-          </aside>
+              <div>
+                <dt className="text-muted-foreground">Profit today</dt>
+                <dd className={`mt-0.5 tabular-nums ${pnlClass(view.todayProfit) || "text-foreground"}`}>{usd(view.todayProfit)}</dd>
+              </div>
+              <div>
+                <dt className="text-muted-foreground">Trades today</dt>
+                <dd className="mt-0.5 tabular-nums text-foreground">{view.tradesToday} <span className="text-muted-foreground">· {view.openTrades} open</span></dd>
+              </div>
+              <div>
+                <dt className="text-muted-foreground">Accounts</dt>
+                <dd className="mt-0.5 tabular-nums text-foreground">{view.runningCount ? `${view.runningCount} running` : "Last account"}</dd>
+              </div>
+            </dl>
+          </section>
         </div>
-      )}
+      </div>
+
+      {/* Live trades */}
+      <h2 className="mt-10 text-[18px] font-medium text-foreground">Trades</h2>
+      <LiveTrades rows={view.latestList} sessions={data?.sessions ?? []} />
+
+      {/* Accounts */}
+      <h2 className="mt-10 text-[18px] font-medium text-foreground">Accounts</h2>
+      <section className="console-card mt-3 p-4 sm:p-5">
+        <p className="text-[13px] text-muted-foreground">Old accounts can be deleted. Accounts live on your JX Bot plan or running now are locked.</p>
+        <div className="mt-3 overflow-x-auto">
+          <table className="w-full min-w-[680px] text-[13px]">
+            <thead className="text-left text-[12px] text-muted-foreground">
+              <tr className="border-b border-border">
+                <th className="pb-2 font-normal">MT5 account</th>
+                <th className="pb-2 font-normal">Status</th>
+                <th className="pb-2 text-right font-normal">Balance</th>
+                <th className="pb-2 text-right font-normal">Equity</th>
+                <th className="pb-2 text-right font-normal">Today</th>
+                <th className="pb-2 text-right font-normal">Trades</th>
+                <th className="pb-2 text-right font-normal">Open lots</th>
+                <th className="pb-2 text-right font-normal"><span className="sr-only">Delete</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              {view.latestList.length === 0 ? (
+                <tr><td colSpan={8} className="py-8 text-center text-[12px] text-muted-foreground">No MT5 accounts have reported yet.</td></tr>
+              ) : view.latestList.map((r) => {
+                const lastSession = (data?.sessions ?? []).find((x) => x.mt5_account === r.mt5_account);
+                const online = Date.now() - Date.parse(r.updated_at) < ONLINE_MS && !lastSession?.ended_at;
+                const block = data?.deleteBlock?.[r.mt5_account] ?? null;
+                return (
+                  <tr key={r.license_id}>
+                    <td className="py-2.5 text-foreground">{r.mt5_account}<span className="ml-2 text-muted-foreground">{r.symbol}</span></td>
+                    <td className="py-2.5">
+                      <span className={`inline-flex items-center gap-1.5 ${online ? "text-foreground" : "text-muted-foreground"}`}>
+                        <span className={`h-1.5 w-1.5 rounded-full ${online ? "bg-emerald-600" : "bg-muted-foreground"}`} />
+                        {r.target_hit && r.day === new Date().toISOString().slice(0, 10) ? "Target reached" : online ? "Running" : "Offline"}
+                      </span>
+                    </td>
+                    <td className="py-2.5 text-right tabular-nums">{usd(r.balance)}</td>
+                    <td className="py-2.5 text-right tabular-nums">{usd(r.equity)}</td>
+                    <td className={`py-2.5 text-right tabular-nums ${pnlClass(r.today_profit)}`}>{usd(r.today_profit)}</td>
+                    <td className="py-2.5 text-right tabular-nums">{r.trades_today}</td>
+                    <td className="py-2.5 text-right tabular-nums">{r.open_lots.toFixed(2)}</td>
+                    <td className="py-2.5 pl-2 text-right">
+                      {block ? (
+                        // Missing status = not locked; the server still refuses deleting live/running accounts.
+                        <span
+                          className="inline-flex h-8 w-8 items-center justify-center text-muted-foreground"
+                          title={block === "running" ? "Running now, can't delete" : "Live on your JX Bot plan, can't delete"}
+                          aria-label={block === "running" ? "Running now, can't delete" : "Live on your JX Bot plan, can't delete"}
+                        >
+                          <Lock className="h-3.5 w-3.5" />
+                        </span>
+                      ) : (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                          aria-label={`Delete MT5 ${r.mt5_account}`}
+                          disabled={deleting === r.mt5_account}
+                          onClick={() => onDelete(r.mt5_account)}
+                        >
+                          <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                        </Button>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      {/* Target + ON/OFF */}
+      <div className="mt-10 grid grid-cols-1 gap-2 lg:grid-cols-2">
+        <section className="console-card p-4 sm:p-5">
+          <div className="text-[13px] text-muted-foreground">Daily target per account</div>
+          <div className="mt-1 text-[22px] font-medium tabular-nums text-foreground">{usd(view.target)} <span className="text-[13px] font-normal text-muted-foreground">each</span></div>
+          {view.perAccount.length === 0 && <div className="mt-4 h-1.5 rounded-full bg-background" />}
+          {view.perAccount.map((a) => (
+            <div key={a.account} className="mt-4">
+              <div className="flex justify-between text-[12px]"><span className="text-foreground">MT5 {a.account}</span><span className="tabular-nums text-muted-foreground">{usd(a.combined)} / {usd(view.target)}</span></div>
+              <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-background">
+                <div className="h-full rounded-full" style={{ background: "#2a9d8f", width: `${view.target > 0 ? Math.min(100, Math.max(0, (a.combined / view.target) * 100)) : 0}%` }} />
+              </div>
+            </div>
+          ))}
+          <p className="mt-4 text-[13px] leading-5 text-muted-foreground">
+            Every IP has its own daily target. When one account reaches it, that bot closes its trades and starts again next day.
+          </p>
+        </section>
+        <section className="console-card">
+          <OnOffLog sessions={(data?.sessions ?? []).filter((x) => account === "all" || x.mt5_account === account)} />
+        </section>
+      </div>
       <ConfirmDialog
         open={!!confirmAcc}
         title={`Delete MT5 ${confirmAcc ?? ""}?`}
@@ -403,10 +474,10 @@ function LiveTrades({ rows, sessions }: { rows: BotReportRow[]; sessions: BotSes
   const totalFloat = open.reduce((a, r) => a + (r.equity - r.balance), 0);
   const th = "px-3 py-2 font-normal whitespace-nowrap";
   const td = "px-3 py-2.5 whitespace-nowrap";
-  const first = "pl-4 sm:pl-7";
+  const first = "pl-4 sm:pl-5";
   return (
-    <section className="border-b border-border">
-      <div className="flex items-center justify-between border-b border-border px-4 sm:px-7">
+    <section className="console-card mt-3 overflow-hidden">
+      <div className="flex items-center justify-between border-b border-border px-4 sm:px-5">
         <div className="flex items-center gap-7">
           {([["open", "Open", totalOpen], ["closed", "Closed today", null]] as const).map(([k, label, n]) => (
             <button
@@ -448,7 +519,7 @@ function LiveTrades({ rows, sessions }: { rows: BotReportRow[]; sessions: BotSes
                   const lastSession = sessions.find((x) => x.mt5_account === r.mt5_account);
                   const online = Date.now() - Date.parse(r.updated_at) < ONLINE_MS && !lastSession?.ended_at;
                   return (
-                    <tr key={r.license_id} className="border-b border-border last:border-0">
+                    <tr key={r.license_id}>
                       <td className={`${td} ${first}`}>
                         <span className="inline-flex items-center gap-2">
                           <img src={euFlag} alt="" className="h-4 w-4 rounded-full object-cover" />
@@ -485,7 +556,7 @@ function LiveTrades({ rows, sessions }: { rows: BotReportRow[]; sessions: BotSes
                 <tr><td colSpan={5} className="px-3 py-8 text-center text-[12px] text-muted-foreground">No trades closed today yet.</td></tr>
               ) : (
                 live.map((r) => (
-                  <tr key={r.license_id} className="border-b border-border last:border-0">
+                  <tr key={r.license_id}>
                     <td className={`${td} ${first}`}>
                       <span className="inline-flex items-center gap-2">
                         <img src={euFlag} alt="" className="h-4 w-4 rounded-full object-cover" />
