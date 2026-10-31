@@ -14,6 +14,14 @@ const ACTIVE = { className: "!bg-muted !text-foreground" };
 
 const MONO = "font-sans";
 
+/** Resources menu items (desktop dropdown + phone menu). */
+const RESOURCES = [
+  { to: "/insights", label: "Blog" },
+  { to: "/help", label: "Support" },
+  { to: "/docs", label: "Docs" },
+  { to: "/contact", label: "Contact" },
+] as const;
+
 /** The homepage header, shared by every public page so the menu is identical everywhere. */
 export default function SiteHeader() {
   const { user: authUser } = useAuthUser();
@@ -21,6 +29,7 @@ export default function SiteHeader() {
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
   const [searchOpen, setSearchOpen] = React.useState(false);
   const [tryOpen, setTryOpen] = React.useState(false);
+  const [resOpen, setResOpen] = React.useState(false);
   const closeSearch = React.useCallback(() => setSearchOpen(false), []);
   const [avatarUrl, setAvatarUrl] = React.useState<string | null>(null);
   React.useEffect(() => {
@@ -57,7 +66,29 @@ export default function SiteHeader() {
             <Link to="/about" activeProps={ACTIVE}>Why Jenvu</Link>
             <Link to="/ai-engine" activeProps={ACTIVE}>Products</Link>
             <Link to="/strategies/ict-gold-trading" activeProps={ACTIVE}>Solutions</Link>
-            <Link to="/insights" activeProps={ACTIVE}>Resources</Link>
+            <div className="relative" onMouseLeave={() => setResOpen(false)}>
+              <button
+                type="button"
+                aria-expanded={resOpen}
+                aria-haspopup="menu"
+                onClick={() => setResOpen((v) => !v)}
+                onMouseEnter={() => setResOpen(true)}
+                className={`inline-flex items-center gap-1 rounded-full px-3 py-2 hover:bg-muted hover:text-foreground ${resOpen ? "bg-muted text-foreground" : ""}`}
+              >
+                Resources <ChevronDown className={`h-3.5 w-3.5 transition-transform ${resOpen ? "rotate-180" : ""}`} />
+              </button>
+              {resOpen && (
+                <div role="menu" className="absolute left-0 top-full z-50 pt-2">
+                  <div className="w-52 rounded-2xl border border-border bg-background p-2 text-[14px] shadow-lg">
+                    {RESOURCES.map((it) => (
+                      <Link key={it.label} to={it.to} role="menuitem" onClick={() => setResOpen(false)} className="flex items-center rounded-lg px-3 py-2.5 text-foreground hover:bg-muted">
+                        {it.label}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
             <Link to="/platform" activeProps={ACTIVE}>API Platform</Link>
             <Link to="/pricing" activeProps={ACTIVE}>Pricing</Link>
           </nav>
@@ -152,11 +183,9 @@ export default function SiteHeader() {
                 { to: "/about", label: "Why Jenvu" },
                 { to: "/ai-engine", label: "Products" },
                 { to: "/strategies/ict-gold-trading", label: "Solutions" },
-                { to: "/insights", label: "Resources" },
                 { to: "/platform", label: "Platform" },
                 { to: "/pricing", label: "Pricing" },
-                { to: "/docs", label: "Docs" },
-                { to: "/contact", label: "Contact us" },
+                ...RESOURCES,
               ].map((it) => (
 
                 <Link

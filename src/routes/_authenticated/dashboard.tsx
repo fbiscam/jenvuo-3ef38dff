@@ -1356,7 +1356,7 @@ function DashboardLayout() {
         <aside
           className={`dashboard-sidebar-root ${pinned ? "console-sidebar" : ""} ${pathname === "/dashboard/terminal" ? "jenvu-zoom-chrome" : ""} ${
             pinned
-              ? `fixed inset-y-0 left-0 z-50 w-[260px] border-r border-gc-line lg:z-20 lg:translate-x-0 lg:shadow-none ${mobileNavOpen ? "translate-x-0 shadow-2xl" : "-translate-x-full max-lg:invisible"}`
+              ? `fixed inset-y-0 left-0 z-50 w-[260px] border-0 lg:z-20 lg:translate-x-0 lg:shadow-none ${mobileNavOpen ? "translate-x-0 shadow-2xl" : "-translate-x-full max-lg:invisible"}`
               : drawerMode
               ? `fixed inset-y-0 left-0 z-50 w-[280px] rounded-r-2xl ${mobileNavOpen ? "translate-x-0 shadow-2xl" : "-translate-x-full shadow-none"}`
               : `${pathname === "/dashboard/terminal" ? "dashboard-terminal-sidebar border-r border-zinc-200" : ""} max-lg:fixed max-lg:inset-y-0 max-lg:left-0 max-lg:z-50 lg:fixed lg:inset-y-0 lg:left-0 ${navCollapsed ? "w-[60px]" : "w-[224px]"} ${mobileNavOpen ? "max-lg:translate-x-0" : "max-lg:-translate-x-full"}`
@@ -1513,7 +1513,7 @@ function DashboardLayout() {
 
           {/* Quick actions: Help + Settings (left) + Theme + Collapse (right) */}
           <div
-            className={`shrink-0 flex items-center border-t border-gc-line py-2 ${navCollapsed ? "justify-center px-2" : "justify-between pl-3 pr-2"}`}
+            className={`shrink-0 flex items-center border-0 py-2 ${navCollapsed ? "justify-center px-2" : "justify-between pl-3 pr-2"}`}
           >
             {!navCollapsed && (
               <div className="flex items-center gap-1">

@@ -5,6 +5,15 @@ import { openAskJenvu } from "@/components/AskJenvuWidget";
 import bentoImagine from "@/assets/home/bento-imagine.jpg";
 import bentoFox from "@/assets/home/bento-fox.jpg";
 import bentoCar from "@/assets/home/bento-car.jpg";
+import imagine2 from "@/assets/home/loop-imagine-2.jpg";
+import imagine3 from "@/assets/home/loop-imagine-3.jpg";
+import imagine4 from "@/assets/home/loop-imagine-4.jpg";
+import fox2 from "@/assets/home/loop-fox-2.jpg";
+import fox3 from "@/assets/home/loop-fox-3.jpg";
+import fox4 from "@/assets/home/loop-fox-4.jpg";
+import car2 from "@/assets/home/loop-car-2.jpg";
+import car3 from "@/assets/home/loop-car-3.jpg";
+import car4 from "@/assets/home/loop-car-4.jpg";
 import { shortTitle, type HomeArticle } from "@/lib/home-articles";
 import { insightCoverUrl } from "@/lib/insight-cover";
 import starsNebula from "@/assets/platform/stars-nebula.jpg";
@@ -225,6 +234,52 @@ function VoiceTile() {
   );
 }
 
+const IMAGINE_LOOP = [
+  { src: bentoImagine, alt: "Gold bar on a marble desk beside an espresso and a notebook" },
+  { src: imagine2, alt: "Stacked gold bars on a desk beside a laptop showing a candlestick chart" },
+  { src: imagine3, alt: "Gold coin standing on black marble in morning light" },
+  { src: imagine4, alt: "Tablet showing a gold price chart on a desk at sunset" },
+];
+const FOX_LOOP = [
+  { src: bentoFox, alt: "Animated owl with headphones studying a gold chart" },
+  { src: fox2, alt: "Animated fox with headphones watching a glowing chart" },
+  { src: fox3, alt: "Animated robot holding a gold coin on a stack of books" },
+  { src: fox4, alt: "Animated cat in glasses reading a gold price newspaper" },
+];
+const CAR_LOOP = [
+  { src: bentoCar, alt: "Gold vintage sports car on a coastal road at sunset" },
+  { src: car2, alt: "Gold supercar by a glass tower at night" },
+  { src: car3, alt: "Gold yacht on a turquoise sea at sunset" },
+  { src: car4, alt: "Vintage gold motorcycle on a desert road at sunset" },
+];
+
+/** Cross-fades through a set of pictures in a loop (pauses for reduced motion). */
+function LoopImages({ images, width, height, offset = 0, className = "" }: { images: { src: string; alt: string }[]; width: number; height: number; offset?: number; className?: string }) {
+  const [i, setI] = React.useState(0);
+  React.useEffect(() => {
+    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
+    let id: ReturnType<typeof setInterval> | undefined;
+    const t = setTimeout(() => { id = setInterval(() => setI((v) => (v + 1) % images.length), 4000); }, offset);
+    return () => { clearTimeout(t); if (id) clearInterval(id); };
+  }, [images.length, offset]);
+  return (
+    <>
+      {images.map((im, k) => (
+        <img
+          key={im.src}
+          src={im.src}
+          alt={k === i ? im.alt : ""}
+          aria-hidden={k === i ? undefined : true}
+          width={width}
+          height={height}
+          loading="lazy"
+          className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-1000 ease-in-out ${k === i ? "opacity-100" : "opacity-0"} ${className}`}
+        />
+      ))}
+    </>
+  );
+}
+
 export function EntShowcase() {
   return (
     <section className="px-5 pb-20">
@@ -235,14 +290,16 @@ export function EntShowcase() {
       </div>
       <div className="mx-auto mt-3 grid max-w-[1140px] gap-3 md:grid-cols-[2fr_1fr_3fr]">
         <Link to="/insights" className={`${tile} h-[290px]`}>
-          <img src={bentoImagine} alt="Gold bar on a marble desk beside an espresso and a notebook" width={1280} height={960} loading="lazy" className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
-          <span className="absolute bottom-4 left-5 text-[14px] text-gc-on-night">Imagine</span>
+          <LoopImages images={IMAGINE_LOOP} width={1280} height={960} className="transition duration-500 group-hover:scale-105" />
+          <span className="absolute bottom-4 left-5 z-10 text-[14px] text-gc-on-night">Imagine</span>
         </Link>
         <Link to="/insights" className={`${tile} grid h-[290px] grid-rows-2 gap-1`}>
-          <img src={bentoFox} alt="Animated owl with headphones studying a gold chart" width={1152} height={960} loading="lazy" className="h-full w-full rounded-[18px] object-cover" />
-          <div className="relative">
-            <img src={bentoCar} alt="Gold vintage sports car on a coastal road at sunset" width={1152} height={960} loading="lazy" className="h-full w-full rounded-[18px] object-cover" />
-            <span className="absolute bottom-3 right-4 inline-flex items-center gap-1 text-[14px] text-gc-on-night">Explore <ArrowRight className="h-3.5 w-3.5" /></span>
+          <div className="relative overflow-hidden rounded-[18px]">
+            <LoopImages images={FOX_LOOP} width={1152} height={960} offset={1300} />
+          </div>
+          <div className="relative overflow-hidden rounded-[18px]">
+            <LoopImages images={CAR_LOOP} width={1152} height={960} offset={2600} />
+            <span className="absolute bottom-3 right-4 z-10 inline-flex items-center gap-1 text-[14px] text-gc-on-night">Explore <ArrowRight className="h-3.5 w-3.5" /></span>
           </div>
         </Link>
         <VoiceTile />
