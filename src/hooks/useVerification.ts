@@ -40,6 +40,7 @@ export const VERIFICATION_ALLOWED_PATHS = [
   "/dashboard",
   "/dashboard/profile",
   "/dashboard/security",
+  "/dashboard/settings",
   "/dashboard/documents",
 ];
 

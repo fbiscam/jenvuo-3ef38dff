@@ -86,7 +86,7 @@ export function SidebarMoreMenu({ onSignOut }: { onSignOut: () => void }) {
               {status === "active" ? "Active" : status === "down" ? "Down" : "Checking"}
             </span>
           </div>
-          <Link to="/dashboard/profile" role="menuitem" onClick={close} className={item}>
+          <Link to="/dashboard/settings" role="menuitem" onClick={close} className={item}>
             <Settings className="h-4 w-4" strokeWidth={2} /> Settings
           </Link>
           <Link to="/docs" role="menuitem" onClick={close} className={item}>

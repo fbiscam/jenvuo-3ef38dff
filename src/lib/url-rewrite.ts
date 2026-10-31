@@ -35,6 +35,7 @@ const DASHBOARD_CHILDREN = new Set([
   "referrals",
   "risk",
   "security",
+  "settings",
   "usage",
   "bot-usage",
   "workspace",

@@ -223,7 +223,7 @@ function ConfirmEmailChangePage() {
               </details>
               <div className="flex flex-wrap gap-2 pt-2">
                 <button
-                  onClick={() => navigate({ to: "/dashboard/profile", hash: "change-email" })}
+                  onClick={() => navigate({ to: "/dashboard/security", hash: "change-email" })}
                   className="rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800"
                 >
                   Restart email change
