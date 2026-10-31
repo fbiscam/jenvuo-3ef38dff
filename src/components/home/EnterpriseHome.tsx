@@ -1,9 +1,10 @@
 import * as React from "react";
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, ArrowUp, Bell, Bot, ChevronRight, Code2, MessageCircle, Pause, Play, Plus, ShieldCheck, Sparkles } from "lucide-react";
+import { ArrowRight, ArrowUp, ArrowUpRight, Bell, Bot, ChevronRight, Code2, MessageCircle, Plus, Sparkles } from "lucide-react";
 import { openAskJenvu } from "@/components/AskJenvuWidget";
-import poster from "@/assets/home/hero-ai-3.jpg";
-import vid from "@/assets/home/hero-ai-3.mp4.asset.json";
+import bentoImagine from "@/assets/home/bento-imagine.jpg";
+import bentoFox from "@/assets/home/bento-fox.jpg";
+import bentoCar from "@/assets/home/bento-car.jpg";
 import s1 from "@/assets/home/card-blue.jpg";
 import s2 from "@/assets/home/card-wave.jpg";
 import s3 from "@/assets/home/trade-neon-practice.jpg";
