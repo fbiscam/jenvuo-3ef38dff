@@ -31,7 +31,7 @@ export const Route = createFileRoute("/strategies/ict-gold-trading")({
 const CONTENT: IndustryContent = {
   variant: "solutions",
   heroImg: solHero,
-  pill: "Solutions for Fiber traders",
+  pill: "\n",
   title: "Trade Fiber with clear, rule-based structure",
   intro:
     "Jenvu marks ICT and Smart Money Concepts on live Fiber candles with fixed rules, so the same chart always shows the same levels.",
