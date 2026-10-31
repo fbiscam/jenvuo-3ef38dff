@@ -153,7 +153,7 @@ export default function DashboardTopBar({
       {/* The Terminal's chart toolbar is placed here. The slot always stays mounted (hidden off the
           Terminal) so the toolbar never floats over the page while leaving the Terminal. */}
       <div id="terminal-toolbar-slot" className={onTerminal ? "hidden min-w-0 flex-1 items-center md:flex" : "hidden"} />
-      {onTerminal ? null : (
+      {onTerminal || pinned ? null : (
       <div className={`relative mx-auto hidden w-full ${white ? "max-w-[700px]" : "max-w-[720px]"} sm:block`}>
         {/* Google Cloud style: grey pill at rest, white box with a blue outline while typing. */}
         <form
