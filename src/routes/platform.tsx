@@ -177,7 +177,7 @@ function Models() {
         {MODELS.map((m, i) => (
           <div
             key={m.id}
-            className="relative flex aspect-[5/7] flex-col justify-end overflow-hidden rounded-md bg-gc-night px-7 pb-12 text-left text-gc-on-night"
+            className="relative flex aspect-[4/5] sm:aspect-[5/7] flex-col justify-end overflow-hidden rounded-md bg-gc-night px-7 pb-12 text-left text-gc-on-night"
           >
             <img
               src={m.img}
