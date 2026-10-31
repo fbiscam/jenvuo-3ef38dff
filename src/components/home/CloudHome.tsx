@@ -194,7 +194,7 @@ export function CloudHero({ price: _price, delta: _delta }: { price: string; del
   };
   return (
     <section className="overflow-hidden bg-background">
-      <div className="bg-gradient-to-b from-gc-blue-soft/40 to-background pb-14 pt-14 text-center sm:pt-20">
+      <div className="bg-gradient-to-b from-gc-blue-soft/40 to-background pb-0 pt-14 text-center sm:pt-20">
         <div className="mx-auto max-w-[1296px] px-5 sm:px-8">
           <h1 className="jenvu-rise mx-auto text-[40px] font-normal leading-[1.1] tracking-tight text-gc-ink sm:text-[60px] md:text-[68px]">
             <span className="inline-block rounded-xl border border-gc-line bg-background px-4 pb-1 text-gc-blue shadow-sm sm:px-5">

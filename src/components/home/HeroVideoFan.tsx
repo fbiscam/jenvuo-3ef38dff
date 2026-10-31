@@ -47,7 +47,7 @@ function FanVideo({ card }: { card: FanCard }) {
 
 export function HeroVideoFan() {
   return (
-    <div className="relative mx-auto mt-14 flex h-[260px] max-w-[1700px] items-start justify-center overflow-hidden sm:mt-20 sm:h-[340px] md:h-[400px] lg:h-[440px]">
+    <div className="relative mx-auto mt-8 flex h-[300px] max-w-[1700px] items-start justify-center overflow-hidden pt-8 sm:mt-10 sm:h-[390px] sm:pt-12 md:h-[450px] lg:h-[490px]">
       {CARDS.map((c, i) => (
         <div
           key={c.label}
