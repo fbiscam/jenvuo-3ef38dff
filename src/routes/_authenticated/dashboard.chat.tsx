@@ -344,18 +344,18 @@ function ChatPlayground() {
       {/* Conversation / examples */}
       <div ref={scroller} className="mt-3 min-h-0 flex-1 overflow-y-auto pr-1">
         {turns.length === 0 ? (
-          <div className="flex min-h-full flex-col justify-center py-2">
+          <div className="flex min-h-full flex-col py-2">
             <div className="text-center">
-              <h2 className="text-[17px] font-medium text-foreground">Start a chat with examples</h2>
+              <h2 className="text-[18px] font-medium text-foreground">Start a chat with examples</h2>
               <p className="mt-1 text-[14px] text-muted-foreground">Pick a use case to see the exact prompt and settings, then make it your own.</p>
             </div>
-            <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="mt-6 grid flex-1 grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:grid-rows-2">
               {EXAMPLES.map((ex) => (
                 <button
                   key={ex.title}
                   type="button"
                   onClick={() => pickExample(ex)}
-                  className="flex flex-col rounded-2xl border border-border bg-background p-4 text-left transition-colors hover:bg-[var(--console-card)]"
+                  className="flex flex-col rounded-2xl border border-border bg-background p-5 text-left transition-colors hover:bg-[var(--console-card)] lg:p-6"
                 >
                   <span className={`grid h-7 w-7 place-items-center rounded-full ${ex.tone}`}>
                     <ex.icon className="h-4 w-4" aria-hidden="true" />
