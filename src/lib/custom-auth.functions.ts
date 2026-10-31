@@ -46,6 +46,38 @@ const siteUrlSchema = z
   .refine((url) => /^https?:\/\//i.test(url), 'Invalid site URL')
   .optional()
 
+const turnstileTokenSchema = z.string().trim().max(2048).optional().nullable()
+
+async function passTurnstile(token: string | null | undefined) {
+  const { checkTurnstile } = await import('./turnstile')
+  return checkTurnstile({ secret: process.env.TURNSTILE_SECRET_KEY, token, ip: readClientIp() })
+}
+
+/** Public Cloudflare site key for the sign-in/sign-up check (null = check off). */
+export const getTurnstileSiteKey = createServerFn({ method: 'GET' }).handler(async () => {
+  const key = process.env.TURNSTILE_SITE_KEY?.trim()
+  return { siteKey: key && process.env.TURNSTILE_SECRET_KEY?.trim() ? key : null }
+})
+
+/** Email + password sign-in, only after the Cloudflare check passes. */
+export const signInWithTurnstile = createServerFn({ method: 'POST' })
+  .inputValidator((data) =>
+    z
+      .object({
+        email: z.string().trim().email('Enter a valid email').max(255),
+        password: z.string().min(1).max(72),
+        turnstileToken: turnstileTokenSchema,
+      })
+      .parse(data),
+  )
+  .handler(async ({ data }) => {
+    const check = await passTurnstile(data.turnstileToken)
+    if (!check.ok) return { ok: false as const, error: check.error, captcha: true }
+    const { passwordSignIn } = await import('./custom-auth.server')
+    const res = await passwordSignIn(data.email, data.password)
+    return res.ok ? res : { ...res, captcha: false }
+  })
+
 export const requestSignupOtp = createServerFn({ method: 'POST' })
   .inputValidator((data) =>
     z
@@ -55,13 +87,17 @@ export const requestSignupOtp = createServerFn({ method: 'POST' })
         password: z.string().min(8, 'Password must be at least 8 characters').max(72),
         siteUrl: siteUrlSchema,
         fingerprint: z.string().trim().min(32, 'Device verification failed. Refresh the page and try again.').max(128),
+        turnstileToken: turnstileTokenSchema,
       })
       .parse(data),
   )
   .handler(async ({ data }) => {
     try {
+      const check = await passTurnstile(data.turnstileToken)
+      if (!check.ok) return { ok: false as const, error: check.error }
+      const { turnstileToken: _t, ...input } = data
       const ua = (() => { try { return getRequest().headers.get('user-agent') || '' } catch { return '' } })()
-      await createSignupOtp({ ...data, ip: readClientIp(), country: readTrustedCountry(), fingerprint: data.fingerprint, userAgent: ua })
+      await createSignupOtp({ ...input, ip: readClientIp(), country: readTrustedCountry(), fingerprint: input.fingerprint, userAgent: ua })
       return { ok: true as const }
     } catch (error) {
       return { ok: false as const, error: error instanceof Error ? error.message : 'Could not send code.' }
