@@ -32,7 +32,7 @@ const CONTENT: IndustryContent = {
   variant: "solutions",
   heroImg: solHero,
   pill: "\n",
-  title: "Trade Fiber with clear, rule-based structure",
+  title: "Trade Fiber with clear, rule based structure",
   intro:
     "Jenvu marks ICT and Smart Money Concepts on live Fiber candles with fixed rules, so the same chart always shows the same levels.",
   heroCaption: "Structure, liquidity and zones drawn the same way every time.",
