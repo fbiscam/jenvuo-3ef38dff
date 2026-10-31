@@ -28,6 +28,9 @@ import pythonLogo from "@/assets/platform-logos/python.svg";
 import nodeLogo from "@/assets/platform-logos/nodejs.svg";
 import curlLogo from "@/assets/platform-logos/curl.svg";
 import langchainLogo from "@/assets/platform-logos/langchain.svg";
+import starsNebula from "@/assets/platform/stars-nebula.jpg";
+import starsPlain from "@/assets/platform/stars-plain.jpg";
+import avatarUser from "@/assets/platform/avatar-user.jpg";
 
 export const Route = createFileRoute("/platform")({
   head: () => ({
@@ -159,38 +162,49 @@ function Hero() {
 /* ---------- 2. Models ---------- */
 
 const MODELS = [
-  { id: "claude-opus-5", name: "Claude Opus 5", note: "Deep reasoning, long documents and code" },
-  { id: "gpt-5.5", name: "GPT-5.5", note: "Fast, all-round chat and automation" },
-  { id: "gemini-3.1-pro", name: "Gemini 3.1 Pro", note: "Text and image understanding" },
-  { id: "deepseek-v4-flash-0731", name: "DeepSeek V4", note: "Quick, low-cost everyday tasks" },
+  { id: "claude-opus-5", name: "Claude Opus 5", a: "Deep reasoning and long documents", b: "Code review and refactoring", img: starsNebula },
+  { id: "gpt-5.5", name: "GPT-5.5", a: "Fast, all-round chat", b: "Agents and automation", img: starsPlain },
+  { id: "gemini-3.1-pro", name: "Gemini 3.1 Pro", a: "Text and image understanding", b: "Charts and screenshots", img: starsPlain },
+  { id: "deepseek-v4-flash-0731", name: "DeepSeek V4", a: "Quick everyday tasks", b: "High-volume workloads", img: starsPlain },
 ];
 
 function Models() {
   return (
-    <section className="mx-auto max-w-6xl px-5 py-16 text-center">
-      <h2 className="text-4xl font-medium tracking-tight sm:text-5xl">Powered by frontier models</h2>
-      <p className="mt-5 text-gc-ink-muted">Leading models from every major lab, behind one Jenvu API key.</p>
-      <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-        {MODELS.map((m) => (
+    <section className="mx-auto max-w-[1340px] px-5 py-16 text-center sm:py-20">
+      <h2 className="text-4xl font-medium tracking-tight sm:text-[3.25rem] sm:leading-tight">Powered by frontier models</h2>
+      <p className="mt-5 text-[17px]">Leading models from every major lab deliver advanced intelligence behind one Jenvu API key.</p>
+      <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        {MODELS.map((m, i) => (
           <div
             key={m.id}
-            className="flex min-h-[300px] flex-col justify-end sm:aspect-[3/4] overflow-hidden rounded-md p-6 text-left text-gc-on-night"
-            style={{ backgroundImage: "var(--platform-stars)" }}
+            className="relative flex aspect-[4/5] sm:aspect-[5/7] flex-col justify-end overflow-hidden rounded-md bg-gc-night px-7 pb-12 text-left text-gc-on-night"
           >
-            <h3 className="text-[1.65rem] font-medium tracking-tight">{m.name}</h3>
-            <p className="mt-3 text-sm">Input: $3.00 per 1M tokens</p>
-            <p className="text-sm">Output: $3.00 per 1M tokens</p>
-            <p className="mt-4 text-sm text-gc-on-night-muted">{m.note}</p>
-            <code className="mt-4 font-mono text-xs text-gc-on-night-muted">{m.id}</code>
+            <img
+              src={m.img}
+              alt=""
+              width={768}
+              height={1056}
+              loading="lazy"
+              className="absolute inset-0 h-full w-full object-cover"
+              style={{ transform: ["none", "none", "rotate(180deg)", "scaleX(-1)"][i] }}
+            />
+            <div className="relative">
+              <h3 className="text-[1.75rem] font-medium leading-tight tracking-tight">{m.name}</h3>
+              <p className="mt-3 text-sm font-medium">Input: $3.00 per 1M tokens</p>
+              <p className="mt-1 text-sm font-medium">Output: $3.00 per 1M tokens</p>
+              <p className="mt-4 text-sm font-medium">{m.a}</p>
+              <p className="mt-1 text-sm font-medium">{m.b}</p>
+              <p className="mt-4 text-sm font-medium">Model ID: {m.id}</p>
+            </div>
           </div>
         ))}
       </div>
-      <p className="mt-8 text-sm italic text-gc-ink-muted">
-        One flat rate for every model, paid from your AI credit. See all models in the{" "}
+      <p className="mt-10 text-sm italic">
+        Pricing above is one flat rate for every model, paid from your AI credit. Learn more in the{" "}
         <Link to="/docs" className="underline underline-offset-2">
           API docs
         </Link>{" "}
-        and plans on{" "}
+        and{" "}
         <Link to="/pricing" className="underline underline-offset-2">
           Pricing
         </Link>
@@ -348,135 +362,153 @@ function AgentsSection() {
 
 const CHAT = [
   { me: true, t: "Is gold above the Asia high right now?" },
-  { me: false, t: "One moment, checking the session range." },
-  { me: true, t: "Oh, and tell me if London swept it." },
-  { me: false, t: "Sure — here’s the Asia range and whether London took it out." },
+  { me: false, t: "One moment, I’m pulling that up." },
+  { me: true, t: "Oh, and did London sweep it?" },
+  { me: false, t: "Yes. London took the Asia high, then closed back below it." },
+  { me: true, t: "Great, set an alert for the next retest." },
+  { me: false, t: "Done. I’ll ping you when price comes back to it." },
+];
+
+const VISION_REPLY = "Higher highs and higher lows, so it’s an uptrend, with one pullback before the last push up.";
+
+const CANDLES = [
+  { o: 30, c: 44 }, { o: 44, c: 38 }, { o: 38, c: 52 }, { o: 52, c: 60 }, { o: 60, c: 54 },
+  { o: 54, c: 66 }, { o: 66, c: 61 }, { o: 61, c: 74 }, { o: 74, c: 70 }, { o: 70, c: 84 },
 ];
 
 function useTypewriter(text: string, active: boolean, speed = 22) {
   const [n, setN] = React.useState(0);
   React.useEffect(() => {
-    if (!active) { setN(0); return; }
     setN(0);
+    if (!active) return;
     const id = window.setInterval(() => setN((v) => (v >= text.length ? v : v + 1)), speed);
     return () => window.clearInterval(id);
   }, [text, active, speed]);
   return text.slice(0, n);
 }
 
-/** Chat timeline: each assistant reply shows a typing indicator first. */
-const CHAT_STEPS = CHAT.flatMap((c, i) => (c.me ? [{ i, typing: false }] : [{ i, typing: true }, { i, typing: false }]));
+const WAVE = [30, 65, 100, 55, 85, 40, 70];
 
-function TypingDots() {
+/** Small voice-style waveform; bars move only while that bubble is "speaking". */
+function Wave({ live, tone }: { live: boolean; tone: "user" | "ai" }) {
   return (
-    <span className="inline-flex items-center gap-1 py-1">
-      {[0, 1, 2].map((d) => (
-        <span key={d} className="plat-dot h-1.5 w-1.5 rounded-full bg-gc-ink-muted" style={{ animationDelay: `${d * 0.15}s` }} />
+    <span className={`flex h-6 shrink-0 items-center gap-[2px] ${live ? "" : "opacity-40"}`} aria-hidden>
+      {WAVE.map((h, i) => (
+        <span
+          key={i}
+          className={`w-[2px] rounded-full ${tone === "user" ? "bg-gc-blue/50" : "bg-gc-red/45"} ${live ? "plat-wave" : ""}`}
+          style={{ height: `${h}%`, animationDelay: `${i * 0.09}s` }}
+        />
       ))}
     </span>
   );
 }
 
-function AssistantText({ text }: { text: string }) {
-  const typed = useTypewriter(text, true);
-  return <>{typed}</>;
+function Avatar() {
+  return <img src={avatarUser} alt="" width={64} height={64} loading="lazy" className="h-8 w-8 shrink-0 rounded-md object-cover sm:h-9 sm:w-9" />;
+}
+
+function AiBadge() {
+  return (
+    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-gc-blue text-gc-on-blue sm:h-9 sm:w-9">
+      <Sparkles className="h-4 w-4 sm:h-5 sm:w-5" />
+    </span>
+  );
+}
+
+function Bubble({ me, live, children }: { me: boolean; live: boolean; children: React.ReactNode }) {
+  return (
+    <div className={`plat-msg-in flex ${me ? "justify-start sm:pl-[10%]" : "justify-end sm:pr-[10%]"}`}>
+      <div className="flex max-w-[86%] items-center gap-2.5 rounded-xl bg-background px-3 py-2.5 shadow-[0_6px_28px_-8px] shadow-gc-ink/20 sm:max-w-[62%] sm:gap-3 sm:px-3.5 sm:py-3">
+        {me && <Avatar />}
+        {me && <Wave live={live} tone="user" />}
+        <span className="text-left text-[12px] font-semibold leading-snug sm:text-[13px]">{children}</span>
+        {!me && <Wave live={live} tone="ai" />}
+        {!me && <AiBadge />}
+      </div>
+    </div>
+  );
+}
+
+function TypedLine({ text }: { text: string }) {
+  return <>{useTypewriter(text, true, 28)}</>;
 }
 
 function ChatDemo() {
-  const [step, setStep] = React.useState(0);
+  const [n, setN] = React.useState(1);
   React.useEffect(() => {
-    const last = step >= CHAT_STEPS.length - 1;
-    const t = window.setTimeout(() => setStep(last ? 0 : step + 1), last ? 3200 : CHAT_STEPS[step].typing ? 1100 : 1500);
+    const done = n >= CHAT.length;
+    const t = window.setTimeout(() => setN(done ? 1 : n + 1), done ? 3500 : 2300);
     return () => window.clearTimeout(t);
-  }, [step]);
-  const cur = CHAT_STEPS[step];
-  const visible = CHAT.slice(0, cur.i + 1);
+  }, [n]);
   return (
-    <div className="flex min-h-[300px] flex-col justify-end space-y-3 sm:min-h-[340px] sm:space-y-4">
-      {visible.map((c, i) => {
-        const isCur = i === cur.i;
+    <div className="flex h-full flex-col justify-end gap-4 sm:gap-5">
+      {CHAT.slice(0, n).map((c, i) => {
+        const live = i === n - 1;
         return (
-          <div key={`${i}-${step === 0 ? "a" : "b"}`} className={`plat-msg-in flex ${c.me ? "justify-start" : "justify-end"}`}>
-            <div className="flex max-w-[88%] items-center gap-2.5 rounded-2xl bg-background px-3 py-2.5 text-left shadow-[0_4px_24px_-6px] shadow-gc-ink/15 sm:max-w-[80%] sm:gap-3 sm:px-4 sm:py-3">
-              {c.me && (
-                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-gc-blue-soft text-gc-blue sm:h-8 sm:w-8">
-                  <UserRound className="h-4 w-4" />
-                </span>
-              )}
-              <span className="text-[13px] font-medium sm:text-sm">
-                {!c.me && isCur && cur.typing ? <TypingDots /> : !c.me && isCur ? <AssistantText text={c.t} /> : c.t}
-              </span>
-              {!c.me && (
-                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-gc-blue text-gc-on-blue sm:h-8 sm:w-8">
-                  <Sparkles className="h-4 w-4" />
-                </span>
-              )}
-            </div>
-          </div>
+          <Bubble key={`${i}-${n === 1 ? "x" : "y"}`} me={c.me} live={live}>
+            {live && !c.me ? <TypedLine text={c.t} /> : c.t}
+          </Bubble>
         );
       })}
     </div>
   );
 }
 
-const CANDLES = [
-  { o: 30, c: 44 }, { o: 44, c: 38 }, { o: 38, c: 52 }, { o: 52, c: 60 }, { o: 60, c: 54 },
-  { o: 54, c: 66 }, { o: 66, c: 61 }, { o: 61, c: 74 }, { o: 74, c: 70 }, { o: 70, c: 84 },
-];
-const VISION_REPLY = "Higher highs and higher lows — an uptrend, with one pullback candle before the last push up.";
+function MiniChart({ scanning, marked }: { scanning: boolean; marked: boolean }) {
+  return (
+    <div className="relative h-16 w-24 shrink-0 overflow-hidden rounded-md bg-gc-night p-1.5 sm:h-20 sm:w-32">
+      <div className="relative flex h-full items-end gap-[3px]">
+        {CANDLES.map((k, i) => {
+          const lo = Math.min(k.o, k.c);
+          const hi = Math.max(k.o, k.c);
+          return (
+            <div key={i} className="relative h-full flex-1">
+              <span
+                className={`plat-candle-in absolute inset-x-0 rounded-[1px] ${k.c >= k.o ? "bg-gc-green" : "bg-gc-red"}`}
+                style={{ bottom: `${lo}%`, height: `${Math.max(hi - lo, 4)}%`, animationDelay: `${i * 0.06}s` }}
+              />
+              {marked && (i === 4 || i === 9) && (
+                <span className="plat-box absolute -inset-x-[3px] rounded-sm border border-gc-blue" style={{ bottom: `${lo - 6}%`, height: `${hi - lo + 12}%` }} />
+              )}
+            </div>
+          );
+        })}
+        {scanning && <span className="plat-scan pointer-events-none absolute inset-y-0 w-0.5 bg-gc-blue shadow-[0_0_12px_3px] shadow-gc-blue/60" />}
+      </div>
+    </div>
+  );
+}
 
 function VisionDemo() {
-  const [phase, setPhase] = React.useState(0); // 0 draw, 1 scan, 2 marks, 3 reply
+  const [phase, setPhase] = React.useState(0); // 0 ask, 1 scan, 2 thinking, 3 reply, 4 follow-up
   const [round, setRound] = React.useState(0);
   React.useEffect(() => {
-    const d = [1300, 2600, 900, 4200][phase];
+    const d = [1400, 2600, 1100, 4200, 3200][phase];
     const t = window.setTimeout(() => {
-      if (phase === 3) { setPhase(0); setRound((r) => r + 1); } else setPhase(phase + 1);
+      if (phase === 4) { setPhase(0); setRound((r) => r + 1); } else setPhase(phase + 1);
     }, d);
     return () => window.clearTimeout(t);
   }, [phase]);
-  const typed = useTypewriter(VISION_REPLY, phase === 3, 18);
   return (
-    <div key={round} className="grid items-center gap-4 text-left sm:min-h-[340px] sm:grid-cols-[1.2fr_1fr] sm:gap-6">
-      <div className="relative aspect-[4/3] overflow-hidden rounded-xl bg-gc-night p-4">
-        <div className="relative flex h-full items-end gap-1.5">
-          {CANDLES.map((k, i) => {
-            const up = k.c >= k.o;
-            const lo = Math.min(k.o, k.c);
-            const hi = Math.max(k.o, k.c);
-            const isMark = i === 4 || i === 9;
-            return (
-              <div key={i} className="relative h-full flex-1">
-                <span className="absolute left-1/2 w-px -translate-x-1/2 bg-gc-ink-muted/60" style={{ bottom: `${lo - 4}%`, height: `${hi - lo + 8}%` }} />
-                <span
-                  className={`plat-candle-in absolute inset-x-0 rounded-sm ${up ? "bg-gc-green" : "bg-gc-red"}`}
-                  style={{ bottom: `${lo}%`, height: `${Math.max(hi - lo, 3)}%`, animationDelay: `${i * 0.1}s` }}
-                />
-                {phase >= 2 && isMark && (
-                  <span
-                    className="plat-box absolute -inset-x-1.5 rounded-md border-2 border-gc-blue"
-                    style={{ bottom: `${lo - 6}%`, height: `${hi - lo + 12}%`, animationDelay: i === 9 ? ".2s" : "0s" }}
-                  />
-                )}
-              </div>
-            );
-          })}
-          {phase === 1 && (
-            <span className="plat-scan pointer-events-none absolute inset-y-0 w-0.5 bg-gc-blue shadow-[0_0_18px_4px] shadow-gc-blue/60" />
-          )}
+    <div key={round} className="flex h-full flex-col justify-end gap-4 sm:gap-5">
+      <div className="plat-msg-in flex justify-start sm:pl-[10%]">
+        <div className="flex max-w-[92%] items-center gap-2.5 rounded-xl bg-background px-3 py-2.5 shadow-[0_6px_28px_-8px] shadow-gc-ink/20 sm:max-w-[70%] sm:gap-3 sm:px-3.5 sm:py-3">
+          <Avatar />
+          <MiniChart scanning={phase === 1} marked={phase >= 2} />
+          <span className="text-left text-[12px] font-semibold leading-snug sm:text-[13px]">What’s the trend on this chart?</span>
         </div>
-        <span className="absolute left-3 top-3 rounded-full bg-background/10 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-gc-on-blue">
-          {phase === 0 ? "Uploading image" : phase === 1 ? "Reading chart" : "Analysed"}
-        </span>
       </div>
-      <div className={`rounded-2xl px-4 py-3 shadow-[0_4px_24px_-6px] shadow-gc-ink/15 transition-opacity ${phase >= 2 ? "opacity-100" : "opacity-40"}`}>
-        <p className="flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-wider text-gc-ink-muted">
-          <Sparkles className="h-3 w-3" /> Assistant
-        </p>
-        <p className="mt-2 min-h-[4.5rem] text-[13px] leading-relaxed sm:text-sm">
-          {phase < 3 ? <TypingDots /> : typed}
-        </p>
-      </div>
+      {phase >= 2 && (
+        <Bubble me={false} live={phase === 3}>
+          {phase === 2 ? "Reading the chart…" : phase === 3 ? <TypedLine text={VISION_REPLY} /> : VISION_REPLY}
+        </Bubble>
+      )}
+      {phase >= 4 && (
+        <Bubble me live>
+          Perfect, mark the swing lows for me.
+        </Bubble>
+      )}
     </div>
   );
 }
@@ -485,44 +517,47 @@ function ExperiencesSection() {
   const [tab, setTab] = React.useState<"chat" | "vision">("chat");
   return (
     <section className="bg-gc-surface py-16 text-center sm:py-20">
-      <div className="mx-auto max-w-4xl px-4 sm:px-5">
-        <h2 className="text-3xl font-medium tracking-tight sm:text-4xl">Bring AI experiences to life</h2>
+      <div className="mx-auto max-w-5xl px-4 sm:px-5">
+        <h2 className="text-3xl font-medium tracking-tight sm:text-[2.6rem]">Bring AI experiences to life</h2>
         <div className="mt-6 inline-flex rounded-full bg-background p-1 ring-1 ring-gc-line">
           {(["chat", "vision"] as const).map((k) => (
             <button
               key={k}
               type="button"
               onClick={() => setTab(k)}
-              className={`inline-flex items-center gap-1.5 rounded-full px-5 py-2 text-sm font-medium ${
-                tab === k ? "bg-gc-panel text-gc-ink" : "text-gc-ink-muted hover:text-gc-ink"
-              }`}
+              className={`rounded-full px-4 py-1.5 text-xs font-medium ${tab === k ? "bg-gc-panel text-gc-ink" : "text-gc-ink-muted hover:text-gc-ink"}`}
             >
-              {k === "chat" ? <MessageSquare className="h-4 w-4" /> : <ImageIcon className="h-4 w-4" />}
               {k === "chat" ? "Chat" : "Vision"}
             </button>
           ))}
         </div>
-        <p className="mx-auto mt-6 max-w-md text-[15px] text-gc-ink-muted">
+        <p className="mx-auto mt-6 max-w-lg text-sm">
+          Build{" "}
+          <Link to="/docs" className="underline underline-offset-2">
+            {tab === "chat" ? "chat experiences" : "vision experiences"}
+          </Link>{" "}
           {tab === "chat"
-            ? "Build chat experiences that answer naturally, with streaming responses."
-            : "Build experiences that read charts, screenshots and documents from an image."}
+            ? "that listen and respond naturally, with streaming replies."
+            : "that read charts, screenshots and documents from a single image."}
         </p>
 
-        <div className="mx-auto mt-8 max-w-3xl overflow-hidden rounded-2xl bg-background text-left shadow-[0_20px_60px_-24px] shadow-gc-ink/30 ring-1 ring-gc-line">
-          <div className="flex items-center gap-2 border-b border-gc-line px-4 py-2.5">
-            <span className="h-2.5 w-2.5 rounded-full bg-gc-red/70" />
-            <span className="h-2.5 w-2.5 rounded-full bg-gc-yellow/80" />
-            <span className="h-2.5 w-2.5 rounded-full bg-gc-green/70" />
-            <span className="ml-auto inline-flex items-center gap-1.5 text-[10px] font-medium uppercase tracking-wider text-gc-ink-muted">
-              <span className="plat-dot h-1.5 w-1.5 rounded-full bg-gc-red" /> Live demo
-            </span>
+        <div className="relative mx-auto mt-10 h-[380px] max-w-[760px] overflow-hidden bg-background sm:h-[420px]">
+          {/* soft background swoosh, like the reference */}
+          <svg viewBox="0 0 760 420" preserveAspectRatio="none" className="absolute inset-0 h-full w-full text-gc-surface" aria-hidden>
+            <path
+              d="M330 20 C 470 0, 520 90, 430 150 C 360 200, 300 230, 380 290 C 450 340, 560 330, 600 420 L 420 420 C 380 360, 260 340, 250 280 C 240 210, 330 180, 360 130 C 390 80, 300 50, 330 20 Z"
+              fill="currentColor"
+            />
+          </svg>
+          <div className="absolute inset-x-0 top-0 z-10 h-10 bg-gradient-to-b from-background to-transparent" />
+          <div className="relative h-full px-3 pb-16 pt-6 sm:px-6">
+            {tab === "chat" ? <ChatDemo key="chat" /> : <VisionDemo key="vision" />}
           </div>
-          <div className="px-4 py-6 sm:px-10 sm:py-10" style={{ backgroundImage: "var(--platform-aurora-1)", backgroundSize: "cover" }}>
-            <div className="rounded-xl bg-background/85 p-4 backdrop-blur sm:p-6">
-              {tab === "chat" ? <ChatDemo key="chat" /> : <VisionDemo key="vision" />}
-            </div>
+          <div className="absolute inset-x-0 bottom-4 flex items-center justify-center gap-1.5">
+            <img src="/favicon.png" alt="" width={20} height={20} className="h-5 w-5 rounded" />
+            <span className="text-base font-semibold tracking-tight">Jenvu</span>
           </div>
-          <p className="px-4 py-2 text-right text-[10px] text-gc-ink-muted">Illustrative example</p>
+          <p className="absolute bottom-2 right-3 text-[9px] text-gc-ink-muted">Illustrative example. Results may vary.</p>
         </div>
       </div>
     </section>
@@ -543,9 +578,9 @@ const USE_CASES = [
 function UseCaseCard({ u }: { u: (typeof USE_CASES)[number] }) {
   const [open, setOpen] = React.useState(false);
   return (
-    <div className="flex flex-col rounded-xl bg-gc-surface p-2 text-left">
+    <div className="flex flex-col rounded-md bg-gc-surface p-2 text-left">
       <div
-        className="flex aspect-[16/9] items-center justify-center rounded-lg"
+        className="flex aspect-[16/9] items-center justify-center rounded-sm"
         style={{ backgroundImage: `var(--platform-aurora-${u.g})` }}
       >
         <span className="flex h-14 w-14 items-center justify-center rounded-xl bg-background text-gc-ink">
@@ -632,7 +667,7 @@ function Enterprise() {
       </div>
       <div className="mt-10 grid gap-6 text-left md:grid-cols-3">
         {ENTERPRISE.map((e) => (
-          <div key={e.t} className="rounded-xl border border-gc-line p-7">
+          <div key={e.t} className="rounded-md border border-gc-line p-7">
             <h3 className="text-xl font-medium">{e.t}</h3>
             <Ticks items={e.items} />
           </div>
@@ -650,7 +685,7 @@ function GetStarted() {
       <div className="mx-auto max-w-6xl px-5">
         <h2 className="text-4xl font-medium tracking-tight sm:text-5xl">Get started</h2>
         <div className="mt-10 grid gap-6 text-left md:grid-cols-2">
-          <div className="flex flex-col rounded-xl border border-gc-line bg-background p-7 sm:p-8">
+          <div className="flex flex-col rounded-md border border-gc-line bg-background p-7 sm:p-8">
             <h3 className="text-2xl font-medium">Partner with us on your AI plans</h3>
             <div className="flex-1">
               <Ticks
@@ -665,7 +700,7 @@ function GetStarted() {
               <ContactSales className={pillDark} />
             </div>
           </div>
-          <div className="flex flex-col rounded-xl border border-gc-line bg-background p-7 sm:p-8">
+          <div className="flex flex-col rounded-md border border-gc-line bg-background p-7 sm:p-8">
             <h3 className="text-2xl font-medium">Build on your own</h3>
             <div className="flex-1">
               <Ticks
