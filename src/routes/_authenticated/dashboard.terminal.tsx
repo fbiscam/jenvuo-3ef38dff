@@ -1,3 +1,4 @@
+import JenvuMark from "@/components/JenvuMark";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCredits } from "@/hooks/useCredits";
 import { useEffect, useRef, useState } from "react";
@@ -910,11 +911,7 @@ function TerminalPage() {
                   {messages.length === 0 && (
                     <div className="space-y-4">
                       <div className="flex gap-2.5 text-sm leading-6">
-                        <img
-                          src="/favicon.png"
-                          alt=""
-                          className="mt-0.5 h-6 w-6 shrink-0 rounded-md object-contain"
-                        />
+                        <JenvuMark className="mt-0.5 h-6 w-6 shrink-0 text-foreground" />
                         <p>
                           Ask about the chart you are looking at. I use live EUR/USD data for the
                           selected timeframe.
