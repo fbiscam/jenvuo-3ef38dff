@@ -323,7 +323,7 @@ export function CloudAudiences() {
             role="tab"
             aria-selected={a.key === active}
             onClick={() => setActive(a.key)}
-            className={`shrink-0 rounded-full px-5 py-2.5 text-sm font-medium transition-colors ${
+            className={`shrink-0 rounded-full px-3.5 py-2.5 text-sm font-medium transition-colors sm:px-5 ${
               a.key === active ? "bg-gc-blue text-gc-on-blue" : "text-gc-ink hover:bg-gc-panel"
             }`}
           >
