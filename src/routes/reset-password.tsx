@@ -1,3 +1,4 @@
+import JenvuMark from "@/components/JenvuMark";
 import * as React from "react";
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { toast } from "sonner";
@@ -100,7 +101,7 @@ function ResetPasswordPage() {
       <div className="flex min-h-dvh w-full flex-col">
         <div className="px-6 pt-6 sm:px-10 sm:pt-8">
           <Link to="/" aria-label="Jenvu home" className="inline-flex">
-            <img src="/favicon.png" alt="Jenvu" className="h-9 w-9 rounded-md object-contain" />
+            <JenvuMark className="h-9 w-9 text-foreground" />
           </Link>
         </div>
 

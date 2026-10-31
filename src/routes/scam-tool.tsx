@@ -1,3 +1,4 @@
+import JenvuMark from "@/components/JenvuMark";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import {
@@ -166,7 +167,7 @@ function ScamToolPage() {
           <ArrowLeft className="h-5 w-5" />
         </Link>
         <Link to="/" className="flex shrink-0 items-center gap-2 pr-2">
-          <img src="/favicon.png" alt="" className="h-6 w-6 rounded-md object-contain" />
+          <JenvuMark className="h-6 w-6 text-foreground" />
           <span className="text-[20px] font-medium tracking-tight">
             Jenvu <span className="text-gc-ink-muted">Scam Tool</span>
           </span>
