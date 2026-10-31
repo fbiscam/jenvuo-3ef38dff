@@ -1,6 +1,7 @@
 import { useMemo, useRef, useState, type ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import {
+  Code2,
   ArrowRight, Braces, Brain, Check, Copy, Eye, Info, Radio, Search, Wrench, X,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -241,27 +242,91 @@ export default function ModelsExplorer({ apiHref = "/dashboard/api" }: { apiHref
   if (consoleMode) {
     return (
       <div className="mx-auto w-full max-w-5xl space-y-8 font-sans text-foreground">
-        <div className="flex flex-wrap items-end justify-between gap-4">
+        <h1 className="text-[30px] font-normal tracking-tight text-foreground sm:text-[34px]">Models</h1>
+
+        {/* Featured models */}
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {CONSOLE_FEATURED.map((f, i) => {
+            const m = MODEL_CATALOG.find((x) => x.id === f.id);
+            if (!m) return null;
+            return (
+              <div key={f.id} className="console-card flex min-h-[215px] flex-col p-5">
+                <div className="flex items-start justify-between gap-3">
+                  <h2 className="text-[20px] font-normal leading-tight tracking-tight text-foreground">{m.name}</h2>
+                  {f.isNew && <span className="shrink-0 text-[13px] text-[#f97316]">New</span>}
+                </div>
+                <p className="mt-1.5 text-[14px] text-muted-foreground">
+                  {f.kind} · {formatContext(m.context)} Context
+                </p>
+                <p className="mt-2 line-clamp-3 text-[14px] leading-6 text-muted-foreground">{m.description}</p>
+                <div className="mt-auto pt-4">
+                  <Link
+                    to={i < 2 ? "/dashboard/code" : "/dashboard/api"}
+                    className={`console-pill h-8 px-3.5 text-[13px] ${i < 2 ? "console-pill-solid" : ""}`}
+                  >
+                    {i < 2 ? "Try in code" : "Get API key"}
+                  </Link>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Limits banner */}
+        <div className="console-card flex flex-wrap items-center justify-between gap-4 px-5 py-4">
           <div className="min-w-0">
-            <h1 className="text-[28px] font-medium tracking-tight text-foreground">Models</h1>
-            <p className="mt-1 text-[14px] text-muted-foreground">Every model you can call with one Jenvu API key, at {price} per million tokens.</p>
+            <p className="text-[16px] text-foreground">
+              Unlock higher token limits <span className="ml-1.5 text-muted-foreground">Flat {price} per 1M tokens</span>
+            </p>
+            <p className="mt-1 text-[13px] text-muted-foreground">Upgrade your plan for a bigger daily token allowance.</p>
           </div>
-          <Link to="/dashboard/api" className="console-pill console-pill-solid inline-flex h-9 items-center gap-1.5 px-4 text-sm font-medium">
-            Create API key <ArrowRight className="h-3.5 w-3.5" />
-          </Link>
+          <div className="flex shrink-0 items-center gap-2">
+            <Link to="/dashboard/billing" className="console-pill h-8 px-3.5 text-[13px]">See plans</Link>
+            <Link to="/dashboard/billing" className="console-pill console-pill-solid h-8 px-3.5 text-[13px]">Top up</Link>
+          </div>
         </div>
-        <div className="grid gap-3 sm:grid-cols-3">
-          {[
-            [String(MODEL_CATALOG.length), "Models available"],
-            [String(new Set(MODEL_CATALOG.map((m) => m.provider)).size), "AI labs"],
-            [price, "Per 1M tokens"],
-          ].map(([v, l]) => (
-            <div key={l} className="console-card p-5">
-              <p className="text-[13px] text-muted-foreground">{l}</p>
-              <p className="mt-2 text-2xl font-medium tabular-nums tracking-tight">{v}</p>
-            </div>
-          ))}
-        </div>
+
+        {/* Code / Chat */}
+        <section>
+          <div className="flex items-center justify-between gap-3">
+            <h2 className="inline-flex items-center gap-2 text-[17px] font-normal text-foreground">
+              <Code2 className="h-4 w-4" /> Code / Chat
+            </h2>
+            <a href="#all-models" className="text-[13px] text-muted-foreground hover:text-foreground">Show all</a>
+          </div>
+          <div className="mt-3 grid gap-3 md:grid-cols-2">
+            {CONSOLE_CODE_CHAT.map((id, i) => {
+              const m = MODEL_CATALOG.find((x) => x.id === id);
+              if (!m) return null;
+              return (
+                <div key={id} className="console-card p-5">
+                  <div className="flex items-start justify-between gap-3">
+                    <h3 className="text-[15px] font-medium text-foreground">{m.name}</h3>
+                    <p className="shrink-0 text-[13px] text-muted-foreground">
+                      {i < 2 && <span className="mr-2 text-[#f97316]">New</span>}
+                      Context <span className="text-foreground">{formatContext(m.context)}</span>
+                    </p>
+                  </div>
+                  <p className="mt-1 text-[13px] text-muted-foreground">{m.description}</p>
+                  <div className="mt-3 flex flex-wrap gap-1.5">
+                    {m.capabilities.filter((c) => c !== "streaming").map((c) => (
+                      <span key={c} className="rounded-full bg-foreground/[0.06] px-2.5 py-1 text-[12px] text-foreground">
+                        {CAPABILITY_TEXT[c]}
+                      </span>
+                    ))}
+                  </div>
+                  <div className="mt-4 space-y-1.5 border-t border-border pt-3 text-[13px]">
+                    <div className="flex justify-between"><span className="text-muted-foreground">Input</span><span className="tabular-nums text-foreground">{price}</span></div>
+                    <div className="flex justify-between"><span className="text-muted-foreground">Output</span><span className="tabular-nums text-foreground">{price}</span></div>
+                    <p className="pt-1 text-[12px] text-muted-foreground">Per 1M tokens</p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+
+        <div id="all-models" className="scroll-mt-6" />
         <ConsoleModelTable list={list} query={query} setQuery={setQuery} />
       </div>
     );
@@ -542,3 +607,20 @@ export default function ModelsExplorer({ apiHref = "/dashboard/api" }: { apiHref
     </div>
   );
 }
+
+const CONSOLE_FEATURED: { id: string; kind: string; isNew?: boolean }[] = [
+  { id: "claude-opus-5.5", kind: "Reasoning", isNew: true },
+  { id: "claude-fable-5.1", kind: "Code", isNew: true },
+  { id: "gpt-5.5", kind: "Chat" },
+  { id: "gemini-3.7-flash", kind: "Fast chat" },
+];
+
+const CONSOLE_CODE_CHAT = ["claude-opus-5.5", "claude-fable-5.1", "gpt-5.6-terra", "grok-4.6"];
+
+const CAPABILITY_TEXT: Record<string, string> = {
+  tools: "Tool calling",
+  reasoning: "Reasoning",
+  json: "Structured outputs",
+  vision: "Vision",
+  streaming: "Streaming",
+};
