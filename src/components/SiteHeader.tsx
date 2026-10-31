@@ -1,6 +1,7 @@
 import * as React from "react";
 import { Link } from "@tanstack/react-router";
-import { Menu, Search, X } from "lucide-react";
+import { ChevronDown, Menu, Search, X } from "lucide-react";
+import { openAskJenvu } from "@/components/AskJenvuWidget";
 import HeaderSearch from "@/components/HeaderSearch";
 import { useAuthUser } from "@/hooks/useAuthUser";
 import { supabase } from "@/integrations/supabase/client";
@@ -18,6 +19,7 @@ export default function SiteHeader() {
   const isAuthed = !!authUser;
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
   const [searchOpen, setSearchOpen] = React.useState(false);
+  const [tryOpen, setTryOpen] = React.useState(false);
   const closeSearch = React.useCallback(() => setSearchOpen(false), []);
   const [avatarUrl, setAvatarUrl] = React.useState<string | null>(null);
   React.useEffect(() => {
@@ -148,12 +150,12 @@ export default function SiteHeader() {
             </div>
             <nav className="flex flex-col px-3 pb-4 pt-1 text-[15px] text-zinc-900">
               {[
-                { to: "/about", label: "Overview" },
-                { to: "/platform", label: "Platform" },
-                { to: "/strategies/ict-gold-trading", label: "Solutions" },
+                { to: "/about", label: "Why Jenvu" },
                 { to: "/ai-engine", label: "Products" },
-                { to: "/pricing", label: "Pricing" },
+                { to: "/strategies/ict-gold-trading", label: "Solutions" },
                 { to: "/insights", label: "Resources" },
+                { to: "/platform", label: "Platform" },
+                { to: "/pricing", label: "Pricing" },
                 { to: "/docs", label: "Docs" },
                 { to: "/contact", label: "Contact us" },
               ].map((it) => (
