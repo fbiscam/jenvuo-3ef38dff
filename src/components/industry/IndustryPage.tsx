@@ -372,7 +372,17 @@ function ProductsZigzag({ c }: { c: IndustryContent }) {
             key={s.title}
             className={`grid items-center gap-8 text-left md:grid-cols-2 md:gap-16 ${n % 2 ? "md:[&>*:first-child]:order-2" : ""}`}
           >
-            <NightCard n={n + 1} tag={`0${n + 1}`} title={s.title} className="aspect-[4/3] sm:aspect-[5/4]" />
+            <div className="relative aspect-[4/3] overflow-hidden rounded-md bg-gc-night sm:aspect-[5/4]">
+              <img
+                src={STARS[(n + 1) % STARS.length]}
+                alt=""
+                width={768}
+                height={1056}
+                loading="lazy"
+                className="absolute inset-0 h-full w-full object-cover"
+                style={{ transform: STAR_TX[(n + 1) % STAR_TX.length] }}
+              />
+            </div>
             <div className={`max-w-[460px] ${n % 2 ? "md:justify-self-end" : ""}`}>
               <Kicker>0{n + 1}</Kicker>
               <h3 className="mt-3 text-3xl font-medium leading-tight tracking-tight sm:text-4xl">{s.title}</h3>
