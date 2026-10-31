@@ -170,7 +170,7 @@ function PricingPage() {
             <Link to="/contact" className={LINK}>team</Link>.
           </p>
         </div>
-        <figure className="overflow-hidden rounded-2xl border border-gc-line">
+        <figure className="overflow-hidden rounded-md border border-gc-line">
           <img src={estimateImg} alt="Jenvu cost estimate tool" width={1280} height={720} loading="lazy" className="h-auto w-full" />
         </figure>
       </section>
@@ -178,7 +178,7 @@ function PricingPage() {
       {/* STAY IN CONTROL */}
       <section className="mx-auto grid max-w-[1296px] items-start gap-10 px-5 py-14 sm:px-8 md:grid-cols-2 md:gap-14 lg:px-[72px]">
         <figure className="order-2 md:order-1">
-          <div className="overflow-hidden rounded-2xl border border-gc-line">
+          <div className="overflow-hidden rounded-md border border-gc-line">
             <img src={spendingImg} alt="Jenvu usage dashboard" width={1280} height={720} loading="lazy" className="h-auto w-full" />
           </div>
           <figcaption className="mt-3 text-[13px] text-gc-ink-muted">See your current usage and spending at a glance</figcaption>

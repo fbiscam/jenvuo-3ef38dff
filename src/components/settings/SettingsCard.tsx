@@ -16,7 +16,7 @@ export function SettingsCard({
   tone?: "default" | "danger";
 }) {
   return (
-    <section id={id} className="scroll-mt-24 rounded-[24px] border border-gc-line bg-background">
+    <section id={id} className="scroll-mt-24 rounded-md border border-gc-line bg-background">
       <div className="px-6 pt-6 sm:px-7">
         <p role="heading" aria-level={2} className={cn("text-[20px] font-medium leading-tight", tone === "danger" ? "text-destructive" : "text-gc-ink")}>{title}</p>
         {description && <p className="mt-1.5 max-w-[620px] text-[14px] leading-[1.55] text-gc-ink-muted">{description}</p>}
@@ -44,4 +44,4 @@ export const settingsBtn =
 export const settingsBtnPrimary =
   "inline-flex h-10 items-center justify-center gap-2 rounded-full bg-gc-blue px-5 text-[14px] font-medium text-gc-on-blue hover:bg-gc-blue-hover disabled:opacity-50";
 export const settingsField =
-  "block h-11 w-full rounded-xl border border-gc-line bg-background px-4 text-[15px] text-gc-ink outline-none focus:border-gc-blue-deep focus:ring-2 focus:ring-gc-blue-soft";
+  "block h-11 w-full rounded-md border border-gc-line bg-background px-4 text-[15px] text-gc-ink outline-none focus:border-gc-blue-deep focus:ring-2 focus:ring-gc-blue-soft";

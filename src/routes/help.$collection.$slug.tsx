@@ -113,7 +113,7 @@ function ArticlePage() {
                 </ol>
               );
               if (b.type === "code") return (
-                <pre key={i} className={`${MONO} rounded-xl border border-gc-line bg-gc-panel p-4 text-[12px] sm:text-[13px] text-gc-ink whitespace-pre-wrap`}>{b.content}</pre>
+                <pre key={i} className={`${MONO} rounded-md border border-gc-line bg-gc-panel p-4 text-[12px] sm:text-[13px] text-gc-ink whitespace-pre-wrap`}>{b.content}</pre>
               );
               // note
               const tone = b.tone ?? "info";
@@ -132,7 +132,7 @@ function ArticlePage() {
           </article>
 
           {/* Feedback */}
-          <div className="mt-12 rounded-xl border border-gc-line bg-gc-panel p-6 flex items-center justify-between gap-4 flex-wrap">
+          <div className="mt-12 rounded-md border border-gc-line bg-gc-panel p-6 flex items-center justify-between gap-4 flex-wrap">
             <div>
               <div className="text-sm font-medium text-gc-ink">Was this article helpful?</div>
               <div className="text-xs text-gc-ink-muted">Your feedback helps us improve.</div>
@@ -149,7 +149,7 @@ function ArticlePage() {
               <div className={`${MONO} text-[10px] uppercase tracking-[0.22em] text-gc-ink-muted`}>
                 Related articles
               </div>
-              <ul className="mt-4 divide-y divide-gc-line rounded-xl border border-gc-line bg-background">
+              <ul className="mt-4 divide-y divide-gc-line rounded-md border border-gc-line bg-background">
                 {related.map((a) => (
                   <li key={a.slug}>
                     <Link

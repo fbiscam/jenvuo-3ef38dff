@@ -186,7 +186,7 @@ function SolutionsCards({ c }: { c: IndustryContent }) {
       <SectionHead title={c.solutionsTitle} intro={c.solutionsIntro} />
       <div className="mt-10 grid gap-6 md:grid-cols-3">
         {c.solutions.map((s) => (
-          <a key={s.title} href={s.href} className="group overflow-hidden rounded-[24px] border border-gc-line bg-background transition-shadow hover:shadow-md">
+          <a key={s.title} href={s.href} className="group overflow-hidden rounded-md border border-gc-line bg-background transition-shadow hover:shadow-md">
             <div className="aspect-[16/10] overflow-hidden bg-gc-night">
               <img src={s.img} alt="" width={1280} height={800} loading="lazy" className="h-full w-full object-cover transition duration-700 group-hover:scale-105" />
             </div>
@@ -233,7 +233,7 @@ function TopicsList({ c }: { c: IndustryContent }) {
 
 function TopicBody({ t }: { t: IndustryContent["topics"][number] }) {
   return (
-    <div key={t.label} role="tabpanel" className="ind-rise rounded-[24px] border border-gc-line bg-background p-6 sm:p-8">
+    <div key={t.label} role="tabpanel" className="ind-rise rounded-md border border-gc-line bg-background p-6 sm:p-8">
       <h3 className="text-[24px] font-normal">{t.title}</h3>
       <p className="mt-3 text-[15px] leading-[1.6] text-gc-ink-muted">{t.text}</p>
       <ul className="mt-5 space-y-2">
@@ -372,7 +372,7 @@ function ProductsHighlights({ c }: { c: IndustryContent }) {
           {c.highlights.map((h, n) => {
             const { Icon, bg, fg } = HIGHLIGHT_ICONS[n % HIGHLIGHT_ICONS.length];
             return (
-              <div key={h.title} className="ind-rise rounded-[24px] border border-gc-line bg-background p-7 text-left transition hover:shadow-[0_1px_3px_rgba(60,64,67,0.15),0_4px_12px_rgba(60,64,67,0.12)]" style={{ animationDelay: `${n * 0.08}s` }}>
+              <div key={h.title} className="ind-rise rounded-md border border-gc-line bg-background p-7 text-left transition hover:shadow-[0_1px_3px_rgba(60,64,67,0.15),0_4px_12px_rgba(60,64,67,0.12)]" style={{ animationDelay: `${n * 0.08}s` }}>
                 <span className={`flex h-12 w-12 items-center justify-center rounded-full ${bg}`}><Icon className={`h-6 w-6 ${fg}`} /></span>
                 <h3 className="mt-5 text-[18px] font-medium">{h.title}</h3>
                 <p className="mt-2 text-[15px] leading-[1.6] text-gc-ink-muted">{h.text}</p>

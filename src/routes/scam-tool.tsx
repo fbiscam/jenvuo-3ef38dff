@@ -218,7 +218,7 @@ function ScamToolPage() {
         </div>
 
         {/* Input form */}
-        <form onSubmit={onSubmit} className="rounded-2xl border border-gc-line bg-card p-5 sm:p-6">
+        <form onSubmit={onSubmit} className="rounded-md border border-gc-line bg-card p-5 sm:p-6">
           <div className="relative">
             <activeTab.icon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-400" />
             <input
@@ -329,7 +329,7 @@ function ScamToolPage() {
         )}
 
         {/* Red flags checklist */}
-        <div className="mt-6 rounded-2xl border border-gc-line bg-gc-surface p-5 sm:p-6">
+        <div className="mt-6 rounded-md border border-gc-line bg-gc-surface p-5 sm:p-6">
           <h3 className="text-base font-medium text-black mb-3">
             Common trading scam red flags
           </h3>
@@ -347,7 +347,7 @@ function ScamToolPage() {
         </div>
 
         {/* Full scam check link */}
-        <div className="mt-5 flex flex-col gap-3 rounded-2xl border border-gc-line bg-gc-blue-soft p-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mt-5 flex flex-col gap-3 rounded-md border border-gc-line bg-gc-blue-soft p-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="text-sm font-medium text-black">
               Need a deeper link/email/text analysis?

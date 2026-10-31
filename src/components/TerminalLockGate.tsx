@@ -97,7 +97,7 @@ export function TerminalTrialNotice({ access }: { access: TerminalAccessState })
   if (access.loading || !access.allowed || access.reason !== "trial" || !access.trialEndsAt) return null;
   const left = Date.parse(access.trialEndsAt) - Date.now();
   return (
-    <div className="mb-3 flex flex-col gap-3 rounded-2xl border border-gc-line bg-gc-blue-soft px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+    <div className="mb-3 flex flex-col gap-3 rounded-md border border-gc-line bg-gc-blue-soft px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
       <span className="text-sm text-gc-ink">
         <strong>Free Terminal trial:</strong> {formatLeft(left)} left (until {new Date(access.trialEndsAt).toLocaleDateString()}). Upgrade to keep using the Terminal after that.
       </span>

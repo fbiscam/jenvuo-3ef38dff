@@ -99,7 +99,7 @@ function HeroMockup({ price, delta }: { price: string; delta: string }) {
       <div className="pointer-events-none absolute -bottom-6 left-16 h-14 w-28 rounded-full bg-gc-green" />
       <div className="pointer-events-none absolute -bottom-4 -right-6 h-28 w-28 rounded-full border-[14px] border-gc-blue" />
 
-      <div className="relative overflow-hidden rounded-2xl border border-gc-line bg-background shadow-[0_1px_3px_rgba(60,64,67,0.3),0_4px_8px_3px_rgba(60,64,67,0.15)]">
+      <div className="relative overflow-hidden rounded-md border border-gc-line bg-background shadow-[0_1px_3px_rgba(60,64,67,0.3),0_4px_8px_3px_rgba(60,64,67,0.15)]">
         <div className="flex items-center justify-between border-b border-gc-line px-5 py-3">
           <div className="flex items-center gap-2">
             <span className="h-2.5 w-2.5 rounded-full bg-gc-red" />
@@ -490,7 +490,7 @@ export function CloudProducts() {
             <Link
               key={title}
               to={to}
-              className="group flex flex-col rounded-xl border border-gc-line bg-background p-6 transition hover:shadow-[0_1px_2px_rgba(60,64,67,0.3),0_2px_6px_2px_rgba(60,64,67,0.15)]"
+              className="group flex flex-col rounded-md border border-gc-line bg-background p-6 transition hover:shadow-[0_1px_2px_rgba(60,64,67,0.3),0_2px_6px_2px_rgba(60,64,67,0.15)]"
             >
               <span className={`flex h-11 w-11 items-center justify-center rounded-full ${TONE[tone].bg}`}>
                 <Icon className={`h-5 w-5 ${TONE[tone].fg}`} />
@@ -647,7 +647,7 @@ export function CloudResources() {
         <h2 className="text-[32px] font-normal leading-[1.2] text-gc-ink sm:text-[40px]">Learn and grow</h2>
         <div className="mt-10 grid gap-5 md:grid-cols-3">
           {RESOURCES.map(({ Icon, tone, title, body, to, cta }) => (
-            <Link key={title} to={to} className="group rounded-xl border border-gc-line p-7 transition hover:border-gc-blue">
+            <Link key={title} to={to} className="group rounded-md border border-gc-line p-7 transition hover:border-gc-blue">
               <Icon className={`h-8 w-8 ${TONE[tone].fg}`} strokeWidth={1.75} />
               <h3 className="mt-5 text-[20px] font-medium text-gc-ink">{title}</h3>
               <p className="line-clamp-2 max-sm:line-clamp-none mt-2 text-[15px] leading-[1.6] text-gc-ink-muted">{body}</p>

@@ -231,17 +231,17 @@ function KillzonesPage() {
 
         {/* Live clock strip */}
         <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-3">
-          <div className="rounded-3xl border border-gc-line bg-background p-5 ">
+          <div className="rounded-md border border-gc-line bg-background p-5 ">
             <div className={`${MONO} text-[10px] uppercase tracking-widest text-gc-ink-muted`}>UTC</div>
             <div className={`${MONO} text-xl sm:text-2xl font-semibold mt-1`}>{utcNow}</div>
           </div>
-          <div className="rounded-3xl border border-gc-line bg-background p-5 ">
+          <div className="rounded-md border border-gc-line bg-background p-5 ">
             <div className={`${MONO} text-[10px] uppercase tracking-widest text-gc-ink-muted`}>
               Local · {tzShort}
             </div>
             <div className={`${MONO} text-xl sm:text-2xl font-semibold mt-1`}>{localNow}</div>
           </div>
-          <div className="col-span-2 sm:col-span-1 rounded-3xl border border-gc-line bg-background p-5 ">
+          <div className="col-span-2 sm:col-span-1 rounded-md border border-gc-line bg-background p-5 ">
             <div className={`${MONO} text-[10px] uppercase tracking-widest text-gc-ink-muted`}>
               {ipCity ? "Detected location" : "Timezone"}
             </div>
@@ -395,7 +395,7 @@ function KillzonesPage() {
             );
           })}
           {rows.length === 0 && (
-            <div className="rounded-xl border border-dashed border-gc-line bg-background p-10 text-center text-sm text-gc-ink-muted">
+            <div className="rounded-md border border-dashed border-gc-line bg-background p-10 text-center text-sm text-gc-ink-muted">
               No instruments match your search.
             </div>
           )}

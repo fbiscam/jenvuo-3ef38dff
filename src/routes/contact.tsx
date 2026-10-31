@@ -192,7 +192,7 @@ function ContactPage() {
         {/* RIGHT — cards */}
         <aside className="bg-gc-canvas px-5 py-10 sm:px-10 lg:py-14">
           <div className="max-w-[370px] space-y-4">
-            <div className="rounded-xl border border-gc-line bg-background p-6">
+            <div className="rounded-md border border-gc-line bg-background p-6">
               <img src="/favicon.png" alt="Jenvu" className="h-10 w-10 rounded-lg object-contain" />
               <h2 className="mt-4 text-[20px]">Contact our team direct</h2>
               <a href="mailto:support@jenvu.com" className="mt-6 flex w-full items-center justify-center gap-2 rounded-full bg-home-accent px-5 py-3 text-[16px] font-medium text-home-accent-foreground hover:opacity-90">
@@ -214,7 +214,7 @@ function ContactPage() {
 
 function SideCard({ text, link, href }: { text: string; link: string; href: string }) {
   return (
-    <div className="rounded-xl border border-gc-line bg-background p-4">
+    <div className="rounded-md border border-gc-line bg-background p-4">
       <p className="text-[15px] leading-relaxed">{text}</p>
       <a href={href} className="mt-4 inline-block text-[15px] font-medium text-gc-blue-deep hover:underline">{link}</a>
     </div>

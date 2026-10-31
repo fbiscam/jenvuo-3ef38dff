@@ -83,7 +83,7 @@ export function CloudSolutions() {
             ))}
           </ul>
 
-          <div className="rounded-xl border border-gc-line p-3">
+          <div className="rounded-md border border-gc-line p-3">
             <img src={s.image} alt={s.name} loading="lazy" width={1280} height={640} className="h-56 w-full rounded-lg object-cover md:h-64" />
             <div className="mt-2 grid gap-2 sm:grid-cols-2">
               <div className="rounded-lg bg-gc-ink p-5 text-gc-on-blue">
