@@ -1907,3 +1907,10 @@ html[data-dash-theme="dark"] .ask-jenvu-root {
 h1, h2, h3, h4 { font-family: var(--font-display); letter-spacing: -0.025em; }
 .ask-jenvu-launcher { background: #F4F4F4; color: #000; border: 1px solid rgb(0 0 0 / 0.06); }
 .dark .ask-jenvu-launcher { background: #fff; color: #000; border-color: transparent; }
+
+/* Black theme: all text pure white (public pages + dashboard). Terminal keeps its own theme. */
+.dark:not(.terminal-dark) { --foreground: #ffffff; --muted-foreground: #ffffff; --card-foreground: #ffffff; --popover-foreground: #ffffff; }
+html.dark body :is(h1,h2,h3,h4,h5,h6,p,span,li,a,label,small,dt,dd,td,th,figcaption,blockquote):not(.terminal-dark *):not([class*="bg-white"] *):not([class*="bg-zinc-900"] *):not(.bg-primary *):not(.bg-foreground *),
+.dash-dark :is(h1,h2,h3,h4,h5,h6,p,span,li,a,label,small,dt,dd,td,th,figcaption,blockquote):not(.bg-zinc-900 *):not(.bg-primary *):not(.bg-foreground *):not(.bg-white *) {
+  color: #ffffff !important;
+}
