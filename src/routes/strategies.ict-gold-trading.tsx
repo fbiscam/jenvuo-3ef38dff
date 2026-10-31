@@ -112,7 +112,7 @@ const CONTENT: IndustryContent = {
     { title: "Automate with clear limits", text: "JX Bot runs on your MT5 account and pauses for the day once your daily target is reached." },
   ],
   whyCardTitle: "Rules first, AI second.",
-  whyCardText: "Jenvu does not promise profits or fixed win rates. Trading Fiber carries real risk.",
+  whyCardText: "Jenvu does not promise profits or fixed win rates. Trading Fiber carries risk.",
   storiesTitle: "Stories from the Fiber desk",
   storySlugs: ["fresh-sweep-detection", "london-new-york-sessions", "jx-bot"],
   productsTitle: "Products that power these solutions",
