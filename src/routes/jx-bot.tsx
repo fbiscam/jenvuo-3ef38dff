@@ -3,7 +3,7 @@ import * as React from "react";
 import { ArrowUpRight, X } from "lucide-react";
 import SiteHeader from "@/components/SiteHeader";
 import BlogFooter from "@/components/BlogFooter";
-import Mt5Preview from "@/components/jxbot/Mt5Preview";
+import BotCodingPreview from "@/components/jxbot/BotCodingPreview";
 import { useAuthUser } from "@/hooks/useAuthUser";
 
 export const Route = createFileRoute("/jx-bot")({
@@ -81,7 +81,7 @@ function GetBot({ label = "Use JX Bot" }: { label?: string }) {
 /* ---------- 1. Hero + app window ---------- */
 
 function AppWindow() {
-  return <Mt5Preview />;
+  return <BotCodingPreview />;
 }
 
 function Hero() {
