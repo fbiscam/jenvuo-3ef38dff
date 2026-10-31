@@ -74,11 +74,11 @@ function StatCard({ label, hint, model, value, unit, className }: {
           {label} <Info className="h-3.5 w-3.5" aria-hidden />
         </p>
         <p className="mt-2 flex items-center gap-2 text-sm font-medium text-gc-ink">
-          <ModelLogo m={model} size="sm" /> {model.name}
+          <ModelLogo m={model} size="sm" /> <span className="truncate">{model.name}</span>
         </p>
       </div>
       <p className="flex items-baseline gap-1.5">
-        <span className="text-3xl font-medium tracking-tight text-gc-ink">{value}</span>
+        <span className="text-3xl font-medium tracking-tight tabular-nums text-gc-ink">{value}</span>
         <span className="text-sm text-gc-ink-muted">{unit}</span>
       </p>
     </div>
@@ -104,17 +104,17 @@ function MiniTable({ title, sub, rows, cols, onPick }: {
             <tr className="border-b border-gc-line text-left text-gc-ink-muted">
               <th className="w-8 py-2 font-normal" />
               <th className="py-2 font-normal">Model</th>
-              {cols.map((c) => <th key={c.head} className="py-2 text-right font-normal">{c.head}</th>)}
+              {cols.map((c) => <th key={c.head} className="whitespace-nowrap py-2 pl-4 text-right font-normal">{c.head}</th>)}
             </tr>
           </thead>
           <tbody>
             {rows.map((m, i) => (
               <tr key={m.id} onClick={() => onPick(m.id)} className="cursor-pointer border-b border-gc-line last:border-0 hover:bg-gc-canvas">
-                <td className="py-2.5 text-gc-ink-muted">{i + 1}</td>
+                <td className="py-2.5 tabular-nums text-gc-ink-muted">{i + 1}</td>
                 <td className="py-2.5">
-                  <span className="flex items-center gap-2.5 font-medium text-gc-ink"><ModelLogo m={m} size="sm" />{m.name}</span>
+                  <span className="flex items-center gap-2.5 font-medium text-gc-ink"><ModelLogo m={m} size="sm" /><span className="truncate">{m.name}</span></span>
                 </td>
-                {cols.map((c) => <td key={c.head} className="py-2.5 text-right font-mono text-gc-ink">{c.cell(m)}</td>)}
+                {cols.map((c) => <td key={c.head} className="whitespace-nowrap py-2.5 pl-4 text-right tabular-nums text-gc-ink">{c.cell(m)}</td>)}
               </tr>
             ))}
           </tbody>
@@ -203,7 +203,7 @@ export default function ModelsExplorer({ apiHref = "/dashboard/api" }: { apiHref
                   <span className="hidden h-1.5 w-24 overflow-hidden rounded-full bg-gc-panel sm:block">
                     <span className="block h-full rounded-full bg-gc-blue" style={{ width: `${(m.context / MAX_CONTEXT) * 100}%` }} />
                   </span>
-                  <span className="w-12 text-right font-mono text-sm font-medium text-gc-ink">{formatContext(m.context)}</span>
+                  <span className="w-14 text-right text-sm font-medium tabular-nums text-gc-ink">{formatContext(m.context)}</span>
                 </button>
               </li>
             ))}
@@ -221,7 +221,7 @@ export default function ModelsExplorer({ apiHref = "/dashboard/api" }: { apiHref
 
       {/* Families */}
       <section>
-        <div className="mb-3 flex items-end justify-between gap-3">
+        <div className="mb-3 flex items-center justify-between gap-3">
           <h2 className="text-lg font-medium text-gc-ink">Model families</h2>
           <button type="button" onClick={() => { setProvider("all"); scrollToCatalog(); }} className="text-sm text-gc-ink underline underline-offset-4 hover:text-gc-blue">View all</button>
         </div>
@@ -231,9 +231,9 @@ export default function ModelsExplorer({ apiHref = "/dashboard/api" }: { apiHref
             const sample = MODEL_CATALOG.find((m) => m.provider === key)!;
             return (
               <button key={key} type="button" onClick={() => { setProvider(key); setSelected(sample.id); scrollToCatalog(); }}
-                className="w-64 shrink-0 snap-start rounded-xl border border-gc-line bg-gc-canvas p-4 text-left hover:border-gc-blue lg:w-auto">
-                <span className="flex items-center gap-2 text-base font-medium text-gc-ink"><ModelLogo m={sample} size="sm" />{PROVIDERS[key].label}<span className="text-sm font-normal text-gc-ink-muted">· {count}</span></span>
-                <span className="mt-2 line-clamp-3 block text-sm text-gc-ink-muted">{PROVIDERS[key].blurb}</span>
+                className="flex w-64 shrink-0 snap-start flex-col items-start justify-start rounded-xl border border-gc-line bg-gc-canvas p-4 text-left hover:border-gc-blue lg:w-auto">
+                <span className="flex w-full items-center gap-2.5 text-base font-medium text-gc-ink"><ProviderLogo provider={key} size="sm" /><span className="truncate">{PROVIDERS[key].label}</span><span className="ml-auto rounded-full bg-background px-2 py-0.5 text-xs font-normal tabular-nums text-gc-ink-muted">{count} models</span></span>
+                <span className="mt-3 line-clamp-3 block text-sm text-gc-ink-muted">{PROVIDERS[key].blurb}</span>
               </button>
             );
           })}
@@ -264,11 +264,11 @@ export default function ModelsExplorer({ apiHref = "/dashboard/api" }: { apiHref
             const Icon = CAP_META[key].icon;
             return (
               <button key={key} type="button" onClick={() => { setCap(key); setProvider("all"); scrollToCatalog(); }}
-                className="rounded-xl border border-gc-line bg-background p-4 text-left hover:border-gc-blue sm:p-5">
+                className="flex flex-col items-start justify-start rounded-xl border border-gc-line bg-background p-4 text-left hover:border-gc-blue sm:p-5">
                 <span className={cn("grid h-9 w-9 place-items-center rounded-lg", CAP_META[key].cls)}><Icon className="h-4 w-4" /></span>
                 <span className="mt-6 block text-sm font-medium text-gc-ink">{title}</span>
                 <span className="mt-1 block text-sm text-gc-ink-muted">{text}</span>
-                <span className="mt-4 flex items-center gap-1 text-sm font-medium text-gc-ink">
+                <span className="mt-auto flex items-center gap-1 pt-4 text-sm font-medium text-gc-ink">
                   See {MODEL_CATALOG.filter((m) => m.capabilities.includes(key)).length} models <ArrowRight className="h-3.5 w-3.5" />
                 </span>
               </button>
@@ -324,7 +324,7 @@ export default function ModelsExplorer({ apiHref = "/dashboard/api" }: { apiHref
 
           <div className="flex flex-col p-4 sm:p-6">
             <div className="flex items-center gap-3">
-              <ModelLogo m={current} />
+              <ModelLogo m={current} size="lg" />
               <div className="min-w-0">
                 <h3 className="truncate text-lg font-semibold text-gc-ink">{current.name}</h3>
                 <p className="font-mono text-sm text-gc-ink-muted">{current.id}</p>
@@ -334,8 +334,8 @@ export default function ModelsExplorer({ apiHref = "/dashboard/api" }: { apiHref
 
             <p className="mt-5 text-xs font-medium uppercase tracking-wider text-gc-ink-muted">Pricing</p>
             <dl className="mt-2 divide-y divide-gc-line rounded-lg border border-gc-line bg-gc-canvas text-sm">
-              <div className="flex justify-between px-3 py-2"><dt className="text-gc-ink-muted">Input</dt><dd className="font-mono font-semibold text-gc-ink">{price} / 1M</dd></div>
-              <div className="flex justify-between px-3 py-2"><dt className="text-gc-ink-muted">Output</dt><dd className="font-mono font-semibold text-gc-ink">{price} / 1M</dd></div>
+              <div className="flex justify-between px-3 py-2"><dt className="text-gc-ink-muted">Input</dt><dd className="font-semibold tabular-nums text-gc-ink">{price} / 1M</dd></div>
+              <div className="flex justify-between px-3 py-2"><dt className="text-gc-ink-muted">Output</dt><dd className="font-semibold tabular-nums text-gc-ink">{price} / 1M</dd></div>
               <div className="flex justify-between px-3 py-2"><dt className="text-gc-ink-muted">Per request</dt><dd className="font-semibold text-gc-success">Free</dd></div>
             </dl>
 
