@@ -187,10 +187,10 @@ export default function ModelsExplorer({ apiHref = "/dashboard/api" }: { apiHref
     <div className="mx-auto w-full max-w-[1250px] space-y-14 px-4 py-8 font-sans text-gc-ink sm:px-6 sm:py-10">
       {/* Discover — same look as the Platform page hero */}
       <header className="pb-4 pt-12 text-center sm:pt-20">
-        <h1 className="mx-auto max-w-3xl text-balance text-center text-[2.6rem] font-medium leading-[1.08] tracking-tight sm:text-6xl">
+        <h1 className="mx-auto max-w-3xl lg:max-w-none lg:whitespace-nowrap text-balance text-center text-[2.6rem] font-medium leading-[1.08] tracking-tight sm:text-6xl">
           Discover models on Jenvu
         </h1>
-        <p className="mx-auto mt-6 max-w-2xl text-balance text-center text-[17px] text-gc-ink">
+        <p className="mx-auto mt-6 max-w-2xl lg:max-w-none lg:whitespace-nowrap text-balance text-center text-[17px] text-gc-ink">
           Every model you can call with one Jenvu API key, at one flat price of {price} per million tokens.
         </p>
         <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
@@ -273,7 +273,6 @@ export default function ModelsExplorer({ apiHref = "/dashboard/api" }: { apiHref
           <StatCard label="Smartest open model" hint="Open-weight model with the most capability" model={getCatalogModel("glm-5.3")!} value="Open" unit="weights" />
           <StatCard label="Fastest replies" hint="Light model for quick answers" model={getCatalogModel("gemini-3.7-flash")!} value={formatContext(getCatalogModel("gemini-3.7-flash")!.context)} unit="context" />
           <StatCard label="Most models" hint="Provider with the most models on Jenvu" model={getCatalogModel("claude-opus-5")!} value={String(MODEL_CATALOG.filter((m) => m.provider === "anthropic").length)} unit="Claude models" />
-          <StatCard className="sm:col-span-2" label="Smartest coding" hint="Claude tuned for code" model={getCatalogModel("claude-fable-5.1")!} value={formatContext(getCatalogModel("claude-fable-5.1")!.context)} unit="token context" />
         </div>
       </div>
 
