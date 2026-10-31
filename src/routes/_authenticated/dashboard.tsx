@@ -1316,7 +1316,8 @@ function DashboardLayout() {
   // Console-style pages: menu stays closed until the user opens it from the top bar.
   const drawerMode = !embedMode;
   const navCollapsed = drawerMode ? false : sidebarCollapsed && !mobileNavOpen;
-  const themeApplies = false; // Black theme only on the Terminal page (its own switch).
+  // White/black switch covers every dashboard page; the Terminal keeps its own switch.
+  const themeApplies = pathname !== "/dashboard/terminal";
   const dashDark = themeApplies && dashTheme === "dark";
 
   return (
