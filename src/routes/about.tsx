@@ -86,7 +86,7 @@ function AboutPage() {
         </div>
       </section>
 
-      <div className="px-5 py-6 sm:px-8">
+      <div className="mx-auto max-w-[1200px] px-5 py-6 sm:px-8">
         <Banner title="Honest output, every time">
           When conditions are bad, the analysis says "wait". Every setup must clear bias,
           structure, liquidity, premium/discount, killzone and news-risk checks before it ships.{" "}
