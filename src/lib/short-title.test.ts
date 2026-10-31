@@ -1,6 +1,6 @@
 import { describe, it } from "node:test";
 import { expect } from "./chart/test-expect";
-import { shortTitle } from "./home-articles";
+import { shortTitle } from "./short-title";
 
 describe("shortTitle", () => {
   it("keeps titles of 6 words or fewer unchanged", () => {
