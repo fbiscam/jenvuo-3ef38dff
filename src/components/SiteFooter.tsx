@@ -75,7 +75,6 @@ const columns = [
     links: [
       { to: "/pricing", label: "Jenvu pricing" },
       { to: "/download", label: "Download App" },
-      { to: "/llm", label: "Language Model" },
       { to: "/development", label: "Development" },
       { to: "/ai-engine", label: "Products" },
       { to: "/platform", label: "API Platform" },
@@ -85,6 +84,7 @@ const columns = [
     label: "Intelligence",
     links: [
       { to: "/insights", label: "Market Insights" },
+      { to: "/llm", label: "Language Model" },
       { to: "/scam-tool", label: "Scam Tool" },
       { to: "/killzones", label: "Killzones" },
       { to: "/strategies/ict-gold-trading", label: "Solutions" },

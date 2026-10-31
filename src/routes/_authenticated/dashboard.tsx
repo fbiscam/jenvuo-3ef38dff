@@ -64,7 +64,6 @@ import {
   ShieldCheck,
   Gauge,
   BarChart3,
-  Tag,
   ArrowUpRight,
   ArrowRight,
   CheckCircle2,
@@ -92,8 +91,8 @@ import {
   FileCheck2,
   LockKeyhole,
   CircleHelp,
-  Bot,
-  Boxes,
+  BrainCircuit,
+  Cpu,
   Terminal,
   type LucideIcon,
 } from "lucide-react";
@@ -186,9 +185,8 @@ const NAV_GROUPS: Array<{ label: string; items: TabItem[] }> = [
     label: "",
     items: [
       { to: "/dashboard/api", label: "API Keys", icon: KeyRound },
-      { to: "/dashboard/models", label: "Models", icon: Boxes },
-      { to: "/dashboard/jx-bot", label: "JX Bot", icon: Bot },
-      { to: "/pricing", label: "Pricing", icon: Tag },
+      { to: "/dashboard/models", label: "Models", icon: BrainCircuit },
+      { to: "/dashboard/jx-bot", label: "JX Bot", icon: Cpu },
     ],
   },
   {
