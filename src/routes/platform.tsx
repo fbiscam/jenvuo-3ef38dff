@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import SiteHeader from "@/components/SiteHeader";
 import BlogFooter from "@/components/BlogFooter";
+import { useAuthUser } from "@/hooks/useAuthUser";
 import openaiLogo from "@/assets/platform-logos/openai.svg";
 import pythonLogo from "@/assets/platform-logos/python.svg";
 import nodeLogo from "@/assets/platform-logos/nodejs.svg";
@@ -72,7 +73,21 @@ function ContactSales({ className = pillDark }: { className?: string }) {
   );
 }
 
+/** Signed-in users go straight to the Models page; everyone else signs in first. */
+function useSignedIn() {
+  const { user } = useAuthUser();
+  return !!user;
+}
+
 function StartBuilding({ className = pillLight }: { className?: string }) {
+  const signedIn = useSignedIn();
+  if (signedIn) {
+    return (
+      <Link to="/dashboard/models" className={className}>
+        Start building <ArrowUpRight className="h-3.5 w-3.5" />
+      </Link>
+    );
+  }
   return (
     <a href={SIGN_IN} className={className}>
       Start building <ArrowUpRight className="h-3.5 w-3.5" />
@@ -96,6 +111,7 @@ function Ticks({ items }: { items: string[] }) {
 /* ---------- 1. Hero ---------- */
 
 function StartMenu() {
+  const signedIn = useSignedIn();
   const [open, setOpen] = React.useState(false);
   const ref = React.useRef<HTMLDivElement>(null);
   React.useEffect(() => {
@@ -113,9 +129,25 @@ function StartMenu() {
       </button>
       {open && (
         <div className="absolute left-1/2 z-20 mt-2 w-56 -translate-x-1/2 overflow-hidden rounded-2xl border border-gc-line bg-background p-1.5 text-left shadow-xl">
-          <a href={SIGN_IN} className="block rounded-xl px-3 py-2.5 text-sm hover:bg-gc-surface">
-            Get an API key
-          </a>
+          {signedIn ? (
+            <>
+              <Link to="/dashboard/models" className="block rounded-xl px-3 py-2.5 text-sm hover:bg-gc-surface">
+                Browse models
+              </Link>
+              <Link to="/dashboard/api" className="block rounded-xl px-3 py-2.5 text-sm hover:bg-gc-surface">
+                Get an API key
+              </Link>
+            </>
+          ) : (
+            <>
+              <a href={SIGN_IN} className="block rounded-xl px-3 py-2.5 text-sm hover:bg-gc-surface">
+                Get an API key
+              </a>
+              <Link to="/models" className="block rounded-xl px-3 py-2.5 text-sm hover:bg-gc-surface">
+                Browse models
+              </Link>
+            </>
+          )}
           <Link to="/docs" className="block rounded-xl px-3 py-2.5 text-sm hover:bg-gc-surface">
             Read the docs
           </Link>
