@@ -2161,3 +2161,9 @@ html body .dark .code-box .tok-var { color: #9cdcfe !important; }
 .jx-caret { animation: jx-caret-blink 1s steps(1) infinite; }
 .jx-code-scene .jx-pulse { animation: sc-dot 1.6s ease-in-out infinite; }
 @media (prefers-reduced-motion: reduce) { .jx-caret, .jx-code-scene .jx-pulse { animation: none; } }
+
+/* Chat page: full width at natural size so the examples and composer fill the page. */
+@media (min-width: 1024px) {
+  .jenvu-zoom-dashboard main.dash-page.chat-page { zoom: 0.85 !important; max-width: none; padding-top: 28px; }
+}
+.jenvu-zoom-dashboard main.dash-page.chat-page > :where(div, section, header) { max-width: 1400px; }
