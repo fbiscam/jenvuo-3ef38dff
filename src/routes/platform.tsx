@@ -22,7 +22,7 @@ import {
   UserRound,
 } from "lucide-react";
 import SiteHeader from "@/components/SiteHeader";
-import SiteFooter from "@/components/SiteFooter";
+import BlogFooter from "@/components/BlogFooter";
 
 export const Route = createFileRoute("/platform")({
   head: () => ({
@@ -74,10 +74,10 @@ function StartBuilding({ className = pillLight }: { className?: string }) {
 
 function Ticks({ items }: { items: string[] }) {
   return (
-    <ul className="mt-4 space-y-2 text-[13px] leading-snug text-gc-ink">
+    <ul className="mt-5 space-y-3 text-[15px] leading-snug text-gc-ink">
       {items.map((t) => (
         <li key={t} className="flex gap-2">
-          <Check className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+          <Check className="mt-0.5 h-4 w-4 shrink-0" />
           <span>{t}</span>
         </li>
       ))}
@@ -430,26 +430,26 @@ const USE_CASES = [
 function UseCaseCard({ u }: { u: (typeof USE_CASES)[number] }) {
   const [open, setOpen] = React.useState(false);
   return (
-    <div className="flex flex-col rounded-md bg-gc-surface p-1.5 text-left">
+    <div className="flex flex-col rounded-xl bg-gc-surface p-2 text-left">
       <div
-        className="flex aspect-[16/9] items-center justify-center rounded-sm"
+        className="flex aspect-[16/9] items-center justify-center rounded-lg"
         style={{ backgroundImage: `var(--platform-aurora-${u.g})` }}
       >
-        <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-background text-gc-ink">
-          <u.icon className="h-5 w-5" />
+        <span className="flex h-14 w-14 items-center justify-center rounded-xl bg-background text-gc-ink">
+          <u.icon className="h-7 w-7" />
         </span>
       </div>
-      <div className="flex flex-1 flex-col px-2 pb-2 pt-3">
-        <h3 className="text-[15px] font-medium">{u.t}</h3>
-        <p className="mt-1.5 flex-1 text-xs leading-relaxed">{u.b}</p>
-        {open && <p className="mt-3 rounded-lg bg-background px-3 py-2 text-xs italic text-gc-ink-muted">{u.ex}</p>}
+      <div className="flex flex-1 flex-col px-3 pb-3 pt-5">
+        <h3 className="text-xl font-medium">{u.t}</h3>
+        <p className="mt-2 flex-1 text-[15px] leading-relaxed text-gc-ink-muted">{u.b}</p>
+        {open && <p className="mt-3 rounded-lg bg-background px-4 py-3 text-sm italic text-gc-ink-muted">{u.ex}</p>}
         <button
           type="button"
           onClick={() => setOpen((o) => !o)}
-          className="mt-3 inline-flex w-full items-center justify-center gap-1 rounded-full bg-gc-panel py-1.5 text-xs hover:bg-gc-line/60"
+          className="mt-4 inline-flex w-full items-center justify-center gap-1 rounded-full bg-gc-panel py-2.5 text-sm hover:bg-gc-line/60"
         >
           {open ? "Hide example" : "View example prompt"}
-          <ChevronDown className={`h-3.5 w-3.5 transition-transform ${open ? "rotate-180" : ""}`} />
+          <ChevronDown className={`h-4 w-4 transition-transform ${open ? "rotate-180" : ""}`} />
         </button>
       </div>
     </div>
@@ -458,13 +458,13 @@ function UseCaseCard({ u }: { u: (typeof USE_CASES)[number] }) {
 
 function UseCases() {
   return (
-    <section className="mx-auto max-w-3xl px-5 py-20 text-center">
-      <h2 className="text-3xl font-medium tracking-tight">Use cases driven by our platform</h2>
-      <div className="mt-5 flex justify-center gap-2">
-        <ContactSales className="rounded-full bg-gc-ink px-3.5 py-1.5 text-xs font-medium text-background hover:opacity-85" />
-        <StartBuilding className="inline-flex items-center gap-1 rounded-full bg-gc-surface px-3.5 py-1.5 text-xs font-medium hover:bg-gc-panel" />
+    <section className="mx-auto max-w-6xl px-5 py-20 text-center">
+      <h2 className="text-4xl font-medium tracking-tight sm:text-5xl">Use cases driven by our platform</h2>
+      <div className="mt-7 flex flex-wrap justify-center gap-3">
+        <ContactSales className={pillDark} />
+        <StartBuilding className={pillLight} />
       </div>
-      <div className="mt-6 grid gap-4 sm:grid-cols-2 md:grid-cols-3">
+      <div className="mt-10 grid gap-6 sm:grid-cols-2 md:grid-cols-3">
         {USE_CASES.map((u) => (
           <UseCaseCard key={u.t} u={u} />
         ))}
@@ -506,21 +506,21 @@ const ENTERPRISE = [
 
 function Enterprise() {
   return (
-    <section className="mx-auto max-w-3xl px-5 py-16 text-center">
-      <h2 className="text-3xl font-medium leading-tight tracking-tight">
+    <section className="mx-auto max-w-6xl px-5 py-20 text-center">
+      <h2 className="text-4xl font-medium leading-tight tracking-tight sm:text-5xl">
         Features for running
         <br />
         at scale
       </h2>
-      <div className="mt-5 flex justify-center">
-        <Link to="/docs" className="rounded-full bg-gc-surface px-3.5 py-1.5 text-xs font-medium hover:bg-gc-panel">
+      <div className="mt-7 flex justify-center">
+        <Link to="/docs" className={pillLight}>
           Learn more
         </Link>
       </div>
-      <div className="mt-6 grid gap-3 text-left md:grid-cols-3">
+      <div className="mt-10 grid gap-6 text-left md:grid-cols-3">
         {ENTERPRISE.map((e) => (
-          <div key={e.t} className="rounded-md border border-gc-line p-4">
-            <h3 className="text-[15px] font-medium">{e.t}</h3>
+          <div key={e.t} className="rounded-xl border border-gc-line p-7">
+            <h3 className="text-xl font-medium">{e.t}</h3>
             <Ticks items={e.items} />
           </div>
         ))}
@@ -533,12 +533,12 @@ function Enterprise() {
 
 function GetStarted() {
   return (
-    <section className="bg-gc-surface py-14 text-center">
-      <div className="mx-auto max-w-3xl px-5">
-        <h2 className="text-3xl font-medium tracking-tight">Get started</h2>
-        <div className="mt-6 grid gap-3 text-left md:grid-cols-2">
-          <div className="flex flex-col rounded-md border border-gc-line p-4">
-            <h3 className="text-[15px] font-medium">Partner with us on your AI plans</h3>
+    <section className="bg-gc-surface py-20 text-center">
+      <div className="mx-auto max-w-6xl px-5">
+        <h2 className="text-4xl font-medium tracking-tight sm:text-5xl">Get started</h2>
+        <div className="mt-10 grid gap-6 text-left md:grid-cols-2">
+          <div className="flex flex-col rounded-xl border border-gc-line bg-background p-7 sm:p-8">
+            <h3 className="text-2xl font-medium">Partner with us on your AI plans</h3>
             <div className="flex-1">
               <Ticks
                 items={[
@@ -549,11 +549,11 @@ function GetStarted() {
               />
             </div>
             <div className="mt-8">
-              <ContactSales className="rounded-full bg-gc-ink px-3.5 py-1.5 text-xs font-medium text-background hover:opacity-85" />
+              <ContactSales className={pillDark} />
             </div>
           </div>
-          <div className="flex flex-col rounded-md border border-gc-line p-4">
-            <h3 className="text-[15px] font-medium">Build on your own</h3>
+          <div className="flex flex-col rounded-xl border border-gc-line bg-background p-7 sm:p-8">
+            <h3 className="text-2xl font-medium">Build on your own</h3>
             <div className="flex-1">
               <Ticks
                 items={[
@@ -565,7 +565,7 @@ function GetStarted() {
               />
             </div>
             <div className="mt-8">
-              <StartBuilding className="inline-flex items-center gap-1 rounded-full bg-gc-panel px-3.5 py-1.5 text-xs font-medium hover:bg-gc-line/60" />
+              <StartBuilding className={pillLight} />
             </div>
           </div>
         </div>
@@ -576,7 +576,7 @@ function GetStarted() {
 
 function PlatformPage() {
   return (
-    <div className="min-h-screen bg-background text-gc-ink">
+    <div className="min-h-screen bg-background font-sans text-gc-ink">
       <SiteHeader />
       <main>
         <Hero />
@@ -588,7 +588,7 @@ function PlatformPage() {
         <Enterprise />
         <GetStarted />
       </main>
-      <SiteFooter />
+      <BlogFooter />
     </div>
   );
 }
