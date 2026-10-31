@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import SiteFooter from "@/components/SiteFooter";
+import BlogFooter from "@/components/BlogFooter";
 import HeaderAuthButtons from "@/components/HeaderAuthButtons";
 import SiteHeader from "@/components/SiteHeader";
 
@@ -38,7 +38,7 @@ export function PageShell({
       <section className="bg-background">
         <div className={`mx-auto ${oneLine ? "max-w-[1400px]" : "max-w-3xl"} px-5 pb-12 pt-14 text-center sm:px-8 sm:pb-16 sm:pt-16`}>
           {showEyebrow && <p className={`text-[14px] font-medium ${oneLine ? "text-gc-ink-muted" : "text-gc-blue-deep"}`}>{eyebrow}</p>}
-          <h1 className={`mt-2 whitespace-pre-line ${oneLine ? "text-[26px] sm:whitespace-nowrap sm:text-[clamp(22px,3.2vw,40px)]" : "text-[32px] sm:text-[40px]"} font-normal leading-[1.2] tracking-tight text-gc-ink`}>
+          <h1 className={`mt-2 whitespace-pre-line ${oneLine ? "text-[26px] sm:whitespace-nowrap sm:text-[clamp(22px,3.2vw,40px)]" : "text-[32px] sm:text-[40px]"} font-medium leading-[1.15] tracking-tight text-gc-ink`}>
             {title}
           </h1>
           {intro && (
@@ -47,13 +47,19 @@ export function PageShell({
           <div className="mt-7 flex justify-center">
             <a
               href="https://auth.jenvu.com/sign-in"
-              className="inline-flex h-10 items-center rounded-full bg-gc-blue-deep px-5 text-[14px] font-medium text-gc-on-blue hover:bg-gc-blue"
+              className="inline-flex h-10 items-center rounded-full bg-gc-ink px-5 text-[14px] font-medium text-background transition-opacity hover:opacity-85"
             >
               Get started for free
             </a>
           </div>
         </div>
       </section>
+
+      {!oneLine && (
+        <div className="mx-auto max-w-[1200px] px-5 sm:px-8">
+          <div aria-hidden className="h-28 rounded-md sm:h-40" style={{ backgroundImage: "var(--platform-aurora-1)" }} />
+        </div>
+      )}
 
       {highlight && (
         <div className="px-4 sm:px-6">
@@ -78,7 +84,7 @@ export function PageShell({
 
       <NextStep />
 
-      <div className="hide-in-pwa"><SiteFooter /></div>
+      <div className="hide-in-pwa"><BlogFooter /></div>
     </div>
   );
 }
@@ -104,16 +110,16 @@ export function NextStep() {
   ];
   return (
     <div className="hide-in-pwa px-4 pb-0 pt-4 sm:px-6">
-      <section className="mx-auto max-w-[1536px] bg-gc-panel px-6 py-12 sm:px-10 md:py-16">
+      <section className="mx-auto max-w-[1200px] rounded-md border border-gc-line bg-background px-6 py-12 sm:px-10 md:py-16">
         <div className="mx-auto grid max-w-5xl gap-10 md:grid-cols-[1fr_auto] md:gap-16">
           <div>
-            <h2 className="text-[24px] font-normal text-gc-ink">Take the next step</h2>
+            <h2 className="text-[28px] font-medium tracking-tight text-gc-ink sm:text-[32px]">Take the next step</h2>
             <p className="mt-6 max-w-[500px] text-[16px] leading-[1.6] text-gc-ink-muted">
               Tell us what you're trading. The Jenvu team will help you find the right setup and plan.
             </p>
             <a
               href="https://jenvu.com/contact"
-              className="mt-7 inline-flex h-10 items-center rounded-full bg-gc-blue-deep px-5 text-[14px] font-medium text-gc-on-blue hover:bg-gc-blue"
+              className="mt-7 inline-flex h-10 items-center rounded-full bg-gc-ink px-5 text-[14px] font-medium text-background transition-opacity hover:opacity-85"
             >
               Contact us
             </a>

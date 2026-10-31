@@ -2,6 +2,8 @@ import * as React from "react";
 import { Link } from "@tanstack/react-router";
 import { ChevronLeft, ChevronRight, Pause, Play } from "lucide-react";
 
+const AURORA_BG = ["var(--platform-aurora-1)", "var(--platform-aurora-2)", "var(--platform-aurora-3)"];
+
 /** Ticks while playing; drives the live feature "videos". */
 function useTick(playing: boolean, ms = 450) {
   const [t, setT] = React.useState(0);
@@ -148,11 +150,11 @@ function FeatureCard({ card }: { card: Card }) {
           Explore feature
         </Link>
       </div>
-      <div className="relative h-[232px] bg-gc-ink">
+      <div className="relative h-[232px] bg-gc-ink" style={{ backgroundImage: AURORA_BG[CARDS.indexOf(card) % 3] }}>
         <div className={`absolute inset-0 transition-opacity ${playing ? "opacity-100" : "opacity-60"}`}>
           <Scene t={t} />
         </div>
-        <div className="absolute inset-0 bg-gradient-to-t from-gc-ink/80 via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-gc-ink/60 via-transparent to-transparent" />
         <button
           type="button"
           aria-label={playing ? `Pause ${card.name}` : `Play ${card.name}`}
