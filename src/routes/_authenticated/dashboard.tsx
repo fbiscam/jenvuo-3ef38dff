@@ -21,7 +21,8 @@ import RenewalNotice from "@/components/billing/RenewalNotice";
 import DashboardTopBar from "@/components/dashboard/DashboardTopBar";
 import NotificationStrip from "@/components/dashboard/NotificationStrip";
 import SiteAnnouncementBar from "@/components/dashboard/SiteAnnouncementBar";
-import CloudWelcome from "@/components/dashboard/CloudWelcome";
+import ConsoleWelcome from "@/components/dashboard/ConsoleWelcome";
+import JenvuMark from "@/components/JenvuMark";
 import TwoFactorReminder from "@/components/dashboard/TwoFactorReminder";
 import WelcomeOnboarding from "@/components/dashboard/WelcomeOnboarding";
 import { useLivePriceStream } from "@/hooks/useLivePriceStream";
@@ -183,7 +184,7 @@ const NAV_GROUPS: Array<{ label: string; items: TabItem[] }> = [
     items: [{ to: "/dashboard/usage", label: "Usage", icon: ChartNoAxesCombined }],
   },
   {
-    label: "",
+    label: "API",
     items: [
       { to: "/dashboard/api", label: "API Keys", icon: KeyRound },
       { to: "/dashboard/models", label: "Models", icon: BrainCircuit },
@@ -191,7 +192,7 @@ const NAV_GROUPS: Array<{ label: string; items: TabItem[] }> = [
     ],
   },
   {
-    label: "",
+    label: "Account",
     items: [
       { to: "/dashboard/billing", label: "Billing", icon: Wallet },
       { to: "/dashboard/pay", label: "Payments", icon: BadgeDollarSign },
@@ -1313,8 +1314,10 @@ function DashboardLayout() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authUser?.id, authLoading, refreshTick]);
 
-  // Console-style pages: menu stays closed until the user opens it from the top bar.
+  // Console-style pages: the menu is pinned on the left on desktop (xAI console look);
+  // on phones and on the Terminal it stays closed until opened from the top bar.
   const drawerMode = !embedMode;
+  const pinned = drawerMode && pathname !== "/dashboard/terminal";
   const navCollapsed = drawerMode ? false : sidebarCollapsed && !mobileNavOpen;
   // White/black switch covers every dashboard page; the Terminal keeps its own switch.
   const themeApplies = pathname !== "/dashboard/terminal";
@@ -1335,19 +1338,21 @@ function DashboardLayout() {
           type="button"
           aria-label="Close menu"
           onClick={() => setMobileNavOpen(false)}
-          className={`fixed inset-0 z-40 bg-black/30 backdrop-blur-[1px] ${drawerMode ? "" : "lg:hidden"}`}
+          className={`fixed inset-0 z-40 bg-black/30 backdrop-blur-[1px] ${drawerMode && !pinned ? "" : "lg:hidden"}`}
         />
       )}
 
       {!embedMode && (
-        /* Sidebar (Firebase-style) */
+        /* Sidebar (xAI console-style) */
         <aside
-          className={`dashboard-sidebar-root ${pathname === "/dashboard/terminal" ? "jenvu-zoom-chrome" : ""} ${
-            drawerMode
+          className={`dashboard-sidebar-root ${pinned ? "console-sidebar" : ""} ${pathname === "/dashboard/terminal" ? "jenvu-zoom-chrome" : ""} ${
+            pinned
+              ? `fixed inset-y-0 left-0 z-50 w-[260px] border-r border-gc-line lg:z-20 lg:translate-x-0 lg:shadow-none ${mobileNavOpen ? "translate-x-0 shadow-2xl" : "-translate-x-full max-lg:invisible"}`
+              : drawerMode
               ? `fixed inset-y-0 left-0 z-50 w-[280px] rounded-r-2xl ${mobileNavOpen ? "translate-x-0 shadow-2xl" : "-translate-x-full shadow-none"}`
               : `${pathname === "/dashboard/terminal" ? "dashboard-terminal-sidebar border-r border-zinc-200" : ""} max-lg:fixed max-lg:inset-y-0 max-lg:left-0 max-lg:z-50 lg:fixed lg:inset-y-0 lg:left-0 ${navCollapsed ? "w-[60px]" : "w-[224px]"} ${mobileNavOpen ? "max-lg:translate-x-0" : "max-lg:-translate-x-full"}`
           } flex min-h-0 shrink-0 flex-col overflow-hidden bg-white transition-[width,transform] duration-200 ease-out`}
-          aria-hidden={drawerMode && !mobileNavOpen ? true : undefined}
+          aria-hidden={drawerMode && !pinned && !mobileNavOpen ? true : undefined}
           style={{
             fontFamily: '"Google Sans Flex", "Google Sans", "Product Sans", "Roboto", system-ui, sans-serif',
             fontWeight: 400,
@@ -1355,56 +1360,42 @@ function DashboardLayout() {
         >
           <style>{`.dashboard-sidebar-root, .dashboard-sidebar-root *:not(img):not(svg):not(.material-symbols-rounded) { font-family: "Google Sans Flex", "Google Sans", "Product Sans", "Roboto", system-ui, sans-serif !important; text-transform: none !important; letter-spacing: normal !important; } .dashboard-sidebar-root .material-symbols-rounded { font-family: "Material Symbols Rounded" !important; font-weight: normal !important; font-style: normal !important; text-transform: none !important; letter-spacing: normal !important; white-space: nowrap; word-wrap: normal; direction: ltr; -webkit-font-feature-settings: "liga"; -webkit-font-smoothing: antialiased; }`}</style>
           {/* Brand */}
-          <div
-            className={`flex h-14 shrink-0 items-center gap-2.5 ${navCollapsed ? "justify-center px-2" : drawerMode ? "border-b border-gc-line pl-[6px] pr-3" : "px-4"}`}
-          >
-            {drawerMode && (
-              <button
-                type="button"
-                aria-label="Close menu"
-                onClick={() => setMobileNavOpen(false)}
-                className="inline-flex h-10 w-10 items-center justify-center rounded-full text-gc-ink-muted hover:bg-gc-notice"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            )}
-            <a href="https://jenvu.com" className="flex items-center gap-2.5 min-w-0">
-              <img
-                src="/favicon.png"
-                alt="JENVU"
-                className="dashboard-sidebar-logo h-6 w-6 shrink-0 rounded-md object-contain"
-              />
-              {!navCollapsed && (
-                <span
-                  className="dashboard-sidebar-brand truncate text-[22px] tracking-tight leading-none text-gc-ink"
-                  style={{
-                    fontFamily: '"Google Sans Flex", "Google Sans", "Product Sans", "DM Sans", system-ui, sans-serif',
-                    fontWeight: 500,
-                  }}
-                >
-                  Jenvu
-                </span>
-              )}
+          <div className="flex h-14 shrink-0 items-center gap-2 pl-4 pr-2">
+            <a href="https://jenvu.com" className="flex min-w-0 items-center gap-2.5">
+              <JenvuMark className="dashboard-sidebar-logo h-6 w-6 shrink-0 text-gc-ink" />
+              <span className="dashboard-sidebar-brand truncate text-[20px] font-medium leading-none tracking-tight text-gc-ink">Jenvu</span>
             </a>
-            {!drawerMode && (
-              <button
-                type="button"
-                aria-label="Close menu"
-                onClick={() => setMobileNavOpen(false)}
-                className="ml-auto rounded-md p-1.5 text-zinc-500 hover:bg-zinc-100 lg:hidden"
-              >
-                <X className="h-4 w-4" />
-              </button>
-            )}
+            <button
+              type="button"
+              aria-label="Close menu"
+              onClick={() => setMobileNavOpen(false)}
+              className={`ml-auto inline-flex h-9 w-9 items-center justify-center rounded-full text-gc-ink hover:bg-gc-notice ${pinned ? "lg:hidden" : ""}`}
+            >
+              <X className="h-5 w-5" />
+            </button>
+          </div>
+
+          {/* Workspace pill */}
+          <div className="px-3 pb-3">
+            <Link
+              to="/dashboard/profile"
+              className="flex items-center gap-2.5 rounded-xl border border-gc-line px-2.5 py-2 text-[14px] text-gc-ink hover:bg-gc-notice"
+            >
+              <span className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-gc-ink text-[12px] font-semibold text-background">
+                {(fullName || email || "J").trim().charAt(0).toUpperCase()}
+              </span>
+              <span className="min-w-0 flex-1 truncate">{fullName || "Personal"}</span>
+              <span className="shrink-0 rounded-full border border-gc-line px-2 py-0.5 text-[11px] text-gc-ink-muted">{planTier.charAt(0) + planTier.slice(1).toLowerCase()}</span>
+            </Link>
           </div>
 
           {/* Nav */}
 
-          <nav className={`sidebar-hover-scroll flex-1 min-h-0 overflow-y-auto overflow-x-hidden py-1 ${navCollapsed ? "px-2" : "pl-0 pr-3"}`}>
+          <nav className={`sidebar-hover-scroll flex-1 min-h-0 overflow-y-auto overflow-x-hidden py-1 ${navCollapsed ? "px-2" : "px-3"}`}>
             {[...NAV_GROUPS].map((group, gi) => (
-              <div key={group.label || `nav-group-${gi}`} className={gi > 0 ? "mt-1" : ""}>
+              <div key={group.label || `nav-group-${gi}`} className={gi > 0 ? (group.label ? "mt-5" : "mt-1") : ""}>
                 {!navCollapsed && group.label && (
-                  <div className="mb-1.5 px-2.5 text-[10px] font-normal tracking-wider text-[#6B6C6B]">
+                  <div className="sidebar-group-label mb-1.5 px-3 text-[11px] font-normal text-gc-ink-muted">
                     {group.label}
                   </div>
                 )}
@@ -1427,7 +1418,7 @@ function DashboardLayout() {
                           role="link"
                           aria-disabled="true"
                           title="Terminal is locked: your free 14-day trial has ended. Upgrade to unlock it."
-                          className={`dashboard-sidebar-link relative flex cursor-not-allowed select-none items-center text-[14px] font-normal text-gc-ink opacity-50 ${navCollapsed ? "justify-center rounded-full px-2 py-2" : "gap-3.5 rounded-r-full py-2 pl-4 pr-3"}`}
+                          className={`dashboard-sidebar-link relative flex cursor-not-allowed select-none items-center text-[14px] font-normal text-gc-ink opacity-50 ${navCollapsed ? "justify-center rounded-full px-2 py-2" : "gap-3 rounded-lg px-3 py-2"}`}
                         >
                           <Icon
                             className="dashboard-sidebar-icon h-[19px] w-[19px] shrink-0 text-current"
@@ -1453,10 +1444,11 @@ function DashboardLayout() {
                           setMobileNavOpen(false);
                         }}
                         title={navCollapsed ? t.label : undefined}
-                        className={`dashboard-sidebar-link group relative flex items-center text-[14px] font-normal text-gc-ink transition ${navCollapsed ? "justify-center rounded-full px-2 py-2" : "gap-3.5 rounded-r-full py-2 pl-4 pr-3"} ${active ? "bg-gc-nav-active font-medium text-gc-blue-deep" : "hover:bg-gc-notice"}`}
+                        aria-current={active ? "page" : undefined}
+                        className={`dashboard-sidebar-link group relative flex items-center text-[14px] font-normal text-gc-ink transition ${navCollapsed ? "justify-center rounded-full px-2 py-2" : "gap-3 rounded-lg px-3 py-2"} ${active ? "bg-gc-nav-active font-medium" : "hover:bg-gc-notice"}`}
                       >
                         <Icon
-                          className={`dashboard-sidebar-icon h-[19px] w-[19px] shrink-0 ${active ? "text-gc-blue-deep" : "text-gc-ink-muted"}`}
+                          className="dashboard-sidebar-icon h-[18px] w-[18px] shrink-0 text-gc-ink"
                           strokeWidth={1.75}
                           aria-hidden="true"
                         />
@@ -1517,17 +1509,33 @@ function DashboardLayout() {
             ))}
           </nav>
 
+          {/* Credits card */}
+          {!navCollapsed && (
+            <div className="mx-3 mb-2 rounded-xl bg-gc-nav-active px-3 py-3">
+              <div className="text-[12px] text-gc-ink-muted">Credit balance</div>
+              <div className="mt-0.5 text-[18px] font-medium text-gc-ink">
+                {credits.isLoading ? "—" : `$${(credits.balance || 0).toFixed(2)}`}
+              </div>
+              <Link
+                to="/dashboard/billing"
+                className="mt-2 inline-flex h-8 w-full items-center justify-center gap-1.5 rounded-full bg-gc-ink text-[13px] font-medium text-background hover:opacity-90"
+              >
+                <Plus className="h-3.5 w-3.5" /> Add credits
+              </Link>
+            </div>
+          )}
+
           {/* Quick actions: Help + Settings (left) + Theme + Collapse (right) */}
           <div
-            className={`mt-auto shrink-0 flex items-center border-t border-gc-line py-2 ${navCollapsed ? "justify-center px-2" : "justify-between pl-3 pr-2"}`}
+            className={`shrink-0 flex items-center border-t border-gc-line py-2 ${navCollapsed ? "justify-center px-2" : "justify-between pl-3 pr-2"}`}
           >
             {!navCollapsed && (
               <div className="flex items-center gap-1">
-                <Link to="/help" title="Help center" aria-label="Help center" className="sidebar-quick-btn inline-flex h-7 w-7 items-center justify-center rounded-md text-zinc-600">
-                  <LifeBuoy className="h-3.5 w-3.5" strokeWidth={2.25} />
+                <Link to="/help" title="Help center" aria-label="Help center" className="sidebar-quick-btn inline-flex h-8 w-8 items-center justify-center rounded-md text-gc-ink">
+                  <LifeBuoy className="h-4 w-4" strokeWidth={2} />
                 </Link>
-                <Link to="/dashboard/profile" title="Settings" aria-label="Settings" className="sidebar-quick-btn inline-flex h-7 w-7 items-center justify-center rounded-md text-zinc-600">
-                  <SettingsIcon className="h-3.5 w-3.5" strokeWidth={2.25} />
+                <Link to="/dashboard/profile" title="Settings" aria-label="Settings" className="sidebar-quick-btn inline-flex h-8 w-8 items-center justify-center rounded-md text-gc-ink">
+                  <SettingsIcon className="h-4 w-4" strokeWidth={2} />
                 </Link>
               </div>
             )}
@@ -1538,12 +1546,12 @@ function DashboardLayout() {
                   onClick={toggleDashTheme}
                   title={dashTheme === "dark" ? "White theme" : "Black theme"}
                   aria-label={dashTheme === "dark" ? "Switch to white theme" : "Switch to black theme"}
-                  className="sidebar-quick-btn inline-flex h-7 w-7 items-center justify-center rounded-md text-zinc-600"
+                  className="sidebar-quick-btn inline-flex h-8 w-8 items-center justify-center rounded-md text-gc-ink"
                 >
                   {dashTheme === "dark" ? (
-                    <Sun className="h-3.5 w-3.5" strokeWidth={2.25} />
+                    <Sun className="h-4 w-4" strokeWidth={2} />
                   ) : (
-                    <Moon className="h-3.5 w-3.5" strokeWidth={2.25} />
+                    <Moon className="h-4 w-4" strokeWidth={2} />
                   )}
                 </button>
               )}
@@ -1569,7 +1577,7 @@ function DashboardLayout() {
 
       {/* Right column */}
       <div
-        className={`dashboard-right-col flex min-w-0 min-h-0 flex-1 flex-col ${pathname === "/dashboard/terminal" ? "bg-background" : "bg-gc-canvas"} ${embedMode || drawerMode ? "" : sidebarCollapsed ? "collapsed lg:pl-[60px]" : "lg:pl-[224px]"}`}
+        className={`dashboard-right-col flex min-w-0 min-h-0 flex-1 flex-col ${pathname === "/dashboard/terminal" ? "bg-background" : "bg-background"} ${pinned ? "lg:pl-[260px]" : embedMode || drawerMode ? "" : sidebarCollapsed ? "collapsed lg:pl-[60px]" : "lg:pl-[224px]"}`}
       >
         {drawerMode && (
           <div className={pathname === "/dashboard/terminal" ? "jenvu-zoom-chrome relative z-30 shrink-0" : "contents"}>
@@ -1581,16 +1589,11 @@ function DashboardLayout() {
             email={email}
             onSignOut={() => void signOut()}
             white={pathname === "/dashboard/terminal"}
+            pinned={pinned}
           />
           </div>
         )}
-        <div
-          className={
-            !drawerMode
-              ? "flex min-h-0 w-full flex-1 flex-col"
-              : "flex min-h-0 w-full flex-1 flex-col overflow-clip bg-background sm:mx-2 sm:w-auto sm:rounded-t-[20px]"
-          }
-        >
+        <div className="flex min-h-0 w-full flex-1 flex-col overflow-clip bg-background">
         <WelcomeOnboarding />
         {drawerMode && <RenewalNotice />}
         {drawerMode && pathname === "/dashboard" && <StartTrialBanner />}
@@ -1613,7 +1616,7 @@ function DashboardLayout() {
 
           {pathname === "/dashboard" ? (
             <>
-              <CloudWelcome name={fullName} />
+              <ConsoleWelcome name={fullName} keysCount={extKeyCount} />
 
               {/* Extension usage analytics — Cloudflare-style */}
               <UsageAnalytics
