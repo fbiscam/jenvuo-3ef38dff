@@ -188,14 +188,14 @@ export default function DashboardTopBar({
           )}
         </form>
         {focused && !q.trim() && (
-          <div onMouseDown={(e) => e.preventDefault()} className="absolute left-0 right-0 top-11 rounded-2xl border border-gc-line bg-gc-panel shadow-lg">
+          <div onMouseDown={(e) => e.preventDefault()} className="absolute left-0 right-0 top-11 rounded-md border border-gc-line bg-gc-panel shadow-lg">
             <p className="px-4 py-4 text-[13px] italic text-gc-ink-muted">Do not enter any sensitive, confidential, or personal information.</p>
           </div>
         )}
         {focused && q.trim() && (
           <div
             onMouseDown={(e) => e.preventDefault()}
-            className="absolute left-0 right-0 top-11 max-h-[70vh] overflow-y-auto rounded-2xl border border-gc-line bg-background py-1 shadow-lg"
+            className="absolute left-0 right-0 top-11 max-h-[70vh] overflow-y-auto rounded-md border border-gc-line bg-background py-1 shadow-lg"
           >
             {answer && answer.q === q.trim() && (
               <div className="border-b border-gc-line bg-gc-panel px-4 py-3">

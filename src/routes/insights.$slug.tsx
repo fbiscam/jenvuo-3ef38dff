@@ -242,14 +242,14 @@ function InsightDetailPage() {
                 },
                 pre: ({ children }) => <pre className="my-6">{children}</pre>,
                 table: ({ children }) => (
-                  <div className="my-8 overflow-x-auto rounded-2xl border border-gc-line">
+                  <div className="my-8 overflow-x-auto rounded-md border border-gc-line">
                     <table className="w-full text-[15px]">{children}</table>
                   </div>
                 ),
                 thead: ({ children }) => <thead className="bg-gc-surface">{children}</thead>,
                 th: ({ children }) => <th className="border-b border-gc-line px-4 py-3 text-left font-medium text-gc-ink">{children}</th>,
                 td: ({ children }) => <td className="border-b border-gc-line px-4 py-3 text-gc-ink">{children}</td>,
-                img: ({ src, alt }) => <img src={src} alt={alt} className="my-8 w-full rounded-2xl border border-gc-line" />,
+                img: ({ src, alt }) => <img src={src} alt={alt} className="my-8 w-full rounded-md border border-gc-line" />,
               }}
             >
               {insight.content}
@@ -295,7 +295,7 @@ function RelatedArticles({ slug }: { slug: string }) {
           const words = (a.content || "").trim().split(/\s+/).filter(Boolean).length;
           return (
             <Link key={a.id} to="/insights/$slug" params={{ slug: a.slug }} className="group text-center">
-              <div className="aspect-[16/9] overflow-hidden rounded-2xl border border-gc-line bg-gc-surface">
+              <div className="aspect-[16/9] overflow-hidden rounded-md border border-gc-line bg-gc-surface">
                 <img src={insightCoverUrl(a.title, a.category, a.image_url)} alt={a.title} loading="lazy" width={1280} height={720} className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
               </div>
               <span className="mt-6 inline-flex rounded border border-gc-line px-2 py-1 text-[14px] leading-none text-gc-ink">{a.category}</span>

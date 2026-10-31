@@ -352,7 +352,7 @@ function SubscribeForm() {
 
   if (done) {
     return (
-      <div className="mx-auto max-w-md rounded-2xl border border-gc-line bg-background px-5 py-4 text-[14px] text-gc-ink">
+      <div className="mx-auto max-w-md rounded-md border border-gc-line bg-background px-5 py-4 text-[14px] text-gc-ink">
         ✓ You're on the list. Next briefing lands directly in your inbox.
       </div>
     );

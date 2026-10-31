@@ -152,7 +152,7 @@ function FoundingPage() {
                   { icon: DollarSign, tone: "green", title: "Instant access", body: "Approval unlocks 3 months of the plan you picked plus $250 credit, with no waiting." },
                   { icon: Shield, tone: "yellow", title: "Verified traders", body: "Every member verifies their ID within 2 days, so the cohort stays real." },
                 ] as const).map((b, i) => (
-                  <div key={b.title} className="ind-rise rounded-3xl border border-gc-line bg-background p-7 transition hover:shadow-[0_1px_3px_rgba(60,64,67,0.15),0_4px_12px_rgba(60,64,67,0.12)]" style={{ animationDelay: `${i * 80}ms` }}>
+                  <div key={b.title} className="ind-rise rounded-md border border-gc-line bg-background p-7 transition hover:shadow-[0_1px_3px_rgba(60,64,67,0.15),0_4px_12px_rgba(60,64,67,0.12)]" style={{ animationDelay: `${i * 80}ms` }}>
                     <span className={`flex h-12 w-12 items-center justify-center rounded-full ${TONE[b.tone].bg}`}>
                       <b.icon className={`h-6 w-6 ${TONE[b.tone].fg}`} />
                     </span>
@@ -198,7 +198,7 @@ function FoundingPage() {
                 <p className="mt-3 text-[16px] text-gc-ink-muted">Applications reviewed within 48 hours. Only serious traders — please be honest.</p>
               </div>
 
-              <div className="mt-10 rounded-3xl border border-gc-line bg-background p-6 sm:p-9">
+              <div className="mt-10 rounded-md border border-gc-line bg-background p-6 sm:p-9">
                 {submitted ? (
                   <div className="py-6 text-center" role="status" aria-live="polite">
                     <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-gc-green-soft">
@@ -295,7 +295,7 @@ function FoundingPage() {
 }
 
 const SANS = "font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif]";
-const INPUT = "mt-1.5 w-full rounded-xl border border-gc-line bg-background px-4 py-3 text-[15px] text-gc-ink outline-none placeholder:text-gc-ink-muted focus:border-gc-blue focus:ring-1 focus:ring-gc-blue";
+const INPUT = "mt-1.5 w-full rounded-md border border-gc-line bg-background px-4 py-3 text-[15px] text-gc-ink outline-none placeholder:text-gc-ink-muted focus:border-gc-blue focus:ring-1 focus:ring-gc-blue";
 const TONE = {
   blue: { bg: "bg-gc-blue-soft", fg: "text-gc-blue" },
   green: { bg: "bg-gc-green-soft", fg: "text-gc-green" },

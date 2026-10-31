@@ -63,14 +63,14 @@ function FounderPage() {
                   <img src={founderPhoto.url} alt="Haseeb Ijaz — Founder of Jenvu" width={1024} height={1024} className="h-full w-full object-cover" />
                 </div>
                 <div className="mt-4 space-y-3">
-                  <div className="flex items-center gap-4 rounded-3xl border border-gc-line p-4">
+                  <div className="flex items-center gap-4 rounded-md border border-gc-line p-4">
                     <span className="flex h-11 w-11 items-center justify-center rounded-full bg-gc-blue-soft"><Award className="h-5 w-5 text-gc-blue" /></span>
                     <div>
                       <p className="text-[15px] font-medium">Founded at age 21</p>
                       <p className="text-[13px] text-gc-ink-muted">Jenvu · XAU/USD trading platform</p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-4 rounded-3xl border border-gc-line p-4">
+                  <div className="flex items-center gap-4 rounded-md border border-gc-line p-4">
                     <span className="flex h-11 w-11 items-center justify-center rounded-full bg-gc-yellow-soft"><AlertTriangle className="h-5 w-5 text-gc-yellow" /></span>
                     <div>
                       <p className="text-[15px] font-medium">Pakistan No. #1 Scams Awareness Provider</p>

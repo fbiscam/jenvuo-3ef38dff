@@ -194,7 +194,7 @@ function ScamCheckPage() {
         </div>
 
         {/* Input */}
-        <form onSubmit={onSubmit} className="mt-5 rounded-3xl border border-gc-line bg-background p-5  sm:p-6">
+        <form onSubmit={onSubmit} className="mt-5 rounded-md border border-gc-line bg-background p-5  sm:p-6">
           {kind === "text" ? (
             <textarea
               value={value}
@@ -237,7 +237,7 @@ function ScamCheckPage() {
 
         {/* Result */}
         {result && v && (
-          <section className={`mt-6 rounded-3xl border border-gc-line bg-background p-6 shadow-sm ring-1 ${v.ring}`}>
+          <section className={`mt-6 rounded-md border border-gc-line bg-background p-6 shadow-sm ring-1 ${v.ring}`}>
             <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
               <div className="flex items-start gap-3">
                 <div className={`rounded-xl ${v.bg} p-2.5`}>
