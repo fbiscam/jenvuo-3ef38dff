@@ -153,7 +153,7 @@ export default function DashboardTopBar({
       {/* The Terminal's chart toolbar is placed here. The slot always stays mounted (hidden off the
           Terminal) so the toolbar never floats over the page while leaving the Terminal. */}
       <div id="terminal-toolbar-slot" className={onTerminal ? "hidden min-w-0 flex-1 items-center md:flex" : "hidden"} />
-      {onTerminal ? null : (
+      {onTerminal || pinned ? null : (
       <div className={`relative mx-auto hidden w-full ${white ? "max-w-[700px]" : "max-w-[720px]"} sm:block`}>
         {/* Google Cloud style: grey pill at rest, white box with a blue outline while typing. */}
         <form
@@ -309,12 +309,20 @@ export default function DashboardTopBar({
             <DropdownMenuItem asChild>
               <Link to="/contact" className="cursor-pointer gap-3.5 rounded-r-full py-2 pl-4 pr-3 text-[14px] font-normal text-gc-ink focus:bg-gc-notice"><Mail className="h-[19px] w-[19px] shrink-0 text-gc-ink-muted" strokeWidth={1.75} /> Contact us</Link>
             </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link to="/dashboard/profile" className="cursor-pointer gap-3.5 rounded-r-full py-2 pl-4 pr-3 text-[14px] font-normal text-gc-ink focus:bg-gc-notice"><Settings className="h-[19px] w-[19px] shrink-0 text-gc-ink-muted" strokeWidth={1.75} /> Settings</Link>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onSelect={() => onSignOut()} className="cursor-pointer gap-3.5 rounded-r-full py-2 pl-4 pr-3 text-[14px] font-normal text-gc-ink focus:bg-gc-notice">
+              <LogOut className="h-[19px] w-[19px] shrink-0 text-gc-ink-muted" strokeWidth={1.75} /> Sign out
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
         <DropdownMenu modal={false}>
           <DropdownMenuTrigger asChild>
             <button
               type="button"
+              hidden={pinned}
               aria-label="Account menu"
               className="ml-1 inline-flex h-9 w-9 items-center justify-center overflow-hidden rounded-full ring-1 ring-gc-line hover:ring-2 hover:ring-gc-blue-soft"
             >

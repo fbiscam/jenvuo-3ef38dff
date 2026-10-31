@@ -1375,19 +1375,6 @@ function DashboardLayout() {
             </button>
           </div>
 
-          {/* Workspace pill */}
-          <div className="px-3 pb-3">
-            <Link
-              to="/dashboard/profile"
-              className="flex items-center gap-2.5 rounded-xl border border-gc-line px-2.5 py-2 text-[14px] text-gc-ink hover:bg-gc-notice"
-            >
-              <span className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-gc-ink text-[12px] font-semibold text-background">
-                {(fullName || email || "J").trim().charAt(0).toUpperCase()}
-              </span>
-              <span className="min-w-0 flex-1 truncate">{fullName || "Personal"}</span>
-              <span className="shrink-0 rounded-full border border-gc-line px-2 py-0.5 text-[11px] text-gc-ink-muted">{planTier.charAt(0) + planTier.slice(1).toLowerCase()}</span>
-            </Link>
-          </div>
 
           {/* Nav */}
 
@@ -1509,21 +1496,6 @@ function DashboardLayout() {
             ))}
           </nav>
 
-          {/* Credits card */}
-          {!navCollapsed && (
-            <div className="mx-3 mb-2 rounded-xl bg-gc-nav-active px-3 py-3">
-              <div className="text-[12px] text-gc-ink-muted">Credit balance</div>
-              <div className="mt-0.5 text-[18px] font-medium text-gc-ink">
-                {credits.isLoading ? "—" : `$${(credits.balance || 0).toFixed(2)}`}
-              </div>
-              <Link
-                to="/dashboard/billing"
-                className="mt-2 inline-flex h-8 w-full items-center justify-center gap-1.5 rounded-full bg-gc-ink text-[13px] font-medium text-background hover:opacity-90"
-              >
-                <Plus className="h-3.5 w-3.5" /> Add credits
-              </Link>
-            </div>
-          )}
 
           {/* Quick actions: Help + Settings (left) + Theme + Collapse (right) */}
           <div
