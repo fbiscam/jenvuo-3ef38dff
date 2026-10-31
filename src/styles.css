@@ -2075,9 +2075,12 @@ html body .jenvu-zoom-dashboard main :is(.console-icon-chip, .console-card > svg
 .sc-orb { animation: sc-orb 3.3s ease-in-out infinite; }
 @media (prefers-reduced-motion: reduce) { .sc-dot, .sc-scroll, .sc-progress, .sc-bar, .sc-ripple, .sc-orb { animation: none; } }
 
-/* Desktop dashboard: side menu 7% smaller, page area 15% smaller (both centred as before). */
+/* Desktop dashboard: side menu 7% smaller; page area 15% then another 13% smaller (centred). */
 @media (min-width: 1024px) {
   .jenvu-zoom-dashboard .dashboard-sidebar-root.console-sidebar { zoom: 0.93; }
   .jenvu-zoom-dashboard .dashboard-right-col.lg\:pl-\[260px\] { padding-left: calc(260px * 0.93); }
-  .jenvu-zoom-dashboard main.dash-page { zoom: 0.765 !important; }
+  .jenvu-zoom-dashboard main.dash-page { zoom: 0.666 !important; }
 }
+
+/* Dashboard side menu: no dividing lines on any side (right edge, footer row). */
+.jenvu-zoom-dashboard .dashboard-sidebar-root.console-sidebar { border: 0 !important; box-shadow: none !important; }
