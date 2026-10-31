@@ -1,7 +1,7 @@
 import { getAlertCutoff } from "@/lib/alert-cutoff";
 import { SidebarMoreMenu } from "@/components/dashboard/SidebarMoreMenu";
 import { SettingsSidebarNav, isSettingsPath } from "@/components/settings/SettingsNav";
-import { readSiteTheme, saveSiteTheme } from "@/lib/site-theme";
+import { readSiteTheme, saveSiteTheme, SITE_THEME_EVENT } from "@/lib/site-theme";
 import { getIpGeo } from "@/lib/ip-geo";
 import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
 import { useVerification, isVerificationAllowedPath } from "@/hooks/useVerification";
@@ -699,6 +699,13 @@ function DashboardLayout() {
     // Same choice as the public site's Sun/Moon switch.
     const stored = readSiteTheme() ?? window.localStorage.getItem("jenvu:dash:theme");
     if (stored === "light" || stored === "dark") setDashTheme(stored);
+    // Other switches (e.g. the Personal page theme cards) save the same choice.
+    const onTheme = (e: Event) => {
+      const t = (e as CustomEvent<string>).detail;
+      if (t === "light" || t === "dark") setDashTheme(t);
+    };
+    window.addEventListener(SITE_THEME_EVENT, onTheme);
+    return () => window.removeEventListener(SITE_THEME_EVENT, onTheme);
   }, []);
   const toggleDashTheme = () => {
     const next = dashTheme === "dark" ? "light" : "dark";
