@@ -9,6 +9,50 @@ import s2 from "@/assets/home/card-wave.jpg";
 import s3 from "@/assets/home/trade-neon-practice.jpg";
 import s4 from "@/assets/home/card-ai.jpg";
 import s5 from "@/assets/home/card-gold.jpg";
+import { SiTradingview } from "react-icons/si";
+import mt5Logo from "@/assets/metatrader-logo.png.asset.json";
+import pythonLogo from "@/assets/platform-logos/python.svg";
+import nodeLogo from "@/assets/platform-logos/nodejs.svg";
+import curlLogo from "@/assets/platform-logos/curl.svg";
+import starsNebula from "@/assets/platform/stars-nebula.jpg";
+import starsPlain from "@/assets/platform/stars-plain.jpg";
+
+/* Same section as the Platform page's "Powered by frontier models". */
+const FRONTIER = [
+  { id: "claude-opus-5", name: "Claude Opus 5", a: "Deep reasoning and long documents", b: "Code review and refactoring", img: starsNebula },
+  { id: "gpt-5.5", name: "GPT-5.5", a: "Fast, all-round chat", b: "Agents and automation", img: starsPlain },
+  { id: "gemini-3.1-pro", name: "Gemini 3.1 Pro", a: "Text and image understanding", b: "Charts and screenshots", img: starsPlain },
+  { id: "deepseek-v4-flash-0731", name: "DeepSeek V4", a: "Quick everyday tasks", b: "High-volume workloads", img: starsPlain },
+];
+
+export function EntFrontierModels() {
+  return (
+    <section className="mx-auto max-w-[1340px] px-5 py-16 text-center sm:py-20">
+      <h2 className="text-4xl font-medium tracking-tight sm:text-[3.25rem] sm:leading-tight">Powered by frontier models</h2>
+      <p className="mt-5 text-[17px]">Leading models from every major lab deliver advanced intelligence behind one Jenvu API key.</p>
+      <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        {FRONTIER.map((m, i) => (
+          <div key={m.id} className="relative flex aspect-[4/5] flex-col justify-end overflow-hidden rounded-md bg-gc-night px-7 pb-12 text-left text-gc-on-night sm:aspect-[5/7]">
+            <img src={m.img} alt="" width={768} height={1056} loading="lazy" className="absolute inset-0 h-full w-full object-cover" style={{ transform: ["none", "none", "rotate(180deg)", "scaleX(-1)"][i] }} />
+            <div className="relative">
+              <h3 className="text-[1.75rem] font-medium leading-tight tracking-tight">{m.name}</h3>
+              <p className="mt-3 text-sm font-medium">Input: $3.00 per 1M tokens</p>
+              <p className="mt-1 text-sm font-medium">Output: $3.00 per 1M tokens</p>
+              <p className="mt-4 text-sm font-medium">{m.a}</p>
+              <p className="mt-1 text-sm font-medium">{m.b}</p>
+              <p className="mt-4 text-sm font-medium">Model ID: {m.id}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+      <p className="mt-10 text-sm italic">
+        Pricing above is one flat rate for every model, paid from your AI credit. Learn more in the{" "}
+        <Link to="/docs" className="underline underline-offset-2">API docs</Link> and{" "}
+        <Link to="/pricing" className="underline underline-offset-2">Pricing</Link>.
+      </p>
+    </section>
+  );
+}
 
 const pill =
   "inline-flex items-center gap-1.5 rounded-full bg-foreground px-6 py-3 text-[15px] font-medium text-background transition hover:opacity-85";
@@ -31,10 +75,15 @@ export function EntHero() {
           Get started <ChevronRight className="h-4 w-4" />
         </Link>
       </div>
-      <div className="mx-auto mt-20 grid max-w-5xl grid-cols-2 items-center gap-x-8 gap-y-6 text-[22px] font-semibold tracking-tight text-foreground/80 sm:grid-cols-5">
-        {["MetaTrader 5", "TradingView", "Python", "REST API", "Node.js"].map((n) => (
-          <span key={n}>{n}</span>
-        ))}
+      <div className="mx-auto mt-20 grid max-w-5xl grid-cols-2 items-center justify-items-center gap-x-8 gap-y-6 text-[20px] font-semibold tracking-tight text-foreground/80 sm:grid-cols-5">
+        <span className="flex items-center gap-2.5">
+          <img src={mt5Logo.url} alt="" width={32} height={32} className="h-8 w-8 rounded-md object-contain" />
+          MetaTrader 5
+        </span>
+        <span className="flex items-center gap-2.5"><SiTradingview className="h-7 w-7 text-foreground" aria-hidden />TradingView</span>
+        <span className="flex items-center gap-2.5"><img src={pythonLogo} alt="" width={28} height={28} className="h-7 w-7" />Python</span>
+        <span className="flex items-center gap-2.5"><img src={curlLogo} alt="" width={28} height={28} className="h-7 w-7" />REST API</span>
+        <span className="flex items-center gap-2.5"><img src={nodeLogo} alt="" width={28} height={28} className="h-7 w-7" />Node.js</span>
       </div>
     </section>
   );
