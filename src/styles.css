@@ -2119,3 +2119,29 @@ html body .dash-dark main.settings-page :is(h1, h2, h3, h4, label, dt, dd, th, t
 html body .dash-dark main.settings-page :is(.text-gc-ink-muted, .text-muted-foreground, .text-zinc-500, .text-zinc-600, .text-zinc-400):not(:is(.bg-white, [class*="bg-white"]) *) {
   color: #d4d4d8 !important;
 }
+
+/* Code page example box: light editor colours in white theme, dark editor colours in black theme */
+.code-box { background: #f6f8fa; color: #24292f; border: 1px solid #e5e7eb; }
+.code-box-copy { color: #6e7781; }
+.code-box-copy:hover { color: #24292f; }
+.code-box .tok-comment { color: #6e7781; }
+.code-box .tok-string { color: #0a3069; }
+.code-box .tok-env { color: #0550ae; }
+.code-box .tok-keyword { color: #cf222e; }
+.code-box .tok-const { color: #0550ae; }
+.code-box .tok-number { color: #0550ae; }
+.code-box .tok-func { color: #8250df; }
+.code-box .tok-type { color: #953800; }
+.code-box .tok-var { color: #116329; }
+.dark .code-box { background: #1e1e1e; color: #d4d4d4; border-color: #2a2a2a; }
+.dark .code-box-copy { color: #9d9d9d; }
+.dark .code-box-copy:hover { color: #ffffff; }
+.dark .code-box .tok-comment { color: #6a9955; }
+.dark .code-box .tok-string { color: #ce9178; }
+.dark .code-box .tok-env { color: #4fc1ff; }
+.dark .code-box .tok-keyword { color: #c586c0; }
+.dark .code-box .tok-const { color: #569cd6; }
+.dark .code-box .tok-number { color: #b5cea8; }
+.dark .code-box .tok-func { color: #dcdcaa; }
+.dark .code-box .tok-type { color: #4ec9b0; }
+.dark .code-box .tok-var { color: #9cdcfe; }

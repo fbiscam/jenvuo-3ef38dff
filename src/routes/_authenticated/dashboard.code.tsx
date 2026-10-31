@@ -103,11 +103,11 @@ function CodePage() {
         ))}
       </div>
       <div className="mt-4 grid gap-4 lg:grid-cols-[1.4fr_1fr]">
-        <div className="relative min-h-[220px] min-w-0 rounded-2xl bg-[#1e1e1e] p-5">
-          <button onClick={copy} aria-label="Copy code" className="absolute right-3 top-3 rounded-md p-1.5 text-[#9d9d9d] hover:text-[#ffffff]">
+        <div className="code-box relative min-h-[220px] min-w-0 rounded-2xl p-5">
+          <button onClick={copy} aria-label="Copy code" className="code-box-copy absolute right-3 top-3 rounded-md p-1.5">
             {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
           </button>
-          <pre className="whitespace-pre-wrap break-words pr-8 font-mono text-[13px] leading-relaxed text-[#d4d4d4]"><code>{highlight(ex.code)}</code></pre>
+          <pre className="whitespace-pre-wrap break-words pr-8 font-mono text-[13px] leading-relaxed"><code>{highlight(ex.code)}</code></pre>
         </div>
         <div className="console-card p-5">
           <p className="text-[14px] font-medium text-foreground">Result</p>

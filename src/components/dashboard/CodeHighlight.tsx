@@ -1,16 +1,16 @@
 import * as React from "react";
 
 const RULES: [RegExp, string][] = [
-  [/^(#[^\n]*|\/\/[^\n]*)/, "text-[#6a9955]"],
-  [/^("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|`(?:\\.|[^`\\])*`)/, "text-[#ce9178]"],
-  [/^\$[A-Z_]+/, "text-[#4fc1ff]"],
-  [/^-{1,2}[A-Za-z][\w-]*/, "text-[#c586c0]"],
-  [/^\b(from|import|const|let|await|async|new|return|print|curl|export|def|for|in|if|else)\b/, "text-[#c586c0]"],
-  [/^\b(true|false|null|None)\b/, "text-[#569cd6]"],
-  [/^\b\d+(\.\d+)?\b/, "text-[#b5cea8]"],
-  [/^[A-Za-z_]\w*(?=\s*\()/, "text-[#dcdcaa]"],
-  [/^\b[A-Z]\w*/, "text-[#4ec9b0]"],
-  [/^[A-Za-z_]\w*(?=\s*=[^=])/, "text-[#9cdcfe]"],
+  [/^(#[^\n]*|\/\/[^\n]*)/, "tok-comment"],
+  [/^("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|`(?:\\.|[^`\\])*`)/, "tok-string"],
+  [/^\$[A-Z_]+/, "tok-env"],
+  [/^-{1,2}[A-Za-z][\w-]*/, "tok-keyword"],
+  [/^\b(from|import|const|let|await|async|new|return|print|curl|export|def|for|in|if|else)\b/, "tok-keyword"],
+  [/^\b(true|false|null|None)\b/, "tok-const"],
+  [/^\b\d+(\.\d+)?\b/, "tok-number"],
+  [/^[A-Za-z_]\w*(?=\s*\()/, "tok-func"],
+  [/^\b[A-Z]\w*/, "tok-type"],
+  [/^[A-Za-z_]\w*(?=\s*=[^=])/, "tok-var"],
 ];
 
 /** Editor-style syntax colours for the short REST / Python / Node examples. */
