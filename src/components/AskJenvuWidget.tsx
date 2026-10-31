@@ -60,13 +60,30 @@ export function AskJenvuWidget() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  // Build the (hidden) panel once the page is idle so opening it is instant.
+  const [mounted, setMounted] = React.useState(false);
   React.useEffect(() => {
-    if (open && view === "chat" && !busy) inputRef.current?.focus();
+    if (open) { setMounted(true); return; }
+    const w = window as Window & { requestIdleCallback?: (cb: () => void) => number; cancelIdleCallback?: (id: number) => void };
+    if (w.requestIdleCallback) {
+      const id = w.requestIdleCallback(() => setMounted(true));
+      return () => w.cancelIdleCallback?.(id);
+    }
+    const id = window.setTimeout(() => setMounted(true), 1500);
+    return () => window.clearTimeout(id);
+  }, [open]);
+
+  React.useEffect(() => {
+    if (!(open && view === "chat" && !busy)) return;
+    // Focus after the open animation so it doesn't force a layout mid-frame.
+    const id = window.setTimeout(() => inputRef.current?.focus({ preventScroll: true }), 220);
+    return () => window.clearTimeout(id);
   }, [open, view, busy]);
 
   React.useEffect(() => {
+    if (!open) return;
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
-  }, [msgs, busy]);
+  }, [msgs, busy, open]);
 
   React.useEffect(() => {
     if (!open) return;
@@ -136,11 +153,17 @@ export function AskJenvuWidget() {
         </button>
       )}
 
-      {open && (
+      {(open || mounted) && (
         <div
           role="dialog"
           aria-label="Ask Jenvu"
-          className="fixed inset-x-2 bottom-2 top-16 z-[9999] flex flex-col overflow-hidden rounded-2xl bg-background text-gc-ink shadow-[0_4px_12px_rgba(60,64,67,0.2),0_16px_48px_rgba(60,64,67,0.25)] ring-1 ring-gc-line sm:inset-x-auto sm:right-4 sm:bottom-4 sm:top-auto sm:h-[min(560px,calc(100vh-6rem))] sm:w-[min(640px,calc(100vw-2rem))] animate-in fade-in slide-in-from-bottom-4 duration-200"
+          aria-hidden={!open}
+          inert={!open}
+          className={[
+            "fixed inset-x-2 bottom-2 top-16 z-[9999] flex flex-col overflow-hidden rounded-2xl bg-background text-gc-ink shadow-[0_4px_12px_rgba(60,64,67,0.2),0_16px_48px_rgba(60,64,67,0.25)] ring-1 ring-gc-line sm:inset-x-auto sm:right-4 sm:bottom-4 sm:top-auto sm:h-[min(560px,calc(100vh-6rem))] sm:w-[min(640px,calc(100vw-2rem))]",
+            "[contain:layout_paint] will-change-[opacity,transform] transition-[opacity,transform,visibility] duration-200 ease-out",
+            open ? "visible translate-y-0 opacity-100" : "pointer-events-none invisible translate-y-4 opacity-0",
+          ].join(" ")}
         >
           {/* Header */}
           <div className="relative flex h-14 shrink-0 items-center gap-2 px-5">
