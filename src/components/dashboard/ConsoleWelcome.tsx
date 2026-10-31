@@ -1,17 +1,17 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowUpRight, Plus, MessagesSquare, BrainCircuit, type LucideIcon } from "lucide-react";
+import { ArrowUpRight, Plus, MessagesSquare, BrainCircuit, Bot, CandlestickChart, type LucideIcon } from "lucide-react";
 import { useAuthUser } from "@/hooks/useAuthUser";
 import { useCredits } from "@/hooks/useCredits";
-import botImg from "@/assets/home/hero-ai-3.jpg";
-import terminalImg from "@/assets/home/hero-ai-4.jpg";
+
+
 
 type Product = { title: string; text: string; to: string; img?: string; aurora?: number; icon?: LucideIcon; badge?: string };
 
 const PRODUCTS: Product[] = [
   { title: "Chat API", text: "Build with Jenvu models through one compatible API.", to: "/dashboard/api", aurora: 1, icon: MessagesSquare },
   { title: "Models", text: "Compare context size and price per million tokens.", to: "/dashboard/models", aurora: 2, icon: BrainCircuit, badge: "New" },
-  { title: "JX Bot", text: "Gold M15 Expert Advisor for MT5 with a stop loss.", to: "/dashboard/jx-bot", img: botImg },
-  { title: "Terminal", text: "Sweeps, zones and FVGs on XAU/USD with an AI desk.", to: "/dashboard/terminal", img: terminalImg },
+  { title: "JX Bot", text: "Gold M15 Expert Advisor for MT5 with a stop loss.", to: "/dashboard/jx-bot", aurora: 3, icon: Bot },
+  { title: "Terminal", text: "Sweeps, zones and FVGs on XAU/USD with an AI desk.", to: "/dashboard/terminal", aurora: 1, icon: CandlestickChart },
 ];
 
 /** xAI console-style dashboard home: welcome line, two start cards, product grid. */
