@@ -309,12 +309,20 @@ export default function DashboardTopBar({
             <DropdownMenuItem asChild>
               <Link to="/contact" className="cursor-pointer gap-3.5 rounded-r-full py-2 pl-4 pr-3 text-[14px] font-normal text-gc-ink focus:bg-gc-notice"><Mail className="h-[19px] w-[19px] shrink-0 text-gc-ink-muted" strokeWidth={1.75} /> Contact us</Link>
             </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link to="/dashboard/profile" className="cursor-pointer gap-3.5 rounded-r-full py-2 pl-4 pr-3 text-[14px] font-normal text-gc-ink focus:bg-gc-notice"><Settings className="h-[19px] w-[19px] shrink-0 text-gc-ink-muted" strokeWidth={1.75} /> Settings</Link>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onSelect={() => onSignOut()} className="cursor-pointer gap-3.5 rounded-r-full py-2 pl-4 pr-3 text-[14px] font-normal text-gc-ink focus:bg-gc-notice">
+              <LogOut className="h-[19px] w-[19px] shrink-0 text-gc-ink-muted" strokeWidth={1.75} /> Sign out
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
         <DropdownMenu modal={false}>
           <DropdownMenuTrigger asChild>
             <button
               type="button"
+              hidden={pinned}
               aria-label="Account menu"
               className="ml-1 inline-flex h-9 w-9 items-center justify-center overflow-hidden rounded-full ring-1 ring-gc-line hover:ring-2 hover:ring-gc-blue-soft"
             >

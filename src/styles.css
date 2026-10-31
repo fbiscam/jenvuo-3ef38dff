@@ -2020,3 +2020,12 @@ html.dark body :is(.bg-foreground, .bg-gc-ink, .console-pill-solid):not(.termina
 .dash-dark :is(.bg-foreground, .bg-gc-ink, .console-pill-solid) svg { color: #000000 !important; }
 html.dark body .ask-jenvu-launcher, html.dark body .ask-jenvu-launcher *,
 .dash-dark .ask-jenvu-launcher, .dash-dark .ask-jenvu-launcher * { color: #000000 !important; }
+
+/* Console sections: warm #F9F8F6 panels, no borders (light); dark keeps #141414 */
+.jenvu-zoom-dashboard { --console-card: #f9f8f6; }
+.jenvu-zoom-dashboard.dash-dark { --console-card: #141414; }
+html body .jenvu-zoom-dashboard main :is(.border, .border-t, .border-b, .border-l, .border-r, .border-zinc-100, .border-zinc-200, .border-gc-line):not(input):not(textarea):not(select):not(button):not(.console-pill):not(.console-badge) { border-color: transparent !important; }
+html body .jenvu-zoom-dashboard main :is(.shadow, .shadow-sm, .shadow-md, .shadow-lg) { box-shadow: none !important; }
+html body .jenvu-zoom-dashboard main :is(.bg-gc-panel, .bg-gc-canvas, .bg-zinc-50, .bg-\[\#F4F4F4\]):not(.dash-dark *) { background-color: #f9f8f6 !important; }
+/* Important section icons/logos in orange */
+html body .jenvu-zoom-dashboard main :is(.console-icon-chip, .console-card > svg:first-child, .console-card .console-icon-chip svg) { color: #f97316 !important; }
