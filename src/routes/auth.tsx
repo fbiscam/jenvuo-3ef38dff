@@ -1027,7 +1027,7 @@ function AuthPage() {
                             autoComplete="name"
                             value={fullName}
                             onChange={(e) => setFullName(e.target.value)}
-                            className="h-[43px] w-full rounded-lg border border-border bg-background px-3 text-sm text-foreground outline-none transition focus:border-auth-action focus:ring-1 focus:ring-auth-action"
+                            className="h-11 w-full rounded-xl border border-border bg-background px-3 text-sm text-foreground outline-none transition focus:border-auth-action focus:ring-1 focus:ring-auth-action"
                           />
                         </div>
                         <div>
@@ -1041,7 +1041,7 @@ function AuthPage() {
                             autoComplete="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            className="h-[43px] w-full rounded-lg border border-border bg-background px-3 text-sm text-foreground outline-none transition focus:border-auth-action focus:ring-1 focus:ring-auth-action"
+                            className="h-11 w-full rounded-xl border border-border bg-background px-3 text-sm text-foreground outline-none transition focus:border-auth-action focus:ring-1 focus:ring-auth-action"
                           />
                           {flashInline("email")}
                         </div>
@@ -1057,7 +1057,7 @@ function AuthPage() {
                               autoComplete="new-password"
                               value={password}
                               onChange={(e) => setPassword(e.target.value)}
-                              className="h-[43px] w-full rounded-lg border border-border bg-background px-3 pr-12 text-sm text-foreground outline-none transition focus:border-auth-action focus:ring-1 focus:ring-auth-action"
+                              className="h-11 w-full rounded-xl border border-border bg-background px-3 pr-12 text-sm text-foreground outline-none transition focus:border-auth-action focus:ring-1 focus:ring-auth-action"
                             />
                             <Button type="button" variant="ghost" size="icon" onClick={() => setShowPassword((v) => !v)} aria-label={showPassword ? "Hide password" : "Show password"} className="absolute right-1 top-1/2 -translate-y-1/2 text-muted-foreground hover:bg-transparent hover:text-foreground">
                               {showPassword ? <EyeOff className="h-[18px] w-[18px]" /> : <Eye className="h-[18px] w-[18px]" />}
@@ -1083,7 +1083,7 @@ function AuthPage() {
                         <Button
                           type="submit"
                           disabled={loading}
-                          className="group h-[43px] w-full rounded-lg bg-auth-action px-5 text-sm font-semibold text-auth-action-foreground shadow-none transition hover:bg-auth-action/90"
+                          className="group h-[43px] w-full rounded-full bg-auth-action px-5 text-sm font-semibold text-auth-action-foreground shadow-none transition hover:bg-auth-action/90"
                         >
                           {loading ? btnLoading("Sending code...") : "Create account"}
                         </Button>
@@ -1271,7 +1271,7 @@ function AuthPage() {
                             autoComplete="username"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            className="h-[43px] w-full rounded-lg border border-border bg-background px-3 text-sm text-foreground outline-none transition focus:border-auth-action focus:ring-1 focus:ring-auth-action"
+                            className="h-11 w-full rounded-xl border border-border bg-background px-3 text-sm text-foreground outline-none transition focus:border-auth-action focus:ring-1 focus:ring-auth-action"
                           />
                           {flashInline("email")}
                         </div>
@@ -1288,7 +1288,7 @@ function AuthPage() {
                               autoComplete="current-password"
                               value={password}
                               onChange={(e) => setPassword(e.target.value)}
-                              className="h-[43px] w-full rounded-lg border border-border bg-background px-3 pr-12 text-sm text-foreground outline-none transition focus:border-auth-action focus:ring-1 focus:ring-auth-action"
+                              className="h-11 w-full rounded-xl border border-border bg-background px-3 pr-12 text-sm text-foreground outline-none transition focus:border-auth-action focus:ring-1 focus:ring-auth-action"
                             />
                             <Button type="button" variant="ghost" size="icon" onClick={() => setShowPassword((v) => !v)} aria-label={showPassword ? "Hide password" : "Show password"} className="absolute right-1 top-1/2 -translate-y-1/2 text-muted-foreground hover:bg-transparent hover:text-foreground">
                               {showPassword ? <EyeOff className="h-[18px] w-[18px]" /> : <Eye className="h-[18px] w-[18px]" />}
@@ -1318,7 +1318,7 @@ function AuthPage() {
                         <Button
                           type="submit"
                           disabled={loading}
-                          className="group h-[43px] w-full rounded-lg bg-auth-action px-5 text-sm font-semibold text-auth-action-foreground shadow-none transition hover:bg-auth-action/90"
+                          className="group h-[43px] w-full rounded-full bg-auth-action px-5 text-sm font-semibold text-auth-action-foreground shadow-none transition hover:bg-auth-action/90"
                         >
                           {loading
                             ? btnLoading("Signing in...")
