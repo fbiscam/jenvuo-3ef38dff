@@ -386,60 +386,71 @@ const BUILD_ITEMS: Array<{ key: string; title: string; points: BuildPart[][] }> 
   },
 ];
 
+const BUILD_ICONS: Record<string, LucideIcon[]> = {
+  terminal: [LineChart, Crosshair, Waves],
+  ai: [Sparkles, Bot, FileText],
+  volume: [BarChart3, Waves, LineChart],
+  "jx-bot": [Bot, Bell, Wallet],
+  developers: [KeyRound, Chrome, Cpu],
+};
+
 export function CloudBuildWith() {
   const [open, setOpen] = React.useState<string[]>([BUILD_ITEMS[0].key]);
   const toggle = (key: string) =>
     setOpen((cur) => (cur.includes(key) ? cur.filter((k) => k !== key) : [...cur, key]));
+  const lastOpen = open[open.length - 1] ?? BUILD_ITEMS[0].key;
+  const tileIndex = Math.max(0, BUILD_ITEMS.findIndex((b) => b.key === lastOpen));
   return (
     <section className="jenvu-build-zoom bg-background">
       <div className="mx-auto grid max-w-[1296px] items-start gap-10 px-5 pb-20 pt-8 sm:px-8 md:grid-cols-2 md:gap-20 md:pb-24">
         <div className="md:sticky md:top-24">
-          <h2 className="text-[22px] font-normal leading-[1.3] text-gc-ink min-[400px]:text-[24px] sm:text-[36px] sm:leading-[1.25]">
-            <span className="whitespace-nowrap">Build with the Fiber platform</span>
-            <br />
-            <span className="whitespace-nowrap text-gc-blue-deep">designed for traders and AI</span>
+          <h2 className="text-[26px] font-medium leading-[1.2] tracking-tight text-gc-ink sm:text-[38px] sm:leading-[1.15]">
+            Build with the Fiber platform designed for traders and AI
           </h2>
-          <p className="mt-4 max-w-[540px] text-[14px] leading-[1.55] text-gc-ink-muted sm:mt-5 sm:text-[16px] sm:leading-[1.6]">
+          <p className="mt-4 max-w-[540px] text-[15px] leading-relaxed text-gc-ink sm:mt-5 sm:text-[16px]">
             Try Jenvu with JX Bot on MetaTrader 5 and the top AI models, plus new sign-ups get $100 free credits and 14 days of Pro access free.
           </p>
-          <div className="mt-7 flex flex-wrap items-center gap-7">
-            <Link
-              to="/auth"
-              search={{ mode: "signup" } as never}
-              className="inline-flex h-12 items-center justify-center rounded-full bg-gc-blue px-6 text-[15px] font-medium text-gc-on-blue transition hover:bg-gc-blue-hover"
-            >
+          <div className="mt-7 flex flex-wrap items-center gap-3">
+            <Link to="/auth" search={{ mode: "signup" } as never} className={pillDark}>
               Get started for free
             </Link>
-            <Link to="/pricing" className="text-[15px] font-medium text-gc-blue-deep hover:underline">
-              See all plans and tools
+            <Link to="/pricing" className={pillLight}>
+              See all plans <ArrowUpRight className="h-4 w-4" />
             </Link>
           </div>
+          <AuroraTile
+            n={tileIndex}
+            icons={BUILD_ICONS[BUILD_ITEMS[tileIndex].key]}
+            className="mt-10 hidden aspect-[16/10] w-full max-w-[540px] md:flex"
+          />
         </div>
         <div>
           {BUILD_ITEMS.map((b) => {
             const isOpen = open.includes(b.key);
             return (
-              <div key={b.key} className="border-b-2 border-gc-line">
+              <div key={b.key} className="border-b border-gc-line">
                 <button
                   type="button"
                   aria-expanded={isOpen}
                   onClick={() => toggle(b.key)}
-                  className={`flex w-full items-center justify-between gap-4 py-6 text-left ${isOpen ? "border-b-2 border-gc-line" : ""}`}
+                  className="flex w-full items-center justify-between gap-4 py-6 text-left"
                 >
-                  <span className="text-[19px] text-gc-blue-deep">{b.title}</span>
-                  <ChevronDown className={`h-6 w-6 shrink-0 text-gc-blue-deep transition ${isOpen ? "rotate-180" : ""}`} />
+                  <span className="text-[18px] font-medium text-gc-ink sm:text-[20px]">{b.title}</span>
+                  <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gc-surface ring-1 ring-gc-line/60 transition ${isOpen ? "rotate-180" : ""}`}>
+                    <ChevronDown className="h-5 w-5 text-gc-ink" />
+                  </span>
                 </button>
                 {isOpen && (
-                  <ul className="space-y-6 py-8">
+                  <ul className="space-y-4 pb-8">
                     {b.points.map((parts, i) => (
-                      <li key={i} className="flex items-start gap-4 text-[16px] leading-[1.75] text-gc-ink-muted">
-                        <Check className="mt-1.5 h-5 w-5 shrink-0 text-gc-green" strokeWidth={2.25} />
+                      <li key={i} className="flex items-start gap-3 text-[15px] leading-[1.7] text-gc-ink sm:text-[16px]">
+                        <Check className="mt-1 h-4 w-4 shrink-0 text-gc-ink" strokeWidth={2.25} />
                         <span>
                           {parts.map((p, j) =>
                             typeof p === "string" ? (
                               <React.Fragment key={j}>{p}</React.Fragment>
                             ) : (
-                              <Link key={j} to="/help" hash={p.hash} className="text-gc-blue-deep underline underline-offset-2 hover:text-gc-navy">
+                              <Link key={j} to="/help" hash={p.hash} className="font-medium underline underline-offset-2 hover:opacity-70">
                                 {p.link}
                               </Link>
                             ),
