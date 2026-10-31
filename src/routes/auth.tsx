@@ -819,20 +819,22 @@ function AuthPage() {
 
 
   return (
-    <div className={`min-h-dvh w-full bg-white text-zinc-900 ${SANS} antialiased selection:bg-zinc-900 selection:text-white lg:flex`}>
+    <div className={`min-h-dvh w-full bg-background text-foreground ${SANS} antialiased selection:bg-foreground selection:text-background`}>
 
       {/* LEFT — form column */}
-      <div className="flex min-h-dvh w-full flex-col lg:w-1/2 lg:items-end">
-        <div className="mx-auto w-full max-w-[384px] px-6 pt-8 sm:pt-12 lg:mx-0 lg:mr-16 lg:px-0 xl:mr-24">
+      <div className="flex min-h-dvh w-full flex-col">
+        <div className="flex w-full items-center justify-between px-6 pt-6 sm:px-8">
           <Link to="/" aria-label="Jenvu home" className="inline-flex items-center gap-2.5">
             <JenvuMark className="h-7 w-7 text-foreground" />
-            <span className="text-[15px] text-gc-ink-muted">Try Jenvu for free</span>
+            <span className="text-[18px] font-medium tracking-tight text-foreground">Jenvu</span>
           </Link>
+          <Link to="/" className="rounded-full border border-border px-4 py-1.5 text-[13px] text-foreground hover:bg-muted">Back to home</Link>
         </div>
 
-        <div className="flex w-full flex-1 items-start justify-center px-6 pb-16 pt-10 lg:justify-end lg:px-0 lg:pt-12">
-          <div className="w-full max-w-[384px] lg:mr-16 xl:mr-24">
-            <h1 className="text-left text-[26px] font-semibold tracking-tight text-zinc-900">
+        <div className="flex w-full flex-1 items-start justify-center px-6 pb-16 pt-12 sm:pt-20">
+          <div className="auth-console-card w-full max-w-[400px]">
+            <JenvuMark className="mx-auto mb-6 h-10 w-10 text-foreground" />
+            <h1 className="text-center text-[28px] font-medium tracking-tight text-foreground">
               {mfaChallenge
                 ? "Two-factor authentication"
                 : mode === "forgot"
@@ -864,13 +866,13 @@ function AuthPage() {
 
                   {mfaChallenge ? (
                     <form onSubmit={verifyMfa} className="mt-4 space-y-3">
-                      <div className={`rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-[13px] text-zinc-700 ${MONO}`}>
+                      <div className={`rounded-xl border border-border bg-muted px-4 py-3 text-[13px] text-muted-foreground ${MONO}`}>
                         <p className="leading-relaxed">
                           Two-factor authentication is enabled. Enter the 6-digit code from your authenticator app to continue.
                         </p>
                       </div>
                       <div>
-                        <label className="mb-2 block text-[14px] font-medium text-zinc-900">
+                        <label className="mb-2 block text-[14px] font-medium text-foreground">
                           Authenticator Code
                         </label>
                         <input
@@ -884,7 +886,7 @@ function AuthPage() {
                           aria-invalid={mfaError ? true : undefined}
                           value={mfaCode}
                           onChange={(e) => { setMfaError(null); setMfaCode(e.target.value.replace(/\D/g, "").slice(0, 6)); }}
-                          className={`w-full rounded-xl border bg-white px-4 py-3 text-center text-2xl tracking-[0.6em] outline-none transition placeholder:text-zinc-300 ${MONO} ${mfaError ? "border-red-400 text-red-600 focus:border-red-500" : "border-zinc-200 text-zinc-900 focus:border-zinc-900"} ${mfaShake ? "animate-otp-shake" : ""}`}
+                          className={`w-full rounded-xl border bg-background px-4 py-3 text-center text-2xl tracking-[0.6em] outline-none transition placeholder:text-zinc-300 ${MONO} ${mfaError ? "border-red-400 text-red-600 focus:border-red-500" : "border-border text-foreground focus:border-foreground"} ${mfaShake ? "animate-otp-shake" : ""}`}
                           placeholder="••••••"
                         />
                         {mfaError && (
@@ -895,13 +897,13 @@ function AuthPage() {
 
                       </div>
 
-                      <label className={`flex items-center gap-2 text-xs text-zinc-600 select-none cursor-pointer ${MONO}`}>
+                      <label className={`flex items-center gap-2 text-xs text-muted-foreground select-none cursor-pointer ${MONO}`}>
                         <input
                           type="checkbox"
                           checked={rememberDevice}
                           onChange={(e) => setRememberDevice(e.target.checked)}
                           disabled={loading}
-                          className="h-3.5 w-3.5 rounded border-zinc-300 text-zinc-900 focus:ring-zinc-900"
+                          className="h-3.5 w-3.5 rounded border-border text-foreground focus:ring-zinc-900"
                         />
                         <span>Remember this device for 30 days</span>
                       </label>
@@ -910,7 +912,7 @@ function AuthPage() {
                       <button
                         type="submit"
                         disabled={loading || mfaCode.length !== 6}
-                        className="group w-full rounded-lg bg-gc-blue px-5 py-3 text-sm font-medium text-gc-on-blue hover:bg-gc-blue-hover transition inline-flex items-center justify-center gap-2 disabled:opacity-60"
+                        className="group w-full rounded-full bg-foreground px-5 py-3 text-sm font-medium text-background hover:opacity-90 transition inline-flex items-center justify-center gap-2 disabled:opacity-60"
                       >
                         {loading ? btnLoading("Verifying...") : (<>Verify <ArrowRight className={`w-4 h-4 group-hover:translate-x-0.5 transition ${MONO}`} /></>)}
                       </button>
@@ -920,7 +922,7 @@ function AuthPage() {
                           type="button"
                           onClick={cancelMfa}
                           disabled={loading}
-                          className="text-xs text-zinc-500 hover:text-zinc-900 transition disabled:opacity-40"
+                          className="text-xs text-muted-foreground hover:text-foreground transition disabled:opacity-40"
                         >
                           ← Sign in with a different account
                         </button>
@@ -928,7 +930,7 @@ function AuthPage() {
                           type="button"
                           onClick={resendMfaChallenge}
                           disabled={loading || mfaResending || mfaResendCooldown > 0}
-                          className={`text-xs text-zinc-500 hover:text-zinc-900 transition disabled:opacity-40 ${MONO}`}
+                          className={`text-xs text-muted-foreground hover:text-foreground transition disabled:opacity-40 ${MONO}`}
                           aria-live="polite"
                         >
                           {mfaResending
@@ -942,14 +944,14 @@ function AuthPage() {
                   ) : mode === "signup" ? (
                     otpStep ? (
                       <form onSubmit={verifyOtp} className="mt-4 space-y-3">
-                        <div className="rounded-xl border border-zinc-200 bg-zinc-50 px-3 sm:px-4 py-3 text-[13px] sm:text-[14px] text-zinc-700" style={{ fontFamily: "'Google Sans Flex','Google Sans',sans-serif" }}>
+                        <div className="rounded-xl border border-border bg-muted px-3 sm:px-4 py-3 text-[13px] sm:text-[14px] text-muted-foreground" style={{ fontFamily: "'Google Sans Flex','Google Sans',sans-serif" }}>
                           <p className="leading-relaxed">
-                            <span className="sm:hidden">Code sent to <span className="font-semibold text-zinc-900 break-all">{email}</span>.<br />Enter it to continue.</span>
-                            <span className="hidden sm:inline">We sent a 6-digit code to <span className="font-semibold text-zinc-900">{email}</span>. Enter it below to activate your desk.</span>
+                            <span className="sm:hidden">Code sent to <span className="font-semibold text-foreground break-all">{email}</span>.<br />Enter it to continue.</span>
+                            <span className="hidden sm:inline">We sent a 6-digit code to <span className="font-semibold text-foreground">{email}</span>. Enter it below to activate your desk.</span>
                           </p>
                         </div>
                         <div>
-                          <label className="mb-2 block text-[14px] font-medium text-zinc-900">
+                          <label className="mb-2 block text-[14px] font-medium text-foreground">
                             Verification Code
                           </label>
                           <input
@@ -965,7 +967,7 @@ function AuthPage() {
                             aria-describedby={otpError ? "otp-error" : undefined}
                             value={otpCode}
                             onChange={(e) => { setOtpError(null); setOtpCode(e.target.value.replace(/\D/g, "").slice(0, 6)); }}
-                            className={`w-full rounded-xl border bg-white px-4 py-3 text-center text-2xl tracking-[0.6em] outline-none transition placeholder:text-zinc-300 ${MONO} ${otpError ? "border-red-400 text-red-600 focus:border-red-500" : "border-zinc-200 text-zinc-900 focus:border-zinc-900"} ${otpShake ? "animate-otp-shake" : ""}`}
+                            className={`w-full rounded-xl border bg-background px-4 py-3 text-center text-2xl tracking-[0.6em] outline-none transition placeholder:text-zinc-300 ${MONO} ${otpError ? "border-red-400 text-red-600 focus:border-red-500" : "border-border text-foreground focus:border-foreground"} ${otpShake ? "animate-otp-shake" : ""}`}
                             placeholder="••••••"
                           />
                           {otpError && (
@@ -979,17 +981,17 @@ function AuthPage() {
                         <button
                           type="submit"
                           disabled={loading}
-                          className="group w-full rounded-lg bg-gc-blue px-5 py-3 text-sm font-medium text-gc-on-blue hover:bg-gc-blue-hover transition inline-flex items-center justify-center gap-2 disabled:opacity-60"
+                          className="group w-full rounded-full bg-foreground px-5 py-3 text-sm font-medium text-background hover:opacity-90 transition inline-flex items-center justify-center gap-2 disabled:opacity-60"
                         >
                           {loading ? btnLoading("Verifying...") : (<>Verify & Continue <ArrowRight className={`w-4 h-4 group-hover:translate-x-0.5 transition ${MONO}`} /></>)}
                         </button>
 
-                        <div className="flex items-center justify-between pt-2 text-xs text-zinc-500">
+                        <div className="flex items-center justify-between pt-2 text-xs text-muted-foreground">
                           <button
                             type="button"
                             onClick={() => { setOtpStep(false); setErrorMsg(null); setOtpError(null); }}
                             disabled={loading}
-                            className="hover:text-zinc-900 transition disabled:opacity-40 disabled:cursor-not-allowed"
+                            className="hover:text-foreground transition disabled:opacity-40 disabled:cursor-not-allowed"
                           >
                             ← Change email
                           </button>
@@ -997,7 +999,7 @@ function AuthPage() {
                             type="button"
                             onClick={resendCode}
                             disabled={loading || resending || resendCooldown > 0}
-                            className="font-medium text-zinc-900 underline-offset-2 hover:underline disabled:opacity-50 disabled:no-underline disabled:cursor-not-allowed inline-flex items-center gap-1.5"
+                            className="font-medium text-foreground underline-offset-2 hover:underline disabled:opacity-50 disabled:no-underline disabled:cursor-not-allowed inline-flex items-center gap-1.5"
                           >
                             {resending ? (
                               <>
@@ -1015,7 +1017,7 @@ function AuthPage() {
                     ) : (
                       <form onSubmit={signUp} className="mt-4 space-y-4">
                         <div>
-                          <label htmlFor="signup-name" className="mb-2 block text-[14px] font-medium text-zinc-900">
+                          <label htmlFor="signup-name" className="mb-2 block text-[14px] font-medium text-foreground">
                             Full name
                           </label>
                           <input
@@ -1025,11 +1027,11 @@ function AuthPage() {
                             autoComplete="name"
                             value={fullName}
                             onChange={(e) => setFullName(e.target.value)}
-                            className="h-[43px] w-full rounded-lg border border-zinc-200 bg-white px-3 text-sm text-zinc-900 outline-none transition focus:border-auth-action focus:ring-1 focus:ring-auth-action"
+                            className="h-[43px] w-full rounded-lg border border-border bg-background px-3 text-sm text-foreground outline-none transition focus:border-auth-action focus:ring-1 focus:ring-auth-action"
                           />
                         </div>
                         <div>
-                          <label htmlFor="signup-email" className="mb-2 block text-[14px] font-medium text-zinc-900">
+                          <label htmlFor="signup-email" className="mb-2 block text-[14px] font-medium text-foreground">
                             Email
                           </label>
                           <input
@@ -1039,12 +1041,12 @@ function AuthPage() {
                             autoComplete="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            className="h-[43px] w-full rounded-lg border border-zinc-200 bg-white px-3 text-sm text-zinc-900 outline-none transition focus:border-auth-action focus:ring-1 focus:ring-auth-action"
+                            className="h-[43px] w-full rounded-lg border border-border bg-background px-3 text-sm text-foreground outline-none transition focus:border-auth-action focus:ring-1 focus:ring-auth-action"
                           />
                           {flashInline("email")}
                         </div>
                         <div>
-                          <label htmlFor="signup-password" className="mb-2 block text-[14px] font-medium text-zinc-900">
+                          <label htmlFor="signup-password" className="mb-2 block text-[14px] font-medium text-foreground">
                             Password
                           </label>
                           <div className="relative">
@@ -1055,18 +1057,18 @@ function AuthPage() {
                               autoComplete="new-password"
                               value={password}
                               onChange={(e) => setPassword(e.target.value)}
-                              className="h-[43px] w-full rounded-lg border border-zinc-200 bg-white px-3 pr-12 text-sm text-zinc-900 outline-none transition focus:border-auth-action focus:ring-1 focus:ring-auth-action"
+                              className="h-[43px] w-full rounded-lg border border-border bg-background px-3 pr-12 text-sm text-foreground outline-none transition focus:border-auth-action focus:ring-1 focus:ring-auth-action"
                             />
-                            <Button type="button" variant="ghost" size="icon" onClick={() => setShowPassword((v) => !v)} aria-label={showPassword ? "Hide password" : "Show password"} className="absolute right-1 top-1/2 -translate-y-1/2 text-zinc-700 hover:bg-transparent hover:text-zinc-900">
+                            <Button type="button" variant="ghost" size="icon" onClick={() => setShowPassword((v) => !v)} aria-label={showPassword ? "Hide password" : "Show password"} className="absolute right-1 top-1/2 -translate-y-1/2 text-muted-foreground hover:bg-transparent hover:text-foreground">
                               {showPassword ? <EyeOff className="h-[18px] w-[18px]" /> : <Eye className="h-[18px] w-[18px]" />}
                             </Button>
                           </div>
                           {flashInline("password")}
                         </div>
 
-                        <p className="text-[12px] leading-snug text-zinc-500">
+                        <p className="text-[12px] leading-snug text-muted-foreground">
                           Founding Program: Get 3 Months Access with $250 Credits.{" "}
-                          <Link to="/founding" className="font-medium text-gc-blue-deep underline underline-offset-2">
+                          <Link to="/founding" className="font-medium text-foreground underline underline-offset-2">
                             Apply now
                           </Link>
                         </p>
@@ -1091,23 +1093,23 @@ function AuthPage() {
                   ) : mode === "forgot" ? (
                     forgotStep === "email" ? (
                       <form onSubmit={sendResetLink} className="mt-4 space-y-3">
-                        <div className={`rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-[13px] text-zinc-700 ${MONO}`}>
+                        <div className={`rounded-xl border border-border bg-muted px-4 py-3 text-[13px] text-muted-foreground ${MONO}`}>
                           <p className="leading-relaxed">
                             &nbsp; &nbsp; We'll send a 6-digit reset code.
                           </p>
                         </div>
                         <div>
-                          <label className="mb-2 block text-[14px] font-medium text-zinc-900">
+                          <label className="mb-2 block text-[14px] font-medium text-foreground">
                             Email
                           </label>
                           <div className="relative">
-                            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
+                            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                             <input
                               type="email"
                               required
                               value={email}
                               onChange={(e) => setEmail(e.target.value)}
-                              className="w-full rounded-xl border border-zinc-200 bg-white pl-11 pr-4 py-2.5 text-sm text-zinc-900 outline-none focus:border-zinc-900 transition placeholder:text-zinc-300"
+                              className="w-full rounded-xl border border-border bg-background pl-11 pr-4 py-2.5 text-sm text-foreground outline-none focus:border-foreground transition placeholder:text-zinc-300"
                               placeholder="Institutional email..."
                             />
                           </div>
@@ -1124,7 +1126,7 @@ function AuthPage() {
                         <button
                           type="submit"
                           disabled={loading}
-                          className="group w-full rounded-lg bg-gc-blue px-5 py-3 text-sm font-medium text-gc-on-blue hover:bg-gc-blue-hover transition inline-flex items-center justify-center gap-2 disabled:opacity-60"
+                          className="group w-full rounded-full bg-foreground px-5 py-3 text-sm font-medium text-background hover:opacity-90 transition inline-flex items-center justify-center gap-2 disabled:opacity-60"
                         >
                           {loading ? btnLoading("Sending...") : (<>Send Reset <ArrowRight className={`w-4 h-4 group-hover:translate-x-0.5 transition ${MONO}`} /></>)}
                         </button>
@@ -1133,7 +1135,7 @@ function AuthPage() {
                           <button
                             type="button"
                             onClick={() => { setMode("signin"); setErrorMsg(null); }}
-                            className="text-xs text-zinc-500 hover:text-zinc-900 transition"
+                            className="text-xs text-muted-foreground hover:text-foreground transition"
                           >
                             ← Back to Sign in
                           </button>
@@ -1141,13 +1143,13 @@ function AuthPage() {
                       </form>
                     ) : forgotStep === "code" ? (
                       <form onSubmit={verifyRecoveryOtp} className="mt-4 space-y-3">
-                        <div className={`rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-[13px] text-zinc-700 ${MONO}`}>
+                        <div className={`rounded-xl border border-border bg-muted px-4 py-3 text-[13px] text-muted-foreground ${MONO}`}>
                           <p className="leading-relaxed">
-                            Check <span className="font-semibold text-zinc-900">{email}</span>. Enter the 6-digit code below.
+                            Check <span className="font-semibold text-foreground">{email}</span>. Enter the 6-digit code below.
                           </p>
                         </div>
                         <div>
-                          <label className="mb-2 block text-[14px] font-medium text-zinc-900">
+                          <label className="mb-2 block text-[14px] font-medium text-foreground">
                             Verification Code
                           </label>
                           <input
@@ -1163,7 +1165,7 @@ function AuthPage() {
                             aria-describedby={otpError ? "otp-error-recovery" : undefined}
                             value={otpCode}
                             onChange={(e) => { setOtpError(null); setOtpCode(e.target.value.replace(/\D/g, "").slice(0, 6)); }}
-                            className={`w-full rounded-xl border bg-white px-4 py-3 text-center text-2xl tracking-[0.6em] outline-none transition placeholder:text-zinc-300 ${MONO} ${otpError ? "border-red-400 text-red-600 focus:border-red-500" : "border-zinc-200 text-zinc-900 focus:border-zinc-900"} ${otpShake ? "animate-otp-shake" : ""}`}
+                            className={`w-full rounded-xl border bg-background px-4 py-3 text-center text-2xl tracking-[0.6em] outline-none transition placeholder:text-zinc-300 ${MONO} ${otpError ? "border-red-400 text-red-600 focus:border-red-500" : "border-border text-foreground focus:border-foreground"} ${otpShake ? "animate-otp-shake" : ""}`}
                             placeholder="••••••"
                           />
                           {otpError && (
@@ -1177,17 +1179,17 @@ function AuthPage() {
                         <button
                           type="submit"
                           disabled={loading}
-                          className="group w-full rounded-lg bg-gc-blue px-5 py-3 text-sm font-medium text-gc-on-blue hover:bg-gc-blue-hover transition inline-flex items-center justify-center gap-2 disabled:opacity-60"
+                          className="group w-full rounded-full bg-foreground px-5 py-3 text-sm font-medium text-background hover:opacity-90 transition inline-flex items-center justify-center gap-2 disabled:opacity-60"
                         >
                           {loading ? btnLoading("Verifying...") : (<>Verify Code <ArrowRight className={`w-4 h-4 group-hover:translate-x-0.5 transition ${MONO}`} /></>)}
                         </button>
 
-                        <div className="flex items-center justify-between pt-2 text-xs text-zinc-500">
+                        <div className="flex items-center justify-between pt-2 text-xs text-muted-foreground">
                           <button
                             type="button"
                             onClick={() => { setForgotStep("email"); setErrorMsg(null); setOtpError(null); }}
                             disabled={loading}
-                            className="hover:text-zinc-900 transition disabled:opacity-40 disabled:cursor-not-allowed"
+                            className="hover:text-foreground transition disabled:opacity-40 disabled:cursor-not-allowed"
                           >
                             ← Change email
                           </button>
@@ -1195,7 +1197,7 @@ function AuthPage() {
                             type="button"
                             onClick={resendResetCode}
                             disabled={loading || resending || resendCooldown > 0}
-                            className="font-medium text-zinc-900 underline-offset-2 hover:underline disabled:opacity-50 disabled:no-underline disabled:cursor-not-allowed inline-flex items-center gap-1.5"
+                            className="font-medium text-foreground underline-offset-2 hover:underline disabled:opacity-50 disabled:no-underline disabled:cursor-not-allowed inline-flex items-center gap-1.5"
                           >
                             {resending ? (
                               <>
@@ -1218,20 +1220,20 @@ function AuthPage() {
                           </p>
                         </div>
                         <div>
-                          <label className="mb-2 block text-[14px] font-medium text-zinc-900">
+                          <label className="mb-2 block text-[14px] font-medium text-foreground">
                             New Password
                           </label>
                           <div className="relative">
-                            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
+                            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                             <input
                               type={showNewPassword ? "text" : "password"}
                               required
                               value={newPassword}
                               onChange={(e) => setNewPassword(e.target.value)}
-                              className="w-full rounded-xl border border-zinc-200 bg-white pl-11 pr-11 py-2.5 text-sm text-zinc-900 outline-none focus:border-zinc-900 transition placeholder:text-zinc-300"
+                              className="w-full rounded-xl border border-border bg-background pl-11 pr-11 py-2.5 text-sm text-foreground outline-none focus:border-foreground transition placeholder:text-zinc-300"
                               placeholder="Min 8 characters..."
                             />
-                            <button type="button" onClick={() => setShowNewPassword((v) => !v)} aria-label={showNewPassword ? "Hide password" : "Show password"} className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-700">
+                            <button type="button" onClick={() => setShowNewPassword((v) => !v)} aria-label={showNewPassword ? "Hide password" : "Show password"} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-muted-foreground">
                               {showNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                             </button>
                           </div>
@@ -1249,7 +1251,7 @@ function AuthPage() {
                         <button
                           type="submit"
                           disabled={loading}
-                          className="group w-full rounded-lg bg-gc-blue px-5 py-3 text-sm font-medium text-gc-on-blue hover:bg-gc-blue-hover transition inline-flex items-center justify-center gap-2 disabled:opacity-60"
+                          className="group w-full rounded-full bg-foreground px-5 py-3 text-sm font-medium text-background hover:opacity-90 transition inline-flex items-center justify-center gap-2 disabled:opacity-60"
                         >
                           {loading ? btnLoading("Updating...") : (<>Update Password <ArrowRight className={`w-4 h-4 group-hover:translate-x-0.5 transition ${MONO}`} /></>)}
                         </button>
@@ -1259,7 +1261,7 @@ function AuthPage() {
                     <>
                       <form onSubmit={signIn} className="mt-4 space-y-4">
                         <div>
-                          <label htmlFor="signin-email" className="mb-2 block text-[14px] font-medium text-zinc-900">
+                          <label htmlFor="signin-email" className="mb-2 block text-[14px] font-medium text-foreground">
                             Email
                           </label>
                           <input
@@ -1269,13 +1271,13 @@ function AuthPage() {
                             autoComplete="username"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            className="h-[43px] w-full rounded-lg border border-zinc-200 bg-white px-3 text-sm text-zinc-900 outline-none transition focus:border-auth-action focus:ring-1 focus:ring-auth-action"
+                            className="h-[43px] w-full rounded-lg border border-border bg-background px-3 text-sm text-foreground outline-none transition focus:border-auth-action focus:ring-1 focus:ring-auth-action"
                           />
                           {flashInline("email")}
                         </div>
 
                         <div>
-                          <label htmlFor="signin-password" className="mb-2 block text-[14px] font-medium text-zinc-900">
+                          <label htmlFor="signin-password" className="mb-2 block text-[14px] font-medium text-foreground">
                             Password
                           </label>
                           <div className="relative">
@@ -1286,21 +1288,21 @@ function AuthPage() {
                               autoComplete="current-password"
                               value={password}
                               onChange={(e) => setPassword(e.target.value)}
-                              className="h-[43px] w-full rounded-lg border border-zinc-200 bg-white px-3 pr-12 text-sm text-zinc-900 outline-none transition focus:border-auth-action focus:ring-1 focus:ring-auth-action"
+                              className="h-[43px] w-full rounded-lg border border-border bg-background px-3 pr-12 text-sm text-foreground outline-none transition focus:border-auth-action focus:ring-1 focus:ring-auth-action"
                             />
-                            <Button type="button" variant="ghost" size="icon" onClick={() => setShowPassword((v) => !v)} aria-label={showPassword ? "Hide password" : "Show password"} className="absolute right-1 top-1/2 -translate-y-1/2 text-zinc-700 hover:bg-transparent hover:text-zinc-900">
+                            <Button type="button" variant="ghost" size="icon" onClick={() => setShowPassword((v) => !v)} aria-label={showPassword ? "Hide password" : "Show password"} className="absolute right-1 top-1/2 -translate-y-1/2 text-muted-foreground hover:bg-transparent hover:text-foreground">
                               {showPassword ? <EyeOff className="h-[18px] w-[18px]" /> : <Eye className="h-[18px] w-[18px]" />}
                             </Button>
                           </div>
                           {flashInline("password")}
                         </div>
 
-                        <label className="flex cursor-pointer select-none items-center gap-2 pt-3 text-[14px] text-zinc-900">
+                        <label className="flex cursor-pointer select-none items-center gap-2 pt-3 text-[14px] text-foreground">
                           <input
                             type="checkbox"
                             checked={rememberLogin}
                             onChange={(event) => setRememberLogin(event.target.checked)}
-                            className="h-[18px] w-[18px] rounded border-zinc-300 accent-zinc-900"
+                            className="h-[18px] w-[18px] rounded border-border accent-zinc-900"
                           />
                           <span>Save email and login method on this device</span>
                         </label>
@@ -1328,20 +1330,20 @@ function AuthPage() {
                   )}
 
                   {mode === "signin" && !mfaChallenge && (
-                    <div className="mt-6 space-y-1.5 text-center text-[13px] text-zinc-500">
+                    <div className="mt-6 space-y-1.5 text-center text-[13px] text-muted-foreground">
                       <p>
                         New here?{" "}
                         <button
                           type="button"
                           onClick={() => { setMode("signup"); setErrorMsg(null); setOtpStep(false); }}
-                          className="font-medium text-zinc-900 underline underline-offset-2"
+                          className="font-medium text-foreground underline underline-offset-2"
                         >
                           Create an account
                         </button>
                       </p>
                       <p>
                         Founding member?{" "}
-                        <Link to="/founding" className="font-medium text-gc-blue-deep underline underline-offset-2">
+                        <Link to="/founding" className="font-medium text-foreground underline underline-offset-2">
                           Get 3 Months Access with $250 Credits →
                         </Link>
                       </p>
@@ -1350,7 +1352,7 @@ function AuthPage() {
                         <button
                           type="button"
                           onClick={() => { setMode("forgot"); setForgotStep("email"); setErrorMsg(null); setOtpCode(""); }}
-                          className="font-medium text-zinc-900 underline underline-offset-2"
+                          className="font-medium text-foreground underline underline-offset-2"
                         >
                           Reset it
                         </button>
@@ -1359,19 +1361,19 @@ function AuthPage() {
                   )}
 
                   {mode === "signup" && !otpStep && !mfaChallenge && (
-                    <p className="mt-6 text-center text-[13px] text-zinc-500">
+                    <p className="mt-6 text-center text-[13px] text-muted-foreground">
                       Already have an account?{" "}
                       <button
                         type="button"
                         onClick={() => { setMode("signin"); setErrorMsg(null); }}
-                        className="font-medium text-zinc-900 underline underline-offset-2"
+                        className="font-medium text-foreground underline underline-offset-2"
                       >
                         Sign in
                       </button>
                     </p>
                   )}
 
-                  <p className="mt-8 text-center text-[12px] leading-relaxed text-zinc-400">
+                  <p className="mt-8 text-center text-[12px] leading-relaxed text-muted-foreground">
                     By continuing, I agree to Jenvu's{" "}
                     <Link to="/terms" className="underline underline-offset-2">terms</Link> and{" "}
                     <Link to="/privacy" className="underline underline-offset-2">privacy policy</Link>.
@@ -1380,46 +1382,6 @@ function AuthPage() {
               </div>
             </div>
 
-            {/* RIGHT — Google Cloud-style info panel */}
-            <div className="relative hidden min-h-dvh w-1/2 overflow-hidden bg-background lg:flex lg:flex-col">
-              <svg className="pointer-events-none absolute right-0 top-0 h-full w-[38%]" viewBox="0 0 300 800" fill="none" aria-hidden>
-                <line x1="20" y1="0" x2="200" y2="320" className="stroke-gc-ink-muted" strokeWidth="1" strokeDasharray="1 4" />
-                <circle cx="90" cy="70" r="2.5" className="fill-gc-line" />
-                <circle cx="88" cy="195" r="5" className="fill-gc-yellow" />
-                <path d="M130 430 L175 505 L130 580 L85 505 Z" className="stroke-gc-ink-muted" strokeWidth="1" strokeDasharray="1 4" />
-                <circle cx="105" cy="545" r="8" className="fill-gc-red" />
-                <path d="M40 760 l20 -16 M50 770 l20 -16 M60 780 l20 -16" className="stroke-gc-ink-muted" strokeWidth="1" strokeDasharray="1 3" />
-              </svg>
-              <div className="relative z-10 flex flex-1 flex-col pl-16 pt-[120px] xl:pl-24 sm:pt-[136px]">
-                <div className="max-w-[340px] space-y-7">
-                  <div>
-                    <h2 className="text-[20px] font-normal text-gc-ink">Access to Jenvu tools</h2>
-                    <p className="mt-2 text-[14px] leading-[1.55] text-gc-ink-muted">
-                      Get everything you need to read Fiber: the Terminal, AI desk, sweeps, zones, FVGs and alerts
-                    </p>
-                  </div>
-                  <div>
-                    <h2 className="text-[20px] font-normal text-gc-ink">$100 in free credit</h2>
-                    <p className="mt-2 text-[14px] leading-[1.55] text-gc-ink-muted">
-                      Try Jenvu with $100 in credit to spend on top-tier AI models & pro access to use other features
-                    </p>
-                  </div>
-                  <div>
-                    <h2 className="text-[20px] font-normal text-gc-ink">14 days of Pro access</h2>
-                    <p className="mt-2 text-[14px] leading-[1.55] text-gc-ink-muted">
-                      Start 14 days of Pro free from your dashboard. Upgrade only if Jenvu is right for you
-                    </p>
-                  </div>
-                </div>
-                <svg className="mt-16 h-[230px] w-[220px]" viewBox="0 0 220 230" fill="none" aria-hidden>
-                  <circle cx="58" cy="12" r="7" className="fill-gc-blue" />
-                  <path d="M46 46 H136 L182 124 H92 Z" className="stroke-gc-ink" strokeWidth="1" />
-                  <path d="M0 124 H92 L136 202 H46 Z" className="stroke-gc-ink" strokeWidth="1" />
-                  <line x1="92" y1="124" x2="136" y2="46" className="stroke-gc-ink-muted" strokeWidth="1" strokeDasharray="1 3" />
-                  <ellipse cx="156" cy="89" rx="14" ry="15" className="fill-gc-green" />
-                </svg>
-              </div>
-            </div>
     </div>
   );
 }
