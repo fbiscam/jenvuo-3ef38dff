@@ -2105,3 +2105,17 @@ html body .jenvu-zoom-dashboard main :is(.console-icon-chip, .console-card > svg
   .jx-eye, .jx-float, .jx-in, .jx-bar, .jx-hop, .jx-pulse-text { animation: none; }
   .jx-undrawn path, .jx-draw path { stroke-dashoffset: 0; animation: none; }
 }
+
+/* Settings pages (General, Personal, Security, Billing, Payments, Documents): 5% bigger on desktop. */
+@media (min-width: 1024px) {
+  .jenvu-zoom-dashboard main.dash-page.settings-page { zoom: 0.7 !important; }
+}
+
+/* Settings pages, black theme: main text is pure white; secondary lines are light grey. */
+html body .dash-dark main.settings-page,
+html body .dash-dark main.settings-page :is(h1, h2, h3, h4, label, dt, dd, th, td, p, span, a, button, li):not(:is(.bg-white, [class*="bg-white"], .text-destructive, .text-red-600, .text-gc-success, .text-emerald-700, [class*="text-red"], [class*="text-emerald"], [class*="text-green"], [class*="text-orange"]), :is(.bg-white, [class*="bg-white"]) *) {
+  color: #ffffff !important;
+}
+html body .dash-dark main.settings-page :is(.text-gc-ink-muted, .text-muted-foreground, .text-zinc-500, .text-zinc-600, .text-zinc-400):not(:is(.bg-white, [class*="bg-white"]) *) {
+  color: #d4d4d8 !important;
+}
