@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import SiteHeader from "@/components/SiteHeader";
 import BlogFooter from "@/components/BlogFooter";
+import { GetStartedSection } from "@/components/platform/GetStartedSection";
 import { AllInOnePlatformSection } from "@/components/platform/AllInOnePlatformSection";
 import { useAuthUser } from "@/hooks/useAuthUser";
 import openaiLogo from "@/assets/platform-logos/openai.svg";
@@ -64,7 +65,7 @@ const SIGN_IN = "https://auth.jenvu.com/sign-in";
 const pillDark =
   "inline-flex items-center gap-1.5 rounded-full bg-gc-blue px-5 py-2.5 text-sm font-medium text-gc-on-blue transition-colors hover:bg-gc-blue-hover";
 const pillLight =
-  "inline-flex items-center gap-1.5 rounded-full border border-gc-line bg-background px-5 py-2.5 text-sm font-medium text-gc-blue transition-colors hover:bg-gc-blue-soft";
+  "inline-flex items-center gap-1.5 rounded-full border border-gc-line bg-background px-5 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-muted";
 
 function ContactSales({ className = pillDark }: { className?: string }) {
   return (
@@ -600,51 +601,6 @@ function Enterprise() {
   );
 }
 
-/* ---------- 8. Get started ---------- */
-
-function GetStarted() {
-  return (
-    <section className="bg-background py-20 text-center">
-      <div className="mx-auto max-w-6xl px-5">
-        <h2 className="text-4xl font-medium tracking-tight sm:text-5xl">Get started</h2>
-        <div className="mt-10 grid gap-6 text-left md:grid-cols-2">
-          <div className="flex flex-col rounded-md border border-gc-line bg-background p-7 sm:p-8">
-            <h3 className="text-2xl font-medium">Partner with us on your AI plans</h3>
-            <div className="flex-1">
-              <Ticks
-                items={[
-                  "Talk to our team about your product",
-                  "Get hands-on setup guidance",
-                  "Discuss volume and custom needs",
-                ]}
-              />
-            </div>
-            <div className="mt-8">
-              <ContactSales className={pillDark} />
-            </div>
-          </div>
-          <div className="flex flex-col rounded-md border border-gc-line bg-background p-7 sm:p-8">
-            <h3 className="text-2xl font-medium">Build on your own</h3>
-            <div className="flex-1">
-              <Ticks
-                items={[
-                  "Access leading models through one API",
-                  "Simple pay-as-you-go pricing",
-                  "Works with the OpenAI SDK",
-                  "Build with our API docs and examples",
-                ]}
-              />
-            </div>
-            <div className="mt-8">
-              <StartBuilding className={pillLight} />
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
 function PlatformPage() {
   return (
     <div className="min-h-screen bg-background font-sans text-gc-ink">
@@ -657,7 +613,7 @@ function PlatformPage() {
         <ExperiencesSection />
         <UseCases />
         <Enterprise />
-        <GetStarted />
+        <GetStartedSection />
       </main>
       <BlogFooter />
     </div>

@@ -7,7 +7,7 @@ import { useAuthUser } from "@/hooks/useAuthUser";
 
 const SIGN_IN = "https://auth.jenvu.com/sign-in";
 const pillLight =
-  "inline-flex items-center gap-1.5 rounded-full border border-gc-line bg-background px-5 py-2.5 text-sm font-medium text-gc-blue transition-colors hover:bg-gc-blue-soft";
+  "inline-flex items-center gap-1.5 rounded-full border border-gc-line bg-background px-5 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-muted";
 
 function StartBuilding({ className = pillLight }: { className?: string }) {
   const { user } = useAuthUser();
@@ -55,7 +55,7 @@ export function AllInOnePlatformSection() {
   return (
     <section className="mx-auto max-w-6xl px-5 py-20 text-center">
       <h2 className="text-4xl font-medium tracking-tight sm:text-5xl">The all-in-one platform for builders</h2>
-      <p className="mt-5 text-gc-ink">Build apps and assistants that use your context and tools to get work done.</p>
+      <p className="mt-5 text-[18px] text-gc-ink sm:text-[19px]">Build apps and assistants that use your context and tools to get work done.</p>
       <div className="mt-8 flex flex-wrap justify-center gap-3">
         <Link to="/docs" hash="ai-assistants" className={pillLight}>
           Learn more <ArrowUpRight className="h-3.5 w-3.5" />
@@ -87,7 +87,7 @@ export function AllInOnePlatformSection() {
             </div>
           </div>
           <h3 className="mt-5 text-xl font-medium">Build</h3>
-          <p className="mt-2 text-[15px] leading-relaxed">
+          <p className="mt-2 text-[16px] leading-relaxed">
             Create chat apps and workflows with the OpenAI-compatible Chat Completions API you already know.
           </p>
         </div>
@@ -107,7 +107,7 @@ export function AllInOnePlatformSection() {
             </div>
           </div>
           <h3 className="mt-5 text-xl font-medium">Ground</h3>
-          <p className="mt-2 text-[15px] leading-relaxed">
+          <p className="mt-2 text-[16px] leading-relaxed">
             Give models the right context: send text, documents and chart images with your prompt.
           </p>
         </div>
@@ -118,14 +118,14 @@ export function AllInOnePlatformSection() {
             style={{ backgroundImage: "var(--platform-aurora-3)" }}
           >
             <div className="grid grid-cols-2 gap-4">
-              <Tile><MessageSquare className="h-7 w-7 text-gc-blue" /></Tile>
+              <Tile><MessageSquare className="h-7 w-7" /></Tile>
               <Tile><Mail className="h-7 w-7 text-gc-red" /></Tile>
               <Tile><LineChart className="h-7 w-7 text-gc-green" /></Tile>
               <Tile><Plug className="h-7 w-7" /></Tile>
             </div>
           </div>
           <h3 className="mt-5 text-xl font-medium">Act</h3>
-          <p className="mt-2 text-[15px] leading-relaxed">
+          <p className="mt-2 text-[16px] leading-relaxed">
             Connect assistants to your Jenvu account through our MCP server so they work with your own data.
           </p>
         </div>
