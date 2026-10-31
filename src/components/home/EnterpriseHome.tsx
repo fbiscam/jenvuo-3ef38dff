@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, ArrowUp, ChevronRight, Pause, Play, Plus, ShieldCheck } from "lucide-react";
+import { ArrowRight, ArrowUp, Bell, Bot, ChevronRight, Code2, MessageCircle, Pause, Play, Plus, ShieldCheck, Sparkles } from "lucide-react";
 import { openAskJenvu } from "@/components/AskJenvuWidget";
 import poster from "@/assets/home/hero-ai-3.jpg";
 import vid from "@/assets/home/hero-ai-3.mp4.asset.json";
@@ -157,29 +157,52 @@ export function EntEveryDesk() {
   );
 }
 
-/* 5 — What you get (honest product facts, no invented customers) */
+/* 5 — "Who we're working with" layout, honest Jenvu product facts (no invented customers) */
+function Mark({ icon: Icon, name }: { icon: React.ComponentType<{ className?: string }>; name: string }) {
+  return (
+    <div className="flex items-center gap-2 text-[20px] font-semibold tracking-tight text-foreground">
+      <Icon className="h-6 w-6" />
+      <span>{name}</span>
+    </div>
+  );
+}
 export function EntFacts() {
-  const facts = [
-    ["7", "deterministic trading engines behind every analysis"],
-    ["14 days", "free Pro trial, started when you choose"],
-    ["$3", "per 1M tokens on the Jenvu API, in and out"],
-    ["24/5", "gold market coverage with live alerts"],
+  const facts: [React.ComponentType<{ className?: string }>, string, string, string][] = [
+    [Bell, "Jenvu Alerts", "24/5", "gold market coverage with live alerts"],
+    [Bot, "JX Bot", "2 pips", "maximum spread allowed before any entry"],
+    [Code2, "Jenvu API", "$3", "per 1M tokens, in and out"],
+    [Sparkles, "Free trial", "14 days", "of Pro, started whenever you choose"],
   ];
   return (
     <section className="px-5 py-24">
-      <h2 className={`${h2} text-center`}>What you get with Jenvu</h2>
+      <div className="text-center">
+        <h2 className={h2}>What you're working with</h2>
+        <p className={sub}>
+          Seven deterministic engines, frontier AI models and strict safeguards help traders build, automate, analyze, and review gold setups.
+        </p>
+      </div>
       <div className="mx-auto mt-14 grid max-w-6xl gap-5 lg:grid-cols-2">
-        <div className="flex flex-col justify-between rounded-[24px] bg-muted/60 p-9">
-          <p className="text-[24px] font-medium leading-snug tracking-tight text-foreground">
-            "Every setup is checked by fixed rules first, then explained by AI — so you see why, not just what."
-          </p>
-          <p className="mt-10 text-[14px] text-muted-foreground">Jenvu team · No guaranteed returns — trading carries risk.</p>
+        <div className="flex flex-col justify-between rounded-[24px] bg-muted/60 p-8 sm:p-10">
+          <div>
+            <Mark icon={MessageCircle} name="Ask Jenvu" />
+            <p className="mt-10 text-[22px] font-medium leading-snug tracking-tight text-foreground sm:text-[26px]">
+              “We combine market structure, liquidity zones, session timing, and the reasoning of AI to explain gold setups to traders. This was unthinkable before.”
+            </p>
+            <p className="mt-6 text-[14px] text-muted-foreground">—Jenvu team, on how Ask Jenvu works · No guaranteed returns</p>
+          </div>
+          <div className="mt-14">
+            <div className="text-[48px] font-medium leading-none tracking-tight text-foreground sm:text-[56px]">7</div>
+            <p className="mt-2 text-[15px] text-muted-foreground">deterministic trading engines</p>
+          </div>
         </div>
         <div className="grid gap-5 sm:grid-cols-2">
-          {facts.map(([n, t]) => (
-            <div key={n} className="rounded-[24px] bg-muted/60 p-8">
-              <div className="text-[44px] font-medium tracking-tight text-foreground">{n}</div>
-              <p className="mt-2 text-[15px] text-muted-foreground">{t}</p>
+          {facts.map(([Icon, name, n, t]) => (
+            <div key={name} className="flex min-h-[240px] flex-col justify-between rounded-[24px] bg-muted/60 p-8">
+              <Mark icon={Icon} name={name} />
+              <div className="mt-10">
+                <div className="text-[44px] font-medium leading-none tracking-tight text-foreground">{n}</div>
+                <p className="mt-2 text-[15px] text-muted-foreground">{t}</p>
+              </div>
             </div>
           ))}
         </div>
