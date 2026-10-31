@@ -297,7 +297,7 @@ function Billing() {
         )}
 
         <div className="mt-5">
-          <div className="flex justify-between border-b border-gc-line px-2 py-3 text-[12px] text-gc-ink-muted">
+          <div className="flex justify-between border-b border-gc-line py-3 text-[12px] text-gc-ink-muted">
             <span>Card</span>
             <span>Expiry</span>
           </div>
@@ -312,9 +312,9 @@ function Billing() {
           <table className="w-full min-w-[420px] text-left text-[14px]">
             <thead>
               <tr className="border-b border-gc-line text-[12px] text-gc-ink-muted">
-                <th className="px-2 py-3 font-normal">Grant</th>
-                <th className="px-2 py-3 font-normal">Date</th>
-                <th className="px-2 py-3 text-right font-normal">Amount</th>
+                <th className="px-2 py-3 first:pl-0 last:pr-0 font-normal">Grant</th>
+                <th className="px-2 py-3 first:pl-0 last:pr-0 font-normal">Date</th>
+                <th className="px-2 py-3 first:pl-0 last:pr-0 text-right font-normal">Amount</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gc-line">
@@ -324,16 +324,16 @@ function Billing() {
                 <>
                   {grants.map((g) => (
                     <tr key={g.id}>
-                      <td className="px-2 py-3 text-gc-ink">{g.reason.split("_").map((part) => part.charAt(0).toUpperCase() + part.slice(1)).join(" ")}</td>
-                      <td className="px-2 py-3 text-gc-ink-muted">{fmtDay(g.createdAt)}</td>
-                      <td className="px-2 py-3 text-right tabular-nums text-gc-success">+${g.amount.toFixed(2)}</td>
+                      <td className="px-2 py-3 first:pl-0 last:pr-0 text-gc-ink">{g.reason.split("_").map((part) => part.charAt(0).toUpperCase() + part.slice(1)).join(" ")}</td>
+                      <td className="px-2 py-3 first:pl-0 last:pr-0 text-gc-ink-muted">{fmtDay(g.createdAt)}</td>
+                      <td className="px-2 py-3 first:pl-0 last:pr-0 text-right tabular-nums text-gc-success">+${g.amount.toFixed(2)}</td>
                     </tr>
                   ))}
                   {promotions.map((pr) => (
                     <tr key={pr.id}>
-                      <td className={`${MONO} px-2 py-3 text-gc-ink`}>Promo code {pr.code}</td>
-                      <td className="px-2 py-3 text-gc-ink-muted">{fmtDay(pr.createdAt)}</td>
-                      <td className="px-2 py-3 text-right tabular-nums text-gc-success">+${pr.bonusUsd.toFixed(2)}</td>
+                      <td className={`${MONO} px-2 py-3 first:pl-0 last:pr-0 text-gc-ink`}>Promo code {pr.code}</td>
+                      <td className="px-2 py-3 first:pl-0 last:pr-0 text-gc-ink-muted">{fmtDay(pr.createdAt)}</td>
+                      <td className="px-2 py-3 first:pl-0 last:pr-0 text-right tabular-nums text-gc-success">+${pr.bonusUsd.toFixed(2)}</td>
                     </tr>
                   ))}
                 </>
