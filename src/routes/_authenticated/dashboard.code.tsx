@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { Copy, Check, ArrowUpRight, Code2 } from "lucide-react";
+import { highlight } from "@/components/dashboard/CodeHighlight";
 
 export const Route = createFileRoute("/_authenticated/dashboard/code")({
   head: () => ({

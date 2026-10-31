@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import * as React from "react";
-import { ArrowUpRight, Mic, Monitor, Plus, Search, X } from "lucide-react";
+import { ArrowUpRight, X } from "lucide-react";
 import SiteHeader from "@/components/SiteHeader";
 import BlogFooter from "@/components/BlogFooter";
 import Mt5Preview from "@/components/jxbot/Mt5Preview";
@@ -89,22 +89,6 @@ function GetBot({ label = "Use JX Bot" }: { label?: string }) {
 
 
 /* ---------- 1. Hero + app window ---------- */
-
-const ACCOUNTS = [
-  { name: "Gold M15", note: "Swing found · waiting for close", time: "Now", tone: "bg-foreground" },
-  { name: "Daily target", note: "Paused for today at target", time: "Yesterday", tone: "bg-emerald-500" },
-  { name: "Risk guard", note: "Stop loss set on every trade", time: "Yesterday", tone: "bg-orange-500" },
-  { name: "Licence check", note: "IP matches · plan valid", time: "Yesterday", tone: "bg-sky-500" },
-  { name: "Trading hours", note: "Skipping the London open", time: "Mon", tone: "bg-violet-500" },
-  { name: "Weekend", note: "Off until Monday", time: "Fri", tone: "bg-rose-500" },
-];
-
-const LOG = [
-  "✓ Licence → IP matches · plan valid",
-  "✓ Trend → H1 higher high + higher low",
-  "✓ Candle → M15 closed above the swing",
-  "✓ Order → buy 0.02 lot per $1,000 · SL + TP set",
-];
 
 function AppWindow() {
   return <Mt5Preview />;
