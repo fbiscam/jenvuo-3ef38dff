@@ -2,7 +2,6 @@ import * as React from "react";
 import { Link } from "@tanstack/react-router";
 import { ChevronLeft, ChevronRight, Pause, Play } from "lucide-react";
 
-const AURORA_BG = ["var(--platform-aurora-1)", "var(--platform-aurora-2)", "var(--platform-aurora-3)"];
 
 /** Ticks while playing; drives the live feature "videos". */
 function useTick(playing: boolean, ms = 450) {
