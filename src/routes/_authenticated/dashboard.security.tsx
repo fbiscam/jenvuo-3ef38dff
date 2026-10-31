@@ -89,10 +89,8 @@ function SecurityPage() {
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    void supabase.auth.getSession().then(({ data }) => {
-      setEmail(data.session?.user.email ?? "");
-      setSignedInAt(data.session?.user.last_sign_in_at ?? null);
-    });
+    void supabase.auth.getSession().then(({ data }) => setEmail(data.session?.user.email ?? ""));
+    void supabase.auth.getUser().then(({ data }) => setSignedInAt(data.user?.last_sign_in_at ?? null));
     setDevice(describeBrowser(navigator.userAgent));
     void getIpGeo().then((g) => {
       if (g) setPlace([g.city, g.country_name].filter(Boolean).join(", ") || null);
