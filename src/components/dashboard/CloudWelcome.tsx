@@ -1,18 +1,16 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Link } from "@tanstack/react-router";
-import { Check, ArrowRight, Sparkles, KeyRound, LineChart, Wallet, ShieldCheck, BarChart3 } from "lucide-react";
+import { Check, Plus, ArrowRight } from "lucide-react";
 import { useAuthUser } from "@/hooks/useAuthUser";
 import { FOUNDING_CREDIT_USD, FOUNDING_MONTHS } from "@/lib/founding-offer";
 
-const AURORAS = ["var(--platform-aurora-1)", "var(--platform-aurora-2)", "var(--platform-aurora-3)"];
-
 const QUICK_ACTIONS = [
-  { label: "Create API key", to: "/dashboard/api", icon: KeyRound },
-  { label: "Open Fiber Terminal", to: "/dashboard/terminal", icon: LineChart },
-  { label: "Manage billing", to: "/dashboard/billing", icon: Wallet },
-  { label: "Security settings", to: "/dashboard/profile", icon: ShieldCheck },
-  { label: "View usage", to: "/dashboard/usage", icon: BarChart3 },
+  { label: "Create API key", to: "/dashboard/api" },
+  { label: "Open Fiber Terminal", to: "/dashboard/terminal" },
+  { label: "Manage billing", to: "/dashboard/billing" },
+  { label: "Security settings", to: "/dashboard/profile" },
+  { label: "View usage", to: "/dashboard/usage" },
 ] as const;
 
 type Resource = { title: string; text: string; to: string };
@@ -46,10 +44,8 @@ const RESOURCES: Record<string, Resource[]> = {
 
 function Tick({ children }: { children: ReactNode }) {
   return (
-    <li className="flex items-center gap-3 text-[16px] text-gc-on-blue">
-      <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-background/90">
-        <Check className="h-3.5 w-3.5 text-gc-blue-deep" strokeWidth={2.5} aria-hidden="true" />
-      </span>
+    <li className="flex items-center gap-4 text-[16px] text-gc-ink">
+      <Check className="h-5 w-5 shrink-0 text-gc-green" strokeWidth={2.25} aria-hidden="true" />
       {children}
     </li>
   );
@@ -83,70 +79,64 @@ export default function CloudWelcome({ name: profileName }: { name?: string }) {
   }, [user?.email]);
 
   return (
-    <section className="dashboard-cloud-welcome mb-10">
-      {/* Platform-style aurora hero card */}
+    <section className="dashboard-cloud-welcome -mx-5 -mt-14 mb-10 sm:-mx-8 sm:-mt-7">
       <div
-        className="dash-hero-card relative overflow-hidden rounded-[28px] px-6 py-10 sm:px-10 lg:py-14"
-        style={{ backgroundImage: "var(--platform-aurora-1)" }}
+        className="relative overflow-hidden bg-gc-surface px-5 py-12 sm:px-8 lg:py-16"
+        style={{
+          // full-bleed band: extend the #f8f9fa surface to the panel edges on both sides
+          boxShadow: "0 0 0 100vmax var(--gc-surface), 0 1px 0 100vmax var(--gc-line)",
+          clipPath: "inset(0 -100vmax -1px)",
+        }}
       >
-        <div className="relative grid gap-8 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] lg:items-center">
+        {/* decorative shapes */}
+        <svg className="pointer-events-none absolute inset-0 h-full w-full" aria-hidden="true">
+          <circle cx="47%" cy="18%" r="10" className="fill-gc-blue" />
+          <circle cx="40%" cy="68%" r="14" className="fill-gc-yellow" />
+          <circle cx="82%" cy="20%" r="20" className="fill-gc-green" />
+          <circle cx="75%" cy="86%" r="7" className="fill-gc-red" />
+        </svg>
+        <div className="relative mx-auto grid max-w-6xl gap-10 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
           <div className="min-w-0">
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-background/90 px-3 py-1 text-[13px] font-medium text-gc-ink shadow-sm">
-              <Sparkles className="h-3.5 w-3.5 text-gc-blue" aria-hidden="true" />
-              Welcome, {name}
-            </span>
-            <div
-              role="heading"
-              aria-level={1}
-              className="mt-4 text-balance text-[32px] font-semibold leading-[1.1] tracking-tight text-gc-on-blue sm:text-[44px]"
-            >
+            <p className="text-[17px] text-gc-ink">Welcome, {name}</p>
+            <div role="heading" aria-level={1} className="mt-2 text-[28px] font-normal leading-tight text-gc-ink sm:text-[34px]">
               Make the most of Jenvu
             </div>
-            <ul className="mt-6 space-y-3">
+            <ul className="mt-6 space-y-5">
               <Tick>Read live sweeps, zones and FVGs on Fiber</Tick>
               <Tick>Ask the AI desk about any chart</Tick>
               <Tick>Track usage, billing and API keys in one place</Tick>
             </ul>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Link
-                to="/dashboard/billing"
-                className="dash-pill inline-flex h-11 items-center gap-1.5 rounded-full bg-background px-6 text-[15px] font-medium text-gc-blue-deep shadow-sm transition hover:bg-gc-blue-soft"
-              >
-                View my plan <ArrowRight className="h-4 w-4" aria-hidden="true" />
-              </Link>
-              <Link
-                to="/dashboard/terminal"
-                className="dash-pill inline-flex h-11 items-center rounded-full px-6 text-[15px] font-medium text-gc-on-blue ring-1 ring-gc-on-blue/70 transition hover:bg-gc-on-blue/10"
-              >
-                Open the Terminal
-              </Link>
-            </div>
+            <Link
+              to="/dashboard/billing"
+              className="mt-7 inline-flex h-9 items-center rounded bg-gc-blue-deep px-4 text-[14px] font-medium text-gc-on-blue hover:bg-gc-navy"
+            >
+              View my plan
+            </Link>
           </div>
 
-          <div className="dash-glass min-w-0 rounded-[22px] bg-background/95 p-6 shadow-lg">
-            <p className="text-[13px] font-medium uppercase tracking-wider text-gc-ink-muted">Other options</p>
-            <p className="mt-3 text-[17px] font-medium text-gc-ink">Try the latest top-tier AI models</p>
-            <Link to="/dashboard/terminal" className="mt-2 inline-flex items-center gap-1 text-[14px] font-medium text-gc-blue hover:text-gc-blue-hover">
-              Try the AI desk <ArrowRight className="h-4 w-4" aria-hidden="true" />
+          <div className="min-w-0 border-gc-line lg:border-l lg:pl-6">
+            <p className="text-[14px] text-gc-ink-muted">Other options</p>
+            <p className="mt-4 text-[16px] text-gc-ink">Try the latest top-tier AI models</p>
+            <Link to="/dashboard/terminal" className="mt-4 inline-block text-[14px] font-medium text-gc-blue-deep hover:text-gc-navy">
+              Try the AI desk
             </Link>
-            <div className="my-5 h-px bg-gc-line" />
             {foundingMember ? (
               <>
-                <p className="flex items-center gap-2 text-[16px] leading-relaxed text-gc-ink">
+                <p className="mt-6 flex items-center gap-2 text-[16px] leading-relaxed text-gc-ink">
                   <Check className="h-5 w-5 shrink-0 text-gc-green" strokeWidth={2.25} aria-hidden="true" />
                   You are already in a program
                 </p>
-                <Link to="/dashboard/terminal" className="mt-2 inline-flex items-center gap-1 text-[14px] font-medium text-gc-blue hover:text-gc-blue-hover">
-                  Open the Terminal <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                <Link to="/dashboard/terminal" className="mt-4 inline-block text-[14px] font-medium text-gc-blue-deep hover:text-gc-navy">
+                  Open the Terminal
                 </Link>
               </>
             ) : (
               <>
-                <p className="text-[15px] leading-relaxed text-gc-ink">
+                <p className="mt-6 text-[16px] leading-relaxed text-gc-ink">
                   {FOUNDING_MONTHS} months of your chosen plan with ${FOUNDING_CREDIT_USD} credit and full Terminal access.
                 </p>
-                <Link to="/founding" className="mt-2 inline-flex items-center gap-1 text-[14px] font-medium text-gc-blue hover:text-gc-blue-hover">
-                  Apply for founding program <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                <Link to="/founding" className="mt-4 inline-block text-[14px] font-medium text-gc-blue-deep hover:text-gc-navy">
+                  Apply for founding program
                 </Link>
               </>
             )}
@@ -154,72 +144,51 @@ export default function CloudWelcome({ name: profileName }: { name?: string }) {
         </div>
       </div>
 
-      {/* Quick actions as icon tiles */}
-      <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
-        {QUICK_ACTIONS.map((a, i) => {
-          const Icon = a.icon;
-          return (
+      <div className="mx-auto max-w-6xl px-5 pt-6 sm:px-8 lg:px-0">
+        <div className="flex flex-wrap gap-3">
+          {QUICK_ACTIONS.map((a) => (
             <Link
               key={a.label}
               to={a.to}
-              className="dash-tile group flex flex-col gap-3 rounded-[20px] border border-gc-line/70 bg-background p-4 transition hover:-translate-y-0.5 hover:shadow-md"
+              className="inline-flex h-9 items-center gap-2 rounded border border-gc-line bg-background px-3.5 text-[14px] text-gc-ink hover:bg-gc-surface"
             >
-              <span
-                className="flex h-10 w-10 items-center justify-center rounded-xl"
-                style={{ backgroundImage: AURORAS[i % AURORAS.length] }}
-              >
-                <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-background/90 text-gc-ink">
-                  <Icon className="h-4 w-4" aria-hidden="true" />
-                </span>
-              </span>
-              <span className="flex items-center justify-between gap-2 text-[14px] font-medium text-gc-ink">
-                {a.label}
-                <ArrowRight className="h-4 w-4 shrink-0 text-gc-blue opacity-0 transition group-hover:translate-x-0.5 group-hover:opacity-100" aria-hidden="true" />
-              </span>
+              <Plus className="h-4 w-4" aria-hidden="true" />
+              {a.label}
             </Link>
-          );
-        })}
-      </div>
+          ))}
+        </div>
 
-      <div className="mt-12 text-center">
-        <div role="heading" aria-level={2} className="text-balance text-[26px] font-semibold tracking-tight text-gc-ink sm:text-[32px]">
-          Popular getting started resources
+        <div role="heading" aria-level={2} className="mt-8 text-[24px] font-normal text-gc-ink">Popular getting started resources</div>
+        <p className="mt-4 text-[15px] text-gc-ink-muted">Filter by</p>
+        <div className="mt-3 flex flex-wrap gap-2">
+          {Object.keys(RESOURCES).map((k) => (
+            <button
+              key={k}
+              type="button"
+              onClick={() => setFilter(k)}
+              className={`h-8 rounded-full px-4 text-[14px] transition ${
+                filter === k ? "bg-gc-blue-soft text-gc-blue-deep" : "bg-gc-surface text-gc-ink hover:bg-gc-line/60"
+              }`}
+            >
+              {k}
+            </button>
+          ))}
         </div>
-        <div className="mx-auto mt-3 h-1 w-24 rounded-full" style={{ backgroundImage: "var(--platform-aurora-1)" }} aria-hidden="true" />
-        <div className="mt-6 flex justify-center">
-          <div className="inline-flex max-w-full gap-1 overflow-x-auto rounded-full bg-gc-surface p-1 ring-1 ring-gc-line/60 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-            {Object.keys(RESOURCES).map((k) => (
-              <button
-                key={k}
-                type="button"
-                onClick={() => setFilter(k)}
-                className={`h-9 shrink-0 rounded-full px-4 text-[14px] font-medium transition ${
-                  filter === k ? "bg-gc-blue text-gc-on-blue shadow-sm" : "text-gc-ink hover:bg-gc-panel"
-                }`}
-              >
-                {k}
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
-      <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {RESOURCES[filter].map((r, i) => (
-          <Link
-            key={r.title}
-            to={r.to}
-            className="dash-tile group flex flex-col overflow-hidden rounded-[20px] border border-gc-line/70 bg-background transition hover:-translate-y-0.5 hover:shadow-md"
-          >
-            <span className="block h-2" style={{ backgroundImage: AURORAS[i % AURORAS.length] }} aria-hidden="true" />
-            <span className="flex flex-1 flex-col p-5">
-              <span className="text-[16px] font-medium text-gc-ink">{r.title}</span>
-              <span className="mt-2 text-[14px] leading-relaxed text-gc-ink-muted">{r.text}</span>
-              <span className="mt-auto inline-flex items-center gap-1 pt-4 text-[14px] font-medium text-gc-blue">
+        <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {RESOURCES[filter].map((r) => (
+            <Link
+              key={r.title}
+              to={r.to}
+              className="group rounded-lg border border-gc-line bg-background p-5 transition hover:shadow-md"
+            >
+              <div className="text-[16px] font-medium text-gc-ink">{r.title}</div>
+              <p className="mt-2 text-[14px] leading-relaxed text-gc-ink-muted">{r.text}</p>
+              <span className="mt-4 inline-flex items-center gap-1 text-[14px] font-medium text-gc-blue-deep">
                 Learn more <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
               </span>
-            </span>
-          </Link>
-        ))}
+            </Link>
+          ))}
+        </div>
       </div>
     </section>
   );
