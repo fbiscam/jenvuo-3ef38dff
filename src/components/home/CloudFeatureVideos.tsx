@@ -1,6 +1,7 @@
+import { sectionLead, sectionTitle } from "@/components/home/homeStyles";
 import * as React from "react";
 import { Link } from "@tanstack/react-router";
-import { ChevronLeft, ChevronRight, Pause, Play } from "lucide-react";
+import { ArrowUpRight, ChevronLeft, ChevronRight, Pause, Play } from "lucide-react";
 
 const AURORA_BG = ["var(--platform-aurora-1)", "var(--platform-aurora-2)", "var(--platform-aurora-3)"];
 
@@ -143,11 +144,11 @@ function FeatureCard({ card }: { card: Card }) {
   const t = useTick(playing);
   const { Scene } = card;
   return (
-    <div className="flex w-full max-w-[412px] shrink-0 snap-center flex-col overflow-hidden rounded-3xl bg-gc-surface sm:w-[85vw] sm:snap-start">
-      <div className="flex min-h-[204px] flex-col px-8 pb-8 pt-10">
-        <p className="text-[16px] leading-[1.55] text-gc-ink-muted">{card.text}</p>
-        <Link to={card.to} className="mt-auto pt-6 text-[16px] font-medium text-gc-blue-deep hover:underline">
-          Explore feature
+    <div className="flex w-full max-w-[412px] shrink-0 snap-center flex-col overflow-hidden rounded-md border border-gc-line bg-background sm:w-[85vw] sm:snap-start">
+      <div className="flex min-h-[196px] flex-col px-7 pb-7 pt-8">
+        <p className="text-[16px] leading-[1.55] text-gc-ink">{card.text}</p>
+        <Link to={card.to} className="mt-auto inline-flex w-fit items-center gap-1 border-b border-gc-ink pb-0.5 pt-6 text-[15px] font-medium text-gc-ink hover:opacity-70">
+          Explore feature <ArrowUpRight className="h-3.5 w-3.5" />
         </Link>
       </div>
       <div className="relative h-[232px] bg-gc-ink" style={{ backgroundImage: AURORA_BG[CARDS.indexOf(card) % 3] }}>
@@ -188,9 +189,10 @@ export function CloudFeatureVideos() {
   const scroll = (dir: 1 | -1) => railRef.current?.scrollBy({ left: dir * 440, behavior: "smooth" });
   return (
     <section className="jenvu-videos-zoom bg-background py-16 md:py-20">
-      <h2 className="px-5 text-center text-[32px] font-normal leading-[1.2] text-gc-ink sm:text-[44px]">
-        <span className="text-gc-green">Live features</span> happen on Jenvu
-      </h2>
+      <div className="px-5 text-center">
+        <h2 className={sectionTitle}>Live features happen on Jenvu</h2>
+        <p className={sectionLead}>Watch the Terminal, AI desk and JX Bot at work, the same way they run in your account.</p>
+      </div>
       <div className="mx-auto mt-10 max-w-[1296px]">
         <div ref={railRef} onScroll={onScroll} className="flex snap-x snap-mandatory gap-7 overflow-x-auto px-5 [scrollbar-width:none] sm:px-8 [&::-webkit-scrollbar]:hidden">
           {CARDS.map((c) => (

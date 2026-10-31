@@ -1,8 +1,9 @@
 import * as React from "react";
 import { Link } from "@tanstack/react-router";
 import { openAskJenvu } from "@/components/AskJenvuWidget";
-import { Pause, Play, CandlestickChart, Waves, Clock, Layers, TrendingUp, Target, Bot, ShieldCheck, Gauge, Sparkles, MessageSquare, Brain, Code2, KeyRound, Terminal, Crown, BadgeCheck, Gift, Globe, LineChart, Newspaper, BookOpen, GraduationCap, Lightbulb, LifeBuoy, HelpCircle, type LucideIcon } from "lucide-react";
+import { ArrowUpRight, Pause, Play, CandlestickChart, Waves, Clock, Layers, TrendingUp, Target, Bot, ShieldCheck, Gauge, Sparkles, MessageSquare, Brain, Code2, KeyRound, Terminal, Crown, BadgeCheck, Gift, Globe, LineChart, Newspaper, BookOpen, GraduationCap, Lightbulb, LifeBuoy, HelpCircle, type LucideIcon } from "lucide-react";
 import { AuroraTile } from "@/components/AuroraTile";
+import { pillDark, pillSmDark, pillSmLight } from "@/components/home/homeStyles";
 import { SiBinance, SiCoinbase, SiRevolut, SiRobinhood, SiTradingview } from "react-icons/si";
 import webullLogo from "@/assets/webull-logo.png.asset.json";
 import trading212Logo from "@/assets/trading212-logo.png.asset.json";
@@ -53,17 +54,17 @@ export function CloudSolutions() {
     <section className="jenvu-solutions-zoom bg-background py-20">
       <div className="mx-auto max-w-6xl px-6">
         <div className="grid gap-8 md:grid-cols-2 md:items-start">
-          <h2 className="text-3xl font-normal leading-tight text-gc-ink md:text-4xl">
-            Solve your trading problems with <span className="text-gc-yellow">Fiber solutions</span>
+          <h2 className="text-balance text-[30px] font-medium leading-[1.15] tracking-tight text-gc-ink md:text-[42px]">
+            Solve your trading problems with Fiber solutions
           </h2>
           <div>
-            <p className="text-gc-ink-muted">
-              From spotting <Link to="/help" className="text-gc-blue-deep underline">liquidity sweeps</Link> to managing{" "}
-              <Link to="/help" className="text-gc-blue-deep underline">trade risk</Link>, Jenvu tools fit{" "}
+            <p className="text-[15px] leading-relaxed text-gc-ink sm:text-[17px]">
+              From spotting <Link to="/help" className="font-medium underline underline-offset-2 hover:opacity-70">liquidity sweeps</Link> to managing{" "}
+              <Link to="/help" className="font-medium underline underline-offset-2 hover:opacity-70">trade risk</Link>, Jenvu tools fit{" "}
               <span className="hidden sm:inline">the way you trade Fiber.</span>
               <span className="sm:hidden">how you trade.</span>
             </p>
-            <Link to="/auth" className="mt-5 inline-flex rounded-full bg-gc-blue-deep px-5 py-2.5 text-sm font-medium text-gc-on-blue hover:bg-gc-navy">
+            <Link to="/auth" search={{ mode: "signup" } as never} className={`${pillSmDark} mt-6`}>
               Start for free
             </Link>
           </div>
@@ -77,7 +78,7 @@ export function CloudSolutions() {
                   type="button"
                   onClick={() => setActive(i)}
                   className={`w-full whitespace-nowrap rounded-full px-4 py-2 text-left text-sm transition-colors ${
-                    i === active ? "bg-gc-blue-soft font-medium text-gc-navy" : "text-gc-ink-muted hover:bg-gc-surface"
+                    i === active ? "bg-gc-ink font-medium text-background" : "text-gc-ink hover:bg-gc-surface"
                   }`}
                 >
                   {x.name}
@@ -93,12 +94,12 @@ export function CloudSolutions() {
                 <div className="text-4xl font-medium">{s.stat}</div>
                 <p className="mt-2 font-medium">{s.statText}</p>
               </div>
-              <div className="rounded-lg bg-gc-surface p-5 text-sm text-gc-ink">
+              <div className="rounded-lg bg-gc-surface p-5 text-[15px] leading-relaxed text-gc-ink">
                 {s.body} <strong>{s.bold}</strong>
               </div>
             </div>
             <div className="py-4 text-center">
-              <Link to={s.to} className="text-sm text-gc-blue-deep hover:text-gc-navy">{s.cta}</Link>
+              <Link to={s.to} className="inline-flex items-center gap-1 border-b border-gc-ink pb-0.5 text-sm font-medium text-gc-ink hover:opacity-70">{s.cta} <ArrowUpRight className="h-3.5 w-3.5" /></Link>
             </div>
           </div>
         </div>
@@ -127,6 +128,7 @@ export function CloudLogoStrip() {
   return (
     <section className="jenvu-logos-zoom bg-background pb-20">
       <div className="relative mx-auto max-w-6xl px-6">
+        <p className="text-center text-xs uppercase tracking-[0.2em] text-gc-ink-muted">Works with the platforms you already use</p>
         <div
           className="overflow-hidden"
           style={{
@@ -146,8 +148,8 @@ export function CloudLogoStrip() {
           </div>
         </div>
         <div className="mt-4 flex items-center justify-center">
-          <Link to="/about" className="rounded-full bg-gc-blue-deep px-5 py-2.5 text-sm font-medium text-gc-on-blue hover:bg-gc-navy">
-            See more about Jenvu
+          <Link to="/about" className={pillSmLight}>
+            See more about Jenvu <ArrowUpRight className="h-3.5 w-3.5" />
           </Link>
         </div>
         <button
@@ -178,23 +180,23 @@ export function CloudStartBanner() {
   return (
     <section className="jenvu-start-zoom bg-background pb-20">
       <div className="mx-auto max-w-[80rem] px-4">
-        <div className="relative overflow-hidden rounded-2xl bg-gc-sky">
+        <div className="relative overflow-hidden rounded-md" style={{ backgroundImage: "var(--platform-aurora-1)" }}>
           <div className="relative z-10 max-w-xl px-8 py-16 md:px-16 md:py-24">
-            <h2 className="text-3xl font-normal leading-tight text-gc-ink md:text-[40px]">
-              <span className="text-gc-blue-deep">Let's start trading</span> your Fiber, today
+            <h2 className="text-balance text-[30px] font-medium leading-[1.15] tracking-tight text-gc-ink md:text-[44px]">
+              Let's start trading your Fiber, today
             </h2>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link
                 to="/auth"
                 search={{ mode: "signup" } as never}
-                className="inline-flex rounded-full bg-gc-blue-deep px-6 py-3 text-sm font-medium text-gc-on-blue hover:bg-gc-navy"
+                className={pillDark}
               >
                 Get started for free
               </Link>
               <button
                 type="button"
                 onClick={() => openAskJenvu("sales")}
-                className="inline-flex rounded-full border border-gc-line bg-background px-6 py-3 text-sm font-medium text-gc-ink hover:bg-gc-surface"
+                className="inline-flex h-12 items-center justify-center rounded-full bg-background px-6 text-[15px] font-medium text-gc-ink ring-1 ring-gc-line/60 transition hover:bg-gc-surface"
               >
                 Contact sales
               </button>
