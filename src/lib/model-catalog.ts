@@ -98,14 +98,19 @@ export function mixByProvider(models: CatalogModel[]): CatalogModel[] {
   const order = [...queues.keys()];
   const out: CatalogModel[] = [];
   let last: ProviderKey | null = null;
+  let turn = 0;
   while (out.length < models.length) {
-    let pick: ProviderKey | null = null;
-    for (const p of order) {
-      const left = queues.get(p)!.length;
-      if (!left || p === last) continue;
-      if (!pick || left > queues.get(pick)!.length) pick = p;
+    const remaining = models.length - out.length;
+    // A company that would otherwise run out of gaps must go now.
+    let pick: ProviderKey | null = order.find((p) => p !== last && queues.get(p)!.length * 2 > remaining) ?? null;
+    if (!pick) {
+      // Otherwise take companies in turn, one model each.
+      for (let i = 0; i < order.length; i++) {
+        const p = order[(turn + i) % order.length];
+        if (queues.get(p)!.length && p !== last) { pick = p; turn = (turn + i + 1) % order.length; break; }
+      }
     }
-    if (!pick) pick = last!; // only one provider left
+    if (!pick) pick = last!; // only one company left
     out.push(queues.get(pick)!.shift()!);
     last = pick;
   }
