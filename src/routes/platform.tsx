@@ -383,7 +383,7 @@ function AgentsSection() {
           </div>
           <h3 className="mt-5 text-xl font-medium">Act</h3>
           <p className="mt-2 text-[15px] leading-relaxed">
-            Connect assistants to your Jenvu account through our MCP server so they can work with your own data.
+            Connect assistants to your Jenvu account through our MCP server so they work with your own data.
           </p>
         </div>
       </div>
