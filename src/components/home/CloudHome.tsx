@@ -3,6 +3,7 @@ import * as React from "react";
 import { Link } from "@tanstack/react-router";
 import {
   ArrowRight,
+  ArrowUpRight,
   ChevronLeft,
   ChevronRight,
   ChevronDown,
@@ -286,56 +287,63 @@ const AUDIENCES: Array<{ key: string; label: string; cards: AudienceCard[] }> = 
   },
 ];
 
+const AUDIENCE_TITLE: Record<string, string> = {
+  "NEW TRADERS": "Start free",
+  "JX BOT": "JX Bot for MT5",
+  LEARN: "Learn Fiber trading",
+  "TOP-TIER MODELS": "Top-tier models",
+  "API & EXTENSION": "API & extension",
+  "DEVELOPER DOCS": "Developer docs",
+  "FOUNDING PROGRAM": "Founding Program",
+  PLANS: "Plans",
+  SUPPORT: "Support",
+};
+const AUDIENCE_LINK: Record<string, string> = {
+  "/auth": "Get started",
+  "/pricing": "View pricing",
+  "/insights": "Read insights",
+  "/ai-engine": "View models",
+  "/help": "View docs",
+  "/founding": "Apply now",
+  "/contact": "Contact support",
+};
+
+/** Platform page "Start building with frontier models" look: centred title, pill tabs, bordered guide cards. */
 export function CloudAudiences() {
   const [active, setActive] = React.useState(AUDIENCES[0].key);
   const current = AUDIENCES.find((a) => a.key === active) ?? AUDIENCES[0];
-  // Warm every tab's images up front so switching tabs shows them instantly.
-  React.useEffect(() => {
-    AUDIENCES.forEach((a) => a.cards.forEach((c) => {
-      if (c.img) { const im = new Image(); im.decoding = "async"; im.src = c.img; }
-    }));
-  }, []);
   return (
-    <section className="bg-background px-3 pb-16 sm:px-4">
-      <div className="rounded-[28px] bg-gc-panel px-5 py-8 sm:px-10 md:px-12 md:py-10 xl:px-[96px]">
-        <div role="tablist" className="flex gap-1 overflow-x-auto border-b-2 border-gc-line [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          {AUDIENCES.map((a) => (
-            <button
-              key={a.key}
-              type="button"
-              role="tab"
-              aria-selected={a.key === active}
-              onClick={() => setActive(a.key)}
-              className={`relative -mb-0.5 shrink-0 px-4 py-3 text-[15px] transition ${
-                a.key === active ? "font-medium text-gc-ink" : "text-gc-ink/80 hover:text-gc-ink"
-              }`}
+    <section className="mx-auto max-w-7xl px-5 pb-16 pt-4 text-center">
+      <h2 className="text-3xl font-medium tracking-tight">Built for every kind of Fiber trader</h2>
+      <div role="tablist" className="mt-8 inline-flex max-w-full gap-1 overflow-x-auto rounded-full bg-gc-surface p-1 ring-1 ring-gc-line/60 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        {AUDIENCES.map((a) => (
+          <button
+            key={a.key}
+            type="button"
+            role="tab"
+            aria-selected={a.key === active}
+            onClick={() => setActive(a.key)}
+            className={`shrink-0 rounded-full px-3.5 py-2.5 text-sm font-medium transition-colors sm:px-5 ${
+              a.key === active ? "bg-gc-blue text-gc-on-blue" : "text-gc-ink hover:bg-gc-panel"
+            }`}
+          >
+            {a.label}
+          </button>
+        ))}
+      </div>
+      <div className="mt-14 grid gap-6 text-left md:grid-cols-3">
+        {current.cards.map((c) => (
+          <div key={c.tag} className="flex flex-col rounded-md border border-gc-line p-6">
+            <h3 className="text-xl font-medium text-gc-ink">{AUDIENCE_TITLE[c.tag] ?? c.tag}</h3>
+            <p className="mt-6 flex-1 text-sm leading-relaxed text-gc-ink">{c.text}</p>
+            <Link
+              to={c.to}
+              className="mt-8 inline-flex w-fit items-center gap-1 border-b border-gc-ink pb-0.5 text-[15px] text-gc-ink hover:opacity-70"
             >
-              {a.label}
-              {a.key === active && (
-                <span aria-hidden className="absolute inset-x-0 bottom-0 h-[3px] rounded-t-full bg-gc-ink" />
-              )}
-            </button>
-          ))}
-        </div>
-        <div className="mt-9 grid gap-6 md:grid-cols-3">
-          {current.cards.map((c) => (
-            <div
-              key={c.tag}
-              className="flex min-h-[112px] overflow-hidden rounded-lg border border-gc-line bg-background"
-            >
-              <div className="flex min-w-0 flex-1 flex-col justify-center px-4 py-5">
-                <div className="text-[12px] font-medium tracking-wide text-gc-ink-muted">{c.tag}</div>
-                <p className="mt-1 text-[14px] font-medium leading-[1.5] text-gc-ink sm:text-[16px] sm:leading-[1.55]">{c.text}</p>
-              </div>
-              {c.img && <img src={c.img} alt="" loading="eager" decoding="async" className="w-[112px] shrink-0 object-cover" />}
-              {c.logo && (
-                <div className="flex w-[84px] shrink-0 items-center justify-center">
-                  <img src="/favicon.png" alt="" className="h-14 w-14 object-contain" />
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
+              {AUDIENCE_LINK[c.to] ?? "Learn more"} <ArrowUpRight className="h-3.5 w-3.5" />
+            </Link>
+          </div>
+        ))}
       </div>
     </section>
   );
