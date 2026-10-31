@@ -43,7 +43,9 @@ const ERRORS = [
 const HOW = [
   ["IP check", "On start the bot checks your IP with jenvu.com and trades only while the IP matches and the plan is valid."],
   ["EUR/USD on M15", "Runs on the EURUSD M15 chart; one IP works with one MT5 account."],
-  ["Daily auto-stop", "Pauses for the rest of the day once your plan's daily target is reached."],
+  ["Daily auto-stop", "Pauses for the day at your plan's daily target or 4% of the balance, whichever is lower; 4.7% drawdown guard."],
+  ["Safe trading hours", "New trades Mon–Thu 01:00–14:00 and Fri until 13:00 (broker time); skips London and New York opens and weekends."],
+  ["Entry checks", "Follows the H1 trend and skips wide spreads, weak candles and spikes, so some days have fewer trades."],
   ["Monthly limit", "Stops at your plan's monthly target until the next period."],
 ];
 
