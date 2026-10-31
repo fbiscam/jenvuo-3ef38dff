@@ -34,6 +34,7 @@ const ONLINE_MS = 3 * 60 * 1000;
 function BotUsagePage() {
   const load = useServerFn(getBotUsage);
   const [account, setAccount] = useState("all");
+  const [accountMenuOpen, setAccountMenuOpen] = useState(false);
   const removeAccount = useServerFn(deleteBotAccount);
   const qc = useQueryClient();
   const [deleting, setDeleting] = useState<string | null>(null);

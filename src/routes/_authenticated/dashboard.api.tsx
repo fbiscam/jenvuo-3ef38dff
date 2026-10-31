@@ -182,7 +182,7 @@ function ExtensionPage() {
   const capabilities = getPlanCapabilities(access?.active ? access.plan : "free");
 
   return (
-    <div className="mx-auto w-full max-w-[1100px] px-1 py-2 sm:px-2 sm:py-6">
+    <div className="mx-auto w-full max-w-[1100px] pb-10">
       {/* Header row */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-[28px] font-medium tracking-tight text-foreground sm:text-[32px]">API keys</h1>
