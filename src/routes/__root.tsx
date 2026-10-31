@@ -4,6 +4,7 @@ import {
   Link,
   createRootRouteWithContext,
   useRouter,
+  useRouterState,
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
@@ -16,6 +17,7 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { installIntlGuard } from "../lib/intl-guard";
 import { initCrossDomainSession } from "../lib/cross-domain-session";
+import { applyHtmlTheme, SITE_THEME_BOOT_SCRIPT } from "../lib/site-theme";
 
 const googleAnalyticsId = import.meta.env.VITE_LOVABLE_CONNECTOR_GOOGLE_ANALYTICS_API_KEY;
 
@@ -286,6 +288,7 @@ function RootShell({ children }: { children: ReactNode }) {
     // the `ms-icons-ready` class to <html> before React hydrates.
     <html lang="en" suppressHydrationWarning>
       <head>
+        <script dangerouslySetInnerHTML={{ __html: SITE_THEME_BOOT_SCRIPT }} />
         <HeadContent />
       </head>
 
@@ -305,6 +308,12 @@ function RootComponent() {
   useEffect(() => {
     initCrossDomainSession();
   }, []);
+
+  // Black/white site theme: re-apply on every page change (dashboard handles its own).
+  const themePath = useRouterState({ select: (s) => s.location.pathname });
+  useEffect(() => {
+    applyHtmlTheme(themePath);
+  }, [themePath]);
 
   // Fast cross-subdomain navigation: warm connections, prefetch on hover,
   // and skip the in-app router for links to another jenvu host.

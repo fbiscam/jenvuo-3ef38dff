@@ -1,4 +1,5 @@
 import { getAlertCutoff } from "@/lib/alert-cutoff";
+import { readSiteTheme, saveSiteTheme } from "@/lib/site-theme";
 import { getIpGeo } from "@/lib/ip-geo";
 import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
 import { useVerification, isVerificationAllowedPath } from "@/hooks/useVerification";
@@ -692,15 +693,14 @@ function DashboardLayout() {
   // Dashboard page theme (black by default). Overview and Terminal keep their own look.
   const [dashTheme, setDashTheme] = useState<"light" | "dark">("dark");
   useEffect(() => {
-    const stored = window.localStorage.getItem("jenvu:dash:theme");
+    // Same choice as the public site's Sun/Moon switch.
+    const stored = readSiteTheme() ?? window.localStorage.getItem("jenvu:dash:theme");
     if (stored === "light" || stored === "dark") setDashTheme(stored);
   }, []);
   const toggleDashTheme = () => {
-    setDashTheme((t) => {
-      const next = t === "dark" ? "light" : "dark";
-      window.localStorage.setItem("jenvu:dash:theme", next);
-      return next;
-    });
+    const next = dashTheme === "dark" ? "light" : "dark";
+    saveSiteTheme(next);
+    setDashTheme(next);
   };
   useEffect(() => {
     const open = () => setMobileNavOpen(true);
