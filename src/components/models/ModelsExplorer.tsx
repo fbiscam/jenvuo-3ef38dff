@@ -4,32 +4,33 @@ import {
   ArrowRight, Braces, Brain, Check, Copy, Eye, Filter, Info, Radio, Search, Wrench,
 } from "lucide-react";
 import { toast } from "sonner";
-import openAiLogo from "@/assets/openai-logo.png";
-import claudeLogo from "@/assets/claude-logo.png";
-import xaiLogo from "@/assets/xai-logo.png";
+import claudeLogo from "@/assets/model-logos/claude-color.svg";
+import openAiLogo from "@/assets/model-logos/openai.svg";
+import geminiLogo from "@/assets/model-logos/gemini-color.svg";
+import deepseekLogo from "@/assets/model-logos/deepseek-color.svg";
+import qwenLogo from "@/assets/model-logos/qwen-color.svg";
+import kimiLogo from "@/assets/model-logos/kimi-color.svg";
+import zhipuLogo from "@/assets/model-logos/zhipu-color.svg";
+import bytedanceLogo from "@/assets/model-logos/bytedance-color.svg";
+import grokLogo from "@/assets/model-logos/grok.svg";
+import metaLogo from "@/assets/model-logos/meta-color.svg";
 import {
   MODEL_CATALOG, PRICE_PER_MILLION, PROVIDERS, formatContext, getCatalogModel,
   type Capability, type CatalogModel, type ProviderKey,
 } from "@/lib/model-catalog";
 import { cn } from "@/lib/utils";
 
-const LOGOS: Partial<Record<ProviderKey, string>> = {
-  openai: openAiLogo,
+const LOGOS: Record<ProviderKey, string> = {
   anthropic: claudeLogo,
-  xai: xaiLogo,
-};
-
-const TILE: Record<ProviderKey, string> = {
-  anthropic: "bg-gc-red-soft text-gc-red",
-  openai: "bg-gc-panel text-gc-ink",
-  google: "bg-gc-blue-soft text-gc-blue",
-  deepseek: "bg-gc-blue-soft text-gc-blue-deep",
-  qwen: "bg-gc-blue-soft text-gc-navy",
-  moonshot: "bg-gc-ink text-gc-on-blue",
-  zhipu: "bg-gc-ink text-gc-on-blue",
-  bytedance: "bg-gc-blue-soft text-gc-blue",
-  xai: "bg-gc-ink text-gc-on-blue",
-  meta: "bg-gc-blue-soft text-gc-blue",
+  openai: openAiLogo,
+  google: geminiLogo,
+  deepseek: deepseekLogo,
+  qwen: qwenLogo,
+  moonshot: kimiLogo,
+  zhipu: zhipuLogo,
+  bytedance: bytedanceLogo,
+  xai: grokLogo,
+  meta: metaLogo,
 };
 
 const CAP_META: Record<Capability, { label: string; icon: typeof Brain; cls: string }> = {
@@ -40,14 +41,17 @@ const CAP_META: Record<Capability, { label: string; icon: typeof Brain; cls: str
   json: { label: "JSON", icon: Braces, cls: "bg-gc-green-soft text-gc-green" },
 };
 
-function ModelLogo({ m, size = "md" }: { m: CatalogModel; size?: "sm" | "md" }) {
-  const box = size === "sm" ? "h-7 w-7 text-[11px]" : "h-9 w-9 text-xs";
-  const src = LOGOS[m.provider];
+function ProviderLogo({ provider, size = "md" }: { provider: ProviderKey; size?: "sm" | "md" | "lg" }) {
+  const box = size === "sm" ? "h-7 w-7 rounded-md" : size === "lg" ? "h-12 w-12 rounded-xl" : "h-9 w-9 rounded-lg";
   return (
-    <span className={cn("grid shrink-0 place-items-center overflow-hidden rounded-md border border-gc-line font-semibold", box, src ? "bg-background" : TILE[m.provider])}>
-      {src ? <img src={src} alt="" className="h-[70%] w-[70%] object-contain" loading="lazy" /> : PROVIDERS[m.provider].label.slice(0, 1)}
+    <span className={cn("grid shrink-0 place-items-center border border-gc-line bg-background", box)}>
+      <img src={LOGOS[provider]} alt={`${PROVIDERS[provider].label} logo`} className="h-[58%] w-[58%] object-contain" loading="lazy" />
     </span>
   );
+}
+
+function ModelLogo({ m, size = "md" }: { m: CatalogModel; size?: "sm" | "md" | "lg" }) {
+  return <ProviderLogo provider={m.provider} size={size} />;
 }
 
 const byIds = (ids: string[]) => ids.map((id) => getCatalogModel(id)).filter(Boolean) as CatalogModel[];
