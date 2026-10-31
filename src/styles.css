@@ -1914,3 +1914,9 @@ html.dark body :is(h1,h2,h3,h4,h5,h6,p,span,li,a,label,small,dt,dd,td,th,figcapt
 .dash-dark :is(h1,h2,h3,h4,h5,h6,p,span,li,a,label,small,dt,dd,td,th,figcaption,blockquote):not(.bg-zinc-900 *):not(.bg-primary *):not(.bg-foreground *):not(.bg-white *) {
   color: #ffffff !important;
 }
+
+/* Dashboard tints: light blue (#F0F5FE-like) -> #F4F4F4 on white, white-tint on black; icons white on black */
+.jenvu-zoom-dashboard :is(.bg-blue-50,.bg-sky-50,.bg-indigo-50) { background-color: #F4F4F4 !important; }
+.dash-dark :is(.bg-blue-50,.bg-sky-50,.bg-indigo-50,.bg-zinc-50,.bg-\[\#F4F4F4\]) { background-color: rgba(255,255,255,0.1) !important; }
+.dash-dark :is(aside, nav, [role="dialog"], header) svg:not(.terminal-dark *),
+.dash-dark .text-muted-foreground svg { color: #ffffff !important; }
