@@ -36,6 +36,9 @@ const LOGOS: Record<ProviderKey, string> = {
   meta: metaLogo,
 };
 
+// Black single-colour marks: flip to white on the black theme so they stay visible.
+const MONO_LOGOS = new Set<ProviderKey>(["openai", "xai", "moonshot"]);
+
 const CAP_META: Record<Capability, { label: string; icon: typeof Brain; cls: string }> = {
   reasoning: { label: "Reasoning", icon: Brain, cls: "bg-gc-yellow-soft text-gc-amber" },
   vision: { label: "Vision", icon: Eye, cls: "bg-gc-blue-soft text-gc-blue-deep" },
@@ -48,7 +51,12 @@ function ProviderLogo({ provider, size = "md" }: { provider: ProviderKey; size?:
   const box = size === "sm" ? "h-7 w-7 rounded-md" : size === "lg" ? "h-12 w-12 rounded-xl" : "h-9 w-9 rounded-lg";
   return (
     <span className={cn("grid shrink-0 place-items-center border border-gc-line bg-background", box)}>
-      <img src={LOGOS[provider]} alt={`${PROVIDERS[provider].label} logo`} className="h-[58%] w-[58%] object-contain" loading="lazy" />
+      <img
+        src={LOGOS[provider]}
+        alt={`${PROVIDERS[provider].label} logo`}
+        className={cn("h-[58%] w-[58%] object-contain", MONO_LOGOS.has(provider) && "dark:invert", provider === "moonshot" && "dark:hue-rotate-180")}
+        loading="lazy"
+      />
     </span>
   );
 }

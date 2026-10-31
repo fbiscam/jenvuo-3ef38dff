@@ -1,4 +1,5 @@
 import { getAlertCutoff } from "@/lib/alert-cutoff";
+import { SidebarMoreMenu } from "@/components/dashboard/SidebarMoreMenu";
 import { readSiteTheme, saveSiteTheme } from "@/lib/site-theme";
 import { getIpGeo } from "@/lib/ip-geo";
 import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
@@ -1505,15 +1506,7 @@ function DashboardLayout() {
           >
             {!navCollapsed && (
               <div className="flex items-center gap-1">
-                <Link to="/help" title="Help center" aria-label="Help center" className="sidebar-quick-btn inline-flex h-8 w-8 items-center justify-center rounded-md text-gc-ink">
-                  <LifeBuoy className="h-4 w-4" strokeWidth={2} />
-                </Link>
-                <Link to="/dashboard/profile" title="Settings" aria-label="Settings" className="sidebar-quick-btn inline-flex h-8 w-8 items-center justify-center rounded-md text-gc-ink">
-                  <SettingsIcon className="h-4 w-4" strokeWidth={2} />
-                </Link>
-                <button type="button" onClick={() => void signOut()} title="Sign out" aria-label="Sign out" className="sidebar-quick-btn inline-flex h-8 w-8 items-center justify-center rounded-md text-gc-ink">
-                  <LogOut className="h-4 w-4" strokeWidth={2} />
-                </button>
+                <SidebarMoreMenu onSignOut={() => void signOut()} />
               </div>
             )}
             <div className={`flex items-center gap-1 ${navCollapsed ? "flex-col" : ""}`}>
