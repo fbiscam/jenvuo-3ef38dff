@@ -92,6 +92,7 @@ import {
   ChartNoAxesCombined,
   KeyRound,
   Code2,
+  MessageSquare,
   BadgeDollarSign,
   FileCheck2,
   LockKeyhole,
