@@ -151,11 +151,11 @@ export function EntShowcase() {
         </Link>
       </div>
       <div className="mx-auto mt-3 grid max-w-[1140px] gap-3 md:grid-cols-[2fr_1fr_3fr]">
-        <Link to="/blog" className={`${tile} h-[290px]`}>
+        <Link to="/insights" className={`${tile} h-[290px]`}>
           <img src={bentoImagine} alt="Iced coffee beside a booklet called Gold Market Notes" width={1024} height={768} loading="lazy" className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
           <span className="absolute bottom-4 left-5 text-[14px] text-gc-on-night">Imagine</span>
         </Link>
-        <Link to="/blog" className={`${tile} grid h-[290px] grid-rows-2 gap-1`}>
+        <Link to="/insights" className={`${tile} grid h-[290px] grid-rows-2 gap-1`}>
           <img src={bentoFox} alt="Animated fox studying a gold chart" width={896} height={752} loading="lazy" className="h-full w-full rounded-[18px] object-cover" />
           <div className="relative">
             <img src={bentoCar} alt="Green vintage roadster with a gold stripe" width={896} height={752} loading="lazy" className="h-full w-full rounded-[18px] object-cover" />
