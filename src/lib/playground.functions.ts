@@ -2,12 +2,12 @@
 // Same plan, balance, daily-limit and $3/1M-token billing as the public API.
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { buildPlaygroundMessages, clampMaxTokens, type PlaygroundTurn } from "@/lib/playground";
+import { buildPlaygroundMessages, clampMaxTokens, sanitizePlaygroundImages, type PlaygroundTurn } from "@/lib/playground";
 
 export const playgroundChat = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => {
-    const obj = (d ?? {}) as { model?: unknown; turns?: unknown; instructions?: unknown; maxTokens?: unknown };
+    const obj = (d ?? {}) as { model?: unknown; turns?: unknown; instructions?: unknown; maxTokens?: unknown; images?: unknown };
     const turns: PlaygroundTurn[] = Array.isArray(obj.turns)
       ? obj.turns
           .map((t) => t as { role?: unknown; content?: unknown })
@@ -19,6 +19,7 @@ export const playgroundChat = createServerFn({ method: "POST" })
       turns,
       instructions: typeof obj.instructions === "string" ? obj.instructions : "",
       maxTokens: clampMaxTokens(obj.maxTokens),
+      images: sanitizePlaygroundImages(obj.images),
     };
   })
   .handler(async ({ data, context }) => {
@@ -26,7 +27,7 @@ export const playgroundChat = createServerFn({ method: "POST" })
     const { jenvuServiceError } = await import("@/lib/jenvu-api-errors");
     const modelId = resolvePublicModel(data.model);
     if (!modelId) return { ok: false as const, error: "That model isn't available." };
-    const messages = buildPlaygroundMessages(data.turns, data.instructions);
+    const messages = buildPlaygroundMessages(data.turns, data.instructions, data.images);
     if (!messages.length || data.turns[data.turns.length - 1]?.role !== "user") {
       return { ok: false as const, error: "Type a message first." };
     }
