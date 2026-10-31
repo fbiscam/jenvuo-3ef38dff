@@ -171,9 +171,9 @@ function Playground() {
           <span className="h-2.5 w-2.5 rounded-full bg-gc-red" />
           <span className="h-2.5 w-2.5 rounded-full bg-gc-yellow" />
           <span className="h-2.5 w-2.5 rounded-full bg-gc-green" />
-          <span className="ml-3 font-mono">POST /v1/chat/completions</span>
+          <span className="ml-3 whitespace-nowrap font-mono">POST<span className="hidden sm:inline"> /v1/chat/completions</span></span>
         </div>
-        <span className="rounded-full border border-gc-night-soft px-2.5 py-0.5 font-mono text-[11px] text-gc-on-night-muted">
+        <span className="whitespace-nowrap rounded-full border border-gc-night-soft px-2.5 py-0.5 font-mono text-[11px] text-gc-on-night-muted">
           jenvu-fast
         </span>
       </div>
