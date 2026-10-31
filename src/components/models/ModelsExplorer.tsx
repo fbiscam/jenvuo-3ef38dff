@@ -142,9 +142,9 @@ function FilterChip({ active, onClick, children }: { active: boolean; onClick: (
 
 function SectionHead({ title, sub }: { title: string; sub: string }) {
   return (
-    <div className="mb-3">
-      <h2 className="text-2xl font-medium tracking-tight text-gc-ink sm:text-3xl">{title}</h2>
-      <p className="text-sm text-gc-ink-muted">{sub}</p>
+    <div className="mx-auto mb-8 max-w-2xl text-center">
+      <h2 className="text-3xl font-medium tracking-tight text-gc-ink sm:text-[2.5rem] sm:leading-tight">{title}</h2>
+      <p className="mt-3 text-[17px] text-gc-ink">{sub}</p>
     </div>
   );
 }
@@ -207,7 +207,7 @@ export default function ModelsExplorer({ apiHref = "/dashboard/api" }: { apiHref
             [String(new Set(MODEL_CATALOG.map((m) => m.provider)).size), "Labs"],
             [price, "Per 1M tokens"],
           ].map(([v, l]) => (
-            <div key={l} className="px-3">
+            <div key={l} className="px-3 text-center">
               <dd className="text-3xl font-medium tabular-nums tracking-tight">{v}</dd>
               <dt className="mt-1 text-sm text-gc-ink-muted">{l}</dt>
             </div>
@@ -219,7 +219,7 @@ export default function ModelsExplorer({ apiHref = "/dashboard/api" }: { apiHref
       <section className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
         {FLAGSHIPS.slice(0, 4).map((m, i) => (
           <button key={m.id} type="button" onClick={() => pick(m.id)}
-            className="relative flex aspect-[5/4] flex-col justify-end overflow-hidden rounded-md bg-gc-night px-7 pb-8 text-left text-gc-on-night sm:aspect-[5/7]">
+            className="relative flex aspect-[5/4] flex-col justify-end overflow-hidden rounded-md bg-gc-night px-7 pb-10 text-left text-gc-on-night sm:aspect-[5/7]">
             <img src={i === 0 ? starsNebula : starsPlain} alt="" width={768} height={1056} loading="lazy"
               className="absolute inset-0 h-full w-full object-cover"
               style={{ transform: ["none", "none", "rotate(180deg)", "scaleX(-1)"][i] }} />
@@ -243,7 +243,8 @@ export default function ModelsExplorer({ apiHref = "/dashboard/api" }: { apiHref
             <span className="w-5 text-center">#</span>
             <span className="w-9 shrink-0" aria-hidden />
             <span className="flex-1">Model</span>
-            <span className="text-right">Context window</span>
+            <span className="hidden w-24 sm:block" aria-hidden />
+            <span className="w-14 text-right">Context</span>
           </div>
           <ul>
             {FLAGSHIPS.map((m, i) => (
@@ -276,9 +277,12 @@ export default function ModelsExplorer({ apiHref = "/dashboard/api" }: { apiHref
 
       {/* Families */}
       <section>
-        <div className="mb-3 flex items-center justify-between gap-3">
-          <h2 className="text-2xl font-medium tracking-tight text-gc-ink sm:text-3xl">Model families</h2>
-          <button type="button" onClick={() => { setProvider("all"); scrollToCatalog(); }} className="text-sm text-gc-ink underline underline-offset-4 hover:text-gc-blue">View all</button>
+        <div className="mx-auto mb-8 max-w-2xl text-center">
+          <h2 className="text-3xl font-medium tracking-tight text-gc-ink sm:text-[2.5rem] sm:leading-tight">Model families</h2>
+          <p className="mt-3 text-[17px] text-gc-ink">
+            Every lab on Jenvu, grouped by provider.{" "}
+            <button type="button" onClick={() => { setProvider("all"); scrollToCatalog(); }} className="underline underline-offset-4 hover:text-gc-blue">View all</button>
+          </p>
         </div>
         <div className="flex snap-x gap-3 overflow-x-auto pb-1 lg:grid lg:grid-cols-5 lg:overflow-visible">
           {FAMILY_KEYS.map((key) => {
