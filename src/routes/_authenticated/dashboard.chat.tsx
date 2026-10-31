@@ -253,7 +253,7 @@ function ChatPlayground() {
     }
   };
 
-  const useExample = (ex: Example) => {
+  const pickExample = (ex: Example) => {
     setInstructions(ex.instructions ?? "");
     setInput(ex.prompt);
     if (ex.tags.includes("Image input")) imageInput.current?.click();
@@ -354,7 +354,7 @@ function ChatPlayground() {
                 <button
                   key={ex.title}
                   type="button"
-                  onClick={() => useExample(ex)}
+                  onClick={() => pickExample(ex)}
                   className="flex flex-col rounded-2xl border border-border bg-background p-4 text-left transition-colors hover:bg-[var(--console-card)]"
                 >
                   <span className={`grid h-7 w-7 place-items-center rounded-full ${ex.tone}`}>
