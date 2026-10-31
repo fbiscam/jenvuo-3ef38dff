@@ -36,6 +36,11 @@ import devDocs from "@/assets/home/dev-docs.jpg";
 import progFounding from "@/assets/home/prog-founding.jpg";
 import progPlans from "@/assets/home/prog-plans.jpg";
 import progSupport from "@/assets/home/prog-support.jpg";
+import openAiLogo from "@/assets/model-logos/openai.svg";
+import claudeLogo from "@/assets/model-logos/claude-color.svg";
+import geminiLogo from "@/assets/model-logos/gemini-color.svg";
+import deepseekLogo from "@/assets/model-logos/deepseek-color.svg";
+import grokLogo from "@/assets/model-logos/grok.svg";
 
 type Tone = "blue" | "red" | "yellow" | "green";
 
@@ -255,6 +260,41 @@ export function CloudHero({ price: _price, delta: _delta }: { price: string; del
   );
 }
 
+/* ---------------- AI model logo strip (under the hero stories) ---------------- */
+const MODEL_LOGOS: Array<{ name: string; src: string; mono?: boolean }> = [
+  { name: "OpenAI", src: openAiLogo, mono: true },
+  { name: "Claude", src: claudeLogo },
+  { name: "Gemini", src: geminiLogo },
+  { name: "DeepSeek", src: deepseekLogo },
+  { name: "Grok", src: grokLogo, mono: true },
+];
+
+/** Centred label plus a row of model logos with names, like the Platform "works with" strip. */
+export function CloudModelStrip() {
+  return (
+    <section aria-label="AI models" className="mx-auto max-w-[1296px] px-5 pb-16 pt-6 text-center sm:px-8">
+      <p className="text-[12px] font-medium uppercase tracking-[0.18em] text-gc-ink-muted">
+        Powered by the top AI models
+      </p>
+      <ul className="mt-7 flex flex-wrap items-center justify-center gap-x-10 gap-y-6 sm:gap-x-14">
+        {MODEL_LOGOS.map((m) => (
+          <li key={m.name} className="flex items-center gap-2.5 text-gc-ink">
+            <img
+              src={m.src}
+              alt=""
+              width={28}
+              height={28}
+              loading="lazy"
+              className={`h-7 w-7 ${m.mono ? "dark:invert" : ""}`}
+            />
+            <span className="text-[18px] font-medium tracking-tight sm:text-[20px]">{m.name}</span>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
 /* ---------------- Audience tabs (Google Cloud-style panel) ---------------- */
 type AudienceCard = { tag: string; text: string; to: string; img?: string; logo?: boolean };
 const AUDIENCES: Array<{ key: string; label: string; cards: AudienceCard[] }> = [
@@ -313,8 +353,8 @@ export function CloudAudiences() {
   const [active, setActive] = React.useState(AUDIENCES[0].key);
   const current = AUDIENCES.find((a) => a.key === active) ?? AUDIENCES[0];
   return (
-    <section className="mx-auto max-w-7xl px-5 pb-16 pt-4 text-center">
-      <h2 className="text-3xl font-medium tracking-tight">Built for every kind of Fiber trader</h2>
+    <section className="mx-auto max-w-[1472px] px-5 pb-20 pt-6 text-center">
+      <h2 className="text-[34px] font-medium tracking-tight sm:text-[35px]">Built for every kind of Fiber trader</h2>
       <div role="tablist" className="mt-8 inline-flex max-w-full gap-1 overflow-x-auto rounded-full bg-gc-surface p-1 ring-1 ring-gc-line/60 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {AUDIENCES.map((a) => (
           <button
@@ -323,7 +363,7 @@ export function CloudAudiences() {
             role="tab"
             aria-selected={a.key === active}
             onClick={() => setActive(a.key)}
-            className={`shrink-0 rounded-full px-3.5 py-2.5 text-sm font-medium transition-colors sm:px-5 ${
+            className={`shrink-0 rounded-full px-4 py-3 text-[15px] font-medium transition-colors sm:px-6 sm:text-base ${
               a.key === active ? "bg-gc-blue text-gc-on-blue" : "text-gc-ink hover:bg-gc-panel"
             }`}
           >
@@ -331,16 +371,16 @@ export function CloudAudiences() {
           </button>
         ))}
       </div>
-      <div className="mt-14 grid gap-6 text-left md:grid-cols-3">
+      <div className="mt-16 grid gap-7 text-left md:grid-cols-3">
         {current.cards.map((c) => (
-          <div key={c.tag} className="flex flex-col rounded-md border border-gc-line p-6">
-            <h3 className="text-xl font-medium text-gc-ink">{AUDIENCE_TITLE[c.tag] ?? c.tag}</h3>
-            <p className="mt-6 flex-1 text-sm leading-relaxed text-gc-ink">{c.text}</p>
+          <div key={c.tag} className="flex flex-col rounded-md border border-gc-line p-7 sm:p-8">
+            <h3 className="text-[23px] font-medium text-gc-ink">{AUDIENCE_TITLE[c.tag] ?? c.tag}</h3>
+            <p className="mt-7 flex-1 text-base leading-relaxed text-gc-ink">{c.text}</p>
             <Link
               to={c.to}
-              className="mt-8 inline-flex w-fit items-center gap-1 border-b border-gc-ink pb-0.5 text-[15px] text-gc-ink hover:opacity-70"
+              className="mt-9 inline-flex w-fit items-center gap-1 border-b border-gc-ink pb-0.5 text-[17px] text-gc-ink hover:opacity-70"
             >
-              {AUDIENCE_LINK[c.to] ?? "Learn more"} <ArrowUpRight className="h-3.5 w-3.5" />
+              {AUDIENCE_LINK[c.to] ?? "Learn more"} <ArrowUpRight className="h-4 w-4" />
             </Link>
           </div>
         ))}
