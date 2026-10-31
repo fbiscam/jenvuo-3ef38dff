@@ -142,6 +142,16 @@
   --color-gc-on-night-muted: var(--gc-on-night-muted);
   --color-auth-action: var(--auth-action);
   --color-auth-action-foreground: var(--auth-action-foreground);
+  --color-ent-card: var(--ent-card);
+  --color-ent-ivory: var(--ent-ivory);
+  --color-ent-bubble: var(--ent-bubble);
+  --color-ent-ide: var(--ent-ide);
+  --color-ent-ide-fg: var(--ent-ide-fg);
+  --color-ent-ide-green: var(--ent-ide-green);
+  --color-ent-ide-add: var(--ent-ide-add);
+  --color-ent-ide-del: var(--ent-ide-del);
+  --color-ent-orange: var(--ent-orange);
+  --color-ent-excel: var(--ent-excel);
 }
 
 :root {
@@ -1662,7 +1672,20 @@ pre, pre *, code, kbd, samp {
 :root {
   --ent-hero-wash: linear-gradient(var(--background), var(--background));
   --ent-aurora: radial-gradient(120% 90% at 20% 10%, oklch(0.8 0.12 250), transparent 60%), radial-gradient(100% 80% at 90% 90%, oklch(0.75 0.14 280), transparent 60%), oklch(0.93 0.04 250);
+  --ent-card: #f4f4f4;
+  --ent-ivory: #f6f5f1;
+  --ent-bubble: #ebeae6;
+  --ent-ide: #161616;
+  --ent-ide-fg: #d4d4d4;
+  --ent-ide-green: #4ade80;
+  --ent-ide-add: rgba(74, 222, 128, 0.14);
+  --ent-ide-del: rgba(248, 113, 113, 0.16);
+  --ent-orange: #f26b1d;
+  --ent-excel: #1d7044;
 }
 .dark {
   --ent-hero-wash: linear-gradient(var(--background), var(--background));
+  --ent-card: oklch(0.24 0.02 260);
+  --ent-ivory: oklch(0.24 0.02 260);
+  --ent-bubble: oklch(0.32 0.02 260);
 }

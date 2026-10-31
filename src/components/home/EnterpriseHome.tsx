@@ -1,9 +1,10 @@
 import * as React from "react";
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, ArrowUp, Bell, Bot, ChevronRight, Code2, MessageCircle, Pause, Play, Plus, ShieldCheck, Sparkles } from "lucide-react";
+import { ArrowRight, ArrowUp, ArrowUpRight, Bell, Bot, ChevronRight, Code2, MessageCircle, Plus, Sparkles } from "lucide-react";
 import { openAskJenvu } from "@/components/AskJenvuWidget";
-import poster from "@/assets/home/hero-ai-3.jpg";
-import vid from "@/assets/home/hero-ai-3.mp4.asset.json";
+import bentoImagine from "@/assets/home/bento-imagine.jpg";
+import bentoFox from "@/assets/home/bento-fox.jpg";
+import bentoCar from "@/assets/home/bento-car.jpg";
 import s1 from "@/assets/home/card-blue.jpg";
 import s2 from "@/assets/home/card-wave.jpg";
 import s3 from "@/assets/home/trade-neon-practice.jpg";
@@ -59,23 +60,114 @@ const pill =
 const h2 = "text-[34px] font-medium leading-[1.1] tracking-tight text-foreground sm:text-[48px]";
 const sub = "mx-auto mt-5 max-w-2xl text-[17px] leading-relaxed text-muted-foreground";
 
-/* 1 — Hero + tools strip */
+/* 1 — Hero (xAI style): badge, headline, two pills */
 export function EntHero() {
   return (
-    <section className="bg-[image:var(--ent-hero-wash)] px-5 pb-16 pt-24 text-center sm:pt-32">
-      <h1 className="mx-auto max-w-4xl text-[42px] font-medium leading-[1.05] tracking-tight text-foreground sm:text-[68px]">
-        Frontier AI for the most ambitious traders
+    <section className="bg-[image:var(--ent-hero-wash)] px-5 pb-14 pt-16 text-center sm:pt-20">
+      <Link to="/models" className="inline-flex items-center gap-2 rounded-full border border-border bg-background py-1.5 pl-1.5 pr-2 text-[13px] shadow-sm transition hover:bg-muted/40">
+        <span className="rounded-full bg-ent-orange/10 px-2 py-0.5 text-[11px] font-medium text-ent-orange">New</span>
+        <span className="font-medium text-foreground">Meet Jenvu AI</span>
+        <span className="text-muted-foreground">Our new models</span>
+        <span className="flex h-5 w-5 items-center justify-center rounded-full bg-muted"><ArrowUpRight className="h-3 w-3" /></span>
+      </Link>
+      <h1 className="mx-auto mt-8 max-w-4xl text-[42px] font-medium leading-[1.06] tracking-tight text-foreground sm:text-[68px]">
+        Frontier AI models
+        <br />
+        for every chart you{" "}
+        <span className="underline decoration-muted-foreground/40 decoration-[3px] underline-offset-[10px]">see</span>.
       </h1>
-      <p className={sub}>
-        Jenvu gives traders and desks the gold intelligence, alerts and automation to tackle problems that once felt out of reach.
+      <p className="mx-auto mt-6 max-w-2xl text-[16px] text-foreground/80 sm:text-[18px]">
+        Reasoning, code, alerts, charts, and automation. Built for gold traders.
       </p>
-      <div className="mt-9 flex flex-wrap items-center justify-center gap-4">
-        <button type="button" onClick={() => openAskJenvu("sales")} className={pill}>Contact sales</button>
-        <Link to="/auth" search={{ mode: "signup" } as never} className="inline-flex items-center gap-1 text-[15px] font-medium text-foreground hover:opacity-70">
-          Get started <ChevronRight className="h-4 w-4" />
+      <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
+        <Link to="/platform" className="inline-flex items-center gap-1.5 rounded-full bg-foreground px-6 py-3 text-[15px] font-medium text-background transition hover:opacity-85">
+          Get API Access <ChevronRight className="h-4 w-4" />
+        </Link>
+        <Link to="/docs" className="inline-flex items-center rounded-full bg-muted px-6 py-3 text-[15px] font-medium text-foreground transition hover:bg-muted/70">
+          View Documentation
         </Link>
       </div>
-      <div className="mx-auto mt-20 grid max-w-5xl grid-cols-2 items-center justify-items-center gap-x-6 gap-y-6 whitespace-nowrap text-[16px] sm:text-[20px] font-semibold tracking-tight text-foreground/80 sm:grid-cols-5">
+    </section>
+  );
+}
+
+/* 2 — Bento of 6 tiles (replaces the video box) */
+function TileFoot({ label, light = false, link = true }: { label: string; light?: boolean; link?: boolean }) {
+  return (
+    <div className={`absolute inset-x-0 bottom-0 flex items-center justify-between px-5 pb-4 pt-10 text-[14px] ${light ? "bg-gradient-to-t from-ent-ide via-ent-ide/90 to-transparent text-ent-ide-fg" : "bg-gradient-to-t from-ent-ivory via-ent-ivory/90 to-transparent text-foreground"}`}>
+      <span>{label}</span>
+      {link && <span className="inline-flex items-center gap-1">Explore <ArrowRight className="h-3.5 w-3.5" /></span>}
+    </div>
+  );
+}
+const tile = "group relative block overflow-hidden rounded-[18px] transition hover:-translate-y-0.5";
+
+export function EntShowcase() {
+  return (
+    <section className="px-5 pb-20">
+      <div className="mx-auto grid max-w-[1140px] gap-3 md:grid-cols-3">
+        {/* Chat */}
+        <Link to="/dashboard" className={`${tile} h-[290px] bg-ent-ivory p-5 text-[13px] leading-snug`}>
+          <div className="mt-[-18px] w-[85%] rounded-2xl bg-ent-bubble px-4 py-2.5 text-foreground/80">the core into a singularity.</div>
+          <div className="mt-3 ml-auto w-fit max-w-[70%] rounded-2xl bg-ent-bubble px-4 py-2.5 text-gc-blue">Why did gold sweep the Asian low?</div>
+          <div className="mt-3 w-[85%] rounded-2xl bg-ent-bubble px-4 py-2.5 text-foreground/80">Sell-side liquidity rested under the range, so price took it before the <span className="text-gc-blue">London open</span>.</div>
+          <div className="mt-3 ml-auto w-fit max-w-[70%] rounded-2xl bg-ent-bubble px-4 py-2.5 text-gc-blue">Explain an FVG simply</div>
+          <div className="mt-3 w-[85%] rounded-2xl bg-ent-bubble px-4 py-2.5 text-foreground/80">A fast move leaves a gap between three candles — <span className="text-gc-blue">price often comes back</span> to fill part of it.</div>
+          <TileFoot label="Chat" />
+        </Link>
+        {/* Build */}
+        <Link to="/docs" className={`${tile} h-[290px] bg-ent-ide font-mono text-[12px] leading-[1.7] text-ent-ide-fg`}>
+          <div className="flex items-center gap-2 px-4 py-3">
+            <span className="h-2.5 w-2.5 rounded-full bg-gc-red" /><span className="h-2.5 w-2.5 rounded-full bg-gc-yellow" /><span className="h-2.5 w-2.5 rounded-full bg-gc-green" />
+            <span className="ml-4 opacity-60">projects/main</span>
+            <span className="ml-auto flex items-center gap-1.5 opacity-70"><span className="h-2 w-10 rounded-sm bg-ent-ide-fg/20"><span className="block h-2 w-2 rounded-sm bg-ent-ide-fg" /></span>16.15%</span>
+          </div>
+          <div className="px-4">
+            <div className="opacity-50">▸ Thinking...</div>
+            <div><span className="text-ent-ide-green">• grep</span> "fvgZone" src/ <span className="opacity-40">no matches</span></div>
+            <div><span className="text-ent-ide-green">• read_file</span> src/api/signals.ts <span className="opacity-40">42 lines</span></div>
+            <div className="flex justify-between opacity-60"><span>| Scan signal handlers</span><span className="text-ent-ide-green">[done]</span></div>
+            <div className="opacity-50">◆ Thought for 2.8s</div>
+            <div className="mt-1 pl-3"><span className="text-gc-blue">◆</span> <b>Edit</b> <span className="text-ent-ide-green">src/api/signals.ts</span></div>
+            <div><span className="opacity-40">14 </span>export async function handler(req) {"{"}</div>
+            <div className="bg-ent-ide-add"><span className="opacity-40">15 </span>  await rateLimit(req, {"{"} max: 100 {"}"});</div>
+            <div className="bg-ent-ide-del"><span className="opacity-40">33 </span>  if (!data.symbol) throw Error;</div>
+            <div className="bg-ent-ide-add"><span className="opacity-40">33 </span>  return schema.parse(data);</div>
+          </div>
+          <TileFoot label="Build" light />
+        </Link>
+        {/* Bot */}
+        <Link to="/dashboard" className={`${tile} h-[290px] bg-ent-ivory p-5 text-[13px] leading-snug`}>
+          <div className="text-[12px] text-muted-foreground">✓ Flagged → 1 alert · XAU/USD $2,412 twice</div>
+          <div className="mt-4 w-[88%] rounded-2xl bg-ent-bubble px-4 py-3 text-foreground">price touched $2,412 at 09:00 and again at 13:30. double top, or two separate tests?</div>
+          <div className="mt-4 ml-auto w-fit rounded-2xl bg-foreground px-4 py-2.5 text-background">two tests, london held the level</div>
+          <div className="mt-6 flex items-center gap-3 text-[12px] text-muted-foreground">
+            <span className="flex h-8 w-8 items-center justify-center gap-1 rounded-full bg-ent-orange">
+              <span className="h-3 w-1 rounded-full bg-background" /><span className="h-3 w-1 rounded-full bg-background" />
+            </span>
+            Thinking
+          </div>
+          <TileFoot label="Bot" />
+        </Link>
+      </div>
+      <div className="mx-auto mt-3 grid max-w-[1140px] gap-3 md:grid-cols-[2fr_1fr_3fr]">
+        <Link to="/insights" className={`${tile} h-[290px]`}>
+          <img src={bentoImagine} alt="Iced coffee beside a booklet called Gold Market Notes" width={1024} height={768} loading="lazy" className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
+          <span className="absolute bottom-4 left-5 text-[14px] text-gc-on-night">Imagine</span>
+        </Link>
+        <Link to="/insights" className={`${tile} grid h-[290px] grid-rows-2 gap-1`}>
+          <img src={bentoFox} alt="Animated fox studying a gold chart" width={896} height={752} loading="lazy" className="h-full w-full rounded-[18px] object-cover" />
+          <div className="relative">
+            <img src={bentoCar} alt="Green vintage roadster with a gold stripe" width={896} height={752} loading="lazy" className="h-full w-full rounded-[18px] object-cover" />
+            <span className="absolute bottom-3 right-4 inline-flex items-center gap-1 text-[14px] text-gc-on-night">Explore <ArrowRight className="h-3.5 w-3.5" /></span>
+          </div>
+        </Link>
+        <Link to="/dashboard" className={`${tile} flex h-[290px] items-center justify-center bg-ent-ivory`}>
+          <span className="h-[190px] w-[190px] rounded-full bg-background shadow-[0_0_60px_rgba(0,0,0,0.04)] transition duration-700 group-hover:scale-105" />
+          <TileFoot label="Voice" />
+        </Link>
+      </div>
+      <div className="mx-auto mt-16 grid max-w-5xl grid-cols-2 items-center justify-items-center gap-x-6 gap-y-6 whitespace-nowrap text-[16px] font-semibold tracking-tight text-foreground/80 sm:grid-cols-5 sm:text-[20px]">
         <span className="flex items-center gap-2.5">
           <img src={mt5Logo.url} alt="" width={32} height={32} className="h-8 w-8 rounded-md object-contain" />
           MetaTrader 5
@@ -89,82 +181,102 @@ export function EntHero() {
   );
 }
 
-/* 2 — Cinematic video box */
-export function EntShowcase() {
-  const ref = React.useRef<HTMLVideoElement>(null);
-  const [playing, setPlaying] = React.useState(true);
-  const toggle = () => {
-    const v = ref.current;
-    if (!v) return;
-    if (v.paused) { void v.play(); setPlaying(true); } else { v.pause(); setPlaying(false); }
-  };
-  return (
-    <section className="px-5 pb-24">
-      <div className="relative mx-auto aspect-[16/9] max-w-6xl overflow-hidden rounded-[28px] bg-foreground">
-        <video ref={ref} src={vid.url} poster={poster} autoPlay muted loop playsInline className="h-full w-full object-cover" />
-        <div className="absolute inset-0 flex items-center justify-center">
-          <span className="rounded-full bg-background/90 px-5 py-2 text-[13px] font-semibold tracking-[0.18em] text-foreground backdrop-blur">IT'S BUILT IN</span>
-        </div>
-        <button type="button" onClick={toggle} aria-label={playing ? "Pause video" : "Play video"} className="absolute bottom-5 right-5 flex h-10 w-10 items-center justify-center rounded-full bg-background/90 text-foreground">
-          {playing ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
-        </button>
-      </div>
-    </section>
-  );
-}
-
-/* 3 — Built for business: 3 cards */
+/* 3 — Built for business: 3 cards, text on top, visual bleeding off the right/bottom edge */
 function Card({ title, body, children }: { title: string; body: string; children: React.ReactNode }) {
   return (
-    <div className="flex min-h-[460px] flex-col overflow-hidden rounded-[24px] bg-muted/50">
-      <div className="p-8 pb-4">
-        <h3 className="text-[22px] font-medium tracking-tight text-foreground">{title}</h3>
-        <p className="mt-2 text-[15px] leading-relaxed text-muted-foreground">{body}</p>
+    <div className="relative flex h-[480px] flex-col overflow-hidden rounded-[8px] bg-ent-card">
+      <div className="px-8 pt-10">
+        <h3 className="text-[21px] font-medium tracking-tight text-foreground">{title}</h3>
+        <p className="mt-3 max-w-[340px] text-[14px] leading-[1.6] text-foreground/85">{body}</p>
       </div>
-      <div className="mt-auto flex items-end justify-center px-8 pb-8">{children}</div>
+      <div className="relative mt-auto h-[300px]">{children}</div>
     </div>
   );
 }
 export function EntBuilt() {
+  const rows = [
+    ["M15", "$2,398.40", "$2,391.00"],
+    ["H1", "$2,405.10", "$2,396.80"],
+    ["M5", "$2,401.70", "$2,397.20"],
+  ];
   return (
     <section className="px-5 py-24">
       <div className="text-center">
-        <h2 className={h2}>Built for trading. Backed by frontier AI.</h2>
-        <p className={sub}>One workspace for gold analysis, alerts, automation and the API — with the safeguards serious traders expect.</p>
+        <h2 className="text-[34px] font-medium leading-[1.1] tracking-tight text-foreground sm:text-[44px]">Built for trading. Backed by frontier AI.</h2>
+        <p className="mx-auto mt-5 max-w-[580px] text-[16px] leading-[1.65] text-foreground/85">
+          Jenvu combines leading research and models to build trader-ready products people can use every day, helping you redesign work around what's possible.
+        </p>
       </div>
-      <div className="mx-auto mt-14 grid max-w-6xl gap-5 md:grid-cols-3">
-        <Card title="Frontier intelligence" body="Ask Jenvu reads ICT/SMC structure on XAU/USD and explains it in plain words.">
-          <div className="w-full rounded-2xl border border-border bg-background p-4 text-left text-[13px] shadow-sm">
-            {["XAU/USD · M15 · bullish FVG", "Sell-side liquidity swept", "Bias: wait for retest"].map((r) => (
-              <div key={r} className="border-b border-border py-2 last:border-0 text-foreground/80">{r}</div>
-            ))}
-            <span className="mt-3 inline-flex items-center gap-1 rounded-full bg-gc-blue px-3 py-1 text-[12px] text-gc-on-blue"><Plus className="h-3 w-3" /> Agent</span>
-          </div>
-        </Card>
-        <Card title="Guidance from setup to scale" body="Alerts, JX Bot and the API come with step-by-step guides and live support.">
-          <div className="w-full rounded-2xl border border-border bg-background p-4 text-left text-[13px] shadow-sm">
-            <div className="flex items-center gap-2 font-medium text-foreground"><ShieldCheck className="h-4 w-4 text-gc-blue" /> Risk check</div>
-            <p className="mt-2 text-muted-foreground">Stop loss on every trade, spread under 2 pips, killzones blocked.</p>
-            <div className="mt-4 flex justify-end"><span className="rounded-full bg-foreground px-3 py-1 text-[12px] text-background">run</span></div>
-          </div>
-        </Card>
-        <Card title="Built to deliver value" body="Simple plans and clear token pricing, so you always know what you pay.">
-          <div className="relative w-full rounded-2xl border border-border bg-background p-4 shadow-sm">
-            <div className="text-[12px] font-medium text-foreground">Cost per signal check</div>
-            <svg viewBox="0 0 220 120" className="mt-2 w-full" aria-hidden="true">
-              {[0, 1, 2, 3, 4].map((i) => (
-                <g key={i}>
-                  <line x1="28" x2="220" y1={10 + i * 24} y2={10 + i * 24} stroke="var(--border)" strokeWidth="1" />
-                  <text x="0" y={14 + i * 24} fontSize="9" fill="var(--muted-foreground)">{100 - i * 10}%</text>
-                </g>
-              ))}
-              <path d="M28,100 C70,80 100,50 140,36 S200,18 220,14" fill="none" stroke="var(--gc-blue)" strokeWidth="3" />
-              <circle cx="220" cy="14" r="4" fill="var(--gc-blue)" />
-            </svg>
-            <div className="absolute -top-4 right-4 rounded-xl bg-foreground px-3 py-2 text-left text-background shadow-lg">
-              <div className="text-[12px] font-medium">$3 / 1M tokens</div>
-              <div className="text-[10px] opacity-70">Same price on every model</div>
+      <div className="mx-auto mt-6 grid max-w-[1240px] gap-5 md:grid-cols-3">
+        <Card title="Frontier intelligence" body="Bring cutting-edge models into charts so traders can delegate high-value analysis.">
+          {/* Spreadsheet */}
+          <div className="absolute -right-6 bottom-0 left-16 top-0 rounded-t-xl border border-border bg-background text-[13px] shadow-sm">
+            <div className="flex items-center gap-3 border-b border-border px-10 py-5">
+              <span className="flex h-5 w-5 items-center justify-center rounded-[4px] bg-ent-excel text-[10px] font-bold text-gc-on-night">X</span>
+              <span className="text-foreground/80">Available setups</span>
             </div>
+            <div className="grid grid-cols-[1fr_1.1fr_1fr] gap-x-4 px-10 py-4 text-foreground/90">
+              <span>Timeframe</span><span>Entry zone</span><span>Stop loss</span>
+            </div>
+            {rows.map((r) => (
+              <div key={r[0]} className="grid grid-cols-[1fr_1.1fr_1fr] gap-x-4 border-t border-border px-10 py-4 text-foreground/80">
+                {r.map((c) => <span key={c}>{c}</span>)}
+              </div>
+            ))}
+            <div className="grid grid-cols-[1fr_1.1fr_1fr] gap-x-4 border-t border-border px-10 py-4">
+              <span className="text-foreground/60">M30</span><span className="h-5 rounded bg-muted" /><span className="h-5 rounded bg-muted" />
+            </div>
+          </div>
+          <div className="absolute bottom-[68px] left-8 right-8 rounded-2xl border border-border bg-background px-5 py-4 shadow-[0_8px_30px_rgba(0,0,0,0.08)]">
+            <p className="text-[14px] text-foreground">Find 15 FVG setups + run London session check</p>
+            <div className="mt-3 flex items-center gap-3 text-[13px]">
+              <Plus className="h-4 w-4 text-foreground" />
+              <span className="h-4 w-px bg-border" />
+              <span className="inline-flex items-center gap-1 text-gc-blue"><Bot className="h-3.5 w-3.5" /> Agent <span className="opacity-70">×</span></span>
+            </div>
+          </div>
+        </Card>
+        <Card title="Guidance from setup to scale" body="Work directly with Jenvu to plan alerts, set up JX Bot, and launch AI safely across your trading.">
+          {/* Document */}
+          <div className="absolute -right-6 bottom-0 left-16 top-2 rounded-t-xl border border-border bg-background px-11 pt-12 shadow-sm">
+            <p className="whitespace-nowrap text-[20px] text-foreground/90">Reviewing setup and risk</p>
+            <p className="mt-9 whitespace-nowrap text-[16px] leading-[1.8] text-foreground/70">Scanned XAU/USD with 7 engines<br />Validated two liquidity sweeps</p>
+            <p className="mt-16 h-5 w-px animate-pulse bg-foreground" />
+          </div>
+          <div className="absolute bottom-[78px] left-6 -right-6 flex items-center gap-4 rounded-full border border-border bg-background px-5 py-4 text-[17px] text-foreground shadow-[0_8px_30px_rgba(0,0,0,0.08)]">
+            <Plus className="h-5 w-5 shrink-0" />
+            <span className="whitespace-nowrap">Scan this chart using 7 engines</span>
+          </div>
+        </Card>
+        <Card title="Built to deliver value" body="Focus on your highest-impact setups, while ensuring reliability, security, risk control, and token efficiency.">
+          {/* Chart */}
+          <div className="absolute -right-6 bottom-0 left-16 top-2 rounded-t-xl border border-border bg-background p-4 shadow-sm">
+            <div className="h-full rounded-lg border border-border px-4 pt-3">
+              <p className="text-[11px] text-muted-foreground">Monthly budget used</p>
+              <svg viewBox="0 0 260 230" className="mt-2 h-[230px] w-full overflow-visible" aria-hidden="true">
+                {[100, 90, 80, 70, 60].map((v, i) => (
+                  <g key={v}>
+                    <line x1="34" x2="260" y1={20 + i * 48} y2={20 + i * 48} stroke="var(--border)" strokeDasharray="3 3" />
+                    <text x="0" y={24 + i * 48} fontSize="11" fill="var(--muted-foreground)">{v}%</text>
+                  </g>
+                ))}
+                <polyline points="56,240 92,140 110,58 140,30 172,26" fill="none" stroke="var(--gc-blue)" strokeWidth="1.5" opacity="0.6" />
+                {[[56, 240], [92, 140], [110, 58], [140, 30], [172, 26]].map(([x, y]) => <circle key={`${x}`} cx={x} cy={y} r="3" fill="var(--gc-blue)" opacity="0.7" />)}
+                <text x="178" y="44" fontSize="11" fill="var(--gc-blue)">Pro plan</text>
+                <polyline points="60,250 88,180 150,96 260,58" fill="none" stroke="var(--muted-foreground)" strokeWidth="1.2" opacity="0.6" />
+                {[[60, 250], [88, 180], [150, 96]].map(([x, y]) => <circle key={`${x}`} cx={x} cy={y} r="3" fill="var(--muted-foreground)" opacity="0.7" />)}
+              </svg>
+            </div>
+          </div>
+          <div className="absolute bottom-[80px] left-[100px] flex items-center gap-2.5 rounded-xl border border-border bg-background py-2 pl-2 pr-8 shadow-[0_8px_30px_rgba(0,0,0,0.1)]">
+            <span className="grid h-10 w-10 grid-cols-2 place-items-center gap-0.5 rounded-lg bg-gc-blue p-2">
+              {[0, 1, 2, 3].map((i) => <span key={i} className="h-2.5 w-2.5 rounded-full border-2 border-gc-on-blue" />)}
+            </span>
+            <span className="text-left">
+              <span className="block text-[13px] font-medium text-gc-blue">$3 / 1M tokens</span>
+              <span className="block text-[12px] text-muted-foreground">Same price on every model</span>
+            </span>
+            <span className="absolute right-2 top-2 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-foreground text-[9px] text-background">×</span>
           </div>
         </Card>
       </div>
