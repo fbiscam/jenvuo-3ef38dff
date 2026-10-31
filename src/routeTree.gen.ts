@@ -31,6 +31,7 @@ import { Route as KillzonesRouteImport } from './routes/killzones'
 import { Route as LlmRouteImport } from './routes/llm'
 import { Route as McpRouteImport } from './routes/mcp'
 import { Route as OpsX9k27m4nRouteImport } from './routes/ops-x9k2-7m4n'
+import { Route as PlatformRouteImport } from './routes/platform'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as RefundRouteImport } from './routes/refund'
@@ -218,6 +219,11 @@ const McpRoute = McpRouteImport.update({
 const OpsX9k27m4nRoute = OpsX9k27m4nRouteImport.update({
   id: '/ops-x9k2-7m4n',
   path: '/ops-x9k2-7m4n',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PlatformRoute = PlatformRouteImport.update({
+  id: '/platform',
+  path: '/platform',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PricingRoute = PricingRouteImport.update({
@@ -686,6 +692,7 @@ export interface FileRoutesByFullPath {
   '/llm': typeof LlmRoute
   '/mcp': typeof McpRoute
   '/ops-x9k2-7m4n': typeof OpsX9k27m4nRouteWithChildren
+  '/platform': typeof PlatformRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/refund': typeof RefundRoute
@@ -785,6 +792,7 @@ export interface FileRoutesByTo {
   '/killzones': typeof KillzonesRoute
   '/llm': typeof LlmRoute
   '/mcp': typeof McpRoute
+  '/platform': typeof PlatformRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/refund': typeof RefundRoute
@@ -888,6 +896,7 @@ export interface FileRoutesById {
   '/llm': typeof LlmRoute
   '/mcp': typeof McpRoute
   '/ops-x9k2-7m4n': typeof OpsX9k27m4nRouteWithChildren
+  '/platform': typeof PlatformRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/refund': typeof RefundRoute
@@ -992,6 +1001,7 @@ export interface FileRouteTypes {
     | '/llm'
     | '/mcp'
     | '/ops-x9k2-7m4n'
+    | '/platform'
     | '/pricing'
     | '/privacy'
     | '/refund'
@@ -1091,6 +1101,7 @@ export interface FileRouteTypes {
     | '/killzones'
     | '/llm'
     | '/mcp'
+    | '/platform'
     | '/pricing'
     | '/privacy'
     | '/refund'
@@ -1193,6 +1204,7 @@ export interface FileRouteTypes {
     | '/llm'
     | '/mcp'
     | '/ops-x9k2-7m4n'
+    | '/platform'
     | '/pricing'
     | '/privacy'
     | '/refund'
@@ -1297,6 +1309,7 @@ export interface RootRouteChildren {
   LlmRoute: typeof LlmRoute
   McpRoute: typeof McpRoute
   OpsX9k27m4nRoute: typeof OpsX9k27m4nRouteWithChildren
+  PlatformRoute: typeof PlatformRoute
   PricingRoute: typeof PricingRoute
   PrivacyRoute: typeof PrivacyRoute
   RefundRoute: typeof RefundRoute
@@ -1491,6 +1504,13 @@ declare module '@tanstack/react-router' {
       path: '/ops-x9k2-7m4n'
       fullPath: '/ops-x9k2-7m4n'
       preLoaderRoute: typeof OpsX9k27m4nRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/platform': {
+      id: '/platform'
+      path: '/platform'
+      fullPath: '/platform'
+      preLoaderRoute: typeof PlatformRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/pricing': {
@@ -2216,6 +2236,7 @@ const rootRouteChildren: RootRouteChildren = {
   LlmRoute: LlmRoute,
   McpRoute: McpRoute,
   OpsX9k27m4nRoute: OpsX9k27m4nRouteWithChildren,
+  PlatformRoute: PlatformRoute,
   PricingRoute: PricingRoute,
   PrivacyRoute: PrivacyRoute,
   RefundRoute: RefundRoute,

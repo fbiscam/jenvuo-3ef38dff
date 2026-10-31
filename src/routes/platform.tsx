@@ -21,7 +21,7 @@ export const Route = createFileRoute("/platform")({
 });
 
 const SNIPPETS: Record<string, string> = {
-  curl: `curl https://jenvu.com/api/v1/chat/completions \\
+  curl: `curl https://jenvu.com/api/public/v1/chat/completions \\
   -H "Authorization: Bearer $JENVU_API_KEY" \\
   -H "Content-Type: application/json" \\
   -d '{
@@ -30,7 +30,7 @@ const SNIPPETS: Record<string, string> = {
   }'`,
   python: `from openai import OpenAI
 
-client = OpenAI(base_url="https://jenvu.com/api/v1", api_key=JENVU_API_KEY)
+client = OpenAI(base_url="https://jenvu.com/api/public/v1", api_key=JENVU_API_KEY)
 
 res = client.chat.completions.create(
     model="jenvu-fast",
@@ -39,7 +39,7 @@ res = client.chat.completions.create(
 print(res.choices[0].message.content)`,
   javascript: `import OpenAI from "openai";
 
-const client = new OpenAI({ baseURL: "https://jenvu.com/api/v1", apiKey: process.env.JENVU_API_KEY });
+const client = new OpenAI({ baseURL: "https://jenvu.com/api/public/v1", apiKey: process.env.JENVU_API_KEY });
 
 const res = await client.chat.completions.create({
   model: "jenvu-fast",
