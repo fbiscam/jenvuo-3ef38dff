@@ -155,7 +155,7 @@ export function EntShowcase() {
           </div>
         </Link>
         <Link to="/dashboard" className={`${tile} flex h-[290px] items-center justify-center bg-ent-ivory`}>
-          <span className="h-[190px] w-[190px] rounded-full bg-background shadow-[0_0_60px_rgba(0,0,0,0.04)] transition duration-700 group-hover:scale-105" />
+          <span className="h-[190px] w-[190px] rounded-full bg-background shadow-[0_0_60px_rgba(0,0,0,0.04)] dark:bg-foreground dark:shadow-[0_0_80px_rgba(255,255,255,0.18)] transition duration-700 group-hover:scale-105" />
           <TileFoot label="Voice" />
         </Link>
       </div>
