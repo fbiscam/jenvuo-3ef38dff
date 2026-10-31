@@ -1,6 +1,6 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { ArrowLeft, ArrowRight, ChevronRight } from "lucide-react";
-import SiteFooter from "@/components/SiteFooter";
+import BlogFooter from "@/components/BlogFooter";
 import HeaderAuthButtons from "@/components/HeaderAuthButtons";
 import { findCollection, type Article } from "@/lib/help-content";
 
@@ -44,7 +44,7 @@ function CollectionPage() {
 
   return (
     <>
-      <div className={`jenvu-zoom min-h-dvh bg-[#FAFAFA] text-zinc-900 ${SANS} antialiased`}>
+      <div className={`min-h-dvh bg-[#FAFAFA] text-zinc-900 ${SANS} antialiased`}>
         <header className="sticky top-0 z-50 border-b border-zinc-100 bg-white">
           <div className="relative mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-5 py-3 sm:px-6 sm:py-4 md:flex md:justify-between">
             <Link to="/" className="flex min-w-0 items-center gap-2.5">
@@ -99,7 +99,7 @@ function CollectionPage() {
           </Link>
         </main>
 
-        <SiteFooter />
+        <BlogFooter />
       </div>
     </>
   );

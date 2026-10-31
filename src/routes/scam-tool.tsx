@@ -184,7 +184,7 @@ function ScamToolPage() {
         </nav>
       </header>
       <div className="flex w-full flex-1 flex-col bg-background sm:mx-2 sm:w-auto sm:rounded-t-[20px]">
-      <div className="mx-auto w-full max-w-5xl px-5 py-8 sm:px-8 lg:py-10" style={{ zoom: 0.9 }}>
+      <div className="mx-auto w-full max-w-5xl px-5 py-8 sm:px-8 lg:py-10">
         <div className="mb-7 border-b border-border pb-6">
           <h1 className="text-[28px] font-medium text-foreground sm:text-[32px]">
             Scam Tool

@@ -2,7 +2,7 @@ import SiteHeader from "@/components/SiteHeader";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import * as React from "react";
 import { ChevronDown, ChevronsUpDown } from "lucide-react";
-import SiteFooter from "@/components/SiteFooter";
+import BlogFooter from "@/components/BlogFooter";
 import { NextStep } from "@/components/PageShell";
 import { useCurrentPlan } from "@/hooks/useCurrentPlan";
 import { useUpgradeLock } from "@/hooks/useUpgradeLock";
@@ -97,13 +97,13 @@ function PricingPage() {
   ];
 
   return (
-    <div className={`public-cloudflare jenvu-zoom min-h-dvh w-full bg-background text-gc-ink ${SANS} antialiased`}>
+    <div className={`public-cloudflare min-h-dvh w-full bg-background text-gc-ink ${SANS} antialiased`}>
       <SiteHeader />
-      <div style={{ zoom: 0.85 }}>
+      <div>
 
       {/* HERO */}
       <section className="mx-auto max-w-[900px] px-5 pb-14 pt-14 text-center sm:px-8 sm:pt-16">
-        <h1 className="text-[34px] font-normal leading-tight tracking-tight sm:text-[42px]">Jenvu pricing</h1>
+        <h1 className="text-[2.6rem] font-medium leading-[1.08] tracking-tight sm:text-6xl">Jenvu pricing</h1>
         <p className="mx-auto mt-5 max-w-[820px] text-[17px] leading-[1.65] text-gc-ink-muted">
           Save money with Jenvu's simple, transparent pricing. Compare every feature in the{" "}
           <a href="#compare" className={LINK}>plan comparison</a> or contact us to get a quote for your trading desk.
@@ -121,7 +121,7 @@ function PricingPage() {
       {/* START FOR FREE + STATS */}
       <section className="mx-auto grid max-w-[1296px] items-center gap-10 px-5 py-10 sm:px-8 md:grid-cols-2 md:gap-14 lg:px-[72px]">
         <div>
-          <h2 className="text-[28px] font-normal leading-tight">Start trading Fiber for free</h2>
+          <h2 className="text-[28px] font-medium leading-tight tracking-tight">Start trading Fiber for free</h2>
           <p className="mt-5 text-[17px] leading-[1.65] text-gc-ink-muted">
             Create an account to see how Jenvu reads the Fiber market in real time. New users get{" "}
             <Link to="/auth" search={{ mode: "signup" } as never} className={LINK}>$100 in free credit</Link> to run the AI desk, plus{" "}
@@ -145,14 +145,14 @@ function PricingPage() {
       {/* TWO COLUMNS */}
       <section className="mx-auto grid max-w-[1296px] gap-10 px-5 py-14 sm:px-8 md:grid-cols-2 md:gap-14 lg:px-[72px]">
         <div>
-          <h2 className="text-[28px] font-normal leading-tight">Only pay for what you use</h2>
+          <h2 className="text-[28px] font-medium leading-tight tracking-tight">Only pay for what you use</h2>
           <p className="mt-5 text-[17px] leading-[1.65] text-gc-ink-muted">
             Every plan includes a monthly AI wallet billed by actual token use, at $3 per million tokens. No up-front fees and no termination charges —{" "}
             <a href="#compare" className={LINK}>view the full comparison.</a>
           </p>
         </div>
         <div>
-          <h2 className="text-[28px] font-normal leading-tight">Save 17% with annual billing</h2>
+          <h2 className="text-[28px] font-medium leading-tight tracking-tight">Save 17% with annual billing</h2>
           <p className="mt-5 text-[17px] leading-[1.65] text-gc-ink-muted">
             Pay once a year instead of monthly and keep the same features for less. Switch the toggle in the{" "}
             <a href="#plans" className={LINK}>plans section</a> to see annual prices for Pro, Elite and Ultra.
@@ -163,7 +163,7 @@ function PricingPage() {
       {/* ESTIMATE YOUR COSTS */}
       <section className="mx-auto grid max-w-[1296px] items-start gap-10 px-5 py-14 sm:px-8 md:grid-cols-2 md:gap-14 lg:px-[72px]">
         <div>
-          <h2 className="text-[28px] font-normal leading-tight">Estimate your costs</h2>
+          <h2 className="text-[28px] font-medium leading-tight tracking-tight">Estimate your costs</h2>
           <p className="mt-5 text-[17px] leading-[1.65] text-gc-ink-muted">
             Understand how your costs change with the number of AI requests and reviews you run. Use the{" "}
             <a href="#top-up" className={LINK}>custom amount tool</a>, or get a custom quote by talking to our{" "}
@@ -184,7 +184,7 @@ function PricingPage() {
           <figcaption className="mt-3 text-[13px] text-gc-ink-muted">See your current usage and spending at a glance</figcaption>
         </figure>
         <div className="order-1 md:order-2">
-          <h2 className="text-[28px] font-normal leading-tight">Stay in control of your spending</h2>
+          <h2 className="text-[28px] font-medium leading-tight tracking-tight">Stay in control of your spending</h2>
           <p className="mt-5 text-[17px] leading-[1.65] text-gc-ink-muted">
             <a href="https://dash.jenvu.com/usage" className={LINK}>Track your usage</a> with daily token limits, wallet balances and request logs.{" "}
             <a href="https://dash.jenvu.com/billing" className={LINK}>Manage billing</a> and top up only when need to.
@@ -257,7 +257,7 @@ function PricingPage() {
 
       {/* COMPARE */}
       <section id="compare" className="scroll-mt-24 mx-auto max-w-[1296px] px-5 py-14 sm:px-8 lg:px-[72px]">
-        <h2 className="text-[28px] font-normal leading-tight">Compare all features</h2>
+        <h2 className="text-[28px] font-medium leading-tight tracking-tight">Compare all features</h2>
         <p className="mt-3 text-[16px] text-gc-ink-muted">All plans include live market data.</p>
         <div className="mt-8 overflow-x-auto rounded-lg border border-gc-line">
           <table className="w-full min-w-[760px] border-collapse text-[15px]">
@@ -308,7 +308,7 @@ function PricingPage() {
 
       {/* TOP-UPS */}
       <section id="top-up" className="scroll-mt-24 mx-auto max-w-[1296px] px-5 py-14 sm:px-8 lg:px-[72px]">
-        <h2 className="text-[28px] font-normal leading-tight">Need more wallet balance?</h2>
+        <h2 className="text-[28px] font-medium leading-tight tracking-tight">Need more wallet balance?</h2>
         <p className="mt-3 max-w-[820px] text-[16px] leading-[1.65] text-gc-ink-muted">
           Live market data is free. ChatGPT 5.5 Pro handles primary analysis, Claude Fable 5.1 reviews eligible plans and Grok 4.6 powers normal chat.
         </p>
@@ -361,7 +361,7 @@ function PricingPage() {
 
       {/* FAQ */}
       <section className="mx-auto max-w-[1296px] px-5 pb-20 sm:px-8 lg:px-[72px]">
-        <h2 className="text-[28px] font-normal leading-tight">Frequently asked questions</h2>
+        <h2 className="text-[28px] font-medium leading-tight tracking-tight">Frequently asked questions</h2>
         <div className="mt-6 flex justify-end">
           <button type="button" onClick={() => setOpen(allOpen ? [] : FAQ.map((_, i) => i))} className="flex items-center gap-2 text-[16px] text-gc-blue-deep">
             {allOpen ? "Collapse all" : "Expand all"} <ChevronsUpDown className="h-4 w-4" />
@@ -390,7 +390,7 @@ function PricingPage() {
 
       <NextStep />
       </div>
-      <SiteFooter />
+      <BlogFooter />
     </div>
   );
 }

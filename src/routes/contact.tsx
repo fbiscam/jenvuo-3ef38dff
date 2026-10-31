@@ -4,7 +4,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { submitContactMessage } from "@/lib/contact.functions";
-import SiteFooter from "@/components/SiteFooter";
+import BlogFooter from "@/components/BlogFooter";
 
 export const Route = createFileRoute("/contact")({
   head: () => ({
@@ -113,14 +113,14 @@ function ContactPage() {
   };
 
   return (
-    <div className={`public-cloudflare jenvu-zoom min-h-dvh w-full bg-background text-gc-ink ${SANS} antialiased`}>
+    <div className={`public-cloudflare min-h-dvh w-full bg-background text-gc-ink ${SANS} antialiased`}>
       <SiteHeader />
 
-      <main className="grid w-full grid-cols-1 lg:grid-cols-[1fr_minmax(360px,30%)]" style={{ zoom: 0.8 }}>
+      <main className="grid w-full grid-cols-1 lg:grid-cols-[1fr_minmax(360px,30%)]">
         {/* LEFT — form */}
         <section className="px-5 py-12 sm:px-10 lg:py-14 lg:pl-[12%] lg:pr-16">
           <div className="max-w-[710px]">
-            <h1 className="text-[34px] leading-tight tracking-tight sm:text-[44px]">
+            <h1 className="text-[2.4rem] font-medium leading-[1.08] tracking-tight sm:text-[3.4rem]">
               Talk to the Jenvu team
             </h1>
             <ul className="mt-6 space-y-3 text-[17px] text-gc-ink-muted">
@@ -207,7 +207,7 @@ function ContactPage() {
         </aside>
       </main>
 
-      <SiteFooter />
+      <BlogFooter />
     </div>
   );
 }

@@ -1,7 +1,7 @@
 import SiteHeader from "@/components/SiteHeader";
 import HeaderAuthButtons from "@/components/HeaderAuthButtons";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import SiteFooter from "@/components/SiteFooter";
+import BlogFooter from "@/components/BlogFooter";
 
 export const Route = createFileRoute("/download")({
   head: () => ({
@@ -109,7 +109,7 @@ const CHANGELOG = [
 function DownloadPage() {
   return (
     <>
-      <div className={`public-cloudflare download-white jenvu-zoom min-h-dvh w-full bg-background text-foreground ${SANS} antialiased selection:bg-home-accent selection:text-home-accent-foreground`}>
+      <div className={`public-cloudflare download-white min-h-dvh w-full bg-background text-foreground ${SANS} antialiased selection:bg-home-accent selection:text-home-accent-foreground`}>
         {/* NAV — matches homepage */}
         <SiteHeader />
 
@@ -229,7 +229,7 @@ function DownloadPage() {
           </div>
         </section>
 
-        <SiteFooter />
+        <BlogFooter />
       </div>
     </>
   );

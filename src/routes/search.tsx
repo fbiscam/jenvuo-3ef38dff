@@ -3,7 +3,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { ChevronRight, Loader2, Search, X } from "lucide-react";
 import SiteHeader from "@/components/SiteHeader";
-import SiteFooter from "@/components/SiteFooter";
+import BlogFooter from "@/components/BlogFooter";
 import { siteSearch, type SearchResult } from "@/lib/site-search.functions";
 
 export const Route = createFileRoute("/search")({
@@ -73,7 +73,7 @@ function SearchPage() {
           {!loading && res && res.hits.length > 0 && res.webError && <p className="text-[13px] text-gc-ink-muted">{res.webError}</p>}
         </div>
       </main>
-      <SiteFooter />
+      <BlogFooter />
     </div>
   );
 }
