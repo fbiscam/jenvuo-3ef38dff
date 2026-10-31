@@ -80,9 +80,9 @@ const ICON_SETS: LucideIcon[][] = [
 ];
 
 const pillDark =
-  "inline-flex items-center gap-1.5 rounded-full bg-gc-ink px-5 py-2.5 text-sm font-medium text-background transition-opacity hover:opacity-85";
+  "inline-flex items-center gap-1.5 rounded-full bg-gc-blue px-5 py-2.5 text-sm font-medium text-gc-on-blue transition-colors hover:bg-gc-blue-hover";
 const pillLight =
-  "inline-flex items-center gap-1.5 rounded-full bg-gc-surface px-5 py-2.5 text-sm font-medium text-gc-ink ring-1 ring-gc-line/60 transition-colors hover:bg-gc-panel";
+  "inline-flex items-center gap-1.5 rounded-full border border-gc-line bg-background px-5 py-2.5 text-sm font-medium text-gc-blue transition-colors hover:bg-gc-blue-soft";
 const underlineLink =
   "inline-flex w-fit items-center gap-1 border-b border-gc-ink pb-0.5 text-[15px] font-medium text-gc-ink hover:opacity-70";
 

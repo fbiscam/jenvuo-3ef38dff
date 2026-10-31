@@ -2,7 +2,6 @@ import * as React from "react";
 import { Link } from "@tanstack/react-router";
 import { ChevronLeft, ChevronRight, Pause, Play } from "lucide-react";
 
-const AURORA_BG = ["var(--platform-aurora-1)", "var(--platform-aurora-2)", "var(--platform-aurora-3)"];
 
 /** Ticks while playing; drives the live feature "videos". */
 function useTick(playing: boolean, ms = 450) {
@@ -150,7 +149,7 @@ function FeatureCard({ card }: { card: Card }) {
           Explore feature
         </Link>
       </div>
-      <div className="relative h-[232px] bg-gc-ink" style={{ backgroundImage: AURORA_BG[CARDS.indexOf(card) % 3] }}>
+      <div className="relative h-[232px] bg-gc-ink">
         <div className={`absolute inset-0 transition-opacity ${playing ? "opacity-100" : "opacity-60"}`}>
           <Scene t={t} />
         </div>
@@ -188,10 +187,9 @@ export function CloudFeatureVideos() {
   const scroll = (dir: 1 | -1) => railRef.current?.scrollBy({ left: dir * 440, behavior: "smooth" });
   return (
     <section className="jenvu-videos-zoom bg-background py-16 md:py-20">
-      <div className="px-5 text-center">
-        <h2 className="text-balance text-[30px] font-medium leading-[1.15] tracking-tight text-gc-ink sm:text-[42px] md:text-5xl">Live features happen on Jenvu</h2>
-        <p className="mx-auto mt-4 max-w-[640px] text-balance text-[15px] leading-relaxed text-gc-ink sm:text-[17px]">Watch the Terminal, AI desk and JX Bot at work, the same way they run in your account.</p>
-      </div>
+      <h2 className="px-5 text-center text-[32px] font-normal leading-[1.2] text-gc-ink sm:text-[44px]">
+        <span className="text-gc-green">Live features</span> happen on Jenvu
+      </h2>
       <div className="mx-auto mt-10 max-w-[1296px]">
         <div ref={railRef} onScroll={onScroll} className="flex snap-x snap-mandatory gap-7 overflow-x-auto px-5 [scrollbar-width:none] sm:px-8 [&::-webkit-scrollbar]:hidden">
           {CARDS.map((c) => (

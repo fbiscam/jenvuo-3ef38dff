@@ -194,10 +194,10 @@ export default function ModelsExplorer({ apiHref = "/dashboard/api" }: { apiHref
           Every model you can call with one Jenvu API key, at one flat price of {price} per million tokens.
         </p>
         <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
-          <button type="button" onClick={scrollToCatalog} className="inline-flex items-center gap-1.5 rounded-full bg-gc-ink px-5 py-2.5 text-sm font-medium text-background transition-opacity hover:opacity-85">
+          <button type="button" onClick={scrollToCatalog} className="inline-flex items-center gap-1.5 rounded-full bg-gc-blue px-5 py-2.5 text-sm font-medium text-gc-on-blue transition-colors hover:bg-gc-blue-hover">
             Browse all {MODEL_CATALOG.length} models
           </button>
-          <Link to={apiHref} className="inline-flex items-center gap-1.5 rounded-full bg-gc-surface px-5 py-2.5 text-sm font-medium text-gc-ink ring-1 ring-gc-line/60 transition-colors hover:bg-gc-panel">
+          <Link to={apiHref} className="inline-flex items-center gap-1.5 rounded-full border border-gc-line bg-background px-5 py-2.5 text-sm font-medium text-gc-blue transition-colors hover:bg-gc-blue-soft">
             {apiHref === "/dashboard/api" ? "Get an API key" : "API docs"} <ArrowRight className="h-3.5 w-3.5" />
           </Link>
         </div>

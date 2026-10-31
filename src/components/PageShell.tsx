@@ -47,7 +47,7 @@ export function PageShell({
           <div className="mt-7 flex justify-center">
             <a
               href="https://auth.jenvu.com/sign-in"
-              className="inline-flex h-10 items-center rounded-full bg-gc-ink px-5 text-[14px] font-medium text-background transition-opacity hover:opacity-85"
+              className="inline-flex h-10 items-center rounded-full bg-gc-blue px-5 text-[14px] font-medium text-gc-on-blue transition-colors hover:bg-gc-blue-hover"
             >
               Get started for free
             </a>
@@ -119,7 +119,7 @@ export function NextStep() {
             </p>
             <a
               href="https://jenvu.com/contact"
-              className="mt-7 inline-flex h-10 items-center rounded-full bg-gc-ink px-5 text-[14px] font-medium text-background transition-opacity hover:opacity-85"
+              className="mt-7 inline-flex h-10 items-center rounded-full bg-gc-blue px-5 text-[14px] font-medium text-gc-on-blue transition-colors hover:bg-gc-blue-hover"
             >
               Contact us
             </a>
