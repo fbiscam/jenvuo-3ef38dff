@@ -9,6 +9,6 @@ describe("shortTitle", () => {
     expect(shortTitle("Gold holds above key support as dollar weakens")).toBe("Gold holds above key support as…");
   });
   it("drops trailing punctuation before the ellipsis", () => {
-    expect(shortTitle("Fed decision: what it means, for gold traders now")).toBe("Fed decision: what it means…");
+    expect(shortTitle("Gold slips as traders await Fed, then rebounds")).toBe("Gold slips as traders await Fed…");
   });
 });
