@@ -5,8 +5,7 @@ import { openAskJenvu } from "@/components/AskJenvuWidget";
 import bentoImagine from "@/assets/home/bento-imagine.jpg";
 import bentoFox from "@/assets/home/bento-fox.jpg";
 import bentoCar from "@/assets/home/bento-car.jpg";
-import { useQuery } from "@tanstack/react-query";
-import { homeArticlesQueryOptions, shortTitle } from "@/lib/home-articles";
+import { shortTitle, type HomeArticle } from "@/lib/home-articles";
 import { insightCoverUrl } from "@/lib/insight-cover";
 import starsNebula from "@/assets/platform/stars-nebula.jpg";
 import starsPlain from "@/assets/platform/stars-plain.jpg";
@@ -356,8 +355,7 @@ export function EntFacts() {
 }
 
 /* 6 — Read more: latest real articles (titles max 6 words) */
-export function EntStories() {
-  const { data: items = [] } = useQuery(homeArticlesQueryOptions);
+export function EntStories({ articles: items }: { articles: HomeArticle[] }) {
   if (items.length === 0) return null;
   return (
     <section className="px-5 py-24">

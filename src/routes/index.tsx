@@ -25,7 +25,7 @@ import {
 
 } from "@/components/home/CloudHome";
 import { EntHero, EntShowcase, EntBuilt, EntFacts, EntStories, EntCta } from "@/components/home/EnterpriseHome";
-import { homeArticlesQueryOptions } from "@/lib/home-articles";
+import { homeArticlesQueryOptions, type HomeArticle } from "@/lib/home-articles";
 import { AllInOnePlatformSection } from "@/components/platform/AllInOnePlatformSection";
 import { CloudFrontierModels } from "@/components/home/CloudFrontierModels";
 import { HomeStats, HomeReadAskAutomate, HomeTrust, HomeGetStarted } from "@/components/home/HomePlatformSections";
@@ -158,11 +158,11 @@ export const Route = createFileRoute("/")({
   // The XAU projection is primed server-side (5-min cache) so the very first
   // paint shows the real live price instead of a stale placeholder.
   loader: async ({ context }) => {
-    const [board] = await Promise.all([
+    const [board, articles] = await Promise.all([
       getCorrelatedMarkets().catch(() => null),
-      context.queryClient.ensureQueryData(homeArticlesQueryOptions).catch(() => null),
+      context.queryClient.ensureQueryData(homeArticlesQueryOptions).catch(() => [] as HomeArticle[]),
     ]);
-    return { tickerRows: null as TickerRow[] | null, board };
+    return { tickerRows: null as TickerRow[] | null, board, articles };
   },
   errorComponent: ({ error }) => (
     <div role="alert" className="p-8 text-sm text-zinc-600">{(error as Error)?.message ?? "Something went wrong."}</div>
@@ -235,7 +235,7 @@ function snapshotsToRows(
 }
 
 function useLiveTicker(): TickerRow[] {
-  const loaderData = Route.useLoaderData() as { tickerRows?: TickerRow[] } | undefined;
+  const loaderData = Route.useLoaderData() as { tickerRows?: TickerRow[]; articles?: HomeArticle[] } | undefined;
   const [rows, setRows] = React.useState<TickerRow[]>(
     loaderData?.tickerRows?.length ? loaderData.tickerRows : INITIAL_TICKER,
   );
@@ -398,7 +398,7 @@ function HomePage() {
           <EntBuilt />
           <AllInOnePlatformSection />
           <EntFacts />
-          <EntStories />
+          <EntStories articles={loaderData?.articles ?? []} />
           <EntCta />
         </main>
       </div>
