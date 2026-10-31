@@ -122,7 +122,7 @@ function Banner() {
     <section className="px-5 py-14">
       <div className="relative mx-auto flex max-w-[1110px] items-center overflow-hidden rounded-[22px] bg-gc-surface md:min-h-[320px] md:overflow-visible">
         <div className="relative z-10 max-w-[460px] p-8 md:p-12">
-          <h2 className="text-[28px] font-medium tracking-tight text-foreground md:text-[32px]">Trades with rules, not feelings</h2>
+          <h2 className="text-[28px] font-medium tracking-tight text-foreground md:whitespace-nowrap md:text-[32px]">Trades with rules, not feelings</h2>
           <p className="mt-4 text-[16px] leading-relaxed text-muted-foreground">
             JX Bot buys after a higher high and higher low, sells after a lower high and lower low, and only acts on
             closed candles. One trade per swing, a stop loss and take profit on every order, and no grid or martingale.
