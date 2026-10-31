@@ -533,7 +533,7 @@ export default function ModelsExplorer({ apiHref = "/dashboard/api" }: { apiHref
 
             <div className="mt-6 border-t border-gc-line pt-4 md:mt-auto">
               <Link to={apiHref} className="flex w-full items-center justify-center gap-2 rounded-lg bg-gc-blue px-4 py-2.5 text-sm font-medium text-gc-on-blue hover:bg-gc-blue-hover">
-                {apiHref === "/dashboard/api" ? "Use with an API key" : "Read the API docs"} <ArrowRight className="h-4 w-4" />
+                Read the API docs <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
           </div>
