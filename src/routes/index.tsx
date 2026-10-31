@@ -392,8 +392,8 @@ function HomePage() {
           <CloudBuildWith />
           <CloudFeatureVideos />
           <CloudSolutions />
-          <HomeTrust />
           <CloudLogoStrip />
+          <HomeTrust />
           <HomeGetStarted />
           <CloudStartBanner />
         </main>
