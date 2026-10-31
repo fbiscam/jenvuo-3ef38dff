@@ -85,17 +85,28 @@ function CodePage() {
       </div>
 
       <h2 className="mt-12 text-[18px] font-medium text-foreground">API usage examples</h2>
-      <div className="mt-4 flex flex-wrap gap-2">
+      <div className="mt-4 flex flex-wrap items-center gap-1" role="tablist">
         {(Object.keys(EXAMPLES) as Tab[]).map((t) => (
-          <button key={t} onClick={() => setTab(t)} className={t === tab ? "console-pill-solid" : "console-pill"}>{t}</button>
+          <button
+            key={t}
+            type="button"
+            role="tab"
+            aria-selected={t === tab}
+            onClick={() => setTab(t)}
+            className={`rounded-full px-3 py-1.5 text-[14px] transition-colors ${
+              t === tab ? "console-card font-medium text-foreground" : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            {t}
+          </button>
         ))}
       </div>
       <div className="mt-4 grid gap-4 lg:grid-cols-[1.4fr_1fr]">
-        <div className="console-card relative p-5">
+        <div className="console-card relative min-h-[220px] min-w-0 p-5">
           <button onClick={copy} aria-label="Copy code" className="absolute right-3 top-3 rounded-md p-1.5 text-muted-foreground hover:text-foreground">
             {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
           </button>
-          <pre className="overflow-x-auto pr-8 text-[13px] leading-relaxed text-foreground"><code>{ex.code}</code></pre>
+          <pre className="whitespace-pre-wrap break-words pr-8 text-[13px] leading-relaxed text-foreground"><code>{ex.code}</code></pre>
         </div>
         <div className="console-card p-5">
           <p className="text-[14px] font-medium text-foreground">Result</p>
