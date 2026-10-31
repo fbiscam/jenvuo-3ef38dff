@@ -138,6 +138,7 @@ export const GLOBAL_PATHS = new Set([
   "founder",
   "killzones",
   "llm",
+  "models",
   "platform",
   "pricing",
   "privacy",
