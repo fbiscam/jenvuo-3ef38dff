@@ -142,8 +142,8 @@ export default function DashboardTopBar({
         <Menu className="h-5 w-5" />
       </button>
       <Link to="/dashboard" className="flex shrink-0 items-center gap-2 pr-2">
-        <img src="/favicon.png" alt="" className="h-6 w-6 rounded-md object-contain" />
-        <span className="text-[20px] font-medium tracking-tight text-gc-ink">Jenvu</span>
+        <JenvuMark className="h-5 w-5 text-foreground" />
+        <span className="text-[20px] font-medium tracking-tight text-foreground">Jenvu</span>
       </Link>
 
       {/* The Terminal's chart toolbar is placed here. The slot always stays mounted (hidden off the
