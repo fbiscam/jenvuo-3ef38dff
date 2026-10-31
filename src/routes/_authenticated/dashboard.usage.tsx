@@ -6,7 +6,6 @@ import { useMemo, useState } from "react";
 import {
   Calendar,
   ChartColumn,
-  ChevronDown,
   ChevronRight,
   Download,
   RefreshCw,
