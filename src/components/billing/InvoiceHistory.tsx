@@ -4,6 +4,8 @@ import { useQuery } from "@tanstack/react-query";
 import { listMyOrders } from "@/lib/payments.functions";
 import { networkMeta, type PaymentOrder } from "@/lib/payments/shared";
 import { supabase } from "@/integrations/supabase/client";
+import { ListFilter } from "lucide-react";
+import { ConsoleSelect } from "@/components/dashboard/ConsoleSelect";
 
 const MONO = "font-sans";
 
@@ -34,11 +36,13 @@ async function loadLogo(): Promise<string | null> {
   }
 }
 
-export default function InvoiceHistory() {
+export default function InvoiceHistory({ variant = "list" }: { variant?: "list" | "table" } = {}) {
   const listFn = useServerFn(listMyOrders);
   const [email, setEmail] = useState<string>("");
   const [fullName, setFullName] = useState<string>("");
   const [busy, setBusy] = useState<string | null>(null);
+  const [filter, setFilter] = useState("all");
+  const [filterOpen, setFilterOpen] = useState(false);
 
   useEffect(() => {
     supabase.auth.getUser().then(async ({ data }) => {
@@ -216,6 +220,68 @@ export default function InvoiceHistory() {
     }
   }
 
+
+  if (variant === "table") {
+    const rows = filter === "all" ? history : history.filter((o) => o.status === filter);
+    const present = Array.from(new Set(history.map((o) => o.status)));
+    return (
+      <section id="invoices" className="scroll-mt-24">
+        <div className="flex items-center justify-between gap-4">
+          <h2 className="text-[20px] font-normal text-gc-ink">Invoices</h2>
+          <ConsoleSelect
+            open={filterOpen}
+            onToggle={() => setFilterOpen((v) => !v)}
+            plain
+            hideArrows
+            align="right"
+            ariaLabel="Filter invoices"
+            icon={<ListFilter className="h-4 w-4" />}
+            valueLabel={filter === "all" ? "Filter" : (STATUS[filter]?.label ?? filter)}
+            value={filter}
+            options={[{ value: "all", label: "All" }, ...present.map((st) => ({ value: st, label: STATUS[st]?.label ?? st }))]}
+            onSelect={(v) => { setFilter(v); setFilterOpen(false); }}
+          />
+        </div>
+        <div className="mt-4 overflow-x-auto">
+          <table className="w-full min-w-[560px] text-left text-[14px]">
+            <thead>
+              <tr className="border-b border-gc-line text-[12px] text-gc-ink-muted">
+                <th className="px-2 py-3 font-normal">Invoice Reference</th>
+                <th className="px-2 py-3 font-normal">Date</th>
+                <th className="px-2 py-3 font-normal">Type</th>
+                <th className="px-2 py-3 font-normal">Amount</th>
+                <th className="px-2 py-3 font-normal">Status</th>
+                <th className="px-2 py-3" aria-label="Receipt" />
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gc-line">
+              {rows.length === 0 ? (
+                <tr><td colSpan={6} className="px-2 py-4 text-center text-gc-ink-muted">No invoices found.</td></tr>
+              ) : rows.map((o) => {
+                const st = STATUS[o.status] ?? { label: o.status, cls: "bg-gc-surface text-gc-ink-muted" };
+                return (
+                  <tr key={o.id}>
+                    <td className="px-2 py-3 text-gc-ink">{invoiceNo(o)}</td>
+                    <td className="px-2 py-3 text-gc-ink-muted">{fmtDate(o.created_at)}</td>
+                    <td className="px-2 py-3 text-gc-ink">{o.target_plan_id ? `${o.target_plan_id.charAt(0).toUpperCase()}${o.target_plan_id.slice(1)} plan` : "Credit top-up"}</td>
+                    <td className="px-2 py-3 tabular-nums text-gc-ink">${Number(o.pay_amount_usd).toFixed(2)}</td>
+                    <td className="px-2 py-3"><span className={`rounded-full px-2.5 py-0.5 text-[12px] font-medium ${st.cls}`}>{st.label}</span></td>
+                    <td className="px-2 py-3 text-right">
+                      {o.status === "approved" && (
+                        <button type="button" onClick={() => download(o)} disabled={busy === o.id} className="text-[13px] text-gc-ink hover:underline disabled:opacity-50">
+                          {busy === o.id ? "Preparing…" : "Receipt"}
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="rounded-2xl border border-zinc-200 bg-white p-5">
