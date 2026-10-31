@@ -120,7 +120,8 @@ function ContactPage() {
         {/* LEFT — form */}
         <section className="px-5 py-12 sm:px-10 lg:py-14 lg:pl-[12%] lg:pr-16">
           <div className="max-w-[710px]">
-            <h1 className="text-[2.4rem] font-medium leading-[1.08] tracking-tight sm:text-[3.4rem]">
+            <span className="inline-flex items-center rounded-full border border-gc-line px-3.5 py-1 text-[13px] font-medium text-gc-ink-muted">Contact us</span>
+            <h1 className="mt-4 text-[2.4rem] font-medium leading-[1.08] tracking-tight sm:text-[3.4rem]">
               Talk to the Jenvu team
             </h1>
             <ul className="mt-6 space-y-3 text-[17px] text-gc-ink-muted">
@@ -130,19 +131,19 @@ function ContactPage() {
                 "Report a bug or share feedback",
               ].map((t) => (
                 <li key={t} className="flex items-center gap-4">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="shrink-0 text-gc-success"><polyline points="4 12 10 18 20 6" /></svg>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="shrink-0 text-gc-blue"><polyline points="4 12 10 18 20 6" /></svg>
                   {t}
                 </li>
               ))}
             </ul>
 
             {doneEmail ? (
-              <div className="mt-8 rounded-2xl bg-gc-canvas p-6">
-                <h2 className="text-xl">Message received.</h2>
+              <div className="mt-8 rounded-md border border-gc-line p-6">
+                <h2 className="text-[22px] font-medium tracking-tight">Message received.</h2>
                 <p className="mt-2 text-gc-ink-muted">
                   Thanks — we'll reply to <span className="font-medium text-gc-ink">{doneEmail}</span> within one business day.
                 </p>
-                <button type="button" onClick={() => setDoneEmail(null)} className="mt-5 text-sm font-medium text-gc-blue-deep hover:underline">
+                <button type="button" onClick={() => setDoneEmail(null)} className="mt-5 text-sm font-medium text-gc-blue hover:underline">
                   Send another message
                 </button>
               </div>
@@ -177,12 +178,12 @@ function ContactPage() {
                   <div className="rounded-lg border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive">{serverError}</div>
                 )}
 
-                <button type="submit" disabled={busy} className="rounded-full bg-home-accent px-6 py-3.5 text-[17px] font-medium text-home-accent-foreground hover:opacity-90 disabled:opacity-60">
+                <button type="submit" disabled={busy} className="inline-flex items-center rounded-full bg-gc-blue px-6 py-3 text-[15px] font-medium text-gc-on-blue transition-colors hover:bg-gc-blue-hover disabled:opacity-60">
                   {busy ? "Sending…" : "Submit request"}
                 </button>
                 <p className="text-[16px] text-gc-ink-muted">
                   I understand my personal data will be processed in accordance with Jenvu's{" "}
-                  <Link to="/privacy" className="text-gc-blue-deep underline">Privacy Policy</Link>.
+                  <Link to="/privacy" className="font-medium text-gc-blue underline underline-offset-2">Privacy Policy</Link>.
                 </p>
               </form>
             )}
@@ -190,12 +191,13 @@ function ContactPage() {
         </section>
 
         {/* RIGHT — cards */}
-        <aside className="bg-gc-canvas px-5 py-10 sm:px-10 lg:py-14">
-          <div className="max-w-[370px] space-y-4">
-            <div className="rounded-md border border-gc-line bg-background p-6">
+        <aside className="relative overflow-hidden border-t border-gc-line px-5 py-10 sm:px-10 lg:border-l lg:border-t-0 lg:py-14">
+          <div aria-hidden className="pointer-events-none absolute inset-0 opacity-60" style={{ backgroundImage: "var(--platform-aurora-1)" }} />
+          <div className="relative max-w-[370px] space-y-4">
+            <div className="rounded-md border border-gc-line bg-background p-6 shadow-sm">
               <img src="/favicon.png" alt="Jenvu" className="h-10 w-10 rounded-lg object-contain" />
-              <h2 className="mt-4 text-[20px]">Contact our team direct</h2>
-              <a href="mailto:support@jenvu.com" className="mt-6 flex w-full items-center justify-center gap-2 rounded-full bg-home-accent px-5 py-3 text-[16px] font-medium text-home-accent-foreground hover:opacity-90">
+              <h2 className="mt-4 text-[22px] font-medium tracking-tight">Contact our team direct</h2>
+              <a href="mailto:support@jenvu.com" className="mt-6 flex w-full items-center justify-center gap-2 rounded-full bg-gc-blue px-5 py-3 text-[15px] font-medium text-gc-on-blue transition-colors hover:bg-gc-blue-hover">
                 support@jenvu.com
               </a>
               <p className="mt-4 text-[15px] text-gc-ink-muted">Monday to Friday, 09:00 – 18:00 UTC</p>
@@ -214,9 +216,9 @@ function ContactPage() {
 
 function SideCard({ text, link, href }: { text: string; link: string; href: string }) {
   return (
-    <div className="rounded-md border border-gc-line bg-background p-4">
+    <div className="rounded-md border border-gc-line bg-background/95 p-5 shadow-sm">
       <p className="text-[15px] leading-relaxed">{text}</p>
-      <a href={href} className="mt-4 inline-block text-[15px] font-medium text-gc-blue-deep hover:underline">{link}</a>
+      <a href={href} className="mt-4 inline-block text-[15px] font-medium text-gc-blue hover:underline">{link}</a>
     </div>
   );
 }
@@ -233,8 +235,8 @@ function Field({ label, htmlFor, error, children }: { label: string; htmlFor: st
 
 function inputClass(hasError: boolean) {
   return [
-    "w-full rounded-[4px] border bg-background px-4 py-4 text-[16px] text-gc-ink placeholder:text-gc-ink-muted",
-    "outline-none transition focus:border-gc-blue-deep focus:ring-1 focus:ring-gc-blue-deep",
-    hasError ? "border-destructive" : "border-gc-ink-muted/50",
+    "w-full rounded-md border bg-background px-4 py-4 text-[16px] text-gc-ink placeholder:text-gc-ink-muted",
+    "outline-none transition focus:border-gc-blue focus:ring-1 focus:ring-gc-blue",
+    hasError ? "border-destructive" : "border-gc-line",
   ].join(" ");
 }
