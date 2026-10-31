@@ -249,7 +249,7 @@ export function EntBuilt() {
             <span className="whitespace-nowrap">Scan this chart using 7 engines</span>
           </div>
         </Card>
-        <Card title="Built to deliver value" body="Focus on your highest-impact setups, while ensuring reliability, security, risk control, and token efficiency.">
+        <Card title="Built to deliver value" body="Focus on your highest-impact setups, while reliability, risk control, token efficiency.">
           {/* Chart */}
           <div className="absolute -right-6 bottom-0 left-16 top-2 rounded-t-xl border border-border bg-background p-4 shadow-sm">
             <div className="h-full rounded-lg border border-border px-4 pt-3">
