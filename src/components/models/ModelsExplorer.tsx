@@ -149,6 +149,59 @@ function SectionHead({ title, sub }: { title: string; sub: string }) {
   );
 }
 
+/** xAI console-style model table used inside the dashboard. */
+function ConsoleModelTable({ list, query, setQuery }: { list: CatalogModel[]; query: string; setQuery: (v: string) => void }) {
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+  const copy = async (id: string) => {
+    try {
+      await navigator.clipboard.writeText(id);
+      setCopiedId(id);
+      setTimeout(() => setCopiedId(null), 1500);
+    } catch {
+      toast.error("Couldn't copy the model ID");
+    }
+  };
+  return (
+    <section className="console-card overflow-hidden">
+      <div className="flex items-center gap-2 px-5 py-4">
+        <Search className="h-4 w-4 text-muted-foreground" />
+        <input
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Search models"
+          className="w-full bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
+        />
+      </div>
+      <div className="hidden grid-cols-[minmax(0,2fr)_minmax(0,1fr)_100px_110px] gap-4 px-5 pb-2 text-[12px] text-muted-foreground sm:grid">
+        <span>Model</span><span>Capabilities</span><span>Context</span><span className="text-right">Price / 1M</span>
+      </div>
+      <ul className="bg-background">
+        {list.map((m) => (
+          <li key={m.id} className="grid grid-cols-1 gap-2 px-5 py-4 sm:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_100px_110px] sm:items-center sm:gap-4">
+            <div className="flex min-w-0 items-center gap-3">
+              <img src={LOGOS[m.provider]} alt="" className="h-6 w-6 shrink-0 object-contain" />
+              <div className="min-w-0">
+                <p className="truncate text-sm font-medium text-foreground">{m.name}</p>
+                <button type="button" onClick={() => void copy(m.id)} className="inline-flex items-center gap-1 font-mono text-[12px] text-muted-foreground hover:text-foreground">
+                  {m.id} {copiedId === m.id ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
+                </button>
+              </div>
+            </div>
+            <div className="flex flex-wrap gap-1">
+              {m.capabilities.slice(0, 3).map((c) => (
+                <span key={c} className="console-badge text-[11px] text-muted-foreground">{CAP_META[c].label}</span>
+              ))}
+            </div>
+            <span className="text-sm tabular-nums text-muted-foreground">{formatContext(m.context)}</span>
+            <span className="text-sm tabular-nums text-foreground sm:text-right">${PRICE_PER_MILLION.toFixed(2)}</span>
+          </li>
+        ))}
+        {list.length === 0 && <li className="px-5 py-10 text-center text-sm text-muted-foreground">No models match your search.</li>}
+      </ul>
+    </section>
+  );
+}
+
 /** OpenRouter-style catalogue of every model available with a Jenvu API key. */
 export default function ModelsExplorer({ apiHref = "/dashboard/api" }: { apiHref?: "/dashboard/api" | "/docs" }) {
   const [selected, setSelected] = useState<string>("claude-opus-5");
