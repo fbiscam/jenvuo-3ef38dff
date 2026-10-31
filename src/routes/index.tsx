@@ -25,6 +25,7 @@ import {
 
 } from "@/components/home/CloudHome";
 import { EntHero, EntShowcase, EntBuilt, EntFacts, EntStories, EntCta } from "@/components/home/EnterpriseHome";
+import { homeArticlesQueryOptions, type HomeArticle } from "@/lib/home-articles";
 import { AllInOnePlatformSection } from "@/components/platform/AllInOnePlatformSection";
 import { CloudFrontierModels } from "@/components/home/CloudFrontierModels";
 import { HomeStats, HomeReadAskAutomate, HomeTrust, HomeGetStarted } from "@/components/home/HomePlatformSections";
@@ -156,9 +157,12 @@ export const Route = createFileRoute("/")({
   // after first paint, so a slow provider can never prevent the page loading.
   // The XAU projection is primed server-side (5-min cache) so the very first
   // paint shows the real live price instead of a stale placeholder.
-  loader: async () => {
-    const board = await getCorrelatedMarkets().catch(() => null);
-    return { tickerRows: null as TickerRow[] | null, board };
+  loader: async ({ context }) => {
+    const [board, articles] = await Promise.all([
+      getCorrelatedMarkets().catch(() => null),
+      context.queryClient.ensureQueryData(homeArticlesQueryOptions).catch(() => [] as HomeArticle[]),
+    ]);
+    return { tickerRows: null as TickerRow[] | null, board, articles };
   },
   errorComponent: ({ error }) => (
     <div role="alert" className="p-8 text-sm text-zinc-600">{(error as Error)?.message ?? "Something went wrong."}</div>
@@ -365,6 +369,7 @@ function Sparkline({ series, up }: { series: number[]; up: boolean }) {
 
 function HomePage() {
   const ticker = useLiveTicker();
+  const homeArticles = (Route.useLoaderData() as { articles?: HomeArticle[] }).articles ?? [];
   
   const xau = ticker.find((r) => r[0] === "Fiber");
   const currentPlan = useCurrentPlan();
@@ -394,7 +399,7 @@ function HomePage() {
           <EntBuilt />
           <AllInOnePlatformSection />
           <EntFacts />
-          <EntStories />
+          <EntStories articles={homeArticles} />
           <EntCta />
         </main>
       </div>

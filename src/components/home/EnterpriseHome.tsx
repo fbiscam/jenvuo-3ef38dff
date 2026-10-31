@@ -5,16 +5,8 @@ import { openAskJenvu } from "@/components/AskJenvuWidget";
 import bentoImagine from "@/assets/home/bento-imagine.jpg";
 import bentoFox from "@/assets/home/bento-fox.jpg";
 import bentoCar from "@/assets/home/bento-car.jpg";
-import s1 from "@/assets/home/card-blue.jpg";
-import s2 from "@/assets/home/card-wave.jpg";
-import s3 from "@/assets/home/trade-neon-practice.jpg";
-import s4 from "@/assets/home/card-ai.jpg";
-import s5 from "@/assets/home/card-gold.jpg";
-import { SiTradingview } from "react-icons/si";
-import mt5Logo from "@/assets/metatrader-logo.png.asset.json";
-import pythonLogo from "@/assets/platform-logos/python.svg";
-import nodeLogo from "@/assets/platform-logos/nodejs.svg";
-import curlLogo from "@/assets/platform-logos/curl.svg";
+import { shortTitle, type HomeArticle } from "@/lib/home-articles";
+import { insightCoverUrl } from "@/lib/insight-cover";
 import starsNebula from "@/assets/platform/stars-nebula.jpg";
 import starsPlain from "@/assets/platform/stars-plain.jpg";
 
@@ -166,16 +158,6 @@ export function EntShowcase() {
           <span className="h-[190px] w-[190px] rounded-full bg-background shadow-[0_0_60px_rgba(0,0,0,0.04)] transition duration-700 group-hover:scale-105" />
           <TileFoot label="Voice" />
         </Link>
-      </div>
-      <div className="mx-auto mt-16 grid max-w-5xl grid-cols-2 items-center justify-items-center gap-x-6 gap-y-6 whitespace-nowrap text-[16px] font-semibold tracking-tight text-foreground/80 sm:grid-cols-5 sm:text-[20px]">
-        <span className="flex items-center gap-2.5">
-          <img src={mt5Logo.url} alt="" width={32} height={32} className="h-8 w-8 rounded-md object-contain" />
-          MetaTrader 5
-        </span>
-        <span className="flex items-center gap-2.5"><SiTradingview className="h-7 w-7 text-foreground" aria-hidden />TradingView</span>
-        <span className="flex items-center gap-2.5"><img src={pythonLogo} alt="" width={28} height={28} className="h-7 w-7" />Python</span>
-        <span className="flex items-center gap-2.5"><img src={curlLogo} alt="" width={28} height={28} className="h-7 w-7" />REST API</span>
-        <span className="flex items-center gap-2.5"><img src={nodeLogo} alt="" width={28} height={28} className="h-7 w-7" />Node.js</span>
       </div>
     </section>
   );
@@ -372,26 +354,35 @@ export function EntFacts() {
   );
 }
 
-/* 6 — Read more cards */
-export function EntStories() {
-  const items = [
-    { img: s1, t: "How Ask Jenvu reads gold structure", to: "/help" },
-    { img: s2, t: "Alerts from first setup to daily use", to: "/help" },
-    { img: s3, t: "Building on the Jenvu API", to: "/docs" },
-    { img: s4, t: "Frontier models, one key", to: "/models" },
-    { img: s5, t: "JX Bot safeguards explained", to: "/help" },
-  ];
+/* 6 — Read more: latest real articles (titles max 6 words) */
+export function EntStories({ articles: items }: { articles: HomeArticle[] }) {
+  if (items.length === 0) return null;
   return (
     <section className="px-5 py-24">
       <div className="mx-auto max-w-7xl">
-        <h2 className={h2}>Read more</h2>
+        <div className="flex items-end justify-between gap-4">
+          <h2 className={h2}>Read more</h2>
+          <Link to="/insights" className="inline-flex items-center gap-1 text-[15px] font-medium text-foreground/80 hover:text-foreground">
+            All articles <ChevronRight className="h-4 w-4" />
+          </Link>
+        </div>
         <div className="mt-10 grid grid-cols-2 gap-4 md:grid-cols-5">
-          {items.map((s) => (
-            <Link key={s.t} to={s.to as never} className="group">
-              <div className="aspect-square overflow-hidden rounded-[20px]">
-                <img src={s.img} alt="" loading="lazy" className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
+          {items.map((a) => (
+            <Link key={a.id} to="/insights/$slug" params={{ slug: a.slug }} className="group">
+              <div className="aspect-square overflow-hidden rounded-[20px] bg-muted">
+                <img
+                  src={insightCoverUrl(a.title, a.category ?? undefined, a.image_url)}
+                  alt={a.title}
+                  loading="lazy"
+                  onError={(e) => {
+                    const t = e.currentTarget;
+                    t.onerror = null;
+                    t.src = insightCoverUrl(a.title, a.category ?? undefined);
+                  }}
+                  className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                />
               </div>
-              <p className="mt-3 text-[15px] font-medium text-foreground">{s.t}</p>
+              <p className="mt-3 text-[15px] font-medium text-foreground">{shortTitle(a.title)}</p>
             </Link>
           ))}
         </div>
