@@ -134,7 +134,12 @@ function UsagePage() {
   const [breakdown, setBreakdown] = useState<ApiType>("text");
   const [model, setModel] = useState<string>("all");
   const [groupDays, setGroupDays] = useState<number>(1);
-  const [openMenu, setOpenMenu] = useState<"type" | "model" | "range" | "group" | null>(null);
+  const [openMenu, setOpenMenu] = useState<"type" | "key" | "model" | "range" | "group" | null>(null);
+  const [groupBy, setGroupBy] = useState<"type" | "key" | "model">("type");
+  const [apiKey, setApiKey] = useState<string>("all");
+  // How many whole ranges back from today the window ends (0 = ends today).
+  const [shift, setShift] = useState(0);
+  const offsetDays = shift * rangeDays;
 
   const models = useMemo(() => {
     if (!data) return [] as string[];
@@ -145,11 +150,17 @@ function UsagePage() {
     if (!data) return null;
     const from = new Date();
     from.setHours(0, 0, 0, 0);
-    from.setDate(from.getDate() - (rangeDays - 1));
+    from.setDate(from.getDate() - (rangeDays - 1 + offsetDays));
     const fromMs = from.getTime();
+    const to = new Date();
+    to.setHours(0, 0, 0, 0);
+    to.setDate(to.getDate() - offsetDays + 1);
+    const toMs = to.getTime();
 
     const rows = data.ledger.filter((r) => {
-      if (new Date(r.created_at).getTime() < fromMs) return false;
+      const t = new Date(r.created_at).getTime();
+      if (t < fromMs || t >= toMs) return false;
+      if (apiKey !== "all" && apiKeyIdOf(r) !== apiKey) return false;
       if (model !== "all" && (r.model ?? "unknown") !== model) return false;
       return true;
     });
@@ -187,7 +198,7 @@ function UsagePage() {
     for (let i = rangeDays - 1; i >= 0; i--) {
       const d = new Date();
       d.setHours(0, 0, 0, 0);
-      d.setDate(d.getDate() - i);
+      d.setDate(d.getDate() - i - offsetDays);
       const key = d.toISOString().slice(0, 10);
       idx.set(key, days.length);
       days.push({
@@ -279,7 +290,7 @@ function UsagePage() {
       terminalDays: days.reduce((sum, day) => sum + day.terminalDays, 0),
       terminalDailyUsd: days.reduce((sum, day) => sum + day.terminalDailyUsd, 0),
     };
-  }, [data, rangeDays, model]);
+  }, [data, rangeDays, model, apiKey, offsetDays]);
 
   if (isLoading) {
     return (
