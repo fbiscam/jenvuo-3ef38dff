@@ -531,7 +531,7 @@ function UsagePage() {
               className="mt-3 flex-1"
               days={chartDays.map((day, i) => ({ date: day.date, v: tokenBars[i] ?? 0 }))}
               keys={["v"]}
-              colors={["var(--muted-foreground)"]}
+              colors={["#a1a1aa"]}
               baseline="var(--border)"
               format={(v) => `${fmtInt(v)} tokens`}
               compact
@@ -546,7 +546,7 @@ function UsagePage() {
               className="mt-3 flex-1"
               days={chartDays.map((day, i) => ({ date: day.date, v: requestBars[i] ?? 0 }))}
               keys={["v"]}
-              colors={["var(--muted-foreground)"]}
+              colors={["#a1a1aa"]}
               baseline="var(--border)"
               format={(v) => `${fmtInt(v)} requests`}
               compact
@@ -673,7 +673,7 @@ function StackedBars<K extends string>({
     });
   return (
     <div className={`flex min-h-0 flex-col ${className}`}>
-      <div className={`flex flex-1 items-stretch gap-[6px] ${compact ? "min-h-[80px]" : "min-h-[220px]"}`}>
+      <div className={`flex flex-1 items-stretch gap-[10px] ${compact ? "min-h-[80px]" : "min-h-[220px]"}`}>
         {days.map((day, i) => {
           const total = totals[i] ?? 0;
           return (
@@ -703,7 +703,7 @@ function StackedBars<K extends string>({
         })}
       </div>
       {!compact ? (
-        <div className="mt-2 flex gap-[6px] text-[11.5px] text-muted-foreground">
+        <div className="mt-2 flex gap-[10px] text-[11.5px] text-muted-foreground">
           {days.map((day, i) => (
             <div key={day.date} className="min-w-0 flex-1 overflow-visible whitespace-nowrap text-center">
               {i % labelEvery === 0 || i === days.length - 1 ? fmtDate(day.date) : ""}
@@ -748,17 +748,16 @@ function Dropdown({
 }) {
   return (
     <div className="relative min-w-0">
-      <Button
+      <button
         type="button"
-        variant="outline"
         onClick={onToggle}
         aria-expanded={open}
-        className="flex h-9 w-full min-w-0 items-center gap-1.5 rounded-full bg-background px-2.5 text-[12px] font-medium text-foreground shadow-none sm:w-auto sm:max-w-[190px] sm:px-3 sm:text-[13px]"
+        className="flex h-9 w-full min-w-0 items-center gap-1.5 rounded-full border border-border bg-transparent px-3 text-[12px] font-medium text-foreground transition-colors hover:bg-foreground/[0.05] sm:w-auto sm:max-w-[220px] sm:text-[13px]"
       >
         {icon}
-        <span className="truncate">{trigger}</span>
-        <ChevronDown className="h-3.5 w-3.5 shrink-0 text-zinc-500" />
-      </Button>
+        <span className="truncate text-foreground">{trigger}</span>
+        <ChevronDown className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+      </button>
       {open && (
         <div className="absolute left-0 z-20 mt-1 max-h-64 w-[min(14rem,calc(100vw-2rem))] overflow-y-auto rounded-lg border border-zinc-200 bg-white p-1 shadow-lg sm:left-auto sm:right-0">
           {options.map((o) => (
