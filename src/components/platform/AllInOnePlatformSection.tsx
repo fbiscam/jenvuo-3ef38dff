@@ -88,7 +88,7 @@ export function AllInOnePlatformSection() {
           </div>
           <h3 className="mt-5 text-xl font-medium">Build</h3>
           <p className="mt-2 text-[16px] leading-relaxed">
-            Create chat apps and workflows with the OpenAI-compatible Chat Completions API you already know.
+            Create chat apps and workflows with the compatible Completions API you already know.
           </p>
         </div>
 
