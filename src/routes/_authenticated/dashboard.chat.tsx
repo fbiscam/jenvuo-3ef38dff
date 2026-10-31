@@ -34,6 +34,9 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { MessageResponse } from "@/components/ai-elements/message";
+import { Button } from "@/components/ui/button";
+import { ProviderLogo } from "@/components/models/ModelsExplorer";
+import { readSiteTheme, SITE_THEME_EVENT } from "@/lib/site-theme";
 import { highlight } from "@/components/dashboard/CodeHighlight";
 import { MIXED_CATALOG, PROVIDERS, PRICE_PER_MILLION, formatContext, getCatalogModel } from "@/lib/model-catalog";
 import { playgroundChat } from "@/lib/playground.functions";
@@ -166,6 +169,7 @@ function ChatPlayground() {
   const [codeOpen, setCodeOpen] = useState(false);
   const [files, setFiles] = useState<ChatAttachment[]>([]);
   const [reading, setReading] = useState(false);
+  const [darkMenus, setDarkMenus] = useState(false);
   const scroller = useRef<HTMLDivElement>(null);
   const box = useRef<HTMLTextAreaElement>(null);
   const imageInput = useRef<HTMLInputElement>(null);
@@ -173,6 +177,14 @@ function ChatPlayground() {
 
   const info = getCatalogModel(model);
   const last = [...turns].reverse().find((t) => t.role === "assistant" && !t.error);
+
+  useEffect(() => {
+    const syncTheme = () => setDarkMenus(readSiteTheme() === "dark");
+    syncTheme();
+    window.addEventListener(SITE_THEME_EVENT, syncTheme);
+    return () => window.removeEventListener(SITE_THEME_EVENT, syncTheme);
+  }, []);
+  const menuTheme = darkMenus ? "dark" : "";
 
   useEffect(() => {
     scroller.current?.scrollTo({ top: scroller.current.scrollHeight, behavior: "smooth" });
@@ -293,13 +305,13 @@ function ChatPlayground() {
           rows={4}
           maxLength={8000}
           placeholder="e.g. Answer in short bullet points."
-          className="mt-2 w-full resize-none rounded-xl border border-border bg-background px-3 py-2 text-[14px] text-foreground outline-none placeholder:text-muted-foreground focus:border-foreground/40"
+          className="mt-2 w-full resize-none rounded-lg border border-border bg-muted/40 px-3 py-3 text-[14px] leading-relaxed text-foreground outline-none placeholder:text-muted-foreground focus:border-foreground/40 focus:ring-2 focus:ring-ring/15"
         />
       </div>
       <div>
         <div className="flex items-center justify-between text-[13px]">
           <label htmlFor="pg-max" className="font-medium text-foreground">Max reply tokens</label>
-          <span className="tabular-nums text-muted-foreground">{maxTokens.toLocaleString()}</span>
+          <span className="rounded-md bg-muted px-2 py-1 tabular-nums text-foreground">{maxTokens.toLocaleString()}</span>
         </div>
         <input
           id="pg-max"
@@ -504,29 +516,28 @@ function ChatPlayground() {
             <div className="flex min-w-0 items-center gap-1">
               <DropdownMenu modal={false}>
                 <DropdownMenuTrigger asChild>
-                  <button type="button" aria-label="Attach files" className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-border text-foreground hover:bg-background">
+                  <Button variant="ghost" size="icon-sm" type="button" aria-label="Attach files" className="shrink-0 rounded-full text-foreground hover:bg-background">
                     {reading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
-                  </button>
+                  </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" side="top" className="w-56 rounded-xl">
-                  <DropdownMenuItem onSelect={() => imageInput.current?.click()}>
-                    <ImageIcon className="h-4 w-4" /> Upload image
+                <DropdownMenuContent align="start" side="top" sideOffset={10} className={`${menuTheme} w-[min(260px,90vw)] rounded-xl border-border bg-background p-2 text-foreground shadow-lg`}>
+                  <DropdownMenuItem className="cursor-pointer gap-3 rounded-lg px-3 py-3 text-[14px] focus:bg-muted focus:text-foreground" onSelect={() => imageInput.current?.click()}>
+                    <ImageIcon className="h-4 w-4" /> Add photos
                   </DropdownMenuItem>
-                  <DropdownMenuItem onSelect={() => docInput.current?.click()}>
-                    <Paperclip className="h-4 w-4" /> Upload document
-                    <span className="ml-auto text-[11px] text-muted-foreground">PDF, TXT, code</span>
+                  <DropdownMenuItem className="cursor-pointer gap-3 rounded-lg px-3 py-3 text-[14px] focus:bg-muted focus:text-foreground" onSelect={() => docInput.current?.click()}>
+                    <Paperclip className="h-4 w-4" /> Add documents
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
               <Popover>
                 <PopoverTrigger asChild>
-                  <button type="button" aria-label="Chat settings" className="inline-flex h-8 items-center gap-1.5 rounded-full px-2.5 text-[13px] text-foreground hover:bg-background">
+                  <Button variant="ghost" size="sm" type="button" aria-label="Chat settings" className="gap-1.5 rounded-full px-2.5 text-[13px] text-foreground hover:bg-background">
                     <SlidersHorizontal className="h-4 w-4" />
                     <span className="hidden sm:inline">{maxTokens.toLocaleString()} tokens · Text</span>
-                  </button>
+                  </Button>
                 </PopoverTrigger>
-                <PopoverContent align="start" side="top" className="w-[min(340px,90vw)] rounded-2xl p-4">
-                  <div className="mb-4 text-[14px] font-medium text-foreground">System prompt &amp; parameters</div>
+                <PopoverContent align="start" side="top" sideOffset={10} className={`${menuTheme} w-[min(340px,90vw)] rounded-xl border-border bg-background p-5 text-foreground shadow-lg`}>
+                  <div className="mb-5 flex items-center gap-2.5 border-b border-border pb-4 text-[14px] font-medium text-foreground"><SlidersHorizontal className="h-4 w-4 text-muted-foreground" />System prompt &amp; parameters</div>
                   {settings}
                 </PopoverContent>
               </Popover>
@@ -534,22 +545,25 @@ function ChatPlayground() {
             <div className="flex min-w-0 items-center gap-1">
               <Popover open={modelOpen} onOpenChange={setModelOpen}>
                 <PopoverTrigger asChild>
-                  <button type="button" aria-label="Choose a model" className="inline-flex min-w-0 items-center gap-1 rounded-full px-2.5 py-1.5 text-[14px] text-foreground hover:bg-background">
+                  <Button variant="ghost" size="sm" type="button" aria-label="Choose a model" className="min-w-0 gap-2 rounded-full px-2.5 text-[14px] text-foreground hover:bg-background">
+                    {info && <ProviderLogo provider={info.provider} size="sm" />}
                     <span className="truncate">{info?.name ?? model}</span>
                     <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground" />
-                  </button>
+                  </Button>
                 </PopoverTrigger>
-                <PopoverContent align="end" side="top" className="max-h-[360px] w-[min(320px,90vw)] overflow-y-auto rounded-2xl p-1.5">
+                <PopoverContent align="end" side="top" sideOffset={10} className={`${menuTheme} max-h-[360px] w-[min(340px,90vw)] overflow-y-auto rounded-xl border-border bg-background p-2 text-foreground shadow-lg`}>
                   {MIXED_CATALOG.map((m) => (
-                    <button
+                    <Button
+                      variant="ghost"
                       key={m.id}
                       type="button"
                       onClick={() => {
                         setModel(m.id);
                         setModelOpen(false);
                       }}
-                      className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-left hover:bg-[var(--console-card)]"
+                      className="h-auto w-full justify-start gap-3 rounded-lg px-3 py-2.5 text-left hover:bg-muted"
                     >
+                      <ProviderLogo provider={m.provider} size="sm" />
                       <span className="min-w-0 flex-1">
                         <span className="block truncate text-[14px] text-foreground">{m.name}</span>
                         <span className="block text-[12px] text-muted-foreground">
@@ -557,7 +571,7 @@ function ChatPlayground() {
                         </span>
                       </span>
                       {m.id === model && <Check className="h-4 w-4 shrink-0 text-foreground" />}
-                    </button>
+                    </Button>
                   ))}
                 </PopoverContent>
               </Popover>
