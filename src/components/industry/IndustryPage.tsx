@@ -1,18 +1,17 @@
 import { useEffect, useState, type ReactNode } from "react";
-import { ChevronDown, ArrowRight, CandlestickChart, Sparkles, BellRing, Code2 } from "lucide-react";
+import { Link } from "@tanstack/react-router";
+import { ArrowUpRight, Check, ChevronDown, CandlestickChart, Sparkles, BellRing, Code2 } from "lucide-react";
 import SiteHeader from "@/components/SiteHeader";
-import SiteFooter from "@/components/SiteFooter";
-import { NextStep } from "@/components/PageShell";
+import BlogFooter from "@/components/BlogFooter";
+import { useAuthUser } from "@/hooks/useAuthUser";
 import { STORIES } from "@/lib/stories";
 
 /**
- * Google Cloud industry-page building blocks for the Solutions and Products
- * pages. Both share the header, section bar and tokens, but each page uses its
- * own layout variant so the two pages never look the same.
+ * Solutions and Products pages, styled like the API Platform page: big centred
+ * headings, dark/light pill buttons, dark image cards, aurora tiles and soft
+ * bordered boxes. Both pages share these pieces but keep their own layout
+ * variant so the two pages never look the same.
  */
-const SANS = "font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif]";
-/** Page content is rendered 18% smaller than the rest of the site. */
-const PAGE_ZOOM = 0.82;
 
 export type IndustryContent = {
   variant: "solutions" | "products";
@@ -34,7 +33,7 @@ export type IndustryContent = {
   storySlugs: string[];
   productsTitle: string;
   products: { title: string; text: string; href: string }[];
-  /** Products page only: white "what you get" section with four icon cards. */
+  /** Products page only: "what you get" section with four icon cards. */
   highlightsTitle?: string;
   highlightsIntro?: string;
   highlights?: { title: string; text: string }[];
@@ -49,61 +48,96 @@ const SECTIONS = [
   { id: "products", label: "Products" },
 ];
 
+const SIGN_IN = "https://auth.jenvu.com/sign-in";
+const AURORAS = ["var(--platform-aurora-1)", "var(--platform-aurora-2)", "var(--platform-aurora-3)"];
+
+const pillDark =
+  "inline-flex items-center gap-1.5 rounded-full bg-gc-ink px-5 py-2.5 text-sm font-medium text-background transition-opacity hover:opacity-85";
+const pillLight =
+  "inline-flex items-center gap-1.5 rounded-full bg-gc-surface px-5 py-2.5 text-sm font-medium text-gc-ink ring-1 ring-gc-line/60 transition-colors hover:bg-gc-panel";
+const underlineLink =
+  "inline-flex w-fit items-center gap-1 border-b border-gc-ink pb-0.5 text-[15px] font-medium text-gc-ink hover:opacity-70";
+
 export function IndustryPage({ c }: { c: IndustryContent }) {
   const p = c.variant === "products";
   return (
-    <div className={`public-cloudflare jenvu-zoom min-h-dvh w-full bg-background text-gc-ink ${SANS} antialiased`}>
+    <div className="min-h-dvh w-full bg-background font-sans text-gc-ink antialiased">
       <SiteHeader />
-      <div style={{ zoom: PAGE_ZOOM }}>
+      <main>
         {p ? <ProductsHero c={c} /> : <SolutionsHero c={c} />}
         <SectionBar hide={p ? ["why", "products", "topics"] : []} />
         {p ? <ProductsZigzag c={c} /> : <SolutionsCards c={c} />}
         {p && <ProductsHighlights c={c} />}
-        {!p && <TopicsList c={c} />}
-        {!p && <WhyAccordion c={c} />}
+        {!p && <TopicsTabs c={c} />}
+        {!p && <WhyList c={c} />}
         {p ? <StoriesRows c={c} /> : <StoriesCards c={c} />}
         {!p && <Products c={c} />}
-        <NextStep />
-      </div>
-      <div className="hide-in-pwa"><SiteFooter /></div>
+        <GetStarted />
+      </main>
+      <BlogFooter />
     </div>
   );
 }
 
 /* ---------- Shared pieces ---------- */
 
-function Buttons({ center = false }: { center?: boolean }) {
+function Buttons() {
   return (
-    <div className={`mt-8 flex flex-wrap gap-3 ${center ? "justify-center" : ""}`}>
-      <a href="https://jenvu.com/contact" className="inline-flex h-11 items-center rounded-full bg-gc-blue-deep px-6 text-[14px] font-medium text-gc-on-blue hover:bg-gc-blue">
+    <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
+      <Link to="/contact" className={pillDark}>
         Talk to an expert
-      </a>
-      <a href="https://jenvu.com/pricing" className="inline-flex h-11 items-center rounded-full border border-gc-line px-6 text-[14px] font-medium text-gc-blue-deep hover:bg-gc-blue-soft">
-        Buy now
-      </a>
+      </Link>
+      <Link to="/pricing" className={pillLight}>
+        Buy now <ArrowUpRight className="h-3.5 w-3.5" />
+      </Link>
     </div>
   );
 }
 
-/** Dark article-style image card (like the homepage stories) with a caption. */
-function ImageCard({ img, caption, tag, className = "", eager = false }: { img: string; caption: string; tag?: string; className?: string; eager?: boolean }) {
+function Ticks({ items }: { items: string[] }) {
   return (
-    <div className={`ind-rise group relative overflow-hidden rounded-[28px] bg-gc-night text-gc-on-night ${className}`}>
+    <ul className="mt-5 space-y-3 text-[15px] leading-snug text-gc-ink">
+      {items.map((t) => (
+        <li key={t} className="flex gap-2">
+          <Check className="mt-0.5 h-4 w-4 shrink-0" />
+          <span>{t}</span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+/** Dark image card with left-aligned text near the bottom (Platform model-card style). */
+function NightCard({
+  img,
+  tag,
+  title,
+  children,
+  className = "",
+  eager = false,
+}: {
+  img: string;
+  tag?: string;
+  title: string;
+  children?: ReactNode;
+  className?: string;
+  eager?: boolean;
+}) {
+  return (
+    <div className={`group relative flex flex-col justify-end overflow-hidden rounded-md bg-gc-night text-left text-gc-on-night ${className}`}>
       <img
         src={img}
         alt=""
         width={1280}
         height={800}
         loading={eager ? "eager" : "lazy"}
-        className="ind-kenburns absolute inset-0 h-full w-full object-cover"
+        className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-105"
       />
-      <div className="absolute inset-0 bg-gradient-to-t from-gc-night via-gc-night/30 to-transparent" />
-      <div className="absolute left-6 top-5 flex items-center gap-2 text-[12px] text-gc-on-night-muted">
-        <span className="ind-pulse h-2 w-2 rounded-full bg-gc-green" />Fiber · live
-      </div>
-      <div className="absolute inset-x-0 bottom-0 p-6 sm:p-8">
-        {tag && <p className="text-[12px] font-medium uppercase tracking-wider text-gc-on-night-muted">{tag}</p>}
-        <p className="mt-1 text-[20px] leading-snug sm:text-[22px]">{caption}</p>
+      <div className="absolute inset-0 bg-gradient-to-t from-gc-night via-gc-night/40 to-transparent" />
+      <div className="relative px-7 pb-9 pt-24">
+        {tag && <p className="text-xs font-medium uppercase tracking-[0.18em] text-gc-on-night-muted">{tag}</p>}
+        <h3 className="mt-2 text-[1.6rem] font-medium leading-tight tracking-tight">{title}</h3>
+        {children}
       </div>
     </div>
   );
@@ -112,7 +146,9 @@ function ImageCard({ img, caption, tag, className = "", eager = false }: { img: 
 function SectionBar({ hide = [] }: { hide?: string[] }) {
   const [active, setActive] = useState("overview");
   useEffect(() => {
-    const els = SECTIONS.filter((s) => !hide.includes(s.id)).map((s) => document.getElementById(s.id)).filter((e): e is HTMLElement => !!e);
+    const els = SECTIONS.filter((s) => !hide.includes(s.id))
+      .map((s) => document.getElementById(s.id))
+      .filter((e): e is HTMLElement => !!e);
     const io = new IntersectionObserver(
       (entries) => {
         const vis = entries.filter((e) => e.isIntersecting).sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)[0];
@@ -122,16 +158,21 @@ function SectionBar({ hide = [] }: { hide?: string[] }) {
     );
     els.forEach((e) => io.observe(e));
     return () => io.disconnect();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   return (
-    // Inside the zoomed wrapper, so the offset is divided to stay under the header.
-    <div className="sticky z-30 px-4 sm:px-6" style={{ top: `calc(4rem / ${PAGE_ZOOM})` }}>
-      <nav aria-label="Page sections" className="mx-auto flex max-w-[1240px] gap-1 overflow-x-auto rounded-full border border-gc-line bg-background px-2 py-1.5 shadow-sm">
+    <div className="sticky top-16 z-30 flex justify-center px-4 sm:px-6">
+      <nav
+        aria-label="Page sections"
+        className="flex max-w-full gap-1 overflow-x-auto rounded-full bg-background/90 p-1.5 ring-1 ring-gc-line backdrop-blur"
+      >
         {SECTIONS.filter((s) => !hide.includes(s.id)).map((s) => (
           <a
             key={s.id}
             href={`#${s.id}`}
-            className={`shrink-0 rounded-full px-4 py-2 text-[14px] transition-colors ${active === s.id ? "bg-gc-blue-soft font-medium text-gc-blue-deep" : "text-gc-ink-muted hover:text-gc-ink"}`}
+            className={`shrink-0 rounded-full px-4 py-2 text-sm font-medium transition-colors ${
+              active === s.id ? "bg-gc-ink text-background" : "text-gc-ink hover:bg-gc-surface"
+            }`}
           >
             {s.label}
           </a>
@@ -141,19 +182,19 @@ function SectionBar({ hide = [] }: { hide?: string[] }) {
   );
 }
 
-function SectionHead({ title, intro, center = false, onNight = false }: { title: string; intro?: string; center?: boolean; onNight?: boolean }) {
+function SectionHead({ title, intro }: { title: string; intro?: string }) {
   return (
-    <div className={`max-w-[720px] ${center ? "mx-auto text-center" : ""}`}>
-      <h2 className="text-[28px] font-normal leading-tight sm:text-[32px]">{title}</h2>
-      {intro && <p className={`mt-4 text-[16px] leading-[1.6] ${onNight ? "text-gc-on-night-muted" : "text-gc-ink-muted"}`}>{intro}</p>}
+    <div className="mx-auto max-w-3xl text-center">
+      <h2 className="text-4xl font-medium leading-tight tracking-tight sm:text-5xl">{title}</h2>
+      {intro && <p className="mt-5 text-[17px] leading-relaxed text-gc-ink">{intro}</p>}
     </div>
   );
 }
 
-function Wrap({ id, children, tint = false, night = false }: { id: string; children: ReactNode; tint?: boolean; night?: boolean }) {
+function Wrap({ id, children, wide = false }: { id: string; children: ReactNode; wide?: boolean }) {
   return (
-    <section id={id} className={`scroll-mt-32 ${tint ? "bg-gc-surface" : ""} ${night ? "bg-gc-night text-gc-on-night" : ""}`}>
-      <div className="mx-auto max-w-[1240px] px-5 py-14 sm:px-8 md:py-20">{children}</div>
+    <section id={id} className="scroll-mt-32">
+      <div className={`mx-auto px-5 py-16 sm:py-20 ${wide ? "max-w-[1340px]" : "max-w-6xl"}`}>{children}</div>
     </section>
   );
 }
@@ -162,19 +203,21 @@ function storyList(c: IndustryContent) {
   return c.storySlugs.map((s) => STORIES.find((x) => x.slug === s)).filter((x) => !!x);
 }
 
+function Kicker({ children }: { children: ReactNode }) {
+  return <p className="text-xs font-medium uppercase tracking-[0.2em] text-gc-ink-muted">{children}</p>;
+}
+
 /* ---------- Solutions page layout ---------- */
 
 function SolutionsHero({ c }: { c: IndustryContent }) {
   return (
     <section id="overview" className="scroll-mt-24">
-      <div className="mx-auto grid max-w-[1240px] items-center gap-10 px-5 pb-12 pt-10 sm:px-8 md:grid-cols-[1fr_1.05fr] md:pb-16 md:pt-14">
-        <div className="ind-rise">
-          <span className="inline-flex rounded-full bg-gc-blue-soft px-3 py-1 text-[13px] font-medium text-gc-blue-deep">{c.pill}</span>
-          <h1 className="mt-5 text-[34px] font-normal leading-[1.15] tracking-tight sm:text-[44px]">{c.title}</h1>
-          <p className="mt-5 max-w-[520px] text-[16px] leading-[1.6] text-gc-ink-muted">{c.intro}</p>
-          <Buttons />
-        </div>
-        <ImageCard img={c.heroImg} caption={c.heroCaption} tag="Top story" eager className="aspect-[16/11] md:aspect-auto md:min-h-[420px]" />
+      <div className="mx-auto max-w-6xl px-5 pb-14 pt-20 text-center sm:pt-28">
+        <Kicker>{c.pill}</Kicker>
+        <h1 className="mx-auto mt-5 max-w-3xl text-[2.6rem] font-medium leading-[1.08] tracking-tight sm:text-6xl">{c.title}</h1>
+        <p className="mx-auto mt-6 max-w-2xl text-[17px] leading-relaxed text-gc-ink">{c.intro}</p>
+        <Buttons />
+        <NightCard img={c.heroImg} tag="Top story" title={c.heroCaption} eager className="mt-16 min-h-[340px] sm:aspect-[16/7] sm:min-h-0" />
       </div>
     </section>
   );
@@ -182,21 +225,17 @@ function SolutionsHero({ c }: { c: IndustryContent }) {
 
 function SolutionsCards({ c }: { c: IndustryContent }) {
   return (
-    <Wrap id="solutions">
+    <Wrap id="solutions" wide>
       <SectionHead title={c.solutionsTitle} intro={c.solutionsIntro} />
-      <div className="mt-10 grid gap-6 md:grid-cols-3">
+      <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {c.solutions.map((s) => (
-          <a key={s.title} href={s.href} className="group overflow-hidden rounded-md border border-gc-line bg-background transition-shadow hover:shadow-md">
-            <div className="aspect-[16/10] overflow-hidden bg-gc-night">
-              <img src={s.img} alt="" width={1280} height={800} loading="lazy" className="h-full w-full object-cover transition duration-700 group-hover:scale-105" />
-            </div>
-            <div className="p-6">
-              <h3 className="text-[20px] font-normal">{s.title}</h3>
-              <p className="mt-3 text-[15px] leading-[1.6] text-gc-ink-muted">{s.text}</p>
-              <span className="mt-4 inline-flex items-center gap-1 text-[14px] font-medium text-gc-blue-deep group-hover:underline">
-                {s.link} <ArrowRight className="h-4 w-4" />
+          <a key={s.title} href={s.href} className="block">
+            <NightCard img={s.img} title={s.title} className="min-h-[380px] sm:aspect-[4/5] sm:min-h-0">
+              <p className="mt-3 text-sm font-medium leading-relaxed text-gc-on-night">{s.text}</p>
+              <span className="mt-5 inline-flex items-center gap-1 border-b border-gc-on-night pb-0.5 text-sm font-medium">
+                {s.link} <ArrowUpRight className="h-3.5 w-3.5" />
               </span>
-            </div>
+            </NightCard>
           </a>
         ))}
       </div>
@@ -204,79 +243,78 @@ function SolutionsCards({ c }: { c: IndustryContent }) {
   );
 }
 
-function TopicsList({ c }: { c: IndustryContent }) {
+function TopicsTabs({ c }: { c: IndustryContent }) {
   const [i, setI] = useState(0);
   const t = c.topics[i];
   return (
-    <Wrap id="topics" tint>
+    <Wrap id="topics">
       <SectionHead title={c.topicsTitle} />
-      <div className="mt-10 grid gap-6 md:grid-cols-[300px_1fr]">
-        <ul role="tablist" className="flex gap-2 overflow-x-auto md:flex-col md:overflow-visible">
+      <div className="mt-9 flex justify-center">
+        <div role="tablist" className="flex max-w-full gap-1 overflow-x-auto rounded-full bg-gc-surface p-1">
           {c.topics.map((x, n) => (
-            <li key={x.label} className="shrink-0">
-              <button
-                role="tab"
-                aria-selected={n === i}
-                onClick={() => setI(n)}
-                className={`w-full rounded-xl border-l-4 px-4 py-3 text-left text-[15px] transition-colors ${n === i ? "border-gc-blue bg-background font-medium text-gc-blue-deep shadow-sm" : "border-transparent text-gc-ink-muted hover:bg-background"}`}
-              >
-                {x.label}
-              </button>
-            </li>
+            <button
+              key={x.label}
+              type="button"
+              role="tab"
+              aria-selected={n === i}
+              onClick={() => setI(n)}
+              className={`shrink-0 rounded-full px-5 py-2 text-sm font-medium transition-colors ${
+                n === i ? "bg-background text-gc-ink shadow-sm" : "text-gc-ink-muted hover:text-gc-ink"
+              }`}
+            >
+              {x.label}
+            </button>
           ))}
-        </ul>
-        <TopicBody t={t} />
+        </div>
       </div>
+      {t && (
+        <div key={t.label} role="tabpanel" className="mt-10 grid overflow-hidden rounded-md border border-gc-line text-left md:grid-cols-2">
+          <div className="p-7 sm:p-10">
+            <h3 className="text-2xl font-medium tracking-tight sm:text-3xl">{t.title}</h3>
+            <p className="mt-4 text-[15px] leading-relaxed text-gc-ink">{t.text}</p>
+            <a href={t.href} className={`mt-8 ${underlineLink}`}>
+              {t.link} <ArrowUpRight className="h-3.5 w-3.5" />
+            </a>
+          </div>
+          <div className="p-7 sm:p-10" style={{ backgroundImage: AURORAS[i % AURORAS.length] }}>
+            <div className="rounded-md bg-background/90 p-6 shadow-lg backdrop-blur">
+              <Kicker>What you get</Kicker>
+              <Ticks items={t.points} />
+            </div>
+          </div>
+        </div>
+      )}
     </Wrap>
   );
 }
 
-function TopicBody({ t }: { t: IndustryContent["topics"][number] }) {
-  return (
-    <div key={t.label} role="tabpanel" className="ind-rise rounded-md border border-gc-line bg-background p-6 sm:p-8">
-      <h3 className="text-[24px] font-normal">{t.title}</h3>
-      <p className="mt-3 text-[15px] leading-[1.6] text-gc-ink-muted">{t.text}</p>
-      <ul className="mt-5 space-y-2">
-        {t.points.map((p) => (
-          <li key={p} className="flex gap-3 text-[15px] leading-[1.5]">
-            <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-gc-blue" />
-            {p}
-          </li>
-        ))}
-      </ul>
-      <a href={t.href} className="mt-6 inline-flex items-center gap-1 text-[14px] font-medium text-gc-blue-deep hover:underline">
-        {t.link} <ArrowRight className="h-4 w-4" />
-      </a>
-    </div>
-  );
-}
-
-function WhyAccordion({ c }: { c: IndustryContent }) {
+function WhyList({ c }: { c: IndustryContent }) {
   const [open, setOpen] = useState(0);
   return (
     <Wrap id="why">
-      <div className="grid items-start gap-10 md:grid-cols-[1fr_1fr]">
+      <div className="grid items-start gap-10 text-left md:grid-cols-2">
         <div>
-          <SectionHead title={c.whyTitle} />
+          <h2 className="text-4xl font-medium leading-tight tracking-tight sm:text-5xl">{c.whyTitle}</h2>
           <div className="mt-8 divide-y divide-gc-line border-y border-gc-line">
             {c.why.map((w, n) => (
               <div key={w.title}>
                 <button
+                  type="button"
                   aria-expanded={open === n}
                   onClick={() => setOpen(open === n ? -1 : n)}
-                  className="flex w-full items-center justify-between gap-4 py-5 text-left text-[18px]"
+                  className="flex w-full items-center justify-between gap-4 py-5 text-left text-lg font-medium"
                 >
                   {w.title}
-                  <ChevronDown className={`h-5 w-5 shrink-0 text-gc-ink-muted transition-transform ${open === n ? "rotate-180" : ""}`} />
+                  <ChevronDown className={`h-5 w-5 shrink-0 transition-transform ${open === n ? "rotate-180" : ""}`} />
                 </button>
-                {open === n && <p className="ind-rise pb-5 text-[15px] leading-[1.6] text-gc-ink-muted">{w.text}</p>}
+                {open === n && <p className="pb-5 text-[15px] leading-relaxed text-gc-ink">{w.text}</p>}
               </div>
             ))}
           </div>
         </div>
         <div>
-          <ImageCard img={c.solutions[0]?.img ?? c.heroImg} caption={c.whyCardTitle} className="aspect-[4/3]" />
-          <p className="mt-4 text-[14px] leading-[1.6] text-gc-ink-muted">{c.whyCardText}</p>
+          <NightCard img={c.solutions[0]?.img ?? c.heroImg} title={c.whyCardTitle} className="min-h-[340px] sm:aspect-[4/3] sm:min-h-0" />
+          <p className="mt-4 text-sm leading-relaxed text-gc-ink-muted">{c.whyCardText}</p>
         </div>
       </div>
     </Wrap>
@@ -285,20 +323,16 @@ function WhyAccordion({ c }: { c: IndustryContent }) {
 
 function StoriesCards({ c }: { c: IndustryContent }) {
   return (
-    <Wrap id="stories" tint>
+    <Wrap id="stories" wide>
       <SectionHead title={c.storiesTitle} />
-      <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {storyList(c).map((s) => (
-          <a key={s.slug} href={`/stories/${s.slug}`} className="group relative block aspect-[4/5] overflow-hidden rounded-[24px] bg-gc-night text-gc-on-night">
-            <img src={s.img} alt="" loading="lazy" className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-105" />
-            <div className="absolute inset-0 bg-gradient-to-t from-gc-night via-gc-night/20 to-transparent" />
-            <div className="absolute inset-x-0 bottom-0 p-6">
-              <p className="text-[12px] font-medium uppercase tracking-wider text-gc-on-night-muted">{s.tag}</p>
-              <h3 className="mt-2 line-clamp-2 max-sm:line-clamp-none text-[20px] font-normal leading-snug">{s.title}</h3>
-              <span className="mt-4 inline-flex items-center gap-1 text-[14px] font-medium">
-                Read now <ArrowRight className="h-4 w-4" />
+          <a key={s.slug} href={`/stories/${s.slug}`} className="block">
+            <NightCard img={s.img} tag={s.tag} title={s.title} className="min-h-[360px] sm:aspect-[4/5] sm:min-h-0">
+              <span className="mt-5 inline-flex items-center gap-1 border-b border-gc-on-night pb-0.5 text-sm font-medium">
+                Read now <ArrowUpRight className="h-3.5 w-3.5" />
               </span>
-            </div>
+            </NightCard>
           </a>
         ))}
       </div>
@@ -311,18 +345,23 @@ function StoriesCards({ c }: { c: IndustryContent }) {
 function ProductsHero({ c }: { c: IndustryContent }) {
   return (
     <section id="overview" className="scroll-mt-24">
-      <div className="mx-auto max-w-[1240px] px-5 pb-12 pt-12 text-center sm:px-8 md:pb-16 md:pt-16">
-        <div className="ind-rise mx-auto max-w-[820px]">
-          <span className="inline-flex rounded-full bg-gc-blue-soft px-3 py-1 text-[13px] font-medium text-gc-blue-deep">{c.pill}</span>
-          <h1 className="mt-5 text-[36px] font-normal leading-[1.12] tracking-tight sm:text-[52px]">{c.title}</h1>
-          <p className="mx-auto mt-5 max-w-[620px] text-[17px] leading-[1.6] text-gc-ink-muted">{c.intro}</p>
-          <Buttons center />
-        </div>
-        <figure className="ind-rise mt-12">
-          <div className="aspect-[2/1] overflow-hidden rounded-[28px] bg-gc-night">
-            <img src={c.heroImg} alt="" width={1600} height={800} loading="eager" className="ind-kenburns h-full w-full object-cover" />
+      <div className="mx-auto max-w-6xl px-5 pb-14 pt-20 text-center sm:pt-28">
+        <Kicker>{c.pill}</Kicker>
+        <h1 className="mx-auto mt-5 max-w-3xl text-[2.6rem] font-medium leading-[1.08] tracking-tight sm:text-6xl">{c.title}</h1>
+        <p className="mx-auto mt-6 max-w-2xl text-[17px] leading-relaxed text-gc-ink">{c.intro}</p>
+        <Buttons />
+        <figure className="mt-16">
+          <div className="relative aspect-[4/3] overflow-hidden rounded-md sm:aspect-[2/1]" style={{ backgroundImage: AURORAS[0] }}>
+            <img
+              src={c.heroImg}
+              alt=""
+              width={1600}
+              height={800}
+              loading="eager"
+              className="absolute bottom-0 left-[8%] right-0 top-[10%] h-[90%] w-[92%] rounded-tl-xl object-cover shadow-2xl"
+            />
           </div>
-          <figcaption className="mt-4 text-[14px] text-gc-ink-muted">{c.heroCaption}</figcaption>
+          <figcaption className="mt-4 text-sm text-gc-ink-muted">{c.heroCaption}</figcaption>
         </figure>
       </div>
     </section>
@@ -332,19 +371,29 @@ function ProductsHero({ c }: { c: IndustryContent }) {
 function ProductsZigzag({ c }: { c: IndustryContent }) {
   return (
     <Wrap id="solutions">
-      <SectionHead title={c.solutionsTitle} intro={c.solutionsIntro} center />
-      <div className="mt-12 space-y-14 md:space-y-20">
+      <SectionHead title={c.solutionsTitle} intro={c.solutionsIntro} />
+      <div className="mt-14 space-y-16 md:space-y-24">
         {c.solutions.map((s, n) => (
-          <div key={s.title} className={`grid items-center gap-8 md:grid-cols-2 md:gap-16 ${n % 2 ? "md:[&>*:first-child]:order-2" : ""}`}>
-            <div className="aspect-[16/10] overflow-hidden rounded-[28px] bg-gc-night">
-              <img src={s.img} alt="" width={1280} height={800} loading="lazy" className="ind-kenburns h-full w-full object-cover" />
+          <div
+            key={s.title}
+            className={`grid items-center gap-8 text-left md:grid-cols-2 md:gap-16 ${n % 2 ? "md:[&>*:first-child]:order-2" : ""}`}
+          >
+            <div className="relative aspect-square overflow-hidden rounded-md sm:aspect-[5/4]" style={{ backgroundImage: AURORAS[n % AURORAS.length] }}>
+              <img
+                src={s.img}
+                alt=""
+                width={1280}
+                height={800}
+                loading="lazy"
+                className="absolute bottom-0 left-[12%] right-0 top-[12%] h-[88%] w-[88%] rounded-tl-xl object-cover shadow-2xl"
+              />
             </div>
             <div className={`max-w-[460px] ${n % 2 ? "md:justify-self-end" : ""}`}>
-              <p className="text-[13px] font-medium text-gc-blue-deep">0{n + 1}</p>
-              <h3 className="mt-2 text-[28px] font-normal leading-tight">{s.title}</h3>
-              <p className="mt-4 text-[16px] leading-[1.6] text-gc-ink-muted">{s.text}</p>
-              <a href={s.href} className="mt-6 inline-flex h-10 items-center gap-1 rounded-full bg-gc-blue-soft px-5 text-[14px] font-medium text-gc-blue-deep hover:brightness-95">
-                {s.link} <ArrowRight className="h-4 w-4" />
+              <Kicker>0{n + 1}</Kicker>
+              <h3 className="mt-3 text-3xl font-medium leading-tight tracking-tight sm:text-4xl">{s.title}</h3>
+              <p className="mt-4 text-[16px] leading-relaxed text-gc-ink">{s.text}</p>
+              <a href={s.href} className={`mt-7 ${pillLight}`}>
+                {s.link} <ArrowUpRight className="h-3.5 w-3.5" />
               </a>
             </div>
           </div>
@@ -354,28 +403,30 @@ function ProductsZigzag({ c }: { c: IndustryContent }) {
   );
 }
 
-const HIGHLIGHT_ICONS = [
-  { Icon: CandlestickChart, bg: "bg-gc-blue-soft", fg: "text-gc-blue" },
-  { Icon: Sparkles, bg: "bg-gc-red-soft", fg: "text-gc-red" },
-  { Icon: BellRing, bg: "bg-gc-yellow-soft", fg: "text-gc-yellow" },
-  { Icon: Code2, bg: "bg-gc-green-soft", fg: "text-gc-green" },
-];
+const HIGHLIGHT_ICONS = [CandlestickChart, Sparkles, BellRing, Code2];
 
-/** Products page: plain white section with four homepage-style icon cards. */
+/** Products page: four Platform use-case style cards. */
 function ProductsHighlights({ c }: { c: IndustryContent }) {
   if (!c.highlights?.length) return null;
   return (
     <section className="bg-background">
-      <div className="mx-auto max-w-[1240px] px-5 py-14 sm:px-8 md:py-20">
-        <SectionHead title={c.highlightsTitle ?? ""} intro={c.highlightsIntro} center />
-        <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mx-auto max-w-[1340px] px-5 py-16 sm:py-20">
+        <SectionHead title={c.highlightsTitle ?? ""} intro={c.highlightsIntro} />
+        <div className="mt-12 grid gap-6 text-left sm:grid-cols-2 lg:grid-cols-4">
           {c.highlights.map((h, n) => {
-            const { Icon, bg, fg } = HIGHLIGHT_ICONS[n % HIGHLIGHT_ICONS.length];
+            const Icon = HIGHLIGHT_ICONS[n % HIGHLIGHT_ICONS.length];
             return (
-              <div key={h.title} className="ind-rise rounded-md border border-gc-line bg-background p-7 text-left transition hover:shadow-[0_1px_3px_rgba(60,64,67,0.15),0_4px_12px_rgba(60,64,67,0.12)]" style={{ animationDelay: `${n * 0.08}s` }}>
-                <span className={`flex h-12 w-12 items-center justify-center rounded-full ${bg}`}><Icon className={`h-6 w-6 ${fg}`} /></span>
-                <h3 className="mt-5 text-[18px] font-medium">{h.title}</h3>
-                <p className="mt-2 text-[15px] leading-[1.6] text-gc-ink-muted">{h.text}</p>
+              <div key={h.title} className="flex flex-col rounded-md border border-gc-line p-7">
+                <span
+                  className="flex h-14 w-14 items-center justify-center rounded-2xl"
+                  style={{ backgroundImage: AURORAS[n % AURORAS.length] }}
+                >
+                  <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-background/90 shadow">
+                    <Icon className="h-5 w-5" />
+                  </span>
+                </span>
+                <h3 className="mt-6 text-xl font-medium">{h.title}</h3>
+                <p className="mt-3 text-[15px] leading-relaxed text-gc-ink">{h.text}</p>
               </div>
             );
           })}
@@ -385,67 +436,22 @@ function ProductsHighlights({ c }: { c: IndustryContent }) {
   );
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export function TopicsTabs({ c }: { c: IndustryContent }) {
-  const [i, setI] = useState(0);
-  const t = c.topics[i];
-  return (
-    <Wrap id="topics" tint>
-      <SectionHead title={c.topicsTitle} center />
-      <div role="tablist" className="mt-8 flex justify-start gap-2 overflow-x-auto pb-1 md:justify-center">
-        {c.topics.map((x, n) => (
-          <button
-            key={x.label}
-            role="tab"
-            aria-selected={n === i}
-            onClick={() => setI(n)}
-            className={`shrink-0 rounded-full px-5 py-2.5 text-[14px] transition-colors ${n === i ? "bg-gc-blue-deep text-gc-on-blue" : "bg-background text-gc-ink-muted ring-1 ring-gc-line hover:text-gc-ink"}`}
-          >
-            {x.label}
-          </button>
-        ))}
-      </div>
-      <div className="mx-auto mt-8 max-w-[900px]">
-        <TopicBody t={t} />
-      </div>
-    </Wrap>
-  );
-}
-
-function WhyNight({ c }: { c: IndustryContent }) {
-  return (
-    <Wrap id="why" night>
-      <SectionHead title={c.whyTitle} intro={c.whyCardTitle} center onNight />
-      <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-        {c.why.map((w, n) => (
-          <div key={w.title} className="ind-rise rounded-[24px] bg-gc-night-soft p-6" style={{ animationDelay: `${n * 0.08}s` }}>
-            <span className="text-[32px] font-light text-gc-yellow">0{n + 1}</span>
-            <h3 className="mt-3 text-[18px] font-medium">{w.title}</h3>
-            <p className="mt-2 text-[14px] leading-[1.6] text-gc-on-night-muted">{w.text}</p>
-          </div>
-        ))}
-      </div>
-      <p className="mt-8 text-center text-[13px] text-gc-on-night-muted">{c.whyCardText}</p>
-    </Wrap>
-  );
-}
-
 function StoriesRows({ c }: { c: IndustryContent }) {
   return (
     <Wrap id="stories">
-      <SectionHead title={c.storiesTitle} center />
-      <div className="mt-10 divide-y divide-gc-line border-y border-gc-line">
+      <SectionHead title={c.storiesTitle} />
+      <div className="mt-12 divide-y divide-gc-line border-y border-gc-line text-left">
         {storyList(c).map((s) => (
-          <a key={s.slug} href={`/stories/${s.slug}`} className="group grid items-center gap-5 py-6 sm:grid-cols-[220px_1fr_auto]">
-            <div className="aspect-[16/10] overflow-hidden rounded-[16px] bg-gc-night">
+          <a key={s.slug} href={`/stories/${s.slug}`} className="group grid items-center gap-5 py-7 sm:grid-cols-[240px_1fr_auto]">
+            <div className="aspect-[16/10] overflow-hidden rounded-md bg-gc-night">
               <img src={s.img} alt="" loading="lazy" className="h-full w-full object-cover transition duration-700 group-hover:scale-105" />
             </div>
             <div>
-              <p className="text-[12px] font-medium tracking-wide text-gc-ink-muted">{s.tag}</p>
-              <h3 className="mt-1 text-[20px] font-normal leading-snug group-hover:text-gc-blue-deep">{s.title}</h3>
+              <Kicker>{s.tag}</Kicker>
+              <h3 className="mt-2 text-2xl font-medium leading-snug tracking-tight">{s.title}</h3>
             </div>
-            <span className="inline-flex items-center gap-1 text-[14px] font-medium text-gc-blue-deep">
-              Read now <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+            <span className={underlineLink}>
+              Read now <ArrowUpRight className="h-3.5 w-3.5" />
             </span>
           </a>
         ))}
@@ -454,33 +460,78 @@ function StoriesRows({ c }: { c: IndustryContent }) {
   );
 }
 
-/* ---------- Product grid (both pages) ---------- */
+/* ---------- Product grid (Solutions page) ---------- */
 
 function Products({ c }: { c: IndustryContent }) {
   const [all, setAll] = useState(false);
   const shown = all ? c.products : c.products.slice(0, 6);
-  const p = c.variant === "products";
   return (
-    <Wrap id="products" tint={p}>
-      <SectionHead title={c.productsTitle} center={p} />
-      <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+    <Wrap id="products">
+      <SectionHead title={c.productsTitle} />
+      <div className="mt-12 grid gap-6 text-left sm:grid-cols-2 lg:grid-cols-3">
         {shown.map((x) => (
-          <div key={x.title} className={`ind-rise flex flex-col rounded-[20px] p-6 ${p ? "bg-background border-l-4 border-gc-blue" : "border border-gc-line"}`}>
-            <h3 className="text-[18px] font-medium">{x.title}</h3>
-            <p className="mt-2 flex-1 text-[15px] leading-[1.6] text-gc-ink-muted">{x.text}</p>
-            <a href={x.href} className="mt-4 inline-flex items-center gap-1 text-[14px] font-medium text-gc-blue-deep hover:underline">
-              Learn more <ArrowRight className="h-4 w-4" />
+          <div key={x.title} className="flex flex-col rounded-md border border-gc-line p-6">
+            <h3 className="text-xl font-medium">{x.title}</h3>
+            <p className="mt-4 flex-1 text-sm leading-relaxed text-gc-ink">{x.text}</p>
+            <a href={x.href} className={`mt-7 ${underlineLink}`}>
+              Learn more <ArrowUpRight className="h-3.5 w-3.5" />
             </a>
           </div>
         ))}
       </div>
       {c.products.length > 6 && (
-        <div className="mt-8 flex justify-center">
-          <button onClick={() => setAll(!all)} className="inline-flex h-10 items-center rounded-full border border-gc-line bg-background px-6 text-[14px] font-medium text-gc-blue-deep hover:bg-gc-blue-soft">
+        <div className="mt-10 flex justify-center">
+          <button type="button" onClick={() => setAll(!all)} className={pillLight}>
             {all ? "View less" : "View more"}
           </button>
         </div>
       )}
     </Wrap>
+  );
+}
+
+/* ---------- Closing (both pages) ---------- */
+
+function GetStarted() {
+  const { user } = useAuthUser();
+  return (
+    <section className="bg-background py-20 text-center">
+      <div className="mx-auto max-w-6xl px-5">
+        <h2 className="text-4xl font-medium tracking-tight sm:text-5xl">Take the next step</h2>
+        <div className="mt-10 grid gap-6 text-left md:grid-cols-2">
+          <div className="flex flex-col rounded-md border border-gc-line p-7 sm:p-8">
+            <h3 className="text-2xl font-medium">Talk to the Jenvu team</h3>
+            <div className="flex-1">
+              <Ticks items={["Tell us what you trade", "Get help choosing a setup and plan", "Ask about the Founding Program"]} />
+            </div>
+            <div className="mt-8">
+              <Link to="/contact" className={pillDark}>
+                Contact us
+              </Link>
+            </div>
+          </div>
+          <div className="flex flex-col rounded-md border border-gc-line p-7 sm:p-8">
+            <h3 className="text-2xl font-medium">Start on your own</h3>
+            <div className="flex-1">
+              <Ticks items={["Open the live Fiber Terminal", "Ask the AI desk about the chart", "Compare plans and credits"]} />
+            </div>
+            <div className="mt-8 flex flex-wrap gap-3">
+              {user ? (
+                <Link to="/dashboard" className={pillLight}>
+                  Open dashboard <ArrowUpRight className="h-3.5 w-3.5" />
+                </Link>
+              ) : (
+                <a href={SIGN_IN} className={pillLight}>
+                  Try it free <ArrowUpRight className="h-3.5 w-3.5" />
+                </a>
+              )}
+              <Link to="/pricing" className="inline-flex items-center gap-1.5 rounded-full px-5 py-2.5 text-sm font-medium hover:bg-gc-surface">
+                See pricing
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
   );
 }
