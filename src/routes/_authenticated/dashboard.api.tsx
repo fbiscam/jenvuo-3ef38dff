@@ -3,7 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { Copy, Check, KeyRound, Trash2, FileText, X, Sparkles, Terminal } from "lucide-react";
+import { Copy, Check, Plus, Search, Trash2, FileText, X, Terminal } from "lucide-react";
 import {
   listExtensionKeys,
   createExtensionKey,
@@ -53,6 +53,7 @@ function ExtensionPage() {
   const [origin, setOrigin] = useState("https://jenvu.com");
   const [deleteTarget, setDeleteTarget] = useState<ExtensionKeyRow | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [query, setQuery] = useState("");
 
   useEffect(() => {
     if (typeof window !== "undefined") setOrigin(window.location.origin);
