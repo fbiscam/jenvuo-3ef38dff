@@ -325,7 +325,7 @@ function ChatPlayground() {
   );
 
   return (
-    <section className="mx-auto flex h-[calc(100dvh-96px)] min-h-[600px] w-full max-w-[1060px] flex-col">
+    <section className="mx-auto flex h-[calc(100dvh-96px)] min-h-[600px] w-full max-w-[1240px] flex-col">
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-[28px] font-medium tracking-tight text-foreground">Chat API</h1>
@@ -357,12 +357,12 @@ function ChatPlayground() {
                   onClick={() => pickExample(ex)}
                   className="flex flex-col rounded-2xl border border-border bg-background p-5 text-left transition-colors hover:bg-[var(--console-card)] lg:p-6"
                 >
-                  <span className={`grid h-7 w-7 place-items-center rounded-full ${ex.tone}`}>
+                  <span className={`grid h-9 w-9 place-items-center rounded-full ${ex.tone}`}>
                     <ex.icon className="h-4 w-4" aria-hidden="true" />
                   </span>
-                  <span className="mt-3 text-[15px] font-medium text-foreground">{ex.title}</span>
-                  <span className="mt-1 text-[13px] leading-snug text-muted-foreground">{ex.text}</span>
-                  <span className="mt-3 flex flex-wrap gap-1.5">
+                  <span className="mt-4 text-[16px] font-medium text-foreground">{ex.title}</span>
+                  <span className="mt-1.5 text-[14px] leading-snug text-muted-foreground">{ex.text}</span>
+                  <span className="mt-auto flex flex-wrap gap-1.5 pt-4">
                     {ex.tags.map((t) => (
                       <span key={t} className="rounded-md bg-[var(--console-card)] px-2 py-0.5 text-[12px] text-foreground">{t}</span>
                     ))}
