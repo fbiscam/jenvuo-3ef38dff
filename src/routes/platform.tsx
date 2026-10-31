@@ -689,9 +689,7 @@ function Enterprise() {
   return (
     <section className="mx-auto max-w-6xl px-5 py-20 text-center">
       <h2 className="text-4xl font-medium leading-tight tracking-tight sm:text-5xl">
-        Features for running
-        <br />
-        at scale
+        Features for running at scale
       </h2>
       <div className="mt-7 flex justify-center">
         <Link to="/docs" hash="api" className={pillLight}>
