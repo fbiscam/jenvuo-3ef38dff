@@ -349,7 +349,7 @@ const BUILD_ITEMS: Array<{ key: string; title: string; points: BuildPart[][] }> 
     key: "terminal",
     title: "Fiber Terminal and chart analysis",
     points: [
-      ["Read live Fiber candles with HH, HL, LH and LL labels on our ", { link: "non-repainting Fiber Terminal", hash: "gold-terminal" }, ", plus BOS and CHoCH breaks that stay fixed once a candle closes"],
+      ["Read live Fiber candles with HH, HL, LH and LL labels on our ", { link: "non-repainting Fiber Terminal", hash: "gold-terminal" }, ", plus BOS and CHoCH breaks that fixed once a candle closes"],
       ["Spot supply and demand zones paired with ", { link: "fair value gaps", hash: "fair-value-gaps" }, ", drawn only when they score strong and kept until a clear invalidation"],
       ["Check fresh liquidity sweeps on 5M, 15M, 1H, 2H and 4H with ", { link: "fakeout filters", hash: "fakeout-filters" }, " that flag weak pokes and re-accepted levels"],
     ],
