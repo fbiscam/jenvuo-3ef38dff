@@ -77,7 +77,7 @@ const columns: FooterGroup[][] = [
     { label: "Products", links: [
       { to: "/ai-engine", label: "Ask Jenvu" },
       { to: "/dashboard/terminal", label: "Fiber Terminal" },
-      { to: "/dashboard/jx-bot", label: "JX Bot" },
+      { to: "/jx-bot", label: "JX Bot" },
       { to: "/dashboard/notifications", label: "Alerts" },
       { to: "/models", label: "Models" },
     ] },

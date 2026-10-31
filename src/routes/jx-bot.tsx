@@ -70,9 +70,9 @@ function useInView<T extends HTMLElement>() {
   return [ref, seen] as const;
 }
 
-function GetBot({ label = "Download for Windows" }: { label?: string }) {
+function GetBot({ label = "Use JX Bot" }: { label?: string }) {
   const { user } = useAuthUser();
-  const icon = <WindowsIcon />;
+  const icon = <ArrowUpRight className="h-4 w-4" />;
   if (user)
     return (
       <Link to="/dashboard/jx-bot" className={pillDark}>
