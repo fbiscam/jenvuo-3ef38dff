@@ -361,18 +361,22 @@ function ExtensionPage() {
                       {k.last_used_at ? new Date(k.last_used_at).toLocaleDateString() : "Never"}
                     </td>
                     <td className="py-3.5 pr-4">
-                      <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[12px] font-medium ${k.revoked_at ? "bg-red-500/10 text-red-600 dark:text-red-400" : "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"}`}><span className={`h-1.5 w-1.5 rounded-full ${k.revoked_at ? "bg-red-500" : "bg-emerald-500"}`} />{k.revoked_at ? "Revoked" : "Active"}</span>
+                      <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[12px] font-medium ${k.revoked_at ? "bg-red-500/10 text-red-600 dark:text-red-400" : "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"}`}><span className={`h-1.5 w-1.5 rounded-full ${k.revoked_at ? "bg-red-500" : "bg-emerald-500"}`} />{k.revoked_at ? "Disabled" : "Active"}</span>
                     </td>
                     <td className="py-3.5 text-right">
-                      <button
-                        type="button"
-                        title={k.revoked_at ? "Delete permanently" : "Revoke key"}
-                        aria-label={k.revoked_at ? `Permanently delete ${k.name}` : `Revoke ${k.name}`}
-                        onClick={() => (k.revoked_at ? setDeleteTarget(k) : void onRevoke(k.id))}
-                        className="rounded-full p-2 text-muted-foreground hover:text-rose-600"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
+                      <KeyActionsMenu
+                        keyName={k.name || "Untitled key"}
+                        revoked={Boolean(k.revoked_at)}
+                        onCopyId={() => void copyText(k.id, "Key ID copied")}
+                        onViewUsage={() => void navigate({ to: "/dashboard/usage" })}
+                        onEdit={() => {
+                          setEditTarget(k);
+                          setEditName(k.name);
+                        }}
+                        onDisable={() => void onRevoke(k.id)}
+                        onRotate={() => setRotateTarget(k)}
+                        onDelete={() => setDeleteTarget(k)}
+                      />
                     </td>
                   </tr>
                 ))
