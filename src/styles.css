@@ -2106,9 +2106,9 @@ html body .jenvu-zoom-dashboard main :is(.console-icon-chip, .console-card > svg
   .jx-undrawn path, .jx-draw path { stroke-dashoffset: 0; animation: none; }
 }
 
-/* Settings pages (General, Personal, Security, Billing, Payments, Documents): 5% bigger on desktop. */
+/* Settings pages (General, Personal, Security, Billing, Payments, Documents): page area only, sidebar untouched. */
 @media (min-width: 1024px) {
-  .jenvu-zoom-dashboard main.dash-page.settings-page { zoom: 0.7 !important; }
+  .jenvu-zoom-dashboard main.dash-page.settings-page { zoom: 0.742 !important; }
 }
 
 /* Settings pages, black theme: main text is pure white; secondary lines are light grey. */
