@@ -200,13 +200,13 @@
   --home-accent: #111111;
   --home-accent-foreground: #ffffff;
   --home-accent-soft: #f1f1f1;
-  --home-accent-canvas: #f0f5fe;
+  --home-accent-canvas: #f4f4f4;
   /* Homepage (Google Cloud-style) palette */
   /* Monochrome: "blue" tokens render black so buttons/links match the homepage. */
   --gc-blue: #111111;
   --gc-blue-hover: #333333;
   --gc-blue-soft: #f1f1f1;
-  --gc-console-bar: #f0f5fe;
+  --gc-console-bar: #f4f4f4;
   --gc-console-search: #e1e6ef;
   --gc-console-rail-active: #d3e3fd;
   --gc-red: #ea4335;
@@ -231,7 +231,7 @@
   --gc-blue-deep: #111111;
   --gc-sky: #dcefff;
   /* Dashboard console shell (Google Cloud console-style) */
-  --gc-canvas: #f0f5fe;
+  --gc-canvas: #f4f4f4;
   --gc-section: #fafafa;
   --gc-success: #188038;
   --gc-nav-active: #dbedfc;
@@ -1036,7 +1036,7 @@ html[data-pwa="1"] .pwa-tabbar {
    theme it would inherit the dark --gc-* tokens and render white-on-white.
    Re-pin the light tokens here so the menu stays readable on white. */
 .dashboard-sidebar-root {
-  --gc-canvas: #f0f5fe;
+  --gc-canvas: #f4f4f4;
   --gc-section: #fafafa;
   --gc-ink: #202124;
   --gc-ink-muted: #3c4043;
