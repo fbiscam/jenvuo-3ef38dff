@@ -791,26 +791,6 @@ function UsagePage() {
               </p>
             ) : (
               <div className="space-y-4">
-                <div className="rounded-lg border border-border p-3">
-                  <div className="flex items-center justify-between text-[11.5px]">
-                    <span className="text-muted-foreground">Daily token limit</span>
-                    <span className="tabular-nums text-foreground">
-                      {fmtInt(data.tokensUsedToday)} /{" "}
-                      {data.dailyTokenLimit > 0 ? fmtInt(data.dailyTokenLimit) : "—"}
-                    </span>
-                  </div>
-                  <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-muted">
-                    <div
-                      className="h-full rounded-full bg-primary"
-                      style={{
-                        width: `${data.dailyTokenLimit > 0 ? Math.min(100, (data.tokensUsedToday / data.dailyTokenLimit) * 100) : 0}%`,
-                      }}
-                    />
-                  </div>
-                  <div className="mt-2 text-[10px] text-muted-foreground">
-                    Balance based · ${data.tokenRateUsdPerMillion} per 1M tokens · resets 00:00 UTC
-                  </div>
-                </div>
                 <div className="divide-y divide-border">
                   {data.recentExtensionKeys.map((key, index) => {
                     const usage = derived.keySpend.get(key.id) ?? { spend: 0, requests: 0 };
