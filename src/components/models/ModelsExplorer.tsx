@@ -68,7 +68,7 @@ function StatCard({ label, hint, model, value, unit, className }: {
   label: string; hint: string; model: CatalogModel; value: string; unit: string; className?: string;
 }) {
   return (
-    <div className={cn("flex flex-col justify-between gap-6 border border-gc-line bg-gc-section p-4 sm:p-5", className)}>
+    <div className={cn("flex flex-col justify-between gap-6 border border-gc-line bg-background p-4 sm:p-5", className)}>
       <div>
         <p className="flex items-center gap-1.5 text-sm text-gc-ink-muted" title={hint}>
           {label} <Info className="h-3.5 w-3.5" aria-hidden />
@@ -91,7 +91,7 @@ function MiniTable({ title, sub, rows, cols, onPick }: {
   onPick: (id: string) => void;
 }) {
   return (
-    <section className="min-w-0 border border-gc-line bg-gc-section p-4 sm:p-5">
+    <section className="min-w-0 border border-gc-line bg-background p-4 sm:p-5">
       <div className="flex items-start justify-between gap-3">
         <div>
           <h3 className="text-base font-medium text-gc-ink">{title}</h3>
@@ -109,7 +109,7 @@ function MiniTable({ title, sub, rows, cols, onPick }: {
           </thead>
           <tbody>
             {rows.map((m, i) => (
-              <tr key={m.id} onClick={() => onPick(m.id)} className="cursor-pointer border-b border-gc-line last:border-0 hover:bg-gc-canvas">
+              <tr key={m.id} onClick={() => onPick(m.id)} className="cursor-pointer border-b border-gc-line last:border-0 hover:bg-gc-section">
                 <td className="py-2.5 tabular-nums text-gc-ink-muted">{i + 1}</td>
                 <td className="py-2.5">
                   <span className="flex items-center gap-2.5 font-medium text-gc-ink"><ModelLogo m={m} size="sm" /><span className="truncate">{m.name}</span></span>
@@ -170,20 +170,40 @@ export default function ModelsExplorer({ apiHref = "/dashboard/api" }: { apiHref
   return (
     <div className="mx-auto w-full max-w-[1250px] space-y-10 px-4 py-8 sm:px-6 sm:py-10">
       {/* Discover */}
-      <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-medium tracking-tight text-gc-ink sm:text-[28px]">Discover models</h1>
-          <p className="mt-1 text-sm text-gc-ink-muted">
-            Every model you can call with one Jenvu API key, at one flat price of {price} per million tokens.
-          </p>
+      <header className="border border-gc-line bg-gc-section px-5 py-7 sm:px-8 sm:py-9">
+        <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+          <div className="max-w-2xl">
+            <p className="text-xs font-medium uppercase tracking-[0.14em] text-gc-blue-deep">Jenvu models</p>
+            <h1 className="mt-2 text-3xl font-medium tracking-tight text-gc-ink sm:text-4xl">Discover models</h1>
+            <p className="mt-2 text-sm text-gc-ink-muted sm:text-base">
+              Every model you can call with one Jenvu API key, at one flat price of {price} per million tokens.
+            </p>
+            <div className="mt-5 flex flex-wrap gap-2">
+              <button type="button" onClick={scrollToCatalog} className="rounded-lg bg-gc-blue px-4 py-2 text-sm font-medium text-gc-on-blue transition-colors hover:bg-gc-blue-hover">
+                Browse all {MODEL_CATALOG.length} models
+              </button>
+              <Link to={apiHref} className="rounded-lg border border-gc-line bg-background px-4 py-2 text-sm font-medium text-gc-ink transition-colors hover:border-gc-blue">
+                {apiHref === "/dashboard/api" ? "Get an API key" : "API docs"}
+              </Link>
+            </div>
+          </div>
+          <dl className="grid grid-cols-3 divide-x divide-gc-line border border-gc-line bg-background">
+            {[
+              [String(MODEL_CATALOG.length), "Models"],
+              [String(new Set(MODEL_CATALOG.map((m) => m.provider)).size), "Labs"],
+              [price, "Per 1M tokens"],
+            ].map(([v, l]) => (
+              <div key={l} className="px-4 py-3 sm:px-6">
+                <dt className="text-xs text-gc-ink-muted">{l}</dt>
+                <dd className="mt-0.5 text-xl font-medium tabular-nums text-gc-ink">{v}</dd>
+              </div>
+            ))}
+          </dl>
         </div>
-        <button type="button" onClick={scrollToCatalog} className="self-start rounded-lg border border-gc-line bg-background px-4 py-2 text-sm font-medium text-gc-ink hover:bg-gc-canvas sm:self-auto">
-          Browse all {MODEL_CATALOG.length} models
-        </button>
       </header>
 
       <div className="grid gap-3 lg:grid-cols-[1.25fr_1fr]">
-        <section className="border border-gc-line bg-gc-section p-4 sm:p-6">
+        <section className="border border-gc-line bg-background p-4 sm:p-6">
           <p className="text-sm text-gc-ink-muted">Flagship models</p>
           <h2 className="mt-1 text-xl font-medium tracking-tight text-gc-ink sm:text-2xl">The top model from each lab, one key</h2>
           <p className="mt-1.5 text-sm text-gc-ink-muted">Switch between Anthropic, OpenAI, Google, Qwen and xAI by changing a single model ID.</p>
@@ -193,7 +213,7 @@ export default function ModelsExplorer({ apiHref = "/dashboard/api" }: { apiHref
           <ul>
             {FLAGSHIPS.map((m, i) => (
               <li key={m.id}>
-                <button type="button" onClick={() => pick(m.id)} className="flex w-full items-center gap-3 border-b border-gc-line py-3 text-left last:border-0 hover:bg-gc-canvas">
+                <button type="button" onClick={() => pick(m.id)} className="flex w-full items-center gap-3 border-b border-gc-line py-3 text-left last:border-0 hover:bg-gc-section">
                   <span className="w-5 text-center text-sm text-gc-ink-muted">{i + 1}</span>
                   <ModelLogo m={m} />
                   <span className="min-w-0 flex-1">
@@ -231,7 +251,7 @@ export default function ModelsExplorer({ apiHref = "/dashboard/api" }: { apiHref
             const sample = MODEL_CATALOG.find((m) => m.provider === key)!;
             return (
               <button key={key} type="button" onClick={() => { setProvider(key); setSelected(sample.id); scrollToCatalog(); }}
-                className="flex w-64 shrink-0 snap-start flex-col items-start justify-start border border-gc-line bg-gc-section p-4 text-left hover:border-gc-blue lg:w-auto">
+                className="flex w-64 shrink-0 snap-start flex-col items-start justify-start border border-gc-line bg-background p-4 text-left transition-colors hover:border-gc-blue hover:bg-gc-section lg:w-auto">
                 <span className="flex w-full items-center gap-2.5 text-base font-medium text-gc-ink"><ProviderLogo provider={key} size="sm" /><span className="truncate">{PROVIDERS[key].label}</span><span className="ml-auto rounded-full bg-background px-2 py-0.5 text-xs font-normal tabular-nums text-gc-ink-muted">{count} models</span></span>
                 <span className="mt-3 line-clamp-3 block text-sm text-gc-ink-muted">{PROVIDERS[key].blurb}</span>
               </button>
@@ -264,7 +284,7 @@ export default function ModelsExplorer({ apiHref = "/dashboard/api" }: { apiHref
             const Icon = CAP_META[key].icon;
             return (
               <button key={key} type="button" onClick={() => { setCap(key); setProvider("all"); scrollToCatalog(); }}
-                className="flex flex-col items-start justify-start border border-gc-line bg-gc-section p-4 text-left hover:border-gc-blue sm:p-5">
+                className="flex flex-col items-start justify-start border border-gc-line bg-background p-4 text-left transition-colors hover:border-gc-blue hover:bg-gc-section sm:p-5">
                 <span className={cn("grid h-9 w-9 place-items-center rounded-lg", CAP_META[key].cls)}><Icon className="h-4 w-4" /></span>
                 <span className="mt-6 block text-sm font-medium text-gc-ink">{title}</span>
                 <span className="mt-1 block text-sm text-gc-ink-muted">{text}</span>
@@ -280,7 +300,7 @@ export default function ModelsExplorer({ apiHref = "/dashboard/api" }: { apiHref
       {/* Catalogue browser */}
       <section ref={catalogRef} className="scroll-mt-24">
         <SectionHead title="All models" sub="Search, filter and open any model to see its price, specs and capabilities." />
-        <div className="grid overflow-hidden border border-gc-line bg-gc-section md:grid-cols-[300px_1fr]">
+        <div className="grid overflow-hidden border border-gc-line bg-background md:grid-cols-[300px_1fr]">
           <div className="flex min-h-0 flex-col border-b border-gc-line bg-background md:border-b-0 md:border-r">
             <div className="flex items-center gap-2 p-3">
               <label className="flex flex-1 items-center gap-2 rounded-lg border border-gc-line bg-background px-3 py-2">
@@ -309,7 +329,7 @@ export default function ModelsExplorer({ apiHref = "/dashboard/api" }: { apiHref
               {list.map((m) => (
                 <li key={m.id}>
                   <button type="button" onClick={() => setSelected(m.id)}
-                    className={cn("flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left", m.id === current.id ? "bg-gc-console-rail-active" : "hover:bg-background")}>
+                    className={cn("flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left", m.id === current.id ? "bg-gc-console-rail-active" : "hover:bg-gc-section")}>
                     <ModelLogo m={m} size="sm" />
                     <span className="min-w-0 flex-1">
                       <span className="block truncate text-sm font-semibold text-gc-ink">{m.name}</span>
@@ -333,14 +353,14 @@ export default function ModelsExplorer({ apiHref = "/dashboard/api" }: { apiHref
             <p className="mt-3 text-sm text-gc-ink">{current.description}</p>
 
             <p className="mt-5 text-xs font-medium uppercase tracking-wider text-gc-ink-muted">Pricing</p>
-            <dl className="mt-2 divide-y divide-gc-line rounded-lg border border-gc-line bg-gc-canvas text-sm">
+            <dl className="mt-2 divide-y divide-gc-line rounded-lg border border-gc-line bg-gc-section text-sm">
               <div className="flex justify-between px-3 py-2"><dt className="text-gc-ink-muted">Input</dt><dd className="font-semibold tabular-nums text-gc-ink">{price} / 1M</dd></div>
               <div className="flex justify-between px-3 py-2"><dt className="text-gc-ink-muted">Output</dt><dd className="font-semibold tabular-nums text-gc-ink">{price} / 1M</dd></div>
               <div className="flex justify-between px-3 py-2"><dt className="text-gc-ink-muted">Per request</dt><dd className="font-semibold text-gc-success">Free</dd></div>
             </dl>
 
             <p className="mt-5 text-xs font-medium uppercase tracking-wider text-gc-ink-muted">Specs</p>
-            <dl className="mt-2 divide-y divide-gc-line rounded-lg border border-gc-line bg-gc-canvas text-sm">
+            <dl className="mt-2 divide-y divide-gc-line rounded-lg border border-gc-line bg-gc-section text-sm">
               <div className="flex items-center justify-between gap-3 px-3 py-2">
                 <dt className="text-gc-ink-muted">Model ID</dt>
                 <dd>
