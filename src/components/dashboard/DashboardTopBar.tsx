@@ -280,8 +280,9 @@ export default function DashboardTopBar({
             <span className="hidden lg:inline">Ask Jenvu</span>
           </button>
         )}
-        <GiftBox />
-        <NotificationBell />
+        {!pinned && <GiftBox />}
+        {!pinned && <NotificationBell />}
+        {!pinned && (
         <DropdownMenu modal={false}>
           <DropdownMenuTrigger asChild>
             <button
@@ -318,6 +319,7 @@ export default function DashboardTopBar({
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
+        )}
         <DropdownMenu modal={false}>
           <DropdownMenuTrigger asChild>
             <button
