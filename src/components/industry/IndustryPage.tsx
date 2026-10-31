@@ -5,6 +5,8 @@ import SiteHeader from "@/components/SiteHeader";
 import BlogFooter from "@/components/BlogFooter";
 import { useAuthUser } from "@/hooks/useAuthUser";
 import { STORIES } from "@/lib/stories";
+import starsNebula from "@/assets/platform/stars-nebula.jpg";
+import starsPlain from "@/assets/platform/stars-plain.jpg";
 
 /**
  * Solutions and Products pages, styled like the API Platform page: big centred
@@ -49,6 +51,10 @@ const SECTIONS = [
 ];
 
 const SIGN_IN = "https://auth.jenvu.com/sign-in";
+/** Same starfield art as the Platform model cards, varied by flipping. */
+const STARS = [starsNebula, starsPlain, starsPlain, starsPlain];
+const STAR_TX = ["none", "none", "rotate(180deg)", "scaleX(-1)"];
+
 const AURORAS = ["var(--platform-aurora-1)", "var(--platform-aurora-2)", "var(--platform-aurora-3)"];
 
 const pillDark =
@@ -109,14 +115,14 @@ function Ticks({ items }: { items: string[] }) {
 
 /** Dark image card with left-aligned text near the bottom (Platform model-card style). */
 function NightCard({
-  img,
+  n = 0,
   tag,
   title,
   children,
   className = "",
   eager = false,
 }: {
-  img: string;
+  n?: number;
   tag?: string;
   title: string;
   children?: ReactNode;
@@ -126,15 +132,15 @@ function NightCard({
   return (
     <div className={`group relative flex flex-col justify-end overflow-hidden rounded-md bg-gc-night text-left text-gc-on-night ${className}`}>
       <img
-        src={img}
+        src={STARS[n % STARS.length]}
         alt=""
-        width={1280}
-        height={800}
+        width={768}
+        height={1056}
         loading={eager ? "eager" : "lazy"}
-        className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-105"
+        className="absolute inset-0 h-full w-full object-cover"
+        style={{ transform: STAR_TX[n % STAR_TX.length] }}
       />
-      <div className="absolute inset-0 bg-gradient-to-t from-gc-night via-gc-night/40 to-transparent" />
-      <div className="relative px-7 pb-9 pt-24">
+      <div className="relative px-7 pb-10 pt-24 sm:pb-12">
         {tag && <p className="text-xs font-medium uppercase tracking-[0.18em] text-gc-on-night-muted">{tag}</p>}
         <h3 className="mt-2 text-[1.6rem] font-medium leading-tight tracking-tight">{title}</h3>
         {children}
@@ -217,7 +223,7 @@ function SolutionsHero({ c }: { c: IndustryContent }) {
         <h1 className="mx-auto mt-5 max-w-3xl text-[2.6rem] font-medium leading-[1.08] tracking-tight sm:text-6xl">{c.title}</h1>
         <p className="mx-auto mt-6 max-w-2xl text-[17px] leading-relaxed text-gc-ink">{c.intro}</p>
         <Buttons />
-        <NightCard img={c.heroImg} tag="Top story" title={c.heroCaption} eager className="mt-16 min-h-[340px] sm:aspect-[16/7] sm:min-h-0" />
+        <NightCard n={0} tag="Top story" title={c.heroCaption} eager className="mt-14 min-h-[260px] sm:mt-16 sm:aspect-[16/6] sm:min-h-0" />
       </div>
     </section>
   );
@@ -228,9 +234,9 @@ function SolutionsCards({ c }: { c: IndustryContent }) {
     <Wrap id="solutions" wide>
       <SectionHead title={c.solutionsTitle} intro={c.solutionsIntro} />
       <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {c.solutions.map((s) => (
+        {c.solutions.map((s, n) => (
           <a key={s.title} href={s.href} className="block">
-            <NightCard img={s.img} title={s.title} className="min-h-[380px] sm:aspect-[4/5] sm:min-h-0">
+            <NightCard n={n} title={s.title} className="aspect-[4/5] sm:aspect-[5/7]">
               <p className="mt-3 text-sm font-medium leading-relaxed text-gc-on-night">{s.text}</p>
               <span className="mt-5 inline-flex items-center gap-1 border-b border-gc-on-night pb-0.5 text-sm font-medium">
                 {s.link} <ArrowUpRight className="h-3.5 w-3.5" />
@@ -313,7 +319,7 @@ function WhyList({ c }: { c: IndustryContent }) {
           </div>
         </div>
         <div>
-          <NightCard img={c.solutions[0]?.img ?? c.heroImg} title={c.whyCardTitle} className="min-h-[340px] sm:aspect-[4/3] sm:min-h-0" />
+          <NightCard n={1} title={c.whyCardTitle} className="min-h-[280px] sm:aspect-[4/3] sm:min-h-0" />
           <p className="mt-4 text-sm leading-relaxed text-gc-ink-muted">{c.whyCardText}</p>
         </div>
       </div>
@@ -326,9 +332,9 @@ function StoriesCards({ c }: { c: IndustryContent }) {
     <Wrap id="stories" wide>
       <SectionHead title={c.storiesTitle} />
       <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {storyList(c).map((s) => (
+        {storyList(c).map((s, n) => (
           <a key={s.slug} href={`/stories/${s.slug}`} className="block">
-            <NightCard img={s.img} tag={s.tag} title={s.title} className="min-h-[360px] sm:aspect-[4/5] sm:min-h-0">
+            <NightCard n={n + 1} tag={s.tag} title={s.title} className="aspect-[4/5] sm:aspect-[5/7]">
               <span className="mt-5 inline-flex items-center gap-1 border-b border-gc-on-night pb-0.5 text-sm font-medium">
                 Read now <ArrowUpRight className="h-3.5 w-3.5" />
               </span>
@@ -350,19 +356,7 @@ function ProductsHero({ c }: { c: IndustryContent }) {
         <h1 className="mx-auto mt-5 max-w-3xl text-[2.6rem] font-medium leading-[1.08] tracking-tight sm:text-6xl">{c.title}</h1>
         <p className="mx-auto mt-6 max-w-2xl text-[17px] leading-relaxed text-gc-ink">{c.intro}</p>
         <Buttons />
-        <figure className="mt-16">
-          <div className="relative aspect-[4/3] overflow-hidden rounded-md sm:aspect-[2/1]" style={{ backgroundImage: AURORAS[0] }}>
-            <img
-              src={c.heroImg}
-              alt=""
-              width={1600}
-              height={800}
-              loading="eager"
-              className="absolute bottom-0 left-[8%] right-0 top-[10%] h-[90%] w-[92%] rounded-tl-xl object-cover shadow-2xl"
-            />
-          </div>
-          <figcaption className="mt-4 text-sm text-gc-ink-muted">{c.heroCaption}</figcaption>
-        </figure>
+        <NightCard n={0} tag="Overview" title={c.heroCaption} eager className="mt-14 min-h-[260px] sm:mt-16 sm:aspect-[16/6] sm:min-h-0" />
       </div>
     </section>
   );
@@ -378,14 +372,15 @@ function ProductsZigzag({ c }: { c: IndustryContent }) {
             key={s.title}
             className={`grid items-center gap-8 text-left md:grid-cols-2 md:gap-16 ${n % 2 ? "md:[&>*:first-child]:order-2" : ""}`}
           >
-            <div className="relative aspect-square overflow-hidden rounded-md sm:aspect-[5/4]" style={{ backgroundImage: AURORAS[n % AURORAS.length] }}>
+            <div className="relative aspect-[4/3] overflow-hidden rounded-md bg-gc-night sm:aspect-[5/4]">
               <img
-                src={s.img}
+                src={STARS[(n + 1) % STARS.length]}
                 alt=""
-                width={1280}
-                height={800}
+                width={768}
+                height={1056}
                 loading="lazy"
-                className="absolute bottom-0 left-[12%] right-0 top-[12%] h-[88%] w-[88%] rounded-tl-xl object-cover shadow-2xl"
+                className="absolute inset-0 h-full w-full object-cover"
+                style={{ transform: STAR_TX[(n + 1) % STAR_TX.length] }}
               />
             </div>
             <div className={`max-w-[460px] ${n % 2 ? "md:justify-self-end" : ""}`}>
@@ -441,10 +436,10 @@ function StoriesRows({ c }: { c: IndustryContent }) {
     <Wrap id="stories">
       <SectionHead title={c.storiesTitle} />
       <div className="mt-12 divide-y divide-gc-line border-y border-gc-line text-left">
-        {storyList(c).map((s) => (
+        {storyList(c).map((s, n) => (
           <a key={s.slug} href={`/stories/${s.slug}`} className="group grid items-center gap-5 py-7 sm:grid-cols-[240px_1fr_auto]">
             <div className="aspect-[16/10] overflow-hidden rounded-md bg-gc-night">
-              <img src={s.img} alt="" loading="lazy" className="h-full w-full object-cover transition duration-700 group-hover:scale-105" />
+              <img src={STARS[(n + 1) % STARS.length]} alt="" loading="lazy" className="h-full w-full object-cover" style={{ transform: STAR_TX[(n + 1) % STAR_TX.length] }} />
             </div>
             <div>
               <Kicker>{s.tag}</Kicker>
