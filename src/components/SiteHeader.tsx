@@ -58,7 +58,7 @@ export default function SiteHeader() {
             <Link to="/ai-engine" activeProps={ACTIVE}>Products</Link>
             <Link to="/strategies/ict-gold-trading" activeProps={ACTIVE}>Solutions</Link>
             <Link to="/insights" activeProps={ACTIVE}>Resources</Link>
-            <Link to="/platform" activeProps={ACTIVE}>Platform</Link>
+            <Link to="/platform" activeProps={ACTIVE}>API Platform</Link>
             <Link to="/pricing" activeProps={ACTIVE}>Pricing</Link>
           </nav>
           )}
