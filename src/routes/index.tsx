@@ -369,6 +369,7 @@ function Sparkline({ series, up }: { series: number[]; up: boolean }) {
 
 function HomePage() {
   const ticker = useLiveTicker();
+  const homeArticles = (Route.useLoaderData() as { articles?: HomeArticle[] }).articles ?? [];
   
   const xau = ticker.find((r) => r[0] === "Fiber");
   const currentPlan = useCurrentPlan();
@@ -398,7 +399,7 @@ function HomePage() {
           <EntBuilt />
           <AllInOnePlatformSection />
           <EntFacts />
-          <EntStories articles={(Route.useLoaderData() as { articles?: HomeArticle[] }).articles ?? []} />
+          <EntStories articles={homeArticles} />
           <EntCta />
         </main>
       </div>
