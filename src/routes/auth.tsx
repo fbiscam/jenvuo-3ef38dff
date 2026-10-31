@@ -1113,6 +1113,11 @@ function AuthPage() {
                           </Link>
                         </p>
 
+                        {turnstileSiteKey && (
+                          <TurnstileWidget siteKey={turnstileSiteKey} onToken={setTurnstileToken} resetKey={turnstileReset} />
+                        )}
+
+
                         {errorMsg && (
                           <div className={`flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[13px] text-red-700`}>
                             <span className="mt-[2px] inline-block h-1.5 w-1.5 rounded-full bg-red-500 shrink-0" />
