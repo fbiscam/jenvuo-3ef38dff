@@ -39,7 +39,7 @@ const pillGrey =
 /** JX Bot face: round head with two slanted eyes that blink. */
 function JxFace({ className = "", eyes = "bg-background" }: { className?: string; eyes?: string }) {
   return (
-    <span className={`relative inline-block rounded-full bg-foreground ${className}`} aria-hidden>
+    <span className={`relative inline-block rounded-full ${/(^| )bg-/.test(className) ? "" : "bg-foreground"} ${className}`} aria-hidden>
       <span className={`jx-eye absolute left-[24%] top-[14%] h-[30%] w-[17%] rotate-[28deg] rounded-full ${eyes}`} />
       <span className={`jx-eye absolute left-[56%] top-[20%] h-[30%] w-[17%] rotate-[28deg] rounded-full ${eyes}`} />
     </span>
