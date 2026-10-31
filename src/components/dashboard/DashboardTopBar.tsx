@@ -13,6 +13,7 @@ import {
   Menu, MoreVertical, Search, SendHorizontal, Settings, ShieldCheck, Sparkles,
 } from "lucide-react";
 import NotificationBell from "@/components/NotificationBell";
+import JenvuMark from "@/components/JenvuMark";
 import {
   DropdownMenu,
   DropdownMenuContent,

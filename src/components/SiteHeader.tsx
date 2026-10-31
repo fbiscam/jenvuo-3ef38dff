@@ -44,16 +44,16 @@ export default function SiteHeader() {
   return (
     <>
       <header className="jenvu-home-header sticky top-0 z-50 border-0 bg-background">
-        <div className="relative flex h-[60px] items-center gap-3 px-4 sm:px-4">
-          <Link to="/" className="flex min-w-0 shrink-0 items-center gap-2">
-            <img src="/favicon.png" alt="Jenvu" className="h-7 w-7 shrink-0 rounded-md object-contain" />
-            <span className="truncate text-[22px] leading-none tracking-tight text-gc-ink" style={{ fontFamily: "\"Google Sans\", \"Product Sans\", \"DM Sans\", system-ui, sans-serif", fontWeight: 500 }}>Jenvu</span>
+        <div className="relative mx-auto flex h-[60px] max-w-[1280px] items-center gap-3 px-5 lg:grid lg:grid-cols-[1fr_auto_1fr]">
+          <Link to="/" className="flex min-w-0 shrink-0 items-center gap-2 justify-self-start">
+            <JenvuMark className="h-6 w-6 shrink-0 text-foreground" />
+            <span className="truncate text-[22px] leading-none tracking-tight text-foreground" style={{ fontFamily: "\"Google Sans\", \"Product Sans\", \"DM Sans\", system-ui, sans-serif", fontWeight: 500 }}>Jenvu</span>
           </Link>
 
           {searchOpen ? (
-            <div className="hidden min-w-0 flex-1 md:flex"><HeaderSearch onClose={closeSearch} /></div>
+            <div className="hidden min-w-0 md:flex lg:w-[520px]"><HeaderSearch onClose={closeSearch} /></div>
           ) : (
-          <nav className="ml-6 hidden min-w-0 items-center gap-0.5 whitespace-nowrap text-[14px] text-gc-ink-muted lg:flex [&>a]:rounded-md [&>a]:px-2.5 [&>a]:py-2 [&>a:hover]:bg-gc-surface [&>a:hover]:text-gc-ink">
+          <nav className="hidden min-w-0 items-center justify-center gap-0.5 whitespace-nowrap text-[14px] text-muted-foreground lg:flex [&>a]:rounded-full [&>a]:px-3 [&>a]:py-2 [&>a:hover]:bg-muted [&>a:hover]:text-foreground">
             <Link to="/about" activeProps={ACTIVE}>Why Jenvu</Link>
             <Link to="/ai-engine" activeProps={ACTIVE}>Products</Link>
             <Link to="/strategies/ict-gold-trading" activeProps={ACTIVE}>Solutions</Link>
@@ -63,7 +63,7 @@ export default function SiteHeader() {
           </nav>
           )}
 
-          <div className="ml-auto flex shrink-0 items-center gap-1.5">
+          <div className="ml-auto flex shrink-0 items-center gap-1.5 justify-self-end">
             <button type="button" onClick={() => setSearchOpen(true)} aria-label="Search" tabIndex={searchOpen ? -1 : 0} aria-hidden={searchOpen} className={`hidden h-10 w-10 items-center justify-center rounded-full text-gc-ink hover:bg-gc-surface md:inline-flex ${searchOpen ? "invisible" : ""}`}>
               <Search className="h-5 w-5" />
             </button>
