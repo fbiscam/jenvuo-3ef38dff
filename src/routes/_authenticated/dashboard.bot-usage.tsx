@@ -139,7 +139,6 @@ function BotUsagePage() {
           >
             <RefreshCw className={`h-4 w-4 ${isFetching ? "animate-spin" : ""}`} />
           </Button>
-        </div>
       </div>
 
       {data && view.latestList.length === 0 && (
