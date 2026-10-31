@@ -1371,8 +1371,8 @@ function DashboardLayout() {
         >
           <style>{`.dashboard-sidebar-root, .dashboard-sidebar-root *:not(img):not(svg):not(.material-symbols-rounded) { font-family: "Google Sans Flex", "Google Sans", "Product Sans", "Roboto", system-ui, sans-serif !important; text-transform: none !important; letter-spacing: normal !important; } .dashboard-sidebar-root .material-symbols-rounded { font-family: "Material Symbols Rounded" !important; font-weight: normal !important; font-style: normal !important; text-transform: none !important; letter-spacing: normal !important; white-space: nowrap; word-wrap: normal; direction: ltr; -webkit-font-feature-settings: "liga"; -webkit-font-smoothing: antialiased; }`}</style>
           {/* Brand */}
-          <div className="flex h-14 shrink-0 items-center gap-2 pl-4 pr-2">
-            <a href="https://jenvu.com" className="flex min-w-0 items-center gap-2.5">
+          <div className="flex h-14 shrink-0 items-center gap-2 pl-[21px] pr-2">
+            <a href="https://jenvu.com" className="flex min-w-0 items-center gap-[9px]">
               <JenvuMark className="dashboard-sidebar-logo h-6 w-6 shrink-0 text-gc-ink" />
               <span className="dashboard-sidebar-brand truncate text-[20px] font-medium leading-none tracking-tight text-gc-ink">Jenvu</span>
             </a>
