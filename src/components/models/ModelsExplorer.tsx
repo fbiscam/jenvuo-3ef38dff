@@ -14,6 +14,8 @@ import zhipuLogo from "@/assets/model-logos/zhipu-color.svg";
 import bytedanceLogo from "@/assets/model-logos/bytedance-color.svg";
 import grokLogo from "@/assets/model-logos/grok.svg";
 import metaLogo from "@/assets/model-logos/meta-color.svg";
+import starsNebula from "@/assets/platform/stars-nebula.jpg";
+import starsPlain from "@/assets/platform/stars-plain.jpg";
 import {
   MIXED_CATALOG, MODEL_CATALOG, PRICE_PER_MILLION, PROVIDERS, formatContext, getCatalogModel, mixByProvider,
   type Capability, type CatalogModel, type ProviderKey,
@@ -70,7 +72,7 @@ function StatCard({ label, hint, model, value, unit, className }: {
   label: string; hint: string; model: CatalogModel; value: string; unit: string; className?: string;
 }) {
   return (
-    <div className={cn("flex flex-col justify-between gap-6 border border-gc-line bg-background p-4 sm:p-5", className)}>
+    <div className={cn("flex flex-col justify-between gap-6 rounded-md border border-gc-line bg-background p-4 sm:p-5", className)}>
       <div>
         <p className="flex items-center gap-1.5 text-sm text-gc-ink-muted" title={hint}>
           {label} <Info className="h-3.5 w-3.5" aria-hidden />
@@ -93,7 +95,7 @@ function MiniTable({ title, sub, rows, cols, onPick }: {
   onPick: (id: string) => void;
 }) {
   return (
-    <section className="min-w-0 border border-gc-line bg-background p-4 sm:p-5">
+    <section className="min-w-0 rounded-md border border-gc-line bg-background p-4 sm:p-5">
       <div className="flex items-start justify-between gap-3">
         <div>
           <h3 className="text-base font-medium text-gc-ink">{title}</h3>
@@ -141,7 +143,7 @@ function FilterChip({ active, onClick, children }: { active: boolean; onClick: (
 function SectionHead({ title, sub }: { title: string; sub: string }) {
   return (
     <div className="mb-3">
-      <h2 className="text-lg font-medium text-gc-ink">{title}</h2>
+      <h2 className="text-2xl font-medium tracking-tight text-gc-ink sm:text-3xl">{title}</h2>
       <p className="text-sm text-gc-ink-muted">{sub}</p>
     </div>
   );
@@ -233,7 +235,7 @@ export default function ModelsExplorer({ apiHref = "/dashboard/api" }: { apiHref
       </section>
 
       <div className="grid gap-3 lg:grid-cols-[1.25fr_1fr]">
-        <section className="border border-gc-line bg-background p-4 sm:p-6">
+        <section className="rounded-md border border-gc-line bg-background p-4 sm:p-6">
           <p className="text-sm text-gc-ink-muted">Flagship models</p>
           <h2 className="mt-1 text-xl font-medium tracking-tight text-gc-ink sm:text-2xl">The top model from each lab, one key</h2>
           <p className="mt-1.5 text-sm text-gc-ink-muted">Switch between Anthropic, OpenAI, Google, Qwen and xAI by changing a single model ID.</p>
@@ -275,7 +277,7 @@ export default function ModelsExplorer({ apiHref = "/dashboard/api" }: { apiHref
       {/* Families */}
       <section>
         <div className="mb-3 flex items-center justify-between gap-3">
-          <h2 className="text-lg font-medium text-gc-ink">Model families</h2>
+          <h2 className="text-2xl font-medium tracking-tight text-gc-ink sm:text-3xl">Model families</h2>
           <button type="button" onClick={() => { setProvider("all"); scrollToCatalog(); }} className="text-sm text-gc-ink underline underline-offset-4 hover:text-gc-blue">View all</button>
         </div>
         <div className="flex snap-x gap-3 overflow-x-auto pb-1 lg:grid lg:grid-cols-5 lg:overflow-visible">
@@ -284,7 +286,7 @@ export default function ModelsExplorer({ apiHref = "/dashboard/api" }: { apiHref
             const sample = MODEL_CATALOG.find((m) => m.provider === key)!;
             return (
               <button key={key} type="button" onClick={() => { setProvider(key); setSelected(sample.id); scrollToCatalog(); }}
-                className="flex w-64 shrink-0 snap-start flex-col items-start justify-start border border-gc-line bg-background p-4 text-left transition-colors hover:border-gc-blue hover:bg-gc-section lg:w-auto">
+                className="flex w-64 shrink-0 snap-start flex-col items-start justify-start rounded-md border border-gc-line bg-background p-4 text-left transition-colors hover:border-gc-blue hover:bg-gc-section lg:w-auto">
                 <span className="flex w-full items-center gap-2.5 text-base font-medium text-gc-ink"><ProviderLogo provider={key} size="sm" /><span className="truncate">{PROVIDERS[key].label}</span><span className="ml-auto rounded-full bg-background px-2 py-0.5 text-xs font-normal tabular-nums text-gc-ink-muted">{count} models</span></span>
                 <span className="mt-3 line-clamp-3 block text-sm text-gc-ink-muted">{PROVIDERS[key].blurb}</span>
               </button>
@@ -317,7 +319,7 @@ export default function ModelsExplorer({ apiHref = "/dashboard/api" }: { apiHref
             const Icon = CAP_META[key].icon;
             return (
               <button key={key} type="button" onClick={() => { setCap(key); setProvider("all"); scrollToCatalog(); }}
-                className="flex flex-col items-start justify-start border border-gc-line bg-background p-4 text-left transition-colors hover:border-gc-blue hover:bg-gc-section sm:p-5">
+                className="flex flex-col items-start justify-start rounded-md border border-gc-line bg-background p-4 text-left transition-colors hover:border-gc-blue hover:bg-gc-section sm:p-5">
                 <span className={cn("grid h-9 w-9 place-items-center rounded-lg", CAP_META[key].cls)}><Icon className="h-4 w-4" /></span>
                 <span className="mt-6 block text-sm font-medium text-gc-ink">{title}</span>
                 <span className="mt-1 block text-sm text-gc-ink-muted">{text}</span>
@@ -333,7 +335,7 @@ export default function ModelsExplorer({ apiHref = "/dashboard/api" }: { apiHref
       {/* Catalogue browser */}
       <section ref={catalogRef} className="scroll-mt-24">
         <SectionHead title="All models" sub="Search, filter and open any model to see its price, specs and capabilities." />
-        <div className="grid overflow-hidden border border-gc-line bg-background md:grid-cols-[340px_1fr]">
+        <div className="grid overflow-hidden rounded-md border border-gc-line bg-background md:grid-cols-[340px_1fr]">
           <div className="flex min-h-0 flex-col border-b border-gc-line bg-background md:border-b-0 md:border-r">
             <div className="space-y-4 border-b border-gc-line p-4">
               <label className="flex h-10 items-center gap-2 rounded-lg border border-gc-line bg-background px-3 transition-colors focus-within:border-gc-blue">
