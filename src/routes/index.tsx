@@ -24,6 +24,7 @@ import {
   CloudHero,
 
 } from "@/components/home/CloudHome";
+import { EntHero, EntShowcase, EntBuilt, EntEveryDesk, EntFacts, EntStories, EntCta } from "@/components/home/EnterpriseHome";
 import { CloudFrontierModels } from "@/components/home/CloudFrontierModels";
 import { HomeStats, HomeReadAskAutomate, HomeTrust, HomeGetStarted } from "@/components/home/HomePlatformSections";
 import { HomeProductCards, HomeExperiences, HomeUseCases } from "@/components/home/HomeShowcaseSections";
@@ -387,13 +388,13 @@ function HomePage() {
 
       <div className="jenvu-home-content">
         <main>
-          <CloudHero price={xau?.[1] ?? "—"} delta={xau?.[2] ?? "…"} />
-          <CloudBuildWith />
-          <CloudAudiences />
-          <CloudFrontierModels />
-          <CloudSolutions />
-          <CloudLogoStrip />
-          <CloudStartBanner />
+          <EntHero />
+          <EntShowcase />
+          <EntBuilt />
+          <EntEveryDesk />
+          <EntFacts />
+          <EntStories />
+          <EntCta />
         </main>
       </div>
 
