@@ -249,10 +249,10 @@ function Models() {
 /* ---------- 3. Start building ---------- */
 
 const GUIDES = [
-  { t: "Quickstart guide", b: "Create a key and make your first request in a few minutes.", l: "View quickstart" },
-  { t: "Migration support", b: "Already on the OpenAI SDK? Change the base URL and key, and keep your code.", l: "View migration guide" },
-  { t: "Model best practices", b: "Pick the right model for speed, cost and quality on each task.", l: "View model guide" },
-];
+  { t: "Quickstart guide", b: "Create a key and make your first request in a few minutes.", l: "View quickstart", to: "/docs", hash: "api" },
+  { t: "Migration support", b: "Already on the OpenAI SDK? Change the base URL and key, and keep your code.", l: "View migration guide", to: "/docs", hash: "ai-assistants" },
+  { t: "Model best practices", b: "Pick the right model for speed, cost and quality on each task.", l: "View model guide", to: "/models", hash: undefined },
+] as const;
 
 function StartSection() {
   return (
@@ -267,7 +267,8 @@ function StartSection() {
             <h3 className="text-xl font-medium">{g.t}</h3>
             <p className="mt-6 flex-1 text-sm leading-relaxed text-gc-ink">{g.b}</p>
             <Link
-              to="/docs"
+              to={g.to}
+              hash={g.hash}
               className="mt-8 inline-flex w-fit items-center gap-1 border-b border-gc-ink pb-0.5 text-[15px] hover:opacity-70"
             >
               {g.l} <ArrowUpRight className="h-3.5 w-3.5" />
@@ -313,7 +314,7 @@ function AgentsSection() {
       <h2 className="text-4xl font-medium tracking-tight sm:text-5xl">The all-in-one platform for builders</h2>
       <p className="mt-5 text-gc-ink">Build apps and assistants that use your context and tools to get work done.</p>
       <div className="mt-8 flex flex-wrap justify-center gap-3">
-        <Link to="/docs" className={pillLight}>
+        <Link to="/docs" hash="ai-assistants" className={pillLight}>
           Learn more <ArrowUpRight className="h-3.5 w-3.5" />
         </Link>
         <StartBuilding className="inline-flex items-center gap-1.5 rounded-full px-5 py-2.5 text-sm font-medium hover:bg-gc-surface" />
@@ -693,7 +694,7 @@ function Enterprise() {
         at scale
       </h2>
       <div className="mt-7 flex justify-center">
-        <Link to="/docs" className={pillLight}>
+        <Link to="/docs" hash="api" className={pillLight}>
           Learn more
         </Link>
       </div>
