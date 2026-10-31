@@ -246,12 +246,12 @@ export default function InvoiceHistory({ variant = "list" }: { variant?: "list" 
           <table className="w-full min-w-[560px] text-left text-[14px]">
             <thead>
               <tr className="border-b border-gc-line text-[12px] text-gc-ink-muted">
-                <th className="px-2 py-3 font-normal">Invoice Reference</th>
-                <th className="px-2 py-3 font-normal">Date</th>
-                <th className="px-2 py-3 font-normal">Type</th>
-                <th className="px-2 py-3 font-normal">Amount</th>
-                <th className="px-2 py-3 font-normal">Status</th>
-                <th className="px-2 py-3" aria-label="Receipt" />
+                <th className="px-2 py-3 first:pl-0 last:pr-0 font-normal">Invoice Reference</th>
+                <th className="px-2 py-3 first:pl-0 last:pr-0 font-normal">Date</th>
+                <th className="px-2 py-3 first:pl-0 last:pr-0 font-normal">Type</th>
+                <th className="px-2 py-3 first:pl-0 last:pr-0 font-normal">Amount</th>
+                <th className="px-2 py-3 first:pl-0 last:pr-0 font-normal">Status</th>
+                <th className="px-2 py-3 first:pl-0 last:pr-0" aria-label="Receipt" />
               </tr>
             </thead>
             <tbody className="divide-y divide-gc-line">
@@ -261,12 +261,12 @@ export default function InvoiceHistory({ variant = "list" }: { variant?: "list" 
                 const st = STATUS[o.status] ?? { label: o.status, cls: "bg-gc-surface text-gc-ink-muted" };
                 return (
                   <tr key={o.id}>
-                    <td className="px-2 py-3 text-gc-ink">{invoiceNo(o)}</td>
-                    <td className="px-2 py-3 text-gc-ink-muted">{fmtDate(o.created_at)}</td>
-                    <td className="px-2 py-3 text-gc-ink">{o.target_plan_id ? `${o.target_plan_id.charAt(0).toUpperCase()}${o.target_plan_id.slice(1)} plan` : "Credit top-up"}</td>
-                    <td className="px-2 py-3 tabular-nums text-gc-ink">${Number(o.pay_amount_usd).toFixed(2)}</td>
-                    <td className="px-2 py-3"><span className={`rounded-full px-2.5 py-0.5 text-[12px] font-medium ${st.cls}`}>{st.label}</span></td>
-                    <td className="px-2 py-3 text-right">
+                    <td className="px-2 py-3 first:pl-0 last:pr-0 text-gc-ink">{invoiceNo(o)}</td>
+                    <td className="px-2 py-3 first:pl-0 last:pr-0 text-gc-ink-muted">{fmtDate(o.created_at)}</td>
+                    <td className="px-2 py-3 first:pl-0 last:pr-0 text-gc-ink">{o.target_plan_id ? `${o.target_plan_id.charAt(0).toUpperCase()}${o.target_plan_id.slice(1)} plan` : "Credit top-up"}</td>
+                    <td className="px-2 py-3 first:pl-0 last:pr-0 tabular-nums text-gc-ink">${Number(o.pay_amount_usd).toFixed(2)}</td>
+                    <td className="px-2 py-3 first:pl-0 last:pr-0"><span className={`rounded-full px-2.5 py-0.5 text-[12px] font-medium ${st.cls}`}>{st.label}</span></td>
+                    <td className="px-2 py-3 first:pl-0 last:pr-0 text-right">
                       {o.status === "approved" && (
                         <button type="button" onClick={() => download(o)} disabled={busy === o.id} className="text-[13px] text-gc-ink hover:underline disabled:opacity-50">
                           {busy === o.id ? "Preparing…" : "Receipt"}
