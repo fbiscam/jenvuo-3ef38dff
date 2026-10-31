@@ -170,16 +170,36 @@ export default function ModelsExplorer({ apiHref = "/dashboard/api" }: { apiHref
   return (
     <div className="mx-auto w-full max-w-[1250px] space-y-10 px-4 py-8 sm:px-6 sm:py-10">
       {/* Discover */}
-      <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-medium tracking-tight text-gc-ink sm:text-[28px]">Discover models</h1>
-          <p className="mt-1 text-sm text-gc-ink-muted">
-            Every model you can call with one Jenvu API key, at one flat price of {price} per million tokens.
-          </p>
+      <header className="border border-gc-line bg-gc-section px-5 py-7 sm:px-8 sm:py-9">
+        <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+          <div className="max-w-2xl">
+            <p className="text-xs font-medium uppercase tracking-[0.14em] text-gc-blue-deep">Jenvu models</p>
+            <h1 className="mt-2 text-3xl font-medium tracking-tight text-gc-ink sm:text-4xl">Discover models</h1>
+            <p className="mt-2 text-sm text-gc-ink-muted sm:text-base">
+              Every model you can call with one Jenvu API key, at one flat price of {price} per million tokens.
+            </p>
+            <div className="mt-5 flex flex-wrap gap-2">
+              <button type="button" onClick={scrollToCatalog} className="rounded-lg bg-gc-blue px-4 py-2 text-sm font-medium text-gc-on-blue transition-colors hover:bg-gc-blue-hover">
+                Browse all {MODEL_CATALOG.length} models
+              </button>
+              <Link to={apiHref} className="rounded-lg border border-gc-line bg-background px-4 py-2 text-sm font-medium text-gc-ink transition-colors hover:border-gc-blue">
+                {apiHref === "/dashboard/api" ? "Get an API key" : "API docs"}
+              </Link>
+            </div>
+          </div>
+          <dl className="grid grid-cols-3 divide-x divide-gc-line border border-gc-line bg-background">
+            {[
+              [String(MODEL_CATALOG.length), "Models"],
+              [String(new Set(MODEL_CATALOG.map((m) => m.provider)).size), "Labs"],
+              [price, "Per 1M tokens"],
+            ].map(([v, l]) => (
+              <div key={l} className="px-4 py-3 sm:px-6">
+                <dt className="text-xs text-gc-ink-muted">{l}</dt>
+                <dd className="mt-0.5 text-xl font-medium tabular-nums text-gc-ink">{v}</dd>
+              </div>
+            ))}
+          </dl>
         </div>
-        <button type="button" onClick={scrollToCatalog} className="self-start rounded-lg border border-gc-line bg-background px-4 py-2 text-sm font-medium text-gc-ink hover:bg-gc-section sm:self-auto">
-          Browse all {MODEL_CATALOG.length} models
-        </button>
       </header>
 
       <div className="grid gap-3 lg:grid-cols-[1.25fr_1fr]">
