@@ -325,7 +325,7 @@ function ChatPlayground() {
   );
 
   return (
-    <section className="mx-auto flex h-[calc(100dvh-96px)] min-h-[600px] w-full max-w-[1240px] flex-col">
+    <section className="mx-auto flex h-[calc((100dvh-90px)/0.85)] min-h-[560px] w-full max-w-[1400px] flex-col">
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-[28px] font-medium tracking-tight text-foreground">Chat API</h1>
@@ -429,7 +429,7 @@ function ChatPlayground() {
         )}
       </div>
 
-      <div className="mx-auto w-full max-w-[640px]">
+      <div className="mx-auto w-full">
         {/* Credits notice */}
         <div className="mt-3 flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-[var(--console-card)] px-4 py-3">
           <span className="inline-flex items-start gap-3">
