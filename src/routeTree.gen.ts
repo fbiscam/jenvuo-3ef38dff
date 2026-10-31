@@ -30,6 +30,7 @@ import { Route as JenvuOpsX9k2RouteImport } from './routes/jenvu-ops-x9k2'
 import { Route as KillzonesRouteImport } from './routes/killzones'
 import { Route as LlmRouteImport } from './routes/llm'
 import { Route as McpRouteImport } from './routes/mcp'
+import { Route as ModelsRouteImport } from './routes/models'
 import { Route as OpsX9k27m4nRouteImport } from './routes/ops-x9k2-7m4n'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as PrivacyRouteImport } from './routes/privacy'
@@ -65,6 +66,7 @@ import { Route as AuthenticatedDashboardDocumentsRouteImport } from './routes/_a
 import { Route as AuthenticatedDashboardExtensionRouteImport } from './routes/_authenticated/dashboard.extension'
 import { Route as AuthenticatedDashboardJournalRouteImport } from './routes/_authenticated/dashboard.journal'
 import { Route as AuthenticatedDashboardJxBotRouteImport } from './routes/_authenticated/dashboard.jx-bot'
+import { Route as AuthenticatedDashboardModelsRouteImport } from './routes/_authenticated/dashboard.models'
 import { Route as AuthenticatedDashboardNotificationsRouteImport } from './routes/_authenticated/dashboard.notifications'
 import { Route as AuthenticatedDashboardPayRouteImport } from './routes/_authenticated/dashboard.pay'
 import { Route as AuthenticatedDashboardPaymentRouteImport } from './routes/_authenticated/dashboard.payment'
@@ -213,6 +215,11 @@ const LlmRoute = LlmRouteImport.update({
 const McpRoute = McpRouteImport.update({
   id: '/mcp',
   path: '/mcp',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ModelsRoute = ModelsRouteImport.update({
+  id: '/models',
+  path: '/models',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OpsX9k27m4nRoute = OpsX9k27m4nRouteImport.update({
@@ -400,6 +407,12 @@ const AuthenticatedDashboardJxBotRoute =
   AuthenticatedDashboardJxBotRouteImport.update({
     id: '/jx-bot',
     path: '/jx-bot',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
+const AuthenticatedDashboardModelsRoute =
+  AuthenticatedDashboardModelsRouteImport.update({
+    id: '/models',
+    path: '/models',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
 const AuthenticatedDashboardNotificationsRoute =
@@ -685,6 +698,7 @@ export interface FileRoutesByFullPath {
   '/killzones': typeof KillzonesRoute
   '/llm': typeof LlmRoute
   '/mcp': typeof McpRoute
+  '/models': typeof ModelsRoute
   '/ops-x9k2-7m4n': typeof OpsX9k27m4nRouteWithChildren
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
@@ -719,6 +733,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/extension': typeof AuthenticatedDashboardExtensionRoute
   '/dashboard/journal': typeof AuthenticatedDashboardJournalRoute
   '/dashboard/jx-bot': typeof AuthenticatedDashboardJxBotRoute
+  '/dashboard/models': typeof AuthenticatedDashboardModelsRoute
   '/dashboard/notifications': typeof AuthenticatedDashboardNotificationsRoute
   '/dashboard/pay': typeof AuthenticatedDashboardPayRoute
   '/dashboard/payment': typeof AuthenticatedDashboardPaymentRoute
@@ -785,6 +800,7 @@ export interface FileRoutesByTo {
   '/killzones': typeof KillzonesRoute
   '/llm': typeof LlmRoute
   '/mcp': typeof McpRoute
+  '/models': typeof ModelsRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/refund': typeof RefundRoute
@@ -817,6 +833,7 @@ export interface FileRoutesByTo {
   '/dashboard/extension': typeof AuthenticatedDashboardExtensionRoute
   '/dashboard/journal': typeof AuthenticatedDashboardJournalRoute
   '/dashboard/jx-bot': typeof AuthenticatedDashboardJxBotRoute
+  '/dashboard/models': typeof AuthenticatedDashboardModelsRoute
   '/dashboard/notifications': typeof AuthenticatedDashboardNotificationsRoute
   '/dashboard/pay': typeof AuthenticatedDashboardPayRoute
   '/dashboard/payment': typeof AuthenticatedDashboardPaymentRoute
@@ -887,6 +904,7 @@ export interface FileRoutesById {
   '/killzones': typeof KillzonesRoute
   '/llm': typeof LlmRoute
   '/mcp': typeof McpRoute
+  '/models': typeof ModelsRoute
   '/ops-x9k2-7m4n': typeof OpsX9k27m4nRouteWithChildren
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
@@ -921,6 +939,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/extension': typeof AuthenticatedDashboardExtensionRoute
   '/_authenticated/dashboard/journal': typeof AuthenticatedDashboardJournalRoute
   '/_authenticated/dashboard/jx-bot': typeof AuthenticatedDashboardJxBotRoute
+  '/_authenticated/dashboard/models': typeof AuthenticatedDashboardModelsRoute
   '/_authenticated/dashboard/notifications': typeof AuthenticatedDashboardNotificationsRoute
   '/_authenticated/dashboard/pay': typeof AuthenticatedDashboardPayRoute
   '/_authenticated/dashboard/payment': typeof AuthenticatedDashboardPaymentRoute
@@ -991,6 +1010,7 @@ export interface FileRouteTypes {
     | '/killzones'
     | '/llm'
     | '/mcp'
+    | '/models'
     | '/ops-x9k2-7m4n'
     | '/pricing'
     | '/privacy'
@@ -1025,6 +1045,7 @@ export interface FileRouteTypes {
     | '/dashboard/extension'
     | '/dashboard/journal'
     | '/dashboard/jx-bot'
+    | '/dashboard/models'
     | '/dashboard/notifications'
     | '/dashboard/pay'
     | '/dashboard/payment'
@@ -1091,6 +1112,7 @@ export interface FileRouteTypes {
     | '/killzones'
     | '/llm'
     | '/mcp'
+    | '/models'
     | '/pricing'
     | '/privacy'
     | '/refund'
@@ -1123,6 +1145,7 @@ export interface FileRouteTypes {
     | '/dashboard/extension'
     | '/dashboard/journal'
     | '/dashboard/jx-bot'
+    | '/dashboard/models'
     | '/dashboard/notifications'
     | '/dashboard/pay'
     | '/dashboard/payment'
@@ -1192,6 +1215,7 @@ export interface FileRouteTypes {
     | '/killzones'
     | '/llm'
     | '/mcp'
+    | '/models'
     | '/ops-x9k2-7m4n'
     | '/pricing'
     | '/privacy'
@@ -1226,6 +1250,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/extension'
     | '/_authenticated/dashboard/journal'
     | '/_authenticated/dashboard/jx-bot'
+    | '/_authenticated/dashboard/models'
     | '/_authenticated/dashboard/notifications'
     | '/_authenticated/dashboard/pay'
     | '/_authenticated/dashboard/payment'
@@ -1296,6 +1321,7 @@ export interface RootRouteChildren {
   KillzonesRoute: typeof KillzonesRoute
   LlmRoute: typeof LlmRoute
   McpRoute: typeof McpRoute
+  ModelsRoute: typeof ModelsRoute
   OpsX9k27m4nRoute: typeof OpsX9k27m4nRouteWithChildren
   PricingRoute: typeof PricingRoute
   PrivacyRoute: typeof PrivacyRoute
@@ -1484,6 +1510,13 @@ declare module '@tanstack/react-router' {
       path: '/mcp'
       fullPath: '/mcp'
       preLoaderRoute: typeof McpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/models': {
+      id: '/models'
+      path: '/models'
+      fullPath: '/models'
+      preLoaderRoute: typeof ModelsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/ops-x9k2-7m4n': {
@@ -1729,6 +1762,13 @@ declare module '@tanstack/react-router' {
       path: '/jx-bot'
       fullPath: '/dashboard/jx-bot'
       preLoaderRoute: typeof AuthenticatedDashboardJxBotRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
+    '/_authenticated/dashboard/models': {
+      id: '/_authenticated/dashboard/models'
+      path: '/models'
+      fullPath: '/dashboard/models'
+      preLoaderRoute: typeof AuthenticatedDashboardModelsRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
     '/_authenticated/dashboard/notifications': {
@@ -2059,6 +2099,7 @@ interface AuthenticatedDashboardRouteChildren {
   AuthenticatedDashboardExtensionRoute: typeof AuthenticatedDashboardExtensionRoute
   AuthenticatedDashboardJournalRoute: typeof AuthenticatedDashboardJournalRoute
   AuthenticatedDashboardJxBotRoute: typeof AuthenticatedDashboardJxBotRoute
+  AuthenticatedDashboardModelsRoute: typeof AuthenticatedDashboardModelsRoute
   AuthenticatedDashboardNotificationsRoute: typeof AuthenticatedDashboardNotificationsRoute
   AuthenticatedDashboardPayRoute: typeof AuthenticatedDashboardPayRoute
   AuthenticatedDashboardPaymentRoute: typeof AuthenticatedDashboardPaymentRoute
@@ -2094,6 +2135,7 @@ const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
     AuthenticatedDashboardExtensionRoute: AuthenticatedDashboardExtensionRoute,
     AuthenticatedDashboardJournalRoute: AuthenticatedDashboardJournalRoute,
     AuthenticatedDashboardJxBotRoute: AuthenticatedDashboardJxBotRoute,
+    AuthenticatedDashboardModelsRoute: AuthenticatedDashboardModelsRoute,
     AuthenticatedDashboardNotificationsRoute:
       AuthenticatedDashboardNotificationsRoute,
     AuthenticatedDashboardPayRoute: AuthenticatedDashboardPayRoute,
@@ -2215,6 +2257,7 @@ const rootRouteChildren: RootRouteChildren = {
   KillzonesRoute: KillzonesRoute,
   LlmRoute: LlmRoute,
   McpRoute: McpRoute,
+  ModelsRoute: ModelsRoute,
   OpsX9k27m4nRoute: OpsX9k27m4nRouteWithChildren,
   PricingRoute: PricingRoute,
   PrivacyRoute: PrivacyRoute,
