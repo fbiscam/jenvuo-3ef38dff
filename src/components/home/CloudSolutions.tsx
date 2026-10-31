@@ -180,7 +180,7 @@ export function CloudStartBanner() {
   return (
     <section className="jenvu-start-zoom bg-background pb-20">
       <div className="mx-auto max-w-[80rem] px-4">
-        <div className="relative overflow-hidden rounded-md" style={{ backgroundImage: "var(--platform-aurora-1)" }}>
+        <div className="relative overflow-hidden rounded-2xl bg-gc-sky">
           <div className="relative z-10 max-w-xl px-8 py-16 md:px-16 md:py-24">
             <h2 className="text-balance text-[30px] font-medium leading-[1.15] tracking-tight text-gc-ink md:text-[44px]">
               Let's start trading your Fiber, today
