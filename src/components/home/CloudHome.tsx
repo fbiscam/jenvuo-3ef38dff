@@ -3,6 +3,7 @@ import * as React from "react";
 import { Link } from "@tanstack/react-router";
 import {
   ArrowRight,
+  ArrowUpRight,
   ChevronLeft,
   ChevronRight,
   ChevronDown,
@@ -21,20 +22,17 @@ import {
   BookOpen,
   LifeBuoy,
   Users,
+  Cpu,
+  FileText,
+  Crown,
+  type LucideIcon,
 } from "lucide-react";
+import { AuroraTile } from "@/components/AuroraTile";
+import { pillDark, pillLight, sectionLead, sectionTitle, underlineLink } from "@/components/home/homeStyles";
 import tradeDesk from "@/assets/home/trade-desk.jpg";
 import tradeChart from "@/assets/home/trade-chart.jpg";
 import tradeGold from "@/assets/home/trade-gold.jpg";
 import { STORIES } from "@/lib/stories";
-import tradeNeonStart from "@/assets/home/trade-neon-start.jpg";
-import tradeNeonPractice from "@/assets/home/trade-neon-practice.jpg";
-import tradeNeonLearn from "@/assets/home/trade-neon-learn.jpg";
-import devModels from "@/assets/home/dev-models.jpg";
-import devExtension from "@/assets/home/dev-extension.jpg";
-import devDocs from "@/assets/home/dev-docs.jpg";
-import progFounding from "@/assets/home/prog-founding.jpg";
-import progPlans from "@/assets/home/prog-plans.jpg";
-import progSupport from "@/assets/home/prog-support.jpg";
 
 type Tone = "blue" | "red" | "yellow" | "green";
 
@@ -196,20 +194,12 @@ export function CloudHero({ price: _price, delta: _delta }: { price: string; del
           Read the chart with AI. Spot sweeps, zones and FVGs live.{" "}
           <span className="font-medium">Start with $100 credits or a Pro access.</span>
         </p>
-        <div className="jenvu-rise [animation-delay:160ms] mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-          <Link
-            to="/auth"
-            search={{ mode: "signup" } as never}
-            className="inline-flex h-12 items-center justify-center rounded-full bg-gc-blue px-6 text-[16px] font-medium text-gc-on-blue transition hover:bg-gc-blue-hover"
-          >
+        <div className="jenvu-rise [animation-delay:160ms] mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
+          <Link to="/auth" search={{ mode: "signup" } as never} className={pillDark}>
             Get started for free
           </Link>
-          <button
-            type="button"
-            onClick={() => openAskJenvu("sales")}
-            className="inline-flex h-12 items-center justify-center rounded-full border border-gc-line bg-background px-6 text-[16px] font-medium text-gc-ink transition hover:bg-gc-surface"
-          >
-            Contact sales
+          <button type="button" onClick={() => openAskJenvu("sales")} className={pillLight}>
+            Contact sales <ArrowUpRight className="h-4 w-4" />
           </button>
         </div>
       </div>
@@ -221,7 +211,7 @@ export function CloudHero({ price: _price, delta: _delta }: { price: string; del
             params={{ slug: s.slug }}
             aria-hidden={s.copy !== 1 || undefined}
             tabIndex={s.copy !== 1 ? -1 : undefined}
-            className="jenvu-story-in group relative h-[300px] w-[85vw] max-w-[448px] shrink-0 overflow-hidden rounded-3xl bg-gc-ink"
+            className="jenvu-story-in group relative h-[300px] w-[85vw] max-w-[448px] shrink-0 overflow-hidden rounded-md bg-gc-ink"
             style={{ animationDelay: `${Math.min(i % 8, 5) * 60}ms` }}
           >
             <img
@@ -255,86 +245,91 @@ export function CloudHero({ price: _price, delta: _delta }: { price: string; del
 }
 
 /* ---------------- Audience tabs (Google Cloud-style panel) ---------------- */
-type AudienceCard = { tag: string; text: string; to: string; img?: string; logo?: boolean };
+type AudienceCard = { tag: string; text: string; to: string; img?: string; logo?: boolean; icon?: LucideIcon };
 const AUDIENCES: Array<{ key: string; label: string; cards: AudienceCard[] }> = [
   {
     key: "traders",
     label: "Traders",
     cards: [
-      { tag: "NEW TRADERS", text: "New sign-ups get 14 days of free Pro access & $100 for the top AI Models for 30 days ", to: "/auth", img: tradeNeonStart },
-      { tag: "JX BOT", text: "Run JX Bot on MetaTrader 5 with a daily auto-stop at your plan's target", to: "/pricing", img: tradeNeonPractice },
-      { tag: "LEARN", text: "Read daily Fiber insights and guides on sweeps, zones and order blocks", to: "/insights", img: tradeNeonLearn },
+      { tag: "NEW TRADERS", text: "New sign-ups get 14 days of free Pro access & $100 for the top AI Models for 30 days ", to: "/auth", icon: Sparkles },
+      { tag: "JX BOT", text: "Run JX Bot on MetaTrader 5 with a daily auto-stop at your plan's target", to: "/pricing", icon: Bot },
+      { tag: "LEARN", text: "Read daily Fiber insights and guides on sweeps, zones and order blocks", to: "/insights", icon: BookOpen },
     ],
   },
   {
     key: "developers",
     label: "Developers",
     cards: [
-      { tag: "TOP-TIER MODELS", text: "Top-tier AI models for developers who want to build serious trading tools", to: "/ai-engine", img: devModels },
-      { tag: "API & EXTENSION", text: "Plug Jenvu models into your apps and bots with API keys in minutes", to: "/pricing", img: devExtension },
-      { tag: "DEVELOPER DOCS", text: "Clear docs and guides to connect, test and ship your projects faster", to: "/help", img: devDocs },
+      { tag: "TOP-TIER MODELS", text: "Top-tier AI models for developers who want to build serious trading tools", to: "/ai-engine", icon: Cpu },
+      { tag: "API & EXTENSION", text: "Plug Jenvu models into your apps and bots with API keys in minutes", to: "/pricing", icon: KeyRound },
+      { tag: "DEVELOPER DOCS", text: "Clear docs and guides to connect, test and ship your projects faster", to: "/help", icon: FileText },
     ],
   },
   {
     key: "programs",
     label: "Special programs",
     cards: [
-      { tag: "FOUNDING PROGRAM", text: "Apply to the invite-only Founding Program for your chosen plan and $250 credit", to: "/founding", img: progFounding },
-      { tag: "PLANS", text: "Choose Pro at $49, Elite at $99 or Ultra at $169, billed every month", to: "/pricing", img: progPlans },
-      { tag: "SUPPORT", text: "Questions about plans, billing or JX Bot? Ask our support team", to: "/contact", img: progSupport },
+      { tag: "FOUNDING PROGRAM", text: "Apply to the invite-only Founding Program for your chosen plan and $250 credit", to: "/founding", icon: Crown },
+      { tag: "PLANS", text: "Choose Pro at $49, Elite at $99 or Ultra at $169, billed every month", to: "/pricing", icon: Wallet },
+      { tag: "SUPPORT", text: "Questions about plans, billing or JX Bot? Ask our support team", to: "/contact", icon: LifeBuoy },
     ],
   },
 ];
 
+const AUDIENCE_ICONS: Record<string, LucideIcon[]> = {
+  "NEW TRADERS": [Sparkles, Wallet, LineChart],
+  "JX BOT": [Bot, Bell, BarChart3],
+  LEARN: [BookOpen, Layers, Waves],
+  "TOP-TIER MODELS": [Cpu, Sparkles, FileText],
+  "API & EXTENSION": [KeyRound, Chrome, Cpu],
+  "DEVELOPER DOCS": [FileText, BookOpen, KeyRound],
+  "FOUNDING PROGRAM": [Crown, Users, Wallet],
+  PLANS: [Wallet, Check, Crown],
+  SUPPORT: [LifeBuoy, Users, Bell],
+};
+
 export function CloudAudiences() {
   const [active, setActive] = React.useState(AUDIENCES[0].key);
   const current = AUDIENCES.find((a) => a.key === active) ?? AUDIENCES[0];
-  // Warm every tab's images up front so switching tabs shows them instantly.
-  React.useEffect(() => {
-    AUDIENCES.forEach((a) => a.cards.forEach((c) => {
-      if (c.img) { const im = new Image(); im.decoding = "async"; im.src = c.img; }
-    }));
-  }, []);
   return (
-    <section className="bg-background px-3 pb-16 sm:px-4">
-      <div className="rounded-[28px] bg-gc-panel px-5 py-8 sm:px-10 md:px-12 md:py-10 xl:px-[96px]">
-        <div role="tablist" className="inline-flex max-w-full gap-1 overflow-x-auto rounded-full bg-background p-1 ring-1 ring-gc-line/70 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          {AUDIENCES.map((a) => (
-            <button
-              key={a.key}
-              type="button"
-              role="tab"
-              aria-selected={a.key === active}
-              onClick={() => setActive(a.key)}
-              className={`shrink-0 rounded-full px-4 py-2 text-[14px] font-medium transition sm:px-5 sm:text-[15px] ${
-                a.key === active ? "bg-gc-blue text-gc-on-blue shadow-sm" : "text-gc-ink/80 hover:bg-gc-blue-soft hover:text-gc-ink"
-              }`}
-            >
-              {a.label}
-            </button>
-          ))}
+    <section className="bg-background px-5 pb-20 pt-6 sm:px-8">
+      <div className="mx-auto max-w-[1296px] text-center">
+        <h2 className={sectionTitle}>Made for every Fiber trader</h2>
+        <p className={sectionLead}>Pick what fits you: trading tools, developer access or our special programs.</p>
+        <div className="mt-8 flex justify-center">
+          <div
+            role="tablist"
+            className="inline-flex max-w-full gap-1 overflow-x-auto rounded-full bg-gc-surface p-1 ring-1 ring-gc-line/60 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          >
+            {AUDIENCES.map((a) => (
+              <button
+                key={a.key}
+                type="button"
+                role="tab"
+                aria-selected={a.key === active}
+                onClick={() => setActive(a.key)}
+                className={`shrink-0 rounded-full px-4 py-2 text-[14px] font-medium transition sm:px-5 sm:text-[15px] ${
+                  a.key === active ? "bg-gc-ink text-background" : "text-gc-ink hover:bg-gc-panel"
+                }`}
+              >
+                {a.label}
+              </button>
+            ))}
+          </div>
         </div>
-        <div className="mt-9 grid gap-6 md:grid-cols-3">
-          {current.cards.map((c) => (
-            <Link
-              key={c.tag}
-              to={c.to}
-              className="group flex min-h-[112px] overflow-hidden rounded-2xl border border-gc-line/70 bg-background shadow-[0_1px_2px_rgba(0,0,0,0.04)] transition hover:-translate-y-0.5 hover:border-gc-blue/40 hover:shadow-md"
-            >
-              <div className="flex min-w-0 flex-1 flex-col justify-center px-4 py-5">
-                <span className="w-fit rounded-full bg-gc-blue-soft px-2.5 py-0.5 text-[11px] font-medium tracking-wide text-gc-blue">{c.tag}</span>
-                <p className="mt-2 text-[14px] font-medium leading-[1.5] text-gc-ink sm:text-[16px] sm:leading-[1.55]">{c.text}</p>
-              </div>
-              {c.img && (
-                <div className="w-[112px] shrink-0 p-2 pl-0">
-                  <img src={c.img} alt="" loading="eager" decoding="async" className="h-full w-full rounded-xl object-cover" />
-                </div>
-              )}
-              {c.logo && (
-                <div className="flex w-[84px] shrink-0 items-center justify-center">
-                  <img src="/favicon.png" alt="" className="h-14 w-14 object-contain" />
-                </div>
-              )}
+        <div className="mt-10 grid gap-6 text-left md:grid-cols-3">
+          {current.cards.map((c, i) => (
+            <Link key={c.tag} to={c.to} className="group flex flex-col">
+              <AuroraTile
+                n={i}
+                icons={AUDIENCE_ICONS[c.tag] ?? (c.icon ? [c.icon] : [Sparkles])}
+                className="aspect-[16/10] w-full transition group-hover:brightness-[1.03]"
+              />
+              <div className="mt-5 text-[12px] font-medium uppercase tracking-[0.14em] text-gc-ink-muted">{c.tag}</div>
+              <p className="mt-2 flex-1 text-[16px] font-medium leading-[1.5] text-gc-ink sm:text-[17px]">{c.text}</p>
+              <span className={`${underlineLink} mt-5`}>
+                Learn more <ArrowUpRight className="h-3.5 w-3.5 transition group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+              </span>
             </Link>
           ))}
         </div>
@@ -391,60 +386,71 @@ const BUILD_ITEMS: Array<{ key: string; title: string; points: BuildPart[][] }> 
   },
 ];
 
+const BUILD_ICONS: Record<string, LucideIcon[]> = {
+  terminal: [LineChart, Crosshair, Waves],
+  ai: [Sparkles, Bot, FileText],
+  volume: [BarChart3, Waves, LineChart],
+  "jx-bot": [Bot, Bell, Wallet],
+  developers: [KeyRound, Chrome, Cpu],
+};
+
 export function CloudBuildWith() {
   const [open, setOpen] = React.useState<string[]>([BUILD_ITEMS[0].key]);
   const toggle = (key: string) =>
     setOpen((cur) => (cur.includes(key) ? cur.filter((k) => k !== key) : [...cur, key]));
+  const lastOpen = open[open.length - 1] ?? BUILD_ITEMS[0].key;
+  const tileIndex = Math.max(0, BUILD_ITEMS.findIndex((b) => b.key === lastOpen));
   return (
     <section className="jenvu-build-zoom bg-background">
       <div className="mx-auto grid max-w-[1296px] items-start gap-10 px-5 pb-20 pt-8 sm:px-8 md:grid-cols-2 md:gap-20 md:pb-24">
         <div className="md:sticky md:top-24">
-          <h2 className="text-[22px] font-normal leading-[1.3] text-gc-ink min-[400px]:text-[24px] sm:text-[36px] sm:leading-[1.25]">
-            <span className="whitespace-nowrap">Build with the Fiber platform</span>
-            <br />
-            <span className="whitespace-nowrap text-gc-blue-deep">designed for traders and AI</span>
+          <h2 className="text-[26px] font-medium leading-[1.2] tracking-tight text-gc-ink sm:text-[38px] sm:leading-[1.15]">
+            Build with the Fiber platform designed for traders and AI
           </h2>
-          <p className="mt-4 max-w-[540px] text-[14px] leading-[1.55] text-gc-ink-muted sm:mt-5 sm:text-[16px] sm:leading-[1.6]">
+          <p className="mt-4 max-w-[540px] text-[15px] leading-relaxed text-gc-ink sm:mt-5 sm:text-[16px]">
             Try Jenvu with JX Bot on MetaTrader 5 and the top AI models, plus new sign-ups get $100 free credits and 14 days of Pro access free.
           </p>
-          <div className="mt-7 flex flex-wrap items-center gap-7">
-            <Link
-              to="/auth"
-              search={{ mode: "signup" } as never}
-              className="inline-flex h-12 items-center justify-center rounded-full bg-gc-blue px-6 text-[15px] font-medium text-gc-on-blue transition hover:bg-gc-blue-hover"
-            >
+          <div className="mt-7 flex flex-wrap items-center gap-3">
+            <Link to="/auth" search={{ mode: "signup" } as never} className={pillDark}>
               Get started for free
             </Link>
-            <Link to="/pricing" className="text-[15px] font-medium text-gc-blue-deep hover:underline">
-              See all plans and tools
+            <Link to="/pricing" className={pillLight}>
+              See all plans <ArrowUpRight className="h-4 w-4" />
             </Link>
           </div>
+          <AuroraTile
+            n={tileIndex}
+            icons={BUILD_ICONS[BUILD_ITEMS[tileIndex].key]}
+            className="mt-10 hidden aspect-[16/10] w-full max-w-[540px] md:flex"
+          />
         </div>
         <div>
           {BUILD_ITEMS.map((b) => {
             const isOpen = open.includes(b.key);
             return (
-              <div key={b.key} className="border-b-2 border-gc-line">
+              <div key={b.key} className="border-b border-gc-line">
                 <button
                   type="button"
                   aria-expanded={isOpen}
                   onClick={() => toggle(b.key)}
-                  className={`flex w-full items-center justify-between gap-4 py-6 text-left ${isOpen ? "border-b-2 border-gc-line" : ""}`}
+                  className="flex w-full items-center justify-between gap-4 py-6 text-left"
                 >
-                  <span className="text-[19px] text-gc-blue-deep">{b.title}</span>
-                  <ChevronDown className={`h-6 w-6 shrink-0 text-gc-blue-deep transition ${isOpen ? "rotate-180" : ""}`} />
+                  <span className="text-[18px] font-medium text-gc-ink sm:text-[20px]">{b.title}</span>
+                  <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gc-surface ring-1 ring-gc-line/60 transition ${isOpen ? "rotate-180" : ""}`}>
+                    <ChevronDown className="h-5 w-5 text-gc-ink" />
+                  </span>
                 </button>
                 {isOpen && (
-                  <ul className="space-y-6 py-8">
+                  <ul className="space-y-4 pb-8">
                     {b.points.map((parts, i) => (
-                      <li key={i} className="flex items-start gap-4 text-[16px] leading-[1.75] text-gc-ink-muted">
-                        <Check className="mt-1.5 h-5 w-5 shrink-0 text-gc-green" strokeWidth={2.25} />
+                      <li key={i} className="flex items-start gap-3 text-[15px] leading-[1.7] text-gc-ink sm:text-[16px]">
+                        <Check className="mt-1 h-4 w-4 shrink-0 text-gc-ink" strokeWidth={2.25} />
                         <span>
                           {parts.map((p, j) =>
                             typeof p === "string" ? (
                               <React.Fragment key={j}>{p}</React.Fragment>
                             ) : (
-                              <Link key={j} to="/help" hash={p.hash} className="text-gc-blue-deep underline underline-offset-2 hover:text-gc-navy">
+                              <Link key={j} to="/help" hash={p.hash} className="font-medium underline underline-offset-2 hover:opacity-70">
                                 {p.link}
                               </Link>
                             ),
