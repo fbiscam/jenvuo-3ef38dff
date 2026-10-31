@@ -53,6 +53,7 @@ export default function SiteHeader() {
           ) : (
           <nav className="ml-6 hidden min-w-0 items-center gap-0.5 whitespace-nowrap text-[14px] text-gc-ink-muted lg:flex [&>a]:rounded-md [&>a]:px-2.5 [&>a]:py-2 [&>a:hover]:bg-gc-surface [&>a:hover]:text-gc-ink">
             <Link to="/about" activeProps={ACTIVE}>Overview</Link>
+            <Link to="/platform" activeProps={ACTIVE}>Platform</Link>
             <Link to="/strategies/ict-gold-trading" activeProps={ACTIVE}>Solutions</Link>
             <Link to="/ai-engine" activeProps={ACTIVE}>Products</Link>
             <Link to="/pricing" activeProps={ACTIVE}>Pricing</Link>
@@ -134,6 +135,7 @@ export default function SiteHeader() {
             <nav className="flex flex-col px-3 pb-4 pt-1 text-[15px] text-zinc-900">
               {[
                 { to: "/about", label: "Overview" },
+                { to: "/platform", label: "Platform" },
                 { to: "/strategies/ict-gold-trading", label: "Solutions" },
                 { to: "/ai-engine", label: "Products" },
                 { to: "/pricing", label: "Pricing" },

@@ -23,6 +23,11 @@ import {
 } from "lucide-react";
 import SiteHeader from "@/components/SiteHeader";
 import BlogFooter from "@/components/BlogFooter";
+import openaiLogo from "@/assets/platform-logos/openai.svg";
+import pythonLogo from "@/assets/platform-logos/python.svg";
+import nodeLogo from "@/assets/platform-logos/nodejs.svg";
+import curlLogo from "@/assets/platform-logos/curl.svg";
+import langchainLogo from "@/assets/platform-logos/langchain.svg";
 
 export const Route = createFileRoute("/platform")({
   head: () => ({
@@ -120,7 +125,13 @@ function StartMenu() {
   );
 }
 
-const WORKS_WITH = ["OpenAI SDK", "Python", "Node.js", "cURL", "LangChain"];
+const WORKS_WITH = [
+  { name: "OpenAI SDK", logo: openaiLogo },
+  { name: "Python", logo: pythonLogo },
+  { name: "Node.js", logo: nodeLogo },
+  { name: "cURL", logo: curlLogo },
+  { name: "LangChain", logo: langchainLogo },
+];
 
 function Hero() {
   return (
@@ -133,10 +144,11 @@ function Hero() {
         <StartMenu />
       </div>
       <p className="mt-24 text-xs uppercase tracking-[0.2em] text-gc-ink-muted">Works with the tools you already use</p>
-      <div className="mt-8 grid grid-cols-2 items-center gap-y-8 sm:grid-cols-5">
+      <div className="mx-auto mt-8 flex max-w-4xl flex-wrap items-center justify-center gap-x-8 gap-y-6 sm:gap-x-12">
         {WORKS_WITH.map((w) => (
-          <span key={w} className="text-xl font-semibold tracking-tight text-gc-ink sm:text-2xl">
-            {w}
+          <span key={w.name} className="inline-flex items-center gap-2.5 text-lg font-semibold tracking-tight text-gc-ink sm:text-2xl">
+            <img src={w.logo} alt="" aria-hidden="true" className="h-7 w-7 object-contain sm:h-8 sm:w-8" loading="lazy" />
+            {w.name}
           </span>
         ))}
       </div>
