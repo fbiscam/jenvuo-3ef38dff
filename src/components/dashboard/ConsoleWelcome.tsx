@@ -10,7 +10,7 @@ const PRODUCTS: Product[] = [
   { title: "Chat API", text: "Call Jenvu models from your own apps with a compatible Chat Completions API.", to: "/dashboard/api", icon: MessageSquareText },
   { title: "Models", text: "Compare every model we serve, with context size and price per million tokens.", to: "/dashboard/models", icon: BrainCircuit, badge: "New" },
   { title: "JX Bot", text: "Run the Gold M15 Expert Advisor on MT5 with a stop loss on every trade.", to: "/dashboard/jx-bot", icon: Cpu },
-  { title: "Terminal", text: "Read sweeps, zones and FVGs on XAU/USD and ask the AI desk about any chart.", to: "/dashboard/terminal", icon: Terminal, badge: "Founding" },
+  { title: "Terminal", text: "Read sweeps, zones and FVGs on XAU/USD and ask the AI desk about any chart.", to: "/dashboard/terminal", icon: Terminal },
 ];
 
 /** xAI console-style dashboard home: welcome line, balance and keys cards, product grid. */
