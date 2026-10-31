@@ -217,7 +217,7 @@ function StopCard() {
     <Card title="Stops at your target" text="It pauses for the day at your plan's daily target or 4% of the balance, and stops for the month at the monthly target.">
       <div className="space-y-2 pt-4">
         <div className="jx-in max-w-[440px] rounded-2xl bg-muted px-4 py-3 text-[14px] text-foreground">
-          Daily target reached on this account. No new trades until tomorrow.
+          Daily target reached on this account. No new trades.
         </div>
         <div className="jx-in max-w-[440px] rounded-2xl bg-muted px-4 py-3 text-[14px] text-foreground" style={{ animationDelay: "0.3s" }}>
           Drawdown guard is on at 4.7%. Open trades keep their stop loss.
