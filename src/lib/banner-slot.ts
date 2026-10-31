@@ -38,5 +38,5 @@ export function useBannerSlot(id: string, priority: number, wants: boolean): boo
   return wants && active === id;
 }
 
-/** Priorities: security/unread notice first, then free trial, then 2FA. */
-export const BANNER_PRIORITY = { notice: 1, trial: 2, twoFactor: 3 } as const;
+/** Priorities: security/unread notice, then site announcement, free trial, 2FA. */
+export const BANNER_PRIORITY = { notice: 1, announcement: 2, trial: 3, twoFactor: 4 } as const;

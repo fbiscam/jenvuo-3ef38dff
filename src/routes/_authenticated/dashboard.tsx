@@ -19,6 +19,7 @@ import StartTrialBanner from "@/components/StartTrialBanner";
 import RenewalNotice from "@/components/billing/RenewalNotice";
 import DashboardTopBar from "@/components/dashboard/DashboardTopBar";
 import NotificationStrip from "@/components/dashboard/NotificationStrip";
+import SiteAnnouncementBar from "@/components/dashboard/SiteAnnouncementBar";
 import CloudWelcome from "@/components/dashboard/CloudWelcome";
 import TwoFactorReminder from "@/components/dashboard/TwoFactorReminder";
 import WelcomeOnboarding from "@/components/dashboard/WelcomeOnboarding";
@@ -1590,6 +1591,7 @@ function DashboardLayout() {
         {drawerMode && pathname === "/dashboard" && <StartTrialBanner />}
         {drawerMode && pathname === "/dashboard" && <TwoFactorReminder />}
         {drawerMode && pathname !== "/dashboard/terminal" && <NotificationStrip />}
+        {drawerMode && pathname !== "/dashboard/terminal" && <SiteAnnouncementBar />}
 
         <main
           className={
