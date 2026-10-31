@@ -151,17 +151,17 @@
      Destructive shifted to orange-red (Okabe-Ito) so red/green confusion is reduced.
      Chart palette follows Okabe-Ito color-blind-safe set. */
   --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0.02 264);           /* #1b1d24 — 16.5:1 on white */
+  --foreground: #202124;           /* same dark ink as the Platform page */
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0.02 264);
+  --card-foreground: #202124;
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0.02 264);
+  --popover-foreground: #202124;
   --primary: oklch(0.208 0.042 265.755);
   --primary-foreground: oklch(0.984 0.003 247.858);
   --secondary: oklch(0.968 0.007 247.896);
   --secondary-foreground: oklch(0.208 0.042 265.755);
   --muted: oklch(0.968 0.007 247.896);
-  --muted-foreground: oklch(0.435 0.035 257);    /* darker: ~4.7:1 on white */
+  --muted-foreground: #3c4043;    /* dark secondary text, ~10:1 on white */
   --accent: oklch(0.968 0.007 247.896);
   --accent-foreground: oklch(0.208 0.042 265.755);
   --destructive: oklch(0.55 0.22 29);            /* orange-red, distinguishable from green */
@@ -176,7 +176,7 @@
   --chart-4: oklch(0.78 0.16 95);                /* yellow */
   --chart-5: oklch(0.55 0.18 330);               /* reddish purple */
   --sidebar: #fcfcfc;
-  --sidebar-foreground: oklch(0.145 0.02 264);
+  --sidebar-foreground: #202124;
   --sidebar-primary: oklch(0.208 0.042 265.755);
   --sidebar-primary-foreground: oklch(0.984 0.003 247.858);
   --sidebar-accent: oklch(0.968 0.007 247.896);
@@ -211,7 +211,7 @@
   --gc-green: #34a853;
   --gc-green-soft: #e6f4ea;
   --gc-ink: #202124;
-  --gc-ink-muted: #5f6368;
+  --gc-ink-muted: #3c4043;
   --gc-surface: #f8f9fa;
   --gc-line: #dadce0;
   --gc-on-blue: #ffffff;
@@ -1004,7 +1004,7 @@ html[data-pwa="1"] .pwa-tabbar {
   --gc-canvas: #f0f5fe;
   --gc-section: #fafafa;
   --gc-ink: #202124;
-  --gc-ink-muted: #5f6368;
+  --gc-ink-muted: #3c4043;
   --gc-line: #dadce0;
   --gc-surface: #f8f9fa;
   --gc-panel: #eef2f7;
@@ -1015,7 +1015,7 @@ html[data-pwa="1"] .pwa-tabbar {
   --gc-blue-deep: #0b57d0;
   --gc-console-search: #e1e6ef;
   --foreground: #202124;
-  --muted-foreground: #5f6368;
+  --muted-foreground: #3c4043;
   --border: #dadce0;
   --muted: #f1f3f4;
   --accent: #e9eef6;
