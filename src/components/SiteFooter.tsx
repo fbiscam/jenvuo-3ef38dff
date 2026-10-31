@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { Globe } from "lucide-react";
 
 const MONO = "font-mono";
 
@@ -59,58 +60,81 @@ function NewsletterSubscribe() {
 
 
 
-const columns = [
-  {
-    label: "Why Jenvu",
-    links: [
-      { to: "/", label: "Home" },
-      { to: "/about", label: "About Jenvu" },
-      { to: "/founding", label: "Founding Program" },
-      { to: "/broadcasts", label: "Broadcast" },
-      { to: "/founder", label: "Our Founder" },
-    ],
-  },
-  {
-    label: "Production",
-    links: [
-      { to: "/pricing", label: "Jenvu pricing" },
-      { to: "/download", label: "Download App" },
-      { to: "/development", label: "Development" },
-      { to: "/ai-engine", label: "Products" },
-      { to: "/platform", label: "API Platform" },
-    ],
-  },
-  {
-    label: "Intelligence",
-    links: [
+type FooterLink = { to: string; label: string; ext?: boolean };
+type FooterGroup = { label: string; links: FooterLink[] };
+
+/* OpenAI Business-style footer: five columns, each with one or more titled groups. */
+const columns: FooterGroup[][] = [
+  [
+    { label: "Intelligence", links: [
+      { to: "/ai-engine", label: "AI Engine" },
       { to: "/insights", label: "Market Insights" },
-      { to: "/llm", label: "Language Model" },
-      { to: "/scam-tool", label: "Scam Tool" },
       { to: "/killzones", label: "Killzones" },
+      { to: "/llm", label: "Language Model" },
+    ] },
+    { label: "Latest models", links: [
+      { to: "/models", label: "All models" },
+      { to: "/models", label: "GPT-5.5" },
+      { to: "/models", label: "Claude Opus 5" },
+      { to: "/models", label: "DeepSeek V4" },
+    ] },
+    { label: "Safety", links: [
+      { to: "/disclaimer", label: "Risk Disclaimer" },
+      { to: "/scam-tool", label: "Scam Tool" },
+    ] },
+  ],
+  [
+    { label: "Products", links: [
+      { to: "/dashboard/terminal", label: "Fiber Terminal", ext: true },
+      { to: "/download", label: "Download App", ext: true },
+      { to: "/development", label: "Development" },
       { to: "/strategies/ict-gold-trading", label: "Solutions" },
-    ],
-  },
-  {
-    label: "Resources",
-    links: [
-      { to: "/dashboard", label: "Dashboard" },
+    ] },
+    { label: "API Platform", links: [
+      { to: "/platform", label: "Platform Overview" },
+      { to: "/dashboard/api", label: "API Log In", ext: true },
+      { to: "/docs", label: "Developer Docs", ext: true },
+    ] },
+  ],
+  [
+    { label: "Business", links: [
+      { to: "/about", label: "Overview" },
+      { to: "/pricing", label: "Pricing" },
+      { to: "/founding", label: "Founding Program" },
+      { to: "/contact", label: "Contact Sales" },
+    ] },
+    { label: "Developers", links: [
+      { to: "/models", label: "Models", ext: true },
+      { to: "/docs", label: "API Docs", ext: true },
+      { to: "/dashboard/usage", label: "Usage", ext: true },
+    ] },
+  ],
+  [
+    { label: "Company", links: [
+      { to: "/about", label: "About Us" },
+      { to: "/founder", label: "Our Founder" },
+      { to: "/broadcasts", label: "Broadcast" },
+    ] },
+    { label: "Support", links: [
+      { to: "/help", label: "Help Center", ext: true },
+      { to: "/contact", label: "Contact Support" },
       { to: "/auth", label: "Sign In" },
-      { to: "/help", label: "Help Center" },
-      { to: "/contact", label: "Contact us" },
-      { to: "/docs", label: "Documentation" },
-    ],
-  },
-  {
-    label: "Legal",
-    links: [
-      { to: "/terms", label: "Terms of Service" },
+    ] },
+  ],
+  [
+    { label: "More", links: [
+      { to: "/insights", label: "Blog" },
+      { to: "/search", label: "Search" },
+      { to: "/dashboard", label: "Dashboard" },
+    ] },
+    { label: "Terms & policies", links: [
+      { to: "/terms", label: "Terms of Use" },
       { to: "/privacy", label: "Privacy Policy" },
       { to: "/refund", label: "Refund Policy" },
-      { to: "/disclaimer", label: "Risk Disclaimer" },
       { to: "/cancellation", label: "Cancellation Policy" },
-    ],
-  },
-] as const;
+    ] },
+  ],
+];
 
 export default function SiteFooter({ className }: { className?: string }) {
   const year = new Date().getFullYear();
@@ -119,21 +143,23 @@ export default function SiteFooter({ className }: { className?: string }) {
       <div className="w-full px-6 py-10 sm:px-10 sm:py-12 lg:px-16">
         <div className="jenvu-footer-menu-zoom">
         <div className="grid grid-cols-2 gap-x-8 gap-y-10 md:grid-cols-5">
-          {columns.map((col) => (
-            <div key={col.label}>
-              <h3 className="text-[16px] font-normal text-gc-ink">{col.label}</h3>
-              <ul className="mt-5 space-y-[14px]">
-                {col.links.map((l) => (
-                  <li key={`${l.to}:${l.label}`}>
-                    <Link
-                      to={l.to}
-                      className="text-[14px] text-gc-ink transition-colors hover:text-gc-blue-deep hover:underline"
-                    >
-                      {l.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
+          {columns.map((groups, ci) => (
+            <div key={ci} className="space-y-10">
+              {groups.map((g) => (
+                <div key={g.label}>
+                  <h3 className="text-[14px] font-medium text-muted-foreground">{g.label}</h3>
+                  <ul className="mt-4 space-y-3">
+                    {g.links.map((l) => (
+                      <li key={`${l.to}:${l.label}`}>
+                        <Link to={l.to} className="text-[14px] text-foreground transition-opacity hover:opacity-60">
+                          {l.label}
+                          {l.ext && <span className="ml-1 text-[11px] text-muted-foreground">↗</span>}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
             </div>
           ))}
         </div>
@@ -141,14 +167,12 @@ export default function SiteFooter({ className }: { className?: string }) {
 
         {/* Bottom bar */}
         <div className="mt-12 flex flex-col gap-5 border-t border-gc-line pt-6 lg:flex-row lg:items-center lg:justify-between">
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-[14px] text-gc-ink">
-            <Link to="/about" className="hover:text-gc-blue-deep">About Jenvu</Link>
-            <span className="text-gc-ink-muted">|</span>
-            <Link to="/privacy" className="hover:text-gc-blue-deep">Privacy</Link>
-            <span className="text-gc-ink-muted">|</span>
-            <Link to="/terms" className="hover:text-gc-blue-deep">Site terms</Link>
-            <span className="text-gc-ink-muted">|</span>
-            <Link to="/disclaimer" className="hover:text-gc-blue-deep">Risk Disclaimer</Link>
+          <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-[14px] text-muted-foreground">
+            <span>Jenvu © {year}</span>
+            <Link to="/privacy" className="hover:text-foreground">Privacy</Link>
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-gc-line px-3 py-1.5 text-foreground">
+              <Globe className="h-4 w-4" aria-hidden /> English (United States)
+            </span>
           </div>
 
 
