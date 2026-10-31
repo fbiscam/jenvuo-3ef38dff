@@ -65,6 +65,7 @@ export default function SiteHeader() {
           <nav className="hidden min-w-0 items-center justify-start gap-0.5 whitespace-nowrap text-[14px] text-muted-foreground lg:flex [&>a]:rounded-full [&>a]:px-3 [&>a]:py-2 [&>a:hover]:bg-muted [&>a:hover]:text-foreground">
             <Link to="/about" activeProps={ACTIVE}>Why Jenvu</Link>
             <Link to="/ai-engine" activeProps={ACTIVE}>Products</Link>
+            <Link to="/jx-bot" activeProps={ACTIVE}>JX Bot</Link>
             <Link to="/strategies/ict-gold-trading" activeProps={ACTIVE}>Solutions</Link>
             <div className="relative" onMouseLeave={() => setResOpen(false)}>
               <button
@@ -129,6 +130,7 @@ export default function SiteHeader() {
                     {[
                       { to: isAuthed ? "/dashboard" : "/auth", label: "Dashboard" },
                       { to: "/dashboard/terminal", label: "Fiber Terminal" },
+                      { to: "/jx-bot", label: "JX Bot" },
                       { to: "/models", label: "AI models" },
                       { to: "/platform", label: "API Platform" },
                       { to: "/download", label: "Download app" },
@@ -182,6 +184,7 @@ export default function SiteHeader() {
               {[
                 { to: "/about", label: "Why Jenvu" },
                 { to: "/ai-engine", label: "Products" },
+                { to: "/jx-bot", label: "JX Bot" },
                 { to: "/strategies/ict-gold-trading", label: "Solutions" },
                 { to: "/platform", label: "Platform" },
                 { to: "/pricing", label: "Pricing" },

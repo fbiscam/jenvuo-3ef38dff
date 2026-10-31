@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { Copy, Check, ArrowUpRight, Code2 } from "lucide-react";
+import { highlight } from "@/components/dashboard/CodeHighlight";
 
 export const Route = createFileRoute("/_authenticated/dashboard/code")({
   head: () => ({
@@ -102,11 +103,11 @@ function CodePage() {
         ))}
       </div>
       <div className="mt-4 grid gap-4 lg:grid-cols-[1.4fr_1fr]">
-        <div className="console-card relative min-h-[220px] min-w-0 p-5">
-          <button onClick={copy} aria-label="Copy code" className="absolute right-3 top-3 rounded-md p-1.5 text-muted-foreground hover:text-foreground">
+        <div className="relative min-h-[220px] min-w-0 rounded-2xl bg-[#1e1e1e] p-5">
+          <button onClick={copy} aria-label="Copy code" className="absolute right-3 top-3 rounded-md p-1.5 text-[#9d9d9d] hover:text-[#ffffff]">
             {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
           </button>
-          <pre className="whitespace-pre-wrap break-words pr-8 text-[13px] leading-relaxed text-foreground"><code>{ex.code}</code></pre>
+          <pre className="whitespace-pre-wrap break-words pr-8 font-mono text-[13px] leading-relaxed text-[#d4d4d4]"><code>{highlight(ex.code)}</code></pre>
         </div>
         <div className="console-card p-5">
           <p className="text-[14px] font-medium text-foreground">Result</p>

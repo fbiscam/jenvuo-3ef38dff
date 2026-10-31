@@ -1,8 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import * as React from "react";
-import { ArrowUpRight, Mic, Monitor, Plus, Search, X } from "lucide-react";
+import { ArrowUpRight, X } from "lucide-react";
 import SiteHeader from "@/components/SiteHeader";
 import BlogFooter from "@/components/BlogFooter";
+import Mt5Preview from "@/components/jxbot/Mt5Preview";
 import { useAuthUser } from "@/hooks/useAuthUser";
 
 export const Route = createFileRoute("/jx-bot")({
@@ -46,16 +47,6 @@ function JxFace({ className = "", eyes = "bg-background" }: { className?: string
   );
 }
 
-function useLoopStep(count: number, ms: number) {
-  const [step, setStep] = React.useState(count);
-  React.useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    setStep(0);
-    const t = window.setInterval(() => setStep((s) => (s + 1) % (count + 3)), ms);
-    return () => window.clearInterval(t);
-  }, [count, ms]);
-  return step;
-}
 
 function useInView<T extends HTMLElement>() {
   const ref = React.useRef<T>(null);
@@ -70,9 +61,9 @@ function useInView<T extends HTMLElement>() {
   return [ref, seen] as const;
 }
 
-function GetBot({ label = "Download for Windows" }: { label?: string }) {
+function GetBot({ label = "Use JX Bot" }: { label?: string }) {
   const { user } = useAuthUser();
-  const icon = <WindowsIcon />;
+  const icon = <ArrowUpRight className="h-4 w-4" />;
   if (user)
     return (
       <Link to="/dashboard/jx-bot" className={pillDark}>
@@ -86,113 +77,11 @@ function GetBot({ label = "Download for Windows" }: { label?: string }) {
   );
 }
 
-function WindowsIcon() {
-  return (
-    <svg viewBox="0 0 16 16" className="h-4 w-4 fill-current" aria-hidden>
-      <path d="M0 2.2 6.5 1.3v6.2H0zM7.3 1.2 16 0v7.5H7.3zM0 8.3h6.5v6.3L0 13.7zM7.3 8.3H16V16l-8.7-1.2z" />
-    </svg>
-  );
-}
 
 /* ---------- 1. Hero + app window ---------- */
 
-const ACCOUNTS = [
-  { name: "Gold M15", note: "Swing found · waiting for close", time: "Now", tone: "bg-foreground" },
-  { name: "Daily target", note: "Paused for today at target", time: "Yesterday", tone: "bg-emerald-500" },
-  { name: "Risk guard", note: "Stop loss set on every trade", time: "Yesterday", tone: "bg-orange-500" },
-  { name: "Licence check", note: "IP matches · plan valid", time: "Yesterday", tone: "bg-sky-500" },
-  { name: "Trading hours", note: "Skipping the London open", time: "Mon", tone: "bg-violet-500" },
-  { name: "Weekend", note: "Off until Monday", time: "Fri", tone: "bg-rose-500" },
-];
-
-const LOG = [
-  "✓ Licence → IP matches · plan valid",
-  "✓ Trend → H1 higher high + higher low",
-  "✓ Candle → M15 closed above the swing",
-  "✓ Order → buy 0.02 lot per $1,000 · SL + TP set",
-];
-
 function AppWindow() {
-  const step = useLoopStep(5, 1300);
-  return (
-    <div className="mx-auto mt-16 w-full max-w-[980px] overflow-hidden rounded-[22px] border border-gc-line bg-background text-left shadow-[0_30px_80px_-40px_rgba(0,0,0,0.35)]">
-      <div className="grid md:grid-cols-[280px_1fr]">
-        {/* list */}
-        <aside className="hidden border-r border-gc-line bg-gc-surface/60 p-3 md:block">
-          <div className="flex items-center justify-between px-1 pb-3">
-            <div className="flex gap-1.5">
-              <span className="h-3 w-3 rounded-full bg-red-400" />
-              <span className="h-3 w-3 rounded-full bg-amber-400" />
-              <span className="h-3 w-3 rounded-full bg-green-500" />
-            </div>
-            <Plus className="h-4 w-4 text-muted-foreground" />
-          </div>
-          <div className="flex items-center gap-2 rounded-lg border border-gc-line bg-background px-3 py-1.5 text-[13px] text-muted-foreground">
-            <Search className="h-3.5 w-3.5" /> Search
-          </div>
-          <ul className="mt-2 space-y-0.5">
-            {ACCOUNTS.map((a, i) => (
-              <li key={a.name} className={`flex gap-3 rounded-lg px-2 py-2.5 ${i === 0 ? "bg-muted" : ""}`}>
-                <JxFace className={`h-8 w-8 shrink-0 ${a.tone}`} eyes="bg-background" />
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-baseline justify-between gap-2">
-                    <span className="truncate text-[14px] text-foreground">{a.name}</span>
-                    <span className="shrink-0 text-[11px] text-muted-foreground">{a.time}</span>
-                  </div>
-                  <div className="truncate text-[12px] text-muted-foreground">{a.note}</div>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </aside>
-        {/* thread */}
-        <div className="flex min-h-[440px] flex-col">
-          <div className="flex items-center justify-between border-b border-gc-line px-4 py-3">
-            <div className="flex items-center gap-2 text-[14px] text-foreground">
-              <JxFace className="h-5 w-5" /> Gold M15
-            </div>
-            <Monitor className="h-4 w-4 text-muted-foreground" />
-          </div>
-          <div className="flex flex-1 flex-col gap-2.5 p-4 text-[14px]">
-            <div className="jx-in max-w-[85%] rounded-2xl bg-muted px-4 py-3 text-foreground">
-              New M15 candle closed on XAU/USD. Running my checks before any trade.
-            </div>
-            {step >= 1 && (
-              <div className="jx-in max-w-[85%] space-y-0.5 rounded-2xl bg-muted px-4 py-3 text-foreground">
-                {LOG.slice(0, Math.min(LOG.length, step + 1)).map((l) => (
-                  <div key={l} className="jx-in">
-                    {l}
-                  </div>
-                ))}
-              </div>
-            )}
-            {step >= 2 && (
-              <div className="jx-in text-center text-[12px] text-muted-foreground">Trade opened · one trade per swing</div>
-            )}
-            {step >= 3 && (
-              <div className="jx-in ml-auto max-w-[80%] rounded-2xl bg-foreground px-4 py-2.5 text-background">
-                Stop for today when the daily target is hit.
-              </div>
-            )}
-            {step >= 4 && (
-              <div className="jx-in max-w-[85%] rounded-2xl bg-muted px-4 py-3 text-foreground">
-                Done. I pause at your plan's daily target or 4% of the balance, whichever comes first.
-              </div>
-            )}
-          </div>
-          <div className="p-4 pt-0">
-            <div className="flex items-center gap-3 rounded-full border border-gc-line px-4 py-2.5 text-[14px] text-muted-foreground">
-              <Plus className="h-4 w-4" />
-              <span className="flex-1">Message Gold M15</span>
-              <span className="grid h-7 w-7 place-items-center rounded-full bg-foreground text-background">
-                <Mic className="h-3.5 w-3.5" />
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+  return <Mt5Preview />;
 }
 
 function Hero() {
