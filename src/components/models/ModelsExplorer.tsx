@@ -182,39 +182,55 @@ export default function ModelsExplorer({ apiHref = "/dashboard/api" }: { apiHref
   const price = `$${PRICE_PER_MILLION.toFixed(2)}`;
 
   return (
-    <div className="mx-auto w-full max-w-[1250px] space-y-10 px-4 py-8 sm:px-6 sm:py-10">
-      {/* Discover */}
-      <header className="border border-gc-line bg-gc-section px-5 py-7 sm:px-8 sm:py-9">
-        <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-          <div className="max-w-2xl">
-            <p className="text-xs font-medium uppercase tracking-[0.14em] text-gc-blue-deep">Jenvu models</p>
-            <h1 className="mt-2 text-3xl font-medium tracking-tight text-gc-ink sm:text-4xl">Discover models</h1>
-            <p className="mt-2 text-sm text-gc-ink-muted sm:text-base">
-              Every model you can call with one Jenvu API key, at one flat price of {price} per million tokens.
-            </p>
-            <div className="mt-5 flex flex-wrap gap-2">
-              <button type="button" onClick={scrollToCatalog} className="rounded-lg bg-gc-blue px-4 py-2 text-sm font-medium text-gc-on-blue transition-colors hover:bg-gc-blue-hover">
-                Browse all {MODEL_CATALOG.length} models
-              </button>
-              <Link to={apiHref} className="rounded-lg border border-gc-line bg-background px-4 py-2 text-sm font-medium text-gc-ink transition-colors hover:border-gc-blue">
-                {apiHref === "/dashboard/api" ? "Get an API key" : "API docs"}
-              </Link>
-            </div>
-          </div>
-          <dl className="grid grid-cols-3 divide-x divide-gc-line border border-gc-line bg-background">
-            {[
-              [String(MODEL_CATALOG.length), "Models"],
-              [String(new Set(MODEL_CATALOG.map((m) => m.provider)).size), "Labs"],
-              [price, "Per 1M tokens"],
-            ].map(([v, l]) => (
-              <div key={l} className="px-4 py-3 sm:px-6">
-                <dt className="text-xs text-gc-ink-muted">{l}</dt>
-                <dd className="mt-0.5 text-xl font-medium tabular-nums text-gc-ink">{v}</dd>
-              </div>
-            ))}
-          </dl>
+    <div className="mx-auto w-full max-w-[1250px] space-y-14 px-4 py-8 font-sans text-gc-ink sm:px-6 sm:py-10">
+      {/* Discover — same look as the Platform page hero */}
+      <header className="pb-4 pt-12 text-center sm:pt-20">
+        <h1 className="mx-auto max-w-3xl text-[2.6rem] font-medium leading-[1.08] tracking-tight sm:text-6xl">
+          Discover models on Jenvu
+        </h1>
+        <p className="mx-auto mt-6 max-w-2xl text-[17px] text-gc-ink">
+          Every model you can call with one Jenvu API key, at one flat price of {price} per million tokens.
+        </p>
+        <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
+          <button type="button" onClick={scrollToCatalog} className="inline-flex items-center gap-1.5 rounded-full bg-gc-ink px-5 py-2.5 text-sm font-medium text-background transition-opacity hover:opacity-85">
+            Browse all {MODEL_CATALOG.length} models
+          </button>
+          <Link to={apiHref} className="inline-flex items-center gap-1.5 rounded-full bg-gc-surface px-5 py-2.5 text-sm font-medium text-gc-ink ring-1 ring-gc-line/60 transition-colors hover:bg-gc-panel">
+            {apiHref === "/dashboard/api" ? "Get an API key" : "API docs"} <ArrowRight className="h-3.5 w-3.5" />
+          </Link>
         </div>
+        <dl className="mx-auto mt-14 grid max-w-xl grid-cols-3 divide-x divide-gc-line">
+          {[
+            [String(MODEL_CATALOG.length), "Models"],
+            [String(new Set(MODEL_CATALOG.map((m) => m.provider)).size), "Labs"],
+            [price, "Per 1M tokens"],
+          ].map(([v, l]) => (
+            <div key={l} className="px-3">
+              <dd className="text-3xl font-medium tabular-nums tracking-tight">{v}</dd>
+              <dt className="mt-1 text-sm text-gc-ink-muted">{l}</dt>
+            </div>
+          ))}
+        </dl>
       </header>
+
+      {/* Frontier cards — starfield style from the Platform page */}
+      <section className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        {FLAGSHIPS.slice(0, 4).map((m, i) => (
+          <button key={m.id} type="button" onClick={() => pick(m.id)}
+            className="relative flex aspect-[4/5] flex-col justify-end overflow-hidden rounded-md bg-gc-night px-7 pb-10 text-left text-gc-on-night sm:aspect-[5/7]">
+            <img src={i === 0 ? starsNebula : starsPlain} alt="" width={768} height={1056} loading="lazy"
+              className="absolute inset-0 h-full w-full object-cover"
+              style={{ transform: ["none", "none", "rotate(180deg)", "scaleX(-1)"][i] }} />
+            <span className="relative block">
+              <span className="block text-[1.6rem] font-medium leading-tight tracking-tight">{m.name}</span>
+              <span className="mt-3 block text-sm font-medium">{PROVIDERS[m.provider].label}</span>
+              <span className="mt-1 block text-sm font-medium">Input / Output: {price} per 1M tokens</span>
+              <span className="mt-1 block text-sm font-medium">Context: {formatContext(m.context)} tokens</span>
+              <span className="mt-4 block text-sm font-medium">Model ID: {m.id}</span>
+            </span>
+          </button>
+        ))}
+      </section>
 
       <div className="grid gap-3 lg:grid-cols-[1.25fr_1fr]">
         <section className="border border-gc-line bg-background p-4 sm:p-6">
