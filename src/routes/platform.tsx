@@ -159,38 +159,49 @@ function Hero() {
 /* ---------- 2. Models ---------- */
 
 const MODELS = [
-  { id: "claude-opus-5", name: "Claude Opus 5", note: "Deep reasoning, long documents and code" },
-  { id: "gpt-5.5", name: "GPT-5.5", note: "Fast, all-round chat and automation" },
-  { id: "gemini-3.1-pro", name: "Gemini 3.1 Pro", note: "Text and image understanding" },
-  { id: "deepseek-v4-flash-0731", name: "DeepSeek V4", note: "Quick, low-cost everyday tasks" },
+  { id: "claude-opus-5", name: "Claude Opus 5", a: "Deep reasoning and long documents", b: "Code review and refactoring", img: starsNebula },
+  { id: "gpt-5.5", name: "GPT-5.5", a: "Fast, all-round chat", b: "Agents and automation", img: starsPlain },
+  { id: "gemini-3.1-pro", name: "Gemini 3.1 Pro", a: "Text and image understanding", b: "Charts and screenshots", img: starsPlain },
+  { id: "deepseek-v4-flash-0731", name: "DeepSeek V4", a: "Quick everyday tasks", b: "High-volume workloads", img: starsPlain },
 ];
 
 function Models() {
   return (
-    <section className="mx-auto max-w-6xl px-5 py-16 text-center">
-      <h2 className="text-4xl font-medium tracking-tight sm:text-5xl">Powered by frontier models</h2>
-      <p className="mt-5 text-gc-ink-muted">Leading models from every major lab, behind one Jenvu API key.</p>
-      <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-        {MODELS.map((m) => (
+    <section className="mx-auto max-w-[1340px] px-5 py-16 text-center sm:py-20">
+      <h2 className="text-4xl font-medium tracking-tight sm:text-[3.25rem] sm:leading-tight">Powered by frontier models</h2>
+      <p className="mt-5 text-[17px]">Leading models from every major lab deliver advanced intelligence behind one Jenvu API key.</p>
+      <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        {MODELS.map((m, i) => (
           <div
             key={m.id}
-            className="flex min-h-[300px] flex-col justify-end sm:aspect-[3/4] overflow-hidden rounded-md p-6 text-left text-gc-on-night"
-            style={{ backgroundImage: "var(--platform-stars)" }}
+            className="relative flex aspect-[5/7] flex-col justify-end overflow-hidden rounded-md bg-gc-night px-7 pb-12 text-left text-gc-on-night"
           >
-            <h3 className="text-[1.65rem] font-medium tracking-tight">{m.name}</h3>
-            <p className="mt-3 text-sm">Input: $3.00 per 1M tokens</p>
-            <p className="text-sm">Output: $3.00 per 1M tokens</p>
-            <p className="mt-4 text-sm text-gc-on-night-muted">{m.note}</p>
-            <code className="mt-4 font-mono text-xs text-gc-on-night-muted">{m.id}</code>
+            <img
+              src={m.img}
+              alt=""
+              width={768}
+              height={1056}
+              loading="lazy"
+              className="absolute inset-0 h-full w-full object-cover"
+              style={i > 0 ? { transform: `scale(${1 + i * 0.08}) rotate(${i * 90}deg)` } : undefined}
+            />
+            <div className="relative">
+              <h3 className="text-[1.75rem] font-medium leading-tight tracking-tight">{m.name}</h3>
+              <p className="mt-3 text-sm font-medium">Input: $3.00 per 1M tokens</p>
+              <p className="mt-1 text-sm font-medium">Output: $3.00 per 1M tokens</p>
+              <p className="mt-4 text-sm font-medium">{m.a}</p>
+              <p className="mt-1 text-sm font-medium">{m.b}</p>
+              <p className="mt-4 text-sm font-medium">Model ID: {m.id}</p>
+            </div>
           </div>
         ))}
       </div>
-      <p className="mt-8 text-sm italic text-gc-ink-muted">
-        One flat rate for every model, paid from your AI credit. See all models in the{" "}
+      <p className="mt-10 text-sm italic">
+        Pricing above is one flat rate for every model, paid from your AI credit. Learn more in the{" "}
         <Link to="/docs" className="underline underline-offset-2">
           API docs
         </Link>{" "}
-        and plans on{" "}
+        and{" "}
         <Link to="/pricing" className="underline underline-offset-2">
           Pricing
         </Link>
