@@ -1,15 +1,18 @@
 import { ConfirmDialog } from "@/components/ConfirmDialog";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { Copy, Check, Plus, Search, Trash2, FileText, X, Terminal } from "lucide-react";
+import { Copy, Check, Plus, Search, FileText, X, Terminal } from "lucide-react";
+import { KeyActionsMenu } from "@/components/dashboard/KeyActionsMenu";
 import {
   listExtensionKeys,
   createExtensionKey,
   revokeExtensionKey,
   deleteExtensionKey,
   revealExtensionKey,
+  renameExtensionKey,
+  rotateExtensionKey,
   type ExtensionKeyRow,
   type ExtensionKeyAccess,
 } from "@/lib/extension-keys.functions";
@@ -54,6 +57,13 @@ function ExtensionPage() {
   const [deleteTarget, setDeleteTarget] = useState<ExtensionKeyRow | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [query, setQuery] = useState("");
+  const [editTarget, setEditTarget] = useState<ExtensionKeyRow | null>(null);
+  const [editName, setEditName] = useState("");
+  const [rotateTarget, setRotateTarget] = useState<ExtensionKeyRow | null>(null);
+  const [saving, setSaving] = useState(false);
+  const rename = useServerFn(renameExtensionKey);
+  const rotate = useServerFn(rotateExtensionKey);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (typeof window !== "undefined") setOrigin(window.location.origin);
@@ -116,6 +126,14 @@ function ExtensionPage() {
     if (!deleteTarget) return;
     setDeleting(true);
     try {
+      // Active keys are disabled first, then removed.
+      if (!deleteTarget.revoked_at) {
+        const r = await revoke({ data: { id: deleteTarget.id } });
+        if (!r.ok) {
+          toast.error(r.error);
+          return;
+        }
+      }
       const res = await remove({ data: { id: deleteTarget.id } });
       if (!res.ok) {
         toast.error(res.error);
@@ -128,6 +146,54 @@ function ExtensionPage() {
       toast.error(e instanceof Error ? e.message : "Could not delete the key");
     } finally {
       setDeleting(false);
+    }
+  };
+
+  const onRename = async () => {
+    if (!editTarget || !editName.trim()) return;
+    setSaving(true);
+    try {
+      const res = await rename({ data: { id: editTarget.id, name: editName } });
+      if (!res.ok) {
+        toast.error(res.error);
+        return;
+      }
+      setEditTarget(null);
+      toast.success("Key name saved");
+      await refresh();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Could not save the name");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const onRotate = async () => {
+    if (!rotateTarget) return;
+    setSaving(true);
+    try {
+      const res = await rotate({ data: { id: rotateTarget.id } });
+      if (!res.ok) {
+        toast.error(res.error);
+        return;
+      }
+      setRotateTarget(null);
+      setFreshKey(res.key);
+      toast.success("Key rotated — the old key no longer works.");
+      await refresh();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Could not rotate the key");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const copyText = async (value: string, message: string) => {
+    try {
+      await navigator.clipboard.writeText(value);
+      toast.success(message);
+    } catch {
+      toast.error("Copy failed");
     }
   };
 
