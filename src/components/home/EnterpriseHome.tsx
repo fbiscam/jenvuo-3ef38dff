@@ -371,13 +371,13 @@ export function EntStories({ articles: items }: { articles: HomeArticle[] }) {
             <Link key={a.id} to="/insights/$slug" params={{ slug: a.slug }} className="group">
               <div className="aspect-square overflow-hidden rounded-[20px] bg-muted">
                 <img
-                  src={insightCoverUrl(a.title, a.category, a.image_url)}
+                  src={insightCoverUrl(a.title, a.category ?? undefined, a.image_url)}
                   alt={a.title}
                   loading="lazy"
                   onError={(e) => {
                     const t = e.currentTarget;
                     t.onerror = null;
-                    t.src = insightCoverUrl(a.title, a.category);
+                    t.src = insightCoverUrl(a.title, a.category ?? undefined);
                   }}
                   className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
                 />
