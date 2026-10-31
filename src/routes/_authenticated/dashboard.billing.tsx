@@ -170,7 +170,7 @@ function Billing() {
   return (
     <div className="mx-auto max-w-5xl space-y-8" style={{ fontFamily: '"Google Sans Flex", "Google Sans", "Product Sans", "Roboto", system-ui, sans-serif' }}>
       {/* Page header */}
-      <h1 className="text-2xl font-semibold tracking-tight text-zinc-900">&nbsp;Billing</h1>
+      <div><h1 className="text-[28px] font-medium tracking-tight text-foreground">Billing</h1><p className="mt-1 text-[14px] text-muted-foreground">Your plan, credit balance, payments and invoices.</p></div>
 
       {/* Tab nav */}
       <nav className="flex flex-wrap gap-x-6 gap-y-2 border-b border-zinc-200">
