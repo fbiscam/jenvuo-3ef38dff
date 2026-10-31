@@ -24,7 +24,7 @@ export const Route = createFileRoute("/ai-engine")({
 const CONTENT: IndustryContent = {
   variant: "products",
   heroImg: prodHero,
-  pill: "Jenvu products",
+  pill: "\n",
   title: "One platform for trading Fiber",
   intro:
     "A live Terminal, an AI engine that explains the chart, rule-based analysis engines, alerts and an API, all built for Fiber.",
