@@ -37,11 +37,11 @@ export default function TwoFactorReminder() {
   return (
     <section className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-gc-line bg-background py-2 pl-4 pr-4 sm:pl-5 md:pr-5">
       <ShieldCheck className="h-5 w-5 shrink-0 text-gc-ink-muted" aria-hidden="true" />
-      <p className="min-w-0 flex-1 text-[13px] text-gc-ink sm:text-[14px]">
+      <p className="min-w-0 flex-1 basis-[calc(100%-2.5rem)] sm:basis-0 text-[13px] text-gc-ink sm:text-[14px]">
         <span className="font-medium">Protect your account with 2FA</span>
         <span className="text-gc-ink-muted"> — Turn on sign-in with an authenticator app so only your phone can sign in.</span>
       </p>
-      <div className="flex shrink-0 items-center gap-2">
+      <div className="ml-9 flex shrink-0 items-center gap-2 sm:ml-0">
         <button
           type="button"
           onClick={dismiss}
