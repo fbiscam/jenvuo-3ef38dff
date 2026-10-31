@@ -10,6 +10,7 @@ import {
   Inbox,
   Lock,
   Mail,
+  Megaphone,
   ShieldCheck,
   SlidersHorizontal,
   Target,
@@ -39,6 +40,7 @@ type Tile = {
 
 const TILES: Tile[] = [
   { key: "inbox", title: "Support Inbox", desc: "Contact & live-chat messages", to: "/jenvu-ops-x9k2/inbox", icon: <Inbox />, group: "Customers" },
+  { key: "announcements", title: "Site Notices", desc: "Updates, new bot & issue alerts for users", to: "/dashboard/admin/announcements", icon: <Megaphone />, group: "Customers" },
   { key: "messages", title: "Contact Messages", desc: "Legacy contact form entries", to: "/dashboard/admin/messages", icon: <Mail />, group: "Customers" },
   { key: "subs", title: "Newsletter Subscribers", desc: "Email list & signal opt-ins", to: "/dashboard/admin/subscribers", icon: <Users />, group: "Customers" },
   { key: "founding", title: "Founding Applications", desc: "Review & approve applicants", to: "/dashboard/admin/founding", icon: <Crown />, group: "Customers" },

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { Link } from "@tanstack/react-router";
+import { useRouter } from "@tanstack/react-router";
 import { AlertTriangle, Bot, Megaphone, Wrench } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuthUser } from "@/hooks/useAuthUser";
@@ -15,6 +15,7 @@ const REFRESH_MS = 5 * 60 * 1000;
  */
 export default function SiteAnnouncementBar() {
   const { user } = useAuthUser();
+  const router = useRouter();
   const [notice, setNotice] = useState<Announcement | null>(null);
   const active = useBannerSlot("announcement", BANNER_PRIORITY.announcement, !!notice);
 
@@ -71,12 +72,13 @@ export default function SiteAnnouncementBar() {
         </button>
         {href ? (
           internal ? (
-            <Link
-              to={href}
+            <button
+              type="button"
+              onClick={() => void router.navigate({ href })}
               className="inline-flex h-8 items-center rounded-full bg-gc-blue-deep px-4 text-[13px] font-medium text-gc-on-blue hover:bg-gc-navy"
             >
               {notice.link_label || "View"}
-            </Link>
+            </button>
           ) : (
             <a
               href={href}
