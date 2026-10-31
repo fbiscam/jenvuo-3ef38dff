@@ -1,3 +1,4 @@
+import { ConsoleSelect } from "@/components/dashboard/ConsoleSelect";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
@@ -407,31 +408,28 @@ function UsagePage() {
   const shortRange = `${rangeDays}d`;
 
   return (
-    <div className="mx-auto w-full max-w-[1180px] pb-10 text-foreground">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <h1 className="text-[28px] font-medium tracking-tight text-foreground">Usage</h1>
-          <p className="mt-1 text-[14px] text-muted-foreground">
-            Spend, tokens and requests across your API keys.
-          </p>
-        </div>
+    <div className="mx-auto w-full max-w-[1100px] pb-10 text-foreground">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <h1 className="text-[28px] font-medium tracking-tight text-foreground sm:text-[32px]">Usage</h1>
         <UsageTabs active="usage" />
       </div>
 
       {/* Filter bar */}
       <div className="mt-6 flex flex-wrap items-center gap-2">
-        <Dropdown
+        <ConsoleSelect
           open={openMenu === "type"}
           onToggle={() => setOpenMenu(openMenu === "type" ? null : "type")}
-          trigger="Group by: API Type"
+          label="Group by"
+          valueLabel="API Type"
           options={[{ value: "type", label: "API Type" }]}
           value="type"
           onSelect={() => setOpenMenu(null)}
         />
-        <Dropdown
+        <ConsoleSelect
           open={openMenu === "model"}
           onToggle={() => setOpenMenu(openMenu === "model" ? null : "model")}
-          trigger={model === "all" ? "Model: All" : `Model: ${modelDisplay(model).model}`}
+          label="Model"
+          valueLabel={model === "all" ? "All" : modelDisplay(model).model}
           options={[
             { value: "all", label: "All models" },
             ...models.map((m) => ({ value: m, label: modelDisplay(m).model })),
@@ -442,10 +440,11 @@ function UsagePage() {
             setOpenMenu(null);
           }}
         />
-        <Dropdown
+        <ConsoleSelect
           open={openMenu === "group"}
           onToggle={() => setOpenMenu(openMenu === "group" ? null : "group")}
-          trigger={`Granularity: ${groupDays === 1 ? "Day" : `${groupDays} days`}`}
+          label="Granularity"
+          valueLabel={groupDays === 1 ? "Day" : `${groupDays} days`}
           options={[1, 7, 14]
             .filter((days) => days < rangeDays || days === 1)
             .map((days) => ({ value: String(days), label: days === 1 ? "Day" : `${days} days` }))}
@@ -455,10 +454,10 @@ function UsagePage() {
             setOpenMenu(null);
           }}
         />
-        <Dropdown
+        <ConsoleSelect
           open={openMenu === "range"}
           onToggle={() => setOpenMenu(openMenu === "range" ? null : "range")}
-          trigger={`${rangeStartLabel(rangeDays)} – ${rangeEndLabel()}`}
+          valueLabel={`${rangeStartLabel(rangeDays)} – ${rangeEndLabel()}`}
           icon={<Calendar className="h-3.5 w-3.5 text-muted-foreground" />}
           options={RANGES.map((r) => ({ value: String(r.days), label: r.label }))}
           value={String(rangeDays)}
@@ -727,56 +726,6 @@ function rangeStartLabel(days: number) {
 
 function rangeEndLabel() {
   return dateLabel(new Date());
-}
-
-function Dropdown({
-  open,
-  onToggle,
-  trigger,
-  icon,
-  options,
-  value,
-  onSelect,
-}: {
-  open: boolean;
-  onToggle: () => void;
-  trigger: string;
-  icon?: React.ReactNode;
-  options: { value: string; label: string }[];
-  value: string;
-  onSelect: (v: string) => void;
-}) {
-  return (
-    <div className="relative min-w-0">
-      <button
-        type="button"
-        onClick={onToggle}
-        aria-expanded={open}
-        className="flex h-9 w-full min-w-0 items-center gap-1.5 rounded-full border border-border bg-transparent px-3 text-[12px] font-medium text-foreground transition-colors hover:bg-foreground/[0.05] sm:w-auto sm:max-w-[220px] sm:text-[13px]"
-      >
-        {icon}
-        <span className="truncate text-foreground">{trigger}</span>
-        <ChevronDown className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
-      </button>
-      {open && (
-        <div className="absolute left-0 z-20 mt-1 max-h-64 w-[min(14rem,calc(100vw-2rem))] overflow-y-auto rounded-lg border border-zinc-200 bg-white p-1 shadow-lg sm:left-auto sm:right-0">
-          {options.map((o) => (
-            <Button
-              key={o.value}
-              type="button"
-              variant="ghost"
-              onClick={() => onSelect(o.value)}
-              className={`block h-auto w-full truncate rounded-md px-2.5 py-1.5 text-left text-[13px] transition ${
-                o.value === value ? "font-semibold text-zinc-900" : "text-zinc-600"
-              }`}
-            >
-              {o.label}
-            </Button>
-          ))}
-        </div>
-      )}
-    </div>
-  );
 }
 
 function TabButton({
