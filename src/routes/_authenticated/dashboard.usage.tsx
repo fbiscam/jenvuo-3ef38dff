@@ -130,10 +130,11 @@ function UsagePage() {
     "capabilities",
   );
   const [sideTab, setSideTab] = useState<"users" | "services" | "keys">("keys");
-  const [rangeDays, setRangeDays] = useState<number>(30);
+  const [rangeDays, setRangeDays] = useState<number>(7);
+  const [breakdown, setBreakdown] = useState<ApiType>("text");
   const [model, setModel] = useState<string>("all");
   const [groupDays, setGroupDays] = useState<number>(1);
-  const [openMenu, setOpenMenu] = useState<"model" | "range" | "group" | null>(null);
+  const [openMenu, setOpenMenu] = useState<"type" | "model" | "range" | "group" | null>(null);
 
   const models = useMemo(() => {
     if (!data) return [] as string[];
@@ -367,42 +368,108 @@ function UsagePage() {
   const terminalTotal = derived.terminalScanUsd + derived.terminalDailyUsd;
   const terminalShare = derived.spent > 0 ? (terminalTotal / derived.spent) * 100 : 0;
 
+  const typeOf = (reason: string): ApiType => {
+    if (reason === "terminal_scan" || reason === "terminal_daily") return "terminal";
+    if (reason === "alert") return "alerts";
+    if (TEXT_REASONS.has(reason)) return "text";
+    return "other";
+  };
+  const typedDays = chartDays.map((day) => ({ date: day.date, text: 0, terminal: 0, alerts: 0, other: 0 }));
+  const typedIndex = new Map(chartDays.map((day, index) => [day.date, index]));
+  const typeTotals: Record<ApiType, number> = { text: 0, terminal: 0, alerts: 0, other: 0 };
+  const reasonTotals = new Map<string, { type: ApiType; count: number; spend: number }>();
+  const sortedDates = chartDays.map((day) => day.date);
+  for (const row of derived.spendRows) {
+    const date = row.created_at.slice(0, 10);
+    let index = typedIndex.get(date);
+    if (index == null) {
+      // grouped buckets: find the last bucket whose start date is <= row date
+      index = -1;
+      for (let i = 0; i < sortedDates.length; i++) if (sortedDates[i]! <= date) index = i;
+      if (index < 0) continue;
+    }
+    const type = typeOf(row.reason);
+    const amount = Math.abs(row.delta);
+    typedDays[index]![type] += amount;
+    typeTotals[type] += amount;
+    const key = label(row.reason);
+    const current = reasonTotals.get(key) ?? { type, count: 0, spend: 0 };
+    current.count += 1;
+    current.spend += amount;
+    reasonTotals.set(key, current);
+  }
+  const breakdownRows = [...reasonTotals.entries()]
+    .filter(([, value]) => value.type === breakdown)
+    .sort((a, b) => b[1].spend - a[1].spend);
+  const breakdownTotal = breakdownRows.reduce((sum, [, value]) => sum + value.spend, 0);
+  const tokenBars = chartDays.map((day) => day.tokens);
+  const requestBars = chartDays.map((day) => day.requests);
+  const shortRange = `${rangeDays}d`;
+
   return (
-    <div className="-mx-5 -mb-7 min-h-[calc(100dvh-4rem)] overflow-hidden bg-background text-foreground sm:-mx-8">
-      <div className="px-4 pt-2 sm:px-6">
-        <h1 className="text-[28px] font-medium tracking-tight text-foreground">Usage</h1>
-        <p className="mt-1 text-[14px] text-muted-foreground">Requests, tokens and credit spend across your API keys.</p>
-      </div>
-      {/* Header */}
-      <div className="flex min-h-14 flex-col gap-3 border-b border-border px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+    <div className="mx-auto w-full max-w-[1180px] pb-10 text-foreground">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <h1 className="text-[28px] font-medium tracking-tight text-foreground">Usage</h1>
+          <p className="mt-1 text-[14px] text-muted-foreground">
+            Spend, tokens and requests across your API keys.
+          </p>
+        </div>
         <UsageTabs active="usage" />
-        <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto_auto] items-center gap-2 sm:flex">
-          <Dropdown
-            open={openMenu === "model"}
-            onToggle={() => setOpenMenu(openMenu === "model" ? null : "model")}
-            trigger={model === "all" ? "All API keys" : model}
-            options={[
-              { value: "all", label: "All API keys" },
-              ...models.map((m) => ({ value: m, label: m })),
-            ]}
-            value={model}
-            onSelect={(v) => {
-              setModel(v);
-              setOpenMenu(null);
-            }}
-          />
-          <Dropdown
-            open={openMenu === "range"}
-            onToggle={() => setOpenMenu(openMenu === "range" ? null : "range")}
-            trigger={rangeLabel}
-            icon={<Calendar className="h-3.5 w-3.5 text-zinc-500" />}
-            options={RANGES.map((r) => ({ value: String(r.days), label: r.label }))}
-            value={String(rangeDays)}
-            onSelect={(v) => {
-              setRangeDays(Number(v));
-              setOpenMenu(null);
-            }}
-          />
+      </div>
+
+      {/* Filter bar */}
+      <div className="mt-6 flex flex-wrap items-center gap-2">
+        <Dropdown
+          open={openMenu === "type"}
+          onToggle={() => setOpenMenu(openMenu === "type" ? null : "type")}
+          trigger="Group by: API Type"
+          options={[{ value: "type", label: "API Type" }]}
+          value="type"
+          onSelect={() => setOpenMenu(null)}
+        />
+        <Dropdown
+          open={openMenu === "model"}
+          onToggle={() => setOpenMenu(openMenu === "model" ? null : "model")}
+          trigger={model === "all" ? "Model: All" : `Model: ${modelDisplay(model).model}`}
+          options={[
+            { value: "all", label: "All models" },
+            ...models.map((m) => ({ value: m, label: modelDisplay(m).model })),
+          ]}
+          value={model}
+          onSelect={(v) => {
+            setModel(v);
+            setOpenMenu(null);
+          }}
+        />
+        <Dropdown
+          open={openMenu === "group"}
+          onToggle={() => setOpenMenu(openMenu === "group" ? null : "group")}
+          trigger={`Granularity: ${groupDays === 1 ? "Day" : `${groupDays} days`}`}
+          options={[1, 7, 14]
+            .filter((days) => days < rangeDays || days === 1)
+            .map((days) => ({ value: String(days), label: days === 1 ? "Day" : `${days} days` }))}
+          value={String(groupDays)}
+          onSelect={(value) => {
+            setGroupDays(Number(value));
+            setOpenMenu(null);
+          }}
+        />
+        <Dropdown
+          open={openMenu === "range"}
+          onToggle={() => setOpenMenu(openMenu === "range" ? null : "range")}
+          trigger={`${rangeStartLabel(rangeDays)} – ${rangeEndLabel()}`}
+          icon={<Calendar className="h-3.5 w-3.5 text-muted-foreground" />}
+          options={RANGES.map((r) => ({ value: String(r.days), label: r.label }))}
+          value={String(rangeDays)}
+          onSelect={(v) => {
+            const next = Number(v);
+            setRangeDays(next);
+            if (groupDays >= next) setGroupDays(1);
+            setOpenMenu(null);
+          }}
+        />
+        <div className="ml-auto flex items-center gap-1">
           <Button
             type="button"
             variant="ghost"
@@ -413,7 +480,7 @@ function UsagePage() {
               else toast.success("Usage refreshed");
             }}
             aria-label="Refresh usage"
-            className="shrink-0 text-muted-foreground"
+            className="h-9 w-9 shrink-0 rounded-full text-muted-foreground"
           >
             <RefreshCw className={`h-4 w-4 ${isFetching ? "animate-spin" : ""}`} />
           </Button>
@@ -423,432 +490,227 @@ function UsagePage() {
             size="icon"
             onClick={exportCsv}
             aria-label="Download usage CSV"
-            className="shrink-0 text-muted-foreground"
+            className="h-9 w-9 shrink-0 rounded-full text-muted-foreground"
           >
             <Download className="h-4 w-4" />
           </Button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_320px]">
-        <div className="min-w-0">
-          <section className="border-b border-border">
-            <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3 px-4 pb-2 pt-5 sm:px-7">
-              <div className="min-w-0">
-                <div className="text-[13px] text-foreground">Total Spend</div>
-                <div className="mt-2 text-xl font-medium tabular-nums text-foreground">
-                  {derived.hasSpend ? fmtUsd(derived.spent, 2) : "No data"}
-                </div>
-              </div>
-              <div className="flex items-center gap-2 text-[13px] text-muted-foreground">
-                <span className="hidden sm:inline">Group by</span>
-                <Dropdown
-                  open={openMenu === "group"}
-                  onToggle={() => setOpenMenu(openMenu === "group" ? null : "group")}
-                  trigger={`${groupDays}d`}
-                  options={[1, 7, 14]
-                    .filter((days) => days <= rangeDays)
-                    .map((days) => ({
-                      value: String(days),
-                      label: `${days} day${days === 1 ? "" : "s"}`,
-                    }))}
-                  value={String(groupDays)}
-                  onSelect={(value) => {
-                    setGroupDays(Number(value));
-                    setOpenMenu(null);
-                  }}
-                />
-              </div>
-            </div>
-            <div className="px-4 pb-5 sm:px-7">
-              {derived.hasSpend ? (
-                <div className="h-72 min-w-0 w-full sm:h-[310px]">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <ComposedChart
-                      data={chartDays}
-                      margin={{ top: 18, right: 6, bottom: 4, left: 0 }}
-                    >
-                      <defs>
-                        <linearGradient id="usageSpent" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="0%" stopColor="#93c5fd" stopOpacity={0.82} />
-                          <stop offset="72%" stopColor="#dbeafe" stopOpacity={0.42} />
-                          <stop offset="100%" stopColor="#ffffff" stopOpacity={0.06} />
-                        </linearGradient>
-                      </defs>
-                      <CartesianGrid stroke="#f1f1f3" strokeDasharray="4 6" vertical={false} />
-                      <XAxis
-                        dataKey="date"
-                        tickLine={false}
-                        axisLine={false}
-                        tickMargin={10}
-                        tick={{ fill: "currentColor", fontSize: 11 }}
-                        tickFormatter={(v: string) =>
-                          new Date(v).toLocaleDateString(undefined, {
-                            month: "short",
-                            day: "numeric",
-                          })
-                        }
-                        minTickGap={24}
-                      />
-                      <YAxis
-                        tickLine={false}
-                        axisLine={false}
-                        width={48}
-                        tick={{ fill: "currentColor", fontSize: 11, textAnchor: "start", dx: -46 }}
-                        tickFormatter={(v: number) => `$${v >= 1 ? v.toFixed(0) : v.toFixed(2)}`}
-                      />
-                      <RTooltip
-                        cursor={{ stroke: "#d4d4d8", strokeDasharray: "4 4" }}
-                        labelFormatter={(v) =>
-                          new Date(String(v)).toLocaleDateString(undefined, {
-                            weekday: "short",
-                            month: "short",
-                            day: "numeric",
-                          })
-                        }
-                        formatter={(value: number, name: string) => [fmtUsd(value, 2), name]}
-                        contentStyle={{
-                          borderRadius: 12,
-                          border: "1px solid #ececef",
-                          padding: "10px 12px",
-                          fontSize: 12,
-                          boxShadow: "0 10px 30px rgba(24,24,27,0.10)",
-                        }}
-                        labelStyle={{ color: "#18181b", fontWeight: 600, marginBottom: 4 }}
-                        itemStyle={{ padding: 0 }}
-                      />
-                      <Area
-                        type="monotone"
-                        dataKey="spent"
-                        name="Spent"
-                        stroke="#18181b"
-                        strokeWidth={2}
-                        fill="url(#usageSpent)"
-                        dot={false}
-                        activeDot={{ r: 4, strokeWidth: 2, stroke: "#fff" }}
-                        animationDuration={900}
-                      />
-                      <Line
-                        type="monotone"
-                        dataKey="earned"
-                        name="Added"
-                        stroke="#a1a1aa"
-                        strokeWidth={1.75}
-                        strokeDasharray="5 6"
-                        dot={false}
-                        activeDot={{ r: 4, strokeWidth: 2, stroke: "#fff" }}
-                        animationDuration={900}
-                      />
-                    </ComposedChart>
-                  </ResponsiveContainer>
-                </div>
-              ) : (
-                <div className="flex h-72 flex-col items-center justify-center text-center sm:h-[310px]">
-                  <span className="flex h-11 w-11 items-center justify-center rounded-lg bg-muted text-muted-foreground">
-                    <ChartColumn className="h-5 w-5" />
-                  </span>
-                  <p className="mt-3 text-sm font-medium text-foreground">No usage data</p>
-                  <p className="mt-2 max-w-sm text-[13px] text-muted-foreground">
-                    The selected date range and group doesn’t have any usage data.
-                  </p>
-                </div>
-              )}
-            </div>
-          </section>
-
-          <div className="flex max-w-full items-center gap-7 overflow-x-auto border-b border-border px-4 text-[13px] sm:px-6">
-            <TabButton active={tab === "capabilities"} onClick={() => setTab("capabilities")}>
-              API capabilities
-            </TabButton>
-            <TabButton active={tab === "categories"} onClick={() => setTab("categories")}>
-              Spend categories
-            </TabButton>
-            <TabButton active={tab === "terminal"} onClick={() => setTab("terminal")}>
-              Terminal usage
-            </TabButton>
-            <TabButton active={tab === "forecast"} onClick={() => setTab("forecast")}>
-              Spend forecast
-            </TabButton>
+      {/* Spend + Tokens / Requests */}
+      <div className="mt-4 grid grid-cols-1 gap-2 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
+        <section className="console-card flex min-h-[420px] flex-col p-4 sm:p-5">
+          <div className="text-[13px] text-muted-foreground">Spend</div>
+          <div className="mt-1 text-[22px] font-medium tabular-nums text-foreground">
+            {fmtUsd(derived.spent, 2)}
           </div>
-
-          {tab === "capabilities" ? (
-            <div className="grid grid-cols-1 gap-4 p-4 sm:grid-cols-2 sm:p-4">
-              <CapabilityCard
-                title="Responses and Chat Completions"
-                start={rangeStartLabel(rangeDays)}
-                end={rangeEndLabel()}
-                items={[
-                  {
-                    color: "bg-chart-1",
-                    label: `${fmtInt(derived.spendRows.length)} requests`,
-                    data: derived.days.map((d) => d.responses),
-                  },
-                  {
-                    color: "bg-chart-2",
-                    label: `${fmtInt(derived.inputTokens)} input tokens`,
-                    data: derived.days.map((d) => d.inputTokens),
-                  },
-                ]}
-              />
-              <CapabilityCard
-                title="Senior reviews"
-                start={rangeStartLabel(rangeDays)}
-                end={rangeEndLabel()}
-                items={[
-                  {
-                    color: "bg-chart-1",
-                    label: `${fmtInt(derived.spendRows.filter((r) => r.stage === "senior_review").length)} requests`,
-                    data: derived.days.map((d) => d.seniorReviews),
-                  },
-                  {
-                    color: "bg-chart-2",
-                    label: `${fmtInt(derived.spendRows.filter((r) => r.stage === "senior_review").reduce((sum, r) => sum + (r.completion_tokens ?? 0), 0))} output tokens`,
-                    data: derived.days.map((d) => d.seniorTokens),
-                  },
-                ]}
-              />
-              <CapabilityCard
-                title="Extension API"
-                start={rangeStartLabel(rangeDays)}
-                end={rangeEndLabel()}
-                items={[
-                  {
-                    color: "bg-chart-1",
-                    label: `${fmtInt(derived.spendRows.filter((r) => r.reason === "extension_api").length)} requests`,
-                    data: derived.days.map((d) => d.extensionRequests),
-                  },
-                ]}
-              />
-              <CapabilityCard
-                title="Credits and top-ups"
-                start={rangeStartLabel(rangeDays)}
-                end={rangeEndLabel()}
-                items={[
-                  {
-                    color: "bg-chart-1",
-                    label: `${fmtInt(derived.earnRows.length)} additions`,
-                    data: derived.days.map((d) => d.additions),
-                  },
-                  {
-                    color: "bg-chart-2",
-                    label: `${fmtUsd(derived.earned, 2)} added`,
-                    data: derived.days.map((d) => d.addedUsd),
-                  },
-                ]}
-              />
-            </div>
-          ) : tab === "categories" ? (
-            <div className="grid gap-8 p-5 md:grid-cols-2">
-              <div>
-                <h2 className="mb-4 text-[13px] text-foreground">  By service</h2>
-                <TypeBreakdown rows={derived.spendRows} />
-              </div>
-              <div>
-                <h2 className="mb-4 text-[13px] text-foreground">       By model</h2>
-                <ModelBreakdown rows={derived.spendRows} />
-              </div>
-            </div>
-          ) : tab === "terminal" ? (
-            <div className="grid grid-cols-1 gap-4 p-4 sm:grid-cols-2">
-              <CapabilityCard
-                title="Terminal chart scans"
-                start={rangeStartLabel(rangeDays)}
-                end={rangeEndLabel()}
-                items={[
-                  {
-                    color: "bg-chart-1",
-                    label: `${fmtInt(derived.terminalScans)} scans`,
-                    data: derived.days.map((day) => day.terminalScans),
-                  },
-                  {
-                    color: "bg-chart-2",
-                    label: `${fmtUsd(derived.terminalScanUsd, 2)} spent`,
-                    data: derived.days.map((day) => day.terminalScanUsd),
-                  },
-                ]}
-              />
-              <CapabilityCard
-                title="Terminal daily fee"
-                start={rangeStartLabel(rangeDays)}
-                end={rangeEndLabel()}
-                items={[
-                  {
-                    color: "bg-chart-1",
-                    label: `${fmtInt(derived.terminalDays)} days charged`,
-                    data: derived.days.map((day) => day.terminalDays),
-                  },
-                  {
-                    color: "bg-chart-2",
-                    label: `${fmtUsd(derived.terminalDailyUsd, 2)} spent`,
-                    data: derived.days.map((day) => day.terminalDailyUsd),
-                  },
-                ]}
-              />
-              <UsageFeature
-                title="Terminal total"
-                description="Chart scans plus the daily Terminal fee in the selected range."
-                value={fmtUsd(terminalTotal, 2)}
-              />
-              <UsageFeature
-                title="Share of your spend"
-                description="How much of everything you spent in this range went to the Terminal."
-                value={derived.spent > 0 ? `${terminalShare.toFixed(0)}%` : "No spend yet"}
-              />
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 gap-4 p-4 sm:grid-cols-2">
-              <UsageFeature
-                title="Average per day"
-                description={`Your spend in the selected range divided by ${rangeDays} days.`}
-                value={fmtUsd(burnPerDay, 2)}
-              />
-              <UsageFeature
-                title="Balance lasts"
-                description={`At your current pace, your ${fmtUsd(data.balance, 2)} balance runs out in about this many days.`}
-                value={runway != null ? `${fmtInt(runway)} days` : "No spend yet"}
-              />
-              <UsageFeature
-                title="Next 30 days"
-                description="Expected spend over the next 30 days if you keep the same pace."
-                value={fmtUsd(burnPerDay * 30, 2)}
-              />
-              <UsageFeature
-                title="This week vs last week"
-                description={`Last 7 days ${fmtUsd(last7, 2)}, the 7 days before ${fmtUsd(prev7, 2)}.`}
-                value={weekChange != null ? `${weekChange >= 0 ? "+" : ""}${weekChange.toFixed(0)}%` : fmtUsd(last7, 2)}
-              />
-              <UsageFeature
-                title="Busiest day"
-                description="The day you spent the most in the selected range."
-                value={topDay ? `${topDay.date.slice(5)} · ${fmtUsd(topDay.spent, 2)}` : "No spend yet"}
-              />
-              <UsageFeature
-                title="Active days"
-                description="Days in the selected range with any spend."
-                value={`${fmtInt(activeDays.length)} / ${rangeDays}`}
-              />
-            </div>
-          )}
-        </div>
-
-        <aside className="border-t border-border xl:border-l xl:border-t-0">
-          <section className="border-b border-border px-4 py-5">
-            <div className="text-[13px] text-foreground">Total tokens</div>
-            <div className="mt-1 text-xl font-medium tabular-nums text-foreground">
+          <StackedBars
+            className="mt-4 flex-1"
+            days={typedDays}
+            keys={API_TYPES.map((t) => t.id)}
+            colors={API_TYPES.map((t) => t.color)}
+            format={(v) => fmtUsd(v, 2)}
+          />
+          <div className="mt-4 flex flex-wrap items-center justify-center gap-x-5 gap-y-1.5 text-[12px]">
+            {API_TYPES.map((t) => (
+              <span key={t.id} className="inline-flex items-center gap-1.5 text-foreground">
+                <span className="h-2 w-2 rounded-[2px]" style={{ background: t.color }} />
+                {t.label}
+                <span className="text-muted-foreground">({fmtUsd(typeTotals[t.id], 2)})</span>
+              </span>
+            ))}
+          </div>
+        </section>
+        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-1">
+          <section className="console-card flex min-h-[200px] flex-col p-4">
+            <div className="text-[13px] text-muted-foreground">Tokens</div>
+            <div className="mt-1 text-[20px] font-medium tabular-nums text-foreground">
               {fmtInt(derived.totalTokens)}
             </div>
-            <div className="mt-5">
-              <MiniLine
-                data={derived.tokenSeries}
-                color="#e11d63"
-                filled={derived.totalTokens > 0}
-              />
-            </div>
+            <StackedBars
+              className="mt-3 flex-1"
+              days={chartDays.map((day, i) => ({ date: day.date, v: tokenBars[i] ?? 0 }))}
+              keys={["v"]}
+              colors={["var(--muted-foreground)"]}
+              baseline="var(--border)"
+              format={(v) => `${fmtInt(v)} tokens`}
+              compact
+            />
           </section>
-
-          <section className="border-b border-border px-4 py-5">
-            <div className="text-[13px] text-foreground">Total requests</div>
-            <div className="mt-1 text-xl font-medium tabular-nums text-foreground">
+          <section className="console-card flex min-h-[200px] flex-col p-4">
+            <div className="text-[13px] text-muted-foreground">Requests</div>
+            <div className="mt-1 text-[20px] font-medium tabular-nums text-foreground">
               {fmtInt(derived.spendRows.length)}
             </div>
-            <div className="mt-5">
-              <MiniLine
-                data={derived.requestSeries}
-                color="#a1a1aa"
-                filled={derived.spendRows.length > 0}
-                dashed
-              />
-            </div>
+            <StackedBars
+              className="mt-3 flex-1"
+              days={chartDays.map((day, i) => ({ date: day.date, v: requestBars[i] ?? 0 }))}
+              keys={["v"]}
+              colors={["var(--muted-foreground)"]}
+              baseline="var(--border)"
+              format={(v) => `${fmtInt(v)} requests`}
+              compact
+            />
           </section>
-
-          <div className="flex items-center gap-7 border-b border-border px-4 text-[13px]">
-            <TabButton active={sideTab === "users"} onClick={() => setSideTab("users")}>
-              Users
-            </TabButton>
-            <TabButton active={sideTab === "services"} onClick={() => setSideTab("services")}>
-              Services
-            </TabButton>
-            <TabButton active={sideTab === "keys"} onClick={() => setSideTab("keys")}>
-              API Keys
-            </TabButton>
-          </div>
-          <section className="px-4 py-5">
-            {sideTab === "users" ? (
-              <div className="space-y-4 text-[12px]">
-                <MetricRow label="Personal requests" value={fmtInt(derived.spendRows.length)} />
-                <MetricRow label="Personal spend" value={fmtUsd(derived.spent, 2)} />
-                <MetricRow label="Average per request" value={fmtUsd(derived.avgCost, 4)} />
-                <MetricRow
-                  label="Last activity"
-                  value={
-                    derived.lastActivity
-                      ? new Date(derived.lastActivity).toLocaleDateString()
-                      : "No activity"
-                  }
-                />
-              </div>
-            ) : sideTab === "services" ? (
-              <TypeBreakdown rows={derived.spendRows} />
-            ) : data.recentExtensionKeys.length === 0 ? (
-              <p className="py-20 text-center text-[13px] text-muted-foreground">
-                There is no usage data for this period and group.
-              </p>
-            ) : (
-              <div className="space-y-4">
-                <div className="divide-y divide-border">
-                  {data.recentExtensionKeys.map((key, index) => {
-                    const usage = derived.keySpend.get(key.id) ?? { spend: 0, requests: 0 };
-                    const pctToday =
-                      data.dailyTokenLimit > 0
-                        ? Math.min(100, (key.tokensToday / data.dailyTokenLimit) * 100)
-                        : 0;
-                    return (
-                      <div key={key.id} className="py-3">
-                        <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
-                          <div className="min-w-0">
-                            <div className="flex items-center gap-2">
-                              <code className="truncate font-mono text-[11.5px] text-foreground">
-                                {key.keyPrefix}••••••••••
-                              </code>
-                              {index === 0 && (
-                                <span className="rounded-full bg-muted px-1.5 py-0.5 text-[9px] font-medium text-foreground">
-                                  Newest
-                                </span>
-                              )}
-                            </div>
-                            <div className="mt-1 truncate text-[10.5px] text-muted-foreground">
-                              {key.name} · {usage.requests} request{usage.requests === 1 ? "" : "s"}{" "}
-                              · {key.revokedAt ? "Revoked" : "Active"}
-                            </div>
-                          </div>
-                          <div className="shrink-0 text-right">
-                            <div className="text-[12px] font-medium tabular-nums text-foreground">
-                              {fmtUsd(usage.spend, 2)}
-                            </div>
-                            <div className="mt-0.5 text-[10px] text-muted-foreground">Spend</div>
-                          </div>
-                        </div>
-                        <div className="mt-2 h-1 w-full overflow-hidden rounded-full bg-muted">
-                          <div
-                            className="h-full rounded-full bg-primary/70"
-                            style={{ width: `${pctToday}%` }}
-                          />
-                        </div>
-                        <div className="mt-1 flex items-center justify-between text-[10px] text-muted-foreground">
-                          <span className="tabular-nums">
-                            {fmtInt(key.tokensToday)} tokens today
-                          </span>
-                          <span className="tabular-nums">{fmtUsd(key.costTodayUsd, 4)}</span>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-          </section>
-        </aside>
+        </div>
       </div>
+
+      {/* Breakdown */}
+      <h2 className="mt-10 text-[18px] font-medium text-foreground">Breakdown</h2>
+      <div className="mt-3 flex flex-wrap items-center gap-1" role="tablist">
+        {API_TYPES.map((t) => (
+          <button
+            key={t.id}
+            type="button"
+            role="tab"
+            aria-selected={breakdown === t.id}
+            onClick={() => setBreakdown(t.id)}
+            className={`rounded-full px-3 py-1.5 text-[14px] transition-colors ${
+              breakdown === t.id
+                ? "console-card font-medium text-foreground"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            {t.label}
+          </button>
+        ))}
+      </div>
+      <section className="console-card mt-3 grid grid-cols-1 gap-6 p-4 sm:p-5 lg:grid-cols-[minmax(0,1.7fr)_minmax(0,1fr)]">
+        <div className="flex min-h-[340px] flex-col">
+          <div className="text-[13px] text-muted-foreground">
+            {API_TYPES.find((t) => t.id === breakdown)?.label}
+          </div>
+          <div className="mt-1 text-[22px] font-medium tabular-nums text-foreground">
+            {fmtUsd(typeTotals[breakdown], 2)}
+          </div>
+          <StackedBars
+            className="mt-4 flex-1"
+            days={typedDays.map((day) => ({ date: day.date, v: day[breakdown] }))}
+            keys={["v"]}
+            colors={[API_TYPES.find((t) => t.id === breakdown)?.color ?? "#f4a261"]}
+            format={(v) => fmtUsd(v, 2)}
+          />
+        </div>
+        <div className="min-w-0">
+          <div className="text-right text-[13px] text-muted-foreground">{shortRange}</div>
+          <table className="mt-10 w-full text-[13px]">
+            <thead>
+              <tr className="border-b border-border text-[12px] text-muted-foreground">
+                <th className="pb-2 text-left font-normal">Type</th>
+                <th className="pb-2 text-right font-normal">Usage</th>
+                <th className="pb-2 text-right font-normal">Spend</th>
+              </tr>
+            </thead>
+            <tbody>
+              {breakdownRows.map(([name, value]) => (
+                <tr key={name}>
+                  <td className="py-2 text-foreground">{name}</td>
+                  <td className="py-2 text-right tabular-nums text-muted-foreground">
+                    {fmtInt(value.count)}
+                  </td>
+                  <td className="py-2 text-right tabular-nums text-foreground">
+                    {fmtSpend(value.spend)}
+                  </td>
+                </tr>
+              ))}
+              <tr>
+                <td className="pt-3 font-medium text-foreground">Total</td>
+                <td />
+                <td className="pt-3 text-right font-medium tabular-nums text-foreground">
+                  {fmtUsd(breakdownTotal, 2)}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+type ApiType = "text" | "terminal" | "alerts" | "other";
+
+const TEXT_REASONS = new Set([
+  "ai_scan",
+  "extension_api",
+  "signal",
+  "ict_narration",
+  "voice_query",
+]);
+
+const API_TYPES: { id: ApiType; label: string; color: string }[] = [
+  { id: "text", label: "Text", color: "#f4a261" },
+  { id: "terminal", label: "Terminal", color: "#2a9d8f" },
+  { id: "alerts", label: "Alerts", color: "#3d5a6c" },
+  { id: "other", label: "Other", color: "#e76f51" },
+];
+
+function StackedBars<K extends string>({
+  days,
+  keys,
+  colors,
+  format,
+  baseline,
+  compact,
+  className = "",
+}: {
+  days: ({ date: string } & Record<K, number>)[];
+  keys: K[];
+  colors: string[];
+  format: (v: number) => string;
+  baseline?: string;
+  compact?: boolean;
+  className?: string;
+}) {
+  const totals = days.map((day) => keys.reduce((sum, k) => sum + (day[k] ?? 0), 0));
+  const max = Math.max(...totals, 0);
+  const labelEvery = Math.max(1, Math.ceil(days.length / (compact ? 3 : 4)));
+  const fmtDate = (iso: string) =>
+    new Date(`${iso}T00:00:00`).toLocaleDateString(undefined, {
+      month: "short",
+      day: "numeric",
+      year: compact ? undefined : "numeric",
+    });
+  return (
+    <div className={`flex min-h-0 flex-col ${className}`}>
+      <div className={`flex flex-1 items-stretch gap-[6px] ${compact ? "min-h-[80px]" : "min-h-[220px]"}`}>
+        {days.map((day, i) => {
+          const total = totals[i] ?? 0;
+          return (
+            <div
+              key={day.date}
+              title={`${fmtDate(day.date)} · ${format(total)}`}
+              className="group flex min-w-0 flex-1 flex-col justify-end rounded-t-[3px] transition-colors hover:bg-foreground/[0.07]"
+            >
+              <div
+                className="flex w-full flex-col-reverse overflow-hidden rounded-t-[3px]"
+                style={{ height: max > 0 ? `${(total / max) * 100}%` : "0%" }}
+              >
+                {keys.map((k, ki) => {
+                  const v = day[k] ?? 0;
+                  if (v <= 0 || total <= 0) return null;
+                  return (
+                    <div
+                      key={k}
+                      style={{ height: `${(v / total) * 100}%`, background: colors[ki] }}
+                    />
+                  );
+                })}
+              </div>
+              <div className="h-[1.5px] w-full" style={{ background: baseline ?? colors[0] }} />
+            </div>
+          );
+        })}
+      </div>
+      {!compact ? (
+        <div className="mt-2 flex gap-[6px] text-[11.5px] text-muted-foreground">
+          {days.map((day, i) => (
+            <div key={day.date} className="min-w-0 flex-1 overflow-visible whitespace-nowrap text-center">
+              {i % labelEvery === 0 || i === days.length - 1 ? fmtDate(day.date) : ""}
+            </div>
+          ))}
+        </div>
+      ) : null}
     </div>
   );
 }
