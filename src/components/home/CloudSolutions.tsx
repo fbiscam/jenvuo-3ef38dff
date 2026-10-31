@@ -50,11 +50,11 @@ export function CloudSolutions() {
     <section className="jenvu-solutions-zoom bg-background py-20">
       <div className="mx-auto max-w-6xl px-6">
         <div className="grid gap-8 md:grid-cols-2 md:items-start">
-          <h2 className="text-balance text-[30px] font-medium leading-[1.15] tracking-tight text-gc-ink md:text-[42px]">
-            Solve your trading problems with Fiber solutions
+          <h2 className="text-3xl font-normal leading-tight text-gc-ink md:text-4xl">
+            Solve your trading problems with <span className="text-gc-yellow">Fiber solutions</span>
           </h2>
           <div>
-            <p className="text-[15px] leading-relaxed text-gc-ink sm:text-[17px]">
+            <p className="text-gc-ink-muted">
               From spotting <Link to="/help" className="text-gc-blue-deep underline">liquidity sweeps</Link> to managing{" "}
               <Link to="/help" className="text-gc-blue-deep underline">trade risk</Link>, Jenvu tools fit{" "}
               <span className="hidden sm:inline">the way you trade Fiber.</span>

@@ -397,10 +397,12 @@ export function CloudBuildWith() {
     <section className="jenvu-build-zoom bg-background">
       <div className="mx-auto grid max-w-[1296px] items-start gap-10 px-5 pb-20 pt-8 sm:px-8 md:grid-cols-2 md:gap-20 md:pb-24">
         <div className="md:sticky md:top-24">
-          <h2 className="text-[26px] font-medium leading-[1.2] tracking-tight text-gc-ink sm:text-[38px] sm:leading-[1.15]">
-            Build with the Fiber platform designed for traders and AI
+          <h2 className="text-[22px] font-normal leading-[1.3] text-gc-ink min-[400px]:text-[24px] sm:text-[36px] sm:leading-[1.25]">
+            <span className="whitespace-nowrap">Build with the Fiber platform</span>
+            <br />
+            <span className="whitespace-nowrap text-gc-blue-deep">designed for traders and AI</span>
           </h2>
-          <p className="mt-4 max-w-[540px] text-[15px] leading-relaxed text-gc-ink sm:mt-5 sm:text-[16px]">
+          <p className="mt-4 max-w-[540px] text-[14px] leading-[1.55] text-gc-ink-muted sm:mt-5 sm:text-[16px] sm:leading-[1.6]">
             Try Jenvu with JX Bot on MetaTrader 5 and the top AI models, plus new sign-ups get $100 free credits and 14 days of Pro access free.
           </p>
           <div className="mt-7 flex flex-wrap items-center gap-7">
