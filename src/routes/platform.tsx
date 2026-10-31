@@ -16,7 +16,6 @@ import {
   MessageSquare,
   PenTool,
   Plug,
-  Search,
   Sparkles,
   Telescope,
   Terminal,
@@ -594,5 +593,3 @@ function PlatformPage() {
   );
 }
 
-// Search icon kept for future header search integration on this page.
-void Search;
