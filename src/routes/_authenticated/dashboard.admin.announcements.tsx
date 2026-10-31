@@ -7,7 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { isAdmin } from "@/lib/admin-messages.functions";
 import { ANNOUNCEMENT_KINDS, type Announcement, type AnnouncementKind } from "@/lib/announcements";
 import { OpsBadge, OpsPage, OpsSection, OpsState, OpsStats, ops } from "@/components/ops/OpsPage";
-import ConfirmDialog from "@/components/ConfirmDialog";
+import { ConfirmDialog } from "@/components/ConfirmDialog";
 
 export const Route = createFileRoute("/_authenticated/dashboard/admin/announcements")({
   head: () => ({
