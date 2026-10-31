@@ -1,6 +1,6 @@
 import { describe, it } from "node:test";
 import { expect } from "./chart/test-expect";
-import { dailyTarget, evaluateIpLicense, licenseLimit, newLicenseKey, LICENSE_KEY_RE } from "./mt5-licenses";
+import { countIpLicenses, dailyTarget, evaluateIpLicense, licenseLimit, newLicenseKey, LICENSE_KEY_RE } from "./mt5-licenses";
 
 const key = "JENV-ABCD-EFGH-JKLM-NPQR";
 const paid = (plan: string) => ({ plan_id: plan, status: "active", is_trial: false, current_period_end: "2099-01-01T00:00:00Z" });
@@ -18,6 +18,23 @@ describe("mt5 licenses", () => {
     expect(licenseLimit("elite")).toBe(2);
     expect(licenseLimit("ultra")).toBe(5);
     expect(licenseLimit("free")).toBe(0);
+  });
+  it("a Pro legacy account-only license leaves its IP slot available", () => {
+    const legacy = [{ mt5_account: "12345678", revoked_at: null }];
+    expect(countIpLicenses(legacy)).toBe(0);
+    expect(countIpLicenses(legacy) < licenseLimit("pro")).toBe(true);
+    const migrated = [{ ...legacy[0], mt5_account: IP }];
+    expect(countIpLicenses(migrated)).toBe(1);
+    expect(countIpLicenses(migrated) < licenseLimit("pro")).toBe(false);
+  });
+  it("counts IP-only and account-bound IPs, but not revoked or empty rows", () => {
+    expect(countIpLicenses([
+      { mt5_account: IP, revoked_at: null },
+      { mt5_account: "198.51.100.7#12345678", revoked_at: null },
+      { mt5_account: "192.0.2.1", revoked_at: "2026-10-01T00:00:00Z" },
+      { mt5_account: null, revoked_at: null },
+      { mt5_account: "12345678", revoked_at: null },
+    ])).toBe(2);
   });
   it("valid IP on paid plan returns targets", () => {
     const r = evaluateIpLicense(IP, IP, "12345678", lic, paid("elite"));

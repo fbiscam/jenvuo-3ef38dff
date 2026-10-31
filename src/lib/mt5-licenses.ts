@@ -63,6 +63,11 @@ export function parseBinding(v: string | null | undefined): { ip: string | null;
 }
 export const formatBinding = (ip: string, account?: string | null) => (account ? `${ip}#${account}` : ip);
 
+/** Only active IP bindings consume an IP slot; legacy account-only rows can be reused. */
+export function countIpLicenses(licenses: { mt5_account: string | null; revoked_at: string | null }[]) {
+  return licenses.filter((l) => !l.revoked_at && parseBinding(l.mt5_account).ip).length;
+}
+
 export type ValidateResult =
   | { valid: true; plan: Mt5PlanId; daily_target: number; monthly_target: number; expires_at: string | null; bind: boolean }
   | { valid: false; reason: "malformed" | "not_found" | "revoked" | "ip_mismatch" | "account_mismatch" | "expired" | "no_plan" };
