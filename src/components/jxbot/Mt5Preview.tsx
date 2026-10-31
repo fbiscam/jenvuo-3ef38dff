@@ -76,9 +76,9 @@ export default function Mt5Preview() {
             <line x1={ENTRY_AT * step} x2={W - AXIS} y1={y(tp)} y2={y(tp)} stroke="#26a69a" strokeDasharray="5 4" />
             <line x1={ENTRY_AT * step} x2={W - AXIS} y1={y(entry)} y2={y(entry)} stroke="#2962ff" />
             <line x1={ENTRY_AT * step} x2={W - AXIS} y1={y(sl)} y2={y(sl)} stroke="#ef5350" strokeDasharray="5 4" />
-            <text x={ENTRY_AT * step + 6} y={y(tp) - 5} fill="#26a69a" fontSize={11}>TP {tp.toFixed(1)}</text>
-            <text x={ENTRY_AT * step + 6} y={y(entry) - 5} fill="#5b8cff" fontSize={11}>BUY 0.02 @ {entry.toFixed(1)}</text>
-            <text x={ENTRY_AT * step + 6} y={y(sl) + 14} fill="#ef5350" fontSize={11}>SL {sl.toFixed(1)}</text>
+            <text x={W - AXIS - 6} textAnchor="end" y={y(tp) - 5} fill="#26a69a" fontSize={11}>TP {tp.toFixed(1)}</text>
+            <text x={W - AXIS - 6} textAnchor="end" y={y(entry) - 5} fill="#5b8cff" fontSize={11}>BUY 0.02 @ {entry.toFixed(1)}</text>
+            <text x={W - AXIS - 6} textAnchor="end" y={y(sl) + 14} fill="#ef5350" fontSize={11}>SL {sl.toFixed(1)}</text>
             <polygon
               points={`${ENTRY_AT * step + step / 2},${y(CANDLES[ENTRY_AT].l) + 8} ${ENTRY_AT * step + step / 2 - 6},${y(CANDLES[ENTRY_AT].l) + 18} ${ENTRY_AT * step + step / 2 + 6},${y(CANDLES[ENTRY_AT].l) + 18}`}
               fill="#2962ff"
