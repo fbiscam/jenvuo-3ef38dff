@@ -69,7 +69,7 @@ function HelpCenterPage() {
   const allOpen = open.length === faqs.length;
 
   return (
-    <div className={`public-cloudflare jenvu-zoom min-h-dvh bg-background text-gc-ink ${SANS} antialiased`}>
+    <div className={`public-cloudflare min-h-dvh bg-background text-gc-ink ${SANS} antialiased`}>
       <SiteHeader />
 
       <div className="mx-auto max-w-[1300px] px-5 sm:px-8">
