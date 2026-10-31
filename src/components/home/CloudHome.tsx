@@ -3,6 +3,7 @@ import * as React from "react";
 import { Link } from "@tanstack/react-router";
 import {
   ArrowRight,
+  ArrowUpRight,
   ChevronLeft,
   ChevronRight,
   ChevronDown,
@@ -27,6 +28,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { AuroraTile } from "@/components/AuroraTile";
+import { pillDark, pillLight, sectionLead, sectionTitle, underlineLink } from "@/components/home/homeStyles";
 import tradeDesk from "@/assets/home/trade-desk.jpg";
 import tradeChart from "@/assets/home/trade-chart.jpg";
 import tradeGold from "@/assets/home/trade-gold.jpg";
