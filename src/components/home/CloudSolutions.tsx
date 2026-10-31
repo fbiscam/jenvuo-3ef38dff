@@ -50,7 +50,7 @@ export function CloudSolutions() {
     <section className="jenvu-solutions-zoom bg-background py-20">
       <div className="mx-auto max-w-6xl px-6">
         <div className="grid gap-8 md:grid-cols-2 md:items-start">
-          <h2 className="text-3xl font-normal leading-tight text-gc-ink md:text-4xl">
+          <h2 className="text-3xl font-medium tracking-tight leading-tight text-gc-ink md:text-4xl">
             Solve your trading problems with <span className="text-gc-yellow">Fiber solutions</span>
           </h2>
           <div>
@@ -177,7 +177,7 @@ export function CloudStartBanner() {
       <div className="mx-auto max-w-[80rem] px-4">
         <div className="relative overflow-hidden rounded-2xl bg-gc-sky">
           <div className="relative z-10 max-w-xl px-8 py-16 md:px-16 md:py-24">
-            <h2 className="text-3xl font-normal leading-tight text-gc-ink md:text-[40px]">
+            <h2 className="text-3xl font-medium tracking-tight leading-tight text-gc-ink md:text-[40px]">
               <span className="text-gc-blue-deep">Let's start trading</span> your Fiber, today
             </h2>
             <div className="mt-8 flex flex-wrap gap-3">

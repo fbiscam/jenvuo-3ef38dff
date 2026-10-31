@@ -397,7 +397,7 @@ export function CloudBuildWith() {
     <section className="jenvu-build-zoom bg-background">
       <div className="mx-auto grid max-w-[1296px] items-start gap-10 px-5 pb-20 pt-8 sm:px-8 md:grid-cols-2 md:gap-20 md:pb-24">
         <div className="md:sticky md:top-24">
-          <h2 className="text-[22px] font-normal leading-[1.3] text-gc-ink min-[400px]:text-[24px] sm:text-[36px] sm:leading-[1.25]">
+          <h2 className="text-[22px] font-medium tracking-tight leading-[1.3] text-gc-ink min-[400px]:text-[24px] sm:text-[36px] sm:leading-[1.25]">
             <span className="whitespace-nowrap">Build with the Fiber platform</span>
             <br />
             <span className="whitespace-nowrap text-gc-blue-deep">designed for traders and AI</span>
@@ -478,7 +478,7 @@ export function CloudProducts() {
     <section className="bg-gc-surface">
       <div className="mx-auto max-w-[1296px] px-5 py-20 sm:px-8 md:py-24">
         <div className="max-w-[720px]">
-          <h2 className="text-[32px] font-normal leading-[1.2] text-gc-ink sm:text-[40px]">
+          <h2 className="text-[32px] font-medium tracking-tight leading-[1.2] text-gc-ink sm:text-[40px]">
             Everything you need to read the Fiber market
           </h2>
           <p className="line-clamp-2 max-sm:line-clamp-none mt-4 text-[17px] leading-[1.6] text-gc-ink-muted">
@@ -543,7 +543,7 @@ export function CloudUseCases() {
   return (
     <section className="bg-background">
       <div className="mx-auto max-w-[1296px] px-5 py-20 sm:px-8 md:py-24">
-        <h2 className="text-center text-[32px] font-normal leading-[1.2] text-gc-ink sm:text-[40px]">
+        <h2 className="text-center text-[32px] font-medium tracking-tight leading-[1.2] text-gc-ink sm:text-[40px]">
           Built for how Fiber traders work
         </h2>
         <div className="mt-10 flex justify-center">
@@ -565,7 +565,7 @@ export function CloudUseCases() {
         </div>
         <div className="mt-12 grid items-center gap-10 md:grid-cols-2">
           <div>
-            <h3 className="text-[28px] font-normal leading-[1.25] text-gc-ink">{current.title}</h3>
+            <h3 className="text-[28px] font-medium tracking-tight leading-[1.25] text-gc-ink">{current.title}</h3>
             <p className="line-clamp-2 max-sm:line-clamp-none mt-4 text-[17px] leading-[1.6] text-gc-ink-muted">{current.body}</p>
             <ul className="mt-6 space-y-3">
               {current.points.map((p) => (
@@ -603,7 +603,7 @@ export function CloudPricing() {
       <div className="mx-auto max-w-[1296px] px-5 py-20 sm:px-8 md:py-24">
         <div className="grid gap-10 md:grid-cols-[1fr_2fr] md:items-start">
           <div>
-            <h2 className="text-[32px] font-normal leading-[1.2] text-gc-ink sm:text-[40px]">Simple, monthly pricing</h2>
+            <h2 className="text-[32px] font-medium tracking-tight leading-[1.2] text-gc-ink sm:text-[40px]">Simple, monthly pricing</h2>
             <p className="line-clamp-2 max-sm:line-clamp-none mt-4 text-[17px] leading-[1.6] text-gc-ink-muted">
               Every plan includes an AI wallet equal to the plan price. Extra AI usage is $3 per million tokens.
             </p>
@@ -644,7 +644,7 @@ export function CloudResources() {
   return (
     <section className="bg-background">
       <div className="mx-auto max-w-[1296px] px-5 py-20 sm:px-8 md:py-24">
-        <h2 className="text-[32px] font-normal leading-[1.2] text-gc-ink sm:text-[40px]">Learn and grow</h2>
+        <h2 className="text-[32px] font-medium tracking-tight leading-[1.2] text-gc-ink sm:text-[40px]">Learn and grow</h2>
         <div className="mt-10 grid gap-5 md:grid-cols-3">
           {RESOURCES.map(({ Icon, tone, title, body, to, cta }) => (
             <Link key={title} to={to} className="group rounded-md border border-gc-line p-7 transition hover:border-gc-blue">
@@ -680,7 +680,7 @@ export function CloudFinalCta() {
       <div className="mx-auto max-w-[1296px] px-5 py-14 sm:px-8 md:py-20">
         <div className="relative grid items-center gap-8 overflow-hidden rounded-3xl bg-gc-blue-soft px-8 py-12 sm:px-12 md:grid-cols-[1.1fr_1fr] md:py-16">
           <div>
-            <h2 className="max-w-[460px] text-[30px] font-normal leading-[1.2] text-gc-ink sm:text-[38px]">
+            <h2 className="max-w-[460px] text-[30px] font-medium tracking-tight leading-[1.2] text-gc-ink sm:text-[38px]">
               <span className="text-gc-blue">Let's start trading</span> your tomorrow, today
             </h2>
             <div className="mt-8 flex flex-wrap items-center gap-3">
