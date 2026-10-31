@@ -431,11 +431,31 @@ function AuthPage() {
       setErrorMsg(parsed.error.issues[0]?.message ?? "Invalid input");
       return;
     }
+    if (needsTurnstile) {
+      setErrorMsg("Please complete the security check.");
+      return;
+    }
     setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({
-      email: parsed.data.email,
-      password: parsed.data.password,
-    });
+    let error: { message: string } | null = null;
+    if (turnstileSiteKey) {
+      // Cloudflare check is on: the server verifies it before signing in.
+      const res = await serverSignIn({
+        data: { email: parsed.data.email, password: parsed.data.password, turnstileToken },
+      }).catch(() => ({ ok: false as const, error: "Sign-in failed. Please try again.", captcha: false }));
+      freshTurnstile();
+      if (res.ok) {
+        const set = await supabase.auth.setSession(res.session);
+        error = set.error ? { message: set.error.message } : null;
+      } else {
+        error = { message: res.error };
+      }
+    } else {
+      const res = await supabase.auth.signInWithPassword({
+        email: parsed.data.email,
+        password: parsed.data.password,
+      });
+      error = res.error ? { message: res.error.message } : null;
+    }
     setLoading(false);
     if (error) {
       const msg = error.message || "";
@@ -482,12 +502,17 @@ function AuthPage() {
       setErrorMsg(parsed.error.issues[0]?.message ?? "Invalid input");
       return;
     }
+    if (needsTurnstile) {
+      setErrorMsg("Please complete the security check.");
+      return;
+    }
     setLoading(true);
     const { getDeviceFingerprint } = await import("@/lib/device-fingerprint");
     const fingerprint = await getDeviceFingerprint();
     const result = await sendSignupOtp({
-      data: { ...parsed.data, siteUrl: window.location.origin, fingerprint },
+      data: { ...parsed.data, siteUrl: window.location.origin, fingerprint, turnstileToken },
     });
+    if (turnstileSiteKey) freshTurnstile();
     setLoading(false);
     if (!result.ok) {
       setErrorMsg(result.error || "Could not send verification code");
