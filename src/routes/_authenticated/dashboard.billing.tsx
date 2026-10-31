@@ -173,72 +173,50 @@ function Billing() {
       <div><h1 className="text-[28px] font-medium tracking-tight text-foreground">Billing</h1><p className="mt-1 text-[14px] text-muted-foreground">Your plan, credit balance, payments and invoices.</p></div>
 
       {/* Tab nav */}
-      <nav className="flex flex-wrap gap-x-6 gap-y-2 border-b border-zinc-200">
+      <nav className="flex flex-wrap gap-2">
         {TABS.map((t) => (
           <button
             key={t}
             type="button"
             onClick={() => setActiveTab(t)}
-            className={`relative pb-3 text-sm transition-colors ${
-              activeTab === t ? "font-medium text-zinc-900" : "text-zinc-500 hover:text-zinc-800"
-            }`}
+            className={`console-pill h-8 px-4 text-[13px] ${activeTab === t ? "console-pill-solid font-medium" : "text-muted-foreground"}`}
           >
             {t}
-            {activeTab === t && (
-              <span className="absolute inset-x-0 -bottom-px h-0.5 bg-zinc-900" />
-            )}
           </button>
         ))}
       </nav>
 
       {activeTab === "Overview" && (
       <div className="space-y-8">
-      {/* Pay as you go + balance */}
-      <section className="space-y-1">
-        <h2 className="text-base font-semibold text-zinc-900">&nbsp; {planLabel}</h2>
-        <div className="flex items-baseline gap-2">
-          <span className="text-4xl font-normal tabular-nums text-zinc-900">${Number(remaining).toFixed(2)}</span>
-        </div>
-        <div className="flex items-center gap-1.5 text-xs text-zinc-500">
-          <Info className="h-3.5 w-3.5 text-zinc-400" />
-          <span>API credit balance</span>
-          <span className="text-zinc-300">·</span>
-          <span>Chat and primary-only analysis cost $0.03; completed senior-reviewed analysis costs $0.20.</span>
-        </div>
-        {trial.active && (
-          <p className="mt-1 text-xs text-amber-600">
-            14-day Pro access ends {trial.endsAtLabel} · {trial.daysLeft > 1 ? `${trial.daysLeft}d left` : trial.hoursLeft > 1 ? `${trial.hoursLeft}h left` : "ends today"} · remaining trial credit becomes $0.00
+      {/* Balance card */}
+      <section className="console-card flex flex-col gap-6 p-6 sm:flex-row sm:items-end sm:justify-between">
+        <div className="space-y-1">
+          <p className="text-[13px] text-muted-foreground">{planLabel} · API credit balance</p>
+          <span className="block text-4xl font-medium tabular-nums tracking-tight text-foreground">${Number(remaining).toFixed(2)}</span>
+          <p className="flex items-center gap-1.5 pt-1 text-xs text-muted-foreground">
+            <Info className="h-3.5 w-3.5" />
+            Chat and primary-only analysis cost $0.03; completed senior-reviewed analysis costs $0.20.
           </p>
-        )}
-      </section>
-
-      {/* Action buttons */}
-      <section className="flex flex-wrap items-center gap-3">
-        <Link
-          to="/dashboard/pay"
-          search={{ purchase: "credits" }}
-          className="rounded-lg border border-zinc-200 bg-white px-5 py-2.5 text-sm font-medium text-black hover:bg-zinc-50 transition-colors"
-        >
-          Buy credits
-        </Link>
-        {plan ? (
-          <Button
-            type="button"
-            variant="secondary"
-            onClick={() => setCancelDialogOpen(true)}
-            className="h-10 min-w-36 border border-border px-5"
-          >
-            Cancel plan
-          </Button>
-        ) : (
-          <Button asChild variant="secondary" className="h-10 min-w-36 border border-border px-5">
-          <Link
-            to="/pricing"
-          >
-            Choose a plan
+          {trial.active && (
+            <p className="pt-1 text-xs text-amber-600">
+              14-day Pro access ends {trial.endsAtLabel} · {trial.daysLeft > 1 ? `${trial.daysLeft}d left` : trial.hoursLeft > 1 ? `${trial.hoursLeft}h left` : "ends today"} · remaining trial credit becomes $0.00
+            </p>
+          )}
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <Link to="/dashboard/pay" search={{ purchase: "credits" }} className="console-pill console-pill-solid inline-flex h-9 items-center px-5 text-sm font-medium">
+            Add credits
           </Link>
-          </Button>
-        )}
+          {plan ? (
+            <button type="button" onClick={() => setCancelDialogOpen(true)} className="console-pill inline-flex h-9 items-center px-5 text-sm font-medium">
+              Cancel plan
+            </button>
+          ) : (
+            <Link to="/pricing" className="console-pill inline-flex h-9 items-center px-5 text-sm font-medium">
+              Choose a plan
+            </Link>
+          )}
+        </div>
       </section>
 
       <AlertDialog open={cancelDialogOpen} onOpenChange={(open) => !cancellingPlan && setCancelDialogOpen(open)}>
