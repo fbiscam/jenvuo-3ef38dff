@@ -361,7 +361,7 @@ function ExtensionPage() {
                       {k.last_used_at ? new Date(k.last_used_at).toLocaleDateString() : "Never"}
                     </td>
                     <td className="py-3.5 pr-4">
-                      <span className="console-badge">{k.revoked_at ? "Revoked" : "Active"}</span>
+                      <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[12px] font-medium ${k.revoked_at ? "bg-red-500/10 text-red-600 dark:text-red-400" : "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"}`}><span className={`h-1.5 w-1.5 rounded-full ${k.revoked_at ? "bg-red-500" : "bg-emerald-500"}`} />{k.revoked_at ? "Revoked" : "Active"}</span>
                     </td>
                     <td className="py-3.5 text-right">
                       <button
