@@ -114,7 +114,7 @@ export const Route = createFileRoute("/auth")({
 
 
 const MONO = "font-sans";
-const SANS = "font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif]";
+const SANS = "font-['Google_Sans_Flex','Google_Sans','Product_Sans','Poppins',system-ui,sans-serif]";
 
 function AuthPage() {
   const navigate = useNavigate();
@@ -941,7 +941,7 @@ function AuthPage() {
                   ) : mode === "signup" ? (
                     otpStep ? (
                       <form onSubmit={verifyOtp} className="mt-4 space-y-3">
-                        <div className="rounded-xl border border-zinc-200 bg-zinc-50 px-3 sm:px-4 py-3 text-[13px] sm:text-[14px] text-zinc-700" style={{ fontFamily: "'Google Sans Flex','Google Sans',sans-serif" }}>
+                        <div className="rounded-xl border border-zinc-200 bg-zinc-50 px-3 sm:px-4 py-3 text-[13px] sm:text-[14px] text-zinc-700" style={{ fontFamily: "'Google Sans Flex','Google Sans Flex','Google Sans',sans-serif" }}>
                           <p className="leading-relaxed">
                             <span className="sm:hidden">Code sent to <span className="font-semibold text-zinc-900 break-all">{email}</span>.<br />Enter it to continue.</span>
                             <span className="hidden sm:inline">We sent a 6-digit code to <span className="font-semibold text-zinc-900">{email}</span>. Enter it below to activate your desk.</span>

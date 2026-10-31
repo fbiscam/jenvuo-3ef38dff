@@ -42,7 +42,7 @@ export const Route = createFileRoute("/download")({
 });
 
 const MONO = "font-sans";
-const SANS = "font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif]";
+const SANS = "font-['Google_Sans_Flex','Google_Sans','Product_Sans','Poppins',system-ui,sans-serif]";
 
 // Placeholder download URLs — wire real links here when builds are ready.
 const DOWNLOADS = {

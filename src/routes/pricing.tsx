@@ -12,7 +12,7 @@ import openAiLogo from "@/assets/openai-logo.png";
 import claudeLogo from "@/assets/claude-logo.png";
 import { AuroraTile } from "@/components/AuroraTile";
 
-const SANS = "font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif]";
+const SANS = "font-['Google_Sans_Flex','Google_Sans','Product_Sans','Poppins',system-ui,sans-serif]";
 const LINK = "font-medium text-gc-blue underline underline-offset-2 hover:text-gc-blue-hover";
 
 export const FAQ = [

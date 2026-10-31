@@ -48,7 +48,7 @@ export default function SiteHeader() {
         <div className="relative mx-auto flex h-[60px] max-w-[1280px] items-center gap-3 px-5 lg:grid lg:grid-cols-[1fr_auto_1fr]">
           <Link to="/" className="flex min-w-0 shrink-0 items-center gap-2 justify-self-start">
             <JenvuMark className="h-6 w-6 shrink-0 text-foreground" />
-            <span className="truncate text-[22px] leading-none tracking-tight text-foreground" style={{ fontFamily: "\"Google Sans\", \"Product Sans\", \"DM Sans\", system-ui, sans-serif", fontWeight: 500 }}>Jenvu</span>
+            <span className="truncate text-[22px] leading-none tracking-tight text-foreground" style={{ fontFamily: "\"Google Sans Flex\", \"Google Sans\", \"Product Sans\", \"DM Sans\", system-ui, sans-serif", fontWeight: 500 }}>Jenvu</span>
           </Link>
 
           {searchOpen ? (
@@ -138,7 +138,7 @@ export default function SiteHeader() {
             <div className="flex items-center justify-between px-5 py-3">
               <Link to="/" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-2.5">
                 <JenvuMark className="h-6 w-6 text-foreground" />
-                <span className="text-[20px] tracking-tight text-foreground" style={{ fontFamily: "\"Google Sans\",\"Product Sans\",\"DM Sans\",system-ui,sans-serif", fontWeight: 500 }}>Jenvu</span>
+                <span className="text-[20px] tracking-tight text-foreground" style={{ fontFamily: "\"Google Sans Flex\", \"Google Sans\",\"Product Sans\",\"DM Sans\",system-ui,sans-serif", fontWeight: 500 }}>Jenvu</span>
               </Link>
               <button
                 type="button"

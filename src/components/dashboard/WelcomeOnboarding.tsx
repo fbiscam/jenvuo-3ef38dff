@@ -13,7 +13,7 @@ const OPTIONS = [
   { id: "jx_bot", title: "Automate Fiber with JX Bot on MT5", desc: "Run Jenvu's Expert Advisor on your MetaTrader 5 account.", img: botImg },
 ] as const;
 
-const FONT = { fontFamily: "'Google Sans Flex','Google Sans',sans-serif" };
+const FONT = { fontFamily: "'Google Sans Flex','Google Sans Flex','Google Sans',sans-serif" };
 const NEW_ACCOUNT_MS = 3 * 24 * 60 * 60 * 1000;
 
 /** Two-step onboarding shown once to newly signed-up users; the choice is saved on the account. */

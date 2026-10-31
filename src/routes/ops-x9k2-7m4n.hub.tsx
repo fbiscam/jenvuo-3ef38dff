@@ -91,7 +91,7 @@ function OpsHub() {
     await router.navigate({ to: "/ops-x9k2-7m4n" });
   }
 
-  const SANS = "font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif]";
+  const SANS = "font-['Google_Sans_Flex','Google_Sans','Product_Sans','Poppins',system-ui,sans-serif]";
 
   if (!ready) {
     return <div className="min-h-dvh w-full bg-background" />;

@@ -3,7 +3,7 @@ import { ArrowUpRight, BookOpen, Headphones, Sparkles, type LucideIcon } from "l
 import BlogFooter from "@/components/BlogFooter";
 import SiteHeader from "@/components/SiteHeader";
 
-const SANS = "font-['Google_Sans','Product_Sans','Poppins',system-ui,sans-serif]";
+const SANS = "font-['Google_Sans_Flex','Google_Sans','Product_Sans','Poppins',system-ui,sans-serif]";
 const AURORAS = ["var(--platform-aurora-1)", "var(--platform-aurora-2)", "var(--platform-aurora-3)"];
 
 /** Same pill buttons as the Platform page (blue to match the homepage). */
