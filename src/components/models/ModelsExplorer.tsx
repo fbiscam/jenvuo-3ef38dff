@@ -195,7 +195,7 @@ export default function ModelsExplorer({ apiHref = "/dashboard/api" }: { apiHref
               <li key={m.id}>
                 <button type="button" onClick={() => pick(m.id)} className="flex w-full items-center gap-3.5 rounded-md px-1 py-3.5 text-left transition-colors hover:bg-gc-canvas">
                   <span className="w-5 text-center text-sm font-medium tabular-nums text-gc-ink-muted">{i + 1}</span>
-                  <ModelLogo m={m} size="lg" />
+                  <ModelLogo m={m} />
                   <span className="min-w-0 flex-1">
                     <span className="block truncate text-[15px] font-semibold text-gc-ink">{m.name}</span>
                     <span className="block text-sm text-gc-ink-muted">{PROVIDERS[m.provider].label}</span>
