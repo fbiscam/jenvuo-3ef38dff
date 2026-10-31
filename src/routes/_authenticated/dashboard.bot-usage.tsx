@@ -1,3 +1,4 @@
+import { ConsoleSelect } from "@/components/dashboard/ConsoleSelect";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -33,6 +34,7 @@ const ONLINE_MS = 3 * 60 * 1000;
 function BotUsagePage() {
   const load = useServerFn(getBotUsage);
   const [account, setAccount] = useState("all");
+  const [accountMenuOpen, setAccountMenuOpen] = useState(false);
   const removeAccount = useServerFn(deleteBotAccount);
   const qc = useQueryClient();
   const [deleting, setDeleting] = useState<string | null>(null);
@@ -103,34 +105,31 @@ function BotUsagePage() {
 
 
   return (
-    <div className="mx-auto w-full max-w-[1180px] pb-10 text-foreground">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <h1 className="text-[28px] font-medium tracking-tight text-foreground">Bot Usage</h1>
-          <p className="mt-1 text-[14px] text-muted-foreground">
-            Profit, trades and ON/OFF activity across your MT5 accounts.
-          </p>
-        </div>
+    <div className="mx-auto w-full max-w-[1100px] pb-10 text-foreground">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <h1 className="text-[28px] font-medium tracking-tight text-foreground sm:text-[32px]">Bot Usage</h1>
         <UsageTabs active="bot" />
       </div>
       <div className="mt-6 mb-4 flex flex-wrap items-center gap-2">
-          <select
+          <ConsoleSelect
+            open={accountMenuOpen}
+            onToggle={() => setAccountMenuOpen((v) => !v)}
+            label="Account"
+            valueLabel={account === "all" ? "All" : `MT5 ${account}`}
+            ariaLabel="MT5 account"
+            options={[{ value: "all", label: "All MT5 accounts" }, ...view.accounts.map((a) => ({ value: a, label: `MT5 ${a}` }))]}
             value={account}
-            onChange={(e) => setAccount(e.target.value)}
-            className="h-9 rounded-full border border-border bg-transparent px-4 text-[13px] text-foreground outline-none"
-            aria-label="MT5 account"
-          >
-            <option value="all">All MT5 accounts</option>
-            {view.accounts.map((a) => (
-              <option key={a} value={a}>MT5 {a}</option>
-            ))}
-          </select>
+            onSelect={(v) => {
+              setAccount(v);
+              setAccountMenuOpen(false);
+            }}
+          />
           <Button
             type="button"
             variant="ghost"
             size="icon"
             aria-label="Refresh bot usage"
-            className="text-muted-foreground"
+            className="ml-auto h-9 w-9 rounded-full text-muted-foreground"
             onClick={async () => {
               const r = await refetch();
               if (r.isError) toast.error("Bot usage could not be refreshed");

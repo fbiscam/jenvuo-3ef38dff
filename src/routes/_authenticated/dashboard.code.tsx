@@ -63,7 +63,7 @@ function CodePage() {
     setTimeout(() => setCopied(false), 1500);
   };
   return (
-    <section className="mx-auto w-full max-w-[1100px] px-4 py-8 sm:px-6">
+    <section className="mx-auto w-full max-w-[1100px] pb-10">
       <h1 className="text-[28px] font-medium text-foreground">Code</h1>
       <p className="mt-1 text-[15px] text-muted-foreground">Call Jenvu models from your own code.</p>
 
