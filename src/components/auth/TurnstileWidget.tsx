@@ -69,6 +69,7 @@ export function TurnstileWidget({
       cancelled = true;
       if (widgetId.current && window.turnstile) window.turnstile.remove(widgetId.current);
       widgetId.current = null;
+      cb.current(null);
     };
   }, [siteKey]);
 
