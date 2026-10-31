@@ -1571,3 +1571,70 @@ body[data-scroll-locked] { margin-right: 0 !important; padding-right: 0 !importa
 pre, pre *, code, kbd, samp {
   font-family: "JetBrains Mono", ui-monospace, monospace;
 }
+
+/* ====== Dashboard: Platform look (blue pill actions, soft cards, bolder titles) ====== */
+.jenvu-zoom-dashboard main button.rounded-full,
+.jenvu-zoom-dashboard main a.rounded-full,
+.jenvu-zoom-dashboard main .dash-pill {
+  border-radius: 9999px !important;
+}
+.jenvu-zoom-dashboard main button.bg-zinc-900,
+.jenvu-zoom-dashboard main a.bg-zinc-900,
+.jenvu-zoom-dashboard main button.bg-black,
+.jenvu-zoom-dashboard main a.bg-black,
+.jenvu-zoom-dashboard main button.bg-gc-blue-deep,
+.jenvu-zoom-dashboard main a.bg-gc-blue-deep {
+  background-color: var(--gc-blue) !important;
+  color: var(--gc-on-blue) !important;
+  border-radius: 9999px !important;
+  border-color: transparent !important;
+  box-shadow: 0 1px 2px color-mix(in oklab, var(--gc-blue) 30%, transparent) !important;
+  transition: background-color .15s ease, box-shadow .15s ease;
+}
+.jenvu-zoom-dashboard main button.bg-zinc-900:hover:not(:disabled),
+.jenvu-zoom-dashboard main a.bg-zinc-900:hover,
+.jenvu-zoom-dashboard main button.bg-black:hover:not(:disabled),
+.jenvu-zoom-dashboard main a.bg-black:hover,
+.jenvu-zoom-dashboard main button.bg-gc-blue-deep:hover:not(:disabled),
+.jenvu-zoom-dashboard main a.bg-gc-blue-deep:hover {
+  background-color: var(--gc-blue-hover) !important;
+  box-shadow: 0 6px 16px -6px color-mix(in oklab, var(--gc-blue) 55%, transparent) !important;
+}
+.jenvu-zoom-dashboard main button.bg-zinc-900 *,
+.jenvu-zoom-dashboard main a.bg-zinc-900 * {
+  color: inherit !important;
+}
+/* Clickable cards lift like Platform tiles */
+.jenvu-zoom-dashboard main a.border.rounded-xl,
+.jenvu-zoom-dashboard main a.border.rounded-2xl,
+.jenvu-zoom-dashboard main a.border.rounded-lg {
+  transition: transform .18s ease, box-shadow .18s ease;
+}
+.jenvu-zoom-dashboard main a.border.rounded-xl:hover,
+.jenvu-zoom-dashboard main a.border.rounded-2xl:hover,
+.jenvu-zoom-dashboard main a.border.rounded-lg:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px -14px rgba(60,64,67,0.35) !important;
+}
+.jenvu-zoom-dashboard main h1 {
+  font-weight: 600 !important;
+  letter-spacing: -0.02em !important;
+}
+.jenvu-zoom-dashboard main input:focus-visible,
+.jenvu-zoom-dashboard main select:focus-visible,
+.jenvu-zoom-dashboard main textarea:focus-visible {
+  border-color: var(--gc-blue) !important;
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--gc-blue) 18%, transparent) !important;
+  outline: none !important;
+}
+/* Welcome hero: keep its own radius and no forced card border */
+.jenvu-zoom-dashboard main .dash-hero-card,
+.jenvu-zoom-dashboard main .dash-glass {
+  border: none !important;
+}
+.jenvu-zoom-dashboard main .dash-tile {
+  border-radius: 20px !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  .jenvu-zoom-dashboard main a.border:hover { transform: none; }
+}
