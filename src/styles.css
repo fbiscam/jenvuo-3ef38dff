@@ -2059,3 +2059,25 @@ html body .jenvu-zoom-dashboard main :is(.console-icon-chip, .console-card > svg
     padding-top: 62px;
   }
 }
+
+/* Homepage showcase: animated Chat/Build/Bot/Voice tiles. */
+@keyframes sc-dot { 0%, 80%, 100% { opacity: .25; transform: translateY(0); } 40% { opacity: 1; transform: translateY(-3px); } }
+@keyframes sc-scroll { from { transform: translateY(0); } to { transform: translateY(-50%); } }
+@keyframes sc-progress { from { width: 0; } to { width: 100%; } }
+@keyframes sc-bar { 0%, 100% { transform: scaleY(.4); } 50% { transform: scaleY(1); } }
+@keyframes sc-ripple { from { transform: scale(1); opacity: .9; } to { transform: scale(1.45); opacity: 0; } }
+@keyframes sc-orb { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.04); } }
+.sc-dot { animation: sc-dot 1.2s ease-in-out infinite; }
+.sc-scroll { animation: sc-scroll 18s linear infinite; }
+.sc-progress { animation: sc-progress 4s ease-in-out infinite; }
+.sc-bar { animation: sc-bar 0.9s ease-in-out infinite; transform-origin: center; }
+.sc-ripple { animation: sc-ripple 3.3s ease-out infinite; }
+.sc-orb { animation: sc-orb 3.3s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) { .sc-dot, .sc-scroll, .sc-progress, .sc-bar, .sc-ripple, .sc-orb { animation: none; } }
+
+/* Desktop dashboard: side menu 7% smaller, page area 15% smaller (both centred as before). */
+@media (min-width: 1024px) {
+  .jenvu-zoom-dashboard .dashboard-sidebar-root.console-sidebar { zoom: 0.93; }
+  .jenvu-zoom-dashboard .dashboard-right-col.lg\:pl-\[260px\] { padding-left: calc(260px * 0.93); }
+  .jenvu-zoom-dashboard main.dash-page { zoom: 0.765 !important; }
+}

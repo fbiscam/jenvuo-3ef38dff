@@ -113,70 +113,139 @@ function TileFoot({ label, light = false, link = true }: { label: string; light?
 }
 const tile = "group relative block overflow-hidden rounded-[18px] transition hover:-translate-y-0.5";
 
+/* Loops 0..count, one step every `ms`; with reduced motion everything stays shown. */
+function useLoopStep(count: number, ms: number) {
+  const [step, setStep] = React.useState(count);
+  React.useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    setStep(0);
+    const id = window.setInterval(() => setStep((s) => (s >= count + 2 ? 0 : s + 1)), ms);
+    return () => window.clearInterval(id);
+  }, [count, ms]);
+  return step;
+}
+const reveal = (on: boolean) => `transition-all duration-500 ${on ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"}`;
+
+function Dots() {
+  return (
+    <span className="inline-flex gap-1">
+      {[0, 1, 2].map((i) => (
+        <span key={i} className="sc-dot h-1.5 w-1.5 rounded-full bg-foreground/50" style={{ animationDelay: `${i * 160}ms` }} />
+      ))}
+    </span>
+  );
+}
+
+const CHAT = [
+  { me: true, t: "Why did gold sweep the Asian low?" },
+  { me: false, t: "Sell-side liquidity rested under the range, so price took it before the London open." },
+  { me: true, t: "Explain an FVG simply" },
+  { me: false, t: "A fast move leaves a gap between three candles — price often comes back to fill part of it." },
+];
+function ChatTile() {
+  const step = useLoopStep(CHAT.length, 1500);
+  const typing = step < CHAT.length && !CHAT[step]?.me;
+  return (
+    <Link to="/dashboard" className={`${tile} h-[290px] bg-ent-ivory p-5 text-[14px] leading-snug`}>
+      <div className="flex flex-col gap-3">
+        {CHAT.map((m, i) => (
+          <div key={i} className={`${reveal(i < step)} rounded-2xl bg-ent-bubble px-4 py-2.5 ${m.me ? "ml-auto w-fit max-w-[75%] text-foreground" : "w-[88%] text-foreground/80"}`}>{m.t}</div>
+        ))}
+        {typing && <div className="w-fit rounded-2xl bg-ent-bubble px-4 py-3"><Dots /></div>}
+      </div>
+      <TileFoot label="Chat" />
+    </Link>
+  );
+}
+
+const CODE: React.ReactNode[] = [
+  <div className="opacity-50">▸ Thinking...</div>,
+  <div><span className="text-ent-ide-green">• grep</span> "fvgZone" src/ <span className="opacity-40">no matches</span></div>,
+  <div><span className="text-ent-ide-green">• read_file</span> src/api/signals.ts <span className="opacity-40">42 lines</span></div>,
+  <div className="flex justify-between opacity-60"><span>| Scan signal handlers</span><span className="text-ent-ide-green">[done]</span></div>,
+  <div className="opacity-50">◆ Thought for 2.8s</div>,
+  <div className="pl-3"><b>Edit</b> <span className="text-ent-ide-green">src/api/signals.ts</span></div>,
+  <div><span className="opacity-40">14 </span>export async function handler(req) {"{"}</div>,
+  <div className="bg-ent-ide-add"><span className="opacity-40">15 </span>+ await rateLimit(req, {"{"} max: 100 {"}"});</div>,
+  <div className="bg-ent-ide-del"><span className="opacity-40">33 </span>- if (!data.symbol) throw Error;</div>,
+  <div className="bg-ent-ide-add"><span className="opacity-40">33 </span>+ return schema.parse(data);</div>,
+  <div><span className="text-ent-ide-green">• run</span> npm test <span className="opacity-40">12 passed</span></div>,
+  <div className="opacity-60">✓ Ready to ship</div>,
+];
+function BuildTile() {
+  return (
+    <Link to="/docs" className={`${tile} h-[290px] bg-ent-ide font-mono text-[12px] leading-[1.7] text-ent-ide-fg`}>
+      <div className="flex items-center gap-2 px-4 py-3">
+        <span className="h-2.5 w-2.5 rounded-full bg-gc-red" /><span className="h-2.5 w-2.5 rounded-full bg-gc-yellow" /><span className="h-2.5 w-2.5 rounded-full bg-gc-green" />
+        <span className="ml-4 opacity-60">projects/main</span>
+        <span className="ml-auto flex items-center gap-1.5 opacity-70"><span className="h-2 w-10 overflow-hidden rounded-sm bg-ent-ide-fg/20"><span className="sc-progress block h-2 rounded-sm bg-ent-ide-fg" /></span></span>
+      </div>
+      <div className="relative h-[200px] overflow-hidden px-4">
+        <div className="sc-scroll">
+          {[...CODE, ...CODE].map((l, i) => <React.Fragment key={i}>{l}</React.Fragment>)}
+        </div>
+      </div>
+      <TileFoot label="Build" light />
+    </Link>
+  );
+}
+
+function BotTile() {
+  const step = useLoopStep(4, 1400);
+  return (
+    <Link to="/dashboard" className={`${tile} h-[290px] bg-ent-ivory p-5 text-[14px] leading-snug`}>
+      <div className={`${reveal(step >= 1)} text-[12px] text-muted-foreground`}>✓ Flagged → 1 alert · XAU/USD $2,412 twice</div>
+      <div className={`${reveal(step >= 2)} mt-4 w-[88%] rounded-2xl bg-ent-bubble px-4 py-3 text-foreground`}>price touched $2,412 at 09:00 and again at 13:30. double top, or two separate tests?</div>
+      <div className={`${reveal(step >= 4)} mt-4 ml-auto w-fit rounded-2xl bg-foreground px-4 py-2.5 text-background`}>two tests, london held the level</div>
+      <div className="mt-6 flex items-center gap-3 text-[12px] text-muted-foreground">
+        <span className="flex h-8 w-8 items-center justify-center gap-1 rounded-full bg-ent-orange">
+          {[0, 1, 2].map((i) => <span key={i} className="sc-bar h-3 w-1 rounded-full bg-background" style={{ animationDelay: `${i * 150}ms` }} />)}
+        </span>
+        {step >= 4 ? "Done" : "Thinking"}
+      </div>
+      <TileFoot label="Bot" />
+    </Link>
+  );
+}
+
+function VoiceTile() {
+  return (
+    <Link to="/dashboard" className={`${tile} flex h-[290px] items-center justify-center bg-ent-ivory`}>
+      <span className="relative flex h-[190px] w-[190px] items-center justify-center">
+        {[0, 1, 2].map((i) => (
+          <span key={i} className="sc-ripple absolute inset-0 rounded-full border border-foreground/15" style={{ animationDelay: `${i * 1.1}s` }} />
+        ))}
+        <span className="sc-orb h-full w-full rounded-full bg-background shadow-[0_0_60px_rgba(0,0,0,0.06)] dark:bg-foreground dark:shadow-[0_0_80px_rgba(255,255,255,0.18)]" />
+        <span className="absolute flex items-end gap-1">
+          {[0, 1, 2, 3, 4].map((i) => <span key={i} className="sc-bar h-6 w-1.5 rounded-full bg-foreground/70 dark:bg-background/70" style={{ animationDelay: `${i * 120}ms` }} />)}
+        </span>
+      </span>
+      <TileFoot label="Voice" />
+    </Link>
+  );
+}
+
 export function EntShowcase() {
   return (
     <section className="px-5 pb-20">
       <div className="mx-auto grid max-w-[1140px] gap-3 md:grid-cols-3">
-        {/* Chat */}
-        <Link to="/dashboard" className={`${tile} h-[290px] bg-ent-ivory p-5 text-[14px] leading-snug`}>
-          <div className="mt-[-18px] w-[85%] rounded-2xl bg-ent-bubble px-4 py-2.5 text-foreground/80">the core into a singularity.</div>
-          <div className="mt-3 ml-auto w-fit max-w-[70%] rounded-2xl bg-ent-bubble px-4 py-2.5 text-foreground">Why did gold sweep the Asian low?</div>
-          <div className="mt-3 w-[85%] rounded-2xl bg-ent-bubble px-4 py-2.5 text-foreground/80">Sell-side liquidity rested under the range, so price took it before the <span className="text-foreground">London open</span>.</div>
-          <div className="mt-3 ml-auto w-fit max-w-[70%] rounded-2xl bg-ent-bubble px-4 py-2.5 text-foreground">Explain an FVG simply</div>
-          <div className="mt-3 w-[85%] rounded-2xl bg-ent-bubble px-4 py-2.5 text-foreground/80">A fast move leaves a gap between three candles — <span className="text-foreground">price often comes back</span> to fill part of it.</div>
-          <TileFoot label="Chat" />
-        </Link>
-        {/* Build */}
-        <Link to="/docs" className={`${tile} h-[290px] bg-ent-ide font-mono text-[12px] leading-[1.7] text-ent-ide-fg`}>
-          <div className="flex items-center gap-2 px-4 py-3">
-            <span className="h-2.5 w-2.5 rounded-full bg-gc-red" /><span className="h-2.5 w-2.5 rounded-full bg-gc-yellow" /><span className="h-2.5 w-2.5 rounded-full bg-gc-green" />
-            <span className="ml-4 opacity-60">projects/main</span>
-            <span className="ml-auto flex items-center gap-1.5 opacity-70"><span className="h-2 w-10 rounded-sm bg-ent-ide-fg/20"><span className="block h-2 w-2 rounded-sm bg-ent-ide-fg" /></span>16.15%</span>
-          </div>
-          <div className="px-4">
-            <div className="opacity-50">▸ Thinking...</div>
-            <div><span className="text-ent-ide-green">• grep</span> "fvgZone" src/ <span className="opacity-40">no matches</span></div>
-            <div><span className="text-ent-ide-green">• read_file</span> src/api/signals.ts <span className="opacity-40">42 lines</span></div>
-            <div className="flex justify-between opacity-60"><span>| Scan signal handlers</span><span className="text-ent-ide-green">[done]</span></div>
-            <div className="opacity-50">◆ Thought for 2.8s</div>
-            <div className="mt-1 pl-3"><span className="text-foreground">◆</span> <b>Edit</b> <span className="text-ent-ide-green">src/api/signals.ts</span></div>
-            <div><span className="opacity-40">14 </span>export async function handler(req) {"{"}</div>
-            <div className="bg-ent-ide-add"><span className="opacity-40">15 </span>  await rateLimit(req, {"{"} max: 100 {"}"});</div>
-            <div className="bg-ent-ide-del"><span className="opacity-40">33 </span>  if (!data.symbol) throw Error;</div>
-            <div className="bg-ent-ide-add"><span className="opacity-40">33 </span>  return schema.parse(data);</div>
-          </div>
-          <TileFoot label="Build" light />
-        </Link>
-        {/* Bot */}
-        <Link to="/dashboard" className={`${tile} h-[290px] bg-ent-ivory p-5 text-[14px] leading-snug`}>
-          <div className="text-[12px] text-muted-foreground">✓ Flagged → 1 alert · XAU/USD $2,412 twice</div>
-          <div className="mt-4 w-[88%] rounded-2xl bg-ent-bubble px-4 py-3 text-foreground">price touched $2,412 at 09:00 and again at 13:30. double top, or two separate tests?</div>
-          <div className="mt-4 ml-auto w-fit rounded-2xl bg-foreground px-4 py-2.5 text-background">two tests, london held the level</div>
-          <div className="mt-6 flex items-center gap-3 text-[12px] text-muted-foreground">
-            <span className="flex h-8 w-8 items-center justify-center gap-1 rounded-full bg-ent-orange">
-              <span className="h-3 w-1 rounded-full bg-background" /><span className="h-3 w-1 rounded-full bg-background" />
-            </span>
-            Thinking
-          </div>
-          <TileFoot label="Bot" />
-        </Link>
+        <ChatTile />
+        <BuildTile />
+        <BotTile />
       </div>
       <div className="mx-auto mt-3 grid max-w-[1140px] gap-3 md:grid-cols-[2fr_1fr_3fr]">
         <Link to="/insights" className={`${tile} h-[290px]`}>
-          <img src={bentoImagine} alt="Iced coffee beside a booklet called Gold Market Notes" width={1024} height={768} loading="lazy" className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
+          <img src={bentoImagine} alt="Gold bar on a marble desk beside an espresso and a notebook" width={1280} height={960} loading="lazy" className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
           <span className="absolute bottom-4 left-5 text-[14px] text-gc-on-night">Imagine</span>
         </Link>
         <Link to="/insights" className={`${tile} grid h-[290px] grid-rows-2 gap-1`}>
-          <img src={bentoFox} alt="Animated fox studying a gold chart" width={896} height={752} loading="lazy" className="h-full w-full rounded-[18px] object-cover" />
+          <img src={bentoFox} alt="Animated owl with headphones studying a gold chart" width={1152} height={960} loading="lazy" className="h-full w-full rounded-[18px] object-cover" />
           <div className="relative">
-            <img src={bentoCar} alt="Green vintage roadster with a gold stripe" width={896} height={752} loading="lazy" className="h-full w-full rounded-[18px] object-cover" />
+            <img src={bentoCar} alt="Gold vintage sports car on a coastal road at sunset" width={1152} height={960} loading="lazy" className="h-full w-full rounded-[18px] object-cover" />
             <span className="absolute bottom-3 right-4 inline-flex items-center gap-1 text-[14px] text-gc-on-night">Explore <ArrowRight className="h-3.5 w-3.5" /></span>
           </div>
         </Link>
-        <Link to="/dashboard" className={`${tile} flex h-[290px] items-center justify-center bg-ent-ivory`}>
-          <span className="h-[190px] w-[190px] rounded-full bg-background shadow-[0_0_60px_rgba(0,0,0,0.04)] dark:bg-foreground dark:shadow-[0_0_80px_rgba(255,255,255,0.18)] transition duration-700 group-hover:scale-105" />
-          <TileFoot label="Voice" />
-        </Link>
+        <VoiceTile />
       </div>
     </section>
   );
