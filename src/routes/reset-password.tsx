@@ -95,7 +95,7 @@ function ResetPasswordPage() {
   return (
     <main
       className="min-h-dvh w-full bg-white text-zinc-900 antialiased selection:bg-zinc-900 selection:text-white"
-      style={{ fontFamily: '"Google Sans", "Google Sans Text", system-ui, -apple-system, sans-serif' }}
+      style={{ fontFamily: '"Google Sans Flex", "Google Sans", "Google Sans Text", system-ui, -apple-system, sans-serif' }}
     >
       <div className="flex min-h-dvh w-full flex-col">
         <div className="px-6 pt-6 sm:px-10 sm:pt-8">

@@ -2,7 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { ShieldCheck, ShieldAlert, Lock } from "lucide-react";
 import { useVerification } from "@/hooks/useVerification";
 
-const FONT = '"Google Sans", "Google Sans Text", Inter, system-ui, sans-serif';
+const FONT = '"Google Sans Flex", "Google Sans", "Google Sans Text", Inter, system-ui, sans-serif';
 
 /** Slim persistent banner shown on the pages an unverified user can still open. */
 export function VerificationBanner({ isAdmin = false }: { isAdmin?: boolean }) {

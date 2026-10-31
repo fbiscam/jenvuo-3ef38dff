@@ -215,7 +215,7 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
       layout: {
         background: { type: ColorType.Solid, color: themeColors.bg },
         textColor: themeColors.text,
-        fontFamily: "'Google Sans', 'Poppins', system-ui, sans-serif",
+        fontFamily: "'Google Sans Flex','Google Sans', 'Poppins', system-ui, sans-serif",
         fontSize: 11,
         panes: { separatorColor: themeColors.border, enableResize: true },
       },

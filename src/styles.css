@@ -53,9 +53,9 @@
  */
 
 @theme inline {
-  --font-display: "Google Sans", "Product Sans", "Poppins", system-ui, sans-serif;
-  --font-sans: "Google Sans", "Product Sans", "Poppins", system-ui, sans-serif;
-  --font-mono: "Google Sans", "Product Sans", system-ui, sans-serif;
+  --font-display: "Google Sans Flex", "Google Sans", "Product Sans", "Poppins", system-ui, sans-serif;
+  --font-sans: "Google Sans Flex", "Google Sans", "Product Sans", "Poppins", system-ui, sans-serif;
+  --font-mono: "Google Sans Flex", "Google Sans", "Product Sans", system-ui, sans-serif;
   --font-code: "JetBrains Mono", ui-monospace, monospace;
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
@@ -200,13 +200,13 @@
   --home-accent: #111111;
   --home-accent-foreground: #ffffff;
   --home-accent-soft: #f1f1f1;
-  --home-accent-canvas: #f0f5fe;
+  --home-accent-canvas: #f4f4f4;
   /* Homepage (Google Cloud-style) palette */
   /* Monochrome: "blue" tokens render black so buttons/links match the homepage. */
   --gc-blue: #111111;
   --gc-blue-hover: #333333;
   --gc-blue-soft: #f1f1f1;
-  --gc-console-bar: #f0f5fe;
+  --gc-console-bar: #f4f4f4;
   --gc-console-search: #e1e6ef;
   --gc-console-rail-active: #d3e3fd;
   --gc-red: #ea4335;
@@ -231,7 +231,7 @@
   --gc-blue-deep: #111111;
   --gc-sky: #dcefff;
   /* Dashboard console shell (Google Cloud console-style) */
-  --gc-canvas: #f0f5fe;
+  --gc-canvas: #f4f4f4;
   --gc-section: #fafafa;
   --gc-success: #188038;
   --gc-nav-active: #dbedfc;
@@ -346,7 +346,7 @@
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
-    font-family: "Google Sans", "Product Sans", "Poppins", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+    font-family: "Google Sans Flex", "Google Sans", "Product Sans", "Poppins", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
   }
 
 }
@@ -819,7 +819,7 @@ html[data-pwa="1"] .pwa-tabbar {
   background: #ffffff;
   border-top: 1px solid rgb(228 228 231);
   padding: 6px 6px calc(6px + env(safe-area-inset-bottom));
-  font-family: "Google Sans", "Product Sans", system-ui, sans-serif;
+  font-family: "Google Sans Flex", "Google Sans", "Product Sans", system-ui, sans-serif;
 }
 .pwa-tabbar a {
   display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -1036,7 +1036,7 @@ html[data-pwa="1"] .pwa-tabbar {
    theme it would inherit the dark --gc-* tokens and render white-on-white.
    Re-pin the light tokens here so the menu stays readable on white. */
 .dashboard-sidebar-root {
-  --gc-canvas: #f0f5fe;
+  --gc-canvas: #f4f4f4;
   --gc-section: #fafafa;
   --gc-ink: #202124;
   --gc-ink-muted: #3c4043;
@@ -1865,3 +1865,40 @@ h1.font-medium, h2.font-medium { letter-spacing: -0.025em; }
 .dash-dark .text-gc-ink,
 .dash-dark .text-gc-ink-muted { color: #ffffff; }
 .dark .text-gc-ink, .dark .text-gc-ink-muted { color: #ffffff; }
+
+/* ====== Ask Jenvu: follows the white / black theme ======
+   The widget mounts outside the dashboard wrapper, so the dashboard sets
+   data-dash-theme on <html>; public pages use .dark on <html>. */
+.ask-jenvu-root {
+  --ask-bg: #ffffff;
+  --gc-blue: #111111;
+  --gc-blue-hover: #333333;
+  --gc-blue-deep: #111111;
+  --gc-on-blue: #ffffff;
+  --gc-blue-soft: #f4f4f4;
+  --gc-sky: #f4f4f4;
+  --gc-surface: #f4f4f4;
+  --gc-ink: #111111;
+  --gc-ink-muted: #52525b;
+  --gc-line: rgba(0, 0, 0, 0.1);
+}
+.dark .ask-jenvu-root,
+html[data-dash-theme="dark"] .ask-jenvu-root {
+  color-scheme: dark;
+  --ask-bg: #0a0a0a;
+  --background: #0a0a0a;
+  --foreground: #ffffff;
+  --muted: #17171a;
+  --muted-foreground: #a1a1aa;
+  --border: rgba(255, 255, 255, 0.12);
+  --gc-blue: #ffffff;
+  --gc-blue-hover: #d4d4d8;
+  --gc-blue-deep: #ffffff;
+  --gc-on-blue: #000000;
+  --gc-blue-soft: #17171a;
+  --gc-sky: #17171a;
+  --gc-surface: #17171a;
+  --gc-ink: #ffffff;
+  --gc-ink-muted: #a1a1aa;
+  --gc-line: rgba(255, 255, 255, 0.12);
+}

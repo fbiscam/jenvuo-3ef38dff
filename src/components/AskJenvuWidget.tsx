@@ -143,12 +143,12 @@ export function AskJenvuWidget() {
           onClick={() => { setView("chat"); setOpen(true); }}
           aria-label="Ask Jenvu"
           className={[
-            "fixed bottom-3 right-3 sm:bottom-5 sm:right-5 z-[9998] flex h-12 sm:h-14 items-center justify-center gap-2.5 rounded-2xl bg-gc-sky text-[15px] font-medium text-gc-blue-deep",
+            "ask-jenvu-root fixed bottom-3 right-3 sm:bottom-5 sm:right-5 z-[9998] flex h-12 sm:h-14 items-center justify-center gap-2.5 rounded-2xl bg-gc-blue text-[15px] font-medium text-gc-on-blue",
             "shadow-[0_2px_6px_rgba(60,64,67,0.15),0_6px_18px_rgba(60,64,67,0.18)] transition-all duration-300 hover:brightness-95",
             compact ? "w-12 sm:w-14 px-0" : "px-4 sm:px-6",
           ].join(" ")}
         >
-          <img src={askJenvuMark} alt="" className="h-5 w-auto shrink-0" />
+          <span aria-hidden className="h-5 w-9 shrink-0 bg-current" style={{ WebkitMask: `url(${askJenvuMark}) center / contain no-repeat`, mask: `url(${askJenvuMark}) center / contain no-repeat` }} />
           {!compact && <span className="whitespace-nowrap">Ask Jenvu</span>}
         </button>
       )}
@@ -160,7 +160,7 @@ export function AskJenvuWidget() {
           aria-hidden={!open}
           inert={!open}
           className={[
-            "fixed inset-x-2 bottom-2 top-16 z-[9999] flex flex-col overflow-hidden rounded-2xl bg-background text-gc-ink shadow-[0_4px_12px_rgba(60,64,67,0.2),0_16px_48px_rgba(60,64,67,0.25)] ring-1 ring-gc-line sm:inset-x-auto sm:right-4 sm:bottom-4 sm:top-auto sm:h-[min(560px,calc(100vh-6rem))] sm:w-[min(640px,calc(100vw-2rem))]",
+            "ask-jenvu-root fixed inset-x-2 bottom-2 top-16 z-[9999] flex flex-col overflow-hidden rounded-2xl bg-[var(--ask-bg)] text-gc-ink shadow-[0_4px_12px_rgba(60,64,67,0.2),0_16px_48px_rgba(60,64,67,0.25)] ring-1 ring-gc-line sm:inset-x-auto sm:right-4 sm:bottom-4 sm:top-auto sm:h-[min(560px,calc(100vh-6rem))] sm:w-[min(640px,calc(100vw-2rem))]",
             "[contain:layout_paint] will-change-[opacity,transform] transition-[opacity,transform,visibility] duration-200 ease-out",
             open ? "visible translate-y-0 opacity-100" : "pointer-events-none invisible translate-y-4 opacity-0",
           ].join(" ")}
