@@ -1319,6 +1319,11 @@ function DashboardLayout() {
   // White/black switch covers every dashboard page; the Terminal keeps its own switch.
   const themeApplies = pathname !== "/dashboard/terminal";
   const dashDark = themeApplies && dashTheme === "dark";
+  // Ask Jenvu lives outside this wrapper; tell it which dashboard theme is on.
+  React.useEffect(() => {
+    document.documentElement.dataset.dashTheme = dashDark ? "dark" : "light";
+    return () => { delete document.documentElement.dataset.dashTheme; };
+  }, [dashDark]);
 
   return (
     <div
