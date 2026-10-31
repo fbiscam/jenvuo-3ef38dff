@@ -125,7 +125,7 @@ export function EntEveryDesk() {
           <button key={x} type="button" onClick={() => setD(i)} className={`rounded-full px-4 py-2 text-[14px] font-medium ${i === d ? "bg-foreground text-background" : "bg-muted text-foreground"}`}>{x}</button>
         ))}
       </div>
-      <div className="relative mx-auto mt-12 max-w-5xl rounded-[28px] bg-[image:var(--ent-aurora)] p-6 sm:p-14">
+      <div className="relative mx-auto mt-12 max-w-5xl rounded-[28px] p-6 sm:p-14" style={{ background: "var(--ent-aurora)" }}>
         <div className="overflow-hidden rounded-2xl bg-background text-left shadow-2xl">
           <div className="flex gap-1.5 border-b border-border px-4 py-3">
             <span className="h-3 w-3 rounded-full bg-gc-red" /><span className="h-3 w-3 rounded-full bg-gc-yellow" /><span className="h-3 w-3 rounded-full bg-gc-green" />
