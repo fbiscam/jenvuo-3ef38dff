@@ -219,7 +219,7 @@ export default function ModelsExplorer({ apiHref = "/dashboard/api" }: { apiHref
       <section className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
         {FLAGSHIPS.slice(0, 4).map((m, i) => (
           <button key={m.id} type="button" onClick={() => pick(m.id)}
-            className="relative flex aspect-[4/5] flex-col justify-end overflow-hidden rounded-md bg-gc-night px-7 pb-10 text-left text-gc-on-night sm:aspect-[5/7]">
+            className="relative flex aspect-[5/4] flex-col justify-end overflow-hidden rounded-md bg-gc-night px-7 pb-8 text-left text-gc-on-night sm:aspect-[5/7]">
             <img src={i === 0 ? starsNebula : starsPlain} alt="" width={768} height={1056} loading="lazy"
               className="absolute inset-0 h-full w-full object-cover"
               style={{ transform: ["none", "none", "rotate(180deg)", "scaleX(-1)"][i] }} />
