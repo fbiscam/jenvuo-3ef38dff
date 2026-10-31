@@ -22,9 +22,9 @@ import {
   CloudAudiences,
   CloudBuildWith,
   CloudHero,
-  CloudModelStrip,
+
 } from "@/components/home/CloudHome";
-import { CloudFeatureVideos } from "@/components/home/CloudFeatureVideos";
+import { CloudFrontierModels } from "@/components/home/CloudFrontierModels";
 import { HomeStats, HomeReadAskAutomate, HomeTrust, HomeGetStarted } from "@/components/home/HomePlatformSections";
 import { HomeProductCards, HomeExperiences, HomeUseCases } from "@/components/home/HomeShowcaseSections";
 import { CloudSolutions, CloudLogoStrip, CloudStartBanner } from "@/components/home/CloudSolutions";
@@ -388,10 +388,9 @@ function HomePage() {
       <div className="jenvu-home-content">
         <main>
           <CloudHero price={xau?.[1] ?? "—"} delta={xau?.[2] ?? "…"} />
-          <CloudModelStrip />
           <CloudBuildWith />
           <CloudAudiences />
-          <CloudFeatureVideos />
+          <CloudFrontierModels />
           <CloudSolutions />
           <CloudLogoStrip />
           <CloudStartBanner />
