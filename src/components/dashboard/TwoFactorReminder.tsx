@@ -50,7 +50,7 @@ export default function TwoFactorReminder() {
           Dismiss
         </button>
         <Link
-          to="/dashboard/profile"
+          to="/dashboard/security"
           className="inline-flex h-8 items-center rounded-full bg-gc-blue-deep px-4 text-[13px] font-medium text-gc-on-blue hover:bg-gc-navy"
         >
           Turn on 2FA

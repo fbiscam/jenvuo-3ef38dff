@@ -76,6 +76,7 @@ import { Route as AuthenticatedDashboardProfileRouteImport } from './routes/_aut
 import { Route as AuthenticatedDashboardReferralsRouteImport } from './routes/_authenticated/dashboard.referrals'
 import { Route as AuthenticatedDashboardRiskRouteImport } from './routes/_authenticated/dashboard.risk'
 import { Route as AuthenticatedDashboardSecurityRouteImport } from './routes/_authenticated/dashboard.security'
+import { Route as AuthenticatedDashboardSettingsRouteImport } from './routes/_authenticated/dashboard.settings'
 import { Route as AuthenticatedDashboardTerminalRouteImport } from './routes/_authenticated/dashboard.terminal'
 import { Route as AuthenticatedDashboardUsageRouteImport } from './routes/_authenticated/dashboard.usage'
 import { Route as AuthenticatedDashboardWorkspaceRouteImport } from './routes/_authenticated/dashboard.workspace'
@@ -470,6 +471,12 @@ const AuthenticatedDashboardSecurityRoute =
     path: '/security',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
+const AuthenticatedDashboardSettingsRoute =
+  AuthenticatedDashboardSettingsRouteImport.update({
+    id: '/settings',
+    path: '/settings',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
 const AuthenticatedDashboardTerminalRoute =
   AuthenticatedDashboardTerminalRouteImport.update({
     id: '/terminal',
@@ -756,6 +763,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/referrals': typeof AuthenticatedDashboardReferralsRoute
   '/dashboard/risk': typeof AuthenticatedDashboardRiskRoute
   '/dashboard/security': typeof AuthenticatedDashboardSecurityRoute
+  '/dashboard/settings': typeof AuthenticatedDashboardSettingsRoute
   '/dashboard/terminal': typeof AuthenticatedDashboardTerminalRoute
   '/dashboard/usage': typeof AuthenticatedDashboardUsageRoute
   '/dashboard/workspace': typeof AuthenticatedDashboardWorkspaceRoute
@@ -858,6 +866,7 @@ export interface FileRoutesByTo {
   '/dashboard/referrals': typeof AuthenticatedDashboardReferralsRoute
   '/dashboard/risk': typeof AuthenticatedDashboardRiskRoute
   '/dashboard/security': typeof AuthenticatedDashboardSecurityRoute
+  '/dashboard/settings': typeof AuthenticatedDashboardSettingsRoute
   '/dashboard/terminal': typeof AuthenticatedDashboardTerminalRoute
   '/dashboard/usage': typeof AuthenticatedDashboardUsageRoute
   '/dashboard/workspace': typeof AuthenticatedDashboardWorkspaceRoute
@@ -966,6 +975,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/referrals': typeof AuthenticatedDashboardReferralsRoute
   '/_authenticated/dashboard/risk': typeof AuthenticatedDashboardRiskRoute
   '/_authenticated/dashboard/security': typeof AuthenticatedDashboardSecurityRoute
+  '/_authenticated/dashboard/settings': typeof AuthenticatedDashboardSettingsRoute
   '/_authenticated/dashboard/terminal': typeof AuthenticatedDashboardTerminalRoute
   '/_authenticated/dashboard/usage': typeof AuthenticatedDashboardUsageRoute
   '/_authenticated/dashboard/workspace': typeof AuthenticatedDashboardWorkspaceRoute
@@ -1074,6 +1084,7 @@ export interface FileRouteTypes {
     | '/dashboard/referrals'
     | '/dashboard/risk'
     | '/dashboard/security'
+    | '/dashboard/settings'
     | '/dashboard/terminal'
     | '/dashboard/usage'
     | '/dashboard/workspace'
@@ -1176,6 +1187,7 @@ export interface FileRouteTypes {
     | '/dashboard/referrals'
     | '/dashboard/risk'
     | '/dashboard/security'
+    | '/dashboard/settings'
     | '/dashboard/terminal'
     | '/dashboard/usage'
     | '/dashboard/workspace'
@@ -1283,6 +1295,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/referrals'
     | '/_authenticated/dashboard/risk'
     | '/_authenticated/dashboard/security'
+    | '/_authenticated/dashboard/settings'
     | '/_authenticated/dashboard/terminal'
     | '/_authenticated/dashboard/usage'
     | '/_authenticated/dashboard/workspace'
@@ -1860,6 +1873,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardSecurityRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
+    '/_authenticated/dashboard/settings': {
+      id: '/_authenticated/dashboard/settings'
+      path: '/settings'
+      fullPath: '/dashboard/settings'
+      preLoaderRoute: typeof AuthenticatedDashboardSettingsRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
     '/_authenticated/dashboard/terminal': {
       id: '/_authenticated/dashboard/terminal'
       path: '/terminal'
@@ -2148,6 +2168,7 @@ interface AuthenticatedDashboardRouteChildren {
   AuthenticatedDashboardReferralsRoute: typeof AuthenticatedDashboardReferralsRoute
   AuthenticatedDashboardRiskRoute: typeof AuthenticatedDashboardRiskRoute
   AuthenticatedDashboardSecurityRoute: typeof AuthenticatedDashboardSecurityRoute
+  AuthenticatedDashboardSettingsRoute: typeof AuthenticatedDashboardSettingsRoute
   AuthenticatedDashboardTerminalRoute: typeof AuthenticatedDashboardTerminalRoute
   AuthenticatedDashboardUsageRoute: typeof AuthenticatedDashboardUsageRoute
   AuthenticatedDashboardWorkspaceRoute: typeof AuthenticatedDashboardWorkspaceRoute
@@ -2186,6 +2207,7 @@ const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
     AuthenticatedDashboardReferralsRoute: AuthenticatedDashboardReferralsRoute,
     AuthenticatedDashboardRiskRoute: AuthenticatedDashboardRiskRoute,
     AuthenticatedDashboardSecurityRoute: AuthenticatedDashboardSecurityRoute,
+    AuthenticatedDashboardSettingsRoute: AuthenticatedDashboardSettingsRoute,
     AuthenticatedDashboardTerminalRoute: AuthenticatedDashboardTerminalRoute,
     AuthenticatedDashboardUsageRoute: AuthenticatedDashboardUsageRoute,
     AuthenticatedDashboardWorkspaceRoute: AuthenticatedDashboardWorkspaceRoute,

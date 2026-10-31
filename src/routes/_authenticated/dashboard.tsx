@@ -1,5 +1,6 @@
 import { getAlertCutoff } from "@/lib/alert-cutoff";
 import { SidebarMoreMenu } from "@/components/dashboard/SidebarMoreMenu";
+import { SettingsSidebarNav, isSettingsPath } from "@/components/settings/SettingsNav";
 import { readSiteTheme, saveSiteTheme } from "@/lib/site-theme";
 import { getIpGeo } from "@/lib/ip-geo";
 import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
@@ -197,10 +198,8 @@ const NAV_GROUPS: Array<{ label: string; items: TabItem[] }> = [
   {
     label: "Account",
     items: [
-      { to: "/dashboard/billing", label: "Billing", icon: Wallet },
-      { to: "/dashboard/pay", label: "Payments", icon: BadgeDollarSign },
-      { to: "/dashboard/documents", label: "Documents", icon: FileCheck2 },
-      { to: "/dashboard/profile", label: "Settings", icon: Settings2 },
+      // Billing, Payments, Documents and profile pages live inside Settings (see SettingsNav).
+      { to: "/dashboard/settings", label: "Settings", icon: Settings2 },
       { to: "/help", label: "Help Center", icon: CircleHelp },
     ],
   },
@@ -1382,7 +1381,9 @@ function DashboardLayout() {
           {/* Nav */}
 
           <nav className={`sidebar-hover-scroll flex-1 min-h-0 overflow-y-auto overflow-x-hidden py-1 ${navCollapsed ? "px-2" : "px-3"}`}>
-            {[...NAV_GROUPS].map((group, gi) => (
+            {isSettingsPath(pathname) ? (
+              <SettingsSidebarNav pathname={pathname} collapsed={navCollapsed} onNavigate={() => setMobileNavOpen(false)} />
+            ) : [...NAV_GROUPS].map((group, gi) => (
               <div key={group.label || `nav-group-${gi}`} className={gi > 0 ? (group.label ? "mt-5" : "mt-1") : ""}>
                 {!navCollapsed && group.label && (
                   <div className="sidebar-group-label mb-1.5 px-3 text-[11px] font-normal text-gc-ink-muted">
@@ -1443,6 +1444,9 @@ function DashboardLayout() {
                           aria-hidden="true"
                         />
                         {!navCollapsed && <span className="truncate">{t.label}</span>}
+                        {!navCollapsed && t.to === "/dashboard/settings" && (
+                          <ChevronRight className="ml-auto h-4 w-4 shrink-0 text-gc-ink-muted" strokeWidth={1.75} aria-hidden="true" />
+                        )}
                         {!navCollapsed && typeof count === "number" && count > 0 && !active && (
                           <span
                             className="ml-auto inline-flex shrink-0 items-center justify-center rounded-full bg-rose-600 text-white ring-2 ring-white"

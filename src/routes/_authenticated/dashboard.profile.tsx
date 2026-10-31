@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -8,19 +8,18 @@ import { readCachedAvatar, writeCachedAvatar, AVATAR_TTL_SECONDS } from "@/lib/a
 
 const PROFILE_CACHE_KEY = "jenvu:profile:basics";
 import { useVerification } from "@/hooks/useVerification";
-import { Camera, Loader2, MonitorSmartphone, ShieldAlert, ShieldCheck, SlidersHorizontal, Trash2, Upload, UserRound } from "lucide-react";
+import { Camera, Loader2, Trash2, Upload } from "lucide-react";
 import { SettingsCard, settingsBtn, settingsBtnPrimary, settingsField } from "@/components/settings/SettingsCard";
-import { DangerZoneSettings, SecuritySettings } from "@/components/settings/SecuritySettings";
-import { PreferencesSettings } from "@/components/settings/PreferencesSettings";
-import { ActiveSessionsSettings } from "@/components/settings/ActiveSessionsSettings";
+import { DangerZoneSettings } from "@/components/settings/SecuritySettings";
+import { SettingsPageHeader } from "@/components/settings/SettingsNav";
 
 export const Route = createFileRoute("/_authenticated/dashboard/profile")({
   head: () => ({
     meta: [
-      { title: "Settings — Jenvu" },
-      { name: "description", content: "Manage your Jenvu profile, security, preferences and active sessions." },
-      { property: "og:title", content: "Settings — Jenvu" },
-      { property: "og:description", content: "Manage your Jenvu profile, security, preferences and active sessions." },
+      { title: "Personal settings — Jenvu" },
+      { name: "description", content: "Update your Jenvu profile photo and name." },
+      { property: "og:title", content: "Personal settings — Jenvu" },
+      { property: "og:description", content: "Update your Jenvu profile photo and name." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "robots", content: "noindex" },
@@ -29,18 +28,18 @@ export const Route = createFileRoute("/_authenticated/dashboard/profile")({
   component: Profile,
 });
 
-const SECTIONS = [
-  { id: "profile", label: "Profile", icon: UserRound },
-  { id: "security", label: "Security", icon: ShieldCheck },
-  { id: "preferences", label: "Preferences", icon: SlidersHorizontal },
-  { id: "sessions", label: "Active sessions", icon: MonitorSmartphone },
-  { id: "danger", label: "Danger zone", icon: ShieldAlert },
-] as const;
+// Old links pointed at sections of one long Settings page; send them to the page that now holds that section.
+const LEGACY_HASH_PAGES: Record<string, "/dashboard/security" | "/dashboard/settings"> = {
+  security: "/dashboard/security",
+  "change-email": "/dashboard/security",
+  sessions: "/dashboard/security",
+  preferences: "/dashboard/settings",
+};
 
 function Profile() {
+  const navigate = useNavigate();
   const { verified } = useVerification();
   const nameLocked = verified;
-  const [active, setActive] = useState<string>("profile");
   const [userId, setUserId] = useState<string | null>(null);
 
   const [email, setEmail] = useState("");
@@ -51,26 +50,14 @@ function Profile() {
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [pendingFile, setPendingFile] = useState<File | null>(null);
-  const [mailAddress, setMailAddress] = useState<string | null>(null);
+  const [, setMailAddress] = useState<string | null>(null);
 
-  // Open the section named in the link (e.g. #security) and keep the side menu in step while scrolling.
   useEffect(() => {
     const hash = window.location.hash.replace("#", "");
-    if (hash) {
-      const target = hash === "change-email" ? "security" : hash;
-      if (SECTIONS.some((s) => s.id === target)) setActive(target);
-      setTimeout(() => document.getElementById(hash)?.scrollIntoView({ block: "start" }), 300);
-    }
-    const obs = new IntersectionObserver(
-      (entries) => {
-        const hit = entries.filter((e) => e.isIntersecting).sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)[0];
-        if (hit) setActive(hit.target.id);
-      },
-      { rootMargin: "-20% 0px -65% 0px" },
-    );
-    const t = setTimeout(() => SECTIONS.forEach((s) => { const el = document.getElementById(s.id); if (el) obs.observe(el); }), 200);
-    return () => { clearTimeout(t); obs.disconnect(); };
-  }, []);
+    const page = LEGACY_HASH_PAGES[hash];
+    if (page) { void navigate({ to: page, hash, replace: true }); return; }
+    if (hash) setTimeout(() => document.getElementById(hash)?.scrollIntoView({ block: "start" }), 300);
+  }, [navigate]);
 
   const refreshAvatarUrl = async (path: string | null) => {
     if (!path) { setAvatarUrl(null); writeCachedAvatar(null); return; }
@@ -180,31 +167,10 @@ function Profile() {
   const initial = (fullName || email || "?").trim().charAt(0).toUpperCase();
 
   return (
-    <div className="mx-auto w-full max-w-5xl pb-10 text-foreground">
-      <header className="jenvu-rise">
-        <h1 className="text-[28px] font-medium tracking-tight text-foreground">Settings</h1>
-        <p className="mt-1 max-w-[620px] text-[14px] text-muted-foreground">Manage your profile, security, preferences and where you're signed in.</p>
-      </header>
+    <div className="mx-auto w-full max-w-[1100px] pb-10 text-foreground">
+      <SettingsPageHeader title="Personal" description="Your photo, name and email address." />
 
-      <div className="mt-6 grid gap-8 lg:grid-cols-[200px_minmax(0,1fr)]">
-        <nav aria-label="Settings sections" className="lg:sticky lg:top-24 lg:self-start">
-          <ul className="flex gap-1 overflow-x-auto pb-1 lg:flex-col lg:overflow-visible lg:pb-0">
-            {SECTIONS.map((s) => (
-              <li key={s.id} className="shrink-0">
-                <a
-                  href={`#${s.id}`}
-                  onClick={(e) => { e.preventDefault(); setActive(s.id); document.getElementById(s.id)?.scrollIntoView({ behavior: "smooth", block: "start" }); }}
-                  aria-current={active === s.id ? "true" : undefined}
-                  className={`flex h-9 items-center gap-3 rounded-full px-4 text-[14px] transition-colors ${active === s.id ? "console-card font-medium text-foreground" : "text-muted-foreground hover:text-foreground"}`}
-                >
-                  <s.icon className="h-4 w-4 shrink-0" />
-                  {s.label}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </nav>
-
+      <div className="mt-6">
         <div className="min-w-0 space-y-6">
           <SettingsCard id="profile" title="Profile" description="Your photo and name show on your dashboard, in the top menu ">
             <div className="flex flex-col gap-5 px-6 py-5 sm:flex-row sm:items-center sm:px-7">
@@ -278,9 +244,6 @@ function Profile() {
             </div>
           </SettingsCard>
 
-          <SecuritySettings email={email} />
-          <PreferencesSettings />
-          <ActiveSessionsSettings />
           <DangerZoneSettings />
         </div>
       </div>
