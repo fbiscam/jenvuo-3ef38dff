@@ -183,11 +183,9 @@ export default function SiteHeader() {
                 { to: "/about", label: "Why Jenvu" },
                 { to: "/ai-engine", label: "Products" },
                 { to: "/strategies/ict-gold-trading", label: "Solutions" },
-                { to: "/insights", label: "Resources" },
                 { to: "/platform", label: "Platform" },
                 { to: "/pricing", label: "Pricing" },
-                { to: "/docs", label: "Docs" },
-                { to: "/contact", label: "Contact us" },
+                ...RESOURCES,
               ].map((it) => (
 
                 <Link
