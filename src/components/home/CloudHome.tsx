@@ -41,6 +41,7 @@ import claudeLogo from "@/assets/model-logos/claude-color.svg";
 import geminiLogo from "@/assets/model-logos/gemini-color.svg";
 import deepseekLogo from "@/assets/model-logos/deepseek-color.svg";
 import grokLogo from "@/assets/model-logos/grok.svg";
+import { HeroVideoFan } from "@/components/home/HeroVideoFan";
 
 type Tone = "blue" | "red" | "yellow" | "green";
 
@@ -193,31 +194,33 @@ export function CloudHero({ price: _price, delta: _delta }: { price: string; del
   };
   return (
     <section className="overflow-hidden bg-background">
-      <div className="mx-auto max-w-[1296px] px-5 pb-14 pt-12 text-center sm:px-8 md:pt-14">
-        <img src="/favicon.png" alt="" width={64} height={64} className="jenvu-logo-intro mx-auto h-16 w-16 object-contain" />
-        <h1 className="jenvu-rise mx-auto mt-7 max-w-[900px] text-[40px] font-medium leading-[1.1] tracking-[-0.5px] text-gc-ink sm:text-[56px] md:text-[60px]">
-          AI trading analysis for Fiber
-        </h1>
-        <p className="jenvu-rise [animation-delay:80ms] mx-auto mt-5 max-w-[820px] text-balance text-[13.5px] leading-[1.55] text-gc-ink-muted min-[400px]:text-[14.5px] sm:line-clamp-2 sm:text-[17px] sm:leading-[1.6]">
-          Read the chart with AI. Spot sweeps, zones and FVGs live.{" "}
-          <span className="font-medium text-gc-ink">Start with $100 credits or a Pro access.</span>
-        </p>
-        <div className="jenvu-rise [animation-delay:160ms] mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-          <Link
-            to="/auth"
-            search={{ mode: "signup" } as never}
-            className="inline-flex h-12 items-center justify-center rounded-full bg-gc-blue px-6 text-[16px] font-medium text-gc-on-blue transition hover:bg-gc-blue-hover"
-          >
-            Get started for free
-          </Link>
-          <button
-            type="button"
-            onClick={() => openAskJenvu("sales")}
-            className="inline-flex h-12 items-center justify-center rounded-full border border-gc-line bg-background px-6 text-[16px] font-medium text-gc-ink transition hover:bg-gc-surface"
-          >
-            Contact sales
-          </button>
+      <div className="bg-gradient-to-b from-gc-blue-soft/40 to-background pb-14 pt-14 text-center sm:pt-20">
+        <div className="mx-auto max-w-[1296px] px-5 sm:px-8">
+          <h1 className="jenvu-rise mx-auto text-[40px] font-normal leading-[1.1] tracking-tight text-gc-ink sm:text-[60px] md:text-[68px]">
+            <span className="inline-block rounded-xl border border-gc-line bg-background px-4 pb-1 text-gc-blue shadow-sm sm:px-5">
+              Frontier intelligence
+            </span>
+            <br />
+            everywhere you trade
+          </h1>
+          <div className="jenvu-rise [animation-delay:100ms] mt-8 flex flex-wrap items-center justify-center gap-6">
+            <Link
+              to="/auth"
+              search={{ mode: "signup" } as never}
+              className="inline-flex h-11 items-center gap-1.5 rounded-full bg-gc-ink px-5 text-[15px] font-medium text-background transition hover:opacity-90"
+            >
+              Get started <ChevronDown className="h-4 w-4" />
+            </Link>
+            <button
+              type="button"
+              onClick={() => openAskJenvu("sales")}
+              className="inline-flex items-center gap-1 text-[15px] font-medium text-gc-ink hover:opacity-70"
+            >
+              Contact sales <ChevronRight className="h-4 w-4" />
+            </button>
+          </div>
         </div>
+        <HeroVideoFan />
       </div>
       <div ref={railRef} onScroll={onScroll} className="flex gap-6 overflow-x-auto px-5 [overscroll-behavior-x:contain] [scrollbar-width:none] sm:px-8 [&::-webkit-scrollbar]:hidden">
         {LOOP_STORIES.map((s, i) => (
