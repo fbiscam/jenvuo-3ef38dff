@@ -235,7 +235,7 @@ function snapshotsToRows(
 }
 
 function useLiveTicker(): TickerRow[] {
-  const loaderData = Route.useLoaderData() as { tickerRows?: TickerRow[]; articles?: HomeArticle[] } | undefined;
+  const loaderData = Route.useLoaderData() as { tickerRows?: TickerRow[] } | undefined;
   const [rows, setRows] = React.useState<TickerRow[]>(
     loaderData?.tickerRows?.length ? loaderData.tickerRows : INITIAL_TICKER,
   );
@@ -398,7 +398,7 @@ function HomePage() {
           <EntBuilt />
           <AllInOnePlatformSection />
           <EntFacts />
-          <EntStories articles={loaderData?.articles ?? []} />
+          <EntStories articles={(Route.useLoaderData() as { articles?: HomeArticle[] }).articles ?? []} />
           <EntCta />
         </main>
       </div>
