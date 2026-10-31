@@ -1638,3 +1638,23 @@ pre, pre *, code, kbd, samp {
 @media (prefers-reduced-motion: reduce) {
   .jenvu-zoom-dashboard main a.border:hover { transform: none; }
 }
+
+/* Homepage "business" sections: illustration and tag colours + motion. */
+:root {
+  --biz-orange: #f78f55;
+  --biz-orange-soft: #fbcfb3;
+  --biz-sky: #5ccbfb;
+  --biz-sky-soft: #b9e8fd;
+  --biz-teal: #33d3c4;
+  --biz-teal-soft: #a7ece6;
+  --biz-pink: #ee86d3;
+  --biz-pink-soft: #f7c6ec;
+  --biz-lavender: #e4d9fb;
+}
+@keyframes biz-line-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+@keyframes biz-progress { from { width: 0; } to { width: 100%; } }
+.biz-line-in { animation: biz-line-in 0.5s ease-out both; }
+.biz-progress { animation: biz-progress 7s linear both; }
+@media (prefers-reduced-motion: reduce) {
+  .biz-line-in, .biz-progress { animation: none; }
+}
