@@ -1509,6 +1509,9 @@ function DashboardLayout() {
                 <Link to="/dashboard/profile" title="Settings" aria-label="Settings" className="sidebar-quick-btn inline-flex h-8 w-8 items-center justify-center rounded-md text-gc-ink">
                   <SettingsIcon className="h-4 w-4" strokeWidth={2} />
                 </Link>
+                <button type="button" onClick={() => void signOut()} title="Sign out" aria-label="Sign out" className="sidebar-quick-btn inline-flex h-8 w-8 items-center justify-center rounded-md text-gc-ink">
+                  <LogOut className="h-4 w-4" strokeWidth={2} />
+                </button>
               </div>
             )}
             <div className={`flex items-center gap-1 ${navCollapsed ? "flex-col" : ""}`}>

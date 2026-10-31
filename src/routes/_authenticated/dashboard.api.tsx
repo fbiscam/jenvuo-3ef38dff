@@ -180,10 +180,10 @@ function ExtensionPage() {
   const capabilities = getPlanCapabilities(access?.active ? access.plan : "free");
 
   return (
-    <div className="w-full px-1 py-2 sm:px-2 sm:py-4">
+    <div className="mx-auto w-full max-w-[1100px] px-1 py-2 sm:px-2 sm:py-6">
       {/* Header row */}
       <div className="grid grid-cols-1 items-center gap-2 sm:flex sm:flex-wrap sm:justify-between sm:gap-3">
-        <h1 className="min-w-0 text-[26px] font-normal tracking-tight text-zinc-900"> Api keys</h1>
+        <div className="min-w-0"><h1 className="text-[28px] font-medium tracking-tight text-foreground">API Keys</h1><p className="mt-1 text-[14px] text-muted-foreground">Create and manage keys for the Jenvu API and extension.</p></div>
         <div className="flex min-w-0 items-center gap-3">
           <button
             onClick={() => setShowGuide((v) => !v)}
@@ -203,7 +203,7 @@ function ExtensionPage() {
               setFreshKey(null);
             }}
             disabled={!canCreate}
-            className="inline-flex items-center gap-2 rounded-full border border-zinc-300 px-4 py-2 text-[13px] font-medium text-zinc-900 hover:bg-zinc-50 disabled:cursor-not-allowed disabled:opacity-45"
+            className="console-pill console-pill-solid disabled:cursor-not-allowed disabled:opacity-45"
           >
             <KeyRound className="h-4 w-4" /> Create API key
           </button>
@@ -211,19 +211,19 @@ function ExtensionPage() {
       </div>
 
       {access && (
-        <div className="mt-5 grid gap-3 border-y border-zinc-200 py-4 sm:grid-cols-3">
-          <div>
-            <div className="text-[11px] text-zinc-500">Plan</div>
-            <div className="mt-1 text-sm font-medium text-zinc-900">{access.planName}</div>
+        <div className="mt-6 grid gap-3 sm:grid-cols-3">
+          <div className="console-card p-5">
+            <div className="text-[13px] text-muted-foreground">Plan</div>
+            <div className="mt-2 text-[22px] font-medium text-zinc-900">{access.planName}</div>
           </div>
-          <div>
-            <div className="text-[11px] text-zinc-500">Active API keys</div>
-            <div className="mt-1 text-sm font-medium tabular-nums text-zinc-900">
+          <div className="console-card p-5">
+            <div className="text-[13px] text-muted-foreground">Active API keys</div>
+            <div className="mt-2 text-[22px] font-medium tabular-nums text-zinc-900">
               {activeKeys.length} / {access.keyLimit}
             </div>
           </div>
-          <div>
-            <div className="text-[11px] text-zinc-500">AI wallet</div>
+          <div className="console-card p-5">
+            <div className="text-[13px] text-muted-foreground">AI wallet</div>
             <div
               className={`mt-1 text-sm font-medium tabular-nums ${access.balance < 0.02 ? "text-rose-600" : "text-zinc-900"}`}
             >
@@ -323,10 +323,10 @@ function ExtensionPage() {
 
       {/* API key list */}
       {
-        <div className="mt-5">
+        <div className="console-card mt-6 p-5">
           <div className="mb-4 flex items-end justify-between gap-3">
             <div>
-              <h2 className="text-[16px] font-medium text-zinc-900">&nbsp; Recent api keys</h2>
+              <h2 className="text-[16px] font-medium text-foreground">Recent API keys</h2>
               <p className="mt-1 text-[12px] text-zinc-500">
                 Your four newest extension keys, newest first.
               </p>
