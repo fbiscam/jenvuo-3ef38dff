@@ -1,6 +1,7 @@
 import { useMemo, useRef, useState, type ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import {
+  Code2,
   ArrowRight, Braces, Brain, Check, Copy, Eye, Info, Radio, Search, Wrench, X,
 } from "lucide-react";
 import { toast } from "sonner";
