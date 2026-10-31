@@ -68,17 +68,17 @@ function StatCard({ label, hint, model, value, unit, className }: {
   label: string; hint: string; model: CatalogModel; value: string; unit: string; className?: string;
 }) {
   return (
-    <div className={cn("flex flex-col justify-between gap-6 rounded-xl border border-gc-line bg-background p-4 sm:p-5", className)}>
+    <div className={cn("flex min-h-[150px] flex-col justify-between gap-6 rounded-xl border border-gc-line bg-background p-5 shadow-sm transition-shadow hover:shadow-md sm:p-6", className)}>
       <div>
         <p className="flex items-center gap-1.5 text-sm text-gc-ink-muted" title={hint}>
           {label} <Info className="h-3.5 w-3.5" aria-hidden />
         </p>
-        <p className="mt-2 flex items-center gap-2 text-sm font-medium text-gc-ink">
+        <p className="mt-2.5 flex items-center gap-2.5 text-[15px] font-semibold text-gc-ink">
           <ModelLogo m={model} size="sm" /> <span className="truncate">{model.name}</span>
         </p>
       </div>
-      <p className="flex items-baseline gap-1.5">
-        <span className="text-3xl font-medium tracking-tight tabular-nums text-gc-ink">{value}</span>
+      <p className="flex items-baseline gap-2">
+        <span className="text-[34px] font-semibold leading-none tracking-tight tabular-nums text-gc-ink">{value}</span>
         <span className="text-sm text-gc-ink-muted">{unit}</span>
       </p>
     </div>
@@ -172,45 +172,45 @@ export default function ModelsExplorer({ apiHref = "/dashboard/api" }: { apiHref
       {/* Discover */}
       <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="text-2xl font-medium tracking-tight text-gc-ink sm:text-[28px]">Discover models</h1>
+          <h1 className="text-2xl font-bold tracking-tight text-gc-ink sm:text-[28px]">Discover models</h1>
           <p className="mt-1 text-sm text-gc-ink-muted">
             Every model you can call with one Jenvu API key, at one flat price of {price} per million tokens.
           </p>
         </div>
-        <button type="button" onClick={scrollToCatalog} className="self-start rounded-lg border border-gc-line bg-background px-4 py-2 text-sm font-medium text-gc-ink hover:bg-gc-canvas sm:self-auto">
+        <button type="button" onClick={scrollToCatalog} className="self-start rounded-lg border border-gc-line bg-background px-4 py-2 text-sm font-semibold text-gc-ink shadow-sm hover:bg-gc-canvas sm:self-auto">
           Browse all {MODEL_CATALOG.length} models
         </button>
       </header>
 
-      <div className="grid gap-3 lg:grid-cols-[1.25fr_1fr]">
-        <section className="rounded-xl border border-gc-line bg-background p-4 sm:p-6">
+      <div className="grid gap-4 lg:grid-cols-[1.2fr_1fr]">
+        <section className="rounded-xl border border-gc-line bg-background p-5 shadow-sm sm:p-7">
           <p className="text-sm text-gc-ink-muted">Flagship models</p>
-          <h2 className="mt-1 text-xl font-medium tracking-tight text-gc-ink sm:text-2xl">The top model from each lab, one key</h2>
-          <p className="mt-1.5 text-sm text-gc-ink-muted">Switch between Anthropic, OpenAI, Google, Qwen and xAI by changing a single model ID.</p>
-          <div className="mt-5 flex justify-between border-b border-gc-line pb-2 text-sm text-gc-ink-muted">
+          <h2 className="mt-1 text-xl font-bold tracking-tight text-gc-ink sm:text-[26px]">The top model from each lab, one key</h2>
+          <p className="mt-2 text-sm text-gc-ink-muted">Switch between Anthropic, OpenAI, Google, Qwen and xAI by changing a single model ID.</p>
+          <div className="mt-6 flex justify-between border-b border-gc-line pb-2.5 text-sm text-gc-ink-muted">
             <span>Model</span><span>Context window</span>
           </div>
-          <ul>
+          <ul className="divide-y divide-gc-line">
             {FLAGSHIPS.map((m, i) => (
               <li key={m.id}>
-                <button type="button" onClick={() => pick(m.id)} className="flex w-full items-center gap-3 border-b border-gc-line py-3 text-left last:border-0 hover:bg-gc-canvas">
-                  <span className="w-5 text-center text-sm text-gc-ink-muted">{i + 1}</span>
+                <button type="button" onClick={() => pick(m.id)} className="flex w-full items-center gap-3.5 rounded-md px-1 py-3.5 text-left transition-colors hover:bg-gc-canvas">
+                  <span className="w-5 text-center text-sm font-medium tabular-nums text-gc-ink-muted">{i + 1}</span>
                   <ModelLogo m={m} />
                   <span className="min-w-0 flex-1">
-                    <span className="block truncate text-sm font-medium text-gc-ink">{m.name}</span>
+                    <span className="block truncate text-[15px] font-semibold text-gc-ink">{m.name}</span>
                     <span className="block text-sm text-gc-ink-muted">{PROVIDERS[m.provider].label}</span>
                   </span>
-                  <span className="hidden h-1.5 w-24 overflow-hidden rounded-full bg-gc-panel sm:block">
+                  <span className="hidden h-2 w-28 overflow-hidden rounded-full bg-gc-panel sm:block">
                     <span className="block h-full rounded-full bg-gc-blue" style={{ width: `${(m.context / MAX_CONTEXT) * 100}%` }} />
                   </span>
-                  <span className="w-14 text-right text-sm font-medium tabular-nums text-gc-ink">{formatContext(m.context)}</span>
+                  <span className="w-14 text-right text-[15px] font-bold tabular-nums text-gc-ink">{formatContext(m.context)}</span>
                 </button>
               </li>
             ))}
           </ul>
         </section>
 
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <StatCard label="Default on Jenvu" hint="Used when a request names no model" model={getCatalogModel("claude-opus-5")!} value={price} unit="/M tokens" />
           <StatCard label="Smartest open model" hint="Open-weight model with the most capability" model={getCatalogModel("glm-5.3")!} value="Open" unit="weights" />
           <StatCard label="Fastest replies" hint="Light model for quick answers" model={getCatalogModel("gemini-3.7-flash")!} value={formatContext(getCatalogModel("gemini-3.7-flash")!.context)} unit="context" />
