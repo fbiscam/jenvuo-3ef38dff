@@ -107,7 +107,7 @@ function ChartMock() {
   const y = (v: number) => 200 - v * 1.6;
   return (
     <div className="flex h-full flex-col items-center justify-center gap-4">
-      <svg viewBox="0 0 320 200" className="h-[200px] w-full max-w-[460px]" aria-hidden>
+      <svg viewBox="0 0 320 200" className="h-[240px] w-full max-w-[600px] sm:h-[270px]" aria-hidden>
         <line x1="0" x2="320" y1={y(102)} y2={y(102)} className="stroke-gc-red" strokeDasharray="4 4" />
         <text x="4" y={y(102) - 4} className="fill-gc-red text-[9px]">BSL swept</text>
         <rect x="150" y={y(66)} width="170" height={y(58) - y(66)} className="fill-gc-blue-soft" />
