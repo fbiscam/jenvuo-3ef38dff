@@ -325,7 +325,7 @@ function ChatPlayground() {
   );
 
   return (
-    <section className="mx-auto flex h-[calc((100dvh-90px)/0.85)] min-h-[560px] w-full max-w-[1400px] flex-col">
+    <section className="mx-auto flex h-[calc((100dvh-80px)/0.76)] min-h-[520px] w-full max-w-[1400px] flex-col">
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-[28px] font-medium tracking-tight text-foreground">Chat API</h1>
@@ -344,25 +344,25 @@ function ChatPlayground() {
       {/* Conversation / examples */}
       <div ref={scroller} className="mt-3 min-h-0 flex-1 overflow-y-auto pr-1">
         {turns.length === 0 ? (
-          <div className="flex min-h-full flex-col py-2">
+          <div className="flex min-h-full flex-col justify-center py-2">
             <div className="text-center">
               <h2 className="text-[18px] font-medium text-foreground">Start a chat with examples</h2>
               <p className="mt-1 text-[14px] text-muted-foreground">Pick a use case to see the exact prompt and settings, then make it your own.</p>
             </div>
-            <div className="mt-6 grid flex-1 grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:grid-rows-2">
+            <div className="mx-auto mt-5 grid w-full max-w-[1150px] grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
               {EXAMPLES.map((ex) => (
                 <button
                   key={ex.title}
                   type="button"
                   onClick={() => pickExample(ex)}
-                  className="flex flex-col rounded-2xl border border-border bg-background p-5 text-left transition-colors hover:bg-[var(--console-card)] lg:p-6"
+                  className="flex flex-col rounded-2xl border border-border bg-background p-4 text-left transition-colors hover:bg-[var(--console-card)]"
                 >
-                  <span className={`grid h-9 w-9 place-items-center rounded-full ${ex.tone}`}>
+                  <span className={`grid h-8 w-8 place-items-center rounded-full ${ex.tone}`}>
                     <ex.icon className="h-4 w-4" aria-hidden="true" />
                   </span>
-                  <span className="mt-4 text-[16px] font-medium text-foreground">{ex.title}</span>
-                  <span className="mt-1.5 text-[14px] leading-snug text-muted-foreground">{ex.text}</span>
-                  <span className="mt-auto flex flex-wrap gap-1.5 pt-4">
+                  <span className="mt-3 text-[15px] font-medium text-foreground">{ex.title}</span>
+                  <span className="mt-1 text-[13px] leading-snug text-muted-foreground">{ex.text}</span>
+                  <span className="mt-auto flex flex-wrap gap-1.5 pt-3">
                     {ex.tags.map((t) => (
                       <span key={t} className="rounded-md bg-[var(--console-card)] px-2 py-0.5 text-[12px] text-foreground">{t}</span>
                     ))}
@@ -429,7 +429,7 @@ function ChatPlayground() {
         )}
       </div>
 
-      <div className="mx-auto w-full">
+      <div className="mx-auto w-full max-w-[1150px]">
         {/* Credits notice */}
         <div className="mt-3 flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-[var(--console-card)] px-4 py-3">
           <span className="inline-flex items-start gap-3">

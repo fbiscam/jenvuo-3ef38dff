@@ -2164,6 +2164,6 @@ html body .dark .code-box .tok-var { color: #9cdcfe !important; }
 
 /* Chat page: full width at natural size so the examples and composer fill the page. */
 @media (min-width: 1024px) {
-  .jenvu-zoom-dashboard main.dash-page.chat-page { zoom: 0.85 !important; max-width: none; padding-top: 28px; }
+  .jenvu-zoom-dashboard main.dash-page.chat-page { zoom: 0.76 !important; max-width: none; padding-top: 24px; }
 }
 .jenvu-zoom-dashboard main.dash-page.chat-page > :where(div, section, header) { max-width: 1400px; }
