@@ -6,9 +6,9 @@ import { useMemo, useState } from "react";
 import {
   Calendar,
   ChartColumn,
+  ChevronLeft,
   ChevronRight,
   Download,
-  RefreshCw,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -482,7 +482,7 @@ function UsagePage() {
   return (
     <div className="mx-auto w-full max-w-[1100px] pb-10 text-foreground">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <h1 className="text-[28px] font-medium tracking-tight text-foreground sm:text-[32px]">Usage</h1>
+        <h1 className="text-[30px] font-normal tracking-tight text-foreground sm:text-[34px]">Usage</h1>
         <UsageTabs active="usage" />
       </div>
 

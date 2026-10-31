@@ -107,11 +107,12 @@ function BotUsagePage() {
   return (
     <div className="mx-auto w-full max-w-[1100px] pb-10 text-foreground">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <h1 className="text-[28px] font-medium tracking-tight text-foreground sm:text-[32px]">Bot Usage</h1>
+        <h1 className="text-[30px] font-normal tracking-tight text-foreground sm:text-[34px]">Bot Usage</h1>
         <UsageTabs active="bot" />
       </div>
-      <div className="mt-6 mb-4 flex flex-wrap items-center gap-2">
+      <div className="mt-5 mb-4 flex flex-wrap items-center gap-2">
           <ConsoleSelect
+            plain
             open={accountMenuOpen}
             onToggle={() => setAccountMenuOpen((v) => !v)}
             label="Account"
