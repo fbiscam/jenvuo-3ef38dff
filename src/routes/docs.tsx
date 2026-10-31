@@ -3,7 +3,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Search, ChevronRight, Menu, X } from "lucide-react";
 import SiteHeader from "@/components/SiteHeader";
 import BlogFooter from "@/components/BlogFooter";
-import { NextStep } from "@/components/PageShell";
+
 import { DOC_GROUPS, type DocSection } from "@/components/docs/doc-content";
 
 export const Route = createFileRoute("/docs")({
@@ -183,7 +183,6 @@ function DocsPage() {
         </aside>
       </div>
 
-      <NextStep />
       <div className="hide-in-pwa"><BlogFooter /></div>
     </div>
   );

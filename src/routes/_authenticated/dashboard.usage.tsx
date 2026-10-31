@@ -679,7 +679,7 @@ function UsagePage() {
         ))}
       </div>
       <section className="console-card mt-3 grid grid-cols-1 gap-6 p-4 sm:p-5 lg:grid-cols-[minmax(0,1.7fr)_minmax(0,1fr)]">
-        <div className="flex min-h-[340px] flex-col">
+        <div className="flex min-h-[330px] flex-col">
           <div className="text-[13px] text-muted-foreground">
             {API_TYPES.find((t) => t.id === breakdown)?.label}
           </div>
