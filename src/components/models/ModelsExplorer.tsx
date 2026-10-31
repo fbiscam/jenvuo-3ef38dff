@@ -183,6 +183,37 @@ export default function ModelsExplorer({ apiHref = "/dashboard/api" }: { apiHref
 
   const price = `$${PRICE_PER_MILLION.toFixed(2)}`;
 
+  const consoleMode = apiHref === "/dashboard/api";
+
+  if (consoleMode) {
+    return (
+      <div className="mx-auto w-full max-w-5xl space-y-8 font-sans text-foreground">
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <div className="min-w-0">
+            <h1 className="text-[28px] font-medium tracking-tight text-foreground">Models</h1>
+            <p className="mt-1 text-[14px] text-muted-foreground">Every model you can call with one Jenvu API key, at {price} per million tokens.</p>
+          </div>
+          <Link to="/dashboard/api" className="console-pill console-pill-solid inline-flex h-9 items-center gap-1.5 px-4 text-sm font-medium">
+            Create API key <ArrowRight className="h-3.5 w-3.5" />
+          </Link>
+        </div>
+        <div className="grid gap-3 sm:grid-cols-3">
+          {[
+            [String(MODEL_CATALOG.length), "Models available"],
+            [String(new Set(MODEL_CATALOG.map((m) => m.provider)).size), "AI labs"],
+            [price, "Per 1M tokens"],
+          ].map(([v, l]) => (
+            <div key={l} className="console-card p-5">
+              <p className="text-[13px] text-muted-foreground">{l}</p>
+              <p className="mt-2 text-2xl font-medium tabular-nums tracking-tight">{v}</p>
+            </div>
+          ))}
+        </div>
+        <ConsoleModelTable list={list} query={query} setQuery={setQuery} />
+      </div>
+    );
+  }
+
   return (
     <div className="mx-auto w-full max-w-[1250px] space-y-14 px-4 py-8 font-sans text-gc-ink sm:px-6 sm:py-10">
       {/* Discover — same look as the Platform page hero */}
