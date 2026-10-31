@@ -74,10 +74,10 @@ function StartBuilding({ className = pillLight }: { className?: string }) {
 
 function Ticks({ items }: { items: string[] }) {
   return (
-    <ul className="mt-4 space-y-2 text-[13px] leading-snug text-gc-ink">
+    <ul className="mt-5 space-y-3 text-[15px] leading-snug text-gc-ink">
       {items.map((t) => (
         <li key={t} className="flex gap-2">
-          <Check className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+          <Check className="mt-0.5 h-4 w-4 shrink-0" />
           <span>{t}</span>
         </li>
       ))}
@@ -461,8 +461,8 @@ function UseCases() {
     <section className="mx-auto max-w-6xl px-5 py-20 text-center">
       <h2 className="text-4xl font-medium tracking-tight sm:text-5xl">Use cases driven by our platform</h2>
       <div className="mt-7 flex flex-wrap justify-center gap-3">
-        <ContactSales className={PRIMARY_BTN} />
-        <StartBuilding className={SECONDARY_BTN} />
+        <ContactSales className={pillDark} />
+        <StartBuilding className={pillLight} />
       </div>
       <div className="mt-10 grid gap-6 sm:grid-cols-2 md:grid-cols-3">
         {USE_CASES.map((u) => (
@@ -513,7 +513,7 @@ function Enterprise() {
         at scale
       </h2>
       <div className="mt-7 flex justify-center">
-        <Link to="/docs" className={SECONDARY_BTN}>
+        <Link to="/docs" className={pillLight}>
           Learn more
         </Link>
       </div>
@@ -549,7 +549,7 @@ function GetStarted() {
               />
             </div>
             <div className="mt-8">
-              <ContactSales className={PRIMARY_BTN} />
+              <ContactSales className={pillDark} />
             </div>
           </div>
           <div className="flex flex-col rounded-xl border border-gc-line bg-background p-7 sm:p-8">
@@ -565,7 +565,7 @@ function GetStarted() {
               />
             </div>
             <div className="mt-8">
-              <StartBuilding className={SECONDARY_BTN} />
+              <StartBuilding className={pillLight} />
             </div>
           </div>
         </div>
