@@ -50,7 +50,7 @@ export function EntFrontierModels() {
 const pill =
   "inline-flex items-center gap-1.5 rounded-full bg-foreground px-6 py-3 text-[15px] font-medium text-background transition hover:opacity-85";
 const h2 = "text-[34px] font-medium leading-[1.1] tracking-tight text-foreground sm:text-[48px]";
-const sub = "mx-auto mt-5 max-w-2xl text-[17px] leading-relaxed text-muted-foreground";
+const sub = "mx-auto mt-5 max-w-2xl text-[18px] sm:text-[19px] leading-relaxed text-muted-foreground";
 
 /* 1 — Hero (xAI style): badge, headline, two pills */
 export function EntHero() {
@@ -68,7 +68,7 @@ export function EntHero() {
         for every chart you{" "}
         <span className="underline decoration-muted-foreground/40 decoration-[3px] underline-offset-[10px]">see</span>.
       </h1>
-      <p className="mx-auto mt-6 max-w-2xl text-[16px] text-foreground/80 sm:text-[18px]">
+      <p className="mx-auto mt-6 max-w-2xl text-[18px] text-foreground/80 sm:text-[21px]">
         Reasoning, code, alerts, charts, and automation. Built for gold traders.
       </p>
       <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
@@ -99,12 +99,12 @@ export function EntShowcase() {
     <section className="px-5 pb-20">
       <div className="mx-auto grid max-w-[1140px] gap-3 md:grid-cols-3">
         {/* Chat */}
-        <Link to="/dashboard" className={`${tile} h-[290px] bg-ent-ivory p-5 text-[13px] leading-snug`}>
+        <Link to="/dashboard" className={`${tile} h-[290px] bg-ent-ivory p-5 text-[14px] leading-snug`}>
           <div className="mt-[-18px] w-[85%] rounded-2xl bg-ent-bubble px-4 py-2.5 text-foreground/80">the core into a singularity.</div>
-          <div className="mt-3 ml-auto w-fit max-w-[70%] rounded-2xl bg-ent-bubble px-4 py-2.5 text-gc-blue">Why did gold sweep the Asian low?</div>
-          <div className="mt-3 w-[85%] rounded-2xl bg-ent-bubble px-4 py-2.5 text-foreground/80">Sell-side liquidity rested under the range, so price took it before the <span className="text-gc-blue">London open</span>.</div>
-          <div className="mt-3 ml-auto w-fit max-w-[70%] rounded-2xl bg-ent-bubble px-4 py-2.5 text-gc-blue">Explain an FVG simply</div>
-          <div className="mt-3 w-[85%] rounded-2xl bg-ent-bubble px-4 py-2.5 text-foreground/80">A fast move leaves a gap between three candles — <span className="text-gc-blue">price often comes back</span> to fill part of it.</div>
+          <div className="mt-3 ml-auto w-fit max-w-[70%] rounded-2xl bg-ent-bubble px-4 py-2.5 text-foreground">Why did gold sweep the Asian low?</div>
+          <div className="mt-3 w-[85%] rounded-2xl bg-ent-bubble px-4 py-2.5 text-foreground/80">Sell-side liquidity rested under the range, so price took it before the <span className="text-foreground">London open</span>.</div>
+          <div className="mt-3 ml-auto w-fit max-w-[70%] rounded-2xl bg-ent-bubble px-4 py-2.5 text-foreground">Explain an FVG simply</div>
+          <div className="mt-3 w-[85%] rounded-2xl bg-ent-bubble px-4 py-2.5 text-foreground/80">A fast move leaves a gap between three candles — <span className="text-foreground">price often comes back</span> to fill part of it.</div>
           <TileFoot label="Chat" />
         </Link>
         {/* Build */}
@@ -120,7 +120,7 @@ export function EntShowcase() {
             <div><span className="text-ent-ide-green">• read_file</span> src/api/signals.ts <span className="opacity-40">42 lines</span></div>
             <div className="flex justify-between opacity-60"><span>| Scan signal handlers</span><span className="text-ent-ide-green">[done]</span></div>
             <div className="opacity-50">◆ Thought for 2.8s</div>
-            <div className="mt-1 pl-3"><span className="text-gc-blue">◆</span> <b>Edit</b> <span className="text-ent-ide-green">src/api/signals.ts</span></div>
+            <div className="mt-1 pl-3"><span className="text-foreground">◆</span> <b>Edit</b> <span className="text-ent-ide-green">src/api/signals.ts</span></div>
             <div><span className="opacity-40">14 </span>export async function handler(req) {"{"}</div>
             <div className="bg-ent-ide-add"><span className="opacity-40">15 </span>  await rateLimit(req, {"{"} max: 100 {"}"});</div>
             <div className="bg-ent-ide-del"><span className="opacity-40">33 </span>  if (!data.symbol) throw Error;</div>
@@ -129,7 +129,7 @@ export function EntShowcase() {
           <TileFoot label="Build" light />
         </Link>
         {/* Bot */}
-        <Link to="/dashboard" className={`${tile} h-[290px] bg-ent-ivory p-5 text-[13px] leading-snug`}>
+        <Link to="/dashboard" className={`${tile} h-[290px] bg-ent-ivory p-5 text-[14px] leading-snug`}>
           <div className="text-[12px] text-muted-foreground">✓ Flagged → 1 alert · XAU/USD $2,412 twice</div>
           <div className="mt-4 w-[88%] rounded-2xl bg-ent-bubble px-4 py-3 text-foreground">price touched $2,412 at 09:00 and again at 13:30. double top, or two separate tests?</div>
           <div className="mt-4 ml-auto w-fit rounded-2xl bg-foreground px-4 py-2.5 text-background">two tests, london held the level</div>
@@ -169,7 +169,7 @@ function Card({ title, body, children }: { title: string; body: string; children
     <div className="relative flex h-[480px] flex-col overflow-hidden rounded-[8px] bg-ent-card">
       <div className="px-8 pt-10">
         <h3 className="text-[21px] font-medium tracking-tight text-foreground">{title}</h3>
-        <p className="mt-3 max-w-[340px] text-[14px] leading-[1.6] text-foreground/85">{body}</p>
+        <p className="mt-3 max-w-[360px] text-[16px] leading-[1.6] text-foreground/85">{body}</p>
       </div>
       <div className="relative mt-auto h-[300px]">{children}</div>
     </div>
@@ -185,7 +185,7 @@ export function EntBuilt() {
     <section className="px-5 py-24">
       <div className="text-center">
         <h2 className="text-[34px] font-medium leading-[1.1] tracking-tight text-foreground sm:text-[44px]">Built for trading. Backed by frontier AI.</h2>
-        <p className="mx-auto mt-5 max-w-[580px] text-[16px] leading-[1.65] text-foreground/85">
+        <p className="mx-auto mt-5 max-w-[620px] text-[18px] leading-[1.65] text-foreground/85">
           Jenvu combines leading research and models to build trader-ready products people can use every day, helping you redesign work around what's possible.
         </p>
       </div>
@@ -214,7 +214,7 @@ export function EntBuilt() {
             <div className="mt-3 flex items-center gap-3 text-[13px]">
               <Plus className="h-4 w-4 text-foreground" />
               <span className="h-4 w-px bg-border" />
-              <span className="inline-flex items-center gap-1 text-gc-blue"><Bot className="h-3.5 w-3.5" /> Agent <span className="opacity-70">×</span></span>
+              <span className="inline-flex items-center gap-1 text-foreground"><Bot className="h-3.5 w-3.5" /> Agent <span className="opacity-70">×</span></span>
             </div>
           </div>
         </Card>
@@ -242,20 +242,20 @@ export function EntBuilt() {
                     <text x="0" y={24 + i * 48} fontSize="11" fill="var(--muted-foreground)">{v}%</text>
                   </g>
                 ))}
-                <polyline points="56,240 92,140 110,58 140,30 172,26" fill="none" stroke="var(--gc-blue)" strokeWidth="1.5" opacity="0.6" />
-                {[[56, 240], [92, 140], [110, 58], [140, 30], [172, 26]].map(([x, y]) => <circle key={`${x}`} cx={x} cy={y} r="3" fill="var(--gc-blue)" opacity="0.7" />)}
-                <text x="178" y="44" fontSize="11" fill="var(--gc-blue)">Pro plan</text>
+                <polyline points="56,240 92,140 110,58 140,30 172,26" fill="none" stroke="var(--foreground)" strokeWidth="1.5" opacity="0.6" />
+                {[[56, 240], [92, 140], [110, 58], [140, 30], [172, 26]].map(([x, y]) => <circle key={`${x}`} cx={x} cy={y} r="3" fill="var(--foreground)" opacity="0.7" />)}
+                <text x="178" y="44" fontSize="11" fill="var(--foreground)">Pro plan</text>
                 <polyline points="60,250 88,180 150,96 260,58" fill="none" stroke="var(--muted-foreground)" strokeWidth="1.2" opacity="0.6" />
                 {[[60, 250], [88, 180], [150, 96]].map(([x, y]) => <circle key={`${x}`} cx={x} cy={y} r="3" fill="var(--muted-foreground)" opacity="0.7" />)}
               </svg>
             </div>
           </div>
           <div className="absolute bottom-[80px] left-[100px] flex items-center gap-2.5 rounded-xl border border-border bg-background py-2 pl-2 pr-8 shadow-[0_8px_30px_rgba(0,0,0,0.1)]">
-            <span className="grid h-10 w-10 grid-cols-2 place-items-center gap-0.5 rounded-lg bg-gc-blue p-2">
-              {[0, 1, 2, 3].map((i) => <span key={i} className="h-2.5 w-2.5 rounded-full border-2 border-gc-on-blue" />)}
+            <span className="grid h-10 w-10 grid-cols-2 place-items-center gap-0.5 rounded-lg bg-foreground p-2">
+              {[0, 1, 2, 3].map((i) => <span key={i} className="h-2.5 w-2.5 rounded-full border-2 border-background" />)}
             </span>
             <span className="text-left">
-              <span className="block text-[13px] font-medium text-gc-blue">$3 / 1M tokens</span>
+              <span className="block text-[13px] font-medium text-foreground">$3 / 1M tokens</span>
               <span className="block text-[12px] text-muted-foreground">Same price on every model</span>
             </span>
             <span className="absolute right-2 top-2 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-foreground text-[9px] text-background">×</span>
@@ -335,7 +335,7 @@ export function EntFacts() {
           </div>
           <div className="mt-14">
             <div className="text-[48px] font-medium leading-none tracking-tight text-foreground sm:text-[56px]">7</div>
-            <p className="mt-2 text-[15px] text-muted-foreground">deterministic trading engines</p>
+            <p className="mt-2 text-[16px] text-muted-foreground">deterministic trading engines</p>
           </div>
         </div>
         <div className="grid gap-5 sm:grid-cols-2">
@@ -344,7 +344,7 @@ export function EntFacts() {
               <Mark icon={Icon} name={name} />
               <div className="mt-10">
                 <div className="text-[44px] font-medium leading-none tracking-tight text-foreground">{n}</div>
-                <p className="mt-2 text-[15px] text-muted-foreground">{t}</p>
+                <p className="mt-2 text-[16px] text-muted-foreground">{t}</p>
               </div>
             </div>
           ))}
@@ -387,7 +387,7 @@ export function EntStories({ articles: items }: { articles: HomeArticle[] }) {
                   className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]"
                 />
               </div>
-              <p className="mt-4 text-[13px] text-muted-foreground">
+              <p className="mt-4 text-[14px] text-muted-foreground">
                 {a.category ? `${a.category} · ` : ""}{newsDate(a.published_at)}
               </p>
               <p className="mt-1.5 inline-flex items-start gap-1 text-[17px] font-medium leading-snug tracking-tight text-foreground">

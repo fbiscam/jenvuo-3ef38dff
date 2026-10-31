@@ -197,14 +197,15 @@
   --brand-gemini: oklch(0.62 0.23 285);
   --brand-deepseek: oklch(0.59 0.22 271);
   --brand-claude: oklch(0.7 0.12 55);
-  --home-accent: #1a73e8;
+  --home-accent: #111111;
   --home-accent-foreground: #ffffff;
-  --home-accent-soft: #e8f0fe;
+  --home-accent-soft: #f1f1f1;
   --home-accent-canvas: #f0f5fe;
   /* Homepage (Google Cloud-style) palette */
-  --gc-blue: #1a73e8;
-  --gc-blue-hover: #1765cc;
-  --gc-blue-soft: #e8f0fe;
+  /* Monochrome: "blue" tokens render black so buttons/links match the homepage. */
+  --gc-blue: #111111;
+  --gc-blue-hover: #333333;
+  --gc-blue-soft: #f1f1f1;
   --gc-console-bar: #f0f5fe;
   --gc-console-search: #e1e6ef;
   --gc-console-rail-active: #d3e3fd;
@@ -227,7 +228,7 @@
   --gc-on-blue: #ffffff;
   --gc-panel: #eef2f7;
   --gc-navy: #283593;
-  --gc-blue-deep: #0b57d0;
+  --gc-blue-deep: #111111;
   --gc-sky: #dcefff;
   /* Dashboard console shell (Google Cloud console-style) */
   --gc-canvas: #f0f5fe;
@@ -1021,8 +1022,8 @@ html[data-pwa="1"] .pwa-tabbar {
   --gc-notice: #e9eef6;
   --gc-nav-active: #dbedfc;
   --gc-sky: #dcefff;
-  --gc-blue: #1a73e8;
-  --gc-blue-deep: #0b57d0;
+  --gc-blue: #111111;
+  --gc-blue-deep: #111111;
   --gc-console-search: #e1e6ef;
   --foreground: #202124;
   --muted-foreground: #3c4043;
