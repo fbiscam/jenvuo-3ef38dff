@@ -18,11 +18,11 @@ export const Route = createFileRoute("/_authenticated/dashboard/code")({
 
 const EXAMPLES = {
   "REST API": {
-    code: `curl https://jenvu.com/api/v1/chat/completions \\
+    code: `curl https://jenvu.com/api/public/v1/chat/completions \\
   -H "Authorization: Bearer $JENVU_API_KEY" \\
   -H "Content-Type: application/json" \\
   -d '{
-    "model": "jenvu-chat",
+    "model": "gpt-5.5",
     "messages": [{"role": "user", "content": "Explain a liquidity sweep."}]
   }'`,
     result: "Returns a JSON chat completion with the model's answer and token usage.",
@@ -30,9 +30,9 @@ const EXAMPLES = {
   Python: {
     code: `from openai import OpenAI
 
-client = OpenAI(base_url="https://jenvu.com/api/v1", api_key="JENVU_API_KEY")
+client = OpenAI(base_url="https://jenvu.com/api/public/v1", api_key="JENVU_API_KEY")
 res = client.chat.completions.create(
-    model="jenvu-chat",
+    model="gpt-5.5",
     messages=[{"role": "user", "content": "Summarize today's XAU/USD structure."}],
 )
 print(res.choices[0].message.content)`,
@@ -41,9 +41,9 @@ print(res.choices[0].message.content)`,
   "Node.js": {
     code: `import OpenAI from "openai";
 
-const client = new OpenAI({ baseURL: "https://jenvu.com/api/v1", apiKey: process.env.JENVU_API_KEY });
+const client = new OpenAI({ baseURL: "https://jenvu.com/api/public/v1", apiKey: process.env.JENVU_API_KEY });
 const res = await client.chat.completions.create({
-  model: "jenvu-chat",
+  model: "gpt-5.5",
   messages: [{ role: "user", content: "Write a code review for this diff." }],
 });
 console.log(res.choices[0].message.content);`,
