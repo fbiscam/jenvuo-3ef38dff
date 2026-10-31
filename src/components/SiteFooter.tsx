@@ -3,6 +3,7 @@ import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Globe } from "lucide-react";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 
 function NewsletterSubscribe() {
@@ -156,6 +157,7 @@ export default function SiteFooter({ className }: { className?: string }) {
             <div className="space-y-5">
               <NewsletterSubscribe />
               <div className="flex flex-wrap items-center gap-3">
+                <ThemeToggle />
                 <Link to="/platform" className="inline-flex items-center rounded-full border border-border px-4 py-1.5 text-[13px] font-medium text-foreground transition-colors hover:bg-muted">
                   Built with Jenvu
                 </Link>
