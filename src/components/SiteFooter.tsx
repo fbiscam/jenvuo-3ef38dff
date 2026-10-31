@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router";
+import JenvuMark from "@/components/JenvuMark";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -151,7 +152,7 @@ export default function SiteFooter({ className }: { className?: string }) {
           {/* Brand block */}
           <div className="flex shrink-0 flex-col justify-between gap-8 lg:w-[300px] lg:border-r lg:border-border lg:pr-10">
             <div>
-              <Link to="/" className="text-[26px] font-medium leading-none tracking-tight text-foreground">Jenvu</Link>
+              <Link to="/" className="inline-flex items-center gap-2.5 text-[26px] font-medium leading-none tracking-tight text-foreground"><JenvuMark className="h-7 w-7 shrink-0" />Jenvu</Link>
               <p className="mt-4 text-[13px] text-muted-foreground">© {year} Jenvu. All rights reserved.</p>
             </div>
             <div className="space-y-5">

@@ -135,9 +135,8 @@ export default function SiteHeader() {
           <div className="absolute inset-0 bg-foreground/40" onClick={() => setMobileMenuOpen(false)} />
           <div className="absolute inset-x-0 top-0 bg-background border-b border-border shadow-lg">
             <div className="flex items-center justify-between px-5 py-3">
-              <Link to="/" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-2.5">
-                <JenvuMark className="h-6 w-6 text-foreground" />
-                <span className="text-[20px] tracking-tight text-foreground" style={{ fontFamily: "\"Google Sans Flex\", \"Google Sans\",\"Product Sans\",\"DM Sans\",system-ui,sans-serif", fontWeight: 500 }}>Jenvu</span>
+              <Link to="/" onClick={() => setMobileMenuOpen(false)} aria-label="Jenvu home" className="flex items-center">
+                <JenvuMark className="h-7 w-7 text-foreground" />
               </Link>
               <button
                 type="button"
