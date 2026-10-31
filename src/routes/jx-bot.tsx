@@ -159,8 +159,8 @@ function AppWindow() {
             </div>
             {step >= 1 && (
               <div className="jx-in max-w-[85%] space-y-0.5 rounded-2xl bg-muted px-4 py-3 text-foreground">
-                {LOG.map((l, i) => (
-                  <div key={l} className={step >= 1 + Math.min(i, 2) ? "" : "opacity-0"}>
+                {LOG.slice(0, Math.min(LOG.length, step + 1)).map((l) => (
+                  <div key={l} className="jx-in">
                     {l}
                   </div>
                 ))}
@@ -203,7 +203,7 @@ function Hero() {
         className="inline-flex items-center gap-2 text-[14px] text-foreground"
       >
         <span className="font-medium">JX Bot for MetaTrader 5</span>
-        <span className="text-muted-foreground">· Open the setup guide</span>
+        <span className="hidden text-muted-foreground sm:inline">· Open the setup guide</span>
         <span className="grid h-6 w-6 place-items-center rounded-full bg-muted">
           <ArrowUpRight className="h-3.5 w-3.5" />
         </span>
