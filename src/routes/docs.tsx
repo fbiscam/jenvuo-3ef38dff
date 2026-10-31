@@ -117,7 +117,7 @@ function DocsPage() {
           </p>
           <div className="jenvu-rise [animation-delay:140ms] mx-auto mt-8 grid max-w-[1100px] gap-3 text-left sm:grid-cols-2 lg:grid-cols-5">
             {DOC_GROUPS.slice(0, 5).map((g) => (
-              <a key={g.title} href={`#${g.sections[0].id}`} className="group rounded-3xl border border-gc-line bg-background p-5 transition-shadow hover:shadow-md">
+              <a key={g.title} href={`#${g.sections[0].id}`} className="group rounded-md border border-gc-line bg-background p-5 transition-shadow hover:shadow-md">
                 <p className="text-[16px] font-medium text-gc-ink">{g.title}</p>
                 <p className="mt-1 text-[13px] text-gc-ink-muted">{g.sections.length} topics</p>
                 <span className="mt-3 inline-flex items-center gap-1 text-[14px] text-gc-blue">Read <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" /></span>
@@ -147,7 +147,7 @@ function DocsPage() {
               <div key={g.title} className="space-y-5">
                 <h2 className="text-[13px] font-medium uppercase tracking-wide text-gc-ink-muted">{g.title}</h2>
                 {g.sections.map((s) => (
-                  <article key={s.id} id={s.id} className="scroll-mt-20 rounded-[28px] border border-gc-line bg-background p-6 sm:p-8">
+                  <article key={s.id} id={s.id} className="scroll-mt-20 rounded-md border border-gc-line bg-background p-6 sm:p-8">
                     <h2 className="text-[26px] font-medium leading-tight tracking-[-0.2px] text-gc-ink">{s.title}</h2>
                     <div className="doc-body mt-4 space-y-4 text-[15px] leading-[1.7] text-gc-ink-muted [&_a]:text-gc-blue-deep [&_a]:underline [&_h3]:pt-2 [&_h3]:text-[18px] [&_h3]:font-normal [&_h3]:text-gc-ink [&_li]:pl-1 [&_ol]:list-decimal [&_ol]:space-y-2 [&_ol]:pl-5 [&_strong]:font-medium [&_strong]:text-gc-ink [&_ul]:list-disc [&_ul]:space-y-2 [&_ul]:pl-5">
                       {s.body}

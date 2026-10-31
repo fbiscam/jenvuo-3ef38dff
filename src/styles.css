@@ -1557,6 +1557,8 @@ body[data-scroll-locked] { margin-right: 0 !important; padding-right: 0 !importa
 .plat-scan { animation: plat-scan 2.6s ease-in-out both; }
 .plat-candle-in { transform-origin: bottom; animation: plat-candle-in .5s cubic-bezier(.2,.8,.2,1) both; }
 .plat-box { animation: plat-box .4s ease-out both; }
+@keyframes plat-wave { 0%, 100% { transform: scaleY(.35); } 50% { transform: scaleY(1); } }
+.plat-wave { animation: plat-wave .8s ease-in-out infinite; }
 @media (prefers-reduced-motion: reduce) {
-  .plat-msg-in, .plat-dot, .plat-scan, .plat-candle-in, .plat-box { animation: none; }
+  .plat-msg-in, .plat-dot, .plat-scan, .plat-candle-in, .plat-box, .plat-wave { animation: none; }
 }

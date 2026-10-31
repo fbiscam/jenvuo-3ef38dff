@@ -578,9 +578,9 @@ const USE_CASES = [
 function UseCaseCard({ u }: { u: (typeof USE_CASES)[number] }) {
   const [open, setOpen] = React.useState(false);
   return (
-    <div className="flex flex-col rounded-xl bg-gc-surface p-2 text-left">
+    <div className="flex flex-col rounded-md bg-gc-surface p-2 text-left">
       <div
-        className="flex aspect-[16/9] items-center justify-center rounded-lg"
+        className="flex aspect-[16/9] items-center justify-center rounded-sm"
         style={{ backgroundImage: `var(--platform-aurora-${u.g})` }}
       >
         <span className="flex h-14 w-14 items-center justify-center rounded-xl bg-background text-gc-ink">
@@ -667,7 +667,7 @@ function Enterprise() {
       </div>
       <div className="mt-10 grid gap-6 text-left md:grid-cols-3">
         {ENTERPRISE.map((e) => (
-          <div key={e.t} className="rounded-xl border border-gc-line p-7">
+          <div key={e.t} className="rounded-md border border-gc-line p-7">
             <h3 className="text-xl font-medium">{e.t}</h3>
             <Ticks items={e.items} />
           </div>
@@ -685,7 +685,7 @@ function GetStarted() {
       <div className="mx-auto max-w-6xl px-5">
         <h2 className="text-4xl font-medium tracking-tight sm:text-5xl">Get started</h2>
         <div className="mt-10 grid gap-6 text-left md:grid-cols-2">
-          <div className="flex flex-col rounded-xl border border-gc-line bg-background p-7 sm:p-8">
+          <div className="flex flex-col rounded-md border border-gc-line bg-background p-7 sm:p-8">
             <h3 className="text-2xl font-medium">Partner with us on your AI plans</h3>
             <div className="flex-1">
               <Ticks
@@ -700,7 +700,7 @@ function GetStarted() {
               <ContactSales className={pillDark} />
             </div>
           </div>
-          <div className="flex flex-col rounded-xl border border-gc-line bg-background p-7 sm:p-8">
+          <div className="flex flex-col rounded-md border border-gc-line bg-background p-7 sm:p-8">
             <h3 className="text-2xl font-medium">Build on your own</h3>
             <div className="flex-1">
               <Ticks
