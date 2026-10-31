@@ -544,6 +544,62 @@ function ExtensionPage() {
         onCancel={() => setDeleteTarget(null)}
         onConfirm={onDelete}
       />
+
+      <ConfirmDialog
+        open={!!rotateTarget}
+        busy={saving}
+        title="Rotate API key?"
+        confirmLabel="Rotate key"
+        busyLabel="Rotating…"
+        description={
+          <>
+            A new secret is created for{" "}
+            <span className="font-medium text-foreground">{rotateTarget?.name}</span> and the old one stops
+            working right away. Update every app that uses it.
+          </>
+        }
+        onCancel={() => setRotateTarget(null)}
+        onConfirm={onRotate}
+      />
+
+      {editTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4" onClick={() => setEditTarget(null)}>
+          <form
+            onClick={(e) => e.stopPropagation()}
+            onSubmit={(e) => {
+              e.preventDefault();
+              void onRename();
+            }}
+            className="w-full max-w-md rounded-2xl border border-border bg-popover p-5 text-popover-foreground shadow-xl"
+          >
+            <div className="flex items-start justify-between gap-3">
+              <div className="text-[16px] font-medium text-foreground">Edit key</div>
+              <button type="button" onClick={() => setEditTarget(null)} aria-label="Close" className="rounded-full p-1 text-muted-foreground hover:bg-[var(--console-card)]">
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+            <label className="mt-4 block text-[13px] text-muted-foreground" htmlFor="edit-key-name">Name</label>
+            <input
+              id="edit-key-name"
+              autoFocus
+              value={editName}
+              maxLength={60}
+              onChange={(e) => setEditName(e.target.value)}
+              className="mt-1.5 w-full rounded-xl border border-border bg-background px-3 py-2 text-[14px] text-foreground outline-none focus:border-foreground/40"
+            />
+            <p className="mt-2 text-[12px] text-muted-foreground">
+              Key ID <code className="font-mono">{editTarget.id.slice(0, 8)}…</code> · created{" "}
+              {new Date(editTarget.created_at).toLocaleDateString()}
+            </p>
+            <div className="mt-5 flex justify-end gap-2">
+              <button type="button" onClick={() => setEditTarget(null)} className="console-pill">Cancel</button>
+              <button type="submit" disabled={saving || !editName.trim()} className="console-pill console-pill-solid disabled:opacity-50">
+                {saving ? "Saving…" : "Save"}
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
     </div>
   );
 }
