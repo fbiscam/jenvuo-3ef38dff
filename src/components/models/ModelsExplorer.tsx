@@ -188,7 +188,7 @@ function ConsoleModelTable({ list, query, setQuery }: { list: CatalogModel[]; qu
         {list.map((m) => (
           <li key={m.id} className="grid grid-cols-1 gap-2 px-5 py-4 sm:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_100px_110px] sm:items-center sm:gap-4">
             <div className="flex min-w-0 items-center gap-3">
-              <img src={LOGOS[m.provider]} alt="" className="h-6 w-6 shrink-0 object-contain" />
+              <img src={LOGOS[m.provider]} alt="" className={cn("h-6 w-6 shrink-0 object-contain", MONO_LOGOS.has(m.provider) && "dark:invert", m.provider === "moonshot" && "dark:hue-rotate-180")} />
               <div className="min-w-0">
                 <p className="truncate text-sm font-medium text-foreground">{m.name}</p>
                 <button type="button" onClick={() => void copy(m.id)} className="inline-flex items-center gap-1 font-mono text-[12px] text-muted-foreground hover:text-foreground">
@@ -515,7 +515,7 @@ export default function ModelsExplorer({ apiHref = "/dashboard/api" }: { apiHref
                   <FilterChip active={provider === "all"} onClick={() => setProvider("all")}>All</FilterChip>
                   {PROVIDER_KEYS.map((k) => (
                     <FilterChip key={k} active={provider === k} onClick={() => setProvider(provider === k ? "all" : k)}>
-                      <img src={LOGOS[k]} alt="" className="h-3.5 w-3.5 object-contain" aria-hidden /> {PROVIDERS[k].label}
+                      <img src={LOGOS[k]} alt="" className={cn("h-3.5 w-3.5 object-contain", MONO_LOGOS.has(k) && "dark:invert", k === "moonshot" && "dark:hue-rotate-180")} aria-hidden /> {PROVIDERS[k].label}
                     </FilterChip>
                   ))}
                 </div>
