@@ -1,17 +1,15 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowUpRight, Plus } from "lucide-react";
+import { ArrowUpRight, Plus, MessagesSquare, BrainCircuit, type LucideIcon } from "lucide-react";
 import { useAuthUser } from "@/hooks/useAuthUser";
 import { useCredits } from "@/hooks/useCredits";
-import chatImg from "@/assets/home/hero-ai-1.jpg";
-import modelsImg from "@/assets/home/hero-ai-2.jpg";
 import botImg from "@/assets/home/hero-ai-3.jpg";
 import terminalImg from "@/assets/home/hero-ai-4.jpg";
 
-type Product = { title: string; text: string; to: string; img: string; badge?: string };
+type Product = { title: string; text: string; to: string; img?: string; aurora?: number; icon?: LucideIcon; badge?: string };
 
 const PRODUCTS: Product[] = [
-  { title: "Chat API", text: "Build with Jenvu models through one compatible API.", to: "/dashboard/api", img: chatImg },
-  { title: "Models", text: "Compare context size and price per million tokens.", to: "/dashboard/models", img: modelsImg, badge: "New" },
+  { title: "Chat API", text: "Build with Jenvu models through one compatible API.", to: "/dashboard/api", aurora: 1, icon: MessagesSquare },
+  { title: "Models", text: "Compare context size and price per million tokens.", to: "/dashboard/models", aurora: 2, icon: BrainCircuit, badge: "New" },
   { title: "JX Bot", text: "Gold M15 Expert Advisor for MT5 with a stop loss.", to: "/dashboard/jx-bot", img: botImg },
   { title: "Terminal", text: "Sweeps, zones and FVGs on XAU/USD with an AI desk.", to: "/dashboard/terminal", img: terminalImg },
 ];
@@ -72,12 +70,20 @@ export default function ConsoleWelcome({ name: profileName, keysCount }: { name?
         {PRODUCTS.map((p) => (
           <Link key={p.title} to={p.to} className="console-card group flex flex-col overflow-hidden">
             <div className="relative aspect-[16/10] overflow-hidden">
+              {p.aurora ? (
+                <div className="flex h-full w-full items-center justify-center" style={{ backgroundImage: `var(--platform-aurora-${p.aurora})` }}>
+                  <span className="flex h-14 w-14 items-center justify-center rounded-xl bg-background text-foreground transition duration-500 group-hover:scale-110">
+                    {p.icon && <p.icon className="h-7 w-7" aria-hidden="true" />}
+                  </span>
+                </div>
+              ) : (
               <img
                 src={p.img}
                 alt=""
                 loading="lazy"
                 className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.04]"
               />
+              )}
               {p.badge && <span className="absolute left-3 top-3 rounded-full bg-background px-2.5 py-0.5 text-[12px] font-medium text-foreground">{p.badge}</span>}
             </div>
             <div className="flex flex-1 flex-col p-5">

@@ -136,7 +136,7 @@ export default function DashboardTopBar({
   const seeAll = () => { const t = q.trim(); if (!t) return; close(); void navigate({ to: "/search", search: { q: t } }); };
 
   return (
-    <header className={`sticky top-0 z-30 flex ${white ? "h-[52px]" : "h-14"} shrink-0 items-center gap-2 ${white ? "border-b border-gc-line bg-background" : "console-topbar border-b border-gc-line bg-background"} px-2 sm:gap-3 sm:px-3`}>
+    <header className={`sticky top-0 z-30 flex ${white ? "h-[52px]" : "h-14"} shrink-0 items-center gap-2 ${white ? "bg-background" : "console-topbar bg-background"} px-2 sm:gap-3 sm:px-3`}>
       <button
         type="button"
         onClick={onMenu}
