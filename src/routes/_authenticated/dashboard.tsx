@@ -89,6 +89,7 @@ import {
   LayoutDashboard,
   ChartNoAxesCombined,
   KeyRound,
+  Code2,
   BadgeDollarSign,
   FileCheck2,
   LockKeyhole,
@@ -188,6 +189,7 @@ const NAV_GROUPS: Array<{ label: string; items: TabItem[] }> = [
     items: [
       { to: "/dashboard/api", label: "API Keys", icon: KeyRound },
       { to: "/dashboard/models", label: "Models", icon: BrainCircuit },
+      { to: "/dashboard/code", label: "Code", icon: Code2 },
       { to: "/dashboard/jx-bot", label: "JX Bot", icon: Cpu },
     ],
   },
