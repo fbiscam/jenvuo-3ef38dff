@@ -1,4 +1,5 @@
 import { ConsoleSelect } from "@/components/dashboard/ConsoleSelect";
+import { StackedBars } from "@/components/dashboard/ConsoleBars";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
@@ -746,76 +747,6 @@ const API_TYPES: { id: ApiType; label: string; color: string }[] = [
   { id: "alerts", label: "Alerts", color: "#3d5a6c" },
   { id: "other", label: "Other", color: "#e76f51" },
 ];
-
-function StackedBars<K extends string>({
-  days,
-  keys,
-  colors,
-  format,
-  baseline,
-  compact,
-  className = "",
-}: {
-  days: ({ date: string } & Record<K, number>)[];
-  keys: K[];
-  colors: string[];
-  format: (v: number) => string;
-  baseline?: string;
-  compact?: boolean;
-  className?: string;
-}) {
-  const totals = days.map((day) => keys.reduce((sum, k) => sum + (day[k] ?? 0), 0));
-  const max = Math.max(...totals, 0);
-  const labelEvery = Math.max(1, Math.ceil(days.length / (compact ? 3 : 4)));
-  const fmtDate = (iso: string) =>
-    new Date(`${iso}T00:00:00`).toLocaleDateString(undefined, {
-      month: "short",
-      day: "numeric",
-      year: compact ? undefined : "numeric",
-    });
-  return (
-    <div className={`flex min-h-0 flex-col ${className}`}>
-      <div className={`flex flex-1 items-stretch gap-[10px] ${compact ? "min-h-[80px]" : "min-h-[220px]"}`}>
-        {days.map((day, i) => {
-          const total = totals[i] ?? 0;
-          return (
-            <div
-              key={day.date}
-              title={`${fmtDate(day.date)} · ${format(total)}`}
-              className="group flex min-w-0 flex-1 flex-col justify-end rounded-t-[3px] transition-colors hover:bg-foreground/[0.07]"
-            >
-              <div
-                className="flex w-full flex-col-reverse overflow-hidden rounded-t-[3px]"
-                style={{ height: max > 0 ? `${(total / max) * 100}%` : "0%" }}
-              >
-                {keys.map((k, ki) => {
-                  const v = day[k] ?? 0;
-                  if (v <= 0 || total <= 0) return null;
-                  return (
-                    <div
-                      key={k}
-                      style={{ height: `${(v / total) * 100}%`, background: colors[ki] }}
-                    />
-                  );
-                })}
-              </div>
-              <div className="h-[1.5px] w-full" style={{ background: baseline ?? colors[0] }} />
-            </div>
-          );
-        })}
-      </div>
-      {!compact ? (
-        <div className="mt-2 flex gap-[10px] text-[11.5px] text-muted-foreground">
-          {days.map((day, i) => (
-            <div key={day.date} className="min-w-0 flex-1 overflow-visible whitespace-nowrap text-center">
-              {i % labelEvery === 0 || i === days.length - 1 ? fmtDate(day.date) : ""}
-            </div>
-          ))}
-        </div>
-      ) : null}
-    </div>
-  );
-}
 
 function dateLabel(date: Date) {
   return date.toLocaleDateString(undefined, { month: "short", day: "2-digit" });
