@@ -311,7 +311,7 @@ export default function DashboardTopBar({
               <Link to="/contact" className="cursor-pointer gap-3.5 rounded-r-full py-2 pl-4 pr-3 text-[14px] font-normal text-gc-ink focus:bg-gc-notice"><Mail className="h-[19px] w-[19px] shrink-0 text-gc-ink-muted" strokeWidth={1.75} /> Contact us</Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
-              <Link to="/dashboard/profile" className="cursor-pointer gap-3.5 rounded-r-full py-2 pl-4 pr-3 text-[14px] font-normal text-gc-ink focus:bg-gc-notice"><Settings className="h-[19px] w-[19px] shrink-0 text-gc-ink-muted" strokeWidth={1.75} /> Settings</Link>
+              <Link to="/dashboard/settings" className="cursor-pointer gap-3.5 rounded-r-full py-2 pl-4 pr-3 text-[14px] font-normal text-gc-ink focus:bg-gc-notice"><Settings className="h-[19px] w-[19px] shrink-0 text-gc-ink-muted" strokeWidth={1.75} /> Settings</Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem onSelect={() => onSignOut()} className="cursor-pointer gap-3.5 rounded-r-full py-2 pl-4 pr-3 text-[14px] font-normal text-gc-ink focus:bg-gc-notice">
@@ -346,7 +346,7 @@ export default function DashboardTopBar({
               </Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
-              <Link to="/dashboard/profile" className="cursor-pointer gap-3.5 rounded-r-full py-2 pl-4 pr-3 text-[14px] font-normal text-gc-ink focus:bg-gc-notice">
+              <Link to="/dashboard/settings" className="cursor-pointer gap-3.5 rounded-r-full py-2 pl-4 pr-3 text-[14px] font-normal text-gc-ink focus:bg-gc-notice">
                 <Settings className="h-[19px] w-[19px] shrink-0 text-gc-ink-muted" strokeWidth={1.75} /> Settings
               </Link>
             </DropdownMenuItem>
