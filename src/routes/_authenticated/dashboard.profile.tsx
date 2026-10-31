@@ -180,10 +180,10 @@ function Profile() {
   const initial = (fullName || email || "?").trim().charAt(0).toUpperCase();
 
   return (
-    <div className="mx-auto w-full max-w-[1080px] pb-10 text-gc-ink">
-      <header className="jenvu-rise pt-2">
-        <h1 className="text-[32px] font-medium leading-tight tracking-[-0.3px] sm:text-[36px]">Settings</h1>
-        <p className="mt-2 max-w-[620px] text-[15px] leading-[1.6] text-gc-ink-muted">Manage your profile, security, preferences and where you're signed in.</p>
+    <div className="mx-auto w-full max-w-5xl pb-10 text-foreground">
+      <header className="jenvu-rise">
+        <h1 className="text-[28px] font-medium tracking-tight text-foreground">Settings</h1>
+        <p className="mt-1 max-w-[620px] text-[14px] text-muted-foreground">Manage your profile, security, preferences and where you're signed in.</p>
       </header>
 
       <div className="mt-6 grid gap-8 lg:grid-cols-[200px_minmax(0,1fr)]">
@@ -195,7 +195,7 @@ function Profile() {
                   href={`#${s.id}`}
                   onClick={(e) => { e.preventDefault(); setActive(s.id); document.getElementById(s.id)?.scrollIntoView({ behavior: "smooth", block: "start" }); }}
                   aria-current={active === s.id ? "true" : undefined}
-                  className={`flex h-10 items-center gap-3 rounded-full px-4 text-[14px] font-medium transition-colors ${active === s.id ? "bg-gc-blue-soft text-gc-blue-deep" : "text-gc-ink-muted hover:bg-gc-surface hover:text-gc-ink"}`}
+                  className={`flex h-9 items-center gap-3 rounded-full px-4 text-[14px] transition-colors ${active === s.id ? "console-card font-medium text-foreground" : "text-muted-foreground hover:text-foreground"}`}
                 >
                   <s.icon className="h-4 w-4 shrink-0" />
                   {s.label}

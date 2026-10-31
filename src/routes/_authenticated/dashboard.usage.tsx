@@ -369,6 +369,10 @@ function UsagePage() {
 
   return (
     <div className="-mx-5 -mb-7 min-h-[calc(100dvh-4rem)] overflow-hidden bg-background text-foreground sm:-mx-8">
+      <div className="px-4 pt-2 sm:px-6">
+        <h1 className="text-[28px] font-medium tracking-tight text-foreground">Usage</h1>
+        <p className="mt-1 text-[14px] text-muted-foreground">Requests, tokens and credit spend across your API keys.</p>
+      </div>
       {/* Header */}
       <div className="flex min-h-14 flex-col gap-3 border-b border-border px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-6">
         <UsageTabs active="usage" />

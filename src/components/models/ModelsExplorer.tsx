@@ -149,6 +149,59 @@ function SectionHead({ title, sub }: { title: string; sub: string }) {
   );
 }
 
+/** xAI console-style model table used inside the dashboard. */
+function ConsoleModelTable({ list, query, setQuery }: { list: CatalogModel[]; query: string; setQuery: (v: string) => void }) {
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+  const copy = async (id: string) => {
+    try {
+      await navigator.clipboard.writeText(id);
+      setCopiedId(id);
+      setTimeout(() => setCopiedId(null), 1500);
+    } catch {
+      toast.error("Couldn't copy the model ID");
+    }
+  };
+  return (
+    <section className="console-card overflow-hidden">
+      <div className="flex items-center gap-2 px-5 py-4">
+        <Search className="h-4 w-4 text-muted-foreground" />
+        <input
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Search models"
+          className="w-full bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
+        />
+      </div>
+      <div className="hidden grid-cols-[minmax(0,2fr)_minmax(0,1fr)_100px_110px] gap-4 px-5 pb-2 text-[12px] text-muted-foreground sm:grid">
+        <span>Model</span><span>Capabilities</span><span>Context</span><span className="text-right">Price / 1M</span>
+      </div>
+      <ul className="bg-background">
+        {list.map((m) => (
+          <li key={m.id} className="grid grid-cols-1 gap-2 px-5 py-4 sm:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_100px_110px] sm:items-center sm:gap-4">
+            <div className="flex min-w-0 items-center gap-3">
+              <img src={LOGOS[m.provider]} alt="" className="h-6 w-6 shrink-0 object-contain" />
+              <div className="min-w-0">
+                <p className="truncate text-sm font-medium text-foreground">{m.name}</p>
+                <button type="button" onClick={() => void copy(m.id)} className="inline-flex items-center gap-1 font-mono text-[12px] text-muted-foreground hover:text-foreground">
+                  {m.id} {copiedId === m.id ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
+                </button>
+              </div>
+            </div>
+            <div className="flex flex-wrap gap-1">
+              {m.capabilities.slice(0, 3).map((c) => (
+                <span key={c} className="console-badge text-[11px] text-muted-foreground">{CAP_META[c].label}</span>
+              ))}
+            </div>
+            <span className="text-sm tabular-nums text-muted-foreground">{formatContext(m.context)}</span>
+            <span className="text-sm tabular-nums text-foreground sm:text-right">${PRICE_PER_MILLION.toFixed(2)}</span>
+          </li>
+        ))}
+        {list.length === 0 && <li className="px-5 py-10 text-center text-sm text-muted-foreground">No models match your search.</li>}
+      </ul>
+    </section>
+  );
+}
+
 /** OpenRouter-style catalogue of every model available with a Jenvu API key. */
 export default function ModelsExplorer({ apiHref = "/dashboard/api" }: { apiHref?: "/dashboard/api" | "/docs" }) {
   const [selected, setSelected] = useState<string>("claude-opus-5");
@@ -183,6 +236,37 @@ export default function ModelsExplorer({ apiHref = "/dashboard/api" }: { apiHref
 
   const price = `$${PRICE_PER_MILLION.toFixed(2)}`;
 
+  const consoleMode = apiHref === "/dashboard/api";
+
+  if (consoleMode) {
+    return (
+      <div className="mx-auto w-full max-w-5xl space-y-8 font-sans text-foreground">
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <div className="min-w-0">
+            <h1 className="text-[28px] font-medium tracking-tight text-foreground">Models</h1>
+            <p className="mt-1 text-[14px] text-muted-foreground">Every model you can call with one Jenvu API key, at {price} per million tokens.</p>
+          </div>
+          <Link to="/dashboard/api" className="console-pill console-pill-solid inline-flex h-9 items-center gap-1.5 px-4 text-sm font-medium">
+            Create API key <ArrowRight className="h-3.5 w-3.5" />
+          </Link>
+        </div>
+        <div className="grid gap-3 sm:grid-cols-3">
+          {[
+            [String(MODEL_CATALOG.length), "Models available"],
+            [String(new Set(MODEL_CATALOG.map((m) => m.provider)).size), "AI labs"],
+            [price, "Per 1M tokens"],
+          ].map(([v, l]) => (
+            <div key={l} className="console-card p-5">
+              <p className="text-[13px] text-muted-foreground">{l}</p>
+              <p className="mt-2 text-2xl font-medium tabular-nums tracking-tight">{v}</p>
+            </div>
+          ))}
+        </div>
+        <ConsoleModelTable list={list} query={query} setQuery={setQuery} />
+      </div>
+    );
+  }
+
   return (
     <div className="mx-auto w-full max-w-[1250px] space-y-14 px-4 py-8 font-sans text-gc-ink sm:px-6 sm:py-10">
       {/* Discover — same look as the Platform page hero */}
@@ -198,7 +282,7 @@ export default function ModelsExplorer({ apiHref = "/dashboard/api" }: { apiHref
             Browse all {MODEL_CATALOG.length} models
           </button>
           <Link to={apiHref} className="inline-flex items-center gap-1.5 rounded-full border border-gc-line bg-background px-5 py-2.5 text-sm font-medium text-gc-blue transition-colors hover:bg-gc-blue-soft">
-            {apiHref === "/dashboard/api" ? "Get an API key" : "API docs"} <ArrowRight className="h-3.5 w-3.5" />
+            API docs <ArrowRight className="h-3.5 w-3.5" />
           </Link>
         </div>
         <dl className="mx-auto mt-14 grid max-w-xl grid-cols-3 divide-x divide-gc-line">
@@ -449,7 +533,7 @@ export default function ModelsExplorer({ apiHref = "/dashboard/api" }: { apiHref
 
             <div className="mt-6 border-t border-gc-line pt-4 md:mt-auto">
               <Link to={apiHref} className="flex w-full items-center justify-center gap-2 rounded-lg bg-gc-blue px-4 py-2.5 text-sm font-medium text-gc-on-blue hover:bg-gc-blue-hover">
-                {apiHref === "/dashboard/api" ? "Use with an API key" : "Read the API docs"} <ArrowRight className="h-4 w-4" />
+                Read the API docs <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
           </div>
