@@ -863,15 +863,7 @@ function AuthPage() {
 
       {/* LEFT — form column */}
       <div className="flex min-h-dvh w-full flex-col">
-        <div className="flex w-full items-center justify-between px-6 pt-6 sm:px-8">
-          <Link to="/" aria-label="Jenvu home" className="inline-flex items-center gap-2.5">
-            <JenvuMark className="h-7 w-7 text-foreground" />
-            <span className="text-[18px] font-medium tracking-tight text-foreground">Jenvu</span>
-          </Link>
-          <Link to="/" className="rounded-full border border-border px-4 py-1.5 text-[13px] text-foreground hover:bg-muted">Back to home</Link>
-        </div>
-
-        <div className="flex w-full flex-1 items-start justify-center px-6 pb-16 pt-12 sm:pt-20">
+        <div className="flex w-full flex-1 items-center justify-center px-6 py-6">
           <div className="auth-console-card w-full max-w-[400px]">
             <JenvuMark className="mx-auto mb-6 h-10 w-10 text-foreground" />
             <h1 className="text-center text-[28px] font-medium tracking-tight text-foreground">
