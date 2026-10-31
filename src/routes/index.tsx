@@ -28,6 +28,7 @@ import { HomeStats, HomeReadAskAutomate, HomeTrust, HomeGetStarted } from "@/com
 import { HomeProductCards, HomeExperiences, HomeUseCases } from "@/components/home/HomeShowcaseSections";
 import { CloudSolutions, CloudLogoStrip, CloudStartBanner } from "@/components/home/CloudSolutions";
 import TailoredToDesk from "@/components/TailoredToDesk";
+import { BizHero, BizStrip, BizWhatsNew, BizEveryDesk, BizPlatform, BizExploreMore, BizCta } from "@/components/home/HomeBusinessSections";
 
 import {
   getCorrelatedMarkets,
@@ -386,20 +387,13 @@ function HomePage() {
 
       <div className="jenvu-home-content">
         <main>
-          <CloudHero price={xau?.[1] ?? "—"} delta={xau?.[2] ?? "…"} />
-          <HomeStats />
-          <CloudAudiences />
-          <HomeReadAskAutomate />
-          <HomeProductCards />
-          <CloudBuildWith />
-          <CloudFeatureVideos />
-          <HomeExperiences />
-          <CloudSolutions />
-          <HomeUseCases />
-          <CloudLogoStrip />
-          <HomeTrust />
-          <HomeGetStarted />
-          <CloudStartBanner />
+          <BizHero />
+          <BizStrip />
+          <BizWhatsNew />
+          <BizEveryDesk />
+          <BizPlatform />
+          <BizExploreMore />
+          <BizCta />
         </main>
       </div>
 
