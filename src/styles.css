@@ -617,11 +617,11 @@
 
 
 /* Homepage: menu keeps the site zoom, page content renders smaller */
-@media (min-width: 1024px) { .jenvu-home-content { zoom: 0.855; } .jenvu-home-header { zoom: 0.772; } }
+@media (min-width: 1024px) { .jenvu-home-content { zoom: 0.898; } .jenvu-home-header { zoom: 0.772; } }
 @media (min-width: 1200px) { .jenvu-home-header { zoom: 0.851; } }
-@media (min-width: 1360px) { .jenvu-home-content { zoom: 0.927; } .jenvu-home-header { zoom: 0.945; } }
+@media (min-width: 1360px) { .jenvu-home-content { zoom: 0.973; } .jenvu-home-header { zoom: 0.945; } }
 @media (min-width: 1500px) { .jenvu-home-header { zoom: 1.04; } }
-@media (min-width: 1680px) { .jenvu-home-content { zoom: 0.972; } .jenvu-home-header { zoom: 1.103; } }
+@media (min-width: 1680px) { .jenvu-home-content { zoom: 1.021; } .jenvu-home-header { zoom: 1.103; } }
 /* Blog (list + article): 20% smaller than the previous blog scale */
 .jenvu-blog-content { zoom: 0.8; }
 @media (min-width: 1024px) { .jenvu-blog-content { zoom: 0.855; } }
