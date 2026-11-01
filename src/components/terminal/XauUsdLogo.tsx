@@ -1,15 +1,16 @@
+import goldLogo from "@/assets/terminal/gold_logo.png.asset.json";
 import { cn } from "@/lib/utils";
 
-/** Gold (XAU/USD) coin mark used in the Terminal. */
+/** Gold (XAU/USD) mark used in the Terminal: the owner's gold-bars logo. */
 export function XauUsdLogo({ size = 22, className }: { size?: number; className?: string }) {
   return (
-    <span
-      role="img"
-      aria-label="XAU/USD"
-      style={{ width: size, height: size, fontSize: size * 0.36, background: "radial-gradient(circle at 30% 28%, #fde68a, #f59e0b 55%, #b45309)" }}
-      className={cn("inline-grid shrink-0 place-items-center rounded-full font-bold text-amber-950", className)}
-    >
-      Au
-    </span>
+    <img
+      src={goldLogo.url}
+      alt="XAU/USD"
+      width={size}
+      height={size}
+      className={cn("shrink-0 rounded-full object-cover", className)}
+      style={{ width: size, height: size }}
+    />
   );
 }

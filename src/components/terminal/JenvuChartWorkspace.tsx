@@ -40,7 +40,6 @@ import {
 import { getTerminalChart } from "@/lib/gold-analysis.functions";
 import { cn } from "@/lib/utils";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { XauUsdLogo } from "./XauUsdLogo";
 import { ChartArea, ChartCandlestick, ChevronDown, Clock3, Lock, Menu, PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import { useStrategyAccess } from "./useStrategyAccess";
 import { LOCKED_STRATEGY_KEYS } from "@/lib/strategy-access";
@@ -864,7 +863,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
           >
             {mobileToolsOpen ? <PanelLeftClose className="h-4 w-4" /> : <PanelLeftOpen className="h-4 w-4" />}
           </button>
-          <span className="hidden md:inline-flex"><XauUsdLogo size={22} /></span>
+          <span className="hidden md:inline-flex"><AssetLogo asset={asset} size={22} /></span>
         </div>
 
         <div className="flex shrink-0 items-center md:hidden" role="group" aria-label="Chart timeframe">
@@ -1190,6 +1189,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
       </div>
       {sidePanelOpen && marketTab === "overview" && (
         <TerminalPeriodReturns
+          asset={asset}
           timeframeKey={timeframe.key}
           onPick={(period) => {
             const next = timeframes.find((t) => t.key === PERIOD_TIMEFRAME[period]);

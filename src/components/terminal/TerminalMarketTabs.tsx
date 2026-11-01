@@ -11,6 +11,7 @@ import { ratingFor, type TechReading, type TechVerdict } from "@/lib/chart/techn
 import { cn } from "@/lib/utils";
 import { AssetLogo, assetInfo, type ChartAsset } from "./terminal-assets";
 import { num, useTechnicals, useWatchQuotes } from "./terminal-market";
+import { getMarketSnapshotsBatch } from "@/lib/gold-analysis.functions";
 
 export type MarketTab = "overview" | "news" | "technicals" | "seasonals";
 const TABS: Array<{ id: MarketTab; label: string }> = [
@@ -72,8 +73,12 @@ export function TerminalSymbolHeader({
   onTabChange: (tab: MarketTab) => void;
   marketOpen?: boolean;
 }) {
-  const quotes = useWatchQuotes();
-  const q = asset === "BTCUSD" ? undefined : quotes.data?.[asset];
+  const watch = useWatchQuotes();
+  const extra = useExtraQuotes();
+  const allQuotes = useMemo(() => ({ ...(extra.data ?? {}), ...(watch.data ?? {}) }), [extra.data, watch.data]);
+  // Only EUR/USD's quick quote matches its chart feed; the Gold/BTC quick quotes come
+  // from a different source than the chart, so their daily change is left off.
+  const q = asset === "EURUSD" ? watch.data?.[asset] : undefined;
   const { title, decimals, label } = assetInfo(asset);
   const live = price ?? q?.price ?? null;
   const ch = q?.changePct ?? null;
@@ -108,7 +113,7 @@ export function TerminalSymbolHeader({
             {now && ` · As of today at ${String(now.getUTCHours()).padStart(2, "0")}:${String(now.getUTCMinutes()).padStart(2, "0")} UTC`}
           </p>
         </div>
-        <HeaderSidePanel quotes={quotes.data} now={now} />
+        <HeaderSidePanel asset={asset} quotes={allQuotes} now={now} />
       </div>
       <nav aria-label={`${label} sections`} className="flex gap-7 border-b-2 border-gc-line px-5">
         {TABS.map((t) => (
@@ -130,12 +135,12 @@ export function TerminalSymbolHeader({
   );
 }
 
-/** Range returns under the Overview chart (1 day … All time); picking one switches the chart timeframe. */
-export function TerminalPeriodReturns({ timeframeKey, onPick }: { timeframeKey: string; onPick: (period: PeriodKey) => void }) {
+/** Range returns under the Overview chart (1 day … All time) for the charted market; picking one switches the chart timeframe. */
+export function TerminalPeriodReturns({ asset = "XAUUSD", timeframeKey, onPick }: { asset?: ChartAsset; timeframeKey: string; onPick: (period: PeriodKey) => void }) {
   const fetchOverview = useServerFn(getGoldOverview);
   const query = useQuery({
-    queryKey: ["terminal-gold-overview", "1d"],
-    queryFn: () => fetchOverview({ data: { period: "1d" } }),
+    queryKey: ["terminal-overview", asset, "1d"],
+    queryFn: () => fetchOverview({ data: { period: "1d", asset } }),
     staleTime: 60_000,
     refetchInterval: 60_000,
     refetchIntervalInBackground: false,
@@ -492,24 +497,54 @@ const SESSIONS = [
   { id: "ny", label: "New York", start: 12, end: 21 },
 ];
 
-const MOVERS = [
-  { symbol: "DXY", label: "DXY", decimals: 3 },
-  { symbol: "US10Y", label: "US 10Y", decimals: 3 },
-  { symbol: "XAGUSD", label: "Silver", decimals: 3 },
-  { symbol: "EURUSD", label: "EUR/USD", decimals: 5 },
-  { symbol: "USDJPY", label: "USD/JPY", decimals: 3 },
-  { symbol: "SPX", label: "S&P 500", decimals: 2 },
-];
+type Mover = { symbol: string; label: string; decimals: number };
+const M = {
+  DXY: { symbol: "DXY", label: "DXY", decimals: 3 },
+  US10Y: { symbol: "US10Y", label: "US 10Y", decimals: 3 },
+  XAGUSD: { symbol: "XAGUSD", label: "Silver", decimals: 3 },
+  EURUSD: { symbol: "EURUSD", label: "EUR/USD", decimals: 5 },
+  USDJPY: { symbol: "USDJPY", label: "USD/JPY", decimals: 3 },
+  SPX: { symbol: "SPX", label: "S&P 500", decimals: 2 },
+  XAUUSD: { symbol: "XAUUSD", label: "Gold", decimals: 2 },
+  ETHUSD: { symbol: "ETHUSD", label: "ETH/USD", decimals: 2 },
+} satisfies Record<string, Mover>;
 
-/** Right side of the symbol header: markets that move gold plus today's trading sessions (UTC). */
-function HeaderSidePanel({ quotes, now }: { quotes?: Record<string, { price: number; changePct: number | null }>; now: Date | null }) {
+/** Markets that move each charted market, shown in the header's "Moves …" box. */
+const MOVERS: Record<ChartAsset, { title: string; list: Mover[] }> = {
+  XAUUSD: { title: "Moves Gold", list: [M.DXY, M.US10Y, M.XAGUSD, M.EURUSD, M.USDJPY, M.SPX] },
+  BTCUSD: { title: "Moves Bitcoin", list: [M.ETHUSD, M.SPX, M.DXY, M.US10Y, M.XAUUSD, M.USDJPY] },
+  EURUSD: { title: "Moves EUR/USD", list: [M.DXY, M.US10Y, M.USDJPY, M.XAUUSD, M.SPX, M.XAGUSD] },
+};
+
+/** Quotes the shared watch list doesn't carry (Gold, Bitcoin, Ether) for the header and its movers. */
+const EXTRA_SYMBOLS = ["XAUUSD", "BTCUSD", "ETHUSD"];
+function useExtraQuotes() {
+  const fetchBatch = useServerFn(getMarketSnapshotsBatch);
+  return useQuery({
+    queryKey: ["terminal-header-extra", EXTRA_SYMBOLS.join(",")],
+    queryFn: async () => {
+      const res = await fetchBatch({ data: { symbols: EXTRA_SYMBOLS } });
+      const map: Record<string, { price: number; changePct: number | null }> = {};
+      for (const row of res?.results ?? []) if (row.snapshot && Number.isFinite(row.snapshot.price)) map[row.symbol] = row.snapshot;
+      return map;
+    },
+    staleTime: 10_000,
+    refetchInterval: 15_000,
+    refetchIntervalInBackground: false,
+    placeholderData: (prev) => prev,
+  });
+}
+
+/** Right side of the symbol header: markets that move the charted market plus today's trading sessions (UTC). */
+function HeaderSidePanel({ asset, quotes, now }: { asset: ChartAsset; quotes?: Record<string, { price: number; changePct: number | null }>; now: Date | null }) {
   const hour = now ? now.getUTCHours() + now.getUTCMinutes() / 60 : null;
+  const movers = MOVERS[asset];
   return (
     <div className="ml-auto hidden shrink-0 items-stretch gap-6 xl:flex">
       <div>
-        <p className="mb-2 text-[11.5px] font-medium uppercase tracking-wide text-gc-ink-muted">Moves Gold</p>
+        <p className="mb-2 text-[11.5px] font-medium uppercase tracking-wide text-gc-ink-muted">{movers.title}</p>
         <div className="grid grid-cols-2 gap-x-6 gap-y-2">
-          {MOVERS.map((m) => {
+          {movers.list.map((m) => {
             const q = quotes?.[m.symbol];
             return (
               <div key={m.symbol} className="flex min-w-[150px] items-baseline justify-between gap-3">

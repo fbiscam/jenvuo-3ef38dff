@@ -1,4 +1,4 @@
-import btcLogo from "@/assets/watchlist/btc.svg";
+import btcAsset from "@/assets/terminal/bitcoin_logo.png.asset.json";
 import flagEu from "@/assets/watchlist/flag-eu.svg";
 import flagUs from "@/assets/watchlist/flag-us.svg";
 import { cn } from "@/lib/utils";
@@ -27,7 +27,7 @@ export function AssetLogo({ asset, size = 22, className }: { asset: ChartAsset; 
   if (asset === "BTCUSD")
     return (
       <img
-        src={btcLogo}
+        src={btcAsset.url}
         alt="BTC/USD"
         width={size}
         height={size}

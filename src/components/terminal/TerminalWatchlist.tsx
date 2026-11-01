@@ -7,7 +7,9 @@ import type { NewsEvent } from "@/lib/news.functions";
 import { isMarketClosed } from "@/lib/signals/qualification";
 import { cn } from "@/lib/utils";
 import { XauUsdLogo } from "./XauUsdLogo";
-import btcLogo from "@/assets/watchlist/btc.svg";
+import btcAsset from "@/assets/terminal/bitcoin_logo.png.asset.json";
+
+const btcLogo = btcAsset.url;
 import ethLogo from "@/assets/watchlist/eth.svg";
 import xagLogo from "@/assets/watchlist/xag.svg";
 import spxLogo from "@/assets/watchlist/spx.svg";
