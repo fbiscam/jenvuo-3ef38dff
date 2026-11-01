@@ -37,13 +37,13 @@ export default function RenewalNotice() {
       : `Your ${name(state.plan)} renewal wasn't paid, so you're on the Free plan. Pay the renewal to get ${name(state.plan)} back.`;
 
   return (
-    <div role="alert" className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-gc-line bg-gc-surface py-2 pl-4 pr-4 sm:pl-5">
-      <AlertTriangle className="h-5 w-5 shrink-0 text-gc-red" aria-hidden="true" />
-      <p className="min-w-0 flex-1 text-[13px] text-gc-ink sm:text-[14px]">{text}</p>
+    <div role="alert" className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-gc-line bg-gc-surface py-1 pl-3.5 pr-4 sm:pl-5">
+      <AlertTriangle className="h-4 w-4 shrink-0 text-gc-red" aria-hidden="true" />
+      <p className="min-w-0 flex-1 text-[12px] text-gc-ink sm:text-[12.5px]">{text}</p>
       <Link
         to="/dashboard/pay"
         search={{ purchase: "plan", renew: state.plan } as never}
-        className="inline-flex h-8 shrink-0 items-center rounded-full bg-gc-blue px-4 text-[13px] font-medium text-gc-on-blue hover:bg-gc-blue-hover"
+        className="inline-flex h-8 shrink-0 items-center rounded-full bg-gc-blue px-3 text-[12px] font-medium text-gc-on-blue hover:bg-gc-blue-hover"
       >
         Pay renewal
       </Link>
