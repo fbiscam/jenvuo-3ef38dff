@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
-import { ArrowUpRight, BookOpen, Headphones, Sparkles, type LucideIcon } from "lucide-react";
+import { Link, useRouterState } from "@tanstack/react-router";
+import { ArrowUpRight, BookOpen, FileText, Headphones, Mail, Sparkles, type LucideIcon } from "lucide-react";
 import BlogFooter from "@/components/BlogFooter";
 import SiteHeader from "@/components/SiteHeader";
 
@@ -73,22 +74,18 @@ export function PageShell({
               Get started for free
             </a>
             {!oneLine && (
-              <a href="https://jenvu.com/contact" className={pillOutline}>
+              <Link to="/contact" className={pillOutline}>
                 Contact sales <ArrowUpRight className="h-3.5 w-3.5" />
-              </a>
+              </Link>
             )}
           </div>
         </div>
       </section>
 
-      {!oneLine && (
-        <div className="mx-auto max-w-[1200px] px-5 sm:px-8">
-          <div aria-hidden className="h-28 rounded-md sm:h-40" style={{ backgroundImage: "var(--platform-aurora-1)" }} />
-        </div>
-      )}
+      {!oneLine && <PolicyHub />}
 
       {highlight && (
-        <div className="px-5 pt-10 sm:px-8">
+        <div className="mx-auto max-w-[1300px] px-5 pt-10 sm:px-10 [&>section]:max-w-none">
           <Banner title={highlight.title}>{highlight.text}</Banner>
         </div>
       )}
@@ -115,6 +112,50 @@ export function PageShell({
   );
 }
 
+const POLICIES = [
+  { to: "/terms", label: "Terms of Use" },
+  { to: "/privacy", label: "Privacy Policy" },
+  { to: "/refund", label: "Refund Policy" },
+  { to: "/disclaimer", label: "Risk Disclaimer" },
+  { to: "/cancellation", label: "Cancellation Policy" },
+  { to: "/help", label: "Help Center" },
+] as const;
+
+/** Policy pages: quick links between policies plus who to ask (replaces the old blank colour strip). */
+function PolicyHub() {
+  const path = useRouterState({ select: (s) => s.location.pathname });
+  if (!POLICIES.some((p) => p.to !== "/help" && path.endsWith(p.to))) return null;
+  return (
+    <div className="mx-auto max-w-[1300px] px-5 sm:px-10">
+      <div className="flex flex-col gap-4 rounded-md border border-gc-line bg-background p-4 sm:p-5 md:flex-row md:items-center md:justify-between">
+        <nav aria-label="Policies" className="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1 [scrollbar-width:none] md:flex-wrap md:pb-0">
+          {POLICIES.map((p) => {
+            const active = path.endsWith(p.to);
+            return (
+              <Link
+                key={p.to}
+                to={p.to}
+                aria-current={active ? "page" : undefined}
+                className={`shrink-0 rounded-full px-3.5 py-1.5 text-[13.5px] font-medium transition-colors ${
+                  active ? "bg-gc-blue text-gc-on-blue" : "border border-gc-line text-gc-ink hover:bg-gc-blue-soft"
+                }`}
+              >
+                {p.label}
+              </Link>
+            );
+          })}
+        </nav>
+        <div className="flex shrink-0 flex-wrap items-center gap-x-5 gap-y-2 text-[13px] text-gc-ink-muted">
+          <span className="inline-flex items-center gap-1.5 md:hidden xl:inline-flex"><FileText className="h-4 w-4" /> Official Jenvu policy</span>
+          <a href="mailto:support@jenvu.com" className="inline-flex items-center gap-1.5 hover:text-gc-ink">
+            <Mail className="h-4 w-4" /> support@jenvu.com
+          </a>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /** Soft bordered box with an aurora glow and centred text. */
 export function Banner({ title, children }: { title: string; children: ReactNode }) {
   return (
@@ -132,36 +173,42 @@ export function Banner({ title, children }: { title: string; children: ReactNode
 
 /** "Take the next step" box with a contact CTA and quick links. */
 export function NextStep() {
-  const links: { label: string; cta: string; href: string; icon: LucideIcon }[] = [
+  const links: { label: string; cta: string; href?: string; to?: "/pricing" | "/founding"; icon: LucideIcon }[] = [
     { label: "Start using Jenvu", cta: "Try it free", href: "https://auth.jenvu.com/sign-in", icon: Sparkles },
-    { label: "Compare plans and credits", cta: "See pricing", href: "https://jenvu.com/pricing", icon: BookOpen },
-    { label: "Join the Jenvu Founding Program", cta: "Apply here", href: "https://jenvu.com/founding", icon: Headphones },
+    { label: "Compare plans and credits", cta: "See pricing", to: "/pricing", icon: BookOpen },
+    { label: "Join the Jenvu Founding Program", cta: "Apply here", to: "/founding", icon: Headphones },
   ];
+  const cls = "flex items-center gap-4 rounded-md bg-background/90 p-4 shadow-sm transition hover:bg-background";
   return (
-    <div className="hide-in-pwa px-5 pb-0 pt-4 sm:px-8">
-      <section className="mx-auto max-w-[1200px] overflow-hidden rounded-md border border-gc-line bg-background">
+    <div className="hide-in-pwa mx-auto max-w-[1300px] px-5 pb-0 pt-4 sm:px-10">
+      <section className="overflow-hidden rounded-md border border-gc-line bg-background">
         <div className="grid md:grid-cols-[1.1fr_1fr]">
-          <div className="px-6 py-12 sm:px-10 md:py-14">
+          <div className="px-5 py-10 sm:px-10 md:py-14">
             <h2 className="text-[30px] font-medium tracking-tight text-gc-ink sm:text-[36px]">Take the next step</h2>
             <p className="mt-5 max-w-[500px] text-[16px] leading-[1.6] text-gc-ink-muted">
               Tell us what you're trading. The Jenvu team will help you find the right setup and plan.
             </p>
-            <a href="https://jenvu.com/contact" className={`mt-8 ${pillBlue}`}>
+            <Link to="/contact" className={`mt-8 ${pillBlue}`}>
               Contact us
-            </a>
+            </Link>
           </div>
           <ul className="grid content-center gap-3 border-t border-gc-line p-5 sm:p-8 md:border-l md:border-t-0" style={{ backgroundImage: "var(--platform-aurora-3)" }}>
             {links.map((l) => (
               <li key={l.label}>
-                <a href={l.href} className="flex items-center gap-4 rounded-md bg-background/90 p-4 shadow-sm transition hover:bg-background">
-                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-gc-line bg-background text-gc-ink">
-                    <l.icon className="h-5 w-5" />
-                  </span>
-                  <span className="min-w-0">
-                    <span className="block text-[14px] text-gc-ink">{l.label}</span>
-                    <span className="mt-0.5 block text-[14px] font-medium text-gc-blue">{l.cta}</span>
-                  </span>
-                </a>
+                {(() => {
+                  const inner = (
+                    <>
+                      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-gc-line bg-background text-gc-ink">
+                        <l.icon className="h-5 w-5" />
+                      </span>
+                      <span className="min-w-0">
+                        <span className="block text-[14px] text-gc-ink">{l.label}</span>
+                        <span className="mt-0.5 block text-[14px] font-medium text-gc-blue">{l.cta}</span>
+                      </span>
+                    </>
+                  );
+                  return l.to ? <Link to={l.to} className={cls}>{inner}</Link> : <a href={l.href} className={cls}>{inner}</a>;
+                })()}
               </li>
             ))}
           </ul>

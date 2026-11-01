@@ -88,6 +88,7 @@
     "jspdf-autotable": "^5.0.8",
     "lightweight-charts": "^5.2.0",
     "lucide-react": "^0.575.0",
+    "marked": "^18.1.2",
     "motion": "^13.4.0",
     "nanoid": "^6.0.1",
     "qrcode": "^1.5.4",

@@ -29,7 +29,7 @@ export default function BlogFooter() {
         <div className="mt-8 flex flex-col gap-5 border-t border-gc-line pt-8 md:flex-row md:items-center md:justify-between">
           <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
             <JenvuMark className="h-9 w-9 shrink-0 text-foreground" />
-            <a href="https://jenvu.com/" className="text-[15px] text-gc-ink-muted hover:text-gc-ink">Jenvu</a>
+            <Link to="/" className="text-[15px] text-gc-ink-muted hover:text-gc-ink">Jenvu</Link>
             <Link to="/pricing" className="text-[15px] text-gc-ink-muted hover:text-gc-ink">Jenvu Products</Link>
             <Link to="/privacy" className="text-[15px] text-gc-ink-muted hover:text-gc-ink">Privacy</Link>
             <Link to="/terms" className="text-[15px] text-gc-ink-muted hover:text-gc-ink">Terms</Link>

@@ -47,8 +47,20 @@ import { MIXED_CATALOG, PROVIDERS, PRICE_PER_MILLION, formatContext, getCatalogM
 import { playgroundChat } from "@/lib/playground.functions";
 import { PLAYGROUND_DEFAULT_MODEL, PLAYGROUND_MAX_IMAGES, PLAYGROUND_MAX_TOKENS, type PlaygroundTurn } from "@/lib/playground";
 import { DOC_ACCEPT, IMAGE_ACCEPT, composeMessage, readAttachment, type ChatAttachment } from "@/components/dashboard/chat-attachments";
-import { codeRequestKind, extractReplyFiles, type ReplyFile } from "@/lib/chat-files";
+import {
+  CHAT_MAX_FILES,
+  codeRequestKind,
+  extractReplyDocument,
+  extractReplyFiles,
+  looksLikeDocRequest,
+  mergeWorkspace,
+  parseRenameRequest,
+  workspaceContext,
+  type ReplyDocument,
+  type ReplyFile,
+} from "@/lib/chat-files";
 import { ChatCodeStudio } from "@/components/dashboard/ChatCodeStudio";
+import { ChatDocView, exportDocumentPdf } from "@/components/dashboard/ChatDocView";
 
 export const Route = createFileRoute("/_authenticated/dashboard/chat")({
   head: () => ({
@@ -89,6 +101,8 @@ const JENVU_BRAIN = [
   "Markets: forex, Gold (XAU/USD), indices and crypto. You know ICT and SMC deeply: market structure (HH/HL/LH/LL, BOS, CHoCH, MSS), liquidity (BSL/SSL, equal highs/lows, PDH/PDL, sweeps and runs), order blocks, breakers, mitigation blocks, FVG/IFVG/BPR, premium/discount and OTE 62-79%, Power of Three, London and New York killzones, Silver Bullet, session opens, and multi-timeframe top-down analysis. Also classic tools: EMA/SMA, RSI, MACD, ATR, volume, support/resistance, risk-reward and position sizing.",
   "Coding: expert in MQL5 (MetaTrader 5 EAs, indicators, CTrade, CPositionInfo, OnInit/OnTick/OnDeinit, new-bar checks, lot sizing from balance, SL/TP, trailing stops, magic numbers, spread and session filters), Pine Script v6 (indicator/strategy, ta.*, request.security, alerts, boxes, labels, tables) and Python for backtests and data.",
   "When asked for code: write the COMPLETE working file in one fenced block tagged with its language, starting with a comment like // File: Name.mq5; no placeholders or TODOs; every trade gets a stop loss. When asked to change existing code, return the whole updated file with the same file name. Then give short setup steps.",
+  "When asked for a PDF, report, guide or document: put the whole document in ONE fenced block tagged ```document written in Markdown (never put ``` inside it). First line: a short UPPERCASE kicker; then '# Title'; then numbered '## 1. Section' headings, '> **Callout title**' blockquotes for formulas and key notes, and tables where they help. The page turns it into a PDF. After the block, add one short line only.",
+  "You can read attached images and documents; use what they show.",
   "Be accurate and concise. Never claim personal trading experience, never promise profits or guaranteed returns, and note that trading carries risk when giving trade ideas.",
 ].join("\n");
 
@@ -192,6 +206,11 @@ function ChatPlayground() {
   const [files, setFiles] = useState<ChatAttachment[]>([]);
   const [reading, setReading] = useState(false);
   const [darkMenus, setDarkMenus] = useState(false);
+  // Editor files (max 4) and the open document live across replies.
+  const [workspace, setWorkspace] = useState<ReplyFile[]>([]);
+  const [activeFile, setActiveFile] = useState(0);
+  const [doc, setDoc] = useState<ReplyDocument | null>(null);
+  const [docOpen, setDocOpen] = useState(false);
   const scroller = useRef<HTMLDivElement>(null);
   const box = useRef<HTMLTextAreaElement>(null);
   const imageInput = useRef<HTMLInputElement>(null);
@@ -235,18 +254,42 @@ function ChatPlayground() {
   };
 
   // Sends the conversation (ending with a user turn) and appends the reply.
+  // The editor files (and an open document) ride on the last user message only,
+  // so the AI can edit, rename or move code between them.
   const ask = async (history: Turn[], images: string[]) => {
     setBusy(true);
     try {
+      const sent = history.filter((t) => !t.error).map(({ role, content: c }) => ({ role, content: c }));
+      const extra =
+        workspaceContext(workspace) +
+        (doc && docOpen ? `\n\n[Document open on the page — to change it, return the WHOLE updated document in one \`\`\`document block]\n${doc.markdown}` : "");
+      const lastMsg = sent[sent.length - 1];
+      if (extra && lastMsg?.role === "user") sent[sent.length - 1] = { ...lastMsg, content: lastMsg.content + extra };
       const res = await send({
         data: {
           model,
           instructions: [JENVU_BRAIN, instructions.trim()].filter(Boolean).join("\n\n"),
           maxTokens,
           images,
-          turns: history.filter((t) => !t.error).map(({ role, content: c }) => ({ role, content: c })),
+          turns: sent,
         },
       });
+      if (res.ok) {
+        const newFiles = extractReplyFiles(res.content);
+        if (newFiles.length) {
+          const merged = mergeWorkspace(workspace, newFiles);
+          setWorkspace(merged.files);
+          const first = merged.files.findIndex((x) => x.name.toLowerCase() === newFiles[0].name.toLowerCase());
+          if (first >= 0) setActiveFile(first);
+          if (merged.dropped.length) toast.error(`The editor holds ${CHAT_MAX_FILES} files. Remove one to add ${merged.dropped.join(", ")}.`);
+          setDocOpen(false);
+        }
+        const newDoc = extractReplyDocument(res.content);
+        if (newDoc) {
+          setDoc(newDoc);
+          setDocOpen(true);
+        }
+      }
       setTurns((t) => [
         ...t,
         res.ok
@@ -272,9 +315,36 @@ function ChatPlayground() {
     }
   };
 
+  const renameFile = (from: string, to: string): string | null => {
+    const clean = to.trim().replace(/\s+/g, "_");
+    if (!/^[\w\-]+\.[A-Za-z0-9]{1,5}$/.test(clean)) return "Use a name like Strategy.pine (letters, numbers, _ or -, then an extension).";
+    if (workspace.some((f) => f.name.toLowerCase() === clean.toLowerCase() && f.name !== from)) return `${clean} is already open.`;
+    setWorkspace((cur) => cur.map((f) => (f.name === from ? { ...f, name: clean } : f)));
+    return null;
+  };
+
+  const removeFile = (name: string) => {
+    setWorkspace((cur) => cur.filter((f) => f.name !== name));
+    setActiveFile(0);
+  };
+
   const submit = async () => {
     const typed = input.trim();
     if ((!typed && !files.length) || busy || reading) return;
+    // "rename a.py to b.py" is done right here — no AI call, no cost.
+    const rename = !files.length ? parseRenameRequest(typed, workspace.map((f) => f.name), workspace[activeFile]?.name) : null;
+    if (rename) {
+      const problem = renameFile(rename.from, rename.to);
+      setTurns((t) => [
+        ...t,
+        { id: crypto.randomUUID(), role: "user", content: typed, display: typed },
+        problem
+          ? { id: crypto.randomUUID(), role: "assistant", content: problem, error: true }
+          : { id: crypto.randomUUID(), role: "assistant", content: `Renamed **${rename.from}** to **${rename.to.trim().replace(/\s+/g, "_")}**.`, model: "local" },
+      ]);
+      setInput("");
+      return;
+    }
     const attached = files;
     const content = composeMessage(typed || "Please look at the attached file.", attached);
     const images = attached.flatMap((f) => (f.kind === "image" ? [f.url] : []));
@@ -305,6 +375,14 @@ function ChatPlayground() {
     void ask(kept, images);
   };
 
+  const newChat = () => {
+    setTurns([]);
+    setWorkspace([]);
+    setActiveFile(0);
+    setDoc(null);
+    setDocOpen(false);
+  };
+
   const pickExample = (ex: Example) => {
     setInstructions(ex.instructions ?? "");
     if (ex.instructions === CODE_BUILDER) setMaxTokens(PLAYGROUND_MAX_TOKENS);
@@ -314,21 +392,13 @@ function ChatPlayground() {
   };
 
   const lastAsked = [...turns].reverse().find((t) => t.role === "user");
-  const askedKind = codeRequestKind(`${lastAsked?.display ?? ""} ${instructions === CODE_BUILDER ? "code bot" : ""}`);
+  const docAsked = looksLikeDocRequest(lastAsked?.display ?? "");
+  const askedKind = docAsked ? null : codeRequestKind(`${lastAsked?.display ?? ""} ${instructions === CODE_BUILDER ? "code bot" : ""}`);
   const codingNow = busy && askedKind !== null;
-  // The newest reply that carries code drives the editor view.
-  const studioFiles: ReplyFile[] = (() => {
-    for (let i = turns.length - 1; i >= 0; i--) {
-      const t = turns[i];
-      if (t.role === "assistant" && !t.error) {
-        const f = extractReplyFiles(t.content);
-        if (f.length) return f;
-      }
-    }
-    return [];
-  })();
-  const studio = studioFiles.length > 0 || codingNow;
-  const studioKind = askedKind ?? (studioFiles[0]?.lang === "pine" ? "pine" : studioFiles[0]?.lang === "python" ? "python" : studioFiles[0]?.lang === "mql5" ? "mql5" : "generic");
+  const writingDoc = busy && docAsked;
+  const showDoc = !!doc && docOpen;
+  const studio = workspace.length > 0 || codingNow || showDoc || writingDoc;
+  const studioKind = askedKind ?? (workspace[0]?.lang === "pine" ? "pine" : workspace[0]?.lang === "python" ? "python" : workspace[0]?.lang === "mql5" ? "mql5" : "generic");
   const studioSeed = turns.length;
 
   const downloadFile = (name: string, code: string) => {
@@ -405,7 +475,7 @@ function ChatPlayground() {
   );
 
   return (
-    <section className={`chat-shell mx-auto flex min-h-[440px] w-full flex-col ${studio ? "max-w-[1500px]" : "max-w-[1150px]"}`}>
+    <section className={"chat-shell mx-auto flex min-h-[440px] w-full max-w-[1166px] flex-col pt-4"}>
       <h1 className="sr-only">Chat</h1>
       {/* Controls: only before the chat starts; afterwards they sit next to the model picker. */}
       {turns.length === 0 && (
@@ -416,22 +486,43 @@ function ChatPlayground() {
         </div>
       )}
 
-      <div className={studio ? "flex min-h-0 flex-1 gap-4 pt-1" : "contents"}>
+      <div className={studio ? "flex min-h-0 flex-1 gap-4 pt-3" : "contents"}>
       {studio && (
         <div className="hidden min-h-0 min-w-0 flex-1 flex-col lg:flex">
-          <ChatCodeStudio files={studioFiles} busy={busy} kind={studioKind} seed={studioSeed} onDownload={(f) => downloadFile(f.name, f.code)} />
+          {showDoc && doc ? (
+            <ChatDocView doc={doc} busy={busy} menuTheme={menuTheme} onClose={() => setDocOpen(false)} />
+          ) : writingDoc ? (
+            <div className="chat-docview flex min-h-0 flex-1 items-center justify-center rounded-2xl text-[15px]">
+              <Shimmer>Writing your document…</Shimmer>
+            </div>
+          ) : (
+            <ChatCodeStudio
+              files={workspace}
+              busy={busy}
+              kind={studioKind}
+              seed={studioSeed}
+              active={Math.min(activeFile, Math.max(workspace.length - 1, 0))}
+              onActive={setActiveFile}
+              onDownload={(f) => downloadFile(f.name, f.code)}
+              onRename={(from, to) => {
+                const problem = renameFile(from, to);
+                if (problem) toast.error(problem);
+              }}
+              onRemove={removeFile}
+            />
+          )}
         </div>
       )}
-      <div className={studio ? "flex min-h-0 w-full flex-col lg:w-[440px] lg:shrink-0" : "contents"}>
+      <div className={studio ? "flex min-h-0 w-full flex-col lg:w-[380px] lg:shrink-0" : "contents"}>
       {/* Conversation / examples */}
       <div ref={scroller} className="mt-1 min-h-0 flex-1 overflow-y-auto [scrollbar-gutter:stable_both-edges]">
         {turns.length === 0 ? (
-          <div className="flex flex-col pt-1 pb-2">
+          <div className="flex flex-col pt-4 pb-2">
             <div className="text-center">
               <h2 className="text-[18px] font-medium text-foreground">Start a chat with examples</h2>
               <p className="mt-1 text-[14px] text-muted-foreground">Pick a use case to see the exact prompt and settings, then make it your own.</p>
             </div>
-            <div className="mx-auto mt-4 grid w-full grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="mx-auto mt-6 grid w-full grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
               {EXAMPLES.map((ex) => (
                 <button
                   key={ex.title}
@@ -454,7 +545,7 @@ function ChatPlayground() {
             </div>
           </div>
         ) : (
-          <div className={`mx-auto space-y-6 pb-4 ${studio ? "" : "max-w-[1000px]"}`}>
+          <div className="space-y-6 pb-4">
             {turns.map((t) =>
               t.role === "user" ? (
                 <div key={t.id} className="flex flex-col items-end gap-2">
@@ -489,31 +580,61 @@ function ChatPlayground() {
                   ) : (
                     <>
                       <div className={`text-[16px] leading-[1.7] text-foreground [&_li]:my-1 [&_p]:my-3 [&_ul]:my-3 [&_ul]:pl-5 ${studio ? "lg:hidden" : ""}`}>
-                        <MessageResponse>{t.content}</MessageResponse>
+                        <MessageResponse>{unwrapDocument(t.content)}</MessageResponse>
                       </div>
                       {studio && (
                         <div className="hidden text-[16px] leading-[1.7] text-foreground lg:block [&_li]:my-1 [&_p]:my-3 [&_ul]:my-3 [&_ul]:pl-5">
                           <MessageResponse>{stripCode(t.content)}</MessageResponse>
                         </div>
                       )}
-                      {extractReplyFiles(t.content).length > 0 && (
-                        <div className="mt-3 flex flex-wrap gap-2">
-                          {extractReplyFiles(t.content).map((f) => (
-                            <button
-                              key={f.name}
-                              type="button"
-                              onClick={() => downloadFile(f.name, f.code)}
-                              className="console-pill-solid inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-[13px] font-medium"
-                            >
-                              <Download className="h-3.5 w-3.5" /> Download {f.name}
-                            </button>
-                          ))}
-                        </div>
-                      )}
+                      {(() => {
+                        const replyFiles = extractReplyFiles(t.content);
+                        const replyDoc = extractReplyDocument(t.content);
+                        if (!replyFiles.length && !replyDoc) return null;
+                        return (
+                          <div className="mt-3 flex flex-wrap gap-2.5">
+                            {replyDoc && (
+                              <>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    if (!exportDocumentPdf(replyDoc)) toast.error("Allow pop-ups for this site to save the PDF.");
+                                  }}
+                                  className="ring-btn inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-[13px] font-medium"
+                                >
+                                  <Download className="h-3.5 w-3.5" /> Download PDF
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setDoc(replyDoc);
+                                    setDocOpen(true);
+                                  }}
+                                  className="hidden items-center gap-1.5 rounded-full bg-[var(--console-card)] px-3.5 py-1.5 text-[13px] font-medium text-foreground lg:inline-flex"
+                                >
+                                  <FileText className="h-3.5 w-3.5" /> Open document
+                                </button>
+                              </>
+                            )}
+                            {replyFiles.map((f) => (
+                              <button
+                                key={f.name}
+                                type="button"
+                                onClick={() => downloadFile(f.name, f.code)}
+                                className="ring-btn inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-[13px] font-medium"
+                              >
+                                <Download className="h-3.5 w-3.5" /> Download {f.name}
+                              </button>
+                            ))}
+                          </div>
+                        );
+                      })()}
                       <div className="mt-4 flex items-center gap-1 text-muted-foreground">
                         <span className="mr-auto min-w-0 truncate text-[12px]">
-                          AI responses may include mistakes
-                          <span className="hidden sm:inline"> · {getCatalogModel(t.model ?? "")?.name ?? t.model} · {t.tokens?.toLocaleString()} tokens · {((t.ms ?? 0) / 1000).toFixed(1)}s</span>
+                          {t.model === "local" ? "Done in the editor" : "AI responses may include mistakes"}
+                          {t.model !== "local" && (
+                            <span className="hidden sm:inline"> · {getCatalogModel(t.model ?? "")?.name ?? t.model} · {t.tokens?.toLocaleString()} tokens · {((t.ms ?? 0) / 1000).toFixed(1)}s</span>
+                          )}
                         </span>
                         <ReplyBtn label="Good response" active={votes[t.id] === "up"} onClick={() => setVotes((v) => ({ ...v, [t.id]: "up" }))}>
                           <ThumbsUp className="h-[18px] w-[18px]" />
@@ -555,7 +676,7 @@ function ChatPlayground() {
         )}
       </div>
 
-      <div className={`mx-auto w-full ${turns.length && !studio ? "max-w-[1000px]" : ""}`}>
+      <div className="w-full">
 
         {/* Composer */}
         <form
@@ -646,7 +767,7 @@ function ChatPlayground() {
             <div className="ml-auto flex min-w-0 items-center gap-1">
               {turns.length > 0 && (
                 <>
-                  <Button variant="ghost" size="icon-sm" type="button" onClick={() => setTurns([])} disabled={busy} aria-label="New chat" title="New chat" className="shrink-0 rounded-full text-foreground hover:bg-background">
+                  <Button variant="ghost" size="icon-sm" type="button" onClick={newChat} disabled={busy} aria-label="New chat" title="New chat" className="shrink-0 rounded-full text-foreground hover:bg-background">
                     <RotateCcw className="h-4 w-4" />
                   </Button>
                   <Button variant="ghost" size="icon-sm" type="button" onClick={() => setCodeOpen(true)} aria-label="View code" title="View code" className="shrink-0 rounded-full text-foreground hover:bg-background">
@@ -731,7 +852,15 @@ function ChatPlayground() {
 
 /** Reply text without its code blocks (the code is shown in the editor). */
 function stripCode(text: string): string {
-  return text.replace(/```[\s\S]*?(```|$)/g, "\n_Code is in the editor._\n").trim();
+  return text
+    .replace(/```document[\s\S]*?(```|$)/gi, "\n_The document is open on the left._\n")
+    .replace(/```[\s\S]*?(```|$)/g, "\n_Code is in the editor._\n")
+    .trim();
+}
+
+/** Shows a ```document block as normal formatted text (phones, no side view). */
+function unwrapDocument(text: string): string {
+  return text.replace(/```document[^\n]*\n([\s\S]*?)(```|$)/gi, "$1");
 }
 
 function ReplyBtn({ label, active, disabled, onClick, children }: { label: string; active?: boolean; disabled?: boolean; onClick: () => void; children: ReactNode }) {
