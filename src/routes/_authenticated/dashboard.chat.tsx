@@ -475,7 +475,7 @@ function ChatPlayground() {
   );
 
   return (
-    <section className={"chat-shell mx-auto flex min-h-[440px] w-full max-w-[960px] flex-col pt-4"}>
+    <section className={"chat-shell mx-auto flex min-h-[440px] w-full max-w-[1166px] flex-col pt-4"}>
       <h1 className="sr-only">Chat</h1>
       {/* Controls: only before the chat starts; afterwards they sit next to the model picker. */}
       {turns.length === 0 && (

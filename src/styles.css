@@ -2172,7 +2172,7 @@ html body .dark .code-box .tok-var { color: #9cdcfe !important; }
 @media (min-width: 1024px) {
   .jenvu-zoom-dashboard main.dash-page.chat-page { zoom: 0.7 !important; max-width: none; padding-top: 24px; }
 }
-.jenvu-zoom-dashboard main.dash-page.chat-page > :where(div, section, header) { max-width: 1400px; }
+.jenvu-zoom-dashboard main.dash-page.chat-page > :where(div, section, header) { max-width: 1166px; }
 /* Chat "writing code" preview: lines type in one by one, then loop. */
 @keyframes chat-code-type { 0% { opacity: 0; clip-path: inset(0 100% 0 0); } 20%, 85% { opacity: 1; clip-path: inset(0 0 0 0); } 100% { opacity: 0; clip-path: inset(0 0 0 0); } }
 .chat-code-line { animation: chat-code-type 2.8s ease-out infinite both; white-space: nowrap; }
