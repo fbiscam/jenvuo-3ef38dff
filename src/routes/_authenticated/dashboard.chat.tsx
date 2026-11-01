@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import {
   ArrowUp,
@@ -682,5 +682,20 @@ function ChatPlayground() {
         </DialogContent>
       </Dialog>
     </section>
+  );
+}
+
+function ReplyBtn({ label, active, disabled, onClick, children }: { label: string; active?: boolean; disabled?: boolean; onClick: () => void; children: ReactNode }) {
+  return (
+    <button
+      type="button"
+      aria-label={label}
+      title={label}
+      disabled={disabled}
+      onClick={onClick}
+      className={`flex h-8 w-8 items-center justify-center rounded-full transition-colors hover:bg-[var(--console-card)] hover:text-foreground disabled:opacity-40 ${active ? "text-foreground" : ""}`}
+    >
+      {children}
+    </button>
   );
 }
