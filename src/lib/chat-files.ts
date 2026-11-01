@@ -151,7 +151,7 @@ export function parseRenameRequest(prompt: string, names: string[], activeName?:
 export function looksLikeDocRequest(prompt: string): boolean {
   const p = prompt.toLowerCase();
   if (/\bpdf\b/.test(p)) return true;
-  const thing = /\b(report|guide|document|doc file|ebook|e-book|handbook|cheat ?sheet|playbook|whitepaper)\b/.test(p);
+  const thing = /\b(report|guide|document|doc file|leads?|proposal|ebook|e-book|handbook|cheat ?sheet|playbook|whitepaper)\b/.test(p);
   const verb = /\b(write|create|build|make|generate|prepare|banao|bana do|bana|likho|tayar)\b/.test(p);
   return thing && verb;
 }

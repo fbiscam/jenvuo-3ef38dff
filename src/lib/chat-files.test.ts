@@ -91,3 +91,13 @@ describe("documents", () => {
     expect(extractReplyFiles(reply)).toHaveLength(0);
   });
 });
+
+import { wantsNewFile as _wnf, mergeWorkspace as _mw } from "./chat-files";
+test("a new-file request never overwrites an open file", () => {
+  assert.equal(_wnf("ab new file banao RSI ki"), true);
+  assert.equal(_wnf("is file ma stop loss add kro"), false);
+  const cur = [{ name: "rsi.py", code: "a\n", lang: "python" }];
+  const r = _mw(cur, [{ name: "rsi.py", code: "b\n", lang: "python" }], 4, true);
+  assert.deepEqual(r.files.map((f) => f.name), ["rsi.py", "rsi_2.py"]);
+  assert.equal(r.files[0]?.code, "a\n");
+});
