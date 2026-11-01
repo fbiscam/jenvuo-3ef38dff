@@ -429,44 +429,53 @@ function ChatPlayground() {
                   )}
                 </div>
               ) : (
-                <div key={t.id} className="group flex gap-3">
-                  <JenvuMark className="mt-0.5 h-6 w-6 shrink-0" />
-                  <div className="min-w-0 flex-1">
-                    {t.error ? (
-                      <div className="rounded-xl border border-red-500/30 bg-red-500/5 px-4 py-3 text-[14px] text-red-600 dark:text-red-400">
-                        {t.content}
+                <div key={t.id} className="min-w-0">
+                  {t.error ? (
+                    <div className="rounded-xl bg-red-500/5 px-4 py-3 text-[14px] text-red-600 dark:text-red-400">
+                      {t.content}
+                      <button type="button" onClick={() => regenerate(t.id)} disabled={busy} className="ml-2 font-medium text-foreground underline-offset-2 hover:underline disabled:opacity-50">
+                        Try again
+                      </button>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="text-[15px] leading-[1.65] text-foreground [&_li]:my-1 [&_p]:my-3 [&_ul]:my-3 [&_ul]:pl-5">
+                        <MessageResponse>{t.content}</MessageResponse>
                       </div>
-                    ) : (
-                      <>
-                        <div className="text-[15px] leading-relaxed text-foreground">
-                          <MessageResponse>{t.content}</MessageResponse>
+                      {extractReplyFiles(t.content).length > 0 && (
+                        <div className="mt-3 flex flex-wrap gap-2">
+                          {extractReplyFiles(t.content).map((f) => (
+                            <button
+                              key={f.name}
+                              type="button"
+                              onClick={() => downloadFile(f.name, f.code)}
+                              className="console-pill-solid inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-[13px] font-medium"
+                            >
+                              <Download className="h-3.5 w-3.5" /> Download {f.name}
+                            </button>
+                          ))}
                         </div>
-                        {extractReplyFiles(t.content).length > 0 && (
-                          <div className="mt-3 flex flex-wrap gap-2">
-                            {extractReplyFiles(t.content).map((f) => (
-                              <button
-                                key={f.name}
-                                type="button"
-                                onClick={() => downloadFile(f.name, f.code)}
-                                className="console-pill-solid inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-[13px] font-medium"
-                              >
-                                <Download className="h-3.5 w-3.5" /> Download {f.name}
-                              </button>
-                            ))}
-                          </div>
-                        )}
-                        <div className="mt-2 flex flex-wrap items-center gap-3 text-[12px] text-muted-foreground">
-                          <button type="button" onClick={() => void copyText(t.id, t.content)} className="inline-flex items-center gap-1 hover:text-foreground" aria-label="Copy reply">
-                            {copied === t.id ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
-                            Copy
-                          </button>
-                          <span>{getCatalogModel(t.model ?? "")?.name ?? t.model}</span>
-                          <span className="tabular-nums">{t.tokens?.toLocaleString()} tokens</span>
-                          <span className="tabular-nums">{((t.ms ?? 0) / 1000).toFixed(1)}s</span>
-                        </div>
-                      </>
-                    )}
-                  </div>
+                      )}
+                      <div className="mt-4 flex items-center gap-1 text-muted-foreground">
+                        <span className="mr-auto min-w-0 truncate text-[12px]">
+                          AI responses may include mistakes
+                          <span className="hidden sm:inline"> · {getCatalogModel(t.model ?? "")?.name ?? t.model} · {t.tokens?.toLocaleString()} tokens · {((t.ms ?? 0) / 1000).toFixed(1)}s</span>
+                        </span>
+                        <ReplyBtn label="Good response" active={votes[t.id] === "up"} onClick={() => setVotes((v) => ({ ...v, [t.id]: "up" }))}>
+                          <ThumbsUp className="h-[18px] w-[18px]" />
+                        </ReplyBtn>
+                        <ReplyBtn label="Bad response" active={votes[t.id] === "down"} onClick={() => setVotes((v) => ({ ...v, [t.id]: "down" }))}>
+                          <ThumbsDown className="h-[18px] w-[18px]" />
+                        </ReplyBtn>
+                        <ReplyBtn label="Regenerate" disabled={busy} onClick={() => regenerate(t.id)}>
+                          <RotateCw className="h-[18px] w-[18px]" />
+                        </ReplyBtn>
+                        <ReplyBtn label="Copy reply" onClick={() => void copyText(t.id, t.content)}>
+                          {copied === t.id ? <Check className="h-[18px] w-[18px]" /> : <Copy className="h-[18px] w-[18px]" />}
+                        </ReplyBtn>
+                      </div>
+                    </>
+                  )}
                 </div>
               ),
             )}
