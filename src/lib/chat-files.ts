@@ -89,6 +89,11 @@ export function looksLikeCodeRequest(prompt: string): boolean {
   return codeRequestKind(prompt) !== null;
 }
 
+/** True when a prompt asks for a separate, new file instead of editing the open one. */
+export function wantsNewFile(prompt: string): boolean {
+  return /\b(new|another|separate|second|alag|nayi|naya|dusri|doosri)\s+(file|script|tab)\b|\bnew file\b|\bfile\s+(alag|nayi|naya)\b/i.test(prompt);
+}
+
 /** Files the Chat code editor can hold at once. */
 export const CHAT_MAX_FILES = 4;
 
@@ -97,10 +102,19 @@ export const CHAT_MAX_FILES = 4;
  * are appended while there is room. Existing files are never pushed out;
  * anything over the limit is reported in `dropped`.
  */
-export function mergeWorkspace(current: ReplyFile[], incoming: ReplyFile[], max = CHAT_MAX_FILES) {
+export function mergeWorkspace(current: ReplyFile[], incoming: ReplyFile[], max = CHAT_MAX_FILES, asNew = false) {
   const files = [...current];
   const dropped: string[] = [];
-  for (const f of incoming) {
+  for (const src of incoming) {
+    let f = src;
+    const taken = (n: string) => files.some((x) => x.name.toLowerCase() === n.toLowerCase());
+    // "new file" requests never overwrite an open file: give it a fresh name.
+    if (asNew && taken(f.name)) {
+      const dot = f.name.lastIndexOf(".");
+      let n = 2;
+      while (taken(`${f.name.slice(0, dot)}_${n}${f.name.slice(dot)}`)) n++;
+      f = { ...f, name: `${f.name.slice(0, dot)}_${n}${f.name.slice(dot)}` };
+    }
     const i = files.findIndex((x) => x.name.toLowerCase() === f.name.toLowerCase());
     if (i >= 0) files[i] = f;
     else if (files.length < max) files.push(f);
@@ -160,5 +174,5 @@ export function workspaceContext(files: ReplyFile[]): string {
   const body = files
     .map((f) => `--- ${f.name} ---\n\`\`\`${f.lang}\n${f.code.replace(/\n$/, "")}\n\`\`\``)
     .join("\n\n");
-  return `\n\n[Files open in the editor (max ${CHAT_MAX_FILES}). To change a file, return the WHOLE file with the same name in its own block starting with "// File: <name>" (or "# File: <name>"). To move or copy code between files, return every file you changed.]\n${body}`;
+  return `\n\n[Files open in the editor (max ${CHAT_MAX_FILES}). To change a file, return the WHOLE file with the same name in its own block starting with "// File: <name>" (or "# File: <name>"). To move or copy code between files, return every file you changed. When the user asks for a NEW file, use a new file name that is not open yet and leave the open files unchanged.]\n${body}`;
 }
