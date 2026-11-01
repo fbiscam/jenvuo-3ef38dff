@@ -76,7 +76,9 @@ export function TerminalSymbolHeader({
   const watch = useWatchQuotes();
   const extra = useExtraQuotes();
   const allQuotes = useMemo(() => ({ ...(extra.data ?? {}), ...(watch.data ?? {}) }), [extra.data, watch.data]);
-  const q = allQuotes[asset];
+  // Only EUR/USD's quick quote matches its chart feed; the Gold/BTC quick quotes come
+  // from a different source than the chart, so their daily change is left off.
+  const q = asset === "EURUSD" ? watch.data?.[asset] : undefined;
   const { title, decimals, label } = assetInfo(asset);
   const live = price ?? q?.price ?? null;
   const ch = q?.changePct ?? null;
