@@ -3,24 +3,24 @@ import { useEffect, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import {
   ArrowUp,
+  Bot,
   Braces,
+  CandlestickChart,
   Check,
   ChevronDown,
   Code2,
   Copy,
+  Download,
   FileText,
   ImageIcon,
-  Languages,
   Lightbulb,
   LineChart,
   Loader2,
-  Mail,
   Newspaper,
   Paperclip,
   Plus,
   RotateCcw,
   SlidersHorizontal,
-  Wallet,
   X,
   type LucideIcon,
 } from "lucide-react";
@@ -34,6 +34,8 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { MessageResponse } from "@/components/ai-elements/message";
+import { Shimmer } from "@/components/ai-elements/shimmer";
+import JenvuMark from "@/components/JenvuMark";
 import { Button } from "@/components/ui/button";
 import { ProviderLogo } from "@/components/models/ModelsExplorer";
 import { readSiteTheme, SITE_THEME_EVENT } from "@/lib/site-theme";
@@ -42,6 +44,7 @@ import { MIXED_CATALOG, PROVIDERS, PRICE_PER_MILLION, formatContext, getCatalogM
 import { playgroundChat } from "@/lib/playground.functions";
 import { PLAYGROUND_DEFAULT_MODEL, PLAYGROUND_MAX_IMAGES, PLAYGROUND_MAX_TOKENS, type PlaygroundTurn } from "@/lib/playground";
 import { DOC_ACCEPT, IMAGE_ACCEPT, composeMessage, readAttachment, type ChatAttachment } from "@/components/dashboard/chat-attachments";
+import { extractReplyFiles, looksLikeCodeRequest } from "@/lib/chat-files";
 
 export const Route = createFileRoute("/_authenticated/dashboard/chat")({
   head: () => ({
@@ -71,6 +74,10 @@ type Turn = PlaygroundTurn & {
 };
 
 const API_BASE = "https://jenvu.com/api/public/v1";
+
+// System prompt for the two builder cards: whole files, nothing left out.
+const CODE_BUILDER =
+  "You are an expert trading-code engineer (MQL5 for MetaTrader 5, Pine Script v6 for TradingView). Write the COMPLETE file from the first line to the last — no placeholders, no 'rest of code', no TODOs. Put the whole file in ONE fenced code block tagged with its language (```mql5 or ```pine) and start it with a comment like // File: Name.mq5. Every trade must have a stop loss. After the code, give 3 short setup steps. Never promise profits.";
 
 type Example = {
   icon: LucideIcon;
@@ -138,21 +145,22 @@ const EXAMPLES: Example[] = [
     prompt: "Explain a liquidity sweep on Gold (XAU/USD) in two sentences.",
   },
   {
-    icon: Mail,
-    tone: "bg-indigo-100 text-indigo-600 dark:bg-indigo-500/15 dark:text-indigo-400",
-    title: "Draft an email",
-    text: "Turn a one-line brief into a polite, clear email.",
-    tags: ["System prompt"],
-    instructions: "Write short, polite, professional emails.",
-    prompt: "Ask a supplier to send last month's invoice by Friday.",
+    icon: Bot,
+    tone: "bg-orange-100 text-orange-600 dark:bg-orange-500/15 dark:text-orange-400",
+    title: "Build an MT5 bot",
+    text: "A complete MQL5 Expert Advisor, ready to download.",
+    tags: ["MQL5", "Download file"],
+    instructions: CODE_BUILDER,
+    prompt: "Build a Gold (XAUUSD) M15 Expert Advisor: EMA 50/200 trend filter, entry on closed candles, stop loss on every trade, 0.02 lot per $1,000 balance, max 1 trade at a time.",
   },
   {
-    icon: Languages,
-    tone: "bg-fuchsia-100 text-fuchsia-600 dark:bg-fuchsia-500/15 dark:text-fuchsia-400",
-    title: "Translate text",
-    text: "Translate a message while keeping its tone.",
-    tags: ["Multilingual"],
-    prompt: 'Translate to Spanish and Urdu: "Your account is ready. Sign in to start testing models."',
+    icon: CandlestickChart,
+    tone: "bg-teal-100 text-teal-600 dark:bg-teal-500/15 dark:text-teal-400",
+    title: "Build a TradingView script",
+    text: "A full Pine Script v6 indicator or strategy file.",
+    tags: ["Pine Script", "Download file"],
+    instructions: CODE_BUILDER,
+    prompt: "Build a Pine Script v6 indicator that marks Fair Value Gaps and swing highs/lows on Gold, with alerts.",
   },
 ];
 
@@ -270,6 +278,18 @@ function ChatPlayground() {
     setInput(ex.prompt);
     if (ex.tags.includes("Image input")) imageInput.current?.click();
     requestAnimationFrame(() => box.current?.focus());
+  };
+
+  const lastAsked = [...turns].reverse().find((t) => t.role === "user");
+  const codingNow = busy && looksLikeCodeRequest(`${lastAsked?.display ?? ""} ${instructions}`);
+
+  const downloadFile = (name: string, code: string) => {
+    const url = URL.createObjectURL(new Blob([code], { type: "text/plain;charset=utf-8" }));
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = name;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
   };
 
   const copyText = async (id: string, text: string) => {
@@ -402,7 +422,7 @@ function ChatPlayground() {
                     </div>
                   )}
                   {(t.display ?? t.content) && (
-                    <div className="max-w-[80%] whitespace-pre-wrap rounded-2xl bg-[var(--console-card)] px-4 py-2.5 text-[15px] text-foreground">
+                    <div className="max-w-[80%] whitespace-pre-wrap break-words rounded-2xl bg-[var(--console-card)] px-4 py-2.5 text-[15px] leading-snug text-foreground">
                       {t.display ?? t.content}
                     </div>
                   )}
