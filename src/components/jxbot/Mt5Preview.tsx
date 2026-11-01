@@ -24,6 +24,8 @@ const W = 900;
 const H = 380;
 const PAD = 12;
 const AXIS = 64;
+/** Shows the internal units as EUR/USD prices (1 unit = 2 pips). */
+const fx = (v: number) => (1.085 + (v - 2384) * 0.0002).toFixed(5);
 
 export default function Mt5Preview() {
   const [shown, setShown] = React.useState(20);
@@ -47,7 +49,7 @@ export default function Mt5Preview() {
   const step = (W - AXIS - PAD) / CANDLES.length;
   const last = vis[vis.length - 1];
   const open = shown > ENTRY_AT;
-  const profit = open ? ((last.c - entry) * 2).toFixed(2) : "0.00";
+  const profit = open ? ((last.c - entry) * 0.4).toFixed(2) : "0.00";
   const ticks = Array.from({ length: 6 }, (_, i) => min + ((max - min) * i) / 5);
 
   return (
@@ -68,7 +70,7 @@ export default function Mt5Preview() {
         {ticks.map((t) => (
           <g key={t}>
             <line x1={0} x2={W - AXIS} y1={y(t)} y2={y(t)} stroke="#0000000d" />
-            <text x={W - AXIS + 8} y={y(t) + 4} fill="#71717a" fontSize={11}>{t.toFixed(1)}</text>
+            <text x={W - AXIS + 8} y={y(t) + 4} fill="#71717a" fontSize={11}>{fx(t)}</text>
           </g>
         ))}
         {open && (
@@ -76,9 +78,9 @@ export default function Mt5Preview() {
             <line x1={ENTRY_AT * step} x2={W - AXIS} y1={y(tp)} y2={y(tp)} stroke="#089981" strokeDasharray="5 4" />
             <line x1={ENTRY_AT * step} x2={W - AXIS} y1={y(entry)} y2={y(entry)} stroke="#2962ff" />
             <line x1={ENTRY_AT * step} x2={W - AXIS} y1={y(sl)} y2={y(sl)} stroke="#f23645" strokeDasharray="5 4" />
-            <text x={W - AXIS - 6} textAnchor="end" y={y(tp) - 5} fill="#089981" fontSize={11}>TP {tp.toFixed(1)}</text>
-            <text x={W - AXIS - 6} textAnchor="end" y={y(entry) - 5} fill="#2962ff" fontSize={11}>BUY 0.02 @ {entry.toFixed(1)}</text>
-            <text x={W - AXIS - 6} textAnchor="end" y={y(sl) + 14} fill="#f23645" fontSize={11}>SL {sl.toFixed(1)}</text>
+            <text x={W - AXIS - 6} textAnchor="end" y={y(tp) - 5} fill="#089981" fontSize={11}>TP {fx(tp)}</text>
+            <text x={W - AXIS - 6} textAnchor="end" y={y(entry) - 5} fill="#2962ff" fontSize={11}>BUY 0.02 @ {fx(entry)}</text>
+            <text x={W - AXIS - 6} textAnchor="end" y={y(sl) + 14} fill="#f23645" fontSize={11}>SL {fx(sl)}</text>
             <polygon
               points={`${ENTRY_AT * step + step / 2},${y(CANDLES[ENTRY_AT].l) + 8} ${ENTRY_AT * step + step / 2 - 6},${y(CANDLES[ENTRY_AT].l) + 18} ${ENTRY_AT * step + step / 2 + 6},${y(CANDLES[ENTRY_AT].l) + 18}`}
               fill="#2962ff"
@@ -102,7 +104,7 @@ export default function Mt5Preview() {
           <g>
             <line x1={0} x2={W - AXIS} y1={y(last.c)} y2={y(last.c)} stroke="#00000040" strokeDasharray="2 3" />
             <rect x={W - AXIS} y={y(last.c) - 9} width={AXIS} height={18} fill={last.c >= last.o ? "#089981" : "#f23645"} />
-            <text x={W - AXIS + 8} y={y(last.c) + 4} fill="#fff" fontSize={11}>{last.c.toFixed(1)}</text>
+            <text x={W - AXIS + 8} y={y(last.c) + 4} fill="#fff" fontSize={11}>{fx(last.c)}</text>
           </g>
         )}
       </svg>
