@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import {
   ArrowUp,
@@ -20,7 +20,10 @@ import {
   Paperclip,
   Plus,
   RotateCcw,
+  RotateCw,
   SlidersHorizontal,
+  ThumbsDown,
+  ThumbsUp,
   X,
   type LucideIcon,
 } from "lucide-react";
@@ -174,6 +177,7 @@ function ChatPlayground() {
   const [instructions, setInstructions] = useState("");
   const [maxTokens, setMaxTokens] = useState(1200);
   const [copied, setCopied] = useState<string | null>(null);
+  const [votes, setVotes] = useState<Record<string, "up" | "down">>({});
   const [codeOpen, setCodeOpen] = useState(false);
   const [files, setFiles] = useState<ChatAttachment[]>([]);
   const [reading, setReading] = useState(false);
@@ -220,23 +224,8 @@ function ChatPlayground() {
     }
   };
 
-  const submit = async () => {
-    const typed = input.trim();
-    if ((!typed && !files.length) || busy || reading) return;
-    const attached = files;
-    const content = composeMessage(typed || "Please look at the attached file.", attached);
-    const images = attached.flatMap((f) => (f.kind === "image" ? [f.url] : []));
-    const userTurn: Turn = {
-      id: crypto.randomUUID(),
-      role: "user",
-      content,
-      display: typed,
-      files: attached.map((f) => ({ name: f.name, kind: f.kind, url: f.kind === "image" ? f.url : undefined })),
-    };
-    const history = [...turns.filter((t) => !t.error), userTurn];
-    setTurns((t) => [...t, userTurn]);
-    setInput("");
-    setFiles([]);
+  // Sends the conversation (ending with a user turn) and appends the reply.
+  const ask = async (history: Turn[], images: string[]) => {
     setBusy(true);
     try {
       const res = await send({
@@ -245,7 +234,7 @@ function ChatPlayground() {
           instructions,
           maxTokens,
           images,
-          turns: history.map(({ role, content: c }) => ({ role, content: c })),
+          turns: history.filter((t) => !t.error).map(({ role, content: c }) => ({ role, content: c })),
         },
       });
       setTurns((t) => [
@@ -271,6 +260,39 @@ function ChatPlayground() {
       setBusy(false);
       box.current?.focus();
     }
+  };
+
+  const submit = async () => {
+    const typed = input.trim();
+    if ((!typed && !files.length) || busy || reading) return;
+    const attached = files;
+    const content = composeMessage(typed || "Please look at the attached file.", attached);
+    const images = attached.flatMap((f) => (f.kind === "image" ? [f.url] : []));
+    const userTurn: Turn = {
+      id: crypto.randomUUID(),
+      role: "user",
+      content,
+      display: typed,
+      files: attached.map((f) => ({ name: f.name, kind: f.kind, url: f.kind === "image" ? f.url : undefined })),
+    };
+    const history = [...turns.filter((t) => !t.error), userTurn];
+    setTurns((t) => [...t, userTurn]);
+    setInput("");
+    setFiles([]);
+    await ask(history, images);
+  };
+
+  // Drops the chosen reply (and anything after it) and asks again.
+  const regenerate = (replyId: string) => {
+    if (busy) return;
+    const idx = turns.findIndex((t) => t.id === replyId);
+    if (idx < 0) return;
+    const kept = turns.slice(0, idx);
+    if (kept[kept.length - 1]?.role !== "user") return;
+    const lastUser = kept[kept.length - 1];
+    const images = (lastUser.files ?? []).flatMap((f) => (f.kind === "image" && f.url ? [f.url] : []));
+    setTurns(kept);
+    void ask(kept, images);
   };
 
   const pickExample = (ex: Example) => {
@@ -358,10 +380,10 @@ function ChatPlayground() {
   );
 
   return (
-    <section className="mx-auto flex h-[calc((100dvh-80px)/0.76)] min-h-[520px] w-full max-w-[1400px] flex-col">
-      {/* Header */}
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-[28px] font-medium tracking-tight text-foreground">Chat API</h1>
+    <section className="chat-shell mx-auto flex min-h-[440px] w-full max-w-[1150px] flex-col">
+      <h1 className="sr-only">Chat</h1>
+      {/* Controls */}
+      <div className="flex items-center justify-end gap-2">
         <div className="flex items-center gap-2">
           {turns.length > 0 && (
             <button type="button" onClick={() => setTurns([])} disabled={busy} className="console-pill disabled:opacity-45">
@@ -375,14 +397,14 @@ function ChatPlayground() {
       </div>
 
       {/* Conversation / examples */}
-      <div ref={scroller} className="mt-3 min-h-0 flex-1 overflow-y-auto pr-1">
+      <div ref={scroller} className="mt-1 min-h-0 flex-1 overflow-y-auto pr-1">
         {turns.length === 0 ? (
-          <div className="flex min-h-full flex-col justify-center py-2">
+          <div className="flex flex-col pt-1 pb-2">
             <div className="text-center">
               <h2 className="text-[18px] font-medium text-foreground">Start a chat with examples</h2>
               <p className="mt-1 text-[14px] text-muted-foreground">Pick a use case to see the exact prompt and settings, then make it your own.</p>
             </div>
-            <div className="mx-auto mt-5 grid w-full max-w-[1150px] grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="mx-auto mt-4 grid w-full grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
               {EXAMPLES.map((ex) => (
                 <button
                   key={ex.title}
@@ -405,7 +427,7 @@ function ChatPlayground() {
             </div>
           </div>
         ) : (
-          <div className="space-y-6 pb-4">
+          <div className="mx-auto max-w-[1000px] space-y-6 pb-4">
             {turns.map((t) =>
               t.role === "user" ? (
                 <div key={t.id} className="flex flex-col items-end gap-2">
@@ -429,44 +451,53 @@ function ChatPlayground() {
                   )}
                 </div>
               ) : (
-                <div key={t.id} className="group flex gap-3">
-                  <JenvuMark className="mt-0.5 h-6 w-6 shrink-0" />
-                  <div className="min-w-0 flex-1">
-                    {t.error ? (
-                      <div className="rounded-xl border border-red-500/30 bg-red-500/5 px-4 py-3 text-[14px] text-red-600 dark:text-red-400">
-                        {t.content}
+                <div key={t.id} className="min-w-0">
+                  {t.error ? (
+                    <div className="rounded-xl bg-red-500/5 px-4 py-3 text-[14px] text-red-600 dark:text-red-400">
+                      {t.content}
+                      <button type="button" onClick={() => regenerate(t.id)} disabled={busy} className="ml-2 font-medium text-foreground underline-offset-2 hover:underline disabled:opacity-50">
+                        Try again
+                      </button>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="text-[15px] leading-[1.65] text-foreground [&_li]:my-1 [&_p]:my-3 [&_ul]:my-3 [&_ul]:pl-5">
+                        <MessageResponse>{t.content}</MessageResponse>
                       </div>
-                    ) : (
-                      <>
-                        <div className="text-[15px] leading-relaxed text-foreground">
-                          <MessageResponse>{t.content}</MessageResponse>
+                      {extractReplyFiles(t.content).length > 0 && (
+                        <div className="mt-3 flex flex-wrap gap-2">
+                          {extractReplyFiles(t.content).map((f) => (
+                            <button
+                              key={f.name}
+                              type="button"
+                              onClick={() => downloadFile(f.name, f.code)}
+                              className="console-pill-solid inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-[13px] font-medium"
+                            >
+                              <Download className="h-3.5 w-3.5" /> Download {f.name}
+                            </button>
+                          ))}
                         </div>
-                        {extractReplyFiles(t.content).length > 0 && (
-                          <div className="mt-3 flex flex-wrap gap-2">
-                            {extractReplyFiles(t.content).map((f) => (
-                              <button
-                                key={f.name}
-                                type="button"
-                                onClick={() => downloadFile(f.name, f.code)}
-                                className="console-pill-solid inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-[13px] font-medium"
-                              >
-                                <Download className="h-3.5 w-3.5" /> Download {f.name}
-                              </button>
-                            ))}
-                          </div>
-                        )}
-                        <div className="mt-2 flex flex-wrap items-center gap-3 text-[12px] text-muted-foreground">
-                          <button type="button" onClick={() => void copyText(t.id, t.content)} className="inline-flex items-center gap-1 hover:text-foreground" aria-label="Copy reply">
-                            {copied === t.id ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
-                            Copy
-                          </button>
-                          <span>{getCatalogModel(t.model ?? "")?.name ?? t.model}</span>
-                          <span className="tabular-nums">{t.tokens?.toLocaleString()} tokens</span>
-                          <span className="tabular-nums">{((t.ms ?? 0) / 1000).toFixed(1)}s</span>
-                        </div>
-                      </>
-                    )}
-                  </div>
+                      )}
+                      <div className="mt-4 flex items-center gap-1 text-muted-foreground">
+                        <span className="mr-auto min-w-0 truncate text-[12px]">
+                          AI responses may include mistakes
+                          <span className="hidden sm:inline"> · {getCatalogModel(t.model ?? "")?.name ?? t.model} · {t.tokens?.toLocaleString()} tokens · {((t.ms ?? 0) / 1000).toFixed(1)}s</span>
+                        </span>
+                        <ReplyBtn label="Good response" active={votes[t.id] === "up"} onClick={() => setVotes((v) => ({ ...v, [t.id]: "up" }))}>
+                          <ThumbsUp className="h-[18px] w-[18px]" />
+                        </ReplyBtn>
+                        <ReplyBtn label="Bad response" active={votes[t.id] === "down"} onClick={() => setVotes((v) => ({ ...v, [t.id]: "down" }))}>
+                          <ThumbsDown className="h-[18px] w-[18px]" />
+                        </ReplyBtn>
+                        <ReplyBtn label="Regenerate" disabled={busy} onClick={() => regenerate(t.id)}>
+                          <RotateCw className="h-[18px] w-[18px]" />
+                        </ReplyBtn>
+                        <ReplyBtn label="Copy reply" onClick={() => void copyText(t.id, t.content)}>
+                          {copied === t.id ? <Check className="h-[18px] w-[18px]" /> : <Copy className="h-[18px] w-[18px]" />}
+                        </ReplyBtn>
+                      </div>
+                    </>
+                  )}
                 </div>
               ),
             )}
@@ -492,7 +523,7 @@ function ChatPlayground() {
         )}
       </div>
 
-      <div className="mx-auto w-full max-w-[1150px]">
+      <div className={`mx-auto w-full ${turns.length ? "max-w-[1000px]" : ""}`}>
 
         {/* Composer */}
         <form
@@ -651,5 +682,20 @@ function ChatPlayground() {
         </DialogContent>
       </Dialog>
     </section>
+  );
+}
+
+function ReplyBtn({ label, active, disabled, onClick, children }: { label: string; active?: boolean; disabled?: boolean; onClick: () => void; children: ReactNode }) {
+  return (
+    <button
+      type="button"
+      aria-label={label}
+      title={label}
+      disabled={disabled}
+      onClick={onClick}
+      className={`flex h-8 w-8 items-center justify-center rounded-full transition-colors hover:bg-[var(--console-card)] hover:text-foreground disabled:opacity-40 ${active ? "text-foreground" : ""}`}
+    >
+      {children}
+    </button>
   );
 }

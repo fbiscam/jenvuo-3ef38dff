@@ -42,12 +42,19 @@ export const playgroundChat = createServerFn({ method: "POST" })
     const requestId = `chatcmpl-${crypto.randomUUID()}`;
     const started = Date.now();
     try {
-      const result = await callChatCompletion({
-        models: gatewayChainFor(modelId),
-        messages,
-        maxTokens: data.maxTokens,
-        stage: "public-api-chat",
-        exactModels: true,
+      const ask = (exactModels: boolean) =>
+        callChatCompletion({
+          models: gatewayChainFor(modelId),
+          messages,
+          maxTokens: data.maxTokens,
+          stage: "public-api-chat",
+          exactModels,
+        });
+      // The chosen model answers first; if its service is down (e.g. no
+      // balance), the reply comes from the low-cost backup so chat still works.
+      const result = await ask(true).catch(async (err) => {
+        console.warn("[playground] chosen model failed, using backup", (err as Error)?.message);
+        return ask(false);
       });
       const charge = await chargeExtensionUsage({
         userId: context.userId,

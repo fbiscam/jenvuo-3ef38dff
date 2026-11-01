@@ -199,7 +199,7 @@ function Profile() {
   const initial = (fullName || email || "?").trim().charAt(0).toUpperCase();
   const pill =
     "inline-flex h-9 items-center justify-center gap-1.5 rounded-full border border-gc-line bg-background px-4 text-[14px] text-gc-ink transition-colors hover:bg-gc-surface disabled:opacity-50";
-  const row = "flex flex-wrap items-center justify-between gap-x-6 gap-y-2 py-3";
+  const row = "flex flex-wrap items-center justify-between gap-x-6 gap-y-2 py-2";
   const rowLabel = "flex min-w-0 items-center gap-3 text-[15px] text-gc-ink";
   const themes: { key: SiteTheme; label: string; icon: typeof Sun }[] = [
     { key: "light", label: "Light", icon: Sun },
@@ -207,11 +207,11 @@ function Profile() {
   ];
 
   return (
-    <div className="mx-auto w-full max-w-[880px] pb-10 pt-2 text-foreground">
+    <div className="mx-auto w-full max-w-[880px] pb-2 pt-0 text-foreground">
       <h1 className="text-[28px] font-normal leading-tight tracking-tight text-gc-ink sm:text-[32px]">Personal</h1>
 
       {/* Photo, name and email */}
-      <div className="mt-7 flex flex-wrap items-center justify-between gap-4">
+      <div className="mt-4 flex flex-wrap items-center justify-between gap-4">
         <div className="flex min-w-0 items-center gap-3">
           <div
             role="button"
@@ -255,7 +255,7 @@ function Profile() {
       </div>
 
       {/* Theme */}
-      <div role="radiogroup" aria-label="Theme" className="mt-6 grid grid-cols-2 gap-2">
+      <div role="radiogroup" aria-label="Theme" className="mt-4 grid grid-cols-2 gap-2">
         {themes.map((t) => (
           <button
             key={t.key}
@@ -264,7 +264,7 @@ function Profile() {
             aria-checked={theme === t.key}
             onClick={() => pickTheme(t.key)}
             className={cn(
-              "flex h-[70px] flex-col items-center justify-center gap-1.5 rounded-xl border text-[14px] transition-colors",
+              "flex h-[62px] flex-col items-center justify-center gap-1.5 rounded-xl border text-[14px] transition-colors",
               theme === t.key ? "border-gc-line bg-gc-surface text-gc-ink" : "border-gc-line bg-background text-gc-ink-muted hover:text-gc-ink",
             )}
           >
@@ -274,7 +274,7 @@ function Profile() {
         ))}
       </div>
 
-      <div className="mt-6 border-t border-gc-line py-3">
+      <div className="mt-4 border-t border-gc-line py-1.5">
         <div className={row}>
           <span className={rowLabel}><UserRound className="h-[18px] w-[18px] shrink-0" strokeWidth={1.75} /> Full name</span>
           <div className="ml-auto flex min-w-0 items-center gap-2">
@@ -308,7 +308,7 @@ function Profile() {
         </div>
       </div>
 
-      <div className="border-t border-gc-line py-3">
+      <div className="border-t border-gc-line py-1.5">
         <div className={row}>
           <span className={rowLabel}><UserSquare2 className="h-[18px] w-[18px] shrink-0" strokeWidth={1.75} /> User ID</span>
           <button type="button" onClick={() => void copyId()} disabled={!userId} className={cn(pill, "ml-auto")}>

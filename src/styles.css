@@ -2275,3 +2275,21 @@ html body .jenvu-zoom-dashboard main .jx-ide :is(.jx-ide-card) { border-radius: 
 .dash-dark .jx-ide svg.text-\[var\(--coder-red\)\] { color: var(--coder-red) !important; }
 .dash-dark .jx-ide svg.text-\[var\(--coder-amber\)\] { color: var(--coder-amber) !important; }
 .dash-dark .jx-ide :is(aside, nav) svg:not([class*="coder-"]) { color: inherit !important; }
+
+/* Chat page fits the screen: height divides out the page zoom (--chat-z = dashboard zoom × 0.7). */
+.chat-shell { height: calc(100dvh / 0.9 - 150px); }
+@media (min-width: 1024px) {
+  .jenvu-zoom-dashboard main.dash-page.chat-page { --chat-z: 0.636; padding-bottom: 0; }
+  .jenvu-zoom-dashboard main.chat-page .chat-shell { height: calc(100dvh / var(--chat-z) - 130px); }
+}
+@media (min-width: 1200px) { .jenvu-zoom-dashboard main.dash-page.chat-page { --chat-z: 0.7035; } }
+@media (min-width: 1360px) { .jenvu-zoom-dashboard main.dash-page.chat-page { --chat-z: 0.7693; } }
+@media (min-width: 1500px) { .jenvu-zoom-dashboard main.dash-page.chat-page { --chat-z: 0.8365; } }
+@media (min-width: 1600px) { .jenvu-zoom-dashboard main.dash-page.chat-page { --chat-z: 0.9212; } }
+@media (min-width: 1680px) { .jenvu-zoom-dashboard main.dash-page.chat-page { --chat-z: 0.9716; } }
+@media (min-width: 1920px) { .jenvu-zoom-dashboard main.dash-page.chat-page { --chat-z: 1.0374; } }
+
+/* Models and Usage: page area 5% larger than other dashboard pages (sidebar untouched). */
+@media (min-width: 1024px) {
+  .jenvu-zoom-dashboard main.dash-page.page-plus5 { zoom: 0.7 !important; }
+}
