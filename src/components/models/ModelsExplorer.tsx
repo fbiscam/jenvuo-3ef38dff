@@ -1,4 +1,5 @@
 import { useMemo, useRef, useState, type ReactNode } from "react";
+import { useModelStatus } from "@/hooks/useModelStatus";
 import { Link } from "@tanstack/react-router";
 import {
   Code2,
@@ -158,9 +159,23 @@ function SectionHead({ title, sub }: { title: string; sub: string }) {
   );
 }
 
+/** Online / Offline pill for one model (null = first check still running). */
+export function StatusBadge({ live, id }: { live: Set<string> | null; id: string }) {
+  if (!live) return <span className="shrink-0 text-[11px] font-normal text-muted-foreground">Checking…</span>;
+  const on = live.has(id);
+  return (
+    <span className={cn("inline-flex shrink-0 items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium",
+      on ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400" : "bg-red-500/10 text-red-600 dark:text-red-400")}>
+      <span className={cn("h-1.5 w-1.5 rounded-full", on ? "animate-pulse bg-emerald-500" : "bg-red-500")} />
+      {on ? "Online" : "Offline"}
+    </span>
+  );
+}
+
 /** xAI console-style model table used inside the dashboard. */
 function ConsoleModelTable({ list, query, setQuery }: { list: CatalogModel[]; query: string; setQuery: (v: string) => void }) {
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const live = useModelStatus();
   const copy = async (id: string) => {
     try {
       await navigator.clipboard.writeText(id);
@@ -190,7 +205,10 @@ function ConsoleModelTable({ list, query, setQuery }: { list: CatalogModel[]; qu
             <div className="flex min-w-0 items-center gap-3">
               <img src={LOGOS[m.provider]} alt="" className={cn("h-6 w-6 shrink-0 object-contain", MONO_LOGOS.has(m.provider) && "dark:invert", m.provider === "moonshot" && "dark:hue-rotate-180")} />
               <div className="min-w-0">
-                <p className="truncate text-sm font-medium text-foreground">{m.name}</p>
+                <p className="flex items-center gap-2 text-sm font-medium text-foreground">
+                  <span className="truncate">{m.name}</span>
+                  <StatusBadge live={live} id={m.id} />
+                </p>
                 <button type="button" onClick={() => void copy(m.id)} className="inline-flex items-center gap-1 font-mono text-[12px] text-muted-foreground hover:text-foreground">
                   {m.id} {copiedId === m.id ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
                 </button>
@@ -218,6 +236,7 @@ export default function ModelsExplorer({ apiHref = "/dashboard/api" }: { apiHref
   const [provider, setProvider] = useState<ProviderKey | "all">("all");
   const [cap, setCap] = useState<Capability | "all">("all");
   const [copied, setCopied] = useState(false);
+  const live = useModelStatus();
   const catalogRef = useRef<HTMLDivElement | null>(null);
 
   const list = useMemo(() => {
@@ -309,7 +328,7 @@ export default function ModelsExplorer({ apiHref = "/dashboard/api" }: { apiHref
               return (
                 <div key={id} className="console-card p-5">
                   <div className="flex items-start justify-between gap-3">
-                    <h3 className="text-[15px] font-medium text-foreground">{m.name}</h3>
+                    <h3 className="flex items-center gap-2 text-[15px] font-medium text-foreground">{m.name} <StatusBadge live={live} id={m.id} /></h3>
                     <p className="shrink-0 text-[13px] text-muted-foreground">
                       {i < 2 && <span className="mr-2 text-[#f97316]">New</span>}
                       Context <span className="text-foreground">{formatContext(m.context)}</span>

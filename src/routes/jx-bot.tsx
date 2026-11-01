@@ -29,7 +29,6 @@ export const Route = createFileRoute("/jx-bot")({
   component: JxBotLanding,
 });
 
-const SIGN_IN = "https://auth.jenvu.com/sign-in";
 const pillDark =
   "inline-flex items-center gap-2 rounded-full bg-foreground px-6 py-3 text-[16px] font-medium text-background transition hover:opacity-85";
 const pillGrey =
@@ -70,9 +69,9 @@ function GetBot({ label = "Use JX Bot" }: { label?: string }) {
       </Link>
     );
   return (
-    <a href={SIGN_IN} className={pillDark}>
+    <Link to="/auth" className={pillDark}>
       {icon} {label}
-    </a>
+    </Link>
   );
 }
 

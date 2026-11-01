@@ -67,7 +67,6 @@ const SECTIONS = [
   { id: "products", label: "Products" },
 ];
 
-const SIGN_IN = "https://auth.jenvu.com/sign-in";
 
 /** Same aurora gradients as the Platform page tiles. */
 const AURORAS = ["var(--platform-aurora-1)", "var(--platform-aurora-2)", "var(--platform-aurora-3)"];
@@ -566,9 +565,9 @@ function GetStarted() {
                   Open dashboard <ArrowUpRight className="h-3.5 w-3.5" />
                 </Link>
               ) : (
-                <a href={SIGN_IN} className={pillLight}>
+                <Link to="/auth" className={pillLight}>
                   Try it free <ArrowUpRight className="h-3.5 w-3.5" />
-                </a>
+                </Link>
               )}
               <Link to="/pricing" className="inline-flex items-center gap-1.5 rounded-full px-5 py-2.5 text-sm font-medium hover:bg-gc-surface">
                 See pricing
