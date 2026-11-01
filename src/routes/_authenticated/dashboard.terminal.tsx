@@ -29,6 +29,7 @@ import {
   type JenvuChartHandle,
 } from "@/components/terminal/JenvuChartWorkspace";
 import { TerminalWatchlist } from "@/components/terminal/TerminalWatchlist";
+import { hasWeekendClose, parseChartAsset, type ChartAsset } from "@/components/terminal/terminal-assets";
 import { transcribeVoiceMessage } from "@/lib/transcription.functions";
 import { cn } from "@/lib/utils";
 import { isMarketClosed } from "@/lib/signals/qualification";
@@ -67,16 +68,16 @@ import { JENVU_MARK_URL as askJenvuMark } from "@/components/JenvuMark";
 export const Route = createFileRoute("/_authenticated/dashboard/terminal")({
   head: () => ({
     meta: [
-      { title: "Jenvu Terminal — Live XAU/USD Chart & AI Desk" },
+      { title: "Jenvu Terminal — Gold, BTC/USD & EUR/USD Charts" },
       {
         name: "description",
         content:
-          "Full-screen XAU/USD charting terminal with drawing tools, multiple timeframes and a built-in AI desk that reads the chart with you.",
+          "Live Gold (XAU/USD), BTC/USD and EUR/USD charts with drawing tools, multiple timeframes and a built-in AI desk that reads the chart with you.",
       },
-      { property: "og:title", content: "Jenvu Terminal — Live XAU/USD Chart & AI Desk" },
+      { property: "og:title", content: "Jenvu Terminal — Gold, BTC/USD & EUR/USD Charts" },
       {
         property: "og:description",
-        content: "Chart XAU/USD like a pro and ask the Jenvu AI desk about the setup in one screen.",
+        content: "Chart Gold, BTC/USD and EUR/USD and ask the Jenvu AI desk about the setup in one screen.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -288,7 +289,7 @@ async function blobToDataUrl(blob: Blob): Promise<string> {
 
 function TerminalPage() {
   const [tf, setTf] = useState(TIMEFRAMES[3]);
-  const [asset, setAsset] = useState<"XAUUSD" | "BTCUSD">("XAUUSD");
+  const [asset, setAsset] = useState<ChartAsset>("XAUUSD");
   // Daily terminal access fee ($0.30 per UTC day, charged once server-side).
   useEffect(() => {
     void import("@/integrations/supabase/client").then(({ supabase }) =>
@@ -300,12 +301,12 @@ function TerminalPage() {
   useEffect(() => {
     try {
       const saved = window.localStorage.getItem("jenvu-terminal-asset");
-      setAsset(saved === "BTCUSD" ? "BTCUSD" : "XAUUSD");
+      setAsset(parseChartAsset(saved));
     } catch {
       /* storage unavailable */
     }
   }, []);
-  const changeAsset = (next: "XAUUSD" | "BTCUSD") => {
+  const changeAsset = (next: ChartAsset) => {
     setAsset(next);
     try {
       window.localStorage.setItem("jenvu-terminal-asset", next);
@@ -584,7 +585,7 @@ function TerminalPage() {
     // Gold weekend (Fri 21:00 → Sun 22:00 UTC): the last candle has closed, so
     // the timer stops at 00:00 like TradingView instead of counting new candles.
     const tick = () => {
-      const closed = asset === "XAUUSD" && isMarketClosed(new Date());
+      const closed = hasWeekendClose(asset) && isMarketClosed(new Date());
       setMarketClosed(closed);
       setSecondsLeft(closed ? 0 : candleSecondsLeft(tf.tv));
     };

@@ -9,7 +9,7 @@ import { PERIODS, type PeriodKey } from "@/lib/chart/gold-history";
 import type { OhlcvBar } from "@/lib/chart/indicators";
 import { ratingFor, type TechReading, type TechVerdict } from "@/lib/chart/technicals";
 import { cn } from "@/lib/utils";
-import { XauUsdLogo } from "./XauUsdLogo";
+import { AssetLogo, assetInfo, type ChartAsset } from "./terminal-assets";
 import { num, useTechnicals, useWatchQuotes } from "./terminal-market";
 
 export type MarketTab = "overview" | "news" | "technicals" | "seasonals";
@@ -66,28 +66,28 @@ export function TerminalSymbolHeader({
   marketOpen = true,
   asset = "XAUUSD",
 }: {
-  asset?: "XAUUSD" | "BTCUSD";
+  asset?: ChartAsset;
   price: number | null;
   tab: MarketTab;
   onTabChange: (tab: MarketTab) => void;
   marketOpen?: boolean;
 }) {
   const quotes = useWatchQuotes();
-  const q = asset === "BTCUSD" ? undefined : quotes.data?.XAUUSD;
-  const title = asset === "BTCUSD" ? "Bitcoin / U.S. Dollar" : "Gold / U.S. Dollar";
+  const q = asset === "BTCUSD" ? undefined : quotes.data?.[asset];
+  const { title, decimals, label } = assetInfo(asset);
   const live = price ?? q?.price ?? null;
   const ch = q?.changePct ?? null;
   const prev = live != null && ch != null ? live / (1 + ch / 100) : null;
   const abs = live != null && prev != null ? live - prev : null;
   const now = useClock();
-  const priceText = live != null ? num(live, 2) : "—";
+  const priceText = live != null ? num(live, decimals) : "—";
   const head = priceText.length > 5 ? priceText.slice(0, -5) : "";
   const tail = priceText.length > 5 ? priceText.slice(-5) : priceText;
 
   return (
     <section aria-label={title} className="hidden shrink-0 bg-card font-sans lg:block">
       <div className="flex items-center gap-5 px-5 pb-3 pt-4">
-        <XauUsdLogo size={80} />
+        <AssetLogo asset={asset} size={80} />
         <div className="min-w-0">
           <h1 className="text-[28px] font-semibold leading-tight tracking-tight text-gc-ink 2xl:text-[34px]">{title}</h1>
           <div className="mt-2 flex flex-wrap items-baseline gap-x-3 gap-y-1">
@@ -99,7 +99,7 @@ export function TerminalSymbolHeader({
             {abs != null && (
               <p className={cn("text-[18px] font-medium tabular-nums", pctTone(abs))}>
                 {abs >= 0 ? "+" : "−"}
-                {num(Math.abs(abs), 2)} <span className="ml-1">{abs >= 0 ? "+" : ""}{pct(ch)}</span>
+                {num(Math.abs(abs), decimals)} <span className="ml-1">{abs >= 0 ? "+" : ""}{pct(ch)}</span>
               </p>
             )}
           </div>
@@ -110,7 +110,7 @@ export function TerminalSymbolHeader({
         </div>
         <HeaderSidePanel quotes={quotes.data} now={now} />
       </div>
-      <nav aria-label="EUR/USD sections" className="flex gap-7 border-b-2 border-gc-line px-5">
+      <nav aria-label={`${label} sections`} className="flex gap-7 border-b-2 border-gc-line px-5">
         {TABS.map((t) => (
           <button
             key={t.id}
