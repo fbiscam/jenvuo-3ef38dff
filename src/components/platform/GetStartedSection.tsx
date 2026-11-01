@@ -4,7 +4,6 @@ import { useAuthUser } from "@/hooks/useAuthUser";
 
 /* "Get started" — shared by /platform and the homepage. */
 
-const SIGN_IN = "https://auth.jenvu.com/sign-in";
 const pillDark =
   "inline-flex items-center gap-1.5 rounded-full bg-foreground px-5 py-2.5 text-sm font-medium text-background transition hover:opacity-85";
 const pillLight =

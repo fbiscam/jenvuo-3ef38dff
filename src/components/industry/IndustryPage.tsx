@@ -67,7 +67,6 @@ const SECTIONS = [
   { id: "products", label: "Products" },
 ];
 
-const SIGN_IN = "https://auth.jenvu.com/sign-in";
 
 /** Same aurora gradients as the Platform page tiles. */
 const AURORAS = ["var(--platform-aurora-1)", "var(--platform-aurora-2)", "var(--platform-aurora-3)"];

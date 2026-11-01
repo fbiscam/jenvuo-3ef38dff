@@ -59,7 +59,6 @@ export const Route = createFileRoute("/platform")({
   component: PlatformPage,
 });
 
-const SIGN_IN = "https://auth.jenvu.com/sign-in";
 
 /* ---------- shared bits ---------- */
 
