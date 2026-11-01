@@ -146,6 +146,7 @@ export function AskJenvuWidget() {
             "ask-jenvu-root fixed bottom-3 right-3 sm:bottom-5 sm:right-5 z-[9998] flex h-12 sm:h-14 items-center justify-center gap-2.5 rounded-2xl ask-jenvu-launcher text-[15px] font-medium",
             "shadow-none border-0 ring-0 transition-all duration-300 hover:brightness-95",
             compact ? "w-12 sm:w-14 px-0" : "px-4 sm:px-6",
+            /^\/(auth|sign-in|sign-up)/.test(pathname) ? "max-md:hidden" : "",
           ].join(" ")}
         >
           <JenvuMark className="h-5 w-5 shrink-0" />

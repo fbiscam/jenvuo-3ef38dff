@@ -56,9 +56,9 @@ export default function SiteAnnouncementBar() {
   const internal = !!href && href.startsWith("/");
 
   return (
-    <section className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-gc-line bg-background py-2 pl-4 pr-4 sm:pl-5 md:pr-5">
-      <Icon className={`h-5 w-5 shrink-0 ${problem ? "text-gc-amber" : "text-gc-ink-muted"}`} aria-hidden="true" />
-      <p className="min-w-0 flex-1 text-[13px] text-gc-ink sm:text-[14px]">
+    <section className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-gc-line bg-background py-1 pl-3.5 pr-4 sm:pl-5 md:pr-5">
+      <Icon className={`h-4 w-4 shrink-0 ${problem ? "text-gc-amber" : "text-gc-ink-muted"}`} aria-hidden="true" />
+      <p className="min-w-0 flex-1 text-[12px] text-gc-ink sm:text-[12.5px]">
         <span className="font-medium">{notice.title}</span>
         {notice.body ? <span className="text-gc-ink-muted"> — {notice.body}</span> : null}
       </p>
@@ -66,7 +66,7 @@ export default function SiteAnnouncementBar() {
         <button
           type="button"
           onClick={() => void dismiss()}
-          className="h-8 rounded-full border border-gc-line bg-background px-4 text-[13px] font-medium text-gc-ink hover:bg-gc-surface"
+          className="h-6 rounded-full border border-gc-line bg-background px-3 text-[12px] font-medium text-gc-ink hover:bg-gc-surface"
         >
           Dismiss
         </button>
@@ -75,7 +75,7 @@ export default function SiteAnnouncementBar() {
             <button
               type="button"
               onClick={() => void router.navigate({ href })}
-              className="inline-flex h-8 items-center rounded-full bg-gc-blue-deep px-4 text-[13px] font-medium text-gc-on-blue hover:bg-gc-navy"
+              className="inline-flex h-6 items-center rounded-full bg-gc-blue-deep px-3 text-[12px] font-medium text-gc-on-blue hover:bg-gc-navy"
             >
               {notice.link_label || "View"}
             </button>
@@ -84,7 +84,7 @@ export default function SiteAnnouncementBar() {
               href={href}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex h-8 items-center rounded-full bg-gc-blue-deep px-4 text-[13px] font-medium text-gc-on-blue hover:bg-gc-navy"
+              className="inline-flex h-6 items-center rounded-full bg-gc-blue-deep px-3 text-[12px] font-medium text-gc-on-blue hover:bg-gc-navy"
             >
               {notice.link_label || "View"}
             </a>

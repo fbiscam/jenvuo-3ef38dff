@@ -35,23 +35,23 @@ export default function TwoFactorReminder() {
   };
 
   return (
-    <section className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-gc-line bg-background py-2 pl-4 pr-4 sm:pl-5 md:pr-5">
-      <ShieldCheck className="h-5 w-5 shrink-0 text-gc-ink-muted" aria-hidden="true" />
-      <p className="min-w-0 flex-[1_1_calc(100%-3rem)] sm:flex-1 text-[13px] text-gc-ink sm:text-[14px]">
+    <section className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-gc-line bg-background py-1 pl-3.5 pr-4 sm:pl-5 md:pr-5">
+      <ShieldCheck className="h-4 w-4 shrink-0 text-gc-ink-muted" aria-hidden="true" />
+      <p className="min-w-0 flex-[1_1_calc(100%-3rem)] sm:flex-1 text-[12px] text-gc-ink sm:text-[12.5px]">
         <span className="font-medium">Protect your account with 2FA</span>
         <span className="text-gc-ink-muted"> — Turn on sign-in with an authenticator app so only your phone can sign in.</span>
       </p>
-      <div className="ml-9 flex shrink-0 items-center gap-2 sm:ml-0">
+      <div className="ml-7 flex shrink-0 items-center gap-2 sm:ml-0">
         <button
           type="button"
           onClick={dismiss}
-          className="h-8 rounded-full border border-gc-line bg-background px-4 text-[13px] font-medium text-gc-ink hover:bg-gc-surface"
+          className="h-6 rounded-full border border-gc-line bg-background px-3 text-[12px] font-medium text-gc-ink hover:bg-gc-surface"
         >
           Dismiss
         </button>
         <Link
           to="/dashboard/security"
-          className="inline-flex h-8 items-center rounded-full bg-gc-blue-deep px-4 text-[13px] font-medium text-gc-on-blue hover:bg-gc-navy"
+          className="inline-flex h-6 items-center rounded-full bg-gc-blue-deep px-3 text-[12px] font-medium text-gc-on-blue hover:bg-gc-navy"
         >
           Turn on 2FA
         </Link>

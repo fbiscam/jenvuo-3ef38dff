@@ -455,8 +455,8 @@ function RootComponent() {
         duration={2000}
         icons={{
           success: (
-            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500 text-white">
-              <svg viewBox="0 0 24 24" className="h-3 w-3" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12l5 5L20 7" /></svg>
+            <span className="flex h-4 w-4 items-center justify-center rounded-full bg-emerald-500 text-white">
+              <svg viewBox="0 0 24 24" className="h-2.5 w-2.5" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12l5 5L20 7" /></svg>
             </span>
           ),
         }}
@@ -464,14 +464,18 @@ function RootComponent() {
         offset={isMobile ? 24 : 96}
         toastOptions={{
           style: {
-            background: "#ffffff",
-            color: "#000000",
-            border: "1px solid #e4e4e7",
-            borderRadius: "16px",
-            boxShadow: "0 8px 24px rgba(0,0,0,0.08)",
+            background: "var(--background)",
+            color: "var(--foreground)",
+            border: "1px solid var(--border)",
+            borderRadius: "999px",
+            boxShadow: "0 4px 14px rgba(0,0,0,0.08)",
+            padding: "8px 14px",
+            fontSize: "13px",
+            minHeight: "0",
+            gap: "8px",
             whiteSpace: "nowrap",
             width: "max-content",
-            maxWidth: "min(92vw, 640px)",
+            maxWidth: "min(92vw, 520px)",
           },
         }}
       />
