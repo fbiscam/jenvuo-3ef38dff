@@ -2201,7 +2201,7 @@ html body .dark .code-box .tok-var { color: #9cdcfe !important; }
 .jx-ide-act:hover { color: var(--ide-fg); }
 .jx-ide-act.is-on { color: var(--ide-fg); }
 .jx-ide-act.is-on::before { content: ""; position: absolute; left: 0; top: 9px; bottom: 9px; width: 2px; background: var(--ide-fg); }
-.jx-ide-side { display: flex; flex-direction: column; width: 270px; flex-shrink: 0; background: var(--ide-side); border-right: 1px solid var(--ide-line); }
+.jx-ide-side { display: flex; flex-direction: column; width: 250px; flex-shrink: 0; background: var(--ide-side); border-right: 1px solid var(--ide-line); }
 @media (max-width: 1023px) { .jx-ide-side { box-shadow: 8px 0 24px rgba(0,0,0,.15); } .jx-ide-ai { box-shadow: -8px 0 24px rgba(0,0,0,.15); } }
 .jx-ide-group { display: flex; align-items: center; gap: 4px; padding: 4px 8px; font-size: 11.5px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; color: var(--ide-fg); opacity: .8; }
 .jx-ide-divider { border-top: 1px solid var(--ide-line); }
@@ -2235,7 +2235,7 @@ html body .dark .code-box .tok-var { color: #9cdcfe !important; }
 .jx-ide-ptab { display: inline-flex; align-items: center; gap: 6px; padding: 8px 0 6px; color: var(--ide-muted); border-bottom: 1px solid transparent; }
 .jx-ide-ptab.is-on { color: var(--ide-fg); border-bottom-color: var(--ide-fg); }
 .jx-ide-count { display: inline-grid; place-items: center; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 999px; background: var(--ide-on); font-size: 11px; }
-.jx-ide-ai { display: flex; flex-direction: column; width: 380px; flex-shrink: 0; background: var(--ide-side); border-left: 1px solid var(--ide-line); }
+.jx-ide-ai { display: flex; flex-direction: column; width: 360px; flex-shrink: 0; background: var(--ide-side); border-left: 1px solid var(--ide-line); }
 @media (min-width: 1600px) { .jx-ide-ai { width: 420px; } }
 .jx-ide-pill { padding: 2px 8px; border-radius: 999px; background: var(--ide-on); font-size: 11px; color: var(--ide-muted); }
 .jx-ide-bubble { padding: 8px 12px; border-radius: 14px; background: var(--ide-on); }
@@ -2261,7 +2261,8 @@ html body .jenvu-zoom-dashboard main .jx-ide :is(.jx-ide-act, .jx-ide-tab, .jx-i
 html body .jenvu-zoom-dashboard main .jx-ide :is(.jx-ide-row) { border-radius: 4px !important; }
 html body .jenvu-zoom-dashboard main .jx-ide :is(.jx-ide-icon) { border-radius: 6px !important; }
 html body .jenvu-zoom-dashboard main .jx-ide :is(.jx-ide-card) { border-radius: 10px !important; }
-.jenvu-zoom-dashboard main .jx-ide :is(input, textarea) { background-color: transparent; color: var(--ide-fg); }
+.jenvu-zoom-dashboard main .jx-ide :is(input, textarea):not(.jx-ide-textarea) { background-color: transparent; color: var(--ide-fg); }
+.jenvu-zoom-dashboard main .jx-ide .jx-ide-textarea { background-color: transparent !important; color: transparent !important; -webkit-text-fill-color: transparent; }
 .jenvu-zoom-dashboard main .jx-ide :is(.jx-ide-palette, .jx-ide-input) { background-color: var(--ide-bg); border-color: var(--ide-line); }
 .jx-ide :is(p, li, label) { color: inherit; }
 .dash-dark .jx-ide svg.text-\[var\(--coder-green\)\] { color: var(--coder-green) !important; }
