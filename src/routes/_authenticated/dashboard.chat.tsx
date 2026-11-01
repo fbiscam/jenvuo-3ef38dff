@@ -20,7 +20,10 @@ import {
   Paperclip,
   Plus,
   RotateCcw,
+  RotateCw,
   SlidersHorizontal,
+  ThumbsDown,
+  ThumbsUp,
   X,
   type LucideIcon,
 } from "lucide-react";
@@ -174,6 +177,7 @@ function ChatPlayground() {
   const [instructions, setInstructions] = useState("");
   const [maxTokens, setMaxTokens] = useState(1200);
   const [copied, setCopied] = useState<string | null>(null);
+  const [votes, setVotes] = useState<Record<string, "up" | "down">>({});
   const [codeOpen, setCodeOpen] = useState(false);
   const [files, setFiles] = useState<ChatAttachment[]>([]);
   const [reading, setReading] = useState(false);
@@ -220,23 +224,8 @@ function ChatPlayground() {
     }
   };
 
-  const submit = async () => {
-    const typed = input.trim();
-    if ((!typed && !files.length) || busy || reading) return;
-    const attached = files;
-    const content = composeMessage(typed || "Please look at the attached file.", attached);
-    const images = attached.flatMap((f) => (f.kind === "image" ? [f.url] : []));
-    const userTurn: Turn = {
-      id: crypto.randomUUID(),
-      role: "user",
-      content,
-      display: typed,
-      files: attached.map((f) => ({ name: f.name, kind: f.kind, url: f.kind === "image" ? f.url : undefined })),
-    };
-    const history = [...turns.filter((t) => !t.error), userTurn];
-    setTurns((t) => [...t, userTurn]);
-    setInput("");
-    setFiles([]);
+  // Sends the conversation (ending with a user turn) and appends the reply.
+  const ask = async (history: Turn[], images: string[]) => {
     setBusy(true);
     try {
       const res = await send({
@@ -245,7 +234,7 @@ function ChatPlayground() {
           instructions,
           maxTokens,
           images,
-          turns: history.map(({ role, content: c }) => ({ role, content: c })),
+          turns: history.filter((t) => !t.error).map(({ role, content: c }) => ({ role, content: c })),
         },
       });
       setTurns((t) => [
@@ -271,6 +260,39 @@ function ChatPlayground() {
       setBusy(false);
       box.current?.focus();
     }
+  };
+
+  const submit = async () => {
+    const typed = input.trim();
+    if ((!typed && !files.length) || busy || reading) return;
+    const attached = files;
+    const content = composeMessage(typed || "Please look at the attached file.", attached);
+    const images = attached.flatMap((f) => (f.kind === "image" ? [f.url] : []));
+    const userTurn: Turn = {
+      id: crypto.randomUUID(),
+      role: "user",
+      content,
+      display: typed,
+      files: attached.map((f) => ({ name: f.name, kind: f.kind, url: f.kind === "image" ? f.url : undefined })),
+    };
+    const history = [...turns.filter((t) => !t.error), userTurn];
+    setTurns((t) => [...t, userTurn]);
+    setInput("");
+    setFiles([]);
+    await ask(history, images);
+  };
+
+  // Drops the chosen reply (and anything after it) and asks again.
+  const regenerate = (replyId: string) => {
+    if (busy) return;
+    const idx = turns.findIndex((t) => t.id === replyId);
+    if (idx < 0) return;
+    const kept = turns.slice(0, idx);
+    if (kept[kept.length - 1]?.role !== "user") return;
+    const lastUser = kept[kept.length - 1];
+    const images = (lastUser.files ?? []).flatMap((f) => (f.kind === "image" && f.url ? [f.url] : []));
+    setTurns(kept);
+    void ask(kept, images);
   };
 
   const pickExample = (ex: Example) => {
