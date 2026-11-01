@@ -47,8 +47,20 @@ import { MIXED_CATALOG, PROVIDERS, PRICE_PER_MILLION, formatContext, getCatalogM
 import { playgroundChat } from "@/lib/playground.functions";
 import { PLAYGROUND_DEFAULT_MODEL, PLAYGROUND_MAX_IMAGES, PLAYGROUND_MAX_TOKENS, type PlaygroundTurn } from "@/lib/playground";
 import { DOC_ACCEPT, IMAGE_ACCEPT, composeMessage, readAttachment, type ChatAttachment } from "@/components/dashboard/chat-attachments";
-import { codeRequestKind, extractReplyFiles, type ReplyFile } from "@/lib/chat-files";
+import {
+  CHAT_MAX_FILES,
+  codeRequestKind,
+  extractReplyDocument,
+  extractReplyFiles,
+  looksLikeDocRequest,
+  mergeWorkspace,
+  parseRenameRequest,
+  workspaceContext,
+  type ReplyDocument,
+  type ReplyFile,
+} from "@/lib/chat-files";
 import { ChatCodeStudio } from "@/components/dashboard/ChatCodeStudio";
+import { ChatDocView, exportDocumentPdf } from "@/components/dashboard/ChatDocView";
 
 export const Route = createFileRoute("/_authenticated/dashboard/chat")({
   head: () => ({
@@ -89,6 +101,8 @@ const JENVU_BRAIN = [
   "Markets: forex, Gold (XAU/USD), indices and crypto. You know ICT and SMC deeply: market structure (HH/HL/LH/LL, BOS, CHoCH, MSS), liquidity (BSL/SSL, equal highs/lows, PDH/PDL, sweeps and runs), order blocks, breakers, mitigation blocks, FVG/IFVG/BPR, premium/discount and OTE 62-79%, Power of Three, London and New York killzones, Silver Bullet, session opens, and multi-timeframe top-down analysis. Also classic tools: EMA/SMA, RSI, MACD, ATR, volume, support/resistance, risk-reward and position sizing.",
   "Coding: expert in MQL5 (MetaTrader 5 EAs, indicators, CTrade, CPositionInfo, OnInit/OnTick/OnDeinit, new-bar checks, lot sizing from balance, SL/TP, trailing stops, magic numbers, spread and session filters), Pine Script v6 (indicator/strategy, ta.*, request.security, alerts, boxes, labels, tables) and Python for backtests and data.",
   "When asked for code: write the COMPLETE working file in one fenced block tagged with its language, starting with a comment like // File: Name.mq5; no placeholders or TODOs; every trade gets a stop loss. When asked to change existing code, return the whole updated file with the same file name. Then give short setup steps.",
+  "When asked for a PDF, report, guide or document: put the whole document in ONE fenced block tagged ```document written in Markdown (never put ``` inside it). First line: a short UPPERCASE kicker; then '# Title'; then numbered '## 1. Section' headings, '> **Callout title**' blockquotes for formulas and key notes, and tables where they help. The page turns it into a PDF. After the block, add one short line only.",
+  "You can read attached images and documents; use what they show.",
   "Be accurate and concise. Never claim personal trading experience, never promise profits or guaranteed returns, and note that trading carries risk when giving trade ideas.",
 ].join("\n");
 
