@@ -249,7 +249,7 @@ function HoursCard() {
       <div className="grid h-full place-items-center pb-10">
         <div className="flex items-center rounded-full border border-gc-line bg-background p-1 pr-3">
           {tones.map((t, i) => (
-            <JxFace key={t} className={`jx-hop -ml-1 h-8 w-8 border-2 border-background first:ml-0 ${t}`} eyes="bg-background" />
+            <JxFace key={t} className={`jx-hop ml-1 h-8 w-8 first:ml-0`} />
           ))}
           <span className="jx-pulse-text ml-2 text-[13px] text-muted-foreground">Waiting for the next session…</span>
         </div>
