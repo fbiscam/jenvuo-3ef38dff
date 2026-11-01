@@ -1,6 +1,6 @@
 import { describe, it } from "node:test";
 import { expect } from "./chart/test-expect";
-import { extractReplyFiles, looksLikeCodeRequest } from "./chat-files";
+import { codeRequestKind, extractReplyFiles, looksLikeCodeRequest } from "./chat-files";
 
 describe("extractReplyFiles", () => {
   it("names an MQL5 block .mq5", () => {
@@ -32,4 +32,12 @@ describe("extractReplyFiles", () => {
 describe("looksLikeCodeRequest", () => {
   it("detects bot requests", () => expect(looksLikeCodeRequest("Gold M15 MT5 bot banao")).toBe(true));
   it("ignores plain questions", () => expect(looksLikeCodeRequest("What is a liquidity sweep?")).toBe(false));
+});
+
+describe("codeRequestKind", () => {
+  it("MT5 bot → mql5", () => expect(codeRequestKind("Build a Gold MT5 EA")).toBe("mql5"));
+  it("Pine indicator → pine", () => expect(codeRequestKind("Pine Script v6 FVG indicator banao")).toBe("pine"));
+  it("python script → python", () => expect(codeRequestKind("write a python script for RSI")).toBe("python"));
+  it("explaining a strategy is not code", () => expect(codeRequestKind("Explain the ICT silver bullet strategy")).toBe(null));
+  it("plain build question is not code", () => expect(codeRequestKind("How do I build discipline?")).toBe(null));
 });
