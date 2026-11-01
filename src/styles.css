@@ -2245,3 +2245,12 @@ html body .dark .code-box .tok-var { color: #9cdcfe !important; }
 .jx-ide-composer { margin: 0 12px 8px; padding: 8px 12px; border-radius: 14px; border: 1px solid var(--ide-line); background: var(--ide-bg); }
 .jx-ide-composer:focus-within { border-color: var(--ide-fg); }
 .jx-ide-status { display: flex; align-items: center; gap: 16px; height: 26px; flex-shrink: 0; padding: 0 12px; font-size: 12px; background: var(--ide-side); color: var(--ide-muted); border-top: 1px solid var(--ide-line); white-space: nowrap; overflow: hidden; }
+
+/* Jexco fills the viewport exactly inside the zoomed dashboard wrapper (desktop has no top bar). */
+@media (min-width: 1024px) { .jenvu-zoom-dashboard .coder-page { height: calc(100dvh / 0.909); } }
+@media (min-width: 1200px) { .jenvu-zoom-dashboard .coder-page { height: calc(100dvh / 1.005); } }
+@media (min-width: 1360px) { .jenvu-zoom-dashboard .coder-page { height: calc(100dvh / 1.099); } }
+@media (min-width: 1500px) { .jenvu-zoom-dashboard .coder-page { height: calc(100dvh / 1.195); } }
+@media (min-width: 1600px) { .jenvu-zoom-dashboard .coder-page { height: calc(100dvh / 1.316); } }
+@media (min-width: 1680px) { .jenvu-zoom-dashboard .coder-page { height: calc(100dvh / 1.388); } }
+@media (min-width: 1920px) { .jenvu-zoom-dashboard .coder-page { height: calc(100dvh / 1.482); } }

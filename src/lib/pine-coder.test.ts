@@ -1,4 +1,5 @@
-import { describe, expect, it } from "vitest";
+import { describe, it } from "node:test";
+import { expect } from "./chart/test-expect";
 import { lintScript, outlineScript, STARTER_MQL5, STARTER_PINE } from "./pine-coder";
 
 describe("lintScript", () => {
@@ -8,7 +9,7 @@ describe("lintScript", () => {
   });
   it("reports an unclosed bracket on its line", () => {
     const p = lintScript('//@version=6\nindicator("x")\nplot(close', "pine");
-    expect(p).toContainEqual({ line: 3, level: "error", message: '"(" is never closed' });
+    expect(p.some((x) => x.line === 3 && x.level === "error" && x.message === '"(" is never closed')).toBe(true);
   });
   it("ignores brackets inside strings and comments", () => {
     expect(lintScript('//@version=6\nindicator("a (")\n// )', "pine")).toEqual([]);
@@ -21,7 +22,9 @@ describe("lintScript", () => {
 
 describe("outlineScript", () => {
   it("lists Pine inputs and MQL5 functions", () => {
-    expect(outlineScript(STARTER_PINE, "pine")[0]).toMatchObject({ kind: "input", name: "len" });
-    expect(outlineScript(STARTER_MQL5, "mql5").map((o) => o.name)).toContain("OnTick");
+    const first = outlineScript(STARTER_PINE, "pine")[0];
+    expect(first.kind).toBe("input");
+    expect(first.name).toBe("len");
+    expect(outlineScript(STARTER_MQL5, "mql5").some((o) => o.name === "OnTick")).toBe(true);
   });
 });
