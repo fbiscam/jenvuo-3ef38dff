@@ -41,3 +41,54 @@ describe("codeRequestKind", () => {
   it("explaining a strategy is not code", () => expect(codeRequestKind("Explain the ICT silver bullet strategy")).toBe(null));
   it("plain build question is not code", () => expect(codeRequestKind("How do I build discipline?")).toBe(null));
 });
+
+import { CHAT_MAX_FILES, extractReplyDocument, looksLikeDocRequest, mergeWorkspace, parseRenameRequest } from "./chat-files";
+
+const f = (name: string, code = "x\n") => ({ name, code, lang: "txt" });
+
+describe("mergeWorkspace", () => {
+  it("holds at most 4 files and reports the rest", () => {
+    const r = mergeWorkspace([f("a.py"), f("b.py"), f("c.py")], [f("d.py"), f("e.py")]);
+    expect(CHAT_MAX_FILES).toBe(4);
+    expect(r.files.map((x) => x.name)).toEqual(["a.py", "b.py", "c.py", "d.py"]);
+    expect(r.dropped).toEqual(["e.py"]);
+  });
+
+  it("updates a file with the same name in place", () => {
+    const r = mergeWorkspace([f("a.py", "old\n"), f("b.py")], [f("A.py", "new\n")]);
+    expect(r.files.length).toBe(2);
+    expect(r.files[0].code).toBe("new\n");
+  });
+});
+
+describe("parseRenameRequest", () => {
+  it("renames one named file to another name", () => {
+    expect(parseRenameRequest("rename backtest.py to rsi.py", ["backtest.py"])).toEqual({ from: "backtest.py", to: "rsi.py" });
+  });
+
+  it("understands Urdu wording", () => {
+    expect(parseRenameRequest("jenvu_code.py ka name rsi_check.py krdo", ["jenvu_code.py", "a.pine"])).toEqual({ from: "jenvu_code.py", to: "rsi_check.py" });
+  });
+
+  it("renames the active file when only the new name is given", () => {
+    expect(parseRenameRequest("name this file Strategy.pine", ["a.pine", "b.py"], "a.pine")).toEqual({ from: "a.pine", to: "Strategy.pine" });
+  });
+
+  it("ignores normal code requests", () => {
+    expect(parseRenameRequest("add an RSI filter to backtest.py", ["backtest.py"])).toBe(null);
+  });
+});
+
+describe("documents", () => {
+  it("detects PDF and report requests", () => {
+    expect(looksLikeDocRequest("RSI ki PDF file banao")).toBe(true);
+    expect(looksLikeDocRequest("write a report on gold sessions")).toBe(true);
+    expect(looksLikeDocRequest("explain RSI")).toBe(false);
+  });
+
+  it("reads the document block and its title, and keeps it out of code files", () => {
+    const reply = "Here:\n```document\nGUIDE\n# RSI Guide\n## 1. Overview\nText\n```";
+    expect(extractReplyDocument(reply)?.title).toBe("RSI Guide");
+    expect(extractReplyFiles(reply)).toHaveLength(0);
+  });
+});
