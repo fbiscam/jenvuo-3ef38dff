@@ -19,9 +19,9 @@ import {
   Newspaper,
   Paperclip,
   Plus,
-  RotateCcw,
   RotateCw,
   SlidersHorizontal,
+  SquarePen,
   ThumbsDown,
   ThumbsUp,
   X,
@@ -61,6 +61,8 @@ import {
 } from "@/lib/chat-files";
 import { ChatCodeStudio } from "@/components/dashboard/ChatCodeStudio";
 import { ChatDocView, exportDocumentPdf } from "@/components/dashboard/ChatDocView";
+import { useAuthUser } from "@/hooks/useAuthUser";
+import { chatSessionKey, parseSavedSession, toSavedSession } from "@/lib/chat-session";
 
 export const Route = createFileRoute("/_authenticated/dashboard/chat")({
   head: () => ({
@@ -101,6 +103,7 @@ const JENVU_BRAIN = [
   "Markets: forex, Gold (XAU/USD), indices and crypto. You know ICT and SMC deeply: market structure (HH/HL/LH/LL, BOS, CHoCH, MSS), liquidity (BSL/SSL, equal highs/lows, PDH/PDL, sweeps and runs), order blocks, breakers, mitigation blocks, FVG/IFVG/BPR, premium/discount and OTE 62-79%, Power of Three, London and New York killzones, Silver Bullet, session opens, and multi-timeframe top-down analysis. Also classic tools: EMA/SMA, RSI, MACD, ATR, volume, support/resistance, risk-reward and position sizing.",
   "Coding: expert in MQL5 (MetaTrader 5 EAs, indicators, CTrade, CPositionInfo, OnInit/OnTick/OnDeinit, new-bar checks, lot sizing from balance, SL/TP, trailing stops, magic numbers, spread and session filters), Pine Script v6 (indicator/strategy, ta.*, request.security, alerts, boxes, labels, tables) and Python for backtests and data.",
   "When asked for code: write the COMPLETE working file in one fenced block tagged with its language, starting with a comment like // File: Name.mq5; no placeholders or TODOs; every trade gets a stop loss. When asked to change existing code, return the whole updated file with the same file name. Then give short setup steps.",
+  "Before writing code, check the request has what you need: platform (MT5/MQL5, TradingView/Pine Script or Python), symbol, timeframe, entry and exit rules, and risk per trade. If something important is missing or unclear, do NOT write code yet: ask up to 3 short numbered questions in the chat and wait for the answer. If the request is already clear, write the code straight away.",
   "When asked for a PDF, report, guide or document: put the whole document in ONE fenced block tagged ```document written in Markdown (never put ``` inside it). First line: a short UPPERCASE kicker; then '# Title'; then numbered '## 1. Section' headings, '> **Callout title**' blockquotes for formulas and key notes, and tables where they help. The page turns it into a PDF. After the block, add one short line only.",
   "You can read attached images and documents; use what they show.",
   "Be accurate and concise. Never claim personal trading experience, never promise profits or guaranteed returns, and note that trading carries risk when giving trade ideas.",
@@ -215,6 +218,34 @@ function ChatPlayground() {
   const box = useRef<HTMLTextAreaElement>(null);
   const imageInput = useRef<HTMLInputElement>(null);
   const docInput = useRef<HTMLInputElement>(null);
+  const { user } = useAuthUser();
+  const [restored, setRestored] = useState(false);
+
+  // The chat stays (refresh, other pages, signing out) until New chat is clicked.
+  useEffect(() => {
+    if (!user?.id) return;
+    const saved = parseSavedSession(window.localStorage.getItem(chatSessionKey(user.id)));
+    if (saved) {
+      setTurns(saved.turns as Turn[]);
+      setWorkspace(saved.workspace);
+      setActiveFile(saved.activeFile);
+      setDoc(saved.doc);
+      setDocOpen(saved.docOpen);
+      if (saved.model && getCatalogModel(saved.model)) setModel(saved.model);
+    }
+    setRestored(true);
+  }, [user?.id]);
+
+  useEffect(() => {
+    if (!user?.id || !restored) return;
+    const key = chatSessionKey(user.id);
+    try {
+      if (!turns.length && !workspace.length && !doc) window.localStorage.removeItem(key);
+      else window.localStorage.setItem(key, JSON.stringify(toSavedSession({ turns, workspace, activeFile, doc, docOpen, model })));
+    } catch {
+      /* storage full or blocked: the chat still works, it just isn't kept */
+    }
+  }, [user?.id, restored, turns, workspace, activeFile, doc, docOpen, model]);
 
   const info = getCatalogModel(model);
   const last = [...turns].reverse().find((t) => t.role === "assistant" && !t.error);
@@ -475,7 +506,7 @@ function ChatPlayground() {
   );
 
   return (
-    <section className={"chat-shell mx-auto flex min-h-[440px] w-full max-w-[1166px] flex-col pt-4"}>
+    <section className="chat-shell flex min-h-[440px] w-full flex-col">
       <h1 className="sr-only">Chat</h1>
       {/* Controls: only before the chat starts; afterwards they sit next to the model picker. */}
       {turns.length === 0 && (
@@ -486,7 +517,7 @@ function ChatPlayground() {
         </div>
       )}
 
-      <div className={studio ? "flex min-h-0 flex-1 gap-4 pt-3" : "contents"}>
+      <div className={studio ? "flex min-h-0 flex-1 gap-6 pt-2" : "contents"}>
       {studio && (
         <div className="hidden min-h-0 min-w-0 flex-1 flex-col lg:flex">
           {showDoc && doc ? (
@@ -513,22 +544,22 @@ function ChatPlayground() {
           )}
         </div>
       )}
-      <div className={studio ? "flex min-h-0 w-full flex-col lg:w-[380px] lg:shrink-0" : "contents"}>
+      <div className={studio ? "flex min-h-0 w-full flex-col lg:w-[480px] lg:shrink-0" : "contents"}>
       {/* Conversation / examples */}
-      <div ref={scroller} className="mt-1 min-h-0 flex-1 overflow-y-auto [scrollbar-gutter:stable_both-edges]">
+      <div ref={scroller} className="scroll-on-hover mt-1 min-h-0 flex-1 overflow-y-auto pr-2">
         {turns.length === 0 ? (
-          <div className="flex flex-col pt-4 pb-2">
+          <div className="flex flex-col pt-6 pb-2">
             <div className="text-center">
               <h2 className="text-[18px] font-medium text-foreground">Start a chat with examples</h2>
               <p className="mt-1 text-[14px] text-muted-foreground">Pick a use case to see the exact prompt and settings, then make it your own.</p>
             </div>
-            <div className="mx-auto mt-6 grid w-full grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="mx-auto mt-8 grid w-full max-w-[1400px] grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
               {EXAMPLES.map((ex) => (
                 <button
                   key={ex.title}
                   type="button"
                   onClick={() => pickExample(ex)}
-                  className="flex flex-col rounded-2xl border border-border bg-background p-4 text-left transition-colors hover:bg-[var(--console-card)]"
+                  className="flex min-h-[170px] flex-col rounded-2xl border border-border bg-background p-5 text-left transition-colors hover:bg-[var(--console-card)]"
                 >
                   <span className={`grid h-8 w-8 place-items-center rounded-full ${ex.tone}`}>
                     <ex.icon className="h-4 w-4" aria-hidden="true" />
@@ -545,7 +576,7 @@ function ChatPlayground() {
             </div>
           </div>
         ) : (
-          <div className="space-y-6 pb-4">
+          <div className="space-y-9 pb-6 pt-2">
             {turns.map((t) =>
               t.role === "user" ? (
                 <div key={t.id} className="flex flex-col items-end gap-2">
@@ -563,7 +594,7 @@ function ChatPlayground() {
                     </div>
                   )}
                   {(t.display ?? t.content) && (
-                    <div className="max-w-[80%] whitespace-pre-wrap break-words rounded-2xl bg-[var(--console-card)] px-4 py-2.5 text-[16px] leading-relaxed text-foreground">
+                    <div className="max-w-[80%] whitespace-pre-wrap break-words rounded-2xl bg-[var(--console-card)] px-5 py-3 text-[16px] leading-[1.65] text-foreground">
                       {t.display ?? t.content}
                     </div>
                   )}
@@ -629,7 +660,7 @@ function ChatPlayground() {
                           </div>
                         );
                       })()}
-                      <div className="mt-4 flex items-center gap-1 text-muted-foreground">
+                      <div className="mt-5 flex items-center gap-1 text-muted-foreground">
                         <span className="mr-auto min-w-0 truncate text-[12px]">
                           {t.model === "local" ? "Done in the editor" : "AI responses may include mistakes"}
                           {t.model !== "local" && (
@@ -768,7 +799,7 @@ function ChatPlayground() {
               {turns.length > 0 && (
                 <>
                   <Button variant="ghost" size="icon-sm" type="button" onClick={newChat} disabled={busy} aria-label="New chat" title="New chat" className="shrink-0 rounded-full text-foreground hover:bg-background">
-                    <RotateCcw className="h-4 w-4" />
+                    <SquarePen className="h-4 w-4" />
                   </Button>
                   <Button variant="ghost" size="icon-sm" type="button" onClick={() => setCodeOpen(true)} aria-label="View code" title="View code" className="shrink-0 rounded-full text-foreground hover:bg-background">
                     <Code2 className="h-4 w-4" />
