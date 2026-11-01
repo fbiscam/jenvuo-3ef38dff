@@ -194,6 +194,7 @@ const NAV_GROUPS: Array<{ label: string; items: TabItem[] }> = [
       { to: "/dashboard/models", label: "Models", icon: BrainCircuit },
       { to: "/dashboard/chat", label: "Chat", icon: MessageSquare },
       { to: "/dashboard/code", label: "Code", icon: Code2 },
+      { to: "/dashboard/coder", label: "Pine Coder", icon: Code2 },
       { to: "/dashboard/jx-bot", label: "JX Bot", icon: Cpu },
     ],
   },
