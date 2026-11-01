@@ -4,7 +4,13 @@ import { parseRssHeadlines, periodPerformance, seasonalSeries, type DailyClose, 
 
 const UA = "Mozilla/5.0";
 const HOSTS = ["query1.finance.yahoo.com", "query2.finance.yahoo.com"];
-const SYMBOL = "EURUSD=X";
+
+/** Price-history symbol per Terminal market (Gold = COMEX gold futures). */
+const HISTORY_SYMBOL = { XAUUSD: "GC=F", BTCUSD: "BTC-USD", EURUSD: "EURUSD=X" } as const;
+type HistoryAsset = keyof typeof HISTORY_SYMBOL;
+const parseAsset = (v: unknown): HistoryAsset => (v === "BTCUSD" || v === "EURUSD" ? v : "XAUUSD");
+/** Symbol used by the seasonals tab (gold history). */
+const SYMBOL = HISTORY_SYMBOL.XAUUSD;
 
 /** Chart interval/range used for the overview line per period. */
 const RANGE: Record<PeriodKey, { interval: string; range: string }> = {
@@ -41,17 +47,17 @@ async function fetchTimeout(url: string, ms = 8000, headers: Record<string, stri
   }
 }
 
-/** Cached per interval/range so the 1-day line and the daily change share one request. */
-function yahooSeries(interval: string, range: string): Promise<YahooSeries> {
+/** Cached per symbol/interval/range so the 1-day line and the daily change share one request. */
+function yahooSeries(interval: string, range: string, symbol: string = SYMBOL): Promise<YahooSeries> {
   const ttl = interval === "5m" || interval === "30m" ? 60_000 : 15 * 60_000;
-  return cached(`y:${interval}:${range}`, ttl, () => yahooSeriesRaw(interval, range));
+  return cached(`y:${symbol}:${interval}:${range}`, ttl, () => yahooSeriesRaw(interval, range, symbol));
 }
 
-async function yahooSeriesRaw(interval: string, range: string): Promise<YahooSeries> {
+async function yahooSeriesRaw(interval: string, range: string, symbol: string): Promise<YahooSeries> {
   let lastErr: unknown = null;
   for (const host of HOSTS) {
     try {
-      const res = await fetchTimeout(`https://${host}/v8/finance/chart/${encodeURIComponent(SYMBOL)}?interval=${interval}&range=${range}`);
+      const res = await fetchTimeout(`https://${host}/v8/finance/chart/${encodeURIComponent(symbol)}?interval=${interval}&range=${range}`);
       if (!res.ok) {
         await res.body?.cancel().catch(() => {});
         throw new Error(`status ${res.status}`);
@@ -74,30 +80,31 @@ async function yahooSeriesRaw(interval: string, range: string): Promise<YahooSer
       lastErr = e;
     }
   }
-  console.error("terminal-overview: EUR/USD history unavailable", lastErr);
-  throw new Error("Gold history is unavailable right now.");
+  console.error("terminal-overview: history unavailable", symbol, lastErr);
+  throw new Error("Price history is unavailable right now.");
 }
 
 /** 10 years of daily closes (longer ranges come back monthly), shared by performance and seasonals. */
-function dailyHistory() {
-  return yahooSeries("1d", "10y");
+function dailyHistory(symbol: string = SYMBOL) {
+  return yahooSeries("1d", "10y", symbol);
 }
 
-/** Overview line for one period plus % change for every period. */
+/** Overview line for one period plus % change for every period, for the chosen market. */
 export const getGoldOverview = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { period?: string }) => {
+  .inputValidator((d: { period?: string; asset?: string }) => {
     const p = String(d?.period ?? "1d") as PeriodKey;
-    return { period: (p in RANGE ? p : "1d") as PeriodKey };
+    return { period: (p in RANGE ? p : "1d") as PeriodKey, asset: parseAsset(d?.asset) };
   })
   .handler(async ({ data }) => {
+    const symbol = HISTORY_SYMBOL[data.asset];
     try {
       const cfg = RANGE[data.period];
       // Sequential: parallel bursts get rate-limited by the price source.
-      const line = await yahooSeries(cfg.interval, cfg.range);
-      const today = await yahooSeries("5m", "1d");
-      const daily = await dailyHistory();
-      const monthly = await yahooSeries("1mo", "max");
+      const line = await yahooSeries(cfg.interval, cfg.range, symbol);
+      const today = await yahooSeries("5m", "1d", symbol);
+      const daily = await dailyHistory(symbol);
+      const monthly = await yahooSeries("1mo", "max", symbol);
       const now = Date.now();
       // Monthly closes before the daily window give "All time" its real start.
       const firstDaily = daily.points[0]?.t ?? Infinity;
@@ -105,6 +112,7 @@ export const getGoldOverview = createServerFn({ method: "POST" })
       const live = today.price ?? today.points[today.points.length - 1]?.c;
       if (live) closes.push({ t: now, c: live });
       return {
+        asset: data.asset,
         period: data.period,
         points: line.points.map((p) => [p.t, p.c] as [number, number]),
         prevClose: data.period === "1d" ? today.prevClose : line.points[0]?.c ?? null,
@@ -112,7 +120,7 @@ export const getGoldOverview = createServerFn({ method: "POST" })
         error: null as string | null,
       };
     } catch {
-      return { period: data.period, points: [], prevClose: null, performance: null, error: "Gold history is unavailable right now." };
+      return { asset: data.asset, period: data.period, points: [], prevClose: null, performance: null, error: "Price history is unavailable right now." };
     }
   });
 

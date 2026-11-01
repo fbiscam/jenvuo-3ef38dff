@@ -40,7 +40,6 @@ import {
 import { getTerminalChart } from "@/lib/gold-analysis.functions";
 import { cn } from "@/lib/utils";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { XauUsdLogo } from "./XauUsdLogo";
 import { ChartArea, ChartCandlestick, ChevronDown, Clock3, Lock, Menu, PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import { useStrategyAccess } from "./useStrategyAccess";
 import { LOCKED_STRATEGY_KEYS } from "@/lib/strategy-access";
