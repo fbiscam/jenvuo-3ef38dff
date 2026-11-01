@@ -2170,9 +2170,9 @@ html body .dark .code-box .tok-var { color: #9cdcfe !important; }
 
 /* Chat page: full width at natural size so the examples and composer fill the page. */
 @media (min-width: 1024px) {
-  .jenvu-zoom-dashboard main.dash-page.chat-page { zoom: 0.7 !important; max-width: none; padding-top: 24px; }
+  .jenvu-zoom-dashboard main.dash-page.chat-page { zoom: 0.7 !important; max-width: none; margin-left: 0; margin-right: 0; padding-top: 52px; padding-left: 40px; padding-right: 40px; }
 }
-.jenvu-zoom-dashboard main.dash-page.chat-page > :where(div, section, header) { max-width: 1166px; }
+.jenvu-zoom-dashboard main.dash-page.chat-page > :where(div, section, header) { max-width: none; }
 /* Chat "writing code" preview: lines type in one by one, then loop. */
 @keyframes chat-code-type { 0% { opacity: 0; clip-path: inset(0 100% 0 0); } 20%, 85% { opacity: 1; clip-path: inset(0 0 0 0); } 100% { opacity: 0; clip-path: inset(0 0 0 0); } }
 .chat-code-line { animation: chat-code-type 2.8s ease-out infinite both; white-space: nowrap; }
@@ -2280,7 +2280,7 @@ html body .jenvu-zoom-dashboard main .jx-ide :is(.jx-ide-card) { border-radius: 
 .chat-shell { height: calc(100dvh / 0.9 - 150px); }
 @media (min-width: 1024px) {
   .jenvu-zoom-dashboard main.dash-page.chat-page { --chat-z: 0.636; padding-bottom: 0; }
-  .jenvu-zoom-dashboard main.chat-page .chat-shell { height: calc(100dvh / var(--chat-z) - 130px); }
+  .jenvu-zoom-dashboard main.chat-page .chat-shell { height: calc(100dvh / var(--chat-z) - 84px); }
 }
 @media (min-width: 1200px) { .jenvu-zoom-dashboard main.dash-page.chat-page { --chat-z: 0.7035; } }
 @media (min-width: 1360px) { .jenvu-zoom-dashboard main.dash-page.chat-page { --chat-z: 0.7693; } }
@@ -2298,7 +2298,7 @@ html body .jenvu-zoom-dashboard main .jx-ide :is(.jx-ide-card) { border-radius: 
 .code-box .code-tab.is-active { background: #f1f1f0; }
 .dark .code-box .code-tab.is-active { background: #1c1c1c; }
 
-/* Download / export buttons: white (black in dark theme) with a looping colourful ring light. */
+/* Download / export buttons: white with black text in both themes, with a looping colourful ring light. */
 @property --ring-a { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
 .ring-btn { position: relative; isolation: isolate; background: #ffffff !important; color: #111111 !important; border: 0; transition: transform .15s ease; }
 .ring-btn:hover { transform: translateY(-1px); }
@@ -2309,7 +2309,7 @@ html body .jenvu-zoom-dashboard main .jx-ide :is(.jx-ide-card) { border-radius: 
 }
 .ring-btn::before { padding: 1.5px; -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; }
 .ring-btn::after { inset: 2px; filter: blur(9px); opacity: .45; z-index: -2; }
-.dark .ring-btn, .dash-dark .ring-btn { background: #0b0b0b !important; color: #ffffff !important; }
+.dark .ring-btn, .dash-dark .ring-btn { background: #ffffff !important; color: #111111 !important; }
 .dark .ring-btn *, .dash-dark .ring-btn * { color: inherit !important; }
 @keyframes ring-spin { to { --ring-a: 360deg; } }
 @media (prefers-reduced-motion: reduce) { .ring-btn::before, .ring-btn::after { animation: none; } }

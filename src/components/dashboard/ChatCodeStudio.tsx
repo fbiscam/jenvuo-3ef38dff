@@ -3,8 +3,8 @@ import { Check, Copy, Download, FileCode2, Loader2, X } from "lucide-react";
 import { highlight } from "@/components/dashboard/CodeHighlight";
 import { CHAT_MAX_FILES, type CodeKind, type ReplyFile } from "@/lib/chat-files";
 
-// Realistic lines typed while the AI writes. Several variants per language so
-// the animation is never the same twice in a row.
+// Realistic lines typed once while the AI writes (no loop). Several variants per
+// language so it is not the same every time.
 const SNIPPETS: Record<CodeKind, { file: string; lines: string[] }[]> = {
   mql5: [
     { file: "JXBot.mq5", lines: ["#property strict", "#include <Trade/Trade.mqh>", "CTrade trade;", "input double RiskPer1000 = 0.02;", "input int    FastEMA = 50;", "int OnInit() {", "  emaFast = iMA(_Symbol, PERIOD_M15, FastEMA, 0, MODE_EMA, PRICE_CLOSE);", "  return INIT_SUCCEEDED;", "}", "void OnTick() {", "  if (!NewBar()) return;", "  double sl = SwingLow(10) - 0.5 * Atr();", "  trade.Buy(LotSize(), _Symbol, Ask(), sl, TakeProfit(sl));", "}"] },
@@ -34,7 +34,11 @@ function useTyped(lines: string[], active: boolean) {
   useEffect(() => {
     setN(0);
     if (!active) return;
-    const id = setInterval(() => setN((c) => (c >= total ? 0 : c + 3)), 28);
+    const id = setInterval(() => setN((c) => {
+      // Types the sample once, then stays put until the real code arrives.
+      if (c + 3 >= total) clearInterval(id);
+      return Math.min(total, c + 3);
+    }), 28);
     return () => clearInterval(id);
   }, [lines, active, total]);
   return lines.join("\n").slice(0, n);
