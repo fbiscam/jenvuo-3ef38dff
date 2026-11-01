@@ -65,6 +65,7 @@ import { Route as AuthenticatedDashboardBillingRouteImport } from './routes/_aut
 import { Route as AuthenticatedDashboardBotUsageRouteImport } from './routes/_authenticated/dashboard.bot-usage'
 import { Route as AuthenticatedDashboardChatRouteImport } from './routes/_authenticated/dashboard.chat'
 import { Route as AuthenticatedDashboardCodeRouteImport } from './routes/_authenticated/dashboard.code'
+import { Route as AuthenticatedDashboardCoderRouteImport } from './routes/_authenticated/dashboard.coder'
 import { Route as AuthenticatedDashboardCourseRouteImport } from './routes/_authenticated/dashboard.course'
 import { Route as AuthenticatedDashboardDocumentsRouteImport } from './routes/_authenticated/dashboard.documents'
 import { Route as AuthenticatedDashboardExtensionRouteImport } from './routes/_authenticated/dashboard.extension'
@@ -404,6 +405,12 @@ const AuthenticatedDashboardCodeRoute =
   AuthenticatedDashboardCodeRouteImport.update({
     id: '/code',
     path: '/code',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
+const AuthenticatedDashboardCoderRoute =
+  AuthenticatedDashboardCoderRouteImport.update({
+    id: '/coder',
+    path: '/coder',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
 const AuthenticatedDashboardCourseRoute =
@@ -765,6 +772,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/bot-usage': typeof AuthenticatedDashboardBotUsageRoute
   '/dashboard/chat': typeof AuthenticatedDashboardChatRoute
   '/dashboard/code': typeof AuthenticatedDashboardCodeRoute
+  '/dashboard/coder': typeof AuthenticatedDashboardCoderRoute
   '/dashboard/course': typeof AuthenticatedDashboardCourseRoute
   '/dashboard/documents': typeof AuthenticatedDashboardDocumentsRoute
   '/dashboard/extension': typeof AuthenticatedDashboardExtensionRoute
@@ -870,6 +878,7 @@ export interface FileRoutesByTo {
   '/dashboard/bot-usage': typeof AuthenticatedDashboardBotUsageRoute
   '/dashboard/chat': typeof AuthenticatedDashboardChatRoute
   '/dashboard/code': typeof AuthenticatedDashboardCodeRoute
+  '/dashboard/coder': typeof AuthenticatedDashboardCoderRoute
   '/dashboard/course': typeof AuthenticatedDashboardCourseRoute
   '/dashboard/documents': typeof AuthenticatedDashboardDocumentsRoute
   '/dashboard/extension': typeof AuthenticatedDashboardExtensionRoute
@@ -981,6 +990,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/bot-usage': typeof AuthenticatedDashboardBotUsageRoute
   '/_authenticated/dashboard/chat': typeof AuthenticatedDashboardChatRoute
   '/_authenticated/dashboard/code': typeof AuthenticatedDashboardCodeRoute
+  '/_authenticated/dashboard/coder': typeof AuthenticatedDashboardCoderRoute
   '/_authenticated/dashboard/course': typeof AuthenticatedDashboardCourseRoute
   '/_authenticated/dashboard/documents': typeof AuthenticatedDashboardDocumentsRoute
   '/_authenticated/dashboard/extension': typeof AuthenticatedDashboardExtensionRoute
@@ -1092,6 +1102,7 @@ export interface FileRouteTypes {
     | '/dashboard/bot-usage'
     | '/dashboard/chat'
     | '/dashboard/code'
+    | '/dashboard/coder'
     | '/dashboard/course'
     | '/dashboard/documents'
     | '/dashboard/extension'
@@ -1197,6 +1208,7 @@ export interface FileRouteTypes {
     | '/dashboard/bot-usage'
     | '/dashboard/chat'
     | '/dashboard/code'
+    | '/dashboard/coder'
     | '/dashboard/course'
     | '/dashboard/documents'
     | '/dashboard/extension'
@@ -1307,6 +1319,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/bot-usage'
     | '/_authenticated/dashboard/chat'
     | '/_authenticated/dashboard/code'
+    | '/_authenticated/dashboard/coder'
     | '/_authenticated/dashboard/course'
     | '/_authenticated/dashboard/documents'
     | '/_authenticated/dashboard/extension'
@@ -1822,6 +1835,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardCodeRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
+    '/_authenticated/dashboard/coder': {
+      id: '/_authenticated/dashboard/coder'
+      path: '/coder'
+      fullPath: '/dashboard/coder'
+      preLoaderRoute: typeof AuthenticatedDashboardCoderRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
     '/_authenticated/dashboard/course': {
       id: '/_authenticated/dashboard/course'
       path: '/course'
@@ -2196,6 +2216,7 @@ interface AuthenticatedDashboardRouteChildren {
   AuthenticatedDashboardBotUsageRoute: typeof AuthenticatedDashboardBotUsageRoute
   AuthenticatedDashboardChatRoute: typeof AuthenticatedDashboardChatRoute
   AuthenticatedDashboardCodeRoute: typeof AuthenticatedDashboardCodeRoute
+  AuthenticatedDashboardCoderRoute: typeof AuthenticatedDashboardCoderRoute
   AuthenticatedDashboardCourseRoute: typeof AuthenticatedDashboardCourseRoute
   AuthenticatedDashboardDocumentsRoute: typeof AuthenticatedDashboardDocumentsRoute
   AuthenticatedDashboardExtensionRoute: typeof AuthenticatedDashboardExtensionRoute
@@ -2235,6 +2256,7 @@ const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
     AuthenticatedDashboardBotUsageRoute: AuthenticatedDashboardBotUsageRoute,
     AuthenticatedDashboardChatRoute: AuthenticatedDashboardChatRoute,
     AuthenticatedDashboardCodeRoute: AuthenticatedDashboardCodeRoute,
+    AuthenticatedDashboardCoderRoute: AuthenticatedDashboardCoderRoute,
     AuthenticatedDashboardCourseRoute: AuthenticatedDashboardCourseRoute,
     AuthenticatedDashboardDocumentsRoute: AuthenticatedDashboardDocumentsRoute,
     AuthenticatedDashboardExtensionRoute: AuthenticatedDashboardExtensionRoute,

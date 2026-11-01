@@ -2167,3 +2167,7 @@ html body .dark .code-box .tok-var { color: #9cdcfe !important; }
   .jenvu-zoom-dashboard main.dash-page.chat-page { zoom: 0.76 !important; max-width: none; padding-top: 24px; }
 }
 .jenvu-zoom-dashboard main.dash-page.chat-page > :where(div, section, header) { max-width: 1400px; }
+
+/* Pine Coder terminal colors (light / dark) */
+.jx-coder-term { background: #fff; --coder-red:#e5484d; --coder-amber:#c27c0e; --coder-green:#18a058; --coder-blue:#2563eb; --coder-purple:#9333ea; --coder-comment:#8a8f98; }
+.dark .jx-coder-term { background: #000; --coder-red:#ff6b6b; --coder-amber:#f5b041; --coder-green:#3ddc84; --coder-blue:#60a5fa; --coder-purple:#c084fc; --coder-comment:#6b7280; }
