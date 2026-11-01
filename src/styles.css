@@ -1911,7 +1911,7 @@ h1, h2, h3, h4 { font-family: var(--font-display); letter-spacing: -0.025em; }
 /* Black theme: all text pure white (public pages + dashboard). Terminal keeps its own theme. */
 .dark:not(.terminal-dark) { --foreground: #ffffff; --muted-foreground: #ffffff; --card-foreground: #ffffff; --popover-foreground: #ffffff; }
 html.dark body :is(h1,h2,h3,h4,h5,h6,p,span,li,a,label,small,dt,dd,td,th,figcaption,blockquote):not(.terminal-dark *):not([class*="bg-white"] *):not([class*="bg-zinc-900"] *):not(.bg-primary *):not(.bg-foreground *):not(.bg-foreground):not(.bg-primary):not([class*="bg-white"]):not(.bg-gc-ink):not(.console-pill-solid):not(.ask-jenvu-launcher):not(.ask-jenvu-launcher *),
-.dash-dark :is(h1,h2,h3,h4,h5,h6,p,span,li,a,label,small,dt,dd,td,th,figcaption,blockquote):not(.bg-zinc-900 *):not(.bg-primary *):not(.bg-foreground *):not(.bg-white *):not(.bg-foreground):not(.bg-primary):not([class*="bg-white"]):not(.bg-gc-ink):not(.console-pill-solid):not(.ask-jenvu-launcher):not(.ask-jenvu-launcher *):not(.code-box *) {
+.dash-dark :is(h1,h2,h3,h4,h5,h6,p,span,li,a,label,small,dt,dd,td,th,figcaption,blockquote):not(.bg-zinc-900 *):not(.bg-primary *):not(.bg-foreground *):not(.bg-white *):not(.bg-foreground):not(.bg-primary):not([class*="bg-white"]):not(.bg-gc-ink):not(.console-pill-solid):not(.ask-jenvu-launcher):not(.ask-jenvu-launcher *):not(.code-box *):not(.jx-ide *) {
   color: #ffffff !important;
 }
 
@@ -2214,7 +2214,7 @@ html body .dark .code-box .tok-var { color: #9cdcfe !important; }
 .jx-ide-input:focus { border-color: var(--ide-fg); }
 .jx-ide-btn { display: inline-flex; align-items: center; justify-content: center; gap: 4px; height: 30px; padding: 0 10px; border-radius: 999px; background: var(--ide-on); color: var(--ide-fg); font-size: 12.5px; }
 .jx-ide-btn:hover { background: var(--ide-hover); outline: 1px solid var(--ide-line); }
-.jx-ide-card { display: block; padding: 10px 12px; border-radius: 10px; background: var(--ide-bg); border: 1px solid var(--ide-line); color: var(--ide-fg); }
+.jx-ide-card { padding: 10px 12px; border-radius: 10px; background: var(--ide-bg); border: 1px solid var(--ide-line); color: var(--ide-fg); }
 .jx-ide-card:hover { border-color: var(--ide-muted); }
 .jx-ide-kbd { display: inline-grid; place-items: center; min-width: 22px; height: 20px; padding: 0 5px; border-radius: 4px; border: 1px solid var(--ide-line); background: var(--ide-side); font-size: 11px; font-family: ui-monospace, monospace; }
 .jx-ide-tabs { display: flex; align-items: stretch; height: 38px; flex-shrink: 0; overflow-x: auto; background: var(--ide-side); border-bottom: 1px solid var(--ide-line); scrollbar-width: none; }
@@ -2254,3 +2254,19 @@ html body .dark .code-box .tok-var { color: #9cdcfe !important; }
 @media (min-width: 1600px) { .jenvu-zoom-dashboard .coder-page { height: calc(100dvh / 1.316); } }
 @media (min-width: 1680px) { .jenvu-zoom-dashboard .coder-page { height: calc(100dvh / 1.388); } }
 @media (min-width: 1920px) { .jenvu-zoom-dashboard .coder-page { height: calc(100dvh / 1.482); } }
+
+/* Jexco: keep editor font/colors and IDE shapes over the dashboard-wide rules */
+.jx-ide .jx-ide-code, .jx-ide .jx-ide-code *, .jx-ide .jx-ide-textarea { font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace !important; font-variant-ligatures: none; }
+html body .jenvu-zoom-dashboard main .jx-ide :is(.jx-ide-act, .jx-ide-tab, .jx-ide-ptab) { border-radius: 0 !important; }
+html body .jenvu-zoom-dashboard main .jx-ide :is(.jx-ide-row) { border-radius: 4px !important; }
+html body .jenvu-zoom-dashboard main .jx-ide :is(.jx-ide-icon) { border-radius: 6px !important; }
+html body .jenvu-zoom-dashboard main .jx-ide :is(.jx-ide-card) { border-radius: 10px !important; }
+.jenvu-zoom-dashboard main .jx-ide :is(input, textarea) { background-color: transparent; color: var(--ide-fg); }
+.jenvu-zoom-dashboard main .jx-ide :is(.jx-ide-palette, .jx-ide-input) { background-color: var(--ide-bg); border-color: var(--ide-line); }
+.jx-ide :is(p, li, label) { color: inherit; }
+.dash-dark .jx-ide svg.text-\[var\(--coder-green\)\] { color: var(--coder-green) !important; }
+.dash-dark .jx-ide svg.text-\[var\(--coder-blue\)\] { color: var(--coder-blue) !important; }
+.dash-dark .jx-ide svg.text-\[var\(--coder-purple\)\] { color: var(--coder-purple) !important; }
+.dash-dark .jx-ide svg.text-\[var\(--coder-red\)\] { color: var(--coder-red) !important; }
+.dash-dark .jx-ide svg.text-\[var\(--coder-amber\)\] { color: var(--coder-amber) !important; }
+.dash-dark .jx-ide :is(aside, nav) svg:not([class*="coder-"]) { color: inherit !important; }

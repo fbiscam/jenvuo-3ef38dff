@@ -484,10 +484,10 @@ function JexcoPage() {
               <div className="jx-ide-crumbs">
                 <span>workspace</span><ChevronRight className="h-3 w-3" />
                 <FileIcon lang={active.lang} /><span>{active.name}</span>
-                <span className="ml-auto opacity-60">{active.lang === "pine" ? "for TradingView Pine Editor" : "for MetaEditor 5"}</span>
+                <span className="ml-auto whitespace-nowrap opacity-60 max-xl:hidden">{active.lang === "pine" ? "for TradingView Pine Editor" : "for MetaEditor 5"}</span>
               </div>
               <div ref={scrollRef} className="jx-ide-editor relative min-h-0 flex-1 overflow-auto">
-                <div className="relative min-h-full min-w-max font-mono" style={{ fontSize, lineHeight: `${lh}px` }}>
+                <div className="jx-ide-code relative min-h-full min-w-max" style={{ fontSize, lineHeight: `${lh}px` }}>
                   <pre className="pointer-events-none m-0 py-2" style={{ font: "inherit" }}>
                     {lines.map((line, i) => (
                       <div key={i} className={`flex ${i + 1 === cursor.line ? "jx-ide-curline" : ""}`}>
