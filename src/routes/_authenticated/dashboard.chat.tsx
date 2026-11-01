@@ -408,33 +408,63 @@ function ChatPlayground() {
                   )}
                 </div>
               ) : (
-                <div key={t.id} className="group">
-                  {t.error ? (
-                    <div className="rounded-xl border border-red-500/30 bg-red-500/5 px-4 py-3 text-[14px] text-red-600 dark:text-red-400">
-                      {t.content}
-                    </div>
-                  ) : (
-                    <>
-                      <div className="text-[15px] leading-relaxed text-foreground">
-                        <MessageResponse>{t.content}</MessageResponse>
+                <div key={t.id} className="group flex gap-3">
+                  <JenvuMark className="mt-0.5 h-6 w-6 shrink-0" />
+                  <div className="min-w-0 flex-1">
+                    {t.error ? (
+                      <div className="rounded-xl border border-red-500/30 bg-red-500/5 px-4 py-3 text-[14px] text-red-600 dark:text-red-400">
+                        {t.content}
                       </div>
-                      <div className="mt-2 flex flex-wrap items-center gap-3 text-[12px] text-muted-foreground">
-                        <button type="button" onClick={() => void copyText(t.id, t.content)} className="inline-flex items-center gap-1 hover:text-foreground" aria-label="Copy reply">
-                          {copied === t.id ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
-                          Copy
-                        </button>
-                        <span>{getCatalogModel(t.model ?? "")?.name ?? t.model}</span>
-                        <span className="tabular-nums">{t.tokens?.toLocaleString()} tokens</span>
-                        <span className="tabular-nums">{((t.ms ?? 0) / 1000).toFixed(1)}s</span>
-                      </div>
-                    </>
-                  )}
+                    ) : (
+                      <>
+                        <div className="text-[15px] leading-relaxed text-foreground">
+                          <MessageResponse>{t.content}</MessageResponse>
+                        </div>
+                        {extractReplyFiles(t.content).length > 0 && (
+                          <div className="mt-3 flex flex-wrap gap-2">
+                            {extractReplyFiles(t.content).map((f) => (
+                              <button
+                                key={f.name}
+                                type="button"
+                                onClick={() => downloadFile(f.name, f.code)}
+                                className="console-pill-solid inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-[13px] font-medium"
+                              >
+                                <Download className="h-3.5 w-3.5" /> Download {f.name}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                        <div className="mt-2 flex flex-wrap items-center gap-3 text-[12px] text-muted-foreground">
+                          <button type="button" onClick={() => void copyText(t.id, t.content)} className="inline-flex items-center gap-1 hover:text-foreground" aria-label="Copy reply">
+                            {copied === t.id ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+                            Copy
+                          </button>
+                          <span>{getCatalogModel(t.model ?? "")?.name ?? t.model}</span>
+                          <span className="tabular-nums">{t.tokens?.toLocaleString()} tokens</span>
+                          <span className="tabular-nums">{((t.ms ?? 0) / 1000).toFixed(1)}s</span>
+                        </div>
+                      </>
+                    )}
+                  </div>
                 </div>
               ),
             )}
             {busy && (
-              <div className="flex items-center gap-2 text-[14px] text-muted-foreground">
-                <Loader2 className="h-4 w-4 animate-spin" /> {info?.name ?? "Model"} is thinking…
+              <div className="flex gap-3" role="status">
+                <JenvuMark className="mt-0.5 h-6 w-6 shrink-0 animate-pulse" />
+                <div className="min-w-0 flex-1">
+                  <div className="text-[15px]">
+                    <Shimmer>{codingNow ? `${info?.name ?? "Jenvu"} is writing your code…` : `${info?.name ?? "Jenvu"} is thinking…`}</Shimmer>
+                  </div>
+                  {codingNow && (
+                    <div className="code-box mt-3 max-w-[560px] rounded-xl p-4 font-mono text-[13px] leading-relaxed">
+                      <div className="chat-code-line" style={{ animationDelay: "0s" }}><span className="text-sky-600 dark:text-sky-400">input</span> double Lots = <span className="text-amber-600 dark:text-amber-400">0.02</span>;</div>
+                      <div className="chat-code-line" style={{ animationDelay: "0.35s" }}><span className="text-violet-600 dark:text-violet-400">void</span> OnTick() {"{"}</div>
+                      <div className="chat-code-line pl-5" style={{ animationDelay: "0.7s" }}><span className="text-emerald-600 dark:text-emerald-400">// entry rules, stop loss, take profit</span></div>
+                      <div className="chat-code-line" style={{ animationDelay: "1.05s" }}>{"}"}<span className="jx-caret ml-0.5 inline-block h-[1.05em] w-[7px] translate-y-[2px] bg-foreground" /></div>
+                    </div>
+                  )}
+                </div>
               </div>
             )}
           </div>
@@ -442,19 +472,6 @@ function ChatPlayground() {
       </div>
 
       <div className="mx-auto w-full max-w-[1150px]">
-        {/* Credits notice */}
-        <div className="mt-3 flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-[var(--console-card)] px-4 py-3">
-          <span className="inline-flex items-start gap-3">
-            <Wallet className="mt-0.5 h-4 w-4 shrink-0 text-orange-500" aria-hidden="true" />
-            <span>
-              <span className="block text-[14px] font-medium text-foreground">Replies use your AI wallet.</span>
-              <span className="block text-[12px] text-muted-foreground">${PRICE_PER_MILLION} / 1M tokens, the same as the API.</span>
-            </span>
-          </span>
-          <Link to="/dashboard/billing" className="console-pill-solid rounded-full px-4 py-2 text-[13px] font-medium">
-            Add credit
-          </Link>
-        </div>
 
         {/* Composer */}
         <form
