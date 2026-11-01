@@ -121,12 +121,12 @@ export function parseRenameRequest(prompt: string, names: string[], activeName?:
   const found: string[] = Array.from(prompt.match(FILE_NAME) ?? []);
   const existing = (n: string) => names.find((x) => x.toLowerCase() === n.toLowerCase());
   if (found.length >= 2) {
-    const from = existing(found[0]);
-    const to = found[found.length - 1];
+    const from = existing(found[0] ?? "");
+    const to = found[found.length - 1] ?? "";
     if (from && !existing(to)) return { from, to };
     return null;
   }
-  if (found.length === 1 && !existing(found[0])) {
+  if (found.length === 1 && found[0] && !existing(found[0])) {
     const from = activeName && existing(activeName) ? activeName : names.length === 1 ? names[0] : undefined;
     return from ? { from, to: found[0] } : null;
   }
