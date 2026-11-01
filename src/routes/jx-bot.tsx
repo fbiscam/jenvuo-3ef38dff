@@ -37,16 +37,28 @@ const pillGrey =
 
 /* ---------- shared bits ---------- */
 
-/** JX Bot face: round head with two slanted eyes that blink. */
-function JxFace({ className = "", eyes = "bg-background" }: { className?: string; eyes?: string }) {
+/** JX Bot mascot: rounded droid helmet with a glowing visor, scanning light and antenna. */
+function JxFace({ className = "" }: { className?: string; eyes?: string }) {
   return (
-    <span className={`relative inline-block rounded-full ${/(^| )bg-/.test(className) ? "" : "bg-foreground"} ${className}`} aria-hidden>
-      <span className={`jx-eye absolute left-[24%] top-[14%] h-[30%] w-[17%] rotate-[28deg] rounded-full ${eyes}`} />
-      <span className={`jx-eye absolute left-[56%] top-[20%] h-[30%] w-[17%] rotate-[28deg] rounded-full ${eyes}`} />
+    <span className={`relative inline-block align-middle ${className}`} aria-hidden>
+      <svg viewBox="0 0 100 100" className="h-full w-full overflow-visible">
+        <line x1="50" y1="14" x2="50" y2="4" stroke="currentColor" strokeWidth="4" strokeLinecap="round" className="text-foreground" />
+        <circle cx="50" cy="4" r="4.5" className="jx-antenna fill-[#18a058]" />
+        <rect x="8" y="14" width="84" height="80" rx="30" className="fill-foreground" />
+        <rect x="4" y="44" width="8" height="22" rx="4" className="fill-foreground" />
+        <rect x="88" y="44" width="8" height="22" rx="4" className="fill-foreground" />
+        <rect x="18" y="38" width="64" height="30" rx="15" className="fill-background" opacity="0.12" />
+        <rect x="21" y="41" width="58" height="24" rx="12" fill="#0b0f14" />
+        <g className="jx-visor">
+          <rect x="30" y="48" width="14" height="10" rx="5" fill="#3ddc84" />
+          <rect x="56" y="48" width="14" height="10" rx="5" fill="#3ddc84" />
+        </g>
+        <rect x="21" y="41" width="10" height="24" rx="5" fill="#3ddc84" opacity="0.18" className="jx-scan" />
+        <path d="M40 80 Q50 85 60 80" fill="none" strokeWidth="3.5" strokeLinecap="round" className="stroke-background" opacity="0.55" />
+      </svg>
     </span>
   );
 }
-
 
 function useInView<T extends HTMLElement>() {
   const ref = React.useRef<T>(null);
