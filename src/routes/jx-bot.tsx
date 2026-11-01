@@ -248,7 +248,7 @@ function HoursCard() {
     <Card title="Trades at safe hours" text="New trades Mon–Thu 01:00–14:00 and Friday until 13:00 broker time. It skips the London and New York opens and weekends.">
       <div className="grid h-full place-items-center pb-10">
         <div className="flex items-center rounded-full border border-gc-line bg-background p-1 pr-3">
-          {tones.map((t, i) => (
+          {tones.map((t) => (
             <JxFace key={t} className={`jx-hop ml-1 h-8 w-8 first:ml-0`} />
           ))}
           <span className="jx-pulse-text ml-2 text-[13px] text-muted-foreground">Waiting for the next session…</span>
