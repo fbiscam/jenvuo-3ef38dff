@@ -18,7 +18,7 @@ export function documentHtml(markdown: string): string {
 
 // Print styles: the same page look, on paper.
 const PRINT_CSS = `
-*{box-sizing:border-box}body{margin:0;font-family:'Google Sans Flex','Google Sans',system-ui,sans-serif;color:#111;background:#fff}
+*{box-sizing:border-box}.doc{overflow-wrap:anywhere;word-break:break-word}.doc pre{white-space:pre-wrap}.doc img{max-width:100%}.doc table{table-layout:fixed}body{margin:0;font-family:'Google Sans Flex','Google Sans',system-ui,sans-serif;color:#111;background:#fff}
 .doc{max-width:760px;margin:0 auto;padding:40px 36px;font-size:13.5px;line-height:1.65}
 .doc>p:first-child{margin:0;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#555;font-weight:600}
 .doc h1{font-size:26px;margin:6px 0 18px;padding-bottom:14px;border-bottom:2px solid #2563eb}
@@ -50,6 +50,23 @@ export function exportDocumentPdf(doc: ReplyDocument) {
   return true;
 }
 
+/** Every Markdown table in the document as one CSV (e.g. a leads list). */
+export function documentCsv(markdown: string): string | null {
+  const rows = markdown.split("\n").filter((l) => /^\s*\|.*\|\s*$/.test(l) && !/^\s*\|[\s:|-]+\|\s*$/.test(l));
+  if (!rows.length) return null;
+  const cell = (c: string) => `"${c.trim().replace(/"/g, '""')}"`;
+  return rows.map((r) => r.trim().replace(/^\||\|$/g, "").split("|").map(cell).join(",")).join("\n") + "\n";
+}
+
+function downloadCsv(doc: ReplyDocument, csv: string) {
+  const url = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `${safeName(doc.title)}.csv`;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
 function downloadMarkdown(doc: ReplyDocument) {
   const url = URL.createObjectURL(new Blob([doc.markdown], { type: "text/markdown;charset=utf-8" }));
   const a = document.createElement("a");
@@ -65,6 +82,7 @@ type Props = { doc: ReplyDocument; busy: boolean; menuTheme: string; onClose: ()
 export function ChatDocView({ doc, busy, menuTheme, onClose }: Props) {
   const [full, setFull] = useState(false);
   const html = useMemo(() => documentHtml(doc.markdown), [doc.markdown]);
+  const csv = useMemo(() => documentCsv(doc.markdown), [doc.markdown]);
 
   return (
     <div className={`chat-docview flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl ${full ? "fixed inset-3 z-50" : ""}`}>
@@ -85,6 +103,11 @@ export function ChatDocView({ doc, busy, menuTheme, onClose }: Props) {
             <DropdownMenuItem className="cursor-pointer gap-2.5 rounded-lg px-3 py-2.5 text-[14px]" onSelect={() => downloadMarkdown(doc)}>
               <FileText className="h-4 w-4" /> Download Markdown
             </DropdownMenuItem>
+            {csv && (
+              <DropdownMenuItem className="cursor-pointer gap-2.5 rounded-lg px-3 py-2.5 text-[14px]" onSelect={() => downloadCsv(doc, csv)}>
+                <Download className="h-4 w-4" /> Download CSV (table)
+              </DropdownMenuItem>
+            )}
           </DropdownMenuContent>
         </DropdownMenu>
         <button type="button" onClick={() => setFull((v) => !v)} aria-label={full ? "Exit full screen" : "Full screen"} className="rounded-md p-1.5 opacity-70 hover:opacity-100">
@@ -94,8 +117,8 @@ export function ChatDocView({ doc, busy, menuTheme, onClose }: Props) {
           <X className="h-4 w-4" />
         </button>
       </div>
-      <div className="min-h-0 flex-1 overflow-y-auto px-3 pb-3 sm:px-6">
-        <article className="chat-doc mx-auto max-w-[760px] rounded-lg px-6 py-8 sm:px-12 sm:py-10" dangerouslySetInnerHTML={{ __html: html }} />
+      <div className="min-h-0 min-w-0 flex-1 overflow-y-auto overflow-x-hidden px-3 pb-3 sm:px-6">
+        <article className="chat-doc mx-auto w-full max-w-[760px] rounded-lg px-6 py-8 sm:px-12 sm:py-10" dangerouslySetInnerHTML={{ __html: html }} />
       </div>
     </div>
   );

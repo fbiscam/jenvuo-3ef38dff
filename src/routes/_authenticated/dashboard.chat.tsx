@@ -54,6 +54,7 @@ import {
   extractReplyFiles,
   looksLikeDocRequest,
   mergeWorkspace,
+  wantsNewFile,
   parseRenameRequest,
   workspaceContext,
   type ReplyDocument,
@@ -105,6 +106,9 @@ const JENVU_BRAIN = [
   "When asked for code: write the COMPLETE working file in one fenced block tagged with its language, starting with a comment like // File: Name.mq5; no placeholders or TODOs; every trade gets a stop loss. When asked to change existing code, return the whole updated file with the same file name. Then give short setup steps.",
   "Before writing code, check the request has what you need: platform (MT5/MQL5, TradingView/Pine Script or Python), symbol, timeframe, entry and exit rules, and risk per trade. If something important is missing or unclear, do NOT write code yet: ask up to 3 short numbered questions in the chat and wait for the answer. If the request is already clear, write the code straight away.",
   "When asked for a PDF, report, guide or document: put the whole document in ONE fenced block tagged ```document written in Markdown (never put ``` inside it). First line: a short UPPERCASE kicker; then '# Title'; then numbered '## 1. Section' headings, '> **Callout title**' blockquotes for formulas and key notes, and tables where they help. The page turns it into a PDF. After the block, add one short line only.",
+  "When asked for a NEW or separate file, write it under a new file name and leave the open files as they are; the editor holds up to 4 files.",
+  "Leads (e.g. 'Google Maps leads for dentists'): first ask for the keyword/business type, country and city, and how many leads, unless already given. You have no live Google Maps access, so never invent phone numbers, emails or addresses: list only businesses you genuinely know are public, leave unknown fields as 'verify', and say the list must be checked on Google Maps. Deliver it as a ```document with a short intro and ONE table: Business | Category | City | Website | Phone | Rating | Notes (the page exports it as PDF and CSV).",
+  "Upwork proposals: if the job post isn't given, ask for it. Then write a proposal under 200 words: a first line that names the client's exact problem (no 'Dear Sir', no 'I am writing to'), 2-3 lines of relevant proof, a short step-by-step plan, timeline, one smart question about the project, and a friendly call to action. Plain, confident, specific; no buzzwords, no invented reviews or past clients. Put it in a ```document block.",
   "You can read attached images and documents; use what they show.",
   "Be accurate and concise. Never claim personal trading experience, never promise profits or guaranteed returns, and note that trading carries risk when giving trade ideas.",
 ].join("\n");
@@ -308,9 +312,11 @@ function ChatPlayground() {
       if (res.ok) {
         const newFiles = extractReplyFiles(res.content);
         if (newFiles.length) {
-          const merged = mergeWorkspace(workspace, newFiles);
+          const lastUser = [...history].reverse().find((t) => t.role === "user");
+          const merged = mergeWorkspace(workspace, newFiles, CHAT_MAX_FILES, wantsNewFile(lastUser?.display ?? lastUser?.content ?? ""));
           setWorkspace(merged.files);
-          const first = merged.files.findIndex((x) => x.name.toLowerCase() === newFiles[0].name.toLowerCase());
+          const fresh = merged.files.findIndex((x) => !workspace.some((w) => w.name === x.name));
+          const first = fresh >= 0 ? fresh : merged.files.findIndex((x) => x.name.toLowerCase() === (newFiles[0]?.name ?? "").toLowerCase());
           if (first >= 0) setActiveFile(first);
           if (merged.dropped.length) toast.error(`The editor holds ${CHAT_MAX_FILES} files. Remove one to add ${merged.dropped.join(", ")}.`);
           setDocOpen(false);
@@ -355,8 +361,9 @@ function ChatPlayground() {
   };
 
   const removeFile = (name: string) => {
+    const idx = workspace.findIndex((f) => f.name === name);
     setWorkspace((cur) => cur.filter((f) => f.name !== name));
-    setActiveFile(0);
+    setActiveFile((a) => Math.max(0, a > idx || a === workspace.length - 1 ? a - 1 : a));
   };
 
   const submit = async () => {

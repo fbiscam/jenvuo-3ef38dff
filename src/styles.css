@@ -2308,7 +2308,7 @@ html body .jenvu-zoom-dashboard main .jx-ide :is(.jx-ide-card) { border-radius: 
   animation: ring-spin 3.2s linear infinite;
 }
 .ring-btn::before { padding: 1.5px; -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; }
-.ring-btn::after { inset: 2px; filter: blur(9px); opacity: .45; z-index: -2; }
+.ring-btn::after { display: none; }
 .dark .ring-btn, .dash-dark .ring-btn { background: #ffffff !important; color: #111111 !important; }
 .dark .ring-btn *, .dash-dark .ring-btn * { color: inherit !important; }
 @keyframes ring-spin { to { --ring-a: 360deg; } }
@@ -2337,3 +2337,7 @@ html body .jenvu-zoom-dashboard main .jx-ide :is(.jx-ide-card) { border-radius: 
 .dark .chat-doc th { background: #111; }
 .chat-doc code { font-family: ui-monospace, Menlo, monospace; font-size: 13px; background: rgba(127,127,127,.12); padding: 1px 5px; border-radius: 4px; }
 .chat-doc a { text-decoration: underline; }
+.chat-doc { overflow-wrap: anywhere; word-break: break-word; min-width: 0; max-width: 100%; }
+.chat-doc table { display: block; overflow-x: auto; table-layout: auto; }
+.chat-doc pre { white-space: pre-wrap; overflow-x: auto; max-width: 100%; }
+.chat-doc img { max-width: 100%; height: auto; }
