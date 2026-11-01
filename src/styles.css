@@ -1911,7 +1911,7 @@ h1, h2, h3, h4 { font-family: var(--font-display); letter-spacing: -0.025em; }
 /* Black theme: all text pure white (public pages + dashboard). Terminal keeps its own theme. */
 .dark:not(.terminal-dark) { --foreground: #ffffff; --muted-foreground: #ffffff; --card-foreground: #ffffff; --popover-foreground: #ffffff; }
 html.dark body :is(h1,h2,h3,h4,h5,h6,p,span,li,a,label,small,dt,dd,td,th,figcaption,blockquote):not(.terminal-dark *):not([class*="bg-white"] *):not([class*="bg-zinc-900"] *):not(.bg-primary *):not(.bg-foreground *):not(.bg-foreground):not(.bg-primary):not([class*="bg-white"]):not(.bg-gc-ink):not(.console-pill-solid):not(.ask-jenvu-launcher):not(.ask-jenvu-launcher *),
-.dash-dark :is(h1,h2,h3,h4,h5,h6,p,span,li,a,label,small,dt,dd,td,th,figcaption,blockquote):not(.bg-zinc-900 *):not(.bg-primary *):not(.bg-foreground *):not(.bg-white *):not(.bg-foreground):not(.bg-primary):not([class*="bg-white"]):not(.bg-gc-ink):not(.console-pill-solid):not(.ask-jenvu-launcher):not(.ask-jenvu-launcher *):not(.code-box *) {
+.dash-dark :is(h1,h2,h3,h4,h5,h6,p,span,li,a,label,small,dt,dd,td,th,figcaption,blockquote):not(.bg-zinc-900 *):not(.bg-primary *):not(.bg-foreground *):not(.bg-white *):not(.bg-foreground):not(.bg-primary):not([class*="bg-white"]):not(.bg-gc-ink):not(.console-pill-solid):not(.ask-jenvu-launcher):not(.ask-jenvu-launcher *):not(.code-box *):not(.jx-ide *) {
   color: #ffffff !important;
 }
 
@@ -2175,5 +2175,99 @@ html body .dark .code-box .tok-var { color: #9cdcfe !important; }
 .jenvu-zoom-dashboard main.dash-page.chat-page > :where(div, section, header) { max-width: 1400px; }
 
 /* Jexco editor colors (light / dark) */
-.jx-coder-term { background: #fff; --coder-red:#e5484d; --coder-amber:#c27c0e; --coder-green:#18a058; --coder-blue:#2563eb; --coder-purple:#9333ea; --coder-comment:#8a8f98; }
-.dark .jx-coder-term { background: #000; --coder-red:#ff6b6b; --coder-amber:#f5b041; --coder-green:#3ddc84; --coder-blue:#60a5fa; --coder-purple:#c084fc; --coder-comment:#6b7280; }
+/* ===== Jexco IDE (VS Code-style). White canvas in light theme, pure black in dark. ===== */
+.jx-coder-term {
+  --ide-bg:#ffffff; --ide-side:#f8f8f8; --ide-line:#e7e7e7; --ide-hover:rgba(0,0,0,.05); --ide-on:rgba(0,0,0,.08);
+  --ide-fg:#1f1f1f; --ide-muted:#6e6e6e; --ide-cur:rgba(0,0,0,.035); --ide-gutter:#a0a0a0;
+  --coder-red:#d1242f; --coder-amber:#b35c00; --coder-green:#1a7f37; --coder-blue:#0b57d0; --coder-purple:#8250df; --coder-teal:#0a7d8c; --coder-string:#c4421a; --coder-comment:#6e7781;
+  background: var(--ide-bg); color: var(--ide-fg);
+}
+.dark .jx-coder-term {
+  --ide-bg:#000000; --ide-side:#0b0b0b; --ide-line:#1f1f1f; --ide-hover:rgba(255,255,255,.06); --ide-on:rgba(255,255,255,.1);
+  --ide-fg:#ffffff; --ide-muted:#9a9a9a; --ide-cur:rgba(255,255,255,.04); --ide-gutter:#5a5a5a;
+  --coder-red:#ff6b6b; --coder-amber:#f5b041; --coder-green:#3ddc84; --coder-blue:#6cb6ff; --coder-purple:#d2a8ff; --coder-teal:#4fd1c5; --coder-string:#ffa657; --coder-comment:#7d8590;
+}
+.jx-ide { position: relative; display: flex; flex-direction: column; flex: 1 1 auto; min-height: 0; overflow: hidden; font-size: 13px; }
+.jx-ide button { cursor: pointer; }
+.jx-ide-title { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 12px; height: 44px; padding: 0 8px; background: var(--ide-side); border-bottom: 1px solid var(--ide-line); flex-shrink: 0; }
+.jx-ide-palette { width: 100%; height: 30px; border-radius: 8px; border: 1px solid var(--ide-line); background: var(--ide-bg); color: var(--ide-fg); padding: 0 12px 0 32px; font-size: 12.5px; outline: none; }
+.jx-ide-palette:focus { border-color: var(--ide-fg); }
+.jx-ide-menu { background: var(--ide-bg); border: 1px solid var(--ide-line); border-radius: 10px; box-shadow: 0 12px 32px rgba(0,0,0,.14); }
+.jx-ide-icon { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 6px; color: var(--ide-muted); }
+.jx-ide-icon:hover { background: var(--ide-hover); color: var(--ide-fg); }
+.jx-ide-icon.is-on { color: var(--ide-fg); }
+.jx-ide-activity { display: flex; flex-direction: column; align-items: center; gap: 2px; width: 48px; flex-shrink: 0; padding: 6px 0; background: var(--ide-side); border-right: 1px solid var(--ide-line); }
+.jx-ide-act { position: relative; display: grid; place-items: center; width: 48px; height: 46px; color: var(--ide-muted); }
+.jx-ide-act:hover { color: var(--ide-fg); }
+.jx-ide-act.is-on { color: var(--ide-fg); }
+.jx-ide-act.is-on::before { content: ""; position: absolute; left: 0; top: 9px; bottom: 9px; width: 2px; background: var(--ide-fg); }
+.jx-ide-side { display: flex; flex-direction: column; width: 250px; flex-shrink: 0; background: var(--ide-side); border-right: 1px solid var(--ide-line); }
+@media (max-width: 1023px) { .jx-ide-side { box-shadow: 8px 0 24px rgba(0,0,0,.15); } .jx-ide-ai { box-shadow: -8px 0 24px rgba(0,0,0,.15); } }
+.jx-ide-group { display: flex; align-items: center; gap: 4px; padding: 4px 8px; font-size: 11.5px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; color: var(--ide-fg); opacity: .8; }
+.jx-ide-divider { border-top: 1px solid var(--ide-line); }
+.jx-ide-row { display: flex; align-items: center; gap: 6px; min-height: 26px; font-size: 13px; color: var(--ide-fg); border-radius: 4px; cursor: pointer; }
+.jx-ide-row:hover { background: var(--ide-hover); }
+.jx-ide-row.is-on { background: var(--ide-on); }
+.jx-ide-kind { display: inline-grid; place-items: center; width: 18px; height: 16px; border-radius: 3px; font-size: 9.5px; font-weight: 700; font-family: ui-monospace, monospace; }
+.jx-ide-kind.kind-input { color: var(--coder-amber); } .jx-ide-kind.kind-function { color: var(--coder-purple); } .jx-ide-kind.kind-plot { color: var(--coder-teal); } .jx-ide-kind.kind-order { color: var(--coder-green); }
+.jx-ide-input { background: var(--ide-bg); color: var(--ide-fg); border: 1px solid var(--ide-line); border-radius: 6px; outline: none; }
+.jx-ide-input:focus { border-color: var(--ide-fg); }
+.jx-ide-btn { display: inline-flex; align-items: center; justify-content: center; gap: 4px; height: 30px; padding: 0 10px; border-radius: 999px; background: var(--ide-on); color: var(--ide-fg); font-size: 12.5px; }
+.jx-ide-btn:hover { background: var(--ide-hover); outline: 1px solid var(--ide-line); }
+.jx-ide-card { padding: 10px 12px; border-radius: 10px; background: var(--ide-bg); border: 1px solid var(--ide-line); color: var(--ide-fg); }
+.jx-ide-card:hover { border-color: var(--ide-muted); }
+.jx-ide-kbd { display: inline-grid; place-items: center; min-width: 22px; height: 20px; padding: 0 5px; border-radius: 4px; border: 1px solid var(--ide-line); background: var(--ide-side); font-size: 11px; font-family: ui-monospace, monospace; }
+.jx-ide-tabs { display: flex; align-items: stretch; height: 38px; flex-shrink: 0; overflow-x: auto; background: var(--ide-side); border-bottom: 1px solid var(--ide-line); scrollbar-width: none; }
+.jx-ide-tab { display: flex; align-items: center; gap: 6px; padding: 0 8px 0 12px; font-size: 13px; color: var(--ide-muted); border-right: 1px solid var(--ide-line); cursor: pointer; white-space: nowrap; position: relative; }
+.jx-ide-tab:hover { color: var(--ide-fg); }
+.jx-ide-tab.is-on { background: var(--ide-bg); color: var(--ide-fg); }
+.jx-ide-tab.is-on::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 2px; background: var(--ide-fg); }
+.jx-ide-tab.is-on::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 1px; background: var(--ide-bg); }
+.jx-ide-crumbs { display: flex; align-items: center; gap: 6px; height: 26px; padding: 0 16px; font-size: 12.5px; color: var(--ide-muted); flex-shrink: 0; background: var(--ide-bg); }
+.jx-ide-editor { background: var(--ide-bg); }
+.jx-ide-curline { background: var(--ide-cur); }
+.jx-ide-gutter { width: 64px; flex-shrink: 0; padding-right: 20px; text-align: right; color: var(--ide-gutter); user-select: none; }
+.jx-ide-gutter.is-on { color: var(--ide-fg); }
+.jx-ide-gutter.has-err { color: var(--coder-red); }
+.jx-ide-textarea { position: absolute; inset: 0; width: 100%; height: 100%; resize: none; overflow: hidden; white-space: pre; background: transparent; padding: 8px 40px 8px 64px; font-family: inherit; color: transparent; caret-color: var(--ide-fg); outline: none; border: 0; }
+.jx-ide-textarea::selection { background: color-mix(in srgb, var(--coder-blue) 28%, transparent); }
+.jx-ide-panel { display: flex; flex-direction: column; height: 190px; flex-shrink: 0; background: var(--ide-bg); border-top: 1px solid var(--ide-line); padding-top: 4px; }
+.jx-ide-ptab { display: inline-flex; align-items: center; gap: 6px; padding: 8px 0 6px; color: var(--ide-muted); border-bottom: 1px solid transparent; }
+.jx-ide-ptab.is-on { color: var(--ide-fg); border-bottom-color: var(--ide-fg); }
+.jx-ide-count { display: inline-grid; place-items: center; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 999px; background: var(--ide-on); font-size: 11px; }
+.jx-ide-ai { display: flex; flex-direction: column; width: 360px; flex-shrink: 0; background: var(--ide-side); border-left: 1px solid var(--ide-line); }
+@media (min-width: 1600px) { .jx-ide-ai { width: 420px; } }
+.jx-ide-pill { padding: 2px 8px; border-radius: 999px; background: var(--ide-on); font-size: 11px; color: var(--ide-muted); }
+.jx-ide-bubble { padding: 8px 12px; border-radius: 14px; background: var(--ide-on); }
+.jx-ide-chip { flex-shrink: 0; padding: 4px 10px; border-radius: 999px; border: 1px solid var(--ide-line); background: var(--ide-bg); font-size: 11.5px; color: var(--ide-fg); white-space: nowrap; }
+.jx-ide-chip:hover { border-color: var(--ide-muted); }
+.jx-ide-chip:disabled { opacity: .4; }
+.jx-ide-composer { margin: 0 12px 8px; padding: 8px 12px; border-radius: 14px; border: 1px solid var(--ide-line); background: var(--ide-bg); }
+.jx-ide-composer:focus-within { border-color: var(--ide-fg); }
+.jx-ide-status { display: flex; align-items: center; gap: 16px; height: 26px; flex-shrink: 0; padding: 0 12px; font-size: 12px; background: var(--ide-side); color: var(--ide-muted); border-top: 1px solid var(--ide-line); white-space: nowrap; overflow: hidden; }
+
+/* Jexco fills the viewport exactly inside the zoomed dashboard wrapper (desktop has no top bar). */
+@media (min-width: 1024px) { .jenvu-zoom-dashboard .coder-page { height: calc(100dvh / 0.909); } }
+@media (min-width: 1200px) { .jenvu-zoom-dashboard .coder-page { height: calc(100dvh / 1.005); } }
+@media (min-width: 1360px) { .jenvu-zoom-dashboard .coder-page { height: calc(100dvh / 1.099); } }
+@media (min-width: 1500px) { .jenvu-zoom-dashboard .coder-page { height: calc(100dvh / 1.195); } }
+@media (min-width: 1600px) { .jenvu-zoom-dashboard .coder-page { height: calc(100dvh / 1.316); } }
+@media (min-width: 1680px) { .jenvu-zoom-dashboard .coder-page { height: calc(100dvh / 1.388); } }
+@media (min-width: 1920px) { .jenvu-zoom-dashboard .coder-page { height: calc(100dvh / 1.482); } }
+
+/* Jexco: keep editor font/colors and IDE shapes over the dashboard-wide rules */
+.jx-ide .jx-ide-code, .jx-ide .jx-ide-code *, .jx-ide .jx-ide-textarea { font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace !important; font-variant-ligatures: none; }
+html body .jenvu-zoom-dashboard main .jx-ide :is(.jx-ide-act, .jx-ide-tab, .jx-ide-ptab) { border-radius: 0 !important; }
+html body .jenvu-zoom-dashboard main .jx-ide :is(.jx-ide-row) { border-radius: 4px !important; }
+html body .jenvu-zoom-dashboard main .jx-ide :is(.jx-ide-icon) { border-radius: 6px !important; }
+html body .jenvu-zoom-dashboard main .jx-ide :is(.jx-ide-card) { border-radius: 10px !important; }
+.jenvu-zoom-dashboard main .jx-ide :is(input, textarea):not(.jx-ide-textarea) { background-color: transparent; color: var(--ide-fg); }
+.jenvu-zoom-dashboard main .jx-ide .jx-ide-textarea { background-color: transparent !important; color: transparent !important; -webkit-text-fill-color: transparent; }
+.jenvu-zoom-dashboard main .jx-ide :is(.jx-ide-palette, .jx-ide-input) { background-color: var(--ide-bg); border-color: var(--ide-line); }
+.jx-ide :is(p, li, label) { color: inherit; }
+.dash-dark .jx-ide svg.text-\[var\(--coder-green\)\] { color: var(--coder-green) !important; }
+.dash-dark .jx-ide svg.text-\[var\(--coder-blue\)\] { color: var(--coder-blue) !important; }
+.dash-dark .jx-ide svg.text-\[var\(--coder-purple\)\] { color: var(--coder-purple) !important; }
+.dash-dark .jx-ide svg.text-\[var\(--coder-red\)\] { color: var(--coder-red) !important; }
+.dash-dark .jx-ide svg.text-\[var\(--coder-amber\)\] { color: var(--coder-amber) !important; }
+.dash-dark .jx-ide :is(aside, nav) svg:not([class*="coder-"]) { color: inherit !important; }

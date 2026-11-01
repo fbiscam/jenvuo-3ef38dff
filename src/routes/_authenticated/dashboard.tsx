@@ -1590,11 +1590,13 @@ function DashboardLayout() {
           className={
             pathname === "/dashboard/terminal"
               ? "h-full min-h-0 w-full flex-1 overflow-hidden bg-background"
-              : embedMode
-                ? `dash-page${isSettingsPath(pathname) ? " settings-page" : ""} w-full flex-1 bg-background px-5 pt-7 pb-7 sm:px-8`
-                : `dash-page${isSettingsPath(pathname) ? " settings-page" : ""}${pathname === "/dashboard/chat" ? " chat-page" : ""} mx-auto w-full max-w-7xl flex-1 bg-white px-5 pt-7 pb-7 sm:px-8 lg:pb-2`
+              : pathname === "/dashboard/coder"
+                ? "coder-page flex h-[calc(100dvh-56px)] min-h-0 w-full flex-col overflow-hidden bg-background lg:h-dvh"
+                : embedMode
+                  ? `dash-page${isSettingsPath(pathname) ? " settings-page" : ""} w-full flex-1 bg-background px-5 pt-7 pb-7 sm:px-8`
+                  : `dash-page${isSettingsPath(pathname) ? " settings-page" : ""}${pathname === "/dashboard/chat" ? " chat-page" : ""} mx-auto w-full max-w-7xl flex-1 bg-white px-5 pt-7 pb-7 sm:px-8 lg:pb-2`
           }
-          style={pathname === "/dashboard/terminal" ? undefined : { zoom: 0.9 }}
+          style={pathname === "/dashboard/terminal" || pathname === "/dashboard/coder" ? undefined : { zoom: 0.9 }}
         >
           <IdVerificationDeadlineNotice access={terminalAccess} />
           {pathname !== "/dashboard/terminal" && <VerificationBanner isAdmin={isAdminUser} />}

@@ -52,3 +52,66 @@ void OnTick()
 {
    // Ask Jexco to add your entry rules here.
 }`;
+
+export type CodeProblem = { line: number; level: "error" | "warning"; message: string };
+
+/** Removes strings and comments so bracket checks ignore their contents. */
+function stripLine(line: string): string {
+  return line.replace(/"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'/g, '""').replace(/\/\/.*$/, "");
+}
+
+/** Quick editor checks (not a compiler): brackets, version header, entry points. */
+export function lintScript(code: string, lang: CoderLang): CodeProblem[] {
+  const out: CodeProblem[] = [];
+  const lines = code.split("\n");
+  const stack: { ch: string; line: number }[] = [];
+  const pairs: Record<string, string> = { ")": "(", "]": "[", "}": "{" };
+  lines.forEach((raw, i) => {
+    for (const ch of stripLine(raw)) {
+      if (ch === "(" || ch === "[" || ch === "{") stack.push({ ch, line: i + 1 });
+      else if (pairs[ch]) {
+        const top = stack.pop();
+        if (!top || top.ch !== pairs[ch]) out.push({ line: i + 1, level: "error", message: `Unexpected "${ch}"` });
+      }
+    }
+  });
+  for (const s of stack) out.push({ line: s.line, level: "error", message: `"${s.ch}" is never closed` });
+
+  if (lang === "pine") {
+    if (!/^\s*\/\/@version=\d+/m.test(code)) out.push({ line: 1, level: "warning", message: "Add //@version=6 on the first line" });
+    if (!/\b(indicator|strategy|library)\s*\(/.test(code)) out.push({ line: 1, level: "error", message: "Script needs indicator(), strategy() or library()" });
+    lines.forEach((l, i) => {
+      if (/lookahead\s*=\s*barmerge\.lookahead_on/.test(l)) out.push({ line: i + 1, level: "warning", message: "lookahead_on can repaint in backtests" });
+    });
+    if (/strategy\.entry\s*\(/.test(code) && !/strategy\.exit\s*\(/.test(code)) out.push({ line: 1, level: "warning", message: "Strategy has entries but no strategy.exit stop loss" });
+  } else {
+    const isIndicator = /OnCalculate\s*\(/.test(code);
+    if (!isIndicator && !/OnTick\s*\(/.test(code)) out.push({ line: 1, level: "error", message: "Expert Advisor needs OnTick()" });
+    lines.forEach((l, i) => {
+      if (/\btrade\.(Buy|Sell)\s*\(\s*[^,)]+\s*(,\s*[^,)]*){0,2}\)/.test(l)) out.push({ line: i + 1, level: "warning", message: "Order without a stop loss" });
+    });
+  }
+  return out.sort((a, b) => a.line - b.line);
+}
+
+export type OutlineItem = { line: number; kind: "input" | "function" | "plot" | "order"; name: string };
+
+/** Inputs, functions, plots and orders in the file, for the Outline panel. */
+export function outlineScript(code: string, lang: CoderLang): OutlineItem[] {
+  const items: OutlineItem[] = [];
+  code.split("\n").forEach((l, i) => {
+    const line = i + 1;
+    let m: RegExpMatchArray | null;
+    if (lang === "pine") {
+      if ((m = l.match(/^\s*(?:var\s+)?(\w+)\s*=\s*input(?:\.\w+)?\s*\(/))) items.push({ line, kind: "input", name: m[1] });
+      else if ((m = l.match(/^(\w+)\s*\([^)]*\)\s*=>/))) items.push({ line, kind: "function", name: m[1] });
+      else if ((m = l.match(/^\s*(plot\w*)\s*\(/))) items.push({ line, kind: "plot", name: m[1] });
+      else if ((m = l.match(/(strategy\.(?:entry|exit|close))\s*\(\s*"([^"]*)"/))) items.push({ line, kind: "order", name: `${m[1]} "${m[2]}"` });
+    } else {
+      if ((m = l.match(/^\s*input\s+\w+\s+(\w+)/))) items.push({ line, kind: "input", name: m[1] });
+      else if ((m = l.match(/^\s*(?:int|void|double|bool|string|long|ulong|datetime)\s+(\w+)\s*\(/))) items.push({ line, kind: "function", name: m[1] });
+      else if ((m = l.match(/\b(trade\.(?:Buy|Sell|PositionClose))\s*\(/))) items.push({ line, kind: "order", name: m[1] });
+    }
+  });
+  return items;
+}
