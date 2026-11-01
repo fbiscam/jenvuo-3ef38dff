@@ -55,7 +55,7 @@ export function ChatCodeStudio({ files, busy, kind, seed, onDownload }: Props) {
   useEffect(() => setActive(0), [files]);
   const variants = SNIPPETS[kind];
   const snippet = variants[seed % variants.length];
-  const showTyping = busy || !files.length;
+  const showTyping = !files.length;
   const typed = useTyped(snippet.lines, showTyping);
   const file = files[Math.min(active, files.length - 1)];
   const code = showTyping ? typed : file?.code ?? "";
@@ -117,9 +117,9 @@ export function ChatCodeStudio({ files, busy, kind, seed, onDownload }: Props) {
         ))}
       </div>
       <div className="flex items-center gap-2 border-t border-current/10 px-4 py-2 text-[12px] opacity-70">
-        {showTyping ? (
+        {showTyping || busy ? (
           <>
-            <Loader2 className="h-3.5 w-3.5 animate-spin" /> Writing {snippet.file.split(".").pop()?.toUpperCase()} code…
+            <Loader2 className="h-3.5 w-3.5 animate-spin" /> {showTyping ? `Writing ${snippet.file.split(".").pop()?.toUpperCase()} code…` : `Updating ${file?.name}…`}
           </>
         ) : (
           <>
