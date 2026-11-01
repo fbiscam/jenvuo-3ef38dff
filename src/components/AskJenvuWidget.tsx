@@ -28,7 +28,7 @@ export function openAskJenvu(view: "chat" | "sales" | "live" = "chat") {
 
 // Floating button shows on every page except the dashboard (which includes the Terminal);
 // there it opens from the Ask Jenvu button in the top bar.
-const HIDDEN = [/^\/dashboard/];
+const HIDDEN = [/^\/dashboard/, /^\/(jenvu-ops-x9k2|ops-x9k2-7m4n)(\/|$)/];
 
 export function AskJenvuWidget() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
