@@ -47,7 +47,8 @@ import { MIXED_CATALOG, PROVIDERS, PRICE_PER_MILLION, formatContext, getCatalogM
 import { playgroundChat } from "@/lib/playground.functions";
 import { PLAYGROUND_DEFAULT_MODEL, PLAYGROUND_MAX_IMAGES, PLAYGROUND_MAX_TOKENS, type PlaygroundTurn } from "@/lib/playground";
 import { DOC_ACCEPT, IMAGE_ACCEPT, composeMessage, readAttachment, type ChatAttachment } from "@/components/dashboard/chat-attachments";
-import { extractReplyFiles, looksLikeCodeRequest } from "@/lib/chat-files";
+import { codeRequestKind, extractReplyFiles, type ReplyFile } from "@/lib/chat-files";
+import { ChatCodeStudio } from "@/components/dashboard/ChatCodeStudio";
 
 export const Route = createFileRoute("/_authenticated/dashboard/chat")({
   head: () => ({
@@ -81,6 +82,15 @@ const API_BASE = "https://jenvu.com/api/public/v1";
 // System prompt for the two builder cards: whole files, nothing left out.
 const CODE_BUILDER =
   "You are an expert trading-code engineer (MQL5 for MetaTrader 5, Pine Script v6 for TradingView). Write the COMPLETE file from the first line to the last — no placeholders, no 'rest of code', no TODOs. Put the whole file in ONE fenced code block tagged with its language (```mql5 or ```pine) and start it with a comment like // File: Name.mq5. Every trade must have a stop loss. After the code, give 3 short setup steps. Never promise profits.";
+
+// Always sent first: the trading and coding knowledge every reply builds on.
+const JENVU_BRAIN = [
+  "You are Jenvu AI, an expert trading assistant and senior trading-software engineer.",
+  "Markets: forex, Gold (XAU/USD), indices and crypto. You know ICT and SMC deeply: market structure (HH/HL/LH/LL, BOS, CHoCH, MSS), liquidity (BSL/SSL, equal highs/lows, PDH/PDL, sweeps and runs), order blocks, breakers, mitigation blocks, FVG/IFVG/BPR, premium/discount and OTE 62-79%, Power of Three, London and New York killzones, Silver Bullet, session opens, and multi-timeframe top-down analysis. Also classic tools: EMA/SMA, RSI, MACD, ATR, volume, support/resistance, risk-reward and position sizing.",
+  "Coding: expert in MQL5 (MetaTrader 5 EAs, indicators, CTrade, CPositionInfo, OnInit/OnTick/OnDeinit, new-bar checks, lot sizing from balance, SL/TP, trailing stops, magic numbers, spread and session filters), Pine Script v6 (indicator/strategy, ta.*, request.security, alerts, boxes, labels, tables) and Python for backtests and data.",
+  "When asked for code: write the COMPLETE working file in one fenced block tagged with its language, starting with a comment like // File: Name.mq5; no placeholders or TODOs; every trade gets a stop loss. When asked to change existing code, return the whole updated file with the same file name. Then give short setup steps.",
+  "Be accurate and concise. Never claim personal trading experience, never promise profits or guaranteed returns, and note that trading carries risk when giving trade ideas.",
+].join("\n");
 
 type Example = {
   icon: LucideIcon;
@@ -231,7 +241,7 @@ function ChatPlayground() {
       const res = await send({
         data: {
           model,
-          instructions,
+          instructions: [JENVU_BRAIN, instructions.trim()].filter(Boolean).join("\n\n"),
           maxTokens,
           images,
           turns: history.filter((t) => !t.error).map(({ role, content: c }) => ({ role, content: c })),
@@ -304,7 +314,22 @@ function ChatPlayground() {
   };
 
   const lastAsked = [...turns].reverse().find((t) => t.role === "user");
-  const codingNow = busy && looksLikeCodeRequest(`${lastAsked?.display ?? ""} ${instructions}`);
+  const askedKind = codeRequestKind(`${lastAsked?.display ?? ""} ${instructions === CODE_BUILDER ? "code bot" : ""}`);
+  const codingNow = busy && askedKind !== null;
+  // The newest reply that carries code drives the editor view.
+  const studioFiles: ReplyFile[] = (() => {
+    for (let i = turns.length - 1; i >= 0; i--) {
+      const t = turns[i];
+      if (t.role === "assistant" && !t.error) {
+        const f = extractReplyFiles(t.content);
+        if (f.length) return f;
+      }
+    }
+    return [];
+  })();
+  const studio = studioFiles.length > 0 || codingNow;
+  const studioKind = askedKind ?? (studioFiles[0]?.lang === "pine" ? "pine" : studioFiles[0]?.lang === "python" ? "python" : studioFiles[0]?.lang === "mql5" ? "mql5" : "generic");
+  const studioSeed = turns.length;
 
   const downloadFile = (name: string, code: string) => {
     const url = URL.createObjectURL(new Blob([code], { type: "text/plain;charset=utf-8" }));
