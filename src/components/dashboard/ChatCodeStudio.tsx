@@ -1,7 +1,7 @@
-import { useEffect, useMemo, useState } from "react";
-import { Check, Copy, Download, FileCode2, Loader2 } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Check, Copy, Download, FileCode2, Loader2, X } from "lucide-react";
 import { highlight } from "@/components/dashboard/CodeHighlight";
-import type { CodeKind, ReplyFile } from "@/lib/chat-files";
+import { CHAT_MAX_FILES, type CodeKind, type ReplyFile } from "@/lib/chat-files";
 
 // Realistic lines typed while the AI writes. Several variants per language so
 // the animation is never the same twice in a row.
@@ -45,14 +45,19 @@ type Props = {
   busy: boolean;
   kind: CodeKind;
   seed: number;
+  active: number;
+  onActive: (i: number) => void;
   onDownload: (f: ReplyFile) => void;
+  onRename: (from: string, to: string) => void;
+  onRemove: (name: string) => void;
 };
 
-/** Read-only code editor shown beside the chat while the AI builds code. */
-export function ChatCodeStudio({ files, busy, kind, seed, onDownload }: Props) {
-  const [active, setActive] = useState(0);
+/** Code editor shown beside the chat: up to 4 files, rename by double-click, red ✕ removes. */
+export function ChatCodeStudio({ files, busy, kind, seed, active, onActive, onDownload, onRename, onRemove }: Props) {
   const [copied, setCopied] = useState(false);
-  useEffect(() => setActive(0), [files]);
+  const [editing, setEditing] = useState<string | null>(null);
+  const [draft, setDraft] = useState("");
+  const nameInput = useRef<HTMLInputElement>(null);
   const variants = SNIPPETS[kind];
   const snippet = variants[seed % variants.length];
   const showTyping = !files.length;
@@ -60,6 +65,10 @@ export function ChatCodeStudio({ files, busy, kind, seed, onDownload }: Props) {
   const file = files[Math.min(active, files.length - 1)];
   const code = showTyping ? typed : file?.code ?? "";
   const lines = useMemo(() => code.replace(/\n$/, "").split("\n"), [code]);
+
+  useEffect(() => {
+    if (editing) nameInput.current?.select();
+  }, [editing]);
 
   const copy = async () => {
     if (!file) return;
@@ -72,34 +81,77 @@ export function ChatCodeStudio({ files, busy, kind, seed, onDownload }: Props) {
     }
   };
 
+  const saveName = () => {
+    const to = draft.trim().replace(/\s+/g, "_");
+    if (editing && to && to !== editing) onRename(editing, to);
+    setEditing(null);
+  };
+
   return (
     <div className="code-box flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl">
-      <div className="flex items-center gap-1 border-b border-current/10 px-2 pt-2">
+      <div className="flex items-center gap-2 border-b border-current/10 px-2 py-2">
         <div className="flex min-w-0 flex-1 gap-1 overflow-x-auto">
           {showTyping ? (
-            <span className="inline-flex items-center gap-2 rounded-t-lg px-3 py-2 text-[13px] font-medium">
+            <span className="code-tab is-active inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-[13px] font-medium">
               <FileCode2 className="h-4 w-4 opacity-70" /> {snippet.file}
             </span>
           ) : (
             files.map((f, i) => (
-              <button
+              <span
                 key={f.name}
-                type="button"
-                onClick={() => setActive(i)}
-                className={`inline-flex shrink-0 items-center gap-2 rounded-t-lg px-3 py-2 text-[13px] font-medium ${i === active ? "opacity-100" : "opacity-55 hover:opacity-90"}`}
-                style={i === active ? { boxShadow: "inset 0 -2px 0 currentColor" } : undefined}
+                className={`code-tab group inline-flex shrink-0 items-center rounded-lg text-[13px] font-medium ${i === active ? "is-active" : "opacity-60 hover:opacity-100"}`}
               >
-                <FileCode2 className="h-4 w-4 opacity-70" /> {f.name}
-              </button>
+                {editing === f.name ? (
+                  <span className="inline-flex items-center gap-2 py-1 pl-3 pr-1">
+                    <FileCode2 className="h-4 w-4 opacity-70" />
+                    <input
+                      ref={nameInput}
+                      value={draft}
+                      onChange={(e) => setDraft(e.target.value)}
+                      onBlur={saveName}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") saveName();
+                        if (e.key === "Escape") setEditing(null);
+                      }}
+                      aria-label="File name"
+                      className="w-[150px] rounded-md bg-transparent px-1 py-0.5 outline-none ring-1 ring-current/25"
+                    />
+                  </span>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => onActive(i)}
+                    onDoubleClick={() => {
+                      setDraft(f.name);
+                      setEditing(f.name);
+                    }}
+                    title="Double-click to rename"
+                    className="inline-flex items-center gap-2 py-1.5 pl-3 pr-1.5"
+                  >
+                    <FileCode2 className="h-4 w-4 opacity-70" /> {f.name}
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={() => onRemove(f.name)}
+                  disabled={busy}
+                  aria-label={`Remove ${f.name}`}
+                  title="Remove file"
+                  className="mr-1 rounded-md p-1 text-red-500 hover:bg-red-500/10 disabled:opacity-40"
+                >
+                  <X className="h-3.5 w-3.5" />
+                </button>
+              </span>
             ))
           )}
         </div>
         {!showTyping && file && (
-          <div className="flex shrink-0 items-center gap-1 pb-1">
+          <div className="flex shrink-0 items-center gap-1.5">
+            <span className="hidden text-[12px] opacity-50 xl:inline">{files.length}/{CHAT_MAX_FILES} files</span>
             <button type="button" onClick={() => void copy()} aria-label="Copy code" className="code-box-copy rounded-md p-1.5">
               {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
             </button>
-            <button type="button" onClick={() => onDownload(file)} aria-label={`Download ${file.name}`} className="code-box-copy rounded-md p-1.5">
+            <button type="button" onClick={() => onDownload(file)} aria-label={`Download ${file.name}`} title={`Download ${file.name}`} className="ring-btn inline-flex h-8 w-8 items-center justify-center rounded-full">
               <Download className="h-4 w-4" />
             </button>
           </div>
@@ -123,7 +175,7 @@ export function ChatCodeStudio({ files, busy, kind, seed, onDownload }: Props) {
           </>
         ) : (
           <>
-            {file?.lang.toUpperCase()} · {lines.length} lines · Ask the AI on the right to change anything
+            {file?.lang.toUpperCase()} · {lines.length} lines · Ask the AI on the right to change, rename or move code between files
           </>
         )}
       </div>
