@@ -101,9 +101,19 @@ export const getGoldOverview = createServerFn({ method: "POST" })
     try {
       const cfg = RANGE[data.period];
       // Sequential: parallel bursts get rate-limited by the price source.
-      const line = await yahooSeries(cfg.interval, cfg.range, symbol);
-      const today = await yahooSeries("5m", "1d", symbol);
       const daily = await dailyHistory(symbol);
+      // Weekends/holidays: an intraday "1 day" window can come back nearly empty
+      // (e.g. gold futures on Sunday), so fall back to the last trading days.
+      const lastDay: YahooSeries = {
+        points: daily.points.slice(-2),
+        prevClose: daily.points[daily.points.length - 2]?.c ?? null,
+        price: daily.price ?? daily.points[daily.points.length - 1]?.c ?? null,
+      };
+      const today = await yahooSeries("5m", "1d", symbol).catch(() => lastDay);
+      const line =
+        cfg.interval === "5m" && cfg.range === "1d"
+          ? today
+          : await yahooSeries(cfg.interval, cfg.range, symbol).catch(() => yahooSeries("30m", "5d", symbol));
       const monthly = await yahooSeries("1mo", "max", symbol);
       const now = Date.now();
       // Monthly closes before the daily window give "All time" its real start.
