@@ -829,7 +829,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
       <div className={cn("flex min-h-0 min-w-0 flex-1 flex-col", sidePanelOpen && "terminal-page-scroll lg:gap-3 lg:overflow-y-auto lg:p-3")}>
       {sidePanelOpen && (
         <div className="hidden lg:block">
-          <TerminalSymbolHeader price={currentPrice} tab={marketTab} onTabChange={setMarketTab} marketOpen={!goldClosed} />
+          <TerminalSymbolHeader asset={asset} price={currentPrice} tab={marketTab} onTabChange={setMarketTab} marketOpen={!goldClosed} />
         </div>
       )}
       {sidePanelOpen && <TerminalTabBody tab={marketTab} bars={bars} timeframeKey={timeframe.key} />}
