@@ -20,7 +20,7 @@ describe("saved chat", () => {
   });
 
   it("is kept per account, so another account never sees it", () => {
-    expect(chatSessionKey("a")).not.toBe(chatSessionKey("b"));
+    expect(chatSessionKey("a") === chatSessionKey("b")).toBe(false);
   });
 
   it("drops image data but keeps the file name", () => {
