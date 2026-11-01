@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { Copy, Download, FileCode2, Files, Loader2, Plus, SendHorizontal, Sparkles, Trash2, Wand2, X } from "lucide-react";
 import { toast } from "sonner";
@@ -296,7 +296,7 @@ function JexcoPage() {
   );
 }
 
-function IconBtn({ label, onClick, children }: { label: string; onClick: () => void; children: React.ReactNode }) {
+function IconBtn({ label, onClick, children }: { label: string; onClick: () => void; children: ReactNode }) {
   return (
     <button aria-label={label} title={label} onClick={onClick} className="grid h-7 w-7 place-items-center rounded-full hover:bg-muted">
       {children}
