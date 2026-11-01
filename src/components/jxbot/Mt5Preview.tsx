@@ -1,6 +1,6 @@
 import * as React from "react";
 
-/** Deterministic Gold M15 candles for the MT5-style preview (illustration only). */
+/** Deterministic EUR/USD M15 candles for the MT5-style preview (illustration only). */
 function makeCandles(n: number) {
   let seed = 7;
   const rnd = () => ((seed = (seed * 9301 + 49297) % 233280) / 233280);
@@ -58,13 +58,13 @@ export default function Mt5Preview() {
           <span className="h-3 w-3 rounded-full bg-amber-400" />
           <span className="h-3 w-3 rounded-full bg-green-500" />
         </div>
-        <span className="font-sans text-[13px] text-zinc-900">XAUUSD · M15</span>
+        <span className="font-sans text-[13px] text-zinc-900">EURUSD · M15</span>
         <span className="hidden text-zinc-500 sm:inline">MetaTrader 5 · JX Bot attached</span>
         <span className="ml-auto flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-0.5 text-emerald-700">
           <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" /> AutoTrading ON
         </span>
       </div>
-      <svg viewBox={`0 0 ${W} ${H}`} className="block h-auto w-full" role="img" aria-label="Gold M15 chart with a JX Bot buy trade, stop loss and take profit">
+      <svg viewBox={`0 0 ${W} ${H}`} className="block h-auto w-full" role="img" aria-label="EUR/USD M15 chart with a JX Bot buy trade, stop loss and take profit">
         {ticks.map((t) => (
           <g key={t}>
             <line x1={0} x2={W - AXIS} y1={y(t)} y2={y(t)} stroke="#0000000d" />

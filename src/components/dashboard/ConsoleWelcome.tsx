@@ -10,7 +10,7 @@ type Product = { title: string; text: string; to: string; img?: string; aurora?:
 const PRODUCTS: Product[] = [
   { title: "Chat API", text: "Build with Jenvu models through one compatible API.", to: "/dashboard/api", aurora: 1, icon: MessagesSquare },
   { title: "Models", text: "Compare context size and price per million tokens.", to: "/dashboard/models", aurora: 2, icon: BrainCircuit, badge: "New" },
-  { title: "JX Bot", text: "Gold M15 Expert Advisor for MT5 with a stop loss.", to: "/dashboard/jx-bot", aurora: 3, icon: Bot },
+  { title: "JX Bot", text: "EUR/USD M15 Expert Advisor for MT5 with a stop loss.", to: "/dashboard/jx-bot", aurora: 3, icon: Bot },
   { title: "Terminal", text: "Sweeps, zones and FVGs on XAU/USD with an AI desk.", to: "/dashboard/terminal", aurora: 1, icon: CandlestickChart },
 ];
 

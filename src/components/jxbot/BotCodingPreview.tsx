@@ -6,7 +6,7 @@ import { Check } from "lucide-react";
  * out in colored code on a pure white canvas while the build steps tick off.
  * Illustration of the bot's published rules only — not the full source.
  */
-const CODE = `// JX Bot — Gold (XAU/USD) M15 swing EA
+const CODE = `// JX Bot — EUR/USD M15 swing EA
 #property strict
 input double LotPer1000 = 0.02;   // lot per $1,000
 input bool   UseStopLoss = true;  // stop loss on every trade
@@ -147,7 +147,7 @@ export default function BotCodingPreview() {
             );
           })}
           <div className="mt-auto rounded-xl bg-[#f9fafb] p-3 font-mono text-[11px] leading-relaxed text-[#6b7280]">
-            <div>Symbol <span className="text-[#111827]">XAUUSD</span></div>
+            <div>Symbol <span className="text-[#111827]">EURUSD</span></div>
             <div>Timeframe <span className="text-[#111827]">M15</span></div>
             <div>Lot <span className="text-[#111827]">0.02 / $1,000</span></div>
             <div>Stop loss <span className="text-[#16a34a]">always on</span></div>

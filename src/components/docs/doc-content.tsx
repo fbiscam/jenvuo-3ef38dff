@@ -299,7 +299,7 @@ export const DOC_GROUPS: DocGroup[] = [
         body: (
           <>
             <p>
-              JX Bot is Jenvu's Expert Advisor for <strong>Fiber on MetaTrader 5</strong> (M15 chart). It comes with every paid plan:
+              JX Bot is Jenvu's Expert Advisor for <strong>EUR/USD on MetaTrader 5</strong> (M15 chart). It comes with every paid plan:
               Pro 1 IP, Elite 2, Ultra 5. There is no license key: you add the IP of the PC or RDP that runs MT5, and one IP works with one MT5 account.
             </p>
             <ul>
