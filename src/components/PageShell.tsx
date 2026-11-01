@@ -85,7 +85,7 @@ export function PageShell({
       {!oneLine && <PolicyHub />}
 
       {highlight && (
-        <div className="px-5 pt-10 sm:px-8">
+        <div className="mx-auto max-w-[1300px] px-5 pt-10 sm:px-10 [&>section]:max-w-none">
           <Banner title={highlight.title}>{highlight.text}</Banner>
         </div>
       )}
@@ -128,7 +128,7 @@ function PolicyHub() {
   return (
     <div className="mx-auto max-w-[1300px] px-5 sm:px-10">
       <div className="flex flex-col gap-4 rounded-md border border-gc-line bg-background p-4 sm:p-5 md:flex-row md:items-center md:justify-between">
-        <nav aria-label="Policies" className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1 [scrollbar-width:none] md:flex-wrap md:pb-0">
+        <nav aria-label="Policies" className="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1 [scrollbar-width:none] md:flex-wrap md:pb-0">
           {POLICIES.map((p) => {
             const active = path.endsWith(p.to);
             return (
@@ -136,7 +136,7 @@ function PolicyHub() {
                 key={p.to}
                 to={p.to}
                 aria-current={active ? "page" : undefined}
-                className={`shrink-0 rounded-full px-4 py-2 text-[14px] font-medium transition-colors ${
+                className={`shrink-0 rounded-full px-3.5 py-1.5 text-[13.5px] font-medium transition-colors ${
                   active ? "bg-gc-blue text-gc-on-blue" : "border border-gc-line text-gc-ink hover:bg-gc-blue-soft"
                 }`}
               >
@@ -146,7 +146,7 @@ function PolicyHub() {
           })}
         </nav>
         <div className="flex shrink-0 flex-wrap items-center gap-x-5 gap-y-2 text-[13px] text-gc-ink-muted">
-          <span className="inline-flex items-center gap-1.5"><FileText className="h-4 w-4" /> Official Jenvu policy</span>
+          <span className="inline-flex items-center gap-1.5 md:hidden xl:inline-flex"><FileText className="h-4 w-4" /> Official Jenvu policy</span>
           <a href="mailto:support@jenvu.com" className="inline-flex items-center gap-1.5 hover:text-gc-ink">
             <Mail className="h-4 w-4" /> support@jenvu.com
           </a>
