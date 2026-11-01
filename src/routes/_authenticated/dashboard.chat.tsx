@@ -427,7 +427,7 @@ function ChatPlayground() {
             </div>
           </div>
         ) : (
-          <div className="space-y-6 pb-4">
+          <div className="mx-auto max-w-[1000px] space-y-6 pb-4">
             {turns.map((t) =>
               t.role === "user" ? (
                 <div key={t.id} className="flex flex-col items-end gap-2">
@@ -523,7 +523,7 @@ function ChatPlayground() {
         )}
       </div>
 
-      <div className="w-full">
+      <div className={`mx-auto w-full ${turns.length ? "max-w-[1000px]" : ""}`}>
 
         {/* Composer */}
         <form
