@@ -358,10 +358,10 @@ function ChatPlayground() {
   );
 
   return (
-    <section className="mx-auto flex h-[calc((100dvh-80px)/0.76)] min-h-[520px] w-full max-w-[1400px] flex-col">
-      {/* Header */}
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-[28px] font-medium tracking-tight text-foreground">Chat API</h1>
+    <section className="chat-shell mx-auto flex min-h-[440px] w-full max-w-[1150px] flex-col">
+      <h1 className="sr-only">Chat</h1>
+      {/* Controls */}
+      <div className="flex items-center justify-end gap-2">
         <div className="flex items-center gap-2">
           {turns.length > 0 && (
             <button type="button" onClick={() => setTurns([])} disabled={busy} className="console-pill disabled:opacity-45">
@@ -375,14 +375,14 @@ function ChatPlayground() {
       </div>
 
       {/* Conversation / examples */}
-      <div ref={scroller} className="mt-3 min-h-0 flex-1 overflow-y-auto pr-1">
+      <div ref={scroller} className="mt-1 min-h-0 flex-1 overflow-y-auto pr-1">
         {turns.length === 0 ? (
-          <div className="flex min-h-full flex-col justify-center py-2">
+          <div className="flex flex-col pt-1 pb-2">
             <div className="text-center">
               <h2 className="text-[18px] font-medium text-foreground">Start a chat with examples</h2>
               <p className="mt-1 text-[14px] text-muted-foreground">Pick a use case to see the exact prompt and settings, then make it your own.</p>
             </div>
-            <div className="mx-auto mt-5 grid w-full max-w-[1150px] grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="mx-auto mt-4 grid w-full grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
               {EXAMPLES.map((ex) => (
                 <button
                   key={ex.title}
