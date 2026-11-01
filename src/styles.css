@@ -2093,6 +2093,12 @@ html body .jenvu-zoom-dashboard main :is(.console-icon-chip, .console-card > svg
 @keyframes jx-hop { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
 @keyframes jx-draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
 .jx-eye { animation: jx-blink 4.5s infinite; transform: rotate(28deg); }
+@keyframes jx-visor-blink { 0%, 93%, 100% { transform: scaleY(1); } 96% { transform: scaleY(0.15); } }
+@keyframes jx-scan { 0% { transform: translateX(0); } 50% { transform: translateX(48px); } 100% { transform: translateX(0); } }
+@keyframes jx-antenna { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
+.jx-visor { transform-box: fill-box; transform-origin: center; animation: jx-visor-blink 4.5s infinite; }
+.jx-scan { animation: jx-scan 3.2s ease-in-out infinite; }
+.jx-antenna { animation: jx-antenna 1.6s ease-in-out infinite; }
 .jx-float { animation: jx-float 5s ease-in-out infinite; }
 .jx-in { animation: jx-in 0.45s ease-out both; }
 .jx-bar { transform-origin: bottom; animation: jx-bar 2.4s ease-in-out infinite; }
@@ -2102,7 +2108,7 @@ html body .jenvu-zoom-dashboard main :is(.console-icon-chip, .console-card > svg
 .jx-undrawn path, .jx-draw path { stroke-dasharray: 1; stroke-dashoffset: 1; }
 .jx-draw path { animation: jx-draw 2.2s ease-out forwards; }
 @media (prefers-reduced-motion: reduce) {
-  .jx-eye, .jx-float, .jx-in, .jx-bar, .jx-hop, .jx-pulse-text { animation: none; }
+  .jx-visor, .jx-scan, .jx-antenna, .jx-eye, .jx-float, .jx-in, .jx-bar, .jx-hop, .jx-pulse-text { animation: none; }
   .jx-undrawn path, .jx-draw path { stroke-dashoffset: 0; animation: none; }
 }
 
@@ -2168,6 +2174,6 @@ html body .dark .code-box .tok-var { color: #9cdcfe !important; }
 }
 .jenvu-zoom-dashboard main.dash-page.chat-page > :where(div, section, header) { max-width: 1400px; }
 
-/* Pine Coder terminal colors (light / dark) */
+/* Jexco editor colors (light / dark) */
 .jx-coder-term { background: #fff; --coder-red:#e5484d; --coder-amber:#c27c0e; --coder-green:#18a058; --coder-blue:#2563eb; --coder-purple:#9333ea; --coder-comment:#8a8f98; }
 .dark .jx-coder-term { background: #000; --coder-red:#ff6b6b; --coder-amber:#f5b041; --coder-green:#3ddc84; --coder-blue:#60a5fa; --coder-purple:#c084fc; --coder-comment:#6b7280; }
