@@ -70,9 +70,9 @@ function GetBot({ label = "Use JX Bot" }: { label?: string }) {
       </Link>
     );
   return (
-    <a href={SIGN_IN} className={pillDark}>
+    <Link to="/auth" className={pillDark}>
       {icon} {label}
-    </a>
+    </Link>
   );
 }
 

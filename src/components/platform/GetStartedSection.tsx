@@ -20,9 +20,9 @@ function StartBuilding() {
     );
   }
   return (
-    <a href={SIGN_IN} className={pillLight}>
+    <Link to="/auth" className={pillLight}>
       Start building <ArrowUpRight className="h-3.5 w-3.5" />
-    </a>
+    </Link>
   );
 }
 
