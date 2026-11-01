@@ -1,11 +1,12 @@
 import * as React from "react";
 
 const RULES: [RegExp, string][] = [
+  [/^#(property|include|define)\b/, "tok-keyword"],
   [/^(#[^\n]*|\/\/[^\n]*)/, "tok-comment"],
   [/^("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|`(?:\\.|[^`\\])*`)/, "tok-string"],
   [/^\$[A-Z_]+/, "tok-env"],
   [/^-{1,2}[A-Za-z][\w-]*/, "tok-keyword"],
-  [/^\b(from|import|const|let|await|async|new|return|print|curl|export|def|for|in|if|else)\b/, "tok-keyword"],
+  [/^\b(from|import|const|let|var|await|async|new|return|print|curl|export|def|for|while|in|if|else|class|void|input|double|int|bool|string|datetime|static|extern|true|false|indicator|strategy|plot|ta|math|request|series|float|color)\b/, "tok-keyword"],
   [/^\b(true|false|null|None)\b/, "tok-const"],
   [/^\b\d+(\.\d+)?\b/, "tok-number"],
   [/^[A-Za-z_]\w*(?=\s*\()/, "tok-func"],
