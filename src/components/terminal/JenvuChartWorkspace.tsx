@@ -708,6 +708,22 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
 
   const rail = (
     <nav aria-label="Chart tools" className="flex min-w-0 flex-1 items-center gap-0.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      <div role="group" aria-label="Pair" className="mr-1 flex shrink-0 items-center gap-0.5 rounded-lg bg-muted/60 p-0.5">
+        {(["XAUUSD", "BTCUSD"] as const).map((a) => (
+          <button
+            key={a}
+            type="button"
+            aria-pressed={asset === a}
+            onClick={() => onAssetChange?.(a)}
+            className={cn(
+              "h-7 rounded-md px-2.5 font-mono text-xs font-semibold text-muted-foreground hover:text-foreground",
+              asset === a && "bg-background text-foreground shadow-sm",
+            )}
+          >
+            {a === "XAUUSD" ? "XAU/USD" : "BTC/USD"}
+          </button>
+        ))}
+      </div>
       <Popover>
         <PopoverTrigger asChild>
           <button type="button" aria-label="Timeframe" title="Timeframe" className={cn(railBtn, "text-gc-ink")}>
