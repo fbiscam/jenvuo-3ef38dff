@@ -475,7 +475,7 @@ function ChatPlayground() {
   );
 
   return (
-    <section className={`chat-shell mx-auto flex min-h-[440px] w-full flex-col ${studio ? "max-w-[1500px]" : "max-w-[1150px]"}`}>
+    <section className={"chat-shell mx-auto flex min-h-[440px] w-full max-w-[960px] flex-col pt-4"}>
       <h1 className="sr-only">Chat</h1>
       {/* Controls: only before the chat starts; afterwards they sit next to the model picker. */}
       {turns.length === 0 && (
@@ -486,22 +486,43 @@ function ChatPlayground() {
         </div>
       )}
 
-      <div className={studio ? "flex min-h-0 flex-1 gap-4 pt-1" : "contents"}>
+      <div className={studio ? "flex min-h-0 flex-1 gap-4 pt-3" : "contents"}>
       {studio && (
         <div className="hidden min-h-0 min-w-0 flex-1 flex-col lg:flex">
-          <ChatCodeStudio files={studioFiles} busy={busy} kind={studioKind} seed={studioSeed} onDownload={(f) => downloadFile(f.name, f.code)} />
+          {showDoc && doc ? (
+            <ChatDocView doc={doc} busy={busy} menuTheme={menuTheme} onClose={() => setDocOpen(false)} />
+          ) : writingDoc ? (
+            <div className="chat-docview flex min-h-0 flex-1 items-center justify-center rounded-2xl text-[15px]">
+              <Shimmer>Writing your document…</Shimmer>
+            </div>
+          ) : (
+            <ChatCodeStudio
+              files={workspace}
+              busy={busy}
+              kind={studioKind}
+              seed={studioSeed}
+              active={Math.min(activeFile, Math.max(workspace.length - 1, 0))}
+              onActive={setActiveFile}
+              onDownload={(f) => downloadFile(f.name, f.code)}
+              onRename={(from, to) => {
+                const problem = renameFile(from, to);
+                if (problem) toast.error(problem);
+              }}
+              onRemove={removeFile}
+            />
+          )}
         </div>
       )}
-      <div className={studio ? "flex min-h-0 w-full flex-col lg:w-[440px] lg:shrink-0" : "contents"}>
+      <div className={studio ? "flex min-h-0 w-full flex-col lg:w-[380px] lg:shrink-0" : "contents"}>
       {/* Conversation / examples */}
       <div ref={scroller} className="mt-1 min-h-0 flex-1 overflow-y-auto [scrollbar-gutter:stable_both-edges]">
         {turns.length === 0 ? (
-          <div className="flex flex-col pt-1 pb-2">
+          <div className="flex flex-col pt-4 pb-2">
             <div className="text-center">
               <h2 className="text-[18px] font-medium text-foreground">Start a chat with examples</h2>
               <p className="mt-1 text-[14px] text-muted-foreground">Pick a use case to see the exact prompt and settings, then make it your own.</p>
             </div>
-            <div className="mx-auto mt-4 grid w-full grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="mx-auto mt-6 grid w-full grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
               {EXAMPLES.map((ex) => (
                 <button
                   key={ex.title}
@@ -524,7 +545,7 @@ function ChatPlayground() {
             </div>
           </div>
         ) : (
-          <div className={`mx-auto space-y-6 pb-4 ${studio ? "" : "max-w-[1000px]"}`}>
+          <div className="space-y-6 pb-4">
             {turns.map((t) =>
               t.role === "user" ? (
                 <div key={t.id} className="flex flex-col items-end gap-2">
@@ -625,7 +646,7 @@ function ChatPlayground() {
         )}
       </div>
 
-      <div className={`mx-auto w-full ${turns.length && !studio ? "max-w-[1000px]" : ""}`}>
+      <div className="w-full">
 
         {/* Composer */}
         <form
@@ -716,7 +737,7 @@ function ChatPlayground() {
             <div className="ml-auto flex min-w-0 items-center gap-1">
               {turns.length > 0 && (
                 <>
-                  <Button variant="ghost" size="icon-sm" type="button" onClick={() => setTurns([])} disabled={busy} aria-label="New chat" title="New chat" className="shrink-0 rounded-full text-foreground hover:bg-background">
+                  <Button variant="ghost" size="icon-sm" type="button" onClick={newChat} disabled={busy} aria-label="New chat" title="New chat" className="shrink-0 rounded-full text-foreground hover:bg-background">
                     <RotateCcw className="h-4 w-4" />
                   </Button>
                   <Button variant="ghost" size="icon-sm" type="button" onClick={() => setCodeOpen(true)} aria-label="View code" title="View code" className="shrink-0 rounded-full text-foreground hover:bg-background">
