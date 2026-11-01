@@ -15,3 +15,6 @@
 - [x] Settings pages: page area 6% bigger
 - [x] Payments page: Billing-style flat look
 - [x] Chat page: colored example cards, image/document upload, GPT-5.6 Luna default, taller fit
+- [x] Unpaid renewals: 3-day grace, then Free
+- [x] Pine Coder page (AI coding terminal for TradingView scripts)
+- [x] Social logos for X (profile + banner)
