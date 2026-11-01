@@ -580,31 +580,61 @@ function ChatPlayground() {
                   ) : (
                     <>
                       <div className={`text-[16px] leading-[1.7] text-foreground [&_li]:my-1 [&_p]:my-3 [&_ul]:my-3 [&_ul]:pl-5 ${studio ? "lg:hidden" : ""}`}>
-                        <MessageResponse>{t.content}</MessageResponse>
+                        <MessageResponse>{unwrapDocument(t.content)}</MessageResponse>
                       </div>
                       {studio && (
                         <div className="hidden text-[16px] leading-[1.7] text-foreground lg:block [&_li]:my-1 [&_p]:my-3 [&_ul]:my-3 [&_ul]:pl-5">
                           <MessageResponse>{stripCode(t.content)}</MessageResponse>
                         </div>
                       )}
-                      {extractReplyFiles(t.content).length > 0 && (
-                        <div className="mt-3 flex flex-wrap gap-2">
-                          {extractReplyFiles(t.content).map((f) => (
-                            <button
-                              key={f.name}
-                              type="button"
-                              onClick={() => downloadFile(f.name, f.code)}
-                              className="console-pill-solid inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-[13px] font-medium"
-                            >
-                              <Download className="h-3.5 w-3.5" /> Download {f.name}
-                            </button>
-                          ))}
-                        </div>
-                      )}
+                      {(() => {
+                        const replyFiles = extractReplyFiles(t.content);
+                        const replyDoc = extractReplyDocument(t.content);
+                        if (!replyFiles.length && !replyDoc) return null;
+                        return (
+                          <div className="mt-3 flex flex-wrap gap-2.5">
+                            {replyDoc && (
+                              <>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    if (!exportDocumentPdf(replyDoc)) toast.error("Allow pop-ups for this site to save the PDF.");
+                                  }}
+                                  className="ring-btn inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-[13px] font-medium"
+                                >
+                                  <Download className="h-3.5 w-3.5" /> Download PDF
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setDoc(replyDoc);
+                                    setDocOpen(true);
+                                  }}
+                                  className="hidden items-center gap-1.5 rounded-full bg-[var(--console-card)] px-3.5 py-1.5 text-[13px] font-medium text-foreground lg:inline-flex"
+                                >
+                                  <FileText className="h-3.5 w-3.5" /> Open document
+                                </button>
+                              </>
+                            )}
+                            {replyFiles.map((f) => (
+                              <button
+                                key={f.name}
+                                type="button"
+                                onClick={() => downloadFile(f.name, f.code)}
+                                className="ring-btn inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-[13px] font-medium"
+                              >
+                                <Download className="h-3.5 w-3.5" /> Download {f.name}
+                              </button>
+                            ))}
+                          </div>
+                        );
+                      })()}
                       <div className="mt-4 flex items-center gap-1 text-muted-foreground">
                         <span className="mr-auto min-w-0 truncate text-[12px]">
-                          AI responses may include mistakes
-                          <span className="hidden sm:inline"> · {getCatalogModel(t.model ?? "")?.name ?? t.model} · {t.tokens?.toLocaleString()} tokens · {((t.ms ?? 0) / 1000).toFixed(1)}s</span>
+                          {t.model === "local" ? "Done in the editor" : "AI responses may include mistakes"}
+                          {t.model !== "local" && (
+                            <span className="hidden sm:inline"> · {getCatalogModel(t.model ?? "")?.name ?? t.model} · {t.tokens?.toLocaleString()} tokens · {((t.ms ?? 0) / 1000).toFixed(1)}s</span>
+                          )}
                         </span>
                         <ReplyBtn label="Good response" active={votes[t.id] === "up"} onClick={() => setVotes((v) => ({ ...v, [t.id]: "up" }))}>
                           <ThumbsUp className="h-[18px] w-[18px]" />
