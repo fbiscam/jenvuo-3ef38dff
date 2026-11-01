@@ -18,3 +18,8 @@
 - [x] Unpaid renewals: 3-day grace, then Free
 - [x] Pine Coder page (AI coding terminal for TradingView scripts)
 - [x] Social logos for X (profile + banner)
+- [x] Chat page lined up with Settings edges; top sections moved down a little
+- [x] Chat editor: soft file tabs, rename (double-click or ask), up to 4 files with red remove, AI can move code between files
+- [x] Ring-light Download/Export buttons
+- [x] PDF/report requests open a formatted document page with Download PDF
+- [x] Policy pages: blank blue strip replaced by policy quick links; "Take the next step" lined up with footer
