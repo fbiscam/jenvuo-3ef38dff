@@ -13,13 +13,13 @@ export const Route = createFileRoute("/killzones")({
       {
         name: "description",
         content:
-          "Live ICT/SMC killzone times for Fiber — shown in UTC and your local timezone with real-time IN/OUT status.",
+          "Live ICT/SMC killzone times for Gold, BTC/USD and EUR/USD — shown in UTC and your local timezone with real-time IN/OUT status.",
       },
-      { property: "og:title", content: "Fiber Killzone Times Tracker" },
+      { property: "og:title", content: "Gold, BTC/USD & EUR/USD Killzone Times" },
       {
         property: "og:description",
         content:
-          "Live ICT/SMC killzone times for Fiber — shown in UTC and your local timezone with real-time IN/OUT status.",
+          "Live ICT/SMC killzone times for Gold, BTC/USD and EUR/USD — shown in UTC and your local timezone with real-time IN/OUT status.",
       },
       { property: "og:url", content: "https://jenvu.com/killzones" },
       { property: "og:type", content: "website" },

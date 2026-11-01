@@ -64,6 +64,7 @@ import { buildLiveBars, liveStreamMatchesHistory } from "@/lib/chart/live-candle
 import { sessionBucketMs } from "@/lib/chart/session-buckets";
 import { useLivePriceStream } from "@/hooks/useLivePriceStream";
 import { isMarketClosed } from "@/lib/signals/qualification";
+import { AssetLogo, CHART_ASSETS, assetInfo, hasWeekendClose, type ChartAsset } from "./terminal-assets";
 
 
 // Buyer/seller pressure is shown on every chart timeframe.
@@ -134,8 +135,8 @@ type Props = {
   onTimeframeChange: (tf: TimeframeOption) => void;
   rightSlot?: ReactNode;
   mobileNewsRow?: ReactNode;
-  asset?: "XAUUSD" | "BTCUSD";
-  onAssetChange?: (asset: "XAUUSD" | "BTCUSD") => void;
+  asset?: ChartAsset;
+  onAssetChange?: (asset: ChartAsset) => void;
   theme?: "light" | "dark";
   /** Extra buttons placed at the bottom of the left side bar (e.g. Ask With AI). */
   railSlot?: ReactNode;
@@ -347,7 +348,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
 
   // Gold is closed Fri 21:00 → Sun 22:00 UTC. The candles already printed stay
   // on the chart, but nothing moves: no history polling and no live price.
-  const goldClosed = asset === "XAUUSD" && isMarketClosed(new Date());
+  const goldClosed = hasWeekendClose(asset) && isMarketClosed(new Date());
   const chartQuery = useQuery({
     queryKey: ["terminal-chart", "trusted-gold-v2", asset, timeframe.key],
     // The authenticated route already guarantees a session. The server-function
@@ -368,7 +369,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
   });
 
   const payload = chartQuery.data;
-  const pairLabel = asset === "BTCUSD" ? "BTC/USD" : "XAU/USD";
+  const pairLabel = assetInfo(asset).label;
   const showSmcPressure = smcToggles.pressure && PRESSURE_TIMEFRAMES.has(timeframe.key) && (asset === "XAUUSD" || asset === "BTCUSD");
   // One "Zone + FVG strategy" switch drives zones, their FVGs and Entry/SL/TP
   // together (15m/30m only); the saved switch stays as the user set it.
@@ -392,7 +393,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
     // Gold feed trades 24/7, but real gold is shut Fri 21:00 → Sun 22:00 UTC.
     // Drop candles that open inside that window so the chart matches TradingView.
     const fed = payload?.bars ?? [];
-    const next = asset === "XAUUSD" ? fed.filter((b) => !isMarketClosed(new Date(Number(b.time) * 1000))) : fed;
+    const next = hasWeekendClose(asset) ? fed.filter((b) => !isMarketClosed(new Date(Number(b.time) * 1000))) : fed;
     if (next.length) {
       lastGoodBarsRef.current = { key, bars: next };
       return next;
@@ -407,7 +408,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
   const bars = useMemo(() => {
     if (goldClosed || !streamMatchesHistory) return rawBars;
     const liveBucket =
-      asset === "XAUUSD"
+      hasWeekendClose(asset)
         ? Math.floor(sessionBucketMs(Date.now(), stepSeconds * 1000) / 1000)
         : Math.floor(Date.now() / (stepSeconds * 1000)) * stepSeconds;
     return buildLiveBars(rawBars, livePrice, liveBucket);
@@ -480,7 +481,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
       const s = stateRef.current;
       return buildChartContext({
         timeframeLabel: s.timeframe.label,
-        pairLabel: s.payload?.asset === "BTCUSD" ? "BTC/USD" : "XAU/USD",
+        pairLabel: assetInfo(asset).label,
         bars: s.bars,
         stepSeconds: s.stepSeconds,
         source:
@@ -709,18 +710,19 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
   const rail = (
     <nav aria-label="Chart tools" className="flex min-w-0 flex-1 items-center gap-0.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
       <div role="group" aria-label="Pair" className="mr-1 flex shrink-0 items-center gap-0.5 rounded-lg bg-muted/60 p-0.5">
-        {(["XAUUSD", "BTCUSD"] as const).map((a) => (
+        {CHART_ASSETS.map(({ symbol: a, label }) => (
           <button
             key={a}
             type="button"
             aria-pressed={asset === a}
             onClick={() => onAssetChange?.(a)}
             className={cn(
-              "h-7 rounded-md px-2.5 font-mono text-xs font-semibold text-muted-foreground hover:text-foreground",
+              "inline-flex h-7 items-center gap-1.5 rounded-md px-2 font-mono text-xs font-semibold text-muted-foreground hover:text-foreground",
               asset === a && "bg-background text-foreground shadow-sm",
             )}
           >
-            {a === "XAUUSD" ? "XAU/USD" : "BTC/USD"}
+            <AssetLogo asset={a} size={16} />
+            {label}
           </button>
         ))}
       </div>

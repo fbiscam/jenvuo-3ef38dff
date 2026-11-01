@@ -122,16 +122,16 @@ import xaiLogo from "@/assets/xai-logo.png";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "AI Fiber Trading — Jenvu" },
+      { title: "AI Trading for Gold, BTC/USD & EUR/USD — Jenvu" },
       {
         name: "description",
         content:
-          "Jenvu is an AI trading terminal for live ICT/SMC Fiber analysis with precise entries, stops, targets and mandatory senior review on eligible plans.",
+          "Jenvu is an AI trading terminal for live ICT/SMC analysis of Gold (XAU/USD), BTC/USD and EUR/USD with precise entries, stops, targets and mandatory senior review on eligible plans.",
       },
-      { property: "og:title", content: "AI Fiber Trading — Jenvu" },
+      { property: "og:title", content: "AI Trading for Gold, BTC/USD & EUR/USD — Jenvu" },
       {
         property: "og:description",
-        content: "Analyze Fiber charts in TradingView with institutional ICT/SMC logic, chart-aware AI and reviewed trade signals.",
+        content: "Analyze Gold, BTC/USD and EUR/USD charts with institutional ICT/SMC logic, chart-aware AI and reviewed trade signals.",
       },
       { property: "og:url", content: "https://jenvu.com/" },
       { property: "og:type", content: "website" },
@@ -147,7 +147,7 @@ export const Route = createFileRoute("/")({
           applicationCategory: "FinanceApplication",
           operatingSystem: "Web",
           description:
-            "AI trading terminal with institutional ICT/SMC analysis and reviewed signals for Fiber.",
+            "AI trading terminal with institutional ICT/SMC analysis and reviewed signals for Gold, BTC/USD and EUR/USD.",
           offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
         }),
       },

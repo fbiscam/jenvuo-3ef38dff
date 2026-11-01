@@ -11,7 +11,7 @@ export const Route = createFileRoute("/ai-engine")({
       { title: "Products — Jenvu Terminal, AI Engine & API" },
       { name: "description", content: "Jenvu products: JX Bot for MetaTrader 5, the Top AI Models, rule-based analysis engines, alerts and the developer API." },
       { property: "og:title", content: "Products — Jenvu" },
-      { property: "og:description", content: "The Jenvu Terminal, AI engine, analysis engines, alerts and API for Fiber traders." },
+      { property: "og:description", content: "The Jenvu Terminal, AI engine, analysis engines, alerts and API for Gold, BTC/USD and EUR/USD traders." },
       { property: "og:url", content: "https://jenvu.com/ai-engine" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

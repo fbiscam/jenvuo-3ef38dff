@@ -10,9 +10,9 @@ export const Route = createFileRoute("/founder")({
   head: () => ({
     meta: [
       { title: "Haseeb Ijaz — Founder of Jenvu" },
-      { name: "description", content: "Meet Haseeb Ijaz, founder of Jenvu. At 21, he built an AI Fiber trading platform powered by ICT, SMC and rule-based chart analysis." },
+      { name: "description", content: "Meet Haseeb Ijaz, founder of Jenvu. At 21, he built an AI trading platform for Gold, BTC/USD and EUR/USD, powered by ICT, SMC and rule-based chart analysis." },
       { property: "og:title", content: "Haseeb Ijaz — Founder of Jenvu" },
-      { property: "og:description", content: "At 21, Haseeb Ijaz founded Jenvu to bring structured Fiber trading analysis into every serious trader's chart workflow." },
+      { property: "og:description", content: "At 21, Haseeb Ijaz founded Jenvu to bring structured Gold, BTC/USD and EUR/USD analysis into every serious trader's chart workflow." },
       { property: "og:url", content: "https://jenvu.com/founder" },
       { property: "og:type", content: "profile" },
       { name: "twitter:card", content: "summary_large_image" },
