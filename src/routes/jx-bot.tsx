@@ -141,7 +141,7 @@ function Banner() {
           </p>
         </div>
         <div className="pointer-events-none absolute -bottom-4 right-6 hidden md:block">
-          <JxFace className="jx-float h-[360px] w-[360px] shadow-[0_30px_60px_-20px_rgba(0,0,0,0.35)]" />
+          <JxFace className="jx-float h-[340px] w-[340px] drop-shadow-[0_24px_30px_rgba(0,0,0,0.25)]" />
         </div>
       </div>
     </section>
