@@ -118,7 +118,7 @@ const FILE_NAME = /[\w\-]+\.[a-z0-9]{1,5}\b/gi;
  */
 export function parseRenameRequest(prompt: string, names: string[], activeName?: string): { from: string; to: string } | null {
   if (!names.length || !/\b(rename|name|naam|call it|save as)\b/i.test(prompt)) return null;
-  const found = prompt.match(FILE_NAME) ?? [];
+  const found: string[] = Array.from(prompt.match(FILE_NAME) ?? []);
   const existing = (n: string) => names.find((x) => x.toLowerCase() === n.toLowerCase());
   if (found.length >= 2) {
     const from = existing(found[0]);
