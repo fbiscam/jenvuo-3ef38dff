@@ -134,8 +134,8 @@ type Props = {
   onTimeframeChange: (tf: TimeframeOption) => void;
   rightSlot?: ReactNode;
   mobileNewsRow?: ReactNode;
-  asset?: "EURUSD" | "BTCUSD";
-  onAssetChange?: (asset: "EURUSD" | "BTCUSD") => void;
+  asset?: "XAUUSD" | "BTCUSD";
+  onAssetChange?: (asset: "XAUUSD" | "BTCUSD") => void;
   theme?: "light" | "dark";
   /** Extra buttons placed at the bottom of the left side bar (e.g. Ask With AI). */
   railSlot?: ReactNode;
@@ -222,7 +222,7 @@ function ToolButton({
 }
 
 export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function JenvuChartWorkspace(
-  { timeframes, timeframe, onTimeframeChange, rightSlot, mobileNewsRow, asset = "EURUSD", onAssetChange, theme = "light", railSlot, sidePanelOpen = false, rightPanelOpen = sidePanelOpen, onSidePanelOpenChange },
+  { timeframes, timeframe, onTimeframeChange, rightSlot, mobileNewsRow, asset = "XAUUSD", onAssetChange, theme = "light", railSlot, sidePanelOpen = false, rightPanelOpen = sidePanelOpen, onSidePanelOpenChange },
   ref,
 ) {
   const fetchChart = useServerFn(getTerminalChart);
@@ -347,7 +347,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
 
   // Gold is closed Fri 21:00 → Sun 22:00 UTC. The candles already printed stay
   // on the chart, but nothing moves: no history polling and no live price.
-  const goldClosed = asset === "EURUSD" && isMarketClosed(new Date());
+  const goldClosed = asset === "XAUUSD" && isMarketClosed(new Date());
   const chartQuery = useQuery({
     queryKey: ["terminal-chart", "trusted-gold-v2", asset, timeframe.key],
     // The authenticated route already guarantees a session. The server-function
@@ -360,7 +360,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
     // Only reuse the previous payload for the SAME pair and timeframe; showing
     // another timeframe's candles while switching made the chart look broken.
     placeholderData: (prev) =>
-      prev && prev.timeframe === timeframe.key && (prev.asset === asset || (!prev.asset && asset === "EURUSD")) ? prev : undefined,
+      prev && prev.timeframe === timeframe.key && (prev.asset === asset || (!prev.asset && asset === "XAUUSD")) ? prev : undefined,
     refetchIntervalInBackground: false,
     staleTime: 1000,
     retry: 4,
@@ -368,8 +368,8 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
   });
 
   const payload = chartQuery.data;
-  const pairLabel = asset === "BTCUSD" ? "BTC/USD" : "EUR/USD";
-  const showSmcPressure = smcToggles.pressure && PRESSURE_TIMEFRAMES.has(timeframe.key) && (asset === "EURUSD" || asset === "BTCUSD");
+  const pairLabel = asset === "BTCUSD" ? "BTC/USD" : "XAU/USD";
+  const showSmcPressure = smcToggles.pressure && PRESSURE_TIMEFRAMES.has(timeframe.key) && (asset === "XAUUSD" || asset === "BTCUSD");
   // One "Zone + FVG strategy" switch drives zones, their FVGs and Entry/SL/TP
   // together (15m/30m only); the saved switch stays as the user set it.
   // Plan strategies (Fresh sweep, Swing price action, Zone + FVG) stay locked
@@ -392,7 +392,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
     // Gold feed trades 24/7, but real gold is shut Fri 21:00 → Sun 22:00 UTC.
     // Drop candles that open inside that window so the chart matches TradingView.
     const fed = payload?.bars ?? [];
-    const next = asset === "EURUSD" ? fed.filter((b) => !isMarketClosed(new Date(Number(b.time) * 1000))) : fed;
+    const next = asset === "XAUUSD" ? fed.filter((b) => !isMarketClosed(new Date(Number(b.time) * 1000))) : fed;
     if (next.length) {
       lastGoodBarsRef.current = { key, bars: next };
       return next;
@@ -407,7 +407,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
   const bars = useMemo(() => {
     if (goldClosed || !streamMatchesHistory) return rawBars;
     const liveBucket =
-      asset === "EURUSD"
+      asset === "XAUUSD"
         ? Math.floor(sessionBucketMs(Date.now(), stepSeconds * 1000) / 1000)
         : Math.floor(Date.now() / (stepSeconds * 1000)) * stepSeconds;
     return buildLiveBars(rawBars, livePrice, liveBucket);
@@ -480,24 +480,22 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
       const s = stateRef.current;
       return buildChartContext({
         timeframeLabel: s.timeframe.label,
-        pairLabel: s.payload?.asset === "BTCUSD" ? "BTC/USD" : "EUR/USD",
+        pairLabel: s.payload?.asset === "BTCUSD" ? "BTC/USD" : "XAU/USD",
         bars: s.bars,
         stepSeconds: s.stepSeconds,
         source:
-          s.payload?.asset === "EURUSD"
-            ? `EUR/USD ${s.payload?.provider === "Binance" ? "Binance EURUSDT proxy" : "forex"} candles`
-            : s.payload?.source === "binance"
+          s.payload?.source === "binance"
             ? "Binance BTC/USDT live candles"
             : s.payload?.source === "spot"
             ? `spot ${pairLabel}`
-            : `PAXG candles (${s.payload?.provider ?? "exchange"}) scaled to live EUR/USD spot`,
+            : `PAXG candles (${s.payload?.provider ?? "exchange"}) scaled to live XAU/USD spot`,
         indicators: s.indicators,
         smc: s.smc,
         smcToggles: s.smcToggles,
         // Use the selected chart state, just like the visible overlay. The Gold
         // payload historically omitted its asset echo, which made the chart
         // show pressure while telling the AI that pressure was unavailable.
-        includePressure: smcToggles.pressure && PRESSURE_TIMEFRAMES.has(s.timeframe.key) && (asset === "EURUSD" || asset === "BTCUSD"),
+        includePressure: smcToggles.pressure && PRESSURE_TIMEFRAMES.has(s.timeframe.key) && (asset === "XAUUSD" || asset === "BTCUSD"),
         drawings: s.drawings,
         drawingsVisible: s.drawingsVisible,
         selectedId: s.selectedId,
@@ -710,6 +708,22 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
 
   const rail = (
     <nav aria-label="Chart tools" className="flex min-w-0 flex-1 items-center gap-0.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      <div role="group" aria-label="Pair" className="mr-1 flex shrink-0 items-center gap-0.5 rounded-lg bg-muted/60 p-0.5">
+        {(["XAUUSD", "BTCUSD"] as const).map((a) => (
+          <button
+            key={a}
+            type="button"
+            aria-pressed={asset === a}
+            onClick={() => onAssetChange?.(a)}
+            className={cn(
+              "h-7 rounded-md px-2.5 font-mono text-xs font-semibold text-muted-foreground hover:text-foreground",
+              asset === a && "bg-background text-foreground shadow-sm",
+            )}
+          >
+            {a === "XAUUSD" ? "XAU/USD" : "BTC/USD"}
+          </button>
+        ))}
+      </div>
       <Popover>
         <PopoverTrigger asChild>
           <button type="button" aria-label="Timeframe" title="Timeframe" className={cn(railBtn, "text-gc-ink")}>
@@ -815,7 +829,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
       <div className={cn("flex min-h-0 min-w-0 flex-1 flex-col", sidePanelOpen && "terminal-page-scroll lg:gap-3 lg:overflow-y-auto lg:p-3")}>
       {sidePanelOpen && (
         <div className="hidden lg:block">
-          <TerminalSymbolHeader price={currentPrice} tab={marketTab} onTabChange={setMarketTab} marketOpen={!goldClosed} />
+          <TerminalSymbolHeader asset={asset} price={currentPrice} tab={marketTab} onTabChange={setMarketTab} marketOpen={!goldClosed} />
         </div>
       )}
       {sidePanelOpen && <TerminalTabBody tab={marketTab} bars={bars} timeframeKey={timeframe.key} />}

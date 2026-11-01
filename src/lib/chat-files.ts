@@ -65,7 +65,25 @@ export function extractReplyFiles(reply: string): ReplyFile[] {
   return out;
 }
 
-/** True when a prompt asks for code, so the page can show the coding animation. */
+export type CodeKind = "mql5" | "pine" | "python" | "web" | "generic";
+
+/**
+ * Which kind of code a prompt asks for, or null when it doesn't ask for code.
+ * Words like "strategy" or "build" alone are not enough: "explain this
+ * strategy" must stay a normal chat, so the coding view only opens on demand.
+ */
+export function codeRequestKind(prompt: string): CodeKind | null {
+  const p = prompt.toLowerCase();
+  if (/\b(mql5?|mq5|mt5|mt4|metatrader|expert advisor|\bea\b)\b/.test(p) || /\b(trading )?bot\b/.test(p)) return "mql5";
+  if (/\b(pine( ?script)?|tradingview (script|indicator|strategy))\b/.test(p)) return "pine";
+  if (/\bpython\b|\.py\b/.test(p)) return "python";
+  if (/\b(html|css|javascript|typescript|react|website|web ?page)\b/.test(p)) return "web";
+  const verb = /\b(write|create|build|make|generate|code|banao|bana do|likho|fix|refactor|convert)\b/.test(p);
+  const thing = /\b(code|script|indicator|function|program|class|snippet|file)\b/.test(p);
+  return verb && thing ? "generic" : null;
+}
+
+/** True when a prompt asks for code, so the page can show the coding view. */
 export function looksLikeCodeRequest(prompt: string): boolean {
-  return /\b(code|script|bot|ea|expert advisor|indicator|strategy|pine|mql5?|mt5|mt4|function|program|python|javascript|build|banao|likho)\b/i.test(prompt);
+  return codeRequestKind(prompt) !== null;
 }

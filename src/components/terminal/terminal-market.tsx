@@ -60,7 +60,7 @@ export function useTechnicals(bars: OhlcvBar[], timeframeKey: string, allowed: A
   const usesChartBars = activeTf === timeframeKey;
   const otherTf = useQuery({
     queryKey: ["terminal-technicals", activeTf],
-    queryFn: () => fetchChart({ data: { timeframe: activeTf, asset: "EURUSD" } }),
+    queryFn: () => fetchChart({ data: { timeframe: activeTf, asset: "XAUUSD" } }),
     enabled: !usesChartBars,
     staleTime: 60_000,
     refetchInterval: 60_000,

@@ -1,15 +1,15 @@
 import { cn } from "@/lib/utils";
-import euFlag from "@/assets/watchlist/flag-eu.svg";
 
-/** EUR/USD badge (main Terminal instrument): round EU flag. */
+/** Gold (XAU/USD) coin mark used in the Terminal. */
 export function XauUsdLogo({ size = 22, className }: { size?: number; className?: string }) {
   return (
-    <img
-      src={euFlag}
-      width={size}
-      height={size}
-      alt="EUR/USD"
-      className={cn("shrink-0 rounded-full object-cover", className)}
-    />
+    <span
+      role="img"
+      aria-label="XAU/USD"
+      style={{ width: size, height: size, fontSize: size * 0.36, background: "radial-gradient(circle at 30% 28%, #fde68a, #f59e0b 55%, #b45309)" }}
+      className={cn("inline-grid shrink-0 place-items-center rounded-full font-bold text-amber-950", className)}
+    >
+      Au
+    </span>
   );
 }

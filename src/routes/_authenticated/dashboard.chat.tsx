@@ -47,7 +47,8 @@ import { MIXED_CATALOG, PROVIDERS, PRICE_PER_MILLION, formatContext, getCatalogM
 import { playgroundChat } from "@/lib/playground.functions";
 import { PLAYGROUND_DEFAULT_MODEL, PLAYGROUND_MAX_IMAGES, PLAYGROUND_MAX_TOKENS, type PlaygroundTurn } from "@/lib/playground";
 import { DOC_ACCEPT, IMAGE_ACCEPT, composeMessage, readAttachment, type ChatAttachment } from "@/components/dashboard/chat-attachments";
-import { extractReplyFiles, looksLikeCodeRequest } from "@/lib/chat-files";
+import { codeRequestKind, extractReplyFiles, type ReplyFile } from "@/lib/chat-files";
+import { ChatCodeStudio } from "@/components/dashboard/ChatCodeStudio";
 
 export const Route = createFileRoute("/_authenticated/dashboard/chat")({
   head: () => ({
@@ -81,6 +82,15 @@ const API_BASE = "https://jenvu.com/api/public/v1";
 // System prompt for the two builder cards: whole files, nothing left out.
 const CODE_BUILDER =
   "You are an expert trading-code engineer (MQL5 for MetaTrader 5, Pine Script v6 for TradingView). Write the COMPLETE file from the first line to the last — no placeholders, no 'rest of code', no TODOs. Put the whole file in ONE fenced code block tagged with its language (```mql5 or ```pine) and start it with a comment like // File: Name.mq5. Every trade must have a stop loss. After the code, give 3 short setup steps. Never promise profits.";
+
+// Always sent first: the trading and coding knowledge every reply builds on.
+const JENVU_BRAIN = [
+  "You are Jenvu AI, an expert trading assistant and senior trading-software engineer.",
+  "Markets: forex, Gold (XAU/USD), indices and crypto. You know ICT and SMC deeply: market structure (HH/HL/LH/LL, BOS, CHoCH, MSS), liquidity (BSL/SSL, equal highs/lows, PDH/PDL, sweeps and runs), order blocks, breakers, mitigation blocks, FVG/IFVG/BPR, premium/discount and OTE 62-79%, Power of Three, London and New York killzones, Silver Bullet, session opens, and multi-timeframe top-down analysis. Also classic tools: EMA/SMA, RSI, MACD, ATR, volume, support/resistance, risk-reward and position sizing.",
+  "Coding: expert in MQL5 (MetaTrader 5 EAs, indicators, CTrade, CPositionInfo, OnInit/OnTick/OnDeinit, new-bar checks, lot sizing from balance, SL/TP, trailing stops, magic numbers, spread and session filters), Pine Script v6 (indicator/strategy, ta.*, request.security, alerts, boxes, labels, tables) and Python for backtests and data.",
+  "When asked for code: write the COMPLETE working file in one fenced block tagged with its language, starting with a comment like // File: Name.mq5; no placeholders or TODOs; every trade gets a stop loss. When asked to change existing code, return the whole updated file with the same file name. Then give short setup steps.",
+  "Be accurate and concise. Never claim personal trading experience, never promise profits or guaranteed returns, and note that trading carries risk when giving trade ideas.",
+].join("\n");
 
 type Example = {
   icon: LucideIcon;
@@ -231,7 +241,7 @@ function ChatPlayground() {
       const res = await send({
         data: {
           model,
-          instructions,
+          instructions: [JENVU_BRAIN, instructions.trim()].filter(Boolean).join("\n\n"),
           maxTokens,
           images,
           turns: history.filter((t) => !t.error).map(({ role, content: c }) => ({ role, content: c })),
@@ -304,7 +314,22 @@ function ChatPlayground() {
   };
 
   const lastAsked = [...turns].reverse().find((t) => t.role === "user");
-  const codingNow = busy && looksLikeCodeRequest(`${lastAsked?.display ?? ""} ${instructions}`);
+  const askedKind = codeRequestKind(`${lastAsked?.display ?? ""} ${instructions === CODE_BUILDER ? "code bot" : ""}`);
+  const codingNow = busy && askedKind !== null;
+  // The newest reply that carries code drives the editor view.
+  const studioFiles: ReplyFile[] = (() => {
+    for (let i = turns.length - 1; i >= 0; i--) {
+      const t = turns[i];
+      if (t.role === "assistant" && !t.error) {
+        const f = extractReplyFiles(t.content);
+        if (f.length) return f;
+      }
+    }
+    return [];
+  })();
+  const studio = studioFiles.length > 0 || codingNow;
+  const studioKind = askedKind ?? (studioFiles[0]?.lang === "pine" ? "pine" : studioFiles[0]?.lang === "python" ? "python" : studioFiles[0]?.lang === "mql5" ? "mql5" : "generic");
+  const studioSeed = turns.length;
 
   const downloadFile = (name: string, code: string) => {
     const url = URL.createObjectURL(new Blob([code], { type: "text/plain;charset=utf-8" }));
@@ -380,24 +405,26 @@ function ChatPlayground() {
   );
 
   return (
-    <section className="chat-shell mx-auto flex min-h-[440px] w-full max-w-[1150px] flex-col">
+    <section className={`chat-shell mx-auto flex min-h-[440px] w-full flex-col ${studio ? "max-w-[1500px]" : "max-w-[1150px]"}`}>
       <h1 className="sr-only">Chat</h1>
-      {/* Controls */}
-      <div className="flex items-center justify-end gap-2">
-        <div className="flex items-center gap-2">
-          {turns.length > 0 && (
-            <button type="button" onClick={() => setTurns([])} disabled={busy} className="console-pill disabled:opacity-45">
-              <RotateCcw className="h-4 w-4" /> New chat
-            </button>
-          )}
+      {/* Controls: only before the chat starts; afterwards they sit next to the model picker. */}
+      {turns.length === 0 && (
+        <div className="flex items-center justify-end gap-2">
           <button type="button" onClick={() => setCodeOpen(true)} className="inline-flex items-center gap-1.5 text-[14px] text-muted-foreground hover:text-foreground">
             <Code2 className="h-4 w-4" /> View Code
           </button>
         </div>
-      </div>
+      )}
 
+      <div className={studio ? "flex min-h-0 flex-1 gap-4 pt-1" : "contents"}>
+      {studio && (
+        <div className="hidden min-h-0 min-w-0 flex-1 flex-col lg:flex">
+          <ChatCodeStudio files={studioFiles} busy={busy} kind={studioKind} seed={studioSeed} onDownload={(f) => downloadFile(f.name, f.code)} />
+        </div>
+      )}
+      <div className={studio ? "flex min-h-0 w-full flex-col lg:w-[440px] lg:shrink-0" : "contents"}>
       {/* Conversation / examples */}
-      <div ref={scroller} className="mt-1 min-h-0 flex-1 overflow-y-auto pr-1">
+      <div ref={scroller} className="mt-1 min-h-0 flex-1 overflow-y-auto [scrollbar-gutter:stable_both-edges]">
         {turns.length === 0 ? (
           <div className="flex flex-col pt-1 pb-2">
             <div className="text-center">
@@ -427,7 +454,7 @@ function ChatPlayground() {
             </div>
           </div>
         ) : (
-          <div className="mx-auto max-w-[1000px] space-y-6 pb-4">
+          <div className={`mx-auto space-y-6 pb-4 ${studio ? "" : "max-w-[1000px]"}`}>
             {turns.map((t) =>
               t.role === "user" ? (
                 <div key={t.id} className="flex flex-col items-end gap-2">
@@ -445,7 +472,7 @@ function ChatPlayground() {
                     </div>
                   )}
                   {(t.display ?? t.content) && (
-                    <div className="max-w-[80%] whitespace-pre-wrap break-words rounded-2xl bg-[var(--console-card)] px-4 py-2.5 text-[15px] leading-snug text-foreground">
+                    <div className="max-w-[80%] whitespace-pre-wrap break-words rounded-2xl bg-[var(--console-card)] px-4 py-2.5 text-[16px] leading-relaxed text-foreground">
                       {t.display ?? t.content}
                     </div>
                   )}
@@ -461,9 +488,14 @@ function ChatPlayground() {
                     </div>
                   ) : (
                     <>
-                      <div className="text-[15px] leading-[1.65] text-foreground [&_li]:my-1 [&_p]:my-3 [&_ul]:my-3 [&_ul]:pl-5">
+                      <div className={`text-[16px] leading-[1.7] text-foreground [&_li]:my-1 [&_p]:my-3 [&_ul]:my-3 [&_ul]:pl-5 ${studio ? "lg:hidden" : ""}`}>
                         <MessageResponse>{t.content}</MessageResponse>
                       </div>
+                      {studio && (
+                        <div className="hidden text-[16px] leading-[1.7] text-foreground lg:block [&_li]:my-1 [&_p]:my-3 [&_ul]:my-3 [&_ul]:pl-5">
+                          <MessageResponse>{stripCode(t.content)}</MessageResponse>
+                        </div>
+                      )}
                       {extractReplyFiles(t.content).length > 0 && (
                         <div className="mt-3 flex flex-wrap gap-2">
                           {extractReplyFiles(t.content).map((f) => (
@@ -505,11 +537,11 @@ function ChatPlayground() {
               <div className="flex gap-3" role="status">
                 <JenvuMark className="mt-0.5 h-6 w-6 shrink-0 animate-pulse" />
                 <div className="min-w-0 flex-1">
-                  <div className="text-[15px]">
+                  <div className="text-[16px]">
                     <Shimmer>{codingNow ? `${info?.name ?? "Jenvu"} is writing your code…` : `${info?.name ?? "Jenvu"} is thinking…`}</Shimmer>
                   </div>
                   {codingNow && (
-                    <div className="code-box mt-3 max-w-[560px] rounded-xl p-4 font-mono text-[13px] leading-relaxed">
+                    <div className="code-box mt-3 max-w-[560px] rounded-xl p-4 lg:hidden font-mono text-[13px] leading-relaxed">
                       <div className="chat-code-line" style={{ animationDelay: "0s" }}><span className="text-sky-600 dark:text-sky-400">input</span> double Lots = <span className="text-amber-600 dark:text-amber-400">0.02</span>;</div>
                       <div className="chat-code-line" style={{ animationDelay: "0.35s" }}><span className="text-violet-600 dark:text-violet-400">void</span> OnTick() {"{"}</div>
                       <div className="chat-code-line pl-5" style={{ animationDelay: "0.7s" }}><span className="text-emerald-600 dark:text-emerald-400">// entry rules, stop loss, take profit</span></div>
@@ -523,7 +555,7 @@ function ChatPlayground() {
         )}
       </div>
 
-      <div className={`mx-auto w-full ${turns.length ? "max-w-[1000px]" : ""}`}>
+      <div className={`mx-auto w-full ${turns.length && !studio ? "max-w-[1000px]" : ""}`}>
 
         {/* Composer */}
         <form
@@ -575,13 +607,13 @@ function ChatPlayground() {
               }
             }}
             rows={1}
-            placeholder="Ask anything"
+            placeholder={studio ? "Ask the AI to change the code…" : "Ask anything"}
             aria-label="Message"
-            className="max-h-40 min-h-[28px] w-full resize-none bg-transparent text-[15px] text-foreground outline-none placeholder:text-muted-foreground"
+            className="max-h-40 min-h-[28px] w-full resize-none bg-transparent text-[16px] text-foreground outline-none placeholder:text-muted-foreground"
           />
           <input ref={imageInput} type="file" accept={IMAGE_ACCEPT} multiple hidden onChange={(e) => { void addFiles(e.target.files, "image"); e.target.value = ""; }} />
           <input ref={docInput} type="file" accept={DOC_ACCEPT} multiple hidden onChange={(e) => { void addFiles(e.target.files, "doc"); e.target.value = ""; }} />
-          <div className="mt-1.5 flex items-center justify-between gap-2">
+          <div className="mt-1.5 flex flex-wrap items-center justify-between gap-x-2 gap-y-1">
             <div className="flex min-w-0 items-center gap-1">
               <DropdownMenu modal={false}>
                 <DropdownMenuTrigger asChild>
@@ -611,13 +643,23 @@ function ChatPlayground() {
                 </PopoverContent>
               </Popover>
             </div>
-            <div className="flex min-w-0 items-center gap-1">
+            <div className="ml-auto flex min-w-0 items-center gap-1">
+              {turns.length > 0 && (
+                <>
+                  <Button variant="ghost" size="icon-sm" type="button" onClick={() => setTurns([])} disabled={busy} aria-label="New chat" title="New chat" className="shrink-0 rounded-full text-foreground hover:bg-background">
+                    <RotateCcw className="h-4 w-4" />
+                  </Button>
+                  <Button variant="ghost" size="icon-sm" type="button" onClick={() => setCodeOpen(true)} aria-label="View code" title="View code" className="shrink-0 rounded-full text-foreground hover:bg-background">
+                    <Code2 className="h-4 w-4" />
+                  </Button>
+                </>
+              )}
               <Popover open={modelOpen} onOpenChange={setModelOpen}>
                 <PopoverTrigger asChild>
                   <Button variant="ghost" size="sm" type="button" aria-label="Choose a model" className="min-w-0 gap-2 rounded-full px-2.5 text-[14px] text-foreground hover:bg-background">
                     {info && <ProviderLogo provider={info.provider} size="sm" />}
-                    <span className="truncate">{info?.name ?? model}</span>
-                    <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground" />
+                    <span className="max-w-[150px] truncate">{info?.name ?? model}</span>
+                    <ChevronDown className="h-4 w-4 shrink-0 text-foreground opacity-70" />
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent align="end" side="top" sideOffset={10} className={`${menuTheme} max-h-[360px] w-[min(340px,90vw)] overflow-y-auto rounded-xl border-border bg-background p-2 text-foreground shadow-lg`}>
@@ -648,13 +690,15 @@ function ChatPlayground() {
                 type="submit"
                 disabled={(!input.trim() && !files.length) || busy || reading}
                 aria-label="Send"
-                className="console-pill-solid flex h-8 w-8 shrink-0 items-center justify-center rounded-full disabled:opacity-40"
+                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-foreground text-background transition-opacity disabled:opacity-35"
               >
                 {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <ArrowUp className="h-4 w-4" />}
               </button>
             </div>
           </div>
         </form>
+      </div>
+      </div>
       </div>
 
       {/* View code */}
@@ -683,6 +727,11 @@ function ChatPlayground() {
       </Dialog>
     </section>
   );
+}
+
+/** Reply text without its code blocks (the code is shown in the editor). */
+function stripCode(text: string): string {
+  return text.replace(/```[\s\S]*?(```|$)/g, "\n_Code is in the editor._\n").trim();
 }
 
 function ReplyBtn({ label, active, disabled, onClick, children }: { label: string; active?: boolean; disabled?: boolean; onClick: () => void; children: ReactNode }) {

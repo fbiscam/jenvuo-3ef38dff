@@ -64,29 +64,32 @@ export function TerminalSymbolHeader({
   tab,
   onTabChange,
   marketOpen = true,
+  asset = "XAUUSD",
 }: {
+  asset?: "XAUUSD" | "BTCUSD";
   price: number | null;
   tab: MarketTab;
   onTabChange: (tab: MarketTab) => void;
   marketOpen?: boolean;
 }) {
   const quotes = useWatchQuotes();
-  const q = quotes.data?.XAUUSD;
+  const q = asset === "BTCUSD" ? undefined : quotes.data?.XAUUSD;
+  const title = asset === "BTCUSD" ? "Bitcoin / U.S. Dollar" : "Gold / U.S. Dollar";
   const live = price ?? q?.price ?? null;
   const ch = q?.changePct ?? null;
   const prev = live != null && ch != null ? live / (1 + ch / 100) : null;
   const abs = live != null && prev != null ? live - prev : null;
   const now = useClock();
-  const priceText = live != null ? num(live, 5) : "—";
+  const priceText = live != null ? num(live, 2) : "—";
   const head = priceText.length > 5 ? priceText.slice(0, -5) : "";
   const tail = priceText.length > 5 ? priceText.slice(-5) : priceText;
 
   return (
-    <section aria-label="Euro / U.S. Dollar" className="hidden shrink-0 bg-card font-sans lg:block">
+    <section aria-label={title} className="hidden shrink-0 bg-card font-sans lg:block">
       <div className="flex items-center gap-5 px-5 pb-3 pt-4">
         <XauUsdLogo size={80} />
         <div className="min-w-0">
-          <h1 className="text-[28px] font-semibold leading-tight tracking-tight text-gc-ink 2xl:text-[34px]">Euro / U.S. Dollar</h1>
+          <h1 className="text-[28px] font-semibold leading-tight tracking-tight text-gc-ink 2xl:text-[34px]">{title}</h1>
           <div className="mt-2 flex flex-wrap items-baseline gap-x-3 gap-y-1">
             <p className="text-[36px] font-semibold leading-none tabular-nums tracking-tight text-gc-ink 2xl:text-[44px]">
               {head}
@@ -96,7 +99,7 @@ export function TerminalSymbolHeader({
             {abs != null && (
               <p className={cn("text-[18px] font-medium tabular-nums", pctTone(abs))}>
                 {abs >= 0 ? "+" : "−"}
-                {num(Math.abs(abs), 5)} <span className="ml-1">{abs >= 0 ? "+" : ""}{pct(ch)}</span>
+                {num(Math.abs(abs), 2)} <span className="ml-1">{abs >= 0 ? "+" : ""}{pct(ch)}</span>
               </p>
             )}
           </div>
@@ -504,7 +507,7 @@ function HeaderSidePanel({ quotes, now }: { quotes?: Record<string, { price: num
   return (
     <div className="ml-auto hidden shrink-0 items-stretch gap-6 xl:flex">
       <div>
-        <p className="mb-2 text-[11.5px] font-medium uppercase tracking-wide text-gc-ink-muted">Moves EUR/USD</p>
+        <p className="mb-2 text-[11.5px] font-medium uppercase tracking-wide text-gc-ink-muted">Moves Gold</p>
         <div className="grid grid-cols-2 gap-x-6 gap-y-2">
           {MOVERS.map((m) => {
             const q = quotes?.[m.symbol];
