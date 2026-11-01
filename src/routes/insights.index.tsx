@@ -47,18 +47,18 @@ export const Route = createFileRoute("/insights/")({
       {
         name: "description",
         content:
-          "Our insights — daily Fiber analysis, ICT and SMC briefings, and institutional market updates narrated by the Jenvu terminal engine.",
+          "Our insights — daily Gold, BTC/USD and EUR/USD analysis, ICT and SMC briefings, and institutional market updates narrated by the Jenvu terminal engine.",
       },
       { property: "og:title", content: "Our Insights — Jenvu" },
       {
         property: "og:description",
-        content: "Daily Fiber analysis, ICT and SMC briefings, and institutional market updates from the Jenvu desk.",
+        content: "Daily Gold, BTC/USD and EUR/USD analysis, ICT and SMC briefings, and institutional market updates from the Jenvu desk.",
       },
       { property: "og:url", content: "https://blogs.jenvu.com/" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "Our Insights — Jenvu" },
-      { name: "twitter:description", content: "Daily Fiber analysis, ICT and SMC briefings from the Jenvu desk." },
+      { name: "twitter:description", content: "Daily Gold, BTC/USD and EUR/USD analysis, ICT and SMC briefings from the Jenvu desk." },
     ],
     links: [{ rel: "canonical", href: "https://blogs.jenvu.com/" }],
     scripts: [
@@ -69,7 +69,7 @@ export const Route = createFileRoute("/insights/")({
           "@type": "CollectionPage",
           name: "Market Insights",
           description:
-            "Daily Fiber analysis, ICT and SMC briefings, and institutional market updates from the Jenvu desk.",
+            "Daily Gold, BTC/USD and EUR/USD analysis, ICT and SMC briefings, and institutional market updates from the Jenvu desk.",
           url: "https://blogs.jenvu.com/",
           isPartOf: { "@type": "WebSite", name: "Jenvu", url: "https://jenvu.com/" },
         }),

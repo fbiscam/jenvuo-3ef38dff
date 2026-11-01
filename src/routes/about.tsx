@@ -7,7 +7,7 @@ export const Route = createFileRoute("/about")({
   head: () => ({
     meta: [
       { title: "About Jenvu — Our Mission" },
-      { name: "description", content: "Meet Jenvu — the mission, philosophy and team behind the AI Fiber trading terminal for Fiber." },
+      { name: "description", content: "Meet Jenvu — the mission, philosophy and team behind the AI trading terminal for Gold, BTC/USD and EUR/USD." },
       { property: "og:title", content: "Who We Are — Jenvu" },
       { property: "og:description", content: "The mission, philosophy and team behind Jenvu's AI-powered trading terminal." },
       { property: "og:url", content: "https://jenvu.com/about" },

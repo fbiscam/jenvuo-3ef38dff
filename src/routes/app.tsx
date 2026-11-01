@@ -35,21 +35,21 @@ import { useLiveTicker, type TickerRow } from "@/hooks/useLiveTicker";
 export const Route = createFileRoute("/app")({
   head: () => ({
     meta: [
-      { title: "AI Gold Analysis — Jenvu" },
+      { title: "AI Gold, BTC/USD & EUR/USD Analysis — Jenvu" },
       { name: "robots", content: "noindex, follow" },
       {
         name: "description",
         content:
-          "Ask Jenvu for live institutional ICT/SMC analysis on XAU/USD — A+ setups, structured entries, stops and targets with clear chart context.",
+          "Ask Jenvu for live institutional ICT/SMC analysis on Gold (XAU/USD), BTC/USD and EUR/USD — A+ setups, structured entries, stops and targets with clear chart context.",
       },
-      { name: "keywords", content: "gold trading terminal, XAU/USD AI analysis, ICT gold analysis, SMC bullion AI, XAUUSD signals" },
-      { property: "og:title", content: "AI Gold Analysis — Jenvu" },
-      { property: "og:description", content: "Institutional AI chart analysis focused on XAU/USD." },
+      { name: "keywords", content: "gold trading terminal, XAU/USD AI analysis, BTCUSD AI analysis, EURUSD AI analysis, ICT gold analysis, SMC bullion AI, XAUUSD signals" },
+      { property: "og:title", content: "AI Gold, BTC/USD & EUR/USD Analysis — Jenvu" },
+      { property: "og:description", content: "Institutional AI chart analysis for Gold, BTC/USD and EUR/USD." },
       { property: "og:url", content: "https://jenvu.com/app" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "AI Gold Analysis — Jenvu" },
-      { name: "twitter:description", content: "Analyze XAU/USD with institutional ICT/SMC logic and clear chart context." },
+      { name: "twitter:title", content: "AI Gold, BTC/USD & EUR/USD Analysis — Jenvu" },
+      { name: "twitter:description", content: "Analyze Gold, BTC/USD and EUR/USD with institutional ICT/SMC logic and clear chart context." },
     ],
     links: [{ rel: "canonical", href: "https://jenvu.com/app" }],
     scripts: [
