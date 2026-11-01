@@ -254,18 +254,42 @@ function ChatPlayground() {
   };
 
   // Sends the conversation (ending with a user turn) and appends the reply.
+  // The editor files (and an open document) ride on the last user message only,
+  // so the AI can edit, rename or move code between them.
   const ask = async (history: Turn[], images: string[]) => {
     setBusy(true);
     try {
+      const sent = history.filter((t) => !t.error).map(({ role, content: c }) => ({ role, content: c }));
+      const extra =
+        workspaceContext(workspace) +
+        (doc && docOpen ? `\n\n[Document open on the page — to change it, return the WHOLE updated document in one \`\`\`document block]\n${doc.markdown}` : "");
+      const lastMsg = sent[sent.length - 1];
+      if (extra && lastMsg?.role === "user") sent[sent.length - 1] = { ...lastMsg, content: lastMsg.content + extra };
       const res = await send({
         data: {
           model,
           instructions: [JENVU_BRAIN, instructions.trim()].filter(Boolean).join("\n\n"),
           maxTokens,
           images,
-          turns: history.filter((t) => !t.error).map(({ role, content: c }) => ({ role, content: c })),
+          turns: sent,
         },
       });
+      if (res.ok) {
+        const newFiles = extractReplyFiles(res.content);
+        if (newFiles.length) {
+          const merged = mergeWorkspace(workspace, newFiles);
+          setWorkspace(merged.files);
+          const first = merged.files.findIndex((x) => x.name.toLowerCase() === newFiles[0].name.toLowerCase());
+          if (first >= 0) setActiveFile(first);
+          if (merged.dropped.length) toast.error(`The editor holds ${CHAT_MAX_FILES} files. Remove one to add ${merged.dropped.join(", ")}.`);
+          setDocOpen(false);
+        }
+        const newDoc = extractReplyDocument(res.content);
+        if (newDoc) {
+          setDoc(newDoc);
+          setDocOpen(true);
+        }
+      }
       setTurns((t) => [
         ...t,
         res.ok
@@ -291,9 +315,36 @@ function ChatPlayground() {
     }
   };
 
+  const renameFile = (from: string, to: string): string | null => {
+    const clean = to.trim().replace(/\s+/g, "_");
+    if (!/^[\w\-]+\.[A-Za-z0-9]{1,5}$/.test(clean)) return "Use a name like Strategy.pine (letters, numbers, _ or -, then an extension).";
+    if (workspace.some((f) => f.name.toLowerCase() === clean.toLowerCase() && f.name !== from)) return `${clean} is already open.`;
+    setWorkspace((cur) => cur.map((f) => (f.name === from ? { ...f, name: clean } : f)));
+    return null;
+  };
+
+  const removeFile = (name: string) => {
+    setWorkspace((cur) => cur.filter((f) => f.name !== name));
+    setActiveFile(0);
+  };
+
   const submit = async () => {
     const typed = input.trim();
     if ((!typed && !files.length) || busy || reading) return;
+    // "rename a.py to b.py" is done right here — no AI call, no cost.
+    const rename = !files.length ? parseRenameRequest(typed, workspace.map((f) => f.name), workspace[activeFile]?.name) : null;
+    if (rename) {
+      const problem = renameFile(rename.from, rename.to);
+      setTurns((t) => [
+        ...t,
+        { id: crypto.randomUUID(), role: "user", content: typed, display: typed },
+        problem
+          ? { id: crypto.randomUUID(), role: "assistant", content: problem, error: true }
+          : { id: crypto.randomUUID(), role: "assistant", content: `Renamed **${rename.from}** to **${rename.to.trim().replace(/\s+/g, "_")}**.`, model: "local" },
+      ]);
+      setInput("");
+      return;
+    }
     const attached = files;
     const content = composeMessage(typed || "Please look at the attached file.", attached);
     const images = attached.flatMap((f) => (f.kind === "image" ? [f.url] : []));
@@ -324,6 +375,14 @@ function ChatPlayground() {
     void ask(kept, images);
   };
 
+  const newChat = () => {
+    setTurns([]);
+    setWorkspace([]);
+    setActiveFile(0);
+    setDoc(null);
+    setDocOpen(false);
+  };
+
   const pickExample = (ex: Example) => {
     setInstructions(ex.instructions ?? "");
     if (ex.instructions === CODE_BUILDER) setMaxTokens(PLAYGROUND_MAX_TOKENS);
@@ -333,21 +392,13 @@ function ChatPlayground() {
   };
 
   const lastAsked = [...turns].reverse().find((t) => t.role === "user");
-  const askedKind = codeRequestKind(`${lastAsked?.display ?? ""} ${instructions === CODE_BUILDER ? "code bot" : ""}`);
+  const docAsked = looksLikeDocRequest(lastAsked?.display ?? "");
+  const askedKind = docAsked ? null : codeRequestKind(`${lastAsked?.display ?? ""} ${instructions === CODE_BUILDER ? "code bot" : ""}`);
   const codingNow = busy && askedKind !== null;
-  // The newest reply that carries code drives the editor view.
-  const studioFiles: ReplyFile[] = (() => {
-    for (let i = turns.length - 1; i >= 0; i--) {
-      const t = turns[i];
-      if (t.role === "assistant" && !t.error) {
-        const f = extractReplyFiles(t.content);
-        if (f.length) return f;
-      }
-    }
-    return [];
-  })();
-  const studio = studioFiles.length > 0 || codingNow;
-  const studioKind = askedKind ?? (studioFiles[0]?.lang === "pine" ? "pine" : studioFiles[0]?.lang === "python" ? "python" : studioFiles[0]?.lang === "mql5" ? "mql5" : "generic");
+  const writingDoc = busy && docAsked;
+  const showDoc = !!doc && docOpen;
+  const studio = workspace.length > 0 || codingNow || showDoc || writingDoc;
+  const studioKind = askedKind ?? (workspace[0]?.lang === "pine" ? "pine" : workspace[0]?.lang === "python" ? "python" : workspace[0]?.lang === "mql5" ? "mql5" : "generic");
   const studioSeed = turns.length;
 
   const downloadFile = (name: string, code: string) => {
