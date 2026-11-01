@@ -2293,3 +2293,47 @@ html body .jenvu-zoom-dashboard main .jx-ide :is(.jx-ide-card) { border-radius: 
 @media (min-width: 1024px) {
   .jenvu-zoom-dashboard main.dash-page.page-plus5 { zoom: 0.7 !important; }
 }
+
+/* Chat code editor tabs: soft pill, no dark underline. */
+.code-box .code-tab.is-active { background: #f1f1f0; }
+.dark .code-box .code-tab.is-active { background: #1c1c1c; }
+
+/* Download / export buttons: white (black in dark theme) with a looping colourful ring light. */
+@property --ring-a { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
+.ring-btn { position: relative; isolation: isolate; background: #ffffff !important; color: #111111 !important; border: 0; transition: transform .15s ease; }
+.ring-btn:hover { transform: translateY(-1px); }
+.ring-btn::before, .ring-btn::after {
+  content: ""; position: absolute; inset: -1.5px; border-radius: inherit; z-index: -1; pointer-events: none;
+  background: conic-gradient(from var(--ring-a), #ff5f6d, #ffc371, #47e891, #38bdf8, #a78bfa, #f472b6, #ff5f6d);
+  animation: ring-spin 3.2s linear infinite;
+}
+.ring-btn::before { padding: 1.5px; -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; }
+.ring-btn::after { inset: 2px; filter: blur(9px); opacity: .45; z-index: -2; }
+.dark .ring-btn, .dash-dark .ring-btn { background: #0b0b0b !important; color: #ffffff !important; }
+.dark .ring-btn *, .dash-dark .ring-btn * { color: inherit !important; }
+@keyframes ring-spin { to { --ring-a: 360deg; } }
+@media (prefers-reduced-motion: reduce) { .ring-btn::before, .ring-btn::after { animation: none; } }
+
+/* Chat document (PDF-style) page. */
+.chat-docview { background: #f4f4f3; color: #111; }
+.dark .chat-docview { background: #0d0d0d; color: #f5f5f5; }
+.chat-doc { background: #ffffff; color: #1a1a1a; box-shadow: 0 1px 2px rgba(0,0,0,.06), 0 0 0 1px rgba(0,0,0,.05); font-size: 15px; line-height: 1.7; }
+.dark .chat-doc { background: #000000; color: #f2f2f2; box-shadow: 0 0 0 1px #222; }
+.chat-doc > p:first-child { margin: 0; font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; opacity: .65; }
+.chat-doc h1 { font-size: 28px; font-weight: 600; line-height: 1.2; margin: 6px 0 20px; padding-bottom: 14px; border-bottom: 2px solid #2563eb; }
+.chat-doc h2 { font-size: 19px; font-weight: 600; margin: 30px 0 12px; padding-left: 11px; border-left: 3px solid #2563eb; }
+.chat-doc h3 { font-size: 16px; font-weight: 600; margin: 20px 0 8px; }
+.chat-doc p { margin: 10px 0; }
+.chat-doc ul, .chat-doc ol { margin: 10px 0; padding-left: 22px; }
+.chat-doc ul { list-style: disc; } .chat-doc ol { list-style: decimal; }
+.chat-doc li { margin: 4px 0; }
+.chat-doc blockquote { margin: 16px 0; padding: 12px 16px; border-left: 3px solid #2563eb; background: #eff4ff; border-radius: 8px; }
+.dark .chat-doc blockquote { background: #0c1a33; }
+.chat-doc blockquote p { margin: 4px 0; }
+.chat-doc table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 14px; }
+.chat-doc th, .chat-doc td { border: 1px solid #dfe3ea; padding: 9px 12px; text-align: left; vertical-align: top; }
+.dark .chat-doc th, .dark .chat-doc td { border-color: #2a2a2a; }
+.chat-doc th { background: #f4f6f9; font-weight: 600; }
+.dark .chat-doc th { background: #111; }
+.chat-doc code { font-family: ui-monospace, Menlo, monospace; font-size: 13px; background: rgba(127,127,127,.12); padding: 1px 5px; border-radius: 4px; }
+.chat-doc a { text-decoration: underline; }
