@@ -1,6 +1,6 @@
 import { describe, it } from "node:test";
 import { expect } from "./chart/test-expect";
-import { codeRequestKind, extractReplyFiles, looksLikeCodeRequest } from "./chat-files";
+import { CHAT_MAX_FILES, codeRequestKind, extractReplyDocument, extractReplyFiles, looksLikeCodeRequest, looksLikeDocRequest, mergeWorkspace, parseRenameRequest } from "./chat-files";
 
 describe("extractReplyFiles", () => {
   it("names an MQL5 block .mq5", () => {
@@ -42,7 +42,6 @@ describe("codeRequestKind", () => {
   it("plain build question is not code", () => expect(codeRequestKind("How do I build discipline?")).toBe(null));
 });
 
-import { CHAT_MAX_FILES, extractReplyDocument, looksLikeDocRequest, mergeWorkspace, parseRenameRequest } from "./chat-files";
 
 const f = (name: string, code = "x\n") => ({ name, code, lang: "txt" });
 
