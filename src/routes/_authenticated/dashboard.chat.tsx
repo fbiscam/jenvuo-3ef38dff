@@ -523,7 +523,7 @@ function ChatPlayground() {
         )}
       </div>
 
-      <div className="mx-auto w-full max-w-[1150px]">
+      <div className="w-full">
 
         {/* Composer */}
         <form
