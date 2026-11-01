@@ -852,7 +852,15 @@ function ChatPlayground() {
 
 /** Reply text without its code blocks (the code is shown in the editor). */
 function stripCode(text: string): string {
-  return text.replace(/```[\s\S]*?(```|$)/g, "\n_Code is in the editor._\n").trim();
+  return text
+    .replace(/```document[\s\S]*?(```|$)/gi, "\n_The document is open on the left._\n")
+    .replace(/```[\s\S]*?(```|$)/g, "\n_Code is in the editor._\n")
+    .trim();
+}
+
+/** Shows a ```document block as normal formatted text (phones, no side view). */
+function unwrapDocument(text: string): string {
+  return text.replace(/```document[^\n]*\n([\s\S]*?)(```|$)/gi, "$1");
 }
 
 function ReplyBtn({ label, active, disabled, onClick, children }: { label: string; active?: boolean; disabled?: boolean; onClick: () => void; children: ReactNode }) {
