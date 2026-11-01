@@ -2170,9 +2170,13 @@ html body .dark .code-box .tok-var { color: #9cdcfe !important; }
 
 /* Chat page: full width at natural size so the examples and composer fill the page. */
 @media (min-width: 1024px) {
-  .jenvu-zoom-dashboard main.dash-page.chat-page { zoom: 0.76 !important; max-width: none; padding-top: 24px; }
+  .jenvu-zoom-dashboard main.dash-page.chat-page { zoom: 0.7 !important; max-width: none; padding-top: 24px; }
 }
 .jenvu-zoom-dashboard main.dash-page.chat-page > :where(div, section, header) { max-width: 1400px; }
+/* Chat "writing code" preview: lines type in one by one, then loop. */
+@keyframes chat-code-type { 0% { opacity: 0; clip-path: inset(0 100% 0 0); } 20%, 85% { opacity: 1; clip-path: inset(0 0 0 0); } 100% { opacity: 0; clip-path: inset(0 0 0 0); } }
+.chat-code-line { animation: chat-code-type 2.8s ease-out infinite both; white-space: nowrap; }
+@media (prefers-reduced-motion: reduce) { .chat-code-line { animation: none; } }
 
 /* Jexco editor colors (light / dark) */
 /* ===== Jexco IDE (VS Code-style). White canvas in light theme, pure black in dark. ===== */

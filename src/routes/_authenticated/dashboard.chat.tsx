@@ -275,6 +275,7 @@ function ChatPlayground() {
 
   const pickExample = (ex: Example) => {
     setInstructions(ex.instructions ?? "");
+    if (ex.instructions === CODE_BUILDER) setMaxTokens(PLAYGROUND_MAX_TOKENS);
     setInput(ex.prompt);
     if (ex.tags.includes("Image input")) imageInput.current?.click();
     requestAnimationFrame(() => box.current?.focus());
