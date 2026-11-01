@@ -289,7 +289,7 @@ function NewsTab() {
             {items.map((n) => (
               <tr key={n.link} className="border-b border-gc-line/70 hover:bg-gc-console-search/50">
                 <td className="py-3 text-gc-ink-muted">{ago(n.publishedAt)}</td>
-                <td className="py-3"><XauUsdLogo size={18} /></td>
+                <td className="py-3"><AssetLogo asset="XAUUSD" size={18} /></td>
                 <td className="py-3 pr-4">
                   <a href={n.link} target="_blank" rel="noopener noreferrer" className="group inline-flex items-center gap-1.5 text-gc-ink hover:text-gc-blue">
                     {n.title}
