@@ -50,6 +50,7 @@ export function extractReplyFiles(reply: string): ReplyFile[] {
     const code = m[2].replace(/\s+$/, "") + "\n";
     if (!code.trim()) continue;
     const tag = m[1].toLowerCase();
+    if (tag === "document") continue;
     const lang = EXT[tag] ? tag : guessLang(code);
     const ext = EXT[lang] ?? "txt";
     let name = namedInCode(code) ?? `${titleInCode(code, EXT[lang] === "mq5" ? "mql5" : lang) ?? "jenvu_code"}.${ext}`;
