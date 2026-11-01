@@ -9,16 +9,16 @@ import { useAuthUser } from "@/hooks/useAuthUser";
 export const Route = createFileRoute("/jx-bot")({
   head: () => ({
     meta: [
-      { title: "JX Bot — Jenvu's Gold trading bot for MetaTrader 5" },
+      { title: "JX Bot — Jenvu's EUR/USD trading bot for MetaTrader 5" },
       {
         name: "description",
         content:
-          "How JX Bot works: a Gold (XAU/USD) M15 swing bot for MetaTrader 5 with a stop loss on every trade, safe trading hours, daily auto-stop and IP licensing.",
+          "How JX Bot works: an EUR/USD M15 swing bot for MetaTrader 5 with a stop loss on every trade, safe trading hours, daily auto-stop and IP licensing.",
       },
-      { property: "og:title", content: "JX Bot — Jenvu's Gold trading bot for MetaTrader 5" },
+      { property: "og:title", content: "JX Bot — Jenvu's EUR/USD trading bot for MetaTrader 5" },
       {
         property: "og:description",
-        content: "A Gold M15 swing bot for MT5: stop loss on every trade, safe hours, daily auto-stop and IP licensing.",
+        content: "An EUR/USD M15 swing bot for MT5: stop loss on every trade, safe hours, daily auto-stop and IP licensing.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -99,7 +99,7 @@ function Hero() {
         Meet <JxFace className="jx-float h-[0.9em] w-[0.9em]" /> JX Bot
       </h1>
       <p className="mx-auto mt-6 max-w-[620px] text-[17px] leading-relaxed text-muted-foreground md:text-[20px]">
-        A Gold trading bot for MetaTrader 5. It reads XAU/USD on M15, follows clear swing rules and puts a stop loss
+        An EUR/USD trading bot for MetaTrader 5. It reads EUR/USD only on M15, follows clear swing rules and puts a stop loss
         on every trade, so you don't have to watch the chart all day.
       </p>
       <div className="mt-8 flex flex-wrap justify-center gap-3">
@@ -174,7 +174,7 @@ function WorksCard() {
             <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-amber-500" /> Checking
           </span>
         </div>
-        <p className="px-4 pt-1 text-[13px] text-foreground/80">Jenvu license: VALID · trading XAU/USD M15</p>
+        <p className="px-4 pt-1 text-[13px] text-foreground/80">Jenvu license: VALID · trading EUR/USD M15</p>
         <div className={`relative mx-4 mt-3 h-full overflow-hidden rounded-t-xl ${aurora}`}>
           <MiniScreen>
             {[70, 45, 60, 35, 55].map((w, i) => (
@@ -195,7 +195,7 @@ function CandlesCard() {
   return (
     <Card title="Checks every candle" text="It follows the H1 trend and skips wide spreads, weak candles and sudden spikes, so some days have fewer trades.">
       <div className="h-full overflow-hidden rounded-t-2xl border border-gc-line bg-background">
-        <div className="border-b border-gc-line px-4 py-2 text-[12px] text-muted-foreground">JX Bot is reading XAU/USD M15</div>
+        <div className="border-b border-gc-line px-4 py-2 text-[12px] text-muted-foreground">JX Bot is reading EUR/USD M15</div>
         <div className={`relative h-full ${aurora2}`}>
           <MiniScreen>
             <div className="flex h-[150px] items-end gap-2 px-2">
@@ -298,7 +298,7 @@ const FAQS = [
   },
   {
     q: "Can I backtest it first?",
-    a: "Yes. The bot supports the MT5 Strategy Tester, so you can test it on past Gold data before running it live.",
+    a: "Yes. The bot supports the MT5 Strategy Tester, so you can test it on past EUR/USD data before running it live.",
   },
 ];
 
@@ -341,7 +341,7 @@ function Closing() {
   return (
     <section className="overflow-hidden px-5 pt-16 text-center">
       <h2 className="text-[34px] font-medium tracking-tight text-foreground md:text-[40px]">Meet your first Bot</h2>
-      <p className="mt-2 text-[16px] text-foreground/80">A Gold trading bot that follows its rules every candle</p>
+      <p className="mt-2 text-[16px] text-foreground/80">An EUR/USD trading bot that follows its rules every candle</p>
       <div className="mt-6 flex flex-wrap justify-center gap-3">
         <GetBot label="Get started for free" />
         <Link to="/contact" className={pillGrey}>

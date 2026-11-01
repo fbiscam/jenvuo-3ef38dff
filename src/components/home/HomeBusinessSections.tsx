@@ -134,7 +134,7 @@ function TagChip({ tag }: { tag: Tag }) {
 }
 
 const NEWS: { tag: Tag; title: string; body: string; to: string }[] = [
-  { tag: "Product", title: "JX Bot for MetaTrader 5", body: "Gold M15 swing bot with a stop loss on every trade and a daily target.", to: "/download" },
+  { tag: "Product", title: "JX Bot for MetaTrader 5", body: "EUR/USD M15 swing bot with a stop loss on every trade and a daily target.", to: "/download" },
   { tag: "Product", title: "Top AI models, one key", body: "See every model the Jenvu API serves and what each is best at.", to: "/models" },
   { tag: "Guide", title: "Fiber killzones", body: "When London and New York move the market, in your own time zone.", to: "/killzones" },
   { tag: "Guide", title: "ICT trading for Gold", body: "Liquidity, order blocks and fair value gaps, explained step by step.", to: "/strategies/ict-gold-trading" },
@@ -247,7 +247,7 @@ export function BizEveryDesk() {
 const PRODUCTS = [
   { key: "ask", label: "Ask Jenvu", Icon: Sparkles, body: "Ask about Fiber in plain words for structure, levels and plans you can check on the chart.", to: "/ai-engine" },
   { key: "terminal", label: "Terminal", Icon: CandlestickChart, body: "A live Fiber chart with liquidity sweeps, fair value gaps and seven engines in one view.", to: "/ai-engine" },
-  { key: "bot", label: "JX Bot", Icon: Bot, body: "A Gold M15 swing bot for MetaTrader 5, with a stop loss on every trade.", to: "/download" },
+  { key: "bot", label: "JX Bot", Icon: Bot, body: "An EUR/USD M15 swing bot for MetaTrader 5, with a stop loss on every trade.", to: "/download" },
   { key: "api", label: "API", Icon: Code2, body: "Top AI models behind one key, at $3 per million tokens, working with the OpenAI SDK.", to: "/platform" },
 ] as const;
 type ProductKey = (typeof PRODUCTS)[number]["key"];

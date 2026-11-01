@@ -1,6 +1,6 @@
 import * as React from "react";
 
-/** Deterministic Gold M15 candles for the MT5-style preview (illustration only). */
+/** Deterministic EUR/USD M15 candles for the MT5-style preview (illustration only). */
 function makeCandles(n: number) {
   let seed = 7;
   const rnd = () => ((seed = (seed * 9301 + 49297) % 233280) / 233280);
@@ -24,6 +24,8 @@ const W = 900;
 const H = 380;
 const PAD = 12;
 const AXIS = 64;
+/** Shows the internal units as EUR/USD prices (1 unit = 2 pips). */
+const fx = (v: number) => (1.085 + (v - 2384) * 0.0002).toFixed(5);
 
 export default function Mt5Preview() {
   const [shown, setShown] = React.useState(20);
@@ -47,7 +49,7 @@ export default function Mt5Preview() {
   const step = (W - AXIS - PAD) / CANDLES.length;
   const last = vis[vis.length - 1];
   const open = shown > ENTRY_AT;
-  const profit = open ? ((last.c - entry) * 2).toFixed(2) : "0.00";
+  const profit = open ? ((last.c - entry) * 0.4).toFixed(2) : "0.00";
   const ticks = Array.from({ length: 6 }, (_, i) => min + ((max - min) * i) / 5);
 
   return (
@@ -58,17 +60,17 @@ export default function Mt5Preview() {
           <span className="h-3 w-3 rounded-full bg-amber-400" />
           <span className="h-3 w-3 rounded-full bg-green-500" />
         </div>
-        <span className="font-sans text-[13px] text-zinc-900">XAUUSD · M15</span>
+        <span className="font-sans text-[13px] text-zinc-900">EURUSD · M15</span>
         <span className="hidden text-zinc-500 sm:inline">MetaTrader 5 · JX Bot attached</span>
         <span className="ml-auto flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-0.5 text-emerald-700">
           <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" /> AutoTrading ON
         </span>
       </div>
-      <svg viewBox={`0 0 ${W} ${H}`} className="block h-auto w-full" role="img" aria-label="Gold M15 chart with a JX Bot buy trade, stop loss and take profit">
+      <svg viewBox={`0 0 ${W} ${H}`} className="block h-auto w-full" role="img" aria-label="EUR/USD M15 chart with a JX Bot buy trade, stop loss and take profit">
         {ticks.map((t) => (
           <g key={t}>
             <line x1={0} x2={W - AXIS} y1={y(t)} y2={y(t)} stroke="#0000000d" />
-            <text x={W - AXIS + 8} y={y(t) + 4} fill="#71717a" fontSize={11}>{t.toFixed(1)}</text>
+            <text x={W - AXIS + 8} y={y(t) + 4} fill="#71717a" fontSize={11}>{fx(t)}</text>
           </g>
         ))}
         {open && (
@@ -76,9 +78,9 @@ export default function Mt5Preview() {
             <line x1={ENTRY_AT * step} x2={W - AXIS} y1={y(tp)} y2={y(tp)} stroke="#089981" strokeDasharray="5 4" />
             <line x1={ENTRY_AT * step} x2={W - AXIS} y1={y(entry)} y2={y(entry)} stroke="#2962ff" />
             <line x1={ENTRY_AT * step} x2={W - AXIS} y1={y(sl)} y2={y(sl)} stroke="#f23645" strokeDasharray="5 4" />
-            <text x={W - AXIS - 6} textAnchor="end" y={y(tp) - 5} fill="#089981" fontSize={11}>TP {tp.toFixed(1)}</text>
-            <text x={W - AXIS - 6} textAnchor="end" y={y(entry) - 5} fill="#2962ff" fontSize={11}>BUY 0.02 @ {entry.toFixed(1)}</text>
-            <text x={W - AXIS - 6} textAnchor="end" y={y(sl) + 14} fill="#f23645" fontSize={11}>SL {sl.toFixed(1)}</text>
+            <text x={W - AXIS - 6} textAnchor="end" y={y(tp) - 5} fill="#089981" fontSize={11}>TP {fx(tp)}</text>
+            <text x={W - AXIS - 6} textAnchor="end" y={y(entry) - 5} fill="#2962ff" fontSize={11}>BUY 0.02 @ {fx(entry)}</text>
+            <text x={W - AXIS - 6} textAnchor="end" y={y(sl) + 14} fill="#f23645" fontSize={11}>SL {fx(sl)}</text>
             <polygon
               points={`${ENTRY_AT * step + step / 2},${y(CANDLES[ENTRY_AT].l) + 8} ${ENTRY_AT * step + step / 2 - 6},${y(CANDLES[ENTRY_AT].l) + 18} ${ENTRY_AT * step + step / 2 + 6},${y(CANDLES[ENTRY_AT].l) + 18}`}
               fill="#2962ff"
@@ -102,7 +104,7 @@ export default function Mt5Preview() {
           <g>
             <line x1={0} x2={W - AXIS} y1={y(last.c)} y2={y(last.c)} stroke="#00000040" strokeDasharray="2 3" />
             <rect x={W - AXIS} y={y(last.c) - 9} width={AXIS} height={18} fill={last.c >= last.o ? "#089981" : "#f23645"} />
-            <text x={W - AXIS + 8} y={y(last.c) + 4} fill="#fff" fontSize={11}>{last.c.toFixed(1)}</text>
+            <text x={W - AXIS + 8} y={y(last.c) + 4} fill="#fff" fontSize={11}>{fx(last.c)}</text>
           </g>
         )}
       </svg>
