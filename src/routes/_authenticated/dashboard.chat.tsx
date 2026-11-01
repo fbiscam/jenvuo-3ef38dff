@@ -3,24 +3,24 @@ import { useEffect, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import {
   ArrowUp,
+  Bot,
   Braces,
+  CandlestickChart,
   Check,
   ChevronDown,
   Code2,
   Copy,
+  Download,
   FileText,
   ImageIcon,
-  Languages,
   Lightbulb,
   LineChart,
   Loader2,
-  Mail,
   Newspaper,
   Paperclip,
   Plus,
   RotateCcw,
   SlidersHorizontal,
-  Wallet,
   X,
   type LucideIcon,
 } from "lucide-react";
@@ -34,6 +34,8 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { MessageResponse } from "@/components/ai-elements/message";
+import { Shimmer } from "@/components/ai-elements/shimmer";
+import JenvuMark from "@/components/JenvuMark";
 import { Button } from "@/components/ui/button";
 import { ProviderLogo } from "@/components/models/ModelsExplorer";
 import { readSiteTheme, SITE_THEME_EVENT } from "@/lib/site-theme";
@@ -42,6 +44,7 @@ import { MIXED_CATALOG, PROVIDERS, PRICE_PER_MILLION, formatContext, getCatalogM
 import { playgroundChat } from "@/lib/playground.functions";
 import { PLAYGROUND_DEFAULT_MODEL, PLAYGROUND_MAX_IMAGES, PLAYGROUND_MAX_TOKENS, type PlaygroundTurn } from "@/lib/playground";
 import { DOC_ACCEPT, IMAGE_ACCEPT, composeMessage, readAttachment, type ChatAttachment } from "@/components/dashboard/chat-attachments";
+import { extractReplyFiles, looksLikeCodeRequest } from "@/lib/chat-files";
 
 export const Route = createFileRoute("/_authenticated/dashboard/chat")({
   head: () => ({
@@ -71,6 +74,10 @@ type Turn = PlaygroundTurn & {
 };
 
 const API_BASE = "https://jenvu.com/api/public/v1";
+
+// System prompt for the two builder cards: whole files, nothing left out.
+const CODE_BUILDER =
+  "You are an expert trading-code engineer (MQL5 for MetaTrader 5, Pine Script v6 for TradingView). Write the COMPLETE file from the first line to the last — no placeholders, no 'rest of code', no TODOs. Put the whole file in ONE fenced code block tagged with its language (```mql5 or ```pine) and start it with a comment like // File: Name.mq5. Every trade must have a stop loss. After the code, give 3 short setup steps. Never promise profits.";
 
 type Example = {
   icon: LucideIcon;
@@ -138,21 +145,22 @@ const EXAMPLES: Example[] = [
     prompt: "Explain a liquidity sweep on Gold (XAU/USD) in two sentences.",
   },
   {
-    icon: Mail,
-    tone: "bg-indigo-100 text-indigo-600 dark:bg-indigo-500/15 dark:text-indigo-400",
-    title: "Draft an email",
-    text: "Turn a one-line brief into a polite, clear email.",
-    tags: ["System prompt"],
-    instructions: "Write short, polite, professional emails.",
-    prompt: "Ask a supplier to send last month's invoice by Friday.",
+    icon: Bot,
+    tone: "bg-orange-100 text-orange-600 dark:bg-orange-500/15 dark:text-orange-400",
+    title: "Build an MT5 bot",
+    text: "A complete MQL5 Expert Advisor, ready to download.",
+    tags: ["MQL5", "Download file"],
+    instructions: CODE_BUILDER,
+    prompt: "Build a Gold (XAUUSD) M15 Expert Advisor: EMA 50/200 trend filter, entry on closed candles, stop loss on every trade, 0.02 lot per $1,000 balance, max 1 trade at a time.",
   },
   {
-    icon: Languages,
-    tone: "bg-fuchsia-100 text-fuchsia-600 dark:bg-fuchsia-500/15 dark:text-fuchsia-400",
-    title: "Translate text",
-    text: "Translate a message while keeping its tone.",
-    tags: ["Multilingual"],
-    prompt: 'Translate to Spanish and Urdu: "Your account is ready. Sign in to start testing models."',
+    icon: CandlestickChart,
+    tone: "bg-teal-100 text-teal-600 dark:bg-teal-500/15 dark:text-teal-400",
+    title: "Build a TradingView script",
+    text: "A full Pine Script v6 indicator or strategy file.",
+    tags: ["Pine Script", "Download file"],
+    instructions: CODE_BUILDER,
+    prompt: "Build a Pine Script v6 indicator that marks Fair Value Gaps and swing highs/lows on Gold, with alerts.",
   },
 ];
 
@@ -267,9 +275,22 @@ function ChatPlayground() {
 
   const pickExample = (ex: Example) => {
     setInstructions(ex.instructions ?? "");
+    if (ex.instructions === CODE_BUILDER) setMaxTokens(PLAYGROUND_MAX_TOKENS);
     setInput(ex.prompt);
     if (ex.tags.includes("Image input")) imageInput.current?.click();
     requestAnimationFrame(() => box.current?.focus());
+  };
+
+  const lastAsked = [...turns].reverse().find((t) => t.role === "user");
+  const codingNow = busy && looksLikeCodeRequest(`${lastAsked?.display ?? ""} ${instructions}`);
+
+  const downloadFile = (name: string, code: string) => {
+    const url = URL.createObjectURL(new Blob([code], { type: "text/plain;charset=utf-8" }));
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = name;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
   };
 
   const copyText = async (id: string, text: string) => {
@@ -402,39 +423,69 @@ function ChatPlayground() {
                     </div>
                   )}
                   {(t.display ?? t.content) && (
-                    <div className="max-w-[80%] whitespace-pre-wrap rounded-2xl bg-[var(--console-card)] px-4 py-2.5 text-[15px] text-foreground">
+                    <div className="max-w-[80%] whitespace-pre-wrap break-words rounded-2xl bg-[var(--console-card)] px-4 py-2.5 text-[15px] leading-snug text-foreground">
                       {t.display ?? t.content}
                     </div>
                   )}
                 </div>
               ) : (
-                <div key={t.id} className="group">
-                  {t.error ? (
-                    <div className="rounded-xl border border-red-500/30 bg-red-500/5 px-4 py-3 text-[14px] text-red-600 dark:text-red-400">
-                      {t.content}
-                    </div>
-                  ) : (
-                    <>
-                      <div className="text-[15px] leading-relaxed text-foreground">
-                        <MessageResponse>{t.content}</MessageResponse>
+                <div key={t.id} className="group flex gap-3">
+                  <JenvuMark className="mt-0.5 h-6 w-6 shrink-0" />
+                  <div className="min-w-0 flex-1">
+                    {t.error ? (
+                      <div className="rounded-xl border border-red-500/30 bg-red-500/5 px-4 py-3 text-[14px] text-red-600 dark:text-red-400">
+                        {t.content}
                       </div>
-                      <div className="mt-2 flex flex-wrap items-center gap-3 text-[12px] text-muted-foreground">
-                        <button type="button" onClick={() => void copyText(t.id, t.content)} className="inline-flex items-center gap-1 hover:text-foreground" aria-label="Copy reply">
-                          {copied === t.id ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
-                          Copy
-                        </button>
-                        <span>{getCatalogModel(t.model ?? "")?.name ?? t.model}</span>
-                        <span className="tabular-nums">{t.tokens?.toLocaleString()} tokens</span>
-                        <span className="tabular-nums">{((t.ms ?? 0) / 1000).toFixed(1)}s</span>
-                      </div>
-                    </>
-                  )}
+                    ) : (
+                      <>
+                        <div className="text-[15px] leading-relaxed text-foreground">
+                          <MessageResponse>{t.content}</MessageResponse>
+                        </div>
+                        {extractReplyFiles(t.content).length > 0 && (
+                          <div className="mt-3 flex flex-wrap gap-2">
+                            {extractReplyFiles(t.content).map((f) => (
+                              <button
+                                key={f.name}
+                                type="button"
+                                onClick={() => downloadFile(f.name, f.code)}
+                                className="console-pill-solid inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-[13px] font-medium"
+                              >
+                                <Download className="h-3.5 w-3.5" /> Download {f.name}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                        <div className="mt-2 flex flex-wrap items-center gap-3 text-[12px] text-muted-foreground">
+                          <button type="button" onClick={() => void copyText(t.id, t.content)} className="inline-flex items-center gap-1 hover:text-foreground" aria-label="Copy reply">
+                            {copied === t.id ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+                            Copy
+                          </button>
+                          <span>{getCatalogModel(t.model ?? "")?.name ?? t.model}</span>
+                          <span className="tabular-nums">{t.tokens?.toLocaleString()} tokens</span>
+                          <span className="tabular-nums">{((t.ms ?? 0) / 1000).toFixed(1)}s</span>
+                        </div>
+                      </>
+                    )}
+                  </div>
                 </div>
               ),
             )}
             {busy && (
-              <div className="flex items-center gap-2 text-[14px] text-muted-foreground">
-                <Loader2 className="h-4 w-4 animate-spin" /> {info?.name ?? "Model"} is thinking…
+              <div className="flex gap-3" role="status">
+                <JenvuMark className="mt-0.5 h-6 w-6 shrink-0 animate-pulse" />
+                <div className="min-w-0 flex-1">
+                  <div className="text-[15px]">
+                    <Shimmer>{codingNow ? `${info?.name ?? "Jenvu"} is writing your code…` : `${info?.name ?? "Jenvu"} is thinking…`}</Shimmer>
+                  </div>
+                  {codingNow && (
+                    <div className="code-box mt-3 max-w-[560px] rounded-xl p-4 font-mono text-[13px] leading-relaxed">
+                      <div className="chat-code-line" style={{ animationDelay: "0s" }}><span className="text-sky-600 dark:text-sky-400">input</span> double Lots = <span className="text-amber-600 dark:text-amber-400">0.02</span>;</div>
+                      <div className="chat-code-line" style={{ animationDelay: "0.35s" }}><span className="text-violet-600 dark:text-violet-400">void</span> OnTick() {"{"}</div>
+                      <div className="chat-code-line pl-5" style={{ animationDelay: "0.7s" }}><span className="text-emerald-600 dark:text-emerald-400">// entry rules, stop loss, take profit</span></div>
+                      <div className="chat-code-line" style={{ animationDelay: "1.05s" }}>{"}"}<span className="jx-caret ml-0.5 inline-block h-[1.05em] w-[7px] translate-y-[2px] bg-foreground" /></div>
+                    </div>
+                  )}
+                </div>
               </div>
             )}
           </div>
@@ -442,19 +493,6 @@ function ChatPlayground() {
       </div>
 
       <div className="mx-auto w-full max-w-[1150px]">
-        {/* Credits notice */}
-        <div className="mt-3 flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-[var(--console-card)] px-4 py-3">
-          <span className="inline-flex items-start gap-3">
-            <Wallet className="mt-0.5 h-4 w-4 shrink-0 text-orange-500" aria-hidden="true" />
-            <span>
-              <span className="block text-[14px] font-medium text-foreground">Replies use your AI wallet.</span>
-              <span className="block text-[12px] text-muted-foreground">${PRICE_PER_MILLION} / 1M tokens, the same as the API.</span>
-            </span>
-          </span>
-          <Link to="/dashboard/billing" className="console-pill-solid rounded-full px-4 py-2 text-[13px] font-medium">
-            Add credit
-          </Link>
-        </div>
 
         {/* Composer */}
         <form
