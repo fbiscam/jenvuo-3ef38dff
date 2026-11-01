@@ -32,7 +32,7 @@ After your answer, on new lines, output exactly:
 KNOWLEDGE:
 ${knowledge}`;
 
-
+const ANON_DAILY_LIMIT = 30;
 export const askJenvu = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => Input.parse(data))
   .handler(async ({ data }): Promise<AskJenvuResult> => {
@@ -51,6 +51,21 @@ export const askJenvu = createServerFn({ method: "POST" })
       "anon";
     const rl = checkAnalyzeRateLimit(`ask-jenvu:${userId ?? "anon"}:${ip}`);
     if (!rl.allowed) return { ok: false, error: `You're asking quickly. Please wait ${rl.retryInSec}s and try again.` };
+
+    // Durable daily cap for visitors (per IP) so the free assistant can't be
+    // used as an unlimited AI proxy. Signed-in users keep the per-minute limit.
+    if (!userId) {
+      try {
+        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+        const { data: used, error } = await supabaseAdmin.rpc("bump_ask_jenvu_anon", { _bucket: `ip:${ip}` });
+        if (error) throw error;
+        if ((used ?? 0) > ANON_DAILY_LIMIT) {
+          return { ok: false, error: "You've reached today's free question limit. Sign in to keep asking." };
+        }
+      } catch {
+        return { ok: false, error: "Ask Jenvu couldn't answer right now. Please try again in a moment." };
+      }
+    }
 
     const history = data.messages.slice(-12);
     if (history[history.length - 1].role !== "user") return { ok: false, error: "Please type a question." };
