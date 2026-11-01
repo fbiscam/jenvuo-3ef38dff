@@ -43,7 +43,7 @@ export default function RenewalNotice() {
       <Link
         to="/dashboard/pay"
         search={{ purchase: "plan", renew: state.plan } as never}
-        className="inline-flex h-8 shrink-0 items-center rounded-full bg-gc-blue px-3 text-[12px] font-medium text-gc-on-blue hover:bg-gc-blue-hover"
+        className="inline-flex h-6 shrink-0 items-center rounded-full bg-gc-blue px-3 text-[12px] font-medium text-gc-on-blue hover:bg-gc-blue-hover"
       >
         Pay renewal
       </Link>
