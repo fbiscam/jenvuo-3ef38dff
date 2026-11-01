@@ -206,6 +206,11 @@ function ChatPlayground() {
   const [files, setFiles] = useState<ChatAttachment[]>([]);
   const [reading, setReading] = useState(false);
   const [darkMenus, setDarkMenus] = useState(false);
+  // Editor files (max 4) and the open document live across replies.
+  const [workspace, setWorkspace] = useState<ReplyFile[]>([]);
+  const [activeFile, setActiveFile] = useState(0);
+  const [doc, setDoc] = useState<ReplyDocument | null>(null);
+  const [docOpen, setDocOpen] = useState(false);
   const scroller = useRef<HTMLDivElement>(null);
   const box = useRef<HTMLTextAreaElement>(null);
   const imageInput = useRef<HTMLInputElement>(null);
