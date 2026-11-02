@@ -76,19 +76,21 @@ function downloadMarkdown(doc: ReplyDocument) {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
-type Props = { doc: ReplyDocument; busy: boolean; menuTheme: string; onClose: () => void };
+type Props = { doc: ReplyDocument; busy: boolean; menuTheme: string; onClose: () => void; embedded?: boolean };
 
 /** Formatted document page (PDF-style) shown beside the chat. */
-export function ChatDocView({ doc, busy, menuTheme, onClose }: Props) {
+export function ChatDocView({ doc, busy, menuTheme, onClose, embedded = false }: Props) {
   const [full, setFull] = useState(false);
   const html = useMemo(() => documentHtml(doc.markdown), [doc.markdown]);
   const csv = useMemo(() => documentCsv(doc.markdown), [doc.markdown]);
 
   return (
-    <div className={`chat-docview flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl ${full ? "fixed inset-3 z-50" : ""}`}>
+    <div className={`chat-docview flex min-h-0 flex-1 flex-col overflow-hidden ${embedded && !full ? "" : "rounded-2xl"} ${full ? "fixed inset-3 z-50 bg-background" : ""}`}>
       <div className="flex items-center gap-2 px-4 py-2.5">
+        {embedded && !full ? <span className="flex-1" /> : <>
         <FileText className="h-4 w-4 shrink-0 opacity-60" />
         <span className="min-w-0 flex-1 truncate text-[14px] font-medium">{doc.title}</span>
+        </>}
         {busy && <span className="text-[12px] opacity-60">Updating…</span>}
         <DropdownMenu modal={false}>
           <DropdownMenuTrigger asChild>
@@ -113,9 +115,11 @@ export function ChatDocView({ doc, busy, menuTheme, onClose }: Props) {
         <button type="button" onClick={() => setFull((v) => !v)} aria-label={full ? "Exit full screen" : "Full screen"} className="rounded-md p-1.5 opacity-70 hover:opacity-100">
           {full ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
         </button>
-        <button type="button" onClick={onClose} aria-label="Close document" className="rounded-md p-1.5 opacity-70 hover:opacity-100">
-          <X className="h-4 w-4" />
-        </button>
+        {!embedded && (
+          <button type="button" onClick={onClose} aria-label="Close document" className="rounded-md p-1.5 opacity-70 hover:opacity-100">
+            <X className="h-4 w-4" />
+          </button>
+        )}
       </div>
       <div className="min-h-0 min-w-0 flex-1 overflow-y-auto overflow-x-hidden px-3 pb-3 sm:px-6">
         <article className="chat-doc mx-auto w-full max-w-[760px] rounded-lg px-6 py-8 sm:px-12 sm:py-10" dangerouslySetInnerHTML={{ __html: html }} />

@@ -19,14 +19,16 @@ function Card({ title, children }: { title: string; children: React.ReactNode })
   );
 }
 
-export function ChatSitePanel({ report, loading, domain, onClose }: { report: SiteReport | null; loading: boolean; domain: string; onClose: () => void }) {
+export function ChatSitePanel({ report, loading, domain, onClose, embedded = false }: { report: SiteReport | null; loading: boolean; domain: string; onClose: () => void; embedded?: boolean }) {
   const fmt = (d: string | null) => (d ? new Date(d).toLocaleDateString() : null);
   return (
-    <div className="chat-docview flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-border">
-      <div className="flex items-center gap-2 border-b border-border px-4 py-2.5 text-[13px]">
-        <span className="min-w-0 flex-1 truncate font-medium text-foreground">Website report · {domain}</span>
-        <button type="button" onClick={onClose} className="text-muted-foreground hover:text-foreground">Close</button>
-      </div>
+    <div className={`chat-docview flex min-h-0 flex-1 flex-col overflow-hidden ${embedded ? "" : "rounded-2xl border border-border"}`}>
+      {!embedded && (
+        <div className="flex items-center gap-2 border-b border-border px-4 py-2.5 text-[13px]">
+          <span className="min-w-0 flex-1 truncate font-medium text-foreground">Website report · {domain}</span>
+          <button type="button" onClick={onClose} className="text-muted-foreground hover:text-foreground">Close</button>
+        </div>
+      )}
       {loading || !report ? (
         <div className="flex flex-1 items-center justify-center text-[15px]"><Shimmer>{`Checking ${domain}…`}</Shimmer></div>
       ) : (
