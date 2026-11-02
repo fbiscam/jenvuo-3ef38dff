@@ -18,6 +18,7 @@ import {
   ArrowUpRight,
   Camera,
   Circle,
+  Code,
   Eye,
   EyeOff,
   Layers,
@@ -725,7 +726,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
   const rail = (
     <nav aria-label="Chart tools" className="flex min-w-0 flex-1 items-center gap-0.5">
       <div className="flex min-w-0 flex-1 items-center gap-0.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-      <div role="group" aria-label="Pair" className="-ml-1.5 mr-1 flex shrink-0 items-center gap-0.5 rounded-lg bg-muted/60 p-0.5">
+      <div role="group" aria-label="Pair" className="mr-1 flex shrink-0 items-center gap-0.5 rounded-lg bg-muted/60 p-0.5">
         {CHART_ASSETS.map(({ symbol: a, label }) => (
           <button
             key={a}
@@ -794,6 +795,10 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
           {smcMenu}
         </PopoverContent>
       </Popover>
+      <button type="button" onClick={() => setScriptPanelOpen((v) => !v)} aria-pressed={scriptPanelOpen} aria-label="Jenvu Script" title="Jenvu Script" className={cn(railBtn, scriptPanelOpen && "bg-accent text-foreground")}>
+        <Code className="h-4 w-4" />
+        <span className="hidden xl:inline">Jenvu Script</span>
+      </button>
       <span className="mx-1 h-5 w-px shrink-0 bg-gc-line" aria-hidden="true" />
       <button type="button" onClick={downloadSnapshot} aria-label="Download chart snapshot" title="Download chart snapshot" className={railBtn}>
         <Camera className="h-4 w-4" />
@@ -911,6 +916,20 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
           </PopoverContent>
         </Popover>
 
+        <button
+          type="button"
+          onClick={() => setScriptPanelOpen((v) => !v)}
+          aria-pressed={scriptPanelOpen}
+          aria-label="Jenvu Script"
+          title="Jenvu Script"
+          className={cn(
+            "hidden",
+            scriptPanelOpen && "bg-accent text-foreground",
+          )}
+        >
+          <Code className="h-3.5 w-3.5" />
+          <span className="hidden 2xl:inline">Jenvu Script</span>
+        </button>
 
         <Tooltip>
           <TooltipTrigger asChild>

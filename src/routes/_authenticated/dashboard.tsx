@@ -1362,8 +1362,8 @@ function DashboardLayout() {
           className={`dashboard-sidebar-root ${pinned ? "console-sidebar" : ""} ${onTerminal && !terminalRail ? "jenvu-zoom-chrome" : ""} ${
             drawerMode && onTerminal
               ? mobileNavOpen
-                ? "dashboard-terminal-sidebar fixed inset-y-0 left-0 z-50 w-[280px] translate-x-0 rounded-r-2xl shadow-2xl"
-                : "terminal-rail dashboard-terminal-sidebar fixed inset-y-0 left-0 z-20 w-[52px] -translate-x-full border-r border-zinc-200 max-lg:invisible lg:translate-x-0"
+                ? "fixed inset-y-0 left-0 z-50 w-[280px] translate-x-0 rounded-r-2xl shadow-2xl"
+                : "terminal-rail fixed inset-y-0 left-0 z-20 w-[52px] -translate-x-full border-r border-zinc-200 max-lg:invisible lg:translate-x-0"
               : pinned
               ? `fixed inset-y-0 left-0 z-50 w-[260px] border-0 lg:z-20 lg:translate-x-0 lg:shadow-none ${mobileNavOpen ? "translate-x-0 shadow-2xl" : "-translate-x-full max-lg:invisible"}`
               : drawerMode
@@ -1378,9 +1378,9 @@ function DashboardLayout() {
         >
           <style>{`.dashboard-sidebar-root, .dashboard-sidebar-root *:not(img):not(svg):not(.material-symbols-rounded) { font-family: "Google Sans Flex", "Google Sans", "Product Sans", "Roboto", system-ui, sans-serif !important; text-transform: none !important; letter-spacing: normal !important; } .dashboard-sidebar-root .material-symbols-rounded { font-family: "Material Symbols Rounded" !important; font-weight: normal !important; font-style: normal !important; text-transform: none !important; letter-spacing: normal !important; white-space: nowrap; word-wrap: normal; direction: ltr; -webkit-font-feature-settings: "liga"; -webkit-font-smoothing: antialiased; }`}</style>
           {/* Brand */}
-          <div className={`flex shrink-0 items-center ${terminalRail ? "terminal-rail-brand h-11 justify-center" : "h-14 gap-2 pl-[21px] pr-2"}`}>
+          <div className={`flex shrink-0 items-center ${terminalRail ? "h-12 justify-center" : "h-14 gap-2 pl-[21px] pr-2"}`}>
             <a href="https://jenvu.com" title={terminalRail ? "Jenvu" : undefined} className="flex min-w-0 items-center gap-[9px]">
-              <JenvuMark className={`dashboard-sidebar-logo shrink-0 text-gc-ink ${terminalRail ? "h-[21px] w-[21px]" : "h-6 w-6"}`} />
+              <JenvuMark className={`dashboard-sidebar-logo shrink-0 text-gc-ink ${terminalRail ? "h-5 w-5" : "h-6 w-6"}`} />
               {!terminalRail && <span className="dashboard-sidebar-brand truncate text-[20px] font-medium leading-none tracking-tight text-gc-ink">Jenvu</span>}
             </a>
             {!terminalRail && <button

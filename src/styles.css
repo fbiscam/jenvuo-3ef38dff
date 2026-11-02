@@ -2415,12 +2415,3 @@ html body :is(.dark, .dash-dark) .vsc-studio .tok-var { color: #a8dcff !importan
 .terminal-topbar button.w-8, .terminal-topbar button.w-9, .terminal-topbar button.w-10 { width: 28px !important; }
 .terminal-topbar svg.lucide { width: 15px !important; height: 15px !important; }
 .terminal-rail .sidebar-quick-btn { width: 30px; height: 30px; }
-
-/* Terminal rail: logo row matches the top bar height so the logo, page icons and drawing tools line up. */
-.terminal-rail .terminal-rail-brand { height: 44px !important; }
-.terminal-rail nav { padding-top: 6px !important; }
-/* Terminal theme switch: larger than the other compact header buttons. */
-.terminal-topbar button.terminal-theme-btn { width: 34px !important; height: 34px !important; }
-.terminal-topbar button.terminal-theme-btn svg.lucide { width: 19px !important; height: 19px !important; }
-/* Black terminal: page rail icons and logo turn white like the black dashboard. */
-body:has(.terminal-dark) .dashboard-terminal-sidebar :is(.dashboard-sidebar-link, .dashboard-sidebar-logo, .dashboard-sidebar-icon, svg) { color: oklch(1 0 0) !important; }
