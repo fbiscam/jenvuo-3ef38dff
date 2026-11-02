@@ -48,10 +48,10 @@ const CAP_META: Record<Capability, { label: string; icon: typeof Brain; cls: str
   json: { label: "JSON", icon: Braces, cls: "bg-gc-green-soft text-gc-green" },
 };
 
-export function ProviderLogo({ provider, size = "md" }: { provider: ProviderKey; size?: "sm" | "md" | "lg" }) {
+export function ProviderLogo({ provider, size = "md", bare = false }: { provider: ProviderKey; size?: "sm" | "md" | "lg"; bare?: boolean }) {
   const box = size === "sm" ? "h-7 w-7 rounded-md" : size === "lg" ? "h-12 w-12 rounded-xl" : "h-9 w-9 rounded-lg";
   return (
-    <span className={cn("grid shrink-0 place-items-center border border-gc-line bg-background", box)}>
+    <span className={cn("grid shrink-0 place-items-center", bare ? "h-5 w-5" : cn("border border-gc-line bg-background", box))}>
       <img
         src={LOGOS[provider]}
         alt={`${PROVIDERS[provider].label} logo`}
