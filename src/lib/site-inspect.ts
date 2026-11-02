@@ -1,6 +1,6 @@
 // Pure helpers for the chat's Website / SEO inspector panel.
 
-const DOMAIN_RE = /\b((?:https?:\/\/)?(?:[a-z0-9-]+\.)+[a-z]{2,24})(?:\/[^\s]*)?/i;
+const DOMAIN_RE = /\b((?:https?:\/\/)?(?:[a-z0-9-]+\.)+[a-z]{2,24})(?![a-z0-9-])(?:\/[^\s]*)?/i;
 const INTENT_RE = /\b(seo|domain|website|site|web ?site|keywords?|ranking|rank|age|info|information|audit|check|analy[sz]e)\b/i;
 
 /** Returns the bare domain when the message asks about a website, else null. */
