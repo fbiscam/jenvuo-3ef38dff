@@ -1341,7 +1341,7 @@ function AuthPage() {
                             onChange={(event) => setRememberLogin(event.target.checked)}
                             className="h-[18px] w-[18px] rounded border-border accent-zinc-900"
                           />
-                          <span>Save email and login method on this device</span>
+                          <span>Save email and login method on device</span>
                         </label>
 
                         {turnstileSiteKey && (
