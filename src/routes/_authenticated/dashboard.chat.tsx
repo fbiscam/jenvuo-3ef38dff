@@ -810,7 +810,7 @@ function ChatPlayground() {
                         )}
                         <div className="mt-3 flex items-center gap-1 text-muted-foreground">
                           {t.image && t.imageFinal && (
-                            <button type="button" onClick={() => downloadImage(t.image ?? "", t.content)} className="ring-btn mr-2 inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-[13px] font-medium">
+                            <button type="button" onClick={() => downloadImage(t.image ?? "", t.content)} className="ring-btn mr-2 inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-[13px] font-medium lg:hidden">
                               <Download className="h-3.5 w-3.5" /> Download image
                             </button>
                           )}
