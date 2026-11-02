@@ -95,7 +95,7 @@ export function wantsNewFile(prompt: string): boolean {
 }
 
 /** Files the Chat code editor can hold at once. */
-export const CHAT_MAX_FILES = 4;
+export const CHAT_MAX_FILES = 2;
 
 /**
  * Adds a reply's files to the editor: same name = updated in place, new names
@@ -145,6 +145,18 @@ export function parseRenameRequest(prompt: string, names: string[], activeName?:
     return from ? { from, to: found[0] } : null;
   }
   return null;
+}
+
+/**
+ * True when a prompt asks the AI to create a picture ("image banao", "draw a
+ * gold bull logo"). Asking about an attached image is not a request to create one.
+ */
+export function looksLikeImageRequest(prompt: string): boolean {
+  const p = prompt.toLowerCase();
+  if (/\b(describe|explain|analy[sz]e|read|what is in|what's in|kya hai|batao)\b/.test(p)) return false;
+  const thing = /\b(image|images|picture|pic|photo|tasveer|tasvir|illustration|logo|poster|wallpaper|artwork|drawing|thumbnail|banner|icon)\b/.test(p);
+  const verb = /\b(create|generate|make|draw|design|paint|render|banao|bana do|bana|banado|banaye|banaen)\b/.test(p);
+  return thing && verb;
 }
 
 /** True when a prompt asks for a PDF, report, guide or other document. */

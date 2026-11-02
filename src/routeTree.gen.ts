@@ -47,6 +47,7 @@ import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } fr
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedInboxRouteImport } from './routes/_authenticated/inbox'
 import { Route as AuthenticatedTerminalRouteImport } from './routes/_authenticated/terminal'
+import { Route as ApiChatImageRouteImport } from './routes/api/chat-image'
 import { Route as HelpIndexRouteImport } from './routes/help.index'
 import { Route as InsightsIndexRouteImport } from './routes/insights.index'
 import { Route as InsightsSlugRouteImport } from './routes/insights.$slug'
@@ -308,6 +309,11 @@ const AuthenticatedTerminalRoute = AuthenticatedTerminalRouteImport.update({
   id: '/terminal',
   path: '/terminal',
   getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const ApiChatImageRoute = ApiChatImageRouteImport.update({
+  id: '/api/chat-image',
+  path: '/api/chat-image',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const HelpIndexRoute = HelpIndexRouteImport.update({
   id: '/help/',
@@ -755,6 +761,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AuthenticatedDashboardRouteWithChildren
   '/inbox': typeof AuthenticatedInboxRoute
   '/terminal': typeof AuthenticatedTerminalRoute
+  '/api/chat-image': typeof ApiChatImageRoute
   '/insights/$slug': typeof InsightsSlugRoute
   '/jenvu-ops-x9k2/inbox': typeof JenvuOpsX9k2InboxRoute
   '/ops-x9k2-7m4n/hub': typeof OpsX9k27m4nHubRoute
@@ -861,6 +868,7 @@ export interface FileRoutesByTo {
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/inbox': typeof AuthenticatedInboxRoute
   '/terminal': typeof AuthenticatedTerminalRoute
+  '/api/chat-image': typeof ApiChatImageRoute
   '/insights/$slug': typeof InsightsSlugRoute
   '/jenvu-ops-x9k2/inbox': typeof JenvuOpsX9k2InboxRoute
   '/ops-x9k2-7m4n/hub': typeof OpsX9k27m4nHubRoute
@@ -973,6 +981,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRouteWithChildren
   '/_authenticated/inbox': typeof AuthenticatedInboxRoute
   '/_authenticated/terminal': typeof AuthenticatedTerminalRoute
+  '/api/chat-image': typeof ApiChatImageRoute
   '/insights/$slug': typeof InsightsSlugRoute
   '/jenvu-ops-x9k2/inbox': typeof JenvuOpsX9k2InboxRoute
   '/ops-x9k2-7m4n/hub': typeof OpsX9k27m4nHubRoute
@@ -1085,6 +1094,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/inbox'
     | '/terminal'
+    | '/api/chat-image'
     | '/insights/$slug'
     | '/jenvu-ops-x9k2/inbox'
     | '/ops-x9k2-7m4n/hub'
@@ -1191,6 +1201,7 @@ export interface FileRouteTypes {
     | '/.well-known/oauth-protected-resource'
     | '/inbox'
     | '/terminal'
+    | '/api/chat-image'
     | '/insights/$slug'
     | '/jenvu-ops-x9k2/inbox'
     | '/ops-x9k2-7m4n/hub'
@@ -1302,6 +1313,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard'
     | '/_authenticated/inbox'
     | '/_authenticated/terminal'
+    | '/api/chat-image'
     | '/insights/$slug'
     | '/jenvu-ops-x9k2/inbox'
     | '/ops-x9k2-7m4n/hub'
@@ -1411,6 +1423,7 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
   Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
+  ApiChatImageRoute: typeof ApiChatImageRoute
   StoriesSlugRoute: typeof StoriesSlugRoute
   StrategiesIctGoldTradingRoute: typeof StrategiesIctGoldTradingRoute
   HelpIndexRoute: typeof HelpIndexRoute
@@ -1708,6 +1721,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/terminal'
       preLoaderRoute: typeof AuthenticatedTerminalRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/api/chat-image': {
+      id: '/api/chat-image'
+      path: '/api/chat-image'
+      fullPath: '/api/chat-image'
+      preLoaderRoute: typeof ApiChatImageRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/help/': {
       id: '/help/'
@@ -2400,6 +2420,7 @@ const rootRouteChildren: RootRouteChildren = {
   TermsRoute: TermsRoute,
   Char91DotwellKnownChar93OauthProtectedResourceRoute:
     Char91DotwellKnownChar93OauthProtectedResourceRoute,
+  ApiChatImageRoute: ApiChatImageRoute,
   StoriesSlugRoute: StoriesSlugRoute,
   StrategiesIctGoldTradingRoute: StrategiesIctGoldTradingRoute,
   HelpIndexRoute: HelpIndexRoute,
