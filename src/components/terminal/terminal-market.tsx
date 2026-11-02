@@ -45,8 +45,8 @@ export function useWatchQuotes() {
       for (const row of res?.results ?? []) if (row.snapshot && Number.isFinite(row.snapshot.price)) map[row.symbol] = row.snapshot;
       return map;
     },
-    staleTime: 10_000,
-    refetchInterval: 15_000,
+    staleTime: 1_000,
+    refetchInterval: 2_000,
     refetchIntervalInBackground: false,
     placeholderData: (prev) => prev,
   });
