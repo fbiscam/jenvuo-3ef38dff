@@ -1100,7 +1100,7 @@ function ChatPlayground() {
           <input ref={imageInput} type="file" accept={IMAGE_ACCEPT} hidden onChange={(e) => { void addFiles(e.target.files, "image"); e.target.value = ""; }} />
           <input ref={docInput} type="file" accept={DOC_ACCEPT} hidden onChange={(e) => { void addFiles(e.target.files, "doc"); e.target.value = ""; }} />
           <div className="mt-1.5 flex flex-nowrap items-end justify-between gap-x-2">
-            <div className="flex min-w-0 shrink-0 items-center gap-1">
+            <div className="-ml-2 flex min-w-0 shrink-0 items-center gap-0.5">
               <DropdownMenu modal={false}>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="icon-sm" type="button" aria-label="Attach files" className="shrink-0 rounded-full text-foreground hover:bg-background">
