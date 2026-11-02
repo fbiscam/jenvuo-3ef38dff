@@ -58,6 +58,7 @@ async function normalizeCatastrophicSsrResponse(response: Response): Promise<Res
 // On the server we also redirect old subdomain URLs and legacy /dashboard/*
 // paths to the clean apex-domain URLs.
 import { apexRedirectTarget } from "./lib/url-rewrite";
+import { runWithRequestCtx } from "./lib/keep-alive.server";
 
 
 export default {
@@ -68,7 +69,7 @@ export default {
 
       const handler = await getServerEntry();
 
-      const response = await handler.fetch(request, env, ctx);
+      const response = await runWithRequestCtx(ctx, () => handler.fetch(request, env, ctx));
       // The visitor closed or reloaded the page before it finished loading.
       // Nobody is waiting for this response, so don't log it as a crash.
       if (request.signal?.aborted) {
