@@ -16,17 +16,16 @@ export function dailyTarget(plan: Mt5PlanId) {
   return MT5_PLANS[plan].monthlyTarget / 20;
 }
 
-/** Per-account target overrides (owner account imgakhar@gmail.com: $1,000/day). Keyed by user id. */
-const TARGET_OVERRIDES: Record<string, { daily: number; monthly: number }> = {
-  "5af751fb-de3b-4a24-aefd-aed53ef44378": { daily: 1000, monthly: 20000 },
-  // malik00902@dawntv.co.uk (test account): $500/day
-  "3281e6c3-39f0-4a13-9085-ab5a595fc91b": { daily: 500, monthly: 10000 },
-};
+/** Daily/monthly target for a plan. Every account (owner included) follows its plan limit. */
+export function targetsFor(plan: Mt5PlanId, _userId?: string | null) {
+  return { daily: dailyTarget(plan), monthly: MT5_PLANS[plan].monthlyTarget };
+}
 
-/** Daily/monthly target for a plan, with any per-account override applied. */
-export function targetsFor(plan: Mt5PlanId, userId?: string | null) {
-  const o = userId ? TARGET_OVERRIDES[userId] : undefined;
-  return o ? { daily: o.daily, monthly: o.monthly } : { daily: dailyTarget(plan), monthly: MT5_PLANS[plan].monthlyTarget };
+/** JX Bot unlocks only on an active, paid (non-trial) plan. */
+export function isPaidBotSub(sub: Sub, now = Date.now()) {
+  if (!sub || sub.is_trial || sub.status !== "active") return false;
+  if (sub.current_period_end && Date.parse(sub.current_period_end) <= now) return false;
+  return isMt5Plan(String(sub.plan_id || "").toLowerCase());
 }
 
 export function licenseLimit(plan: string | null | undefined) {
@@ -86,9 +85,7 @@ export function evaluateIpLicense(enteredIp: string, callerIp: string, account: 
   if (b.ip !== ip || normalizeIp(callerIp) !== ip) return { valid: false, reason: "ip_mismatch" };
   if (b.account && b.account !== account) return { valid: false, reason: "account_mismatch" };
   const plan = String(sub?.plan_id || "").toLowerCase();
-  const active = sub && (sub.status === "active" || sub.status === "trialing");
-  if (!active || !isMt5Plan(plan)) return { valid: false, reason: sub?.plan_id && plan !== "free" ? "expired" : "no_plan" };
-  if (sub.current_period_end && Date.parse(sub.current_period_end) <= now) return { valid: false, reason: "expired" };
+  if (!sub || !isPaidBotSub(sub, now)) return { valid: false, reason: sub?.plan_id && plan !== "free" && !sub?.is_trial ? "expired" : "no_plan" };
   const t = targetsFor(plan, lic.user_id);
   return {
     valid: true,
