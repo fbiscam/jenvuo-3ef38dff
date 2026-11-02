@@ -32,7 +32,7 @@ function useTyped(lines: string[], active: boolean) {
   const [n, setN] = useState(0);
   const total = lines.join("\n").length;
   useEffect(() => {
-    setN(0);
+    // Pausing (AI asks a question) keeps the typed code; it resumes from there.
     if (!active) return;
     const id = setInterval(() => setN((c) => {
       // Types the sample once, then stays put until the real code arrives.
@@ -41,6 +41,7 @@ function useTyped(lines: string[], active: boolean) {
     }), 28);
     return () => clearInterval(id);
   }, [lines, active, total]);
+  useEffect(() => setN(0), [lines]);
   return lines.join("\n").slice(0, n);
 }
 
@@ -64,12 +65,15 @@ export function ChatCodeStudio({ files, busy, kind, seed, active, onActive, onDo
   const [draft, setDraft] = useState("");
   const nameInput = useRef<HTMLInputElement>(null);
   const variants = SNIPPETS[kind];
-  const snippet = variants[seed % variants.length];
+  // Pick the sample once so a follow-up answer continues the same code.
+  const [pick] = useState(seed);
+  const snippet = variants[pick % variants.length];
   const showTyping = !files.length && busy;
   const waiting = !files.length && !busy;
+  const draftShown = !files.length;
   const typed = useTyped(snippet.lines, showTyping);
   const file = files[Math.min(active, files.length - 1)];
-  const code = showTyping ? typed : file?.code ?? "";
+  const code = draftShown ? typed : file?.code ?? "";
   const lines = useMemo(() => code.replace(/\n$/, "").split("\n"), [code]);
 
   useEffect(() => {
@@ -165,17 +169,6 @@ export function ChatCodeStudio({ files, busy, kind, seed, active, onActive, onDo
           </div>
         )}
       </div>
-      {waiting ? (
-        <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-2 px-8 text-center">
-          <FileCode2 className="h-6 w-6 opacity-50" />
-          <p className="text-[14px] opacity-80">Answer the questions in the chat — your code will be written here.</p>
-          {onClose && (
-            <button type="button" onClick={onClose} className="mt-2 rounded-full px-3 py-1 text-[12px] opacity-60 ring-1 ring-current/20 hover:opacity-100">
-              Close editor
-            </button>
-          )}
-        </div>
-      ) : (
       <div className="min-h-0 flex-1 overflow-auto py-3 font-mono text-[13.5px] leading-[1.7]">
         {lines.map((l, i) => (
           <div key={i} className="flex">
@@ -187,10 +180,9 @@ export function ChatCodeStudio({ files, busy, kind, seed, active, onActive, onDo
           </div>
         ))}
       </div>
-      )}
       <div className="flex items-center gap-2 border-t border-current/10 px-4 py-2 text-[12px] opacity-70">
         {waiting ? (
-          <>Editor stays open while the AI asks what it needs</>
+          <>Paused — answer the AI's questions in the chat and coding continues here</>
         ) : showTyping || busy ? (
           <>
             <Loader2 className="h-3.5 w-3.5 animate-spin" /> {showTyping ? `Writing ${snippet.file.split(".").pop()?.toUpperCase()} code…` : `Updating ${file?.name}…`}
