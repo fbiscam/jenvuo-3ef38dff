@@ -28,7 +28,7 @@ export function ChatSitePanel({ report, loading, domain, onClose }: { report: Si
         <button type="button" onClick={onClose} className="text-muted-foreground hover:text-foreground">Close</button>
       </div>
       {loading || !report ? (
-        <div className="flex flex-1 items-center justify-center text-[15px]"><Shimmer>Checking {domain}…</Shimmer></div>
+        <div className="flex flex-1 items-center justify-center text-[15px]"><Shimmer>{`Checking ${domain}…`}</Shimmer></div>
       ) : (
         <div className="chat-no-scrollbar min-h-0 flex-1 overflow-y-auto p-4">
           {report.error && <p className="mb-3 rounded-lg bg-muted px-3 py-2 text-[13px] text-foreground">{report.error}</p>}
