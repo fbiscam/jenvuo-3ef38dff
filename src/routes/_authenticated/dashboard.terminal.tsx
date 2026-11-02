@@ -9,7 +9,6 @@ import {
   History,
   ImagePlus,
   ListChecks,
-  Zap,
   Mic,
   Moon,
   Newspaper,
