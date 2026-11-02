@@ -274,8 +274,12 @@ function ChatPlayground() {
   const [uploaded, setUploaded] = useState<ChatAttachment | null>(null);
   const [reading, setReading] = useState(false);
   const [darkMenus, setDarkMenus] = useState(false);
-  // Editor files (max 4) and the open document live across replies.
+  // Editor files and the open document live across replies.
   const [workspace, setWorkspace] = useState<ReplyFile[]>([]);
+  // Replies arrive later, so they read the newest files (and a pending copy) from refs.
+  const workspaceRef = useRef<ReplyFile[]>([]);
+  workspaceRef.current = workspace;
+  const copyRef = useRef<{ from: string; to: string } | null>(null);
   const [activeFile, setActiveFile] = useState(0);
   const [doc, setDoc] = useState<ReplyDocument | null>(null);
   const [docOpen, setDocOpen] = useState(false);
@@ -487,18 +491,28 @@ function ChatPlayground() {
     {
       let limitNote: string | null = null;
       if (res.ok) {
-        const newFiles = extractReplyFiles(res.content);
+        // Latest open files (a copy made just before sending is already in here).
+        const current = workspaceRef.current;
+        const copy = copyRef.current;
+        copyRef.current = null;
+        let newFiles = extractReplyFiles(res.content);
+        // Changes asked for a fresh copy always land in the copy, never in the original.
+        if (copy) {
+          newFiles = newFiles.map((f, i) =>
+            f.name.toLowerCase() === copy.from.toLowerCase() || (newFiles.length === 1 && i === 0) ? { ...f, name: copy.to } : f,
+          );
+        }
         if (newFiles.length) {
           const lastUser = [...history].reverse().find((t) => t.role === "user");
           const otherItems = frameUsed({ ...frameNow, codeFiles: 0 });
           const room = Math.max(0, Math.min(CHAT_MAX_FILES, FRAME_MAX_ITEMS - otherItems));
-          const merged = mergeWorkspace(workspace, newFiles, Math.max(room, workspace.length), wantsNewFile(lastUser?.display ?? lastUser?.content ?? ""));
+          const merged = mergeWorkspace(current, newFiles, Math.max(room, current.length), !copy && wantsNewFile(lastUser?.display ?? lastUser?.content ?? ""));
           setWorkspace(merged.files);
-          const fresh = merged.files.findIndex((x) => !workspace.some((w) => w.name === x.name));
+          const fresh = merged.files.findIndex((x) => !current.some((w) => w.name === x.name));
           const changed = merged.files.findIndex((x) => newFiles.some((n) => n.name.toLowerCase() === x.name.toLowerCase()));
-          const askedIdx = findMentionedFile(lastUser?.display ?? lastUser?.content ?? "", merged.files.map((x) => x.name));
+          const askedIdx = copy ? merged.files.findIndex((x) => x.name === copy.to) : findMentionedFile(lastUser?.display ?? lastUser?.content ?? "", merged.files.map((x) => x.name));
           const activeChanged = merged.files[activeFile] && newFiles.some((n) => n.name.toLowerCase() === merged.files[activeFile]!.name.toLowerCase());
-          const first = fresh >= 0 ? fresh : askedIdx >= 0 ? askedIdx : activeChanged ? activeFile : changed;
+          const first = copy && askedIdx >= 0 ? askedIdx : fresh >= 0 ? fresh : askedIdx >= 0 ? askedIdx : activeChanged ? activeFile : changed;
           if (first >= 0) setActiveFile(first);
           if (merged.dropped.length)
             limitNote = `**${merged.dropped.join(", ")}** couldn't open: the frame is full (max ${FRAME_MAX_ITEMS} files, ${CHAT_MAX_FILES} of them code). Please remove one file with the ✕ on its tab, then try again.`;
