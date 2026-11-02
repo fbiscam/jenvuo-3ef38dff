@@ -716,43 +716,33 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
             )}
           >
             <AssetLogo asset={a} size={16} />
-            <span className="hidden 2xl:inline">{label}</span>
+            <span className="hidden lg:inline">{label}</span>
           </button>
         ))}
       </div>
-      <Popover>
-        <PopoverTrigger asChild>
-          <button type="button" aria-label="Timeframe" title="Timeframe" className={cn(railBtn, "text-gc-ink")}>
-            <Clock3 className="h-4 w-4" />
-            <span className="tabular-nums">{timeframe.label}</span>
-            <ChevronDown className="h-3.5 w-3.5 opacity-60" />
+      <div role="group" aria-label="Chart timeframe" className="flex shrink-0 items-center gap-0.5">
+        {timeframes.map((item) => (
+          <button
+            type="button"
+            key={item.key}
+            onClick={() => onTimeframeChange(item)}
+            aria-pressed={item.key === timeframe.key}
+            className={cn(
+              "h-7 rounded-md px-2 font-mono text-xs font-semibold text-muted-foreground transition-colors hover:bg-accent hover:text-foreground",
+              item.key === timeframe.key && "bg-accent text-foreground",
+            )}
+          >
+            {item.label}
           </button>
-        </PopoverTrigger>
-        <PopoverContent side="bottom" align="start" className={cn("w-56 p-1.5", popClass)}>
-          <p className="px-2 pb-1.5 pt-1 text-sm text-foreground">Timeframe · <span className="font-mono font-semibold">{timeframe.label}</span></p>
-          <div className="grid grid-cols-3 gap-1">
-            {timeframes.map((item) => (
-              <button
-                type="button"
-                key={item.key}
-                onClick={() => onTimeframeChange(item)}
-                aria-pressed={item.key === timeframe.key}
-                className={cn(
-                  "h-9 rounded-lg font-mono text-xs font-semibold text-muted-foreground hover:bg-accent hover:text-foreground",
-                  item.key === timeframe.key && "bg-gc-blue-soft text-gc-blue dark:bg-accent dark:text-foreground",
-                )}
-              >
-                {item.label}
-              </button>
-            ))}
-          </div>
-        </PopoverContent>
-      </Popover>
+        ))}
+      </div>
+      <span className="mx-1 h-5 w-px shrink-0 bg-gc-line" aria-hidden="true" />
       <Popover>
         <PopoverTrigger asChild>
           <button type="button" aria-label="Indicators" title="Indicators" className={railBtn}>
             <Activity className="h-4 w-4" />
             <span className="hidden xl:inline">Indicators</span>
+            {indicators.length > 0 && <span className="rounded bg-secondary px-1 font-mono text-[10px]">{indicators.length}</span>}
           </button>
         </PopoverTrigger>
         <PopoverContent side="bottom" align="start" className={cn("max-h-[80vh] w-80 overflow-y-auto sidebar-hover-scroll p-2", popClass)}>
@@ -763,13 +753,17 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
         <PopoverTrigger asChild>
           <button type="button" aria-label="Jenvu SMC" title="Jenvu SMC" className={railBtn}>
             <Layers className="h-4 w-4" />
-            <span className="hidden xl:inline">SMC</span>
+            <span className="hidden xl:inline">Jenvu SMC</span>
           </button>
         </PopoverTrigger>
         <PopoverContent side="bottom" align="start" className={cn("max-h-[80vh] w-80 overflow-y-auto sidebar-hover-scroll p-2", popClass)}>
           {smcMenu}
         </PopoverContent>
       </Popover>
+      <button type="button" onClick={() => setScriptPanelOpen((v) => !v)} aria-pressed={scriptPanelOpen} aria-label="Jenvu Script" title="Jenvu Script" className={cn(railBtn, scriptPanelOpen && "bg-accent text-foreground")}>
+        <Code className="h-4 w-4" />
+        <span className="hidden xl:inline">Jenvu Script</span>
+      </button>
       <span className="mx-1 h-5 w-px shrink-0 bg-gc-line" aria-hidden="true" />
       <button type="button" onClick={downloadSnapshot} aria-label="Download chart snapshot" title="Download chart snapshot" className={railBtn}>
         <Camera className="h-4 w-4" />
