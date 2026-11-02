@@ -244,6 +244,16 @@ function ChatPlayground() {
   const [maxTokens, setMaxTokens] = useState(1200);
   const [copied, setCopied] = useState<string | null>(null);
   const [votes, setVotes] = useState<Record<string, "up" | "down">>({});
+  const vote = (id: string, dir: "up" | "down") => {
+    const undo = votes[id] === dir;
+    setVotes((v) => {
+      const next = { ...v };
+      if (undo) delete next[id];
+      else next[id] = dir;
+      return next;
+    });
+    if (!undo) toast.success(dir === "up" ? "Thanks — glad this helped." : "Thanks — we'll use this to improve.");
+  };
   const [codeOpen, setCodeOpen] = useState(false);
   const [files, setFiles] = useState<ChatAttachment[]>([]);
   // The last file the user sent; it opens in its own tab of the work area.
@@ -978,11 +988,11 @@ function ChatPlayground() {
                         <span className="mr-auto min-w-0 truncate text-[12px] leading-none">
                           {t.model === "local" ? "Done in the editor" : "AI responses may include mistakes"}
                         </span>
-                        <ReplyBtn label="Good response" active={votes[t.id] === "up"} onClick={() => setVotes((v) => ({ ...v, [t.id]: "up" }))}>
-                          <ThumbsUp className="h-[18px] w-[18px]" />
+                        <ReplyBtn label="Good response" active={votes[t.id] === "up"} onClick={() => vote(t.id, "up")}>
+                          <ThumbsUp className="h-[18px] w-[18px]" fill={votes[t.id] === "up" ? "currentColor" : "none"} />
                         </ReplyBtn>
-                        <ReplyBtn label="Bad response" active={votes[t.id] === "down"} onClick={() => setVotes((v) => ({ ...v, [t.id]: "down" }))}>
-                          <ThumbsDown className="h-[18px] w-[18px]" />
+                        <ReplyBtn label="Bad response" active={votes[t.id] === "down"} onClick={() => vote(t.id, "down")}>
+                          <ThumbsDown className="h-[18px] w-[18px]" fill={votes[t.id] === "down" ? "currentColor" : "none"} />
                         </ReplyBtn>
                         <ReplyBtn label="Regenerate" disabled={busy} onClick={() => regenerate(t.id)}>
                           <RotateCw className="h-[18px] w-[18px]" />
@@ -1254,7 +1264,8 @@ function ReplyBtn({ label, active, disabled, onClick, children }: { label: strin
       title={label}
       disabled={disabled}
       onClick={onClick}
-      className={`flex h-8 w-8 items-center justify-center rounded-full transition-colors hover:bg-[var(--console-card)] hover:text-foreground disabled:opacity-40 ${active ? "text-foreground" : ""}`}
+      aria-pressed={active}
+      className={`flex h-8 w-8 items-center justify-center rounded-full transition-colors hover:bg-[var(--console-card)] hover:text-foreground disabled:opacity-40 ${active ? "bg-[var(--console-card)] text-foreground" : ""}`}
     >
       {children}
     </button>
