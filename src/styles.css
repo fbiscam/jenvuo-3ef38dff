@@ -2397,3 +2397,8 @@ html body :is(.dark, .dash-dark) .vsc-studio .tok-number { color: #c8f0a8 !impor
 html body :is(.dark, .dash-dark) .vsc-studio .tok-func { color: #fff08a !important; }
 html body :is(.dark, .dash-dark) .vsc-studio .tok-type { color: #4fe8c8 !important; }
 html body :is(.dark, .dash-dark) .vsc-studio .tok-var { color: #a8dcff !important; }
+
+/* Chat side frame: no scrollbar tracks or arrow buttons anywhere inside it (wheel/touch scroll still works). */
+.vsc-studio *, .code-box * { scrollbar-width: none; -ms-overflow-style: none; }
+.vsc-studio *::-webkit-scrollbar, .code-box *::-webkit-scrollbar,
+.vsc-studio *::-webkit-scrollbar-button, .code-box *::-webkit-scrollbar-button { display: none; width: 0; height: 0; }
