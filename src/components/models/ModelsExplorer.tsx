@@ -16,6 +16,9 @@ import zhipuLogo from "@/assets/model-logos/zhipu-color.svg";
 import bytedanceLogo from "@/assets/model-logos/bytedance-color.svg";
 import grokLogo from "@/assets/model-logos/grok.svg";
 import metaLogo from "@/assets/model-logos/meta-color.svg";
+import mistralLogo from "@/assets/model-logos/mistral-color.svg";
+import minimaxLogo from "@/assets/model-logos/minimax-color.svg";
+import nvidiaLogo from "@/assets/model-logos/nvidia-color.svg";
 import starsNebula from "@/assets/platform/stars-nebula.jpg";
 import starsPlain from "@/assets/platform/stars-plain.jpg";
 import {
@@ -35,6 +38,9 @@ const LOGOS: Record<ProviderKey, string> = {
   bytedance: bytedanceLogo,
   xai: grokLogo,
   meta: metaLogo,
+  mistral: mistralLogo,
+  minimax: minimaxLogo,
+  nvidia: nvidiaLogo,
 };
 
 // Black single-colour marks: flip to white on the black theme so they stay visible.
