@@ -737,7 +737,6 @@ function ChatPlayground() {
           ...(site ? ["site" as const] : []),
         ];
         const front = ids.some((id) => id === pane) ? pane : (ids[0] ?? "code");
-        const used = frameUsed(frameNow);
         const twoWords = (t: string) => t.split(/\s+/).filter(Boolean).slice(0, 2).join(" ");
         const extraTabs: StudioTab[] = [
           ...(showImage ? [{ id: "image", label: "Image", icon: "image" as const, active: front === "image", onOpen: () => setPane("image"), onClose: () => setImageView(null) }] : []),
