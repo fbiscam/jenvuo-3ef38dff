@@ -277,7 +277,22 @@ function ChatPlayground() {
   }, []);
   const menuTheme = darkMenus ? "dark" : "";
 
+  // Follow new messages only when the reader is already at the bottom.
+  const [awayFromBottom, setAwayFromBottom] = useState(false);
+  const awayRef = useRef(false);
   useEffect(() => {
+    const el = scroller.current;
+    if (!el) return;
+    const onScroll = () => {
+      const away = el.scrollHeight - el.scrollTop - el.clientHeight > 120;
+      awayRef.current = away;
+      setAwayFromBottom(away);
+    };
+    el.addEventListener("scroll", onScroll, { passive: true });
+    return () => el.removeEventListener("scroll", onScroll);
+  }, []);
+  useEffect(() => {
+    if (awayRef.current) return;
     scroller.current?.scrollTo({ top: scroller.current.scrollHeight, behavior: "smooth" });
   }, [turns, busy]);
 
@@ -780,12 +795,20 @@ function ChatPlayground() {
                           </div>
                         );
                       })()}
-                      <div className="mt-5 flex items-center gap-1 text-muted-foreground">
+                      {t.model !== "local" && (() => {
+                        const cm = getCatalogModel(t.model ?? "");
+                        return (
+                          <div className="mt-4 flex flex-wrap items-center gap-2 text-[12px] text-muted-foreground">
+                            {cm && <ProviderLogo provider={cm.provider} size="sm" />}
+                            <span className="font-medium text-foreground">{cm?.name ?? t.model}</span>
+                            {typeof t.tokens === "number" && <span className="rounded-full bg-[var(--console-card)] px-2 py-0.5 tabular-nums text-foreground">{t.tokens.toLocaleString()} tokens</span>}
+                            <span className="tabular-nums">{((t.ms ?? 0) / 1000).toFixed(1)}s</span>
+                          </div>
+                        );
+                      })()}
+                      <div className="mt-2 flex items-center gap-1 text-muted-foreground">
                         <span className="mr-auto min-w-0 truncate text-[12px]">
                           {t.model === "local" ? "Done in the editor" : "AI responses may include mistakes"}
-                          {t.model !== "local" && (
-                            <span className="hidden sm:inline"> · {getCatalogModel(t.model ?? "")?.name ?? t.model} · {t.tokens?.toLocaleString()} tokens · {((t.ms ?? 0) / 1000).toFixed(1)}s</span>
-                          )}
                         </span>
                         <ReplyBtn label="Good response" active={votes[t.id] === "up"} onClick={() => setVotes((v) => ({ ...v, [t.id]: "up" }))}>
                           <ThumbsUp className="h-[18px] w-[18px]" />
@@ -824,6 +847,18 @@ function ChatPlayground() {
                 </div>
               </div>
             )}
+          </div>
+        )}
+        {awayFromBottom && turns.length > 0 && (
+          <div className="pointer-events-none sticky bottom-3 flex justify-center">
+            <button
+              type="button"
+              aria-label="Scroll to latest message"
+              onClick={() => scroller.current?.scrollTo({ top: scroller.current.scrollHeight, behavior: "smooth" })}
+              className="pointer-events-auto grid h-9 w-9 place-items-center rounded-full border border-border bg-background text-foreground shadow-md hover:bg-muted"
+            >
+              <ChevronDown className="h-5 w-5" />
+            </button>
           </div>
         )}
       </div>
