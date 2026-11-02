@@ -708,6 +708,8 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
             key={a}
             type="button"
             aria-pressed={asset === a}
+            aria-label={label}
+            title={label}
             onClick={() => onAssetChange?.(a)}
             className={cn(
               "inline-flex h-7 items-center gap-1.5 rounded-md px-2 font-mono text-xs font-semibold text-muted-foreground hover:text-foreground",
