@@ -334,7 +334,7 @@ export default function ModelsExplorer({ apiHref = "/dashboard/api" }: { apiHref
               return (
                 <div key={id} className="console-card p-5">
                   <div className="flex items-start justify-between gap-3">
-                    <h3 className="flex items-center gap-2 text-[15px] font-medium text-foreground"><ProviderLogo provider={m.provider} size="sm" />{m.name} <StatusBadge live={live} id={m.id} /></h3>
+                    <h3 className="flex items-center gap-2 text-[15px] font-medium text-foreground"><ProviderLogo provider={m.provider} bare />{m.name} <StatusBadge live={live} id={m.id} /></h3>
                     <p className="shrink-0 text-[13px] text-muted-foreground">
                       {i < 2 && <span className="mr-2 text-[#f97316]">New</span>}
                       Context <span className="text-foreground">{formatContext(m.context)}</span>
