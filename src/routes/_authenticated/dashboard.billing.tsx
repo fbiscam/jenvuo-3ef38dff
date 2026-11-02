@@ -7,16 +7,6 @@ import { useTrial } from "@/hooks/useTrial";
 import { cancelMyPlan } from "@/lib/subscription.functions";
 import { redeemFreeCode } from "@/lib/payments.functions";
 import InvoiceHistory from "@/components/billing/InvoiceHistory";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
 import { Info } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/dashboard/billing")({
@@ -104,9 +94,7 @@ function Billing() {
       }
       setCancelDialogOpen(false);
       await credits.refresh();
-      toast.success("Plan cancelled", {
-        description: `Your paid features were removed${Number(result.credits_removed ?? 0) > 0 ? ` and $${Number(result.credits_removed).toFixed(2)} in credits were forfeited` : ""}.`,
-      });
+      toast.success("Plan cancelled");
     } catch (error) {
       toast.error("Could not cancel your plan", {
         description: error instanceof Error ? error.message : "Please try again.",
@@ -237,31 +225,39 @@ function Billing() {
         </div>
       </section>
 
-      <AlertDialog open={cancelDialogOpen} onOpenChange={(open) => !cancellingPlan && setCancelDialogOpen(open)}>
-        <AlertDialogContent className="max-w-md rounded-xl border-zinc-200 bg-white">
-          <AlertDialogHeader>
-            <AlertDialogTitle className="text-zinc-900">Cancel your plan?</AlertDialogTitle>
-            <AlertDialogDescription className="space-y-3 text-zinc-600">
-              <span className="block">This action takes effect immediately. You will lose your remaining credits and all paid plan features.</span>
-              <span className="block font-medium text-rose-600">Your current ${Number(remaining).toFixed(2)} credit balance will become $0.00.</span>
-              <span className="block">Are you sure you want to continue?</span>
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={cancellingPlan}>Keep plan</AlertDialogCancel>
-            <AlertDialogAction
-              disabled={cancellingPlan}
-              onClick={(event) => {
-                event.preventDefault();
-                void handleCancelPlan();
-              }}
-              className="bg-rose-600 text-white hover:bg-rose-700"
-            >
-              {cancellingPlan ? "Cancelling…" : "Cancel plan permanently"}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      {/* Toast-style confirm (same look as the "copied" notice). Plain fixed
+          element on purpose: a modal dialog locks page scroll, which made the
+          Billing page jump when "Cancel plan" was clicked. */}
+      {cancelDialogOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-start justify-center px-4 pt-24 sm:justify-end sm:pr-6"
+          onMouseDown={(e) => { if (e.target === e.currentTarget && !cancellingPlan) setCancelDialogOpen(false); }}
+          onKeyDown={(e) => { if (e.key === "Escape" && !cancellingPlan) setCancelDialogOpen(false); }}
+        >
+          <div
+            role="alertdialog"
+            aria-modal="false"
+            aria-labelledby="cancel-plan-title"
+            className="w-full max-w-[380px] animate-in fade-in-0 slide-in-from-top-2 rounded-2xl border border-border bg-background p-4 text-foreground shadow-[0_4px_14px_rgba(0,0,0,0.08)]"
+          >
+            <div className="flex items-start gap-2.5">
+              <span className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-destructive text-[11px] font-bold leading-none text-destructive-foreground">!</span>
+              <div className="min-w-0 text-[13px]">
+                <p id="cancel-plan-title" className="font-medium">Cancel your plan?</p>
+                <p className="mt-1 text-muted-foreground">Takes effect now. Paid features end and your ${Number(remaining).toFixed(2)} credit becomes $0.00.</p>
+              </div>
+            </div>
+            <div className="mt-3 flex justify-end gap-2">
+              <button type="button" autoFocus disabled={cancellingPlan} onClick={() => setCancelDialogOpen(false)} className="inline-flex h-8 items-center rounded-full border border-border bg-background px-3.5 text-[13px] text-foreground transition-colors hover:bg-secondary disabled:opacity-50">
+                Keep plan
+              </button>
+              <button type="button" disabled={cancellingPlan} onClick={() => void handleCancelPlan()} className="inline-flex h-8 items-center rounded-full bg-destructive px-3.5 text-[13px] font-medium text-destructive-foreground transition-opacity hover:opacity-90 disabled:opacity-50">
+                {cancellingPlan ? "Cancelling…" : "Cancel plan"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Payment details */}
       <section className="mt-12">

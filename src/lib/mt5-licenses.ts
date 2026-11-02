@@ -86,6 +86,7 @@ export function evaluateIpLicense(enteredIp: string, callerIp: string, account: 
   if (b.account && b.account !== account) return { valid: false, reason: "account_mismatch" };
   const plan = String(sub?.plan_id || "").toLowerCase();
   if (!sub || !isPaidBotSub(sub, now)) return { valid: false, reason: sub?.plan_id && plan !== "free" && !sub?.is_trial ? "expired" : "no_plan" };
+  if (!isMt5Plan(plan)) return { valid: false, reason: "no_plan" };
   const t = targetsFor(plan, lic.user_id);
   return {
     valid: true,
