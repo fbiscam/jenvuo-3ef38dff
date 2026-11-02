@@ -196,7 +196,7 @@ function JxBotPage() {
 
       {access && !access.allowed && (
         <div className="console-card mt-4 flex flex-wrap items-center justify-between gap-3 px-5 py-4 text-[14px] text-foreground">
-          <span>JX Bot is included with Pro, Elite or Ultra, and free for 14 days with the free trial. Credit alone does not unlock it.</span>
+          <span>JX Bot unlocks only with an active paid plan (Pro, Elite or Ultra). Free trial and credit do not unlock it.</span>
           <Link to="/dashboard/billing" className="console-pill console-pill-solid">Buy now</Link>
         </div>
       )}
