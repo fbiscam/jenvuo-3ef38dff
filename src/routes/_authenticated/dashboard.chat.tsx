@@ -652,7 +652,7 @@ function ChatPlayground() {
       )}
       <div className={studio ? "flex min-h-0 w-full flex-col lg:w-[480px] lg:shrink-0" : "contents"}>
       {/* Conversation / examples */}
-      <div ref={scroller} className="scroll-on-hover mt-1 min-h-0 flex-1 overflow-y-auto pr-2">
+      <div ref={scroller} className="chat-no-scrollbar mt-1 min-h-0 flex-1 overflow-y-auto">
         {turns.length === 0 ? (
           <div className="flex flex-col pt-6 pb-2">
             <div className="text-center">
