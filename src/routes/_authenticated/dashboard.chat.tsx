@@ -462,8 +462,9 @@ function ChatPlayground() {
     }
   };
 
-  const submit = async () => {
-    const typed = input.trim();
+  // `override` sends a clicked suggestion right away, without the message box.
+  const submit = async (override?: string) => {
+    const typed = (override ?? input).trim();
     if ((!typed && !files.length) || busy || reading) return;
     if (!files.length && looksLikeImageRequest(typed)) {
       await makeImage(typed);
@@ -702,7 +703,7 @@ function ChatPlayground() {
                   <img src={uploaded.url} alt={uploaded.name} className="max-h-full max-w-full rounded-lg object-contain" />
                 </div>
               ) : (
-                <pre className="min-h-0 flex-1 overflow-auto whitespace-pre-wrap break-words p-4 font-mono text-[13px] leading-relaxed">{uploaded.text}</pre>
+                <pre className="chat-no-scrollbar min-h-0 flex-1 overflow-auto whitespace-pre-wrap break-words p-4 font-mono text-[13px] leading-relaxed">{uploaded.text}</pre>
               )
             ) : front === "image" && imageView ? (
               <ChatImagePanel view={imageView} onDownload={(url) => downloadImage(url, imageView.prompt)} />
@@ -882,8 +883,8 @@ function ChatPlayground() {
                                 key={c}
                                 type="button"
                                 onClick={() => {
-                                  setInput(c);
-                                  box.current?.focus();
+                                  setInput("");
+                                  void submit(c);
                                 }}
                                 className="w-fit max-w-full rounded-2xl border border-dashed border-foreground/30 px-4 py-2 text-left text-[14px] text-foreground hover:border-foreground/60 hover:bg-[var(--console-card)]"
                               >

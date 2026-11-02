@@ -121,7 +121,7 @@ export function ChatDocView({ doc, busy, menuTheme, onClose, embedded = false }:
           </button>
         )}
       </div>
-      <div className="min-h-0 min-w-0 flex-1 overflow-y-auto overflow-x-hidden px-3 pb-3 sm:px-6">
+      <div className="chat-no-scrollbar min-h-0 min-w-0 flex-1 overflow-y-auto overflow-x-hidden px-3 pb-3 sm:px-6">
         <article className="chat-doc mx-auto w-full max-w-[760px] rounded-lg px-6 py-8 sm:px-12 sm:py-10" dangerouslySetInnerHTML={{ __html: html }} />
       </div>
     </div>
