@@ -2350,9 +2350,10 @@ html body .jenvu-zoom-dashboard main .jx-ide :is(.jx-ide-card) { border-radius: 
 .chat-doc table { display: block; overflow-x: auto; table-layout: auto; font-size: 12.5px; line-height: 1.45; scrollbar-width: none; }
 .chat-doc table::-webkit-scrollbar { display: none; }
 /* Table cells keep whole words on proper lines (no letter-by-letter wrapping); the table slides sideways instead. */
-.chat-doc th, .chat-doc td { overflow-wrap: normal; word-break: normal; hyphens: none; min-width: 110px; max-width: 260px; padding: 7px 10px; }
+.chat-doc th, .chat-doc td { overflow-wrap: normal; word-break: normal; hyphens: none; max-width: 240px; padding: 7px 10px; }
+.chat-doc td:last-child, .chat-doc td a { white-space: nowrap; }
 .chat-doc th { white-space: nowrap; }
-.chat-doc td a { overflow-wrap: anywhere; }
+
 .chat-doc pre { white-space: pre-wrap; overflow-x: auto; max-width: 100%; }
 .chat-doc img { max-width: 100%; height: auto; }
 

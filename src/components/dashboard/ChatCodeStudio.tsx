@@ -208,13 +208,13 @@ export function ChatCodeStudio({ files, busy, kind, seed, active, onActive, onDo
           </div>
         ))}
       </div>
-      {(waiting || showTyping || busy) && (
+      {(waiting || showTyping) && (
       <div className="vsc-status flex items-center gap-2 px-4 py-1.5 text-[12px]">
         {waiting ? (
           <>Paused — answer the AI's questions in the chat and coding continues here</>
         ) : (
           <>
-            <Loader2 className="h-3.5 w-3.5 animate-spin" /> {showTyping ? `Writing ${snippet.file.split(".").pop()?.toUpperCase()} code…` : `Updating ${file?.name}…`}
+            <Loader2 className="h-3.5 w-3.5 animate-spin" /> {`Writing ${snippet?.file.split(".").pop()?.toUpperCase()} code…`}
           </>
         )}
       </div>
