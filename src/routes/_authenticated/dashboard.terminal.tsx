@@ -9,6 +9,7 @@ import {
   History,
   ImagePlus,
   ListChecks,
+  Zap,
   Mic,
   Moon,
   Newspaper,
@@ -328,7 +329,7 @@ function TerminalPage() {
   const [panelsOpen, setPanelsOpen] = useState(true);
   // The watchlist fills the right side whenever the AI desk is closed.
   // Watchlist removed at user request; chart uses the full width.
-  const showWatchlist = false as boolean;
+  const showWatchlist = watchlistOpen && !deskOpen;
   const chartRef = useRef<JenvuChartHandle | null>(null);
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<ChatMsg[]>([]);
@@ -717,8 +718,8 @@ function TerminalPage() {
               asset={asset}
               onAssetChange={changeAsset}
               theme={theme}
-              sidePanelOpen={panelsOpen}
-              rightPanelOpen={panelsOpen && !deskOpen}
+              sidePanelOpen={false}
+              rightPanelOpen={false}
               onSidePanelOpenChange={setPanelsOpen}
               onTimeframeChange={(next) => {
                 const match = TIMEFRAMES.find((item) => item.key === next.key);
@@ -750,6 +751,28 @@ function TerminalPage() {
                     {formatCountdown(secondsLeft)}
                     {marketClosed && <span className="hidden font-normal text-gc-ink-muted xl:inline">Market closed</span>}
                   </div>
+                  <button
+                    type="button"
+                    onClick={() => setDeskOpen((v) => !v)}
+                    aria-pressed={deskOpen}
+                    className="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 px-3 text-[12px] font-semibold text-primary-foreground shadow-sm transition-opacity hover:opacity-90"
+                  >
+                    <Zap className="h-3.5 w-3.5" />
+                    Ask With AI
+                  </button>
+                  {!deskOpen && (
+                    <button
+                      type="button"
+                      onClick={() => setWatchlistOpen((v) => !v)}
+                      aria-pressed={watchlistOpen}
+                      title={watchlistOpen ? "Hide watchlist" : "Show watchlist"}
+                      aria-label={watchlistOpen ? "Hide watchlist" : "Show watchlist"}
+                      className="hidden h-8 shrink-0 items-center gap-1.5 rounded-full px-2.5 text-[12px] font-medium text-gc-ink-muted transition-colors hover:bg-gc-console-search hover:text-gc-ink dark:text-muted-foreground dark:hover:bg-accent lg:inline-flex"
+                    >
+                      <ListChecks className="h-4 w-4" />
+                      <span className="hidden xl:inline">Watchlist</span>
+                    </button>
+                  )}
                 </>
               }
               rightSlot={
