@@ -54,17 +54,19 @@ type Props = {
   onDownload: (f: ReplyFile) => void;
   onRename: (from: string, to: string) => void;
   onRemove: (name: string) => void;
+  onClose?: () => void;
 };
 
-/** Code editor shown beside the chat: up to 4 files, rename by double-click, red ✕ removes. */
-export function ChatCodeStudio({ files, busy, kind, seed, active, onActive, onDownload, onRename, onRemove }: Props) {
+/** Code editor shown beside the chat: up to 2 files, rename by double-click, red ✕ removes. */
+export function ChatCodeStudio({ files, busy, kind, seed, active, onActive, onDownload, onRename, onRemove, onClose }: Props) {
   const [copied, setCopied] = useState(false);
   const [editing, setEditing] = useState<string | null>(null);
   const [draft, setDraft] = useState("");
   const nameInput = useRef<HTMLInputElement>(null);
   const variants = SNIPPETS[kind];
   const snippet = variants[seed % variants.length];
-  const showTyping = !files.length;
+  const showTyping = !files.length && busy;
+  const waiting = !files.length && !busy;
   const typed = useTyped(snippet.lines, showTyping);
   const file = files[Math.min(active, files.length - 1)];
   const code = showTyping ? typed : file?.code ?? "";
@@ -95,7 +97,9 @@ export function ChatCodeStudio({ files, busy, kind, seed, active, onActive, onDo
     <div className="code-box flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl">
       <div className="flex items-center gap-2 border-b border-current/10 px-2 py-2">
         <div className="flex min-w-0 flex-1 gap-1 overflow-x-auto">
-          {showTyping ? (
+          {waiting ? (
+            <span className="px-2 py-1.5 text-[13px] opacity-60">Code editor</span>
+          ) : showTyping ? (
             <span className="code-tab is-active inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-[13px] font-medium">
               <FileCode2 className="h-4 w-4 opacity-70" /> {snippet.file}
             </span>
@@ -161,6 +165,17 @@ export function ChatCodeStudio({ files, busy, kind, seed, active, onActive, onDo
           </div>
         )}
       </div>
+      {waiting ? (
+        <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-2 px-8 text-center">
+          <FileCode2 className="h-6 w-6 opacity-50" />
+          <p className="text-[14px] opacity-80">Answer the questions in the chat — your code will be written here.</p>
+          {onClose && (
+            <button type="button" onClick={onClose} className="mt-2 rounded-full px-3 py-1 text-[12px] opacity-60 ring-1 ring-current/20 hover:opacity-100">
+              Close editor
+            </button>
+          )}
+        </div>
+      ) : (
       <div className="min-h-0 flex-1 overflow-auto py-3 font-mono text-[13.5px] leading-[1.7]">
         {lines.map((l, i) => (
           <div key={i} className="flex">
@@ -172,8 +187,11 @@ export function ChatCodeStudio({ files, busy, kind, seed, active, onActive, onDo
           </div>
         ))}
       </div>
+      )}
       <div className="flex items-center gap-2 border-t border-current/10 px-4 py-2 text-[12px] opacity-70">
-        {showTyping || busy ? (
+        {waiting ? (
+          <>Editor stays open while the AI asks what it needs</>
+        ) : showTyping || busy ? (
           <>
             <Loader2 className="h-3.5 w-3.5 animate-spin" /> {showTyping ? `Writing ${snippet.file.split(".").pop()?.toUpperCase()} code…` : `Updating ${file?.name}…`}
           </>

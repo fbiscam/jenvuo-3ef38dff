@@ -33,10 +33,13 @@ type TurnLike = SavedTurn & { files?: { name: string; kind: "image" | "doc"; url
 
 /** What is stored: images are dropped (only their names stay) and old turns trimmed. */
 export function toSavedSession(s: Omit<ChatSession, "turns"> & { turns: TurnLike[] }): ChatSession {
-  const turns = s.turns.slice(-CHAT_SESSION_MAX_TURNS).map(({ files, ...t }) => ({
+  const turns = s.turns.slice(-CHAT_SESSION_MAX_TURNS).map(({ files, ...rest }) => {
+    const { image: _image, imageFinal: _final, ...t } = rest as typeof rest & { image?: string; imageFinal?: boolean };
+    return {
     ...t,
     ...(files?.length ? { files: files.map((f) => ({ name: f.name, kind: f.kind })) } : {}),
-  }));
+    };
+  });
   return { ...s, turns, activeFile: Math.max(0, Math.min(s.activeFile, s.workspace.length - 1)) };
 }
 
