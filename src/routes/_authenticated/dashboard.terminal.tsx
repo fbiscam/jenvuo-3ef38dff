@@ -737,9 +737,9 @@ function TerminalPage() {
                     }
                     aria-label={theme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
                     title={theme === "dark" ? "Light theme" : "Dark theme"}
-                    className="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full px-2.5 text-[13px] font-medium text-gc-ink-muted transition-colors hover:bg-gc-console-search hover:text-gc-ink dark:text-muted-foreground dark:hover:bg-accent w-8 justify-center px-0"
+                    className="terminal-theme-btn inline-flex shrink-0 items-center justify-center rounded-full border border-border bg-gc-console-search text-gc-ink transition-colors hover:bg-accent dark:bg-accent dark:text-foreground"
                   >
-                    {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+                    {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
                   </button>
                   <div
                     className="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full bg-gc-console-search px-2.5 text-[12px] font-semibold tabular-nums text-gc-ink dark:bg-accent dark:text-foreground"
