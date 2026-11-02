@@ -141,7 +141,7 @@ export default function DashboardTopBar({
         type="button"
         onClick={onMenu}
         aria-label="Open menu"
-        className={`${onTerminal ? "inline-flex lg:hidden" : pinned ? "inline-flex lg:hidden" : "inline-flex"} h-10 w-10 shrink-0 items-center justify-center rounded-full text-gc-ink-muted hover:bg-gc-notice`}
+        className={`${onTerminal ? "hidden" : pinned ? "inline-flex lg:hidden" : "inline-flex"} h-10 w-10 shrink-0 items-center justify-center rounded-full text-gc-ink-muted hover:bg-gc-notice`}
       >
         <Menu className="h-5 w-5" />
       </button>
