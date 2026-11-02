@@ -122,16 +122,16 @@ import xaiLogo from "@/assets/xai-logo.png";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "AI Trading for Gold, BTC/USD & EUR/USD — Jenvu" },
+      { title: "Jenvu: AI Trading Platform | API, JX Bot & Live Terminal" },
       {
         name: "description",
         content:
-          "Jenvu is an AI trading terminal for live ICT/SMC analysis of Gold (XAU/USD), BTC/USD and EUR/USD with precise entries, stops, targets and mandatory senior review on eligible plans.",
+          "One platform. Endless market intelligence. Ask the AI, read live charts in the Terminal, run JX Bot and connect the developer API, all in one workspace.",
       },
-      { property: "og:title", content: "AI Trading for Gold, BTC/USD & EUR/USD — Jenvu" },
+      { property: "og:title", content: "Jenvu: AI Trading Platform | API, JX Bot & Live Terminal" },
       {
         property: "og:description",
-        content: "Analyze Gold, BTC/USD and EUR/USD charts with institutional ICT/SMC logic, chart-aware AI and reviewed trade signals.",
+        content: "Ask the AI, read live charts in the Terminal, run JX Bot and connect the developer API, all in one workspace.",
       },
       { property: "og:url", content: "https://jenvu.com/" },
       { property: "og:type", content: "website" },
@@ -147,7 +147,7 @@ export const Route = createFileRoute("/")({
           applicationCategory: "FinanceApplication",
           operatingSystem: "Web",
           description:
-            "AI trading terminal with institutional ICT/SMC analysis and reviewed signals for Gold, BTC/USD and EUR/USD.",
+            "AI trading platform with a live Terminal, JX Bot and a developer API.",
           offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
         }),
       },
