@@ -700,7 +700,8 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
 
 
   const rail = (
-    <nav aria-label="Chart tools" className="flex min-w-0 flex-1 items-center gap-0.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+    <nav aria-label="Chart tools" className="flex min-w-0 flex-1 items-center gap-0.5">
+      <div className="flex min-w-0 flex-1 items-center gap-0.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
       <div role="group" aria-label="Pair" className="mr-1 flex shrink-0 items-center gap-0.5 rounded-lg bg-muted/60 p-0.5">
         {CHART_ASSETS.map(({ symbol: a, label }) => (
           <button
@@ -714,7 +715,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
             )}
           >
             <AssetLogo asset={a} size={16} />
-            {label}
+            <span className="hidden 2xl:inline">{label}</span>
           </button>
         ))}
       </div>
@@ -791,6 +792,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
       <button type="button" onClick={() => void toggleFullscreen()} aria-label={fullscreen ? "Exit fullscreen chart" : "Fullscreen chart"} title={fullscreen ? "Exit fullscreen" : "Fullscreen chart"} className={railBtn}>
         {fullscreen ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
       </button>
+      </div>
       {railSlot && <div className="ml-auto flex shrink-0 items-center gap-0.5 pl-2">{railSlot}</div>}
     </nav>
   );
