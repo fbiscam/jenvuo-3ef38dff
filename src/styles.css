@@ -2355,21 +2355,42 @@ html body .jenvu-zoom-dashboard main .jx-ide :is(.jx-ide-card) { border-radius: 
 .chat-no-scrollbar::-webkit-scrollbar { display: none; width: 0; height: 0; }
 
 /* VS Code Dark+ look for the chat code studio (all themes) */
-html body .code-box.vsc-studio { background: #1e1e1e !important; color: #d4d4d4 !important; border-color: #2b2b2b; }
-html body .vsc-studio > div:first-child { background: #252526; border-color: #2b2b2b !important; }
-html body .vsc-studio .code-tab { color: #969696; }
-html body .vsc-studio .code-tab.is-active { background: #1e1e1e; color: #ffffff; box-shadow: inset 0 2px 0 #007acc; }
-html body .vsc-studio .code-box-copy { color: #c5c5c5; }
-html body .vsc-studio .vsc-line:hover { background: #2a2d2e; }
-html body .vsc-studio .vsc-line > span:first-child { color: #858585; opacity: 1; }
-html body .vsc-studio .vsc-status { background: #007acc; color: #ffffff; }
+/* Code area: white in the white theme, VS Code dark in the black theme, slightly brighter colours. */
+html body .code-box.vsc-studio { background: #ffffff !important; color: #1f2328 !important; border-color: #e5e7eb; }
+html body .vsc-studio > div:first-child { background: #f8fafc; border-color: #e5e7eb !important; }
+html body .vsc-studio .code-tab { color: #57606a; }
+html body .vsc-studio .code-tab.is-active { background: #ffffff; color: #111111; box-shadow: inset 0 2px 0 #0a84ff; }
+html body .vsc-studio .code-box-copy, html body .vsc-studio .vsc-count { color: #57606a; }
+html body .vsc-studio .vsc-line:hover { background: #f3f6fa; }
+html body .vsc-studio .vsc-line > span:first-child { color: #8c959f; opacity: 1; }
+html body .vsc-studio .vsc-status { background: #0a84ff; color: #ffffff; }
 html body .vsc-studio .vsc-status * { color: #ffffff !important; }
-html body .vsc-studio .tok-comment { color: #6a9955 !important; font-style: italic; }
-html body .vsc-studio .tok-string { color: #ce9178 !important; }
-html body .vsc-studio .tok-env { color: #4fc1ff !important; }
-html body .vsc-studio .tok-keyword { color: #c586c0 !important; }
-html body .vsc-studio .tok-const { color: #569cd6 !important; }
-html body .vsc-studio .tok-number { color: #b5cea8 !important; }
-html body .vsc-studio .tok-func { color: #dcdcaa !important; }
-html body .vsc-studio .tok-type { color: #4ec9b0 !important; }
-html body .vsc-studio .tok-var { color: #9cdcfe !important; }
+html body .vsc-studio .tok-comment { color: #1a8f3c !important; font-style: italic; }
+html body .vsc-studio .tok-string { color: #d1242f !important; }
+html body .vsc-studio .tok-env { color: #0969da !important; }
+html body .vsc-studio .tok-keyword { color: #a626d6 !important; }
+html body .vsc-studio .tok-const { color: #0550ff !important; }
+html body .vsc-studio .tok-number { color: #0a7d5a !important; }
+html body .vsc-studio .tok-func { color: #b35900 !important; }
+html body .vsc-studio .tok-type { color: #0b8a8f !important; }
+html body .vsc-studio .tok-var { color: #0b4fa8 !important; }
+html body :is(.dark, .dash-dark) .code-box.vsc-studio { background: #1e1e1e !important; color: #e6e6e6 !important; border-color: #2b2b2b; }
+html body :is(.dark, .dash-dark) .vsc-studio > div:first-child { background: #252526; border-color: #2b2b2b !important; }
+html body :is(.dark, .dash-dark) .vsc-studio .code-tab,
+html body :is(.dark, .dash-dark) .vsc-studio .code-tab.is-active,
+html body :is(.dark, .dash-dark) .vsc-studio .code-tab *,
+html body :is(.dark, .dash-dark) .vsc-studio .vsc-count,
+html body :is(.dark, .dash-dark) .vsc-studio .code-box-copy { color: #ffffff !important; opacity: 1 !important; }
+html body :is(.dark, .dash-dark) .vsc-studio .code-tab.is-active { background: #1e1e1e; box-shadow: inset 0 2px 0 #3794ff; }
+html body :is(.dark, .dash-dark) .vsc-studio .vsc-line:hover { background: #2a2d2e; }
+html body :is(.dark, .dash-dark) .vsc-studio .vsc-line > span:first-child { color: #ffffff; opacity: .85; }
+html body :is(.dark, .dash-dark) .vsc-studio .vsc-status { background: #007acc; }
+html body :is(.dark, .dash-dark) .vsc-studio .tok-comment { color: #7fd36b !important; }
+html body :is(.dark, .dash-dark) .vsc-studio .tok-string { color: #ffa47a !important; }
+html body :is(.dark, .dash-dark) .vsc-studio .tok-env { color: #5cd2ff !important; }
+html body :is(.dark, .dash-dark) .vsc-studio .tok-keyword { color: #e28cff !important; }
+html body :is(.dark, .dash-dark) .vsc-studio .tok-const { color: #6cb6ff !important; }
+html body :is(.dark, .dash-dark) .vsc-studio .tok-number { color: #c8f0a8 !important; }
+html body :is(.dark, .dash-dark) .vsc-studio .tok-func { color: #fff08a !important; }
+html body :is(.dark, .dash-dark) .vsc-studio .tok-type { color: #4fe8c8 !important; }
+html body :is(.dark, .dash-dark) .vsc-studio .tok-var { color: #a8dcff !important; }
