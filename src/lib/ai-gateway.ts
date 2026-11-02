@@ -80,7 +80,10 @@ function providerConfigured(model: string): boolean {
   // OmniRoute is the sole inference provider. Credential validation happens
   // inside the request attempt so a missing deployment binding is reported
   // accurately instead of being mistaken for an empty model chain.
-  return model.startsWith("omniroute/") || model.startsWith("codecraft/") || model.startsWith("aws/");
+  return (
+    model.startsWith("omniroute/") || model.startsWith("codecraft/") || model.startsWith("aws/") ||
+    (model.startsWith("lovable/") && !!process.env.LOVABLE_API_KEY)
+  );
 }
 
 // -------- Per-worker model health cache -----------------------------------
@@ -136,6 +139,10 @@ async function singleAttemptInner(
   opts: CallChatOptions,
   signal?: AbortSignal,
 ): Promise<{ content: string; usage: UsageInfo }> {
+  if (model.startsWith("lovable/")) {
+    const r = await callLovableModel(model.slice("lovable/".length), opts, signal);
+    return { content: r.content, usage: r.usage };
+  }
   const isCodeCraft = model.startsWith("codecraft/");
   const isAws = model.startsWith("aws/");
   if (!isCodeCraft && !isAws && !model.startsWith("omniroute/")) {
