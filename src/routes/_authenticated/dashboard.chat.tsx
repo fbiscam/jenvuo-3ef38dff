@@ -45,7 +45,7 @@ import { readSiteTheme, SITE_THEME_EVENT } from "@/lib/site-theme";
 import { highlight } from "@/components/dashboard/CodeHighlight";
 import { MIXED_CATALOG, PROVIDERS, PRICE_PER_MILLION, formatContext, getCatalogModel } from "@/lib/model-catalog";
 import { playgroundChat } from "@/lib/playground.functions";
-import { PLAYGROUND_DEFAULT_MODEL, PLAYGROUND_MAX_IMAGES, PLAYGROUND_MAX_TOKENS, type PlaygroundTurn } from "@/lib/playground";
+import { PLAYGROUND_DEFAULT_MODEL, PLAYGROUND_MAX_TOKENS, type PlaygroundTurn } from "@/lib/playground";
 import { DOC_ACCEPT, IMAGE_ACCEPT, composeMessage, readAttachment, type ChatAttachment } from "@/components/dashboard/chat-attachments";
 import {
   CHAT_MAX_FILES,
@@ -519,6 +519,7 @@ function ChatPlayground() {
   const newChat = () => {
     setTurns([]);
     setWorkspace([]);
+    setUploaded(null);
     setActiveFile(0);
     setDoc(null);
     setDocOpen(false);
@@ -1009,8 +1010,8 @@ function ChatPlayground() {
             aria-label="Message"
             className="max-h-40 min-h-[28px] w-full resize-none bg-transparent text-[16px] text-foreground outline-none placeholder:text-muted-foreground"
           />
-          <input ref={imageInput} type="file" accept={IMAGE_ACCEPT} multiple hidden onChange={(e) => { void addFiles(e.target.files, "image"); e.target.value = ""; }} />
-          <input ref={docInput} type="file" accept={DOC_ACCEPT} multiple hidden onChange={(e) => { void addFiles(e.target.files, "doc"); e.target.value = ""; }} />
+          <input ref={imageInput} type="file" accept={IMAGE_ACCEPT} hidden onChange={(e) => { void addFiles(e.target.files, "image"); e.target.value = ""; }} />
+          <input ref={docInput} type="file" accept={DOC_ACCEPT} hidden onChange={(e) => { void addFiles(e.target.files, "doc"); e.target.value = ""; }} />
           <div className="mt-1.5 flex flex-wrap items-center justify-between gap-x-2 gap-y-1">
             <div className="flex min-w-0 items-center gap-1">
               <DropdownMenu modal={false}>
