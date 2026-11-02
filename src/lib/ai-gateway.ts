@@ -438,9 +438,9 @@ async function callBackupChat(
     u.completionTokens = Math.max(1, Math.round(content.length / 4));
   }
   if (!u.totalTokens) u.totalTokens = u.promptTokens + u.completionTokens;
-  const validation = opts.validateContent?.(content, BACKUP_CHAT_MODEL) ?? true;
+  const validation = opts.validateContent?.(content, model) ?? true;
   if (validation !== true) throw new AiGatewayError(validation, 422, true);
-  return { content, model: BACKUP_CHAT_MODEL, usage: u };
+  return { content, model, usage: u };
 }
 
 // Main entrypoint. Returns raw assistant content string plus model/usage.
@@ -618,7 +618,7 @@ async function callChatChain(
         if (lastErr.terminal) {
           const isAuthOrBilling =
             lastErr.status === 401 || lastErr.status === 402 || lastErr.status === 403;
-          if (isAuthOrBilling) throw lastErr;
+          if (isAuthOrBilling && isLastModel) throw lastErr;
           // Other terminal model failures also continue with the next model.
           break;
         }
