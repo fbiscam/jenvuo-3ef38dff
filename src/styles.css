@@ -1292,8 +1292,8 @@ body:has(.terminal-dark) .jenvu-terminal-shell :is(header, .terminal-toolbar) sv
   color: oklch(1 0 0) !important;
 }
 /* Black terminal: every icon and label in the widgets, watchlist and panels is white too. */
-.terminal-dark :is(svg.lucide, .lucide),
-.terminal-dark :is(button, [role="button"], [role="tab"]):not(.bg-primary):not(.bg-foreground):not([class*="bg-white"]) {
+.terminal-dark .lucide:not([class*="text-emerald"]):not([class*="text-green"]):not([class*="text-red"]):not([class*="text-rose"]):not([class*="text-orange"]):not([class*="text-amber"]):not([class*="text-yellow"]):not([class*="text-sky"]):not([class*="text-blue"]):not([class*="text-primary-foreground"]):not([class*="text-background"]),
+.terminal-dark :is(button, [role="button"], [role="tab"]):not(.bg-primary):not(.bg-foreground):not([class*="bg-white"]):not([class*="bg-orange"]):not([class*="text-emerald"]):not([class*="text-green"]):not([class*="text-red"]):not([class*="text-rose"]):not([class*="text-orange"]):not([class*="text-amber"]):not([class*="text-yellow"]):not([class*="text-sky"]):not([class*="text-blue"]):not([class*="text-primary-foreground"]):not([class*="text-background"]) {
   color: oklch(1 0 0);
 }
 .terminal-dark :is(.text-muted-foreground, .text-gc-ink-muted, [class*="text-zinc-"], [class*="text-slate-"], [class*="text-gray-"], [class*="text-neutral-"]) {
