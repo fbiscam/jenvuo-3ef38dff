@@ -159,7 +159,7 @@ export function ChatCodeStudio({ files, busy, kind, seed, active, onActive, onDo
         </div>
         {!showTyping && file && (
           <div className="flex shrink-0 items-center gap-1.5">
-            <span className="hidden text-[12px] opacity-50 xl:inline">{files.length}/{CHAT_MAX_FILES} files</span>
+            <span className="vsc-count hidden text-[12px] xl:inline">{files.length}/{CHAT_MAX_FILES} files</span>
             <button type="button" onClick={() => void copy()} aria-label="Copy code" className="code-box-copy rounded-md p-1.5">
               {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
             </button>

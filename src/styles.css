@@ -2300,19 +2300,18 @@ html body .jenvu-zoom-dashboard main .jx-ide :is(.jx-ide-card) { border-radius: 
 
 /* Download / export buttons: white with black text in both themes, with a looping colourful ring light. */
 @property --ring-a { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
-.ring-btn { position: relative; isolation: isolate; background: #ffffff !important; color: #111111 !important; border: 0; transition: transform .15s ease; }
-.ring-btn:hover { transform: translateY(-1px); }
-.ring-btn::before, .ring-btn::after {
-  content: ""; position: absolute; inset: -1.5px; border-radius: inherit; z-index: -1; pointer-events: none;
-  background: conic-gradient(from var(--ring-a), #ff5f6d, #ffc371, #47e891, #38bdf8, #a78bfa, #f472b6, #ff5f6d);
+.ring-btn {
+  position: relative; color: #111111 !important; border: 1.5px solid transparent !important; transition: transform .15s ease;
+  background:
+    linear-gradient(#ffffff, #ffffff) padding-box,
+    conic-gradient(from var(--ring-a), #ff5f6d, #ffc371, #47e891, #38bdf8, #a78bfa, #f472b6, #ff5f6d) border-box !important;
   animation: ring-spin 3.2s linear infinite;
 }
-.ring-btn::before { padding: 1.5px; -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; }
-.ring-btn::after { display: none; }
-.dark .ring-btn, .dash-dark .ring-btn { background: #ffffff !important; color: #111111 !important; }
+.ring-btn:hover { transform: translateY(-1px); }
+.dark .ring-btn, .dash-dark .ring-btn { color: #111111 !important; }
 .dark .ring-btn *, .dash-dark .ring-btn * { color: inherit !important; }
 @keyframes ring-spin { to { --ring-a: 360deg; } }
-@media (prefers-reduced-motion: reduce) { .ring-btn::before, .ring-btn::after { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .ring-btn { animation: none; } }
 
 /* Chat document (PDF-style) page. */
 .chat-docview { background: #f4f4f3; color: #111; }
