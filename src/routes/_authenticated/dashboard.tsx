@@ -1329,7 +1329,10 @@ function DashboardLayout() {
   // on phones and on the Terminal it stays closed until opened from the top bar.
   const drawerMode = !embedMode;
   const pinned = drawerMode && pathname !== "/dashboard/terminal";
-  const navCollapsed = drawerMode ? false : sidebarCollapsed && !mobileNavOpen;
+  const onTerminal = pathname === "/dashboard/terminal";
+  // On the Terminal (desktop) the menu stays as a slim rail of page icons; opening it shows the full list.
+  const terminalRail = drawerMode && onTerminal && !mobileNavOpen;
+  const navCollapsed = drawerMode ? terminalRail : sidebarCollapsed && !mobileNavOpen;
   // White/black switch covers every dashboard page; the Terminal keeps its own switch.
   const themeApplies = pathname !== "/dashboard/terminal";
   const dashDark = themeApplies && dashTheme === "dark";
@@ -1356,14 +1359,18 @@ function DashboardLayout() {
       {!embedMode && (
         /* Sidebar (xAI console-style) */
         <aside
-          className={`dashboard-sidebar-root ${pinned ? "console-sidebar" : ""} ${pathname === "/dashboard/terminal" ? "jenvu-zoom-chrome" : ""} ${
-            pinned
+          className={`dashboard-sidebar-root ${pinned ? "console-sidebar" : ""} ${onTerminal && !terminalRail ? "jenvu-zoom-chrome" : ""} ${
+            drawerMode && onTerminal
+              ? mobileNavOpen
+                ? "fixed inset-y-0 left-0 z-50 w-[280px] translate-x-0 rounded-r-2xl shadow-2xl"
+                : "terminal-rail fixed inset-y-0 left-0 z-20 w-[52px] -translate-x-full border-r border-zinc-200 max-lg:invisible lg:translate-x-0"
+              : pinned
               ? `fixed inset-y-0 left-0 z-50 w-[260px] border-0 lg:z-20 lg:translate-x-0 lg:shadow-none ${mobileNavOpen ? "translate-x-0 shadow-2xl" : "-translate-x-full max-lg:invisible"}`
               : drawerMode
               ? `fixed inset-y-0 left-0 z-50 w-[280px] rounded-r-2xl ${mobileNavOpen ? "translate-x-0 shadow-2xl" : "-translate-x-full shadow-none"}`
               : `${pathname === "/dashboard/terminal" ? "dashboard-terminal-sidebar border-r border-zinc-200" : ""} max-lg:fixed max-lg:inset-y-0 max-lg:left-0 max-lg:z-50 lg:fixed lg:inset-y-0 lg:left-0 ${navCollapsed ? "w-[60px]" : "w-[224px]"} ${mobileNavOpen ? "max-lg:translate-x-0" : "max-lg:-translate-x-full"}`
           } flex min-h-0 shrink-0 flex-col overflow-hidden bg-white transition-[width,transform] duration-200 ease-out`}
-          aria-hidden={drawerMode && !pinned && !mobileNavOpen ? true : undefined}
+          aria-hidden={drawerMode && !pinned && !mobileNavOpen && !onTerminal ? true : undefined}
           style={{
             fontFamily: '"Google Sans Flex", "Google Sans", "Product Sans", "Roboto", system-ui, sans-serif',
             fontWeight: 400,
@@ -1371,19 +1378,19 @@ function DashboardLayout() {
         >
           <style>{`.dashboard-sidebar-root, .dashboard-sidebar-root *:not(img):not(svg):not(.material-symbols-rounded) { font-family: "Google Sans Flex", "Google Sans", "Product Sans", "Roboto", system-ui, sans-serif !important; text-transform: none !important; letter-spacing: normal !important; } .dashboard-sidebar-root .material-symbols-rounded { font-family: "Material Symbols Rounded" !important; font-weight: normal !important; font-style: normal !important; text-transform: none !important; letter-spacing: normal !important; white-space: nowrap; word-wrap: normal; direction: ltr; -webkit-font-feature-settings: "liga"; -webkit-font-smoothing: antialiased; }`}</style>
           {/* Brand */}
-          <div className="flex h-14 shrink-0 items-center gap-2 pl-[21px] pr-2">
-            <a href="https://jenvu.com" className="flex min-w-0 items-center gap-[9px]">
-              <JenvuMark className="dashboard-sidebar-logo h-6 w-6 shrink-0 text-gc-ink" />
-              <span className="dashboard-sidebar-brand truncate text-[20px] font-medium leading-none tracking-tight text-gc-ink">Jenvu</span>
+          <div className={`flex shrink-0 items-center ${terminalRail ? "h-12 justify-center" : "h-14 gap-2 pl-[21px] pr-2"}`}>
+            <a href="https://jenvu.com" title={terminalRail ? "Jenvu" : undefined} className="flex min-w-0 items-center gap-[9px]">
+              <JenvuMark className={`dashboard-sidebar-logo shrink-0 text-gc-ink ${terminalRail ? "h-5 w-5" : "h-6 w-6"}`} />
+              {!terminalRail && <span className="dashboard-sidebar-brand truncate text-[20px] font-medium leading-none tracking-tight text-gc-ink">Jenvu</span>}
             </a>
-            <button
+            {!terminalRail && <button
               type="button"
               aria-label="Close menu"
               onClick={() => setMobileNavOpen(false)}
               className={`ml-auto inline-flex h-9 w-9 items-center justify-center rounded-full text-gc-ink hover:bg-gc-notice ${pinned ? "lg:hidden" : ""}`}
             >
               <X className="h-5 w-5" />
-            </button>
+            </button>}
           </div>
 
 
@@ -1560,7 +1567,7 @@ function DashboardLayout() {
 
       {/* Right column */}
       <div
-        className={`dashboard-right-col flex min-w-0 min-h-0 flex-1 flex-col ${pathname === "/dashboard/terminal" ? "bg-background" : "bg-background"} ${pinned ? "lg:pl-[260px]" : embedMode || drawerMode ? "" : sidebarCollapsed ? "collapsed lg:pl-[60px]" : "lg:pl-[224px]"}`}
+        className={`dashboard-right-col flex min-w-0 min-h-0 flex-1 flex-col ${pathname === "/dashboard/terminal" ? "bg-background" : "bg-background"} ${pinned ? "lg:pl-[260px]" : drawerMode && onTerminal ? "lg:pl-[52px]" : embedMode || drawerMode ? "" : sidebarCollapsed ? "collapsed lg:pl-[60px]" : "lg:pl-[224px]"}`}
       >
         {drawerMode && (
           <div className={pathname === "/dashboard/terminal" ? "jenvu-zoom-chrome relative z-30 shrink-0" : "contents"}>

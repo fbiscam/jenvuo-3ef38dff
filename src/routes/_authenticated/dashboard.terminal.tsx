@@ -9,7 +9,6 @@ import {
   History,
   ImagePlus,
   ListChecks,
-  Zap,
   Mic,
   Moon,
   Newspaper,
@@ -751,15 +750,6 @@ function TerminalPage() {
                     {formatCountdown(secondsLeft)}
                     {marketClosed && <span className="hidden font-normal text-gc-ink-muted xl:inline">Market closed</span>}
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => setDeskOpen((v) => !v)}
-                    aria-pressed={deskOpen}
-                    className="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 px-3 text-[12px] font-semibold text-primary-foreground shadow-sm transition-opacity hover:opacity-90"
-                  >
-                    <Zap className="h-3.5 w-3.5" />
-                    Ask With AI
-                  </button>
                   {!deskOpen && (
                     <button
                       type="button"
