@@ -976,7 +976,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
         <nav
           aria-label="Drawing tools"
           className={cn(
-            "w-11 shrink-0 flex-col items-center gap-0.5 overflow-y-auto border-r border-border py-1.5 md:hidden",
+            "w-11 shrink-0 flex-col items-center gap-0.5 overflow-y-auto border-r border-border py-1.5 [scrollbar-width:none] md:!flex [&::-webkit-scrollbar]:hidden",
             mobileToolsOpen ? "flex" : "hidden",
           )}
         >
