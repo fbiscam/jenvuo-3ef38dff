@@ -196,7 +196,7 @@ function Hero() {
 /* ---------- 2. Models ---------- */
 
 const MODELS = [
-  { id: "claude-opus-5", name: "Claude Opus 5", a: "Deep reasoning and long documents", b: "Code review and refactoring", img: starsNebula },
+  { id: "claude-opus-5", name: "Claude Opus 5", a: "Deep reasoning and documents", b: "Code review and refactoring", img: starsNebula },
   { id: "gpt-5.5", name: "GPT-5.5", a: "Fast, all-round chat", b: "Agents and automation", img: starsPlain },
   { id: "gemini-3.1-pro", name: "Gemini 3.1 Pro", a: "Text and image understanding", b: "Charts and screenshots", img: starsPlain },
   { id: "deepseek-v4-flash-0731", name: "DeepSeek V4", a: "Quick everyday tasks", b: "High-volume workloads", img: starsPlain },
