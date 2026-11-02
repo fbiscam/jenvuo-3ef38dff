@@ -849,6 +849,18 @@ function ChatPlayground() {
             )}
           </div>
         )}
+        {awayFromBottom && turns.length > 0 && (
+          <div className="pointer-events-none sticky bottom-3 flex justify-center">
+            <button
+              type="button"
+              aria-label="Scroll to latest message"
+              onClick={() => scroller.current?.scrollTo({ top: scroller.current.scrollHeight, behavior: "smooth" })}
+              className="pointer-events-auto grid h-9 w-9 place-items-center rounded-full border border-border bg-background text-foreground shadow-md hover:bg-muted"
+            >
+              <ChevronDown className="h-5 w-5" />
+            </button>
+          </div>
+        )}
       </div>
 
       <div className="w-full">
