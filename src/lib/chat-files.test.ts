@@ -110,3 +110,13 @@ describe("looksLikeImageRequest", () => {
   it("describing an attached image is not", () => expect(looksLikeImageRequest("Describe what you see in the attached image")).toBe(false));
   it("writing code is not", () => expect(looksLikeImageRequest("write an MT5 bot")).toBe(false));
 });
+
+import { shortFileName } from "./chat-files";
+describe("shortFileName", () => {
+  it("keeps 2-word names", () => expect(shortFileName("RSI_AllInOne.pine")).toBe("RSI_AllInOne.pine"));
+  it("cuts longer names to 2 words", () => expect(shortFileName("gold_sweep_strategy_v2.mq5")).toBe("gold_sweep.mq5"));
+});
+describe("SEO and leads open as documents", () => {
+  it("seo report", () => expect(looksLikeDocRequest("example.com ka SEO report banao")).toBe(true));
+  it("leads", () => expect(looksLikeDocRequest("dentists ki leads nikalo aur list banao")).toBe(true));
+});
