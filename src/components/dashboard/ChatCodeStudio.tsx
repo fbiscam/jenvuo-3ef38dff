@@ -1,7 +1,11 @@
-import { useEffect, useMemo, useRef, useState } from "react";
-import { Check, Copy, Download, FileCode2, Loader2, X } from "lucide-react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { Check, Copy, Download, FileCode2, FileText, Globe, Image as ImageIcon, Loader2, Paperclip, X } from "lucide-react";
 import { highlight } from "@/components/dashboard/CodeHighlight";
-import { CHAT_MAX_FILES, type CodeKind, type ReplyFile } from "@/lib/chat-files";
+import { shortFileName, type CodeKind, type ReplyFile } from "@/lib/chat-files";
+
+/** A non-code item (image, document, upload, website) in the same tab row as the code files. */
+export type StudioTab = { id: string; label: string; icon: "image" | "doc" | "file" | "site"; active: boolean; onOpen: () => void; onClose: () => void };
+const TAB_ICON = { image: ImageIcon, doc: FileText, file: Paperclip, site: Globe } as const;
 
 // Realistic lines typed once while the AI writes (no loop). Several variants per
 // language so it is not the same every time.
@@ -56,10 +60,18 @@ type Props = {
   onRename: (from: string, to: string) => void;
   onRemove: (name: string) => void;
   onClose?: () => void;
+  /** Show code tabs/body at all (false when the frame only holds an image, document…). */
+  hasCode?: boolean;
+  /** The code body is in front (otherwise `children` fills the frame). */
+  codeActive?: boolean;
+  extraTabs?: StudioTab[];
+  /** Items used, e.g. "3/4". */
+  count?: string;
+  children?: ReactNode;
 };
 
 /** Code editor shown beside the chat: up to 2 files, rename by double-click, red ✕ removes. */
-export function ChatCodeStudio({ files, busy, kind, seed, active, onActive, onDownload, onRename, onRemove, onClose }: Props) {
+export function ChatCodeStudio({ files, busy, kind, seed, active, onActive, onDownload, onRename, onRemove, onClose, hasCode = true, codeActive = true, extraTabs = [], count, children }: Props) {
   const [copied, setCopied] = useState(false);
   const [editing, setEditing] = useState<string | null>(null);
   const [draft, setDraft] = useState("");
@@ -100,18 +112,18 @@ export function ChatCodeStudio({ files, busy, kind, seed, active, onActive, onDo
   return (
     <div className="code-box vsc-studio flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl">
       <div className="flex items-center gap-2 border-b border-current/10 px-2 py-2">
-        <div className="flex min-w-0 flex-1 gap-1 overflow-x-auto">
-          {waiting ? (
+        <div className="chat-no-scrollbar flex min-w-0 flex-1 gap-1 overflow-x-auto">
+          {!hasCode ? null : waiting ? (
             <span className="px-2 py-1.5 text-[13px] opacity-60">Code editor</span>
           ) : showTyping ? (
-            <span className="code-tab is-active inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-[13px] font-medium">
+            <button type="button" onClick={() => onActive(0)} className={`code-tab inline-flex shrink-0 items-center gap-2 rounded-lg px-3 py-1.5 text-[13px] font-medium ${codeActive ? "is-active" : "opacity-60 hover:opacity-100"}`}>
               <FileCode2 className="h-4 w-4 opacity-70" /> {snippet.file}
-            </span>
+            </button>
           ) : (
             files.map((f, i) => (
               <span
                 key={f.name}
-                className={`code-tab group inline-flex shrink-0 items-center rounded-lg text-[13px] font-medium ${i === active ? "is-active" : "opacity-60 hover:opacity-100"}`}
+                className={`code-tab group inline-flex shrink-0 items-center rounded-lg text-[13px] font-medium ${codeActive && i === active ? "is-active" : "opacity-60 hover:opacity-100"}`}
               >
                 {editing === f.name ? (
                   <span className="inline-flex items-center gap-2 py-1 pl-3 pr-1">
@@ -137,10 +149,10 @@ export function ChatCodeStudio({ files, busy, kind, seed, active, onActive, onDo
                       setDraft(f.name);
                       setEditing(f.name);
                     }}
-                    title="Double-click to rename"
+                    title={`${f.name} — double-click to rename`}
                     className="inline-flex items-center gap-2 py-1.5 pl-3 pr-1.5"
                   >
-                    <FileCode2 className="h-4 w-4 opacity-70" /> {f.name}
+                    <FileCode2 className="h-4 w-4 opacity-70" /> {shortFileName(f.name)}
                   </button>
                 )}
                 <button
@@ -156,10 +168,23 @@ export function ChatCodeStudio({ files, busy, kind, seed, active, onActive, onDo
               </span>
             ))
           )}
+          {extraTabs.map((t) => {
+            const Icon = TAB_ICON[t.icon];
+            return (
+              <span key={t.id} className={`code-tab inline-flex shrink-0 items-center rounded-lg text-[13px] font-medium ${t.active ? "is-active" : "opacity-60 hover:opacity-100"}`}>
+                <button type="button" onClick={t.onOpen} title={t.label} className="inline-flex max-w-[150px] items-center gap-2 py-1.5 pl-3 pr-1.5">
+                  <Icon className="h-4 w-4 shrink-0 opacity-70" /> <span className="truncate">{t.label}</span>
+                </button>
+                <button type="button" onClick={t.onClose} aria-label={`Close ${t.label}`} title="Close" className="mr-1 rounded-md p-1 text-red-500 hover:bg-red-500/10">
+                  <X className="h-3.5 w-3.5" />
+                </button>
+              </span>
+            );
+          })}
         </div>
-        {!showTyping && file && (
+        {count && <span className="vsc-count shrink-0 text-[12px] tabular-nums">{count}</span>}
+        {codeActive && !showTyping && file && (
           <div className="flex shrink-0 items-center gap-1.5">
-            <span className="vsc-count hidden text-[12px] xl:inline">{files.length}/{CHAT_MAX_FILES} files</span>
             <button type="button" onClick={() => void copy()} aria-label="Copy code" className="code-box-copy rounded-md p-1.5">
               {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
             </button>
@@ -169,6 +194,9 @@ export function ChatCodeStudio({ files, busy, kind, seed, active, onActive, onDo
           </div>
         )}
       </div>
+      {!codeActive ? (
+        <div className="flex min-h-0 flex-1 flex-col overflow-hidden">{children}</div>
+      ) : (<>
       <div className="min-h-0 flex-1 overflow-auto py-3 font-mono text-[13.5px] leading-[1.7]">
         {lines.map((l, i) => (
           <div key={i} className="vsc-line flex">
@@ -193,6 +221,7 @@ export function ChatCodeStudio({ files, busy, kind, seed, active, onActive, onDo
           </>
         )}
       </div>
+      </>)}
     </div>
   );
 }
