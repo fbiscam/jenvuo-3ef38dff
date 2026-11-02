@@ -45,7 +45,7 @@ import { readSiteTheme, SITE_THEME_EVENT } from "@/lib/site-theme";
 import { highlight } from "@/components/dashboard/CodeHighlight";
 import { MIXED_CATALOG, PROVIDERS, PRICE_PER_MILLION, formatContext, getCatalogModel } from "@/lib/model-catalog";
 import { playgroundChat } from "@/lib/playground.functions";
-import { PLAYGROUND_DEFAULT_MODEL, PLAYGROUND_MAX_IMAGES, PLAYGROUND_MAX_TOKENS, type PlaygroundTurn } from "@/lib/playground";
+import { PLAYGROUND_DEFAULT_MODEL, PLAYGROUND_MAX_TOKENS, type PlaygroundTurn } from "@/lib/playground";
 import { DOC_ACCEPT, IMAGE_ACCEPT, composeMessage, readAttachment, type ChatAttachment } from "@/components/dashboard/chat-attachments";
 import {
   CHAT_MAX_FILES,
@@ -233,6 +233,8 @@ function ChatPlayground() {
   const [votes, setVotes] = useState<Record<string, "up" | "down">>({});
   const [codeOpen, setCodeOpen] = useState(false);
   const [files, setFiles] = useState<ChatAttachment[]>([]);
+  // The last file the user sent; it opens in its own tab of the work area.
+  const [uploaded, setUploaded] = useState<ChatAttachment | null>(null);
   const [reading, setReading] = useState(false);
   const [darkMenus, setDarkMenus] = useState(false);
   // Editor files (max 4) and the open document live across replies.
@@ -243,7 +245,7 @@ function ChatPlayground() {
   // Once code is asked for, the editor stays open (even while the AI asks questions).
   const [codePinned, setCodePinned] = useState<CodeKind | null>(null);
   // Which tab of the left work area is in front; code, picture and document all stay open.
-  const [pane, setPane] = useState<"code" | "image" | "doc">("code");
+  const [pane, setPane] = useState<"code" | "image" | "doc" | "upload">("code");
   const [imageView, setImageView] = useState<ImageView | null>(null);
   const [imaging, setImaging] = useState(false);
   const scroller = useRef<HTMLDivElement>(null);
@@ -315,13 +317,11 @@ function ChatPlayground() {
     setReading(true);
     try {
       for (const file of Array.from(list)) {
-        if (kind === "image" && files.filter((f) => f.kind === "image").length >= PLAYGROUND_MAX_IMAGES) {
-          toast.error(`Up to ${PLAYGROUND_MAX_IMAGES} images per message.`);
-          break;
-        }
         try {
           const a = await readAttachment(file, kind);
-          setFiles((cur) => [...cur, a]);
+          // One upload at a time: a new pick replaces the previous one.
+          if (files.length) toast.message(`Only 1 file per message — ${a.name} replaced the previous one.`);
+          setFiles([a]);
           if (a.kind === "doc" && a.truncated) toast.message(`${a.name} is long — only the first part is sent.`);
         } catch (e) {
           toast.error(e instanceof Error ? e.message : `Couldn't read ${file.name}.`);
@@ -491,6 +491,10 @@ function ChatPlayground() {
     setTurns((t) => [...t, userTurn]);
     setInput("");
     setFiles([]);
+    if (attached[0]) {
+      setUploaded(attached[0]);
+      setPane("upload");
+    }
     await ask(history, images);
   };
 
@@ -515,6 +519,7 @@ function ChatPlayground() {
   const newChat = () => {
     setTurns([]);
     setWorkspace([]);
+    setUploaded(null);
     setActiveFile(0);
     setDoc(null);
     setDocOpen(false);
@@ -537,7 +542,7 @@ function ChatPlayground() {
   const writingDoc = busy && docAsked;
   const showDoc = !!doc && docOpen;
   const showImage = !!imageView;
-  const studio = workspace.length > 0 || codingNow || showDoc || writingDoc || codePinned !== null || showImage;
+  const studio = !!uploaded || workspace.length > 0 || codingNow || showDoc || writingDoc || codePinned !== null || showImage;
   const studioKind = askedKind ?? codePinned ?? (workspace[0]?.lang === "pine" ? "pine" : workspace[0]?.lang === "python" ? "python" : workspace[0]?.lang === "mql5" ? "mql5" : "generic");
   const studioSeed = turns.length;
 
@@ -640,9 +645,10 @@ function ChatPlayground() {
           ...(hasCode ? [{ id: "code" as const, label: workspace.length ? `Code · ${workspace.length}` : "Code" }] : []),
           ...(showImage ? [{ id: "image" as const, label: "Image" }] : []),
           ...(showDoc || writingDoc ? [{ id: "doc" as const, label: "Document" }] : []),
+          ...(uploaded ? [{ id: "upload" as const, label: "Your file" }] : []),
         ];
         const front = tabs.some((t) => t.id === pane) ? pane : (tabs[0]?.id ?? "code");
-        const used = workspace.length + (showImage ? 1 : 0) + (showDoc ? 1 : 0);
+        const used = workspace.length + (showImage ? 1 : 0) + (showDoc ? 1 : 0) + (uploaded ? 1 : 0);
         return (
         <div className="hidden min-h-0 min-w-0 flex-1 flex-col lg:flex">
           {tabs.length > 1 && (
@@ -662,7 +668,21 @@ function ChatPlayground() {
               <span className="ml-auto text-[12px] tabular-nums text-muted-foreground">{used}/4 items</span>
             </div>
           )}
-          {front === "image" && imageView ? (
+          {front === "upload" && uploaded ? (
+            <div className="chat-docview flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-border">
+              <div className="flex items-center gap-2 border-b border-border px-4 py-2.5 text-[13px]">
+                <span className="min-w-0 flex-1 truncate font-medium text-foreground" title={uploaded.name}>{uploaded.name}</span>
+                <button type="button" onClick={() => setUploaded(null)} className="text-muted-foreground hover:text-foreground">Close</button>
+              </div>
+              {uploaded.kind === "image" ? (
+                <div className="flex min-h-0 flex-1 items-center justify-center p-4">
+                  <img src={uploaded.url} alt={uploaded.name} className="max-h-full max-w-full rounded-lg object-contain" />
+                </div>
+              ) : (
+                <pre className="min-h-0 flex-1 overflow-auto whitespace-pre-wrap break-words p-4 font-mono text-[13px] leading-relaxed text-foreground">{uploaded.text}</pre>
+              )}
+            </div>
+          ) : front === "image" && imageView ? (
             <ChatImagePanel view={imageView} onClose={() => setImageView(null)} onDownload={(url) => downloadImage(url, imageView.prompt)} />
           ) : front === "doc" && showDoc && doc ? (
             <ChatDocView doc={doc} busy={busy} menuTheme={menuTheme} onClose={() => setDocOpen(false)} />
@@ -990,8 +1010,8 @@ function ChatPlayground() {
             aria-label="Message"
             className="max-h-40 min-h-[28px] w-full resize-none bg-transparent text-[16px] text-foreground outline-none placeholder:text-muted-foreground"
           />
-          <input ref={imageInput} type="file" accept={IMAGE_ACCEPT} multiple hidden onChange={(e) => { void addFiles(e.target.files, "image"); e.target.value = ""; }} />
-          <input ref={docInput} type="file" accept={DOC_ACCEPT} multiple hidden onChange={(e) => { void addFiles(e.target.files, "doc"); e.target.value = ""; }} />
+          <input ref={imageInput} type="file" accept={IMAGE_ACCEPT} hidden onChange={(e) => { void addFiles(e.target.files, "image"); e.target.value = ""; }} />
+          <input ref={docInput} type="file" accept={DOC_ACCEPT} hidden onChange={(e) => { void addFiles(e.target.files, "doc"); e.target.value = ""; }} />
           <div className="mt-1.5 flex flex-wrap items-center justify-between gap-x-2 gap-y-1">
             <div className="flex min-w-0 items-center gap-1">
               <DropdownMenu modal={false}>
