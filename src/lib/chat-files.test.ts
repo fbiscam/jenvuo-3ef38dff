@@ -155,3 +155,26 @@ describe("findMentionedFile", () => {
     expect(findMentionedFile("add RSI filter", names)).toBe(-1);
   });
 });
+
+import { parseDuplicateRequest, copyName } from "./chat-files";
+
+describe("parseDuplicateRequest", () => {
+  it("copies the open file into a new _copy file without calling the AI", () => {
+    expect(parseDuplicateRequest("is file ko copy krka duplicate krdo aur new file banao", ["gold.mq5"], "gold.mq5")).toEqual({ from: "gold.mq5", to: "gold_copy.mq5", withChanges: false });
+  });
+  it("uses the name the user gives", () => {
+    expect(parseDuplicateRequest("duplicate gold.mq5 as gold_v2.mq5", ["gold.mq5", "rsi.py"])).toEqual({ from: "gold.mq5", to: "gold_v2.mq5", withChanges: false });
+  });
+  it("changes asked later do not trigger an edit now", () => {
+    expect(parseDuplicateRequest("file duplicate krdo changes bad ma bataunga", ["a.pine"], "a.pine")?.withChanges).toBe(false);
+  });
+  it("changes asked now are sent for the copy", () => {
+    expect(parseDuplicateRequest("duplicate this file and add a stop loss", ["a.pine"], "a.pine")?.withChanges).toBe(true);
+  });
+  it("plain edits are not duplicates", () => {
+    expect(parseDuplicateRequest("add a stop loss to a.pine", ["a.pine"], "a.pine")).toBe(null);
+  });
+  it("never reuses a taken copy name", () => {
+    expect(copyName("a.pine", ["a.pine", "a_copy.pine"])).toBe("a_copy_2.pine");
+  });
+});
