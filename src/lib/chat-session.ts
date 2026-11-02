@@ -67,3 +67,17 @@ export function parseSavedSession(raw: string | null): ChatSession | null {
     return null;
   }
 }
+
+/** A reply still being written on the server (kept so it shows up after leaving the page). */
+export const chatPendingKey = (userId: string) => `jenvu.chat.pending.v1.${userId}`;
+
+export function parsePendingJob(raw: string | null): { jobId: string; startedAt: number } | null {
+  if (!raw) return null;
+  try {
+    const v = JSON.parse(raw) as { jobId?: unknown; startedAt?: unknown };
+    if (typeof v.jobId !== "string" || typeof v.startedAt !== "number") return null;
+    return { jobId: v.jobId, startedAt: v.startedAt };
+  } catch {
+    return null;
+  }
+}

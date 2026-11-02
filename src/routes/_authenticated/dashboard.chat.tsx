@@ -22,6 +22,7 @@ import {
   RotateCw,
   SlidersHorizontal,
   SquarePen,
+  Square,
   ThumbsDown,
   ThumbsUp,
   X,
@@ -47,7 +48,7 @@ import { ProviderLogo } from "@/components/models/ModelsExplorer";
 import { readSiteTheme, SITE_THEME_EVENT } from "@/lib/site-theme";
 import { highlight } from "@/components/dashboard/CodeHighlight";
 import { MIXED_CATALOG, PROVIDERS, PRICE_PER_MILLION, formatContext, getCatalogModel } from "@/lib/model-catalog";
-import { playgroundChat } from "@/lib/playground.functions";
+import { playgroundChat, getChatJob, stopChatJob, type PlaygroundResult } from "@/lib/playground.functions";
 import { PLAYGROUND_DEFAULT_MODEL, PLAYGROUND_MAX_TOKENS, type PlaygroundTurn } from "@/lib/playground";
 import { DOC_ACCEPT, IMAGE_ACCEPT, composeMessage, readAttachment, type ChatAttachment } from "@/components/dashboard/chat-attachments";
 import {
@@ -75,7 +76,7 @@ import {
 import { ChatCodeStudio, type StudioTab } from "@/components/dashboard/ChatCodeStudio";
 import { ChatDocView, exportDocumentPdf } from "@/components/dashboard/ChatDocView";
 import { useAuthUser } from "@/hooks/useAuthUser";
-import { chatSessionKey, parseSavedSession, toSavedSession } from "@/lib/chat-session";
+import { chatSessionKey, chatPendingKey, parsePendingJob, parseSavedSession, toSavedSession } from "@/lib/chat-session";
 import { streamImage, ImageStreamError } from "@/lib/stream-image";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -235,6 +236,18 @@ const EXAMPLES: Example[] = [
 
 function ChatPlayground() {
   const send = useServerFn(playgroundChat);
+  const readJob = useServerFn(getChatJob);
+  const stopJob = useServerFn(stopChatJob);
+  // The reply being written right now; Stop clears it so a late answer is ignored.
+  const jobRef = useRef<string | null>(null);
+  const imageAbort = useRef<AbortController | null>(null);
+  const mounted = useRef(true);
+  useEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+    };
+  }, []);
   const [model, setModel] = useState<string>(PLAYGROUND_DEFAULT_MODEL);
   const [modelOpen, setModelOpen] = useState(false);
   const [turns, setTurns] = useState<Turn[]>([]);
@@ -297,6 +310,10 @@ function ChatPlayground() {
       // Chat always opens on the default model (Claude Opus 5.5); an old saved pick is not restored.
     }
     setRestored(true);
+    // A reply was still being written when the user left: pick it up from the server.
+    const pending = parsePendingJob(window.localStorage.getItem(chatPendingKey(user.id)));
+    if (pending) void resumeJob(pending.jobId, pending.startedAt, (saved?.turns ?? []) as Turn[]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id]);
 
   useEffect(() => {
@@ -363,7 +380,66 @@ function ChatPlayground() {
   // Sends the conversation (ending with a user turn) and appends the reply.
   // The editor files (and an open document) ride on the last user message only,
   // so the AI can edit, rename or move code between them.
+  const setPending = (jobId: string | null) => {
+    if (!user?.id) return;
+    try {
+      if (jobId) window.localStorage.setItem(chatPendingKey(user.id), JSON.stringify({ jobId, startedAt: Date.now() }));
+      else window.localStorage.removeItem(chatPendingKey(user.id));
+    } catch {
+      /* storage blocked */
+    }
+  };
+
+  const resumeJob = async (jobId: string, startedAt: number, history: Turn[]) => {
+    jobRef.current = jobId;
+    setBusy(true);
+    try {
+      for (;;) {
+        if (jobRef.current !== jobId || !mounted.current) return;
+        const job = await readJob({ data: { id: jobId } }).catch(() => null);
+        if (jobRef.current !== jobId || !mounted.current) return;
+        if (job?.status === "done" || job?.status === "error") {
+          const res = (job.result ?? { ok: false, error: "The model couldn't answer. Please try again." }) as PlaygroundResult;
+          applyReply(res, history);
+          break;
+        }
+        if (!job || job.status === "missing" || job.status === "stopped" || Date.now() - startedAt > 6 * 60_000) {
+          if (job?.status !== "stopped")
+            setTurns((t) => [...t, { id: crypto.randomUUID(), role: "assistant", content: "The reply was interrupted. Please try again.", error: true }]);
+          break;
+        }
+        await new Promise((r) => setTimeout(r, 2000));
+      }
+      setPending(null);
+      jobRef.current = null;
+      setBusy(false);
+    } catch {
+      setPending(null);
+      jobRef.current = null;
+      setBusy(false);
+    }
+  };
+
+  // Stop button: drops the reply being written (text or picture).
+  const stop = () => {
+    const jobId = jobRef.current;
+    jobRef.current = null;
+    if (imageAbort.current) {
+      imageAbort.current.abort();
+      imageAbort.current = null;
+    }
+    if (jobId) void stopJob({ data: { id: jobId } }).catch(() => undefined);
+    setPending(null);
+    setBusy(false);
+    setImaging(false);
+    setTurns((t) => [...t, { id: crypto.randomUUID(), role: "assistant", content: "Stopped.", model: "local" }]);
+    box.current?.focus();
+  };
+
   const ask = async (history: Turn[], images: string[]) => {
+    const jobId = crypto.randomUUID();
+    jobRef.current = jobId;
+    setPending(jobId);
     setBusy(true);
     try {
       const sent = history.filter((t) => !t.error).map(({ role, content: c }) => ({ role, content: c }));
@@ -383,8 +459,32 @@ function ChatPlayground() {
           maxTokens,
           images,
           turns: sent,
+          jobId,
         },
       });
+      // Stopped, or the user left Chat (the saved reply is picked up when they come back).
+      if (jobRef.current !== jobId || !mounted.current) return;
+      setPending(null);
+      applyReply(res, history);
+    } catch {
+      if (jobRef.current !== jobId || !mounted.current) return;
+      setPending(null);
+      setTurns((t) => [
+        ...t,
+        { id: crypto.randomUUID(), role: "assistant", content: "The model couldn't answer. Please try again.", error: true },
+      ]);
+    } finally {
+      if (jobRef.current === jobId && mounted.current) {
+        jobRef.current = null;
+        setBusy(false);
+        box.current?.focus();
+      }
+    }
+  };
+
+  // Puts a finished reply into the chat (files, document, limit notes).
+  const applyReply = (res: PlaygroundResult, history: Turn[]) => {
+    {
       let limitNote: string | null = null;
       if (res.ok) {
         const newFiles = extractReplyFiles(res.content);
@@ -427,14 +527,6 @@ function ChatPlayground() {
           : { id: crypto.randomUUID(), role: "assistant", content: res.error, error: true },
         ...(limitNote ? [{ id: crypto.randomUUID(), role: "assistant" as const, content: limitNote, model: "local" }] : []),
       ]);
-    } catch {
-      setTurns((t) => [
-        ...t,
-        { id: crypto.randomUUID(), role: "assistant", content: "The model couldn't answer. Please try again.", error: true },
-      ]);
-    } finally {
-      setBusy(false);
-      box.current?.focus();
     }
   };
 
@@ -462,6 +554,8 @@ function ChatPlayground() {
     setPane("image");
     setBusy(true);
     setImaging(true);
+    const ctrl = new AbortController();
+    imageAbort.current = ctrl;
     try {
       const { data } = await supabase.auth.getSession();
       const token = data.session?.access_token;
@@ -472,10 +566,11 @@ function ChatPlayground() {
           setImageView((v) => (v && v.turnId === replyId ? { ...v, url, final } : v));
           setTurns((t) => t.map((x) => (x.id === replyId ? { ...x, image: url, imageFinal: final } : x)));
         },
-        undefined,
+        ctrl.signal,
         token ? { Authorization: `Bearer ${token}` } : undefined,
       );
     } catch (e) {
+      if (ctrl.signal.aborted) return;
       const status = e instanceof ImageStreamError ? e.status : 0;
       const msg =
         status === 402
@@ -488,9 +583,12 @@ function ChatPlayground() {
       setImageView((v) => (v?.turnId === replyId ? null : v));
       setTurns((t) => t.map((x) => (x.id === replyId ? { id: x.id, role: "assistant", content: msg, error: true } : x)));
     } finally {
-      setBusy(false);
-      setImaging(false);
-      box.current?.focus();
+      if (imageAbort.current === ctrl) {
+        imageAbort.current = null;
+        setBusy(false);
+        setImaging(false);
+        box.current?.focus();
+      }
     }
   };
 
@@ -1172,14 +1270,26 @@ function ChatPlayground() {
                   ))}
                 </PopoverContent>
               </Popover>
-              <button
-                type="submit"
-                disabled={(!input.trim() && !files.length) || busy || reading}
-                aria-label="Send"
-                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-border bg-[var(--chat-send-bg,#fff)] text-[var(--chat-send-fg,#000)] shadow-sm transition-opacity disabled:opacity-35"
-              >
-                {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <ArrowUp className="h-4 w-4" />}
-              </button>
+              {busy ? (
+                <button
+                  type="button"
+                  onClick={stop}
+                  aria-label="Stop reply"
+                  title="Stop"
+                  className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-border bg-[var(--chat-send-bg,#fff)] text-[var(--chat-send-fg,#000)] shadow-sm"
+                >
+                  <Square className="h-3.5 w-3.5 fill-current" />
+                </button>
+              ) : (
+                <button
+                  type="submit"
+                  disabled={(!input.trim() && !files.length) || reading}
+                  aria-label="Send"
+                  className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-border bg-[var(--chat-send-bg,#fff)] text-[var(--chat-send-fg,#000)] shadow-sm transition-opacity disabled:opacity-35"
+                >
+                  <ArrowUp className="h-4 w-4" />
+                </button>
+              )}
             </div>
           </div>
         </form>
