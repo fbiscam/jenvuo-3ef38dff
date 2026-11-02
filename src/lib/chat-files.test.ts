@@ -1,6 +1,6 @@
 import { describe, it } from "node:test";
 import { expect } from "./chart/test-expect";
-import { CHAT_MAX_FILES, codeRequestKind, extractReplyDocument, extractReplyFiles, looksLikeCodeRequest, looksLikeDocRequest, looksLikeImageRequest, mergeWorkspace, parseRenameRequest } from "./chat-files";
+import { CHAT_MAX_FILES, codeRequestKind, extractReplyDocument, extractReplyFiles, looksLikeCodeRequest, looksLikeDocRequest, looksLikeImageRequest, mergeWorkspace, parseRenameRequest, frameLimitBlock, findMentionedFile } from "./chat-files";
 
 describe("extractReplyFiles", () => {
   it("names an MQL5 block .mq5", () => {
@@ -119,4 +119,39 @@ describe("shortFileName", () => {
 describe("SEO and leads open as documents", () => {
   it("seo report", () => expect(looksLikeDocRequest("example.com ka SEO report banao")).toBe(true));
   it("leads", () => expect(looksLikeDocRequest("dentists ki leads nikalo aur list banao")).toBe(true));
+});
+
+describe("frame holds max 4 files", () => {
+  const full = { codeFiles: 2, image: true, doc: true, upload: false, site: false };
+  it("blocks a new image when 4 files are open", () => {
+    expect(frameLimitBlock("image", { codeFiles: 2, image: false, doc: true, upload: true, site: false })).toContain("remove one");
+  });
+  it("blocks a third code file", () => {
+    expect(frameLimitBlock("code-new", { codeFiles: 2, image: false, doc: false, upload: false, site: false })).toContain("remove one");
+  });
+  it("lets an open file be edited when full", () => {
+    expect(frameLimitBlock("code-edit", full)).toBe(null);
+  });
+  it("lets the open image be replaced when full", () => {
+    expect(frameLimitBlock("image", full)).toBe(null);
+  });
+  it("allows a new code file with room", () => {
+    expect(frameLimitBlock("code-new", { codeFiles: 1, image: true, doc: false, upload: false, site: false })).toBe(null);
+  });
+});
+
+describe("findMentionedFile", () => {
+  const names = ["gold_sweep_strategy.mq5", "backtest.py"];
+  it("finds a file by full name", () => {
+    expect(findMentionedFile("backtest.py ma changes kro", names)).toBe(1);
+  });
+  it("finds a file by its short tab name", () => {
+    expect(findMentionedFile("gold_sweep.mq5 ma stop loss add kro", names)).toBe(0);
+  });
+  it("finds a file by a name word", () => {
+    expect(findMentionedFile("change the backtest file", names)).toBe(1);
+  });
+  it("returns -1 when no file is named", () => {
+    expect(findMentionedFile("add RSI filter", names)).toBe(-1);
+  });
 });
