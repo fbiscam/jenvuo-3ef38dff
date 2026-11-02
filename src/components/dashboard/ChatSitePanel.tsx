@@ -66,7 +66,7 @@ export function ChatSitePanel({ report, loading, domain, onClose }: { report: Si
               <Row label="Links" value={String(report.links)} />
             </Card>
           </div>
-          {report.keywords.length > 0 && (
+          {report.keywords.length > 0 && (<div className="mt-3">
             <Card title="Top keywords on the page">
               <div className="mt-2 flex flex-wrap gap-1.5">
                 {report.keywords.map((k) => (
