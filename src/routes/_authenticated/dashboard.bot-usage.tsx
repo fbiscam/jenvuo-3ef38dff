@@ -260,16 +260,16 @@ function BotUsagePage() {
       </div>
 
       {/* Live trades */}
-      <h2 className="mt-10 text-[18px] font-medium text-foreground">Trades</h2>
+      <h2 className="mt-10 text-[20px] font-medium text-foreground">Trades</h2>
       <LiveTrades rows={view.latestList} sessions={data?.sessions ?? []} />
 
       {/* Accounts */}
-      <h2 className="mt-10 text-[18px] font-medium text-foreground">Accounts</h2>
+      <h2 className="mt-10 text-[20px] font-medium text-foreground">Accounts</h2>
       <section className="console-card mt-3 p-4 sm:p-5">
-        <p className="text-[13px] text-muted-foreground">Old accounts can be deleted. Accounts live on your JX Bot plan or running now are locked.</p>
+        <p className="text-[14px] text-muted-foreground">Old accounts can be deleted. Accounts live on your JX Bot plan or running now are locked.</p>
         <div className="mt-3 overflow-x-auto">
-          <table className="w-full min-w-[680px] text-[13px]">
-            <thead className="text-left text-[12px] text-muted-foreground">
+          <table className="w-full min-w-[680px] text-[14px]">
+            <thead className="text-left text-[13px] text-muted-foreground">
               <tr className="border-b border-border">
                 <th className="pb-2 font-normal">MT5 account</th>
                 <th className="pb-2 font-normal">Status</th>
@@ -283,7 +283,7 @@ function BotUsagePage() {
             </thead>
             <tbody>
               {view.latestList.length === 0 ? (
-                <tr><td colSpan={8} className="py-8 text-center text-[12px] text-muted-foreground">No MT5 accounts have reported yet.</td></tr>
+                <tr><td colSpan={8} className="py-8 text-center text-[13px] text-muted-foreground">No MT5 accounts have reported yet.</td></tr>
               ) : view.latestList.map((r) => {
                 const lastSession = (data?.sessions ?? []).find((x) => x.mt5_account === r.mt5_account);
                 const online = Date.now() - Date.parse(r.updated_at) < ONLINE_MS && !lastSession?.ended_at;
@@ -337,18 +337,18 @@ function BotUsagePage() {
       {/* Target + ON/OFF */}
       <div className="mt-10 grid grid-cols-1 gap-2 lg:grid-cols-2">
         <section className="console-card p-4 sm:p-5">
-          <div className="text-[13px] text-muted-foreground">Daily target per account</div>
-          <div className="mt-1 text-[22px] font-medium tabular-nums text-foreground">{usd(view.target)} <span className="text-[13px] font-normal text-muted-foreground">each</span></div>
+          <div className="text-[14px] text-muted-foreground">Daily target per account</div>
+          <div className="mt-1 text-[24px] font-medium tabular-nums text-foreground">{usd(view.target)} <span className="text-[14px] font-normal text-muted-foreground">each</span></div>
           {view.perAccount.length === 0 && <div className="mt-4 h-1.5 rounded-full bg-background" />}
           {view.perAccount.map((a) => (
             <div key={a.account} className="mt-4">
-              <div className="flex justify-between text-[12px]"><span className="text-foreground">MT5 {a.account}</span><span className="tabular-nums text-muted-foreground">{usd(a.combined)} / {usd(view.target)}</span></div>
+              <div className="flex justify-between text-[13px]"><span className="text-foreground">MT5 {a.account}</span><span className="tabular-nums text-muted-foreground">{usd(a.combined)} / {usd(view.target)}</span></div>
               <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-background">
                 <div className="h-full rounded-full" style={{ background: "#2a9d8f", width: `${view.target > 0 ? Math.min(100, Math.max(0, (a.combined / view.target) * 100)) : 0}%` }} />
               </div>
             </div>
           ))}
-          <p className="mt-4 text-[13px] leading-5 text-muted-foreground">
+          <p className="mt-4 text-[14px] leading-5 text-muted-foreground">
             Every IP has its own daily target. When one account reaches it, that bot closes its trades and starts again next day.
           </p>
         </section>
@@ -386,9 +386,9 @@ function OnOffLog({ sessions }: { sessions: BotSessionRow[] }) {
   const now = Date.now();
   return (
     <div className="p-5">
-      <div className="text-[13px] font-semibold text-foreground">Bot ON / OFF · last 3 days (UTC)</div>
+      <div className="text-[14px] font-semibold text-foreground">Bot ON / OFF · last 3 days (UTC)</div>
       {sessions.length === 0 ? (
-        <p className="mt-3 text-[12px] text-muted-foreground">No ON/OFF records yet. They appear once the latest bot is running.</p>
+        <p className="mt-3 text-[13px] text-muted-foreground">No ON/OFF records yet. They appear once the latest bot is running.</p>
       ) : (
         <ul className="no-scrollbar-arrows mt-3 max-h-[480px] divide-y divide-border overflow-y-auto">
           {sessions.map((x) => {
@@ -396,7 +396,7 @@ function OnOffLog({ sessions }: { sessions: BotSessionRow[] }) {
             const running = cause.by === "none";
             const end = x.ended_at ?? x.last_seen_at;
             return (
-              <li key={x.id} className="py-2.5 text-[12px]">
+              <li key={x.id} className="py-2.5 text-[13px]">
                 <div className="flex items-center justify-between gap-2">
                   <span className="text-foreground">MT5 {x.mt5_account}</span>
                   <OnOffBadge on={running} />
@@ -407,7 +407,7 @@ function OnOffLog({ sessions }: { sessions: BotSessionRow[] }) {
                 {!running && (
                   <div className="mt-1 text-foreground">
                     {cause.label}
-                    <span className="ml-1.5 rounded bg-secondary px-1.5 py-0.5 text-[11px] text-muted-foreground">{WHO[cause.by]}</span>
+                    <span className="ml-1.5 rounded bg-secondary px-1.5 py-0.5 text-[12px] text-muted-foreground">{WHO[cause.by]}</span>
                   </div>
                 )}
               </li>
@@ -421,7 +421,7 @@ function OnOffLog({ sessions }: { sessions: BotSessionRow[] }) {
 
 function OnOffBadge({ on }: { on: boolean }) {
   return on ? (
-    <span className="inline-flex items-center gap-1.5 rounded-full border border-gc-success/30 bg-gc-success/10 px-2 py-0.5 text-[11px] font-semibold text-gc-success">
+    <span className="inline-flex items-center gap-1.5 rounded-full border border-gc-success/30 bg-gc-success/10 px-2 py-0.5 text-[12px] font-semibold text-gc-success">
       <span className="relative flex h-1.5 w-1.5">
         <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-gc-success opacity-70" />
         <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-gc-success" />
@@ -429,7 +429,7 @@ function OnOffBadge({ on }: { on: boolean }) {
       ON
     </span>
   ) : (
-    <span className="inline-flex items-center gap-1.5 rounded-full border border-destructive/30 bg-destructive/10 px-2 py-0.5 text-[11px] font-semibold text-destructive">
+    <span className="inline-flex items-center gap-1.5 rounded-full border border-destructive/30 bg-destructive/10 px-2 py-0.5 text-[12px] font-semibold text-destructive">
       <span className="h-1.5 w-1.5 rounded-full bg-destructive" />
       OFF
     </span>
@@ -464,21 +464,21 @@ function LiveTrades({ rows, sessions }: { rows: BotReportRow[]; sessions: BotSes
               key={k}
               type="button"
               onClick={() => setTab(k)}
-              className={`relative flex shrink-0 items-center gap-1.5 py-3 text-[13px] ${tab === k ? "text-foreground after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 after:bg-foreground" : "text-muted-foreground hover:text-foreground"}`}
+              className={`relative flex shrink-0 items-center gap-1.5 py-3 text-[14px] ${tab === k ? "text-foreground after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 after:bg-foreground" : "text-muted-foreground hover:text-foreground"}`}
             >
               {label}
-              {n !== null && <span className="rounded-full bg-secondary px-1.5 text-[11px] leading-4 tabular-nums text-foreground">{n}</span>}
+              {n !== null && <span className="rounded-full bg-secondary px-1.5 text-[12px] leading-4 tabular-nums text-foreground">{n}</span>}
             </button>
           ))}
         </div>
-        <div className="hidden text-[12px] text-muted-foreground sm:block">
+        <div className="hidden text-[13px] text-muted-foreground sm:block">
           Floating <span className={`font-medium tabular-nums ${pnlClass(totalFloat)}`}>{usd(totalFloat)}</span>
         </div>
       </div>
       <div className="overflow-x-auto">
         {tab === "open" ? (
-          <table className="w-full min-w-[760px] text-[13px]">
-            <thead className="text-left text-[12px] text-muted-foreground">
+          <table className="w-full min-w-[760px] text-[14px]">
+            <thead className="text-left text-[13px] text-muted-foreground">
               <tr className="border-b border-border">
                 <th className={`${th} ${first}`}>Symbol</th>
                 <th className={th}>Account</th>
@@ -492,7 +492,7 @@ function LiveTrades({ rows, sessions }: { rows: BotReportRow[]; sessions: BotSes
             </thead>
             <tbody>
               {open.length === 0 ? (
-                <tr><td colSpan={8} className="px-3 py-8 text-center text-[12px] text-muted-foreground">No open trades right now. They appear here while the bot is trading.</td></tr>
+                <tr><td colSpan={8} className="px-3 py-8 text-center text-[13px] text-muted-foreground">No open trades right now. They appear here while the bot is trading.</td></tr>
               ) : (
                 open.map((r) => {
                   const floating = r.equity - r.balance;
@@ -504,7 +504,7 @@ function LiveTrades({ rows, sessions }: { rows: BotReportRow[]; sessions: BotSes
                         <span className="inline-flex items-center gap-2">
                           <img src={euFlag} alt="" className="h-4 w-4 rounded-full object-cover" />
                           <span className="text-foreground">{symbolLabel(r.symbol)}</span>
-                          <span className="rounded-full bg-secondary px-1.5 text-[11px] tabular-nums">{r.open_trades}</span>
+                          <span className="rounded-full bg-secondary px-1.5 text-[12px] tabular-nums">{r.open_trades}</span>
                         </span>
                       </td>
                       <td className={`${td} tabular-nums`}>{r.mt5_account}</td>
@@ -521,8 +521,8 @@ function LiveTrades({ rows, sessions }: { rows: BotReportRow[]; sessions: BotSes
             </tbody>
           </table>
         ) : (
-          <table className="w-full min-w-[560px] text-[13px]">
-            <thead className="text-left text-[12px] text-muted-foreground">
+          <table className="w-full min-w-[560px] text-[14px]">
+            <thead className="text-left text-[13px] text-muted-foreground">
               <tr className="border-b border-border">
                 <th className={`${th} ${first}`}>Symbol</th>
                 <th className={th}>Account</th>
@@ -533,7 +533,7 @@ function LiveTrades({ rows, sessions }: { rows: BotReportRow[]; sessions: BotSes
             </thead>
             <tbody>
               {live.length === 0 ? (
-                <tr><td colSpan={5} className="px-3 py-8 text-center text-[12px] text-muted-foreground">No trades closed today yet.</td></tr>
+                <tr><td colSpan={5} className="px-3 py-8 text-center text-[13px] text-muted-foreground">No trades closed today yet.</td></tr>
               ) : (
                 live.map((r) => (
                   <tr key={r.license_id}>
