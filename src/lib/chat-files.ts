@@ -95,7 +95,7 @@ export function wantsNewFile(prompt: string): boolean {
 }
 
 /** Files the Chat code editor can hold at once. */
-export const CHAT_MAX_FILES = 2;
+export const CHAT_MAX_FILES = 999;
 
 /**
  * Adds a reply's files to the editor: same name = updated in place, new names
@@ -203,7 +203,7 @@ export function shortFileName(name: string): string {
 }
 
 /** Items the frame beside the chat holds at once (code files, image, document, upload, website). */
-export const FRAME_MAX_ITEMS = 4;
+export const FRAME_MAX_ITEMS = 999;
 
 export type FrameState = { codeFiles: number; image: boolean; doc: boolean; upload: boolean; site: boolean };
 

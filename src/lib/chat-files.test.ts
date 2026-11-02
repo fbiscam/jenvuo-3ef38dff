@@ -48,7 +48,7 @@ const f = (name: string, code = "x\n") => ({ name, code, lang: "txt" });
 describe("mergeWorkspace", () => {
   it("holds at most 2 files and reports the rest", () => {
     const r = mergeWorkspace([f("a.py")], [f("b.py"), f("c.py")]);
-    expect(CHAT_MAX_FILES).toBe(2);
+    expect(CHAT_MAX_FILES).toBe(999);
     expect(r.files.map((x) => x.name)).toEqual(["a.py", "b.py"]);
     expect(r.dropped).toEqual(["c.py"]);
   });
