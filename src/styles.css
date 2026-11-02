@@ -1243,7 +1243,7 @@ html:not(.ms-icons-ready) .material-symbols-rounded {
   --secondary: oklch(0.24 0.01 275);
   --secondary-foreground: oklch(0.98 0 0);
   --muted: oklch(0.22 0.01 275);
-  --muted-foreground: oklch(0.72 0.01 275);
+  --muted-foreground: oklch(0.9 0 0);
   --accent: oklch(0.25 0.012 275);
   --accent-foreground: oklch(1 0 0);
   --border: oklch(0.25 0.01 275);
@@ -1258,7 +1258,7 @@ body:has(.terminal-dark) .jenvu-terminal-shell {
   --card: oklch(0.1 0 0);
   --popover: oklch(0.2 0.01 275);
   --muted: oklch(0.22 0.01 275);
-  --muted-foreground: oklch(0.72 0.01 275);
+  --muted-foreground: oklch(0.9 0 0);
   --accent: oklch(0.25 0.012 275);
   --border: oklch(0.25 0.01 275);
   --gc-console-bar: oklch(0 0 0);
@@ -1267,7 +1267,7 @@ body:has(.terminal-dark) .jenvu-terminal-shell {
   --gc-canvas: oklch(0 0 0);
   --gc-section: oklch(0.12 0 0);
   --gc-ink: oklch(0.97 0 0);
-  --gc-ink-muted: oklch(0.7 0.012 275);
+  --gc-ink-muted: oklch(0.9 0 0);
   --gc-line: oklch(0.25 0.01 275);
   --gc-panel: oklch(0.1 0 0);
   --gc-notice: oklch(0.22 0.01 275);
@@ -1291,6 +1291,14 @@ body:has(.terminal-dark) .jenvu-terminal-shell .terminal-toolbar :is(button, [ro
 body:has(.terminal-dark) .jenvu-terminal-shell :is(header, .terminal-toolbar) svg {
   color: oklch(1 0 0) !important;
 }
+/* Black terminal: every icon and label in the widgets, watchlist and panels is white too. */
+.terminal-dark :is(svg.lucide, .lucide),
+.terminal-dark :is(button, [role="button"], [role="tab"]):not(.bg-primary):not(.bg-foreground):not([class*="bg-white"]) {
+  color: oklch(1 0 0);
+}
+.terminal-dark :is(.text-muted-foreground, .text-gc-ink-muted, [class*="text-zinc-"], [class*="text-slate-"], [class*="text-gray-"], [class*="text-neutral-"]) {
+  color: oklch(0.92 0 0) !important;
+}
 
 /* Black terminal: the left app menu turns near-black with white icons too. */
 body:has(.terminal-dark) .dashboard-terminal-sidebar,
@@ -1300,6 +1308,8 @@ body:has(.terminal-dark) .dashboard-terminal-sidebar .bg-sidebar {
 }
 body:has(.terminal-dark) .dashboard-terminal-sidebar .dashboard-sidebar-link,
 body:has(.terminal-dark) .dashboard-terminal-sidebar .dashboard-sidebar-brand,
+body:has(.terminal-dark) .dashboard-terminal-sidebar .dashboard-sidebar-logo,
+body:has(.terminal-dark) .dashboard-terminal-sidebar :is(span, div, a, svg, .sidebar-group-label),
 body:has(.terminal-dark) .dashboard-terminal-sidebar button {
   color: oklch(1 0 0) !important;
 }

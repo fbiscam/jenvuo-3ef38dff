@@ -1362,8 +1362,8 @@ function DashboardLayout() {
           className={`dashboard-sidebar-root ${pinned ? "console-sidebar" : ""} ${onTerminal && !terminalRail ? "jenvu-zoom-chrome" : ""} ${
             drawerMode && onTerminal
               ? mobileNavOpen
-                ? "fixed inset-y-0 left-0 z-50 w-[280px] translate-x-0 rounded-r-2xl shadow-2xl"
-                : "terminal-rail fixed inset-y-0 left-0 z-20 w-[52px] -translate-x-full border-r border-zinc-200 max-lg:invisible lg:translate-x-0"
+                ? "dashboard-terminal-sidebar fixed inset-y-0 left-0 z-50 w-[280px] translate-x-0 rounded-r-2xl shadow-2xl"
+                : "dashboard-terminal-sidebar terminal-rail fixed inset-y-0 left-0 z-20 w-[52px] -translate-x-full border-r border-zinc-200 max-lg:invisible lg:translate-x-0"
               : pinned
               ? `fixed inset-y-0 left-0 z-50 w-[260px] border-0 lg:z-20 lg:translate-x-0 lg:shadow-none ${mobileNavOpen ? "translate-x-0 shadow-2xl" : "-translate-x-full max-lg:invisible"}`
               : drawerMode
