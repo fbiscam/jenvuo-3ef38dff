@@ -242,6 +242,8 @@ function ChatPlayground() {
   const [docOpen, setDocOpen] = useState(false);
   // Once code is asked for, the editor stays open (even while the AI asks questions).
   const [codePinned, setCodePinned] = useState<CodeKind | null>(null);
+  // Which tab of the left work area is in front; code, picture and document all stay open.
+  const [pane, setPane] = useState<"code" | "image" | "doc">("code");
   const [imageView, setImageView] = useState<ImageView | null>(null);
   const [imaging, setImaging] = useState(false);
   const scroller = useRef<HTMLDivElement>(null);
@@ -361,15 +363,14 @@ function ChatPlayground() {
           const first = fresh >= 0 ? fresh : merged.files.findIndex((x) => x.name.toLowerCase() === (newFiles[0]?.name ?? "").toLowerCase());
           if (first >= 0) setActiveFile(first);
           if (merged.dropped.length) toast.error(`The editor holds ${CHAT_MAX_FILES} files. Remove one to add ${merged.dropped.join(", ")}.`);
-          setDocOpen(false);
-          setImageView(null);
+          setPane("code");
           setCodePinned((k) => k ?? "generic");
         }
         const newDoc = extractReplyDocument(res.content);
         if (newDoc) {
           setDoc(newDoc);
           setDocOpen(true);
-          setImageView(null);
+          setPane("doc");
         }
       }
       setTurns((t) => [
@@ -418,7 +419,7 @@ function ChatPlayground() {
     setTurns((t) => [...t, userTurn, { id: replyId, role: "assistant", content: `Image created for: "${prompt}"`, model: "image" }]);
     setInput("");
     setImageView({ turnId: replyId, prompt, final: false });
-    setDocOpen(false);
+    setPane("image");
     setBusy(true);
     setImaging(true);
     try {
