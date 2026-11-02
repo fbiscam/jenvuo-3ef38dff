@@ -197,7 +197,7 @@ export function ChatCodeStudio({ files, busy, kind, seed, active, onActive, onDo
       {!codeActive ? (
         <div className="flex min-h-0 flex-1 flex-col overflow-hidden">{children}</div>
       ) : (<>
-      <div className="min-h-0 flex-1 overflow-auto py-3 font-mono text-[13.5px] leading-[1.7]">
+      <div className="chat-no-scrollbar min-h-0 flex-1 overflow-auto py-3 font-mono text-[13.5px] leading-[1.7]">
         {lines.map((l, i) => (
           <div key={i} className="vsc-line flex">
             <span className="w-12 shrink-0 select-none pr-4 text-right opacity-40">{i + 1}</span>
