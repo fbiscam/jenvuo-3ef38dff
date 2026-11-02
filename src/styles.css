@@ -2300,19 +2300,18 @@ html body .jenvu-zoom-dashboard main .jx-ide :is(.jx-ide-card) { border-radius: 
 
 /* Download / export buttons: white with black text in both themes, with a looping colourful ring light. */
 @property --ring-a { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
-.ring-btn { position: relative; isolation: isolate; background: #ffffff !important; color: #111111 !important; border: 0; transition: transform .15s ease; }
-.ring-btn:hover { transform: translateY(-1px); }
-.ring-btn::before, .ring-btn::after {
-  content: ""; position: absolute; inset: -1.5px; border-radius: inherit; z-index: -1; pointer-events: none;
-  background: conic-gradient(from var(--ring-a), #ff5f6d, #ffc371, #47e891, #38bdf8, #a78bfa, #f472b6, #ff5f6d);
+.ring-btn {
+  position: relative; color: #111111 !important; border: 1.5px solid transparent !important; transition: transform .15s ease;
+  background:
+    linear-gradient(#ffffff, #ffffff) padding-box,
+    conic-gradient(from var(--ring-a), #ff5f6d, #ffc371, #47e891, #38bdf8, #a78bfa, #f472b6, #ff5f6d) border-box !important;
   animation: ring-spin 3.2s linear infinite;
 }
-.ring-btn::before { padding: 1.5px; -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; }
-.ring-btn::after { display: none; }
-.dark .ring-btn, .dash-dark .ring-btn { background: #ffffff !important; color: #111111 !important; }
+.ring-btn:hover { transform: translateY(-1px); }
+.dark .ring-btn, .dash-dark .ring-btn { color: #111111 !important; }
 .dark .ring-btn *, .dash-dark .ring-btn * { color: inherit !important; }
 @keyframes ring-spin { to { --ring-a: 360deg; } }
-@media (prefers-reduced-motion: reduce) { .ring-btn::before, .ring-btn::after { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .ring-btn { animation: none; } }
 
 /* Chat document (PDF-style) page. */
 .chat-docview { background: #f4f4f3; color: #111; }
@@ -2356,21 +2355,42 @@ html body .jenvu-zoom-dashboard main .jx-ide :is(.jx-ide-card) { border-radius: 
 .chat-no-scrollbar::-webkit-scrollbar { display: none; width: 0; height: 0; }
 
 /* VS Code Dark+ look for the chat code studio (all themes) */
-html body .code-box.vsc-studio { background: #1e1e1e !important; color: #d4d4d4 !important; border-color: #2b2b2b; }
-html body .vsc-studio > div:first-child { background: #252526; border-color: #2b2b2b !important; }
-html body .vsc-studio .code-tab { color: #969696; }
-html body .vsc-studio .code-tab.is-active { background: #1e1e1e; color: #ffffff; box-shadow: inset 0 2px 0 #007acc; }
-html body .vsc-studio .code-box-copy { color: #c5c5c5; }
-html body .vsc-studio .vsc-line:hover { background: #2a2d2e; }
-html body .vsc-studio .vsc-line > span:first-child { color: #858585; opacity: 1; }
-html body .vsc-studio .vsc-status { background: #007acc; color: #ffffff; }
+/* Code area: white in the white theme, VS Code dark in the black theme, slightly brighter colours. */
+html body .code-box.vsc-studio { background: #ffffff !important; color: #1f2328 !important; border-color: #e5e7eb; }
+html body .vsc-studio > div:first-child { background: #f8fafc; border-color: #e5e7eb !important; }
+html body .vsc-studio .code-tab { color: #57606a; }
+html body .vsc-studio .code-tab.is-active { background: #ffffff; color: #111111; box-shadow: inset 0 2px 0 #0a84ff; }
+html body .vsc-studio .code-box-copy, html body .vsc-studio .vsc-count { color: #57606a; }
+html body .vsc-studio .vsc-line:hover { background: #f3f6fa; }
+html body .vsc-studio .vsc-line > span:first-child { color: #8c959f; opacity: 1; }
+html body .vsc-studio .vsc-status { background: #0a84ff; color: #ffffff; }
 html body .vsc-studio .vsc-status * { color: #ffffff !important; }
-html body .vsc-studio .tok-comment { color: #6a9955 !important; font-style: italic; }
-html body .vsc-studio .tok-string { color: #ce9178 !important; }
-html body .vsc-studio .tok-env { color: #4fc1ff !important; }
-html body .vsc-studio .tok-keyword { color: #c586c0 !important; }
-html body .vsc-studio .tok-const { color: #569cd6 !important; }
-html body .vsc-studio .tok-number { color: #b5cea8 !important; }
-html body .vsc-studio .tok-func { color: #dcdcaa !important; }
-html body .vsc-studio .tok-type { color: #4ec9b0 !important; }
-html body .vsc-studio .tok-var { color: #9cdcfe !important; }
+html body .vsc-studio .tok-comment { color: #1a8f3c !important; font-style: italic; }
+html body .vsc-studio .tok-string { color: #d1242f !important; }
+html body .vsc-studio .tok-env { color: #0969da !important; }
+html body .vsc-studio .tok-keyword { color: #a626d6 !important; }
+html body .vsc-studio .tok-const { color: #0550ff !important; }
+html body .vsc-studio .tok-number { color: #0a7d5a !important; }
+html body .vsc-studio .tok-func { color: #b35900 !important; }
+html body .vsc-studio .tok-type { color: #0b8a8f !important; }
+html body .vsc-studio .tok-var { color: #0b4fa8 !important; }
+html body :is(.dark, .dash-dark) .code-box.vsc-studio { background: #1e1e1e !important; color: #e6e6e6 !important; border-color: #2b2b2b; }
+html body :is(.dark, .dash-dark) .vsc-studio > div:first-child { background: #252526; border-color: #2b2b2b !important; }
+html body :is(.dark, .dash-dark) .vsc-studio .code-tab,
+html body :is(.dark, .dash-dark) .vsc-studio .code-tab.is-active,
+html body :is(.dark, .dash-dark) .vsc-studio .code-tab *,
+html body :is(.dark, .dash-dark) .vsc-studio .vsc-count,
+html body :is(.dark, .dash-dark) .vsc-studio .code-box-copy { color: #ffffff !important; opacity: 1 !important; }
+html body :is(.dark, .dash-dark) .vsc-studio .code-tab.is-active { background: #1e1e1e; box-shadow: inset 0 2px 0 #3794ff; }
+html body :is(.dark, .dash-dark) .vsc-studio .vsc-line:hover { background: #2a2d2e; }
+html body :is(.dark, .dash-dark) .vsc-studio .vsc-line > span:first-child { color: #ffffff; opacity: .85; }
+html body :is(.dark, .dash-dark) .vsc-studio .vsc-status { background: #007acc; }
+html body :is(.dark, .dash-dark) .vsc-studio .tok-comment { color: #7fd36b !important; }
+html body :is(.dark, .dash-dark) .vsc-studio .tok-string { color: #ffa47a !important; }
+html body :is(.dark, .dash-dark) .vsc-studio .tok-env { color: #5cd2ff !important; }
+html body :is(.dark, .dash-dark) .vsc-studio .tok-keyword { color: #e28cff !important; }
+html body :is(.dark, .dash-dark) .vsc-studio .tok-const { color: #6cb6ff !important; }
+html body :is(.dark, .dash-dark) .vsc-studio .tok-number { color: #c8f0a8 !important; }
+html body :is(.dark, .dash-dark) .vsc-studio .tok-func { color: #fff08a !important; }
+html body :is(.dark, .dash-dark) .vsc-studio .tok-type { color: #4fe8c8 !important; }
+html body :is(.dark, .dash-dark) .vsc-studio .tok-var { color: #a8dcff !important; }
