@@ -313,7 +313,7 @@ async function callLovableModel(
                   : { type: "image", source: { type: "url", url: p.image_url.url } };
               }),
       }));
-    body = { model, messages, max_tokens: Math.max(opts.maxTokens ?? 2000, 1024), ...(system ? { system } : {}) };
+    body = { model, messages, max_tokens: opts.maxTokens ?? 2000, ...(system ? { system } : {}) };
   } else {
     body = { model, messages: opts.messages, ...(opts.maxTokens ? { max_tokens: opts.maxTokens } : {}) };
     if (opts.jsonMode) body.response_format = { type: "json_object" };
@@ -367,7 +367,7 @@ async function callBackupChat(
     stream: true,
   };
   if (wantsJson) body.text = { format: { type: "json_object" } };
-  if (opts.maxTokens) body.max_output_tokens = Math.max(opts.maxTokens, 2000);
+  if (opts.maxTokens) body.max_output_tokens = Math.max(opts.maxTokens, 16);
 
   const res = await fetch("https://ai.gateway.lovable.dev/v1/responses", {
     ...(signal ? { signal } : {}),

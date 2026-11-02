@@ -384,7 +384,9 @@ function ChatPlayground() {
           setWorkspace(merged.files);
           const fresh = merged.files.findIndex((x) => !workspace.some((w) => w.name === x.name));
           const changed = merged.files.findIndex((x) => newFiles.some((n) => n.name.toLowerCase() === x.name.toLowerCase()));
-          const first = fresh >= 0 ? fresh : changed;
+          const askedIdx = findMentionedFile(lastUser?.display ?? lastUser?.content ?? "", merged.files.map((x) => x.name));
+          const activeChanged = merged.files[activeFile] && newFiles.some((n) => n.name.toLowerCase() === merged.files[activeFile]!.name.toLowerCase());
+          const first = fresh >= 0 ? fresh : askedIdx >= 0 ? askedIdx : activeChanged ? activeFile : changed;
           if (first >= 0) setActiveFile(first);
           if (merged.dropped.length)
             limitNote = `**${merged.dropped.join(", ")}** couldn't open: the frame is full (max ${FRAME_MAX_ITEMS} files, ${CHAT_MAX_FILES} of them code). Please remove one file with the ✕ on its tab, then try again.`;

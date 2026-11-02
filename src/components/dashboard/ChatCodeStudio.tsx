@@ -112,7 +112,7 @@ export function ChatCodeStudio({ files, busy, kind, seed, active, onActive, onDo
   return (
     <div className="code-box vsc-studio flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl">
       <div className="flex items-center gap-2 border-b border-current/10 px-2 py-2">
-        <div className="chat-no-scrollbar flex min-w-0 flex-1 gap-1 overflow-x-auto">
+        <div className="chat-no-scrollbar flex min-w-0 flex-1 snap-x gap-1 overflow-x-auto overscroll-x-contain scroll-smooth touch-pan-x">
           {!hasCode ? null : waiting ? (
             <span className="px-2 py-1.5 text-[13px] opacity-60">Code editor</span>
           ) : showTyping ? (
@@ -208,19 +208,17 @@ export function ChatCodeStudio({ files, busy, kind, seed, active, onActive, onDo
           </div>
         ))}
       </div>
+      {(waiting || showTyping || busy) && (
       <div className="vsc-status flex items-center gap-2 px-4 py-1.5 text-[12px]">
         {waiting ? (
           <>Paused — answer the AI's questions in the chat and coding continues here</>
-        ) : showTyping || busy ? (
+        ) : (
           <>
             <Loader2 className="h-3.5 w-3.5 animate-spin" /> {showTyping ? `Writing ${snippet.file.split(".").pop()?.toUpperCase()} code…` : `Updating ${file?.name}…`}
           </>
-        ) : (
-          <>
-            {file?.lang.toUpperCase()} · {lines.length} lines · Ask the AI on the right to change, rename or move code between files
-          </>
         )}
       </div>
+      )}
       </>)}
     </div>
   );

@@ -46,11 +46,11 @@ describe("codeRequestKind", () => {
 const f = (name: string, code = "x\n") => ({ name, code, lang: "txt" });
 
 describe("mergeWorkspace", () => {
-  it("holds at most 2 files and reports the rest", () => {
-    const r = mergeWorkspace([f("a.py")], [f("b.py"), f("c.py")]);
-    expect(CHAT_MAX_FILES).toBe(2);
-    expect(r.files.map((x) => x.name)).toEqual(["a.py", "b.py"]);
-    expect(r.dropped).toEqual(["c.py"]);
+  it("keeps every new file (no small file limit)", () => {
+    const r = mergeWorkspace([f("a.py")], [f("b.py"), f("c.py"), f("d.py"), f("e.py")]);
+    expect(CHAT_MAX_FILES).toBe(999);
+    expect(r.files.length).toBe(5);
+    expect(r.dropped).toEqual([]);
   });
 
   it("updates a file with the same name in place", () => {
@@ -123,11 +123,11 @@ describe("SEO and leads open as documents", () => {
 
 describe("frame holds max 4 files", () => {
   const full = { codeFiles: 2, image: true, doc: true, upload: false, site: false };
-  it("blocks a new image when 4 files are open", () => {
-    expect(frameLimitBlock("image", { codeFiles: 2, image: false, doc: true, upload: true, site: false })).toContain("remove one");
+  it("allows a new image when 4 files are open", () => {
+    expect(frameLimitBlock("image", { codeFiles: 2, image: false, doc: true, upload: true, site: false })).toBe(null);
   });
-  it("blocks a third code file", () => {
-    expect(frameLimitBlock("code-new", { codeFiles: 2, image: false, doc: false, upload: false, site: false })).toContain("remove one");
+  it("allows a fifth and sixth code file", () => {
+    expect(frameLimitBlock("code-new", { codeFiles: 5, image: false, doc: false, upload: false, site: false })).toBe(null);
   });
   it("lets an open file be edited when full", () => {
     expect(frameLimitBlock("code-edit", full)).toBe(null);
