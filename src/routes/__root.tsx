@@ -147,20 +147,20 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "google-adsense-account", content: "ca-pub-9179643691974639" },
       { name: "google-adsense-account", content: "ca-pub-8708842688547386" },
       { name: "google-adsense-account", content: "ca-pub-6031688799547633" },
-      { title: "Jenvu — AI Trading for Gold, BTC/USD & EUR/USD" },
+      { title: "Jenvu: AI Trading Platform | API, JX Bot & Live Terminal" },
       {
         name: "description",
         content:
-          "AI trading platform for Gold (XAU/USD), BTC/USD and EUR/USD with live ICT/SMC analysis, chart context, A+ setups and reviewed trade signals.",
+          "One platform. Endless market intelligence. Ask the AI, read live charts in the Terminal, run JX Bot and connect the developer API, all in one workspace.",
       },
       { name: "author", content: "Jenvu AI" },
       { name: "theme-color", content: "#000000" },
       { property: "og:site_name", content: "Jenvu AI" },
-      { property: "og:title", content: "Jenvu AI — Gold, BTC/USD & EUR/USD Trading Desk" },
+      { property: "og:title", content: "Jenvu: AI Trading Platform | API, JX Bot & Live Terminal" },
       {
         property: "og:description",
         content:
-          "Analyze Gold, BTC/USD and EUR/USD charts with institutional ICT/SMC logic, reviewed signals and clear risk context.",
+          "Ask the AI, read live charts in the Terminal, run JX Bot and connect the developer API, all in one workspace.",
       },
       { property: "og:type", content: "website" },
       { property: "og:locale", content: "en_US" },
@@ -170,11 +170,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/afb81f86-c6e3-4892-b81f-eb551ed99e17/id-preview-cf5425ce--06cd4260-299b-4286-8096-c43f2f596dee.lovable.app-1782731006346.png",
       },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "Jenvu AI — Gold, BTC/USD & EUR/USD Trading Desk" },
+      { name: "twitter:title", content: "Jenvu: AI Trading Platform | API, JX Bot & Live Terminal" },
       {
         name: "twitter:description",
         content:
-          "AI trading for Gold, BTC/USD and EUR/USD with ICT/SMC analysis and reviewed trade signals.",
+          "Ask the AI, read live charts in the Terminal, run JX Bot and connect the developer API, all in one workspace.",
       },
       {
         name: "twitter:image",
