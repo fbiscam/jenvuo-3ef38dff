@@ -166,7 +166,7 @@ export function TerminalWatchlist({
       return map;
     },
     staleTime: 8_000,
-    refetchInterval: 10_000,
+    refetchInterval: 2_000,
     refetchIntervalInBackground: false,
     placeholderData: (previous) => previous,
   });

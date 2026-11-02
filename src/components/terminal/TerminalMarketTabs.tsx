@@ -84,8 +84,8 @@ export function TerminalSymbolHeader({
   const overview = useQuery({
     queryKey: ["terminal-overview", asset, "1d"],
     queryFn: () => fetchOverview({ data: { period: "1d", asset } }),
-    staleTime: 60_000,
-    refetchInterval: 60_000,
+    staleTime: 2_000,
+    refetchInterval: 3_000,
     refetchIntervalInBackground: false,
     enabled: asset !== "EURUSD",
   });
@@ -152,8 +152,8 @@ export function TerminalPeriodReturns({ asset = "XAUUSD", timeframeKey, onPick }
   const query = useQuery({
     queryKey: ["terminal-overview", asset, "1d"],
     queryFn: () => fetchOverview({ data: { period: "1d", asset } }),
-    staleTime: 60_000,
-    refetchInterval: 60_000,
+    staleTime: 2_000,
+    refetchInterval: 3_000,
     refetchIntervalInBackground: false,
   });
   const [picked, setPicked] = useState<PeriodKey | null>(null);
@@ -539,8 +539,8 @@ function useExtraQuotes() {
       for (const row of res?.results ?? []) if (row.snapshot && Number.isFinite(row.snapshot.price)) map[row.symbol] = row.snapshot;
       return map;
     },
-    staleTime: 10_000,
-    refetchInterval: 15_000,
+    staleTime: 1_000,
+    refetchInterval: 2_000,
     refetchIntervalInBackground: false,
     placeholderData: (prev) => prev,
   });

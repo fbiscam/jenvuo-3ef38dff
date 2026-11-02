@@ -349,7 +349,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
     queryFn: () => fetchChart({ data: { timeframe: timeframe.key, asset } }),
     // History refresh only; the forming candle follows the live price stream.
     // Every refresh is a paid server call, so 15s and paused when the tab is hidden.
-    refetchInterval: goldClosed ? false : 15_000,
+    refetchInterval: goldClosed ? false : 3_000,
     // Only reuse the previous payload for the SAME pair and timeframe; showing
     // another timeframe's candles while switching made the chart look broken.
     placeholderData: (prev) =>
