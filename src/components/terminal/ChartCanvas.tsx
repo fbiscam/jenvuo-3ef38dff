@@ -43,7 +43,7 @@ export const CHART_THEMES: Record<ChartTheme, { bg: string; text: string; grid: 
   light: {
     bg: "#ffffff",
     text: "#131722",
-    grid: "#d3d9e2",
+    grid: "#f0f3fa",
     border: "#d6dae3",
     up: "#089981",
     down: "#f23645",
@@ -54,7 +54,7 @@ export const CHART_THEMES: Record<ChartTheme, { bg: string; text: string; grid: 
   dark: {
     bg: "#000000",
     text: "#f2f2f2",
-    grid: "#141414",
+    grid: "#1a1a1a",
     border: "#1f1f1f",
     up: "#089981",
     down: "#f23645",
@@ -220,8 +220,8 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
         panes: { separatorColor: themeColors.border, enableResize: true },
       },
       grid: {
-        vertLines: { visible: false, color: themeColors.grid },
-        horzLines: { visible: false, color: themeColors.grid },
+        vertLines: { visible: true, color: themeColors.grid },
+        horzLines: { visible: true, color: themeColors.grid },
       },
       crosshair: { mode: CrosshairMode.Normal },
       rightPriceScale: { borderColor: themeColors.border },
@@ -330,7 +330,7 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
         textColor: t.text,
         panes: { separatorColor: t.border, enableResize: true },
       },
-      grid: { vertLines: { visible: false, color: t.grid }, horzLines: { visible: false, color: t.grid } },
+      grid: { vertLines: { visible: true, color: t.grid }, horzLines: { visible: true, color: t.grid } },
       rightPriceScale: { borderColor: t.border },
       timeScale: { borderColor: t.border },
     });

@@ -39,7 +39,31 @@ import {
 import { getTerminalChart } from "@/lib/gold-analysis.functions";
 import { cn } from "@/lib/utils";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { ChevronDown, Clock3, Lock, Menu, PanelLeftClose, PanelLeftOpen } from "lucide-react";
+import { CalendarRange, ChevronDown, Clock3, Lock, Menu, PanelLeftClose, PanelLeftOpen } from "lucide-react";
+
+/** TradingView-style quick ranges in the chart's bottom bar (each picks a timeframe). */
+const RANGE_BUTTONS = [
+  { key: "1d", label: "1D" },
+  { key: "5d", label: "5D" },
+  { key: "1m", label: "1M" },
+  { key: "3m", label: "3M" },
+  { key: "6m", label: "6M" },
+  { key: "ytd", label: "YTD" },
+  { key: "1y", label: "1Y" },
+  { key: "5y", label: "5Y" },
+  { key: "all", label: "All" },
+] as const;
+
+function UtcClock() {
+  const [now, setNow] = useState<string>("");
+  useEffect(() => {
+    const tick = () => setNow(new Date().toISOString().slice(11, 19));
+    tick();
+    const id = window.setInterval(tick, 1000);
+    return () => window.clearInterval(id);
+  }, []);
+  return <span className="ml-auto font-mono text-[12px] tabular-nums text-foreground/80">{now ? `${now} UTC` : ""}</span>;
+}
 import { useStrategyAccess } from "./useStrategyAccess";
 import { LOCKED_STRATEGY_KEYS } from "@/lib/strategy-access";
 import { Switch } from "@/components/ui/switch";
@@ -256,6 +280,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
   // The Terminal uses candles only (the Line/area switch was removed).
   const chartStyle = "candles" as const;
   const [marketTab, setMarketTab] = useState<MarketTab>("overview");
+  const [tfMenuOpen, setTfMenuOpen] = useState(false);
   // Desktop chart toolbar is rendered into the dashboard top bar (in place of the old price strip).
   const [toolbarHost, setToolbarHost] = useState<HTMLElement | null>(null);
   useEffect(() => {
@@ -720,22 +745,32 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
           </button>
         ))}
       </div>
-      <div role="group" aria-label="Chart timeframe" className="flex shrink-0 items-center gap-0.5">
-        {timeframes.map((item) => (
-          <button
-            type="button"
-            key={item.key}
-            onClick={() => onTimeframeChange(item)}
-            aria-pressed={item.key === timeframe.key}
-            className={cn(
-              "h-7 rounded-md px-2 font-mono text-xs font-semibold text-muted-foreground transition-colors hover:bg-accent hover:text-foreground",
-              item.key === timeframe.key && "bg-accent text-foreground",
-            )}
-          >
-            {item.label}
+      <span className="mx-1 h-5 w-px shrink-0 bg-gc-line" aria-hidden="true" />
+      <Popover open={tfMenuOpen} onOpenChange={setTfMenuOpen}>
+        <PopoverTrigger asChild>
+          <button type="button" aria-label="Chart timeframe" title="Chart timeframe" className={cn(railBtn, "px-2 font-semibold text-foreground")}>
+            {timeframe.label}
+            <ChevronDown className="h-3 w-3 opacity-70" />
           </button>
-        ))}
-      </div>
+        </PopoverTrigger>
+        <PopoverContent side="bottom" align="start" className={cn("w-40 p-1", popClass)}>
+          <p className="px-2 pb-1 pt-1 text-[11px] font-medium uppercase tracking-wide text-muted-foreground">Timeframe</p>
+          {timeframes.map((item) => (
+            <button
+              type="button"
+              key={item.key}
+              onClick={() => { onTimeframeChange(item); setTfMenuOpen(false); }}
+              aria-pressed={item.key === timeframe.key}
+              className={cn(
+                "flex w-full items-center justify-between rounded-md px-2 py-1.5 text-left text-[13px] text-foreground hover:bg-accent",
+                item.key === timeframe.key && "bg-accent font-semibold",
+              )}
+            >
+              {item.label}
+            </button>
+          ))}
+        </PopoverContent>
+      </Popover>
       <span className="mx-1 h-5 w-px shrink-0 bg-gc-line" aria-hidden="true" />
       <Popover>
         <PopoverTrigger asChild>
@@ -1130,6 +1165,30 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
                 </button>
               </div>
             )}
+          </div>
+
+          {/* TradingView-style bottom bar: quick ranges + live clock (desktop). */}
+          <div className="hidden h-8 shrink-0 items-center gap-0.5 border-t border-border bg-background px-2 font-sans md:flex">
+            {RANGE_BUTTONS.map((r) => (
+              <button
+                key={r.key}
+                type="button"
+                title={`${r.label} range`}
+                onClick={() => {
+                  const next = timeframes.find((t) => t.key === PERIOD_TIMEFRAME[r.key]);
+                  if (next && next.key !== timeframe.key) onTimeframeChange(next);
+                  else chartRef.current?.fit();
+                }}
+                className="h-6 rounded px-1.5 text-[12px] font-medium text-foreground/80 hover:bg-accent hover:text-foreground"
+              >
+                {r.label}
+              </button>
+            ))}
+            <span className="mx-1 h-4 w-px bg-border" aria-hidden="true" />
+            <button type="button" onClick={() => chartRef.current?.fit()} title="Go to latest" aria-label="Go to latest" className="inline-flex h-6 w-6 items-center justify-center rounded text-foreground/80 hover:bg-accent hover:text-foreground">
+              <CalendarRange className="h-4 w-4" />
+            </button>
+            <UtcClock />
           </div>
 
           {demoTradingEnabled && paperOpen && <PaperTradingPanel trading={demo} price={currentPrice} onClose={() => setPaperOpen(false)} />}
