@@ -20,15 +20,46 @@ export type TerminalAccess = {
   trialEndsAt?: string | null;
 };
 
+export const PAID_PLANS = ["starter", "pro", "elite", "ultra"] as const;
+
+type Sub = {
+  plan_id: string | null;
+  status: string | null;
+  is_trial: boolean | null;
+  current_period_end: string | null;
+  trial_ends_at: string | null;
+};
+
 /**
- * Terminal rule: the Terminal is reserved for approved Founding members
- * (free of cost) and admins. Paid plans, the Pro trial and credit never
- * unlock it; they cover JX Bot licenses and Top AI Models instead.
- * `founding` is the evaluated Founding row, or null when there is none.
+ * Plan rule (decides the paid Terminal features such as the locked chart
+ * strategies, not the Terminal itself): an active paid plan unlocks them for
+ * its period, a running Pro free trial until it ends. Free accounts keep the
+ * free features only, even when they hold credit.
  */
-export function evaluateTerminalAccess(founding: TerminalAccess | null): TerminalAccess {
-  if (founding && (founding.allowed || founding.reason === "id_overdue")) return founding;
-  return { allowed: false, reason: "not_founding", idDeadline: null, idSubmitted: false, trialEndsAt: null };
+export function evaluatePlanAccess(sub: Sub | null, now = Date.now()): TerminalAccess {
+  const base = { idDeadline: null, idSubmitted: false };
+  const status = (sub?.status || "").toLowerCase();
+  const active = status === "active" || status === "trialing";
+  const periodOk = !sub?.current_period_end || Date.parse(sub.current_period_end) > now;
+  const plan = String(sub?.plan_id || "").toLowerCase();
+  const paid = active && periodOk && !sub?.is_trial && (PAID_PLANS as readonly string[]).includes(plan);
+  if (paid) return { ...base, allowed: true, reason: "paid", trialEndsAt: null };
+  const trialEnd = Date.parse(sub?.trial_ends_at || "");
+  if (active && sub?.is_trial && Number.isFinite(trialEnd)) {
+    if (trialEnd > now) return { ...base, allowed: true, reason: "trial", trialEndsAt: new Date(trialEnd).toISOString() };
+    return { ...base, allowed: false, reason: "trial_ended", trialEndsAt: null };
+  }
+  return { ...base, allowed: false, reason: "no_plan", trialEndsAt: null };
+}
+
+/**
+ * Terminal rule: the Terminal is open to every signed-in user. `plan` is the
+ * paid-feature decision (admin, Founding, paid plan, trial or none); the
+ * Terminal stays allowed either way and only the paid features follow `plan`.
+ */
+export function evaluateTerminalAccess(plan: TerminalAccess | null): TerminalAccess {
+  const base = plan ?? { allowed: false, reason: "no_plan", idDeadline: null, idSubmitted: false, trialEndsAt: null };
+  return { ...base, allowed: true };
 }
 
 function escapeLike(v: string) {
@@ -48,8 +79,11 @@ export function evaluateFoundingRow(row: Row, now = Date.now()): TerminalAccess 
   return { allowed: true, reason: "founding", idDeadline: iso, idSubmitted: false };
 }
 
-/** Terminal access: admins and approved Founding members only (2-day ID rule). */
-export async function checkTerminalAccess(
+/**
+ * Paid-feature access: admins, approved Founding members (2-day ID rule),
+ * paid plans and a running Pro free trial. Free users get allowed=false.
+ */
+export async function checkPlanAccess(
   supabase: SupabaseClient<any>,
   userId: string,
   email: string | null | undefined,
@@ -80,5 +114,29 @@ export async function checkTerminalAccess(
       .limit(1);
     row = byEmail.data?.[0];
   }
-  return evaluateTerminalAccess(row ? evaluateFoundingRow(row) : null);
+  if (row) {
+    const founding = evaluateFoundingRow(row);
+    if (founding.allowed) return founding;
+  }
+
+  const { data: sub } = await (supabaseAdmin as any)
+    .from("user_subscriptions")
+    .select("plan_id, status, is_trial, current_period_end, trial_ends_at")
+    .eq("user_id", userId)
+    .order("updated_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  const plan = evaluatePlanAccess(sub ?? null);
+  // Founding members past the ID deadline keep the notice state when they have no plan.
+  if (!plan.allowed && row) return evaluateFoundingRow(row);
+  return plan;
+}
+
+/** Terminal access: open to every signed-in user; `reason` carries the plan state. */
+export async function checkTerminalAccess(
+  supabase: SupabaseClient<any>,
+  userId: string,
+  email: string | null | undefined,
+): Promise<TerminalAccess> {
+  return evaluateTerminalAccess(await checkPlanAccess(supabase, userId, email));
 }
