@@ -94,9 +94,7 @@ function Billing() {
       }
       setCancelDialogOpen(false);
       await credits.refresh();
-      toast.success("Plan cancelled", {
-        description: `Your paid features were removed${Number(result.credits_removed ?? 0) > 0 ? ` and $${Number(result.credits_removed).toFixed(2)} in credits were forfeited` : ""}.`,
-      });
+      toast.success("Plan cancelled");
     } catch (error) {
       toast.error("Could not cancel your plan", {
         description: error instanceof Error ? error.message : "Please try again.",
