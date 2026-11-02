@@ -39,7 +39,31 @@ import {
 import { getTerminalChart } from "@/lib/gold-analysis.functions";
 import { cn } from "@/lib/utils";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { ChevronDown, Clock3, Lock, Menu, PanelLeftClose, PanelLeftOpen } from "lucide-react";
+import { CalendarRange, ChevronDown, Clock3, Lock, Menu, PanelLeftClose, PanelLeftOpen } from "lucide-react";
+
+/** TradingView-style quick ranges in the chart's bottom bar (each picks a timeframe). */
+const RANGE_BUTTONS = [
+  { key: "1d", label: "1D" },
+  { key: "5d", label: "5D" },
+  { key: "1m", label: "1M" },
+  { key: "3m", label: "3M" },
+  { key: "6m", label: "6M" },
+  { key: "ytd", label: "YTD" },
+  { key: "1y", label: "1Y" },
+  { key: "5y", label: "5Y" },
+  { key: "all", label: "All" },
+] as const;
+
+function UtcClock() {
+  const [now, setNow] = useState<string>("");
+  useEffect(() => {
+    const tick = () => setNow(new Date().toISOString().slice(11, 19));
+    tick();
+    const id = window.setInterval(tick, 1000);
+    return () => window.clearInterval(id);
+  }, []);
+  return <span className="ml-auto font-mono text-[12px] tabular-nums text-foreground/80">{now ? `${now} UTC` : ""}</span>;
+}
 import { useStrategyAccess } from "./useStrategyAccess";
 import { LOCKED_STRATEGY_KEYS } from "@/lib/strategy-access";
 import { Switch } from "@/components/ui/switch";
@@ -256,6 +280,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
   // The Terminal uses candles only (the Line/area switch was removed).
   const chartStyle = "candles" as const;
   const [marketTab, setMarketTab] = useState<MarketTab>("overview");
+  const [tfMenuOpen, setTfMenuOpen] = useState(false);
   // Desktop chart toolbar is rendered into the dashboard top bar (in place of the old price strip).
   const [toolbarHost, setToolbarHost] = useState<HTMLElement | null>(null);
   useEffect(() => {
