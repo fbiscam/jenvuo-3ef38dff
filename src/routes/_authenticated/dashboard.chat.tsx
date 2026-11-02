@@ -53,10 +53,12 @@ import {
   extractReplyDocument,
   extractReplyFiles,
   looksLikeDocRequest,
+  looksLikeImageRequest,
   mergeWorkspace,
   wantsNewFile,
   parseRenameRequest,
   workspaceContext,
+  type CodeKind,
   type ReplyDocument,
   type ReplyFile,
 } from "@/lib/chat-files";
@@ -64,6 +66,8 @@ import { ChatCodeStudio } from "@/components/dashboard/ChatCodeStudio";
 import { ChatDocView, exportDocumentPdf } from "@/components/dashboard/ChatDocView";
 import { useAuthUser } from "@/hooks/useAuthUser";
 import { chatSessionKey, parseSavedSession, toSavedSession } from "@/lib/chat-session";
+import { streamImage, ImageStreamError } from "@/lib/stream-image";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated/dashboard/chat")({
   head: () => ({
@@ -90,7 +94,12 @@ type Turn = PlaygroundTurn & {
   cost?: number;
   ms?: number;
   error?: boolean;
+  /** A picture the AI created (not kept in browser storage). */
+  image?: string;
+  imageFinal?: boolean;
 };
+
+type ImageView = { turnId: string; prompt: string; url?: string; final: boolean };
 
 const API_BASE = "https://jenvu.com/api/public/v1";
 
@@ -106,7 +115,8 @@ const JENVU_BRAIN = [
   "When asked for code: write the COMPLETE working file in one fenced block tagged with its language, starting with a comment like // File: Name.mq5; no placeholders or TODOs; every trade gets a stop loss. When asked to change existing code, return the whole updated file with the same file name. Then give short setup steps.",
   "Before writing code, check the request has what you need: platform (MT5/MQL5, TradingView/Pine Script or Python), symbol, timeframe, entry and exit rules, and risk per trade. If something important is missing or unclear, do NOT write code yet: ask up to 3 short numbered questions in the chat and wait for the answer. If the request is already clear, write the code straight away.",
   "When asked for a PDF, report, guide or document: put the whole document in ONE fenced block tagged ```document written in Markdown (never put ``` inside it). First line: a short UPPERCASE kicker; then '# Title'; then numbered '## 1. Section' headings, '> **Callout title**' blockquotes for formulas and key notes, and tables where they help. The page turns it into a PDF. After the block, add one short line only.",
-  "When asked for a NEW or separate file, write it under a new file name and leave the open files as they are; the editor holds up to 4 files.",
+  "When asked for a NEW or separate file, write it under a new file name and leave the open files as they are; the editor holds up to 2 files and the page shows 1 document (PDF) at a time.",
+  "The page creates pictures itself when the user asks for an image, so never say you can't make images.",
   "Leads (e.g. 'Google Maps leads for dentists'): first ask for the keyword/business type, country and city, and how many leads, unless already given. You have no live Google Maps access, so never invent phone numbers, emails or addresses: list only businesses you genuinely know are public, leave unknown fields as 'verify', and say the list must be checked on Google Maps. Deliver it as a ```document with a short intro and ONE table: Business | Category | City | Website | Phone | Rating | Notes (the page exports it as PDF and CSV).",
   "Upwork proposals: if the job post isn't given, ask for it. Then write a proposal under 200 words: a first line that names the client's exact problem (no 'Dear Sir', no 'I am writing to'), 2-3 lines of relevant proof, a short step-by-step plan, timeline, one smart question about the project, and a friendly call to action. Plain, confident, specific; no buzzwords, no invented reviews or past clients. Put it in a ```document block.",
   "You can read attached images and documents; use what they show.",
@@ -218,6 +228,10 @@ function ChatPlayground() {
   const [activeFile, setActiveFile] = useState(0);
   const [doc, setDoc] = useState<ReplyDocument | null>(null);
   const [docOpen, setDocOpen] = useState(false);
+  // Once code is asked for, the editor stays open (even while the AI asks questions).
+  const [codePinned, setCodePinned] = useState<CodeKind | null>(null);
+  const [imageView, setImageView] = useState<ImageView | null>(null);
+  const [imaging, setImaging] = useState(false);
   const scroller = useRef<HTMLDivElement>(null);
   const box = useRef<HTMLTextAreaElement>(null);
   const imageInput = useRef<HTMLInputElement>(null);
@@ -232,6 +246,7 @@ function ChatPlayground() {
     if (saved) {
       setTurns(saved.turns as Turn[]);
       setWorkspace(saved.workspace);
+      if (saved.workspace.length) setCodePinned("generic");
       setActiveFile(saved.activeFile);
       setDoc(saved.doc);
       setDocOpen(saved.docOpen);
@@ -320,11 +335,14 @@ function ChatPlayground() {
           if (first >= 0) setActiveFile(first);
           if (merged.dropped.length) toast.error(`The editor holds ${CHAT_MAX_FILES} files. Remove one to add ${merged.dropped.join(", ")}.`);
           setDocOpen(false);
+          setImageView(null);
+          setCodePinned((k) => k ?? "generic");
         }
         const newDoc = extractReplyDocument(res.content);
         if (newDoc) {
           setDoc(newDoc);
           setDocOpen(true);
+          setImageView(null);
         }
       }
       setTurns((t) => [
@@ -366,9 +384,57 @@ function ChatPlayground() {
     setActiveFile((a) => Math.max(0, a > idx || a === workspace.length - 1 ? a - 1 : a));
   };
 
+  // "image banao": the picture is drawn live in the frame on the left (and in the chat on phones).
+  const makeImage = async (prompt: string) => {
+    const userTurn: Turn = { id: crypto.randomUUID(), role: "user", content: prompt, display: prompt };
+    const replyId = crypto.randomUUID();
+    setTurns((t) => [...t, userTurn, { id: replyId, role: "assistant", content: `Image created for: "${prompt}"`, model: "image" }]);
+    setInput("");
+    setImageView({ turnId: replyId, prompt, final: false });
+    setDocOpen(false);
+    setBusy(true);
+    setImaging(true);
+    try {
+      const { data } = await supabase.auth.getSession();
+      const token = data.session?.access_token;
+      await streamImage(
+        "/api/chat-image",
+        { prompt },
+        (url, final) => {
+          setImageView((v) => (v && v.turnId === replyId ? { ...v, url, final } : v));
+          setTurns((t) => t.map((x) => (x.id === replyId ? { ...x, image: url, imageFinal: final } : x)));
+        },
+        undefined,
+        token ? { Authorization: `Bearer ${token}` } : undefined,
+      );
+    } catch (e) {
+      const status = e instanceof ImageStreamError ? e.status : 0;
+      const msg =
+        status === 402
+          ? "AI credits are used up, so the image couldn't be made right now."
+          : status === 429
+            ? "Too many image requests. Please wait a moment and try again."
+            : e instanceof Error && e.message
+              ? e.message
+              : "The image couldn't be created. Please try again.";
+      setImageView((v) => (v?.turnId === replyId ? null : v));
+      setTurns((t) => t.map((x) => (x.id === replyId ? { id: x.id, role: "assistant", content: msg, error: true } : x)));
+    } finally {
+      setBusy(false);
+      setImaging(false);
+      box.current?.focus();
+    }
+  };
+
   const submit = async () => {
     const typed = input.trim();
     if ((!typed && !files.length) || busy || reading) return;
+    if (!files.length && looksLikeImageRequest(typed)) {
+      await makeImage(typed);
+      return;
+    }
+    const kindAsked = looksLikeDocRequest(typed) ? null : codeRequestKind(`${typed} ${instructions === CODE_BUILDER ? "code bot" : ""}`);
+    if (kindAsked) setCodePinned(kindAsked);
     // "rename a.py to b.py" is done right here — no AI call, no cost.
     const rename = !files.length ? parseRenameRequest(typed, workspace.map((f) => f.name), workspace[activeFile]?.name) : null;
     if (rename) {
@@ -408,6 +474,11 @@ function ChatPlayground() {
     const kept = turns.slice(0, idx);
     if (kept[kept.length - 1]?.role !== "user") return;
     const lastUser = kept[kept.length - 1];
+    if (turns[idx]?.model === "image" || (turns[idx]?.error && looksLikeImageRequest(lastUser.display ?? ""))) {
+      setTurns(kept.slice(0, -1));
+      void makeImage(lastUser.display ?? lastUser.content);
+      return;
+    }
     const images = (lastUser.files ?? []).flatMap((f) => (f.kind === "image" && f.url ? [f.url] : []));
     setTurns(kept);
     void ask(kept, images);
@@ -419,6 +490,8 @@ function ChatPlayground() {
     setActiveFile(0);
     setDoc(null);
     setDocOpen(false);
+    setCodePinned(null);
+    setImageView(null);
   };
 
   const pickExample = (ex: Example) => {
@@ -432,11 +505,12 @@ function ChatPlayground() {
   const lastAsked = [...turns].reverse().find((t) => t.role === "user");
   const docAsked = looksLikeDocRequest(lastAsked?.display ?? "");
   const askedKind = docAsked ? null : codeRequestKind(`${lastAsked?.display ?? ""} ${instructions === CODE_BUILDER ? "code bot" : ""}`);
-  const codingNow = busy && askedKind !== null;
+  const codingNow = busy && !imaging && !docAsked && (askedKind !== null || codePinned !== null);
   const writingDoc = busy && docAsked;
   const showDoc = !!doc && docOpen;
-  const studio = workspace.length > 0 || codingNow || showDoc || writingDoc;
-  const studioKind = askedKind ?? (workspace[0]?.lang === "pine" ? "pine" : workspace[0]?.lang === "python" ? "python" : workspace[0]?.lang === "mql5" ? "mql5" : "generic");
+  const showImage = !!imageView;
+  const studio = workspace.length > 0 || codingNow || showDoc || writingDoc || codePinned !== null || showImage;
+  const studioKind = askedKind ?? codePinned ?? (workspace[0]?.lang === "pine" ? "pine" : workspace[0]?.lang === "python" ? "python" : workspace[0]?.lang === "mql5" ? "mql5" : "generic");
   const studioSeed = turns.length;
 
   const downloadFile = (name: string, code: string) => {
@@ -446,6 +520,13 @@ function ChatPlayground() {
     a.download = name;
     a.click();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
+  };
+
+  const downloadImage = (url: string, prompt: string) => {
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `jenvu_${prompt.toLowerCase().replace(/[^a-z0-9]+/g, "_").slice(0, 40) || "image"}.png`;
+    a.click();
   };
 
   const copyText = async (id: string, text: string) => {
@@ -527,7 +608,9 @@ function ChatPlayground() {
       <div className={studio ? "flex min-h-0 flex-1 gap-6 pt-2" : "contents"}>
       {studio && (
         <div className="hidden min-h-0 min-w-0 flex-1 flex-col lg:flex">
-          {showDoc && doc ? (
+          {showImage && imageView ? (
+            <ChatImagePanel view={imageView} onClose={() => setImageView(null)} onDownload={(url) => downloadImage(url, imageView.prompt)} />
+          ) : showDoc && doc ? (
             <ChatDocView doc={doc} busy={busy} menuTheme={menuTheme} onClose={() => setDocOpen(false)} />
           ) : writingDoc ? (
             <div className="chat-docview flex min-h-0 flex-1 items-center justify-center rounded-2xl text-[15px]">
@@ -547,6 +630,7 @@ function ChatPlayground() {
                 if (problem) toast.error(problem);
               }}
               onRemove={removeFile}
+              onClose={() => setCodePinned(null)}
             />
           )}
         </div>
@@ -616,6 +700,35 @@ function ChatPlayground() {
                       </button>
                     </div>
                   ) : (
+                    t.model === "image" ? (
+                      <div>
+                        {t.image ? (
+                          <button
+                            type="button"
+                            onClick={() => setImageView({ turnId: t.id, prompt: t.display ?? t.content, url: t.image, final: !!t.imageFinal })}
+                            className="block overflow-hidden rounded-2xl"
+                            aria-label="Open image"
+                          >
+                            <img src={t.image} alt="AI image" className={`max-h-[320px] w-auto max-w-full transition-[filter] duration-500 ${t.imageFinal ? "blur-0" : "blur-2xl"}`} />
+                          </button>
+                        ) : busy && imaging ? (
+                          <div className="text-[16px]"><Shimmer>Creating your image…</Shimmer></div>
+                        ) : (
+                          <p className="text-[14px] text-muted-foreground">Image not kept after reload. Click regenerate to make it again.</p>
+                        )}
+                        <div className="mt-3 flex items-center gap-1 text-muted-foreground">
+                          {t.image && t.imageFinal && (
+                            <button type="button" onClick={() => downloadImage(t.image ?? "", t.content)} className="ring-btn mr-2 inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-[13px] font-medium">
+                              <Download className="h-3.5 w-3.5" /> Download image
+                            </button>
+                          )}
+                          <span className="mr-auto text-[12px]">AI images may include mistakes</span>
+                          <ReplyBtn label="Regenerate" disabled={busy} onClick={() => regenerate(t.id)}>
+                            <RotateCw className="h-[18px] w-[18px]" />
+                          </ReplyBtn>
+                        </div>
+                      </div>
+                    ) : (
                     <>
                       <div className={`text-[16px] leading-[1.7] text-foreground [&_li]:my-1 [&_p]:my-3 [&_ul]:my-3 [&_ul]:pl-5 ${studio ? "lg:hidden" : ""}`}>
                         <MessageResponse>{unwrapDocument(t.content)}</MessageResponse>
@@ -688,11 +801,12 @@ function ChatPlayground() {
                         </ReplyBtn>
                       </div>
                     </>
+                    )
                   )}
                 </div>
               ),
             )}
-            {busy && (
+            {busy && !imaging && (
               <div className="flex gap-3" role="status">
                 <JenvuMark className="mt-0.5 h-6 w-6 shrink-0 animate-pulse" />
                 <div className="min-w-0 flex-1">
@@ -885,6 +999,41 @@ function ChatPlayground() {
         </DialogContent>
       </Dialog>
     </section>
+  );
+}
+
+/** Left frame: the picture being created (blurred until it's finished). */
+function ChatImagePanel({ view, onClose, onDownload }: { view: ImageView; onClose: () => void; onDownload: (url: string) => void }) {
+  return (
+    <div className="code-box flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl">
+      <div className="flex items-center gap-2 border-b border-current/10 px-3 py-2">
+        <span className="code-tab is-active inline-flex min-w-0 items-center gap-2 rounded-lg px-3 py-1.5 text-[13px] font-medium">
+          <ImageIcon className="h-4 w-4 shrink-0 opacity-70" /> <span className="truncate">Image</span>
+        </span>
+        <span className="min-w-0 flex-1 truncate text-[12px] opacity-60">{view.prompt}</span>
+        {view.url && view.final && (
+          <button type="button" onClick={() => onDownload(view.url ?? "")} aria-label="Download image" title="Download image" className="ring-btn inline-flex h-8 w-8 items-center justify-center rounded-full">
+            <Download className="h-4 w-4" />
+          </button>
+        )}
+        <button type="button" onClick={onClose} aria-label="Close image" className="code-box-copy rounded-md p-1.5">
+          <X className="h-4 w-4" />
+        </button>
+      </div>
+      <div className="flex min-h-0 flex-1 items-center justify-center overflow-hidden p-6">
+        {view.url ? (
+          <img src={view.url} alt={view.prompt} className={`max-h-full max-w-full rounded-xl object-contain transition-[filter] duration-500 ${view.final ? "blur-0" : "blur-2xl"}`} />
+        ) : (
+          <div className="flex flex-col items-center gap-3 text-[15px]">
+            <Loader2 className="h-6 w-6 animate-spin opacity-60" />
+            <Shimmer>Creating your image…</Shimmer>
+          </div>
+        )}
+      </div>
+      <div className="flex items-center gap-2 border-t border-current/10 px-4 py-2 text-[12px] opacity-70">
+        {view.final ? "Done · Download it or ask for another image" : <><Loader2 className="h-3.5 w-3.5 animate-spin" /> Drawing your image…</>}
+      </div>
+    </div>
   );
 }
 
