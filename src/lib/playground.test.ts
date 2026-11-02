@@ -47,7 +47,7 @@ describe("playground images", () => {
     const last = msgs[2].content as { type: string }[];
     expect(last.map((p) => p.type)).toEqual(["text", "image_url"]);
   });
-  it("opens on the cheap GPT-5.6 Luna model", () => {
-    expect(PLAYGROUND_DEFAULT_MODEL).toBe("gpt-5.6-luna");
+  it("opens on the AWS DeepSeek V3.2 model", () => {
+    expect(PLAYGROUND_DEFAULT_MODEL).toBe("deepseek-v3.2");
   });
 });

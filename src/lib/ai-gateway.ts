@@ -80,7 +80,7 @@ function providerConfigured(model: string): boolean {
   // OmniRoute is the sole inference provider. Credential validation happens
   // inside the request attempt so a missing deployment binding is reported
   // accurately instead of being mistaken for an empty model chain.
-  return model.startsWith("omniroute/") || model.startsWith("codecraft/");
+  return model.startsWith("omniroute/") || model.startsWith("codecraft/") || model.startsWith("aws/");
 }
 
 // -------- Per-worker model health cache -----------------------------------
@@ -137,12 +137,17 @@ async function singleAttemptInner(
   signal?: AbortSignal,
 ): Promise<{ content: string; usage: UsageInfo }> {
   const isCodeCraft = model.startsWith("codecraft/");
-  if (!isCodeCraft && !model.startsWith("omniroute/")) {
+  const isAws = model.startsWith("aws/");
+  if (!isCodeCraft && !isAws && !model.startsWith("omniroute/")) {
     throw new AiGatewayError(jenvuServiceError(400), 400, true);
   }
 
-  const omniRouteKey = isCodeCraft ? process.env.CODECRAFT_API_KEY : process.env.CUSTOM_AI_API_KEY;
-  const omniRouteBase = isCodeCraft
+  const omniRouteKey = isAws
+    ? process.env.AWS_API_KEY
+    : isCodeCraft ? process.env.CODECRAFT_API_KEY : process.env.CUSTOM_AI_API_KEY;
+  const omniRouteBase = isAws
+    ? (process.env.AWS_BASE_URL || "https://bedrock-mantle.us-east-1.api.aws/v1").replace(/\/+$/, "")
+    : isCodeCraft
     ? "https://codecraftapi.com/v1"
     : (process.env.CUSTOM_AI_BASE_URL || "").replace(/\/+$/, "");
   if (!omniRouteKey) {
@@ -155,7 +160,7 @@ async function singleAttemptInner(
   const endpoint = /\/chat\/completions$/i.test(omniRouteBase)
     ? omniRouteBase
     : `${omniRouteBase.replace(/\/v1$/i, "")}/v1/chat/completions`;
-  const wireModel = model.slice(isCodeCraft ? "codecraft/".length : "omniroute/".length);
+  const wireModel = model.slice(isAws ? "aws/".length : isCodeCraft ? "codecraft/".length : "omniroute/".length);
   const body: Record<string, unknown> = {
     model: wireModel,
     messages: opts.messages,
@@ -238,6 +243,24 @@ const BACKUP_CHAT_MODEL = "openai/gpt-6-luna";
 // Temporary: CodeCraft keys have no balance, so user chat answers through
 // Lovable AI first. Set to false once CodeCraft is topped up again.
 const LOVABLE_CHAT_FIRST = true;
+
+// Owner's AWS Bedrock key: best live-tested models, tried before anything else.
+const AWS_FIRST = true;
+export const AWS_BEST_CHAIN = [
+  "aws/deepseek.v3.2",
+  "aws/zai.glm-5",
+  "aws/mistral.mistral-large-3-675b-instruct",
+  "aws/qwen.qwen3-235b-a22b-2507",
+] as const;
+export const AWS_CODING_CHAIN = [
+  "aws/qwen.qwen3-coder-480b-a35b-instruct",
+  "aws/deepseek.v3.2",
+  "aws/mistral.devstral-2-123b",
+] as const;
+const AWS_VISION_CHAIN = [
+  "aws/qwen.qwen3-vl-235b-a22b-instruct",
+  "aws/mistral.mistral-large-3-675b-instruct",
+] as const;
 
 function toResponsesInput(messages: ChatMessage[]) {
   return messages.map((m) => {
@@ -350,6 +373,18 @@ export async function callChatCompletion(
   opts: CallChatOptions,
 ): Promise<{ content: string; model: string; usage: UsageInfo }> {
   const primary = opts.raceModels ? callChatRace : callChatChain;
+  // AWS Bedrock models answer every AI job first (best live-tested models).
+  if (AWS_FIRST && !opts.exactModels && process.env.AWS_API_KEY) {
+    const hasImages = opts.messages.some((m) => Array.isArray(m.content) && m.content.some((p) => p.type === "image_url"));
+    const models = [...(hasImages ? AWS_VISION_CHAIN : AWS_BEST_CHAIN)];
+    try {
+      return opts.raceModels
+        ? await callChatRace({ ...opts, models })
+        : await callChatChain({ ...opts, models, retriesPerModel: 1, attemptTimeoutMs: opts.attemptTimeoutMs ?? 60000 });
+    } catch (awsErr) {
+      console.warn(`[ai] ${opts.stage ?? "chat"}: AWS models failed, trying Lovable AI`, (awsErr as Error)?.message);
+    }
+  }
   // Every AI job (chat, articles, analysis, reviews) answers through the
   // cheapest Lovable model first while LOVABLE_CHAT_FIRST is on.
   if (LOVABLE_CHAT_FIRST && !opts.exactModels) {
