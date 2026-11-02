@@ -38,6 +38,9 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { MessageResponse } from "@/components/ai-elements/message";
 import { Shimmer } from "@/components/ai-elements/shimmer";
+import { ChatSitePanel } from "@/components/dashboard/ChatSitePanel";
+import { inspectSite, type SiteReport } from "@/lib/site-inspect.functions";
+import { siteInspectTarget } from "@/lib/site-inspect";
 import JenvuMark from "@/components/JenvuMark";
 import { Button } from "@/components/ui/button";
 import { ProviderLogo } from "@/components/models/ModelsExplorer";
@@ -245,7 +248,9 @@ function ChatPlayground() {
   // Once code is asked for, the editor stays open (even while the AI asks questions).
   const [codePinned, setCodePinned] = useState<CodeKind | null>(null);
   // Which tab of the left work area is in front; code, picture and document all stay open.
-  const [pane, setPane] = useState<"code" | "image" | "doc" | "upload">("code");
+  const [pane, setPane] = useState<"code" | "image" | "doc" | "upload" | "site">("code");
+  const [site, setSite] = useState<{ domain: string; report: SiteReport | null } | null>(null);
+  const runInspect = useServerFn(inspectSite);
   const [imageView, setImageView] = useState<ImageView | null>(null);
   const [imaging, setImaging] = useState(false);
   const scroller = useRef<HTMLDivElement>(null);
@@ -477,6 +482,14 @@ function ChatPlayground() {
       setInput("");
       return;
     }
+    const siteTarget = !files.length ? siteInspectTarget(typed) : null;
+    if (siteTarget) {
+      setSite({ domain: siteTarget, report: null });
+      setPane("site");
+      runInspect({ data: { domain: siteTarget } })
+        .then((report) => setSite((cur) => (cur?.domain === siteTarget ? { domain: siteTarget, report } : cur)))
+        .catch(() => setSite(null));
+    }
     const attached = files;
     const content = composeMessage(typed || "Please look at the attached file.", attached);
     const images = attached.flatMap((f) => (f.kind === "image" ? [f.url] : []));
@@ -542,7 +555,7 @@ function ChatPlayground() {
   const writingDoc = busy && docAsked;
   const showDoc = !!doc && docOpen;
   const showImage = !!imageView;
-  const studio = !!uploaded || workspace.length > 0 || codingNow || showDoc || writingDoc || codePinned !== null || showImage;
+  const studio = !!site || !!uploaded || workspace.length > 0 || codingNow || showDoc || writingDoc || codePinned !== null || showImage;
   const studioKind = askedKind ?? codePinned ?? (workspace[0]?.lang === "pine" ? "pine" : workspace[0]?.lang === "python" ? "python" : workspace[0]?.lang === "mql5" ? "mql5" : "generic");
   const studioSeed = turns.length;
 
@@ -646,6 +659,7 @@ function ChatPlayground() {
           ...(showImage ? [{ id: "image" as const, label: "Image" }] : []),
           ...(showDoc || writingDoc ? [{ id: "doc" as const, label: "Document" }] : []),
           ...(uploaded ? [{ id: "upload" as const, label: "Your file" }] : []),
+          ...(site ? [{ id: "site" as const, label: "Website" }] : []),
         ];
         const front = tabs.some((t) => t.id === pane) ? pane : (tabs[0]?.id ?? "code");
         const used = workspace.length + (showImage ? 1 : 0) + (showDoc ? 1 : 0) + (uploaded ? 1 : 0);
@@ -668,7 +682,9 @@ function ChatPlayground() {
               <span className="ml-auto text-[12px] tabular-nums text-muted-foreground">{used}/4 items</span>
             </div>
           )}
-          {front === "upload" && uploaded ? (
+          {front === "site" && site ? (
+            <ChatSitePanel domain={site.domain} report={site.report} loading={!site.report} onClose={() => setSite(null)} />
+          ) : front === "upload" && uploaded ? (
             <div className="chat-docview flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-border">
               <div className="flex items-center gap-2 border-b border-border px-4 py-2.5 text-[13px]">
                 <span className="min-w-0 flex-1 truncate font-medium text-foreground" title={uploaded.name}>{uploaded.name}</span>
