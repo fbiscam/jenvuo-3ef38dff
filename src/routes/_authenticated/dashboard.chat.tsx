@@ -52,6 +52,12 @@ import { PLAYGROUND_DEFAULT_MODEL, PLAYGROUND_MAX_TOKENS, type PlaygroundTurn } 
 import { DOC_ACCEPT, IMAGE_ACCEPT, composeMessage, readAttachment, type ChatAttachment } from "@/components/dashboard/chat-attachments";
 import {
   CHAT_MAX_FILES,
+  FRAME_MAX_ITEMS,
+  findMentionedFile,
+  frameLimitBlock,
+  frameUsed,
+  type FrameAsk,
+  type FrameState,
   codeRequestKind,
   shortFileName,
   extractReplyDocument,
@@ -255,6 +261,8 @@ function ChatPlayground() {
   const [site, setSite] = useState<{ domain: string; report: SiteReport | null } | null>(null);
   const runInspect = useServerFn(inspectSite);
   const [imageView, setImageView] = useState<ImageView | null>(null);
+  // What the frame beside the chat holds right now (max 4 items).
+  const frameNow: FrameState = { codeFiles: workspace.length, image: !!imageView, doc: !!doc && docOpen, upload: !!uploaded, site: !!site };
   const [imaging, setImaging] = useState(false);
   const scroller = useRef<HTMLDivElement>(null);
   const box = useRef<HTMLTextAreaElement>(null);
@@ -347,8 +355,12 @@ function ChatPlayground() {
     setBusy(true);
     try {
       const sent = history.filter((t) => !t.error).map(({ role, content: c }) => ({ role, content: c }));
+      const full = frameUsed(frameNow) >= FRAME_MAX_ITEMS || workspace.length >= CHAT_MAX_FILES;
       const extra =
         workspaceContext(workspace) +
+        (full
+          ? `\n\n[The frame is full (${frameUsed(frameNow)}/${FRAME_MAX_ITEMS} files, ${workspace.length}/${CHAT_MAX_FILES} code). You may change an open file, but never create a new file: if a new file is needed, tell the user to remove one file with the ✕ on its tab and try again.]`
+          : "") +
         (doc && docOpen ? `\n\n[Document open on the page — to change it, return the WHOLE updated document in one \`\`\`document block]\n${doc.markdown}` : "");
       const lastMsg = sent[sent.length - 1];
       if (extra && lastMsg?.role === "user") sent[sent.length - 1] = { ...lastMsg, content: lastMsg.content + extra };
@@ -361,16 +373,21 @@ function ChatPlayground() {
           turns: sent,
         },
       });
+      let limitNote: string | null = null;
       if (res.ok) {
         const newFiles = extractReplyFiles(res.content);
         if (newFiles.length) {
           const lastUser = [...history].reverse().find((t) => t.role === "user");
-          const merged = mergeWorkspace(workspace, newFiles, CHAT_MAX_FILES, wantsNewFile(lastUser?.display ?? lastUser?.content ?? ""));
+          const otherItems = frameUsed({ ...frameNow, codeFiles: 0 });
+          const room = Math.max(0, Math.min(CHAT_MAX_FILES, FRAME_MAX_ITEMS - otherItems));
+          const merged = mergeWorkspace(workspace, newFiles, Math.max(room, workspace.length), wantsNewFile(lastUser?.display ?? lastUser?.content ?? ""));
           setWorkspace(merged.files);
           const fresh = merged.files.findIndex((x) => !workspace.some((w) => w.name === x.name));
-          const first = fresh >= 0 ? fresh : merged.files.findIndex((x) => x.name.toLowerCase() === (newFiles[0]?.name ?? "").toLowerCase());
+          const changed = merged.files.findIndex((x) => newFiles.some((n) => n.name.toLowerCase() === x.name.toLowerCase()));
+          const first = fresh >= 0 ? fresh : changed;
           if (first >= 0) setActiveFile(first);
-          if (merged.dropped.length) toast.error(`The editor holds ${CHAT_MAX_FILES} files. Remove one to add ${merged.dropped.join(", ")}.`);
+          if (merged.dropped.length)
+            limitNote = `**${merged.dropped.join(", ")}** couldn't open: the frame is full (max ${FRAME_MAX_ITEMS} files, ${CHAT_MAX_FILES} of them code). Please remove one file with the ✕ on its tab, then try again.`;
           setPane("code");
           setCodePinned((k) => k ?? "generic");
         }
@@ -394,6 +411,7 @@ function ChatPlayground() {
               ms: res.ms,
             }
           : { id: crypto.randomUUID(), role: "assistant", content: res.error, error: true },
+        ...(limitNote ? [{ id: crypto.randomUUID(), role: "assistant" as const, content: limitNote, model: "local" }] : []),
       ]);
     } catch {
       setTurns((t) => [
@@ -466,7 +484,42 @@ function ChatPlayground() {
   const submit = async (override?: string) => {
     const typed = (override ?? input).trim();
     if ((!typed && !files.length) || busy || reading) return;
-    if (!files.length && looksLikeImageRequest(typed)) {
+    // Frame full (4 files, or 2 code files): say so and ask to remove one first, no AI call.
+    const mentioned = findMentionedFile(typed, workspace.map((f) => f.name));
+    const isImage = !files.length && looksLikeImageRequest(typed);
+    const isDoc = looksLikeDocRequest(typed);
+    const siteAsk = !files.length ? siteInspectTarget(typed) : null;
+    const codeAsk = !isDoc && codeRequestKind(`${typed} ${instructions === CODE_BUILDER ? "code bot" : ""}`) !== null;
+    const frameAsk: FrameAsk = files.length
+      ? "upload"
+      : isImage
+        ? "image"
+        : isDoc
+          ? "doc"
+          : siteAsk
+            ? "site"
+            : codeAsk
+              ? (wantsNewFile(typed) || workspace.length === 0) && mentioned < 0
+                ? "code-new"
+                : "code-edit"
+              : null;
+    const blocked = frameLimitBlock(frameAsk, frameNow);
+    if (blocked) {
+      setTurns((t) => [
+        ...t,
+        { id: crypto.randomUUID(), role: "user", content: typed, display: typed },
+        { id: crypto.randomUUID(), role: "assistant", content: blocked, model: "local" },
+      ]);
+      setInput("");
+      return;
+    }
+    // Talking about an open file moves the frame to it.
+    if (mentioned >= 0) {
+      setActiveFile(mentioned);
+      setPane("code");
+    } else if (!isImage && imageView && /\b(image|picture|pic|photo|tasveer|tasvir)\b/i.test(typed)) setPane("image");
+    else if (!isDoc && doc && docOpen && /\b(document|doc|pdf|report|proposal|leads?)\b/i.test(typed)) setPane("doc");
+    if (isImage) {
       await makeImage(typed);
       return;
     }
@@ -486,7 +539,7 @@ function ChatPlayground() {
       setInput("");
       return;
     }
-    const siteTarget = !files.length ? siteInspectTarget(typed) : null;
+    const siteTarget = siteAsk;
     if (siteTarget) {
       setSite({ domain: siteTarget, report: null });
       setPane("site");
@@ -495,7 +548,10 @@ function ChatPlayground() {
         .catch(() => setSite(null));
     }
     const attached = files;
-    const content = composeMessage(typed || "Please look at the attached file.", attached);
+    const target = mentioned >= 0 ? workspace[mentioned]?.name : undefined;
+    const content =
+      composeMessage(typed || "Please look at the attached file.", attached) +
+      (target ? `\n\n[The user means the open file ${target}: make the change in that file and return it with the same name.]` : "");
     const images = attached.flatMap((f) => (f.kind === "image" ? [f.url] : []));
     const userTurn: Turn = {
       id: crypto.randomUUID(),
@@ -666,7 +722,7 @@ function ChatPlayground() {
           ...(site ? ["site" as const] : []),
         ];
         const front = ids.some((id) => id === pane) ? pane : (ids[0] ?? "code");
-        const used = workspace.length + (showImage ? 1 : 0) + (showDoc ? 1 : 0) + (uploaded ? 1 : 0);
+        const used = frameUsed(frameNow);
         const twoWords = (t: string) => t.split(/\s+/).filter(Boolean).slice(0, 2).join(" ");
         const extraTabs: StudioTab[] = [
           ...(showImage ? [{ id: "image", label: "Image", icon: "image" as const, active: front === "image", onOpen: () => setPane("image"), onClose: () => setImageView(null) }] : []),
