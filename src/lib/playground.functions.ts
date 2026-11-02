@@ -2,7 +2,7 @@
 // Same plan, balance, daily-limit and $3/1M-token billing as the public API.
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { buildPlaygroundMessages, clampMaxTokens, sanitizePlaygroundImages, type PlaygroundTurn } from "@/lib/playground";
+import { PLAYGROUND_DEFAULT_MODEL, buildPlaygroundMessages, clampMaxTokens, sanitizePlaygroundImages, type PlaygroundTurn } from "@/lib/playground";
 
 export const playgroundChat = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -23,9 +23,9 @@ export const playgroundChat = createServerFn({ method: "POST" })
     };
   })
   .handler(async ({ data, context }) => {
-    const { resolvePublicModel, gatewayChainFor } = await import("@/lib/public-api-models");
+    const { resolvePublicModel, gatewayChainFor, publicIdForRoute } = await import("@/lib/public-api-models");
     const { jenvuServiceError } = await import("@/lib/jenvu-api-errors");
-    const modelId = resolvePublicModel(data.model);
+    const modelId = resolvePublicModel(data.model || PLAYGROUND_DEFAULT_MODEL);
     if (!modelId) return { ok: false as const, error: "That model isn't available." };
     const messages = buildPlaygroundMessages(data.turns, data.instructions, data.images);
     if (!messages.length || data.turns[data.turns.length - 1]?.role !== "user") {
@@ -44,14 +44,15 @@ export const playgroundChat = createServerFn({ method: "POST" })
     try {
       const ask = (exactModels: boolean) =>
         callChatCompletion({
-          models: gatewayChainFor(modelId),
+          models: gatewayChainFor(modelId, { viaLovable: true }),
           messages,
           maxTokens: data.maxTokens,
           stage: "public-api-chat",
           exactModels,
         });
-      // The chosen model answers first; if its service is down (e.g. no
-      // balance), the reply comes from the low-cost backup so chat still works.
+      // The chosen model answers first (on Lovable AI or its own service); only if
+      // every route for it is down does a backup answer — and the reply then
+      // names the backup model, never the chosen one.
       const result = await ask(true).catch(async (err) => {
         console.warn("[playground] chosen model failed, using backup", (err as Error)?.message);
         return ask(false);
@@ -67,7 +68,8 @@ export const playgroundChat = createServerFn({ method: "POST" })
       return {
         ok: true as const,
         content: result.content,
-        model: modelId,
+        model: publicIdForRoute(result.model),
+        chosen: modelId,
         usage: result.usage,
         cost: charge?.charged ?? 0,
         ms: Date.now() - started,
