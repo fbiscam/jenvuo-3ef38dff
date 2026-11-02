@@ -282,7 +282,7 @@ function ChatPlayground() {
       setActiveFile(saved.activeFile);
       setDoc(saved.doc);
       setDocOpen(saved.docOpen);
-      if (saved.model && getCatalogModel(saved.model)) setModel(saved.model);
+      // Chat always opens on the default model (Claude Opus 5.5); an old saved pick is not restored.
     }
     setRestored(true);
   }, [user?.id]);
@@ -1088,8 +1088,8 @@ function ChatPlayground() {
           />
           <input ref={imageInput} type="file" accept={IMAGE_ACCEPT} hidden onChange={(e) => { void addFiles(e.target.files, "image"); e.target.value = ""; }} />
           <input ref={docInput} type="file" accept={DOC_ACCEPT} hidden onChange={(e) => { void addFiles(e.target.files, "doc"); e.target.value = ""; }} />
-          <div className="mt-1.5 flex flex-wrap items-center justify-between gap-x-2 gap-y-1">
-            <div className="flex min-w-0 items-center gap-1">
+          <div className="mt-1.5 flex flex-nowrap items-end justify-between gap-x-2">
+            <div className="flex min-w-0 shrink-0 items-center gap-1">
               <DropdownMenu modal={false}>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="icon-sm" type="button" aria-label="Attach files" className="shrink-0 rounded-full text-foreground hover:bg-background">
@@ -1109,7 +1109,7 @@ function ChatPlayground() {
                 <PopoverTrigger asChild>
                   <Button variant="ghost" size="sm" type="button" aria-label="Chat settings" className="gap-1.5 rounded-full px-2.5 text-[13px] text-foreground hover:bg-background">
                     <SlidersHorizontal className="h-4 w-4" />
-                    <span className="hidden sm:inline">{maxTokens.toLocaleString()} tokens · Text</span>
+                    <span className="hidden whitespace-nowrap sm:inline">{maxTokens.toLocaleString()} tokens</span>
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent align="start" side="top" sideOffset={10} className={`${menuTheme} w-[min(340px,90vw)] rounded-xl border-border bg-background p-5 text-foreground shadow-lg`}>
