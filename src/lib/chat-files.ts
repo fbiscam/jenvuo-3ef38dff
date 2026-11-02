@@ -163,7 +163,7 @@ export function looksLikeImageRequest(prompt: string): boolean {
 export function looksLikeDocRequest(prompt: string): boolean {
   const p = prompt.toLowerCase();
   if (/\bpdf\b/.test(p)) return true;
-  const thing = /\b(report|guide|document|doc file|leads?|proposal|ebook|e-book|handbook|cheat ?sheet|playbook|whitepaper)\b/.test(p);
+  const thing = /\b(report|guide|document|doc file|leads?|proposal|ebook|e-book|handbook|cheat ?sheet|playbook|whitepaper|seo|audit|article|cover letter|resume|cv)\b/.test(p);
   const verb = /\b(write|create|build|make|generate|prepare|banao|bana do|bana|likho|tayar)\b/.test(p);
   return thing && verb;
 }
@@ -187,4 +187,17 @@ export function workspaceContext(files: ReplyFile[]): string {
     .map((f) => `--- ${f.name} ---\n\`\`\`${f.lang}\n${f.code.replace(/\n$/, "")}\n\`\`\``)
     .join("\n\n");
   return `\n\n[Files open in the editor (max ${CHAT_MAX_FILES}). To change a file, return the WHOLE file with the same name in its own block starting with "// File: <name>" (or "# File: <name>"). To move or copy code between files, return every file you changed. When the user asks for a NEW file, use a new file name that is not open yet and leave the open files unchanged.]\n${body}`;
+}
+
+/**
+ * Tab label for a file: at most 2 words of its name plus the extension
+ * ("gold_sweep_strategy_v2.mq5" -> "gold_sweep.mq5"), so 4 tabs fit in one row.
+ */
+export function shortFileName(name: string): string {
+  const dot = name.lastIndexOf(".");
+  const stem = dot > 0 ? name.slice(0, dot) : name;
+  const ext = dot > 0 ? name.slice(dot) : "";
+  const words = stem.split(/[\s_\-]+/).filter(Boolean);
+  if (words.length <= 2) return name;
+  return `${words.slice(0, 2).join("_")}${ext}`;
 }

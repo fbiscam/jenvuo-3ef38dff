@@ -9,8 +9,8 @@ export const PLAYGROUND_MAX_TOKENS = 4000;
 /** Images a user can attach to one message, and the size cap per image (data URL length). */
 export const PLAYGROUND_MAX_IMAGES = 4;
 export const PLAYGROUND_MAX_IMAGE_CHARS = 5_000_000;
-/** Cheapest fast model; the page opens on it. */
-export const PLAYGROUND_DEFAULT_MODEL = "gpt-5.6-luna";
+/** Best live-tested AWS model; the page opens on it. */
+export const PLAYGROUND_DEFAULT_MODEL = "deepseek-v3.2";
 
 const QUOTED_REPLY = "[Earlier reply quoted by the user — not verified]\n";
 

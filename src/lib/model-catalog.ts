@@ -5,7 +5,7 @@ import { PUBLIC_API_MODEL_IDS, type PublicApiModelId } from "@/lib/public-api-mo
 export type Capability = "reasoning" | "vision" | "tools" | "streaming" | "json";
 export type ProviderKey =
   | "anthropic" | "openai" | "google" | "deepseek" | "qwen" | "moonshot"
-  | "zhipu" | "bytedance" | "xai" | "meta";
+  | "zhipu" | "bytedance" | "xai" | "meta" | "mistral" | "minimax" | "nvidia";
 
 export type CatalogModel = {
   id: PublicApiModelId;
@@ -29,6 +29,9 @@ export const PROVIDERS: Record<ProviderKey, { label: string; blurb: string }> = 
   bytedance: { label: "ByteDance", blurb: "Seed models tuned for speed and everyday tasks." },
   xai: { label: "xAI", blurb: "Grok models with live-style, direct answers." },
   meta: { label: "Meta", blurb: "Muse models for creative and general chat." },
+  mistral: { label: "Mistral", blurb: "European models from tiny Ministral to Mistral Large and Devstral for code." },
+  minimax: { label: "MiniMax", blurb: "MiniMax M2 models for agents, coding and long tasks." },
+  nvidia: { label: "NVIDIA", blurb: "Nemotron models tuned for fast, efficient reasoning." },
 };
 
 /** Flat Jenvu price, USD per 1M tokens (prompt and reply). */
@@ -46,7 +49,39 @@ const K = 1_000;
 const MIL = 1_000_000;
 
 export const MODEL_CATALOG: CatalogModel[] = [
-  M("claude-opus-5", "Claude Opus 5", "anthropic", MIL, "Anthropic's most capable model. Exceptional reasoning and agentic performance. Jenvu's default model.", ALL, ["flagship"]),
+  M("deepseek-v3.2", "DeepSeek V3.2", "deepseek", 128 * K, "DeepSeek's latest V3 model: strong reasoning, maths and code. Jenvu's default model.", TEXT, ["flagship", "open"]),
+  M("deepseek-v3.1", "DeepSeek V3.1", "deepseek", 128 * K, "Previous DeepSeek V3 release, fast and reliable.", TEXT, ["open"]),
+  M("qwen3-coder-480b", "Qwen3 Coder 480B", "qwen", 256 * K, "Qwen's largest coding model for big projects, refactors and agents.", TEXT, ["coding", "open", "flagship"]),
+  M("qwen3-coder-30b", "Qwen3 Coder 30B", "qwen", 256 * K, "Compact Qwen coding model, quick to answer.", TEXT, ["coding", "open", "fast"]),
+  M("qwen3-coder-next", "Qwen3 Coder Next", "qwen", 256 * K, "Newest Qwen coding release.", TEXT, ["coding", "open"]),
+  M("qwen3-235b", "Qwen3 235B", "qwen", 256 * K, "Large Qwen3 model for general reasoning and writing.", TEXT, ["open"]),
+  M("qwen3-vl-235b", "Qwen3 VL 235B", "qwen", 256 * K, "Qwen3 vision model: reads images, charts and screenshots.", ALL, ["open"]),
+  M("qwen3-next-80b", "Qwen3 Next 80B", "qwen", 256 * K, "Efficient Qwen3 Next model with fast replies.", TEXT, ["open", "fast"]),
+  M("qwen3-32b", "Qwen3 32B", "qwen", 128 * K, "Small Qwen3 model for everyday tasks.", TEXT, ["open", "fast"]),
+  M("mistral-large-3", "Mistral Large 3", "mistral", 256 * K, "Mistral's flagship model for hard reasoning and long documents.", ALL, ["flagship", "open"]),
+  M("devstral-2", "Devstral 2", "mistral", 256 * K, "Mistral's coding model for agents and large codebases.", TEXT, ["coding", "open"]),
+  M("magistral-small", "Magistral Small", "mistral", 128 * K, "Small Mistral reasoning model that thinks step by step.", TEXT, ["open"]),
+  M("ministral-3-14b", "Ministral 3 14B", "mistral", 128 * K, "Compact Mistral model, quick and inexpensive.", TEXT, ["open", "fast"]),
+  M("ministral-3-8b", "Ministral 3 8B", "mistral", 128 * K, "Smaller Ministral for very fast replies.", TEXT, ["open", "fast"]),
+  M("ministral-3-3b", "Ministral 3 3B", "mistral", 128 * K, "Tiny Ministral for simple tasks.", TEXT, ["open", "fast"]),
+  M("kimi-k2.5", "Kimi K2.5", "moonshot", 256 * K, "Moonshot's Kimi K2.5 for agents, tools and long tasks.", TEXT, ["open"]),
+  M("kimi-k2-thinking", "Kimi K2 Thinking", "moonshot", 256 * K, "Kimi that reasons step by step before answering.", TEXT, ["open"]),
+  M("gpt-oss-120b", "GPT-OSS 120B", "openai", 128 * K, "OpenAI's open-weight 120B model with built-in reasoning.", TEXT, ["open"]),
+  M("gpt-oss-20b", "GPT-OSS 20B", "openai", 128 * K, "Smaller open-weight OpenAI model, quick to answer.", TEXT, ["open", "fast"]),
+  M("glm-5", "GLM-5", "zhipu", 200 * K, "Zhipu GLM-5, strong at code and many languages.", TEXT, ["open", "coding"]),
+  M("glm-4.7", "GLM-4.7", "zhipu", 200 * K, "GLM-4.7 for coding and agent work.", TEXT, ["open", "coding"]),
+  M("glm-4.7-flash", "GLM-4.7 Flash", "zhipu", 200 * K, "Fast GLM-4.7 for quick replies.", TEXT, ["open", "fast"]),
+  M("glm-4.6", "GLM-4.6", "zhipu", 200 * K, "Previous GLM release.", TEXT, ["open"]),
+  M("minimax-m2.5", "MiniMax M2.5", "minimax", 200 * K, "MiniMax's newest model for coding and agents.", TEXT, ["open", "coding"]),
+  M("minimax-m2.1", "MiniMax M2.1", "minimax", 200 * K, "MiniMax M2.1 for long multi-step tasks.", TEXT, ["open"]),
+  M("minimax-m2", "MiniMax M2", "minimax", 200 * K, "First MiniMax M2 release.", TEXT, ["open"]),
+  M("gemma-3-27b", "Gemma 3 27B", "google", 128 * K, "Google's open Gemma 3, the largest size.", TEXT, ["open"]),
+  M("gemma-3-12b", "Gemma 3 12B", "google", 128 * K, "Mid-size open Gemma 3.", TEXT, ["open", "fast"]),
+  M("gemma-3-4b", "Gemma 3 4B", "google", 128 * K, "Small open Gemma 3 for quick tasks.", TEXT, ["open", "fast"]),
+  M("nemotron-super-3", "Nemotron Super 3", "nvidia", 128 * K, "NVIDIA's 120B Nemotron for reasoning and agents.", TEXT, ["open"]),
+  M("nemotron-nano-3", "Nemotron Nano 3", "nvidia", 128 * K, "Efficient 30B Nemotron, quick and capable.", TEXT, ["open", "fast"]),
+  M("nemotron-nano-9b", "Nemotron Nano 9B", "nvidia", 128 * K, "Tiny Nemotron for very fast replies.", TEXT, ["open", "fast"]),
+  M("claude-opus-5", "Claude Opus 5", "anthropic", MIL, "Anthropic's most capable model. Exceptional reasoning and agentic performance.", ALL, ["flagship"]),
   M("claude-opus-5.5", "Claude Opus 5.5", "anthropic", MIL, "The newest Opus release, built for the hardest multi-step reasoning and analysis.", ALL, ["flagship"]),
   M("claude-fable-5.1", "Claude Fable 5.1", "anthropic", MIL, "Claude tuned for code: refactors, reviews and long agent runs.", ALL, ["coding"]),
   M("claude-fable-5", "Claude Fable 5", "anthropic", MIL, "The first Fable release, a reliable coding and writing model.", ALL, ["coding"]),

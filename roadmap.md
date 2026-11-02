@@ -23,3 +23,5 @@
 - [x] Ring-light Download/Export buttons
 - [x] PDF/report requests open a formatted document page with Download PDF
 - [x] Policy pages: blank blue strip replaced by policy quick links; "Take the next step" lined up with footer
+- [x] AWS models: best ones default everywhere, all working models listed with logos
+- [x] Chat frame: one tab row (max 4), images only in frame, leads/SEO/proposals in frame, 2-word file names
