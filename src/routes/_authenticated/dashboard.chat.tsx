@@ -384,7 +384,7 @@ function ChatPlayground() {
           setWorkspace(merged.files);
           const fresh = merged.files.findIndex((x) => !workspace.some((w) => w.name === x.name));
           const changed = merged.files.findIndex((x) => newFiles.some((n) => n.name.toLowerCase() === x.name.toLowerCase()));
-          const askedIdx = findMentionedFile(merged.files.map((x) => x.name), lastUser?.display ?? lastUser?.content ?? "");
+          const askedIdx = findMentionedFile(lastUser?.display ?? lastUser?.content ?? "", merged.files.map((x) => x.name));
           const activeChanged = merged.files[activeFile] && newFiles.some((n) => n.name.toLowerCase() === merged.files[activeFile]!.name.toLowerCase());
           const first = fresh >= 0 ? fresh : askedIdx >= 0 ? askedIdx : activeChanged ? activeFile : changed;
           if (first >= 0) setActiveFile(first);
