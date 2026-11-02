@@ -634,13 +634,39 @@ function ChatPlayground() {
       )}
 
       <div className={studio ? "flex min-h-0 flex-1 gap-6 pt-2" : "contents"}>
-      {studio && (
+      {studio && (() => {
+        const hasCode = workspace.length > 0 || codingNow || codePinned !== null;
+        const tabs = [
+          ...(hasCode ? [{ id: "code" as const, label: workspace.length ? `Code · ${workspace.length}` : "Code" }] : []),
+          ...(showImage ? [{ id: "image" as const, label: "Image" }] : []),
+          ...(showDoc || writingDoc ? [{ id: "doc" as const, label: "Document" }] : []),
+        ];
+        const front = tabs.some((t) => t.id === pane) ? pane : (tabs[0]?.id ?? "code");
+        const used = workspace.length + (showImage ? 1 : 0) + (showDoc ? 1 : 0);
+        return (
         <div className="hidden min-h-0 min-w-0 flex-1 flex-col lg:flex">
-          {showImage && imageView ? (
+          {tabs.length > 1 && (
+            <div role="tablist" className="mb-2 flex items-center gap-1.5">
+              {tabs.map((t) => (
+                <button
+                  key={t.id}
+                  type="button"
+                  role="tab"
+                  aria-selected={front === t.id}
+                  onClick={() => setPane(t.id)}
+                  className={`rounded-full px-3.5 py-1.5 text-[13px] transition-colors ${front === t.id ? "bg-foreground text-background" : "bg-muted text-muted-foreground hover:text-foreground"}`}
+                >
+                  {t.label}
+                </button>
+              ))}
+              <span className="ml-auto text-[12px] tabular-nums text-muted-foreground">{used}/4 items</span>
+            </div>
+          )}
+          {front === "image" && imageView ? (
             <ChatImagePanel view={imageView} onClose={() => setImageView(null)} onDownload={(url) => downloadImage(url, imageView.prompt)} />
-          ) : showDoc && doc ? (
+          ) : front === "doc" && showDoc && doc ? (
             <ChatDocView doc={doc} busy={busy} menuTheme={menuTheme} onClose={() => setDocOpen(false)} />
-          ) : writingDoc ? (
+          ) : front === "doc" && writingDoc ? (
             <div className="chat-docview flex min-h-0 flex-1 items-center justify-center rounded-2xl text-[15px]">
               <Shimmer>Writing your document…</Shimmer>
             </div>
