@@ -652,7 +652,7 @@ function ChatPlayground() {
       )}
       <div className={studio ? "flex min-h-0 w-full flex-col lg:w-[480px] lg:shrink-0" : "contents"}>
       {/* Conversation / examples */}
-      <div ref={scroller} className="scroll-on-hover mt-1 min-h-0 flex-1 overflow-y-auto pr-2">
+      <div ref={scroller} className="chat-no-scrollbar mt-1 min-h-0 flex-1 overflow-y-auto">
         {turns.length === 0 ? (
           <div className="flex flex-col pt-6 pb-2">
             <div className="text-center">
@@ -799,7 +799,7 @@ function ChatPlayground() {
                         const cm = getCatalogModel(t.model ?? "");
                         return (
                           <div className="mt-4 flex flex-wrap items-center gap-2 text-[12px] text-muted-foreground">
-                            {cm && <ProviderLogo provider={cm.provider} size="sm" />}
+                            {cm && <ProviderLogo provider={cm.provider} size="sm" bare />}
                             <span className="font-medium text-foreground">{cm?.name ?? t.model}</span>
                             {typeof t.tokens === "number" && <span className="rounded-full bg-[var(--console-card)] px-2 py-0.5 tabular-nums text-foreground">{t.tokens.toLocaleString()} tokens</span>}
                             <span className="tabular-nums">{((t.ms ?? 0) / 1000).toFixed(1)}s</span>
@@ -850,7 +850,7 @@ function ChatPlayground() {
           </div>
         )}
         {awayFromBottom && turns.length > 0 && (
-          <div className="pointer-events-none sticky bottom-3 flex justify-center">
+          <div className="pointer-events-none sticky bottom-3 z-10 mx-auto flex w-full max-w-[760px] justify-center">
             <button
               type="button"
               aria-label="Scroll to latest message"
@@ -965,7 +965,7 @@ function ChatPlayground() {
               <Popover open={modelOpen} onOpenChange={setModelOpen}>
                 <PopoverTrigger asChild>
                   <Button variant="ghost" size="sm" type="button" aria-label="Choose a model" className="min-w-0 gap-2 rounded-full px-2.5 text-[14px] text-foreground hover:bg-background">
-                    {info && <ProviderLogo provider={info.provider} size="sm" />}
+                    {info && <ProviderLogo provider={info.provider} size="sm" bare />}
                     <span className="max-w-[150px] truncate">{info?.name ?? model}</span>
                     <ChevronDown className="h-4 w-4 shrink-0 text-foreground opacity-70" />
                   </Button>
@@ -982,7 +982,7 @@ function ChatPlayground() {
                       }}
                       className="h-auto w-full justify-start gap-3 rounded-lg px-3 py-2.5 text-left hover:bg-muted"
                     >
-                      <ProviderLogo provider={m.provider} size="sm" />
+                      <ProviderLogo provider={m.provider} size="sm" bare />
                       <span className="min-w-0 flex-1">
                         <span className="block truncate text-[14px] text-foreground">{m.name}</span>
                         <span className="block text-[12px] text-muted-foreground">
@@ -998,7 +998,7 @@ function ChatPlayground() {
                 type="submit"
                 disabled={(!input.trim() && !files.length) || busy || reading}
                 aria-label="Send"
-                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-foreground text-background transition-opacity disabled:opacity-35"
+                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-border bg-[var(--chat-send-bg,#fff)] text-[var(--chat-send-fg,#000)] shadow-sm transition-opacity disabled:opacity-35"
               >
                 {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <ArrowUp className="h-4 w-4" />}
               </button>
