@@ -242,6 +242,7 @@ function ChatPlayground() {
   const [busy, setBusy] = useState(false);
   const [instructions, setInstructions] = useState("");
   const [maxTokens, setMaxTokens] = useState(1200);
+  const effort = EFFORTS.find((e) => e.tokens === maxTokens) ?? (maxTokens <= 1200 ? EFFORTS[0] : maxTokens <= 2400 ? EFFORTS[1] : EFFORTS[2]);
   const [copied, setCopied] = useState<string | null>(null);
   const [votes, setVotes] = useState<Record<string, "up" | "down">>({});
   const vote = (id: string, dir: "up" | "down") => {
@@ -763,7 +764,6 @@ function ChatPlayground() {
             hasCode={hasCode}
             codeActive={front === "code"}
             extraTabs={extraTabs}
-            count={`${used}/4`}
           >
             {front === "site" && site ? (
               <ChatSitePanel embedded domain={site.domain} report={site.report} loading={!site.report} onClose={() => setSite(null)} />
@@ -1119,9 +1119,9 @@ function ChatPlayground() {
               </DropdownMenu>
               <Popover>
                 <PopoverTrigger asChild>
-                  <Button variant="ghost" size="sm" type="button" aria-label="Chat settings" className="gap-1.5 rounded-full px-2.5 text-[13px] text-foreground hover:bg-background">
+                  <Button variant="ghost" size="sm" type="button" aria-label="Effort and settings" className="gap-1.5 rounded-full px-2.5 text-[13px] text-foreground hover:bg-background">
                     <SlidersHorizontal className="h-4 w-4" />
-                    <span className="hidden whitespace-nowrap sm:inline">{maxTokens.toLocaleString()} tokens</span>
+                    <span className="whitespace-nowrap">{effort.label}</span>
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent align="start" side="top" sideOffset={10} className={`${menuTheme} w-[min(340px,90vw)] rounded-xl border-border bg-background p-5 text-foreground shadow-lg`}>
@@ -1256,6 +1256,12 @@ function stripCode(text: string): string {
 function unwrapDocument(text: string): string {
   return text.replace(/```document[^\n]*\n([\s\S]*?)(```|$)/gi, "$1");
 }
+
+const EFFORTS = [
+  { id: "fast", label: "Fast", tokens: 1200 },
+  { id: "hard", label: "Hard", tokens: 2400 },
+  { id: "heavy", label: "Heavy", tokens: 4000 },
+] as const;
 
 function ReplyBtn({ label, active, disabled, onClick, children }: { label: string; active?: boolean; disabled?: boolean; onClick: () => void; children: ReactNode }) {
   return (
