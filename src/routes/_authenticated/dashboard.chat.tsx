@@ -688,7 +688,8 @@ function ChatPlayground() {
             />
           )}
         </div>
-      )}
+        );
+      })()}
       <div className={studio ? "flex min-h-0 w-full flex-col lg:w-[480px] lg:shrink-0" : "contents"}>
       {/* Conversation / examples */}
       <div ref={scroller} className="chat-no-scrollbar mt-1 min-h-0 flex-1 overflow-y-auto">
