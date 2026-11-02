@@ -1,4 +1,4 @@
-import { Shimmer } from "@/components/ui/shimmer";
+import { Shimmer } from "@/components/ai-elements/shimmer";
 import type { SiteReport } from "@/lib/site-inspect.functions";
 
 function Row({ label, value }: { label: string; value: string | null | undefined }) {
@@ -73,7 +73,7 @@ export function ChatSitePanel({ report, loading, domain, onClose }: { report: Si
                   <span key={k.word} className="rounded-full bg-muted px-2.5 py-1 text-[12px] text-foreground">{k.word} <span className="tabular-nums text-muted-foreground">{k.count}</span></span>
                 ))}
               </div>
-            </Card>
+            </Card></div>
           )}
         </div>
       )}
