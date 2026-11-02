@@ -53,6 +53,7 @@ import { DOC_ACCEPT, IMAGE_ACCEPT, composeMessage, readAttachment, type ChatAtta
 import {
   CHAT_MAX_FILES,
   codeRequestKind,
+  shortFileName,
   extractReplyDocument,
   extractReplyFiles,
   looksLikeDocRequest,
@@ -119,6 +120,8 @@ const JENVU_BRAIN = [
   "Before writing code, check the request has what you need: platform (MT5/MQL5, TradingView/Pine Script or Python), symbol, timeframe, entry and exit rules, and risk per trade. If something important is missing or unclear, do NOT write code yet: ask up to 3 short numbered questions in the chat and wait for the answer. If the request is already clear, write the code straight away.",
   "When asked for a PDF, report, guide or document: put the whole document in ONE fenced block tagged ```document written in Markdown (never put ``` inside it). First line: a short UPPERCASE kicker; then '# Title'; then numbered '## 1. Section' headings, '> **Callout title**' blockquotes for formulas and key notes, and tables where they help. The page turns it into a PDF. After the block, add one short line only.",
   "When asked for a NEW or separate file, write it under a new file name and leave the open files as they are; the editor holds up to 2 files and the page shows 1 document (PDF) at a time.",
+  "File names are short: at most 2 words plus the extension, e.g. GoldSweep.mq5 or rsi_bot.py. Document titles are at most 4 words.",
+  "Leads lists, SEO / website reports, proposals, articles, emails, CVs and any long written piece go in ONE ```document block so they open in the frame beside the chat; in the chat itself write only one short line.",
   "The page creates pictures itself when the user asks for an image, so never say you can't make images.",
   "Leads (e.g. 'Google Maps leads for dentists'): first ask for the keyword/business type, country and city, and how many leads, unless already given. You have no live Google Maps access, so never invent phone numbers, emails or addresses: list only businesses you genuinely know are public, leave unknown fields as 'verify', and say the list must be checked on Google Maps. Deliver it as a ```document with a short intro and ONE table: Business | Category | City | Website | Phone | Rating | Notes (the page exports it as PDF and CSV).",
   "Upwork proposals: if the job post isn't given, ask for it. Then write a proposal under 200 words: a first line that names the client's exact problem (no 'Dear Sir', no 'I am writing to'), 2-3 lines of relevant proof, a short step-by-step plan, timeline, one smart question about the project, and a friendly call to action. Plain, confident, specific; no buzzwords, no invented reviews or past clients. Put it in a ```document block.",
@@ -782,14 +785,24 @@ function ChatPlayground() {
                     t.model === "image" ? (
                       <div>
                         {t.image ? (
-                          <button
-                            type="button"
-                            onClick={() => setImageView({ turnId: t.id, prompt: t.display ?? t.content, url: t.image, final: !!t.imageFinal })}
-                            className="block overflow-hidden rounded-2xl"
-                            aria-label="Open image"
-                          >
-                            <img src={t.image} alt="AI image" className={`max-h-[320px] w-auto max-w-full transition-[filter] duration-500 ${t.imageFinal ? "blur-0" : "blur-2xl"}`} />
-                          </button>
+                          <>
+                            {/* Phones: the picture shows here. Desktop: only in the frame on the left. */}
+                            <button
+                              type="button"
+                              onClick={() => setImageView({ turnId: t.id, prompt: t.display ?? t.content, url: t.image, final: !!t.imageFinal })}
+                              className="block overflow-hidden rounded-2xl lg:hidden"
+                              aria-label="Open image"
+                            >
+                              <img src={t.image} alt="AI image" className={`max-h-[320px] w-auto max-w-full transition-[filter] duration-500 ${t.imageFinal ? "blur-0" : "blur-2xl"}`} />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => { setImageView({ turnId: t.id, prompt: t.display ?? t.content, url: t.image, final: !!t.imageFinal }); setPane("image"); }}
+                              className="hidden items-center gap-2 rounded-full bg-[var(--console-card)] px-3.5 py-2 text-[14px] text-foreground lg:inline-flex"
+                            >
+                              <ImageIcon className="h-4 w-4 text-muted-foreground" /> {t.imageFinal ? "Image is open in the frame" : "Creating image in the frame…"}
+                            </button>
+                          </>
                         ) : busy && imaging ? (
                           <div className="text-[16px]"><Shimmer>Creating your image…</Shimmer></div>
                         ) : (
