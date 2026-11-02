@@ -121,7 +121,19 @@ const JENVU_BRAIN = [
   "Upwork proposals: if the job post isn't given, ask for it. Then write a proposal under 200 words: a first line that names the client's exact problem (no 'Dear Sir', no 'I am writing to'), 2-3 lines of relevant proof, a short step-by-step plan, timeline, one smart question about the project, and a friendly call to action. Plain, confident, specific; no buzzwords, no invented reviews or past clients. Put it in a ```document block.",
   "You can read attached images and documents; use what they show.",
   "Be accurate and concise. Never claim personal trading experience, never promise profits or guaranteed returns, and note that trading carries risk when giving trade ideas.",
+  "When you ask the user a question, end the reply with ONE line exactly like: [[choices: first suggested answer | second suggested answer]] — 2 or 3 short answers the user can click. Never use it when you are not asking anything.",
 ].join("\n");
+
+// AI-suggested answers: a trailing [[choices: a | b]] line becomes clickable chips.
+const CHOICES_RE = /\[\[\s*choices\s*:([^\]]*)\]\]/i;
+function extractChoices(text: string): string[] {
+  const m = CHOICES_RE.exec(text);
+  if (!m?.[1]) return [];
+  return m[1].split("|").map((s) => s.trim()).filter(Boolean).slice(0, 3);
+}
+function stripChoices(text: string): string {
+  return text.replace(new RegExp(CHOICES_RE.source, "gi"), "").trimEnd();
+}
 
 type Example = {
   icon: LucideIcon;
@@ -746,11 +758,11 @@ function ChatPlayground() {
                     ) : (
                     <>
                       <div className={`text-[16px] leading-[1.7] text-foreground [&_li]:my-1 [&_p]:my-3 [&_ul]:my-3 [&_ul]:pl-5 ${studio ? "lg:hidden" : ""}`}>
-                        <MessageResponse>{unwrapDocument(t.content)}</MessageResponse>
+                        <MessageResponse>{unwrapDocument(stripChoices(t.content))}</MessageResponse>
                       </div>
                       {studio && (
                         <div className="hidden text-[16px] leading-[1.7] text-foreground lg:block [&_li]:my-1 [&_p]:my-3 [&_ul]:my-3 [&_ul]:pl-5">
-                          <MessageResponse>{stripCode(t.content)}</MessageResponse>
+                          <MessageResponse>{stripCode(stripChoices(t.content))}</MessageResponse>
                         </div>
                       )}
                       {(() => {
@@ -792,6 +804,37 @@ function ChatPlayground() {
                                 <Download className="h-3.5 w-3.5" /> Download {f.name}
                               </button>
                             ))}
+                          </div>
+                        );
+                      })()}
+                      {(() => {
+                        const choices = extractChoices(t.content);
+                        if (!choices.length || t.id !== turns[turns.length - 1]?.id || busy) return null;
+                        return (
+                          <div className="mt-4 flex flex-col gap-2">
+                            {choices.map((c) => (
+                              <button
+                                key={c}
+                                type="button"
+                                onClick={() => {
+                                  setInput(c);
+                                  box.current?.focus();
+                                }}
+                                className="w-fit max-w-full rounded-2xl border border-dashed border-foreground/30 px-4 py-2 text-left text-[14px] text-foreground hover:border-foreground/60 hover:bg-[var(--console-card)]"
+                              >
+                                {c}
+                              </button>
+                            ))}
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setInput("");
+                                box.current?.focus();
+                              }}
+                              className="w-fit rounded-2xl px-4 py-2 text-left text-[14px] text-muted-foreground hover:text-foreground"
+                            >
+                              Something else? Type your own answer below…
+                            </button>
                           </div>
                         );
                       })()}
