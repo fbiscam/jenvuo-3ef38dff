@@ -394,7 +394,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
   // Never draw EURUSDT ticks into interbank EUR/USD candles: that creates
   // artificial jumps/wicks. Forex candles update with their own 15s payload.
   const streamMatchesHistory = liveStreamMatchesHistory(asset, payload?.provider);
-  const livePrice = useLivePriceStream(goldClosed || !streamMatchesHistory ? undefined : asset, rawBars.at(-1)?.close ?? null, undefined, { intervalMs: 3000 });
+  const livePrice = useLivePriceStream(goldClosed || !streamMatchesHistory ? undefined : asset, rawBars.at(-1)?.close ?? null, undefined, { intervalMs: 1000 });
   const stepSeconds = payload?.stepSeconds ?? 1800;
   const bars = useMemo(() => {
     if (goldClosed || !streamMatchesHistory) return rawBars;
@@ -799,7 +799,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
         </div>
       )}
       {sidePanelOpen && <TerminalTabBody tab={marketTab} bars={bars} timeframeKey={timeframe.key} />}
-      <div className={cn("flex min-h-0 min-w-0 flex-1", sidePanelOpen && "lg:h-[540px] lg:flex-none lg:gap-3 2xl:h-[600px]", sidePanelOpen && marketTab !== "overview" && "lg:hidden")}>
+      <div className={cn("flex min-h-0 min-w-0 flex-1", sidePanelOpen && "lg:h-[calc(100dvh-150px)] lg:min-h-[540px] lg:flex-none lg:gap-3", sidePanelOpen && marketTab !== "overview" && "lg:hidden")}>
       <div
         className={cn(
           "flex min-h-0 min-w-0 flex-1 flex-col bg-background",
