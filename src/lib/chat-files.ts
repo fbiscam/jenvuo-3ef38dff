@@ -201,3 +201,65 @@ export function shortFileName(name: string): string {
   if (words.length <= 2) return name;
   return `${words.slice(0, 2).join("_")}${ext}`;
 }
+
+/** Items the frame beside the chat holds at once (code files, image, document, upload, website). */
+export const FRAME_MAX_ITEMS = 4;
+
+export type FrameState = { codeFiles: number; image: boolean; doc: boolean; upload: boolean; site: boolean };
+
+export function frameUsed(s: FrameState): number {
+  return s.codeFiles + (s.image ? 1 : 0) + (s.doc ? 1 : 0) + (s.upload ? 1 : 0) + (s.site ? 1 : 0);
+}
+
+export type FrameAsk = "code-new" | "code-edit" | "image" | "doc" | "upload" | "site" | null;
+
+/**
+ * Whether a request would need a new frame tab while the frame is full.
+ * Returns the message to show (the request is not sent), or null when it fits.
+ * Editing an open file, or replacing the open image/document/upload/report, always fits.
+ */
+export function frameLimitBlock(ask: FrameAsk, s: FrameState): string | null {
+  const used = frameUsed(s);
+  const full = used >= FRAME_MAX_ITEMS;
+  const msg = `The frame already has ${FRAME_MAX_ITEMS} files (max ${FRAME_MAX_ITEMS}). Please remove one file with the ✕ on its tab, then try again.`;
+  if (ask === "code-new") {
+    if (s.codeFiles >= CHAT_MAX_FILES) return `The editor already has ${CHAT_MAX_FILES} code files (max ${CHAT_MAX_FILES}). Please remove one code file with the ✕ on its tab, then try again.`;
+    return full ? msg : null;
+  }
+  if (ask === "image") return full && !s.image ? msg : null;
+  if (ask === "doc") return full && !s.doc ? msg : null;
+  if (ask === "upload") return full && !s.upload ? msg : null;
+  if (ask === "site") return full && !s.site ? msg : null;
+  return null;
+}
+
+/**
+ * The open file a message talks about ("gold_sweep.mq5 ma changes kro",
+ * "change the backtest file"), by full name, short tab name or name words. -1 when none.
+ */
+export function findMentionedFile(prompt: string, names: string[]): number {
+  const p = prompt.toLowerCase();
+  const words = (s: string) => s.toLowerCase().replace(/\.[a-z0-9]{1,5}$/, "").split(/[\s_\-.]+/).filter((w) => w.length > 2);
+  let best = -1;
+  let bestScore = 0;
+  names.forEach((n, i) => {
+    const full = n.toLowerCase();
+    let score = 0;
+    if (p.includes(full)) score = 100;
+    else if (p.includes(shortFileName(n).toLowerCase())) score = 90;
+    else {
+      const stem = full.replace(/\.[a-z0-9]{1,5}$/, "");
+      if (stem.length > 2 && (p.includes(stem) || p.includes(stem.replace(/[_\-]+/g, " ")))) score = 80;
+      else {
+        const ws = words(n).filter((w) => !["jenvu", "code", "file"].includes(w));
+        const hits = ws.filter((w) => new RegExp(`\\b${w.replace(/[^\w]/g, "")}\\b`).test(p)).length;
+        if (hits) score = hits * 10;
+      }
+    }
+    if (score > bestScore) {
+      bestScore = score;
+      best = i;
+    }
+  });
+  return best;
+}
