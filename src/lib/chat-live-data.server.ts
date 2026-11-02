@@ -73,11 +73,11 @@ async function mapsLeads(query: string, count: number): Promise<{ leads: Lead[];
   return { leads: leads.slice(0, count) };
 }
 
-/** Reads up to 10 lead websites (5 at a time) for public email addresses. */
+/** Reads up to 6 lead websites (3 at a time; Firecrawl allows ~10 requests a minute) for public email addresses. */
 async function addEmails(leads: Lead[]) {
-  const withSite = leads.filter((l) => l.website).slice(0, 10);
-  for (let i = 0; i < withSite.length; i += 5) {
-    await Promise.all(withSite.slice(i, i + 5).map(async (l) => {
+  const withSite = leads.filter((l) => l.website).slice(0, 6);
+  for (let i = 0; i < withSite.length; i += 3) {
+    await Promise.all(withSite.slice(i, i + 3).map(async (l) => {
       try {
         const j = await firecrawl("scrape", { url: l.website, formats: ["markdown", "links"], onlyMainContent: false }, 15000);
         const d = (j?.data ?? j) as { markdown?: string; links?: string[] } | undefined;
