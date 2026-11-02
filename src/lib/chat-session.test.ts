@@ -1,6 +1,6 @@
 import { describe, it } from "node:test";
 import { expect } from "./chart/test-expect";
-import { CHAT_SESSION_MAX_TURNS, chatSessionKey, parseSavedSession, toSavedSession } from "./chat-session";
+import { CHAT_SESSION_MAX_TURNS, chatPendingKey, chatSessionKey, parsePendingJob, parseSavedSession, toSavedSession } from "./chat-session";
 
 const base = { workspace: [], activeFile: 0, doc: null, docOpen: false };
 
@@ -43,5 +43,16 @@ describe("saved chat", () => {
     expect(parseSavedSession(null)).toBe(null);
     expect(parseSavedSession("{bad")).toBe(null);
     expect(parseSavedSession(JSON.stringify(toSavedSession({ ...base, turns: [] })))).toBe(null);
+  });
+});
+
+describe("pending reply (keeps running after leaving Chat)", () => {
+  it("is kept per account", () => {
+    expect(chatPendingKey("u1")).not.toBe(chatPendingKey("u2"));
+  });
+  it("reads a saved pending reply and rejects broken ones", () => {
+    expect(parsePendingJob(JSON.stringify({ jobId: "abc", startedAt: 5 }))).toEqual({ jobId: "abc", startedAt: 5 });
+    expect(parsePendingJob("{bad")).toBe(null);
+    expect(parsePendingJob(JSON.stringify({ jobId: 1 }))).toBe(null);
   });
 });
