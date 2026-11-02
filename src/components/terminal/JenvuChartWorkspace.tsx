@@ -40,7 +40,7 @@ import {
 import { getTerminalChart } from "@/lib/gold-analysis.functions";
 import { cn } from "@/lib/utils";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { ChartArea, ChartCandlestick, ChevronDown, Clock3, Lock, Menu, PanelLeftClose, PanelLeftOpen } from "lucide-react";
+import { ChevronDown, Clock3, Lock, Menu, PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import { useStrategyAccess } from "./useStrategyAccess";
 import { LOCKED_STRATEGY_KEYS } from "@/lib/strategy-access";
 import { Switch } from "@/components/ui/switch";
@@ -254,16 +254,9 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
   const [fullscreen, setFullscreen] = useState(false);
   const [ticketSide, setTicketSide] = useState<DemoSide | null>(null);
   const [paperOpen, setPaperOpen] = useState(false);
-  // Candles are the trading default; explicit chart-style picks remain saved.
-  const [chartStyle, setChartStyle] = useState<"candles" | "area">("candles");
+  // The Terminal uses candles only (the Line/area switch was removed).
+  const chartStyle = "candles" as const;
   const [marketTab, setMarketTab] = useState<MarketTab>("overview");
-  useEffect(() => {
-    setChartStyle(readJson<"candles" | "area">("jenvu:terminal-chart-style", "candles") === "area" ? "area" : "candles");
-  }, []);
-  const pickChartStyle = (next: "candles" | "area") => {
-    setChartStyle(next);
-    writeJson("jenvu:terminal-chart-style", next);
-  };
   // Desktop chart toolbar is rendered into the dashboard top bar (in place of the old price strip).
   const [toolbarHost, setToolbarHost] = useState<HTMLElement | null>(null);
   useEffect(() => {
@@ -753,24 +746,6 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
           </div>
         </PopoverContent>
       </Popover>
-      <div role="group" aria-label="Chart style" className="mx-1 flex shrink-0 items-center rounded-full bg-gc-console-search p-0.5 dark:bg-accent">
-        {([["area", "Line", ChartArea], ["candles", "Candles", ChartCandlestick]] as const).map(([key, label, Icon]) => (
-          <button
-            key={key}
-            type="button"
-            onClick={() => pickChartStyle(key)}
-            aria-pressed={chartStyle === key}
-            title={`${label} chart`}
-            className={cn(
-              "inline-flex h-7 items-center gap-1.5 rounded-full px-2.5 text-[12px] font-medium text-gc-ink-muted transition-colors hover:text-gc-ink dark:text-muted-foreground",
-              chartStyle === key && "bg-card text-gc-ink shadow-sm dark:bg-background dark:text-foreground",
-            )}
-          >
-            <Icon className="h-3.5 w-3.5" />
-            <span className="hidden xl:inline">{label}</span>
-          </button>
-        ))}
-      </div>
       <Popover>
         <PopoverTrigger asChild>
           <button type="button" aria-label="Indicators" title="Indicators" className={railBtn}>

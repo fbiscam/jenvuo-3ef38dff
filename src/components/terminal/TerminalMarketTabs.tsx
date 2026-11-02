@@ -76,13 +76,24 @@ export function TerminalSymbolHeader({
   const watch = useWatchQuotes();
   const extra = useExtraQuotes();
   const allQuotes = useMemo(() => ({ ...(extra.data ?? {}), ...(watch.data ?? {}) }), [extra.data, watch.data]);
-  // Only EUR/USD's quick quote matches its chart feed; the Gold/BTC quick quotes come
-  // from a different source than the chart, so their daily change is left off.
+  // EUR/USD's quick quote matches its chart feed. Gold/BTC quick quotes come from a
+  // different source, so their change is measured against the same previous close the
+  // "1 day" range button uses (shared query), keeping header and range numbers equal.
   const q = asset === "EURUSD" ? watch.data?.[asset] : undefined;
+  const fetchOverview = useServerFn(getGoldOverview);
+  const overview = useQuery({
+    queryKey: ["terminal-overview", asset, "1d"],
+    queryFn: () => fetchOverview({ data: { period: "1d", asset } }),
+    staleTime: 60_000,
+    refetchInterval: 60_000,
+    refetchIntervalInBackground: false,
+    enabled: asset !== "EURUSD",
+  });
   const { title, decimals, label } = assetInfo(asset);
   const live = price ?? q?.price ?? null;
-  const ch = q?.changePct ?? null;
-  const prev = live != null && ch != null ? live / (1 + ch / 100) : null;
+  const prevClose = asset === "EURUSD" ? null : overview.data?.prevClose ?? null;
+  const ch = asset === "EURUSD" ? q?.changePct ?? null : live != null && prevClose ? ((live - prevClose) / prevClose) * 100 : null;
+  const prev = asset === "EURUSD" ? (live != null && ch != null ? live / (1 + ch / 100) : null) : prevClose;
   const abs = live != null && prev != null ? live - prev : null;
   const now = useClock();
   const priceText = live != null ? num(live, decimals) : "—";
