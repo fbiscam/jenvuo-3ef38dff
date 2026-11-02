@@ -38,6 +38,12 @@ export const playgroundChat = createServerFn({ method: "POST" })
       return { ok: false as const, error: String(entitlement.error || "Your plan doesn't include API models.") };
     }
 
+    // Leads, website/SEO and web questions get real data (Google Maps, Firecrawl) first.
+    const userTurns = data.turns.filter((t) => t.role === "user");
+    const { liveDataFor } = await import("@/lib/chat-live-data.server");
+    const live = await liveDataFor(userTurns[userTurns.length - 1]?.content ?? "", userTurns[userTurns.length - 2]?.content ?? "");
+    if (live) messages.splice(messages.length - 1, 0, { role: "user", content: live.block });
+
     const { callChatCompletion, AiGatewayError } = await import("@/lib/ai-gateway");
     const requestId = `chatcmpl-${crypto.randomUUID()}`;
     const started = Date.now();
