@@ -1754,11 +1754,8 @@ export const getTerminalChart = createServerFn({ method: "POST" })
     const asset: TerminalAsset = d?.asset === "BTCUSD" ? "BTCUSD" : d?.asset === "XAUUSD" ? "XAUUSD" : "EURUSD";
     return { timeframe: TF_MS[tf] ? tf : "30m", asset };
   })
-  .handler(async ({ data, context }) => {
-    const { checkTerminalAccess } = await import("@/lib/terminal-access.server");
-    const email = (context.claims as { email?: string } | undefined)?.email ?? null;
-    const access = await checkTerminalAccess(context.supabase as any, context.userId, email);
-    if (!access.allowed) throw new Error("TERMINAL_LOCKED: Terminal is available to approved Founding Program members only.");
+  .handler(async ({ data }) => {
+    // The Terminal chart is open to every signed-in user (requireSupabaseAuth).
     return loadTerminalChart(data.timeframe, data.asset);
   });
 

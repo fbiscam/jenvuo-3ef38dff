@@ -168,14 +168,14 @@ export const DOC_GROUPS: DocGroup[] = [
       {
         id: "terminal-access",
         title: "Who can use the Terminal",
-        keywords: "access locked founding program id verification",
+        keywords: "access open free paid strategies founding program id verification",
         body: (
           <>
-            <p>The Terminal is reserved for approved <strong>Founding Program</strong> members, free of cost. <strong>Pro, Elite and Ultra</strong> plans, the free trial and credit do not unlock it: plans cover <strong>JX Bot</strong> for MT5 and the <strong>Top AI Models</strong>, and every other page stays open.</p>
+            <p>The Terminal is open to <strong>every signed-in user</strong>, on any plan. The chart, live prices and the free SMC tools work for everyone.</p>
             <ul>
-              <li>When your Founding application is approved, you get 3 months of your chosen plan and $250 credit straight away.</li>
-              <li>You then have <strong>2 days</strong> to upload an identity document. Once submitted, access continues.</li>
-              <li>If no document is submitted in time, the Terminal locks until you upload one.</li>
+              <li>The advanced chart strategies (Fresh sweep, Swing price action, Zone + FVG) need an active <strong>Starter, Pro or Elite</strong> plan, the free trial, or an approved Founding membership.</li>
+              <li>Credit alone does not unlock the advanced strategies.</li>
+              <li>Founding members get 3 months of their chosen plan and $250 credit, and have <strong>2 days</strong> to upload an identity document to keep those extras.</li>
             </ul>
             <p>Apply at <a href="https://jenvu.com/founding">jenvu.com/founding</a>.</p>
           </>

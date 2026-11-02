@@ -2,8 +2,9 @@
  * Chart strategy lock.
  *
  * Fresh sweep, Swing price action and the Zone + FVG (supply / demand)
- * strategy are part of Terminal access: they unlock exactly when the Terminal
- * does (approved Founding members and admins) and cost no credits.
+ * strategy are paid Terminal features: the Terminal is open to everyone, but
+ * these unlock only with a paid plan, the Pro trial, Founding or admin, and
+ * cost no credits.
  */
 
 /** Chart switches covered by the lock. */
@@ -18,7 +19,7 @@ export type StrategyAccess = {
 
 const UNLOCK_REASONS: StrategyAccessReason[] = ["admin", "paid", "founding", "trial"];
 
-/** Strategies follow the Terminal access decision exactly. */
+/** Strategies follow the plan decision (checkPlanAccess). */
 export function evaluateStrategyAccess(terminal: { allowed: boolean; reason: string | null }): StrategyAccess {
   if (!terminal.allowed) return { allowed: false, reason: "no_plan" };
   const reason = UNLOCK_REASONS.find((r) => r === terminal.reason) ?? "paid";
