@@ -1545,6 +1545,17 @@ function DashboardLayout() {
                   )}
                 </button>
               )}
+              {terminalRail && (
+                <button
+                  type="button"
+                  onClick={() => setMobileNavOpen(true)}
+                  title="Open menu"
+                  aria-label="Open menu"
+                  className="sidebar-quick-btn inline-flex h-8 w-8 items-center justify-center rounded-md text-zinc-600"
+                >
+                  <ChevronsRight className="h-4 w-4" />
+                </button>
+              )}
               {!drawerMode && (
               <button
                 type="button"

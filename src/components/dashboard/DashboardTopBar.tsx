@@ -136,16 +136,16 @@ export default function DashboardTopBar({
   const seeAll = () => { const t = q.trim(); if (!t) return; close(); void navigate({ to: "/search", search: { q: t } }); };
 
   return (
-    <header className={`sticky top-0 z-30 ${pinned && !onTerminal ? "flex lg:hidden" : "flex"} ${white ? "h-[52px]" : "h-14"} shrink-0 items-center gap-2 ${white ? "bg-background" : "console-topbar bg-background"} px-2 sm:gap-3 sm:px-3`}>
+    <header className={`sticky top-0 z-30 ${pinned && !onTerminal ? "flex lg:hidden" : "flex"} ${onTerminal ? "terminal-topbar h-11" : white ? "h-[52px]" : "h-14"} shrink-0 items-center gap-2 ${white ? "bg-background" : "console-topbar bg-background"} px-2 sm:gap-3 sm:px-3`}>
       <button
         type="button"
         onClick={onMenu}
         aria-label="Open menu"
-        className={`${onTerminal ? "hidden md:inline-flex" : pinned ? "inline-flex lg:hidden" : "inline-flex"} h-10 w-10 shrink-0 items-center justify-center rounded-full text-gc-ink-muted hover:bg-gc-notice`}
+        className={`${onTerminal ? "inline-flex lg:hidden" : pinned ? "inline-flex lg:hidden" : "inline-flex"} h-10 w-10 shrink-0 items-center justify-center rounded-full text-gc-ink-muted hover:bg-gc-notice`}
       >
         <Menu className="h-5 w-5" />
       </button>
-      <Link to="/dashboard" className={`${pinned ? "flex lg:hidden" : "flex"} shrink-0 items-center gap-2 pr-2`}>
+      <Link to="/dashboard" className={`${pinned || onTerminal ? "flex lg:hidden" : "flex"} shrink-0 items-center gap-2 pr-2`}>
         <JenvuMark className="h-5 w-5 text-foreground" />
         <span className="text-[20px] font-medium tracking-tight text-foreground">Jenvu</span>
       </Link>
