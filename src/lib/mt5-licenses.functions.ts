@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { isMt5Plan, licenseLimit, newLicenseKey, normalizeIp, parseBinding, targetsFor } from "./mt5-licenses";
+import { isMt5Plan, isPaidBotSub, licenseLimit, newLicenseKey, normalizeIp, parseBinding, targetsFor } from "./mt5-licenses";
 
 export type Mt5LicenseRow = { id: string; license_key: string; mt5_account: string | null; plan_id: string; revoked_at: string | null; last_validated_at: string | null; created_at: string };
 
@@ -10,8 +10,7 @@ async function readPlan(userId: string) {
   const db = supabaseAdmin as any;
   const { data: sub } = await db.from("user_subscriptions").select("plan_id,status,is_trial,current_period_end").eq("user_id", userId).maybeSingle();
   const plan = String(sub?.plan_id || "free").toLowerCase();
-  const active = !!sub && (sub.status === "active" || sub.status === "trialing") && (!sub.current_period_end || Date.parse(sub.current_period_end) > Date.now());
-  const ok = active && isMt5Plan(plan);
+  const ok = isPaidBotSub(sub ?? null) && isMt5Plan(plan);
   const t = ok ? targetsFor(plan as any, userId) : { daily: 0, monthly: 0 };
   return { db, plan: ok ? plan : "free", allowed: ok, limit: ok ? licenseLimit(plan) : 0, expiresAt: ok ? (sub.current_period_end as string | null) : null, dailyTarget: t.daily, monthlyTarget: t.monthly };
 }
