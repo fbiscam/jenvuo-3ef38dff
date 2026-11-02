@@ -860,6 +860,28 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
           <span className="hidden md:inline-flex"><AssetLogo asset={asset} size={22} /></span>
         </div>
 
+        <div role="group" aria-label="Pair" className="mr-1 flex shrink-0 items-center gap-0.5 md:hidden">
+          {CHART_ASSETS.map(({ symbol: a, label }) => (
+            <button
+              key={a}
+              type="button"
+              aria-pressed={asset === a}
+              aria-label={label}
+              title={label}
+              onClick={() => onAssetChange?.(a)}
+              className={cn(
+                "inline-flex h-7 items-center gap-1 rounded-md px-1.5 font-mono text-[11px] font-semibold text-muted-foreground transition-colors hover:bg-accent hover:text-foreground",
+                asset === a && "bg-accent text-foreground",
+                asset === a && theme === "dark" && "bg-[#2a2a2a] text-white hover:bg-[#2a2a2a] hover:text-white",
+              )}
+            >
+              <AssetLogo asset={a} size={14} />
+              <span>{label}</span>
+            </button>
+          ))}
+        </div>
+        <span className="mx-1 h-5 w-px shrink-0 bg-border md:hidden" aria-hidden="true" />
+
         <div className="flex shrink-0 items-center md:hidden" role="group" aria-label="Chart timeframe">
           {timeframes.map((item) => (
             <button

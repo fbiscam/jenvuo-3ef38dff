@@ -1422,7 +1422,7 @@ export function renderSmcOverlay(
     ctx.roundRect?.(xx - w / 2 - 5, baseline - 12, w + 10, 16, 4);
     if (!ctx.roundRect) ctx.rect(xx - w / 2 - 5, baseline - 12, w + 10, 16);
     ctx.fill();
-    ctx.fillStyle = sw.status === "confirmed" ? "#2962ff" : sw.status === "late" ? "#f59e0b" : sw.status === "failed" ? "#f23645" : isDarkCanvas(ctx) ? "#d1d4dc" : "#5d606b";
+    ctx.fillStyle = isDarkCanvas(ctx) ? "#ffffff" : sw.status === "confirmed" ? "#2962ff" : sw.status === "late" ? "#f59e0b" : sw.status === "failed" ? "#f23645" : isDarkCanvas(ctx) ? "#d1d4dc" : "#5d606b";
     ctx.fillText(sw.text, xx - w / 2, baseline);
     ctx.restore();
   };
@@ -1447,7 +1447,7 @@ export function renderSmcOverlay(
     ctx.roundRect?.(bx, baseline - 12, w + 10, 16, 4);
     if (!ctx.roundRect) ctx.rect(bx, baseline - 12, w + 10, 16);
     ctx.fill();
-    ctx.fillStyle = pa.control === "buyers" ? "#089981" : pa.control === "sellers" ? "#f23645" : isDarkCanvas(ctx) ? "#d1d4dc" : "#5d606b";
+    ctx.fillStyle = isDarkCanvas(ctx) ? "#ffffff" : pa.control === "buyers" ? "#089981" : pa.control === "sellers" ? "#f23645" : isDarkCanvas(ctx) ? "#d1d4dc" : "#5d606b";
     ctx.fillText(pa.text, xx - w / 2, baseline);
     ctx.restore();
     sweepTag(t, xx, up ? baseline - 18 : baseline + 18);
@@ -1574,7 +1574,7 @@ function renderLiquidityMap(ctx: CanvasRenderingContext2D, map: LiquidityMap, pr
     // SSL sweep: cross under the low wick. BSL sweep: cross just beyond the high wick.
     const y = s.side === "SSL" ? yx + 12 : yx - 12;
     const r = 4;
-    ctx.strokeStyle = s.side === "BSL" ? "#f23645" : "#089981";
+    ctx.strokeStyle = isDarkCanvas(ctx) ? "#ffffff" : s.side === "BSL" ? "#f23645" : "#089981";
     ctx.beginPath();
     ctx.moveTo(x - r, y - r);
     ctx.lineTo(x + r, y + r);
