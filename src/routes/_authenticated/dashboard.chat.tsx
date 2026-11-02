@@ -685,20 +685,21 @@ function ChatPlayground() {
         />
       </div>
       <div>
-        <div className="flex items-center justify-between text-[13px]">
-          <label htmlFor="pg-max" className="font-medium text-foreground">Max reply tokens</label>
-          <span className="rounded-md bg-muted px-2 py-1 tabular-nums text-foreground">{maxTokens.toLocaleString()}</span>
+        <div className="text-[13px] font-medium text-foreground">Effort</div>
+        <div role="radiogroup" aria-label="Effort" className="mt-2 grid grid-cols-3 gap-1 rounded-lg bg-muted p-1">
+          {EFFORTS.map((e) => (
+            <button
+              key={e.id}
+              type="button"
+              role="radio"
+              aria-checked={effort.id === e.id}
+              onClick={() => setMaxTokens(e.tokens)}
+              className={`rounded-md px-2 py-1.5 text-[13px] transition-colors ${effort.id === e.id ? "bg-background font-medium text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
+            >
+              {e.label}
+            </button>
+          ))}
         </div>
-        <input
-          id="pg-max"
-          type="range"
-          min={64}
-          max={PLAYGROUND_MAX_TOKENS}
-          step={64}
-          value={maxTokens}
-          onChange={(e) => setMaxTokens(Number(e.target.value))}
-          className="mt-3 w-full accent-foreground"
-        />
       </div>
       <div className="border-t border-border pt-4 text-[13px] text-muted-foreground">
         <div className="flex justify-between"><span>Price</span><span className="text-foreground">${PRICE_PER_MILLION} / 1M tokens</span></div>
