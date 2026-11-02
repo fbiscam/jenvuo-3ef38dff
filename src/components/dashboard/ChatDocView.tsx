@@ -18,7 +18,7 @@ export function documentHtml(markdown: string): string {
 
 // Print styles: the same page look, on paper.
 const PRINT_CSS = `
-*{box-sizing:border-box}.doc{overflow-wrap:anywhere;word-break:break-word}.doc pre{white-space:pre-wrap}.doc img{max-width:100%}.doc table{table-layout:fixed}body{margin:0;font-family:'Google Sans Flex','Google Sans',system-ui,sans-serif;color:#111;background:#fff}
+*{box-sizing:border-box}.doc{overflow-wrap:anywhere;word-break:break-word}.doc pre{white-space:pre-wrap}.doc img{max-width:100%}.doc table{table-layout:auto}.doc th,.doc td{overflow-wrap:normal;word-break:normal}.doc th{white-space:nowrap}body{margin:0;font-family:'Google Sans Flex','Google Sans',system-ui,sans-serif;color:#111;background:#fff}
 .doc{max-width:760px;margin:0 auto;padding:40px 36px;font-size:13.5px;line-height:1.65}
 .doc>p:first-child{margin:0;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#555;font-weight:600}
 .doc h1{font-size:26px;margin:6px 0 18px;padding-bottom:14px;border-bottom:2px solid #2563eb}
