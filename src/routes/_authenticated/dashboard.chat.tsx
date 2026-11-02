@@ -637,8 +637,36 @@ function ChatPlayground() {
     }
     const kindAsked = looksLikeDocRequest(typed) ? null : codeRequestKind(`${typed} ${instructions === CODE_BUILDER ? "code bot" : ""}`);
     if (kindAsked) setCodePinned(kindAsked);
+    // "duplicate this file" / "copy krka new file banao": the copy opens in a new tab right away.
+    const dup = !files.length ? parseDuplicateRequest(typed, workspace.map((f) => f.name), workspace[activeFile]?.name) : null;
+    let copyTarget: string | undefined;
+    if (dup) {
+      const src = workspace.find((f) => f.name === dup.from);
+      const to = dup.to.trim().replace(/\s+/g, "_");
+      if (src) {
+        const next = [...workspace, { ...src, name: to }];
+        setWorkspace(next);
+        setActiveFile(next.length - 1);
+        setPane("code");
+        if (!dup.withChanges) {
+          setTurns((t) => [
+            ...t,
+            { id: crypto.randomUUID(), role: "user", content: typed, display: typed },
+            {
+              id: crypto.randomUUID(),
+              role: "assistant",
+              content: `Copied **${dup.from}** to a new file **${to}**. It's open now — tell me what to change in it.`,
+              model: "local",
+            },
+          ]);
+          setInput("");
+          return;
+        }
+        copyTarget = to;
+      }
+    }
     // "rename a.py to b.py" is done right here — no AI call, no cost.
-    const rename = !files.length ? parseRenameRequest(typed, workspace.map((f) => f.name), workspace[activeFile]?.name) : null;
+    const rename = !files.length && !dup ? parseRenameRequest(typed, workspace.map((f) => f.name), workspace[activeFile]?.name) : null;
     if (rename) {
       const problem = renameFile(rename.from, rename.to);
       setTurns((t) => [
