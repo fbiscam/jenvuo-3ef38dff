@@ -98,7 +98,7 @@ export function ChatCodeStudio({ files, busy, kind, seed, active, onActive, onDo
   };
 
   return (
-    <div className="code-box flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl">
+    <div className="code-box vsc-studio flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl">
       <div className="flex items-center gap-2 border-b border-current/10 px-2 py-2">
         <div className="flex min-w-0 flex-1 gap-1 overflow-x-auto">
           {waiting ? (
@@ -171,7 +171,7 @@ export function ChatCodeStudio({ files, busy, kind, seed, active, onActive, onDo
       </div>
       <div className="min-h-0 flex-1 overflow-auto py-3 font-mono text-[13.5px] leading-[1.7]">
         {lines.map((l, i) => (
-          <div key={i} className="flex">
+          <div key={i} className="vsc-line flex">
             <span className="w-12 shrink-0 select-none pr-4 text-right opacity-40">{i + 1}</span>
             <code className="whitespace-pre pr-6">
               {highlight(l)}
@@ -180,7 +180,7 @@ export function ChatCodeStudio({ files, busy, kind, seed, active, onActive, onDo
           </div>
         ))}
       </div>
-      <div className="flex items-center gap-2 border-t border-current/10 px-4 py-2 text-[12px] opacity-70">
+      <div className="vsc-status flex items-center gap-2 px-4 py-1.5 text-[12px]">
         {waiting ? (
           <>Paused — answer the AI's questions in the chat and coding continues here</>
         ) : showTyping || busy ? (

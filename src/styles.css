@@ -2354,3 +2354,23 @@ html body .jenvu-zoom-dashboard main .jx-ide :is(.jx-ide-card) { border-radius: 
 /* Chat: no visible scrollbar or arrows anywhere */
 .chat-no-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
 .chat-no-scrollbar::-webkit-scrollbar { display: none; width: 0; height: 0; }
+
+/* VS Code Dark+ look for the chat code studio (all themes) */
+html body .code-box.vsc-studio { background: #1e1e1e !important; color: #d4d4d4 !important; border-color: #2b2b2b; }
+html body .vsc-studio > div:first-child { background: #252526; border-color: #2b2b2b !important; }
+html body .vsc-studio .code-tab { color: #969696; }
+html body .vsc-studio .code-tab.is-active { background: #1e1e1e; color: #ffffff; box-shadow: inset 0 2px 0 #007acc; }
+html body .vsc-studio .code-box-copy { color: #c5c5c5; }
+html body .vsc-studio .vsc-line:hover { background: #2a2d2e; }
+html body .vsc-studio .vsc-line > span:first-child { color: #858585; opacity: 1; }
+html body .vsc-studio .vsc-status { background: #007acc; color: #ffffff; }
+html body .vsc-studio .vsc-status * { color: #ffffff !important; }
+html body .vsc-studio .tok-comment { color: #6a9955 !important; font-style: italic; }
+html body .vsc-studio .tok-string { color: #ce9178 !important; }
+html body .vsc-studio .tok-env { color: #4fc1ff !important; }
+html body .vsc-studio .tok-keyword { color: #c586c0 !important; }
+html body .vsc-studio .tok-const { color: #569cd6 !important; }
+html body .vsc-studio .tok-number { color: #b5cea8 !important; }
+html body .vsc-studio .tok-func { color: #dcdcaa !important; }
+html body .vsc-studio .tok-type { color: #4ec9b0 !important; }
+html body .vsc-studio .tok-var { color: #9cdcfe !important; }
