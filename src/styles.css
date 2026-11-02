@@ -2359,12 +2359,12 @@ html body .jenvu-zoom-dashboard main .jx-ide :is(.jx-ide-card) { border-radius: 
 html body .code-box.vsc-studio { background: #ffffff !important; color: #1f2328 !important; border-color: #e5e7eb; }
 html body .vsc-studio > div:first-child { background: #f8fafc; border-color: #e5e7eb !important; }
 html body .vsc-studio .code-tab { color: #57606a; }
-html body .vsc-studio .code-tab.is-active { background: #ffffff; color: #111111; box-shadow: inset 0 2px 0 #0a84ff; }
+html body .vsc-studio .code-tab.is-active { background: #ffffff; color: #111111; box-shadow: none; }
 html body .vsc-studio .code-box-copy, html body .vsc-studio .vsc-count { color: #57606a; }
 html body .vsc-studio .vsc-line:hover { background: #f3f6fa; }
 html body .vsc-studio .vsc-line > span:first-child { color: #8c959f; opacity: 1; }
-html body .vsc-studio .vsc-status { background: #0a84ff; color: #ffffff; }
-html body .vsc-studio .vsc-status * { color: #ffffff !important; }
+html body .vsc-studio .vsc-status { background: #f6f8fa; color: #57606a; border-top: 1px solid #e5e7eb; }
+html body .vsc-studio .vsc-status * { color: #57606a !important; }
 html body .vsc-studio .tok-comment { color: #1a8f3c !important; font-style: italic; }
 html body .vsc-studio .tok-string { color: #d1242f !important; }
 html body .vsc-studio .tok-env { color: #0969da !important; }
@@ -2381,10 +2381,13 @@ html body :is(.dark, .dash-dark) .vsc-studio .code-tab.is-active,
 html body :is(.dark, .dash-dark) .vsc-studio .code-tab *,
 html body :is(.dark, .dash-dark) .vsc-studio .vsc-count,
 html body :is(.dark, .dash-dark) .vsc-studio .code-box-copy { color: #ffffff !important; opacity: 1 !important; }
-html body :is(.dark, .dash-dark) .vsc-studio .code-tab.is-active { background: #1e1e1e; box-shadow: inset 0 2px 0 #3794ff; }
+html body :is(.dark, .dash-dark) .vsc-studio .code-tab.is-active { background: #1e1e1e; box-shadow: none; }
 html body :is(.dark, .dash-dark) .vsc-studio .vsc-line:hover { background: #2a2d2e; }
 html body :is(.dark, .dash-dark) .vsc-studio .vsc-line > span:first-child { color: #ffffff; opacity: .85; }
-html body :is(.dark, .dash-dark) .vsc-studio .vsc-status { background: #007acc; }
+html body :is(.dark, .dash-dark) .vsc-studio .vsc-status { background: #ffffff; color: #000000; border-top: 0; }
+html body :is(.dark, .dash-dark) .vsc-studio .vsc-status * { color: #000000 !important; }
+html body :is(.dark, .dash-dark) .chat-composer { background: #000000 !important; border-color: rgba(255,255,255,.12) !important; }
+html body :is(.dark, .dash-dark) .chat-composer textarea { background: transparent !important; }
 html body :is(.dark, .dash-dark) .vsc-studio .tok-comment { color: #7fd36b !important; }
 html body :is(.dark, .dash-dark) .vsc-studio .tok-string { color: #ffa47a !important; }
 html body :is(.dark, .dash-dark) .vsc-studio .tok-env { color: #5cd2ff !important; }

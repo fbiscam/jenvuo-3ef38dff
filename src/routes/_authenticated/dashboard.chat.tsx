@@ -905,16 +905,16 @@ function ChatPlayground() {
                       {t.model !== "local" && (() => {
                         const cm = getCatalogModel(t.model ?? "");
                         return (
-                          <div className="mt-4 flex flex-wrap items-center gap-2 text-[12px] text-muted-foreground">
+                          <div className="mt-4 flex h-6 flex-wrap items-center gap-2 leading-none text-[12px] text-muted-foreground">
                             {cm && <ProviderLogo provider={cm.provider} size="sm" bare />}
                             <span className="font-medium text-foreground">{cm?.name ?? t.model}</span>
-                            {typeof t.tokens === "number" && <span className="rounded-full bg-[var(--console-card)] px-2 py-0.5 tabular-nums text-foreground">{t.tokens.toLocaleString()} tokens</span>}
+                            {typeof t.tokens === "number" && <span className="inline-flex h-6 items-center rounded-full bg-[var(--console-card)] px-2 tabular-nums text-foreground">{t.tokens.toLocaleString()} tokens</span>}
                             <span className="tabular-nums">{((t.ms ?? 0) / 1000).toFixed(1)}s</span>
                           </div>
                         );
                       })()}
-                      <div className="mt-2 flex items-center gap-1 text-muted-foreground">
-                        <span className="mr-auto min-w-0 truncate text-[12px]">
+                      <div className="mt-2 flex h-8 items-center gap-1 text-muted-foreground">
+                        <span className="mr-auto min-w-0 truncate text-[12px] leading-none">
                           {t.model === "local" ? "Done in the editor" : "AI responses may include mistakes"}
                         </span>
                         <ReplyBtn label="Good response" active={votes[t.id] === "up"} onClick={() => setVotes((v) => ({ ...v, [t.id]: "up" }))}>
@@ -978,7 +978,7 @@ function ChatPlayground() {
             e.preventDefault();
             void submit();
           }}
-          className="mt-2 rounded-2xl bg-[var(--console-card)] px-4 pb-2.5 pt-3"
+          className="mt-2 chat-composer rounded-2xl border border-border bg-[var(--console-card)] px-4 pb-2.5 pt-3"
         >
           {!!files.length && (
             <div className="mb-2 flex flex-wrap gap-2">

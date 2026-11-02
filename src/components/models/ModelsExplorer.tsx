@@ -55,8 +55,8 @@ export function ProviderLogo({ provider, size = "md", bare = false }: { provider
       <img
         src={LOGOS[provider]}
         alt={`${PROVIDERS[provider].label} logo`}
-        className={cn("h-[58%] w-[58%] object-contain", MONO_LOGOS.has(provider) && "dark:invert", provider === "moonshot" && "dark:hue-rotate-180")}
-        loading="lazy"
+        className={cn(bare ? "h-[18px] w-[18px] object-contain" : "h-[58%] w-[58%] object-contain", MONO_LOGOS.has(provider) && "dark:invert", provider === "moonshot" && "dark:hue-rotate-180")}
+        loading="eager" decoding="async"
       />
     </span>
   );
