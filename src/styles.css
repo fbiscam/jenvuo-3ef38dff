@@ -2279,7 +2279,7 @@ html body .jenvu-zoom-dashboard main .jx-ide :is(.jx-ide-card) { border-radius: 
 /* Chat page fits the screen: height divides out the page zoom (--chat-z = dashboard zoom × 0.7). */
 .chat-shell { height: calc(100dvh / 0.9 - 150px); }
 @media (min-width: 1024px) {
-  .jenvu-zoom-dashboard main.dash-page.chat-page { --chat-z: 0.636; padding-bottom: 0; }
+  .jenvu-zoom-dashboard main.dash-page.chat-page { --chat-z: 0.636; padding-bottom: 0; padding-top: 16px; }
   .jenvu-zoom-dashboard main.chat-page .chat-shell { height: calc(100dvh / var(--chat-z) - 84px); }
 }
 @media (min-width: 1200px) { .jenvu-zoom-dashboard main.dash-page.chat-page { --chat-z: 0.7035; } }
@@ -2341,3 +2341,12 @@ html body .jenvu-zoom-dashboard main .jx-ide :is(.jx-ide-card) { border-radius: 
 .chat-doc table { display: block; overflow-x: auto; table-layout: auto; }
 .chat-doc pre { white-space: pre-wrap; overflow-x: auto; max-width: 100%; }
 .chat-doc img { max-width: 100%; height: auto; }
+
+/* Chat page scrollbars: thin thumb only, never the up/down arrow buttons. */
+.chat-shell, .chat-shell * { scrollbar-width: auto; scrollbar-color: auto; }
+.chat-shell ::-webkit-scrollbar, .chat-shell::-webkit-scrollbar { width: 6px; height: 6px; background: transparent; }
+.chat-shell ::-webkit-scrollbar-button, .chat-shell::-webkit-scrollbar-button { display: none; width: 0; height: 0; }
+.chat-shell ::-webkit-scrollbar-track { background: transparent; }
+.chat-shell ::-webkit-scrollbar-thumb { background: transparent; border-radius: 999px; }
+.chat-shell :hover::-webkit-scrollbar-thumb { background: var(--gc-line); }
+.chat-shell ::-webkit-scrollbar-corner { background: transparent; }

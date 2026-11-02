@@ -1,6 +1,6 @@
 import { describe, it } from "node:test";
 import { expect } from "./chart/test-expect";
-import { CHAT_MAX_FILES, codeRequestKind, extractReplyDocument, extractReplyFiles, looksLikeCodeRequest, looksLikeDocRequest, mergeWorkspace, parseRenameRequest } from "./chat-files";
+import { CHAT_MAX_FILES, codeRequestKind, extractReplyDocument, extractReplyFiles, looksLikeCodeRequest, looksLikeDocRequest, looksLikeImageRequest, mergeWorkspace, parseRenameRequest } from "./chat-files";
 
 describe("extractReplyFiles", () => {
   it("names an MQL5 block .mq5", () => {
@@ -46,11 +46,11 @@ describe("codeRequestKind", () => {
 const f = (name: string, code = "x\n") => ({ name, code, lang: "txt" });
 
 describe("mergeWorkspace", () => {
-  it("holds at most 4 files and reports the rest", () => {
-    const r = mergeWorkspace([f("a.py"), f("b.py"), f("c.py")], [f("d.py"), f("e.py")]);
-    expect(CHAT_MAX_FILES).toBe(4);
-    expect(r.files.map((x) => x.name)).toEqual(["a.py", "b.py", "c.py", "d.py"]);
-    expect(r.dropped).toEqual(["e.py"]);
+  it("holds at most 2 files and reports the rest", () => {
+    const r = mergeWorkspace([f("a.py")], [f("b.py"), f("c.py")]);
+    expect(CHAT_MAX_FILES).toBe(2);
+    expect(r.files.map((x) => x.name)).toEqual(["a.py", "b.py"]);
+    expect(r.dropped).toEqual(["c.py"]);
   });
 
   it("updates a file with the same name in place", () => {
@@ -102,4 +102,11 @@ describe("new file requests", () => {
     expect(r.files.map((f) => f.name)).toEqual(["rsi.py", "rsi_2.py"]);
     expect(r.files[0]?.code).toBe("a\n");
   });
+});
+
+describe("looksLikeImageRequest", () => {
+  it("image banao is an image request", () => expect(looksLikeImageRequest("ek gold bull ki image banao")).toBe(true));
+  it("draw a logo is an image request", () => expect(looksLikeImageRequest("Draw a logo for my trading app")).toBe(true));
+  it("describing an attached image is not", () => expect(looksLikeImageRequest("Describe what you see in the attached image")).toBe(false));
+  it("writing code is not", () => expect(looksLikeImageRequest("write an MT5 bot")).toBe(false));
 });
