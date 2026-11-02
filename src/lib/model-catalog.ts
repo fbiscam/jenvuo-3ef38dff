@@ -49,7 +49,7 @@ const K = 1_000;
 const MIL = 1_000_000;
 
 export const MODEL_CATALOG: CatalogModel[] = [
-  M("deepseek-v3.2", "DeepSeek V3.2", "deepseek", 128 * K, "DeepSeek's latest V3 model: strong reasoning, maths and code. Jenvu's default model.", TEXT, ["flagship", "open"]),
+  M("deepseek-v3.2", "DeepSeek V3.2", "deepseek", 128 * K, "DeepSeek's latest V3 model: strong reasoning, maths and code. Default for API calls that name no model.", TEXT, ["flagship", "open"]),
   M("deepseek-v3.1", "DeepSeek V3.1", "deepseek", 128 * K, "Previous DeepSeek V3 release, fast and reliable.", TEXT, ["open"]),
   M("qwen3-coder-480b", "Qwen3 Coder 480B", "qwen", 256 * K, "Qwen's largest coding model for big projects, refactors and agents.", TEXT, ["coding", "open", "flagship"]),
   M("qwen3-coder-30b", "Qwen3 Coder 30B", "qwen", 256 * K, "Compact Qwen coding model, quick to answer.", TEXT, ["coding", "open", "fast"]),
@@ -82,7 +82,7 @@ export const MODEL_CATALOG: CatalogModel[] = [
   M("nemotron-nano-3", "Nemotron Nano 3", "nvidia", 128 * K, "Efficient 30B Nemotron, quick and capable.", TEXT, ["open", "fast"]),
   M("nemotron-nano-9b", "Nemotron Nano 9B", "nvidia", 128 * K, "Tiny Nemotron for very fast replies.", TEXT, ["open", "fast"]),
   M("claude-opus-5", "Claude Opus 5", "anthropic", MIL, "Anthropic's most capable model. Exceptional reasoning and agentic performance.", ALL, ["flagship"]),
-  M("claude-opus-5.5", "Claude Opus 5.5", "anthropic", MIL, "The newest Opus release, built for the hardest multi-step reasoning and analysis.", ALL, ["flagship"]),
+  M("claude-opus-5.5", "Claude Opus 5.5", "anthropic", MIL, "Anthropic's best model and the Chat default, built for the hardest reasoning and analysis.", ALL, ["flagship"]),
   M("claude-fable-5.1", "Claude Fable 5.1", "anthropic", MIL, "Claude tuned for code: refactors, reviews and long agent runs.", ALL, ["coding"]),
   M("claude-fable-5", "Claude Fable 5", "anthropic", MIL, "The first Fable release, a reliable coding and writing model.", ALL, ["coding"]),
   M("claude-sonnet-5", "Claude Sonnet 5", "anthropic", MIL, "Balanced Claude model: strong quality at a quicker pace.", ALL, ["coding"]),

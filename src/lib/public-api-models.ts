@@ -82,8 +82,46 @@ export function resolvePublicModel(model: unknown): PublicApiModelId | null {
   return ALIASES[key] ?? null;
 }
 
-export function gatewayChainFor(id: PublicApiModelId): string[] {
-  // Never silently substitute a different model or provider for API callers.
+/** Same model served by Lovable AI (public id -> Lovable model id). Chat playground only. */
+export const LOVABLE_MODEL_MAP: Partial<Record<PublicApiModelId, string>> = {
+  "claude-opus-5.5": "anthropic/claude-opus-5-5",
+  "claude-opus-5": "anthropic/claude-opus-5",
+  "claude-sonnet-5": "anthropic/claude-sonnet-5",
+  "claude-fable-5.1": "anthropic/claude-fable-5-1",
+  "gpt-5.5": "openai/gpt-5.5",
+  "gpt-5.5-pro": "openai/gpt-5.5-pro",
+  "gpt-5.6-sol": "openai/gpt-5.6-sol",
+  "gpt-5.6-terra": "openai/gpt-5.6-terra",
+  "gpt-5.6-luna": "openai/gpt-5.6-luna",
+  "gemini-3.1-pro": "google/gemini-3.1-pro-preview",
+  "gemini-3.7-flash": "google/gemini-3.7-flash",
+  "gemini-3.6-flash": "google/gemini-3.6-flash",
+};
+
+/**
+ * Routes for one model. Never substitutes a different model. With `viaLovable`
+ * (dashboard chat), the same model is tried on Lovable AI first.
+ */
+export function gatewayChainFor(id: PublicApiModelId, opts: { viaLovable?: boolean } = {}): string[] {
   const aws = (AWS_MODEL_MAP as Record<string, string>)[id];
-  return aws ? [`aws/${aws}`] : [`codecraft/${id}`];
+  if (aws) return [`aws/${aws}`];
+  const lov = opts.viaLovable ? LOVABLE_MODEL_MAP[id] : undefined;
+  return lov ? [`lovable/${lov}`, `codecraft/${id}`] : [`codecraft/${id}`];
+}
+
+/** Public id (or a readable name) for the route that actually answered. */
+export function publicIdForRoute(route: string): string {
+  const [prefix, ...rest] = route.split("/");
+  const wire = rest.join("/");
+  if (prefix === "aws") {
+    const hit = Object.entries(AWS_MODEL_MAP).find(([, v]) => v === wire);
+    if (hit) return hit[0];
+  }
+  if (prefix === "codecraft" && (PUBLIC_API_MODEL_IDS as readonly string[]).includes(wire)) return wire;
+  const lov = prefix === "lovable" ? wire : route;
+  const hit = Object.entries(LOVABLE_MODEL_MAP).find(([, v]) => v === lov);
+  if (hit) return hit[0];
+  // e.g. "openai/gpt-6-luna" -> "GPT-6 Luna"
+  const name = (lov.split("/").pop() ?? lov).replace(/-/g, " ");
+  return name.replace(/^gpt /i, "GPT-").replace(/\b\w/g, (c) => c.toUpperCase());
 }

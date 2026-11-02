@@ -1,6 +1,7 @@
 import { describe, it } from "node:test";
 import { expect } from "./chart/test-expect";
 import { buildPlaygroundMessages, clampMaxTokens, sanitizePlaygroundImages, PLAYGROUND_MAX_IMAGE_CHARS, PLAYGROUND_DEFAULT_MODEL } from "./playground";
+import { gatewayChainFor, publicIdForRoute } from "./public-api-models";
 
 describe("buildPlaygroundMessages", () => {
   it("never sends a real assistant or system turn", () => {
@@ -47,7 +48,18 @@ describe("playground images", () => {
     const last = msgs[2].content as { type: string }[];
     expect(last.map((p) => p.type)).toEqual(["text", "image_url"]);
   });
-  it("opens on the AWS DeepSeek V3.2 model", () => {
-    expect(PLAYGROUND_DEFAULT_MODEL).toBe("deepseek-v3.2");
+  it("opens on Claude Opus 5.5", () => {
+    expect(PLAYGROUND_DEFAULT_MODEL).toBe("claude-opus-5.5");
+  });
+  it("chat tries the chosen model on Lovable AI first, never another model", () => {
+    expect(gatewayChainFor("claude-opus-5.5", { viaLovable: true })).toEqual(["lovable/anthropic/claude-opus-5-5", "codecraft/claude-opus-5.5"]);
+    expect(gatewayChainFor("claude-opus-5.5")).toEqual(["codecraft/claude-opus-5.5"]);
+    expect(gatewayChainFor("deepseek-v3.2", { viaLovable: true })).toEqual(["aws/deepseek.v3.2"]);
+  });
+  it("names the model that really answered", () => {
+    expect(publicIdForRoute("lovable/anthropic/claude-opus-5-5")).toBe("claude-opus-5.5");
+    expect(publicIdForRoute("aws/deepseek.v3.2")).toBe("deepseek-v3.2");
+    expect(publicIdForRoute("codecraft/gpt-5.5")).toBe("gpt-5.5");
+    expect(publicIdForRoute("openai/gpt-6-luna")).toBe("GPT-6 Luna");
   });
 });

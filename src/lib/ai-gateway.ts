@@ -80,7 +80,10 @@ function providerConfigured(model: string): boolean {
   // OmniRoute is the sole inference provider. Credential validation happens
   // inside the request attempt so a missing deployment binding is reported
   // accurately instead of being mistaken for an empty model chain.
-  return model.startsWith("omniroute/") || model.startsWith("codecraft/") || model.startsWith("aws/");
+  return (
+    model.startsWith("omniroute/") || model.startsWith("codecraft/") || model.startsWith("aws/") ||
+    (model.startsWith("lovable/") && !!process.env.LOVABLE_API_KEY)
+  );
 }
 
 // -------- Per-worker model health cache -----------------------------------
@@ -136,6 +139,10 @@ async function singleAttemptInner(
   opts: CallChatOptions,
   signal?: AbortSignal,
 ): Promise<{ content: string; usage: UsageInfo }> {
+  if (model.startsWith("lovable/")) {
+    const r = await callLovableModel(model.slice("lovable/".length), opts, signal);
+    return { content: r.content, usage: r.usage };
+  }
   const isCodeCraft = model.startsWith("codecraft/");
   const isAws = model.startsWith("aws/");
   if (!isCodeCraft && !isAws && !model.startsWith("omniroute/")) {
@@ -277,8 +284,76 @@ function toResponsesInput(messages: ChatMessage[]) {
   });
 }
 
+// Lovable AI serves each family on its own endpoint: OpenAI on /responses,
+// Claude on /messages (native Anthropic format), others on /chat/completions.
+async function callLovableModel(
+  model: string,
+  opts: CallChatOptions,
+  signal?: AbortSignal,
+): Promise<{ content: string; model: string; usage: UsageInfo }> {
+  if (model.startsWith("openai/")) return callBackupChat(opts, model, signal);
+  const key = process.env.LOVABLE_API_KEY;
+  if (!key) throw new AiGatewayError(jenvuServiceError(401), 503, true);
+  const isClaude = model.startsWith("anthropic/");
+  let body: Record<string, unknown>;
+  if (isClaude) {
+    const system = opts.messages.filter((m) => m.role === "system").map((m) => (typeof m.content === "string" ? m.content : "")).join("\n\n");
+    const messages = opts.messages
+      .filter((m) => m.role !== "system")
+      .map((m) => ({
+        role: m.role === "assistant" ? "assistant" : "user",
+        content:
+          typeof m.content === "string"
+            ? m.content
+            : m.content.map((p) => {
+                if (p.type === "text") return { type: "text", text: p.text };
+                const hit = /^data:(image\/[a-z]+);base64,(.+)$/i.exec(p.image_url.url);
+                return hit
+                  ? { type: "image", source: { type: "base64", media_type: hit[1], data: hit[2] } }
+                  : { type: "image", source: { type: "url", url: p.image_url.url } };
+              }),
+      }));
+    body = { model, messages, max_tokens: Math.max(opts.maxTokens ?? 2000, 1024), ...(system ? { system } : {}) };
+  } else {
+    body = { model, messages: opts.messages, ...(opts.maxTokens ? { max_tokens: opts.maxTokens } : {}) };
+    if (opts.jsonMode) body.response_format = { type: "json_object" };
+  }
+  let res: Response;
+  try {
+    res = await fetch(`https://ai.gateway.lovable.dev/v1/${isClaude ? "messages" : "chat/completions"}`, {
+      ...(signal ? { signal } : {}),
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${key}`,
+        ...(isClaude ? { "anthropic-version": "2023-06-01" } : {}),
+      },
+      body: JSON.stringify(body),
+    });
+  } catch {
+    throw new AiGatewayError(jenvuServiceError(503), 503, false);
+  }
+  if (!res.ok) {
+    await res.text().catch(() => "");
+    throw new AiGatewayError(jenvuServiceError(res.status), res.status, !(res.status === 429 || res.status >= 500));
+  }
+  const j: any = await res.json();
+  const content = String(
+    isClaude
+      ? (j?.content ?? []).filter((c: any) => c?.type === "text").map((c: any) => c.text).join("")
+      : j?.choices?.[0]?.message?.content ?? "",
+  ).trim();
+  if (!content) throw new AiGatewayError(jenvuServiceError(502), 502, false);
+  const u = j?.usage ?? {};
+  const promptTokens = Number(u.input_tokens ?? u.prompt_tokens ?? 0) || Math.max(1, Math.round(JSON.stringify(opts.messages).length / 4));
+  const completionTokens = Number(u.output_tokens ?? u.completion_tokens ?? 0) || Math.max(1, Math.round(content.length / 4));
+  return { content, model, usage: { promptTokens, completionTokens, totalTokens: promptTokens + completionTokens } };
+}
+
 async function callBackupChat(
   opts: CallChatOptions,
+  model: string = BACKUP_CHAT_MODEL,
+  signal?: AbortSignal,
 ): Promise<{ content: string; model: string; usage: UsageInfo }> {
   const key = process.env.LOVABLE_API_KEY;
   if (!key) throw new AiGatewayError("Backup AI is not configured.", 0, true);
@@ -286,7 +361,7 @@ async function callBackupChat(
     opts.jsonMode &&
     opts.messages.some((m) => JSON.stringify(m.content).toLowerCase().includes("json"));
   const body: Record<string, unknown> = {
-    model: BACKUP_CHAT_MODEL,
+    model,
     input: toResponsesInput(opts.messages),
     store: false,
     stream: true,
@@ -295,6 +370,7 @@ async function callBackupChat(
   if (opts.maxTokens) body.max_output_tokens = Math.max(opts.maxTokens, 2000);
 
   const res = await fetch("https://ai.gateway.lovable.dev/v1/responses", {
+    ...(signal ? { signal } : {}),
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -362,9 +438,9 @@ async function callBackupChat(
     u.completionTokens = Math.max(1, Math.round(content.length / 4));
   }
   if (!u.totalTokens) u.totalTokens = u.promptTokens + u.completionTokens;
-  const validation = opts.validateContent?.(content, BACKUP_CHAT_MODEL) ?? true;
+  const validation = opts.validateContent?.(content, model) ?? true;
   if (validation !== true) throw new AiGatewayError(validation, 422, true);
-  return { content, model: BACKUP_CHAT_MODEL, usage: u };
+  return { content, model, usage: u };
 }
 
 // Main entrypoint. Returns raw assistant content string plus model/usage.
@@ -542,7 +618,7 @@ async function callChatChain(
         if (lastErr.terminal) {
           const isAuthOrBilling =
             lastErr.status === 401 || lastErr.status === 402 || lastErr.status === 403;
-          if (isAuthOrBilling) throw lastErr;
+          if (isAuthOrBilling && isLastModel) throw lastErr;
           // Other terminal model failures also continue with the next model.
           break;
         }

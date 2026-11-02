@@ -74,7 +74,7 @@ function ModelLogo({ m, size = "md" }: { m: CatalogModel; size?: "sm" | "md" | "
 
 const byIds = (ids: string[]) => ids.map((id) => getCatalogModel(id)).filter(Boolean) as CatalogModel[];
 
-const FLAGSHIPS = byIds(["deepseek-v3.2", "qwen3-coder-480b", "mistral-large-3", "claude-opus-5.5", "gpt-5.5-pro", "gemini-3.1-pro"]);
+const FLAGSHIPS = byIds(["claude-opus-5.5", "gpt-5.5-pro", "gemini-3.1-pro", "deepseek-v3.2", "qwen3-coder-480b", "mistral-large-3"]);
 const FAST = mixByProvider(MODEL_CATALOG.filter((m) => m.tags.includes("fast"))).slice(0, 5);
 const OPEN = mixByProvider(MODEL_CATALOG.filter((m) => m.tags.includes("open"))).slice(0, 5);
 const CODING = mixByProvider(MODEL_CATALOG.filter((m) => m.tags.includes("coding"))).slice(0, 5);
@@ -237,7 +237,7 @@ function ConsoleModelTable({ list, query, setQuery }: { list: CatalogModel[]; qu
 
 /** OpenRouter-style catalogue of every model available with a Jenvu API key. */
 export default function ModelsExplorer({ apiHref = "/dashboard/api" }: { apiHref?: "/dashboard/api" | "/docs" }) {
-  const [selected, setSelected] = useState<string>("deepseek-v3.2");
+  const [selected, setSelected] = useState<string>("claude-opus-5.5");
   const [query, setQuery] = useState("");
   const [provider, setProvider] = useState<ProviderKey | "all">("all");
   const [cap, setCap] = useState<Capability | "all">("all");
@@ -285,7 +285,7 @@ export default function ModelsExplorer({ apiHref = "/dashboard/api" }: { apiHref
             return (
               <div key={f.id} className="console-card flex min-h-[215px] flex-col p-5">
                 <div className="flex items-start justify-between gap-3">
-                  <h2 className="text-[20px] font-normal leading-tight tracking-tight text-foreground">{m.name}</h2>
+                  <h2 className="flex items-center gap-2.5 text-[20px] font-normal leading-tight tracking-tight text-foreground"><ProviderLogo provider={m.provider} size="sm" />{m.name}</h2>
                   {f.isNew && <span className="shrink-0 text-[13px] text-[#f97316]">New</span>}
                 </div>
                 <p className="mt-1.5 text-[14px] text-muted-foreground">
@@ -334,7 +334,7 @@ export default function ModelsExplorer({ apiHref = "/dashboard/api" }: { apiHref
               return (
                 <div key={id} className="console-card p-5">
                   <div className="flex items-start justify-between gap-3">
-                    <h3 className="flex items-center gap-2 text-[15px] font-medium text-foreground">{m.name} <StatusBadge live={live} id={m.id} /></h3>
+                    <h3 className="flex items-center gap-2 text-[15px] font-medium text-foreground"><ProviderLogo provider={m.provider} bare />{m.name} <StatusBadge live={live} id={m.id} /></h3>
                     <p className="shrink-0 text-[13px] text-muted-foreground">
                       {i < 2 && <span className="mr-2 text-[#f97316]">New</span>}
                       Context <span className="text-foreground">{formatContext(m.context)}</span>
@@ -451,7 +451,7 @@ export default function ModelsExplorer({ apiHref = "/dashboard/api" }: { apiHref
         </section>
 
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          <StatCard label="Default on Jenvu" hint="Used when a request names no model" model={getCatalogModel("deepseek-v3.2")!} value={price} unit="/M tokens" />
+          <StatCard label="Default in Chat" hint="The model the dashboard chat opens on" model={getCatalogModel("claude-opus-5.5")!} value={price} unit="/M tokens" />
           <StatCard label="Smartest open model" hint="Open-weight model with the most capability" model={getCatalogModel("qwen3-coder-480b")!} value="Open" unit="weights" />
           <StatCard label="Fastest replies" hint="Light model for quick answers" model={getCatalogModel("gemini-3.7-flash")!} value={formatContext(getCatalogModel("gemini-3.7-flash")!.context)} unit="context" />
           <StatCard label="Most models" hint="Provider with the most models on Jenvu" model={getCatalogModel("qwen3-coder-480b")!} value={String(MODEL_CATALOG.filter((m) => m.provider === "qwen").length)} unit="Qwen models" />
@@ -579,7 +579,7 @@ export default function ModelsExplorer({ apiHref = "/dashboard/api" }: { apiHref
                       <span className="block truncate text-sm font-semibold text-gc-ink">{m.name}</span>
                       <span className="block truncate text-xs text-gc-ink-muted">{PROVIDERS[m.provider].label} · {m.id}</span>
                     </span>
-                    {m.id === "deepseek-v3.2" && <span className="h-1.5 w-1.5 rounded-full bg-gc-blue" aria-label="Default" />}
+                    {m.id === "claude-opus-5.5" && <span className="h-1.5 w-1.5 rounded-full bg-gc-blue" aria-label="Default" />}
                   </button>
                 </li>
               ))}
@@ -642,13 +642,13 @@ export default function ModelsExplorer({ apiHref = "/dashboard/api" }: { apiHref
 }
 
 const CONSOLE_FEATURED: { id: string; kind: string; isNew?: boolean }[] = [
-  { id: "deepseek-v3.2", kind: "Chat", isNew: true },
-  { id: "qwen3-coder-480b", kind: "Code", isNew: true },
-  { id: "mistral-large-3", kind: "Reasoning", isNew: true },
-  { id: "glm-4.7-flash", kind: "Fast chat" },
+  { id: "claude-opus-5.5", kind: "Chat · Default", isNew: true },
+  { id: "gpt-5.5-pro", kind: "Reasoning", isNew: true },
+  { id: "gemini-3.1-pro", kind: "Long context", isNew: true },
+  { id: "deepseek-v3.2", kind: "Open chat" },
 ];
 
-const CONSOLE_CODE_CHAT = ["qwen3-coder-480b", "devstral-2", "deepseek-v3.2", "minimax-m2.5"];
+const CONSOLE_CODE_CHAT = ["claude-sonnet-5", "claude-fable-5.1", "gpt-5.6-terra", "qwen3-coder-480b"];
 
 const CAPABILITY_TEXT: Record<string, string> = {
   tools: "Tool calling",
