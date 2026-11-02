@@ -68,6 +68,7 @@ import {
   mergeWorkspace,
   wantsNewFile,
   parseRenameRequest,
+  parseDuplicateRequest,
   workspaceContext,
   type CodeKind,
   type ReplyDocument,
@@ -126,7 +127,7 @@ const JENVU_BRAIN = [
   "When asked for code: write the COMPLETE working file in one fenced block tagged with its language, starting with a comment like // File: Name.mq5; no placeholders or TODOs; every trade gets a stop loss. When asked to change existing code, return the whole updated file with the same file name. Then give short setup steps.",
   "Before writing code, check the request has what you need: platform (MT5/MQL5, TradingView/Pine Script or Python), symbol, timeframe, entry and exit rules, and risk per trade. If something important is missing or unclear, do NOT write code yet: ask up to 3 short numbered questions in the chat and wait for the answer. If the request is already clear, write the code straight away.",
   "When asked for a PDF, report, guide or document: put the whole document in ONE fenced block tagged ```document written in Markdown (never put ``` inside it). First line: a short UPPERCASE kicker; then '# Title'; then numbered '## 1. Section' headings, '> **Callout title**' blockquotes for formulas and key notes, and tables where they help. The page turns it into a PDF. After the block, add one short line only.",
-  "When asked for a NEW or separate file, write it under a new file name and leave the open files as they are; the editor holds up to 2 files and the page shows 1 document (PDF) at a time.",
+  "When asked for a NEW, separate, duplicate or copied file, write the whole file under a new file name and leave the open files as they are; the editor can hold many files (each opens in its own tab) and the page shows 1 document (PDF) at a time. Never tell the user to remove a file before making a new one.",
   "File names are short: at most 2 words plus the extension, e.g. GoldSweep.mq5 or rsi_bot.py. Document titles are at most 4 words.",
   "Leads lists, SEO / website reports, proposals, articles, emails, CVs and any long written piece go in ONE ```document block so they open in the frame beside the chat; in the chat itself write only one short line.",
   "The page creates pictures itself when the user asks for an image, so never say you can't make images.",
@@ -274,8 +275,12 @@ function ChatPlayground() {
   const [uploaded, setUploaded] = useState<ChatAttachment | null>(null);
   const [reading, setReading] = useState(false);
   const [darkMenus, setDarkMenus] = useState(false);
-  // Editor files (max 4) and the open document live across replies.
+  // Editor files and the open document live across replies.
   const [workspace, setWorkspace] = useState<ReplyFile[]>([]);
+  // Replies arrive later, so they read the newest files (and a pending copy) from refs.
+  const workspaceRef = useRef<ReplyFile[]>([]);
+  workspaceRef.current = workspace;
+  const copyRef = useRef<{ from: string; to: string } | null>(null);
   const [activeFile, setActiveFile] = useState(0);
   const [doc, setDoc] = useState<ReplyDocument | null>(null);
   const [docOpen, setDocOpen] = useState(false);
@@ -487,18 +492,28 @@ function ChatPlayground() {
     {
       let limitNote: string | null = null;
       if (res.ok) {
-        const newFiles = extractReplyFiles(res.content);
+        // Latest open files (a copy made just before sending is already in here).
+        const current = workspaceRef.current;
+        const copy = copyRef.current;
+        copyRef.current = null;
+        let newFiles = extractReplyFiles(res.content);
+        // Changes asked for a fresh copy always land in the copy, never in the original.
+        if (copy) {
+          newFiles = newFiles.map((f, i) =>
+            f.name.toLowerCase() === copy.from.toLowerCase() || (newFiles.length === 1 && i === 0) ? { ...f, name: copy.to } : f,
+          );
+        }
         if (newFiles.length) {
           const lastUser = [...history].reverse().find((t) => t.role === "user");
           const otherItems = frameUsed({ ...frameNow, codeFiles: 0 });
           const room = Math.max(0, Math.min(CHAT_MAX_FILES, FRAME_MAX_ITEMS - otherItems));
-          const merged = mergeWorkspace(workspace, newFiles, Math.max(room, workspace.length), wantsNewFile(lastUser?.display ?? lastUser?.content ?? ""));
+          const merged = mergeWorkspace(current, newFiles, Math.max(room, current.length), !copy && wantsNewFile(lastUser?.display ?? lastUser?.content ?? ""));
           setWorkspace(merged.files);
-          const fresh = merged.files.findIndex((x) => !workspace.some((w) => w.name === x.name));
+          const fresh = merged.files.findIndex((x) => !current.some((w) => w.name === x.name));
           const changed = merged.files.findIndex((x) => newFiles.some((n) => n.name.toLowerCase() === x.name.toLowerCase()));
-          const askedIdx = findMentionedFile(lastUser?.display ?? lastUser?.content ?? "", merged.files.map((x) => x.name));
+          const askedIdx = copy ? merged.files.findIndex((x) => x.name === copy.to) : findMentionedFile(lastUser?.display ?? lastUser?.content ?? "", merged.files.map((x) => x.name));
           const activeChanged = merged.files[activeFile] && newFiles.some((n) => n.name.toLowerCase() === merged.files[activeFile]!.name.toLowerCase());
-          const first = fresh >= 0 ? fresh : askedIdx >= 0 ? askedIdx : activeChanged ? activeFile : changed;
+          const first = copy && askedIdx >= 0 ? askedIdx : fresh >= 0 ? fresh : askedIdx >= 0 ? askedIdx : activeChanged ? activeFile : changed;
           if (first >= 0) setActiveFile(first);
           if (merged.dropped.length)
             limitNote = `**${merged.dropped.join(", ")}** couldn't open: the frame is full (max ${FRAME_MAX_ITEMS} files, ${CHAT_MAX_FILES} of them code). Please remove one file with the ✕ on its tab, then try again.`;
@@ -637,8 +652,38 @@ function ChatPlayground() {
     }
     const kindAsked = looksLikeDocRequest(typed) ? null : codeRequestKind(`${typed} ${instructions === CODE_BUILDER ? "code bot" : ""}`);
     if (kindAsked) setCodePinned(kindAsked);
+    // "duplicate this file" / "copy krka new file banao": the copy opens in a new tab right away.
+    const dup = !files.length ? parseDuplicateRequest(typed, workspace.map((f) => f.name), workspace[activeFile]?.name) : null;
+    let copyTarget: string | undefined;
+    if (dup) {
+      const src = workspace.find((f) => f.name === dup.from);
+      const to = dup.to.trim().replace(/\s+/g, "_");
+      if (src) {
+        const next = [...workspace, { ...src, name: to }];
+        setWorkspace(next);
+        setActiveFile(next.length - 1);
+        setPane("code");
+        if (!dup.withChanges) {
+          setTurns((t) => [
+            ...t,
+            { id: crypto.randomUUID(), role: "user", content: typed, display: typed },
+            {
+              id: crypto.randomUUID(),
+              role: "assistant",
+              content: `Copied **${dup.from}** to a new file **${to}**. It's open now — tell me what to change in it.`,
+              model: "local",
+            },
+          ]);
+          setInput("");
+          return;
+        }
+        workspaceRef.current = next;
+        copyRef.current = { from: dup.from, to };
+        copyTarget = to;
+      }
+    }
     // "rename a.py to b.py" is done right here — no AI call, no cost.
-    const rename = !files.length ? parseRenameRequest(typed, workspace.map((f) => f.name), workspace[activeFile]?.name) : null;
+    const rename = !files.length && !dup ? parseRenameRequest(typed, workspace.map((f) => f.name), workspace[activeFile]?.name) : null;
     if (rename) {
       const problem = renameFile(rename.from, rename.to);
       setTurns((t) => [
@@ -661,9 +706,16 @@ function ChatPlayground() {
     }
     const attached = files;
     const target = mentioned >= 0 ? workspace[mentioned]?.name : undefined;
+    const newAsk = !copyTarget && codeAsk && wantsNewFile(typed);
     const content =
       composeMessage(typed || "Please look at the attached file.", attached) +
-      (target ? `\n\n[The user means the open file ${target}: make the change in that file and return it with the same name.]` : "");
+      (copyTarget && dup
+        ? `\n\n[The page already made a copy of ${dup.from} named ${copyTarget}. Apply the requested changes ONLY to the copy: return the WHOLE file starting with "// File: ${copyTarget}" (or "# File: ${copyTarget}"). Do not return ${dup.from}; it stays unchanged.]`
+        : newAsk
+          ? `\n\n[The user wants a NEW file: write the WHOLE new file in its own code block with a new file name that is not open yet (start it with "// File: <name>"). Do not change or return the open files.]`
+          : target
+            ? `\n\n[The user means the open file ${target}: make the change in that file and return it with the same name.]`
+            : "");
     const images = attached.flatMap((f) => (f.kind === "image" ? [f.url] : []));
     const userTurn: Turn = {
       id: crypto.randomUUID(),

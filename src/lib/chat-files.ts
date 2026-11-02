@@ -91,7 +91,52 @@ export function looksLikeCodeRequest(prompt: string): boolean {
 
 /** True when a prompt asks for a separate, new file instead of editing the open one. */
 export function wantsNewFile(prompt: string): boolean {
-  return /\b(new|another|separate|second|alag|nayi|naya|dusri|doosri)\s+(file|script|tab)\b|\bnew file\b|\bfile\s+(alag|nayi|naya)\b/i.test(prompt);
+  return (
+    /\b(new|another|separate|second|alag|nayi|naya|nai|nyi|dusri|doosri)\s+(file|script|tab|frame)s?\b|\bfile\s+(alag|nayi|naya|nai|nyi)\b/i.test(prompt) ||
+    wantsDuplicate(prompt)
+  );
+}
+
+/** True when a prompt asks to copy / duplicate a file ("is file ko duplicate krdo"). */
+export function wantsDuplicate(prompt: string): boolean {
+  return /\b(duplicate|duplicat|clone|naqal|copy\s+(?:kr|kar|ka|bana)|copy\s+(?:this|that|the|of)\s+file|file\s+(?:ko\s+)?copy|make\s+a\s+copy|copy\s+(?:it|this))\w*/i.test(prompt);
+}
+
+/** A free copy name: "gold.mq5" -> "gold_copy.mq5", then "gold_copy_2.mq5"... */
+export function copyName(name: string, names: string[]): string {
+  const taken = (n: string) => names.some((x) => x.toLowerCase() === n.toLowerCase());
+  const dot = name.lastIndexOf(".");
+  const stem = dot > 0 ? name.slice(0, dot) : name;
+  const ext = dot > 0 ? name.slice(dot) : "";
+  let out = `${stem}_copy${ext}`;
+  for (let i = 2; taken(out); i++) out = `${stem}_copy_${i}${ext}`;
+  return out;
+}
+
+/**
+ * "duplicate gold.mq5", "is file ko copy krka new file banao", "copy a.py as b.py":
+ * which open file to copy, the new name, and whether changes were asked too
+ * (then the AI edits the copy). Null when the prompt isn't a duplicate request.
+ */
+export function parseDuplicateRequest(
+  prompt: string,
+  names: string[],
+  activeName?: string,
+): { from: string; to: string; withChanges: boolean } | null {
+  if (!names.length || !wantsDuplicate(prompt)) return null;
+  const existing = (n: string) => names.find((x) => x.toLowerCase() === n.toLowerCase());
+  const found: string[] = Array.from(prompt.match(FILE_NAME) ?? []);
+  const named = found.map(existing).find(Boolean);
+  const mentioned = findMentionedFile(prompt, names);
+  const from = named ?? (mentioned >= 0 ? names[mentioned] : undefined) ?? (activeName && existing(activeName)) ?? names[names.length - 1];
+  if (!from) return null;
+  const wanted = found.find((n) => !existing(n));
+  const to = wanted ?? copyName(from, names);
+  const later = /\b(bad\s*ma|baad\s*m[ae]?|baad\s*mein|later|phir\s+bata|then\s+i'?ll)\b/i.test(prompt);
+  const change = /\b(change|changes|edit|modify|add|remove|update|fix|improve|replace|convert|tabdeel|badal|hata|laga)\w*/i.test(
+    prompt.replace(/\b(duplicate|copy|clone)\w*/gi, ""),
+  );
+  return { from, to, withChanges: change && !later };
 }
 
 /** Files the Chat code editor can hold at once. */
