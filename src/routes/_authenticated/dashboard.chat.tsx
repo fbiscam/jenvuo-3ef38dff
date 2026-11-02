@@ -68,6 +68,7 @@ import {
   mergeWorkspace,
   wantsNewFile,
   parseRenameRequest,
+  parseDuplicateRequest,
   workspaceContext,
   type CodeKind,
   type ReplyDocument,
@@ -676,6 +677,8 @@ function ChatPlayground() {
           setInput("");
           return;
         }
+        workspaceRef.current = next;
+        copyRef.current = { from: dup.from, to };
         copyTarget = to;
       }
     }
