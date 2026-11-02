@@ -716,7 +716,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
             )}
           >
             <AssetLogo asset={a} size={16} />
-            <span className="hidden 2xl:inline">{label}</span>
+            <span className="hidden lg:inline">{label}</span>
           </button>
         ))}
       </div>
