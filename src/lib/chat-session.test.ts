@@ -48,7 +48,7 @@ describe("saved chat", () => {
 
 describe("pending reply (keeps running after leaving Chat)", () => {
   it("is kept per account", () => {
-    expect(chatPendingKey("u1")).not.toBe(chatPendingKey("u2"));
+    expect(chatPendingKey("u1") === chatPendingKey("u2")).toBe(false);
   });
   it("reads a saved pending reply and rejects broken ones", () => {
     expect(parsePendingJob(JSON.stringify({ jobId: "abc", startedAt: 5 }))).toEqual({ jobId: "abc", startedAt: 5 });
