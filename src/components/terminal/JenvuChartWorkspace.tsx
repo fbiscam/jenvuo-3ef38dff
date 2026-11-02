@@ -771,19 +771,6 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
           {smcMenu}
         </PopoverContent>
       </Popover>
-      <Popover>
-        <PopoverTrigger asChild>
-          <button type="button" aria-label="Drawing tools" title="Drawing tools" className={railBtn}>
-            <PenLine className="h-4 w-4" />
-            <span className="hidden xl:inline">Draw</span>
-            {tool !== "cursor" && <span className="absolute right-1.5 top-1 h-1.5 w-1.5 rounded-full bg-gc-blue" aria-hidden="true" />}
-          </button>
-        </PopoverTrigger>
-        <PopoverContent side="bottom" align="start" className={cn("w-[236px] p-2", popClass)}>
-          <p className="px-1 pb-1.5 text-sm text-foreground">Drawing tools</p>
-          <div className="flex flex-wrap items-center gap-0.5" role="toolbar" aria-label="Drawing tools">{renderTools(false)}</div>
-        </PopoverContent>
-      </Popover>
       <span className="mx-1 h-5 w-px shrink-0 bg-gc-line" aria-hidden="true" />
       <button type="button" onClick={downloadSnapshot} aria-label="Download chart snapshot" title="Download chart snapshot" className={railBtn}>
         <Camera className="h-4 w-4" />
