@@ -51,12 +51,19 @@ describe("playground images", () => {
   it("opens on Claude Opus 5.5", () => {
     expect(PLAYGROUND_DEFAULT_MODEL).toBe("claude-opus-5.5");
   });
-  it("chat tries the chosen model on Lovable AI first, never another model", () => {
-    expect(gatewayChainFor("claude-opus-5.5", { viaLovable: true })).toEqual(["lovable/anthropic/claude-opus-5-5", "codecraft/claude-opus-5.5"]);
+  it("chat tries OmniRoute first, then the chosen model's own routes", () => {
+    expect(gatewayChainFor("claude-opus-5.5", { viaLovable: true })).toEqual([
+      "omniroute/kiro/claude-sonnet-4.5",
+      "lovable/anthropic/claude-opus-5-5",
+      "codecraft/claude-opus-5.5",
+    ]);
     expect(gatewayChainFor("claude-opus-5.5")).toEqual(["codecraft/claude-opus-5.5"]);
-    expect(gatewayChainFor("deepseek-v3.2", { viaLovable: true })).toEqual(["aws/deepseek.v3.2"]);
+    expect(gatewayChainFor("deepseek-v3.2", { viaLovable: true })).toEqual(["omniroute/kr/deepseek-3.2", "aws/deepseek.v3.2"]);
+    expect(gatewayChainFor("deepseek-v3.2")).toEqual(["omniroute/kr/deepseek-3.2", "aws/deepseek.v3.2"]);
   });
   it("names the model that really answered", () => {
+    expect(publicIdForRoute("omniroute/kr/deepseek-3.2")).toBe("deepseek-v3.2");
+    expect(publicIdForRoute("omniroute/kiro/claude-sonnet-4.5")).toBe("Claude Sonnet 4.5");
     expect(publicIdForRoute("lovable/anthropic/claude-opus-5-5")).toBe("claude-opus-5.5");
     expect(publicIdForRoute("aws/deepseek.v3.2")).toBe("deepseek-v3.2");
     expect(publicIdForRoute("codecraft/gpt-5.5")).toBe("gpt-5.5");

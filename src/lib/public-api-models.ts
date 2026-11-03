@@ -98,21 +98,42 @@ export const LOVABLE_MODEL_MAP: Partial<Record<PublicApiModelId, string>> = {
   "gemini-3.6-flash": "google/gemini-3.6-flash",
 };
 
+/** Same model served by OmniRoute (public id -> OmniRoute model id), tried first. Live-tested 2026-11-03. */
+export const OMNIROUTE_MODEL_MAP: Partial<Record<PublicApiModelId, string>> = {
+  "deepseek-v3.2": "kr/deepseek-3.2",
+  "glm-5": "kr/glm-5",
+  "qwen3-coder-next": "kr/qwen3-coder-next",
+};
+
+/** OmniRoute's best working Claude; dashboard chat tries it first for Claude picks (owner's choice). */
+export const OMNIROUTE_CHAT_CLAUDE = "kiro/claude-sonnet-4.5";
+
 /**
- * Routes for one model. Never substitutes a different model. With `viaLovable`
- * (dashboard chat), the same model is tried on Lovable AI first.
+ * Routes for one model. OmniRoute is tried first: the same model when it serves
+ * it, and in dashboard chat (`viaLovable`) its best Claude for Claude picks — the
+ * reply then names the model that answered. Then the model's own routes.
  */
 export function gatewayChainFor(id: PublicApiModelId, opts: { viaLovable?: boolean } = {}): string[] {
+  const omni = OMNIROUTE_MODEL_MAP[id];
+  const first = omni
+    ? [`omniroute/${omni}`]
+    : opts.viaLovable && id.startsWith("claude-")
+    ? [`omniroute/${OMNIROUTE_CHAT_CLAUDE}`]
+    : [];
   const aws = (AWS_MODEL_MAP as Record<string, string>)[id];
-  if (aws) return [`aws/${aws}`];
+  if (aws) return [...first, `aws/${aws}`];
   const lov = opts.viaLovable ? LOVABLE_MODEL_MAP[id] : undefined;
-  return lov ? [`lovable/${lov}`, `codecraft/${id}`] : [`codecraft/${id}`];
+  return [...first, ...(lov ? [`lovable/${lov}`, `codecraft/${id}`] : [`codecraft/${id}`])];
 }
 
 /** Public id (or a readable name) for the route that actually answered. */
 export function publicIdForRoute(route: string): string {
   const [prefix, ...rest] = route.split("/");
   const wire = rest.join("/");
+  if (prefix === "omniroute") {
+    const hit = Object.entries(OMNIROUTE_MODEL_MAP).find(([, v]) => v === wire);
+    if (hit) return hit[0];
+  }
   if (prefix === "aws") {
     const hit = Object.entries(AWS_MODEL_MAP).find(([, v]) => v === wire);
     if (hit) return hit[0];
