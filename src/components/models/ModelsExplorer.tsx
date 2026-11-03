@@ -379,7 +379,7 @@ export default function ModelsExplorer({ apiHref = "/dashboard/api", inShell = f
             </p>
           </>
         )}
-        <div className={cn("flex flex-wrap items-center justify-center gap-3", !inShell && "mt-9")}>
+        <div className={cn("flex flex-wrap items-center justify-center gap-3", inShell ? "hidden" : "mt-9")}>
           <button type="button" onClick={scrollToCatalog} className="inline-flex items-center gap-1.5 rounded-full bg-gc-blue px-5 py-2.5 text-sm font-medium text-gc-on-blue transition-colors hover:bg-gc-blue-hover">
             Browse all {MODEL_CATALOG.length} models
           </button>
@@ -387,7 +387,7 @@ export default function ModelsExplorer({ apiHref = "/dashboard/api", inShell = f
             API docs <ArrowRight className="h-3.5 w-3.5" />
           </Link>
         </div>
-        <dl className={cn("mx-auto grid max-w-xl grid-cols-3 divide-x divide-gc-line", inShell ? "mt-10" : "mt-14")}>
+        <dl className={cn("mx-auto grid max-w-xl grid-cols-3 divide-x divide-gc-line", inShell ? "mt-0" : "mt-14")}>
           {[
             [String(MODEL_CATALOG.length), "Models"],
             [String(new Set(MODEL_CATALOG.map((m) => m.provider)).size), "Labs"],
