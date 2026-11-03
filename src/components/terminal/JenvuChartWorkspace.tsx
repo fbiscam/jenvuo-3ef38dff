@@ -398,7 +398,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
   const chartSmcToggles = useMemo<SmcToggles>(() => {
     const zonesOn = wantsZones && strategiesUnlocked;
     const historyOn = (smcToggles.sdHistory ?? false) && SD_HISTORY_TIMEFRAMES.has(timeframe.key) && strategiesUnlocked;
-    return { ...smcToggles, sdZones: zonesOn, sdStrategy: zonesOn, sdHistory: historyOn, sdPlan: true, swingSweep: wantsSwingSweep && strategiesUnlocked, sweeps: (smcToggles.sweeps ?? true) && SWING_SWEEP_TIMEFRAMES.has(timeframe.key), priceAction: wantsPriceAction && strategiesUnlocked, swingPlan: timeframe.key === "1h" && strategiesUnlocked };
+    return { ...smcToggles, sdZones: zonesOn, sdStrategy: zonesOn, sdHistory: historyOn, sdPlan: true, swingSweep: wantsSwingSweep && strategiesUnlocked, sweeps: (smcToggles.sweeps ?? true) && SWING_SWEEP_TIMEFRAMES.has(timeframe.key), priceAction: wantsPriceAction && strategiesUnlocked, swingPlan: false };
   }, [smcToggles, timeframe.key, wantsZones, wantsSwingSweep, wantsPriceAction, strategiesUnlocked]);
   // Keep the last non-empty history for this pair/timeframe so a failed or
   // empty poll never blanks the chart.
