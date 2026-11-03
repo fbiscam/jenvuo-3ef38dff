@@ -19,6 +19,7 @@ import { computeLiquidityMap, type LiquidityMap } from "./liquidity-sweeps";
 import { computeFreshFvgs, FVG_MAX_TOTAL, type FreshFvg } from "./fresh-fvgs";
 import { classifySwingSweep, type SwingSweep } from "./swing-sweep";
 import { classifySwingPriceAction, type SwingPriceAction } from "./swing-price-action";
+import { computeSwingTradePlan, type SwingTradePlan } from "./swing-trade-plan";
 import {
   isHighProbabilityLiquiditySweep,
   isHighProbabilityPriceAction,
@@ -145,6 +146,8 @@ export type SmcOverlay = {
   priceAction?: Record<number, SwingPriceAction>;
   /** Fresh-swing liquidity sweep verdict (previous 10 candles), keyed by pivot time. */
   swingSweeps?: Record<number, SwingSweep>;
+  /** 1H fresh-swing Entry/SL/TP (price action and/or sweep). */
+  swingPlan?: SwingTradePlan | null;
 };
 
 export type ReversalSignal = {
@@ -279,6 +282,8 @@ export type SmcToggles = {
   priceAction?: boolean;
   /** Fresh-swing liquidity sweep tag (4H only). */
   swingSweep?: boolean;
+  /** 1H fresh-swing Entry/SL/TP from price action / sweep. */
+  swingPlan?: boolean;
 };
 
 export const DEFAULT_SMC: SmcToggles = {
@@ -939,7 +944,17 @@ export function computeSmcOverlay(
   for (const p of [...pivotsLabelled, ...livePivots]) {
     swingSweeps[p.t] = classifySwingSweep(fractalBars, closedIdx.get(p.t) ?? -1, p.kind);
   }
+  const swingPlan = computeSwingTradePlan(
+    fractalBars,
+    [...pivotsLabelled, ...livePivots].map((p) => ({
+      index: closedIdx.get(p.t) ?? -1,
+      kind: p.kind,
+      paOk: isHighProbabilityPriceAction(priceAction[p.t]),
+      sweepOk: isHighProbabilitySweep(swingSweeps[p.t]),
+    })).filter((p) => p.index >= 0),
+  );
   return {
+    swingPlan,
     swingSweeps,
     priceAction,
     freshFvgs,
@@ -1557,8 +1572,11 @@ export function renderSmcOverlay(
       ctx.restore();
     }
   }
-  // Pressure no longer draws any Entry/SL/TP lines (user request); trade
-  // plans come only from the Zone + FVG strategy.
+  // 1H fresh-swing plan (price action and/or sweep) — user request.
+  if (toggles.swingPlan && smc.swingPlan) {
+    const p = smc.swingPlan;
+    sdPlan({ t: p.t, plan: { side: `${p.side} ${p.grade}`, entry: p.entry, sl: p.sl, tp1: p.tp1, tp2: p.tp2 } } as unknown as SdZone);
+  }
   ctx.restore();
 }
 
