@@ -236,7 +236,7 @@ function ConsoleModelTable({ list, query, setQuery }: { list: CatalogModel[]; qu
 }
 
 /** OpenRouter-style catalogue of every model available with a Jenvu API key. */
-export default function ModelsExplorer({ apiHref = "/dashboard/api" }: { apiHref?: "/dashboard/api" | "/docs" }) {
+export default function ModelsExplorer({ apiHref = "/dashboard/api", inShell = false }: { apiHref?: "/dashboard/api" | "/docs"; /** Public page inside PageShell: the shell draws the heading. */ inShell?: boolean }) {
   const [selected, setSelected] = useState<string>("claude-opus-5.5");
   const [query, setQuery] = useState("");
   const [provider, setProvider] = useState<ProviderKey | "all">("all");
@@ -366,16 +366,20 @@ export default function ModelsExplorer({ apiHref = "/dashboard/api" }: { apiHref
   }
 
   return (
-    <div className="mx-auto w-full max-w-[1250px] space-y-14 px-4 py-8 font-sans text-gc-ink sm:px-6 sm:py-10">
+    <div className={cn("mx-auto w-full max-w-[1250px] space-y-14 px-4 font-sans text-gc-ink sm:px-6", inShell ? "pb-10 pt-0" : "py-8 sm:py-10")}>
       {/* Discover — same look as the Platform page hero */}
-      <header className="pb-4 pt-12 text-center sm:pt-20">
-        <h1 className="mx-auto max-w-3xl lg:max-w-none lg:whitespace-nowrap text-balance text-center text-[2.6rem] font-medium leading-[1.08] tracking-tight sm:text-6xl">
-          Discover models on Jenvu
-        </h1>
-        <p className="mx-auto mt-6 max-w-2xl lg:max-w-none lg:whitespace-nowrap text-balance text-center text-[17px] text-gc-ink">
-          Every model you can call with one Jenvu API key, at one flat price of {price} per million tokens.
-        </p>
-        <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
+      <header className={cn("pb-4 text-center", inShell ? "pt-0" : "pt-12 sm:pt-20")}>
+        {!inShell && (
+          <>
+            <h1 className="mx-auto max-w-3xl lg:max-w-none lg:whitespace-nowrap text-balance text-center text-[2.6rem] font-medium leading-[1.08] tracking-tight sm:text-6xl">
+              Discover models on Jenvu
+            </h1>
+            <p className="mx-auto mt-6 max-w-2xl lg:max-w-none lg:whitespace-nowrap text-balance text-center text-[17px] text-gc-ink">
+              Every model you can call with one Jenvu API key, at one flat price of {price} per million tokens.
+            </p>
+          </>
+        )}
+        <div className={cn("flex flex-wrap items-center justify-center gap-3", !inShell && "mt-9")}>
           <button type="button" onClick={scrollToCatalog} className="inline-flex items-center gap-1.5 rounded-full bg-gc-blue px-5 py-2.5 text-sm font-medium text-gc-on-blue transition-colors hover:bg-gc-blue-hover">
             Browse all {MODEL_CATALOG.length} models
           </button>
@@ -383,7 +387,7 @@ export default function ModelsExplorer({ apiHref = "/dashboard/api" }: { apiHref
             API docs <ArrowRight className="h-3.5 w-3.5" />
           </Link>
         </div>
-        <dl className="mx-auto mt-14 grid max-w-xl grid-cols-3 divide-x divide-gc-line">
+        <dl className={cn("mx-auto grid max-w-xl grid-cols-3 divide-x divide-gc-line", inShell ? "mt-10" : "mt-14")}>
           {[
             [String(MODEL_CATALOG.length), "Models"],
             [String(new Set(MODEL_CATALOG.map((m) => m.provider)).size), "Labs"],
