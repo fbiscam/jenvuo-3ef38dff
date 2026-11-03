@@ -22,7 +22,7 @@ export const PROVIDERS: Record<ProviderKey, { label: string; blurb: string }> = 
   anthropic: { label: "Anthropic", blurb: "Claude models for deep reasoning, long documents." },
   openai: { label: "OpenAI", blurb: "GPT models for general chat, tools and structured answers." },
   google: { label: "Google", blurb: "Gemini and Gemma models with long context and fast." },
-  deepseek: { label: "DeepSeek", blurb: "Open-weight models with strong maths, code and value." },
+  deepseek: { label: "DeepSeek", blurb: "Open-weight models with strong maths and code." },
   qwen: { label: "Qwen", blurb: "Alibaba's Qwen family, from compact 27B to Max." },
   moonshot: { label: "Moonshot", blurb: "Kimi models built for agents and long tasks." },
   zhipu: { label: "Zhipu", blurb: "GLM open models for coding and multilingual work." },
