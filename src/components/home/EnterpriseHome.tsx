@@ -332,7 +332,7 @@ export function EntBuilt() {
       <div className="text-center">
         <h2 className="text-[34px] font-medium leading-[1.1] tracking-tight text-foreground sm:text-[44px]">Built for trading. Backed by frontier AI.</h2>
         <p className="mx-auto mt-5 max-w-[620px] text-[18px] leading-[1.65] text-foreground/85">
-          Jenvu combines leading research and models to build trader-ready products people can use every day, helping you redesign work around what's possible.
+          Jenvu combines leading research and models to build trader-ready products
         </p>
       </div>
       <div className="mx-auto mt-6 grid max-w-[1240px] gap-5 md:grid-cols-3">
