@@ -386,8 +386,8 @@ function TerminalPage() {
       const stamp = formatNewYorkNewsTime(event.date);
       const lead = stage === "now" ? "Releasing now" : `In ${Math.max(1, Math.round(mins))} min`;
       const show = event.impact === "High" ? toast.warning : toast.info;
-      show(`${lead}: ${event.country} ${event.title}`, {
-        description: `${event.impact} impact · ${stamp.date}, ${stamp.time} NY${event.forecast ? ` · Forecast ${event.forecast}` : ""}${event.previous ? ` · Previous ${event.previous}` : ""}`,
+      // One-line pill, same look as every other site notification.
+      show(`${lead}: ${event.country} ${event.title} · ${event.impact} · ${stamp.time} NY`, {
         duration: stage === "30" ? 10_000 : 20_000,
       });
     }

@@ -459,6 +459,12 @@ function RootComponent() {
               <svg viewBox="0 0 24 24" className="h-2.5 w-2.5" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12l5 5L20 7" /></svg>
             </span>
           ),
+          warning: (
+            <span className="flex h-4 w-4 items-center justify-center rounded-full bg-amber-500 text-[10px] font-bold leading-none text-white">!</span>
+          ),
+          info: (
+            <span className="flex h-4 w-4 items-center justify-center rounded-full bg-foreground text-[10px] font-bold leading-none text-background">i</span>
+          ),
         }}
         position={isMobile ? "bottom-center" : "top-right"}
         offset={isMobile ? 24 : 96}
