@@ -179,9 +179,9 @@ export function TwoFactorSettings() {
   // Enrollment in progress
   if (enroll) {
     return (
-      <form onSubmit={verifyEnroll} className="mt-5 space-y-4 rounded-xl border border-border bg-zinc-50/60 p-5">
+      <form onSubmit={verifyEnroll} className="mt-5 space-y-4 rounded-xl border border-border bg-card p-5">
         <div className="flex items-start gap-3">
-          <Shield className="mt-0.5 h-5 w-5 shrink-0 text-zinc-700" />
+          <Shield className="mt-0.5 h-5 w-5 shrink-0 text-foreground" />
           <div>
             <p className="text-sm font-medium text-foreground">Set up your authenticator</p>
             <p className="mt-1 text-xs text-muted-foreground leading-relaxed">
@@ -206,7 +206,7 @@ export function TwoFactorSettings() {
                 className="shrink-0 rounded-md border border-border bg-card p-1.5 text-muted-foreground hover:bg-muted"
                 aria-label="Copy secret"
               >
-                {copied ? <Check className="h-3.5 w-3.5 text-emerald-600" /> : <Copy className="h-3.5 w-3.5" />}
+                {copied ? <Check className="h-3.5 w-3.5 text-foreground" /> : <Copy className="h-3.5 w-3.5" />}
               </button>
             </div>
             <p className="text-[11px] text-muted-foreground">Keep this secret private. It grants access to your account.</p>
