@@ -37,8 +37,8 @@ const SOLUTIONS: Solution[] = [
   { name: "AI-first traders", image: imgOffice, stat: "1 question", statText: "one clear answer from the AI desk, no noise", body: "Ask about the current chart and get a focused, structured reply.", bold: "Read the market with AI next to you.", cta: "Explore the AI desk", to: "/ai-engine" },
   { name: "Developers", image: imgDev, stat: "$3 / 1M", statText: "tokens for top-tier models through API keys", body: "Plug Jenvu models into your own apps, bots and trading tools.", bold: "Build with our API and extension.", cta: "Explore developer tools", to: "/help" },
   { name: "Founding members", image: imgMeeting, stat: "2 days", statText: "to verify your ID after your plan is approved", body: "Approved Founding members get 3 months of their chosen plan with $250 credit.", bold: "Apply to the invite-only program.", cta: "Explore the Founding Program", to: "/founding" },
-  { name: "Session traders", image: imgLondon, stat: "London / NY", statText: "killzone sessions tracked on the chart", body: "Know when London and New York liquidity is most active on Gold.", bold: "Time your entries around the sessions.", cta: "Explore session tools", to: "/help" },
-  { name: "Gold investors", image: imgSouk, stat: "Gold", statText: "three markets, analysed in depth every day", body: "Follow Gold with daily insights, macro drivers and clear structure.", bold: "Stay close to the Gold, Bitcoin and EUR/USD markets.", cta: "Explore Gold insights", to: "/insights" },
+  { name: "Session traders", image: imgLondon, stat: "London / NY", statText: "killzone sessions tracked on the chart", body: "Know when London and New York liquidity is most active on Gold and EUR/USD.", bold: "Time your entries around the sessions.", cta: "Explore session tools", to: "/help" },
+  { name: "Gold investors", image: imgSouk, stat: "Gold", statText: "daily insights on Gold, Bitcoin and EUR/USD", body: "Follow Gold with daily insights, macro drivers and clear structure.", bold: "Stay close to the Gold, Bitcoin and EUR/USD markets.", cta: "Explore Gold insights", to: "/insights" },
   { name: "Students", image: imgLibrary, stat: "Free guides", statText: "on sweeps, zones and FVGs for every level", body: "Learn ICT and SMC ideas step by step with real Gold examples.", bold: "Build your trading knowledge.", cta: "Explore learning resources", to: "/insights" },
   { name: "Support & help", image: imgSupport, stat: "Help centre", statText: "answers on plans, billing and JX Bot", body: "Find quick answers or contact our team about your account.", bold: "Get help when you need it.", cta: "Visit the help centre", to: "/help" },
 ];
@@ -178,7 +178,7 @@ export function CloudStartBanner() {
         <div className="relative overflow-hidden rounded-2xl bg-gc-sky">
           <div className="relative z-10 max-w-xl px-8 py-16 md:px-16 md:py-24">
             <h2 className="text-3xl font-medium tracking-tight leading-tight text-gc-ink md:text-[40px]">
-              <span className="text-gc-blue-deep">Let's start trading</span> your Gold, today
+              <span className="text-gc-blue-deep">Let's start trading</span> your markets, today
             </h2>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link

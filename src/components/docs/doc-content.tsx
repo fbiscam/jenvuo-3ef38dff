@@ -25,7 +25,7 @@ export const DOC_GROUPS: DocGroup[] = [
         body: (
           <>
             <p>
-              Jenvu is an analysis platform built for one market: <strong>Gold</strong>. It combines a live chart (the
+              Jenvu is an analysis platform built for three markets: <strong>Gold</strong>, <strong>Bitcoin</strong> and <strong>EUR/USD</strong>. It combines a live chart (the
               Terminal), chart markings based on ICT and Smart Money Concepts, an AI chat that explains what it sees, alerts, a demo
               trading account and a browser extension.
             </p>

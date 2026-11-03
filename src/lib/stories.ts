@@ -191,7 +191,7 @@ export const STORIES: Story[] = [
     stats: [
       { value: "1–5", label: "IPs per plan" },
       { value: "$150", label: "Daily target on Ultra" },
-      { value: "M15", label: "chart" },
+      { value: "M15", label: "EUR/USD chart" },
     ],
     cta: { label: "See plans", href: "https://jenvu.com/pricing" },
   },
@@ -247,7 +247,7 @@ export const STORIES: Story[] = [
     },
     banner: {
       title: "Weekend closure handled for you",
-      text: "When the Gold, Bitcoin and EUR/USD markets is closed at the weekend, the chart shows it, and the closed-candle timer counts down to the next open.",
+      text: "When the Gold and EUR/USD markets are closed at the weekend, the chart shows it, and the closed-candle timer counts down to the next open.",
     },
     steps: {
       title: "What you'll see",

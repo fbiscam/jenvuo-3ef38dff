@@ -111,7 +111,7 @@ export const collections: Collection[] = [
           { type: "h2", content: "Step by step" },
           { type: "ol", items: [
             "Open the Jenvu desk from your dashboard.",
-            "Confirm the instrument — Gold, Bitcoin and EUR/USD.",
+            "Confirm the instrument — Gold, Bitcoin or EUR/USD.",
             "Hit 'Analyze'. The terminal reads the active chart and starts building the setup.",
             "Wait while the 7-stage pipeline runs — usually 10–25 seconds.",
             "If the final score is 85+, the setup is graded A+ and entry, stop and targets appear.",
@@ -205,7 +205,7 @@ export const collections: Collection[] = [
           ]},
 
           { type: "h2", content: "3. Supported market" },
-          { type: "p", content: "Jenvu is tuned for Gold on the 30-minute timeframe. Requests about other markets stay in general chat mode." },
+          { type: "p", content: "Jenvu is tuned for Gold, Bitcoin and EUR/USD on the 30-minute timeframe. Requests about other markets stay in general chat mode." },
 
           { type: "h2", content: "4. Still stuck" },
           { type: "p", content: "Start a new chat from the History menu in the AI panel, then retry your question. If the issue continues, contact support from the Help Center." },

@@ -449,7 +449,7 @@ export function CloudBuildWith() {
       <div className="mx-auto grid max-w-[1296px] items-start gap-10 px-5 pb-20 pt-8 sm:px-8 md:grid-cols-2 md:gap-20 md:pb-24">
         <div className="md:sticky md:top-24">
           <h2 className="text-[22px] font-medium tracking-tight leading-[1.3] text-gc-ink min-[400px]:text-[24px] sm:text-[36px] sm:leading-[1.25]">
-            <span className="whitespace-nowrap">Build with the Gold platform</span>
+            <span className="whitespace-nowrap">Build with the Jenvu platform</span>
             <br />
             <span className="whitespace-nowrap text-gc-blue-deep">designed for traders and AI</span>
           </h2>
