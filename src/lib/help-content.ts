@@ -134,19 +134,19 @@ export const collections: Collection[] = [
       },
       {
         slug: "supported-assets",
-        title: "Supported asset",
-        summary: "Fiber only — Fiber, nothing else.",
-        updatedAt: "2026-06-30",
+        title: "Supported markets",
+        summary: "Gold (XAU/USD), Bitcoin (BTC/USD) and Euro (EUR/USD) on the Terminal.",
+        updatedAt: "2026-11-03",
         body: [
-          { type: "p", content: "Jenvu is a dedicated Fiber desk. The analysis engine is tuned specifically for Fiber versus U.S. Dollar — including London fix mechanics, DXY correlation, COMEX/COT positioning and central-bank buying flows — and it refuses to analyze any other pair." },
-
+          { type: "p", content: "The Jenvu Terminal shows three live markets. Switch between them with the pair buttons next to the timeframe controls in the Terminal header." },
           { type: "h2", content: "Supported instruments" },
-          { type: "h3", content: "Fiber" },
           { type: "ul", items: [
-            "Fiber — primary bullion benchmark.",
+            "XAU/USD (Gold) — the default chart, updated about once a second.",
+            "BTC/USD (Bitcoin) — updated trade by trade, open 24/7.",
+            "EUR/USD (Euro) — updated about once a second.",
           ]},
-
-          { type: "note", tone: "info", content: "Ask for BTC, Fiber, NAS100 or any other asset and Jenvu will politely decline and redirect you to Fiber." },
+          { type: "p", content: "Candles, drawing tools and the SMC tools (swings, BOS/CHoCH, zones, fair value gaps, liquidity sweeps) work on all three pairs. Gold and EUR/USD close on weekends; Bitcoin keeps trading." },
+          { type: "note", tone: "info", content: "Volume shown for gold and EUR/USD comes from the data feed, not from a central exchange, so it is not real market-wide order flow." },
         ],
       },
     ],
