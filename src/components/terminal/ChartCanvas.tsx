@@ -211,6 +211,7 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
     if (!host) return;
     const themeColors = CHART_THEMES[propsRef.current.theme ?? "light"];
     const chart = createChart(host, {
+      // Hide the TradingView logo in the bottom-left corner.
       autoSize: true,
       layout: {
         background: { type: ColorType.Solid, color: themeColors.bg },
