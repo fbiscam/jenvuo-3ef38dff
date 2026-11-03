@@ -45,7 +45,7 @@ const CORR_PLACEHOLDER: CorrelatedMarket[] = [
   { symbol: "DXY", display: "DXY", note: "USD strength — inverse driver" },
   { symbol: "US10Y", display: "US10Y", note: "Real yields — inverse driver" },
   { symbol: "XAGUSD", display: "XAG/USD", note: "Silver beta — confirms metals" },
-  { symbol: "EURUSD", display: "Fiber", note: "USD leg — positive driver" },
+  { symbol: "EURUSD", display: "EUR/USD", note: "USD leg — positive driver" },
   { symbol: "USDJPY", display: "USD/JPY", note: "Carry / risk — inverse driver" },
   { symbol: "SPX", display: "S&P 500", note: "Risk appetite — rotation cue" },
   { symbol: "WTI", display: "WTI Oil", note: "Inflation impulse — positive" },
@@ -187,7 +187,7 @@ const INITIAL_TICKER: TickerRow[] = [
   ["DXY", "—", "…"],
   ["US10Y", "—", "…"],
   ["XAG/USD", "—", "…"],
-  ["Fiber", "—", "…"],
+  ["EUR/USD", "—", "…"],
   ["USD/JPY", "—", "…"],
   ["S&P 500", "—", "…"],
   ["WTI Oil", "—", "…"],
@@ -200,7 +200,7 @@ const SYMBOL_MAP: Record<string, string> = {
   "DXY": "DXY",
   "US10Y": "US10Y",
   "XAG/USD": "XAGUSD",
-  "Fiber": "EURUSD",
+  "EUR/USD": "EURUSD",
   "USD/JPY": "USDJPY",
   "S&P 500": "SPX",
   "WTI Oil": "WTI",
@@ -372,7 +372,7 @@ function HomePage() {
   const ticker = useLiveTicker();
   const homeArticles = (Route.useLoaderData() as { articles?: HomeArticle[] }).articles ?? [];
   
-  const xau = ticker.find((r) => r[0] === "Fiber");
+  const xau = ticker.find((r) => r[0] === "EUR/USD");
   const currentPlan = useCurrentPlan();
   const upgradeLock = useUpgradeLock();
   const trial = useTrial();

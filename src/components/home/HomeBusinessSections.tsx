@@ -47,7 +47,7 @@ const h2 = "text-balance text-[32px] font-normal leading-[1.12] tracking-tight t
 const HERO_CARDS = [
   { src: realAlerts, label: "Alerts", rot: -7, y: 40 },
   { src: realAsk, label: "Ask Jenvu", rot: -3, y: 16 },
-  { src: realTerminal, label: "Fiber Terminal", rot: 0, y: 0, main: true },
+  { src: realTerminal, label: "Jenvu Terminal", rot: 0, y: 0, main: true },
   { src: realBot, label: "JX Bot", rot: 3, y: 16 },
   { src: realApi, label: "API", rot: 7, y: 40 },
 ];
@@ -97,7 +97,7 @@ export function BizHero() {
 /* ---------------- Product strip ---------------- */
 
 const STRIP = [
-  { Icon: CandlestickChart, name: "Fiber Terminal" },
+  { Icon: CandlestickChart, name: "Jenvu Terminal" },
   { Icon: MessageSquare, name: "Ask Jenvu" },
   { Icon: Bot, name: "JX Bot" },
   { Icon: Code2, name: "API Platform" },
@@ -136,7 +136,7 @@ function TagChip({ tag }: { tag: Tag }) {
 const NEWS: { tag: Tag; title: string; body: string; to: string }[] = [
   { tag: "Product", title: "JX Bot for MetaTrader 5", body: "EUR/USD M15 swing bot with a stop loss on every trade and a daily target.", to: "/download" },
   { tag: "Product", title: "Top AI models, one key", body: "See every model the Jenvu API serves and what each is best at.", to: "/models" },
-  { tag: "Guide", title: "Fiber killzones", body: "When London and New York move the market, in your own time zone.", to: "/killzones" },
+  { tag: "Guide", title: "Gold killzones", body: "When London and New York move the market, in your own time zone.", to: "/killzones" },
   { tag: "Guide", title: "ICT trading for Gold", body: "Liquidity, order blocks and fair value gaps, explained step by step.", to: "/strategies/ict-gold-trading" },
   { tag: "Update", title: "Scam check", body: "Check a broker, signal group or wallet before you send money.", to: "/scam-check" },
 ];
@@ -153,7 +153,7 @@ export function BizWhatsNew() {
               <div><TagChip tag="Offer" /></div>
               <h3 className="mt-3 text-[30px] font-normal leading-tight tracking-tight text-gc-ink sm:text-[38px]">Founding Program</h3>
               <p className="mt-4 max-w-md text-[17px] leading-relaxed text-gc-ink-muted">
-                Apply to join Jenvu early: three months of your chosen plan plus $250 credit, and full Fiber Terminal access once approved.
+                Apply to join Jenvu early: three months of your chosen plan plus $250 credit, and full Jenvu Terminal access once approved.
               </p>
               <div className="mt-auto pt-8">
                 <Link to="/founding" className={textLink}>Apply now <ChevronRight className="h-4 w-4" /></Link>
@@ -180,7 +180,7 @@ export function BizWhatsNew() {
 /* ---------------- AI for every desk ---------------- */
 
 const DESKS = [
-  { name: "Gold traders", body: "Read Fiber structure, liquidity and killzones with chart-aware AI and seven trading engines.", line: "What if you could read Fiber structure in seconds", to: "/ai-engine" },
+  { name: "Gold traders", body: "Read Gold structure, liquidity and killzones with chart-aware AI and seven trading engines.", line: "What if you could read Gold structure in seconds", to: "/ai-engine" },
   { name: "Analysts", body: "Turn sessions, news and price action into clear daily notes and shareable insights.", line: "What if your morning notes wrote themselves", to: "/insights" },
   { name: "Bot users", body: "Run JX Bot on MetaTrader 5 with a stop loss on every trade, trading hours and a daily target.", line: "What if your bot stopped at your daily target", to: "/download" },
   { name: "Developers", body: "Call the top AI models behind one Jenvu API key, pay as you go.", line: "What if every top model sat behind one key", to: "/platform" },
@@ -245,8 +245,8 @@ export function BizEveryDesk() {
 /* ---------------- Complete platform ---------------- */
 
 const PRODUCTS = [
-  { key: "ask", label: "Ask Jenvu", Icon: Sparkles, body: "Ask about Fiber in plain words for structure, levels and plans you can check on the chart.", to: "/ai-engine" },
-  { key: "terminal", label: "Terminal", Icon: CandlestickChart, body: "A live Fiber chart with liquidity sweeps, fair value gaps and seven engines in one view.", to: "/ai-engine" },
+  { key: "ask", label: "Ask Jenvu", Icon: Sparkles, body: "Ask about Gold in plain words for structure, levels and plans you can check on the chart.", to: "/ai-engine" },
+  { key: "terminal", label: "Terminal", Icon: CandlestickChart, body: "A live Gold, Bitcoin or EUR/USD chart with liquidity sweeps, fair value gaps and seven engines in one view.", to: "/ai-engine" },
   { key: "bot", label: "JX Bot", Icon: Bot, body: "An EUR/USD M15 swing bot for MetaTrader 5, with a stop loss on every trade.", to: "/download" },
   { key: "api", label: "API", Icon: Code2, body: "Top AI models behind one key, at $3 per million tokens, working with the OpenAI SDK.", to: "/platform" },
 ] as const;
@@ -254,7 +254,7 @@ type ProductKey = (typeof PRODUCTS)[number]["key"];
 
 const SIDEBAR: Record<ProductKey, { nav: string[]; pinned: string[]; recent: string[] }> = {
   ask: { nav: ["New chat", "Projects", "Alerts", "Watchlist", "Journal"], pinned: ["London open plan", "Check H4 liquidity", "Weekly Gold outlook"], recent: ["Is DXY pushing Gold down?", "Explain this FVG", "Asia range targets"] },
-  terminal: { nav: ["Chart", "Engines", "Killzones", "Alerts", "Journal"], pinned: ["Fiber M15", "Fiber H1", "Fiber H4"], recent: ["Sweep of Asia high", "Bullish FVG 15m", "SSL taken at NY open"] },
+  terminal: { nav: ["Chart", "Engines", "Killzones", "Alerts", "Journal"], pinned: ["Gold M15", "Gold H1", "Gold H4"], recent: ["Sweep of Asia high", "Bullish FVG 15m", "SSL taken at NY open"] },
   bot: { nav: ["Overview", "Accounts", "IP licence", "Downloads", "Reports"], pinned: ["Main MT5 account", "Daily target", "Trading hours"], recent: ["Bot ON 08:00", "Target reached", "Bot OFF 16:30"] },
   api: { nav: ["Playground", "API keys", "Models", "Usage", "Docs"], pinned: ["Production key", "Test key"], recent: ["chat.completions", "Model list", "Usage this week"] },
 };
@@ -265,7 +265,7 @@ function WindowCenter({ k }: { k: ProductKey }) {
     return (
       <div className="flex h-full flex-col p-6">
         <div className="flex items-center justify-between text-[13px] text-gc-ink-muted">
-          <span className="font-medium text-gc-ink">Fiber · M15</span>
+          <span className="font-medium text-gc-ink">Gold · M15</span>
           <span>Engines: 7 on</span>
         </div>
         <svg viewBox="0 0 300 140" className="mt-4 w-full flex-1">
@@ -330,7 +330,7 @@ await client.chat.completions.create({
       <div className="w-full max-w-lg rounded-2xl border border-gc-line bg-gc-panel/50">
         <div className="flex items-center gap-1.5 px-4 pt-2 text-[11px] text-gc-ink-muted"><FolderOpen className="h-3 w-3" /> Choose project</div>
         <div className="m-1 rounded-xl border border-gc-line bg-background px-3 py-2.5">
-          <p className="text-[13px] text-gc-ink-muted">Ask anything about Fiber</p>
+          <p className="text-[13px] text-gc-ink-muted">Ask anything about Gold</p>
           <div className="mt-3 flex items-center gap-3 text-[11px] text-gc-ink-muted">
             <Plus className="h-3.5 w-3.5" />
             <span className="inline-flex items-center gap-1"><ShieldCheck className="h-3 w-3" /> Chart-aware</span>
@@ -351,7 +351,7 @@ export function BizPlatform() {
   return (
     <section className="bg-background px-5 py-16 sm:py-24">
       <div className="mx-auto max-w-7xl text-center">
-        <h2 className={h2}>A complete AI desk for Fiber traders</h2>
+        <h2 className={h2}>A complete AI desk for Gold, Bitcoin and EUR/USD traders</h2>
         <div className="mx-auto mt-8 inline-flex max-w-full flex-wrap justify-center gap-1 rounded-3xl border sm:rounded-full border-gc-line p-1">
           {PRODUCTS.map(({ key, label, Icon }) => (
             <button
@@ -408,7 +408,7 @@ export function BizPlatform() {
 /* ---------------- Explore more ---------------- */
 
 const EXPLORE = [
-  { src: realTraders, label: "Traders", body: "Read Fiber with seven engines", to: "/ai-engine" },
+  { src: realTraders, label: "Traders", body: "Read Gold with seven engines", to: "/ai-engine" },
   { src: realFounding, label: "Founding members", body: "Join early, shape Jenvu", to: "/founding" },
   { src: realLearners, label: "Learners", body: "ICT and SMC, step by step", to: "/strategies/ict-gold-trading" },
   { src: realApi, label: "Developers", body: "Top AI models, one key", to: "/platform" },

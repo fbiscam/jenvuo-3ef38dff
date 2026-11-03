@@ -129,7 +129,7 @@ export default function SiteHeader() {
                   <div className="w-56 rounded-2xl border border-border bg-background p-2 text-[14px] shadow-lg">
                     {[
                       { to: isAuthed ? "/dashboard" : "/auth", label: "Dashboard" },
-                      { to: "/dashboard/terminal", label: "Fiber Terminal" },
+                      { to: "/dashboard/terminal", label: "Jenvu Terminal" },
                       { to: "/jx-bot", label: "JX Bot" },
                       { to: "/models", label: "AI models" },
                       { to: "/platform", label: "API Platform" },

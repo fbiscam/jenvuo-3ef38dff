@@ -48,10 +48,10 @@ function AboutPage() {
     <PageShell
       wide
       title={"About Jenvu, the AI \nFiber trading terminal"}
-      intro="Jenvu was built on a simple thesis: institutional logic shouldn't be locked behind a Bloomberg terminal. We turned ICT and SMC playbooks into an AI trading terminal any serious Fiber trader can use directly on the chart."
+      intro="Jenvu was built on a simple thesis: institutional logic shouldn't be locked behind a Bloomberg terminal. We turned ICT and SMC playbooks into an AI trading terminal any serious Gold, Bitcoin and EUR/USD trader can use directly on the chart."
     >
       <Feature
-        title="A new way to read Fiber"
+        title="A new way to read Gold"
         text={
           <p>
             Give independent traders the same structural read of the market that desk
@@ -68,7 +68,7 @@ function AboutPage() {
       {/* WHAT WE BUILD */}
       <section className="mx-auto max-w-[1200px] px-5 py-14 text-center sm:px-8">
         <h2 className="text-[30px] font-medium tracking-tight text-gc-ink sm:text-[40px]">What we build</h2>
-        <p className="mt-4 text-[16px] text-gc-ink-muted">Three products, one focus: reading Fiber clearly.</p>
+        <p className="mt-4 text-[16px] text-gc-ink-muted">Three products, one focus: reading Gold, Bitcoin and EUR/USD clearly.</p>
         <div className="mt-10 grid gap-5 text-left md:grid-cols-3">
           {BUILD.map((b, i) => (
             <a key={b.title} href={b.href} className="group flex flex-col overflow-hidden rounded-md border border-gc-line bg-background transition-shadow hover:shadow-md">
@@ -99,7 +99,7 @@ function AboutPage() {
         text={
           <>
             <p>
-              Jenvu is a Fiber specialist. Instead of spreading across unrelated pairs, every
+              Jenvu focuses on three markets: Gold, Bitcoin and EUR/USD. Instead of spreading across unrelated pairs, every
               engine is tuned deeply for one bullion market: chart-first analysis on the active
               TradingView chart, the institutional ICT/SMC playbook with killzones, liquidity and
               OTE, and clear explanations in plain language.
@@ -113,7 +113,7 @@ function AboutPage() {
         href="https://jenvu.com/pricing"
         stats={[
           { value: "7", label: "Deterministic trading engines" },
-          { value: "1", label: "Dedicated market: Fiber" },
+          { value: "3", label: "Markets: Gold, Bitcoin, EUR/USD" },
           { value: "6", label: "Checks before any setup ships" },
           { value: "14", label: "Days of Pro access in the free trial" },
           { value: "$100", label: "Free credit to get started" },
@@ -124,7 +124,7 @@ function AboutPage() {
         title="Get inspired"
         intro="Guides, product updates and help from the Jenvu team."
         cards={[
-          { title: "How ICT and SMC concepts read Fiber structure", href: "https://jenvu.com/strategies/ict-gold-trading", cta: "Read the guide" },
+          { title: "How ICT and SMC concepts read Gold structure", href: "https://jenvu.com/strategies/ict-gold-trading", cta: "Read the guide" },
           { title: "Inside the AI engine behind every Jenvu answer", href: "https://jenvu.com/ai-engine", cta: "Read the story" },
           { title: "Questions about your account, plan or the Terminal", href: "https://support.jenvu.com", cta: "Visit help center" },
         ]}
