@@ -168,26 +168,27 @@ function ChatTile() {
 }
 
 const CODE: React.ReactNode[] = [
-  <div className="opacity-50">▸ Thinking...</div>,
-  <div><span className="text-ent-ide-green">• grep</span> "fvgZone" src/ <span className="opacity-40">no matches</span></div>,
+  <div className="font-semibold text-ent-ide-fg">&gt; Add rate limiting to all API routes.</div>,
+  <div className="text-ent-ide-purple/80">▸ Thinking...</div>,
+  <div><span className="text-ent-ide-cyan">• grep</span> <span className="text-ent-ide-amber">"fvgZone"</span> src/ <span className="opacity-40">no matches</span></div>,
   <div><span className="text-ent-ide-green">• read_file</span> src/api/signals.ts <span className="opacity-40">42 lines</span></div>,
-  <div className="flex justify-between opacity-60"><span>| Scan signal handlers</span><span className="text-ent-ide-green">[done]</span></div>,
-  <div className="opacity-50">◆ Thought for 2.8s</div>,
-  <div className="pl-3"><b>Edit</b> <span className="text-ent-ide-green">src/api/signals.ts</span></div>,
-  <div><span className="opacity-40">14 </span>export async function handler(req) {"{"}</div>,
-  <div className="bg-ent-ide-add"><span className="opacity-40">15 </span>+ await rateLimit(req, {"{"} max: 100 {"}"});</div>,
-  <div className="bg-ent-ide-del"><span className="opacity-40">33 </span>- if (!data.symbol) throw Error;</div>,
-  <div className="bg-ent-ide-add"><span className="opacity-40">33 </span>+ return schema.parse(data);</div>,
-  <div><span className="text-ent-ide-green">• run</span> npm test <span className="opacity-40">12 passed</span></div>,
-  <div className="opacity-60">✓ Ready to ship</div>,
+  <div className="flex justify-between"><span className="opacity-70">| Scan signal handlers</span><span className="rounded bg-ent-ide-add px-1.5 text-ent-ide-green">done</span></div>,
+  <div className="text-ent-ide-purple">◆ Thought for 2.8s</div>,
+  <div className="pl-3"><b>Edit</b> <span className="text-ent-ide-cyan">src/api/signals.ts</span></div>,
+  <div><span className="opacity-40">14 </span><span className="text-ent-ide-purple">export async function</span> <span className="text-ent-ide-amber">handler</span>(req) {"{"}</div>,
+  <div className="border-l-2 border-ent-ide-green bg-ent-ide-add pl-1 text-ent-ide-green"><span className="opacity-50">15 </span>+ await rateLimit(req, {"{"} max: 100 {"}"});</div>,
+  <div className="border-l-2 border-ent-ide-red bg-ent-ide-del pl-1 text-ent-ide-red"><span className="opacity-50">33 </span>- if (!data.symbol) throw Error;</div>,
+  <div className="border-l-2 border-ent-ide-green bg-ent-ide-add pl-1 text-ent-ide-green"><span className="opacity-50">33 </span>+ return schema.parse(data);</div>,
+  <div><span className="text-ent-ide-cyan">• run</span> npm test <span className="text-ent-ide-green">12 passed</span></div>,
+  <div className="font-semibold text-ent-ide-green">✓ Ready to ship</div>,
 ];
 function BuildTile() {
   return (
-    <Link to="/docs" className={`${tile} h-[290px] bg-ent-ide font-mono text-[12px] leading-[1.7] text-ent-ide-fg`}>
-      <div className="flex items-center gap-2 px-4 py-3">
-        <span className="h-2.5 w-2.5 rounded-full bg-gc-red" /><span className="h-2.5 w-2.5 rounded-full bg-gc-yellow" /><span className="h-2.5 w-2.5 rounded-full bg-gc-green" />
-        <span className="ml-4 opacity-60">projects/main</span>
-        <span className="ml-auto flex items-center gap-1.5 opacity-70"><span className="h-2 w-10 overflow-hidden rounded-sm bg-ent-ide-fg/20"><span className="sc-progress block h-2 rounded-sm bg-ent-ide-fg" /></span></span>
+    <Link to="/docs" className={`${tile} h-[290px] bg-ent-ide font-mono text-[12px] leading-[1.7] text-ent-ide-fg antialiased`}>
+      <div className="flex items-center gap-2 border-b border-ent-ide-fg/10 bg-ent-ide-bar px-4 py-3">
+        <span className="h-3 w-3 rounded-full bg-ent-ide-red" /><span className="h-3 w-3 rounded-full bg-ent-ide-amber" /><span className="h-3 w-3 rounded-full bg-ent-ide-green" />
+        <span className="ml-4 text-ent-ide-fg/70">projects/main</span>
+        <span className="ml-auto flex items-center gap-1.5"><span className="h-1.5 w-12 overflow-hidden rounded-full bg-ent-ide-fg/15"><span className="sc-progress block h-1.5 rounded-full bg-ent-ide-cyan" /></span></span>
       </div>
       <div className="relative h-[200px] overflow-hidden px-4">
         <div className="sc-scroll">

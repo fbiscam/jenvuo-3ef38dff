@@ -150,6 +150,11 @@
   --color-ent-ide-green: var(--ent-ide-green);
   --color-ent-ide-add: var(--ent-ide-add);
   --color-ent-ide-del: var(--ent-ide-del);
+  --color-ent-ide-cyan: var(--ent-ide-cyan);
+  --color-ent-ide-purple: var(--ent-ide-purple);
+  --color-ent-ide-amber: var(--ent-ide-amber);
+  --color-ent-ide-red: var(--ent-ide-red);
+  --color-ent-ide-bar: var(--ent-ide-bar);
   --color-ent-orange: var(--ent-orange);
   --color-ent-excel: var(--ent-excel);
 }
@@ -1710,11 +1715,16 @@ pre, pre *, code, kbd, samp {
   --ent-card: #f4f4f4;
   --ent-ivory: #f6f5f1;
   --ent-bubble: #ebeae6;
-  --ent-ide: #161616;
-  --ent-ide-fg: #d4d4d4;
-  --ent-ide-green: #4ade80;
-  --ent-ide-add: rgba(74, 222, 128, 0.14);
-  --ent-ide-del: rgba(248, 113, 113, 0.16);
+  --ent-ide: #0d1117;
+  --ent-ide-fg: #e6edf3;
+  --ent-ide-green: #3fe08a;
+  --ent-ide-add: rgba(46, 204, 113, 0.18);
+  --ent-ide-del: rgba(255, 92, 92, 0.18);
+  --ent-ide-cyan: #38d6f5;
+  --ent-ide-purple: #c084fc;
+  --ent-ide-amber: #fbbf24;
+  --ent-ide-red: #ff7b72;
+  --ent-ide-bar: #161b22;
   --ent-orange: #f26b1d;
   --ent-excel: #1d7044;
 }
