@@ -109,14 +109,14 @@ export default function AvatarAdjuster({ file, onCancel, onDone }: Props) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="w-full max-w-sm rounded-2xl bg-white p-5 shadow-xl">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/40 p-4 backdrop-blur-sm">
+      <div className="w-full max-w-sm rounded-2xl border border-border bg-card p-5 text-card-foreground shadow-xl">
         <div className="mb-3 flex items-center justify-between">
-          <h3 className="text-sm font-semibold text-zinc-900">Adjust photo</h3>
+          <h3 className="text-sm font-semibold text-foreground">Adjust photo</h3>
           <button
             type="button"
             onClick={onCancel}
-            className="text-xs text-zinc-500 hover:text-zinc-800"
+            className="rounded-full px-3 py-1 text-xs text-muted-foreground hover:bg-muted hover:text-foreground"
           >
             Cancel
           </button>
@@ -129,7 +129,7 @@ export default function AvatarAdjuster({ file, onCancel, onDone }: Props) {
           onPointerUp={onPointerUp}
           onPointerCancel={onPointerUp}
           onWheel={onWheel}
-          className="relative mx-auto touch-none overflow-hidden rounded-full border border-zinc-200 bg-zinc-100 select-none"
+          className="relative mx-auto touch-none overflow-hidden rounded-full border border-border bg-muted ring-4 ring-muted/50 select-none"
           style={{ width: BOX, height: BOX, cursor: "grab" }}
         >
           {imgUrl && img && (
@@ -148,19 +148,22 @@ export default function AvatarAdjuster({ file, onCancel, onDone }: Props) {
         </div>
 
         <div className="mt-4">
-          <label className="flex items-center gap-3 text-xs text-zinc-600">
-            <span className="w-10 shrink-0">Zoom</span>
+          <div className="flex items-center gap-2 rounded-full border border-border bg-muted/40 px-2 py-1.5">
+            <button type="button" aria-label="Zoom out" onClick={() => setZoom((z) => Math.max(1, +(z - 0.25).toFixed(2)))} disabled={zoom <= 1} className="grid h-7 w-7 shrink-0 place-items-center rounded-full text-foreground hover:bg-background disabled:opacity-40">−</button>
             <input
               type="range"
               min={1}
               max={4}
               step={0.01}
               value={zoom}
+              aria-label="Zoom"
               onChange={(e) => setZoom(parseFloat(e.target.value))}
-              className="flex-1 accent-emerald-600"
+              className="h-1 flex-1 cursor-pointer accent-foreground"
             />
-          </label>
-          <p className="mt-2 text-[11px] text-zinc-500">
+            <button type="button" aria-label="Zoom in" onClick={() => setZoom((z) => Math.min(4, +(z + 0.25).toFixed(2)))} disabled={zoom >= 4} className="grid h-7 w-7 shrink-0 place-items-center rounded-full text-foreground hover:bg-background disabled:opacity-40">+</button>
+            <span className="w-11 shrink-0 text-right font-mono text-[11px] text-muted-foreground">{Math.round(zoom * 100)}%</span>
+          </div>
+          <p className="mt-2 text-center text-[11px] text-muted-foreground">
             Drag to reposition · Scroll or slider to zoom
           </p>
         </div>
@@ -170,7 +173,7 @@ export default function AvatarAdjuster({ file, onCancel, onDone }: Props) {
             type="button"
             onClick={doExport}
             disabled={!img || saving}
-            className="w-full rounded-full bg-emerald-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-emerald-700 disabled:opacity-50"
+            className="w-full rounded-full bg-foreground px-4 py-2.5 text-sm font-medium text-background hover:opacity-90 disabled:opacity-50"
           >
             {saving ? "Saving…" : "Set new profile picture"}
           </button>

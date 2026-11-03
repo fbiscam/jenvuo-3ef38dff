@@ -169,7 +169,7 @@ export function TwoFactorSettings() {
 
   if (loading) {
     return (
-      <div className="mt-4 flex items-center gap-2 text-sm text-zinc-500">
+      <div className="mt-4 flex items-center gap-2 text-sm text-muted-foreground">
         <Loader2 className="w-4 h-4 animate-spin" />
         Loading 2FA status…
       </div>
@@ -179,12 +179,12 @@ export function TwoFactorSettings() {
   // Enrollment in progress
   if (enroll) {
     return (
-      <form onSubmit={verifyEnroll} className="mt-5 space-y-4 rounded-xl border border-zinc-200 bg-zinc-50/60 p-5">
+      <form onSubmit={verifyEnroll} className="mt-5 space-y-4 rounded-xl border border-border bg-zinc-50/60 p-5">
         <div className="flex items-start gap-3">
           <Shield className="mt-0.5 h-5 w-5 shrink-0 text-zinc-700" />
           <div>
-            <p className="text-sm font-medium text-zinc-900">Set up your authenticator</p>
-            <p className="mt-1 text-xs text-zinc-500 leading-relaxed">
+            <p className="text-sm font-medium text-foreground">Set up your authenticator</p>
+            <p className="mt-1 text-xs text-muted-foreground leading-relaxed">
               Scan the QR code with Google Authenticator, 1Password, Authy, or any TOTP app.
               Then enter the 6-digit code the app shows.
             </p>
@@ -192,29 +192,29 @@ export function TwoFactorSettings() {
         </div>
 
         <div className="flex flex-col items-center gap-3 sm:flex-row sm:items-start">
-          <div className="rounded-lg border border-zinc-200 bg-white p-3">
+          <div className="rounded-xl border border-border bg-white p-3">
             {/* Supabase returns an SVG data URL */}
             <img src={enroll.qr} alt="Scan this QR code with your authenticator app" className="h-40 w-40" />
           </div>
           <div className="flex-1 space-y-2">
-            <p className="text-[11px] font-semibold uppercase tracking-widest text-zinc-500">Or enter manually</p>
-            <div className="flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 font-mono text-xs text-zinc-800 break-all">
+            <p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">Or enter manually</p>
+            <div className="flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2 font-mono text-xs text-foreground break-all">
               <span className="flex-1">{enroll.secret}</span>
               <button
                 type="button"
                 onClick={copySecret}
-                className="shrink-0 rounded-md border border-zinc-200 bg-white p-1.5 text-zinc-600 hover:bg-zinc-50"
+                className="shrink-0 rounded-md border border-border bg-card p-1.5 text-muted-foreground hover:bg-muted"
                 aria-label="Copy secret"
               >
                 {copied ? <Check className="h-3.5 w-3.5 text-emerald-600" /> : <Copy className="h-3.5 w-3.5" />}
               </button>
             </div>
-            <p className="text-[11px] text-zinc-500">Keep this secret private. It grants access to your account.</p>
+            <p className="text-[11px] text-muted-foreground">Keep this secret private. It grants access to your account.</p>
           </div>
         </div>
 
         <div>
-          <label className="block text-xs font-medium text-zinc-600">Verification code</label>
+          <label className="block text-xs font-medium text-muted-foreground">Verification code</label>
           <input
             type="text"
             inputMode="numeric"
@@ -223,7 +223,7 @@ export function TwoFactorSettings() {
             value={code}
             onChange={(e) => { setCodeError(null); setCode(e.target.value.replace(/\D/g, "").slice(0, 6)); }}
             className={`mt-1 block w-full rounded-lg border px-4 py-3 text-center text-2xl tracking-[0.5em] font-mono outline-none transition ${
-              codeError ? "border-red-400 text-red-600" : "border-zinc-200 text-zinc-900 focus:border-zinc-900"
+              codeError ? "border-red-400 text-red-600" : "border-border text-foreground bg-background focus:border-foreground"
             }`}
             placeholder="••••••"
           />
@@ -234,7 +234,7 @@ export function TwoFactorSettings() {
           <button
             type="submit"
             disabled={busy || code.length !== 6}
-            className="inline-flex items-center gap-2 rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800 disabled:opacity-50"
+            className="inline-flex items-center gap-2 rounded-full bg-foreground px-4 py-2 text-sm font-medium text-background hover:opacity-90 disabled:opacity-50"
           >
             {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <ShieldCheck className="h-4 w-4" />}
             Verify & enable
@@ -243,7 +243,7 @@ export function TwoFactorSettings() {
             type="button"
             onClick={cancelEnroll}
             disabled={busy}
-            className="rounded-lg border border-zinc-200 px-4 py-2 text-sm font-medium hover:bg-zinc-50 disabled:opacity-50"
+            className="rounded-full border border-border px-4 py-2 text-sm font-medium hover:bg-muted disabled:opacity-50"
           >
             Cancel
           </button>
@@ -255,19 +255,19 @@ export function TwoFactorSettings() {
   // Enabled state
   if (verified) {
     return (
-      <div className="mt-5 rounded-xl border border-emerald-200 bg-emerald-50/60 p-4">
+      <div className="mt-5 rounded-xl border border-border bg-card p-4">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start">
           
           <div className="min-w-0 flex-1">
-            <p className="text-sm font-medium text-emerald-900 whitespace-nowrap">Two-factor authentication is ON</p>
-            <p className="mt-1 text-xs text-emerald-800/80">
+            <p className="text-sm font-medium text-foreground whitespace-nowrap">Two-factor authentication is ON</p>
+            <p className="mt-1 text-xs text-muted-foreground">
               Every sign-in requires a 6-digit code from your authenticator app.
             </p>
           </div>
           <button
             onClick={disable}
             disabled={busy}
-            className="inline-flex shrink-0 items-center justify-center gap-1.5 self-start rounded-lg border border-emerald-300 bg-white px-3 py-1.5 text-xs font-medium text-emerald-800 hover:bg-emerald-50 disabled:opacity-50"
+            className="inline-flex shrink-0 items-center justify-center gap-1.5 self-start rounded-full border border-border bg-background px-4 py-1.5 text-xs font-medium text-foreground hover:bg-muted disabled:opacity-50"
           >
             {busy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <ShieldOff className="h-3.5 w-3.5" />}
             Disable
@@ -279,17 +279,17 @@ export function TwoFactorSettings() {
 
   // Disabled state — offer to enable
   return (
-    <div className="mt-5 rounded-xl border border-zinc-200 bg-white p-4">
+    <div className="mt-5 rounded-xl border border-border bg-card p-4">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start">
         
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-medium text-zinc-900">Two-factor authentication</p>
-          <p className="mt-1 text-xs text-zinc-500">Require a 6-digit code from an authenticator app on every sign-in.</p>
+          <p className="text-sm font-medium text-foreground">Two-factor authentication</p>
+          <p className="mt-1 text-xs text-muted-foreground">Require a 6-digit code from an authenticator app on every sign-in.</p>
         </div>
         <button
           onClick={startEnroll}
           disabled={busy}
-          className="inline-flex shrink-0 items-center justify-center gap-1.5 self-start rounded-lg bg-zinc-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-zinc-800 disabled:opacity-50"
+          className="inline-flex shrink-0 items-center justify-center gap-1.5 self-start rounded-full bg-foreground px-4 py-1.5 text-xs font-medium text-background hover:opacity-90 disabled:opacity-50"
         >
           {busy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Shield className="h-3.5 w-3.5" />}
           Enable
