@@ -206,7 +206,7 @@ export function apexRedirectTarget(url: URL): string | null {
     // but a path belonging to another section goes to that section's host
     // (e.g. dash.jenvu.com/help -> support.jenvu.com/).
     if (sub === "dash" || SECTION_HOSTS[host]) {
-      if (isGlobalPath(p)) {
+      if (isGlobalPath(p) && !(sub === "dash" && dashInternal(p))) {
         const next = new URL(url);
         if (p === "/auth") {
           next.hostname = AUTH_HOST;
@@ -291,7 +291,7 @@ export function apexRedirectTarget(url: URL): string | null {
     // Clean dashboard child URLs: /alerts, /billing, /admin/*
     if (segments.length >= 1) {
       const child = segments[0];
-      if (child === "admin" || DASHBOARD_CHILDREN.has(child)) {
+      if (child === "admin" || (DASHBOARD_CHILDREN.has(child) && !isGlobalPath(p))) {
         const next = new URL(url);
         next.hostname = dashHost;
         next.pathname = p;
@@ -360,7 +360,7 @@ export function rewriteInput(url: URL): URL | undefined {
 
   // Dashboard child paths: /alerts -> /dashboard/alerts
   const segments = p.split("/").filter(Boolean);
-  if (segments.length === 1 && DASHBOARD_CHILDREN.has(segments[0])) {
+  if (segments.length === 1 && DASHBOARD_CHILDREN.has(segments[0]) && !isGlobalPath(p)) {
     const next = new URL(url);
     next.pathname = `/dashboard/${segments[0]}`;
     return next;
