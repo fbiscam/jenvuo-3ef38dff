@@ -22,7 +22,7 @@ export const FAQ = [
   ["When does JX Bot trade?", "New trades open Monday to Thursday between 01:00 and 14:00 broker time and on Friday until 13:00. The bot skips the London open (07:00–09:00 UTC), the New York open (13:00–15:00 UTC) and weekends. It stops for the day at your plan's daily target or 4% of the balance, whichever is lower, or at the 4.7% drawdown guard."],
   ["Who can use the Terminal?", "The Terminal is reserved for approved Founding Program members, free of cost. Pro, Elite and Ultra cover JX Bot and the Top AI Models."],
   ["Can I cancel anytime?", "Yes. Plans are month-to-month with no lock-in. You keep access until the end of the period you already paid for."],
-  ["What markets are covered?", "Fiber only. Jenvu focuses on Fiber."],
+  ["What markets are covered?", "The Terminal covers Gold (XAU/USD), Bitcoin (BTC/USD) and Euro (EUR/USD). JX Bot trades EUR/USD only."],
 ];
 
 export const Route = createFileRoute("/pricing")({
