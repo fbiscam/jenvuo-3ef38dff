@@ -22,7 +22,7 @@ import starsPlain from "@/assets/platform/stars-plain.jpg";
 /* ---------- Dark product cards (Platform "Powered by frontier models" look) ---------- */
 
 const PRODUCTS = [
-  { name: "Fiber Terminal", a: "Live chart with sweeps, FVGs and killzones", b: "Seven engines read every candle", to: "/ai-engine", tag: "Charts", img: starsNebula, flip: "none" },
+  { name: "Jenvu Terminal", a: "Live chart with sweeps, FVGs and killzones", b: "Seven engines read every candle", to: "/ai-engine", tag: "Charts", img: starsNebula, flip: "none" },
   { name: "Ask Jenvu", a: "Plain-English answers about Gold", b: "Top AI models in one chat", to: "/llm", tag: "AI desk", img: starsPlain, flip: "none" },
   { name: "JX Bot", a: "MetaTrader 5 Expert Advisor", b: "Stop loss on every trade, daily auto-stop", to: "/download", tag: "Automation", img: starsPlain, flip: "rotate(180deg)" },
   { name: "API Platform", a: "One OpenAI-compatible key", b: "Pay as you go from your AI credit", to: "/platform", tag: "Developers", img: starsPlain, flip: "scaleX(-1)" },
@@ -154,7 +154,7 @@ export function HomeExperiences() {
         <p className={sectionLead}>
           {tab === "chat"
             ? "Ask Jenvu about the market in plain English and get clear, cautious answers."
-            : "See sweeps, gaps and killzones marked on a live Fiber chart."}
+            : "See sweeps, gaps and killzones marked on a live Gold, Bitcoin or EUR/USD chart."}
         </p>
         <div className="relative mx-auto mt-10 h-[420px] max-w-[760px] overflow-hidden rounded-md bg-background p-5 ring-1 ring-gc-line/60 sm:h-[440px] sm:p-8">
           <div className="absolute inset-x-0 top-0 h-1.5" style={{ backgroundImage: "var(--platform-aurora-2)" }} />
@@ -215,7 +215,7 @@ export function HomeUseCases() {
   return (
     <section className="bg-background px-5 py-16 text-center sm:px-8 sm:py-20">
       <div className="mx-auto max-w-6xl">
-        <h2 className={sectionTitle}>Use cases for every Fiber trader</h2>
+        <h2 className={sectionTitle}>Use cases for every Gold, Bitcoin and EUR/USD trader</h2>
         <p className={sectionLead}>From your first chart to a running bot, pick where you want to start.</p>
         <div className="mt-7 flex flex-wrap justify-center gap-3">
           <Link to="/auth" search={{ mode: "signup" } as never} className={pillDark}>

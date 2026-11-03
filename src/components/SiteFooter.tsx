@@ -76,7 +76,7 @@ const columns: FooterGroup[][] = [
   [
     { label: "Products", links: [
       { to: "/ai-engine", label: "Ask Jenvu" },
-      { to: "/dashboard/terminal", label: "Fiber Terminal" },
+      { to: "/dashboard/terminal", label: "Jenvu Terminal" },
       { to: "/jx-bot", label: "JX Bot" },
       { to: "/dashboard/notifications", label: "Alerts" },
       { to: "/models", label: "Models" },
@@ -159,12 +159,15 @@ export default function SiteFooter({ className }: { className?: string }) {
               <NewsletterSubscribe />
               <div className="flex flex-wrap items-center gap-3">
                 <ThemeToggle />
-                <Link to="/platform" className="inline-flex items-center rounded-full border border-border px-4 py-1.5 text-[13px] font-medium text-foreground transition-colors hover:bg-muted">
-                  Built with Jenvu
-                </Link>
-                <span className="inline-flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-[13px] text-muted-foreground">
-                  <Globe className="h-3.5 w-3.5" aria-hidden /> English
-                </span>
+                {/* "Built with Jenvu" and "English" always sit side by side. */}
+                <div className="flex flex-nowrap items-center gap-2">
+                  <Link to="/platform" className="inline-flex items-center whitespace-nowrap rounded-full border border-border px-4 py-1.5 text-[13px] font-medium text-foreground transition-colors hover:bg-muted">
+                    Built with Jenvu
+                  </Link>
+                  <span className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border border-border px-3 py-1.5 text-[13px] text-muted-foreground">
+                    <Globe className="h-3.5 w-3.5" aria-hidden /> English
+                  </span>
+                </div>
               </div>
             </div>
           </div>

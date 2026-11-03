@@ -222,10 +222,10 @@ function KillzonesPage() {
       <SiteHeader />
       <main className="jenvu-home-content mx-auto max-w-[1296px] px-5 pb-16 sm:px-8">
         <div className="pb-10 pt-12 text-center md:pt-14">
-          <span className="jenvu-rise inline-flex rounded-full bg-gc-blue-soft px-3 py-1 text-[13px] font-medium text-gc-blue-deep">Free tool · Fiber</span>
-          <h1 className="jenvu-rise mt-5 text-[40px] font-medium leading-[1.1] tracking-[-0.5px] sm:text-[56px]">Fiber killzones, live</h1>
+          <span className="jenvu-rise inline-flex rounded-full bg-gc-blue-soft px-3 py-1 text-[13px] font-medium text-gc-blue-deep">Free tool · Gold</span>
+          <h1 className="jenvu-rise mt-5 text-[40px] font-medium leading-[1.1] tracking-[-0.5px] sm:text-[56px]">Gold killzones, live</h1>
           <p className="jenvu-rise [animation-delay:80ms] mx-auto mt-5 max-w-[720px] text-[17px] leading-[1.6] text-gc-ink-muted">
-            ICT / SMC session windows for Fiber — shown in UTC and your local time, with a live in/out status.
+            ICT / SMC session windows for Gold — shown in UTC and your local time, with a live in/out status.
           </p>
         </div>
 
@@ -402,7 +402,7 @@ function KillzonesPage() {
         </div>
 
         <p className="mt-10 text-center text-[13px] text-gc-ink-muted">
-          Local times are converted from UTC using your device timezone. Killzones show when Fiber is usually most active — they don't guarantee a setup.
+          Local times are converted from UTC using your device timezone. Killzones show when Gold is usually most active — they don't guarantee a setup.
         </p>
       </main>
       <div className="hide-in-pwa"><BlogFooter /></div>

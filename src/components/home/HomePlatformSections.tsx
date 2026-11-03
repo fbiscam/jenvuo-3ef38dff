@@ -19,7 +19,7 @@ import { pillDark, pillLight, sectionLead, sectionTitle } from "@/components/hom
 /* Platform-page style sections for the homepage: stats, read/ask/automate, trust and get started. */
 
 const STATS: Array<{ v: string; t: string; g: number }> = [
-  { v: "7", t: "analysis engines reading every Fiber candle", g: 1 },
+  { v: "7", t: "analysis engines reading every Gold candle", g: 1 },
   { v: "5", t: "timeframes from 5M to 4H, checked live", g: 2 },
   { v: "14 days", t: "of Pro access free for new sign-ups", g: 3 },
   { v: "$100", t: "credit for the top AI models", g: 1 },
@@ -59,7 +59,7 @@ export function HomeReadAskAutomate() {
   return (
     <section className="bg-background px-5 py-20 text-center sm:px-8">
       <div className="mx-auto max-w-6xl">
-        <h2 className={sectionTitle}>The all-in-one desk for Fiber traders</h2>
+        <h2 className={sectionTitle}>The all-in-one desk for Gold, Bitcoin and EUR/USD traders</h2>
         <p className={sectionLead}>Read the chart, ask the AI and automate on MT5, all from one account.</p>
         <div className="mt-12 grid gap-6 text-left md:grid-cols-3">
           <Link to="/pricing" className="group block">
@@ -69,7 +69,7 @@ export function HomeReadAskAutomate() {
                   <span className="h-2 w-2 rounded-full bg-gc-red" />
                   <span className="h-2 w-2 rounded-full bg-gc-yellow" />
                   <span className="h-2 w-2 rounded-full bg-gc-green" />
-                  <span className="ml-3 text-[11px] font-medium text-gc-ink">Fiber · 15M</span>
+                  <span className="ml-3 text-[11px] font-medium text-gc-ink">Gold · 15M</span>
                 </div>
                 <svg viewBox="0 0 200 120" className="h-[calc(100%-32px)] w-full p-3" aria-hidden="true">
                   <line x1="0" x2="200" y1="22" y2="22" strokeDasharray="3 3" className="stroke-gc-blue" strokeWidth="0.8" />
@@ -189,7 +189,7 @@ export function HomeGetStarted() {
             <div className="flex flex-1 flex-col p-7 sm:p-8">
               <h3 className="text-2xl font-medium text-gc-ink">Trade with Jenvu</h3>
               <div className="flex-1">
-                <Ticks items={["14 days of Pro access and $100 credit", "Fiber Terminal, AI desk and alerts", "JX Bot for MetaTrader 5"]} />
+                <Ticks items={["14 days of Pro access and $100 credit", "Jenvu Terminal, AI desk and alerts", "JX Bot for MetaTrader 5"]} />
               </div>
               <div className="mt-8">
                 <Link to="/auth" search={{ mode: "signup" } as never} className={pillDark}>

@@ -121,9 +121,9 @@ function PricingPage() {
       {/* START FOR FREE + STATS */}
       <section className="mx-auto grid max-w-[1296px] items-center gap-10 px-5 py-10 sm:px-8 md:grid-cols-2 md:gap-14 lg:px-[72px]">
         <div>
-          <h2 className="text-[30px] font-medium leading-tight tracking-tight sm:text-[36px]">Start trading Fiber for free</h2>
+          <h2 className="text-[30px] font-medium leading-tight tracking-tight sm:text-[36px]">Start trading Gold, Bitcoin and EUR/USD for free</h2>
           <p className="mt-5 text-[17px] leading-[1.65] text-gc-ink-muted">
-            Create an account to see how Jenvu reads the Fiber market in real time. New users get{" "}
+            Create an account to see how Jenvu reads the Gold, Bitcoin and EUR/USD markets in real time. New users get{" "}
             <Link to="/auth" search={{ mode: "signup" } as never} className={LINK}>$100 in free credit</Link> to run the AI desk, plus{" "}
             <a href="#plans" className={LINK}>14 days of Pro access</a>, started with one click from the dashboard.
           </p>

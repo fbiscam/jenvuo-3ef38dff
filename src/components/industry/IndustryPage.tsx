@@ -557,7 +557,7 @@ function GetStarted() {
           <div className="flex flex-col rounded-md border border-gc-line p-7 sm:p-8">
             <h3 className="text-2xl font-medium">Start on your own</h3>
             <div className="flex-1">
-              <Ticks items={["Open the live Fiber Terminal", "Ask the AI desk about the chart", "Compare plans and credits"]} />
+              <Ticks items={["Open the live Jenvu Terminal", "Ask the AI desk about the chart", "Compare plans and credits"]} />
             </div>
             <div className="mt-8 flex flex-wrap gap-3">
               {user ? (

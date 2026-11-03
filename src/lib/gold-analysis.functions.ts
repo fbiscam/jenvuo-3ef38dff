@@ -1564,6 +1564,9 @@ const EUR_YAHOO: Record<string, { interval: string; range: string }> = {
   "15m": { interval: "15m", range: "1mo" },
   "30m": { interval: "30m", range: "1mo" },
   "1h": { interval: "60m", range: "1y" },
+  // Today's 5m candles rebuild the forming hour: Yahoo's own forming 60m bar
+  // stays flat (open = close) until the hour ends.
+  "5m-today": { interval: "5m", range: "1d" },
 };
 
 async function fetchYahooEurCandles(fetchTf: string): Promise<Candle[]> {
@@ -1589,7 +1592,7 @@ async function fetchYahooEurCandles(fetchTf: string): Promise<Candle[]> {
         if (![o, h, l, c].every((x) => typeof x === "number" && Number.isFinite(x) && x > 0)) continue;
         out.push({ t: ts[i] * 1000, o: r5(o), h: r5(h), l: r5(l), c: r5(c), v: 0 });
       }
-      if (out.length < 50) throw new Error("too few candles");
+      if (out.length < (fetchTf === "5m-today" ? 1 : 50)) throw new Error("too few candles");
       return out;
     } catch (e) {
       lastErr = e;
@@ -1611,6 +1614,12 @@ async function loadEurTerminalChart(tf: string): Promise<TerminalChartPayload> {
     // Real interbank EUR/USD first (5 decimals, no weekend prints); Binance EURUSDT
     // is a thin 4-decimal crypto proxy that made blocky candles and weekend bars.
     candles = await fetchYahooEurCandles(fetchTf);
+    if (fetchTf === "1h") {
+      const hourStart = Math.floor(Date.now() / 3_600_000) * 3_600_000;
+      const recent = await fetchYahooEurCandles("5m-today").catch(() => [] as Candle[]);
+      const fresh = recent.filter((c) => c.t >= hourStart);
+      if (fresh.length) candles = [...candles.filter((c) => c.t < hourStart), ...fresh];
+    }
   } catch {
     try {
       candles = await Promise.any([
@@ -1629,7 +1638,10 @@ async function loadEurTerminalChart(tf: string): Promise<TerminalChartPayload> {
     if (![c.t, c.o, c.h, c.l, c.c].every(Number.isFinite)) continue;
     const bucket = sessionBucketMs(c.t, step);
     const prev = byBucket.get(bucket);
-    byBucket.set(bucket, prev && fetchTf !== tf
+    // Always merge into the bucket: Yahoo appends the live quote as an extra
+    // unaligned row (open = close), which used to overwrite the forming candle
+    // and leave it as a flat dash.
+    byBucket.set(bucket, prev
       ? { ...prev, h: Math.max(prev.h, c.h), l: Math.min(prev.l, c.l), c: c.c, v: (prev.v || 0) + (c.v || 0) }
       : c);
   }
