@@ -251,8 +251,18 @@ const BACKUP_CHAT_MODEL = "openai/gpt-6-luna";
 // Lovable AI first. Set to false once CodeCraft is topped up again.
 const LOVABLE_CHAT_FIRST = true;
 
-// Owner's AWS Bedrock key: best live-tested models, tried before anything else.
-const AWS_FIRST = true;
+// OmniRoute (CUSTOM_AI_BASE_URL) answers every non-exact AI job first, as the
+// owner asked; all four models live-tested OK on 2026-11-03.
+const OMNIROUTE_FIRST = true;
+export const OMNIROUTE_BEST_CHAIN = [
+  "omniroute/kiro/claude-sonnet-4.5",
+  "omniroute/kr/deepseek-3.2",
+  "omniroute/kr/glm-5",
+  "omniroute/kiro/auto",
+] as const;
+
+// Owner's AWS Bedrock key: off so AWS credits are not used. Set true to re-enable.
+const AWS_FIRST = false;
 export const AWS_BEST_CHAIN = [
   "aws/deepseek.v3.2",
   "aws/zai.glm-5",
@@ -449,7 +459,19 @@ export async function callChatCompletion(
   opts: CallChatOptions,
 ): Promise<{ content: string; model: string; usage: UsageInfo }> {
   const primary = opts.raceModels ? callChatRace : callChatChain;
-  // AWS Bedrock models answer every AI job first (best live-tested models).
+  const hasImagesInput = opts.messages.some((m) => Array.isArray(m.content) && m.content.some((p) => p.type === "image_url"));
+  // OmniRoute answers every text AI job first.
+  if (OMNIROUTE_FIRST && !opts.exactModels && !hasImagesInput && process.env.CUSTOM_AI_API_KEY) {
+    const models = [...OMNIROUTE_BEST_CHAIN];
+    try {
+      return opts.raceModels
+        ? await callChatRace({ ...opts, models })
+        : await callChatChain({ ...opts, models, retriesPerModel: 1, attemptTimeoutMs: opts.attemptTimeoutMs ?? 60000 });
+    } catch (omniErr) {
+      console.warn(`[ai] ${opts.stage ?? "chat"}: OmniRoute models failed, trying next provider`, (omniErr as Error)?.message);
+    }
+  }
+  // AWS Bedrock (off while AWS_FIRST is false).
   if (AWS_FIRST && !opts.exactModels && process.env.AWS_API_KEY) {
     const hasImages = opts.messages.some((m) => Array.isArray(m.content) && m.content.some((p) => p.type === "image_url"));
     const models = [...(hasImages ? AWS_VISION_CHAIN : AWS_BEST_CHAIN)];
