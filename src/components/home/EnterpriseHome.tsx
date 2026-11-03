@@ -536,8 +536,8 @@ export function EntStories({ articles: items }: { articles: HomeArticle[] }) {
               <p className="mt-4 text-[14px] text-muted-foreground">
                 {a.category ? `${a.category} · ` : ""}{newsDate(a.published_at)}
               </p>
-              <p className="mt-1.5 inline-flex items-start gap-1 text-[17px] font-medium leading-snug tracking-tight text-foreground">
-                <span>{shortTitle(a.title)}</span>
+              <p className="mt-1.5 flex items-center gap-1 text-[17px] font-medium leading-snug tracking-tight text-foreground">
+                <span className="min-w-0 truncate" title={shortTitle(a.title)}>{shortTitle(a.title)}</span>
                 <ChevronRight className="mt-[3px] h-4 w-4 shrink-0 transition-transform group-hover:translate-x-0.5" />
               </p>
             </Link>

@@ -157,10 +157,9 @@ export default function SiteFooter({ className }: { className?: string }) {
             </div>
             <div className="space-y-5">
               <NewsletterSubscribe />
-              <div className="flex flex-wrap items-center gap-3">
+              <div className="flex flex-nowrap items-center gap-2">
                 <ThemeToggle />
-                {/* "Built with Jenvu" and "English" always sit side by side. */}
-                <div className="flex flex-nowrap items-center gap-2">
+                {/* Theme button, "Built with Jenvu" and "English" always sit on one line. */}
                   <Link to="/platform" className="inline-flex items-center whitespace-nowrap rounded-full border border-border px-4 py-1.5 text-[13px] font-medium text-foreground transition-colors hover:bg-muted">
                     Built with Jenvu
                   </Link>
