@@ -80,8 +80,8 @@ const SignalChart = forwardRef<SignalChartHandle, Props>(function SignalChart(
   useEffect(() => {
     if (!containerRef.current) return;
     const chart = createChart(containerRef.current, {
-      // Hide the TradingView logo in the bottom-left corner.
-      layout: {
+            layout: {
+        attributionLogo: false,
         background: { color: "transparent" },
         textColor: dark ? "#d4d4d8" : "#262626",
         fontFamily: '"Google Sans Flex", "Google Sans", "Product Sans", system-ui, sans-serif',
