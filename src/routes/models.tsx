@@ -1,6 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import SiteHeader from "@/components/SiteHeader";
-import BlogFooter from "@/components/BlogFooter";
+import { PageShell } from "@/components/PageShell";
 import ModelsExplorer from "@/components/models/ModelsExplorer";
 
 export const Route = createFileRoute("/models")({
@@ -21,12 +20,13 @@ export const Route = createFileRoute("/models")({
 
 function ModelsPage() {
   return (
-    <div className="min-h-screen bg-background">
-      <SiteHeader />
-      <main>
-        <ModelsExplorer apiHref="/dashboard/api" />
-      </main>
-      <BlogFooter />
-    </div>
+    <PageShell
+      eyebrow="Models"
+      title="Discover models on Jenvu"
+      intro="Every model you can call with one Jenvu API key — Claude, GPT, Gemini, DeepSeek, Qwen, Grok and more — at one flat price per million tokens."
+      wide
+    >
+      <ModelsExplorer apiHref="/docs" inShell />
+    </PageShell>
   );
 }
