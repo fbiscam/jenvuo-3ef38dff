@@ -18,7 +18,6 @@ import {
   ArrowUpRight,
   Camera,
   Circle,
-  Code,
   Eye,
   EyeOff,
   Layers,
