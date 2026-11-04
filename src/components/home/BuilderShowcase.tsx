@@ -119,7 +119,7 @@ function ResearchScene() {
         <span className="exa-type overflow-hidden whitespace-nowrap">Top 3 gold drivers</span>
         <span className="exa-caret ml-0.5 h-3.5 w-px shrink-0 bg-exa-ink" />
       </div>
-      <div className="absolute inset-x-[6%] bottom-[11%] top-[28%] overflow-hidden rounded-[3px] bg-gc-night px-[5%] py-[4%] font-mono text-[10px] leading-[1.55] text-exa-paper shadow-2xl">
+      <div className="absolute inset-x-[6%] bottom-[8%] top-[26%] overflow-hidden rounded-[3px] bg-gc-night px-[5%] py-[4%] font-mono text-[9.5px] leading-[1.42] text-exa-paper shadow-2xl">
         {JSON_LINES.map((l, k) => (
           <div key={k} className="exa-line whitespace-nowrap" style={{ paddingLeft: l.i * 12, animationDelay: `${k * 0.12}s` }}>
             {l.t.split(/("[^"]*")/g).map((part, j) =>
