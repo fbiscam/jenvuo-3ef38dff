@@ -24,7 +24,7 @@ import {
   CloudHero,
 
 } from "@/components/home/CloudHome";
-import { EntHero, EntShowcase, EntBuilt, EntDevelopers, EntStories } from "@/components/home/EnterpriseHome";
+import { EntHero, EntShowcase, EntBuilt, EntFacts, EntStories } from "@/components/home/EnterpriseHome";
 import { homeArticlesQueryOptions, type HomeArticle } from "@/lib/home-articles";
 import { GetStartedSection } from "@/components/platform/GetStartedSection";
 import { AllInOnePlatformSection } from "@/components/platform/AllInOnePlatformSection";
@@ -399,7 +399,7 @@ function HomePage() {
           <EntShowcase />
           <EntBuilt />
           <AllInOnePlatformSection />
-          <EntDevelopers />
+          <EntFacts />
           <EntStories articles={homeArticles} />
           <GetStartedSection />
         </main>
