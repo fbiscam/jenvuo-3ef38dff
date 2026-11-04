@@ -44,7 +44,7 @@ export function GetStartedSection() {
       <div className="mx-auto max-w-6xl px-5">
         <h2 className="text-4xl font-medium tracking-tight sm:text-5xl">Get started</h2>
         <div className="mt-10 grid gap-6 text-left md:grid-cols-2">
-          <div className="flex flex-col rounded-md border border-gc-line bg-background p-7 sm:p-8">
+          <div className="flex flex-col get-started-card rounded-md border border-gc-line p-7 sm:p-8">
             <h3 className="text-2xl font-medium">Partner with us on your AI plans</h3>
             <div className="flex-1">
               <Ticks
@@ -59,7 +59,7 @@ export function GetStartedSection() {
               <Link to="/contact" className={pillDark}>Contact sales</Link>
             </div>
           </div>
-          <div className="flex flex-col rounded-md border border-gc-line bg-background p-7 sm:p-8">
+          <div className="flex flex-col get-started-card rounded-md border border-gc-line p-7 sm:p-8">
             <h3 className="text-2xl font-medium">Build on your own</h3>
             <div className="flex-1">
               <Ticks
