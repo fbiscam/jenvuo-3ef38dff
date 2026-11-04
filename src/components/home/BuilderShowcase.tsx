@@ -173,7 +173,7 @@ export function BuilderShowcase() {
       <ShowCard
         scene={<SwarmScene />}
         title="The context your trading agent needs"
-        body="Broad coverage across market, news and code sources so your agent always has the right context."
+        body="Broad coverage across market, news and code sources so your agent always has right context."
         cta="Use our search API"
         to="/docs"
       />
