@@ -4,7 +4,6 @@ import { siteSearch, type SearchHit } from "@/lib/site-search.functions";
 import { askJenvu, type AskJenvuResult } from "@/lib/ask-jenvu.functions";
 import { MessageResponse } from "@/components/ai-elements/message";
 import { Shimmer } from "@/components/ai-elements/shimmer";
-import { JENVU_MARK_URL as askJenvuMark } from "@/components/JenvuMark";
 import GiftBox from "@/components/dashboard/GiftBox";
 import { SITE_PAGES } from "@/lib/site-pages";
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
