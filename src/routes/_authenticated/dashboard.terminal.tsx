@@ -815,14 +815,8 @@ function TerminalPage() {
                 "relative flex h-[45%] min-h-0 w-full shrink-0 flex-col overflow-hidden border-t border-border bg-card text-card-foreground lg:h-full lg:w-[380px] lg:border-l lg:border-t-0",
               )}
             >
-              <div className="flex min-h-17 items-center gap-2.5 px-4 py-3">
-                <JenvuMark className="h-6 w-6 shrink-0 text-foreground" />
-                <div className="min-w-0 flex-1">
-                  <h2 className="truncate text-sm font-semibold leading-5">Ask Jenvu</h2>
-                  <p className="truncate text-[11px] leading-4 text-muted-foreground">
-                    Live chart desk · Claude Sonnet 4.5
-                  </p>
-                </div>
+              <div className="flex items-center justify-end gap-1 px-3 py-2">
+                <h2 className="sr-only">Ask Jenvu</h2>
                 <Button
                   type="button"
                   variant="ghost"

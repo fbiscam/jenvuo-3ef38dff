@@ -109,10 +109,6 @@ export default function HeaderSearch({ onClose }: { onClose: () => void }) {
 
         {showPanel && showAnswer && (
           <div className="border-b border-gc-line bg-background px-5 py-4">
-            <div className="mb-3 flex items-center gap-2 text-[13px] font-medium text-gc-ink">
-              <JenvuMark className="h-4 w-4 shrink-0" />
-              Ask Jenvu
-            </div>
             {answer.res === null ? (
               <div className="flex items-center gap-2.5 text-[14px]">
                 <JenvuMark className="h-5 w-5 shrink-0 animate-pulse" />
