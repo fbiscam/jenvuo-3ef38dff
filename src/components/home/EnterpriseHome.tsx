@@ -1,5 +1,4 @@
 import * as React from "react";
-import { Button } from "@/components/ui/button";
 import { Link } from "@tanstack/react-router";
 import { ArrowRight, ArrowUp, ArrowUpRight, Bell, Bot, ChevronRight, Code2, MessageCircle, Plus, Sparkles } from "lucide-react";
 import { openAskJenvu } from "@/components/AskJenvuWidget";
@@ -310,42 +309,6 @@ export function EntShowcase() {
   );
 }
 
-/* Small white squares at the four corners of the coral panels (reference look). */
-function CornerMarks() {
-  const c = "pointer-events-none absolute z-10 h-2 w-2 bg-dev-mark";
-  return (
-    <>
-      <span className={`${c} left-3 top-3`} />
-      <span className={`${c} right-3 top-3`} />
-      <span className={`${c} bottom-3 left-3`} />
-      <span className={`${c} bottom-3 right-3`} />
-    </>
-  );
-}
-
-/* Light-theme syntax colouring for the developer code window. */
-const SYN_KEYWORDS = new Set(["from", "import", "const", "await", "new", "print", "curl", "return", "async"]);
-function highlight(code: string) {
-  return code.split("\n").map((line, li) => {
-    const parts = line.split(/("(?:[^"\\]|\\.)*"|'[^']*'|\/\/.*$|#.*$|\b\d+(?:\.\d+)?\b|\b[A-Za-z_]+\b)/g);
-    return (
-      <div key={li} className="flex gap-4">
-        <span className="w-5 shrink-0 select-none text-right text-dev-window-muted">{li + 1}</span>
-        <span className="whitespace-pre">
-          {parts.map((p, i) => {
-            if (!p) return null;
-            if (p.startsWith("//") || p.startsWith("#")) return <span key={i} className="text-dev-syn-com">{p}</span>;
-            if (p.startsWith('"') || p.startsWith("'")) return <span key={i} className="text-dev-syn-str">{p}</span>;
-            if (/^\d/.test(p)) return <span key={i} className="text-dev-syn-num">{p}</span>;
-            if (SYN_KEYWORDS.has(p)) return <span key={i} className="text-dev-syn-key">{p}</span>;
-            return <span key={i}>{p}</span>;
-          })}
-        </span>
-      </div>
-    );
-  });
-}
-
 /* 3 — Built for business: 3 cards, text on top, visual bleeding off the right/bottom edge */
 function Card({ title, body, children }: { title: string; body: string; children: React.ReactNode }) {
   return (
@@ -354,10 +317,7 @@ function Card({ title, body, children }: { title: string; body: string; children
         <h3 className="text-[21px] font-medium tracking-tight text-foreground">{title}</h3>
         <p className="mt-3 max-w-[360px] text-[16px] leading-[1.6] text-foreground/85">{body}</p>
       </div>
-      <div className="dev-coral relative mx-4 mb-4 mt-auto h-[300px] overflow-hidden rounded-[6px]">
-        <CornerMarks />
-        {children}
-      </div>
+      <div className="relative mt-auto h-[300px]">{children}</div>
     </div>
   );
 }
@@ -612,7 +572,7 @@ console.log(response.choices[0].message.content);`,
 ];
 
 export function EntDevelopers() {
-  const [tab, setTab] = React.useState("curl");
+  const [tab, setTab] = React.useState(DEV_SNIPPETS[0].id);
   const [copied, setCopied] = React.useState(false);
   const active = DEV_SNIPPETS.find((s) => s.id === tab) ?? DEV_SNIPPETS[0];
   const copy = async () => {
@@ -630,15 +590,15 @@ export function EntDevelopers() {
     ["OpenAI", "compatible endpoints"],
   ];
   return (
-    <section className="px-5 py-16 sm:py-20">
-      <div className="mx-auto grid max-w-[1140px] items-center gap-10 lg:grid-cols-2 lg:gap-20">
+    <section className="px-5 py-24">
+      <div className="mx-auto grid max-w-7xl items-center gap-12 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-16">
         <div>
-          <span className="text-[13px] text-muted-foreground">
-            For developers
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-muted px-3 py-1 text-[13px] font-medium text-foreground">
+            <Code2 className="h-3.5 w-3.5" /> For developers
           </span>
-          <h2 className="mt-4 text-[36px] font-medium leading-[1.05] text-foreground sm:text-[44px]">One API.<br />Every modality.</h2>
-          <p className="mt-4 max-w-[390px] text-[15px] leading-relaxed text-foreground/85">
-            Text, code, images, and chart analysis — all through a single unified API. Start building with your Jenvu key in seconds.
+          <h2 className={`${h2} mt-6`}>One API key. Every frontier model.</h2>
+          <p className="mt-5 max-w-xl text-[18px] leading-relaxed text-muted-foreground">
+            Build on Jenvu with OpenAI-compatible endpoints. Swap two lines in your existing code and reach leading models from every major lab.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Link to="/dashboard/api" className="inline-flex items-center gap-1.5 rounded-full bg-foreground px-6 py-3 text-[15px] font-medium text-background transition hover:opacity-90">
@@ -648,55 +608,50 @@ export function EntDevelopers() {
               Read the docs
             </Link>
           </div>
-          <dl className="mt-8 grid max-w-[370px] grid-cols-3 gap-4">
+          <dl className="mt-12 grid grid-cols-3 gap-4 border-t border-border pt-8">
             {stats.map(([n, t]) => (
               <div key={t}>
-                <dt className="text-[14px] font-medium leading-none text-foreground">{n}</dt>
-                <dd className="mt-1.5 text-[11px] leading-snug text-muted-foreground">{t}</dd>
+                <dt className="text-[28px] font-medium leading-none tracking-tight text-foreground sm:text-[34px]">{n}</dt>
+                <dd className="mt-2 text-[14px] leading-snug text-muted-foreground">{t}</dd>
               </div>
             ))}
           </dl>
         </div>
 
-        <div className="min-w-0">
-        <div className="dev-coral relative overflow-hidden px-5 py-8 sm:px-10 sm:py-10">
-          <CornerMarks />
-          <div className="overflow-hidden rounded-[8px] bg-dev-window text-dev-window-fg shadow-xl">
-            <div className="flex items-center justify-between gap-3 border-b border-dev-window-line px-4 py-3">
-              <div className="flex items-center gap-1.5">
-                <span className="h-3 w-3 rounded-full bg-gc-red" />
-                <span className="h-3 w-3 rounded-full bg-gc-yellow" />
-                <span className="h-3 w-3 rounded-full bg-gc-green" />
-              </div>
-              <Button variant="ghost" size="sm"
-                type="button"
-                onClick={copy}
-                className="h-6 px-1 text-[11px] text-dev-window-muted"
-              >
-                {copied ? "Copied" : "Copy"}
-              </Button>
+        <div className="min-w-0 overflow-hidden rounded-[20px] bg-ent-ide text-ent-ide-fg shadow-2xl">
+          <div className="flex items-center justify-between gap-3 border-b border-ent-ide-fg/10 px-4 py-3">
+            <div className="flex items-center gap-1.5">
+              <span className="h-3 w-3 rounded-full bg-ent-ide-fg/25" />
+              <span className="h-3 w-3 rounded-full bg-ent-ide-fg/25" />
+              <span className="h-3 w-3 rounded-full bg-ent-ide-fg/25" />
             </div>
-            <pre className="h-[230px] overflow-auto px-3 py-4 font-mono text-[11px] leading-[1.9]">
-              <code>{highlight(active.code)}</code>
-            </pre>
+            <button
+              type="button"
+              onClick={copy}
+              className="rounded-md px-2.5 py-1 text-[12px] font-medium text-ent-ide-fg/80 transition hover:bg-ent-ide-fg/10 hover:text-ent-ide-fg"
+            >
+              {copied ? "Copied" : "Copy"}
+            </button>
           </div>
-        </div>
-            <div className="no-scrollbar mt-3 flex gap-1 overflow-x-auto px-1 py-1" role="tablist">
-              {DEV_SNIPPETS.map((s) => (
-                <Button variant="ghost" size="sm"
-                  key={s.id}
-                  type="button"
-                  role="tab"
-                  aria-selected={s.id === tab}
-                  onClick={() => setTab(s.id)}
-                  className={`shrink-0 whitespace-nowrap rounded-full border px-3.5 py-1.5 text-[13px] font-medium transition ${
-                    s.id === tab ? "border-foreground text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"
-                  }`}
-                >
-                  {s.label}
-                </Button>
-              ))}
-            </div>
+          <div className="no-scrollbar flex gap-1 overflow-x-auto border-b border-ent-ide-fg/10 px-3 py-2" role="tablist">
+            {DEV_SNIPPETS.map((s) => (
+              <button
+                key={s.id}
+                type="button"
+                role="tab"
+                aria-selected={s.id === tab}
+                onClick={() => setTab(s.id)}
+                className={`shrink-0 whitespace-nowrap rounded-md px-3 py-1.5 text-[13px] font-medium transition ${
+                  s.id === tab ? "bg-ent-ide-fg/15 text-ent-ide-fg" : "text-ent-ide-fg/60 hover:text-ent-ide-fg"
+                }`}
+              >
+                {s.label}
+              </button>
+            ))}
+          </div>
+          <pre className="h-[400px] overflow-auto p-5 font-mono text-[13px] leading-[1.7]">
+            <code>{active.code}</code>
+          </pre>
         </div>
       </div>
     </section>
