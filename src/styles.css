@@ -169,6 +169,7 @@
   --color-exa-hl: var(--exa-hl);
   --color-exa-ink: var(--exa-ink);
   --color-exa-paper: var(--exa-paper);
+  --color-exa-key: var(--exa-key);
 }
 
 :root {
@@ -2472,6 +2473,7 @@ html body :is(.dark, .dash-dark) .vsc-studio .tok-var { color: #a8dcff !importan
   --exa-hl: oklch(0.86 0.09 245);
   --exa-ink: oklch(0.2 0.02 260);
   --exa-paper: oklch(0.995 0 0);
+  --exa-key: oklch(0.93 0.1 95);
   --dev-coral-bg:
     url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 .22 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"),
     radial-gradient(70% 60% at 20% 10%, oklch(0.78 0.15 45 / 0.9), transparent 60%),
@@ -2500,7 +2502,10 @@ html body :is(.dark, .dash-dark) .vsc-studio .tok-var { color: #a8dcff !importan
 @keyframes exa-hl-in { 0%, 15% { background-size: 0% 100%; } 35%, 85% { background-size: 100% 100%; } 100% { background-size: 0% 100%; } }
 @keyframes exa-line-in { 0%, 8% { opacity: 0; transform: translateY(6px); } 18%, 88% { opacity: 1; transform: none; } 100% { opacity: 0; } }
 @keyframes exa-caret { 50% { opacity: 0; } }
-.exa-swarm { animation: exa-swarm 40s linear infinite; }
+.exa-swarm { animation: exa-breathe 9s ease-in-out infinite; transform-origin: 52% 44%; }
+@keyframes exa-breathe { 0%, 100% { transform: scale(1) rotate(0deg); } 50% { transform: scale(1.06) rotate(4deg); } }
+@keyframes exa-type { 0% { max-width: 0; } 45%, 85% { max-width: 20ch; } 100% { max-width: 0; } }
+.exa-type { animation: exa-type 7s steps(18) infinite; }
 .exa-dot { animation: exa-twinkle 3.2s ease-in-out infinite; }
 .exa-float { animation: exa-float 5s ease-in-out infinite; }
 .exa-hl {
@@ -2513,7 +2518,7 @@ html body :is(.dark, .dash-dark) .vsc-studio .tok-var { color: #a8dcff !importan
 .exa-line { opacity: 0; animation: exa-line-in 7s ease-out infinite; }
 .exa-caret { animation: exa-caret 1s step-end infinite; }
 @media (prefers-reduced-motion: reduce) {
-  .exa-swarm, .exa-dot, .exa-float, .exa-caret { animation: none; }
+  .exa-swarm, .exa-dot, .exa-float, .exa-caret, .exa-type { animation: none; }
   .exa-hl { animation: none; background-size: 100% 100%; }
   .exa-line { animation: none; opacity: 1; }
 }
