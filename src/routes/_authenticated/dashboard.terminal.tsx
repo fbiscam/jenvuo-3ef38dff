@@ -608,7 +608,7 @@ function TerminalPage() {
 
   async function send(message: { text: string; files?: FileUIPart[] }) {
     const image = message.files?.find((file) => file.mediaType?.startsWith("image/") && file.url);
-    const query = message.text.trim() || (image ? "Analyze this XAU/USD chart screenshot." : "");
+    const query = message.text.trim() || (image ? "Analyze this chart screenshot." : "");
     if (!query || sendLockedRef.current || ask.isPending) return;
     sendLockedRef.current = true;
     // The AI desk always reads the exact chart state (drawings, indicators,
