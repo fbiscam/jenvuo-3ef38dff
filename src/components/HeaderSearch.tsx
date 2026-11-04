@@ -7,7 +7,7 @@ import { askJenvu, type AskJenvuResult } from "@/lib/ask-jenvu.functions";
 import { SITE_PAGES, matchSitePages } from "@/lib/site-pages";
 import { MessageResponse } from "@/components/ai-elements/message";
 import { Shimmer } from "@/components/ai-elements/shimmer";
-import JenvuMark, { JENVU_MARK_URL as askJenvuMark } from "@/components/JenvuMark";
+import JenvuMark from "@/components/JenvuMark";
 
 /**
  * Header search that opens in place of the top menu (Google Cloud style).
@@ -115,7 +115,7 @@ export default function HeaderSearch({ onClose }: { onClose: () => void }) {
             </div>
             {answer.res === null ? (
               <div className="flex items-center gap-2.5 text-[14px]">
-                <span aria-hidden className="ask-jenvu-mark-ring h-6 w-10 shrink-0" style={{ ["--mark" as string]: `url(${askJenvuMark})` }}><span className="ask-jenvu-mark-loop h-full w-full" /></span>
+                <JenvuMark className="h-5 w-5 shrink-0 animate-pulse" />
                 <Shimmer>Thinking about your question…</Shimmer>
               </div>
             ) : answer.res.ok ? (

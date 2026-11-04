@@ -4,7 +4,6 @@ import { siteSearch, type SearchHit } from "@/lib/site-search.functions";
 import { askJenvu, type AskJenvuResult } from "@/lib/ask-jenvu.functions";
 import { MessageResponse } from "@/components/ai-elements/message";
 import { Shimmer } from "@/components/ai-elements/shimmer";
-import { JENVU_MARK_URL as askJenvuMark } from "@/components/JenvuMark";
 import GiftBox from "@/components/dashboard/GiftBox";
 import { SITE_PAGES } from "@/lib/site-pages";
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
@@ -208,7 +207,7 @@ export default function DashboardTopBar({
                 </div>
                 {answer.res === null ? (
                   <div className="flex items-center gap-2 text-[13px]">
-                    <span aria-hidden className="ask-jenvu-mark-ring h-6 w-10 shrink-0" style={{ ["--mark" as string]: `url(${askJenvuMark})` }}><span className="ask-jenvu-mark-loop h-full w-full" /></span>
+                    <JenvuMark className="h-5 w-5 shrink-0 animate-pulse" />
                     <Shimmer>Thinking about your question…</Shimmer>
                   </div>
                 ) : answer.res.ok ? (
