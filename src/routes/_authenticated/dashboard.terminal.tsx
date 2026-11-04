@@ -613,19 +613,11 @@ function TerminalPage() {
     if (!query || sendLockedRef.current || ask.isPending) return;
     sendLockedRef.current = true;
     // The AI desk always reads the exact chart state (drawings, indicators,
-    // scripts). When the question is about what is on screen, it also gets a
-    // snapshot of the Jenvu chart so it can see the drawings visually.
+    // scripts) as text, so every question answers through the OmniRoute text
+    // chain — vision providers are only used for images the user attaches.
     const chartContext = chartRef.current?.describe() || undefined;
-    let chartImage = image?.url;
-    let chartShared = false;
-    if (!chartImage && (CHART_INTENT_RE.test(query) || chartRef.current?.hasDrawings())) {
-      const shot = chartRef.current?.snapshot();
-      if (shot && shot.length < MAX_IMAGE_BYTES * 1.3) {
-        chartImage = shot;
-        chartShared = true;
-      }
-    }
-    addMessage({ role: "user", text: query, files: image ? [image] : undefined, chartShared });
+    const chartImage = image?.url;
+    addMessage({ role: "user", text: query, files: image ? [image] : undefined });
     setInput("");
     const history = messagesRef.current
       .filter((m) => m.text.trim().length > 0)
