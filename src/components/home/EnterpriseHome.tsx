@@ -565,7 +565,7 @@ console.log(response.choices[0].message.content);`,
   -d '{
     "model": "claude-sonnet-4.5",
     "messages": [
-      {"role": "user", "content": "Give me today\\'s Gold bias."}
+      {"role": "user", "content": "Give me the Gold bias for today."}
     ]
   }'`,
   },
