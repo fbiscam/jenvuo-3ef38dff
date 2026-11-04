@@ -180,7 +180,7 @@ export function BuilderShowcase() {
       <ShowCard
         scene={<HighlightScene />}
         title="Token-efficient contents highlights"
-        body="Pull only the most relevant excerpts from long pages and reports, so prompts stay short and cheap."
+        body="Pull only the most relevant excerpts from long pages and reports, so prompts short & cheap."
         cta="Try it in the Chat playground"
         to="/dashboard/chat"
       />
