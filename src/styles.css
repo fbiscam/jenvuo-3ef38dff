@@ -643,6 +643,10 @@
 @media (min-width: 1680px) { .jenvu-zoom .jenvu-site-footer { zoom: calc(1 / 1.5); } }
 @media (min-width: 768px) { .pricing-zoom .jenvu-site-footer { zoom: calc(1 / 1.375); } }
 
+/* Public site (homepage + its pages, not the dashboard): 10% smaller on laptop/desktop */
+@media (min-width: 1024px) { .jenvu-public-scale { zoom: 0.9; min-height: calc(100vh / 0.9); } }
+html[data-pwa="1"] .jenvu-public-scale { zoom: 1; }
+
 @media (min-width: 1024px) { .killzones-root { zoom: 1.25; } }
 @media (min-width: 1280px) and (min-height: 800px) { .jenvu-auth-zoom { zoom: 1.21; } }
 
