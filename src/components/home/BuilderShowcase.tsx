@@ -187,7 +187,7 @@ export function BuilderShowcase() {
       <ShowCard
         scene={<ResearchScene />}
         title="Low-latency to research in one API"
-        body="Choose fast answers or deep research, with structured outputs you can drop straight into your app."
+        body="Choose fast answers, deep research, with structured outputs you drop straight into data."
         cta="Integrate Jenvu with your agent"
         to="/docs"
         hash="ai-assistants"
