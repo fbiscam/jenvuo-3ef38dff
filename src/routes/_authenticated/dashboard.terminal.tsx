@@ -99,16 +99,15 @@ const TIMEFRAMES = [
   { key: "1d", tv: "D", label: "1D" },
 ];
 
-/** Questions about what is on screen get an automatic chart snapshot. */
-const CHART_INTENT_RE =
-  /\b(chart|screen|dekh\w*|dikh\w*|mark\w*|circle|circled|gol|draw\w*|drawing|line|lines|box|rectangle|arrow|fib\w*|position|indicator\w*|script\w*|pine|ema|sma|rsi|macd|vwap|bollinger|atr|this|these|that|ye|yeh|yahan|yaha|waha|wahan|visible|see|look)\b/i;
+// Chart questions are answered from the desk's deterministic chart read
+// (chartRef.describe()) plus verified server-side market data — no screenshot
+// is attached, so every question routes to the OmniRoute text chain.
 
 type ChatMsg = {
   role: "user" | "assistant";
   text: string;
   signal?: GoldSignal;
   files?: FileUIPart[];
-  chartShared?: boolean;
 };
 
 type ChatThread = {
