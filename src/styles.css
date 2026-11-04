@@ -2445,7 +2445,3 @@ html body :is(.dark, .dash-dark) .vsc-studio .tok-var { color: #a8dcff !importan
 .terminal-topbar button.w-8, .terminal-topbar button.w-9, .terminal-topbar button.w-10 { width: 28px !important; }
 .terminal-topbar svg.lucide { width: 15px !important; height: 15px !important; }
 .terminal-rail .sidebar-quick-btn { width: 30px; height: 30px; }
-
-/* Homepage/Platform "Get started" cards: warm off-white in light theme. */
-.get-started-card { background-color: #f9f8f6; }
-.dark .get-started-card { background-color: hsl(0 0% 100% / 0.04); }
