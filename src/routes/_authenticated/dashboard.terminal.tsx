@@ -920,8 +920,8 @@ function TerminalPage() {
                       <div className="flex gap-2.5 text-sm leading-6">
                         <JenvuMark className="mt-0.5 h-6 w-6 shrink-0 text-foreground" />
                         <p>
-                          Ask about the chart you are looking at. I use live XAU/USD data for the
-                          selected timeframe.
+                          Ask about the chart you are looking at. I use live data for the selected
+                          pair and timeframe.
                         </p>
                       </div>
                       <div className="ml-8 flex flex-wrap gap-1.5">
