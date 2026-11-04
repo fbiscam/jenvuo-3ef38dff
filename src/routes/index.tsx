@@ -398,7 +398,7 @@ function HomePage() {
           <EntHero />
           <EntShowcase />
           <EntBuilt />
-          <AllInOnePlatformSection />
+          <AllInOnePlatformSection showcase />
           <EntDevelopers />
           <EntStories articles={homeArticles} />
           <GetStartedSection />

@@ -2,6 +2,7 @@ import * as React from "react";
 import { Link } from "@tanstack/react-router";
 import { ArrowUpRight, Braces, Code2, FileText, Globe, Image as ImageIcon, LineChart, Mail, MessageSquare, Plug, Sparkles } from "lucide-react";
 import { useAuthUser } from "@/hooks/useAuthUser";
+import { BuilderShowcase } from "@/components/home/BuilderShowcase";
 
 /* "The all-in-one platform for builders" — shared by /platform and the homepage. */
 
@@ -50,7 +51,7 @@ function Tile({ children }: { children: React.ReactNode }) {
   );
 }
 
-export function AllInOnePlatformSection() {
+export function AllInOnePlatformSection({ showcase = false }: { showcase?: boolean }) {
   return (
     <section className="mx-auto max-w-6xl px-5 py-20 text-center">
       <h2 className="text-4xl font-medium tracking-tight sm:text-5xl">The all-in-one platform for builders</h2>
@@ -62,6 +63,7 @@ export function AllInOnePlatformSection() {
         <StartBuilding className="inline-flex items-center gap-1.5 rounded-full px-5 py-2.5 text-sm font-medium hover:bg-gc-surface" />
       </div>
 
+      {showcase ? <BuilderShowcase /> : (
       <div className="mt-10 grid gap-6 text-left md:grid-cols-3">
         <div>
           <div
@@ -129,6 +131,7 @@ export function AllInOnePlatformSection() {
           </p>
         </div>
       </div>
+      )}
     </section>
   );
 }
