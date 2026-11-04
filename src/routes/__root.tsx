@@ -444,7 +444,9 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <Outlet />
+      <div className={themePath.startsWith("/dashboard") ? "contents" : "jenvu-public-scale"}>
+        <Outlet />
+      </div>
       {/* <PwaTabBar /> disabled */}
       <div className="hide-in-pwa">
         <AskJenvuWidget />
