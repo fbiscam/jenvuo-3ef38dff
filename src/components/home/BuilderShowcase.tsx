@@ -12,17 +12,17 @@ function seeded(n: number) {
   let x = Math.sin(n * 9301 + 49297) * 233280;
   return x - Math.floor(x);
 }
-const DOTS = Array.from({ length: 520 }, (_, i) => {
+const DOTS = Array.from({ length: 1100 }, (_, i) => {
   // Box-Muller-ish spread: dense core, scattered edges.
   const u = Math.max(seeded(i + 1), 0.0001);
   const v = seeded(i + 777);
-  const r = Math.sqrt(-2 * Math.log(u)) * 15;
+  const r = Math.sqrt(-2 * Math.log(u)) * 13;
   const a = v * Math.PI * 2;
   return {
     x: 52 + Math.cos(a) * r * 1.05,
     y: 44 + Math.sin(a) * r * 1.2,
-    s: 2 + Math.floor(seeded(i + 333) * 4) * 1.3,
-    o: 0.65 + seeded(i + 99) * 0.35,
+    s: 2.5 + Math.floor(seeded(i + 333) * 4) * 1.4,
+    o: 0.8 + seeded(i + 99) * 0.2,
     tw: i % 6 === 0,
     d: (i % 11) * 0.3,
   };
