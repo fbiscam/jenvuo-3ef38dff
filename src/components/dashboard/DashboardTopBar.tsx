@@ -208,7 +208,7 @@ export default function DashboardTopBar({
                 </div>
                 {answer.res === null ? (
                   <div className="flex items-center gap-2 text-[13px]">
-                    <span aria-hidden className="ask-jenvu-mark-ring h-6 w-10 shrink-0" style={{ ["--mark" as string]: `url(${askJenvuMark})` }}><span className="ask-jenvu-mark-loop h-full w-full" /></span>
+                    <JenvuMark className="h-5 w-5 shrink-0 animate-pulse" />
                     <Shimmer>Thinking about your question…</Shimmer>
                   </div>
                 ) : answer.res.ok ? (
