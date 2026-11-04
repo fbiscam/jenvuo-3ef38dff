@@ -42,7 +42,7 @@ export function GetStartedSection() {
   return (
     <section className="bg-background py-20 text-center">
       <div className="mx-auto max-w-6xl px-5">
-        <h2 className="text-4xl font-medium tracking-tight sm:text-5xl">Get started</h2>
+        <h2 className="text-4xl font-medium tracking-tight sm:text-5xl">Choose how to get started</h2>
         <div className="mt-10 grid gap-6 text-left md:grid-cols-2">
           <div className="flex flex-col rounded-md border border-gc-line bg-background p-7 sm:p-8">
             <h3 className="text-2xl font-medium">Partner with us on your AI plans</h3>
