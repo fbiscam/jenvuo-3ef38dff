@@ -1,6 +1,6 @@
 # Roadmap
 
-- [ ] Refine homepage animated showcase and compact developer section to match supplied references
+- [x] Refine homepage animated showcase and compact developer section to match supplied references (desktop/mobile checked; live tab interaction unverified)
 
 - [x] Stop Billing plan-action label flicker on entry
 - [x] Correct Terminal candle presentation to match TradingView styling (exact venue OHLC equivalence is not claimed)
