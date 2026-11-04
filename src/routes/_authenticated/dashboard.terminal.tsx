@@ -980,12 +980,6 @@ function TerminalPage() {
                         ) : (
                           m.text
                         )}
-                        {m.role === "user" && m.chartShared && (
-                          <span className="mt-1 flex items-center gap-1 text-[11px] text-muted-foreground">
-                            <Camera className="h-3 w-3" />
-                            Chart view shared with Jenvu
-                          </span>
-                        )}
                       </MessageContent>
                     </Message>
                   ))}
