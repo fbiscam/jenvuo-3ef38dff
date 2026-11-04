@@ -107,6 +107,8 @@ type ChatMsg = {
   text: string;
   signal?: GoldSignal;
   files?: FileUIPart[];
+  /** Pair + timeframe of the chart read with this question, e.g. "XAU/USD 1H". */
+  chartSynced?: string;
 };
 
 type ChatThread = {
@@ -616,7 +618,13 @@ function TerminalPage() {
     // chain — vision providers are only used for images the user attaches.
     const chartContext = chartRef.current?.describe() || undefined;
     const chartImage = image?.url;
-    addMessage({ role: "user", text: query, files: image ? [image] : undefined });
+    const pairLabel = asset.length === 6 ? `${asset.slice(0, 3)}/${asset.slice(3)}` : asset;
+    addMessage({
+      role: "user",
+      text: query,
+      files: image ? [image] : undefined,
+      chartSynced: chartContext ? `${pairLabel} ${tf.label}` : undefined,
+    });
     setInput("");
     const history = messagesRef.current
       .filter((m) => m.text.trim().length > 0)
@@ -987,6 +995,12 @@ function TerminalPage() {
                           m.text
                         )}
                       </MessageContent>
+                      {m.role === "user" && m.chartSynced && (
+                        <span className="ml-auto inline-flex items-center gap-1.5 text-[11px] text-muted-foreground">
+                          <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-chart-2" />
+                          Live chart synced · {m.chartSynced}
+                        </span>
+                      )}
                     </Message>
                   ))}
 

@@ -108,19 +108,22 @@ export default function HeaderSearch({ onClose }: { onClose: () => void }) {
         )}
 
         {showPanel && showAnswer && (
-          <div className="border-b border-gc-line bg-gc-panel px-4 py-3">
-            <div className="mb-2 flex items-center gap-2 text-[12px] font-medium text-gc-ink-muted">
+          <div className="border-b border-gc-line bg-background px-5 py-4">
+            <div className="mb-3 flex items-center gap-2 text-[13px] font-medium text-gc-ink">
+              <JenvuMark className="h-4 w-4 shrink-0" />
               Ask Jenvu
             </div>
             {answer.res === null ? (
-              <div className="flex items-center gap-2 text-[13px]">
+              <div className="flex items-center gap-2.5 text-[14px]">
                 <span aria-hidden className="ask-jenvu-mark-ring h-6 w-10 shrink-0" style={{ ["--mark" as string]: `url(${askJenvuMark})` }}><span className="ask-jenvu-mark-loop h-full w-full" /></span>
                 <Shimmer>Thinking about your question…</Shimmer>
               </div>
             ) : answer.res.ok ? (
-              <div className="text-[14px] text-gc-ink"><MessageResponse>{answer.res.text}</MessageResponse></div>
+              <div className="break-words text-[15px] leading-[1.6] text-gc-ink [&_li]:my-1 [&_ol]:my-2 [&_ol]:pl-5 [&_p:first-child]:mt-0 [&_p:last-child]:mb-0 [&_p]:my-2.5 [&_ul]:my-2 [&_ul]:pl-5">
+                <MessageResponse>{answer.res.text}</MessageResponse>
+              </div>
             ) : (
-              <p className="text-[13px] text-gc-ink-muted">{answer.res.error}</p>
+              <div className="rounded-lg bg-gc-red-soft px-4 py-3 text-[14px] text-gc-ink">{answer.res.error}</div>
             )}
           </div>
         )}
