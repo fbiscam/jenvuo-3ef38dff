@@ -1,5 +1,7 @@
 # Roadmap
 
+- [ ] Refine homepage animated showcase and compact developer section to match supplied references
+
 - [x] Stop Billing plan-action label flicker on entry
 - [x] Correct Terminal candle presentation to match TradingView styling (exact venue OHLC equivalence is not claimed)
 - [x] Restyle Documents page with the dashboard theme

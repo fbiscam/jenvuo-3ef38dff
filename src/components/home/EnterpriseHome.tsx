@@ -1,4 +1,5 @@
 import * as React from "react";
+import { Button } from "@/components/ui/button";
 import { Link } from "@tanstack/react-router";
 import { ArrowRight, ArrowUp, ArrowUpRight, Bell, Bot, ChevronRight, Code2, MessageCircle, Plus, Sparkles } from "lucide-react";
 import { openAskJenvu } from "@/components/AskJenvuWidget";
@@ -611,7 +612,7 @@ console.log(response.choices[0].message.content);`,
 ];
 
 export function EntDevelopers() {
-  const [tab, setTab] = React.useState(DEV_SNIPPETS[0].id);
+  const [tab, setTab] = React.useState("curl");
   const [copied, setCopied] = React.useState(false);
   const active = DEV_SNIPPETS.find((s) => s.id === tab) ?? DEV_SNIPPETS[0];
   const copy = async () => {
@@ -629,15 +630,15 @@ export function EntDevelopers() {
     ["OpenAI", "compatible endpoints"],
   ];
   return (
-    <section className="px-5 py-24">
-      <div className="mx-auto grid max-w-7xl items-center gap-12 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-16">
+    <section className="px-5 py-16 sm:py-20">
+      <div className="mx-auto grid max-w-[1140px] items-center gap-10 lg:grid-cols-2 lg:gap-20">
         <div>
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-muted px-3 py-1 text-[13px] font-medium text-foreground">
-            <Code2 className="h-3.5 w-3.5" /> For developers
+          <span className="text-[13px] text-muted-foreground">
+            For developers
           </span>
-          <h2 className={`${h2} mt-6`}>One API. Every modality.</h2>
-          <p className="mt-5 max-w-xl text-[18px] leading-relaxed text-muted-foreground">
-            Text, code, images and chart analysis through a single OpenAI-compatible API. Swap two lines in your code and start building in seconds.
+          <h2 className="mt-4 text-[36px] font-medium leading-[1.05] text-foreground sm:text-[44px]">One API.<br />Every modality.</h2>
+          <p className="mt-4 max-w-[390px] text-[15px] leading-relaxed text-foreground/85">
+            Text, code, images, and chart analysis — all through a single unified API. Start building with your Jenvu key in seconds.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Link to="/dashboard/api" className="inline-flex items-center gap-1.5 rounded-full bg-foreground px-6 py-3 text-[15px] font-medium text-background transition hover:opacity-90">
@@ -647,53 +648,55 @@ export function EntDevelopers() {
               Read the docs
             </Link>
           </div>
-          <dl className="mt-12 grid grid-cols-3 gap-4 border-t border-border pt-8">
+          <dl className="mt-8 grid max-w-[370px] grid-cols-3 gap-4">
             {stats.map(([n, t]) => (
               <div key={t}>
-                <dt className="text-[28px] font-medium leading-none tracking-tight text-foreground sm:text-[34px]">{n}</dt>
-                <dd className="mt-2 text-[14px] leading-snug text-muted-foreground">{t}</dd>
+                <dt className="text-[14px] font-medium leading-none text-foreground">{n}</dt>
+                <dd className="mt-1.5 text-[11px] leading-snug text-muted-foreground">{t}</dd>
               </div>
             ))}
           </dl>
         </div>
 
-        <div className="dev-coral relative min-w-0 overflow-hidden rounded-[8px] px-4 pb-6 pt-12 sm:px-12 sm:pb-10 sm:pt-16">
+        <div className="min-w-0">
+        <div className="dev-coral relative overflow-hidden px-5 py-8 sm:px-10 sm:py-10">
           <CornerMarks />
-          <div className="overflow-hidden rounded-[12px] bg-dev-window text-dev-window-fg shadow-[0_30px_60px_-20px_rgba(0,0,0,0.45)]">
+          <div className="overflow-hidden rounded-[8px] bg-dev-window text-dev-window-fg shadow-xl">
             <div className="flex items-center justify-between gap-3 border-b border-dev-window-line px-4 py-3">
               <div className="flex items-center gap-1.5">
                 <span className="h-3 w-3 rounded-full bg-gc-red" />
                 <span className="h-3 w-3 rounded-full bg-gc-yellow" />
                 <span className="h-3 w-3 rounded-full bg-gc-green" />
               </div>
-              <button
+              <Button variant="ghost" size="sm"
                 type="button"
                 onClick={copy}
-                className="rounded-md border border-dev-window-line px-2.5 py-1 text-[12px] font-medium text-dev-window-fg/80 transition hover:text-dev-window-fg"
+                className="h-6 px-1 text-[11px] text-dev-window-muted"
               >
                 {copied ? "Copied" : "Copy"}
-              </button>
+              </Button>
             </div>
-            <pre className="h-[340px] overflow-auto px-4 py-5 font-mono text-[12.5px] leading-[1.75] sm:text-[13px]">
+            <pre className="h-[230px] overflow-auto px-3 py-4 font-mono text-[11px] leading-[1.9]">
               <code>{highlight(active.code)}</code>
             </pre>
-            <div className="no-scrollbar flex gap-1 overflow-x-auto border-t border-dev-window-line px-3 py-2.5" role="tablist">
+          </div>
+        </div>
+            <div className="no-scrollbar mt-3 flex gap-1 overflow-x-auto px-1 py-1" role="tablist">
               {DEV_SNIPPETS.map((s) => (
-                <button
+                <Button variant="ghost" size="sm"
                   key={s.id}
                   type="button"
                   role="tab"
                   aria-selected={s.id === tab}
                   onClick={() => setTab(s.id)}
                   className={`shrink-0 whitespace-nowrap rounded-full border px-3.5 py-1.5 text-[13px] font-medium transition ${
-                    s.id === tab ? "border-dev-window-fg text-dev-window-fg" : "border-transparent text-dev-window-muted hover:text-dev-window-fg"
+                    s.id === tab ? "border-foreground text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"
                   }`}
                 >
                   {s.label}
-                </button>
+                </Button>
               ))}
             </div>
-          </div>
         </div>
       </div>
     </section>

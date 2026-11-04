@@ -12,7 +12,7 @@ function seeded(n: number) {
   let x = Math.sin(n * 9301 + 49297) * 233280;
   return x - Math.floor(x);
 }
-const DOTS = Array.from({ length: 1100 }, (_, i) => {
+const DOTS = Array.from({ length: 1800 }, (_, i) => {
   // Box-Muller-ish spread: dense core, scattered edges.
   const u = Math.max(seeded(i + 1), 0.0001);
   const v = seeded(i + 777);
@@ -20,7 +20,7 @@ const DOTS = Array.from({ length: 1100 }, (_, i) => {
   const a = v * Math.PI * 2;
   return {
     x: 52 + Math.cos(a) * r * 1.05,
-    y: 44 + Math.sin(a) * r * 1.2,
+    y: 48 + Math.sin(a) * r * 1.65,
     s: 2.5 + Math.floor(seeded(i + 333) * 4) * 1.4,
     o: 0.8 + seeded(i + 99) * 0.2,
     tw: i % 6 === 0,
@@ -93,19 +93,19 @@ const JSON_LINES: { t: string; i: number }[] = [
   { t: '"content": {', i: 0 },
   { t: '"drivers": [', i: 1 },
   { t: "{", i: 2 },
-  { t: '"driver_name":', i: 3 },
-  { t: '"impact":', i: 3 },
-  { t: '"trend":', i: 3 },
+  { t: '"driver_name": "Dollar",', i: 3 },
+  { t: '"impact": 0.82,', i: 3 },
+  { t: '"trend": "falling"', i: 3 },
   { t: "},", i: 2 },
   { t: "{", i: 2 },
-  { t: '"driver_name":', i: 3 },
-  { t: '"impact":', i: 3 },
-  { t: '"trend":', i: 3 },
+  { t: '"driver_name": "Yields",', i: 3 },
+  { t: '"impact": 0.64,', i: 3 },
+  { t: '"trend": "stable"', i: 3 },
   { t: "},", i: 2 },
   { t: "{", i: 2 },
-  { t: '"driver_name":', i: 3 },
-  { t: '"impact":', i: 3 },
-  { t: '"trend":', i: 3 },
+  { t: '"driver_name": "Risk",', i: 3 },
+  { t: '"impact": 0.71,', i: 3 },
+  { t: '"trend": "rising"', i: 3 },
   { t: "}", i: 2 },
   { t: "]", i: 1 },
   { t: "}", i: 0 },
@@ -119,14 +119,14 @@ function ResearchScene() {
         <span className="exa-type overflow-hidden whitespace-nowrap">Top 3 gold drivers</span>
         <span className="exa-caret ml-0.5 h-3.5 w-px shrink-0 bg-exa-ink" />
       </div>
-      <div className="absolute inset-x-[6%] bottom-[8%] top-[26%] overflow-hidden rounded-[3px] bg-gc-night px-[5%] py-[4%] font-mono text-[9.5px] leading-[1.42] text-exa-paper shadow-2xl">
+      <div className="exa-code absolute inset-x-[6%] bottom-[11%] top-[23%] overflow-hidden rounded-[3px] bg-gc-night px-[5%] py-[4%] font-mono text-[10px] leading-[1.42] text-exa-paper shadow-2xl">
         {JSON_LINES.map((l, k) => (
           <div key={k} className="exa-line whitespace-nowrap" style={{ paddingLeft: l.i * 12, animationDelay: `${k * 0.12}s` }}>
-            {l.t.split(/("[^"]*")/g).map((part, j) =>
+            {l.t.split(/("[^"]*"|\b\d+(?:\.\d+)?\b)/g).map((part, j) =>
               part.startsWith('"') ? (
-                <span key={j} className="text-exa-key">{part}</span>
+                <span key={j} className={l.t.indexOf(part) < l.t.indexOf(":") ? "text-ent-ide-cyan" : "text-ent-ide-green"}>{part}</span>
               ) : (
-                <span key={j}>{part}</span>
+                <span key={j} className={/^\d/.test(part) ? "text-ent-ide-amber" : "text-exa-key"}>{part}</span>
               ),
             )}
           </div>
