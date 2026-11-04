@@ -500,6 +500,164 @@ export function EntFacts() {
   );
 }
 
+/* 5b — Developer API showcase (replaces EntFacts on the homepage; EntFacts kept for rollback) */
+const DEV_SNIPPETS: { id: string; label: string; code: string }[] = [
+  {
+    id: "python",
+    label: "Python",
+    code: `from openai import OpenAI
+
+client = OpenAI(
+    api_key="YOUR_JENVU_KEY",
+    base_url="https://jenvu.com/api/public/v1",
+)
+
+response = client.chat.completions.create(
+    model="claude-sonnet-4.5",
+    messages=[
+        {"role": "user", "content": "Give me today's Gold bias."},
+    ],
+)
+
+print(response.choices[0].message.content)`,
+  },
+  {
+    id: "ts",
+    label: "TypeScript",
+    code: `const res = await fetch("https://jenvu.com/api/public/v1/chat/completions", {
+  method: "POST",
+  headers: {
+    Authorization: "Bearer YOUR_JENVU_KEY",
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    model: "claude-sonnet-4.5",
+    messages: [{ role: "user", content: "Give me today's Gold bias." }],
+  }),
+});
+
+const data = await res.json();
+console.log(data.choices[0].message.content);`,
+  },
+  {
+    id: "ts-openai",
+    label: "TypeScript (OpenAI SDK)",
+    code: `import OpenAI from "openai";
+
+const client = new OpenAI({
+  apiKey: "YOUR_JENVU_KEY",
+  baseURL: "https://jenvu.com/api/public/v1",
+});
+
+const response = await client.chat.completions.create({
+  model: "claude-sonnet-4.5",
+  messages: [{ role: "user", content: "Give me today's Gold bias." }],
+});
+
+console.log(response.choices[0].message.content);`,
+  },
+  {
+    id: "curl",
+    label: "cURL",
+    code: `curl https://jenvu.com/api/public/v1/chat/completions \\
+  -H "Authorization: Bearer YOUR_JENVU_KEY" \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "model": "claude-sonnet-4.5",
+    "messages": [
+      {"role": "user", "content": "Give me today\\'s Gold bias."}
+    ]
+  }'`,
+  },
+];
+
+export function EntDevelopers() {
+  const [tab, setTab] = React.useState(DEV_SNIPPETS[0].id);
+  const [copied, setCopied] = React.useState(false);
+  const active = DEV_SNIPPETS.find((s) => s.id === tab) ?? DEV_SNIPPETS[0];
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(active.code);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 1500);
+    } catch {
+      /* clipboard blocked — ignore */
+    }
+  };
+  const stats: [string, string][] = [
+    ["$3", "per 1M tokens, in and out"],
+    ["1 key", "for every frontier model"],
+    ["OpenAI", "compatible endpoints"],
+  ];
+  return (
+    <section className="px-5 py-24">
+      <div className="mx-auto grid max-w-7xl items-center gap-12 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-16">
+        <div>
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-muted px-3 py-1 text-[13px] font-medium text-foreground">
+            <Code2 className="h-3.5 w-3.5" /> For developers
+          </span>
+          <h2 className={`${h2} mt-6`}>One API key. Every frontier model.</h2>
+          <p className="mt-5 max-w-xl text-[18px] leading-relaxed text-muted-foreground">
+            Build on Jenvu with OpenAI-compatible endpoints. Swap two lines in your existing code and reach leading models from every major lab.
+          </p>
+          <div className="mt-8 flex flex-wrap gap-3">
+            <Link to="/dashboard/api" className="inline-flex items-center gap-1.5 rounded-full bg-foreground px-6 py-3 text-[15px] font-medium text-background transition hover:opacity-90">
+              Get API key <ArrowRight className="h-4 w-4" />
+            </Link>
+            <Link to="/docs" className="inline-flex items-center rounded-full bg-muted px-6 py-3 text-[15px] font-medium text-foreground transition hover:bg-muted/70">
+              Read the docs
+            </Link>
+          </div>
+          <dl className="mt-12 grid grid-cols-3 gap-4 border-t border-border pt-8">
+            {stats.map(([n, t]) => (
+              <div key={t}>
+                <dt className="text-[28px] font-medium leading-none tracking-tight text-foreground sm:text-[34px]">{n}</dt>
+                <dd className="mt-2 text-[14px] leading-snug text-muted-foreground">{t}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+
+        <div className="min-w-0 overflow-hidden rounded-[20px] bg-ent-ide text-ent-ide-fg shadow-2xl">
+          <div className="flex items-center justify-between gap-3 border-b border-ent-ide-fg/10 px-4 py-3">
+            <div className="flex items-center gap-1.5">
+              <span className="h-3 w-3 rounded-full bg-ent-ide-fg/25" />
+              <span className="h-3 w-3 rounded-full bg-ent-ide-fg/25" />
+              <span className="h-3 w-3 rounded-full bg-ent-ide-fg/25" />
+            </div>
+            <button
+              type="button"
+              onClick={copy}
+              className="rounded-md px-2.5 py-1 text-[12px] font-medium text-ent-ide-fg/80 transition hover:bg-ent-ide-fg/10 hover:text-ent-ide-fg"
+            >
+              {copied ? "Copied" : "Copy"}
+            </button>
+          </div>
+          <div className="no-scrollbar flex gap-1 overflow-x-auto border-b border-ent-ide-fg/10 px-3 py-2" role="tablist">
+            {DEV_SNIPPETS.map((s) => (
+              <button
+                key={s.id}
+                type="button"
+                role="tab"
+                aria-selected={s.id === tab}
+                onClick={() => setTab(s.id)}
+                className={`shrink-0 whitespace-nowrap rounded-md px-3 py-1.5 text-[13px] font-medium transition ${
+                  s.id === tab ? "bg-ent-ide-fg/15 text-ent-ide-fg" : "text-ent-ide-fg/60 hover:text-ent-ide-fg"
+                }`}
+              >
+                {s.label}
+              </button>
+            ))}
+          </div>
+          <pre className="h-[400px] overflow-auto p-5 font-mono text-[13px] leading-[1.7]">
+            <code>{active.code}</code>
+          </pre>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 /* 6 — Latest news: 4 newest real articles (titles max 6 words) */
 const newsDate = (iso: string) =>
   new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" });
