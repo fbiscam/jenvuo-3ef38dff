@@ -157,6 +157,18 @@
   --color-ent-ide-bar: var(--ent-ide-bar);
   --color-ent-orange: var(--ent-orange);
   --color-ent-excel: var(--ent-excel);
+  --color-dev-window: var(--dev-window);
+  --color-dev-window-fg: var(--dev-window-fg);
+  --color-dev-window-muted: var(--dev-window-muted);
+  --color-dev-window-line: var(--dev-window-line);
+  --color-dev-syn-key: var(--dev-syn-key);
+  --color-dev-syn-str: var(--dev-syn-str);
+  --color-dev-syn-num: var(--dev-syn-num);
+  --color-dev-syn-com: var(--dev-syn-com);
+  --color-dev-mark: var(--dev-mark);
+  --color-exa-hl: var(--exa-hl);
+  --color-exa-ink: var(--exa-ink);
+  --color-exa-paper: var(--exa-paper);
 }
 
 :root {
