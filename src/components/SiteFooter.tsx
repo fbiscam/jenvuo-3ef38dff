@@ -151,7 +151,7 @@ export default function SiteFooter({ className }: { className?: string }) {
       <div className="site-edge">
         <div className="flex flex-col gap-12 border-t border-gc-line py-12 lg:flex-row lg:gap-0">
           {/* Brand block */}
-          <div className="flex shrink-0 flex-col justify-between gap-8 lg:w-[300px] lg:border-r lg:border-dashed lg:border-gc-line lg:pr-10">
+          <div className="flex shrink-0 flex-col justify-between gap-8 lg:w-[300px] lg:pr-10">
             <div>
               <Link to="/" className="inline-flex items-center gap-2.5 text-[26px] font-medium leading-none tracking-tight text-foreground"><JenvuMark className="h-7 w-7 shrink-0" />Jenvu</Link>
               <p className="mt-4 text-[13px] text-muted-foreground">© {year} Jenvu. All rights reserved.</p>
@@ -172,9 +172,10 @@ export default function SiteFooter({ className }: { className?: string }) {
           </div>
 
           {/* Link columns: two rows so every title in a row sits on the same line */}
-          <div className="flex flex-1 flex-col gap-10 lg:pl-12">
+          {/* Pushed to the right so the last column ends on the page's right edge. */}
+          <div className="flex flex-1 flex-col gap-10 lg:ml-auto lg:flex-none lg:pl-12">
             {[0, 1].map((row) => (
-              <div key={row} className="grid grid-cols-2 gap-x-8 gap-y-10 sm:grid-cols-3 lg:grid-cols-5">
+              <div key={row} className="grid grid-cols-2 gap-x-8 gap-y-10 sm:grid-cols-3 lg:grid-cols-[repeat(5,max-content)] lg:gap-x-14">
                 {columns.map((groups) => {
                   const g = groups[row];
                   if (!g) return null;

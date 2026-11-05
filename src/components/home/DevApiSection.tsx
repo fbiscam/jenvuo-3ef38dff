@@ -125,7 +125,7 @@ export function DevApiSection() {
             <br />
             Every modality.
           </h2>
-          <p className="mt-5 max-w-md text-[17px] leading-relaxed text-foreground/80">
+          <p className="mt-5 max-w-md text-[17px] font-normal leading-relaxed text-foreground">
             Text, code, voice, images, and video — all through a single unified API. Start building in seconds.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
