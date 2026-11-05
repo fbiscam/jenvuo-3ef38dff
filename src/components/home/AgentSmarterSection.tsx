@@ -171,7 +171,7 @@ function HighlightsCard() {
       <h3 className="mt-6 text-[20px] font-medium tracking-tight">JX Bot runs inside MetaTrader 5</h3>
       <p className="mt-2 text-[15.5px] leading-relaxed text-gc-ink">
         An{" "}
-        <Link to="/jx-bot" className={inlineLink}>IP-licensed EA</Link> for EUR/USD with fixed risk per $1,000 and a stop-loss on every trade
+        <Link to="/jx-bot" className={inlineLink}>IP-licensed EA</Link> for EUR/USD with fixed risk per $1,000 and a stop-loss on every trade with daily drawdown 4.7
       </p>
     </div>
   );
