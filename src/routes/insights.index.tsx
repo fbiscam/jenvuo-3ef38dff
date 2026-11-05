@@ -164,7 +164,7 @@ function InsightsPage() {
 
       <div className="jenvu-blog-content">
         {/* HERO */}
-        <section className="mx-auto max-w-7xl px-5 pb-6 pt-14 text-center sm:px-6 sm:pt-16">
+        <section className="site-edge pb-6 pt-14 text-center sm:pt-16">
           <JenvuMark className="mx-auto h-14 w-14 text-foreground" />
           <h1 className="mx-auto mt-5 max-w-[960px] text-[34px] font-medium leading-[1.15] tracking-[-0.5px] text-gc-ink sm:text-[50px]">
             <span className="text-gc-blue">News, tips, and insights</span> to sharpen your Gold trading
@@ -192,7 +192,7 @@ function InsightsPage() {
           </div>
         </section>
 
-        <main className="mx-auto max-w-7xl px-5 py-10 sm:px-6 sm:py-12">
+        <main className="site-edge py-10 sm:py-12">
           {/* FEATURED */}
           {featured && (
             <Link
