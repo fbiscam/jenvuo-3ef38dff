@@ -120,7 +120,7 @@ export default function SiteHeader() {
                 aria-haspopup="menu"
                 onClick={() => setTryOpen((v) => !v)}
                 onMouseEnter={() => setTryOpen(true)}
-                className="inline-flex h-10 items-center gap-1 rounded-full border border-foreground/20 bg-background px-4 text-[14px] font-medium text-foreground hover:bg-muted"
+                className="inline-flex h-10 items-center gap-1 rounded-full border border-foreground/20 bg-gc-surface px-4 text-[14px] font-medium text-foreground hover:brightness-95"
               >
                 Try Jenvu <ChevronDown className={`h-4 w-4 transition-transform ${tryOpen ? "rotate-180" : ""}`} />
               </button>
