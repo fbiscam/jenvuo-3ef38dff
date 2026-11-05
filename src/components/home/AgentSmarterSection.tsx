@@ -8,8 +8,6 @@ import cloudsImg from "@/assets/agent-card-clouds.jpg";
    (particle cloud, highlighted excerpt, typed query → JSON). Replaces the old
    "all-in-one platform" block on the homepage only; /platform keeps its own. */
 
-const pill =
-  "mt-5 inline-flex items-center gap-1.5 rounded-full bg-gc-pill px-5 py-2.5 text-[15px] text-foreground transition hover:brightness-95";
 const inlineLink = "text-foreground underline decoration-1 underline-offset-[3px] hover:opacity-70";
 
 function useReducedMotion() {
@@ -78,8 +76,8 @@ function ParticleCloud() {
 }
 
 const VERTICALS = [
-  { title: ["The ", "reports", " your ", "finance", " agent needs"], chips: [{ t: "NEWS", x: "26%", y: "27%" }, { t: "CODE DOCS", x: "56%", y: "23%" }] },
-  { title: ["The ", "papers", " your ", "research", " agent needs"], chips: [{ t: "PEOPLE", x: "53%", y: "17%" }, { t: "COMPANIES", x: "8%", y: "51%" }] },
+  { title: ["Live ", "XAU/USD", " candles with ", "SMC", " context"], chips: [{ t: "ZONE + FVG", x: "26%", y: "27%" }, { t: "LIQUIDITY SWEEP", x: "52%", y: "23%" }] },
+  { title: ["Live ", "BTC/USD", " and ", "EUR/USD", " on one chart"], chips: [{ t: "PRICE ACTION", x: "50%", y: "17%" }, { t: "BSL / SSL", x: "8%", y: "51%" }] },
 ];
 
 function Chip({ t, x, y, delay }: { t: string; x: string; y: string; delay: number }) {
@@ -115,10 +113,9 @@ function SearchCard() {
         ))}
       </h3>
       <p className="mt-2 text-[15.5px] leading-relaxed text-gc-ink">
-        Comprehensive coverage over all{" "}
-        <Link to="/docs" className={inlineLink}>search verticals</Link> so your agent has the right context to solve its problem
+        The{" "}
+        <Link to="/dashboard/terminal" className={inlineLink}>Jenvu Terminal</Link> marks fresh swings, liquidity sweeps and Zone + FVG on 1H to 1D so your analysis starts from real structure
       </p>
-      <Link to="/docs" className={pill}>Use our search API →</Link>
     </div>
   );
 }
@@ -150,16 +147,16 @@ function HighlightsCard() {
         <img src={skyImg} alt="" width={1024} height={1216} loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
         <div className="absolute left-[6%] right-[6%] top-[10%] bg-background p-4 sm:top-[15%] sm:p-5 text-foreground shadow-xl">
           <div className="flex items-center gap-2 font-mono text-[10.5px] font-semibold tracking-wider text-gc-ink">
-            <span className="h-2 w-2 bg-gc-ink" /> 90% TOKEN REDUCTION
+            <span className="h-2 w-2 bg-gc-ink" /> JX BOT · MQL5 EA
           </div>
-          <div className="mt-4 text-[20px] tracking-tight">Wikipedia - Boeing</div>
-          <p className="mt-1 text-[11.5px] leading-[1.6] text-gc-ink">
-            airplanes , rotorcraft , rockets , satellites , and missiles worldwide. The company also provides leasing and
-            product support services. Boeing is among the{" "}
-            <Mark on={on} delay={0}>largest global aerospace manufacturers</Mark> ; it is the{" "}
-            <Mark on={on} delay={350}>fourth-largest defense contractor</Mark> in the world based on 2022 revenue and is the
-            largest exporter in the United States by dollar value. Boeing was{" "}
-            <Mark on={on} delay={700}>founded in 1916</Mark> by William E. Boeing in Seattle , Washington.
+          <div className="mt-4 text-[20px] tracking-tight">EUR/USD · M15</div>
+          <p className="mt-1 font-mono text-[11px] leading-[1.6] text-gc-ink">
+            input string MyIP = ""; // IP registered on jenvu.com
+            <br />if(!ValidateLicense(MyIP)) return INIT_FAILED;
+            <br />double lot = 0.02 * (AccountInfoDouble(ACCOUNT_BALANCE) / 1000.0);
+            <br />{" "}<Mark on={on} delay={0}>every trade opens with a stop-loss</Mark>,{" "}
+            <Mark on={on} delay={350}>entries only in session hours</Mark>, and{" "}
+            <Mark on={on} delay={700}>new entries stop at the daily target</Mark>.
           </p>
         </div>
         <button
@@ -171,12 +168,11 @@ function HighlightsCard() {
           HIGHLIGHTS: {on ? "ON" : "OFF"}
         </button>
       </div>
-      <h3 className="mt-6 text-[20px] font-medium tracking-tight">Token-efficient contents with highlights</h3>
+      <h3 className="mt-6 text-[20px] font-medium tracking-tight">JX Bot runs inside MetaTrader 5</h3>
       <p className="mt-2 text-[15.5px] leading-relaxed text-gc-ink">
-        Specialized model trained to{" "}
-        <Link to="/docs" className={inlineLink}>extract the most relevant excerpts</Link> from the web
+        An{" "}
+        <Link to="/jx-bot" className={inlineLink}>IP-licensed EA</Link> for EUR/USD with fixed risk per $1,000 and a stop-loss on every trade
       </p>
-      <Link to="/dashboard/chat" className={pill}>Try it out in our API Playground →</Link>
     </div>
   );
 }
@@ -185,16 +181,12 @@ function HighlightsCard() {
 
 const QUERIES = [
   {
-    q: "Top 3 aerospace companies, CEO's name, founded year?",
-    rows: [["GE Aerospace", "Larry Culp", 1892], ["RTX", "Christopher T. Calio", 2020], ["Boeing", "Kelly Ortberg", 1916]],
+    q: "Gold 1H: fresh swing, sweep, bias?",
+    rows: [["XAU/USD", "Liquidity sweep", "1H"], ["XAU/USD", "Price action", "4H"], ["XAU/USD", "Zone + FVG", "1D"]],
   },
   {
-    q: "Top 3 exchange operators, CEO's name, founded year?",
-    rows: [["CME Group", "Terry Duffy", 1898], ["ICE", "Jeffrey Sprecher", 2000], ["Nasdaq", "Adena Friedman", 1971]],
-  },
-  {
-    q: "Top 3 chip makers, CEO's name, founded year?",
-    rows: [["NVIDIA", "Jensen Huang", 1993], ["TSMC", "C. C. Wei", 1987], ["Intel", "Lip-Bu Tan", 1968]],
+    q: "BTC and EUR/USD structure right now?",
+    rows: [["BTC/USD", "Fresh high", "1H"], ["EUR/USD", "Fresh low", "1H"], ["EUR/USD", "Liquidity sweep", "2H"]],
   },
 ] as const;
 
@@ -217,7 +209,7 @@ function ResearchCard() {
 
   const k = (s: string) => <span className="text-gc-on-night">"{s}"</span>;
   const val = (s: string | number) =>
-    done ? <span className="agent-fade text-gc-on-night-muted">{typeof s === "number" ? s : `"${s}"`}</span> : null;
+    done ? <span className="agent-fade text-gc-on-night-muted">{`"${s}"`}</span> : null;
 
   return (
     <div>
@@ -230,26 +222,25 @@ function ResearchCard() {
           </span>
         </div>
         <pre className="absolute left-[6%] right-[6%] top-[22%] overflow-hidden bg-gc-night p-4 font-mono text-[10.5px] leading-[1.45] text-gc-on-night">
-          {k("content")}: {"{"}
-          {"\n  "}{k("companies")}: [
+          {k("analysis")}: {"{"}
+          {"\n  "}{k("setups")}: [
           {QUERIES[qi].rows.map((r, i) => (
             <React.Fragment key={`${qi}-${i}`}>
               {"\n    {"}
-              {"\n      "}{k("company_name")}: {val(r[0])}{done ? "," : ""}
-              {"\n      "}{k("ceo_name")}: {val(r[1])}{done ? "," : ""}
-              {"\n      "}{k("founded_year")}: {val(r[2])}
-              {"\n    }"}{i < 2 ? "," : ""}
+              {"\n      "}{k("pair")}: {val(r[0])}{done ? "," : ""}
+              {"\n      "}{k("signal")}: {val(r[1])}{done ? "," : ""}
+              {"\n      "}{k("timeframe")}: {val(r[2])}
+              {"\n    }"}{i < QUERIES[qi].rows.length - 1 ? "," : ""}
             </React.Fragment>
           ))}
           {"\n  ]\n}"}
         </pre>
       </div>
-      <h3 className="mt-6 text-[20px] font-medium tracking-tight">Low-latency to deep research in one API</h3>
+      <h3 className="mt-6 text-[20px] font-medium tracking-tight">Ask Jenvu returns structured market analysis</h3>
       <p className="mt-2 text-[15.5px] leading-relaxed text-gc-ink">
-        Configure for fast results or{" "}
-        <Link to="/docs" className={inlineLink}>deep research</Link> with structured outputs and grounded citations
+        Chart context goes to the AI so answers come back as{" "}
+        <Link to="/docs" className={inlineLink}>structured JSON</Link> from verified market data, not guesses
       </p>
-      <Link to="/dashboard/api" className={pill}>Integrate Jenvu with your agent →</Link>
     </div>
   );
 }
