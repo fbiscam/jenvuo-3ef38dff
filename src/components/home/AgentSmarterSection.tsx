@@ -42,7 +42,7 @@ function ParticleCloud() {
     const gauss = () => (rnd() + rnd() + rnd() - 1.5) / 1.5;
     const pts = Array.from({ length: 2400 }, () => {
       const x = gauss(), y = gauss(), z = gauss();
-      return { x, y, z, s: 1.6 + rnd() * 4.4, a: 0.55 + rnd() * 0.45 };
+      return { x, y, z, s: 2 + rnd() * 5, a: 0.55 + rnd() * 0.45 };
     });
 
     let raf = 0;
@@ -53,7 +53,7 @@ function ParticleCloud() {
       if (canvas.width !== w * dpr) { canvas.width = w * dpr; canvas.height = h * dpr; }
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       ctx.clearRect(0, 0, w, h);
-      const cx = w / 2, cy = h / 2, r = Math.min(w, h) * 0.62;
+      const cx = w / 2, cy = h / 2, r = Math.min(w, h) * 0.95;
       const cos = Math.cos(angle), sin = Math.sin(angle);
       for (const p of pts) {
         const x = p.x * cos - p.z * sin;
@@ -148,7 +148,7 @@ function HighlightsCard() {
     <div>
       <div className="relative aspect-[5/6] overflow-hidden">
         <img src={skyImg} alt="" width={1024} height={1216} loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
-        <div className="absolute left-[6%] right-[6%] top-[17%] bg-background p-5 text-foreground shadow-xl">
+        <div className="absolute left-[6%] right-[6%] top-[10%] bg-background p-4 sm:top-[15%] sm:p-5 text-foreground shadow-xl">
           <div className="flex items-center gap-2 font-mono text-[10.5px] font-semibold tracking-wider text-gc-ink">
             <span className="h-2 w-2 bg-gc-ink" /> 90% TOKEN REDUCTION
           </div>
@@ -165,7 +165,7 @@ function HighlightsCard() {
         <button
           type="button"
           onClick={() => { setAuto(false); setOn((v) => !v); }}
-          className="absolute bottom-[6%] left-1/2 -translate-x-1/2 bg-gc-night px-2.5 py-1.5 font-mono text-[10.5px] font-semibold tracking-wider text-gc-on-night"
+          className="absolute bottom-[4%] left-1/2 -translate-x-1/2 bg-gc-night px-2.5 py-1.5 font-mono text-[10.5px] font-semibold tracking-wider text-gc-on-night"
           aria-pressed={on}
         >
           HIGHLIGHTS: {on ? "ON" : "OFF"}
