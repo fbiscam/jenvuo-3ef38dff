@@ -146,11 +146,12 @@ const linkCls = "text-[14px] text-muted-foreground transition-colors hover:text-
 export default function SiteFooter({ className }: { className?: string }) {
   const year = new Date().getFullYear();
   return (
-    <footer className={`jenvu-site-footer hide-in-pwa relative border-t border-border bg-background ${className || ""}`}>
-      <div className="mx-auto w-full max-w-[1400px] px-6 py-14 sm:px-10 lg:px-16">
-        <div className="flex flex-col gap-12 lg:flex-row lg:gap-0">
+    <footer className={`jenvu-site-footer hide-in-pwa relative bg-background ${className || ""}`}>
+      {/* Top line sits inside the page width (inset left/right), like the xAI footer. */}
+      <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="flex flex-col gap-12 border-t border-gc-line py-12 sm:px-5 lg:flex-row lg:gap-0">
           {/* Brand block */}
-          <div className="flex shrink-0 flex-col justify-between gap-8 lg:w-[300px] lg:border-r lg:border-border lg:pr-10">
+          <div className="flex shrink-0 flex-col justify-between gap-8 lg:w-[300px] lg:border-r lg:border-dashed lg:border-gc-line lg:pr-10">
             <div>
               <Link to="/" className="inline-flex items-center gap-2.5 text-[26px] font-medium leading-none tracking-tight text-foreground"><JenvuMark className="h-7 w-7 shrink-0" />Jenvu</Link>
               <p className="mt-4 text-[13px] text-muted-foreground">© {year} Jenvu. All rights reserved.</p>
