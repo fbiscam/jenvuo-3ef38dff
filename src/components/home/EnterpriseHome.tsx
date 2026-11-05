@@ -80,7 +80,7 @@ function RotatingWord() {
 /* 1 — Hero (xAI style): badge, headline, two pills */
 export function EntHero() {
   return (
-    <section className="bg-[image:var(--ent-hero-wash)] px-5 pb-14 pt-16 text-center sm:pt-20">
+    <section className="bg-[image:var(--ent-hero-wash)] px-5 pb-20 pt-24 text-center sm:pb-24 sm:pt-28">
       <Link to="/models" className="inline-flex items-center gap-2 rounded-full border border-foreground/[0.07] bg-background py-1.5 pl-1.5 pr-2 text-[13px] transition hover:bg-muted/40">
         <span className="rounded-full bg-ent-orange/10 px-2 py-0.5 text-[11px] font-medium text-ent-orange">New</span>
         <span className="font-medium text-foreground">Meet Jenvu AI</span>
