@@ -24,7 +24,8 @@ import {
   CloudHero,
 
 } from "@/components/home/CloudHome";
-import { EntHero, EntShowcase, EntFacts, EntStories } from "@/components/home/EnterpriseHome";
+import { EntHero, EntShowcase, EntStories } from "@/components/home/EnterpriseHome";
+import { DevApiSection } from "@/components/home/DevApiSection";
 import { homeArticlesQueryOptions, type HomeArticle } from "@/lib/home-articles";
 import { JxBotFeatures } from "@/components/jxbot/JxBotFeatures";
 import { GetStartedSection } from "@/components/platform/GetStartedSection";
@@ -400,7 +401,7 @@ function HomePage() {
           <EntShowcase />
           <JxBotFeatures />
           <AllInOnePlatformSection />
-          <EntFacts />
+          <DevApiSection />
           <EntStories articles={homeArticles} />
           <GetStartedSection />
         </main>
