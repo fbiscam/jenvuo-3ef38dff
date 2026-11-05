@@ -3,7 +3,6 @@ import * as React from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { Check, Users, DollarSign, Shield, ArrowRight } from "lucide-react";
 import BlogFooter from "@/components/BlogFooter";
 import SiteHeader from "@/components/SiteHeader";
 import { submitFoundingApplication, foundingStats } from "@/lib/founding.functions";
@@ -24,6 +23,7 @@ export const Route = createFileRoute("/founding")({
       },
       { property: "og:url", content: "https://jenvu.com/founding" },
       { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [{ rel: "canonical", href: "https://jenvu.com/founding" }],
   }),
@@ -106,222 +106,167 @@ function FoundingPage() {
   }
 
   return (
-    <div className={`min-h-dvh w-full bg-background text-gc-ink ${SANS} antialiased`}>
+    <div className={`public-cloudflare min-h-dvh w-full bg-background text-gc-ink ${SANS} antialiased`}>
       <SiteHeader />
 
-      <div className="jenvu-home-content">
-        <main>
-          {/* Hero — homepage style */}
-          <section className="bg-background">
-            <div className="mx-auto max-w-[1296px] px-5 pb-12 pt-12 text-center sm:px-8 md:pt-14">
-              <JenvuMark className="jenvu-logo-intro mx-auto h-16 w-16 text-foreground" />
-              <span className="jenvu-rise mt-6 inline-flex rounded-full bg-gc-blue-soft px-3 py-1 text-[13px] font-medium text-gc-blue-deep">Invite-only · {remaining} seats left this month</span>
-              <h1 className="jenvu-rise mx-auto mt-5 max-w-[900px] text-[40px] font-medium leading-[1.1] tracking-[-0.5px] text-gc-ink sm:text-[56px] md:text-[60px]">
-                Founding Trader Program
-              </h1>
-              <p className="jenvu-rise [animation-delay:80ms] mx-auto mt-5 max-w-[760px] text-[16px] leading-[1.6] text-gc-ink-muted sm:text-[17px]">
-                Once approved, you get <span className="font-medium text-gc-ink">3 months of your chosen plan with $250 credit</span>, unlocked straight away. You then have <span className="font-medium text-gc-ink">2 days to verify your ID</span> to keep access.
-              </p>
-              <div className="jenvu-rise [animation-delay:160ms] mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-                <a href="#apply" className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-gc-blue px-6 text-[16px] font-medium text-gc-on-blue transition hover:bg-gc-blue-hover">
-                  Apply for a seat <ArrowRight className="h-4 w-4" />
-                </a>
-                <Link to="/pricing" className="inline-flex h-12 items-center justify-center rounded-full border border-gc-line bg-background px-6 text-[16px] font-medium text-gc-ink transition hover:bg-gc-surface">
-                  Buy now
+      <main className="grid w-full grid-cols-1 lg:grid-cols-[1fr_minmax(360px,30%)]">
+        {/* LEFT — form */}
+        <section id="apply" className="scroll-mt-24 px-5 py-12 sm:px-10 lg:py-14 lg:pl-[12%] lg:pr-16">
+          <div className="max-w-[710px]">
+            <span className="inline-flex items-center rounded-full border border-gc-line px-3.5 py-1 text-[13px] font-medium text-gc-ink-muted">Invite-only · {remaining} seats left</span>
+            <h1 className="mt-4 text-[2.4rem] font-medium leading-[1.08] tracking-tight sm:text-[3.4rem]">
+              Founding Trader Program
+            </h1>
+            <ul className="mt-6 space-y-3 text-[17px] text-gc-ink-muted">
+              {[
+                "3 months of your chosen plan with $250 credit",
+                "Only 50 traders accepted each month",
+                "Verify your ID within 2 days to keep access",
+              ].map((t) => (
+                <li key={t} className="flex items-center gap-4">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="shrink-0 text-gc-blue"><polyline points="4 12 10 18 20 6" /></svg>
+                  {t}
+                </li>
+              ))}
+            </ul>
+
+            {submitted ? (
+              <div className="mt-8 rounded-md border border-gc-line p-6" role="status" aria-live="polite">
+                <h2 className="text-[22px] font-medium tracking-tight">Application received.</h2>
+                <p className="mt-2 text-gc-ink-muted">
+                  Thanks — our team will review it and email you a decision within <span className="font-medium text-gc-ink">48 hours</span>. Please check your inbox and spam folder.
+                </p>
+                <Link to="/" className="mt-5 inline-block text-sm font-medium text-gc-blue hover:underline">
+                  Back to home
                 </Link>
               </div>
-
-              <div className="jenvu-rise [animation-delay:220ms] mx-auto mt-10 max-w-md rounded-3xl bg-gc-surface p-6 text-left">
-                <div className="flex items-center justify-between text-[13px] text-gc-ink-muted">
-                  <span>Seats claimed this month</span>
-                  <span className="font-medium text-gc-ink">{seats.filled} / {seats.total}</span>
+            ) : (
+              <form onSubmit={onSubmit} className="mt-8 space-y-6">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <Field name="full_name" label="Full name*" required />
+                  <Field name="email" label="Email*" type="email" required />
                 </div>
-                <div className="mt-3 h-2 overflow-hidden rounded-full bg-gc-blue-soft">
-                  <div className="h-full rounded-full bg-gc-blue transition-all duration-700 ease-out" style={{ width: `${pct}%` }} />
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <Field name="whatsapp_number" label="WhatsApp number*" type="tel" required />
+                  <Field name="country" label="Country (optional)" />
                 </div>
-                <div className="mt-2 text-[12px] text-gc-ink-muted">{remaining} spots remaining</div>
-              </div>
-            </div>
-          </section>
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <Field name="broker" label="Broker (optional)" />
+                  <Field name="experience_years" label="Experience in years (optional)" type="number" />
+                </div>
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <Field key={`ref-${refEmail}`} name="referrer_email" label="Referred by email (optional)" type="email" defaultValue={refEmail} />
+                  <Field name="myfxbook_url" label="MyFxBook link (optional)" />
+                </div>
 
-          {/* Benefits — homepage card style with tone icons */}
-          <section className="bg-background">
-            <div className="mx-auto max-w-[1296px] px-5 pb-16 sm:px-8">
-              <div className="grid gap-5 md:grid-cols-3">
-                {([
-                  { icon: Users, tone: "blue", title: "Curated cohort", body: "Only 50 traders each month. Serious applicants, real capital, no tire-kickers." },
-                  { icon: DollarSign, tone: "green", title: "Instant access", body: "Approval unlocks 3 months of the plan you picked plus $250 credit, with no waiting." },
-                  { icon: Shield, tone: "yellow", title: "Verified traders", body: "Every member verifies their ID within 2 days, so the cohort stays real." },
-                ] as const).map((b, i) => (
-                  <div key={b.title} className="ind-rise rounded-md border border-gc-line bg-background p-7 transition hover:shadow-[0_1px_3px_rgba(60,64,67,0.15),0_4px_12px_rgba(60,64,67,0.12)]" style={{ animationDelay: `${i * 80}ms` }}>
-                    <span className={`flex h-12 w-12 items-center justify-center rounded-full ${TONE[b.tone].bg}`}>
-                      <b.icon className={`h-6 w-6 ${TONE[b.tone].fg}`} />
-                    </span>
-                    <h3 className="mt-5 text-[20px] font-medium text-gc-ink">{b.title}</h3>
-                    <p className="mt-2 text-[15px] leading-[1.6] text-gc-ink-muted">{b.body}</p>
+                <div>
+                  <p className="text-[15px] text-gc-ink-muted">Which plan do you want?*</p>
+                  <div className="mt-1.5 grid grid-cols-3 gap-3">
+                    {([
+                      { id: "pro", label: "Pro", desc: "$10 wallet" },
+                      { id: "elite", label: "Elite", desc: "$25 wallet" },
+                      { id: "ultra", label: "Ultra", desc: "$50 wallet" },
+                    ] as const).map((p) => {
+                      const active = plan === p.id;
+                      return (
+                        <button
+                          key={p.id}
+                          type="button"
+                          onClick={() => setPlan(p.id)}
+                          aria-pressed={active}
+                          className={`rounded-md border px-4 py-3 text-left transition ${active ? "border-gc-ink bg-gc-pill" : "border-gc-line bg-background hover:bg-gc-surface"}`}
+                        >
+                          <div className="text-[15px] font-medium text-gc-ink">{p.label}</div>
+                          <div className="text-[13px] text-gc-ink-muted">{p.desc}</div>
+                        </button>
+                      );
+                    })}
                   </div>
-                ))}
+                </div>
+
+                <div>
+                  <label htmlFor="f-why" className="text-[15px] text-gc-ink-muted">Why do you want in?*</label>
+                  <textarea
+                    id="f-why"
+                    name="why_joining"
+                    required
+                    minLength={10}
+                    maxLength={1500}
+                    rows={4}
+                    placeholder="Tell us about your trading journey."
+                    className={`${INPUT} mt-1.5 min-h-[104px] resize-y`}
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={submitting || remaining === 0}
+                  className="inline-flex items-center rounded-full bg-gc-blue px-6 py-3 text-[15px] font-medium text-gc-on-blue transition-colors hover:bg-gc-blue-hover disabled:opacity-60"
+                >
+                  {submitting ? "Submitting…" : remaining === 0 ? "This month is full" : "Submit application"}
+                </button>
+                <p className="text-[16px] text-gc-ink-muted">
+                  By applying you agree to Jenvu's{" "}
+                  <Link to="/terms" className="font-medium text-gc-blue underline underline-offset-2">Terms</Link> and{" "}
+                  <Link to="/disclaimer" className="font-medium text-gc-blue underline underline-offset-2">Risk Disclaimer</Link>. Trading involves significant risk.
+                </p>
+              </form>
+            )}
+          </div>
+        </section>
+
+        {/* RIGHT — cards */}
+        <aside className="relative overflow-hidden border-t border-gc-line px-5 py-10 sm:px-10 lg:border-l lg:border-t-0 lg:py-14">
+          <div aria-hidden className="pointer-events-none absolute inset-0 opacity-60" style={{ backgroundImage: "var(--platform-aurora-1)" }} />
+          <div className="relative max-w-[370px] space-y-4">
+            <div className="rounded-md border border-gc-line bg-background p-6 shadow-sm">
+              <JenvuMark className="h-10 w-10 text-foreground" />
+              <h2 className="mt-4 text-[22px] font-medium tracking-tight">Seats this month</h2>
+              <div className="mt-5 flex items-center justify-between text-[14px] text-gc-ink-muted">
+                <span>Claimed</span>
+                <span className="font-medium text-gc-ink">{seats.filled} / {seats.total}</span>
               </div>
+              <div className="mt-2 h-2 overflow-hidden rounded-full bg-gc-pill">
+                <div className="h-full rounded-full bg-gc-blue transition-all duration-700 ease-out" style={{ width: `${pct}%` }} />
+              </div>
+              <p className="mt-3 text-[15px] text-gc-ink-muted">{remaining} spots remaining</p>
             </div>
-          </section>
-
-          {/* How it works */}
-          <section className="bg-gc-surface">
-            <div className="mx-auto grid max-w-[1296px] gap-10 px-5 py-16 sm:px-8 lg:grid-cols-[0.8fr_1.2fr] lg:py-20">
-              <div>
-                <h2 className="text-[32px] font-medium leading-[1.2] text-gc-ink sm:text-[40px]">How it works</h2>
-                <p className="mt-4 max-w-[420px] text-[16px] leading-[1.6] text-gc-ink-muted">Four simple steps from application to your first chart.</p>
-              </div>
-              <ol className="space-y-4">
-                {[
-                  ["Apply", "Fill the short form below. We review every application manually."],
-                  ["Get approved", "If accepted, you get 3 months of the plan you picked and $250 credit straight away, including the Terminal."],
-                  ["Verify your ID in 2 days", "Upload your ID documents from your account within 2 days of approval."],
-                  ["Keep trading", "Once your documents are submitted, your access continues. If they're not sent in time, the Terminal is locked until you verify."],
-                ].map(([t, d], i) => (
-                  <li key={t} className="flex gap-5 rounded-3xl bg-background p-6">
-                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gc-blue text-[15px] font-medium text-gc-on-blue">{i + 1}</span>
-                    <div>
-                      <div className="text-[17px] font-medium text-gc-ink">{t}</div>
-                      <div className="mt-1 text-[15px] leading-[1.6] text-gc-ink-muted">{d}</div>
-                    </div>
-                  </li>
-                ))}
-              </ol>
-            </div>
-          </section>
-
-          {/* Application form */}
-          <section id="apply" className="scroll-mt-24 bg-background">
-            <div className="mx-auto max-w-[760px] px-5 py-16 sm:px-8 lg:py-20">
-              <div className="text-center">
-                <h2 className="text-[32px] font-medium leading-[1.2] text-gc-ink sm:text-[40px]">Apply for a founding seat</h2>
-                <p className="mt-3 text-[16px] text-gc-ink-muted">Applications reviewed within 48 hours. Only serious traders — please be honest.</p>
-              </div>
-
-              <div className="mt-10 rounded-md border border-gc-line bg-background p-6 sm:p-9">
-                {submitted ? (
-                  <div className="py-6 text-center" role="status" aria-live="polite">
-                    <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-gc-green-soft">
-                      <Check className="h-7 w-7 text-gc-green" />
-                    </div>
-                    <h3 className="mt-5 text-[24px] font-medium text-gc-ink">Application received</h3>
-                    <p className="mx-auto mt-3 max-w-lg text-[15px] leading-relaxed text-gc-ink-muted">
-                      Thank you — we've got your application. Our team will personally review it and email you a decision within <strong className="text-gc-ink">48 hours</strong>.
-                    </p>
-                    <p className="mt-2 text-[13px] text-gc-ink-muted">Please keep an eye on your inbox (and spam folder).</p>
-                    <Link to="/" className="mt-6 inline-flex h-11 items-center justify-center rounded-full bg-gc-blue px-6 text-[15px] font-medium text-gc-on-blue hover:bg-gc-blue-hover">
-                      Back to home
-                    </Link>
-                  </div>
-                ) : (
-                  <form onSubmit={onSubmit} className="space-y-5">
-                    <Field name="full_name" label="Full name" required placeholder="Your full name" />
-                    <Field name="email" label="Email" type="email" required placeholder="you@example.com" />
-                    <Field name="whatsapp_number" label="WhatsApp number" type="tel" required placeholder="+92 300 1234567" />
-
-                    <div>
-                      <label className="text-[14px] font-medium text-gc-ink">
-                        Which plan do you want? <span className="text-gc-red">*</span>
-                      </label>
-                      <div className="mt-2 grid grid-cols-3 gap-2">
-                        {([
-                          { id: "pro", label: "Pro", desc: "$10 wallet" },
-                          { id: "elite", label: "Elite", desc: "$25 wallet" },
-                          { id: "ultra", label: "Ultra", desc: "$50 wallet" },
-                        ] as const).map((p) => {
-                          const active = plan === p.id;
-                          return (
-                            <button
-                              key={p.id}
-                              type="button"
-                              onClick={() => setPlan(p.id)}
-                              className={`rounded-2xl border px-4 py-3 text-left transition ${active ? "border-gc-blue bg-gc-blue-soft" : "border-gc-line bg-background hover:bg-gc-surface"}`}
-                            >
-                              <div className={`text-[14px] font-medium ${active ? "text-gc-blue-deep" : "text-gc-ink"}`}>{p.label}</div>
-                              <div className="text-[12px] text-gc-ink-muted">{p.desc}</div>
-                            </button>
-                          );
-                        })}
-                      </div>
-                      <p className="mt-1.5 text-[12px] text-gc-ink-muted">Approved applicants get this plan for 3 months with $250 credit.</p>
-                    </div>
-                    <div className="grid gap-5 sm:grid-cols-2">
-                      <Field name="country" label="Country" placeholder="Pakistan" />
-                      <Field name="broker" label="Broker" placeholder="IC Markets, Exness…" />
-                    </div>
-                    <div className="grid gap-5 sm:grid-cols-2">
-                      <Field name="experience_years" label="Experience (years)" type="number" placeholder="3" />
-                      <Field key={`ref-${refEmail}`} name="referrer_email" label="Referred by (optional)" type="email" placeholder="friend@email.com" defaultValue={refEmail} />
-                    </div>
-                    <Field name="myfxbook_url" label="MyFxBook / verified track record (optional)" placeholder="https://myfxbook.com/…" />
-                    <div>
-                      <label className="text-[14px] font-medium text-gc-ink">
-                        Why do you want in? <span className="text-gc-red">*</span>
-                      </label>
-                      <textarea
-                        name="why_joining"
-                        required
-                        minLength={10}
-                        maxLength={1500}
-                        rows={4}
-                        placeholder="Tell us about your trading journey and what stability would mean for you…"
-                        className={INPUT}
-                      />
-                    </div>
-
-                    <button
-                      type="submit"
-                      disabled={submitting || remaining === 0}
-                      className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-gc-blue px-6 text-[16px] font-medium text-gc-on-blue transition hover:bg-gc-blue-hover disabled:opacity-60"
-                    >
-                      {submitting ? "Submitting…" : remaining === 0 ? "This month is full — join waitlist" : "Submit application"}
-                      <ArrowRight className="h-4 w-4" />
-                    </button>
-
-                    <p className="text-[12px] leading-relaxed text-gc-ink-muted">
-                      By applying you agree to our <Link to="/terms" className="text-gc-blue underline">Terms</Link> and <Link to="/disclaimer" className="text-gc-blue underline">Risk Disclaimer</Link>. Futures trading involves significant risk.
-                    </p>
-                  </form>
-                )}
-              </div>
-            </div>
-          </section>
-        </main>
-      </div>
+            <SideCard text="We review every application by hand and reply within 48 hours." />
+            <SideCard text="Once approved, upload your ID from your account within 2 days to keep access." />
+            <SideCard text="Questions about the program? Email our team." link="support@jenvu.com" href="mailto:support@jenvu.com" />
+            <SideCard text="Prefer to start right away without applying?" link="See plans and pricing" href="/pricing" />
+          </div>
+        </aside>
+      </main>
 
       <BlogFooter />
     </div>
   );
 }
 
-const SANS = "font-['Google_Sans_Flex','Google_Sans','Product_Sans','Poppins',system-ui,sans-serif]";
-const INPUT = "mt-1.5 w-full rounded-md border border-gc-line bg-background px-4 py-3 text-[15px] text-gc-ink outline-none placeholder:text-gc-ink-muted focus:border-gc-blue focus:ring-1 focus:ring-gc-blue";
-const TONE = {
-  blue: { bg: "bg-gc-blue-soft", fg: "text-gc-blue" },
-  green: { bg: "bg-gc-green-soft", fg: "text-gc-green" },
-  yellow: { bg: "bg-gc-yellow-soft", fg: "text-gc-yellow" },
-} as const;
+function SideCard({ text, link, href }: { text: string; link?: string; href?: string }) {
+  return (
+    <div className="rounded-md border border-gc-line bg-background/95 p-5 shadow-sm">
+      <p className="text-[15px] leading-relaxed">{text}</p>
+      {link && href && <a href={href} className="mt-4 inline-block text-[15px] font-medium text-gc-blue hover:underline">{link}</a>}
+    </div>
+  );
+}
 
-function Field(props: {
-  name: string;
-  label: string;
-  type?: string;
-  required?: boolean;
-  placeholder?: string;
-  defaultValue?: string;
-}) {
+const SANS = "font-['Google_Sans_Flex','Google_Sans','Product_Sans','Poppins',system-ui,sans-serif]";
+const INPUT = "w-full rounded-md border border-gc-line bg-background px-4 py-4 text-[16px] text-gc-ink outline-none transition placeholder:text-gc-ink-muted focus:border-gc-blue focus:ring-1 focus:ring-gc-blue";
+
+function Field(props: { name: string; label: string; type?: string; required?: boolean; defaultValue?: string }) {
+  const id = `f-${props.name}`;
   return (
     <div>
-      <label className="text-[14px] font-medium text-gc-ink">
-        {props.label}
-        {props.required && <span className="text-gc-red"> *</span>}
-      </label>
+      <label htmlFor={id} className="sr-only">{props.label}</label>
       <input
+        id={id}
         name={props.name}
         type={props.type ?? "text"}
         required={props.required}
-        placeholder={props.placeholder}
+        placeholder={props.label}
         defaultValue={props.defaultValue}
         className={INPUT}
       />

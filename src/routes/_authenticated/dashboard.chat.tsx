@@ -1042,11 +1042,11 @@ function ChatPlayground() {
                       </div>
                     ) : (
                     <>
-                      <div className={`text-[16px] leading-[1.7] text-foreground [&_li]:my-1 [&_p]:my-3 [&_ul]:my-3 [&_ul]:pl-5 ${studio ? "lg:hidden" : ""}`}>
+                      <div className={`text-[16px] leading-[1.7] text-foreground [&_li]:my-1 [&_ol]:my-3 [&_ol]:list-decimal [&_ol]:pl-6 [&_p]:my-3 [&_ul]:my-3 [&_ul]:list-disc [&_ul]:pl-6 ${studio ? "lg:hidden" : ""}`}>
                         <MessageResponse>{unwrapDocument(stripChoices(t.content))}</MessageResponse>
                       </div>
                       {studio && (
-                        <div className="hidden text-[16px] leading-[1.7] text-foreground lg:block [&_li]:my-1 [&_p]:my-3 [&_ul]:my-3 [&_ul]:pl-5">
+                        <div className="hidden text-[16px] leading-[1.7] text-foreground lg:block [&_li]:my-1 [&_ol]:my-3 [&_ol]:list-decimal [&_ol]:pl-6 [&_p]:my-3 [&_ul]:my-3 [&_ul]:list-disc [&_ul]:pl-6">
                           <MessageResponse>{stripCode(stripChoices(t.content))}</MessageResponse>
                         </div>
                       )}

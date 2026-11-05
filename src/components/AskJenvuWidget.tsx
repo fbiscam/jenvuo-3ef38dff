@@ -300,7 +300,7 @@ function AssistantTurn({ msg, last, onRetry, onAsk, onSales }: {
   }
   return (
     <div>
-      <div className="text-[15px] leading-[1.6] [&_li]:my-1 [&_p]:my-3 [&_ul]:my-3 [&_ul]:pl-5">
+      <div className="text-[15px] leading-[1.6] [&_li]:my-1 [&_ol]:my-3 [&_ol]:list-decimal [&_ol]:pl-6 [&_p]:my-3 [&_ul]:my-3 [&_ul]:list-disc [&_ul]:pl-6">
         <MessageResponse>{msg.content}</MessageResponse>
       </div>
       {msg.showSales && (
