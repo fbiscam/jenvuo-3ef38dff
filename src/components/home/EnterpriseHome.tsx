@@ -283,7 +283,9 @@ export function EntShowcase() {
       </div>
       <div className="mx-auto mt-3 grid max-w-7xl gap-3 md:grid-cols-[2fr_1fr_3fr]">
         <Link to="/insights" className={`${tile} h-[290px]`}>
-          <LoopImages images={IMAGINE_LOOP} width={1280} height={960} className="transition duration-500 group-hover:scale-105" />
+          <div className="absolute inset-0 transition-transform duration-500 group-hover:scale-[1.03]">
+            <LoopImages images={IMAGINE_LOOP} width={1280} height={960} />
+          </div>
           <span className="absolute bottom-4 left-5 z-10 text-[14px] text-gc-on-night">Imagine</span>
         </Link>
         <Link to="/insights" className={`${tile} grid h-[290px] grid-rows-2 gap-1`}>
