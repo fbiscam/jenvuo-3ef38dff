@@ -199,6 +199,7 @@ export default function SiteFooter({ className }: { className?: string }) {
                 })}
               </div>
             ))}
+            </div>
           </div>
         </div>
       </div>
