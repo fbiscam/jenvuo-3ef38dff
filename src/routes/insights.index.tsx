@@ -192,7 +192,7 @@ function InsightsPage() {
           </div>
         </section>
 
-        <main className="mx-auto max-w-[1200px] px-5 py-10 sm:px-8 sm:py-12">
+        <main className="mx-auto max-w-7xl px-5 py-10 sm:px-6 sm:py-12">
           {/* FEATURED */}
           {featured && (
             <Link
@@ -231,28 +231,30 @@ function InsightsPage() {
             {filter === "latest" ? "All stories" : filter === "gold" ? "Gold analysis" : "Macro and education"}
           </h2>
 
-          <div>
+          <div className="mt-8 grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
             {remaining.map((item) => (
               <Link
                 key={item.id}
                 to="/insights/$slug"
                 params={{ slug: item.slug }}
-                className="group flex items-center gap-6 border-b border-gc-line py-8"
+                className="group flex min-w-0 flex-col"
               >
-                <div className="min-w-0 flex-1">
+                <div className="aspect-[16/9] w-full overflow-hidden rounded-2xl bg-gc-surface">
+                  <img {...coverProps(item)} loading="lazy" className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]" />
+                </div>
+                <div className="mt-5">
                   <Chip>{item.category}</Chip>
-                  <h3 className="mt-3 text-[20px] font-normal leading-[1.35] text-gc-ink group-hover:text-gc-blue sm:text-[26px]">
-                    {item.title}
-                  </h3>
-                  <Byline item={item} />
                 </div>
-                <div className="hidden aspect-[16/9] w-[246px] shrink-0 overflow-hidden rounded-2xl bg-gc-surface sm:block">
-                  <img {...coverProps(item)} loading="lazy" className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
-                </div>
+                <h3 className="mt-3 line-clamp-2 text-[20px] font-normal leading-[1.35] text-gc-ink group-hover:text-gc-blue sm:text-[22px]">
+                  {item.title}
+                </h3>
+                {item.excerpt && (
+                  <p className="mt-2 line-clamp-2 text-[15px] leading-[1.6] text-gc-ink-muted">{item.excerpt}</p>
+                )}
+                <Byline item={item} />
               </Link>
             ))}
           </div>
-
 
           {remaining.length === 0 && !featured && (
             <div className="py-16 text-center text-[15px] text-gc-ink-muted">No articles in this category yet.</div>
