@@ -256,7 +256,7 @@ function ResearchCard() {
 
 export function AgentSmarterSection() {
   return (
-    <section className="mx-auto max-w-6xl px-5 py-20">
+    <section className="mx-auto max-w-7xl px-5 py-20">
       <h2 className="text-center text-4xl font-medium tracking-tight sm:text-5xl">Designed to make your Agent smarter</h2>
       <div className="mt-12 grid gap-10 md:grid-cols-3 md:gap-8">
         <SearchCard />

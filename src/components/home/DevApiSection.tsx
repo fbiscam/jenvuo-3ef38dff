@@ -117,7 +117,7 @@ export function DevApiSection() {
 
   return (
     <section className="px-5 py-24">
-      <div className="mx-auto grid max-w-6xl items-center gap-14 lg:grid-cols-[1fr_1.15fr]">
+      <div className="mx-auto grid max-w-7xl items-center gap-14 lg:grid-cols-[1fr_1.15fr]">
         <div>
           <p className="text-[14px] text-muted-foreground">For developers</p>
           <h2 className="mt-4 text-[40px] font-medium leading-[1.05] tracking-tight text-foreground sm:text-[48px]">
