@@ -28,7 +28,7 @@ import { EntHero, EntShowcase, EntStories } from "@/components/home/EnterpriseHo
 import { DevApiSection } from "@/components/home/DevApiSection";
 import { homeArticlesQueryOptions, type HomeArticle } from "@/lib/home-articles";
 import { GetStartedSection } from "@/components/platform/GetStartedSection";
-import { AllInOnePlatformSection } from "@/components/platform/AllInOnePlatformSection";
+import { AgentSmarterSection } from "@/components/home/AgentSmarterSection";
 import { CloudFrontierModels } from "@/components/home/CloudFrontierModels";
 import { HomeStats, HomeReadAskAutomate, HomeTrust, HomeGetStarted } from "@/components/home/HomePlatformSections";
 import { HomeProductCards, HomeExperiences, HomeUseCases } from "@/components/home/HomeShowcaseSections";
@@ -399,7 +399,7 @@ function HomePage() {
           <EntHero />
           <EntShowcase />
           <DevApiSection />
-          <AllInOnePlatformSection />
+          <AgentSmarterSection />
           <EntStories articles={homeArticles} />
           <GetStartedSection />
         </main>

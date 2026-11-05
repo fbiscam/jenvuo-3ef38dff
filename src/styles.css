@@ -2467,3 +2467,20 @@ html body :is(.dark, .dash-dark) .vsc-studio .tok-var { color: #a8dcff !importan
 .dev-code-fn { color: #6f42c1; }
 .dev-code-builtin { color: #005cc5; }
 .dev-code-param { color: #e36209; }
+
+/* "Designed to make your Agent smarter" homepage cards */
+:root { --agent-highlight: oklch(0.86 0.06 245 / 0.85); }
+.dark { --agent-highlight: oklch(0.42 0.1 255 / 0.85); }
+.agent-mark {
+  background-image: linear-gradient(var(--agent-highlight), var(--agent-highlight));
+  background-repeat: no-repeat;
+  background-position: left center;
+  transition: background-size 0.6s ease;
+}
+@keyframes agent-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+.agent-chip { animation: agent-bob 3.2s ease-in-out infinite; }
+@keyframes agent-fade-in { from { opacity: 0; } to { opacity: 1; } }
+.agent-fade { animation: agent-fade-in 0.5s ease both; }
+@keyframes agent-blink { 50% { opacity: 0; } }
+.agent-caret { animation: agent-blink 1s step-end infinite; }
+@media (prefers-reduced-motion: reduce) { .agent-chip, .agent-fade, .agent-caret { animation: none; } .agent-mark { transition: none; } }
