@@ -1,36 +1,29 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowUpRight, Check } from "lucide-react";
+import { Check } from "lucide-react";
 import { useAuthUser } from "@/hooks/useAuthUser";
 
-/* "Get started" — shared by /platform and the homepage. */
+/* "Choose how to get started" — shared by /platform and the homepage (xAI-style cards). */
 
 const pillDark =
-  "inline-flex items-center gap-1.5 rounded-full bg-foreground px-5 py-2.5 text-sm font-medium text-background transition hover:opacity-85";
+  "flex h-9 w-full items-center justify-center rounded-full bg-foreground text-[14px] font-medium text-background transition hover:opacity-85";
 const pillLight =
-  "inline-flex items-center gap-1.5 rounded-full border border-gc-line bg-background px-5 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-muted";
+  "flex h-9 w-full items-center justify-center rounded-full border border-gc-line bg-background text-[14px] font-medium text-foreground transition-colors hover:bg-muted";
 
 function StartBuilding() {
   const { user } = useAuthUser();
-  if (user) {
-    return (
-      <Link to="/dashboard/models" className={pillLight}>
-        Start building <ArrowUpRight className="h-3.5 w-3.5" />
-      </Link>
-    );
-  }
   return (
-    <Link to="/auth" className={pillLight}>
-      Start building <ArrowUpRight className="h-3.5 w-3.5" />
+    <Link to={user ? "/dashboard/models" : "/auth"} className={pillDark}>
+      Start Building
     </Link>
   );
 }
 
 function Ticks({ items }: { items: string[] }) {
   return (
-    <ul className="mt-5 space-y-3 text-[16px] leading-snug text-gc-ink">
+    <ul className="mt-6 space-y-3 border-t border-gc-line pt-6 text-[14px] leading-snug text-gc-ink">
       {items.map((t) => (
-        <li key={t} className="flex gap-2">
-          <Check className="mt-0.5 h-4 w-4 shrink-0" />
+        <li key={t} className="flex items-start gap-3">
+          <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-gc-ink-muted" />
           <span>{t}</span>
         </li>
       ))}
@@ -38,42 +31,48 @@ function Ticks({ items }: { items: string[] }) {
   );
 }
 
+function Card({ title, sub, items, action }: { title: string; sub: string; items: string[]; action: React.ReactNode }) {
+  return (
+    <div className="flex flex-col rounded-2xl bg-gc-surface p-7 sm:p-9">
+      <h3 className="text-[22px] font-medium tracking-tight text-gc-ink">{title}</h3>
+      <p className="mt-3 text-[15px] text-gc-ink">{sub}</p>
+      <div className="flex-1">
+        <Ticks items={items} />
+      </div>
+      <div className="mt-10">{action}</div>
+    </div>
+  );
+}
+
 export function GetStartedSection() {
   return (
-    <section className="bg-background py-20 text-center">
-      <div className="mx-auto max-w-7xl px-5">
-        <h2 className="text-4xl font-medium tracking-tight sm:text-5xl">Choose how to get started</h2>
-        <div className="mt-10 grid gap-6 text-left md:grid-cols-2">
-          <div className="flex flex-col rounded-md border border-gc-line bg-background p-7 sm:p-8">
-            <h3 className="text-2xl font-medium">Partner with us on your AI plans</h3>
-            <div className="flex-1">
-              <Ticks
-                items={[
-                  "Talk to our team about your product",
-                  "Get hands-on setup guidance",
-                  "Discuss volume and custom needs",
-                ]}
-              />
-            </div>
-            <div className="mt-8">
-              <Link to="/contact" className={pillDark}>Contact sales</Link>
-            </div>
-          </div>
-          <div className="flex flex-col rounded-md border border-gc-line bg-background p-7 sm:p-8">
-            <h3 className="text-2xl font-medium">Build on your own</h3>
-            <div className="flex-1">
-              <Ticks
-                items={[
-                  "Access leading models through one API",
-                  "Simple pay-as-you-go pricing",
-                  "Works with the OpenAI SDK",
-                  "Build with our API docs and examples",
-                ]}
-              />
-            </div>
-            <div className="mt-8">
-              <StartBuilding />
-            </div>
+    <section className="bg-background">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="border-t border-gc-line pb-20 pt-20 text-center sm:pt-24">
+          <h2 className="text-[28px] font-medium tracking-tight text-gc-ink sm:text-[32px]">Choose how to get started</h2>
+          <div className="mx-auto mt-12 grid max-w-[1110px] gap-5 text-left md:grid-cols-2">
+            <Card
+              title="Build on your own"
+              sub="Launch your AI-powered product with:"
+              items={[
+                "Access leading models through one API",
+                "Simple pay-as-you-go pricing",
+                "Works with the OpenAI SDK",
+                "Build with our API docs and examples",
+              ]}
+              action={<StartBuilding />}
+            />
+            <Card
+              title="Get extra support"
+              sub="Hands-on help and custom needs for your team."
+              items={[
+                "Talk to our team about your product",
+                "Get hands-on setup guidance",
+                "Discuss volume and custom needs",
+                "Billing support for teams",
+              ]}
+              action={<Link to="/contact" className={pillLight}>Contact Sales</Link>}
+            />
           </div>
         </div>
       </div>

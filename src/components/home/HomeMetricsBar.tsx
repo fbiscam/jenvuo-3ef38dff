@@ -28,16 +28,16 @@ export function HomeMetricsBar() {
 
   return (
     <section className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
-      <div className="grid grid-cols-1 border-y border-gc-line sm:grid-cols-3">
+      <div className="grid grid-cols-1 border-y border-gc-line py-2 sm:grid-cols-3 sm:py-9">
         {items.map((it, i) => (
           <div
             key={it.label}
-            className={`px-2 py-8 sm:px-8 sm:py-10 ${i > 0 ? "border-t border-gc-line sm:border-l sm:border-t-0" : ""}`}
+            className={`py-7 sm:py-1 ${i > 0 ? "border-t border-gc-line sm:border-l sm:border-t-0 sm:pl-9" : ""}`}
           >
-            <div className="text-[40px] font-semibold leading-none tracking-tight text-gc-ink tabular-nums sm:text-[52px]">
+            <div className="text-[40px] font-normal leading-none tracking-tight text-gc-ink tabular-nums sm:text-[44px]">
               {it.value}
             </div>
-            <p className="mt-3 text-[14px] text-gc-ink-muted">{it.label}</p>
+            <p className="mt-5 text-[13px] text-gc-ink-muted">{it.label}</p>
           </div>
         ))}
       </div>
