@@ -103,6 +103,24 @@ export function requestIp(headers: Headers) {
   return normalizeIp(headers.get("cf-connecting-ip") || headers.get("x-forwarded-for") || headers.get("x-real-ip"));
 }
 
+/** Fixed daily target as % of the day's starting balance (user cannot change it). */
+export const DAILY_TARGET_PCT: Record<Mt5PlanId, number> = { pro: 1.5, elite: 2.5, ultra: 3.5 };
+/** Fixed daily drawdown guard, % of the day's starting balance. */
+export const DAILY_DRAWDOWN_PCT = 4.7;
+
+/**
+ * Server-enforced daily stop for one account. Start balance = balance − today's profit.
+ * Stops when profit reaches the plan % target or loss reaches the 4.7% drawdown guard.
+ */
+export function dailyStopFor(plan: Mt5PlanId, balance: number, todayProfit: number) {
+  const start = Math.max(0, (Number(balance) || 0) - (Number(todayProfit) || 0));
+  const round = (n: number) => Math.round(n * 100) / 100;
+  const target = round((start * DAILY_TARGET_PCT[plan]) / 100);
+  const drawdown = round((start * DAILY_DRAWDOWN_PCT) / 100);
+  const p = Number(todayProfit) || 0;
+  return { start: round(start), target, drawdown, stop: start > 0 && (p >= target || p <= -drawdown), reason: p >= target ? "target" : p <= -drawdown ? "drawdown" : null };
+}
+
 /** Plan daily target is shared by every account on the plan: stop all bots once their combined profit today reaches it. */
 export function sharedTargetStatus(dailyTarget: number, todayProfits: number[], anyHit = false) {
   const combined = Math.round(todayProfits.reduce((a, b) => a + (Number.isFinite(b) ? b : 0), 0) * 100) / 100;

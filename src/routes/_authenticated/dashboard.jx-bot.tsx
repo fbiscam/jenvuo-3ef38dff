@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { Bot, Check, Copy, Download, FileText, Plus, Trash2, Wrench, X } from "lucide-react";
 import { useMt5Access } from "@/components/dashboard/Mt5Licenses";
 import { createMt5License, getBotDownloadUrl, revokeMt5License, type Mt5LicenseRow } from "@/lib/mt5-licenses.functions";
-import { MT5_PLANS, countIpLicenses, dailyTarget, isMt5Plan, parseBinding } from "@/lib/mt5-licenses";
+import { DAILY_DRAWDOWN_PCT, DAILY_TARGET_PCT, MT5_PLANS, countIpLicenses, dailyTarget, isMt5Plan, parseBinding } from "@/lib/mt5-licenses";
 
 const MONO = "font-sans";
 
@@ -43,7 +43,7 @@ const ERRORS = [
 const HOW = [
   ["IP check", "On start the bot checks your IP with jenvu.com and trades only while the IP matches and the plan is valid."],
   ["EUR/USD on M15", "Runs on the EURUSD M15 chart; one IP works with one MT5 account."],
-  ["Daily auto-stop", "Pauses for the day at your plan's daily target or 4% of the balance, whichever is lower; 4.7% drawdown guard."],
+  ["Daily auto-stop", "Fixed by Jenvu: pauses for the day at 1.5% (Pro), 2.5% (Elite) or 3.5% (Ultra) of the day's starting balance, or at the 4.7% daily drawdown guard."],
   ["Safe trading hours", "New trades Mon–Thu 01:00–14:00 and Fri until 13:00 (broker time); skips London and New York opens and weekends."],
   ["Entry checks", "Follows the H1 trend and skips wide spreads, weak candles and spikes, so some days have fewer trades."],
   ["Monthly limit", "Stops at your plan's monthly target until the next period."],
@@ -156,7 +156,8 @@ function JxBotPage() {
     ? [
         { label: "Plan", value: access.allowed ? MT5_PLANS[plan].name : "No plan" },
         { label: "Linked IPs", value: `${bound} / ${limit}` },
-        { label: "Daily target", value: access.allowed ? `$${(access.dailyTarget || dailyTarget(plan)).toLocaleString()}` : "—" },
+        { label: "Daily target", value: access.allowed ? `${DAILY_TARGET_PCT[plan]}% of balance` : "—" },
+        { label: "Drawdown guard", value: access.allowed ? `${DAILY_DRAWDOWN_PCT}% daily` : "—" },
         { label: "Monthly target", value: access.allowed ? `$${(access.monthlyTarget || MT5_PLANS[plan].monthlyTarget).toLocaleString()}` : "—" },
       ]
     : [];
@@ -219,10 +220,7 @@ function JxBotPage() {
                   <div className="mt-0.5">{s.text}</div>
                   {s.code && (
                     <div className="mt-2 flex items-center gap-2">
-                      <code className={`${MONO} min-w-0 flex-1 truncate rounded-lg border border-gc-line bg-background px-3 py-2 text-[13px] text-foreground`}>{s.code}</code>
-                      <button type="button" onClick={() => copyValue(s.code!, `step-${i}`)} className="console-pill shrink-0">
-                        {copied === `step-${i}` ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />} Copy
-                      </button>
+                      <code className={`${MONO} pointer-events-none min-w-0 flex-1 select-none truncate rounded-lg border border-gc-line bg-background px-3 py-2 text-[13px] text-foreground`}>{s.code}</code>
                     </div>
                   )}
                 </div>
