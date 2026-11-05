@@ -35,7 +35,7 @@ function Card({ title, sub, items, action }: { title: string; sub: string; items
   return (
     <div className="flex flex-col rounded-2xl bg-gc-surface p-7 sm:p-9">
       <h3 className="text-[22px] font-medium tracking-tight text-gc-ink">{title}</h3>
-      <p className="mt-3 text-[15px] text-gc-ink">{sub}</p>
+      <p className="mt-3 text-[15px] font-normal text-foreground">{sub}</p>
       <div className="flex-1">
         <Ticks items={items} />
       </div>
