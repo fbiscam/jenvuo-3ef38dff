@@ -2,18 +2,14 @@ import * as React from "react";
 import { Link } from "@tanstack/react-router";
 import { ArrowRight, ArrowUp, ArrowUpRight, Bell, Bot, ChevronRight, Code2, MessageCircle, Plus, Sparkles } from "lucide-react";
 import { openAskJenvu } from "@/components/AskJenvuWidget";
-import bentoImagine from "@/assets/home/bento-imagine.jpg";
-import bentoFox from "@/assets/home/bento-fox.jpg";
-import bentoCar from "@/assets/home/bento-car.jpg";
-import imagine2 from "@/assets/home/loop-imagine-2.jpg";
-import imagine3 from "@/assets/home/loop-imagine-3.jpg";
-import imagine4 from "@/assets/home/loop-imagine-4.jpg";
-import fox2 from "@/assets/home/loop-fox-2.jpg";
-import fox3 from "@/assets/home/loop-fox-3.jpg";
-import fox4 from "@/assets/home/loop-fox-4.jpg";
-import car2 from "@/assets/home/loop-car-2.jpg";
-import car3 from "@/assets/home/loop-car-3.jpg";
-import car4 from "@/assets/home/loop-car-4.jpg";
+import showController from "@/assets/home/show-imagine-controller.jpg";
+import showCoast from "@/assets/home/show-imagine-coast.jpg";
+import showMerch from "@/assets/home/show-imagine-merch.jpg";
+import showSneaker from "@/assets/home/show-explore-sneaker.jpg";
+import showPerfume from "@/assets/home/show-explore-perfume.jpg";
+import showRedTop from "@/assets/home/show-explore-redtop.jpg";
+import showOrchid from "@/assets/home/show-explore-orchid.jpg";
+import showWatch from "@/assets/home/show-explore-watch.jpg";
 import { shortTitle, type HomeArticle } from "@/lib/home-articles";
 import { insightCoverUrl } from "@/lib/insight-cover";
 import starsNebula from "@/assets/platform/stars-nebula.jpg";
@@ -236,22 +232,18 @@ function VoiceTile() {
 }
 
 const IMAGINE_LOOP = [
-  { src: bentoImagine, alt: "Gold bar on a marble desk beside an espresso and a notebook" },
-  { src: imagine2, alt: "Stacked gold bars on a desk beside a laptop showing a candlestick chart" },
-  { src: imagine3, alt: "Gold coin standing on black marble in morning light" },
-  { src: imagine4, alt: "Tablet showing a gold price chart on a desk at sunset" },
+  { src: showController, alt: "Black game controller lit by a red glow" },
+  { src: showCoast, alt: "Friends walking along a coastal road at sunset" },
+  { src: showMerch, alt: "Black hoodie, cap, tote bag and mug laid flat" },
 ];
 const FOX_LOOP = [
-  { src: bentoFox, alt: "Animated owl with headphones studying a gold chart" },
-  { src: fox2, alt: "Animated fox with headphones watching a glowing chart" },
-  { src: fox3, alt: "Animated robot holding a gold coin on a stack of books" },
-  { src: fox4, alt: "Animated cat in glasses reading a gold price newspaper" },
+  { src: showSneaker, alt: "White running sneaker floating on grey" },
+  { src: showPerfume, alt: "Perfume bottle on pink flower petals" },
+  { src: showRedTop, alt: "Woman in a red tank top in a studio" },
 ];
 const CAR_LOOP = [
-  { src: bentoCar, alt: "Gold vintage sports car on a coastal road at sunset" },
-  { src: car2, alt: "Gold supercar by a glass tower at night" },
-  { src: car3, alt: "Gold yacht on a turquoise sea at sunset" },
-  { src: car4, alt: "Vintage gold motorcycle on a desert road at sunset" },
+  { src: showOrchid, alt: "Orchid Bloom serum bottle beside a purple orchid" },
+  { src: showWatch, alt: "Silver wristwatch on white marble" },
 ];
 
 /** Cross-fades through a set of pictures in a loop (pauses for reduced motion). */
@@ -274,7 +266,7 @@ function LoopImages({ images, width, height, offset = 0, className = "" }: { ima
           width={width}
           height={height}
           loading="lazy"
-          className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-1000 ease-in-out ${k === i ? "opacity-100" : "opacity-0"} ${className}`}
+          className={`absolute inset-0 h-full w-full object-cover transition-[opacity,scale] ease-in-out ${k === i ? "scale-[1.06] opacity-100 duration-[1000ms,4500ms]" : "scale-100 opacity-0 duration-[1000ms,0ms] delay-[0ms,1000ms]"} ${className}`}
         />
       ))}
     </>
@@ -291,7 +283,9 @@ export function EntShowcase() {
       </div>
       <div className="mx-auto mt-3 grid max-w-7xl gap-3 md:grid-cols-[2fr_1fr_3fr]">
         <Link to="/insights" className={`${tile} h-[290px]`}>
-          <LoopImages images={IMAGINE_LOOP} width={1280} height={960} className="transition duration-500 group-hover:scale-105" />
+          <div className="absolute inset-0 transition-transform duration-500 group-hover:scale-[1.03]">
+            <LoopImages images={IMAGINE_LOOP} width={1280} height={960} />
+          </div>
           <span className="absolute bottom-4 left-5 z-10 text-[14px] text-gc-on-night">Imagine</span>
         </Link>
         <Link to="/insights" className={`${tile} grid h-[290px] grid-rows-2 gap-1`}>

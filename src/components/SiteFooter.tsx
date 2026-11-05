@@ -151,7 +151,7 @@ export default function SiteFooter({ className }: { className?: string }) {
       <div className="site-edge">
         <div className="flex flex-col gap-12 border-t border-gc-line py-12 lg:flex-row lg:gap-0">
           {/* Brand block */}
-          <div className="flex shrink-0 flex-col justify-between gap-8 lg:w-[300px] lg:pr-10">
+          <div className="flex shrink-0 flex-col justify-between gap-8 lg:w-[300px] lg:border-r lg:border-dashed lg:border-gc-line lg:pr-10">
             <div>
               <Link to="/" className="inline-flex items-center gap-2.5 text-[26px] font-medium leading-none tracking-tight text-foreground"><JenvuMark className="h-7 w-7 shrink-0" />Jenvu</Link>
               <p className="mt-4 text-[13px] text-muted-foreground">© {year} Jenvu. All rights reserved.</p>
