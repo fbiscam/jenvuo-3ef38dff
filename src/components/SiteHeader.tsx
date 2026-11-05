@@ -113,6 +113,13 @@ export default function SiteHeader() {
                 Log in
               </Link>
             )}
+            <button
+              type="button"
+              onClick={() => openAskJenvu("sales")}
+              className="inline-flex h-10 items-center justify-center whitespace-nowrap rounded-full bg-gc-pill px-4 text-[14px] font-medium text-foreground hover:brightness-95"
+            >
+              Contact Sales
+            </button>
             <div className="relative hidden sm:block" onMouseLeave={() => setTryOpen(false)}>
               <button
                 type="button"
@@ -120,9 +127,10 @@ export default function SiteHeader() {
                 aria-haspopup="menu"
                 onClick={() => setTryOpen((v) => !v)}
                 onMouseEnter={() => setTryOpen(true)}
-                className="inline-flex h-10 items-center gap-1 rounded-full border border-foreground/20 bg-gc-surface px-4 text-[14px] font-medium text-foreground hover:brightness-95"
+                className="inline-flex h-10 items-stretch overflow-hidden rounded-full bg-foreground text-[14px] font-medium text-background hover:opacity-90"
               >
-                Try Jenvu <ChevronDown className={`h-4 w-4 transition-transform ${tryOpen ? "rotate-180" : ""}`} />
+                <span className="flex items-center pl-4 pr-3">Try Jenvu</span>
+                <span aria-hidden="true" className="flex items-center border-l border-background/20 pl-2.5 pr-3"><ChevronDown className={`h-4 w-4 transition-transform ${tryOpen ? "rotate-180" : ""}`} /></span>
               </button>
               {tryOpen && (
                 <div role="menu" className="absolute right-0 top-full z-50 pt-2">
@@ -143,13 +151,6 @@ export default function SiteHeader() {
                 </div>
               )}
             </div>
-            <button
-              type="button"
-              onClick={() => openAskJenvu("sales")}
-              className="inline-flex h-10 items-center justify-center whitespace-nowrap rounded-full bg-foreground px-4 text-[14px] font-medium text-background hover:opacity-85"
-            >
-              Contact sales
-            </button>
             <button
               type="button"
               aria-label="Open menu"
