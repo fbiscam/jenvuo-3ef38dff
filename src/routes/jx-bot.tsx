@@ -33,7 +33,7 @@ export const Route = createFileRoute("/jx-bot")({
 const pillDark =
   "inline-flex items-center gap-2 rounded-full bg-foreground px-6 py-3 text-[16px] font-medium text-background transition hover:opacity-85";
 const pillGrey =
-  "inline-flex items-center gap-2 rounded-full bg-muted px-6 py-3 text-[16px] font-medium text-foreground transition hover:bg-gc-line";
+  "inline-flex items-center gap-2 rounded-full bg-gc-pill px-6 py-3 text-[16px] font-medium text-foreground transition hover:brightness-95";
 
 /* ---------- shared bits ---------- */
 

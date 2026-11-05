@@ -200,7 +200,7 @@ function InsightDetailPage() {
             <div className="sticky top-28">
               <div className="text-[20px] font-medium leading-[1.4] text-gc-ink">Try Jenvu Terminal</div>
               <p className="mt-3 text-[14px] leading-[1.7] text-gc-ink-muted">Access the live gold chart in Jenvu</p>
-              <a href="https://auth.jenvu.com/sign-in" className="mt-5 inline-flex h-12 items-center rounded-full bg-gc-blue px-6 text-[16px] font-medium text-gc-on-blue hover:bg-gc-blue-hover">
+              <a href="https://auth.jenvu.com/sign-in" className="mt-5 inline-flex h-12 items-center rounded-full bg-foreground px-6 text-[16px] font-medium text-background hover:opacity-90">
                 Try now
               </a>
             </div>

@@ -114,7 +114,7 @@ function FounderPage() {
               <h2 className="text-[32px] font-medium leading-[1.2] sm:text-[40px]">Start trading with the same view</h2>
               <p className="mt-4 text-[16px] text-gc-ink-muted">Pick a plan and open the Terminal Haseeb built.</p>
               <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-                <Link to="/pricing" className="inline-flex h-12 items-center gap-2 rounded-full bg-gc-blue px-6 text-[16px] font-medium text-gc-on-blue hover:bg-gc-blue-hover">
+                <Link to="/pricing" className="inline-flex h-12 items-center gap-2 rounded-full bg-foreground px-6 text-[16px] font-medium text-background hover:opacity-90">
                   Buy now <ArrowRight className="h-4 w-4" />
                 </Link>
                 <Link to="/founding" className="inline-flex h-12 items-center rounded-full border border-gc-line px-6 text-[16px] font-medium text-gc-ink hover:bg-gc-surface">

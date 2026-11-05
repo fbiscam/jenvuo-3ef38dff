@@ -184,7 +184,7 @@ function ScamCheckPage() {
                 key={t.kind}
                 type="button"
                 onClick={() => switchTab(t.kind)}
-                className={`inline-flex h-11 w-full items-center justify-center gap-2 rounded-full text-[14px] font-medium transition ${active ? "bg-gc-blue text-gc-on-blue" : "border border-gc-line bg-background text-gc-ink hover:bg-gc-surface"}`}
+                className={`inline-flex h-11 w-full items-center justify-center gap-2 rounded-full text-[14px] font-medium transition ${active ? "bg-foreground text-background" : "bg-gc-pill text-foreground hover:brightness-95"}`}
               >
                 <Icon className="h-4 w-4" />
                 {t.label}
@@ -223,7 +223,7 @@ function ScamCheckPage() {
             <Button
               type="submit"
               disabled={loading || !value.trim()}
-              className="h-11 rounded-full bg-gc-blue px-6 text-gc-on-blue hover:bg-gc-blue-hover"
+              className="h-11 rounded-full bg-foreground px-6 text-background hover:opacity-90"
             >
               {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ShieldCheck className="h-4 w-4" />}
               {loading ? "Analysing…" : "Check now"}
