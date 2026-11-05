@@ -1,4 +1,3 @@
-import JenvuMark from "@/components/JenvuMark";
 import * as React from "react";
 import SiteHeader from "@/components/SiteHeader";
 import { createFileRoute, Link } from "@tanstack/react-router";
@@ -6,6 +5,17 @@ import { useServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { submitContactMessage } from "@/lib/contact.functions";
 import BlogFooter from "@/components/BlogFooter";
+import {
+  ArrowUpRight,
+  CALLOUT_BUTTON,
+  FORM_SANS,
+  FormCallout,
+  FormField,
+  FormHero,
+  RadioCards,
+  SUBMIT_BUTTON,
+  formInputClass,
+} from "@/components/forms/CenteredForm";
 
 export const Route = createFileRoute("/contact")({
   head: () => ({
@@ -50,25 +60,32 @@ export const Route = createFileRoute("/contact")({
   component: ContactPage,
 });
 
-const SANS = "font-['Google_Sans_Flex','Google_Sans','Product_Sans','Poppins',system-ui,sans-serif]";
+const REQUEST_TYPES = [
+  { id: "Plans & billing", label: "Plans & billing" },
+  { id: "Partnership", label: "Partnership" },
+  { id: "Support", label: "Support" },
+] as const;
+type RequestType = (typeof REQUEST_TYPES)[number]["id"];
 
 const ClientSchema = z.object({
-  name: z.string().trim().min(1, "Enter your name").max(100),
+  firstName: z.string().trim().min(1, "Enter your first name").max(50),
+  lastName: z.string().trim().min(1, "Enter your last name").max(50),
   email: z.string().trim().email("Enter a valid email").max(255),
-  phone: z.string().trim().max(30, "Phone number is too long").regex(/^[+()\-.\s\d]*$/, "Enter a valid phone number"),
-  subject: z.string().trim().min(1, "Add a subject").max(150),
+  company: z.string().trim().max(80, "Company name is too long"),
+  requestType: z.string().min(1, "Choose a request type"),
   message: z.string().trim().min(5, "Message is too short").max(2000),
 });
 
 type FormState = {
-  name: string;
+  firstName: string;
+  lastName: string;
   email: string;
-  phone: string;
-  subject: string;
+  company: string;
+  requestType: RequestType | "";
   message: string;
 };
 
-const INITIAL: FormState = { name: "", email: "", phone: "", subject: "", message: "" };
+const INITIAL: FormState = { firstName: "", lastName: "", email: "", company: "", requestType: "", message: "" };
 
 function ContactPage() {
   const submit = useServerFn(submitContactMessage);
@@ -78,11 +95,13 @@ function ContactPage() {
   const [serverError, setServerError] = React.useState<string | null>(null);
   const [doneEmail, setDoneEmail] = React.useState<string | null>(null);
 
-  const onChange = (k: keyof FormState) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setForm((s) => ({ ...s, [k]: e.target.value }));
+  const set = <K extends keyof FormState>(k: K, v: FormState[K]) => {
+    setForm((s) => ({ ...s, [k]: v }));
     if (errors[k]) setErrors((es) => ({ ...es, [k]: undefined }));
     if (serverError) setServerError(null);
   };
+  const onChange = (k: keyof FormState) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
+    set(k, e.target.value as never);
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -97,11 +116,20 @@ function ContactPage() {
       setErrors(fieldErrors);
       return;
     }
+    const d = parsed.data;
     setBusy(true);
     try {
-      const res = await submit({ data: parsed.data });
+      const res = await submit({
+        data: {
+          name: `${d.firstName} ${d.lastName}`.trim(),
+          email: d.email,
+          phone: "",
+          subject: d.company ? `${d.requestType} — ${d.company}` : d.requestType,
+          message: d.message,
+        },
+      });
       if (res.ok) {
-        setDoneEmail(parsed.data.email);
+        setDoneEmail(d.email);
         setForm(INITIAL);
       } else {
         setServerError(res.error);
@@ -114,130 +142,79 @@ function ContactPage() {
   };
 
   return (
-    <div className={`public-cloudflare min-h-dvh w-full bg-background text-gc-ink ${SANS} antialiased`}>
+    <div className={`public-cloudflare min-h-dvh w-full bg-background text-gc-ink ${FORM_SANS} antialiased`}>
       <SiteHeader />
 
-      <main className="grid w-full grid-cols-1 lg:grid-cols-[1fr_minmax(360px,30%)]">
-        {/* LEFT — form */}
-        <section className="px-5 py-12 sm:px-10 lg:py-14 lg:pl-[12%] lg:pr-16">
-          <div className="max-w-[710px]">
-            <span className="inline-flex items-center rounded-full border border-gc-line px-3.5 py-1 text-[13px] font-medium text-gc-ink-muted">Contact us</span>
-            <h1 className="mt-4 text-[2.4rem] font-medium leading-[1.08] tracking-tight sm:text-[3.4rem]">
-              Talk to the Jenvu team
-            </h1>
-            <ul className="mt-6 space-y-3 text-[17px] text-gc-ink-muted">
-              {[
-                "Ask about plans, billing or the Terminal",
-                "Start a conversation about partnerships",
-                "Report a bug or share feedback",
-              ].map((t) => (
-                <li key={t} className="flex items-center gap-4">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="shrink-0 text-gc-blue"><polyline points="4 12 10 18 20 6" /></svg>
-                  {t}
-                </li>
-              ))}
-            </ul>
+      <main className="w-full px-5 pb-24 pt-20 sm:pt-28">
+        <FormHero eyebrow="Sales" title="Contact Sales">
+          Interested in what Jenvu can do for your trading or your team? Fill out the form and a member of our team will be in touch shortly.
+        </FormHero>
 
-            {doneEmail ? (
-              <div className="mt-8 rounded-md border border-gc-line p-6">
-                <h2 className="text-[22px] font-medium tracking-tight">Message received.</h2>
-                <p className="mt-2 text-gc-ink-muted">
-                  Thanks — we'll reply to <span className="font-medium text-gc-ink">{doneEmail}</span> within one business day.
-                </p>
-                <button type="button" onClick={() => setDoneEmail(null)} className="mt-5 text-sm font-medium text-gc-blue hover:underline">
-                  Send another message
-                </button>
-              </div>
-            ) : (
-              <form onSubmit={onSubmit} className="mt-8 space-y-6" noValidate>
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  <Field label="Full name*" htmlFor="c-name" error={errors.name}>
-                    <input id="c-name" type="text" autoComplete="name" maxLength={100} value={form.name} onChange={onChange("name")} className={inputClass(!!errors.name)} placeholder="Full name*" />
-                  </Field>
-                  <Field label="Email*" htmlFor="c-email" error={errors.email}>
-                    <input id="c-email" type="email" autoComplete="email" maxLength={255} value={form.email} onChange={onChange("email")} className={inputClass(!!errors.email)} placeholder="Email*" />
-                  </Field>
-                </div>
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  <Field label="Phone number (optional)" htmlFor="c-phone" error={errors.phone}>
-                    <input id="c-phone" type="tel" inputMode="tel" autoComplete="tel" maxLength={30} value={form.phone} onChange={onChange("phone")} className={inputClass(!!errors.phone)} placeholder="Phone number (optional)" />
-                  </Field>
-                  <Field label="Subject*" htmlFor="c-subject" error={errors.subject}>
-                    <input id="c-subject" type="text" maxLength={150} value={form.subject} onChange={onChange("subject")} className={inputClass(!!errors.subject)} placeholder="Subject*" />
-                  </Field>
-                </div>
-                <div>
-                  <label htmlFor="c-message" className="text-[15px] text-gc-ink-muted">Describe what you need*</label>
-                  <textarea id="c-message" rows={4} maxLength={2000} value={form.message} onChange={onChange("message")} className={`${inputClass(!!errors.message)} mt-1.5 min-h-[104px] resize-y`} placeholder="e.g., I'd like to know more about the Elite plan." />
-                  <div className="mt-1 flex justify-between text-xs text-gc-ink-muted">
-                    <span className="text-destructive">{errors.message}</span>
-                    <span>{form.message.length}/2,000</span>
-                  </div>
-                </div>
+        <FormCallout
+          action={
+            <a href="https://dash.jenvu.com/overview" className={CALLOUT_BUTTON}>
+              Open Jenvu Dashboard <ArrowUpRight />
+            </a>
+          }
+        >
+          Want to get started right away?
+          <br />
+          You can self-serve directly in the dashboard.
+        </FormCallout>
 
-                {serverError && (
-                  <div className="rounded-lg border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive">{serverError}</div>
-                )}
-
-                <button type="submit" disabled={busy} className="inline-flex items-center rounded-full bg-gc-blue px-6 py-3 text-[15px] font-medium text-gc-on-blue transition-colors hover:bg-gc-blue-hover disabled:opacity-60">
-                  {busy ? "Sending…" : "Submit request"}
-                </button>
-                <p className="text-[16px] text-gc-ink-muted">
-                  I understand my personal data will be processed in accordance with Jenvu's{" "}
-                  <Link to="/privacy" className="font-medium text-gc-blue underline underline-offset-2">Privacy Policy</Link>.
-                </p>
-              </form>
-            )}
-          </div>
-        </section>
-
-        {/* RIGHT — cards */}
-        <aside className="relative overflow-hidden border-t border-gc-line px-5 py-10 sm:px-10 lg:border-l lg:border-t-0 lg:py-14">
-          <div aria-hidden className="pointer-events-none absolute inset-0 opacity-60" style={{ backgroundImage: "var(--platform-aurora-1)" }} />
-          <div className="relative max-w-[370px] space-y-4">
-            <div className="rounded-md border border-gc-line bg-background p-6 shadow-sm">
-              <JenvuMark className="h-10 w-10 text-foreground" />
-              <h2 className="mt-4 text-[22px] font-medium tracking-tight">Contact our team direct</h2>
-              <a href="mailto:support@jenvu.com" className="mt-6 flex w-full items-center justify-center gap-2 rounded-full bg-gc-blue px-5 py-3 text-[15px] font-medium text-gc-on-blue transition-colors hover:bg-gc-blue-hover">
-                support@jenvu.com
-              </a>
-              <p className="mt-4 text-[15px] text-gc-ink-muted">Monday to Friday, 09:00 – 18:00 UTC</p>
+        <div className="mx-auto mt-16 max-w-[605px]">
+          {doneEmail ? (
+            <div className="rounded-xl bg-gc-surface p-6 text-center" role="status" aria-live="polite">
+              <h2 className="text-[22px] font-normal tracking-tight">Message received.</h2>
+              <p className="mt-2 text-[15px] text-gc-ink-muted">
+                Thanks — we'll reply to <span className="text-foreground">{doneEmail}</span> within one business day.
+              </p>
+              <button type="button" onClick={() => setDoneEmail(null)} className={`${CALLOUT_BUTTON} mt-5`}>
+                Send another message
+              </button>
             </div>
-            <SideCard text="New customers get $100 credit and 14 days of Pro." link="Get started for free" href="https://auth.jenvu.com/sign-in" />
-            <SideCard text="Get help with your account, resolve billing issues, and find helpful guides." link="Visit Jenvu Support" href="https://support.jenvu.com" />
-            <SideCard text="Learn how the Founding Program gives early traders access." link="Apply to the Founding Program" href="https://jenvu.com/founding" />
-          </div>
-        </aside>
+          ) : (
+            <form onSubmit={onSubmit} className="space-y-7" noValidate>
+              <div className="grid grid-cols-1 gap-x-4 gap-y-7 sm:grid-cols-2">
+                <FormField label="First Name" htmlFor="c-first" required error={errors.firstName}>
+                  <input id="c-first" type="text" autoComplete="given-name" maxLength={50} value={form.firstName} onChange={onChange("firstName")} className={formInputClass(!!errors.firstName)} />
+                </FormField>
+                <FormField label="Last Name" htmlFor="c-last" required error={errors.lastName}>
+                  <input id="c-last" type="text" autoComplete="family-name" maxLength={50} value={form.lastName} onChange={onChange("lastName")} className={formInputClass(!!errors.lastName)} />
+                </FormField>
+              </div>
+              <FormField label="Email" htmlFor="c-email" required error={errors.email}>
+                <input id="c-email" type="email" autoComplete="email" maxLength={255} value={form.email} onChange={onChange("email")} className={formInputClass(!!errors.email)} />
+              </FormField>
+              <FormField label="Company Name (optional)" htmlFor="c-company" error={errors.company}>
+                <input id="c-company" type="text" autoComplete="organization" maxLength={80} value={form.company} onChange={onChange("company")} className={formInputClass(!!errors.company)} />
+              </FormField>
+              <FormField label="Request Type" required error={errors.requestType}>
+                <RadioCards name="request-type" value={form.requestType} onChange={(v) => set("requestType", v)} options={REQUEST_TYPES} />
+              </FormField>
+              <FormField label="Message" htmlFor="c-message" required error={errors.message}>
+                <textarea id="c-message" rows={4} maxLength={2000} value={form.message} onChange={onChange("message")} className={`${formInputClass(!!errors.message)} min-h-[106px] resize-y`} placeholder="How can we help?" />
+              </FormField>
+
+              {serverError && (
+                <div className="rounded-lg border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive">{serverError}</div>
+              )}
+
+              <div>
+                <button type="submit" disabled={busy} className={SUBMIT_BUTTON}>
+                  {busy ? "Sending…" : "Contact Sales"}
+                </button>
+                <p className="mt-4 text-[13px] text-gc-ink-muted">
+                  Your details are handled under Jenvu's{" "}
+                  <Link to="/privacy" className="text-foreground underline underline-offset-2">Privacy Policy</Link>.
+                </p>
+              </div>
+            </form>
+          )}
+        </div>
       </main>
 
       <BlogFooter />
     </div>
   );
-}
-
-function SideCard({ text, link, href }: { text: string; link: string; href: string }) {
-  return (
-    <div className="rounded-md border border-gc-line bg-background/95 p-5 shadow-sm">
-      <p className="text-[15px] leading-relaxed">{text}</p>
-      <a href={href} className="mt-4 inline-block text-[15px] font-medium text-gc-blue hover:underline">{link}</a>
-    </div>
-  );
-}
-
-function Field({ label, htmlFor, error, children }: { label: string; htmlFor: string; error?: string; children: React.ReactNode }) {
-  return (
-    <div>
-      <label htmlFor={htmlFor} className="sr-only">{label}</label>
-      {children}
-      {error && <p className="mt-1.5 text-xs text-destructive">{error}</p>}
-    </div>
-  );
-}
-
-function inputClass(hasError: boolean) {
-  return [
-    "w-full rounded-md border bg-background px-4 py-4 text-[16px] text-gc-ink placeholder:text-gc-ink-muted",
-    "outline-none transition focus:border-gc-blue focus:ring-1 focus:ring-gc-blue",
-    hasError ? "border-destructive" : "border-gc-line",
-  ].join(" ");
 }
