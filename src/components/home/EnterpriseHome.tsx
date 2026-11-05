@@ -284,12 +284,12 @@ function LoopImages({ images, width, height, offset = 0, className = "" }: { ima
 export function EntShowcase() {
   return (
     <section className="px-5 pb-20">
-      <div className="mx-auto grid max-w-[1140px] gap-3 md:grid-cols-3">
+      <div className="mx-auto grid max-w-7xl gap-3 md:grid-cols-3">
         <ChatTile />
         <BuildTile />
         <BotTile />
       </div>
-      <div className="mx-auto mt-3 grid max-w-[1140px] gap-3 md:grid-cols-[2fr_1fr_3fr]">
+      <div className="mx-auto mt-3 grid max-w-7xl gap-3 md:grid-cols-[2fr_1fr_3fr]">
         <Link to="/insights" className={`${tile} h-[290px]`}>
           <LoopImages images={IMAGINE_LOOP} width={1280} height={960} className="transition duration-500 group-hover:scale-105" />
           <span className="absolute bottom-4 left-5 z-10 text-[14px] text-gc-on-night">Imagine</span>
