@@ -43,7 +43,7 @@ export function HomeMetricsBar() {
             key={it.key}
             className={`py-7 sm:py-1 ${i > 0 ? "border-t border-gc-line sm:border-l sm:border-t-0 sm:pl-9" : ""}`}
           >
-            <div className="text-[48px] font-bold leading-none tracking-tight text-gc-ink tabular-nums sm:text-[64px]">
+            <div className="text-[48px] font-normal leading-none tracking-tight text-gc-ink tabular-nums sm:text-[64px]">
               {it.value}
             </div>
             <p className="mt-5 text-[14px] text-gc-ink-muted">{it.label}</p>

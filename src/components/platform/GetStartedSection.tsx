@@ -50,7 +50,7 @@ export function GetStartedSection() {
       <div className="mx-auto max-w-7xl">
         <div className="border-t border-gc-line pb-20 pt-20 text-center sm:pt-24">
           <h2 className="text-[28px] font-medium tracking-tight text-gc-ink sm:text-[32px]">Choose how to get started</h2>
-          <div className="mx-auto mt-12 grid max-w-[1110px] gap-5 text-left md:grid-cols-2">
+          <div className="mx-auto mt-12 grid w-full max-w-7xl gap-5 text-left md:grid-cols-2">
             <Card
               title="Build on your own"
               sub="Launch your AI-powered product with:"
