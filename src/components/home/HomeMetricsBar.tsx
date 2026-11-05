@@ -20,8 +20,8 @@ export function HomeMetricsBar() {
       label: (
         <span className="inline-flex items-center gap-2">
           models in
-          <span className="inline-flex items-center gap-1.5 text-[12px] font-semibold uppercase tracking-[0.28em] text-gc-ink">
-            <JBadge className="h-5 w-5" />
+          <span className="inline-flex items-center gap-1.5 text-[11px] font-light uppercase tracking-[0.42em] text-gc-ink-muted">
+            <JBadge className="h-4 w-4" />
             Jenvu
           </span>
         </span>
@@ -32,16 +32,16 @@ export function HomeMetricsBar() {
 
   return (
     <section className="w-full px-5">
-      <div className="mx-auto grid max-w-7xl grid-cols-1 border-y border-gc-line py-2 sm:grid-cols-3 sm:py-9">
+      <div className="mx-auto grid max-w-7xl grid-cols-1 border-y border-gc-line py-2 sm:grid-cols-3 sm:py-10">
         {items.map((it, i) => (
           <div
             key={it.key}
             className={`py-7 sm:py-1 ${i > 0 ? "border-t border-gc-line sm:border-l sm:border-t-0 sm:pl-9" : ""}`}
           >
-            <div className="text-[48px] font-normal leading-none tracking-tight text-gc-ink tabular-nums sm:text-[64px]">
+            <div className="text-[44px] font-normal leading-none tracking-[-0.02em] text-gc-ink tabular-nums sm:text-[52px]">
               {it.value}
             </div>
-            <p className="mt-5 text-[14px] text-gc-ink-muted">{it.label}</p>
+            <p className="mt-6 text-[13px] text-gc-ink-muted">{it.label}</p>
           </div>
         ))}
       </div>
