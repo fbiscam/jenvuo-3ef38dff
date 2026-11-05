@@ -85,7 +85,7 @@ export function PageShell({
       {!oneLine && <PolicyHub />}
 
       {highlight && (
-        <div className="mx-auto max-w-[1300px] px-5 pt-10 sm:px-10 [&>section]:max-w-none">
+        <div className="mx-auto max-w-[82.5rem] px-5 pt-10 [&>section]:max-w-none">
           <Banner title={highlight.title}>{highlight.text}</Banner>
         </div>
       )}
@@ -126,7 +126,7 @@ function PolicyHub() {
   const path = useRouterState({ select: (s) => s.location.pathname });
   if (!POLICIES.some((p) => p.to !== "/help" && path.endsWith(p.to))) return null;
   return (
-    <div className="mx-auto max-w-[1300px] px-5 sm:px-10">
+    <div className="mx-auto max-w-[82.5rem] px-5">
       <div className="flex flex-col gap-4 rounded-md border border-gc-line bg-background p-4 sm:p-5 md:flex-row md:items-center md:justify-between">
         <nav aria-label="Policies" className="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1 [scrollbar-width:none] md:flex-wrap md:pb-0">
           {POLICIES.map((p) => {

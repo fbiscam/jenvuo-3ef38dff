@@ -400,8 +400,8 @@ function HomePage() {
           <EntHero />
           <EntShowcase />
           <DevApiSection />
-          <HomeMetricsBar />
           <AgentSmarterSection />
+          <HomeMetricsBar />
           <EntStories articles={homeArticles} />
           <GetStartedSection />
         </main>

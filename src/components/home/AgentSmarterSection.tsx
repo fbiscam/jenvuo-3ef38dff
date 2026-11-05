@@ -9,7 +9,7 @@ import cloudsImg from "@/assets/agent-card-clouds.jpg";
    "all-in-one platform" block on the homepage only; /platform keeps its own. */
 
 const pill =
-  "mt-5 inline-flex items-center gap-1.5 bg-muted px-4 py-2.5 text-[15px] text-foreground transition-colors hover:bg-gc-line";
+  "mt-5 inline-flex items-center gap-1.5 rounded-full border border-gc-line bg-gc-surface px-5 py-2.5 text-[15px] text-foreground transition hover:brightness-95";
 const inlineLink = "text-foreground underline decoration-1 underline-offset-[3px] hover:opacity-70";
 
 function useReducedMotion() {
