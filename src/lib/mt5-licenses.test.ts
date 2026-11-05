@@ -154,14 +154,14 @@ it("IP-only license locks only its most recent account", () => {
 
 import { dailyStopFor } from "./mt5-licenses";
 describe("fixed % daily target and drawdown", () => {
-  it("Pro 1.5%, Elite 2.5%, Ultra 3.5% of $2,500 start balance", () => {
-    expect(dailyStopFor("pro", 2500, 0).target).toBe(37.5);
-    expect(dailyStopFor("elite", 2500, 0).target).toBe(62.5);
-    expect(dailyStopFor("ultra", 2500, 0).target).toBe(87.5);
+  it("Pro 2%, Elite 4%, Ultra 6% of $2,500 start balance", () => {
+    expect(dailyStopFor("pro", 2500, 0).target).toBe(50);
+    expect(dailyStopFor("elite", 2500, 0).target).toBe(100);
+    expect(dailyStopFor("ultra", 2500, 0).target).toBe(150);
   });
   it("stops at target using start balance (balance − today's profit)", () => {
-    expect(dailyStopFor("pro", 2537.5, 37.5).stop).toBe(true);
-    expect(dailyStopFor("pro", 2530, 30).stop).toBe(false);
+    expect(dailyStopFor("pro", 2550, 50).stop).toBe(true);
+    expect(dailyStopFor("pro", 2540, 40).stop).toBe(false);
   });
   it("stops at 4.7% drawdown", () => {
     expect(dailyStopFor("ultra", 2382.5, -117.5).reason).toBe("drawdown");

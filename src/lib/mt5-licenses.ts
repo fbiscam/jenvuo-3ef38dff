@@ -104,7 +104,7 @@ export function requestIp(headers: Headers) {
 }
 
 /** Fixed daily target as % of the day's starting balance (user cannot change it). */
-export const DAILY_TARGET_PCT: Record<Mt5PlanId, number> = { pro: 1.5, elite: 2.5, ultra: 3.5 };
+export const DAILY_TARGET_PCT: Record<Mt5PlanId, number> = { pro: 2, elite: 4, ultra: 6 };
 /** Fixed daily drawdown guard, % of the day's starting balance. */
 export const DAILY_DRAWDOWN_PCT = 4.7;
 
