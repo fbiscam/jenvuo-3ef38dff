@@ -40,9 +40,9 @@ function ParticleCloud() {
     let seed = 7;
     const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
     const gauss = () => (rnd() + rnd() + rnd() - 1.5) / 1.5;
-    const pts = Array.from({ length: 2400 }, () => {
+    const pts = Array.from({ length: 3200 }, () => {
       const x = gauss(), y = gauss(), z = gauss();
-      return { x, y, z, s: 2 + rnd() * 5, a: 0.55 + rnd() * 0.45 };
+      return { x, y, z, s: 3 + rnd() * 7, a: 0.55 + rnd() * 0.45 };
     });
 
     let raf = 0;
@@ -53,7 +53,7 @@ function ParticleCloud() {
       if (canvas.width !== w * dpr) { canvas.width = w * dpr; canvas.height = h * dpr; }
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       ctx.clearRect(0, 0, w, h);
-      const cx = w / 2, cy = h / 2, r = Math.min(w, h) * 0.95;
+      const cx = w / 2, cy = h / 2, r = Math.min(w, h) * 0.8;
       const cos = Math.cos(angle), sin = Math.sin(angle);
       for (const p of pts) {
         const x = p.x * cos - p.z * sin;
