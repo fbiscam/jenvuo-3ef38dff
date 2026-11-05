@@ -1,13 +1,12 @@
 // Ops-console-only server functions for crypto payments & promo codes.
 import { createServerFn } from "@tanstack/react-start";
-import { isOpsUnlockedOrToken } from "./admin-guard.server";
-
 async function db() {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   return supabaseAdmin as any;
 }
 
 async function gate(token?: string) {
+  const { isOpsUnlockedOrToken } = await import("./admin-guard.server");
   const ok = await isOpsUnlockedOrToken(token);
   if (!ok) throw new Error("Locked");
 }
