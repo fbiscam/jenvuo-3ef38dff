@@ -399,9 +399,8 @@ function HomePage() {
         <main>
           <EntHero />
           <EntShowcase />
-          <JxBotFeatures />
-          <AllInOnePlatformSection />
           <DevApiSection />
+          <AllInOnePlatformSection />
           <EntStories articles={homeArticles} />
           <GetStartedSection />
         </main>
