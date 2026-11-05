@@ -137,7 +137,7 @@ export function DevApiSection() {
             </Link>
             <Link
               to="/docs"
-              className="inline-flex h-10 items-center rounded-full bg-gc-surface px-5 text-[14px] font-medium text-foreground transition hover:brightness-95"
+              className="inline-flex h-10 items-center rounded-full bg-gc-pill px-5 text-[14px] font-medium text-foreground transition hover:brightness-95"
             >
               Read Docs
             </Link>
@@ -187,7 +187,7 @@ export function DevApiSection() {
                 onClick={() => setTab(t.id)}
                 className={`shrink-0 rounded-full border px-3.5 py-1.5 text-[13.5px] font-normal transition ${
                   t.id === tab
-                    ? "border-gc-line bg-gc-surface text-foreground"
+                    ? "border-transparent bg-gc-pill text-foreground"
                     : "border-transparent text-muted-foreground hover:text-foreground"
                 }`}
               >

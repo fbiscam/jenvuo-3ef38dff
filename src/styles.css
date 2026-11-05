@@ -125,6 +125,7 @@
   --color-gc-ink: var(--gc-ink);
   --color-gc-ink-muted: var(--gc-ink-muted);
   --color-gc-surface: var(--gc-surface);
+  --color-gc-pill: var(--gc-pill);
   --color-gc-line: var(--gc-line);
   --color-gc-on-blue: var(--gc-on-blue);
   --color-gc-panel: var(--gc-panel);
@@ -229,6 +230,7 @@
   --gc-ink: #202124;
   --gc-ink-muted: #3c4043;
   --gc-surface: #f9f8f6;
+  --gc-pill: #f2f1ef;
   --gc-line: #dadce0;
   --gc-on-blue: #ffffff;
   --gc-panel: #eef2f7;
@@ -300,6 +302,7 @@
   --gc-ink: #ffffff;
   --gc-ink-muted: #a1a1aa;
   --gc-surface: #0e0e10;
+  --gc-pill: #1f1f22;
   --gc-line: rgba(255, 255, 255, 0.1);
   --gc-panel: #141416;
   --gc-sky: #17171a;

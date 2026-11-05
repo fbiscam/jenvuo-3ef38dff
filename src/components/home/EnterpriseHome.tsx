@@ -103,7 +103,7 @@ export function EntHero() {
         <Link to="/platform" className="inline-flex items-center gap-1.5 rounded-full bg-foreground px-6 py-3 text-[15px] font-medium text-background transition hover:opacity-85">
           Get API Access <ChevronRight className="h-4 w-4" />
         </Link>
-        <Link to="/docs" className="inline-flex items-center rounded-full bg-gc-surface px-6 py-3 text-[15px] font-medium text-foreground transition hover:brightness-95">
+        <Link to="/docs" className="inline-flex items-center rounded-full bg-gc-pill px-6 py-3 text-[15px] font-medium text-foreground transition hover:brightness-95">
           View Documentation
         </Link>
       </div>
