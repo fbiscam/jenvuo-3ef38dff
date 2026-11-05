@@ -142,7 +142,7 @@ export function DevApiSection() {
               Read Docs
             </Link>
           </div>
-          <dl className="mt-10 flex flex-wrap gap-x-10 gap-y-4">
+          <dl className="mt-10 flex flex-wrap gap-x-7 gap-y-4 sm:gap-x-10">
             {METRICS.map(([v, l]) => (
               <div key={l}>
                 <dt className="text-[15px] font-medium text-foreground">{v}</dt>
@@ -170,7 +170,7 @@ export function DevApiSection() {
                   {copied ? "Copied" : "Copy"}
                 </button>
               </div>
-              <pre className="dev-code-body h-[250px] overflow-auto px-4 py-4 font-mono text-[12.5px] leading-[1.75]">
+              <pre className="dev-code-body h-[285px] overflow-auto px-4 py-4 font-mono text-[12.5px] leading-[1.75]">
                 {active.code.split("\n").map((ln, i) => (
                   <div key={`${active.id}-${i}`} className="whitespace-pre">
                     {ln ? highlight(ln, active.lang) : " "}
