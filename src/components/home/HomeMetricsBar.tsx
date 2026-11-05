@@ -1,24 +1,19 @@
-import { useEffect, useState } from "react";
 import type React from "react";
-import JenvuMark from "@/components/JenvuMark";
-import { getBotDailyProfit, type BotProfitStat } from "@/lib/bot-stats.functions";
 
-const usd = (n: number) =>
-  `${n < 0 ? "-" : ""}$${Math.abs(n).toLocaleString("en-US", { maximumFractionDigits: 0 })}`;
+/** New geometric "J" badge used only in the stats bar (separate from the site JenvuMark). */
+function JBadge({ className = "h-5 w-5" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true" className={className}>
+      <rect x="1.5" y="1.5" width="21" height="21" rx="6" strokeWidth="1.6" />
+      <path d="M9 7h7M14 7v6.5a3.5 3.5 0 0 1-7 0" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
 
-/** Three-stat bar under the developer section; first stat is live JX Bot profit (all accounts). */
+/** Three-stat bar above Latest news. Only checkable facts — never a win-rate or profit promise. */
 export function HomeMetricsBar() {
-  const [stat, setStat] = useState<BotProfitStat | null>(null);
-  useEffect(() => {
-    let live = true;
-    const load = () => getBotDailyProfit().then((s) => live && setStat(s)).catch(() => {});
-    load();
-    const t = setInterval(load, 60_000);
-    return () => { live = false; clearInterval(t); };
-  }, []);
-
   const items: { value: string; label: React.ReactNode; key: string }[] = [
-    { key: "profit", value: stat ? usd(stat.profit) : "—", label: "JX Bot profit today" },
+    { key: "pairs", value: "3", label: "live trading pairs" },
     {
       key: "models",
       value: "60+",
@@ -26,7 +21,7 @@ export function HomeMetricsBar() {
         <span className="inline-flex items-center gap-2">
           models in
           <span className="inline-flex items-center gap-1.5 text-[12px] font-semibold uppercase tracking-[0.28em] text-gc-ink">
-            <JenvuMark className="h-4 w-4" />
+            <JBadge className="h-5 w-5" />
             Jenvu
           </span>
         </span>
