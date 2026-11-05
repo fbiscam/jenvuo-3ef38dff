@@ -24,9 +24,10 @@ import {
   CloudHero,
 
 } from "@/components/home/CloudHome";
-import { EntHero, EntShowcase, EntBuilt, EntFacts, EntStories } from "@/components/home/EnterpriseHome";
+import { EntHero, EntShowcase, EntFacts, EntStories } from "@/components/home/EnterpriseHome";
 import { homeArticlesQueryOptions, type HomeArticle } from "@/lib/home-articles";
 import { JxBotFeatures } from "@/components/jxbot/JxBotFeatures";
+import { GetStartedSection } from "@/components/platform/GetStartedSection";
 import { AllInOnePlatformSection } from "@/components/platform/AllInOnePlatformSection";
 import { CloudFrontierModels } from "@/components/home/CloudFrontierModels";
 import { HomeStats, HomeReadAskAutomate, HomeTrust, HomeGetStarted } from "@/components/home/HomePlatformSections";
@@ -397,11 +398,11 @@ function HomePage() {
         <main>
           <EntHero />
           <EntShowcase />
-          <EntBuilt />
+          <JxBotFeatures />
           <AllInOnePlatformSection />
           <EntFacts />
           <EntStories articles={homeArticles} />
-          <JxBotFeatures />
+          <GetStartedSection />
         </main>
       </div>
 
