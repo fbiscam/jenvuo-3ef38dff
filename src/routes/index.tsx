@@ -26,7 +26,6 @@ import {
 } from "@/components/home/CloudHome";
 import { EntHero, EntShowcase, EntStories } from "@/components/home/EnterpriseHome";
 import { DevApiSection } from "@/components/home/DevApiSection";
-import { HomeMetricsBar } from "@/components/home/HomeMetricsBar";
 import { homeArticlesQueryOptions, type HomeArticle } from "@/lib/home-articles";
 import { GetStartedSection } from "@/components/platform/GetStartedSection";
 import { AgentSmarterSection } from "@/components/home/AgentSmarterSection";
@@ -401,7 +400,6 @@ function HomePage() {
           <EntShowcase />
           <DevApiSection />
           <AgentSmarterSection />
-          <HomeMetricsBar />
           <EntStories articles={homeArticles} />
           <GetStartedSection />
         </main>
