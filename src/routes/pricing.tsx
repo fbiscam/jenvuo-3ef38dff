@@ -109,10 +109,10 @@ function PricingPage() {
           <a href="#compare" className={LINK}>plan comparison</a> or contact us to get a quote for your trading desk.
         </p>
         <div className="mt-8 flex flex-wrap justify-center gap-3">
-          <Link to="/contact" className="inline-flex items-center gap-1.5 rounded-full bg-gc-blue px-5 py-2.5 text-sm font-medium text-gc-on-blue transition-colors hover:bg-gc-blue-hover">
+          <Link to="/contact" className="inline-flex items-center gap-1.5 rounded-full bg-foreground px-5 py-2.5 text-sm font-medium text-background transition hover:opacity-90">
             Request a quote
           </Link>
-          <Link to="/auth" search={{ mode: "signup" } as never} className="inline-flex items-center gap-1.5 rounded-full border border-gc-line bg-background px-5 py-2.5 text-sm font-medium text-gc-blue transition-colors hover:bg-gc-blue-soft">
+          <Link to="/auth" search={{ mode: "signup" } as never} className="inline-flex items-center gap-1.5 rounded-full bg-gc-pill px-5 py-2.5 text-sm font-medium text-foreground transition hover:brightness-95">
             Get started for free
           </Link>
         </div>
@@ -203,7 +203,7 @@ function PricingPage() {
                 key={b}
                 type="button"
                 onClick={() => setBilling(b)}
-                className={`rounded-full px-5 py-2 text-[14px] font-medium transition ${billing === b ? "bg-gc-blue text-gc-on-blue" : "text-gc-ink-muted hover:text-gc-ink"}`}
+                className={`rounded-full px-5 py-2 text-[14px] font-medium transition ${billing === b ? "bg-foreground text-background" : "text-gc-ink-muted hover:text-gc-ink"}`}
               >
                 {b === "monthly" ? "Monthly" : "Annual · save 17%"}
               </button>
@@ -241,7 +241,7 @@ function PricingPage() {
                   ) : (
                     <Link
                       to={destination}
-                      className={`flex h-11 items-center justify-center rounded-full text-[15px] font-medium transition ${plan.key === "pro" ? "bg-gc-blue text-gc-on-blue hover:bg-gc-blue-hover" : "border border-gc-line text-gc-blue hover:bg-gc-surface"}`}
+                      className={`flex h-11 items-center justify-center rounded-full text-[15px] font-medium transition ${plan.key === "pro" ? "bg-foreground text-background hover:opacity-90" : "bg-gc-pill text-foreground hover:brightness-95"}`}
                     >
                       {trialPro ? "Upgrade to Pro" : currentPlan !== null ? "Upgrade" : "Buy now"}
                     </Link>
@@ -428,7 +428,7 @@ function CustomTopUp({ signedOut }: { signedOut: boolean }) {
           <Link
             to={signedOut ? "/auth" : "/dashboard/pay"}
             search={signedOut ? undefined : ({ amount: safe } as never)}
-            className="inline-flex h-11 items-center justify-center whitespace-nowrap rounded-full bg-gc-blue px-6 text-[15px] font-medium text-gc-on-blue hover:bg-gc-blue-hover"
+            className="inline-flex h-11 items-center justify-center whitespace-nowrap rounded-full bg-foreground px-6 text-[15px] font-medium text-background hover:opacity-90"
           >
             Buy now
           </Link>
