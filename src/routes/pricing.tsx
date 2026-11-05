@@ -19,7 +19,7 @@ export const FAQ = [
   ["Is this financial advice?", "No. Jenvu is an analysis tool. Every setup is for educational purposes and you remain responsible for your own trades."],
   ["How does the free trial work?", "After signing up, click “Start free” in your dashboard. You get $100 credit and 14 days of Pro access, including JX Bot, once per account. When it ends, JX Bot stops until you buy a plan."],
   ["What do the plans include?", "Every plan includes JX Bot for MetaTrader 5 (1, 2 or 5 IPs, verified by IP address, no license key) and the Top AI Models with a monthly AI wallet. Credit alone never unlocks JX Bot; it pays for API and AI use."],
-  ["When does JX Bot trade?", "New trades open Monday to Thursday between 01:00 and 14:00 broker time and on Friday until 13:00. The bot skips the London open (07:00–09:00 UTC), the New York open (13:00–15:00 UTC) and weekends. It stops for the day at your plan's daily target or 4% of the balance, whichever is lower, or at the 4.7% drawdown guard."],
+  ["When does JX Bot trade?", "New trades open Monday to Thursday between 01:00 and 14:00 broker time and on Friday until 13:00. The bot skips the London open (07:00–09:00 UTC), the New York open (13:00–15:00 UTC) and weekends. It stops for the day at a fixed daily target of 1.5% (Pro), 2.5% (Elite) or 3.5% (Ultra) of the day's starting balance, or at the fixed 4.7% daily drawdown guard."],
   ["Who can use the Terminal?", "The Terminal is reserved for approved Founding Program members, free of cost. Pro, Elite and Ultra cover JX Bot and the Top AI Models."],
   ["Can I cancel anytime?", "Yes. Plans are month-to-month with no lock-in. You keep access until the end of the period you already paid for."],
   ["What markets are covered?", "The Terminal covers Gold (XAU/USD), Bitcoin (BTC/USD) and Euro (EUR/USD). JX Bot trades EUR/USD only."],
@@ -55,7 +55,7 @@ type Mark = boolean | string;
 const COMPARE: ReadonlyArray<{ f: string; b: Mark; c: Mark; d: Mark }> = [
   { f: "JX Bot IPs (PC or RDP)", b: "1", c: "2", d: "5" },
   { f: "JX Bot monthly profit target", b: "$600", c: "$1,500", d: "$3,000" },
-  { f: "JX Bot daily target per IP", b: "$30", c: "$75", d: "$150" },
+  { f: "JX Bot daily target per IP", b: "1.5% of balance", c: "2.5% of balance", d: "3.5% of balance" },
   { f: "Daily auto-stop at target (or 4% of balance)", b: true, c: true, d: true },
   { f: "Safe trading hours (Mon–Thu 01:00–14:00, Fri until 13:00)", b: true, c: true, d: true },
   { f: "London & New York open block, weekends off", b: true, c: true, d: true },
@@ -90,9 +90,9 @@ function PricingPage() {
   const allOpen = open.length === FAQ.length;
 
   const plans = [
-    { key: "pro" as const, name: "Pro", price: priceOf("pro", 49), description: "JX Bot on 1 MT5 account with a $600 monthly target.", wallet: "$10 AI wallet", bot: ["JX Bot on 1 IP", "$30 daily auto-stop", "Top AI Models"] },
-    { key: "elite" as const, name: "Elite", price: priceOf("elite", 99), description: "JX Bot on 2 MT5 accounts with a $1,500 monthly target.", wallet: "$25 AI wallet", bot: ["JX Bot on 2 IPs", "$75 daily auto-stop", "Top AI Models + senior review"] },
-    { key: "ultra" as const, name: "Ultra", price: priceOf("ultra", 169), description: "JX Bot on 5 MT5 accounts with a $3,000 monthly target.", wallet: "$50 AI wallet", bot: ["JX Bot on 5 IPs", "$150 daily auto-stop", "Top AI Models + priority support"] },
+    { key: "pro" as const, name: "Pro", price: priceOf("pro", 49), description: "JX Bot on 1 MT5 account with a $600 monthly target.", wallet: "$10 AI wallet", bot: ["JX Bot on 1 IP", "1.5% daily auto-stop", "Top AI Models"] },
+    { key: "elite" as const, name: "Elite", price: priceOf("elite", 99), description: "JX Bot on 2 MT5 accounts with a $1,500 monthly target.", wallet: "$25 AI wallet", bot: ["JX Bot on 2 IPs", "2.5% daily auto-stop", "Top AI Models + senior review"] },
+    { key: "ultra" as const, name: "Ultra", price: priceOf("ultra", 169), description: "JX Bot on 5 MT5 accounts with a $3,000 monthly target.", wallet: "$50 AI wallet", bot: ["JX Bot on 5 IPs", "3.5% daily auto-stop", "Top AI Models + priority support"] },
   ];
 
   return (
