@@ -1,5 +1,4 @@
 import { createServerFn } from "@tanstack/react-start";
-import { useSession } from "@tanstack/react-start/server";
 import { createHash, timingSafeEqual } from "node:crypto";
 
 type AdminSession = { unlocked?: boolean; username?: string };
@@ -43,7 +42,7 @@ async function requireUnlocked() {
   try {
     const { isSameOriginRequest } = await import("./csrf-guard.server");
     if (process.env.ADMIN_SESSION_SECRET && isSameOriginRequest()) {
-      const session = await useSession<AdminSession>(sessionConfig());
+      const session = await (await import("@tanstack/react-start/server")).useSession<AdminSession>(sessionConfig());
       if (session.data.unlocked) {
         return { unlocked: true as const, username: session.data.username ?? "admin" };
       }
@@ -95,7 +94,7 @@ export const adminLogin = createServerFn({ method: "POST" })
     if (!uOk || !pOk) {
       return { ok: false as const, error: "Invalid credentials" };
     }
-    const session = await useSession<AdminSession>(sessionConfig());
+    const session = await (await import("@tanstack/react-start/server")).useSession<AdminSession>(sessionConfig());
     await session.update({ unlocked: true, username: expectedUser });
     return { ok: true as const };
   });
@@ -103,7 +102,7 @@ export const adminLogin = createServerFn({ method: "POST" })
 export const adminLogout = createServerFn({ method: "POST" }).handler(async () => {
   const { assertSameOrigin } = await import("./csrf-guard.server");
   assertSameOrigin();
-  const session = await useSession<AdminSession>(sessionConfig());
+  const session = await (await import("@tanstack/react-start/server")).useSession<AdminSession>(sessionConfig());
   await session.clear();
   return { ok: true as const };
 });

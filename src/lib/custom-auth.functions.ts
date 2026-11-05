@@ -1,36 +1,5 @@
 import { createServerFn } from '@tanstack/react-start'
-import { getRequest } from '@tanstack/react-start/server'
 import { z } from 'zod'
-
-function readClientIp(): string {
-  try {
-    const req = getRequest()
-    const h = req.headers
-    const raw =
-      h.get('cf-connecting-ip') ||
-      h.get('x-forwarded-for')?.split(',')[0] ||
-      h.get('x-real-ip') ||
-      ''
-    return raw.trim()
-  } catch {
-    return ''
-  }
-}
-
-function readTrustedCountry(): string {
-  try {
-    const headers = getRequest().headers
-    const cloudflareCountry = headers.get('cf-ipcountry')?.trim().toUpperCase() || ''
-    if (/^[A-Z]{2}$/.test(cloudflareCountry)) return cloudflareCountry
-    if (process.env['VERCEL'] === '1') {
-      const vercelCountry = headers.get('x-vercel-ip-country')?.trim().toUpperCase() || ''
-      if (/^[A-Z]{2}$/.test(vercelCountry)) return vercelCountry
-    }
-  } catch {
-    return ''
-  }
-  return ''
-}
 
 import {
   createRecoveryOtp,
@@ -50,6 +19,7 @@ const turnstileTokenSchema = z.string().trim().max(2048).optional().nullable()
 
 async function passTurnstile(token: string | null | undefined) {
   const { checkTurnstile } = await import('./turnstile')
+  const { readClientIp } = await import('./request-meta.server')
   return checkTurnstile({ secret: process.env.TURNSTILE_SECRET_KEY, token, ip: readClientIp() })
 }
 
@@ -96,7 +66,8 @@ export const requestSignupOtp = createServerFn({ method: 'POST' })
       const check = await passTurnstile(data.turnstileToken)
       if (!check.ok) return { ok: false as const, error: check.error }
       const { turnstileToken: _t, ...input } = data
-      const ua = (() => { try { return getRequest().headers.get('user-agent') || '' } catch { return '' } })()
+      const { readClientIp, readTrustedCountry, readUserAgent } = await import('./request-meta.server')
+    const ua = readUserAgent()
       await createSignupOtp({ ...input, ip: readClientIp(), country: readTrustedCountry(), fingerprint: input.fingerprint, userAgent: ua })
       return { ok: true as const }
     } catch (error) {
@@ -116,7 +87,8 @@ export const confirmSignupOtp = createServerFn({ method: 'POST' })
       .parse(data),
   )
   .handler(async ({ data }) => {
-    const ua = (() => { try { return getRequest().headers.get('user-agent') || '' } catch { return '' } })()
+    const { readClientIp, readTrustedCountry, readUserAgent } = await import('./request-meta.server')
+    const ua = readUserAgent()
     return verifySignupOtp({ ...data, ip: readClientIp(), country: readTrustedCountry(), fingerprint: data.fingerprint, userAgent: ua })
   })
 
