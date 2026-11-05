@@ -1,10 +1,19 @@
-import JenvuMark from "@/components/JenvuMark";
 import * as React from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import BlogFooter from "@/components/BlogFooter";
 import SiteHeader from "@/components/SiteHeader";
+import {
+  CALLOUT_BUTTON,
+  FORM_SANS,
+  FormCallout,
+  FormField,
+  FormHero,
+  RadioCards,
+  SUBMIT_BUTTON,
+  formInputClass,
+} from "@/components/forms/CenteredForm";
 import { submitFoundingApplication, foundingStats } from "@/lib/founding.functions";
 
 export const Route = createFileRoute("/founding")({
@@ -106,137 +115,90 @@ function FoundingPage() {
   }
 
   return (
-    <div className={`public-cloudflare min-h-dvh w-full bg-background text-gc-ink ${SANS} antialiased`}>
+    <div className={`public-cloudflare min-h-dvh w-full bg-background text-gc-ink ${FORM_SANS} antialiased`}>
       <SiteHeader />
 
-      <main className="grid w-full grid-cols-1 lg:grid-cols-[1fr_minmax(360px,30%)]">
-        {/* LEFT — form */}
-        <section id="apply" className="scroll-mt-24 px-5 py-12 sm:px-10 lg:py-14 lg:pl-[12%] lg:pr-16">
-          <div className="max-w-[710px]">
-            <span className="inline-flex items-center rounded-full border border-gc-line px-3.5 py-1 text-[13px] font-medium text-gc-ink-muted">Invite-only · {remaining} seats left</span>
-            <h1 className="mt-4 text-[2.4rem] font-medium leading-[1.08] tracking-tight sm:text-[3.4rem]">
-              Founding Trader Program
-            </h1>
-            <ul className="mt-6 space-y-3 text-[17px] text-gc-ink-muted">
-              {[
-                "3 months of your chosen plan with $250 credit",
-                "Only 50 traders accepted each month",
-                "Verify your ID within 2 days to keep access",
-              ].map((t) => (
-                <li key={t} className="flex items-center gap-4">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="shrink-0 text-gc-blue"><polyline points="4 12 10 18 20 6" /></svg>
-                  {t}
-                </li>
-              ))}
-            </ul>
+      <main className="w-full px-5 pb-24 pt-20 sm:pt-28">
+        <FormHero eyebrow="Founding" title="Founding Trader Program">
+          An invite-only program for 50 traders a month. Approved traders get 3 months of their chosen plan with $250 credit, and verify their ID within 2 days to keep access.
+        </FormHero>
 
-            {submitted ? (
-              <div className="mt-8 rounded-md border border-gc-line p-6" role="status" aria-live="polite">
-                <h2 className="text-[22px] font-medium tracking-tight">Application received.</h2>
-                <p className="mt-2 text-gc-ink-muted">
-                  Thanks — our team will review it and email you a decision within <span className="font-medium text-gc-ink">48 hours</span>. Please check your inbox and spam folder.
-                </p>
-                <Link to="/" className="mt-5 inline-block text-sm font-medium text-gc-blue hover:underline">
-                  Back to home
-                </Link>
+        <FormCallout
+          action={
+            <Link to="/pricing" className={CALLOUT_BUTTON}>
+              See plans and pricing
+            </Link>
+          }
+        >
+          <span className="text-foreground">{seats.filled} / {seats.total}</span> seats claimed this month · {remaining} left
+          <div className="mx-auto mt-3 h-1.5 max-w-[260px] overflow-hidden rounded-full bg-gc-pill">
+            <div className="h-full rounded-full bg-foreground transition-all duration-700 ease-out" style={{ width: `${pct}%` }} />
+          </div>
+          <p className="mt-3">Prefer to start right away without applying?</p>
+        </FormCallout>
+
+        <div id="apply" className="mx-auto mt-16 max-w-[605px] scroll-mt-24">
+          {submitted ? (
+            <div className="rounded-xl bg-gc-surface p-6 text-center" role="status" aria-live="polite">
+              <h2 className="text-[22px] font-normal tracking-tight">Application received.</h2>
+              <p className="mt-2 text-[15px] text-gc-ink-muted">
+                Our team will review it and email you a decision within <span className="text-foreground">48 hours</span>. Please check your inbox and spam folder.
+              </p>
+              <Link to="/" className={`${CALLOUT_BUTTON} mt-5`}>Back to home</Link>
+            </div>
+          ) : (
+            <form onSubmit={onSubmit} className="space-y-7">
+              <div className="grid grid-cols-1 gap-x-4 gap-y-7 sm:grid-cols-2">
+                <Field name="full_name" label="Full Name" required autoComplete="name" />
+                <Field name="email" label="Email" type="email" required autoComplete="email" />
+                <Field name="whatsapp_number" label="WhatsApp Number" type="tel" required autoComplete="tel" />
+                <Field name="country" label="Country (optional)" autoComplete="country-name" />
+                <Field name="broker" label="Broker (optional)" />
+                <Field name="experience_years" label="Experience in years (optional)" type="number" />
+                <Field key={`ref-${refEmail}`} name="referrer_email" label="Referred by email (optional)" type="email" defaultValue={refEmail} />
+                <Field name="myfxbook_url" label="MyFxBook link (optional)" />
               </div>
-            ) : (
-              <form onSubmit={onSubmit} className="mt-8 space-y-6">
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  <Field name="full_name" label="Full name*" required />
-                  <Field name="email" label="Email*" type="email" required />
-                </div>
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  <Field name="whatsapp_number" label="WhatsApp number*" type="tel" required />
-                  <Field name="country" label="Country (optional)" />
-                </div>
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  <Field name="broker" label="Broker (optional)" />
-                  <Field name="experience_years" label="Experience in years (optional)" type="number" />
-                </div>
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  <Field key={`ref-${refEmail}`} name="referrer_email" label="Referred by email (optional)" type="email" defaultValue={refEmail} />
-                  <Field name="myfxbook_url" label="MyFxBook link (optional)" />
-                </div>
 
-                <div>
-                  <p className="text-[15px] text-gc-ink-muted">Which plan do you want?*</p>
-                  <div className="mt-1.5 grid grid-cols-3 gap-3">
-                    {([
-                      { id: "pro", label: "Pro", desc: "$10 wallet" },
-                      { id: "elite", label: "Elite", desc: "$25 wallet" },
-                      { id: "ultra", label: "Ultra", desc: "$50 wallet" },
-                    ] as const).map((p) => {
-                      const active = plan === p.id;
-                      return (
-                        <button
-                          key={p.id}
-                          type="button"
-                          onClick={() => setPlan(p.id)}
-                          aria-pressed={active}
-                          className={`rounded-md border px-4 py-3 text-left transition ${active ? "border-gc-ink bg-gc-pill" : "border-gc-line bg-background hover:bg-gc-surface"}`}
-                        >
-                          <div className="text-[15px] font-medium text-gc-ink">{p.label}</div>
-                          <div className="text-[13px] text-gc-ink-muted">{p.desc}</div>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
+              <FormField label="Which plan do you want?" required>
+                <RadioCards
+                  name="requested_plan"
+                  value={plan}
+                  onChange={setPlan}
+                  options={[
+                    { id: "pro", label: "Pro", hint: "$10 wallet" },
+                    { id: "elite", label: "Elite", hint: "$25 wallet" },
+                    { id: "ultra", label: "Ultra", hint: "$50 wallet" },
+                  ] as const}
+                />
+              </FormField>
 
-                <div>
-                  <label htmlFor="f-why" className="text-[15px] text-gc-ink-muted">Why do you want in?*</label>
-                  <textarea
-                    id="f-why"
-                    name="why_joining"
-                    required
-                    minLength={10}
-                    maxLength={1500}
-                    rows={4}
-                    placeholder="Tell us about your trading journey."
-                    className={`${INPUT} mt-1.5 min-h-[104px] resize-y`}
-                  />
-                </div>
+              <FormField label="Why do you want in?" htmlFor="f-why" required>
+                <textarea
+                  id="f-why"
+                  name="why_joining"
+                  required
+                  minLength={10}
+                  maxLength={1500}
+                  rows={4}
+                  placeholder="Tell us about your trading journey."
+                  className={`${formInputClass()} min-h-[106px] resize-y`}
+                />
+              </FormField>
 
-                <button
-                  type="submit"
-                  disabled={submitting || remaining === 0}
-                  className="inline-flex items-center rounded-full bg-gc-blue px-6 py-3 text-[15px] font-medium text-gc-on-blue transition-colors hover:bg-gc-blue-hover disabled:opacity-60"
-                >
+              <div>
+                <button type="submit" disabled={submitting || remaining === 0} className={SUBMIT_BUTTON}>
                   {submitting ? "Submitting…" : remaining === 0 ? "This month is full" : "Submit application"}
                 </button>
-                <p className="text-[16px] text-gc-ink-muted">
+                <p className="mt-4 text-[13px] text-gc-ink-muted">
                   By applying you agree to Jenvu's{" "}
-                  <Link to="/terms" className="font-medium text-gc-blue underline underline-offset-2">Terms</Link> and{" "}
-                  <Link to="/disclaimer" className="font-medium text-gc-blue underline underline-offset-2">Risk Disclaimer</Link>. Trading involves significant risk.
+                  <Link to="/terms" className="text-foreground underline underline-offset-2">Terms</Link> and{" "}
+                  <Link to="/disclaimer" className="text-foreground underline underline-offset-2">Risk Disclaimer</Link>. Trading involves significant risk.
+                  {" "}Questions? <a href="mailto:support@jenvu.com" className="text-foreground underline underline-offset-2">support@jenvu.com</a>
                 </p>
-              </form>
-            )}
-          </div>
-        </section>
-
-        {/* RIGHT — cards */}
-        <aside className="relative overflow-hidden border-t border-gc-line px-5 py-10 sm:px-10 lg:border-l lg:border-t-0 lg:py-14">
-          <div aria-hidden className="pointer-events-none absolute inset-0 opacity-60" style={{ backgroundImage: "var(--platform-aurora-1)" }} />
-          <div className="relative max-w-[370px] space-y-4">
-            <div className="rounded-md border border-gc-line bg-background p-6 shadow-sm">
-              <JenvuMark className="h-10 w-10 text-foreground" />
-              <h2 className="mt-4 text-[22px] font-medium tracking-tight">Seats this month</h2>
-              <div className="mt-5 flex items-center justify-between text-[14px] text-gc-ink-muted">
-                <span>Claimed</span>
-                <span className="font-medium text-gc-ink">{seats.filled} / {seats.total}</span>
               </div>
-              <div className="mt-2 h-2 overflow-hidden rounded-full bg-gc-pill">
-                <div className="h-full rounded-full bg-gc-blue transition-all duration-700 ease-out" style={{ width: `${pct}%` }} />
-              </div>
-              <p className="mt-3 text-[15px] text-gc-ink-muted">{remaining} spots remaining</p>
-            </div>
-            <SideCard text="We review every application by hand and reply within 48 hours." />
-            <SideCard text="Once approved, upload your ID from your account within 2 days to keep access." />
-            <SideCard text="Questions about the program? Email our team." link="support@jenvu.com" href="mailto:support@jenvu.com" />
-            <SideCard text="Prefer to start right away without applying?" link="See plans and pricing" href="/pricing" />
-          </div>
-        </aside>
+            </form>
+          )}
+        </div>
       </main>
 
       <BlogFooter />
@@ -244,32 +206,19 @@ function FoundingPage() {
   );
 }
 
-function SideCard({ text, link, href }: { text: string; link?: string; href?: string }) {
-  return (
-    <div className="rounded-md border border-gc-line bg-background/95 p-5 shadow-sm">
-      <p className="text-[15px] leading-relaxed">{text}</p>
-      {link && href && <a href={href} className="mt-4 inline-block text-[15px] font-medium text-gc-blue hover:underline">{link}</a>}
-    </div>
-  );
-}
-
-const SANS = "font-['Google_Sans_Flex','Google_Sans','Product_Sans','Poppins',system-ui,sans-serif]";
-const INPUT = "w-full rounded-md border border-gc-line bg-background px-4 py-4 text-[16px] text-gc-ink outline-none transition placeholder:text-gc-ink-muted focus:border-gc-blue focus:ring-1 focus:ring-gc-blue";
-
-function Field(props: { name: string; label: string; type?: string; required?: boolean; defaultValue?: string }) {
+function Field(props: { name: string; label: string; type?: string; required?: boolean; defaultValue?: string; autoComplete?: string }) {
   const id = `f-${props.name}`;
   return (
-    <div>
-      <label htmlFor={id} className="sr-only">{props.label}</label>
+    <FormField label={props.label} htmlFor={id} required={props.required}>
       <input
         id={id}
         name={props.name}
         type={props.type ?? "text"}
         required={props.required}
-        placeholder={props.label}
+        autoComplete={props.autoComplete}
         defaultValue={props.defaultValue}
-        className={INPUT}
+        className={formInputClass()}
       />
-    </div>
+    </FormField>
   );
 }

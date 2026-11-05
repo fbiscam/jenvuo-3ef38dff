@@ -1,5 +1,4 @@
 import { createServerFn } from '@tanstack/react-start'
-import { getRequest } from '@tanstack/react-start/server'
 import { z } from 'zod'
 import { requireSupabaseAuth } from '@/integrations/supabase/auth-middleware'
 
@@ -9,22 +8,6 @@ const siteUrlSchema = z
   .url()
   .refine((url) => /^https?:\/\//i.test(url), 'Invalid site URL')
   .optional()
-
-function readRequestMeta() {
-  try {
-    const req = getRequest()
-    const headers = req.headers
-    const ip =
-      headers.get('cf-connecting-ip') ||
-      headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
-      headers.get('x-real-ip') ||
-      null
-    const userAgent = headers.get('user-agent') || null
-    return { ip: ip ?? undefined, userAgent: userAgent ?? undefined }
-  } catch {
-    return {}
-  }
-}
 
 export const requestEmailChange = createServerFn({ method: 'POST' })
   .middleware([requireSupabaseAuth])
@@ -43,7 +26,7 @@ export const requestEmailChange = createServerFn({ method: 'POST' })
       if (error || !userRes.user?.email) {
         return { ok: false as const, error: 'Could not identify your current account.' }
       }
-      const meta = readRequestMeta()
+      const meta = (await import('./request-meta.server')).readRequestMeta()
       await createEmailChangeRequest({
         userId: userRes.user.id,
         oldEmail: userRes.user.email,
@@ -64,6 +47,6 @@ export const confirmEmailChange = createServerFn({ method: 'POST' })
   )
   .handler(async ({ data }) => {
     const { confirmEmailChangeToken } = await import('./email-change.server')
-    const meta = readRequestMeta()
+    const meta = (await import('./request-meta.server')).readRequestMeta()
     return confirmEmailChangeToken(data.token, meta)
   })
