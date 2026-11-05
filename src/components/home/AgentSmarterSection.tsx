@@ -114,7 +114,7 @@ function SearchCard() {
       </h3>
       <p className="mt-2 text-[15.5px] leading-relaxed text-gc-ink">
         The{" "}
-        <Link to="/dashboard/terminal" className={inlineLink}>Jenvu Terminal</Link> marks fresh swings, liquidity sweeps and Zone + FVG on 1H to 1D so your analysis starts from real structure
+        <Link to="/dashboard/terminal" className={inlineLink}>Jenvu Terminal</Link> marks fresh swings, liquidity sweeps and Zone + FVG on 1H to 1D so your analysis makes easy
       </p>
     </div>
   );
