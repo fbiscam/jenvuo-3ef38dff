@@ -54,7 +54,7 @@ export default function SiteHeader() {
   return (
     <>
       <header className="jenvu-home-header sticky top-0 z-50 border-0 bg-background/75 backdrop-blur-md backdrop-saturate-150">
-        <div className="relative mx-auto flex h-[60px] max-w-[82.5rem] items-center gap-3 px-5 lg:gap-8">
+        <div className="site-edge relative flex h-[60px] items-center gap-3 lg:gap-8">
           <Link to="/" aria-label="Jenvu home" className="flex shrink-0 items-center">
             <JenvuMark className="h-7 w-7 shrink-0 text-foreground" />
           </Link>

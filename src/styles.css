@@ -2484,3 +2484,20 @@ html body :is(.dark, .dash-dark) .vsc-studio .tok-var { color: #a8dcff !importan
 @keyframes agent-blink { 50% { opacity: 0; } }
 .agent-caret { animation: agent-blink 1s step-end infinite; }
 @media (prefers-reduced-motion: reduce) { .agent-chip, .agent-fade, .agent-caret { animation: none; } .agent-mark { transition: none; } }
+
+/* Header/footer edges line up with page sections on every public page.
+   Header, content and footer use different zoom levels, so the shared
+   edge width is scaled by (content zoom ÷ own zoom). */
+.site-edge { margin-inline: auto; width: 100%; max-width: calc(82.5rem * var(--edge-k, 1)); padding-inline: calc(1.25rem * var(--edge-k, 1)); }
+:root { --content-k: 1; --hz: 1; }
+.jenvu-site-footer .site-edge { --edge-k: var(--content-k); }
+.jenvu-home-header .site-edge { --edge-k: calc(var(--content-k) / var(--hz)); }
+@media (min-width: 1024px) {
+  .jenvu-home-header { --hz: 0.772; }
+  :root:has(.jenvu-home-content) { --content-k: 0.898; }
+  :root:has(.jenvu-zoom) { --content-k: 1.05; }
+}
+@media (min-width: 1200px) { .jenvu-home-header { --hz: 0.851; } :root:has(.jenvu-zoom) { --content-k: 1.15; } }
+@media (min-width: 1360px) { .jenvu-home-header { --hz: 0.945; } :root:has(.jenvu-home-content) { --content-k: 0.973; } :root:has(.jenvu-zoom) { --content-k: 1.28; } }
+@media (min-width: 1500px) { .jenvu-home-header { --hz: 1.04; } :root:has(.jenvu-zoom) { --content-k: 1.4; } }
+@media (min-width: 1680px) { .jenvu-home-header { --hz: 1.103; } :root:has(.jenvu-home-content) { --content-k: 1.021; } :root:has(.jenvu-zoom) { --content-k: 1.5; } }

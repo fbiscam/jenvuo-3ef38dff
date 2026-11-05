@@ -148,7 +148,7 @@ export default function SiteFooter({ className }: { className?: string }) {
   return (
     <footer className={`jenvu-site-footer hide-in-pwa relative bg-background ${className || ""}`}>
       {/* Top line sits inside the page width (inset left/right), like the xAI footer. */}
-      <div className="mx-auto w-full max-w-[82.5rem] px-5">
+      <div className="site-edge">
         <div className="flex flex-col gap-12 border-t border-gc-line py-12 lg:flex-row lg:gap-0">
           {/* Brand block */}
           <div className="flex shrink-0 flex-col justify-between gap-8 lg:w-[300px] lg:border-r lg:border-dashed lg:border-gc-line lg:pr-10">
