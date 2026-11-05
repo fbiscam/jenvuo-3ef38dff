@@ -173,9 +173,10 @@ export default function SiteFooter({ className }: { className?: string }) {
 
           {/* Link columns: two rows so every title in a row sits on the same line */}
           {/* Pushed to the right so the last column ends on the page's right edge. */}
-          <div className="flex flex-1 flex-col gap-10 lg:ml-auto lg:flex-none lg:pl-12">
+          <div className="flex flex-1 lg:ml-auto lg:flex-none lg:pl-12">
+            <div className="grid flex-1 grid-cols-2 gap-x-8 gap-y-10 sm:grid-cols-3 lg:grid-cols-[repeat(5,max-content)] lg:gap-x-14">
             {[0, 1].map((row) => (
-              <div key={row} className="grid grid-cols-2 gap-x-8 gap-y-10 sm:grid-cols-3 lg:grid-cols-[repeat(5,max-content)] lg:gap-x-14">
+              <div key={row} className="contents">
                 {columns.map((groups) => {
                   const g = groups[row];
                   if (!g) return null;
