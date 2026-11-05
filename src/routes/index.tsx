@@ -27,7 +27,6 @@ import {
 import { EntHero, EntShowcase, EntStories } from "@/components/home/EnterpriseHome";
 import { DevApiSection } from "@/components/home/DevApiSection";
 import { homeArticlesQueryOptions, type HomeArticle } from "@/lib/home-articles";
-import { JxBotFeatures } from "@/components/jxbot/JxBotFeatures";
 import { GetStartedSection } from "@/components/platform/GetStartedSection";
 import { AllInOnePlatformSection } from "@/components/platform/AllInOnePlatformSection";
 import { CloudFrontierModels } from "@/components/home/CloudFrontierModels";
