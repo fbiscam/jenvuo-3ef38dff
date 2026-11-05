@@ -63,9 +63,9 @@ export const Route = createFileRoute("/platform")({
 /* ---------- shared bits ---------- */
 
 const pillDark =
-  "inline-flex items-center gap-1.5 rounded-full bg-gc-blue px-5 py-2.5 text-sm font-medium text-gc-on-blue transition-colors hover:bg-gc-blue-hover";
+  "inline-flex items-center gap-1.5 rounded-full bg-foreground px-5 py-2.5 text-sm font-medium text-background transition hover:opacity-90";
 const pillLight =
-  "inline-flex items-center gap-1.5 rounded-full border border-gc-line bg-background px-5 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-muted";
+  "inline-flex items-center gap-1.5 rounded-full bg-gc-pill px-5 py-2.5 text-sm font-medium text-foreground transition hover:brightness-95";
 
 function ContactSales({ className = pillDark }: { className?: string }) {
   return (

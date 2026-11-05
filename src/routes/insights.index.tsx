@@ -266,7 +266,7 @@ function InsightsPage() {
                 type="button"
                 onClick={() => goToPage(currentPage - 1)}
                 disabled={currentPage === 1}
-                className="h-10 rounded-full border border-gc-line bg-background px-4 text-[14px] font-medium text-gc-ink hover:bg-gc-surface disabled:cursor-not-allowed disabled:opacity-40"
+                className="h-10 rounded-full bg-gc-pill px-4 text-[14px] font-medium text-foreground hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-40"
               >
                 ← Previous
               </button>
@@ -277,7 +277,7 @@ function InsightsPage() {
                   onClick={() => goToPage(n)}
                   aria-current={n === currentPage ? "page" : undefined}
                   className={`h-10 min-w-10 rounded-full px-3 text-[14px] font-medium transition-colors ${
-                    n === currentPage ? "bg-gc-blue text-gc-on-blue" : "text-gc-ink hover:bg-gc-surface"
+                    n === currentPage ? "bg-foreground text-background" : "text-gc-ink hover:bg-gc-surface"
                   }`}
                 >
                   {n}
@@ -287,7 +287,7 @@ function InsightsPage() {
                 type="button"
                 onClick={() => goToPage(currentPage + 1)}
                 disabled={currentPage === totalPages}
-                className="h-10 rounded-full border border-gc-line bg-background px-4 text-[14px] font-medium text-gc-ink hover:bg-gc-surface disabled:cursor-not-allowed disabled:opacity-40"
+                className="h-10 rounded-full bg-gc-pill px-4 text-[14px] font-medium text-foreground hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-40"
               >
                 Next →
               </button>
@@ -375,7 +375,7 @@ function SubscribeForm() {
       <button
         type="submit"
         disabled={busy}
-        className="h-12 whitespace-nowrap rounded-full bg-gc-blue px-6 text-[15px] font-medium text-gc-on-blue transition hover:bg-gc-blue-hover disabled:opacity-60"
+        className="h-12 whitespace-nowrap rounded-full bg-foreground px-6 text-[15px] font-medium text-background transition hover:opacity-90 disabled:opacity-60"
       >
         {busy ? "…" : "Subscribe"}
       </button>

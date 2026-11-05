@@ -179,7 +179,7 @@ function ScamToolPage() {
           <Link to="/help" className="hidden rounded-full px-3 py-2 hover:bg-gc-notice sm:inline-flex">
             Help
           </Link>
-          <Button asChild size="sm" className="rounded-full bg-gc-blue text-gc-on-blue hover:bg-gc-blue-hover">
+          <Button asChild size="sm" className="rounded-full bg-foreground text-background hover:opacity-90">
             <Link to="/auth">Sign in</Link>
           </Button>
         </nav>
@@ -235,7 +235,7 @@ function ScamToolPage() {
           <Button
             type="submit"
             disabled={!value.trim() || loading}
-            className="rounded-full bg-gc-blue text-gc-on-blue hover:bg-gc-blue-hover"
+            className="rounded-full bg-foreground text-background hover:opacity-90"
           >
             {loading ? (
               <Loader2 className="w-4 h-4 animate-spin" />

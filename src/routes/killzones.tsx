@@ -272,7 +272,7 @@ function KillzonesPage() {
               <button
                 key={c}
                 onClick={() => setCat(c)}
-                className={`h-9 px-4 rounded-full border text-[12px] font-medium transition ${ cat === c ? "border-gc-blue bg-gc-blue text-gc-on-blue" : "border-border bg-background text-muted-foreground hover:border-home-accent/50" }`}
+                className={`h-9 px-4 rounded-full border text-[12px] font-medium transition ${ cat === c ? "border-transparent bg-foreground text-background" : "border-transparent bg-gc-pill text-foreground hover:brightness-95" }`}
               >
                 {c}
               </button>

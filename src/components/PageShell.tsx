@@ -7,11 +7,11 @@ import SiteHeader from "@/components/SiteHeader";
 const SANS = "font-['Google_Sans_Flex','Google_Sans','Product_Sans','Poppins',system-ui,sans-serif]";
 const AURORAS = ["var(--platform-aurora-1)", "var(--platform-aurora-2)", "var(--platform-aurora-3)"];
 
-/** Same pill buttons as the Platform page (blue to match the homepage). */
+/** Same pill buttons as the homepage (black primary, warm-grey light). */
 export const pillBlue =
-  "inline-flex items-center gap-1.5 rounded-full bg-gc-blue px-5 py-2.5 text-sm font-medium text-gc-on-blue transition-colors hover:bg-gc-blue-hover";
+  "inline-flex items-center gap-1.5 rounded-full bg-foreground px-5 py-2.5 text-sm font-medium text-background transition hover:opacity-90";
 export const pillOutline =
-  "inline-flex items-center gap-1.5 rounded-full border border-gc-line bg-background px-5 py-2.5 text-sm font-medium text-gc-blue transition-colors hover:bg-gc-blue-soft";
+  "inline-flex items-center gap-1.5 rounded-full bg-gc-pill px-5 py-2.5 text-sm font-medium text-foreground transition hover:brightness-95";
 const blueLink = "inline-flex items-center gap-1 text-[15px] font-medium text-gc-blue hover:underline";
 
 /**
