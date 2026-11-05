@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { sessionStep, sharedTargetStatus } from "@/lib/mt5-licenses";
+import { DAILY_DRAWDOWN_PCT, DAILY_TARGET_PCT, dailyStopFor, sessionStep, sharedTargetStatus } from "@/lib/mt5-licenses";
 import { checkBotByIp } from "@/lib/mt5-ip-license.server";
 
 // Always HTTP 200: the MT5 bot reads the JSON body only.
@@ -60,8 +60,12 @@ export const Route = createFileRoute("/api/public/licenses/report")({
           );
 
           // Each license has its own daily target: only this account's profit today counts.
-          const s = sharedTargetStatus(r.daily_target, [num(body?.today_profit)], body?.target_hit === true);
-          return ok({ valid: true, daily_target: r.daily_target, profit: s.combined, stop: s.stop });
+          // Fixed by the server: plan % of the day's starting balance and the 4.7% drawdown guard (EA inputs can't change them).
+          const profit = num(body?.today_profit);
+          const d = dailyStopFor(r.plan, num(body?.balance), profit);
+          const target = d.start > 0 ? d.target : r.daily_target;
+          const s = sharedTargetStatus(target, [profit], body?.target_hit === true);
+          return ok({ valid: true, daily_target: target, daily_target_pct: DAILY_TARGET_PCT[r.plan], max_daily_drawdown: d.drawdown, drawdown_pct: DAILY_DRAWDOWN_PCT, profit: s.combined, stop: s.stop || d.stop, stop_reason: d.reason ?? (s.stop ? "target" : null) });
         } catch {
           return ok({ valid: false, reason: "server_error" });
         }
