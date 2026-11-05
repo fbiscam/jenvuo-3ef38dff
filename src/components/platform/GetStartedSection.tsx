@@ -7,7 +7,7 @@ import { useAuthUser } from "@/hooks/useAuthUser";
 const pillDark =
   "flex h-9 w-full items-center justify-center rounded-full bg-foreground text-[14px] font-medium text-background transition hover:opacity-85";
 const pillLight =
-  "flex h-9 w-full items-center justify-center rounded-full border border-gc-line bg-background text-[14px] font-medium text-foreground transition-colors hover:bg-muted";
+  "flex h-9 w-full items-center justify-center rounded-full border border-gc-line bg-gc-surface text-[14px] font-medium text-foreground transition-colors hover:brightness-95";
 
 function StartBuilding() {
   const { user } = useAuthUser();
@@ -46,8 +46,8 @@ function Card({ title, sub, items, action }: { title: string; sub: string; items
 
 export function GetStartedSection() {
   return (
-    <section className="bg-background">
-      <div className="mx-auto max-w-7xl px-5">
+    <section className="bg-background px-5">
+      <div className="mx-auto max-w-7xl">
         <div className="border-t border-gc-line pb-20 pt-20 text-center sm:pt-24">
           <h2 className="text-[28px] font-medium tracking-tight text-gc-ink sm:text-[32px]">Choose how to get started</h2>
           <div className="mx-auto mt-12 grid max-w-[1110px] gap-5 text-left md:grid-cols-2">

@@ -137,7 +137,7 @@ export function DevApiSection() {
             </Link>
             <Link
               to="/docs"
-              className="inline-flex h-10 items-center rounded-full bg-muted px-5 text-[14px] font-medium text-foreground transition hover:bg-muted/70"
+              className="inline-flex h-10 items-center rounded-full bg-gc-surface px-5 text-[14px] font-medium text-foreground transition hover:brightness-95"
             >
               Read Docs
             </Link>

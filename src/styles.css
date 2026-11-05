@@ -228,7 +228,7 @@
   --gc-green-soft: #e6f4ea;
   --gc-ink: #202124;
   --gc-ink-muted: #3c4043;
-  --gc-surface: #f8f9fa;
+  --gc-surface: #f9f8f6;
   --gc-line: #dadce0;
   --gc-on-blue: #ffffff;
   --gc-panel: #eef2f7;
@@ -1050,7 +1050,7 @@ html[data-pwa="1"] .pwa-tabbar {
   --gc-ink: #202124;
   --gc-ink-muted: #3c4043;
   --gc-line: #dadce0;
-  --gc-surface: #f8f9fa;
+  --gc-surface: #f9f8f6;
   --gc-panel: #eef2f7;
   --gc-notice: #e9eef6;
   --gc-nav-active: #dbedfc;
