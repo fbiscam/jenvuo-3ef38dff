@@ -27,7 +27,7 @@ export function HomeMetricsBar() {
   ];
 
   return (
-    <section className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+    <section className="mx-auto w-full max-w-7xl px-5">
       <div className="grid grid-cols-1 border-y border-gc-line py-2 sm:grid-cols-3 sm:py-9">
         {items.map((it, i) => (
           <div
