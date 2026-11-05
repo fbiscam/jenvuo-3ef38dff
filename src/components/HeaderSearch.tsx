@@ -83,7 +83,7 @@ export default function HeaderSearch({ onClose }: { onClose: () => void }) {
     <div ref={boxRef} className="relative ml-4 min-w-0 flex-1">
       <form
         onSubmit={(e) => { e.preventDefault(); if (t) ask(t); }}
-        className="flex h-10 items-center gap-3 rounded-lg border-2 border-gc-blue-deep bg-background px-3"
+        className="flex h-10 items-center gap-3 rounded-xl border border-gc-line bg-background px-3 shadow-sm transition focus-within:border-foreground/30"
       >
         <Search className="h-5 w-5 shrink-0 text-gc-ink" />
         <input
@@ -100,7 +100,7 @@ export default function HeaderSearch({ onClose }: { onClose: () => void }) {
         </button>
       </form>
 
-      <div className={`absolute inset-x-0 top-full z-[80] mt-1 max-h-[70vh] overflow-y-auto rounded-lg border border-gc-line shadow-lg ${showPanel ? "bg-background" : "bg-gc-panel"}`}>
+      <div className={`absolute inset-x-0 top-full z-[80] mt-1.5 max-h-[70vh] overflow-y-auto rounded-xl border border-gc-line shadow-lg ${showPanel ? "bg-background" : "bg-gc-panel"}`}>
         {!showPanel && (
           <p className="px-4 py-4 text-[13px] italic text-gc-ink-muted">
             Do not enter any sensitive, confidential, or personal information.

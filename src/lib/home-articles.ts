@@ -13,16 +13,26 @@ export type HomeArticle = {
   published_at: string;
 };
 
+/** The four articles written for the homepage "Latest news" row; always shown, in this order. */
+export const HOME_ARTICLE_SLUGS = [
+  "streaming-replies-with-the-jenvu-api",
+  "build-a-gold-analysis-agent",
+  "choosing-the-right-model-per-task",
+  "handling-api-errors-and-rate-limits",
+] as const;
+
 export const homeArticlesQueryOptions = queryOptions({
-  queryKey: ["home-articles", HOME_ARTICLE_COUNT],
+  queryKey: ["home-articles", "pinned", ...HOME_ARTICLE_SLUGS],
   queryFn: async (): Promise<HomeArticle[]> => {
     const { data, error } = await supabase
       .from("insights")
       .select("id, title, slug, category, image_url, published_at")
-      .order("published_at", { ascending: false })
-      .limit(HOME_ARTICLE_COUNT);
+      .in("slug", [...HOME_ARTICLE_SLUGS]);
     if (error) throw error;
-    return (data ?? []) as HomeArticle[];
+    const rows = (data ?? []) as HomeArticle[];
+    return HOME_ARTICLE_SLUGS.map((s) => rows.find((r) => r.slug === s)).filter(
+      (r): r is HomeArticle => !!r,
+    );
   },
   staleTime: 5 * 60_000,
 });

@@ -179,14 +179,16 @@ export function DevApiSection() {
               </pre>
             </div>
           </div>
-          <div className="mt-4 flex gap-1 overflow-x-auto [scrollbar-width:none]">
+          <div className="mt-4 flex gap-2 overflow-x-auto [scrollbar-width:none]">
             {TABS.map((t) => (
               <button
                 key={t.id}
                 type="button"
                 onClick={() => setTab(t.id)}
-                className={`shrink-0 rounded-full px-3 py-1.5 text-[14px] transition ${
-                  t.id === tab ? "bg-muted font-medium text-foreground" : "text-muted-foreground hover:text-foreground"
+                className={`shrink-0 rounded-full border px-3.5 py-1.5 text-[13.5px] font-normal transition ${
+                  t.id === tab
+                    ? "border-gc-line bg-gc-surface text-foreground"
+                    : "border-transparent text-muted-foreground hover:text-foreground"
                 }`}
               >
                 {t.label}
