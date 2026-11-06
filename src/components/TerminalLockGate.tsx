@@ -143,7 +143,7 @@ export function TerminalLocked({ reason }: { reason?: string | null }) {
         <p className="mt-2 text-sm text-zinc-600">
           {overdue
             ? "Your 2-day window to complete ID verification has ended. Submit your ID verification and the Terminal unlocks again automatically."
-            : "The Terminal is reserved for approved Founding Program members, free of cost. Plans and credit cover JX Bot for MT5 and the Top AI Models; every other page stays open."}
+            : "The Terminal is only for approved Founding Program members. After approval, verify your ID within 2 days to keep it open."}
         </p>
         <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
           <Link
