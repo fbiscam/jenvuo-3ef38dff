@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { Bot, Check, Copy, Download, FileText, Plus, Trash2, Wrench, X } from "lucide-react";
 import { useMt5Access } from "@/components/dashboard/Mt5Licenses";
 import { createMt5License, getBotDownloadUrl, revokeMt5License, type Mt5LicenseRow } from "@/lib/mt5-licenses.functions";
-import { DAILY_DRAWDOWN_PCT, DAILY_TARGET_PCT, MT5_PLANS, countIpLicenses, dailyTarget, isMt5Plan, parseBinding } from "@/lib/mt5-licenses";
+import { DAILY_DRAWDOWN_PCT, DAILY_TARGET_PCT, MT5_PLANS, countIpLicenses, isMt5Plan, parseBinding } from "@/lib/mt5-licenses";
 
 const MONO = "font-sans";
 
@@ -43,7 +43,7 @@ const ERRORS = [
 const HOW = [
   ["IP check", "On start the bot checks your IP with jenvu.com and trades only while the IP matches and the plan is valid."],
   ["EUR/USD on M15", "Runs on the EURUSD M15 chart; one IP works with one MT5 account."],
-  ["Daily auto-stop", "Fixed by Jenvu: pauses for the day at 1.5% (Pro), 2.5% (Elite) or 3.5% (Ultra) of the day's starting balance, or at the 4.7% daily drawdown guard."],
+  ["Daily auto-stop", `Fixed by Jenvu: pauses for the day at ${DAILY_TARGET_PCT.pro}% (Pro), ${DAILY_TARGET_PCT.elite}% (Elite) or ${DAILY_TARGET_PCT.ultra}% (Ultra) of the day's starting balance, or at the ${DAILY_DRAWDOWN_PCT}% daily drawdown guard.`],
   ["Safe trading hours", "New trades Mon–Thu 01:00–14:00 and Fri until 13:00 (broker time); skips London and New York opens and weekends."],
   ["Entry checks", "Follows the H1 trend and skips wide spreads, weak candles and spikes, so some days have fewer trades."],
   ["Monthly limit", "Stops at your plan's monthly target until the next period."],
@@ -353,7 +353,7 @@ function JxBotPage() {
                     {access?.allowed && k === plan && <span className="ml-2 rounded-full bg-foreground px-2 py-0.5 text-[11px] text-background">Yours</span>}
                   </td>
                   <td className="text-right tabular-nums">${MT5_PLANS[k].monthlyTarget.toLocaleString()}</td>
-                  <td className="text-right tabular-nums">${dailyTarget(k)}</td>
+                  <td className="text-right tabular-nums">{DAILY_TARGET_PCT[k]}%</td>
                   <td className="text-right tabular-nums">{MT5_PLANS[k].licenses}</td>
                 </tr>
               ))}
