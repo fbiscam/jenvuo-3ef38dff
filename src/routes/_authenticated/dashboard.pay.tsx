@@ -21,6 +21,8 @@ import {
   type PaymentOrder,
   type Quote,
 } from "@/lib/payments/shared";
+import { planFeatures } from "@/lib/plan-features";
+import { getFoundingMembership } from "@/lib/mt5-licenses.functions";
 import { UsdtIcon, TronIcon, BnbIcon, EthIcon, NetworkIcon } from "@/components/pay/CoinIcons";
 
 export const Route = createFileRoute("/_authenticated/dashboard/pay")({
@@ -92,10 +94,18 @@ function PayPage() {
   const [orders, setOrders] = useState<PaymentOrder[]>([]);
   const qSeq = useRef(0);
 
+  const membershipFn = useServerFn(getFoundingMembership);
+  const [foundingMember, setFoundingMember] = useState(false);
+  useEffect(() => {
+    let alive = true;
+    membershipFn().then((r) => alive && setFoundingMember(!!r.member)).catch(() => {});
+    return () => { alive = false; };
+  }, [membershipFn]);
+
   const PLANS = [
-    { id: "pro", name: "Pro", price: 49, features: ["Realtime Alerts", "Journal Access", "Multi-Timeframe Bias"] },
-    { id: "elite", name: "Elite", price: 99, features: ["XAU/USD Senior Review", "Custom Alert Rules", "AI Model Analysis"] },
-    { id: "ultra", name: "Ultra", price: 169, features: ["Priority Support", "Advanced Signals", "Full ICT Narration"] },
+    { id: "pro", name: "Pro", price: 49, features: planFeatures("pro", foundingMember) },
+    { id: "elite", name: "Elite", price: 99, features: planFeatures("elite", foundingMember) },
+    { id: "ultra", name: "Ultra", price: 169, features: planFeatures("ultra", foundingMember) },
   ];
 
   const currentPrice = useMemo(() => {

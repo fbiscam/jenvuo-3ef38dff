@@ -307,7 +307,7 @@ export const DOC_GROUPS: DocGroup[] = [
               <li>Type the same IP into the bot's MyIP input; the bot checks with jenvu.com that it runs from that IP before it trades.</li>
               <li>It pauses for the day at your daily target (monthly target / 20) and stops at the monthly target.</li>
             </ul>
-            <Note>Targets are stop limits, not promised profit. Credit alone does not unlock JX Bot; a paid plan or the 14-day free trial does.</Note>
+            <Note>Targets are stop limits, not promised profit. Credit and the free trial do not unlock JX Bot; it is for approved Founding members (first month free, then a paid plan).</Note>
           </>
         ),
       },
