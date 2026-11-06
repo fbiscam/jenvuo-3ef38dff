@@ -84,10 +84,11 @@ export function evaluateIpLicense(enteredIp: string, callerIp: string, account: 
   const b = parseBinding(lic.mt5_account);
   if (b.ip !== ip || normalizeIp(callerIp) !== ip) return { valid: false, reason: "ip_mismatch" };
   if (b.account && b.account !== account) return { valid: false, reason: "account_mismatch" };
-  // Verified Founding members (not yet locked by the $200 / 30-day check) run the bot on Pro limits.
+  // Verified Founding members (within their 30 days) run the bot on their Founding plan (Pro or Elite).
   if (foundingBot && !(sub && isPaidBotSub(sub, now))) {
-    const t = targetsFor("pro", lic.user_id);
-    return { valid: true, plan: "pro", daily_target: t.daily, monthly_target: t.monthly, expires_at: null, bind: !b.account };
+    const fp = String(sub?.plan_id || "").toLowerCase() === "elite" ? "elite" : "pro";
+    const t = targetsFor(fp, lic.user_id);
+    return { valid: true, plan: fp, daily_target: t.daily, monthly_target: t.monthly, expires_at: null, bind: !b.account };
   }
   const plan = String(sub?.plan_id || "").toLowerCase();
   if (!sub || !isPaidBotSub(sub, now)) return { valid: false, reason: sub?.plan_id && plan !== "free" && !sub?.is_trial ? "expired" : "no_plan" };

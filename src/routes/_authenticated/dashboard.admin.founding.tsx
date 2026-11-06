@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
+import { foundingPlanFor } from "@/lib/founding-offer";
 import {
   Search,
   Crown,
@@ -54,12 +55,8 @@ function AdminFoundingPage() {
   const [loading, setLoading] = useState(true);
   const [allowed, setAllowed] = useState(false);
   const [rows, setRows] = useState<FoundingApplication[]>([]);
-  const [planChoice] = useState<Record<string, "pro" | "elite" | "ultra">>({});
-  const planFor = (r: FoundingApplication) => {
-    const req = String(r.requested_plan || "").toLowerCase();
-    void req;
-    return planChoice[r.id] ?? "pro";
-  };
+  // Founding grants the applicant's pick of Pro or Elite (anything else becomes Pro).
+  const planFor = (r: FoundingApplication) => foundingPlanFor(r.requested_plan);
   const [q, setQ] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [sort, setSort] = useState<SortKey>("newest");
@@ -136,7 +133,7 @@ function AdminFoundingPage() {
     setBusy(id + "profit");
     try {
       const row = rows.find((r) => r.id === id);
-      await update({ data: { id, status: "active", first_profit_reached: true, plan: row ? planFor(row) : "elite" } });
+      await update({ data: { id, status: "active", first_profit_reached: true, plan: row ? planFor(row) : "pro" } });
       setRows((prev) =>
         prev.map((r) => (r.id === id ? { ...r, status: "active", first_profit_at: new Date().toISOString() } : r)),
       );
@@ -271,7 +268,7 @@ function AdminFoundingPage() {
                           Wants: {r.requested_plan}
                         </span>
                       )}
-                      <span className="inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Grants: Pro · 30 days</span>
+                      <span className="inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Grants: {planFor(r) === "elite" ? "Elite" : "Pro"} · 30 days · $200</span>
                       <span
                         className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide ${
                           STATUS_STYLES[r.status] || "bg-muted text-foreground"
