@@ -182,11 +182,10 @@ export function CloudStartBanner() {
             </h2>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link
-                to="/auth"
-                search={{ mode: "signup" } as never}
+                to="/founding"
                 className="inline-flex rounded-full bg-gc-blue-deep px-6 py-3 text-sm font-medium text-gc-on-blue hover:bg-gc-navy"
               >
-                Get started for free
+                Apply now
               </Link>
               <button
                 type="button"

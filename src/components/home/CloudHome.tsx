@@ -205,8 +205,7 @@ export function CloudHero({ price: _price, delta: _delta }: { price: string; del
           </h1>
           <div className="jenvu-rise [animation-delay:100ms] mt-8 flex flex-wrap items-center justify-center gap-6">
             <Link
-              to="/auth"
-              search={{ mode: "signup" } as never}
+              to="/founding"
               className="inline-flex h-11 items-center gap-1.5 rounded-full bg-gc-ink px-5 text-[15px] font-medium text-background transition hover:opacity-90"
             >
               Get started <ChevronDown className="h-4 w-4" />
@@ -458,11 +457,10 @@ export function CloudBuildWith() {
           </p>
           <div className="mt-7 flex flex-wrap items-center gap-7">
             <Link
-              to="/auth"
-              search={{ mode: "signup" } as never}
+              to="/founding"
               className="inline-flex h-12 items-center justify-center rounded-full bg-gc-blue px-6 text-[15px] font-medium text-gc-on-blue transition hover:bg-gc-blue-hover"
             >
-              Get started for free
+              Apply now
             </Link>
             <Link to="/pricing" className="text-[15px] font-medium text-gc-blue-deep hover:underline">
               See all plans and tools
@@ -736,11 +734,10 @@ export function CloudFinalCta() {
             </h2>
             <div className="mt-8 flex flex-wrap items-center gap-3">
               <Link
-                to="/auth"
-                search={{ mode: "signup" } as never}
+                to="/founding"
                 className="inline-flex h-11 items-center justify-center rounded-full bg-gc-blue px-6 text-[15px] font-medium text-gc-on-blue transition hover:bg-gc-blue-hover"
               >
-                Get started for free
+                Apply now
               </Link>
               <button
                 type="button"

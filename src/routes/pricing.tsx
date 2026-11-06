@@ -133,8 +133,8 @@ function PricingPage() {
           <Link to="/contact" className="inline-flex items-center gap-1.5 rounded-full bg-foreground px-5 py-2.5 text-sm font-medium text-background transition hover:opacity-90">
             Request a quote
           </Link>
-          <Link to="/auth" search={{ mode: "signup" } as never} className="inline-flex items-center gap-1.5 rounded-full bg-gc-pill px-5 py-2.5 text-sm font-medium text-foreground transition hover:brightness-95">
-            Get started for free
+          <Link to="/founding" className="inline-flex items-center gap-1.5 rounded-full bg-gc-pill px-5 py-2.5 text-sm font-medium text-foreground transition hover:brightness-95">
+            Apply now
           </Link>
         </div>
       </section>
@@ -145,7 +145,7 @@ function PricingPage() {
           <h2 className="text-[30px] font-medium leading-tight tracking-tight sm:text-[36px]">Start trading Gold, Bitcoin and EUR/USD for free</h2>
           <p className="mt-5 text-[17px] leading-[1.65] text-gc-ink-muted">
             Create an account to see how Jenvu reads the Gold, Bitcoin and EUR/USD markets in real time. New users get{" "}
-            <Link to="/auth" search={{ mode: "signup" } as never} className={LINK}>$100 in free credit</Link> to run the AI desk, plus{" "}
+            <Link to="/founding" className={LINK}>$100 in free credit</Link> to run the AI desk, plus{" "}
             <a href="#plans" className={LINK}>14 days of Pro access</a>, started with one click from the dashboard.
           </p>
         </div>
