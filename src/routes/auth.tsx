@@ -1377,7 +1377,7 @@ function AuthPage() {
                       <p>
                         New here? Sign-up is closed.{" "}
                         <Link to="/founding" className="font-medium text-foreground underline underline-offset-2">
-                          Apply for the Founding Program →
+                          Apply for the Founding Program
                         </Link>
                       </p>
                       <p>
