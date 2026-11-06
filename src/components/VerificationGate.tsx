@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
-import { ShieldCheck, ShieldAlert, Lock } from "lucide-react";
+import { ShieldCheck, Lock } from "lucide-react";
 import { useVerification } from "@/hooks/useVerification";
+import { VerifyNotice } from "@/components/TerminalLockGate";
 
 const FONT = '"Google Sans Flex", "Google Sans", "Google Sans Text", Inter, system-ui, sans-serif';
 
@@ -9,37 +10,17 @@ export function VerificationBanner({ isAdmin = false }: { isAdmin?: boolean }) {
   const { loading, verified, submitted, rejected, needsInfo, status } = useVerification();
   if (isAdmin || loading || verified || !status) return null;
 
-  const tone = rejected
-    ? { border: "border-red-200", bg: "bg-red-50", text: "text-red-900" }
-    : submitted || needsInfo
-      ? { border: "border-amber-200", bg: "bg-amber-50", text: "text-amber-900" }
-      : { border: "border-blue-200", bg: "bg-blue-50", text: "text-blue-900" };
-
-  const message = rejected
-    ? "Your documents were rejected. Please re-upload your ID verification and driving license to unlock your account."
+  const tone = rejected ? "error" : submitted || needsInfo ? "warn" : "info";
+  const title = rejected ? "Documents rejected" : needsInfo ? "One more document needed" : submitted ? "Documents under review" : "Verify your identity";
+  const text = rejected
+    ? "Re-upload your ID and driving license to unlock your account."
     : needsInfo
-      ? "Our reviewer needs one more document. Please verify your identity to access signals and alerts."
+      ? "Our reviewer needs one more document to unlock signals and alerts."
       : submitted
-        ? "Documents received — we're reviewing them. Signals and alerts unlock once approved."
-        : "Please verify your identity to access signals, alerts and account changes.";
+        ? "Signals and alerts unlock once our team approves them."
+        : "Unlock signals, alerts and account changes.";
 
-  return (
-    <div
-      className={`mb-4 flex flex-col gap-3 rounded-2xl border ${tone.border} ${tone.bg} px-4 py-3 sm:flex-row sm:items-center sm:justify-between`}
-      style={{ fontFamily: FONT }}
-    >
-      <div className={`flex items-start gap-2 text-sm ${tone.text}`}>
-        <ShieldAlert className="mt-0.5 h-4 w-4 shrink-0" />
-        <span>{message}</span>
-      </div>
-      <Link
-        to="/dashboard/documents"
-        className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-zinc-900 px-3.5 py-2 text-xs font-semibold text-white hover:bg-zinc-800"
-      >
-        <ShieldCheck className="h-3.5 w-3.5" /> Verify identity
-      </Link>
-    </div>
-  );
+  return <VerifyNotice tone={tone} title={title} text={text} action={submitted ? "View documents" : "Verify identity"} />;
 }
 
 /** Full-page lock shown instead of restricted page content. */

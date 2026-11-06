@@ -69,27 +69,50 @@ export function IdVerificationDeadlineNotice({ access }: { access: TerminalAcces
     const t = setInterval(() => setNow(Date.now()), 30_000);
     return () => clearInterval(t);
   }, []);
-  if (access.loading || !access.allowed || access.reason !== "founding" || !access.idDeadline) return null;
+  if (!showsIdDeadline(access) || !access.idDeadline) return null;
   const deadline = Date.parse(access.idDeadline);
   const left = deadline - now;
+  const when = new Date(deadline).toLocaleString(undefined, { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
   return (
-    <div className="mb-3 flex flex-col gap-3 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
-      <div className="flex items-start gap-2 text-sm text-amber-900">
-        <ShieldAlert className="mt-0.5 h-4 w-4 shrink-0" />
-        <span>
-          <strong>ID verification required within 2 days.</strong> Your Terminal is unlocked, but you must submit
-          your ID verification by {new Date(deadline).toLocaleString()} ({formatLeft(left)} left). If it is not
-          submitted in time, the Terminal will lock again.
-        </span>
-      </div>
+    <VerifyNotice
+      tone="warn"
+      title="Verify your ID"
+      text={`Submit it by ${when} (${formatLeft(left)} left) to keep the Terminal unlocked.`}
+      action="Verify ID now"
+    />
+  );
+}
+
+/**
+ * One themed ID-verification notice (rounded strip, small text, pill button). Both the
+ * Founding 2-day deadline and the general "verify identity" banner use it.
+ */
+export function VerifyNotice({ tone = "info", title, text, action }: { tone?: "info" | "warn" | "error"; title: string; text: string; action: string }) {
+  const dot = tone === "error" ? "bg-destructive" : tone === "warn" ? "bg-gc-warning" : "bg-gc-ink-muted";
+  return (
+    <div className="mb-4 grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-x-3 rounded-full border border-gc-line bg-gc-surface py-1.5 pl-4 pr-1.5 max-sm:rounded-2xl">
+      <span className="relative flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-background">
+        <ShieldAlert className="h-3.5 w-3.5 text-gc-ink" aria-hidden="true" />
+        <span className={`absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full ring-2 ring-gc-surface ${dot}`} aria-hidden="true" />
+      </span>
+      <p className="min-w-0 text-[12.5px] leading-snug text-gc-ink line-clamp-2 sm:line-clamp-none sm:truncate">
+        <span className="font-medium">{title}</span>
+        <span className="text-gc-ink-muted"> — {text}</span>
+      </p>
       <Link
         to="/dashboard/documents"
-        className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-zinc-900 px-3.5 py-2 text-xs font-semibold text-white hover:bg-zinc-800"
+        className="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full bg-gc-blue-deep px-3.5 text-[12.5px] font-medium text-gc-on-blue transition-colors hover:bg-gc-navy"
       >
-        <ShieldCheck className="h-3.5 w-3.5" /> Verify ID now
+        <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" />
+        {action}
       </Link>
     </div>
   );
+}
+
+/** Whether the Founding ID-deadline notice is showing (then the general banner is hidden). */
+export function showsIdDeadline(access: TerminalAccessState): boolean {
+  return !access.loading && access.allowed && access.reason === "founding" && !!access.idDeadline;
 }
 
 /** Small banner while the Pro free trial is running. */

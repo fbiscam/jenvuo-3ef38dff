@@ -1635,7 +1635,7 @@ function DashboardLayout() {
           style={pathname === "/dashboard/terminal" ? undefined : { zoom: 0.9 }}
         >
           <IdVerificationDeadlineNotice access={terminalAccess} />
-          {pathname !== "/dashboard/terminal" && <VerificationBanner isAdmin={isAdminUser} />}
+          {pathname !== "/dashboard/terminal" && !showsIdDeadline(terminalAccess) && <VerificationBanner isAdmin={isAdminUser} />}
 
           {pathname === "/dashboard" ? (
             <ConsoleWelcome name={fullName} keysCount={extKeyCount} />
