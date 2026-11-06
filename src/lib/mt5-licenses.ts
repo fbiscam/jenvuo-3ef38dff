@@ -76,7 +76,7 @@ export type ValidateResult =
  * Both must equal the IP registered on the website; the first MT5 account on that IP is locked in.
  * An active paid plan or the 14-day free trial makes it valid; credit never does.
  */
-export function evaluateIpLicense(enteredIp: string, callerIp: string, account: string, lic: Lic | null, sub: Sub, now = Date.now()): ValidateResult {
+export function evaluateIpLicense(enteredIp: string, callerIp: string, account: string, lic: Lic | null, sub: Sub, now = Date.now(), foundingBot = false): ValidateResult {
   const ip = normalizeIp(enteredIp);
   if (!ip || !MT5_ACCOUNT_RE.test(account)) return { valid: false, reason: "malformed" };
   if (!lic) return { valid: false, reason: "not_found" };
@@ -84,6 +84,11 @@ export function evaluateIpLicense(enteredIp: string, callerIp: string, account: 
   const b = parseBinding(lic.mt5_account);
   if (b.ip !== ip || normalizeIp(callerIp) !== ip) return { valid: false, reason: "ip_mismatch" };
   if (b.account && b.account !== account) return { valid: false, reason: "account_mismatch" };
+  // Verified Founding members (not yet locked by the $200 / 30-day check) run the bot on Pro limits.
+  if (foundingBot && !(sub && isPaidBotSub(sub, now))) {
+    const t = targetsFor("pro", lic.user_id);
+    return { valid: true, plan: "pro", daily_target: t.daily, monthly_target: t.monthly, expires_at: null, bind: !b.account };
+  }
   const plan = String(sub?.plan_id || "").toLowerCase();
   if (!sub || !isPaidBotSub(sub, now)) return { valid: false, reason: sub?.plan_id && plan !== "free" && !sub?.is_trial ? "expired" : "no_plan" };
   if (!isMt5Plan(plan)) return { valid: false, reason: "no_plan" };

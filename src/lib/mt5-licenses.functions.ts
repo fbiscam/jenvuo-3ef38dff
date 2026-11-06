@@ -9,10 +9,16 @@ async function readPlan(userId: string) {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const db = supabaseAdmin as any;
   const { data: sub } = await db.from("user_subscriptions").select("plan_id,status,is_trial,current_period_end").eq("user_id", userId).maybeSingle();
-  const plan = String(sub?.plan_id || "free").toLowerCase();
-  const ok = isPaidBotSub(sub ?? null) && isMt5Plan(plan);
+  const subPlan = String(sub?.plan_id || "free").toLowerCase();
+  const paid = isPaidBotSub(sub ?? null) && isMt5Plan(subPlan);
+  const { foundingBotFor } = await import("./mt5-ip-license.server");
+  const founding = await foundingBotFor(db, userId);
+  // Verified Founding members run the bot on Pro limits until the $200 / 30-day check locks it.
+  const viaFounding = !paid && founding.state === "active";
+  const ok = paid || viaFounding;
+  const plan = paid ? subPlan : viaFounding ? "pro" : "free";
   const t = ok ? targetsFor(plan as any, userId) : { daily: 0, monthly: 0 };
-  return { db, plan: ok ? plan : "free", allowed: ok, limit: ok ? licenseLimit(plan) : 0, expiresAt: ok ? (sub.current_period_end as string | null) : null, dailyTarget: t.daily, monthlyTarget: t.monthly };
+  return { db, plan, allowed: ok, viaFounding, founding, limit: ok ? licenseLimit(plan) : 0, expiresAt: paid ? (sub.current_period_end as string | null) : null, dailyTarget: t.daily, monthlyTarget: t.monthly };
 }
 
 export const getMt5Access = createServerFn({ method: "POST" })
