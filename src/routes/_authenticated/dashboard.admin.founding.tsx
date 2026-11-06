@@ -58,7 +58,8 @@ function AdminFoundingPage() {
   const [planChoice, setPlanChoice] = useState<Record<string, "pro" | "elite" | "ultra">>({});
   const planFor = (r: FoundingApplication) => {
     const req = String(r.requested_plan || "").toLowerCase();
-    return planChoice[r.id] ?? (req === "pro" || req === "ultra" ? req : "elite");
+    void req;
+    return planChoice[r.id] ?? "pro";
   };
   const [q, setQ] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
@@ -271,19 +272,7 @@ function AdminFoundingPage() {
                           Wants: {r.requested_plan}
                         </span>
                       )}
-                      <label className="inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-                        Grant
-                        <select
-                          aria-label="Plan to grant"
-                          value={planFor(r)}
-                          onChange={(e) => setPlanChoice((prev) => ({ ...prev, [r.id]: e.target.value as "pro" | "elite" | "ultra" }))}
-                          className="rounded-full border border-border bg-background px-2 py-0.5 text-[10px] uppercase"
-                        >
-                          <option value="pro">Pro</option>
-                          <option value="elite">Elite</option>
-                          <option value="ultra">Ultra</option>
-                        </select>
-                      </label>
+                      <span className="inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Grants: Pro · 30 days</span>
                       <span
                         className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide ${
                           STATUS_STYLES[r.status] || "bg-muted text-foreground"
@@ -382,7 +371,7 @@ function AdminFoundingPage() {
                         onClick={() => markProfit(r.id)}
                         className="inline-flex items-center gap-1 rounded-lg bg-gc-amber px-2.5 py-1.5 text-[12px] font-medium text-gc-on-blue hover:bg-gc-amber/90 disabled:opacity-50"
                       >
-                        Fund {PLAN_AMOUNT[(r.requested_plan || "elite").toLowerCase()] || "$25"} ({(r.requested_plan || "elite").toUpperCase()}) → Active
+                        Fund (PRO) → Active
                       </button>
                     )}
                     {r.status === "rejected" && (
