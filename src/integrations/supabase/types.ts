@@ -2371,6 +2371,24 @@ export type Database = {
         }
         Relationships: []
       }
+      playground_chat_saves: {
+        Row: {
+          data: Json
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          data: Json
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          data?: Json
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           alerts_last_seen_at: string | null

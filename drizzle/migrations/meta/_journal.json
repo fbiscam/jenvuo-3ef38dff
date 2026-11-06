@@ -176,6 +176,13 @@
       "when": 1793623818402,
       "tag": "0024_chat_jobs",
       "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1793937110334,
+      "tag": "0025_playground_chat_saves",
+      "breakpoints": true
     }
   ]
 }
