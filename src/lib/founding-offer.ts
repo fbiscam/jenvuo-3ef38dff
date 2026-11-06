@@ -1,27 +1,35 @@
 /** Founding Program offer, shared by the site copy and the trial-length checks. */
-export const FOUNDING_PLAN = "pro" as const;
+/** Plans an applicant can pick; anything else falls back to Pro. */
+export const FOUNDING_PLANS = ["pro", "elite"] as const;
+export type FoundingPlan = (typeof FOUNDING_PLANS)[number];
+export const FOUNDING_PLAN: FoundingPlan = "pro";
 export const FOUNDING_MONTHS = 1;
 export const FOUNDING_PLAN_DAYS = 30;
-export const FOUNDING_CREDIT_USD = 250;
-export const FOUNDING_CREDIT_DAYS = 60;
+export const FOUNDING_CREDIT_USD = 200;
+/** Founding credit ends together with the Founding plan. */
+export const FOUNDING_CREDIT_DAYS = 30;
 export const FOUNDING_ID_DAYS = 2;
-/** Credit from plans, top-ups and the free trial lasts this long from each grant. */
+/** Credit from plans, top-ups, the free trial and Founding lasts this long from each grant. */
 export const CREDIT_LOT_DAYS = 30;
 
 const DAY = 86400000;
 
-/** When the founding Pro plan ends, counted from the approval date. */
+/** The Founding plan granted for a requested tier (Pro or Elite only). */
+export function foundingPlanFor(requested: string | null | undefined): FoundingPlan {
+  return String(requested || "").toLowerCase() === "elite" ? "elite" : "pro";
+}
+
+/** When the founding plan ends, counted from the approval date. */
 export function foundingTrialEnd(approvedAt: Date): Date {
   return new Date(approvedAt.getTime() + FOUNDING_PLAN_DAYS * DAY);
 }
 
-/** When the founding $250 credit expires, counted from the approval date. */
+/** When the founding credit expires, counted from the approval date. */
 export function foundingCreditEnd(approvedAt: Date): Date {
   return new Date(approvedAt.getTime() + FOUNDING_CREDIT_DAYS * DAY);
 }
 
-/** Expiry for a credit grant (mirrors the database rule). */
-export function creditLotExpiry(grantedAt: Date, reason: string): Date {
-  const days = reason === "founding_trial_grant" ? FOUNDING_CREDIT_DAYS : CREDIT_LOT_DAYS;
-  return new Date(grantedAt.getTime() + days * DAY);
+/** Expiry for a credit grant (mirrors the database rule: 30 days for every grant). */
+export function creditLotExpiry(grantedAt: Date, _reason: string): Date {
+  return new Date(grantedAt.getTime() + CREDIT_LOT_DAYS * DAY);
 }
