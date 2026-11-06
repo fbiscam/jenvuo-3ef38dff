@@ -21,11 +21,11 @@ const LINK = "font-medium text-gc-blue underline underline-offset-2 hover:text-g
 
 export const FAQ = [
   ["Is this financial advice?", "No. Jenvu is an analysis tool. Every setup is for educational purposes and you remain responsible for your own trades."],
-  ["How does the free trial work?", "After signing up, click “Start free” in your dashboard. You get $100 credit and 14 days of Pro access (Terminal strategies and API credit) once per account. The free trial does not include JX Bot."],
+  ["Is there a free trial or open sign-up?", "No. Sign-up and the free trial are closed. Jenvu accounts are created only for approved Founding Program members, who get Pro or Elite with $200 credit for 30 days. Apply at jenvu.com/founding."],
   ["What do the plans include?", "Every plan includes the Terminal's paid strategies, the Top AI Models and monthly API credit: Pro $29, Elite $59 and Ultra $99 a month. JX Bot for MetaTrader 5 (1, 2 or 5 IPs, verified by IP address, no license key) is offered only to verified Founding Program members, who pay the bot's cost on top: Pro $49, Elite $99 or Ultra $169."],
   ["Who gets JX Bot?", "JX Bot is only for approved Founding Program members. After approval and ID verification, the first month is free. After that, members keep the bot by buying Pro ($49), Elite ($99) or Ultra ($169), which include the JX Bot cost. A plan bought without Founding membership covers the Terminal and API only. Credit alone never unlocks JX Bot. Apply at jenvu.com/founding."],
   ["When does JX Bot trade?", `New trades open Monday to Thursday between 01:00 and 14:00 broker time and on Friday until 13:00. The bot skips the London open (07:00–09:00 UTC), the New York open (13:00–15:00 UTC) and weekends. It stops for the day at a fixed daily target of ${DAILY_TARGET_PCT.pro}% (Pro), ${DAILY_TARGET_PCT.elite}% (Elite) or ${DAILY_TARGET_PCT.ultra}% (Ultra) of the day's starting balance, or at the fixed ${DAILY_DRAWDOWN_PCT}% daily drawdown guard.`],
-  ["Who can use the Terminal?", "The Terminal is open to every signed-in user. Its paid strategies (Fresh sweep, Swing price action, Zone + FVG) need a Pro, Elite or Ultra plan, a running free trial or Founding access."],
+  ["Who can use the Terminal?", "Only approved Founding Program members. After approval you have 2 days to verify your ID; if it isn't sent in time the Terminal locks until you send it. Plans can be bought only after your ID is verified."],
   ["Can I cancel anytime?", "Yes. Plans are month-to-month with no lock-in. You keep access until the end of the period you already paid for."],
   ["What markets are covered?", "The Terminal covers Gold (XAU/USD), Bitcoin (BTC/USD) and Euro (EUR/USD). JX Bot trades EUR/USD only."],
 ];
@@ -34,7 +34,7 @@ export const Route = createFileRoute("/pricing")({
   head: () => ({
     meta: [
       { title: "Jenvu Pricing — Pro, Elite and Ultra Plans" },
-      { name: "description", content: "Transparent Jenvu pricing: Pro $29, Elite $59 and Ultra $99 a month for the Terminal and API, $3 per million tokens, plus $100 free credit and 14 days of Pro for new users." },
+      { name: "description", content: "Transparent Jenvu pricing: Pro $29, Elite $59 and Ultra $99 a month for the Terminal and API, $3 per million tokens, for approved Founding Program members." },
       { property: "og:title", content: "Jenvu pricing" },
       { property: "og:description", content: "Pro, Elite and Ultra plans for the Terminal and Top AI Models, with JX Bot for approved Founding members." },
       { property: "og:type", content: "website" },
@@ -94,10 +94,18 @@ function PricingPage() {
   // Only verified Founding members see JX Bot in the plans and pay the bot-included price.
   const membershipFn = useServerFn(getFoundingMembership);
   const [founding, setFounding] = React.useState(false);
+  // Buying is only for admins and ID-verified Founding members; others apply first.
+  const [buyGate, setBuyGate] = React.useState<PurchaseGate>({ canBuy: false, reason: "apply" });
   React.useEffect(() => {
-    if (signedOut) { setFounding(false); return; }
+    if (signedOut) { setFounding(false); setBuyGate({ canBuy: false, reason: "apply" }); return; }
     let alive = true;
-    membershipFn().then((r) => alive && setFounding(!!r.verified)).catch(() => {});
+    membershipFn()
+      .then((r) => {
+        if (!alive) return;
+        setFounding(!!r.verified);
+        setBuyGate(purchaseGate({ isAdmin: !!r.isAdmin, member: !!r.member, verified: !!r.verified }));
+      })
+      .catch(() => {});
     return () => { alive = false; };
   }, [signedOut, membershipFn]);
   const botLine = (ips: number) => (founding ? `JX Bot on ${ips} IP${ips > 1 ? "s" : ""} included` : "JX Bot: Founding members only");
@@ -142,20 +150,20 @@ function PricingPage() {
       {/* START FOR FREE + STATS */}
       <section className="mx-auto grid max-w-[1296px] items-center gap-10 px-5 py-10 sm:px-8 md:grid-cols-2 md:gap-14 lg:px-[72px]">
         <div>
-          <h2 className="text-[30px] font-medium leading-tight tracking-tight sm:text-[36px]">Start trading Gold, Bitcoin and EUR/USD for free</h2>
+          <h2 className="text-[30px] font-medium leading-tight tracking-tight sm:text-[36px]">Jenvu is for Founding Program members</h2>
           <p className="mt-5 text-[17px] leading-[1.65] text-gc-ink-muted">
-            Create an account to see how Jenvu reads the Gold, Bitcoin and EUR/USD markets in real time. New users get{" "}
-            <Link to="/founding" className={LINK}>$100 in free credit</Link> to run the AI desk, plus{" "}
-            <a href="#plans" className={LINK}>14 days of Pro access</a>, started with one click from the dashboard.
+            The Terminal, JX Bot and API credit are only for approved{" "}
+            <Link to="/founding" className={LINK}>Founding Program</Link> members. Approved members get Pro or Elite with $200 credit for 30 days, verify their ID within 2 days, and can then{" "}
+            <a href="#plans" className={LINK}>buy a plan</a> to keep going.
           </p>
         </div>
         <div className="grid grid-cols-2 gap-3">
           {[
-            { value: "$100", label: "in free credit" },
-            { value: "14", label: "days of Pro access" },
+            { value: "$200", label: "credit for approved members" },
+            { value: "30", label: "days of Pro or Elite" },
           ].map((s) => (
             <div key={s.label} className="relative overflow-hidden rounded-md border border-gc-line p-6">
-              <div aria-hidden className="absolute inset-x-0 top-0 h-1" style={{ backgroundImage: s.value === "$100" ? "var(--platform-aurora-1)" : "var(--platform-aurora-3)" }} />
+              <div aria-hidden className="absolute inset-x-0 top-0 h-1" style={{ backgroundImage: s.value === "$200" ? "var(--platform-aurora-1)" : "var(--platform-aurora-3)" }} />
               <p className="text-[48px] font-medium leading-none tracking-tight text-gc-ink sm:text-[60px]">{s.value}</p>
               <p className="mt-4 text-[15px] text-gc-ink-muted">{s.label}</p>
             </div>
@@ -236,7 +244,7 @@ function PricingPage() {
             const trialPro = trial.active && plan.key === "pro";
             const isCurrent = currentPlan === plan.key && !trialPro;
             const disabled = currentPlan !== null && !isCurrent && !trialPro && upgradeLock.locked;
-            const destination = currentPlan !== null ? "/dashboard/pay" : "/auth";
+            const destination = buyGate.canBuy ? "/dashboard/pay" : buyGate.reason === "verify_id" ? "/dashboard/documents" : "/founding";
             return (
               <article key={plan.key} className={`flex min-h-[280px] flex-col rounded-md border p-7 ${plan.key === "pro" ? "border-gc-blue" : "border-gc-line"}`}>
                 <div className="flex items-center justify-between gap-3">
@@ -269,7 +277,7 @@ function PricingPage() {
                       to={destination}
                       className={`flex h-11 items-center justify-center rounded-full text-[15px] font-medium transition ${plan.key === "pro" ? "bg-foreground text-background hover:opacity-90" : "bg-gc-pill text-foreground hover:brightness-95"}`}
                     >
-                      {trialPro ? "Upgrade to Pro" : currentPlan !== null ? "Upgrade" : "Buy now"}
+                      {!buyGate.canBuy ? (buyGate.reason === "verify_id" ? "Verify ID to buy" : "Apply now") : trialPro ? "Upgrade to Pro" : currentPlan !== null ? "Upgrade" : "Buy now"}
                     </Link>
                   )}
                 </div>
@@ -354,16 +362,16 @@ function PricingPage() {
               </div>
               <p className="mt-2 text-[14px] text-gc-ink-muted">One-time · ~{(Math.floor((p.price / 3) * 10) / 10).toFixed(1)}M tokens</p>
               <Link
-                to={signedOut ? "/auth" : "/dashboard/pay"}
-                search={signedOut ? undefined : ({ amount: p.price } as never)}
+                to={buyGate.canBuy ? "/dashboard/pay" : "/founding"}
+                search={buyGate.canBuy ? ({ amount: p.price } as never) : undefined}
                 className="mt-6 inline-flex h-10 items-center justify-center rounded-full border border-gc-line text-[14px] font-medium text-gc-blue hover:bg-gc-surface"
               >
-                Buy now
+                {buyGate.canBuy ? "Buy now" : "Apply now"}
               </Link>
             </div>
           ))}
         </div>
-        <CustomTopUp signedOut={signedOut} />
+        <CustomTopUp signedOut={!buyGate.canBuy} />
       </section>
 
       {/* GUIDANCE */}
@@ -452,11 +460,11 @@ function CustomTopUp({ signedOut }: { signedOut: boolean }) {
             <div className="mt-1 text-[12px] text-gc-ink-muted">about {primaryRequests} primary requests</div>
           </div>
           <Link
-            to={signedOut ? "/auth" : "/dashboard/pay"}
+            to={signedOut ? "/founding" : "/dashboard/pay"}
             search={signedOut ? undefined : ({ amount: safe } as never)}
             className="inline-flex h-11 items-center justify-center whitespace-nowrap rounded-full bg-foreground px-6 text-[15px] font-medium text-background hover:opacity-90"
           >
-            Buy now
+            {signedOut ? "Apply now" : "Buy now"}
           </Link>
         </div>
       </div>
