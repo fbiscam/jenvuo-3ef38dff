@@ -258,7 +258,7 @@ function renderApplicantEmail(kind: ApplicantEmailKind, name: string, plan: stri
           `Congratulations, ${n} 🎉`,
           "Documents · Approved",
           `<p style="margin:0 0 12px">Your identity documents have been reviewed and <strong>approved</strong>. Your Founding Trader account is fully verified.</p>
-           <p style="margin:0 0 12px">Billing continues on your <strong>${escapeHtml(meta.label)}</strong> plan as expected. Nothing else is required from your side.</p>
+           <p style="margin:0 0 12px">Your <strong>${escapeHtml(meta.label)}</strong> Founding plan stays active for its ${FOUNDING_PLAN_DAYS} days and JX Bot is now unlocked — open the JX Bot page to add your IP and download it.</p>
            <p style="margin:0">Thanks for keeping the program transparent.</p>`,
           { label: "Open my dashboard", href: `${APP_URL}/dashboard` },
         ),
