@@ -16,6 +16,17 @@ export const quoteTopup = createServerFn({ method: "POST" })
     return evaluatePromo({ userId: context.userId, amountUsd: data.amountUsd, code: data.code ?? null });
   });
 
+/** Plans, top-ups and credit codes are only for admins and ID-verified Founding members. */
+async function purchaseBlock(supabase: any, userId: string): Promise<string | null> {
+  const { purchaseGate, PURCHASE_BLOCK_MESSAGE, isFoundingMember, isVerifiedFoundingMember } = await import("@/lib/founding-bot");
+  const { data: isAdmin } = await supabase.rpc("has_role", { _user_id: userId, _role: "admin" });
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const { foundingBotFor } = await import("@/lib/mt5-ip-license.server");
+  const info = await foundingBotFor(supabaseAdmin as any, userId);
+  const gate = purchaseGate({ isAdmin: !!isAdmin, member: isFoundingMember(info.state), verified: isVerifiedFoundingMember(info) });
+  return gate.canBuy || gate.reason === "ok" ? null : PURCHASE_BLOCK_MESSAGE[gate.reason];
+}
+
 const createSchema = z.object({
   amountUsd: z.number().min(5).max(10000),
   network: z.enum(["trc20", "bep20", "erc20"]),
@@ -28,6 +39,8 @@ export const createTopupOrder = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => createSchema.parse(d))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
+    const blocked = await purchaseBlock(supabase, userId);
+    if (blocked) return { ok: false as const, error: blocked };
     const { evaluatePromo, getDepositAddresses } = await import("@/lib/payments/core.server");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
@@ -158,6 +171,8 @@ export const redeemFreeCode = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => z.object({ code: z.string().trim().min(2).max(40) }).parse(d))
   .handler(async ({ data, context }) => {
     const { userId } = context;
+    const blocked = await purchaseBlock(context.supabase, userId);
+    if (blocked) return { ok: false as const, error: blocked };
     const { evaluatePromo, creditWallet, bumpPromoUsage } = await import("@/lib/payments/core.server");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
