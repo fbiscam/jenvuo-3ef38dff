@@ -1,5 +1,5 @@
 import { evaluateIpLicense, formatBinding, isPaidBotSub, normalizeIp, requestIp, type ValidateResult } from "@/lib/mt5-licenses";
-import type { FoundingBotState } from "@/lib/founding-bot";
+import { isVerifiedFoundingMember, type FoundingBotState } from "@/lib/founding-bot";
 
 export type FoundingBotInfo = { state: FoundingBotState; profit: number; review_at: string | null; verified_at: string | null; locked_at: string | null; milestone: boolean };
 

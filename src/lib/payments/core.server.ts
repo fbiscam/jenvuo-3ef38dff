@@ -174,11 +174,14 @@ export async function bumpPromoUsage(code: string) {
 
 /** Upgrade the user's plan to the best tier their paid amount covers, and end any trial. */
 export async function applyPlanForPayment(userId: string, paidUsd: number, targetPlanId?: string | null) {
-  const { data: plans } = await supabaseAdmin
-    .from("plans")
-    .select("id, price_usd")
-    .order("price_usd", { ascending: true });
-  const tiers = (plans ?? []).filter((p: any) => Number(p.price_usd) > 0);
+  // Prices come from plan-pricing.ts: Terminal + API for everyone, plus the JX Bot cost
+  // for verified Founding members, so the payment check matches the price they were shown.
+  const { planPrice, PAID_PLAN_IDS } = await import("@/lib/plan-pricing");
+  const { isVerifiedFoundingMember } = await import("@/lib/founding-bot");
+  const { foundingBotFor } = await import("@/lib/mt5-ip-license.server");
+  const withBot = isVerifiedFoundingMember(await foundingBotFor(supabaseAdmin as any, userId));
+  const plans = PAID_PLAN_IDS.map((id) => ({ id, price_usd: planPrice(id, withBot) }));
+  const tiers = plans;
 
   let earned: any = null;
   if (targetPlanId) {
