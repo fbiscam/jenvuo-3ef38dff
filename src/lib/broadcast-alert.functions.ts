@@ -2,7 +2,7 @@ import { createServerFn } from '@tanstack/react-start'
 import { requireSupabaseAuth } from '@/integrations/supabase/auth-middleware'
 import { z } from 'zod'
 
-const FROM = 'Jenvu Signal Desk <signals@notify.jenvu.net>'
+const FROM = 'Jenvu Signal Desk <signals@notify.jenvu.com>'
 
 const BroadcastSchema = z.object({
   pair: z.string().min(3).max(16),
