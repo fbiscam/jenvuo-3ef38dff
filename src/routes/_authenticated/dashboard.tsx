@@ -1613,7 +1613,7 @@ function DashboardLayout() {
               ? "h-full min-h-0 w-full flex-1 overflow-hidden bg-background"
               : embedMode
                 ? `dash-page${isSettingsPath(pathname) ? " settings-page" : ""} w-full flex-1 bg-background px-5 pt-7 pb-7 sm:px-8`
-                : `dash-page${isSettingsPath(pathname) ? " settings-page" : ""}${pathname === "/dashboard/chat" ? " chat-page" : ""}${["/dashboard/models", "/dashboard/usage", "/dashboard/api", "/dashboard/bot-usage", "/dashboard/jx-bot"].includes(pathname) ? " page-plus5" : ""} w-full max-w-7xl flex-1 bg-white px-5 pt-14 pb-7 sm:px-8 lg:pb-2`
+                : `dash-page${isSettingsPath(pathname) ? " settings-page" : ""}${pathname === "/dashboard/chat" ? " chat-page" : ""}${["/dashboard/models", "/dashboard/usage", "/dashboard/api", "/dashboard/bot-usage", "/dashboard/jx-bot"].includes(pathname) ? " page-plus5" : ""} w-full max-w-7xl flex-1 bg-white px-5 ${pathname === "/dashboard/chat" ? "pt-14" : "pt-14 lg:pt-20"} pb-7 sm:px-8 lg:pb-2`
           }
           style={pathname === "/dashboard/terminal" ? undefined : { zoom: 0.9 }}
         >
