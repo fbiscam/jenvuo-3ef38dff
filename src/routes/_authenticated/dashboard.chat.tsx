@@ -304,7 +304,19 @@ function ChatPlayground() {
   // The chat stays (refresh, other pages, signing out) until New chat is clicked.
   useEffect(() => {
     if (!user?.id) return;
-    const saved = parseSavedSession(window.localStorage.getItem(chatSessionKey(user.id)));
+    let cancelled = false;
+    const uid = user.id;
+    void (async () => {
+    // The account's chat is kept in the cloud so every device/browser sees it; local copy is the fallback.
+    let saved = parseSavedSession(window.localStorage.getItem(chatSessionKey(uid)));
+    try {
+      const { data } = await supabase.from("playground_chat_saves").select("data").eq("user_id", uid).maybeSingle();
+      const cloud = data ? parseSavedSession(JSON.stringify(data.data)) : null;
+      if (cloud) saved = cloud;
+    } catch {
+      /* offline: use the local copy */
+    }
+    if (cancelled) return;
     if (saved) {
       setTurns(saved.turns as Turn[]);
       setWorkspace(saved.workspace);
@@ -316,20 +328,36 @@ function ChatPlayground() {
     }
     setRestored(true);
     // A reply was still being written when the user left: pick it up from the server.
-    const pending = parsePendingJob(window.localStorage.getItem(chatPendingKey(user.id)));
+    const pending = parsePendingJob(window.localStorage.getItem(chatPendingKey(uid)));
     if (pending) void resumeJob(pending.jobId, pending.startedAt, (saved?.turns ?? []) as Turn[]);
+    })();
+    return () => {
+      cancelled = true;
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id]);
 
   useEffect(() => {
     if (!user?.id || !restored) return;
     const key = chatSessionKey(user.id);
+    const uid = user.id;
+    const empty = !turns.length && !workspace.length && !doc;
+    const snapshot = empty ? null : toSavedSession({ turns, workspace, activeFile, doc, docOpen, model });
     try {
-      if (!turns.length && !workspace.length && !doc) window.localStorage.removeItem(key);
-      else window.localStorage.setItem(key, JSON.stringify(toSavedSession({ turns, workspace, activeFile, doc, docOpen, model })));
+      if (!snapshot) window.localStorage.removeItem(key);
+      else window.localStorage.setItem(key, JSON.stringify(snapshot));
     } catch {
       /* storage full or blocked: the chat still works, it just isn't kept */
     }
+    // Cloud copy (debounced) so a fresh login on another device shows the same chat.
+    const t = window.setTimeout(() => {
+      if (!snapshot) void supabase.from("playground_chat_saves").delete().eq("user_id", uid);
+      else
+        void supabase
+          .from("playground_chat_saves")
+          .upsert({ user_id: uid, data: JSON.parse(JSON.stringify(snapshot)), updated_at: new Date().toISOString() });
+    }, 1200);
+    return () => window.clearTimeout(t);
   }, [user?.id, restored, turns, workspace, activeFile, doc, docOpen, model]);
 
   const info = getCatalogModel(model);
