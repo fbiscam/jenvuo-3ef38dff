@@ -25,7 +25,7 @@ export default function StartTrialBanner() {
   return (
     <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-x-3 border-b border-gc-line bg-background py-1 pl-3.5 pr-4 sm:gap-x-4 sm:pl-5 md:pr-5">
       <Gift className="h-4 w-4 shrink-0 text-gc-ink-muted" aria-hidden="true" />
-      <p className="min-w-0 truncate text-[12px] text-gc-ink sm:text-[12.5px]">
+      <p className="min-w-0 line-clamp-2 text-[12px] leading-snug sm:line-clamp-none sm:truncate text-gc-ink sm:text-[12.5px]">
         <span className="font-medium">Free trial</span>
         <span className="text-gc-ink-muted"> — $100 in credit and 14 days of Pro. You won't be charged when it ends.</span>
       </p>
