@@ -95,7 +95,8 @@ type ApplicantEmailExtras = {
 };
 
 function renderApplicantEmail(kind: ApplicantEmailKind, name: string, plan: string, extras: ApplicantEmailExtras = {}) {
-  const meta = PLAN_META[plan] || PLAN_META.elite;
+  void plan;
+  const meta = PLAN_META[FOUNDING_PLAN];
   const FONT = "'Google Sans','Google Sans Normal',-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif";
   const wrap = (title: string, tag: string, body: string, cta?: { label: string; href: string }, cta2?: { label: string; href: string }) => `<!doctype html><html><body style="margin:0;background:#f7f7f8;font-family:${FONT};color:#18181b;padding:32px 12px">
 

@@ -205,7 +205,7 @@ export const STORIES: Story[] = [
     feature: {
       title: "Early access for serious Gold, Bitcoin and EUR/USD traders",
       text: [
-        "Approved members get 3 months of their chosen plan, $250 credit and full access to the Terminal.",
+        "Approved members get 1 month of Pro, $250 credit valid for 60 days, full Terminal access and JX Bot after ID verification.",
         "You'll have two days to verify your ID after approval. Once your documents are in, your access continues.",
       ],
       caption: "A small group of traders helping shape Jenvu",

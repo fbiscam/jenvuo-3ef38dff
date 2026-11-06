@@ -153,7 +153,7 @@ export function BizWhatsNew() {
               <div><TagChip tag="Offer" /></div>
               <h3 className="mt-3 text-[30px] font-normal leading-tight tracking-tight text-gc-ink sm:text-[38px]">Founding Program</h3>
               <p className="mt-4 max-w-md text-[17px] leading-relaxed text-gc-ink-muted">
-                Apply to join Jenvu early: three months of your chosen plan plus $250 credit, and full Jenvu Terminal access once approved.
+                Apply to join Jenvu early: 1 month of Pro plus $250 credit (valid 60 days), full Terminal access, and JX Bot after ID verification.
               </p>
               <div className="mt-auto pt-8">
                 <Link to="/founding" className={textLink}>Apply now <ChevronRight className="h-4 w-4" /></Link>
