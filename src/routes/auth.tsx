@@ -731,7 +731,7 @@ function AuthPage() {
       data: {
         type: "welcome",
         title: `Welcome to Jenvu${fullName ? ", " + fullName.split(" ")[0] : ""} 👋`,
-        body: "Your account is ready. Explore signals, dashboard, and referrals.",
+        body: "Your account is ready. Explore the Terminal, Chat and API.",
         dedupeKey: `welcome-${email.toLowerCase()}`,
       },
     });
