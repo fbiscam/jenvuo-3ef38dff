@@ -80,8 +80,8 @@ function HelpCenterPage() {
             <p className="mt-5 max-w-[830px] text-[18px] leading-relaxed text-gc-ink-muted">
               Check our self-serve guides or learn more about getting help with your account, billing and the Terminal. Choose the topic that's right for you.
             </p>
-            <a href="https://auth.jenvu.com/sign-in" className="mt-7 inline-block rounded-full bg-home-accent px-6 py-3 text-[16px] font-medium text-home-accent-foreground hover:opacity-90">
-              Sign up
+            <a href="https://jenvu.com/founding" className="mt-7 inline-block rounded-full bg-home-accent px-6 py-3 text-[16px] font-medium text-home-accent-foreground hover:opacity-90">
+              Apply now
             </a>
           </div>
           <div className="rounded-lg bg-gc-canvas p-6">

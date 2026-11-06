@@ -60,8 +60,8 @@ function GetBot({ label = "Use JX Bot" }: { label?: string }) {
       </Link>
     );
   return (
-    <Link to="/auth" className={pillDark}>
-      {icon} {label}
+    <Link to="/founding" className={pillDark}>
+      {icon} {user ? label : "Apply now"}
     </Link>
   );
 }
@@ -207,7 +207,7 @@ function Closing() {
       <h2 className="text-[34px] font-medium tracking-tight text-foreground md:text-[40px]">Meet your first Bot</h2>
       <p className="mt-2 text-[16px] text-foreground/80">An EUR/USD trading bot that follows its rules every candle</p>
       <div className="mt-6 flex flex-wrap justify-center gap-3">
-        <GetBot label="Get started for free" />
+        <GetBot label="Open JX Bot" />
         <Link to="/contact" className={pillGrey}>
           Contact sales
         </Link>
