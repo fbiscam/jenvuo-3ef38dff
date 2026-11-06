@@ -25,7 +25,7 @@ export const COLORS = {
   soft: '#70757a',
   border: '#dadce0',
   hairline: '#dadce0',
-  accent: '#1a73e8',
+  accent: '#111111',
 }
 
 /** Load Google Sans inside <Head>. Falls back to system sans-serif when web fonts are blocked. */
@@ -146,9 +146,9 @@ export const shellStyles = {
   },
   button: {
     display: 'inline-block',
-    backgroundColor: '#1a73e8',
+    backgroundColor: '#111111',
     color: '#ffffff',
-    border: '1px solid #1a73e8',
+    border: '1px solid #111111',
     fontFamily: INTER,
     fontSize: '14px',
     fontWeight: 500 as const,
