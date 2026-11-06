@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "bun:test";
 import { isFoundingMember, jxBotAction } from "./founding-bot";
 
 describe("JX Bot page button", () => {
