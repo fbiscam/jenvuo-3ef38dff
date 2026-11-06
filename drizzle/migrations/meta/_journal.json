@@ -183,6 +183,13 @@
       "when": 1793937110334,
       "tag": "0025_playground_chat_saves",
       "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "7",
+      "when": 1793970881023,
+      "tag": "0026_founding_one_month_pro_bot_milestone",
+      "breakpoints": true
     }
   ]
 }
