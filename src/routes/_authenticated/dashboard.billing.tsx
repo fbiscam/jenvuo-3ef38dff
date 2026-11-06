@@ -4,10 +4,11 @@ import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { useCredits } from "@/hooks/useCredits";
 import { useTrial } from "@/hooks/useTrial";
+import { useFreeTrial } from "@/hooks/useFreeTrial";
 import { cancelMyPlan } from "@/lib/subscription.functions";
 import { redeemFreeCode } from "@/lib/payments.functions";
 import InvoiceHistory from "@/components/billing/InvoiceHistory";
-import { Info } from "lucide-react";
+import { Gift, Info, Loader2 } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/dashboard/billing")({
   head: () => ({
@@ -49,6 +50,7 @@ const field =
 function Billing() {
   const credits = useCredits();
   const trial = useTrial();
+  const freeTrial = useFreeTrial();
   const cancelPlan = useServerFn(cancelMyPlan);
   const redeemPromotion = useServerFn(redeemFreeCode);
 
@@ -186,6 +188,27 @@ function Billing() {
               <Link to="/dashboard/pay" search={{ purchase: "credits" }} className={pillSolid}>Add credits</Link>
             </div>
           </div>
+
+          {freeTrial.eligible && (
+            <div className="flex flex-col gap-3 border-t border-gc-line px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex min-w-0 items-start gap-2.5">
+                <Gift className="mt-0.5 h-4 w-4 shrink-0 text-gc-ink-muted" aria-hidden="true" />
+                <div className="min-w-0">
+                  <p className="text-[14px] font-medium text-gc-ink">Free trial available</p>
+                  <p className="mt-0.5 text-[13px] text-gc-ink-muted">$100 in credit and 14 days of Pro. You won't be charged when it ends.</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => void freeTrial.start()}
+                disabled={freeTrial.starting}
+                className={`${pillSolid} shrink-0 self-start sm:self-auto`}
+              >
+                {freeTrial.starting && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+                Start free trial
+              </button>
+            </div>
+          )}
 
           {promoOpen && (
             <div className="flex flex-col gap-2 border-t border-gc-line px-5 py-4 sm:flex-row sm:items-center">
