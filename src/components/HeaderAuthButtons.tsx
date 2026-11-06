@@ -55,7 +55,7 @@ export default function HeaderAuthButtons({ signInOnly = false }: { signInOnly?:
         to="/founding"
         className="inline-flex items-center gap-1.5 rounded-lg bg-gc-pill px-3 py-1.5 text-xs font-medium text-foreground hover:brightness-95 sm:gap-2 sm:px-3.5 sm:text-sm"
       >
-        Sign up
+        Apply now
         <span className={`${MONO} text-[10px] opacity-70`}>→</span>
       </Link>
     </div>

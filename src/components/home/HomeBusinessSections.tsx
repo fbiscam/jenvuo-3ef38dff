@@ -65,7 +65,7 @@ export function BizHero() {
         </h1>
         <div className="mt-9 flex flex-wrap items-center justify-center gap-5">
           <Link to="/founding" className={pillInk}>
-            Get started <ChevronDown className="h-4 w-4" />
+            Apply now <ChevronRight className="h-4 w-4" />
           </Link>
           <button type="button" onClick={() => openAskJenvu("sales")} className={textLink}>
             Contact sales <ChevronRight className="h-4 w-4" />
@@ -444,7 +444,7 @@ export function BizCta() {
         <h2 className={`${h2} mx-auto max-w-2xl`}>Interested in seeing how Jenvu works for your trading?</h2>
         <div className="mt-8 flex flex-wrap items-center justify-center gap-5">
           <Link to="/founding" className="inline-flex h-10 items-center gap-1.5 rounded-full bg-gc-line/60 px-4 text-[14px] text-gc-ink hover:bg-gc-line">
-            Get started <ChevronDown className="h-4 w-4" />
+            Apply now <ChevronRight className="h-4 w-4" />
           </Link>
           <button type="button" onClick={() => openAskJenvu("sales")} className="inline-flex items-center gap-0.5 text-[14px] text-gc-ink hover:text-gc-blue">
             Contact sales <ChevronRight className="h-4 w-4" />

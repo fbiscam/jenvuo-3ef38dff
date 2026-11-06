@@ -208,7 +208,7 @@ export function CloudHero({ price: _price, delta: _delta }: { price: string; del
               to="/founding"
               className="inline-flex h-11 items-center gap-1.5 rounded-full bg-gc-ink px-5 text-[15px] font-medium text-background transition hover:opacity-90"
             >
-              Get started <ChevronDown className="h-4 w-4" />
+              Apply now
             </Link>
             <button
               type="button"
