@@ -1,4 +1,5 @@
-import { describe, expect, it } from "bun:test";
+import { describe, it } from "node:test";
+import { expect } from "./chart/test-expect";
 import { planFeatures } from "./plan-features";
 
 describe("billing plan features", () => {
