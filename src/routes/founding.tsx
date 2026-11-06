@@ -146,6 +146,14 @@ function FoundingPage() {
               </p>
               <Link to="/" className={`${CALLOUT_BUTTON} mt-5`}>Back to home</Link>
             </div>
+          ) : remaining === 0 ? (
+            <div className="rounded-xl bg-gc-surface p-6 text-center" role="status" aria-live="polite">
+              <h2 className="text-[22px] font-normal tracking-tight">Seats are full this month.</h2>
+              <p className="mt-2 text-[15px] text-gc-ink-muted">
+                All {seats.total} Founding seats for this month are taken. Please apply again next month.
+              </p>
+              <Link to="/pricing" className={`${CALLOUT_BUTTON} mt-5`}>See plans and pricing</Link>
+            </div>
           ) : (
             <form onSubmit={onSubmit} className="space-y-7">
               <div className="grid grid-cols-1 gap-x-4 gap-y-7 sm:grid-cols-2">
