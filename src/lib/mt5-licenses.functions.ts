@@ -29,6 +29,17 @@ export const getMt5Access = createServerFn({ method: "POST" })
     return { ...access, licenses: (access.allowed ? data ?? [] : []) as Mt5LicenseRow[] };
   });
 
+/** Billing: whether the caller is an approved Founding member (decides the plan feature list). */
+export const getFoundingMembership = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { isFoundingMember } = await import("./founding-bot");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { foundingBotFor } = await import("./mt5-ip-license.server");
+    const info = await foundingBotFor(supabaseAdmin as any, context.userId);
+    return { member: isFoundingMember(info.state) };
+  });
+
 /** Sidebar: whether JX Bot opens (admin, active paid plan or verified Founding member). */
 export const getJxBotNavAccess = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
