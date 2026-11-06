@@ -29,6 +29,17 @@ export const getMt5Access = createServerFn({ method: "POST" })
     return { ...access, licenses: (access.allowed ? data ?? [] : []) as Mt5LicenseRow[] };
   });
 
+/** Sidebar: whether JX Bot opens (admin, active paid plan or verified Founding member). */
+export const getJxBotNavAccess = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { jxBotNavOpen } = await import("./founding-bot");
+    const { data: isAdmin } = await (context.supabase as any).rpc("has_role", { _user_id: context.userId, _role: "admin" });
+    if (isAdmin) return { open: true };
+    const { allowed } = await readPlan(context.userId);
+    return { open: jxBotNavOpen({ isAdmin: false, allowed }) };
+  });
+
 export const createMt5License = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => z.object({ ip: z.string().trim().refine((v) => !!normalizeIp(v), "Enter a valid IP address") }).parse(d))
