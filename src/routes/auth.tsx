@@ -859,12 +859,12 @@ function AuthPage() {
 
 
   return (
-    <div className={`min-h-dvh w-full bg-background text-foreground ${SANS} antialiased selection:bg-foreground selection:text-background`}>
+    <div className={`min-h-dvh w-full bg-background text-foreground lg:h-dvh lg:overflow-hidden ${SANS} antialiased selection:bg-foreground selection:text-background`}>
 
       {/* LEFT — form column */}
-      <div className="flex min-h-dvh w-full flex-col">
+      <div className="flex min-h-dvh w-full flex-col lg:h-dvh">
         <div className="flex w-full flex-1 items-center justify-center px-6 py-6">
-          <div className="auth-console-card w-full max-w-[400px]">
+          <div className="auth-console-card auth-zoom-desktop w-full max-w-[400px]">
             <JenvuMark className="mx-auto mb-6 h-10 w-10 text-foreground" />
             <h1 className="text-center text-[28px] font-medium tracking-tight text-foreground">
               {mfaChallenge
