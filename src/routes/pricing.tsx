@@ -18,10 +18,11 @@ const LINK = "font-medium text-gc-blue underline underline-offset-2 hover:text-g
 
 export const FAQ = [
   ["Is this financial advice?", "No. Jenvu is an analysis tool. Every setup is for educational purposes and you remain responsible for your own trades."],
-  ["How does the free trial work?", "After signing up, click “Start free” in your dashboard. You get $100 credit and 14 days of Pro access, including JX Bot, once per account. When it ends, JX Bot stops until you buy a plan."],
-  ["What do the plans include?", "Every plan includes JX Bot for MetaTrader 5 (1, 2 or 5 IPs, verified by IP address, no license key) and the Top AI Models with a monthly AI wallet. Credit alone never unlocks JX Bot; it pays for API and AI use."],
+  ["How does the free trial work?", "After signing up, click “Start free” in your dashboard. You get $100 credit and 14 days of Pro access (Terminal strategies and API credit) once per account. The free trial does not include JX Bot."],
+  ["What do the plans include?", "Every plan includes the Terminal's paid strategies, the Top AI Models and monthly API credit. JX Bot for MetaTrader 5 (1, 2 or 5 IPs, verified by IP address, no license key) is offered only to approved Founding Program members."],
+  ["Who gets JX Bot?", "JX Bot is only for approved Founding Program members. After approval and ID verification, the first month is free. After that, members keep the bot by buying Pro, Elite or Ultra. Credit alone never unlocks JX Bot. Apply at jenvu.com/founding."],
   ["When does JX Bot trade?", `New trades open Monday to Thursday between 01:00 and 14:00 broker time and on Friday until 13:00. The bot skips the London open (07:00–09:00 UTC), the New York open (13:00–15:00 UTC) and weekends. It stops for the day at a fixed daily target of ${DAILY_TARGET_PCT.pro}% (Pro), ${DAILY_TARGET_PCT.elite}% (Elite) or ${DAILY_TARGET_PCT.ultra}% (Ultra) of the day's starting balance, or at the fixed ${DAILY_DRAWDOWN_PCT}% daily drawdown guard.`],
-  ["Who can use the Terminal?", "The Terminal is reserved for approved Founding Program members, free of cost. Pro, Elite and Ultra cover JX Bot and the Top AI Models."],
+  ["Who can use the Terminal?", "The Terminal is open to every signed-in user. Its paid strategies (Fresh sweep, Swing price action, Zone + FVG) need a Pro, Elite or Ultra plan, a running free trial or Founding access."],
   ["Can I cancel anytime?", "Yes. Plans are month-to-month with no lock-in. You keep access until the end of the period you already paid for."],
   ["What markets are covered?", "The Terminal covers Gold (XAU/USD), Bitcoin (BTC/USD) and Euro (EUR/USD). JX Bot trades EUR/USD only."],
 ];
@@ -32,7 +33,7 @@ export const Route = createFileRoute("/pricing")({
       { title: "Jenvu Pricing — Pro, Elite and Ultra Plans" },
       { name: "description", content: "Transparent Jenvu pricing: Pro $49, Elite $99 and Ultra $169 a month, $3 per million tokens, plus $100 free credit and 14 days of Pro for new users." },
       { property: "og:title", content: "Jenvu pricing" },
-      { property: "og:description", content: "Pro, Elite and Ultra plans for JX Bot on MT5 and the Top AI Models, with $100 free credit to start." },
+      { property: "og:description", content: "Pro, Elite and Ultra plans for the Terminal and Top AI Models, with JX Bot for approved Founding members." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { property: "og:url", content: "https://jenvu.com/pricing" },
@@ -54,7 +55,7 @@ export const Route = createFileRoute("/pricing")({
 
 type Mark = boolean | string;
 const COMPARE: ReadonlyArray<{ f: string; b: Mark; c: Mark; d: Mark }> = [
-  { f: "JX Bot IPs (PC or RDP)", b: "1", c: "2", d: "5" },
+  { f: "JX Bot IPs, Founding members only (PC or RDP)", b: "1", c: "2", d: "5" },
   { f: "JX Bot daily target", b: `${DAILY_TARGET_PCT.pro}% of balance`, c: `${DAILY_TARGET_PCT.elite}% of balance`, d: `${DAILY_TARGET_PCT.ultra}% of balance` },
   { f: "JX Bot daily target per IP", b: `${DAILY_TARGET_PCT.pro}% of day-start balance`, c: `${DAILY_TARGET_PCT.elite}% of day-start balance`, d: `${DAILY_TARGET_PCT.ultra}% of day-start balance` },
   { f: `Daily auto-stop at target (or ${DAILY_DRAWDOWN_PCT}% drawdown)`, b: true, c: true, d: true },
@@ -91,9 +92,9 @@ function PricingPage() {
   const allOpen = open.length === FAQ.length;
 
   const plans = [
-    { key: "pro" as const, name: "Pro", price: priceOf("pro", 49), description: "JX Bot on 1 MT5 account.", wallet: "$10 AI wallet", bot: ["JX Bot on 1 IP", `${DAILY_TARGET_PCT.pro}% daily auto-stop`, "Top AI Models"] },
-    { key: "elite" as const, name: "Elite", price: priceOf("elite", 99), description: "JX Bot on 2 MT5 accounts.", wallet: "$25 AI wallet", bot: ["JX Bot on 2 IPs", `${DAILY_TARGET_PCT.elite}% daily auto-stop`, "Top AI Models + senior review"] },
-    { key: "ultra" as const, name: "Ultra", price: priceOf("ultra", 169), description: "JX Bot on 5 MT5 accounts.", wallet: "$50 AI wallet", bot: ["JX Bot on 5 IPs", `${DAILY_TARGET_PCT.ultra}% daily auto-stop`, "Top AI Models + priority support"] },
+    { key: "pro" as const, name: "Pro", price: priceOf("pro", 49), description: "Terminal strategies and API credit.", wallet: "$10 AI wallet", bot: ["Terminal paid strategies", "Top AI Models", "2 API keys", "Founding members: JX Bot on 1 IP"] },
+    { key: "elite" as const, name: "Elite", price: priceOf("elite", 99), description: "More API credit and senior review.", wallet: "$25 AI wallet", bot: ["Terminal paid strategies", "Top AI Models + senior review", "3 API keys", "Founding members: JX Bot on 2 IPs"] },
+    { key: "ultra" as const, name: "Ultra", price: priceOf("ultra", 169), description: "The most API credit and priority support.", wallet: "$50 AI wallet", bot: ["Terminal paid strategies", "Top AI Models + priority support", "5 API keys", "Founding members: JX Bot on 5 IPs"] },
   ];
 
   return (
