@@ -21,6 +21,7 @@ import {
   type PaymentOrder,
   type Quote,
 } from "@/lib/payments/shared";
+import { planPrice } from "@/lib/plan-pricing";
 import { planFeatures } from "@/lib/plan-features";
 import { getFoundingMembership } from "@/lib/mt5-licenses.functions";
 import { UsdtIcon, TronIcon, BnbIcon, EthIcon, NetworkIcon } from "@/components/pay/CoinIcons";
@@ -98,21 +99,21 @@ function PayPage() {
   const [foundingMember, setFoundingMember] = useState(false);
   useEffect(() => {
     let alive = true;
-    membershipFn().then((r) => alive && setFoundingMember(!!r.member)).catch(() => {});
+    membershipFn().then((r) => alive && setFoundingMember(!!r.verified)).catch(() => {});
     return () => { alive = false; };
   }, [membershipFn]);
 
   const PLANS = [
-    { id: "pro", name: "Pro", price: 49, features: planFeatures("pro", foundingMember) },
-    { id: "elite", name: "Elite", price: 99, features: planFeatures("elite", foundingMember) },
-    { id: "ultra", name: "Ultra", price: 169, features: planFeatures("ultra", foundingMember) },
+    { id: "pro", name: "Pro", price: planPrice("pro", foundingMember), features: planFeatures("pro", foundingMember) },
+    { id: "elite", name: "Elite", price: planPrice("elite", foundingMember), features: planFeatures("elite", foundingMember) },
+    { id: "ultra", name: "Ultra", price: planPrice("ultra", foundingMember), features: planFeatures("ultra", foundingMember) },
   ];
 
   const currentPrice = useMemo(() => {
     const p = PLANS.find(x => x.id === currentPlan);
     if (trial.active) return 0;
     return p ? p.price : 0;
-  }, [currentPlan, trial.active]);
+  }, [currentPlan, trial.active, foundingMember]);
 
   useEffect(() => {
     if (mode === "upgrade" && !selectedPlanId) {
@@ -133,7 +134,7 @@ function PayPage() {
     }
     const c = Number(custom);
     return custom.trim() && Number.isFinite(c) ? Math.round(c * 100) / 100 : amount;
-  }, [amount, custom, mode, selectedPlanId]);
+  }, [amount, custom, mode, selectedPlanId, foundingMember]);
 
 
 

@@ -382,9 +382,9 @@ export const DOC_GROUPS: DocGroup[] = [
         body: (
           <>
             <ul>
-              <li><strong>Pro</strong> — $49 per month.</li>
-              <li><strong>Elite</strong> — $99 per month.</li>
-              <li><strong>Ultra</strong> — $169 per month.</li>
+              <li><strong>Pro</strong> — $29 per month (Founding members with JX Bot: $49).</li>
+              <li><strong>Elite</strong> — $59 per month (Founding members with JX Bot: $99).</li>
+              <li><strong>Ultra</strong> — $99 per month (Founding members with JX Bot: $169).</li>
             </ul>
             <p>
               Each paid plan includes a monthly AI wallet. AI use is charged by actual tokens at $3 per million. See{" "}

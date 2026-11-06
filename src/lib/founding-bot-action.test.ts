@@ -21,3 +21,13 @@ describe("JX Bot page button", () => {
     expect(isFoundingMember("locked")).toBe(true);
   });
 });
+
+import { isVerifiedFoundingMember } from "./founding-bot";
+describe("verified Founding member (sees and runs JX Bot)", () => {
+  it("needs approval and ID verification", () => {
+    expect(isVerifiedFoundingMember({ state: "active", verified_at: "2026-11-01T00:00:00Z" })).toBe(true);
+    expect(isVerifiedFoundingMember({ state: "locked", verified_at: "2026-11-01T00:00:00Z" })).toBe(true);
+    expect(isVerifiedFoundingMember({ state: "awaiting_id", verified_at: null })).toBe(false);
+    expect(isVerifiedFoundingMember({ state: "none", verified_at: null })).toBe(false);
+  });
+});

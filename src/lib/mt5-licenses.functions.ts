@@ -10,9 +10,11 @@ async function readPlan(userId: string) {
   const db = supabaseAdmin as any;
   const { data: sub } = await db.from("user_subscriptions").select("plan_id,status,is_trial,current_period_end").eq("user_id", userId).maybeSingle();
   const subPlan = String(sub?.plan_id || "free").toLowerCase();
-  const paid = isPaidBotSub(sub ?? null) && isMt5Plan(subPlan);
   const { foundingBotFor } = await import("./mt5-ip-license.server");
+  const { isVerifiedFoundingMember } = await import("./founding-bot");
   const founding = await foundingBotFor(db, userId);
+  // JX Bot is for verified Founding members only: a paid plan alone (Terminal + API) never unlocks it.
+  const paid = isPaidBotSub(sub ?? null) && isMt5Plan(subPlan) && isVerifiedFoundingMember(founding);
   // Verified Founding members run the bot on their Founding plan (Pro or Elite) for 30 days.
   const viaFounding = !paid && founding.state === "active";
   const ok = paid || viaFounding;
@@ -33,11 +35,11 @@ export const getMt5Access = createServerFn({ method: "POST" })
 export const getFoundingMembership = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const { isFoundingMember } = await import("./founding-bot");
+    const { isFoundingMember, isVerifiedFoundingMember } = await import("./founding-bot");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { foundingBotFor } = await import("./mt5-ip-license.server");
     const info = await foundingBotFor(supabaseAdmin as any, context.userId);
-    return { member: isFoundingMember(info.state) };
+    return { member: isFoundingMember(info.state), verified: isVerifiedFoundingMember(info) };
   });
 
 /** Sidebar: whether JX Bot opens (admin, active paid plan or verified Founding member). */

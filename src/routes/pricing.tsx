@@ -12,6 +12,9 @@ import xaiLogo from "@/assets/xai-logo.png";
 import openAiLogo from "@/assets/openai-logo.png";
 import claudeLogo from "@/assets/claude-logo.png";
 import { AuroraTile } from "@/components/AuroraTile";
+import { useServerFn } from "@tanstack/react-start";
+import { getFoundingMembership } from "@/lib/mt5-licenses.functions";
+import { JX_BOT_PRICE, TERMINAL_API_PRICE, planPrice } from "@/lib/plan-pricing";
 
 const SANS = "font-['Google_Sans_Flex','Google_Sans','Product_Sans','Poppins',system-ui,sans-serif]";
 const LINK = "font-medium text-gc-blue underline underline-offset-2 hover:text-gc-blue-hover";
@@ -19,8 +22,8 @@ const LINK = "font-medium text-gc-blue underline underline-offset-2 hover:text-g
 export const FAQ = [
   ["Is this financial advice?", "No. Jenvu is an analysis tool. Every setup is for educational purposes and you remain responsible for your own trades."],
   ["How does the free trial work?", "After signing up, click “Start free” in your dashboard. You get $100 credit and 14 days of Pro access (Terminal strategies and API credit) once per account. The free trial does not include JX Bot."],
-  ["What do the plans include?", "Every plan includes the Terminal's paid strategies, the Top AI Models and monthly API credit. JX Bot for MetaTrader 5 (1, 2 or 5 IPs, verified by IP address, no license key) is offered only to approved Founding Program members."],
-  ["Who gets JX Bot?", "JX Bot is only for approved Founding Program members. After approval and ID verification, the first month is free. After that, members keep the bot by buying Pro, Elite or Ultra. Credit alone never unlocks JX Bot. Apply at jenvu.com/founding."],
+  ["What do the plans include?", "Every plan includes the Terminal's paid strategies, the Top AI Models and monthly API credit: Pro $29, Elite $59 and Ultra $99 a month. JX Bot for MetaTrader 5 (1, 2 or 5 IPs, verified by IP address, no license key) is offered only to verified Founding Program members, who pay the bot's cost on top: Pro $49, Elite $99 or Ultra $169."],
+  ["Who gets JX Bot?", "JX Bot is only for approved Founding Program members. After approval and ID verification, the first month is free. After that, members keep the bot by buying Pro ($49), Elite ($99) or Ultra ($169), which include the JX Bot cost. A plan bought without Founding membership covers the Terminal and API only. Credit alone never unlocks JX Bot. Apply at jenvu.com/founding."],
   ["When does JX Bot trade?", `New trades open Monday to Thursday between 01:00 and 14:00 broker time and on Friday until 13:00. The bot skips the London open (07:00–09:00 UTC), the New York open (13:00–15:00 UTC) and weekends. It stops for the day at a fixed daily target of ${DAILY_TARGET_PCT.pro}% (Pro), ${DAILY_TARGET_PCT.elite}% (Elite) or ${DAILY_TARGET_PCT.ultra}% (Ultra) of the day's starting balance, or at the fixed ${DAILY_DRAWDOWN_PCT}% daily drawdown guard.`],
   ["Who can use the Terminal?", "The Terminal is open to every signed-in user. Its paid strategies (Fresh sweep, Swing price action, Zone + FVG) need a Pro, Elite or Ultra plan, a running free trial or Founding access."],
   ["Can I cancel anytime?", "Yes. Plans are month-to-month with no lock-in. You keep access until the end of the period you already paid for."],
@@ -31,7 +34,7 @@ export const Route = createFileRoute("/pricing")({
   head: () => ({
     meta: [
       { title: "Jenvu Pricing — Pro, Elite and Ultra Plans" },
-      { name: "description", content: "Transparent Jenvu pricing: Pro $49, Elite $99 and Ultra $169 a month, $3 per million tokens, plus $100 free credit and 14 days of Pro for new users." },
+      { name: "description", content: "Transparent Jenvu pricing: Pro $29, Elite $59 and Ultra $99 a month for the Terminal and API, $3 per million tokens, plus $100 free credit and 14 days of Pro for new users." },
       { property: "og:title", content: "Jenvu pricing" },
       { property: "og:description", content: "Pro, Elite and Ultra plans for the Terminal and Top AI Models, with JX Bot for approved Founding members." },
       { property: "og:type", content: "website" },
@@ -54,15 +57,20 @@ export const Route = createFileRoute("/pricing")({
 });
 
 type Mark = boolean | string;
-const COMPARE: ReadonlyArray<{ f: string; b: Mark; c: Mark; d: Mark }> = [
-  { f: "JX Bot IPs, Founding members only (PC or RDP)", b: "1", c: "2", d: "5" },
-  { f: "JX Bot daily target", b: `${DAILY_TARGET_PCT.pro}% of balance`, c: `${DAILY_TARGET_PCT.elite}% of balance`, d: `${DAILY_TARGET_PCT.ultra}% of balance` },
-  { f: "JX Bot daily target per IP", b: `${DAILY_TARGET_PCT.pro}% of day-start balance`, c: `${DAILY_TARGET_PCT.elite}% of day-start balance`, d: `${DAILY_TARGET_PCT.ultra}% of day-start balance` },
-  { f: `Daily auto-stop at target (or ${DAILY_DRAWDOWN_PCT}% drawdown)`, b: true, c: true, d: true },
-  { f: "Safe trading hours (Mon–Thu 01:00–14:00, Fri until 13:00)", b: true, c: true, d: true },
-  { f: "London & New York open block, weekends off", b: true, c: true, d: true },
-  { f: "Entry checks (H1 trend, spread, candle, spike guard)", b: true, c: true, d: true },
-  { f: "JX Bot download, presets & updates", b: true, c: true, d: true },
+type Row = { f: string; b: Mark; c: Mark; d: Mark; bot?: boolean };
+/** Shown to everyone except verified Founding members: JX Bot in one line. */
+const BOT_ONE_LINE: Row = { f: "JX Bot (MT5)", b: "Founding members only", c: "Founding members only", d: "Founding members only" };
+const COMPARE: ReadonlyArray<Row> = [
+  { f: "Terminal + API price", b: `$${TERMINAL_API_PRICE.pro}`, c: `$${TERMINAL_API_PRICE.elite}`, d: `$${TERMINAL_API_PRICE.ultra}` },
+  { f: "JX Bot cost (Founding members)", b: `+$${JX_BOT_PRICE.pro}`, c: `+$${JX_BOT_PRICE.elite}`, d: `+$${JX_BOT_PRICE.ultra}`, bot: true },
+  { f: "JX Bot IPs (PC or RDP)", b: "1", c: "2", d: "5", bot: true },
+  { bot: true, f: "JX Bot daily target", b: `${DAILY_TARGET_PCT.pro}% of balance`, c: `${DAILY_TARGET_PCT.elite}% of balance`, d: `${DAILY_TARGET_PCT.ultra}% of balance` },
+  { bot: true, f: "JX Bot daily target per IP", b: `${DAILY_TARGET_PCT.pro}% of day-start balance`, c: `${DAILY_TARGET_PCT.elite}% of day-start balance`, d: `${DAILY_TARGET_PCT.ultra}% of day-start balance` },
+  { bot: true, f: `Daily auto-stop at target (or ${DAILY_DRAWDOWN_PCT}% drawdown)`, b: true, c: true, d: true },
+  { bot: true, f: "Safe trading hours (Mon–Thu 01:00–14:00, Fri until 13:00)", b: true, c: true, d: true },
+  { bot: true, f: "London & New York open block, weekends off", b: true, c: true, d: true },
+  { bot: true, f: "Entry checks (H1 trend, spread, candle, spike guard)", b: true, c: true, d: true },
+  { bot: true, f: "JX Bot download, presets & updates", b: true, c: true, d: true },
   { f: "Monthly AI wallet", b: "$10", c: "$25", d: "$50" },
   { f: "Daily token limit", b: "1.5M", c: "5M", d: "10M" },
   { f: "Balance-based quota ($3 = 1M tokens)", b: true, c: true, d: true },
@@ -83,6 +91,17 @@ function PricingPage() {
   const trial = useTrial();
   const signedOut = currentPlan === null;
   const [billing, setBilling] = React.useState<"monthly" | "annual">("monthly");
+  // Only verified Founding members see JX Bot in the plans and pay the bot-included price.
+  const membershipFn = useServerFn(getFoundingMembership);
+  const [founding, setFounding] = React.useState(false);
+  React.useEffect(() => {
+    if (signedOut) { setFounding(false); return; }
+    let alive = true;
+    membershipFn().then((r) => alive && setFounding(!!r.verified)).catch(() => {});
+    return () => { alive = false; };
+  }, [signedOut, membershipFn]);
+  const botLine = (ips: number) => (founding ? `JX Bot on ${ips} IP${ips > 1 ? "s" : ""} included` : "JX Bot: Founding members only");
+  const compareRows = founding ? COMPARE : [COMPARE[0], BOT_ONE_LINE, ...COMPARE.filter((r) => !r.bot && r !== COMPARE[0])];
   const priceOf = (id: string, price: number) => {
     const base = price;
     return billing === "annual" && base > 0 ? Math.round((base * 12 * 0.83) / 10) * 10 : base;
@@ -92,9 +111,9 @@ function PricingPage() {
   const allOpen = open.length === FAQ.length;
 
   const plans = [
-    { key: "pro" as const, name: "Pro", price: priceOf("pro", 49), description: "Terminal strategies and API credit.", wallet: "$10 AI wallet", bot: ["Terminal paid strategies", "Top AI Models", "2 API keys", "Founding members: JX Bot on 1 IP"] },
-    { key: "elite" as const, name: "Elite", price: priceOf("elite", 99), description: "More API credit and senior review.", wallet: "$25 AI wallet", bot: ["Terminal paid strategies", "Top AI Models + senior review", "3 API keys", "Founding members: JX Bot on 2 IPs"] },
-    { key: "ultra" as const, name: "Ultra", price: priceOf("ultra", 169), description: "The most API credit and priority support.", wallet: "$50 AI wallet", bot: ["Terminal paid strategies", "Top AI Models + priority support", "5 API keys", "Founding members: JX Bot on 5 IPs"] },
+    { key: "pro" as const, name: "Pro", price: priceOf("pro", planPrice("pro", founding)), description: "Terminal strategies and API credit.", wallet: "$10 AI wallet", bot: ["Terminal paid strategies", "Top AI Models", "2 API keys", botLine(1)] },
+    { key: "elite" as const, name: "Elite", price: priceOf("elite", planPrice("elite", founding)), description: "More API credit and senior review.", wallet: "$25 AI wallet", bot: ["Terminal paid strategies", "Top AI Models + senior review", "3 API keys", botLine(2)] },
+    { key: "ultra" as const, name: "Ultra", price: priceOf("ultra", planPrice("ultra", founding)), description: "The most API credit and priority support.", wallet: "$50 AI wallet", bot: ["Terminal paid strategies", "Top AI Models + priority support", "5 API keys", botLine(5)] },
   ];
 
   return (
@@ -230,6 +249,11 @@ function PricingPage() {
                   <span className="text-[14px] text-gc-ink-muted">{suffix}</span>
                 </div>
                 <p className="mt-2 text-[14px] text-gc-ink-muted">{plan.wallet} included</p>
+                {founding && (
+                  <p className="mt-1 text-[13px] text-gc-ink-muted">
+                    Terminal + API ${TERMINAL_API_PRICE[plan.key]} + JX Bot ${JX_BOT_PRICE[plan.key]}
+                  </p>
+                )}
                 <ul className="mt-5 space-y-2 text-[14px] text-gc-ink">
                   {plan.bot.map((b) => (
                     <li key={b} className="flex items-start gap-2"><span aria-hidden className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-gc-blue-deep" />{b}</li>
@@ -272,7 +296,7 @@ function PricingPage() {
               </tr>
             </thead>
             <tbody>
-              {COMPARE.map((row) => (
+              {compareRows.map((row) => (
                 <tr key={row.f} className="border-t border-gc-line">
                   <td className="px-6 py-4 text-gc-ink">{row.f}</td>
                   {[row.b, row.c, row.d].map((v, i) => (

@@ -403,7 +403,7 @@ export const collections: Collection[] = [
             "Realtime email & push alerts.",
           ]},
 
-          { type: "h2", content: "Pro — $49 / month" },
+          { type: "h2", content: "Pro — $29 / month" },
           { type: "ul", items: [
             "1,500,000 tokens per day.",
             "$10 wallet per month.",
@@ -415,7 +415,7 @@ export const collections: Collection[] = [
             "Multi-timeframe bias engine.",
           ]},
 
-          { type: "h2", content: "Elite — $99 / month" },
+          { type: "h2", content: "Elite — $59 / month" },
           { type: "ul", items: [
             "5,000,000 tokens per day.",
             "$25 wallet per month.",
@@ -426,7 +426,7 @@ export const collections: Collection[] = [
             "Dedicated onboarding & SLA.",
           ]},
 
-          { type: "h2", content: "Ultra — $169 / month" },
+          { type: "h2", content: "Ultra — $99 / month" },
           { type: "ul", items: [
             "10,000,000 tokens per day.",
             "$50 wallet per month.",
@@ -435,7 +435,7 @@ export const collections: Collection[] = [
             "Priority desk support.",
           ]},
 
-          { type: "note", tone: "info", content: "See the Pricing page for the full feature matrix and one-time top-up packs ($1 = 3 scans). All credit expires 30 days after it is added; the oldest credit is spent first." },
+          { type: "note", tone: "info", content: "These prices cover the Terminal and API. JX Bot is only for verified Founding members, whose plans add the bot cost: Pro $49, Elite $99, Ultra $169. See the Pricing page for the full feature matrix and one-time top-up packs ($1 = 3 scans). All credit expires 30 days after it is added; the oldest credit is spent first." },
         ],
       },
 
