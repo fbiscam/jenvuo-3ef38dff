@@ -1,13 +1,13 @@
 import { evaluateIpLicense, formatBinding, isPaidBotSub, normalizeIp, requestIp, type ValidateResult } from "@/lib/mt5-licenses";
 import type { FoundingBotState } from "@/lib/founding-bot";
 
-export type FoundingBotInfo = { state: FoundingBotState; profit: number; review_at: string | null; verified_at: string | null; locked_at: string | null };
+export type FoundingBotInfo = { state: FoundingBotState; profit: number; review_at: string | null; verified_at: string | null; locked_at: string | null; milestone: boolean };
 
 /** Founding JX Bot state from the database rule (also locks + notifies once the $200 / 30-day check is met). */
 export async function foundingBotFor(db: any, userId: string): Promise<FoundingBotInfo> {
   const { data, error } = await db.rpc("founding_bot_check", { _user_id: userId });
-  if (error || !data) return { state: "none", profit: 0, review_at: null, verified_at: null, locked_at: null };
-  return { state: data.state, profit: Number(data.profit) || 0, review_at: data.review_at ?? null, verified_at: data.verified_at ?? null, locked_at: data.locked_at ?? null };
+  if (error || !data) return { state: "none", profit: 0, review_at: null, verified_at: null, locked_at: null, milestone: false };
+  return { state: data.state, profit: Number(data.profit) || 0, review_at: data.review_at ?? null, verified_at: data.verified_at ?? null, locked_at: data.locked_at ?? null, milestone: !!data.milestone };
 }
 
 /** Find the active license registered for an IP (binding "ip" or "ip#account"). */

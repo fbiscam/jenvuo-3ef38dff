@@ -10,6 +10,7 @@ import {
   FormCallout,
   FormField,
   FormHero,
+  RadioCards,
   SUBMIT_BUTTON,
   formInputClass,
 } from "@/components/forms/CenteredForm";
@@ -22,12 +23,12 @@ export const Route = createFileRoute("/founding")({
       {
         name: "description",
         content:
-          "Invite-only program for 50 Gold, Bitcoin and EUR/USD traders a month. Approved traders get 1 month of Pro with $250 credit (valid 60 days), and JX Bot once their ID is verified within 2 days.",
+          "Invite-only program for 50 Gold, Bitcoin and EUR/USD traders a month. Approved traders get 1 month of Pro or Elite with $200 credit, and JX Bot once their ID is verified within 2 days.",
       },
       { property: "og:title", content: "Founding Trader Program" },
       {
         property: "og:description",
-        content: "Approval unlocks 1 month of Pro with $250 credit valid for 60 days. Verify your ID within 2 days to unlock JX Bot.",
+        content: "Approval unlocks 1 month of Pro or Elite with $200 credit. Verify your ID within 2 days to unlock JX Bot.",
       },
       { property: "og:url", content: "https://jenvu.com/founding" },
       { property: "og:type", content: "website" },
@@ -69,7 +70,7 @@ function FoundingPage() {
   const remaining = Math.max(0, seats.total - seats.filled);
   const pct = Math.min(100, Math.round((seats.filled / seats.total) * 100));
 
-  const plan = "pro" as const;
+  const [plan, setPlan] = React.useState<"pro" | "elite">("pro");
   const [refEmail, setRefEmail] = React.useState<string>("");
 
   React.useEffect(() => {
@@ -119,7 +120,7 @@ function FoundingPage() {
 
       <main className="w-full px-5 pb-24 pt-20 sm:pt-28">
         <FormHero eyebrow="Founding" title="Founding Trader Program">
-          An invite-only program for 50 traders a month. Approved traders get 1 month of Pro with $250 credit (valid 60 days). Verify your ID within 2 days to unlock JX Bot; after 30 days, if the bot has made $200 or more, it locks so you can take your payout and move to a paid plan.
+          An invite-only program for 50 traders a month. Approved traders get 1 month of Pro or Elite with $200 credit and JX Bot once their ID is verified (within 2 days). After 30 days the plan, credit and bot access end, and we tell you whether the bot reached $200 profit so you can take your payout and choose a paid plan.
         </FormHero>
 
         <FormCallout
@@ -157,6 +158,18 @@ function FoundingPage() {
                 <Field key={`ref-${refEmail}`} name="referrer_email" label="Referred by email (optional)" type="email" defaultValue={refEmail} />
                 <Field name="myfxbook_url" label="MyFxBook link (optional)" />
               </div>
+
+              <FormField label="Plan" htmlFor="f-plan" required>
+                <RadioCards
+                  name="requested_plan"
+                  value={plan}
+                  onChange={setPlan}
+                  options={[
+                    { id: "pro", label: "Pro", hint: "30 days" },
+                    { id: "elite", label: "Elite", hint: "30 days" },
+                  ] as const}
+                />
+              </FormField>
 
               <FormField label="Why do you want in?" htmlFor="f-why" required>
                 <textarea

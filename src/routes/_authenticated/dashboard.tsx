@@ -44,6 +44,7 @@ import { signOutAndRedirect } from "@/lib/cross-domain-session";
 
 import { getUsageStats, type UsageStats } from "@/lib/usage.functions";
 import { listExtensionKeys } from "@/lib/extension-keys.functions";
+import { getJxBotNavAccess } from "@/lib/mt5-licenses.functions";
 import { Button } from "@/components/ui/button";
 import astraGalaxyBanner from "@/assets/astra-galaxy-banner.jpg";
 import grokModelLogo from "@/assets/grok-logo-transparent.png";
@@ -741,6 +742,20 @@ function DashboardLayout() {
   const { user: authUser, loading: authLoading } = useAuthUser();
   const terminalAccess = useTerminalAccess(authUser?.id);
   const terminalLocked = !terminalAccess.loading && !terminalAccess.allowed;
+  // JX Bot opens only for admins, active paid plans and ID-verified Founding members.
+  const jxBotNavFn = useServerFn(getJxBotNavAccess);
+  const [jxBotOpen, setJxBotOpen] = useState<boolean | null>(null);
+  useEffect(() => {
+    if (!authUser?.id) return;
+    let alive = true;
+    jxBotNavFn()
+      .then((r) => alive && setJxBotOpen(!!r.open))
+      .catch(() => alive && setJxBotOpen(false));
+    return () => {
+      alive = false;
+    };
+  }, [authUser?.id, jxBotNavFn]);
+  const jxBotLocked = jxBotOpen === false;
   const localHour = useLocalHour();
   const greetingText = pickGreeting(localHour);
   const currentPlan = useCurrentPlan();
@@ -1418,13 +1433,15 @@ function DashboardLayout() {
                       : undefined;
                     const isNotifs = t.to === "/dashboard/notifications";
                     const hasUnread = isNotifs && unreadNotifs > 0 && !active;
-                    if (t.to === "/dashboard/terminal" && terminalLocked) {
+                    const lockedTerminal = t.to === "/dashboard/terminal" && terminalLocked;
+                    const lockedBot = t.to === "/dashboard/jx-bot" && jxBotLocked;
+                    if (lockedTerminal || lockedBot) {
                       return (
                         <span
                           key={t.to}
                           role="link"
                           aria-disabled="true"
-                          title="Terminal is locked: your free 14-day trial has ended. Upgrade to unlock it."
+                          title={lockedBot ? "JX Bot is locked: it opens for Founding members once their ID is verified and approved, or with a paid plan." : "Terminal is locked: your free 14-day trial has ended. Upgrade to unlock it."}
                           className={`dashboard-sidebar-link relative flex cursor-not-allowed select-none items-center text-[14px] font-normal text-gc-ink opacity-50 ${navCollapsed ? "justify-center rounded-full px-2 py-2" : "gap-3 rounded-lg px-3 py-2"}`}
                         >
                           <Icon

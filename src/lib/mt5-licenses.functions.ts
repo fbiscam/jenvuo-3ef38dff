@@ -13,10 +13,10 @@ async function readPlan(userId: string) {
   const paid = isPaidBotSub(sub ?? null) && isMt5Plan(subPlan);
   const { foundingBotFor } = await import("./mt5-ip-license.server");
   const founding = await foundingBotFor(db, userId);
-  // Verified Founding members run the bot on Pro limits until the $200 / 30-day check locks it.
+  // Verified Founding members run the bot on their Founding plan (Pro or Elite) for 30 days.
   const viaFounding = !paid && founding.state === "active";
   const ok = paid || viaFounding;
-  const plan = paid ? subPlan : viaFounding ? "pro" : "free";
+  const plan = paid ? subPlan : viaFounding ? (subPlan === "elite" ? "elite" : "pro") : "free";
   const t = ok ? targetsFor(plan as any, userId) : { daily: 0, monthly: 0 };
   return { db, plan, allowed: ok, viaFounding, founding, limit: ok ? licenseLimit(plan) : 0, expiresAt: paid ? (sub.current_period_end as string | null) : null, dailyTarget: t.daily, monthlyTarget: t.monthly };
 }
@@ -27,6 +27,17 @@ export const getMt5Access = createServerFn({ method: "POST" })
     const { db, ...access } = await readPlan(context.userId);
     const { data } = await db.from("mt5_licenses").select("id,license_key,mt5_account,plan_id,revoked_at,last_validated_at,created_at").eq("user_id", context.userId).order("created_at", { ascending: false });
     return { ...access, licenses: (access.allowed ? data ?? [] : []) as Mt5LicenseRow[] };
+  });
+
+/** Sidebar: whether JX Bot opens (admin, active paid plan or verified Founding member). */
+export const getJxBotNavAccess = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { jxBotNavOpen } = await import("./founding-bot");
+    const { data: isAdmin } = await (context.supabase as any).rpc("has_role", { _user_id: context.userId, _role: "admin" });
+    if (isAdmin) return { open: true };
+    const { allowed } = await readPlan(context.userId);
+    return { open: jxBotNavOpen({ isAdmin: false, allowed }) };
   });
 
 export const createMt5License = createServerFn({ method: "POST" })

@@ -196,9 +196,9 @@ function JxBotPage() {
 
       {access && (access as any).viaFounding && (
         <div className="console-card mt-4 px-5 py-4 text-[14px] text-foreground">
-          Founding access on Pro limits. Bot profit so far: <span className="font-medium tabular-nums">${Number((access as any).founding?.profit ?? 0).toFixed(2)}</span>.{" "}
-          {(access as any).founding?.review_at && <>Checked on {new Date((access as any).founding.review_at).toLocaleDateString()}: </>}
-          if it has made ${FOUNDING_PROFIT_MILESTONE_USD} or more by then, the bot locks so you can take your payout and move to a paid plan.
+          Founding access on your {access.plan === "elite" ? "Elite" : "Pro"} plan. Bot profit so far: <span className="font-medium tabular-nums">${Number((access as any).founding?.profit ?? 0).toFixed(2)}</span>.{" "}
+          {(access as any).founding?.review_at && <>Your Founding plan, credit and bot access end on {new Date((access as any).founding.review_at).toLocaleDateString()}. </>}
+          We will tell you then if the bot reached ${FOUNDING_PROFIT_MILESTONE_USD}, so you can take your payout and choose a paid plan.
         </div>
       )}
 
@@ -206,7 +206,9 @@ function JxBotPage() {
         <div className="console-card mt-4 flex flex-wrap items-center justify-between gap-3 px-5 py-4 text-[14px] text-foreground">
           <span>
             {(access as any).founding?.state === "locked"
-              ? `Your Founding bot reached the $${FOUNDING_PROFIT_MILESTONE_USD} profit milestone. Take your payout, then choose a paid plan to keep JX Bot running.`
+              ? (access as any).founding?.milestone
+                ? `Your Founding bot reached the $${FOUNDING_PROFIT_MILESTONE_USD} profit milestone. Your Founding month has ended: take your payout, then choose a paid plan to keep JX Bot running.`
+                : "Your 30-day Founding plan and credit have ended. Choose a paid plan to keep using JX Bot."
               : (access as any).founding?.state === "awaiting_id"
                 ? "Founding members get JX Bot once their ID is verified. Upload your ID in Settings → Documents."
                 : "JX Bot unlocks with an active paid plan (Pro, Elite or Ultra) or a verified Founding membership. Free trial and credit do not unlock it."}

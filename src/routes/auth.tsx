@@ -1099,7 +1099,7 @@ function AuthPage() {
                         </div>
 
                         <p className="text-[12px] leading-snug text-muted-foreground">
-                          Founding Program: Get 1 Month Pro with $250 Credits.{" "}
+                          Founding Program: Get 1 Month Pro or Elite with $200 Credits.{" "}
                           <Link to="/founding" className="font-medium text-foreground underline underline-offset-2">
                             Apply now
                           </Link>
@@ -1386,7 +1386,7 @@ function AuthPage() {
                       <p>
                         Founding member?{" "}
                         <Link to="/founding" className="font-medium text-foreground underline underline-offset-2">
-                          Get 1 Month Pro with $250 Credits →
+                          Get 1 Month Pro or Elite with $200 Credits →
                         </Link>
                       </p>
                       <p>
