@@ -352,7 +352,22 @@ export const submitFoundingApplication = createServerFn({ method: "POST" })
       }
     }
 
-    const { error } = await supabase.from("founding_applications" as any).insert({
+    // Seats full this month: no new applications until next month.
+    if (service) {
+      const counter = createClient<Database>(url, service, {
+        auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
+      });
+      const { filled, total } = await countFoundingSeats(counter);
+      if (filled >= total) return { ok: false, error: SEATS_FULL_MESSAGE };
+    }
+
+    // Save with the server key: the form is signed out, and an email that already has an
+    // account gets linked to it by a database trigger, which the signed-out rule rejects.
+    // Only the validated fields below are written; status stays at its "pending" default.
+    const writer = service
+      ? createClient<Database>(url, service, { auth: { storage: undefined, persistSession: false, autoRefreshToken: false } })
+      : supabase;
+    const { error } = await writer.from("founding_applications" as any).insert({
       full_name: data.full_name,
       email: data.email.toLowerCase(),
       whatsapp_number: data.whatsapp_number,
@@ -700,12 +715,19 @@ export const foundingStats = createServerFn({ method: "GET" }).handler(async () 
   const supa = createClient<Database>(url, service, {
     auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
   });
+  const { filled, total, monthKey } = await countFoundingSeats(supa);
+  return { seatsFilled: filled, seatsTotal: total, monthKey };
+});
+
+export const FOUNDING_SEATS_PER_MONTH = 50;
+export const SEATS_FULL_MESSAGE = "All seats for this month are full. Please apply again next month.";
+
+/** Approved seats this month (seat_month, else approved_at / created_at in the month). */
+async function countFoundingSeats(supa: any) {
   const now = new Date();
   const monthKey = now.toISOString().slice(0, 7);
   const monthStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1)).toISOString();
   const monthEnd = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 1)).toISOString();
-  // Count approved/active applications for this month, matching either seat_month
-  // or falling back to approved_at / created_at within the current month.
   const { data: rows } = await supa
     .from("founding_applications" as any)
     .select("id, seat_month, approved_at, created_at, status")
@@ -715,8 +737,8 @@ export const foundingStats = createServerFn({ method: "GET" }).handler(async () 
     const ts = r.approved_at || r.created_at;
     return ts && ts >= monthStart && ts < monthEnd;
   }).length;
-  return { seatsFilled: filled, seatsTotal: 50, monthKey };
-});
+  return { filled, total: FOUNDING_SEATS_PER_MONTH, monthKey };
+}
 
 /* ---------------- Document submission tracking ---------------- */
 
