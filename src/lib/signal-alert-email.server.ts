@@ -2,7 +2,7 @@
 // Used by manual admin broadcast and auto-scan cron.
 import { supabaseAdmin } from '@/integrations/supabase/client.server'
 
-const FROM = 'Jenvu Signal Desk <signals@notify.jenvu.net>'
+const FROM = 'Jenvu Signal Desk <signals@notify.jenvu.com>'
 
 export interface EnqueueAlertEmailsArgs {
   alertId: string

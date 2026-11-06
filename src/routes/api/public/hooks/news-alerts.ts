@@ -6,8 +6,8 @@ import { createClient } from '@supabase/supabase-js'
 // next ~75 minutes, then fans out an in-app notification + email once per event.
 
 const FF_URL = 'https://nfs.faireconomy.media/ff_calendar_thisweek.json'
-const SENDER_DOMAIN = 'notify.jenvu.net'
-const FROM = 'Jenvu Market Desk <news@notify.jenvu.net>'
+const SENDER_DOMAIN = 'notify.jenvu.com'
+const FROM = 'Jenvu Market Desk <news@notify.jenvu.com>'
 
 type FFEvent = {
   title: string
