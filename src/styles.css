@@ -2086,8 +2086,13 @@ html body .jenvu-zoom-dashboard main :is(.console-icon-chip, .console-card > svg
 /* Desktop: the page heading sits on the same line as the sidebar's first item (Overview). */
 @media (min-width: 1024px) {
   .jenvu-zoom-dashboard main.dash-page {
-    padding-top: 96px;
+    padding-top: 80px;
   }
+}
+
+/* Sign-in / sign-out page: 10% larger on laptop/desktop, still fits one screen. */
+@media (min-width: 1024px) {
+  .auth-zoom-desktop { zoom: 1.1; }
 }
 
 /* Homepage showcase: animated Chat/Build/Bot/Voice tiles. */
