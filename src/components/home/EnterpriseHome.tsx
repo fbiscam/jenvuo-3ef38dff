@@ -454,7 +454,7 @@ export function EntFacts() {
     [Bell, "Jenvu Alerts", "24/5", "gold market coverage with live alerts"],
     [Bot, "JX Bot", "2 pips", "maximum spread allowed before any entry"],
     [Code2, "Jenvu API", "$3", "per 1M tokens, in and out"],
-    [Sparkles, "Free trial", "14 days", "of Pro, started whenever you choose"],
+    [Sparkles, "Founding Program", "30 days", "of Pro or Elite with $200 credit for approved members"],
   ];
   return (
     <section className="px-5 py-24">
