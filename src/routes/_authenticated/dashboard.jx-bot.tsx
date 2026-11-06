@@ -1,5 +1,5 @@
 import { ConfirmDialog } from "@/components/ConfirmDialog";
-import { FOUNDING_PROFIT_MILESTONE_USD } from "@/lib/founding-bot";
+import { FOUNDING_PROFIT_MILESTONE_USD, jxBotAction } from "@/lib/founding-bot";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
@@ -75,6 +75,7 @@ function JxBotPage() {
   const bound = countIpLicenses(licenses);
   const limit = access?.limit ?? 0;
   const canCreate = Boolean(access?.allowed && bound < limit);
+  const botAction = access ? jxBotAction({ state: (access as any).founding?.state, allowed: access.allowed, viaFounding: !!(access as any).viaFounding }) : null;
 
   const copyValue = async (value: string, id: string) => {
     try {
@@ -179,6 +180,9 @@ function JxBotPage() {
           <button onClick={() => setShowCreate(true)} disabled={!canCreate} className="console-pill console-pill-solid disabled:cursor-not-allowed disabled:opacity-45">
             <Plus className="h-4 w-4" /> Add IP
           </button>
+          {botAction && access?.allowed && (
+            <Link to={botAction.to} className="console-pill console-pill-solid">{botAction.label}</Link>
+          )}
         </div>
       </div>
       <p className="mt-2 text-[14px] text-muted-foreground">MetaTrader 5 bot · one IP works with one MT5 account.</p>
@@ -211,9 +215,9 @@ function JxBotPage() {
                 : "Your 30-day Founding plan and credit have ended. Choose a paid plan to keep using JX Bot."
               : (access as any).founding?.state === "awaiting_id"
                 ? "Founding members get JX Bot once their ID is verified. Upload your ID in Settings → Documents."
-                : "JX Bot unlocks with an active paid plan (Pro, Elite or Ultra) or a verified Founding membership. Free trial and credit do not unlock it."}
+                : "JX Bot is for approved Founding Program members: the first month is free after your ID is verified, then it continues on a paid plan. Free trial and credit do not unlock it."}
           </span>
-          <Link to="/dashboard/billing" className="console-pill console-pill-solid">Buy now</Link>
+          {botAction && <Link to={botAction.to} className="console-pill console-pill-solid">{botAction.label}</Link>}
         </div>
       )}
 
