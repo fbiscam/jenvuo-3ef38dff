@@ -45,6 +45,14 @@ export function isFoundingMember(state: FoundingBotState | string | null | undef
   return !!state && state !== "none";
 }
 
+/**
+ * Approved Founding members whose ID was verified. Only they see JX Bot in plans, pay the
+ * bot-included price, and can run JX Bot on a paid plan.
+ */
+export function isVerifiedFoundingMember(info: { state: FoundingBotState | string | null | undefined; verified_at?: string | null } | null | undefined): boolean {
+  return !!info && isFoundingMember(info.state) && info.state !== "awaiting_id" && !!info.verified_at;
+}
+
 export type JxBotAction = { label: string; to: "/founding" | "/dashboard/documents" | "/dashboard/pay" };
 
 /**

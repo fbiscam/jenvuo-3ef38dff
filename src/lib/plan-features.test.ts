@@ -4,8 +4,8 @@ import { planFeatures } from "./plan-features";
 
 describe("billing plan features", () => {
   it("shows JX Bot per plan to Founding members", () => {
-    expect(planFeatures("elite", true)[0]).toBe("JX Bot on 2 IPs");
-    expect(planFeatures("pro", true)[0]).toBe("JX Bot on 1 IP");
+    expect(planFeatures("elite", true)[1]).toBe("JX Bot on 2 IPs +$40");
+    expect(planFeatures("pro", true)[1]).toBe("JX Bot on 1 IP +$20");
   });
   it("hides JX Bot from everyone else and shows Terminal and API credit", () => {
     const f = planFeatures("ultra", false);
