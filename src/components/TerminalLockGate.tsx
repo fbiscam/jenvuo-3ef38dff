@@ -88,7 +88,7 @@ export function IdVerificationDeadlineNotice({ access }: { access: TerminalAcces
  * Founding 2-day deadline and the general "verify identity" banner use it.
  */
 export function VerifyNotice({ tone = "info", title, text, action }: { tone?: "info" | "warn" | "error"; title: string; text: string; action: string }) {
-  const dot = tone === "error" ? "bg-destructive" : tone === "warn" ? "bg-gc-warning" : "bg-gc-ink-muted";
+  const dot = tone === "error" ? "bg-destructive" : tone === "warn" ? "bg-gc-amber" : "bg-gc-ink-muted";
   return (
     <div className="mb-4 grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-x-3 rounded-full border border-gc-line bg-gc-surface py-1.5 pl-4 pr-1.5 max-sm:rounded-2xl">
       <span className="relative flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-background">
