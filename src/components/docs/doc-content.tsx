@@ -158,10 +158,10 @@ export const DOC_GROUPS: DocGroup[] = [
         keywords: "access open free paid strategies founding program id verification",
         body: (
           <>
-            <p>The Terminal is open to <strong>every signed-in user</strong>, on any plan. The chart, live prices and the free SMC tools work for everyone.</p>
+            <p>The Terminal is only for <strong>approved Founding Program members</strong> (and accounts on a paid plan).</p>
             <ul>
-              <li>The advanced chart strategies (Fresh sweep, Swing price action, Zone + FVG) need an active <strong>Starter, Pro or Elite</strong> plan, the free trial, or an approved Founding membership.</li>
-              <li>Credit alone does not unlock the advanced strategies.</li>
+              <li>After approval you have <strong>2 days</strong> to verify your ID. If it isn't sent in time, the Terminal locks until you send it.</li>
+              <li>Credit alone never unlocks the Terminal.</li>
               <li>Founding members get 1 month of Pro or Elite and $200 credit, and have <strong>2 days</strong> to upload an identity document. JX Bot unlocks once the ID is verified. After 30 days the plan, credit and bot access end, and you are told whether the bot reached $200 profit; a paid plan keeps JX Bot running.</li>
             </ul>
             <p>Apply at <a href="https://jenvu.com/founding">jenvu.com/founding</a>.</p>

@@ -330,7 +330,7 @@ const AUDIENCES: Array<{ key: string; label: string; cards: AudienceCard[] }> = 
 ];
 
 const AUDIENCE_TITLE: Record<string, string> = {
-  "NEW TRADERS": "Start free",
+  "NEW TRADERS": "Apply now",
   "JX BOT": "JX Bot for MT5",
   LEARN: "Learn Gold trading",
   "TOP-TIER MODELS": "Top-tier models",
@@ -453,7 +453,7 @@ export function CloudBuildWith() {
             <span className="whitespace-nowrap text-gc-blue-deep">designed for traders and AI</span>
           </h2>
           <p className="mt-4 max-w-[540px] text-[14px] leading-[1.55] text-gc-ink-muted sm:mt-5 sm:text-[16px] sm:leading-[1.6]">
-            Try Jenvu with JX Bot on MetaTrader 5 and the top AI models, plus new sign-ups get $100 free credits and 14 days of Pro access free.
+            Jenvu is for approved Founding Program members: Pro or Elite with $200 credit for 30 days, the Terminal and JX Bot after ID verification.
           </p>
           <div className="mt-7 flex flex-wrap items-center gap-7">
             <Link
