@@ -1,3 +1,4 @@
+import { DAILY_TARGET_PCT, DAILY_DRAWDOWN_PCT } from "@/lib/mt5-licenses";
 import * as React from "react";
 
 /* JX Bot feature cards ("Works inside MetaTrader 5" + 3 more) — shared by /jx-bot and the homepage. */
@@ -88,13 +89,13 @@ function CandlesCard() {
 
 function StopCard() {
   return (
-    <Card title="Stops at your target" text="It pauses for the day at your plan's daily target or 4% of the balance, and stops for the month at the monthly target.">
+    <Card title="Stops at your target" text={`It pauses for the day at ${DAILY_TARGET_PCT.pro}% (Pro), ${DAILY_TARGET_PCT.elite}% (Elite) or ${DAILY_TARGET_PCT.ultra}% (Ultra) of the day's starting balance, or the ${DAILY_DRAWDOWN_PCT}% drawdown guard, and stops for the month at the monthly target.`}>
       <div className="space-y-2 pt-4">
         <div className="jx-in max-w-[440px] rounded-2xl bg-muted px-4 py-3 text-[14px] text-foreground">
           Daily target reached on this account. No new trades.
         </div>
         <div className="jx-in max-w-[440px] rounded-2xl bg-muted px-4 py-3 text-[14px] text-foreground" style={{ animationDelay: "0.3s" }}>
-          Drawdown guard is on at 4.7%. Depends on balance.
+          Drawdown guard is on at {DAILY_DRAWDOWN_PCT}%. Depends on balance.
         </div>
         <div className="pt-3 text-center text-[13px] text-muted-foreground md:max-w-[440px]">
           Status for <span className="rounded-full bg-muted px-2 py-0.5 font-medium text-foreground">Paused · target hit</span>
