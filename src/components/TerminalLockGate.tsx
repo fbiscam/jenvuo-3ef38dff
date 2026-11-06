@@ -101,7 +101,7 @@ export function VerifyNotice({ tone = "info", title, text, action }: { tone?: "i
       </p>
       <Link
         to="/dashboard/documents"
-        className="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full bg-gc-blue-deep px-3.5 text-[12.5px] font-medium text-gc-on-blue transition-colors hover:bg-gc-navy"
+        className="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full bg-gc-blue-deep px-3.5 text-[12.5px] font-medium text-gc-on-blue transition-opacity hover:opacity-90"
       >
         <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" />
         {action}
