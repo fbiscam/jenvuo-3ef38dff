@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useState } from "react";
-import { Link } from "@tanstack/react-router";
 import { Bell, ShieldAlert } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
@@ -68,7 +67,7 @@ export default function NotificationStrip() {
   const Icon = isSecurity ? ShieldAlert : Bell;
 
   return (
-    <section className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-gc-line bg-background py-1 pl-3.5 pr-4 sm:pl-5 md:pr-5">
+    <section className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-x-3 border-b border-gc-line bg-background py-1 pl-3.5 pr-4 sm:gap-x-4 sm:pl-5 md:pr-5">
       <Icon className={`h-4 w-4 shrink-0 ${isSecurity ? "text-gc-red" : "text-gc-ink-muted"}`} aria-hidden="true" />
       <p className="min-w-0 flex-1 truncate text-[12px] text-gc-ink sm:text-[12.5px]">
         <span className="font-medium">{notice.title}</span>
@@ -82,22 +81,6 @@ export default function NotificationStrip() {
         >
           Dismiss
         </button>
-        {isSecurity ? (
-          <Link
-            to="/dashboard/security"
-            onClick={() => void dismiss()}
-            className="inline-flex h-6 items-center rounded-full bg-gc-blue-deep px-3 text-[12px] font-medium text-gc-on-blue hover:bg-gc-navy"
-          >
-            Change password
-          </Link>
-        ) : (
-          <Link
-            to="/dashboard/notifications"
-            className="inline-flex h-6 items-center rounded-full bg-gc-blue-deep px-3 text-[12px] font-medium text-gc-on-blue hover:bg-gc-navy"
-          >
-            View
-          </Link>
-        )}
       </div>
     </section>
   );

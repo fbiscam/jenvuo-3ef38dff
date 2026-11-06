@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useState } from "react";
-import { useRouter } from "@tanstack/react-router";
 import { AlertTriangle, Bot, Megaphone, Wrench } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuthUser } from "@/hooks/useAuthUser";
@@ -15,7 +14,6 @@ const REFRESH_MS = 5 * 60 * 1000;
  */
 export default function SiteAnnouncementBar() {
   const { user } = useAuthUser();
-  const router = useRouter();
   const [notice, setNotice] = useState<Announcement | null>(null);
   const active = useBannerSlot("announcement", BANNER_PRIORITY.announcement, !!notice);
 
@@ -52,13 +50,11 @@ export default function SiteAnnouncementBar() {
 
   const Icon = ICONS[notice.kind] ?? Megaphone;
   const problem = notice.kind === "issue" || notice.kind === "maintenance";
-  const href = notice.link_url?.trim() || null;
-  const internal = !!href && href.startsWith("/");
 
   return (
-    <section className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-gc-line bg-background py-1 pl-3.5 pr-4 sm:pl-5 md:pr-5">
+    <section className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-x-3 border-b border-gc-line bg-background py-1 pl-3.5 pr-4 sm:gap-x-4 sm:pl-5 md:pr-5">
       <Icon className={`h-4 w-4 shrink-0 ${problem ? "text-gc-amber" : "text-gc-ink-muted"}`} aria-hidden="true" />
-      <p className="min-w-0 flex-1 text-[12px] text-gc-ink sm:text-[12.5px]">
+      <p className="min-w-0 truncate text-[12px] text-gc-ink sm:text-[12.5px]">
         <span className="font-medium">{notice.title}</span>
         {notice.body ? <span className="text-gc-ink-muted"> — {notice.body}</span> : null}
       </p>
@@ -70,26 +66,6 @@ export default function SiteAnnouncementBar() {
         >
           Dismiss
         </button>
-        {href ? (
-          internal ? (
-            <button
-              type="button"
-              onClick={() => void router.navigate({ href })}
-              className="inline-flex h-6 items-center rounded-full bg-gc-blue-deep px-3 text-[12px] font-medium text-gc-on-blue hover:bg-gc-navy"
-            >
-              {notice.link_label || "View"}
-            </button>
-          ) : (
-            <a
-              href={href}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex h-6 items-center rounded-full bg-gc-blue-deep px-3 text-[12px] font-medium text-gc-on-blue hover:bg-gc-navy"
-            >
-              {notice.link_label || "View"}
-            </a>
-          )
-        ) : null}
       </div>
     </section>
   );
