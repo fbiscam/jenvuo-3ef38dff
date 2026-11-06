@@ -48,6 +48,10 @@ export const signInWithTurnstile = createServerFn({ method: 'POST' })
     return res.ok ? res : { ...res, captcha: false }
   })
 
+/** Public sign-up is closed; approved Founding applicants get their account by email. */
+export const SIGNUP_CLOSED = true
+export const SIGNUP_CLOSED_MESSAGE = 'Sign-up is closed. Apply for the Founding Program at jenvu.com/founding; approved members get their account by email.'
+
 export const requestSignupOtp = createServerFn({ method: 'POST' })
   .inputValidator((data) =>
     z
@@ -62,6 +66,8 @@ export const requestSignupOtp = createServerFn({ method: 'POST' })
       .parse(data),
   )
   .handler(async ({ data }) => {
+    // Sign-up is closed: accounts are created only when a Founding application is approved.
+    if (SIGNUP_CLOSED) return { ok: false as const, error: SIGNUP_CLOSED_MESSAGE }
     try {
       const check = await passTurnstile(data.turnstileToken)
       if (!check.ok) return { ok: false as const, error: check.error }
@@ -87,6 +93,7 @@ export const confirmSignupOtp = createServerFn({ method: 'POST' })
       .parse(data),
   )
   .handler(async ({ data }) => {
+    if (SIGNUP_CLOSED) return { ok: false as const, error: SIGNUP_CLOSED_MESSAGE }
     const { readClientIp, readTrustedCountry, readUserAgent } = await import('./request-meta.server')
     const ua = readUserAgent()
     return verifySignupOtp({ ...data, ip: readClientIp(), country: readTrustedCountry(), fingerprint: data.fingerprint, userAgent: ua })
