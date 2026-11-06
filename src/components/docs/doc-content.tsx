@@ -42,17 +42,16 @@ export const DOC_GROUPS: DocGroup[] = [
       },
       {
         id: "create-account",
-        title: "Create an account",
-        keywords: "sign up register signup login sign in",
+        title: "Get an account",
+        keywords: "sign up register signup login sign in founding apply",
         body: (
           <>
+            <p>Public sign-up is closed. Jenvu accounts are created only for approved Founding Program members.</p>
             <ol>
-              <li>Open <a href="https://auth.jenvu.com/sign-in">auth.jenvu.com/sign-in</a> and choose <strong>Sign up</strong>.</li>
-              <li>Enter your name, email and a password, or continue with Google.</li>
-              <li>Confirm your email using the link we send you.</li>
-              <li>You land on your dashboard at <strong>dash.jenvu.com/overview</strong>.</li>
+              <li>Apply at <a href="https://jenvu.com/founding">jenvu.com/founding</a>.</li>
+              <li>When you're approved, we email you a secure link to set your password.</li>
+              <li>Sign in at <a href="https://auth.jenvu.com/sign-in">auth.jenvu.com/sign-in</a> and verify your ID on the Documents page within 2 days.</li>
             </ol>
-            <p>Sign-up is open to everyone. To prevent abuse, only two accounts can be created from the same device or network.</p>
           </>
         ),
       },
@@ -62,19 +61,7 @@ export const DOC_GROUPS: DocGroup[] = [
         keywords: "trial credit pro 14 days $100 start free",
         body: (
           <>
-            <p>
-              New accounts can start a free trial that gives you <strong>$100 of AI credit</strong> and <strong>14 days of Pro</strong>.
-            </p>
-            <ol>
-              <li>Sign in to your dashboard.</li>
-              <li>In the blue banner at the top, click <strong>Start free</strong>.</li>
-              <li>The credit and Pro access are added straight away.</li>
-            </ol>
-            <ul>
-              <li>The trial starts only when you click — signing up alone does not start it.</li>
-              <li>Each account can claim it once.</li>
-              <li>It is not available while you already have an active paid plan.</li>
-            </ul>
+            <p>The free trial is closed. Approved Founding Program members get Pro or Elite with $200 credit for 30 days instead. Plans can be bought after your ID is verified.</p>
           </>
         ),
       },
