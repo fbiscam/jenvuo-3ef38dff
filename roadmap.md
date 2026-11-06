@@ -1,6 +1,6 @@
 # Roadmap
 
-- [ ] Align customer-facing JX Bot daily targets with the enforced plan percentages
+- [x] Align customer-facing JX Bot daily targets with the enforced plan percentages
 
 - [x] Stop Billing plan-action label flicker on entry
 - [x] Correct Terminal candle presentation to match TradingView styling (exact venue OHLC equivalence is not claimed)
