@@ -66,3 +66,22 @@ export function jxBotAction(input: { state: FoundingBotState | string | null | u
   if (input.state === "awaiting_id") return { label: "Upload ID", to: "/dashboard/documents" };
   return { label: "Buy now", to: "/dashboard/pay" };
 }
+
+export type PurchaseGate = { canBuy: boolean; reason: "ok" | "apply" | "verify_id" };
+
+/**
+ * Who can pay for a plan or top-up: admins and approved Founding members whose ID is
+ * verified. Founding members still waiting on ID must verify first (any day of their
+ * month); everyone else is sent to apply for the Founding Program.
+ */
+export function purchaseGate(input: { isAdmin: boolean; member: boolean; verified: boolean }): PurchaseGate {
+  if (input.isAdmin || (input.member && input.verified)) return { canBuy: true, reason: "ok" };
+  if (input.member) return { canBuy: false, reason: "verify_id" };
+  return { canBuy: false, reason: "apply" };
+}
+
+/** Message shown (and returned by the server) when a purchase is refused. */
+export const PURCHASE_BLOCK_MESSAGE: Record<Exclude<PurchaseGate["reason"], "ok">, string> = {
+  apply: "Plans and credit are only for approved Founding Program members. Apply at jenvu.com/founding.",
+  verify_id: "Verify your ID first. Plans can be bought once your documents are approved.",
+};
