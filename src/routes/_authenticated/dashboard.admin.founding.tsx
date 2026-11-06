@@ -16,7 +16,6 @@ import {
   Download,
 } from "lucide-react";
 
-const PLAN_AMOUNT: Record<string, string> = { pro: "$10", elite: "$25", ultra: "$50", free: "$2" };
 
 import { isAdmin } from "@/lib/admin-messages.functions";
 import { OpsPage, OpsState, OpsStats, OpsTab, ops } from "@/components/ops/OpsPage";
@@ -55,7 +54,7 @@ function AdminFoundingPage() {
   const [loading, setLoading] = useState(true);
   const [allowed, setAllowed] = useState(false);
   const [rows, setRows] = useState<FoundingApplication[]>([]);
-  const [planChoice, setPlanChoice] = useState<Record<string, "pro" | "elite" | "ultra">>({});
+  const [planChoice] = useState<Record<string, "pro" | "elite" | "ultra">>({});
   const planFor = (r: FoundingApplication) => {
     const req = String(r.requested_plan || "").toLowerCase();
     void req;
