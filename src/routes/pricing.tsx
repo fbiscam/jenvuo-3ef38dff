@@ -55,7 +55,7 @@ export const Route = createFileRoute("/pricing")({
 type Mark = boolean | string;
 const COMPARE: ReadonlyArray<{ f: string; b: Mark; c: Mark; d: Mark }> = [
   { f: "JX Bot IPs (PC or RDP)", b: "1", c: "2", d: "5" },
-  { f: "JX Bot monthly profit target", b: "$600", c: "$1,500", d: "$3,000" },
+  { f: "JX Bot daily target", b: `${DAILY_TARGET_PCT.pro}% of balance`, c: `${DAILY_TARGET_PCT.elite}% of balance`, d: `${DAILY_TARGET_PCT.ultra}% of balance` },
   { f: "JX Bot daily target per IP", b: `${DAILY_TARGET_PCT.pro}% of day-start balance`, c: `${DAILY_TARGET_PCT.elite}% of day-start balance`, d: `${DAILY_TARGET_PCT.ultra}% of day-start balance` },
   { f: `Daily auto-stop at target (or ${DAILY_DRAWDOWN_PCT}% drawdown)`, b: true, c: true, d: true },
   { f: "Safe trading hours (Mon–Thu 01:00–14:00, Fri until 13:00)", b: true, c: true, d: true },
@@ -91,9 +91,9 @@ function PricingPage() {
   const allOpen = open.length === FAQ.length;
 
   const plans = [
-    { key: "pro" as const, name: "Pro", price: priceOf("pro", 49), description: "JX Bot on 1 MT5 account with a $600 monthly target.", wallet: "$10 AI wallet", bot: ["JX Bot on 1 IP", `${DAILY_TARGET_PCT.pro}% daily auto-stop`, "Top AI Models"] },
-    { key: "elite" as const, name: "Elite", price: priceOf("elite", 99), description: "JX Bot on 2 MT5 accounts with a $1,500 monthly target.", wallet: "$25 AI wallet", bot: ["JX Bot on 2 IPs", `${DAILY_TARGET_PCT.elite}% daily auto-stop`, "Top AI Models + senior review"] },
-    { key: "ultra" as const, name: "Ultra", price: priceOf("ultra", 169), description: "JX Bot on 5 MT5 accounts with a $3,000 monthly target.", wallet: "$50 AI wallet", bot: ["JX Bot on 5 IPs", `${DAILY_TARGET_PCT.ultra}% daily auto-stop`, "Top AI Models + priority support"] },
+    { key: "pro" as const, name: "Pro", price: priceOf("pro", 49), description: "JX Bot on 1 MT5 account.", wallet: "$10 AI wallet", bot: ["JX Bot on 1 IP", `${DAILY_TARGET_PCT.pro}% daily auto-stop`, "Top AI Models"] },
+    { key: "elite" as const, name: "Elite", price: priceOf("elite", 99), description: "JX Bot on 2 MT5 accounts.", wallet: "$25 AI wallet", bot: ["JX Bot on 2 IPs", `${DAILY_TARGET_PCT.elite}% daily auto-stop`, "Top AI Models + senior review"] },
+    { key: "ultra" as const, name: "Ultra", price: priceOf("ultra", 169), description: "JX Bot on 5 MT5 accounts.", wallet: "$50 AI wallet", bot: ["JX Bot on 5 IPs", `${DAILY_TARGET_PCT.ultra}% daily auto-stop`, "Top AI Models + priority support"] },
   ];
 
   return (

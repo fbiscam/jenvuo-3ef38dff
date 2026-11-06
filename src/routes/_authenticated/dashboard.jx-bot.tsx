@@ -154,11 +154,9 @@ function JxBotPage() {
 
   const stats = access
     ? [
-        { label: "Plan", value: access.allowed ? MT5_PLANS[plan].name : "No plan" },
         { label: "Linked IPs", value: `${bound} / ${limit}` },
         { label: "Daily target", value: access.allowed ? `${DAILY_TARGET_PCT[plan]}% of balance` : "—" },
         { label: "Drawdown guard", value: access.allowed ? `${DAILY_DRAWDOWN_PCT}% daily` : "—" },
-        { label: "Monthly target", value: access.allowed ? `$${(access.monthlyTarget || MT5_PLANS[plan].monthlyTarget).toLocaleString()}` : "—" },
       ]
     : [];
 
@@ -298,7 +296,6 @@ function JxBotPage() {
                             </button>
                           )}
                         </span>
-                        <div className="text-[12px] text-muted-foreground">{MT5_PLANS[isMt5Plan(l.plan_id) ? l.plan_id : "pro"].name} plan</div>
                       </td>
                       <td className="py-3.5 pr-4">
                         {b.account ? <span className={`${MONO} text-foreground`}>{b.account}</span> : <span className="text-muted-foreground">Locks to the first account</span>}
@@ -340,8 +337,7 @@ function JxBotPage() {
             <thead>
               <tr className="text-[13px] text-muted-foreground">
                 <th className="py-2 text-left font-normal">Plan</th>
-                <th className="text-right font-normal">Monthly</th>
-                <th className="text-right font-normal">Daily</th>
+                <th className="text-right font-normal">Daily target</th>
                 <th className="text-right font-normal">IPs</th>
               </tr>
             </thead>
@@ -350,9 +346,8 @@ function JxBotPage() {
                 <tr key={k} className={`console-row ${access?.allowed && k === plan ? "font-medium" : ""} text-foreground`}>
                   <td className="py-2.5">
                     {MT5_PLANS[k].name}
-                    {access?.allowed && k === plan && <span className="ml-2 rounded-full bg-foreground px-2 py-0.5 text-[11px] text-background">Yours</span>}
+                    {access?.allowed && k === plan && <span className="ml-2 rounded-full bg-emerald-500/10 px-2 py-0.5 text-[11px] font-medium text-emerald-600 dark:text-emerald-400">Yours</span>}
                   </td>
-                  <td className="text-right tabular-nums">${MT5_PLANS[k].monthlyTarget.toLocaleString()}</td>
                   <td className="text-right tabular-nums">{DAILY_TARGET_PCT[k]}%</td>
                   <td className="text-right tabular-nums">{MT5_PLANS[k].licenses}</td>
                 </tr>
