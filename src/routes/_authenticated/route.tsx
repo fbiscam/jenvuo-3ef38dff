@@ -4,7 +4,6 @@ import { recordLogin } from "@/lib/login-alert.functions";
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { useAutoCloseTrades } from "@/hooks/useAutoCloseTrades";
-import { useGlobalNotificationToasts } from "@/hooks/useGlobalNotificationToasts";
 import { verifyTrustedDevice } from "@/lib/trusted-devices.functions";
 import { restoreSharedSession, authSignInUrl } from "@/lib/cross-domain-session";
 
@@ -53,7 +52,7 @@ function useLoginAlert() {
 function AuthenticatedLayout() {
   useLoginAlert();
   useAutoCloseTrades();
-  useGlobalNotificationToasts();
+  // No pop-up notifications on dashboard pages: they stay in the bell list (Terminal keeps its own news alerts).
   return <Outlet />;
 }
 
