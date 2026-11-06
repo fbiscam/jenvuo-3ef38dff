@@ -345,7 +345,7 @@ export const collections: Collection[] = [
         summary: "Who can use the JX Bot, how to register your IP and how to install it in MetaTrader 5.",
         updatedAt: "2026-10-31",
         body: [
-          { type: "p", content: "The JX Bot is Jenvu's EUR/USD Expert Advisor for MetaTrader 5. It is available on a Pro, Elite or Ultra monthly plan, and free for 14 days with the free trial (it stops when the trial ends unless a plan is bought). Credit alone does not unlock it. Open Dashboard → JX Bot to download it. How the bot decides its trades is proprietary and not published." },
+          { type: "p", content: "The JX Bot is Jenvu's EUR/USD Expert Advisor for MetaTrader 5. It is only for approved Founding Program members whose ID is verified: the first Founding month is free, then a Pro, Elite or Ultra plan keeps it running. Credit alone does not unlock it. Open Dashboard → JX Bot to download it. How the bot decides its trades is proprietary and not published." },
           { type: "h2", content: "Plans" },
           { type: "ul", items: [`Pro: ${DAILY_TARGET_PCT.pro}% daily target, ${DAILY_DRAWDOWN_PCT}% drawdown guard, 1 IP (one PC or RDP).`, `Elite: ${DAILY_TARGET_PCT.elite}% daily target, 2 IPs.`, `Ultra: ${DAILY_TARGET_PCT.ultra}% daily target, 5 IPs.`, "Daily target is the plan percentage of the day's starting balance, per IP: each MT5 account has its own target, and when one reaches it that bot closes its trades and starts again the next day.", "See profit, balance, equity and trades for each account at Dashboard → Usage → Bot Usage."] },
           { type: "h2", content: "Trading hours and safety" },
@@ -484,7 +484,7 @@ export const collections: Collection[] = [
         summary: "Charts and tools are included with Terminal access; only AI replies use credits.",
         updatedAt: "2026-10-21",
         body: [
-          { type: "p", content: "The Terminal is reserved for approved Founding Program members, free of cost. Pro, Elite and Ultra plans, the free trial and credit do not unlock it; plans cover JX Bot and the Top AI Models, and every other page stays open. Apply at jenvu.com/founding." },
+          { type: "p", content: "The Terminal is only for approved Founding Program members. After approval you have 2 days to verify your ID, or the Terminal locks until you send it. Credit never unlocks it, and plans can be bought only after your ID is verified. Apply at jenvu.com/founding." },
           { type: "p", content: "With Terminal access you can use the chart as much as you like. Only AI features use credits, because each AI reply has a real processing cost. Every charge is checked and deducted on Jenvu's servers before an answer is returned, so it cannot be skipped from the browser." },
           { type: "h2", content: "Included with Terminal access (no credits)" },
           { type: "ul", items: [
@@ -505,7 +505,7 @@ export const collections: Collection[] = [
             "AI replies are charged only for the tokens actually used: $3 per 1,000,000 tokens. There is no fixed fee per question, and failed requests are free.",
             "Your balance and the rate are shown under the Terminal chat box.",
             "Daily AI allowance by plan: Free 100K, Pro 1.5M, Elite 5M, Ultra 10M tokens. It resets at 00:00 UTC and is also limited by your balance ($3 = 1M tokens).",
-            "AI chat is included with Pro, Elite and Ultra (including the 14-day Pro free trial).",
+            "AI chat is included with Pro, Elite and Ultra, including the Founding plan.",
           ]},
           { type: "h2", content: "When credits run out" },
           { type: "ul", items: [

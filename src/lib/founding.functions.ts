@@ -97,95 +97,94 @@ type ApplicantEmailExtras = {
 function renderApplicantEmail(kind: ApplicantEmailKind, name: string, plan: string, extras: ApplicantEmailExtras = {}) {
   const meta = PLAN_META[foundingPlanFor(plan)];
   const FONT = "'Google Sans Flex','Google Sans','Google Sans Normal',-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif";
-  const wrap = (title: string, tag: string, body: string, cta?: { label: string; href: string }, cta2?: { label: string; href: string }) => `<!doctype html><html><head><link href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:wght@400;500;700&display=swap" rel="stylesheet"></head><body style="margin:0;background:#f7f7f8;font-family:${FONT};color:#18181b;padding:32px 12px">
-
-    <div style="max-width:560px;margin:0 auto 18px;text-align:center">
-      <table role="presentation" cellpadding="0" cellspacing="0" align="center" style="margin:0 auto;border-collapse:collapse">
+  // Site theme: white page, black ink, warm-gray surfaces, black primary pill and gray secondary pill.
+  const btn = (c: { label: string; href: string }, primary: boolean) =>
+    `<a href="${c.href}" style="display:inline-block;background:${primary ? "#09090b" : "#f2f1ef"};color:${primary ? "#ffffff" : "#09090b"};text-decoration:none;padding:12px 22px;border-radius:999px;font-weight:500;font-size:14px;font-family:${FONT}">${escapeHtml(c.label)}</a>`;
+  const wrap = (title: string, tag: string, body: string, cta?: { label: string; href: string }, cta2?: { label: string; href: string }) => `<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><link href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:wght@400;500;700&display=swap" rel="stylesheet"></head><body style="margin:0;background:#ffffff;font-family:${FONT};color:#18181b;padding:32px 12px">
+    <div style="max-width:560px;margin:0 auto">
+      <table role="presentation" cellpadding="0" cellspacing="0" style="border-collapse:collapse;margin:0 0 28px">
         <tr>
-          <td style="vertical-align:middle"><img src="${APP_URL}/favicon.png" width="32" height="32" alt="Jenvu" style="display:block;border-radius:7px" /></td>
-          <td style="vertical-align:middle;padding-left:12px;font-family:'Google Sans Flex','Google Sans','Google Sans Normal',-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:22px;font-weight:400;letter-spacing:-0.005em;color:#09090b;line-height:1">Jenvu</td>
+          <td style="vertical-align:middle"><img src="${APP_URL}/favicon.png" width="28" height="28" alt="Jenvu" style="display:block;border-radius:7px" /></td>
+          <td style="vertical-align:middle;padding-left:10px;font-family:${FONT};font-size:20px;font-weight:400;color:#09090b;line-height:1">Jenvu</td>
         </tr>
       </table>
-    </div>
-
-    <div style="max-width:560px;margin:0 auto;background:#ffffff;border:1px solid #e4e4e7;border-radius:20px;overflow:hidden">
-      <div style="padding:28px 32px 8px">
-        <div style="font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#71717a">${escapeHtml(tag)}</div>
-        <h1 style="font-size:24px;line-height:1.2;margin:8px 0 0;color:#09090b">${escapeHtml(title)}</h1>
-      </div>
-      <div style="padding:16px 32px 8px;font-size:15px;line-height:1.6;color:#3f3f46">${body}</div>
-      ${cta ? `<div style="padding:16px 32px ${cta2 ? '8px' : '28px'}"><a href="${cta.href}" style="display:inline-block;background:#ffffff;color:#09090b;text-decoration:none;padding:12px 20px;border-radius:10px;font-weight:600;font-size:14px;border:1px solid #e4e4e7;box-shadow:0 1px 2px rgba(9,9,11,.08)">${escapeHtml(cta.label)}</a>${cta2 ? `&nbsp;&nbsp;<a href="${cta2.href}" style="display:inline-block;background:#ffffff;color:#09090b;text-decoration:none;padding:12px 20px;border-radius:10px;font-weight:600;font-size:14px;border:1px solid #e4e4e7;box-shadow:0 1px 2px rgba(9,9,11,.08)">${escapeHtml(cta2.label)}</a>` : ''}</div>${cta2 ? '<div style="height:12px"></div>' : ''}` : `<div style="height:16px"></div>`}
-      <div style="border-top:1px solid #f4f4f5;padding:16px 32px 24px;font-size:12px;color:#a1a1aa">
-        Jenvu · Institutional-grade XAU intelligence · <a href="${APP_URL}" style="color:#71717a;text-decoration:underline">jenvu.com</a>
+      <div style="display:inline-block;background:#f2f1ef;color:#52525b;border-radius:999px;padding:5px 12px;font-size:12px;font-weight:500">${escapeHtml(tag)}</div>
+      <h1 style="font-family:${FONT};font-size:28px;line-height:1.2;font-weight:400;letter-spacing:-0.01em;margin:14px 0 0;color:#09090b">${escapeHtml(title)}</h1>
+      <div style="padding:18px 0 4px;font-size:15px;line-height:1.65;color:#3f3f46">${body}</div>
+      ${cta ? `<div style="padding:18px 0 8px">${btn(cta, true)}${cta2 ? `&nbsp;&nbsp;${btn(cta2, false)}` : ""}</div>` : ""}
+      <div style="margin-top:32px;border-top:1px dashed #d4d4d8;padding-top:18px;font-size:12px;line-height:1.6;color:#a1a1aa">
+        Jenvu · AI trading tools for Gold, Bitcoin and EUR/USD · <a href="${APP_URL}" style="color:#71717a;text-decoration:underline">jenvu.com</a> · <a href="https://support.jenvu.com" style="color:#71717a;text-decoration:underline">Help</a><br/>
+        Trading involves risk. Jenvu tools do not guarantee profits.
       </div>
     </div></body></html>`;
+
+  // Shared list for the Founding emails: what an approved member gets.
+  const box = (rows: string[]) =>
+    `<div style="background:#f7f6f4;border-radius:16px;padding:16px 20px;margin:4px 0 14px">${rows
+      .map((r) => `<div style="padding:6px 0;font-size:14px;color:#18181b">&#8226;&nbsp;&nbsp;${r}</div>`)
+      .join("")}</div>`;
+  const perks = () =>
+    box([
+      `<strong>${escapeHtml(meta.label)}</strong> plan for ${FOUNDING_PLAN_DAYS} days`,
+      `$${FOUNDING_CREDIT_USD} API credit for the same ${FOUNDING_PLAN_DAYS} days`,
+      "Jenvu Terminal for Gold, Bitcoin and EUR/USD",
+      "JX Bot for MetaTrader 5 once your ID is verified",
+    ]);
 
   const n = escapeHtml(name);
   switch (kind) {
     case "received":
       return {
-        subject: "We received your Founding Trader application",
+        subject: "We received your Founding Program application",
         html: wrap(
-          `Thanks, ${n} — application received`,
-          "Founding Trader Program",
-          `<p style="margin:0 0 12px">We got your application for the <strong>${escapeHtml(meta.label)}</strong> tier. Every application is reviewed manually within <strong>48 hours</strong>.</p>
-           <p style="margin:0 0 12px">If approved, you'll get:</p>
-           <ul style="margin:0 0 12px;padding-left:20px">
-             <li style="margin:4px 0"><strong>${escapeHtml(meta.label)}</strong> plan for <strong>${FOUNDING_PLAN_DAYS} days</strong>, unlocked straight away</li>
-             <li style="margin:4px 0">$${FOUNDING_CREDIT_USD} credit on your account for the same ${FOUNDING_PLAN_DAYS} days</li>
-             <li style="margin:4px 0">JX Bot once your ID is verified</li>
-             <li style="margin:4px 0">Full access — extension analysis, signals, alerts and killzones</li>
-           </ul>
-           <p style="margin:0">After approval you have <strong>2 days to verify your ID</strong> from your account to keep access.</p>`,
-          { label: "Explore the platform", href: `${APP_URL}/` },
+          `Thanks, ${n}. Your application is in.`,
+          "Application received",
+          `<p style="margin:0 0 12px">We got your Founding Program application for the <strong>${escapeHtml(meta.label)}</strong> plan. A person on our team reviews every application, usually within <strong>48 hours</strong>.</p>
+           <p style="margin:0 0 8px">If you're approved, you get:</p>
+           ${perks()}
+           <p style="margin:0">After approval you have <strong>2 days to verify your ID</strong>. Until it's verified, the Terminal closes after 2 days and plans can't be bought.</p>`,
+          { label: "Read about the program", href: `${APP_URL}/founding` },
         ),
       };
     case "approved": {
       const resetUrl = extras.resetUrl || `${APP_URL}/auth`;
       return {
-        subject: "Your application has been approved 🎉",
+        subject: "You're approved for the Jenvu Founding Program",
         html: wrap(
-          `Congratulations, ${n} — you're approved.`,
-          "Approved · Founding Trader",
-          `<p style="margin:0 0 14px;line-height:1.6">Your Founding Trader application has been <strong>approved</strong>. Welcome to Jenvu — a small, hand-picked cohort of traders.</p>
-           <p style="margin:0 0 18px;line-height:1.6">Your seat is reserved on the <strong>${escapeHtml(meta.label)}</strong> plan for ${FOUNDING_PLAN_DAYS} days, with $${FOUNDING_CREDIT_USD} credit for the same period. JX Bot unlocks once your ID is verified. After 30 days the plan, credit and bot access end; we will tell you if the bot reached $200 profit so you can take your payout and choose a paid plan.</p>
-           <p style="margin:0 0 10px;font-weight:600">What you get inside Jenvu</p>
-           <ul style="margin:0 0 18px;padding-left:20px;line-height:1.5">
-             <li style="margin:6px 0">Institutional XAU/USD signal engine</li>
-             <li style="margin:6px 0">Live killzones & session alerts</li>
-             <li style="margin:6px 0">Trade journal with auto win/lose tracking</li>
-             <li style="margin:6px 0">AI chart reviews & macro context on every scan</li>
-           </ul>
-           <p style="margin:0 0 8px;font-weight:600">Next step — set your password</p>
-           <p style="margin:0 0 4px;line-height:1.6">Use the secure link below. It's a one-time link tied to your email.</p>`,
+          `Welcome, ${n}. You're approved.`,
+          "Founding Program · Approved",
+          `<p style="margin:0 0 12px">Your Founding Program application is <strong>approved</strong>. Your account is ready and includes:</p>
+           ${perks()}
+           <p style="margin:0 0 8px;font-weight:500;color:#09090b">Two steps to start</p>
+           <p style="margin:0 0 6px">1. Set your password with the secure link below. It works once and is tied to this email.</p>
+           <p style="margin:0 0 12px">2. Verify your ID on the Documents page within <strong>2 days</strong>. That keeps the Terminal open, unlocks JX Bot, and lets you buy a plan later.</p>
+           <p style="margin:0;color:#71717a">After ${FOUNDING_PLAN_DAYS} days the plan, credit and bot access end. We'll tell you whether the bot reached $200 profit, and you can buy a plan to continue.</p>`,
           { label: "Set my password", href: resetUrl },
+          { label: "Verify my ID", href: `${APP_URL}/dashboard/documents` },
         ),
       };
     }
     case "password_set": {
-      const hours = extras.activateHours ?? 4;
       return {
-        subject: `You're in — your ${meta.label} plan activates in ${hours} hours`,
+        subject: "Your Jenvu account is ready",
         html: wrap(
           `You're in, ${n}.`,
-          "Account Ready · Founding Trader",
-          `<p style="margin:0 0 12px">Your password is set and your Jenvu account is live. ✅</p>
-           <p style="margin:0 0 12px">Your <strong>${escapeHtml(meta.label)}</strong> plan will be activated on this account within the next <strong>${hours} hours</strong>. Once it's live, you'll see the wallet credit and full plan features on your Billing page.</p>
-           <p style="margin:0 0 12px">In the meantime, feel free to explore the dashboard — the signal page, journal and killzones are already open to you.</p>
-           <p style="margin:0;color:#52525b"><em>You'll get a separate "account funded" email the moment your wallet is credited.</em></p>`,
+          "Founding Program · Account ready",
+          `<p style="margin:0 0 12px">Your password is set and your <strong>${escapeHtml(meta.label)}</strong> Founding plan is active on this account.</p>
+           <p style="margin:0">If you haven't yet, verify your ID on the Documents page within 2 days of approval to keep the Terminal open and unlock JX Bot.</p>`,
           { label: "Open my dashboard", href: `${APP_URL}/dashboard` },
+          { label: "Verify my ID", href: `${APP_URL}/dashboard/documents` },
         ),
       };
     }
     case "funded":
       return {
-        subject: `Your account has been funded 🎉`,
+        subject: "Your Jenvu account has been funded",
         html: wrap(
-          `Congratulations, ${n} — you're funded.`,
-          "Funded · Founding Trader",
-          `<p style="margin:0 0 14px;line-height:1.6">Great news — your Jenvu account has just been funded with <strong>$${FOUNDING_CREDIT_USD}</strong> of wallet credit on the <strong>${escapeHtml(meta.label)}</strong> plan.</p>
-           <p style="margin:0 0 14px;line-height:1.6">The credit is live in your wallet right now. You can start scanning XAU/USD, use full trade management and enable realtime alerts straight from the dashboard.</p>
-           <p style="margin:0 0 4px;line-height:1.6;color:#52525b"><em>Your full transaction history is always available on the Billing page.</em></p>`,
+          `Your account is funded, ${n}.`,
+          "Founding Program · Funded",
+          `<p style="margin:0 0 12px"><strong>$${FOUNDING_CREDIT_USD}</strong> of API credit is now in your wallet on the <strong>${escapeHtml(meta.label)}</strong> plan. It lasts ${FOUNDING_PLAN_DAYS} days and is spent on Chat, the Jenvu API and AI analysis.</p>
+           <p style="margin:0">You can see every credit and charge on your Billing page.</p>`,
           { label: "Open my dashboard", href: `${APP_URL}/dashboard` },
           { label: "View billing", href: `${APP_URL}/dashboard/billing` },
         ),

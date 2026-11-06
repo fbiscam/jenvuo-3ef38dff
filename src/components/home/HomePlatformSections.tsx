@@ -192,8 +192,8 @@ export function HomeGetStarted() {
                 <Ticks items={["14 days of Pro access and $100 credit", "Jenvu Terminal, AI desk and alerts", "JX Bot for MetaTrader 5"]} />
               </div>
               <div className="mt-8">
-                <Link to="/auth" search={{ mode: "signup" } as never} className={pillDark}>
-                  Get started for free
+                <Link to="/founding" className={pillDark}>
+                  Apply now
                 </Link>
               </div>
             </div>

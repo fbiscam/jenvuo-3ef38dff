@@ -60,7 +60,7 @@ function HelpCenterPage() {
 
   const faqs = [
     { q: "How do I cancel my Jenvu subscription?", a: "Open Dashboard → Billing and choose Cancel plan. You keep access until the end of the period you already paid for. See the Cancellation policy for details." },
-    { q: "How do I start the free trial?", a: "After signing up, click “Start free” in the banner at the top of your dashboard. It adds $100 credit and 14 days of Pro, once per account." },
+    { q: "How do I get a Jenvu account?", a: "Sign-up and the free trial are closed. Apply for the Founding Program at jenvu.com/founding; approved members get an email to set their password, then verify their ID within 2 days." },
     { q: "Who can use the Terminal?", a: "The Terminal is reserved for approved Founding Program members, free of cost. Pro, Elite and Ultra plans cover JX Bot for MT5 and the Top AI Models; credit pays for API and AI use, and all other pages stay open." },
     { q: "How do I get JX Bot?", a: "Choose Pro, Elite or Ultra, then open Dashboard → JX Bot to download it, add the IP of the PC or RDP that runs MT5 and follow the install steps." },
     { q: "How do I contact Jenvu support?", a: "Email support@jenvu.com or use the Contact page. We reply within one business day, Monday to Friday." },
@@ -80,8 +80,8 @@ function HelpCenterPage() {
             <p className="mt-5 max-w-[830px] text-[18px] leading-relaxed text-gc-ink-muted">
               Check our self-serve guides or learn more about getting help with your account, billing and the Terminal. Choose the topic that's right for you.
             </p>
-            <a href="https://auth.jenvu.com/sign-in" className="mt-7 inline-block rounded-full bg-home-accent px-6 py-3 text-[16px] font-medium text-home-accent-foreground hover:opacity-90">
-              Sign up
+            <a href="https://jenvu.com/founding" className="mt-7 inline-block rounded-full bg-home-accent px-6 py-3 text-[16px] font-medium text-home-accent-foreground hover:opacity-90">
+              Apply now
             </a>
           </div>
           <div className="rounded-lg bg-gc-canvas p-6">

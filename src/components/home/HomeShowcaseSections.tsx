@@ -218,8 +218,8 @@ export function HomeUseCases() {
         <h2 className={sectionTitle}>Use cases for every Gold, Bitcoin and EUR/USD trader</h2>
         <p className={sectionLead}>From your first chart to a running bot, pick where you want to start.</p>
         <div className="mt-7 flex flex-wrap justify-center gap-3">
-          <Link to="/auth" search={{ mode: "signup" } as never} className={pillDark}>
-            <Sparkles className="h-4 w-4" /> Start free
+          <Link to="/founding" className={pillDark}>
+            <Sparkles className="h-4 w-4" /> Apply now
           </Link>
           <Link to="/pricing" className={pillLight}>
             <ShieldCheck className="h-4 w-4" /> See plans

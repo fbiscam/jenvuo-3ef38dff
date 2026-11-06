@@ -70,9 +70,9 @@ export function PageShell({
             </p>
           )}
           <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
-            <a href="https://auth.jenvu.com/sign-in" className={pillBlue}>
-              Get started for free
-            </a>
+            <Link to="/founding" className={pillBlue}>
+              Apply now
+            </Link>
             {!oneLine && (
               <Link to="/contact" className={pillOutline}>
                 Contact sales <ArrowUpRight className="h-3.5 w-3.5" />
@@ -174,9 +174,9 @@ export function Banner({ title, children }: { title: string; children: ReactNode
 /** "Take the next step" box with a contact CTA and quick links. */
 export function NextStep() {
   const links: { label: string; cta: string; href?: string; to?: "/pricing" | "/founding"; icon: LucideIcon }[] = [
-    { label: "Start using Jenvu", cta: "Try it free", href: "https://auth.jenvu.com/sign-in", icon: Sparkles },
+    { label: "Join the Founding Program", cta: "Apply now", to: "/founding", icon: Sparkles },
     { label: "Compare plans and credits", cta: "See pricing", to: "/pricing", icon: BookOpen },
-    { label: "Join the Jenvu Founding Program", cta: "Apply here", to: "/founding", icon: Headphones },
+    { label: "Already a member", cta: "Sign in", href: "https://auth.jenvu.com/sign-in", icon: Headphones },
   ];
   const cls = "flex items-center gap-4 rounded-md bg-background/90 p-4 shadow-sm transition hover:bg-background";
   return (

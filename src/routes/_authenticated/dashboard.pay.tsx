@@ -24,6 +24,8 @@ import {
 import { planPrice } from "@/lib/plan-pricing";
 import { planFeatures } from "@/lib/plan-features";
 import { getFoundingMembership } from "@/lib/mt5-licenses.functions";
+import { purchaseGate, PURCHASE_BLOCK_MESSAGE } from "@/lib/founding-bot";
+import { Lock } from "lucide-react";
 import { UsdtIcon, TronIcon, BnbIcon, EthIcon, NetworkIcon } from "@/components/pay/CoinIcons";
 
 export const Route = createFileRoute("/_authenticated/dashboard/pay")({
@@ -97,11 +99,21 @@ function PayPage() {
 
   const membershipFn = useServerFn(getFoundingMembership);
   const [foundingMember, setFoundingMember] = useState(false);
+  // Until the check answers, buying stays locked (only ID-verified Founding members and admins can pay).
+  const [gate, setGate] = useState<ReturnType<typeof purchaseGate> | null>(null);
   useEffect(() => {
     let alive = true;
-    membershipFn().then((r) => alive && setFoundingMember(!!r.verified)).catch(() => {});
+    membershipFn()
+      .then((r) => {
+        if (!alive) return;
+        setFoundingMember(!!r.verified);
+        setGate(purchaseGate({ isAdmin: !!r.isAdmin, member: !!r.member, verified: !!r.verified }));
+      })
+      .catch(() => alive && setGate({ canBuy: false, reason: "apply" }));
     return () => { alive = false; };
   }, [membershipFn]);
+
+  const canBuy = !!gate?.canBuy;
 
   const PLANS = [
     { id: "pro", name: "Pro", price: planPrice("pro", foundingMember), features: planFeatures("pro", foundingMember) },
@@ -258,6 +270,23 @@ function PayPage() {
         </div>
       </div>
 
+      {gate && !gate.canBuy && (
+        <div className="mt-6 grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-x-3 rounded-full border border-gc-line bg-gc-surface py-1.5 pl-4 pr-1.5 max-sm:rounded-2xl">
+          <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-background">
+            <Lock className="h-3.5 w-3.5 text-gc-ink" aria-hidden="true" />
+          </span>
+          <p className="min-w-0 text-[12.5px] leading-snug text-gc-ink line-clamp-2">
+            {gate.reason === "verify_id" ? PURCHASE_BLOCK_MESSAGE.verify_id : "Plans and credit are only for approved Founding Program members."}
+          </p>
+          <Link
+            to={gate.reason === "verify_id" ? "/dashboard/documents" : "/founding"}
+            className="inline-flex h-8 shrink-0 items-center rounded-full bg-gc-blue-deep px-3.5 text-[12.5px] font-medium text-gc-on-blue hover:opacity-90"
+          >
+            {gate.reason === "verify_id" ? "Verify ID" : "Apply now"}
+          </Link>
+        </div>
+      )}
+
       {!order || order.status === "expired" ? (
         <>
           {/* What to buy */}
@@ -285,7 +314,7 @@ function PayPage() {
                 {PLANS.map((p) => {
                   // Renewing: the current plan stays selectable so it can be paid again.
                   const isCurrent = !renew && !trial.active && currentPlan === p.id;
-                  const disabled = isCurrent;
+                  const disabled = isCurrent || !canBuy;
                   const selected = selectedPlanId === p.id;
                   return (
                     <button
@@ -369,7 +398,7 @@ function PayPage() {
                   aria-label="Promo code"
                   className={`${field} w-48 uppercase`}
                 />
-                <button type="button" onClick={onRedeem} disabled={busy} className={pill}>Redeem free credit</button>
+                <button type="button" onClick={onRedeem} disabled={busy || !canBuy} className={pill}>Redeem free credit</button>
                 {quote?.error && <span className="text-[13px] text-destructive">{quote.error}</span>}
                 {!quote?.error && quote?.promoCode && (
                   <span className="text-[13px] text-gc-success">
@@ -402,7 +431,7 @@ function PayPage() {
                 <button
                   type="button"
                   onClick={onCreate}
-                  disabled={busy || !!quote?.error || (mode === "upgrade" && !selectedPlanId)}
+                  disabled={!canBuy || busy || !!quote?.error || (mode === "upgrade" && !selectedPlanId)}
                   className={pillSolid}
                 >
                   {mode === "upgrade" ? "Upgrade now" : "Continue to payment"}

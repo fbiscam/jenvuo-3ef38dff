@@ -53,13 +53,16 @@ export function evaluatePlanAccess(sub: Sub | null, now = Date.now()): TerminalA
 }
 
 /**
- * Terminal rule: the Terminal is open to every signed-in user. `plan` is the
- * paid-feature decision (admin, Founding, paid plan, trial or none); the
- * Terminal stays allowed either way and only the paid features follow `plan`.
+ * Terminal rule: the Terminal is only for approved Founding members (who must send
+ * their ID within 2 days of approval), admins and accounts on an active paid plan
+ * (plans can only be bought by ID-verified Founding members). A free trial or credit
+ * never opens it.
  */
 export function evaluateTerminalAccess(plan: TerminalAccess | null): TerminalAccess {
-  const base = plan ?? { allowed: false, reason: "no_plan", idDeadline: null, idSubmitted: false, trialEndsAt: null };
-  return { ...base, allowed: true };
+  const base = plan ?? { allowed: false, reason: "not_founding", idDeadline: null, idSubmitted: false, trialEndsAt: null };
+  const allowed = base.allowed && (base.reason === "admin" || base.reason === "founding" || base.reason === "paid");
+  if (allowed) return base;
+  return { ...base, allowed: false, reason: base.reason === "id_overdue" ? "id_overdue" : "not_founding" };
 }
 
 function escapeLike(v: string) {
@@ -127,12 +130,13 @@ export async function checkPlanAccess(
     .limit(1)
     .maybeSingle();
   const plan = evaluatePlanAccess(sub ?? null);
-  // Founding members past the ID deadline keep the notice state when they have no plan.
-  if (!plan.allowed && row) return evaluateFoundingRow(row);
+  // Founding members past the ID deadline stay locked (their Founding month is a trial
+  // subscription) until they send their ID or buy a paid plan.
+  if (row && (!plan.allowed || plan.reason === "trial")) return evaluateFoundingRow(row);
   return plan;
 }
 
-/** Terminal access: open to every signed-in user; `reason` carries the plan state. */
+/** Terminal access: Founding members (2-day ID rule), admins and paid plans only. */
 export async function checkTerminalAccess(
   supabase: SupabaseClient<any>,
   userId: string,
