@@ -175,7 +175,7 @@ export const DOC_GROUPS: DocGroup[] = [
             <ul>
               <li>The advanced chart strategies (Fresh sweep, Swing price action, Zone + FVG) need an active <strong>Starter, Pro or Elite</strong> plan, the free trial, or an approved Founding membership.</li>
               <li>Credit alone does not unlock the advanced strategies.</li>
-              <li>Founding members get 1 month of Pro and $250 credit (valid 60 days), and have <strong>2 days</strong> to upload an identity document. JX Bot unlocks once the ID is verified; after 30 days, if the bot has made $200 or more, it locks until you move to a paid plan.</li>
+              <li>Founding members get 1 month of Pro or Elite and $200 credit, and have <strong>2 days</strong> to upload an identity document. JX Bot unlocks once the ID is verified. After 30 days the plan, credit and bot access end, and you are told whether the bot reached $200 profit; a paid plan keeps JX Bot running.</li>
             </ul>
             <p>Apply at <a href="https://jenvu.com/founding">jenvu.com/founding</a>.</p>
           </>
@@ -416,7 +416,7 @@ export const DOC_GROUPS: DocGroup[] = [
         keywords: "founding apply early access",
         body: (
           <p>
-            The Founding Program gives early traders 1 month of Pro, $250 credit valid for 60 days, Terminal access and JX Bot after ID verification. Apply at{" "}
+            The Founding Program gives early traders 1 month of Pro or Elite, $200 credit for the same 30 days, Terminal access and JX Bot after ID verification. Apply at{" "}
             <a href="https://jenvu.com/founding">jenvu.com/founding</a>, choose a plan and wait for approval. See{" "}
             <a href="#terminal-access">Who can use the Terminal</a> for the verification step.
           </p>

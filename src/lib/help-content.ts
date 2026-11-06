@@ -462,7 +462,7 @@ export const collections: Collection[] = [
             "Pro: $10 wallet added on each billing date.",
             "Elite: $25 wallet added on each billing date.",
             "Ultra: $50 wallet added on each billing date.",
-            "Top-up credit stacks on top of your plan and expires 30 days after it is added (Founding credit: 60 days). The oldest credit is spent first.",
+            "Top-up credit stacks on top of your plan and expires 30 days after it is added (Founding credit too). The oldest credit is spent first.",
           ]},
           { type: "h2", content: "Daily token usage" },
           { type: "ul", items: [
