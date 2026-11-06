@@ -141,8 +141,9 @@ function AuthPage() {
   const freshTurnstile = () => setTurnstileReset((n) => n + 1);
   const search = Route.useSearch();
   const redirectTo = sanitizeRedirect(search.redirect);
+  // Sign-up is closed: the page always opens on sign-in (old ?mode=signup links included).
   const [mode, setMode] = React.useState<"signin" | "signup" | "forgot">(
-    search.mode === "signup" ? "signup" : "signin",
+    "signin",
   );
 
   const [fullName, setFullName] = React.useState("");
@@ -1374,19 +1375,9 @@ function AuthPage() {
                   {mode === "signin" && !mfaChallenge && (
                     <div className="mt-6 space-y-1.5 text-center text-[13px] text-muted-foreground">
                       <p>
-                        New here?{" "}
-                        <button
-                          type="button"
-                          onClick={() => { setMode("signup"); setErrorMsg(null); setOtpStep(false); }}
-                          className="font-medium text-foreground underline underline-offset-2"
-                        >
-                          Create an account
-                        </button>
-                      </p>
-                      <p>
-                        Founding member?{" "}
+                        New here? Sign-up is closed.{" "}
                         <Link to="/founding" className="font-medium text-foreground underline underline-offset-2">
-                          Get 1 Month Pro or Elite with $200 Credits →
+                          Apply for the Founding Program →
                         </Link>
                       </p>
                       <p>
