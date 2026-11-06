@@ -27,3 +27,6 @@
 - [x] Policy pages: blank blue strip replaced by policy quick links; "Take the next step" lined up with footer
 - [x] AWS models: best ones default everywhere, all working models listed with logos
 - [x] Chat frame: one tab row (max 4), images only in frame, leads/SEO/proposals in frame, 2-word file names
+
+- [x] Founding: 1 month Pro only, $250 credit valid 60 days, JX Bot after ID verification, $200 profit check at 30 days locks bot + notification
+- [x] Credits expire 30 days after each grant on every plan and the free trial (Founding credit 60 days); oldest spent first

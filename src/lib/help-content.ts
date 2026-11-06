@@ -435,7 +435,7 @@ export const collections: Collection[] = [
             "Priority desk support.",
           ]},
 
-          { type: "note", tone: "info", content: "See the Pricing page for the full feature matrix and one-time top-up packs ($1 = 3 scans, never expire)." },
+          { type: "note", tone: "info", content: "See the Pricing page for the full feature matrix and one-time top-up packs ($1 = 3 scans). All credit expires 30 days after it is added; the oldest credit is spent first." },
         ],
       },
 
@@ -462,7 +462,7 @@ export const collections: Collection[] = [
             "Pro: $10 wallet added on each billing date.",
             "Elite: $25 wallet added on each billing date.",
             "Ultra: $50 wallet added on each billing date.",
-            "Top-up packs never expire and stack on top of your plan.",
+            "Top-up credit stacks on top of your plan and expires 30 days after it is added (Founding credit: 60 days). The oldest credit is spent first.",
           ]},
           { type: "h2", content: "Daily token usage" },
           { type: "ul", items: [

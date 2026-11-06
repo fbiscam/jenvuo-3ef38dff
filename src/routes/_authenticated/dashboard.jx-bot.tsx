@@ -1,4 +1,5 @@
 import { ConfirmDialog } from "@/components/ConfirmDialog";
+import { FOUNDING_PROFIT_MILESTONE_USD } from "@/lib/founding-bot";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
@@ -193,9 +194,23 @@ function JxBotPage() {
         </div>
       )}
 
+      {access && (access as any).viaFounding && (
+        <div className="console-card mt-4 px-5 py-4 text-[14px] text-foreground">
+          Founding access on Pro limits. Bot profit so far: <span className="font-medium tabular-nums">${Number((access as any).founding?.profit ?? 0).toFixed(2)}</span>.{" "}
+          {(access as any).founding?.review_at && <>Checked on {new Date((access as any).founding.review_at).toLocaleDateString()}: </>}
+          if it has made ${FOUNDING_PROFIT_MILESTONE_USD} or more by then, the bot locks so you can take your payout and move to a paid plan.
+        </div>
+      )}
+
       {access && !access.allowed && (
         <div className="console-card mt-4 flex flex-wrap items-center justify-between gap-3 px-5 py-4 text-[14px] text-foreground">
-          <span>JX Bot unlocks only with an active paid plan (Pro, Elite or Ultra). Free trial and credit do not unlock it.</span>
+          <span>
+            {(access as any).founding?.state === "locked"
+              ? `Your Founding bot reached the $${FOUNDING_PROFIT_MILESTONE_USD} profit milestone. Take your payout, then choose a paid plan to keep JX Bot running.`
+              : (access as any).founding?.state === "awaiting_id"
+                ? "Founding members get JX Bot once their ID is verified. Upload your ID in Settings → Documents."
+                : "JX Bot unlocks with an active paid plan (Pro, Elite or Ultra) or a verified Founding membership. Free trial and credit do not unlock it."}
+          </span>
           <Link to="/dashboard/billing" className="console-pill console-pill-solid">Buy now</Link>
         </div>
       )}

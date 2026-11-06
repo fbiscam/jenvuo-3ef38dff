@@ -1293,6 +1293,8 @@ export type Database = {
         Row: {
           admin_notes: string | null
           approved_at: string | null
+          bot_locked_at: string | null
+          bot_profit_usd: number | null
           broker: string | null
           country: string | null
           created_at: string
@@ -1326,6 +1328,8 @@ export type Database = {
         Insert: {
           admin_notes?: string | null
           approved_at?: string | null
+          bot_locked_at?: string | null
+          bot_profit_usd?: number | null
           broker?: string | null
           country?: string | null
           created_at?: string
@@ -1359,6 +1363,8 @@ export type Database = {
         Update: {
           admin_notes?: string | null
           approved_at?: string | null
+          bot_locked_at?: string | null
+          bot_profit_usd?: number | null
           broker?: string | null
           country?: string | null
           created_at?: string
@@ -3816,6 +3822,7 @@ export type Database = {
       expire_my_pro_trial: { Args: never; Returns: boolean }
       expire_pro_trials: { Args: never; Returns: number }
       expire_trial_account: { Args: { _user_id: string }; Returns: boolean }
+      founding_bot_check: { Args: { _user_id: string }; Returns: Json }
       free_trial_eligible: { Args: never; Returns: boolean }
       get_guest_messages: {
         Args: { _token: string }
@@ -3957,6 +3964,7 @@ export type Database = {
         Args: { _content: string; _token: string }
         Returns: string
       }
+      process_founding_bot_milestones: { Args: never; Returns: number }
       process_founding_renewals: { Args: never; Returns: number }
       renew_founding_plan: {
         Args: { _plan_id: string; _user_id: string }

@@ -1,4 +1,4 @@
-import { FOUNDING_CREDIT_USD, FOUNDING_MONTHS } from "@/lib/founding-offer";
+import { FOUNDING_CREDIT_DAYS, FOUNDING_CREDIT_USD, FOUNDING_PLAN, FOUNDING_PLAN_DAYS } from "@/lib/founding-offer";
 import { createServerFn } from "@tanstack/react-start";
 import { createClient } from "@supabase/supabase-js";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
@@ -20,7 +20,7 @@ const ApplyInput = z.object({
   monthly_volume_usd: z.coerce.number().min(0).max(1_000_000_000).optional(),
   why_joining: z.string().trim().min(10).max(1500),
   myfxbook_url: z.string().trim().max(300).optional().default(""),
-  requested_plan: z.enum(["free", "pro", "elite", "ultra"]).default("elite"),
+  requested_plan: z.enum(["free", "pro", "elite", "ultra"]).default("pro").transform(() => "pro" as const),
   referrer_email: z.string().trim().email().max(255).optional().or(z.literal("")),
 });
 
@@ -95,7 +95,8 @@ type ApplicantEmailExtras = {
 };
 
 function renderApplicantEmail(kind: ApplicantEmailKind, name: string, plan: string, extras: ApplicantEmailExtras = {}) {
-  const meta = PLAN_META[plan] || PLAN_META.elite;
+  void plan;
+  const meta = PLAN_META[FOUNDING_PLAN];
   const FONT = "'Google Sans','Google Sans Normal',-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif";
   const wrap = (title: string, tag: string, body: string, cta?: { label: string; href: string }, cta2?: { label: string; href: string }) => `<!doctype html><html><body style="margin:0;background:#f7f7f8;font-family:${FONT};color:#18181b;padding:32px 12px">
 
@@ -131,8 +132,9 @@ function renderApplicantEmail(kind: ApplicantEmailKind, name: string, plan: stri
           `<p style="margin:0 0 12px">We got your application for the <strong>${escapeHtml(meta.label)}</strong> tier. Every application is reviewed manually within <strong>48 hours</strong>.</p>
            <p style="margin:0 0 12px">If approved, you'll get:</p>
            <ul style="margin:0 0 12px;padding-left:20px">
-             <li style="margin:4px 0"><strong>${escapeHtml(meta.label)}</strong> plan for <strong>${FOUNDING_MONTHS} months</strong>, unlocked straight away</li>
-             <li style="margin:4px 0">$${FOUNDING_CREDIT_USD} credit on your account</li>
+             <li style="margin:4px 0"><strong>${escapeHtml(meta.label)}</strong> plan for <strong>${FOUNDING_PLAN_DAYS} days</strong>, unlocked straight away</li>
+             <li style="margin:4px 0">$${FOUNDING_CREDIT_USD} credit on your account, valid for ${FOUNDING_CREDIT_DAYS} days</li>
+             <li style="margin:4px 0">JX Bot once your ID is verified</li>
              <li style="margin:4px 0">Full access — extension analysis, signals, alerts and killzones</li>
            </ul>
            <p style="margin:0">After approval you have <strong>2 days to verify your ID</strong> from your account to keep access.</p>`,
@@ -147,7 +149,7 @@ function renderApplicantEmail(kind: ApplicantEmailKind, name: string, plan: stri
           `Congratulations, ${n} — you're approved.`,
           "Approved · Founding Trader",
           `<p style="margin:0 0 14px;line-height:1.6">Your Founding Trader application has been <strong>approved</strong>. Welcome to Jenvu — a small, hand-picked cohort of traders.</p>
-           <p style="margin:0 0 18px;line-height:1.6">Your seat is reserved on the <strong>${escapeHtml(meta.label)}</strong> plan for ${FOUNDING_MONTHS} months, with $${FOUNDING_CREDIT_USD} credit.</p>
+           <p style="margin:0 0 18px;line-height:1.6">Your seat is reserved on the <strong>${escapeHtml(meta.label)}</strong> plan for ${FOUNDING_PLAN_DAYS} days, with $${FOUNDING_CREDIT_USD} credit valid for ${FOUNDING_CREDIT_DAYS} days. JX Bot unlocks once your ID is verified; after 30 days, if the bot has made $200 or more, it locks so you can take your payout and move to a paid plan.</p>
            <p style="margin:0 0 10px;font-weight:600">What you get inside Jenvu</p>
            <ul style="margin:0 0 18px;padding-left:20px;line-height:1.5">
              <li style="margin:6px 0">Institutional XAU/USD signal engine</li>
@@ -470,9 +472,8 @@ export const updateFoundingApplication = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     await assertAdmin(context.supabase, context.userId);
-    if ((data.status === "approved" || data.status === "active") && !data.plan) {
-      throw new Error("Choose the plan to grant before approving or activating.");
-    }
+    // The Founding Program grants Pro only (30 days), whatever tier was requested or picked.
+    if (data.status === "approved" || data.status === "active" || data.plan) data.plan = FOUNDING_PLAN;
 
     // Fetch prior row so we only email on real status transitions
     const { data: prior } = await context.supabase
@@ -557,7 +558,7 @@ export const updateFoundingApplication = createServerFn({ method: "POST" })
           }
           approvedResetUrl = (linkData as any)?.properties?.action_link || null;
           // Approved members get their selected plan right away (Terminal
-          // unlocks too; 3 months + $250 credit; ID verification within 2 days).
+          // unlocks too; Pro for 30 days + $250 credit for 60 days; ID verification within 2 days).
           const planUserId = existingUserId || (linkData as any)?.user?.id || null;
           if (planUserId) {
             const { error: planErr } = await admin.rpc("activate_founding_trial" as any, {
