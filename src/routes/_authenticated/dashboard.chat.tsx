@@ -309,6 +309,16 @@ function ChatPlayground() {
     void (async () => {
     // The account's chat is kept in the cloud so every device/browser sees it; local copy is the fallback.
     let saved = parseSavedSession(window.localStorage.getItem(chatSessionKey(uid)));
+    // Show the local copy at once so the examples screen never flashes before the chat.
+    if (saved) {
+      setTurns(saved.turns as Turn[]);
+      setWorkspace(saved.workspace);
+      if (saved.workspace.length) setCodePinned("generic");
+      setActiveFile(saved.activeFile);
+      setDoc(saved.doc);
+      setDocOpen(saved.docOpen);
+      setRestored(true);
+    }
     try {
       const { data } = await supabase.from("playground_chat_saves").select("data").eq("user_id", uid).maybeSingle();
       const cloud = data ? parseSavedSession(JSON.stringify(data.data)) : null;
@@ -893,7 +903,7 @@ function ChatPlayground() {
   );
 
   return (
-    <section className="chat-shell flex min-h-[440px] w-full flex-col">
+    <section className={`chat-shell flex min-h-[440px] w-full flex-col ${turns.length === 0 && !studio ? "justify-center" : ""}`}>
       <h1 className="sr-only">Chat</h1>
       {/* Controls: only before the chat starts; afterwards they sit next to the model picker. */}
       {turns.length === 0 && (
@@ -967,8 +977,10 @@ function ChatPlayground() {
       })()}
       <div className={studio ? "flex min-h-0 w-full flex-col lg:w-[480px] lg:shrink-0" : "contents"}>
       {/* Conversation / examples */}
-      <div ref={scroller} className="chat-no-scrollbar mt-1 min-h-0 flex-1 overflow-y-auto">
-        {turns.length === 0 ? (
+      <div ref={scroller} className={`chat-no-scrollbar mt-1 min-h-0 overflow-y-auto ${turns.length === 0 && !studio ? "flex-none" : "flex-1"}`}>
+        {!restored && user?.id ? (
+          <div className="min-h-[40vh]" aria-busy="true" />
+        ) : turns.length === 0 ? (
           <div className="flex flex-col pt-6 pb-2">
             <div className="text-center">
               <h2 className="text-[18px] font-medium text-foreground">Start a chat with examples</h2>
