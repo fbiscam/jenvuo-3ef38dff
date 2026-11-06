@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { Link } from "@tanstack/react-router";
 import { Gift, Loader2 } from "lucide-react";
 import { useFreeTrial } from "@/hooks/useFreeTrial";
 import { BANNER_PRIORITY, useBannerSlot } from "@/lib/banner-slot";
@@ -24,19 +23,17 @@ export default function StartTrialBanner() {
   };
 
   return (
-    <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-gc-line bg-background py-2 pl-4 pr-14 sm:pl-5 md:pr-5">
-      <Gift className="h-5 w-5 shrink-0 text-gc-ink-muted" aria-hidden="true" />
-      <p className="min-w-0 flex-1 text-[13px] text-gc-ink sm:text-[14px]">
-        Start your Free Trial with $100 in credit and 14 days of Pro. Don't worry, you won't be charged when it ends.{" "}
-        <Link to="/pricing" className="text-gc-blue-deep underline underline-offset-2 hover:text-gc-navy">
-          Learn more
-        </Link>
+    <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-x-3 border-b border-gc-line bg-background py-1 pl-3.5 pr-4 sm:gap-x-4 sm:pl-5 md:pr-5">
+      <Gift className="h-4 w-4 shrink-0 text-gc-ink-muted" aria-hidden="true" />
+      <p className="min-w-0 truncate text-[12px] text-gc-ink sm:text-[12.5px]">
+        <span className="font-medium">Free trial</span>
+        <span className="text-gc-ink-muted"> — $100 in credit and 14 days of Pro. You won't be charged when it ends.</span>
       </p>
       <div className="flex shrink-0 items-center gap-2">
         <button
           type="button"
           onClick={dismiss}
-          className="h-8 rounded-full border border-gc-line bg-background px-4 text-[13px] font-medium text-gc-ink hover:bg-gc-surface"
+          className="h-6 rounded-full border border-gc-line bg-background px-3 text-[12px] font-medium text-gc-ink hover:bg-gc-surface"
         >
           Dismiss
         </button>
@@ -44,7 +41,7 @@ export default function StartTrialBanner() {
           type="button"
           onClick={() => void start()}
           disabled={starting}
-          className="inline-flex h-8 items-center gap-1.5 rounded-full bg-gc-blue-deep px-4 text-[13px] font-medium text-gc-on-blue hover:bg-gc-navy disabled:opacity-60"
+          className="inline-flex h-6 items-center gap-1.5 rounded-full bg-gc-blue-deep px-3 text-[12px] font-medium text-gc-on-blue hover:bg-gc-navy disabled:opacity-60"
         >
           {starting && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
           Start free

@@ -10,7 +10,7 @@ export const LOGO_URL = `${SITE_URL}/favicon.png`
  * matching the Jenvu product UI.
  */
 export const INTER =
-  "'Google Sans Normal', 'Google Sans', 'Product Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"
+  "'Google Sans Flex', 'Google Sans', 'Google Sans Normal', 'Product Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"
 
 // Legacy aliases so existing templates keep compiling without edits.
 export const URBANIST = INTER
@@ -25,7 +25,7 @@ export const COLORS = {
   soft: '#70757a',
   border: '#dadce0',
   hairline: '#dadce0',
-  accent: '#1a73e8',
+  accent: '#111111',
 }
 
 /** Load Google Sans inside <Head>. Falls back to system sans-serif when web fonts are blocked. */
@@ -41,7 +41,7 @@ export const EmailFonts = () => (
       crossOrigin=""
     />
     <link
-      href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:wght@400;500;700&family=Google+Sans:wght@400;500;700&display=swap"
       rel="stylesheet"
     />
   </>
@@ -86,7 +86,7 @@ const logoWrap = {
 
 const logoWord = {
   margin: 0,
-  fontFamily: '"Google Sans","Google Sans Normal",-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif',
+  fontFamily: '"Google Sans Flex","Google Sans","Google Sans Normal",-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif',
   fontSize: '22px',
   fontWeight: 400 as const,
   letterSpacing: '-0.005em',
@@ -146,9 +146,9 @@ export const shellStyles = {
   },
   button: {
     display: 'inline-block',
-    backgroundColor: '#1a73e8',
+    backgroundColor: '#111111',
     color: '#ffffff',
-    border: '1px solid #1a73e8',
+    border: '1px solid #111111',
     fontFamily: INTER,
     fontSize: '14px',
     fontWeight: 500 as const,

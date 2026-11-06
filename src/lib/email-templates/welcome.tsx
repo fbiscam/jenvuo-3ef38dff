@@ -19,6 +19,7 @@ interface Props {
 }
 
 const SITE = 'https://jenvu.com'
+const DASH = 'https://dash.jenvu.com'
 
 const listItem: React.CSSProperties = {
   fontFamily: 'inherit',
@@ -43,13 +44,12 @@ const fineprint: React.CSSProperties = {
 const WelcomeEmail = ({
   recipient = 'trader@jenvu.com',
   fullName,
-  siteUrl = SITE,
 }: Props) => {
   const first = fullName?.split(/\s+/)[0]
   return (
     <Html lang="en" dir="ltr">
       <EmailHead />
-      <Preview>Welcome to Jenvu — your AI trading extension is ready</Preview>
+      <Preview>Welcome to Jenvu — your trading desk is ready</Preview>
       <Body style={s.main}>
         <Container style={s.container}>
           <LogoHeader />
@@ -59,42 +59,42 @@ const WelcomeEmail = ({
               {first ? `Welcome, ${first}` : 'Welcome to Jenvu'}
             </Heading>
             <Text style={s.text}>
-              You&apos;re in. Jenvu turns real-time ICT & SMC market structure into
-              chart-aware analysis, precision signals, and a journal that shows
-              exactly where your edge lives.
+              You&apos;re in. Jenvu brings live charts, AI analysis and 60+ AI
+              models together for Gold (XAU/USD), Bitcoin (BTC/USD) and EUR/USD.
             </Text>
 
-            <Text style={{ ...s.text, marginTop: 20, fontWeight: 600, color: COLORS.ink }}>
-              Get started in 60 seconds:
+            <Text style={{ ...s.text, marginTop: 20, fontWeight: 500, color: COLORS.ink }}>
+              Get started:
             </Text>
             <Text style={listItem}>
-              1. Open your{' '}
-              <Link href={`${siteUrl}/dashboard`} style={linkStyle}>Dashboard</Link>{' '}
-              — check your credits & plan.
+              1. Open the{' '}
+              <Link href={`${DASH}/terminal`} style={linkStyle}>Terminal</Link>{' '}
+              — live candles and market structure for all three pairs.
             </Text>
             <Text style={listItem}>
-              2. Open the{' '}
-              <Link href={`${siteUrl}/app`} style={linkStyle}>Jenvu desk</Link>{' '}
-              — analyze XAU/USD in one click.
+              2. Ask anything in{' '}
+              <Link href={`${DASH}/chat`} style={linkStyle}>Chat</Link>{' '}
+              — pick from 60+ AI models in one place.
             </Text>
             <Text style={listItem}>
-              3. Enable{' '}
-              <Link href={`${siteUrl}/dashboard/notifications`} style={linkStyle}>Signal Alerts</Link>{' '}
-              — never miss a killzone opportunity.
+              3. Build with the{' '}
+              <Link href={`${DASH}/api`} style={linkStyle}>Jenvu API</Link>{' '}
+              — one key for every model.
             </Text>
             <Text style={listItem}>
-              4. Log your first trade in the{' '}
-              <Link href={`${siteUrl}/dashboard/journal`} style={linkStyle}>Journal</Link>.
+              4. Start your free trial from the{' '}
+              <Link href={`${DASH}/overview`} style={linkStyle}>Dashboard</Link>{' '}
+              — $100 in credit and 14 days of Pro, no charge when it ends.
             </Text>
 
             <Section style={{ textAlign: 'center', marginTop: 28 }}>
-              <Link href={`${siteUrl}/dashboard`} style={s.button}>
+              <Link href={`${DASH}/overview`} style={s.button}>
                 Open Dashboard
               </Link>
             </Section>
 
             <Text style={fineprint}>
-              Questions? Just reply to this email — it lands with our support desk.
+              Trading involves risk; Jenvu gives analysis, not guaranteed results. Questions? Reply to this email or visit support.jenvu.com.
             </Text>
           </Section>
         </Container>
