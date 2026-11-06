@@ -1239,7 +1239,7 @@ function ChatPlayground() {
             e.preventDefault();
             void submit();
           }}
-          className="mt-2 chat-composer rounded-2xl border border-border bg-[var(--console-card)] px-4 pb-2.5 pt-3"
+          className={`${turns.length ? "mt-2" : "mt-5"} chat-composer rounded-2xl border border-border bg-[var(--console-card)] px-4 pb-2.5 pt-3`}
         >
           {!!files.length && (
             <div className="mb-2 flex flex-wrap gap-2">

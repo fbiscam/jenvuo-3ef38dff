@@ -1539,7 +1539,7 @@ function DashboardLayout() {
 
           {/* Quick actions: Help + Settings (left) + Theme + Collapse (right) */}
           <div
-            className={`shrink-0 flex items-center border-0 py-2 ${navCollapsed ? "justify-center px-2" : "justify-between pl-3 pr-2"}`}
+            className={`shrink-0 flex items-center border-0 pb-2 pt-0.5 ${navCollapsed ? "justify-center px-2" : "justify-between pl-[17px] pr-4"}`}
           >
             {!navCollapsed && (
               <div className="flex items-center gap-1">
