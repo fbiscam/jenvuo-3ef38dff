@@ -14,6 +14,7 @@ import claudeLogo from "@/assets/claude-logo.png";
 import { AuroraTile } from "@/components/AuroraTile";
 import { useServerFn } from "@tanstack/react-start";
 import { getFoundingMembership } from "@/lib/mt5-licenses.functions";
+import { purchaseGate, type PurchaseGate } from "@/lib/founding-bot";
 import { JX_BOT_PRICE, TERMINAL_API_PRICE, planPrice } from "@/lib/plan-pricing";
 
 const SANS = "font-['Google_Sans_Flex','Google_Sans','Product_Sans','Poppins',system-ui,sans-serif]";
