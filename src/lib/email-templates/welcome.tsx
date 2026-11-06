@@ -44,7 +44,6 @@ const fineprint: React.CSSProperties = {
 const WelcomeEmail = ({
   recipient = 'trader@jenvu.com',
   fullName,
-  siteUrl = SITE,
 }: Props) => {
   const first = fullName?.split(/\s+/)[0]
   return (
