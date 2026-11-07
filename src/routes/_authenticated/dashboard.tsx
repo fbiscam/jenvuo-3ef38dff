@@ -1635,8 +1635,9 @@ function DashboardLayout() {
           style={pathname === "/dashboard/terminal" ? undefined : { zoom: 0.9 }}
         >
           {/* The Documents page already holds the upload form, so no "Verify ID" notice there. */}
-          {pathname !== "/dashboard/documents" && <IdVerificationDeadlineNotice access={terminalAccess} />}
-          {pathname !== "/dashboard/terminal" && pathname !== "/dashboard/documents" && !showsIdDeadline(terminalAccess) && <VerificationBanner isAdmin={isAdminUser} />}
+          {/* Verify ID notices show on the Overview page only. */}
+          {pathname === "/dashboard" && <IdVerificationDeadlineNotice access={terminalAccess} />}
+          {pathname === "/dashboard" && !showsIdDeadline(terminalAccess) && <VerificationBanner isAdmin={isAdminUser} />}
 
           {pathname === "/dashboard" ? (
             <ConsoleWelcome name={fullName} keysCount={extKeyCount} />
