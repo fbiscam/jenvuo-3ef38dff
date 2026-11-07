@@ -23,7 +23,10 @@ export function planPrice(plan: PaidPlanId, withBot: boolean): number {
  * API credit a plan payment adds (USD). The rest of the price pays for the Terminal and
  * JX Bot access, so it is never added to the wallet.
  */
-export const PLAN_API_CREDIT: Record<PaidPlanId, number> = { pro: 10, elite: 25, ultra: 50 };
+export const PLAN_API_CREDIT: Record<PaidPlanId, number> = { pro: 25, elite: 59, ultra: 99 };
+
+/** API credit Founding members get for their Founding month (Pro or Elite). */
+export const FOUNDING_API_CREDIT: Record<"pro" | "elite", number> = { pro: 25, elite: 50 };
 
 /**
  * Credit to add when an order is approved. Credit top-ups add what was bought. A plan

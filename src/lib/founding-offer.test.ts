@@ -22,9 +22,9 @@ describe("Founding offer", () => {
   it("plan lasts 30 days", () => {
     expect(foundingTrialEnd(new Date(approved)).toISOString()).toBe("2026-10-31T00:00:00.000Z");
   });
-  it("Founding credit is only the plan's API credit: Pro $10, Elite $25", () => {
-    expect(foundingCreditFor("pro")).toBe(10);
-    expect(foundingCreditFor("elite")).toBe(25);
+  it("Founding credit is only the plan's API credit: Pro $25, Elite $50", () => {
+    expect(foundingCreditFor("pro")).toBe(25);
+    expect(foundingCreditFor("elite")).toBe(50);
   });
   it("Founding credit ends with the plan after 30 days", () => {
     expect(foundingCreditEnd(new Date(approved)).toISOString()).toBe("2026-10-31T00:00:00.000Z");

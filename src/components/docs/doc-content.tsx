@@ -61,7 +61,7 @@ export const DOC_GROUPS: DocGroup[] = [
         keywords: "founding program apply id verification trial credit pro elite 30 days api credit seats",
         body: (
           <>
-            <p>The free trial is closed. Approved Founding Program members get Pro or Elite for 30 days instead, with the plan's API credit ($10 Pro, $25 Elite) added once their ID is verified. Plans can be bought after your ID is verified.</p>
+            <p>The free trial is closed. Approved Founding Program members get Pro or Elite for 30 days instead, with the plan's API credit ($25 Pro, $50 Elite) added once their ID is verified. Plans can be bought after your ID is verified.</p>
           </>
         ),
       },

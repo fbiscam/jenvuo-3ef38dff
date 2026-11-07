@@ -406,7 +406,7 @@ export const collections: Collection[] = [
           { type: "h2", content: "Pro — $29 / month" },
           { type: "ul", items: [
             "1,500,000 tokens per day.",
-            "$10 wallet per month.",
+            "$25 API credit per month.",
             "AI terminal chat billed from the included wallet.",
             "Personal API keys for the Jenvu API endpoint.",
             "Full Gold signal engine.",
@@ -418,7 +418,7 @@ export const collections: Collection[] = [
           { type: "h2", content: "Elite — $59 / month" },
           { type: "ul", items: [
             "5,000,000 tokens per day.",
-            "$25 wallet per month.",
+            "$59 API credit per month.",
             "Everything in Pro, plus senior review on analysis.",
             "Priority A+ alerts (< 30 seconds).",
             "Dedicated Gold scanner with DXY overlay.",
@@ -429,7 +429,7 @@ export const collections: Collection[] = [
           { type: "h2", content: "Ultra — $99 / month" },
           { type: "ul", items: [
             "10,000,000 tokens per day.",
-            "$50 wallet per month.",
+            "$99 API credit per month.",
             "Everything in Elite.",
             "< 10s SLA priority alerts.",
             "Priority desk support.",
@@ -459,9 +459,9 @@ export const collections: Collection[] = [
           { type: "h2", content: "How wallets refresh" },
           { type: "ul", items: [
             "Free: $2 wallet each month (~5 scans).",
-            "Pro: $10 wallet added on each billing date.",
-            "Elite: $25 wallet added on each billing date.",
-            "Ultra: $50 wallet added on each billing date.",
+            "Pro: $25 API credit added on each billing date.",
+            "Elite: $59 API credit added on each billing date.",
+            "Ultra: $99 API credit added on each billing date.",
             "Top-up credit stacks on top of your plan and expires 30 days after it is added (Founding credit too). The oldest credit is spent first.",
           ]},
           { type: "h2", content: "Daily token usage" },
@@ -484,7 +484,7 @@ export const collections: Collection[] = [
         summary: "Charts and tools are included with Terminal access; only AI replies use credits.",
         updatedAt: "2026-10-21",
         body: [
-          { type: "p", content: "The Terminal is only for approved Founding Program members (100 seats a month). After approval you have 2 days to upload your ID; the Terminal and JX Bot open once it is verified, and the Jenvu team then adds your plan's API credit ($10 Pro, $25 Elite). Your Founding month lasts 30 days: after that the Terminal, JX Bot and Founding credit close until you buy a plan and your payment is approved. Credit never unlocks the Terminal, and plans can be picked only after your ID is verified (credit top-ups work before). Until then you can open every dashboard page, but actions like API keys and Chat stay locked. Apply at jenvu.com/founding." },
+          { type: "p", content: "The Terminal is only for approved Founding Program members (100 seats a month). After approval you have 2 days to upload your ID; the Terminal and JX Bot open once it is verified, and the Jenvu team then adds your plan's API credit ($25 Pro, $50 Elite). Your Founding month lasts 30 days: after that the Terminal, JX Bot and Founding credit close until you buy a plan and your payment is approved. Credit never unlocks the Terminal, and plans can be picked only after your ID is verified (credit top-ups work before). Until then you can open every dashboard page, but actions like API keys and Chat stay locked. Apply at jenvu.com/founding." },
           { type: "p", content: "With Terminal access you can use the chart as much as you like. Only AI features use credits, because each AI reply has a real processing cost. Every charge is checked and deducted on Jenvu's servers before an answer is returned, so it cannot be skipped from the browser." },
           { type: "h2", content: "Included with Terminal access (no credits)" },
           { type: "ul", items: [

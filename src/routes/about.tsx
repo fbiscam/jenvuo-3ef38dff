@@ -116,7 +116,7 @@ function AboutPage() {
           { value: "3", label: "Markets: Gold, Bitcoin, EUR/USD" },
           { value: "6", label: "Checks before any setup ships" },
           { value: "30", label: "Days of Pro or Elite for Founding members" },
-          { value: "$10–$25", label: "Plan API credit after ID verification" },
+          { value: "$25–$50", label: "Plan API credit after ID verification" },
           { value: "100", label: "Founding seats every month" },
         ]}
       />

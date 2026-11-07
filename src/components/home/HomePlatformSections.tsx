@@ -22,7 +22,7 @@ const STATS: Array<{ v: string; t: string; g: number }> = [
   { v: "7", t: "analysis engines reading every Gold candle", g: 1 },
   { v: "5", t: "timeframes from 5M to 4H, checked live", g: 2 },
   { v: "30 days", t: "of Pro or Elite for Founding members", g: 3 },
-  { v: "$10–$25", t: "plan API credit once your ID is verified", g: 1 },
+  { v: "$25–$50", t: "plan API credit once your ID is verified", g: 1 },
 ];
 
 export function HomeStats() {

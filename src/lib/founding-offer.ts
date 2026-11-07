@@ -1,4 +1,4 @@
-import { PLAN_API_CREDIT } from "@/lib/plan-pricing";
+import { FOUNDING_API_CREDIT } from "@/lib/plan-pricing";
 /** Founding Program offer, shared by the site copy and the trial-length checks. */
 /** Plans an applicant can pick; anything else falls back to Pro. */
 export const FOUNDING_PLANS = ["pro", "elite"] as const;
@@ -6,12 +6,12 @@ export type FoundingPlan = (typeof FOUNDING_PLANS)[number];
 export const FOUNDING_PLAN: FoundingPlan = "pro";
 export const FOUNDING_MONTHS = 1;
 export const FOUNDING_PLAN_DAYS = 30;
-/** Founding members get only their plan's API credit (Pro $10, Elite $25), not a separate bonus. */
+/** Founding members get only their plan's API credit (Pro $25, Elite $50), not a separate bonus. */
 export function foundingCreditFor(plan: string | null | undefined): number {
-  return PLAN_API_CREDIT[foundingPlanFor(plan)];
+  return FOUNDING_API_CREDIT[foundingPlanFor(plan)];
 }
-/** "$10 (Pro) or $25 (Elite)" for copy that doesn't know the member's plan. */
-export const FOUNDING_CREDIT_LABEL = `$${PLAN_API_CREDIT.pro} (Pro) or $${PLAN_API_CREDIT.elite} (Elite)`;
+/** "$25 (Pro) or $50 (Elite)" for copy that doesn't know the member's plan. */
+export const FOUNDING_CREDIT_LABEL = `$${FOUNDING_API_CREDIT.pro} (Pro) or $${FOUNDING_API_CREDIT.elite} (Elite)`;
 /** Founding credit ends together with the Founding plan. */
 export const FOUNDING_CREDIT_DAYS = 30;
 export const FOUNDING_ID_DAYS = 2;
