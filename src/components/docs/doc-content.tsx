@@ -57,8 +57,8 @@ export const DOC_GROUPS: DocGroup[] = [
       },
       {
         id: "free-trial",
-        title: "Free trial",
-        keywords: "trial credit pro 14 days $100 start free",
+        title: "Founding Program & access",
+        keywords: "founding program apply id verification trial credit pro elite 30 days $200 seats",
         body: (
           <>
             <p>The free trial is closed. Approved Founding Program members get Pro or Elite for 30 days instead, with $200 credit added once their ID is verified. Plans can be bought after your ID is verified.</p>
@@ -292,9 +292,9 @@ export const DOC_GROUPS: DocGroup[] = [
             <ul>
               <li>Download it from Dashboard → JX Bot and follow the install steps there.</li>
               <li>Type the same IP into the bot's MyIP input; the bot checks with jenvu.com that it runs from that IP before it trades.</li>
-              <li>It pauses for the day at your daily target (monthly target / 20) and stops at the monthly target.</li>
+              <li>It pauses for the day at your plan's daily target: 2% (Pro), 4% (Elite) or 6% (Ultra) of the day's starting balance, or at the 4.7% daily drawdown guard.</li>
             </ul>
-            <Note>Targets are stop limits, not promised profit. Credit and the free trial do not unlock JX Bot; it is for approved Founding members (first month free, then a paid plan).</Note>
+            <Note>Targets are stop limits, not promised profit. Credit does not unlock JX Bot; it is only for approved Founding members whose ID is verified (first month free, then a Founding plan).</Note>
           </>
         ),
       },
