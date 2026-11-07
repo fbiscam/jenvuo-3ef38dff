@@ -95,5 +95,5 @@ export const TRIAL_PLAN_MESSAGE = "You already have this plan in your Founding m
 /** Message shown (and returned by the server) when a purchase is refused. */
 export const PURCHASE_BLOCK_MESSAGE: Record<Exclude<PurchaseGate["reason"], "ok">, string> = {
   apply: "Plans and credit are only for approved Founding Program members. Apply at jenvu.com/founding.",
-  verify_id: "Verify your ID first. Plans can be bought once your documents are approved.",
+  verify_id: "Verify your ID first. Plans can be picked once your documents are approved; credit top-ups work now.",
 };

@@ -411,7 +411,7 @@ function PayPage() {
                   aria-label="Promo code"
                   className={`${field} w-48 uppercase`}
                 />
-                <button type="button" onClick={onRedeem} disabled={busy || !canBuy} className={pill}>Redeem free credit</button>
+                <button type="button" onClick={onRedeem} disabled={busy || !canTopup} className={pill}>Redeem free credit</button>
                 {quote?.error && <span className="text-[13px] text-destructive">{quote.error}</span>}
                 {!quote?.error && quote?.promoCode && (
                   <span className="text-[13px] text-gc-success">
