@@ -489,9 +489,15 @@ export const updateFoundingApplication = createServerFn({ method: "POST" })
     // Fetch prior row so we only email on real status transitions
     const { data: prior } = await context.supabase
       .from("founding_applications" as any)
-      .select("email, full_name, status, requested_plan")
+      .select("email, full_name, status, requested_plan, document_status, user_id")
       .eq("id", data.id)
       .maybeSingle();
+
+    // Funding (approved -> active) adds the Founding API credit, and only once the ID is verified.
+    const funding = data.status === "active" && (prior as any)?.status === "approved";
+    if (funding && String((prior as any)?.document_status || "") !== "verified") {
+      throw new Error("Verify this member's ID first. Credit can only be funded after ID verification.");
+    }
 
     // The Founding Program grants Pro or Elite only (30 days): the admin's pick, else the applicant's.
     if (data.status === "approved" || data.status === "active" || data.plan) {
@@ -501,7 +507,8 @@ export const updateFoundingApplication = createServerFn({ method: "POST" })
     const patch: Record<string, any> = { updated_at: new Date().toISOString() };
     if (data.status) {
       patch.status = data.status;
-      if (data.status === "approved" || data.status === "active") {
+      // Funding an approved member keeps their original approval date (the 30-day clock).
+      if (data.status === "approved" || (data.status === "active" && !funding)) {
         patch.approved_at = new Date().toISOString();
         patch.seat_month = new Date().toISOString().slice(0, 7);
       }
@@ -618,6 +625,23 @@ export const updateFoundingApplication = createServerFn({ method: "POST" })
           if (rpcErr) throw new Error(`plan activation: ${rpcErr.message}`);
         }
       }
+    }
+
+    // FUND: approved + ID-verified member gets the Founding API credit now (admin action).
+    if (funding) {
+      const admin = await getServiceClient();
+      let uid: string | null = (prior as any)?.user_id ?? null;
+      if (!uid && p?.email) {
+        const target = String(p.email).toLowerCase();
+        for (let page = 1; page <= 20 && !uid; page++) {
+          const { data: list } = await admin.auth.admin.listUsers({ page, perPage: 1000 });
+          uid = list?.users?.find((u) => u.email?.toLowerCase() === target)?.id ?? null;
+          if (!list?.users?.length || list.users.length < 1000) break;
+        }
+      }
+      if (!uid) throw new Error("This member has no account yet, so no credit was added.");
+      const { error: creditErr } = await admin.rpc("release_founding_credit" as any, { _user_id: uid });
+      if (creditErr) throw new Error(`credit: ${creditErr.message}`);
     }
 
     // Referral reward ($5 each) is now awarded when the referred user upgrades

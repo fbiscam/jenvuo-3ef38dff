@@ -133,11 +133,9 @@ function AdminFoundingPage() {
     setBusy(id + "profit");
     try {
       const row = rows.find((r) => r.id === id);
-      await update({ data: { id, status: "active", first_profit_reached: true, plan: row ? planFor(row) : "pro" } });
-      setRows((prev) =>
-        prev.map((r) => (r.id === id ? { ...r, status: "active", first_profit_at: new Date().toISOString() } : r)),
-      );
-      toast.success("Account funded → plan activated");
+      await update({ data: { id, status: "active", plan: row ? planFor(row) : "pro" } });
+      setRows((prev) => prev.map((r) => (r.id === id ? { ...r, status: "active" } : r)));
+      toast.success("Funded: $200 API credit added to the member's account");
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Update failed");
     } finally {
@@ -363,11 +361,12 @@ function AdminFoundingPage() {
                     )}
                     {r.status === "approved" && (
                       <button
-                        disabled={busy === r.id + "profit"}
+                        disabled={busy === r.id + "profit" || (r as any).document_status !== "verified"}
                         onClick={() => markProfit(r.id)}
-                        className="inline-flex items-center gap-1 rounded-lg bg-gc-amber px-2.5 py-1.5 text-[12px] font-medium text-gc-on-blue hover:bg-gc-amber/90 disabled:opacity-50"
+                        title={(r as any).document_status !== "verified" ? "Verify the member's ID first" : "Add the $200 Founding API credit"}
+                        className="inline-flex items-center gap-1 rounded-lg bg-gc-amber px-2.5 py-1.5 text-[12px] font-medium text-gc-on-blue hover:bg-gc-amber/90 disabled:cursor-not-allowed disabled:opacity-50"
                       >
-                        Fund (PRO) → Active
+                        {(r as any).document_status === "verified" ? "Fund $200 credit" : "Fund (verify ID first)"}
                       </button>
                     )}
                     {r.status === "rejected" && (
