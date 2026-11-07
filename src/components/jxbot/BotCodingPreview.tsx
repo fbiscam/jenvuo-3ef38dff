@@ -103,23 +103,23 @@ export default function BotCodingPreview() {
 
   return (
     <div className="jx-code-scene mx-auto mt-16 w-full max-w-[980px] overflow-hidden rounded-[22px] text-left shadow-[0_30px_80px_-40px_rgba(0,0,0,0.22)]">
-      <div className="flex items-center gap-2 px-5 pt-4 text-[12px]">
-        <span className="rounded-md bg-[#f3f4f6] px-2.5 py-1 font-mono text-[#111827]">JXBot.mq5</span>
-        <span className="font-mono text-[#9ca3af]">MetaEditor 5</span>
-        <span className="ml-auto inline-flex items-center gap-1.5 font-mono text-[#6b7280]">
+      <div className="flex min-w-0 items-center gap-2 px-3 pt-3 text-[11px] sm:px-5 sm:pt-4 sm:text-[12px]">
+        <span className="shrink-0 rounded-md bg-[#f3f4f6] px-2.5 py-1 font-mono text-[#111827]">JXBot.mq5</span>
+        <span className="hidden truncate font-mono text-[#9ca3af] sm:inline">MetaEditor 5</span>
+        <span className="ml-auto inline-flex shrink-0 items-center gap-1.5 font-mono text-[#6b7280]">
           <span className={`h-2 w-2 rounded-full ${done ? "bg-[#16a34a]" : "jx-pulse bg-[#f59e0b]"}`} />
           {done ? "0 errors, 0 warnings" : "Writing…"}
         </span>
       </div>
 
-      <div className="grid gap-0 md:grid-cols-[1fr_250px]">
-        <pre className="m-0 overflow-hidden px-5 pb-6 pt-4 font-mono text-[12px] leading-[1.7] text-[#1f2937] sm:text-[13px]" aria-label="JX Bot code being written">
-          <code className="block min-h-[420px] sm:min-h-[460px]">
+      <div className="grid grid-cols-1 gap-0 md:grid-cols-[minmax(0,1fr)_250px]">
+        <pre className="m-0 min-w-0 overflow-x-auto overflow-y-hidden px-3 pb-5 pt-3 font-mono text-[10.5px] leading-[1.65] text-[#1f2937] [scrollbar-width:thin] sm:px-5 sm:pb-6 sm:pt-4 sm:text-[13px] sm:leading-[1.7]" aria-label="JX Bot code being written">
+          <code className="block w-max min-w-full min-h-[360px] sm:min-h-[460px]">
             {LINES.map((full, i) => {
               const visible = i < lineCount ? typedLines[i] : null;
               return (
                 <div key={i} className="flex">
-                  <span className="w-8 shrink-0 select-none pr-3 text-right text-[#c0c4cc]">{i + 1}</span>
+                  <span className="w-6 shrink-0 select-none pr-2 text-right text-[#c0c4cc] sm:w-8 sm:pr-3">{i + 1}</span>
                   <span className="whitespace-pre">
                     {visible !== null ? paint(visible, i) : <span className="invisible">{full || " "}</span>}
                     {i === lineCount - 1 && !done && <span className="jx-caret ml-px inline-block h-[1.05em] w-[2px] translate-y-[2px] bg-[#2563eb]" />}
