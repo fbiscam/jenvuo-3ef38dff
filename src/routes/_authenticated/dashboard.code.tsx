@@ -1,15 +1,14 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
-import { Copy, Check, ArrowUpRight, Code2 } from "lucide-react";
-import { highlight } from "@/components/dashboard/CodeHighlight";
+import { ArrowUpRight, Check, ChevronRight } from "lucide-react";
+import { CodeTabs, HELLO_SAMPLES, API_BASE } from "@/components/docs/DocsOverview";
 
 export const Route = createFileRoute("/_authenticated/dashboard/code")({
   head: () => ({
     meta: [
       { title: "Code API · Jenvu Console" },
-      { name: "description", content: "Build with Jenvu models from code: REST, Python and Node.js examples." },
+      { name: "description", content: "Build with Jenvu models from code: JavaScript, Python and cURL examples." },
       { property: "og:title", content: "Code API · Jenvu Console" },
-      { property: "og:description", content: "Build with Jenvu models from code: REST, Python and Node.js examples." },
+      { property: "og:description", content: "Build with Jenvu models from code: JavaScript, Python and cURL examples." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -17,102 +16,48 @@ export const Route = createFileRoute("/_authenticated/dashboard/code")({
   component: CodePage,
 });
 
-const EXAMPLES = {
-  "REST API": {
-    code: `curl https://jenvu.com/api/public/v1/chat/completions \\
-  -H "Authorization: Bearer $JENVU_API_KEY" \\
-  -H "Content-Type: application/json" \\
-  -d '{
-    "model": "gpt-5.5",
-    "messages": [{"role": "user", "content": "Explain a liquidity sweep."}]
-  }'`,
-    result: "Returns a JSON chat completion with the model's answer and token usage.",
-  },
-  Python: {
-    code: `from openai import OpenAI
-
-client = OpenAI(base_url="https://jenvu.com/api/public/v1", api_key="JENVU_API_KEY")
-res = client.chat.completions.create(
-    model="gpt-5.5",
-    messages=[{"role": "user", "content": "Summarize today's XAU/USD structure."}],
-)
-print(res.choices[0].message.content)`,
-    result: "Works with the OpenAI Python SDK — only the base URL and key change.",
-  },
-  "Node.js": {
-    code: `import OpenAI from "openai";
-
-const client = new OpenAI({ baseURL: "https://jenvu.com/api/public/v1", apiKey: process.env.JENVU_API_KEY });
-const res = await client.chat.completions.create({
-  model: "gpt-5.5",
-  messages: [{ role: "user", content: "Write a code review for this diff." }],
-});
-console.log(res.choices[0].message.content);`,
-    result: "Same compatible API from JavaScript or TypeScript.",
-  },
-} as const;
-
-type Tab = keyof typeof EXAMPLES;
+const POINTS = ["OpenAI-compatible — keep your SDK", "One endpoint for every model", "Streaming and JSON answers"];
 
 function CodePage() {
-  const [tab, setTab] = useState<Tab>("REST API");
-  const [copied, setCopied] = useState(false);
-  const ex = EXAMPLES[tab];
-  const copy = async () => {
-    await navigator.clipboard.writeText(ex.code);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1500);
-  };
   return (
-    <section className="mx-auto w-full max-w-[1100px] pb-10">
-      <h1 className="text-[28px] font-medium text-foreground">Code</h1>
+    <section className="mx-auto w-full min-w-0 max-w-[1100px] pb-10">
+      <h1 className="text-[26px] font-medium text-foreground sm:text-[28px]">Code</h1>
       <p className="mt-1 text-[15px] text-muted-foreground">Call Jenvu models from your own code.</p>
 
-      <div className="console-card mt-8 grid overflow-hidden md:grid-cols-[1fr_1.2fr]">
-        <div className="flex aspect-[16/10] items-center justify-center md:aspect-auto" style={{ backgroundImage: "var(--platform-aurora-3)" }}>
-          <span className="flex h-16 w-16 items-center justify-center rounded-2xl bg-background text-foreground">
-            <Code2 className="h-8 w-8" aria-hidden="true" />
-          </span>
-        </div>
-        <div className="flex flex-col justify-center p-6 sm:p-8">
-          <span className="w-fit rounded-full bg-background px-2.5 py-0.5 text-[12px] font-medium text-foreground">OpenAI-compatible</span>
-          <h2 className="mt-3 text-[22px] font-medium text-foreground">Jenvu Chat API</h2>
-          <p className="mt-2 text-[15px] leading-relaxed text-muted-foreground">One endpoint for every Jenvu model. Use your existing SDK, change the base URL and key.</p>
+      <div className="console-card mt-6 grid min-w-0 gap-6 p-5 sm:mt-8 sm:p-8 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:items-center">
+        <div className="min-w-0">
+          <span className="inline-block rounded-full border border-border px-2.5 py-0.5 text-[12px] font-medium text-foreground">OpenAI-compatible</span>
+          <h2 className="mt-3 text-[22px] font-medium text-foreground sm:text-[26px]">Jenvu Chat API</h2>
+          <p className="mt-2 text-[15px] leading-relaxed text-muted-foreground">Use your existing SDK — change only the base URL and key.</p>
+          <code className="mt-3 block break-all rounded-lg border border-border px-3 py-2 font-mono text-[12.5px] text-foreground">{API_BASE}</code>
+          <ul className="mt-4 space-y-2 text-[14px] text-foreground">
+            {POINTS.map((p) => (
+              <li key={p} className="flex items-center gap-2"><Check className="h-4 w-4 shrink-0 text-muted-foreground" /> {p}</li>
+            ))}
+          </ul>
           <div className="mt-5 flex flex-wrap gap-2">
-            <Link to="/dashboard/api" className="console-pill-solid">Get API key</Link>
+            <Link to="/dashboard/api" className="console-pill-solid">Get API key <ChevronRight className="h-3.5 w-3.5" aria-hidden="true" /></Link>
             <Link to="/dashboard/models" className="console-pill">View models <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" /></Link>
           </div>
         </div>
+        <CodeTabs samples={HELLO_SAMPLES} />
       </div>
 
-      <h2 className="mt-12 text-[18px] font-medium text-foreground">  API usage examples</h2>
-      <div className="mt-4 flex flex-wrap items-center gap-1" role="tablist">
-        {(Object.keys(EXAMPLES) as Tab[]).map((t) => (
-          <button
-            key={t}
-            type="button"
-            role="tab"
-            aria-selected={t === tab}
-            onClick={() => setTab(t)}
-            className={`rounded-full px-3 py-1.5 text-[14px] transition-colors ${
-              t === tab ? "console-card font-medium text-foreground" : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            {t}
-          </button>
+      <h2 className="mt-10 text-[18px] font-medium text-foreground">Next steps</h2>
+      <div className="mt-4 grid gap-3 sm:grid-cols-3">
+        {[
+          { t: "Quickstart", d: "Key, SDK and first request.", href: "/docs#quickstart" },
+          { t: "Pricing", d: "Flat rate per 1M tokens.", href: "/docs#api-pricing" },
+          { t: "All models", d: "Every model the API serves.", href: "/dashboard/models" },
+        ].map((x) => (
+          <a key={x.t} href={x.href} className="console-card flex items-start justify-between gap-3 p-4 transition hover:opacity-90">
+            <span>
+              <span className="block text-[15px] font-medium text-foreground">{x.t}</span>
+              <span className="mt-0.5 block text-[13px] text-muted-foreground">{x.d}</span>
+            </span>
+            <ArrowUpRight className="mt-1 h-4 w-4 shrink-0 text-muted-foreground" />
+          </a>
         ))}
-      </div>
-      <div className="mt-4 grid gap-4 lg:grid-cols-[1.4fr_1fr]">
-        <div className="code-box relative min-h-[220px] min-w-0 rounded-2xl p-5">
-          <button onClick={copy} aria-label="Copy code" className="code-box-copy absolute right-3 top-3 rounded-md p-1.5">
-            {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-          </button>
-          <pre className="whitespace-pre-wrap break-words pr-8 font-mono text-[13px] leading-relaxed"><code>{highlight(ex.code)}</code></pre>
-        </div>
-        <div className="console-card p-5">
-          <p className="text-[14px] font-medium text-foreground">Result</p>
-          <p className="mt-2 text-[14px] leading-relaxed text-muted-foreground">{ex.result}</p>
-        </div>
       </div>
     </section>
   );
