@@ -2523,3 +2523,17 @@ html body .dash-dark a.verify-cta {
 html body a.verify-cta * {
   color: inherit !important;
 }
+
+/* Docs code panel: always dark (xAI docs look), in both site themes. */
+.docs-code { background: #0f0f10; color: #e6e6e6; border: 1px solid #1f1f22; }
+.docs-code-bar { border-bottom: 1px solid #222225; }
+.docs-code .docs-code-tab { color: #a1a1aa; }
+.docs-code .docs-code-tab:hover { color: #ffffff; }
+.docs-code .docs-code-tab-on { color: #ffffff; font-weight: 500; }
+html body .docs-code pre, html body .docs-code code { color: #e6e6e6 !important; }
+html body .docs-code .tok-comment { color: #8b949e !important; }
+html body .docs-code .tok-string { color: #a5d6ff !important; }
+html body .docs-code .tok-env, html body .docs-code .tok-const, html body .docs-code .tok-number { color: #79c0ff !important; }
+html body .docs-code .tok-keyword { color: #ff7b72 !important; }
+html body .docs-code .tok-func { color: #d2a8ff !important; }
+html body .docs-code .tok-type, html body .docs-code .tok-var { color: #ffa657 !important; }
