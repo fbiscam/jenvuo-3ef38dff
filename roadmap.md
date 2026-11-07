@@ -38,3 +38,8 @@
 - [x] Pricing: all plan buttons on one line (Founding aligned with the others)
 - [x] Sign-out works everywhere (homepage must not sign you back in); sign-in shows everywhere
 - [x] Blog list + article pages in the reference-image style
+- [ ] Dark theme: homepage developer code card readable
+- [ ] Email box page opens (no Page not found) + test email
+- [ ] Admin console: one theme look on every page
+- [ ] Admin hub: number badges for new applications, payments, emails/support
+- [ ] Models page: signed-in users don't see Apply now
