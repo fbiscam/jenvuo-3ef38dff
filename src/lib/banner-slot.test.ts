@@ -17,4 +17,7 @@ describe("pickBanner", () => {
   it("shows nothing when no banner wants to show", () => {
     expect(pickBanner([])).toBeNull();
   });
+  it("Verify ID takes the top spot ahead of 2FA and other notices", () => {
+    expect(pickBanner([["twoFactor", BANNER_PRIORITY.twoFactor], ["notice", BANNER_PRIORITY.notice], ["verifyId", BANNER_PRIORITY.verify]])).toBe("verifyId");
+  });
 });
