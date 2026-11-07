@@ -161,19 +161,19 @@ export function AskJenvuWidget() {
           aria-hidden={!open}
           inert={!open}
           className={[
-            "ask-jenvu-root fixed inset-x-2 bottom-2 top-16 z-[9999] flex flex-col overflow-hidden rounded-2xl bg-[var(--ask-bg)] text-gc-ink shadow-[0_4px_12px_rgba(60,64,67,0.2),0_16px_48px_rgba(60,64,67,0.25)] ring-1 ring-gc-line sm:inset-x-auto sm:right-4 sm:bottom-4 sm:top-auto sm:h-[min(560px,calc(100vh-6rem))] sm:w-[min(640px,calc(100vw-2rem))]",
+            "ask-jenvu-root fixed inset-x-2 bottom-2 top-16 z-[9999] flex flex-col overflow-hidden rounded-[20px] border border-gc-line bg-[var(--ask-bg)] text-gc-ink shadow-[0_24px_64px_-24px_rgba(0,0,0,0.35)] sm:inset-x-auto sm:right-4 sm:bottom-4 sm:top-auto sm:h-[min(560px,calc(100vh-6rem))] sm:w-[min(640px,calc(100vw-2rem))]",
             "[contain:layout_paint] will-change-[opacity,transform] transition-[opacity,transform,visibility] duration-200 ease-out",
             open ? "visible translate-y-0 opacity-100" : "pointer-events-none invisible translate-y-4 opacity-0",
           ].join(" ")}
         >
           {/* Header */}
-          <div className="relative flex h-14 shrink-0 items-center gap-2 px-5">
+          <div className="relative flex h-14 shrink-0 items-center gap-2 border-b border-gc-line px-5">
             {view !== "chat" ? (
               <button type="button" onClick={() => setView("chat")} className="-ml-2 flex items-center gap-3 rounded-full py-1.5 pl-2 pr-3 text-[15px] hover:bg-gc-surface">
                 <ArrowLeft className="h-5 w-5" /> Return to conversation
               </button>
             ) : (
-              <span className="text-[16px]">Ask Jenvu</span>
+              <span className="flex items-center gap-2.5 text-[15px] font-medium"><span className="flex h-8 w-8 items-center justify-center rounded-[10px] bg-gc-surface"><JenvuMark className="h-4 w-4" /></span>Ask Jenvu</span>
             )}
             <div className="ml-auto flex items-center">
               {!empty && (
@@ -186,14 +186,14 @@ export function AskJenvuWidget() {
               </button>
             </div>
             {menu && (
-              <div className="absolute right-14 top-12 z-10 w-48 rounded-lg bg-background py-1 shadow-lg ring-1 ring-gc-line">
-                <button type="button" className="w-full px-4 py-2 text-left text-[14px] hover:bg-gc-surface" onClick={() => { setMsgs([]); setView("chat"); setMenu(false); }}>
+              <div className="absolute right-14 top-12 z-10 w-52 rounded-2xl border border-gc-line bg-[var(--ask-bg)] p-1 shadow-lg">
+                <button type="button" className="w-full rounded-xl px-3 py-2 text-left text-[14px] hover:bg-gc-surface" onClick={() => { setMsgs([]); setView("chat"); setMenu(false); }}>
                   New conversation
                 </button>
-                <button type="button" className="w-full px-4 py-2 text-left text-[14px] hover:bg-gc-surface" onClick={() => { setView("sales"); setMenu(false); }}>
+                <button type="button" className="w-full rounded-xl px-3 py-2 text-left text-[14px] hover:bg-gc-surface" onClick={() => { setView("sales"); setMenu(false); }}>
                   Contact sales
                 </button>
-                <button type="button" className="w-full px-4 py-2 text-left text-[14px] hover:bg-gc-surface" onClick={() => { goLive(msgs); setMenu(false); }}>
+                <button type="button" className="w-full rounded-xl px-3 py-2 text-left text-[14px] hover:bg-gc-surface" onClick={() => { goLive(msgs); setMenu(false); }}>
                   Chat with a person
                 </button>
               </div>
@@ -209,12 +209,12 @@ export function AskJenvuWidget() {
               <div ref={scrollRef} className="min-h-0 flex-1 overflow-y-auto px-6 pb-4">
                 {empty ? (
                   <div className="flex min-h-full flex-col justify-center py-4">
-                    <h2 className="mx-auto max-w-[460px] text-center text-[26px] font-normal leading-[1.3]">
-                      What would you like to know about ?
+                    <h2 className="mx-auto max-w-[460px] text-center text-[26px] font-medium leading-[1.3] tracking-tight">
+                      What would you like to know about Jenvu?
                     </h2>
                     <div className="mt-6 space-y-2.5">
                       {STARTERS.map((s) => (
-                        <button key={s} type="button" onClick={() => send(s)} className="flex w-full items-center justify-between gap-3 rounded-full bg-gc-surface px-6 py-4 text-left text-[14px] transition hover:bg-gc-blue-soft">
+                        <button key={s} type="button" onClick={() => send(s)} className="flex w-full items-center justify-between gap-3 rounded-2xl border border-gc-line bg-gc-surface px-5 py-3.5 text-left text-[14px] transition hover:border-gc-ink/30">
                           <span>{s}</span>
                           <CornerDownRight className="h-5 w-5 shrink-0" />
                         </button>
@@ -226,7 +226,7 @@ export function AskJenvuWidget() {
                     {msgs.map((m, i) =>
                       m.role === "user" ? (
                         <div key={i} className="flex justify-end">
-                          <p className="max-w-[80%] whitespace-pre-wrap break-words rounded-2xl bg-gc-notice px-4 py-2.5 text-[15px] leading-snug text-gc-ink">{m.content}</p>
+                          <p className="max-w-[80%] whitespace-pre-wrap break-words rounded-2xl rounded-br-md bg-gc-surface px-4 py-2.5 text-[15px] leading-snug text-gc-ink">{m.content}</p>
                         </div>
                       ) : (
                         <AssistantTurn
@@ -252,7 +252,7 @@ export function AskJenvuWidget() {
               <div className="shrink-0 px-5 pb-3">
                 <form
                   onSubmit={(e) => { e.preventDefault(); void send(input); }}
-                  className="flex items-center gap-3 rounded-full bg-background py-2 pl-5 pr-2 shadow-[0_1px_3px_rgba(60,64,67,0.2),0_2px_8px_rgba(60,64,67,0.15)] ring-1 ring-gc-line"
+                  className="flex items-center gap-3 rounded-2xl border border-gc-line bg-gc-surface py-2 pl-5 pr-2 focus-within:border-gc-ink/40"
                 >
                   <SearchCheck className="h-5 w-5 shrink-0 text-gc-ink-muted" />
                   <textarea
@@ -306,7 +306,7 @@ function AssistantTurn({ msg, last, onRetry, onAsk, onSales }: {
       {msg.showSales && (
         <div className="mt-5 border-t border-gc-line pt-5">
           <p className="text-[15px]">How would you like to begin? 🚀</p>
-          <button type="button" onClick={onSales} className="mt-3 flex items-center gap-3 rounded-full bg-gc-blue-soft py-2 pl-5 pr-2 text-[16px] text-gc-blue-deep transition hover:brightness-95">
+          <button type="button" onClick={onSales} className="mt-3 flex items-center gap-3 rounded-full border border-gc-line bg-gc-surface py-1.5 pl-5 pr-1.5 text-[15px] font-medium text-gc-ink transition hover:border-gc-ink/30">
             <FileText className="h-5 w-5" />
             <span className="mr-6">Contact sales</span>
             <span className="flex h-10 w-10 items-center justify-center rounded-full bg-gc-blue text-gc-on-blue">
@@ -326,7 +326,7 @@ function AssistantTurn({ msg, last, onRetry, onAsk, onSales }: {
         <div className="mt-5 flex flex-wrap gap-2.5">
           {msg.followUps.map((q) => (
             <button key={q} type="button" onClick={() => onAsk(q)} className="flex items-center gap-2 rounded-full px-4 py-2 text-left text-[14px] ring-1 ring-gc-line transition hover:bg-gc-surface">
-              <CornerDownRight className="h-4 w-4 shrink-0 text-gc-blue" /> {q}
+              <CornerDownRight className="h-4 w-4 shrink-0 text-gc-ink-muted" /> {q}
             </button>
           ))}
         </div>
@@ -396,7 +396,7 @@ function SalesForm({ onDone }: { onDone: () => void }) {
         <CheckCircle2 className="h-12 w-12 text-gc-success" />
         <h3 className="mt-4 text-[20px]">Thanks, we'll call you back</h3>
         <p className="mt-2 text-[14px] text-gc-ink-muted">Our team replies Monday to Friday, 09:00 – 18:00 UTC.</p>
-        <button type="button" onClick={onDone} className="mt-6 rounded-full bg-gc-blue px-6 py-2.5 text-[14px] font-medium text-gc-on-blue hover:bg-gc-blue-hover">
+        <button type="button" onClick={onDone} className="mt-6 rounded-full bg-gc-blue px-6 py-2.5 text-[14px] font-medium text-gc-on-blue hover:opacity-90">
           Return to conversation
         </button>
       </div>
@@ -404,18 +404,21 @@ function SalesForm({ onDone }: { onDone: () => void }) {
   }
 
   const cls = (k: string) =>
-    `w-full rounded-[4px] border bg-background px-4 py-3.5 text-[15px] text-gc-ink outline-none placeholder:text-gc-ink-muted focus:border-gc-blue-deep focus:ring-1 focus:ring-gc-blue-deep ${errors[k] ? "border-destructive" : "border-gc-ink-muted/50"}`;
+    `w-full rounded-xl border bg-gc-surface px-4 py-3 text-[15px] text-gc-ink outline-none placeholder:text-gc-ink-muted focus:border-gc-ink/50 ${errors[k] ? "border-destructive" : "border-gc-line"}`;
   const Err = ({ k }: { k: string }) => (errors[k] ? <p className="mt-1 text-[12px] text-destructive">{errors[k]}</p> : null);
 
   return (
-    <form onSubmit={submit} className="min-h-0 flex-1 space-y-4 overflow-y-auto px-6 pb-6 pt-2" noValidate>
-      <div className="flex items-center gap-3">
-        <span className="flex h-9 w-9 items-center justify-center rounded-full bg-gc-blue-deep text-gc-on-blue">
+    <form onSubmit={submit} className="min-h-0 flex-1 space-y-3.5 overflow-y-auto px-6 pb-6 pt-5" noValidate>
+      <div className="flex items-center gap-3 pb-1">
+        <span className="flex h-10 w-10 items-center justify-center rounded-[12px] border border-gc-line bg-gc-surface text-gc-ink">
           <FileText className="h-4 w-4" />
         </span>
-        <h3 className="text-[15px]">Request a call back</h3>
+        <div>
+          <h3 className="text-[17px] font-medium tracking-tight">Contact sales</h3>
+          <p className="text-[13px] text-gc-ink-muted">Leave your details and we'll call you back.</p>
+        </div>
       </div>
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 gap-3">
         <div><input aria-label="First name" placeholder="First name*" value={f.first} onChange={set("first")} maxLength={50} className={cls("first")} /><Err k="first" /></div>
         <div><input aria-label="Last name" placeholder="Last name*" value={f.last} onChange={set("last")} maxLength={50} className={cls("last")} /><Err k="last" /></div>
       </div>
@@ -430,12 +433,12 @@ function SalesForm({ onDone }: { onDone: () => void }) {
         <Err k="topic" />
       </div>
       <div><textarea aria-label="Message" placeholder="Anything else? (optional)" rows={3} value={f.message} onChange={set("message")} maxLength={1500} className={`${cls("message")} resize-none`} /></div>
-      <button type="submit" disabled={sending} className="inline-flex h-11 items-center gap-2 rounded-full bg-gc-blue-deep px-6 text-[15px] font-medium text-gc-on-blue transition hover:bg-gc-blue disabled:opacity-60">
+      <button type="submit" disabled={sending} className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-full bg-gc-blue px-6 text-[15px] font-medium text-gc-on-blue transition hover:opacity-90 disabled:opacity-60">
         {sending && <Loader2 className="h-4 w-4 animate-spin" />} Submit request
       </button>
       <p className="text-[13px] leading-relaxed text-gc-ink-muted">
         I understand my personal data will be processed in accordance with Jenvu's{" "}
-        <a href="/privacy" className="text-gc-blue underline">Privacy Policy</a>.
+        <a href="/privacy" className="text-gc-ink underline">Privacy Policy</a>.
       </p>
     </form>
   );
