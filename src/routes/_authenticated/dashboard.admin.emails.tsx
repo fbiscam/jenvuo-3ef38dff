@@ -3,8 +3,8 @@ import { useEffect, useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { z } from "zod";
-import { AtSign, Inbox, Send, PenLine } from "lucide-react";
-import { isAdmin } from "@/lib/admin-messages.functions";
+import { AtSign, Inbox, Send, PenLine, Mail } from "lucide-react";
+import { isAdmin, listContactMessages, updateContactMessageStatus, type ContactMessage } from "@/lib/admin-messages.functions";
 import { listSentEmails, sendAdminEmail, type SentEmail } from "@/lib/admin-email.functions";
 import { EMAIL_BOXES, type EmailBox } from "@/lib/admin-email";
 import { OpsPage, OpsState, OpsTab, OpsBadge, ops } from "@/components/ops/OpsPage";
@@ -27,17 +27,23 @@ export const Route = createFileRoute("/_authenticated/dashboard/admin/emails")({
   component: AdminEmailsPage,
 });
 
-type Tab = "compose" | "sent";
+type Tab = "received" | "compose" | "sent";
 
 function AdminEmailsPage() {
   const params = Route.useSearch();
   const checkAdmin = useServerFn(isAdmin);
   const fetchSent = useServerFn(listSentEmails);
   const send = useServerFn(sendAdminEmail);
+  const fetchReceived = useServerFn(listContactMessages);
+  const setStatus = useServerFn(updateContactMessageStatus);
 
   const [loading, setLoading] = useState(true);
   const [allowed, setAllowed] = useState(false);
-  const [tab, setTab] = useState<Tab>("compose");
+  // Opening a reply link lands on Compose; otherwise the inbox comes first.
+  const [tab, setTab] = useState<Tab>(params.to || params.reply ? "compose" : "received");
+  const [received, setReceived] = useState<ContactMessage[]>([]);
+  const [openMsg, setOpenMsg] = useState<ContactMessage | null>(null);
+  const [replyId, setReplyId] = useState<string | undefined>(params.reply);
   const [sent, setSent] = useState<SentEmail[]>([]);
   const [box, setBox] = useState<EmailBox>(params.box ?? "support");
   const [to, setTo] = useState(params.to ?? "");
@@ -51,7 +57,11 @@ function AdminEmailsPage() {
     try {
       const { admin } = await checkAdmin();
       setAllowed(admin);
-      if (admin) setSent(await fetchSent());
+      if (admin) {
+        const [s, r] = await Promise.all([fetchSent(), fetchReceived().catch(() => [] as ContactMessage[])]);
+        setSent(s);
+        setReceived(r);
+      }
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Failed to load");
     } finally {
@@ -64,10 +74,11 @@ function AdminEmailsPage() {
     e.preventDefault();
     setBusy(true);
     try {
-      const r = await send({ data: { box, to, subject, body, contactMessageId: params.reply } });
+      const r = await send({ data: { box, to, subject, body, contactMessageId: replyId } });
       if (r.ok) {
         toast.success(r.message);
-        setTo(""); setSubject(""); setBody("");
+        setTo(""); setSubject(""); setBody(""); setReplyId(undefined);
+        if (replyId) setReceived((list) => list.map((m) => (m.id === replyId ? { ...m, status: "replied" } : m)));
       } else toast.error(r.message);
       setSent(await fetchSent());
     } catch (err) {
@@ -76,6 +87,24 @@ function AdminEmailsPage() {
     } finally {
       setBusy(false);
     }
+  };
+
+  const unread = received.filter((m) => m.status === "new").length;
+  const openReceived = (m: ContactMessage) => {
+    setOpenMsg(m);
+    if (m.status === "new") {
+      setReceived((list) => list.map((x) => (x.id === m.id ? { ...x, status: "read" } : x)));
+      void setStatus({ data: { id: m.id, status: "read" } }).catch(() => {});
+    }
+  };
+  const replyTo = (m: ContactMessage) => {
+    setBox(/sales|plans|partnership/i.test(m.subject) ? "sales" : "support");
+    setTo(m.email);
+    setSubject(m.subject.startsWith("Re:") ? m.subject : `Re: ${m.subject}`);
+    setBody(`Hi ${m.name.split(" ")[0] || "there"},\n\n\n\n---\nOn ${new Date(m.created_at).toLocaleString()}, ${m.name} wrote:\n${m.message}`);
+    setReplyId(m.id);
+    setOpenMsg(null);
+    setTab("compose");
   };
 
   const shown = useMemo(() => sent.filter((s) => boxFilter === "all" || s.from_box === boxFilter), [sent, boxFilter]);
@@ -97,6 +126,9 @@ function AdminEmailsPage() {
       }
       tabs={
         <>
+          <OpsTab active={tab === "received"} onClick={() => setTab("received")} count={unread}>
+            Received <span className="ml-1.5 tabular-nums text-muted-foreground">{received.length}</span>
+          </OpsTab>
           <OpsTab active={tab === "compose"} onClick={() => setTab("compose")}>Compose</OpsTab>
           <OpsTab active={tab === "sent"} onClick={() => setTab("sent")}>
             Sent <span className="ml-1.5 tabular-nums text-muted-foreground">{sent.length}</span>
@@ -104,7 +136,30 @@ function AdminEmailsPage() {
         </>
       }
     >
-      {tab === "compose" ? (
+      {tab === "received" ? (
+        received.length === 0 ? (
+          <div className="px-6 py-16 text-center text-[13px] text-muted-foreground">No one has contacted you yet.</div>
+        ) : (
+          <ul className="divide-y divide-border border-y border-border">
+            {received.map((m) => (
+              <li key={m.id}>
+                <button type="button" onClick={() => openReceived(m)} className="flex w-full items-start gap-3 px-4 py-3.5 text-left transition hover:bg-muted/40 sm:px-6">
+                  <Mail className={`mt-0.5 h-4 w-4 shrink-0 ${m.status === "new" ? "text-foreground" : "text-muted-foreground"}`} />
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-center justify-between gap-x-2">
+                      <span className={`truncate text-[13px] text-foreground ${m.status === "new" ? "font-semibold" : ""}`}>{m.name} · {m.email}</span>
+                      <span className="shrink-0 text-[11px] text-muted-foreground">{new Date(m.created_at).toLocaleString()}</span>
+                    </div>
+                    <div className={`truncate text-[13px] text-foreground ${m.status === "new" ? "font-semibold" : "font-medium"}`}>{m.subject}</div>
+                    <div className="truncate text-xs text-muted-foreground">{m.phone ? `WhatsApp ${m.phone} · ` : ""}{m.message}</div>
+                  </div>
+                  <OpsBadge tone={m.status === "new" ? "danger" : m.status === "replied" ? "success" : "neutral"}>{m.status}</OpsBadge>
+                </button>
+              </li>
+            ))}
+          </ul>
+        )
+      ) : tab === "compose" ? (
         <form onSubmit={onSend} className="mx-auto w-full max-w-3xl space-y-4 px-4 py-6 sm:px-6">
           <div>
             <label className="mb-1.5 block text-[12px] text-muted-foreground">From</label>
@@ -183,6 +238,28 @@ function AdminEmailsPage() {
               ))}
             </ul>
           )}
+        </div>
+      )}
+
+      {openMsg && (
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-foreground/40 p-0 sm:items-center sm:p-4" onClick={() => setOpenMsg(null)}>
+          <div className="w-full max-w-2xl rounded-t-2xl border border-border bg-background shadow-xl sm:rounded-2xl" onClick={(e) => e.stopPropagation()}>
+            <div className="border-b border-border px-5 py-4 sm:px-6">
+              <div className="text-[11px] uppercase tracking-wider text-muted-foreground">{new Date(openMsg.created_at).toLocaleString()}</div>
+              <h2 className="mt-1 text-lg font-semibold text-foreground">{openMsg.subject}</h2>
+              <p className="mt-1 break-all text-sm text-muted-foreground">
+                From {openMsg.name} · <a href={`mailto:${openMsg.email}`} className="underline">{openMsg.email}</a>
+                {openMsg.phone && (
+                  <> · WhatsApp <a href={`https://wa.me/${openMsg.phone.replace(/\D/g, "")}`} target="_blank" rel="noreferrer" className="underline">{openMsg.phone}</a></>
+                )}
+              </p>
+            </div>
+            <div className="max-h-[55vh] overflow-y-auto whitespace-pre-wrap px-5 py-5 text-sm leading-relaxed text-foreground sm:px-6">{openMsg.message}</div>
+            <div className="flex justify-end gap-2 border-t border-border px-5 py-3 sm:px-6">
+              <button type="button" className={ops.btnPrimary} onClick={() => replyTo(openMsg)}>Reply</button>
+              <button type="button" className={ops.btn} onClick={() => setOpenMsg(null)}>Close</button>
+            </div>
+          </div>
         </div>
       )}
 
