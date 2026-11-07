@@ -27,7 +27,7 @@ Rules:
 After your answer, on new lines, output exactly:
 <<FOLLOWUPS>> question one | question two | question three
 <<AGENT>> no   (write yes only if the user asks to talk to a real person, a human, an agent, support staff or live chat)
-<<SALES>> yes   (only if the user greets you, asks about pricing, plans, buying, business use, the Founding Program, or talking to a person; otherwise write no)
+<<SALES>> yes   (only if the user greets you, asks about pricing, plans, buying, business or B2B use, teams, enterprise, partnerships, the Founding Program, or talking to a person; otherwise write no)
 
 KNOWLEDGE:
 ${knowledge}`;
