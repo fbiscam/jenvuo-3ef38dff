@@ -218,6 +218,13 @@
       "when": 1794026148486,
       "tag": "0030_founding_credit_on_admin_fund",
       "breakpoints": true
+    },
+    {
+      "idx": 31,
+      "version": "7",
+      "when": 1794030960089,
+      "tag": "0031_admin_sent_emails",
+      "breakpoints": true
     }
   ]
 }
