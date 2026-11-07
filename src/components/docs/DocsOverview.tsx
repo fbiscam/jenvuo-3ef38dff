@@ -66,7 +66,8 @@ export function CodeTabs({ samples, className = "" }: { samples: CodeSample[]; c
   };
   return (
     <div className={`docs-code min-w-0 overflow-hidden rounded-2xl ${className}`}>
-      <div className="docs-code-bar flex items-center gap-1 overflow-x-auto px-3 py-2.5 sm:px-4">
+      <div className="docs-code-bar flex items-center gap-2 px-3 py-2.5 sm:px-4">
+        <div className="flex min-w-0 flex-1 items-center gap-1 overflow-x-auto">
         {samples.map((x, k) => (
           <button
             key={x.label}
@@ -78,7 +79,8 @@ export function CodeTabs({ samples, className = "" }: { samples: CodeSample[]; c
             {x.label}
           </button>
         ))}
-        <button type="button" onClick={copy} aria-label="Copy code" className="docs-code-tab ml-auto shrink-0 rounded-md p-1.5">
+        </div>
+        <button type="button" onClick={copy} aria-label="Copy code" className="docs-code-tab shrink-0 rounded-md p-1.5">
           {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
         </button>
       </div>
@@ -360,7 +362,7 @@ export function DocsOverview() {
         <h3 className="mt-8 text-[20px] font-medium text-gc-ink">Text API</h3>
         <p className="text-[15px] text-gc-ink-muted">Prices per 1M tokens</p>
         <div className="mt-4 overflow-x-auto">
-          <table className="w-full min-w-[560px] text-[14px]">
+          <table className="w-full min-w-[420px] text-[13px] sm:text-[14px]">
             <thead>
               <tr className="border-b border-gc-line text-left text-gc-ink">
                 <th className="py-3 pr-4 font-medium">Model</th>

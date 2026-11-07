@@ -35,7 +35,7 @@ const SANS = "font-['Google_Sans_Flex','Google_Sans','Product_Sans','Poppins',sy
 type NavGroup = { title: string; sections: { id: string; title: string; keywords?: string }[] };
 
 const START_GROUP: NavGroup = {
-  title: "Get Started",
+  title: "API",
   sections: [
     { id: "docs-overview", title: "Overview", keywords: "api start" },
     { id: "quickstart", title: "Quickstart", keywords: "api key sdk first request" },
