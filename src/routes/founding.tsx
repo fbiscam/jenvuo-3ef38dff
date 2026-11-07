@@ -55,7 +55,8 @@ function FoundingPage() {
         .catch(() => {});
     };
     refresh();
-    const interval = window.setInterval(refresh, 10000);
+    // Seat counts change slowly: check once a minute, only while the tab is visible.
+    const interval = window.setInterval(() => { if (document.visibilityState === "visible") refresh(); }, 60000);
     const onFocus = () => refresh();
     const onVisible = () => { if (document.visibilityState === "visible") refresh(); };
     window.addEventListener("focus", onFocus);

@@ -1,4 +1,4 @@
-import { evaluateIpLicense, formatBinding, isPaidBotSub, normalizeIp, requestIp, type ValidateResult } from "@/lib/mt5-licenses";
+import { evaluateIpLicense, formatBinding, isPaidBotSub, licenseCheckDue, normalizeIp, requestIp, type ValidateResult } from "@/lib/mt5-licenses";
 import { isVerifiedFoundingMember, type FoundingBotState } from "@/lib/founding-bot";
 
 export type FoundingBotInfo = { state: FoundingBotState; profit: number; review_at: string | null; verified_at: string | null; locked_at: string | null; milestone: boolean };
@@ -12,10 +12,15 @@ export async function foundingBotFor(db: any, userId: string): Promise<FoundingB
 
 /** Find the active license registered for an IP (binding "ip" or "ip#account"). */
 export async function findLicenseByIp(db: any, ip: string) {
-  const exact = await db.from("mt5_licenses").select("id,user_id,mt5_account,revoked_at").is("revoked_at", null).eq("mt5_account", ip).limit(1).maybeSingle();
-  if (exact.data) return exact.data;
-  const bound = await db.from("mt5_licenses").select("id,user_id,mt5_account,revoked_at").is("revoked_at", null).like("mt5_account", `${ip}#%`).limit(1).maybeSingle();
-  return bound.data ?? null;
+  // One lookup for both binding shapes ("ip" and "ip#account"); `ip` is already normalized (digits, hex, dots, colons only).
+  const { data } = await db
+    .from("mt5_licenses")
+    .select("id,user_id,mt5_account,revoked_at,last_validated_at")
+    .is("revoked_at", null)
+    .or(`mt5_account.eq."${ip}",mt5_account.like."${ip}#*"`)
+    .limit(2);
+  const rows = (data ?? []) as { id: string; user_id: string; mt5_account: string | null; revoked_at: string | null; last_validated_at: string | null }[];
+  return rows.find((r) => r.mt5_account === ip) ?? rows[0] ?? null;
 }
 
 /** Shared by validate + report: check the bot's IP/account and lock the first account in. */
@@ -37,7 +42,8 @@ export async function checkBotByIp(body: any, headers: Headers): Promise<{ r: Va
     if (!isPaidBotSub(sub)) foundingBot = founding.state === "active";
   }
   const r = evaluateIpLicense(enteredIp, requestIp(headers), account, lic, sub, Date.now(), foundingBot);
-  if (r.valid) {
+  // Skip the per-minute rewrite: only bind a new account or refresh "last check" every few minutes.
+  if (r.valid && (r.bind || licenseCheckDue(lic.last_validated_at))) {
     await db.from("mt5_licenses").update({ last_validated_at: new Date().toISOString(), ...(r.bind ? { mt5_account: formatBinding(enteredIp, account) } : {}) }).eq("id", lic.id);
   }
   return { r, lic, account };

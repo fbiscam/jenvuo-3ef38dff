@@ -62,6 +62,14 @@ export function parseBinding(v: string | null | undefined): { ip: string | null;
 }
 export const formatBinding = (ip: string, account?: string | null) => (account ? `${ip}#${account}` : ip);
 
+/** The bot reports about once a minute; the license "last check" time is rewritten at most this often. */
+export const LICENSE_TOUCH_EVERY_MS = 5 * 60_000;
+export function licenseCheckDue(lastIso: string | null | undefined, now = Date.now(), every = LICENSE_TOUCH_EVERY_MS) {
+  if (!lastIso) return true;
+  const t = Date.parse(lastIso);
+  return !Number.isFinite(t) || now - t >= every;
+}
+
 /** Only active IP bindings consume an IP slot; legacy account-only rows can be reused. */
 export function countIpLicenses(licenses: { mt5_account: string | null; revoked_at: string | null }[]) {
   return licenses.filter((l) => !l.revoked_at && parseBinding(l.mt5_account).ip).length;

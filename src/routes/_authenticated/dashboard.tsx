@@ -843,8 +843,8 @@ function DashboardLayout() {
         load,
       )
       .subscribe();
-    // Polling fallback (20s) in case realtime drops, plus refresh on tab focus.
-    const iv = window.setInterval(load, 20000);
+    // Live updates arrive by realtime; slow fallback check only while the tab is visible, plus refresh on focus.
+    const iv = window.setInterval(() => { if (document.visibilityState === "visible") void load(); }, 60000);
     const onVis = () => {
       if (document.visibilityState === "visible") load();
     };
