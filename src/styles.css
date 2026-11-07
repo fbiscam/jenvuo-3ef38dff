@@ -2574,14 +2574,23 @@ html body .docs-code .tok-type, html body .docs-code .tok-var { color: #ffa657 !
   opacity: 0.7;
 }
 
-/* ====== Ops Console size: ~10% larger than the dashboard at every width ====== */
-@media (min-width: 1024px) { .ops-zoom, .jenvu-zoom-dashboard.ops-embed { zoom: 1; min-height: 100vh; } }
-@media (min-width: 1200px) { .ops-zoom, .jenvu-zoom-dashboard.ops-embed { zoom: 1.105; min-height: calc(100vh / 1.105); } }
-@media (min-width: 1360px) { .ops-zoom, .jenvu-zoom-dashboard.ops-embed { zoom: 1.21; min-height: calc(100vh / 1.21); } }
-@media (min-width: 1500px) { .ops-zoom, .jenvu-zoom-dashboard.ops-embed { zoom: 1.315; min-height: calc(100vh / 1.315); } }
-@media (min-width: 1600px) { .ops-zoom, .jenvu-zoom-dashboard.ops-embed { zoom: 1.45; min-height: calc(100vh / 1.45); } }
-@media (min-width: 1680px) { .ops-zoom, .jenvu-zoom-dashboard.ops-embed { zoom: 1.53; min-height: calc(100vh / 1.53); } }
-@media (min-width: 1920px) { .ops-zoom, .jenvu-zoom-dashboard.ops-embed { zoom: 1.63; min-height: calc(100vh / 1.63); } }
+/* ====== Ops Console size ======
+   Shell (sidebar + Overview, .ops-shell-zoom) = dashboard scale.
+   Standalone tool pages (.ops-zoom) = dashboard scale.
+   Tool pages inside the console frame get the hub's zoom (--ops-inner-zoom,
+   see src/lib/ops-zoom.ts): a bit larger than the dashboard. */
+@media (min-width: 1024px) { .ops-zoom, .ops-shell-zoom { zoom: 0.909; min-height: calc(100vh / 0.909); } }
+@media (min-width: 1200px) { .ops-zoom, .ops-shell-zoom { zoom: 1.005; min-height: calc(100vh / 1.005); } }
+@media (min-width: 1360px) { .ops-zoom, .ops-shell-zoom { zoom: 1.099; min-height: calc(100vh / 1.099); } }
+@media (min-width: 1500px) { .ops-zoom, .ops-shell-zoom { zoom: 1.195; min-height: calc(100vh / 1.195); } }
+@media (min-width: 1600px) { .ops-zoom, .ops-shell-zoom { zoom: 1.316; min-height: calc(100vh / 1.316); } }
+@media (min-width: 1680px) { .ops-zoom, .ops-shell-zoom { zoom: 1.388; min-height: calc(100vh / 1.388); } }
+@media (min-width: 1920px) { .ops-zoom, .ops-shell-zoom { zoom: 1.482; min-height: calc(100vh / 1.482); } }
+html[data-ops-z] .jenvu-zoom-dashboard.ops-embed,
+html[data-ops-z] .ops-zoom {
+  zoom: var(--ops-inner-zoom, 1) !important;
+  min-height: calc(100vh / var(--ops-inner-zoom, 1)) !important;
+}
 /* Ops sidebar: same feel as the dashboard console sidebar */
 .ops-side { background-color: var(--background); border-right: 1px solid var(--ops-line); }
 .ops-nav-item { color: var(--muted-foreground); }

@@ -1,7 +1,8 @@
 import JenvuMark from "@/components/JenvuMark";
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { OPS_ZOOM_MESSAGE, opsInnerZoomFor } from "@/lib/ops-zoom";
 import type { ReactNode } from "react";
 import {
   Activity,
@@ -82,6 +83,13 @@ function OpsHub() {
   const [ready, setReady] = useState(false);
   const [active, setActive] = useState<Tile | null>(null);
   const [navOpen, setNavOpen] = useState(false);
+  // Keep the open tool's size in step with the screen (see ops-zoom.ts).
+  const frameRef = useRef<HTMLIFrameElement | null>(null);
+  useEffect(() => {
+    const send = () => frameRef.current?.contentWindow?.postMessage({ type: OPS_ZOOM_MESSAGE, z: opsInnerZoomFor(window.innerWidth) }, "*");
+    window.addEventListener("resize", send);
+    return () => window.removeEventListener("resize", send);
+  }, []);
   const [dark, setDark] = useState(false);
   useEffect(() => setDark(readSiteTheme() === "dark"), []);
   const fetchCounts = useServerFn(opsPendingCounts);
@@ -181,7 +189,7 @@ function OpsHub() {
   return (
     <div className={`ops-console flex h-dvh w-full overflow-hidden bg-background text-foreground ${SANS} antialiased`}>
       {/* Desktop: pinned sidebar, same as the dashboard */}
-      <aside className="ops-side ops-zoom hidden w-[248px] shrink-0 lg:block" style={{ minHeight: 0 }}>
+      <aside className="ops-side ops-shell-zoom hidden w-[248px] shrink-0 lg:block" style={{ minHeight: 0 }}>
         {sidebar}
       </aside>
       {/* Phones: drawer */}
@@ -210,11 +218,11 @@ function OpsHub() {
                 Open in new tab ↗
               </a>
             </div>
-            <iframe key={active.key} src={toolUrl(active, true)} title={active.title} className="min-h-0 w-full flex-1 bg-background" />
+            <iframe ref={frameRef} key={active.key} src={toolUrl(active, true)} title={active.title} className="min-h-0 w-full flex-1 bg-background" />
           </div>
         ) : (
           <main className="min-h-0 flex-1 overflow-y-auto">
-            <div className="ops-zoom mx-auto w-full max-w-[1100px] px-5 pb-12 pt-8 sm:px-8 lg:pt-10" style={{ minHeight: 0 }}>
+            <div className="ops-shell-zoom mx-auto w-full max-w-[1100px] px-5 pb-12 pt-8 sm:px-8 lg:pt-10" style={{ minHeight: 0 }}>
               <h1 className="text-[30px] font-normal tracking-tight sm:text-[34px]">Overview</h1>
               <p className="mt-1 text-[14px] text-muted-foreground">
                 {total > 0 ? `${total} new item${total === 1 ? "" : "s"} waiting for you.` : "Nothing new waiting right now."}
@@ -304,5 +312,6 @@ function toolUrl(t: Tile, embed: boolean): string {
   }
   if (!embed) return base;
   const token = typeof window !== "undefined" ? window.sessionStorage.getItem("jenvu_ops_token") : null;
-  return `${base}${base.includes("?") ? "&" : "?"}embed=1${token ? `&t=${encodeURIComponent(token)}` : ""}`;
+  const z = typeof window !== "undefined" ? opsInnerZoomFor(window.innerWidth) : 1;
+  return `${base}${base.includes("?") ? "&" : "?"}embed=1&z=${z}${token ? `&t=${encodeURIComponent(token)}` : ""}`;
 }

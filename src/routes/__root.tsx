@@ -18,6 +18,7 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { installIntlGuard } from "../lib/intl-guard";
 import { initCrossDomainSession } from "../lib/cross-domain-session";
 import { applyHtmlTheme, SITE_THEME_BOOT_SCRIPT } from "../lib/site-theme";
+import { OPS_EMBED_ZOOM_BOOT_SCRIPT } from "../lib/ops-zoom";
 
 const googleAnalyticsId = import.meta.env.VITE_LOVABLE_CONNECTOR_GOOGLE_ANALYTICS_API_KEY;
 
@@ -294,6 +295,7 @@ function RootShell({ children }: { children: ReactNode }) {
     <html lang="en" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: SITE_THEME_BOOT_SCRIPT }} />
+        <script dangerouslySetInnerHTML={{ __html: OPS_EMBED_ZOOM_BOOT_SCRIPT }} />
         <HeadContent />
       </head>
 
