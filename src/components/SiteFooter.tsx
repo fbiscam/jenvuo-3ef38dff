@@ -65,7 +65,7 @@ type FooterLink = { to: string; label: string; ext?: boolean; href?: string };
 type FooterGroup = { label: string; links: FooterLink[] };
 
 const SOCIAL = {
-  x: "https://x.com/jenvu",
+  x: "https://x.com/itsjenvu",
   facebook: "https://www.facebook.com/jenvucompany/",
   whatsapp: "https://whatsapp.com/channel/0029VbB4UDs3bbV9jWIhxN3T",
 };
