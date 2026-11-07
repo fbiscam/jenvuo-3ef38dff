@@ -4,6 +4,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { createClient } from "@supabase/supabase-js";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
+import { canUploadDocuments, submissionBlock, DOCS_LOCKED_MESSAGE } from "@/lib/doc-submission";
 import type { Database } from "@/integrations/supabase/types";
 
 const ApplyInput = z.object({
@@ -834,40 +835,79 @@ export const getMyDocumentStatus = createServerFn({ method: "GET" })
     }
   });
 
+/** Final step of an upload: checks the rules, then locks the files for review. */
 export const markMyDocumentsSubmitted = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => z.object({ note: z.string().trim().max(1000).optional() }).parse(d))
   .handler(async ({ data, context }) => {
-    const email = (context.claims as any)?.email as string | undefined;
-    if (!email) throw new Error("No email on session");
-    const url = process.env.SUPABASE_URL;
-    const service = process.env.SUPABASE_SERVICE_ROLE_KEY;
-    if (!url || !service) throw new Error("Server not configured");
-    const admin = createClient<Database>(url, service, {
-      auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
+    const app = await getMyApplication(context, DOC_STATUS_FIELDS);
+    if (!app) throw new Error("No Founding application found for this account");
+    const admin = await getServiceClient();
+    const { data: docs } = await admin
+      .from("founding_documents" as any)
+      .select("doc_kind, created_at")
+      .eq("application_id", app.id)
+      .neq("doc_kind", "earning_proof");
+    const list = (docs ?? []) as any[];
+    const since = app.document_status === "needs_info" ? app.documents_info_requested_at : app.document_status === "rejected" ? app.documents_rejected_at : null;
+    const block = submissionBlock({
+      status: app.document_status,
+      kinds: {
+        identity: list.filter((d) => d.doc_kind === "identity").length,
+        driving_license: list.filter((d) => d.doc_kind === "driving_license").length,
+      },
+      newFiles: since ? list.filter((d) => String(d.created_at) > String(since)).length : list.length,
     });
-    const { data: row } = await admin
-      .from("founding_applications" as any)
-      .select("id, document_status")
-      .ilike("email", email)
-      .order("created_at", { ascending: false })
-      .limit(1)
-      .maybeSingle();
-    if (!row) throw new Error("No application found for this account");
-    const r = row as any;
-    if (r.document_status === "verified") return { ok: true, already: true };
+    if (block) throw new Error(block);
+    const now = new Date().toISOString();
     const { error } = await admin
       .from("founding_applications" as any)
       .update({
         document_status: "received",
-        documents_submitted_at: new Date().toISOString(),
+        documents_submitted_at: now,
         documents_note: data.note ?? null,
         documents_rejected_at: null,
         documents_rejected_reason: null,
-        updated_at: new Date().toISOString(),
+        documents_info_request: null,
+        documents_info_requested_at: null,
+        updated_at: now,
       })
-      .eq("id", r.id);
+      .eq("id", app.id);
     if (error) throw new Error(error.message);
+    if (app.email) {
+      try {
+        await enqueueApplicantEmail(
+          admin,
+          "documents_submitted",
+          String(app.email),
+          String(app.full_name || "there"),
+          String(app.requested_plan || "elite"),
+          `${app.id}-docs-submitted-${Date.now()}`,
+        );
+      } catch (e) {
+        console.error("[founding] docs-submitted email failed:", (e as Error)?.message);
+      }
+      try {
+        const { sendSystemMail } = await import("@/lib/system-mail.server");
+        const name = String(app.full_name || "there").split(/\s+/)[0];
+        await sendSystemMail({
+          from: "notifications@jenvu.email",
+          toUserId: context.userId,
+          subject: "We received your documents",
+          body: [
+            `Hi ${name},`,
+            ``,
+            `Thanks for sending over your identity documents — your document(s) are safely in our review queue.`,
+            ``,
+            `A real person on our team will review and update your status here, usually within 48 hours.`,
+            ``,
+            `— Jenvu Notifications`,
+          ].join("\n"),
+        });
+      } catch (e) {
+        console.error("[founding] system-mail docs-submitted failed:", (e as Error)?.message);
+      }
+    }
     return { ok: true };
   });
 
@@ -1084,7 +1124,8 @@ export const registerDocumentFile = createServerFn({ method: "POST" })
     if (!data.storage_path.startsWith(`${context.userId}/`)) {
       throw new Error("Invalid storage path");
     }
-    // Users can resubmit at any time after rejection or needs_info — no waiting window.
+    // Uploads are open only before the first submission or after a rejection / info request.
+    if (!canUploadDocuments(app.document_status)) throw new Error(DOCS_LOCKED_MESSAGE);
     const admin = await getServiceClient();
     // Server-side check: the file must actually exist in storage at that path, with a matching size.
     const slash = data.storage_path.lastIndexOf("/");
@@ -1109,86 +1150,28 @@ export const registerDocumentFile = createServerFn({ method: "POST" })
       doc_kind: data.doc_kind,
     });
     if (error) throw new Error(error.message);
-    // Bump application to "received" (unless verified)
-    if (app.document_status !== "verified") {
-      await admin
-        .from("founding_applications" as any)
-        .update({
-          document_status: "received",
-          documents_submitted_at: new Date().toISOString(),
-          documents_rejected_at: null,
-          documents_rejected_reason: null,
-          documents_info_request: null,
-          documents_info_requested_at: null,
-          updated_at: new Date().toISOString(),
-        })
-        .eq("id", app.id);
-      // Notify applicant that documents landed (idempotent per application submission window)
-      if (app.email) {
-        await enqueueApplicantEmail(
-          admin,
-          "documents_submitted",
-          String(app.email),
-          String(app.full_name || "there"),
-          String(app.requested_plan || "elite"),
-          `${app.id}-docs-submitted-${Date.now()}`,
-        );
-        try {
-          const { sendSystemMail } = await import("@/lib/system-mail.server");
-          const name = String(app.full_name || "there").split(/\s+/)[0];
-          await sendSystemMail({
-            from: "notifications@jenvu.email",
-            toUserId: context.userId,
-            subject: "We received your documents",
-            body: [
-              `Hi ${name},`,
-              ``,
-              `Thanks for sending over your identity documents — your document(s) are safely in our review queue.`,
-              ``,
-              `A real person on our team will review and update your status here, usually within 48 hours.`,
-              ``,
-              `— Jenvu Notifications`,
-            ].join("\n"),
-          });
-        } catch (e) {
-          console.error("[founding] system-mail docs-submitted failed:", (e as Error)?.message);
-        }
-      }
-    }
+    // Status changes only when the member presses Submit (markMyDocumentsSubmitted).
     return { ok: true };
   });
 
-export const listMyDocumentFiles = createServerFn({ method: "GET" })
+/** How many files of each kind the member has sent — no names or links: submitted files stay hidden. */
+export const getMyDocumentSummary = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .handler(async ({ context }): Promise<FoundingDocFile[]> => {
+  .handler(async ({ context }): Promise<{ identity: number; driving_license: number }> => {
     const app = await getMyApplication(context);
-    if (!app) return [];
+    if (!app) return { identity: 0, driving_license: 0 };
     const admin = await getServiceClient();
     const { data, error } = await admin
       .from("founding_documents" as any)
-      .select("id, application_id, storage_path, mime_type, file_size, original_name, doc_kind, created_at")
+      .select("doc_kind")
       .eq("application_id", app.id)
-      .neq("doc_kind", "earning_proof")
-      .order("created_at", { ascending: false });
+      .neq("doc_kind", "earning_proof");
     if (error) throw new Error(error.message);
-    return await signPaths(admin, (data ?? []) as any);
-  });
-
-export const deleteMyDocumentFile = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
-  .handler(async ({ data, context }) => {
-    const admin = await getServiceClient();
-    const { data: row } = await admin
-      .from("founding_documents" as any)
-      .select("id, user_id, storage_path")
-      .eq("id", data.id)
-      .maybeSingle();
-    const r = row as any;
-    if (!r || r.user_id !== context.userId) throw new Error("Not found");
-    await admin.storage.from(BUCKET).remove([r.storage_path]);
-    await admin.from("founding_documents" as any).delete().eq("id", data.id);
-    return { ok: true };
+    const list = (data ?? []) as any[];
+    return {
+      identity: list.filter((d) => d.doc_kind === "identity").length,
+      driving_license: list.filter((d) => d.doc_kind === "driving_license").length,
+    };
   });
 
 export type AdminDocSubmission = {
