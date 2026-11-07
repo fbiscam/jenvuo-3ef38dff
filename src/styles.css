@@ -2565,3 +2565,11 @@ html body .docs-code .tok-type, html body .docs-code .tok-var { color: #ffa657 !
 .ops-console :is(input, textarea, select):not([type="checkbox"]):not([type="radio"]) { border-color: var(--ops-line); }
 .ops-count { background-color: #ef4444; color: #ffffff !important; }
 .ops-tile:hover { border-color: color-mix(in oklab, var(--foreground) 22%, transparent); }
+
+/* ID not verified yet: pages are look-only (see IdViewOnly). */
+.id-view-only :is(button, input, textarea, select, [role="button"], [role="switch"], [role="checkbox"], [role="combobox"]) {
+  cursor: not-allowed;
+}
+.id-view-only :is(input, textarea, select) {
+  opacity: 0.7;
+}
