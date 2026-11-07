@@ -239,6 +239,20 @@
       "when": 1794036627138,
       "tag": "0033_founding_credit_is_plan_credit",
       "breakpoints": true
+    },
+    {
+      "idx": 34,
+      "version": "7",
+      "when": 1794037038178,
+      "tag": "0034_lock_submitted_documents",
+      "breakpoints": true
+    },
+    {
+      "idx": 35,
+      "version": "7",
+      "when": 1794037055357,
+      "tag": "0035_founding_docs_read_while_open",
+      "breakpoints": true
     }
   ]
 }
