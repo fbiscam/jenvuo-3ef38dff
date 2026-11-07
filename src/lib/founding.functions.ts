@@ -1056,7 +1056,14 @@ async function getMyApplication(context: any, fields = "id, email, full_name, re
     .order("created_at", { ascending: false })
     .limit(1)
     .maybeSingle();
-  return legacy as any;
+  const row = legacy as any;
+  if (!row) return null;
+  if (row.user_id && row.user_id !== context.userId) return null; // belongs to another account
+  if (!row.user_id) {
+    await linkApplicationToUser(admin, row.id, context.userId);
+    row.user_id = context.userId;
+  }
+  return row;
 }
 
 export const registerDocumentFile = createServerFn({ method: "POST" })
