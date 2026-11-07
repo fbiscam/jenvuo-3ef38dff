@@ -24,7 +24,7 @@ export const Route = createFileRoute("/founding")({
       {
         name: "description",
         content:
-          "Invite-only program for 100 Gold, Bitcoin and EUR/USD traders a month. Approved traders get 1 month of Pro or Elite; the plan's API credit ($10 Pro, $25 Elite) and JX Bot unlock once their ID is verified within 2 days.",
+          "Invite-only program for 100 Gold, Bitcoin and EUR/USD traders a month. Approved traders get 1 month of Pro or Elite; the plan's API credit ($25 Pro, $50 Elite) and JX Bot unlock once their ID is verified within 2 days.",
       },
       { property: "og:title", content: "Founding Trader Program" },
       {
