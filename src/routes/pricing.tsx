@@ -1,5 +1,5 @@
 import { DAILY_TARGET_PCT, DAILY_DRAWDOWN_PCT } from "@/lib/mt5-licenses";
-import { BuyBlockedDialog } from "@/components/BuyNowButton";
+import { showBuyBlocked } from "@/components/BuyNowButton";
 import SiteHeader from "@/components/SiteHeader";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import * as React from "react";
@@ -272,7 +272,6 @@ function PricingPage() {
         </p>
       </section>
 
-      <BuyBlockedDialog open={blocked !== null} onOpenChange={(v) => !v && setBlocked(null)} reason={blocked ?? "apply"} />
 
       {/* COMPARE */}
       <section id="compare" className="scroll-mt-24 mx-auto max-w-7xl px-5 py-14 sm:px-8">
