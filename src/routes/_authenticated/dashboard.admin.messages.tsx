@@ -115,9 +115,9 @@ function AdminMessagesPage() {
         </div>
       }
       tabs={FILTERS.map((f) => (
-        <OpsTab key={f.key} active={filter === f.key} onClick={() => setFilter(f.key)}>
+        <OpsTab key={f.key} active={filter === f.key} onClick={() => setFilter(f.key)} count={f.key === "new" ? counts[f.key] : undefined}>
           {f.label}
-          <span className="ml-1.5 tabular-nums text-muted-foreground">{counts[f.key]}</span>
+          {f.key !== "new" && <span className="ml-1.5 tabular-nums text-muted-foreground">{counts[f.key]}</span>}
         </OpsTab>
       ))}
     >

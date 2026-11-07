@@ -134,9 +134,14 @@ function AdminDocumentsPage() {
       description="Review ID and driving license uploads, then approve or reject"
       icon={<FileText />}
       tabs={["all", "received", "pending", "needs_info", "verified", "rejected"].map((s) => (
-        <OpsTab key={s} active={filter === s} onClick={() => setFilter(s)}>
+        <OpsTab
+          key={s}
+          active={filter === s}
+          onClick={() => setFilter(s)}
+          count={s === "received" || s === "pending" ? rows.filter((r) => r.document_status === s).length : undefined}
+        >
           <span className="capitalize">{s.replace("_", " ")}</span>
-          {s !== "all" && (
+          {s !== "all" && s !== "received" && s !== "pending" && (
             <span className="ml-1.5 tabular-nums text-muted-foreground">
               {rows.filter((r) => r.document_status === s).length}
             </span>
