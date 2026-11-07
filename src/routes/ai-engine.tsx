@@ -92,7 +92,7 @@ const CONTENT: IndustryContent = {
       label: "Billing and credits",
       title: "Plans and credits",
       text: "Pick Pro, Elite or Ultra and top up your wallet when you need more AI usage.",
-      points: ["$200 credit for verified Founding members", "Clear usage in your dashboard", "Top up from $5"],
+      points: ["Plan API credit for verified Founding members", "Clear usage in your dashboard", "Top up from $5"],
       link: "See pricing",
       href: "https://jenvu.com/pricing",
     },

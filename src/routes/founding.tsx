@@ -24,12 +24,12 @@ export const Route = createFileRoute("/founding")({
       {
         name: "description",
         content:
-          "Invite-only program for 100 Gold, Bitcoin and EUR/USD traders a month. Approved traders get 1 month of Pro or Elite; $200 credit and JX Bot unlock once their ID is verified within 2 days.",
+          "Invite-only program for 100 Gold, Bitcoin and EUR/USD traders a month. Approved traders get 1 month of Pro or Elite; the plan's API credit ($10 Pro, $25 Elite) and JX Bot unlock once their ID is verified within 2 days.",
       },
       { property: "og:title", content: "Founding Trader Program" },
       {
         property: "og:description",
-        content: "Approval unlocks 1 month of Pro or Elite. Verify your ID within 2 days to unlock $200 credit and JX Bot.",
+        content: "Approval unlocks 1 month of Pro or Elite. Verify your ID within 2 days to unlock the plan's API credit and JX Bot.",
       },
       { property: "og:url", content: "https://jenvu.com/founding" },
       { property: "og:type", content: "website" },

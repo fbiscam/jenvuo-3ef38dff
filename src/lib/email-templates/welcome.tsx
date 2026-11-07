@@ -84,7 +84,7 @@ const WelcomeEmail = ({
             <Text style={listItem}>
               4. Verify your ID from the{' '}
               <Link href={`${DASH}/overview`} style={linkStyle}>Dashboard</Link>{' '}
-              — your Terminal, JX Bot and $200 Founding credit open after it's checked.
+              — your Terminal, JX Bot and your plan's API credit open after it's checked.
             </Text>
 
             <Section style={{ textAlign: 'center', marginTop: 28 }}>

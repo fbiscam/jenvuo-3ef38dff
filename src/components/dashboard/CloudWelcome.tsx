@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Link } from "@tanstack/react-router";
 import { Check, Plus, ArrowRight } from "lucide-react";
 import { useAuthUser } from "@/hooks/useAuthUser";
-import { FOUNDING_CREDIT_USD, FOUNDING_MONTHS } from "@/lib/founding-offer";
+import { FOUNDING_CREDIT_LABEL, FOUNDING_MONTHS } from "@/lib/founding-offer";
 
 const QUICK_ACTIONS = [
   { label: "Create API key", to: "/dashboard/api" },
@@ -33,7 +33,7 @@ const RESOURCES: Record<string, Resource[]> = {
   "Billing and plans": [
     { title: "Plans and pricing", text: "Pro $29, Elite $59 and Ultra $99 per month.", to: "/pricing" },
     { title: "Manage billing", text: "Change plan, top up credit and see your invoices.", to: "/dashboard/billing" },
-    { title: "Founding Program", text: "1 month of Pro or Elite with $200 credit, Terminal access and JX Bot.", to: "/founding" },
+    { title: "Founding Program", text: "1 month of Pro or Elite with the plan's API credit, Terminal access and JX Bot.", to: "/founding" },
   ],
   General: [
     { title: "Help Center", text: "Answers about accounts, security, billing and the Terminal.", to: "/help" },
@@ -133,7 +133,7 @@ export default function CloudWelcome({ name: profileName }: { name?: string }) {
             ) : (
               <>
                 <p className="mt-6 text-[16px] leading-relaxed text-gc-ink">
-                  {FOUNDING_MONTHS} month of Pro or Elite with ${FOUNDING_CREDIT_USD} credit and full Terminal access.
+                  {FOUNDING_MONTHS} month of Pro or Elite with {FOUNDING_CREDIT_LABEL} API credit and full Terminal access.
                 </p>
                 <Link to="/founding" className="mt-4 inline-block text-[14px] font-medium text-gc-blue-deep hover:text-gc-navy">
                   Apply for founding program

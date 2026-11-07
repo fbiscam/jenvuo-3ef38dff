@@ -304,7 +304,7 @@ const AUDIENCES: Array<{ key: string; label: string; cards: AudienceCard[] }> = 
     key: "traders",
     label: "Traders",
     cards: [
-      { tag: "NEW TRADERS", text: "Approved Founding members get 30 days of Pro or Elite and $200 AI credit once their ID is verified", to: "/founding", img: tradeNeonStart },
+      { tag: "NEW TRADERS", text: "Approved Founding members get 30 days of Pro or Elite and the plan's API credit once their ID is verified", to: "/founding", img: tradeNeonStart },
       { tag: "JX BOT", text: "Run JX Bot on MetaTrader 5 with a daily auto-stop at your plan's target", to: "/pricing", img: tradeNeonPractice },
       { tag: "LEARN", text: "Read daily Gold insights and guides on sweeps, zones and order blocks", to: "/insights", img: tradeNeonLearn },
     ],
@@ -322,7 +322,7 @@ const AUDIENCES: Array<{ key: string; label: string; cards: AudienceCard[] }> = 
     key: "programs",
     label: "Special programs",
     cards: [
-      { tag: "FOUNDING PROGRAM", text: "Apply to the invite-only Founding Program for 1 month of Pro or Elite and $200 credit", to: "/founding", img: progFounding },
+      { tag: "FOUNDING PROGRAM", text: "Apply to the invite-only Founding Program for 1 month of Pro or Elite with API credit", to: "/founding", img: progFounding },
       { tag: "PLANS", text: "Choose Pro at $29, Elite at $59 or Ultra at $99, billed every month", to: "/pricing", img: progPlans },
       { tag: "SUPPORT", text: "Questions about plans, billing or JX Bot? Ask our support team", to: "/contact", img: progSupport },
     ],
@@ -453,7 +453,7 @@ export function CloudBuildWith() {
             <span className="whitespace-nowrap text-gc-blue-deep">designed for traders and AI</span>
           </h2>
           <p className="mt-4 max-w-[540px] text-[14px] leading-[1.55] text-gc-ink-muted sm:mt-5 sm:text-[16px] sm:leading-[1.6]">
-            Jenvu is for approved Founding Program members: Pro or Elite and the Terminal for 30 days, with $200 credit and JX Bot after ID verification.
+            Jenvu is for approved Founding Program members: Pro or Elite and the Terminal for 30 days, with the plan's API credit and JX Bot after ID verification.
           </p>
           <div className="mt-7 flex flex-wrap items-center gap-7">
             <Link

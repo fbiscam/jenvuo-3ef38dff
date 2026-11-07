@@ -135,7 +135,7 @@ function AdminFoundingPage() {
       const row = rows.find((r) => r.id === id);
       await update({ data: { id, status: "active", plan: row ? planFor(row) : "pro" } });
       setRows((prev) => prev.map((r) => (r.id === id ? { ...r, status: "active" } : r)));
-      toast.success("Funded: $200 API credit added to the member's account");
+      toast.success("Funded: the plan's API credit was added to the member's account");
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Update failed");
     } finally {
@@ -266,7 +266,7 @@ function AdminFoundingPage() {
                           Wants: {r.requested_plan}
                         </span>
                       )}
-                      <span className="inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Grants: {planFor(r) === "elite" ? "Elite" : "Pro"} · 30 days · $200</span>
+                      <span className="inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Grants: {planFor(r) === "elite" ? "Elite" : "Pro"} · 30 days · ${planFor(r) === "elite" ? 25 : 10}</span>
                       <span
                         className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide ${
                           STATUS_STYLES[r.status] || "bg-muted text-foreground"
@@ -363,10 +363,10 @@ function AdminFoundingPage() {
                       <button
                         disabled={busy === r.id + "profit" || (r as any).document_status !== "verified"}
                         onClick={() => markProfit(r.id)}
-                        title={(r as any).document_status !== "verified" ? "Verify the member's ID first" : "Add the $200 Founding API credit"}
+                        title={(r as any).document_status !== "verified" ? "Verify the member's ID first" : "Add the plan's API credit"}
                         className="inline-flex items-center gap-1 rounded-lg bg-gc-amber px-2.5 py-1.5 text-[12px] font-medium text-gc-on-blue hover:bg-gc-amber/90 disabled:cursor-not-allowed disabled:opacity-50"
                       >
-                        {(r as any).document_status === "verified" ? "Fund $200 credit" : "Fund (verify ID first)"}
+                        {(r as any).document_status === "verified" ? `Fund $${planFor(r) === "elite" ? 25 : 10} credit` : "Fund (verify ID first)"}
                       </button>
                     )}
                     {r.status === "rejected" && (

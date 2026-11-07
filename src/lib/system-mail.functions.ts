@@ -20,7 +20,7 @@ export const sendWelcomeSystemMail = createServerFn({ method: "POST" })
       `Here's what you can do next:`,
       `• Open the Terminal for live Gold, Bitcoin and EUR/USD charts`,
       `• Ask anything in Chat with 60+ AI models`,
-      `• Verify your ID to open the Terminal, JX Bot and your $200 Founding credit (dash.jenvu.com/documents)`,
+      `• Verify your ID to open the Terminal, JX Bot and your plan's API credit (dash.jenvu.com/documents)`,
       `• Reply to this message any time — support@jenvu.email is monitored by our team`,
       ``,
       `— The Jenvu Team`,
