@@ -217,6 +217,8 @@ function PricingPage() {
               <span className="text-[44px] font-medium leading-none tracking-tight">$0</span>
               <span className="text-[14px] text-gc-ink-muted">/ 30 days</span>
             </div>
+            {/* Same-height price note as the paid cards so every button sits on one line. */}
+            <p className="mt-1.5 min-h-[18px] text-[12px] leading-[18px] text-gc-ink-muted">Invite only · ID verified</p>
             <div className="mt-5">
               {member ? (
                 <div className={`${btnBase} border border-gc-line bg-gc-surface`}>You're a member</div>
@@ -245,11 +247,11 @@ function PricingPage() {
                 <span className="text-[44px] font-medium leading-none tracking-tight">${priceOf(planPrice(plan.key, founding))}</span>
                 <span className="text-[14px] text-gc-ink-muted">{suffix}</span>
               </div>
-              {founding && (
-                <p className="mt-1.5 text-[12px] text-gc-ink-muted">
-                  Terminal + API ${TERMINAL_API_PRICE[plan.key]} + JX Bot ${JX_BOT_PRICE[plan.key]}
-                </p>
-              )}
+              <p className="mt-1.5 min-h-[18px] text-[12px] leading-[18px] text-gc-ink-muted">
+                {founding
+                  ? `Terminal + API $${TERMINAL_API_PRICE[plan.key]} + JX Bot $${JX_BOT_PRICE[plan.key]}`
+                  : "Terminal + API"}
+              </p>
               <div className="mt-5">{planCta(plan.key)}</div>
               <Summary big={plan.big} label={plan.bigLabel} />
               <FeatureList title="Platform & AI" items={plan.features} />

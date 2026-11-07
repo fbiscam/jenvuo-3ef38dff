@@ -8,6 +8,7 @@ import { useAuthUser } from "@/hooks/useAuthUser";
 import { supabase } from "@/integrations/supabase/client";
 import { readCachedAvatar, writeCachedAvatar, AVATAR_TTL_SECONDS } from "@/lib/avatar-cache";
 import { getDefaultAvatar } from "@/lib/default-avatar";
+import { signOutAndRedirect } from "@/lib/cross-domain-session";
 
 /** Current page in the top menu: dark text with a blue line along the bottom of the header. */
 const ACTIVE = { className: "!bg-muted !text-foreground" };
@@ -147,6 +148,16 @@ export default function SiteHeader() {
                         {it.label} <span className="text-[11px] text-muted-foreground">↗</span>
                       </Link>
                     ))}
+                    {isAuthed && (
+                      <button
+                        type="button"
+                        role="menuitem"
+                        onClick={() => { setTryOpen(false); void signOutAndRedirect("/"); }}
+                        className="mt-1 flex w-full items-center rounded-lg border-t border-border px-3 py-2.5 text-left text-foreground hover:bg-muted"
+                      >
+                        Sign out
+                      </button>
+                    )}
                   </div>
                 </div>
               )}
@@ -210,6 +221,15 @@ export default function SiteHeader() {
                   Dashboard
                   <span className={`${MONO} text-[10px] opacity-70 ml-1.5`}>↗</span>
                 </Link>
+              ) : null}
+              {isAuthed ? (
+                <button
+                  type="button"
+                  onClick={() => { setMobileMenuOpen(false); void signOutAndRedirect("/"); }}
+                  className="mx-3 mt-2 inline-flex items-center justify-center rounded-lg px-3 py-2.5 text-sm font-medium text-foreground hover:bg-muted"
+                >
+                  Sign out
+                </button>
               ) : (
                 <div className="mt-2 grid grid-cols-2 gap-2 px-3">
                   <Link
