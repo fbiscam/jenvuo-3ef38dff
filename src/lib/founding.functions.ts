@@ -333,17 +333,41 @@ export const submitFoundingApplication = createServerFn({ method: "POST" })
         ? data.referrer_email.toLowerCase()
         : null;
 
+    const email = data.email.toLowerCase();
+    // Lookups need the server key: signed-out visitors can't read applications, so a
+    // publishable-key check always came back empty and the insert then failed on the
+    // unique email/referrer index with a misleading "already applied" message.
+    const reader = service
+      ? createClient<Database>(url, service, { auth: { storage: undefined, persistSession: false, autoRefreshToken: false } })
+      : supabase;
+
+    const { data: prior } = await reader
+      .from("founding_applications" as any)
+      .select("id, status, user_id")
+      .eq("email", email)
+      .limit(1)
+      .maybeSingle();
+    const priorRow = prior as { id: string; status: string | null; user_id: string | null } | null;
+    let hasAccount = false;
+    if (priorRow?.user_id && service) {
+      const { data: u } = await (reader as any).auth.admin.getUserById(priorRow.user_id);
+      hasAccount = Boolean(u?.user);
+    }
+    const { foundingReapplyDecision } = await import("@/lib/founding-reapply");
+    const decision = foundingReapplyDecision(priorRow, hasAccount);
+    if (decision.action === "block") return { ok: false, error: decision.error };
+
     // Prevent the same referrer email from being reused across multiple applications
     if (normalizedReferrer) {
-      if (normalizedReferrer === data.email.toLowerCase()) {
+      if (normalizedReferrer === email) {
         return { ok: false, error: "You can't refer yourself." };
       }
-      const { data: existing } = await supabase
+      let refQuery = reader
         .from("founding_applications" as any)
         .select("id")
-        .eq("referrer_email", normalizedReferrer)
-        .limit(1)
-        .maybeSingle();
+        .eq("referrer_email", normalizedReferrer);
+      if (priorRow) refQuery = refQuery.neq("id", priorRow.id);
+      const { data: existing } = await refQuery.limit(1).maybeSingle();
       if (existing) {
         return {
           ok: false,
@@ -367,9 +391,17 @@ export const submitFoundingApplication = createServerFn({ method: "POST" })
     const writer = service
       ? createClient<Database>(url, service, { auth: { storage: undefined, persistSession: false, autoRefreshToken: false } })
       : supabase;
+    // Reopen: a rejected applicant, or one whose account was removed, starts fresh.
+    if (decision.action === "reopen" && priorRow) {
+      const { error: delErr } = await writer.from("founding_applications" as any).delete().eq("id", priorRow.id);
+      if (delErr) {
+        console.error("[founding] reopen failed:", delErr.message);
+        return { ok: false, error: "Could not submit. Please try again." };
+      }
+    }
     const { error } = await writer.from("founding_applications" as any).insert({
       full_name: data.full_name,
-      email: data.email.toLowerCase(),
+      email,
       whatsapp_number: data.whatsapp_number,
       country: data.country || null,
       broker: data.broker || null,
@@ -384,7 +416,10 @@ export const submitFoundingApplication = createServerFn({ method: "POST" })
     if (error) {
       const msg = error.message.toLowerCase();
       if (msg.includes("duplicate") || msg.includes("unique")) {
-        return { ok: false, error: "You've already applied. We'll be in touch." };
+        if (msg.includes("referrer")) {
+          return { ok: false, error: "This referral email has already been used on another application." };
+        }
+        return { ok: false, error: "Your application is already in and under review. We'll email you soon." };
       }
       console.error("[founding] insert failed:", error.message);
       return { ok: false, error: "Could not submit. Please try again." };
