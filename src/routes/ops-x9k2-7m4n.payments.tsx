@@ -13,7 +13,8 @@ import {
 } from "@/lib/ops-payments.functions";
 import { networkMeta } from "@/lib/payments/shared";
 import { RefreshCw, Wallet } from "lucide-react";
-import { OpsPage, OpsStats, OpsTab, ops } from "@/components/ops/OpsPage";
+import { OpsCount, OpsPage, OpsStats, OpsTab, ops } from "@/components/ops/OpsPage";
+import { opsPendingCounts } from "@/lib/ops-counts.functions";
 
 export const Route = createFileRoute("/ops-x9k2-7m4n/payments")({
   head: () => ({
