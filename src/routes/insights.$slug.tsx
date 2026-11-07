@@ -169,7 +169,7 @@ function InsightDetailPage() {
             <h1 className="mx-auto max-w-[820px] text-[34px] font-normal leading-[1.12] tracking-[-0.8px] text-gc-ink sm:text-[48px]">
               {insight.title}
             </h1>
-            {insight.excerpt && (
+            {insight.excerpt && !excerptRepeatsBody(insight.excerpt, insight.content) && (
               <p className="mx-auto mt-6 max-w-[540px] text-[17px] leading-[1.6] text-gc-ink">{insight.excerpt}</p>
             )}
             <div className="mt-6 text-[13px] text-gc-ink-muted">
@@ -242,6 +242,12 @@ function InsightDetailPage() {
       <InsightsFooter />
     </div>
   );
+}
+
+/** Skip the subtitle when it is just the cut-off start of the first paragraph. */
+function excerptRepeatsBody(excerpt: string, content: string | null | undefined): boolean {
+  const head = excerpt.replace(/(\.\.\.|…)\s*$/, "").trim().slice(0, 80);
+  return !!head && (content || "").replace(/^#.*\n+/, "").trimStart().startsWith(head);
 }
 
 function readMinutes(content: string | null | undefined): number {
