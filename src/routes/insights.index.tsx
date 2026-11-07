@@ -14,7 +14,7 @@ type Insight = Tables<"insights">;
 
 // Format date deterministically in UTC so SSR and client match exactly.
 const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-export function fmtDate(iso: string) {
+function fmtDate(iso: string) {
   const d = new Date(iso);
   return `${MONTHS[d.getUTCMonth()]} ${d.getUTCDate()}, ${d.getUTCFullYear()}`;
 }
@@ -24,7 +24,7 @@ export const insightsQueryOptions = queryOptions({
   queryFn: async () => {
     const { data, error } = await supabase
       .from("insights")
-      .select("id, title, slug, excerpt, content, category, image_url, is_breaking, published_at, created_at, updated_at, indexed_at")
+      .select("id, title, slug, excerpt, category, image_url, is_breaking, published_at, created_at, updated_at, indexed_at")
       .order("published_at", { ascending: false });
 
     if (error) throw error;
