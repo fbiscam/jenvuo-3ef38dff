@@ -6,12 +6,20 @@ export const TERMINAL_UNLOCK_STATUSES = ["approved", "active", "graduated", "ver
 /** Founding members must submit ID verification within this window after approval. */
 export const ID_VERIFICATION_GRACE_MS = 2 * 24 * 60 * 60 * 1000;
 
-/** Document states that count as "ID verification done" for the Terminal grace rule. */
-const ID_DONE_STATUSES = ["received", "pending", "verified"];
+/** Document states meaning the ID was sent and is waiting for review. */
+const ID_SENT_STATUSES = ["received", "pending"];
+
+/** The Founding month: Terminal and JX Bot end this long after approval (unless a paid plan is bought). */
+export const FOUNDING_PERIOD_MS = 30 * 24 * 60 * 60 * 1000;
+
+/** Locked reasons that keep their own message instead of the generic "apply" one. */
+const KEPT_LOCK_REASONS = ["id_required", "id_pending", "id_overdue", "founding_ended"];
 
 export type TerminalAccess = {
   allowed: boolean;
-  reason: "admin" | "founding" | "paid" | "trial" | "trial_ended" | "no_plan" | "not_founding" | "id_overdue";
+  reason:
+    | "admin" | "founding" | "paid" | "trial" | "trial_ended" | "no_plan" | "not_founding"
+    | "id_required" | "id_pending" | "id_overdue" | "founding_ended";
   /** ISO deadline for ID verification, only while it is still outstanding. */
   idDeadline: string | null;
   /** True when documents are submitted but not yet approved. */
@@ -62,7 +70,7 @@ export function evaluateTerminalAccess(plan: TerminalAccess | null): TerminalAcc
   const base = plan ?? { allowed: false, reason: "not_founding", idDeadline: null, idSubmitted: false, trialEndsAt: null };
   const allowed = base.allowed && (base.reason === "admin" || base.reason === "founding" || base.reason === "paid");
   if (allowed) return base;
-  return { ...base, allowed: false, reason: base.reason === "id_overdue" ? "id_overdue" : "not_founding" };
+  return { ...base, allowed: false, reason: KEPT_LOCK_REASONS.includes(base.reason) ? base.reason : "not_founding" };
 }
 
 function escapeLike(v: string) {
@@ -71,15 +79,21 @@ function escapeLike(v: string) {
 
 type Row = { id: string; approved_at: string | null; created_at: string | null; document_status: string | null };
 
+/**
+ * Founding rule: the Terminal (and JX Bot) open only once the ID is verified, and the
+ * Founding month ends 30 days after approval. Before verification the member has 2 days
+ * to send the ID; after 30 days they need a paid plan.
+ */
 export function evaluateFoundingRow(row: Row, now = Date.now()): TerminalAccess {
   const doc = (row.document_status || "").toLowerCase();
-  if (doc === "verified") return { allowed: true, reason: "founding", idDeadline: null, idSubmitted: false };
-  if (ID_DONE_STATUSES.includes(doc)) return { allowed: true, reason: "founding", idDeadline: null, idSubmitted: true };
   const start = Date.parse(row.approved_at || row.created_at || "") || now;
+  if (now >= start + FOUNDING_PERIOD_MS) return { allowed: false, reason: "founding_ended", idDeadline: null, idSubmitted: doc === "verified" };
+  if (doc === "verified") return { allowed: true, reason: "founding", idDeadline: null, idSubmitted: true };
+  if (ID_SENT_STATUSES.includes(doc)) return { allowed: false, reason: "id_pending", idDeadline: null, idSubmitted: true };
   const deadline = start + ID_VERIFICATION_GRACE_MS;
   const iso = new Date(deadline).toISOString();
   if (now > deadline) return { allowed: false, reason: "id_overdue", idDeadline: iso, idSubmitted: false };
-  return { allowed: true, reason: "founding", idDeadline: iso, idSubmitted: false };
+  return { allowed: false, reason: "id_required", idDeadline: iso, idSubmitted: false };
 }
 
 /**
@@ -133,6 +147,7 @@ export async function checkPlanAccess(
   // Founding members past the ID deadline stay locked (their Founding month is a trial
   // subscription) until they send their ID or buy a paid plan.
   if (row && (!plan.allowed || plan.reason === "trial")) return evaluateFoundingRow(row);
+  // An ended Founding trial (plan already moved back to Free) still says why it is locked.
   return plan;
 }
 

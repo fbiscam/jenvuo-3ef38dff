@@ -24,13 +24,27 @@ describe("Terminal access (Founding members only)", () => {
     const plan = evaluatePlanAccess(sub({ plan_id: "pro", status: "active", current_period_end: iso(now + day) }), now);
     expect(evaluateTerminalAccess(plan).allowed).toBe(true);
   });
-  it("an approved Founding member opens it inside the 2-day ID window", () => {
+  it("an approved Founding member stays locked until the ID is verified", () => {
     const row = { id: "a", approved_at: iso(now - day), created_at: null, document_status: null };
-    expect(evaluateTerminalAccess(evaluateFoundingRow(row, now)).allowed).toBe(true);
+    const r = evaluateTerminalAccess(evaluateFoundingRow(row, now));
+    expect(r.allowed).toBe(false);
+    expect(r.reason).toBe("id_required");
   });
-  it("a Founding member with a verified ID keeps it open", () => {
+  it("a sent but not yet approved ID keeps the Terminal locked", () => {
+    const row = { id: "a", approved_at: iso(now - day), created_at: null, document_status: "pending" };
+    const r = evaluateTerminalAccess(evaluateFoundingRow(row, now));
+    expect(r.allowed).toBe(false);
+    expect(r.reason).toBe("id_pending");
+  });
+  it("a Founding member with a verified ID opens the Terminal", () => {
     const row = { id: "a", approved_at: iso(now - 10 * day), created_at: null, document_status: "verified" };
     expect(evaluateTerminalAccess(evaluateFoundingRow(row, now)).allowed).toBe(true);
+  });
+  it("the Founding month ends 30 days after approval", () => {
+    const row = { id: "a", approved_at: iso(now - 30 * day), created_at: null, document_status: "verified" };
+    const r = evaluateTerminalAccess(evaluateFoundingRow(row, now));
+    expect(r.allowed).toBe(false);
+    expect(r.reason).toBe("founding_ended");
   });
   it("a free account keeps the paid chart strategies locked", () => {
     expect(evaluateStrategyAccess(evaluatePlanAccess(null, now)).allowed).toBe(false);
@@ -50,9 +64,9 @@ describe("Terminal access (Founding members only)", () => {
     expect(running.allowed).toBe(true);
     expect(ended.allowed).toBe(false);
   });
-  it("Founding member inside the 2-day ID window has paid features", () => {
+  it("Founding member without a verified ID has no paid features yet", () => {
     const row = { id: "a", approved_at: iso(now - day), created_at: null, document_status: null };
-    expect(evaluateFoundingRow(row, now).allowed).toBe(true);
+    expect(evaluateFoundingRow(row, now).allowed).toBe(false);
   });
   it("Founding member past the 2-day ID window is locked out of the Terminal", () => {
     const row = { id: "a", approved_at: iso(now - 3 * day), created_at: null, document_status: null };
