@@ -20,7 +20,7 @@ export type CatalogModel = {
 
 export const PROVIDERS: Record<ProviderKey, { label: string; blurb: string }> = {
   anthropic: { label: "Anthropic", blurb: "Claude models for deep reasoning, long documents." },
-  openai: { label: "OpenAI", blurb: "GPT models for general chat, tools and structured answers." },
+  openai: { label: "OpenAI", blurb: "GPT models for general chat, tools & structured answers." },
   google: { label: "Google", blurb: "Gemini and Gemma models with long context and fast." },
   deepseek: { label: "DeepSeek", blurb: "Open-weight models with strong maths and code." },
   qwen: { label: "Qwen", blurb: "Alibaba's Qwen family, from compact 27B to Max." },
