@@ -21,7 +21,7 @@ import {
   type PaymentOrder,
   type Quote,
 } from "@/lib/payments/shared";
-import { planPrice } from "@/lib/plan-pricing";
+import { planPrice, isPaidPlanId, PLAN_API_CREDIT } from "@/lib/plan-pricing";
 import { planFeatures } from "@/lib/plan-features";
 import { getFoundingMembership } from "@/lib/mt5-licenses.functions";
 import { purchaseGate, PURCHASE_BLOCK_MESSAGE } from "@/lib/founding-bot";
@@ -419,7 +419,10 @@ function PayPage() {
                   </div>
                   <p className="mt-1 text-[13px] text-gc-ink-muted">
                     {mode === "upgrade" ? (
-                      <>Upgrade to <span className="text-gc-ink">{PLANS.find((p) => p.id === selectedPlanId)?.name}</span> plan</>
+                      <>
+                        Upgrade to <span className="text-gc-ink">{PLANS.find((p) => p.id === selectedPlanId)?.name}</span> plan
+                        {isPaidPlanId(selectedPlanId) && <> · includes <span className="text-gc-ink">${PLAN_API_CREDIT[selectedPlanId]}</span> API credit</>}
+                      </>
                     ) : (
                       <>You receive <span className="text-gc-ink">${(quote?.creditUsd ?? effAmount).toFixed(2)}</span> in credit</>
                     )}

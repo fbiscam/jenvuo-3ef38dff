@@ -57,6 +57,13 @@ export const createTopupOrder = createServerFn({ method: "POST" })
     const suffix = Math.floor(Math.random() * 89 + 10) / 100;
     const payAmount = Math.round((quote.payUsd + suffix) * 100) / 100;
 
+    // A plan payment adds only that plan's API credit, so the order records that amount.
+    const { isPaidPlanId, PLAN_API_CREDIT } = await import("@/lib/plan-pricing");
+    if (isPaidPlanId(data.planId)) {
+      quote.creditUsd = PLAN_API_CREDIT[data.planId];
+      quote.bonusUsd = 0;
+    }
+
     const { data: authData } = await supabase.auth.getUser();
     const { data: row, error } = await supabaseAdmin
       .from("payment_orders")

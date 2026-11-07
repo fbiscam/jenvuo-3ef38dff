@@ -51,3 +51,5 @@
 - [x] Contact page: required WhatsApp number
 - [x] Email box: Received tab with contact messages
 - [x] Admin pages same width/sections as dashboard pages
+- [x] Verify ID notice: no box/border, green button, phone-friendly, in the 2FA notice spot
+- [x] Plan payments add only the plan's API credit (Pro $10, Elite $25, Ultra $50); existing balances corrected

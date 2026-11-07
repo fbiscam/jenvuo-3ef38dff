@@ -1,10 +1,10 @@
 import { DAILY_TARGET_PCT } from "@/lib/mt5-licenses";
-import { JX_BOT_PRICE, TERMINAL_API_PRICE } from "@/lib/plan-pricing";
+import { JX_BOT_PRICE, PLAN_API_CREDIT, TERMINAL_API_PRICE } from "@/lib/plan-pricing";
 
 export type PaidPlanId = "pro" | "elite" | "ultra";
 
 const IPS: Record<PaidPlanId, number> = { pro: 1, elite: 2, ultra: 5 };
-const WALLET: Record<PaidPlanId, number> = { pro: 10, elite: 25, ultra: 50 };
+const WALLET = PLAN_API_CREDIT;
 const API_KEYS: Record<PaidPlanId, number> = { pro: 2, elite: 3, ultra: 5 };
 
 /**

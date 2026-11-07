@@ -267,21 +267,46 @@ export async function approveOrder(orderId: string, by: string) {
   if (!order) throw new Error("Order not found.");
   if (order.status === "approved") return { ok: true as const, alreadyDone: true };
 
-  const credit = Number(order.credit_usd);
+  const { isPaidPlanId, orderCreditToAdd } = await import("@/lib/plan-pricing");
+  const isPlanOrder = isPaidPlanId(order.target_plan_id);
+  const meta = {
+    order_id: order.id,
+    network: order.network,
+    tx_hash: order.tx_hash,
+    promo_code: order.promo_code,
+    bonus_usd: Number(order.bonus_usd ?? 0),
+    approved_by: by,
+  };
+  let credit: number;
 
-  await creditWallet({
-    userId: order.user_id,
-    amount: credit,
-    reason: "topup_crypto",
-    metadata: {
-      order_id: order.id,
-      network: order.network,
-      tx_hash: order.tx_hash,
-      promo_code: order.promo_code,
-      bonus_usd: Number(order.bonus_usd ?? 0),
-      approved_by: by,
-    },
-  });
+  if (isPlanOrder) {
+    // Plan payment: start the plan, then add only that plan's API credit. The rest of the
+    // price pays for Terminal / JX Bot access and never lands in the wallet.
+    const balanceOf = async () => {
+      const { data } = await supabaseAdmin.from("credit_balances").select("balance").eq("user_id", order.user_id).maybeSingle();
+      return Number(data?.balance ?? 0);
+    };
+    const before = await balanceOf();
+    let applied: string | null = null;
+    try {
+      applied = await applyPlanForPayment(order.user_id, Number(order.pay_amount_usd ?? 0), order.target_plan_id);
+      await ensureMt5License(order.user_id);
+    } catch (e) {
+      console.error("plan upgrade on approval failed", (e as Error)?.message);
+    }
+    const after = await balanceOf();
+    credit = orderCreditToAdd({ planId: applied ?? order.target_plan_id, topupCreditUsd: 0, gainedFromPlanSwitch: after - before });
+    if (credit > 0) {
+      await creditWallet({ userId: order.user_id, amount: credit, reason: "plan_credit", metadata: { ...meta, plan_id: applied ?? order.target_plan_id } });
+    }
+    credit = Math.round(Math.max(0, after - before + credit) * 100) / 100;
+  } else {
+    // Credit top-up: adds exactly the credit bought and never changes the plan.
+    credit = orderCreditToAdd({ planId: null, topupCreditUsd: Number(order.credit_usd) });
+    if (credit > 0) {
+      await creditWallet({ userId: order.user_id, amount: credit, reason: "topup_crypto", metadata: meta });
+    }
+  }
 
   if (order.promo_code) {
     await supabaseAdmin.from("promo_redemptions").insert({
@@ -292,14 +317,6 @@ export async function approveOrder(orderId: string, by: string) {
       bonus_usd: Number(order.bonus_usd ?? 0),
     });
     await bumpPromoUsage(order.promo_code);
-  }
-
-  // Paid amount (excluding promo bonus) decides the plan tier.
-  try {
-    await applyPlanForPayment(order.user_id, Number(order.pay_amount_usd ?? credit), order.target_plan_id);
-    await ensureMt5License(order.user_id);
-  } catch (e) {
-    console.error("plan upgrade on approval failed", (e as Error)?.message);
   }
 
 

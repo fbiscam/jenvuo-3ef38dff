@@ -3,6 +3,7 @@ import { Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { Lock, ShieldAlert, ShieldCheck } from "lucide-react";
 import { getTerminalAccess } from "@/lib/terminal-access.functions";
+import { BANNER_PRIORITY, useBannerSlot } from "@/lib/banner-slot";
 
 export type TerminalAccessState = {
   loading: boolean;
@@ -76,37 +77,40 @@ export function IdVerificationDeadlineNotice({ access }: { access: TerminalAcces
   return (
     <VerifyNotice
       tone="warn"
-      title="Verify your ID"
-      text={`Send it by ${when} (${formatLeft(left)} left). The Terminal and JX Bot open once it is approved.`}
+      title={`Verify your ID · ${formatLeft(left)} left`}
+      text={`Send it by ${when}. The Terminal and JX Bot open once it is approved.`}
       action="Verify ID now"
     />
   );
 }
 
 /**
- * One themed ID-verification notice (rounded strip, small text, pill button). Both the
- * Founding 2-day deadline and the general "verify identity" banner use it.
+ * One ID-verification notice: a slim strip in the dashboard's top notice spot (where the
+ * 2FA reminder shows), no box or border, green pill button. Shares the one-notice slot so
+ * it never stacks with the 2FA / announcement strips.
  */
 export function VerifyNotice({ tone = "info", title, text, action }: { tone?: "info" | "warn" | "error"; title: string; text: string; action: string }) {
-  const dot = tone === "error" ? "bg-destructive" : tone === "warn" ? "bg-gc-amber" : "bg-gc-ink-muted";
+  const active = useBannerSlot("verifyId", BANNER_PRIORITY.verify, true);
+  if (!active) return null;
+  const dot = tone === "error" ? "bg-destructive" : tone === "warn" ? "bg-gc-amber" : "bg-gc-green";
   return (
-    <div className="verify-notice mb-5 flex w-full items-center gap-3.5 rounded-xl border border-gc-line bg-gc-surface px-4 py-3 max-sm:flex-wrap sm:gap-4 sm:px-5">
-      <span className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-gc-line bg-background">
-        <ShieldAlert className="h-4 w-4 text-gc-ink" aria-hidden="true" />
-        <span className={`absolute -right-1 -top-1 h-2.5 w-2.5 rounded-full ring-2 ring-gc-surface ${dot}`} aria-hidden="true" />
+    <section className="verify-notice grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-x-3 bg-transparent py-1.5 pl-3.5 pr-4 sm:gap-x-4 sm:pl-5 md:pr-5">
+      <span className="relative flex h-4 w-4 shrink-0 items-center justify-center">
+        <ShieldAlert className="h-4 w-4 text-gc-ink-muted" aria-hidden="true" />
+        <span className={`absolute -right-0.5 -top-0.5 h-1.5 w-1.5 rounded-full ${dot}`} aria-hidden="true" />
       </span>
-      <div className="min-w-0 flex-1">
-        <p className="text-[14px] font-medium leading-snug text-gc-ink">{title}</p>
-        <p className="mt-0.5 text-[13px] leading-snug text-gc-ink-muted">{text}</p>
-      </div>
+      <p className="min-w-0 line-clamp-2 text-[12px] leading-snug text-gc-ink sm:line-clamp-none sm:truncate sm:text-[12.5px]">
+        <span className="font-medium">{title}</span>
+        <span className="text-gc-ink-muted"> — {text}</span>
+      </p>
       <Link
         to="/dashboard/documents"
-        className="verify-cta inline-flex h-9 shrink-0 items-center justify-center gap-1.5 rounded-full px-4 text-[13px] font-medium transition-opacity hover:opacity-90 max-sm:w-full"
+        className="verify-cta inline-flex h-7 shrink-0 items-center justify-center gap-1 whitespace-nowrap rounded-full px-3 text-[12px] font-medium transition-opacity hover:opacity-90"
       >
         <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" />
         {action}
       </Link>
-    </div>
+    </section>
   );
 }
 
