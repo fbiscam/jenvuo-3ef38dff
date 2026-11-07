@@ -3,17 +3,17 @@ import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
-import { UploadCloud, Trash2, FileVideo, FileImage, FileText, Check, ShieldCheck } from "lucide-react";
+import { UploadCloud, Trash2, FileVideo, FileImage, FileText, Check, ShieldCheck, Lock } from "lucide-react";
 import { SettingsCard, SettingsFlat, SettingsRow } from "@/components/settings/SettingsCard";
 import { supabase } from "@/integrations/supabase/client";
 import {
   getMyDocumentStatus,
-  listMyDocumentFiles,
+  getMyDocumentSummary,
   registerDocumentFile,
-  deleteMyDocumentFile,
+  markMyDocumentsSubmitted,
   type DocumentStatusRow,
-  type FoundingDocFile,
 } from "@/lib/founding.functions";
+import { canUploadDocuments, submissionBlock } from "@/lib/doc-submission";
 
 export const Route = createFileRoute("/_authenticated/dashboard/documents")({
   head: () => ({ meta: [
@@ -67,13 +67,13 @@ function FileIcon({ mime }: { mime: string }) {
 function DocumentsPage() {
   const qc = useQueryClient();
   const fetchStatus = useServerFn(getMyDocumentStatus);
-  const fetchFiles = useServerFn(listMyDocumentFiles);
+  const fetchSummary = useServerFn(getMyDocumentSummary);
   const register = useServerFn(registerDocumentFile);
-  const remove = useServerFn(deleteMyDocumentFile);
+  const finalize = useServerFn(markMyDocumentsSubmitted);
   const inputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState<string>("");
-  const [pending, setPending] = useState<File[]>([]);
+  const [pending, setPending] = useState<{ file: File; kind: DocKind }[]>([]);
   const [docKind, setDocKind] = useState<DocKind>("identity");
 
   const { data: row, isLoading } = useQuery<DocumentStatusRow | null>({
@@ -81,39 +81,43 @@ function DocumentsPage() {
     queryFn: () => fetchStatus({ data: undefined as any } as any),
   });
 
-  const { data: files = [] } = useQuery<FoundingDocFile[]>({
-    queryKey: ["my-document-files"],
-    queryFn: () => fetchFiles({ data: undefined as any } as any),
+  const { data: sent = { identity: 0, driving_license: 0 } } = useQuery({
+    queryKey: ["my-document-summary"],
+    queryFn: () => fetchSummary({ data: undefined as any } as any),
     enabled: !!row,
   });
 
   const rejected = row?.document_status === "rejected";
   const needsInfo = row?.document_status === "needs_info";
   const currentIdx = rejected || needsInfo ? 0 : statusIndex(row?.document_status);
-  const canUpload = !!row && row.document_status !== "verified";
-
-  const removeMut = useMutation({
-    mutationFn: (id: string) => remove({ data: { id } } as any),
-    onSuccess: () => {
-      toast.success("File removed");
-      qc.invalidateQueries({ queryKey: ["my-document-files"] });
-      qc.invalidateQueries({ queryKey: ["my-document-status"] });
-    },
-    onError: (e: any) => toast.error(e?.message || "Could not remove"),
-  });
+  const canUpload = !!row && canUploadDocuments(row.document_status);
+  const locked = !!row && !canUpload && row.document_status !== "verified";
+  const hasKind = (k: DocKind) => sent[k] > 0 || pending.some((p) => p.kind === k);
+  const submitBlock = row
+    ? submissionBlock({
+        status: row.document_status,
+        kinds: {
+          identity: sent.identity + pending.filter((p) => p.kind === "identity").length,
+          driving_license: sent.driving_license + pending.filter((p) => p.kind === "driving_license").length,
+        },
+        newFiles: pending.length,
+      })
+    : null;
 
   function handleFiles(list: FileList | null) {
     if (!list || !list.length) return;
-    const accepted: File[] = [];
+    const accepted: { file: File; kind: DocKind }[] = [];
     for (const file of Array.from(list)) {
       if (file.size > MAX_BYTES) {
         toast.error(`${file.name} exceeds 100 MB`);
         continue;
       }
-      accepted.push(file);
+      accepted.push({ file, kind: docKind });
     }
     if (accepted.length) {
       setPending((prev) => [...prev, ...accepted]);
+      // After adding the ID, move on to the driving license.
+      if (docKind === "identity" && !hasKind("driving_license")) setDocKind("driving_license");
     }
     if (inputRef.current) inputRef.current.value = "";
   }
@@ -124,40 +128,43 @@ function DocumentsPage() {
 
   async function submitPending() {
     if (!pending.length || !row) return;
+    if (submitBlock) {
+      toast.error(submitBlock);
+      return;
+    }
     setUploading(true);
     try {
       const { data: session } = await supabase.auth.getUser();
       const uid = session?.user?.id;
       if (!uid) throw new Error("Not signed in");
       let done = 0;
-      for (const file of pending) {
+      for (const { file, kind } of pending) {
         setProgress(`Uploading ${++done}/${pending.length}: ${file.name}`);
         const safe = file.name.replace(/[^\w.\-]+/g, "_").slice(-80);
         const path = `${uid}/${row.id}/${Date.now()}-${safe}`;
         const { error: upErr } = await supabase.storage
           .from("founding-docs")
           .upload(path, file, { contentType: file.type || "application/octet-stream", upsert: false });
-        if (upErr) {
-          toast.error(`${file.name}: ${upErr.message}`);
-          continue;
-        }
+        if (upErr) throw new Error(`${file.name}: ${upErr.message}`);
         await register({
           data: {
             storage_path: path,
             mime_type: file.type || "application/octet-stream",
             file_size: file.size,
             original_name: file.name,
-            doc_kind: docKind,
+            doc_kind: kind,
           },
         } as any);
       }
+      setProgress("Sending for review…");
+      await finalize({ data: {} } as any);
       toast.success("Submitted for review");
       setPending([]);
-      qc.invalidateQueries({ queryKey: ["my-document-files"] });
-      qc.invalidateQueries({ queryKey: ["my-document-status"] });
     } catch (e: any) {
       toast.error(e?.message || "Upload failed");
     } finally {
+      qc.invalidateQueries({ queryKey: ["my-document-summary"] });
+      qc.invalidateQueries({ queryKey: ["my-document-status"] });
       setUploading(false);
       setProgress("");
     }
@@ -253,7 +260,7 @@ function DocumentsPage() {
                   <SettingsRow label="Document type" hint={DOC_KINDS.find((k) => k.key === docKind)?.desc}>
                     <div role="radiogroup" aria-label="Document type" className="inline-flex rounded-full border border-gc-line bg-gc-surface p-1">
                       {DOC_KINDS.map((k) => {
-                        const uploaded = files.some((f) => f.doc_kind === k.key);
+                        const uploaded = hasKind(k.key);
                         return (
                           <button
                             key={k.key}
@@ -284,18 +291,19 @@ function DocumentsPage() {
                       <input ref={inputRef} type="file" multiple accept={ACCEPT} onChange={(e) => handleFiles(e.target.files)} className="hidden" />
                     </div>
                   </div>
-                  {pending.map((f, i) => (
-                    <SettingsRow key={`${f.name}-${i}`} label={<span className="flex min-w-0 items-center gap-2 text-gc-ink"><FileIcon mime={f.type || ""} /><span className="truncate">{f.name}</span></span>} hint={`Ready to submit · ${fmtSize(f.size)}`}>
+                  {pending.map(({ file: f, kind }, i) => (
+                    <SettingsRow key={`${f.name}-${i}`} label={<span className="flex min-w-0 items-center gap-2 text-gc-ink"><FileIcon mime={f.type || ""} /><span className="truncate">{f.name}</span></span>} hint={`${DOC_KINDS.find((k) => k.key === kind)?.label} · ready to submit · ${fmtSize(f.size)}`}>
                       <button type="button" onClick={() => removePending(i)} disabled={uploading} aria-label="Remove" className="text-gc-ink-muted hover:text-destructive">
                         <Trash2 className="h-4 w-4" />
                       </button>
                     </SettingsRow>
                   ))}
-                  <div className="flex justify-end px-1 py-4 sm:px-2">
+                  <div className="flex flex-wrap items-center justify-end gap-3 px-1 py-4 sm:px-2">
+                    {pending.length > 0 && submitBlock && <p className="text-[13px] text-gc-ink-muted">{submitBlock}</p>}
                     <button
                       type="button"
                       onClick={submitPending}
-                      disabled={pending.length === 0 || uploading}
+                      disabled={pending.length === 0 || uploading || !!submitBlock}
                       className="inline-flex h-9 items-center justify-center rounded-full bg-gc-blue px-5 text-[14px] font-medium text-gc-on-blue hover:bg-gc-blue-hover disabled:opacity-50"
                     >
                       {uploading ? "Submitting…" : `Submit${pending.length ? ` (${pending.length})` : ""}`}
@@ -304,24 +312,16 @@ function DocumentsPage() {
                 </SettingsCard>
               )}
 
-              {canUpload && files.length > 0 && (
-                <SettingsCard id="files" title={`Uploaded files (${files.length})`}>
-                  {files.map((f) => (
-                    <SettingsRow
-                      key={f.id}
-                      label={<span className="flex min-w-0 items-center gap-2 text-gc-ink"><FileIcon mime={f.mime_type} /><span className="truncate">{f.original_name || f.storage_path.split("/").pop()}</span></span>}
-                      hint={`${fmtSize(f.file_size)} · ${new Date(f.created_at).toLocaleString()}`}
-                    >
-                      <span className="inline-flex items-center gap-4">
-                        {f.signed_url && (
-                          <a href={f.signed_url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-gc-ink hover:underline">View</a>
-                        )}
-                        <button onClick={() => removeMut.mutate(f.id)} disabled={removeMut.isPending} aria-label="Remove" className="text-gc-ink-muted hover:text-destructive">
-                          <Trash2 className="h-4 w-4" />
-                        </button>
-                      </span>
-                    </SettingsRow>
-                  ))}
+              {locked && (
+                <SettingsCard id="files" title="Documents submitted">
+                  <SettingsRow
+                    label={<span className="flex items-center gap-2 text-gc-ink"><Lock className="h-4 w-4 text-gc-ink-muted" /> Locked for review</span>}
+                    hint="Your files can't be viewed, changed or removed after you submit. If our team needs anything else, they'll ask you here."
+                  >
+                    <span className="text-[13px] text-gc-ink-muted">
+                      {sent.identity + sent.driving_license} file{sent.identity + sent.driving_license === 1 ? "" : "s"}
+                    </span>
+                  </SettingsRow>
                 </SettingsCard>
               )}
             </>
