@@ -212,7 +212,7 @@ function PricingPage() {
           {/* Founding */}
           <article className="flex flex-col rounded-2xl border border-gc-line bg-background p-6">
             <h3 className="text-[20px] font-medium tracking-tight">Founding</h3>
-            <p className="mt-1.5 min-h-[44px] text-[14px] leading-[1.55] text-gc-ink-muted">Invite-only first month for approved members.</p>
+            <p className="mt-1.5 lg:min-h-[44px] text-[14px] leading-[1.55] text-gc-ink-muted">Invite-only first month for approved members.</p>
             <div className="mt-5 flex items-baseline gap-1.5">
               <span className="text-[44px] font-medium leading-none tracking-tight">$0</span>
               <span className="text-[14px] text-gc-ink-muted">/ 30 days</span>
@@ -240,7 +240,7 @@ function PricingPage() {
                   <span className="rounded-full bg-gc-pill px-2.5 py-0.5 text-[12px] font-medium text-foreground">Most popular</span>
                 )}
               </div>
-              <p className="mt-1.5 min-h-[44px] text-[14px] leading-[1.55] text-gc-ink-muted">{plan.description}</p>
+              <p className="mt-1.5 lg:min-h-[44px] text-[14px] leading-[1.55] text-gc-ink-muted">{plan.description}</p>
               <div className="mt-5 flex items-baseline gap-1.5">
                 <span className="text-[44px] font-medium leading-none tracking-tight">${priceOf(planPrice(plan.key, founding))}</span>
                 <span className="text-[14px] text-gc-ink-muted">{suffix}</span>
