@@ -2480,15 +2480,15 @@ html body :is(.dark, .dash-dark) .vsc-studio .tok-var { color: #a8dcff !importan
 .dev-code-builtin { color: #005cc5; }
 .dev-code-param { color: #e36209; }
 /* Black theme: dark editor with bright, readable syntax colors */
-.dark .dev-code-card { background: #111113; color: #e6edf3; box-shadow: 0 10px 30px -12px rgba(0,0,0,0.7); border: 1px solid #27272a; }
-.dark .dev-code-bar { border-bottom-color: #27272a; }
-.dark .dev-code-body { color: #e6edf3; scrollbar-color: #3f3f46 transparent; }
+.dark .dev-code-card, .dash-dark .dev-code-card { background: #111113; color: #e6edf3; box-shadow: 0 10px 30px -12px rgba(0,0,0,0.7); border: 1px solid #27272a; }
+.dark .dev-code-bar, .dash-dark .dev-code-bar { border-bottom-color: #27272a; }
+.dark .dev-code-body, .dash-dark .dev-code-body { color: #e6edf3; scrollbar-color: #3f3f46 transparent; }
 .dark .dev-code-copy { color: #a1a1aa; } .dark .dev-code-copy:hover { color: #ffffff; }
-.dark .dev-code-kw { color: #ff7b72; }
-.dark .dev-code-str { color: #a5d6ff; }
-.dark .dev-code-fn { color: #d2a8ff; }
-.dark .dev-code-builtin { color: #79c0ff; }
-.dark .dev-code-param { color: #ffa657; }
+.dark .dev-code-kw, .dash-dark .dev-code-kw { color: #ff7b72; }
+.dark .dev-code-str, .dash-dark .dev-code-str { color: #a5d6ff; }
+.dark .dev-code-fn, .dash-dark .dev-code-fn { color: #d2a8ff; }
+.dark .dev-code-builtin, .dash-dark .dev-code-builtin { color: #79c0ff; }
+.dark .dev-code-param, .dash-dark .dev-code-param { color: #ffa657; }
 
 /* "Designed to make your Agent smarter" homepage cards */
 :root { --agent-highlight: oklch(0.86 0.06 245 / 0.85); }
