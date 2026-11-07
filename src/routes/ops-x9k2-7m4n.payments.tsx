@@ -76,6 +76,8 @@ function OpsPayments() {
   const [error, setError] = useState<string | null>(null);
   const [form, setForm] = useState({ ...emptyPromo });
   const [query, setQuery] = useState("");
+  const countsFn = useServerFn(opsPendingCounts);
+  const [reviewCount, setReviewCount] = useState(0);
 
 
   const load = useCallback(async () => {
@@ -88,12 +90,13 @@ function OpsPayments() {
       ]);
       setRows(o);
       setPromos(p);
+      countsFn({ data: { token } }).then((c) => setReviewCount(c.payments)).catch(() => {});
       setCfgState(c as any);
       setError(null);
     } catch (e: any) {
       setError(String(e?.message ?? "Could not load payments."));
     }
-  }, [filter, listFn, promosFn, getCfg]);
+  }, [filter, listFn, promosFn, getCfg, countsFn]);
 
   useEffect(() => { void load(); }, [load]);
 
@@ -188,7 +191,7 @@ function OpsPayments() {
         </button>
       }
       tabs={(["orders", "promos", "config"] as const).map((t) => (
-        <OpsTab key={t} active={tab === t} onClick={() => setTab(t)}>
+        <OpsTab key={t} active={tab === t} onClick={() => setTab(t)} count={t === "orders" ? reviewCount : undefined}>
           <span className="capitalize">{t === "config" ? "Deposit addresses" : t}</span>
         </OpsTab>
       ))}
@@ -212,9 +215,10 @@ function OpsPayments() {
                 <button
                   key={f.id}
                   onClick={() => setFilter(f.id)}
-                  className={`h-8 rounded-full px-3 text-[13px] transition ${ filter === f.id ? "bg-foreground text-background" : "border border-border text-muted-foreground hover:bg-muted" }`}
+                  className={`inline-flex h-8 items-center rounded-full px-3 text-[13px] transition ${ filter === f.id ? "bg-foreground text-background" : "border border-border text-muted-foreground hover:bg-muted" }`}
                 >
                   {f.label}
+                  {f.id === "review" && reviewCount > 0 && <OpsCount value={reviewCount} className="ml-1.5" />}
                 </button>
               ))}
               <input
