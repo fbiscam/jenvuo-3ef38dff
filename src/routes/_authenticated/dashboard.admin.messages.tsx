@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState, useMemo } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
@@ -193,13 +193,18 @@ function AdminMessagesPage() {
             </div>
             <div className="flex flex-wrap items-center justify-between gap-2 border-t border-border bg-muted/50 px-6 py-3">
               <div className="flex flex-wrap gap-2">
-                <a
-                  href={`mailto:${selected.email}?subject=Re: ${encodeURIComponent(selected.subject)}`}
-                  onClick={() => void setStatus(selected.id, "replied")}
+                <Link
+                  to="/dashboard/admin/emails"
+                  search={{
+                    to: selected.email,
+                    subject: selected.subject.startsWith("Re:") ? selected.subject : `Re: ${selected.subject}`,
+                    box: /sales/i.test(selected.subject) ? "sales" : "support",
+                    reply: selected.id,
+                  }}
                   className="inline-flex items-center gap-1.5 rounded-lg bg-gc-blue px-3 py-1.5 text-xs font-medium text-gc-on-blue hover:bg-gc-blue-hover"
                 >
-                  <Reply className="h-3.5 w-3.5" /> Reply by email
-                </a>
+                  <Reply className="h-3.5 w-3.5" /> Reply from Email box
+                </Link>
                 <button
                   type="button"
                   onClick={() => void setStatus(selected.id, "archived")}
