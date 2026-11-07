@@ -903,7 +903,7 @@ function ChatPlayground() {
   );
 
   return (
-    <section className={`chat-shell flex min-h-[440px] w-full flex-col ${turns.length === 0 && !studio ? "justify-center" : ""}`}>
+    <section className={`chat-shell flex min-h-[440px] w-full flex-col ${turns.length === 0 && !studio ? "lg:justify-center" : ""}`}>
       <h1 className="sr-only">Chat</h1>
       {/* Controls: only before the chat starts; afterwards they sit next to the model picker. */}
       {turns.length === 0 && (
@@ -977,7 +977,7 @@ function ChatPlayground() {
       })()}
       <div className={studio ? "flex min-h-0 w-full flex-col lg:w-[480px] lg:shrink-0" : "contents"}>
       {/* Conversation / examples */}
-      <div ref={scroller} className={`chat-no-scrollbar mt-1 min-h-0 overflow-y-auto ${turns.length === 0 && !studio ? "flex-none" : "flex-1"}`}>
+      <div ref={scroller} className={`chat-no-scrollbar mt-1 min-h-0 overflow-y-auto ${turns.length === 0 && !studio ? "flex-1 lg:flex-none" : "flex-1"}`}>
         {!restored && user?.id ? (
           <div className="min-h-[40vh]" aria-busy="true" />
         ) : turns.length === 0 ? (
@@ -986,20 +986,20 @@ function ChatPlayground() {
               <h2 className="text-[18px] font-medium text-foreground">Start a chat with examples</h2>
               <p className="mt-1 text-[14px] text-muted-foreground">Pick a use case to see the exact prompt and settings, then make it your own.</p>
             </div>
-            <div className="mx-auto mt-8 grid w-full max-w-[1400px] grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="mx-auto mt-5 grid w-full max-w-[1400px] grid-cols-2 gap-2.5 sm:mt-8 sm:gap-4 lg:grid-cols-4">
               {EXAMPLES.map((ex) => (
                 <button
                   key={ex.title}
                   type="button"
                   onClick={() => pickExample(ex)}
-                  className="flex min-h-[170px] flex-col rounded-2xl border border-border bg-background p-5 text-left transition-colors hover:bg-[var(--console-card)]"
+                  className="flex min-w-0 flex-col rounded-2xl border border-border bg-background p-3.5 text-left transition-colors hover:bg-[var(--console-card)] sm:min-h-[170px] sm:p-5"
                 >
                   <span className={`grid h-8 w-8 place-items-center rounded-full ${ex.tone}`}>
                     <ex.icon className="h-4 w-4" aria-hidden="true" />
                   </span>
-                  <span className="mt-3 text-[15px] font-medium text-foreground">{ex.title}</span>
-                  <span className="mt-1 text-[13px] leading-snug text-muted-foreground">{ex.text}</span>
-                  <span className="mt-auto flex flex-wrap gap-1.5 pt-3">
+                  <span className="mt-2.5 text-[14px] font-medium leading-snug text-foreground sm:mt-3 sm:text-[15px]">{ex.title}</span>
+                  <span className="mt-1 hidden text-[13px] leading-snug text-muted-foreground sm:block">{ex.text}</span>
+                  <span className="mt-auto hidden flex-wrap gap-1.5 pt-3 sm:flex">
                     {ex.tags.map((t) => (
                       <span key={t} className="rounded-md bg-[var(--console-card)] px-2 py-0.5 text-[12px] text-foreground">{t}</span>
                     ))}
