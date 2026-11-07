@@ -90,7 +90,7 @@ export function IdVerificationDeadlineNotice({ access }: { access: TerminalAcces
 export function VerifyNotice({ tone = "info", title, text, action }: { tone?: "info" | "warn" | "error"; title: string; text: string; action: string }) {
   const dot = tone === "error" ? "bg-destructive" : tone === "warn" ? "bg-gc-amber" : "bg-gc-ink-muted";
   return (
-    <div className="verify-notice mx-auto mb-5 flex w-full max-w-[930px] items-center gap-3.5 rounded-xl border border-gc-line bg-gc-surface px-4 py-3 max-sm:flex-wrap sm:gap-4 sm:px-5">
+    <div className="verify-notice mb-5 flex w-full items-center gap-3.5 rounded-xl border border-gc-line bg-gc-surface px-4 py-3 max-sm:flex-wrap sm:gap-4 sm:px-5">
       <span className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-gc-line bg-background">
         <ShieldAlert className="h-4 w-4 text-gc-ink" aria-hidden="true" />
         <span className={`absolute -right-1 -top-1 h-2.5 w-2.5 rounded-full ring-2 ring-gc-surface ${dot}`} aria-hidden="true" />
