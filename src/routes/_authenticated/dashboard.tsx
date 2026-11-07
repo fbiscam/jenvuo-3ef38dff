@@ -1619,6 +1619,9 @@ function DashboardLayout() {
           <div className="absolute inset-x-0 top-0">
         {drawerMode && pathname === "/dashboard" && <StartTrialBanner />}
         {drawerMode && pathname === "/dashboard" && <TwoFactorReminder />}
+        {/* Verify ID notice: Overview only, in the same top spot as the 2FA reminder. */}
+        {pathname === "/dashboard" && <IdVerificationDeadlineNotice access={terminalAccess} />}
+        {pathname === "/dashboard" && !showsIdDeadline(terminalAccess) && <VerificationBanner isAdmin={isAdminUser} />}
         {drawerMode && pathname !== "/dashboard/terminal" && <NotificationStrip />}
         {drawerMode && pathname !== "/dashboard/terminal" && <SiteAnnouncementBar />}
           </div>
@@ -1634,11 +1637,6 @@ function DashboardLayout() {
           }
           style={pathname === "/dashboard/terminal" ? undefined : { zoom: 0.9 }}
         >
-          {/* The Documents page already holds the upload form, so no "Verify ID" notice there. */}
-          {/* Verify ID notices show on the Overview page only. */}
-          {pathname === "/dashboard" && <IdVerificationDeadlineNotice access={terminalAccess} />}
-          {pathname === "/dashboard" && !showsIdDeadline(terminalAccess) && <VerificationBanner isAdmin={isAdminUser} />}
-
           {pathname === "/dashboard" ? (
             <ConsoleWelcome name={fullName} keysCount={extKeyCount} />
           ) : pathname === "/dashboard/terminal" && !terminalAccess.allowed ? (
