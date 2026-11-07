@@ -304,7 +304,7 @@ const AUDIENCES: Array<{ key: string; label: string; cards: AudienceCard[] }> = 
     key: "traders",
     label: "Traders",
     cards: [
-      { tag: "NEW TRADERS", text: "New sign-ups get 14 days of free Pro access & $100 for the top AI Models for 30 days ", to: "/auth", img: tradeNeonStart },
+      { tag: "NEW TRADERS", text: "Approved Founding members get 30 days of Pro or Elite and $200 AI credit once their ID is verified", to: "/founding", img: tradeNeonStart },
       { tag: "JX BOT", text: "Run JX Bot on MetaTrader 5 with a daily auto-stop at your plan's target", to: "/pricing", img: tradeNeonPractice },
       { tag: "LEARN", text: "Read daily Gold insights and guides on sweeps, zones and order blocks", to: "/insights", img: tradeNeonLearn },
     ],

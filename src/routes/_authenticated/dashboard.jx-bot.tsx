@@ -215,7 +215,7 @@ function JxBotPage() {
                 : "Your 30-day Founding plan and credit have ended. Choose a paid plan to keep using JX Bot."
               : (access as any).founding?.state === "awaiting_id"
                 ? "Founding members get JX Bot once their ID is verified. Upload your ID in Settings → Documents."
-                : "JX Bot is for approved Founding Program members: the first month is free after your ID is verified, then it continues on a paid plan. Free trial and credit do not unlock it."}
+                : "JX Bot is for approved Founding Program members: the first month is free after your ID is verified, then it continues on a Founding plan. Credit does not unlock it."}
           </span>
           {botAction && <Link to={botAction.to} className="console-pill console-pill-solid">{botAction.label}</Link>}
         </div>

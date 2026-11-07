@@ -605,7 +605,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
         <p className="mx-2 mb-1.5 flex items-start gap-1.5 rounded-md bg-accent px-2 py-1.5 text-[11px] leading-4 text-muted-foreground sm:text-xs">
           <Lock className="mt-0.5 h-3 w-3 shrink-0" aria-hidden="true" />
           <span>
-            Fresh sweep, price action and Zone + FVG come with a plan or the Pro free trial.
+            Fresh sweep, price action and Zone + FVG come with a plan or the Founding Program.
           </span>
         </p>
       )}

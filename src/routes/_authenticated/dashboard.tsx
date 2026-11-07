@@ -1441,7 +1441,7 @@ function DashboardLayout() {
                           key={t.to}
                           role="link"
                           aria-disabled="true"
-                          title={lockedBot ? "JX Bot is locked: it opens for Founding members once their ID is verified and approved, or with a paid plan." : "Terminal is locked: your free 14-day trial has ended. Upgrade to unlock it."}
+                          title={lockedBot ? "JX Bot is locked: it opens for Founding members once their ID is verified and approved, or with a paid plan." : "Terminal is locked: it opens for verified Founding members and paid plans."}
                           className={`dashboard-sidebar-link relative flex cursor-not-allowed select-none items-center text-[14px] font-normal text-gc-ink opacity-50 ${navCollapsed ? "justify-center rounded-full px-2 py-2" : "gap-3 rounded-lg px-3 py-2"}`}
                         >
                           <Icon
