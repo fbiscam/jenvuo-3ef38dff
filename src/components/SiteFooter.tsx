@@ -66,9 +66,8 @@ type FooterGroup = { label: string; links: FooterLink[] };
 
 const SOCIAL = {
   x: "https://x.com/jenvu",
-  instagram: "https://www.instagram.com/jenvucompany/",
-  facebook: "https://www.facebook.com/jenvucompany",
-  whatsapp: "https://whatsapp.com/channel/jenvuai",
+  facebook: "https://www.facebook.com/jenvucompany/",
+  whatsapp: "https://whatsapp.com/channel/0029VbB4UDs3bbV9jWIhxN3T",
 };
 
 /* xAI-style footer: brand block on the left, five two-tier link columns on the right. */
@@ -134,7 +133,6 @@ const columns: FooterGroup[][] = [
     ] },
     { label: "Social", links: [
       { to: "", href: SOCIAL.x, label: "X" },
-      { to: "", href: SOCIAL.instagram, label: "Instagram" },
       { to: "", href: SOCIAL.facebook, label: "Facebook" },
       { to: "", href: SOCIAL.whatsapp, label: "WhatsApp" },
     ] },
