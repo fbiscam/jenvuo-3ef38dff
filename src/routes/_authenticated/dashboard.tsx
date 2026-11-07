@@ -3,9 +3,11 @@ import { SidebarMoreMenu } from "@/components/dashboard/SidebarMoreMenu";
 import { SettingsSidebarNav, isSettingsPath } from "@/components/settings/SettingsNav";
 import { readSiteTheme, saveSiteTheme, SITE_THEME_EVENT } from "@/lib/site-theme";
 import { getIpGeo } from "@/lib/ip-geo";
-import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
-import { useVerification, isVerificationAllowedPath } from "@/hooks/useVerification";
-import { VerificationBanner, VerificationLocked } from "@/components/VerificationGate";
+import { createFileRoute, Link, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
+import { useVerification } from "@/hooks/useVerification";
+import { VerificationBanner } from "@/components/VerificationGate";
+import { IdViewOnly } from "@/components/IdViewOnly";
+import { idActionsLocked, idViewOnly } from "@/lib/id-gate";
 import { TerminalLocked, TerminalChecking, useTerminalAccess, IdVerificationDeadlineNotice, showsIdDeadline } from "@/components/TerminalLockGate";
 import { Lock as TerminalLockIcon } from "lucide-react";
 import xaiLogo from "@/assets/xai-logo.png";
@@ -731,13 +733,11 @@ function DashboardLayout() {
   }, []);
   const [unreadNotifs, setUnreadNotifs] = useState(0);
   const [isAdminUser, setIsAdminUser] = useState(false);
-  // Unverified accounts may only use Dashboard, Security and Documents.
-  const verificationLocked =
-    !isAdminUser &&
+  // Unverified members can open every page, but outside Overview/settings/Billing/Payments it is look-only.
+  const navigateTo = useNavigate();
+  const viewOnly =
     !verification.loading &&
-    !!verification.status &&
-    !verification.verified &&
-    !isVerificationAllowedPath(pathname);
+    idViewOnly(pathname, idActionsLocked({ isAdmin: isAdminUser, documentStatus: verification.status, hasApplication: !!verification.row }));
   const credits = useCredits();
   const { user: authUser, loading: authLoading } = useAuthUser();
   const terminalAccess = useTerminalAccess(authUser?.id);
@@ -1641,8 +1641,10 @@ function DashboardLayout() {
             <ConsoleWelcome name={fullName} keysCount={extKeyCount} />
           ) : pathname === "/dashboard/terminal" && !terminalAccess.allowed ? (
             terminalAccess.loading ? <TerminalChecking /> : <TerminalLocked reason={terminalAccess.reason} />
-          ) : verificationLocked && pathname !== "/dashboard/terminal" ? (
-            <VerificationLocked />
+          ) : viewOnly && pathname !== "/dashboard/terminal" ? (
+            <IdViewOnly onVerify={() => void navigateTo({ to: "/dashboard/documents" })}>
+              <Outlet />
+            </IdViewOnly>
           ) : (
             <Outlet />
           )}
