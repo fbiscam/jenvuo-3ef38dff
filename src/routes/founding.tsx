@@ -29,7 +29,7 @@ export const Route = createFileRoute("/founding")({
       { property: "og:title", content: "Founding Trader Program" },
       {
         property: "og:description",
-        content: "Approval unlocks 1 month of Pro or Elite with $200 credit. Verify your ID within 2 days to unlock JX Bot.",
+        content: "Approval unlocks 1 month of Pro or Elite. Verify your ID within 2 days to unlock $200 credit and JX Bot.",
       },
       { property: "og:url", content: "https://jenvu.com/founding" },
       { property: "og:type", content: "website" },

@@ -453,7 +453,7 @@ export function CloudBuildWith() {
             <span className="whitespace-nowrap text-gc-blue-deep">designed for traders and AI</span>
           </h2>
           <p className="mt-4 max-w-[540px] text-[14px] leading-[1.55] text-gc-ink-muted sm:mt-5 sm:text-[16px] sm:leading-[1.6]">
-            Jenvu is for approved Founding Program members: Pro or Elite with $200 credit for 30 days, the Terminal and JX Bot after ID verification.
+            Jenvu is for approved Founding Program members: Pro or Elite and the Terminal for 30 days, with $200 credit and JX Bot after ID verification.
           </p>
           <div className="mt-7 flex flex-wrap items-center gap-7">
             <Link

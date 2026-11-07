@@ -61,7 +61,7 @@ export const DOC_GROUPS: DocGroup[] = [
         keywords: "trial credit pro 14 days $100 start free",
         body: (
           <>
-            <p>The free trial is closed. Approved Founding Program members get Pro or Elite with $200 credit for 30 days instead. Plans can be bought after your ID is verified.</p>
+            <p>The free trial is closed. Approved Founding Program members get Pro or Elite for 30 days instead, with $200 credit added once their ID is verified. Plans can be bought after your ID is verified.</p>
           </>
         ),
       },
@@ -162,7 +162,7 @@ export const DOC_GROUPS: DocGroup[] = [
             <ul>
               <li>After approval you have <strong>2 days</strong> to verify your ID. If it isn't sent in time, the Terminal locks until you send it.</li>
               <li>Credit alone never unlocks the Terminal.</li>
-              <li>Founding members get 1 month of Pro or Elite and $200 credit, and have <strong>2 days</strong> to upload an identity document. JX Bot unlocks once the ID is verified. After 30 days the plan, credit and bot access end, and you are told whether the bot reached $200 profit; a paid plan keeps JX Bot running.</li>
+              <li>Founding members get 1 month of Pro or Elite, and have <strong>2 days</strong> to upload an identity document. The $200 API credit and JX Bot unlock once the ID is verified. After 30 days the plan, credit and bot access end, and you are told whether the bot reached $200 profit; a paid plan keeps JX Bot running.</li>
             </ul>
             <p>Apply at <a href="https://jenvu.com/founding">jenvu.com/founding</a>.</p>
           </>
@@ -403,7 +403,7 @@ export const DOC_GROUPS: DocGroup[] = [
         keywords: "founding apply early access",
         body: (
           <p>
-            The Founding Program gives early traders 1 month of Pro or Elite, $200 credit for the same 30 days, Terminal access and JX Bot after ID verification. Apply at{" "}
+            The Founding Program gives early traders 1 month of Pro or Elite and Terminal access, plus $200 credit and JX Bot after ID verification. Apply at{" "}
             <a href="https://jenvu.com/founding">jenvu.com/founding</a>, choose a plan and wait for approval. See{" "}
             <a href="#terminal-access">Who can use the Terminal</a> for the verification step.
           </p>
