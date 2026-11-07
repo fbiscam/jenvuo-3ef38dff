@@ -25,8 +25,7 @@ export function OpsPage({ title, description, icon: _icon, actions, tabs, standa
   // page padding and 0.9 scale so both look the same size.
   return (
     <div
-      className={`ops-console text-foreground ${standalone ? "min-h-dvh w-full bg-background px-5 pt-14 sm:px-8 lg:pt-20" : "w-full"}`}
-      style={standalone ? { zoom: 0.9 } : undefined}
+      className={`ops-console text-foreground ${standalone ? "ops-zoom min-h-dvh w-full bg-background px-5 pt-8 sm:px-8 lg:pt-10" : "w-full"}`}
     >
       <div className="mx-auto w-full max-w-[1100px] pb-10">
         <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">

@@ -946,7 +946,7 @@ export const adminUpdateDocumentStatus = createServerFn({ method: "POST" })
 
     const { data: priorRow } = await admin
       .from("founding_applications" as any)
-      .select("email, full_name, requested_plan, document_status")
+      .select("email, full_name, requested_plan, document_status, user_id")
       .eq("id", data.id)
       .maybeSingle();
     const prior = priorRow as any;
@@ -956,6 +956,25 @@ export const adminUpdateDocumentStatus = createServerFn({ method: "POST" })
       .update(patch)
       .eq("id", data.id);
     if (error) throw new Error(error.message);
+
+    // ID verified → the member gets their plan's API credit right away.
+    // release_founding_credit grants once per Founding period, so re-verifying never doubles it.
+    if (data.document_status === "verified") {
+      let uid: string | null = prior?.user_id ?? null;
+      if (!uid && prior?.email) {
+        const target = String(prior.email).toLowerCase();
+        for (let page = 1; page <= 20 && !uid; page++) {
+          const { data: list } = await admin.auth.admin.listUsers({ page, perPage: 1000 });
+          uid = list?.users?.find((u) => u.email?.toLowerCase() === target)?.id ?? null;
+          if (!list?.users?.length || list.users.length < 1000) break;
+        }
+        if (uid) await linkApplicationToUser(admin, data.id, uid);
+      }
+      if (uid) {
+        const { error: creditErr } = await admin.rpc("release_founding_credit" as any, { _user_id: uid });
+        if (creditErr) console.error("[founding] credit on ID verify failed:", creditErr.message);
+      }
+    }
 
     // Fire applicant email on every admin action — even if status is unchanged,
     // the admin may intentionally re-notify the user (mark reviewing, reject, etc.).

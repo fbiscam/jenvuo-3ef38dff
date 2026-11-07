@@ -58,3 +58,7 @@
 - [x] Dashboard Code page back to its earlier look
 - [x] Admin Documents "Need info" Send request works
 - [x] Submitted ID files locked: no new uploads, not shown, no delete/change (until rejected or info requested)
+- [x] Verify ID toast: remove "Verify ID" button/text from the notice
+- [x] Ops (admin) console: dashboard-style sidebar layout, slightly larger scale, same font/theme
+- [x] Support page new look, other admin pages dashboard-like
+- [x] lonedone16@gmail.com: ID verified but no API credit — fix grant + root cause

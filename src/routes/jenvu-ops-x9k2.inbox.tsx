@@ -298,452 +298,288 @@ function AdminInbox() {
   ];
 
   return (
-    <div className="ops-console relative flex h-screen flex-col bg-background text-[13px] text-gc-ink antialiased [font-family:'Google_Sans_Flex','Google_Sans','Product_Sans','Poppins',system-ui,-apple-system,sans-serif] [font-feature-settings:'cv11','ss01','ss03'] [font-optical-sizing:auto]">
-      {/* Top bar */}
-      <header className="relative z-10 flex min-h-14 shrink-0 items-center justify-between gap-3 border-b border-border bg-background px-4 py-2 sm:px-6">
-        <div className="flex items-center gap-3">
-          <span className="grid h-9 w-9 shrink-0 place-items-center ops-chip rounded-xl">
-            <Inbox className="h-4 w-4" />
-          </span>
+    <div className="ops-console flex h-dvh flex-col bg-background text-[13px] text-foreground antialiased [font-family:'Google_Sans_Flex','Google_Sans','Product_Sans','Poppins',system-ui,-apple-system,sans-serif]">
+      <div className="ops-zoom flex min-h-0 flex-1 flex-col" style={{ minHeight: 0 }}>
+        {/* Page header — same as the dashboard pages */}
+        <header className="mx-auto flex w-full max-w-[1280px] shrink-0 flex-col gap-4 px-4 pt-6 sm:flex-row sm:items-end sm:justify-between sm:px-6 lg:pt-8">
           <div className="min-w-0">
-            <h1 className="truncate text-[15px] font-medium text-foreground">Support inbox</h1>
-            <p className="hidden text-[13px] text-muted-foreground sm:block">Review conversations and reply to customer support requests</p>
+            <h1 className="text-[28px] font-normal tracking-tight text-foreground sm:text-[32px]">Support</h1>
+            <p className="mt-1 text-[14px] text-muted-foreground">
+              {counts.unread > 0
+                ? `${counts.unread} conversation${counts.unread === 1 ? "" : "s"} waiting for a reply.`
+                : "Live chat from the website. Everyone has a reply."}
+            </p>
           </div>
-        </div>
-        <div className="flex items-center gap-3">
-          <span className="hidden text-[13px] text-muted-foreground sm:inline">{username}</span>
-          <button
-            onClick={handleLogout}
-            className="grid h-8 w-8 place-items-center rounded-xl text-muted-foreground transition hover:bg-muted hover:text-foreground"
-            title="Sign out"
-          >
-            <LogOut className="h-3.5 w-3.5" />
-          </button>
-        </div>
-      </header>
-
-
-      <div className="relative z-10 flex min-h-0 flex-1 overflow-hidden">
-        {/* Left rail — filters/nav */}
-        <nav className="hidden w-60 shrink-0 flex-col border-r border-border bg-background p-4 md:flex">
-          <div className="mb-3 px-2 text-[13px] font-medium text-foreground">
-            Inbox
+          <div className="flex items-center gap-2">
+            {username && <span className="ops-chip hidden rounded-full px-3 py-1.5 text-[12.5px] sm:inline">{username}</span>}
+            <button onClick={handleLogout} className="ops-btn inline-flex h-9 items-center gap-1.5 rounded-full px-4 text-[13px] font-medium" title="Sign out">
+              <LogOut className="h-3.5 w-3.5" /> Sign out
+            </button>
           </div>
-          <ul className="space-y-0.5">
+        </header>
+
+        <div className="mx-auto w-full max-w-[1280px] shrink-0 px-4 pt-5 sm:px-6">
+          <div className="ops-tabs flex max-w-full items-center gap-1 overflow-x-auto rounded-full p-1 text-[13px] [scrollbar-width:none] sm:w-fit">
             {filters.map((f) => {
               const active = filter === f.key;
               return (
-                <li key={f.key}>
-                  <button
-                    onClick={() => setFilter(f.key)}
-                    className={`group flex w-full items-center justify-between rounded-lg px-3 py-2 text-[13px] transition ${
-                      active
-                        ? "bg-muted font-medium text-foreground"
-                        : "text-muted-foreground hover:bg-muted hover:text-foreground"
-                    }`}
-                  >
-                    <span className="flex items-center gap-2.5">
-                      <span className={`h-1.5 w-1.5 rounded-full ${active ? "bg-gc-blue" : "border border-gc-line"}`} />
-                      {f.label}
-                    </span>
-                    <span className="text-[12px] tabular-nums text-muted-foreground">
-                      {f.count}
-                    </span>
-                  </button>
-
-                </li>
+                <button
+                  key={f.key}
+                  onClick={() => setFilter(f.key)}
+                  className={`inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full px-3.5 py-1.5 transition ${
+                    active ? "ops-tab-active font-medium text-foreground" : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  {f.label}
+                  <span className={`text-[11.5px] tabular-nums ${f.key === "unread" && f.count > 0 ? "ops-count rounded-full px-1.5" : "text-muted-foreground"}`}>
+                    {f.count}
+                  </span>
+                </button>
               );
             })}
-          </ul>
-        </nav>
+          </div>
+        </div>
 
-        {/* Middle — conversation list */}
-        <aside
-          className={`flex w-full shrink-0 flex-col border-r border-border bg-background md:w-[360px] ${ activeId ? "hidden md:flex" : "flex" }`}
-        >
-          <div className="flex h-14 items-center gap-3 border-b border-border px-5">
-            <span className="text-[13px] font-medium capitalize text-foreground">{filter}</span>
-            <span className="text-[12px] tabular-nums text-muted-foreground">
-              {filtered.length}
-            </span>
-            <div className="ml-auto flex items-center">
+        <div className="mx-auto flex min-h-0 w-full max-w-[1280px] flex-1 gap-4 px-4 pb-5 pt-4 sm:px-6">
+          {/* Conversation list */}
+          <aside className={`ops-card min-h-0 w-full shrink-0 flex-col overflow-hidden rounded-2xl md:w-[340px] ${activeId ? "hidden md:flex" : "flex"}`}>
+            <div className="ops-line border-b p-3">
               <div className="relative">
-                <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3 w-3 -translate-y-1/2 text-muted-foreground" />
+                <Search className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
                 <input
                   ref={searchRef}
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
-                  placeholder="Search…"
-                  className="h-8 w-44 rounded-lg border border-border bg-background pl-7 pr-2 text-[12px] placeholder:text-muted-foreground focus:border-gc-blue focus:outline-none focus:ring-2 focus:ring-gc-blue-soft"
+                  placeholder="Search name or email"
+                  className="ops-input h-9 w-full rounded-full pl-8 pr-3 text-[13px] outline-none placeholder:text-muted-foreground focus:ring-2 focus:ring-foreground/15"
                 />
               </div>
             </div>
-          </div>
-
-          <div className="flex-1 overflow-y-auto">
-            {filtered.length === 0 ? (
-              <div className="flex h-full flex-col items-center justify-center px-6 py-10 text-center">
-                <div className="grid h-12 w-12 place-items-center ops-card rounded-xl">
-                  <Inbox className="h-4 w-4 text-muted-foreground" />
+            <div className="min-h-0 flex-1 overflow-y-auto p-1.5">
+              {filtered.length === 0 ? (
+                <div className="flex h-full flex-col items-center justify-center px-6 py-10 text-center">
+                  <Inbox className="h-5 w-5 text-muted-foreground" />
+                  <p className="mt-3 text-[13.5px] font-medium">No conversations</p>
+                  <p className="mt-1 text-[12.5px] text-muted-foreground">
+                    {filter === "open" ? "You're all caught up." : "Nothing matches this filter."}
+                  </p>
                 </div>
-                <p className="mt-3 text-[13px] font-semibold text-gc-ink">No conversations</p>
-                <p className="mt-1 text-[11.5px] text-muted-foreground">
-                  {filter === "open" ? "You're all caught up." : "Nothing matches this filter."}
+              ) : (
+                <ul className="space-y-0.5">
+                  {filtered.map((s) => {
+                    const isActive = s.id === activeId;
+                    const name = s.guest_name || s.guest_email?.split("@")[0] || "Anonymous";
+                    const hasUnread = s.unread_admin > 0;
+                    return (
+                      <li key={s.id}>
+                        <button
+                          onClick={() => setActiveId(s.id)}
+                          className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition ${
+                            isActive ? "ops-tab-active" : "hover:bg-foreground/[0.04]"
+                          }`}
+                        >
+                          <span className="ops-chip relative grid h-10 w-10 shrink-0 place-items-center rounded-full text-[12px] font-medium">
+                            {initials(s.guest_name, s.guest_email)}
+                            {s.status === "open" && (
+                              <span className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-gc-green ring-2 ring-background" />
+                            )}
+                          </span>
+                          <span className="min-w-0 flex-1">
+                            <span className="flex items-baseline justify-between gap-2">
+                              <span className={`truncate text-[13.5px] ${hasUnread ? "font-semibold" : "font-medium"}`}>{name}</span>
+                              <span className="shrink-0 text-[11.5px] tabular-nums text-muted-foreground">{timeAgo(s.last_message_at)}</span>
+                            </span>
+                            <span className="mt-0.5 flex items-center justify-between gap-2">
+                              <span className="truncate text-[12.5px] text-muted-foreground">{s.guest_email || "No email"}</span>
+                              {hasUnread && (
+                                <span className="ops-count grid h-[18px] min-w-[18px] shrink-0 place-items-center rounded-full px-1.5 text-[10.5px] font-semibold tabular-nums">
+                                  {s.unread_admin}
+                                </span>
+                              )}
+                            </span>
+                          </span>
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+            </div>
+          </aside>
+
+          {/* Conversation */}
+          <section className={`ops-card min-h-0 min-w-0 flex-1 flex-col overflow-hidden rounded-2xl ${activeId ? "flex" : "hidden md:flex"}`}>
+            {!activeSession ? (
+              <div className="flex flex-1 flex-col items-center justify-center gap-2 p-8 text-center">
+                <Inbox className="h-6 w-6 text-muted-foreground" />
+                <p className="text-[14.5px] font-medium">Pick a conversation</p>
+                <p className="max-w-xs text-[12.5px] leading-relaxed text-muted-foreground">
+                  Shortcuts: <Kbd>J</Kbd> / <Kbd>K</Kbd> move, <Kbd>R</Kbd> reply, <Kbd>E</Kbd> close.
                 </p>
               </div>
             ) : (
-              <ul>
-                {filtered.map((s) => {
-                  const isActive = s.id === activeId;
-                  const name = s.guest_name || s.guest_email?.split("@")[0] || "Anonymous";
-                  const hasUnread = s.unread_admin > 0;
-                  return (
-                    <li key={s.id}>
-                      <button
-                        onClick={() => setActiveId(s.id)}
-                        className={`group relative flex w-full items-start gap-3.5 border-b border-border px-5 py-3.5 text-left transition-all duration-200 ${
-                          isActive
-                            ? "bg-gc-sky/50"
-                            : "hover:bg-muted"
+              <>
+                <div className="ops-line flex min-h-16 shrink-0 items-center gap-3 border-b px-4 py-3 sm:px-5">
+                  <button
+                    onClick={() => setActiveId(null)}
+                    className="ops-btn grid h-8 w-8 place-items-center rounded-full md:hidden"
+                    aria-label="Back"
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                  </button>
+                  <span className="ops-chip grid h-10 w-10 shrink-0 place-items-center rounded-full text-[12px] font-medium">
+                    {initials(activeSession.guest_name, activeSession.guest_email)}
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2">
+                      <span className="truncate text-[15px] font-medium">{activeSession.guest_name || "Visitor"}</span>
+                      <span
+                        className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium capitalize ${
+                          activeSession.status === "open" ? "bg-gc-green-soft text-gc-success" : "ops-chip text-muted-foreground"
                         }`}
                       >
-                        {/* Active accent bar */}
-                        <span
-                          className={`absolute left-0 top-1/2 h-8 w-[3px] -translate-y-1/2 rounded-r-full bg-gc-blue transition-all duration-200 ${
-                            isActive ? "opacity-100" : "opacity-0 group-hover:opacity-30"
-                          }`}
-                        />
-                        {/* Unread dot */}
-                        {hasUnread && !isActive && (
-                          <span className="absolute left-1.5 top-1/2 h-1.5 w-1.5 -translate-y-1/2 rounded-full bg-gc-success shadow-[0_0_0_3px_rgba(16,185,129,0.15)]" />
-                        )}
-                        <div className="relative mt-0.5 shrink-0">
-                          <div className={`grid h-10 w-10 place-items-center rounded-xl ${avatarColor(s.guest_name, s.guest_email)} text-[12px] font-semibold text-gc-on-blue shadow-[0_4px_12px_-4px_rgba(0,0,0,0.35)] ring-1 ring-background transition-transform duration-200 group-hover:scale-105`}>
-                            {initials(s.guest_name, s.guest_email)}
-                          </div>
-                          <span
-                            className={`absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full ring-2 ring-background ${
-                              s.status === "open" ? "bg-gc-success" : "bg-gc-line"
-                            }`}
-                          />
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <div className="flex items-baseline justify-between gap-2">
-                            <span
-                              className={`truncate text-[13.5px] tracking-tight ${
-                                hasUnread ? "font-semibold text-gc-ink" : "font-medium text-gc-ink"
-                              }`}
-                            >
-                              {name}
-                            </span>
-                            <span className="shrink-0 font-mono text-[10px] tabular-nums text-gc-ink-muted">
-                              {timeAgo(s.last_message_at)}
-                            </span>
-                          </div>
-                          <div className="mt-0.5 flex items-center justify-between gap-2">
-                            <span className="truncate text-[11.5px] text-gc-ink-muted">
-                              {s.guest_email || "No email provided"}
-                            </span>
-                            {hasUnread && (
-                              <span className="grid h-[18px] min-w-[18px] shrink-0 place-items-center ops-count rounded-full px-1.5 text-[10px] font-semibold tabular-nums shadow-[0_2px_6px_-1px_rgba(0,0,0,0.3)]">
-                                {s.unread_admin}
-                              </span>
-                            )}
-                          </div>
-                          <div className="mt-1.5 flex flex-wrap items-center gap-1">
-                            <Chip
-                              tone="zinc"
-                              icon={s.status === "open" ? <CircleDot className="h-2.5 w-2.5" /> : <Circle className="h-2.5 w-2.5" />}
-                            >
-                              {s.status}
-                            </Chip>
-                            <Chip tone="zinc" icon={<Hash className="h-2.5 w-2.5" />}>
-                              {s.id.slice(0, 6)}
-                            </Chip>
-                          </div>
-                        </div>
-                      </button>
-                    </li>
-
-                  );
-                })}
-              </ul>
-            )}
-          </div>
-        </aside>
-
-        {/* Right — conversation */}
-        <section className={`flex flex-1 flex-col bg-background ${activeId ? "flex" : "hidden md:flex"}`}>
-          {!activeSession ? (
-            <div className="flex flex-1 flex-col items-center justify-center gap-3 p-8 text-center">
-              <div className="grid h-16 w-16 place-items-center ops-card rounded-xl">
-                <Inbox className="h-6 w-6 text-muted-foreground" />
-              </div>
-              <p className="text-[14px] font-semibold tracking-tight text-gc-ink">Select a conversation</p>
-              <p className="max-w-xs text-[12px] leading-relaxed text-muted-foreground">
-                Use <Kbd>J</Kbd> / <Kbd>K</Kbd> to navigate, <Kbd>R</Kbd> to reply, <Kbd>E</Kbd> to close.
-              </p>
-            </div>
-          ) : (
-            <>
-              {/* Thread header */}
-              <div className="flex h-16 shrink-0 items-center gap-3 border-b border-border bg-background px-6">
-
-                <button
-                  onClick={() => setActiveId(null)}
-                  className="grid h-8 w-8 place-items-center rounded-xl text-gc-ink-muted hover:bg-gc-panel md:hidden"
-                  aria-label="Back"
-                >
-                  <ChevronLeft className="h-4 w-4" />
-                </button>
-                <div className={`relative grid h-9 w-9 place-items-center rounded-xl ${avatarColor(activeSession.guest_name, activeSession.guest_email)} text-[11px] font-semibold text-gc-on-blue shadow-[0_2px_6px_-2px_rgba(0,0,0,0.4)] ring-1 ring-border`}>
-                  {initials(activeSession.guest_name, activeSession.guest_email)}
-                  <span className={`absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full ring-2 ring-background ${activeSession.status === "open" ? "bg-gc-success" : "bg-gc-line"}`} />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-1.5">
-                    <span className="truncate text-[14px] font-semibold tracking-tight">
-                      {activeSession.guest_name || "Anonymous visitor"}
-                    </span>
-                    <Chip
-                      tone="zinc"
-                      icon={activeSession.status === "open" ? <CircleDot className="h-2.5 w-2.5" /> : <CheckCircle2 className="h-2.5 w-2.5" />}
-                    >
-                      {activeSession.status}
-                    </Chip>
-                  </div>
-                  <div className="mt-0.5 flex items-center gap-2 text-[11px] text-gc-ink-muted">
-                    {activeSession.guest_email ? (
-                      <button
-                        onClick={() => copyEmail(activeSession.guest_email!)}
-                        className="group flex items-center gap-1 truncate transition hover:text-gc-ink"
-                        title="Copy email"
-                      >
-                        <Mail className="h-3 w-3" />
-                        <span className="truncate">{activeSession.guest_email}</span>
-                        {copied ? (
-                          <CheckCircle2 className="h-3 w-3 text-gc-success" />
-                        ) : (
-                          <Copy className="h-3 w-3 opacity-0 transition group-hover:opacity-100" />
-                        )}
-                      </button>
-                    ) : (
-                      <span className="flex items-center gap-1 text-gc-ink-muted">
-                        <Mail className="h-3 w-3" /> No email
+                        {activeSession.status}
                       </span>
-                    )}
-                    <span className="text-gc-ink-muted">·</span>
-                    <span className="flex items-center gap-1">
-                      <Calendar className="h-3 w-3" /> {new Date(activeSession.created_at).toLocaleDateString()}
-                    </span>
+                    </div>
+                    <div className="mt-0.5 flex flex-wrap items-center gap-x-2 text-[12px] text-muted-foreground">
+                      {activeSession.guest_email ? (
+                        <button
+                          onClick={() => copyEmail(activeSession.guest_email!)}
+                          className="inline-flex items-center gap-1 truncate transition hover:text-foreground"
+                          title="Copy email"
+                        >
+                          {activeSession.guest_email}
+                          {copied ? <CheckCircle2 className="h-3 w-3 text-gc-success" /> : <Copy className="h-3 w-3" />}
+                        </button>
+                      ) : (
+                        <span>No email</span>
+                      )}
+                      <span>·</span>
+                      <span>Started {new Date(activeSession.created_at).toLocaleDateString()}</span>
+                      <span className="hidden sm:inline">· {messages.length} messages</span>
+                    </div>
                   </div>
-                </div>
-                <div className="flex items-center gap-1">
                   {activeSession.status === "open" ? (
                     <button
                       onClick={handleClose}
-                      className="inline-flex items-center gap-1.5 ops-card rounded-xl px-3 py-1.5 text-[12px] font-medium text-foreground transition hover:bg-muted"
+                      className="ops-btn inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full px-4 text-[13px] font-medium"
                       title="Close (E)"
                     >
-                      <Archive className="h-3 w-3" /> Close
+                      <Archive className="h-3.5 w-3.5" /> Close
                     </button>
-                  ) : (
-                    <span className="inline-flex items-center gap-1 rounded-xl bg-muted px-3 py-1.5 text-[12px] font-medium text-muted-foreground">
-                      <CheckCircle2 className="h-3 w-3" /> Closed
-                    </span>
-                  )}
+                  ) : null}
                 </div>
-              </div>
 
-              {/* Messages */}
-              <div ref={scrollRef} className="flex-1 overflow-y-auto bg-muted/30">
-                <div className="mx-auto max-w-3xl space-y-1 p-8">
-                  {messages.length === 0 && (
-                    <div className="py-8 text-center text-[12px] text-muted-foreground">No messages yet</div>
-                  )}
-                  {messages.map((m, i) => {
-                    const isAdminMsg = m.sender === "admin";
-                    const prev = messages[i - 1];
-                    const showHeader = !prev || prev.sender !== m.sender ||
-                      new Date(m.created_at).getTime() - new Date(prev.created_at).getTime() > 5 * 60 * 1000;
-                    return (
-                      <div key={m.id} className={showHeader ? "pt-6" : "pt-1"}>
-                        {showHeader && (
-                          <div className={`mb-2 flex items-center gap-2 text-[12px] text-muted-foreground ${isAdminMsg ? "justify-end" : ""}`}>
-                            <span className="font-medium text-muted-foreground">
-                              {isAdminMsg ? username || "You" : activeSession.guest_name || "Visitor"}
-                            </span>
-                            <span>
-                              {new Date(m.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-                            </span>
-                          </div>
-                        )}
-                        <div className={`flex ${isAdminMsg ? "justify-end" : "justify-start"}`}>
-                          <div
-                            className={`max-w-[78%] whitespace-pre-wrap break-words rounded-xl px-4 py-3 text-[13.5px] leading-relaxed ${ isAdminMsg ? "bg-muted text-gc-ink" : "border border-border bg-background text-gc-ink" }`}
-                          >
-                            {m.content}
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Composer */}
-              <form onSubmit={handleReply} className="shrink-0 border-t border-border bg-background p-5">
-                {activeSession.status === "closed" ? (
-                  <div className="flex items-center justify-center gap-2 ops-card rounded-xl py-3 text-[12px] text-muted-foreground">
-                    <CheckCircle2 className="h-3.5 w-3.5" /> This conversation is closed
-                  </div>
-                ) : (
-                  <div className="mx-auto max-w-3xl">
-                    <div className="relative ops-card rounded-xl transition focus-within:border-foreground">
-
-                      <textarea
-                        ref={inputRef}
-                        value={input}
-                        onChange={(e) => setInput(e.target.value)}
-                        onKeyDown={(e) => {
-                          if ((e.key === "Enter" && (e.metaKey || e.ctrlKey)) || (e.key === "Enter" && !e.shiftKey)) {
-                            e.preventDefault();
-                            handleReply(e as unknown as React.FormEvent);
-                          }
-                        }}
-                        placeholder="Reply to visitor…  (Enter to send, Shift+Enter for newline)"
-                        rows={2}
-                        maxLength={4000}
-                        className="max-h-48 min-h-[60px] w-full resize-none bg-transparent px-4 py-3 text-[13.5px] leading-relaxed outline-none placeholder:text-gc-ink-muted"
-                      />
-                      <div className="flex items-center justify-between gap-2 border-t border-gc-blue/[0.05] px-2.5 py-2">
-                        <div className="relative">
-                          <button
-                            type="button"
-                            onClick={() => setShowCanned((v) => !v)}
-                            className="inline-flex items-center gap-1.5 rounded-xl px-2.5 py-1.5 text-[12px] font-medium text-gc-ink-muted transition hover:bg-gc-blue/5 hover:text-gc-ink"
-                          >
-                            <Zap className="h-3 w-3" /> Canned
-                          </button>
-                          {showCanned && (
-                            <>
-                              <button
-                                type="button"
-                                onClick={() => setShowCanned(false)}
-                                className="fixed inset-0 z-10 cursor-default"
-                                aria-label="Close"
-                              />
-                              <div className="absolute bottom-full left-0 z-20 mb-1.5 w-80 overflow-hidden rounded-xl border border-gc-line bg-background ring-1 ring-border">
-                                <div className="border-b border-gc-line bg-gc-panel/60 px-3 py-2 text-[12px] font-medium text-muted-foreground">
-                                  Quick replies
-                                </div>
-                                <ul className="max-h-64 overflow-y-auto py-1">
-                                  {CANNED.map((c) => (
-                                    <li key={c.key}>
-                                      <button
-                                        type="button"
-                                        onClick={() => {
-                                          setInput((prev) => (prev ? prev + "\n\n" + c.text : c.text));
-                                          setShowCanned(false);
-                                          inputRef.current?.focus();
-                                        }}
-                                        className="block w-full px-3 py-2 text-left transition hover:bg-gc-panel"
-                                      >
-                                        <div className="text-[12.5px] font-semibold text-gc-ink">{c.label}</div>
-                                        <div className="mt-0.5 line-clamp-2 text-[11px] text-gc-ink-muted">{c.text}</div>
-                                      </button>
-                                    </li>
-                                  ))}
-                                </ul>
-                              </div>
-                            </>
+                <div ref={scrollRef} className="min-h-0 flex-1 overflow-y-auto bg-background">
+                  <div className="mx-auto max-w-3xl px-4 py-6 sm:px-8">
+                    {messages.length === 0 && <div className="py-8 text-center text-[12.5px] text-muted-foreground">No messages yet</div>}
+                    {messages.map((m, i) => {
+                      const isAdminMsg = m.sender === "admin";
+                      const prev = messages[i - 1];
+                      const showHeader =
+                        !prev || prev.sender !== m.sender || new Date(m.created_at).getTime() - new Date(prev.created_at).getTime() > 5 * 60 * 1000;
+                      return (
+                        <div key={m.id} className={showHeader ? "pt-5" : "pt-1"}>
+                          {showHeader && (
+                            <div className={`mb-1.5 flex items-center gap-2 text-[12px] text-muted-foreground ${isAdminMsg ? "justify-end" : ""}`}>
+                              <span className="font-medium">{isAdminMsg ? username || "You" : activeSession.guest_name || "Visitor"}</span>
+                              <span>{new Date(m.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</span>
+                            </div>
                           )}
+                          <div className={`flex ${isAdminMsg ? "justify-end" : "justify-start"}`}>
+                            <div
+                              className={`max-w-[80%] whitespace-pre-wrap break-words rounded-2xl px-4 py-2.5 text-[14px] leading-relaxed ${
+                                isAdminMsg ? "bg-foreground text-background" : "ops-card text-foreground"
+                              }`}
+                            >
+                              {m.content}
+                            </div>
+                          </div>
                         </div>
-                        <div className="flex items-center gap-2">
-                          <span className="hidden font-mono text-[10.5px] text-gc-ink-muted sm:inline">
-                            {input.length}/4000
-                          </span>
-                          <button
-                            type="submit"
-                            disabled={sending || !input.trim()}
-                            aria-label="Send"
-                            title="Send (Enter)"
-                            className="grid h-10 w-10 place-items-center rounded-xl bg-gc-blue text-gc-on-blue transition hover:bg-gc-blue-hover disabled:cursor-not-allowed disabled:opacity-40"
-                          >
-                            {sending ? (
-                              <Loader2 className="h-4 w-4 animate-spin" />
-                            ) : (
-                              <Send className="h-4 w-4" />
-                            )}
-                          </button>
+                      );
+                    })}
+                  </div>
+                </div>
 
+                <form onSubmit={handleReply} className="ops-line shrink-0 border-t bg-background p-3 sm:p-4">
+                  {activeSession.status === "closed" ? (
+                    <div className="flex items-center justify-center gap-2 py-2 text-[12.5px] text-muted-foreground">
+                      <CheckCircle2 className="h-3.5 w-3.5" /> This conversation is closed
+                    </div>
+                  ) : (
+                    <div className="mx-auto max-w-3xl">
+                      <div className="ops-input rounded-2xl transition focus-within:ring-2 focus-within:ring-foreground/15">
+                        <textarea
+                          ref={inputRef}
+                          value={input}
+                          onChange={(e) => setInput(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter" && !e.shiftKey) {
+                              e.preventDefault();
+                              handleReply(e as unknown as React.FormEvent);
+                            }
+                          }}
+                          placeholder="Write a reply… (Enter to send, Shift+Enter for a new line)"
+                          rows={2}
+                          maxLength={4000}
+                          className="max-h-48 min-h-[56px] w-full resize-none bg-transparent px-4 py-3 text-[14px] leading-relaxed outline-none placeholder:text-muted-foreground"
+                        />
+                        <div className="flex items-center justify-between gap-2 px-2.5 pb-2.5">
+                          <div className="relative">
+                            <button
+                              type="button"
+                              onClick={() => setShowCanned((v) => !v)}
+                              className="ops-btn inline-flex h-8 items-center gap-1.5 rounded-full px-3 text-[12.5px] font-medium"
+                            >
+                              <Zap className="h-3 w-3" /> Quick replies
+                            </button>
+                            {showCanned && (
+                              <>
+                                <button type="button" onClick={() => setShowCanned(false)} className="fixed inset-0 z-10 cursor-default" aria-label="Close" />
+                                <div className="ops-card absolute bottom-full left-0 z-20 mb-2 w-80 overflow-hidden rounded-2xl bg-background shadow-lg">
+                                  <ul className="max-h-64 overflow-y-auto p-1">
+                                    {CANNED.map((c) => (
+                                      <li key={c.key}>
+                                        <button
+                                          type="button"
+                                          onClick={() => {
+                                            setInput((prev) => (prev ? prev + "\n\n" + c.text : c.text));
+                                            setShowCanned(false);
+                                            inputRef.current?.focus();
+                                          }}
+                                          className="block w-full rounded-xl px-3 py-2 text-left transition hover:bg-foreground/[0.05]"
+                                        >
+                                          <div className="text-[13px] font-medium">{c.label}</div>
+                                          <div className="mt-0.5 line-clamp-2 text-[12px] text-muted-foreground">{c.text}</div>
+                                        </button>
+                                      </li>
+                                    ))}
+                                  </ul>
+                                </div>
+                              </>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="hidden text-[11.5px] tabular-nums text-muted-foreground sm:inline">{input.length}/4000</span>
+                            <button
+                              type="submit"
+                              disabled={sending || !input.trim()}
+                              aria-label="Send"
+                              title="Send (Enter)"
+                              className="inline-flex h-9 items-center gap-1.5 rounded-full bg-foreground px-4 text-[13px] font-medium text-background transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
+                            >
+                              {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-3.5 w-3.5" />} Send
+                            </button>
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                )}
-              </form>
-            </>
-          )}
-        </section>
-
-        {/* Details rail */}
-        {activeSession && (
-          <aside className="hidden w-64 shrink-0 flex-col border-l border-border bg-background p-4 xl:flex">
-            <div className="text-[13px] font-medium text-foreground">
-              Visitor
-            </div>
-            <div className="mt-3 flex items-center gap-3 ops-card rounded-xl p-3">
-              <div className={`relative grid h-11 w-11 place-items-center rounded-xl ${avatarColor(activeSession.guest_name, activeSession.guest_email)} text-[13px] font-semibold text-gc-on-blue shadow-[0_2px_8px_-2px_rgba(0,0,0,0.4)] ring-1 ring-border`}>
-                {initials(activeSession.guest_name, activeSession.guest_email)}
-              </div>
-              <div className="min-w-0">
-                <div className="truncate text-[13.5px] font-semibold tracking-tight">
-                  {activeSession.guest_name || "Anonymous"}
-                </div>
-                <div className="truncate text-[11px] text-gc-ink-muted">
-                  {activeSession.guest_email || "No email"}
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-5 space-y-2.5 text-[11.5px]">
-              <DetailRow icon={<UserIcon className="h-3 w-3" />} label="Name">
-                {activeSession.guest_name || "—"}
-              </DetailRow>
-              <DetailRow icon={<Mail className="h-3 w-3" />} label="Email">
-                {activeSession.guest_email || "—"}
-              </DetailRow>
-              <DetailRow icon={<Hash className="h-3 w-3" />} label="Session">
-                <span className="font-mono text-[10.5px]">{activeSession.id.slice(0, 8)}</span>
-              </DetailRow>
-              <DetailRow icon={<Calendar className="h-3 w-3" />} label="Started">
-                {new Date(activeSession.created_at).toLocaleString()}
-              </DetailRow>
-              <DetailRow icon={<CircleDot className="h-3 w-3" />} label="Status">
-                <span className="capitalize">{activeSession.status}</span>
-              </DetailRow>
-            </div>
-
-            <div className="mt-6 text-[13px] font-medium text-foreground">
-              Activity
-            </div>
-            <div className="mt-2 ops-card rounded-xl p-3 text-[12px]">
-              <div className="flex items-center justify-between">
-                <span className="text-gc-ink-muted">Messages</span>
-                <span className="font-mono tabular-nums font-semibold text-gc-ink">
-                  {messages.length}
-                </span>
-              </div>
-              <div className="mt-2 flex items-center justify-between">
-                <span className="text-gc-ink-muted">Last reply</span>
-                <span className="font-mono tabular-nums text-gc-ink">
-                  {timeAgo(activeSession.last_message_at)} ago
-                </span>
-              </div>
-            </div>
-          </aside>
-        )}
+                  )}
+                </form>
+              </>
+            )}
+          </section>
+        </div>
       </div>
     </div>
   );
