@@ -22,9 +22,9 @@ export const Route = createFileRoute("/_authenticated/dashboard/admin/documents"
 });
 
 const STATUS_BADGES: Record<string, string> = {
-  received: "bg-gc-sky text-gc-blue-deep border-gc-blue-soft",
+  received: "ops-chip text-foreground border-gc-blue-soft",
   pending: "bg-gc-yellow-soft text-gc-amber border-gc-yellow",
-  needs_info: "bg-gc-sky text-gc-blue-deep border-gc-blue-soft",
+  needs_info: "ops-chip text-foreground border-gc-blue-soft",
   verified: "bg-gc-green-soft text-gc-success border-gc-success/30",
   rejected: "bg-gc-red-soft text-gc-red border-gc-red/30",
 };

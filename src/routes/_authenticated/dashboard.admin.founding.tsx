@@ -39,10 +39,10 @@ export const Route = createFileRoute("/_authenticated/dashboard/admin/founding")
 const STATUS_STYLES: Record<string, string> = {
   pending: "bg-gc-yellow-soft text-gc-amber ring-1 ring-gc-yellow",
   approved: "bg-gc-green-soft text-gc-success ring-1 ring-gc-success/30",
-  active: "bg-gc-sky text-gc-blue-deep ring-1 ring-gc-blue-soft",
+  active: "ops-chip text-foreground ring-1 ring-gc-blue-soft",
   rejected: "bg-gc-red-soft text-gc-red ring-1 ring-gc-red/30",
   waitlisted: "bg-muted text-foreground ring-1 ring-border",
-  graduated: "bg-gc-sky text-gc-blue-deep ring-1 ring-gc-blue-soft",
+  graduated: "ops-chip text-foreground ring-1 ring-gc-blue-soft",
 };
 
 type SortKey = "newest" | "oldest" | "name";
