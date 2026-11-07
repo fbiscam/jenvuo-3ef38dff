@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "bun:test";
 import { FOUNDING_SEATS_PER_MONTH, formatSeatOpening, nextSeatOpening, seatsFullMessage } from "./founding-seats";
 
 describe("Founding seats", () => {
