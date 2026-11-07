@@ -58,10 +58,10 @@ export const DOC_GROUPS: DocGroup[] = [
       {
         id: "free-trial",
         title: "Founding Program & access",
-        keywords: "founding program apply id verification trial credit pro elite 30 days $200 seats",
+        keywords: "founding program apply id verification trial credit pro elite 30 days api credit seats",
         body: (
           <>
-            <p>The free trial is closed. Approved Founding Program members get Pro or Elite for 30 days instead, with $200 credit added once their ID is verified. Plans can be bought after your ID is verified.</p>
+            <p>The free trial is closed. Approved Founding Program members get Pro or Elite for 30 days instead, with the plan's API credit ($10 Pro, $25 Elite) added once their ID is verified. Plans can be bought after your ID is verified.</p>
           </>
         ),
       },
@@ -403,7 +403,7 @@ export const DOC_GROUPS: DocGroup[] = [
         keywords: "founding apply early access",
         body: (
           <p>
-            The Founding Program gives early traders 1 month of Pro or Elite and Terminal access, plus $200 credit and JX Bot after ID verification. Apply at{" "}
+            The Founding Program gives early traders 1 month of Pro or Elite and Terminal access, plus the plan's API credit and JX Bot after ID verification. Apply at{" "}
             <a href="https://jenvu.com/founding">jenvu.com/founding</a>, choose a plan and wait for approval. See{" "}
             <a href="#terminal-access">Who can use the Terminal</a> for the verification step.
           </p>

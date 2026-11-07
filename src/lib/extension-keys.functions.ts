@@ -46,6 +46,9 @@ export const createExtensionKey = createServerFn({ method: 'POST' })
     return { name: name || 'Extension key' }
   })
   .handler(async ({ data, context }) => {
+    const { idActionBlock } = await import('./id-gate.server')
+    const idBlocked = await idActionBlock(context.userId)
+    if (idBlocked) return { ok: false as const, error: idBlocked }
     const { generateExtensionKey, hashExtensionKey, encryptExtensionKey } = await import('./extension-auth.server')
     const client = context.supabase as any
     const access = await readAccess(client, context.userId)
@@ -178,6 +181,9 @@ export const rotateExtensionKey = createServerFn({ method: 'POST' })
     return { id: obj.id }
   })
   .handler(async ({ data, context }) => {
+    const { idActionBlock } = await import('./id-gate.server')
+    const idBlocked = await idActionBlock(context.userId)
+    if (idBlocked) return { ok: false as const, error: idBlocked }
     const client = context.supabase as any
     const access = await readAccess(client, context.userId)
     if (!access.active || access.plan === 'free' || access.keyLimit < 1) return { ok: false as const, error: 'Upgrade to Pro, Elite, or Ultra to rotate API keys.' }

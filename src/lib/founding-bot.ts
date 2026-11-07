@@ -74,14 +74,26 @@ export type PurchaseGate = { canBuy: boolean; reason: "ok" | "apply" | "verify_i
  * verified. Founding members still waiting on ID must verify first (any day of their
  * month); everyone else is sent to apply for the Founding Program.
  */
-export function purchaseGate(input: { isAdmin: boolean; member: boolean; verified: boolean }): PurchaseGate {
+export function purchaseGate(input: { isAdmin: boolean; member: boolean; verified: boolean; kind?: "plan" | "topup" }): PurchaseGate {
   if (input.isAdmin || (input.member && input.verified)) return { canBuy: true, reason: "ok" };
+  // Members still waiting on ID can use Payments for credit top-ups, but not pick a plan.
+  if (input.member && input.kind === "topup") return { canBuy: true, reason: "ok" };
   if (input.member) return { canBuy: false, reason: "verify_id" };
   return { canBuy: false, reason: "apply" };
 }
 
+/**
+ * During the Founding month the plan already given as the trial can't be bought again;
+ * the other plans can. After the month ends any plan can be bought.
+ */
+export function isTrialPlanLocked(planId: string | null | undefined, trialPlan: string | null | undefined): boolean {
+  return !!planId && !!trialPlan && planId === trialPlan;
+}
+
+export const TRIAL_PLAN_MESSAGE = "You already have this plan in your Founding month. Pick another plan.";
+
 /** Message shown (and returned by the server) when a purchase is refused. */
 export const PURCHASE_BLOCK_MESSAGE: Record<Exclude<PurchaseGate["reason"], "ok">, string> = {
   apply: "Plans and credit are only for approved Founding Program members. Apply at jenvu.com/founding.",
-  verify_id: "Verify your ID first. Plans can be bought once your documents are approved.",
+  verify_id: "Verify your ID first. Plans can be picked once your documents are approved; credit top-ups work now.",
 };

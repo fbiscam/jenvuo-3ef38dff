@@ -1,4 +1,4 @@
-import { FOUNDING_CREDIT_USD, FOUNDING_PLAN_DAYS, foundingPlanFor } from "@/lib/founding-offer";
+import { foundingCreditFor, FOUNDING_PLAN_DAYS, foundingPlanFor } from "@/lib/founding-offer";
 import { FOUNDING_SEATS_PER_MONTH, nextSeatOpening, seatsFullMessage } from "@/lib/founding-seats";
 import { createServerFn } from "@tanstack/react-start";
 import { createClient } from "@supabase/supabase-js";
@@ -127,7 +127,7 @@ function renderApplicantEmail(kind: ApplicantEmailKind, name: string, plan: stri
   const perks = () =>
     box([
       `<strong>${escapeHtml(meta.label)}</strong> plan for ${FOUNDING_PLAN_DAYS} days`,
-      `$${FOUNDING_CREDIT_USD} API credit for the same ${FOUNDING_PLAN_DAYS} days`,
+      `$${foundingCreditFor(plan)} API credit (the plan's own) for the same ${FOUNDING_PLAN_DAYS} days`,
       "Jenvu Terminal for Gold, Bitcoin and EUR/USD",
       "JX Bot for MetaTrader 5 once your ID is verified",
     ]);
@@ -184,7 +184,7 @@ function renderApplicantEmail(kind: ApplicantEmailKind, name: string, plan: stri
         html: wrap(
           `Your account is funded, ${n}.`,
           "Founding Program · Funded",
-          `<p style="margin:0 0 12px"><strong>$${FOUNDING_CREDIT_USD}</strong> of API credit is now in your wallet on the <strong>${escapeHtml(meta.label)}</strong> plan. It lasts ${FOUNDING_PLAN_DAYS} days and is spent on Chat, the Jenvu API and AI analysis.</p>
+          `<p style="margin:0 0 12px"><strong>$${foundingCreditFor(plan)}</strong> of API credit is now in your wallet on the <strong>${escapeHtml(meta.label)}</strong> plan. It lasts ${FOUNDING_PLAN_DAYS} days and is spent on Chat, the Jenvu API and AI analysis.</p>
            <p style="margin:0">You can see every credit and charge on your Billing page.</p>`,
           { label: "Open my dashboard", href: `${APP_URL}/dashboard` },
           { label: "View billing", href: `${APP_URL}/dashboard/billing` },
@@ -616,7 +616,7 @@ export const updateFoundingApplication = createServerFn({ method: "POST" })
           }
           approvedResetUrl = (linkData as any)?.properties?.action_link || null;
           // Approved members get their selected plan right away (Terminal
-          // unlocks too; Pro or Elite for 30 days + $200 credit ending with it; ID verification within 2 days).
+          // unlocks too; Pro or Elite for 30 days + that plan's API credit ending with it; ID verification within 2 days).
           const planUserId = existingUserId || (linkData as any)?.user?.id || null;
           if (planUserId) {
             // Link the application to the account so Documents/ID upload finds it.

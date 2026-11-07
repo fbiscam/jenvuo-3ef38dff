@@ -17,7 +17,7 @@ const SANS = "font-['Google_Sans_Flex','Google_Sans','Product_Sans','Poppins',sy
 
 export const FAQ = [
   ["Is this financial advice?", "No. Jenvu is an analysis tool. Every setup is for educational purposes and you remain responsible for your own trades."],
-  ["Is there a free trial or open sign-up?", "No. Sign-up and the free trial are closed. Jenvu accounts are created only for approved Founding Program members, who get Pro or Elite for 30 days, plus $200 credit once their ID is verified. Apply at jenvu.com/founding."],
+  ["Is there a free trial or open sign-up?", "No. Sign-up and the free trial are closed. Jenvu accounts are created only for approved Founding Program members, who get Pro or Elite for 30 days with the plan's API credit ($10 Pro, $25 Elite) once their ID is verified. Apply at jenvu.com/founding."],
   ["What do the plans include?", "Every plan includes the Terminal's paid strategies, the Top AI Models and monthly API credit: Pro $29, Elite $59 and Ultra $99 a month. JX Bot for MetaTrader 5 (1, 2 or 5 IPs, verified by IP address, no license key) is offered only to verified Founding Program members, who pay the bot's cost on top: Pro $49, Elite $99 or Ultra $169."],
   ["Who gets JX Bot?", "JX Bot is only for approved Founding Program members. After approval and ID verification, the first month is free. After that, members keep the bot by buying Pro ($49), Elite ($99) or Ultra ($169), which include the JX Bot cost. A plan bought without Founding membership covers the Terminal and API only. Credit alone never unlocks JX Bot. Apply at jenvu.com/founding."],
   ["When does JX Bot trade?", `New trades open Monday to Thursday between 01:00 and 14:00 broker time and on Friday until 13:00. The bot skips the London open (07:00–09:00 UTC), the New York open (13:00–15:00 UTC) and weekends. It stops for the day at a fixed daily target of ${DAILY_TARGET_PCT.pro}% (Pro), ${DAILY_TARGET_PCT.elite}% (Elite) or ${DAILY_TARGET_PCT.ultra}% (Ultra) of the day's starting balance, or at the fixed ${DAILY_DRAWDOWN_PCT}% daily drawdown guard.`],
@@ -226,7 +226,7 @@ function PricingPage() {
                 <Link to="/founding" className={btnStyle(false)}>Apply now</Link>
               )}
             </div>
-            <Summary big="$200" label="credit after ID check" />
+            <Summary big="$10–$25" label="plan API credit after ID check" />
             <FeatureList title="Platform & AI" items={["Pro or Elite for 30 days", "Terminal after ID verification", "100 seats each month"]} />
             <FeatureList title="JX Bot (MT5)" items={["First month free", "Unlocked after ID verification"]} />
           </article>

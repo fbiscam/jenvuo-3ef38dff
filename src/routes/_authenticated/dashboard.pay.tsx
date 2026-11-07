@@ -24,7 +24,7 @@ import {
 import { planPrice, isPaidPlanId, PLAN_API_CREDIT } from "@/lib/plan-pricing";
 import { planFeatures } from "@/lib/plan-features";
 import { getFoundingMembership } from "@/lib/mt5-licenses.functions";
-import { purchaseGate, PURCHASE_BLOCK_MESSAGE } from "@/lib/founding-bot";
+import { purchaseGate, PURCHASE_BLOCK_MESSAGE, isTrialPlanLocked } from "@/lib/founding-bot";
 import { Lock } from "lucide-react";
 import { UsdtIcon, TronIcon, BnbIcon, EthIcon, NetworkIcon } from "@/components/pay/CoinIcons";
 
@@ -101,19 +101,31 @@ function PayPage() {
   const [foundingMember, setFoundingMember] = useState(false);
   // Until the check answers, buying stays locked (only ID-verified Founding members and admins can pay).
   const [gate, setGate] = useState<ReturnType<typeof purchaseGate> | null>(null);
+  // Members waiting on ID can still top up credit; only plans need the verified ID.
+  const [topupGate, setTopupGate] = useState<ReturnType<typeof purchaseGate> | null>(null);
+  const [trialPlan, setTrialPlan] = useState<string | null>(null);
   useEffect(() => {
     let alive = true;
     membershipFn()
-      .then((r) => {
+      .then((r: any) => {
         if (!alive) return;
         setFoundingMember(!!r.verified);
-        setGate(purchaseGate({ isAdmin: !!r.isAdmin, member: !!r.member, verified: !!r.verified }));
+        setTrialPlan(r.trialPlan ?? null);
+        const who = { isAdmin: !!r.isAdmin, member: !!r.member, verified: !!r.verified };
+        setGate(purchaseGate({ ...who, kind: "plan" }));
+        setTopupGate(purchaseGate({ ...who, kind: "topup" }));
       })
-      .catch(() => alive && setGate({ canBuy: false, reason: "apply" }));
+      .catch(() => {
+        if (!alive) return;
+        setGate({ canBuy: false, reason: "apply" });
+        setTopupGate({ canBuy: false, reason: "apply" });
+      });
     return () => { alive = false; };
   }, [membershipFn]);
 
-  const canBuy = !!gate?.canBuy;
+  const canBuyPlan = !!gate?.canBuy;
+  const canTopup = !!topupGate?.canBuy;
+  const canBuy = mode === "upgrade" ? canBuyPlan && !isTrialPlanLocked(selectedPlanId, trialPlan) : canTopup;
 
   const PLANS = [
     { id: "pro", name: "Pro", price: planPrice("pro", foundingMember), features: planFeatures("pro", foundingMember) },
@@ -128,8 +140,8 @@ function PayPage() {
   }, [currentPlan, trial.active, foundingMember]);
 
   useEffect(() => {
-    if (mode === "upgrade" && !selectedPlanId) {
-      const next = PLANS.find(p => p.price > currentPrice);
+    if (mode === "upgrade" && (!selectedPlanId || isTrialPlanLocked(selectedPlanId, trialPlan))) {
+      const next = PLANS.find(p => p.price > currentPrice && !isTrialPlanLocked(p.id, trialPlan));
       if (next) {
         setSelectedPlanId(next.id);
       } else {
@@ -138,7 +150,7 @@ function PayPage() {
         setSelectedPlanId(currentPlan || "pro");
       }
     }
-  }, [mode, currentPlan, currentPrice, selectedPlanId]);
+  }, [mode, currentPlan, currentPrice, selectedPlanId, trialPlan]);
 
   const effAmount = useMemo(() => {
     if (mode === "upgrade" && selectedPlanId) {
@@ -270,7 +282,7 @@ function PayPage() {
         </div>
       </div>
 
-      {gate && !gate.canBuy && (
+      {gate && !gate.canBuy && (mode === "upgrade" || !canTopup) && (
         <div className="mt-6 grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-x-3 rounded-full border border-gc-line bg-gc-surface py-1.5 pl-4 pr-1.5 max-sm:rounded-2xl">
           <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-background">
             <Lock className="h-3.5 w-3.5 text-gc-ink" aria-hidden="true" />
@@ -313,8 +325,9 @@ function PayPage() {
               <div className="mt-5 grid gap-3 sm:grid-cols-3">
                 {PLANS.map((p) => {
                   // Renewing: the current plan stays selectable so it can be paid again.
-                  const isCurrent = !renew && !trial.active && currentPlan === p.id;
-                  const disabled = isCurrent || !canBuy;
+                  const trialLocked = isTrialPlanLocked(p.id, trialPlan);
+                  const isCurrent = trialLocked || (!renew && !trial.active && currentPlan === p.id);
+                  const disabled = isCurrent || !canBuyPlan;
                   const selected = selectedPlanId === p.id;
                   return (
                     <button
@@ -326,7 +339,7 @@ function PayPage() {
                     >
                       <div className="flex items-center justify-between">
                         <span className="text-[14px] font-medium text-gc-ink">{p.name}</span>
-                        {isCurrent && <span className="rounded-full bg-background px-2 py-0.5 text-[11px] text-gc-success">Current</span>}
+                        {isCurrent && <span className="rounded-full bg-background px-2 py-0.5 text-[11px] text-gc-success">{trialLocked ? "Founding month" : "Current"}</span>}
                       </div>
                       <div className="mt-2 text-[24px] tabular-nums text-gc-ink">${p.price}</div>
                       <ul className="mt-4 space-y-1.5">
@@ -398,7 +411,7 @@ function PayPage() {
                   aria-label="Promo code"
                   className={`${field} w-48 uppercase`}
                 />
-                <button type="button" onClick={onRedeem} disabled={busy || !canBuy} className={pill}>Redeem free credit</button>
+                <button type="button" onClick={onRedeem} disabled={busy || !canTopup} className={pill}>Redeem free credit</button>
                 {quote?.error && <span className="text-[13px] text-destructive">{quote.error}</span>}
                 {!quote?.error && quote?.promoCode && (
                   <span className="text-[13px] text-gc-success">
