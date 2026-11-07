@@ -35,6 +35,6 @@
 - [x] Docs page in xAI docs style (overview, models, quickstart, pricing, phone menu) + Code page phone layout
 - [x] Admin Email box: send from support@/sales@jenvu.com, sent history, reply from Contact inbox
 - [ ] Receive replies at support@/sales@jenvu.com (waiting on owner: turn on Cloudflare Email Routing for jenvu.com)
-- [ ] Pricing: all plan buttons on one line (Founding aligned with the others)
-- [ ] Sign-out works everywhere (homepage must not sign you back in); sign-in shows everywhere
-- [ ] Blog list + article pages in the reference-image style
+- [x] Pricing: all plan buttons on one line (Founding aligned with the others)
+- [x] Sign-out works everywhere (homepage must not sign you back in); sign-in shows everywhere
+- [x] Blog list + article pages in the reference-image style
