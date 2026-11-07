@@ -142,6 +142,9 @@ export function initCrossDomainSession() {
       clearSessionCookie();
       return;
     }
+    if (signOutInProgress === false && evt === "SIGNED_IN") {
+      // fresh sign-in: nothing pending
+    }
     if (session?.access_token && session?.refresh_token) {
       writeSessionCookie(session.access_token, session.refresh_token);
     } else if (evt === "SIGNED_OUT") {
