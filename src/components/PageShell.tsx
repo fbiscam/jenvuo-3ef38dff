@@ -172,11 +172,17 @@ export function Banner({ title, children }: { title: string; children: ReactNode
 
 /** "Take the next step" box with a contact CTA and quick links. */
 export function NextStep() {
-  const links: { label: string; cta: string; href?: string; to?: "/pricing" | "/founding"; icon: LucideIcon }[] = [
-    { label: "Join the Founding Program", cta: "Apply now", to: "/founding", icon: Sparkles },
-    { label: "Compare plans and credits", cta: "See pricing", to: "/pricing", icon: BookOpen },
-    { label: "Already a member", cta: "Sign in", href: "https://auth.jenvu.com/sign-in", icon: Headphones },
-  ];
+  const { user } = useAuthUser();
+  const links: { label: string; cta: string; href?: string; to?: "/pricing" | "/founding" | "/dashboard"; icon: LucideIcon }[] = user
+    ? [
+        { label: "Open your dashboard", cta: "Go to dashboard", to: "/dashboard", icon: Sparkles },
+        { label: "Compare plans and credits", cta: "See pricing", to: "/pricing", icon: BookOpen },
+      ]
+    : [
+        { label: "Join the Founding Program", cta: "Apply now", to: "/founding", icon: Sparkles },
+        { label: "Compare plans and credits", cta: "See pricing", to: "/pricing", icon: BookOpen },
+        { label: "Already a member", cta: "Sign in", href: "https://auth.jenvu.com/sign-in", icon: Headphones },
+      ];
   const cls = "flex items-center gap-4 rounded-md bg-background/90 p-4 shadow-sm transition hover:bg-background";
   return (
     <div className="hide-in-pwa mx-auto max-w-[1300px] px-5 pb-0 pt-4 sm:px-10">
@@ -347,7 +353,7 @@ function HeroPrimaryCta() {
   if (loading) return <span className={`${pillBlue} invisible`} aria-hidden>Apply now</span>;
   if (user) {
     return (
-      <Link to="/dashboard/overview" className={pillBlue}>
+      <Link to="/dashboard" className={pillBlue}>
         Go to dashboard <ArrowUpRight className="h-3.5 w-3.5" />
       </Link>
     );
