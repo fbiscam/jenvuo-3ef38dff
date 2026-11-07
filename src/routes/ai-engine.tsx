@@ -111,7 +111,7 @@ const CONTENT: IndustryContent = {
   highlightsTitle: "What you get with every plan",
   highlightsIntro: "Four tools that work together on one live Gold, Bitcoin or EUR/USD chart.",
   highlights: [
-    { title: "Live Gold, Bitcoin and EUR/USD chart", text: "Candles with structure, zones, sweeps marked for you." },
+    { title: "Gold, Bitcoin & EUR/USD ", text: "Candles with structure, zones, sweeps marked for you." },
     { title: "AI answers", text: "Ask about the chart and get a short, plain-language reply." },
     { title: "Price alerts", text: "Pick a level and get told when Gold reaches it." },
     { title: "API keys", text: "Use Jenvu analysis in your own apps and bots." },
