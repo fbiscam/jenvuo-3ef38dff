@@ -57,7 +57,7 @@ function BotUsagePage() {
       setDeleting(null);
     }
   };
-  const { data, isFetching, refetch } = useQuery({ queryKey: ["bot-usage"], queryFn: () => load(), refetchInterval: 5_000, refetchOnWindowFocus: true });
+  const { data, isFetching, refetch } = useQuery({ queryKey: ["bot-usage"], queryFn: () => load(), refetchInterval: 15_000, refetchOnWindowFocus: true });
   const [rangeDays, setRangeDays] = useState(30);
   const [rangeOpen, setRangeOpen] = useState(false);
 

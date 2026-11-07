@@ -150,9 +150,8 @@ function NotificationsPage() {
         )
         .subscribe();
     })();
-    // Polling fallback (15s) + refresh on tab focus so new notifications
-    // appear even if the realtime socket drops.
-    const iv = window.setInterval(() => { refresh(); }, 15000);
+    // Realtime is the live path; slow fallback check (visible tab only) + refresh on focus.
+    const iv = window.setInterval(() => { if (document.visibilityState === "visible") refresh(); }, 60000);
     const onVis = () => { if (document.visibilityState === "visible") refresh(); };
     document.addEventListener("visibilitychange", onVis);
     window.addEventListener("focus", refresh);

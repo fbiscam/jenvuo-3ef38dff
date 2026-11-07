@@ -110,7 +110,7 @@ export default function NotificationBell() {
 
   useEffect(() => {
     load();
-    const t = setInterval(load, 60_000);
+    const t = setInterval(() => { if (document.visibilityState === "visible") void load(); }, 60_000);
     return () => clearInterval(t);
   }, [load]);
 

@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useLivePrices } from "@/hooks/useLivePrices";
 import { toast } from "sonner";
 import { useAuthUser } from "@/hooks/useAuthUser";
+import { pollWhileVisible } from "@/lib/poll";
 
 type OpenTrade = {
   id: string;
@@ -39,8 +40,11 @@ export function useAutoCloseTrades() {
       if (!stopped) setOpenTrades((data as unknown as OpenTrade[]) ?? []);
     };
     fetchOpen();
-    const id = setInterval(fetchOpen, 20000);
-    return () => { stopped = true; clearInterval(id); };
+    // Hidden tabs skip the 20s check; coming back to the tab refreshes at once.
+    const stop = pollWhileVisible(fetchOpen, 20000);
+    const onVis = () => { if (document.visibilityState === "visible") void fetchOpen(); };
+    document.addEventListener("visibilitychange", onVis);
+    return () => { stopped = true; stop(); document.removeEventListener("visibilitychange", onVis); };
   }, [loading, user?.id]);
 
   const symbols = useMemo(
