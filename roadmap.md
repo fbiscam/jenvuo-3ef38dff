@@ -43,3 +43,5 @@
 - [x] Admin console: one theme look on every page
 - [x] Admin hub: number badges for new applications, payments, emails/support
 - [x] Models page: signed-in users don't see Apply now
+- [x] Verify ID notice: clean card with black/white button, hidden on the Documents page
+- [x] Approved Founding members see the Documents upload form (application linked to their account)

@@ -619,6 +619,8 @@ export const updateFoundingApplication = createServerFn({ method: "POST" })
           // unlocks too; Pro or Elite for 30 days + $200 credit ending with it; ID verification within 2 days).
           const planUserId = existingUserId || (linkData as any)?.user?.id || null;
           if (planUserId) {
+            // Link the application to the account so Documents/ID upload finds it.
+            await linkApplicationToUser(admin, data.id, planUserId);
             const { error: planErr } = await admin.rpc("activate_founding_trial" as any, {
               _user_id: planUserId,
               _plan_id: planId,
@@ -653,6 +655,7 @@ export const updateFoundingApplication = createServerFn({ method: "POST" })
           if (!userList?.users?.length || (userList.users.length < 1000)) break;
         }
         if (matchedUserId) {
+          await linkApplicationToUser(admin, data.id, matchedUserId);
           const { error: rpcErr } = await admin.rpc("activate_founding_trial" as any, {
             _user_id: matchedUserId,
             _plan_id: planId,
@@ -819,38 +822,12 @@ export type DocumentStatusRow = {
 export const getMyDocumentStatus = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }): Promise<DocumentStatusRow | null> => {
-    const email = (context.claims as any)?.email as string | undefined;
     try {
-      const fields =
-        "id, full_name, email, status, requested_plan, document_status, documents_submitted_at, documents_verified_at, documents_rejected_at, documents_rejected_reason, documents_note, documents_info_request, documents_info_requested_at, created_at";
-      const { data: linked, error: linkedError } = await context.supabase
-        .from("founding_applications" as any)
-        .select(fields)
-        .eq("user_id", context.userId)
-        .order("created_at", { ascending: false })
-        .limit(1)
-        .maybeSingle();
-      if (linkedError) {
-        // Transient network/permission hiccups must not blank the dashboard.
-        console.error("getMyDocumentStatus failed", linkedError.message);
-        return null;
-      }
-      if (linked) return linked as unknown as DocumentStatusRow;
-      if (!email) return null;
-
-      // Legacy applications may predate user_id binding, so retain email fallback.
-      const { data: legacy, error: legacyError } = await context.supabase
-        .from("founding_applications" as any)
-        .select(fields)
-        .ilike("email", email)
-        .order("created_at", { ascending: false })
-        .limit(1)
-        .maybeSingle();
-      if (legacyError) {
-        console.error("getMyDocumentStatus legacy lookup failed", legacyError.message);
-        return null;
-      }
-      return (legacy as unknown as DocumentStatusRow) ?? null;
+      // Server-side lookup by account id, then by the signed-in email (approval
+      // can happen before the row is linked). RLS only sees linked rows, so a
+      // just-approved member used to get "No application found".
+      const row = await getMyApplication(context, DOC_STATUS_FIELDS);
+      return (row as unknown as DocumentStatusRow) ?? null;
     } catch (e) {
       console.error("getMyDocumentStatus threw", e);
       return null;
@@ -1045,11 +1022,24 @@ async function signPaths(admin: any, rows: FoundingDocFile[]): Promise<FoundingD
   return rows.map((r) => ({ ...r, signed_url: map.get(r.storage_path) ?? null }));
 }
 
-// Returns the founding_applications row bound to the current user's email (creates none).
-async function getMyApplication(context: any) {
+const DOC_STATUS_FIELDS =
+  "id, full_name, email, status, requested_plan, document_status, documents_submitted_at, documents_verified_at, documents_rejected_at, documents_rejected_reason, documents_note, documents_info_request, documents_info_requested_at, created_at, user_id";
+
+/** Bind an application to an account once (never re-points a row already linked elsewhere). */
+async function linkApplicationToUser(admin: any, applicationId: string, userId: string) {
+  const { error } = await admin
+    .from("founding_applications" as any)
+    .update({ user_id: userId })
+    .eq("id", applicationId)
+    .is("user_id", null);
+  if (error) console.error("[founding] link application to user failed:", error.message);
+}
+
+// Returns the founding_applications row for the current user: linked by user_id,
+// else matched by the signed-in email and linked on the spot (creates none).
+async function getMyApplication(context: any, fields = "id, email, full_name, requested_plan, document_status, documents_rejected_at, user_id") {
   const email = (context.claims as any)?.email as string | undefined;
   const admin = await getServiceClient();
-  const fields = "id, email, full_name, requested_plan, document_status, documents_rejected_at";
   const { data: linked } = await admin
     .from("founding_applications" as any)
     .select(fields)
@@ -1066,7 +1056,14 @@ async function getMyApplication(context: any) {
     .order("created_at", { ascending: false })
     .limit(1)
     .maybeSingle();
-  return legacy as any;
+  const row = legacy as any;
+  if (!row) return null;
+  if (row.user_id && row.user_id !== context.userId) return null; // belongs to another account
+  if (!row.user_id) {
+    await linkApplicationToUser(admin, row.id, context.userId);
+    row.user_id = context.userId;
+  }
+  return row;
 }
 
 export const registerDocumentFile = createServerFn({ method: "POST" })

@@ -90,18 +90,18 @@ export function IdVerificationDeadlineNotice({ access }: { access: TerminalAcces
 export function VerifyNotice({ tone = "info", title, text, action }: { tone?: "info" | "warn" | "error"; title: string; text: string; action: string }) {
   const dot = tone === "error" ? "bg-destructive" : tone === "warn" ? "bg-gc-amber" : "bg-gc-ink-muted";
   return (
-    <div className="mb-4 grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-x-4 rounded-full border border-gc-line bg-gc-surface py-2 pl-5 pr-2 sm:pl-6 max-sm:gap-x-3 max-sm:rounded-2xl max-sm:px-4 max-sm:py-3">
-      <span className="relative flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-background">
-        <ShieldAlert className="h-3.5 w-3.5 text-gc-ink" aria-hidden="true" />
-        <span className={`absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full ring-2 ring-gc-surface ${dot}`} aria-hidden="true" />
+    <div className="verify-notice mb-5 flex w-full items-center gap-3.5 rounded-xl border border-gc-line bg-gc-surface px-4 py-3 max-sm:flex-wrap sm:gap-4 sm:px-5">
+      <span className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-gc-line bg-background">
+        <ShieldAlert className="h-4 w-4 text-gc-ink" aria-hidden="true" />
+        <span className={`absolute -right-1 -top-1 h-2.5 w-2.5 rounded-full ring-2 ring-gc-surface ${dot}`} aria-hidden="true" />
       </span>
-      <p className="min-w-0 text-[12.5px] leading-snug text-gc-ink line-clamp-2 sm:line-clamp-none sm:truncate">
-        <span className="font-medium">{title}</span>
-        <span className="text-gc-ink-muted"> — {text}</span>
-      </p>
+      <div className="min-w-0 flex-1">
+        <p className="text-[14px] font-medium leading-snug text-gc-ink">{title}</p>
+        <p className="mt-0.5 text-[13px] leading-snug text-gc-ink-muted">{text}</p>
+      </div>
       <Link
         to="/dashboard/documents"
-        className="verify-cta inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full px-4 text-[12.5px] font-medium transition-opacity hover:opacity-90"
+        className="verify-cta inline-flex h-9 shrink-0 items-center justify-center gap-1.5 rounded-full px-4 text-[13px] font-medium transition-opacity hover:opacity-90 max-sm:w-full"
       >
         <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" />
         {action}

@@ -2524,11 +2524,11 @@ html body :is(.dark, .dash-dark) .vsc-studio .tok-var { color: #a8dcff !importan
 @media (min-width: 1500px) { .jenvu-home-header { --hz: 1.04; } :root:has(.jenvu-zoom) { --content-k: 1.4; } }
 @media (min-width: 1680px) { .jenvu-home-header { --hz: 1.103; } :root:has(.jenvu-home-content) { --content-k: 1.021; } :root:has(.jenvu-zoom) { --content-k: 1.5; } }
 
-/* ID verification button: green "active" pill on every theme. */
+/* ID verification button: monochrome pill (black on white pages, white on black). */
 html body a.verify-cta,
 html body .dash-dark a.verify-cta {
-  background-color: var(--gc-success) !important;
-  color: var(--gc-on-success) !important;
+  background-color: var(--gc-blue) !important;
+  color: var(--gc-on-blue) !important;
 }
 html body a.verify-cta * {
   color: inherit !important;
