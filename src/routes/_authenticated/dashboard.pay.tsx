@@ -21,7 +21,7 @@ import {
   type PaymentOrder,
   type Quote,
 } from "@/lib/payments/shared";
-import { planPrice } from "@/lib/plan-pricing";
+import { planPrice, isPaidPlanId, PLAN_API_CREDIT } from "@/lib/plan-pricing";
 import { planFeatures } from "@/lib/plan-features";
 import { getFoundingMembership } from "@/lib/mt5-licenses.functions";
 import { purchaseGate, PURCHASE_BLOCK_MESSAGE } from "@/lib/founding-bot";
