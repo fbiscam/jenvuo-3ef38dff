@@ -125,7 +125,7 @@ function PricingPage() {
   const [member, setMember] = React.useState(false);
   // Buying is only for admins and ID-verified Founding members; others apply first.
   const [buyGate, setBuyGate] = React.useState<PurchaseGate>({ canBuy: false, reason: "apply" });
-  const [blocked, setBlocked] = React.useState<"verify_id" | "apply" | null>(null);
+  const navigate = useNavigate();
   React.useEffect(() => {
     if (signedOut) { setFounding(false); setMember(false); setBuyGate({ canBuy: false, reason: "apply" }); return; }
     let alive = true;
@@ -164,7 +164,7 @@ function PricingPage() {
     if (disabled) return <button type="button" disabled className={`${btnBase} cursor-not-allowed border border-gc-line bg-gc-surface text-gc-ink-muted`}>Locked in trial</button>;
     if (!signedOut && !buyGate.canBuy) {
       return (
-        <button type="button" onClick={() => setBlocked(buyGate.reason === "verify_id" ? "verify_id" : "apply")} className={btnStyle(solid)}>
+        <button type="button" onClick={() => showBuyBlocked(buyGate.reason === "verify_id" ? "verify_id" : "apply", (t) => navigate({ to: t }))} className={btnStyle(solid)}>
           Buy now
         </button>
       );
