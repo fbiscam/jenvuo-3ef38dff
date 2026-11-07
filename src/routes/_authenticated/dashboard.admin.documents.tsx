@@ -22,9 +22,9 @@ export const Route = createFileRoute("/_authenticated/dashboard/admin/documents"
 });
 
 const STATUS_BADGES: Record<string, string> = {
-  received: "bg-gc-sky text-gc-blue-deep border-gc-blue-soft",
+  received: "ops-chip text-foreground border-gc-blue-soft",
   pending: "bg-gc-yellow-soft text-gc-amber border-gc-yellow",
-  needs_info: "bg-gc-sky text-gc-blue-deep border-gc-blue-soft",
+  needs_info: "ops-chip text-foreground border-gc-blue-soft",
   verified: "bg-gc-green-soft text-gc-success border-gc-success/30",
   rejected: "bg-gc-red-soft text-gc-red border-gc-red/30",
 };
@@ -134,9 +134,14 @@ function AdminDocumentsPage() {
       description="Review ID and driving license uploads, then approve or reject"
       icon={<FileText />}
       tabs={["all", "received", "pending", "needs_info", "verified", "rejected"].map((s) => (
-        <OpsTab key={s} active={filter === s} onClick={() => setFilter(s)}>
+        <OpsTab
+          key={s}
+          active={filter === s}
+          onClick={() => setFilter(s)}
+          count={s === "received" || s === "pending" ? rows.filter((r) => r.document_status === s).length : undefined}
+        >
           <span className="capitalize">{s.replace("_", " ")}</span>
-          {s !== "all" && (
+          {s !== "all" && s !== "received" && s !== "pending" && (
             <span className="ml-1.5 tabular-nums text-muted-foreground">
               {rows.filter((r) => r.document_status === s).length}
             </span>

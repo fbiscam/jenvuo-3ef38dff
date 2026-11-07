@@ -1941,8 +1941,8 @@ h1, h2, h3, h4 { font-family: var(--font-display); letter-spacing: -0.025em; }
 
 /* Black theme: all text pure white (public pages + dashboard). Terminal keeps its own theme. */
 .dark:not(.terminal-dark) { --foreground: #ffffff; --muted-foreground: #ffffff; --card-foreground: #ffffff; --popover-foreground: #ffffff; }
-html.dark body :is(h1,h2,h3,h4,h5,h6,p,span,li,a,label,small,dt,dd,td,th,figcaption,blockquote):not(.terminal-dark *):not([class*="bg-white"] *):not([class*="bg-zinc-900"] *):not(.bg-primary *):not(.bg-foreground *):not(.bg-foreground):not(.bg-primary):not([class*="bg-white"]):not(.bg-gc-ink):not(.console-pill-solid):not(.ask-jenvu-launcher):not(.ask-jenvu-launcher *),
-.dash-dark :is(h1,h2,h3,h4,h5,h6,p,span,li,a,label,small,dt,dd,td,th,figcaption,blockquote):not(.bg-zinc-900 *):not(.bg-primary *):not(.bg-foreground *):not(.bg-white *):not(.bg-foreground):not(.bg-primary):not([class*="bg-white"]):not(.bg-gc-ink):not(.console-pill-solid):not(.ask-jenvu-launcher):not(.ask-jenvu-launcher *):not(.code-box *):not(.docs-code *):not(.jx-ide *) {
+html.dark body :is(h1,h2,h3,h4,h5,h6,p,span,li,a,label,small,dt,dd,td,th,figcaption,blockquote):not(.terminal-dark *):not([class*="bg-white"] *):not([class*="bg-zinc-900"] *):not(.bg-primary *):not(.bg-foreground *):not(.bg-foreground):not(.bg-primary):not([class*="bg-white"]):not(.bg-gc-ink):not(.console-pill-solid):not(.ask-jenvu-launcher):not(.ask-jenvu-launcher *):not(.dev-code-card *):not(.code-box *):not(.docs-code *),
+.dash-dark :is(h1,h2,h3,h4,h5,h6,p,span,li,a,label,small,dt,dd,td,th,figcaption,blockquote):not(.bg-zinc-900 *):not(.bg-primary *):not(.bg-foreground *):not(.bg-white *):not(.bg-foreground):not(.bg-primary):not([class*="bg-white"]):not(.bg-gc-ink):not(.console-pill-solid):not(.ask-jenvu-launcher):not(.ask-jenvu-launcher *):not(.code-box *):not(.docs-code *):not(.jx-ide *):not(.dev-code-card *) {
   color: #ffffff !important;
 }
 
@@ -2479,6 +2479,16 @@ html body :is(.dark, .dash-dark) .vsc-studio .tok-var { color: #a8dcff !importan
 .dev-code-fn { color: #6f42c1; }
 .dev-code-builtin { color: #005cc5; }
 .dev-code-param { color: #e36209; }
+/* Black theme: dark editor with bright, readable syntax colors */
+.dark .dev-code-card, .dash-dark .dev-code-card { background: #111113; color: #e6edf3; box-shadow: 0 10px 30px -12px rgba(0,0,0,0.7); border: 1px solid #27272a; }
+.dark .dev-code-bar, .dash-dark .dev-code-bar { border-bottom-color: #27272a; }
+.dark .dev-code-body, .dash-dark .dev-code-body { color: #e6edf3; scrollbar-color: #3f3f46 transparent; }
+.dark .dev-code-copy { color: #a1a1aa; } .dark .dev-code-copy:hover { color: #ffffff; }
+.dark .dev-code-kw, .dash-dark .dev-code-kw { color: #ff7b72; }
+.dark .dev-code-str, .dash-dark .dev-code-str { color: #a5d6ff; }
+.dark .dev-code-fn, .dash-dark .dev-code-fn { color: #d2a8ff; }
+.dark .dev-code-builtin, .dash-dark .dev-code-builtin { color: #79c0ff; }
+.dark .dev-code-param, .dash-dark .dev-code-param { color: #ffa657; }
 
 /* "Designed to make your Agent smarter" homepage cards */
 :root { --agent-highlight: oklch(0.86 0.06 245 / 0.85); }
@@ -2537,3 +2547,21 @@ html body .docs-code .tok-env, html body .docs-code .tok-const, html body .docs-
 html body .docs-code .tok-keyword { color: #ff7b72 !important; }
 html body .docs-code .tok-func { color: #d2a8ff !important; }
 html body .docs-code .tok-type, html body .docs-code .tok-var { color: #ffa657 !important; }
+
+/* ====== Ops Console (admin) theme: same look as the dashboard console ====== */
+.ops-console { --ops-card: #f4f4f4; --ops-line: #e7e7e7; --ops-chip: #ffffff; --ops-input: #ffffff; }
+.dark .ops-console, .dash-dark .ops-console, .ops-console.dark { --ops-card: #141414; --ops-line: #262626; --ops-chip: #1f1f1f; --ops-input: #0a0a0a; }
+.dark .ops-console.bg-background, .dash-dark .ops-console.bg-background { background-color: #000; }
+.ops-card { background-color: var(--ops-card); border: 1px solid var(--ops-line); }
+.ops-card .ops-card { background-color: transparent; border: 0; border-radius: 0; }
+.ops-line, .ops-console .border-border { border-color: var(--ops-line) !important; }
+.ops-chip { background-color: var(--ops-chip); border: 1px solid var(--ops-line); color: var(--foreground); }
+.ops-tabs { background-color: var(--ops-card); border: 1px solid var(--ops-line); }
+.ops-tab-active { background-color: var(--background); box-shadow: 0 1px 2px rgb(0 0 0 / 0.08); }
+.dark .ops-console .ops-tab-active, .dash-dark .ops-console .ops-tab-active { background-color: #2a2a2a; }
+.ops-input { background-color: var(--ops-input); border: 1px solid var(--ops-line); }
+.ops-btn { background-color: var(--ops-chip); border: 1px solid var(--ops-line); }
+.ops-btn:hover { background-color: var(--ops-card); }
+.ops-console :is(input, textarea, select):not([type="checkbox"]):not([type="radio"]) { border-color: var(--ops-line); }
+.ops-count { background-color: #ef4444; color: #ffffff !important; }
+.ops-tile:hover { border-color: color-mix(in oklab, var(--foreground) 22%, transparent); }

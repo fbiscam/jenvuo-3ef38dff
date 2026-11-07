@@ -39,10 +39,10 @@ export const Route = createFileRoute("/_authenticated/dashboard/admin/founding")
 const STATUS_STYLES: Record<string, string> = {
   pending: "bg-gc-yellow-soft text-gc-amber ring-1 ring-gc-yellow",
   approved: "bg-gc-green-soft text-gc-success ring-1 ring-gc-success/30",
-  active: "bg-gc-sky text-gc-blue-deep ring-1 ring-gc-blue-soft",
+  active: "ops-chip text-foreground ring-1 ring-gc-blue-soft",
   rejected: "bg-gc-red-soft text-gc-red ring-1 ring-gc-red/30",
   waitlisted: "bg-muted text-foreground ring-1 ring-border",
-  graduated: "bg-gc-sky text-gc-blue-deep ring-1 ring-gc-blue-soft",
+  graduated: "ops-chip text-foreground ring-1 ring-gc-blue-soft",
 };
 
 type SortKey = "newest" | "oldest" | "name";
@@ -218,11 +218,11 @@ function AdminFoundingPage() {
           { label: "Rejected", value: counts.rejected || 0, tone: "danger" },
         ]}
       />
-      <div className="flex max-w-full items-center gap-7 overflow-x-auto border-b border-border px-4 text-[13px] sm:px-6">
+      <div className="ops-tabs flex max-w-full items-center gap-1 overflow-x-auto rounded-full p-1 text-[13px] [scrollbar-width:none] sm:w-fit">
         {(["all", "pending", "waitlisted", "approved", "active", "rejected", "graduated"] as const).map((s) => (
-          <OpsTab key={s} active={statusFilter === s} onClick={() => setStatusFilter(s)}>
+          <OpsTab key={s} active={statusFilter === s} onClick={() => setStatusFilter(s)} count={s === "pending" ? counts[s] || 0 : undefined}>
             <span className="capitalize">{s}</span>
-            {s !== "all" && counts[s] ? <span className="ml-1.5 tabular-nums text-muted-foreground">{counts[s]}</span> : null}
+            {s !== "all" && s !== "pending" && counts[s] ? <span className="ml-1.5 tabular-nums text-muted-foreground">{counts[s]}</span> : null}
           </OpsTab>
         ))}
       </div>
