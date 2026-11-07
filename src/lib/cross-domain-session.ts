@@ -1,5 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 import { dashExternal } from "@/lib/url-rewrite";
+import { addSignedOut, decideSync, isSignedOut, parseSignedOut, SIGNED_OUT_COOKIE, tokenClaims } from "@/lib/session-sync";
 
 // Shares the auth session across jenvu.com subdomains (dash, support, blogs,
 // leads). localStorage is per-origin, so without this a user signed in on
@@ -100,6 +101,21 @@ export function clearStoredAuthSessions() {
 export async function signOutAndRedirect(redirectPath = "/dashboard") {
   if (typeof window === "undefined") return;
   const destination = authSignInUrl(redirectPath);
+  // Remember which sign-in ended so every other jenvu.com address drops its
+  // own copy of it instead of signing you back in.
+  if (isJenvuHost()) {
+    const current = await Promise.race([
+      supabase.auth.getSession().then(({ data }) => data.session?.access_token ?? null).catch(() => null),
+      new Promise<null>((resolve) => window.setTimeout(() => resolve(null), 800)),
+    ]);
+    writeSignedOutMarker(
+      addSignedOut(
+        readSignedOutMarker(),
+        tokenClaims(current).sessionId,
+        tokenClaims(readSessionCookie()?.access_token).sessionId,
+      ),
+    );
+  }
   signOutInProgress = true;
   clearStoredAuthSessions();
   await Promise.race([
@@ -114,40 +130,132 @@ export async function signOutAndRedirect(redirectPath = "/dashboard") {
 }
 
 let initialized = false;
+/** Session id this address held most recently (to spot brand-new sign-ins). */
+let lastLocalSessionId: string | null = null;
+/** True while we drop a signed-out copy here, so the shared cookie survives. */
+let droppingLocal = false;
+let syncing = false;
+
+function readSignedOutMarker(): string[] {
+  const match = document.cookie.split("; ").find((c) => c.startsWith(`${SIGNED_OUT_COOKIE}=`));
+  return parseSignedOut(match ? decodeURIComponent(match.slice(SIGNED_OUT_COOKIE.length + 1)) : null);
+}
+
+function writeSignedOutMarker(list: string[]) {
+  if (!isJenvuHost()) return;
+  document.cookie = `${SIGNED_OUT_COOKIE}=${encodeURIComponent(list.join("."))}; Domain=${COOKIE_DOMAIN}; Path=/; Max-Age=${60 * 60 * 24 * 30}; SameSite=Lax; Secure`;
+}
+
+/**
+ * Bring this address in line with the others: drop a session that was signed
+ * out elsewhere, pick up a live sign-in made elsewhere, or share ours.
+ */
+async function syncNow() {
+  if (syncing || signOutInProgress || !isJenvuHost()) return;
+  syncing = true;
+  try {
+    const { data } = await supabase.auth.getSession();
+    const local = data.session;
+    const shared = readSessionCookie();
+    const action = decideSync({
+      localToken: local?.access_token ?? null,
+      sharedToken: shared?.access_token ?? null,
+      signedOut: readSignedOutMarker(),
+    });
+    if (action === "drop-local") {
+      droppingLocal = true;
+      try {
+        await supabase.auth.signOut({ scope: "local" }).catch(() => undefined);
+      } finally {
+        droppingLocal = false;
+      }
+      clearStoredLocalTokens();
+    } else if (action === "adopt-shared" && shared) {
+      const { error } = await supabase.auth.setSession(shared);
+      if (error) {
+        // The shared sign-in is no longer valid; forget it and any stale copy.
+        clearSessionCookie();
+        if (local) {
+          droppingLocal = true;
+          try {
+            await supabase.auth.signOut({ scope: "local" }).catch(() => undefined);
+          } finally {
+            droppingLocal = false;
+          }
+        }
+      }
+    } else if (action === "publish-local" && local) {
+      writeSessionCookie(local.access_token, local.refresh_token);
+    }
+  } finally {
+    syncing = false;
+  }
+}
+
+function clearStoredLocalTokens() {
+  for (const storage of [window.localStorage, window.sessionStorage]) {
+    for (let i = storage.length - 1; i >= 0; i -= 1) {
+      const key = storage.key(i);
+      if (key?.startsWith("sb-") && key.endsWith("-auth-token")) storage.removeItem(key);
+    }
+  }
+}
+
+/** Supabase forbids awaiting its own calls inside the auth callback. */
+function syncSoon() {
+  window.setTimeout(() => void syncNow(), 0);
+}
 
 export function initCrossDomainSession() {
   if (initialized || !isJenvuHost()) return;
   initialized = true;
 
-  // Restore: no local session on this subdomain but a shared cookie exists.
-  supabase.auth.getSession().then(({ data }) => {
-    if (signOutInProgress) {
-      clearSessionCookie();
-      return;
-    }
-    if (data.session) return;
-    const tokens = readSessionCookie();
-    if (!tokens) return;
-    supabase.auth
-      .setSession({
-        access_token: tokens.access_token,
-        refresh_token: tokens.refresh_token,
-      })
-      .catch(() => clearSessionCookie());
-  });
-
-  // Mirror: keep the shared cookie in sync with sign-in / refresh / sign-out.
   supabase.auth.onAuthStateChange((evt, session) => {
     if (signOutInProgress) {
       clearSessionCookie();
       return;
     }
     if (session?.access_token && session?.refresh_token) {
-      writeSessionCookie(session.access_token, session.refresh_token);
-    } else if (evt === "SIGNED_OUT") {
-      clearSessionCookie();
+      const sid = tokenClaims(session.access_token).sessionId;
+      const prev = lastLocalSessionId;
+      lastLocalSessionId = sid;
+      const marker = readSignedOutMarker();
+      // Page open: compare with the other addresses before sharing anything,
+      // so a copy signed out elsewhere can't sign everyone back in.
+      if (evt === "INITIAL_SESSION" || isSignedOut(session.access_token, marker)) {
+        syncSoon();
+        return;
+      }
+      const shared = readSessionCookie();
+      const sharedSid = tokenClaims(shared?.access_token).sessionId;
+      const sharedLive = !!shared && !isSignedOut(shared.access_token, marker);
+      const brandNew = sid !== prev;
+      if (!sharedLive || sharedSid === sid || brandNew) {
+        writeSessionCookie(session.access_token, session.refresh_token);
+      } else {
+        syncSoon();
+      }
+      return;
+    }
+    if (evt === "INITIAL_SESSION") {
+      syncSoon();
+      return;
+    }
+    if (evt === "SIGNED_OUT") {
+      const prev = lastLocalSessionId;
+      lastLocalSessionId = null;
+      if (droppingLocal) return;
+      // Only forget the shared sign-in if it is the one that just ended here.
+      const shared = readSessionCookie();
+      if (!shared || !prev || tokenClaims(shared.access_token).sessionId === prev) clearSessionCookie();
     }
   });
+
+  // Coming back to an open tab: catch sign-outs/sign-ins made elsewhere.
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible") void syncNow();
+  });
+  window.addEventListener("focus", () => void syncNow());
 }
 
 /**
@@ -160,6 +268,10 @@ export async function restoreSharedSession(): Promise<boolean> {
   if (!isJenvuHost() || signOutInProgress) return false;
   const tokens = readSessionCookie();
   if (!tokens) return false;
+  if (isSignedOut(tokens.access_token, readSignedOutMarker())) {
+    clearSessionCookie();
+    return false;
+  }
   const { data, error } = await supabase.auth.setSession(tokens);
   if (error || !data.session) {
     clearSessionCookie();
