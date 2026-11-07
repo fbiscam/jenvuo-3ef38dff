@@ -484,7 +484,7 @@ export const collections: Collection[] = [
         summary: "Charts and tools are included with Terminal access; only AI replies use credits.",
         updatedAt: "2026-10-21",
         body: [
-          { type: "p", content: "The Terminal is only for approved Founding Program members. After approval you have 2 days to verify your ID, or the Terminal locks until you send it. Credit never unlocks it, and plans can be bought only after your ID is verified. Apply at jenvu.com/founding." },
+          { type: "p", content: "The Terminal is only for approved Founding Program members (100 seats a month). After approval you have 2 days to upload your ID; the Terminal and JX Bot open once it is verified, and the Jenvu team then funds your $200 Founding credit. Your Founding month lasts 30 days: after that the Terminal, JX Bot and Founding credit close until you buy a plan and your payment is approved. Credit never unlocks the Terminal, and plans can be bought only after your ID is verified. Apply at jenvu.com/founding." },
           { type: "p", content: "With Terminal access you can use the chart as much as you like. Only AI features use credits, because each AI reply has a real processing cost. Every charge is checked and deducted on Jenvu's servers before an answer is returned, so it cannot be skipped from the browser." },
           { type: "h2", content: "Included with Terminal access (no credits)" },
           { type: "ul", items: [

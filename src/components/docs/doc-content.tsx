@@ -162,7 +162,7 @@ export const DOC_GROUPS: DocGroup[] = [
             <ul>
               <li>After approval you have <strong>2 days</strong> to verify your ID. If it isn't sent in time, the Terminal locks until you send it.</li>
               <li>Credit alone never unlocks the Terminal.</li>
-              <li>Founding members get 1 month of Pro or Elite, and have <strong>2 days</strong> to upload an identity document. The $200 API credit and JX Bot unlock once the ID is verified. After 30 days the plan, credit and bot access end, and you are told whether the bot reached $200 profit; a paid plan keeps JX Bot running.</li>
+              <li>Founding members get 1 month of Pro or Elite, and have <strong>2 days</strong> to upload an identity document. The Terminal and JX Bot open once the ID is verified, and the team then funds the $200 API credit. After 30 days the plan, credit and bot access end, and you are told whether the bot reached $200 profit; a paid plan keeps JX Bot running.</li>
             </ul>
             <p>Apply at <a href="https://jenvu.com/founding">jenvu.com/founding</a>.</p>
           </>
