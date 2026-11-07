@@ -339,7 +339,7 @@ function PricingPage() {
             <Link to="/contact" className="inline-flex h-11 items-center justify-center rounded-full bg-foreground px-6 text-[15px] font-medium text-background transition hover:opacity-90">
               Contact sales
             </Link>
-            <a href="mailto:sales@jenvu.com" className="text-[15px] text-gc-ink-muted underline-offset-4 hover:text-gc-ink hover:underline">sales@jenvu.com</a>
+            <a href="mailto:support@jenvu.com" className="text-[15px] text-gc-ink-muted underline-offset-4 hover:text-gc-ink hover:underline">support@jenvu.com</a>
           </div>
         </div>
         <ul className="grid gap-2.5">
