@@ -1,4 +1,4 @@
-import { describe, it } from "bun:test";
+import { describe, it } from "node:test";
 import { expect } from "./chart/test-expect";
 import { isValidWhatsApp } from "./contact-phone";
 
