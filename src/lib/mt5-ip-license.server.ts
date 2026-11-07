@@ -19,7 +19,7 @@ export async function findLicenseByIp(db: any, ip: string) {
     .is("revoked_at", null)
     .or(`mt5_account.eq."${ip}",mt5_account.like."${ip}#*"`)
     .limit(2);
-  const rows = (data ?? []) as { mt5_account: string | null }[];
+  const rows = (data ?? []) as { id: string; user_id: string; mt5_account: string | null; revoked_at: string | null; last_validated_at: string | null }[];
   return rows.find((r) => r.mt5_account === ip) ?? rows[0] ?? null;
 }
 
