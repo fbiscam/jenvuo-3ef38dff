@@ -19,6 +19,26 @@ export function planPrice(plan: PaidPlanId, withBot: boolean): number {
   return TERMINAL_API_PRICE[plan] + (withBot ? JX_BOT_PRICE[plan] : 0);
 }
 
+/**
+ * API credit a plan payment adds (USD). The rest of the price pays for the Terminal and
+ * JX Bot access, so it is never added to the wallet.
+ */
+export const PLAN_API_CREDIT: Record<PaidPlanId, number> = { pro: 10, elite: 25, ultra: 50 };
+
+/**
+ * Credit to add when an order is approved. Credit top-ups add what was bought. A plan
+ * payment adds only the plan's API credit, minus what switching plans already added.
+ */
+export function orderCreditToAdd(args: {
+  planId: string | null | undefined;
+  topupCreditUsd: number;
+  gainedFromPlanSwitch?: number;
+}): number {
+  if (!isPaidPlanId(args.planId)) return Math.max(0, Math.round(args.topupCreditUsd * 100) / 100);
+  const gained = Math.max(0, args.gainedFromPlanSwitch ?? 0);
+  return Math.max(0, Math.round((PLAN_API_CREDIT[args.planId] - gained) * 100) / 100);
+}
+
 /** Highest plan a payment covers (or null), using the payer's own price list. */
 export function planCoveredBy(paidUsd: number, withBot: boolean): PaidPlanId | null {
   let best: PaidPlanId | null = null;
