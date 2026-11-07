@@ -3,6 +3,7 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import { ArrowUpRight, BookOpen, FileText, Headphones, Mail, Sparkles, type LucideIcon } from "lucide-react";
 import BlogFooter from "@/components/BlogFooter";
 import SiteHeader from "@/components/SiteHeader";
+import { useAuthUser } from "@/hooks/useAuthUser";
 
 const SANS = "font-['Google_Sans_Flex','Google_Sans','Product_Sans','Poppins',system-ui,sans-serif]";
 const AURORAS = ["var(--platform-aurora-1)", "var(--platform-aurora-2)", "var(--platform-aurora-3)"];
@@ -70,9 +71,7 @@ export function PageShell({
             </p>
           )}
           <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
-            <Link to="/founding" className={pillBlue}>
-              Apply now
-            </Link>
+            <HeroPrimaryCta />
             {!oneLine && (
               <Link to="/contact" className={pillOutline}>
                 Contact sales <ArrowUpRight className="h-3.5 w-3.5" />
@@ -339,5 +338,23 @@ export function UL({ children }: { children: ReactNode }) {
     <ul className="list-disc space-y-2 pl-5 text-[15px] leading-[1.65] text-gc-ink-muted marker:text-gc-blue">
       {children}
     </ul>
+  );
+}
+
+/** Signed-out visitors apply; signed-in users go straight to their dashboard. */
+function HeroPrimaryCta() {
+  const { user, loading } = useAuthUser();
+  if (loading) return <span className={`${pillBlue} invisible`} aria-hidden>Apply now</span>;
+  if (user) {
+    return (
+      <Link to="/dashboard/overview" className={pillBlue}>
+        Go to dashboard <ArrowUpRight className="h-3.5 w-3.5" />
+      </Link>
+    );
+  }
+  return (
+    <Link to="/founding" className={pillBlue}>
+      Apply now
+    </Link>
   );
 }
