@@ -55,3 +55,6 @@
 - [x] Plan payments add only the plan's API credit (Pro $10, Elite $25, Ultra $50); existing balances corrected
 - [x] ID not verified: every dashboard page opens look-only (no API keys/Chat/actions); Billing + Payments usable; top-ups allowed, plans only after ID; Founding trial plan not re-buyable during its month
 - [x] Founding credit = plan's API credit only (Pro $10, Elite $25), no $200
+- [x] Dashboard Code page back to its earlier look
+- [x] Admin Documents "Need info" Send request works
+- [x] Submitted ID files locked: no new uploads, not shown, no delete/change (until rejected or info requested)
