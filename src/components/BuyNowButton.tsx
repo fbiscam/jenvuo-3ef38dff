@@ -132,7 +132,8 @@ export function BuyNowButton({
         type="button"
         className={className}
         onClick={() => {
-          if (gate?.canBuy) navigate({ to });
+          if (!gate) return;
+          if (gate.canBuy) navigate({ to });
           else setOpen(true);
         }}
       >

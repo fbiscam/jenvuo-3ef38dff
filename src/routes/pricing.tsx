@@ -1,4 +1,5 @@
 import { DAILY_TARGET_PCT, DAILY_DRAWDOWN_PCT } from "@/lib/mt5-licenses";
+import { BuyBlockedDialog } from "@/components/BuyNowButton";
 import SiteHeader from "@/components/SiteHeader";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import * as React from "react";
@@ -97,6 +98,7 @@ function PricingPage() {
   const [founding, setFounding] = React.useState(false);
   // Buying is only for admins and ID-verified Founding members; others apply first.
   const [buyGate, setBuyGate] = React.useState<PurchaseGate>({ canBuy: false, reason: "apply" });
+  const [blocked, setBlocked] = React.useState<"verify_id" | "apply" | null>(null);
   React.useEffect(() => {
     if (signedOut) { setFounding(false); setBuyGate({ canBuy: false, reason: "apply" }); return; }
     let alive = true;
@@ -245,7 +247,7 @@ function PricingPage() {
             const trialPro = trial.active && plan.key === "pro";
             const isCurrent = currentPlan === plan.key && !trialPro;
             const disabled = currentPlan !== null && !isCurrent && !trialPro && upgradeLock.locked;
-            const destination = buyGate.canBuy ? "/dashboard/pay" : buyGate.reason === "verify_id" ? "/dashboard/documents" : "/founding";
+            const destination = signedOut ? "/founding" : "/dashboard/pay";
             return (
               <article key={plan.key} className={`flex min-h-[280px] flex-col rounded-md border p-7 ${plan.key === "pro" ? "border-gc-blue" : "border-gc-line"}`}>
                 <div className="flex items-center justify-between gap-3">
@@ -273,12 +275,20 @@ function PricingPage() {
                     <div className="flex h-11 items-center justify-center rounded-full border border-gc-line bg-gc-surface text-[15px] font-medium">Current plan</div>
                   ) : disabled ? (
                     <button type="button" disabled className="h-11 w-full cursor-not-allowed rounded-full border border-gc-line bg-gc-surface text-[15px] text-gc-ink-muted">Locked in trial</button>
+                  ) : !signedOut && !buyGate.canBuy ? (
+                    <button
+                      type="button"
+                      onClick={() => setBlocked(buyGate.reason === "verify_id" ? "verify_id" : "apply")}
+                      className={`flex h-11 w-full items-center justify-center rounded-full text-[15px] font-medium transition ${plan.key === "pro" ? "bg-foreground text-background hover:opacity-90" : "bg-gc-pill text-foreground hover:brightness-95"}`}
+                    >
+                      Buy now
+                    </button>
                   ) : (
                     <Link
                       to={destination}
                       className={`flex h-11 items-center justify-center rounded-full text-[15px] font-medium transition ${plan.key === "pro" ? "bg-foreground text-background hover:opacity-90" : "bg-gc-pill text-foreground hover:brightness-95"}`}
                     >
-                      {!buyGate.canBuy ? (buyGate.reason === "verify_id" ? "Verify ID to buy" : "Apply now") : trialPro ? "Upgrade to Pro" : currentPlan !== null ? "Upgrade" : "Buy now"}
+                      {signedOut ? "Apply now" : trialPro ? "Upgrade to Pro" : currentPlan !== null && currentPlan !== "free" ? "Upgrade" : "Buy now"}
                     </Link>
                   )}
                 </div>
@@ -287,6 +297,8 @@ function PricingPage() {
           })}
         </div>
       </section>
+
+      <BuyBlockedDialog open={blocked !== null} onOpenChange={(v) => !v && setBlocked(null)} reason={blocked ?? "apply"} />
 
       {/* COMPARE */}
       <section id="compare" className="scroll-mt-24 mx-auto max-w-[1296px] px-5 py-14 sm:px-8 lg:px-[72px]">

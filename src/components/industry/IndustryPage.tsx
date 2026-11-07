@@ -23,6 +23,7 @@ import {
 import SiteHeader from "@/components/SiteHeader";
 import BlogFooter from "@/components/BlogFooter";
 import { useAuthUser } from "@/hooks/useAuthUser";
+import { BuyNowButton } from "@/components/BuyNowButton";
 import { STORIES } from "@/lib/stories";
 
 /**
@@ -114,9 +115,9 @@ function Buttons() {
       <Link to="/contact" className={pillDark}>
         Talk to an expert
       </Link>
-      <Link to="/pricing" className={pillLight}>
-        Buy now <ArrowUpRight className="h-3.5 w-3.5" />
-      </Link>
+      <BuyNowButton className={pillLight}>
+        <ArrowUpRight className="h-3.5 w-3.5" />
+      </BuyNowButton>
     </div>
   );
 }
@@ -557,16 +558,15 @@ function GetStarted() {
           <div className="flex flex-col rounded-md border border-gc-line p-7 sm:p-8">
             <h3 className="text-2xl font-medium">Start on your own</h3>
             <div className="flex-1">
-              <Ticks items={["Open the live Jenvu Terminal", "Ask the AI desk about the chart", "Compare plans and credits"]} />
+              <Ticks items={["Apply to the Founding Program", "Verify your ID to open the Terminal and JX Bot", "Buy a plan once your ID is verified"]} />
             </div>
             <div className="mt-8 flex flex-wrap gap-3">
-              {user ? (
-                <Link to="/dashboard" className={pillLight}>
-                  Open dashboard <ArrowUpRight className="h-3.5 w-3.5" />
-                </Link>
-              ) : (
-                <Link to="/auth" className={pillLight}>
-                  Try it free <ArrowUpRight className="h-3.5 w-3.5" />
+              <BuyNowButton className={pillLight}>
+                <ArrowUpRight className="h-3.5 w-3.5" />
+              </BuyNowButton>
+              {user && (
+                <Link to="/dashboard" className="inline-flex items-center gap-1.5 rounded-full px-5 py-2.5 text-sm font-medium hover:bg-gc-surface">
+                  Open dashboard
                 </Link>
               )}
               <Link to="/pricing" className="inline-flex items-center gap-1.5 rounded-full px-5 py-2.5 text-sm font-medium hover:bg-gc-surface">
