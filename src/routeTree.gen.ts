@@ -92,6 +92,7 @@ import { Route as AuthenticatedDashboardAdminAccuracyRouteImport } from './route
 import { Route as AuthenticatedDashboardAdminAnnouncementsRouteImport } from './routes/_authenticated/dashboard.admin.announcements'
 import { Route as AuthenticatedDashboardAdminBugsRouteImport } from './routes/_authenticated/dashboard.admin.bugs'
 import { Route as AuthenticatedDashboardAdminDocumentsRouteImport } from './routes/_authenticated/dashboard.admin.documents'
+import { Route as AuthenticatedDashboardAdminEmailsRouteImport } from './routes/_authenticated/dashboard.admin.emails'
 import { Route as AuthenticatedDashboardAdminFoundingRouteImport } from './routes/_authenticated/dashboard.admin.founding'
 import { Route as AuthenticatedDashboardAdminInsightsRouteImport } from './routes/_authenticated/dashboard.admin.insights'
 import { Route as AuthenticatedDashboardAdminMessagesRouteImport } from './routes/_authenticated/dashboard.admin.messages'
@@ -565,6 +566,12 @@ const AuthenticatedDashboardAdminDocumentsRoute =
     path: '/admin/documents',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
+const AuthenticatedDashboardAdminEmailsRoute =
+  AuthenticatedDashboardAdminEmailsRouteImport.update({
+    id: '/admin/emails',
+    path: '/admin/emails',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
 const AuthenticatedDashboardAdminFoundingRoute =
   AuthenticatedDashboardAdminFoundingRouteImport.update({
     id: '/admin/founding',
@@ -806,6 +813,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/admin/announcements': typeof AuthenticatedDashboardAdminAnnouncementsRoute
   '/dashboard/admin/bugs': typeof AuthenticatedDashboardAdminBugsRoute
   '/dashboard/admin/documents': typeof AuthenticatedDashboardAdminDocumentsRoute
+  '/dashboard/admin/emails': typeof AuthenticatedDashboardAdminEmailsRoute
   '/dashboard/admin/founding': typeof AuthenticatedDashboardAdminFoundingRoute
   '/dashboard/admin/insights': typeof AuthenticatedDashboardAdminInsightsRoute
   '/dashboard/admin/messages': typeof AuthenticatedDashboardAdminMessagesRoute
@@ -913,6 +921,7 @@ export interface FileRoutesByTo {
   '/dashboard/admin/announcements': typeof AuthenticatedDashboardAdminAnnouncementsRoute
   '/dashboard/admin/bugs': typeof AuthenticatedDashboardAdminBugsRoute
   '/dashboard/admin/documents': typeof AuthenticatedDashboardAdminDocumentsRoute
+  '/dashboard/admin/emails': typeof AuthenticatedDashboardAdminEmailsRoute
   '/dashboard/admin/founding': typeof AuthenticatedDashboardAdminFoundingRoute
   '/dashboard/admin/insights': typeof AuthenticatedDashboardAdminInsightsRoute
   '/dashboard/admin/messages': typeof AuthenticatedDashboardAdminMessagesRoute
@@ -1026,6 +1035,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/admin/announcements': typeof AuthenticatedDashboardAdminAnnouncementsRoute
   '/_authenticated/dashboard/admin/bugs': typeof AuthenticatedDashboardAdminBugsRoute
   '/_authenticated/dashboard/admin/documents': typeof AuthenticatedDashboardAdminDocumentsRoute
+  '/_authenticated/dashboard/admin/emails': typeof AuthenticatedDashboardAdminEmailsRoute
   '/_authenticated/dashboard/admin/founding': typeof AuthenticatedDashboardAdminFoundingRoute
   '/_authenticated/dashboard/admin/insights': typeof AuthenticatedDashboardAdminInsightsRoute
   '/_authenticated/dashboard/admin/messages': typeof AuthenticatedDashboardAdminMessagesRoute
@@ -1139,6 +1149,7 @@ export interface FileRouteTypes {
     | '/dashboard/admin/announcements'
     | '/dashboard/admin/bugs'
     | '/dashboard/admin/documents'
+    | '/dashboard/admin/emails'
     | '/dashboard/admin/founding'
     | '/dashboard/admin/insights'
     | '/dashboard/admin/messages'
@@ -1246,6 +1257,7 @@ export interface FileRouteTypes {
     | '/dashboard/admin/announcements'
     | '/dashboard/admin/bugs'
     | '/dashboard/admin/documents'
+    | '/dashboard/admin/emails'
     | '/dashboard/admin/founding'
     | '/dashboard/admin/insights'
     | '/dashboard/admin/messages'
@@ -1358,6 +1370,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/admin/announcements'
     | '/_authenticated/dashboard/admin/bugs'
     | '/_authenticated/dashboard/admin/documents'
+    | '/_authenticated/dashboard/admin/emails'
     | '/_authenticated/dashboard/admin/founding'
     | '/_authenticated/dashboard/admin/insights'
     | '/_authenticated/dashboard/admin/messages'
@@ -2037,6 +2050,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardAdminDocumentsRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
+    '/_authenticated/dashboard/admin/emails': {
+      id: '/_authenticated/dashboard/admin/emails'
+      path: '/admin/emails'
+      fullPath: '/dashboard/admin/emails'
+      preLoaderRoute: typeof AuthenticatedDashboardAdminEmailsRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
     '/_authenticated/dashboard/admin/founding': {
       id: '/_authenticated/dashboard/admin/founding'
       path: '/admin/founding'
@@ -2259,6 +2279,7 @@ interface AuthenticatedDashboardRouteChildren {
   AuthenticatedDashboardAdminAnnouncementsRoute: typeof AuthenticatedDashboardAdminAnnouncementsRoute
   AuthenticatedDashboardAdminBugsRoute: typeof AuthenticatedDashboardAdminBugsRoute
   AuthenticatedDashboardAdminDocumentsRoute: typeof AuthenticatedDashboardAdminDocumentsRoute
+  AuthenticatedDashboardAdminEmailsRoute: typeof AuthenticatedDashboardAdminEmailsRoute
   AuthenticatedDashboardAdminFoundingRoute: typeof AuthenticatedDashboardAdminFoundingRoute
   AuthenticatedDashboardAdminInsightsRoute: typeof AuthenticatedDashboardAdminInsightsRoute
   AuthenticatedDashboardAdminMessagesRoute: typeof AuthenticatedDashboardAdminMessagesRoute
@@ -2303,6 +2324,8 @@ const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
     AuthenticatedDashboardAdminBugsRoute: AuthenticatedDashboardAdminBugsRoute,
     AuthenticatedDashboardAdminDocumentsRoute:
       AuthenticatedDashboardAdminDocumentsRoute,
+    AuthenticatedDashboardAdminEmailsRoute:
+      AuthenticatedDashboardAdminEmailsRoute,
     AuthenticatedDashboardAdminFoundingRoute:
       AuthenticatedDashboardAdminFoundingRoute,
     AuthenticatedDashboardAdminInsightsRoute:

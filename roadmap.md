@@ -32,3 +32,6 @@
 - [x] Credits expire 30 days after each grant on every plan and the free trial (Founding credit 60 days); oldest spent first
 - [x] Founding: Pro or Elite pick, $200 credit, everything ends at 30 days with $200-profit notice; JX Bot menu locked for non-members; no dashboard pop-ups
 - [x] Founding-members-only: Terminal/JX Bot/API credit for approved members (2-day ID rule), plans buyable only after ID verified, sign-up and free trial closed, Apply now buttons, themed Founding emails, AI/help copy
+- [x] Docs page in xAI docs style (overview, models, quickstart, pricing, phone menu) + Code page phone layout
+- [x] Admin Email box: send from support@/sales@jenvu.com, sent history, reply from Contact inbox
+- [ ] Receive replies at support@/sales@jenvu.com (waiting on owner: turn on Cloudflare Email Routing for jenvu.com)

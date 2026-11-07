@@ -1942,7 +1942,7 @@ h1, h2, h3, h4 { font-family: var(--font-display); letter-spacing: -0.025em; }
 /* Black theme: all text pure white (public pages + dashboard). Terminal keeps its own theme. */
 .dark:not(.terminal-dark) { --foreground: #ffffff; --muted-foreground: #ffffff; --card-foreground: #ffffff; --popover-foreground: #ffffff; }
 html.dark body :is(h1,h2,h3,h4,h5,h6,p,span,li,a,label,small,dt,dd,td,th,figcaption,blockquote):not(.terminal-dark *):not([class*="bg-white"] *):not([class*="bg-zinc-900"] *):not(.bg-primary *):not(.bg-foreground *):not(.bg-foreground):not(.bg-primary):not([class*="bg-white"]):not(.bg-gc-ink):not(.console-pill-solid):not(.ask-jenvu-launcher):not(.ask-jenvu-launcher *),
-.dash-dark :is(h1,h2,h3,h4,h5,h6,p,span,li,a,label,small,dt,dd,td,th,figcaption,blockquote):not(.bg-zinc-900 *):not(.bg-primary *):not(.bg-foreground *):not(.bg-white *):not(.bg-foreground):not(.bg-primary):not([class*="bg-white"]):not(.bg-gc-ink):not(.console-pill-solid):not(.ask-jenvu-launcher):not(.ask-jenvu-launcher *):not(.code-box *):not(.jx-ide *) {
+.dash-dark :is(h1,h2,h3,h4,h5,h6,p,span,li,a,label,small,dt,dd,td,th,figcaption,blockquote):not(.bg-zinc-900 *):not(.bg-primary *):not(.bg-foreground *):not(.bg-white *):not(.bg-foreground):not(.bg-primary):not([class*="bg-white"]):not(.bg-gc-ink):not(.console-pill-solid):not(.ask-jenvu-launcher):not(.ask-jenvu-launcher *):not(.code-box *):not(.docs-code *):not(.jx-ide *) {
   color: #ffffff !important;
 }
 
@@ -2523,3 +2523,17 @@ html body .dash-dark a.verify-cta {
 html body a.verify-cta * {
   color: inherit !important;
 }
+
+/* Docs code panel: always dark (xAI docs look), in both site themes. */
+.docs-code { background: #0f0f10; color: #e6e6e6; border: 1px solid #1f1f22; }
+.docs-code-bar { border-bottom: 1px solid #222225; }
+.docs-code .docs-code-tab { color: #a1a1aa; }
+.docs-code .docs-code-tab:hover { color: #ffffff; }
+.docs-code .docs-code-tab-on { color: #ffffff; font-weight: 500; }
+html body .docs-code pre, html body .docs-code code { color: #e6e6e6 !important; }
+html body .docs-code .tok-comment { color: #8b949e !important; }
+html body .docs-code .tok-string { color: #a5d6ff !important; }
+html body .docs-code .tok-env, html body .docs-code .tok-const, html body .docs-code .tok-number { color: #79c0ff !important; }
+html body .docs-code .tok-keyword { color: #ff7b72 !important; }
+html body .docs-code .tok-func { color: #d2a8ff !important; }
+html body .docs-code .tok-type, html body .docs-code .tok-var { color: #ffa657 !important; }

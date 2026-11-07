@@ -44,6 +44,45 @@ export type Database = {
         }
         Relationships: []
       }
+      admin_sent_emails: {
+        Row: {
+          body: string
+          contact_message_id: string | null
+          created_at: string
+          error: string | null
+          from_box: string
+          id: string
+          sent_by: string
+          status: string
+          subject: string
+          to_email: string
+        }
+        Insert: {
+          body: string
+          contact_message_id?: string | null
+          created_at?: string
+          error?: string | null
+          from_box: string
+          id?: string
+          sent_by: string
+          status?: string
+          subject: string
+          to_email: string
+        }
+        Update: {
+          body?: string
+          contact_message_id?: string | null
+          created_at?: string
+          error?: string | null
+          from_box?: string
+          id?: string
+          sent_by?: string
+          status?: string
+          subject?: string
+          to_email?: string
+        }
+        Relationships: []
+      }
       ai_cost_log: {
         Row: {
           completion_tokens: number
