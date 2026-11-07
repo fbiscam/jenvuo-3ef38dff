@@ -211,6 +211,13 @@
       "when": 1794025532531,
       "tag": "0029_founding_credit_after_id_verification",
       "breakpoints": true
+    },
+    {
+      "idx": 30,
+      "version": "7",
+      "when": 1794026148486,
+      "tag": "0030_founding_credit_on_admin_fund",
+      "breakpoints": true
     }
   ]
 }
