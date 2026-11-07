@@ -1,30 +1,22 @@
-import JenvuMark from "@/components/JenvuMark";
 import SiteHeader from "@/components/SiteHeader";
-import HeaderAuthButtons from "@/components/HeaderAuthButtons";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState, useMemo } from "react";
+import { useState } from "react";
+import { ChevronRight } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
 import type { Tables } from "@/integrations/supabase/types";
-import BlogFooter from "@/components/BlogFooter";
-import { insightCoverUrl } from "@/lib/insight-cover";
+import InsightsFooter from "@/components/insights/InsightsFooter";
+import { BlogHeroArt, BlogTile } from "@/components/insights/BlogArt";
 
 type Insight = Tables<"insights">;
 
 // Format date deterministically in UTC so SSR and client match exactly.
 const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-function fmtUTC(iso: string, kind: "full" | "compact") {
+export function fmtDate(iso: string) {
   const d = new Date(iso);
-  const mo = MONTHS[d.getUTCMonth()];
-  const day = d.getUTCDate();
-  const yr = d.getUTCFullYear();
-  const hh = String(d.getUTCHours()).padStart(2, "0");
-  const mm = String(d.getUTCMinutes()).padStart(2, "0");
-  return kind === "full"
-    ? `${mo} ${day}, ${yr} · ${hh}:${mm} UTC`
-    : `${hh}:${mm} UTC · ${mo} ${day}`;
+  return `${MONTHS[d.getUTCMonth()]} ${d.getUTCDate()}, ${d.getUTCFullYear()}`;
 }
 
 export const insightsQueryOptions = queryOptions({
@@ -43,7 +35,7 @@ export const insightsQueryOptions = queryOptions({
 export const Route = createFileRoute("/insights/")({
   head: () => ({
     meta: [
-      { title: "Market Insights — Jenvu" },
+      { title: "News — Jenvu Gold Insights and Updates" },
       {
         name: "description",
         content:
@@ -92,211 +84,116 @@ export const Route = createFileRoute("/insights/")({
   ),
 });
 
-const MONO = "font-sans";
 const SANS = "font-['Google_Sans_Flex','Google_Sans','Product_Sans','Poppins',system-ui,sans-serif]";
 
-const PAGE_SIZE = 9;
+const LIST_STEP = 20;
 
 function InsightsPage() {
   const { data: insights } = useSuspenseQuery(insightsQueryOptions);
+  const [shown, setShown] = useState(LIST_STEP);
 
-  // Ticker: any breaking + most recent items (outsourced top-bar feed)
-  const tickerItems = (() => {
-    const breaking = insights.filter((i) => i.is_breaking);
-    const recent = insights.slice(0, 8);
-    const seen = new Set<string>();
-    return [...breaking, ...recent].filter((i) => {
-      if (seen.has(i.id)) return false;
-      seen.add(i.id);
-      return true;
-    }).slice(0, 10);
-  })();
-
-  const [filter, setFilter] = useState<"latest" | "gold" | "macro">("latest");
-  const [page, setPage] = useState(1);
-  const filters: { id: typeof filter; label: string }[] = [
-    { id: "latest", label: "Latest" },
-    { id: "gold", label: "Gold" },
-    { id: "macro", label: "Macro" },
-  ];
-
-  const filtered = useMemo(() => {
-    if (filter === "latest") return insights;
-    const goldCats = ["gold", "eur/usd", "forex", "analysis", "ict", "smc", "strategy", "institutional"];
-    const macroCats = ["market news", "education", "ai"];
-    const match = filter === "gold" ? goldCats : macroCats;
-    return insights.filter((i) => match.includes((i.category || "").toLowerCase()));
-  }, [insights, filter]);
-
-  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
-  const currentPage = Math.min(page, totalPages);
-  const start = (currentPage - 1) * PAGE_SIZE;
-  const pageItems = filtered.slice(start, start + PAGE_SIZE);
-
-  // On page 1 use the first item as the featured hero; grid shows the rest of the page.
-  const featured = currentPage === 1 ? pageItems[0] : undefined;
-  const remaining = currentPage === 1 ? pageItems.slice(1) : pageItems;
-
-  const goToPage = (n: number) => {
-    setPage(Math.min(Math.max(1, n), totalPages));
-    if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
-  };
-  const onFilterChange = (id: typeof filter) => {
-    setFilter(id);
-    setPage(1);
-  };
-
-  const coverProps = (item: Insight) => ({
-    src: insightCoverUrl(item.title, item.category, item.image_url),
-    alt: item.title,
-    width: 1280,
-    height: 720,
-    onError: (e: React.SyntheticEvent<HTMLImageElement>) => {
-      const t = e.currentTarget;
-      t.onerror = null;
-      t.src = insightCoverUrl(item.title, item.category);
-    },
-  });
+  const top = insights[0];
+  const featured = insights.slice(1, 5);
+  const rest = insights.slice(5);
+  const visible = rest.slice(0, shown);
 
   return (
     <div className={`min-h-dvh w-full bg-background text-gc-ink ${SANS} antialiased`}>
       <SiteHeader />
 
       <div className="jenvu-blog-content">
-        {/* HERO */}
-        <section className="site-edge pb-6 pt-14 text-center sm:pt-16">
-          <JenvuMark className="mx-auto h-14 w-14 text-foreground" />
-          <h1 className="mx-auto mt-5 max-w-[960px] text-[34px] font-medium leading-[1.15] tracking-[-0.5px] text-gc-ink sm:text-[50px]">
-            <span className="text-gc-blue">News, tips, and insights</span> to sharpen your Gold trading
-          </h1>
-          <div className="mt-8 flex flex-wrap justify-center gap-2" role="tablist" aria-label="Filter articles">
-            {filters.map((f) => {
-              const active = filter === f.id;
-              return (
-                <button
-                  key={f.id}
-                  type="button"
-                  role="tab"
-                  aria-selected={active}
-                  onClick={() => onFilterChange(f.id)}
-                  className={`h-9 rounded-full border px-4 text-[14px] font-medium transition-colors ${
-                    active
-                      ? "border-gc-nav-active bg-gc-nav-active text-gc-blue-deep"
-                      : "border-gc-line bg-background text-gc-ink hover:bg-gc-surface"
-                  }`}
-                >
-                  {f.label}
-                </button>
-              );
-            })}
-          </div>
-        </section>
+        <main className="site-edge pb-16 pt-12 sm:pt-20">
+          <h1 className="sr-only">Jenvu news and Gold market insights</h1>
 
-        <main className="site-edge py-10 sm:py-12">
-          {/* FEATURED */}
-          {featured && (
-            <Link
-              to="/insights/$slug"
-              params={{ slug: featured.slug }}
-              className="group mb-14 grid items-center gap-8 lg:grid-cols-[minmax(0,5fr)_minmax(0,9fr)] lg:gap-14"
-            >
+          {/* TOP STORY */}
+          {top && (
+            <section className="grid items-center gap-8 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-14">
               <div className="order-2 lg:order-1">
-                <Chip>{featured.category}</Chip>
-                <h2 className="mt-4 text-[26px] font-normal leading-[1.3] text-gc-ink group-hover:text-gc-blue sm:text-[30px]">
-                  {featured.title}
+                <div className="text-[14px] text-gc-ink-muted">{fmtDate(top.published_at)}</div>
+                <h2 className="mt-4 text-[34px] font-normal leading-[1.1] tracking-[-0.8px] text-gc-ink sm:text-[46px]">
+                  {top.title}
                 </h2>
-                {featured.excerpt && (
-                  <p className="mt-4 line-clamp-3 text-[16px] leading-[1.7] text-gc-ink-muted">{featured.excerpt}</p>
+                {top.excerpt && (
+                  <p className="mt-5 line-clamp-3 text-[17px] leading-[1.6] text-gc-ink">{top.excerpt}</p>
                 )}
-                <Byline item={featured} />
-              </div>
-              <div className="order-1 aspect-[16/10] overflow-hidden rounded-[28px] bg-gc-ink lg:order-2">
-                <img {...coverProps(featured)} className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]" />
-              </div>
-            </Link>
-          )}
-
-          {/* NEWS IN SHORT */}
-          <section className="mb-16 rounded-3xl bg-gc-canvas px-6 py-10 sm:px-12">
-            <h2 className="text-[22px] font-medium text-gc-ink">News in short</h2>
-            <p className="mt-2 max-w-[720px] text-[16px] leading-[1.6] text-gc-ink-muted">
-              A quick take on Gold briefings, product updates and trading guides from Jenvu in one handy place. Updated daily.
-            </p>
-            <a href="#subscribe" className="mt-6 inline-flex h-11 items-center rounded-full border border-gc-ink-muted px-6 text-[15px] font-medium text-gc-blue hover:bg-background">
-              Click here
-            </a>
-          </section>
-
-          <h2 className="border-b border-gc-line pb-6 text-[26px] font-normal text-gc-ink sm:text-[30px]">
-            {filter === "latest" ? "All stories" : filter === "gold" ? "Gold analysis" : "Macro and education"}
-          </h2>
-
-          <div className="mt-8 grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
-            {remaining.map((item) => (
-              <Link
-                key={item.id}
-                to="/insights/$slug"
-                params={{ slug: item.slug }}
-                className="group flex min-w-0 flex-col"
-              >
-                <div className="aspect-[16/9] w-full overflow-hidden rounded-2xl bg-gc-surface">
-                  <img {...coverProps(item)} loading="lazy" className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]" />
-                </div>
-                <div className="mt-5">
-                  <Chip>{item.category}</Chip>
-                </div>
-                <h3 className="mt-3 line-clamp-2 text-[20px] font-normal leading-[1.35] text-gc-ink group-hover:text-gc-blue sm:text-[22px]">
-                  {item.title}
-                </h3>
-                {item.excerpt && (
-                  <p className="mt-2 line-clamp-2 text-[15px] leading-[1.6] text-gc-ink-muted">{item.excerpt}</p>
-                )}
-                <Byline item={item} />
-              </Link>
-            ))}
-          </div>
-
-          {remaining.length === 0 && !featured && (
-            <div className="py-16 text-center text-[15px] text-gc-ink-muted">No articles in this category yet.</div>
-          )}
-
-          {totalPages > 1 && (
-            <nav aria-label="Blog pagination" className="mt-14 flex flex-wrap items-center justify-center gap-2">
-              <button
-                type="button"
-                onClick={() => goToPage(currentPage - 1)}
-                disabled={currentPage === 1}
-                className="h-10 rounded-full bg-gc-pill px-4 text-[14px] font-medium text-foreground hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-40"
-              >
-                ← Previous
-              </button>
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map((n) => (
-                <button
-                  key={n}
-                  type="button"
-                  onClick={() => goToPage(n)}
-                  aria-current={n === currentPage ? "page" : undefined}
-                  className={`h-10 min-w-10 rounded-full px-3 text-[14px] font-medium transition-colors ${
-                    n === currentPage ? "bg-foreground text-background" : "text-gc-ink hover:bg-gc-surface"
-                  }`}
+                <Link
+                  to="/insights/$slug"
+                  params={{ slug: top.slug }}
+                  className="mt-8 inline-flex h-11 items-center gap-2 rounded-full bg-foreground px-5 text-[14px] font-medium text-background transition hover:opacity-90"
                 >
-                  {n}
-                </button>
+                  Read More <ChevronRight className="h-4 w-4" />
+                </Link>
+              </div>
+              <Link to="/insights/$slug" params={{ slug: top.slug }} className="order-1 block lg:order-2" aria-label={top.title}>
+                <BlogHeroArt title={top.title} className="aspect-[16/9] w-full lg:aspect-[16/8.4]" />
+              </Link>
+            </section>
+          )}
+
+          {/* FEATURED */}
+          {featured.length > 0 && (
+            <section className="mt-16 grid gap-x-6 gap-y-10 sm:mt-20 sm:grid-cols-2 lg:grid-cols-4">
+              {featured.map((item) => (
+                <Link key={item.id} to="/insights/$slug" params={{ slug: item.slug }} className="group block min-w-0">
+                  <BlogTile title={item.title} category={item.category} className="aspect-[1.9/1] w-full transition group-hover:opacity-90" />
+                  <div className="mt-4 flex items-center gap-2 text-[12px] text-gc-ink">
+                    <span>{item.category}</span>
+                    <span className="text-gc-ink-muted">·</span>
+                    <span>{fmtDate(item.published_at)}</span>
+                  </div>
+                  <h3 className="mt-2 text-[16px] leading-[1.35] text-gc-ink">
+                    <span className="group-hover:underline group-hover:underline-offset-4">{item.title}</span>
+                    <ChevronRight className="ml-1 inline h-3.5 w-3.5 text-gc-ink-muted" />
+                  </h3>
+                </Link>
               ))}
-              <button
-                type="button"
-                onClick={() => goToPage(currentPage + 1)}
-                disabled={currentPage === totalPages}
-                className="h-10 rounded-full bg-gc-pill px-4 text-[14px] font-medium text-foreground hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-40"
-              >
-                Next →
-              </button>
-            </nav>
+            </section>
+          )}
+
+          {/* ALL POSTS */}
+          {rest.length > 0 && (
+            <section className="mt-20 sm:mt-24">
+              <h2 className="text-[28px] font-normal tracking-[-0.4px] text-gc-ink sm:text-[32px]">All posts</h2>
+              <ul className="mt-8 border-t border-gc-line sm:mt-10">
+                {visible.map((item) => (
+                  <li key={item.id} className="border-b border-gc-line">
+                    <Link
+                      to="/insights/$slug"
+                      params={{ slug: item.slug }}
+                      className="group flex flex-col gap-1.5 py-5 sm:flex-row sm:items-center sm:justify-between sm:gap-10"
+                    >
+                      <div className="min-w-0">
+                        <div className="text-[16px] font-medium text-gc-ink group-hover:underline group-hover:underline-offset-4">{item.title}</div>
+                        {item.excerpt && (
+                          <p className="mt-1 line-clamp-2 text-[14px] leading-[1.55] text-gc-ink-muted sm:line-clamp-1">{item.excerpt}</p>
+                        )}
+                      </div>
+                      <div className="shrink-0 text-[13px] text-gc-ink-muted">{fmtDate(item.published_at)}</div>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+              {rest.length > shown && (
+                <div className="mt-10 flex justify-center">
+                  <button
+                    type="button"
+                    onClick={() => setShown((n) => n + LIST_STEP)}
+                    className="h-11 rounded-full bg-gc-pill px-6 text-[14px] font-medium text-foreground hover:brightness-95"
+                  >
+                    Show more posts
+                  </button>
+                </div>
+              )}
+            </section>
+          )}
+
+          {insights.length === 0 && (
+            <div className="py-24 text-center text-[15px] text-gc-ink-muted">No posts yet.</div>
           )}
 
           {/* NEWSLETTER */}
-          <section id="subscribe" className="mt-20 scroll-mt-24 rounded-3xl bg-gc-canvas px-6 py-12 text-center sm:px-12">
-            <h2 className="text-[26px] font-normal leading-[1.25] text-gc-ink sm:text-[32px]">Get new articles by email</h2>
+          <section id="subscribe" className="mt-24 scroll-mt-24 border-t border-gc-line pt-14 text-center">
+            <h2 className="text-[24px] font-normal leading-[1.25] text-gc-ink sm:text-[28px]">Get new posts by email</h2>
             <p className="mx-auto mb-8 mt-3 max-w-xl text-[15px] leading-[1.6] text-gc-ink-muted">
               One short email when a new Gold briefing goes live. Unsubscribe any time.
             </p>
@@ -305,7 +202,7 @@ function InsightsPage() {
         </main>
       </div>
 
-      <BlogFooter />
+      <InsightsFooter />
     </div>
   );
 }
@@ -385,18 +282,4 @@ function SubscribeForm() {
 export function readMinutes(content: string | null | undefined): number {
   const words = (content || "").trim().split(/\s+/).filter(Boolean).length;
   return Math.max(1, Math.round(words / 220));
-}
-
-function Chip({ children }: { children: React.ReactNode }) {
-  return (
-    <span className="inline-flex rounded border border-gc-line px-2 py-1 text-[14px] leading-none text-gc-ink">{children}</span>
-  );
-}
-
-function Byline({ item }: { item: Insight }) {
-  return (
-    <div className="mt-3 text-[14px] text-gc-ink-muted">
-      By Jenvu Team • {readMinutes(item.content)}-minute read • {fmtUTC(item.published_at, "full")}
-    </div>
-  );
 }
