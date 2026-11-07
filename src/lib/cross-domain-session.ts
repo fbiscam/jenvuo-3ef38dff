@@ -142,9 +142,6 @@ export function initCrossDomainSession() {
       clearSessionCookie();
       return;
     }
-    if (signOutInProgress === false && evt === "SIGNED_IN") {
-      // fresh sign-in: nothing pending
-    }
     if (session?.access_token && session?.refresh_token) {
       writeSessionCookie(session.access_token, session.refresh_token);
     } else if (evt === "SIGNED_OUT") {
@@ -187,6 +184,9 @@ function canonicalDestination(path: string): string | null {
  * to in-app navigation.
  */
 export async function goAfterSignIn(path: string, fallback: () => void): Promise<boolean> {
+  // A new sign-in ends any earlier sign-out on this page, so the shared
+  // cookie is written again instead of being wiped.
+  signOutInProgress = false;
   // OAuth consent must stay on the current host with its query intact.
   if (typeof window !== "undefined" && path.startsWith("/.lovable/oauth/consent")) {
     window.location.replace(path);
