@@ -24,6 +24,9 @@ export const playgroundChat = createServerFn({ method: "POST" })
     };
   })
   .handler(async ({ data, context }) => {
+    const { idActionBlock } = await import("@/lib/id-gate.server");
+    const idBlocked = await idActionBlock(context.userId);
+    if (idBlocked) return { ok: false as const, error: idBlocked };
     if (!data.jobId) return runPlaygroundChat(data, context.userId, async () => true);
     // The reply keeps being written (and saved) even if the user leaves the page or closes the site.
     const jobId = data.jobId;
