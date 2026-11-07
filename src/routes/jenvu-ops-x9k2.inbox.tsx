@@ -298,11 +298,11 @@ function AdminInbox() {
   ];
 
   return (
-    <div className="relative flex h-screen flex-col bg-background text-[13px] text-gc-ink antialiased [font-family:'Google_Sans_Flex','Google_Sans','Product_Sans','Poppins',system-ui,-apple-system,sans-serif] [font-feature-settings:'cv11','ss01','ss03'] [font-optical-sizing:auto]">
+    <div className="ops-console relative flex h-screen flex-col bg-background text-[13px] text-gc-ink antialiased [font-family:'Google_Sans_Flex','Google_Sans','Product_Sans','Poppins',system-ui,-apple-system,sans-serif] [font-feature-settings:'cv11','ss01','ss03'] [font-optical-sizing:auto]">
       {/* Top bar */}
       <header className="relative z-10 flex min-h-14 shrink-0 items-center justify-between gap-3 border-b border-border bg-background px-4 py-2 sm:px-6">
         <div className="flex items-center gap-3">
-          <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-gc-sky text-gc-blue-deep">
+          <span className="grid h-9 w-9 shrink-0 place-items-center ops-chip rounded-xl">
             <Inbox className="h-4 w-4" />
           </span>
           <div className="min-w-0">
@@ -383,7 +383,7 @@ function AdminInbox() {
           <div className="flex-1 overflow-y-auto">
             {filtered.length === 0 ? (
               <div className="flex h-full flex-col items-center justify-center px-6 py-10 text-center">
-                <div className="grid h-12 w-12 place-items-center rounded-xl border border-border bg-background">
+                <div className="grid h-12 w-12 place-items-center ops-card rounded-xl">
                   <Inbox className="h-4 w-4 text-muted-foreground" />
                 </div>
                 <p className="mt-3 text-[13px] font-semibold text-gc-ink">No conversations</p>
@@ -445,7 +445,7 @@ function AdminInbox() {
                               {s.guest_email || "No email provided"}
                             </span>
                             {hasUnread && (
-                              <span className="grid h-[18px] min-w-[18px] shrink-0 place-items-center rounded-full bg-gc-blue px-1.5 text-[10px] font-semibold text-gc-on-blue tabular-nums shadow-[0_2px_6px_-1px_rgba(0,0,0,0.3)]">
+                              <span className="grid h-[18px] min-w-[18px] shrink-0 place-items-center ops-count rounded-full px-1.5 text-[10px] font-semibold tabular-nums shadow-[0_2px_6px_-1px_rgba(0,0,0,0.3)]">
                                 {s.unread_admin}
                               </span>
                             )}
@@ -476,7 +476,7 @@ function AdminInbox() {
         <section className={`flex flex-1 flex-col bg-background ${activeId ? "flex" : "hidden md:flex"}`}>
           {!activeSession ? (
             <div className="flex flex-1 flex-col items-center justify-center gap-3 p-8 text-center">
-              <div className="grid h-16 w-16 place-items-center rounded-xl border border-border bg-background">
+              <div className="grid h-16 w-16 place-items-center ops-card rounded-xl">
                 <Inbox className="h-6 w-6 text-muted-foreground" />
               </div>
               <p className="text-[14px] font-semibold tracking-tight text-gc-ink">Select a conversation</p>
@@ -542,7 +542,7 @@ function AdminInbox() {
                   {activeSession.status === "open" ? (
                     <button
                       onClick={handleClose}
-                      className="inline-flex items-center gap-1.5 rounded-xl border border-border bg-background px-3 py-1.5 text-[12px] font-medium text-foreground transition hover:bg-muted"
+                      className="inline-flex items-center gap-1.5 ops-card rounded-xl px-3 py-1.5 text-[12px] font-medium text-foreground transition hover:bg-muted"
                       title="Close (E)"
                     >
                       <Archive className="h-3 w-3" /> Close
@@ -594,12 +594,12 @@ function AdminInbox() {
               {/* Composer */}
               <form onSubmit={handleReply} className="shrink-0 border-t border-border bg-background p-5">
                 {activeSession.status === "closed" ? (
-                  <div className="flex items-center justify-center gap-2 rounded-xl border border-border bg-background py-3 text-[12px] text-muted-foreground">
+                  <div className="flex items-center justify-center gap-2 ops-card rounded-xl py-3 text-[12px] text-muted-foreground">
                     <CheckCircle2 className="h-3.5 w-3.5" /> This conversation is closed
                   </div>
                 ) : (
                   <div className="mx-auto max-w-3xl">
-                    <div className="relative rounded-xl border border-border bg-background transition focus-within:border-foreground">
+                    <div className="relative ops-card rounded-xl transition focus-within:border-foreground">
 
                       <textarea
                         ref={inputRef}
@@ -693,7 +693,7 @@ function AdminInbox() {
             <div className="text-[13px] font-medium text-foreground">
               Visitor
             </div>
-            <div className="mt-3 flex items-center gap-3 rounded-xl border border-border bg-background p-3">
+            <div className="mt-3 flex items-center gap-3 ops-card rounded-xl p-3">
               <div className={`relative grid h-11 w-11 place-items-center rounded-xl ${avatarColor(activeSession.guest_name, activeSession.guest_email)} text-[13px] font-semibold text-gc-on-blue shadow-[0_2px_8px_-2px_rgba(0,0,0,0.4)] ring-1 ring-border`}>
                 {initials(activeSession.guest_name, activeSession.guest_email)}
               </div>
@@ -728,7 +728,7 @@ function AdminInbox() {
             <div className="mt-6 text-[13px] font-medium text-foreground">
               Activity
             </div>
-            <div className="mt-2 rounded-xl border border-border bg-background p-3 text-[12px]">
+            <div className="mt-2 ops-card rounded-xl p-3 text-[12px]">
               <div className="flex items-center justify-between">
                 <span className="text-gc-ink-muted">Messages</span>
                 <span className="font-mono tabular-nums font-semibold text-gc-ink">
