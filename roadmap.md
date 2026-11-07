@@ -45,3 +45,9 @@
 - [x] Models page: signed-in users don't see Apply now
 - [x] Verify ID notice: clean card with black/white button, hidden on the Documents page
 - [x] Approved Founding members see the Documents upload form (application linked to their account)
+- [x] Buy now when ID not verified: toast notice instead of pop-up (no page shake)
+- [x] Verify ID notice only on Overview
+- [x] Billing: Founding shows 30-day access, not 14-day
+- [x] Contact page: required WhatsApp number
+- [x] Email box: Received tab with contact messages
+- [x] Admin pages same width/sections as dashboard pages

@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
+import { isValidWhatsApp } from "@/lib/contact-phone";
 import type { Database } from "@/integrations/supabase/types";
 
 const ContactInput = z.object({
@@ -15,7 +16,9 @@ const ContactInput = z.object({
     .default(""),
   subject: z.string().trim().min(1, "Subject is required").max(150, "Subject is too long"),
   message: z.string().trim().min(5, "Message is too short").max(2000, "Message is too long"),
-});
+  /** Contact page: WhatsApp number is required. */
+  requirePhone: z.boolean().optional(),
+}).refine((d) => !d.requirePhone || isValidWhatsApp(d.phone), { message: "Enter your WhatsApp number", path: ["phone"] });
 
 export type ContactInputType = z.infer<typeof ContactInput>;
 
@@ -44,12 +47,12 @@ function buildNotification(input: ContactInputType) {
       <table style="width:100%;font-size:14px;border-collapse:collapse;margin-bottom:16px">
         <tr><td style="color:#6b7280;padding:4px 0;width:80px">From</td><td style="padding:4px 0"><strong>${safeName}</strong></td></tr>
         <tr><td style="color:#6b7280;padding:4px 0">Email</td><td style="padding:4px 0"><a href="mailto:${safeEmail}">${safeEmail}</a></td></tr>
-        <tr><td style="color:#6b7280;padding:4px 0">Phone</td><td style="padding:4px 0">${safePhone}</td></tr>
+        <tr><td style="color:#6b7280;padding:4px 0">WhatsApp</td><td style="padding:4px 0">${safePhone}</td></tr>
       </table>
       <div style="font-size:14px;line-height:1.6;white-space:pre-wrap;border-top:1px solid #e5e7eb;padding-top:16px">${safeMessage}</div>
       <p style="font-size:12px;color:#6b7280;margin-top:24px">Reply directly to this email — it goes straight to ${safeName}.</p>
     </div></body></html>`;
-  const text = `New contact message\n\nFrom: ${input.name} <${input.email}>\nPhone: ${input.phone || "—"}\nSubject: ${input.subject}\n\n${input.message}\n\nReply to this email to respond directly.`;
+  const text = `New contact message\n\nFrom: ${input.name} <${input.email}>\nWhatsApp: ${input.phone || "—"}\nSubject: ${input.subject}\n\n${input.message}\n\nReply to this email to respond directly.`;
   return { html, text };
 }
 

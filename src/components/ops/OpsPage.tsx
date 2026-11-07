@@ -19,36 +19,29 @@ type OpsPageProps = {
   children: ReactNode;
 };
 
-export function OpsPage({ title, description, icon, actions, tabs, standalone, children }: OpsPageProps) {
+export function OpsPage({ title, description, icon: _icon, actions, tabs, standalone, children }: OpsPageProps) {
+  // Same frame as the regular dashboard pages (Usage, Billing): page width,
+  // big plain title, then sections. Standalone pages copy the dashboard's own
+  // page padding and 0.9 scale so both look the same size.
   return (
     <div
-      className={`ops-console ${
-        standalone
-          ? "min-h-dvh w-full bg-background text-foreground"
-          : "-mx-5 -mt-7 -mb-7 min-h-[calc(100dvh-4rem)] overflow-hidden bg-background text-foreground sm:-mx-8"
-      }`}
+      className={`ops-console text-foreground ${standalone ? "min-h-dvh w-full bg-background px-5 pt-14 sm:px-8 lg:pt-20" : "w-full"}`}
+      style={standalone ? { zoom: 0.9 } : undefined}
     >
-      <div className="mx-auto w-full max-w-[1280px] px-4 pb-10 pt-6 sm:px-6 sm:pt-8">
-        <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-          <div className="flex min-w-0 items-center gap-3">
-            {icon && (
-              <span className="ops-chip grid h-10 w-10 shrink-0 place-items-center rounded-xl [&_svg]:h-[18px] [&_svg]:w-[18px]">
-                {icon}
-              </span>
-            )}
-            <div className="min-w-0">
-              <h1 className="truncate text-[22px] font-medium tracking-tight text-foreground sm:text-[26px]">{title}</h1>
-              {description && <p className="mt-0.5 text-[13.5px] text-muted-foreground">{description}</p>}
-            </div>
+      <div className="mx-auto w-full max-w-[1100px] pb-10">
+        <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="min-w-0">
+            <h1 className="truncate text-[30px] font-normal tracking-tight text-foreground sm:text-[34px]">{title}</h1>
+            {description && <p className="mt-1 text-[14px] text-muted-foreground">{description}</p>}
           </div>
           {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
         </header>
         {tabs && (
-          <div className="ops-tabs mt-5 flex max-w-full items-center gap-1 overflow-x-auto rounded-full p-1 text-[13px] [scrollbar-width:none] sm:w-fit">
+          <div className="ops-tabs mt-6 flex max-w-full items-center gap-1 overflow-x-auto rounded-full p-1 text-[13px] [scrollbar-width:none] sm:w-fit">
             {tabs}
           </div>
         )}
-        <div className="ops-content mt-5 space-y-4">{children}</div>
+        <div className="ops-content mt-6 space-y-4">{children}</div>
       </div>
     </div>
   );

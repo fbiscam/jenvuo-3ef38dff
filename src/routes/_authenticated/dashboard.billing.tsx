@@ -237,7 +237,7 @@ function Billing() {
             </p>
             {trial.active && (
               <p className="pl-4 text-[13px]">
-                14-day Pro access ends {trial.endsAtLabel} · {trial.daysLeft > 1 ? `${trial.daysLeft}d left` : trial.hoursLeft > 1 ? `${trial.hoursLeft}h left` : "ends today"} · remaining trial credit becomes $0.00
+                30-day Pro access ends {trial.endsAtLabel} · {trial.daysLeft > 1 ? `${trial.daysLeft}d left` : trial.hoursLeft > 1 ? `${trial.hoursLeft}h left` : "ends today"} · remaining credit becomes $0.00
               </p>
             )}
             <p className="flex items-center gap-2 pl-4 text-[13px]">
