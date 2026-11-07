@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import JenvuMark from "@/components/JenvuMark";
-import ThemeToggle from "@/components/ThemeToggle";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 type Item = { label: string; to?: string; href?: string };
 
