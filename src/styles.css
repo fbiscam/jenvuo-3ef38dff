@@ -241,6 +241,7 @@
   --gc-canvas: #f4f4f4;
   --gc-section: #fafafa;
   --gc-success: #188038;
+  --gc-on-success: #ffffff;
   --gc-nav-active: #dbedfc;
   --gc-notice: #e9eef6;
   --gc-night: #0b1424;
@@ -2512,3 +2513,13 @@ html body :is(.dark, .dash-dark) .vsc-studio .tok-var { color: #a8dcff !importan
 @media (min-width: 1360px) { .jenvu-home-header { --hz: 0.945; } :root:has(.jenvu-home-content) { --content-k: 0.973; } :root:has(.jenvu-zoom) { --content-k: 1.28; } }
 @media (min-width: 1500px) { .jenvu-home-header { --hz: 1.04; } :root:has(.jenvu-zoom) { --content-k: 1.4; } }
 @media (min-width: 1680px) { .jenvu-home-header { --hz: 1.103; } :root:has(.jenvu-home-content) { --content-k: 1.021; } :root:has(.jenvu-zoom) { --content-k: 1.5; } }
+
+/* ID verification button: green "active" pill on every theme. */
+html body a.verify-cta,
+html body .dash-dark a.verify-cta {
+  background-color: var(--gc-success) !important;
+  color: var(--gc-on-success) !important;
+}
+html body a.verify-cta * {
+  color: inherit !important;
+}

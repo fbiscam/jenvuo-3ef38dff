@@ -15,6 +15,7 @@ import {
   formInputClass,
 } from "@/components/forms/CenteredForm";
 import { submitFoundingApplication, foundingStats } from "@/lib/founding.functions";
+import { FOUNDING_SEATS_PER_MONTH, formatSeatOpening, nextSeatOpening } from "@/lib/founding-seats";
 
 export const Route = createFileRoute("/founding")({
   head: () => ({
@@ -23,12 +24,12 @@ export const Route = createFileRoute("/founding")({
       {
         name: "description",
         content:
-          "Invite-only program for 50 Gold, Bitcoin and EUR/USD traders a month. Approved traders get 1 month of Pro or Elite with $200 credit, and JX Bot once their ID is verified within 2 days.",
+          "Invite-only program for 100 Gold, Bitcoin and EUR/USD traders a month. Approved traders get 1 month of Pro or Elite; $200 credit and JX Bot unlock once their ID is verified within 2 days.",
       },
       { property: "og:title", content: "Founding Trader Program" },
       {
         property: "og:description",
-        content: "Approval unlocks 1 month of Pro or Elite with $200 credit. Verify your ID within 2 days to unlock JX Bot.",
+        content: "Approval unlocks 1 month of Pro or Elite. Verify your ID within 2 days to unlock $200 credit and JX Bot.",
       },
       { property: "og:url", content: "https://jenvu.com/founding" },
       { property: "og:type", content: "website" },
@@ -44,13 +45,13 @@ function FoundingPage() {
   const stats = useServerFn(foundingStats);
   const [submitting, setSubmitting] = React.useState(false);
   const [submitted, setSubmitted] = React.useState(false);
-  const [seats, setSeats] = React.useState<{ filled: number; total: number }>({ filled: 0, total: 50 });
+  const [seats, setSeats] = React.useState<{ filled: number; total: number; nextOpenAt: string }>({ filled: 0, total: FOUNDING_SEATS_PER_MONTH, nextOpenAt: nextSeatOpening().toISOString() });
 
   React.useEffect(() => {
     let cancelled = false;
     const refresh = () => {
       stats()
-        .then((s) => { if (!cancelled) setSeats({ filled: s.seatsFilled, total: s.seatsTotal }); })
+        .then((s) => { if (!cancelled) setSeats({ filled: s.seatsFilled, total: s.seatsTotal, nextOpenAt: s.nextOpenAt }); })
         .catch(() => {});
     };
     refresh();
@@ -120,7 +121,7 @@ function FoundingPage() {
 
       <main className="w-full px-5 pb-24 pt-20 sm:pt-28">
         <FormHero eyebrow="Founding" title="Founding Trader Program">
-          An invite-only program for 50 traders a month. Approved traders get 1 month of Pro or Elite with $200 credit and JX Bot once their ID is verified (within 2 days). After 30 days the plan, credit and bot access end, and we tell you whether the bot reached $200 profit so you can take your payout and choose a paid plan.
+          An invite-only program for 100 traders a month. Approved traders get 1 month of Pro or Elite and the Terminal right away; the $200 API credit and JX Bot unlock once their ID is verified (within 2 days). After 30 days the plan, credit and bot access end, and we tell you whether the bot reached $200 profit so you can take your payout and choose a paid plan.
         </FormHero>
 
         <FormCallout
@@ -130,7 +131,7 @@ function FoundingPage() {
             </Link>
           }
         >
-          <span className="text-foreground">{seats.filled} / {seats.total}</span> seats claimed this month · {remaining} left
+          <span className="text-foreground">{seats.filled} / {seats.total}</span> seats claimed this month · {remaining === 0 ? <>reopens {formatSeatOpening(new Date(seats.nextOpenAt))}</> : <>{remaining} left</>}
           <div className="mx-auto mt-3 h-1.5 max-w-[260px] overflow-hidden rounded-full bg-gc-pill">
             <div className="h-full rounded-full bg-foreground transition-all duration-700 ease-out" style={{ width: `${pct}%` }} />
           </div>
@@ -150,7 +151,7 @@ function FoundingPage() {
             <div className="rounded-xl bg-gc-surface p-6 text-center" role="status" aria-live="polite">
               <h2 className="text-[22px] font-normal tracking-tight">Seats are full this month.</h2>
               <p className="mt-2 text-[15px] text-gc-ink-muted">
-                All {seats.total} Founding seats for this month are taken. Please apply again next month.
+                All {seats.total} Founding seats for this month are taken. Seats open again on <span className="text-foreground">{formatSeatOpening(new Date(seats.nextOpenAt))}</span>.
               </p>
               <Link to="/pricing" className={`${CALLOUT_BUTTON} mt-5`}>See plans and pricing</Link>
             </div>

@@ -90,7 +90,7 @@ export function IdVerificationDeadlineNotice({ access }: { access: TerminalAcces
 export function VerifyNotice({ tone = "info", title, text, action }: { tone?: "info" | "warn" | "error"; title: string; text: string; action: string }) {
   const dot = tone === "error" ? "bg-destructive" : tone === "warn" ? "bg-gc-amber" : "bg-gc-ink-muted";
   return (
-    <div className="mb-4 grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-x-3 rounded-full border border-gc-line bg-gc-surface py-1.5 pl-4 pr-1.5 max-sm:rounded-2xl">
+    <div className="mb-4 grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-x-4 rounded-full border border-gc-line bg-gc-surface py-2 pl-5 pr-2 sm:pl-6 max-sm:gap-x-3 max-sm:rounded-2xl max-sm:px-4 max-sm:py-3">
       <span className="relative flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-background">
         <ShieldAlert className="h-3.5 w-3.5 text-gc-ink" aria-hidden="true" />
         <span className={`absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full ring-2 ring-gc-surface ${dot}`} aria-hidden="true" />
@@ -101,7 +101,7 @@ export function VerifyNotice({ tone = "info", title, text, action }: { tone?: "i
       </p>
       <Link
         to="/dashboard/documents"
-        className="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full bg-gc-blue-deep px-3.5 text-[12.5px] font-medium text-gc-on-blue transition-opacity hover:opacity-90"
+        className="verify-cta inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full px-4 text-[12.5px] font-medium transition-opacity hover:opacity-90"
       >
         <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" />
         {action}
