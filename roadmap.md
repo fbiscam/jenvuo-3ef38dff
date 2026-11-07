@@ -64,3 +64,5 @@
 - [x] lonedone16@gmail.com: ID verified but no API credit — fix grant + root cause
 - [x] API credit: Pro $25, Elite $59, Ultra $99; Founding Pro $25, Elite $50 — code, DB, existing accounts, pricing/docs/help/Ask Jenvu copy
 - [x] Ask Jenvu + contact-sales form: theme look
+- [x] Blog pages: earlier footer back (Follow us + links)
+- [x] Ops console: shell at dashboard size; Support/Founding and other tools inside it larger
