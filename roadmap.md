@@ -62,3 +62,5 @@
 - [x] Ops (admin) console: dashboard-style sidebar layout, slightly larger scale, same font/theme
 - [x] Support page new look, other admin pages dashboard-like
 - [x] lonedone16@gmail.com: ID verified but no API credit — fix grant + root cause
+- [ ] API credit: Pro $25, Elite $59, Ultra $99; Founding Pro $25, Elite $50 — code, DB, existing accounts, pricing/docs/help/Ask Jenvu copy
+- [ ] Ask Jenvu + contact-sales form: theme look
