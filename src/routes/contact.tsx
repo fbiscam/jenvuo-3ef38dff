@@ -4,6 +4,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { submitContactMessage } from "@/lib/contact.functions";
+import { isValidWhatsApp } from "@/lib/contact-phone";
 import BlogFooter from "@/components/BlogFooter";
 import {
   ArrowUpRight,
@@ -71,6 +72,7 @@ const ClientSchema = z.object({
   firstName: z.string().trim().min(1, "Enter your first name").max(50),
   lastName: z.string().trim().min(1, "Enter your last name").max(50),
   email: z.string().trim().email("Enter a valid email").max(255),
+  whatsapp: z.string().trim().refine(isValidWhatsApp, "Enter your WhatsApp number with country code"),
   company: z.string().trim().max(80, "Company name is too long"),
   requestType: z.string().min(1, "Choose a request type"),
   message: z.string().trim().min(5, "Message is too short").max(2000),
@@ -80,12 +82,13 @@ type FormState = {
   firstName: string;
   lastName: string;
   email: string;
+  whatsapp: string;
   company: string;
   requestType: RequestType | "";
   message: string;
 };
 
-const INITIAL: FormState = { firstName: "", lastName: "", email: "", company: "", requestType: "", message: "" };
+const INITIAL: FormState = { firstName: "", lastName: "", email: "", whatsapp: "", company: "", requestType: "", message: "" };
 
 function ContactPage() {
   const submit = useServerFn(submitContactMessage);
@@ -123,7 +126,8 @@ function ContactPage() {
         data: {
           name: `${d.firstName} ${d.lastName}`.trim(),
           email: d.email,
-          phone: "",
+          phone: d.whatsapp,
+          requirePhone: true,
           subject: d.company ? `${d.requestType} — ${d.company}` : d.requestType,
           message: d.message,
         },
@@ -185,6 +189,9 @@ function ContactPage() {
               </div>
               <FormField label="Email" htmlFor="c-email" required error={errors.email}>
                 <input id="c-email" type="email" autoComplete="email" maxLength={255} value={form.email} onChange={onChange("email")} className={formInputClass(!!errors.email)} />
+              </FormField>
+              <FormField label="WhatsApp Number" htmlFor="c-whatsapp" required error={errors.whatsapp}>
+                <input id="c-whatsapp" type="tel" inputMode="tel" autoComplete="tel" placeholder="+1 555 123 4567" maxLength={30} value={form.whatsapp} onChange={onChange("whatsapp")} className={formInputClass(!!errors.whatsapp)} />
               </FormField>
               <FormField label="Company Name (optional)" htmlFor="c-company" error={errors.company}>
                 <input id="c-company" type="text" autoComplete="organization" maxLength={80} value={form.company} onChange={onChange("company")} className={formInputClass(!!errors.company)} />
