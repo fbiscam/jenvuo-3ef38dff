@@ -184,6 +184,9 @@ function canonicalDestination(path: string): string | null {
  * to in-app navigation.
  */
 export async function goAfterSignIn(path: string, fallback: () => void): Promise<boolean> {
+  // A new sign-in ends any earlier sign-out on this page, so the shared
+  // cookie is written again instead of being wiped.
+  signOutInProgress = false;
   // OAuth consent must stay on the current host with its query intact.
   if (typeof window !== "undefined" && path.startsWith("/.lovable/oauth/consent")) {
     window.location.replace(path);

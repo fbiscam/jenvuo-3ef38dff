@@ -72,6 +72,12 @@ export const Route = createFileRoute("/auth")({
       if (search.emailChanged === "1") return;
       if (search.mfa === "1") return;
       if (new URLSearchParams(window.location.search).get("signed_out") === "1") {
+        // Drop the marker first: beforeLoad re-runs when the session changes
+        // (router.invalidate on SIGNED_IN), and a lingering signed_out=1 would
+        // wipe the brand-new session right after the user signs in again.
+        const url = new URL(window.location.href);
+        url.searchParams.delete("signed_out");
+        window.history.replaceState(window.history.state, "", `${url.pathname}${url.search}${url.hash}`);
         clearStoredAuthSessions();
         await supabase.auth.signOut({ scope: "local" }).catch(() => undefined);
         clearStoredAuthSessions();
