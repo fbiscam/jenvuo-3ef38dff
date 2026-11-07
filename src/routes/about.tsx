@@ -115,8 +115,9 @@ function AboutPage() {
           { value: "7", label: "Deterministic trading engines" },
           { value: "3", label: "Markets: Gold, Bitcoin, EUR/USD" },
           { value: "6", label: "Checks before any setup ships" },
-          { value: "14", label: "Days of Pro access in the free trial" },
-          { value: "$100", label: "Free credit to get started" },
+          { value: "30", label: "Days of Pro or Elite for Founding members" },
+          { value: "$200", label: "Credit funded after ID verification" },
+          { value: "100", label: "Founding seats every month" },
         ]}
       />
 

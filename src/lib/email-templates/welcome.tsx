@@ -82,9 +82,9 @@ const WelcomeEmail = ({
               — one key for every model.
             </Text>
             <Text style={listItem}>
-              4. Start your free trial from the{' '}
+              4. Verify your ID from the{' '}
               <Link href={`${DASH}/overview`} style={linkStyle}>Dashboard</Link>{' '}
-              — $100 in credit and 14 days of Pro, no charge when it ends.
+              — your Terminal, JX Bot and $200 Founding credit open after it's checked.
             </Text>
 
             <Section style={{ textAlign: 'center', marginTop: 28 }}>

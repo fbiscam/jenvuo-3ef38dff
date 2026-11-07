@@ -21,8 +21,8 @@ import { pillDark, pillLight, sectionLead, sectionTitle } from "@/components/hom
 const STATS: Array<{ v: string; t: string; g: number }> = [
   { v: "7", t: "analysis engines reading every Gold candle", g: 1 },
   { v: "5", t: "timeframes from 5M to 4H, checked live", g: 2 },
-  { v: "14 days", t: "of Pro access free for new sign-ups", g: 3 },
-  { v: "$100", t: "credit for the top AI models", g: 1 },
+  { v: "30 days", t: "of Pro or Elite for Founding members", g: 3 },
+  { v: "$200", t: "credit once your ID is verified", g: 1 },
 ];
 
 export function HomeStats() {
@@ -189,7 +189,7 @@ export function HomeGetStarted() {
             <div className="flex flex-1 flex-col p-7 sm:p-8">
               <h3 className="text-2xl font-medium text-gc-ink">Trade with Jenvu</h3>
               <div className="flex-1">
-                <Ticks items={["14 days of Pro access and $100 credit", "Jenvu Terminal, AI desk and alerts", "JX Bot for MetaTrader 5"]} />
+                <Ticks items={["30 days of Pro or Elite and $200 credit", "Jenvu Terminal, AI desk and alerts", "JX Bot for MetaTrader 5 (ID verified)"]} />
               </div>
               <div className="mt-8">
                 <Link to="/founding" className={pillDark}>

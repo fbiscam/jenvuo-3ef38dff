@@ -13,7 +13,7 @@ export const Route = createFileRoute("/docs")({
       {
         name: "description",
         content:
-          "Everything about Jenvu in one place: accounts, the free trial, the Terminal chart, zones, FVGs, sweeps, AI chat, plans, API and a full A–Z glossary.",
+          "Everything about Jenvu in one place: accounts, the Founding Program, the Terminal chart, zones, FVGs, sweeps, AI chat, plans, API and a full A–Z glossary.",
       },
       { property: "og:title", content: "Jenvu Documentation — A to Z guide" },
       {
@@ -112,7 +112,7 @@ function DocsPage() {
         <div className="mx-auto max-w-[1296px] px-5 pb-10 pt-12 text-center sm:px-8 md:pt-14">
           <h1 className="jenvu-rise mx-auto max-w-[900px] text-[40px] font-medium leading-[1.1] tracking-[-0.5px] sm:text-[56px]">Jenvu documentation</h1>
           <p className="jenvu-rise [animation-delay:80ms] mx-auto mt-5 max-w-[720px] text-[17px] leading-[1.6] text-gc-ink-muted">
-            The complete A to Z guide to Jenvu — your account, the free trial, the Terminal chart and every marking on it, AI chat,
+            The complete A to Z guide to Jenvu — your account, the Founding Program, the Terminal chart and every marking on it, AI chat,
             plans, the API and a glossary of every term we use.
           </p>
           <div className="jenvu-rise [animation-delay:140ms] mx-auto mt-8 grid max-w-[1100px] gap-3 text-left sm:grid-cols-2 lg:grid-cols-5">
