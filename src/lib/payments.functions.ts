@@ -16,15 +16,23 @@ export const quoteTopup = createServerFn({ method: "POST" })
     return evaluatePromo({ userId: context.userId, amountUsd: data.amountUsd, code: data.code ?? null });
   });
 
-/** Plans, top-ups and credit codes are only for admins and ID-verified Founding members. */
-async function purchaseBlock(supabase: any, userId: string): Promise<string | null> {
-  const { purchaseGate, PURCHASE_BLOCK_MESSAGE, isFoundingMember, isVerifiedFoundingMember } = await import("@/lib/founding-bot");
+/**
+ * Plans need admin or an ID-verified Founding member; credit top-ups and codes are also open
+ * to members still waiting on ID. During the Founding month its trial plan can't be bought again.
+ */
+async function purchaseBlock(supabase: any, userId: string, planId: string | null = null): Promise<string | null> {
+  const { purchaseGate, PURCHASE_BLOCK_MESSAGE, isFoundingMember, isVerifiedFoundingMember, isTrialPlanLocked, TRIAL_PLAN_MESSAGE } = await import("@/lib/founding-bot");
   const { data: isAdmin } = await supabase.rpc("has_role", { _user_id: userId, _role: "admin" });
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const { foundingBotFor } = await import("@/lib/mt5-ip-license.server");
   const info = await foundingBotFor(supabaseAdmin as any, userId);
-  const gate = purchaseGate({ isAdmin: !!isAdmin, member: isFoundingMember(info.state), verified: isVerifiedFoundingMember(info) });
-  return gate.canBuy || gate.reason === "ok" ? null : PURCHASE_BLOCK_MESSAGE[gate.reason];
+  const gate = purchaseGate({ isAdmin: !!isAdmin, member: isFoundingMember(info.state), verified: isVerifiedFoundingMember(info), kind: planId ? "plan" : "topup" });
+  if (!gate.canBuy && gate.reason !== "ok") return PURCHASE_BLOCK_MESSAGE[gate.reason];
+  if (planId && !isAdmin) {
+    const { activeTrialPlan } = await import("@/lib/id-gate.server");
+    if (isTrialPlanLocked(planId, await activeTrialPlan(userId))) return TRIAL_PLAN_MESSAGE;
+  }
+  return null;
 }
 
 const createSchema = z.object({
@@ -39,7 +47,7 @@ export const createTopupOrder = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => createSchema.parse(d))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    const blocked = await purchaseBlock(supabase, userId);
+    const blocked = await purchaseBlock(supabase, userId, data.planId || null);
     if (blocked) return { ok: false as const, error: blocked };
     const { evaluatePromo, getDepositAddresses } = await import("@/lib/payments/core.server");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");

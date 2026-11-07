@@ -29,3 +29,15 @@ export async function idActionBlock(userId: string): Promise<string | null> {
   }
   return idActionsLocked({ isAdmin: false, documentStatus: app?.document_status, hasApplication: !!app }) ? ID_ACTION_MESSAGE : null;
 }
+
+/** The plan running as an active Founding trial for this user, or null. */
+export async function activeTrialPlan(userId: string): Promise<string | null> {
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const { data } = await (supabaseAdmin as any)
+    .from("user_subscriptions")
+    .select("plan_id, status, is_trial, trial_ends_at")
+    .eq("user_id", userId)
+    .maybeSingle();
+  if (!data || data.status !== "active" || !data.is_trial || !data.trial_ends_at) return null;
+  return Date.parse(data.trial_ends_at) > Date.now() ? String(data.plan_id) : null;
+}
