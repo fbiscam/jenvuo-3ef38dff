@@ -1,4 +1,5 @@
-import { describe, expect, it } from "bun:test";
+import { describe, it } from "node:test";
+import { expect } from "./chart/test-expect";
 import { FOUNDING_SEATS_PER_MONTH, formatSeatOpening, nextSeatOpening, seatsFullMessage } from "./founding-seats";
 
 describe("Founding seats", () => {
