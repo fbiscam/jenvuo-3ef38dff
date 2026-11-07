@@ -40,7 +40,9 @@ export const getFoundingMembership = createServerFn({ method: "POST" })
     const { foundingBotFor } = await import("./mt5-ip-license.server");
     const info = await foundingBotFor(supabaseAdmin as any, context.userId);
     const { data: isAdmin } = await (context.supabase as any).rpc("has_role", { _user_id: context.userId, _role: "admin" });
-    return { member: isFoundingMember(info.state), verified: isVerifiedFoundingMember(info), isAdmin: !!isAdmin };
+    const { activeTrialPlan } = await import("./id-gate.server");
+    const trialPlan = isFoundingMember(info.state) && !isAdmin ? await activeTrialPlan(context.userId) : null;
+    return { member: isFoundingMember(info.state), verified: isVerifiedFoundingMember(info), isAdmin: !!isAdmin, trialPlan };
   });
 
 /** Sidebar: whether JX Bot opens (admin, active paid plan or verified Founding member). */
