@@ -11,7 +11,6 @@ function notify() {
   toast(ID_ACTION_MESSAGE, {
     id: "id-view-only",
     duration: 5000,
-    action: { label: "Verify ID now", onClick: () => go?.() },
   });
 }
 
