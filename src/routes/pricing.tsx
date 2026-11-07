@@ -1,7 +1,7 @@
 import { DAILY_TARGET_PCT, DAILY_DRAWDOWN_PCT } from "@/lib/mt5-licenses";
 import { showBuyBlocked } from "@/components/BuyNowButton";
 import SiteHeader from "@/components/SiteHeader";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import * as React from "react";
 import { Bot, Check, Cpu, LineChart, Minus, Plus, Sparkles } from "lucide-react";
 import BlogFooter from "@/components/BlogFooter";
