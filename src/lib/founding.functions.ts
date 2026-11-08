@@ -336,6 +336,8 @@ async function enqueueApplicantEmail(admin: any, kind: ApplicantEmailKind, to: s
 export const submitFoundingApplication = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => ApplyInput.parse(data))
   .handler(async ({ data }): Promise<{ ok: true } | { ok: false; error: string }> => {
+    const { FOUNDING_APPLICATIONS_OPEN, FOUNDING_CLOSED_MESSAGE } = await import("@/lib/founding-seats");
+    if (!FOUNDING_APPLICATIONS_OPEN) return { ok: false, error: FOUNDING_CLOSED_MESSAGE };
     const url = process.env.SUPABASE_URL;
     const pub = process.env.SUPABASE_PUBLISHABLE_KEY;
     const service = process.env.SUPABASE_SERVICE_ROLE_KEY;
