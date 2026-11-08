@@ -33,3 +33,22 @@ export function domainAge(created: Date, now: Date): string {
   const m = months % 12;
   return `${y} year${y === 1 ? "" : "s"}, ${m} month${m === 1 ? "" : "s"}`;
 }
+
+/**
+ * Only real public websites may be opened by the inspector: no IP addresses,
+ * no local/internal names, no own-service hosts, standard ports only.
+ * Checked for the first address and for every redirect hop.
+ */
+export function isInspectableUrl(raw: string): boolean {
+  let u: URL;
+  try { u = new URL(raw); } catch { return false; }
+  if (u.protocol !== "https:" && u.protocol !== "http:") return false;
+  if (u.username || u.password) return false;
+  if (u.port && u.port !== "80" && u.port !== "443") return false;
+  const host = u.hostname.toLowerCase().replace(/\.$/, "");
+  if (!/^([a-z0-9-]+\.)+[a-z]{2,24}$/.test(host)) return false; // rejects IPv4/IPv6 literals
+  if (/(^|\.)(localhost|local|internal|intranet|lan|home|corp|localdomain|test|invalid|example|onion)$/.test(host)) return false;
+  if (/(^|\.)(jenvu\.com|supabase\.co|supabase\.in|lovable\.app|lovableproject\.com|workers\.dev)$/.test(host)) return false;
+  if (/(^|\.)(nip\.io|sslip\.io|xip\.io|localtest\.me|lvh\.me)$/.test(host)) return false;
+  return true;
+}
