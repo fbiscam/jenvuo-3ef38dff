@@ -56,7 +56,7 @@ const REASON_LABEL: Record<string, string> = {
   extension_api: "AI usage",
   signal: "Signal scan",
   ict_narration: "ICT narration",
-  alert: "Alert broadcast",
+  alert: "Other",
   voice_query: "AI chat query",
   monthly_reset: "Monthly reset",
   monthly_grant: "Monthly wallet",
