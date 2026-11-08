@@ -102,7 +102,7 @@ export async function enqueueSignalAlertEmails(a: EnqueueAlertEmailsArgs): Promi
     htfBias: a.htfBias ?? '',
     rationale: a.rationale ?? '',
     firedAt: a.firedAt,
-    signalUrl: 'https://jenvu.com/dashboard/notifications',
+    signalUrl: 'https://dash.jenvu.com/overview',
   }
 
   // 5. Enqueue in parallel (recipient loop was previously serial → mid-broadcast

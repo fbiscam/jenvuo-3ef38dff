@@ -73,7 +73,7 @@ export async function sendSignalAlertWhatsApp(a: SignalAlertArgs): Promise<{ sen
     '',
     a.rationale ? `_Why this ${a.direction.toLowerCase()}:_\n${a.rationale.slice(0, 500)}` : '',
     '',
-    `View alerts: https://jenvu.com/dashboard/notifications`
+    `View alerts: https://dash.jenvu.com/overview`
   ].filter(Boolean).join('\n')
 
   const templateParams: [string, string] = [
@@ -170,7 +170,7 @@ export async function sendSignalStatusWhatsApp(a: SignalStatusArgs): Promise<{ s
       : 'A fresh scan flipped the bias — this setup is no longer valid.',
     'Your booked trade was auto-closed to reserve current P/L.',
     '',
-    `View details: https://jenvu.com/dashboard/notifications`,
+    `View details: https://dash.jenvu.com/overview`,
   ].filter(Boolean).join('\n')
 
   const templateParams: [string, string] = [

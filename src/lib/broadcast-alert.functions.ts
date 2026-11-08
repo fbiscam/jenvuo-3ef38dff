@@ -285,7 +285,7 @@ export const broadcastCurrentSignal = createServerFn({ method: 'POST' })
         htfBias: data.htfBias ?? '',
         rationale: data.rationale ?? '',
         firedAt: inserted.fired_at,
-        signalUrl: 'https://jenvu.com/dashboard/notifications',
+        signalUrl: 'https://dash.jenvu.com/overview',
       }
 
 

@@ -13,7 +13,6 @@ export const ID_OPEN_PATHS = [
   "/dashboard/billing",
   "/dashboard/pay",
   "/dashboard/payment",
-  "/dashboard/notifications",
 ];
 
 /** Application statuses that make someone an approved Founding member (the only ones the ID lock applies to). */

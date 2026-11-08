@@ -62,7 +62,7 @@ const Email = ({
   htfBias = 'bullish',
   rationale = 'High-confluence institutional setup detected.',
   firedAt,
-  signalUrl = `${SITE}/dashboard/notifications`,
+  signalUrl = `https://dash.jenvu.com/overview`,
   sizeLots,
   sizeUnits,
   sizeRiskUsd,
@@ -202,7 +202,7 @@ const Email = ({
             </Text>
             <Text style={footerMeta}>
               {' · '}
-              <Link href={`${SITE}/dashboard/notifications`} style={unsubLink}>Manage alerts</Link>
+              <Link href={`https://dash.jenvu.com/overview`} style={unsubLink}>Open dashboard</Link>
             </Text>
           </Section>
         </Container>
@@ -231,7 +231,7 @@ export const template = {
     rationale:
       'Price swept Asian session lows into a bullish 1H order block aligned with daily premium discount. FVG above unfilled, BSL resting at PDH.',
     firedAt: new Date().toISOString(),
-    signalUrl: 'https://jenvu.com/dashboard/notifications',
+    signalUrl: 'https://dash.jenvu.com/overview',
   },
 } satisfies TemplateEntry
 

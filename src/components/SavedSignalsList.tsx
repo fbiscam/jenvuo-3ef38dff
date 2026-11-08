@@ -1,4 +1,3 @@
-import { Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Trash2, Bookmark } from "lucide-react";
@@ -68,11 +67,6 @@ export function SavedSignalsList() {
         <p className="mx-auto mt-1.5 max-w-md text-sm text-zinc-500 sm:max-w-none sm:whitespace-nowrap">
           Saved setups will appear here when an alert is added to your account.
         </p>
-        <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
-          <Link to="/dashboard/notifications" className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-4 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-50">
-            Set alert preferences
-          </Link>
-        </div>
       </div>
     );
   }

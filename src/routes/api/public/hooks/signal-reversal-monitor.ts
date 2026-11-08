@@ -441,7 +441,7 @@ export const Route = createFileRoute(
                   ``,
                   `Your booked trade has been auto-closed to reserve current P/L.`,
                   ``,
-                  `Open dashboard: https://jenvu.com/dashboard/notifications`,
+                  `Open dashboard: https://dash.jenvu.com/overview`,
                 ].join("\n");
                 const html = `<div style="font-family:'Google Sans','Segoe UI',Arial,sans-serif;color:#111;line-height:1.5;padding:16px">
                   <h2 style="margin:0 0 12px">${reason === "sl_hit" ? "⚠️ Signal invalidated" : "🔄 Signal reversed"}</h2>
@@ -458,7 +458,7 @@ export const Route = createFileRoute(
                     <tr><td style="padding:4px 12px 4px 0;color:#666">Status</td><td style="padding:4px 0"><b>${statusLine}</b></td></tr>
                   </table>
                   <p style="margin:12px 0 0">Your booked trade has been auto-closed to reserve current P/L.</p>
-                  <p style="margin:12px 0 0"><a href="https://jenvu.com/dashboard/notifications" style="color:#2563eb">Open dashboard</a></p>
+                  <p style="margin:12px 0 0"><a href="https://dash.jenvu.com/overview" style="color:#2563eb">Open dashboard</a></p>
                 </div>`;
                 const { sendManagedEmailLogged } = await import("@/lib/email/managed.server");
                 for (const email of uniqueEmails) {

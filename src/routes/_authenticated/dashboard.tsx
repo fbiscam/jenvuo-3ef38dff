@@ -490,9 +490,8 @@ function SignalDeskHistory() {
         const when = new Date(a.fired_at);
         const ago = relTime(when);
         return (
-          <Link
+          <div
             key={a.id}
-            to="/dashboard/notifications"
             className="flex items-center gap-3 px-4 py-2.5 hover:bg-zinc-50"
           >
             <div className="min-w-0 flex-1">
@@ -513,7 +512,7 @@ function SignalDeskHistory() {
               <div className="text-[11px] font-medium text-zinc-700">{a.confidence}%</div>
               <div className="text-[10px] text-zinc-400">{ago}</div>
             </div>
-          </Link>
+          </div>
         );
       })}
     </div>
@@ -731,7 +730,6 @@ function DashboardLayout() {
       return false;
     }
   }, []);
-  const [unreadNotifs, setUnreadNotifs] = useState(0);
   const [isAdminUser, setIsAdminUser] = useState(false);
   // Unverified members can open every page, but outside Overview/settings/Billing/Payments it is look-only.
   const navigateTo = useNavigate();
@@ -812,70 +810,7 @@ function DashboardLayout() {
     };
   }, [authLoading, authUser]);
 
-  // Unread notifications count — only counts notifications newer than the last
-  // time the user opened the notifications page (localStorage timestamp).
-  // This prevents old already-seen notifications from re-appearing after sign-in.
-  useEffect(() => {
-    if (authLoading || !authUser) {
-      setUnreadNotifs(0);
-      return;
-    }
-    let cancelled = false;
-    const lastSeenKey = `jenvu:notifs:last-seen:${authUser.id}`;
-    const load = async () => {
-      const lastSeen =
-        (typeof window !== "undefined" && window.localStorage.getItem(lastSeenKey)) ||
-        new Date(0).toISOString();
-      const { count } = await supabase
-        .from("user_notifications")
-        .select("id", { count: "exact", head: true })
-        .eq("user_id", authUser.id)
-        .is("read_at", null)
-        .gt("created_at", lastSeen);
-      if (!cancelled) setUnreadNotifs(count ?? 0);
-    };
-    load();
-    const ch = supabase
-      .channel(`notif-nav:${authUser.id}:${Math.random().toString(36).slice(2)}`)
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "user_notifications",
-          filter: `user_id=eq.${authUser.id}`,
-        },
-        load,
-      )
-      .subscribe();
-    // Live updates arrive by realtime; slow fallback check only while the tab is visible, plus refresh on focus.
-    const iv = window.setInterval(() => { if (document.visibilityState === "visible") void load(); }, 60000);
-    const onVis = () => {
-      if (document.visibilityState === "visible") load();
-    };
-    document.addEventListener("visibilitychange", onVis);
-    window.addEventListener("focus", load);
-    return () => {
-      cancelled = true;
-      supabase.removeChannel(ch);
-      window.clearInterval(iv);
-      document.removeEventListener("visibilitychange", onVis);
-      window.removeEventListener("focus", load);
-    };
-  }, [authUser?.id, authLoading]);
 
-  // Clear red indicator when user visits the notifications page and persist
-  // the "last seen" timestamp so old notifications never count again.
-  useEffect(() => {
-    if (!pathname.startsWith("/dashboard/notifications")) return;
-    setUnreadNotifs(0);
-    if (typeof window !== "undefined" && authUser?.id) {
-      window.localStorage.setItem(
-        `jenvu:notifs:last-seen:${authUser.id}`,
-        new Date().toISOString(),
-      );
-    }
-  }, [pathname, authUser?.id]);
 
   useEffect(() => {
     // Wait until Supabase has restored the session; otherwise RLS-gated
@@ -1436,8 +1371,6 @@ function DashboardLayout() {
                     const count = t.countKey
                       ? (newCounts as Record<string, number>)[t.countKey]
                       : undefined;
-                    const isNotifs = t.to === "/dashboard/notifications";
-                    const hasUnread = isNotifs && unreadNotifs > 0 && !active;
                     const lockedTerminal = t.to === "/dashboard/terminal" && terminalLocked;
                     const lockedBot = t.to === "/dashboard/jx-bot" && jxBotLocked;
                     if (lockedTerminal || lockedBot) {
@@ -1501,24 +1434,8 @@ function DashboardLayout() {
                             New
                           </span>
                         )}
-                        {!navCollapsed && hasUnread && (
-                          <span
-                            className="ml-auto inline-flex shrink-0 items-center justify-center rounded-full bg-rose-600 text-white ring-2 ring-white"
-                            style={{
-                              height: 16,
-                              paddingLeft: 6,
-                              paddingRight: 6,
-                              fontSize: 9,
-                              fontFamily: "'Inter', system-ui, sans-serif",
-                              fontWeight: 700,
-                              letterSpacing: 0.3,
-                            }}
-                          >
-                            New
-                          </span>
-                        )}
                         {navCollapsed &&
-                          ((typeof count === "number" && count > 0 && !active) || hasUnread) && (
+                          (typeof count === "number" && count > 0 && !active) && (
                             <span
                               className="absolute -right-1 -top-1 inline-flex items-center justify-center rounded-full bg-rose-600 text-white"
                               style={{
