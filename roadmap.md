@@ -66,3 +66,4 @@
 - [x] Ask Jenvu + contact-sales form: theme look
 - [x] Blog pages: earlier footer back (Follow us + links)
 - [x] Ops console: shell at dashboard size; Support/Founding and other tools inside it larger
+- [x] Ops tools (Founding, Payments, Emails, Documents and the rest) open as their own console pages in the Support-inbox look, with a back button, never inside the dashboard
