@@ -148,7 +148,7 @@ function PricingPage() {
   const plans: Array<{ key: PlanKey; name: string; description: string; big: string; bigLabel: string; features: string[]; ips: number }> = [
     { key: "pro", name: "Pro", description: "Terminal & AI for everyday trading", big: "$25", bigLabel: "API credit every month", ips: 1, features: ["Terminal paid strategies", "ChatGPT 5.5 Pro and Grok 4.6", "1.5M daily tokens", "2 API keys"] },
     { key: "elite", name: "Elite", description: "More AI usage with senior review.", big: "$59", bigLabel: "API credit & senior review", ips: 2, features: ["Everything in Pro", "Claude Fable 5.1 senior review", "5M daily tokens", "3 API keys, webhooks & logs"] },
-    { key: "ultra", name: "Ultra", description: "Maximum limits and priority support.", big: "$99", bigLabel: "API credit & priority desk", ips: 5, features: ["Everything in Elite", "10M daily tokens", "5 API keys", "Priority desk support"] },
+    { key: "ultra", name: "Ultra", description: "Maximum limits & priority support", big: "$99", bigLabel: "API credit & priority desk", ips: 5, features: ["Everything in Elite", "10M daily tokens", "5 API keys", "Priority desk support"] },
   ];
 
   const btnBase = "flex h-11 w-full items-center justify-center rounded-full text-[15px] font-medium transition";
