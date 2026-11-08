@@ -54,8 +54,20 @@ import { Route as InsightsSlugRouteImport } from './routes/insights.$slug'
 import { Route as JenvuOpsX9k2IndexRouteImport } from './routes/jenvu-ops-x9k2.index'
 import { Route as JenvuOpsX9k2InboxRouteImport } from './routes/jenvu-ops-x9k2.inbox'
 import { Route as OpsX9k27m4nIndexRouteImport } from './routes/ops-x9k2-7m4n.index'
+import { Route as OpsX9k27m4nAccuracyRouteImport } from './routes/ops-x9k2-7m4n.accuracy'
+import { Route as OpsX9k27m4nAnnouncementsRouteImport } from './routes/ops-x9k2-7m4n.announcements'
+import { Route as OpsX9k27m4nBugsRouteImport } from './routes/ops-x9k2-7m4n.bugs'
+import { Route as OpsX9k27m4nDocumentsRouteImport } from './routes/ops-x9k2-7m4n.documents'
+import { Route as OpsX9k27m4nEmailsRouteImport } from './routes/ops-x9k2-7m4n.emails'
+import { Route as OpsX9k27m4nFoundingRouteImport } from './routes/ops-x9k2-7m4n.founding'
 import { Route as OpsX9k27m4nHubRouteImport } from './routes/ops-x9k2-7m4n.hub'
+import { Route as OpsX9k27m4nInsightsRouteImport } from './routes/ops-x9k2-7m4n.insights'
+import { Route as OpsX9k27m4nMessagesRouteImport } from './routes/ops-x9k2-7m4n.messages'
 import { Route as OpsX9k27m4nPaymentsRouteImport } from './routes/ops-x9k2-7m4n.payments'
+import { Route as OpsX9k27m4nScanAuditRouteImport } from './routes/ops-x9k2-7m4n.scan-audit'
+import { Route as OpsX9k27m4nSubscribersRouteImport } from './routes/ops-x9k2-7m4n.subscribers'
+import { Route as OpsX9k27m4nTuningRouteImport } from './routes/ops-x9k2-7m4n.tuning'
+import { Route as OpsX9k27m4nTvMismatchRouteImport } from './routes/ops-x9k2-7m4n.tv-mismatch'
 import { Route as StoriesSlugRouteImport } from './routes/stories.$slug'
 import { Route as StrategiesIctGoldTradingRouteImport } from './routes/strategies.ict-gold-trading'
 import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
@@ -346,14 +358,75 @@ const OpsX9k27m4nIndexRoute = OpsX9k27m4nIndexRouteImport.update({
   path: '/',
   getParentRoute: () => OpsX9k27m4nRoute,
 } as any)
+const OpsX9k27m4nAccuracyRoute = OpsX9k27m4nAccuracyRouteImport.update({
+  id: '/accuracy',
+  path: '/accuracy',
+  getParentRoute: () => OpsX9k27m4nRoute,
+} as any)
+const OpsX9k27m4nAnnouncementsRoute =
+  OpsX9k27m4nAnnouncementsRouteImport.update({
+    id: '/announcements',
+    path: '/announcements',
+    getParentRoute: () => OpsX9k27m4nRoute,
+  } as any)
+const OpsX9k27m4nBugsRoute = OpsX9k27m4nBugsRouteImport.update({
+  id: '/bugs',
+  path: '/bugs',
+  getParentRoute: () => OpsX9k27m4nRoute,
+} as any)
+const OpsX9k27m4nDocumentsRoute = OpsX9k27m4nDocumentsRouteImport.update({
+  id: '/documents',
+  path: '/documents',
+  getParentRoute: () => OpsX9k27m4nRoute,
+} as any)
+const OpsX9k27m4nEmailsRoute = OpsX9k27m4nEmailsRouteImport.update({
+  id: '/emails',
+  path: '/emails',
+  getParentRoute: () => OpsX9k27m4nRoute,
+} as any)
+const OpsX9k27m4nFoundingRoute = OpsX9k27m4nFoundingRouteImport.update({
+  id: '/founding',
+  path: '/founding',
+  getParentRoute: () => OpsX9k27m4nRoute,
+} as any)
 const OpsX9k27m4nHubRoute = OpsX9k27m4nHubRouteImport.update({
   id: '/hub',
   path: '/hub',
   getParentRoute: () => OpsX9k27m4nRoute,
 } as any)
+const OpsX9k27m4nInsightsRoute = OpsX9k27m4nInsightsRouteImport.update({
+  id: '/insights',
+  path: '/insights',
+  getParentRoute: () => OpsX9k27m4nRoute,
+} as any)
+const OpsX9k27m4nMessagesRoute = OpsX9k27m4nMessagesRouteImport.update({
+  id: '/messages',
+  path: '/messages',
+  getParentRoute: () => OpsX9k27m4nRoute,
+} as any)
 const OpsX9k27m4nPaymentsRoute = OpsX9k27m4nPaymentsRouteImport.update({
   id: '/payments',
   path: '/payments',
+  getParentRoute: () => OpsX9k27m4nRoute,
+} as any)
+const OpsX9k27m4nScanAuditRoute = OpsX9k27m4nScanAuditRouteImport.update({
+  id: '/scan-audit',
+  path: '/scan-audit',
+  getParentRoute: () => OpsX9k27m4nRoute,
+} as any)
+const OpsX9k27m4nSubscribersRoute = OpsX9k27m4nSubscribersRouteImport.update({
+  id: '/subscribers',
+  path: '/subscribers',
+  getParentRoute: () => OpsX9k27m4nRoute,
+} as any)
+const OpsX9k27m4nTuningRoute = OpsX9k27m4nTuningRouteImport.update({
+  id: '/tuning',
+  path: '/tuning',
+  getParentRoute: () => OpsX9k27m4nRoute,
+} as any)
+const OpsX9k27m4nTvMismatchRoute = OpsX9k27m4nTvMismatchRouteImport.update({
+  id: '/tv-mismatch',
+  path: '/tv-mismatch',
   getParentRoute: () => OpsX9k27m4nRoute,
 } as any)
 const StoriesSlugRoute = StoriesSlugRouteImport.update({
@@ -771,8 +844,20 @@ export interface FileRoutesByFullPath {
   '/api/chat-image': typeof ApiChatImageRoute
   '/insights/$slug': typeof InsightsSlugRoute
   '/jenvu-ops-x9k2/inbox': typeof JenvuOpsX9k2InboxRoute
+  '/ops-x9k2-7m4n/accuracy': typeof OpsX9k27m4nAccuracyRoute
+  '/ops-x9k2-7m4n/announcements': typeof OpsX9k27m4nAnnouncementsRoute
+  '/ops-x9k2-7m4n/bugs': typeof OpsX9k27m4nBugsRoute
+  '/ops-x9k2-7m4n/documents': typeof OpsX9k27m4nDocumentsRoute
+  '/ops-x9k2-7m4n/emails': typeof OpsX9k27m4nEmailsRoute
+  '/ops-x9k2-7m4n/founding': typeof OpsX9k27m4nFoundingRoute
   '/ops-x9k2-7m4n/hub': typeof OpsX9k27m4nHubRoute
+  '/ops-x9k2-7m4n/insights': typeof OpsX9k27m4nInsightsRoute
+  '/ops-x9k2-7m4n/messages': typeof OpsX9k27m4nMessagesRoute
   '/ops-x9k2-7m4n/payments': typeof OpsX9k27m4nPaymentsRoute
+  '/ops-x9k2-7m4n/scan-audit': typeof OpsX9k27m4nScanAuditRoute
+  '/ops-x9k2-7m4n/subscribers': typeof OpsX9k27m4nSubscribersRoute
+  '/ops-x9k2-7m4n/tuning': typeof OpsX9k27m4nTuningRoute
+  '/ops-x9k2-7m4n/tv-mismatch': typeof OpsX9k27m4nTvMismatchRoute
   '/stories/$slug': typeof StoriesSlugRoute
   '/strategies/ict-gold-trading': typeof StrategiesIctGoldTradingRoute
   '/help/': typeof HelpIndexRoute
@@ -879,8 +964,20 @@ export interface FileRoutesByTo {
   '/api/chat-image': typeof ApiChatImageRoute
   '/insights/$slug': typeof InsightsSlugRoute
   '/jenvu-ops-x9k2/inbox': typeof JenvuOpsX9k2InboxRoute
+  '/ops-x9k2-7m4n/accuracy': typeof OpsX9k27m4nAccuracyRoute
+  '/ops-x9k2-7m4n/announcements': typeof OpsX9k27m4nAnnouncementsRoute
+  '/ops-x9k2-7m4n/bugs': typeof OpsX9k27m4nBugsRoute
+  '/ops-x9k2-7m4n/documents': typeof OpsX9k27m4nDocumentsRoute
+  '/ops-x9k2-7m4n/emails': typeof OpsX9k27m4nEmailsRoute
+  '/ops-x9k2-7m4n/founding': typeof OpsX9k27m4nFoundingRoute
   '/ops-x9k2-7m4n/hub': typeof OpsX9k27m4nHubRoute
+  '/ops-x9k2-7m4n/insights': typeof OpsX9k27m4nInsightsRoute
+  '/ops-x9k2-7m4n/messages': typeof OpsX9k27m4nMessagesRoute
   '/ops-x9k2-7m4n/payments': typeof OpsX9k27m4nPaymentsRoute
+  '/ops-x9k2-7m4n/scan-audit': typeof OpsX9k27m4nScanAuditRoute
+  '/ops-x9k2-7m4n/subscribers': typeof OpsX9k27m4nSubscribersRoute
+  '/ops-x9k2-7m4n/tuning': typeof OpsX9k27m4nTuningRoute
+  '/ops-x9k2-7m4n/tv-mismatch': typeof OpsX9k27m4nTvMismatchRoute
   '/stories/$slug': typeof StoriesSlugRoute
   '/strategies/ict-gold-trading': typeof StrategiesIctGoldTradingRoute
   '/help': typeof HelpIndexRoute
@@ -993,8 +1090,20 @@ export interface FileRoutesById {
   '/api/chat-image': typeof ApiChatImageRoute
   '/insights/$slug': typeof InsightsSlugRoute
   '/jenvu-ops-x9k2/inbox': typeof JenvuOpsX9k2InboxRoute
+  '/ops-x9k2-7m4n/accuracy': typeof OpsX9k27m4nAccuracyRoute
+  '/ops-x9k2-7m4n/announcements': typeof OpsX9k27m4nAnnouncementsRoute
+  '/ops-x9k2-7m4n/bugs': typeof OpsX9k27m4nBugsRoute
+  '/ops-x9k2-7m4n/documents': typeof OpsX9k27m4nDocumentsRoute
+  '/ops-x9k2-7m4n/emails': typeof OpsX9k27m4nEmailsRoute
+  '/ops-x9k2-7m4n/founding': typeof OpsX9k27m4nFoundingRoute
   '/ops-x9k2-7m4n/hub': typeof OpsX9k27m4nHubRoute
+  '/ops-x9k2-7m4n/insights': typeof OpsX9k27m4nInsightsRoute
+  '/ops-x9k2-7m4n/messages': typeof OpsX9k27m4nMessagesRoute
   '/ops-x9k2-7m4n/payments': typeof OpsX9k27m4nPaymentsRoute
+  '/ops-x9k2-7m4n/scan-audit': typeof OpsX9k27m4nScanAuditRoute
+  '/ops-x9k2-7m4n/subscribers': typeof OpsX9k27m4nSubscribersRoute
+  '/ops-x9k2-7m4n/tuning': typeof OpsX9k27m4nTuningRoute
+  '/ops-x9k2-7m4n/tv-mismatch': typeof OpsX9k27m4nTvMismatchRoute
   '/stories/$slug': typeof StoriesSlugRoute
   '/strategies/ict-gold-trading': typeof StrategiesIctGoldTradingRoute
   '/help/': typeof HelpIndexRoute
@@ -1107,8 +1216,20 @@ export interface FileRouteTypes {
     | '/api/chat-image'
     | '/insights/$slug'
     | '/jenvu-ops-x9k2/inbox'
+    | '/ops-x9k2-7m4n/accuracy'
+    | '/ops-x9k2-7m4n/announcements'
+    | '/ops-x9k2-7m4n/bugs'
+    | '/ops-x9k2-7m4n/documents'
+    | '/ops-x9k2-7m4n/emails'
+    | '/ops-x9k2-7m4n/founding'
     | '/ops-x9k2-7m4n/hub'
+    | '/ops-x9k2-7m4n/insights'
+    | '/ops-x9k2-7m4n/messages'
     | '/ops-x9k2-7m4n/payments'
+    | '/ops-x9k2-7m4n/scan-audit'
+    | '/ops-x9k2-7m4n/subscribers'
+    | '/ops-x9k2-7m4n/tuning'
+    | '/ops-x9k2-7m4n/tv-mismatch'
     | '/stories/$slug'
     | '/strategies/ict-gold-trading'
     | '/help/'
@@ -1215,8 +1336,20 @@ export interface FileRouteTypes {
     | '/api/chat-image'
     | '/insights/$slug'
     | '/jenvu-ops-x9k2/inbox'
+    | '/ops-x9k2-7m4n/accuracy'
+    | '/ops-x9k2-7m4n/announcements'
+    | '/ops-x9k2-7m4n/bugs'
+    | '/ops-x9k2-7m4n/documents'
+    | '/ops-x9k2-7m4n/emails'
+    | '/ops-x9k2-7m4n/founding'
     | '/ops-x9k2-7m4n/hub'
+    | '/ops-x9k2-7m4n/insights'
+    | '/ops-x9k2-7m4n/messages'
     | '/ops-x9k2-7m4n/payments'
+    | '/ops-x9k2-7m4n/scan-audit'
+    | '/ops-x9k2-7m4n/subscribers'
+    | '/ops-x9k2-7m4n/tuning'
+    | '/ops-x9k2-7m4n/tv-mismatch'
     | '/stories/$slug'
     | '/strategies/ict-gold-trading'
     | '/help'
@@ -1328,8 +1461,20 @@ export interface FileRouteTypes {
     | '/api/chat-image'
     | '/insights/$slug'
     | '/jenvu-ops-x9k2/inbox'
+    | '/ops-x9k2-7m4n/accuracy'
+    | '/ops-x9k2-7m4n/announcements'
+    | '/ops-x9k2-7m4n/bugs'
+    | '/ops-x9k2-7m4n/documents'
+    | '/ops-x9k2-7m4n/emails'
+    | '/ops-x9k2-7m4n/founding'
     | '/ops-x9k2-7m4n/hub'
+    | '/ops-x9k2-7m4n/insights'
+    | '/ops-x9k2-7m4n/messages'
     | '/ops-x9k2-7m4n/payments'
+    | '/ops-x9k2-7m4n/scan-audit'
+    | '/ops-x9k2-7m4n/subscribers'
+    | '/ops-x9k2-7m4n/tuning'
+    | '/ops-x9k2-7m4n/tv-mismatch'
     | '/stories/$slug'
     | '/strategies/ict-gold-trading'
     | '/help/'
@@ -1784,6 +1929,48 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OpsX9k27m4nIndexRouteImport
       parentRoute: typeof OpsX9k27m4nRoute
     }
+    '/ops-x9k2-7m4n/accuracy': {
+      id: '/ops-x9k2-7m4n/accuracy'
+      path: '/accuracy'
+      fullPath: '/ops-x9k2-7m4n/accuracy'
+      preLoaderRoute: typeof OpsX9k27m4nAccuracyRouteImport
+      parentRoute: typeof OpsX9k27m4nRoute
+    }
+    '/ops-x9k2-7m4n/announcements': {
+      id: '/ops-x9k2-7m4n/announcements'
+      path: '/announcements'
+      fullPath: '/ops-x9k2-7m4n/announcements'
+      preLoaderRoute: typeof OpsX9k27m4nAnnouncementsRouteImport
+      parentRoute: typeof OpsX9k27m4nRoute
+    }
+    '/ops-x9k2-7m4n/bugs': {
+      id: '/ops-x9k2-7m4n/bugs'
+      path: '/bugs'
+      fullPath: '/ops-x9k2-7m4n/bugs'
+      preLoaderRoute: typeof OpsX9k27m4nBugsRouteImport
+      parentRoute: typeof OpsX9k27m4nRoute
+    }
+    '/ops-x9k2-7m4n/documents': {
+      id: '/ops-x9k2-7m4n/documents'
+      path: '/documents'
+      fullPath: '/ops-x9k2-7m4n/documents'
+      preLoaderRoute: typeof OpsX9k27m4nDocumentsRouteImport
+      parentRoute: typeof OpsX9k27m4nRoute
+    }
+    '/ops-x9k2-7m4n/emails': {
+      id: '/ops-x9k2-7m4n/emails'
+      path: '/emails'
+      fullPath: '/ops-x9k2-7m4n/emails'
+      preLoaderRoute: typeof OpsX9k27m4nEmailsRouteImport
+      parentRoute: typeof OpsX9k27m4nRoute
+    }
+    '/ops-x9k2-7m4n/founding': {
+      id: '/ops-x9k2-7m4n/founding'
+      path: '/founding'
+      fullPath: '/ops-x9k2-7m4n/founding'
+      preLoaderRoute: typeof OpsX9k27m4nFoundingRouteImport
+      parentRoute: typeof OpsX9k27m4nRoute
+    }
     '/ops-x9k2-7m4n/hub': {
       id: '/ops-x9k2-7m4n/hub'
       path: '/hub'
@@ -1791,11 +1978,53 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OpsX9k27m4nHubRouteImport
       parentRoute: typeof OpsX9k27m4nRoute
     }
+    '/ops-x9k2-7m4n/insights': {
+      id: '/ops-x9k2-7m4n/insights'
+      path: '/insights'
+      fullPath: '/ops-x9k2-7m4n/insights'
+      preLoaderRoute: typeof OpsX9k27m4nInsightsRouteImport
+      parentRoute: typeof OpsX9k27m4nRoute
+    }
+    '/ops-x9k2-7m4n/messages': {
+      id: '/ops-x9k2-7m4n/messages'
+      path: '/messages'
+      fullPath: '/ops-x9k2-7m4n/messages'
+      preLoaderRoute: typeof OpsX9k27m4nMessagesRouteImport
+      parentRoute: typeof OpsX9k27m4nRoute
+    }
     '/ops-x9k2-7m4n/payments': {
       id: '/ops-x9k2-7m4n/payments'
       path: '/payments'
       fullPath: '/ops-x9k2-7m4n/payments'
       preLoaderRoute: typeof OpsX9k27m4nPaymentsRouteImport
+      parentRoute: typeof OpsX9k27m4nRoute
+    }
+    '/ops-x9k2-7m4n/scan-audit': {
+      id: '/ops-x9k2-7m4n/scan-audit'
+      path: '/scan-audit'
+      fullPath: '/ops-x9k2-7m4n/scan-audit'
+      preLoaderRoute: typeof OpsX9k27m4nScanAuditRouteImport
+      parentRoute: typeof OpsX9k27m4nRoute
+    }
+    '/ops-x9k2-7m4n/subscribers': {
+      id: '/ops-x9k2-7m4n/subscribers'
+      path: '/subscribers'
+      fullPath: '/ops-x9k2-7m4n/subscribers'
+      preLoaderRoute: typeof OpsX9k27m4nSubscribersRouteImport
+      parentRoute: typeof OpsX9k27m4nRoute
+    }
+    '/ops-x9k2-7m4n/tuning': {
+      id: '/ops-x9k2-7m4n/tuning'
+      path: '/tuning'
+      fullPath: '/ops-x9k2-7m4n/tuning'
+      preLoaderRoute: typeof OpsX9k27m4nTuningRouteImport
+      parentRoute: typeof OpsX9k27m4nRoute
+    }
+    '/ops-x9k2-7m4n/tv-mismatch': {
+      id: '/ops-x9k2-7m4n/tv-mismatch'
+      path: '/tv-mismatch'
+      fullPath: '/ops-x9k2-7m4n/tv-mismatch'
+      preLoaderRoute: typeof OpsX9k27m4nTvMismatchRouteImport
       parentRoute: typeof OpsX9k27m4nRoute
     }
     '/stories/$slug': {
@@ -2391,14 +2620,38 @@ const JenvuOpsX9k2RouteWithChildren = JenvuOpsX9k2Route._addFileChildren(
 )
 
 interface OpsX9k27m4nRouteChildren {
+  OpsX9k27m4nAccuracyRoute: typeof OpsX9k27m4nAccuracyRoute
+  OpsX9k27m4nAnnouncementsRoute: typeof OpsX9k27m4nAnnouncementsRoute
+  OpsX9k27m4nBugsRoute: typeof OpsX9k27m4nBugsRoute
+  OpsX9k27m4nDocumentsRoute: typeof OpsX9k27m4nDocumentsRoute
+  OpsX9k27m4nEmailsRoute: typeof OpsX9k27m4nEmailsRoute
+  OpsX9k27m4nFoundingRoute: typeof OpsX9k27m4nFoundingRoute
   OpsX9k27m4nHubRoute: typeof OpsX9k27m4nHubRoute
+  OpsX9k27m4nInsightsRoute: typeof OpsX9k27m4nInsightsRoute
+  OpsX9k27m4nMessagesRoute: typeof OpsX9k27m4nMessagesRoute
   OpsX9k27m4nPaymentsRoute: typeof OpsX9k27m4nPaymentsRoute
+  OpsX9k27m4nScanAuditRoute: typeof OpsX9k27m4nScanAuditRoute
+  OpsX9k27m4nSubscribersRoute: typeof OpsX9k27m4nSubscribersRoute
+  OpsX9k27m4nTuningRoute: typeof OpsX9k27m4nTuningRoute
+  OpsX9k27m4nTvMismatchRoute: typeof OpsX9k27m4nTvMismatchRoute
   OpsX9k27m4nIndexRoute: typeof OpsX9k27m4nIndexRoute
 }
 
 const OpsX9k27m4nRouteChildren: OpsX9k27m4nRouteChildren = {
+  OpsX9k27m4nAccuracyRoute: OpsX9k27m4nAccuracyRoute,
+  OpsX9k27m4nAnnouncementsRoute: OpsX9k27m4nAnnouncementsRoute,
+  OpsX9k27m4nBugsRoute: OpsX9k27m4nBugsRoute,
+  OpsX9k27m4nDocumentsRoute: OpsX9k27m4nDocumentsRoute,
+  OpsX9k27m4nEmailsRoute: OpsX9k27m4nEmailsRoute,
+  OpsX9k27m4nFoundingRoute: OpsX9k27m4nFoundingRoute,
   OpsX9k27m4nHubRoute: OpsX9k27m4nHubRoute,
+  OpsX9k27m4nInsightsRoute: OpsX9k27m4nInsightsRoute,
+  OpsX9k27m4nMessagesRoute: OpsX9k27m4nMessagesRoute,
   OpsX9k27m4nPaymentsRoute: OpsX9k27m4nPaymentsRoute,
+  OpsX9k27m4nScanAuditRoute: OpsX9k27m4nScanAuditRoute,
+  OpsX9k27m4nSubscribersRoute: OpsX9k27m4nSubscribersRoute,
+  OpsX9k27m4nTuningRoute: OpsX9k27m4nTuningRoute,
+  OpsX9k27m4nTvMismatchRoute: OpsX9k27m4nTvMismatchRoute,
   OpsX9k27m4nIndexRoute: OpsX9k27m4nIndexRoute,
 }
 

@@ -23,7 +23,6 @@ import {
 import { opsLock, opsStatus } from "@/lib/ops-gate.functions";
 import { opsPendingCounts, type OpsCounts } from "@/lib/ops-counts.functions";
 import { OpsCount, ops } from "@/components/ops/OpsPage";
-import { dashExternal } from "@/lib/url-rewrite";
 import { applyHtmlTheme, readSiteTheme, saveSiteTheme } from "@/lib/site-theme";
 
 export const Route = createFileRoute("/ops-x9k2-7m4n/hub")({
@@ -48,16 +47,16 @@ type Tile = {
 
 const TILES: Tile[] = [
   { key: "inbox", countKey: "inbox", title: "Support Inbox", desc: "Contact & live-chat messages", to: "/jenvu-ops-x9k2/inbox", icon: <Inbox />, group: "Customers" },
-  { key: "announcements", title: "Site Notices", desc: "Updates, new bot & issue alerts for users", to: "/dashboard/admin/announcements", icon: <Megaphone />, group: "Customers" },
-  { key: "emails", title: "Email Box", desc: "Send from support@ or sales@jenvu.com", to: "/dashboard/admin/emails", icon: <Mail />, group: "Customers" },
-  { key: "messages", countKey: "messages", title: "Contact Messages", desc: "Legacy contact form entries", to: "/dashboard/admin/messages", icon: <Mail />, group: "Customers" },
-  { key: "subs", title: "Newsletter Subscribers", desc: "Email list & signal opt-ins", to: "/dashboard/admin/subscribers", icon: <Users />, group: "Customers" },
-  { key: "founding", countKey: "founding", title: "Founding Applications", desc: "Review & approve applicants", to: "/dashboard/admin/founding", icon: <Crown />, group: "Customers" },
-  { key: "docs", countKey: "documents", title: "Document Submissions", desc: "Earning-proof review", to: "/dashboard/admin/documents", icon: <FileText />, group: "Customers" },
-  { key: "audit", title: "Scan Audit", desc: "AI cost & scan ledger", to: "/dashboard/admin/scan-audit", icon: <ShieldCheck />, group: "Money" },
-  { key: "accuracy", title: "Accuracy Dashboard", desc: "Paper-trade win rate & drift", to: "/dashboard/admin/accuracy", icon: <Target />, group: "Signals" },
-  { key: "tuning", title: "Weight Tuning", desc: "Grid search & walk-forward configs", to: "/dashboard/admin/tuning", icon: <SlidersHorizontal />, group: "Signals" },
-  { key: "tvmm", title: "TV Mismatch Checker", desc: "Signal chart price drift audit", to: "/dashboard/admin/tv-mismatch", icon: <Activity />, group: "Signals" },
+  { key: "announcements", title: "Site Notices", desc: "Updates, new bot & issue alerts for users", to: "/ops-x9k2-7m4n/announcements", icon: <Megaphone />, group: "Customers" },
+  { key: "emails", title: "Email Box", desc: "Send from support@ or sales@jenvu.com", to: "/ops-x9k2-7m4n/emails", icon: <Mail />, group: "Customers" },
+  { key: "messages", countKey: "messages", title: "Contact Messages", desc: "Legacy contact form entries", to: "/ops-x9k2-7m4n/messages", icon: <Mail />, group: "Customers" },
+  { key: "subs", title: "Newsletter Subscribers", desc: "Email list & signal opt-ins", to: "/ops-x9k2-7m4n/subscribers", icon: <Users />, group: "Customers" },
+  { key: "founding", countKey: "founding", title: "Founding Applications", desc: "Review & approve applicants", to: "/ops-x9k2-7m4n/founding", icon: <Crown />, group: "Customers" },
+  { key: "docs", countKey: "documents", title: "Document Submissions", desc: "Earning-proof review", to: "/ops-x9k2-7m4n/documents", icon: <FileText />, group: "Customers" },
+  { key: "audit", title: "Scan Audit", desc: "AI cost & scan ledger", to: "/ops-x9k2-7m4n/scan-audit", icon: <ShieldCheck />, group: "Money" },
+  { key: "accuracy", title: "Accuracy Dashboard", desc: "Paper-trade win rate & drift", to: "/ops-x9k2-7m4n/accuracy", icon: <Target />, group: "Signals" },
+  { key: "tuning", title: "Weight Tuning", desc: "Grid search & walk-forward configs", to: "/ops-x9k2-7m4n/tuning", icon: <SlidersHorizontal />, group: "Signals" },
+  { key: "tvmm", title: "TV Mismatch Checker", desc: "Signal chart price drift audit", to: "/ops-x9k2-7m4n/tv-mismatch", icon: <Activity />, group: "Signals" },
   
   { key: "payments", countKey: "payments", title: "Payments & Promos", desc: "Crypto top-ups, approvals & promo codes", to: "/ops-x9k2-7m4n/payments", icon: <Wallet />, group: "Money" },
 
@@ -221,11 +220,7 @@ function OpsHub() {
   );
 }
 
-/** Dashboard tools live on dash.jenvu.com: link there directly (no extra redirect hop). */
+/** Every tool opens as its own console page next to this overview. */
 function toolUrl(t: Tile): string {
-  if (typeof window !== "undefined" && t.to.startsWith("/dashboard/")) {
-    const host = window.location.hostname;
-    if (host === "jenvu.com" || host.endsWith(".jenvu.com")) return `https://dash.jenvu.com${dashExternal(t.to)}`;
-  }
   return t.to;
 }
