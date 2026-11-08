@@ -58,6 +58,8 @@ export type CreditState = {
   balance: number;      // USD wallet balance
   allowance: number;    // monthly wallet allowance (USD)
   periodResetsAt: string | null;
+  /** When the current paid plan is next due (paid, non-trial plans only). */
+  nextBillingDate: string | null;
   trial: TrialInfo;
   recent: LedgerEntry[];
   grants: CreditGrant[];
@@ -76,7 +78,7 @@ export const getCreditState = createServerFn({ method: "GET" })
     const [{ data: sub }, { data: bal }, { data: ledger }, { data: positiveLedger }, { data: promoRedemptions }] = await Promise.all([
       supabase
         .from("user_subscriptions")
-        .select("plan_id, status, is_trial, trial_ends_at")
+        .select("plan_id, status, is_trial, trial_ends_at, current_period_end, renewal_due_at")
         .eq("user_id", userId)
         .maybeSingle(),
 
@@ -148,6 +150,10 @@ export const getCreditState = createServerFn({ method: "GET" })
       balance: Number(bal?.balance ?? 0),
       allowance: Number(bal?.monthly_allowance ?? walletUsd),
       periodResetsAt: bal?.period_resets_at ?? null,
+      nextBillingDate:
+        planId !== "free" && !(sub as any)?.is_trial
+          ? (((sub as any)?.renewal_due_at as string | null) ?? ((sub as any)?.current_period_end as string | null) ?? null)
+          : null,
       grants: (positiveLedger ?? [])
         .filter((r: any) => !["promo_bonus", "topup_crypto", "refund"].includes(String(r.reason)))
         .map((r: any) => ({

@@ -235,6 +235,19 @@ function Billing() {
                 <span>You have <span className="text-gc-ink">no credits</span> remaining</span>
               )}
             </p>
+            {credits.state?.nextBillingDate && !trial.active && (() => {
+              const due = new Date(credits.state.nextBillingDate);
+              const days = Math.ceil((due.getTime() - Date.now()) / 86_400_000);
+              return (
+                <p className="flex items-center gap-2.5">
+                  <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-gc-ink-muted" aria-hidden="true" />
+                  <span>
+                    Next billing date: <span className="text-gc-ink">{fmtDay(credits.state.nextBillingDate)}</span>
+                    {" · "}{days > 1 ? `${days} days left` : days === 1 ? "1 day left" : days === 0 ? "due today" : "payment due"}
+                  </span>
+                </p>
+              );
+            })()}
             {trial.active && (
               <p className="pl-4 text-[13px]">
                 30-day Pro access ends {trial.endsAtLabel} · {trial.daysLeft > 1 ? `${trial.daysLeft}d left` : trial.hoursLeft > 1 ? `${trial.hoursLeft}h left` : "ends today"} · remaining credit becomes $0.00
