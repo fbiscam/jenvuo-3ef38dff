@@ -17,7 +17,7 @@ const CARDS: FanCard[] = [
   { label: "Ask Jenvu", poster: img1, video: vid1.url, rot: -6, y: 28 },
   { label: "Jenvu Terminal", poster: img2, video: vid2.url, rot: -3, y: 44 },
   { label: "Jenvu AI", poster: img3, video: vid3.url, rot: 0, y: 0, main: true },
-  { label: "Alerts", poster: img4, video: vid4.url, rot: 3, y: 44 },
+  { label: "API Platform", poster: img4, video: vid4.url, rot: 3, y: 44 },
   { label: "JX Bot", poster: img5, video: vid5.url, rot: 6, y: 28 },
 ];
 

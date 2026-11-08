@@ -390,7 +390,7 @@ function UsagePage() {
 
   const typeOf = (reason: string): ApiType => {
     if (reason === "terminal_scan" || reason === "terminal_daily") return "terminal";
-    if (reason === "alert") return "alerts";
+    if (reason === "alert") return "other";
     if (TEXT_REASONS.has(reason)) return "text";
     return "other";
   };
@@ -744,7 +744,6 @@ const TEXT_REASONS = new Set([
 const API_TYPES: { id: ApiType; label: string; color: string }[] = [
   { id: "text", label: "Text", color: "#f4a261" },
   { id: "terminal", label: "Terminal", color: "#2a9d8f" },
-  { id: "alerts", label: "Alerts", color: "#3d5a6c" },
   { id: "other", label: "Other", color: "#e76f51" },
 ];
 

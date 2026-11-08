@@ -58,7 +58,7 @@ export const collections: Collection[] = [
             "Chat with the terminal like a desk analyst directly from your TradingView chart.",
             "Generate A+ setups on demand for Gold.",
             "Watch the AI mark structure, FVGs, order blocks and liquidity directly on the chart.",
-            "Save signals to your dashboard and receive alerts when new A+ setups are detected.",
+            "Save signals to your dashboard.",
             "Get news context, killzone awareness and bias confirmation before risking capital.",
           ]},
 
@@ -98,7 +98,7 @@ export const collections: Collection[] = [
             "You can then sign in and access your dashboard and trading terminal.",
           ]},
 
-          { type: "note", tone: "tip", content: "Use a real email — password resets, A+ signal alerts and billing receipts are all sent there." },
+          { type: "note", tone: "tip", content: "Use a real email — password resets and billing receipts are all sent there." },
         ],
       },
       {
@@ -400,7 +400,6 @@ export const collections: Collection[] = [
             "Full ICT / SMC narration.",
             "Trade journal & analytics.",
             "Multi-timeframe bias engine.",
-            "Realtime email & push alerts.",
           ]},
 
           { type: "h2", content: "Pro — $29 / month" },
@@ -410,7 +409,6 @@ export const collections: Collection[] = [
             "AI terminal chat billed from the included wallet.",
             "Personal API keys for the Jenvu API endpoint.",
             "Full Gold signal engine.",
-            "Realtime A+ email & push alerts (no delay).",
             "Full ICT / SMC narration, trade journal & analytics.",
             "Multi-timeframe bias engine.",
           ]},
@@ -420,9 +418,8 @@ export const collections: Collection[] = [
             "5,000,000 tokens per day.",
             "$59 API credit per month.",
             "Everything in Pro, plus senior review on analysis.",
-            "Priority A+ alerts (< 30 seconds).",
             "Dedicated Gold scanner with DXY overlay.",
-            "API access, webhooks and custom alert rules.",
+            "API access and webhooks.",
             "Dedicated onboarding & SLA.",
           ]},
 
@@ -431,7 +428,6 @@ export const collections: Collection[] = [
             "10,000,000 tokens per day.",
             "$99 API credit per month.",
             "Everything in Elite.",
-            "< 10s SLA priority alerts.",
             "Priority desk support.",
           ]},
 
@@ -453,7 +449,6 @@ export const collections: Collection[] = [
             "Signal returning WAIT (dead market) — free.",
             "AI terminal chat or analysis — actual prompt and reply tokens at $3 per 1,000,000 tokens.",
             "Senior review — its actual tokens are added at the same token rate, with no fixed fee.",
-            "A+ broadcast alert delivered to you — free.",
           ]},
 
           { type: "h2", content: "How wallets refresh" },
@@ -685,7 +680,7 @@ export const collections: Collection[] = [
         summary: "Account deletion is permanent and removes all saved data.",
         updatedAt: "2026-06-30",
         body: [
-          { type: "p", content: "Account deletion is permanent. We remove your profile, saved signals, journal entries, alerts and billing history. This action cannot be reversed." },
+          { type: "p", content: "Account deletion is permanent. We remove your profile, saved signals, journal entries and billing history. This action cannot be reversed." },
 
           { type: "h2", content: "How to request deletion" },
           { type: "ol", items: [
@@ -707,12 +702,12 @@ export const collections: Collection[] = [
         summary: "See our Privacy Policy for the full breakdown.",
         updatedAt: "2026-06-30",
         body: [
-          { type: "p", content: "We only collect and retain the minimum data needed to run your account, generate signals and deliver alerts. We do not sell user data and we don't share it with advertisers." },
+          { type: "p", content: "We only collect and retain the minimum data needed to run your account, and generate analysis. We do not sell user data and we don't share it with advertisers." },
 
           { type: "h2", content: "What we store" },
           { type: "ul", items: [
             "Your name, email and authentication tokens.",
-            "Saved signals, journal entries and alert preferences.",
+            "Saved signals and journal entries.",
             "Billing metadata (plan, credits, invoice references).",
             "Anonymous product analytics (page views, error logs).",
           ]},
@@ -732,7 +727,7 @@ export const collections: Collection[] = [
   {
     slug: "mobile-app",
     title: "Mobile App",
-    description: "iOS and Android — install, notifications, haptics.",
+    description: "iOS and Android — install and sign in.",
     icon: "Smartphone",
     articles: [
       {
@@ -741,7 +736,7 @@ export const collections: Collection[] = [
         summary: "Download links are on the Download page.",
         updatedAt: "2026-06-30",
         body: [
-          { type: "p", content: "Jenvu's mobile companions keep your alerts, saved signals and account status available away from your TradingView workstation." },
+          { type: "p", content: "Jenvu's mobile companions keep your saved signals and account status available away from your TradingView workstation." },
 
           { type: "h2", content: "Download" },
           { type: "ol", items: [
@@ -752,38 +747,12 @@ export const collections: Collection[] = [
 
           { type: "h2", content: "First-launch permissions" },
           { type: "ul", items: [
-            "Notifications — required for A+ signal alerts.",
+            "Notifications — for account and billing messages.",
             "Network access — required to sync signals and account status.",
             "Haptics — automatic, no prompt.",
           ]},
 
           { type: "note", tone: "tip", content: "Accept all three on first launch. You can always tighten them later in your phone's settings without losing data." },
-        ],
-      },
-      {
-        slug: "push-notifications",
-        title: "Enable push notifications",
-        summary: "Get A+ setup alerts as soon as they're detected.",
-        updatedAt: "2026-06-30",
-        body: [
-          { type: "p", content: "Push notifications are how Jenvu surfaces A+ setups the moment the engine detects them — typically within seconds of the structure shift on the chart." },
-
-          { type: "h2", content: "Turn them on" },
-          { type: "ol", items: [
-            "Open the Jenvu mobile app and sign in.",
-            "Accept the push prompt on first launch.",
-            "If you tapped 'Don't allow', enable Notifications for Jenvu in your phone's Settings app.",
-            "Open Dashboard → Alerts to fine-tune which alerts you receive.",
-          ]},
-
-          { type: "h2", content: "What you'll get" },
-          { type: "ul", items: [
-            "A+ setup detected — symbol, direction and score.",
-            "News risk warning before high-impact events.",
-            "Killzone open reminders (London / NY) if enabled.",
-          ]},
-
-          { type: "note", tone: "info", content: "All plans receive realtime email & push alerts the moment an A+ setup forms." },
         ],
       },
     ],

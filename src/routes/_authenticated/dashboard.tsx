@@ -139,7 +139,7 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
       { title: "Dashboard — Jenvu" },
       {
         name: "description",
-        content: "Your saved A+ setups, alert preferences, trade journal, and billing.",
+        content: "Your saved A+ setups, trade journal, and billing.",
       },
       { name: "robots", content: "noindex" },
     ],

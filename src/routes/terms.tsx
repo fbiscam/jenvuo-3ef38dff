@@ -42,7 +42,7 @@ function TermsPage() {
         <P>You agree not to:</P>
         <UL>
           <li>Reverse engineer, scrape, or use automated means to access the Service beyond documented APIs.</li>
-          <li>Resell, sublicense, or redistribute Jenvu's analysis or alerts to third parties without written permission.</li>
+          <li>Resell, sublicense, or redistribute Jenvu's analysis to third parties without written permission.</li>
           <li>Use the Service to violate any law, infringe intellectual property, or harm others.</li>
           <li>Interfere with security, rate limits, or the integrity of the Service.</li>
           <li>Submit content that is unlawful, harmful, deceptive, or malicious.</li>

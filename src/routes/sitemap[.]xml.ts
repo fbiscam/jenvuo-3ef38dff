@@ -42,7 +42,6 @@ export const Route = createFileRoute("/sitemap.xml")({
           { path: "/refund", changefreq: "yearly", priority: "0.3" },
           { path: "/killzones", changefreq: "daily", priority: "0.7" },
           { path: "/", origin: SUPPORT_URL, changefreq: "weekly", priority: "0.6" },
-          { path: "/broadcasts", changefreq: "daily", priority: "0.7" },
         ];
 
         // Append Help Center pages

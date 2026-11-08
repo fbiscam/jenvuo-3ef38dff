@@ -14,13 +14,13 @@ type Step = {
 const STEPS: Step[] = [
   {
     title: "Your desk, at a glance",
-    body: "Account Overview shows saved signals, alerts, trade journal stats and open positions — everything in one white surface.",
+    body: "Account Overview shows saved signals, trade journal stats and open positions — everything in one white surface.",
     icon: LayoutDashboard,
     cta: { to: "/dashboard", label: "Explore dashboard" },
   },
   {
     title: "Risk sized to your balance",
-    body: "Risk Manager tunes lot size, SL and TP to your live wallet balance so every alert respects your account.",
+    body: "Risk Manager tunes lot size, SL and TP to your live wallet balance so every trade respects your account.",
     icon: Scale,
     cta: { to: "/dashboard/risk", label: "Set up Risk" },
   },

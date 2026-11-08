@@ -189,7 +189,7 @@ function DocumentsPage() {
       <div className="mx-auto w-full max-w-[930px] pb-10 pt-2 text-foreground">
         <h1 className="px-1 text-[28px] font-normal leading-tight tracking-tight text-gc-ink sm:px-2 sm:text-[32px]">Documents</h1>
         <p className="mt-2 max-w-2xl px-1 text-[14px] leading-relaxed text-gc-ink-muted sm:px-2">
-          Submit your ID and driving license. Signals, alerts and account changes unlock as soon as our team approves them.
+          Submit your ID and driving license. Signals and account changes unlock as soon as our team approves them.
         </p>
 
         <div className="mt-8 space-y-10">

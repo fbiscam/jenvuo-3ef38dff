@@ -15,10 +15,10 @@ export function VerificationBanner({ isAdmin = false }: { isAdmin?: boolean }) {
   const text = rejected
     ? "Re-upload your ID and driving license to unlock your account."
     : needsInfo
-      ? "Our reviewer needs one more document to unlock signals and alerts."
+      ? "Our reviewer needs one more document to unlock signals."
       : submitted
-        ? "Signals and alerts unlock once our team approves them."
-        : "Unlock signals, alerts and account changes.";
+        ? "Signals unlock once our team approves them."
+        : "Unlock signals and account changes.";
 
   return <VerifyNotice tone={tone} title={title} text={text} action={submitted ? "View documents" : "Verify identity"} />;
 }
@@ -40,7 +40,7 @@ export function VerificationLocked() {
               ? "Our reviewer asked for one more document. Add it and this page unlocks automatically."
               : submitted
                 ? "Your documents are under review. This page unlocks as soon as our team approves them."
-                : "Submit your ID verification and driving license to unlock signals, alerts and account changes."}
+                : "Submit your ID verification and driving license to unlock signals and account changes."}
         </p>
         <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
           <Link

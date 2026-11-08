@@ -29,18 +29,18 @@ function PrivacyPage() {
         <UL>
           <li><strong>Account data</strong> — email, display name, hashed password, and authentication provider identifiers when you sign in.</li>
           <li><strong>Extension inputs</strong> — text prompts, chart images and market context you explicitly submit for analysis.</li>
-          <li><strong>Trading interactions</strong> — saved signals, alert preferences, and journal entries you create.</li>
+          <li><strong>Trading interactions</strong> — saved signals and journal entries you create.</li>
           <li><strong>Usage telemetry</strong> — routes visited, feature events, device type, browser, IP address (truncated where feasible), and crash diagnostics.</li>
-          <li><strong>Email engagement</strong> — opens, clicks and unsubscribe events for newsletters and alerts you opted into.</li>
+          <li><strong>Email engagement</strong> — opens, clicks and unsubscribe events for newsletters you opted into.</li>
         </UL>
       </section>
 
       <section className="space-y-3">
         <H2>2. How we use it</H2>
         <UL>
-          <li>Generate market analysis, narrate setups, and deliver realtime A+ alerts you requested.</li>
+          <li>Generate market analysis and narrate setups.</li>
           <li>Authenticate sessions, prevent abuse, and protect against fraud.</li>
-          <li>Send transactional emails (signups, password resets, signal alerts) and product announcements where opted in.</li>
+          <li>Send transactional emails (signups, password resets, billing) and product announcements where opted in.</li>
           <li>Improve product quality via aggregated, de-identified analytics.</li>
           <li>Comply with legal obligations and respond to lawful requests.</li>
         </UL>
@@ -57,7 +57,7 @@ function PrivacyPage() {
         <UL>
           <li><strong>Cloud infrastructure & database</strong> — to host the app and store your account data.</li>
           <li><strong>AI inference</strong> — to generate chart analysis, reviewed signals and content.</li>
-          <li><strong>Email delivery</strong> — to send transactional and alert emails.</li>
+          <li><strong>Email delivery</strong> — to send transactional emails.</li>
           <li><strong>Market data feeds</strong> — public price feeds (e.g. Binance, exchange APIs) for live quotes.</li>
         </UL>
         <P>All processors are bound by data processing agreements and use data strictly for the services we request.</P>

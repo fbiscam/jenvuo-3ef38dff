@@ -26,8 +26,8 @@ export const DOC_GROUPS: DocGroup[] = [
           <>
             <p>
               Jenvu is an analysis platform built for three markets: <strong>Gold</strong>, <strong>Bitcoin</strong> and <strong>EUR/USD</strong>. It combines a live chart (the
-              Terminal), chart markings based on ICT and Smart Money Concepts, an AI chat that explains what it sees, alerts, a demo
-              trading account and a browser extension.
+              Terminal), chart markings based on ICT and Smart Money Concepts, an AI chat that explains what it sees
+              and a browser extension.
             </p>
             <p>The main parts of Jenvu are:</p>
             <ul>
@@ -138,7 +138,7 @@ export const DOC_GROUPS: DocGroup[] = [
       {
         id: "notifications",
         title: "Notifications",
-        keywords: "bell alerts messages",
+        keywords: "bell messages",
         body: (
           <p>
             The bell in the top bar shows all your notifications with their full text. New ones appear instantly without reloading.
@@ -330,17 +330,6 @@ export const DOC_GROUPS: DocGroup[] = [
             Behind the chart are seven rule-based engines that read things like market structure, zones, fair value gaps and
             liquidity. They always give the same result for the same candles, so markings are consistent and repeatable. The
             AI explains their output — it does not invent its own levels.
-          </p>
-        ),
-      },
-      {
-        id: "alerts",
-        title: "Alerts",
-        keywords: "alerts signal buy sell notify",
-        body: (
-          <p>
-            When the engines detect a qualifying setup, an alert is sent to your notification bell. Buy alerts show a green arrow and
-            sell alerts a red arrow. Alerts describe what the chart shows — they are not instructions to trade.
           </p>
         ),
       },

@@ -5,7 +5,7 @@ export const Route = createFileRoute("/disclaimer")({
   head: () => ({
     meta: [
       { title: "Risk Disclaimer — Jenvu" },
-      { name: "description", content: "Important risk disclosure for users of Jenvu AI chart analysis, extension signals and alerts. Read before trading." },
+      { name: "description", content: "Important risk disclosure for users of Jenvu AI chart analysis, and extension signals. Read before trading." },
       { property: "og:title", content: "Risk Disclaimer — Jenvu" },
       { property: "og:url", content: "https://jenvu.com/disclaimer" },
     ],
@@ -18,13 +18,13 @@ function DisclaimerPage() {
   return (
     <PageShell
       eyebrow="\n"
-      highlight={{ title: 'Trading involves real risk', text: 'Jenvu analysis, alerts and signals are educational and not financial advice. Past results never guarantee future results, and you can lose all the money you allocate to trading.' }}
+      highlight={{ title: 'Trading involves real risk', text: 'Jenvu analysis and signals are educational and not financial advice. Past results never guarantee future results, and you can lose all the money you allocate to trading.' }}
       title="Risk Disclaimer"
-      intro="Trading carries substantial risk. Please read this disclosure carefully before using any analysis, alert, or signal produced by Jenvu."
+      intro="Trading carries substantial risk. Please read this disclosure carefully before using any analysis or signal produced by Jenvu."
     >
       <section className="space-y-3">
         <H2>1. Not financial advice</H2>
-        <P>Jenvu is an educational and analytical research tool. Nothing on jenvu.com, the TradingView extension, the signal desk, articles, or any alert constitutes investment advice, a recommendation to buy or sell, or a solicitation. We are not a registered investment adviser, broker-dealer, or financial planner in any jurisdiction.</P>
+        <P>Jenvu is an educational and analytical research tool. Nothing on jenvu.com, the TradingView extension, the signal desk or articles constitutes investment advice, a recommendation to buy or sell, or a solicitation. We are not a registered investment adviser, broker-dealer, or financial planner in any jurisdiction.</P>
       </section>
 
       <section className="space-y-3">
