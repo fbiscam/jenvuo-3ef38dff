@@ -31,6 +31,7 @@ export function OpsPage({ title, description, icon: _icon, actions, tabs, standa
       <div className="mx-auto w-full max-w-[1100px] pb-10">
         <a
           href={opsHubHref()}
+          suppressHydrationWarning
           className="mb-4 inline-flex items-center gap-1.5 text-[13px] text-muted-foreground transition hover:text-foreground"
         >
           <ArrowLeft className="h-3.5 w-3.5" /> Ops Console
