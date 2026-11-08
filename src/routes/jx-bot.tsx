@@ -6,6 +6,7 @@ import BlogFooter from "@/components/BlogFooter";
 import BotCodingPreview from "@/components/jxbot/BotCodingPreview";
 import { JxFace, JxBotFeatures } from "@/components/jxbot/JxBotFeatures";
 import { useAuthUser } from "@/hooks/useAuthUser";
+import { DAILY_DRAWDOWN_PCT } from "@/lib/mt5-licenses";
 
 export const Route = createFileRoute("/jx-bot")({
   head: () => ({
@@ -159,6 +160,22 @@ const FAQS = [
   {
     q: "Does JX Bot guarantee profit?",
     a: "No. Trading carries risk and losses happen. Targets are limits the bot stops at, not promised results. Start with a small lot size.",
+  },
+  {
+    q: "Can I use it on a prop firm like The5ers?",
+    a: "The5ers support told us JX Bot looks consistent with their EA rules: a visible hard stop loss on every trade, no martingale, grid, tick scalping or arbitrage, and EUR/USD M15 isn't restricted. Rules differ by firm and can change, so check yours first.",
+  },
+  {
+    q: "What if my VPS or RDP changes and I get a new IP?",
+    a: "Delete the old IP in Dashboard → JX Bot, add the new one and type it into MyIP. The5ers said a new VPS IP isn't a rule break by itself on your own account; never use a VPS or VPN to hide your location.",
+  },
+  {
+    q: "Can I check my trades on my phone?",
+    a: "Yes. You can stay logged in on the MT5 phone app while the bot runs on your VPS. Use the investor (read-only) password and don't place manual trades on that account.",
+  },
+  {
+    q: "Does the bot avoid news?",
+    a: `It has no news calendar, but it opens no new trades during the London and New York opens, skips spreads above 2 pips and spike candles, and stops at a fixed ${DAILY_DRAWDOWN_PCT}% daily drawdown. For very big events you can turn Algo Trading off for a while.`,
   },
   {
     q: "Can I backtest it first?",

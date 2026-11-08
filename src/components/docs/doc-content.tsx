@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { DAILY_DRAWDOWN_PCT } from "@/lib/mt5-licenses";
 
 export type DocSection = { id: string; title: string; keywords?: string; body: ReactNode };
 export type DocGroup = { title: string; sections: DocSection[] };
@@ -162,7 +163,7 @@ export const DOC_GROUPS: DocGroup[] = [
             <ul>
               <li>After approval you have <strong>2 days</strong> to verify your ID. If it isn't sent in time, the Terminal locks until you send it.</li>
               <li>Credit alone never unlocks the Terminal.</li>
-              <li>Founding members get 1 month of Pro or Elite, and have <strong>2 days</strong> to upload an identity document. The Terminal and JX Bot open once the ID is verified, and the team then funds the $200 API credit. After 30 days the plan, credit and bot access end, and you are told whether the bot reached $200 profit; a paid plan keeps JX Bot running.</li>
+              <li>Founding members get 1 month of Pro or Elite, and have <strong>2 days</strong> to upload an identity document. The Terminal and JX Bot open once the ID is verified, and the plan's API credit is added ($25 Pro, $50 Elite). After 30 days the plan, credit and bot access end, and you are told whether the bot reached $200 profit; a paid plan keeps JX Bot running.</li>
             </ul>
             <p>Apply at <a href="https://jenvu.com/founding">jenvu.com/founding</a>.</p>
           </>
@@ -295,6 +296,28 @@ export const DOC_GROUPS: DocGroup[] = [
               <li>It pauses for the day at your plan's daily target: 2% (Pro), 4% (Elite) or 6% (Ultra) of the day's starting balance, or at the 4.7% daily drawdown guard.</li>
             </ul>
             <Note>Targets are stop limits, not promised profit. Credit does not unlock JX Bot; it is only for approved Founding members whose ID is verified (first month free, then a Founding plan).</Note>
+          </>
+        ),
+      },
+      {
+        id: "jx-bot-prop-firms",
+        title: "Prop firms, VPS and mobile",
+        keywords: "prop firm the5ers ftmo funded challenge vps rdp ip change mobile phone news rules allowed",
+        body: (
+          <>
+            <p>
+              Based on what The5ers support told us in November 2026. Every firm has its own rules and they can change, so check your firm's current rules first.
+            </p>
+            <ul>
+              <li><strong>Is the strategy allowed?</strong> The5ers said JX Bot looks consistent with their EA rules: a visible hard stop loss on every trade, no martingale, no grid, no tick scalping, no arbitrage. EUR/USD and M15 are not restricted. They also ask that you own the EA you run.</li>
+              <li><strong>New VPS or RDP, new IP?</strong> Not a rule break by itself when it's your own account. Delete the old IP in Dashboard → JX Bot, add the new one, type it into MyIP and stop the bot on the old VPS. Never use a VPS or VPN to hide your location.</li>
+              <li><strong>Phone login?</strong> Yes, you can check trades on the MT5 phone app while the bot runs on the VPS. Use the investor (read-only) password and don't trade manually on that account.</li>
+              <li><strong>News?</strong> The bot has no news calendar, but it opens no new trades during the London open (07:00–09:00 UTC) and New York open (13:00–15:00 UTC), skips spreads above 2 pips and spike candles, and stops at the fixed {DAILY_DRAWDOWN_PCT}% daily drawdown guard.</li>
+            </ul>
+            <p>
+              Full answers: <a href="https://support.jenvu.com/help/signal-engine/jx-bot-prop-firms">JX Bot on prop firms</a>.
+            </p>
+            <Note>Prop firm rules and losses are your responsibility. No setup guarantees you pass a challenge or keep a funded account.</Note>
           </>
         ),
       },
