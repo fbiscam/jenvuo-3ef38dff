@@ -79,8 +79,12 @@ function getSections(): Section[] {
   return sections;
 }
 
-/** Core facts + the best-matching sections for the latest question (bounded size). */
-export function getRelevantJenvuKnowledge(question: string, maxChars = 7000): string {
+/**
+ * Core facts + the best-matching sections for the latest question.
+ * `maxChars` budgets the matched sections only: the core facts alone are
+ * longer than the old shared budget, which silently dropped every article.
+ */
+export function getRelevantJenvuKnowledge(question: string, maxChars = 6000): string {
   const q = tokenize(question);
   const scored = getSections()
     .map((s) => {
@@ -95,7 +99,7 @@ export function getRelevantJenvuKnowledge(question: string, maxChars = 7000): st
     .filter((x) => x.score > 0)
     .sort((a, b) => b.score - a.score);
   const parts = [CORE_FACTS.trim()];
-  let size = parts[0].length;
+  let size = 0;
   for (const { s } of scored) {
     if (size + s.text.length > maxChars) continue;
     parts.push(s.text);
