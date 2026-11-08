@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { domainAge, topKeywords } from "./site-inspect";
+import { domainAge, isInspectableUrl, topKeywords } from "./site-inspect";
 
 export type SiteReport = {
   domain: string;
@@ -37,7 +37,7 @@ export const inspectSite = createServerFn({ method: "POST" })
     if (!/^([a-z0-9-]+\.)+[a-z]{2,24}$/.test(domain)) throw new Error("Invalid domain");
     return { domain };
   })
-  .handler(async ({ data }): Promise<SiteReport> => {
+  .handler(async ({ data, context }): Promise<SiteReport> => {
     const { domain } = data;
     const url = `https://${domain}`;
     const r: SiteReport = {
@@ -45,13 +45,36 @@ export const inspectSite = createServerFn({ method: "POST" })
       images: 0, imagesNoAlt: 0, links: 0, canonical: null, robots: null, lang: null, server: null,
       created: null, age: null, registrar: null, expires: null, keywords: [], score: 0,
     };
+    // Same access as Chat itself (ID check + plan entitlement), plus a per-user rate
+    // limit, so the inspector can't be used as a free fetch proxy.
+    const { idActionBlock } = await import("@/lib/id-gate.server");
+    const idBlocked = await idActionBlock(context.userId);
+    if (idBlocked) return { ...r, error: idBlocked };
+    const { getExtensionEntitlement } = await import("@/lib/extension-billing.server");
+    const entitlement = await getExtensionEntitlement(context.userId);
+    if (!entitlement.allowed) return { ...r, error: "Your plan doesn't include website reports." };
+    const { checkAnalyzeRateLimit } = await import("@/lib/ai-gateway");
+    const rl = checkAnalyzeRateLimit(`site-inspect:${context.userId}`);
+    if (!rl.allowed) return { ...r, error: `Too many website checks. Please wait ${rl.retryInSec}s.` };
+    if (!isInspectableUrl(url)) return { ...r, error: "This website can't be checked." };
     const page = (async () => {
       const t0 = Date.now();
       try {
-        const res = await fetch(url, { redirect: "follow", headers: { "user-agent": "Mozilla/5.0 JenvuInspector" }, signal: AbortSignal.timeout(10000) });
+        // Redirects are followed by hand (max 5) so every hop is checked as a public website.
+        let target = url;
+        let res: Response | null = null;
+        for (let hop = 0; hop <= 5; hop++) {
+          if (!isInspectableUrl(target)) throw new Error("blocked");
+          res = await fetch(target, { redirect: "manual", headers: { "user-agent": "Mozilla/5.0 JenvuInspector" }, signal: AbortSignal.timeout(10000) });
+          const loc = res.status >= 300 && res.status < 400 ? res.headers.get("location") : null;
+          if (!loc) break;
+          target = new URL(loc, target).toString();
+          res = null;
+        }
+        if (!res) throw new Error("too many redirects");
         r.ms = Date.now() - t0;
         r.status = res.status;
-        r.https = res.url.startsWith("https://");
+        r.https = target.startsWith("https://");
         r.server = res.headers.get("server");
         const html = (await res.text()).slice(0, 800_000);
         r.title = pick(html, /<title[^>]*>([\s\S]*?)<\/title>/i);

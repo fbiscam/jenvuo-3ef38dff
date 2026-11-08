@@ -33,6 +33,9 @@ KNOWLEDGE:
 ${knowledge}`;
 
 const ANON_DAILY_LIMIT = 30;
+// Total free answers per day for all signed-out visitors together, so rotating IPs
+// can't turn the free assistant into an unbounded paid AI bill.
+const ANON_GLOBAL_DAILY_LIMIT = 600;
 export const askJenvu = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => Input.parse(data))
   .handler(async ({ data }): Promise<AskJenvuResult> => {
@@ -61,6 +64,11 @@ export const askJenvu = createServerFn({ method: "POST" })
         if (error) throw error;
         if ((used ?? 0) > ANON_DAILY_LIMIT) {
           return { ok: false, error: "You've reached today's free question limit. Sign in to keep asking." };
+        }
+        const { data: total, error: gErr } = await supabaseAdmin.rpc("bump_ask_jenvu_anon", { _bucket: "global:visitors" });
+        if (gErr) throw gErr;
+        if ((total ?? 0) > ANON_GLOBAL_DAILY_LIMIT) {
+          return { ok: false, error: "Ask Jenvu is busy for visitors today. Sign in to keep asking." };
         }
       } catch {
         return { ok: false, error: "Ask Jenvu couldn't answer right now. Please try again in a moment." };
