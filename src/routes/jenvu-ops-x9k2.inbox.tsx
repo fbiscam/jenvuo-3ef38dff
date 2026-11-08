@@ -30,6 +30,7 @@ import {
   adminReply,
   adminCloseSession,
 } from "@/lib/admin-gate.functions";
+import { opsHubHref } from "@/components/ops/OpsPage";
 
 export const Route = createFileRoute("/jenvu-ops-x9k2/inbox")({
   head: () => ({
@@ -301,7 +302,16 @@ function AdminInbox() {
     <div className="ops-console flex h-dvh flex-col bg-background text-[13px] text-foreground antialiased [font-family:'Google_Sans_Flex','Google_Sans','Product_Sans','Poppins',system-ui,-apple-system,sans-serif]">
       <div className="ops-zoom flex min-h-0 flex-1 flex-col" style={{ minHeight: 0 }}>
         {/* Page header — same as the dashboard pages */}
-        <header className="mx-auto flex w-full max-w-[1280px] shrink-0 flex-col gap-4 px-4 pt-6 sm:flex-row sm:items-end sm:justify-between sm:px-6 lg:pt-8">
+        <div className="mx-auto w-full max-w-[1280px] shrink-0 px-4 pt-5 sm:px-6 lg:pt-6">
+          <a
+            href={opsHubHref()}
+            suppressHydrationWarning
+            className="ops-btn inline-flex h-8 items-center gap-1.5 rounded-full px-3 text-[12.5px] font-medium text-foreground transition"
+          >
+            <ChevronLeft className="h-3.5 w-3.5" /> Ops Console
+          </a>
+        </div>
+        <header className="mx-auto flex w-full max-w-[1280px] shrink-0 flex-col gap-4 px-4 pt-4 sm:flex-row sm:items-end sm:justify-between sm:px-6">
           <div className="min-w-0">
             <h1 className="text-[28px] font-normal tracking-tight text-foreground sm:text-[32px]">Support</h1>
             <p className="mt-1 text-[14px] text-muted-foreground">
