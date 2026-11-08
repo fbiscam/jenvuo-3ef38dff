@@ -5,12 +5,17 @@ import { isTrialPlanLocked, purchaseGate } from "./founding-bot";
 
 describe("ID check: look but no actions", () => {
   it("locks actions for an approved member without a verified ID", () => {
-    expect(idActionsLocked({ isAdmin: false, documentStatus: null, hasApplication: true })).toBe(true);
-    expect(idActionsLocked({ isAdmin: false, documentStatus: "pending", hasApplication: true })).toBe(true);
+    expect(idActionsLocked({ isAdmin: false, documentStatus: null, hasApplication: true, applicationStatus: "approved" })).toBe(true);
+    expect(idActionsLocked({ isAdmin: false, documentStatus: "pending", hasApplication: true, applicationStatus: "active" })).toBe(true);
   });
   it("opens actions once the ID is verified, and for admins", () => {
-    expect(idActionsLocked({ isAdmin: false, documentStatus: "verified", hasApplication: true })).toBe(false);
-    expect(idActionsLocked({ isAdmin: true, documentStatus: null, hasApplication: true })).toBe(false);
+    expect(idActionsLocked({ isAdmin: false, documentStatus: "verified", hasApplication: true, applicationStatus: "approved" })).toBe(false);
+    expect(idActionsLocked({ isAdmin: true, documentStatus: null, hasApplication: true, applicationStatus: "approved" })).toBe(false);
+  });
+  it("never locks pending, rejected or waitlisted applicants", () => {
+    expect(idActionsLocked({ isAdmin: false, documentStatus: null, hasApplication: true, applicationStatus: "pending" })).toBe(false);
+    expect(idActionsLocked({ isAdmin: false, documentStatus: null, hasApplication: true, applicationStatus: "rejected" })).toBe(false);
+    expect(idActionsLocked({ isAdmin: false, documentStatus: null, hasApplication: true, applicationStatus: "waitlisted" })).toBe(false);
   });
   it("API keys and Chat pages are look-only", () => {
     expect(idViewOnly("/dashboard/api", true)).toBe(true);

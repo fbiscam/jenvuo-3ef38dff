@@ -68,7 +68,7 @@ export function BlogTile({ title, category, className = "" }: { title: string; c
 export function BlogHeroArt({ title, className = "" }: { title: string; className?: string }) {
   const h = hash(title);
   const a = PAIRS[h % PAIRS.length];
-  const b = PAIRS[(h >> 3) % PAIRS.length];
+  const b = PAIRS[(h >>> 3) % PAIRS.length];
   const short = title.length > 46 ? `${title.slice(0, 44).replace(/\s+\S*$/, "")}…` : title;
   return (
     <div
