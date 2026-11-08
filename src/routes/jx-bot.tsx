@@ -6,6 +6,7 @@ import BlogFooter from "@/components/BlogFooter";
 import BotCodingPreview from "@/components/jxbot/BotCodingPreview";
 import { JxFace, JxBotFeatures } from "@/components/jxbot/JxBotFeatures";
 import { useAuthUser } from "@/hooks/useAuthUser";
+import { DAILY_DRAWDOWN_PCT } from "@/lib/mt5-licenses";
 
 export const Route = createFileRoute("/jx-bot")({
   head: () => ({
@@ -174,7 +175,7 @@ const FAQS = [
   },
   {
     q: "Does the bot avoid news?",
-    a: "It has no news calendar, but it opens no new trades during the London and New York opens, skips spreads above 2 pips and spike candles, and stops at a fixed 4.7% daily drawdown. For very big events you can turn Algo Trading off for a while.",
+    a: `It has no news calendar, but it opens no new trades during the London and New York opens, skips spreads above 2 pips and spike candles, and stops at a fixed ${DAILY_DRAWDOWN_PCT}% daily drawdown. For very big events you can turn Algo Trading off for a while.`,
   },
   {
     q: "Can I backtest it first?",
