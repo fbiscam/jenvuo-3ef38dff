@@ -1,8 +1,7 @@
 import JenvuMark from "@/components/JenvuMark";
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { OPS_ZOOM_MESSAGE, opsInnerZoomFor } from "@/lib/ops-zoom";
+import { useCallback, useEffect, useState } from "react";
 import type { ReactNode } from "react";
 import {
   Activity,
@@ -10,10 +9,8 @@ import {
   Crown,
   FileText,
   Inbox,
-  LayoutGrid,
   Lock,
   Mail,
-  Menu,
   Moon,
   Sun,
   Megaphone,
@@ -81,15 +78,6 @@ function OpsHub() {
   const lock = useServerFn(opsLock);
   const status = useServerFn(opsStatus);
   const [ready, setReady] = useState(false);
-  const [active, setActive] = useState<Tile | null>(null);
-  const [navOpen, setNavOpen] = useState(false);
-  // Keep the open tool's size in step with the screen (see ops-zoom.ts).
-  const frameRef = useRef<HTMLIFrameElement | null>(null);
-  useEffect(() => {
-    const send = () => frameRef.current?.contentWindow?.postMessage({ type: OPS_ZOOM_MESSAGE, z: opsInnerZoomFor(window.innerWidth) }, "*");
-    window.addEventListener("resize", send);
-    return () => window.removeEventListener("resize", send);
-  }, []);
   const [dark, setDark] = useState(false);
   useEffect(() => setDark(readSiteTheme() === "dark"), []);
   const fetchCounts = useServerFn(opsPendingCounts);
@@ -142,11 +130,6 @@ function OpsHub() {
   const total = (counts?.inbox ?? 0) + (counts?.founding ?? 0) + (counts?.documents ?? 0) + (counts?.payments ?? 0);
   const countFor = (t: Tile) => (t.countKey && counts ? counts[t.countKey] : 0);
 
-  const select = (t: Tile | null) => {
-    setActive(t);
-    setNavOpen(false);
-    if (!t) void refresh();
-  };
 
   const toggleTheme = () => {
     const next = dark ? "light" : "dark";
@@ -155,163 +138,94 @@ function OpsHub() {
     setDark(!dark);
   };
 
-  const sidebar = (
-    <nav className="flex h-full flex-col">
-      <div className="flex h-14 shrink-0 items-center gap-2.5 px-4">
-        <JenvuMark className="h-6 w-6 text-foreground" />
-        <span className="text-[15px] font-medium text-foreground">Ops Console</span>
-        <span className="ml-auto inline-flex items-center gap-1.5 text-[11.5px] text-muted-foreground">
-          <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-gc-green" /> Live
-        </span>
-      </div>
-      <div className="flex-1 overflow-y-auto px-2.5 pb-3">
-        <NavItem active={!active} onClick={() => select(null)} icon={<LayoutGrid />} label="Overview" count={total} />
-        {GROUPS.map((g) => (
-          <div key={g.name} className="mt-4">
-            <div className="px-2.5 pb-1 text-[11.5px] font-medium text-muted-foreground">{g.name}</div>
-            {TILES.filter((t) => t.group === g.name).map((t) => (
-              <NavItem key={t.key} active={active?.key === t.key} onClick={() => select(t)} icon={t.icon} label={t.title} count={countFor(t)} />
-            ))}
-          </div>
-        ))}
-      </div>
-      <div className="ops-line flex shrink-0 items-center gap-2 border-t px-3 py-3">
-        <button onClick={toggleTheme} className={`${ops.btn} h-9 w-9 px-0`} aria-label={dark ? "White theme" : "Black theme"}>
-          {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-        </button>
-        <button onClick={onLock} className={`${ops.btn} flex-1`}>
-          <Lock className="h-3.5 w-3.5" /> Lock console
-        </button>
-      </div>
-    </nav>
-  );
-
   return (
-    <div className={`ops-console flex h-dvh w-full overflow-hidden bg-background text-foreground ${SANS} antialiased`}>
-      {/* Desktop: pinned sidebar, same as the dashboard */}
-      <aside className="ops-side ops-shell-zoom hidden w-[248px] shrink-0 lg:block" style={{ minHeight: 0 }}>
-        {sidebar}
-      </aside>
-      {/* Phones: drawer */}
-      {navOpen && (
-        <div className="fixed inset-0 z-50 lg:hidden">
-          <button aria-label="Close menu" className="absolute inset-0 bg-foreground/30" onClick={() => setNavOpen(false)} />
-          <aside className="ops-side absolute inset-y-0 left-0 w-[272px] max-w-[85vw] shadow-xl">{sidebar}</aside>
-        </div>
-      )}
-
-      <div className="flex min-w-0 flex-1 flex-col">
-        <header className="ops-line flex h-14 shrink-0 items-center gap-3 border-b px-3 sm:px-5 lg:hidden">
-          <button onClick={() => setNavOpen(true)} className={`${ops.btn} h-9 w-9 px-0`} aria-label="Open menu">
-            <Menu className="h-4 w-4" />
-          </button>
-          <span className="truncate text-[15px] font-medium">{active ? active.title : "Overview"}</span>
-          {total > 0 && <OpsCount value={total} className="ml-auto" />}
-        </header>
-
-        {active ? (
-          <div className="flex min-h-0 flex-1 flex-col">
-            <div className="ops-line hidden h-12 shrink-0 items-center gap-3 border-b px-5 lg:flex">
-              <span className="text-[14px] font-medium text-foreground">{active.title}</span>
-              <span className="truncate text-[12.5px] text-muted-foreground">{active.desc}</span>
-              <a href={toolUrl(active, false)} target="_blank" rel="noreferrer" className="ml-auto text-[13px] text-muted-foreground hover:text-foreground">
-                Open in new tab ↗
-              </a>
-            </div>
-            <iframe ref={frameRef} key={active.key} src={toolUrl(active, true)} title={active.title} className="min-h-0 w-full flex-1 bg-background" />
+    <div className={`ops-console min-h-dvh w-full bg-background text-foreground ${SANS} antialiased`}>
+      <header className="ops-line sticky top-0 z-30 border-b bg-background">
+        <div className="ops-shell-zoom mx-auto flex h-14 w-full max-w-[1100px] items-center gap-3 px-5 sm:px-8" style={{ minHeight: 0 }}>
+          <JenvuMark className="h-6 w-6 text-foreground" />
+          <span className="text-[15px] font-medium text-foreground">Ops Console</span>
+          <span className="hidden items-center gap-1.5 text-[12px] text-muted-foreground sm:inline-flex">
+            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-gc-green" /> Live · Restricted team
+          </span>
+          <div className="ml-auto flex items-center gap-2">
+            {total > 0 && <OpsCount value={total} />}
+            <button onClick={toggleTheme} className={`${ops.btn} h-9 w-9 px-0`} aria-label={dark ? "White theme" : "Black theme"}>
+              {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+            </button>
+            <button onClick={onLock} className={ops.btn}>
+              <Lock className="h-3.5 w-3.5" /> <span className="hidden sm:inline">Lock console</span>
+            </button>
           </div>
-        ) : (
-          <main className="min-h-0 flex-1 overflow-y-auto">
-            <div className="ops-shell-zoom mx-auto w-full max-w-[1100px] px-5 pb-12 pt-8 sm:px-8 lg:pt-10" style={{ minHeight: 0 }}>
-              <h1 className="text-[30px] font-normal tracking-tight sm:text-[34px]">Overview</h1>
-              <p className="mt-1 text-[14px] text-muted-foreground">
-                {total > 0 ? `${total} new item${total === 1 ? "" : "s"} waiting for you.` : "Nothing new waiting right now."}
-              </p>
-              <section className="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
-                {PENDING.map((p) => {
-                  const v = counts ? counts[p.key] : null;
-                  const tile = TILES.find((t) => t.key === p.tile);
-                  return (
-                    <button
-                      key={p.key}
-                      type="button"
-                      onClick={() => tile && select(tile)}
-                      className="ops-card ops-tile relative rounded-2xl px-4 py-4 text-left transition sm:px-5"
-                    >
-                      <div className="flex items-center justify-between text-[12.5px] text-muted-foreground">
-                        {p.label}
-                        {!!v && <span className="h-2 w-2 rounded-full bg-gc-red" aria-hidden />}
-                      </div>
-                      <div className="mt-2 text-[24px] font-medium tabular-nums text-foreground">{v ?? "–"}</div>
-                      <div className="mt-0.5 text-[12px] text-muted-foreground">{p.hint}</div>
-                    </button>
-                  );
-                })}
-              </section>
+        </div>
+      </header>
 
-              {GROUPS.map((g) => (
-                <section key={g.name} className="mt-8">
-                  <h2 className="text-[13px] font-medium text-muted-foreground">{g.name}</h2>
-                  <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                    {TILES.filter((t) => t.group === g.name).map((t) => {
-                      const c = countFor(t);
-                      return (
-                        <button
-                          key={t.key}
-                          type="button"
-                          onClick={() => select(t)}
-                          className="ops-card ops-tile group relative flex items-start gap-3 rounded-2xl p-4 text-left transition"
-                        >
-                          <span className="ops-chip relative grid h-10 w-10 shrink-0 place-items-center rounded-xl [&_svg]:h-[18px] [&_svg]:w-[18px]">
-                            {t.icon}
-                            <OpsCount value={c} className="absolute -right-2 -top-2" />
-                          </span>
-                          <span className="min-w-0 flex-1">
-                            <span className="block text-[14px] font-medium text-foreground">{t.title}</span>
-                            <span className="mt-0.5 block text-[13px] text-muted-foreground">
-                              {c ? <span className="font-medium text-foreground">{c} new · </span> : null}
-                              {t.desc}
-                            </span>
-                          </span>
-                          <ArrowRight className="mt-1 h-4 w-4 shrink-0 text-muted-foreground transition group-hover:translate-x-0.5 group-hover:text-foreground" />
-                        </button>
-                      );
-                    })}
-                  </div>
-                </section>
-              ))}
+      <main className="ops-shell-zoom mx-auto w-full max-w-[1100px] px-5 pb-12 pt-8 sm:px-8 lg:pt-10" style={{ minHeight: 0 }}>
+        <h1 className="text-[30px] font-normal tracking-tight sm:text-[34px]">Overview</h1>
+        <p className="mt-1 text-[14px] text-muted-foreground">
+          {total > 0 ? `${total} new item${total === 1 ? "" : "s"} waiting for you.` : "Nothing new waiting right now."}
+        </p>
+
+        <section className="mt-5 grid grid-cols-2 gap-2 lg:grid-cols-4">
+          {PENDING.map((p) => {
+            const v = counts ? counts[p.key] : null;
+            const tile = TILES.find((t) => t.key === p.tile);
+            return (
+              <a
+                key={p.key}
+                href={tile ? toolUrl(tile) : undefined}
+                className="ops-card ops-tile relative flex min-h-[120px] flex-col rounded-2xl p-4 text-left transition sm:p-5"
+              >
+                <div className="flex items-center justify-between text-[13px] text-muted-foreground">
+                  {p.label}
+                  {!!v && <span className="h-2 w-2 rounded-full bg-gc-red" aria-hidden />}
+                </div>
+                <div className="mt-1 text-[22px] font-medium tabular-nums text-foreground">{v ?? "–"}</div>
+                <div className="mt-auto pt-2 text-[12px] text-muted-foreground">{p.hint}</div>
+              </a>
+            );
+          })}
+        </section>
+
+        {GROUPS.map((g) => (
+          <section key={g.name} className="mt-10">
+            <h2 className="text-[18px] font-medium text-foreground">{g.name}</h2>
+            <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
+              {TILES.filter((t) => t.group === g.name).map((t) => {
+                const c = countFor(t);
+                return (
+                  <a
+                    key={t.key}
+                    href={toolUrl(t)}
+                    className="ops-card ops-tile group relative flex items-start gap-3 rounded-2xl p-4 text-left transition sm:p-5"
+                  >
+                    <span className="ops-chip relative grid h-10 w-10 shrink-0 place-items-center rounded-xl [&_svg]:h-[18px] [&_svg]:w-[18px]">
+                      {t.icon}
+                      <OpsCount value={c} className="absolute -right-2 -top-2" />
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block text-[14px] font-medium text-foreground">{t.title}</span>
+                      <span className="mt-0.5 block text-[13px] text-muted-foreground">
+                        {c ? <span className="font-medium text-foreground">{c} new · </span> : null}
+                        {t.desc}
+                      </span>
+                    </span>
+                    <ArrowRight className="mt-1 h-4 w-4 shrink-0 text-muted-foreground transition group-hover:translate-x-0.5 group-hover:text-foreground" />
+                  </a>
+                );
+              })}
             </div>
-          </main>
-        )}
-      </div>
+          </section>
+        ))}
+      </main>
     </div>
   );
 }
 
-function NavItem({ active, onClick, icon, label, count }: { active: boolean; onClick: () => void; icon: ReactNode; label: string; count?: number }) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      data-active={active}
-      className="ops-nav-item flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-[13.5px] transition [&_svg]:h-4 [&_svg]:w-4 [&_svg]:shrink-0"
-    >
-      {icon}
-      <span className="min-w-0 flex-1 truncate">{label}</span>
-      <OpsCount value={count} />
-    </button>
-  );
-}
-
 /** Dashboard tools live on dash.jenvu.com: link there directly (no extra redirect hop). */
-function toolUrl(t: Tile, embed: boolean): string {
-  let base = t.to;
+function toolUrl(t: Tile): string {
   if (typeof window !== "undefined" && t.to.startsWith("/dashboard/")) {
     const host = window.location.hostname;
-    if (host === "jenvu.com" || host.endsWith(".jenvu.com")) base = `https://dash.jenvu.com${dashExternal(t.to)}`;
+    if (host === "jenvu.com" || host.endsWith(".jenvu.com")) return `https://dash.jenvu.com${dashExternal(t.to)}`;
   }
-  if (!embed) return base;
-  const token = typeof window !== "undefined" ? window.sessionStorage.getItem("jenvu_ops_token") : null;
-  const z = typeof window !== "undefined" ? opsInnerZoomFor(window.innerWidth) : 1;
-  return `${base}${base.includes("?") ? "&" : "?"}embed=1&z=${z}${token ? `&t=${encodeURIComponent(token)}` : ""}`;
+  return t.to;
 }

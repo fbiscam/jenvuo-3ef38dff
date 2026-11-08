@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { ArrowLeft } from "lucide-react";
 
 /**
  * Shared look for every Ops Console page (hub tools, admin pages, payments,
@@ -28,6 +29,13 @@ export function OpsPage({ title, description, icon: _icon, actions, tabs, standa
       className={`ops-console text-foreground ${standalone ? "ops-zoom min-h-dvh w-full bg-background px-5 pt-8 sm:px-8 lg:pt-10" : "w-full"}`}
     >
       <div className="mx-auto w-full max-w-[1100px] pb-10">
+        <a
+          href={opsHubHref()}
+          suppressHydrationWarning
+          className="mb-4 inline-flex items-center gap-1.5 text-[13px] text-muted-foreground transition hover:text-foreground"
+        >
+          <ArrowLeft className="h-3.5 w-3.5" /> Ops Console
+        </a>
         <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="min-w-0">
             <h1 className="truncate text-[30px] font-normal tracking-tight text-foreground sm:text-[34px]">{title}</h1>
@@ -36,11 +44,11 @@ export function OpsPage({ title, description, icon: _icon, actions, tabs, standa
           {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
         </header>
         {tabs && (
-          <div className="ops-tabs mt-6 flex max-w-full items-center gap-1 overflow-x-auto rounded-full p-1 text-[13px] [scrollbar-width:none] sm:w-fit">
+          <div className="mt-5 flex max-w-full items-center gap-1 overflow-x-auto text-[14px] [scrollbar-width:none]" role="tablist">
             {tabs}
           </div>
         )}
-        <div className="ops-content mt-6 space-y-4">{children}</div>
+        <div className="ops-content mt-5 space-y-2">{children}</div>
       </div>
     </div>
   );
@@ -75,8 +83,10 @@ export function OpsTab({
     <button
       type="button"
       onClick={onClick}
-      className={`inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full px-3.5 py-1.5 transition ${
-        active ? "ops-tab-active font-medium text-foreground" : "text-muted-foreground hover:text-foreground"
+      role="tab"
+      aria-selected={active}
+      className={`inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-1.5 transition-colors ${
+        active ? "ops-card font-medium text-foreground" : "text-muted-foreground hover:text-foreground"
       }`}
     >
       {children}
@@ -90,11 +100,11 @@ export type OpsStat = { label: string; value: ReactNode; hint?: ReactNode; tone?
 /** Row of headline numbers, one console card each. */
 export function OpsStats({ items }: { items: OpsStat[] }) {
   return (
-    <section className="grid grid-cols-2 gap-3 sm:grid-cols-[repeat(auto-fit,minmax(170px,1fr))]">
+    <section className="grid grid-cols-2 gap-2 sm:grid-cols-[repeat(auto-fit,minmax(170px,1fr))]">
       {items.map((s) => (
-        <div key={s.label} className="ops-card min-w-0 rounded-2xl px-4 py-4 sm:px-5">
-          <div className="text-[12.5px] text-muted-foreground">{s.label}</div>
-          <div className={`mt-2 truncate text-[22px] font-medium tabular-nums ${s.tone ? TONE_TEXT[s.tone] : "text-foreground"}`}>
+        <div key={s.label} className="ops-card min-w-0 rounded-2xl p-4 sm:p-5">
+          <div className="text-[13px] text-muted-foreground">{s.label}</div>
+          <div className={`mt-1 truncate text-[22px] font-medium tabular-nums ${s.tone ? TONE_TEXT[s.tone] : "text-foreground"}`}>
             {s.value}
           </div>
           {s.hint && <div className="mt-1 truncate text-[12px] text-muted-foreground">{s.hint}</div>}
@@ -117,14 +127,14 @@ export function OpsSection({
   flush?: boolean;
 }) {
   return (
-    <section className="ops-card overflow-hidden rounded-2xl">
+    <section className="pt-2 first:pt-0">
       {(title || actions) && (
-        <div className="flex flex-wrap items-center justify-between gap-2 px-4 pt-4 sm:px-5">
-          {title && <h2 className="text-[14px] font-medium text-foreground">{title}</h2>}
+        <div className="mb-3 mt-6 flex flex-wrap items-center justify-between gap-2">
+          {title && <h2 className="text-[18px] font-medium text-foreground">{title}</h2>}
           {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
         </div>
       )}
-      <div className={flush ? "pt-3" : "px-4 py-4 sm:px-5"}>{children}</div>
+      <div className={`ops-card overflow-hidden rounded-2xl ${flush ? "" : "p-4 sm:p-5"}`}>{children}</div>
     </section>
   );
 }
@@ -189,3 +199,12 @@ export const ops = {
     "inline-flex h-9 items-center justify-center gap-1.5 rounded-full bg-foreground px-4 text-[13px] font-medium text-background transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50",
   card: "ops-card rounded-2xl",
 };
+
+/** Ops Console overview lives on the main site (jenvu.com). */
+function opsHubHref(): string {
+  if (typeof window !== "undefined") {
+    const host = window.location.hostname;
+    if (host !== "jenvu.com" && host.endsWith(".jenvu.com")) return "https://jenvu.com/ops-x9k2-7m4n/hub";
+  }
+  return "/ops-x9k2-7m4n/hub";
+}
