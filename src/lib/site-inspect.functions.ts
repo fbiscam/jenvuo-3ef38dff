@@ -72,10 +72,9 @@ export const inspectSite = createServerFn({ method: "POST" })
           res = null;
         }
         if (!res) throw new Error("too many redirects");
-        Object.defineProperty(res, "url", { value: target, configurable: true });
         r.ms = Date.now() - t0;
         r.status = res.status;
-        r.https = res.url.startsWith("https://");
+        r.https = target.startsWith("https://");
         r.server = res.headers.get("server");
         const html = (await res.text()).slice(0, 800_000);
         r.title = pick(html, /<title[^>]*>([\s\S]*?)<\/title>/i);
