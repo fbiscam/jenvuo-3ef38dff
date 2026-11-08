@@ -9,9 +9,9 @@ export const Route = createFileRoute("/ai-engine")({
   head: () => ({
     meta: [
       { title: "Products — Jenvu Terminal, AI Engine & API" },
-      { name: "description", content: "Jenvu products: JX Bot for MetaTrader 5, the Top AI Models, rule-based analysis engines, alerts and the developer API." },
+      { name: "description", content: "Jenvu products: JX Bot for MetaTrader 5, the Top AI Models, rule-based analysis engines and the developer API." },
       { property: "og:title", content: "Products — Jenvu" },
-      { property: "og:description", content: "The Jenvu Terminal, AI engine, analysis engines, alerts and API for Gold, BTC/USD and EUR/USD traders." },
+      { property: "og:description", content: "The Jenvu Terminal, AI engine, analysis engines and API for Gold, BTC/USD and EUR/USD traders." },
       { property: "og:url", content: "https://jenvu.com/ai-engine" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -27,7 +27,7 @@ const CONTENT: IndustryContent = {
   pill: "\n",
   title: "One platform for trading Gold, Bitcoin and EUR/USD",
   intro:
-    "A live Terminal, an AI engine that explains the chart, rule-based analysis engines, alerts and an API, all built for Gold, Bitcoin and EUR/USD.",
+    "A live Terminal, an AI engine that explains the chart, rule-based analysis engines and an API, all built for Gold, Bitcoin and EUR/USD.",
   heroCaption: "The Terminal, AI engine and API working on one live Gold, Bitcoin or EUR/USD chart.",
   solutionsTitle: "Everything you need in one place",
   solutionsIntro: "Start with the Terminal and add the tools you need.",
@@ -73,14 +73,6 @@ const CONTENT: IndustryContent = {
       href: "/stories/ai-desk-updates",
     },
     {
-      label: "Alerts",
-      title: "Price alerts",
-      text: "Set the level you care about and get notified when Gold reaches it.",
-      points: ["Alerts in the dashboard", "Works while you are away", "Manage alerts any time"],
-      link: "Read the docs",
-      href: "https://jenvu.com/docs",
-    },
-    {
       label: "JX Bot",
       title: "JX Bot for MT5",
       text: "Jenvu's Expert Advisor trades EUR/USD on MetaTrader 5 and stops at your plan's targets.",
@@ -109,11 +101,10 @@ const CONTENT: IndustryContent = {
   storiesTitle: "Latest product stories",
   storySlugs: ["ai-desk-updates", "rvol-and-volume-direction", "build-with-jenvu"],
   highlightsTitle: "What you get with every plan",
-  highlightsIntro: "Four tools that work together on one live Gold, Bitcoin or EUR/USD chart.",
+  highlightsIntro: "Three tools that work together on one live Gold, Bitcoin or EUR/USD chart.",
   highlights: [
     { title: "Gold, Bitcoin & EUR/USD ", text: "Candles with structure, zones, sweeps marked for you." },
     { title: "AI answers", text: "Ask about the chart and get a short, plain-language reply." },
-    { title: "Price alerts", text: "Pick a level and get told when Gold reaches it." },
     { title: "API keys", text: "Use Jenvu analysis in your own apps and bots." },
   ],
   productsTitle: "Explore all products",

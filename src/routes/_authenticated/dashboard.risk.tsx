@@ -59,7 +59,7 @@ function RiskPage() {
       <div className="mb-2">
         <h1 className="pl-1 text-lg font-semibold text-black">Risk Management</h1>
         <p className="text-xs text-gray-700 mt-0.5">
-          Position size and daily loss guard. Applies to signal cards and WhatsApp alerts.
+          Position size and daily loss guard. Applies to signal cards.
         </p>
       </div>
 
@@ -106,7 +106,7 @@ function RiskPage() {
                 Enable daily loss kill-switch
               </label>
               <p className="text-xs text-gray-700 mt-0.5">
-                When today's realized losses hit the limit, new signal alerts and charges are paused until 00:00 UTC.
+                When today's realized losses hit the limit, new signals and charges are paused until 00:00 UTC.
               </p>
             </div>
 

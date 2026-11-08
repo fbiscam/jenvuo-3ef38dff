@@ -71,7 +71,7 @@ function SavedSignals() {
         </div>
         <h3 className="mt-4 text-lg font-semibold tracking-tight">No saved setups yet</h3>
         <p className="mx-auto mt-1.5 max-w-md text-sm text-zinc-500 sm:max-w-none sm:whitespace-nowrap">
-          Saved setups will appear here when an alert is added to your account.
+          Saved setups will appear here when you save one to your account.
         </p>
       </div>
     );

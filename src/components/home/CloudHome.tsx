@@ -517,7 +517,7 @@ const PRODUCTS: Array<{ Icon: typeof Bot; tone: Tone; title: string; body: strin
   { Icon: Waves, tone: "yellow", title: "Liquidity sweeps", body: "Fresh high/low sweep detection on 5M, 15M, 1H, 2H and 4H with fakeout filters.", to: "/help" },
   { Icon: Layers, tone: "green", title: "Zones + FVG", body: "Supply and demand zones paired with fair value gaps, drawn only when they score strong.", to: "/help" },
   { Icon: Chrome, tone: "blue", title: "Browser extension", body: "Bring Jenvu analysis into TradingView with a side panel that reads your chart.", to: "/download" },
-  { Icon: Bell, tone: "red", title: "Signals & alerts", body: "Reviewed Gold setups and alerts, with WAIT when the evidence isn't there.", to: "/pricing" },
+  { Icon: Bell, tone: "red", title: "Reviewed signals", body: "Reviewed Gold setups, with WAIT when the evidence isn't there.", to: "/pricing" },
   { Icon: BarChart3, tone: "yellow", title: "Volume RVOL", body: "Relative volume spikes and buyer/seller share for every candle at a glance.", to: "/help" },
   { Icon: KeyRound, tone: "green", title: "API keys", body: "Use Jenvu models in your own tools at $3 per million tokens.", to: "/pricing" },
 ];

@@ -94,7 +94,7 @@ function ChatMock() {
         sweep. Watch whether the gap below gets filled before you decide anything.
       </Bubble>
       <Bubble me>Which killzone is next?</Bubble>
-      <Bubble>London opens next. Jenvu marks it on your chart and can alert you when it starts.</Bubble>
+      <Bubble>London opens next. Jenvu marks it on your chart so you can see when it starts.</Bubble>
     </div>
   );
 }
@@ -178,9 +178,9 @@ export function HomeExperiences() {
 
 const USE_CASES = [
   { icon: Waves, t: "Spot liquidity sweeps", b: "See when price runs a high or low and snaps back, marked on the chart.", ex: "“Did Gold sweep the Asian high today?”", g: 1 },
-  { icon: Crosshair, t: "Plan around killzones", b: "Know when London and New York sessions open, with alerts before each one.", ex: "“When does the New York killzone start in my time?”", g: 2 },
+  { icon: Crosshair, t: "Plan around killzones", b: "Know when London and New York sessions open, marked on your chart.", ex: "“When does the New York killzone start in my time?”", g: 2 },
   { icon: LineChart, t: "Read the market structure", b: "Breaks of structure, gaps and order blocks explained step by step.", ex: "“Explain the last break of structure on 1H.”", g: 3 },
-  { icon: Bell, t: "Get alerts that matter", b: "Price, sweep and session alerts by email or in the browser extension.", ex: "“Alert me if Gold crosses the daily high.”", g: 2 },
+  { icon: Bell, t: "Watch key levels", b: "See the daily high, low and session ranges drawn on the live chart.", ex: "“Where is the daily high on Gold today?”", g: 2 },
   { icon: Bot, t: "Automate with JX Bot", b: "Run the MT5 Expert Advisor with a stop loss on every trade and a daily auto-stop.", ex: "“How do I register my VPS IP for JX Bot?”", g: 3 },
   { icon: BookOpen, t: "Learn as you trade", b: "Turn ICT and SMC ideas into plain lessons you can check on a live chart.", ex: "“Explain a fair value gap to a beginner.”", g: 1 },
 ];

@@ -291,8 +291,8 @@ const CHAT = [
   { me: false, t: "One moment, I’m pulling that up." },
   { me: true, t: "Oh, and did London sweep it?" },
   { me: false, t: "Yes. London took the Asia high, then closed back below it." },
-  { me: true, t: "Great, set an alert for the next retest." },
-  { me: false, t: "Done. I’ll ping you when price comes back to it." },
+  { me: true, t: "Great, mark the next retest level." },
+  { me: false, t: "Done. It’s drawn on your chart now." },
 ];
 
 const VISION_REPLY = "Higher highs and higher lows, so it’s an uptrend, with one pullback before the last push up.";

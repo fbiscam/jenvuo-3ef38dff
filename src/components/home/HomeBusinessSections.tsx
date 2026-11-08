@@ -27,7 +27,6 @@ import {
 } from "lucide-react";
 
 import { openAskJenvu } from "@/components/AskJenvuWidget";
-import realAlerts from "@/assets/home/real-alerts.jpg";
 import realAsk from "@/assets/home/real-ask.jpg";
 import realTerminal from "@/assets/home/real-terminal.jpg";
 import realBot from "@/assets/home/real-bot.jpg";
@@ -45,7 +44,6 @@ const h2 = "text-balance text-[32px] font-normal leading-[1.12] tracking-tight t
 /* ---------------- Hero ---------------- */
 
 const HERO_CARDS = [
-  { src: realAlerts, label: "Alerts", rot: -7, y: 40 },
   { src: realAsk, label: "Ask Jenvu", rot: -3, y: 16 },
   { src: realTerminal, label: "Jenvu Terminal", rot: 0, y: 0, main: true },
   { src: realBot, label: "JX Bot", rot: 3, y: 16 },
@@ -101,7 +99,6 @@ const STRIP = [
   { Icon: MessageSquare, name: "Ask Jenvu" },
   { Icon: Bot, name: "JX Bot" },
   { Icon: Code2, name: "API Platform" },
-  { Icon: Bell, name: "Alerts" },
 ];
 
 export function BizStrip() {
@@ -253,8 +250,8 @@ const PRODUCTS = [
 type ProductKey = (typeof PRODUCTS)[number]["key"];
 
 const SIDEBAR: Record<ProductKey, { nav: string[]; pinned: string[]; recent: string[] }> = {
-  ask: { nav: ["New chat", "Projects", "Alerts", "Watchlist", "Journal"], pinned: ["London open plan", "Check H4 liquidity", "Weekly Gold outlook"], recent: ["Is DXY pushing Gold down?", "Explain this FVG", "Asia range targets"] },
-  terminal: { nav: ["Chart", "Engines", "Killzones", "Alerts", "Journal"], pinned: ["Gold M15", "Gold H1", "Gold H4"], recent: ["Sweep of Asia high", "Bullish FVG 15m", "SSL taken at NY open"] },
+  ask: { nav: ["New chat", "Projects", "Library", "Watchlist", "Journal"], pinned: ["London open plan", "Check H4 liquidity", "Weekly Gold outlook"], recent: ["Is DXY pushing Gold down?", "Explain this FVG", "Asia range targets"] },
+  terminal: { nav: ["Chart", "Engines", "Killzones", "Watchlist", "Journal"], pinned: ["Gold M15", "Gold H1", "Gold H4"], recent: ["Sweep of Asia high", "Bullish FVG 15m", "SSL taken at NY open"] },
   bot: { nav: ["Overview", "Accounts", "IP licence", "Downloads", "Reports"], pinned: ["Main MT5 account", "Daily target", "Trading hours"], recent: ["Bot ON 08:00", "Target reached", "Bot OFF 16:30"] },
   api: { nav: ["Playground", "API keys", "Models", "Usage", "Docs"], pinned: ["Production key", "Test key"], recent: ["chat.completions", "Model list", "Usage this week"] },
 };
