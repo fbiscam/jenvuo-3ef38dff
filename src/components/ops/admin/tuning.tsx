@@ -1,0 +1,429 @@
+import { useEffect, useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
+import { toast } from "sonner";
+import { RefreshCw, Play, CheckCircle2, RotateCcw, ShieldCheck, ShieldAlert, ChevronDown, ChevronRight, SlidersHorizontal } from "lucide-react";
+import { isAdmin } from "@/lib/admin-messages.functions";
+import { OpsPage, OpsState } from "@/components/ops/OpsPage";
+import {
+  listWeightConfigs, listTuningRuns, activateWeightConfig, rollbackWeightConfig,
+  listFoldResultsForConfig,
+  type WeightConfigRow, type TuningRunRow, type FoldResultRow,
+} from "@/lib/tuning/weights-admin.functions";
+import { runGridSearchTuning } from "@/lib/tuning/grid-search.functions";
+import { runWalkForwardValidation } from "@/lib/tuning/walk-forward.functions";
+
+
+function pct(n: number | null | undefined, d = 1) {
+  if (n == null || !Number.isFinite(n)) return "—";
+  return `${n.toFixed(d)}%`;
+}
+function num(n: number | null | undefined, d = 2) {
+  if (n == null || !Number.isFinite(n)) return "—";
+  return n.toFixed(d);
+}
+function timeAgo(iso: string | null) {
+  if (!iso) return "—";
+  const diff = Date.now() - new Date(iso).getTime();
+  const m = Math.floor(diff / 60000);
+  if (m < 60) return `${m}m ago`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return `${h}h ago`;
+  return `${Math.floor(h / 24)}d ago`;
+}
+
+export function TuningPage() {
+  const checkAdmin = useServerFn(isAdmin);
+  const loadConfigs = useServerFn(listWeightConfigs);
+  const loadRuns = useServerFn(listTuningRuns);
+  const runGrid = useServerFn(runGridSearchTuning);
+  const runValidate = useServerFn(runWalkForwardValidation);
+  const loadFolds = useServerFn(listFoldResultsForConfig);
+  const activate = useServerFn(activateWeightConfig);
+  const rollback = useServerFn(rollbackWeightConfig);
+
+  const [allowed, setAllowed] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [busy, setBusy] = useState(false);
+  const [configs, setConfigs] = useState<WeightConfigRow[]>([]);
+  const [runs, setRuns] = useState<TuningRunRow[]>([]);
+  const [symbol, setSymbol] = useState("XAUUSD");
+  const [validatingId, setValidatingId] = useState<string | null>(null);
+  const [expanded, setExpanded] = useState<string | null>(null);
+  const [foldsByConfig, setFoldsByConfig] = useState<Record<string, FoldResultRow[]>>({});
+
+  const reload = async () => {
+    setLoading(true);
+    try {
+      const [c, r] = await Promise.all([loadConfigs(), loadRuns()]);
+      setConfigs(c ?? []);
+      setRuns(r ?? []);
+    } catch (e: any) {
+      toast.error(e?.message ?? "Failed to load");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const ok = await checkAdmin();
+        setAllowed(!!ok);
+        if (ok) await reload();
+      } catch {
+        setAllowed(false);
+      } finally {
+        setLoading(false);
+      }
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  if (loading && !allowed) {
+    return <OpsState title="Loading tuning…" />;
+  }
+  if (!allowed) {
+    return <OpsState title="Admin access required" description="Sign in with an admin account to view this page." />;
+  }
+
+  const active = configs.find((c) => c.status === "active");
+
+  const startGrid = async () => {
+    if (busy) return;
+    setBusy(true);
+    const tid = toast.loading("Running grid search — this can take up to 60s…");
+    try {
+      const res = await runGrid({ data: { symbol, threshold: 62 } });
+      toast.success(
+        `Best v${res.newVersion}: winRate=${pct(res.best.winRate)} · avgR=${num(res.best.avgR)} · sample=${res.best.sample}`,
+        { id: tid },
+      );
+      await reload();
+    } catch (e: any) {
+      toast.error(e?.message ?? "Grid search failed", { id: tid });
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const doActivate = async (id: string, version: number, validated: boolean) => {
+    const force = !validated;
+    const msg = force
+      ? `⚠️ v${version} has NOT passed walk-forward validation. Manual override will activate it anyway. Continue?`
+      : `Activate weight config v${version}?`;
+    if (!confirm(msg)) return;
+    try {
+      await activate({ data: { configId: id, forceManualOverride: force } });
+      toast.success(`v${version} is now active`);
+      await reload();
+    } catch (e: any) {
+      toast.error(e?.message ?? "Activation failed");
+    }
+  };
+  const doRollback = async () => {
+    if (!confirm("Roll back to the most recently retired configuration?")) return;
+    try {
+      const r = await rollback();
+      toast.success(`Rolled back to v${r.rolledBackTo}`);
+      await reload();
+    } catch (e: any) {
+      toast.error(e?.message ?? "Rollback failed");
+    }
+  };
+
+  const doValidate = async (id: string, version: number) => {
+    if (validatingId) return;
+    setValidatingId(id);
+    const tid = toast.loading(`Walk-forward validating v${version} — 5 folds…`);
+    try {
+      const res = await runValidate({ data: { configId: id, symbol, threshold: 62 } });
+      const s = res.summary as any;
+      if (res.passed) {
+        toast.success(`v${version} PASSED · ${s.foldWinsForCandidate}/${s.folds} folds · winRate=${pct(s.aggWinRate)} · avgR=${num(s.aggAvgR)}`, { id: tid });
+      } else {
+        toast.error(`v${version} FAILED · ${s.foldWinsForCandidate}/${s.folds} folds · winRate=${pct(s.aggWinRate)} · avgR=${num(s.aggAvgR)}`, { id: tid });
+      }
+      await reload();
+      // refresh folds inline if expanded
+      if (expanded === id) {
+        const folds = await loadFolds({ data: { configId: id } });
+        setFoldsByConfig((m) => ({ ...m, [id]: folds }));
+      }
+    } catch (e: any) {
+      toast.error(e?.message ?? "Validation failed", { id: tid });
+    } finally {
+      setValidatingId(null);
+    }
+  };
+
+  const toggleFolds = async (id: string) => {
+    if (expanded === id) { setExpanded(null); return; }
+    setExpanded(id);
+    if (!foldsByConfig[id]) {
+      try {
+        const folds = await loadFolds({ data: { configId: id } });
+        setFoldsByConfig((m) => ({ ...m, [id]: folds }));
+      } catch (e: any) {
+        toast.error(e?.message ?? "Failed to load folds");
+      }
+    }
+  };
+
+  return (
+    <OpsPage
+      title="Signal weight tuning"
+      description="Grid search on backtest history · Phase 1"
+      icon={<SlidersHorizontal />}
+      actions={
+        <>
+          <button
+            onClick={reload}
+            className="inline-flex items-center gap-1 rounded-lg border border-border bg-background px-3 py-1.5 text-sm text-foreground hover:bg-muted"
+          >
+            <RefreshCw className="h-3.5 w-3.5" /> Refresh
+          </button>
+          <button
+            onClick={doRollback}
+            className="inline-flex items-center gap-1 rounded-lg border border-border bg-background px-3 py-1.5 text-sm text-foreground hover:bg-muted"
+          >
+            <RotateCcw className="h-3.5 w-3.5" /> Rollback
+          </button>
+        </>
+      }
+    >
+      <div className="space-y-6 px-4 py-5 sm:px-6">
+
+      {active && (
+        <div className="rounded-xl border border-gc-success/30 bg-gc-green-soft p-4 text-sm">
+          <div className="font-medium text-gc-success">
+            Active configuration: v{active.version}{" "}
+            <span className="text-gc-success">({active.created_by})</span>
+          </div>
+          <div className="text-gc-success">
+            Activated {timeAgo(active.activated_at)}
+            {active.notes ? ` · ${active.notes}` : ""}
+          </div>
+        </div>
+      )}
+
+      <section className="rounded-xl border border-border bg-background p-4">
+        <h2 className="mb-3 text-[13px] font-medium text-foreground">Run grid search</h2>
+        <div className="flex flex-wrap items-end gap-3">
+          <label className="flex flex-col gap-1 text-xs text-muted-foreground">
+            Symbol
+            <select
+              value={symbol}
+              onChange={(e) => setSymbol(e.target.value)}
+              className="rounded-lg border border-border bg-background px-3 py-1.5 text-sm text-foreground"
+            >
+              {["XAUUSD"].map((s) => (
+                <option key={s} value={s}>{s}</option>
+              ))}
+            </select>
+          </label>
+          <button
+            onClick={startGrid}
+            disabled={busy}
+            className="inline-flex items-center gap-1 rounded-lg bg-gc-blue px-4 py-2 text-sm font-medium text-gc-on-blue hover:bg-gc-blue-hover disabled:opacity-50"
+          >
+            <Play className="h-3.5 w-3.5" /> {busy ? "Running…" : "Run grid search"}
+          </button>
+        </div>
+        <p className="mt-3 text-xs text-muted-foreground">
+          27 combinations · scores each on ~900 15m candles + 600 1h candles ·
+          objective = expectancy × √sample. Best candidate is saved but NOT
+          auto-activated. Activate manually with a confirm, or wait for Phase 2
+          walk-forward validation.
+        </p>
+      </section>
+
+      <section className="rounded-xl border border-border bg-background">
+        <h2 className="border-b border-border px-4 py-3 text-[13px] font-medium text-foreground">Tuning runs</h2>
+        <div className="overflow-x-auto">
+          <table className="min-w-full text-sm">
+            <thead className="text-[12px] text-muted-foreground">
+              <tr>
+                <th className="whitespace-nowrap px-3 py-2.5 font-normal text-left">Started</th>
+                <th className="whitespace-nowrap px-3 py-2.5 font-normal text-left">Mode</th>
+                <th className="whitespace-nowrap px-3 py-2.5 font-normal text-left">Symbol</th>
+                <th className="whitespace-nowrap px-3 py-2.5 font-normal text-right">Combos</th>
+                <th className="whitespace-nowrap px-3 py-2.5 font-normal text-right">Best win %</th>
+                <th className="whitespace-nowrap px-3 py-2.5 font-normal text-right">Best avg R</th>
+                <th className="whitespace-nowrap px-3 py-2.5 font-normal text-right">Sample</th>
+                <th className="whitespace-nowrap px-3 py-2.5 font-normal text-left">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {runs.length === 0 && (
+                <tr><td colSpan={8} className="px-3 py-6 text-center text-muted-foreground">No runs yet.</td></tr>
+              )}
+              {runs.map((r) => {
+                const m = (r.metrics ?? {}) as Record<string, any>;
+                return (
+                  <tr key={r.id} className="border-t border-border">
+                    <td className="px-3 py-2 text-foreground">{timeAgo(r.started_at)}</td>
+                    <td className="px-3 py-2 text-foreground">{r.mode}</td>
+                    <td className="px-3 py-2 text-foreground">{r.symbol}</td>
+                    <td className="px-3 py-2 text-right text-foreground">{r.combinations_tested}</td>
+                    <td className="px-3 py-2 text-right text-foreground">{pct(m.winRate)}</td>
+                    <td className="px-3 py-2 text-right text-foreground">{num(m.avgR)}</td>
+                    <td className="px-3 py-2 text-right text-foreground">{m.sample ?? "—"}</td>
+                    <td className="px-3 py-2 text-foreground">{r.status}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section className="rounded-xl border border-border bg-background">
+        <h2 className="border-b border-border px-4 py-3 text-[13px] font-medium text-foreground">Weight configurations</h2>
+        <div className="overflow-x-auto">
+          <table className="min-w-full text-sm">
+            <thead className="text-[12px] text-muted-foreground">
+              <tr>
+                <th className="whitespace-nowrap px-3 py-2.5 font-normal text-left"></th>
+                <th className="whitespace-nowrap px-3 py-2.5 font-normal text-left">Version</th>
+                <th className="whitespace-nowrap px-3 py-2.5 font-normal text-left">Source</th>
+                <th className="whitespace-nowrap px-3 py-2.5 font-normal text-left">Status</th>
+                <th className="whitespace-nowrap px-3 py-2.5 font-normal text-left">Validation</th>
+                <th className="whitespace-nowrap px-3 py-2.5 font-normal text-left">Notes</th>
+                <th className="whitespace-nowrap px-3 py-2.5 font-normal text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {configs.map((c) => {
+                const s = (c.validation_summary ?? {}) as any;
+                const isOpen = expanded === c.id;
+                const folds = foldsByConfig[c.id] ?? [];
+                return (
+                  <>
+                    <tr key={c.id} className="border-t border-border align-top">
+                      <td className="px-3 py-2">
+                        <button onClick={() => toggleFolds(c.id)} className="text-muted-foreground hover:text-foreground">
+                          {isOpen ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+                        </button>
+                      </td>
+                      <td className="px-3 py-2 font-medium text-foreground">v{c.version}</td>
+                      <td className="px-3 py-2 text-foreground">{c.created_by}</td>
+                      <td className="px-3 py-2">
+                        {c.status === "active" ? (
+                          <span className="inline-flex items-center gap-1 rounded-full bg-gc-green-soft px-2 py-0.5 text-xs font-medium text-gc-success">
+                            <CheckCircle2 className="h-3 w-3" /> Active
+                          </span>
+                        ) : c.status === "candidate" ? (
+                          <span className="rounded-full bg-gc-yellow-soft px-2 py-0.5 text-xs font-medium text-gc-amber">
+                            Candidate
+                          </span>
+                        ) : (
+                          <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
+                            Retired
+                          </span>
+                        )}
+                      </td>
+                      <td className="px-3 py-2 text-xs">
+                        {c.validated ? (
+                          <span className="inline-flex items-center gap-1 rounded-full bg-gc-green-soft px-2 py-0.5 font-medium text-gc-success">
+                            <ShieldCheck className="h-3 w-3" /> Passed
+                            {s.foldWinsForCandidate != null ? ` ${s.foldWinsForCandidate}/${s.folds ?? 5}` : ""}
+                          </span>
+                        ) : c.validation_summary ? (
+                          <span className="inline-flex items-center gap-1 rounded-full bg-gc-red-soft px-2 py-0.5 font-medium text-gc-red">
+                            <ShieldAlert className="h-3 w-3" /> Failed
+                            {s.foldWinsForCandidate != null ? ` ${s.foldWinsForCandidate}/${s.folds ?? 5}` : ""}
+                          </span>
+                        ) : (
+                          <span className="rounded-full bg-muted px-2 py-0.5 font-medium text-muted-foreground">
+                            Not run
+                          </span>
+                        )}
+                      </td>
+                      <td className="px-3 py-2 text-muted-foreground">{c.notes ?? "—"}</td>
+                      <td className="px-3 py-2 text-right">
+                        <div className="flex justify-end gap-1">
+                          {c.status !== "active" && c.status !== "retired" && (
+                            <button
+                              onClick={() => doValidate(c.id, c.version)}
+                              disabled={validatingId === c.id}
+                              className="rounded-lg border border-border bg-background px-3 py-1 text-xs text-foreground hover:bg-muted disabled:opacity-50"
+                            >
+                              {validatingId === c.id ? "Validating…" : "Validate"}
+                            </button>
+                          )}
+                          {c.status !== "active" && (
+                            <button
+                              onClick={() => doActivate(c.id, c.version, c.validated)}
+                              className={
+                                c.validated
+                                  ? "rounded-lg bg-gc-blue px-3 py-1 text-xs font-medium text-gc-on-blue hover:bg-gc-blue-hover"
+                                  : "rounded-lg border border-gc-red/30 bg-background px-3 py-1 text-xs text-gc-red hover:bg-gc-red-soft"
+                              }
+                            >
+                              {c.validated ? "Activate" : "Force activate"}
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                    {isOpen && (
+                      <tr className="border-t border-border bg-muted/50">
+                        <td colSpan={7} className="px-4 py-3">
+                          {folds.length === 0 ? (
+                            <div className="text-xs text-muted-foreground">No walk-forward folds recorded for this config yet.</div>
+                          ) : (
+                            <table className="min-w-full text-xs">
+                              <thead className="text-muted-foreground">
+                                <tr>
+                                  <th className="px-2 py-1 text-left">Fold</th>
+                                  <th className="px-2 py-1 text-left">OOS window</th>
+                                  <th className="px-2 py-1 text-right">Cand win %</th>
+                                  <th className="px-2 py-1 text-right">Cand avg R</th>
+                                  <th className="px-2 py-1 text-right">Sample</th>
+                                  <th className="px-2 py-1 text-right">Base win %</th>
+                                  <th className="px-2 py-1 text-right">Base avg R</th>
+                                  <th className="px-2 py-1 text-left">Beats baseline</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {folds.map((f) => {
+                                  const cm = (f.metrics ?? {}) as any;
+                                  const b = cm.baseline ?? {};
+                                  return (
+                                    <tr key={f.id} className="border-t border-border">
+                                      <td className="px-2 py-1 text-foreground">#{f.fold_index}</td>
+                                      <td className="px-2 py-1 text-muted-foreground">
+                                        {new Date(f.oos_start).toLocaleDateString()} → {new Date(f.oos_end).toLocaleDateString()}
+                                      </td>
+                                      <td className="px-2 py-1 text-right text-foreground">{pct(f.win_rate)}</td>
+                                      <td className="px-2 py-1 text-right text-foreground">{num(f.expectancy_r)}</td>
+                                      <td className="px-2 py-1 text-right text-foreground">{f.sample_size}</td>
+                                      <td className="px-2 py-1 text-right text-muted-foreground">{pct(b.winRate)}</td>
+                                      <td className="px-2 py-1 text-right text-muted-foreground">{num(b.avgR)}</td>
+                                      <td className="px-2 py-1">
+                                        {f.passed ? (
+                                          <span className="text-gc-success">✓</span>
+                                        ) : (
+                                          <span className="text-gc-red">✗</span>
+                                        )}
+                                      </td>
+                                    </tr>
+                                  );
+                                })}
+                              </tbody>
+                            </table>
+                          )}
+                        </td>
+                      </tr>
+                    )}
+                  </>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </section>
+      </div>
+    </OpsPage>
+  );
+}
