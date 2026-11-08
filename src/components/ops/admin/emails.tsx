@@ -9,7 +9,7 @@ import { listSentEmails, sendAdminEmail, type SentEmail } from "@/lib/admin-emai
 import { EMAIL_BOXES, type EmailBox } from "@/lib/admin-email";
 import { OpsPage, OpsState, OpsTab, OpsBadge, ops } from "@/components/ops/OpsPage";
 
-const search = z.object({
+export const emailsSearch = z.object({
   to: z.string().optional(),
   subject: z.string().optional(),
   box: z.enum(["support", "sales"]).optional(),
@@ -19,8 +19,9 @@ const search = z.object({
 
 type Tab = "received" | "compose" | "sent";
 
-export function AdminEmailsPage() {
-  const params = Route.useSearch();
+export type EmailsSearch = z.infer<typeof emailsSearch>;
+
+export function AdminEmailsPage({ params = {} }: { params?: EmailsSearch }) {
   const checkAdmin = useServerFn(isAdmin);
   const fetchSent = useServerFn(listSentEmails);
   const send = useServerFn(sendAdminEmail);
