@@ -202,7 +202,7 @@ const Email = ({
             </Text>
             <Text style={footerMeta}>
               {' · '}
-              <Link href={`https://dash.jenvu.com/overview`} style={unsubLink}>Manage alerts</Link>
+              <Link href={`https://dash.jenvu.com/overview`} style={unsubLink}>Open dashboard</Link>
             </Text>
           </Section>
         </Container>
