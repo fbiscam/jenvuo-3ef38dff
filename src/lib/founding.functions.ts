@@ -89,11 +89,13 @@ type ApplicantEmailKind =
   | "documents_received"
   | "documents_approved"
   | "documents_rejected"
-  | "documents_needs_info";
+  | "documents_needs_info"
+  | "already_applied";
 
 type ApplicantEmailExtras = {
   resetUrl?: string;
   activateHours?: number;
+  note?: string;
 };
 
 function renderApplicantEmail(kind: ApplicantEmailKind, name: string, plan: string, extras: ApplicantEmailExtras = {}) {
@@ -135,6 +137,20 @@ function renderApplicantEmail(kind: ApplicantEmailKind, name: string, plan: stri
 
   const n = escapeHtml(name);
   switch (kind) {
+    case "already_applied":
+      // Sent instead of showing the status on the form, so the form never reveals
+      // whether an email already applied or is a member (only the inbox owner learns it).
+      return {
+        subject: "About your Founding Program application",
+        html: wrap(
+          `Hi ${n}, we already have you.`,
+          "Founding Program",
+          `<p style="margin:0 0 12px">Someone (probably you) just sent the Founding Program form with this email address.</p>
+           <p style="margin:0 0 12px">${escapeHtml(extras.note ?? "This email already has a Founding application.")}</p>
+           <p style="margin:0">If this wasn't you, you can ignore this email.</p>`,
+          { label: "Sign in", href: "https://auth.jenvu.com/sign-in" },
+        ),
+      };
     case "received":
       return {
         subject: "We received your Founding Program application",
@@ -356,7 +372,15 @@ export const submitFoundingApplication = createServerFn({ method: "POST" })
     }
     const { foundingReapplyDecision } = await import("@/lib/founding-reapply");
     const decision = foundingReapplyDecision(priorRow, hasAccount);
-    if (decision.action === "block") return { ok: false, error: decision.error };
+    if (decision.action === "block") {
+      // Same answer as a fresh application, so the form can't be used to find out who
+      // applied or is a member. The real status goes only to that inbox (once a day).
+      if (service && priorRow) {
+        const day = new Date().toISOString().slice(0, 10);
+        await enqueueApplicantEmail(reader, "already_applied", email, data.full_name, data.requested_plan, `${priorRow.id}-${day}`, { note: decision.error });
+      }
+      return { ok: true };
+    }
 
     // Prevent the same referrer email from being reused across multiple applications
     if (normalizedReferrer) {
@@ -420,7 +444,8 @@ export const submitFoundingApplication = createServerFn({ method: "POST" })
         if (msg.includes("referrer")) {
           return { ok: false, error: "This referral email has already been used on another application." };
         }
-        return { ok: false, error: "Your application is already in and under review. We'll email you soon." };
+        // Same neutral answer as a new application (no "already applied" hint).
+        return { ok: true };
       }
       console.error("[founding] insert failed:", error.message);
       return { ok: false, error: "Could not submit. Please try again." };
