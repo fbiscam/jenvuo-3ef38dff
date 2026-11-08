@@ -1,5 +1,9 @@
+import { createContext, useContext, useEffect, useState } from "react";
 import type { ReactNode } from "react";
-import { ArrowLeft } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import { ArrowLeft, Lock, Moon, Sun } from "lucide-react";
+import { opsLock } from "@/lib/ops-gate.functions";
+import { applyHtmlTheme, readSiteTheme, saveSiteTheme } from "@/lib/site-theme";
 
 /**
  * Shared look for every Ops Console page (hub tools, admin pages, payments,
@@ -20,10 +24,54 @@ type OpsPageProps = {
   children: ReactNode;
 };
 
-export function OpsPage({ title, description, icon: _icon, actions, tabs, standalone, children }: OpsPageProps) {
-  // Same frame as the regular dashboard pages (Usage, Billing): page width,
-  // big plain title, then sections. Standalone pages copy the dashboard's own
-  // page padding and 0.9 scale so both look the same size.
+/** True inside `OpsStandalone`: pages render as their own console page (no dashboard frame). */
+export const OpsStandaloneContext = createContext(false);
+
+const OPS_FONT = "[font-family:'Google_Sans_Flex','Google_Sans','Product_Sans','Poppins',system-ui,-apple-system,sans-serif]";
+
+export function OpsPage({ title, description, icon: _icon, actions, tabs, standalone: standaloneProp, children }: OpsPageProps) {
+  const standalone = useContext(OpsStandaloneContext) || !!standaloneProp;
+  if (standalone) {
+    // Same frame as the Support inbox: back button, big title, header tools,
+    // pill tab bar, then full-width content.
+    return (
+      <div className={`ops-console min-h-dvh w-full bg-background text-[13px] text-foreground antialiased ${OPS_FONT}`}>
+        <div className="ops-zoom" style={{ minHeight: 0 }}>
+          <header className="mx-auto w-full max-w-[1280px] px-4 pt-5 sm:px-6 lg:pt-6">
+            <a
+              href={opsHubHref()}
+              suppressHydrationWarning
+              className="ops-btn inline-flex h-8 items-center gap-1.5 rounded-full px-3 text-[12.5px] font-medium text-foreground transition"
+            >
+              <ArrowLeft className="h-3.5 w-3.5" /> Ops Console
+            </a>
+            <div className="mt-4 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+              <div className="min-w-0">
+                <h1 className="truncate text-[28px] font-normal tracking-tight text-foreground sm:text-[32px]">{title}</h1>
+                {description && <p className="mt-1 text-[14px] text-muted-foreground">{description}</p>}
+              </div>
+              <div className="flex flex-wrap items-center gap-2">
+                {actions}
+                <OpsHeaderTools />
+              </div>
+            </div>
+          </header>
+          {tabs && (
+            <div className="mx-auto w-full max-w-[1280px] px-4 pt-5 sm:px-6">
+              <div
+                className="ops-tabs flex max-w-full items-center gap-1 overflow-x-auto rounded-full p-1 text-[13px] [scrollbar-width:none] sm:w-fit"
+                role="tablist"
+              >
+                {tabs}
+              </div>
+            </div>
+          )}
+          <div className="ops-content mx-auto w-full max-w-[1280px] space-y-2 px-4 pb-10 pt-4 sm:px-6">{children}</div>
+        </div>
+      </div>
+    );
+  }
+  // Inside the dashboard frame (kept for any page still shown there).
   return (
     <div
       className={`ops-console text-foreground ${standalone ? "ops-zoom min-h-dvh w-full bg-background px-5 pt-8 sm:px-8 lg:pt-10" : "w-full"}`}
@@ -85,8 +133,8 @@ export function OpsTab({
       onClick={onClick}
       role="tab"
       aria-selected={active}
-      className={`inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-1.5 transition-colors ${
-        active ? "ops-card font-medium text-foreground" : "text-muted-foreground hover:text-foreground"
+      className={`inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full px-3.5 py-1.5 transition ${
+        active ? "ops-tab-active font-medium text-foreground" : "text-muted-foreground hover:text-foreground"
       }`}
     >
       {children}
@@ -143,18 +191,76 @@ export function OpsBody({ children }: { children: ReactNode }) {
   return <div className="space-y-4">{children}</div>;
 }
 
-export function OpsState({ title, description, standalone }: { title: string; description?: string; standalone?: boolean }) {
+export function OpsState({
+  title,
+  description,
+  standalone: standaloneProp,
+  action,
+}: {
+  title: string;
+  description?: string;
+  standalone?: boolean;
+  action?: ReactNode;
+}) {
+  const standalone = useContext(OpsStandaloneContext) || !!standaloneProp;
   return (
     <div
-      className={`ops-console flex flex-col items-center justify-center bg-background px-6 text-center ${
+      className={`ops-console flex flex-col items-center justify-center bg-background px-6 text-center ${standalone ? OPS_FONT : ""} ${
         standalone ? "min-h-dvh" : "-mx-5 -mt-7 -mb-7 min-h-[calc(100dvh-4rem)] sm:-mx-8"
       }`}
     >
       <div className="ops-card rounded-2xl px-8 py-7">
         <p className="text-sm font-medium text-foreground">{title}</p>
         {description && <p className="mt-2 max-w-sm text-[13px] text-muted-foreground">{description}</p>}
+        {action && <div className="mt-4 flex justify-center">{action}</div>}
       </div>
+      {standalone && (
+        <a href={opsHubHref()} suppressHydrationWarning className="mt-4 inline-flex items-center gap-1.5 text-[13px] text-muted-foreground hover:text-foreground">
+          <ArrowLeft className="h-3.5 w-3.5" /> Ops Console
+        </a>
+      )}
     </div>
+  );
+}
+
+/** Black/white theme switch and Lock button shown on every standalone console page. */
+export function OpsHeaderTools() {
+  const lock = useServerFn(opsLock);
+  const [dark, setDark] = useState(false);
+  useEffect(() => setDark(readSiteTheme() === "dark"), []);
+  const toggleTheme = () => {
+    const next = dark ? "light" : "dark";
+    saveSiteTheme(next);
+    applyHtmlTheme(window.location.pathname);
+    setDark(!dark);
+  };
+  async function onLock() {
+    try {
+      window.sessionStorage.removeItem("jenvu_ops_token");
+    } catch {
+      /* ignore */
+    }
+    try {
+      await lock({});
+    } finally {
+      window.location.assign("/ops-x9k2-7m4n");
+    }
+  }
+  return (
+    <>
+      <button
+        type="button"
+        onClick={toggleTheme}
+        className="ops-btn inline-flex h-9 w-9 items-center justify-center rounded-full text-foreground transition"
+        aria-label={dark ? "White theme" : "Black theme"}
+        title={dark ? "White theme" : "Black theme"}
+      >
+        {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+      </button>
+      <button type="button" onClick={() => void onLock()} className={ops.btn} title="Lock console">
+        <Lock className="h-3.5 w-3.5" /> <span className="hidden sm:inline">Lock</span>
+      </button>
+    </>
   );
 }
 
@@ -201,7 +307,7 @@ export const ops = {
 };
 
 /** Ops Console overview lives on the main site (jenvu.com). */
-function opsHubHref(): string {
+export function opsHubHref(): string {
   if (typeof window !== "undefined") {
     const host = window.location.hostname;
     if (host !== "jenvu.com" && host.endsWith(".jenvu.com")) return "https://jenvu.com/ops-x9k2-7m4n/hub";
