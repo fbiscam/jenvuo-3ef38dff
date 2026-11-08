@@ -15,3 +15,11 @@ describe("Founding seats", () => {
     expect(seatsFullMessage(new Date("2026-11-07T04:23:00Z"))).toContain("Dec 1, 2026, 00:00 UTC");
   });
 });
+
+import { FOUNDING_APPLICATIONS_OPEN } from "./founding-seats";
+
+describe("Founding applications switch", () => {
+  it("stays closed until the owner asks to reopen", () => {
+    expect(FOUNDING_APPLICATIONS_OPEN).toBe(false);
+  });
+});

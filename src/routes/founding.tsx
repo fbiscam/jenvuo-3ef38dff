@@ -15,7 +15,7 @@ import {
   formInputClass,
 } from "@/components/forms/CenteredForm";
 import { submitFoundingApplication, foundingStats } from "@/lib/founding.functions";
-import { FOUNDING_SEATS_PER_MONTH, formatSeatOpening, nextSeatOpening } from "@/lib/founding-seats";
+import { FOUNDING_APPLICATIONS_OPEN, FOUNDING_SEATS_PER_MONTH, formatSeatOpening, nextSeatOpening } from "@/lib/founding-seats";
 
 export const Route = createFileRoute("/founding")({
   head: () => ({
@@ -147,6 +147,14 @@ function FoundingPage() {
                 Our team will review it and email you a decision within <span className="text-foreground">48 hours</span>. Please check your inbox and spam folder.
               </p>
               <Link to="/" className={`${CALLOUT_BUTTON} mt-5`}>Back to home</Link>
+            </div>
+          ) : !FOUNDING_APPLICATIONS_OPEN ? (
+            <div className="rounded-xl bg-gc-surface p-6 text-center" role="status" aria-live="polite">
+              <h2 className="text-[22px] font-normal tracking-tight">Applications are closed for now.</h2>
+              <p className="mt-2 text-[15px] text-gc-ink-muted">
+                We aren't taking new Founding applications at the moment. They will reopen soon, so please check back later.
+              </p>
+              <Link to="/pricing" className={`${CALLOUT_BUTTON} mt-5`}>See plans and pricing</Link>
             </div>
           ) : remaining === 0 ? (
             <div className="rounded-xl bg-gc-surface p-6 text-center" role="status" aria-live="polite">

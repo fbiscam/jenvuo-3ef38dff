@@ -17,3 +17,12 @@ export function formatSeatOpening(d: Date): string {
 export function seatsFullMessage(now: Date = new Date()): string {
   return `All seats for this month are full. Seats open again on ${formatSeatOpening(nextSeatOpening(now))}.`;
 }
+
+/**
+ * Master switch for new Founding applications. Owner closed them on Nov 8, 2026
+ * until further notice; set back to true to reopen the form.
+ */
+export const FOUNDING_APPLICATIONS_OPEN = false;
+
+export const FOUNDING_CLOSED_MESSAGE =
+  "Founding applications are closed for now. We'll reopen them soon.";
