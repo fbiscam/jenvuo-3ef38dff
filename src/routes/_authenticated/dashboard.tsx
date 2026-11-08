@@ -737,7 +737,12 @@ function DashboardLayout() {
   const navigateTo = useNavigate();
   const viewOnly =
     !verification.loading &&
-    idViewOnly(pathname, idActionsLocked({ isAdmin: isAdminUser, documentStatus: verification.status, hasApplication: !!verification.row }));
+    idViewOnly(pathname, idActionsLocked({
+      isAdmin: isAdminUser,
+      documentStatus: verification.status,
+      hasApplication: !!verification.row,
+      applicationStatus: (verification.row as any)?.status,
+    }));
   const credits = useCredits();
   const { user: authUser, loading: authLoading } = useAuthUser();
   const terminalAccess = useTerminalAccess(authUser?.id);

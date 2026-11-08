@@ -1,4 +1,4 @@
-import { ID_ACTION_MESSAGE, idActionsLocked } from "@/lib/id-gate";
+import { ID_ACTION_MESSAGE, ID_LOCK_APPLICATION_STATUSES, idActionsLocked } from "@/lib/id-gate";
 
 /** Server check for actions an unverified member can't take yet. Returns the message to show, or null. */
 export async function idActionBlock(userId: string): Promise<string | null> {
@@ -8,7 +8,7 @@ export async function idActionBlock(userId: string): Promise<string | null> {
   if (isAdmin) return null;
   let { data: app } = await db
     .from("founding_applications")
-    .select("document_status")
+    .select("document_status, status")
     .eq("user_id", userId)
     .order("created_at", { ascending: false })
     .limit(1)
@@ -19,15 +19,22 @@ export async function idActionBlock(userId: string): Promise<string | null> {
     if (email) {
       ({ data: app } = await db
         .from("founding_applications")
-        .select("document_status")
+        .select("document_status, status")
         .ilike("email", email)
-        .in("status", ["approved", "active", "graduated", "verified"])
+        .in("status", ID_LOCK_APPLICATION_STATUSES)
         .order("created_at", { ascending: false })
         .limit(1)
         .maybeSingle());
     }
   }
-  return idActionsLocked({ isAdmin: false, documentStatus: app?.document_status, hasApplication: !!app }) ? ID_ACTION_MESSAGE : null;
+  return idActionsLocked({
+    isAdmin: false,
+    documentStatus: app?.document_status,
+    hasApplication: !!app,
+    applicationStatus: app?.status,
+  })
+    ? ID_ACTION_MESSAGE
+    : null;
 }
 
 /** The plan running as an active Founding trial for this user, or null. */
