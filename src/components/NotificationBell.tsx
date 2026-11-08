@@ -74,7 +74,7 @@ function visualFor(n: NotificationRow): Visual {
     return {
       Icon: isBuy ? TrendingUp : TrendingDown,
       tone: isBuy ? "text-gc-success" : "text-destructive",
-      href: "/dashboard/notifications",
+      href: "/dashboard",
       search: alertId ? { alertId } : undefined,
     };
   }

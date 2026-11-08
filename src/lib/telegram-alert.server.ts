@@ -48,7 +48,7 @@ function formatSignal(a: TelegramSignal): string {
     '',
     a.rationale ? `<i>${escapeHtml(a.rationale.slice(0, 600))}</i>` : '',
     '',
-    `https://jenvu.com/dashboard/notifications`,
+    `https://dash.jenvu.com/overview`,
   ]
     .filter(Boolean)
     .join('\n')

@@ -2,7 +2,6 @@ import { Link, useRouterState } from "@tanstack/react-router";
 
 const TABS = [
   { to: "/dashboard", icon: "home", label: "Home" },
-  { to: "/dashboard/notifications", icon: "notifications", label: "Alerts" },
   { to: "/dashboard/profile", icon: "person", label: "Profile" },
 ] as const;
 
