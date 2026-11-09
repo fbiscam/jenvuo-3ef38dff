@@ -281,6 +281,13 @@
       "when": 1794199934516,
       "tag": "0039_allow_ultra_and_upgrade_period",
       "breakpoints": true
+    },
+    {
+      "idx": 40,
+      "version": "7",
+      "when": 1794200261797,
+      "tag": "0040_fix_plan_names_and_sync_bot_licenses",
+      "breakpoints": true
     }
   ]
 }

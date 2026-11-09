@@ -122,7 +122,11 @@ export const getCreditState = createServerFn({ method: "GET" })
       }
     }
 
-    const plan = (planRow as any) ?? { id: "free", name: "Free", price_usd: 0, wallet_usd: 2.00, feature_journal: false, feature_realtime_alerts: false, feature_full_ict: false, feature_scanner: false };
+    const basePlan = (planRow as any) ?? { id: "free", name: "Free", price_usd: 0, wallet_usd: 2.00, feature_journal: false, feature_realtime_alerts: false, feature_full_ict: false, feature_scanner: false };
+    // Display name always follows the plan id, so a stale DB label can never
+    // show "Elite" for an Ultra account again.
+    const PLAN_LABELS: Record<string, string> = { free: "Free", pro: "Pro", elite: "Elite", ultra: "Ultra" };
+    const plan = { ...basePlan, name: PLAN_LABELS[String(basePlan.id ?? planId)] ?? basePlan.name };
     const { getPlanCapabilities } = await import("@/lib/plan-entitlements");
     const capabilities = getPlanCapabilities(planId);
     const walletUsd = Number(plan.wallet_usd ?? 0);
