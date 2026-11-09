@@ -62,8 +62,13 @@ export default function SiteHeader() {
   }, []);
   return (
     <>
-      <header className={`jenvu-home-header sticky top-0 z-50 border-b bg-background/75 backdrop-blur-md backdrop-saturate-150 transition-[border-color] duration-200 ${scrolled ? "border-border" : "border-transparent"}`}>
+      <header className={`jenvu-home-header sticky top-0 z-50 border-0 bg-background/75 backdrop-blur-md backdrop-saturate-150`}>
         <div className="site-edge relative flex h-[60px] items-center gap-3 lg:gap-8">
+          {/* Divider limited to the content edges so it lines up with the page sections. */}
+          <span
+            aria-hidden
+            className={`pointer-events-none absolute bottom-0 inset-x-[calc(1.25rem*var(--edge-k,1))] h-px bg-border transition-opacity duration-200 ${scrolled ? "opacity-100" : "opacity-0"}`}
+          />
           <Link to="/" aria-label="Jenvu home" className="flex shrink-0 items-center">
             <JenvuMark className="h-7 w-7 shrink-0 text-foreground" />
           </Link>
