@@ -649,8 +649,9 @@
 @media (min-width: 1680px) { .jenvu-zoom .jenvu-site-footer { zoom: calc(1 / 1.5); } }
 @media (min-width: 768px) { .pricing-zoom .jenvu-site-footer { zoom: calc(1 / 1.375); } }
 
-/* Public site (homepage + its pages, not the dashboard): 10% smaller on laptop/desktop */
-@media (min-width: 1024px) { .jenvu-public-scale { zoom: 0.9; min-height: calc(100vh / 0.9); } }
+/* Public site (homepage + its pages, not the dashboard): page scale on laptop/desktop.
+   0.99 = the old 0.9 scale +10% so sections span wider, close to the xAI reference. */
+@media (min-width: 1024px) { .jenvu-public-scale { zoom: 0.99; min-height: calc(100vh / 0.99); } }
 html[data-pwa="1"] .jenvu-public-scale { zoom: 1; }
 
 @media (min-width: 1024px) { .killzones-root { zoom: 1.25; } }
