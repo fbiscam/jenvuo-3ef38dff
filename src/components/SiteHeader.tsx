@@ -52,9 +52,17 @@ export default function SiteHeader() {
       return () => { document.body.style.overflow = prev; };
     }
   }, [mobileMenuOpen]);
+  // x.ai-style divider: no line at the top of the page, a thin full-width line once the page scrolls.
+  const [scrolled, setScrolled] = React.useState(false);
+  React.useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 8);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
   return (
     <>
-      <header className="jenvu-home-header sticky top-0 z-50 border-0 bg-background/75 backdrop-blur-md backdrop-saturate-150">
+      <header className={`jenvu-home-header sticky top-0 z-50 border-b bg-background/75 backdrop-blur-md backdrop-saturate-150 transition-[border-color] duration-200 ${scrolled ? "border-border" : "border-transparent"}`}>
         <div className="site-edge relative flex h-[60px] items-center gap-3 lg:gap-8">
           <Link to="/" aria-label="Jenvu home" className="flex shrink-0 items-center">
             <JenvuMark className="h-7 w-7 shrink-0 text-foreground" />
