@@ -376,6 +376,11 @@ export async function ensureMt5License(userId: string) {
   const { data: sub } = await db.from("user_subscriptions").select("plan_id,is_trial").eq("user_id", userId).maybeSingle();
   if (!sub || sub.is_trial || !isMt5Plan(sub.plan_id)) return;
   const { count } = await db.from("mt5_licenses").select("id", { count: "exact", head: true }).eq("user_id", userId).is("revoked_at", null);
-  if ((count ?? 0) > 0) return;
+  if ((count ?? 0) > 0) {
+    // Upgrades/downgrades: existing licenses follow the current paid plan.
+    await db.from("mt5_licenses").update({ plan_id: sub.plan_id })
+      .eq("user_id", userId).is("revoked_at", null).neq("plan_id", sub.plan_id);
+    return;
+  }
   await db.from("mt5_licenses").insert({ user_id: userId, license_key: newLicenseKey(), plan_id: sub.plan_id });
 }
