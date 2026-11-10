@@ -1,6 +1,7 @@
 import * as React from "react";
 import { Link } from "@tanstack/react-router";
 import { Check, Copy } from "lucide-react";
+import { RevealWords } from "@/components/RevealWords";
 import { PUBLIC_API_MODEL_IDS } from "@/lib/public-api-models";
 
 /* Homepage "For developers" section (replaces "What you're working with").
@@ -121,9 +122,11 @@ export function DevApiSection() {
         <div>
           <p className="text-[14px] text-muted-foreground">For developers</p>
           <h2 className="mt-4 text-[40px] font-medium leading-[1.05] tracking-tight text-foreground sm:text-[48px]">
-            One API.
-            <br />
-            Every modality.
+            <RevealWords>
+              One API.
+              <br />
+              Every modality.
+            </RevealWords>
           </h2>
           <p className="mt-5 max-w-md text-[17px] font-normal leading-relaxed text-foreground">
             Text, code, voice, images, and video — all through a single unified API. Start building in seconds.
