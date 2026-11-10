@@ -1500,6 +1500,20 @@ html body .dash-dark main.bg-white { background-color: #000000 !important; }
   .jenvu-logo-big { opacity: 1; }
 }
 
+/* Heading word reveal (x.ai style), driven by <RevealWords> */
+.reveal-word { display: inline-block; }
+@keyframes jenvu-word-in {
+  from { opacity: 0; filter: blur(12px); transform: translateY(0.38em); }
+  to { opacity: 1; filter: blur(0); transform: none; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .reveal-words[data-reveal="idle"] .reveal-word { opacity: 0; filter: blur(12px); transform: translateY(0.38em); }
+  .reveal-words[data-reveal="shown"] .reveal-word {
+    animation: jenvu-word-in 0.9s cubic-bezier(0.2, 0.75, 0.2, 1) both;
+    animation-delay: var(--rw-delay, 0ms);
+  }
+}
+
 /* Industry pages (Solutions / Products): animated dark cards */
 @keyframes ind-candle { 0%,100% { transform: scaleY(1); } 50% { transform: scaleY(0.55); } }
 @keyframes ind-line { from { stroke-dashoffset: 600; } to { stroke-dashoffset: 0; } }

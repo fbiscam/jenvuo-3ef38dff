@@ -2,6 +2,7 @@ import * as React from "react";
 import { Link } from "@tanstack/react-router";
 import { ArrowRight, ArrowUp, ArrowUpRight, Bell, Bot, ChevronRight, Code2, MessageCircle, Plus, Sparkles } from "lucide-react";
 import { openAskJenvu } from "@/components/AskJenvuWidget";
+import { RevealWords } from "@/components/RevealWords";
 import showController from "@/assets/home/show-imagine-controller.jpg";
 import showCoast from "@/assets/home/show-imagine-coast.jpg";
 import showMerch from "@/assets/home/show-imagine-merch.jpg";
@@ -26,7 +27,7 @@ const FRONTIER = [
 export function EntFrontierModels() {
   return (
     <section className="mx-auto max-w-[1340px] px-5 py-16 text-center sm:py-20">
-      <h2 className="text-4xl font-medium tracking-tight sm:text-[3.25rem] sm:leading-tight">Powered by frontier models</h2>
+      <h2 className="text-4xl font-medium tracking-tight sm:text-[3.25rem] sm:leading-tight"><RevealWords>Powered by frontier models</RevealWords></h2>
       <p className="mt-5 text-[17px]">Leading models from every major lab deliver advanced intelligence behind one Jenvu API key.</p>
       <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
         {FRONTIER.map((m, i) => (
@@ -88,9 +89,11 @@ export function EntHero() {
         <span className="flex h-5 w-5 items-center justify-center rounded-full bg-muted"><ArrowUpRight className="h-3 w-3" /></span>
       </Link>
       <h1 className="mx-auto mt-8 max-w-4xl text-[42px] font-medium leading-[1.08] tracking-tight text-foreground sm:text-[68px]">
-        Frontier AI models
-        <br />
-        for everything you <RotatingWord />
+        <RevealWords delay={120} step={80}>
+          Frontier AI models
+          <br />
+          for everything you <RotatingWord />
+        </RevealWords>
       </h1>
       <p className="mx-auto mt-6 max-w-2xl text-balance px-2 text-[18px] text-foreground/80 sm:text-[19px] lg:max-w-none lg:whitespace-nowrap lg:px-0 lg:text-[21px]">
         Reasoning, code, signals, execution, and risk. Tuned for precision market intelligence.
@@ -324,7 +327,7 @@ export function EntBuilt() {
   return (
     <section className="px-5 py-24">
       <div className="text-center">
-        <h2 className="text-[34px] font-medium leading-[1.1] tracking-tight text-foreground sm:text-[44px]">Built for trading. Backed by frontier AI.</h2>
+        <h2 className="text-[34px] font-medium leading-[1.1] tracking-tight text-foreground sm:text-[44px]"><RevealWords>Built for trading. Backed by frontier AI.</RevealWords></h2>
         <p className="mx-auto mt-5 max-w-[620px] text-[18px] leading-[1.65] text-foreground/85">
           Jenvu combines leading research and models to build trader-ready products
         </p>
@@ -412,7 +415,7 @@ export function EntEveryDesk() {
   const [d, setD] = React.useState(0);
   return (
     <section className="px-5 py-24 text-center">
-      <h2 className={h2}>AI for every desk</h2>
+      <h2 className={h2}><RevealWords>AI for every desk</RevealWords></h2>
       <p className={sub}>Whoever you are, Jenvu fits the way you already trade.</p>
       <div className="mt-8 flex flex-wrap justify-center gap-2">
         {desks.map((x, i) => (
@@ -459,7 +462,7 @@ export function EntFacts() {
   return (
     <section className="px-5 py-24">
       <div className="text-center">
-        <h2 className={h2}>What you're working with</h2>
+        <h2 className={h2}><RevealWords>What you're working with</RevealWords></h2>
         <p className={sub}>
           Seven deterministic engines, frontier AI models and strict safeguards help traders build, automate, analyze, and review gold setups.
         </p>
@@ -504,7 +507,7 @@ export function EntStories({ articles: items }: { articles: HomeArticle[] }) {
     <section className="px-5 py-24">
       <div className="mx-auto max-w-7xl">
         <div className="flex items-end justify-between gap-4">
-          <h2 className="text-[28px] font-medium tracking-tight text-foreground sm:text-[32px]">Latest news</h2>
+          <h2 className="text-[28px] font-medium tracking-tight text-foreground sm:text-[32px]"><RevealWords>Latest news</RevealWords></h2>
           <Link to="/insights" className="inline-flex items-center gap-0.5 text-[15px] font-medium text-foreground/80 hover:text-foreground">
             All posts <ChevronRight className="h-4 w-4" />
           </Link>
@@ -549,7 +552,7 @@ export function EntCta() {
   return (
     <section className="px-5 pb-24 pt-10">
       <div className="mx-auto max-w-6xl rounded-[28px] bg-muted/70 px-6 py-20 text-center">
-        <h2 className={h2}>Start building with Jenvu</h2>
+        <h2 className={h2}><RevealWords>Start building with Jenvu</RevealWords></h2>
         <p className={sub}>Talk with us about where to start, how to set up safely, and how to bring frontier AI into your trading.</p>
         <button type="button" onClick={() => openAskJenvu("sales")} className={`${pill} mt-9`}>Contact sales</button>
       </div>
