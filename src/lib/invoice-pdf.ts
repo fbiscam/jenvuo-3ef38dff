@@ -178,8 +178,8 @@ export async function buildInvoicePdf(
   if (bonus > 0) {
     y += 18;
     doc.text(date, L, y);
-    doc.text(`Bonus credit${o.promo_code ? ` (${o.promo_code})` : ""}`, descX, y);
-    doc.text(`$${bonus.toFixed(2)}`, R, y, { align: "right" });
+    doc.text(`Bonus credit $${bonus.toFixed(2)}${o.promo_code ? ` (${o.promo_code})` : ""} · free`, descX, y);
+    doc.text("$0.00", R, y, { align: "right" });
   }
 
   y += 15;
