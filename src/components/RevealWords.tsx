@@ -29,7 +29,8 @@ export function RevealWords({
     }
     const io = new IntersectionObserver(
       (entries) => {
-        if (entries.some((e) => e.isIntersecting)) {
+        // Also reveal headings the visitor already scrolled past quickly.
+        if (entries.some((e) => e.isIntersecting || e.boundingClientRect.top < 0)) {
           setShown(true);
           io.disconnect();
         }
