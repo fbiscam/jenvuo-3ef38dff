@@ -15,9 +15,6 @@ function fmtDate(iso: string) {
   return new Date(iso).toLocaleDateString(undefined, { day: "2-digit", month: "short", year: "numeric" });
 }
 
-function fmtDateLong(iso: string) {
-  return new Date(iso).toLocaleDateString(undefined, { day: "numeric", month: "long", year: "numeric" });
-}
 
 
 export default function InvoiceHistory({ variant = "list" }: { variant?: "list" | "table" } = {}) {
