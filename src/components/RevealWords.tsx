@@ -9,7 +9,7 @@ import * as React from "react";
 export function RevealWords({
   children,
   delay = 0,
-  step = 70,
+  step = 30,
 }: {
   children: React.ReactNode;
   /** ms before the first word starts. */
@@ -35,7 +35,7 @@ export function RevealWords({
           io.disconnect();
         }
       },
-      { rootMargin: "0px 0px -8% 0px", threshold: 0.15 },
+      { rootMargin: "0px 0px 0px 0px", threshold: 0 },
     );
     io.observe(el);
     return () => io.disconnect();
