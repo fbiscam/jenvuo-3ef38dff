@@ -16,6 +16,7 @@ import { PwaTabBar } from "@/components/PwaTabBar";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { installIntlGuard } from "../lib/intl-guard";
+import { installDomGuard } from "../lib/dom-guard";
 import { initCrossDomainSession } from "../lib/cross-domain-session";
 import { applyHtmlTheme, SITE_THEME_BOOT_SCRIPT } from "../lib/site-theme";
 import { OPS_EMBED_ZOOM_BOOT_SCRIPT } from "../lib/ops-zoom";
@@ -26,6 +27,9 @@ const googleAnalyticsId = import.meta.env.VITE_LOVABLE_CONNECTOR_GOOGLE_ANALYTIC
 // default-locale date/number format throw and crash the page. Neutralise it
 // before any component renders.
 installIntlGuard();
+// Ads, Google Translate and extensions move React-owned nodes; without this
+// one stray node crashes the page and the visitor has to refresh.
+installDomGuard();
 
 function NotFoundComponent() {
   return (
@@ -80,7 +84,7 @@ function ErrorComponent({ error: rawError, reset }: { error: unknown; reset: () 
     // user on the error boundary. The URL-scoped marker prevents reload loops.
     const message = `${error.name} ${error.message} ${error.stack ?? ""}`;
     const isStaleBundle =
-      /Failed to fetch dynamically imported module|Importing a module script failed|Loading chunk [^ ]+ failed|ChunkLoadError|module is not defined|is not defined/i.test(
+      /Failed to fetch dynamically imported module|Importing a module script failed|Loading chunk [^ ]+ failed|ChunkLoadError/i.test(
         message,
       );
     if (isStaleBundle && !recoveryStarted.current && typeof window !== "undefined") {
@@ -244,33 +248,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "manifest", href: "/manifest.webmanifest" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
+      // One font request instead of eight: only families the site renders.
       {
         rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap",
-      },
-      {
-        rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap",
-      },
-      {
-        rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap",
-      },
-      {
-        rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Google+Sans:wght@300;400;500;600;700&display=swap",
-      },
-      {
-        rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wght@6..144,300..800&display=swap",
-      },
-      {
-        rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600;700&display=swap",
-      },
-      {
-        rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap",
+        href: "https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wght@6..144,300..800&family=JetBrains+Mono:wght@400;500;600&family=DM+Sans:wght@500;600&family=Urbanist:wght@400;500;600;700&display=swap",
       },
       {
         rel: "stylesheet",

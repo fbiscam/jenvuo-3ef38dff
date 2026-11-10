@@ -160,8 +160,15 @@ export const Route = createFileRoute("/")({
   // The XAU projection is primed server-side (5-min cache) so the very first
   // paint shows the real live price instead of a stale placeholder.
   loader: async ({ context }) => {
-    const [board, articles] = await Promise.all([
+    // Use the macro board only if it is already cached (answers fast); never
+    // hold the whole page for slow outside price feeds — the page fetches it
+    // itself right after it opens.
+    const boardFast = Promise.race([
       getCorrelatedMarkets().catch(() => null),
+      new Promise<null>((resolve) => setTimeout(() => resolve(null), 300)),
+    ]);
+    const [board, articles] = await Promise.all([
+      boardFast,
       context.queryClient.ensureQueryData(homeArticlesQueryOptions).catch(() => [] as HomeArticle[]),
     ]);
     return { tickerRows: null as TickerRow[] | null, board, articles };
