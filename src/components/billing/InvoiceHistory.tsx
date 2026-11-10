@@ -9,32 +9,13 @@ import { ConsoleSelect } from "@/components/dashboard/ConsoleSelect";
 
 const MONO = "font-sans";
 
-function invoiceNo(o: PaymentOrder) {
-  return `JV-${new Date(o.created_at).getFullYear()}-${o.id.slice(0, 8).toUpperCase()}`;
-}
+import { invoiceNo } from "@/lib/invoice-pdf";
 
 function fmtDate(iso: string) {
   return new Date(iso).toLocaleDateString(undefined, { day: "2-digit", month: "short", year: "numeric" });
 }
 
-function fmtDateLong(iso: string) {
-  return new Date(iso).toLocaleDateString(undefined, { day: "numeric", month: "long", year: "numeric" });
-}
 
-async function loadLogo(): Promise<string | null> {
-  try {
-    const res = await fetch("/favicon.png");
-    const blob = await res.blob();
-    return await new Promise((resolve) => {
-      const fr = new FileReader();
-      fr.onload = () => resolve(String(fr.result));
-      fr.onerror = () => resolve(null);
-      fr.readAsDataURL(blob);
-    });
-  } catch {
-    return null;
-  }
-}
 
 export default function InvoiceHistory({ variant = "list" }: { variant?: "list" | "table" } = {}) {
   const listFn = useServerFn(listMyOrders);
@@ -74,146 +55,8 @@ export default function InvoiceHistory({ variant = "list" }: { variant?: "list" 
   async function download(o: PaymentOrder) {
     setBusy(o.id);
     try {
-      const [{ jsPDF }, logo] = await Promise.all([import("jspdf"), loadLogo()]);
-      const doc = new jsPDF({ unit: "pt", format: "a4" });
-      const W = doc.internal.pageSize.getWidth();
-      const L = 48;
-      const R = W - L;
-      const net = networkMeta(o.network);
-      // Built-in Helvetica renders crisp vector text in every PDF viewer.
-      const F = "helvetica";
-
-      const date = fmtDateLong(o.decided_at ?? o.created_at);
-      const paid = Number(o.pay_amount_usd);
-      const bonus = Number(o.bonus_usd);
-      const credit = Number(o.credit_usd);
-
-      // ── Header: big INVOICE title left, company block + logo right ──────
-      if (logo) {
-        try {
-          doc.addImage(logo, "PNG", R - 34, 30, 34, 34, undefined, "NONE");
-        } catch {
-          /* ignore */
-        }
-      }
-
-      doc.setFont(F, "bold");
-      doc.setFontSize(30);
-      doc.setTextColor(17, 17, 17);
-      doc.text("INVOICE", L, 108);
-
-      doc.setFont(F, "normal");
-      doc.setFontSize(13);
-      doc.setTextColor(17, 17, 17);
-      doc.text("Jenvu", R, 96, { align: "right" });
-      doc.setFontSize(10);
-      doc.setTextColor(60, 60, 60);
-      doc.text("jenvu.com · info@jenvu.com", R, 116, { align: "right" });
-      doc.text("Florida, United States", R, 131, { align: "right" });
-
-      // ── Grey band: invoice for (left) / meta (right) ─────────────────────
-      const bandY = 172;
-      const bandH = 152;
-      doc.setFillColor(226, 232, 238);
-      doc.rect(0, bandY, W, bandH, "F");
-
-      doc.setFont(F, "normal");
-      doc.setFontSize(10);
-      doc.setTextColor(40, 40, 40);
-      doc.text("Invoice for", L, bandY + 34);
-
-      doc.setFontSize(16);
-      doc.setTextColor(17, 17, 17);
-      doc.text(fullName || email || "Account holder", L, bandY + 72);
-
-      doc.setFontSize(10);
-      doc.setTextColor(50, 50, 50);
-      doc.text(email || "—", L, bandY + 100);
-      doc.text("Jenvu account credit top-up", L, bandY + 116);
-
-      const metaLabelX = R - 250;
-      const metaValueX = R - 230;
-      const metaRows: [string, string][] = [
-        ["Invoice number", invoiceNo(o)],
-        ["Invoice date", date],
-        ["Payment method", `${net.asset} on ${net.chain}`],
-      ];
-      if (o.tx_hash) {
-        metaRows.push([
-          "Transaction",
-          `${o.tx_hash.slice(0, 18)}${o.tx_hash.length > 18 ? "…" : ""}`,
-        ]);
-      }
-      let my = bandY + 52;
-      metaRows.forEach(([label, value]) => {
-        doc.setFontSize(10);
-        doc.setTextColor(60, 60, 60);
-        doc.text(label, metaLabelX, my, { align: "right" });
-        doc.setTextColor(17, 17, 17);
-        doc.text(value, metaValueX, my);
-        my += 22;
-      });
-
-      // ── Line item table ─────────────────────────────────────────────────
-      let y = bandY + bandH + 48;
-      doc.setFont(F, "bold");
-      doc.setFontSize(11);
-      doc.setTextColor(17, 17, 17);
-      doc.text("Date", L, y);
-      doc.text("Description", L + 250, y);
-      doc.text("Total amount in (USD $)", R, y, { align: "right" });
-
-      y += 14;
-      doc.setDrawColor(30, 30, 30);
-      doc.setLineWidth(1);
-      doc.line(L, y, R, y);
-
-      doc.setFont(F, "normal");
-      doc.setFontSize(11);
-      y += 30;
-      doc.text(date, L, y);
-      doc.text("Account credit top-up", L + 250, y);
-      doc.text(`$${paid.toFixed(2)}`, R, y, { align: "right" });
-
-      if (bonus > 0) {
-        y += 26;
-        doc.text(date, L, y);
-        doc.text(`Bonus credit${o.promo_code ? ` (${o.promo_code})` : ""}`, L + 250, y);
-        doc.text(`$${bonus.toFixed(2)}`, R, y, { align: "right" });
-      }
-
-      y += 24;
-      doc.line(L, y, R, y);
-
-      // ── Total ───────────────────────────────────────────────────────────
-      y += 34;
-      doc.setFont(F, "normal");
-      doc.setFontSize(12);
-      doc.setTextColor(17, 17, 17);
-      doc.text("Total", R - 160, y, { align: "right" });
-      doc.text(`$${paid.toFixed(2)}`, R, y, { align: "right" });
-
-      y += 26;
-      doc.setFontSize(10);
-      doc.setTextColor(80, 80, 80);
-      doc.text("Credited to balance", R - 160, y, { align: "right" });
-      doc.text(`$${credit.toFixed(2)}`, R, y, { align: "right" });
-
-      // ── Footer ──────────────────────────────────────────────────────────
-      const H = doc.internal.pageSize.getHeight();
-      doc.setFontSize(9);
-      doc.setTextColor(140, 140, 140);
-      doc.text(
-        "Paid in full. Credits are applied to your Jenvu account balance immediately after approval.",
-        L,
-        H - 64,
-      );
-      doc.text(
-        "info@jenvu.com · This invoice was generated electronically and is valid without signature.",
-        L,
-        H - 48,
-      );
-
+      const { buildInvoicePdf } = await import("@/lib/invoice-pdf");
+      const doc = await buildInvoicePdf(o, { fullName, email });
       doc.save(`${invoiceNo(o)}.pdf`);
     } finally {
       setBusy(null);
