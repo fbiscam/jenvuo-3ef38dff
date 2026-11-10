@@ -1,5 +1,6 @@
 import * as React from "react";
 import { Link } from "@tanstack/react-router";
+import { RevealWords } from "@/components/RevealWords";
 import fluidImg from "@/assets/agent-card-fluid.jpg";
 import skyImg from "@/assets/agent-card-sky.jpg";
 import cloudsImg from "@/assets/agent-card-clouds.jpg";
@@ -249,7 +250,7 @@ export function AgentSmarterSection() {
   return (
     <section className="px-5 py-20">
       <div className="mx-auto max-w-7xl">
-      <h2 className="text-center text-4xl font-medium tracking-tight sm:text-5xl">Designed to make your trading smarter</h2>
+      <h2 className="text-center text-4xl font-medium tracking-tight sm:text-5xl"><RevealWords>Designed to make your trading smarter</RevealWords></h2>
       <div className="mt-12 grid gap-10 md:grid-cols-3 md:gap-8">
         <SearchCard />
         <HighlightsCard />
