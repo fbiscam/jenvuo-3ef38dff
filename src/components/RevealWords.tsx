@@ -1,8 +1,8 @@
 import * as React from "react";
 
 /**
- * x.ai-style heading entrance: each word rises out of a soft blur, one after
- * another, the first time the heading scrolls into view. Words are split in
+ * x.ai-style heading entrance: words appear together with a near-instant soft
+ * blur the first time the heading scrolls into view. Words are split in
  * React render (never by touching the DOM afterwards) so ads/translate guards
  * stay happy. Reduced-motion visitors see the text straight away (CSS).
  */
