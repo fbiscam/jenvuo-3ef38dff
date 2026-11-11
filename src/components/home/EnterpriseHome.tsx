@@ -89,7 +89,7 @@ export function EntHero() {
         <span className="flex h-5 w-5 items-center justify-center rounded-full bg-muted"><ArrowUpRight className="h-3 w-3" /></span>
       </Link>
       <h1 className="mx-auto mt-8 max-w-4xl text-[42px] font-medium leading-[1.08] tracking-tight text-foreground sm:text-[68px]">
-        <RevealWords step={35}>
+        <RevealWords step={12}>
           Frontier AI models
           <br />
           for everything you <RotatingWord />
