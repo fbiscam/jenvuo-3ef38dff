@@ -2331,6 +2331,12 @@ html body .jenvu-zoom-dashboard main .jx-ide :is(.jx-ide-card) { border-radius: 
   .jenvu-zoom-dashboard main.dash-page.page-plus5 { zoom: 0.7 !important; }
 }
 
+/* Phones and tablets use the original, unscaled dashboard layout. CSS zoom on
+   narrow screens makes width calculations and horizontal scrolling unreliable. */
+@media (max-width: 1023px) {
+  .jenvu-zoom-dashboard main.dash-page { zoom: 1 !important; }
+}
+
 /* Chat code editor tabs: soft pill, no dark underline. */
 .code-box .code-tab.is-active { background: #f1f1f0; }
 .dark .code-box .code-tab.is-active { background: #1c1c1c; }
