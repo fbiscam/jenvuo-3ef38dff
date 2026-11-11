@@ -9,7 +9,7 @@ import * as React from "react";
 export function RevealWords({
   children,
   delay = 0,
-  step = 10,
+  step = 0,
 }: {
   children: React.ReactNode;
   /** ms before the first word starts. */
