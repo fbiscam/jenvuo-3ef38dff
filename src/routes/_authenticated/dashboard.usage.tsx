@@ -481,14 +481,14 @@ function UsagePage() {
   const granularityLabel = groupDays === 1 ? "Day" : groupDays === 7 ? "Week" : "Month";
 
   return (
-    <div className="mx-auto w-full max-w-[1100px] pb-10 text-foreground">
+    <div className="mx-auto min-w-0 w-full max-w-[1100px] pb-10 text-foreground">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <h1 className="text-[30px] font-normal tracking-tight text-foreground sm:text-[34px]">Usage</h1>
         <UsageTabs active="usage" />
       </div>
 
       {/* Filter bar */}
-      <div className="mt-5 flex flex-wrap items-center gap-x-6 gap-y-2">
+      <div className="mt-5 flex min-w-0 flex-wrap items-center gap-x-6 gap-y-2">
         <ConsoleSelect
           plain
           open={openMenu === "type"}
@@ -553,7 +553,7 @@ function UsagePage() {
             setOpenMenu(null);
           }}
         />
-        <div className="ml-auto flex items-center gap-1">
+        <div className="flex w-full min-w-0 flex-wrap items-center gap-1 sm:ml-auto sm:w-auto sm:flex-nowrap">
           <button
             type="button"
             onClick={() => setShift((v) => v + 1)}
@@ -602,7 +602,7 @@ function UsagePage() {
 
       {/* Spend + Tokens / Requests */}
       <div className="mt-4 grid grid-cols-1 gap-2 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
-        <section className="console-card flex min-h-[420px] flex-col p-4 sm:p-5">
+        <section className="console-card min-w-0 flex min-h-[420px] flex-col p-4 sm:p-5">
           <div className="text-[13px] text-muted-foreground">Spend</div>
           <div className="mt-1 text-[22px] font-medium tabular-nums text-foreground">
             {fmtUsd(derived.spent, 2)}
@@ -625,7 +625,7 @@ function UsagePage() {
           </div>
         </section>
         <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-1">
-          <section className="console-card flex min-h-[200px] flex-col p-4">
+          <section className="console-card min-w-0 flex min-h-[200px] flex-col p-4">
             <div className="text-[13px] text-muted-foreground">Tokens</div>
             <div className="mt-1 text-[20px] font-medium tabular-nums text-foreground">
               {fmtInt(derived.totalTokens)}
@@ -640,7 +640,7 @@ function UsagePage() {
               compact
             />
           </section>
-          <section className="console-card flex min-h-[200px] flex-col p-4">
+          <section className="console-card min-w-0 flex min-h-[200px] flex-col p-4">
             <div className="text-[13px] text-muted-foreground">Requests</div>
             <div className="mt-1 text-[20px] font-medium tabular-nums text-foreground">
               {fmtInt(derived.spendRows.length)}
@@ -678,7 +678,7 @@ function UsagePage() {
           </button>
         ))}
       </div>
-      <section className="console-card mt-3 grid grid-cols-1 gap-6 p-4 sm:p-5 lg:grid-cols-[minmax(0,1.7fr)_minmax(0,1fr)]">
+      <section className="console-card min-w-0 mt-3 grid grid-cols-1 gap-6 p-4 sm:p-5 lg:grid-cols-[minmax(0,1.7fr)_minmax(0,1fr)]">
         <div className="flex min-h-[330px] flex-col">
           <div className="text-[13px] text-muted-foreground">
             {API_TYPES.find((t) => t.id === breakdown)?.label}
