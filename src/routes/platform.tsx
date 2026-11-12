@@ -32,8 +32,8 @@ import pythonLogo from "@/assets/platform-logos/python.svg";
 import nodeLogo from "@/assets/platform-logos/nodejs.svg";
 import curlLogo from "@/assets/platform-logos/curl.svg";
 import langchainLogo from "@/assets/platform-logos/langchain.svg";
-import starsNebula from "@/assets/platform/stars-nebula.jpg";
-import starsPlain from "@/assets/platform/stars-plain.jpg";
+import starsNebula from "@/assets/platform/stars-nebula.webp";
+import starsPlain from "@/assets/platform/stars-plain.webp";
 import avatarUser from "@/assets/platform/avatar-user.jpg";
 
 export const Route = createFileRoute("/platform")({

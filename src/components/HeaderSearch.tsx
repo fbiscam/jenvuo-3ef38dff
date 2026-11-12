@@ -5,7 +5,7 @@ import { ExternalLink, FileText, Loader2, Search, SendHorizontal, Sparkles } fro
 import { siteSearch, type SearchHit } from "@/lib/site-search.functions";
 import { askJenvu, type AskJenvuResult } from "@/lib/ask-jenvu.functions";
 import { SITE_PAGES, matchSitePages } from "@/lib/site-pages";
-import { MessageResponse } from "@/components/ai-elements/message";
+import { MessageResponse } from "@/components/ai-elements/lazy-message-response";
 import { Shimmer } from "@/components/ai-elements/shimmer";
 import JenvuMark from "@/components/JenvuMark";
 

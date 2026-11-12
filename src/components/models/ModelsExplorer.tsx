@@ -19,8 +19,8 @@ import metaLogo from "@/assets/model-logos/meta-color.svg";
 import mistralLogo from "@/assets/model-logos/mistral-color.svg";
 import minimaxLogo from "@/assets/model-logos/minimax-color.svg";
 import nvidiaLogo from "@/assets/model-logos/nvidia-color.svg";
-import starsNebula from "@/assets/platform/stars-nebula.jpg";
-import starsPlain from "@/assets/platform/stars-plain.jpg";
+import starsNebula from "@/assets/platform/stars-nebula.webp";
+import starsPlain from "@/assets/platform/stars-plain.webp";
 import {
   MIXED_CATALOG, MODEL_CATALOG, PRICE_PER_MILLION, PROVIDERS, formatContext, getCatalogModel, mixByProvider,
   type Capability, type CatalogModel, type ProviderKey,

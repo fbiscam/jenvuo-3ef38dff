@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { siteSearch, type SearchHit } from "@/lib/site-search.functions";
 import { askJenvu, type AskJenvuResult } from "@/lib/ask-jenvu.functions";
-import { MessageResponse } from "@/components/ai-elements/message";
+import { MessageResponse } from "@/components/ai-elements/lazy-message-response";
 import { Shimmer } from "@/components/ai-elements/shimmer";
 import GiftBox from "@/components/dashboard/GiftBox";
 import { SITE_PAGES } from "@/lib/site-pages";

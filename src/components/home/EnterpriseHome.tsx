@@ -3,18 +3,18 @@ import { Link } from "@tanstack/react-router";
 import { ArrowRight, ArrowUp, ArrowUpRight, Bell, Bot, ChevronRight, Code2, MessageCircle, Plus, Sparkles } from "lucide-react";
 import { openAskJenvu } from "@/components/AskJenvuWidget";
 import { RevealWords } from "@/components/RevealWords";
-import showController from "@/assets/home/show-imagine-controller.jpg";
-import showCoast from "@/assets/home/show-imagine-coast.jpg";
-import showMerch from "@/assets/home/show-imagine-merch.jpg";
-import showSneaker from "@/assets/home/show-explore-sneaker.jpg";
-import showPerfume from "@/assets/home/show-explore-perfume.jpg";
-import showRedTop from "@/assets/home/show-explore-redtop.jpg";
-import showOrchid from "@/assets/home/show-explore-orchid.jpg";
-import showWatch from "@/assets/home/show-explore-watch.jpg";
+import showController from "@/assets/home/show-imagine-controller.webp";
+import showCoast from "@/assets/home/show-imagine-coast.webp";
+import showMerch from "@/assets/home/show-imagine-merch.webp";
+import showSneaker from "@/assets/home/show-explore-sneaker.webp";
+import showPerfume from "@/assets/home/show-explore-perfume.webp";
+import showRedTop from "@/assets/home/show-explore-redtop.webp";
+import showOrchid from "@/assets/home/show-explore-orchid.webp";
+import showWatch from "@/assets/home/show-explore-watch.webp";
 import { shortTitle, type HomeArticle } from "@/lib/home-articles";
 import { insightCoverUrl } from "@/lib/insight-cover";
-import starsNebula from "@/assets/platform/stars-nebula.jpg";
-import starsPlain from "@/assets/platform/stars-plain.jpg";
+import starsNebula from "@/assets/platform/stars-nebula.webp";
+import starsPlain from "@/assets/platform/stars-plain.webp";
 
 /* Same section as the Platform page's "Powered by frontier models". */
 const FRONTIER = [

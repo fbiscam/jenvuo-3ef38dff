@@ -14,8 +14,8 @@ import {
 } from "lucide-react";
 import { openAskJenvu } from "@/components/AskJenvuWidget";
 import { pillDark, pillLight, sectionLead, sectionTitle } from "@/components/home/homeStyles";
-import starsNebula from "@/assets/platform/stars-nebula.jpg";
-import starsPlain from "@/assets/platform/stars-plain.jpg";
+import starsNebula from "@/assets/platform/stars-nebula.webp";
+import starsPlain from "@/assets/platform/stars-plain.webp";
 
 /* Homepage sections borrowed from the Platform page: dark product cards, AI demo and use cases. */
 

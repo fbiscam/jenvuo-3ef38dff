@@ -1,9 +1,9 @@
 import * as React from "react";
 import { Link } from "@tanstack/react-router";
 import { RevealWords } from "@/components/RevealWords";
-import fluidImg from "@/assets/agent-card-fluid.jpg";
-import skyImg from "@/assets/agent-card-sky.jpg";
-import cloudsImg from "@/assets/agent-card-clouds.jpg";
+import fluidImg from "@/assets/agent-card-fluid.webp";
+import skyImg from "@/assets/agent-card-sky.webp";
+import cloudsImg from "@/assets/agent-card-clouds.webp";
 
 /* "Designed to make your Agent smarter" — homepage section with three animated cards
    (particle cloud, highlighted excerpt, typed query → JSON). Replaces the old

@@ -5,7 +5,7 @@ import {
   RotateCw, SearchCheck, ThumbsDown, ThumbsUp, X, CheckCircle2, Loader2,
 } from "lucide-react";
 import { toast } from "sonner";
-import { MessageResponse } from "@/components/ai-elements/message";
+import { MessageResponse } from "@/components/ai-elements/lazy-message-response";
 import { Shimmer } from "@/components/ai-elements/shimmer";
 import { askJenvu } from "@/lib/ask-jenvu.functions";
 import { submitContactMessage } from "@/lib/contact.functions";
