@@ -41,9 +41,9 @@ export function SettingsSidebarNav({ pathname, collapsed, onNavigate }: { pathna
             onClick={onNavigate}
             title={collapsed ? p.label : undefined}
             aria-current={active ? "page" : undefined}
-            className={`dashboard-sidebar-link flex items-center text-[14px] text-gc-ink transition ${collapsed ? "justify-center rounded-full px-2 py-2" : "gap-3 rounded-lg px-3 py-2"} ${active ? "font-bold" : "font-normal hover:bg-gc-notice"}`}
+            className={`dashboard-sidebar-link flex items-center text-[14px] text-gc-ink transition ${collapsed ? "justify-center rounded-full px-2 py-2" : "gap-3 rounded-lg px-3 py-2"} ${active ? "font-semibold" : "font-normal hover:bg-gc-notice"}`}
           >
-            <Icon className="dashboard-sidebar-icon h-[18px] w-[18px] shrink-0 text-gc-ink" strokeWidth={active ? 2.4 : 1.75} aria-hidden="true" />
+            <Icon className="dashboard-sidebar-icon h-[18px] w-[18px] shrink-0 text-gc-ink" strokeWidth={active ? 2.1 : 1.75} aria-hidden="true" />
             {!collapsed && <span className="truncate">{p.label}</span>}
           </Link>
         );

@@ -2604,4 +2604,4 @@ html[data-ops-z] .ops-zoom {
 
 /* Sidebar current page: bold text only, never a background highlight. */
 .dashboard-sidebar-link[aria-current="page"],
-.dashboard-sidebar-link[aria-current="page"]:hover { background-color: transparent !important; font-weight: 700 !important; }
+.dashboard-sidebar-link[aria-current="page"]:hover { background-color: transparent !important; font-weight: 600 !important; }
