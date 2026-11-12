@@ -1330,7 +1330,9 @@ body:has(.terminal-dark) .dashboard-terminal-sidebar :is(span, div, a, svg, .sid
 body:has(.terminal-dark) .dashboard-terminal-sidebar button {
   color: oklch(1 0 0) !important;
 }
-body:has(.terminal-dark) .dashboard-terminal-sidebar .dashboard-sidebar-link:not([aria-current="page"]):hover {
+body:has(.terminal-dark) .dashboard-terminal-sidebar .dashboard-sidebar-link:hover,
+body:has(.terminal-dark) .dashboard-terminal-sidebar .dashboard-sidebar-link[aria-current="page"],
+body:has(.terminal-dark) .dashboard-terminal-sidebar .dashboard-sidebar-link.active {
   background-color: oklch(0.27 0 0) !important;
 }
 body:has(.terminal-dark) .dashboard-terminal-sidebar .h-px {
@@ -2036,8 +2038,6 @@ html body .jenvu-zoom-dashboard main a[role="button"] { border-radius: 9999px !i
 .jenvu-zoom-dashboard main input.bg-transparent:focus,
 .jenvu-zoom-dashboard main input.bg-transparent:focus-visible { outline: none !important; box-shadow: none !important; border-color: transparent !important; }
 .console-pill-solid:hover { background: var(--foreground); opacity: 0.88; }
-/* Small icons in solid pills: thicker stroke so they stay crisp at dashboard zoom (thin 2px lines blur to grey) */
-.console-pill-solid svg { stroke-width: 2.5; flex-shrink: 0; }
 .console-icon-chip {
   display: inline-flex; align-items: center; justify-content: center; height: 36px; width: 36px;
   border-radius: 10px; background: var(--background); color: var(--foreground);
@@ -2603,13 +2603,3 @@ html[data-ops-z] .ops-zoom {
 .ops-nav-item { color: var(--muted-foreground); }
 .ops-nav-item:hover { background-color: var(--ops-card); color: var(--foreground); }
 .ops-nav-item[data-active="true"] { background-color: var(--ops-card); color: var(--foreground); font-weight: 500; }
-
-/* Sidebar current page: normal text, never a background highlight. */
-.dashboard-sidebar-link[aria-current="page"],
-.dashboard-sidebar-link[aria-current="page"]:hover { background-color: transparent !important; font-weight: 500 !important; }
-
-/* Phones only: everything 5% smaller. Uses the root font size (Tailwind sizes are rem)
-   instead of zoom, because zoom breaks width math and causes sideways scrolling on phones. */
-@media (max-width: 767px) {
-  html { font-size: 95%; }
-}

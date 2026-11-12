@@ -1407,7 +1407,7 @@ function DashboardLayout() {
                         }}
                         title={navCollapsed ? t.label : undefined}
                         aria-current={active ? "page" : undefined}
-                        className={`dashboard-sidebar-link group relative flex items-center text-[14px] font-normal text-gc-ink transition ${navCollapsed ? "justify-center rounded-full px-2 py-2" : "gap-3 rounded-lg px-3 py-2"} ${active ? "" : "hover:bg-gc-notice"}`}
+                        className={`dashboard-sidebar-link group relative flex items-center text-[14px] font-normal text-gc-ink transition ${navCollapsed ? "justify-center rounded-full px-2 py-2" : "gap-3 rounded-lg px-3 py-2"} ${active ? "bg-gc-nav-active font-medium" : "hover:bg-gc-notice"}`}
                       >
                         <Icon
                           className="dashboard-sidebar-icon h-[18px] w-[18px] shrink-0 text-gc-ink"
