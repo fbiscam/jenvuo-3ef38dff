@@ -1330,9 +1330,7 @@ body:has(.terminal-dark) .dashboard-terminal-sidebar :is(span, div, a, svg, .sid
 body:has(.terminal-dark) .dashboard-terminal-sidebar button {
   color: oklch(1 0 0) !important;
 }
-body:has(.terminal-dark) .dashboard-terminal-sidebar .dashboard-sidebar-link:hover,
-body:has(.terminal-dark) .dashboard-terminal-sidebar .dashboard-sidebar-link[aria-current="page"],
-body:has(.terminal-dark) .dashboard-terminal-sidebar .dashboard-sidebar-link.active {
+body:has(.terminal-dark) .dashboard-terminal-sidebar .dashboard-sidebar-link:not([aria-current="page"]):hover {
   background-color: oklch(0.27 0 0) !important;
 }
 body:has(.terminal-dark) .dashboard-terminal-sidebar .h-px {
@@ -2603,3 +2601,7 @@ html[data-ops-z] .ops-zoom {
 .ops-nav-item { color: var(--muted-foreground); }
 .ops-nav-item:hover { background-color: var(--ops-card); color: var(--foreground); }
 .ops-nav-item[data-active="true"] { background-color: var(--ops-card); color: var(--foreground); font-weight: 500; }
+
+/* Sidebar current page: bold text only, never a background highlight. */
+.dashboard-sidebar-link[aria-current="page"],
+.dashboard-sidebar-link[aria-current="page"]:hover { background-color: transparent !important; font-weight: 700 !important; }
