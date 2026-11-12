@@ -2108,6 +2108,7 @@ export type Database = {
           mt5_account: string
           open_lots: number
           open_trades: number
+          peak_balance: number | null
           start_balance: number | null
           symbol: string
           target_hit: boolean
@@ -2124,6 +2125,7 @@ export type Database = {
           mt5_account: string
           open_lots?: number
           open_trades?: number
+          peak_balance?: number | null
           start_balance?: number | null
           symbol?: string
           target_hit?: boolean
@@ -2140,6 +2142,7 @@ export type Database = {
           mt5_account?: string
           open_lots?: number
           open_trades?: number
+          peak_balance?: number | null
           start_balance?: number | null
           symbol?: string
           target_hit?: boolean

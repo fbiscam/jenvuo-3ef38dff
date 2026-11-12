@@ -119,7 +119,7 @@ export function requestIp(headers: Headers) {
 
 /** Fixed daily target as % of the day's starting balance (user cannot change it). */
 export const DAILY_TARGET_PCT: Record<Mt5PlanId, number> = { pro: 2, elite: 4, ultra: 6 };
-/** Fixed daily drawdown guard, % of the day's starting balance. */
+/** Fixed daily drawdown guard, % of the day's peak closed balance (see peakDrawdown). */
 export const DAILY_DRAWDOWN_PCT = 4.7;
 
 /**
@@ -133,6 +133,19 @@ export function dailyStopFor(plan: Mt5PlanId, balance: number, todayProfit: numb
   const drawdown = round((start * DAILY_DRAWDOWN_PCT) / 100);
   const p = Number(todayProfit) || 0;
   return { start: round(start), target, drawdown, stop: start > 0 && (p >= target || p <= -drawdown), reason: p >= target ? "target" : p <= -drawdown ? "drawdown" : null };
+}
+
+/**
+ * 4.7% daily drawdown measured from the day's peak closed balance (start balance plus profit already
+ * closed today, never lower than the start), so profit banked earlier in the day is protected too.
+ */
+export function peakDrawdown(start: number, storedPeak: number | null | undefined, balance: number, equity: number) {
+  const round = (n: number) => Math.round(n * 100) / 100;
+  const s = Number(start) || 0;
+  const peak = round(Math.max(s, Number(storedPeak) || 0, Number(balance) || 0));
+  const limit = round((peak * DAILY_DRAWDOWN_PCT) / 100);
+  const floor = round(peak - limit);
+  return { peak, limit, floor, hit: s > 0 && peak > 0 && (Number(equity) || 0) <= floor };
 }
 
 /**

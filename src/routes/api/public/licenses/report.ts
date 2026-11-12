@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { DAILY_DRAWDOWN_PCT, DAILY_TARGET_PCT, dailyStopFor, reportDayProfit, reportDayStart, sessionStep, sharedTargetStatus } from "@/lib/mt5-licenses";
+import { DAILY_DRAWDOWN_PCT, DAILY_TARGET_PCT, dailyStopFor, peakDrawdown, reportDayProfit, reportDayStart, sessionStep, sharedTargetStatus } from "@/lib/mt5-licenses";
 import { checkBotByIp } from "@/lib/mt5-ip-license.server";
 
 // Always HTTP 200: the MT5 bot reads the JSON body only.
@@ -41,11 +41,13 @@ export const Route = createFileRoute("/api/public/licenses/report")({
 
           const day = new Date().toISOString().slice(0, 10);
           // Saved profit = closed balance gain since this UTC day began (broker rollover can't reset it).
-          const { data: cur } = await db.from("mt5_bot_reports").select("start_balance").eq("license_id", lic.id).eq("day", day).maybeSingle();
+          const { data: cur } = await db.from("mt5_bot_reports").select("start_balance,peak_balance").eq("license_id", lic.id).eq("day", day).maybeSingle();
           const { data: prev } = cur?.start_balance == null
             ? await db.from("mt5_bot_reports").select("balance").eq("user_id", lic.user_id).eq("mt5_account", account).lt("day", day).order("day", { ascending: false }).order("updated_at", { ascending: false }).limit(1).maybeSingle()
             : { data: null };
           const startBalance = reportDayStart(cur?.start_balance, prev?.balance, num(body?.equity), num(body?.today_profit));
+          // Drawdown guard reference: highest closed balance today (start + profit already closed).
+          const pd = peakDrawdown(startBalance, cur?.peak_balance, num(body?.balance), num(body?.equity));
           await db.from("mt5_bot_reports").upsert(
             {
               license_id: lic.id,
@@ -57,6 +59,7 @@ export const Route = createFileRoute("/api/public/licenses/report")({
               equity: num(body?.equity),
               today_profit: reportDayProfit(num(body?.balance), startBalance),
               start_balance: startBalance,
+              peak_balance: pd.peak,
               trades_today: Math.max(0, Math.round(num(body?.trades_today, 100000))),
               open_trades: Math.max(0, Math.round(num(body?.open_trades, 100000))),
               open_lots: Math.max(0, num(body?.open_lots, 100000)),
@@ -67,12 +70,13 @@ export const Route = createFileRoute("/api/public/licenses/report")({
           );
 
           // Each license has its own daily target: only this account's profit today counts.
-          // Fixed by the server: plan % of the day's starting balance and the 4.7% drawdown guard (EA inputs can't change them).
+          // Fixed by the server: plan % of the day's starting balance; 4.7% drawdown from the day's peak closed balance (EA inputs can't change them).
           const profit = num(body?.today_profit);
           const d = dailyStopFor(r.plan, num(body?.balance), profit);
           const target = d.start > 0 ? d.target : r.daily_target;
           const s = sharedTargetStatus(target, [profit], body?.target_hit === true);
-          return ok({ valid: true, daily_target: target, daily_target_pct: DAILY_TARGET_PCT[r.plan], max_daily_drawdown: d.drawdown, drawdown_pct: DAILY_DRAWDOWN_PCT, profit: s.combined, stop: s.stop || d.stop, stop_reason: d.reason ?? (s.stop ? "target" : null) });
+          const targetHit = d.reason === "target";
+          return ok({ valid: true, daily_target: target, daily_target_pct: DAILY_TARGET_PCT[r.plan], max_daily_drawdown: pd.limit, drawdown_floor: pd.floor, drawdown_pct: DAILY_DRAWDOWN_PCT, profit: s.combined, stop: s.stop || targetHit || pd.hit, stop_reason: pd.hit ? "drawdown" : targetHit || s.stop ? "target" : null });
         } catch {
           return ok({ valid: false, reason: "server_error" });
         }

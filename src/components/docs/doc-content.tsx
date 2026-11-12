@@ -293,7 +293,7 @@ export const DOC_GROUPS: DocGroup[] = [
             <ul>
               <li>Download it from Dashboard → JX Bot and follow the install steps there.</li>
               <li>Type the same IP into the bot's MyIP input; the bot checks with jenvu.com that it runs from that IP before it trades.</li>
-              <li>It pauses for the day at your plan's daily target: 2% (Pro), 4% (Elite) or 6% (Ultra) of the day's starting balance, or at the 4.7% daily drawdown guard.</li>
+              <li>It pauses for the day at your plan's daily target: 2% (Pro), 4% (Elite) or 6% (Ultra) of the day's starting balance, or at the {DAILY_DRAWDOWN_PCT}% daily drawdown guard (counted from the day's highest closed balance, so profit already closed today is protected).</li>
             </ul>
             <Note>Targets are stop limits, not promised profit. Credit does not unlock JX Bot; it is only for approved Founding members whose ID is verified (first month free, then a Founding plan).</Note>
           </>

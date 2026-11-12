@@ -21,3 +21,4 @@
 - `installDomGuard` (`src/lib/dom-guard.ts`, run in `__root.tsx`) skips removeChild/insertBefore on moved nodes and the homepage loader waits at most 300ms for outside price feeds: ads/translate DOM edits and slow feeds made first opens fail until refresh.
 - Invoice PDFs are built only by `buildInvoicePdf` in `invoice-pdf.ts` (layout of the reference invoice, site font from `public/fonts/invoice/` Latin subsets, vector Jenvu mark): one invoice look for every download.
 - JX Bot saved `today_profit` is closed balance minus the UTC day's `start_balance` (`reportDayStart` in `mt5-licenses.ts`, tested), not the EA's figure: broker midnight resets wiped days.
+- JX Bot 4.7% daily drawdown is measured from the day's peak closed balance (`peakDrawdown` in mt5-licenses.ts, tested; stored as `mt5_bot_reports.peak_balance`) on both server and EA: protects profit already closed that day.

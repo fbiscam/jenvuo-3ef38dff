@@ -1,0 +1,2 @@
+ALTER TABLE public.mt5_bot_reports ADD COLUMN IF NOT EXISTS peak_balance numeric;
+UPDATE public.mt5_bot_reports SET peak_balance = GREATEST(COALESCE(start_balance, balance), balance) WHERE peak_balance IS NULL;

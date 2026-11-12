@@ -193,3 +193,26 @@ describe("bot daily profit (UTC day, closed balance)", () => {
     expect(reportDayStart(null, null, 2496.16, -3.84)).toBe(2500);
   });
 });
+
+import { peakDrawdown } from "./mt5-licenses";
+
+describe("daily drawdown from the day's peak closed balance", () => {
+  it("counts the 4.7% from start + closed profit (12 Nov: start 2602.36, closed 2679.06)", () => {
+    const d = peakDrawdown(2602.36, null, 2679.06, 2600);
+    expect(d.peak).toBe(2679.06);
+    expect(d.limit).toBe(125.92);
+    expect(d.floor).toBe(2553.14);
+    expect(d.hit).toBe(false);
+    expect(peakDrawdown(2602.36, null, 2679.06, 2553.14).hit).toBe(true);
+  });
+  it("keeps the day's peak after a later losing close", () => {
+    expect(peakDrawdown(2602.36, 2679.06, 2650, 2560).peak).toBe(2679.06);
+    expect(peakDrawdown(2602.36, 2679.06, 2650, 2550).hit).toBe(true);
+  });
+  it("never measures below the start balance", () => {
+    const d = peakDrawdown(2500, null, 2450, 2382.5);
+    expect(d.peak).toBe(2500);
+    expect(d.hit).toBe(true);
+    expect(peakDrawdown(2500, null, 2450, 2390).hit).toBe(false);
+  });
+});
