@@ -20,3 +20,4 @@
 - Plan display names come from the plan id in `getCreditState` (`credits.functions.ts`), not `plans.name`, and `ensureMt5License` moves existing JX Bot licenses to the current paid plan on every approved plan payment: a stale DB label showed Ultra accounts as Elite and upgraded users kept old-plan licenses.
 - `installDomGuard` (`src/lib/dom-guard.ts`, run in `__root.tsx`) skips removeChild/insertBefore on moved nodes and the homepage loader waits at most 300ms for outside price feeds: ads/translate DOM edits and slow feeds made first opens fail until refresh.
 - Invoice PDFs are built only by `buildInvoicePdf` in `invoice-pdf.ts` (layout of the reference invoice, site font from `public/fonts/invoice/` Latin subsets, vector Jenvu mark): one invoice look for every download.
+- JX Bot saved `today_profit` is closed balance minus the UTC day's `start_balance` (`reportDayStart` in `mt5-licenses.ts`, tested), not the EA's figure: broker midnight resets wiped days.
