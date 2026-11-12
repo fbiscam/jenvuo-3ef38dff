@@ -2606,7 +2606,7 @@ html[data-ops-z] .ops-zoom {
 
 /* Sidebar current page: normal text, never a background highlight. */
 .dashboard-sidebar-link[aria-current="page"],
-.dashboard-sidebar-link[aria-current="page"]:hover { background-color: transparent !important; font-weight: 400 !important; }
+.dashboard-sidebar-link[aria-current="page"]:hover { background-color: transparent !important; font-weight: 500 !important; }
 
 /* Phones only: everything 5% smaller. Uses the root font size (Tailwind sizes are rem)
    instead of zoom, because zoom breaks width math and causes sideways scrolling on phones. */
