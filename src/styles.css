@@ -2602,9 +2602,9 @@ html[data-ops-z] .ops-zoom {
 .ops-nav-item:hover { background-color: var(--ops-card); color: var(--foreground); }
 .ops-nav-item[data-active="true"] { background-color: var(--ops-card); color: var(--foreground); font-weight: 500; }
 
-/* Sidebar current page: bold text only, never a background highlight. */
+/* Sidebar current page: normal text, never a background highlight. */
 .dashboard-sidebar-link[aria-current="page"],
-.dashboard-sidebar-link[aria-current="page"]:hover { background-color: transparent !important; font-weight: 600 !important; }
+.dashboard-sidebar-link[aria-current="page"]:hover { background-color: transparent !important; font-weight: 400 !important; }
 
 /* Phones only: everything 5% smaller. Uses the root font size (Tailwind sizes are rem)
    instead of zoom, because zoom breaks width math and causes sideways scrolling on phones. */
