@@ -2,7 +2,8 @@ import { ConsoleSelect } from "@/components/dashboard/ConsoleSelect";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import { Bot, Calendar, Download, Lock, RefreshCw, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { ProfitBars, StackedBars } from "@/components/dashboard/ConsoleBars";
@@ -57,7 +58,38 @@ function BotUsagePage() {
       setDeleting(null);
     }
   };
-  const { data, isFetching, refetch } = useQuery({ queryKey: ["bot-usage"], queryFn: () => load(), refetchInterval: 15_000, refetchOnWindowFocus: true });
+  // Live: each EA report (about once a minute) pushes an update; the timed refresh is only a fallback and skips hidden tabs.
+  const { data, isFetching, refetch } = useQuery({ queryKey: ["bot-usage"], queryFn: () => load(), refetchInterval: 30_000, refetchIntervalInBackground: false, refetchOnWindowFocus: true });
+  useEffect(() => {
+    let channel: ReturnType<typeof supabase.channel> | null = null;
+    let cancelled = false;
+    let timer: number | undefined;
+    const refresh = () => {
+      window.clearTimeout(timer);
+      timer = window.setTimeout(() => void qc.invalidateQueries({ queryKey: ["bot-usage"] }), 400);
+    };
+    (async () => {
+      const { data: u } = await supabase.auth.getUser();
+      const uid = u.user?.id;
+      if (!uid || cancelled) return;
+      channel = supabase
+        .channel(`bot-usage:${uid}:${Math.random().toString(36).slice(2)}`)
+        .on("postgres_changes", { event: "*", schema: "public", table: "mt5_bot_reports", filter: `user_id=eq.${uid}` }, refresh)
+        .on("postgres_changes", { event: "*", schema: "public", table: "mt5_bot_sessions", filter: `user_id=eq.${uid}` }, refresh)
+        .subscribe();
+    })();
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+      if (channel) supabase.removeChannel(channel);
+    };
+  }, [qc]);
+  // Re-check Running/Offline every 15s even when no new report arrives.
+  const [tick, setTick] = useState(0);
+  useEffect(() => {
+    const id = window.setInterval(() => { if (document.visibilityState !== "hidden") setTick((t) => t + 1); }, 15_000);
+    return () => window.clearInterval(id);
+  }, []);
   const [rangeDays, setRangeDays] = useState(30);
   const [rangeOpen, setRangeOpen] = useState(false);
 
@@ -105,7 +137,8 @@ function BotUsagePage() {
         .filter((r) => r.day === today && Date.now() - Date.parse(r.updated_at) < ONLINE_MS && !(data?.sessions ?? []).find((x) => x.mt5_account === r.mt5_account)?.ended_at)
         .reduce((a, r) => a + r.open_trades, 0),
     };
-  }, [data, account, rangeDays]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- tick re-evaluates Running/Offline against the clock
+  }, [data, account, rangeDays, tick]);
 
   const rangeLabel = (() => {
     const start = new Date(Date.now() - (rangeDays - 1) * 86400000);
