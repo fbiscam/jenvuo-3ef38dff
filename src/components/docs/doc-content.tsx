@@ -312,7 +312,7 @@ export const DOC_GROUPS: DocGroup[] = [
               <li><strong>Is the strategy allowed?</strong> The5ers said JX Bot looks consistent with their EA rules: a visible hard stop loss on every trade, no martingale, no grid, no tick scalping, no arbitrage. EUR/USD and M15 are not restricted. They also ask that you own the EA you run.</li>
               <li><strong>New VPS or RDP, new IP?</strong> Not a rule break by itself when it's your own account. Delete the old IP in Dashboard → JX Bot, add the new one, type it into MyIP and stop the bot on the old VPS. Never use a VPS or VPN to hide your location.</li>
               <li><strong>Phone login?</strong> Yes, you can check trades on the MT5 phone app while the bot runs on the VPS. Use the investor (read-only) password and don't trade manually on that account.</li>
-              <li><strong>News?</strong> The bot has no news calendar, but it opens no new trades during the London open (06:15–09:00 UTC) and New York open (12:15–15:00 UTC), skips spreads above 2 pips and spike candles, and stops at the fixed {DAILY_DRAWDOWN_PCT}% daily drawdown guard.</li>
+              <li><strong>News?</strong> The bot has no news calendar, but it opens no new trades during the London open (06:15–09:00 UTC) or the New York session (no new trades after 12:00 UTC), skips spreads above 2 pips and spike candles, and stops at the fixed {DAILY_DRAWDOWN_PCT}% daily drawdown guard.</li>
             </ul>
             <p>
               Full answers: <a href="https://support.jenvu.com/help/signal-engine/jx-bot-prop-firms">JX Bot on prop firms</a>.
