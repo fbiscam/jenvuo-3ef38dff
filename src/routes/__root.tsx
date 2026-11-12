@@ -248,10 +248,18 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "manifest", href: "/manifest.webmanifest" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-      // One font request instead of eight: only families the site renders.
+      // Site font is self-hosted (styles.css @font-face); preload it so the
+      // first paint already uses it instead of a thin fallback.
+      {
+        rel: "preload",
+        href: "/fonts/gsf/gsf-latin.woff2",
+        as: "font",
+        type: "font/woff2",
+        crossOrigin: "anonymous",
+      },
       {
         rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wght@6..144,300..800&family=JetBrains+Mono:wght@400;500;600&family=DM+Sans:wght@500;600&family=Urbanist:wght@400;500;600;700&display=swap",
+        href: "https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=DM+Sans:wght@500;600&family=Urbanist:wght@400;500;600;700&display=swap",
       },
       {
         rel: "stylesheet",
