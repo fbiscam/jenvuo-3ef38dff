@@ -2605,3 +2605,9 @@ html[data-ops-z] .ops-zoom {
 /* Sidebar current page: bold text only, never a background highlight. */
 .dashboard-sidebar-link[aria-current="page"],
 .dashboard-sidebar-link[aria-current="page"]:hover { background-color: transparent !important; font-weight: 600 !important; }
+
+/* Phones only: everything 5% smaller. Uses the root font size (Tailwind sizes are rem)
+   instead of zoom, because zoom breaks width math and causes sideways scrolling on phones. */
+@media (max-width: 767px) {
+  html { font-size: 95%; }
+}
