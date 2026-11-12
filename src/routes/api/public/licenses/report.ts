@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { DAILY_DRAWDOWN_PCT, DAILY_TARGET_PCT, dailyStopFor, sessionStep, sharedTargetStatus } from "@/lib/mt5-licenses";
+import { DAILY_DRAWDOWN_PCT, DAILY_TARGET_PCT, dailyStopFor, reportDayProfit, reportDayStart, sessionStep, sharedTargetStatus } from "@/lib/mt5-licenses";
 import { checkBotByIp } from "@/lib/mt5-ip-license.server";
 
 // Always HTTP 200: the MT5 bot reads the JSON body only.
@@ -40,6 +40,12 @@ export const Route = createFileRoute("/api/public/licenses/report")({
           if (event === "stop") return ok({ valid: true, recorded: true });
 
           const day = new Date().toISOString().slice(0, 10);
+          // Saved profit = closed balance gain since this UTC day began (broker rollover can't reset it).
+          const { data: cur } = await db.from("mt5_bot_reports").select("start_balance").eq("license_id", lic.id).eq("day", day).maybeSingle();
+          const { data: prev } = cur?.start_balance == null
+            ? await db.from("mt5_bot_reports").select("balance").eq("user_id", lic.user_id).eq("mt5_account", account).lt("day", day).order("day", { ascending: false }).order("updated_at", { ascending: false }).limit(1).maybeSingle()
+            : { data: null };
+          const startBalance = reportDayStart(cur?.start_balance, prev?.balance, num(body?.equity), num(body?.today_profit));
           await db.from("mt5_bot_reports").upsert(
             {
               license_id: lic.id,
@@ -49,7 +55,8 @@ export const Route = createFileRoute("/api/public/licenses/report")({
               symbol: String(body?.symbol ?? "").slice(0, 20),
               balance: num(body?.balance),
               equity: num(body?.equity),
-              today_profit: num(body?.today_profit),
+              today_profit: reportDayProfit(num(body?.balance), startBalance),
+              start_balance: startBalance,
               trades_today: Math.max(0, Math.round(num(body?.trades_today, 100000))),
               open_trades: Math.max(0, Math.round(num(body?.open_trades, 100000))),
               open_lots: Math.max(0, num(body?.open_lots, 100000)),

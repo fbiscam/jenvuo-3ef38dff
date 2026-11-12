@@ -135,6 +135,18 @@ export function dailyStopFor(plan: Mt5PlanId, balance: number, todayProfit: numb
   return { start: round(start), target, drawdown, stop: start > 0 && (p >= target || p <= -drawdown), reason: p >= target ? "target" : p <= -drawdown ? "drawdown" : null };
 }
 
+/**
+ * Stored daily profit is per UTC day from the closed balance: the day starts at the previous day's
+ * closing balance (first ever day: equity − the EA's profit), so a broker midnight reset can't wipe it.
+ */
+export function reportDayStart(existingStart: number | null | undefined, prevBalance: number | null | undefined, equity: number, eaProfit: number) {
+  const ok = (n: unknown): n is number => n !== null && n !== undefined && Number.isFinite(Number(n));
+  if (ok(existingStart)) return Number(existingStart);
+  if (ok(prevBalance)) return Number(prevBalance);
+  return Math.round(((Number(equity) || 0) - (Number(eaProfit) || 0)) * 100) / 100;
+}
+export const reportDayProfit = (balance: number, start: number) => Math.round(((Number(balance) || 0) - start) * 100) / 100;
+
 /** Plan daily target is shared by every account on the plan: stop all bots once their combined profit today reaches it. */
 export function sharedTargetStatus(dailyTarget: number, todayProfits: number[], anyHit = false) {
   const combined = Math.round(todayProfits.reduce((a, b) => a + (Number.isFinite(b) ? b : 0), 0) * 100) / 100;

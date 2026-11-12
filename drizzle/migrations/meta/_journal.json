@@ -288,6 +288,13 @@
       "when": 1794200261797,
       "tag": "0040_fix_plan_names_and_sync_bot_licenses",
       "breakpoints": true
+    },
+    {
+      "idx": 41,
+      "version": "7",
+      "when": 1794461757700,
+      "tag": "0041_bot_report_start_balance",
+      "breakpoints": true
     }
   ]
 }

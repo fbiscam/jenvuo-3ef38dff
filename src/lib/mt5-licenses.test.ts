@@ -1,6 +1,6 @@
 import { describe, it } from "node:test";
 import { expect } from "./chart/test-expect";
-import { countIpLicenses, dailyTarget, evaluateIpLicense, licenseLimit, newLicenseKey, LICENSE_KEY_RE } from "./mt5-licenses";
+import { reportDayProfit, reportDayStart, countIpLicenses, dailyTarget, evaluateIpLicense, licenseLimit, newLicenseKey, LICENSE_KEY_RE } from "./mt5-licenses";
 
 const key = "JENV-ABCD-EFGH-JKLM-NPQR";
 const paid = (plan: string) => ({ plan_id: plan, status: "active", is_trial: false, current_period_end: "2099-01-01T00:00:00Z" });
@@ -175,5 +175,21 @@ describe("fixed % daily target and drawdown", () => {
   });
   it("stops at 4.7% drawdown", () => {
     expect(dailyStopFor("ultra", 2382.5, -117.5).reason).toBe("drawdown");
+  });
+});
+
+describe("bot daily profit (UTC day, closed balance)", () => {
+  it("keeps the day's start balance after the broker's midnight reset", () => {
+    // 11 Nov: day began at 2528.80; after broker rollover the EA reports -26.39 but the saved start stays.
+    const start = reportDayStart(2528.8, 2498.56, 2577.53, -26.39);
+    expect(start).toBe(2528.8);
+    expect(reportDayProfit(2602.36, start)).toBe(73.56);
+  });
+  it("starts a new day at the previous day's closing balance", () => {
+    expect(reportDayStart(null, 2602.36, 2666.45, 62.53)).toBe(2602.36);
+    expect(reportDayProfit(2666.45, 2602.36)).toBe(64.09);
+  });
+  it("first ever day starts at equity minus the EA's profit", () => {
+    expect(reportDayStart(null, null, 2496.16, -3.84)).toBe(2500);
   });
 });
