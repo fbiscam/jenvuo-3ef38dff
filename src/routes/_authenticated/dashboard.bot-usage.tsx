@@ -58,24 +58,57 @@ function BotUsagePage() {
       setDeleting(null);
     }
   };
-  // Live: each EA report (about once a minute) pushes an update; the timed refresh is only a fallback and skips hidden tabs.
-  const { data, isFetching, refetch } = useQuery({ queryKey: ["bot-usage"], queryFn: () => load(), refetchInterval: 30_000, refetchIntervalInBackground: false, refetchOnWindowFocus: true });
+  // Live: each EA report is pushed straight onto the screen from the realtime event (no server round-trip);
+  // a quiet background reload then confirms it, and the timed refresh is only a fallback that skips hidden tabs.
+  const { data, isFetching, refetch } = useQuery({ queryKey: ["bot-usage"], queryFn: () => load(), refetchInterval: 20_000, refetchIntervalInBackground: false, refetchOnWindowFocus: true });
   useEffect(() => {
     let channel: ReturnType<typeof supabase.channel> | null = null;
     let cancelled = false;
     let timer: number | undefined;
-    const refresh = () => {
+    type Usage = Awaited<ReturnType<typeof load>>;
+    const confirm = () => {
       window.clearTimeout(timer);
-      timer = window.setTimeout(() => void qc.invalidateQueries({ queryKey: ["bot-usage"] }), 400);
+      timer = window.setTimeout(() => void qc.invalidateQueries({ queryKey: ["bot-usage"] }), 2_000);
+    };
+    const onReport = (p: { eventType: string; new: Record<string, unknown> }) => {
+      const n = p.new as Record<string, any>;
+      if (p.eventType !== "DELETE" && n?.license_id && n?.day) {
+        const row: BotReportRow = {
+          license_id: n.license_id, day: n.day, mt5_account: n.mt5_account, symbol: n.symbol,
+          balance: Number(n.balance), equity: Number(n.equity), today_profit: Number(n.today_profit),
+          trades_today: Number(n.trades_today ?? 0), open_trades: Number(n.open_trades ?? 0), open_lots: Number(n.open_lots ?? 0),
+          target_hit: !!n.target_hit, updated_at: n.updated_at,
+        };
+        qc.setQueryData<Usage>(["bot-usage"], (old) => {
+          if (!old) return old;
+          const i = old.rows.findIndex((r) => r.license_id === row.license_id && r.day === row.day);
+          const rows = i >= 0 ? old.rows.map((r, j) => (j === i ? row : r)) : [...old.rows, row].sort((a, b) => a.day.localeCompare(b.day));
+          return { ...old, rows };
+        });
+      }
+      confirm();
+    };
+    const onSession = (p: { eventType: string; new: Record<string, unknown> }) => {
+      const n = p.new as Record<string, any>;
+      if (p.eventType !== "DELETE" && n?.id) {
+        const ses: BotSessionRow = { id: n.id, mt5_account: n.mt5_account, started_at: n.started_at, last_seen_at: n.last_seen_at, ended_at: n.ended_at ?? null, end_reason: n.end_reason ?? null };
+        qc.setQueryData<Usage>(["bot-usage"], (old) => {
+          if (!old) return old;
+          const has = old.sessions.some((s) => s.id === ses.id);
+          const sessions = has ? old.sessions.map((s) => (s.id === ses.id ? ses : s)) : [ses, ...old.sessions];
+          return { ...old, sessions };
+        });
+      }
+      confirm();
     };
     (async () => {
-      const { data: u } = await supabase.auth.getUser();
-      const uid = u.user?.id;
+      const { data: s } = await supabase.auth.getSession();
+      const uid = s.session?.user?.id;
       if (!uid || cancelled) return;
       channel = supabase
         .channel(`bot-usage:${uid}:${Math.random().toString(36).slice(2)}`)
-        .on("postgres_changes", { event: "*", schema: "public", table: "mt5_bot_reports", filter: `user_id=eq.${uid}` }, refresh)
-        .on("postgres_changes", { event: "*", schema: "public", table: "mt5_bot_sessions", filter: `user_id=eq.${uid}` }, refresh)
+        .on("postgres_changes", { event: "*", schema: "public", table: "mt5_bot_reports", filter: `user_id=eq.${uid}` }, onReport as never)
+        .on("postgres_changes", { event: "*", schema: "public", table: "mt5_bot_sessions", filter: `user_id=eq.${uid}` }, onSession as never)
         .subscribe();
     })();
     return () => {
@@ -84,10 +117,10 @@ function BotUsagePage() {
       if (channel) supabase.removeChannel(channel);
     };
   }, [qc]);
-  // Re-check Running/Offline every 15s even when no new report arrives.
+  // Re-check Running/Offline every 5s even when no new report arrives.
   const [tick, setTick] = useState(0);
   useEffect(() => {
-    const id = window.setInterval(() => { if (document.visibilityState !== "hidden") setTick((t) => t + 1); }, 15_000);
+    const id = window.setInterval(() => { if (document.visibilityState !== "hidden") setTick((t) => t + 1); }, 5_000);
     return () => window.clearInterval(id);
   }, []);
   const [rangeDays, setRangeDays] = useState(30);
