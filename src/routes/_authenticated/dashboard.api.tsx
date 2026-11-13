@@ -17,6 +17,7 @@ import {
   type ExtensionKeyAccess,
 } from "@/lib/extension-keys.functions";
 import { getPlanCapabilities } from "@/lib/plan-entitlements";
+import { readPageCache, writePageCache } from "@/lib/page-cache";
 
 const MONO = "font-sans";
 const API_BASE = "https://jenvu.com/api/public/v1";
@@ -70,12 +71,12 @@ function ExtensionPage() {
   }, []);
 
   const refresh = async () => {
-    setLoading(true);
     try {
       const res = await load();
       if (res.ok) {
         setKeys(res.keys);
         setAccess(res.access);
+        void writePageCache("api-keys", { keys: res.keys, access: res.access });
       } else toast.error(res.error || "Could not load your keys");
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Could not load your keys");
@@ -85,7 +86,21 @@ function ExtensionPage() {
   };
 
   useEffect(() => {
-    void refresh(); /* eslint-disable-next-line react-hooks/exhaustive-deps */
+    let alive = true;
+    // Show the last known list instantly, then refresh it in the background.
+    void readPageCache<{ keys: ExtensionKeyRow[]; access: ExtensionKeyAccess }>("api-keys").then(
+      (cached) => {
+        if (!alive || !cached) return;
+        setKeys((cur) => (cur.length ? cur : cached.keys));
+        setAccess((cur) => cur ?? cached.access);
+        setLoading(false);
+      },
+    );
+    void refresh();
+    return () => {
+      alive = false;
+    };
+    /* eslint-disable-next-line react-hooks/exhaustive-deps */
   }, []);
 
   const onCreate = async () => {
