@@ -459,11 +459,20 @@ function ProductsHighlights({ c }: { c: IndustryContent }) {
     <section className="bg-background">
       <div className="mx-auto max-w-[1340px] px-5 py-16 sm:py-20">
         <SectionHead title={c.highlightsTitle ?? ""} intro={c.highlightsIntro} />
-        <div className="mt-12 grid gap-6 text-left sm:grid-cols-2 lg:grid-cols-4">
+        <div
+          className={
+            c.highlights.length === 3
+              ? "mx-auto mt-12 grid max-w-5xl gap-6 text-center sm:grid-cols-2 lg:grid-cols-3"
+              : "mt-12 grid gap-6 text-left sm:grid-cols-2 lg:grid-cols-4"
+          }
+        >
           {c.highlights.map((h, n) => {
             const Icon = HIGHLIGHT_ICONS[n % HIGHLIGHT_ICONS.length];
             return (
-              <div key={h.title} className="flex flex-col rounded-md border border-gc-line p-7">
+              <div
+                key={h.title}
+                className={`flex flex-col rounded-md border border-gc-line p-7 ${c.highlights!.length === 3 ? "items-center" : ""}`}
+              >
                 <span
                   className="flex h-14 w-14 items-center justify-center rounded-2xl"
                   style={{ backgroundImage: AURORAS[n % AURORAS.length] }}
