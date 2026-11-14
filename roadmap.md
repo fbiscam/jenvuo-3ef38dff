@@ -37,6 +37,7 @@
 - [ ] Receive replies at support@/sales@jenvu.com (waiting on owner: turn on Cloudflare Email Routing for jenvu.com)
 - [x] Pricing: all plan buttons on one line (Founding aligned with the others)
 - [x] Sign-out works everywhere (homepage must not sign you back in); sign-in shows everywhere
+- [x] News Impact: simple green UP / red DOWN cards with confidence for the next news
 - [x] Blog list + article pages in the reference-image style
 - [x] Dark theme: homepage developer code card readable
 - [x] Email box page opens (no Page not found) + test email
