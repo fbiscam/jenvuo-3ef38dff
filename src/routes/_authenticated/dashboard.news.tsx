@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
-import { Activity, CalendarClock, FlaskConical, Newspaper, RefreshCw, Radar } from "lucide-react";
+import { Activity, ArrowDown, ArrowUp, CalendarClock, Minus, FlaskConical, Newspaper, RefreshCw, Radar } from "lucide-react";
 import { Bar, BarChart, Cell, ReferenceLine, ResponsiveContainer, Tooltip as RTooltip, XAxis, YAxis } from "recharts";
 import { getNewsImpact, type UpcomingRelease } from "@/lib/news-impact.functions";
 import {
@@ -11,14 +11,15 @@ import {
   eventDef,
   lastReleases,
   moveStats,
+  outlookFrom,
   sameDirectionPct,
   sameReadReactions,
-  signalFrom,
   surpriseOf,
   usdRead,
   whatIf,
   type FiveMinReaction,
   type NewsEventKey,
+  type Outlook,
   type Signal,
 } from "@/lib/news-impact";
 import { readPageCache, writePageCache } from "@/lib/page-cache";
@@ -248,18 +249,34 @@ function Kpi({ label, value, sub, toneValue }: { label: string; value: string; s
   );
 }
 
-function Scenario({ title, rows }: { title: string; rows: FiveMinReaction[] }) {
-  const s = moveStats(rows, "t15");
+function OutlookCard({ title, outlook, big }: { title: string; outlook: Outlook; big?: boolean }) {
+  const { dir, confidence, avgMove, n } = outlook;
+  const color = dir === "up" ? UP : dir === "down" ? DOWN : undefined;
+  const Icon = dir === "up" ? ArrowUp : dir === "down" ? ArrowDown : Minus;
+  const word = dir === "up" ? "UP" : dir === "down" ? "DOWN" : dir === "mixed" ? "MIXED" : "NO DATA";
   return (
-    <div className="rounded-2xl border border-border/60 p-4">
-      <div className="text-[12px] text-muted-foreground">{title}</div>
-      <div className="mt-2"><SignalBadge signal={signalFrom(s)} /></div>
-      <dl className="mt-3 grid grid-cols-2 gap-y-2 text-[13px] tabular-nums">
-        <dt className="text-muted-foreground">Gold up / down</dt><dd className="text-right">{s.upPct}% / {s.downPct}%</dd>
-        <dt className="text-muted-foreground">Avg T+15m</dt><dd className={`text-right ${tone(s.avgT15)}`}>{usd(s.avgT15)}</dd>
-        <dt className="text-muted-foreground">Avg 60m range</dt><dd className="text-right">${s.avgRange.toFixed(2)}</dd>
-        <dt className="text-muted-foreground">Samples</dt><dd className="text-right">{s.n}</dd>
-      </dl>
+    <div
+      className="rounded-2xl border p-5"
+      style={color ? { borderColor: `${color}66`, background: `${color}12` } : undefined}
+    >
+      <div className="text-[13px] text-muted-foreground">{title}</div>
+      <div className="mt-3 flex items-center gap-3" style={color ? { color } : undefined}>
+        <span
+          className={`inline-flex shrink-0 items-center justify-center rounded-full ${big ? "h-16 w-16" : "h-14 w-14"}`}
+          style={color ? { background: `${color}22` } : undefined}
+        >
+          <Icon className={big ? "h-9 w-9" : "h-8 w-8"} strokeWidth={2.5} />
+        </span>
+        <div>
+          <div className={`font-semibold leading-none tracking-tight ${big ? "text-[40px]" : "text-[34px]"}`}>{word}</div>
+          {dir !== "none" && <div className="mt-1.5 text-[15px] font-medium tabular-nums">{confidence}% confidence</div>}
+        </div>
+      </div>
+      <div className="mt-4 text-[13px] text-muted-foreground tabular-nums">
+        {dir === "none"
+          ? `Only ${n} past result${n === 1 ? "" : "s"} like this, not enough to read.`
+          : `Avg Gold move ${usd(avgMove)} in 15 min · ${n} past releases`}
+      </div>
     </div>
   );
 }
@@ -302,21 +319,22 @@ function Hero({ next, releases, now, loading }: { next: UpcomingRelease | null; 
         <span><span className="text-muted-foreground">Typical 60m range </span>${allStats.avgRange.toFixed(2)}</span>
       </div>
       {released && s != null ? (
-        <div className="mt-5 rounded-2xl border border-border/60 p-4">
-          <div className="flex flex-wrap items-center gap-3">
-            <span className="text-[13px]">Surprise <b className={tone(s * def.usdDir)}>{s > 0 ? "+" : ""}{s}{next.scale ?? ""}{next.unit ?? ""}</b> → {usdRead(next.event_key, s) === 0 ? "in line" : (usdRead(next.event_key, s) ?? 0) > 0 ? "USD positive" : "USD negative"}</span>
-            <SignalBadge signal={signalFrom(liveStats)} />
-          </div>
-          <div className="mt-2 text-[13px] text-muted-foreground">
-            After {liveStats.n} similar surprises Gold rose {liveStats.upPct}% and fell {liveStats.downPct}% of the time at T+15m (avg {usd(liveStats.avgT15)}).
-          </div>
+        <div className="mt-5">
+          <OutlookCard
+            big
+            title={`Released: ${fmtVal(next.actual, next.unit, next.scale)} vs forecast ${fmtVal(next.forecast, next.unit, next.scale)} (${usdRead(next.event_key, s) === 0 ? "in line" : (usdRead(next.event_key, s) ?? 0) > 0 ? "beat, USD stronger" : "miss, USD weaker"})`}
+            outlook={outlookFrom(liveStats)}
+          />
         </div>
       ) : (
         <div className="mt-5 grid grid-cols-1 gap-2 sm:grid-cols-2">
-          <Scenario title="If Actual beats Forecast (USD +)" rows={sameReadReactions(history, next.event_key, def.usdDir)} />
-          <Scenario title="If Actual misses Forecast (USD −)" rows={sameReadReactions(history, next.event_key, -def.usdDir)} />
+          <OutlookCard title="If the number beats forecast (USD stronger)" outlook={outlookFrom(moveStats(sameReadReactions(history, next.event_key, def.usdDir), "t15"))} />
+          <OutlookCard title="If the number misses forecast (USD weaker)" outlook={outlookFrom(moveStats(sameReadReactions(history, next.event_key, -def.usdDir), "t15"))} />
         </div>
       )}
+      <p className="mt-3 text-[12px] text-muted-foreground">
+        Confidence = how often Gold went that way 15 minutes after the same kind of result in the last {RELEASES_PER_EVENT} releases. History, not a promise.
+      </p>
     </section>
   );
 }

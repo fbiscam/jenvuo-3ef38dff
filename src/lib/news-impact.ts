@@ -190,3 +190,13 @@ export function parseNum(v: unknown): number | null {
   const m = v.replace(/,/g, "").match(/-?\d+(\.\d+)?/);
   return m ? Number(m[0]) : null;
 }
+
+export type Outlook = { dir: "up" | "down" | "mixed" | "none"; confidence: number; avgMove: number; n: number };
+
+/** Simple card read: the side Gold took more often at T+15m, its share as confidence; a tie is mixed, too few samples none. */
+export function outlookFrom(stats: Pick<MoveStats, "n" | "upPct" | "downPct" | "avgT15">): Outlook {
+  const { n, upPct, downPct, avgT15 } = stats;
+  if (n < MIN_SAMPLES) return { dir: "none", confidence: 0, avgMove: avgT15, n };
+  if (upPct === downPct) return { dir: "mixed", confidence: upPct, avgMove: avgT15, n };
+  return upPct > downPct ? { dir: "up", confidence: upPct, avgMove: avgT15, n } : { dir: "down", confidence: downPct, avgMove: avgT15, n };
+}

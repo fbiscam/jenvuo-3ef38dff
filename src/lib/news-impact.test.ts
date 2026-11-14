@@ -1,6 +1,6 @@
 import { describe, it } from "node:test";
 import { expect } from "./chart/test-expect";
-import { fiveMinReaction, hourReaction, lastReleases, moveStats, signalFrom, surpriseOf, usdRead, whatIf, type Release } from "./news-impact";
+import { fiveMinReaction, hourReaction, lastReleases, moveStats, outlookFrom, signalFrom, surpriseOf, usdRead, whatIf, type Release } from "./news-impact";
 
 const T = Date.UTC(2026, 10, 6, 13, 30);
 const five = (moves: number[]) => moves.map((c, i) => ({ t: T + i * 300_000, o: i === 0 ? 100 : 100 + moves[i - 1], h: 100 + c + 1, l: 100 + c - 1, c: 100 + c }));
@@ -51,5 +51,12 @@ describe("news impact", () => {
     const list = Array.from({ length: 30 }, (_, i) => rel(String(i + 1), 1, 1, 0));
     expect(lastReleases(list, "nfp", T)).toHaveLength(24);
     expect(moveStats([]).n).toBe(0);
+  });
+  it("outlook card: side Gold took more often, its share as confidence", () => {
+    expect(outlookFrom({ n: 12, upPct: 83, downPct: 17, avgT15: 14.2 })).toEqual({ dir: "up", confidence: 83, avgMove: 14.2, n: 12 });
+    expect(outlookFrom({ n: 9, upPct: 22, downPct: 78, avgT15: -12.5 }).dir).toBe("down");
+    expect(outlookFrom({ n: 9, upPct: 22, downPct: 78, avgT15: -12.5 }).confidence).toBe(78);
+    expect(outlookFrom({ n: 8, upPct: 50, downPct: 50, avgT15: 0.3 }).dir).toBe("mixed");
+    expect(outlookFrom({ n: 4, upPct: 100, downPct: 0, avgT15: 9 }).dir).toBe("none");
   });
 });
