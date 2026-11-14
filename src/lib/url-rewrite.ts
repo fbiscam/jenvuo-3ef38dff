@@ -42,6 +42,7 @@ const DASHBOARD_CHILDREN = new Set([
   "extension",
   "models",
   "chat",
+  "news",
 ]);
 
 /** Internal dashboard path -> clean dash.jenvu.com path. */

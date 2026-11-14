@@ -103,6 +103,7 @@ import {
   BrainCircuit,
   Cpu,
   Terminal,
+  Newspaper,
   type LucideIcon,
 } from "lucide-react";
 import {
@@ -184,6 +185,7 @@ const NAV_GROUPS: Array<{ label: string; items: TabItem[] }> = [
         countKey: "saved",
       },
       { to: "/dashboard/terminal", label: "Terminal", icon: Terminal },
+      { to: "/dashboard/news", label: "News Impact", icon: Newspaper },
     ],
   },
   {

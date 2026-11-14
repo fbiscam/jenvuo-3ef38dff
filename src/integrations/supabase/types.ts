@@ -2255,6 +2255,51 @@ export type Database = {
         }
         Relationships: []
       }
+      news_releases: {
+        Row: {
+          actual: number | null
+          computed_at: string | null
+          event_key: string
+          forecast: number | null
+          id: string
+          previous: number | null
+          reactions: Json | null
+          released_at: string
+          scale: string | null
+          title: string
+          unit: string | null
+          updated_at: string
+        }
+        Insert: {
+          actual?: number | null
+          computed_at?: string | null
+          event_key: string
+          forecast?: number | null
+          id: string
+          previous?: number | null
+          reactions?: Json | null
+          released_at: string
+          scale?: string | null
+          title: string
+          unit?: string | null
+          updated_at?: string
+        }
+        Update: {
+          actual?: number | null
+          computed_at?: string | null
+          event_key?: string
+          forecast?: number | null
+          id?: string
+          previous?: number | null
+          reactions?: Json | null
+          released_at?: string
+          scale?: string | null
+          title?: string
+          unit?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       newsletter_subscribers: {
         Row: {
           created_at: string
