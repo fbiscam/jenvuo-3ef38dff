@@ -868,10 +868,10 @@ function DashboardLayout() {
           const { data: signed } = await supabase.storage
             .from("avatars")
             .createSignedUrl(path, AVATAR_TTL_SECONDS);
-          if (!cancelled && signed?.signedUrl) {
-            setAvatarUrl(signed.signedUrl);
-            writeCachedAvatar(signed.signedUrl);
-          }
+          if (cancelled) return;
+          // Missing file: drop the dead cached link so the default avatar shows.
+          setAvatarUrl(signed?.signedUrl ?? null);
+          writeCachedAvatar(signed?.signedUrl ?? null);
         });
 
       const days = RANGE_DAYS[range];
@@ -953,10 +953,8 @@ function DashboardLayout() {
             const { data: signed } = await supabase.storage
               .from("avatars")
               .createSignedUrl(path, AVATAR_TTL_SECONDS);
-            if (signed?.signedUrl) {
-              setAvatarUrl(signed.signedUrl);
-              writeCachedAvatar(signed.signedUrl);
-            }
+            setAvatarUrl(signed?.signedUrl ?? null);
+            writeCachedAvatar(signed?.signedUrl ?? null);
           }
         },
       )

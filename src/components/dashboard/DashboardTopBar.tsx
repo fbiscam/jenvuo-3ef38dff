@@ -13,6 +13,8 @@ import {
 } from "lucide-react";
 import NotificationBell from "@/components/NotificationBell";
 import JenvuMark from "@/components/JenvuMark";
+import { getDefaultAvatar } from "@/lib/default-avatar";
+import { clearCachedAvatar } from "@/lib/avatar-cache";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -48,6 +50,15 @@ export default function DashboardTopBar({
   pinned?: boolean;
 }) {
   const navigate = useNavigate();
+  // If the photo link is dead (missing file / expired), show the default avatar instead of a broken image.
+  const fallbackAvatar = getDefaultAvatar(email);
+  const [brokenAvatar, setBrokenAvatar] = useState<string | null>(null);
+  const shownAvatar = avatarUrl && brokenAvatar !== avatarUrl ? avatarUrl : fallbackAvatar;
+  const onAvatarError = () => {
+    if (shownAvatar === fallbackAvatar) return;
+    setBrokenAvatar(avatarUrl);
+    clearCachedAvatar(); // never reuse a dead link on the next page load
+  };
   const [q, setQ] = useState("");
   const [focused, setFocused] = useState(false);
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -327,12 +338,12 @@ export default function DashboardTopBar({
               aria-label="Account menu"
               className="ml-1 inline-flex h-9 w-9 items-center justify-center overflow-hidden rounded-full ring-1 ring-gc-line hover:ring-2 hover:ring-gc-blue-soft"
             >
-              <img src={avatarUrl} alt="" className="h-full w-full object-cover" />
+              <img src={shownAvatar} onError={onAvatarError} alt="" className="h-full w-full object-cover" />
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-64 rounded-2xl bg-background py-2 pl-0 pr-2">
             <DropdownMenuLabel className="flex items-center gap-3 px-3 py-3 font-normal">
-              <img src={avatarUrl} alt="" className="h-10 w-10 rounded-full object-cover" />
+              <img src={shownAvatar} onError={onAvatarError} alt="" className="h-10 w-10 rounded-full object-cover" />
               <div className="min-w-0">
                 <div className="truncate text-[14px] font-medium text-gc-ink">{name || "Your account"}</div>
                 <div className="truncate text-[12px] text-gc-ink-muted">{email}</div>
