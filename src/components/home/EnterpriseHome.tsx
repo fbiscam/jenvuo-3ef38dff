@@ -3,7 +3,6 @@ import { Link } from "@tanstack/react-router";
 import { ArrowRight, ArrowUp, ArrowUpRight, Bell, Bot, ChevronRight, Code2, MessageCircle, Plus, Sparkles } from "lucide-react";
 import { openAskJenvu } from "@/components/AskJenvuWidget";
 import { RevealWords } from "@/components/RevealWords";
-import { DAILY_DRAWDOWN_PCT } from "@/lib/mt5-licenses";
 import showController from "@/assets/home/show-imagine-controller.webp";
 import showCoast from "@/assets/home/show-imagine-coast.webp";
 import showMerch from "@/assets/home/show-imagine-merch.webp";
@@ -60,7 +59,7 @@ const h2 = "text-[34px] font-medium leading-[1.1] tracking-tight text-foreground
 const sub = "mx-auto mt-5 max-w-2xl text-[18px] sm:text-[19px] leading-relaxed text-muted-foreground";
 
 /* Rotating last word of the hero heading; a colourful line sweeps under it and the word changes as it passes. */
-const ROTATING = ["execute.", "follow rules.", "stay disciplined.", "automate."];
+const ROTATING = ["trade.", "analyze.", "backtest.", "execute.", "automate."];
 function RotatingWord() {
   const [i, setI] = React.useState(0);
   const [still, setStill] = React.useState(false);
@@ -82,62 +81,30 @@ function RotatingWord() {
 /* 1 — Hero (xAI style): badge, headline, two pills */
 export function EntHero() {
   return (
-    <section className="bg-[image:var(--ent-hero-wash)] px-5 pb-16 pt-24 text-center sm:pb-20 sm:pt-28">
-      <Link to="/jx-bot" className="inline-flex items-center gap-2 rounded-full border border-foreground/[0.07] bg-background py-1.5 pl-1.5 pr-2 text-[13px] transition hover:bg-muted/40">
-        <span className="rounded-full bg-ent-orange/10 px-2 py-0.5 text-[11px] font-medium text-ent-orange">Flagship</span>
-        <span className="font-medium text-foreground">JX Bot</span>
-        <span className="text-muted-foreground">for MetaTrader 5</span>
+    <section className="bg-[image:var(--ent-hero-wash)] px-5 pb-20 pt-24 text-center sm:pb-24 sm:pt-28">
+      <Link to="/models" className="inline-flex items-center gap-2 rounded-full border border-foreground/[0.07] bg-background py-1.5 pl-1.5 pr-2 text-[13px] transition hover:bg-muted/40">
+        <span className="rounded-full bg-ent-orange/10 px-2 py-0.5 text-[11px] font-medium text-ent-orange">New</span>
+        <span className="font-medium text-foreground">Meet Jenvu AI</span>
+        <span className="text-muted-foreground">Our new models</span>
         <span className="flex h-5 w-5 items-center justify-center rounded-full bg-muted"><ArrowUpRight className="h-3 w-3" /></span>
       </Link>
       <h1 className="mx-auto mt-8 max-w-4xl text-[42px] font-medium leading-[1.08] tracking-tight text-foreground sm:text-[68px]">
         <RevealWords>
-          Automated trading
+          Frontier AI models
           <br />
-          built to <RotatingWord />
+          for everything you <RotatingWord />
         </RevealWords>
       </h1>
-      <p className="mx-auto mt-6 max-w-2xl text-balance px-2 text-[18px] text-foreground/80 sm:text-[19px] lg:text-[21px]">
-        JX Bot trades on MetaTrader 5 with fixed session hours and a daily drawdown stop, backed by the Jenvu Terminal and AI.
+      <p className="mx-auto mt-6 max-w-2xl text-balance px-2 text-[18px] text-foreground/80 sm:text-[19px] lg:max-w-none lg:whitespace-nowrap lg:px-0 lg:text-[21px]">
+        Reasoning, code, signals, execution, and risk. Tuned for precision market intelligence.
       </p>
       <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
-        <Link to="/jx-bot" className="inline-flex items-center gap-1.5 rounded-full bg-foreground px-6 py-3 text-[15px] font-medium text-background transition hover:opacity-85">
-          Explore JX Bot <ChevronRight className="h-4 w-4" />
+        <Link to="/platform" className="inline-flex items-center gap-1.5 rounded-full bg-foreground px-6 py-3 text-[15px] font-medium text-background transition hover:opacity-85">
+          Get API Access <ChevronRight className="h-4 w-4" />
         </Link>
-        <Link to="/pricing" className="inline-flex items-center rounded-full bg-gc-pill px-6 py-3 text-[15px] font-medium text-foreground transition hover:brightness-95">
-          See plans
+        <Link to="/docs" className="inline-flex items-center rounded-full bg-gc-pill px-6 py-3 text-[15px] font-medium text-foreground transition hover:brightness-95">
+          View Documentation
         </Link>
-      </div>
-    </section>
-  );
-}
-
-/* 1b — JX Bot flagship pillars; Terminal and API sit underneath as the companion suite. */
-const JX_PILLARS = [
-  { t: "EUR/USD on M15", d: "One pair, one timeframe, the same rules on every candle." },
-  { t: "Session hours", d: "Trades Asia and London only. No new trades at the London open or in the New York session." },
-  { t: `${DAILY_DRAWDOWN_PCT}% daily stop`, d: "Counted from the day's highest closed balance, so profit closed today counts too." },
-  { t: "IP licensing", d: "Runs only on the MT5 machine whose IP you register in your dashboard." },
-];
-export function EntJxBotPillars() {
-  return (
-    <section className="px-5 pb-20">
-      <div className="mx-auto max-w-7xl">
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          {JX_PILLARS.map((p) => (
-            <div key={p.t} className="rounded-[18px] bg-ent-ivory p-6 text-left">
-              <Bot className="h-5 w-5 text-foreground/70" />
-              <h3 className="mt-4 text-[18px] font-medium tracking-tight text-foreground">{p.t}</h3>
-              <p className="mt-2 text-[14px] leading-relaxed text-muted-foreground">{p.d}</p>
-            </div>
-          ))}
-        </div>
-        <p className="mt-6 text-center text-[14px] text-muted-foreground">
-          Backed by the{" "}
-          <Link to="/dashboard/terminal" className="font-medium text-foreground underline underline-offset-2">Jenvu Terminal</Link>
-          {" "}for live charts and the{" "}
-          <Link to="/platform" className="font-medium text-foreground underline underline-offset-2">Jenvu API</Link>
-          {" "}for developers. Trading carries risk; past results don't guarantee future returns.
-        </p>
       </div>
     </section>
   );

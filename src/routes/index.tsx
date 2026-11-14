@@ -24,7 +24,7 @@ import {
   CloudHero,
 
 } from "@/components/home/CloudHome";
-import { EntHero, EntJxBotPillars, EntShowcase, EntStories } from "@/components/home/EnterpriseHome";
+import { EntHero, EntShowcase, EntStories } from "@/components/home/EnterpriseHome";
 import { DevApiSection } from "@/components/home/DevApiSection";
 import { homeArticlesQueryOptions, type HomeArticle } from "@/lib/home-articles";
 import { GetStartedSection } from "@/components/platform/GetStartedSection";
@@ -123,16 +123,16 @@ import xaiLogo from "@/assets/xai-logo.png";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Jenvu: JX Bot for MT5 | Live Terminal & AI API" },
+      { title: "Jenvu: AI Trading Platform | API, JX Bot & Live Terminal" },
       {
         name: "description",
         content:
-          "Run JX Bot, Jenvu's automated MetaTrader 5 bot with session hours and a daily drawdown stop, backed by the live Terminal, AI chat and developer API.",
+          "One platform. Endless market intelligence. Ask the AI, read live charts in the Terminal, run JX Bot and connect the developer API, all in one workspace.",
       },
-      { property: "og:title", content: "Jenvu: JX Bot for MT5 | Live Terminal & AI API" },
+      { property: "og:title", content: "Jenvu: AI Trading Platform | API, JX Bot & Live Terminal" },
       {
         property: "og:description",
-        content: "Jenvu's automated MetaTrader 5 bot, backed by the live Terminal, AI chat and developer API.",
+        content: "Ask the AI, read live charts in the Terminal, run JX Bot and connect the developer API, all in one workspace.",
       },
       { property: "og:url", content: "https://jenvu.com/" },
       { property: "og:type", content: "website" },
@@ -404,7 +404,6 @@ function HomePage() {
       <div className="jenvu-home-content">
         <main>
           <EntHero />
-          <EntJxBotPillars />
           <EntShowcase />
           <DevApiSection />
           <AgentSmarterSection />
