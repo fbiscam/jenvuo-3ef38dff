@@ -19,3 +19,15 @@ describe("checkTurnstile", () => {
     expect(await checkTurnstile({ secret: undefined, token: null })).toEqual({ ok: true });
   });
 });
+
+import { isPreviewHost } from "./turnstile";
+describe("isPreviewHost", () => {
+  it("skips the check on the Lovable preview", () => {
+    expect(isPreviewHost("id-preview--06cd4260-299b-4286-8096-c43f2f596dee.lovable.app")).toEqual(true);
+  });
+  it("keeps the check on live domains", () => {
+    expect(isPreviewHost("auth.jenvu.com")).toEqual(false);
+    expect(isPreviewHost("jenvuo.lovable.app")).toEqual(false);
+    expect(isPreviewHost("project--06cd4260-299b-4286-8096-c43f2f596dee.lovable.app")).toEqual(false);
+  });
+});

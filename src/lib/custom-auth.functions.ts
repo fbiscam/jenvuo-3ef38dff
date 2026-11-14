@@ -17,7 +17,14 @@ const siteUrlSchema = z
 
 const turnstileTokenSchema = z.string().trim().max(2048).optional().nullable()
 
+async function onPreviewHost() {
+  const { isPreviewHost } = await import('./turnstile')
+  const { getRequest } = await import('@tanstack/react-start/server')
+  try { return isPreviewHost(new URL(getRequest().url).hostname) } catch { return false }
+}
+
 async function passTurnstile(token: string | null | undefined) {
+  if (await onPreviewHost()) return { ok: true as const }
   const { checkTurnstile } = await import('./turnstile')
   const { readClientIp } = await import('./request-meta.server')
   return checkTurnstile({ secret: process.env.TURNSTILE_SECRET_KEY, token, ip: readClientIp() })
@@ -25,6 +32,7 @@ async function passTurnstile(token: string | null | undefined) {
 
 /** Public Cloudflare site key for the sign-in/sign-up check (null = check off). */
 export const getTurnstileSiteKey = createServerFn({ method: 'GET' }).handler(async () => {
+  if (await onPreviewHost()) return { siteKey: null }
   const key = process.env.TURNSTILE_SITE_KEY?.trim()
   return { siteKey: key && process.env.TURNSTILE_SECRET_KEY?.trim() ? key : null }
 })

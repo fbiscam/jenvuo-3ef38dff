@@ -34,3 +34,22 @@ export async function checkTurnstile(opts: {
     return { ok: false, error: TURNSTILE_FAILED };
   }
 }
+
+const PREVIEW_SUFFIX = /\.(lovable\.app|gpt-eng\.com|gptengineer\.run)$/;
+
+/**
+ * Lovable preview hosts (and localhost) skip Turnstile: the site key only allows
+ * the live jenvu.com domains, so the widget shows "Unable to connect" there.
+ * Published hosts (jenvu.com, project--<id>.lovable.app, slugs) stay checked.
+ */
+export function isPreviewHost(hostname: string): boolean {
+  const host = hostname.trim().toLowerCase();
+  if (host === "localhost" || host === "127.0.0.1") return true;
+  if (/\.(lovableproject|lovableproject-dev)\.com$/.test(host)) return true;
+  if (!PREVIEW_SUFFIX.test(host)) return false;
+  const first = host.split(".")[0];
+  if (/^(?:id-preview|preview)(?:-[a-z0-9]+)?--.+$/.test(first)) return true;
+  if (/^project--[0-9a-f-]{36}-dev$/.test(first)) return true;
+  const labels = host.split(".");
+  return /^live--[0-9a-f-]{36}(?:-thr_[a-z0-9]+)?$/.test(first) && labels.length === 4;
+}
