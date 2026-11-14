@@ -99,7 +99,6 @@ import {
   BadgeDollarSign,
   FileCheck2,
   LockKeyhole,
-  CircleHelp,
   BrainCircuit,
   Cpu,
   Terminal,
@@ -190,7 +189,10 @@ const NAV_GROUPS: Array<{ label: string; items: TabItem[] }> = [
   },
   {
     label: "",
-    items: [{ to: "/dashboard/usage", label: "Usage", icon: ChartNoAxesCombined }],
+    items: [
+      { to: "/dashboard/jx-bot", label: "JX Bot", icon: Cpu },
+      { to: "/dashboard/usage", label: "Usage", icon: ChartNoAxesCombined },
+    ],
   },
   {
     label: "API",
@@ -199,7 +201,6 @@ const NAV_GROUPS: Array<{ label: string; items: TabItem[] }> = [
       { to: "/dashboard/models", label: "Models", icon: BrainCircuit },
       { to: "/dashboard/chat", label: "Chat", icon: MessageSquare },
       { to: "/dashboard/code", label: "Code", icon: Code2 },
-      { to: "/dashboard/jx-bot", label: "JX Bot", icon: Cpu },
     ],
   },
   {
@@ -207,7 +208,6 @@ const NAV_GROUPS: Array<{ label: string; items: TabItem[] }> = [
     items: [
       // Billing, Payments, Documents and profile pages live inside Settings (see SettingsNav).
       { to: "/dashboard/settings", label: "Settings", icon: Settings2 },
-      { to: "/help", label: "Help Center", icon: CircleHelp },
     ],
   },
 ];
