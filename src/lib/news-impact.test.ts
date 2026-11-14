@@ -1,6 +1,6 @@
 import { describe, it } from "node:test";
 import { expect } from "./chart/test-expect";
-import { fiveMinReaction, hourReaction, lastReleases, moveStats, outlookFrom, signalFrom, surpriseOf, usdRead, whatIf, type Release } from "./news-impact";
+import { fiveMinReaction, hourReaction, inPreNewsWindow, lastReleases, moveStats, outlookFrom, signalFrom, surpriseOf, usdRead, whatIf, type Release } from "./news-impact";
 
 const T = Date.UTC(2026, 10, 6, 13, 30);
 const five = (moves: number[]) => moves.map((c, i) => ({ t: T + i * 300_000, o: i === 0 ? 100 : 100 + moves[i - 1], h: 100 + c + 1, l: 100 + c - 1, c: 100 + c }));
@@ -58,5 +58,13 @@ describe("news impact", () => {
     expect(outlookFrom({ n: 9, upPct: 22, downPct: 78, avgT15: -12.5 }).confidence).toBe(78);
     expect(outlookFrom({ n: 8, upPct: 50, downPct: 50, avgT15: 0.3 }).dir).toBe("mixed");
     expect(outlookFrom({ n: 4, upPct: 100, downPct: 0, avgT15: 9 }).dir).toBe("none");
+  });
+
+  it("pre-news window is the last hour before release only", () => {
+    const t = Date.parse("2026-11-20T13:30:00Z");
+    expect(inPreNewsWindow(t, t - 61 * 60_000)).toBe(false);
+    expect(inPreNewsWindow(t, t - 60 * 60_000)).toBe(true);
+    expect(inPreNewsWindow(t, t - 42 * 60_000)).toBe(true);
+    expect(inPreNewsWindow(t, t)).toBe(false);
   });
 });

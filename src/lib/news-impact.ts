@@ -200,3 +200,10 @@ export function outlookFrom(stats: Pick<MoveStats, "n" | "upPct" | "downPct" | "
   if (upPct === downPct) return { dir: "mixed", confidence: upPct, avgMove: avgT15, n };
   return upPct > downPct ? { dir: "up", confidence: upPct, avgMove: avgT15, n } : { dir: "down", confidence: downPct, avgMove: avgT15, n };
 }
+
+/** Pre-news window: the last hour before a release, when the expectation read goes live. */
+export const PRE_NEWS_WINDOW_MS = 60 * 60_000;
+export function inPreNewsWindow(releaseMs: number, nowMs: number): boolean {
+  const left = releaseMs - nowMs;
+  return left > 0 && left <= PRE_NEWS_WINDOW_MS;
+}

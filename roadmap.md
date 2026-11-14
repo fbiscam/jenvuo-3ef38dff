@@ -70,3 +70,4 @@
 - [x] Ops tools (Founding, Payments, Emails, Documents and the rest) open as their own console pages in the Support-inbox look, with a back button, never inside the dashboard
 
 - [x] Public pages (not dashboard) 10% bigger/wider, closer to the xAI reference
+- [x] News Impact: only one section — next news, countdown, 1-hour pre-news banner, UP/DOWN cards with confidence + short verdict
