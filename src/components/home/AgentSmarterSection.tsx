@@ -44,28 +44,58 @@ function ParticleCloud() {
       return { x, y, z, s: 3 + rnd() * 7, a: 0.55 + rnd() * 0.45 };
     });
 
+    // Soft round glowing dot, pre-rendered once so thousands of points stay smooth.
+    const sprite = document.createElement("canvas");
+    sprite.width = sprite.height = 64;
+    const sg = sprite.getContext("2d")!;
+    const grad = sg.createRadialGradient(32, 32, 0, 32, 32, 32);
+    grad.addColorStop(0, "rgba(255,255,255,1)");
+    grad.addColorStop(0.35, "rgba(255,255,255,0.85)");
+    grad.addColorStop(1, "rgba(255,255,255,0)");
+    sg.fillStyle = grad;
+    sg.fillRect(0, 0, 64, 64);
+
     let raf = 0;
     let angle = 0;
-    const draw = () => {
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    let last = performance.now();
+    const proj = pts.map(() => ({ sx: 0, sy: 0, size: 0, a: 0, z: 0 }));
+    const draw = (now = performance.now()) => {
+      const dt = Math.min(48, now - last);
+      last = now;
+      const dpr = Math.min(window.devicePixelRatio || 1, 3);
       const w = canvas.clientWidth, h = canvas.clientHeight;
-      if (canvas.width !== w * dpr) { canvas.width = w * dpr; canvas.height = h * dpr; }
+      if (canvas.width !== Math.round(w * dpr)) { canvas.width = Math.round(w * dpr); canvas.height = Math.round(h * dpr); }
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       ctx.clearRect(0, 0, w, h);
       const cx = w / 2, cy = h / 2, r = Math.min(w, h) * 0.8;
       const cos = Math.cos(angle), sin = Math.sin(angle);
-      for (const p of pts) {
+      const tilt = Math.sin(angle * 0.7) * 0.18;
+      const ct = Math.cos(tilt), st = Math.sin(tilt);
+      for (let i = 0; i < pts.length; i++) {
+        const p = pts[i];
         const x = p.x * cos - p.z * sin;
-        const z = p.x * sin + p.z * cos;
+        const z0 = p.x * sin + p.z * cos;
+        const y = p.y * ct - z0 * st;
+        const z = p.y * st + z0 * ct;
         const persp = 1.6 / (2.4 - z * 0.6);
-        const sx = cx + x * r * persp;
-        const sy = cy + p.y * r * persp;
-        const size = p.s * persp;
-        ctx.fillStyle = `rgba(255,255,255,${Math.min(1, p.a * (0.6 + persp * 0.4))})`;
-        ctx.fillRect(sx, sy, size, size);
+        const o = proj[i];
+        o.sx = cx + x * r * persp;
+        o.sy = cy + y * r * persp;
+        o.size = p.s * persp * 0.9;
+        o.a = Math.min(1, p.a * (0.45 + persp * 0.55));
+        o.z = z;
       }
+      proj.sort((a, b) => a.z - b.z);
+      ctx.globalCompositeOperation = "lighter";
+      for (const o of proj) {
+        ctx.globalAlpha = o.a * 0.9;
+        const d = o.size * 1.6;
+        ctx.drawImage(sprite, o.sx - d / 2, o.sy - d / 2, d, d);
+      }
+      ctx.globalAlpha = 1;
+      ctx.globalCompositeOperation = "source-over";
       if (!reduced) {
-        angle += 0.0035;
+        angle += 0.00022 * dt;
         raf = requestAnimationFrame(draw);
       }
     };
@@ -101,8 +131,9 @@ function SearchCard() {
   const v = VERTICALS[i];
   return (
     <div>
-      <div className="relative aspect-[5/6] overflow-hidden">
-        <img src={fluidImg} alt="" width={1024} height={1216} loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
+      <div className="agent-frame relative aspect-[5/6] overflow-hidden">
+        <img src={fluidImg} alt="" width={1600} height={1904} loading="lazy" decoding="async" className="agent-drift absolute inset-0 h-full w-full object-cover" />
+        <span className="agent-sheen pointer-events-none absolute inset-0" aria-hidden />
         <ParticleCloud />
         <div key={i} className="agent-fade absolute inset-0">
           {v.chips.map((c, k) => <Chip key={c.t} {...c} delay={k * 0.6} />)}
@@ -144,8 +175,9 @@ function HighlightsCard() {
   }, [auto]);
   return (
     <div>
-      <div className="relative aspect-[5/6] overflow-hidden">
-        <img src={skyImg} alt="" width={1024} height={1216} loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
+      <div className="agent-frame relative aspect-[5/6] overflow-hidden">
+        <img src={skyImg} alt="" width={1600} height={1904} loading="lazy" decoding="async" className="agent-drift absolute inset-0 h-full w-full object-cover" />
+        <span className="agent-sheen pointer-events-none absolute inset-0" aria-hidden />
         <div className="absolute left-[6%] right-[6%] top-[10%] bg-background p-4 sm:top-[15%] sm:p-5 text-foreground shadow-xl">
           <div className="flex items-center gap-2 font-mono text-[10.5px] font-semibold tracking-wider text-gc-ink">
             <span className="h-2 w-2 bg-gc-ink" /> JX BOT · MQL5 EA
@@ -214,8 +246,9 @@ function ResearchCard() {
 
   return (
     <div>
-      <div className="relative aspect-[5/6] overflow-hidden">
-        <img src={cloudsImg} alt="" width={1024} height={1216} loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
+      <div className="agent-frame relative aspect-[5/6] overflow-hidden">
+        <img src={cloudsImg} alt="" width={1600} height={1904} loading="lazy" decoding="async" className="agent-drift absolute inset-0 h-full w-full object-cover" />
+        <span className="agent-sheen pointer-events-none absolute inset-0" aria-hidden />
         <div className="absolute left-[6%] right-[6%] top-[9%] bg-background px-3 py-2.5 text-[12px] text-foreground shadow-md">
           <span className="block truncate">
             {q.slice(0, typed)}
