@@ -129,7 +129,7 @@ export function DevApiSection() {
             </RevealWords>
           </h2>
           <p className="mt-5 max-w-md text-[17px] font-normal leading-relaxed text-foreground">
-            Text, code, voice, images, and video — all through a single unified API. Start building in seconds.
+            Text, code, voice, images, and video — all through a <span className="hidden sm:inline">single </span>unified API. <span className="hidden sm:inline">Start building</span><span className="sm:hidden">Build</span> in seconds.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Link
@@ -145,7 +145,7 @@ export function DevApiSection() {
               Read Docs
             </Link>
           </div>
-          <dl className="mt-10 flex flex-wrap gap-x-7 gap-y-4 sm:gap-x-10">
+          <dl className="mt-10 grid grid-cols-3 gap-2 sm:flex sm:flex-wrap sm:gap-x-10 sm:gap-y-4">
             {METRICS.map(([v, l]) => (
               <div key={l}>
                 <dt className="text-[15px] font-medium text-foreground">{v}</dt>
@@ -182,7 +182,7 @@ export function DevApiSection() {
               </pre>
             </div>
           </div>
-          <div className="mt-4 flex gap-2 overflow-x-auto [scrollbar-width:none]">
+          <div className="mt-4 flex flex-wrap gap-2">
             {TABS.map((t) => (
               <button
                 key={t.id}
