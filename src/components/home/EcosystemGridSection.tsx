@@ -81,7 +81,7 @@ export function EcosystemGridSection() {
         </h2>
         <Link
           to="/insights"
-          className="mt-8 inline-flex items-center gap-1.5 rounded-full bg-foreground px-6 py-3 text-[15px] font-medium text-background transition hover:opacity-85"
+          className="mt-8 inline-flex items-center gap-1.5 rounded-full bg-gc-pill px-6 py-3 text-[15px] font-medium text-foreground transition hover:brightness-95"
         >
           Read our stories <ArrowRight className="h-4 w-4" aria-hidden />
         </Link>
