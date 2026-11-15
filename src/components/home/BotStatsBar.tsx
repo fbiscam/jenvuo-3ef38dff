@@ -32,7 +32,7 @@ export function BotStatsBar() {
       value: "99+",
       label: (
         <span className="inline-flex flex-wrap items-center gap-3">
-          Founding seats allocation by <HaseebMark />
+          Founding seats by <HaseebMark />
         </span>
       ),
     },
