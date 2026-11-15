@@ -42,7 +42,7 @@ export function BotStatsBar() {
     },
     {
       key: "bot",
-      value: "99%",
+      value: "99% Wins",
       label: (
         <span className="inline-flex items-start gap-3">
           <JxBotLogo />
