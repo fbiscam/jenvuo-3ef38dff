@@ -1,5 +1,6 @@
 import type React from "react";
 import { DAILY_DRAWDOWN_PCT } from "@/lib/mt5-licenses";
+import { JxFace } from "@/components/jxbot/JxBotFeatures";
 
 /** Wide square-cut HASEEB wordmark (Colossus-style), drawn as SVG paths. */
 function HaseebMark({ className = "" }: { className?: string }) {
@@ -16,12 +17,7 @@ function HaseebMark({ className = "" }: { className?: string }) {
 }
 
 function JxBotLogo() {
-  return (
-    <svg viewBox="0 0 32 32" aria-label="JX Bot" role="img" className="h-7 w-7 shrink-0 text-gc-ink" fill="none" stroke="currentColor" strokeWidth="2">
-      <rect x="5" y="9" width="22" height="16" rx="4" />
-      <path d="M16 4v5M11 15v3M21 15v3M12 21h8" strokeLinecap="round" />
-    </svg>
-  );
+  return <JxFace className="h-7 w-7 shrink-0 bg-gc-ink" eyes="bg-background" />;
 }
 
 export function formatTokens(n: number): string {
@@ -61,7 +57,7 @@ export function BotStatsBar() {
       <div className="mx-auto grid max-w-7xl grid-cols-1 border-y border-gc-line py-2 sm:grid-cols-3 sm:py-10">
         {items.map((it, i) => (
           <div key={it.key} className={`py-7 sm:py-1 ${i > 0 ? "border-t border-gc-line sm:border-l sm:border-t-0 sm:pl-9" : ""}`}>
-            <div className="text-[44px] font-normal leading-none tracking-[-0.02em] text-gc-ink tabular-nums sm:text-[52px]">{it.value}</div>
+            <div className="text-[40px] font-medium leading-none tracking-[-0.01em] text-gc-ink tabular-nums sm:text-[48px] sm:leading-[48px]">{it.value}</div>
             <div className="mt-6 text-[13px] text-gc-ink-muted">{it.label}</div>
           </div>
         ))}
