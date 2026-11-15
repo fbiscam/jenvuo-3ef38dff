@@ -57,7 +57,7 @@ export function BotStatsBar() {
       <div className="mx-auto grid max-w-7xl grid-cols-1 border-y border-gc-line py-2 sm:grid-cols-3 sm:py-10">
         {items.map((it, i) => (
           <div key={it.key} className={`py-7 sm:py-1 ${i > 0 ? "border-t border-gc-line sm:border-l sm:border-t-0 sm:pl-9" : ""}`}>
-            <div className="font-["Sora",sans-serif] text-[40px] font-medium leading-none tracking-[-0.04em] text-gc-ink tabular-nums sm:text-[48px] sm:leading-[48px]">{it.value}</div>
+            <div className="font-['Sora',sans-serif] text-[40px] font-medium leading-none tracking-[-0.04em] text-gc-ink tabular-nums sm:text-[48px] sm:leading-[48px]">{it.value}</div>
             <div className="mt-6 text-[13px] text-gc-ink-muted">{it.label}</div>
           </div>
         ))}
