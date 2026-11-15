@@ -45,6 +45,8 @@ type Card = {
   logos?: { src: string; mono?: boolean }[];
   icon?: ComponentType<{ className?: string }>;
   quote: string;
+  /** Who uses this: the people on that platform Jenvu helps. */
+  audience: string;
   role: string;
 };
 
@@ -54,55 +56,64 @@ const CARDS: Record<string, Card> = {
   "jx-bot-on-metatrader-5": {
     brand: "MetaTrader 5",
     logos: MT5,
-    quote: `We built JX Bot to run inside your own MetaTrader 5 with no licence key to share. You register your IP, the bot checks it with Jenvu, and it stops for the day at your plan's target or ${DAILY_DRAWDOWN_PCT}% below the day's peak balance.`,
+    quote: `Traders who already run MetaTrader 5 add JX Bot to their own terminal. Jenvu checks their registered IP, manages the EUR/USD basket and stops for the day at the plan's target or ${DAILY_DRAWDOWN_PCT}% below the day's peak balance.`,
+    audience: "MetaTrader 5 traders",
     role: "JX Bot for MT5",
   },
   "one-api-many-models": {
     brand: "Jenvu API",
     logos: [{ src: openAiLogo, mono: true }, { src: claudeLogo }, { src: geminiLogo }],
-    quote: `One key, one endpoint, ${PUBLIC_API_MODEL_IDS.length} models. Change the model field and the same code talks to Claude, GPT, Gemini, Grok or DeepSeek, and every call shows up on your Usage page.`,
+    quote: `Developers who use OpenAI, Claude and Gemini keep one Jenvu key instead of three accounts. They change the model field to reach any of ${PUBLIC_API_MODEL_IDS.length} models, and every call lands on one Usage page and one balance.`,
+    audience: "OpenAI and Claude users",
     role: "Jenvu API and Models",
   },
   "news-impact-on-gold": {
     brand: "News Impact",
     icon: Newspaper,
-    quote: `Before every CPI, NFP or FOMC release we show how Gold moved after the last ${RELEASES_PER_EVENT} releases when the number beat or missed. It's history to help you prepare, not a forecast.`,
+    quote: `Traders who watch CPI, NFP and FOMC use Jenvu to see how Gold moved after the last ${RELEASES_PER_EVENT} releases when the number beat or missed, so they prepare with history instead of guessing. It is not a forecast.`,
+    audience: "Gold news traders",
     role: "News trading",
   },
   "gold-analysis-in-python": {
     brand: "Python",
     logos: [{ src: pythonLogo }],
-    quote: "Point the OpenAI Python package at Jenvu, add your key, and you have a Gold market assistant in a few lines. Keep the key in an environment variable, never in public code.",
+    quote: "Developers who write Python point the OpenAI package at Jenvu, add their key and get a Gold market assistant in a few lines, with the key kept in an environment variable, never in public code.",
+    audience: "Python developers",
     role: "Developers",
   },
   "fresh-sweep-detection": {
     brand: "Jenvu Terminal",
     icon: CandlestickChart,
-    quote: "Fresh sweeps are marked on 5M, 15M, 1H, 2H and 4H from closed candles only, so you see where liquidity was taken and how price reacted. Labels help you read the chart; they are never a trade signal.",
+    quote: "Traders who read liquidity on TradingView-style charts use the Jenvu Terminal to see fresh sweeps on 5M to 4H, marked from closed candles only. Labels help them read the chart; they are never a trade signal.",
+    audience: "Price-action traders",
     role: "Terminal",
   },
   "ai-desk-updates": {
     brand: "Jenvu AI",
     icon: Sparkles,
-    quote: "The AI desk reads the chart you see and answers the question you asked. When the evidence isn't strong enough, it says WAIT instead of forcing a setup, and it never promises a win rate.",
+    quote: "Traders who ask AI about the chart get answers based on the chart they see. When the evidence isn't strong enough, Jenvu AI says WAIT instead of forcing a setup, and it never promises a win rate.",
+    audience: "Traders who ask AI",
     role: "AI desk",
   },
   "rvol-and-volume-direction": {
     brand: "Volume",
     icon: BarChart3,
-    quote: "Every candle shows RVOL spikes against the last 20 candles and an estimated buyer/seller share. Gold has no single central feed, so we label the split as an estimate.",
+    quote: "Traders who follow volume see RVOL spikes against the last 20 candles and an estimated buyer/seller share. Gold has no single central feed, so Jenvu labels the split as an estimate.",
+    audience: "Volume traders",
     role: "Terminal",
   },
   "daily-gold-insights": {
     brand: "Jenvu Insights",
     icon: BookOpen,
-    quote: "Daily Gold insights and trading guides that teach the market one day at a time. Education, not financial advice.",
+    quote: "People learning Gold read Jenvu's daily insights and guides to understand the market one day at a time. Education, not financial advice.",
+    audience: "Gold learners",
     role: "Insights",
   },
   "jx-bot": {
     brand: "JX Bot",
     logos: MT5,
-    quote: "JX Bot trades EUR/USD on the M15 chart with 0.05 lot per $1,000 of balance and clear daily limits. The target is where it stops for the day, not a result we promise.",
+    quote: "Traders who want EUR/USD automation on MT5 run JX Bot on the M15 chart with 0.05 lot per $1,000 of balance and clear daily limits. The target is where it stops for the day, not a promised result.",
+    audience: "EUR/USD traders on MT5",
     role: "JX Bot for MT5",
   },
   "founding-program": {
@@ -111,18 +122,21 @@ const CARDS: Record<string, Card> = {
     quote: FOUNDING_APPLICATIONS_OPEN
       ? "The Founding Program is invite-only and every application is reviewed by our team. Applications are open now."
       : "The Founding Program is invite-only and every application is reviewed by our team. Applications are closed for now and will reopen here.",
+    audience: "Founding members",
     role: "Founding Program",
   },
   "london-new-york-sessions": {
     brand: "Sessions",
     icon: Clock,
-    quote: "London and New York session zones are drawn on the chart so you always know when the market is awake, and the weekend closure is handled for you.",
+    quote: "Traders who plan around sessions see London and New York zones drawn on the chart, so they always know when the market is awake, and the weekend closure is handled for them.",
+    audience: "Session traders",
     role: "Terminal",
   },
   "build-with-jenvu": {
     brand: "Jenvu for developers",
     icon: Code2,
-    quote: "Use Jenvu models with API keys from your dashboard or through the browser extension, and pay only for the tokens you use.",
+    quote: "Developers use Jenvu models with API keys from the dashboard or through the browser extension, and pay only for the tokens they use.",
+    audience: "Extension users",
     role: "Developers",
   },
 };
@@ -153,6 +167,25 @@ function BrandMark({ card }: { card: Card }) {
   );
 }
 
+/** Bottom-bar mark: the platform these users work on (never a stock face). */
+function AudienceMark({ card }: { card: Card }) {
+  const logo = card.logos?.[0];
+  return (
+    <span
+      aria-hidden
+      className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md border border-gc-line bg-gc-pill"
+    >
+      {logo ? (
+        <img src={logo.src} alt="" width={26} height={26} loading="lazy" decoding="async" className={`h-[26px] w-[26px] object-contain ${logo.mono ? "dark:invert" : ""}`} />
+      ) : card.icon ? (
+        <card.icon className="h-5 w-5 text-gc-ink" />
+      ) : (
+        <span className="text-[18px] font-semibold text-gc-ink">J</span>
+      )}
+    </span>
+  );
+}
+
 function StoriesIndex() {
   return (
     <div className={`public-cloudflare min-h-dvh w-full bg-background text-foreground ${SANS} antialiased`}>
@@ -177,7 +210,7 @@ function StoriesIndex() {
         <section className="mx-auto max-w-[1140px] px-5 pb-20 sm:px-8 sm:pb-24">
           <div className="grid gap-6 md:grid-cols-2">
             {STORIES.map((s) => {
-              const card = CARDS[s.slug] ?? { brand: s.title, icon: BookOpen, quote: s.intro, role: "Jenvu" };
+              const card = CARDS[s.slug] ?? { brand: s.title, icon: BookOpen, quote: s.intro, audience: "Jenvu users", role: "Jenvu" };
               return (
                 <article
                   key={s.slug}
@@ -189,15 +222,10 @@ function StoriesIndex() {
                   </blockquote>
                   <div className="mt-6 flex flex-wrap items-center justify-between gap-4">
                     <div className="flex min-w-0 items-center gap-3">
-                      <span
-                        aria-hidden
-                        className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md bg-foreground text-[18px] font-semibold text-background"
-                      >
-                        J
-                      </span>
+                      <AudienceMark card={card} />
                       <div className="min-w-0">
-                        <p className="text-[15px] font-semibold text-gc-ink">Jenvu team</p>
-                        <p className="text-[13px] text-gc-ink-muted">{card.role}</p>
+                        <p className="text-[15px] font-semibold text-gc-ink">{card.audience}</p>
+                        <p className="text-[13px] text-gc-ink-muted">Jenvu · {card.role}</p>
                       </div>
                     </div>
                     <Link to="/stories/$slug" params={{ slug: s.slug }} className={pillBlue} aria-label={`Read case study: ${s.title}`}>
