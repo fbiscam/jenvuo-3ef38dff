@@ -273,7 +273,7 @@ function JxBotPage() {
       {/* IP list (API Keys table style) */}
       <div className="mt-8">
         <div className="flex items-end justify-between gap-3">
-          <h2 className="text-[20px] font-medium tracking-tight text-foreground">Your IP addresses</h2>
+          <h2 className="text-[20px] font-medium tracking-tight text-foreground"> Your IP addresses</h2>
           <span className="shrink-0 text-[13px] tabular-nums text-muted-foreground">{active.length} active · {bound} of {limit} used</span>
         </div>
 
