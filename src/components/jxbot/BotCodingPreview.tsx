@@ -6,37 +6,37 @@ import { Check } from "lucide-react";
  * out in colored code on a pure white canvas while the build steps tick off.
  * Illustration of the bot's published rules only — not the full source.
  */
-const CODE = `// JX Bot — EUR/USD M15 EA
+const CODE = `// JX Bot — EUR/USD M15 swing EA
 #property strict
-input double LotPer1000 = 0.05;   // lot per $1,000
-input double DailyGuard = 4.7;    // % below day's peak
+input double LotPer1000 = 0.02;   // lot per $1,000
+input bool   UseStopLoss = true;  // stop loss on every trade
 
 void OnTick()
 {
-   if(DailyGuardHit(DailyGuard)) return;
-   if(!InSession(ASIA, LONDON)) { ManageBasket(); return; }
    if(!NewClosedCandle(PERIOD_M15)) return;
+   Swing s = ReadSwing(_Symbol, PERIOD_M15);
 
-   int trend = H1Trend(_Symbol);
-   if(SpreadOk() && ConfirmCandle(trend))
-      OpenBasketTrade(trend);
-   ManageBasket();
+   if(s.HigherHigh && s.HigherLow && !HasOpenTrade())
+      OpenTrade(ORDER_TYPE_BUY, s.Low);
+   else if(s.LowerHigh && s.LowerLow && !HasOpenTrade())
+      OpenTrade(ORDER_TYPE_SELL, s.High);
 }
 
-void ManageBasket()
+void OpenTrade(int type, double swing)
 {
    double lot = LotPer1000 * AccountBalance() / 1000.0;
-   if(BasketTakeProfitHit()) CloseBasket();   // basket TP
-   LockProfit();                              // profit lock
+   double sl  = StopFrom(swing);   // never without SL
+   double tp  = TakeProfitFrom(sl);
+   Trade.PositionOpen(_Symbol, type, lot, Ask(), sl, tp);
 }`;
 
 const LINES = CODE.split("\n");
 
 const STEPS = [
-  { at: 4, label: "Lot size + daily guard" },
-  { at: 9, label: "Asia + London sessions only" },
-  { at: 15, label: "H1 trend, spread and candle checks" },
-  { at: 22, label: "Basket take profit + profit lock" },
+  { at: 4, label: "Risk settings" },
+  { at: 9, label: "Read closed M15 candles" },
+  { at: 14, label: "Swing rules: HH/HL buy, LH/LL sell" },
+  { at: 21, label: "Stop loss + take profit on every order" },
   { at: LINES.length, label: "Compile JXBot.ex5" },
 ];
 

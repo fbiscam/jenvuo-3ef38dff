@@ -15,12 +15,12 @@ export const Route = createFileRoute("/jx-bot")({
       {
         name: "description",
         content:
-          "How JX Bot works: an EUR/USD M15 bot for MetaTrader 5 with basket trade management, Asia and London hours, a daily drawdown guard, daily auto-stop and IP licensing.",
+          "How JX Bot works: an EUR/USD M15 swing bot for MetaTrader 5 with a stop loss on every trade, safe trading hours, daily auto-stop and IP licensing.",
       },
       { property: "og:title", content: "JX Bot — Jenvu's EUR/USD trading bot for MetaTrader 5" },
       {
         property: "og:description",
-        content: "An EUR/USD M15 bot for MT5: basket trade management, Asia and London hours, daily drawdown guard and IP licensing.",
+        content: "An EUR/USD M15 swing bot for MT5: stop loss on every trade, safe hours, daily auto-stop and IP licensing.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -91,8 +91,8 @@ function Hero() {
         Meet <JxFace className="jx-float h-[0.9em] w-[0.9em]" /> JX Bot
       </h1>
       <p className="mx-auto mt-6 max-w-[620px] text-[17px] leading-relaxed text-muted-foreground md:text-[20px]">
-        An EUR/USD trading bot for MetaTrader 5. It reads EUR/USD only on M15, trades the Asia and London sessions and stops for the day at a
-        fixed daily drawdown guard, so you don't have to watch the chart all day.
+        An EUR/USD trading bot for MetaTrader 5. It reads EUR/USD only on M15, follows clear swing rules and puts a stop loss
+        on every trade, so you don't have to watch the chart all day.
       </p>
       <div className="mt-8 flex flex-wrap justify-center gap-3">
         <GetBot />
@@ -114,8 +114,8 @@ function Banner() {
         <div className="relative z-10 max-w-[460px] p-8 md:p-12">
           <h2 className="text-[28px] font-medium tracking-tight text-foreground md:whitespace-nowrap md:text-[32px]">Trades with rules, not feelings</h2>
           <p className="mt-4 text-[16px] leading-relaxed text-muted-foreground">
-            JX Bot only acts on closed candles, follows the H1 trend and manages its trades as one basket with a basket
-            take profit, a profit lock and a fixed daily drawdown guard
+            JX Bot buys after a higher high and higher low, sells after a lower high and lower low, and only acts on
+            closed candles. One trade per swing, a stop loss and take profit on every order
           </p>
         </div>
         <div className="pointer-events-none absolute -bottom-4 right-6 hidden md:block">
@@ -147,7 +147,7 @@ function Guides() {
 const FAQS = [
   {
     q: "How is JX Bot different from a signal service?",
-    a: "It places trades itself inside your MetaTrader 5, using fixed rules on closed M15 candles. Trades are managed as a basket with a basket take profit and profit lock; there is no stop loss on each position, and the daily drawdown guard limits the day's loss.",
+    a: "It places trades itself inside your MetaTrader 5, using fixed swing rules on closed M15 candles, with a stop loss and take profit on every order.",
   },
   {
     q: "Who can use JX Bot?",
@@ -163,7 +163,7 @@ const FAQS = [
   },
   {
     q: "Can I use it on a prop firm like The5ers?",
-    a: "Check your firm's rules first. JX Bot manages trades as a basket that can add trades at set distances, and it does not place a stop loss on each position; its loss limit is the fixed daily drawdown guard. Many prop firms restrict grid-style EAs or require a stop loss on every trade, so share these details with your firm's support before you start.",
+    a: "The5ers support told us JX Bot looks consistent with their EA rules: a visible hard stop loss on every trade, no martingale, grid, tick scalping or arbitrage, and EUR/USD M15 isn't restricted. Rules differ by firm and can change, so check yours first.",
   },
   {
     q: "What if my VPS or RDP changes and I get a new IP?",
@@ -175,7 +175,7 @@ const FAQS = [
   },
   {
     q: "Does the bot avoid news?",
-    a: `It has no news calendar, but it opens no new trades during the London open (06:15–09:00 UTC) or the New York session (after 12:00 UTC), skips spreads above 2 pips and spike candles, and stops at a fixed ${DAILY_DRAWDOWN_PCT}% daily drawdown. For very big events you can turn Algo Trading off for a while.`,
+    a: `It has no news calendar, but it opens no new trades during the London and New York opens, skips spreads above 2 pips and spike candles, and stops at a fixed ${DAILY_DRAWDOWN_PCT}% daily drawdown. For very big events you can turn Algo Trading off for a while.`,
   },
   {
     q: "Can I backtest it first?",
