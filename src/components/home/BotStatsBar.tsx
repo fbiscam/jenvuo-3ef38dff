@@ -17,7 +17,7 @@ function HaseebMark({ className = "" }: { className?: string }) {
 }
 
 function JxBotLogo() {
-  return <JxFace className="h-7 w-7 shrink-0 bg-gc-ink" eyes="bg-background" />;
+  return <JxFace className="relative -top-1 h-7 w-7 shrink-0 bg-gc-ink" eyes="bg-background" />;
 }
 
 export function formatTokens(n: number): string {
