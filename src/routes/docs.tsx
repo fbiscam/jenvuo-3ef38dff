@@ -93,6 +93,19 @@ function DocsPage() {
     return () => obs.disconnect();
   }, [tocIds]);
 
+  // "On this page" stays hidden until the reader reaches Quickstart.
+  const [showToc, setShowToc] = React.useState(false);
+  React.useEffect(() => {
+    const check = () => {
+      const q = document.getElementById("quickstart");
+      setShowToc(q ? q.getBoundingClientRect().top <= window.innerHeight * 0.6 : true);
+    };
+    check();
+    window.addEventListener("scroll", check, { passive: true });
+    window.addEventListener("resize", check);
+    return () => { window.removeEventListener("scroll", check); window.removeEventListener("resize", check); };
+  }, []);
+
   // Ctrl/Cmd + K focuses the docs search.
   React.useEffect(() => {
     const on = (e: KeyboardEvent) => {
@@ -284,7 +297,7 @@ function DocsPage() {
           </div>
         </main>
 
-        <aside className="hidden xl:block">
+        <aside className={`hidden xl:block transition-opacity duration-300 ${showToc ? "opacity-100" : "pointer-events-none opacity-0"}`} aria-hidden={!showToc}>
           <div className="sticky top-16 flex max-h-[calc(100dvh-4rem)] flex-col py-8">
             <p className="text-[14px] font-medium text-gc-ink">On this page</p>
             <ul className="mt-3 flex-1 space-y-0.5 overflow-y-auto">
