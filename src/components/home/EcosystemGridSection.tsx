@@ -2,7 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { SiBinance, SiTradingview } from "react-icons/si";
 import pythonLogo from "@/assets/platform-logos/python.svg";
-import metaTraderLogo from "@/assets/metatrader-logo.png.asset.json";
+import metaTraderLogo from "@/assets/platform-logos/metatrader5.svg";
 import openAiLogo from "@/assets/model-logos/openai.svg";
 import claudeLogo from "@/assets/model-logos/claude-color.svg";
 import geminiLogo from "@/assets/model-logos/gemini-color.svg";
@@ -29,7 +29,7 @@ type Tile = {
 };
 
 const TILES: Tile[] = [
-  { name: "MetaTrader 5", logo: metaTraderLogo.url, to: "/jx-bot" },
+  { name: "MetaTrader 5", logo: metaTraderLogo, to: "/jx-bot" },
   { name: "TradingView", icon: SiTradingview },
   { name: "OpenAI", logo: openAiLogo, mono: true, to: "/models" },
   { name: "Claude", logo: claudeLogo },
