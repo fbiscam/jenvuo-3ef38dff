@@ -30,7 +30,7 @@ export function formatTokens(n: number): string {
 /** Homepage stats: fixed capacity/seat figures set by the owner, plus JX Bot rules. No win-rate claims. */
 export function BotStatsBar() {
   const items: { key: string; value: string; label: React.ReactNode }[] = [
-    { key: "tokens", value: "110M+", label: "Monthly API token processing capacity across models" },
+    { key: "tokens", value: "110M+", label: "Monthly API token processing" },
     {
       key: "founding",
       value: "99+",
