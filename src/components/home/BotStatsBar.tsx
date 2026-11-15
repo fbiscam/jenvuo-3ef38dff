@@ -1,18 +1,14 @@
 import type React from "react";
 import { DAILY_DRAWDOWN_PCT } from "@/lib/mt5-licenses";
 import { JxFace } from "@/components/jxbot/JxBotFeatures";
+import haseebWordmark from "@/assets/haseeb-wordmark.png.asset.json";
 
-/** Wide square-cut HASEEB wordmark (Colossus-style), drawn as SVG paths. */
+/** Original supplied HASEEB wordmark, with its light background and grey lettering. */
 function HaseebMark({ className = "" }: { className?: string }) {
   return (
-    <svg viewBox="0 0 236 24" aria-label="HASEEB" role="img" className={`h-4 w-auto text-gc-ink ${className}`} fill="currentColor">
-      {/* H */}<path d="M0 0h6v9h20V0h6v24h-6v-9H6v9H0z" />
-      {/* A */}<path d="M40 24V6l6-6h20l6 6v18h-6v-9H46v9zm6-15h20V6H46z" />
-      {/* S */}<path d="M80 0h32v6H86v3h26v15H80v-6h26v-3H80z" />
-      {/* E */}<path d="M120 0h32v6h-26v3h22v6h-22v3h26v6h-32z" />
-      {/* E */}<path d="M160 0h32v6h-26v3h22v6h-22v3h26v6h-32z" />
-      {/* B */}<path d="M200 0h30l6 6v3l-3 3 3 3v3l-6 6h-30zm6 6v3h24V6zm0 9v3h24v-3z" />
-    </svg>
+    <span className={`inline-flex h-7 w-[180px] max-w-full shrink-0 items-center bg-gc-on-blue ${className}`}>
+      <img src={haseebWordmark.url} alt="HASEEB" className="h-full w-full object-contain" />
+    </span>
   );
 }
 
