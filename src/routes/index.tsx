@@ -404,7 +404,7 @@ function HomePage() {
 
 
       <div className="jenvu-home-content">
-        <main className="home-sora-headings">
+        <main>
           <EntHero />
           <EntShowcase />
           <DevApiSection />
