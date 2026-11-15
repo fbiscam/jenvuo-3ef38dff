@@ -11,8 +11,9 @@ const SOCIAL = [
 /** Simple Google Cloud blog-style footer used on the blog pages. */
 export default function BlogFooter() {
   return (
-    <footer className="hide-in-pwa border-t border-gc-line bg-background">
-      <div className="site-edge py-8 sm:py-10">
+    <footer className="hide-in-pwa bg-background">
+      <div className="site-edge">
+        <div className="border-t border-gc-line py-8 sm:py-10">
         <div className="flex flex-wrap items-center gap-x-8 gap-y-4">
           <span className="text-[15px] font-medium text-gc-ink">Follow us</span>
           <div className="flex items-center gap-6 sm:gap-8">
@@ -40,6 +41,7 @@ export default function BlogFooter() {
               <option value="en">English</option>
             </select>
           </div>
+        </div>
         </div>
       </div>
     </footer>

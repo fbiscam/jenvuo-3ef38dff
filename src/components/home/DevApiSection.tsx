@@ -145,11 +145,11 @@ export function DevApiSection() {
               Read Docs
             </Link>
           </div>
-          <dl className="mt-10 grid grid-cols-3 gap-2 sm:flex sm:flex-wrap sm:gap-x-10 sm:gap-y-4">
+          <dl className="mt-10 grid grid-cols-[1fr_1fr_auto] gap-2 sm:flex sm:flex-wrap sm:gap-x-10 sm:gap-y-4">
             {METRICS.map(([v, l]) => (
               <div key={l}>
                 <dt className="text-[15px] font-medium text-foreground">{v}</dt>
-                <dd className="mt-0.5 text-[12px] text-muted-foreground">{l}</dd>
+                <dd className="mt-0.5 whitespace-nowrap text-[12px] text-muted-foreground max-[360px]:text-[10px]">{l}</dd>
               </div>
             ))}
           </dl>

@@ -1,5 +1,8 @@
 # Roadmap
 
+- [x] Keep mobile API metric labels on one line and align shared CTA/footer dividers (including API Platform)
+- [x] Inspect the reported utils.ts error: current helper returns a string and has no line 8
+
 - [x] Apply Geist Sans to the homepage stats headings and inspect the reported utils error
 
 - [x] Homepage stats: label-sized grey HASEEB mark and Gotham-style headings

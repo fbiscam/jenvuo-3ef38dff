@@ -47,8 +47,8 @@ function Card({ title, sub, items, action }: { title: string; sub: string; items
 
 export function GetStartedSection() {
   return (
-    <section className="bg-background px-5">
-      <div className="mx-auto max-w-7xl">
+    <section className="bg-background">
+      <div className="site-edge">
         <div className="border-t border-gc-line pb-20 pt-20 text-center sm:pt-24">
           <h2 className="text-[28px] font-medium tracking-tight text-gc-ink sm:text-[32px]"><RevealWords>Choose how to get started</RevealWords></h2>
           <div className="mx-auto mt-12 grid w-full max-w-7xl gap-5 text-left md:grid-cols-2">
