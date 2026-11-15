@@ -131,7 +131,7 @@ function TagChip({ tag }: { tag: Tag }) {
 }
 
 const NEWS: { tag: Tag; title: string; body: string; to: string }[] = [
-  { tag: "Product", title: "JX Bot for MetaTrader 5", body: "EUR/USD M15 swing bot with a stop loss on every trade and a daily target.", to: "/download" },
+  { tag: "Product", title: "JX Bot for MetaTrader 5", body: "EUR/USD M15 bot with a daily drawdown guard and a daily target.", to: "/download" },
   { tag: "Product", title: "Top AI models, one key", body: "See every model the Jenvu API serves and what each is best at.", to: "/models" },
   { tag: "Guide", title: "Gold killzones", body: "When London and New York move the market, in your own time zone.", to: "/killzones" },
   { tag: "Guide", title: "ICT trading for Gold", body: "Liquidity, order blocks and fair value gaps, explained step by step.", to: "/strategies/ict-gold-trading" },
@@ -179,7 +179,7 @@ export function BizWhatsNew() {
 const DESKS = [
   { name: "Gold traders", body: "Read Gold structure, liquidity and killzones with chart-aware AI and seven trading engines.", line: "What if you could read Gold structure in seconds", to: "/ai-engine" },
   { name: "Analysts", body: "Turn sessions, news and price action into clear daily notes and shareable insights.", line: "What if your morning notes wrote themselves", to: "/insights" },
-  { name: "Bot users", body: "Run JX Bot on MetaTrader 5 with a stop loss on every trade, trading hours and a daily target.", line: "What if your bot stopped at your daily target", to: "/download" },
+  { name: "Bot users", body: "Run JX Bot on MetaTrader 5 with a daily drawdown guard, trading hours and a daily target.", line: "What if your bot stopped at your daily target", to: "/download" },
   { name: "Developers", body: "Call the top AI models behind one Jenvu API key, pay as you go.", line: "What if every top model sat behind one key", to: "/platform" },
   { name: "Learners", body: "Learn ICT and SMC on real Gold charts, with an AI tutor that explains every step.", line: "What if ICT and SMC finally made sense", to: "/strategies/ict-gold-trading" },
   { name: "Founding members", body: "Join early, help shape the product and get full Terminal access once approved.", line: "What if you joined Jenvu on day one", to: "/founding" },
@@ -244,7 +244,7 @@ export function BizEveryDesk() {
 const PRODUCTS = [
   { key: "ask", label: "Ask Jenvu", Icon: Sparkles, body: "Ask about Gold in plain words for structure, levels and plans you can check on the chart.", to: "/ai-engine" },
   { key: "terminal", label: "Terminal", Icon: CandlestickChart, body: "A live Gold, Bitcoin or EUR/USD chart with liquidity sweeps, fair value gaps and seven engines in one view.", to: "/ai-engine" },
-  { key: "bot", label: "JX Bot", Icon: Bot, body: "An EUR/USD M15 swing bot for MetaTrader 5, with a stop loss on every trade.", to: "/download" },
+  { key: "bot", label: "JX Bot", Icon: Bot, body: "An EUR/USD M15 bot for MetaTrader 5, with a fixed daily drawdown guard.", to: "/download" },
   { key: "api", label: "API", Icon: Code2, body: "Top AI models behind one key, at $3 per million tokens, working with the OpenAI SDK.", to: "/platform" },
 ] as const;
 type ProductKey = (typeof PRODUCTS)[number]["key"];

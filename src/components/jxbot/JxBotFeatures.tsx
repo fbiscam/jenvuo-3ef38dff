@@ -108,7 +108,7 @@ function StopCard() {
 function HoursCard() {
   const tones = ["bg-emerald-500", "bg-violet-500", "bg-rose-500", "bg-orange-400"];
   return (
-    <Card title="Trades at safe hours" text="New trades Mon–Thu 01:00–14:00 and Friday until 13:00 broker time. It skips the London and New York opens and weekends.">
+    <Card title="Trades at safe hours" text="New trades Mon–Thu 01:00–14:00 and Friday until 13:00 broker time. It trades Asia and London only, skipping the London open, the New York session and weekends.">
       <div className="grid h-full place-items-center pb-10">
         <div className="flex items-center rounded-full border border-gc-line bg-background p-1 pr-3">
           {tones.map((t) => (

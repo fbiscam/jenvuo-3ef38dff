@@ -45,7 +45,7 @@ const HOW = [
   ["IP check", "On start the bot checks your IP with jenvu.com and trades only while the IP matches and the plan is valid."],
   ["EUR/USD on M15", "Runs on the EURUSD M15 chart; one IP works with one MT5 account."],
   ["Daily auto-stop", `Fixed by Jenvu: pauses for the day at ${DAILY_TARGET_PCT.pro}% (Pro), ${DAILY_TARGET_PCT.elite}% (Elite) or ${DAILY_TARGET_PCT.ultra}% (Ultra) of the day's starting balance, or at the ${DAILY_DRAWDOWN_PCT}% daily drawdown guard.`],
-  ["Safe trading hours", "New trades Mon–Thu 01:00–14:00 and Fri until 13:00 (broker time); skips London and New York opens and weekends."],
+  ["Safe trading hours", "New trades Mon–Thu 01:00–14:00 and Fri until 13:00 (broker time); trades only Asia and London, skips the London open (06:15–09:00 UTC), the New York session (after 12:00 UTC) and weekends."],
   ["Entry checks", "Follows the H1 trend and skips wide spreads, weak candles and spikes, so some days have fewer trades."],
   ["Monthly limit", "Stops at your plan's monthly target until the next period."],
 ];

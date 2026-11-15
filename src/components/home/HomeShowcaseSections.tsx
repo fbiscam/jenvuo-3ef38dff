@@ -24,7 +24,7 @@ import starsPlain from "@/assets/platform/stars-plain.webp";
 const PRODUCTS = [
   { name: "Jenvu Terminal", a: "Live chart with sweeps, FVGs and killzones", b: "Seven engines read every candle", to: "/ai-engine", tag: "Charts", img: starsNebula, flip: "none" },
   { name: "Ask Jenvu", a: "Plain-English answers about Gold", b: "Top AI models in one chat", to: "/llm", tag: "AI desk", img: starsPlain, flip: "none" },
-  { name: "JX Bot", a: "MetaTrader 5 Expert Advisor", b: "Stop loss on every trade, daily auto-stop", to: "/download", tag: "Automation", img: starsPlain, flip: "rotate(180deg)" },
+  { name: "JX Bot", a: "MetaTrader 5 Expert Advisor", b: "Daily drawdown guard, daily auto-stop", to: "/download", tag: "Automation", img: starsPlain, flip: "rotate(180deg)" },
   { name: "API Platform", a: "One OpenAI-compatible key", b: "Pay as you go from your AI credit", to: "/platform", tag: "Developers", img: starsPlain, flip: "scaleX(-1)" },
 ] as const;
 
@@ -181,7 +181,7 @@ const USE_CASES = [
   { icon: Crosshair, t: "Plan around killzones", b: "Know when London and New York sessions open, marked on your chart.", ex: "“When does the New York killzone start in my time?”", g: 2 },
   { icon: LineChart, t: "Read the market structure", b: "Breaks of structure, gaps and order blocks explained step by step.", ex: "“Explain the last break of structure on 1H.”", g: 3 },
   { icon: Bell, t: "Watch key levels", b: "See the daily high, low and session ranges drawn on the live chart.", ex: "“Where is the daily high on Gold today?”", g: 2 },
-  { icon: Bot, t: "Automate with JX Bot", b: "Run the MT5 Expert Advisor with a stop loss on every trade and a daily auto-stop.", ex: "“How do I register my VPS IP for JX Bot?”", g: 3 },
+  { icon: Bot, t: "Automate with JX Bot", b: "Run the MT5 Expert Advisor with a daily drawdown guard and a daily auto-stop.", ex: "“How do I register my VPS IP for JX Bot?”", g: 3 },
   { icon: BookOpen, t: "Learn as you trade", b: "Turn ICT and SMC ideas into plain lessons you can check on a live chart.", ex: "“Explain a fair value gap to a beginner.”", g: 1 },
 ];
 

@@ -151,7 +151,7 @@ const TRUST = [
   },
   {
     t: "Risk-first analysis",
-    items: ["WAIT when the evidence isn't there", "Stop loss on every JX Bot trade", "Daily auto-stop at your target"],
+    items: ["WAIT when the evidence isn't there", "Fixed daily drawdown guard on JX Bot", "Daily auto-stop at your target"],
   },
   {
     t: "Help when you need it",
