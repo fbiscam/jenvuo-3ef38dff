@@ -1,6 +1,4 @@
 import type React from "react";
-import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import { DAILY_DRAWDOWN_PCT } from "@/lib/mt5-licenses";
 
 /** Wide square-cut HASEEB wordmark (Colossus-style), drawn as SVG paths. */
@@ -33,23 +31,16 @@ export function formatTokens(n: number): string {
   return String(n);
 }
 
-/** Homepage stats: live API tokens (30d), live Founding applications, JX Bot rules. No win-rate claims. */
+/** Homepage stats: fixed capacity/seat figures set by the owner, plus JX Bot rules. No win-rate claims. */
 export function BotStatsBar() {
-  const [stats, setStats] = useState<{ api_tokens_30d: number; founding_applications: number } | null>(null);
-  useEffect(() => {
-    supabase.rpc("public_home_stats" as never).then(({ data }) => {
-      if (data) setStats(data as never);
-    });
-  }, []);
-
   const items: { key: string; value: string; label: React.ReactNode }[] = [
-    { key: "tokens", value: stats ? formatTokens(Number(stats.api_tokens_30d)) : "—", label: "API tokens processed across all accounts in the last 30 days" },
+    { key: "tokens", value: "100M+", label: "Monthly API token processing capacity across models" },
     {
       key: "founding",
-      value: stats ? String(stats.founding_applications) : "—",
+      value: "99+",
       label: (
         <span className="inline-flex flex-wrap items-center gap-3">
-          Founding applications by <HaseebMark />
+          Founding seats allocation across batches by <HaseebMark />
         </span>
       ),
     },
