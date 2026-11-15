@@ -3,11 +3,11 @@ import { DAILY_DRAWDOWN_PCT } from "@/lib/mt5-licenses";
 import { JxFace } from "@/components/jxbot/JxBotFeatures";
 import haseebWordmark from "@/assets/haseeb-grey.png.asset.json";
 
-/** Supplied HASEEB wordmark in the owner's grey, sized to the label text. */
+/** Supplied HASEEB wordmark in black, sized to the label text. */
 function HaseebMark({ className = "" }: { className?: string }) {
   return (
     <span className={`inline-flex h-[13px] w-[85px] max-w-full shrink-0 items-center ${className}`}>
-      <img src={haseebWordmark.url} alt="HASEEB" className="h-full w-full object-contain" />
+      <img src={haseebWordmark.url} alt="HASEEB" className="h-full w-full object-contain brightness-0 dark:invert" />
     </span>
   );
 }
