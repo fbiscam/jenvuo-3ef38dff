@@ -72,6 +72,17 @@ function StoryPage() {
         <Banner title={story.banner.title}>{story.banner.text}</Banner>
       </div>
 
+      {story.code && (
+        <section className="mx-auto max-w-[1040px] px-5 py-6 sm:px-8">
+          <div className="overflow-hidden rounded-2xl border border-gc-line bg-gc-surface">
+            <p className="border-b border-gc-line px-5 py-3 font-mono text-[13px] text-gc-ink-muted">{story.code.title}</p>
+            <pre className="overflow-x-auto px-5 py-4 font-mono text-[13px] leading-[1.7] text-gc-ink">
+              <code>{story.code.text}</code>
+            </pre>
+          </div>
+        </section>
+      )}
+
       {/* Key points + numbers */}
       <section className="mx-auto grid max-w-[1040px] items-center gap-10 px-5 py-14 sm:px-8 md:grid-cols-2">
         <div>
@@ -100,6 +111,11 @@ function StoryPage() {
         intro="Keep reading about what's new at Jenvu."
         cards={related.map((r) => ({ title: r.title, href: `/stories/${r.slug}`, cta: "Read the story" }))}
       />
+      <div className="pb-14 text-center">
+        <Link to="/stories" className="inline-flex items-center rounded-full bg-gc-pill px-6 py-3 text-[15px] font-medium text-gc-ink transition hover:brightness-95">
+          All stories
+        </Link>
+      </div>
     </PageShell>
   );
 }

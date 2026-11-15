@@ -6,6 +6,14 @@ import placeFloor from "@/assets/home/place-floor.jpg";
 import placeVault from "@/assets/home/place-vault.jpg";
 import placeLondon from "@/assets/home/place-london.jpg";
 import placeDev from "@/assets/home/place-dev.jpg";
+import realBot from "@/assets/home/real-bot.jpg";
+import devModels from "@/assets/home/dev-models.jpg";
+import tradeGold from "@/assets/home/trade-gold.jpg";
+import devDocs from "@/assets/home/dev-docs.jpg";
+import { PUBLIC_API_MODEL_IDS } from "@/lib/public-api-models";
+import { DAILY_DRAWDOWN_PCT } from "@/lib/mt5-licenses";
+
+const API_BASE = "https://jenvu.com/api/public/v1";
 
 export type Story = {
   slug: string;
@@ -18,9 +26,168 @@ export type Story = {
   steps: { title: string; points: string[] };
   stats: { value: string; label: string }[];
   cta: { label: string; href: string };
+  /** Optional code sample shown under the banner (developer stories). */
+  code?: { title: string; text: string };
 };
 
 export const STORIES: Story[] = [
+  {
+    slug: "jx-bot-on-metatrader-5",
+    img: realBot,
+    tag: "METATRADER 5",
+    title: "How JX Bot runs on MetaTrader 5 with Jenvu",
+    intro:
+      "A look inside the workflow: how the bot checks your licence, which sessions it trades, and the limits that stop it for the day.",
+    feature: {
+      title: "Your MT5, your account, Jenvu's rules",
+      text: [
+        "JX Bot is an Expert Advisor that runs inside your own MetaTrader 5 on the EURUSD M15 chart. There is no licence key: you register the IP of the PC or RDP that runs MT5 in your dashboard and type the same IP into the bot.",
+        "Each time the bot starts and while it runs, it asks Jenvu whether that IP belongs to an account with JX Bot access. Once a minute it reports its balance and status, which you can follow live on the Bot Usage page.",
+      ],
+      caption: "JX Bot attached to the EURUSD M15 chart in MetaTrader 5",
+    },
+    banner: {
+      title: "Limits, not promises",
+      text: "Trading carries risk and losses can happen. The daily target and the drawdown limit are points where the bot stops, not results it guarantees. The bot manages its trades as one group and closes them together; it does not place a separate stop loss on every trade.",
+    },
+    steps: {
+      title: "What happens behind the scenes",
+      points: [
+        "One IP works for one MT5 account, and the same IP can't be used by two Jenvu accounts.",
+        "The bot trades the Asia and London sessions and opens no new trades in the New York session (from 12:00 UTC).",
+        "Lot size is 0.05 per $1,000 of balance.",
+        "Each account stops for the day when it reaches your plan's daily target, counted from that account's own profit.",
+        `A ${DAILY_DRAWDOWN_PCT}% drawdown limit follows the day's highest closed balance, so the limit moves up as closed profit grows.`,
+      ],
+    },
+    stats: [
+      { value: "M15", label: "EUR/USD chart" },
+      { value: "0.05", label: "Lot per $1,000 of balance" },
+      { value: `${DAILY_DRAWDOWN_PCT}%`, label: "Daily drawdown limit from the day's peak" },
+    ],
+    cta: { label: "See JX Bot", href: "https://jenvu.com/jx-bot" },
+  },
+  {
+    slug: "one-api-many-models",
+    img: devModels,
+    tag: "AI MODELS",
+    title: "One Jenvu API key for Claude, GPT, Gemini, Grok, DeepSeek and more",
+    intro:
+      "Switch between model families by changing one word in your request. Same key, same endpoint, same bill.",
+    feature: {
+      title: "Change the model, keep the code",
+      text: [
+        "The Jenvu API speaks the same format as the OpenAI SDK, so the tools you already use work by pointing them at Jenvu's address.",
+        "Every model is picked with the model field. Try a reasoning model for market analysis, a coding model for your scripts, and a fast model for quick answers, without opening separate accounts.",
+      ],
+      caption: "Every model available through the Jenvu API, listed on the Models page",
+    },
+    banner: {
+      title: "The model you ask for is the model you get",
+      text: "Each model name maps to exactly one model. The Models page only lists models the API really serves, and every call shows up on your Usage page.",
+    },
+    steps: {
+      title: "How to switch models",
+      points: [
+        "Create an API key in your dashboard.",
+        "Pick a model from the Models page and copy its name.",
+        "Put that name in the model field of your request.",
+        "Track tokens and spending for each call on the Usage page.",
+      ],
+    },
+    stats: [
+      { value: String(PUBLIC_API_MODEL_IDS.length), label: "Models behind one API key" },
+      { value: "$3", label: "Per million tokens" },
+      { value: "1", label: "Endpoint for every model" },
+    ],
+    cta: { label: "Browse the models", href: "https://jenvu.com/models" },
+  },
+  {
+    slug: "news-impact-on-gold",
+    img: tradeGold,
+    tag: "NEWS TRADING",
+    title: "See how Gold reacted to the last 24 CPI, NFP and FOMC releases",
+    intro:
+      "The News page shows the next big US release, counts down to it, and tells you what Gold usually did when the number beat or missed.",
+    feature: {
+      title: "History before the headline",
+      text: [
+        "For each event Jenvu keeps the last 24 releases with their actual, forecast and previous numbers, then measures how price moved 5, 15 and 60 minutes later.",
+        "From that history it shows two simple cards before the release: what Gold usually did after a beat and after a miss, with how often that happened. After the release, one card shows what actually happened.",
+      ],
+      caption: "The next release, its countdown and the beat and miss cards",
+    },
+    banner: {
+      title: "Past reactions, not a forecast",
+      text: "Gold reactions are measured on PAXG from Binance, a token backed by physical gold, used as a stand-in for spot Gold. Past moves don't guarantee the next one, and with fewer than five releases no direction is shown.",
+    },
+    steps: {
+      title: "Events covered",
+      points: [
+        "Non-Farm Payrolls (NFP).",
+        "Consumer prices (CPI) and producer prices (PPI).",
+        "FOMC rate decisions.",
+        "Core PCE inflation and GDP.",
+        "A red banner appears in the last hour before a release.",
+      ],
+    },
+    stats: [
+      { value: "24", label: "Past releases per event" },
+      { value: "6", label: "High-impact US events" },
+      { value: "1 hr", label: "Warning before each release" },
+    ],
+    cta: { label: "Open the News page", href: "https://dash.jenvu.com/news" },
+  },
+  {
+    slug: "gold-analysis-in-python",
+    img: devDocs,
+    tag: "PYTHON",
+    title: "Build a Gold market assistant in Python with a few lines of code",
+    intro:
+      "Use the official OpenAI Python package, point it at Jenvu, and ask any model about Gold from your own scripts.",
+    feature: {
+      title: "From API key to first answer",
+      text: [
+        "Install the openai package, save your Jenvu API key in an environment variable, and set the base URL to Jenvu. That's the whole setup.",
+        "From there you can stream long answers, run the same question through several models, or plug the replies into your own alerts and dashboards.",
+      ],
+      caption: "A first Python call to the Jenvu API",
+    },
+    banner: {
+      title: "Keep your key private",
+      text: "Read the key from an environment variable and never paste it into public code. You can delete a key at any time from the API keys page.",
+    },
+    steps: {
+      title: "Steps",
+      points: [
+        "Run pip install openai.",
+        "Create a key on the API keys page and save it as JENVU_API_KEY.",
+        "Set base_url to the Jenvu API address in the example above.",
+        "Choose a model name from the Models page.",
+        "Add stream=True when you want the answer to arrive word by word.",
+      ],
+    },
+    stats: [
+      { value: "11", label: "Lines for a first call" },
+      { value: "1", label: "Package to install" },
+      { value: "$3", label: "Per million tokens" },
+    ],
+    code: {
+      title: "gold_assistant.py",
+      text: `import os
+from openai import OpenAI
+client = OpenAI(
+    base_url="${API_BASE}",
+    api_key=os.getenv("JENVU_API_KEY")
+)
+chat = client.chat.completions.create(
+    model="gpt-5.5",
+    messages=[{"role": "user", "content": "Explain gold liquidity"}]
+)
+print(chat.choices[0].message.content)`,
+    },
+    cta: { label: "Read the API docs", href: "https://jenvu.com/docs" },
+  },
   {
     slug: "fresh-sweep-detection",
     img: cardTopStory,

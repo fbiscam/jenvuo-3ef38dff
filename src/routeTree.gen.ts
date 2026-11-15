@@ -68,6 +68,7 @@ import { Route as OpsX9k27m4nScanAuditRouteImport } from './routes/ops-x9k2-7m4n
 import { Route as OpsX9k27m4nSubscribersRouteImport } from './routes/ops-x9k2-7m4n.subscribers'
 import { Route as OpsX9k27m4nTuningRouteImport } from './routes/ops-x9k2-7m4n.tuning'
 import { Route as OpsX9k27m4nTvMismatchRouteImport } from './routes/ops-x9k2-7m4n.tv-mismatch'
+import { Route as StoriesIndexRouteImport } from './routes/stories.index'
 import { Route as StoriesSlugRouteImport } from './routes/stories.$slug'
 import { Route as StrategiesIctGoldTradingRouteImport } from './routes/strategies.ict-gold-trading'
 import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
@@ -429,6 +430,11 @@ const OpsX9k27m4nTvMismatchRoute = OpsX9k27m4nTvMismatchRouteImport.update({
   id: '/tv-mismatch',
   path: '/tv-mismatch',
   getParentRoute: () => OpsX9k27m4nRoute,
+} as any)
+const StoriesIndexRoute = StoriesIndexRouteImport.update({
+  id: '/stories/',
+  path: '/stories/',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const StoriesSlugRoute = StoriesSlugRouteImport.update({
   id: '/stories/$slug',
@@ -871,6 +877,7 @@ export interface FileRoutesByFullPath {
   '/insights/': typeof InsightsIndexRoute
   '/jenvu-ops-x9k2/': typeof JenvuOpsX9k2IndexRoute
   '/ops-x9k2-7m4n/': typeof OpsX9k27m4nIndexRoute
+  '/stories/': typeof StoriesIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
   '/dashboard/api': typeof AuthenticatedDashboardApiRoute
@@ -992,6 +999,7 @@ export interface FileRoutesByTo {
   '/insights': typeof InsightsIndexRoute
   '/jenvu-ops-x9k2': typeof JenvuOpsX9k2IndexRoute
   '/ops-x9k2-7m4n': typeof OpsX9k27m4nIndexRoute
+  '/stories': typeof StoriesIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
   '/dashboard/api': typeof AuthenticatedDashboardApiRoute
@@ -1119,6 +1127,7 @@ export interface FileRoutesById {
   '/insights/': typeof InsightsIndexRoute
   '/jenvu-ops-x9k2/': typeof JenvuOpsX9k2IndexRoute
   '/ops-x9k2-7m4n/': typeof OpsX9k27m4nIndexRoute
+  '/stories/': typeof StoriesIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/_authenticated/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
   '/_authenticated/dashboard/api': typeof AuthenticatedDashboardApiRoute
@@ -1246,6 +1255,7 @@ export interface FileRouteTypes {
     | '/insights/'
     | '/jenvu-ops-x9k2/'
     | '/ops-x9k2-7m4n/'
+    | '/stories/'
     | '/.lovable/oauth/consent'
     | '/dashboard/analytics'
     | '/dashboard/api'
@@ -1367,6 +1377,7 @@ export interface FileRouteTypes {
     | '/insights'
     | '/jenvu-ops-x9k2'
     | '/ops-x9k2-7m4n'
+    | '/stories'
     | '/.lovable/oauth/consent'
     | '/dashboard/analytics'
     | '/dashboard/api'
@@ -1493,6 +1504,7 @@ export interface FileRouteTypes {
     | '/insights/'
     | '/jenvu-ops-x9k2/'
     | '/ops-x9k2-7m4n/'
+    | '/stories/'
     | '/.lovable/oauth/consent'
     | '/_authenticated/dashboard/analytics'
     | '/_authenticated/dashboard/api'
@@ -1598,6 +1610,7 @@ export interface RootRouteChildren {
   StoriesSlugRoute: typeof StoriesSlugRoute
   StrategiesIctGoldTradingRoute: typeof StrategiesIctGoldTradingRoute
   HelpIndexRoute: typeof HelpIndexRoute
+  StoriesIndexRoute: typeof StoriesIndexRoute
   DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
   ApiPublicGoldRoute: typeof ApiPublicGoldRoute
   HelpCollectionSlugRoute: typeof HelpCollectionSlugRoute
@@ -2039,6 +2052,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/ops-x9k2-7m4n/tv-mismatch'
       preLoaderRoute: typeof OpsX9k27m4nTvMismatchRouteImport
       parentRoute: typeof OpsX9k27m4nRoute
+    }
+    '/stories/': {
+      id: '/stories/'
+      path: '/stories'
+      fullPath: '/stories/'
+      preLoaderRoute: typeof StoriesIndexRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/stories/$slug': {
       id: '/stories/$slug'
@@ -2722,6 +2742,7 @@ const rootRouteChildren: RootRouteChildren = {
   StoriesSlugRoute: StoriesSlugRoute,
   StrategiesIctGoldTradingRoute: StrategiesIctGoldTradingRoute,
   HelpIndexRoute: HelpIndexRoute,
+  StoriesIndexRoute: StoriesIndexRoute,
   DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
   ApiPublicGoldRoute: ApiPublicGoldRoute,
   HelpCollectionSlugRoute: HelpCollectionSlugRoute,
