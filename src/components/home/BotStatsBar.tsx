@@ -1,9 +1,9 @@
 import type React from "react";
 import { DAILY_DRAWDOWN_PCT } from "@/lib/mt5-licenses";
 import { JxFace } from "@/components/jxbot/JxBotFeatures";
-import haseebWordmark from "@/assets/haseeb-wordmark.png.asset.json";
+import haseebWordmark from "@/assets/haseeb-clean.png.asset.json";
 
-/** Original supplied HASEEB wordmark, with its light background and grey lettering. */
+/** Supplied charcoal HASEEB wordmark, cropped to remove the blue edge. */
 function HaseebMark({ className = "" }: { className?: string }) {
   return (
     <span className={`inline-flex h-7 w-[180px] max-w-full shrink-0 items-center bg-gc-on-blue ${className}`}>
@@ -53,8 +53,8 @@ export function BotStatsBar() {
       <div className="mx-auto grid max-w-7xl grid-cols-1 border-y border-gc-line py-2 sm:grid-cols-3 sm:py-10">
         {items.map((it, i) => (
           <div key={it.key} className={`py-7 sm:py-1 ${i > 0 ? "border-t border-gc-line sm:border-l sm:border-t-0 sm:pl-9" : ""}`}>
-            <div className="font-['Roboto_Mono',monospace] text-[40px] font-medium leading-none tracking-normal text-gc-ink tabular-nums sm:text-[48px] sm:leading-[48px]">{it.value}</div>
-            <div className="mt-6 text-[13px] text-gc-ink-muted">{it.label}</div>
+            <div className="font-sans text-[40px] font-medium leading-none tracking-normal text-gc-ink tabular-nums sm:text-[48px] sm:leading-[48px]">{it.value}</div>
+            <div className="mt-6 font-sans text-[13px] text-gc-ink-muted">{it.label}</div>
           </div>
         ))}
       </div>
