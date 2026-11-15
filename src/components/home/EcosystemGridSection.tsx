@@ -77,7 +77,7 @@ export function EcosystemGridSection() {
     <section className="px-5 py-20">
       <div className="mx-auto max-w-7xl">
         <h2 className="max-w-2xl text-3xl font-medium leading-tight tracking-tight text-foreground sm:text-[40px]">
-          Join the traders and developers building on top of the Forax market.
+          Join the traders and developers building on top of the forex market.
         </h2>
         <Link
           to="/stories"
