@@ -2630,3 +2630,12 @@ html[data-ops-z] .ops-zoom {
 .ops-nav-item { color: var(--muted-foreground); }
 .ops-nav-item:hover { background-color: var(--ops-card); color: var(--foreground); }
 .ops-nav-item[data-active="true"] { background-color: var(--ops-card); color: var(--foreground); font-weight: 500; }
+
+/* Homepage bento grid (JenvuBentoSection) */
+.bento-card { border: 1px solid var(--gc-line); background: var(--gc-surface); border-radius: 1.5rem; padding: 1.5rem; transition: transform 0.4s cubic-bezier(.2,.7,.2,1), box-shadow 0.4s ease; }
+@media (min-width: 640px) { .bento-card { padding: 1.75rem; } }
+@media (hover: hover) { .bento-card:hover { transform: translateY(-3px); box-shadow: 0 26px 60px -34px oklch(0 0 0 / 0.35); } }
+@keyframes bento-draw-kf { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+.bento-draw { stroke-dasharray: 1; animation: bento-draw-kf 2.4s ease-out both; }
+.bento-fade { animation: agent-fade-in 0.45s ease both; }
+@media (prefers-reduced-motion: reduce) { .bento-card, .bento-draw, .bento-fade { transition: none; animation: none; } }
