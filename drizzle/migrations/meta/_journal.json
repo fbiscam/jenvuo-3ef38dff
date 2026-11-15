@@ -316,6 +316,13 @@
       "when": 1794675058133,
       "tag": "0044_create_news_releases",
       "breakpoints": true
+    },
+    {
+      "idx": 45,
+      "version": "7",
+      "when": 1794733634481,
+      "tag": "0045_public_home_stats",
+      "breakpoints": true
     }
   ]
 }

@@ -4056,6 +4056,7 @@ export type Database = {
       }
       process_founding_bot_milestones: { Args: never; Returns: number }
       process_founding_renewals: { Args: never; Returns: number }
+      public_home_stats: { Args: never; Returns: Json }
       release_founding_credit: { Args: { _user_id: string }; Returns: boolean }
       renew_founding_plan: {
         Args: { _plan_id: string; _user_id: string }
