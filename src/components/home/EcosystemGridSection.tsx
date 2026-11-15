@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
-import { SiBinance, SiPython, SiTradingview } from "react-icons/si";
+import { SiBinance, SiTradingview } from "react-icons/si";
+import pythonLogo from "@/assets/platform-logos/python.svg";
 import metaTraderLogo from "@/assets/metatrader-logo.png.asset.json";
 import openAiLogo from "@/assets/model-logos/openai.svg";
 import claudeLogo from "@/assets/model-logos/claude-color.svg";
@@ -18,7 +19,9 @@ import metaLogo from "@/assets/model-logos/meta-color.svg";
  */
 type Tile = {
   name: string;
-  icon?: React.ComponentType<{ className?: string }>;
+  icon?: React.ComponentType<{ className?: string; style?: React.CSSProperties }>;
+  /** Official brand color for icon-font logos (omit for black/white brands). */
+  color?: string;
   logo?: string;
   /** Mono black logos need inverting on the dark theme. */
   mono?: boolean;
@@ -30,11 +33,11 @@ const TILES: Tile[] = [
   { name: "TradingView", icon: SiTradingview },
   { name: "OpenAI", logo: openAiLogo, mono: true, to: "/models" },
   { name: "Claude", logo: claudeLogo },
-  { name: "Binance", icon: SiBinance },
+  { name: "Binance", icon: SiBinance, color: "#F0B90B" },
   { name: "Gemini", logo: geminiLogo, to: "/models" },
   { name: "Grok", logo: grokLogo, mono: true, to: "/models" },
   { name: "DeepSeek", logo: deepseekLogo },
-  { name: "Python", icon: SiPython, to: "/docs" },
+  { name: "Python", logo: pythonLogo, to: "/docs" },
   { name: "Mistral", logo: mistralLogo },
   { name: "Qwen", logo: qwenLogo, to: "/models" },
   { name: "Meta Llama", logo: metaLogo },
@@ -51,7 +54,7 @@ function TileBody({ t }: { t: Tile }) {
       )}
       <span className="flex items-center gap-2 text-foreground">
         {t.icon ? (
-          <t.icon className="h-6 w-6" />
+          <t.icon className="h-6 w-6" style={t.color ? { color: t.color } : undefined} />
         ) : (
           <img
             src={t.logo}
@@ -60,7 +63,7 @@ function TileBody({ t }: { t: Tile }) {
             height={24}
             loading="lazy"
             decoding="async"
-            className={`h-6 w-6 object-contain grayscale ${t.mono ? "dark:invert" : ""}`}
+            className={`h-6 w-6 object-contain ${t.mono ? "dark:invert" : ""}`}
           />
         )}
         <span className="whitespace-nowrap text-[17px] font-semibold tracking-tight">{t.name}</span>
@@ -78,7 +81,7 @@ export function EcosystemGridSection() {
         </h2>
         <Link
           to="/insights"
-          className="mt-8 inline-flex items-center gap-2 rounded-md bg-muted px-4 py-2.5 text-sm text-foreground transition-colors hover:bg-accent"
+          className="mt-8 inline-flex items-center gap-1.5 rounded-full bg-foreground px-6 py-3 text-[15px] font-medium text-background transition hover:opacity-85"
         >
           Read our stories <ArrowRight className="h-4 w-4" aria-hidden />
         </Link>
