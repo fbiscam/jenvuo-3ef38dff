@@ -112,8 +112,8 @@ function StoryPage() {
         cards={related.map((r) => ({ title: r.title, href: `/stories/${r.slug}`, cta: "Read the story" }))}
       />
       <div className="pb-14 text-center">
-        <Link to="/stories" className="inline-flex items-center rounded-full bg-gc-pill px-6 py-3 text-[15px] font-medium text-gc-ink transition hover:brightness-95">
-          All stories
+        <Link to="/platform" className="inline-flex items-center rounded-full bg-gc-pill px-6 py-3 text-[15px] font-medium text-gc-ink transition hover:brightness-95">
+          Explore the API Platform
         </Link>
       </div>
     </PageShell>

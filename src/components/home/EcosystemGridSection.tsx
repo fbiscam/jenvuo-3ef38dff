@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, ArrowUpRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { SiBinance, SiTradingview } from "react-icons/si";
 import pythonLogo from "@/assets/platform-logos/python.svg";
 import metaTraderLogo from "@/assets/metatrader5-logo.png.asset.json";
@@ -46,12 +46,6 @@ const TILES: Tile[] = [
 function TileBody({ t }: { t: Tile }) {
   return (
     <>
-      {t.to && (
-        <ArrowRight
-          className="absolute right-5 top-5 h-4 w-4 text-muted-foreground transition-transform group-hover:-rotate-45"
-          aria-hidden
-        />
-      )}
       <span className="flex items-center gap-2 text-foreground">
         {t.icon ? (
           <t.icon className="h-6 w-6" style={t.color ? { color: t.color } : undefined} />
@@ -80,10 +74,10 @@ export function EcosystemGridSection() {
           Join the traders and developers building on top of the forex market.
         </h2>
         <Link
-          to="/stories"
+          to="/platform"
           className="mt-8 inline-flex items-center gap-1.5 rounded-full bg-gc-pill px-6 py-3 text-[15px] font-medium text-foreground transition hover:brightness-95"
         >
-          Read our stories <ArrowRight className="h-4 w-4" aria-hidden />
+          Start building with the API <ArrowRight className="h-4 w-4" aria-hidden />
         </Link>
 
         <div className="mt-14 grid grid-cols-2 border-l border-t border-border sm:grid-cols-3 lg:grid-cols-6">
