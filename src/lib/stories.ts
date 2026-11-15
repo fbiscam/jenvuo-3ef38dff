@@ -11,7 +11,15 @@ import devModels from "@/assets/home/dev-models.jpg";
 import tradeGold from "@/assets/home/trade-gold.jpg";
 import devDocs from "@/assets/home/dev-docs.jpg";
 import { PUBLIC_API_MODEL_IDS } from "@/lib/public-api-models";
-import { DAILY_DRAWDOWN_PCT } from "@/lib/mt5-licenses";
+import { DAILY_DRAWDOWN_PCT, DAILY_TARGET_PCT, MT5_PLANS } from "@/lib/mt5-licenses";
+import { MIN_SAMPLES, NEWS_EVENTS, RELEASES_PER_EVENT } from "@/lib/news-impact";
+import { FOUNDING_APPLICATIONS_OPEN } from "@/lib/founding-seats";
+
+const TARGETS = Object.values(DAILY_TARGET_PCT);
+const TARGET_RANGE = `${Math.min(...TARGETS)}–${Math.max(...TARGETS)}%`;
+const IP_COUNTS = Object.values(MT5_PLANS).map((p) => p.licenses);
+const IP_RANGE = `${Math.min(...IP_COUNTS)}–${Math.max(...IP_COUNTS)}`;
+const TARGET_LIST = `Pro ${DAILY_TARGET_PCT.pro}%, Elite ${DAILY_TARGET_PCT.elite}%, Ultra ${DAILY_TARGET_PCT.ultra}%`;
 
 const API_BASE = "https://jenvu.com/api/public/v1";
 
@@ -56,7 +64,7 @@ export const STORIES: Story[] = [
         "One IP works for one MT5 account, and the same IP can't be used by two Jenvu accounts.",
         "The bot trades the Asia and London sessions and opens no new trades in the New York session (from 12:00 UTC).",
         "Lot size is 0.05 per $1,000 of balance.",
-        "Each account stops for the day when it reaches your plan's daily target, counted from that account's own profit.",
+        `Each account stops for the day at its plan's daily target (${TARGET_LIST} of the day-start balance), counted from that account's own profit.`,
         `A ${DAILY_DRAWDOWN_PCT}% drawdown limit follows the day's highest closed balance, so the limit moves up as closed profit grows.`,
       ],
     },
@@ -106,20 +114,20 @@ export const STORIES: Story[] = [
     slug: "news-impact-on-gold",
     img: tradeGold,
     tag: "NEWS TRADING",
-    title: "See how Gold reacted to the last 24 CPI, NFP and FOMC releases",
+    title: `See how Gold reacted to the last ${RELEASES_PER_EVENT} CPI, NFP and FOMC releases`,
     intro:
       "The News page shows the next big US release, counts down to it, and tells you what Gold usually did when the number beat or missed.",
     feature: {
       title: "History before the headline",
       text: [
-        "For each event Jenvu keeps the last 24 releases with their actual, forecast and previous numbers, then measures how price moved 5, 15 and 60 minutes later.",
+        `For each event Jenvu keeps the last ${RELEASES_PER_EVENT} releases with their actual, forecast and previous numbers, then measures how price moved 5, 15 and 60 minutes later.`,
         "From that history it shows two simple cards before the release: what Gold usually did after a beat and after a miss, with how often that happened. After the release, one card shows what actually happened.",
       ],
       caption: "The next release, its countdown and the beat and miss cards",
     },
     banner: {
       title: "Past reactions, not a forecast",
-      text: "Gold reactions are measured on PAXG from Binance, a token backed by physical gold, used as a stand-in for spot Gold. Past moves don't guarantee the next one, and with fewer than five releases no direction is shown.",
+      text: `Gold reactions are measured on PAXG from Binance, a token backed by physical gold, used as a stand-in for spot Gold. Past moves don't guarantee the next one, and with fewer than ${MIN_SAMPLES} measured releases no direction is shown.`,
     },
     steps: {
       title: "Events covered",
@@ -132,8 +140,8 @@ export const STORIES: Story[] = [
       ],
     },
     stats: [
-      { value: "24", label: "Past releases per event" },
-      { value: "6", label: "High-impact US events" },
+      { value: String(RELEASES_PER_EVENT), label: "Past releases per event" },
+      { value: String(NEWS_EVENTS.length), label: "High-impact US events" },
       { value: "1 hr", label: "Warning before each release" },
     ],
     cta: { label: "Open the News page", href: "https://dash.jenvu.com/news" },
@@ -334,30 +342,30 @@ print(chat.choices[0].message.content)`,
     tag: "JX BOT FOR MT5",
     title: "Let JX Bot trade EUR/USD for you on MetaTrader 5",
     intro:
-      "JX Bot is Jenvu's Expert Advisor for EUR/USD on MT5. It runs on your own account and stops at the targets your plan sets.",
+      "JX Bot is Jenvu's Expert Advisor for EUR/USD on MT5. It runs on your own account and stops for the day at the target your plan sets.",
     feature: {
       title: "Automated EUR/USD trading with clear limits",
       text: [
         "Download the bot from your dashboard, add the IP of the PC or RDP that runs MT5 and attach it to the EURUSD M15 chart.",
-        "The bot checks with Jenvu that it runs from your IP, pauses for the day at your daily target and stops at your monthly target.",
+        `The bot checks with Jenvu that it runs from your IP, pauses for the day at your plan's daily target: ${TARGET_LIST} of each account's day-start balance.`,
       ],
       caption: "JX Bot running on the EURUSD M15 chart in MetaTrader 5",
     },
     banner: {
       title: "Targets are limits, not promises",
-      text: "Trading carries risk. The daily and monthly targets are where the bot stops, not results it guarantees. Start with a small lot size.",
+      text: `Trading carries risk. The daily target and the ${DAILY_DRAWDOWN_PCT}% daily drawdown limit are where the bot stops, not results it guarantees.`,
     },
     steps: {
       title: "How to start",
       points: [
-        "Choose Pro, Elite or Ultra on the pricing page.",
+        "JX Bot is part of Pro, Elite and Ultra for verified Founding members.",
         "Open JX Bot in your dashboard and download the bot.",
         "Add your PC or RDP IP, type it into the bot and follow the install steps.",
       ],
     },
     stats: [
-      { value: "1–5", label: "IPs per plan" },
-      { value: "$150", label: "Daily target on Ultra" },
+      { value: IP_RANGE, label: "IPs per plan" },
+      { value: TARGET_RANGE, label: "Daily target by plan" },
       { value: "M15", label: "EUR/USD chart" },
     ],
     cta: { label: "See plans", href: "https://jenvu.com/pricing" },
@@ -366,9 +374,11 @@ print(chat.choices[0].message.content)`,
     slug: "founding-program",
     img: placeVault,
     tag: "FOUNDING PROGRAM",
-    title: "Apply to the invite-only Founding Program today",
+    title: FOUNDING_APPLICATIONS_OPEN ? "Apply to the invite-only Founding Program today" : "Inside the invite-only Founding Program",
     intro:
-      "Founding members get early access to the Terminal and help shape what we build next.",
+      FOUNDING_APPLICATIONS_OPEN
+      ? "Founding members get early access to the Terminal and help shape what we build next."
+      : "Founding members get early access to the Terminal and help shape what we build next. New applications are paused for now.",
     feature: {
       title: "Early access for serious Gold, Bitcoin and EUR/USD traders",
       text: [
@@ -382,7 +392,7 @@ print(chat.choices[0].message.content)`,
       text: "Every application is reviewed by hand. We'll email you once a decision has been made.",
     },
     steps: {
-      title: "How to apply",
+      title: FOUNDING_APPLICATIONS_OPEN ? "How to apply" : "How it works when applications are open",
       points: [
         "Fill in the short application form.",
         "Tell us how you trade Gold, Bitcoin and EUR/USD today.",
@@ -395,7 +405,9 @@ print(chat.choices[0].message.content)`,
       { value: "1", label: "Short application form" },
       { value: "Now", label: "Plan starts on approval" },
     ],
-    cta: { label: "Apply now", href: "https://jenvu.com/founding" },
+    cta: FOUNDING_APPLICATIONS_OPEN
+      ? { label: "Apply now", href: "https://jenvu.com/founding" }
+      : { label: "See the Founding Program", href: "https://jenvu.com/founding" },
   },
   {
     slug: "london-new-york-sessions",
