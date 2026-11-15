@@ -1,5 +1,7 @@
 # Roadmap
 
+- [x] Homepage stats: label-sized grey HASEEB mark and Gotham-style headings
+
 - [x] Align customer-facing JX Bot daily targets with the enforced plan percentages
 
 - [x] Stop Billing plan-action label flicker on entry

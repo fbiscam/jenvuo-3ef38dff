@@ -76,6 +76,7 @@
   --font-sans: "Google Sans Flex", "Google Sans", "Product Sans", "Poppins", system-ui, sans-serif;
   --font-mono: "Google Sans Flex", "Google Sans", "Product Sans", system-ui, sans-serif;
   --font-code: "JetBrains Mono", ui-monospace, monospace;
+  --font-stat-heading: "Montserrat", "Google Sans Flex", system-ui, sans-serif;
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
