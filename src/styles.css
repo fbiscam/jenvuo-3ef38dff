@@ -2631,3 +2631,8 @@ html[data-ops-z] .ops-zoom {
 .ops-nav-item { color: var(--muted-foreground); }
 .ops-nav-item:hover { background-color: var(--ops-card); color: var(--foreground); }
 .ops-nav-item[data-active="true"] { background-color: var(--ops-card); color: var(--foreground); font-weight: 500; }
+
+/* Homepage: every heading uses Sora (owner choice). */
+.home-sora-headings :is(h1, h2, h3, h4) {
+  font-family: "Sora", "Google Sans Flex", system-ui, sans-serif;
+}
