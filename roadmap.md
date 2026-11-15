@@ -1,5 +1,7 @@
 # Roadmap
 
+- [x] Apply Geist Sans to the homepage stats headings and inspect the reported utils error
+
 - [x] Homepage stats: label-sized grey HASEEB mark and Gotham-style headings
 
 - [x] Align customer-facing JX Bot daily targets with the enforced plan percentages
