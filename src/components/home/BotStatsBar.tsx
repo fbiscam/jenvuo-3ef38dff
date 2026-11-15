@@ -46,7 +46,7 @@ export function BotStatsBar() {
       label: (
         <span className="inline-flex items-start gap-3">
           <JxBotLogo />
-          <span>JX Bot: automated EUR/USD M15 basket execution on MT5, stops for the day at a {DAILY_DRAWDOWN_PCT}% trailing drawdown</span>
+          <span>JX Bot: automated EUR/USD Strategies</span>
         </span>
       ),
     },
