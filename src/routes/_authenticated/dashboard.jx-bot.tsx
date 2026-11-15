@@ -281,7 +281,7 @@ function JxBotPage() {
           <table className="w-full min-w-[720px] text-left text-[14px]">
             <thead>
               <tr className="text-[13px] text-muted-foreground">
-                <th className="py-3 pr-4 font-normal">IP address</th>
+                <th className="py-3 pr-4 font-normal">  IP address</th>
                 <th className="py-3 pr-4 font-normal">MT5 account</th>
                 <th className="py-3 pr-4 font-normal">Created</th>
                 <th className="py-3 pr-4 font-normal">Last check</th>
