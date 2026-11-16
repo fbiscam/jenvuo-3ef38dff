@@ -103,9 +103,9 @@
 - [x] Credit top-ups removed everywhere (Pricing, Payments, server); plans only
 - [ ] Page speed pass (not started)
 
-- [ ] API requests/min per plan (Free 10, Pro 20, Elite 40, Ultra 80) shown as numbers in the pricing table
-- [ ] Daily token limits Free 1M, Pro 4M, Elite 10M, Ultra 20M everywhere
-- [ ] JX Bot IPs: Free 1, Pro 2, Elite 3, Ultra 5
-- [ ] Replace "Plans can be bought after your ID is verified" line
-- [ ] Sign-in: one-time email code option
-- [ ] Two-step: authenticator and/or email code (email code confirmed before it turns on); removal blocked for 24h after a suspicious login
+- [x] API requests/min per plan (Free 10, Pro 20, Elite 40, Ultra 80) shown as numbers in the pricing table
+- [x] Daily token limits Free 1M, Pro 4M, Elite 10M, Ultra 20M everywhere
+- [x] JX Bot IPs: Free 1, Pro 2, Elite 3, Ultra 5
+- [x] Replace "Plans can be bought after your ID is verified" line
+- [x] Sign-in: one-time email code option
+- [x] Two-step: authenticator and/or email code (email code confirmed before it turns on); removal blocked for 24h after a suspicious login

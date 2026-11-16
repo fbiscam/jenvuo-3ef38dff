@@ -63,8 +63,8 @@ export const DOC_GROUPS: DocGroup[] = [
         keywords: "founding program apply id verification trial credit pro elite 30 days api credit seats",
         body: (
           <>
-            <p>The Free plan gives every account $10 API credit every month, 1 API key and 2 hours a day of the Terminal's paid indicators. Free API keys can send up to 30 requests per minute. JX Bot is not part of Free.</p>
-            <p>Approved Founding Program members get Pro or Elite for 30 days, counted from the day their ID is verified, with JX Bot and the plan's API credit ($25 Pro, $50 Elite). Plans can be bought after your ID is verified.</p>
+            <p>The Free plan gives every account $10 API credit every month, 1 API key and 2 hours a day of the Terminal's paid indicators. API keys can send up to 10 requests per minute on Free, 20 on Pro, 40 on Elite and 80 on Ultra. Daily token limits are Free 1M, Pro 4M, Elite 10M and Ultra 20M. Free includes JX Bot on 1 IP with a $5 daily target.</p>
+            <p>Approved Founding Program members get Pro or Elite for 30 days, counted from the day their ID is verified, with JX Bot and the plan's API credit ($25 Pro, $50 Elite). Every plan is open to everyone: pick, upgrade or renew it anytime from Payments in your dashboard.</p>
           </>
         ),
       },
@@ -290,7 +290,7 @@ export const DOC_GROUPS: DocGroup[] = [
           <>
             <p>
               JX Bot is Jenvu's Expert Advisor for <strong>EUR/USD on MetaTrader 5</strong> (M15 chart). It comes with every paid plan:
-              Pro 1 IP, Elite 2, Ultra 5. There is no license key: you add the IP of the PC or RDP that runs MT5, and one IP works with one MT5 account.
+              Free 1 IP, Pro 2, Elite 3, Ultra 5. There is no license key: you add the IP of the PC or RDP that runs MT5, and one IP works with one MT5 account.
             </p>
             <ul>
               <li>Download it from Dashboard → JX Bot and follow the install steps there.</li>

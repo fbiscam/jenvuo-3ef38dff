@@ -354,7 +354,7 @@ export const collections: Collection[] = [
         body: [
           { type: "p", content: "The JX Bot is Jenvu's EUR/USD Expert Advisor for MetaTrader 5. It is included in every plan, Free too: the plan decides how many IPs you get and the daily profit target. Daily profit targets are maximum safety caps — profit is not guaranteed. Open Dashboard → JX Bot to download it. How the bot decides its trades is proprietary and not published." },
           { type: "h2", content: "Plans" },
-          { type: "ul", items: [`Free: $5 daily profit target, ${DAILY_DRAWDOWN_PCT}% drawdown guard, 1 IP (one PC or RDP).`, `Pro: ${DAILY_TARGET_PCT.pro}% daily target, 1 IP.`, `Elite: ${DAILY_TARGET_PCT.elite}% daily target, 2 IPs.`, `Ultra: ${DAILY_TARGET_PCT.ultra}% daily target, 5 IPs.`, "On paid plans the daily target is the plan percentage of the day's starting balance (Free: a fixed $5), per IP: each MT5 account has its own target, and when one reaches it that bot closes its trades and starts again the next day.", "See profit, balance, equity and trades for each account at Dashboard → Usage → Bot Usage."] },
+          { type: "ul", items: [`Free: $5 daily profit target, ${DAILY_DRAWDOWN_PCT}% drawdown guard, 1 IP (one PC or RDP).`, `Pro: ${DAILY_TARGET_PCT.pro}% daily target, 2 IPs.`, `Elite: ${DAILY_TARGET_PCT.elite}% daily target, 3 IPs.`, `Ultra: ${DAILY_TARGET_PCT.ultra}% daily target, 5 IPs.`, "On paid plans the daily target is the plan percentage of the day's starting balance (Free: a fixed $5), per IP: each MT5 account has its own target, and when one reaches it that bot closes its trades and starts again the next day.", "See profit, balance, equity and trades for each account at Dashboard → Usage → Bot Usage."] },
           { type: "h2", content: "Trading hours and safety" },
           { type: "ul", items: ["New trades Monday to Thursday 01:00–14:00 and Friday until 13:00 (broker server time). No trading on Saturday and Sunday.", "The bot trades only the Asia and London sessions. No new trades during the London open (06:15–09:00 UTC), and the New York session is off (no new trades after 12:00 UTC). Open trades are still managed, and a trade already in profit at 06:15 UTC is protected at break-even.", `Daily stop (fixed, can't be changed): $5 profit (Free), ${DAILY_TARGET_PCT.pro}% (Pro), ${DAILY_TARGET_PCT.elite}% (Elite) or ${DAILY_TARGET_PCT.ultra}% (Ultra) of the day's starting balance. Fixed ${DAILY_DRAWDOWN_PCT}% daily drawdown guard (counted from the day's highest closed balance, so profit already closed today is protected).`, "Before each entry the bot checks the H1 trend, the spread (max 2 pips), a confirming candle and skips spike candles, so some days have fewer trades.", "After an update, download again, attach the bot again and load the Jenvu EURUSD 15M preset in Inputs."] },
           { type: "h2", content: "Setup" },
@@ -402,10 +402,10 @@ export const collections: Collection[] = [
 
           { type: "h2", content: "Daily token limits" },
           { type: "ul", items: [
-            "Free — 100,000 tokens per day.",
-            "Pro — 1,500,000 tokens per day.",
-            "Elite — 5,000,000 tokens per day.",
-            "Ultra — 10,000,000 tokens per day.",
+            "Free — 1,000,000 tokens per day.",
+            "Pro — 4,000,000 tokens per day.",
+            "Elite — 10,000,000 tokens per day.",
+            "Ultra — 20,000,000 tokens per day.",
             "Rate: $3 per 1M tokens. Resets daily at 00:00 UTC.",
             "The amount available today is the lower of your plan ceiling and your balance-based quota.",
           ]},
@@ -422,7 +422,7 @@ export const collections: Collection[] = [
 
           { type: "h2", content: "Free" },
           { type: "ul", items: [
-            "100,000 tokens per day.",
+            "1,000,000 tokens per day.",
             "$2 wallet per month (~5 scans).",
             "AI terminal chat with starter wallet access.",
             "Full signal engine — A+ / A institutional signals.",
@@ -433,7 +433,7 @@ export const collections: Collection[] = [
 
           { type: "h2", content: "Pro — $29 / month" },
           { type: "ul", items: [
-            "1,500,000 tokens per day.",
+            "4,000,000 tokens per day.",
             "$25 API credit per month.",
             "AI terminal chat billed from the included wallet.",
             "Personal API keys for the Jenvu API endpoint.",
@@ -490,7 +490,7 @@ export const collections: Collection[] = [
           ]},
           { type: "h2", content: "Daily token usage" },
           { type: "ul", items: [
-            "Every request consumes tokens from a shared daily allowance capped by your plan (Free 100K, Pro 1.5M, Elite 5M, Ultra 10M).",
+            "Every request consumes tokens from a shared daily allowance capped by your plan (Free 1M, Pro 4M, Elite 10M, Ultra 20M).",
             "Your current wallet balance sets the available amount at $3 per 1,000,000 tokens, up to the plan ceiling.",
             "For example, a $3 balance provides one complete 1M-token block; below $3, the allowance scales down proportionally, so $1 provides about 333K tokens.",
             "New plan credit updates the available limit automatically, while spending that reduces your balance can also reduce it.",
@@ -508,7 +508,7 @@ export const collections: Collection[] = [
         summary: "Charts and tools are included with Terminal access; only AI replies use credits.",
         updatedAt: "2026-10-21",
         body: [
-          { type: "p", content: "The Terminal is open to every signed-in account. Its paid indicators run for a set time each UTC day by plan (Free 2 hours, Pro 8, Elite 16, Ultra all day) and lock until 00:00 UTC once the time is used; approved Founding Program members (100 seats a month) get their plan's hours. Founding members have 2 days after approval to upload their ID; the Terminal and JX Bot open once it is verified, and the Jenvu team then adds the plan's API credit ($25 Pro, $50 Elite). The Founding month lasts 30 days from the day the ID is verified: after that the Terminal, JX Bot and Founding credit close until you buy a plan and your payment is approved. Credit never unlocks the Terminal, and plans can be picked only after your ID is verified (credit top-ups work before). Until then you can open every dashboard page, but actions like API keys and Chat stay locked. Apply at jenvu.com/founding." },
+          { type: "p", content: "The Terminal is open to every signed-in account. Its paid indicators run for a set time each UTC day by plan (Free 2 hours, Pro 8, Elite 16, Ultra all day) and lock until 00:00 UTC once the time is used; approved Founding Program members (100 seats a month) get their plan's hours. Founding members have 2 days after approval to upload their ID; the Terminal and JX Bot open once it is verified, and the Jenvu team then adds the plan's API credit ($25 Pro, $50 Elite). The Founding month lasts 30 days from the day the ID is verified: after that the Terminal, JX Bot and Founding credit close until you buy a plan and your payment is approved. Credit never unlocks the Terminal. Plans are open to everyone and can be picked or upgraded anytime from Payments (credit top-ups are no longer sold). Until then you can open every dashboard page, but actions like API keys and Chat stay locked. Apply at jenvu.com/founding." },
           { type: "p", content: "With Terminal access you can use the chart as much as you like. Only AI features use credits, because each AI reply has a real processing cost. Every charge is checked and deducted on Jenvu's servers before an answer is returned, so it cannot be skipped from the browser." },
           { type: "h2", content: "Included with Terminal access (no credits)" },
           { type: "ul", items: [
@@ -528,7 +528,7 @@ export const collections: Collection[] = [
           { type: "ul", items: [
             "AI replies are charged only for the tokens actually used: $3 per 1,000,000 tokens. There is no fixed fee per question, and failed requests are free.",
             "Your balance and the rate are shown under the Terminal chat box.",
-            "Daily AI allowance by plan: Free 100K, Pro 1.5M, Elite 5M, Ultra 10M tokens. It resets at 00:00 UTC and is also limited by your balance ($3 = 1M tokens).",
+            "Daily AI allowance by plan: Free 1M, Pro 4M, Elite 10M, Ultra 20M tokens. It resets at 00:00 UTC and is also limited by your balance ($3 = 1M tokens).",
             "AI chat is included with Pro, Elite and Ultra, including the Founding plan.",
           ]},
           { type: "h2", content: "When credits run out" },
@@ -558,15 +558,15 @@ export const collections: Collection[] = [
 
           { type: "h2", content: "How many keys you get" },
           { type: "ul", items: [
-            "Free — 1 API key (30 requests a minute).",
-            "Pro — 3 API keys.",
-            "Elite — 5 API keys.",
-            "Ultra — 7 API keys.",
+            "Free — 1 API key, 10 requests a minute.",
+            "Pro — 3 API keys, 20 requests a minute.",
+            "Elite — 5 API keys, 40 requests a minute.",
+            "Ultra — 7 API keys, 80 requests a minute.",
           ]},
 
           { type: "h2", content: "Quota and limits" },
           { type: "ul", items: [
-            "All keys on your account share one daily token allowance capped by the plan (Free 100K, Pro 1.5M, Elite 5M, Ultra 10M).",
+            "All keys on your account share one daily token allowance capped by the plan (Free 1M, Pro 4M, Elite 10M, Ultra 20M).",
             "The available limit is calculated from the current wallet at $3 per 1,000,000 tokens, without exceeding the plan ceiling.",
             "A $3 balance provides one complete 1M-token block. If the balance falls below $3, the quota scales proportionally; $1 provides about 333K tokens.",
             "Plan credit, promo-code credit and usage automatically update this number across the dashboard and Usage page.",

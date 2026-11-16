@@ -1,4 +1,4 @@
-import { DAILY_TARGET_PCT, DAILY_DRAWDOWN_PCT, FREE_BOT, TARGET_DISCLAIMER } from "@/lib/mt5-licenses";
+import { DAILY_TARGET_PCT, DAILY_DRAWDOWN_PCT, FREE_BOT, MT5_PLANS, TARGET_DISCLAIMER } from "@/lib/mt5-licenses";
 import { showBuyBlocked } from "@/components/BuyNowButton";
 import SiteHeader from "@/components/SiteHeader";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
@@ -13,7 +13,7 @@ import { getFoundingMembership } from "@/lib/mt5-licenses.functions";
 import { purchaseGate, type PurchaseGate } from "@/lib/founding-bot";
 import { PLAN_API_CREDIT, TERMINAL_API_PRICE, planPrice } from "@/lib/plan-pricing";
 import { PLAN_DAILY_TOKEN_LIMITS } from "@/lib/plan-entitlements";
-import { TRIAL_API_RPM } from "@/lib/free-trial";
+import { PLAN_API_RPM } from "@/lib/plan-entitlements";
 import { FREE_PLAN_API_KEYS, FREE_PLAN_CREDIT_USD, PLAN_API_KEYS, TERMINAL_DAILY_HOURS } from "@/lib/free-plan";
 import { MODEL_CATALOG } from "@/lib/model-catalog";
 import { JxBotLogo, PlatformLogo, TerminalLogo } from "@/components/brand/ProductLogos";
@@ -28,7 +28,7 @@ export const FAQ = [
   ["Is this financial advice?", "No. Jenvu is an analysis tool. Every setup is for educational purposes and you remain responsible for your own trades."],
   ["Is there a free plan?", `Yes. Anyone can sign up (one person, one account) and use Jenvu on the Free plan: $${FREE_PLAN_CREDIT_USD} API credit every month, ${FREE_PLAN_API_KEYS} API key, ${TERMINAL_DAILY_HOURS.free} hours a day of the Terminal's paid indicators (Fresh sweep, price action, Zone + FVG) and JX Bot on 1 IP with a $${FREE_BOT.dailyTargetUsd} daily profit target. When the day's Terminal time is used up the indicators lock until 00:00 UTC.`],
   ["What do the plans include?", `Every plan includes the Terminal's paid indicators for a set time each day, the Top AI Models, monthly API credit and JX Bot for MetaTrader 5: Free $0 with $${FREE_PLAN_CREDIT_USD} credit, ${TERMINAL_DAILY_HOURS.free} hours a day and a $${FREE_BOT.dailyTargetUsd} bot target; Pro $${TERMINAL_API_PRICE.pro} a month with $${PLAN_API_CREDIT.pro} credit, ${TERMINAL_DAILY_HOURS.pro} hours and a ${DAILY_TARGET_PCT.pro}% bot target; Elite $${TERMINAL_API_PRICE.elite} with $${PLAN_API_CREDIT.elite} credit, ${TERMINAL_DAILY_HOURS.elite} hours and ${DAILY_TARGET_PCT.elite}%; Ultra $${TERMINAL_API_PRICE.ultra} with $${PLAN_API_CREDIT.ultra} credit, all day and ${DAILY_TARGET_PCT.ultra}%. Plans only: credit top-ups are not sold.`],
-  ["Who gets JX Bot?", `Everyone. JX Bot is part of every plan: Free runs 1 IP and stops for the day at $${FREE_BOT.dailyTargetUsd} profit, Pro ${DAILY_TARGET_PCT.pro}% on 1 IP, Elite ${DAILY_TARGET_PCT.elite}% on 2 IPs and Ultra ${DAILY_TARGET_PCT.ultra}% on 5 IPs. ${TARGET_DISCLAIMER} The Founding Program gives approved, ID-verified members their chosen plan (Pro or Elite) free for 30 days.`],
+  ["Who gets JX Bot?", `Everyone. JX Bot is part of every plan: Free runs 1 IP and stops for the day at $${FREE_BOT.dailyTargetUsd} profit, Pro ${DAILY_TARGET_PCT.pro}% on ${MT5_PLANS.pro.licenses} IPs, Elite ${DAILY_TARGET_PCT.elite}% on ${MT5_PLANS.elite.licenses} IPs and Ultra ${DAILY_TARGET_PCT.ultra}% on ${MT5_PLANS.ultra.licenses} IPs. ${TARGET_DISCLAIMER} The Founding Program gives approved, ID-verified members their chosen plan (Pro or Elite) free for 30 days.`],
   ["When does JX Bot trade?", `New trades open Monday to Thursday between 01:00 and 14:00 broker time and on Friday until 13:00. It trades only the Asia and London sessions: it skips the London open (06:15–09:00 UTC), the whole New York session (no new trades after 12:00 UTC) and weekends. It stops for the day at a fixed daily target of $${FREE_BOT.dailyTargetUsd} (Free), ${DAILY_TARGET_PCT.pro}% (Pro), ${DAILY_TARGET_PCT.elite}% (Elite) or ${DAILY_TARGET_PCT.ultra}% (Ultra) of the day's starting balance, or at the fixed ${DAILY_DRAWDOWN_PCT}% daily drawdown guard (counted from the day's highest closed balance, so profit already closed today is protected).`],
   ["Who can use the Terminal?", `Every signed-in user can open the Terminal. Its paid indicators run for a set time each UTC day by plan: Free ${TERMINAL_DAILY_HOURS.free} hours, Pro ${TERMINAL_DAILY_HOURS.pro}, Elite ${TERMINAL_DAILY_HOURS.elite} and Ultra all day. Time counts only while one of them is switched on and the Terminal is open; when it is used up they lock and disappear until 00:00 UTC.`],
   ["Can I cancel anytime?", "Yes. Plans are month-to-month with no lock-in. You keep access until the end of the period you already paid for."],
@@ -88,7 +88,7 @@ const GROUPS: ReadonlyArray<Group> = [
       { f: "Daily token limit", v: [TOKENS("free"), TOKENS("pro"), TOKENS("elite"), TOKENS("ultra"), "Custom"] },
       { f: "Daily tokens reset at 00:00 UTC", v: ALL },
       { f: "Balance-based quota ($3 = 1M tokens)", v: ALL },
-      { f: "API requests per minute", v: [`${TRIAL_API_RPM}`, "Standard", "Standard", "Standard", "Custom"] },
+      { f: "API requests per minute", v: [`${PLAN_API_RPM.free} RPM`, `${PLAN_API_RPM.pro} RPM`, `${PLAN_API_RPM.elite} RPM`, `${PLAN_API_RPM.ultra} RPM`, "Custom"] },
       { f: "Usage page in the dashboard", v: ALL },
     ],
   },
@@ -128,7 +128,7 @@ const GROUPS: ReadonlyArray<Group> = [
     bot: true,
     rows: [
       { f: "Included in the plan price", v: ALL },
-      { f: "IPs (PC or RDP)", v: [String(FREE_BOT.licenses), "1", "2", "5", "Custom"] },
+      { f: "IPs (PC or RDP)", v: [String(FREE_BOT.licenses), String(MT5_PLANS.pro.licenses), String(MT5_PLANS.elite.licenses), String(MT5_PLANS.ultra.licenses), "Custom"] },
       { f: "Daily profit target per IP (not guaranteed)", v: [`$${FREE_BOT.dailyTargetUsd}`, `${DAILY_TARGET_PCT.pro}%`, `${DAILY_TARGET_PCT.elite}%`, `${DAILY_TARGET_PCT.ultra}%`, "Custom"] },
       { f: `Auto-stop at target or ${DAILY_DRAWDOWN_PCT}% drawdown`, v: ALL },
       { f: "IP sign-in, no license key", v: ALL },
@@ -227,9 +227,9 @@ function PricingPage() {
 
   const plans: Array<{ key: CardKey; name: string; description: string; big: string; bigLabel: string; features: string[]; ips: number }> = [
     { key: "free", name: "Free", description: "Try the Terminal & API", big: `$${FREE_PLAN_CREDIT_USD}`, bigLabel: "API credit every month", ips: 0, features: [`Terminal paid indicators ${TERMINAL_DAILY_HOURS.free}h a day`, "ChatGPT 5.5 Pro and Grok 4.6", `${TOKENS("free")} daily tokens`, `${FREE_PLAN_API_KEYS} API key`] },
-    { key: "pro", name: "Pro", description: "Terminal & AI for everyday trading", big: `$${PLAN_API_CREDIT.pro}`, bigLabel: "API credit every month", ips: 1, features: [`Terminal paid indicators ${TERMINAL_DAILY_HOURS.pro}h a day`, "ChatGPT 5.5 Pro and Grok 4.6", "1.5M daily tokens", `${PLAN_API_KEYS.pro} API keys`] },
-    { key: "elite", name: "Elite", description: "More AI usage with senior review.", big: `$${PLAN_API_CREDIT.elite}`, bigLabel: "API credit & senior review", ips: 2, features: [`Terminal paid indicators ${TERMINAL_DAILY_HOURS.elite}h a day`, "Claude Fable 5.1 senior review", "5M daily tokens", `${PLAN_API_KEYS.elite} API keys, webhooks & logs`] },
-    { key: "ultra", name: "Ultra", description: "Maximum limits & priority support", big: `$${PLAN_API_CREDIT.ultra}`, bigLabel: "API credit & priority desk", ips: 5, features: ["Terminal paid indicators all day", "10M daily tokens", `${PLAN_API_KEYS.ultra} API keys`, "Priority desk support"] },
+    { key: "pro", name: "Pro", description: "Terminal & AI for everyday trading", big: `$${PLAN_API_CREDIT.pro}`, bigLabel: "API credit every month", ips: MT5_PLANS.pro.licenses, features: [`Terminal paid indicators ${TERMINAL_DAILY_HOURS.pro}h a day`, "ChatGPT 5.5 Pro and Grok 4.6", `${TOKENS("pro")} daily tokens`, `${PLAN_API_KEYS.pro} API keys`] },
+    { key: "elite", name: "Elite", description: "More AI usage with senior review.", big: `$${PLAN_API_CREDIT.elite}`, bigLabel: "API credit & senior review", ips: MT5_PLANS.elite.licenses, features: [`Terminal paid indicators ${TERMINAL_DAILY_HOURS.elite}h a day`, "Claude Fable 5.1 senior review", `${TOKENS("elite")} daily tokens`, `${PLAN_API_KEYS.elite} API keys, webhooks & logs`] },
+    { key: "ultra", name: "Ultra", description: "Maximum limits & priority support", big: `$${PLAN_API_CREDIT.ultra}`, bigLabel: "API credit & priority desk", ips: MT5_PLANS.ultra.licenses, features: ["Terminal paid indicators all day", `${TOKENS("ultra")} daily tokens`, `${PLAN_API_KEYS.ultra} API keys`, "Priority desk support"] },
   ];
 
   const bigBase = "flex h-10 w-full items-center justify-center rounded-full text-[15px] font-medium transition";

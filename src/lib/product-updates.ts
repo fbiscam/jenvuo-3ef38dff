@@ -20,6 +20,13 @@ export type ProductUpdate = {
 
 export const PRODUCT_UPDATES: ProductUpdate[] = [
   {
+    title: "Higher limits and two-step sign-in",
+    copy: "Daily tokens: Free 1M, Pro 4M, Elite 10M, Ultra 20M. API: 10/20/40/80 requests a minute. JX Bot: Pro 2, Elite 3, Ultra 5 IPs. Sign in with a one-time email code, and turn on email codes or an authenticator app.",
+    at: "2026-11-16T07:30:00Z",
+    tag: "Updated",
+    icon: "shield",
+  },
+  {
     title: "Stronger institutional analysis engine",
     copy: "Extension scans now verify inducement, repeated support/resistance and D1-to-M5 BOS/CHoCH.",
     at: "2026-09-19T06:53:00Z",

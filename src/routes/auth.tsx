@@ -1361,8 +1361,7 @@ function AuthPage() {
                 <p className="text-center text-[13px] leading-snug text-muted-foreground">
                   Free plan: $10 API credit every month and 2 hours a day of the paid Terminal indicators.
                   <br />
-                  Want JX Bot?{" "}
-                  <Link to="/founding" className="font-medium text-foreground underline underline-offset-2">Apply for the Founding Program</Link>
+                  JX Bot included on 1 IP with a $5 daily target.
                 </p>
                 {turnstileSiteKey && <TurnstileWidget siteKey={turnstileSiteKey} onToken={setTurnstileToken} resetKey={turnstileReset} />}
                 {errorBox}

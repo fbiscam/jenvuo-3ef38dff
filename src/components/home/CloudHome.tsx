@@ -571,7 +571,7 @@ const USE_CASES: Array<{ key: string; title: string; body: string; points: strin
     key: "jx-bot",
     title: "JX Bot",
     body: "Jenvu's Expert Advisor trades EUR/USD on MetaTrader 5 and stops at the daily and monthly targets of your plan.",
-    points: ["1, 2 or 5 IPs, no license key", "Daily auto-stop at target", "One-click download and setup guide"],
+    points: ["1 to 5 IPs by plan, no license key", "Daily auto-stop at target", "One-click download and setup guide"],
     Icon: Bot,
     tone: "green",
   },

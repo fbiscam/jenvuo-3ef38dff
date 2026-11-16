@@ -13,9 +13,9 @@ describe("mt5 licenses", () => {
     expect(dailyTarget("elite")).toBe(75);
     expect(dailyTarget("ultra")).toBe(150);
   });
-  it("license limits per plan", () => {
-    expect(licenseLimit("pro")).toBe(1);
-    expect(licenseLimit("elite")).toBe(2);
+  it("license limits per plan: Free 1, Pro 2, Elite 3, Ultra 5 IPs", () => {
+    expect(licenseLimit("pro")).toBe(2);
+    expect(licenseLimit("elite")).toBe(3);
     expect(licenseLimit("ultra")).toBe(5);
     expect(licenseLimit("free")).toBe(1);
     expect(licenseLimit("none")).toBe(0);
@@ -24,8 +24,8 @@ describe("mt5 licenses", () => {
     const legacy = [{ mt5_account: "12345678", revoked_at: null }];
     expect(countIpLicenses(legacy)).toBe(0);
     expect(countIpLicenses(legacy) < licenseLimit("pro")).toBe(true);
-    const migrated = [{ ...legacy[0], mt5_account: IP }];
-    expect(countIpLicenses(migrated)).toBe(1);
+    const migrated = [{ ...legacy[0], mt5_account: IP }, { mt5_account: "198.51.100.7", revoked_at: null }];
+    expect(countIpLicenses(migrated)).toBe(2);
     expect(countIpLicenses(migrated) < licenseLimit("pro")).toBe(false);
   });
   it("counts IP-only and account-bound IPs, but not revoked or empty rows", () => {
