@@ -1,5 +1,7 @@
 # Roadmap
 
+- [x] Rebuild Why Jenvu with floating animated windows, reference spacing, detailed previews and review cards; desktop/mobile screenshots, FAQ expansion, no overflow/runtime errors and reduced motion verified. Build OK; utils numeric-input check returns a string (reported line 8 does not exist). Reviews remain labelled samples; earlier email OTP/cron verification limits remain unchanged.
+
 - [x] Sweep signup/email ownership across email/social entry points, Settings email change, confirmation, Founding invitation, help/docs/pricing/AI/search and live Free-plan functions; remove remaining one-person copy. Pricing/Help rendered; Docs source checked (browser navigation aborted). Cron schedule internals unavailable; function definitions checked. Existing records/settings unchanged.
 
 - [x] Remove signup device/IP/subnet/VPN account caps while preserving email ownership and verification
